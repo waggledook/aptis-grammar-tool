@@ -14,6 +14,7 @@ export default function GapFillItem({ item, onAnswer }) {
   const [reportReason, setReportReason]   = useState('')
   const [otherText, setOtherText]         = useState('')
   const [isFav, setIsFav]                 = useState(false)
+  const [sendingReport, setSendingReport] = useState(false)
 
   // Pre-split for rendering
   const [before, after] = sentence.split('___')
@@ -61,30 +62,36 @@ const toggleFav = async () => {
   // 4) Send a report
   //
   // 4) Send a report
-const handleSendReport = async () => {
-  if (!reportReason) return
-  try {
-    await sendReport({
-      itemId: id,
-      question: sentence,
-      issue: reportReason === 'other' ? 'other' : reportReason,
-      comments: otherText.trim(),
-      // extra metadata helps the email/report
-      level,
-      selectedOption: sel != null ? options[sel] : null,
-      correctOption: options[answerIndex],
-    })
-
-    // optional: nicer UX than alert (you already import toast)
-    // toast('Thanks! Your report has been sent.')
-    setShowReport(false)
-    setReportReason('')
-    setOtherText('')
-  } catch (err) {
-    console.error('Report error:', err)
-    // toast('Failed to send report. Please try again later.')
-  }
-}
+  const handleSendReport = async () => {
+    if (!reportReason || sendingReport) return;
+    setSendingReport(true);
+    try {
+      await sendReport({
+        itemId: id,
+        question: sentence,
+        issue: reportReason === 'other' ? 'other' : reportReason,
+        comments: otherText.trim(),
+        level,
+        selectedOption: sel != null ? options[sel] : null,
+        correctOption: options[answerIndex],
+      });
+  
+      toast(
+        auth.currentUser?.email
+          ? `Thanks — we emailed a copy to ${auth.currentUser.email}.`
+          : 'Thanks — your report was sent.'
+      );
+  
+      setShowReport(false);
+      setReportReason('');
+      setOtherText('');
+    } catch (err) {
+      console.error('Report error:', err);
+      toast('Sorry — failed to send. Please try again.');
+    } finally {
+      setSendingReport(false);
+    }
+  };
 
   return (
     <div className="card gapfill-card">
@@ -201,13 +208,13 @@ const handleSendReport = async () => {
     </div>
 
     <div className="report-actions">
-      <button
-        className="review-btn"
-        onClick={handleSendReport}
-        disabled={!reportReason}
-      >
-        Send report
-      </button>
+    <button
+  className="review-btn"
+  onClick={handleSendReport}
+  disabled={!reportReason || sendingReport}
+>
+  {sendingReport ? 'Sending…' : 'Send report'}
+</button>
       <button className="review-btn" onClick={() => setShowReport(false)}>
         Cancel
       </button>
