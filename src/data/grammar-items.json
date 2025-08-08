@@ -1,0 +1,512 @@
+    [
+    {
+      "id": "b1_cond_01",
+      "level": "B1",
+      "tag": "Conditionals",
+      "sentence": "If she ___ earlier, she wouldn't have missed the bus.",
+      "options": ["left", "had left", "leaves"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'left' is simple past, but the third conditional requires past perfect.",
+        "Correct: 'had left' fits the third conditional structure for past regrets.",
+        "Incorrect: 'leaves' is present tense and not appropriate in this past hypothetical."
+      ]
+    },
+    {
+      "id": "b1_art_01",
+      "level": "B1",
+      "tag": "Articles",
+      "sentence": "I saw ___ elephant at the zoo.",
+      "options": ["a", "an", "the"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'a' is wrong because 'elephant' starts with a vowel sound.",
+        "Correct: 'an' is used before words starting with a vowel sound.",
+        "Incorrect: 'the' is too specific for a first mention."
+      ]
+    },
+    {
+      "id": "b2_relcl_01",
+      "level": "B2",
+      "tag": "Relative Clauses",
+      "sentence": "The person ___ called you is waiting outside.",
+      "options": ["who", "which", "whose"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'who' refers to people and fits the subject role here.",
+        "Incorrect: 'which' refers to things, not people.",
+        "Incorrect: 'whose' is used to show possession, not as a subject."
+      ]
+    },
+    {
+      "id": "b2_pass_01",
+      "level": "B2",
+      "tag": "Passive Voice",
+      "sentence": "The report ___ by the time we arrived.",
+      "options": ["was finished", "has finished", "finishes"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'was finished' is past simple passive, fitting the context.",
+        "Incorrect: 'has finished' is active and not passive.",
+        "Incorrect: 'finishes' is present simple, which doesn't fit the past timeline."
+      ]
+    },
+    {
+      "id": "b2_verbpat_01",
+      "level": "B2",
+      "tag": "Verb Patterns",
+      "sentence": "She enjoys ___ in the mountains.",
+      "options": ["to hike", "hiking", "hike"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'to hike' doesn't follow the correct verb pattern after 'enjoys'.",
+        "Correct: 'hiking' is a gerund, which is used after verbs like 'enjoy'.",
+        "Incorrect: 'hike' is a bare infinitive, which is not used here."
+      ]
+    },
+    {
+      "id": "c1_invert_01",
+      "level": "C1",
+      "tag": "Inversion",
+      "sentence": "Not only ___ the match, but they also broke a record.",
+      "options": ["they won", "did they win", "they had won"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'they won' doesn't follow the inversion required after 'not only'.",
+        "Correct: 'did they win' shows subject-auxiliary inversion, which is needed here.",
+        "Incorrect: 'they had won' is grammatically fine but lacks the necessary inversion."
+      ]
+    },
+    {
+      "id": "c1_modals_01",
+      "level": "C1",
+      "tag": "Modals (Past)",
+      "sentence": "He ___ told her the truth. She was furious.",
+      "options": ["must have", "should have", "can't have"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'must have' suggests certainty, but we’re talking about a mistake.",
+        "Correct: 'should have' expresses a past obligation or recommendation not followed.",
+        "Incorrect: 'can't have' implies disbelief, which doesn’t match the context."
+      ]
+    },
+    {
+      "id": "b1_tense_01",
+      "level": "B1",
+      "tag": "Verb Tenses",
+      "sentence": "I ___ to the cinema when I saw her.",
+      "options": ["go", "was going", "have gone"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'go' is present and doesn’t match the past context.",
+        "Correct: 'was going' sets up a past continuous action interrupted by another event.",
+        "Incorrect: 'have gone' is present perfect, which doesn't fit this timeline."
+      ]
+    },
+    {
+      "id": "b2_prep_01",
+      "level": "B2",
+      "tag": "Dependent Prepositions",
+      "sentence": "She’s very good ___ dealing with pressure.",
+      "options": ["at", "on", "with"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'good at' is the correct collocation.",
+        "Incorrect: 'good on' is not a standard expression here.",
+        "Incorrect: 'good with' is sometimes possible, but not with 'dealing with pressure'."
+      ]
+    },
+    {
+      "id": "c1_subj_01",
+      "level": "C1",
+      "tag": "Subjunctive",
+      "sentence": "It’s essential that she ___ on time.",
+      "options": ["be", "is", "was"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'be' is the base form used in formal subjunctive constructions.",
+        "Incorrect: 'is' sounds normal but doesn't reflect the subjunctive mood.",
+        "Incorrect: 'was' is past tense, and not appropriate here."
+      ]
+    },
+    {
+      "id": "b1_comp_01",
+      "level": "B1",
+      "tag": "Comparatives",
+      "sentence": "My phone is ___ than yours.",
+      "options": ["expensiver", "more expensive", "most expensive"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'expensiver' is not a valid comparative form.",
+        "Correct: 'more expensive' is the correct comparative for long adjectives.",
+        "Incorrect: 'most expensive' is a superlative, not a comparative."
+      ]
+    },
+    {
+      "id": "b2_reported_01",
+      "level": "B2",
+      "tag": "Reported Speech",
+      "sentence": "She said she ___ coming to the party.",
+      "options": ["is", "was", "has been"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'is' doesn’t match the backshifting in reported speech.",
+        "Correct: 'was' is the correct backshifted form of 'is coming'.",
+        "Incorrect: 'has been' changes the meaning and tense unnecessarily."
+      ]
+    },
+    {
+      "id": "c1_discourse_01",
+      "level": "C1",
+      "tag": "Discourse Markers",
+      "sentence": "She studied hard; ___, she passed the exam easily.",
+      "options": ["however", "nevertheless", "as a result"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'however' contrasts two ideas, but this is a cause-effect relationship.",
+        "Incorrect: 'nevertheless' signals contrast, not consequence.",
+        "Correct: 'as a result' shows cause and effect appropriately."
+      ]
+    },
+    {
+      "id": "b2_gerinf_01",
+      "level": "B2",
+      "tag": "Gerunds and Infinitives",
+      "sentence": "He promised ___ me as soon as he arrived.",
+      "options": ["call", "to call", "calling"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'call' is a bare infinitive, not used after 'promised'.",
+        "Correct: 'to call' is the proper infinitive form after 'promised'.",
+        "Incorrect: 'calling' is a gerund, which doesn’t follow 'promised'."
+      ]
+    },
+    {
+      "id": "c1_advclauses_01",
+      "level": "C1",
+      "tag": "Adverbial Clauses",
+      "sentence": "___ he had all the qualifications, they rejected his application.",
+      "options": ["Even though", "Because", "Unless"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'Even though' introduces contrast, which fits this context.",
+        "Incorrect: 'Because' would imply his qualifications were the reason for rejection.",
+        "Incorrect: 'Unless' introduces a condition, which doesn’t match the sentence logic."
+      ]
+    },
+    {
+      "id": "b2_futureforms_01",
+      "level": "B2",
+      "tag": "Future Forms",
+      "sentence": "We ___ to visit them next weekend.",
+      "options": ["are going", "go", "will going"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'are going' is the correct 'be going to' future structure.",
+        "Incorrect: 'go' is present simple, not suitable for planned future.",
+        "Incorrect: 'will going' is ungrammatical; 'will' is followed by base verb."
+      ]
+    },
+    {
+      "id": "c1_cleft_01",
+      "level": "C1",
+      "tag": "Cleft Sentences",
+      "sentence": "What I need right now ___ a break.",
+      "options": ["is", "are", "was"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'is' agrees with the singular subject 'what I need'.",
+        "Incorrect: 'are' is plural and doesn’t match the subject.",
+        "Incorrect: 'was' is past tense and the sentence is in present."
+      ]
+    },
+    {
+      "id": "b1_past_01",
+      "level": "B1",
+      "tag": "Past Tenses",
+      "sentence": "We ___ to Italy last summer.",
+      "options": ["go", "went", "gone"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'go' is present tense and doesn’t fit the past time marker.",
+        "Correct: 'went' is the past form of 'go' and fits the sentence.",
+        "Incorrect: 'gone' is a past participle, not used without an auxiliary."
+      ]
+    },
+    {
+      "id": "b2_wishes_01",
+      "level": "B2",
+      "tag": "Wishes",
+      "sentence": "I wish I ___ more confident during the interview.",
+      "options": ["was", "am", "had been"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'was' is for present wishes; this refers to a past regret.",
+        "Incorrect: 'am' is present and doesn't express a hypothetical.",
+        "Correct: 'had been' is the past perfect form needed for past regrets."
+      ]
+    },
+    {
+      "id": "c1_participles_01",
+      "level": "C1",
+      "tag": "Participles",
+      "sentence": "___ the documents, she quickly left the office.",
+      "options": ["To sign", "Signed", "Signing"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'To sign' doesn’t show completed action or simultaneous action.",
+        "Incorrect: 'Signed' sounds like a passive reduced relative clause, not a simultaneous action.",
+        "Correct: 'Signing' implies simultaneous action while leaving."
+      ]
+    },
+    {
+      "id": "b1_prep2_01",
+      "level": "B1",
+      "tag": "Prepositions",
+      "sentence": "He was afraid ___ flying.",
+      "options": ["of", "for", "about"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'afraid of' is the correct fixed prepositional phrase.",
+        "Incorrect: 'afraid for' suggests concern about someone else, not fear of something.",
+        "Incorrect: 'afraid about' is not a standard collocation."
+      ]
+    },
+    {
+      "id": "b2_negmodals_01",
+      "level": "B2",
+      "tag": "Modals (Negative)",
+      "sentence": "You ___ smoke here — it's a non-smoking area.",
+      "options": ["mustn't", "don't have to", "can't"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'mustn't' expresses prohibition — it's not allowed.",
+        "Incorrect: 'don't have to' means it's not necessary, but still permitted.",
+        "Incorrect: 'can't' may work in informal contexts, but 'mustn't' is clearer for rules."
+      ]
+    },
+    {
+      "id": "c1_advmod_01",
+      "level": "C1",
+      "tag": "Adverb Modification",
+      "sentence": "He drives ___ fast for such narrow roads.",
+      "options": ["too", "very", "enough"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'too fast' expresses excess beyond what is acceptable or safe.",
+        "Incorrect: 'very fast' simply describes speed, not excess.",
+        "Incorrect: 'enough fast' is grammatically incorrect; 'enough' comes after adjectives."
+      ]
+    },
+    {
+      "id": "b2_infclauses_01",
+      "level": "B2",
+      "tag": "gerunds and infinitives",
+      "sentence": "She was the first person ___ the new software.",
+      "options": ["trying", "to try", "tried"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'trying' doesn’t fit after 'the first person'.",
+        "Correct: 'to try' is the correct infinitive structure after ordinal expressions.",
+        "Incorrect: 'tried' is past simple, which is not grammatically correct here."
+      ]
+    },
+    {
+      "id": "c1_pseudo_01",
+      "level": "C1",
+      "tag": "Cleft Sentences",
+      "sentence": "What I like most about her ___ her honesty.",
+      "options": ["are", "was", "is"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'are' doesn't agree with singular subject 'honesty'.",
+        "Incorrect: 'was' shifts to past tense unnecessarily.",
+        "Correct: 'is' matches the singular subject and present tense."
+      ]
+    },
+    {
+      "id": "b1_quants_01",
+      "level": "B1",
+      "tag": "Quantifiers",
+      "sentence": "There aren't ___ apples left in the basket.",
+      "options": ["some", "any", "much"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'some' is typically used in affirmative statements.",
+        "Correct: 'any' is used in negative contexts like this one.",
+        "Incorrect: 'much' is used with uncountable nouns, not 'apples'."
+      ]
+    },
+    {
+      "id": "c1_partperf_01",
+      "level": "C1",
+      "tag": "Perfect Participles",
+      "sentence": "___ finished her work, she left the office early.",
+      "options": ["Having", "Have", "Being"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'Having finished' is a perfect participle, showing one action completed before another.",
+        "Incorrect: 'Have finished' is ungrammatical in this structure.",
+        "Incorrect: 'Being finished' is passive and doesn’t make sense here."
+      ]
+    },
+    {
+      "id": "b2_expressions_01",
+      "level": "B2",
+      "tag": "Fixed Expressions",
+      "sentence": "They arrived at the airport just ___ time to catch the flight.",
+      "options": ["in", "on", "at"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'in time' means early enough for something.",
+        "Incorrect: 'on time' means exactly at the scheduled time, but doesn't work with 'to catch'.",
+        "Incorrect: 'at time' is not a standard expression."
+      ]
+    },
+    {
+      "id": "b1_wordorder_01",
+      "level": "B1",
+      "tag": "Word Order",
+      "sentence": "She  ___ her homework in the library.",
+      "options": ["frequent does", "does often", "often does"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'frequently' could be correct here",
+        "Incorrect: 'does often' is awkward and unnatural in this position.",
+        "Correct: 'often does' is the correct word order (adverb before main verb)."
+      ]
+    },
+    [
+  {
+    "id": "A2_modal_01",
+    "level": "A2",
+    "tag": "Modal verbs",
+    "sentence": "You ________ leave early today if you finish your work.",
+    "options": ["must", "can", "should"],
+    "answerIndex": 1,
+    "explanations": [
+      "'must' = obligation, not permission.",
+      "Correct: 'can' expresses permission.",
+      "'should' = advice."
+    ]
+  },
+  {
+    "id": "B1_modal_02",
+    "level": "B1",
+    "tag": "Modal verbs",
+    "sentence": "I ________ speak French quite well, but I'm still learning.",
+    "options": ["be able to", "can", "could"],
+    "answerIndex": 1,
+    "explanations": [
+      "Needs 'am/is/are able to' for present.",
+      "Correct: present ability = 'can'.",
+      "'could' = past/general ability or conditional."
+    ]
+  },
+  {
+    "id": "B2_modal_03",
+    "level": "B2",
+    "tag": "Modal verbs",
+    "sentence": "You ________ smoke in here; it's a no-smoking area.",
+    "options": ["shouldn't", "mustn't", "don't have to"],
+    "answerIndex": 1,
+    "explanations": [
+      "Weak advice only.",
+      "Correct: 'mustn't' = prohibition.",
+      "'don't have to' = lack of necessity."
+    ]
+  },
+  {
+    "id": "B1_modal_04",
+    "level": "B1",
+    "tag": "Modal verbs",
+    "sentence": "You ________ bring any food; there's plenty here.",
+    "options": ["don't have to", "can't", "mustn't"],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: it isn't necessary.",
+      "'can't' = impossibility/prohibition.",
+      "'mustn't' = prohibition."
+    ]
+  },
+  {
+    "id": "B2_modal_05",
+    "level": "B2",
+    "tag": "Modal verbs",
+    "sentence": "The lights are off; they ________ be at home.",
+    "options": ["could", "can't", "must"],
+    "answerIndex": 1,
+    "explanations": [
+      "Weak possibility.",
+      "Correct: strong negative deduction.",
+      "Strong positive deduction."
+    ]
+  },
+  {
+    "id": "C1_modal_06",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "He drove for six hours without stopping — he ________ been exhausted.",
+    "options": ["must have", "should have", "could have"],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: strong deduction about the past.",
+      "Expectation/criticism, not deduction.",
+      "Possibility only."
+    ]
+  },
+  {
+    "id": "C1_modal_07",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "You ________ told me earlier; now it's too late.",
+    "options": ["must have", "should have", "could have"],
+    "answerIndex": 1,
+    "explanations": [
+      "Deduction, wrong meaning here.",
+      "Correct: past advice/criticism.",
+      "Possibility/ability only."
+    ]
+  },
+  {
+    "id": "B1_modal_08",
+    "level": "B1",
+    "tag": "Modal verbs",
+    "sentence": "You ________ see a doctor if the pain gets worse.",
+    "options": ["must", "may", "should"],
+    "answerIndex": 2,
+    "explanations": [
+      "Obligation (stronger than intended).",
+      "Permission/possibility, not advice.",
+      "Correct: advice/recommendation."
+    ]
+  },
+  {
+    "id": "B2_modal_09",
+    "level": "B2",
+    "tag": "Modal verbs",
+    "sentence": "I ________ go to London next week, but I'm not sure yet.",
+    "options": ["might", "should", "must"],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: uncertain future possibility.",
+      "Advice/expectation, not uncertainty.",
+      "Obligation/necessity."
+    ]
+  },
+  {
+    "id": "C1_modal_10",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "You're late — your presentation ________ start at nine.",
+    "options": ["should have", "was supposed to", "must have"],
+    "answerIndex": 1,
+    "explanations": [
+      "Criticism/expectation not met (past perfect), not a schedule label.",
+      "Correct: scheduled/expected obligation in the past.",
+      "Deduction about the past."
+    ]
+  }
+]
+
+]

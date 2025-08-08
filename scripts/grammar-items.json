@@ -1,0 +1,2710 @@
+    [
+    {
+      "id": "b1_cond_01",
+      "level": "B1",
+      "tag": "Conditionals",
+      "sentence": "If she ___ earlier, she wouldn't have missed the bus.",
+      "options": ["left", "had left", "leaves"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'left' is simple past, but the third conditional requires past perfect.",
+        "Correct: 'had left' fits the third conditional structure for past regrets.",
+        "Incorrect: 'leaves' is present tense and not appropriate in this past hypothetical."
+      ]
+    },
+    {
+      "id": "b1_art_01",
+      "level": "B1",
+      "tag": "Articles",
+      "sentence": "I saw ___ elephant at the zoo.",
+      "options": ["a", "the", "an"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'a' is wrong because 'elephant' starts with a vowel sound.",
+        "Incorrect: 'the' is too specific for a first mention.",
+        "Correct: 'an' is used before words starting with a vowel sound."
+      ]
+    },
+    {
+      "id": "b2_relcl_01",
+      "level": "B2",
+      "tag": "Relative Clauses",
+      "sentence": "The person ___ called you is waiting outside.",
+      "options": ["who", "which", "whose"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'who' refers to people and fits the subject role here.",
+        "Incorrect: 'which' refers to things, not people.",
+        "Incorrect: 'whose' is used to show possession, not as a subject."
+      ]
+    },
+    {
+      "id": "b2_pass_01",
+      "level": "B2",
+      "tag": "Passive Voice",
+      "sentence": "The report ___ by the time we arrived.",
+      "options": ["has finished", "finishes", "was finished"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'has finished' is active and not passive.",
+        "Incorrect: 'finishes' is present simple, which doesn't fit the past timeline.",
+        "Correct: 'was finished' is past simple passive, fitting the context."
+      ]
+    },
+    {
+      "id": "b2_verbpat_01",
+      "level": "B1",
+      "tag": "Gerunds and Infinitives",
+      "sentence": "She enjoys ___ in the mountains.",
+      "options": ["to hike", "hiking", "hike"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'to hike' doesn't follow the correct verb pattern after 'enjoys'.",
+        "Correct: 'hiking' is a gerund, which is used after verbs like 'enjoy'.",
+        "Incorrect: 'hike' is a bare infinitive, which is not used here."
+      ]
+    },
+    {
+      "id": "c1_invert_01",
+      "level": "C1",
+      "tag": "Inversion",
+      "sentence": "Not only ___ the match, but they also broke a record.",
+      "options": ["they won", "did they win", "they had won"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'they won' doesn't follow the inversion required after 'not only'.",
+        "Correct: 'did they win' shows subject-auxiliary inversion, which is needed here.",
+        "Incorrect: 'they had won' is grammatically fine but lacks the necessary inversion."
+      ]
+    },
+    {
+      "id": "c1_modals_01",
+      "level": "C1",
+      "tag": "Modal verbs",
+      "sentence": "He ___ told her the truth. She was furious whhe she found out he was lying.",
+      "options": ["must have", "can't have", "should have"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'must have' suggests certainty, but we’re talking about a mistake.",
+        "Incorrect: 'can't have' implies disbelief, which doesn’t match the context.",
+        "Correct: 'should have' means it was a good idea, be he didn't do it."
+      ]
+    },
+    {
+      "id": "b1_tense_01",
+      "level": "B1",
+      "tag": "Narrative Tenses",
+      "sentence": "I ___ to the cinema when I saw her.",
+      "options": ["go", "was going", "have gone"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'go' is present and doesn’t match the past context.",
+        "Correct: 'was going' sets up a past continuous action interrupted by another event.",
+        "Incorrect: 'have gone' is present perfect, which doesn't fit this timeline."
+      ]
+    },
+    {
+      "id": "b2_prep_01",
+      "level": "B2",
+      "tag": "Prepositions",
+      "sentence": "She’s very good ___ dealing with pressure.",
+      "options": ["at", "on", "with"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'good at' is the correct collocation.",
+        "Incorrect: 'good on' is not a standard expression here.",
+        "Incorrect: 'good with' is sometimes possible, but not with 'dealing with pressure'."
+      ]
+    },
+    {
+      "id": "c1_subj_01",
+      "level": "C1",
+      "tag": "Subjunctive",
+      "sentence": "It’s essential that she ___ on time.",
+      "options": ["was", "is", "be"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'was' is past tense, and not appropriate here.",
+        "Incorrect: 'is' sounds normal but doesn't reflect the subjunctive mood.",
+        "Correct: 'be' is the base form used in formal subjunctive constructions."
+      ]
+    },
+    {
+      "id": "b1_comp_01",
+      "level": "B1",
+      "tag": "Comparatives and Superlatives",
+      "sentence": "My phone is ___ than yours.",
+      "options": ["expensiver", "more expensive", "most expensive"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'expensiver' is not a valid comparative form.",
+        "Correct: 'more expensive' is the correct comparative for long adjectives.",
+        "Incorrect: 'most expensive' is a superlative, not a comparative."
+      ]
+    },
+    {
+      "id": "b2_reported_01",
+      "level": "B2",
+      "tag": "Reported Speech",
+      "sentence": "She said she ___ coming to the party.",
+      "options": ["is", "was", "has been"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'is' doesn’t match the backshifting in reported speech.",
+        "Correct: 'was' is the correct backshifted form of 'is coming'.",
+        "Incorrect: 'has been' changes the meaning and tense unnecessarily."
+      ]
+    },
+    {
+      "id": "c1_discourse_01",
+      "level": "C1",
+      "tag": "Discourse Markers",
+      "sentence": "She studied hard; ___, she passed the exam easily.",
+      "options": ["however", "nevertheless", "as a result"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'however' contrasts two ideas, but this is a cause-effect relationship.",
+        "Incorrect: 'nevertheless' signals contrast, not consequence.",
+        "Correct: 'as a result' shows cause and effect appropriately."
+      ]
+    },
+    {
+      "id": "b2_gerinf_01",
+      "level": "B2",
+      "tag": "Gerunds and Infinitives",
+      "sentence": "He promised ___ me as soon as he arrived.",
+      "options": ["call", "to call", "calling"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'call' is a bare infinitive, not used after 'promised'.",
+        "Correct: 'to call' is the proper infinitive form after 'promised'.",
+        "Incorrect: 'calling' is a gerund, which doesn’t follow 'promised'."
+      ]
+    },
+    {
+      "id": "c1_advclauses_01",
+      "level": "C1",
+      "tag": "Adverbial Clauses",
+      "sentence": "___ he had all the qualifications, they rejected his application.",
+      "options": ["Even though", "Because", "Unless"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'Even though' introduces contrast, which fits this context.",
+        "Incorrect: 'Because' would imply his qualifications were the reason for rejection.",
+        "Incorrect: 'Unless' introduces a condition, which doesn’t match the sentence logic."
+      ]
+    },
+    {
+      "id": "b2_futureforms_01",
+      "level": "B1",
+      "tag": "Future Forms",
+      "sentence": "We ___ to visit them next weekend.",
+      "options": ["are going", "go", "will going"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'are going' is the correct 'be going to' future structure.",
+        "Incorrect: 'go' is present simple, not suitable for planned future.",
+        "Incorrect: 'will going' is ungrammatical; 'will' is followed by base verb."
+      ]
+    },
+    {
+      "id": "c1_cleft_01",
+      "level": "C1",
+      "tag": "Cleft Sentences",
+      "sentence": "What I need right now ___ a break.",
+      "options": ["are", "was", "is"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'are' is plural and doesn’t match the subject.",
+        "Incorrect: 'was' is past tense and the sentence is in present.",
+        "Correct: 'is' agrees with the singular subject 'what I need'."
+      ]
+    },
+    {
+      "id": "b1_past_01",
+      "level": "B1",
+      "tag": "Narrative Tenses",
+      "sentence": "We ___ to Italy last summer.",
+      "options": ["go", "went", "gone"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'go' is present tense and doesn’t fit the past time marker.",
+        "Correct: 'went' is the past form of 'go' and fits the sentence.",
+        "Incorrect: 'gone' is a past participle, not used without an auxiliary."
+      ]
+    },
+    {
+      "id": "b2_wishes_01",
+      "level": "B2",
+      "tag": "Wishes",
+      "sentence": "I wish I ___ more confident during the interview.",
+      "options": ["was", "am", "had been"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'was' is for present wishes; this refers to a past regret.",
+        "Incorrect: 'am' is present and doesn't express a hypothetical.",
+        "Correct: 'had been' is the past perfect form needed for past regrets."
+      ]
+    },
+    {
+      "id": "c1_participles_01",
+      "level": "C1",
+      "tag": "Participles",
+      "sentence": "___ the documents, she quickly left the office.",
+      "options": ["To sign", "Signed", "Signing"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'To sign' doesn’t show completed action or simultaneous action.",
+        "Incorrect: 'Signed' sounds like a passive reduced relative clause, not a simultaneous action.",
+        "Correct: 'Signing' implies simultaneous action while leaving."
+      ]
+    },
+    {
+      "id": "b1_prep2_01",
+      "level": "B1",
+      "tag": "Prepositions",
+      "sentence": "He was afraid ___ flying.",
+      "options": ["of", "for", "about"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'afraid of' is the correct fixed prepositional phrase.",
+        "Incorrect: 'afraid for' suggests concern about someone else, not fear of something.",
+        "Incorrect: 'afraid about' is not a standard collocation."
+      ]
+    },
+    {
+      "id": "b2_negmodals_01",
+      "level": "B2",
+      "tag": "Modal verbs",
+      "sentence": "You ___ smoke here — it's a non-smoking area.",
+      "options": ["mustn't", "don't have to", "mustn't to"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'mustn't' expresses prohibition — it's not allowed.",
+        "Incorrect: 'don't have to' means it's not necessary, but still permitted.",
+        "Incorrect: 'mustn't to' is incorrect because we use infinitive without to after a modal verb."
+      ]
+    },
+    {
+      "id": "c1_advmod_01",
+      "level": "B1",
+      "tag": "Adverb Modification",
+      "sentence": "He drives ___ fast for such narrow roads.",
+      "options": ["too", "very", "enough"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'too fast' expresses excess beyond what is acceptable or safe.",
+        "Incorrect: 'very fast' simply describes speed, not excess.",
+        "Incorrect: 'enough fast' is grammatically incorrect; 'enough' comes after adjectives."
+      ]
+    },
+    {
+      "id": "b2_infclauses_01",
+      "level": "B2",
+      "tag": "Gerunds and Infinitives",
+      "sentence": "She was the first person ___ the new software.",
+      "options": ["trying", "to try", "tried"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'trying' doesn’t fit after 'the first person'.",
+        "Correct: 'to try' is the correct infinitive structure after ordinal expressions.",
+        "Incorrect: 'tried' is past simple, which is not grammatically correct here."
+      ]
+    },
+    {
+      "id": "c1_pseudo_01",
+      "level": "B2",
+      "tag": "Cleft Sentences",
+      "sentence": "What I like most about her ___ her honesty.",
+      "options": ["are", "was", "is"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'are' doesn't agree with singular subject 'honesty'.",
+        "Incorrect: 'was' shifts to past tense unnecessarily.",
+        "Correct: 'is' matches the singular subject and present tense."
+      ]
+    },
+    {
+      "id": "b1_quants_01",
+      "level": "B1",
+      "tag": "Quantifiers",
+      "sentence": "There aren't ___ apples left in the basket.",
+      "options": ["some", "any", "much"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'some' is typically used in affirmative statements.",
+        "Correct: 'any' is used in negative contexts like this one.",
+        "Incorrect: 'much' is used with uncountable nouns, not 'apples'."
+      ]
+    },
+    {
+      "id": "c1_partperf_01",
+      "level": "C1",
+      "tag": "Perfect Participles",
+      "sentence": "___ finished her work, she left the office early.",
+      "options": ["Having", "Have", "Being"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'Having finished' is a perfect participle, showing one action completed before another.",
+        "Incorrect: 'Have finished' is ungrammatical in this structure.",
+        "Incorrect: 'Being finished' is passive and doesn’t make sense here."
+      ]
+    },
+    {
+      "id": "b2_expressions_01",
+      "level": "B2",
+      "tag": "Prepositions",
+      "sentence": "They arrived at the airport just ___ time to catch the flight.",
+      "options": ["in", "on", "at"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'in time' means early enough for something.",
+        "Incorrect: 'on time' means exactly at the scheduled time, but doesn't work with 'to catch'.",
+        "Incorrect: 'at time' is not a standard expression."
+      ]
+    },
+    {
+      "id": "b1_wordorder_01",
+      "level": "B1",
+      "tag": "Adverb position",
+      "sentence": "She  ___ her homework in the library.",
+      "options": ["frequent does", "does often", "often does"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'frequently' could be correct here",
+        "Incorrect: 'does often' is awkward and unnatural in this position.",
+        "Correct: 'often does' is the correct word order (adverb before main verb)."
+      ]
+    },
+    {
+      "id": "b1_comp_02",
+      "level": "B1",
+      "tag": "Comparatives and Superlatives",
+      "sentence": "This test is ___ than the one we did last week.",
+      "options": ["difficult", "more difficult", "most difficult"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'difficult' needs a comparative marker here.",
+        "Correct: 'more difficult' is the correct comparative for long adjectives.",
+        "Incorrect: 'most difficult' is a superlative, not a comparative."
+      ]
+    },
+    {
+      "id": "b1_notas_01",
+      "level": "B1",
+      "tag": "Comparatives and Superlatives",
+      "sentence": "The train wasn’t ___ I expected.",
+      "options": ["as fast as", "so fast than", "too fast as"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'as fast as' is the standard structure for comparisons of equality.",
+        "Incorrect: 'so fast than' is incorrect. 'so fast as' is possible in negative sentences",
+        "Incorrect: 'too fast as' is grammatically incorrect."
+      ]
+    },
+    {
+      "id": "b2_modcomp_01",
+      "level": "B1",
+      "tag": "Comparatives and Superlatives",
+      "sentence": "This phone is slightly ___ than mine.",
+      "options": ["cheaper", "more cheap", "cheapest"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'cheaper' is the comparative of cheap. one syllable adjectives: add +er",
+        "Incorrect: 'more cheap' is not correct for one-syllable adjectives",
+        "Incorrect: 'cheapest' is a superlative. This sentence requires a comparative structure"
+      ]
+    },
+    {
+      "id": "b2_supl_01",
+      "level": "B2",
+      "tag": "Comparatives and Superlatives",
+      "sentence": "Of all the runners, she was by  ___",
+      "options": ["far the faster", "much the faster", "far the fastest"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'faster' is a comparative, used for comparing two things.",
+        "Incorrect: 'much' is incorrect: by + far is used to emphasise a superlative.",
+        "Correct: 'fastest' is the superlative form needed here."
+      ]
+    },
+    {
+      "id": "b2_notso_01",
+      "level": "B2",
+      "tag": "Comparatives and Superlatives",
+      "sentence": "The new version isn’t  ___ as the original.",
+      "options": ["quite as good", "quite as better", "near as good"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'quite as good' is correct: we add quite to not as... as to indicate a small difference.",
+        "Incorrect: 'quite as better' is wrong because we don't use the comparative after as.",
+        "Incorrect: 'near as good' would be correct if we used 'nearly'. Not nearly as.... indicates a big difference."
+      ]
+    },
+    {
+      "id": "c1_doublecomp_01",
+      "level": "B2",
+      "tag": "Comparatives and Superlatives",
+      "sentence": "The more you practise,  ___ you become.",
+      "options": ["better", "the best", "the better"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'better' is comparative but we need 'the + comparative' in this structure.",
+        "Incorrect: 'the best' is using the superlative not comparative.",
+        "Correct: 'the better' :here we use the + comparative correctly."
+        
+      ]
+    },
+    {
+      "id": "b2_eqcomp_01",
+      "level": "B2",
+      "tag": "Comparatives and Superlatives",
+      "sentence": "He’s  ___ tall as his older brother.",
+      "options": ["just so", "just as", "equal as"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'just so' is not correct: we can use not so... as in negative sentences.",
+        "Correct: 'just as' is correct to show that two things are the same.",
+        "Incorrect: 'equal as' does not exist in English"
+      ]
+    },
+    {
+      "id": "c1_negcomp_01",
+      "level": "C1",
+      "tag": "inversion",
+      "sentence": "No sooner had he left ___ it started raining.",
+      "options": ["than", "when", "that"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'No sooner... than' is a fixed comparative structure with inversion.",
+        "Incorrect: 'when' is not possible after 'no sooner'. But 'barely/scarcely/hardly... when' has the same meaning",
+        "Incorrect: 'that' is not used with no sooner."
+      ]
+    },
+    {
+      "id": "c1_exaggcomp_01",
+      "level": "B1",
+      "tag": "Comparatives and Superlatives",
+      "sentence": "It’s by far the ___ experience I’ve ever had.",
+      "options": ["more terrifying", "most terrifying", "terrifying"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'more terrifying' is a comparative, not used with 'ever had'.",
+        "Correct: 'most terrifying' is a superlative, matching 'ever had'.",
+        "Incorrect: 'terrifying' is a base adjective and incomplete here."
+      ]
+    },
+    {
+      "id": "b2_nowherenear_01",
+      "level": "B2",
+      "tag": "Comparatives and Superlatives",
+      "sentence": "The new software is ___  user-friendly as the old version.",
+      "options": ["anywhere near as", "nowhere nearly as", "nowhere near as"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'anywhere near as' is incorrect because anywhere is not negative.",
+        "Incorrect: 'nowhere nearly as' is incorrect because we use 'near', not 'nearly'.",
+        "Correct: 'nowhere near as' is used to emphasise a significant difference when using not as... as."
+      ]
+    },
+    {
+      "id": "c1_farless_01",
+      "level": "B2",
+      "tag": "Comparatives and Superlatives",
+      "sentence": "His latest book is  ___ interesting than his earlier works.",
+      "options": ["far little", "much least", "far less"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'far little' is wrong because we need a comparative adjective.",
+        "Incorrect: 'much least' is incorrect because least is a superlative. 'much less' is correct.",
+        "Correct: 'far less' is a common structure used to emphasise a comparative."
+      ]
+    },
+    {
+      "id": "b1_cond0_01",
+      "level": "B1",
+      "tag": "Conditionals",
+      "sentence": "If she’s not too tired in the evenings, she ___ to the gym.",
+      "options": ["will go", "is going", "goes"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'will go', for a first conditinal, suggests a specific future instance, not a routine.",
+        "Incorrect: 'is going' is present continuous, which doesn’t fit habitual meaning here.",
+        "Correct: Zero conditionals use present simple in both clauses to describe habits or routines."
+      ]
+    },
+    {
+      "id": "b1_cond1_01",
+      "level": "B1",
+      "tag": "Conditionals",
+      "sentence": "If she doesn’t set an alarm, she ___ late for work tomorrow.",
+      "options": ["is", "will be", "was"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'is' would suggest a general fact, not a specific future situation.",
+        "Correct: First conditional uses 'will' in the remain clause to talk about future possibilities.",
+        "Incorrect: 'was' is past tense and doesn't fit a future conditional."
+      ]
+    },
+    {
+      "id": "b2_cond2_01",
+      "level": "B2",
+      "tag": "Conditionals",
+      "sentence": "If I ___ more confident, I would speak up in meetings.",
+      "options": ["had been", "were", "am"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'had been' is past perfect, used in third conditionals.",
+        "Correct: In the second conditional, we use past simple in the 'if' clause, often 'were' for all subjects.",
+        "Incorrect: 'am' is present simple and doesn’t match this hypothetical structure."
+      ]
+    },
+    {
+      "id": "c1_condinv_01",
+      "level": "C1",
+      "tag": "Conditionals",
+      "sentence": "Had they known the truth, they ___ things differently.",
+      "options": ["did", "will do", "would have done"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'did' is simple past, which doesn’t show the hypothetical.",
+        "Incorrect: 'will do' expresses future and doesn't suit a past hypothetical.",
+        "Correct: This is an inverted third conditional. 'Had they known' = 'If they had known'."
+      ]
+    },
+    {
+      "id": "c1_mixedcond_01",
+      "level": "C1",
+      "tag": "Conditionals",
+      "sentence": "If I had taken that job, I ___ in New York now.",
+      "options": ["would have lived", "would be living", "live"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'would have lived' expresses a completed past result, but 'now' refers to the present.",
+        "Correct: This is a mixed conditional: past condition with a present result.",
+        "Incorrect: 'live' is present simple which isn't used in an unreal conditional."
+      ]
+    },
+    {
+      "id": "b1_cond0_02",
+      "level": "B1",
+      "tag": "Conditionals",
+      "sentence": "If people don't drink enough water, they ___ dehydrated.",
+      "options": ["got", "get", "will get"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'got' is past tense and does not describe a situation that's always true.",
+        "Correct: This is a zero conditional describing a general consequence.",
+        "Incorrect: 'will get' is used in first conditionals, suggests a specific future outcome, not a general truth."
+      ]
+    },
+    {
+      "id": "b1_cond1_02",
+      "level": "B1",
+      "tag": "Conditionals",
+      "sentence": "If it rains tomorrow, we ___ the picnic.",
+      "options": ["won’t have", "don’t have", "didn’t have"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: In first conditionals, we use present simple in the 'if' clause and 'will/won’t' in the result.",
+        "Incorrect: 'don’t have' is present simple, which would be used in a habitual or zero conditional.",
+        "Incorrect: 'didn’t have' is past simple, which doesn't express a future possibility."
+      ]
+    },
+    {
+      "id": "b2_cond2_02",
+      "level": "B1",
+      "tag": "Conditionals",
+      "sentence": "If I won the lottery, I ___ a house by the sea.",
+      "options": ["bought", "would buy", "will buy"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'bought' is past simple and we need would (or could) in the main clause.",
+        "Correct: Second conditional expresses an unreal or unlikely present/future situation.",
+        "Incorrect: 'will buy' fits a first conditional, not a hypothetical one."
+      ]
+    },
+    {
+      "id": "c1_cond3_01",
+      "level": "B2",
+      "tag": "Conditionals",
+      "sentence": "If they had left earlier, they ___ the train.",
+      "options": ["would catch", "caught", "would have caught"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'would catch' fits a second conditional (unreal present/future).",
+        "Incorrect: 'caught' is simple past, and we need 'would have' in the main clauses of 3rd conditional.",
+        "Correct: Third conditional = past perfect + would have + past participle."
+      ]
+    },
+    {
+      "id": "c1_cond_mixed_02",
+      "level": "B2",
+      "tag": "Conditionals",
+      "sentence": "If I hadn’t skipped breakfast, I ___ so hungry now.",
+      "options": ["wouldn’t have been", "won't be", "wouldn't be"],
+      "answerIndex": 2,
+      "explanations": [
+        "Incorrect: 'wouldn’t have been' is a third conditional with a past result, but the clause refers to NOW.",
+        "Incorrect: 'won’t be' refers to a future outcome, not present.",
+        "Correct: This is a mixed conditional — past action with a present result."
+      ]
+    },
+    {
+      "id": "c1_cond_alt_01",
+      "level": "B1",
+      "tag": "Conditionals",
+      "sentence": "Unless we leave now, we ___ the beginning of the film.",
+      "options": ["missed", "will miss", "would miss"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'missed' is past simple and doesn’t refer to the future.",
+        "Correct: 'Unless' functions like 'if not' in a first conditional structure.",
+        "Incorrect: 'would miss' fits a second conditional (unreal), not this real future scenario."
+      ]
+    },
+    {
+      "id": "b2_ifclause_01",
+      "level": "B1",
+      "tag": "Conditionals",
+      "sentence": "We would go hiking more often if the weather ___ better.",
+      "options": ["were", "had been", "is"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'were' is past simple, which is used in 2nd conditionals for present or future hypothetical situations",
+        "Incorrect: 'had been' would be a 3rd conditional, a hypothetical past situaation. We 'would have gone hiking' would be needed in the other clause",
+        "Correct: 'Is' would be correct in a first or zero conditional, using 'will go' or 'go' in the main clause."
+      ]
+    },
+    {
+      "id": "c1_invif_01",
+      "level": "C1",
+      "tag": "Conditionals",
+      "sentence": "Were she to accept the job, she ___ to relocate immediately.",
+      "options": ["had", "would have", "will have"],
+      "answerIndex": 1,
+      "explanations": [
+        "Incorrect: 'had' is not correct: we need 'would' in the main clause.",
+        "Correct: This is a formal inverted second conditional: 'Were she to...' = 'if she were to accept' or 'If she accepted...'.",
+        "Incorrect: 'will have' fits a first conditional, not a hypothetical one."
+      ]
+    },
+    {
+      "id": "c1_cond_adv_01",
+      "level": "B1",
+      "tag": "Conditionals",
+      "sentence": "Take a coat ___ it gets cold later.",
+      "options": ["in case", "unless", "even if"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: 'in case' is used to express precaution — you take the coat to be prepared.",
+        "Incorrect: 'unless' means 'if not' and 'if it doesn't get cold later' doesn't make sense.",
+        "Incorrect: 'even if' implies doing something *despite* a possible condition, which doesn't fit here."
+      ]
+    },
+    {
+      "id": "b2_ifneg_01",
+      "level": "B2",
+      "tag": "Conditionals",
+      "sentence": "If he hadn’t ignored the instructions, he ___ so many mistakes.",
+      "options": ["wouldn't have made", "wouldn’t make", "won’t make"],
+      "answerIndex": 0,
+      "explanations": [
+        "Correct: This is a third conditional with a past regret using 'would have + past participle'.",
+        "Incorrect: 'wouldn’t make' is second conditional (unreal present), not appropriate here.",
+        "Incorrect: 'won’t make' refers to future, not past events."
+      ]
+    },
+    {
+      "id": "c1_cond_provided_01",
+      "level": "B2",
+      "tag": "Conditionals",
+      "sentence": "You can borrow the car ___ you drive carefully.",
+      "options": ["unless", "even though", "provided that"],
+      "answerIndex": 2,
+      "explanations": [
+        
+        "Incorrect: 'unless' would imply the opposite condition.",
+        "Incorrect: 'even though' introduces contrast, not condition.",
+        "Correct: 'provided that' introduces a condition and is a formal alternative to 'if'."
+      ]
+    },
+    {
+      "id": "c1_cond_unlesspast_01",
+      "level": "C1",
+      "tag": "Conditionals",
+      "sentence": "He wouldn’t have succeeded unless someone ___ him a second chance.",
+      "options": ["gives", "had given", "would have given"],
+      "answerIndex": 1,
+      "explanations": [
+        
+        "Incorrect: 'gives' is present simple, which doesn’t fit a past hypothetical.",
+        "Correct: Third conditionals use past perfect in the conditional clause — here introduced with 'unless'.",
+        "Incorrect: 'would have given' is inccorect as we don't use would in the conditional clause."
+      ]
+    },
+      {
+        "id": "a1_art_01",
+        "level": "A1",
+        "tag": "Articles",
+        "sentence": "He’s eating ___ apple.",
+        "options": ["a", "the", "an"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'a' is used before consonant sounds, not vowels.",
+          "Incorrect: 'the' is for known or previously mentioned items.",
+          "Correct: 'an' is used before vowel sounds like 'apple'."
+        ]
+      },
+      {
+        "id": "a2_art_01",
+        "level": "A2",
+        "tag": "Articles",
+        "sentence": "When we went to Paris, we stayed at ___ hotel near the city centre.",
+        "options": ["—", "a", "the"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: No article is not allowed with singular countable nouns.",
+          "Correct: 'a' is used for first mention of a singular countable noun.",
+          "Incorrect: 'the' would only be correct if the listener already knows which hotel, or there is only one, which is not the case."
+        ]
+      },
+      {
+        "id": "b1_art_012",
+        "level": "A2",
+        "tag": "Articles",
+        "sentence": "He gave me ___ book you recommended.",
+        "options": ["a", "the", "—"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'a' is for non-specific first mentions.",
+          "Correct: 'the' refers to a specific book already known to both speaker and listener.",
+          "Incorrect: Zero article is not used before singular countable nouns."
+        ]
+      },
+      {
+        "id": "a2_art_02",
+        "level": "A2",
+        "tag": "Articles",
+        "sentence": "Do you want ___ cup of tea?",
+        "options": ["a", "—", "the"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'a' is used for offers or first mentions.",
+          "Incorrect: Zero article is not used with countable singular nouns.",
+          "Incorrect: 'the' implies a known specific cup."
+        ]
+      },
+      {
+        "id": "b2_art_01",
+        "level": "B2",
+        "tag": "Articles",
+        "sentence": "She was at ___ university when we met.",
+        "options": ["a", "the", "—"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'a' suggests any university, but this refers to the time when she was a student.",
+          "Incorrect: 'the' would suggest a specific university, focussing on the physical place, not the fact of being a student.",
+          "Correct: No article is used when referring to the institution in a general sense, and being a student."
+        ]
+      },
+      {
+        "id": "b1_art_02",
+        "level": "B1",
+        "tag": "Articles",
+        "sentence": "After dinner, we went for ___ walk along the river.",
+        "options": ["a", "the", "—"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'a walk' is a typical collocation for leisure activity.",
+          "Incorrect: 'the' suggests a specific walk already known or mentioned.",
+          "Incorrect: Zero article is not allowed with singular countable nouns."
+        ]
+      },
+      {
+        "id": "b2_art_02",
+        "level": "A2",
+        "tag": "Articles",
+        "sentence": "___ moon looked especially bright last night.",
+        "options": ["A", "—", "The"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'A moon' would be wrong unless referring to one of many moons.",
+          "Incorrect: No article isn’t used with unique objects. With proper nouns like 'Mars' or 'Jupiter, no aritcle is correct",
+          "Correct: 'The moon' is a unique object, so we always use 'the'."
+        ]
+      },
+      {
+        "id": "a2_art_03",
+        "level": "A2",
+        "tag": "Articles",
+        "sentence": "He works as ___ engineer for an international company.",
+        "options": ["an", "—", "the"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'an' is used before vowel sounds like 'engineer'.",
+          "Incorrect: - is inccorect, as we always use a/an before jobs.",
+          "Incorrect: 'the' is too specific for this context."
+        ]
+      },
+      {
+        "id": "b2_art_03",
+        "level": "B2",
+        "tag": "Articles",
+        "sentence": "___ Netherlands is known for its canals and windmills.",
+        "options": ["—", "The", "A"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: No article is used with most countries, but this is an exception.",
+          "Correct: We use 'the' with country names that are plural or contain political terms (e.g. 'the Netherlands').",
+          "Incorrect: 'A Netherlands' is never correct."
+        ]
+      },
+        {
+          "id": "b2_art_04",
+          "level": "B2",
+          "tag": "Articles",
+          "sentence": "Many tourists visit ___ Alps for skiing in winter.",
+          "options": ["a", "the", "—"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'A Alps' is grammatically incorrect — 'Alps' is plural and unique.",
+            "Correct: We use 'the' with mountain ranges like 'the Alps'.",
+            "Incorrect: No article is used with most countries, but mountain ranges always take 'the'."
+          ]
+        },
+        {
+          "id": "c1_art_01",
+          "level": "C1",
+          "tag": "Articles",
+          "sentence": "___ rich often invest their money in real estate.",
+          "options": ["A", "—", "The"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'A rich' is incorrect without a noun.",
+            "Incorrect: No article doesn't work when referring to a defined group like this.",
+            "Correct: 'The rich' means rich people in general. We use 'the + adjective' to refer to a group."
+          ]
+        },
+        {
+          "id": "b2_art_05",
+          "level": "B2",
+          "tag": "Articles",
+          "sentence": "___ Amazon is the second longest river in the world.",
+          "options": ["A", "The", "—"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'A Amazon' is grammatically incorrect — it’s a specific name.",
+            "Correct: Rivers always take 'the', e.g. the Amazon, the Nile.",
+            "Incorrect: Zero article is not used with named rivers."
+          ]
+        },
+        {
+          "id": "c1_art_02",
+          "level": "C1",
+          "tag": "Articles",
+          "sentence": "She donated a large sum to help ___ elderly in her community.",
+          "options": ["the", "a", "—"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'The elderly' refers to elderly people in general — we use 'the + adjective' for groups.",
+            "Incorrect: 'A elderly' is grammatically incorrect (and singular/plural mismatch).",
+            "Incorrect: No article sounds incomplete when referring to a whole group in this way."
+          ]
+        },
+        {
+          "id": "b2_art_06",
+          "level": "B2",
+          "tag": "Articles",
+          "sentence": "Lake Como is in ___ north of Italy.",
+          "options": ["the", "—", "a"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: When referring to regions of countries, we use 'the north/south/etc.'",
+            "Incorrect: Zero article sounds incomplete in this context.",
+            "Incorrect: 'a north' is not a valid expression."
+          ]
+        },
+        {
+          "id": "c1_art_03",
+          "level": "B2",
+          "tag": "Articles",
+          "sentence": "___ Spanish have a strong tradition of family gatherings.",
+          "options": ["The", "A", "—"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'The Spanish' refers to the Spanish people as a nationality group.",
+            "Incorrect: 'A Spanish' would require a noun (e.g. 'a Spanish person').",
+            "Incorrect: Zero article isn't used for nationalities used as plural collective nouns."
+          ]
+        },
+        {
+          "id": "b1_art_03",
+          "level": "B1",
+          "tag": "Articles",
+          "sentence": "She visited ___ Mount Fuji during her trip to Japan.",
+          "options": ["—", "a", "the"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'the is not correct, as we do not use 'the' with mountains: e.g. We climbed Everest.",
+            "Incorrect: 'A Mount Fuji' is not correct as there is only one.",
+            "Incorrect: 'The' is not used before mountain names."
+          ]
+        },
+        {
+          "id": "c1_art_04",
+          "level": "A2",
+          "tag": "Articles",
+          "sentence": "They’re launching ___ campaign to raise awareness about climate change.",
+          "options": ["—", "a", "the"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: Zero article is not allowed with singular countable nouns.",
+            "Correct: 'a campaign' is used for first mention of a singular countable noun.",
+            "Incorrect: 'the campaign' would imply the listener already knows about it."
+          ]
+        },
+        {
+          "id": "b2_art_07",
+          "level": "B1",
+          "tag": "Articles",
+          "sentence": "They travelled across ___ Sahara on camelback.",
+          "options": ["—", "a", "the"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: No article is not correct with named deserts.",
+            "Incorrect: 'A Sahara' is not possible as there is only one Sahara Desert.",
+            "Correct: Deserts (like rivers and oceans) take 'the' — 'the Sahara', 'the Gobi'."
+          ]
+        },
+        {
+          "id": "c1_art_05",
+          "level": "B2",
+          "tag": "Articles",
+          "sentence": "___ Spanish people are generally very sociable.",
+          "options": ["A", "—", "The"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'A Spanish people' is grammatically incorrect — we don't use 'a' with plural 'people'.",
+            "Correct: No article is correct when we are referring to Spanish people in general. Compare 'The Spanish people I know' (specific group).",
+            "Incorrect: 'The Spanish people' is wrong because we are referring to Spanish people in general."
+          ]
+        },
+        {
+          "id": "c1_art_11",
+          "level": "B2",
+          "tag": "Articles",
+          "sentence": "___ are known for their efficiency and punctuality.",
+          "options": ["The Germans", "A Germans", "Germans"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'The Germans' would imply a specific group, not a nationality in general.",
+            "Incorrect: 'A Germans' is grammatically wrong — singular article with a plural noun.",
+            "Correct: 'Germans': Nationalities ending in -an are used as nouns, eg. 'An Italian'. We use the plural form with no article to make generalisations"
+          ]
+        },
+        {
+          "id": "c1_art_09",
+          "level": "B2",
+          "tag": "Articles",
+          "sentence": "___ tend to value personal freedom and individualism.",
+          "options": ["The Americans", "Americans", "The American"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'The Americans' refers to a specific group, not the nationality in general.",
+            "Correct: 'Americans': Nationalities ending in -an are used as nouns, eg. 'An Italian'. We use the plural form with no article to make generalisations",
+            "Incorrect: 'The American' is singular and doesn’t work with a plural verb like 'tend'."
+          ]
+        },
+        {
+          "id": "b2_art_06b",
+          "level": "B2",
+          "tag": "Articles",
+          "sentence": "We spent a week hiking in ___ Spain.",
+          "options": ["Northern", "the Northern", "a Northern"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: We don’t use an article before compound place names like 'Northern Spain'.",
+            "Incorrect: 'The Northern Spain' is not correct. Compare 'the north of Spain'.",
+            "Incorrect: 'A Northern Spain' is not a valid phrase — we don’t use 'a' before region names like this."
+          ]
+        },
+        {
+          "id": "a2_prep_01",
+          "level": "B1",
+          "tag": "Prepositions",
+          "sentence": "She’s very good ___ dancing.",
+          "options": ["on", "in", "at"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'on' does not go with good.",
+            "Incorrect: 'in' does not go with good.",
+            "Correct: We say 'good at' something. The same with 'great/ok/bad/terrible at' etc"
+          ]
+        },
+        {
+          "id": "a2_prep_02",
+          "level": "A2",
+          "tag": "Prepositions",
+          "sentence": "He’s afraid ___ spiders.",
+          "options": ["with", "for", "of"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'with' does not go with afraid.",
+            "Incorrect: 'for' does not go with afraid.",
+            "Correct: 'afraid of' is the correct collocation."
+          ]
+        },
+        {
+          "id": "a2_prep_03",
+          "level": "A2",
+          "tag": "Prepositions",
+          "sentence": "They arrived ___ the airport very early.",
+          "options": ["at", "to", "in"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: We say 'arrive at' with most public places.",
+            "Incorrect: 'to' does not go with arrive.",
+            "Incorrect: 'in': we use arrive in for bigger less specific places, like neighbourhoods, towns, countries etc."
+          ]
+        },
+        {
+          "id": "b1_prep_01",
+          "level": "B1",
+          "tag": "Prepositions",
+          "sentence": "I’m looking forward ___ the holidays.",
+          "options": ["to", "for", "at"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'look forward to' is a set phrase.",
+            "Incorrect: 'for' does not go with look forward.",
+            "Incorrect: 'at' does not go with look forward."
+          ]
+        },
+        {
+          "id": "b1_prep_02",
+          "level": "A2",
+          "tag": "Prepositions",
+          "sentence": "She apologized ___ being late.",
+          "options": ["of", "about", "for"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'of' does not go with 'apologize'.",
+            "Incorrect: 'about' idoes not go with 'apologize'.",
+            "Correct: 'apologize for' is the right structure."
+          ]
+        },
+        {
+          "id": "b1_prep_03",
+          "level": "B1",
+          "tag": "Prepositions",
+          "sentence": "He depends ___ his parents for money.",
+          "options": ["on", "in", "of"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'depend on' is the correct form.",
+            "Incorrect: 'in' does not go with 'depend'.",
+            "Incorrect: 'of' does not go with 'depend'."
+          ]
+        },
+        {
+          "id": "b2_prep_020",
+          "level": "C1",
+          "tag": "Prepositions",
+          "sentence": "There has been a sharp increase ___ prices.",
+          "options": ["of", "in", "to"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'of prices' is incorrect here.",
+            "Correct: 'increase in prices' is the right phrase. The same with similar constructions: 'a rise/fall/decrease etc IN'",
+            "Incorrect: 'to prices' is not used in this case."
+          ]
+        },
+        {
+          "id": "b2_prep_02",
+          "level": "B2",
+          "tag": "Prepositions",
+          "sentence": "This area is famous ___ its natural beauty.",
+          "options": ["for", "with", "by"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'famous for' is the correct collocation.",
+            "Incorrect: 'with' does not go with 'famous'.",
+            "Incorrect: 'by' does not go with 'famous'."
+          ]
+        },
+        {
+          "id": "b2_prep_03",
+          "level": "B2",
+          "tag": "Prepositions",
+          "sentence": "He’s been accused ___ stealing company money.",
+          "options": ["about", "of", "for"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'about' does not go with 'accuse'.",
+            "Correct: 'accused of' is the standard form. To accuse somebody of something",
+            "Incorrect: 'for' does not go with 'accuse'."
+          ]
+        },
+        {
+          "id": "b2_prep_04",
+          "level": "B2",
+          "tag": "Prepositions",
+          "sentence": "She’s responsible ___ managing the team.",
+          "options": ["of", "for", "with"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'responsible of' is a common mistake.",
+            "Correct: 'responsible for' is the standard structure.",
+            "Incorrect: 'with' does not go with 'responsible'."
+          ]
+        },
+        {
+          "id": "b1_prep_04",
+          "level": "B2",
+          "tag": "Prepositions",
+          "sentence": "I'm not very keen ___ horror films.",
+          "options": ["about", "on", "in"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'about' does not go with 'keen'.",
+            "Correct: 'on' is the right preposition after this adjective.",
+            "Incorrect: 'in' does not go with 'keen'."
+          ]
+        },
+        {
+          "id": "b1_prep_06",
+          "level": "B1",
+          "tag": "Prepositions",
+          "sentence": "He's married ___ a doctor.",
+          "options": ["to", "with", "in"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'be married to' is the correct form.",
+            "Incorrect: 'with' does not go with 'married'.",
+            "Incorrect: 'in' does not go with 'married'."
+          ]
+        },
+        {
+          "id": "b2_prep_05",
+          "level": "C1",
+          "tag": "Prepositions",
+          "sentence": "They succeeded ___ improving the system.",
+          "options": ["on", "in", "at"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'on' does not go with 'succeed'.",
+            "Correct: 'succeed in' is the correct verb + preposition pattern.",
+            "Incorrect: 'at' does not go with 'succeed'."
+          ]
+        },
+        {
+          "id": "b2_prep_06",
+          "level": "B2",
+          "tag": "Prepositions",
+          "sentence": "She insisted ___ paying for dinner.",
+          "options": ["in", "on", "with"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'in' does not go with 'insist'.",
+            "Correct: 'insist on' is the right collocation.",
+            "Incorrect: 'with' does not go with 'insist'."
+          ]
+        },
+        {
+          "id": "b2_prep_09",
+          "level": "B2",
+          "tag": "Prepositions",
+          "sentence": "This rule applies ___ all employees, regardless of position.",
+          "options": ["to", "for", "at"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'applies to' is the correct verb-preposition pairing.",
+            "Incorrect: 'applies for' changes the meaning.",
+            "Incorrect: 'at' does not go with 'apply'."
+          ]
+        },
+        {
+          "id": "a2_prep_time_01",
+          "level": "A2",
+          "tag": "Prepositions",
+          "sentence": "The train leaves ___ 8 o’clock sharp.",
+          "options": ["in", "at", "on"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'in' is used for longer time periods like months or years.",
+            "Correct: 'at' is used for specific clock times.",
+            "Incorrect: 'on' is used for days and dates, not times."
+          ]
+        },
+        {
+          "id": "b1_prep_place_012",
+          "level": "B1",
+          "tag": "Prepositions",
+          "sentence": "They met each other ___ the corner of the street.",
+          "options": ["at", "along", "in"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'at the corner' is the standard phrase for location.",
+            "Incorrect: 'along the corner': along is not used to indicate location.",
+            "Incorrect: 'in the corner' is typically used for indoor spaces."
+          ]
+        },
+        {
+          "id": "b1_prep_movement_01",
+          "level": "B1",
+          "tag": "Prepositions",
+          "sentence": "She walked ___ the room without saying a word.",
+          "options": ["into", "over", "at"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'into' expresses movement inside a space.",
+            "Incorrect: 'over' means across the top, not appropriate here.",
+            "Incorrect: 'at' refers to a location, not movement into."
+          ]
+        },
+        {
+          "id": "b2_prep_time_01",
+          "level": "B1",
+          "tag": "Prepositions",
+          "sentence": "We haven’t seen him ___ the beginning of the year.",
+          "options": ["for", "since", "from"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'for' would be followed by a duration (e.g. for six months).",
+            "Correct: 'since' is used with a specific point in time.",
+            "Incorrect: 'from' doesn't go with this present perfect structure."
+          ]
+        },
+        {
+          "id": "a2_prep_place_01",
+          "level": "A2",
+          "tag": "Prepositions",
+          "sentence": "The keys are ___ the table. Can you see them?",
+          "options": ["on", "in", "over"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'on the table' describes surface location.",
+            "Incorrect: 'in the table' suggests the keys are 'inside' the table.",
+            "Incorrect: 'over the table' means suspended above, not resting on."
+          ]
+        },
+        {
+          "id": "a2_prep_time_02",
+          "level": "A2",
+          "tag": "Prepositions",
+          "sentence": "We always have lunch ___ noon.",
+          "options": ["on", "at", "in"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'on' is used for days and dates.",
+            "Correct: 'at' is used for specific times, including 'at noon'.",
+            "Incorrect: 'in' is used for longer periods like months or seasons."
+          ]
+        },
+        {
+          "id": "b1_prep_place_02",
+          "level": "B1",
+          "tag": "Prepositions",
+          "sentence": "There was a beautiful painting ___ the wall.",
+          "options": ["in", "at", "on"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'in the wall' suggests something inside.",
+            "Incorrect: 'at the wall' would imply being next to it, not on it.",
+            "Correct: 'on the wall' is the usual phrase for something mounted."
+          ]
+        },
+        {
+          "id": "b2_prep_movement_02",
+          "level": "B2",
+          "tag": "Prepositions",
+          "sentence": "He ran quickly ___ the hill and disappeared.",
+          "options": ["above", "over", "along"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'above' implies a vertical distance, not movement.",
+            "Correct: 'over' suggests crossing to the other side.",
+            "Incorrect: 'along' means following a path, not crossing it."
+          ]
+        },
+        {
+          "id": "b1_prep_time_03",
+          "level": "B1",
+          "tag": "Prepositions",
+          "sentence": "She arrived ___ time to catch the train.",
+          "options": ["at", "on", "in"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'at time' is not a correct phrase.",
+            "Incorrect: 'on time' means punctual, but the expression here requires 'in time' (with sufficient time).",
+            "Correct: 'in time' means before the deadline or moment."
+          ]
+        },
+        {
+          "id": "b1_narr_01",
+          "level": "B1",
+          "tag": "Narrative Tenses",
+          "sentence": "I ___ in the shower when I heard a loud crash.",
+          "options": ["sang", "had sung", "was singing"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'sang' suggests a finished action, not one in progress.",
+            "Incorrect: 'had sung' places the action before another past point, not at the same time.",
+            "Correct: Past continuous describes an action in progress interrupted by another."
+          ]
+        },
+        {
+          "id": "b2_narr_02",
+          "level": "B1",
+          "tag": "Narrative Tenses",
+          "sentence": "By the time we arrived, the guests ___.",
+          "options": ["already leave", "had already left", "left already"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'already leave' is present and this is a past situation",
+            "Correct: 'had already left':Past perfect shows the action was completed before our arrival.",
+            "Incorrect: 'left already' Past simple doesn’t clearly mark the earlier action here."
+          ]
+        },
+        {
+          "id": "b2_narr_03",
+          "level": "B2",
+          "tag": "Narrative Tenses",
+          "sentence": "She ___ for over an hour when he finally called.",
+          "options": ["was waiting", "had been waiting", "waited"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'was waiting': Past continuous indicates a continuous action, but the duration 'for over an hour' requires the perfect form ",
+            "Correct: Past perfect continuous shows ongoing duration before another past event afer 'for over an hour'.",
+            "Incorrect: Past simple doesn’t express continuity or duration."
+          ]
+        },
+        {
+          "id": "c1_narr_04",
+          "level": "C1",
+          "tag": "Narrative Tenses",
+          "sentence": "Every summer, we ___ a cottage by the lake.",
+          "options": ["were renting", "would rent", "use to rent"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: Past continuous suggests a temporary ongoing action, not a repeated habit.",
+            "Correct: 'would' + base verb expresses a past habit with time framing.",
+            "Incorrect: 'use to rent' is wrong here because we need past simple 'used to'."
+          ]
+        },
+        {
+          "id": "b1_narr_05",
+          "level": "B1",
+          "tag": "Narrative Tenses",
+          "sentence": "When I got to the station, the train ___.",
+          "options": ["already went", "had already gone", "were going"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'already went': Past simple doesn’t show that it happened before my arrival and is not normally used with 'already'.",
+            "Correct: 'had already gone': Past perfect shows the train had left before the later past action.",
+            "Incorrect: 'were going' Past continuous is incorrect here because the train is singular and goes with 'was'."
+          ]
+        },
+        {
+          "id": "b1_narr_06",
+          "level": "B1",
+          "tag": "Narrative Tenses",
+          "sentence": "He ___ dinner when the lights went out.",
+          "options": ["was having", "had", "has"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'was having': Past continuous is used for an action in progress interrupted by another.",
+            "Incorrect: 'had': Past simple means he had dinner after the lights went out, which doesn't make sense here.",
+            "Incorrect: 'has': Present tense is incorrect as this is a past situation: 'went out': past simple."
+          ]
+        },
+        {
+          "id": "b1_narr_08",
+          "level": "B1",
+          "tag": "Narrative Tenses",
+          "sentence": "She ___ the documents and put them in the drawer.",
+          "options": ["has signed", "was signing", "signed"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect:'has signed': Present perfect is incorrect as it is a past situation: 'she put' is past simple..",
+            "Incorrect: 'was signing': Past continuous suggests an action in progress, not completed.",
+            "Correct: Past simple is used for a sequence of completed past events. first she 'signed' then she 'put'"
+          ]
+        },
+        {
+          "id": "c1_narr_09",
+          "level": "C1",
+          "tag": "Narrative Tenses",
+          "sentence": "Back then, we ___ the same pub every Friday after work.",
+          "options": ["were visiting", "had visited", "would visit"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'were visiting': Past continuous doesn’t express regularity or habit.",
+            "Incorrect: 'had visited': past perfect does not describe a past habit, 'back then'.",
+            "Correct: 'Would' is used for repeated past habits, especially with time markers like 'every Friday'."
+          ]
+        },
+        {
+          "id": "b2_narr_10",
+          "level": "B2",
+          "tag": "Narrative Tenses",
+          "sentence": "By the time the police arrived, the burglars ___.",
+          "options": ["had escaped", "escaped", "have escaped"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: Past perfect shows the burglars left before the police arrived.",
+            "Incorrect: Past simple might imply both actions happened in sequence, not clearly separated in time.",
+            "Incorrect: Present perfect doesn't go with this past situation, relative to a past action: 'escaped'."
+          ]
+        },
+        {
+          "id": "b1_narr_fix_01",
+          "level": "B1",
+          "tag": "Narrative Tenses",
+          "sentence": "While I ___ the door, the phone rang.",
+          "options": ["open", "was opening", "had opened"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'open': present simple is wrong because this is a past situation: 'rang'.",
+            "Correct: Past continuous expresses the action in progress when another action happened.",
+            "Incorrect: Past perfect suggests the action was completed before the phone rang, but doesn't fit with 'while'."
+          ]
+        },
+        {
+          "id": "b2_narr_12",
+          "level": "B2",
+          "tag": "Narrative Tenses",
+          "sentence": "They ___ for hours before they finally reached the campsite.",
+          "options": ["were walking", "walked", "had been walking"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: Past continuous shows an ongoing action but doesn’t show past duration which we need with 'for hours'.",
+            "Incorrect: 'walked': is incorrect because we need the perfect with the duration 'for hours'",
+            "Correct: 'had been walking: Past perfect continuous is used for actions continuing up to a point in the past, especially with a duration: 'for hours'."
+          ]
+        },
+        {
+          "id": "c1_narr_14",
+          "level": "C1",
+          "tag": "Narrative Tenses",
+          "sentence": "When we were children, we ___ by candlelight during power cuts.",
+          "options": ["had read", "were reading", "would read"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'had read': Past perfect doesn’t describe a habitual action",
+            "Incorrect: 'were reading': Past continuous is not used for repeated past habits.",
+            "Correct: 'Would' is appropriate to describe past repeated actions or habits."
+          ]
+        },
+        {
+          "id": "b1_narr_16",
+          "level": "B1",
+          "tag": "Narrative Tenses",
+          "sentence": "We ___ in the garden when it suddenly started to rain.",
+          "options": ["sat", "were sitting", "had sat"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'Sat' doesn't express an ongoing action at the moment of interruption.",
+            "Correct: 'were sitting: Past continuous is used for actions in progress.",
+            "Incorrect: 'had sat': Past perfect isn't correct because it doesn't express a continuous action as the rain started."
+          ]
+        },
+        {
+          "id": "b2_narr_17",
+          "level": "B2",
+          "tag": "Narrative Tenses",
+          "sentence": "By the time I got to the party, everyone ___.",
+          "options": ["left", "had been left", "was leaving"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: Past simple doesn’t clearly show which event happened first.",
+            "Incorrect: 'had been left' Past perfect is incorrect because it is in the PASSIVE VOICE. 'had left' would be correct",
+            "Correct: 'was leaving: Past continuous suggests that people had started leaving, but not everyone had left yet."
+          ]
+        },
+        {
+          "id": "c1_narr_18",
+          "level": "C1",
+          "tag": "Narrative Tenses",
+          "sentence": "He ___ the piano every day when he was young.",
+          "options": ["would play", "was playing", "had played"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'Would' describes a habitual action in the past.",
+            "Incorrect: 'was playing': Past continuous does not express repeated past habit.",
+            "Incorrect: 'had played': Past perfect refers to a specific earlier event, not a habit."
+          ]
+        },
+        {
+          "id": "b1_narr_19",
+          "level": "B1",
+          "tag": "Narrative Tenses",
+          "sentence": "They ___ dinner when the guests arrived.",
+          "options": ["were having", "had", "have had"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'were having': Past continuous expresses the action in progress.",
+            "Incorrect: 'had': Past simple doesn’t convey that the action was ongoing. 'had had', past perfect would be correct",
+            "Incorrect: 'Have had' is a present perfect form, not appropriate for this past situation."
+          ]
+        },
+        {
+          "id": "b2_narr_fix_01",
+          "level": "B2",
+          "tag": "Narrative Tenses",
+          "sentence": "She had a headache because she ___ all morning without a break.",
+          "options": ["worked", "was working", "had been working"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: Past simple doesn’t convey the idea of continuous effort over time.",
+            "Incorrect: 'was working': Past continuous would be correct without the duration 'all morning'.",
+            "Correct: 'had been working': Past perfect continuous is correct here because we have the duration 'all morning' which requires the perfect form."
+          ]
+        },
+        {
+          "id": "b1_quant_01",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "There were only ___ people at the meeting, so it ended early.",
+          "options": ["few", "a few", "a little"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'Few' without 'a' doesn't go with 'only'.",
+            "Correct: 'A few' is appropriate for countable nouns like 'people'.",
+            "Incorrect: 'A little' is used with uncountable nouns."
+          ]
+        },
+        {
+          "id": "b1_quant_02",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "We have ___ milk left — not enough for everyone.",
+          "options": ["few", "many", "little"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'few' is used with countables, not 'milk'.",
+            "Incorrect: 'Many' is used with countables, and here the meaning is negative.",
+            "Correct: 'Little' fits with uncountables and expresses insufficiency."
+          ]
+        },
+        {
+          "id": "b2_quant_03",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "He hasn’t done ___ to help prepare for the trip.",
+          "options": ["much", "many", "a lot of"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'Much' is correct for an indefinite quantity here. There is no noun used..",
+            "Incorrect: 'Many' is for countable nouns.",
+            "Incorrect: 'a lot of' is wrong because 'of' needs a noun. eg. 'a lot of work'. Here 'a lot' is correct"
+          ]
+        },
+        {
+          "id": "b1_quant_04",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "___ of the information in the report is outdated.",
+          "options": ["Many", "Some", "A few"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'Many' is wrong because information is uncountable.",
+            "Correct: 'Some' is appropriate with uncountable nouns (also possible with countables).",
+            "Incorrect: 'A few' is only used with plural countables."
+          ]
+        },
+        {
+          "id": "b1_quant_05",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "I brought ___ sandwiches in case anyone gets hungry.",
+          "options": ["a little", "few", "a few"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'A little' is for uncountable nouns, not 'sandwiches'.",
+            "Incorrect: 'few' without 'a' is too negative, as it means 'not many'.",
+            "Correct: 'A few' fits with plural countable nouns like 'sandwiches'."
+          ]
+        },
+        {
+          "id": "b2_quant_06",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "She spends ___ of her time reading science fiction novels.",
+          "options": ["many", "few", "most"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'Many' doesn’t go with 'time', which is uncountable.",
+            "Incorrect: 'Few' is also inappropriate for uncountables. We could say 'little of her time'.",
+            "Correct: 'Most of her time' is a common and correct phrase."
+          ]
+        },
+        {
+          "id": "b1_quant_07",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "Five of us spoke a little Chinese, but ___ of us had ever been to Asia before the trip.",
+          "options": ["neither", "none", "nothing"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'Neither' is used when referring to two people.",
+            "Correct: 'None of us' fits for more than two and refers to people.",
+            "Incorrect: 'Nothing' refers to things, not people."
+          ]
+        },
+        {
+          "id": "quant_21",
+          "level": "A2",
+          "tag": "Quantifiers",
+          "sentence": "There weren’t ___ chairs for everyone to sit down.",
+          "options": ["too many", "enough", "a lot of"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'too many' would suggest an excess. Here we need more chairs.",
+            "Correct: 'enough' is used to express sufficient quantity.",
+            "Incorrect: 'a lot of' is positive and doesn’t express insufficiency."
+          ]
+        },
+        {
+          "id": "quant_22",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "She has ___ interest in politics.",
+          "options": ["a few", "little", "few"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'a few' is for plural countable nouns, not uncountable ones.",
+            "Correct: 'little' is used with uncountable nouns like 'interest'.",
+            "Incorrect: 'few' is used with countable nouns."
+          ]
+        },
+        {
+          "id": "quant_23",
+          "level": "B2",
+          "tag": "Quantifiers",
+          "sentence": "We saw ___ tourists in the winter months.",
+          "options": ["hardly any", "plenty", "a great deal of"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'hardly any' means almost none, which fits the idea of low numbers.",
+            "Incorrect: 'plenty' means 'more than enough' and needs the preposition 'of'.",
+            "Incorrect: 'a great deal of' is for uncountable nouns."
+          ]
+        },
+        {
+          "id": "quant_24",
+          "level": "B2",
+          "tag": "Quantifiers",
+          "sentence": "___ of the 10 participants had read the article beforehand, so it was impossible to discuss it",
+          "options": ["Each", "None", "Neither"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'Each' implies all had read it, which would make it possible to discuss the article",
+            "Correct: 'None' is used for zero quantity out of more than two.",
+            "Incorrect: 'Neither' is only used when referring to two people or things."
+          ]
+        },
+        {
+          "id": "quant_25",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "There’s ___ milk left in the fridge — not much.",
+          "options": ["few", "a few", "a little"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'few' has a more negative tone and doesn't fit well here.",
+            "Incorrect: 'a few' is for plural countable nouns.",
+            "Correct: 'a little' is used for small amounts of uncountable nouns."
+          ]
+        },
+        {
+          "id": "quant_26",
+          "level": "A2",
+          "tag": "Quantifiers",
+          "sentence": "They have ___ cats at home.",
+          "options": ["much", "little", "a lot of"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'much' is used with uncountables, usually negative.",
+            "Incorrect: 'little' is for uncountables and doesn’t make sense with 'cats'.",
+            "Correct: 'a lot of' is fine with countable nouns like 'cats'."
+          ]
+        },
+        {
+          "id": "quant_27",
+          "level": "C1",
+          "tag": "Quantifiers",
+          "sentence": "She had made ___ progress than expected, given the circumstances.",
+          "options": ["too many", "few", "far less"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'too many' is not appropriate with uncountables.",
+            "Incorrect: 'few' is used for countable nouns.",
+            "Correct: 'far less' is comparative and fits with uncountable nouns like 'progress'. Far is used for emphasis."
+          ]
+        },
+        {
+          "id": "quant_28",
+          "level": "B2",
+          "tag": "Quantifiers",
+          "sentence": "We didn’t see ___ people at the concert.",
+          "options": ["much", "many", "a little"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'much' is used with uncountables.",
+            "Correct: 'many' is used for plural countable nouns like 'people'.",
+            "Incorrect: 'a little' is used with uncountables."
+          ]
+        },
+        {
+          "id": "quant_29",
+          "level": "B2",
+          "tag": "Quantifiers",
+          "sentence": "I invited them both, but ___ of them came.",
+          "options": ["neither", "none", "either"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'neither' means not one or the other of two.",
+            "Incorrect: 'none' is used for more than two.",
+            "Incorrect: 'either' suggests one or the other, not both."
+          ]
+        },
+        {
+          "id": "quant_30",
+          "level": "B2",
+          "tag": "Quantifiers",
+          "sentence": "He didn’t show ___ interest in the topic.",
+          "options": ["a few", "much", "many"],
+          "answerIndex": 1,
+          "explanations": [
+            "Incorrect: 'a few' doesn’t work with uncountables.",
+            "Correct: 'much' is used with uncountables like 'interest'.",
+            "Incorrect: 'many' is for plural countable nouns."
+          ]
+        },
+        {
+          "id": "a2_quant_11",
+          "level": "A2",
+          "tag": "Quantifiers",
+          "sentence": "There isn’t ___ milk left in the fridge.",
+          "options": ["many", "some", "much"],
+          "answerIndex": 2,
+          "explanations": [
+              "Incorrect: 'Many' is used with plural countable nouns, not uncountables like 'milk'.",
+              "Incorrect: 'Some' is possible in affirmative statements, but here we would use 'any' in the negative.",
+              "Correct: 'Much' is used in negative sentences with uncountable nouns."
+          ]
+      },
+      {
+          "id": "b1_quant_12",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "I only had ___ time to finish the report before the deadline.",
+          "options": ["a little", "a few", "many"],
+          "answerIndex": 0,
+          "explanations": [
+              "Correct: 'A little' is used with uncountable nouns like 'time'.",
+              "Incorrect: 'A few' is used with countable nouns, and doesn't fit here.",
+              "Incorrect: 'Many' is incorrect with uncountable nouns."
+          ]
+      },
+      {
+          "id": "b2_quant_13",
+          "level": "B2",
+          "tag": "Quantifiers",
+          "sentence": "They invited all their friends, but only ___ showed up.",
+          "options": ["few", "a few", "much"],
+          "answerIndex": 1,
+          "explanations": [
+              "Incorrect: 'Few' cannot be used without 'a' after 'only'.",
+              "Correct: 'A few' suggests some came, but not many.",
+              "Incorrect: 'Much' is uncountable and cannot be used with 'friends'."
+          ]
+      },
+      {
+          "id": "b1_quant_14",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "There were too ___ mistakes in the essay to ignore.",
+          "options": ["much", "many", "a lot"],
+          "answerIndex": 1,
+          "explanations": [
+              "Incorrect: 'Much' is for uncountable nouns.",
+              "Correct: 'Many' is used with plural countable nouns like 'mistakes'.",
+              "Incorrect: 'A lot' needs 'of' to go with mistakes, and can't be used after 'too'."
+          ]
+      },
+      {
+          "id": "b2_quant_15",
+          "level": "B2",
+          "tag": "Quantifiers",
+          "sentence": "He spoke so quickly that ___ of us could follow what he was saying.",
+          "options": ["nobody", "few", "much"],
+          "answerIndex": 0,
+          "explanations": [
+              "Correct: 'nobody' cannot be used with 'of us'. 'Nobody could follow' would be correct",
+              "Incorrect: 'Few' suggests that not many could follow..",
+              "Incorrect: 'Much' is not correct because 'us' refers to people which is countable."
+          ]
+      },
+      {
+          "id": "c1_quant_17",
+          "level": "C1",
+          "tag": "Quantifiers",
+          "sentence": "Hardly ___ of the proposals were accepted by the committee.",
+          "options": ["any", "some", "much"],
+          "answerIndex": 0,
+          "explanations": [
+              "Correct: 'Hardly any' is a fixed expression to indicate very few or almost none.",
+              "Incorrect: 'Some' does not go with the negative meaning of 'hardly'.",
+              "Incorrect: 'Much' is for uncountable nouns and cannot be used with hardly"
+          ]
+      },
+      {
+          "id": "b2_quant_18",
+          "level": "B2",
+          "tag": "Quantifiers",
+          "sentence": "Only ___ of the team members were able to attend the meeting.",
+          "options": ["either", "some", "a little"],
+          "answerIndex": 1,
+          "explanations": [
+              "Incorrect: 'Either' refers to two people/things, and is not used with 'only'.",
+              "Correct: 'Some' refers to a portion of a larger group.",
+              "Incorrect: 'A little' is used with uncountables."
+          ]
+      },
+      {
+          "id": "c1_quant_19",
+          "level": "C1",
+          "tag": "Quantifiers",
+          "sentence": "___ of the two applicants had the qualifications we were looking for.",
+          "options": ["None", "Neither", "Any"],
+          "answerIndex": 1,
+          "explanations": [
+              "Incorrect: 'None' would be correct with more than two applicants.",
+              "Correct: 'Neither' is correct because we specify two applicants.",
+              "Incorrect: 'Any' would not work without a negative or interrogative context."
+          ]
+      },
+      {
+          "id": "b1_quant_20",
+          "level": "B1",
+          "tag": "Quantifiers",
+          "sentence": "I don't have ___ money to buy concert tickets this month.",
+          "options": ["enough", "a few", "plenty"],
+          "answerIndex": 0,
+          "explanations": [
+              "Correct: 'Enough' is used to express sufficient quantity.",
+              "Incorrect: 'A few' is used with countable nouns.",
+              "Incorrect: 'Plenty' would be used in an affirmative sentence, and needs 'of'."
+          ]
+      },
+      {
+        "id": "quant_34",
+        "level": "C1",
+        "tag": "Quantifiers",
+        "sentence": "There was ___ media coverage following the scandal.",
+        "options": ["a great deal of", "many", "a few"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'a great deal of' is appropriate for uncountable nouns like 'coverage'. 'a great/good deal of' are more formal ways of saying 'a lot of'.",
+          "Incorrect: 'a large number of' is used with countables.",
+          "Incorrect: 'a lot' is missing the preposition 'of' here."
+        ]
+      },
+      {
+        "id": "b1_ginf_01",
+        "level": "B1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "She promised ___ him with the project over the weekend.",
+        "options": ["help", "helping", "to help"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: promise + to inf'.",
+          "Incorrect: 'Helping' is a gerund, but 'promise' takes the infinitive.",
+          "Correct: We use 'to + inf' after 'promise'."
+        ]
+      },
+      {
+        "id": "b2_ginf_02",
+        "level": "B2",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "He avoided ___ about the argument during dinner.",
+        "options": ["to speak", "speaking", "speak"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'Avoid' is followed by a gerund, not an infinitive.",
+          "Correct: 'Avoid' is one of many verbs followed by a gerund.",
+          "Incorrect: 'Avoid' is followed by a gerund, not the infinitive without to."
+        ]
+      },
+      {
+        "id": "b1_ginf_03",
+        "level": "B1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "I can’t afford ___ a new phone right now.",
+        "options": ["buying", "to buy", "buy"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'Afford' is followed by the infinitive, not the gerund.",
+          "Correct: 'Can’t afford to +inf' is the correct structure.",
+          "Incorrect: 'can’t afford' takes the to inf."
+        ]
+      },
+      {
+        "id": "b2_ginf_04",
+        "level": "C1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "I regret ___ you that your application was unsuccessful.",
+        "options": ["informing", "inform", "to inform"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'Informing' would refer to a past action you already did. In this case, we regret something we are doing in the moment of speaking",
+          "Incorrect: Regret takes the to infinitive or the gerund.",
+          "Correct: 'Regret to do something' = sorry to say/tell someone bad news."
+        ]
+      },
+      {
+        "id": "b2_ginf_05",
+        "level": "B2",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "They stopped ___ when the teacher entered the room.",
+        "options": ["to talk", "talking", "talk"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'Stopped to talk' would mean they stopped another action in order to talk.",
+          "Correct: 'Stopped talking': the gerund is the activity which is stopped",
+          "Incorrect: Stopped never goes with the infinitive without to."
+        ]
+      },
+      {
+        "id": "b2_ginf_06",
+        "level": "B2",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "He admitted ___ the mistake during the meeting.",
+        "options": ["to make", "making", "make"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: Admit always takes a gerund.",
+          "Correct: 'Admit' is followed by a gerund.",
+          "Incorrect: Admit always takes a gerund."
+        ]
+      },
+      {
+        "id": "b2_ginf_07",
+        "level": "B2",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "We decided ___ the meeting until next week.",
+        "options": ["to postpone", "postponing", "postpone"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Decide' is followed by 'to + infinitive'.",
+          "Incorrect: Gerund is not used after 'decide'.",
+          "Incorrect: 'Decide' is followed by 'to + infinitive'."
+        ]
+      },
+      {
+        "id": "b2_ginf_08",
+        "level": "B2",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "He admitted to ___ the documents without permission.",
+        "options": ["access", "accessing", "accesses"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect:'to here is a preposition, and so is followed by verb-ing.",
+          "Correct: 'Admitted to' is followed by a gerund.",
+          "Incorrect: We can't use a verb in the present simple after a preposition."
+        ]
+      },
+      {
+        "id": "b2_ginf_09",
+        "level": "B2",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "He forgot ___ the door before leaving.",
+        "options": ["lock", "locking", "to lock"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'forget' takes either the gerund or infinitive'.",
+          "Incorrect: 'forget' can take the gerund, when referring to a memory we have. e.g 'I won't forget meeting you'",
+          "Correct: 'Forgot to lock' = he didn’t do it."
+        ]
+      },
+      {
+        "id": "b2_ginf_10",
+        "level": "B2",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "It was really boring. He went on ___ about his trip for hours.",
+        "options": ["to talk", "talking", "talk"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'Go on to infinitive' means you stop one activity and start another.",
+          "Correct: 'Go on + verb-ing' = he continued the same activity.",
+          "Incorrect: Go on never goes with the infinitive without 'to'."
+        ]
+      },
+      {
+        "id": "c1_ginf_12b",
+        "level": "C1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "They were forbidden ___ their phones during the exam.",
+        "options": ["using", "to using", "to use"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: forbid + to infinitive.",
+          "Incorrect: forbid does not take the gerund.",
+          "Correct: 'forbid' takes the infinitive with 'to'."
+        ]
+      },
+      {
+        "id": "c1_ginf_13b",
+        "level": "B1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "He promised ___ the documents by Friday.",
+        "options": ["sending", "send", "to send"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'Promised sending' is not standard.",
+          "Incorrect: The bare infinitive isn't used after 'promised'.",
+          "Correct: 'Promise' is followed by 'to + base verb'."
+        ]
+      },
+      {
+        "id": "c1_ginf_14b",
+        "level": "B2",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "The manager agreed ___ us more time to finish.",
+        "options": ["giving", "give", "to give"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'agree' + to infinitive.",
+          "Incorrect: 'agree' doesn't take the infinitive without 'to'.",
+          "Correct: 'Agree' is followed by the infinitive with 'to'."
+        ]
+      },
+      {
+        "id": "c1_ginf_11",
+        "level": "B2",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "I don’t mind you ___ late as long as you call.",
+        "options": ["arriving", "to arrive", "arrive"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Mind' is followed by a gerund.",
+          "Incorrect: 'To arrive' is not used with 'mind'.",
+          "Incorrect: 'mind' to verb-ing always'"
+        ]
+      },
+      {
+        "id": "c1_ginf_12",
+        "level": "C1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "You had better ___ your boss before making changes.",
+        "options": ["consult", "consulting", "to consult"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Had better' works like a modal verb (similar meaning to 'should') and takes the infinitive without 'to'.",
+          "Incorrect: had better + infinitive without 'to'.",
+          "Incorrect: had better + infinitive without 'to'."
+        ]
+      },
+      {
+        "id": "c1_ginf_13",
+        "level": "C1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "I suggest ___ the train to avoid traffic.",
+        "options": ["take", "taking", "to take"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'suggest' + verb-ing.",
+          "Correct: 'Suggest' is typically followed by a gerund.",
+          "Incorrect: suggest + to infinitive is not standard."
+        ]
+      },
+      {
+        "id": "c1_ginf_14",
+        "level": "C1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "He denied ___ the email, even though we had proof.",
+        "options": ["to send", "sending", "send"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'Deny' takes a gerund, not an infinitive.",
+          "Correct: 'Denied sending' is the standard form.",
+          "Incorrect: deny + verb-ing always."
+        ]
+      },
+      {
+        "id": "c1_ginf_15",
+        "level": "C1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "Is it really worth ___ a complaint? They won’t do anything.",
+        "options": ["to make", "make", "making"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'Worth' is not followed by an infinitive.",
+          "Incorrect: 'Worth' + verb-ing.",
+          "Correct: 'Worth is followed by a gerund or a noun."
+        ]
+      },
+      {
+        "id": "c1_ginf_16",
+        "level": "C1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "She was forbidden ___ the lab without supervision.",
+        "options": ["entering", "to enter", "to entering"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'Forbid' takes to + infinitive.",
+          "Correct: forbid (somebody9 + to infinitive.",
+          "Incorrect: forbid never takes the gerund."
+        ]
+      },
+      {
+        "id": "c1_ginf_17",
+        "level": "C1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "We managed to avoid ___ by the traffic cameras.",
+        "options": ["being caught", "to be caught", "caught"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Avoid' is followed by a gerund. Passive form = 'being caught'.",
+          "Incorrect: avoid 'verb-ing'.",
+          "Incorrect: 'being' is necessary as this is a passive voice."
+        ]
+      },
+      {
+        "id": "c1_ginf_18",
+        "level": "C1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "They let us ___ the venue earlier than usual.",
+        "options": ["to enter", "entering", "enter"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'Let' is followed by the infinitive without to.",
+          "Incorrect: 'Let' does not take a gerund'.",
+          "Correct: 'Let someone do something', let takes infinitive without to."
+        ]
+      },
+      {
+        "id": "c1_ginf_19",
+        "level": "C1",
+        "tag": "Gerunds and Infinitives",
+        "sentence": "The therapist recommended ___ a journal every night.",
+        "options": ["to keep", "keep", "keeping"],
+        "answerIndex": 2,
+        "explanations": [
+          
+          "Incorrect: recommend + to infinitive is not standard.",
+          "Incorrect: recommend + verb-ing.",
+          "Correct: 'Recommend' is followed by a gerund."
+        ]
+      },
+      {
+        "id": "b1_future_01",
+        "level": "B1",
+        "tag": "Future Forms",
+        "sentence": "Look at those clouds! It ___ any second now.",
+        "options": ["will rain", "is raining", "is going to rain"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'Will rain' less natural when the prediction is based on (visible) evidence in the present moment.",
+          "Incorrect: Present continuous is used for arrangements (plans), not predictions.",
+          "Correct: 'Going to' is used for predictions based on present evidence."
+        ]
+      },
+      {
+        "id": "b2_future_02",
+        "level": "B2",
+        "tag": "Future Forms",
+        "sentence": "They ___ for Paris at 6am tomorrow.",
+        "options": ["are leaving", "will leave", "leaves"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Present continuous for fixed plans with a time reference.",
+          "Incorrect: 'Will leave' is less natural for scheduled events.",
+          "Incorrect: Present simple is more common in timetables, not personal plans. Here it is incorrect because of the 's' as well (they=plural)."
+        ]
+      },
+      {
+        "id": "b2_future_03",
+        "level": "B2",
+        "tag": "Future Forms",
+        "sentence": "By the time you get home, I ___ dinner, so you can eat as soon as you arrive.",
+        "options": ["will be cooking", "am going to cook", "will have cooked"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: This would describe an ongoing action, not a completed one. We know the food will be ready before you arrive.",
+          "Incorrect: 'Going to' doesn't work with 'by the time' in this case.",
+          "Correct: 'Will have cooked' shows completion before a point in the future, and is typically used with 'by the time'."
+        ]
+      },
+      {
+        "id": "a2_future_04",
+        "level": "A2",
+        "tag": "Future Forms",
+        "sentence": "I think it ___ cold tomorrow.",
+        "options": ["will be", "is being", "going to be"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Will' is used for predictions based on opinion or belief.",
+          "Incorrect: future continuous is not used for future predictions.",
+          "Incorrect: 'Going to be' is more common with present evidence. Here it is incorrect because we're missing the verb 'to be': 'is going to be'."
+        ]
+      },
+      {
+        "id": "b1_future_05",
+        "level": "B1",
+        "tag": "Future Forms",
+        "sentence": "This time next week, we ___ on the beach!",
+        "options": ["are lying", "will be lying", "will have lain"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: Present continuous is use for future arrangements. Here we are describing an action in progress at a future time.",
+          "Correct: 'Will be lying' (future continuous) describes an ongoing future action.",
+          "Incorrect: 'Will have lain' focuses on completion, not an action in progress."
+        ]
+      },
+      {
+        "id": "b2_future_06",
+        "level": "B2",
+        "tag": "Future Forms",
+        "sentence": "She says she ___ her final decision by Friday.",
+        "options": ["will be making", "will have made", "makes"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: Progressive doesn't work with 'by Friday. It could work with 'on Friday' or 'this Friday', but not with 'by'.",
+          "Correct: 'Will have made' expresses completed future action before another point. future perfect especially common with 'by'.",
+          "Incorrect: Present simple doesn't work for a future plan."
+        ]
+      },
+      {
+        "id": "a2_future_07",
+        "level": "B1",
+        "tag": "Future Forms",
+        "sentence": "We ___ a barbecue on Saturday. Want to come?",
+        "options": ["are having", "will have", "have had"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Present continuous is used for planned future events/arrangements.",
+          "Incorrect: 'Will have' is strange here as we are referring to a plan we already hav.",
+          "Incorrect: 'Have had', present perfect, refers to the past."
+        ]
+      },
+      {
+        "id": "c1_future_08",
+        "level": "C1",
+        "tag": "Future Forms",
+        "sentence": "If she keeps going at this pace, she ___ the summit before sunset.",
+        "options": ["will reaches", "will have reached", "are reaching"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'Will reach' is possible but not 'will reaches'. will (modal verb) + infintive without to.",
+          "Correct: 'Will have reached' is used for completion before a point in time.",
+          "Incorrect: Present continuous is used for future arrangements, and doesn't fit here (conditional/prediction)."
+        ]
+      },
+      {
+        "id": "b2_future_09",
+        "level": "B2",
+        "tag": "Future Forms",
+        "sentence": "Don't call her at 8. She ___ her presentation then. It starts at 7:30",
+        "options": ["will be giving", "gives", "will give"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Will be giving' shows an action in progress at a future time.",
+          "Incorrect: Present simple doesn't indicate an action already in progress. It could be used for a fixed timetabled event, but less natural here.",
+          "Incorrect: 'Will give' suggests her presentation starts at 8, but we know it starts earlier (7:30)."
+        ]
+      },
+      {
+        "id": "b1_future_10",
+        "level": "B1",
+        "tag": "Future Forms",
+        "sentence": "I ___ the results as soon as I get them.",
+        "options": ["will tell you", "am telling you", "go to tell you"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Will' is used in conditional sentences and future time clauses (as soon as).",
+          "Incorrect: 'Am telling you' suggests a fixed arrangement, which doesn't fit here.",
+          "Incorrect: 'Go to tell you' needs to be in the continuous (going to future), 'am going to tell you'. But is less natural in these structures."
+        ]
+      },
+      {
+        "id": "c1_future_11",
+        "level": "C1",
+        "tag": "Future Forms",
+        "sentence": "The President ___ a formal apology later this afternoon.",
+        "options": ["going to issue", "issues", "is to issue"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: missing the the verb to be: 'is going to issue'.",
+          "Incorrect: Present simple is rare for future outside timetables or schedules.",
+          "Correct: 'Be to + infinitive' is formal and appropriate in announcements."
+        ]
+      },
+      {
+        "id": "c1_future_12",
+        "level": "C1",
+        "tag": "Future Forms",
+        "sentence": "The flight ___ at 8:15, so we need to leave now.",
+        "options": ["is about to leave", "is set to leaving", "is due to leave"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'About to' implies very soon but doesn’t give a fixed time.",
+          "Incorrect: 'Is set to leaving' is incorrect because 'set to' needs the infinitive.",
+          "Correct: 'Due to' works well with scheduled arrangements."
+        ]
+      },
+      {
+        "id": "c1_future_13",
+        "level": "B2",
+        "tag": "Future Forms",
+        "sentence": "He looked like he ___ something important.",
+        "options": ["is going to say", "will have said", "was about to say"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: Present/future mix doesn't fit with past context. 'was going to say' would be correct.",
+          "Incorrect: future perfect doesn't fit with 'looked' in the past.",
+          "Correct: 'Was about to' implies immediate past intention. Future in the past (was instead of is)."
+        ]
+      },
+      {
+        "id": "c1_future_15",
+        "level": "C1",
+        "tag": "Future Forms",
+        "sentence": "He is ___ launching a new brand when the scandal broke.",
+        "options": ["just about to", "due to", "on the point of"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: would be correct with the infinitive: just about to LAUNCH.",
+          "Incorrect: 'Due to' also takes the infinitive: 'due to launch'. due= scheduled or expected.",
+          "Correct: 'On the point of' has a similar meaning to 'be about to' but goes with verb-ing."
+        ]
+      },
+      {
+        "id": "c1_future_17",
+        "level": "C1",
+        "tag": "Future Forms",
+        "sentence": "The meeting ___ at 2pm sharp, so please be punctual.",
+        "options": ["is to beginning", "will have begun", "is due to begin"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'is to begin' (infinitive) would be correct. to be + to inf is a formal future form, especially for timetabled events.",
+          "Incorrect: 'future perfect would mean it begins before 2pm- not possible with 2pm SHARP.",
+          "Correct: 'Is due to' is ideal for fixed, scheduled events like meetings. 'due' similar to 'scheduled' or 'expected'."
+        ]
+      },
+      {
+        "id": "A2_modal_01",
+        "level": "A2",
+        "tag": "Modal verbs",
+        "sentence": "You ___ leave early today if you finish your work.",
+        "options": ["must", "can", "should"],
+        "answerIndex": 1,
+        "explanations": [
+          "'must' = obligation, not permission. Not logical in this context.",
+          "Correct: 'can' expresses permission.",
+          "'ought' = recommendation, but is incorrect here without 'to'."
+        ]
+      },
+      {
+        "id": "B1_modal_02",
+        "level": "B1",
+        "tag": "Modal verbs",
+        "sentence": "I ___ speak French quite well, but I'm still learning.",
+        "options": ["be able to", "can", "could"],
+        "answerIndex": 1,
+        "explanations": [
+          "Needs 'am/is/are able to' for present, and in most cases is more formal.",
+          "Correct: present ability = 'can'.",
+          "'could' = past/general ability, but this sentence is about the present."
+        ]
+      },
+      {
+        "id": "B1_modal_04",
+        "level": "B1",
+        "tag": "Modal verbs",
+        "sentence": "You ___ bring any food; there's plenty here.",
+        "options": ["don't have to", "can't", "mustn't"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'don't have to' suggests it isn't necessary.",
+          "'can't' = impossibility/prohibition, which is too strong here.",
+          "'mustn't have' = mustn't have is to describe past deductions, (it was impossible) and goes with past participle. You could say 'mustn't bring', but it's a bit strong. "
+        ]
+      },
+      {
+        "id": "B2_modal_05",
+        "level": "B2",
+        "tag": "Modal verbs",
+        "sentence": "The lights are off; they ___ be at home.",
+        "options": ["could", "can't", "must"],
+        "answerIndex": 1,
+        "explanations": [
+          "A possibility, but then the lights would be on.",
+          "Correct: strong negative deduction: they are definitely not at home.",
+          "Strong positive deduction: they are definitely at home, but then the lights would be on."
+        ]
+      },
+      {
+        "id": "C1_modal_06",
+        "level": "B2",
+        "tag": "Modal verbs",
+        "sentence": "He drove for six hours without stopping — he ___ been exhausted.",
+        "options": ["must have", "should have", "could have"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: strong deduction about the past. It's very likely he was exhausted.",
+          "Expectation/criticism, not deduction. It was a good idea for him to be exhausted doesn't make sense.",
+          "Possibility only, not strong enough for this context."
+        ]
+      },
+      {
+        "id": "C1_modal_07",
+        "level": "B2",
+        "tag": "Modal verbs",
+        "sentence": "You ___ told me earlier; now it's too late.",
+        "options": ["must have", "should have", "could"],
+        "answerIndex": 1,
+        "explanations": [
+          "past Deduction: You definitey told me earlier, which doesn't make sense in this context.",
+          "Correct: past advice/criticism. You didn't tell me, and that was a mistake.",
+          "Past possibility, but is missing the 'have' to be correct."
+        ]
+      },
+      {
+        "id": "B2_modal_09",
+        "level": "B1",
+        "tag": "Modal verbs",
+        "sentence": "I ___ go to London next week, but I'm not sure yet.",
+        "options": ["might", "ought", "must"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: uncertain future possibility.",
+          "ought to expresses advice/ something is a good idea, but we are missing 'to'.",
+          "Obligation/necessity, grammatically correct, but doesn't make sense with 'I'm not sure yet'."
+        ]
+      },
+      {
+        "id": "C1_modal_10",
+        "level": "C1",
+        "tag": "Modal verbs",
+        "sentence": "You're late — your presentation ___ start at nine.",
+        "options": ["should have", "was supposed to", "must have"],
+        "answerIndex": 1,
+        "explanations": [
+          "Could be correct, but we would need 'started' after have, not the infinitive 'start'.",
+          "Correct: expresses a past obligation that was not satisfied.",
+          "Deduction about the past: Your presentation definitely started at nine, but it doesn't fit the context of being late."
+        ]
+      },
+      {
+        "id": "C1_modal_21",
+        "level": "C1",
+        "tag": "Modal verbs",
+        "sentence": "We left at 5 a.m., but there was no traffic — we ___ left so early.",
+        "options": ["needn't have", "didn't need to", "mustn't have"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'needn't have + past participle' = the action happened but was unnecessary.",
+          "'didn't need to' = unnecessary, but it requires the infinitive 'leave', not the past participle.",
+          "'mustn't have' = past deduction; wrong meaning here, as we are talking about a past action that was unnecessary, not a deduction."
+        ]
+      },
+      {
+        "id": "B2_modal_22",
+        "level": "B2",
+        "tag": "Modal verbs",
+        "sentence": "We had free tickets, so we ___ pay for entry.",
+        "options": ["didn't need to", "needn't have", "mustn't"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: lack of necessity (and we probably didn’t pay).",
+          "'needn't have paid' would imply we paid, but it wasn’t necessary. But here we have 'pay' not the past participle 'paid'.",
+          "'mustn't' = present prohibition or strong advice, but the sentence is about the past."
+        ]
+      },
+      {
+        "id": "C1_modal_23",
+        "level": "C1",
+        "tag": "Modal verbs",
+        "sentence": "After three attempts, she finally ___ reset the server.",
+        "options": ["was able to", "could", "could have"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct for an ability on a single successful occasion.",
+          "'could' is not natural for an ability on a specific occasion.",
+          "'could have' suggests a possibility that didn’t necessarily happen, which doesn't fit here."
+        ]
+      },
+      {
+        "id": "C1_modal_24",
+        "level": "C1",
+        "tag": "Modal verbs",
+        "sentence": "Doorbell again — that ___ the post woman.",
+        "options": ["will be", "would be", "should have been"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'will' for present assumption: A deduction about the present (That’ll be the post woman).",
+          "'would be' is not used for a present assumption here.",
+          "'should have been' is past expectation; wrong time: we are talking about the present, not the past."
+        ]
+      },
+      {
+        "id": "C1_modal_25",
+        "level": "C1",
+        "tag": "Modal verbs",
+        "sentence": "How ___  speak to her like that?",
+        "options": ["dare you", "dare you to", "do dare"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: dare is often used as a modal verb in questions forms and negatives",
+          "'to' is not used in modal constructions.",
+          "'do dare you' is the wrong order for a question form. We could say 'do you dare to speak to her like that?' or 'do you dare speak to her like that'."
+        ]
+      },
+      {
+        "id": "C1_modal_26",
+        "level": "C1",
+        "tag": "Modal verbs",
+        "sentence": "You ___ be late again.",
+        "options": ["had better not", "shouldn't have", "hadn't better"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: strong recommendation for present/future. Similar to 'should', but stronger, often used as a threat/warning.",
+          "'shouldn't have' = past criticism- doesn't work because we have 'be' and not 'been'.",
+          "'had better' is never separated by not, the negative form is 'had better not'."
+        ]
+      },
+      {
+        "id": "C1_modal_27",
+        "level": "C1",
+        "tag": "Modal verbs",
+        "sentence": "He did it again — I ___ he ___ cancel at the last minute.",
+        "options": ["might have known / would", "might have known / will", "might know / would"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct idiom: 'I might have known (that) he would…' (ironic, typical behaviour).",
+          "Tense clash: 'might have known' pairs with 'would', not 'will', for this idiom.",
+          "Wrong tense: 'might know' is present, we need a past meaning here."
+        ]
+      },
+      {
+        "id": "C1_modal_28",
+        "level": "C1",
+        "tag": "Modal verbs",
+        "sentence": "They brought coats, but the hall was heated — they ___ brought them.",
+        "options": ["needn't have", "didn't need to", "mustn't have"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: they DID bring them, but it wasn’t necessary. Need can be a modal verb in the negative.",
+          "Didn't need to is always possible, but here we have `brought' not the infinitive 'bring'.",
+          "'mustn't have' is a past deduction; not a past necessity."
+        ]
+      },
+      {
+        "id": "B2_modal_29",
+        "level": "B2",
+        "tag": "Modal verbs",
+        "sentence": "With fast-track security, we ___ wait in the long queue.",
+        "options": ["didn't need to", "needn't have", "couldn't have"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: lack of necessity in the past (and we probably didn’t wait).",
+          "'needn't have waited' implies we did wait, which wasn't necessary- but it requires the past participle 'WAITED'.",
+          "'couldn't have' = impossibility; wrong meaning."
+        ]
+      },
+      {
+        "id": "C1_modal_30",
+        "level": "C1",
+        "tag": "Modal verbs",
+        "sentence": "The door was jammed, but after a few tries we ___ open it.",
+        "options": ["were able to", "could", "could have"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct for a past ability on a single occasion.",
+          "Not possible for an ability on a specific occasion in the past.",
+          "Suggests a possibility in the past, not something that we actually did."
+        ]
+      },
+      {
+        "id": "A2_modal_31",
+        "level": "A2",
+        "tag": "Modal verbs",
+        "sentence": "You ________ use my laptop if you need it.",
+        "options": ["can", "mustn't", "should to"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'can' = permission/ability.",
+          "'must' = prohibition, doesn't make sense with 'if you need it'.",
+          "'should' = advice, less natural here, and cannot be used with 'to'."
+        ]
+      },
+      {
+        "id": "A2_modal_32",
+        "level": "A2",
+        "tag": "Modal verbs",
+        "sentence": "You ________ swim here; the currents are too dangerous.",
+        "options": ["mustn't", "don't have to", "could"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'mustn't' = prohibition.",
+          "'don't have to' means you can swim here, but it isn't necessary, which doesn't make sense here.",
+          "'could' = theoretical possibility, which contradicts the fact that it is too dangerous."
+        ]
+      },
+      {
+        "id": "B1_modal_33",
+        "level": "B1",
+        "tag": "Modal verbs",
+        "sentence": "You ________ see a dentist as soon as you can.",
+        "options": ["should", "must to", "ought"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'should' = advice/recommendation.",
+          "'must' = strong obligation but we can't use 'to' after a modal verb.",
+          "'ought' = advice recommendation, but ought goes with 'to'."
+        ]
+      },
+      {
+        "id": "B2_modal_36",
+        "level": "B2",
+        "tag": "Modal verbs",
+        "sentence": "He was in Madrid all day; he ________ attended the meeting in London.",
+        "options": ["can't have", "mustn't have", "shouldn't have"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'can't have' = strong negative deduction about the past. It was impossible for him to attend.",
+          "'must have' means it was almost certain he attended, which is not possible if he was in Madrid.",
+          "'shouldn't have' = past criticism, wrong meaning."
+        ]
+      },
+      {
+        "id": "C1_modal_37",
+        "level": "C1",
+        "tag": "Modal verbs",
+        "sentence": "We ended up paying for a taxi, but the hotel offered a free shuttle — we ________ paid for the ride.",
+        "options": ["needn't have", "didn't need to", "ought not to"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: we DID pay, but it wasn’t necessary, in the negative need can be a modal verb.",
+          "Means it wasn’t necessary but it would require the infinitive 'pay'.",
+          "a bad idea in the past, but we are missing 'have' to be correct. 'ought not to have paid' would be correct."
+        ]
+      },
+      {
+        "id": "C1_modal_38",
+        "level": "C1",
+        "tag": "Modal verbs",
+        "sentence": "Despite the outage, the team ________ restore service by noon.",
+        "options": ["was able to", "could", "could have"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct for an ability on one specific occasion.",
+          "Unnatural for one specific success in the positive, we use could for general ability in the past.",
+          "Past possibility, not a completed success."
+        ]
+      }
+  ]

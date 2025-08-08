@@ -1,0 +1,429 @@
+/* src/index.css */
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  font-weight: 500;
+  color: #646cff;
+  text-decoration: inherit;
+}
+a:hover {
+  color: #535bf2;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus,
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #ffffff;
+  }
+  a:hover {
+    color: #747bff;
+  }
+  button {
+    background-color: #f9f9f9;
+  }
+}
+/* report icon positioning on each card */
+.gapfill-card {
+  position: relative;
+  padding: 1.5rem;
+  background: #1e293b;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* icon button container */
+.report-icon-btn {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  outline: none;
+}
+
+/* tooltip text hidden by default */
+.report-icon-btn .tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity .2s;
+  position: absolute;
+  bottom: 120%;
+  right: 50%;
+  transform: translateX(50%);
+  background: rgba(0,0,0,0.8);
+  color: #fff;
+  font-size: 12px;
+  padding: 4px 6px;
+  border-radius: 3px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* show it on hover */
+.report-icon-btn:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* simple styling for the report form overlay */
+.report-form-card {
+  position: absolute;
+  bottom: 40px;
+  right: 8px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px;
+  width: 220px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  z-index: 10;
+}
+
+.report-form-card h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1em;
+}
+
+.report-form-card select,
+.report-form-card textarea {
+  width: 100%;
+  margin-bottom: 8px;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.report-form-buttons {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+/* CEFR badge — refined chip */
+.cefr-badge {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.28rem 0.62rem;
+  border-radius: 9999px;
+  border: 1px solid #2a3d6e;
+  background: rgba(13, 27, 56, 0.55);         /* subtle glassy bg */
+  color: #e5efff;                              /* consistent light text */
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.12);
+  backdrop-filter: blur(2px);                  /* optional: remove if you dislike blur */
+}
+
+/* small colored dot = level hint */
+.cefr-badge::before {
+  content: '';
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--badge-color, #8aa0ff);
+  box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset;
+}
+
+/* Level colours (set as CSS variables) */
+.cefr-A1 { --badge-color: #8ec7ff; }
+.cefr-A2 { --badge-color: #6ef4cf; }
+.cefr-B1 { --badge-color: #7fb4ff; }
+.cefr-B2 { --badge-color: #f0c35b; }
+.cefr-C1 { --badge-color: #e69aa0; }
+
+/* Mobile tweaks */
+@media (max-width: 480px) {
+  .cefr-badge {
+    top: 0.5rem;
+    right: 0.5rem;
+    padding: 0.24rem 0.5rem;
+    font-size: 0.72rem;
+  }
+}
+
+
+  .sentence-text {
+    padding-right: 3rem;     /* shrink right padding so text has more room */
+    font-size: 1rem;         /* optional: adjust base font-size if needed */
+  }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem; /* adjust as you like */
+}
+.fav-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+.fav-btn:hover {
+  opacity: 0.8;
+}
+
+/* fieldset tidy */
+.levels-fieldset { border: none; margin-bottom: 16px; padding: 0; }
+
+/* row + chip styles */
+.level-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 6px; }
+.level-chip {
+  position: relative; display: inline-flex; align-items: center; gap: .4rem;
+  padding: 6px 10px; border-radius: 9999px;
+  border: 1px solid #2a3d6e; background: rgba(13,27,56,.55);
+  color: #e5efff; font-weight: 800; cursor: pointer; user-select: none;
+  transition: border-color .15s, background .15s, transform .05s;
+}
+.level-chip input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.level-chip .dot { width: 8px; height: 8px; border-radius: 50%;
+  background: var(--badge-color, #8aa0ff); box-shadow: 0 0 0 2px rgba(255,255,255,.06) inset; }
+.level-chip .txt { letter-spacing: .02em; }
+.level-chip:hover { background: rgba(13,27,56,.75); }
+.level-chip:active { transform: translateY(1px); }
+.level-chip:focus-within { outline: 2px solid #3b82f6; outline-offset: 2px; }
+.level-chip.selected { border-color: var(--badge-color, #8aa0ff); background: rgba(13,27,56,.75); }
+
+/* CEFR color variables (if not already added) */
+.cefr-A1 { --badge-color: #8ec7ff; }
+.cefr-A2 { --badge-color: #6ef4cf; }
+.cefr-B1 { --badge-color: #7fb4ff; }
+.cefr-B2 { --badge-color: #f0c35b; }
+.cefr-C1 { --badge-color: #e69aa0; }
+
+/* Stronger affordance for selectable chips */
+.level-chip {
+  border: 1px solid #2a3d6e;
+}
+.level-chip:hover {
+  border-color: var(--badge-color, #8aa0ff);
+}
+
+/* Turn the dot into a mini checkbox */
+.level-chip .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 4px;                  /* rounded square reads like a checkbox */
+  border: 2px solid var(--badge-color, #8aa0ff);
+  background: transparent;
+  position: relative;
+  transition: background .15s ease, border-color .15s ease, transform .05s ease;
+}
+
+/* Selected state: fill the box and draw a check */
+.level-chip.selected {
+  border-color: var(--badge-color, #8aa0ff);
+  background: rgba(255, 211, 106, 0.08);  /* subtle gold wash so the chip changes too */
+  color: #ffffff;
+  box-shadow: 0 0 0 2px rgba(255,211,106,.15);
+}
+.level-chip.selected .dot {
+  background: var(--badge-color, #8aa0ff);
+}
+.level-chip.selected .dot::after {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: #0a1f44;                        /* dark navy tick on colored box */
+}
+
+/* ——— Smaller chips overall ——— */
+.level-row { gap: 8px; }
+
+.level-chip {
+  padding: 4px 8px;          /* was 6px 10px */
+  font-size: 0.74rem;        /* was ~0.78–0.8rem */
+}
+
+.level-chip .dot {
+  width: 10px;               /* was 14px in the checkbox variant */
+  height: 10px;
+  border-width: 2px;
+}
+.level-chip.selected .dot::after {
+  font-size: 10px;           /* tick size down */
+}
+
+/* ——— Mobile: force single line with horizontal scroll ——— */
+@media (max-width: 520px) {
+  .level-row {
+    flex-wrap: nowrap;       /* keep in one row */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 6px;
+  }
+  .level-chip {
+    padding: 3px 7px;
+    font-size: 0.68rem;
+  }
+  .level-chip .dot {
+    width: 9px;
+    height: 9px;
+    border-width: 1.5px;
+  }
+  .level-chip.selected .dot::after {
+    font-size: 9px;
+  }
+}
+
+/* Optional: hide scrollbar on WebKit (purely cosmetic) */
+/*
+.level-row::-webkit-scrollbar { display: none; }
+.level-row { scrollbar-width: none; }
+*/
+
+/* Make the indicator a clean circular dot again */
+.level-chip .dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--badge-color, #8aa0ff);
+  background: transparent;
+  transition: background .15s ease, border-color .15s ease, transform .05s ease;
+}
+
+/* Selected: fill the dot + give the chip a colored ring */
+.level-chip.selected {
+  border-color: var(--badge-color, #8aa0ff);
+  background: rgba(13,27,56,.75);
+  color: #ffffff;
+}
+.level-chip.selected .dot { background: var(--badge-color, #8aa0ff); }
+
+/* subtle outer ring using a pseudo element (plays nice with var colors) */
+.level-chip.selected::after {
+  content: '';
+  position: absolute;
+  inset: -3px;               /* ring outside the chip */
+  border-radius: 9999px;
+  border: 2px solid var(--badge-color, #8aa0ff);
+  opacity: .35;
+  pointer-events: none;
+}
+
+/* Hover affordance */
+.level-chip:hover { border-color: var(--badge-color, #8aa0ff); }
+
+/* Question count chips */
+.count-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 8px 0 6px;
+}
+
+.count-label { opacity: .8; font-size: .85rem; }
+
+.count-chip {
+  background: #0f2246;
+  border: 1px solid #2a3d6e;
+  color: #cfe2ff;
+  border-radius: 9999px;
+  padding: 6px 10px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: filter .15s, transform .05s, border-color .15s;
+}
+.count-chip:hover { filter: brightness(1.05); }
+.count-chip:active { transform: translateY(1px); }
+
+.count-chip.selected {
+  background: linear-gradient(180deg, #ffd36a, #ffb200);
+  color: #0a1f44;
+  border-color: #ffb200;
+}
+
+@media (max-width: 520px) {
+  .count-row { gap: 6px; }
+  .count-chip { padding: 4px 8px; font-size: .78rem; }
+}
+
+/* Report sheet inside the card */
+.report-bar {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid #2a3d6e;
+  border-radius: 12px;
+  background: rgba(13,27,56,.55);
+}
+
+.report-fields {
+  display: grid;
+  gap: 8px;
+}
+
+.report-input {
+  width: 100%;
+  border: 1px solid #2a3d6e;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: #0f2246;
+  color: #e5efff;
+  resize: vertical;
+}
+
+.report-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
