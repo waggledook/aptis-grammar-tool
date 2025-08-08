@@ -150,27 +150,42 @@ const toggleFav = async () => {
       </div>
 
       {/* Feedback list */}
-      {sel !== null && (
-        <div className="explanation">
-          <p className="explanation-title">Feedback:</p>
-          <ul className="explanation-list">
-            {options.map((opt, i) => (
-              <li
-                key={i}
-                className={`explanation-item ${
-                  i === answerIndex ? 'correct' : 'incorrect'
-                }`}
-              >
-                <span className="explanation-flag">
-                  {i === answerIndex ? '✔' : '✖'}
-                </span>
-                <span className="explanation-option">{opt}</span>
-                <p className="explanation-text">{explanations[i]}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
+      {sel !== null && (() => {
+  // Pair option + explanation + meta
+  const feedback = options.map((opt, i) => ({
+    key: i,                 // original index
+    opt,
+    exp: explanations[i],
+    isCorrect: i === answerIndex,
+    isChosen: i === sel
+  }));
+
+  // Order: correct first, then chosen (if wrong), then original order
+  const ordered = feedback.sort((a, b) => {
+    if (a.isCorrect !== b.isCorrect) return a.isCorrect ? -1 : 1;
+    if (a.isChosen !== b.isChosen)   return a.isChosen ? -1 : 1;
+    return a.key - b.key;
+  });
+
+  return (
+    <div className="explanation">
+      <p className="explanation-title">Feedback:</p>
+      <ul className="explanation-list">
+        {ordered.map(f => (
+          <li
+            key={f.key}
+            className={`explanation-item ${f.isCorrect ? 'correct' : 'incorrect'}`}
+          >
+            <span className="explanation-flag">{f.isCorrect ? '✔' : '✖'}</span>
+            <span className="explanation-option">{f.opt}</span>
+            <p className="explanation-text">{f.exp}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+})()}
+
 
       {/* Report icon */}
       <button
