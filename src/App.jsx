@@ -63,6 +63,19 @@ useEffect(() => {
     }
   }
 
+  const newSetSameSettings = () => {
+    if (loading || tagsLoading) return;
+    generate();                              // re-runs with current levels/tag/count
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
+  const clearExercises = () => {
+    setItems([]);
+    setAnsweredCount(0);
+    setError(null);
+    setRunKey(k => k + 1);                   // ensures any child state is reset
+  };
+  
   // — EARLY RETURN FOR AUTH FORM —  
   // Now we’ve already registered *all* hooks, so it’s safe:
   if (showAuth && !user) {
@@ -189,6 +202,30 @@ useEffect(() => {
               answered={answeredCount}
               total={items.length}
             />
+
+          {/* ⬇️ Add this footer block */}
+    {items.length > 0 && (
+      <div className="exercise-footer">
+        <button
+          type="button"
+          className="review-btn"
+          onClick={newSetSameSettings}
+          disabled={loading || tagsLoading}
+        >
+          Replay
+        </button>
+
+        <button
+          type="button"
+          className="ghost-btn"
+          onClick={clearExercises}
+          disabled={loading}
+        >
+          Clear page
+        </button>
+      </div>
+    )}
+    {/* ⬆️ End footer */}
           </>
         )}
       </>

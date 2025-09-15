@@ -2633,7 +2633,7 @@
         "id": "A2_modal_31",
         "level": "A2",
         "tag": "Modal verbs",
-        "sentence": "You ________ use my laptop if you need it.",
+        "sentence": "You ___ use my laptop if you need it.",
         "options": ["can", "mustn't", "should to"],
         "answerIndex": 0,
         "explanations": [
@@ -2646,7 +2646,7 @@
         "id": "A2_modal_32",
         "level": "A2",
         "tag": "Modal verbs",
-        "sentence": "You ________ swim here; the currents are too dangerous.",
+        "sentence": "You ___ swim here; the currents are too dangerous.",
         "options": ["mustn't", "don't have to", "could"],
         "answerIndex": 0,
         "explanations": [
@@ -2659,7 +2659,7 @@
         "id": "B1_modal_33",
         "level": "B1",
         "tag": "Modal verbs",
-        "sentence": "You ________ see a dentist as soon as you can.",
+        "sentence": "You ___ see a dentist as soon as you can.",
         "options": ["should", "must to", "ought"],
         "answerIndex": 0,
         "explanations": [
@@ -2672,7 +2672,7 @@
         "id": "B2_modal_36",
         "level": "B2",
         "tag": "Modal verbs",
-        "sentence": "He was in Madrid all day; he ________ attended the meeting in London.",
+        "sentence": "He was in Madrid all day; he ___ attended the meeting in London.",
         "options": ["can't have", "mustn't have", "shouldn't have"],
         "answerIndex": 0,
         "explanations": [
@@ -2685,7 +2685,7 @@
         "id": "C1_modal_37",
         "level": "C1",
         "tag": "Modal verbs",
-        "sentence": "We ended up paying for a taxi, but the hotel offered a free shuttle — we ________ paid for the ride.",
+        "sentence": "We ended up paying for a taxi, but the hotel offered a free shuttle — we ___ paid for the ride.",
         "options": ["needn't have", "didn't need to", "ought not to"],
         "answerIndex": 0,
         "explanations": [
@@ -2698,7 +2698,7 @@
         "id": "C1_modal_38",
         "level": "C1",
         "tag": "Modal verbs",
-        "sentence": "Despite the outage, the team ________ restore service by noon.",
+        "sentence": "Despite the outage, the team ___ restore service by noon.",
         "options": ["was able to", "could", "could have"],
         "answerIndex": 0,
         "explanations": [
@@ -2706,5 +2706,319 @@
           "Unnatural for one specific success in the positive, we use could for general ability in the past.",
           "Past possibility, not a completed success."
         ]
+      },
+      {
+        "id": "a2_passive_01",
+        "level": "A2",
+        "tags": ["Passive Voice"],
+        "sentence": "The cake ___ by my mum yesterday.",
+        "options": ["was baked", "baked", "is baked"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: past simple passive = was/were + past participle.",
+          "Incorrect: 'baked' (simple past active) is wrong. A cake cannot bake itself.",
+          "Incorrect: present simple passive doesn't match 'yesterday' (past time)."
+        ]
+      },
+      {
+        "id": "a2_passive_02",
+        "level": "A2",
+        "tags": ["Passive Voice"],
+        "sentence": "English ___ in many countries.",
+        "options": ["speaks", "is spoken", "was spoke"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'speaks' is active voice. A language cannot speak itself.",
+          "Correct: present simple passive for general truths/habits.",
+          "Incorrect: '*was spoke*' is ungrammatical; past participle is 'spoken'."
+        ]
+      },
+      {
+        "id": "a2_passive_03",
+        "level": "A2",
+        "tags": ["Passive Voice"],
+        "sentence": "The windows ___ every week.",
+        "options": ["were clean", "are cleaned", "clean"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'were clean' doesn't use the past participle 'cleaned'.",
+          "Correct: present simple passive for regular actions.",
+          "Incorrect: 'clean' (active) is wrong. A window cannot clean itself."
+        ]
+      },
+      {
+        "id": "a2_passive_04",
+        "level": "A2",
+        "tags": ["Passive Voice"],
+        "sentence": "The letter ___ tomorrow.",
+        "options": ["is send", "will be sent", "will send"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: 'is send' doesn't incude the past participle 'sent'.",
+          "Correct: future passive = will be + past participle.",
+          "Incorrect: 'will send' is active- a letter cannot send itself."
+        ]
+      },
+      {
+        "id": "a2_passive_05",
+        "level": "A2",
+        "tags": ["Passive Voice"],
+        "sentence": "Lunch ___ at 1 p.m. every day.",
+        "options": ["is served", "serves", "served"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: present simple passive for scheduled/regular service.",
+          "Incorrect: passive is required, lunch cannot serve itself.",
+          "Incorrect: needs the verb 'to be'."
+        ]
+      },
+      {
+        "id": "a2_passive_06",
+        "level": "A2",
+        "tags": ["Passive Voice"],
+        "sentence": "The car ___ last Monday.",
+        "options": ["is repairing", "was repaired", "repaired itself"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: present continuous passive would be 'is being repaired' and doesn't match 'last Monday'.",
+          "Correct: past simple passive for a finished past action.",
+          "Incorrect: 'a car cannot repair itself'; needs a subject and auxiliary verb in the passive voice."
+        ]
+      },
+      {
+        "id": "b1_passive_01",
+        "level": "B1",
+        "tags": ["Passive Voice"],
+        "sentence": "My bike ___ last night.",
+        "options": ["has stolen", "was stolen", "was stole"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: present perfect is wrong because it is not passive (no 'been') and last night requires past simple.",
+          "Correct: past simple passive = was/were + past participle.",
+          "Incorrect: 'stole' is past simple and here we need the past participle 'stolen'"
+        ]
+      },
+      {
+        "id": "b1_passive_02",
+        "level": "B1",
+        "tags": ["Passive Voice"],
+        "sentence": "The walls ___ right now.",
+        "options": ["are being painted", "are painted", "is being painted"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: present continuous passive for an action in progress.",
+          "Incorrect: 'are painted' doesn't work with 'right now'. It's happening at the moment, so we need the continuous form.",
+          "Incorrect: wrong agreement: the plural 'walls' requires 'are'."
+        ]
+      },
+      {
+        "id": "b1_passive_03",
+        "level": "B1",
+        "tags": ["Passive Voice"],
+        "sentence": "A new library ___ next year.",
+        "options": ["is going to built", "will be built", "is build"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: needs passive infinitive 'to be built'. A library cannot build itself.",
+          "Correct: future passive with 'will'.",
+          "Incorrect: the passive requires the past participle 'built' and present simple is wrong with the future reference 'next year'."
+        ]
+      },
+      {
+        "id": "b1_passive_04",
+        "level": "B1",
+        "tags": ["Passive Voice"],
+        "sentence": "These forms ___ before Friday.",
+        "options": ["must be completed", "must complete", "must be completing"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: modal + be + past participle for passive obligation.",
+          "Incorrect: active; somebody completes the form, so passive is required.",
+          "Incorrect: continuous aspect is not used with this sense of obligation."
+        ]
+      },
+      {
+        "id": "b1_passive_05",
+        "level": "B1",
+        "tags": ["Passive Voice"],
+        "sentence": "Our house ___ by a local company.",
+        "options": ["was build", "was built", "built"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: past participle is 'built', not 'build'.",
+          "Correct: past simple passive.",
+          "Incorrect: a house cannot build itself; needs a subject and auxiliary verb in the passive voice."
+        ]
+      },
+      {
+        "id": "b1_passive_06",
+        "level": "B1",
+        "tags": ["Passive Voice"],
+        "sentence": "Dinner ___ by my dad on Sundays.",
+        "options": ["is cooked", "cooked", "was cooking"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: present simple passive for regular habits.",
+          "Incorrect: active; Dinner cannot cook itself.",
+          "Incorrect: past continuous; doesn't match 'on Sundays' (habitual), and is also active."
+        ]
+      },
+      {
+        "id": "b1_passive_07",
+        "level": "B1",
+        "tags": ["Passive Voice"],
+        "sentence": "I ___ any details at the meeting.",
+        "options": ["wasn't given", "didn't given", "haven't been gave"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: past simple passive fits the past-time context.",
+          "Incorrect: '*didn't given*' is incorrect because we need the verb 'to be' in the passive voice.",
+          "Incorrect: wrong participle ('gave'); present perfect form also mismatches a finished meeting."
+        ]
+      },
+      {
+        "id": "b1_passive_08",
+        "level": "B1",
+        "tags": ["Passive Voice"],
+        "sentence": "The story ___ in several newspapers yesterday.",
+        "options": ["was covered", "has covered", "was covering"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: past simple passive for a completed event with 'yesterday'.",
+          "Incorrect: present perfect active; we need to passive (story covered BY journalists/newspapers).",
+          "Incorrect: past continuous is wrong here with 'yesterday' and is also in the active voice."
+        ]
+      },
+      {
+        "id": "b2_passive_01",
+        "level": "B2",
+        "tags": ["Passive Voice"],
+        "sentence": "The report ___. You don't need to do anything.",
+        "options": ["has already been finished", "had already been finished", "has already finished"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: present perfect passive suits a recent, relevant completion.",
+          "Incorrect: past perfect needs a reference past event. Here the emphasis is on the present relevance.",
+          "Incorrect: this sentence requires the passive voice with the verb 'to be'."
+        ]
+      },
+      {
+        "id": "b2_passive_02",
+        "level": "B2",
+        "tags": ["Passive Voice"],
+        "sentence": "The CEO ______.",
+        "options": ["is believed to have resigned", "is said to resign", "was believed that he resigned"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: reporting passive with perfect infinitive for a completed action.",
+          "Incorrect: 'to resign' suggests a general/future habit; not the reported past event.",
+          "Incorrect: We could say 'It was believed that the CEO had resigned' or 'The CEO was believed to have resigned'."
+        ]
+      },
+      {
+        "id": "b2_passive_03",
+        "level": "B2",
+        "tags": ["Passive Voice"],
+        "sentence": "It is said ___ the palace is haunted.",
+        "options": ["that", "to be", "as"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'It is said that…' + clause.",
+          "Incorrect: We need a that clause here. We could say 'the palace is said to be haunted').",
+          "Incorrect: 'as' does not introduce the reported clause here."
+        ]
+      },
+      {
+        "id": "b2_passive_04",
+        "level": "B2",
+        "tags": ["Passive Voice"],
+        "sentence": "The results ___ to the press tomorrow morning.",
+        "options": ["will announce", "will be announced", "are announcing"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: active; who will announce?",
+          "Correct: future passive for an official communication.",
+          "Incorrect: present continuous (active) is not passive voice. 'are being annouced' could be correct."
+        ]
+      },
+      {
+        "id": "b2_passive_05",
+        "level": "B2",
+        "tags": ["Passive Voice"],
+        "sentence": "Applicants ___ of the decision by email.",
+        "options": ["will be notifying", "will notify", "will be notified"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: we need the passive here as the applicant won't notify. They will be notified (by the company for example).",
+          "Incorrect: not passive voice",
+          "Correct: future passive fits a formal announcement pattern."
+        ]
+      },
+      {
+        "id": "b2_passive_06",
+        "level": "B2",
+        "tags": ["Passive Voice"],
+        "sentence": "The software ___ to all users next week.",
+        "options": ["is rolled out", "will be rolled out", "was rolled out"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: present passive is wrong here beucase of the future time reference",
+          "Correct: future passive matches 'next week'.",
+          "Incorrect: past simple doesn't match the future time reference."
+        ]
+      },
+      {
+        "id": "c1_passive_01",
+        "level": "B2",
+        "tags": ["Passive Voice"],
+        "sentence": "She hates ___ what to do.",
+        "options": ["being told", "to being told", "that tell her"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: after 'hate', the gerund 'being told' is natural; this is a passive gerund.",
+          "Incorrect: '*to being told*' is wrong as 'to' needs the base form 'be'.",
+          "Incorrect: 'hates' is usually followed by a gerund, not a that clause."
+        ]
+      },
+      {
+        "id": "c1_passive_02",
+        "level": "C1",
+        "tags": ["Passive Voice"],
+        "sentence": "The documents need ___ before Friday.",
+        "options": ["having signed", "to be signed", "to sign"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: we need an infinitive after need and the passive voice with'be'.",
+          "Correct: we use the infinitive after need, and the passive voice with 'be': somebody will sign the document.",
+          "Incorrect: active infinitive; missing the passive meaning."
+        ]
+      },
+      {
+        "id": "c1_passive_03",
+        "level": "C1",
+        "tags": ["Passive Voice"],
+        "sentence": "He is said ___ in Portugal now.",
+        "options": ["that he is living", "to be living", "to have lived"],
+        "answerIndex": 1,
+        "explanations": [
+          "Incorrect: after 'he is said' we need an infinitive, not a clause. We could 'say it is said that he is living'",
+          "Correct: progressive passive infinitive conveys a current situation.",
+          "Incorrect: perfect infinitive refers to a completed past situation, not 'now'."
+        ]
+      },
+      {
+        "id": "c1_passive_04",
+        "level": "C1",
+        "tags": ["Passive Voice"],
+        "sentence": "The museum is thought ___ by over a million people each year.",
+        "options": ["to be visited", "to have visited", "to being visited"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: reporting passive: we need the infinitive and here in the passive voice as the museum is visted by people.",
+          "Incorrect: 'to have visited' is not passive- it suggests the museum did the visiting.",
+          "Incorrect: '*to being*' is ungrammatical; use 'to be + past participle'."
+        ]
       }
+
+      
   ]

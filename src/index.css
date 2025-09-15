@@ -427,3 +427,145 @@ button:focus-visible {
   margin-top: 8px;
 }
 
+/* ===== Primary action: Generate ===== */
+.generate-btn {
+  background: linear-gradient(180deg, #162a57, #0f2246);
+  color: #e5efff;
+  border: 1px solid #2a3d6e;
+  border-radius: 14px;
+  padding: 10px 16px;
+  font-weight: 800;
+  letter-spacing: .01em;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 0 9999px rgba(255,255,255,0.02);
+  transition: transform .05s ease, filter .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+.generate-btn:hover {
+  filter: brightness(1.05);
+  border-color: #3b82f6;
+  box-shadow: 0 8px 22px rgba(0,0,0,.28), 0 0 0 3px rgba(59,130,246,.2);
+}
+.generate-btn:active { transform: translateY(1px); }
+.generate-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59,130,246,.35);
+}
+.generate-btn:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  filter: none;
+  box-shadow: none;
+}
+
+/* ===== Quiz option buttons ===== */
+.options-row { gap: 10px; flex-wrap: wrap; }
+.option-btn {
+  background: rgba(13,27,56,.55);
+  color: #e5efff;
+  border: 1px solid #2a3d6e;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-weight: 700;
+  transition: transform .05s ease, filter .15s ease, border-color .15s ease, background .15s ease;
+}
+.option-btn:hover { filter: brightness(1.06); border-color: #3b82f6; }
+.option-btn:active { transform: translateY(1px); }
+.option-btn:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+
+/* After answer is chosen, buttons are disabled — make that look intentional */
+.option-btn:disabled { opacity: .9; cursor: default; }
+
+/* Correct/incorrect reveal (works with your existing classes) */
+.option-btn.correct {
+  border-color: #22c55e;
+  background: rgba(34,197,94,.12);
+  color: #d7ffe7;
+  box-shadow: 0 0 0 2px rgba(34,197,94,.18);
+}
+.option-btn.incorrect {
+  border-color: #ef4444;
+  background: rgba(239,68,68,.10);
+  color: #ffe2e2;
+  box-shadow: 0 0 0 2px rgba(239,68,68,.14);
+}
+
+/* Optional: compact on small screens */
+@media (max-width: 520px) {
+  .generate-btn { padding: 9px 14px; border-radius: 12px; }
+  .option-btn   { padding: 7px 10px; border-radius: 10px; font-weight: 800; }
+}
+
+.exercise-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+.ghost-btn {
+  background: transparent;
+  color: #9ec3ff;
+  border: 1px dashed #2a3d6e;
+  border-radius: 12px;
+  padding: 8px 12px;
+  font-weight: 800;
+  transition: border-color .15s, filter .15s, transform .05s;
+}
+.ghost-btn:hover { border-color: #3b82f6; filter: brightness(1.05); }
+.ghost-btn:active { transform: translateY(1px); }
+@media (max-width: 520px) { .exercise-footer { justify-content: center; } }
+
+/* Override legacy yellow styles with higher specificity */
+.App .btn-row .generate-btn {
+  background: linear-gradient(180deg, #162a57, #0f2246) !important;
+  color: #e5efff !important;
+  border: 1px solid #2a3d6e !important;
+  border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0,0,0,.25), inset 0 0 0 9999px rgba(255,255,255,0.02);
+}
+.App .btn-row .generate-btn:hover {
+  filter: brightness(1.05);
+  border-color: #3b82f6;
+  box-shadow: 0 8px 22px rgba(0,0,0,.28), 0 0 0 3px rgba(59,130,246,.2);
+}
+
+/* Quiz options */
+.App .gapfill-card .options-row .option-btn {
+  background: rgba(13,27,56,.55) !important;
+  color: #e5efff !important;
+  border: 1px solid #2a3d6e !important;
+  border-radius: 12px;
+  box-shadow: none;
+}
+.App .gapfill-card .options-row .option-btn.correct {
+  border-color: #22c55e;
+  background: rgba(34,197,94,.12) !important;
+  color: #d7ffe7 !important;
+}
+.App .gapfill-card .options-row .option-btn.incorrect {
+  border-color: #ef4444;
+  background: rgba(189, 34, 34, 0.1) !important;
+  color: #ffe2e2 !important;
+}
+/* Make the selected incorrect option stand out more */
+.App .gapfill-card .options-row .option-btn.incorrect {
+  background: linear-gradient(180deg, rgba(239,68,68,.22), rgba(239,68,68,.12)) !important; /* deeper red wash */
+  border-color: #f43f5e !important;      /* brighter red border */
+  color: #fff !important;                /* better contrast on red */
+  box-shadow:
+    0 0 0 2px rgba(244,63,94,.45),       /* red glow ring */
+    0 8px 22px rgba(0,0,0,.28);          /* lift */
+}
+
+/* Subtle attention nudge (respects reduced-motion) */
+@media (prefers-reduced-motion: no-preference) {
+  .App .gapfill-card .options-row .option-btn.incorrect {
+    animation: option-shake .28s ease;
+  }
+  @keyframes option-shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-2px); }
+    50% { transform: translateX(2px); }
+    75% { transform: translateX(-1px); }
+    100% { transform: translateX(0); }
+  }
+}

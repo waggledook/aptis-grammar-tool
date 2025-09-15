@@ -70,9 +70,11 @@ export async function fetchItems({
     );
   }
 
-  // shuffle
-  items = items.sort(() => Math.random() - 0.5);
-  return items.slice(0, count);
+  // shuffle items, then shuffle options/explanations in each chosen item
+return items
+.sort(() => Math.random() - 0.5)
+.slice(0, count)
+.map(shuffleOptionsSafely);
 }
 
 
