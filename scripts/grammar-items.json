@@ -27,7 +27,7 @@
     },
     {
       "id": "b2_relcl_01",
-      "level": "B2",
+      "level": "B1",
       "tag": "Relative Clauses",
       "sentence": "The person ___ called you is waiting outside.",
       "options": ["who", "which", "whose"],
@@ -3018,7 +3018,279 @@
           "Incorrect: 'to have visited' is not passive- it suggests the museum did the visiting.",
           "Incorrect: '*to being*' is ungrammatical; use 'to be + past participle'."
         ]
+      },
+      {
+        "id": "a2_rel_01",
+        "level": "A2",
+        "tags": ["Relative Clauses"],
+        "sentence": "The man ___ lives next door is very friendly.",
+        "options": ["who", "which", "where"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'who' introduces a defining relative clause for a person.",
+          "Incorrect: 'which' is used for things, not people.",
+          "Incorrect: 'where' introduces a place, not a person."
+        ]
+      },
+      {
+        "id": "a2_rel_02",
+        "level": "A2",
+        "tags": ["Relative Clauses"],
+        "sentence": "I have a friend ___ can speak three languages.",
+        "options": ["who", "whose", "which"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'who' as subject of the clause.",
+          "Incorrect: 'whose' expresses possession and needs a noun after it (e.g., 'whose car').",
+          "Incorrect: 'which' refers to things, not people (a friend)."
+        ]
+      },
+      {
+        "id": "a2_rel_03",
+        "level": "A2",
+        "tags": ["Relative Clauses"],
+        "sentence": "This is the shop ___ I usually buy bread.",
+        "options": ["where", "which", "who"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'where' introduces a place where something happens.",
+          "Incorrect: 'which' would need 'in which' here.",
+          "Incorrect: 'who' refers to people."
+        ]
+      },
+      {
+        "id": "a2_rel_04",
+        "level": "A2",
+        "tags": ["Relative Clauses"],
+        "sentence": "The book ___ is on the table is mine.",
+        "options": ["that", "who", "where"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'that' (or 'which') introduces a defining clause about the book, a thing.",
+          "Incorrect: 'who' refers to people, not objects.",
+          "Incorrect: 'where' refers to places."
+        ]
+      },
+      {
+        "id": "b1_rel_01",
+        "level": "B1",
+        "tags": ["Relative Clauses"],
+        "sentence": "She showed me a photo of the house ___ she was born.",
+        "options": ["where", "which", "that"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'where' introduces a place clause, 'the house in which she was born'.",
+          "Incorrect: 'which' would need 'in which'.",
+          "Incorrect: 'that' doesn’t work alone for places."
+        ]
+      },
+      {
+        "id": "b1_rel_02",
+        "level": "B1",
+        "tags": ["Relative Clauses"],
+        "sentence": "The woman ___ car was stolen went to the police.",
+        "options": ["whose", "who", "whom"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'whose' shows possession (her car).",
+          "Incorrect: 'who' is wrong, as we need a posessive prononun before the noun.",
+          "Incorrect: 'whom' is object form, of who, but we need possession here."
+        ]
+      },
+      {
+        "id": "b1_rel_03",
+        "level": "B2",
+        "tags": ["Relative Clauses"],
+        "sentence": "That’s the teacher ___ lessons are always interesting.",
+        "options": ["whose", "who", "that"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'whose' shows possession (his/her lessons).",
+          "Incorrect: 'who lessons' is wrong, as we need a possessive pronoun before the noun.",
+          "Incorrect: 'that lessons' is wrong, as we need a possessive pronoun before the noun."
+        ]
+      },
+      {
+        "id": "b1_rel_04",
+        "level": "B2",
+        "tags": ["Relative Clauses"],
+        "sentence": "I met a girl ___ brother works with me.",
+        "options": ["whose", "who", "that"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'whose brother' shows possession: it is her brother. 'whose' replaces 'her'.",
+          "Incorrect: 'who brother' is wrong, as we need a possessive pronoun before the noun.",
+          "Incorrect: 'that brother' is wrong, as we need a possessive pronoun before the noun."
+        ]
+      },
+      {
+        "id": "b2_rel_01",
+        "level": "B2",
+        "tags": ["Relative Clauses"],
+        "sentence": "She didn’t get the job, ___ surprised everyone.",
+        "options": ["which", "that", "what"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: non-defining relative clause with 'which' refers to the whole clause, 'She didn't get the job'.",
+          "Incorrect: 'that' doesn’t introduce non-defining clauses (afrer a comma).",
+          "Incorrect: 'what' refers to 'the thing that', not a person."
+        ]
+      },
+      {
+        "id": "b2_rel_02",
+        "level": "B2",
+        "tags": ["Relative Clauses"],
+        "sentence": "He’s the man ___ I told you about.",
+        "options": ["whom", "what", "whose"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'whom' is object of 'told'. Informally, 'who' is more common here.",
+          "Incorrect: 'what' refers to 'the thing that', not a person.",
+          "Incorrect: 'whose' shows possession, not object."
+        ]
+      },
+      {
+        "id": "b2_rel_03",
+        "level": "B2",
+        "tags": ["Relative Clauses"],
+        "sentence": "The meeting, ___ was very long, finished at 10 p.m.",
+        "options": ["which", "that", "who"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: non-defining clause with 'which'.",
+          "Incorrect: 'that' is not used in non-defining clauses, after a comma.",
+          "Incorrect: 'who' refers to people, not meetings."
+        ]
+      },
+      {
+        "id": "b2_rel_04",
+        "level": "B2",
+        "tags": ["Relative Clauses"],
+        "sentence": "He gave me the keys, ___ I put in my pocket.",
+        "options": ["which", "that", "who"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'which' refers to 'the keys', a thing.",
+          "Incorrect: 'that' not used after a comma, in non-defining clauses.",
+          "Incorrect: 'who' doesn’t refer to objects, only people."
+        ]
+      },
+      {
+        "id": "c1_rel_01",
+        "level": "C1",
+        "tags": ["Relative Clauses"],
+        "sentence": "He bought a car, the engine of ___ is extremely powerful.",
+        "options": ["which", "it", "whom"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'the engine of which' is a formal relative structure. where which refers to the car.",
+          "Incorrect: 'it' could refer to the car, but we need a relative pronoun here, as it's the same sentence.",
+          "Incorrect: 'whom' refers to people, not things."
+        ]
+      },
+      {
+        "id": "c1_rel_02",
+        "level": "B2",
+        "tags": ["Relative Clauses"],
+        "sentence": "He failed the exam, ___ made his parents angry.",
+        "options": ["which", "that", "what"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'which' refers to the whole clause 'he failed the exam'.",
+          "Incorrect: 'that' not used in non-defining clauses (after a comma).",
+          "Incorrect: 'what' is a pronoun that means 'the thing(s) that', but cannot be used to refer to the whole clause, 'he failed the exam'."
+        ]
+      },
+      {
+        "id": "c1_rel_03",
+        "level": "B2",
+        "tags": ["Relative Clauses"],
+        "sentence": "The proposal, ___ many people disagreed with, was finally accepted.",
+        "options": ["which", "that", "whom"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'which' refers to the proposal, a thing",
+          "Incorrect: 'that' cannot introduce a non-defining clause (after a comma).",
+          "Incorrect: 'whom' refers to people, not a thing, the proposal."
+        ]
+      },
+      {
+        "id": "c1_rel_04",
+        "level": "C1",
+        "tags": ["Relative Clauses"],
+        "sentence": "The committee reached a decision, about ___ there has been much debate.",
+        "options": ["which", "that", "what"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'about which' is a formal construction used in written English.",
+          "Incorrect: 'that' cannot follow a preposition in this way.",
+          "Incorrect: 'what' would require a different clause structure."
+        ]
+      },
+      {
+        "id": "c1_rel_05",
+        "level": "C1",
+        "tags": ["Relative Clauses"],
+        "sentence": "Few of the students, none of ___ had studied consistently, passed the exam.",
+        "options": ["whom", "who", "which"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'none of whom' refers back to 'students' in a non-defining relative clause. 'whom', the object pronoun, is required after 'of', a preposition.",
+          "Incorrect: 'none of who' is ungrammatical.",
+          "Incorrect: 'which' does not refer to people."
+        ]
+      },
+      {
+        "id": "c1_rel_06",
+        "level": "C1",
+        "tags": ["Relative Clauses"],
+        "sentence": "She gave me three reasons, the most convincing of ___ concerned cost.",
+        "options": ["which", "that", "them"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'the most convincing of which' is a formal quantifier-based relative clause.",
+          "Incorrect: 'that' cannot follow a preposition or quantifier like this.",
+          "Incorrect: 'them' would be correct in a separate sentence, but we need a relative pronoun here."
+        ]
+      },
+      {
+        "id": "b2_rel_06",
+        "level": "B2",
+        "tags": ["Relative Clauses"],
+        "sentence": "The city ___ I grew up in is very different now.",
+        "options": ["which", "where", "whom"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'which' (or 'that') with a stranded preposition: 'which I grew up in'.",
+          "Incorrect: 'where' is incorrect because of the preposition 'in' at the end of the clause. 'where I grew up' would be correct.",
+          "Incorrect: 'whom' refers to people, not places."
+        ]
+      },
+      {
+        "id": "c1_rel_09",
+        "level": "C1",
+        "tags": ["Relative Clauses"],
+        "sentence": "I went to check on the teachers, ___ pupils had been expelled.",
+        "options": ["three of whose", "three of whom", "none of their"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'three of whose' shows possession (the teacher's pupils).",
+          "Incorrect: 'three of whom' would refer to the teachers directly, not their pupils.",
+          "Incorrect: 'none of their' is wrong because we need a relative possessive here as it is the same sentence, after a comma. "
+        ]
+      },
+      {
+        "id": "c1_rel_10",
+        "level": "C1",
+        "tags": ["Relative Clauses"],
+        "sentence": "She entered two races, ___ she managed to win.",
+        "options": ["neither of which", "none of which", "neither of them"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'neither of which' is correct because there were two races specified, and neither applies to TWO.",
+          "Incorrect: 'none of which' is used for more than two, so it is wrong here.",
+          "Incorrect: 'neither of them' is incorrect because we need a relative pronoun after the comma. This would be correct as a new sentence."
+        ]
       }
 
-      
   ]
