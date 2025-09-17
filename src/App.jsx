@@ -10,6 +10,7 @@ import useTags                     from './hooks/useTags'
 import { fetchItems }              from './api/grammar'
 import ReviewMistakes   from './components/ReviewMistakes'
 import ReviewFavourites from './components/ReviewFavourites'
+import AptisPart2Reorder from './reading/AptisPart2Reorder';
 import ToastHost from './components/ToastHost';
 import './App.css'
 
@@ -90,7 +91,15 @@ useEffect(() => {
   <div className="content-container">
 
     {/* Auth bar */}
-<div style={{ textAlign: 'right', marginBottom: '1rem' }}>
+    <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
+  <button
+    onClick={() => setView('reading')}
+    className="topbar-btn"
+    style={{ marginRight: '0.5rem' }}
+  >
+    Reading: Reorder
+  </button>
+
   {user ? (
     <>
       <button onClick={doSignOut} className="topbar-btn">Sign Out</button>
@@ -127,6 +136,20 @@ useEffect(() => {
       <ReviewFavourites />
       </>
     )}
+
+{view === 'reading' && (
+  <>
+    <button
+      onClick={() => setView('home')}
+      className="review-btn"
+      style={{ marginBottom: '1rem' }}
+    >
+      ← Back
+    </button>
+
+    <AptisPart2Reorder />
+  </>
+)}
 
     {/* Only show the main practice UI on the “home” view */}
     {view === 'home' && (
