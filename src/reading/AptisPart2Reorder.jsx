@@ -1,4 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
+import { saveReadingCompletion, fetchReadingCompletions } from '../firebase';
+import { toast } from "../utils/toast"; // your ToastHost helper
 
 /**
  * Aptis Part 2 – Sentence Reordering (drag sentences into slots)
@@ -420,20 +422,30 @@ function ChipDropdown({ items, value, onChange, label = "Task" }) {
   
         {open && (
           <ul className="chip-menu" role="listbox">
-            {items.map((it, i) => (
-              <li key={it.id}>
-                <button
-                  type="button"
-                  role="option"
-                  aria-selected={i === value}
-                  className={`chip-option ${i === value ? 'active' : ''}`}
-                  onClick={() => { onChange(i); setOpen(false); }}
-                  title={it.title}
-                >
-                  <strong className="num">{i + 1}.</strong> <span className="ttl">{it.title}</span>
-                </button>
-              </li>
-            ))}
+            {items.map((it, i) => {
+  const isActive = i === value;
+  const isLocked = !!it.locked; // comes from decoratedItems
+  return (
+    <li key={it.id}>
+      <button
+        type="button"
+        role="option"
+        aria-selected={isActive}
+        aria-disabled={isLocked}
+        className={`chip-option ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`}
+        onClick={() => {
+          if (isLocked) return;      // block selection if locked
+          onChange(i);
+          setOpen(false);
+        }}
+        title={it.title}
+      >
+        <strong className="num">{i + 1}.</strong>
+        <span className="ttl">{it.title}</span>
+      </button>
+    </li>
+  );
+})}
           </ul>
         )}
       </div>
@@ -441,60 +453,113 @@ function ChipDropdown({ items, value, onChange, label = "Task" }) {
   }
 
 // ---------- Main container showing two texts side‑by‑side ----------
-export default function AptisPart2Reorder({ tasks = DEMO_TASKS }) {
-    // Flatten: each text becomes its own selectable task
-    const flattened = useMemo(() => {
-      const out = [];
-      tasks.forEach((t) => {
-        t.texts.forEach((tx, idx) => {
-          out.push({
-            id: `${t.id}__${tx.id}`,
-            // Compose a friendly title: Task title — Text title
-            title: tx.title || t.title,
-            subtitle: t.title !== tx.title ? t.title : '',
-            intro: t.intro || '',
-            text: tx,
-          });
+export default function AptisPart2Reorder({ tasks = DEMO_TASKS, user, onRequireSignIn }) {
+  // Flatten: each text becomes its own selectable task
+  const flattened = useMemo(() => {
+    const out = [];
+    tasks.forEach((t) => {
+      t.texts.forEach((tx) => {
+        out.push({
+          id: `${t.id}__${tx.id}`,
+          // Compose a friendly title: Task title — Text title
+          title: tx.title || t.title,
+          subtitle: t.title !== tx.title ? t.title : "",
+          intro: t.intro || "",
+          text: tx,
         });
       });
-      return out;
-    }, [tasks]);
-  
-    const [taskIndex, setTaskIndex] = useState(0);
-    const current = flattened[taskIndex] || flattened[0];
-  
-    return (
-      <div className="aptis-reorder game-wrapper">
-        <StyleScope />
-  
-        <header className="header">
-          <div>
-            <h2 className="title">Reading – Sentence Order (Aptis Part 2)</h2>
-            {current?.intro && <p className="intro">{current.intro}</p>}
-            {current?.subtitle && (
-              <p className="intro" style={{ opacity: 0.8 }}>
-                <em>From: {current.subtitle}</em>
-              </p>
-            )}
-          </div>
-  
-          <div className="picker">
-  <ChipDropdown
-    items={flattened}
-    value={taskIndex}
-    onChange={setTaskIndex}
-    label="Task"
-  />
-</div>
-        </header>
-  
-        {/* Single task view (just one text) */}
-        <div className="single">
-          <TextReorder key={current?.id} spec={current.text} />
-        </div>
-      </div>
-    );
+    });
+    return out;
+  }, [tasks]);
+
+  const [taskIndex, setTaskIndex] = useState(0);
+  const current = flattened[taskIndex] || flattened[0];
+
+  // ✅ NEW: track which tasks are completed for this user
+  const [completed, setCompleted] = useState(new Set());
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      if (!user) { setCompleted(new Set()); return; }
+      const done = await fetchReadingCompletions(); // ← use the top-level import
+      if (alive) setCompleted(done);
+    })();
+    return () => { alive = false; };
+  }, [user]);
+
+ // ✅ guard selection – tasks 3+ require sign-in (index >= 2)
+function handleSelectTask(nextIndex) {
+  if (!user && nextIndex >= 2) {
+    onRequireSignIn?.(); // open your sign-in modal
+    return;
   }
+  setTaskIndex(nextIndex);
+}
+
+// (optional) decorate picker labels with ✓ / 🔒
+const decoratedItems = useMemo(
+  () =>
+    flattened.map((f, i) => {
+      const locked = !user && i >= 2;
+      return {
+        ...f,
+        locked,
+        title:
+          `${i + 1}. ${f.title}` +
+          (completed.has(f.id) ? " ✓" : "") +
+          (locked ? " 🔒" : "")
+      };
+    }),
+  [flattened, completed, user]
+);
+
+return (
+  <div className="aptis-reorder game-wrapper">
+    <StyleScope />
+
+    <header className="header">
+      <div>
+        <h2 className="title">Reading – Sentence Order (Aptis Part 2)</h2>
+        {/* If the intro sentence is now inside the slots as fixed, remove this next line */}
+        {/* {current?.intro && <p className="intro">{current.intro}</p>} */}
+        {current?.subtitle && (
+          <p className="intro" style={{ opacity: 0.8 }}>
+            <em>From: {current.subtitle}</em>
+          </p>
+        )}
+      </div>
+
+      <div className="picker">
+        <ChipDropdown
+          items={decoratedItems}          // ⬅️ use decorated labels
+          value={taskIndex}
+          onChange={handleSelectTask}     // ⬅️ call the guard, not setTaskIndex
+          label="Task"
+        />
+      </div>
+    </header>
+
+    {/* Single task view (just one text) */}
+    <div className="single">
+    <TextReorder
+  key={current?.id}
+  spec={current.text}
+  onChangeCheck={async (fb) => {
+    // fb = array of booleans/null per slot (null = empty)
+    if (!user) return;
+    if (fb.length && fb.every(v => v === true)) {
+      await saveReadingCompletion(current.id);     // persist
+      setCompleted(prev => new Set(prev).add(current.id)); // update UI
+      toast("Task marked as completed ✓");
+    }
+  }}
+/>
+    </div>
+  </div>
+);
+}
+
 // ---------- Scoped styles ----------
 function StyleScope(){
   return (
@@ -560,6 +625,7 @@ function StyleScope(){
   /* existing styles */
   min-height: 52px; /* gives a target even if empty */
 }
+  .aptis-reorder .chip-option.locked { opacity: .5; cursor: not-allowed; }
 
     `}</style>
   );

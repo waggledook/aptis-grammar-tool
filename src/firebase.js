@@ -172,3 +172,30 @@ export async function sendReport({
   });
 }
 
+// — READING PROGRESS (Part 2 reorder) ————————————————
+
+/**
+ * Save (or update) completion for a reading task for the current user.
+ * @param {string} taskId - use the same ID you show in the dropdown (e.g. `${parentId}__${textId}`)
+ */
+export async function saveReadingCompletion(taskId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return; // silently skip if not signed in
+  // /users/{uid}/readingProgress/{taskId}
+  const ref = doc(db, "users", uid, "readingProgress", taskId);
+  await setDoc(ref, { completed: true, updatedAt: serverTimestamp() }, { merge: true });
+}
+
+/**
+ * Fetch a Set of completed reading task IDs for the current user.
+ * @returns {Promise<Set<string>>}
+ */
+export async function fetchReadingCompletions() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return new Set();
+  const snap = await getDocs(collection(db, "users", uid, "readingProgress"));
+  const done = new Set();
+  snap.forEach(d => { if (d.data()?.completed) done.add(d.id); });
+  return done;
+}
+

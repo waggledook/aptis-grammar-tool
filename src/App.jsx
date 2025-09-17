@@ -10,6 +10,7 @@ import useTags                     from './hooks/useTags'
 import { fetchItems }              from './api/grammar'
 import ReviewMistakes   from './components/ReviewMistakes'
 import ReviewFavourites from './components/ReviewFavourites'
+import ReadingGuide from './reading/ReadingGuide';
 import AptisPart2Reorder from './reading/AptisPart2Reorder';
 import ToastHost from './components/ToastHost';
 import './App.css'
@@ -42,6 +43,8 @@ useEffect(() => {
   const [answeredCount, setAnsweredCount] = useState(0)
   const [count, setCount] = useState(10); // how many questions to generate
   const [runKey, setRunKey] = useState(0);
+
+  const [readingMode, setReadingMode] = useState('menu'); // 'menu' | 'guide' | 'practice'
 
   const {
     tags: allTags,
@@ -92,13 +95,13 @@ useEffect(() => {
 
     {/* Auth bar */}
     <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
-  <button
-    onClick={() => setView('reading')}
-    className="topbar-btn"
-    style={{ marginRight: '0.5rem' }}
-  >
-    Reading: Reorder
-  </button>
+    <button
+  onClick={() => { setView('reading'); setReadingMode('menu'); }}
+  className="topbar-btn"
+  style={{ marginRight: '0.5rem' }}
+>
+  Reading: Reorder
+</button>
 
   {user ? (
     <>
@@ -140,16 +143,41 @@ useEffect(() => {
 {view === 'reading' && (
   <>
     <button
-      onClick={() => setView('home')}
+      onClick={() => { setView('home'); setReadingMode('menu'); }}
       className="review-btn"
       style={{ marginBottom: '1rem' }}
     >
       ← Back
     </button>
 
-    <AptisPart2Reorder />
+    {readingMode === 'menu' && (
+      <div className="reading-menu">
+        <h1>Reading – Reorder</h1>
+        <p className="muted">Choose an activity type.</p>
+        <div className="btn-row" style={{ gap: '0.5rem', marginTop: '0.75rem' }}>
+          <button className="review-btn" onClick={() => setReadingMode('guide')}>
+            Guided activity
+          </button>
+          <button className="review-btn" onClick={() => setReadingMode('practice')}>
+            Practice tasks
+          </button>
+        </div>
+      </div>
+    )}
+
+    {readingMode === 'guide' && (
+      <ReadingGuide />
+    )}
+
+    {readingMode === 'practice' && (
+      <AptisPart2Reorder
+        user={user}
+        onRequireSignIn={() => setShowAuth(true)}
+      />
+    )}
   </>
 )}
+
 
     {/* Only show the main practice UI on the “home” view */}
     {view === 'home' && (
