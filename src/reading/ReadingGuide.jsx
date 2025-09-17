@@ -24,31 +24,46 @@ const TASKS /** @type {GuideTask[]} */ = [
         id: "t12a",
         text: "Create a strong password that contains both letters and numbers.",
         order: 1,
-        clues: { idx: [0, 2, 7, 8], note: "Imperative instruction; 'strong' signals requirement; 'both' … 'and' pairs items." }
+        clues: {
+          idx: [], // no highlight needed for A in your mockup
+          note: "This sentence describes the first stage in the process."
+        }
       },
       {
         id: "t12b",
         text: "After doing so, enable two-factor authentication on the login page.",
         order: 2,
-        clues: { idx: [0,1,2,3], note: "Temporal anaphora: 'After doing so' refers back to the previous step." }
+        clues: {
+          idx: [0,1,2,3], // ‘After doing so’
+          note: "‘After doing so’ refers to having completed a previous action."
+        }
       },
       {
         id: "t12c",
         text: "Once this is active, the system will send a code to your phone whenever you sign in.",
         order: 3,
-        clues: { idx: [0,1,2,3,6], note: "Condition/sequence: 'Once this is active' + pronoun 'this' ties to 2FA." }
+        clues: {
+          idx: [0,1], // ‘Once this’
+          note: "‘Once this’ shows that this step comes after another action; ‘this’ refers to a previously completed step in the process."
+        }
       },
       {
         id: "t12d",
         text: "If you ever lose this device, contact customer support immediately.",
         order: 4,
-        clues: { idx: [0,5,6,7], note: "Conditional 'If' + deictic 'this device' refers to the phone from the prior step." }
+        clues: {
+          idx: [0,5,6], // ‘If’ … ‘this device’
+          note: "‘This device’ suggests that a device has already been mentioned. What could it be?"
+        }
       },
       {
         id: "t12e",
         text: "Finally, remember that you should never share your login details with anyone.",
         order: 5,
-        clues: { idx: [0,2,6,9,10], note: "Sequence closer 'Finally' + prohibition 'never' and indefinite 'anyone'." }
+        clues: {
+          idx: [0], // ‘Finally’
+          note: "‘Finally’ clearly indicates that this sentence comes at the end."
+        }
       }
     ]
   },
@@ -107,30 +122,40 @@ function shuffle(arr){ const a = arr.slice(); for (let i=a.length-1;i>0;i--){ co
 function deepClone(x){ return JSON.parse(JSON.stringify(x)); }
 
 // --------------------------- Components ---------------------------
-function ClueReveal({ sentence, revealed, onReveal }){
-  const tokens = useMemo(()=>tokenize(sentence.text), [sentence.text]);
+function ClueReveal({ sentence, revealed, onReveal }) {
+  const tokens = useMemo(() => tokenize(sentence.text), [sentence.text]);
   const gold = sentence.clues?.idx || [];
+
   return (
     <div className="clue-reveal">
+      {/* Sentence with bold highlights */}
       <p className="srnt">
-        {tokens.map((t,i)=>{
+        {tokens.map((t, i) => {
           const isGold = revealed && gold.includes(i);
-          return <span key={i} className={isGold?"tok gold":"tok"}>{t}</span>;
+          return (
+            <span
+              key={i}
+              className={isGold ? "tok gold" : "tok"}
+              style={isGold ? { fontWeight: "bold" } : {}}
+            >
+              {t}
+            </span>
+          );
         })}
       </p>
-      <div className="row">
-        {!revealed ? (
-          <button className="btn" onClick={onReveal}>Show clues</button>
-        ) : (
-          <span className="chip ok">Cohesive clues highlighted</span>
-        )}
-        {sentence.clues?.note && revealed && (
-          <span className="note">{sentence.clues.note}</span>
-        )}
-      </div>
+
+      {/* Show button / Explanation */}
+      {!revealed ? (
+        <button className="btn" onClick={onReveal}>Show clues</button>
+      ) : (
+        <div className="explain">
+          <p>{sentence.clues?.note}</p>
+        </div>
+      )}
     </div>
   );
 }
+
 
 function ApplyReorder({ intro, sentences }){
   // intro becomes fixed slot 0; sentences are 1..N
@@ -244,18 +269,19 @@ export default function ReadingGuide(){
       <header className="intro-box">
         <h2>Reading – Guided Reorder</h2>
         <p>
-          In this activity, you’ll practise the Aptis Part 2 <strong>sentence order</strong> task.
-          You’ll work with short texts such as <strong>instructions</strong>, <strong>reports</strong>,
+          In reading part 2, you have to put six sentences into the <strong>correct order</strong>, in two separate tasks.
+          There are different types of texts, such as <strong>instructions</strong>, <strong>reports</strong>,
           <strong> biographies</strong>, or <strong>process descriptions</strong>.
+          Follow the steps below to complete the activities:
         </p>
         <ol className="steps">
           <li>
-            <strong>Explore clues:</strong> Read each sentence and, if needed, click
-            <em> Show clues</em> to reveal cohesion (linkers, pronouns, sequencing, cause/purpose).
+            <strong>Look for clues:</strong> Do you think the sentence belongs at the start, middle, or end of the text?
+            Are there any words or phrases that show connections with other sentences?
           </li>
           <li>
-            <strong>Reorder:</strong> Use those clues to drag the sentences into a coherent text.
-            The introduction is fixed at the top.
+            <strong>Reorder:</strong> Drag the sentences into the correct position.
+            The first sentence is done for you.
           </li>
         </ol>
       </header>
@@ -332,6 +358,18 @@ function GuideStyle(){
 
 .intro-box .steps li { margin: .25rem 0; }
 .muted { color: #a9b7d1; }
+
+.tok.gold {
+  background: none;          /* remove background */
+  border-bottom: 2px solid #7db3ff;
+  font-weight: bold;         /* bold like your mockup */
+}
+.explain {
+  margin-top: .35rem;
+  color: #cfe1ff;
+  font-size: .95rem;
+}
+
 
     `}</style>
   );
