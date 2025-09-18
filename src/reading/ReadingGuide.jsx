@@ -70,41 +70,71 @@ const TASKS /** @type {GuideTask[]} */ = [
   // Task 13 – Report (Public transport survey)
   {
     id: "transport-survey",
-    title: "Report: Public transport survey",
-    intro: "This report summarises the results of a recent passenger survey about bus services in the city.",
+    title: "Report (Public transport survey)",
+    intro:
+      "This report summarises the results of a recent passenger survey about bus services in the city.",
     sentences: [
       {
         id: "t13a",
         text: "Most respondents said the buses usually arrived on time.",
         order: 1,
-        clues: { idx: [0,4], note: "Quantifier 'Most' sets baseline; adverb 'usually' indicates typical trend." }
+        clues: {
+          // “Most respondents”
+          idx: [0, 1],
+          note:
+            "“Most respondents” refers directly to the survey in the intro. The sentence begins the summary of the results."
+        }
       },
       {
         id: "t13b",
-        text: "Nevertheless, some passengers complained about overcrowding during peak hours.",
+        text:
+          "Nevertheless, some passengers complained about overcrowding during peak hours.",
         order: 2,
-        clues: { idx: [0,1,8,9], note: "Contrastive linker 'Nevertheless'; time anchor 'peak hours'." }
+        clues: {
+          // “Nevertheless,”
+          idx: [0],
+          note:
+            "“Nevertheless” contrasts with the previous idea. In this sentence, we have a negative point, so it must contrast with a positive idea previously."
+        }
       },
       {
         id: "t13c",
-        text: "Several went on to mention that the routes were confusing for new users.",
+        text:
+          "Several went on to mention that the routes were confusing for new users.",
         order: 3,
-        clues: { idx: [0,1,2,6], note: "Additive progression 'went on to' + focus on 'new users'." }
+        clues: {
+          // “Several went on”
+          idx: [0, 1, 2],
+          note:
+            "What does “several” refer to? Probably those users who participated in the survey. “went on to inf” is a phrasal verb meaning to continue (with a new topic)."
+        }
       },
       {
         id: "t13d",
-        text: "As a result of these comments, the transport authority plans to redesign the timetable.",
+        text:
+          "As a result of these comments, the transport authority plans to redesign the timetable.",
         order: 4,
-        clues: { idx: [0,1,2,3,4,5,6], note: "Causal linker 'As a result of' + anaphora 'these comments' (B & C)." }
+        clues: {
+          // “As a result of these comments”
+          idx: [0, 1, 2, 3, 4, 5],
+          note:
+            "“As a result” expresses a consequence/result of the previous information. “These comments” refers back to earlier results from the survey. Do you think this sentence is a consequence of positive or negative feedback? Why?"
+        }
       },
       {
         id: "t13e",
-        text: "It will also introduce clearer signs at bus stops in order to reduce confusion.",
+        text:
+          "It will also introduce clearer signs at bus stops in order to reduce confusion.",
         order: 5,
-        clues: { idx: [0,2,3,9,10], note: "Pronoun 'It' (authority) + additive 'also' + purpose 'in order to'." }
+        clues: {
+          // “It” + “also” + “in order to reduce confusion”
+          idx: [0, 2, 9, 10, 11, 12, 13],
+          note:
+            "“It” is a pronoun, referring back to a previous noun in another sentence (transport authority). “also” implies additional action—this means the report describes another measure taken previously. “reduce confusion”: this is a solution to a problem previously mentioned in the text."
+        }
       }
     ]
-  }
+  }  
 ];
 
 // --------------------------- Utils ---------------------------
@@ -192,7 +222,6 @@ function ApplyReorder({ intro, sentences }){
 
   return (
     <div className="apply">
-      <h4 className="subt">Apply: Put the sentences in order</h4>
       <div className="grid">
         <ol className="slots">
           {state.slots.map((s,i)=>{

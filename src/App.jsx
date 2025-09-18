@@ -11,6 +11,8 @@ import { fetchItems }              from './api/grammar'
 import ReviewMistakes   from './components/ReviewMistakes'
 import ReviewFavourites from './components/ReviewFavourites'
 import ReadingGuide from './reading/ReadingGuide';
+import MainMenu from './components/MainMenu';
+import ReadingMenu from './components/ReadingMenu';
 import AptisPart2Reorder from './reading/AptisPart2Reorder';
 import ToastHost from './components/ToastHost';
 import './App.css'
@@ -19,14 +21,14 @@ export default function App() {
   // — AUTH STATE —
 const [user,     setUser]     = useState(null)
 const [showAuth, setShowAuth] = useState(false)
-const [view,     setView]     = useState('home')  // 'home' | 'mistakes' | 'favourites'
+const [view, setView] = useState('menu'); // 'menu' | 'grammar' | 'readingMenu' | 'reading' | 'readingGuide' | 'mistakes' | 'favourites'
 
 useEffect(() => {
   const unsub = onAuthStateChanged(auth, u => {
     setUser(u)
     if (!u) {
-      setShowAuth(false)    // hide the login form
-      setView('home')       // go back to the main practice screen
+      setShowAuth(false)
+      setView('menu')        // ← was 'home'
     }
   })
   return unsub
@@ -95,18 +97,11 @@ useEffect(() => {
 
     {/* Auth bar */}
     <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
-    <button
-  onClick={() => { setView('reading'); setReadingMode('menu'); }}
-  className="topbar-btn"
-  style={{ marginRight: '0.5rem' }}
->
-  Reading: Reorder
-</button>
-
+  <button onClick={() => setView('menu')} className="topbar-btn" style={{ marginRight: 8 }}>
+    Home
+  </button>
   {user ? (
-    <>
-      <button onClick={doSignOut} className="topbar-btn">Sign Out</button>
-    </>
+    <button onClick={doSignOut} className="topbar-btn">Sign Out</button>
   ) : (
     <button onClick={() => setShowAuth(true)} className="topbar-btn">
       Sign In / Sign Up
@@ -114,173 +109,147 @@ useEffect(() => {
   )}
 </div>
     {/* ————— Show the right “page” ————— */}
-    {view === 'mistakes' && (
-      <>
-      <button
-  onClick={() => setView('home')}
-  className="review-btn"
-  style={{ marginBottom: '1rem' }}
->
-  ← Back
-</button>
-      <ReviewMistakes />
-      </>
+
+{view === 'menu' && (
+  <MainMenu onSelect={(next) => setView(next)} />
+)}
+
+{view === 'grammar' && (
+  <>
+    <h1>Aptis Grammar Practice</h1>
+
+    {tagsLoading && <p>Loading tags…</p>}
+    {tagsError   && <p className="error-text">Error loading tags.</p>}
+
+    {!tagsLoading && !tagsError && (
+      <FilterPanel
+        levels={levels}
+        onLevelsChange={setLevels}
+        tag={tag}
+        onTagChange={setTag}
+        allTags={allTags}
+      />
     )}
 
-    {view === 'favourites' && (
-      <>
+    <div className="count-row" role="group" aria-label="Number of questions">
+      {[5, 10, 15].map(n => (
+        <button
+          key={n}
+          type="button"
+          className={`count-chip ${count === n ? 'selected' : ''}`}
+          onClick={() => setCount(n)}
+          aria-pressed={count === n}
+        >
+          {n}
+        </button>
+      ))}
+      <span className="count-label">questions</span>
+    </div>
+
+    <div className="btn-row">
       <button
-  onClick={() => setView('home')}
-  className="review-btn"
-  style={{ marginBottom: '1rem' }}
->
-  ← Back
-</button>
-      <ReviewFavourites />
+        className="generate-btn"
+        onClick={generate}
+        disabled={loading || tagsLoading}
+      >
+        {loading ? 'Loading…' : 'Generate Exercises'}
+      </button>
+
+      {user && (
+        <>
+          <button className="review-btn mistakes" onClick={() => setView('mistakes')}>Review Mistakes</button>
+          <button className="review-btn favourites" onClick={() => setView('favourites')}>Review Favourites</button>
+        </>
+      )}
+    </div>
+
+    {error && <p className="error-text">{error}</p>}
+
+    {!error && (
+      <>
+        <GapFillList
+          key={runKey}
+          items={items}
+          onAnswer={() => setAnsweredCount(c => c + 1)}
+        />
+        <ProgressTracker answered={answeredCount} total={items.length} />
+
+        {items.length > 0 && (
+          <div className="exercise-footer">
+            <button type="button" className="review-btn" onClick={newSetSameSettings} disabled={loading || tagsLoading}>Replay</button>
+            <button type="button" className="ghost-btn" onClick={clearExercises} disabled={loading}>Clear page</button>
+          </div>
+        )}
       </>
     )}
+  </>
+)}
 
-{view === 'reading' && (
+{view === 'mistakes' && (
   <>
     <button
-      onClick={() => { setView('home'); setReadingMode('menu'); }}
+      onClick={() => setView('grammar')}
       className="review-btn"
       style={{ marginBottom: '1rem' }}
     >
       ← Back
     </button>
+    <ReviewMistakes />
+  </>
+)}
 
-    {readingMode === 'menu' && (
-      <div className="reading-menu">
-        <h1>Reading – Reorder</h1>
-        <p className="muted">Choose an activity type.</p>
-        <div className="btn-row" style={{ gap: '0.5rem', marginTop: '0.75rem' }}>
-          <button className="review-btn" onClick={() => setReadingMode('guide')}>
-            Guided activity
-          </button>
-          <button className="review-btn" onClick={() => setReadingMode('practice')}>
-            Practice tasks
-          </button>
-        </div>
-      </div>
-    )}
+{view === 'favourites' && (
+  <>
+    <button
+      onClick={() => setView('grammar')}
+      className="review-btn"
+      style={{ marginBottom: '1rem' }}
+    >
+      ← Back
+    </button>
+    <ReviewFavourites />
+  </>
+)}
 
-    {readingMode === 'guide' && (
-      <ReadingGuide />
-    )}
+{view === 'readingMenu' && (
+  <ReadingMenu
+    onSelect={(next) => setView(next)}  // expects 'readingGuide' or 'reading'
+    onBack={() => setView('menu')}
+  />
+)}
 
-    {readingMode === 'practice' && (
-      <AptisPart2Reorder
-        user={user}
-        onRequireSignIn={() => setShowAuth(true)}
-      />
-    )}
+{view === 'readingGuide' && (
+  <>
+    <button
+      onClick={() => setView('readingMenu')}
+      className="review-btn"
+      style={{ marginBottom: '1rem' }}
+    >
+      ← Back
+    </button>
+    <ReadingGuide />
+  </>
+)}
+
+{view === 'reading' && (
+  <>
+    <button
+      onClick={() => setView('readingMenu')}
+      className="review-btn"
+      style={{ marginBottom: '1rem' }}
+    >
+      ← Back
+    </button>
+    <AptisPart2Reorder
+      user={user}
+      onRequireSignIn={() => setShowAuth(true)}
+    />
   </>
 )}
 
 
-    {/* Only show the main practice UI on the “home” view */}
-    {view === 'home' && (
-      <>
-        <h1>Aptis Grammar Practice</h1>
 
-        {tagsLoading && <p>Loading tags…</p>}
-        {tagsError   && <p className="error-text">Error loading tags.</p>}
 
-        {!tagsLoading && !tagsError && (
-          <FilterPanel
-            levels={levels}
-            onLevelsChange={setLevels}
-            tag={tag}
-            onTagChange={setTag}
-            allTags={allTags}
-          />
-        )}
-
-<div className="count-row" role="group" aria-label="Number of questions">
-  {[5, 10, 15].map(n => (
-    <button
-      key={n}
-      type="button"
-      className={`count-chip ${count === n ? 'selected' : ''}`}
-      onClick={() => setCount(n)}
-      aria-pressed={count === n}
-    >
-      {n}
-    </button>
-  ))}
-  <span className="count-label">questions</span>
-</div>
-
-<div className="btn-row">
-  <button
-    className="generate-btn"
-    onClick={generate}
-    disabled={loading || tagsLoading}
-  >
-    {loading ? 'Loading…' : 'Generate Exercises'}
-  </button>
-
-  {user && (
-    <>
-      <button
-        className="review-btn mistakes"
-        onClick={() => setView('mistakes')}
-      >
-        Review Mistakes
-      </button>
-
-      <button
-        className="review-btn favourites"
-        onClick={() => setView('favourites')}
-      >
-        Review Favourites
-      </button>
-    </>
-  )}
-</div>
-
-        {error && <p className="error-text">{error}</p>}
-
-        {!error && (
-          <>
-            <GapFillList
-              key={runKey}                          // ← this remounts the whole list
-              items={items}
-              onAnswer={() => setAnsweredCount(c => c + 1)}
-            />
-            <ProgressTracker
-              answered={answeredCount}
-              total={items.length}
-            />
-
-          {/* ⬇️ Add this footer block */}
-    {items.length > 0 && (
-      <div className="exercise-footer">
-        <button
-          type="button"
-          className="review-btn"
-          onClick={newSetSameSettings}
-          disabled={loading || tagsLoading}
-        >
-          Replay
-        </button>
-
-        <button
-          type="button"
-          className="ghost-btn"
-          onClick={clearExercises}
-          disabled={loading}
-        >
-          Clear page
-        </button>
-      </div>
-    )}
-    {/* ⬆️ End footer */}
-          </>
-        )}
-      </>
-    )}
   </div>
 </div>
 
