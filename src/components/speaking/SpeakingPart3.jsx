@@ -152,7 +152,7 @@ function TaskFlow({ task, onFinished }) {
       (async () => { await speakTTS(questions[seg]); setSub("beep"); })();
     }
     if (sub === "beep") {
-      (async () => { await playBeep(600, 0.2); startSegment(); })();
+      (async () => { await playBeep(600, 1.2); startSegment(); })();
     }
   }, [overall, sub, seg, questions]);
 
@@ -238,7 +238,7 @@ function TaskFlow({ task, onFinished }) {
       } catch { resolve(); }
     });
   }
-  function playBeep(freq = 600, seconds = 0.2) {
+  function playBeep(freq = 600, seconds = 1.2) {
     return new Promise((resolve) => {
       try {
         const ctx = new (window.AudioContext || window.webkitAudioContext)();
