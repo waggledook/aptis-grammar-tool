@@ -8,16 +8,22 @@ export default function MainMenu({ onSelect }) {
 
       <div className="menu-grid">
         {/* Grammar */}
-        <button className="menu-card" onClick={() => onSelect('grammar')}>
-          <h3>Grammar Practice</h3>
-          <p>Gap-fills by level & tag (A2–C1). Track mistakes & favourites.</p>
-        </button>
+<button className="menu-card" onClick={() => onSelect('grammar')}>
+  <h3>Grammar Practice</h3>
+  <p>Gap-fills by level & tag (A2–C1). Track mistakes & favourites.</p>
+</button>
 
-        {/* Single Reading entry → sub-menu you already have */}
-        <button className="menu-card" onClick={() => onSelect('readingMenu')}>
-          <h3>Reading: Sentence Order</h3>
-          <p>Aptis Part 2 — choose Guided Lesson or Practice Activities.</p>
-        </button>
+{/* Single Reading entry → sub-menu you already have */}
+<button className="menu-card" onClick={() => onSelect('readingMenu')}>
+  <h3>Reading: Sentence Order</h3>
+  <p>Aptis Part 2 — choose Guided Lesson or Practice Activities.</p>
+</button>
+
+{/* Speaking entry → sub-menu */}
+<button className="menu-card" onClick={() => onSelect('speakingMenu')}>
+  <h3>Speaking Practice</h3>
+  <p>Aptis Part 2 — describe a photo and answer follow-up questions.</p>
+</button>
       </div>
 
       <style>{`

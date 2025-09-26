@@ -13,6 +13,9 @@ import ReviewFavourites from './components/ReviewFavourites'
 import ReadingGuide from './reading/ReadingGuide';
 import MainMenu from './components/MainMenu';
 import ReadingMenu from './components/ReadingMenu';
+import SpeakingMenu from './components/speaking/SpeakingMenu';
+import SpeakingPart2 from './components/speaking/SpeakingPart2';
+import SpeakingPart3 from './components/speaking/SpeakingPart3';
 import AptisPart2Reorder from './reading/AptisPart2Reorder';
 import ToastHost from './components/ToastHost';
 import './App.css'
@@ -21,7 +24,7 @@ export default function App() {
   // — AUTH STATE —
 const [user,     setUser]     = useState(null)
 const [showAuth, setShowAuth] = useState(false)
-const [view, setView] = useState('menu'); // 'menu' | 'grammar' | 'readingMenu' | 'reading' | 'readingGuide' | 'mistakes' | 'favourites'
+const [view, setView] = useState('menu'); // 'menu' | 'grammar' | 'readingMenu' | 'reading' | 'readingGuide' | 'mistakes' | 'favourites' | 'speakingMenu' | 'speakingPart2' |
 
 useEffect(() => {
   const unsub = onAuthStateChanged(auth, u => {
@@ -245,6 +248,33 @@ useEffect(() => {
       onRequireSignIn={() => setShowAuth(true)}
     />
   </>
+)}
+
+{view === 'speakingMenu' && (
+  <SpeakingMenu
+    onBack={() => setView('menu')}
+    onSelect={(key) => {
+      if (key === 'part2') setView('speakingPart2');
+      if (key === 'part3') setView('speakingPart3');   // ✅ route Part 3
+    }}
+  />
+)}
+
+{view === 'speakingPart2' && (
+  <SpeakingPart2
+    onBack={() => setView('speakingMenu')}
+    user={user}                          // ✅ unlocks tasks 3+ when signed in
+    onRequireSignIn={() => setView('menu')} // or open your auth modal here
+    // tasks={myPart2Tasks}               // optional: provide your own bank
+  />
+)}
+
+{view === 'speakingPart3' && (
+  <SpeakingPart3
+    user={user}
+    // onRequireSignIn={() => setShowAuth(true)}
+    // tasks={myPart3Bank} // optional override when your photos are ready
+  />
 )}
 
 
