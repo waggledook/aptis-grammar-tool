@@ -22,7 +22,7 @@ export default function MainMenu({ onSelect }) {
 {/* Speaking entry → sub-menu */}
 <button className="menu-card" onClick={() => onSelect('speakingMenu')}>
   <h3>Speaking Practice</h3>
-  <p>Aptis Part 2 — describe a photo and answer follow-up questions.</p>
+  <p>Practice tasks for all parts of the speaking exam.</p>
 </button>
       </div>
 

@@ -16,6 +16,7 @@ import ReadingMenu from './components/ReadingMenu';
 import SpeakingMenu from './components/speaking/SpeakingMenu';
 import SpeakingPart2 from './components/speaking/SpeakingPart2';
 import SpeakingPart3 from './components/speaking/SpeakingPart3';
+import SpeakingPart4 from "./components/speaking/SpeakingPart4";
 import AptisPart2Reorder from './reading/AptisPart2Reorder';
 import ToastHost from './components/ToastHost';
 import './App.css'
@@ -256,6 +257,7 @@ useEffect(() => {
     onSelect={(key) => {
       if (key === 'part2') setView('speakingPart2');
       if (key === 'part3') setView('speakingPart3');   // ✅ route Part 3
+      if (key === 'part4') setView('speakingPart4');
     }}
   />
 )}
@@ -277,7 +279,13 @@ useEffect(() => {
   />
 )}
 
-
+{view === 'speakingPart4' && (
+  <SpeakingPart4
+    user={user}
+    // prepareSeconds={60}
+    // speakSeconds={120}
+  />
+)}
 
 
   </div>

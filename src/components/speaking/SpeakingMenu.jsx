@@ -14,23 +14,24 @@ export default function SpeakingMenu({ onSelect, onBack }) {
       <div className="cards">
         <button className="card" onClick={() => onSelect('part2')}>
           <h3>Part 2: Describe a Photograph</h3>
-          <p>1 picture · 3 questions. Q1 is always “Describe the photograph.”</p>
+          <p>1 picture · 3 questions. Describe a photo and answer related questions”</p>
         </button>
 
         <button className="card" onClick={() => onSelect('part3')}>
           <h3>Part 3: Describe & Compare</h3>
-          <p>Compare two photographs. Three questions, 45s each.</p>
+          <p>Compare two photographs, and answer related questions.</p>
         </button>
+
+        <button className="card" onClick={() => onSelect('part4')}>
+  <h3>Part 4: Presentation & Discussion</h3>
+  <p>1-minute prep, then a 2-minute talk answering 3 questions.</p>
+</button>
 
         <div className="card disabled" aria-disabled="true">
           <h3>Part 1: Personal Questions</h3>
           <p>Short answers about yourself. (Coming soon)</p>
         </div>
 
-        <div className="card disabled" aria-disabled="true">
-          <h3>Part 4: Presentation &amp; Discussion</h3>
-          <p>Talk for longer with follow-up questions. (Coming soon)</p>
-        </div>
       </div>
 
       <button className="topbar-btn" onClick={onBack} style={{ marginTop: '1rem' }}>
