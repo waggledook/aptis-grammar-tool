@@ -12,9 +12,14 @@ export default function SpeakingMenu({ onSelect, onBack }) {
       </header>
 
       <div className="cards">
+      <button className="card" onClick={() => onSelect('part1')}>
+  <h3>Part 1: Personal Questions</h3>
+  <p>Practice answering 3 short personal questions.</p>
+</button>
+
         <button className="card" onClick={() => onSelect('part2')}>
           <h3>Part 2: Describe a Photograph</h3>
-          <p>1 picture · 3 questions. Describe a photo and answer related questions”</p>
+          <p>1 picture · 3 questions. Describe a photo and answer related questions.</p>
         </button>
 
         <button className="card" onClick={() => onSelect('part3')}>
@@ -26,11 +31,6 @@ export default function SpeakingMenu({ onSelect, onBack }) {
   <h3>Part 4: Presentation & Discussion</h3>
   <p>1-minute prep, then a 2-minute talk answering 3 questions.</p>
 </button>
-
-        <div className="card disabled" aria-disabled="true">
-          <h3>Part 1: Personal Questions</h3>
-          <p>Short answers about yourself. (Coming soon)</p>
-        </div>
 
       </div>
 

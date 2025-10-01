@@ -14,6 +14,7 @@ import ReadingGuide from './reading/ReadingGuide';
 import MainMenu from './components/MainMenu';
 import ReadingMenu from './components/ReadingMenu';
 import SpeakingMenu from './components/speaking/SpeakingMenu';
+import SpeakingPart1 from "./components/speaking/SpeakingPart1";
 import SpeakingPart2 from './components/speaking/SpeakingPart2';
 import SpeakingPart3 from './components/speaking/SpeakingPart3';
 import SpeakingPart4 from "./components/speaking/SpeakingPart4";
@@ -255,10 +256,19 @@ useEffect(() => {
   <SpeakingMenu
     onBack={() => setView('menu')}
     onSelect={(key) => {
+      if (key === 'part1') setView('speakingPart1');
       if (key === 'part2') setView('speakingPart2');
       if (key === 'part3') setView('speakingPart3');   // ✅ route Part 3
       if (key === 'part4') setView('speakingPart4');
     }}
+  />
+)}
+
+
+{view === 'speakingPart1' && (
+  <SpeakingPart1
+    user={user}
+    speakSeconds={30}         // tweak if you want
   />
 )}
 

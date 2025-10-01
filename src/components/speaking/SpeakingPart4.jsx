@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
+import { loadSpeakingDone, markSpeakingDone } from "../../utils/speakingProgress";
 
 /**
  * Aptis Speaking – Part 4 (2-minute talk)
@@ -28,16 +29,13 @@ export default function SpeakingPart4({
   const [taskIndex, setTaskIndex] = useState(0);
   const current = tasks[taskIndex] || tasks[0];
 
-  // completed set (optional)
+  // completed set (cross-device via Firebase; local fallback)
   const [completed, setCompleted] = useState(new Set());
   useEffect(() => {
     let alive = true;
     (async () => {
-      try {
-        if (!user) { setCompleted(new Set()); return; }
-        const done = await fb.fetchSpeakingCompletions?.("part4");
-        if (alive && done) setCompleted(done);
-      } catch {}
+        const done = await loadSpeakingDone("part4", fb, user);
+        if (alive) setCompleted(done);
     })();
     return () => { alive = false; };
   }, [user]);
@@ -78,12 +76,9 @@ export default function SpeakingPart4({
         prepareSeconds={prepareSeconds}
         speakSeconds={speakSeconds}
         onFinished={async () => {
-          if (!user) return;
-          try {
-            await fb.saveSpeakingCompletion?.(current.id, "part4");
-            setCompleted(prev => new Set(prev).add(current.id));
-            toast("Task marked as completed ✓");
-          } catch {}
+          const updated = await markSpeakingDone("part4", [current.id], fb, user);
+          if (updated) setCompleted(updated);
+          toast("Task marked as completed ✓");
         }}
       />
     </div>
@@ -103,7 +98,7 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
     const chunksRef = useRef([]);
     const [file, setFile] = useState(null); // { blob, url, name }
   
-    const questions = task?.qs || [];
+    const questions = task?.qs || task?.questions || [];
   
     // reset on task change
     useEffect(() => {

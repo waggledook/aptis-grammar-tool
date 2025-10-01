@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
+import { loadSpeakingDone, markSpeakingDone } from "../../utils/speakingProgress";
 
 /**
  * Speaking – Part 2 (Exam-like with Start → TTS → Beep → Record)
@@ -33,11 +34,8 @@ export default function SpeakingPart2({ tasks = DEMO_TASKS, user, onRequireSignI
   useEffect(() => {
     let alive = true;
     (async () => {
-      try {
-        if (!user) { setCompleted(new Set()); return; }
-        const done = await fb.fetchSpeakingCompletions?.();
-        if (alive && done) setCompleted(done);
-      } catch {}
+      const done = await loadSpeakingDone("part2", fb, user);
+      if (alive) setCompleted(done);
     })();
     return () => { alive = false; };
   }, [user]);
@@ -91,12 +89,9 @@ export default function SpeakingPart2({ tasks = DEMO_TASKS, user, onRequireSignI
       <SpeakingAutoFlow
         task={current}
         onFinished={async () => {
-          if (!user) return;
-          try {
-            await fb.saveSpeakingCompletion?.(current.id);
-            setCompleted(prev => new Set(prev).add(current.id));
-            toast("Task marked as completed ✓");
-          } catch {}
+          const updated = await markSpeakingDone("part2", [current.id], fb, user);
+          if (updated) setCompleted(updated);
+          toast("Task marked as completed ✓");
         }}
       />
     </div>

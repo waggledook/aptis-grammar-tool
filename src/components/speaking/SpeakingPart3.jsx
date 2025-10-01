@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
+import { loadSpeakingDone, markSpeakingDone } from "../../utils/speakingProgress";
 
 /**
  * Speaking – Part 3 (Compare two photos) — Exam-like
@@ -29,11 +30,8 @@ export default function SpeakingPart3({ tasks = DEMO_TASKS, user, onRequireSignI
   useEffect(() => {
     let alive = true;
     (async () => {
-      try {
-        if (!user) { setCompleted(new Set()); return; }
-        const done = await fb.fetchSpeakingCompletions?.("part3"); // optional discriminator
-        if (alive && done) setCompleted(done);
-      } catch {}
+      const done = await loadSpeakingDone("part3", fb, user);
+      if (alive) setCompleted(done);
     })();
     return () => { alive = false; };
   }, [user]);
@@ -85,13 +83,9 @@ export default function SpeakingPart3({ tasks = DEMO_TASKS, user, onRequireSignI
       <TaskFlow
         task={current}
         onFinished={async () => {
-          if (!user) return;
-          try {
-            // optional: pass a discriminator so part2/part3 can be stored separately
-            await fb.saveSpeakingCompletion?.(current.id, "part3");
-            setCompleted(prev => new Set(prev).add(current.id));
-            toast("Task marked as completed ✓");
-          } catch {}
+          const updated = await markSpeakingDone("part3", [current.id], fb, user);
+          if (updated) setCompleted(updated);
+          toast("Task marked as completed ✓");
         }}
       />
     </div>
