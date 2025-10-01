@@ -7,7 +7,7 @@ export default function SpeakingMenu({ onSelect, onBack }) {
       <header className="header">
         <h2 className="title">Speaking</h2>
         <p className="intro">
-          Practise Aptis Speaking. Start with Part 2 (describe a photograph). Other parts coming soon.
+          Practise Aptis Speaking Tasks part 1 to 4.
         </p>
       </header>
 
