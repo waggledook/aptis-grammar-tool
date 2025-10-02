@@ -29,7 +29,7 @@ export default function SpeakingPart2({ tasks = DEMO_TASKS, user, onRequireSignI
   const [taskIndex, setTaskIndex] = useState(0);
   const current = items[taskIndex] || items[0];
 
-  // Completions
+  // Completions (✓ shown in picker)
   const [completed, setCompleted] = useState(new Set());
   useEffect(() => {
     let alive = true;
@@ -41,10 +41,9 @@ export default function SpeakingPart2({ tasks = DEMO_TASKS, user, onRequireSignI
   }, [user]);
 
   function handleSelectTask(nextIndex) {
-    // If guest, ignore clicks on locked items (index >= 2)
-    if ((!user && nextIndex >= 2)) {
-      // optional: toast("Sign in to unlock more tasks");
-      return; // do nothing (no redirect)
+    if (!user && nextIndex >= 2) {
+      onRequireSignIn?.();     // match Reading behaviour + use the prop
+      return;
     }
     setTaskIndex(nextIndex);
   }

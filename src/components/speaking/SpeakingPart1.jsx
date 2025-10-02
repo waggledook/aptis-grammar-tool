@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "../../utils/toast";
-import * as fb from "../../firebase";
+import * as fb from "../../firebase"; // namespace import (works even if functions aren't exported by name)
+import { loadSpeakingDone, markSpeakingDone } from "../../utils/speakingProgress";
 
 /**
  * Speaking – Part 1 (Personal Questions)
@@ -33,17 +34,8 @@ export default function SpeakingPart1({
   useEffect(() => {
     let alive = true;
     (async () => {
-      try {
-        if (user && fb.fetchSpeakingCompletions) {
-            const done = await fb.fetchSpeakingCompletions("part1"); // should return raw ids
-            if (alive) setCompleted(done || new Set());
-        } else {
-          // fallback to localStorage
-          const raw = localStorage.getItem("aptis_part1_done_ids") || "[]";
-          const ids = new Set(JSON.parse(raw)); // raw ids
-          if (alive) setCompleted(ids);
-        }
-      } catch {}
+    const done = await loadSpeakingDone("part1", fb, user);
+    if (alive) setCompleted(done);
     })();
     return () => { alive = false; };
   }, [user]);
@@ -150,18 +142,8 @@ export default function SpeakingPart1({
   async function markCompleted() {
     const ids = chosen.map(q => q.id); // raw ids
     try {
-      if (user && fb.saveSpeakingCompletion) {
-        for (const id of ids) await fb.saveSpeakingCompletion(id, "part1");
-        setCompleted(prev => new Set([...prev, ...ids]));
-      } else {
-        // localStorage fallback
-        const raw = localStorage.getItem("aptis_part1_done_ids") || "[]";
-        const arr = new Set(JSON.parse(raw));
-        ids.forEach(id => arr.add(id));
-        const out = Array.from(arr);
-        localStorage.setItem("aptis_part1_done_ids", JSON.stringify(out));
-        setCompleted(new Set(arr));
-      }
+      const updated = await markSpeakingDone("part1", ids, fb, user);
+      if (updated) setCompleted(updated);
       toast?.("Marked these questions as completed ✓");
     } catch {}
   }

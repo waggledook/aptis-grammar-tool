@@ -51,8 +51,7 @@ export default function SpeakingPart3({ tasks = DEMO_TASKS, user, onRequireSignI
 
   function handleSelectTask(nextIndex) {
     if (!user && nextIndex >= 2) {
-      // reading-style: just ignore (no redirect)
-      // onRequireSignIn?.(); // enable if you want to open a modal instead
+      onRequireSignIn?.(); // open your sign-in modal/sheet
       return;
     }
     setTaskIndex(nextIndex);
