@@ -500,7 +500,7 @@ const DEMO_TASKS = [
     qs: [
       "Tell me about a town or city that you visited recently.",
       "What did you do there and who were you with?",
-      "Is it better to raise chidren in the countryside or the city?"
+      "Is it better to raise children in the countryside or the city?"
     ]
   },
   {

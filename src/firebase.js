@@ -42,8 +42,8 @@ export const db   = getFirestore(app);
 // — AUTH HELPERS (unchanged) —
 export const doSignIn     = (email, pw) => signInWithEmailAndPassword(auth, email, pw);
 export const doSignUp     = (email, pw) => createUserWithEmailAndPassword(auth, email, pw);
-export const onAuthChange = cb        => onAuthStateChanged(auth, cb);
-export const doSignOut    = ()        => signOut(auth);
+export const onAuthChange = (cb)       => onAuthStateChanged(auth, cb);
+export const doSignOut    = ()         => signOut(auth);
 
 // — FIRESTORE HELPERS —
 // helper to build a reference to /users/{uid}/{subcol}
@@ -51,11 +51,6 @@ function userCol(subcol) {
   if (!auth.currentUser) throw new Error("Must be signed in");
   return collection(db, "users", auth.currentUser.uid, subcol);
 }
-
-
-
-
-
 
 // — FAVOURITES —
 
@@ -87,7 +82,6 @@ export async function fetchFavourites() {
   // each doc has { itemId, ... }
   return snap.docs.map(d => d.data().itemId);
 }
-
 
 /**
  * Record a new mistake for the current user, then trim to the 15 most recent.
@@ -143,11 +137,12 @@ const reportsCollection = collection(db, "reports");
  *   itemId: string,
  *   question: string,
  *   issue: string,
- *   comments?: string
+ *   comments?: string,
+ *   level?: string|null,
+ *   selectedOption?: string|null,
+ *   correctOption?: string|null,
  * }} args
  */
-
-
 export async function sendReport({
   itemId,
   question,
@@ -199,3 +194,46 @@ export async function fetchReadingCompletions() {
   return done;
 }
 
+// — SPEAKING PROGRESS (Parts 1–4) ———————————————————————————————
+// These are the new helpers you can call from Parts 2/3/4 components via your
+// existing speakingProgress.js utilities (loadSpeakingDone / markSpeakingDone).
+
+/**
+ * Save a speaking completion for the current user.
+ * Stores at /users/{uid}/speakingProgress with docId `${part}:${taskId}`.
+ * @param {string} taskId  (e.g. 'photo-set-07')
+ * @param {'part1'|'part2'|'part3'|'part4'} part
+ */
+export async function saveSpeakingCompletion(taskId, part = "part2") {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return; // silently skip when signed out (localStorage handles fallback)
+  const colRef = collection(db, "users", uid, "speakingProgress");
+  const docId  = `${part}:${taskId}`;
+  const ref    = doc(colRef, docId);
+  await setDoc(
+    ref,
+    {
+      part,
+      taskId,
+      completed: true,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
+/**
+ * Fetch the set of speaking completions for a given part.
+ * Returns an array of doc IDs (`${part}:${taskId}`).
+ * Your normalizer can strip the prefix to plain taskIds for display.
+ * @param {'part1'|'part2'|'part3'|'part4'} part
+ * @returns {Promise<string[]>}
+ */
+export async function fetchSpeakingCompletions(part = "part2") {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return [];
+  const colRef = collection(db, "users", uid, "speakingProgress");
+  const qPart  = query(colRef, where("part", "==", part));
+  const snap   = await getDocs(qPart);
+  return snap.docs.map(d => d.id); // `${part}:${taskId}`
+}
