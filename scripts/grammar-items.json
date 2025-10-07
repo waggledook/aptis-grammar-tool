@@ -3291,6 +3291,366 @@
           "Incorrect: 'none of which' is used for more than two, so it is wrong here.",
           "Incorrect: 'neither of them' is incorrect because we need a relative pronoun after the comma. This would be correct as a new sentence."
         ]
+      },
+      {
+        "id": "b1_rep_01",
+        "level": "B1",
+        "tag": "Reported Speech",
+        "sentence": "He said he ___ the match the day before.",
+        "options": ["had watched", "watched", "has watched"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Past time marker 'the day before' requires backshift to past perfect. Past simple becomes past perfect.",
+          "Incorrect: Simple past is the direct-speech tense; we usually backshift after 'said'.",
+          "Incorrect: Present perfect doesn’t match the reported-past perspective."
+        ]
+      },
+      {
+        "id": "b1_rep_03",
+        "level": "B1",
+        "tag": "Reported Speech",
+        "sentence": "They said they ___ the next day.",
+        "options": ["would leave", "will leave", "was leaving"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'will' → 'would' and 'tomorrow' → 'the next day' in reported speech.",
+          "Incorrect: 'will leave' is the direct-speech form, which is impossible with 'the next day' (past reference).",
+          "Incorrect: 'were leaving' is possible as a future arrangement in the past, but 'they was' is not possible."
+        ]
+      },
+      {
+        "id": "b1_rep_04",
+        "level": "B1",
+        "tag": "Reported Speech",
+        "sentence": "He told me ___ late.",
+        "options": ["not to be", "that I being", "don't be"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Negative imperatives report as 'told/asked + object + not to + verb'.",
+          "Incorrect: 'I being' is not a complete verb form.",
+          "Incorrect: This is still an imperative form, not reported speech."
+        ]
+      },
+      {
+        "id": "b1_rep_05",
+        "level": "B2",
+        "tag": "Reported Speech",
+        "sentence": "She asked me ___ earlier.",
+        "options": ["to arrive", "that I arrive", "don't arrive"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Requests can be reported as 'ask + object + to + verb'.",
+          "Incorrect: 'that I' is not the reporting pattern for requests.",
+          "Incorrect: 'dont arrive is incorrect for a reported request, we could say 'if/whether I could (not) arrive'"
+        ]
+      },
+      {
+        "id": "b2_rep_01",
+        "level": "B2",
+        "tag": "Reported Speech",
+        "sentence": "He asked ___  finished.",
+        "options": ["whether I had", "if I did", "I had"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Yes/No questions report with 'if' or 'whether', and here present perfect backshifts to past perfect.",
+          "Incorrect: 'if I did' is wrong because present perfect becomes past perfect in reported speech, and did finished is ungrammatical.",
+          "Incorrect: a reported question needs 'if' or 'whether'."
+        ]
+      },
+      {
+        "id": "b2_rep_03",
+        "level": "B1",
+        "tag": "Reported Speech",
+        "sentence": "He said he ___ me there that day, but not earlier.",
+        "options": ["could meet", "can meet", "could met"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'can' becomes 'could' in reported speech.",
+          "Incorrect: Present 'can' is the direct-speech form, which is impossible with 'that day' (past).",
+          "Incorrect: 'could met' is incorrect because can (modal verb) is always followed by the infinitive, not the past, 'met'."
+        ]
+      },
+      {
+        "id": "b2_rep_06",
+        "level": "B2",
+        "tag": "Reported Speech",
+        "sentence": "She said she ___ the report the previous week.",
+        "options": ["had completed", "would complete", "has completed"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Completed-before-past → past perfect in reported speech.",
+          "Incorrect: would complete is future-in-the-past, not suitable for a completed action.",
+          "Incorrect: Present perfect is incorrect as the action is in the past relative to a past time (the previous week)."
+        ]
+      },
+      {
+        "id": "c1_rep_01",
+        "level": "B2",
+        "tag": "Reported Speech",
+        "sentence": "He asked how long I ___ there by then.",
+        "options": ["had worked", "have worked", "worked"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Present perfect in the original question backshifts to past perfect.",
+          "Incorrect: Keeps present perfect from direct speech, which doesn't fit with the past reference 'by then'.",
+          "Incorrect: Simple past is incorrect here as the direct question was in present perfect."
+        ]
+      },
+      {
+        "id": "c1_rep_02",
+        "level": "B2",
+        "tag": "Reported Speech",
+        "sentence": "He said that if he saw her, he ___ me.",
+        "options": ["would call", "will call", "called"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: In reported conditionals, 'will' normally backshifts to 'would'.",
+          "Incorrect: 'will' is the direct-speech form, and it doesn't match with 'saw' in the if-clause.",
+          "Incorrect: Simple past doesn’t match the reported conditional structure. using 'will' in direct speech."
+        ]
+      },
+      {
+        "id": "c1_rep_03",
+        "level": "B2",
+        "tag": "Reported Speech",
+        "sentence": "The teacher told us ___ our phones in the exam.",
+        "options": ["not to use", "that we not", "don't use"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Reported imperative → 'told + object + not to + verb'.",
+          "Incorrect: imperatives are not reported with 'that' in English, but with the to infinitive.",
+          "Incorrect: we use the infinitive to report the imperative."
+        ]
+      },
+      {
+        "id": "c1_rep_long_02",
+        "level": "C1",
+        "tag": "Reported Speech",
+        "sentence": "The spokesperson ________ any further questions until the report was published.",
+        "options": [
+          "refused to answer",
+          "denied answering",
+          "insisted on answer"
+        ],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'refuse to + verb' indicates unwillingness to do something-",
+          "Incorrect: 'deny answering' means claiming you didn’t answer, not choosing not to, which doesn't make sense here.",
+          "Incorrect: 'insist on answer' is ungrammatical; it requires 'insist on answering', which doesn't make sense with the negative meaning of the sentence with 'any'."
+        ]
+      },
+      {
+        "id": "c1_rep_long_03",
+        "level": "C2",
+        "tag": "Reported Speech",
+        "sentence": "The scientist ________ the findings in an open-access journal.",
+        "options": [
+          "recommended publishing",
+          "recommended us to publish",
+          "recommended that we did published"
+        ],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: We usually use recommend + verb-ing/gerund, without the object pronoun.",
+          "Incorrect: 'recommended us to publish' is ungrammatical; 'recommended that we publish' would be correct.",
+          "Incorrect: 'did published' is ungrammatical; 'that we publish' or 'that we should publish' would be correct. (informally 'that we published' is also possible)."
+        ]
+      },
+      {
+        "id": "c1_rep_long_04",
+        "level": "C1",
+        "tag": "Reported Speech",
+        "sentence": "The lawyer ________ false testimony.",
+        "options": [
+          "accused the witness of giving",
+          "accused the witness to give",
+          "warned the witness about give"
+        ],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'accuse someone of doing something' is the fixed pattern.",
+          "Incorrect: 'blame someone for to give' is ungrammatical; it should be 'for giving'.",
+          "Incorrect: 'warned the witness about giving' as advice would be correct, but 'about give' is incorrect. preposition + verb-ing."
+        ]
+      },
+      {
+        "id": "c1_rep_long_05",
+        "level": "C1",
+        "tag": "Reported Speech",
+        "sentence": "The CEO ________  to finish her statement before questions were taken.",
+        "options": [
+          "insisted on being allowed",
+          "insisted to be allowed",
+          "refused to be allowed"
+        ],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'insist on + gerund' is the correct structure, and meaning for this sentence.",
+          "Incorrect: insist does not take the to infinitive; 'insisted to be allowed' is ungrammatical.",
+          "Incorrect: 'refused to be allowed' changes the meaning to unwillingness, which doesn't fit the context."
+        ]
+      },
+      {
+        "id": "c1_rep_long_06",
+        "level": "C1",
+        "tag": "Reported Speech",
+        "sentence": "The athlete ________ performance-enhancing drugs.",
+        "options": [
+          "denied taking",
+          "refused taking",
+          "insisted to have taken"
+        ],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'deny' takes a gerund: deny + verb-ing.",
+          "Incorrect: 'refuse' doesn’t collocate with a gerund; use 'refuse to + verb'.",
+          "Incorrect: 'insist to have taken' is ungrammatical; 'insisted on having taken' would mean the opposite."
+        ]
+      },
+      {
+        "id": "c1_rep_long_07",
+        "level": "C1",
+        "tag": "Reported Speech",
+        "sentence": "The union leader ________ a strike unless negotiations resumed.",
+        "options": [
+          "threatened to call",
+          "suggested to call",
+          "insisted on to call"
+        ],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'threaten to + verb' indicates a conditional intention → 'threatened to call'.",
+          "Incorrect: 'suggested to call' is ungrammatical; 'suggested calling' or 'suggested that we call' would be correct.",
+          "Incorrect: 'insist on to call' is wrong because insist on goes with verb-ing: insisted on calling is correct."
+        ]
+      },
+      {
+        "id": "c1_rep_long_08",
+        "level": "C1",
+        "tag": "Reported Speech",
+        "sentence": "Her lawyer ________ that the contract be rewritten to protect her rights.",
+        "options": [
+          "insisted that the contract be rewritten",
+          "insisted on rewrite the contract",
+          "threatened them with rewrite the contract"
+        ],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Insist that + subject + base verb' is the correct formal structure.",
+          "Incorrect: 'insisted on rewrite' is ungrammatical; it should be 'insisted on rewriting'.",
+          "Incorrect: 'threatened them with rewrite' is ungrammatical; it should be 'threatened to rewrite'."
+        ]
+      },
+      {
+        "id": "c1_rep_long_09",
+        "level": "C1",
+        "tag": "Reported Speech",
+        "sentence": "The manager ________ the quarterly targets.",
+        "options": [
+          "accused her team of not meeting",
+          "warned her team to not meet",
+          "refused her team of meeting"
+        ],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'accuse someone of doing something' → 'accused her team of not meeting'.",
+          "Incorrect: 'warn someone to not meet' doesn't make sense, as the manager would want them to meet targets.",
+          "Incorrect: 'refuse of' is ungrammatical, and refuse doesn't fit the context."
+        ]
+      },
+      {
+        "id": "c1_rep_long_10",
+        "level": "B2",
+        "tag": "Reported Speech",
+        "sentence": "The prime minister ________ having been aware of the security breach before it happened.",
+        "options": [
+          "denied",
+          "refused",
+          "insisted"
+        ],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'denied' = reject a past accusation, deny takes a gerund.",
+          "Incorrect: 'refuse' is used with the infinitive: refuse to do something.",
+          "Incorrect: 'insist' goes withs 'on + gerund' or a 'that' clause."
+        ]
+      },
+      {
+        "id": "a2_rep_02",
+        "level": "A2",
+        "tag": "Reported Speech",
+        "sentence": "Tom said he ___ the movie the day before.",
+        "options": ["had seen", "saw", "has seen"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Reported past action → past perfect 'had seen' is the reported speech form of 'saw'.",
+          "Incorrect: 'saw' is simple past; should be backshifted to past pefect.",
+          "Incorrect: 'has seen' is present perfect, which doesn’t fit the past reference 'the day before'."
+        ]
+      },
+      {
+        "id": "a2_rep_03",
+        "level": "A2",
+        "tag": "Reported Speech",
+        "sentence": "He told me he ___ come to the party yesterday.",
+        "options": ["would", "will", "can"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Future 'will' becomes 'would' in reported speech.",
+          "Incorrect: 'will' is direct speech form, which is impossible with 'yesterday' (past reference).",
+          "Incorrect: 'can' is wrong because of the past reference 'yesterday'."
+        ]
+      },
+      {
+        "id": "a2_rep_07",
+        "level": "A2",
+        "tag": "Reported Speech",
+        "sentence": "She told me she ___ visit her parents the next day.",
+        "options": ["would", "will", "was"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'will' → 'would' in reported speech for future.",
+          "Incorrect: 'will' is not backshifted for reported speech, which we need her with the past reference 'the next day'.",
+          "Incorrect: 'was' doesn’t fit with 'visit'. 'was visiting' would be possible for a planned arrangement."
+        ]
+      },
+      {
+        "id": "a2_rep_08",
+        "level": "A2",
+        "tag": "Reported Speech",
+        "sentence": "He said he ___ coffee because it made him nervous.",
+        "options": ["didn’t drink", "doesn’t drink", "not drink"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Backshifted negative simple past → 'didn’t drink' from direct 'I don’t drink'.",
+          "Incorrect: 'doesn’t drink' is present-tense direct speech, and it doesn't fit with the past verb, 'made'.",
+          "Incorrect: 'not drink' is grammatically incomplete."
+        ]
+      },
+      {
+        "id": "a2_rep_09",
+        "level": "A2",
+        "tag": "Reported Speech",
+        "sentence": "She asked if I ___ help her with the boxes the next day.",
+        "options": ["could", "can", "will"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'can' → 'could' in reported speech for polite requests.",
+          "Incorrect: 'can' is direct speech form, and doesn’t fit past context of 'the next day'.",
+          "Incorrect: 'will' expresses future, and doesn't fit the past context of 'the next day'."
+        ]
+      },
+      {
+        "id": "a2_rep_10",
+        "level": "A2",
+        "tag": "Reported Speech",
+        "sentence": "He said they ___ happy with the results.",
+        "options": ["were", "is", "was"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Plural subject + past tense → 'were'. Reported form of 'they are'.",
+          "Incorrect: 'is' is not backshifted, and doesn't agree with 'they'.",
+          "Incorrect: 'was' mismatches plural 'they'."
+        ]
       }
-
   ]
