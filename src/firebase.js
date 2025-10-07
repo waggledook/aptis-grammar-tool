@@ -1,8 +1,10 @@
 // src/firebase.js
 import { initializeApp } from "firebase/app";
-import { getAnalytics }  from "firebase/analytics";
+import { getAnalytics } from "firebase/analytics";
+
+// ⬇️ Use initializeFirestore instead of getFirestore
 import {
-  getFirestore,
+  initializeFirestore,
   collection,
   doc,
   setDoc,
@@ -13,31 +15,39 @@ import {
   where,
   orderBy,
   limit,
-  serverTimestamp
+  serverTimestamp,
 } from "firebase/firestore";
+
 import {
   getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
-  signOut
+  signOut,
 } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCvpE87D16safq68oFB4fJKPyCURsc-mrU",
   authDomain: "examplay-auth.firebaseapp.com",
-  projectId: "examplay-auth",              // ← this must be here
+  projectId: "examplay-auth",
   storageBucket: "examplay-auth.appspot.com",
   messagingSenderId: "654835226958",
   appId: "1:654835226958:web:a95cd8da4adb09c8a5661f",
-  measurementId: "G-DMMT8D3XBR"
+  measurementId: "G-DMMT8D3XBR",
 };
 
 const app = initializeApp(firebaseConfig);
 getAnalytics(app);
 
+// ⬇️ Initialize Firestore with long-polling (avoids WebChannel terminate 400s)
+export const db = initializeFirestore(app, {
+  experimentalAutoDetectLongPolling: true,
+  // If you still see issues, try flipping this:
+  useFetchStreams: false, // set to true on some Chromium builds if needed
+  // Last resort (stronger): experimentalForceLongPolling: true,
+});
+
 export const auth = getAuth(app);
-export const db   = getFirestore(app);
 
 // — AUTH HELPERS (unchanged) —
 export const doSignIn     = (email, pw) => signInWithEmailAndPassword(auth, email, pw);

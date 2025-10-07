@@ -40,6 +40,12 @@ export default function SpeakingPart2({ tasks = DEMO_TASKS, user, onRequireSignI
     return () => { alive = false; };
   }, [user]);
 
+  // 🔍 Debug: check user + Firebase exports
+  useEffect(() => {
+    console.log("[p2] user?", { hasUser: !!user, uid: fb?.auth?.currentUser?.uid || null });
+    console.log("[p2] hasFB?", { save: !!fb.saveSpeakingCompletion, fetch: !!fb.fetchSpeakingCompletions });
+  }, [user]);
+
   function handleSelectTask(nextIndex) {
     if (!user && nextIndex >= 2) {
       onRequireSignIn?.();     // match Reading behaviour + use the prop
@@ -86,13 +92,29 @@ export default function SpeakingPart2({ tasks = DEMO_TASKS, user, onRequireSignI
       </header>
 
       <SpeakingAutoFlow
-        task={current}
-        onFinished={async () => {
-          const updated = await markSpeakingDone("part2", [current.id], fb, user);
-          if (updated) setCompleted(updated);
-          toast("Task marked as completed ✓");
-        }}
-      />
+  task={current}
+  onFinished={async () => {
+    try {
+      console.log("[p2] finish → markSpeakingDone", {
+        part: "part2",
+        id: current.id,
+        hasUser: !!user
+      });
+
+      const updated = await markSpeakingDone("part2", [current.id], fb, user);
+
+      console.log("[p2] result", {
+        updated: updated ? [...updated] : null
+      });
+
+      if (updated) setCompleted(updated);
+      toast("Task marked as completed ✓");
+    } catch (e) {
+      console.error("[p2] error in markSpeakingDone", e);
+      toast("Couldn’t save completion (local only).");
+    }
+  }}
+/>
     </div>
   );
 }
