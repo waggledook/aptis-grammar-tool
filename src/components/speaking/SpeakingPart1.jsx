@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase"; // namespace import (works even if functions aren't exported by name)
 import { loadSpeakingDone, markSpeakingDone } from "../../utils/speakingProgress";
+import { PART1_QUESTIONS } from "./banks/part1";
+
 
 /**
  * Speaking – Part 1 (Personal Questions)
@@ -29,7 +31,7 @@ export default function SpeakingPart1({
   const chunksRef = useRef([]);
 
   // -------- Bank + progress tracking --------
-  const BANK = useMemo(() => DEDUP_BANK, []);
+  const BANK = useMemo(() => PART1_QUESTIONS, []);
   const [completed, setCompleted] = useState(new Set()); // set of raw ids like "p1q001"
   useEffect(() => {
     let alive = true;

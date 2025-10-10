@@ -16,15 +16,25 @@ import {
   orderBy,
   limit,
   serverTimestamp,
+  getCountFromServer,           // ← NEW
+  increment                     // ← NEW
 } from "firebase/firestore";
 
 import {
   getAuth,
+  updateProfile,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   onAuthStateChanged,
   signOut,
 } from "firebase/auth";
+
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCvpE87D16safq68oFB4fJKPyCURsc-mrU",
@@ -48,6 +58,7 @@ export const db = initializeFirestore(app, {
 });
 
 export const auth = getAuth(app);
+export const storage = getStorage(app);
 
 // — AUTH HELPERS (unchanged) —
 export const doSignIn     = (email, pw) => signInWithEmailAndPassword(auth, email, pw);
@@ -247,3 +258,224 @@ export async function fetchSpeakingCompletions(part = "part2") {
   const snap   = await getDocs(qPart);
   return snap.docs.map(d => d.id); // `${part}:${taskId}`
 }
+
+
+// — WRITING PART 1: save a session (questions + answers) ————————————————
+/**
+ * Save one Writing Part 1 session for the current user.
+ * Each session stores the 5 questions with the student's answers.
+ */
+export async function saveWritingP1Submission(payload) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return; // silently skip if signed out
+
+  const colRef = collection(db, "users", uid, "writingP1Sessions");
+  await addDoc(colRef, {
+    type: "part1",
+    items: payload.items,
+    count: payload.items?.length ?? 0,
+    createdAt: serverTimestamp(),
+  });
+}
+
+/** Count of reading completions */
+export async function fetchReadingProgressCount() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return 0;
+  const snap = await getDocs(collection(db, "users", uid, "readingProgress"));
+  return snap.size || 0;
+}
+
+/** Speaking progress counts per part */
+export async function fetchSpeakingCounts() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return { part1: 0, part2: 0, part3: 0, part4: 0 };
+  const col = collection(db, "users", uid, "speakingProgress");
+  const counts = { part1: 0, part2: 0, part3: 0, part4: 0 };
+  const snap = await getDocs(col);
+  snap.forEach(d => {
+    const p = d.data()?.part;
+    if (p && counts[p] !== undefined) counts[p] += 1;
+  });
+  return counts;
+}
+
+/** Recent mistakes (IDs only) */
+export async function fetchRecentMistakes(n = 10) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return [];
+  const q = query(
+    collection(db, "users", uid, "mistakes"),
+    orderBy("answeredAt", "desc"),
+    limit(n)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => d.data()?.itemId).filter(Boolean);
+}
+
+/** Recent favourites (IDs only) */
+export async function fetchRecentFavourites(n = 10) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return [];
+  const q = query(collection(db, "users", uid, "favourites"), orderBy("createdAt", "desc"), limit(n));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => d.data()?.itemId).filter(Boolean);
+}
+
+/** Fetch Writing Part 1 sessions (latest first) */
+export async function fetchWritingP1Sessions(n = 20) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return [];
+  const q = query(
+    collection(db, "users", uid, "writingP1Sessions"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({
+    id: d.id,
+    createdAt: d.data()?.createdAt || null,
+    items: d.data()?.items || [],
+  }));
+}
+
+// ─── GRAMMAR PROGRESS ────────────────────────────────────────────────────────
+// Per-item progress is stored at /users/{uid}/grammarProgress/{itemId}
+// Shape:
+// { attempts: number, everCorrect: boolean, lastCorrect: boolean, lastAnsweredAt: TS }
+
+/**
+ * Save the result for one grammar item.
+ * @param {string} itemId
+ * @param {boolean} isCorrect
+ */
+export async function saveGrammarResult(itemId, isCorrect) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return; // guests handled by localStorage mirror in UI
+
+  const ref = doc(db, "users", uid, "grammarProgress", itemId);
+  await setDoc(
+    ref,
+    {
+      attempts: increment(1),
+      everCorrect: isCorrect ? true : increment(0), // stays true once correct
+      lastCorrect: !!isCorrect,
+      lastAnsweredAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
+/**
+ * Fetch dashboard counts for the profile progress bar:
+ * answered = #docs in /grammarProgress,
+ * correct  = #docs with everCorrect == true,
+ * total    = total #grammar items in the bank (from /grammarItems).
+ */
+export async function fetchGrammarDashboard() {
+  const uid = auth.currentUser?.uid;
+
+  // Total items from public grammarItems (uses count aggregation)
+  const totalSnap = await getCountFromServer(query(collection(db, "grammarItems")));
+  const total = totalSnap.data().count || 0;
+
+  if (!uid) {
+    // Guest: no per-user docs → answered/correct from local mirror (optional)
+    return { answered: 0, correct: 0, total };
+  }
+
+  const col = collection(db, "users", uid, "grammarProgress");
+  const progSnap = await getDocs(col);
+
+  let answered = 0;
+  let correct = 0;
+  progSnap.forEach(d => {
+    answered += 1;
+    if (d.data()?.everCorrect) correct += 1;
+  });
+
+  return { answered, correct, total };
+}
+
+/**
+ * Upload a PNG/JPG avatar to Storage and mirror its URL to Auth + Firestore.
+ * Path: userAvatars/{uid}/badge.png
+ */
+// Upload a PNG/JPG avatar to Storage, then mirror URL to Auth + Firestore.
+export async function uploadAvatarAndSave(file) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Must be signed in");
+
+  const avatarRef = ref(storage, `userAvatars/${user.uid}/badge.png`);
+  const task = uploadBytesResumable(avatarRef, file, {
+    contentType: file?.type || "image/png", // important for rules
+  });
+
+  await new Promise((resolve, reject) => {
+    task.on("state_changed", null, (err) => {
+      console.error("[avatar] upload error:", err.code, err.message, err?.serverResponse);
+      reject(err);
+    }, resolve);
+  });
+
+  const url = await getDownloadURL(avatarRef);
+
+  await updateProfile(user, { photoURL: url });
+  await setDoc(doc(db, "users", user.uid), { photoURL: url }, { merge: true });
+
+  return url;
+}
+
+/** Optional: use a preset image that already lives in your app bundle or CDN */
+export async function setPresetAvatar(url) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Must be signed in");
+  await updateProfile(user, { photoURL: url });
+  await setDoc(doc(db, "users", user.uid), { photoURL: url }, { merge: true });
+  return url;
+}
+
+// --- DEV ONLY: expose helpers for quick debugging in the browser console ---
+if (import.meta.env.DEV) {
+  // so you can run: auth.currentUser?.uid in DevTools
+  // (make sure these names don't clash with anything else)
+  window.auth = auth;
+  window.storage = storage;
+
+  // tiny 1x1 PNG upload tester: window._testUpload()
+  window._testUpload = async () => {
+    const u = auth.currentUser;
+    if (!u) { console.warn('Not signed in'); return 'NO_AUTH'; }
+
+    // 1x1 transparent PNG
+    const base64 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8Xw8AAqMBm6c6q8sAAAAASUVORK5CYII=';
+    const bytes = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+    const file = new File([bytes], 'ping.png', { type: 'image/png' });
+
+    const { ref, uploadBytesResumable, getDownloadURL } = await import('firebase/storage');
+    const { updateProfile } = await import('firebase/auth');
+    const { doc, setDoc } = await import('firebase/firestore');
+
+    const avatarRef = ref(storage, `userAvatars/${u.uid}/badge.png`);
+    const task = uploadBytesResumable(avatarRef, file, { contentType: file.type });
+
+    const result = await new Promise((res, rej) => {
+      task.on('state_changed', null, (err) => {
+        console.error('[test upload] error:', err.code, err.message);
+        rej(err);
+      }, async () => {
+        const url = await getDownloadURL(avatarRef);
+        try {
+          await updateProfile(u, { photoURL: url });
+          await setDoc(doc(db, 'users', u.uid), { photoURL: url }, { merge: true });
+        } catch {}
+        res(url);
+      });
+    });
+
+    console.log('[test upload] success URL:', result);
+    return result;
+  };
+}
+
+

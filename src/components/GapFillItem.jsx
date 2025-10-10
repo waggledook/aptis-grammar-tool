@@ -1,7 +1,7 @@
 // src/components/GapFillItem.jsx
 import React, { useState, useEffect } from 'react'
 import { auth, sendReport, recordMistake,
-         addFavourite, removeFavourite, fetchFavourites } from '../firebase'
+         addFavourite, removeFavourite, fetchFavourites, saveGrammarResult } from '../firebase'
 import { AlertCircle, Star } from 'lucide-react'
 import { toast } from '../utils/toast'
 import '../index.css'     // your global styles
@@ -36,8 +36,13 @@ export default function GapFillItem({ item, onAnswer }) {
     if (sel !== null) return
     onAnswer()
     setSel(idx)
-    if (idx !== answerIndex) {
-      recordMistake(id).catch(console.error)
+    const isCorrect = idx === answerIndex;
+    if (!isCorrect) {
+      recordMistake(id).catch(console.error);
+    }
+    // Track progress for signed-in users
+    if (auth.currentUser) {
+      saveGrammarResult(id, isCorrect)
     }
   }
 

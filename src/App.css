@@ -428,3 +428,50 @@ button {
   .select { min-width: 0; width: 100%; }
 }
 
+/* Reuse your existing .topbar-btn look; enhance for profile badge */
+.topbar-btn.profile-badge{
+  display:inline-flex; align-items:center; gap:.5rem;
+  padding:.35rem .6rem .35rem .4rem;
+}
+.topbar-btn.profile-badge .avatar{
+  width:1.45rem; height:1.45rem; border-radius:999px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:#294b84; /* matches your primary tone */
+  border:1px solid #3a6ebd;
+  font-weight:700; line-height:1; font-size:.9rem;
+}
+
+@media (max-width: 420px){
+  .topbar-btn.profile-badge .label{ display:none; }
+}
+
+/* Compact circular badge for signed-in users */
+.profile-badge-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-badge-btn .avatar {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 50%;
+  background: #294b84;          /* your brand blue */
+  border: 1px solid #3a6ebd;    /* subtle outline */
+  color: #e6f0ff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.profile-badge-btn:hover .avatar {
+  filter: brightness(1.1);
+  transform: scale(1.05);
+}

@@ -24,6 +24,18 @@ export default function MainMenu({ onSelect }) {
   <h3>Speaking Practice</h3>
   <p>Practice tasks for all parts of the speaking exam.</p>
 </button>
+
+{/* Writing entry → sub-menu */}
+<button className="menu-card" onClick={() => onSelect('writingMenu')}>
+  <h3>Writing Practice</h3>
+  <p>Practise all parts of the Aptis Writing test, from short answers to full emails.</p>
+</button>
+
+<button className="menu-card" onClick={() => onSelect('profile')}>
+  <h3>My Profile</h3>
+  <p>See your progress and review saved work.</p>
+</button>
+
       </div>
 
       <style>{`

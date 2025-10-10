@@ -12,6 +12,9 @@ import ReviewMistakes   from './components/ReviewMistakes'
 import ReviewFavourites from './components/ReviewFavourites'
 import ReadingGuide from './reading/ReadingGuide';
 import MainMenu from './components/MainMenu';
+import Profile from "./components/profile/Profile";
+import WritingMenu from './components/writing/WritingMenu';
+import WritingPart1 from './components/writing/WritingPart1';
 import ReadingMenu from './components/ReadingMenu';
 import SpeakingMenu from './components/speaking/SpeakingMenu';
 import SpeakingPart1 from "./components/speaking/SpeakingPart1";
@@ -101,18 +104,35 @@ useEffect(() => {
   <div className="content-container">
 
     {/* Auth bar */}
-    <div style={{ textAlign: 'right', marginBottom: '1rem' }}>
-  <button onClick={() => setView('menu')} className="topbar-btn" style={{ marginRight: 8 }}>
+    <div style={{ textAlign: "right", marginBottom: "1rem", display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+  <button onClick={() => setView("menu")} className="topbar-btn">
     Home
   </button>
+
   {user ? (
-    <button onClick={doSignOut} className="topbar-btn">Sign Out</button>
+    <>
+      <button onClick={doSignOut} className="topbar-btn">
+        Sign Out
+      </button>
+
+      <button
+        onClick={() => setView("profile")}
+        className="profile-badge-btn"
+        aria-label="Open profile"
+        title={user.email || "My Profile"}
+      >
+        <span className="avatar">
+          {((user.displayName || user.email || "U")[0] || "U").toUpperCase()}
+        </span>
+      </button>
+    </>
   ) : (
     <button onClick={() => setShowAuth(true)} className="topbar-btn">
       Sign In / Sign Up
     </button>
   )}
 </div>
+
     {/* ————— Show the right “page” ————— */}
 
 {view === 'menu' && (
@@ -216,6 +236,20 @@ useEffect(() => {
   </>
 )}
 
+{view === 'writingMenu' && (
+  <WritingMenu
+  onSelect={(part) => setView(`writing_${part}`)} // 'writing_part1', etc.
+  onBack={() => setView('menu')}                  // your app uses 'menu'
+  />
+)}
+
+{view === "writing_part1" && (
+  <WritingPart1
+    onBack={() => setView("writingMenu")}
+    user={user}
+  />
+)}
+
 {view === 'readingMenu' && (
   <ReadingMenu
     onSelect={(next) => setView(next)}  // expects 'readingGuide' or 'reading'
@@ -295,6 +329,10 @@ useEffect(() => {
     // prepareSeconds={60}
     // speakSeconds={120}
   />
+)}
+
+{view === 'profile' && (
+  <Profile user={user} onBack={() => setView('menu')} />
 )}
 
 
