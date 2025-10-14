@@ -97,6 +97,8 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
   
     const recRef = useRef(null);
     const chunksRef = useRef([]);
+    const ttsAudioRef = useRef(null);
+    const ttsCacheRef = useRef(new Map()); // key: `${voice}::${text}` → url
     const [file, setFile] = useState(null); // { blob, url, name }
   
     const questions = task?.qs || task?.questions || [];
@@ -220,18 +222,58 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
     }
   
     // TTS + beep
-    function cancelTTS(){ try { window.speechSynthesis?.cancel(); } catch {} }
-    function speakTTS(text){
-      return new Promise((resolve)=>{
-        try{
-          const synth = window.speechSynthesis; if (!synth) return resolve();
-          const u = new SpeechSynthesisUtterance(text);
-          u.lang = "en-GB"; u.rate = 1; u.pitch = 1; u.volume = 1;
-          u.onend = resolve; u.onerror = resolve;
-          synth.cancel(); synth.speak(u);
-        } catch { resolve(); }
-      });
+    function cancelTTS(){
+      try { window.speechSynthesis?.cancel(); } catch {}
+      try {
+        const a = ttsAudioRef.current;
+        if (a) { a.pause(); a.removeAttribute('src'); a.load(); }
+      } catch {}
     }
+
+    async function speakTTS(text){
+  const voice = 'en-GB-Neural2-C';  // UK neural (change if you want)
+  const key = `${voice}::${text}`;
+
+  try {
+    // cache first
+    let url = ttsCacheRef.current.get(key);
+    if (!url) {
+      const r = await fetch('/speak', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, voice, rate: 0.98, pitch: -1.0, format: 'mp3' })
+      });
+      if (!r.ok) throw new Error(`speak ${r.status}`);
+      const data = await r.json(); // { url, cached }
+      url = data.url;
+      ttsCacheRef.current.set(key, url);
+    }
+
+    const a = ttsAudioRef.current;
+    if (!a) return;
+    a.src = url;
+    await a.play(); // user clicked Start, so autoplay OK
+
+    // wait until it finishes
+    await new Promise((res) => {
+      const onEnd = () => { a.removeEventListener('ended', onEnd); res(); };
+      a.addEventListener('ended', onEnd);
+    });
+  } catch (e) {
+    console.warn('[P4 TTS] cloud failed, falling back to speechSynthesis', e);
+    // graceful fallback so the flow continues
+    await new Promise((resolve)=>{
+      try{
+        const synth = window.speechSynthesis; if(!synth) return resolve();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-GB'; u.rate = 1; u.pitch = 1; u.volume = 1;
+        u.onend = resolve; u.onerror = resolve;
+        synth.cancel(); synth.speak(u);
+      } catch { resolve(); }
+    });
+  }
+}
+
     function playBeep(freq=600, seconds=1.0){
       return new Promise((resolve)=>{
         try{
@@ -254,6 +296,7 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
       <div className="panes panes-vertical">
         {/* Top: controls + timers */}
         <section className="panel controls-panel">
+          <audio ref={ttsAudioRef} preload="none" style={{ display: 'none' }} />
           <div className="meters">
             <span className="pill">
               {phase === "ready"    && "Ready to start"}
@@ -272,16 +315,21 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
             </div>
           )}
   
-          {phase === "announce" && (
-            <div className="actions">
-              <button
-                className="btn"
-                onClick={() => { window.speechSynthesis?.cancel(); setLeft(prepareSeconds); setPhase("prep"); }}
-              >
-                Skip instructions
-              </button>
-            </div>
-          )}
+  {phase === "announce" && (
+  <div className="actions">
+    <button
+      className="btn"
+      onClick={() => {
+        cancelTTS();                 // ← was speechSynthesis?.cancel()
+        setLeft(prepareSeconds);
+        setPhase("prep");
+      }}
+    >
+      Skip instructions
+    </button>
+  </div>
+)}
+
 
 {phase === "prep" && (
   <div className="actions">

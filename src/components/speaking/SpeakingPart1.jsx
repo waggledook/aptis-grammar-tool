@@ -3,6 +3,7 @@ import { toast } from "../../utils/toast";
 import * as fb from "../../firebase"; // namespace import (works even if functions aren't exported by name)
 import { loadSpeakingDone, markSpeakingDone } from "../../utils/speakingProgress";
 import { PART1_QUESTIONS } from "./banks/part1";
+import { getTtsUrl } from '../../api/speak';
 
 
 /**
@@ -29,6 +30,9 @@ export default function SpeakingPart1({
   const [micError, setMicError] = useState("");
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
+  const ttsAudioRef = useRef(null);
+  const ttsCacheRef = useRef(new Map()); // key: text|voice → url
+
 
   // -------- Bank + progress tracking --------
   const BANK = useMemo(() => PART1_QUESTIONS, []);
@@ -151,17 +155,57 @@ export default function SpeakingPart1({
   }
 
   // -------- TTS + Beep --------
-  function cancelTTS(){ try { window.speechSynthesis?.cancel(); } catch {} }
-  function speakTTS(text){
-    return new Promise((resolve)=>{
-      try{
-        const synth = window.speechSynthesis; if(!synth) return resolve();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = "en-GB"; u.rate = 1; u.pitch = 1; u.volume = 1;
-        u.onend = resolve; u.onerror = resolve;
-        synth.cancel(); synth.speak(u);
-      } catch { resolve(); }
-    });
+  function cancelTTS(){
+    try { window.speechSynthesis?.cancel(); } catch {}
+    try {
+      const a = ttsAudioRef.current;
+      if (a) { a.pause(); a.removeAttribute('src'); a.load(); }
+    } catch {}
+  }
+  async function speakTTS(text) {
+    const voice = 'en-GB-Neural2-C';   // default voice (change if you like)
+    const key = `${voice}::${text}`;
+  
+    try {
+      // cache first
+      let url = ttsCacheRef.current.get(key);
+      if (!url) {
+        const r = await fetch('/speak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, voice, rate: 0.98, pitch: -1.0, format: 'mp3' })
+        });
+        if (!r.ok) throw new Error(`speak ${r.status}`);
+        const data = await r.json(); // { url, cached }
+        url = data.url;
+        ttsCacheRef.current.set(key, url);
+      }
+  
+      const a = ttsAudioRef.current;
+      if (!a) return;
+      a.src = url;
+  
+      // play() is allowed because your flow starts from a user click (Start)
+      await a.play();
+  
+      // Wait until the audio finishes
+      await new Promise((res) => {
+        const onEnd = () => { a.removeEventListener('ended', onEnd); res(); };
+        a.addEventListener('ended', onEnd);
+      });
+    } catch (e) {
+      console.warn('[TTS] cloud failed, falling back to speechSynthesis', e);
+      // Fallback to browser voice so the flow continues
+      await new Promise((resolve) => {
+        try {
+          const synth = window.speechSynthesis; if (!synth) return resolve();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = 'en-GB'; u.rate = 1; u.pitch = 1; u.volume = 1;
+          u.onend = resolve; u.onerror = resolve;
+          synth.cancel(); synth.speak(u);
+        } catch { resolve(); }
+      });
+    }
   }
   function playBeep(freq=600, seconds=1.0){
     return new Promise((resolve)=>{
@@ -235,6 +279,7 @@ export default function SpeakingPart1({
       </header>
 
       <section className="panel">
+      <audio ref={ttsAudioRef} preload="none" style={{ display: 'none' }} />
         {/* Status row */}
         <div className="meters">
           <span className="pill">

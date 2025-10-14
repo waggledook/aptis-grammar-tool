@@ -115,6 +115,8 @@ function TaskFlow({ task, onFinished }) {
   const [micError, setMicError] = useState("");
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
+  const ttsAudioRef = useRef(null);
+  const ttsCacheRef = useRef(new Map()); // `${voice}::${text}` → url
 
   // reset on task change
   useEffect(() => {
@@ -219,19 +221,58 @@ function TaskFlow({ task, onFinished }) {
   }
 
   // TTS + beep
-  function cancelTTS(){ try { window.speechSynthesis?.cancel(); } catch {} }
-  function speakTTS(text) {
-    return new Promise((resolve) => {
-      try {
-        const synth = window.speechSynthesis;
-        if (!synth) return resolve();
-        const u = new SpeechSynthesisUtterance(text);
-        u.lang = "en-GB"; u.rate = 1; u.pitch = 1; u.volume = 1;
-        u.onend = () => resolve(); u.onerror = () => resolve();
-        synth.cancel(); synth.speak(u);
-      } catch { resolve(); }
-    });
+  function cancelTTS() {
+    try { window.speechSynthesis?.cancel(); } catch {}
+    try {
+      const a = ttsAudioRef.current;
+      if (a) { a.pause(); a.removeAttribute('src'); a.load(); }
+    } catch {}
   }
+  
+  async function speakTTS(text) {
+    const voice = 'en-GB-Neural2-C';   // UK neural; switch if you like
+    const key = `${voice}::${text}`;
+  
+    try {
+      // cache first
+      let url = ttsCacheRef.current.get(key);
+      if (!url) {
+        const r = await fetch('/speak', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, voice, rate: 0.98, pitch: -1.0, format: 'mp3' })
+        });
+        if (!r.ok) throw new Error(`speak ${r.status}`);
+        const data = await r.json(); // { url, cached }
+        url = data.url;
+        ttsCacheRef.current.set(key, url);
+      }
+  
+      const a = ttsAudioRef.current;
+      if (!a) return;
+      a.src = url;
+      await a.play(); // user gesture already happened (Start)
+  
+      // wait until audio ends
+      await new Promise((res) => {
+        const onEnd = () => { a.removeEventListener('ended', onEnd); res(); };
+        a.addEventListener('ended', onEnd);
+      });
+    } catch (e) {
+      console.warn('[P3 TTS] cloud failed, falling back to speechSynthesis', e);
+      // Fallback so the flow continues
+      await new Promise((resolve) => {
+        try {
+          const synth = window.speechSynthesis; if (!synth) return resolve();
+          const u = new SpeechSynthesisUtterance(text);
+          u.lang = 'en-GB'; u.rate = 1; u.pitch = 1; u.volume = 1;
+          u.onend = resolve; u.onerror = resolve;
+          synth.cancel(); synth.speak(u);
+        } catch { resolve(); }
+      });
+    }
+  }
+  
   function playBeep(freq = 600, seconds = 1.2) {
     return new Promise((resolve) => {
       try {
@@ -269,6 +310,7 @@ function TaskFlow({ task, onFinished }) {
     <div className="panes panes-vertical">
       {/* Top: controls */}
       <section className="panel controls-panel">
+        <audio ref={ttsAudioRef} preload="none" style={{ display: 'none' }} />
         <div className="meters">
           <span className="pill">
             {overall === "ready" && "Ready to start"}
