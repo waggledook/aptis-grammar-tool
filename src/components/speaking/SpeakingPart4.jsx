@@ -102,6 +102,19 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
     const [file, setFile] = useState(null); // { blob, url, name }
   
     const questions = task?.qs || task?.questions || [];
+
+    const audioCtxRef = useRef(null);
+async function ensureAudioContext() {
+  if (!audioCtxRef.current) {
+    audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  const ctx = audioCtxRef.current;
+  if (ctx.state === "suspended") {
+    try { await ctx.resume(); } catch {}
+  }
+  return ctx;
+}
+
   
     // reset on task change
     useEffect(() => {
@@ -152,6 +165,14 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
         await startSpeak();
       })();
     }, [phase]);
+
+    useEffect(() => () => {
+      try {
+        const mr = recRef.current;
+        if (mr && mr.state !== "inactive") mr.stop();
+      } catch {}
+    }, []);
+    
   
     // keyboard helpers: Space to start/stop
     useEffect(() => {
@@ -165,8 +186,8 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
       return () => window.removeEventListener("keydown", onKey);
     }, [phase]);
   
-    function startPrep() {
-      // We first read the questions + prep note in "announce"
+    async function startPrep() {
+      await ensureAudioContext();     // 👈 iOS needs a user-gesture resume
       setPhase("announce");
     }
   
@@ -183,27 +204,54 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
       onFinished?.();
     }
   
+    function pickRecordingMime() {
+      const prefs = [
+        'audio/mp4;codecs=mp4a.40.2', // iOS best
+        'audio/mp4',
+        'audio/webm;codecs=opus',
+        'audio/webm'
+      ];
+      if (window.MediaRecorder && MediaRecorder.isTypeSupported) {
+        for (const t of prefs) if (MediaRecorder.isTypeSupported(t)) return t;
+      }
+      return '';
+    }
+    function extForMime(mime='') {
+      if (mime.includes('mp4')) return 'm4a';
+      if (mime.includes('webm')) return 'webm';
+      return 'm4a';
+    }
+
     // recording helpers
     async function startRecording() {
       try {
         if (!navigator.mediaDevices?.getUserMedia) {
-          setMicError("Recording not supported."); 
+          setMicError("Recording not supported.");
           return;
         }
+        if (typeof MediaRecorder === 'undefined') {
+          setMicError("MediaRecorder not available in this browser.");
+          return;
+        }
+    
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const mr = new MediaRecorder(stream);
+    
+        const mime = pickRecordingMime();
+        const mr = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
         recRef.current = mr;
         chunksRef.current = [];
-  
+    
         mr.ondataavailable = (e) => { if (e.data?.size) chunksRef.current.push(e.data); };
         mr.onstop = () => {
-          const blob = new Blob(chunksRef.current, { type: "audio/webm" });
+          const finalMime = mr.mimeType || mime || 'audio/mp4';
+          const blob = new Blob(chunksRef.current, { type: finalMime });
+          const ext = extForMime(finalMime);
+          const name = `part4-${task?.id || "task"}-talk.${ext}`;
           const url = URL.createObjectURL(blob);
-          const name = `part4-${task?.id || "task"}-talk.webm`;
-          setFile({ blob, url, name });
+          setFile({ blob, url, name, mime: finalMime });
           stream.getTracks().forEach(t => t.stop());
         };
-  
+    
         mr.start();
         setRecording(true);
       } catch (err) {
@@ -212,6 +260,7 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
         setRecording(false);
       }
     }
+    
   
     function stopRecording(silent = false) {
       const mr = recRef.current;
@@ -235,6 +284,7 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
   const key = `${voice}::${text}`;
 
   try {
+    await ensureAudioContext(); // optional
     // cache first
     let url = ttsCacheRef.current.get(key);
     if (!url) {
@@ -274,29 +324,34 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
   }
 }
 
-    function playBeep(freq=600, seconds=1.0){
-      return new Promise((resolve)=>{
-        try{
-          const C = new (window.AudioContext||window.webkitAudioContext)();
-          const o=C.createOscillator(), g=C.createGain();
-          o.type="sine"; o.frequency.value=freq; o.connect(g); g.connect(C.destination);
-          g.gain.setValueAtTime(0.001, C.currentTime);
-          g.gain.exponentialRampToValueAtTime(0.35, C.currentTime + 0.03);
-          o.start();
-          const tEnd = C.currentTime + seconds;
-          g.gain.exponentialRampToValueAtTime(0.0001, tEnd);
-          o.stop(tEnd + 0.01);
-          o.onended = () => { C.close?.(); resolve(); };
-        } catch { resolve(); }
-      });
-    }
+function playBeep(freq = 600, seconds = 1.0){
+  return new Promise(async (resolve) => {
+    try{
+      const C = await ensureAudioContext();
+      const o = C.createOscillator(), g = C.createGain();
+      o.type = "sine"; o.frequency.value = freq;
+      o.connect(g); g.connect(C.destination);
+
+      const now = C.currentTime;
+      g.gain.setValueAtTime(0.0001, now);
+      g.gain.exponentialRampToValueAtTime(0.35, now + 0.03);
+      const tEnd = now + seconds;
+      g.gain.exponentialRampToValueAtTime(0.0001, tEnd);
+
+      o.start(now);
+      o.stop(tEnd + 0.01);
+      o.onended = () => { try { o.disconnect(); g.disconnect(); } catch {} resolve(); };
+    } catch { resolve(); }
+  });
+}
+
   
     // UI
     return (
       <div className="panes panes-vertical">
         {/* Top: controls + timers */}
         <section className="panel controls-panel">
-          <audio ref={ttsAudioRef} preload="none" style={{ display: 'none' }} />
+        <audio ref={ttsAudioRef} preload="none" playsInline style={{ display: 'none' }} />
           <div className="meters">
             <span className="pill">
               {phase === "ready"    && "Ready to start"}
@@ -354,11 +409,11 @@ function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
           {phase === "summary" && (
             <div className="actions" style={{ gap: ".5rem", flexWrap: "wrap" }}>
               {file?.url && (
-                <>
-                  <audio controls src={file.url} />
-                  <a className="btn primary" href={file.url} download={file.name}>Download talk</a>
-                </>
-              )}
+  <>
+    <audio controls playsInline preload="metadata" src={file.url} />
+    <a className="btn primary" href={file.url} download={file.name}>Download talk</a>
+  </>
+)}
             </div>
           )}
   

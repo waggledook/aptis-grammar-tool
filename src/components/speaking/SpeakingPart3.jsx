@@ -118,6 +118,20 @@ function TaskFlow({ task, onFinished }) {
   const ttsAudioRef = useRef(null);
   const ttsCacheRef = useRef(new Map()); // `${voice}::${text}` → url
 
+  const audioCtxRef = useRef(null);
+
+async function ensureAudioContext() {
+  if (!audioCtxRef.current) {
+    audioCtxRef.current = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  const ctx = audioCtxRef.current;
+  if (ctx.state === "suspended") {
+    try { await ctx.resume(); } catch {}
+  }
+  return ctx;
+}
+
+
   // reset on task change
   useEffect(() => {
     setOverall("ready");
@@ -141,6 +155,13 @@ function TaskFlow({ task, onFinished }) {
     if (overall === "running" && sub === "speak" && left === 0) finishSegment();
   }, [overall, sub, left]);
 
+  useEffect(() => () => {
+    try {
+      const mr = mediaRecorderRef.current;
+      if (mr && mr.state !== "inactive") mr.stop();
+    } catch {}
+  }, []);
+  
   // announce → beep → speak
   useEffect(() => {
     if (overall !== "running") return;
@@ -152,7 +173,8 @@ function TaskFlow({ task, onFinished }) {
     }
   }, [overall, sub, seg, questions]);
 
-  function startTask() {
+  async function startTask() {
+    await ensureAudioContext();               // 👈 iOS needs this
     setOverall("running");
     setSeg(0);
     setSub("announce");
@@ -178,7 +200,26 @@ function TaskFlow({ task, onFinished }) {
       onFinished?.();
     }
   }
-
+  function pickRecordingMime() {
+    const prefs = [
+      'audio/mp4;codecs=mp4a.40.2', // iOS best
+      'audio/mp4',
+      'audio/webm;codecs=opus',
+      'audio/webm'
+    ];
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported) {
+      for (const t of prefs) {
+        if (MediaRecorder.isTypeSupported(t)) return t;
+      }
+    }
+    return '';
+  }
+  function extForMime(mime='') {
+    if (mime.includes('mp4')) return 'm4a';
+    if (mime.includes('webm')) return 'webm';
+    return 'm4a';
+  }
+  
   // MediaRecorder
   async function startRecording() {
     try {
@@ -186,24 +227,35 @@ function TaskFlow({ task, onFinished }) {
         setMicError("Recording not supported in this browser.");
         return;
       }
+      if (typeof MediaRecorder === 'undefined') {
+        setMicError("MediaRecorder not available in this browser.");
+        return;
+      }
+  
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mr = new MediaRecorder(stream);
+  
+      const mime = pickRecordingMime();
+      const mr = mime ? new MediaRecorder(stream, { mimeType: mime }) : new MediaRecorder(stream);
       mediaRecorderRef.current = mr;
       audioChunksRef.current = [];
-
+  
       mr.ondataavailable = (e) => { if (e.data?.size) audioChunksRef.current.push(e.data); };
       mr.onstop = () => {
-        const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
+        const finalMime = mr.mimeType || mime || 'audio/mp4';
+        const blob = new Blob(audioChunksRef.current, { type: finalMime });
+        const ext = extForMime(finalMime);
+        const name = `part3-${task?.id || "task"}-q${seg + 1}.${ext}`;
         const url = URL.createObjectURL(blob);
-        const name = `part3-${task?.id || "task"}-q${seg + 1}.webm`;
+  
         setRecordings(prev => {
           const next = [...prev];
-          next[seg] = { blob, url, name };
+          next[seg] = { blob, url, name, mime: finalMime };
           return next;
         });
+  
         stream.getTracks().forEach(t => t.stop());
       };
-
+  
       mr.start();
       setRecording(true);
     } catch (err) {
@@ -212,6 +264,7 @@ function TaskFlow({ task, onFinished }) {
       setRecording(false);
     }
   }
+  
   function stopRecording(silent = false) {
     const mr = mediaRecorderRef.current;
     if (mr && mr.state !== "inactive") {
@@ -234,6 +287,7 @@ function TaskFlow({ task, onFinished }) {
     const key = `${voice}::${text}`;
   
     try {
+      await ensureAudioContext(); // optional
       // cache first
       let url = ttsCacheRef.current.get(key);
       if (!url) {
@@ -274,21 +328,28 @@ function TaskFlow({ task, onFinished }) {
   }
   
   function playBeep(freq = 600, seconds = 1.2) {
-    return new Promise((resolve) => {
+    return new Promise(async (resolve) => {
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const o = ctx.createOscillator(); const g = ctx.createGain();
-        o.type = "sine"; o.frequency.value = freq; o.connect(g); g.connect(ctx.destination);
-        g.gain.setValueAtTime(0.001, ctx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.3, ctx.currentTime + 0.02);
-        o.start();
-        const tEnd = ctx.currentTime + seconds;
+        const C = await ensureAudioContext();
+        const o = C.createOscillator();
+        const g = C.createGain();
+        o.type = "sine";
+        o.frequency.value = freq;
+        o.connect(g); g.connect(C.destination);
+  
+        const now = C.currentTime;
+        g.gain.setValueAtTime(0.0001, now);
+        g.gain.exponentialRampToValueAtTime(0.3, now + 0.02);
+        const tEnd = now + seconds;
         g.gain.exponentialRampToValueAtTime(0.0001, tEnd);
+  
+        o.start(now);
         o.stop(tEnd + 0.01);
-        o.onended = () => { ctx.close?.(); resolve(); };
+        o.onended = () => { try { o.disconnect(); g.disconnect(); } catch {} resolve(); };
       } catch { resolve(); }
     });
   }
+  
 
   // keyboard
   useEffect(() => {
@@ -310,7 +371,7 @@ function TaskFlow({ task, onFinished }) {
     <div className="panes panes-vertical">
       {/* Top: controls */}
       <section className="panel controls-panel">
-        <audio ref={ttsAudioRef} preload="none" style={{ display: 'none' }} />
+      <audio ref={ttsAudioRef} preload="none" playsInline style={{ display: 'none' }} />
         <div className="meters">
           <span className="pill">
             {overall === "ready" && "Ready to start"}
@@ -341,7 +402,7 @@ function TaskFlow({ task, onFinished }) {
             )}
             {sub === "doneSeg" && (
               <>
-                <audio controls src={recordings[seg]?.url} />
+                <audio controls playsInline preload="metadata" src={recordings[seg]?.url} />
                 <a className="btn" href={recordings[seg]?.url} download={recordings[seg]?.name}>
                   Download Q{seg + 1}
                 </a>
@@ -432,7 +493,7 @@ function Summary({ recordings, taskId, onDownloadAll }) {
         {recordings.map((r, i) => (
           <li key={i} style={{ display: "flex", gap: ".5rem", alignItems: "center", flexWrap: "wrap" }}>
             <span className="pill">Q{i + 1}</span>
-            <audio controls src={r?.url} />
+            <audio controls playsInline preload="metadata" src={r?.url} />
             <a className="btn" href={r?.url} download={r?.name}>Download Q{i + 1}</a>
           </li>
         ))}
