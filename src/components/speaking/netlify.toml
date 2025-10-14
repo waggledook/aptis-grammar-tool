@@ -1,0 +1,5 @@
+[[redirects]]
+from = "/speak"
+to = "https://europe-west1-examplay-auth.cloudfunctions.net/speak"
+status = 200
+force = true
