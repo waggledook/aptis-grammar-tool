@@ -49,10 +49,59 @@ const WRITING_P1_BANK = [
   "How do you relax after work?"
 ];
 
+const strId = (s) => "q_" + [...s].reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
+
+
+/** Minimal model answers (short, natural, no padding) */
+const SUGGESTED_ANSWERS = (() => {
+  const A = {};
+  // Helper to attach by id
+  const add = (q, arr) => { A[strId(q)] = arr; };
+
+  add("What do you do?", ["I’m a teacher", "Software developer", "I’m a student"]);
+  add("What did you do yesterday?", ["Worked till 6", "Went to the gym", "Dinner with friends"]);
+  add("What’s your favourite colour?", ["Blue", "Black", "Turquoise"]);
+  add("What’s the weather like today?", ["Sunny and warm", "Cloudy", "Cold and windy"]);
+  add("How do you get to work?", ["By bus", "I drive", "On foot"]);
+  add("Where do you usually eat lunch?", ["At home", "Office canteen", "A small café"]);
+  add("What time do you get up on weekdays?", ["At 7 a.m.", "Half past six", "Quarter to seven"]);
+  add("What type of films do you like watching?", ["Comedies", "Action", "Documentaries"]);
+  add("What’s your favourite type of music?", ["Indie rock", "Classical", "Latin pop"]);
+  add("How often do you exercise?", ["Three times a week", "Most days", "At weekends"]);
+  add("Who do you spend the weekend with?", ["My family", "Friends", "My partner"]);
+  add("What’s your favourite food?", ["Sushi", "Roast chicken", "Pasta"]);
+  add("What do you do in your free time?", ["Read novels", "Play football", "Cook"]);
+  add("Who do you live with?", ["My parents", "Two flatmates", "Alone"]);
+  add("Where do you live?", ["In Cairo", "Near the city centre", "In a small town"]);
+  add("What’s your favourite animal?", ["Dogs", "Tigers", "Dolphins"]);
+  add("What’s your favourite TV show?", ["Friends", "Stranger Things", "Planet Earth"]);
+  add("What’s your dream job?", ["Pilot", "University lecturer", "Game designer"]);
+  add("What’s your favourite place in your city?", ["The old market", "Riverside park", "The library"]);
+  add("What dishes do you like to cook?", ["Stir-fry", "Lasagne", "Curry"]);
+  add("Who is your best friend?", ["Omar", "My cousin Sara", "Ali from work"]);
+  add("What’s/was your favourite subject at school?", ["Physics", "History", "Art"]);
+  add("How often do you use your phone?", ["All day", "Every few hours", "Too much!"]);
+  add("What kind of clothes do you like?", ["Casual", "Sporty", "Smart-casual"]);
+  add("What’s your favourite time of year?", ["Spring", "Late summer", "Winter"]);
+  add("What do you usually do on holidays?", ["Swim and read", "Visit museums", "Hike"]);
+  add("What’s your favourite sport?", ["Football", "Tennis", "Basketball"]);
+  add("How do you usually spend your evenings?", ["Cook and relax", "Gym then TV", "Study"]);
+  add("What kind of movies do you like?", ["Thrillers", "Rom-coms", "Sci-fi"]);
+  add("What are you doing this weekend?", ["Visiting my parents", "A day trip", "Studying"]);
+  add("Where would you like to travel?", ["Japan", "New Zealand", "Iceland"]);
+  add("What languages do you speak?", ["Arabic and English", "Spanish, a little French"]);
+  add("What do you usually have for breakfast?", ["Coffee and toast", "Eggs", "Fruit and yoghurt"]);
+  add("What’s your favourite app?", ["Spotify", "Notion", "WhatsApp"]);
+  add("What hobbies do you have?", ["Photography", "Gardening", "Gaming"]);
+  add("How do you relax after work?", ["Music and tea", "A short walk", "Warm shower"]);
+  return A;
+})();
+
+
 /* =========================================================================
    HELPERS
    ========================================================================= */
-const strId = (s) => "q_" + [...s].reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
+
 
 function loadHistory() {
   try { return new Set(JSON.parse(localStorage.getItem(LS_HISTORY_KEY) || "[]")); }
@@ -86,6 +135,13 @@ export default function WritingPart1({ user }) {
   // Refs for sequential focusing
   const inputRefs = useRef([]);
 
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+function getSuggestionsFor(qId) {
+  return SUGGESTED_ANSWERS[qId] || [];
+}
+
+
   useEffect(() => {
     setAnswers((prev) => {
       const next = Array(sessionQs.length).fill("");
@@ -96,6 +152,7 @@ export default function WritingPart1({ user }) {
   }, [sessionQs.length]);
 
   function start() {
+    setShowSuggestions(false);            // ← reset
     setPhase("typing");
     setTimeout(() => {
       if (inputRefs.current[0]) inputRefs.current[0].focus();
@@ -156,6 +213,7 @@ if (user && fb?.saveWritingP1Submission) {
 
 
   function newSet() {
+    setShowSuggestions(false);            // ← reset
     const h = loadHistory();
     const qs = pickRandomQuestions(WRITING_P1_BANK, h);
     setSessionQs(qs);
@@ -222,19 +280,52 @@ if (user && fb?.saveWritingP1Submission) {
             </form>
           )}
 
-          {phase === "summary" && (
-            <>
-              <h3 style={{ marginTop: 0 }}>Summary</h3>
-              <ol className="list">
-                {sessionQs.map((q, i) => (
-                  <li key={q.id}>
-                    <div className="p">{q.text}</div>
-                    <div className="ans">{(answers[i] || "").trim() || <em>(no answer)</em>}</div>
-                  </li>
-                ))}
-              </ol>
-            </>
-          )}
+{phase === "summary" && (
+  <>
+    <h3 style={{ marginTop: 0 }}>Summary</h3>
+
+    {/* Toggle to show/hide suggestions */}
+    <div className="actions" style={{ margin: ".5rem 0 .75rem" }}>
+      <button
+        className="btn"
+        onClick={() => setShowSuggestions(s => !s)}
+        aria-expanded={showSuggestions}
+      >
+        {showSuggestions ? "Hide suggested answers" : "Show suggested answers"}
+      </button>
+    </div>
+
+    <ol className="list">
+      {sessionQs.map((q, i) => {
+        const sug = getSuggestionsFor(q.id);
+        return (
+          <li key={q.id}>
+            <div className="p">{q.text}</div>
+            <div className="ans">
+              {(answers[i] || "").trim() || <em>(no answer)</em>}
+            </div>
+
+            {/* Suggestions directly under this question */}
+            {showSuggestions && (
+              <div className="chips" style={{ marginTop: ".4rem" }}>
+                {sug && sug.length ? (
+                  sug.map((s, k) => (
+                    <span className="chip" key={k}>{s}</span>
+                  ))
+                ) : (
+                  <span className="muted" style={{ fontStyle: "italic" }}>
+                    Examples coming soon
+                  </span>
+                )}
+              </div>
+            )}
+          </li>
+        );
+      })}
+    </ol>
+  </>
+)}
+
         </section>
 
         <section className="panel">
@@ -247,26 +338,26 @@ if (user && fb?.saveWritingP1Submission) {
           </div>
 
           {phase === "summary" && (
-            <div className="actions">
-              <button className="btn" onClick={newSet}>Try another 5</button>
-              <button
-  className="btn"
-  onClick={() => {
-    const textToCopy = sessionQs
-      .map(
-        (q, i) =>
-          `${i + 1}. ${q.text} — ${answers[i] ? answers[i].trim() : "(no answer)"}`
-      )
-      .join("\n");
-    navigator.clipboard
-      .writeText(textToCopy)
-      .then(() => toast("Copied questions + answers ✓"));
-  }}
->
-  Copy answers
-</button>
-            </div>
-          )}
+  <div className="actions">
+    <button className="btn" onClick={newSet}>Try another 5</button>
+    <button
+      className="btn"
+      onClick={() => {
+        const textToCopy = sessionQs
+          .map(
+            (q, i) =>
+              `${i + 1}. ${q.text} — ${answers[i] ? answers[i].trim() : "(no answer)"}`
+          )
+          .join("\n");
+        navigator.clipboard
+          .writeText(textToCopy)
+          .then(() => toast("Copied questions + answers ✓"));
+      }}
+    >
+      Copy answers
+    </button>
+  </div>
+)}
         </section>
       </div>
     </div>
@@ -299,6 +390,31 @@ function StyleScope() {
       .list li{list-style:none;background:#0f1b31;border:1px solid #2c416f;border-radius:.5rem;padding:.6rem}
       .list .p{color:#cfe1ff;margin-bottom:.3rem}
       .list .ans{color:#e6f0ff}
+      .suggest-panel{
+  margin-top: .9rem;
+  background:#0f1b31;
+  border:1px solid #2c416f;
+  border-radius:10px;
+  padding:.75rem;
+}
+.suggest-panel h4{
+  margin:.1rem 0 .5rem;
+  color:#cfe1ff;
+  font-size:1rem;
+}
+.suggest-list{
+  list-style:none; margin:0; padding:0; display:grid; gap:.6rem;
+}
+.chips{ display:flex; flex-wrap:wrap; gap:.35rem; }
+.chip{
+  background:#24365d;
+  border:1px solid #335086;
+  color:#e6f0ff;
+  padding:.2rem .5rem;
+  border-radius:999px;
+  font-size:.9rem;
+  white-space:nowrap;
+}
     `}</style>
   );
 }
