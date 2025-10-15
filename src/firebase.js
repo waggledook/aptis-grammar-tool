@@ -339,6 +339,36 @@ export async function fetchWritingP1Sessions(n = 20) {
   }));
 }
 
+// — WRITING PART 1 GUIDE: save "Improve the answer" attempts —————————————
+/**
+ * Saves a single attempt from the guide's FixOpen widget when the user
+ * reveals the suggestion. One doc per reveal.
+ *
+ * payload = { prompt, original, suggestion, attempt }
+ */
+export async function saveWritingP1GuideEdits(payload) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return; // silently skip if signed out (guide is low-stakes)
+
+  const colRef = collection(db, "users", uid, "writingP1GuideEdits");
+  await addDoc(colRef, {
+    ...payload,               // prompt, original, suggestion, attempt
+    createdAt: serverTimestamp(),
+    kind: "p1_guide_fixopen",
+    app: "aptis-trainer",
+  });
+}
+
+export async function fetchWritingP1GuideEdits(n = 100) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return [];
+  const col = collection(db, "users", uid, "writingP1GuideEdits");
+  const qy = query(col, orderBy("createdAt", "desc"), limit(n));
+  const snap = await getDocs(qy);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
+
 // ─── GRAMMAR PROGRESS ────────────────────────────────────────────────────────
 // Per-item progress is stored at /users/{uid}/grammarProgress/{itemId}
 // Shape:

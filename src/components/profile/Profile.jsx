@@ -18,6 +18,8 @@ export default function Profile({ user, onBack }) {
   const [grammarDash, setGrammarDash] = useState({ answered: 0, correct: 0, total: 0 });
   const [writingP1, setWritingP1] = useState([]);
   const [showWritingP1, setShowWritingP1] = useState(false);
+  const [guideEdits, setGuideEdits] = useState([]);
+  const [showGuideEdits, setShowGuideEdits] = useState(false);
   const [openStudio, setOpenStudio] = useState(false);
   const [photoURL, setPhotoURL] = useState(auth.currentUser?.photoURL || '');
   const SPEAKING_TOTALS = {
@@ -47,6 +49,7 @@ export default function Profile({ user, onBack }) {
           f,
           w,
           gDash, // ← name this!
+          gEdits,
         ] = await Promise.all([
           fb.fetchReadingProgressCount(),
           fb.fetchSpeakingCounts(),
@@ -54,6 +57,7 @@ export default function Profile({ user, onBack }) {
           fb.fetchRecentFavourites(8),
           fb.fetchWritingP1Sessions(10),
           fb.fetchGrammarDashboard(),   // ← this resolves to gDash
+          fb.fetchWritingP1GuideEdits(100),
         ]);
   
         if (!alive) return;
@@ -63,6 +67,7 @@ export default function Profile({ user, onBack }) {
         setFavourites(f);
         setWritingP1(w);
         setGrammarDash(gDash);          // ← use gDash here
+        setGuideEdits(gEdits);
       } catch (e) {
         console.error("[Profile] load failed", e);
         toast("Couldn’t load some profile data.");
@@ -266,6 +271,99 @@ export default function Profile({ user, onBack }) {
     </>
   )}
 </section>
+
+<section className="panel collapsible" style={{ marginTop: "1rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showGuideEdits}
+    onClick={() => setShowGuideEdits(s => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>My Guide (Part 1: FixOpen)</h3>
+    <span className="muted">{guideEdits.length} {guideEdits.length === 1 ? "item" : "items"}</span>
+    <span className={`chev ${showGuideEdits ? "open" : ""}`} aria-hidden>▾</span>
+  </button>
+
+  {showGuideEdits && (
+    <>
+      {!guideEdits.length ? (
+        <p className="muted" style={{ marginTop: ".5rem" }}>No saved guide answers yet.</p>
+      ) : (
+        <>
+          <div className="actions" style={{ marginTop: ".5rem" }}>
+            <button
+              className="btn"
+              onClick={() => {
+                const text = guideEdits.map((r, i) => {
+                  const when =
+                    r.createdAt?.toDate?.()
+                      ? r.createdAt.toDate().toLocaleString()
+                      : r.updatedAt?.toDate?.()
+                      ? r.updatedAt.toDate().toLocaleString()
+                      : "—";
+                
+                  return [
+                    `Item ${i + 1} (${when})`,
+                    `Q: ${r.prompt || "—"}`,
+                    `Your answer: ${r.attempt || "(no answer)"}`,
+                    r.original ? `Original: ${r.original}` : null,
+                  ]
+                    .filter(Boolean)
+                    .join("\n");
+                }).join("\n\n");                
+                navigator.clipboard.writeText(text).then(() => toast("Copied guide items ✓"));
+              }}
+            >
+              Copy all
+            </button>
+          </div>
+
+          <ul className="wlist" style={{ marginTop: ".5rem" }}>
+            {guideEdits.map((r, idx) => (
+              <li key={r.id || idx} className="wcard">
+                <div className="whead">
+                  <div>
+                    <strong>Item</strong>
+                    <div className="muted small">
+                      {(r.createdAt?.toDate?.() && r.createdAt.toDate().toLocaleString())
+                        || (r.updatedAt?.toDate?.() && r.updatedAt.toDate().toLocaleString())
+                        || "—"}
+                    </div>
+                  </div>
+                  <div className="actions">
+                    <button
+                      className="btn"
+                      onClick={() => {
+                        const text = [
+                          `Q: ${r.prompt || "—"}`,
+                          `Your answer: ${r.attempt || "(no answer)"}`,
+                          r.suggestion ? `Suggestion: ${r.suggestion}` : null,
+                          r.original ? `Original: ${r.original}` : null,
+                        ].filter(Boolean).join("\n");
+                        navigator.clipboard.writeText(text).then(() => toast("Copied item ✓"));
+                      }}
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+
+                <div className="qa" style={{ listStyle: "none", paddingLeft: 0 }}>
+                  <div className="q"><strong>Q:</strong> {r.prompt || "—"}</div>
+                  <div className="a"><strong>Your answer:</strong> {r.attempt || <em>(no answer)</em>}</div>
+                  {r.original && (
+                    <div className="a muted"><strong>Original:</strong> {r.original}</div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </>
+  )}
+</section>
+
 
         </>
       )}

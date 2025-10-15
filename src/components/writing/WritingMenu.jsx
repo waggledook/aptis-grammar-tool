@@ -21,6 +21,11 @@ export default function WritingMenu({ onSelect, onBack }) {
           <p>Answer 5 short messages with single words or short phrases. Fast and focused.</p>
         </button>
 
+        <button className="card" onClick={() => onSelect("part1Guide")}>
+  <h3>Part 1 Guide</h3>
+  <p>How to write effective 1–5 word answers, with mini-practice.</p>
+</button>
+
         <button className="card disabled" onClick={comingSoon}>
           <h3>Part 2: Short text  <span className="soon">Coming soon</span></h3>
           <p>Fill a short form or write a short sentence response (20–30 words).</p>
