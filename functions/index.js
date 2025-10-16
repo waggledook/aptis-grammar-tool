@@ -1,40 +1,58 @@
 /* eslint-disable no-undef */
 const functions = require("firebase-functions");
 const admin     = require("firebase-admin");
-const sgMail    = require("@sendgrid/mail");
+const nodemailer = require("nodemailer");
 
 // ---------- init Admin (safe if called twice) ----------
 try { admin.app(); } catch { admin.initializeApp(); }
 
-// ---------- SendGrid (existing) ----------
-sgMail.setApiKey(functions.config().sendgrid.key);
+// ---------- Mail config (supports env vars OR functions.config()) ----------
+const GMAIL_USER   = process.env.GMAIL_USER || functions.config().gmail?.user;
+const GMAIL_PASS   = process.env.GMAIL_APP_PASSWORD || functions.config().gmail?.pass;
+const TEACHER_EMAIL = process.env.TEACHER_EMAIL || functions.config().notify?.teacher_email || GMAIL_USER;
 
-// =============== EXISTING: Firestore -> email ===================
-exports.emailReport = functions.firestore
-  .document("reports/{reportId}")
+// Gmail requires the "from" to be the authenticated user (or an alias on that account)
+const FROM_ADDRESS = GMAIL_USER;
+
+// Single reusable transporter
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: { user: GMAIL_USER, pass: GMAIL_PASS },
+});
+
+
+// Tip: pick a region; matching your TTS function is nice. If unsure, keep default.
+exports.emailReport = functions.region("europe-west1")
+  // .region("europe-west1")  // optional: align with your speak() region
+  .firestore.document("reports/{reportId}")
   .onCreate(async (snap) => {
+    const r = snap.data() || {};
+
+    // Accept both old and new field names
     const {
       itemId,
       level = null,
       question = "",
-      issue = "",
       comments = "",
       selectedOption = null,
       correctOption = null,
       userEmail = null,
       userId = null,
-    } = snap.data();
+    } = r;
+
+    const issue =
+      r.issueLabel || r.issueCode || r.issue || "unspecified";
 
     const when = new Date().toLocaleString("en-GB", { timeZone: "Europe/Madrid" });
 
     const lines = [
-      `Item: ${itemId}`,
-      `Question: ${question}`,
+      `Item: ${itemId || "-"}`,
+      `Question: ${question || "-"}`,
       `Issue: ${issue}`,
       `Comments: ${comments || "none"}`,
       ...(level ? [`Level: ${level}`] : []),
-      ...(selectedOption !== null ? [`User selected: ${selectedOption}`] : []),
-      ...(correctOption !== null ? [`Correct answer: ${correctOption}`] : []),
+      ...(selectedOption != null ? [`User selected: ${selectedOption}`] : []),
+      ...(correctOption != null ? [`Correct answer: ${correctOption}`] : []),
       `Reported by: ${userEmail || "anonymous"}${userId ? ` (uid: ${userId})` : ""}`,
       `At: ${when}`,
     ];
@@ -42,38 +60,44 @@ exports.emailReport = functions.firestore
     const esc = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
     const toHtml = (arr) => arr.map(l => `<p>${esc(l)}</p>`).join("");
 
-    const adminMsg = {
-      to: "contact@beeskillsenglish.com",
-      from: '"Grammar Tool" <noreply@beeskillsenglish.com>',
-      subject: `New report: ${issue} — ${itemId}`,
-      text: lines.join("\n"),
-      html: toHtml(lines),
-      replyTo: userEmail || undefined,
-    };
+   // --- Admin email
+   const adminMsg = {
+    from: FROM_ADDRESS,
+    to: TEACHER_EMAIL || FROM_ADDRESS,
+    subject: `New report: ${issue} — ${itemId || "-"}`,
+    text: lines.join("\n"),
+    html: toHtml(lines),
+    replyTo: userEmail && userEmail.includes("@") ? userEmail : undefined,
+  };
 
-    const messages = [adminMsg];
-    if (userEmail) {
-      const userIntro = [
+    // --- Optional user receipt
+    const userMsg = (userEmail && userEmail.includes("@")) ? {
+      from: FROM_ADDRESS,
+      to: userEmail,
+      subject: "Thanks for your feedback 🙌",
+      text: [
         "Thank you for your feedback! We will review the question as soon as possible.",
         "",
-        "Here’s a copy of your report:"
-      ];
-      const userText = [...userIntro, ...lines].join("\n");
-      const userHtml =
+        "Here’s a copy of your report:",
+        "",
+        ...lines
+      ].join("\n"),
+      html:
         `<p>Thank you for your feedback! We will review the question as soon as possible.</p>` +
-        `<hr/>` + toHtml(lines);
+        `<hr/>` + toHtml(lines),
+      replyTo: TEACHER_EMAIL || FROM_ADDRESS,
+    } : null;
 
-      messages.push({
-        to: userEmail,
-        from: '"Grammar Tool" <noreply@beeskillsenglish.com>',
-        subject: "Thanks for your feedback 🙌",
-        text: userText,
-        html: userHtml,
-        replyTo: "contact@beeskillsenglish.com",
-      });
+    try {
+      await transporter.sendMail(adminMsg);
+      if (userMsg) await transporter.sendMail(userMsg);
+      console.log("MAIL_OK report", { id: snap.id, to: adminMsg.to, copy: !!userMsg });
+    } catch (err) {
+      console.error("MAIL_FAIL report", err?.message || String(err));
+      // Do not throw — avoid retry storms; logs are enough to debug
     }
 
-    await sgMail.send(messages);
+    return null;
   });
 
 // =============== NEW: HTTPS /speak (Google TTS + cache) =========

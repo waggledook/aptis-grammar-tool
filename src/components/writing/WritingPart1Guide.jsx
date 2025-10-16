@@ -79,7 +79,8 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
 
           <Section title="Micro-practice: Trim the answer">
             <p className="muted" style={{ marginTop: 0 }}>
-              Tap words to <strong>cross out</strong> anything extra. Aim for 1–5 words.
+              The following answers are too long and complicated.
+              Tap words to <strong>cross out</strong> anything extra. Aim for the shortest possible answer.
             </p>
             <TrimIt
               prompt="What did you do yesterday?"
