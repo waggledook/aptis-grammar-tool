@@ -36,10 +36,13 @@ export default function WritingMenu({ onSelect, onBack }) {
           <p>Reply to three social-style messages. Keep each answer to 30–40 words.</p>
         </button>
 
-        <button className="card disabled" onClick={comingSoon}>
-          <h3>Part 4: Emails  <span className="soon">Coming soon</span></h3>
-          <p>Write two emails: an informal one (40–50 words) and a formal one (120–150).</p>
-        </button>
+        <button
+  className="card"
+  onClick={() => onSelect("part4")}
+>
+  <h3>Part 4: Emails</h3>
+  <p>Write two emails: an informal one (40–50 words) and a formal one (120–150 words).</p>
+</button>
       </div>
 
       <button className="topbar-btn" onClick={onBack} style={{ marginTop: "1rem" }}>

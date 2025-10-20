@@ -368,6 +368,55 @@ export async function fetchWritingP1GuideEdits(n = 100) {
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
+// — WRITING PART 4: save an emails task ————————————————
+/**
+ * Save one Writing Part 4 submission (friend + formal emails) for the current user.
+ * payload shape expected by the UI:
+ * { taskId, friendText, formalText, counts: { friend, formal } }
+ */
+export async function saveWritingP4Submission(payload) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return; // silently skip if signed out
+
+  const colRef = collection(db, "users", uid, "writingP4Submissions");
+  await addDoc(colRef, {
+    type: "part4",
+    ...payload,
+    createdAt: serverTimestamp(),
+  });
+}
+
+/** Fetch Writing Part 4 submissions (latest first) */
+export async function fetchWritingP4Submissions(n = 20) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return [];
+
+  const q = query(
+    collection(db, "users", uid, "writingP4Submissions"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(q);
+
+  return snap.docs.map((d) => {
+    const data = d.data() || {};
+    return {
+      id: d.id,
+      createdAt: data.createdAt || null,
+      taskId: data.taskId || null,
+      // include BOTH text and HTML so the Profile can preserve formatting
+      friendText: data.friendText || "",
+      formalText: data.formalText || "",
+      friendHTML: data.friendHTML || "",
+      formalHTML: data.formalHTML || "",
+      counts: data.counts || { friend: 0, formal: 0 },
+    };
+  });
+}
+
+
+
 
 // ─── GRAMMAR PROGRESS ────────────────────────────────────────────────────────
 // Per-item progress is stored at /users/{uid}/grammarProgress/{itemId}

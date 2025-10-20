@@ -19,6 +19,9 @@ export default function Profile({ user, onBack }) {
   const [writingP1, setWritingP1] = useState([]);
   const [showWritingP1, setShowWritingP1] = useState(false);
   const [guideEdits, setGuideEdits] = useState([]);
+  const [writingP4, setWritingP4] = useState([]);
+  const [showWritingP4, setShowWritingP4] = useState(false);
+
   const [showGuideEdits, setShowGuideEdits] = useState(false);
   const [openStudio, setOpenStudio] = useState(false);
   const [photoURL, setPhotoURL] = useState(auth.currentUser?.photoURL || '');
@@ -50,6 +53,7 @@ export default function Profile({ user, onBack }) {
           w,
           gDash, // ← name this!
           gEdits,
+          wP4, // NEW
         ] = await Promise.all([
           fb.fetchReadingProgressCount(),
           fb.fetchSpeakingCounts(),
@@ -58,6 +62,7 @@ export default function Profile({ user, onBack }) {
           fb.fetchWritingP1Sessions(10),
           fb.fetchGrammarDashboard(),   // ← this resolves to gDash
           fb.fetchWritingP1GuideEdits(100),
+          fb.fetchWritingP4Submissions?.(20) ?? Promise.resolve([]), // NEW (safe if not implemented)
         ]);
   
         if (!alive) return;
@@ -68,6 +73,7 @@ export default function Profile({ user, onBack }) {
         setWritingP1(w);
         setGrammarDash(gDash);          // ← use gDash here
         setGuideEdits(gEdits);
+        setWritingP4(wP4); // NEW
       } catch (e) {
         console.error("[Profile] load failed", e);
         toast("Couldn’t load some profile data.");
@@ -364,6 +370,98 @@ export default function Profile({ user, onBack }) {
   )}
 </section>
 
+{/* --- Writing Part 4 submissions --- */}
+<section className="panel collapsible" style={{ marginTop: "1rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showWritingP4}
+    onClick={() => setShowWritingP4((s) => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>My Writing (Part 4)</h3>
+    <span className="muted">
+      {writingP4.length} {writingP4.length === 1 ? "submission" : "submissions"}
+    </span>
+    <span className={`chev ${showWritingP4 ? "open" : ""}`} aria-hidden>▾</span>
+  </button>
+
+  {showWritingP4 && (
+    <>
+      {!writingP4.length ? (
+        <p className="muted" style={{ marginTop: ".5rem" }}>
+          No saved submissions yet.
+        </p>
+      ) : (
+        <ul className="wlist" style={{ marginTop: ".5rem" }}>
+          {writingP4.map((s, idx) => {
+            const when =
+              s.createdAt?.toDate?.()
+                ? s.createdAt.toDate().toLocaleString()
+                : s.createdAt || "—";
+            return (
+              <li key={s.id || idx} className="wcard">
+                <div className="whead">
+                  <div>
+                    <strong>Submission</strong>
+                    <div className="muted small">{when}</div>
+                    {s.taskId && (
+                      <div className="muted small">Task: {s.taskId}</div>
+                    )}
+                  </div>
+                  <div className="actions">
+                    <button
+                      className="btn"
+                      onClick={() => copySubmission(s)}
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+
+                {/* PREVIEW (two-column layout) */}
+                <div className="submitted-p4">
+                  {/* Informal */}
+                  <div className="p4-col">
+                    <div className="p4-title">
+                      Informal (~50 w) — {s.counts?.friend ?? 0} words
+                    </div>
+                    <div
+                      className="submitted-html"
+                      dangerouslySetInnerHTML={{
+                        __html: normalizeHtmlForDisplay(
+                          s.friendHTML,
+                          s.friendText
+                        ),
+                      }}
+                    />
+                  </div>
+
+                  {/* Formal */}
+                  <div className="p4-col">
+                    <div className="p4-title">
+                      Formal (120–150 w) — {s.counts?.formal ?? 0} words
+                    </div>
+                    <div
+                      className="submitted-html"
+                      dangerouslySetInnerHTML={{
+                        __html: normalizeHtmlForDisplay(
+                          s.formalHTML,
+                          s.formalText
+                        ),
+                      }}
+                    />
+                  </div>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </>
+  )}
+</section>
+
+
 
         </>
       )}
@@ -458,6 +556,33 @@ function StyleScope(){
   background:#24365d; border:1px solid #335086; color:#e6f0ff;
   padding:.45rem .7rem; border-radius:10px; cursor:pointer;
 }
+  /* Part 4 preview layout */
+.submitted-p4{
+  display:grid; grid-template-columns:1fr; gap:.8rem; margin-top:.5rem;
+}
+@media(min-width:900px){
+  .submitted-p4{ grid-template-columns: 1fr 1fr; }
+}
+.p4-col .p4-title{
+  font-weight:700; margin-bottom:.35rem; color:#cfe1ff;
+}
+
+/* Keep HTML spacing and LTR rendering */
+.submitted-html {
+  white-space: pre-wrap;      /* keep any literal \n we inject (inside text nodes) */
+  direction: ltr;
+  unicode-bidi: plaintext;
+  background:#0a1528;
+  border:1px solid #223a68;
+  border-radius:10px;
+  padding:.65rem;
+  line-height:1.6;
+  color:#e6f0ff;
+}
+.submitted-html p, .submitted-html div { margin: 0 0 1rem; }
+.submitted-html p:last-child, .submitted-html div:last-child { margin-bottom: 0; }
+
+
     `}</style>
   );
 }
@@ -474,5 +599,165 @@ function ProgressBar({ label, value, max, right }) {
       </div>
     );
   }
-  
+
+  // ADD — tiny helpers for Profile page
+function stripHtml(html = "") {
+  const el = document.createElement("div");
+  el.innerHTML = html;
+  return el.innerText.replace(/\s+/g, " ").trim();
+}
+
+function escHtml(txt = "") {
+  // If we only have plain text, turn it into safe HTML (line breaks -> <br>)
+  const safe = (txt + "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return safe.replace(/\n/g, "<br/>");
+}
+
+// Detects if the string already contains HTML-ish tags.
+function looksLikeHtml(s = "") {
+  return /<([a-z][\w:-]*)\b[^>]*>/i.test(s);
+}
+
+// Turn plain text into HTML paragraphs, preserving single line breaks.
+function textToHtml(txt = "") {
+  // strip any LRM at start so it doesn't create a weird first character
+  const clean = (txt + "").replace(/^\u200E+/, "");
+  const safe = clean
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  // split on blank lines => paragraphs; inside each paragraph, single \n => <br>
+  const paras = safe.split(/\n{2,}/).map(p => p.replace(/\n/g, "<br/>"));
+  return `<p>${paras.join("</p><p>")}</p>`;
+}
+
+// Use friendHTML/formalHTML if it looks like HTML; otherwise fallback to the text.
+function normalizeHtmlForDisplay(html, text) {
+  if (html && looksLikeHtml(html)) {
+    // also remove leading LRM if present
+    return html.replace(/^\u200E+/, "");
+  }
+  // No HTML saved? Build HTML from the plain text we stored.
+  return textToHtml(text || "");
+}
+
+// --- tiny clipboard helper (HTML + plain text) ---
+async function copyHtmlWithFallback({ html = "", text = "" }) {
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new window.ClipboardItem({
+        "text/html": new Blob([html], { type: "text/html" }),
+        "text/plain": new Blob([text], { type: "text/plain" }),
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      // fallback: plain text
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    toast("Copied ✓");
+  } catch (e) {
+    console.warn("[Profile] copy failed", e);
+    toast("Copy failed — select and copy manually.");
+  }
+}
+
+// optional mini button component for reuse
+function CopyBtn({ html, text, className = "" }) {
+  return (
+    <button
+      type="button"
+      className={`btn ${className}`}
+      onClick={() => copyHtmlWithFallback({ html: html || "", text: text || "" })}
+      title="Copy with formatting"
+    >
+      Copy
+    </button>
+  );
+}
+
+// Build plain-text summary for fallback
+function buildSubmissionText(s) {
+  const when =
+    s.createdAt?.toDate?.()
+      ? s.createdAt.toDate().toLocaleString()
+      : s.createdAt || "—";
+
+  return [
+    `Submission (${when}) — Task: ${s.taskId || "—"}`,
+    "",
+    "— Informal (~50 words) —",
+    stripHtml(s.friendHTML || s.friendText || "(empty)"),
+    "",
+    "— Formal (120–150 words) —",
+    stripHtml(s.formalHTML || s.formalText || "(empty)"),
+    "",
+    `Word counts: friend ${s.counts?.friend ?? "—"}, formal ${s.counts?.formal ?? "—"}`,
+  ].join("\n");
+}
+
+// Build HTML summary that embeds the real email HTML (keeps formatting)
+function buildSubmissionHtml(s) {
+  const when =
+    s.createdAt?.toDate?.()
+      ? s.createdAt.toDate().toLocaleString()
+      : s.createdAt || "—";
+
+  const friend = normalizeHtmlForDisplay(s.friendHTML, s.friendText) || "<em>(empty)</em>";
+  const formal = normalizeHtmlForDisplay(s.formalHTML, s.formalText) || "<em>(empty)</em>";
+
+  // Minimal wrapper; paste-friendly in Gmail/Docs/Word
+  return `
+    <div>
+      <h3 style="margin:0 0 .4rem 0;">Aptis Writing – Part 4</h3>
+      <p style="margin:.25rem 0;"><strong>Task:</strong> ${s.taskId || "—"}</p>
+      <p style="margin:.25rem 0;"><em>${when}</em></p>
+
+      <h4 style="margin:.8rem 0 .35rem 0;">— Informal (~50 words) —</h4>
+      ${friend}
+
+      <h4 style="margin:.8rem 0 .35rem 0;">— Formal (120–150 words) —</h4>
+      ${formal}
+
+      <p style="margin:.8rem 0 0 0;"><em>Word counts: friend ${s.counts?.friend ?? "—"}, formal ${s.counts?.formal ?? "—"}</em></p>
+    </div>
+  `;
+}
+
+// Copy both text/html and text/plain
+async function copySubmission(s) {
+  try {
+    const html = buildSubmissionHtml(s);
+    const text = buildSubmissionText(s);
+
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new window.ClipboardItem({
+        "text/html": new Blob([html], { type: "text/html" }),
+        "text/plain": new Blob([text], { type: "text/plain" }),
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      // Fallback: plain text
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    toast("Copied submission ✓");
+  } catch (e) {
+    console.warn("[Profile] copy failed", e);
+    toast("Copy failed — select and copy manually.");
+  }
+}
+
   

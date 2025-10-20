@@ -16,6 +16,7 @@ import Profile from "./components/profile/Profile";
 import WritingMenu from './components/writing/WritingMenu';
 import WritingPart1 from './components/writing/WritingPart1';
 import WritingPart1Guide from "./components/writing/WritingPart1Guide.jsx";
+import WritingPart4Emails from "./components/writing/WritingPart4Emails";
 import ReadingMenu from './components/ReadingMenu';
 import SpeakingMenu from './components/speaking/SpeakingMenu';
 import SpeakingPart1 from "./components/speaking/SpeakingPart1";
@@ -256,6 +257,13 @@ useEffect(() => {
     user={user}
     onBack={() => setView("writingMenu")}
     onStartPractice={() => setView("writing_part1")}
+  />
+)}
+
+{view === "writing_part4" && (
+  <WritingPart4Emails
+    user={user}
+    onBack={() => setView("writingMenu")}
   />
 )}
 
