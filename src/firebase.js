@@ -415,6 +415,34 @@ export async function fetchWritingP4Submissions(n = 20) {
   });
 }
 
+// — WRITING PART 4 GUIDE: save "Tone Transformation" attempts —————————————
+/**
+ * Saves one reformulation attempt from the register guide (formal ↔ informal).
+ * payload = { prompt, original, model, attempt }
+ */
+export async function saveWritingP4RegisterAttempts(payload) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return; // low-stakes guide → skip silently if signed out
+
+  const colRef = collection(db, "users", uid, "writingP4RegisterAttempts");
+  await addDoc(colRef, {
+    ...payload,                 // prompt, original, model, attempt
+    createdAt: serverTimestamp(),
+    kind: "p4_register_fixopen",
+    app: "aptis-trainer",
+  });
+}
+
+/** Fetch Writing Part 4 Register/Tone attempts (latest first) */
+export async function fetchWritingP4RegisterAttempts(n = 100) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return [];
+  const col = collection(db, "users", uid, "writingP4RegisterAttempts");
+  const qy  = query(col, orderBy("createdAt", "desc"), limit(n));
+  const snap = await getDocs(qy);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+
 
 
 

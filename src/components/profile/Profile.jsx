@@ -21,6 +21,8 @@ export default function Profile({ user, onBack }) {
   const [guideEdits, setGuideEdits] = useState([]);
   const [writingP4, setWritingP4] = useState([]);
   const [showWritingP4, setShowWritingP4] = useState(false);
+  const [p4Register, setP4Register] = useState([]);
+  const [showP4Register, setShowP4Register] = useState(false);
 
   const [showGuideEdits, setShowGuideEdits] = useState(false);
   const [openStudio, setOpenStudio] = useState(false);
@@ -54,6 +56,7 @@ export default function Profile({ user, onBack }) {
           gDash, // ← name this!
           gEdits,
           wP4, // NEW
+          p4Reg,
         ] = await Promise.all([
           fb.fetchReadingProgressCount(),
           fb.fetchSpeakingCounts(),
@@ -63,6 +66,7 @@ export default function Profile({ user, onBack }) {
           fb.fetchGrammarDashboard(),   // ← this resolves to gDash
           fb.fetchWritingP1GuideEdits(100),
           fb.fetchWritingP4Submissions?.(20) ?? Promise.resolve([]), // NEW (safe if not implemented)
+          fb.fetchWritingP4RegisterAttempts?.(100) ?? Promise.resolve([]), // NEW
         ]);
   
         if (!alive) return;
@@ -74,6 +78,7 @@ export default function Profile({ user, onBack }) {
         setGrammarDash(gDash);          // ← use gDash here
         setGuideEdits(gEdits);
         setWritingP4(wP4); // NEW
+        setP4Register(p4Reg); // NEW
       } catch (e) {
         console.error("[Profile] load failed", e);
         toast("Couldn’t load some profile data.");
@@ -359,6 +364,96 @@ export default function Profile({ user, onBack }) {
                   <div className="a"><strong>Your answer:</strong> {r.attempt || <em>(no answer)</em>}</div>
                   {r.original && (
                     <div className="a muted"><strong>Original:</strong> {r.original}</div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
+        </>
+      )}
+    </>
+  )}
+</section>
+
+{/* --- Writing Part 4 Guide: Register & Tone attempts --- */}
+<section className="panel collapsible" style={{ marginTop: "1rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showP4Register}
+    onClick={() => setShowP4Register(s => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>My Guide (Part 4: Register &amp; Tone)</h3>
+    <span className="muted">
+      {p4Register.length} {p4Register.length === 1 ? "item" : "items"}
+    </span>
+    <span className={`chev ${showP4Register ? "open" : ""}`} aria-hidden>▾</span>
+  </button>
+
+  {showP4Register && (
+    <>
+      {!p4Register.length ? (
+        <p className="muted" style={{ marginTop: ".5rem" }}>No saved attempts yet.</p>
+      ) : (
+        <>
+          <div className="actions" style={{ marginTop: ".5rem" }}>
+            <button
+              className="btn"
+              onClick={() => {
+                const text = p4Register.map((r, i) => {
+                  const when =
+                    r.createdAt?.toDate?.()
+                      ? r.createdAt.toDate().toLocaleString()
+                      : "—";
+                  return [
+                    `Item ${i + 1} (${when})`,
+                    `Prompt: ${r.prompt || "—"}`,
+                    `Original: ${r.original || "—"}`,
+                    `Your answer: ${r.attempt || "(no answer)"}`,
+                    r.model ? `Suggestion: ${r.model}` : null,
+                  ].filter(Boolean).join("\n");
+                }).join("\n\n");
+                navigator.clipboard.writeText(text).then(() => toast("Copied register items ✓"));
+              }}
+            >
+              Copy all
+            </button>
+          </div>
+
+          <ul className="wlist" style={{ marginTop: ".5rem" }}>
+            {p4Register.map((r, idx) => (
+              <li key={r.id || idx} className="wcard">
+                <div className="whead">
+                  <div>
+                    <strong>Item</strong>
+                    <div className="muted small">
+                      {(r.createdAt?.toDate?.() && r.createdAt.toDate().toLocaleString()) || "—"}
+                    </div>
+                  </div>
+                  <div className="actions">
+                    <button
+                      className="btn"
+                      onClick={() => {
+                        const text = [
+                          `Prompt: ${r.prompt || "—"}`,
+                          `Original: ${r.original || "—"}`,
+                          `Your answer: ${r.attempt || "(no answer)"}`,
+                          r.model ? `Suggestion: ${r.model}` : null,
+                        ].filter(Boolean).join("\n");
+                        navigator.clipboard.writeText(text).then(() => toast("Copied item ✓"));
+                      }}
+                    >
+                      Copy
+                    </button>
+                  </div>
+                </div>
+
+                <div className="qa" style={{ listStyle: "none", paddingLeft: 0 }}>
+                  <div className="q"><strong>Prompt:</strong> {r.prompt || "—"}</div>
+                  <div className="a"><strong>Original:</strong> {r.original || "—"}</div>
+                  <div className="a"><strong>Your answer:</strong> {r.attempt || <em>(no answer)</em>}</div>
+                  {r.model && (
+                    <div className="a muted"><strong>Suggestion:</strong> {r.model}</div>
                   )}
                 </div>
               </li>

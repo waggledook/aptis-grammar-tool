@@ -16,7 +16,9 @@ import Profile from "./components/profile/Profile";
 import WritingMenu from './components/writing/WritingMenu';
 import WritingPart1 from './components/writing/WritingPart1';
 import WritingPart1Guide from "./components/writing/WritingPart1Guide.jsx";
+import WritingPart4Guide from "./components/writing/WritingPart4Guide";
 import WritingPart4Emails from "./components/writing/WritingPart4Emails";
+import WritingPart4RegisterGuide from "./components/writing/WritingPart4RegisterGuide";
 import ReadingMenu from './components/ReadingMenu';
 import SpeakingMenu from './components/speaking/SpeakingMenu';
 import SpeakingPart1 from "./components/speaking/SpeakingPart1";
@@ -264,6 +266,25 @@ useEffect(() => {
   <WritingPart4Emails
     user={user}
     onBack={() => setView("writingMenu")}
+  />
+)}
+
+{view === "writing_part4Guide" && (
+  <WritingPart4Guide
+    onBack={() => setView("writingMenu")}
+    onOpen={(slug) => {
+      if (slug === "register") return setView("writing_p4-register");
+      if (slug === "practice") return setView("writing_part4"); // ← send to emails tool
+      // fallback (for future slugs, if you add them)
+      setView(`writing_p4-${slug}`);
+    }}
+  />
+)}
+
+{view === "writing_p4-register" && (
+  <WritingPart4RegisterGuide
+    onBack={() => setView("writing_part4Guide")}
+    onStartPractice={() => setView("writing_part4")}
   />
 )}
 

@@ -12,10 +12,10 @@ export default function SpeakingMenu({ onSelect, onBack }) {
       </header>
 
       <div className="cards">
-      <button className="card" onClick={() => onSelect('part1')}>
-  <h3>Part 1: Personal Questions</h3>
-  <p>Practice answering 3 short personal questions.</p>
-</button>
+        <button className="card" onClick={() => onSelect('part1')}>
+          <h3>Part 1: Personal Questions</h3>
+          <p>Practice answering 3 short personal questions.</p>
+        </button>
 
         <button className="card" onClick={() => onSelect('part2')}>
           <h3>Part 2: Describe a Photograph</h3>
@@ -28,10 +28,21 @@ export default function SpeakingMenu({ onSelect, onBack }) {
         </button>
 
         <button className="card" onClick={() => onSelect('part4')}>
-  <h3>Part 4: Presentation & Discussion</h3>
-  <p>1-minute prep, then a 2-minute talk answering 3 questions.</p>
-</button>
+          <h3>Part 4: Presentation & Discussion</h3>
+          <p>1-minute prep, then a 2-minute talk answering 3 questions.</p>
+        </button>
+      </div>
 
+      {/* External mock test link */}
+      <div className="mock-test-link">
+        <a
+          href="https://aptis-gen.speaking1.beeskillsenglish.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mock-test-btn sleek"
+        >
+          🎤 Try a complete speaking test in exam conditions!
+        </a>
       </div>
 
       <button className="topbar-btn" onClick={onBack} style={{ marginTop: '1rem' }}>
@@ -54,6 +65,86 @@ export default function SpeakingMenu({ onSelect, onBack }) {
         .card p { margin:0; color:#cfd9f3; }
         .card.disabled { cursor:default; opacity:.55; }
         .card.disabled:hover { transform:none; box-shadow:none; border-color:#2c4b83; }
+
+        /* ---- Mock test CTA (BeeSkills palette) ---- */
+        .mock-test-link {
+          margin-top: 1.6rem;
+          text-align: center;
+        }
+
+        .mock-test-btn.sleek {
+          position: relative;
+          display: inline-block;
+          padding: 1rem 1.6rem;
+          border-radius: 16px;
+          text-decoration: none;
+          font-weight: 700;
+          font-size: 1rem;
+          letter-spacing: .2px;
+          color: #ffcf40;
+          background: linear-gradient(180deg, #0e1a2f 0%, #1a2b4a 100%);
+          border: 1px solid rgba(255, 207, 64, 0.75);
+          box-shadow:
+            0 10px 24px rgba(0,0,0,.35),
+            inset 0 1px 0 rgba(255,255,255,.06),
+            inset 0 -8px 14px rgba(0,0,0,.25);
+          transition:
+            transform .18s ease,
+            box-shadow .18s ease,
+            border-color .18s ease,
+            background .18s ease,
+            color .18s ease;
+          cursor: pointer;
+        }
+
+        .mock-test-btn.sleek::after {
+          content: "";
+          position: absolute;
+          left: 10px;
+          right: 10px;
+          bottom: -6px;
+          height: 8px;
+          border-radius: 12px;
+          background: radial-gradient(60% 120% at 50% 0%, rgba(255,207,64,.25), rgba(255,207,64,0)),
+                      radial-gradient(80% 140% at 50% 100%, rgba(0,0,0,.35), rgba(0,0,0,0));
+          filter: blur(.2px);
+          pointer-events: none;
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          .mock-test-btn.sleek:hover {
+            transform: translateY(-3px);
+            border-color: rgba(255, 207, 64, 0.95);
+            color: #ffe07a;
+            background: linear-gradient(180deg, #142444 0%, #21365f 100%);
+            box-shadow:
+              0 16px 28px rgba(0,0,0,.38),
+              inset 0 1px 0 rgba(255,255,255,.08),
+              inset 0 -6px 12px rgba(0,0,0,.22),
+              0 0 0 2px rgba(255,207,64,.08);
+          }
+          .mock-test-btn.sleek:hover::after {
+            bottom: -8px;
+            opacity: .95;
+          }
+        }
+
+        .mock-test-btn.sleek:active {
+          transform: translateY(0);
+          box-shadow:
+            0 8px 18px rgba(0,0,0,.30),
+            inset 0 1px 0 rgba(255,255,255,.05),
+            inset 0 -4px 10px rgba(0,0,0,.28);
+        }
+
+        .mock-test-btn.sleek:focus-visible {
+          outline: none;
+          box-shadow:
+            0 0 0 3px rgba(255,207,64,.25),
+            0 10px 24px rgba(0,0,0,.35),
+            inset 0 1px 0 rgba(255,255,255,.06),
+            inset 0 -8px 14px rgba(0,0,0,.25);
+        }
       `}</style>
     </div>
   );
