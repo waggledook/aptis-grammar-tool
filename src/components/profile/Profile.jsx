@@ -786,15 +786,20 @@ function buildSubmissionText(s) {
       ? s.createdAt.toDate().toLocaleString()
       : s.createdAt || "—";
 
+  const friendPlain = plainFromEmail({ html: s.friendHTML, text: s.friendText }) || "(empty)";
+  const formalPlain = plainFromEmail({ html: s.formalHTML, text: s.formalText }) || "(empty)";
+
   return [
-    `Submission (${when}) — Task: ${s.taskId || "—"}`,
-    "",
-    "— Informal (~50 words) —",
-    stripHtml(s.friendHTML || s.friendText || "(empty)"),
-    "",
-    "— Formal (120–150 words) —",
-    stripHtml(s.formalHTML || s.formalText || "(empty)"),
-    "",
+    `Aptis Writing – Part 4`,
+    `Task: ${s.taskId || "—"}`,
+    `${when}`,
+    ``,
+    `— Informal (~50 words) —`,
+    friendPlain,
+    ``,
+    `— Formal (120–150 words) —`,
+    formalPlain,
+    ``,
     `Word counts: friend ${s.counts?.friend ?? "—"}, formal ${s.counts?.formal ?? "—"}`,
   ].join("\n");
 }
@@ -806,10 +811,9 @@ function buildSubmissionHtml(s) {
       ? s.createdAt.toDate().toLocaleString()
       : s.createdAt || "—";
 
-  const friend = normalizeHtmlForDisplay(s.friendHTML, s.friendText) || "<em>(empty)</em>";
-  const formal = normalizeHtmlForDisplay(s.formalHTML, s.formalText) || "<em>(empty)</em>";
+  const friend = robustEmailForClipboard({ html: s.friendHTML, text: s.friendText });
+  const formal = robustEmailForClipboard({ html: s.formalHTML, text: s.formalText });
 
-  // Minimal wrapper; paste-friendly in Gmail/Docs/Word
   return `
     <div>
       <h3 style="margin:0 0 .4rem 0;">Aptis Writing – Part 4</h3>
@@ -826,6 +830,7 @@ function buildSubmissionHtml(s) {
     </div>
   `;
 }
+
 
 // Copy both text/html and text/plain
 async function copySubmission(s) {
@@ -854,5 +859,84 @@ async function copySubmission(s) {
     toast("Copy failed — select and copy manually.");
   }
 }
+
+// Convert editor HTML (div/br soup) into solid <p> blocks for clipboard/Word
+function normalizeEmailHtmlForClipboard(html = "") {
+  let s = (html || "").replace(/^\u200E+/, ""); // strip any leading LRM
+
+  // 1) Convert top-level <div>…</div> blocks into <p>…</p>
+  s = s.replace(/<div\b[^>]*>/gi, "<p>").replace(/<\/div>/gi, "</p>");
+
+  // 2) Turn empty lines into visible blank paragraphs
+  s = s
+    .replace(/<p>\s*(?:<br\s*\/?>\s*)*<\/p>/gi, "<p>&nbsp;</p>") // empty p → nbsp
+    .replace(/(?:<br\s*\/?>\s*){2,}/gi, "</p><p>"); // double <br> → new <p>
+
+  // 3) If there are still no block tags (rare), wrap lines into <p>
+  if (!/<p\b|<ul\b|<ol\b|<table\b/i.test(s)) {
+    const lines = s.split(/<br\s*\/?>/i).map(x => x.trim() || "&nbsp;");
+    s = "<p>" + lines.join("</p><p>") + "</p>";
+  }
+
+  // 4) Some editors end with a trailing <br> that Word ignores; force a final block
+  s = s.replace(/(<br\s*\/?>\s*)+<\/p>$/i, "</p><p>&nbsp;</p>");
+
+  return s;
+}
+
+// Prefer saved plain text; otherwise derive from HTML, preserving line breaks.
+function plainFromEmail({ html = "", text = "" }) {
+  // If we have HTML, convert it to plain text *with paragraph breaks*.
+  if (html && /<([a-z][\w:-]*)\b[^>]*>/i.test(html)) {
+    let s = html;
+
+    // normalise block boundaries into line breaks
+    s = s
+      // end of paragraphs/divs → blank line (new paragraph)
+      .replace(/<\/p\s*>/gi, "\n\n")
+      .replace(/<\/div\s*>/gi, "\n\n")
+      // explicit line break
+      .replace(/<br\s*\/?>/gi, "\n")
+      // headings/other blocks -> also end a block
+      .replace(/<\/h[1-6]\s*>/gi, "\n\n")
+      // strip remaining tags
+      .replace(/<[^>]+>/g, "")
+      // normalise CRLF
+      .replace(/\r\n/g, "\n");
+
+    // collapse 3+ newlines → just a blank line, trim end
+    s = s.replace(/\n{3,}/g, "\n\n").trimEnd();
+    return s;
+  }
+
+  // Fallback to editor text if no HTML is available.
+  return (text || "").replace(/\r\n/g, "\n");
+}
+
+function htmlFromPlainEmail(text = "") {
+  const lines = (text || "").replace(/\r\n/g, "\n").split("\n");
+  const paras = [];
+  let buf = [];
+
+  const flush = () => {
+    const joined = buf.join(" ").trim();
+    paras.push(joined.length ? escHtml(joined) : "&nbsp;"); // keep empty paragraph
+    buf = [];
+  };
+
+  for (const ln of lines) {
+    if (ln.trim() === "") flush(); else buf.push(ln.trim());
+  }
+  flush();
+
+  return "<p>" + paras.join("</p><p>") + "</p>";
+}
+
+function robustEmailForClipboard({ html = "", text = "" }) {
+  // Build <p>-only HTML from the plain text we just derived from HTML.
+  const plain = plainFromEmail({ html, text });
+  return htmlFromPlainEmail(plain);
+}
+
 
   

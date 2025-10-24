@@ -149,25 +149,63 @@ const counts = useMemo(() => ({
 // summary state
 const [showSummary, setShowSummary] = useState(false);
 
-// plain-text export used for copy/download
-function buildSummaryText() {
+// Build the plain-text version from the HTML (keeps line breaks)
+function buildSummaryPlain() {
+  // Get plain versions that actually include blank lines between paragraphs.
+  const friendPlain = htmlToPlainKeepLines(friendHTML, friendText);
+  const formalPlain = htmlToPlainKeepLines(formalHTML, formalText);
+
   return [
     `Aptis Writing – Part 4`,
     `Task: ${current.title}`,
     ``,
     `— Informal (~50 words) —`,
-    friendText.trim() || "(empty)",
+    friendPlain || "(empty)",
     ``,
     `— Formal (120–150 words) —`,
-    formalText.trim() || "(empty)",
+    formalPlain || "(empty)",
     ``,
     `Word counts: friend ${counts.friend}, formal ${counts.formal}`,
   ].join("\n");
 }
 
+
+// Build the HTML version (what Google Docs/Word will honor)
+function buildSummaryHtml() {
+  const friend = normalizeHtmlForClipboard(friendHTML, friendText) || "<em>(empty)</em>";
+  const formal = normalizeHtmlForClipboard(formalHTML, formalText) || "<em>(empty)</em>";
+  return `
+    <div>
+      <h3 style="margin:0 0 .4rem 0;">Aptis Writing – Part 4</h3>
+      <p style="margin:.25rem 0;"><strong>Task:</strong> ${current.title}</p>
+
+      <h4 style="margin:.8rem 0 .35rem 0;">— Informal (~50 words) —</h4>
+      ${friend}
+
+      <h4 style="margin:.8rem 0 .35rem 0;">— Formal (120–150 words) —</h4>
+      ${formal}
+
+      <p style="margin:.8rem 0 0 0;"><em>Word counts: friend ${counts.friend}, formal ${counts.formal}</em></p>
+    </div>
+  `;
+}
+
 async function handleCopy() {
   try {
-    await navigator.clipboard.writeText(buildSummaryText());
+    const html = buildSummaryHtml();
+    const text = buildSummaryPlain();
+
+    if (navigator.clipboard && window.ClipboardItem) {
+      await navigator.clipboard.write([
+        new window.ClipboardItem({
+          "text/html": new Blob([html], { type: "text/html" }),
+          "text/plain": new Blob([text], { type: "text/plain" }),
+        }),
+      ]);
+    } else {
+      // fallback: plain text
+      await navigator.clipboard.writeText(text);
+    }
     toast("Answers copied ✓");
   } catch {
     toast("Copy failed — select and copy manually.");
@@ -175,9 +213,10 @@ async function handleCopy() {
 }
 
 function handleDownload() {
-  const blob = new Blob([buildSummaryText()], { type: "text/plain;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
+  const text = buildSummaryPlain();            // ← use the line-preserving plain text
+  const blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
   a.href = url;
   a.download = `aptis-writing-p4-${current.id}.txt`;
   a.click();
@@ -278,9 +317,7 @@ function handleDownload() {
           <div className="card-meta">{counts.friend} words</div>
           <div
             className="preview"
-            dangerouslySetInnerHTML={{
-              __html: friendHTML || "<em>(empty)</em>",
-            }}
+            dangerouslySetInnerHTML={{ __html: normalizeHtmlForClipboard(friendHTML, friendText) }}
           />
         </div>
 
@@ -289,9 +326,7 @@ function handleDownload() {
           <div className="card-meta">{counts.formal} words</div>
           <div
             className="preview"
-            dangerouslySetInnerHTML={{
-              __html: formalHTML || "<em>(empty)</em>",
-            }}
+            dangerouslySetInnerHTML={{ __html: normalizeHtmlForClipboard(formalHTML, formalText) }}
           />
         </div>
       </div>
@@ -440,6 +475,82 @@ function ChipDropdown({ items, value, onChange, label="Task" }) {
     </div>
   );
 }
+
+
+// Does the string already look like HTML?
+function looksLikeHtml(s = "") {
+  return /<([a-z][\w:-]*)\b[^>]*>/i.test(s);
+}
+
+// Plain text -> minimal HTML paragraphs (keeps single \n inside each paragraph)
+function textToHtml(txt = "") {
+  const clean = (txt + "").replace(/^\u200E+/, ""); // strip leading LRM
+  const safe  = clean.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const paras = safe.split(/\n{2,}/).map(p => p.replace(/\n/g, "<br/>"));
+  return `<p>${paras.join("</p><p>")}</p>`;
+}
+
+// Take the editor output (with Shift+Enter <br> soup etc.)
+// and rebuild CLEAN paragraph HTML that Word / TextEdit / Notes / Gmail will all respect.
+function normalizeHtmlForClipboard(html, fallbackText) {
+  // Step 1: get reliable plain text with paragraph gaps preserved.
+  // htmlToPlainKeepLines() already:
+  // - turns <br> into "\n"
+  // - creates blank lines between blocks
+  // - normalises whitespace
+  const plain = htmlToPlainKeepLines(html, fallbackText);
+
+  // Step 2: turn that plain text back into clean <p>...</p> HTML.
+  // textToHtml():
+  // - splits on double newlines (\n\n) into paragraphs
+  // - converts single \n inside a paragraph into <br/>
+  // - wraps each paragraph in <p>...</p>
+  //
+  // This gives us legal, boring HTML:
+  //   <p>Dear you,</p><p>youo you ...</p><p>Yours,</p><p>me</p>
+  // which pastes with real line breaks basically everywhere.
+  return textToHtml(plain);
+}
+
+// HTML -> plain text while **preserving lines and paragraph gaps**
+function htmlToPlainKeepLines(html = "", fallbackText = "") {
+  if (!html) return (fallbackText || "").replace(/\r\n/g, "\n").trim();
+
+  const tmp = document.createElement("div");
+  tmp.innerHTML = html.replace(/^\u200E+/, "");
+
+  // 1) turn <br> into literal \n
+  tmp.querySelectorAll("br").forEach(br => br.replaceWith("\n"));
+
+  // 2) collect blocks; add a blank line after block-levels so paragraphs survive
+  const blocks = [];
+  const isBlock = (n) => /^(P|DIV|LI|H[1-6]|PRE|BLOCKQUOTE)$/i.test(n.nodeName);
+
+  // walk top-level children; fall back to textContent if no clear blocks
+  if ([...tmp.childNodes].some(n => n.nodeType === 1 && isBlock(n))) {
+    tmp.childNodes.forEach(n => {
+      if (n.nodeType === 1) {
+        const t = n.textContent.replace(/\u00A0/g, " ").replace(/[ \t]+\n/g, "\n").trimEnd();
+        if (t) blocks.push(t);
+        if (isBlock(n)) blocks.push(""); // blank line between blocks
+      } else if (n.nodeType === 3) {
+        const t = n.nodeValue.replace(/\u00A0/g, " ");
+        if (t.trim()) blocks.push(t.trimEnd());
+      }
+    });
+  }
+
+  let out = blocks.length ? blocks.join("\n") : tmp.textContent;
+
+  // normalize newlines & collapse >2 blanks to exactly 1 blank line
+  return out
+    .replace(/\u00A0/g, " ")     // nbsp → space
+    .replace(/\r\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+
 
 /* ---------- styles ---------- */
 function StyleScope(){
