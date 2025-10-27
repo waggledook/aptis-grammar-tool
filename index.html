@@ -46,28 +46,43 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
 
-  <!-- JSON-LD: describe the app for search engines -->
+  <!-- JSON-LD structured data -->
 <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "WebApplication",
-    "name": "Aptis Trainer | BeeSkills English",
-    "url": "https://aptis-trainer.beeskillsenglish.com/",
-    "applicationCategory": "EducationalApplication",
-    "operatingSystem": "Web",
-    "description": "Interactive Aptis Trainer — practise all parts of the exam, grammar, speaking, writing, reading... and track your progress.",
-    "provider": {
-      "@type": "EducationalOrganization",
-      "name": "BeeSkills English",
-      "url": "https://beeskillsenglish.com/"
-    },
-    "inLanguage": "en",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "EUR"
-    }
+    "@graph": [
+      {
+        "@type": "WebApplication",
+        "name": "Seif Aptis Trainer | Seif English Academy",
+        "url": "https://aptis-trainer.beeskillsenglish.com/",
+        "applicationCategory": "EducationalApplication",
+        "operatingSystem": "Web",
+        "description": "Interactive Aptis Trainer — practise all parts of the Aptis General exam: Grammar, Speaking, Writing, and Reading. Track your progress and build exam confidence.",
+        "inLanguage": "en",
+        "provider": {
+          "@type": "EducationalOrganization",
+          "name": "Seif English Academy",
+          "url": "https://idiomasseif.com/"
+        },
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "EUR"
+        }
+      },
+      {
+        "@type": "Organization",
+        "name": "Seif English Academy",
+        "url": "https://aptis-trainer.beeskillsenglish.com/",
+        "logo": "https://aptis-trainer.beeskillsenglish.com/og-image.jpg",
+        "sameAs": [
+          "https://idiomasseif.com/",
+          "https://www.instagram.com/seif.academy/",
+          "https://www.facebook.com/seif.academy/"
+        ]
+      }
+    ]
   }
-  </script>
+  </script>  
   </body>
 </html>
