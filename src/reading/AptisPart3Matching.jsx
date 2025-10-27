@@ -1,5 +1,5 @@
 // src/reading/AptisPart3Matching.jsx
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useRef } from "react";
 import { saveReadingCompletion, fetchReadingCompletions } from "../firebase";
 import { toast } from "../utils/toast";
 
@@ -47,7 +47,7 @@ const DEMO_TASKS = [
           text: "Who thinks some workers have an unfair advantage due to visibility?",
           answer: "Sofia",
           evidence:
-            "remote workers are often overlooked for promotions - out of sight, out of mind.",
+            "remote workers are often overlooked for promotions- out of sight, out of mind.",
           explanation:
             "Sofia says that if you're not physically seen, you're less likely to be promoted.",
         },
@@ -108,6 +108,7 @@ export default function AptisPart3Matching({ tasks = DEMO_TASKS, user, onRequire
   const [feedback, setFeedback] = useState({});
   const [completed, setCompleted] = useState(new Set());
   const [whyOpen, setWhyOpen] = useState(null);
+  const commentRefs = useRef({});
   const current = tasks[taskIndex];
 
   
@@ -123,6 +124,24 @@ export default function AptisPart3Matching({ tasks = DEMO_TASKS, user, onRequire
       alive = false;
     };
   }, [user]);
+
+  // 🔹 NEW SCROLL EFFECT — paste here
+useEffect(() => {
+    if (!whyOpen) return;
+  
+    // which question is open?
+    const q = current.questions.find((qq) => qq.id === whyOpen);
+    if (!q) return;
+  
+    const who = q.answer; // e.g. "Leo"
+    const node = commentRefs.current[who]?.current;
+    if (node) {
+      node.scrollIntoView({
+        behavior: "smooth",
+        block: "center",
+      });
+    }
+  }, [whyOpen, current]);
 
   const names = useMemo(() => current.comments.map((c) => c.name), [current]);
 
@@ -231,29 +250,34 @@ export default function AptisPart3Matching({ tasks = DEMO_TASKS, user, onRequire
 
       {/* ---------- Comments section ---------- */}
       <section className="comments">
-        <h3>Comments</h3>
+  <h3>Comments</h3>
 
-        {current.comments.map((c, i) => (
-          <div
-            key={i}
-            className={`comment ${
-              // visually pop the active speaker if a why? is open
-              whyOpen &&
-              current.questions.find((q) => q.id === whyOpen)?.answer === c.name
-                ? "active-speaker"
-                : ""
-            }`}
-          >
-            <strong>{c.name}</strong>
+  {current.comments.map((c, i) => {
+    const isActive =
+      whyOpen &&
+      current.questions.find((q) => q.id === whyOpen)?.answer === c.name;
 
-            {/* If this speaker is currently being explained, show highlighted text */}
-            {whyOpen &&
-            current.questions.find((q) => q.id === whyOpen)?.answer === c.name
-              ? renderCommentTextWithHighlight(c.name)
-              : <p>{c.text}</p>}
-          </div>
-        ))}
-      </section>
+    // ensure there's a ref for this name
+    if (!commentRefs.current[c.name]) {
+      commentRefs.current[c.name] = React.createRef();
+    }
+
+    return (
+      <div
+        key={i}
+        ref={commentRefs.current[c.name]}
+        className={`comment ${isActive ? "active-speaker" : ""}`}
+      >
+        <strong>{c.name}</strong>
+
+        {isActive
+          ? renderCommentTextWithHighlight(c.name)
+          : <p>{c.text}</p>}
+      </div>
+    );
+  })}
+</section>
+
 
       {/* ---------- Questions section ---------- */}
       <section className="questions-section">
@@ -359,12 +383,13 @@ function StyleScope() {
         .aptis-matching .intro { color:var(--muted); margin-top:.2rem; }
   
         /* COMMENTS */
-        .aptis-matching .comments {
-          background:var(--panel);
-          border-radius:16px;
-          padding:1rem;
-          margin-bottom:1.5rem;
-        }
+        .aptis-matching .comment {
+  margin-bottom:1rem;
+  border:1px solid transparent;
+  border-radius:10px;
+  padding:.5rem .6rem;
+  transition: box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
         .aptis-matching .comments h3 {
           margin-top:0;
           color:var(--ok);
@@ -377,10 +402,10 @@ function StyleScope() {
           padding:.5rem .6rem;
         }
         .aptis-matching .comment.active-speaker {
-          border-color:#37598e;
-          background:#0f1b31;
-          box-shadow:0 0 0 2px rgba(110,168,255,.15);
-        }
+  border-color:#37598e;
+  background:#0f1b31;
+  box-shadow:0 0 0 2px rgba(110,168,255,.3), 0 8px 24px rgba(0,0,0,.6);
+}
         .aptis-matching .comment strong {
           color:var(--ok);
           display:block;
