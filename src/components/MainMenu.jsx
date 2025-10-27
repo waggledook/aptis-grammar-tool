@@ -22,8 +22,8 @@ export default function MainMenu({ onSelect }) {
 
 {/* Single Reading entry → sub-menu you already have */}
 <button className="menu-card" onClick={() => onSelect('readingMenu')}>
-  <h3>Reading: Sentence Order</h3>
-  <p>Aptis Part 2 — choose Guided Lesson or Practice Activities.</p>
+  <h3>Reading Practice</h3>
+  <p>Practice tasks for all reading sections.</p>
 </button>
 
 {/* Speaking entry → sub-menu */}
