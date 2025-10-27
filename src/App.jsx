@@ -26,6 +26,7 @@ import SpeakingPart2 from './components/speaking/SpeakingPart2';
 import SpeakingPart3 from './components/speaking/SpeakingPart3';
 import SpeakingPart4 from "./components/speaking/SpeakingPart4";
 import AptisPart2Reorder from './reading/AptisPart2Reorder';
+import AptisPart3Matching from './reading/AptisPart3Matching';
 import ToastHost from './components/ToastHost';
 import './App.css'
 
@@ -323,6 +324,24 @@ useEffect(() => {
     />
   </>
 )}
+
+{view === 'readingPart3' && (
+  <>
+    <button
+      onClick={() => setView('readingMenu')}
+      className="review-btn"
+      style={{ marginBottom: '1rem' }}
+    >
+      ← Back
+    </button>
+
+    <AptisPart3Matching
+      user={user}
+      onRequireSignIn={() => setShowAuth(true)}
+    />
+  </>
+)}
+
 
 {view === 'speakingMenu' && (
   <SpeakingMenu
