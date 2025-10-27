@@ -28,6 +28,7 @@ import SpeakingPart4 from "./components/speaking/SpeakingPart4";
 import AptisPart2Reorder from './reading/AptisPart2Reorder';
 import AptisPart3Matching from './reading/AptisPart3Matching';
 import ToastHost from './components/ToastHost';
+import Footer from "./components/common/Footer";
 import './App.css'
 
 export default function App() {
@@ -392,6 +393,7 @@ useEffect(() => {
   <Profile user={user} onBack={() => setView('menu')} />
 )}
 
+<Footer />
 
   </div>
 </div>
