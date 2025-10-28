@@ -390,7 +390,12 @@ useEffect(() => {
 )}
 
 {view === 'profile' && (
-  <Profile user={user} onBack={() => setView('menu')} />
+  <Profile
+    user={user}
+    onBack={() => setView('menu')}
+    onGoMistakes={() => setView('mistakes')}
+    onGoFavourites={() => setView('favourites')}
+  />
 )}
 
 <Footer />
