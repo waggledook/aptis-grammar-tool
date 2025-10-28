@@ -17,7 +17,7 @@ const DEMO_TASKS = [
         {
           name: "Ryan",
           text:
-            "Remote work is here to stay, and that’s a good thing. For years, employers assumed people couldn’t be trusted to work without supervision, but that’s nonsense. Most people are more focused when they’re comfortable. Personally, I’ve saved hours every week by cutting out the commute. Companies benefit too; less need for expensive office space. As long as the targets are met, who cares where the work is done? The world is moving forward, and managers need to stop thinking like it’s still 1995.",
+            "Remote work is here to stay, and that’s a good thing. For years, employers assumed people couldn’t be trusted to carry out their duties without supervision, but that’s nonsense. Most people are more focused when they’re comfortable. Personally, I’ve gained back hours every week by cutting out the commute. Companies benefit too; less need for expensive office space. As long as the targets are met, who cares where the work is done? The world is moving forward, and managers need to stop thinking like it’s still 1995.",
         },
         {
           name: "Leo",
@@ -27,20 +27,20 @@ const DEMO_TASKS = [
         {
           name: "Sofia",
           text:
-            "I’ve been homeworking for a couple of years now, and though not travelling to work on the busy trains is awesome, I like having a few days in the office to collaborate face to face. But I also value quiet time at home to concentrate. What worries me is that remote workers are often overlooked for promotions- out of sight, out of mind. Employers need to make sure opportunities are equal for everyone. Still, in terms of productivity, it really depends on you, you know?  Some are lazier at home, but others find it easier to focus.",
+            "I’ve been homeworking for a couple of years now, and though not travelling to work on the busy trains is awesome, I like having a few days in the office to collaborate face to face as well: It's definitely less isolating when you can just pop over to the next desk to check up on a colleague. What worries me is that remote workers are often overlooked for promotions- out of sight, out of mind. Employers need to make sure opportunities are equal for everyone. Still, in terms of productivity, it really depends on you, you know?  Some are lazier at home, but others find it easier to focus.",
         },
       ],
       questions: [
         {
             id: 1,
-            text: "Who says working remotely makes it difficult to switch off from work?",
+            text: "Who says working remotely makes it difficult to disconnect from work?",
             answer: "Leo",
             evidenceParts: [
               "I never feel like I can log off properly",
               "when my computer is in the next room"
             ],
             explanation:
-              "Leo says he can't ‘log off’ mentally because work is always right there at home.",
+              "Log off=disconnect from a website/app. I this case Leo is using it to mean disconnect from work.",
           },
         {
           id: 2,
@@ -49,16 +49,16 @@ const DEMO_TASKS = [
           evidence:
             "remote workers are often overlooked for promotions- out of sight, out of mind.",
           explanation:
-            "Sofia says that if you're not physically seen, you're less likely to be promoted.",
+            "out of sight: not seen. So remote workers are not considered for better positions (overlooked=not considered).",
         },
         {
           id: 3,
           text: "Who believes that employees can be counted on to work independently?",
           answer: "Ryan",
           evidence:
-            "employers assumed people couldn’t be trusted to work without supervision, but that’s nonsense.",
+            "employers assumed people couldn’t be trusted to carry out their duties without supervision, but that’s nonsense.",
           explanation:
-            "Ryan says people can be trusted to work without someone watching them.",
+            "counted on= relied on. So similar to 'trusted'. 'Without supervision' means independently. Ryan says that's it's nonsense to think employees can't work independently.",
         },
         {
           id: 4,
@@ -67,16 +67,16 @@ const DEMO_TASKS = [
           evidence:
             "at home, it’s easy to faff about.",
           explanation:
-            "Emma says that without the structure of the office, it's easy to waste time at home.",
+            "Emma says that without the structure of the office, we 'faff about': British informal phrasal verb for waste time or be unproductive. Sofia also mentions productivity, but she says it depends on the person.",
         },
         {
           id: 5,
           text: "Who appreciates the time saved by not travelling to work?",
           answer: "Ryan",
           evidence:
-            "I’ve saved hours every week by cutting out the commute.",
+            "I’ve gained back hours every week by cutting out the commute.",
           explanation:
-            "Ryan likes remote work partly because he doesn't have to travel in.",
+            "'commute' means travel to/from work. Ryan cuts this out: he removes it from his routine and saves time. Sofia mentions 'not travelling to work' but doesn't specifically say she saves time.",
         },
         {
           id: 6,
@@ -85,16 +85,16 @@ const DEMO_TASKS = [
           evidence:
             "younger workers miss out on learning from more experienced colleagues when they’re isolated at home.",
           explanation:
-            "Emma thinks being physically around experienced colleagues teaches you things you can’t get at home.",
+            "'miss out on' = lose opportunities to experience something. Learning from experienced colleagues=informal learning.",
         },
         {
           id: 7,
           text: "Who says the best option is combining office and home work?",
           answer: "Sofia",
           evidence:
-            "I like having a few days in the office to collaborate face to face. But I also value quiet time at home to concentrate.",
+            "I like having a few days in the office to collaborate face to face as well",
           explanation:
-            "Sofia describes a hybrid model: some office days, some home days.",
+            "Sofia likes working from home but at the office 'as well'. She describes several benefits.",
         },
       ],
     },
