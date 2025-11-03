@@ -475,3 +475,76 @@ button {
   filter: brightness(1.1);
   transform: scale(1.05);
 }
+
+/* Make sure cards can host absolutely positioned children */
+.menu-card {
+  position: relative;
+}
+
+/* Header row for title + badge */
+.menu-card-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Corner wrapper for the icon */
+.uc-top-wrapper {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  pointer-events: none; /* don't block clicks on the card */
+}
+
+/* Actual icon */
+.uc-top-icon {
+  width: 32px;
+  height: auto;
+  display: block;
+}
+
+/* Tooltip bubble */
+.uc-top-wrapper::after {
+  content: "In progress!";
+  position: absolute;
+  top: -28px;
+  right: 0;
+  background: #0e1a30;
+  color: #ffcf40;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateY(4px);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 207, 64, 0.4);
+  z-index: 10;
+}
+
+/* Little arrow pointer */
+.uc-top-wrapper::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  right: 8px;
+  border-width: 6px;
+  border-style: solid;
+  border-color: transparent transparent #0e1a30 transparent;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 9;
+}
+
+/* Show tooltip when hovering card */
+.menu-card:hover .uc-top-wrapper::after,
+.menu-card:hover .uc-top-wrapper::before {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+

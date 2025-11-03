@@ -27,8 +27,11 @@ import SpeakingPart3 from './components/speaking/SpeakingPart3';
 import SpeakingPart4 from "./components/speaking/SpeakingPart4";
 import AptisPart2Reorder from './reading/AptisPart2Reorder';
 import AptisPart3Matching from './reading/AptisPart3Matching';
+import VocabularyMenu from "./components/vocabulary/VocabularyMenu";
 import ToastHost from './components/ToastHost';
 import Footer from "./components/common/Footer";
+import VocabularyTopics from "./components/vocabulary/VocabularyTopics";
+import TopicTrainer from "./components/vocabulary/TopicTrainer";
 import './App.css'
 
 export default function App() {
@@ -386,6 +389,19 @@ useEffect(() => {
     user={user}
     // prepareSeconds={60}
     // speakSeconds={120}
+  />
+)}
+
+{view === "vocabularyMenu" && (
+  <VocabularyMenu
+    onSelect={(section) => setView(section)}
+    onBack={() => setView("menu")}
+  />
+)}
+
+{view === "vocabTopics" && (
+  <VocabularyTopics
+    onBack={() => setView("vocabularyMenu")}
   />
 )}
 

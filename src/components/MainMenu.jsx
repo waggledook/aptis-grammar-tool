@@ -1,5 +1,7 @@
 import React from "react";
 import { toast } from "../utils/toast"; // only needed if you pick Option B
+import UnderConstructionBadge from "./common/UnderConstructionBadge";
+
 
 export default function MainMenu({ onSelect }) {
   return (
@@ -46,16 +48,20 @@ export default function MainMenu({ onSelect }) {
           </p>
         </button>
 
-        <button
-  className="menu-card soon-card tease"
-  onClick={() => toast("Vocabulary section coming soon 👀")}
->
-  <div className="soon-head">
-    <h3>Vocabulary</h3>
-    <span className="soon-pill">Coming soon</span>
+        <button className="menu-card" onClick={() => onSelect("vocabularyMenu")}>
+  <div className="menu-card-header">
+    <h3>Vocabulary Practice</h3>
+    <span className="uc-top-wrapper">
+      <img
+        src="/images/ui/under-construction.png"
+        alt="Under construction"
+        className="uc-top-icon"
+      />
+    </span>
   </div>
-  <p>High-frequency Aptis-style vocab questions and revision tools.</p>
+  <p>Topics, synonyms, and collocations.</p>
 </button>
+
 
 <button
   className="menu-card soon-card tease"
