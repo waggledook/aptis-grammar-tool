@@ -2,12 +2,18 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { travelData } from "./data/travelData";
 
-export default function TopicTrainer({ topic, onBack }) {
-  // Right now we only have travel. Later we can switch on topic.
-  const topicInfo = topic === "travel" ? travelData : null;
+const TOPIC_DATA = {
+  travel: travelData
+  // work: workData,
+  // health: healthData,
+  // etc.
+};
 
-  // We'll start with the first set in that topic.
-  const [setIndex, setSetIndex] = useState(0);
+export default function TopicTrainer({ topic, onBack }) {
+  const topicInfo = TOPIC_DATA[topic] || null;
+
+  const [setIndex, setSetIndex] = useState(null);
+  const [hasChosenSet, setHasChosenSet] = useState(false); // 👈 NEW
 
   // Phase 1 = "match", Phase 2 = "review"
   const [phase, setPhase] = useState("match");
@@ -93,39 +99,96 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
 
 
   // --- REVIEW STATE ---
-  // We reuse index for which review sentence we're on
   const [reviewIndex, setReviewIndex] = useState(0);
   const [chosenAnswer, setChosenAnswer] = useState(null);
   const [showReviewFeedback, setShowReviewFeedback] = useState(false);
+  const [showReviewImage, setShowReviewImage] = useState(false);
 
-  if (!topicInfo || !activeSet) {
+  // Track sentences the student got wrong on the first run
+  const [mistakes, setMistakes] = useState([]);     // array of review items
+  const [mistakeMode, setMistakeMode] = useState(false); // false = full set, true = only mistakes
+
+  if (!topicInfo) {
     return (
       <div className="topic-trainer game-wrapper">
         <header className="header">
           <h2 className="title">Topic not found</h2>
           <p className="intro">No data available for this topic yet.</p>
         </header>
-
+  
         <button className="topbar-btn" onClick={onBack}>
           ← Back to Topics
         </button>
       </div>
     );
   }
+  
 
-  const reviewItem = shuffledReview[reviewIndex];
-  const wordBank = activeSet.pairs.map(p => p.term); // only real taught terms
+  const currentReviewList = mistakeMode ? mistakes : shuffledReview;
+  const reviewItem = currentReviewList[reviewIndex];  // ✅ use the active list
+  const wordBank = activeSet ? activeSet.pairs.map((p) => p.term) : [];
+
+  const answerOptions = reviewItem?.answer
+    ? reviewItem.answer
+        .split("/")
+        .map((a) => a.trim().toLowerCase())
+        .filter(Boolean)
+    : [];
+
+  const cluePair =
+    activeSet?.pairs?.find((p) => {
+      const term = p.term.toLowerCase();
+      return answerOptions.some(
+        (opt) =>
+          term === opt || term.includes(opt) || opt.includes(term)
+      );
+    }) || null;
+
   const [typedAnswer, setTypedAnswer] = useState("");
-const [isCorrect, setIsCorrect] = useState(false);
-const inputRef = useRef(null);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const inputRef = useRef(null);
 
+  const totalItems = shuffledReview.length;
+  const firstRunCorrect = totalItems - mistakes.length;
+
+// 🔍 Focus input whenever we go into review / move on
 useEffect(() => {
   if (phase === "review" && inputRef.current) {
     inputRef.current.focus();
   }
-}, [phase, reviewIndex]);                // ✅ triggers on phase change or next question
+}, [phase, reviewIndex]);
+
+// 🔁 Reset everything when we change to a different set
+useEffect(() => {
+  if (!activeSet) return;
+
+  setPhase("match");
+
+  // Match state
+  setMatchedTerms([]);
+  setMatchedDefs([]);
+  setSelectedDef(null);
+  setSelectedTerm(null);
+  setFeedbackFlash(null);
+  setShakeDef(null);
+  setShakeTerm(null);
+  setPulseItems({ def: null, term: null });
+  setShowDefs({});
+
+  // Review state
+  setReviewIndex(0);
+  setChosenAnswer(null);
+  setShowReviewFeedback(false);
+  setTypedAnswer("");
+  setIsCorrect(false);
+  setShowReviewImage(false);   // 👈 reset picture clue
+  setMistakes([]);       // 👈 new
+  setMistakeMode(false); // 👈 new
+}, [activeSet]);
 
 function checkTypedAnswer() {
+  if (!reviewItem) return;
+
   const cleanUser = typedAnswer.trim().toLowerCase();
   const cleanCorrect = reviewItem.answer.trim().toLowerCase();
 
@@ -137,13 +200,24 @@ function checkTypedAnswer() {
   setIsCorrect(correct);
   setShowReviewFeedback(true);
 
+  if (!correct && !mistakeMode) {
+    // Store this sentence as a mistake (only on the first full run)
+    setMistakes((prev) => {
+      const already = prev.some(
+        (item) => item.sentence === reviewItem.sentence
+      );
+      if (already) return prev;
+      return [...prev, reviewItem];
+    });
+  }
+
   if (correct) {
     // ✅ Auto-advance after short delay
     setTimeout(() => {
       nextReview();
     }, 1500);
   }
-  // ❌ For incorrect answers: no auto-advance — waits for Enter press
+  // ❌ Incorrect: waits for Enter → nextReview()
 }
 
 
@@ -154,47 +228,126 @@ function checkTypedAnswer() {
   }
 
   function nextReview() {
+    const list = mistakeMode ? mistakes : shuffledReview;
+
+    setShowReviewImage(false); // reset picture clue for the new sentence
+
     const next = reviewIndex + 1;
-    if (next < shuffledReview.length) {
+    if (next < list.length) {
       setReviewIndex(next);
       setTypedAnswer("");
       setShowReviewFeedback(false);
       setIsCorrect(false);
     } else {
-      // finished set
+      // finished this run – move index past the end so reviewItem becomes undefined
+      setReviewIndex(next);
+      setTypedAnswer("");
+      setShowReviewFeedback(false);
+      setIsCorrect(false);
     }
   }
+
+  function restartMistakes() {
+    if (mistakes.length === 0) return;
+    setMistakeMode(true);
+    setReviewIndex(0);
+    setTypedAnswer("");
+    setShowReviewFeedback(false);
+    setIsCorrect(false);
+    setShowReviewImage(false);
+  }
+
+  function restartFullReview() {
+    setMistakeMode(false);
+    setMistakes([]);
+    setReviewIndex(0);
+    setTypedAnswer("");
+    setShowReviewFeedback(false);
+    setIsCorrect(false);
+    setShowReviewImage(false);
+  }
+
+
 
   return (
     <div className="topic-trainer game-wrapper fade-in">
       {/* HEADER */}
       <header className="header">
-        <h2 className="title" style={{ textTransform: "capitalize" }}>
-          {topic} • {activeSet.title}
-        </h2>
-        <p className="intro">
-          {activeSet.focus}
-        </p>
-      </header>
+  <h2 className="title" style={{ textTransform: "capitalize" }}>
+    {topic}
+    {activeSet ? ` • ${activeSet.title}` : ""}
+  </h2>
+  <p className="intro">
+    {activeSet
+      ? activeSet.focus
+      : "Choose a set below to start practising this topic."}
+  </p>
+</header>
 
-      {/* PHASE TOGGLE / PROGRESSION */}
-      <div className="stage-tabs">
-        <button
-          className={`tab-btn ${phase === "match" ? "active" : ""}`}
-          onClick={() => setPhase("match")}
-        >
-          🔗 Match
-        </button>
-        <button
-  className={`tab-btn ${phase === "review" ? "active" : ""}`}
-  onClick={() => setPhase("review")}
->
-  ✍️ Review
-</button>
+            {/* SET SELECTOR */}
+            <div className="set-tabs">
+        <span className="set-label">Set:</span>
+        <div className="set-pill-row">
+          {topicInfo.sets.map((set, idx) => (
+            <button
+              key={set.id}
+              className={
+                "set-pill " + (idx === setIndex ? "active" : "")
+              }
+              onClick={() => {
+                setSetIndex(idx);
+                setHasChosenSet(true); // mark that the user has chosen a set
+              }}
+            >
+              {set.title}
+            </button>
+          ))}
+        </div>
       </div>
 
+      {/* 🟦 If no set selected yet, show intro + set options */}
+      {!hasChosenSet && (
+        <div className="card set-select">
+          <p className="phase-intro">
+            Choose a topic set to begin practising this theme.
+          </p>
+          <div className="set-pill-row">
+            {topicInfo.sets.map((set, idx) => (
+              <button
+                key={set.id}
+                className="review-btn"
+                onClick={() => {
+                  setSetIndex(idx);
+                  setHasChosenSet(true);
+                }}
+              >
+                {set.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* PHASE TOGGLE / PROGRESSION – only once a set is chosen */}
+      {hasChosenSet && (
+        <div className="stage-tabs">
+          <button
+            className={`tab-btn ${phase === "match" ? "active" : ""}`}
+            onClick={() => setPhase("match")}
+          >
+            🔗 Match
+          </button>
+          <button
+            className={`tab-btn ${phase === "review" ? "active" : ""}`}
+            onClick={() => setPhase("review")}
+          >
+            ✍️ Review
+          </button>
+        </div>
+      )}
+
       {/* PHASE 1: MATCHING BOARD */}
-      {phase === "match" && (
+      {hasChosenSet && phase === "match" && (
   <div className="card match-phase">
     <p className="phase-intro">
       Match each definition (left) with the correct word or phrase (right). Some words on the right
@@ -308,75 +461,166 @@ function checkTypedAnswer() {
 )}
 
 
-      {/* PHASE 2: REVIEW (gap-fill ALL items from this set) */}
-      {phase === "review" && (
-  <div className="card review-phase">
-    <p className="phase-intro">
-      Type the missing word or phrase to complete each sentence.
-    </p>
+            {/* PHASE 2: REVIEW (gap-fill ALL items from this set) */}
+            {hasChosenSet && phase === "review" && (
+        <div className="card review-phase">
+          <p className="phase-intro">
+            Type the missing word or phrase to complete each sentence.
+          </p>
 
-    <p className="prompt">{reviewItem.sentence}</p>
+          {reviewItem ? (
+            <>
+              <p className="prompt">{reviewItem.sentence}</p>
 
-    <input
-  ref={inputRef}
-  type="text"
-  className="answer-input"
-  placeholder="Type your answer..."
-  value={typedAnswer}
-  onChange={(e) => setTypedAnswer(e.target.value)}
-  onKeyDown={(e) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      if (showReviewFeedback) {
-        nextReview();          // Enter again moves to next, regardless of correctness
-      } else {
-        checkTypedAnswer();    // First Enter checks the answer
-      }
-    }
-  }}
-  disabled={showReviewFeedback}
-/>
+              {cluePair && cluePair.image && (
+                <div className="clue-area">
+                  <button
+                    type="button"
+                    className="clue-btn"
+                    onClick={() =>
+                      setShowReviewImage((prev) => !prev)
+                    }
+                  >
+                    {showReviewImage ? "Hide picture clue" : "Picture clue"}
+                  </button>
 
-    {!showReviewFeedback && (
-      <button className="review-btn" onClick={checkTypedAnswer}>
-        Check
-      </button>
-    )}
+                  {showReviewImage && (
+                    <div className="clue-image-wrapper">
+                      <img
+                        src={cluePair.image}
+                        alt={cluePair.term}
+                        className="clue-image"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
 
-    {showReviewFeedback && (
-      <div className="explanation-block">
-        {isCorrect ? (
-          <p className="good">✅ Great! “{reviewItem.answer}” is correct.</p>
-        ) : (
-          <>
-            <p className="bad">❌ Not quite.</p>
-            <p>
-              Correct answer: <strong>{reviewItem.answer}</strong>
-            </p>
-          </>
-        )}
-        <div className="nav-btns">
-          <button className="review-btn" onClick={nextReview}>
-            Next →
-          </button>
+              <input
+                ref={inputRef}
+                type="text"
+                className="answer-input"
+                placeholder="Type your answer..."
+                value={typedAnswer}
+                onChange={(e) => {
+                  if (showReviewFeedback) return; // freeze text after feedback
+                  setTypedAnswer(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    if (showReviewFeedback) {
+                      nextReview(); // Enter after feedback → next
+                    } else {
+                      checkTypedAnswer(); // first Enter → check
+                    }
+                  }
+                }}
+              />
+
+              {!showReviewFeedback && (
+                <button className="review-btn" onClick={checkTypedAnswer}>
+                  Check
+                </button>
+              )}
+
+              {showReviewFeedback && (
+                <div className="explanation-block">
+                  {isCorrect ? (
+                    <p className="good">
+                      ✅ Great! “{reviewItem.answer}” is correct.
+                    </p>
+                  ) : (
+                    <>
+                      <p className="bad">❌ Not quite.</p>
+                      <p>
+                        Correct answer:{" "}
+                        <strong>{reviewItem.answer}</strong>
+                      </p>
+                    </>
+                  )}
+                  <div className="nav-btns">
+                    <button className="review-btn" onClick={nextReview}>
+                      Next →
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              <p className="counter">
+                {reviewIndex + 1} / {currentReviewList.length}
+              </p>
+            </>
+          ) : (
+            <div className="review-complete">
+              <h3 className="col-title">Set complete</h3>
+
+              {!mistakeMode && (
+                <>
+                  <p>
+                    You answered{" "}
+                    <strong>
+                      {firstRunCorrect} / {totalItems}
+                    </strong>{" "}
+                    correctly on the first try.
+                  </p>
+                  {mistakes.length > 0 ? (
+                    <>
+                      <p>
+                        You had{" "}
+                        <strong>{mistakes.length}</strong> sentence
+                        {mistakes.length === 1 ? "" : "s"} to practise
+                        again.
+                      </p>
+                      <div className="nav-btns">
+                        <button
+                          className="review-btn"
+                          onClick={restartMistakes}
+                        >
+                          Review only my mistakes
+                        </button>
+                        <button
+                          className="review-btn secondary"
+                          onClick={restartFullReview}
+                        >
+                          Start full review again
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <p>Brilliant — you got everything right first time!</p>
+                  )}
+                </>
+              )}
+
+              {mistakeMode && (
+                <>
+                  <p>
+                    You’ve gone through all your mistake sentences again.
+                  </p>
+                  <div className="nav-btns">
+                    <button
+                      className="review-btn secondary"
+                      onClick={restartFullReview}
+                    >
+                      Start full review again
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          <div className="tips-block">
+            <h4 className="tips-title">Common mistakes</h4>
+            <ul className="tips-list">
+              {activeSet.tips.map((tip, i) => (
+                <li key={i}>{tip}</li>
+              ))}
+            </ul>
+          </div>
         </div>
-      </div>
-    )}
-
-    <p className="counter">
-      {reviewIndex + 1} / {shuffledReview.length}
-    </p>
-
-    <div className="tips-block">
-      <h4 className="tips-title">Common mistakes</h4>
-      <ul className="tips-list">
-        {activeSet.tips.map((tip, i) => (
-          <li key={i}>{tip}</li>
-        ))}
-      </ul>
-    </div>
-  </div>
-)}
+      )}
 
 
       <button
@@ -409,6 +653,50 @@ function checkTypedAnswer() {
           border-color:#4a79d8;
           color:#fff;
         }
+
+                .set-tabs {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: center;
+          gap: .5rem .75rem;
+          margin-bottom: 1rem;
+        }
+
+        .set-label {
+          font-size: .85rem;
+          text-transform: uppercase;
+          letter-spacing: .08em;
+          color: #9fb0e0;
+        }
+
+        .set-pill-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: .5rem;
+        }
+
+        .set-pill {
+          border-radius: 999px;
+          border: 1px solid #2c4b83;
+          background: #101b32;
+          color: #cfd9f3;
+          padding: .25rem .8rem;
+          font-size: .85rem;
+          cursor: pointer;
+          transition: all .15s ease;
+        }
+
+        .set-pill:hover {
+          background: #182544;
+        }
+
+        .set-pill.active {
+          background: #1f3560;
+          border-color: #4a79d8;
+          color: #fff;
+        }
+
 
         .card {
           background:#13213b;
@@ -757,10 +1045,78 @@ function checkTypedAnswer() {
   box-shadow: 0 0 6px rgba(98,137,255,0.4);
 }
 
+        .review-complete {
+          margin-top: 0.5rem;
+          background: #0e1b33;
+          border: 1px solid #2c4b83;
+          border-radius: 10px;
+          padding: 0.9rem 1rem;
+          color: #cfd9f3;
+          text-align: left;
+          font-size: 0.9rem;
+        }
+
+        .review-btn.secondary {
+          background: #101b32;
+          border: 1px solid #4a79d8;
+          color: #cfd9f3;
+        }
+
+        .review-btn.secondary:hover {
+          background: #1f3560;
+          box-shadow: none;
+        }
+
+
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
+        .clue-area {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 0.5rem;              /* adds consistent spacing between button & image */
+          margin-bottom: 0.75rem;   /* space below before the input box */
+        }
+
+        .clue-btn {
+          font-size: 0.8rem;
+          padding: 0.3rem 0.8rem;
+          border-radius: 999px;
+          border: 1px solid #2c4b83;
+          background: #101b32;
+          color: #cfd9f3;
+          cursor: pointer;
+          transition: background 0.15s ease, border-color 0.15s ease;
+        }
+
+        .clue-btn:hover {
+          background: #1f3560;
+          border-color: #4a79d8;
+        }
+
+        .clue-image-wrapper {
+          display: flex;
+          justify-content: center;
+        }
+
+        .clue-image {
+          width: 72px;
+          height: 72px;
+          object-fit: contain;
+          filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.45));
+        }
+        .card.set-select {
+          text-align: center;
+        }
+        .card.set-select .set-pill-row {
+          justify-content: center;
+          flex-wrap: wrap;
+          gap: 0.75rem;
+        }
+
+
 
       `}</style>
     </div>
