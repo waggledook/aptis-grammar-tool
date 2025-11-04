@@ -1,16 +1,38 @@
 import React from "react";
 import TopicTrainer from "./TopicTrainer";
+import TopicFlashcards from "./TopicFlashcards"; // 👈 NEW
 import { toast } from "../../utils/toast";
 import UnderConstructionPanel from "../common/UnderConstructionPanel";
 
 export default function VocabularyTopics({ onSelect, onBack }) {
   const [selectedTopic, setSelectedTopic] = React.useState(null);
+  const [topicView, setTopicView] = React.useState("practice"); // 👈 NEW: "practice" | "flashcards"
+
+  // In future you can pass real auth info down:
+  const isAuthenticated = false; // or from props/context
 
   if (selectedTopic) {
+    // 🔁 When a topic is selected, switch between Practice vs Flashcards
+    if (topicView === "flashcards") {
+      return (
+        <TopicFlashcards
+          topic={selectedTopic}
+          onBack={() => setTopicView("practice")} // go back to practice view for this topic
+          isAuthenticated={isAuthenticated}
+        />
+      );
+    }
+
     return (
       <TopicTrainer
         topic={selectedTopic}
-        onBack={() => setSelectedTopic(null)}
+        onBack={() => {
+          // leaving the topic entirely: reset selection + view
+          setSelectedTopic(null);
+          setTopicView("practice");
+        }}
+        isAuthenticated={isAuthenticated}
+        onShowFlashcards={() => setTopicView("flashcards")} // 👈 tell parent to show flashcards
       />
     );
   }

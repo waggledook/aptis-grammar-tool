@@ -9,7 +9,12 @@ const TOPIC_DATA = {
   // etc.
 };
 
-export default function TopicTrainer({ topic, onBack }) {
+export default function TopicTrainer({
+  topic,
+  onBack,
+  isAuthenticated = false,
+  onShowFlashcards,
+}) {
   const topicInfo = TOPIC_DATA[topic] || null;
 
   const [setIndex, setSetIndex] = useState(null);
@@ -271,21 +276,20 @@ function checkTypedAnswer() {
 
   return (
     <div className="topic-trainer game-wrapper fade-in">
-      {/* HEADER */}
-      <header className="header">
-  <h2 className="title" style={{ textTransform: "capitalize" }}>
-    {topic}
-    {activeSet ? ` • ${activeSet.title}` : ""}
-  </h2>
-  <p className="intro">
-    {activeSet
-      ? activeSet.focus
-      : "Choose a set below to start practising this topic."}
-  </p>
-</header>
+            <header className="header">
+        <h2 className="title" style={{ textTransform: "capitalize" }}>
+          {topic}
+          {activeSet ? ` • ${activeSet.title}` : ""}
+        </h2>
+        <p className="intro">
+          {activeSet
+            ? activeSet.focus
+            : "Choose a set below to start practising this topic."}
+        </p>
+      </header>
 
-            {/* SET SELECTOR */}
-            <div className="set-tabs">
+      {/* SET SELECTOR */}
+      <div className="set-tabs">
         <span className="set-label">Set:</span>
         <div className="set-pill-row">
           {topicInfo.sets.map((set, idx) => (
@@ -296,7 +300,7 @@ function checkTypedAnswer() {
               }
               onClick={() => {
                 setSetIndex(idx);
-                setHasChosenSet(true); // mark that the user has chosen a set
+                setHasChosenSet(true);
               }}
             >
               {set.title}
@@ -305,7 +309,7 @@ function checkTypedAnswer() {
         </div>
       </div>
 
-      {/* 🟦 If no set selected yet, show intro + set options */}
+      {/* If no set selected yet, show intro + big buttons */}
       {!hasChosenSet && (
         <div className="card set-select">
           <p className="phase-intro">
@@ -325,6 +329,21 @@ function checkTypedAnswer() {
               </button>
             ))}
           </div>
+        </div>
+      )}
+
+      {/* Flashcards CTA – now below the set chooser */}
+      {onShowFlashcards && (
+        <div className="flashcards-cta">
+          <button
+            className="flashcards-btn"
+            onClick={onShowFlashcards}
+          >
+            🃏 Flashcards for this topic
+          </button>
+          <p className="flashcards-sub">
+            Review all the words in this topic as simple flip cards.
+          </p>
         </div>
       )}
 
@@ -1114,6 +1133,39 @@ function checkTypedAnswer() {
           justify-content: center;
           flex-wrap: wrap;
           gap: 0.75rem;
+        }
+        .flashcards-cta {
+          margin-top: 0.5rem;
+          margin-bottom: 0.75rem;
+          text-align: center;
+        }
+
+        .flashcards-btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.4rem;
+          background: #101b32;
+          border-radius: 999px;
+          border: 1px solid #4a79d8;
+          padding: 0.45rem 1.3rem;
+          color: #e6f0ff;
+          font-weight: 600;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+        }
+
+        .flashcards-btn:hover {
+          background: #1f3560;
+          box-shadow: 0 0 6px rgba(98,137,255,0.4);
+          transform: translateY(-1px);
+        }
+
+        .flashcards-sub {
+          margin-top: 0.25rem;
+          font-size: 0.8rem;
+          color: #a9b7d1;
         }
 
 
