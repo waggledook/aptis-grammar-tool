@@ -1,11 +1,16 @@
 // src/components/ReadingMenu.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Seo from "./common/Seo.jsx";
 
 export default function ReadingMenu() {
   const navigate = useNavigate();
   return (
     <div className="reading-menu game-wrapper">
+      <Seo
+        title="Aptis Reading Practice | Seif Aptis Trainer"
+        description="Practise Aptis Reading tasks, including sentence order (Part 2) and matching opinions (Part 3), plus a strategy guide for Part 2."
+      />
       <header className="header">
         <h2 className="title">Reading Practice</h2>
         <p className="intro">

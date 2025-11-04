@@ -1,6 +1,8 @@
 // src/components/writing/WritingMenu.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Seo from "../common/Seo.jsx";
+
 
 export default function WritingMenu() {
   const navigate = useNavigate();
@@ -10,6 +12,10 @@ export default function WritingMenu() {
 
   return (
     <div className="writing-menu game-wrapper">
+      <Seo
+        title="Aptis Writing Practice | Seif Aptis Trainer"
+        description="Practise Aptis Writing Parts 1 and 4 with guides and full exam-style tasks, plus a complete mock writing test."
+      />
       <header className="header">
         <h2 className="title">Writing</h2>
         <p className="intro">

@@ -33,6 +33,7 @@ import ToastHost from './components/ToastHost';
 import Footer from "./components/common/Footer";
 import VocabularyTopics from "./components/vocabulary/VocabularyTopics";
 import TopicTrainer from "./components/vocabulary/TopicTrainer";
+import Seo from "./components/common/Seo.jsx";
 import './App.css'
 
 export default function App() {
@@ -111,6 +112,10 @@ useEffect(() => {
   function GrammarPage() {
     return (
       <>
+        <Seo
+        title="Aptis Grammar Practice | Seif Aptis Trainer"
+        description="Generate Aptis-style grammar gap-fill exercises by level and topic. Practise A2–C1 grammar and review your mistakes and favourites."
+      />
         <h1>Aptis Grammar Practice</h1>
 
         {tagsLoading && <p>Loading tags…</p>}

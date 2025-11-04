@@ -2,12 +2,17 @@ import React from "react";
 import { toast } from "../utils/toast"; // only needed if you pick Option B
 import UnderConstructionBadge from "./common/UnderConstructionBadge";
 import { useNavigate } from "react-router-dom";
+import Seo from "./common/Seo.jsx"; // adjust path if your folder structure differs
 
 
 export default function MainMenu({ onSelect }) {
   const navigate = useNavigate();
   return (
     <div className="menu-wrapper">
+      <Seo
+        title="Seif Aptis Trainer | Free Aptis Practice"
+        description="Practise Aptis grammar, reading, writing, speaking and vocabulary online. Exam-style tasks with tips, guides and progress tracking."
+      />
       <header
         className="main-header"
         style={{ textAlign: "center", marginBottom: "0rem" }}

@@ -4,12 +4,18 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "../../utils/toast";
 import UnderConstructionPanel from "../common/UnderConstructionPanel";
 import UnderConstructionBadge from "../common/UnderConstructionBadge";
+import Seo from "../common/Seo.jsx";
+
 
 export default function VocabularyMenu() {
   const navigate = useNavigate();
 
   return (
     <div className="vocab-menu game-wrapper">
+      <Seo
+        title="Aptis Vocabulary Practice | Seif Aptis Trainer"
+        description="Build vocabulary for Aptis through topic-based practice and upcoming synonym and collocation trainers."
+      />
       <header className="header">
         <h2 className="title">Vocabulary Practice</h2>
         <p className="intro">

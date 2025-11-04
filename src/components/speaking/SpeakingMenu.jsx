@@ -1,12 +1,18 @@
 // src/components/speaking/SpeakingMenu.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Seo from "../common/Seo.jsx";
+
 
 export default function SpeakingMenu() {
   const navigate = useNavigate();
 
   return (
     <div className="speaking-menu game-wrapper">
+      <Seo
+        title="Aptis Speaking Practice | Seif Aptis Trainer"
+        description="Practise all parts of the Aptis Speaking test: personal questions, photo description, compare & discuss, and a short presentation."
+      />
       <header className="header">
         <h2 className="title">Speaking</h2>
         <p className="intro">
