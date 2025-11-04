@@ -287,33 +287,36 @@ function checkTypedAnswer() {
         </p>
       </header>
 
-      {/* SET SELECTOR */}
-<div className="set-tabs">
-  <span className="set-label">Set:</span>
-  <div className="set-pill-row">
-    {topicInfo.sets.map((set, idx) => (
-      <button
-        key={set.id}
-        className={
-          "set-pill " +
-          (idx === setIndex ? "active" : "") +
-          (!isSignedIn && idx >= 2 ? " locked" : "")
-        }
-        onClick={() => {
-          // 🔒 guests only get first two sets
-          if (!isSignedIn && idx >= 2) {
-            toast("Sign in to unlock this set 🔒");
-            return;
-          }
-          setSetIndex(idx);
-          setHasChosenSet(true);
-        }}
-      >
-        {set.title}
-      </button>
-    ))}
-  </div>
-</div>
+            {/* Compact SET selector – only after a set is chosen */}
+            {hasChosenSet && (
+        <div className="set-tabs">
+          <span className="set-label">Set:</span>
+          <div className="set-pill-row">
+            {topicInfo.sets.map((set, idx) => (
+              <button
+                key={set.id}
+                className={
+                  "set-pill " +
+                  (idx === setIndex ? "active" : "") +
+                  (!isSignedIn && idx >= 2 ? " locked" : "")
+                }
+                onClick={() => {
+                  // 🔒 guests only get first two sets
+                  if (!isSignedIn && idx >= 2) {
+                    toast("Sign in to unlock this set 🔒");
+                    return;
+                  }
+                  setSetIndex(idx);
+                  setHasChosenSet(true);
+                }}
+              >
+                {set.title}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
 
 
       {/* If no set selected yet, show intro + big buttons */}
