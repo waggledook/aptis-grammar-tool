@@ -1,11 +1,14 @@
 // src/components/vocabulary/TopicTrainer.jsx
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { travelData } from "./data/travelData";
+import { workData } from "./data/workData"; 
 import { auth } from "../../firebase";
 import { toast } from "../../utils/toast";
 
 const TOPIC_DATA = {
-  travel: travelData
+  travel: travelData,
+  work: workData,
+  
   // work: workData,
   // health: healthData,
   // etc.

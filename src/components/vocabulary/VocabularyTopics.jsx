@@ -41,7 +41,7 @@ export default function VocabularyTopics({
 
   const topics = [
     { id: "travel", name: "Travel", emoji: "🧳", desc: "Transport, holidays, accommodation...", active: true },
-    { id: "work", name: "Work", emoji: "💼", desc: "Jobs, offices, responsibilities..." },
+    { id: "work",   name: "Work",   emoji: "💼", desc: "Jobs, offices, responsibilities...",  active: true }, // 👈 now active
     { id: "education", name: "Education", emoji: "🏫", desc: "School, university, exams..." },
     { id: "health", name: "Health", emoji: "🍎", desc: "Exercise, medicine, healthy living..." },
     { id: "technology", name: "Technology", emoji: "💻", desc: "Computers, gadgets, the internet..." },
@@ -59,7 +59,7 @@ export default function VocabularyTopics({
 
       <UnderConstructionPanel
         title="Topic practice in progress"
-        message="Right now only the Travel topic is available. More topics (Work, Education, Health, etc.) are on the way!"
+        message="Right now the Travel and Work topics are available. More topics (Education, Health, etc.) are on the way!"
       />
 
       <div className="cards">

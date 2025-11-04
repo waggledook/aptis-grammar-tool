@@ -1,6 +1,7 @@
 // src/components/vocabulary/TopicFlashcards.jsx
 import React, { useMemo, useState, useEffect } from "react";
 import { travelData } from "./data/travelData";
+import { workData } from "./data/workData";   // 👈 new
 
 function shuffleArray(array) {
     return [...array].sort(() => Math.random() - 0.5);
@@ -9,6 +10,7 @@ function shuffleArray(array) {
 // Add future topics here as you create them
 const TOPIC_DATA = {
   travel: travelData,
+  work: workData,
   // work: workData,
   // health: healthData,
 };
