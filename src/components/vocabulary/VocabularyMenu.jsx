@@ -1,9 +1,13 @@
+// src/components/vocabulary/VocabularyMenu.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "../../utils/toast";
 import UnderConstructionPanel from "../common/UnderConstructionPanel";
 import UnderConstructionBadge from "../common/UnderConstructionBadge";
 
-export default function VocabularyMenu({ onSelect, onBack }) {
+export default function VocabularyMenu() {
+  const navigate = useNavigate();
+
   return (
     <div className="vocab-menu game-wrapper">
       <header className="header">
@@ -14,31 +18,29 @@ export default function VocabularyMenu({ onSelect, onBack }) {
       </header>
 
       {/* 🛠 Big under-construction notice for the whole vocab area */}
-<UnderConstructionPanel
-  title="Vocabulary module in progress"
-  message="Right now you can practise topic-based vocabulary. Synonym and collocation trainers are on the way!"
-/>
+      <UnderConstructionPanel
+        title="Vocabulary module in progress"
+        message="Right now you can practise topic-based vocabulary. Synonym and collocation trainers are on the way!"
+      />
 
       <div className="cards">
         {/* 🧩 Topic Practice (active, but marked as in progress) */}
         <button
-  className="card menu-card"
-  onClick={() => onSelect("vocabTopics")}
->
-  <div className="menu-card-header">
-    <h3>Topic Practice</h3>
-    <span className="uc-top-wrapper">
-      <img
-        src="/images/ui/under-construction.png"
-        alt="Under construction"
-        className="uc-top-icon"
-      />
-    </span>
-  </div>
-  <p>Study words by theme (e.g. Travel, Education...).</p>
-</button>
-
-
+          className="card menu-card"
+          onClick={() => navigate("/vocabulary/topics")}
+        >
+          <div className="menu-card-header">
+            <h3>Topic Practice</h3>
+            <span className="uc-top-wrapper">
+              <img
+                src="/images/ui/under-construction.png"
+                alt="Under construction"
+                className="uc-top-icon"
+              />
+            </span>
+          </div>
+          <p>Study words by theme (e.g. Travel, Education...).</p>
+        </button>
 
         {/* 🔁 Synonym Trainer (coming soon) */}
         <button
@@ -49,7 +51,9 @@ export default function VocabularyMenu({ onSelect, onBack }) {
             <h3>Synonym Trainer</h3>
             <span className="soon-pill">Coming soon</span>
           </div>
-          <p>Learn subtle differences between similar words and expand your lexical range.</p>
+          <p>
+            Learn subtle differences between similar words and expand your lexical range.
+          </p>
         </button>
 
         {/* ⚙️ Collocation Trainer (coming soon) */}
@@ -67,7 +71,7 @@ export default function VocabularyMenu({ onSelect, onBack }) {
 
       <button
         className="topbar-btn"
-        onClick={onBack}
+        onClick={() => navigate("/")}
         style={{ marginTop: "1rem" }}
       >
         ← Back to main menu

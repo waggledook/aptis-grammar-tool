@@ -1,20 +1,26 @@
+// src/components/vocabulary/VocabularyTopics.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import TopicTrainer from "./TopicTrainer";
-import TopicFlashcards from "./TopicFlashcards"; // 👈 NEW
+import TopicFlashcards from "./TopicFlashcards";
 import { toast } from "../../utils/toast";
 import UnderConstructionPanel from "../common/UnderConstructionPanel";
 
-export default function VocabularyTopics({ onSelect, onBack, isAuthenticated = false }) {
+export default function VocabularyTopics({
+  onSelect,
+  onBack,
+  isAuthenticated = false,
+}) {
+  const navigate = useNavigate();
   const [selectedTopic, setSelectedTopic] = React.useState(null);
   const [topicView, setTopicView] = React.useState("practice");
 
   if (selectedTopic) {
-    // 🔁 When a topic is selected, switch between Practice vs Flashcards
     if (topicView === "flashcards") {
       return (
         <TopicFlashcards
           topic={selectedTopic}
-          onBack={() => setTopicView("practice")} // go back to practice view for this topic
+          onBack={() => setTopicView("practice")}
           isAuthenticated={isAuthenticated}
         />
       );
@@ -24,12 +30,11 @@ export default function VocabularyTopics({ onSelect, onBack, isAuthenticated = f
       <TopicTrainer
         topic={selectedTopic}
         onBack={() => {
-          // leaving the topic entirely: reset selection + view
           setSelectedTopic(null);
           setTopicView("practice");
         }}
         isAuthenticated={isAuthenticated}
-        onShowFlashcards={() => setTopicView("flashcards")} // 👈 tell parent to show flashcards
+        onShowFlashcards={() => setTopicView("flashcards")}
       />
     );
   }
@@ -52,7 +57,6 @@ export default function VocabularyTopics({ onSelect, onBack, isAuthenticated = f
         </p>
       </header>
 
-      {/* 🛠 Status panel for this section */}
       <UnderConstructionPanel
         title="Topic practice in progress"
         message="Right now only the Travel topic is available. More topics (Work, Education, Health, etc.) are on the way!"
@@ -82,7 +86,7 @@ export default function VocabularyTopics({ onSelect, onBack, isAuthenticated = f
 
       <button
         className="topbar-btn"
-        onClick={onBack}
+        onClick={() => navigate("/vocabulary")}
         style={{ marginTop: "1rem" }}
       >
         ← Back to Vocabulary Menu

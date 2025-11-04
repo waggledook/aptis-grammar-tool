@@ -1,9 +1,11 @@
 import React from "react";
 import { toast } from "../utils/toast"; // only needed if you pick Option B
 import UnderConstructionBadge from "./common/UnderConstructionBadge";
+import { useNavigate } from "react-router-dom";
 
 
 export default function MainMenu({ onSelect }) {
+  const navigate = useNavigate();
   return (
     <div className="menu-wrapper">
       <header
@@ -28,16 +30,16 @@ export default function MainMenu({ onSelect }) {
         </button>
 
         {/* Reading */}
-        <button className="menu-card" onClick={() => onSelect("readingMenu")}>
-          <h3>Reading Practice</h3>
-          <p>Practice tasks for all reading sections.</p>
-        </button>
+        <button className="menu-card" onClick={() => navigate("/reading")}>
+        <h3>Reading Practice</h3>
+        <p>Practice tasks for all reading sections.</p>
+      </button>
 
         {/* Speaking */}
-        <button className="menu-card" onClick={() => onSelect("speakingMenu")}>
-          <h3>Speaking Practice</h3>
-          <p>Practice tasks for all parts of the speaking exam.</p>
-        </button>
+<button className="menu-card" onClick={() => navigate("/speaking")}>
+  <h3>Speaking Practice</h3>
+  <p>Practice tasks for all parts of the speaking exam.</p>
+</button>
 
         {/* Writing */}
         <button className="menu-card" onClick={() => onSelect("writingMenu")}>
@@ -48,7 +50,7 @@ export default function MainMenu({ onSelect }) {
           </p>
         </button>
 
-        <button className="menu-card" onClick={() => onSelect("vocabularyMenu")}>
+        <button className="menu-card" onClick={() => navigate("/vocabulary")}>
   <div className="menu-card-header">
     <h3>Vocabulary Practice</h3>
     <span className="uc-top-wrapper">

@@ -1,7 +1,10 @@
 // src/components/speaking/SpeakingMenu.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function SpeakingMenu({ onSelect, onBack }) {
+export default function SpeakingMenu() {
+  const navigate = useNavigate();
+
   return (
     <div className="speaking-menu game-wrapper">
       <header className="header">
@@ -12,28 +15,28 @@ export default function SpeakingMenu({ onSelect, onBack }) {
       </header>
 
       <div className="cards">
-        <button className="card" onClick={() => onSelect('part1')}>
+        <button className="card" onClick={() => navigate("/speaking/part1")}>
           <h3>Part 1: Personal Questions</h3>
           <p>Practice answering 3 short personal questions.</p>
         </button>
 
-        <button className="card" onClick={() => onSelect('part2')}>
+        <button className="card" onClick={() => navigate("/speaking/part2")}>
           <h3>Part 2: Describe a Photograph</h3>
           <p>1 picture · 3 questions. Describe a photo and answer related questions.</p>
         </button>
 
-        <button className="card" onClick={() => onSelect('part3')}>
+        <button className="card" onClick={() => navigate("/speaking/part3")}>
           <h3>Part 3: Describe & Compare</h3>
           <p>Compare two photographs, and answer related questions.</p>
         </button>
 
-        <button className="card" onClick={() => onSelect('part4')}>
+        <button className="card" onClick={() => navigate("/speaking/part4")}>
           <h3>Part 4: Presentation & Discussion</h3>
           <p>1-minute prep, then a 2-minute talk answering 3 questions.</p>
         </button>
       </div>
 
-      {/* External mock test link */}
+      {/* External mock test link (unchanged) */}
       <div className="mock-test-link">
         <a
           href="https://aptis-gen.speaking1.beeskillsenglish.com/"
@@ -45,7 +48,12 @@ export default function SpeakingMenu({ onSelect, onBack }) {
         </a>
       </div>
 
-      <button className="topbar-btn" onClick={onBack} style={{ marginTop: '1rem' }}>
+      {/* Back to main menu via router */}
+      <button
+        className="topbar-btn"
+        onClick={() => navigate("/")}
+        style={{ marginTop: "1rem" }}
+      >
         ← Back to main menu
       </button>
 

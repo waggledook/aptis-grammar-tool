@@ -1,7 +1,9 @@
 // src/components/ReadingMenu.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function ReadingMenu({ onSelect, onBack }) {
+export default function ReadingMenu() {
+  const navigate = useNavigate();
   return (
     <div className="reading-menu game-wrapper">
       <header className="header">
@@ -14,38 +16,28 @@ export default function ReadingMenu({ onSelect, onBack }) {
 
       <div className="cards">
         {/* 🧩 Part 2: Sentence Order */}
-        <button
-          className="card"
-          onClick={() => onSelect("reading")}
-        >
+        <button className="card" onClick={() => navigate("/reading/part2")}>
           <h3>Part 2: Sentence Order</h3>
           <p>Reorder sentences to form a logical paragraph.</p>
         </button>
 
-{/* 📘 Part 2 Guide */}
-        <button
-          className="card"
-          onClick={() => onSelect("readingGuide")}
-        >
+        {/* 📘 Part 2 Guide */}
+        <button className="card" onClick={() => navigate("/reading/part2-guide")}>
           <h3>Part 2 Guide: Sentence Order</h3>
           <p>Learn how to spot cohesive clues and link ideas when reordering sentences.</p>
         </button>
-        
+
         {/* 🗣️ Part 3: Matching Opinions */}
-        <button
-          className="card"
-          onClick={() => onSelect("readingPart3")}
-        >
+        <button className="card" onClick={() => navigate("/reading/part3")}>
           <h3>Part 3: Matching Opinions</h3>
           <p>Read four short comments and decide who says what.</p>
         </button>
-
-        
       </div>
 
+      {/* Back to main menu */}
       <button
         className="topbar-btn"
-        onClick={onBack}
+        onClick={() => navigate("/")}
         style={{ marginTop: "1rem" }}
       >
         ← Back to main menu
