@@ -1,5 +1,4 @@
-import React, { useMemo, useState } from "react";
-
+import React, { useMemo, useState, useEffect } from "react";
 /**
  * ReadingGuide – Guided flow (clue reveal ➜ then reorder)
  * • Both guided tasks on a single page (no dropdown).
@@ -156,27 +155,37 @@ function ClueReveal({ sentence, revealed, onReveal }) {
   const tokens = useMemo(() => tokenize(sentence.text), [sentence.text]);
   const gold = sentence.clues?.idx || [];
 
+  // helper: is this token pure punctuation?
+  const isPunctuation = (tok) => /^[,.;:!?]$/.test(tok);
+
   return (
     <div className="clue-reveal">
       {/* Sentence with bold highlights */}
       <p className="srnt">
         {tokens.map((t, i) => {
           const isGold = revealed && gold.includes(i);
+          const needsSpaceBefore =
+            i > 0 && !isPunctuation(t); // space before non-punctuation tokens (except first)
+
           return (
-            <span
-              key={i}
-              className={isGold ? "tok gold" : "tok"}
-              style={isGold ? { fontWeight: "bold" } : {}}
-            >
-              {t}
-            </span>
+            <React.Fragment key={i}>
+              {needsSpaceBefore && " "}
+              <span
+                className={isGold ? "tok gold" : "tok"}
+                style={isGold ? { fontWeight: "bold" } : {}}
+              >
+                {t}
+              </span>
+            </React.Fragment>
           );
         })}
       </p>
 
       {/* Show button / Explanation */}
       {!revealed ? (
-        <button className="btn" onClick={onReveal}>Show clues</button>
+        <button className="btn" onClick={onReveal}>
+          Show clues
+        </button>
       ) : (
         <div className="explain">
           <p>{sentence.clues?.note}</p>
@@ -290,50 +299,99 @@ function GuidedTaskSection({ task }) {
 }
 
 export default function ReadingGuide(){
+  // Always start this page at the top
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo(0, 0);
+    }
+  }, []);
   return (
     <div className="reading-guide game-wrapper">
       <GuideStyle />
+      <div className="reading-guide-inner">
+        {/* 🌟 General description */}
+        <header className="intro-box">
+          <h2>Reading – Guided Reorder</h2>
+          <p>
+            In reading part 2, you have to put six sentences into the <strong>correct order</strong>, in two separate tasks.
+            There are different types of texts, such as <strong>instructions</strong>, <strong>reports</strong>,
+            <strong> biographies</strong>, or <strong>process descriptions</strong>.
+            Follow the steps below to complete the activities:
+          </p>
+          <ol className="steps">
+            <li>
+              <strong>Look for clues:</strong> Do you think the sentence belongs at the start, middle, or end of the text?
+              Are there any words or phrases that show connections with other sentences?
+            </li>
+            <li>
+              <strong>Reorder:</strong> Drag the sentences into the correct position.
+              The first sentence is done for you.
+            </li>
+          </ol>
+        </header>
 
-      {/* 🌟 General description */}
-      <header className="intro-box">
-        <h2>Reading – Guided Reorder</h2>
-        <p>
-          In reading part 2, you have to put six sentences into the <strong>correct order</strong>, in two separate tasks.
-          There are different types of texts, such as <strong>instructions</strong>, <strong>reports</strong>,
-          <strong> biographies</strong>, or <strong>process descriptions</strong>.
-          Follow the steps below to complete the activities:
-        </p>
-        <ol className="steps">
-          <li>
-            <strong>Look for clues:</strong> Do you think the sentence belongs at the start, middle, or end of the text?
-            Are there any words or phrases that show connections with other sentences?
-          </li>
-          <li>
-            <strong>Reorder:</strong> Drag the sentences into the correct position.
-            The first sentence is done for you.
-          </li>
-        </ol>
-      </header>
-
-      {/* 📝 Render ALL guided tasks */}
-      {TASKS.map(task => (
-        <GuidedTaskSection key={task.id} task={task} />
-      ))}
+        {/* 📝 Render ALL guided tasks */}
+        {TASKS.map(task => (
+          <GuidedTaskSection key={task.id} task={task} />
+        ))}
+      </div>
     </div>
   );
 }
+
 
 
 // --------------------------- Styles ---------------------------
 function GuideStyle(){
   return (
     <style>{`
-      .reading-guide { --ink:#e6f0ff; --muted:#a9b7d1; --panel:#13213b; --ok:#2fb67c; --bad:#e46c6c; }
-      .reading-guide { color: var(--ink); }
+      .reading-guide {
+        --ink:#e6f0ff;
+        --muted:#a9b7d1;
+        --panel:#13213b;
+        --ok:#2fb67c;
+        --bad:#e46c6c;
+
+        color: var(--ink);
+
+        /* 🔒 keep the guide inside the viewport */
+        width: 100%;
+        max-width: 100vw;
+        margin: 0 auto;
+        overflow-x: hidden;
+      }
+
+      /* All children respect the container width */
+      .reading-guide * {
+        box-sizing: border-box;
+        max-width: 100%;
+      }
+
+      .reading-guide-inner {
+        width: 100%;
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 0.9rem 1rem 1.5rem;
+      }
+
+      @media (max-width: 600px) {
+        .reading-guide-inner {
+          padding: 0.75rem 0.75rem 1.25rem;
+        }
+      }
+
       .reading-guide .title { margin:0 0 .25rem; font-size:1.4rem; }
       .reading-guide .muted { color: var(--muted); }
 
-      .task { background: var(--panel); border:1px solid #203258; border-radius:16px; padding:1rem; margin:1rem 0; }
+      /* make each task a card */
+      .task-block {
+        background: var(--panel);
+        border:1px solid #203258;
+        border-radius:16px;
+        padding:1rem;
+        margin:1rem 0;
+      }
+        
       .task-head { margin-bottom:.5rem; }
       .task-title { margin:0 0 .25rem; font-size:1.15rem; }
 
@@ -398,6 +456,7 @@ function GuideStyle(){
   color: #cfe1ff;
   font-size: .95rem;
 }
+
 
 
     `}</style>

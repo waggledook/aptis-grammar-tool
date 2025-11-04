@@ -402,6 +402,7 @@ useEffect(() => {
 {view === "vocabTopics" && (
   <VocabularyTopics
     onBack={() => setView("vocabularyMenu")}
+    isAuthenticated={!!user}   // 👈 tell it whether the user is signed in
   />
 )}
 

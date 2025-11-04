@@ -234,6 +234,165 @@ export const travelData = {
         "We say 'go sightseeing' to talk about visiting famous places and monuments in a city.",
         "You 'stay in a hotel / apartment / Airbnb' on holiday – we don't normally say 'sleep in a hotel' for the whole stay."
       ]
+    },
+    {
+      id: "destination_adjectives",
+      title: "Describing destinations",
+      focus: "Adjectives and phrases to describe places, landmarks, and travel destinations.",
+    
+      words: [
+        "picturesque",
+        "remote",
+        "historic",
+        "breathtaking",
+        "off the beaten track",
+        "touristy",
+        "overrated",
+        "lively",
+        "cosmopolitan",
+        "crowded",
+        "tacky"
+      ],
+    
+      pairs: [
+        {
+          term: "picturesque",
+          definition: "Very beautiful, especially in a quaint or charming way.",
+          image: "/images/vocab/travel/picturesque.png",
+          collocation: "a __________ village"
+        },
+        {
+          term: "remote",
+          definition: "Far away from towns or cities; isolated and difficult to reach.",
+          image: "/images/vocab/travel/remote.png",
+          collocation: "a __________ island"
+        },
+        {
+          term: "historic",
+          definition: "Important or famous in history.",
+          image: "/images/vocab/travel/historic.png",
+          collocation: "a __________ city centre"
+        },
+        {
+          term: "breathtaking",
+          definition: "Extremely beautiful or impressive.",
+          image: "/images/vocab/travel/breathtaking.png",
+          collocation: "a __________ view"
+        },
+        {
+          term: "off the beaten track",
+          definition: "Far from the usual tourist areas; not visited by many tourists.",
+          image: "/images/vocab/travel/off-the-beaten-path.png",
+          collocation: "somewhere __________"
+        },
+        {
+          term: "touristy",
+          definition:
+            "Very full of tourists, often with many souvenir shops and not very authentic.",
+          image: "/images/vocab/travel/touristy.png",
+          collocation: "a very __________ area"
+        },
+        {
+          term: "overrated",
+          definition: "Not as good as many people say or think.",
+          image: "/images/vocab/travel/overrrated.png", // match your file name
+          collocation: "an __________ tourist attraction"
+        },
+        {
+          term: "lively",
+          definition: "Full of activity, energy and fun.",
+          image: "/images/vocab/travel/lively.png",
+          collocation: "a __________ market"
+        },
+        {
+          term: "cosmopolitan",
+          definition:
+            "Having people from many different countries and cultures.",
+          image: "/images/vocab/travel/cosmopolitan.png",
+          collocation: "a __________ city"
+        },
+        {
+          term: "crowded",
+          definition: "Full of people, leaving very little space to move.",
+          image: "/images/vocab/travel/crowded.png",
+          collocation: "a very __________ train"
+        },
+        {
+          term: "tacky",
+          definition:
+            "Looking cheap and flashy in a way that is not in good taste.",
+          image: "/images/vocab/travel/tacky.png",
+          collocation: "__________ souvenirs"
+        }
+      ],
+    
+      distractors: ["peaceful", "noisy"],
+    
+      review: [
+        {
+          sentence:
+            "The village was so __________ that every street looked like a postcard.",
+          answer: "picturesque"
+        },
+        {
+          sentence:
+            "They stayed in a __________ cabin, hours away from the nearest town.",
+          answer: "remote"
+        },
+        {
+          sentence:
+            "We walked through the __________ city centre, full of old churches and monuments.",
+          answer: "historic"
+        },
+        {
+          sentence:
+            "The view from the top of the cliff was absolutely __________.",
+          answer: "breathtaking"
+        },
+        {
+          sentence:
+            "We found a little café __________, far from the busy tourist area.",
+          answer: "off the beaten track"
+        },
+        {
+          sentence:
+            "That square is so __________ now – just souvenir shops and tour groups everywhere.",
+          answer: "touristy"
+        },
+        {
+          sentence:
+            "People talk about that monument all the time, but honestly I think it’s __________.",
+          answer: "overrated"
+        },
+        {
+          sentence:
+            "The old town is really __________ in the evenings, with music and people in the streets.",
+          answer: "lively"
+        },
+        {
+          sentence:
+            "London is a very __________ city, with people from all over the world.",
+          answer: "cosmopolitan"
+        },
+        {
+          sentence:
+            "The metro was so __________ that we could hardly move.",
+          answer: "crowded"
+        },
+        {
+          sentence:
+            "The shop was full of __________ souvenirs like plastic keyrings and glittery magnets.",
+          answer: "tacky"
+        }
+      ],
+    
+      tips: [
+        "Use these adjectives to avoid repeating 'nice' or 'beautiful' when you describe places.",
+        "‘Touristy’ is often negative, while ‘popular’ is neutral.",
+        "‘Overrated’ means people say it’s great but you don’t agree.",
+        "‘Off the beaten track’ is a fixed phrase – don’t say *out of the beaten track*.",
+        "‘Tacky’ describes things that look cheap and in bad taste, often souvenirs."
+      ]
     }
   ]
 };

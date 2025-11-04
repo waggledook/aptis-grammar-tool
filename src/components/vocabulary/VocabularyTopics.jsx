@@ -4,12 +4,9 @@ import TopicFlashcards from "./TopicFlashcards"; // 👈 NEW
 import { toast } from "../../utils/toast";
 import UnderConstructionPanel from "../common/UnderConstructionPanel";
 
-export default function VocabularyTopics({ onSelect, onBack }) {
+export default function VocabularyTopics({ onSelect, onBack, isAuthenticated = false }) {
   const [selectedTopic, setSelectedTopic] = React.useState(null);
-  const [topicView, setTopicView] = React.useState("practice"); // 👈 NEW: "practice" | "flashcards"
-
-  // In future you can pass real auth info down:
-  const isAuthenticated = false; // or from props/context
+  const [topicView, setTopicView] = React.useState("practice");
 
   if (selectedTopic) {
     // 🔁 When a topic is selected, switch between Practice vs Flashcards

@@ -1,6 +1,8 @@
 // src/components/vocabulary/TopicTrainer.jsx
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { travelData } from "./data/travelData";
+import { auth } from "../../firebase";
+import { toast } from "../../utils/toast";
 
 const TOPIC_DATA = {
   travel: travelData
@@ -9,12 +11,9 @@ const TOPIC_DATA = {
   // etc.
 };
 
-export default function TopicTrainer({
-  topic,
-  onBack,
-  isAuthenticated = false,
-  onShowFlashcards,
-}) {
+export default function TopicTrainer({ topic, onBack, onShowFlashcards }) {
+  const user = auth.currentUser;
+  const isSignedIn = !!user;
   const topicInfo = TOPIC_DATA[topic] || null;
 
   const [setIndex, setSetIndex] = useState(null);
@@ -289,48 +288,63 @@ function checkTypedAnswer() {
       </header>
 
       {/* SET SELECTOR */}
-      <div className="set-tabs">
-        <span className="set-label">Set:</span>
-        <div className="set-pill-row">
-          {topicInfo.sets.map((set, idx) => (
-            <button
-              key={set.id}
-              className={
-                "set-pill " + (idx === setIndex ? "active" : "")
-              }
-              onClick={() => {
-                setSetIndex(idx);
-                setHasChosenSet(true);
-              }}
-            >
-              {set.title}
-            </button>
-          ))}
-        </div>
-      </div>
+<div className="set-tabs">
+  <span className="set-label">Set:</span>
+  <div className="set-pill-row">
+    {topicInfo.sets.map((set, idx) => (
+      <button
+        key={set.id}
+        className={
+          "set-pill " +
+          (idx === setIndex ? "active" : "") +
+          (!isSignedIn && idx >= 2 ? " locked" : "")
+        }
+        onClick={() => {
+          // 🔒 guests only get first two sets
+          if (!isSignedIn && idx >= 2) {
+            toast("Sign in to unlock this set 🔒");
+            return;
+          }
+          setSetIndex(idx);
+          setHasChosenSet(true);
+        }}
+      >
+        {set.title}
+      </button>
+    ))}
+  </div>
+</div>
+
 
       {/* If no set selected yet, show intro + big buttons */}
-      {!hasChosenSet && (
-        <div className="card set-select">
-          <p className="phase-intro">
-            Choose a topic set to begin practising this theme.
-          </p>
-          <div className="set-pill-row">
-            {topicInfo.sets.map((set, idx) => (
-              <button
-                key={set.id}
-                className="review-btn"
-                onClick={() => {
-                  setSetIndex(idx);
-                  setHasChosenSet(true);
-                }}
-              >
-                {set.title}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+{!hasChosenSet && (
+  <div className="card set-select">
+    <p className="phase-intro">
+      Choose a topic set to begin practising this theme.
+    </p>
+    <div className="set-pill-row">
+      {topicInfo.sets.map((set, idx) => (
+        <button
+          key={set.id}
+          className={
+            "review-btn" + (!isSignedIn && idx >= 2 ? " locked" : "")
+          }
+          onClick={() => {
+            if (!isSignedIn && idx >= 2) {
+              toast("Sign in to unlock this set 🔒");
+              return;
+            }
+            setSetIndex(idx);
+            setHasChosenSet(true);
+          }}
+          
+        >
+          {set.title}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
 
       {/* Flashcards CTA – now below the set chooser */}
       {onShowFlashcards && (
@@ -397,6 +411,12 @@ function checkTypedAnswer() {
     onClick={() => handleDefClick(item.definition)}
   >
     <img src={item.image} alt={item.term} className="thumb" />
+
+    {item.collocation && (
+    <span className="collocation-hint">
+      {item.collocation}
+    </span>
+  )}
 
     {/* in-tile info button */}
     <span
@@ -1167,6 +1187,24 @@ function checkTypedAnswer() {
           font-size: 0.8rem;
           color: #a9b7d1;
         }
+.collocation-hint {
+          display: block;
+          margin-top: 0.35rem;
+          font-size: 0.75rem;
+          color: #b7c3e6;
+          text-align: center;
+          pointer-events: none; /* don’t block clicks on the tile */
+          line-height: 1.2;
+        }
+
+        .tile.done .collocation-hint {
+          color: #d7f4df;
+        }
+        .set-pill.locked,
+.review-btn.locked {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
 
 
