@@ -24,10 +24,10 @@ export default function MainMenu({ onSelect }) {
 
       <div className="menu-grid">
         {/* Grammar */}
-        <button className="menu-card" onClick={() => onSelect("grammar")}>
-          <h3>Grammar Practice</h3>
-          <p>Gap-fills by level & tag (A2–C1). Track mistakes & favourites.</p>
-        </button>
+<button className="menu-card" onClick={() => navigate("/grammar")}>
+  <h3>Grammar Practice</h3>
+  <p>Gap-fills by level & tag (A2–C1). Track mistakes & favourites.</p>
+</button>
 
         {/* Reading */}
         <button className="menu-card" onClick={() => navigate("/reading")}>
@@ -42,13 +42,13 @@ export default function MainMenu({ onSelect }) {
 </button>
 
         {/* Writing */}
-        <button className="menu-card" onClick={() => onSelect("writingMenu")}>
-          <h3>Writing Practice</h3>
-          <p>
-            Practise all parts of the Aptis Writing test, from short answers to
-            full emails.
-          </p>
-        </button>
+<button className="menu-card" onClick={() => navigate("/writing")}>
+  <h3>Writing Practice</h3>
+  <p>
+    Practise all parts of the Aptis Writing test, from short answers to
+    full emails.
+  </p>
+</button>
 
         <button className="menu-card" onClick={() => navigate("/vocabulary")}>
   <div className="menu-card-header">
@@ -77,10 +77,10 @@ export default function MainMenu({ onSelect }) {
 </button>
 
         {/* Profile */}
-        <button className="menu-card" onClick={() => onSelect("profile")}>
-          <h3>My Profile</h3>
-          <p>See your progress and review saved work.</p>
-        </button>
+<button className="menu-card" onClick={() => navigate("/profile")}>
+  <h3>My Profile</h3>
+  <p>See your progress and review saved work.</p>
+</button>
       </div>
 
       <style>{`

@@ -107,6 +107,111 @@ useEffect(() => {
     return <AuthForm onSuccess={() => setShowAuth(false)} />
   }
 
+  // 👇 Add this INSIDE App, before the `return`
+  function GrammarPage() {
+    return (
+      <>
+        <h1>Aptis Grammar Practice</h1>
+
+        {tagsLoading && <p>Loading tags…</p>}
+        {tagsError && <p className="error-text">Error loading tags.</p>}
+
+        {!tagsLoading && !tagsError && (
+          <FilterPanel
+            levels={levels}
+            onLevelsChange={setLevels}
+            tag={tag}
+            onTagChange={setTag}
+            allTags={allTags}
+          />
+        )}
+
+        <div
+          className="count-row"
+          role="group"
+          aria-label="Number of questions"
+        >
+          {[5, 10, 15].map((n) => (
+            <button
+              key={n}
+              type="button"
+              className={`count-chip ${count === n ? "selected" : ""}`}
+              onClick={() => setCount(n)}
+              aria-pressed={count === n}
+            >
+              {n}
+            </button>
+          ))}
+          <span className="count-label">questions</span>
+        </div>
+
+        <div className="btn-row">
+          <button
+            className="generate-btn"
+            onClick={generate}
+            disabled={loading || tagsLoading}
+          >
+            {loading ? "Loading…" : "Generate Exercises"}
+          </button>
+
+          {user && (
+            <>
+              <button
+                className="review-btn mistakes"
+                onClick={() => navigate("/profile/mistakes")}
+              >
+                Review Mistakes
+              </button>
+              <button
+                className="review-btn favourites"
+                onClick={() => navigate("/profile/favourites")}
+              >
+                Review Favourites
+              </button>
+            </>
+          )}
+        </div>
+
+        {error && <p className="error-text">{error}</p>}
+
+        {!error && (
+          <>
+            <GapFillList
+              key={runKey}
+              items={items}
+              onAnswer={() => setAnsweredCount((c) => c + 1)}
+            />
+            <ProgressTracker
+              answered={answeredCount}
+              total={items.length}
+            />
+
+            {items.length > 0 && (
+              <div className="exercise-footer">
+                <button
+                  type="button"
+                  className="review-btn"
+                  onClick={newSetSameSettings}
+                  disabled={loading || tagsLoading}
+                >
+                  Replay
+                </button>
+                <button
+                  type="button"
+                  className="ghost-btn"
+                  onClick={clearExercises}
+                  disabled={loading}
+                >
+                  Clear page
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </>
+    );
+  }
+
   // — RENDER MAIN APP —
   return (
     // in src/App.jsx (inside your App component’s return)
@@ -143,20 +248,15 @@ useEffect(() => {
       </button>
 
       <button
-        onClick={() => {
-          // keep old view logic for non-routed bits
-          setView("profile");
-          // and give Profile its own URL
-          navigate("/profile");
-        }}
-        className="profile-badge-btn"
-        aria-label="Open profile"
-        title={user.email || "My Profile"}
-      >
-        <span className="avatar">
-          {((user.displayName || user.email || "U")[0] || "U").toUpperCase()}
-        </span>
-      </button>
+  onClick={() => navigate("/profile")}
+  className="profile-badge-btn"
+  aria-label="Open profile"
+  title={user.email || "My Profile"}
+>
+  <span className="avatar">
+    {((user.displayName || user.email || "U")[0] || "U").toUpperCase()}
+  </span>
+</button>
     </>
   ) : (
     <button onClick={() => setShowAuth(true)} className="topbar-btn">
@@ -167,6 +267,10 @@ useEffect(() => {
 
    {/* ————— Show the right “page” ————— */}
 <Routes>
+
+  {/* ——— Grammar route ——— */}
+  <Route path="/grammar" element={<GrammarPage />} />
+
 {/* Reading routes */}
 <Route path="/reading" element={<ReadingMenu />} />
 <Route path="/reading/part2" element={
@@ -284,6 +388,156 @@ useEffect(() => {
     element={<VocabularyTopics isAuthenticated={!!user} />}
   />
 
+{/* ——— Writing routes ——— */}
+<Route path="/writing" element={<WritingMenu />} />
+
+<Route
+  path="/writing/part1"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/writing")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back
+      </button>
+      <WritingPart1
+        user={user}
+        onBack={() => navigate("/writing")}
+      />
+    </>
+  }
+/>
+
+<Route
+  path="/writing/part1-guide"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/writing")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back
+      </button>
+      <WritingPart1Guide
+        user={user}
+        onBack={() => navigate("/writing")}
+        onStartPractice={() => navigate("/writing/part1")}
+      />
+    </>
+  }
+/>
+
+<Route
+  path="/writing/part4"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/writing")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back
+      </button>
+      <WritingPart4Emails
+        user={user}
+        onBack={() => navigate("/writing")}
+      />
+    </>
+  }
+/>
+
+<Route
+  path="/writing/part4-guide"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/writing")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back
+      </button>
+      <WritingPart4Guide
+        onBack={() => navigate("/writing")}
+        onOpen={(slug) => {
+          if (slug === "register") return navigate("/writing/part4-register");
+          if (slug === "practice") return navigate("/writing/part4");
+          // fallback for any future slugs
+          navigate(`/writing/p4-${slug}`);
+        }}
+      />
+    </>
+  }
+/>
+
+<Route
+  path="/writing/part4-register"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/writing/part4-guide")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back
+      </button>
+      <WritingPart4RegisterGuide
+        onBack={() => navigate("/writing/part4-guide")}
+        onStartPractice={() => navigate("/writing/part4")}
+      />
+    </>
+  }
+/>
+
+{/* ——— Profile routes ——— */}
+<Route
+  path="/profile"
+  element={
+    <Profile
+      user={user}
+      onBack={() => navigate("/")}
+      onGoMistakes={() => navigate("/profile/mistakes")}
+      onGoFavourites={() => navigate("/profile/favourites")}
+    />
+  }
+/>
+
+<Route
+  path="/profile/mistakes"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/profile")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back to profile
+      </button>
+      <ReviewMistakes />
+    </>
+  }
+/>
+
+<Route
+  path="/profile/favourites"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/profile")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back to profile
+      </button>
+      <ReviewFavourites />
+    </>
+  }
+/>
+
+
   <Route
     path="/*"
     element={
@@ -292,100 +546,7 @@ useEffect(() => {
           <MainMenu onSelect={(next) => setView(next)} />
         )}
 
-        {view === 'grammar' && (
-          <>
-            <h1>Aptis Grammar Practice</h1>
-
-            {tagsLoading && <p>Loading tags…</p>}
-            {tagsError   && <p className="error-text">Error loading tags.</p>}
-
-            {!tagsLoading && !tagsError && (
-              <FilterPanel
-                levels={levels}
-                onLevelsChange={setLevels}
-                tag={tag}
-                onTagChange={setTag}
-                allTags={allTags}
-              />
-            )}
-
-            <div className="count-row" role="group" aria-label="Number of questions">
-              {[5, 10, 15].map(n => (
-                <button
-                  key={n}
-                  type="button"
-                  className={`count-chip ${count === n ? 'selected' : ''}`}
-                  onClick={() => setCount(n)}
-                  aria-pressed={count === n}
-                >
-                  {n}
-                </button>
-              ))}
-              <span className="count-label">questions</span>
-            </div>
-
-            <div className="btn-row">
-              <button
-                className="generate-btn"
-                onClick={generate}
-                disabled={loading || tagsLoading}
-              >
-                {loading ? 'Loading…' : 'Generate Exercises'}
-              </button>
-
-              {user && (
-                <>
-                  <button
-                    className="review-btn mistakes"
-                    onClick={() => setView('mistakes')}
-                  >
-                    Review Mistakes
-                  </button>
-                  <button
-                    className="review-btn favourites"
-                    onClick={() => setView('favourites')}
-                  >
-                    Review Favourites
-                  </button>
-                </>
-              )}
-            </div>
-
-            {error && <p className="error-text">{error}</p>}
-
-            {!error && (
-              <>
-                <GapFillList
-                  key={runKey}
-                  items={items}
-                  onAnswer={() => setAnsweredCount(c => c + 1)}
-                />
-                <ProgressTracker answered={answeredCount} total={items.length} />
-
-                {items.length > 0 && (
-                  <div className="exercise-footer">
-                    <button
-                      type="button"
-                      className="review-btn"
-                      onClick={newSetSameSettings}
-                      disabled={loading || tagsLoading}
-                    >
-                      Replay
-                    </button>
-                    <button
-                      type="button"
-                      className="ghost-btn"
-                      onClick={clearExercises}
-                      disabled={loading}
-                    >
-                      Clear page
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-          </>
-        )}
+        {view === 'grammar' && <GrammarPage />}
 
         {view === 'mistakes' && (
           <>

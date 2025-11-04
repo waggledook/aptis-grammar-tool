@@ -1,7 +1,9 @@
 // src/components/writing/WritingMenu.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-export default function WritingMenu({ onSelect, onBack }) {
+export default function WritingMenu() {
+  const navigate = useNavigate();
   function comingSoon() {
     alert("Coming soon! Parts 2–4 will be available shortly.");
   }
@@ -16,12 +18,12 @@ export default function WritingMenu({ onSelect, onBack }) {
       </header>
 
       <div className="cards">
-        <button className="card" onClick={() => onSelect("part1")}>
+      <button className="card" onClick={() => navigate("/writing/part1")}>
           <h3>Part 1: Word-level writing</h3>
           <p>Answer 5 short messages with single words or short phrases. Fast and focused.</p>
         </button>
 
-        <button className="card" onClick={() => onSelect("part1Guide")}>
+        <button className="card" onClick={() => navigate("/writing/part1-guide")}>
   <h3>Part 1 Guide</h3>
   <p>How to write effective 1–5 word answers, with mini-practice.</p>
 </button>
@@ -38,7 +40,7 @@ export default function WritingMenu({ onSelect, onBack }) {
 
         <button
     className="card"
-    onClick={() => onSelect("part4Guide")}
+    onClick={() => navigate("/writing/part4-guide")}
   >
     <h3>Part 4 Guide</h3>
     <p>Understand the task and explore Register, Structure, Language, and more.</p>
@@ -46,7 +48,7 @@ export default function WritingMenu({ onSelect, onBack }) {
 
         <button
   className="card"
-  onClick={() => onSelect("part4")}
+  onClick={() => navigate("/writing/part4")}
 >
   <h3>Part 4: Emails</h3>
   <p>Write two emails: an informal one (40–50 words) and a formal one (120–150 words).</p>
@@ -68,7 +70,11 @@ export default function WritingMenu({ onSelect, onBack }) {
 </div>
 
 
-      <button className="topbar-btn" onClick={onBack} style={{ marginTop: "1rem" }}>
+<button
+  className="topbar-btn"
+  onClick={() => navigate("/")}
+  style={{ marginTop: "1rem" }}
+>
         ← Back to main menu
       </button>
 
