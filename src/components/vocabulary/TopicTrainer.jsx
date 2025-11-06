@@ -62,36 +62,26 @@ const rightItems = useMemo(() => {
   return shuffle(allTerms);
 }, [activeSet]);
 
-function handleDefClick(defText) {
-  if (matchedDefs.includes(defText)) return;
-  setSelectedDef(defText);
-  setFeedbackFlash(null);
-}
+function tryMatch(defText, term) {
+  if (!activeSet) return;
 
-function handleTermClick(term) {
-  if (matchedTerms.includes(term)) return;
-  if (!selectedDef) {
-    setSelectedTerm(term);
-    return;
-  }
+  const pair = activeSet.pairs.find((p) => p.definition === defText);
 
-  // Try to match immediately
-  const pair = activeSet.pairs.find((p) => p.definition === selectedDef);
   if (pair && pair.term === term) {
     // ✅ correct
     setMatchedTerms((prev) => [...prev, term]);
-    setMatchedDefs((prev) => [...prev, selectedDef]);
+    setMatchedDefs((prev) => [...prev, defText]);
     setSelectedDef(null);
     setSelectedTerm(null);
     setFeedbackFlash("correct");
-  
+
     // pulse both sides
-    setPulseItems({ def: selectedDef, term });
+    setPulseItems({ def: defText, term });
     setTimeout(() => setPulseItems({ def: null, term: null }), 500);
   } else {
     // ❌ wrong
     setFeedbackFlash("wrong");
-    setShakeDef(selectedDef);
+    setShakeDef(defText);
     setShakeTerm(term);
     setTimeout(() => {
       setShakeDef(null);
@@ -101,6 +91,35 @@ function handleTermClick(term) {
     setSelectedTerm(null);
   }
 }
+
+function handleDefClick(defText) {
+  if (matchedDefs.includes(defText)) return;
+  setFeedbackFlash(null);
+
+  // If a term is already selected, try to match now
+  if (selectedTerm) {
+    tryMatch(defText, selectedTerm);
+  } else {
+    // Otherwise just select this definition
+    setSelectedDef(defText);
+    setSelectedTerm(null);
+  }
+}
+
+function handleTermClick(term) {
+  if (matchedTerms.includes(term)) return;
+  setFeedbackFlash(null);
+
+  // If a definition is already selected, try to match now
+  if (selectedDef) {
+    tryMatch(selectedDef, term);
+  } else {
+    // Otherwise just select this term
+    setSelectedTerm(term);
+    setSelectedDef(null);
+  }
+}
+
 
 const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
 
@@ -389,9 +408,9 @@ function checkTypedAnswer() {
       {hasChosenSet && phase === "match" && (
   <div className="card match-phase">
     <p className="phase-intro">
-      Match each definition (left) with the correct word or phrase (right). Some words on the right
-      are extra and do not have a match.
-    </p>
+  Match each picture/definition on the left with the correct word or phrase on the right. 
+  Some words on the right are extra and do not have a match. Tap the small “i” on a picture card to see a short definition.
+</p>
 
     <div className="match-columns">
       {/* LEFT: DEFINITIONS */}
@@ -1018,19 +1037,27 @@ function checkTypedAnswer() {
 @media (max-width:600px){
   .thumb { width: 40px; height: 40px; }
 }
+/* Slight zoom for picture clues on hover / tap */
+.tile:hover .thumb,
+.tile:active .thumb {
+  transform: scale(1.75);
+}
 
 /* In-tile info button (top-right) */
 .info-dot {
   position: absolute;
   top: 4px; right: 4px;
-  width: 18px; height: 18px;
-  font-size: 11px;
-  display: grid; place-items: center;
+  width: 22px;
+  height: 22px;
+  font-size: 13px;
+  display: grid;
+  place-items: center;
   font-weight: 700;
   color: #0f1220;
   background: #ffcf40;
   border-radius: 999px;
   box-shadow: 0 1px 0 rgba(0,0,0,.25);
+  cursor: pointer;
 }
 .tile.done .info-dot { background:#ffe077; }
 

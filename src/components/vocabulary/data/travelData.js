@@ -295,7 +295,7 @@ export const travelData = {
         {
           term: "overrated",
           definition: "Not as good as many people say or think.",
-          image: "/images/vocab/travel/overrrated.png", // match your file name
+          image: "/images/vocab/travel/overrated.png", // match your file name
           collocation: "an __________ tourist attraction"
         },
         {

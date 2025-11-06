@@ -312,7 +312,351 @@ export const workData = {
           "Notice the stress: 'IT techNIcian' (NI), 'electrician' (CIAN).",
           "A 'designer' can be many types (fashion designer, web designer, graphic designer) – the second word explains the field."
         ]
-      }      
+      },
+      {
+        id: "work_verbs",
+        title: "Verb phrases about work",
+        focus: "Actions related to getting, doing or leaving a job.",
+      
+        words: [
+            "apply for",
+            "get promoted",
+            "work overtime",
+            "earn",
+            "take off",
+            "have an interview",
+            "get fired / be sacked",
+            "retire",
+            "set up",
+            "work from home",
+            "do shift",
+            "deal with"
+          ],
+          
+          pairs: [
+            {
+              term: "apply for",
+              definition:
+                "Send your CV or application form to ask to be considered for a position.",
+              image: "/images/vocab/work/apply-for-a-job.png",
+              collocation: "to __________ a job"
+            },
+            {
+              term: "get promoted",
+              definition:
+                "Move to a higher position in your company, often with more responsibility.",
+              image: "/images/vocab/work/get-promoted.png",
+              collocation: "to __________ to manager"
+            },
+            {
+              term: "work overtime",
+              definition:
+                "Work longer than your normal hours, often in the evening or at the weekend.",
+              image: "/images/vocab/work/work-overtime.png",
+              collocation: "to __________ at the weekend"
+            },
+            {
+              term: "earn",
+              definition:
+                "Receive money for the work you do or the service you provide.",
+              image: "/images/vocab/work/earn-a-living.png",
+              collocation: "to __________ a living/good salary"
+            },
+            {
+              term: "take off",
+              definition:
+                "Not go to work for a period of time, usually one day or more.",
+              image: "/images/vocab/work/take-a-day-off.png",
+              collocation: "to __________ a few days"
+            },
+            {
+              term: "have an interview",
+              definition:
+                "Meet with an employer to answer questions before you get a job.",
+              image: "/images/vocab/work/have-an-interview.png",
+              collocation: "to __________ for a job"
+            },
+            {
+              term: "get fired / be sacked",
+              definition:
+                "Lose your job because your boss tells you to leave.",
+              image: "/images/vocab/work/get-fired.png",
+              collocation: "to __________ from your job"
+            },
+            {
+              term: "retire",
+              definition:
+                "Stop working permanently, usually when you are older.",
+              image: "/images/vocab/work/retire.png",
+              collocation: "to __________ at 65"
+            },
+            {
+              term: "set up",
+              definition:
+                "Start or create something new, especially a company or project.",
+              image: "/images/vocab/work/set-up-a-business.png",
+              collocation: "to __________ a business"
+            },
+            {
+              term: "work from home",
+              definition:
+                "Do your job from your house instead of going to the office.",
+              image: "/images/vocab/work/work-from-home.png",
+              collocation: "to __________ three days a week"
+            },
+            {
+              term: "do shift",
+              definition:
+                "Work in a pattern where you have different times, such as day and night work.",
+              image: "/images/vocab/work/do-shift-work.png",
+              collocation: "to __________ work at night"
+            },
+            {
+              term: "deal with",
+              definition:
+                "Talk to, help or manage people or problems as part of your job.",
+              image: "/images/vocab/work/deal-with-customers.png",
+              collocation: "to __________ customers"
+            }
+          ],
+          
+          distractors: ["go on strike", "be off work"],
+          
+          review: [
+            {
+              sentence:
+                "She decided to __________ a programming job abroad.",
+              answer: "apply for"
+            },
+            {
+              sentence:
+                "After two years he finally managed to __________.",
+              answer: "get promoted"
+            },
+            {
+              sentence:
+                "We often have to __________ at the end of the month to finish all the reports.",
+              answer: "work overtime"
+            },
+            {
+              sentence:
+                "He doesn’t __________ very much, but it is enough to pay the rent.",
+              answer: "earn"
+            },
+            {
+              sentence:
+                "I’m going to __________ a day next week so I can visit my parents.",
+              answer: "take off"
+            },
+            {
+              sentence:
+                "You normally have to __________ before a company offers you the job.",
+              answer: "have an interview"
+            },
+            {
+              sentence:
+                "He was always late for work, so he finally __________ last week.",
+              answer: "get fired / be sacked / got fired"
+            },
+            {
+              sentence:
+                "My grandfather plans to __________ next year after working for the bank for forty years.",
+              answer: "retire"
+            },
+            {
+              sentence:
+                "She wants to __________ her own online shop.",
+              answer: "set up"
+            },
+            {
+              sentence:
+                "Many office workers now __________ three days a week.",
+              answer: "work from home"
+            },
+            {
+              sentence:
+                "Nurses often __________ work at night or very early in the morning.",
+              answer: "do shift"
+            },
+            {
+              sentence:
+                "In my job I __________ customers all day, so I need to be patient.",
+              answer: "deal with"
+            }
+          ],
+      
+        tips: [
+          "We usually say 'apply for a job/position',but 'apply to a position/company'.",
+          "Use 'earn' with money: 'earn a living', 'earn a good salary' – not *win money from your job*.",
+          "Compare 'get promoted' (a better position) with 'get a raise' (more money)."
+        ]
+      },
+      {
+        id: "work_adjectives",
+        title: "Adjectives to describe work",
+        focus: "Adjectives to describe types and qualities of jobs.",
+      
+        words: [
+          "full-time",
+          "part-time",
+          "temporary",
+          "permanent",
+          "well-paid",
+          "badly-paid",
+          "rewarding",
+          "challenging",
+          "stressful",
+          "boring",
+          "self-employed",
+          "unemployed"
+        ],
+      
+        pairs: [
+          {
+            term: "full-time",
+            definition:
+              "Working the whole week, usually around 35–40 hours.",
+            image: "/images/vocab/work/full-time.png"
+          },
+          {
+            term: "part-time",
+            definition:
+              "Working only part of the week or day, not all the hours of a full job.",
+            image: "/images/vocab/work/part-time.png"
+          },
+          {
+            term: "temporary",
+            definition:
+              "Lasting only for a short period, not forever.",
+            image: "/images/vocab/work/temporary.png"
+          },
+          {
+            term: "permanent",
+            definition:
+              "Continuing for a long time, with no fixed end date.",
+            image: "/images/vocab/work/permanent.png"
+          },
+          {
+            term: "well-paid",
+            definition:
+              "Giving you a lot of money compared to other jobs.",
+            image: "/images/vocab/work/well-paid.png"
+          },
+          {
+            term: "badly-paid",
+            definition:
+              "Not giving you much money for the work you do.",
+            image: "/images/vocab/work/badly-paid.png"
+          },
+          {
+            term: "rewarding",
+            definition:
+              "Making you feel good because the work is helpful or important.",
+            image: "/images/vocab/work/rewarding.png"
+          },
+          {
+            term: "challenging",
+            definition:
+              "Difficult in a good way and makes you use your skills.",
+            image: "/images/vocab/work/challenging.png"
+          },
+          {
+            term: "stressful",
+            definition:
+              "Making you feel worried, tired or under a lot of pressure.",
+            image: "/images/vocab/work/stressful.png"
+          },
+          {
+            term: "demanding",
+            definition:
+              "Requiring a lot of effort, energy or skill; difficult but not necessarily negative.",
+            image: "/images/vocab/work/demanding.png"
+          },          
+          {
+            term: "self-employed",
+            definition:
+              "Working for yourself and not for a company or boss.",
+            image: "/images/vocab/work/self-employed.png"
+          },
+          {
+            term: "unemployed",
+            definition:
+              "Not having a job, but usually looking for one.",
+            image: "/images/vocab/work/unemployed.png"
+          }
+        ],
+      
+        distractors: ["repetitive", "flexible"],
+      
+        review: [
+          {
+            sentence:
+              "She has a __________ job at the hospital; she works 40 hours a week.",
+            answer: "full-time"
+          },
+          {
+            sentence:
+              "I’m a student, so I only have a __________ job in a café at weekends.",
+            answer: "part-time"
+          },
+          {
+            sentence:
+              "He got a __________ contract for the summer holidays.",
+            answer: "temporary"
+          },
+          {
+            sentence:
+              "After my trial period the company offered me a __________ position.",
+            answer: "permanent"
+          },
+          {
+            sentence:
+              "Working as a lawyer is usually quite __________, but the hours are long.",
+            answer: "well-paid"
+          },
+          {
+            sentence:
+              "Unfortunately many service jobs are __________ and people struggle to save money.",
+            answer: "badly-paid"
+          },
+          {
+            sentence:
+              "Teaching can be very __________ when you see your students improve.",
+            answer: "rewarding"
+          },
+          {
+            sentence:
+              "The new project is really __________, but I’m learning a lot.",
+            answer: "challenging"
+          },
+          {
+            sentence:
+              "Working in the emergency room is extremely __________.",
+            answer: "stressful"
+          },
+          {
+            sentence:
+              "Being a doctor can be very __________ because you work long hours and need to make quick decisions.",
+            answer: "demanding"
+          },
+          {
+            sentence:
+              "My sister is __________; she runs her own online shop from home.",
+            answer: "self-employed"
+          },
+          {
+            sentence:
+              "He has been __________ for six months but is applying for lots of jobs.",
+            answer: "unemployed"
+          }
+        ],
+      
+        tips: [
+          "We often say 'a full-time job' / 'a part-time job', and 'work full-time / part-time'.",
+          "'Challenging' and 'demanding' are similar, but 'challenging' is more positive.",
+          "'Self-employed' and 'freelance' are a little different: 'self-employed' means you run your own business, while 'freelance' means you work for different companies on separate projects."
+        ]
+      }            
     ]
   };
   
