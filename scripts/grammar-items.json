@@ -745,7 +745,7 @@
     },
       {
         "id": "a1_art_01",
-        "level": "A1",
+        "level": "A2",
         "tag": "Articles",
         "sentence": "He’s eating ___ apple.",
         "options": ["a", "the", "an"],
@@ -3651,6 +3651,305 @@
           "Correct: Plural subject + past tense → 'were'. Reported form of 'they are'.",
           "Incorrect: 'is' is not backshifted, and doesn't agree with 'they'.",
           "Incorrect: 'was' mismatches plural 'they'."
+        ]
+      },
+      {
+        "id": "b2_link_15",
+        "level": "B2",
+        "tag": "Linkers",
+        "sentence": "We saw the cathedral and the museum. ___, we also went on a boat tour along the river.",
+        "options": ["what’s more", "as well as", "too"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'what’s more' introduces an additional idea at sentence level — it’s natural and cohesive here.",
+          "Incorrect: 'as well as' joins phrases within a single clause, not two independent sentences.",
+          "Incorrect: 'too' usually appears at the end of a clause, not at the beginning, so it’s grammatically wrong in this position."
+        ]
+      },
+      {
+        "id": "b2_link_16",
+        "level": "B2",
+        "tag": "Linkers",
+        "sentence": "The film was dull and far too long. ___, the acting was surprisingly weak.",
+        "options": ["Moreover", "As well as", "Even so"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Moreover' adds an additional, supporting negative point — typical of written formal discourse.",
+          "Incorrect: 'As well as' would need to join two verb phrases within one clause, not start a new sentence.",
+          "Incorrect: 'Even so' introduces contrast, not addition."
+        ]
+      },
+      {
+        "id": "b2_link_17",
+        "level": "B2",
+        "tag": "Linkers",
+        "sentence": "The snow had stopped falling. ___, the roads were still dangerous to drive on.",
+        "options": ["Even so", "Even though", "In contrast"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Even so' introduces an unexpected contrast, and is a sentence connector.",
+          "Incorrect: 'Even though' is a subordinating conjunction that must connect two clauses: 'Even though the snow had stopped...'.",
+          "Incorrect: 'In contrast' compares two broader facts, not expectation vs reality. This sentence expresses a surprising contrast."
+        ]
+      },
+      {
+        "id": "b2_link_18",
+        "level": "B2",
+        "tag": "Linkers",
+        "sentence": "___ being twins, they have completely different personalities.",
+        "options": ["Despite", "Although", "Even though"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Despite' (preposition) + gerund phrase ('being twins') is the correct form. despite can be followed by a noun, pronoun, or -ing form.",
+          "Incorrect: 'Although' must be followed by a full clause, not a gerund. So, 'Although they are twins' would be correct.",
+          "Incorrect: 'Even though'm like 'although', also requires a clause, not a noun/-ing phrase."
+        ]
+      },
+      {
+        "id": "c1_link_24",
+        "level": "C1",
+        "tag": "Linkers",
+        "sentence": "Our dining room is a place we keep strictly for eating, ___ the kitchen, which also serves as a workspace.",
+        "options": ["as opposed to", "whereas", "while"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'as opposed to' contrasts two noun phrases ('the dining room' vs 'the kitchen') and highlights their different purposes.",
+          "Incorrect: 'whereas' would join two full clauses, but here we have a noun: 'the kitchen'. 'whereas the kitchen also serves...' would be correct.",
+          "Incorrect: 'while' is interchangeable with 'whereas', so it is also incorrect here."
+        ]
+      },
+      {
+        "id": "b2_link_20",
+        "level": "B2",
+        "tag": "Linkers",
+        "sentence": "She’s here on business ___ pleasure, so she won’t have much free time.",
+        "options": ["rather than", "as opposed", "as well as"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'rather than' contrasts two noun phrases, expressing preference or exclusion.",
+          "Incorrect: 'as opposed' is incomplete; it needs 'to'.",
+          "Incorrect: 'as well as' adds information, not contrast. We are told that she won't have free time."
+        ]
+      },
+      {
+        "id": "c1_link_16",
+        "level": "C1",
+        "tag": "Linkers",
+        "sentence": "Her first novel was dark and tragic. ___, her latest book is full of humour and hope.",
+        "options": ["In contrast", "On the contrary", "Whereas"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'In contrast' highlights a clear difference between two works by the same person, making it the most natural choice here.",
+          "Incorrect: 'On the contrary' is used to reject or refute a previous statement, not to compare two facts.",
+          "Incorrect: 'Whereas' connects two clauses within one sentence, not two independent sentences like this."
+        ]
+      },      
+      {
+        "id": "c1_link_18_alt",
+        "level": "C1",
+        "tag": "Linkers",
+        "sentence": "Some people think she’s unfriendly. ___, she’s one of the kindest people I know.",
+        "options": ["On the contrary", "However", "In contrast"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'On the contrary' directly refutes the previous opinion ('she’s unfriendly').",
+          "Incorrect: 'However' simply introduces contrast but doesn’t reverse the claim.",
+          "Incorrect: 'In contrast' compares two separate things, not refutes a statement. On the contrary and in contrast are often confused."
+        ]
+      },
+      {
+        "id": "c1_link_19",
+        "level": "C1",
+        "tag": "Linkers",
+        "sentence": "The policy has improved working conditions. ___, salaries remain low in most sectors.",
+        "options": ["Even so", "Therefore", "Even though"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Even so' introduces an unexpected contrast after a positive outcome.",
+          "Incorrect: 'Therefore' expresses consequence, not a contrast.",
+          "Incorrect: 'Even though' in a conjunction, not a sentence connector. It links clauses in the same sentence."
+        ]
+      },
+      {
+        "id": "c1_link_20",
+        "level": "C1",
+        "tag": "Linkers",
+        "sentence": "I had hoped for a warm welcome. ___, the receptionist barely looked at me.",
+        "options": ["Instead", "In contrast", "Even though"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Instead' indicates that something different from the expectation occurred, and is a sentence connector.",
+          "Incorrect: 'In contrast' compares two broader facts, not expectation vs reality. This sentence expresses a surprising contrast.",
+          "Incorrect: 'Even though' must link two clauses, not independent sentences."
+        ]
+      },
+      {
+        "id": "c1_link_22",
+        "level": "B2",
+        "tag": "Linkers",
+        "sentence": "He finally handed in his resignation. ___, he had been threatening to leave for months.",
+        "options": ["After all", "As a result", "Even though"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'After all' justifies or explains something that now makes sense in light of earlier information.",
+          "Incorrect: 'As a result' expresses cause–effect, not justification.",
+          "Incorrect: 'Even though' cannot stand alone between sentences."
+        ]
+      },
+      {
+        "id": "c1_link_15",
+        "level": "B2",
+        "tag": "Linkers",
+        "sentence": "___ his poor performance, he was still given another chance.",
+        "options": ["In spite of", "despite of", "Although"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'In spite of' + noun phrase shows concession.",
+          "Incorrect: 'Despite of' does not exist; 'despite' is used without 'of', and would be correct here on its own.",
+          "Incorrect: 'Although' must be followed by a clause, not a noun phrase: 'ALthough his performance was poor...'."
+        ]
+      },
+      {
+        "id": "b1_link_01",
+        "level": "B1",
+        "tag": "Linkers",
+        "sentence": "She was tired, ___ she went to bed early.",
+        "options": ["so", "although", "because"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'so' introduces a consequence or result.",
+          "Incorrect: 'although' introduces contrast, not result.",
+          "Incorrect: 'because' introduces a reason, not a result."
+        ]
+      },
+      {
+        "id": "b1_link_02",
+        "level": "A2",
+        "tag": "Linkers",
+        "sentence": "We didn’t go out ___ it was raining.",
+        "options": ["because", "but", "so"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'because' gives the reason for not going out.",
+          "Incorrect: 'but' expresses contrast, not cause.",
+          "Incorrect: 'so' expresses result, not cause."
+        ]
+      },
+      {
+        "id": "b1_link_03",
+        "level": "A2",
+        "tag": "Linkers",
+        "sentence": "I wanted to go to the concert, ___ I didn’t have enough money.",
+        "options": ["so", "because", "but"],
+        "answerIndex": 2,
+        "explanations": [
+          "Incorrect: 'so' would mean a result, not contrast.",
+          "Incorrect: 'because' introduces a reason, not opposition.",
+          "Correct: 'but' shows contrast between the two ideas."
+        ]
+      },
+      {
+        "id": "b1_link_04",
+        "level": "B1",
+        "tag": "Linkers",
+        "sentence": "She stayed at home ___ the bad weather.",
+        "options": ["because of", "because", "despite"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'because of' is used with a noun phrase ('the bad weather'). preposition + noun.",
+          "Correct: 'because' is used with a clause (e.g., 'because the weather was bad').",
+          "Incorrect: 'despite' expresses a contrast, not a reason."
+        ]
+      },
+      {
+        "id": "c1_link_31",
+        "level": "C1",
+        "tag": "Linkers",
+        "sentence": "___ you decide to cancel, please let us know at least 24 hours in advance.",
+        "options": ["Should", "Provided that", "Unless"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Should you decide to cancel' is an inversion for 'If you decide to cancel', adding formality.",
+          "Incorrect: 'Provided that' wouldn’t fit, as this is a conditional opening clause, not a requirement clause.",
+          "Incorrect: 'Unless' changes the meaning completely ('if you don’t decide to cancel')."
+        ]
+      },
+      {
+        "id": "c1_link_35",
+        "level": "C1",
+        "tag": "Linkers",
+        "sentence": "The results were unclear, ___ further tests were required.",
+        "options": ["so", "in order to", "therefore"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'so' introduces a direct result, and as a conjunction it links the two clauses correctly.",
+          "Incorrect: 'in order to' expresses purpose, not result.",
+          "Incorrect: 'therefore' would require a semicolon or full stop in formal writing- it is a sentence connector, not a conjunction. '...unclear. Therefore, further tests...''"
+        ]
+      },
+      {
+        "id": "a2_link_06",
+        "level": "A2",
+        "tag": "Linkers",
+        "sentence": "Wash your hands ___ you sit down to eat.",
+        "options": ["before", "after", "while"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'before' shows that the first action must happen earlier in time.",
+          "Incorrect: 'after' reverses the order of actions.",
+          "Incorrect: 'while' means 'during', which doesn’t make sense here."
+        ]
+      },
+      {
+        "id": "a2_link_07",
+        "level": "A2",
+        "tag": "Linkers",
+        "sentence": "We can’t start the meeting ___ the manager arrives.",
+        "options": ["until", "when", "after"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'until' means we must wait for the manager to arrive before starting.",
+          "Incorrect: 'when' doesn't make sense here, because we need the manager to start the meeting.",
+          "Incorrect: 'after' isn't logical, as we need the manager to start the meeting."
+        ]
+      },
+      {
+        "id": "b1_link_13",
+        "level": "B1",
+        "tag": "Linkers",
+        "sentence": "We arrived late, ___ we missed the beginning of the show.",
+        "options": ["so", "because", "but"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'so' expresses the result of arriving late.",
+          "Incorrect: 'because' would suggest the opposite cause/result relationship.",
+          "Incorrect: 'but' introduces contrast, not logical consequence."
+        ]
+      },
+      {
+        "id": "b1_link_15",
+        "level": "B1",
+        "tag": "Linkers",
+        "sentence": "I lived in London ___ five years before moving back to Spain.",
+        "options": ["for", "since", "during"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'for' is used with a length of time ('five years').",
+          "Incorrect: 'since' must be followed by a starting point, not a duration.",
+          "Incorrect: 'during' requires an event or period noun ('during my studies'), not a number of years."
+        ]
+      },
+      {
+        "id": "b1_link_17",
+        "level": "B1",
+        "tag": "Linkers",
+        "sentence": "She has worked here ___ 2018.",
+        "options": ["since", "for", "during"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'since' introduces the starting point of an ongoing action.",
+          "Incorrect: 'for' would require a length of time ('for five years').",
+          "Incorrect: 'during' introduces a completed time period or event, not continuous time from a starting point."
         ]
       }
   ]
