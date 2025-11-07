@@ -57,14 +57,13 @@ useEffect(() => {
 
   // — EXERCISE STATE — 
   // **Moved above any return** so hooks are always called
-  const [levels,        setLevels]        = useState([])
-  const [tag,           setTag]           = useState('')
-  const [items,         setItems]         = useState([])
-  const [loading,       setLoading]       = useState(false)
-  const [error,         setError]         = useState(null)
-  const [answeredCount, setAnsweredCount] = useState(0)
-  const [count, setCount] = useState(10); // how many questions to generate
-  const [runKey, setRunKey] = useState(0);
+  const [levels,  setLevels]  = useState([])
+const [tag,     setTag]     = useState('')
+const [items,   setItems]   = useState([])
+const [loading, setLoading] = useState(false)
+const [error,   setError]   = useState(null)
+const [count,   setCount]   = useState(10); // how many questions to generate
+const [runKey,  setRunKey]  = useState(0);
 
   const [readingMode, setReadingMode] = useState('menu'); // 'menu' | 'guide' | 'practice'
 
@@ -77,17 +76,17 @@ useEffect(() => {
   const generate = async () => {
     setLoading(true)
     setError(null)
-    setAnsweredCount(0)
     try {
       const batch = await fetchItems({ levels, tags: tag ? [tag] : [], count })
       setItems(batch)
-      setRunKey(k => k + 1)   // ← force remount for a fresh run
+      setRunKey(k => k + 1)   // force fresh run for child components
     } catch {
       setError('Failed to load items.')
     } finally {
       setLoading(false)
     }
   }
+  
 
   const newSetSameSettings = () => {
     if (loading || tagsLoading) return;
@@ -97,9 +96,8 @@ useEffect(() => {
   
   const clearExercises = () => {
     setItems([]);
-    setAnsweredCount(0);
     setError(null);
-    setRunKey(k => k + 1);                   // ensures any child state is reset
+    setRunKey(k => k + 1); // ensures any child state is reset
   };
   
   // — EARLY RETURN FOR AUTH FORM —  
@@ -110,6 +108,23 @@ useEffect(() => {
 
   // 👇 Add this INSIDE App, before the `return`
   function GrammarPage() {
+    const [answeredCount, setAnsweredCount] = useState(0);
+
+    const handleGenerate = () => {
+      setAnsweredCount(0);
+      generate();
+    };
+  
+    const handleReplay = () => {
+      setAnsweredCount(0);
+      newSetSameSettings();
+    };
+  
+    const handleClear = () => {
+      setAnsweredCount(0);
+      clearExercises();
+    };
+
     return (
       <>
         <Seo
@@ -152,12 +167,12 @@ useEffect(() => {
 
         <div className="btn-row">
           <button
-            className="generate-btn"
-            onClick={generate}
-            disabled={loading || tagsLoading}
-          >
-            {loading ? "Loading…" : "Generate Exercises"}
-          </button>
+  className="generate-btn"
+  onClick={handleGenerate}
+  disabled={loading || tagsLoading}
+>
+  {loading ? "Loading…" : "Generate Exercises"}
+</button>
 
           {user && (
             <>
@@ -182,10 +197,11 @@ useEffect(() => {
         {!error && (
           <>
             <GapFillList
-              key={runKey}
-              items={items}
-              onAnswer={() => setAnsweredCount((c) => c + 1)}
-            />
+  key={runKey}
+  runKey={runKey}                           // optional but recommended
+  items={items}
+  onAnswer={() => setAnsweredCount(c => c + 1)}
+/>
             <ProgressTracker
               answered={answeredCount}
               total={items.length}
@@ -194,21 +210,21 @@ useEffect(() => {
             {items.length > 0 && (
               <div className="exercise-footer">
                 <button
-                  type="button"
-                  className="review-btn"
-                  onClick={newSetSameSettings}
-                  disabled={loading || tagsLoading}
-                >
-                  Replay
-                </button>
-                <button
-                  type="button"
-                  className="ghost-btn"
-                  onClick={clearExercises}
-                  disabled={loading}
-                >
-                  Clear page
-                </button>
+  type="button"
+  className="review-btn"
+  onClick={handleReplay}
+  disabled={loading || tagsLoading}
+>
+  Replay
+</button>
+<button
+  type="button"
+  className="ghost-btn"
+  onClick={handleClear}
+  disabled={loading}
+>
+  Clear page
+</button>
               </div>
             )}
           </>

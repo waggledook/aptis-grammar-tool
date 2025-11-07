@@ -32,19 +32,30 @@ export default function GapFillItem({ item, onAnswer }) {
   //
   // 2) Handle answer clicks (and record mistakes)
   //
-  const handleClick = idx => {
-    if (sel !== null) return
-    onAnswer()
-    setSel(idx)
-    const isCorrect = idx === answerIndex;
-    if (!isCorrect) {
-      recordMistake(id).catch(console.error);
+  const handleClick = (idx) => {
+    if (sel !== null) return;
+  
+    try {
+      // Only call if provided
+      if (typeof onAnswer === "function") {
+        onAnswer();
+      }
+  
+      setSel(idx);
+  
+      const isCorrect = idx === answerIndex;
+  
+      // Only write to Firestore if signed in
+      if (auth.currentUser) {
+        if (!isCorrect) {
+          recordMistake(id).catch(console.error);
+        }
+        saveGrammarResult(id, isCorrect).catch?.(console.error);
+      }
+    } catch (err) {
+      console.error("Error in handleClick for item", id, err);
     }
-    // Track progress for signed-in users
-    if (auth.currentUser) {
-      saveGrammarResult(id, isCorrect)
-    }
-  }
+  };
 
   // 3) Toggle favourite on/off
 const toggleFav = async () => {
@@ -135,22 +146,23 @@ const toggleFav = async () => {
       <div className="options-row">
         {options.map((opt, i) => (
           <button
-            key={i}
-            className={`
-              option-btn
-              ${sel !== null
-                ? i === answerIndex
-                  ? 'correct'
-                  : i === sel
-                    ? 'incorrect'
-                    : ''
-                : ''}
-            `}
-            onClick={() => handleClick(i)}
-            disabled={sel !== null}
-          >
-            {opt}
-          </button>
+          key={i}
+          type="button"  // 👈 explicitly a button, not a form submit
+          className={`
+            option-btn
+            ${sel !== null
+              ? i === answerIndex
+                ? 'correct'
+                : i === sel
+                  ? 'incorrect'
+                  : ''
+              : ''}
+          `}
+          onClick={() => handleClick(i)}
+          disabled={sel !== null}
+        >
+          {opt}
+        </button>
         ))}
       </div>
 
