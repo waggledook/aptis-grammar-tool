@@ -2581,8 +2581,8 @@
         "id": "C1_modal_27",
         "level": "C1",
         "tag": "Modal verbs",
-        "sentence": "He did it again — I ___ he ___ cancel at the last minute.",
-        "options": ["might have known / would", "might have known / will", "might know / would"],
+        "sentence": "He did it again — I ___ cancel at the last minute.",
+        "options": ["might have known he would", "might have known he will", "might know he would"],
         "answerIndex": 0,
         "explanations": [
           "Correct idiom: 'I might have known (that) he would…' (ironic, typical behaviour).",
@@ -3951,5 +3951,200 @@
           "Incorrect: 'for' would require a length of time ('for five years').",
           "Incorrect: 'during' introduces a completed time period or event, not continuous time from a starting point."
         ]
-      }
+      },
+      {
+        "id": "b1_tag_06",
+        "level": "B1",
+        "tag": "Question tags",
+        "sentence": "You like spicy food, ___?",
+        "options": ["don't you", "do you", "aren't you"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Present simple with 'you' takes 'do' in the tag: 'don't you?'.",
+          "Incorrect: 'do you?' would follow a negative statement, like 'You don't like spicy food...'.",
+          "Incorrect: 'aren't you?' uses the verb 'be', not 'like'."
+        ]
+      },
+      {
+        "id": "b1_tag_07",
+        "level": "B1",
+        "tag": "Question tags",
+        "sentence": "She isn’t coming to the party, ___?",
+        "options": ["is she", "isn't she", "does she"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Negative main clause → positive tag: 'is she?'.",
+          "Incorrect: in question tags, if the main clause is negative, the tag must be positive.",
+          "Incorrect: 'does she?' uses the wrong auxiliary."
+        ]
+      },
+      {
+        "id": "b1_tag_08",
+        "level": "B1",
+        "tag": "Question tags",
+        "sentence": "They’ve already met, ___?",
+        "options": ["haven't they", "didn't they", "don't they"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Present perfect → 'have' in the tag: 'haven't they?'.",
+          "Incorrect: 'didn't they?' would match past simple, not present perfect.",
+          "Incorrect: 'don't they?' uses 'do' in present simple instead of 'have' for the perfect."
+        ]
+      },
+      {
+        "id": "b1_tag_09",
+        "level": "B2",
+        "tag": "Question tags",
+        "sentence": "You have three brothers, ___?",
+        "options": ["don't you", "haven't you", "aren't you"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Here 'have' is a main verb, so we use 'do' in the tag: 'don't you?' (present simple).",
+          "Incorrect: 'haven't you?' would match auxiliary 'have', as in 'you've been…'.",
+          "Incorrect: 'aren't you?' would go with 'be', not 'have'."
+        ]
+      },
+      {
+        "id": "b2_tag_01",
+        "level": "B2",
+        "tag": "Question tags",
+        "sentence": "Everyone’s here already, ___?",
+        "options": ["aren't they", "isn't he", "doesn't he"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Everyone' takes a singular verb but a plural pronoun in the tag: 'aren't they?'.",
+          "Incorrect: 'isn't he?' isn't correct because although 'everyone' is singular, we use 'they' as we are referring to more than one person.",
+          "Incorrect: 'doesn't he?' uses 'do' instead of 'be', and has the wrong subject pronoun."
+        ]
+      },
+      {
+        "id": "b2_tag_02",
+        "level": "B2",
+        "tag": "Question tags",
+        "sentence": "Nobody phoned to cancel, ___?",
+        "options": ["did they", "didn't they", "do they"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Negative subject 'nobody' → positive tag 'did they?'.",
+          "Incorrect: Although, the main clauses doesn't include 'not', 'nobody' is negative, so the tag must be positive.",
+          "Incorrect: 'do they?' uses present instead of past."
+        ]
+      },
+      {
+        "id": "b2_tag_03",
+        "level": "B1",
+        "tag": "Question tags",
+        "sentence": "There aren’t many tickets left, ___?",
+        "options": ["are there", "aren't there", "do they"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Negative 'there are not' → positive tag 'are there?'.",
+          "Incorrect: 'aren't there?' repeats the negative.",
+          "Incorrect: 'do they?' doesn’t match the 'there is/are' structure."
+        ]
+      },
+      {
+        "id": "b1_tag_10",
+        "level": "B2",
+        "tag": "Question tags",
+        "sentence": "He hardly ever calls his parents, ___?",
+        "options": ["does he", "doesn't he", "is he"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'hardly ever' is negative in meaning, so we use a positive tag: 'does he?'.",
+          "Incorrect: Although, the main clauses doesn't include 'not', 'never' is negative, so the tag must be positive.",
+          "Incorrect: 'is he?' uses 'be' instead of 'do'."
+        ]
+      },
+      {
+        "id": "b1_tag_11",
+        "level": "B1",
+        "tag": "Question tags",
+        "sentence": "They’re watching a film upstairs, ___?",
+        "options": ["aren't they", "don't they", "didn't they"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Present continuous → 'be' in the tag: 'aren't they?'.",
+          "Incorrect: 'don't they?' uses 'do', not 'be'.",
+          "Incorrect: 'didn't they?' changes the tense."
+        ]
+      },
+      {
+        "id": "b1_tag_12",
+        "level": "B1",
+        "tag": "Question tags",
+        "sentence": "She’ll help us with the project, ___?",
+        "options": ["won't she", "will she", "doesn't she"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Future with 'will' → negative tag 'won't she?'.",
+          "Incorrect: 'will she?' would follow a negative statement.",
+          "Incorrect: 'doesn't she?' is present simple, not future."
+        ]
+      },
+      {
+        "id": "b2_tag_04",
+        "level": "B2",
+        "tag": "Question tags",
+        "sentence": "We shouldn’t leave it to the last minute, ___?",
+        "options": ["should we", "shouldn't we", "do we"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Negative with 'shouldn't' → positive tag 'should we?'.",
+          "Incorrect: in question tags, if the main clause is negative, the tag must be positive.",
+          "Incorrect: 'do we?' doesn’t match the modal verb 'should'."
+        ]
+      },
+      {
+        "id": "b1_tag_13",
+        "level": "B2",
+        "tag": "Question tags",
+        "sentence": "Close the window, ___?",
+        "options": ["will you", "do you", "don't you"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Imperatives commonly take 'will you?' as a friendly request tag.",
+          "Incorrect: 'do you?' is not used with imperatives.",
+          "Incorrect: 'don't you?' doesn’t go with an imperative."
+        ]
+      },
+      {
+        "id": "b1_tag_14",
+        "level": "B2",
+        "tag": "Question tags",
+        "sentence": "Don’t be late, ___?",
+        "options": ["will you", "do you", "are you"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Negative imperative → usually 'will you?' in the tag.",
+          "Incorrect: 'do you' is not used with imperatives.",
+          "Incorrect: 'are you?' doesn’t go with an imperative at all."
+        ]
+      },
+      {
+        "id": "b1_tag_15",
+        "level": "B2",
+        "tag": "Question tags",
+        "sentence": "Let’s start the meeting, ___?",
+        "options": ["shall we", "will we", "don't we"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: 'Let’s…' takes the tag 'shall we?', reflecting its use in suggestions.",
+          "Incorrect: 'will we?' is not used with 'let’s' in this way.",
+          "Incorrect: 'don't we?' is not used with let's and imperatives."
+        ]
+      },
+      {
+        "id": "b2_tag_05",
+        "level": "B1",
+        "tag": "Question tags",
+        "sentence": "You’ve been working really hard recently, ___?",
+        "options": ["haven't you", "didn't you", "aren't you"],
+        "answerIndex": 0,
+        "explanations": [
+          "Correct: Present perfect continuous → 'have' in the tag: 'haven't you?'.",
+          "Incorrect: 'didn't you?' is past simple; original sentence is present perfect.",
+          "Incorrect: 'aren't you?' is present and uses the auxiliary 'be' not 'have'."
+        ]
+      }      
   ]
