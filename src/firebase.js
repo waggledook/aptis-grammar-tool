@@ -474,6 +474,22 @@ export async function saveGrammarResult(itemId, isCorrect) {
 }
 
 /**
+ * Fetch the IDs of grammar items this user has ever answered.
+ * Uses the doc IDs from /users/{uid}/grammarProgress.
+ * @returns {Promise<string[]>}
+ */
+export async function fetchSeenGrammarItemIds() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return []; // guests: no seen items
+
+  const col = collection(db, "users", uid, "grammarProgress");
+  const snap = await getDocs(col);
+
+  // Each doc ID is the itemId we stored in saveGrammarResult(...)
+  return snap.docs.map(d => d.id);
+}
+
+/**
  * Fetch dashboard counts for the profile progress bar:
  * answered = #docs in /grammarProgress,
  * correct  = #docs with everCorrect == true,

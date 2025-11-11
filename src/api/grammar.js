@@ -38,6 +38,48 @@ function shuffleOptionsSafely(item) {
 }
 
 /**
+ * Choose items, optionally preferring "unseen" ones for a user.
+ * `seenIds` should be the IDs of items the user has already answered.
+ */
+function chooseItemsWithSeen({
+  items,
+  count,
+  seenIds = [],
+  preferNew = false,
+}) {
+  // No preference → original behaviour
+  if (!preferNew || !seenIds.length) {
+    return items
+      .sort(() => Math.random() - 0.5)
+      .slice(0, count)
+      .map(shuffleOptionsSafely);
+  }
+
+  const seenSet = new Set(seenIds);
+
+  const unseen = items.filter(it => !seenSet.has(it.id));
+  const seen   = items.filter(it =>  seenSet.has(it.id));
+
+  // Shuffle both buckets
+  unseen.sort(() => Math.random() - 0.5);
+  seen.sort(() => Math.random() - 0.5);
+
+  const chosen = [];
+
+  // Take as many unseen as we can
+  for (let i = 0; i < unseen.length && chosen.length < count; i++) {
+    chosen.push(unseen[i]);
+  }
+
+  // If we still need more, fill from seen
+  for (let i = 0; i < seen.length && chosen.length < count; i++) {
+    chosen.push(seen[i]);
+  }
+
+  return chosen.map(shuffleOptionsSafely);
+}
+
+/**
  * Fetches a random set of grammar items matching the given filters.
  *
  * @param {{
@@ -47,34 +89,41 @@ function shuffleOptionsSafely(item) {
  * }} params
  * @returns {Promise<Object[]>} Array of grammar items
  */
+// src/api/grammar.js
 export async function fetchItems({
-  levels = [],
-  tags   = [],
-  count  = 5
+  levels    = [],
+  tags      = [],
+  count     = 5,
+  preferNew = false,
+  seenIds   = [],
 }) {
+  // Normalise tags into an array on each item
   let items = itemsData.map(item => ({
     ...item,
     tags: Array.isArray(item.tags)
       ? item.tags
       : item.tag
         ? [item.tag]
-        : []
+        : [],
   }));
 
   if (levels.length) {
     items = items.filter(item => levels.includes(item.level));
   }
+
   if (tags.length) {
     items = items.filter(item =>
       item.tags.some(t => tags.includes(t))
     );
   }
 
-  // shuffle items, then shuffle options/explanations in each chosen item
-return items
-.sort(() => Math.random() - 0.5)
-.slice(0, count)
-.map(shuffleOptionsSafely);
+  // Delegate to helper that can prefer unseen items
+  return chooseItemsWithSeen({
+    items,
+    count,
+    seenIds,
+    preferNew,
+  });
 }
 
 

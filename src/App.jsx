@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react'
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { auth, doSignOut }        from './firebase'
+import { auth, doSignOut, fetchSeenGrammarItemIds } from './firebase';
 import { onAuthStateChanged }      from 'firebase/auth'
 import AuthForm                    from './components/AuthForm'
 import FilterPanel                 from './components/FilterPanel'
@@ -74,18 +74,40 @@ const [runKey,  setRunKey]  = useState(0);
   } = useTags()
 
   const generate = async () => {
-    setLoading(true)
-    setError(null)
+    setLoading(true);
+    setError(null);
+  
     try {
-      const batch = await fetchItems({ levels, tags: tag ? [tag] : [], count })
-      setItems(batch)
-      setRunKey(k => k + 1)   // force fresh run for child components
-    } catch {
-      setError('Failed to load items.')
+      let seenIds = [];
+  
+      // Only try to prefer "new" questions if signed in
+      if (user) {
+        try {
+          seenIds = await fetchSeenGrammarItemIds();
+        } catch (err) {
+          console.error("fetchSeenGrammarItemIds failed; falling back to random", err);
+          seenIds = [];
+        }
+      }
+  
+      const batch = await fetchItems({
+        levels,
+        tags: tag ? [tag] : [],
+        count,
+        // Prefer new items for signed-in users
+        preferNew: !!user,
+        seenIds,
+      });
+  
+      setItems(batch);
+      setRunKey(k => k + 1); // force fresh run for child components
+    } catch (err) {
+      console.error("generate() failed", err);
+      setError('Failed to load items.');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };  
   
 
   const newSetSameSettings = () => {
@@ -191,6 +213,24 @@ const [runKey,  setRunKey]  = useState(0);
             </>
           )}
         </div>
+
+        {!user && (
+  <div className="auth-nudge">
+    <p className="auth-nudge-text">
+      Want to track your progress and review your mistakes later?
+      <br />
+      <strong>Sign in or create a free account.</strong>
+    </p>
+    <button
+  type="button"
+  className="topbar-btn"
+  onClick={() => setShowAuth(true)}
+>
+  Sign in / Sign up
+</button>
+  </div>
+)}
+
 
         {error && <p className="error-text">{error}</p>}
 

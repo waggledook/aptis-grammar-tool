@@ -8,7 +8,7 @@ export default function FilterPanel({
   onTagChange,       // setter for tag
   allTags            // array of strings
 }) {
-  const allLevels = ['A1','A2','B1','B2','C1'];
+  const allLevels = ['A2','B1','B2','C1'];
 
   const toggleLevel = lvl => {
     onLevelsChange(

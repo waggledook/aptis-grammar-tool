@@ -547,4 +547,46 @@ button {
   transform: translateY(0);
 }
 
+.auth-nudge {
+  margin-top: 0.75rem;
+  margin-bottom: 1rem;       /* 👈 Add this line */
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.9);        /* dark slate, fits your theme */
+  border: 1px solid rgba(148, 163, 184, 0.5);/* subtle border */
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: #e5e7eb;                            /* light grey text */
+}
+
+.auth-nudge-text {
+  margin: 0;
+  flex: 1 1 auto;
+}
+
+.auth-nudge-text strong {
+  color: #facc15;                            /* your gold accent */
+  font-weight: 600;
+}
+
+.auth-nudge-btn {
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  background: transparent;
+  color: #e5e7eb;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.auth-nudge-btn:hover {
+  background: rgba(148, 163, 184, 0.15);
+}
+
+
+
 
