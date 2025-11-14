@@ -36,6 +36,23 @@ export default function SpeakingMenu() {
           <p>Compare two photographs, and answer related questions.</p>
         </button>
 
+        <button
+  className="card"
+  onClick={() => navigate("/speaking/photo-guide")}
+>
+  <div className="menu-card-header">
+    <h3>Guide: describing pictures</h3>
+    <span className="uc-top-wrapper">
+      <img
+        src="/images/ui/under-construction.png"
+        alt="Under construction"
+        className="uc-top-icon"
+      />
+    </span>
+  </div>
+  <p>Useful phrases, prepositions & speculation for Parts 2 and 3.</p>
+</button>
+
         <button className="card" onClick={() => navigate("/speaking/part4")}>
           <h3>Part 4: Presentation & Discussion</h3>
           <p>1-minute prep, then a 2-minute talk answering 3 questions.</p>

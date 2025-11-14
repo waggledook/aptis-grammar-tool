@@ -587,6 +587,28 @@ button {
   background: rgba(148, 163, 184, 0.15);
 }
 
+.promo-banner {
+  margin-top: 1.5rem;
+  padding: 0.9rem 1.25rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  text-align: center;
+  font-size: 0.92rem;
+  color: #e5e7eb;
+  line-height: 1.4;
+}
+
+.promo-banner a {
+  color: #facc15; /* your brand gold */
+  font-weight: 600;
+  margin-left: 0.3rem;
+  text-decoration: none;
+}
+
+.promo-banner a:hover {
+  text-decoration: underline;
+}
 
 
 

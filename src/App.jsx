@@ -26,7 +26,7 @@ import SpeakingPart1 from "./components/speaking/SpeakingPart1";
 import SpeakingPart2 from './components/speaking/SpeakingPart2';
 import SpeakingPart3 from './components/speaking/SpeakingPart3';
 import SpeakingPart4 from "./components/speaking/SpeakingPart4";
-import AptisPart2Reorder from './reading/AptisPart2Reorder';
+import SpeakingPart2and3_PhotoGuide from "./components/speaking/SpeakingPart2and3_PhotoGuide.jsx";import AptisPart2Reorder from './reading/AptisPart2Reorder';
 import AptisPart3Matching from './reading/AptisPart3Matching';
 import VocabularyMenu from "./components/vocabulary/VocabularyMenu";
 import ToastHost from './components/ToastHost';
@@ -441,6 +441,18 @@ const [runKey,  setRunKey]  = useState(0);
     </>
   }
 />
+
+<Route
+  path="/speaking/photo-guide"
+  element={
+    <SpeakingPart2and3_PhotoGuide
+      onBack={() => navigate("/speaking")}
+      onStartPart2={() => navigate("/speaking/part2")}
+      onStartPart3={() => navigate("/speaking/part3")}
+    />
+  }
+/>
+
 
 {/* vocabulary routes */}
 <Route path="/vocabulary" element={<VocabularyMenu />} />

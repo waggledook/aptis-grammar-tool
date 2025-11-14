@@ -88,6 +88,20 @@ export default function MainMenu({ onSelect }) {
 </button>
       </div>
 
+{/* --- Promo Banner --- */}
+<div className="promo-banner">
+  <p>
+    🎓 Looking for full Aptis B1–C1 preparation with live classes?
+    <a
+      href="https://idiomasseif.com/preparacion-examen-aptis/aptis-b1-b2-c1/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      View Seif Academy courses →
+    </a>
+  </p>
+</div>
+
       <style>{`
         /* ——— Layout wrapper ——— */
         .menu-wrapper {
