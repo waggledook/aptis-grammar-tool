@@ -1,5 +1,5 @@
 // src/components/speaking/SpeakingPart2and3_PhotoGuide.jsx
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Seo from "../common/Seo.jsx";
 import UnderConstructionPanel from "../common/UnderConstructionPanel";
 
@@ -129,129 +129,148 @@ const mountainItems = [
  * ========================= */
 
 const SPEC_SETS = [
-  {
-    id: "balcony",
-    title: "Balcony breakfast mystery",
-    image: "/images/speaking/describing-pictures/balcony-scene.png",
-    intro:
-      "You don’t really know this person’s situation. Rewrite the strong sentences using speculative language.",
-    items: [
-      {
-        id: "balcony1",
-        strong: "He is travelling on business.",
-        target: "Use must.",
-        keywords: ["must"],
-        model: "He must be travelling on business.",
-        explanation:
-          "Use must + be + -ing for a strong deduction in the present.",
-      },
-      {
-        id: "balcony2",
-        strong: "He is sad.",
-        target: "Use looks.",
-        keywords: ["looks", "look"],
-        model: "He looks sad.",
-        explanation:
-          "Use look / looks + adjective to talk about appearance.",
-      },
-      {
-        id: "balcony3",
-        strong: "He feels lonely.",
-        target: "Use probably.",
-        keywords: ["probably"],
-        model: "He probably feels lonely.",
-        explanation:
-          "Probably shows that you think something is quite likely, but not certain.",
-      },
-    ],
-  },
-  {
-    id: "bench",
-    title: "Park bench meeting",
-    image: "/images/speaking/describing-pictures/bench-scene.png",
-    intro:
-      "Look at the people on the bench. We can guess, but we don’t know for sure.",
-    items: [
-      {
-        id: "bench1",
-        strong: "The two people are a couple.",
-        target: "Use may.",
-        keywords: ["may"],
-        model: "They may be a couple.",
-        explanation: "May is a modal for possibility, similar to might / could.",
-      },
-      {
-        id: "bench2",
-        strong: "She is angry with him.",
-        target: "Use seem / seems.",
-        keywords: ["seems", "seem"],
-        model: "She seems angry with him.",
-        explanation:
-          "Seem is useful when you talk about impressions or feelings.",
-      },
-      {
-        id: "bench3",
-        strong: "They had a fight.",
-        target: "Use could.",
-        keywords: ["could"],
-        model: "They could have had a fight.",
-        explanation: "Could have + past participle is good for past possibilities.",
-      },
-    ],
-  },
-  {
-    id: "runner",
-    title: "Unexpected street moment",
-    image: "/images/speaking/describing-pictures/runner-scene.png",
-    intro:
-      "Here you can use different structures to show how sure you are about your ideas.",
-    items: [
-      {
-        id: "runner1",
-        strong: "He has got lost.",
-        target: "Use must.",
-        keywords: ["must"],
-        model: "He must have got lost.",
-        explanation:
-          "Must have + past participle shows a strong deduction about the past.",
-      },
-      {
-        id: "runner2",
-        strong: "He is from another city.",
-        target: "Use almost certainly.",
-        keywords: ["almost certainly"],
-        model: "He is almost certainly from another city.",
-        explanation:
-          "Almost certainly shows you are very sure, but still not 100%.",
-      },
-      {
-        id: "runner3",
-        strong: "The other person wants to give him directions.",
-        target: "Use I guess.",
-        keywords: ["i guess"],
-        model: "I guess the other person wants to give him directions.",
-        explanation:
-          "I guess is a nice informal way to show you are making a guess.",
-      },
-    ],
-  },
-];
+    {
+      id: "balcony",
+      title: "Balcony breakfast mystery",
+      image: "/images/speaking/describing-pictures/balcony-scene.png",
+      intro:
+        "You don’t really know this person’s situation. Complete the sentence using speculative language.",
+      items: [
+        {
+          id: "balcony1",
+          strong: "He is travelling on business.",
+          target: "Use must",
+          gap: "He ___ on business.",
+          words: 3,
+          answers: ["must be travelling", "must be traveling"],
+          explanation:
+            "Use must + be + -ing for a strong deduction in the present.",
+        },
+        {
+          id: "balcony2",
+          strong: "He is sad.",
+          target: "Use look.",
+          gap: "He ___.",
+          words: 2,
+          answers: ["looks sad"],
+          explanation:
+            "Use look / looks + adjective to talk about appearance. Here the most natural option is “He looks sad.”",
+        },
+        {
+          id: "balcony3",
+          strong: "He feels lonely.",
+          target: "Use probably",
+          gap: "He ___.",
+          words: 3,
+          answers: ["probably feels lonely"],
+          explanation:
+            "Probably shows that you think something is quite likely, but not certain.",
+        },
+      ],
+    },
+    {
+      id: "bench",
+      title: "Park bench meeting",
+      image: "/images/speaking/describing-pictures/bench-scene.png",
+      intro:
+        "Look at the people on the bench. Complete the sentence with a speculative form.",
+      items: [
+        {
+          id: "bench1",
+          strong: "The two people are a couple.",
+          target: "Use may",
+          gap: "They ___ couple.",
+          words: 3,
+          answers: ["may be a"],
+          explanation: "May is a modal for possibility, similar to might / could.",
+        },
+        {
+          id: "bench2",
+          strong: "She is angry with him.",
+          target: "Use seem",
+          gap: "She ___ him.",
+          words: 5,
+          answers: ["seems to be angry with", "seems angry with"],
+          explanation:
+            "Seem is useful when you talk about impressions or feelings.",
+        },
+        {
+          id: "bench3",
+          strong: "They had a fight.",
+          target: "Use might",
+          gap: "They ___ a fight.",
+          words: 3,
+          answers: ["might have had"],
+          explanation:
+            "might have + past participle is good for past possibilities.",
+        },
+      ],
+    },
+    {
+      id: "runner",
+      title: "Unexpected street moment",
+      image: "/images/speaking/describing-pictures/runner-scene.png",
+      intro:
+        "Here you can show how sure you are about your ideas by completing the sentence.",
+      items: [
+        {
+          id: "runner1",
+          strong: "He has got lost.",
+          target: "Use must",
+          gap: "He ___  lost.",
+          words: 3,
+          answers: ["must have got", "must have gotten"],
+          explanation:
+            "Must have + past participle shows a strong deduction about the past.",
+        },
+        {
+          id: "runner2",
+          strong: "He is from another city.",
+          target: "Use almost certainly",
+          gap: "He ___ city.",
+          words: 5,
+          answers: ["is almost certainly from another"],
+          explanation:
+            "Almost certainly shows you are very sure, but still not 100%.",
+        },
+        {
+          id: "runner3",
+          strong: "The other person wants to give him directions.",
+          target: "Use guess",
+          gap: "I ___ give him directions.",
+          words: 6,
+          answers: ["guess the other person wants to"],
+          explanation:
+            "I guess is a nice informal way to show you are not sure about what you are saying.",
+        },
+      ],
+    },
+  ];  
 
 /* =========================
  * MAIN COMPONENT
  * ========================= */
 
 export default function SpeakingPart2and3_PhotoGuide({
-  onBack,
-  onStartPractice,
-}) {
-  // which screen are we on? menu | language | prepositions | speculation
-  const [view, setView] = useState("menu");
-
-  // shared state for gap-fills
-  const [answers, setAnswers] = useState({});
-  const [checkState, setCheckState] = useState({});
-  const inputRefs = useRef({});
+    onBack,
+    onStartPractice,
+  }) {
+    // which screen are we on? menu | language | prepositions | speculation
+    const [view, setView] = useState("menu");
+  
+    /* 🔄 RESET SCROLL POSITION WHEN VIEW CHANGES */
+    useEffect(() => {
+      window.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "auto", // change to "smooth" if you want
+      });
+    }, [view]);
+  
+    // shared state for gap-fills
+    const [answers, setAnswers] = useState({});
+    const [checkState, setCheckState] = useState({});
+    const inputRefs = useRef({});  
 
   const handleAnswerChange = (id, value) => {
     setAnswers((prev) => ({ ...prev, [id]: value }));
@@ -269,36 +288,40 @@ export default function SpeakingPart2and3_PhotoGuide({
     }
   };
 
-  const checkOne = (id, correctAnswers, explanation, itemsArray) => {
-    const user = (answers[id] || "").trim().toLowerCase();
+  const checkOne = (id, correctAnswer, explanation, itemsArray) => {
+    const raw = (answers[id] || "").trim().toLowerCase();
+    const solutions = Array.isArray(correctAnswer)
+      ? correctAnswer.map(s => s.toLowerCase())
+      : [correctAnswer.toLowerCase()];
   
-    // Support single string OR array of strings
-    const list = Array.isArray(correctAnswers)
-      ? correctAnswers.map(a => a.toLowerCase())
-      : [String(correctAnswers || "").toLowerCase()];
-  
-    const ok = list.includes(user);
+    const ok = solutions.includes(raw);
   
     setCheckState(prev => ({
       ...prev,
       [id]: {
-        ...(prev[id] || {}),
-        touched: true,
+        done: true,
         ok,
-      },
+        reveal: correctAnswer,     // ALWAYS store correct answer
+        explanation: explanation || null,
+      }
     }));
   
+    // If you still want auto-focus to next item:
     if (ok && itemsArray) {
       focusNext(id, itemsArray);
     }
-  };  
+  };
+  
 
-  const revealAnswer = (id) => {
-    setCheckState((prev) => ({
+  const revealAnswer = (id, correctAnswer, explanation) => {
+    setCheckState(prev => ({
       ...prev,
       [id]: {
         ...(prev[id] || {}),
-        showAnswer: true,
+        done: true,
+        ok: false, // we're just revealing, not checking correctness
+        reveal: correctAnswer,
+        explanation: explanation || null,
       },
     }));
   };
@@ -315,6 +338,7 @@ export default function SpeakingPart2and3_PhotoGuide({
   };
 
   const [specAnswers, setSpecAnswers] = useState(makeInitialSpecAnswers);
+  // { [id]: { checked: boolean, ok: boolean, showModel: boolean } }
   const [specState, setSpecState] = useState({});
 
   const handleSpecChange = (id, value) => {
@@ -322,8 +346,9 @@ export default function SpeakingPart2and3_PhotoGuide({
   };
 
   const checkSpecItem = (item) => {
-    const user = (specAnswers[item.id] || "").toLowerCase();
-    const ok = item.keywords.some((kw) => user.includes(kw));
+    const raw = (specAnswers[item.id] || "").trim().toLowerCase();
+    const solutions = (item.answers || []).map((a) => a.toLowerCase());
+    const ok = solutions.includes(raw);
 
     setSpecState((prev) => ({
       ...prev,
@@ -331,7 +356,6 @@ export default function SpeakingPart2and3_PhotoGuide({
         ...(prev[item.id] || {}),
         checked: true,
         ok,
-        // auto-show model when target word is used
         showModel: ok ? true : prev[item.id]?.showModel ?? false,
       },
     }));
@@ -346,7 +370,6 @@ export default function SpeakingPart2and3_PhotoGuide({
       },
     }));
   };
-
   const openSection = (section) => setView(section);
 
   /* --------- Render helpers for sub-screens --------- */
@@ -430,9 +453,9 @@ export default function SpeakingPart2and3_PhotoGuide({
         <div className="gap-exercise">
           {officeItems.map((item) => {
             const result = checkState[item.id] || {};
-            const isChecked = result.touched;
-            const isCorrect = result.ok;
-            const showAnswer = result.showAnswer;
+            const isDone = result.done;
+            const revealed = result.reveal;
+            const explanation = result.explanation;
 
             return (
               <div key={item.id} className="gap-item">
@@ -480,34 +503,36 @@ export default function SpeakingPart2and3_PhotoGuide({
                     </button>
 
                     <button
-                      type="button"
-                      className="btn tiny ghost"
-                      onClick={() => revealAnswer(item.id)}
-                    >
-                      Show answer
-                    </button>
+  type="button"
+  className="btn tiny ghost"
+  onClick={() =>
+    revealAnswer(
+      item.id,
+      item.answers || item.answer,
+      item.explanation
+    )
+  }
+>
+  Show answer
+</button>
                   </div>
                 </label>
 
-                {isChecked && (
-                  <p className={`feedback ${isCorrect ? "ok" : "wrong"}`}>
-                    {isCorrect ? "✓ Correct" : "✗ Not quite"}
-                  </p>
-                )}
-
-                {isChecked &&
-                  !isCorrect &&
-                  item.explanation &&
-                  !showAnswer && (
-                    <p className="feedback note">Hint: {item.explanation}</p>
-                  )}
-
-                {showAnswer && (
-                  <p className="feedback note">
-                    Answer: <strong>{item.answer}</strong>
-                    {item.explanation ? ` – ${item.explanation}` : ""}
-                  </p>
-                )}
+                {isDone && (
+  <div className="feedback-group">
+    <p className={`feedback ${result.ok ? "ok" : "wrong"}`}>
+      {result.ok ? "Good! Answer:" : "Answer:"}{" "}
+      <strong>
+        {Array.isArray(revealed)
+          ? revealed.join(" / ")
+          : revealed}
+      </strong>
+    </p>
+    {explanation && (
+      <p className="feedback note">{explanation}</p>
+    )}
+  </div>
+)}
               </div>
             );
           })}
@@ -532,9 +557,9 @@ export default function SpeakingPart2and3_PhotoGuide({
         <div className="gap-exercise">
           {parkItems.map((item) => {
             const result = checkState[item.id] || {};
-            const isChecked = result.touched;
-            const isCorrect = result.ok;
-            const showAnswer = result.showAnswer;
+            const isDone = result.done;
+            const revealed = result.reveal;
+            const explanation = result.explanation;
 
             return (
               <div key={item.id} className="gap-item">
@@ -582,34 +607,36 @@ export default function SpeakingPart2and3_PhotoGuide({
                     </button>
 
                     <button
-                      type="button"
-                      className="btn tiny ghost"
-                      onClick={() => revealAnswer(item.id)}
-                    >
-                      Show answer
-                    </button>
+  type="button"
+  className="btn tiny ghost"
+  onClick={() =>
+    revealAnswer(
+      item.id,
+      item.answers || item.answer,
+      item.explanation
+    )
+  }
+>
+  Show answer
+</button>
                   </div>
                 </label>
 
-                {isChecked && (
-                  <p className={`feedback ${isCorrect ? "ok" : "wrong"}`}>
-                    {isCorrect ? "✓ Correct" : "✗ Not quite"}
-                  </p>
-                )}
-
-                {isChecked &&
-                  !isCorrect &&
-                  item.explanation &&
-                  !showAnswer && (
-                    <p className="feedback note">Hint: {item.explanation}</p>
-                  )}
-
-                {showAnswer && (
-                  <p className="feedback note">
-                    Answer: <strong>{item.answer}</strong>
-                    {item.explanation ? ` – ${item.explanation}` : ""}
-                  </p>
-                )}
+                {isDone && (
+  <div className="feedback-group">
+    <p className={`feedback ${result.ok ? "ok" : "wrong"}`}>
+      {result.ok ? "Good! Answer:" : "Answer:"}{" "}
+      <strong>
+        {Array.isArray(revealed)
+          ? revealed.join(" / ")
+          : revealed}
+      </strong>
+    </p>
+    {explanation && (
+      <p className="feedback note">{explanation}</p>
+    )}
+  </div>
+)}
               </div>
             );
           })}
@@ -634,9 +661,9 @@ export default function SpeakingPart2and3_PhotoGuide({
         <div className="gap-exercise">
           {mountainItems.map((item) => {
             const result = checkState[item.id] || {};
-            const isChecked = result.touched;
-            const isCorrect = result.ok;
-            const showAnswer = result.showAnswer;
+            const isDone = result.done;
+            const revealed = result.reveal;
+            const explanation = result.explanation;            
 
             return (
               <div key={item.id} className="gap-item">
@@ -684,34 +711,37 @@ export default function SpeakingPart2and3_PhotoGuide({
                     </button>
 
                     <button
-                      type="button"
-                      className="btn tiny ghost"
-                      onClick={() => revealAnswer(item.id)}
-                    >
-                      Show answer
-                    </button>
+  type="button"
+  className="btn tiny ghost"
+  onClick={() =>
+    revealAnswer(
+      item.id,
+      item.answers || item.answer,
+      item.explanation
+    )
+  }
+>
+  Show answer
+</button>
                   </div>
                 </label>
 
-                {isChecked && (
-                  <p className={`feedback ${isCorrect ? "ok" : "wrong"}`}>
-                    {isCorrect ? "✓ Correct" : "✗ Not quite"}
-                  </p>
-                )}
+                {isDone && (
+  <div className="feedback-group">
+    <p className={`feedback ${result.ok ? "ok" : "wrong"}`}>
+      {result.ok ? "Good! Answer:" : "Answer:"}{" "}
+      <strong>
+        {Array.isArray(revealed)
+          ? revealed.join(" / ")
+          : revealed}
+      </strong>
+    </p>
+    {explanation && (
+      <p className="feedback note">{explanation}</p>
+    )}
+  </div>
+)}
 
-                {isChecked &&
-                  !isCorrect &&
-                  item.explanation &&
-                  !showAnswer && (
-                    <p className="feedback note">Hint: {item.explanation}</p>
-                  )}
-
-                {showAnswer && (
-                  <p className="feedback note">
-                    Answer: <strong>{item.answer}</strong>
-                    {item.explanation ? ` – ${item.explanation}` : ""}
-                  </p>
-                )}
               </div>
             );
           })}
@@ -734,52 +764,62 @@ export default function SpeakingPart2and3_PhotoGuide({
             hurry…
           </em>
         </p>
-
+  
         {SPEC_SETS.map((set, index) => (
           <div key={set.id} className="spec-block">
             <h3>
               Photo {index + 1}: {set.title}
             </h3>
-
+  
             <img
               src={set.image}
               alt={set.title}
               className="speculation-image"
               draggable="false"
             />
-
+  
             <p className="panel-text small">{set.intro}</p>
-
+  
             <div className="spec-items">
               {set.items.map((item) => {
                 const state = specState[item.id] || {};
                 const { checked, ok, showModel } = state;
-
+  
+                // Split the gap at the placeholder "___"
+                const parts = item.gap.split("___");
+                const left = parts[0] || "";
+                const right = parts[1] || "";
+  
                 return (
                   <div key={item.id} className="spec-item-card">
                     <p className="strong">
                       <strong>Strong sentence:</strong> {item.strong}
                     </p>
                     <p className="target">
-  🎯 <strong>Target:</strong>
-  <span className="target-pill">{item.target}</span>
-</p>
-
-                    <textarea
-                      rows={2}
-                      value={specAnswers[item.id]}
-                      onChange={(e) =>
-                        handleSpecChange(item.id, e.target.value)
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" && !e.shiftKey) {
-                          e.preventDefault();
-                          checkSpecItem(item);
-                        }
-                      }}
-                      placeholder="Rewrite the sentence using the target words…"
-                    />
-
+                      🎯 <strong>Target:</strong>
+                      <span className="target-pill">{item.target}</span>
+                    </p>
+  
+                    <p className="spec-gap-line">
+                      {left}
+                      <input
+                        type="text"
+                        className="spec-gap-input"
+                        value={specAnswers[item.id] || ""}
+                        onChange={(e) => handleSpecChange(item.id, e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            checkSpecItem(item);
+                          }
+                        }}
+                        placeholder={`${item.words} word${
+                          item.words > 1 ? "s" : ""
+                        }`}
+                      />
+                      {right}
+                    </p>
+  
                     <div className="spec-actions">
                       <button
                         type="button"
@@ -796,18 +836,26 @@ export default function SpeakingPart2and3_PhotoGuide({
                         Show suggestion
                       </button>
                     </div>
-
+  
                     {checked && (
-  <p className={`feedback ${ok ? "ok" : "wrong"}`}>
-    {ok ? "Good!" : "Try again – use the target word or structure."}
-  </p>
-)}
-
-{showModel && (
-  <p className="suggested-answer">
-    Suggested answer: <strong>{item.model}</strong>
-  </p>
-)}
+                      <p className={`feedback ${ok ? "ok" : "wrong"}`}>
+                        {ok
+                          ? "Good! That’s one correct way to complete the gap."
+                          : "Not quite – check the target language and try again, or show the suggestion."}
+                      </p>
+                    )}
+  
+                    {showModel && (
+                      <p className="suggested-answer">
+                        Suggested answer:{" "}
+                        <strong>
+                          {item.answers && item.answers.length > 1
+                            ? item.answers.join(" / ")
+                            : item.answers[0]}
+                        </strong>
+                        {item.explanation ? ` – ${item.explanation}` : ""}
+                      </p>
+                    )}
                   </div>
                 );
               })}
@@ -816,7 +864,7 @@ export default function SpeakingPart2and3_PhotoGuide({
         ))}
       </section>
     </main>
-  );
+  );  
 
   /* =========================
    * RENDER
@@ -1354,6 +1402,25 @@ export default function SpeakingPart2and3_PhotoGuide({
   margin-bottom: 0.5rem;
   color: var(--ink);
 }
+.spec-gap-line {
+  margin: 0.4rem 0 0.3rem;
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.spec-gap-input {
+  display: inline-block;
+  min-width: 120px;
+  max-width: 220px;
+  padding: 0.25rem 0.45rem;
+  margin: 0 0.3rem;
+  border-radius: 0.45rem;
+  border: 1px solid #4b5563;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+}
+
       `}</style>
     </div>
   );
