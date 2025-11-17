@@ -4,6 +4,7 @@ import Seo from "../common/Seo.jsx";
 import UnderConstructionPanel from "../common/UnderConstructionPanel";
 import { db, auth } from "../../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import PreppyFlashcards from "./PreppyFlashcards";
 
 /* =========================
  * DATA: office / park / mountain
@@ -823,6 +824,18 @@ const handleSaveSpeculationNote = async (which) => {
           })}
         </div>
       </section>
+
+      <section className="panel">
+  <h2>Prepositions with Preppy the Penguin</h2>
+  <p className="panel-text">
+    Review all your prepositions with Preppy the Penguin!
+    Decide which preposition fits the gap based on the picture, and flip the card to
+    see the answer.
+
+  </p>
+
+  <PreppyFlashcards />
+</section>
     </main>
   );
 
