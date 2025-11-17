@@ -1,7 +1,7 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react'
 import { Routes, Route, useNavigate } from "react-router-dom";
-import { auth, doSignOut, fetchSeenGrammarItemIds } from './firebase';
+import { auth, doSignOut, fetchSeenGrammarItemIds, db, ensureUserProfile } from "./firebase";
 import { onAuthStateChanged }      from 'firebase/auth'
 import AuthForm                    from './components/AuthForm'
 import FilterPanel                 from './components/FilterPanel'
@@ -35,6 +35,10 @@ import VocabularyTopics from "./components/vocabulary/VocabularyTopics";
 import TopicTrainer from "./components/vocabulary/TopicTrainer";
 import Seo from "./components/common/Seo.jsx";
 import './App.css'
+import { doc, getDoc } from "firebase/firestore";
+import AdminDashboard from "./components/admin/AdminDashboard.jsx";
+
+
 
 export default function App() {
   // — AUTH STATE —
@@ -44,15 +48,32 @@ const [view, setView] = useState('menu'); // 'menu' | 'grammar' | 'readingMenu' 
 const navigate = useNavigate();  // 👈 add this
 
 useEffect(() => {
-  const unsub = onAuthStateChanged(auth, u => {
-    setUser(u)
+  const unsub = onAuthStateChanged(auth, async (u) => {
     if (!u) {
-      setShowAuth(false)
-      setView('menu')        // ← was 'home'
+      setUser(null);
+      setShowAuth(false);
+      setView("menu");
+      return;
     }
-  })
-  return unsub
-}, [])
+
+    // ✅ make sure /users/{uid} exists and has email/role
+    await ensureUserProfile(u);
+
+    try {
+      const snap = await getDoc(doc(db, "users", u.uid));
+      const data = snap.exists() ? snap.data() : {};
+      setUser({
+        ...u,
+        role: data.role || "student",
+      });
+    } catch (err) {
+      console.error("Failed to read user role:", err);
+      setUser({ ...u, role: "student" });
+    }
+  });
+
+  return unsub;
+}, []);
 
 
   // — EXERCISE STATE — 
@@ -611,13 +632,42 @@ const [runKey,  setRunKey]  = useState(0);
 />
 
 
+<Route
+  path="/teacher-tools"
+  element={
+    (user?.role === "admin" || user?.role === "teacher")
+      ? (
+          <>
+            <button
+              onClick={() => navigate("/")}
+              className="review-btn"
+              style={{ marginBottom: "1rem" }}
+            >
+              ← Back to home
+            </button>
+            <h1>Teacher Tools</h1>
+            <p>Extra tools for teachers will go here.</p>
+          </>
+        )
+      : <p>Access denied. Teachers only.</p>
+  }
+/>
+<Route
+  path="/admin"
+  element={<AdminDashboard user={user} />}
+/>
+
+
   <Route
     path="/*"
     element={
       <>
         {view === 'menu' && (
-          <MainMenu onSelect={(next) => setView(next)} />
-        )}
+  <MainMenu
+    onSelect={(next) => setView(next)}
+    user={user}               // 👈 pass user down
+  />
+)}
 
         {view === 'grammar' && <GrammarPage />}
 

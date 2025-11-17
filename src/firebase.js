@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 
+
 // ⬇️ Use initializeFirestore instead of getFirestore
 import {
   initializeFirestore,
@@ -11,6 +12,7 @@ import {
   deleteDoc,
   addDoc,
   getDocs,
+  getDoc,
   query,
   where,
   orderBy,
@@ -65,6 +67,50 @@ export const doSignIn     = (email, pw) => signInWithEmailAndPassword(auth, emai
 export const doSignUp     = (email, pw) => createUserWithEmailAndPassword(auth, email, pw);
 export const onAuthChange = (cb)       => onAuthStateChanged(auth, cb);
 export const doSignOut    = ()         => signOut(auth);
+
+/**
+ * Ensure there is a /users/{uid} profile doc with at least
+ *   - email
+ *   - role (default "student" if missing)
+ *   - createdAt
+ *
+ * It WILL NOT overwrite an existing role (so your admin/teacher
+ * accounts are safe).
+ */
+export async function ensureUserProfile(user) {
+  if (!user) return;
+
+  const ref = doc(db, "users", user.uid);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) {
+    // First time we see this user → create full profile
+    await setDoc(
+      ref,
+      {
+        email: user.email || null,
+        role: "student",
+        createdAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+  } else {
+    // Update missing fields only (don’t downgrade roles)
+    const data = snap.data() || {};
+    const patch = {};
+
+    if (!data.email && user.email) {
+      patch.email = user.email;
+    }
+    if (!data.role) {
+      patch.role = "student";
+    }
+
+    if (Object.keys(patch).length) {
+      await setDoc(ref, patch, { merge: true });
+    }
+  }
+}
 
 // — FIRESTORE HELPERS —
 // helper to build a reference to /users/{uid}/{subcol}

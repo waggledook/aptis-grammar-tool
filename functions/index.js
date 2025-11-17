@@ -100,6 +100,104 @@ exports.emailReport = functions.region("europe-west1")
     return null;
   });
 
+// =============== NEW: notify when a user becomes a TEACHER ===============
+exports.onUserRoleChange = functions
+  .region("europe-west1")
+  .firestore.document("users/{userId}")
+  .onWrite(async (change, context) => {
+    const before = change.before.exists ? change.before.data() : null;
+    const after  = change.after.exists  ? change.after.data()  : null;
+
+    // If the document was deleted, do nothing
+    if (!after) {
+      return null;
+    }
+
+    const oldRole = before?.role || null;
+    const newRole = after.role || null;
+
+    // Only act if the role has JUST become "teacher"
+    if (newRole !== "teacher" || oldRole === "teacher") {
+      return null;
+    }
+
+    const userEmail = after.email || null;
+    const when = new Date().toLocaleString("en-GB", {
+      timeZone: "Europe/Madrid",
+    });
+
+    const teacherLines = [
+      "Hi!",
+      "",
+      "You’ve just been set up as a TEACHER on the Seif Aptis Trainer.",
+      "",
+      "From now on you’ll gradually see more teacher-only tools and options, ",
+      "such as setting personalised grammar tests and accessing extra materials.",
+      "",
+      "If you think this was a mistake, or you have any questions, ",
+      "please reply to this email.",
+      "",
+      `Activated on: ${when}`,
+    ];
+
+    const adminLines = [
+      `User promoted to TEACHER at ${when}`,
+      "",
+      `UID: ${context.params.userId}`,
+      `Email: ${userEmail || "(no email stored)"}`,
+      "",
+      `Previous role: ${oldRole || "(none)"}`,
+      `New role: ${newRole}`,
+    ];
+
+    // Email to the new teacher (if we have an address)
+    const teacherMsg =
+      userEmail && userEmail.includes("@")
+        ? {
+            from: FROM_ADDRESS,
+            to: userEmail,
+            subject: "You now have teacher access – Seif Aptis Trainer",
+            text: teacherLines.join("\n"),
+            html:
+              "<p>Hi!</p>" +
+              "<p>You’ve just been set up as a <strong>teacher</strong> on the Seif Aptis Trainer.</p>" +
+              "<p>From now on you’ll gradually see more teacher-only tools and options, such as setting personalised grammar tests and accessing extra materials.</p>" +
+              "<p>If you think this was a mistake, or you have any questions, please reply to this email.</p>" +
+              `<p><em>Activated on: ${when}</em></p>`,
+            replyTo: TEACHER_EMAIL || FROM_ADDRESS,
+          }
+        : null;
+
+    // Notification to you / main admin address
+    const adminMsg = {
+      from: FROM_ADDRESS,
+      to: TEACHER_EMAIL || FROM_ADDRESS,
+      subject: "User promoted to TEACHER – Seif Aptis Trainer",
+      text: adminLines.join("\n"),
+      html: adminLines.map((l) => `<p>${l}</p>`).join(""),
+    };
+
+    try {
+      // Notify admin
+      await transporter.sendMail(adminMsg);
+
+      // Notify teacher, if we know their email
+      if (teacherMsg) {
+        await transporter.sendMail(teacherMsg);
+      }
+
+      console.log("MAIL_OK teacher role change", {
+        uid: context.params.userId,
+        userEmail,
+      });
+    } catch (err) {
+      console.error("MAIL_FAIL teacher role change", err?.message || String(err));
+    }
+
+    return null;
+  });
+
+
 // =============== NEW: HTTPS /speak (Google TTS + cache) =========
 const cors  = require("cors")({ origin: true });
 const crypto = require("crypto");

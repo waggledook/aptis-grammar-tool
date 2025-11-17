@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import Seo from "./common/Seo.jsx"; // adjust path if your folder structure differs
 
 
-export default function MainMenu({ onSelect }) {
+export default function MainMenu({ onSelect, user }) {
   const navigate = useNavigate();
   return (
     <div className="menu-wrapper">
@@ -86,6 +86,29 @@ export default function MainMenu({ onSelect }) {
   <h3>My Profile</h3>
   <p>See your progress and review saved work.</p>
 </button>
+
+{/* Admin tools – only for admins */}
+{user?.role === "admin" && (
+  <button
+    className="menu-card"
+    onClick={() => navigate("/admin")}
+  >
+    <h3>Admin Tools</h3>
+    <p>Manage teacher accounts & user roles.</p>
+  </button>
+)}
+
+        {/* Teacher tools – for teachers and admins */}
+        {(user?.role === "teacher" || user?.role === "admin") && (
+          <button
+            className="menu-card"
+            onClick={() => navigate("/teacher-tools")}
+          >
+            <h3>Teacher Tools</h3>
+            <p>Extra materials and test controls for teachers.</p>
+          </button>
+        )}
+
       </div>
 
 {/* --- Promo Banner --- */}
