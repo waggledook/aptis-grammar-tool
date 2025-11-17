@@ -1841,10 +1841,10 @@
           "tag": "Quantifiers",
           "sentence": "He spoke so quickly that ___ of us could follow what he was saying.",
           "options": ["nobody", "few", "much"],
-          "answerIndex": 0,
+          "answerIndex": 1,
           "explanations": [
-              "Correct: 'nobody' cannot be used with 'of us'. 'Nobody could follow' would be correct",
-              "Incorrect: 'Few' suggests that not many could follow..",
+              "Incorrect: 'nobody' cannot be used with 'of us'. 'Nobody could follow' would be correct",
+              "Correct: 'Few' suggests that not many could follow, and fits with 'of us'.",
               "Incorrect: 'Much' is not correct because 'us' refers to people which is countable."
           ]
       },
