@@ -23,12 +23,26 @@ export default function PreppyFlashcards() {
   const [cards] = useState(() => shuffleArray(preppyPrepositionCards));
   const total = cards.length;
   const current = cards[index];
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Preload all card images once
+useEffect(() => {
+    cards.forEach(card => {
+      const img = new Image();
+      img.src = card.image;
+    });
+  }, [cards]);
 
   useEffect(() => {
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
+
+  // Whenever the card changes, hide the image until it loads
+useEffect(() => {
+    setImageLoaded(false);
+  }, [current.id]);
 
   const safeSetIndex = (delta) => {
     setIndex((i) => (i + delta + total) % total);
@@ -91,8 +105,13 @@ export default function PreppyFlashcards() {
           <div className="preppy3-face preppy3-face--front">
             <p className="preppy3-face-label">Picture</p>
             <div className="preppy3-img-wrap">
-              <img src={current.image} alt={current.fullSentence} />
-            </div>
+  <img
+    src={current.image}
+    alt={current.fullSentence}
+    onLoad={() => setImageLoaded(true)}
+    className={imageLoaded ? "preppy3-img" : "preppy3-img preppy3-img--loading"}
+  />
+</div>
             <p className="preppy3-gap">{current.gapSentence}</p>
             <p className="preppy3-hint">
               Say the sentence aloud. Which preposition fits?{" "}
@@ -274,6 +293,30 @@ export default function PreppyFlashcards() {
             max-height: 180px;
           }
         }
+        .preppy3-img-wrap {
+  width: 100%;
+  max-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.6rem;
+}
+
+/* base image style */
+.preppy3-img {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 12px;
+  display: block;
+  transition: opacity 160ms ease;
+}
+
+/* while loading the new image, hide it and show a neutral placeholder */
+.preppy3-img--loading {
+  opacity: 0;
+}
+
       `}</style>
     </div>
   );
