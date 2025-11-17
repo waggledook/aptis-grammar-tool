@@ -443,6 +443,47 @@ export async function fetchWritingP4RegisterAttempts(n = 100) {
   return snap.docs.map(d => ({ id: d.id, ...d.data() }));
 }
 
+// 🔊 SPEAKING – speculation free notes
+export async function saveSpeakingSpeculationNote({ pictureId, text }) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) {
+    // silently fail or throw, depending on how you want to handle it
+    return;
+  }
+
+  const colRef = collection(db, "users", uid, "speakingSpeculationNotes");
+
+  await addDoc(colRef, {
+    pictureId: pictureId || null,
+    text: text || "",
+    createdAt: serverTimestamp(),
+    app: "aptis-trainer",
+    kind: "speaking_speculation_note",
+  });
+}
+
+export async function fetchSpeakingSpeculationNotes(limitCount = 50) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return [];
+
+  const colRef = collection(db, "users", uid, "speakingSpeculationNotes");
+  const qy = query(
+    colRef,
+    orderBy("createdAt", "desc"),
+    limit(limitCount)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((doc) => {
+    const data = doc.data() || {};
+    return {
+      id: doc.id,
+      text: data.text || "",
+      pictureId: data.pictureId || null,
+      createdAt: data.createdAt || null,
+    };
+  });
+}
 
 
 

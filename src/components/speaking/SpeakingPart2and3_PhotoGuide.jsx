@@ -2,6 +2,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import Seo from "../common/Seo.jsx";
 import UnderConstructionPanel from "../common/UnderConstructionPanel";
+import { db, auth } from "../../firebase";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 
 /* =========================
  * DATA: office / park / mountain
@@ -149,7 +151,7 @@ const SPEC_SETS = [
         {
           id: "balcony2",
           strong: "He is sad.",
-          target: "Use look.",
+          target: "Use look",
           gap: "He ___.",
           words: 2,
           answers: ["looks sad"],
@@ -341,6 +343,10 @@ export default function SpeakingPart2and3_PhotoGuide({
   // { [id]: { checked: boolean, ok: boolean, showModel: boolean } }
   const [specState, setSpecState] = useState({});
 
+  // 👇 NEW: free-practice notes for the two photos
+  const [freeNoteDad, setFreeNoteDad] = useState("");
+  const [freeNoteWedding, setFreeNoteWedding] = useState("");
+
   const handleSpecChange = (id, value) => {
     setSpecAnswers((prev) => ({ ...prev, [id]: value }));
   };
@@ -371,6 +377,76 @@ export default function SpeakingPart2and3_PhotoGuide({
     }));
   };
   const openSection = (section) => setView(section);
+
+  // 🔊 NEW – free practice notes (dad + wedding boat)
+const [freeSpecDadText, setFreeSpecDadText] = useState("");
+const [freeSpecDadStatus, setFreeSpecDadStatus] = useState(null);
+const [freeSpecDadSubmitted, setFreeSpecDadSubmitted] = useState(false);
+
+const [freeSpecBoatText, setFreeSpecBoatText] = useState("");
+const [freeSpecBoatStatus, setFreeSpecBoatStatus] = useState(null);
+const [freeSpecBoatSubmitted, setFreeSpecBoatSubmitted] = useState(false);
+
+// Generic save helper
+const handleSaveSpeculationNote = async (which) => {
+    const user = auth.currentUser;
+  
+    if (!user) {
+      if (which === "dad") {
+        setFreeSpecDadStatus("anon");
+      } else {
+        setFreeSpecBoatStatus("anon");
+      }
+      return;
+    }
+  
+    const rawText =
+      which === "dad" ? freeSpecDadText.trim() : freeSpecBoatText.trim();
+  
+    if (!rawText) return; // nothing to save
+  
+    try {
+      await addDoc(
+        collection(db, "users", user.uid, "speakingSpeculationNotes"),
+        {
+          userId: user.uid,
+          photoKey: which,           // "dad" or "wedding"
+          text: rawText,
+          createdAt: serverTimestamp(),
+        }
+      );
+  
+      if (which === "dad") {
+        setFreeSpecDadStatus("saved");
+        setFreeSpecDadSubmitted(true);  // 🔥 switch to summary view
+      } else {
+        setFreeSpecBoatStatus("saved");
+        setFreeSpecBoatSubmitted(true); // 🔥 switch to summary view
+      }
+    } catch (err) {
+      console.error("Error saving speculation note:", err);
+      if (which === "dad") {
+        setFreeSpecDadStatus("error");
+      } else {
+        setFreeSpecBoatStatus("error");
+      }
+    }
+  };  
+
+  const handleCopySpeculation = async (which) => {
+    const textToCopy =
+      which === "dad" ? freeSpecDadText.trim() : freeSpecBoatText.trim();
+  
+    if (!textToCopy) return;
+  
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      // optional: you could add a toast here if you like
+    } catch (err) {
+      console.error("Clipboard error:", err);
+    }
+  };
+  
 
   /* --------- Render helpers for sub-screens --------- */
 
@@ -863,6 +939,191 @@ export default function SpeakingPart2and3_PhotoGuide({
           </div>
         ))}
       </section>
+{/* 🔊 FREE PRACTICE 1 – Dad in the living room */}
+<section className="panel">
+  <h2>Free practice: speculate about this photo</h2>
+  <p className="panel-text">
+    Look at the picture and write{" "}
+    <strong>as many different sentences as you can</strong> using speculative
+    language: <em>might, may, could, must, can’t, seems, looks, probably,
+    I guess, It looks as if…</em>
+  </p>
+
+  <img
+    src="/images/speaking/describing-pictures/dad-living-room.png"
+    alt="A dad discovering that the living room is covered in children’s drawings"
+    className="speculation-image"
+    draggable="false"
+  />
+
+  {!freeSpecDadSubmitted ? (
+    <>
+      <textarea
+        className="free-spec-textarea"
+        rows={5}
+        value={freeSpecDadText}
+        onChange={(e) => {
+          setFreeSpecDadText(e.target.value);
+          if (freeSpecDadStatus) setFreeSpecDadStatus(null);
+        }}
+        placeholder="Write several speculative sentences here. Try to use different structures and modals..."
+      />
+
+      <div className="spec-actions" style={{ marginTop: "0.6rem" }}>
+        <button
+          type="button"
+          className="btn tiny"
+          onClick={() => handleSaveSpeculationNote("dad")}
+        >
+          Save note to my profile
+        </button>
+      </div>
+
+      {freeSpecDadStatus === "saved" && (
+        <p className="feedback ok">
+          Saved ✅ – you can review this later in your speaking notes.
+        </p>
+      )}
+      {freeSpecDadStatus === "anon" && (
+        <p className="feedback wrong">
+          Please sign in to save your notes to your profile.
+        </p>
+      )}
+      {freeSpecDadStatus === "error" && (
+        <p className="feedback wrong">
+          Sorry, there was a problem saving. Try again in a moment.
+        </p>
+      )}
+    </>
+  ) : (
+    <div className="free-spec-summary">
+      <div className="free-spec-summary-header">
+        <h4 style={{ margin: 0 }}>Your saved sentences</h4>
+        <div className="summary-actions">
+          <button
+            type="button"
+            className="btn tiny"
+            onClick={() => {
+              setFreeSpecDadSubmitted(false);
+              setFreeSpecDadStatus(null);
+            }}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            className="btn tiny"
+            onClick={() => handleCopySpeculation("dad")}
+          >
+            Copy text
+          </button>
+        </div>
+      </div>
+
+      <div className="free-spec-preview">
+        {freeSpecDadText}
+      </div>
+
+      {freeSpecDadStatus === "saved" && (
+        <p className="feedback ok" style={{ marginTop: "0.4rem" }}>
+          Saved ✅ – this version is stored in your speaking notes.
+        </p>
+      )}
+    </div>
+  )}
+</section>
+        {/* 🔊 FREE PRACTICE 2 – Wedding boat scene */
+            <section className="panel">
+  <h2>Free practice: the wedding boat</h2>
+  <p className="panel-text">
+    Now look at this second picture and continue practising. Again, use
+    different speculative structures (<em>might have, could be, must have,
+    can’t, seems, probably, It looks as if…</em>).
+  </p>
+
+  <img
+    src="/images/speaking/describing-pictures/wedding-boat.png"
+    alt="A woman in a dishevelled wedding dress rowing a small boat on rough water"
+    className="speculation-image"
+    draggable="false"
+  />
+
+  {!freeSpecBoatSubmitted ? (
+    <>
+      <textarea
+        className="free-spec-textarea"
+        rows={5}
+        value={freeSpecBoatText}
+        onChange={(e) => {
+          setFreeSpecBoatText(e.target.value);
+          if (freeSpecBoatStatus) setFreeSpecBoatStatus(null);
+        }}
+        placeholder="Write several speculative sentences about the woman, the boat and what might have happened..."
+      />
+
+      <div className="spec-actions" style={{ marginTop: "0.6rem" }}>
+        <button
+          type="button"
+          className="btn tiny"
+          onClick={() => handleSaveSpeculationNote("wedding")}
+        >
+          Save note to my profile
+        </button>
+      </div>
+
+      {freeSpecBoatStatus === "saved" && (
+        <p className="feedback ok">
+          Saved ✅ – great, another set of speculative sentences stored.
+        </p>
+      )}
+      {freeSpecBoatStatus === "anon" && (
+        <p className="feedback wrong">
+          Please sign in to save your notes to your profile.
+        </p>
+      )}
+      {freeSpecBoatStatus === "error" && (
+        <p className="feedback wrong">
+          Sorry, there was a problem saving. Try again in a moment.
+        </p>
+      )}
+    </>
+  ) : (
+    <div className="free-spec-summary">
+      <div className="free-spec-summary-header">
+        <h4 style={{ margin: 0 }}>Your saved sentences</h4>
+        <div className="summary-actions">
+          <button
+            type="button"
+            className="btn tiny"
+            onClick={() => {
+              setFreeSpecBoatSubmitted(false);
+              setFreeSpecBoatStatus(null);
+            }}
+          >
+            Edit
+          </button>
+          <button
+            type="button"
+            className="btn tiny"
+            onClick={() => handleCopySpeculation("wedding")}
+          >
+            Copy text
+          </button>
+        </div>
+      </div>
+
+      <div className="free-spec-preview">
+        {freeSpecBoatText}
+      </div>
+
+      {freeSpecBoatStatus === "saved" && (
+        <p className="feedback ok" style={{ marginTop: "0.4rem" }}>
+          Saved ✅ – this version is stored in your speaking notes.
+        </p>
+      )}
+    </div>
+  )}
+</section>}
     </main>
   );  
 
@@ -913,7 +1174,7 @@ export default function SpeakingPart2and3_PhotoGuide({
             <h3>What you’ll practise in this guide</h3>
             <ul className="bullets">
               <li>Starting a clear description of a photo</li>
-              <li>Using <strong>prepositions of place</strong> accurately</li>
+              <li>Using <strong>prepositions of place and movement</strong> accurately</li>
               <li>
                 Showing different levels of certainty with{" "}
                 <strong>speculative language</strong>
@@ -975,7 +1236,7 @@ export default function SpeakingPart2and3_PhotoGuide({
             <div>
               <h2 className="title">
                 {view === "language" && "Useful photo description language"}
-                {view === "prepositions" && "Prepositions of place with pictures"}
+                {view === "prepositions" && "Prepositions of place and movement"}
                 {view === "speculation" && "Speculating about photos"}
               </h2>
               <p className="intro">
@@ -1420,6 +1681,48 @@ export default function SpeakingPart2and3_PhotoGuide({
   color: #e5e7eb;
   font-size: 0.9rem;
 }
+.free-spec-textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 5rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.5rem;
+  border: 1px solid #4b5563;
+  background: #020617;
+  color: #e5e7eb;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+.free-spec-summary {
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.75rem;
+  background: #0f1b31;
+  border: 1px solid #2c416f;
+}
+
+.free-spec-summary-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.free-spec-summary .summary-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.free-spec-preview {
+  font-size: 0.9rem;
+  color: var(--ink);
+  line-height: 1.4;
+  white-space: pre-wrap; /* keep line breaks from the textarea */
+}
+
 
       `}</style>
     </div>

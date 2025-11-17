@@ -48,6 +48,10 @@ export default function Profile({
   const [showP4Register, setShowP4Register] = useState(false);
   const [showWritingAll, setShowWritingAll] = useState(false);
 
+  const [speakingNotes, setSpeakingNotes] = useState([]);
+  const [showSpeakingNotes, setShowSpeakingNotes] = useState(false);
+
+
 
   // we'll still keep photoURL logic in case you want to bring badges back later,
   // but we just won't render the avatar / studio for now.
@@ -83,6 +87,7 @@ export default function Profile({
           gEdits,
           wP4,
           p4Reg,
+          specNotes,
         ] = await Promise.all([
           fb.fetchReadingProgressCount(),
           fb.fetchSpeakingCounts(),
@@ -93,6 +98,7 @@ export default function Profile({
           fb.fetchWritingP1GuideEdits(100),
           fb.fetchWritingP4Submissions?.(20) ?? Promise.resolve([]),
           fb.fetchWritingP4RegisterAttempts?.(100) ?? Promise.resolve([]),
+          fb.fetchSpeakingSpeculationNotes?.(50) ?? Promise.resolve([]),
         ]);
 
         if (!alive) return;
@@ -105,6 +111,7 @@ export default function Profile({
         setGuideEdits(gEdits);
         setWritingP4(wP4);
         setP4Register(p4Reg);
+        setSpeakingNotes(specNotes);
       } catch (e) {
         console.error("[Profile] load failed", e);
         toast("Couldn’t load some profile data.");
@@ -785,6 +792,140 @@ export default function Profile({
         )}
       </div>
     </div>
+  )}
+</section>
+
+      {/* --- SPEAKING NOTES --- */}
+      <section className="panel collapsible" style={{ marginTop: "1rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showSpeakingNotes}
+    onClick={() => setShowSpeakingNotes((s) => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      My Speaking Notes
+    </h3>
+
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      {speakingNotes.length} saved item
+      {speakingNotes.length === 1 ? "" : "s"}
+    </span>
+
+    <span
+      className={`chev ${showSpeakingNotes ? "open" : ""}`}
+      aria-hidden
+    >
+      ▾
+    </span>
+  </button>
+
+  {showSpeakingNotes && (
+    <>
+      {!speakingNotes.length ? (
+        <p className="muted" style={{ marginTop: ".5rem" }}>
+          No saved speaking notes yet.
+        </p>
+      ) : (
+        <>
+          <div className="actions" style={{ marginTop: ".5rem" }}>
+            <button
+              className="btn"
+              onClick={() => {
+                const text = speakingNotes
+                  .map((n, idx) => {
+                    const when = n.createdAt?.toDate?.()
+                      ? n.createdAt.toDate().toLocaleString()
+                      : "—";
+
+                    // 🔧 NEW: normalise context/pictureId
+                    const ctx = n.context || n.pictureId;
+
+                    const label =
+                      ctx === "dad"
+                        ? "Living-room picture"
+                        : ctx === "wedding"
+                        ? "Wedding boat picture"
+                        : ctx || "Photo note";
+
+                    return [
+                      `Note ${idx + 1} (${when}) – ${label}`,
+                      "",
+                      n.text || "(empty)",
+                    ].join("\n");
+                  })
+                  .join("\n\n");
+
+                navigator.clipboard
+                  .writeText(text)
+                  .then(() => toast("Copied all speaking notes ✓"));
+              }}
+            >
+              Copy all
+            </button>
+          </div>
+
+          <ul className="wlist" style={{ marginTop: ".5rem" }}>
+            {speakingNotes.map((n, idx) => {
+              const when = n.createdAt?.toDate?.()
+                ? n.createdAt.toDate().toLocaleString()
+                : "—";
+
+              // 🔧 NEW: same normalisation here
+              const ctx = n.context || n.pictureId;
+
+              const label =
+                ctx === "dad"
+                  ? "Living-room picture"
+                  : ctx === "wedding"
+                  ? "Wedding boat picture"
+                  : ctx || "Photo note";
+
+              return (
+                <li key={n.id || idx} className="wcard">
+                  <div className="whead">
+                    <div>
+                      <strong>{label}</strong>
+                      <div className="muted small">{when}</div>
+                    </div>
+                    <div className="actions">
+                      <button
+                        className="btn"
+                        onClick={() => {
+                          const text = [
+                            `${label} (${when})`,
+                            "",
+                            n.text || "(empty)",
+                          ].join("\n");
+
+                          navigator.clipboard
+                            .writeText(text)
+                            .then(() => toast("Copied note ✓"));
+                        }}
+                      >
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+
+                  <div
+                    className="qa"
+                    style={{
+                      listStyle: "none",
+                      paddingLeft: 0,
+                    }}
+                  >
+                    <div className="a">
+                      {n.text || <em>(no content)</em>}
+                    </div>
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </>
+      )}
+    </>
   )}
 </section>
 
