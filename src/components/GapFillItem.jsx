@@ -6,7 +6,7 @@ import { AlertCircle, Star } from 'lucide-react'
 import { toast } from '../utils/toast'
 import '../index.css'     // your global styles
 
-export default function GapFillItem({ item, onAnswer }) {
+export default function GapFillItem({ item, onAnswer, testMode = false }) {
   const { id, sentence, options, answerIndex, explanations, level } = item
 
   const [sel, setSel]             = useState(null)
@@ -155,32 +155,43 @@ const toggleFav = async () => {
         {after}
       </p>
 
-      {/* Multiple-choice options */}
-      <div className="options-row">
-        {options.map((opt, i) => (
-          <button
-          key={i}
-          type="button"  // 👈 explicitly a button, not a form submit
-          className={`
-            option-btn
-            ${sel !== null
-              ? i === answerIndex
-                ? 'correct'
-                : i === sel
-                  ? 'incorrect'
-                  : ''
-              : ''}
-          `}
-          onClick={() => handleClick(i)}
-          disabled={sel !== null}
-        >
-          {opt}
-        </button>
-        ))}
-      </div>
+      {/* Multiple-choice options - FIXED VERSION */}
+<div className="options-row">
+  {options.map((opt, i) => {
+    const isChosen = sel === i;
+    const isAnswered = sel !== null;
+
+    let feedbackClass = "";
+
+    // 🟢 Full visual feedback only in practice mode
+    if (isAnswered && !testMode) {
+      if (i === answerIndex) {
+        feedbackClass = "correct";
+      } else if (isChosen) {
+        feedbackClass = "incorrect";
+      }
+    }
+
+    // 🔵 PERSISTENT VISUAL FEEDBACK IN TEST MODE
+    const testModeClass = testMode && isChosen ? 'test-mode-selected' : '';
+    
+    return (
+      <button
+        key={i}
+        type="button"
+        className={`option-btn ${feedbackClass} ${testModeClass}`}
+        onClick={() => handleClick(i)}
+        disabled={isAnswered}   // Disable options in ALL modes once answered
+
+      >
+        {opt}
+      </button>
+    );
+  })}
+</div>
 
       {/* Feedback list */}
-      {sel !== null && (() => {
+      {!testMode && sel !== null && (() => {
   // Pair option + explanation + meta
   const feedback = options.map((opt, i) => ({
     key: i,                 // original index

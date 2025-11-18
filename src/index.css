@@ -569,3 +569,27 @@ button:focus-visible {
     100% { transform: translateX(0); }
   }
 }
+/* More specific test mode selection styling */
+.gapfill-card .options-row .option-btn.test-mode-selected {
+  background-color: #334155 !important;
+  border: 2px solid #60a5fa !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 0 12px rgba(96, 165, 250, 0.7) !important;
+  transform: scale(1.05) !important;
+  transition: all 0.2s ease-in-out !important;
+}
+
+/* Hover state for test mode buttons */
+.gapfill-card .options-row .option-btn:not(:disabled):hover {
+  background-color: #e2e8f0;
+}
+
+/* Ensure disabled state doesn't override test mode selection */
+.gapfill-card .options-row .option-btn:disabled.test-mode-selected {
+  background-color: #334155 !important;
+  border-color: #60a5fa !important;
+  color: white !important;
+  opacity: 1 !important;
+}
+

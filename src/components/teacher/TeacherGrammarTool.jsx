@@ -5,6 +5,8 @@ import FilterPanel from "../FilterPanel";
 import { createGrammarSet } from "../../firebase";
 // ✅ Use the full, up-to-date bank from /scripts
 import allItems from "../../../scripts/grammar-items.json";
+import { toast } from "../../utils/toast";
+
 
 // Normalise tag(s) so we can handle both "tag" and "tags"
 const getItemTags = (item) => {
@@ -27,8 +29,36 @@ export default function TeacherGrammarTool({ user }) {
   const [saving, setSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState("");
 
+  // NEW: test mode flags
+  const [testMode, setTestMode] = useState(false);
+  const [reviewAfterTest, setReviewAfterTest] = useState(false);
+
   const { tags: allTags = [], loading: tagsLoading, error: tagsError } = useTags();
 
+
+  const showModeHelp = (mode) => {
+    let msg = "";
+  
+    switch (mode) {
+      case "practice":
+        msg =
+          "Practice: Students see instant feedback for each question (correct/incorrect and explanations) while doing the set.";
+        break;
+      case "testScore":
+        msg =
+          "Test – score only: Students do NOT see feedback while answering. When they finish, they only see their total score, not corrections.";
+        break;
+      case "testReview":
+        msg =
+          "Test + review: Students do NOT see feedback while answering. When they finish, they see their score AND a full review with correct answers.";
+        break;
+      default:
+        msg =
+          "Choose how feedback works: Practice (instant feedback), Test – score only, or Test + review.";
+    }
+  
+    toast(msg, { duration: 6500 });
+  };  
   // ---------- Helpers ----------
   const toggleSelect = (id) => {
     setSelectedIds((curr) =>
@@ -116,7 +146,9 @@ export default function TeacherGrammarTool({ user }) {
         itemIds: selectedIds,
         levels: metaLevels,
         tags: metaTags,
-        visibility, // "draft" | "published"
+        visibility,     // "draft" | "published"
+        testMode,       // NEW
+        reviewAfterTest // NEW
       };
 
       const id = await createGrammarSet(payload);
@@ -256,6 +288,183 @@ export default function TeacherGrammarTool({ user }) {
               {selectedIds.length === 1 ? "" : "s"}
             </span>
           </div>
+
+                    {/* 🔹 Mode selector – compact, with per-mode help */}
+<div
+  style={{
+    margin: ".35rem 0 .75rem 0",
+    display: "flex",
+    flexDirection: "column",
+    gap: ".4rem",
+  }}
+>
+  <span className="small muted">Mode for this set:</span>
+
+  <div
+    style={{
+      display: "flex",
+      gap: ".5rem",
+      flexWrap: "wrap",
+    }}
+  >
+    {/* PRACTICE */}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: ".2rem",
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => {
+          setTestMode(false);
+          setReviewAfterTest(false);
+        }}
+        className="option-btn"
+        style={{
+          fontSize: "0.8rem",
+          padding: "0.28rem .85rem",
+          borderRadius: "999px",
+          background: !testMode ? "#0f172a" : "transparent",
+          borderColor: !testMode ? "#38bdf8" : "#334155",
+          color: !testMode ? "#e0f7ff" : "#cbd5e1",
+          fontWeight: 600,
+        }}
+      >
+        Practice
+      </button>
+
+      {/* Help for Practice */}
+      <button
+        type="button"
+        onClick={() => showModeHelp("practice")}
+        style={{
+          width: "1.5rem",
+          height: "1.5rem",
+          borderRadius: "999px",
+          border: "1px solid #4b5563",
+          background: "transparent",
+          color: "#9ca3af",
+          fontSize: "0.9rem",
+          lineHeight: 1,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+        }}
+        title="What does Practice mode do?"
+      >
+        ?
+      </button>
+    </div>
+
+    {/* TEST – SCORE ONLY */}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: ".2rem",
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => {
+          setTestMode(true);
+          setReviewAfterTest(false);
+        }}
+        className="option-btn"
+        style={{
+          fontSize: "0.8rem",
+          padding: "0.28rem .85rem",
+          borderRadius: "999px",
+          background: testMode && !reviewAfterTest ? "#1e1b07" : "transparent",
+          borderColor: testMode && !reviewAfterTest ? "#fbbf24" : "#334155",
+          color: testMode && !reviewAfterTest ? "#fef9c3" : "#cbd5e1",
+          fontWeight: 600,
+        }}
+      >
+        Test – score only
+      </button>
+
+      {/* Help for Test – score only */}
+      <button
+        type="button"
+        onClick={() => showModeHelp("testScore")}
+        style={{
+          width: "1.5rem",
+          height: "1.5rem",
+          borderRadius: "999px",
+          border: "1px solid #4b5563",
+          background: "transparent",
+          color: "#9ca3af",
+          fontSize: "0.9rem",
+          lineHeight: 1,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+        }}
+        title="What does this mode do?"
+      >
+        ?
+      </button>
+    </div>
+
+    {/* TEST + REVIEW */}
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: ".2rem",
+      }}
+    >
+      <button
+        type="button"
+        onClick={() => {
+          setTestMode(true);
+          setReviewAfterTest(true);
+        }}
+        className="option-btn"
+        style={{
+          fontSize: "0.8rem",
+          padding: "0.28rem .85rem",
+          borderRadius: "999px",
+          background: testMode && reviewAfterTest ? "#064e3b" : "transparent",
+          borderColor: testMode && reviewAfterTest ? "#22c55e" : "#334155",
+          color: testMode && reviewAfterTest ? "#d1fae5" : "#cbd5e1",
+          fontWeight: 600,
+        }}
+      >
+        Test + review
+      </button>
+
+      {/* Help for Test + review */}
+      <button
+        type="button"
+        onClick={() => showModeHelp("testReview")}
+        style={{
+          width: "1.5rem",
+          height: "1.5rem",
+          borderRadius: "999px",
+          border: "1px solid #4b5563",
+          background: "transparent",
+          color: "#9ca3af",
+          fontSize: "0.9rem",
+          lineHeight: 1,
+          display: "inline-flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+        }}
+        title="What does this mode do?"
+      >
+        ?
+      </button>
+    </div>
+  </div>
+</div>
+
 
                               {/* Selected items list */}
           <div

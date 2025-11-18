@@ -2,19 +2,28 @@
 import React from 'react';
 import GapFillItem from './GapFillItem';
 
-export default function GapFillList({ items, onAnswer, runKey }) {
+export default function GapFillList({
+  items,
+  onAnswer,
+  runKey = "run",
+  testMode = false,
+}) {
   if (!items) return null;
-  if (items.length === 0) return <p>No items to display. Click “Generate” above.</p>;
+  if (items.length === 0) {
+    return <p>No items to display. Click “Generate” above.</p>;
+  }
 
   return (
     <div>
-      {items.map(item => (
+      {items.map((item) => (
         <GapFillItem
-          key={`${runKey}-${item.id}`}   // remounts items each run
+          key={`${runKey}-${item.id}`} // remounts items each run
           item={item}
           onAnswer={onAnswer}
+          testMode={testMode}         // NEW
         />
       ))}
     </div>
   );
 }
+
