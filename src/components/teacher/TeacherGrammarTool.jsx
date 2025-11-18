@@ -92,10 +92,10 @@ export default function TeacherGrammarTool({ user }) {
     const activeLevels = levels.length ? levels : ALL_LEVELS;
     const lowerSearch = search.trim().toLowerCase();
   
-    return allItems.filter((item) => {
+    const filtered = allItems.filter((item) => {
       const itemLevel = item.level || "B1";
       const sentence = (item.sentence || item.text || "").toLowerCase();
-      const tagsArr = getItemTags(item); // ← normalised tags
+      const tagsArr = getItemTags(item);
   
       if (!activeLevels.includes(itemLevel)) return false;
       if (tag && !tagsArr.includes(tag)) return false;
@@ -103,6 +103,9 @@ export default function TeacherGrammarTool({ user }) {
   
       return true;
     });
+  
+    // 🔀 Randomise display order so teachers don’t always see the same items first
+    return [...filtered].sort(() => Math.random() - 0.5);
   }, [levels, tag, search]);
   
 
@@ -467,6 +470,25 @@ export default function TeacherGrammarTool({ user }) {
 
 
                               {/* Selected items list */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "baseline",
+    marginBottom: ".35rem",
+  }}
+>
+  <span className="small muted">
+    Selected items (order of questions)
+  </span>
+  {selectedItems.length > 0 && (
+    <span className="tiny muted">
+      {selectedItems.length} item
+      {selectedItems.length === 1 ? "" : "s"}
+    </span>
+  )}
+</div>
+
           <div
             style={{
               maxHeight: "260px",
@@ -502,17 +524,24 @@ export default function TeacherGrammarTool({ user }) {
 
                   return (
                     <li key={item.id}>
-                      <div className="card gapfill-card">
-                        {/* Header = info row + buttons row */}
+                      <div
+                        className="card gapfill-card"
+                        style={{
+                          padding: ".65rem .8rem",
+                        }}
+                      >
+                        {/* Compact header: level + tag + item number + controls */}
                         <div
                           className="card-header"
                           style={{
                             display: "flex",
-                            flexDirection: "column",
-                            gap: ".3rem",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                            marginBottom: ".35rem",
+                            gap: ".75rem",
                           }}
                         >
-                          {/* Row 1: level + tag + ID */}
+                          {/* Left: meta info */}
                           <div
                             style={{
                               display: "flex",
@@ -521,22 +550,25 @@ export default function TeacherGrammarTool({ user }) {
                               flexWrap: "wrap",
                             }}
                           >
-                            <span className={`cefr-badge cefr-${level}`}>
-                              {level}
-                            </span>
-                            <span className="badge tiny subtle">
-                              {tagLabel}
-                            </span>
+                            <span
+  className={`cefr-badge cefr-${level}`}
+  style={{
+    position: "static",   // ⬅️ stop it from floating in the corner
+    marginLeft: 0,
+  }}
+>
+  {level}
+</span>
+<span className="badge tiny subtle">{tagLabel}</span>
+<span className="tiny muted">Item {index + 1}</span>
                           </div>
-
-                          {/* Row 2: controls, right-aligned */}
+                  
+                          {/* Right: controls */}
                           <div
                             style={{
                               display: "flex",
-                              gap: ".25rem",
+                              gap: ".3rem",
                               alignItems: "center",
-                              justifyContent: "flex-end",
-                              width: "100%",
                             }}
                           >
                             <button
@@ -546,21 +578,25 @@ export default function TeacherGrammarTool({ user }) {
                               disabled={index === 0}
                               title="Move up"
                               style={{
-                                minWidth: "1.9rem",
-                                height: "1.9rem",
+                                minWidth: "1.6rem",
+                                height: "1.6rem",
                                 padding: 0,
                                 fontSize: "0.8rem",
                                 lineHeight: 1,
                                 display: "inline-flex",
                                 alignItems: "center",
                                 justifyContent: "center",
+                                borderRadius: "999px",
+                                background: "#020617",
+                                border: "1px solid #475569",
+                                color: "#e5e7eb",
                                 opacity: index === 0 ? 0.35 : 1,
-                                cursor:
-                                  index === 0 ? "default" : "pointer",
+                                cursor: index === 0 ? "default" : "pointer",
                               }}
                             >
                               ↑
                             </button>
+                  
                             <button
                               type="button"
                               className="option-btn"
@@ -568,51 +604,58 @@ export default function TeacherGrammarTool({ user }) {
                               disabled={index === selectedItems.length - 1}
                               title="Move down"
                               style={{
-                                minWidth: "1.9rem",
-                                height: "1.9rem",
+                                minWidth: "1.6rem",
+                                height: "1.6rem",
                                 padding: 0,
                                 fontSize: "0.8rem",
                                 lineHeight: 1,
                                 display: "inline-flex",
                                 alignItems: "center",
                                 justifyContent: "center",
-                                opacity:
-                                  index === selectedItems.length - 1
-                                    ? 0.35
-                                    : 1,
+                                borderRadius: "999px",
+                                background: "#020617",
+                                border: "1px solid #475569",
+                                color: "#e5e7eb",
+                                opacity: index === selectedItems.length - 1 ? 0.35 : 1,
                                 cursor:
-                                  index === selectedItems.length - 1
-                                    ? "default"
-                                    : "pointer",
+                                  index === selectedItems.length - 1 ? "default" : "pointer",
                               }}
                             >
                               ↓
                             </button>
+                  
                             <button
                               type="button"
                               className="option-btn"
                               onClick={() => toggleSelect(item.id)}
                               title="Remove from set"
                               style={{
-                                minWidth: "1.9rem",
-                                height: "1.9rem",
+                                minWidth: "1.6rem",
+                                height: "1.6rem",
                                 padding: 0,
                                 fontSize: "0.8rem",
                                 lineHeight: 1,
                                 display: "inline-flex",
                                 alignItems: "center",
                                 justifyContent: "center",
+                                borderRadius: "999px",
+                                background: "#450a0a",
+                                border: "1px solid #f97316",
+                                color: "#fed7aa",
                               }}
                             >
                               ✕
                             </button>
                           </div>
                         </div>
-
+                  
                         {/* Sentence preview */}
                         <p
                           className="sentence-text"
-                          style={{ marginTop: ".15rem" }}
+                          style={{
+                            marginTop: 0,
+                            fontSize: "0.95rem",
+                          }}
                         >
                           {before}
                           <strong className="blank">_____</strong>
@@ -620,7 +663,7 @@ export default function TeacherGrammarTool({ user }) {
                         </p>
                       </div>
                     </li>
-                  );
+                  );                  
                 })}
               </ol>
             )}
