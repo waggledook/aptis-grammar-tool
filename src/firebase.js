@@ -19,7 +19,8 @@ import {
   limit,
   serverTimestamp,
   getCountFromServer,           // ← NEW
-  increment                     // ← NEW
+  increment,                     // ← NEW
+  updateDoc                     // ← ADD THIS
 } from "firebase/firestore";
 
 import {
@@ -531,6 +532,124 @@ export async function fetchSpeakingSpeculationNotes(limitCount = 50) {
   });
 }
 
+/**
+ * Create a new grammar set owned by the current user.
+ * @param {Object} data - { title, description, itemIds, levels, tags, visibility }
+ * @returns {Promise<string>} The new document ID.
+ */
+export async function createGrammarSet(data) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error("Must be signed in to create a grammar set.");
+
+  const ref = await addDoc(collection(db, "grammarSets"), {
+    ...data,
+    ownerId: uid,
+    ownerEmail: auth.currentUser.email || null,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  return ref.id;
+}
+
+/**
+ * Update an existing grammar set (only fields you pass).
+ * @param {string} id
+ * @param {Object} data
+ */
+export async function updateGrammarSet(id, data) {
+  const ref = doc(db, "grammarSets", id);
+  await updateDoc(ref, {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+/**
+ * Fetch a single grammar set by ID.
+ */
+export async function getGrammarSet(id) {
+  const ref = doc(db, "grammarSets", id);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
+}
+
+/**
+ * List all published grammar sets (for student browsing).
+ */
+export async function listPublishedGrammarSets() {
+  const q = query(
+    collection(db, "grammarSets"),
+    where("visibility", "==", "published"),
+    orderBy("createdAt", "desc")
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+/**
+ * List grammar sets created by the current user (for teacher dashboard).
+ */
+export async function listMyGrammarSets() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return [];
+  const q = query(
+    collection(db, "grammarSets"),
+    where("ownerId", "==", uid),
+    orderBy("createdAt", "desc")
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+export async function submitGrammarSetAttempt({
+  setId,
+  setTitle,
+  ownerUid,
+  studentUid,
+  studentEmail,
+  score,
+  total,
+  answers,
+}) {
+  const percent = total > 0 ? Math.round((score / total) * 100) : 0;
+
+  const docRef = await addDoc(collection(db, "grammarSetAttempts"), {
+    setId,
+    setTitle,
+    ownerUid,
+    studentUid,
+    studentEmail,
+    score,
+    total,
+    percent,
+    answers,
+    startedAt: serverTimestamp(),   // or pass one in if you track it
+    submittedAt: serverTimestamp(),
+  });
+
+  return docRef.id;
+}
+
+/**
+ * List all attempts for one of *my* grammar sets, newest first.
+ * (Filters by ownerUid AND setId.)
+ */
+export async function listAttemptsForMyGrammarSet(setId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !setId) return [];
+
+  const q = query(
+    collection(db, "grammarSetAttempts"),
+    where("ownerUid", "==", uid),
+    where("setId", "==", setId),
+    orderBy("submittedAt", "desc")
+  );
+
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
 
 
 // ─── GRAMMAR PROGRESS ────────────────────────────────────────────────────────

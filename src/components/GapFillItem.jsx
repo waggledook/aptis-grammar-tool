@@ -33,29 +33,42 @@ export default function GapFillItem({ item, onAnswer }) {
   // 2) Handle answer clicks (and record mistakes)
   //
   const handleClick = (idx) => {
-    if (sel !== null) return;
+    if (sel !== null) return; // already answered
   
-    try {
-      // Only call if provided
-      if (typeof onAnswer === "function") {
-        onAnswer();
+    setSel(idx);
+  
+    const isCorrect = idx === answerIndex;
+  
+    // Tell parent (GrammarSetRunner / main trainer) what happened
+    if (typeof onAnswer === "function") {
+      try {
+        onAnswer({
+          itemId: id,
+          isCorrect,
+          selectedIndex: idx,
+          correctIndex: answerIndex,
+          selectedOption: options?.[idx] ?? null,
+          correctOption: options?.[answerIndex] ?? null,
+        });
+      } catch (err) {
+        console.error("[GapFillItem] onAnswer handler failed:", err);
       }
-  
-      setSel(idx);
-  
-      const isCorrect = idx === answerIndex;
-  
-      // Only write to Firestore if signed in
-      if (auth.currentUser) {
-        if (!isCorrect) {
-          recordMistake(id).catch(console.error);
-        }
-        saveGrammarResult(id, isCorrect).catch?.(console.error);
-      }
-    } catch (err) {
-      console.error("Error in handleClick for item", id, err);
     }
-  };
+  
+    // Only write to Firestore if signed in
+    const user = auth.currentUser;
+    if (!user) return;
+  
+    if (!isCorrect) {
+      recordMistake(id).catch((err) =>
+        console.error("[GapFillItem] recordMistake error:", err)
+      );
+    }
+  
+    saveGrammarResult(id, isCorrect).catch((err) =>
+      console.error("[GapFillItem] saveGrammarResult error:", err)
+    );
+  };  
 
   // 3) Toggle favourite on/off
 const toggleFav = async () => {

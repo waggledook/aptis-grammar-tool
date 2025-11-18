@@ -36,7 +36,9 @@ import TopicTrainer from "./components/vocabulary/TopicTrainer";
 import Seo from "./components/common/Seo.jsx";
 import './App.css'
 import { doc, getDoc } from "firebase/firestore";
+import GrammarSetRunner from "./components/grammar/GrammarSetRunner";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
+import TeacherTools from "./components/teacher/TeacherTools"; // ← Add this
 
 
 
@@ -631,30 +633,20 @@ const [runKey,  setRunKey]  = useState(0);
   }
 />
 
-
 <Route
   path="/teacher-tools"
   element={
-    (user?.role === "admin" || user?.role === "teacher")
-      ? (
-          <>
-            <button
-              onClick={() => navigate("/")}
-              className="review-btn"
-              style={{ marginBottom: "1rem" }}
-            >
-              ← Back to home
-            </button>
-            <h1>Teacher Tools</h1>
-            <p>Extra tools for teachers will go here.</p>
-          </>
-        )
-      : <p>Access denied. Teachers only.</p>
+    user ? <TeacherTools user={user} /> : <p className="muted">Please log in.</p>
   }
 />
 <Route
   path="/admin"
   element={<AdminDashboard user={user} />}
+/>
+
+<Route
+  path="/grammar-sets/:setId"
+  element={<GrammarSetRunner user={user} />}
 />
 
 
