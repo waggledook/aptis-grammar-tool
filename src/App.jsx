@@ -39,7 +39,8 @@ import { doc, getDoc } from "firebase/firestore";
 import GrammarSetRunner from "./components/grammar/GrammarSetRunner";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 import TeacherTools from "./components/teacher/TeacherTools"; // ← Add this
-
+import MyStudents from "./components/teacher/MyStudents";
+import TeacherStudentProfile from "./components/TeacherStudentProfile";
 
 
 export default function App() {
@@ -645,10 +646,19 @@ const [runKey,  setRunKey]  = useState(0);
 />
 
 <Route
+  path="/my-students"
+  element={<MyStudents user={user} />}
+/>
+
+<Route
   path="/grammar-sets/:setId"
   element={<GrammarSetRunner user={user} />}
 />
 
+<Route
+  path="/teacher/student/:studentId"
+  element={<TeacherStudentProfile user={user} />}
+/>
 
   <Route
     path="/*"

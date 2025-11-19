@@ -97,7 +97,7 @@ export const preppyPrepositionCards = [
     id: "into-the-room",
     image: `${BASE}/into-the-room.png`,
     gapSentence: "Preppy is running ____ the room.",
-    fullSentence: "Preppy is running into the room.",
+    fullSentence: "Preppy is running into the room. (entering)",
     answer: "into",
     explanation:
       "Use “into” when something moves from outside to inside an enclosed space."
@@ -105,7 +105,7 @@ export const preppyPrepositionCards = [
   {
     id: "towards-the-box",
     image: `${BASE}/towards-the-box.png`,
-    gapSentence: "Preppy is running _______ the box.",
+    gapSentence: "Preppy is running _______ the box.(in the direction of)",
     fullSentence: "Preppy is running towards the box.",
     answer: "towards",
     explanation:

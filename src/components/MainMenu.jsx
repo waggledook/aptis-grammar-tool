@@ -109,6 +109,16 @@ export default function MainMenu({ onSelect, user }) {
           </button>
         )}
 
+{user && (user.role === "teacher" || user.role === "admin") && (
+  <button
+    className="menu-card"
+    onClick={() => navigate("/my-students")}
+  >
+    <h3>My Students</h3>
+    <p>Track your students' progress.</p>
+  </button>
+)}
+
       </div>
 
 {/* --- Promo Banner --- */}

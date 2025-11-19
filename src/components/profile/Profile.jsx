@@ -13,6 +13,10 @@ export default function Profile({
   onBack,
   onGoMistakes,
   onGoFavourites,
+  // NEW:
+  targetUid,              // optional: which user to load data for
+  titleOverride,          // optional: override "My Profile"
+  viewerLabelOverride,    // optional: override "Signed in as …"
 }) {
   const [loading, setLoading] = useState(true);
 
@@ -75,6 +79,13 @@ export default function Profile({
   // load all profile data
   useEffect(() => {
     let alive = true;
+  
+    const uid = targetUid || auth.currentUser?.uid;
+    if (!uid) {
+      setLoading(false);
+      return;
+    }
+  
     (async () => {
       try {
         const [
@@ -89,18 +100,18 @@ export default function Profile({
           p4Reg,
           specNotes,
         ] = await Promise.all([
-          fb.fetchReadingProgressCount(),
-          fb.fetchSpeakingCounts(),
-          fb.fetchRecentMistakes(8),
-          fb.fetchRecentFavourites(8),
-          fb.fetchWritingP1Sessions(10),
-          fb.fetchGrammarDashboard(),
-          fb.fetchWritingP1GuideEdits(100),
-          fb.fetchWritingP4Submissions?.(20) ?? Promise.resolve([]),
-          fb.fetchWritingP4RegisterAttempts?.(100) ?? Promise.resolve([]),
-          fb.fetchSpeakingSpeculationNotes?.(50) ?? Promise.resolve([]),
+          fb.fetchReadingProgressCount(uid),
+          fb.fetchSpeakingCounts(uid),
+          fb.fetchRecentMistakes(8, uid),
+          fb.fetchRecentFavourites(8, uid),
+          fb.fetchWritingP1Sessions(10, uid),
+          fb.fetchGrammarDashboard(uid),
+          fb.fetchWritingP1GuideEdits(100, uid),
+          fb.fetchWritingP4Submissions?.(20, uid) ?? Promise.resolve([]),
+          fb.fetchWritingP4RegisterAttempts?.(100, uid) ?? Promise.resolve([]),
+          fb.fetchSpeakingSpeculationNotes?.(50, uid) ?? Promise.resolve([]),
         ]);
-
+  
         if (!alive) return;
         setReadingCount(rCount);
         setSpeakingCounts(sCounts);
@@ -119,25 +130,30 @@ export default function Profile({
         if (alive) setLoading(false);
       }
     })();
+  
     return () => {
       alive = false;
     };
-  }, []);
+  }, [targetUid]);  
 
   return (
     <div className="profile-page game-wrapper">
       <StyleScope />
       <header className="header">
-        <h2 className="title">My Profile</h2>
-        <p className="intro">
-          Signed in as <strong>{user?.email || "Guest"}</strong>
-        </p>
-        <div style={{ marginLeft: "auto" }}>
-          <button className="topbar-btn" onClick={onBack}>
-            ← Back
-          </button>
-        </div>
-      </header>
+  <h2 className="title">{titleOverride || "My Profile"}</h2>
+  <p className="intro">
+    {viewerLabelOverride ?? (
+      <>
+        Signed in as <strong>{user?.email || "Guest"}</strong>
+      </>
+    )}
+  </p>
+  <div style={{ marginLeft: "auto" }}>
+    <button className="topbar-btn" onClick={onBack}>
+      ← Back
+    </button>
+  </div>
+</header>
 
       {/* NOTE: avatar / Create/Change badge UI + ProfileBadgeStudio REMOVED */}
 
@@ -215,34 +231,37 @@ export default function Profile({
                 }`}
               />
 
-              <div
-                style={{
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: ".5rem",
-                  marginTop: "0.75rem",
-                }}
-              >
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={() => {
-                    if (onGoMistakes) onGoMistakes();
-                  }}
-                >
-                  Review Mistakes
-                </button>
+{(onGoMistakes || onGoFavourites) && (
+  <div
+    style={{
+      display: "flex",
+      flexWrap: "wrap",
+      gap: ".5rem",
+      marginTop: "0.75rem",
+    }}
+  >
+    {onGoMistakes && (
+      <button
+        className="btn"
+        type="button"
+        onClick={() => onGoMistakes && onGoMistakes()}
+      >
+        Review Mistakes
+      </button>
+    )}
 
-                <button
-                  className="btn"
-                  type="button"
-                  onClick={() => {
-                    if (onGoFavourites) onGoFavourites();
-                  }}
-                >
-                  Review Favourites
-                </button>
-              </div>
+    {onGoFavourites && (
+      <button
+        className="btn"
+        type="button"
+        onClick={() => onGoFavourites && onGoFavourites()}
+      >
+        Review Favourites
+      </button>
+    )}
+  </div>
+)}
+
             </div>
 
             {/* Removed:

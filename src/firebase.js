@@ -65,7 +65,33 @@ export const storage = getStorage(app);
 
 // — AUTH HELPERS (unchanged) —
 export const doSignIn     = (email, pw) => signInWithEmailAndPassword(auth, email, pw);
-export const doSignUp     = (email, pw) => createUserWithEmailAndPassword(auth, email, pw);
+// Sign up with email + password + optional name/username
+export const doSignUp = async ({ email, pw, name, username }) => {
+  const cred = await createUserWithEmailAndPassword(auth, email, pw);
+  const user = cred.user;
+
+  // Store nice displayName in Auth profile
+  if (name) {
+    await updateProfile(user, { displayName: name });
+  }
+
+  // Create /users/{uid} immediately with extended profile
+  const profileRef = doc(db, "users", user.uid);
+  await setDoc(
+    profileRef,
+    {
+      email: user.email || null,
+      name: name || "",
+      username: username ? username.toLowerCase() : "",
+      role: "student",
+      createdAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+
+  return user;
+};
+
 export const onAuthChange = (cb)       => onAuthStateChanged(auth, cb);
 export const doSignOut    = ()         => signOut(auth);
 
@@ -90,6 +116,8 @@ export async function ensureUserProfile(user) {
       ref,
       {
         email: user.email || null,
+        name: user.displayName || "",
+        username: "",           // we don't know yet – stays empty
         role: "student",
         createdAt: serverTimestamp(),
       },
@@ -106,11 +134,23 @@ export async function ensureUserProfile(user) {
     if (!data.role) {
       patch.role = "student";
     }
+    if (!data.name && user.displayName) {
+      patch.name = user.displayName;
+    }
+    if (data.username === undefined) {
+      // ensure the field exists, even if empty
+      patch.username = "";
+    }
 
     if (Object.keys(patch).length) {
       await setDoc(ref, patch, { merge: true });
     }
   }
+}
+
+// near the top of firebase.js (after auth is defined)
+function _uidOrCurrent(uid) {
+  return uid || auth.currentUser?.uid || null;
 }
 
 // — FIRESTORE HELPERS —
@@ -326,21 +366,25 @@ export async function saveWritingP1Submission(payload) {
 }
 
 /** Count of reading completions */
-export async function fetchReadingProgressCount() {
-  const uid = auth.currentUser?.uid;
-  if (!uid) return 0;
-  const snap = await getDocs(collection(db, "users", uid, "readingProgress"));
+export async function fetchReadingProgressCount(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return 0;
+
+  const snap = await getDocs(
+    collection(db, "users", realUid, "readingProgress")
+  );
   return snap.size || 0;
 }
 
 /** Speaking progress counts per part */
-export async function fetchSpeakingCounts() {
-  const uid = auth.currentUser?.uid;
-  if (!uid) return { part1: 0, part2: 0, part3: 0, part4: 0 };
-  const col = collection(db, "users", uid, "speakingProgress");
+export async function fetchSpeakingCounts(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return { part1: 0, part2: 0, part3: 0, part4: 0 };
+
+  const col = collection(db, "users", realUid, "speakingProgress");
   const counts = { part1: 0, part2: 0, part3: 0, part4: 0 };
   const snap = await getDocs(col);
-  snap.forEach(d => {
+  snap.forEach((d) => {
     const p = d.data()?.part;
     if (p && counts[p] !== undefined) counts[p] += 1;
   });
@@ -348,43 +392,52 @@ export async function fetchSpeakingCounts() {
 }
 
 /** Recent mistakes (IDs only) */
-export async function fetchRecentMistakes(n = 10) {
-  const uid = auth.currentUser?.uid;
-  if (!uid) return [];
+export async function fetchRecentMistakes(n = 10, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
   const q = query(
-    collection(db, "users", uid, "mistakes"),
+    collection(db, "users", realUid, "mistakes"),
     orderBy("answeredAt", "desc"),
     limit(n)
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => d.data()?.itemId).filter(Boolean);
+  return snap.docs.map((d) => d.data()?.itemId).filter(Boolean);
 }
+
 
 /** Recent favourites (IDs only) */
-export async function fetchRecentFavourites(n = 10) {
-  const uid = auth.currentUser?.uid;
-  if (!uid) return [];
-  const q = query(collection(db, "users", uid, "favourites"), orderBy("createdAt", "desc"), limit(n));
-  const snap = await getDocs(q);
-  return snap.docs.map(d => d.data()?.itemId).filter(Boolean);
-}
+export async function fetchRecentFavourites(n = 10, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
 
-/** Fetch Writing Part 1 sessions (latest first) */
-export async function fetchWritingP1Sessions(n = 20) {
-  const uid = auth.currentUser?.uid;
-  if (!uid) return [];
   const q = query(
-    collection(db, "users", uid, "writingP1Sessions"),
+    collection(db, "users", realUid, "favourites"),
     orderBy("createdAt", "desc"),
     limit(n)
   );
   const snap = await getDocs(q);
-  return snap.docs.map(d => ({
+  return snap.docs.map((d) => d.data()?.itemId).filter(Boolean);
+}
+
+/** Fetch Writing Part 1 sessions (latest first) */
+export async function fetchWritingP1Sessions(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const q = query(
+    collection(db, "users", realUid, "writingP1Sessions"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => ({
     id: d.id,
     createdAt: d.data()?.createdAt || null,
     items: d.data()?.items || [],
   }));
 }
+
 
 // — WRITING PART 1 GUIDE: save "Improve the answer" attempts —————————————
 /**
@@ -406,13 +459,14 @@ export async function saveWritingP1GuideEdits(payload) {
   });
 }
 
-export async function fetchWritingP1GuideEdits(n = 100) {
-  const uid = auth.currentUser?.uid;
-  if (!uid) return [];
-  const col = collection(db, "users", uid, "writingP1GuideEdits");
+export async function fetchWritingP1GuideEdits(n = 100, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const col = collection(db, "users", realUid, "writingP1GuideEdits");
   const qy = query(col, orderBy("createdAt", "desc"), limit(n));
   const snap = await getDocs(qy);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
 // — WRITING PART 4: save an emails task ————————————————
@@ -434,12 +488,12 @@ export async function saveWritingP4Submission(payload) {
 }
 
 /** Fetch Writing Part 4 submissions (latest first) */
-export async function fetchWritingP4Submissions(n = 20) {
-  const uid = auth.currentUser?.uid;
-  if (!uid) return [];
+export async function fetchWritingP4Submissions(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
 
   const q = query(
-    collection(db, "users", uid, "writingP4Submissions"),
+    collection(db, "users", realUid, "writingP4Submissions"),
     orderBy("createdAt", "desc"),
     limit(n)
   );
@@ -452,7 +506,6 @@ export async function fetchWritingP4Submissions(n = 20) {
       id: d.id,
       createdAt: data.createdAt || null,
       taskId: data.taskId || null,
-      // include BOTH text and HTML so the Profile can preserve formatting
       friendText: data.friendText || "",
       formalText: data.formalText || "",
       friendHTML: data.friendHTML || "",
@@ -481,13 +534,14 @@ export async function saveWritingP4RegisterAttempts(payload) {
 }
 
 /** Fetch Writing Part 4 Register/Tone attempts (latest first) */
-export async function fetchWritingP4RegisterAttempts(n = 100) {
-  const uid = auth.currentUser?.uid;
-  if (!uid) return [];
-  const col = collection(db, "users", uid, "writingP4RegisterAttempts");
-  const qy  = query(col, orderBy("createdAt", "desc"), limit(n));
+export async function fetchWritingP4RegisterAttempts(n = 100, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const col = collection(db, "users", realUid, "writingP4RegisterAttempts");
+  const qy = query(col, orderBy("createdAt", "desc"), limit(n));
   const snap = await getDocs(qy);
-  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
 // 🔊 SPEAKING – speculation free notes
@@ -509,16 +563,12 @@ export async function saveSpeakingSpeculationNote({ pictureId, text }) {
   });
 }
 
-export async function fetchSpeakingSpeculationNotes(limitCount = 50) {
-  const uid = auth.currentUser?.uid;
-  if (!uid) return [];
+export async function fetchSpeakingSpeculationNotes(limitCount = 50, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
 
-  const colRef = collection(db, "users", uid, "speakingSpeculationNotes");
-  const qy = query(
-    colRef,
-    orderBy("createdAt", "desc"),
-    limit(limitCount)
-  );
+  const colRef = collection(db, "users", realUid, "speakingSpeculationNotes");
+  const qy = query(colRef, orderBy("createdAt", "desc"), limit(limitCount));
 
   const snap = await getDocs(qy);
   return snap.docs.map((doc) => {
@@ -531,6 +581,7 @@ export async function fetchSpeakingSpeculationNotes(limitCount = 50) {
     };
   });
 }
+
 
 /**
  * Create a new grammar set owned by the current user.
@@ -615,17 +666,21 @@ export async function submitGrammarSetAttempt({
 }) {
   const percent = total > 0 ? Math.round((score / total) * 100) : 0;
 
+  const user = auth.currentUser;
+
   const docRef = await addDoc(collection(db, "grammarSetAttempts"), {
     setId,
     setTitle,
     ownerUid,
     studentUid,
     studentEmail,
+    studentName: user?.displayName || null,
+    // later you can also load username from the users doc if you like
     score,
     total,
     percent,
     answers,
-    startedAt: serverTimestamp(),   // or pass one in if you track it
+    startedAt: serverTimestamp(),
     submittedAt: serverTimestamp(),
   });
 
@@ -649,6 +704,29 @@ export async function listAttemptsForMyGrammarSet(setId) {
 
   const snap = await getDocs(q);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+}
+
+/**
+ * Look up a user by username and return the email.
+ * @param {string} username
+ * @returns {Promise<string|null>} email or null if not found
+ */
+export async function lookupEmailByUsername(username) {
+  if (!username) return null;
+
+  const uname = username.toLowerCase().trim();
+
+  const q = query(
+    collection(db, "users"),
+    where("username", "==", uname),
+    limit(1)
+  );
+
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+
+  const data = snap.docs[0].data();
+  return data.email || null;
 }
 
 
@@ -684,16 +762,16 @@ export async function saveGrammarResult(itemId, isCorrect) {
  * Uses the doc IDs from /users/{uid}/grammarProgress.
  * @returns {Promise<string[]>}
  */
-export async function fetchSeenGrammarItemIds() {
-  const uid = auth.currentUser?.uid;
-  if (!uid) return []; // guests: no seen items
+export async function fetchSeenGrammarItemIds(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return []; // guests/unknown: no seen items
 
-  const col = collection(db, "users", uid, "grammarProgress");
+  const col = collection(db, "users", realUid, "grammarProgress");
   const snap = await getDocs(col);
 
-  // Each doc ID is the itemId we stored in saveGrammarResult(...)
-  return snap.docs.map(d => d.id);
+  return snap.docs.map((d) => d.id);
 }
+
 
 /**
  * Fetch dashboard counts for the profile progress bar:
@@ -701,24 +779,26 @@ export async function fetchSeenGrammarItemIds() {
  * correct  = #docs with everCorrect == true,
  * total    = total #grammar items in the bank (from /grammarItems).
  */
-export async function fetchGrammarDashboard() {
-  const uid = auth.currentUser?.uid;
+export async function fetchGrammarDashboard(uid) {
+  const realUid = _uidOrCurrent(uid);
 
-  // Total items from public grammarItems (uses count aggregation)
-  const totalSnap = await getCountFromServer(query(collection(db, "grammarItems")));
+  // Total items from public grammarItems (same for everyone)
+  const totalSnap = await getCountFromServer(
+    query(collection(db, "grammarItems"))
+  );
   const total = totalSnap.data().count || 0;
 
-  if (!uid) {
-    // Guest: no per-user docs → answered/correct from local mirror (optional)
+  if (!realUid) {
+    // Guest or no uid: no per-user docs
     return { answered: 0, correct: 0, total };
   }
 
-  const col = collection(db, "users", uid, "grammarProgress");
+  const col = collection(db, "users", realUid, "grammarProgress");
   const progSnap = await getDocs(col);
 
   let answered = 0;
   let correct = 0;
-  progSnap.forEach(d => {
+  progSnap.forEach((d) => {
     answered += 1;
     if (d.data()?.everCorrect) correct += 1;
   });

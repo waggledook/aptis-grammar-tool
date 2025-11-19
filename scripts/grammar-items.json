@@ -3426,7 +3426,7 @@
         "id": "c1_rep_long_02",
         "level": "C1",
         "tag": "Reported Speech",
-        "sentence": "The spokesperson ________ any further questions until the report was published.",
+        "sentence": "The spokesperson ___ any further questions until the report was published.",
         "options": [
           "refused to answer",
           "denied answering",
@@ -3443,7 +3443,7 @@
         "id": "c1_rep_long_03",
         "level": "C2",
         "tag": "Reported Speech",
-        "sentence": "The scientist ________ the findings in an open-access journal.",
+        "sentence": "The scientist ___ the findings in an open-access journal.",
         "options": [
           "recommended publishing",
           "recommended us to publish",
@@ -3460,7 +3460,7 @@
         "id": "c1_rep_long_04",
         "level": "C1",
         "tag": "Reported Speech",
-        "sentence": "The lawyer ________ false testimony.",
+        "sentence": "The lawyer ___ false testimony.",
         "options": [
           "accused the witness of giving",
           "accused the witness to give",
@@ -3477,7 +3477,7 @@
         "id": "c1_rep_long_05",
         "level": "C1",
         "tag": "Reported Speech",
-        "sentence": "The CEO ________  to finish her statement before questions were taken.",
+        "sentence": "The CEO ___  to finish her statement before questions were taken.",
         "options": [
           "insisted on being allowed",
           "insisted to be allowed",
@@ -3494,7 +3494,7 @@
         "id": "c1_rep_long_06",
         "level": "C1",
         "tag": "Reported Speech",
-        "sentence": "The athlete ________ performance-enhancing drugs.",
+        "sentence": "The athlete ___ performance-enhancing drugs.",
         "options": [
           "denied taking",
           "refused taking",
@@ -3511,7 +3511,7 @@
         "id": "c1_rep_long_07",
         "level": "C1",
         "tag": "Reported Speech",
-        "sentence": "The union leader ________ a strike unless negotiations resumed.",
+        "sentence": "The union leader ___ a strike unless negotiations resumed.",
         "options": [
           "threatened to call",
           "suggested to call",
@@ -3528,7 +3528,7 @@
         "id": "c1_rep_long_08",
         "level": "C1",
         "tag": "Reported Speech",
-        "sentence": "Her lawyer ________ that the contract be rewritten to protect her rights.",
+        "sentence": "Her lawyer ___ that the contract be rewritten to protect her rights.",
         "options": [
           "insisted that the contract be rewritten",
           "insisted on rewrite the contract",
@@ -3545,7 +3545,7 @@
         "id": "c1_rep_long_09",
         "level": "C1",
         "tag": "Reported Speech",
-        "sentence": "The manager ________ the quarterly targets.",
+        "sentence": "The manager ___ the quarterly targets.",
         "options": [
           "accused her team of not meeting",
           "warned her team to not meet",
@@ -3562,7 +3562,7 @@
         "id": "c1_rep_long_10",
         "level": "B2",
         "tag": "Reported Speech",
-        "sentence": "The prime minister ________ having been aware of the security breach before it happened.",
+        "sentence": "The prime minister ___ having been aware of the security breach before it happened.",
         "options": [
           "denied",
           "refused",
