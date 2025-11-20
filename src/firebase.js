@@ -50,7 +50,23 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-getAnalytics(app);
+
+// ⭐ Only enable analytics when the user has accepted cookies
+let analyticsInstance = null;
+
+export function enableAnalytics() {
+  try {
+    if (typeof window === "undefined") return null;
+    if (!analyticsInstance) {
+      analyticsInstance = getAnalytics(app);
+      console.log("[analytics] enabled");
+    }
+    return analyticsInstance;
+  } catch (err) {
+    console.warn("[analytics] could not be enabled:", err);
+    return null;
+  }
+}
 
 // ⬇️ Initialize Firestore with long-polling (avoids WebChannel terminate 400s)
 export const db = initializeFirestore(app, {

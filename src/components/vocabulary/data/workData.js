@@ -436,7 +436,7 @@ export const workData = {
             {
               sentence:
                 "We often have to __________ at the end of the month to finish all the reports.",
-              answer: "work overtime"
+              answer: "work overtime / do overtime"
             },
             {
               sentence:
@@ -456,7 +456,7 @@ export const workData = {
             {
               sentence:
                 "He was always late for work, so he finally __________ last week.",
-              answer: "get fired / be sacked / got fired"
+              answer: "get fired / got sacked / got fired"
             },
             {
               sentence:

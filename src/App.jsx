@@ -41,6 +41,9 @@ import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 import TeacherTools from "./components/teacher/TeacherTools"; // ← Add this
 import MyStudents from "./components/teacher/MyStudents";
 import TeacherStudentProfile from "./components/TeacherStudentProfile";
+import CookieBanner from "./components/CookieBanner.jsx";
+import PrivacyPolicy from "./components/legal/PrivacyPolicy.jsx";
+
 
 
 export default function App() {
@@ -298,13 +301,13 @@ const [runKey,  setRunKey]  = useState(0);
   }
 
   // — RENDER MAIN APP —
-  return (
-    // in src/App.jsx (inside your App component’s return)
-<div className="App">
-<ToastHost />
-  <div className="content-container">
-
-    {/* Auth bar */}
+return (
+  // in src/App.jsx (inside your App component’s return)
+  <div className="App">
+    <ToastHost />
+    <CookieBanner />
+    <div className="content-container">
+      {/* Auth bar */}
     <div
   style={{
     textAlign: "right",
@@ -659,6 +662,7 @@ const [runKey,  setRunKey]  = useState(0);
   path="/teacher/student/:studentId"
   element={<TeacherStudentProfile user={user} />}
 />
+<Route path="/privacy" element={<PrivacyPolicy />} />
 
   <Route
     path="/*"
