@@ -17,6 +17,8 @@ import Profile from "./components/profile/Profile";
 import WritingMenu from './components/writing/WritingMenu';
 import WritingPart1 from './components/writing/WritingPart1';
 import WritingPart1Guide from "./components/writing/WritingPart1Guide.jsx";
+import WritingPart2 from "./components/writing/WritingPart2.jsx";
+import WritingPart3 from "./components/writing/WritingPart3.jsx";
 import WritingPart4Guide from "./components/writing/WritingPart4Guide";
 import WritingPart4Emails from "./components/writing/WritingPart4Emails";
 import WritingPart4RegisterGuide from "./components/writing/WritingPart4RegisterGuide";
@@ -525,6 +527,44 @@ return (
         user={user}
         onBack={() => navigate("/writing")}
         onStartPractice={() => navigate("/writing/part1")}
+      />
+    </>
+  }
+/>
+
+<Route
+  path="/writing/part2"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/writing")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back
+      </button>
+      <WritingPart2
+        user={user}
+        onRequireSignIn={() => navigate("/login")}
+      />
+    </>
+  }
+/>
+
+<Route
+  path="/writing/part3"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/writing")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back
+      </button>
+      <WritingPart3
+        user={user}
+        onRequireSignIn={() => navigate("/login")}
       />
     </>
   }

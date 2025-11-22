@@ -381,6 +381,50 @@ export async function saveWritingP1Submission(payload) {
   });
 }
 
+// — WRITING PART 2: save short-form answers ————————————————
+/**
+ * Save one Writing Part 2 submission (single 20–30w paragraph) for the current user.
+ * payload shape from the UI:
+ * { taskId, answerText, answerHTML, counts: { answer } }
+ */
+export async function saveWritingP2Submission(payload) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return; // silently skip if signed out
+
+  const colRef = collection(db, "users", uid, "writingP2Submissions");
+  await addDoc(colRef, {
+    type: "part2",
+    ...payload,
+    createdAt: serverTimestamp(),
+  });
+}
+
+/** Fetch Writing Part 2 submissions (latest first) */
+export async function fetchWritingP2Submissions(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "writingP2Submissions"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => {
+    const data = d.data() || {};
+    return {
+      id: d.id,
+      createdAt: data.createdAt || null,
+      taskId: data.taskId || null,
+      answerText: data.answerText || "",
+      answerHTML: data.answerHTML || "",
+      counts: data.counts || { answer: 0 },
+    };
+  });
+}
+
+
 /** Count of reading completions */
 export async function fetchReadingProgressCount(uid) {
   const realUid = _uidOrCurrent(uid);
@@ -484,6 +528,55 @@ export async function fetchWritingP1GuideEdits(n = 100, uid) {
   const snap = await getDocs(qy);
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
+
+// — WRITING PART 3: save three chat responses ————————————————
+/**
+ * Save one Writing Part 3 submission (three 30–40w chat replies) for the current user.
+ * Suggested payload from the UI:
+ * {
+ *   taskId,
+ *   answersText: [string, string, string],
+ *   answersHTML: [string, string, string],
+ *   counts: number[]   // word counts per answer
+ * }
+ */
+export async function saveWritingP3Submission(payload) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return; // silently skip if signed out
+
+  const colRef = collection(db, "users", uid, "writingP3Submissions");
+  await addDoc(colRef, {
+    type: "part3",
+    ...payload,
+    createdAt: serverTimestamp(),
+  });
+}
+
+/** Fetch Writing Part 3 submissions (latest first) */
+export async function fetchWritingP3Submissions(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "writingP3Submissions"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => {
+    const data = d.data() || {};
+    return {
+      id: d.id,
+      createdAt: data.createdAt || null,
+      taskId: data.taskId || null,
+      answersText: data.answersText || ["", "", ""],
+      answersHTML: data.answersHTML || ["", "", ""],
+      counts: data.counts || [0, 0, 0],
+    };
+  });
+}
+
 
 // — WRITING PART 4: save an emails task ————————————————
 /**

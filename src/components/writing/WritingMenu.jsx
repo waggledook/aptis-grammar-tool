@@ -16,6 +16,7 @@ export default function WritingMenu() {
         title="Aptis Writing Practice | Seif Aptis Trainer"
         description="Practise Aptis Writing Parts 1 and 4 with guides and full exam-style tasks, plus a complete mock writing test."
       />
+      
       <header className="header">
         <h2 className="title">Writing</h2>
         <p className="intro">
@@ -34,15 +35,15 @@ export default function WritingMenu() {
   <p>How to write effective 1–5 word answers, with mini-practice.</p>
 </button>
 
-        <button className="card disabled" onClick={comingSoon}>
-          <h3>Part 2: Short text  <span className="soon">Coming soon</span></h3>
-          <p>Fill a short form or write a short sentence response (20–30 words).</p>
-        </button>
+<button className="card" onClick={() => navigate("/writing/part2")}>
+  <h3>Part 2: Short text</h3>
+  <p>Fill in a short form or write a short sentence response (20–30 words).</p>
+</button>
 
-        <button className="card disabled" onClick={comingSoon}>
-          <h3>Part 3: Three responses  <span className="soon">Coming soon</span></h3>
-          <p>Reply to three social-style messages. Keep each answer to 30–40 words.</p>
-        </button>
+<button className="card" onClick={() => navigate("/writing/part3")}>
+  <h3>Part 3: Three responses</h3>
+  <p>Reply to three social-style messages. Keep each answer to 30–40 words.</p>
+</button>
 
         <button
     className="card"

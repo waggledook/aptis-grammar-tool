@@ -48,6 +48,12 @@ export default function Profile({
   const [writingP4, setWritingP4] = useState([]);
   const [showWritingP4, setShowWritingP4] = useState(false);
 
+  const [writingP2, setWritingP2] = useState([]);
+  const [showWritingP2, setShowWritingP2] = useState(false);
+
+  const [writingP3, setWritingP3] = useState([]);
+  const [showWritingP3, setShowWritingP3] = useState(false);
+
   const [p4Register, setP4Register] = useState([]);
   const [showP4Register, setShowP4Register] = useState(false);
   const [showWritingAll, setShowWritingAll] = useState(false);
@@ -96,6 +102,8 @@ export default function Profile({
           w,
           gDash,
           gEdits,
+          wP2,
+          wP3,
           wP4,
           p4Reg,
           specNotes,
@@ -107,10 +115,12 @@ export default function Profile({
           fb.fetchWritingP1Sessions(10, uid),
           fb.fetchGrammarDashboard(uid),
           fb.fetchWritingP1GuideEdits(100, uid),
+          fb.fetchWritingP2Submissions?.(20, uid) ?? Promise.resolve([]),
+          fb.fetchWritingP3Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP4Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP4RegisterAttempts?.(100, uid) ?? Promise.resolve([]),
           fb.fetchSpeakingSpeculationNotes?.(50, uid) ?? Promise.resolve([]),
-        ]);
+        ]);        
   
         if (!alive) return;
         setReadingCount(rCount);
@@ -120,6 +130,8 @@ export default function Profile({
         setWritingP1(w);
         setGrammarDash(gDash);
         setGuideEdits(gEdits);
+        setWritingP2(wP2);
+        setWritingP3(wP3);
         setWritingP4(wP4);
         setP4Register(p4Reg);
         setSpeakingNotes(specNotes);
@@ -135,6 +147,15 @@ export default function Profile({
       alive = false;
     };
   }, [targetUid]);  
+
+
+  const totalWritingItems =
+  writingP1.length +
+  guideEdits.length +
+  writingP2.length +
+  writingP3.length +
+  writingP4.length +
+  p4Register.length;
 
   return (
     <div className="profile-page game-wrapper">
@@ -284,18 +305,8 @@ export default function Profile({
     </h3>
 
     <span className="muted small" style={{ flexShrink: 0 }}>
-      {writingP1.length +
-        guideEdits.length +
-        p4Register.length +
-        writingP4.length}{" "}
-      saved item
-      {(writingP1.length +
-        guideEdits.length +
-        p4Register.length +
-        writingP4.length) === 1
-        ? ""
-        : "s"}
-    </span>
+  {totalWritingItems} saved item{totalWritingItems === 1 ? "" : "s"}
+</span>
 
     <span className={`chev ${showWritingAll ? "open" : ""}`} aria-hidden>
       ▾
@@ -556,6 +567,157 @@ export default function Profile({
           </>
         )}
       </div>
+
+            {/* ---------- Subsection: Part 2 short forms ---------- */}
+            <div className="subpanel collapsible-inner">
+        <button
+          type="button"
+          className="collapse-head inner"
+          aria-expanded={showWritingP2}
+          onClick={() => setShowWritingP2((s) => !s)}
+        >
+          <div className="inner-head-left">
+            <h4 className="inner-title">Part 2 – Short Forms</h4>
+            <span className="muted small">
+              {writingP2.length}{" "}
+              {writingP2.length === 1 ? "submission" : "submissions"}
+            </span>
+          </div>
+          <span
+            className={`chev ${showWritingP2 ? "open" : ""}`}
+            aria-hidden
+          >
+            ▾
+          </span>
+        </button>
+
+        {showWritingP2 && (
+          <>
+            {!writingP2.length ? (
+              <p className="muted" style={{ marginTop: ".5rem" }}>
+                No saved submissions yet.
+              </p>
+            ) : (
+              <ul className="wlist" style={{ marginTop: ".5rem" }}>
+                {writingP2.map((s, idx) => {
+                  const when = s.createdAt?.toDate?.()
+                    ? s.createdAt.toDate().toLocaleString()
+                    : s.createdAt || "—";
+                  return (
+                    <li key={s.id || idx} className="wcard">
+                      <div className="whead">
+                        <div>
+                          <strong>Submission</strong>
+                          <div className="muted small">{when}</div>
+                          {s.taskId && (
+                            <div className="muted small">
+                              Task: {s.taskId}
+                            </div>
+                          )}
+                          <div className="muted small">
+                            {s.counts?.answer ?? 0} words
+                          </div>
+                        </div>
+                      </div>
+
+                      <div
+                        className="submitted-html"
+                        dangerouslySetInnerHTML={{
+                          __html: normalizeHtmlForDisplay(
+                            s.answerHTML,
+                            s.answerText
+                          ),
+                        }}
+                      />
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
+        )}
+      </div>
+
+            {/* ---------- Subsection: Part 3 chat responses ---------- */}
+            <div className="subpanel collapsible-inner">
+        <button
+          type="button"
+          className="collapse-head inner"
+          aria-expanded={showWritingP3}
+          onClick={() => setShowWritingP3((s) => !s)}
+        >
+          <div className="inner-head-left">
+            <h4 className="inner-title">Part 3 – Chat Responses</h4>
+            <span className="muted small">
+              {writingP3.length}{" "}
+              {writingP3.length === 1 ? "submission" : "submissions"}
+            </span>
+          </div>
+          <span
+            className={`chev ${showWritingP3 ? "open" : ""}`}
+            aria-hidden
+          >
+            ▾
+          </span>
+        </button>
+
+        {showWritingP3 && (
+          <>
+            {!writingP3.length ? (
+              <p className="muted" style={{ marginTop: ".5rem" }}>
+                No saved submissions yet.
+              </p>
+            ) : (
+              <ul className="wlist" style={{ marginTop: ".5rem" }}>
+                {writingP3.map((s, idx) => {
+                  const when = s.createdAt?.toDate?.()
+                    ? s.createdAt.toDate().toLocaleString()
+                    : s.createdAt || "—";
+                  const counts = s.counts || [];
+                  const answersText = s.answersText || [];
+                  const answersHTML = s.answersHTML || [];
+                  return (
+                    <li key={s.id || idx} className="wcard">
+                      <div className="whead">
+                        <div>
+                          <strong>Submission</strong>
+                          <div className="muted small">{when}</div>
+                          {s.taskId && (
+                            <div className="muted small">
+                              Task: {s.taskId}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className="submitted-p4">
+                        {[0, 1, 2].map((i) => (
+                          <div key={i} className="p4-col">
+                            <div className="p4-title">
+                              Answer {i + 1} —{" "}
+                              {counts[i] ?? 0} words
+                            </div>
+                            <div
+                              className="submitted-html"
+                              dangerouslySetInnerHTML={{
+                                __html: normalizeHtmlForDisplay(
+                                  answersHTML[i],
+                                  answersText[i]
+                                ),
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
+        )}
+      </div>
+
 
       {/* ---------- Subsection: Part 4 Register/Tone ---------- */}
       <div className="subpanel collapsible-inner">
