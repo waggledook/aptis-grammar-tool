@@ -4333,7 +4333,7 @@
           "id": "c1_unreal_17",
           "level": "C1",
           "tag": "unreal forms",
-          "sentence": "She’d sooner you ___ her before changing the project plan.",
+          "sentence": "She’d sooner you ___ her before you decided to change the project plan.",
           "options": ["had consulted", "consulted", "would consult"],
           "answerIndex": 0,
           "explanations": [
@@ -4354,5 +4354,137 @@
             "Incorrect: 'explained' is not possible because we're referring to an unreal PAST situation in this sentence.",
             "Incorrect: 'would explain' looks to the future, not a past preference."
           ]
-        }
+        },
+          {
+            "id": "b2_inv_01",
+            "level": "B2",
+            "tag": "Inversion",
+            "sentence": "Never ___ such a confusing explanation.",
+            "options": ["have I heard", "I have heard", "did hear I"],
+            "answerIndex": 0,
+            "explanations": [
+              "Correct: With 'never' at the beginning, we invert the subject and auxiliary (like a questions): inversion after negative adverbials.",
+              "Incorrect: 'I have heard' keeps normal word order and is not used after fronted 'never'.",
+              "Incorrect: 'did hear I' is wrong as we need the subject between auxiliary and main verb (like in questions)."
+            ]
+          },
+          {
+            "id": "b2_inv_02",
+            "level": "B2",
+            "tag": "Inversion",
+            "sentence": "Rarely ___ on time for meetings.",
+            "options": ["is he", "he is", "does he"],
+            "answerIndex": 0,
+            "explanations": [
+              "Correct: After fronted 'rarely', we invert 'be': 'Rarely is he on time...'.",
+              "Incorrect: 'he is' is normal word order and doesn’t follow the inversion pattern.",
+              "Incorrect: 'does he' would require a base verb: 'does he arrive', 'does he turn up', etc."
+            ]
+          },
+          {
+            "id": "b2_inv_03",
+            "level": "B2",
+            "tag": "Inversion",
+            "sentence": "Under no circumstances ___ your password with anyone.",
+            "options": ["you should share", "should you share", "you share"],
+            "answerIndex": 1,
+            "explanations": [
+              
+              "Incorrect: 'you should share' has normal word order and doesn’t follow the inversion.",
+              "Correct: Negative 'Under no circumstances' triggers inversion after the negative adverbial: auxiliary should before 'you'.",
+              "Incorrect: 'you share' is grammatically possible but doesn’t express the strong prohibition clearly."
+            ]
+          },
+          {
+            "id": "b2_inv_04",
+            "level": "C1",
+            "tag": "Inversion",
+            "sentence": "Not until the end of the film ___ what was going on.",
+            "options": ["I understood", "I did understand", "did I understand"],
+            "answerIndex": 2,
+            "explanations": [
+              
+              "Incorrect: 'I understood' is normal order and doesn’t follow the inversion pattern.",
+              "Incorrect: 'I did understand' is emphatic but still normal word order — we need inversion here. (auxiliary before noun)",
+              "Correct: 'Not until...' needs inversion with 'did':inversion after negative adverbials."
+            ]
+          },
+          {
+            "id": "c1_inv_01",
+            "level": "C1",
+            "tag": "Inversion",
+            "sentence": "On no account ___ the machine while it is running.",
+            "options": ["must you open", "you must open", "mustn't you open"],
+            "answerIndex": 0,
+            "explanations": [
+              "Correct: After 'On no account', we invert the auxliary and subject inversion after negative adverbials: 'must you'.",
+              "Incorrect: 'you must' is normal word order and doesn’t follow the inversion after the negative phrase.",
+              "Incorrect: 'mustn't you' creates a double negative: we already have the negative with 'no'."
+            ]
+          },
+          {
+            "id": "c1_inv_02",
+            "level": "C1",
+            "tag": "Inversion",
+            "sentence": "Seldom ___ such widespread support for a proposal.",
+            "options": ["has there been", "there has been", "has been there"],
+            "answerIndex": 0,
+            "explanations": [
+              "Correct: 'Seldom has there been...' uses inversion of 'has' and 'there'.",
+              "Incorrect: 'there has been' is normal word order and doesn’t match the negative-adverbial inversion pattern.",
+              "Incorrect: 'has been there' is ungrammatical in this meaning."
+            ]
+          },
+          {
+            "id": "c1_inv_03",
+            "level": "C1",
+            "tag": "Inversion",
+            "sentence": "Little ___ that his words would be recorded.",
+            "options": ["did he know", "he knew", "did know he"],
+            "answerIndex": 0,
+            "explanations": [
+              "Correct: when we place little at the start of a sentence, we invert subject and auxiliary: 'Little did he know...': inversion after negative adverbials.",
+              "Incorrect: 'he knew' is normal word order and doesn’t follow 'Little' + inversion.",
+              "Incorrect: 'did know he' is incorrect because we need the subject between the auxiliary and subject (like a question form)."
+            ]
+          },
+          {
+            "id": "c1_inv_04",
+            "level": "C1",
+            "tag": "Inversion",
+            "sentence": "Hardly ___ the announcement when the website crashed.",
+            "options": ["had they made", "they had made", "did they made"],
+            "answerIndex": 0,
+            "explanations": [
+              "Correct: 'Hardly had they made the announcement when...' uses past perfect with inversion.",
+              "Incorrect: 'they had made' is past perfect but without the required inversion.",
+              "Incorrect: 'did they made' is incorrect because we have did and made: the main verb should be in the infinitive after did."
+            ]
+          },
+          {
+            "id": "c1_inv_05",
+            "level": "C1",
+            "tag": "Inversion",
+            "sentence": "No sooner ___ the door than the phone rang.",
+            "options": ["had I closed", "I had closed", "have I closed"],
+            "answerIndex": 0,
+            "explanations": [
+              "Correct: 'No sooner had I closed the door than...' is the classic inversion of auxiliary and subject after the negative adverbial 'no sooner'.",
+              "Incorrect: 'I had closed' is past perfect without inversion.",
+              "Incorrect: 'have I closed' uses present perfect, which doesn't fit the past context of the sentence."
+            ]
+          },
+          {
+            "id": "c1_inv_06",
+            "level": "C1",
+            "tag": "Inversion",
+            "sentence": "Only after the meeting ___ how serious the situation was.",
+            "options": ["did we realise", "we realised", "we did realise"],
+            "answerIndex": 0,
+            "explanations": [
+              "Correct: With 'Only after...' at the beginning, we require inversion of subject and auxiliary. This happens when we use negative or restrictive adverbials at the start of a sentence.",
+              "Incorrect: 'we realised' is normal word order and doesn’t follow the 'only + adverbial' inversion rule. We could say 'We only realised after..' but not when starting with 'only'.",
+              "Incorrect: 'we did realise' is emphatic but not inverted."
+            ]
+          }        
   ]
