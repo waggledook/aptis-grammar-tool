@@ -83,27 +83,41 @@ export const storage = getStorage(app);
 export const doSignIn     = (email, pw) => signInWithEmailAndPassword(auth, email, pw);
 // Sign up with email + password + optional name/username
 export const doSignUp = async ({ email, pw, name, username }) => {
+  // 1) Create auth user
   const cred = await createUserWithEmailAndPassword(auth, email, pw);
   const user = cred.user;
 
-  // Store nice displayName in Auth profile
+  // 2) Nice displayName in Auth
   if (name) {
     await updateProfile(user, { displayName: name });
   }
 
-  // Create /users/{uid} immediately with extended profile
+  // 3) Normalise username
+  const uname = (username || "").toLowerCase().trim();
+
+  // 4) Create /users/{uid} profile
   const profileRef = doc(db, "users", user.uid);
   await setDoc(
     profileRef,
     {
       email: user.email || null,
       name: name || "",
-      username: username ? username.toLowerCase() : "",
+      username: uname,
       role: "student",
       createdAt: serverTimestamp(),
     },
     { merge: true }
   );
+
+  // 5) Create /usernames/{username} → { email, uid } mapping (if provided)
+  if (uname) {
+    const unameRef = doc(db, "usernames", uname);
+    await setDoc(unameRef, {
+      email: user.email || email,
+      uid: user.uid,
+      createdAt: serverTimestamp(),
+    });
+  }
 
   return user;
 };
@@ -163,6 +177,7 @@ export async function ensureUserProfile(user) {
     }
   }
 }
+
 
 // near the top of firebase.js (after auth is defined)
 function _uidOrCurrent(uid) {
@@ -825,16 +840,12 @@ export async function lookupEmailByUsername(username) {
 
   const uname = username.toLowerCase().trim();
 
-  const q = query(
-    collection(db, "users"),
-    where("username", "==", uname),
-    limit(1)
-  );
+  const ref = doc(db, "usernames", uname);
+  const snap = await getDoc(ref);
 
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
+  if (!snap.exists()) return null;
 
-  const data = snap.docs[0].data();
+  const data = snap.data();
   return data.email || null;
 }
 
