@@ -7,15 +7,15 @@ import { createGrammarSet } from "../../firebase";
 import allItems from "../../../scripts/grammar-items.json";
 import { toast } from "../../utils/toast";
 
-
 // Normalise tag(s) so we can handle both "tag" and "tags"
 const getItemTags = (item) => {
-    if (Array.isArray(item.tags) && item.tags.length) return item.tags;
-    if (item.tag) return [item.tag];
-    return [];
-  };
+  if (Array.isArray(item.tags) && item.tags.length) return item.tags;
+  if (item.tag) return [item.tag];
+  return [];
+};
 
 const ALL_LEVELS = ["A2", "B1", "B2", "C1"]; // match main tool
+const QUICK_COUNTS = [5, 10, 15, 20];
 
 export default function TeacherGrammarTool({ user }) {
   const [levels, setLevels] = useState([...ALL_LEVELS]);
@@ -33,12 +33,22 @@ export default function TeacherGrammarTool({ user }) {
   const [testMode, setTestMode] = useState(false);
   const [reviewAfterTest, setReviewAfterTest] = useState(false);
 
-  const { tags: allTags = [], loading: tagsLoading, error: tagsError } = useTags();
+  // 🔹 NEW: Quick test generator state
+  const [quickCount, setQuickCount] = useState(10);
+  const [quickSelectedTags, setQuickSelectedTags] = useState([]);
+  const [quickPerTagCounts, setQuickPerTagCounts] = useState({});
+  const [quickAppend, setQuickAppend] = useState(false);
+  const [showQuick, setShowQuick] = useState(false);
 
+  const {
+    tags: allTags = [],
+    loading: tagsLoading,
+    error: tagsError,
+  } = useTags();
 
   const showModeHelp = (mode) => {
     let msg = "";
-  
+
     switch (mode) {
       case "practice":
         msg =
@@ -56,15 +66,23 @@ export default function TeacherGrammarTool({ user }) {
         msg =
           "Choose how feedback works: Practice (instant feedback), Test – score only, or Test + review.";
     }
-  
+
     toast(msg, { duration: 6500 });
-  };  
+  };
+
   // ---------- Helpers ----------
   const toggleSelect = (id) => {
     setSelectedIds((curr) =>
       curr.includes(id) ? curr.filter((x) => x !== id) : [...curr, id]
     );
   };
+
+  const toggleQuickLevel = (lvl) => {
+    setLevels((curr) =>
+      curr.includes(lvl) ? curr.filter((l) => l !== lvl) : [...curr, lvl]
+    );
+  };
+  
 
   const moveItem = (id, direction) => {
     setSelectedIds((curr) => {
@@ -87,27 +105,167 @@ export default function TeacherGrammarTool({ user }) {
     }
   };
 
+  // 🔹 NEW: Quick test helpers
+  const toggleQuickTag = (tagValue) => {
+    setQuickSelectedTags((curr) => {
+      if (curr.includes(tagValue)) {
+        return curr.filter((t) => t !== tagValue);
+      }
+      return [...curr, tagValue];
+    });
+  };
+
+  const updateQuickPerTagCount = (tagValue, raw) => {
+    setQuickPerTagCounts((curr) => ({
+      ...curr,
+      [tagValue]: raw,
+    }));
+  };
+
+  const handleQuickGenerate = () => {
+    setStatusMsg("");
+
+    const activeLevels = levels.length ? levels : ALL_LEVELS;
+
+    // 1) Build a pool that matches level + (optional) tag filters
+    const pool = allItems.filter((item) => {
+      const itemLevel = item.level || "B1";
+      if (!activeLevels.includes(itemLevel)) return false;
+
+      const itemTags = getItemTags(item);
+      if (
+        quickSelectedTags.length &&
+        !quickSelectedTags.some((t) => itemTags.includes(t))
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    if (!pool.length) {
+      toast("No items match your quick-test filters (levels + tags).", {
+        duration: 6000,
+      });
+      return;
+    }
+
+    // 2) Check optional per-tag quotas
+    const parsedPerTag = {};
+    let perTagTotal = 0;
+
+    quickSelectedTags.forEach((t) => {
+      const raw = quickPerTagCounts[t];
+      if (raw === undefined || raw === null || raw === "") return;
+      const n = Number(raw);
+      if (!Number.isFinite(n) || n <= 0) return;
+      parsedPerTag[t] = n;
+      perTagTotal += n;
+    });
+
+    // If per-tag quotas exist, use their total; otherwise use the main quickCount
+    const targetTotal = perTagTotal > 0 ? perTagTotal : quickCount || 10;
+
+    const shuffledPool = [...pool].sort(() => Math.random() - 0.5);
+    const chosen = [];
+    const usedIds = new Set();
+
+    let shortfallTags = [];
+
+    // 3) First satisfy per-tag quotas (if any)
+    if (perTagTotal > 0) {
+      Object.entries(parsedPerTag).forEach(([tagValue, want]) => {
+        const tagPool = shuffledPool.filter(
+          (item) =>
+            getItemTags(item).includes(tagValue) && !usedIds.has(item.id)
+        );
+
+        if (!tagPool.length) {
+          shortfallTags.push(`${tagValue} (no matching items)`);
+          return;
+        }
+
+        const picked = tagPool.slice(0, want);
+        picked.forEach((item) => {
+          if (!usedIds.has(item.id)) {
+            usedIds.add(item.id);
+            chosen.push(item);
+          }
+        });
+
+        if (picked.length < want) {
+          shortfallTags.push(
+            `${tagValue} (only ${picked.length} of ${want} available)`
+          );
+        }
+      });
+    }
+
+    // 4) Top up to targetTotal from the remaining pool
+    if (chosen.length < targetTotal) {
+      for (const item of shuffledPool) {
+        if (chosen.length >= targetTotal) break;
+        if (usedIds.has(item.id)) continue;
+        usedIds.add(item.id);
+        chosen.push(item);
+      }
+    }
+
+    if (!chosen.length) {
+      toast("Couldn't find enough items to build a quick test.", {
+        duration: 6000,
+      });
+      return;
+    }
+
+    // 5) Apply to current set (append or replace)
+    if (quickAppend) {
+      setSelectedIds((curr) => {
+        const currSet = new Set(curr);
+        const merged = [...curr];
+        chosen.forEach((item) => {
+          if (!currSet.has(item.id)) {
+            currSet.add(item.id);
+            merged.push(item.id);
+          }
+        });
+        return merged;
+      });
+    } else {
+      setSelectedIds(chosen.map((item) => item.id));
+    }
+
+    let msg = `Quick test: added ${chosen.length} item${
+      chosen.length === 1 ? "" : "s"
+    }.`;
+    if (shortfallTags.length) {
+      msg += ` Some tag quotas couldn't be fully met: ${shortfallTags.join(
+        "; "
+      )}.`;
+    }
+    toast(msg, { duration: 7000 });
+  };
+
   // ---------- Filtered browser list ----------
   const filteredItems = useMemo(() => {
     const activeLevels = levels.length ? levels : ALL_LEVELS;
     const lowerSearch = search.trim().toLowerCase();
-  
+
     const filtered = allItems.filter((item) => {
       const itemLevel = item.level || "B1";
       const sentence = (item.sentence || item.text || "").toLowerCase();
       const tagsArr = getItemTags(item);
-  
+
       if (!activeLevels.includes(itemLevel)) return false;
       if (tag && !tagsArr.includes(tag)) return false;
       if (lowerSearch && !sentence.includes(lowerSearch)) return false;
-  
+
       return true;
     });
-  
+
     // 🔀 Randomise display order so teachers don’t always see the same items first
     return [...filtered].sort(() => Math.random() - 0.5);
   }, [levels, tag, search]);
-  
 
   const selectedItems = useMemo(
     () =>
@@ -127,7 +285,6 @@ export default function TeacherGrammarTool({ user }) {
         .filter(Boolean)
     )
   );
-  
 
   // ---------- Saving ----------
   const handleSave = async (visibility) => {
@@ -149,9 +306,9 @@ export default function TeacherGrammarTool({ user }) {
         itemIds: selectedIds,
         levels: metaLevels,
         tags: metaTags,
-        visibility,     // "draft" | "published"
-        testMode,       // NEW
-        reviewAfterTest // NEW
+        visibility, // "draft" | "published"
+        testMode, // NEW
+        reviewAfterTest, // NEW
       };
 
       const id = await createGrammarSet(payload);
@@ -277,9 +434,7 @@ export default function TeacherGrammarTool({ user }) {
             }}
           >
             {metaLevels.length > 0 && (
-              <span className="badge">
-                Levels: {metaLevels.join(", ")}
-              </span>
+              <span className="badge">Levels: {metaLevels.join(", ")}</span>
             )}
             {metaTags.length > 0 && (
               <span className="badge subtle">
@@ -292,202 +447,473 @@ export default function TeacherGrammarTool({ user }) {
             </span>
           </div>
 
-                    {/* 🔹 Mode selector – compact, with per-mode help */}
+          {/* 🔹 Mode selector – compact, with per-mode help */}
+          <div
+            style={{
+              margin: ".35rem 0 .75rem 0",
+              display: "flex",
+              flexDirection: "column",
+              gap: ".4rem",
+            }}
+          >
+            <span className="small muted">Mode for this set:</span>
+
+            <div
+              style={{
+                display: "flex",
+                gap: ".5rem",
+                flexWrap: "wrap",
+              }}
+            >
+              {/* PRACTICE */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: ".2rem",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTestMode(false);
+                    setReviewAfterTest(false);
+                  }}
+                  className="option-btn"
+                  style={{
+                    fontSize: "0.8rem",
+                    padding: "0.28rem .85rem",
+                    borderRadius: "999px",
+                    background: !testMode ? "#0f172a" : "transparent",
+                    borderColor: !testMode ? "#38bdf8" : "#334155",
+                    color: !testMode ? "#e0f7ff" : "#cbd5e1",
+                    fontWeight: 600,
+                  }}
+                >
+                  Practice
+                </button>
+
+                {/* Help for Practice */}
+                <button
+                  type="button"
+                  onClick={() => showModeHelp("practice")}
+                  style={{
+                    width: "1.5rem",
+                    height: "1.5rem",
+                    borderRadius: "999px",
+                    border: "1px solid #4b5563",
+                    background: "transparent",
+                    color: "#9ca3af",
+                    fontSize: "0.9rem",
+                    lineHeight: 1,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                  }}
+                  title="What does Practice mode do?"
+                >
+                  ?
+                </button>
+              </div>
+
+              {/* TEST – SCORE ONLY */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: ".2rem",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTestMode(true);
+                    setReviewAfterTest(false);
+                  }}
+                  className="option-btn"
+                  style={{
+                    fontSize: "0.8rem",
+                    padding: "0.28rem .85rem",
+                    borderRadius: "999px",
+                    background:
+                      testMode && !reviewAfterTest ? "#1e1b07" : "transparent",
+                    borderColor:
+                      testMode && !reviewAfterTest ? "#fbbf24" : "#334155",
+                    color:
+                      testMode && !reviewAfterTest
+                        ? "#fef9c3"
+                        : "#cbd5e1",
+                    fontWeight: 600,
+                  }}
+                >
+                  Test – score only
+                </button>
+
+                {/* Help for Test – score only */}
+                <button
+                  type="button"
+                  onClick={() => showModeHelp("testScore")}
+                  style={{
+                    width: "1.5rem",
+                    height: "1.5rem",
+                    borderRadius: "999px",
+                    border: "1px solid #4b5563",
+                    background: "transparent",
+                    color: "#9ca3af",
+                    fontSize: "0.9rem",
+                    lineHeight: 1,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                  }}
+                  title="What does this mode do?"
+                >
+                  ?
+                </button>
+              </div>
+
+              {/* TEST + REVIEW */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: ".2rem",
+                }}
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTestMode(true);
+                    setReviewAfterTest(true);
+                  }}
+                  className="option-btn"
+                  style={{
+                    fontSize: "0.8rem",
+                    padding: "0.28rem .85rem",
+                    borderRadius: "999px",
+                    background:
+                      testMode && reviewAfterTest ? "#064e3b" : "transparent",
+                    borderColor:
+                      testMode && reviewAfterTest ? "#22c55e" : "#334155",
+                    color:
+                      testMode && reviewAfterTest
+                        ? "#d1fae5"
+                        : "#cbd5e1",
+                    fontWeight: 600,
+                  }}
+                >
+                  Test + review
+                </button>
+
+                {/* Help for Test + review */}
+                <button
+                  type="button"
+                  onClick={() => showModeHelp("testReview")}
+                  style={{
+                    width: "1.5rem",
+                    height: "1.5rem",
+                    borderRadius: "999px",
+                    border: "1px solid #4b5563",
+                    background: "transparent",
+                    color: "#9ca3af",
+                    fontSize: "0.9rem",
+                    lineHeight: 1,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                  }}
+                  title="What does this mode do?"
+                >
+                  ?
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* 🔹 Quick test generator – collapsible */}
 <div
   style={{
-    margin: ".35rem 0 .75rem 0",
-    display: "flex",
-    flexDirection: "column",
-    gap: ".4rem",
+    margin: ".75rem 0",
+    padding: ".65rem .75rem",
+    borderRadius: "0.75rem",
+    border: "1px dashed #1f2937",
+    background: "#020617",
   }}
 >
-  <span className="small muted">Mode for this set:</span>
-
-  <div
+  {/* Header row: just the toggle button */}
+<div
+  style={{
+    display: "flex",
+    justifyContent: "flex-start",
+  }}
+>
+  <button
+    type="button"
+    onClick={() => setShowQuick((s) => !s)}
+    aria-expanded={showQuick}
+    className="option-btn"
     style={{
-      display: "flex",
-      gap: ".5rem",
-      flexWrap: "wrap",
+      padding: "0.35rem 0.9rem",
+      borderRadius: "999px",
+      fontSize: "0.85rem",
+      display: "inline-flex",
+      alignItems: "center",
+      gap: ".4rem",
+      background: showQuick ? "#0f172a" : "transparent",
+      borderColor: showQuick ? "#38bdf8" : "#334155",
+      color: showQuick ? "#e0f2fe" : "#cbd5e1",
     }}
   >
-    {/* PRACTICE */}
-    <div
+    Generate quick test
+    <span
+      aria-hidden
       style={{
-        display: "flex",
-        alignItems: "center",
-        gap: ".2rem",
+        display: "inline-block",
+        transform: showQuick ? "rotate(180deg)" : "rotate(0deg)",
+        transition: "transform 0.15s ease-out",
       }}
     >
-      <button
-        type="button"
-        onClick={() => {
-          setTestMode(false);
-          setReviewAfterTest(false);
-        }}
-        className="option-btn"
-        style={{
-          fontSize: "0.8rem",
-          padding: "0.28rem .85rem",
-          borderRadius: "999px",
-          background: !testMode ? "#0f172a" : "transparent",
-          borderColor: !testMode ? "#38bdf8" : "#334155",
-          color: !testMode ? "#e0f7ff" : "#cbd5e1",
-          fontWeight: 600,
-        }}
-      >
-        Practice
-      </button>
-
-      {/* Help for Practice */}
-      <button
-        type="button"
-        onClick={() => showModeHelp("practice")}
-        style={{
-          width: "1.5rem",
-          height: "1.5rem",
-          borderRadius: "999px",
-          border: "1px solid #4b5563",
-          background: "transparent",
-          color: "#9ca3af",
-          fontSize: "0.9rem",
-          lineHeight: 1,
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-        }}
-        title="What does Practice mode do?"
-      >
-        ?
-      </button>
-    </div>
-
-    {/* TEST – SCORE ONLY */}
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: ".2rem",
-      }}
-    >
-      <button
-        type="button"
-        onClick={() => {
-          setTestMode(true);
-          setReviewAfterTest(false);
-        }}
-        className="option-btn"
-        style={{
-          fontSize: "0.8rem",
-          padding: "0.28rem .85rem",
-          borderRadius: "999px",
-          background: testMode && !reviewAfterTest ? "#1e1b07" : "transparent",
-          borderColor: testMode && !reviewAfterTest ? "#fbbf24" : "#334155",
-          color: testMode && !reviewAfterTest ? "#fef9c3" : "#cbd5e1",
-          fontWeight: 600,
-        }}
-      >
-        Test – score only
-      </button>
-
-      {/* Help for Test – score only */}
-      <button
-        type="button"
-        onClick={() => showModeHelp("testScore")}
-        style={{
-          width: "1.5rem",
-          height: "1.5rem",
-          borderRadius: "999px",
-          border: "1px solid #4b5563",
-          background: "transparent",
-          color: "#9ca3af",
-          fontSize: "0.9rem",
-          lineHeight: 1,
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-        }}
-        title="What does this mode do?"
-      >
-        ?
-      </button>
-    </div>
-
-    {/* TEST + REVIEW */}
-    <div
-      style={{
-        display: "flex",
-        alignItems: "center",
-        gap: ".2rem",
-      }}
-    >
-      <button
-        type="button"
-        onClick={() => {
-          setTestMode(true);
-          setReviewAfterTest(true);
-        }}
-        className="option-btn"
-        style={{
-          fontSize: "0.8rem",
-          padding: "0.28rem .85rem",
-          borderRadius: "999px",
-          background: testMode && reviewAfterTest ? "#064e3b" : "transparent",
-          borderColor: testMode && reviewAfterTest ? "#22c55e" : "#334155",
-          color: testMode && reviewAfterTest ? "#d1fae5" : "#cbd5e1",
-          fontWeight: 600,
-        }}
-      >
-        Test + review
-      </button>
-
-      {/* Help for Test + review */}
-      <button
-        type="button"
-        onClick={() => showModeHelp("testReview")}
-        style={{
-          width: "1.5rem",
-          height: "1.5rem",
-          borderRadius: "999px",
-          border: "1px solid #4b5563",
-          background: "transparent",
-          color: "#9ca3af",
-          fontSize: "0.9rem",
-          lineHeight: 1,
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-        }}
-        title="What does this mode do?"
-      >
-        ?
-      </button>
-    </div>
-  </div>
-</div>
-
-
-                              {/* Selected items list */}
-<div
-  style={{
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "baseline",
-    marginBottom: ".35rem",
-  }}
->
-  <span className="small muted">
-    Selected items (order of questions)
-  </span>
-  {selectedItems.length > 0 && (
-    <span className="tiny muted">
-      {selectedItems.length} item
-      {selectedItems.length === 1 ? "" : "s"}
+      ▾
     </span>
+  </button>
+  </div>
+
+  {/* Body: only shown when expanded */}
+  {showQuick && (
+    <div style={{ marginTop: ".65rem" }}>
+      {/* Question count */}
+      <div
+        style={{
+          marginTop: ".1rem",
+          display: "flex",
+          gap: ".4rem",
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        <span className="tiny muted">Total questions:</span>
+        {QUICK_COUNTS.map((n) => {
+          const active = quickCount === n;
+          return (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setQuickCount(n)}
+              className="option-btn"
+              style={{
+                fontSize: "0.8rem",
+                padding: "0.25rem 0.8rem",
+                borderRadius: "999px",
+                background: active ? "#111827" : "transparent",
+                borderColor: active ? "#38bdf8" : "#334155",
+                color: active ? "#e0f2fe" : "#cbd5e1",
+                fontWeight: active ? 600 : 500,
+              }}
+            >
+              {n}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Level chips (hooked into the same `levels` state) */}
+      <div
+        style={{
+          marginTop: ".6rem",
+          display: "flex",
+          gap: ".4rem",
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        <span className="tiny muted">Levels:</span>
+        {ALL_LEVELS.map((lvl) => {
+          const active = levels.includes(lvl);
+          return (
+            <button
+              key={lvl}
+              type="button"
+              onClick={() => toggleQuickLevel(lvl)}
+              className="option-btn"
+              style={{
+                fontSize: "0.75rem",
+                padding: "0.18rem 0.7rem",
+                borderRadius: "999px",
+                background: active ? "#111827" : "transparent",
+                borderColor: active ? "#38bdf8" : "#334155",
+                color: active ? "#e0f2fe" : "#cbd5e1",
+              }}
+            >
+              {lvl}
+            </button>
+          );
+        })}
+        {!levels.length && (
+          <span className="tiny muted">
+            (None selected – we&apos;ll treat this as all levels.)
+          </span>
+        )}
+      </div>
+
+      {/* Tag selection */}
+      <div style={{ marginTop: ".6rem" }}>
+        <span className="tiny muted">Limit to tags (optional):</span>
+        <div
+          style={{
+            marginTop: ".35rem",
+            display: "flex",
+            flexWrap: "wrap",
+            gap: ".3rem",
+          }}
+        >
+          {!allTags.length ? (
+            <span className="tiny muted">Tags loading or unavailable.</span>
+          ) : (
+            allTags.map((t) => {
+              const active = quickSelectedTags.includes(t);
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => toggleQuickTag(t)}
+                  className="badge subtle"
+                  style={{
+                    borderRadius: "999px",
+                    border: "1px solid",
+                    borderColor: active ? "#38bdf8" : "#1f2937",
+                    background: active
+                      ? "rgba(56,189,248,0.1)"
+                      : "transparent",
+                    color: active ? "#e0f2fe" : "#cbd5e1",
+                    cursor: "pointer",
+                    fontSize: "0.7rem",
+                    padding: "0.18rem 0.55rem",
+                  }}
+                >
+                  {t}
+                </button>
+              );
+            })
+          )}
+        </div>
+      </div>
+
+      {/* Per-tag counts */}
+      {quickSelectedTags.length > 0 && (
+        <div style={{ marginTop: ".6rem" }}>
+          <p
+            className="tiny muted"
+            style={{ marginBottom: ".3rem", maxWidth: "32rem" }}
+          >
+            Optional: set per-tag question counts. If you use these,
+            we&apos;ll ignore the total count above and use the sum of
+            these numbers instead.
+          </p>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: ".4rem .8rem",
+            }}
+          >
+            {quickSelectedTags.map((t) => (
+              <label
+                key={t}
+                className="tiny muted"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: ".25rem",
+                }}
+              >
+                <span>{t}</span>
+                <input
+                  type="number"
+                  min="0"
+                  inputMode="numeric"
+                  value={quickPerTagCounts[t] ?? ""}
+                  onChange={(e) =>
+                    updateQuickPerTagCount(t, e.target.value)
+                  }
+                  style={{
+                    width: "3.5rem",
+                    padding: "0.2rem 0.35rem",
+                    borderRadius: "0.375rem",
+                    border: "1px solid #374151",
+                    background: "#020617",
+                    color: "#e5e7eb",
+                    fontSize: "0.7rem",
+                  }}
+                />
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Append + generate */}
+      <div
+        style={{
+          marginTop: ".7rem",
+          display: "flex",
+          alignItems: "center",
+          gap: ".6rem",
+          flexWrap: "wrap",
+        }}
+      >
+        <label
+          className="tiny muted"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: ".25rem",
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={quickAppend}
+            onChange={(e) => setQuickAppend(e.target.checked)}
+          />
+          Append to current set (instead of replacing)
+        </label>
+
+        <button
+          type="button"
+          onClick={handleQuickGenerate}
+          className="review-btn"
+          style={{
+            marginLeft: "auto",
+            padding: "0.3rem 0.9rem",
+            fontSize: "0.8rem",
+          }}
+        >
+          Generate test
+        </button>
+      </div>
+    </div>
   )}
 </div>
+
+          {/* Selected items list */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "baseline",
+              marginBottom: ".35rem",
+            }}
+          >
+            <span className="small muted">Selected items (order of questions)</span>
+            {selectedItems.length > 0 && (
+              <span className="tiny muted">
+                {selectedItems.length} item
+                {selectedItems.length === 1 ? "" : "s"}
+              </span>
+            )}
+          </div>
 
           <div
             style={{
@@ -501,8 +927,8 @@ export default function TeacherGrammarTool({ user }) {
           >
             {!selectedItems.length ? (
               <p className="muted small" style={{ padding: ".25rem" }}>
-                No items selected yet. Use the browser below to add questions to
-                this set.
+                No items selected yet. Use the quick test generator above or the
+                browser below to add questions to this set.
               </p>
             ) : (
               <ol
@@ -551,18 +977,22 @@ export default function TeacherGrammarTool({ user }) {
                             }}
                           >
                             <span
-  className={`cefr-badge cefr-${level}`}
-  style={{
-    position: "static",   // ⬅️ stop it from floating in the corner
-    marginLeft: 0,
-  }}
->
-  {level}
-</span>
-<span className="badge tiny subtle">{tagLabel}</span>
-<span className="tiny muted">Item {index + 1}</span>
+                              className={`cefr-badge cefr-${level}`}
+                              style={{
+                                position: "static", // stop it from floating in the corner
+                                marginLeft: 0,
+                              }}
+                            >
+                              {level}
+                            </span>
+                            <span className="badge tiny subtle">
+                              {tagLabel}
+                            </span>
+                            <span className="tiny muted">
+                              Item {index + 1}
+                            </span>
                           </div>
-                  
+
                           {/* Right: controls */}
                           <div
                             style={{
@@ -591,12 +1021,13 @@ export default function TeacherGrammarTool({ user }) {
                                 border: "1px solid #475569",
                                 color: "#e5e7eb",
                                 opacity: index === 0 ? 0.35 : 1,
-                                cursor: index === 0 ? "default" : "pointer",
+                                cursor:
+                                  index === 0 ? "default" : "pointer",
                               }}
                             >
                               ↑
                             </button>
-                  
+
                             <button
                               type="button"
                               className="option-btn"
@@ -616,14 +1047,19 @@ export default function TeacherGrammarTool({ user }) {
                                 background: "#020617",
                                 border: "1px solid #475569",
                                 color: "#e5e7eb",
-                                opacity: index === selectedItems.length - 1 ? 0.35 : 1,
+                                opacity:
+                                  index === selectedItems.length - 1
+                                    ? 0.35
+                                    : 1,
                                 cursor:
-                                  index === selectedItems.length - 1 ? "default" : "pointer",
+                                  index === selectedItems.length - 1
+                                    ? "default"
+                                    : "pointer",
                               }}
                             >
                               ↓
                             </button>
-                  
+
                             <button
                               type="button"
                               className="option-btn"
@@ -648,7 +1084,7 @@ export default function TeacherGrammarTool({ user }) {
                             </button>
                           </div>
                         </div>
-                  
+
                         {/* Sentence preview */}
                         <p
                           className="sentence-text"
@@ -663,12 +1099,13 @@ export default function TeacherGrammarTool({ user }) {
                         </p>
                       </div>
                     </li>
-                  );                  
+                  );
                 })}
               </ol>
             )}
           </div>
-                              {/* Actions */}
+
+          {/* Actions */}
           <div
             style={{
               display: "flex",
@@ -732,7 +1169,6 @@ export default function TeacherGrammarTool({ user }) {
             </div>
           </div>
 
-
           {statusMsg && (
             <p
               className="small"
@@ -766,7 +1202,10 @@ export default function TeacherGrammarTool({ user }) {
 
             {/* Search box */}
             <div style={{ marginTop: ".5rem" }}>
-              <label className="small muted" htmlFor="teacher-grammar-search">
+              <label
+                className="small muted"
+                htmlFor="teacher-grammar-search"
+              >
                 Search by text
               </label>
               <input
@@ -810,87 +1249,88 @@ export default function TeacherGrammarTool({ user }) {
                 const level = item.level || "B1";
 
                 return (
+                  <div
+                    key={item.id}
+                    className="card gapfill-card"
+                    style={{
+                      opacity: isSelected ? 0.9 : 1,
+                      border: isSelected
+                        ? "1px solid #4ade80"
+                        : "1px solid #1f2937",
+                    }}
+                  >
+                    {/* Header: CEFR badge + tag only */}
+                    <div className="card-header">
+                      <div
+                        style={{
+                          display: "flex",
+                          gap: ".4rem",
+                          alignItems: "center",
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <span className={`cefr-badge cefr-${level}`}>
+                          {level}
+                        </span>
+                        <span className="badge subtle small">
+                          {getItemTags(item)[0] || "—"}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Sentence preview, like the real tool */}
+                    <p
+                      className="sentence-text"
+                      style={{ marginTop: ".15rem" }}
+                    >
+                      {before}
+                      <strong className="blank">_____</strong>
+                      {after}
+                    </p>
+
+                    {/* Options row, non-interactive preview */}
+                    {options.length > 0 && (
+                      <div className="options-row">
+                        {options.map((opt, i) => (
+                          <span
+                            key={i}
+                            className="option-btn"
+                            style={{
+                              cursor: "default",
+                              pointerEvents: "none",
+                            }}
+                          >
+                            {opt}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Add / In set button row, below the sentence */}
                     <div
-                      key={item.id}
-                      className="card gapfill-card"
                       style={{
-                        opacity: isSelected ? 0.9 : 1,
-                        border: isSelected ? "1px solid #4ade80" : "1px solid #1f2937",
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        marginTop: ".5rem",
                       }}
                     >
-                      {/* Header: CEFR badge + tag only */}
-<div className="card-header">
-  <div
-    style={{
-      display: "flex",
-      gap: ".4rem",
-      alignItems: "center",
-      flexWrap: "wrap",
-    }}
-  >
-    <span className={`cefr-badge cefr-${level}`}>
-      {level}
-    </span>
-    <span className="badge subtle small">
-      {getItemTags(item)[0] || "—"}
-    </span>
-  </div>
-</div>
-
-                  
-                      {/* Sentence preview, like the real tool */}
-                      <p
-                        className="sentence-text"
-                        style={{ marginTop: ".15rem" }}
+                      <button
+                        type="button"
+                        className="option-btn"
+                        onClick={() => toggleSelect(item.id)}
+                        style={{
+                          fontSize: "0.75rem",
+                          padding: "0.25rem 0.7rem",
+                          background: isSelected ? "#047857" : undefined,
+                          borderColor: isSelected ? "#10b981" : undefined,
+                          opacity: isSelected ? 0.95 : 1,
+                        }}
                       >
-                        {before}
-                        <strong className="blank">_____</strong>
-                        {after}
-                      </p>
-                  
-                      {/* Options row, non-interactive preview */}
-                      {options.length > 0 && (
-                        <div className="options-row">
-                          {options.map((opt, i) => (
-                            <span
-                              key={i}
-                              className="option-btn"
-                              style={{
-                                cursor: "default",
-                                pointerEvents: "none",
-                              }}
-                            >
-                              {opt}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                      {/* Add / In set button row, below the sentence */}
-<div
-  style={{
-    display: "flex",
-    justifyContent: "flex-end",
-    marginTop: ".5rem",
-  }}
->
-  <button
-    type="button"
-    className="option-btn"
-    onClick={() => toggleSelect(item.id)}
-    style={{
-      fontSize: "0.75rem",
-      padding: "0.25rem 0.7rem",
-      background: isSelected ? "#047857" : undefined,
-      borderColor: isSelected ? "#10b981" : undefined,
-      opacity: isSelected ? 0.95 : 1,
-    }}
-  >
-    {isSelected ? "In set" : "Add to set"}
-  </button>
-</div>
-
+                        {isSelected ? "In set" : "Add to set"}
+                      </button>
                     </div>
-                  );                  
+                  </div>
+                );
               })
             )}
           </div>

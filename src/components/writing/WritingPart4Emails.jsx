@@ -19,7 +19,7 @@ const TASKS = [
   
   Our club has always operated thanks to volunteers and small local donations. However, increasing maintenance and equipment costs mean we now need a more stable source of funding.
   
-  For this reason, the committee has decided to introduce a small annual membership fee of £15, starting next month. The money will go directly towards maintaining our facilities and buying new sports materials.
+  For this reason, the committee has decided to introduce a small monthly membership fee of £15, starting next month. The money will go directly towards maintaining our facilities and buying new sports materials.
   
   We understand that not everyone may agree with this decision, so we would like to hear your opinions before the final vote. Please send your comments or suggestions by next Friday.
   
