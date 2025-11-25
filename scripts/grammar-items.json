@@ -4146,5 +4146,213 @@
           "Incorrect: 'didn't you?' is past simple; original sentence is present perfect.",
           "Incorrect: 'aren't you?' is present and uses the auxiliary 'be' not 'have'."
         ]
-      }      
+      },
+        {
+          "id": "b2_unreal_01",
+          "level": "B2",
+          "tag": "unreal forms",
+          "sentence": "It's about time the government ___ in green energy.",
+          "options": ["invested", "invests", "will invest"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: After 'It’s (about) time' + subject we use a past simple form for something that should already be happening. 'invested' is the unreal past (referring to the present time like a second conditional).",
+            "Incorrect: 'invests' is present simple. With a subject after 'It’s about time', we need the past simple.",
+            "Incorrect: 'will invest' is future, but after it's time we need an unreal past form."
+          ]
+        },
+        {
+          "id": "b2_unreal_02",
+          "level": "B2",
+          "tag": "unreal forms",
+          "sentence": "I wish I ___ that old house when I had the chance.",
+          "options": ["had bought", "bought", "would buy"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: We use 'wish' + past perfect to talk about regrets about the past. 'had bought' refers to a past opportunity, similar to the third conditional.",
+            "Incorrect: 'bought' (past simple) describes a real past action; here the speaker *didn’t* buy the house. We use wish + past simple for present unreal situations.",
+            "Incorrect: 'would buy' suggests a future intention or willingness, not a regret about a past decision."
+          ]
+        },
+        {
+          "id": "b2_unreal_03",
+          "level": "C1",
+          "tag": "unreal forms",
+          "sentence": "I really wish you ___ shouting! I can't hear the TV.",
+          "options": ["had stopped", "can stop", "would stop"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'had stopped' would refer to a past regret, but here the problem is happening now.",
+            "Incorrect: 'can stop' describes a real situation, and is not used after 'wish' for unreal situations.",
+            "Correct: We use 'wish' + would to complain about another person’s behaviour we want to change. 'would stop' is best here."
+          ]
+        },
+        {
+          "id": "b2_unreal_04",
+          "level": "B2",
+          "tag": "unreal forms",
+          "sentence": "I wish I ___ a motorbike; I could get to work much faster.",
+          "options": ["owned", "own", "had owned"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'wish' + past simple describes an unreal present situation, using past simple like a second conditional. The speaker doesn’t own a motorbike.",
+            "Incorrect: 'own' is present simple; with 'wish' we need an unreal past form for present situations, like a second conditional.",
+            "Incorrect: 'had owned' suggests a regret about not having a motorbike int he past, not about the current situation."
+          ]
+        },
+        {
+          "id": "b2_unreal_05",
+          "level": "C1",
+          "tag": "unreal forms",
+          "sentence": "I wish we ___ in the morning; I'd like more time here.",
+          "options": ["weren't leaving", "didn't leave", "hadn't left"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'wish' + past continuous shows that the current arrangement (we are leaving= future plan) is not what the speaker wants. so 'is'--> 'was'.",
+            "Incorrect: 'didn’t leave' doesn’t fit well with a fixed future plan that is already arranged. 'weren't leaving' is the pastnegative form of 'are leaving'.",
+            "Incorrect: 'hadn’t left' refers to a regret about a past departure, but this sentence is about the future."
+          ]
+        },
+        {
+          "id": "c1_unreal_06",
+          "level": "C1",
+          "tag": "unreal forms",
+          "sentence": "I'd rather you ___ anything to my parents about this.",
+          "options": ["didn't say", "don't say", "not to say"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: After 'I'd rather you', we normally use a past simple (unreal past) form for present or future preference. 'didn't say' is correct.",
+            "Incorrect: 'don’t say' is not standard after would rather + subject. We need an unreal past form.",
+            "Incorrect: 'not to say' is not possible after a new subject. after would rather, we can use a bare infinitive, or past simple with a different subject."
+          ]
+        },
+        {
+          "id": "b2_unreal_07",
+          "level": "B2",
+          "tag": "unreal forms",
+          "sentence": "It's high time you ___ working seriously.",
+          "options": ["start", "will start", "started"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: After 'It’s high time you', we usually use a past simple form, not present.",
+            "Incorrect: 'will start' is a real future; 'It’s high time' normally uses an unreal past form to criticise delay.",
+            "Correct: 'started' is the standard unreal past form after 'It’s high time you'. it's time + past simple.  'high/about' show emphasis."
+          ]
+        },
+        {
+          "id": "c1_unreal_08",
+          "level": "C1",
+          "tag": "unreal forms",
+          "sentence": "Helen is so bossy. She acts as if she ___ the place, when she's just a manager!",
+          "options": ["owned", "owns", "will own"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: After 'as if/as though' we use past forms ('owned') to show the idea is unreal or clearly not true.",
+            "Incorrect: 'owns' suggests she might be the owner, which is not the case here.",
+            "Incorrect: 'will own' refers to a possible future situation, not an unreal present attitude."
+          ]
+        },
+        {
+          "id": "c1_unreal_10",
+          "level": "C1",
+          "tag": "unreal forms",
+          "sentence": "I'd sooner you ___ another job before you decide to quit this one.",
+          "options": ["found", "find", "had found"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: After 'I’d sooner you', we normally use past simple to talk about what we would prefer someone to do, the same as would rather.",
+            "Incorrect: 'find' is present simple; would sooner + subject requires an unreal past form.",
+            "Incorrect: 'had found' suggests the action is already completed in the past, which doesn’t fit the advice here."
+          ]
+        },
+        {
+          "id": "b2_unreal_11",
+          "level": "B2",
+          "tag": "unreal forms",
+          "sentence": "It's about time we ___ going or we'll miss the last train.",
+          "options": ["got", "get", "will get"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'It’s about time we got going' uses a past form to show something should happen now or very soon. This is the unreal past after 'It’s about time'.",
+            "Incorrect: 'get going' is present simple. It's time + subject requires an unreal past form.",
+            "Incorrect: 'will get' is a normal future form, not the pattern after 'It’s about time'."
+          ]
+        },
+        {
+          "id": "c1_unreal_12",
+          "level": "B2",
+          "tag": "unreal forms",
+          "sentence": "I wish you ___ me you were going to be late; I've been waiting for an hour.",
+          "options": ["told", "would tell", "had told"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'told' in the past simple describes a real past action; here the speaker *wasn’t* told, so we need a form expressing pastregret. Past perfect like in third conditional.",
+            "Incorrect: 'would tell' is used for future habits/annoyances, not a regret about a specific past situation.",
+            "Correct: 'wish' + past perfect ('had told') expresses regret about something that didn’t happen in the past."
+          ]
+        },
+        {
+          "id": "c1_unreal_13",
+          "level": "C1",
+          "tag": "unreal forms",
+          "sentence": "If only I ___ to the doctor earlier, I wouldn't be so ill now.",
+          "options": ["had gone", "went", "would go"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'If only' + past perfect shows a strong regret about a past action (not going to the doctor), similar to the third conditional.",
+            "Incorrect: 'went' is past simple and doesn’t clearly express regret about a *missed* action.",
+            "Incorrect: 'would go' looks to the future; it doesn’t match the idea of a past regret."
+          ]
+        },
+        {
+          "id": "b2_unreal_14",
+          "level": "B2",
+          "tag": "unreal forms",
+          "sentence": "I'd rather you ___ your phone during dinner.",
+          "options": ["didn't use", "don't use", "not using"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: After 'I’d rather you', we usually use a past simple form for a present/future preference: 'didn’t use'.",
+            "Incorrect: 'don’t use' is present simple; would rather + subject requires an unreal past, in this case the past simple.",
+            "Incorrect: 'not using' is not possible: would rather can be followed by a bare infinitive or past simple with a different subject."
+          ]
+        },
+        {
+          "id": "c1_unreal_15",
+          "level": "C1",
+          "tag": "unreal forms",
+          "sentence": "She speaks to me as though I ___ a child when I already have my own kids!!",
+          "options": ["am", "will be", "were"],
+          "answerIndex": 2,
+          "explanations": [
+            "Incorrect: 'am' suggests a real situation. The speaker is clearly *not* a child.",
+            "Incorrect: 'will be' refers to a future state, which doesn’t fit the comparison.",
+            "Correct: With 'as though' and an unreal comparison, we use a past form ('were') to show the idea isn’t true. 'Was' is also possible here."
+          ]
+      },
+        {
+          "id": "c1_unreal_17",
+          "level": "C1",
+          "tag": "unreal forms",
+          "sentence": "She’d sooner you ___ her before changing the project plan.",
+          "options": ["had consulted", "consulted", "would consult"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: 'She’d sooner you' + past perfect expresses a preferred action that did NOT happen in the past. We use an unreal past perfect like in third conditionals.",
+            "Incorrect: 'consulted' is past simple and does not mark the past unreal nature of the preference.",
+            "Incorrect: 'would consult' is about future willingness/habit, not a past preference."
+          ]
+        },
+        {
+          "id": "c1_unreal_18",
+          "level": "C1",
+          "tag": "unreal forms",
+          "sentence": "I'd much rather you ___ what happened instead of having kept it secret.",
+          "options": ["had explained", "explained", "would explain"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: A past perfect is needed because the speaker wanted an explanation *earlier*, but it didn’t happen. This is similar to a third conditional structure.",
+            "Incorrect: 'explained' is not possible because we're referring to an unreal PAST situation in this sentence.",
+            "Incorrect: 'would explain' looks to the future, not a past preference."
+          ]
+        }
   ]
