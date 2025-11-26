@@ -42,6 +42,7 @@ export default function VocabularyTopics({
   const topics = [
     { id: "travel", name: "Travel", emoji: "🧳", desc: "Transport, holidays, accommodation...", active: true },
     { id: "work",   name: "Work",   emoji: "💼", desc: "Jobs, offices, responsibilities...",  active: true }, // 👈 now active
+    { id: "people", name: "Describing people", emoji: "🧑‍🤝‍🧑", desc: "Appearance and personality vocabulary.", active: true },
     { id: "education", name: "Education", emoji: "🏫", desc: "School, university, exams..." },
     { id: "health", name: "Health", emoji: "🍎", desc: "Exercise, medicine, healthy living..." },
     { id: "technology", name: "Technology", emoji: "💻", desc: "Computers, gadgets, the internet..." },

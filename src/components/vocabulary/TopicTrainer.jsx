@@ -2,12 +2,14 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { travelData } from "./data/travelData";
 import { workData } from "./data/workData"; 
+import { peopleData } from "./data/peopleData"; // NEW
 import { auth } from "../../firebase";
 import { toast } from "../../utils/toast";
 
 const TOPIC_DATA = {
   travel: travelData,
   work: workData,
+  people: peopleData   // NEW
   
   // work: workData,
   // health: healthData,
@@ -26,11 +28,21 @@ export default function TopicTrainer({ topic, onBack, onShowFlashcards }) {
   const [phase, setPhase] = useState("match");
 
   // Load the active set
-  const activeSet = topicInfo?.sets?.[setIndex];
-  const shuffledReview = useMemo(() => {
-    if (!activeSet) return [];
-    return shuffle(activeSet.review);
-  }, [activeSet]);
+const activeSet = topicInfo?.sets?.[setIndex];
+
+// Allow either `review` or `practice` as the source field
+const shuffledReview = useMemo(() => {
+  if (!activeSet) return [];
+
+  const source =
+    activeSet.review && Array.isArray(activeSet.review)
+      ? activeSet.review
+      : activeSet.practice && Array.isArray(activeSet.practice)
+      ? activeSet.practice
+      : [];
+
+  return shuffle(source);
+}, [activeSet]);
 
   // --- MATCH STATE ---
 const [matchedTerms, setMatchedTerms] = useState([]);
@@ -45,7 +57,7 @@ const [showDefs, setShowDefs] = useState({});
 
 
 
-function shuffle(array) {
+function shuffle(array = []) {
   return [...array].sort(() => Math.random() - 0.5);
 }
 
