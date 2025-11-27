@@ -103,22 +103,22 @@ export const peopleData = {
               {
                 sentence:
                   "The security guard is really __________ and looks very strong.",
-                answer: "well-built"
+                answer: "well-built / well built"
               },
               {
                 sentence:
-                  "He's are very __________, which explains why he's a model.",
-                answer: "good-looking / attractive"
+                  "He's very __________, which explains why he's a model.",
+                answer: "good-looking / attractive / good looking"
               },
               {
                 sentence:
                   "He's __________ — not tall or short, just in the middle.",
-                answer: "medium-height"
+                answer: "medium-height / medium height"
               },
               {
                 sentence:
                   "The manager is __________ – probably around fifty years old.",
-                answer: "middle-aged"
+                answer: "middle-aged / middle aged"
               },
               {
                 sentence:
