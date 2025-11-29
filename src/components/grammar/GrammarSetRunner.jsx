@@ -6,6 +6,7 @@ import { fetchItemsByIds } from "../../api/grammar";
 import GapFillList from "../GapFillList";
 import { toast } from "../../utils/toast";
 import { QRCodeSVG } from "qrcode.react";   // 👈 NEW
+import { createLiveGame } from "../../api/liveGames";
 
 export default function GrammarSetRunner({ user }) {
   const { setId } = useParams();
@@ -49,6 +50,28 @@ export default function GrammarSetRunner({ user }) {
     }
     load();
   }, [setId]);
+
+  const handleHostLiveGame = async () => {
+    // Only teachers/admin can host
+    if (!user || (user.role !== "teacher" && user.role !== "admin")) {
+      toast("Only teachers can host live games.");
+      return;
+    }
+
+    if (!setMeta) return;
+
+    try {
+      const { gameId, pin } = await createLiveGame({
+        setId,
+        type: "grammar",
+      });
+      toast(`Live game created – PIN ${pin}`);
+      navigate(`/live/host/${gameId}`);
+    } catch (err) {
+      console.error("[Teacher] createLiveGame failed", err);
+      toast(err.message || "Could not create live game.");
+    }
+  };
 
     // When all items are answered once, submit attempt
     useEffect(() => {
@@ -218,7 +241,6 @@ export default function GrammarSetRunner({ user }) {
     📋 Copy link
   </button>
 
-  {/* QR toggle button */}
   <button
     type="button"
     className="review-btn"
@@ -226,6 +248,17 @@ export default function GrammarSetRunner({ user }) {
   >
     📱 {showQR ? "Hide QR" : "Show QR"}
   </button>
+
+  {/* 👇 NEW – only visible for teachers/admin */}
+  {user && (user.role === "teacher" || user.role === "admin") && (
+    <button
+      type="button"
+      className="review-btn"
+      onClick={handleHostLiveGame}
+    >
+      🎮 Host live game
+    </button>
+  )}
 </div>
 {showQR && (
   <div

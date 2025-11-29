@@ -45,6 +45,9 @@ import MyStudents from "./components/teacher/MyStudents";
 import TeacherStudentProfile from "./components/TeacherStudentProfile";
 import CookieBanner from "./components/CookieBanner.jsx";
 import PrivacyPolicy from "./components/legal/PrivacyPolicy.jsx";
+import LiveGameJoin from "./components/live/LiveGameJoin";
+import LiveGameHost from "./components/live/LiveGameHost";
+import LiveGamePlayer from "./components/live/LiveGamePlayer";
 
 
 
@@ -692,6 +695,10 @@ return (
   path="/my-students"
   element={<MyStudents user={user} />}
 />
+
+<Route path="/live/join" element={<LiveGameJoin />} />
+<Route path="/live/host/:gameId" element={<LiveGameHost />} />
+<Route path="/live/play/:gameId" element={<LiveGamePlayer />} />
 
 <Route
   path="/grammar-sets/:setId"

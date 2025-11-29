@@ -1,7 +1,7 @@
 // src/firebase.js
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
-
+import { getDatabase } from "firebase/database";
 
 // ⬇️ Use initializeFirestore instead of getFirestore
 import {
@@ -47,6 +47,7 @@ const firebaseConfig = {
   messagingSenderId: "654835226958",
   appId: "1:654835226958:web:a95cd8da4adb09c8a5661f",
   measurementId: "G-DMMT8D3XBR",
+  databaseURL: "https://examplay-auth-default-rtdb.europe-west1.firebasedatabase.app",
 };
 
 const app = initializeApp(firebaseConfig);
@@ -75,6 +76,9 @@ export const db = initializeFirestore(app, {
   useFetchStreams: false, // set to true on some Chromium builds if needed
   // Last resort (stronger): experimentalForceLongPolling: true,
 });
+
+// NEW: Realtime Database for live games
+export const rtdb = getDatabase(app);
 
 export const auth = getAuth(app);
 export const storage = getStorage(app);

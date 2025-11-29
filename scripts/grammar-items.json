@@ -236,7 +236,7 @@
     {
       "id": "b2_wishes_01",
       "level": "B2",
-      "tag": "Wishes",
+      "tag": "unreal forms",
       "sentence": "I wish I ___ more confident during the interview.",
       "options": ["was", "am", "had been"],
       "answerIndex": 2,
@@ -340,7 +340,7 @@
     {
       "id": "c1_partperf_01",
       "level": "C1",
-      "tag": "Perfect Participles",
+      "tag": "Participles",
       "sentence": "___ finished her work, she left the office early.",
       "options": ["Having", "Have", "Being"],
       "answerIndex": 0,
@@ -471,7 +471,7 @@
     {
       "id": "c1_negcomp_01",
       "level": "C1",
-      "tag": "inversion",
+      "tag": "Inversion",
       "sentence": "No sooner had he left ___ it started raining.",
       "options": ["than", "when", "that"],
       "answerIndex": 0,
@@ -2950,7 +2950,7 @@
         "answerIndex": 2,
         "explanations": [
           "Incorrect: we need the passive here as the applicant won't notify. They will be notified (by the company for example).",
-          "Incorrect: not passive voice",
+          "Incorrect: not passive voice — apllicants don't do the notifying, so we need be + past participle.",
           "Correct: future passive fits a formal announcement pattern."
         ]
       },
@@ -2976,7 +2976,7 @@
         "answerIndex": 0,
         "explanations": [
           "Correct: after 'hate', the gerund 'being told' is natural; this is a passive gerund.",
-          "Incorrect: '*to being told*' is wrong as 'to' needs the base form 'be'.",
+          "Incorrect: '*to being told*' is wrong as 'to' needs the base form 'be', and hates usually takes a gerund.",
           "Incorrect: 'hates' is usually followed by a gerund, not a that clause."
         ]
       },
