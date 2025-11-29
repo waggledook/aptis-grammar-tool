@@ -6,6 +6,9 @@ import { rtdb, auth, getGrammarSet } from "../../firebase";
 import { fetchItemsByIds } from "../../api/grammar";
 import { setLiveGameStatus, setLiveGameState } from "../../api/liveGames";
 import { toast } from "../../utils/toast";
+import { useTickSound } from "../../hooks/useTickSound";
+import { QRCodeSVG } from "qrcode.react";
+
 
 export default function LiveGameHost() {
   const { gameId } = useParams();
@@ -18,13 +21,21 @@ export default function LiveGameHost() {
   const [remainingSeconds, setRemainingSeconds] = useState(null);
   const [selectedExplanationIndex, setSelectedExplanationIndex] = useState(null);
 
-  // 🔊 Audio refs (host-only sounds)
-  const tickRef = useRef(null);
-  const tickFastRef = useRef(null);
-  const revealRef = useRef(null);
-  const nextRef = useRef(null);
-  const finishRef = useRef(null);
-  const timeUpRef = useRef(null);   // 👈 NEW
+  // Get tick refs + play function from the hook
+const { tickRef, tickFastRef, playTick } = useTickSound();
+
+// 🔊 Other audio refs (host-only sounds)
+const revealRef = useRef(null);
+const nextRef = useRef(null);
+const finishRef = useRef(null);
+const timeUpRef = useRef(null);
+
+const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+// If we already know the PIN, include it as a query param
+const joinUrl =
+game && game.pin
+  ? `${baseUrl}/live/join?pin=${encodeURIComponent(game.pin)}`
+  : `${baseUrl}/live/join`;
 
   // Subscribe to liveGames/{gameId}
   useEffect(() => {
@@ -79,33 +90,6 @@ export default function LiveGameHost() {
     loadItems();
   }, [game, gameId]);
 
-  // Countdown timer based on questionDeadline
-  useEffect(() => {
-    if (!game) {
-      setRemainingSeconds(null);
-      return;
-    }
-
-    const deadline = game.state?.questionDeadline;
-    const currentStatus = game.status || "lobby";
-    const currentPhase = game.state?.phase || "lobby";
-
-    if (!deadline || currentStatus !== "in-progress" || currentPhase !== "question") {
-      setRemainingSeconds(null);
-      return;
-    }
-
-    function updateRemaining() {
-      const now = Date.now();
-      const diffMs = deadline - now;
-      const secs = Math.max(0, Math.ceil(diffMs / 1000));
-      setRemainingSeconds(secs);
-    }
-
-    updateRemaining();
-    const id = setInterval(updateRemaining, 250);
-    return () => clearInterval(id);
-  }, [game]);
 
   // ── Derived values ──────────────────────────
   const currentUser = auth.currentUser;
@@ -121,32 +105,41 @@ export default function LiveGameHost() {
   const phase = game?.state?.phase || "lobby";
   const questionIndex = game?.state?.questionIndex ?? 0;
   const questionDuration = game?.state?.questionDuration ?? 20;
+  const deadline = game?.state?.questionDeadline ?? null;
+
+  // Countdown timer based on questionDeadline
+useEffect(() => {
+    if (!deadline || status !== "in-progress" || phase !== "question") {
+      setRemainingSeconds(null);
+      return;
+    }
+  
+    function updateRemaining() {
+      const now = Date.now();
+      const diffMs = deadline - now;
+      const secs = Math.max(0, Math.ceil(diffMs / 1000));
+      setRemainingSeconds(secs);
+    }
+  
+    updateRemaining();
+    const id = setInterval(updateRemaining, 250);
+    return () => clearInterval(id);
+  }, [deadline, status, phase]);
 
   // Clear any shown explanation when question or phase changes
   useEffect(() => {
     setSelectedExplanationIndex(null);
   }, [questionIndex, phase]);
 
-  // 🔊 Tick sounds: normal tick + faster tick in last 3 seconds
   useEffect(() => {
     if (status !== "in-progress" || phase !== "question") return;
     if (remainingSeconds == null || remainingSeconds <= 0) return;
-
-    // Choose normal vs fast tick
-    const isFinalSeconds = remainingSeconds <= 3;
-    const audio = isFinalSeconds ? tickFastRef.current : tickRef.current;
-    if (!audio) return;
-
-    try {
-      audio.currentTime = 0;
-      audio.play().catch(() => {
-        // Ignore autoplay issues; first click will unlock audio anyway
-      });
-    } catch (err) {
-      // Swallow any audio errors
-      console.warn("[LiveGameHost] audio play failed", err);
-    }
+  
+    const isFast = remainingSeconds <= 3;
+    playTick(isFast);
   }, [remainingSeconds, status, phase]);
+  
+  
 
   // 🔊 Time-up sound when countdown reaches 0 (host only)
 useEffect(() => {
@@ -211,6 +204,8 @@ useEffect(() => {
       return na.localeCompare(nb);
     });
   }, [players]);
+
+  const topThree = sortedPlayers.slice(0, 3);
 
   // ── Early returns ────────────────────────────────
   if (loadingGame) {
@@ -325,6 +320,77 @@ useEffect(() => {
 
   return (
     <div className="page wide">
+        {/* Local styles for the podium animation */}
+        <style>
+          {`
+            @keyframes podium-pop {
+              0% {
+                transform: translateY(10px) scale(0.95);
+                opacity: 0;
+              }
+              100% {
+                transform: translateY(0) scale(1);
+                opacity: 1;
+              }
+            }
+  
+            .podium-row {
+              display: flex;
+              justify-content: center;
+              align-items: flex-end;
+              gap: 1rem;
+              margin-top: 0.75rem;
+            }
+  
+            .podium-column {
+              flex: 0 0 5rem;
+              text-align: center;
+              border-radius: 0.75rem 0.75rem 0.25rem 0.25rem;
+              padding: 0.4rem 0.3rem 0.6rem;
+              background: rgba(15, 23, 42, 0.95);
+              border: 1px solid rgba(148, 163, 184, 0.4);
+              animation: podium-pop 0.4s ease-out forwards;
+            }
+  
+            .podium-column.first {
+              height: 6rem;
+              background: linear-gradient(
+                180deg,
+                rgba(250, 204, 21, 0.18),
+                rgba(15, 23, 42, 0.95)
+              );
+              border-color: rgba(250, 204, 21, 0.7);
+            }
+  
+            .podium-column.second {
+              height: 4.8rem;
+            }
+  
+            .podium-column.third {
+              height: 4rem;
+            }
+  
+            .podium-rank {
+              font-size: 1.1rem;
+              font-weight: 700;
+              display: block;
+              margin-bottom: 0.15rem;
+            }
+  
+            .podium-name {
+              font-size: 0.85rem;
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+  
+            .podium-score {
+              font-size: 0.75rem;
+              opacity: 0.8;
+              margin-top: 0.1rem;
+            }
+          `}
+        </style>  
       <header className="page-header">
         <h1>Host Live Game</h1>
         <p className="muted">
@@ -334,19 +400,65 @@ useEffect(() => {
 
       <section className="card">
         <h2>PIN for students</h2>
-        <p
+
+        <div
           style={{
-            fontSize: "2.5rem",
-            fontWeight: 700,
-            letterSpacing: "0.15em",
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            gap: "1.25rem",
+            marginTop: ".5rem",
           }}
         >
-          {game.pin}
-        </p>
-        <p className="muted">
-          Ask students to open the live game page and enter this PIN.
-        </p>
+          {/* Big PIN display */}
+          <div>
+            <p
+              style={{
+                fontSize: "2.6rem",
+                fontWeight: 800,
+                letterSpacing: "0.18em",
+                marginBottom: ".15rem",
+              }}
+            >
+              {game.pin}
+            </p>
+            <p className="muted" style={{ maxWidth: "260px" }}>
+              Ask students to open the{" "}
+              <strong>Join Live Game</strong> page and enter this PIN.
+            </p>
+          </div>
+
+          {/* QR code */}
+          <div
+            style={{
+              marginLeft: "auto",
+              padding: ".6rem .9rem",
+              borderRadius: ".9rem",
+              border: "1px solid #1e293b",
+              background: "#020617",
+              display: "flex",
+              alignItems: "center",
+              gap: ".75rem",
+            }}
+          >
+            <QRCodeSVG
+              value={joinUrl}
+              size={96}
+              bgColor="transparent"
+              fgColor="#e5e7eb"
+            />
+            <p
+              className="tiny muted"
+              style={{ maxWidth: "180px", margin: 0, lineHeight: 1.4 }}
+            >
+              Students can also{" "}
+              <strong>scan this QR</strong> to open the join page on their
+              phones.
+            </p>
+          </div>
+        </div>
       </section>
+
 
       {/* Game status + controls */}
       <section className="card" style={{ marginTop: "1rem" }}>
@@ -611,6 +723,56 @@ useEffect(() => {
           </>
         )}
       </section>
+
+      {status === "finished" && topThree.length > 0 && (
+        <section className="card" style={{ marginTop: "1rem" }}>
+          <h2>Game finished 🎉</h2>
+          <p className="muted">
+            Great job! Here are the top players for this game.
+          </p>
+
+          <div className="podium-row">
+            {/* 2nd place */}
+            {topThree[1] && (
+              <div className="podium-column second">
+                <span className="podium-rank">🥈 2nd</span>
+                <div className="podium-name">
+                  {topThree[1].name || "Player"}
+                </div>
+                <div className="podium-score">
+                  {topThree[1].score ?? 0} pts
+                </div>
+              </div>
+            )}
+
+            {/* 1st place */}
+            {topThree[0] && (
+              <div className="podium-column first">
+                <span className="podium-rank">🥇 1st</span>
+                <div className="podium-name">
+                  {topThree[0].name || "Player"}
+                </div>
+                <div className="podium-score">
+                  {topThree[0].score ?? 0} pts
+                </div>
+              </div>
+            )}
+
+            {/* 3rd place */}
+            {topThree[2] && (
+              <div className="podium-column third">
+                <span className="podium-rank">🥉 3rd</span>
+                <div className="podium-name">
+                  {topThree[2].name || "Player"}
+                </div>
+                <div className="podium-score">
+                  {topThree[2].score ?? 0} pts
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* Scoreboard */}
       <section className="card" style={{ marginTop: "1rem" }}>

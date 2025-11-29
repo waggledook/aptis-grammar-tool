@@ -158,7 +158,7 @@
     {
       "id": "c1_discourse_01",
       "level": "C1",
-      "tag": "Discourse Markers",
+      "tag": "Linkers",
       "sentence": "She studied hard; ___, she passed the exam easily.",
       "options": ["however", "nevertheless", "as a result"],
       "answerIndex": 2,
@@ -184,7 +184,7 @@
     {
       "id": "c1_advclauses_01",
       "level": "C1",
-      "tag": "Adverbial Clauses",
+      "tag": "Linkers",
       "sentence": "___ he had all the qualifications, they rejected his application.",
       "options": ["Even though", "Because", "Unless"],
       "answerIndex": 0,

@@ -99,6 +99,32 @@ export default function LiveGamePlayer() {
   const questionIndex = game?.state?.questionIndex ?? 0;
   const questionDuration = game?.state?.questionDuration ?? 20;
 
+  const playersObj = game?.players || {};
+  const players = Object.entries(playersObj).map(([pUid, p]) => ({
+    uid: pUid,
+    ...p,
+  }));
+
+  const sortedPlayers = [...players].sort((a, b) => {
+    const sa = a.score || 0;
+    const sb = b.score || 0;
+    if (sb !== sa) return sb - sa;
+    const na = (a.name || "").toLowerCase();
+    const nb = (b.name || "").toLowerCase();
+    return na.localeCompare(nb);
+  });
+
+  const topThree = sortedPlayers.slice(0, 3);
+
+  const myRankIndex =
+    uid && sortedPlayers.length
+      ? sortedPlayers.findIndex((p) => p.uid === uid)
+      : -1;
+
+  const myRank = myRankIndex >= 0 ? myRankIndex + 1 : null;
+  const myScore = me?.score ?? 0;
+
+
   // 🧮 Score init: when we first know "me", set a baseline score to show
   useEffect(() => {
     if (!me) return;
@@ -239,10 +265,156 @@ export default function LiveGamePlayer() {
 
   return (
     <div className="page narrow">
+      <style>
+        {`
+          @keyframes player-podium-pop {
+            0% { transform: translateY(8px) scale(0.95); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+          }
+
+          .player-summary-heading {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+          }
+
+          .player-rank-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 999px;
+            background: rgba(15,23,42,0.9);
+            border: 1px solid rgba(148,163,184,0.6);
+            font-size: 0.9rem;
+          }
+
+          .player-podium-row {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            animation: player-podium-pop 0.35s ease-out forwards;
+          }
+
+          .player-podium-col {
+            flex: 0 0 4rem;
+            text-align: center;
+            border-radius: 0.7rem 0.7rem 0.3rem 0.3rem;
+            padding: 0.35rem 0.25rem 0.5rem;
+            background: rgba(15, 23, 42, 0.96);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            font-size: 0.75rem;
+          }
+
+          .player-podium-col.first {
+            background: linear-gradient(
+              180deg,
+              rgba(250, 204, 21, 0.2),
+              rgba(15, 23, 42, 0.96)
+            );
+            border-color: rgba(250, 204, 21, 0.7);
+          }
+
+          .player-podium-rank {
+            font-weight: 700;
+            margin-bottom: 0.1rem;
+          }
+
+          .player-podium-name {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .player-podium-score {
+            opacity: 0.8;
+            margin-top: 0.05rem;
+          }
+        `}
+      </style>
+
       <h1>Live Game</h1>
       <p className="muted">
         Game PIN: <strong>{game.pin}</strong>
       </p>
+
+      {status === "finished" && me && (
+        <section className="card" style={{ marginTop: "1rem" }}>
+          <h2 className="player-summary-heading">Game over 🎉</h2>
+
+          <p className="muted" style={{ marginBottom: "0.5rem" }}>
+            Thanks for playing! Here’s how you did:
+          </p>
+
+          {myRank && (
+            <div style={{ marginBottom: "0.6rem" }}>
+              <div className="player-rank-badge">
+                <span>
+                  {myRank === 1
+                    ? "🥇"
+                    : myRank === 2
+                    ? "🥈"
+                    : myRank === 3
+                    ? "🥉"
+                    : "🏁"}
+                </span>
+                <span>
+                  You finished <strong>#{myRank}</strong> with{" "}
+                  <strong>{myScore} pts</strong>
+                </span>
+              </div>
+            </div>
+          )}
+
+          {topThree.length > 0 && (
+            <>
+              <p className="tiny muted">Top players this game:</p>
+              <div className="player-podium-row">
+                {/* 2nd */}
+                {topThree[1] && (
+                  <div className="player-podium-col">
+                    <div className="player-podium-rank">🥈 2nd</div>
+                    <div className="player-podium-name">
+                      {topThree[1].name || "Player"}
+                    </div>
+                    <div className="player-podium-score">
+                      {topThree[1].score ?? 0} pts
+                    </div>
+                  </div>
+                )}
+
+                {/* 1st */}
+                {topThree[0] && (
+                  <div className="player-podium-col first">
+                    <div className="player-podium-rank">🥇 1st</div>
+                    <div className="player-podium-name">
+                      {topThree[0].name || "Player"}
+                    </div>
+                    <div className="player-podium-score">
+                      {topThree[0].score ?? 0} pts
+                    </div>
+                  </div>
+                )}
+
+                {/* 3rd */}
+                {topThree[2] && (
+                  <div className="player-podium-col">
+                    <div className="player-podium-rank">🥉 3rd</div>
+                    <div className="player-podium-name">
+                      {topThree[2].name || "Player"}
+                    </div>
+                    <div className="player-podium-score">
+                      {topThree[2].score ?? 0} pts
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </section>
+      )}
 
       <div className="card" style={{ marginTop: "1rem" }}>
         <p>{message}</p>
@@ -265,20 +437,21 @@ export default function LiveGamePlayer() {
       </div>
 
       {/* Question & options */}
-      <div
-        className="card"
-        style={{ marginTop: "1rem", padding: "1.1rem 1.25rem" }}
-      >
-        {loadingItems && <p>Loading questions…</p>}
+      {status !== "finished" && (
+        <div
+          className="card"
+          style={{ marginTop: "1rem", padding: "1.1rem 1.25rem" }}
+        >
+          {loadingItems && <p>Loading questions…</p>}
 
-        {!loadingItems && !currentItem && (
-          <p className="muted">
-            No question available. Your teacher may have reached the end of the
-            game.
-          </p>
-        )}
+          {!loadingItems && !currentItem && (
+            <p className="muted">
+              No question available. Your teacher may have reached the end of the
+              game.
+            </p>
+          )}
 
-        {!loadingItems && currentItem && (
+          {!loadingItems && currentItem && (
           <>
             <p
               style={{
@@ -357,6 +530,7 @@ export default function LiveGamePlayer() {
           </>
         )}
       </div>
+      )}
     </div>
   );
 }
