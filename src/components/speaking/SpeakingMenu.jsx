@@ -57,7 +57,16 @@ export default function SpeakingMenu() {
   className="card"
   onClick={() => navigate("/speaking/part3-comparing")}
 >
-  <h3>Guide: comparing photos (Part 3)</h3>
+  <div className="menu-card-header">
+    <h3>Guide: comparing photos (Part 3)</h3>
+    <span className="uc-top-wrapper">
+      <img
+        src="/images/ui/under-construction.png"
+        alt="Under construction"
+        className="uc-top-icon"
+      />
+    </span>
+  </div>
   <p>Useful language and practice for comparing two pictures in Part 3.</p>
 </button>
 

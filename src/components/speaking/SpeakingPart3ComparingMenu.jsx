@@ -2,6 +2,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
+import UnderConstructionPanel from "../common/UnderConstructionPanel";
 
 export default function SpeakingPart3ComparingMenu() {
   const navigate = useNavigate();
@@ -37,6 +38,11 @@ export default function SpeakingPart3ComparingMenu() {
           </button>
         </div>
       </header>
+
+      <UnderConstructionPanel
+        title="Comparing photos guide in progress"
+        message="We’re still adding more practice tasks, model answers, and extra examples for Part 3. You can already use the useful language and similarities practice sections."
+      />
 
       <section className="panel">
         <h3>What you’ll practise</h3>

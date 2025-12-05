@@ -340,10 +340,9 @@ const [freeModelVisible, setFreeModelVisible] = useState({
         <section className="panel">
           <h2>Key ideas for similarities and differences</h2>
           <p className="panel-text">
-            When you compare the two photos, try to say{" "}
-            <strong>at least one similarity</strong> and{" "}
-            <strong>one difference</strong>. These phrases are especially
-            useful:
+            When you compare the two photos, it's good to use different expressions to describe {" "}
+            <strong>similarities</strong> and{" "}
+            <strong>differences</strong>. Here are a few common phrases to help you:
           </p>
           <div className="phrases-grid">
             <div className="phrase-box">
