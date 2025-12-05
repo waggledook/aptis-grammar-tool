@@ -53,6 +53,14 @@ export default function SpeakingMenu() {
   <p>Useful phrases, prepositions & speculation for Parts 2 and 3.</p>
 </button>
 
+<button
+  className="card"
+  onClick={() => navigate("/speaking/part3-comparing")}
+>
+  <h3>Guide: comparing photos (Part 3)</h3>
+  <p>Useful language and practice for comparing two pictures in Part 3.</p>
+</button>
+
         <button className="card" onClick={() => navigate("/speaking/part4")}>
           <h3>Part 4: Presentation & Discussion</h3>
           <p>1-minute prep, then a 2-minute talk answering 3 questions.</p>

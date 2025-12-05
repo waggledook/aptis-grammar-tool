@@ -48,7 +48,10 @@ import PrivacyPolicy from "./components/legal/PrivacyPolicy.jsx";
 import LiveGameJoin from "./components/live/LiveGameJoin";
 import LiveGameHost from "./components/live/LiveGameHost";
 import LiveGamePlayer from "./components/live/LiveGamePlayer";
-
+import SpeakingPart3ComparingMenu from "./components/speaking/SpeakingPart3ComparingMenu.jsx";
+import SpeakingPart3ComparingLanguage from "./components/speaking/SpeakingPart3ComparingLanguage.jsx";
+import SpeakingPart3Similarities from "./components/speaking/SpeakingPart3Similarities.jsx";
+import SpeakingPart3Comparatives from "./components/speaking/SpeakingPart3Comparatives.jsx";
 
 
 export default function App() {
@@ -485,6 +488,25 @@ return (
   }
 />
 
+<Route
+  path="/speaking/part3-comparing"
+  element={<SpeakingPart3ComparingMenu />}
+/>
+
+<Route
+  path="/speaking/part3-comparing/language"
+  element={<SpeakingPart3ComparingLanguage />}
+/>
+
+<Route
+  path="/speaking/part3-comparing/similarities"
+  element={<SpeakingPart3Similarities />}
+/>
+
+<Route
+  path="/speaking/part3-comparing/comparatives"
+  element={<SpeakingPart3Comparatives />}
+/>
 
 {/* vocabulary routes */}
 <Route path="/vocabulary" element={<VocabularyMenu />} />
