@@ -40,6 +40,7 @@ import './App.css'
 import { doc, getDoc } from "firebase/firestore";
 import GrammarSetRunner from "./components/grammar/GrammarSetRunner";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
+import AdminActivityLog from "./components/admin/AdminActivityLog.jsx";
 import TeacherTools from "./components/teacher/TeacherTools"; // ← Add this
 import MyStudents from "./components/teacher/MyStudents";
 import TeacherStudentProfile from "./components/TeacherStudentProfile";
@@ -55,6 +56,7 @@ import SpeakingPart3Comparatives from "./components/speaking/SpeakingPart3Compar
 import VocabMistakeReview from "./components/vocabulary/VocabMistakeReview";
 import RequireTeacher from "./components/common/RequireTeacher.jsx";
 import SpeakingPart3SimilaritiesExtras from "./components/teacher/SpeakingPart3SimilaritiesExtras.jsx";
+
 
 
 
@@ -745,6 +747,11 @@ return (
 <Route
   path="/admin"
   element={<AdminDashboard user={user} />}
+/>
+
+<Route
+  path="/admin/activity"
+  element={<AdminActivityLog user={user} />}
 />
 
 <Route

@@ -609,6 +609,19 @@ button {
 .promo-banner a:hover {
   text-decoration: underline;
 }
+.teacher-extras-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.teacher-extras-btn .teacher-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  opacity: 0.9;
+}
+
 
 
 

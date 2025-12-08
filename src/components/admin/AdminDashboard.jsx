@@ -8,7 +8,13 @@ export default function AdminDashboard({ user }) {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [assigning, setAssigning] = useState(null); // studentId currently updating
-  const [isNarrow, setIsNarrow] = useState(false);  // mobile breakpoint
+  const [isNarrow, setIsNarrow] = useState(false); // mobile breakpoint
+
+  // NEW: sorting + filtering
+  const [sortBy, setSortBy] = useState("email"); // "email" | "role" | "teacher"
+  const [sortDir, setSortDir] = useState("asc"); // "asc" | "desc"
+  const [teacherFilter, setTeacherFilter] = useState("all"); // "all" | "no-teacher" | "has-teacher" | teacherId
+
   const navigate = useNavigate();
 
   // Responsive breakpoint watcher
@@ -177,12 +183,78 @@ export default function AdminDashboard({ user }) {
     </div>
   );
 
+  // NEW: helper for sorting
+  const primaryLabel = (u) =>
+    (u.email || u.username || u.id || "").toLowerCase();
+
+  const teacherLabelForStudent = (u) => {
+    if (!u.teacherId) return "";
+    const t = teachers.find((t) => t.id === u.teacherId);
+    return t ? labelForTeacher(t).toLowerCase() : "";
+  };
+
+  // NEW: filter by teacher / assignment
+  let filtered = users;
+  if (teacherFilter === "no-teacher") {
+    filtered = users.filter((u) => u.role === "student" && !u.teacherId);
+  } else if (teacherFilter === "has-teacher") {
+    filtered = users.filter((u) => u.role === "student" && !!u.teacherId);
+  } else if (teacherFilter !== "all") {
+    // specific teacher id
+    filtered = users.filter(
+      (u) => u.role === "student" && u.teacherId === teacherFilter
+    );
+  }
+
+  // NEW: sort the filtered list
+  const displayedUsers = [...filtered].sort((a, b) => {
+    let aKey = "";
+    let bKey = "";
+
+    if (sortBy === "email") {
+      aKey = primaryLabel(a);
+      bKey = primaryLabel(b);
+    } else if (sortBy === "role") {
+      aKey = (a.role || "").toLowerCase();
+      bKey = (b.role || "").toLowerCase();
+    } else if (sortBy === "teacher") {
+      aKey = teacherLabelForStudent(a);
+      bKey = teacherLabelForStudent(b);
+    }
+
+    if (aKey < bKey) return sortDir === "asc" ? -1 : 1;
+    if (aKey > bKey) return sortDir === "asc" ? 1 : -1;
+    return 0;
+  });
+
+  // NEW: quick profile navigation
+  const goToProfile = (uid) => {
+    navigate(`/teacher/student/${uid}`);
+  };
+
   return (
     <div style={{ maxWidth: 900, margin: "auto" }}>
-      <button className="review-btn" onClick={() => navigate("/")}>
-        ← Back
-      </button>
-
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "0.5rem",
+        }}
+      >
+        <button className="review-btn" onClick={() => navigate("/")}>
+          ← Back
+        </button>
+  
+        <button
+          className="ghost-btn"
+          style={{ fontSize: "0.85rem", padding: "0.25rem 0.6rem" }}
+          onClick={() => navigate("/admin/activity")}
+        >
+          View activity log
+        </button>
+      </div>
+  
       <h1 style={{ marginTop: "0.75rem" }}>Admin Dashboard</h1>
       <p className="muted small">Signed in as: {user.email}</p>
 
@@ -190,6 +262,78 @@ export default function AdminDashboard({ user }) {
 
       {!loading && (
         <>
+          {/* NEW: toolbar for sorting + filtering */}
+          <div
+            style={{
+              marginTop: "0.75rem",
+              padding: "0.5rem 0.75rem",
+              borderRadius: "0.75rem",
+              background: "#020617",
+              border: "1px solid #1f2937",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "0.75rem",
+              alignItems: "center",
+            }}
+          >
+            <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+              <span className="tiny muted">Sort by</span>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                style={{
+                  fontSize: "0.8rem",
+                  padding: "0.2rem 0.4rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid #374151",
+                  backgroundColor: "#020617",
+                  color: "#e5e7eb",
+                }}
+              >
+                <option value="email">Email / Username</option>
+                <option value="role">Role</option>
+                <option value="teacher">Teacher</option>
+              </select>
+
+              <button
+                type="button"
+                className="ghost-btn"
+                style={{ fontSize: "0.8rem", padding: "0.2rem 0.5rem" }}
+                onClick={() =>
+                  setSortDir((prev) => (prev === "asc" ? "desc" : "asc"))
+                }
+              >
+                {sortDir === "asc" ? "↑ Asc" : "↓ Desc"}
+              </button>
+            </div>
+
+            <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+              <span className="tiny muted">Filter</span>
+              <select
+                value={teacherFilter}
+                onChange={(e) => setTeacherFilter(e.target.value)}
+                style={{
+                  fontSize: "0.8rem",
+                  padding: "0.2rem 0.4rem",
+                  borderRadius: "0.375rem",
+                  border: "1px solid #374151",
+                  backgroundColor: "#020617",
+                  color: "#e5e7eb",
+                  minWidth: "11rem",
+                }}
+              >
+                <option value="all">All users</option>
+                <option value="no-teacher">Students with no teacher</option>
+                <option value="has-teacher">Students with any teacher</option>
+                {teachers.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    Students of {labelForTeacher(t)}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
           {/* MOBILE: card layout */}
           {isNarrow && (
             <div
@@ -200,7 +344,7 @@ export default function AdminDashboard({ user }) {
                 marginTop: "1rem",
               }}
             >
-              {users.map((u) => (
+              {displayedUsers.map((u) => (
                 <div
                   key={u.id}
                   className="panel"
@@ -258,6 +402,19 @@ export default function AdminDashboard({ user }) {
                     }}
                   >
                     {renderTeacherControl(u)}
+
+                    <button
+                      className="ghost-btn"
+                      style={{
+                        fontSize: "0.8rem",
+                        padding: "0.25rem 0.6rem",
+                        alignSelf: "flex-start",
+                      }}
+                      onClick={() => goToProfile(u.id)}
+                    >
+                      View profile
+                    </button>
+
                     {renderRoleButtons(u)}
                   </div>
                 </div>
@@ -291,7 +448,7 @@ export default function AdminDashboard({ user }) {
                 </thead>
 
                 <tbody>
-                  {users.map((u) => (
+                  {displayedUsers.map((u) => (
                     <tr
                       key={u.id}
                       style={{
@@ -308,7 +465,19 @@ export default function AdminDashboard({ user }) {
                             gap: "0.15rem",
                           }}
                         >
-                          <span>
+                          <button
+                            type="button"
+                            onClick={() => goToProfile(u.id)}
+                            style={{
+                              background: "none",
+                              border: "none",
+                              padding: 0,
+                              margin: 0,
+                              color: "inherit",
+                              textAlign: "left",
+                              cursor: "pointer",
+                            }}
+                          >
                             {u.email || (
                               <span
                                 style={{
@@ -319,7 +488,7 @@ export default function AdminDashboard({ user }) {
                                 (no email) {u.id}
                               </span>
                             )}
-                          </span>
+                          </button>
                           {u.username && (
                             <span
                               style={{

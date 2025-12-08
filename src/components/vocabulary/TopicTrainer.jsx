@@ -8,6 +8,8 @@ import {
   recordVocabMistake,   // 👈 NEW
 } from "../../firebase";
 
+import { logVocabSetCompleted, logVocabMatchSession } from "../../firebase";
+
 import { TOPIC_DATA } from "./data/vocabTopics";
 
 
@@ -19,6 +21,9 @@ export default function TopicTrainer({ topic, onBack, onShowFlashcards }) {
   const [setIndex, setSetIndex] = useState(null);
   const [hasChosenSet, setHasChosenSet] = useState(false); // 👈 NEW
 
+  // 👇 NEW: track whether we've already logged a match for this set
+  const hasLoggedMatchForSet = useRef(false);
+
   // Phase 1 = "match", Phase 2 = "review"
   const [phase, setPhase] = useState("match");
 
@@ -29,6 +34,12 @@ export default function TopicTrainer({ topic, onBack, onShowFlashcards }) {
     const [vocabProgress, setVocabProgress] = useState({});
     const activeSetId =
       activeSet?.id || (setIndex != null ? String(setIndex) : null);
+
+  // Reset match logging flag when we move to a different set
+  useEffect(() => {
+    hasLoggedMatchForSet.current = false;
+  }, [activeSetId]);
+
     const activeProg = activeSetId ? vocabProgress[activeSetId] || {} : {};
     const reviewAlreadyDone = !!activeProg.completedReview;
   
@@ -162,6 +173,23 @@ function handleTermClick(term) {
 
 const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
 
+  // Log a vocab match session once when all pairs are matched
+  useEffect(() => {
+    if (!isSignedIn) return;
+    if (!activeSetId || !activeSet) return;
+    if (!allMatched) return;
+    if (hasLoggedMatchForSet.current) return;
+
+    hasLoggedMatchForSet.current = true;
+
+    logVocabMatchSession({
+      topic,
+      setId: activeSetId,
+      totalPairs: activeSet.pairs?.length || 0,
+    });
+  }, [allMatched, isSignedIn, activeSetId, activeSet, topic]);
+
+
 
   // --- REVIEW STATE ---
   const [reviewIndex, setReviewIndex] = useState(0);
@@ -240,6 +268,16 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
           correctFirstTry: firstRunCorrect,
           mistakesCount,
         });
+
+        // 🔹 NEW: log in global activity log
+      logVocabSetCompleted({
+        topic,
+        setId: activeSetId,
+        mode: "review",
+        totalItems,
+        correctFirstTry: firstRunCorrect,
+        mistakesCount,
+      });
 
         setVocabProgress((prev) => ({
           ...prev,

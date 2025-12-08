@@ -345,6 +345,100 @@ export async function fetchRecentVocabMistakes(max = 8, uid) {
     .filter((doc) => doc.resolved !== true);
 }
 
+// ─── GLOBAL ACTIVITY LOG ─────────────────────────────────────────────────────
+/**
+ * Append a single activity event to /activityLog.
+ *
+ * Usage examples:
+ *   await logActivity("grammar_session", {
+ *     mode: "practice",
+ *     totalItems: 20,
+ *     correct: 17,
+ *   });
+ *
+ *   await logActivity("vocab_set_completed", {
+ *     topicId: "sports",
+ *     topicName: "Sports & fitness",
+ *     mode: "match",
+ *   });
+ *
+ * Only logs when a user is signed in.
+ */
+export async function logActivity(type, details = {}) {
+  const user = auth.currentUser;
+  if (!user) return; // silently skip if not signed in
+
+  try {
+    await addDoc(collection(db, "activityLog"), {
+      userId: user.uid,
+      userEmail: user.email || null,
+      type,                    // e.g. "grammar_session", "vocab_set_completed"
+      details: details || {},  // small object with context
+      createdAt: serverTimestamp(),
+      app: "aptis-trainer",    // helps if you ever share a project
+    });
+  } catch (err) {
+    // logging should never break the app
+    console.error("[activityLog] Failed to log activity:", err);
+  }
+}
+
+// ─── ACTIVITY HELPERS ────────────────────────────────────────────────────
+
+/**
+ * Log that the user completed a vocab review set.
+ *
+ * Example:
+ *   logVocabSetCompleted({
+ *     topic: "appearance",
+ *     setId: "set1",
+ *     mode: "review",
+ *     totalItems: 12,
+ *     correctFirstTry: 9,
+ *     mistakesCount: 3,
+ *   });
+ */
+export async function logVocabSetCompleted({
+  topic,
+  setId,
+  mode = "review",
+  totalItems,
+  correctFirstTry,
+  mistakesCount,
+}) {
+  return logActivity("vocab_set_completed", {
+    topic: topic || null,
+    setId: setId || null,
+    mode,
+    totalItems: totalItems ?? null,
+    correctFirstTry: correctFirstTry ?? null,
+    mistakesCount: mistakesCount ?? null,
+  });
+}
+
+// ─── FLASHCARDS ACTIVITY HELPER ────────────────────────────────────────────
+
+export async function logFlashcardsSession({
+  topic,
+  totalCards,
+  isAuthenticated,
+}) {
+  return logActivity("vocab_flashcards_session", {
+    topic: topic || null,
+    totalCards: totalCards ?? null,
+    isAuthenticated: !!isAuthenticated,
+  });
+}
+
+// ─── VOCAB MATCH ACTIVITY HELPER ──────────────────────────────────────────
+export async function logVocabMatchSession({ topic, setId, totalPairs }) {
+  return logActivity("vocab_match_session", {
+    topic: topic || null,
+    setId: setId || null,
+    totalPairs: totalPairs ?? null,
+  });
+}
+
 
 
 // ─── REPORTS HELPER ───────────────────────────────────────────────────────────

@@ -1,8 +1,9 @@
 // src/components/vocabulary/TopicFlashcards.jsx
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useRef } from "react";
 import { travelData } from "./data/travelData";
 import { workData } from "./data/workData";   // 👈 new
 import { peopleData } from "./data/peopleData"; // 👈 new
+import { logFlashcardsSession } from "../../firebase";
 
 function shuffleArray(array) {
     return [...array].sort(() => Math.random() - 0.5);
@@ -19,6 +20,7 @@ const TOPIC_DATA = {
 
 export default function TopicFlashcards({ topic, onBack, isAuthenticated = false }) {
   const topicInfo = TOPIC_DATA[topic] || null;
+  const hasLoggedFlashcards = useRef(false);
 
   // If topic isn't known at all
   if (!topicInfo) {
@@ -57,6 +59,22 @@ export default function TopicFlashcards({ topic, onBack, isAuthenticated = false
       }))
     );
   }, [allowedSets]);
+
+    // Log a flashcards session once per visit when there are cards to show
+    useEffect(() => {
+      if (!topic) return;
+      if (fullDeck.length === 0) return;
+      if (hasLoggedFlashcards.current) return;
+  
+      hasLoggedFlashcards.current = true;
+  
+      logFlashcardsSession({
+        topic,
+        totalCards: fullDeck.length,
+        isAuthenticated,
+      });
+    }, [topic, fullDeck.length, isAuthenticated]);
+  
 
   const [deck, setDeck] = useState(fullDeck);
   const [index, setIndex] = useState(0);
