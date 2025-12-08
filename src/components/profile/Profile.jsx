@@ -7,12 +7,15 @@ import { PART3_TASKS } from "../speaking/banks/part3";
 import { PART4_TASKS } from "../speaking/banks/part4";
 import { auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
+import { getTotalVocabSets } from "../vocabulary/data/vocabTopics";
+
 
 export default function Profile({
   user,
   onBack,
   onGoMistakes,
   onGoFavourites,
+  onGoVocabMistakes,   // 👈 NEW
   // NEW:
   targetUid,              // optional: which user to load data for
   titleOverride,          // optional: override "My Profile"
@@ -61,7 +64,17 @@ export default function Profile({
   const [speakingNotes, setSpeakingNotes] = useState([]);
   const [showSpeakingNotes, setShowSpeakingNotes] = useState(false);
 
+  const [vocabTopicCounts, setVocabTopicCounts] = useState(null); // 👈 NEW
+  const [vocabMistakes, setVocabMistakes] = useState([]); // 👈 NEW
 
+  // Progress sections at the top
+  const [showReadingPanel, setShowReadingPanel] = useState(false);
+  const [showVocabPanel, setShowVocabPanel] = useState(false);
+  const [showSpeakingPanel, setShowSpeakingPanel] = useState(false);
+  const [showGrammarPanel, setShowGrammarPanel] = useState(false);
+
+
+  const TOTAL_VOCAB_SETS = getTotalVocabSets();
 
   // we'll still keep photoURL logic in case you want to bring badges back later,
   // but we just won't render the avatar / studio for now.
@@ -107,6 +120,8 @@ export default function Profile({
           wP4,
           p4Reg,
           specNotes,
+          vocabCounts, // 👈 NEW
+          vocabMistakesArr, // 👈 NEW
         ] = await Promise.all([
           fb.fetchReadingProgressCount(uid),
           fb.fetchSpeakingCounts(uid),
@@ -120,6 +135,8 @@ export default function Profile({
           fb.fetchWritingP4Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP4RegisterAttempts?.(100, uid) ?? Promise.resolve([]),
           fb.fetchSpeakingSpeculationNotes?.(50, uid) ?? Promise.resolve([]),
+          fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}), // 👈 NEW
+          fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]), // 👈 ADD THIS
         ]);        
   
         if (!alive) return;
@@ -135,6 +152,8 @@ export default function Profile({
         setWritingP4(wP4);
         setP4Register(p4Reg);
         setSpeakingNotes(specNotes);
+        setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
+        setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
       } catch (e) {
         console.error("[Profile] load failed", e);
         toast("Couldn’t load some profile data.");
@@ -156,6 +175,15 @@ export default function Profile({
   writingP3.length +
   writingP4.length +
   p4Register.length;
+
+  // 👇 Add this derived value for vocab progress
+const totalCompletedVocab = vocabTopicCounts
+? Object.values(vocabTopicCounts).reduce(
+    (sum, stats) => sum + (stats.completed || 0),
+    0
+  )
+: 0;
+
 
   return (
     <div className="profile-page game-wrapper">
@@ -182,115 +210,255 @@ export default function Profile({
         <p className="muted">Loading…</p>
       ) : (
         <>
-          <section className="cards">
-            {/* Reading card */}
-            <div className="card">
-              <h3>Reading Progress</h3>
-              <p>
-                <strong>{readingCount}</strong> tasks completed
-              </p>
-            </div>
-
-            {/* Speaking card */}
-            <div className="card">
-              <h3>Speaking Progress</h3>
-              <div className="pbar-group">
-                <ProgressBar
-                  value={speakingCounts.part1 || 0}
-                  max={SPEAKING_TOTALS.part1 || 0}
-                  label="Part 1"
-                  right={`${speakingCounts.part1 || 0}/${
-                    SPEAKING_TOTALS.part1 || 0
-                  }`}
-                />
-                <ProgressBar
-                  value={speakingCounts.part2 || 0}
-                  max={SPEAKING_TOTALS.part2 || 0}
-                  label="Part 2"
-                  right={`${speakingCounts.part2 || 0}/${
-                    SPEAKING_TOTALS.part2 || 0
-                  }`}
-                />
-                <ProgressBar
-                  value={speakingCounts.part3 || 0}
-                  max={SPEAKING_TOTALS.part3 || 0}
-                  label="Part 3"
-                  right={`${speakingCounts.part3 || 0}/${
-                    SPEAKING_TOTALS.part3 || 0
-                  }`}
-                />
-                <ProgressBar
-                  value={speakingCounts.part4 || 0}
-                  max={SPEAKING_TOTALS.part4 || 0}
-                  label="Part 4"
-                  right={`${speakingCounts.part4 || 0}/${
-                    SPEAKING_TOTALS.part4 || 0
-                  }`}
-                />
-              </div>
-            </div>
-
-            {/* Grammar card with nav buttons */}
-            <div className="card">
-              <h3>Grammar Progress</h3>
-
-              <ProgressBar
-                label="Answered"
-                value={grammarDash.answered}
-                max={grammarDash.total || 1}
-                right={`${grammarDash.answered}/${
-                  grammarDash.total || 0
-                }`}
-              />
-              <div style={{ height: 8 }} />
-              <ProgressBar
-                label="Correct"
-                value={grammarDash.correct}
-                max={grammarDash.total || 1}
-                right={`${grammarDash.correct}/${
-                  grammarDash.total || 0
-                }`}
-              />
-
-{(onGoMistakes || onGoFavourites) && (
-  <div
-    style={{
-      display: "flex",
-      flexWrap: "wrap",
-      gap: ".5rem",
-      marginTop: "0.75rem",
-    }}
+          {/* --- READING PROGRESS --- */}
+<section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showReadingPanel}
+    onClick={() => setShowReadingPanel((s) => !s)}
   >
-    {onGoMistakes && (
-      <button
-        className="btn"
-        type="button"
-        onClick={() => onGoMistakes && onGoMistakes()}
-      >
-        Review Mistakes
-      </button>
-    )}
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      Reading Progress
+    </h3>
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      {readingCount} task{readingCount === 1 ? "" : "s"} completed
+    </span>
+    <span className={`chev ${showReadingPanel ? "open" : ""}`} aria-hidden>
+      ▾
+    </span>
+  </button>
 
-    {onGoFavourites && (
-      <button
-        className="btn"
-        type="button"
-        onClick={() => onGoFavourites && onGoFavourites()}
-      >
-        Review Favourites
-      </button>
-    )}
-  </div>
-)}
+  {showReadingPanel && (
+    <div className="panel-body">
+      <p>
+        You’ve completed{" "}
+        <strong>{readingCount}</strong> reading task
+        {readingCount === 1 ? "" : "s"} so far.
+      </p>
+    </div>
+  )}
+</section>
 
-            </div>
+{/* --- VOCABULARY PROGRESS --- */}
+<section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showVocabPanel}
+    onClick={() => setShowVocabPanel((s) => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      Vocabulary Progress
+    </h3>
 
-            {/* Removed:
-                - Recent Mistakes list of IDs
-                - Recent Favourites list of IDs
-               They were the 3rd and 4th cards previously.
-            */}
-          </section>
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      {totalCompletedVocab}/{TOTAL_VOCAB_SETS || 0} sets completed
+    </span>
+
+    <span className={`chev ${showVocabPanel ? "open" : ""}`} aria-hidden>
+      ▾
+    </span>
+  </button>
+
+  {showVocabPanel && (
+    <div className="panel-body">
+      <div className="pbar-group">
+        <ProgressBar
+          value={totalCompletedVocab}
+          max={TOTAL_VOCAB_SETS || 1}
+          label="Overall"
+          right={`${totalCompletedVocab}/${TOTAL_VOCAB_SETS || 0}`}
+        />
+      </div>
+
+      {!vocabTopicCounts || Object.keys(vocabTopicCounts).length === 0 ? (
+        <p className="muted small" style={{ marginTop: ".6rem" }}>
+          No vocab sets completed yet.
+        </p>
+      ) : (
+        <ul className="vocab-list" style={{ marginTop: ".6rem" }}>
+          {Object.entries(vocabTopicCounts).map(([topicKey, stats]) => (
+            <li key={topicKey} className="vocab-row">
+              <span className="vocab-topic-label">
+                {topicKey.charAt(0).toUpperCase() + topicKey.slice(1)}
+              </span>
+              <span className="vocab-topic-count">
+                {stats.completed} set{stats.completed === 1 ? "" : "s"} completed
+                {typeof stats.total === "number" && stats.total > 0 && (
+                  <span className="vocab-topic-sub">
+                    {" "}
+                    (out of {stats.total} practised)
+                  </span>
+                )}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <div style={{ marginTop: "0.75rem" }}>
+        <h4
+          style={{
+            margin: "0 0 .4rem 0",
+            fontSize: "0.95rem",
+            color: "#cfe1ff",
+          }}
+        >
+          Mistakes
+        </h4>
+
+        {(!vocabMistakes || vocabMistakes.length === 0) ? (
+          <p className="muted small">
+            No active vocab mistakes – great job!
+          </p>
+        ) : (
+          <>
+            <p className="muted small">
+              You have <strong>{vocabMistakes.length}</strong> vocab item
+              {vocabMistakes.length === 1 ? "" : "s"} to review.
+            </p>
+
+            {onGoVocabMistakes && (
+              <button
+                type="button"
+                className="btn"
+                style={{ marginTop: ".4rem" }}
+                onClick={onGoVocabMistakes}
+              >
+                Review vocab mistakes
+              </button>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  )}
+</section>
+
+{/* --- SPEAKING PROGRESS --- */}
+<section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showSpeakingPanel}
+    onClick={() => setShowSpeakingPanel((s) => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      Speaking Progress
+    </h3>
+
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      Part 1–4 practice overview
+    </span>
+
+    <span className={`chev ${showSpeakingPanel ? "open" : ""}`} aria-hidden>
+      ▾
+    </span>
+  </button>
+
+  {showSpeakingPanel && (
+    <div className="panel-body">
+      <div className="pbar-group">
+        <ProgressBar
+          value={speakingCounts.part1 || 0}
+          max={SPEAKING_TOTALS.part1 || 0}
+          label="Part 1"
+          right={`${speakingCounts.part1 || 0}/${SPEAKING_TOTALS.part1 || 0}`}
+        />
+        <ProgressBar
+          value={speakingCounts.part2 || 0}
+          max={SPEAKING_TOTALS.part2 || 0}
+          label="Part 2"
+          right={`${speakingCounts.part2 || 0}/${SPEAKING_TOTALS.part2 || 0}`}
+        />
+        <ProgressBar
+          value={speakingCounts.part3 || 0}
+          max={SPEAKING_TOTALS.part3 || 0}
+          label="Part 3"
+          right={`${speakingCounts.part3 || 0}/${SPEAKING_TOTALS.part3 || 0}`}
+        />
+        <ProgressBar
+          value={speakingCounts.part4 || 0}
+          max={SPEAKING_TOTALS.part4 || 0}
+          label="Part 4"
+          right={`${speakingCounts.part4 || 0}/${SPEAKING_TOTALS.part4 || 0}`}
+        />
+      </div>
+    </div>
+  )}
+</section>
+
+{/* --- GRAMMAR PROGRESS --- */}
+<section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showGrammarPanel}
+    onClick={() => setShowGrammarPanel((s) => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      Grammar Progress
+    </h3>
+
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      {grammarDash.answered}/{grammarDash.total || 0} items attempted
+    </span>
+
+    <span className={`chev ${showGrammarPanel ? "open" : ""}`} aria-hidden>
+      ▾
+    </span>
+  </button>
+
+  {showGrammarPanel && (
+    <div className="panel-body">
+      <ProgressBar
+        label="Answered"
+        value={grammarDash.answered}
+        max={grammarDash.total || 1}
+        right={`${grammarDash.answered}/${grammarDash.total || 0}`}
+      />
+      <div style={{ height: 8 }} />
+      <ProgressBar
+        label="Correct"
+        value={grammarDash.correct}
+        max={grammarDash.total || 1}
+        right={`${grammarDash.correct}/${grammarDash.total || 0}`}
+      />
+
+      {(onGoMistakes || onGoFavourites) && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: ".5rem",
+            marginTop: "0.75rem",
+          }}
+        >
+          {onGoMistakes && (
+            <button
+              className="btn"
+              type="button"
+              onClick={() => onGoMistakes && onGoMistakes()}
+            >
+              Review Mistakes
+            </button>
+          )}
+
+          {onGoFavourites && (
+            <button
+              className="btn"
+              type="button"
+              onClick={() => onGoFavourites && onGoFavourites()}
+            >
+              Review Favourites
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  )}
+</section>
 
 {/* --- WRITING HISTORY / GUIDE GROUPED --- */}
 <section className="panel collapsible" style={{ marginTop: "1rem" }}>
@@ -1340,6 +1508,40 @@ function StyleScope() {
 .header .topbar-btn {
   margin-bottom: 0.75rem; /* adds subtle vertical space */
 }
+        .vocab-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+      }
+
+      .vocab-row {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+        color: #cfd9f3;
+      }
+
+      .vocab-topic-label {
+        font-weight: 600;
+      }
+
+      .vocab-topic-count {
+        text-align: right;
+        white-space: nowrap;
+      }
+
+      .vocab-topic-sub {
+        font-size: 0.8rem;
+        color: #9fb0e0;
+      }
+      .panel-body {
+  margin-top: 0.75rem;
+}
+
     `}</style>
   );
 }

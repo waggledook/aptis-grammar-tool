@@ -52,6 +52,8 @@ import SpeakingPart3ComparingMenu from "./components/speaking/SpeakingPart3Compa
 import SpeakingPart3ComparingLanguage from "./components/speaking/SpeakingPart3ComparingLanguage.jsx";
 import SpeakingPart3Similarities from "./components/speaking/SpeakingPart3Similarities.jsx";
 import SpeakingPart3Comparatives from "./components/speaking/SpeakingPart3Comparatives.jsx";
+import VocabMistakeReview from "./components/vocabulary/VocabMistakeReview";
+
 
 
 export default function App() {
@@ -666,6 +668,7 @@ return (
       onBack={() => navigate("/")}
       onGoMistakes={() => navigate("/profile/mistakes")}
       onGoFavourites={() => navigate("/profile/favourites")}
+      onGoVocabMistakes={() => navigate("/profile/vocab-mistakes")}   // 👈 ADD THIS
     />
   }
 />
@@ -701,6 +704,25 @@ return (
     </>
   }
 />
+
+<Route
+  path="/profile/vocab-mistakes"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/profile")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back to profile
+      </button>
+      <VocabMistakeReview
+        onBack={() => navigate("/profile")}
+      />
+    </>
+  }
+/>
+
 
 <Route
   path="/teacher-tools"

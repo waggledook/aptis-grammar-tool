@@ -83,7 +83,7 @@ export const peopleData = {
           
             practice: [
               {
-                sentence: "He's quite __________ – almost two metres tall.",
+                sentence: "He's quite __________ – almost two metres.",
                 answer: "tall"
               },
               {

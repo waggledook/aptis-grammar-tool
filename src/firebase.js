@@ -268,6 +268,85 @@ export async function fetchMistakes() {
   return snap.docs.map(d => d.data().itemId);
 }
 
+// ────────────────────────────────
+// Vocab mistakes log
+// /users/{uid}/vocabMistakes
+// ────────────────────────────────
+export async function recordVocabMistake({
+  topic,
+  setId,
+  sentence,
+  correctAnswer,
+  userAnswer,
+}) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+
+  const colRef = collection(db, "users", uid, "vocabMistakes");
+  await addDoc(colRef, {
+    topic,
+    setId,
+    sentence,
+    correctAnswer,
+    userAnswer,
+    resolved: false,          // 👈 NEW
+    createdAt: serverTimestamp(),
+  });
+}
+
+export async function fetchUnresolvedVocabMistakes(limitCount = 50, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const colRef = collection(db, "users", realUid, "vocabMistakes");
+  const q = query(
+    colRef,
+    orderBy("createdAt", "desc"),
+    limit(limitCount)
+  );
+
+  const snap = await getDocs(q);
+
+  // Treat docs with no `resolved` field as unresolved
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }))
+    .filter((doc) => doc.resolved !== true);
+}
+
+export async function resolveVocabMistake(id, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !id) return;
+
+  const docRef = doc(db, "users", realUid, "vocabMistakes", id);
+  await updateDoc(docRef, {
+    resolved: true,
+    resolvedAt: serverTimestamp(),
+  });
+}
+
+
+
+export async function fetchRecentVocabMistakes(max = 8, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const colRef = collection(db, "users", realUid, "vocabMistakes");
+  const q = query(
+    colRef,
+    orderBy("createdAt", "desc"),
+    limit(max)
+  );
+
+  const snap = await getDocs(q);
+
+  // Only show unresolved ones in the profile card, too
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }))
+    .filter((doc) => doc.resolved !== true);
+}
+
+
+
 // ─── REPORTS HELPER ───────────────────────────────────────────────────────────
 
 // re-create the old reports collection helper
@@ -711,6 +790,86 @@ export async function fetchSpeakingSpeculationNotes(limitCount = 50, uid) {
 }
 
 
+// /users/{uid}/vocabProgress/{topic}:{setId}
+
+export async function saveVocabReviewResult({
+  topic,
+  setId,
+  totalItems,
+  correctFirstTry,
+  mistakesCount,
+}) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+
+  const docId = `${topic}:${setId}`;
+  const ref = doc(db, "users", uid, "vocabProgress", docId);
+
+  await setDoc(
+    ref,
+    {
+      topic,
+      setId,
+      completedReview: true,
+      attempts: increment(1),
+      totalItems: totalItems ?? 0,
+      mistakesTotal: increment(mistakesCount ?? 0),
+      lastRun: {
+        totalItems: totalItems ?? 0,
+        correctFirstTry: correctFirstTry ?? 0,
+        mistakesCount: mistakesCount ?? 0,
+      },
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
+export async function fetchVocabProgressByTopic(topic, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return {};
+
+  const colRef = collection(db, "users", realUid, "vocabProgress");
+  const qTopic = query(colRef, where("topic", "==", topic));
+  const snap = await getDocs(qTopic);
+
+  const result = {};
+  snap.forEach((d) => {
+    const data = d.data() || {};
+    const setId = data.setId || (d.id.split(":")[1] || d.id);
+    result[setId] = {
+      completedReview: !!data.completedReview,
+      attempts: data.attempts ?? 0,
+      mistakesTotal: data.mistakesTotal ?? 0,
+    };
+  });
+
+  return result;
+}
+
+export async function fetchVocabTopicCounts(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return {};
+
+  const colRef = collection(db, "users", realUid, "vocabProgress");
+  const snap = await getDocs(colRef);
+
+  const stats = {}; // { [topic]: { completed, total } }
+
+  snap.forEach((d) => {
+    const data = d.data() || {};
+    const topic = data.topic || "other";
+    if (!stats[topic]) {
+      stats[topic] = { completed: 0, total: 0 };
+    }
+    stats[topic].total += 1;
+    if (data.completedReview) {
+      stats[topic].completed += 1;
+    }
+  });
+
+  return stats;
+}
 /**
  * Create a new grammar set owned by the current user.
  * @param {Object} data - { title, description, itemIds, levels, tags, visibility }

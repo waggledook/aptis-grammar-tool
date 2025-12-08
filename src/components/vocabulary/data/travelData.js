@@ -82,12 +82,12 @@ export const travelData = {
         {
           sentence:
             "After we landed we went to __________ to pick up our suitcases.",
-          answer: "baggage claim"
+          answer: "baggage claim / baggage reclaim"
         },
         {
           sentence:
             "You can't take that bottle through __________. Put liquids in a small clear bag.",
-          answer: "security check"
+          answer: "security check / security"
         },
         {
           sentence:
@@ -194,7 +194,7 @@ export const travelData = {
         {
           sentence:
             "It's usually cheaper if you __________ a few months before you travel.",
-          answer: "book a flight"
+          answer: "book a flight / book flights"
         },
         {
           sentence:

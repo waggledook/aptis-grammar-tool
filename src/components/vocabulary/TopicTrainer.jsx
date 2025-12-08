@@ -1,20 +1,15 @@
 // src/components/vocabulary/TopicTrainer.jsx
 import React, { useState, useMemo, useRef, useEffect } from "react";
-import { travelData } from "./data/travelData";
-import { workData } from "./data/workData"; 
-import { peopleData } from "./data/peopleData"; // NEW
 import { auth } from "../../firebase";
 import { toast } from "../../utils/toast";
+import {
+  saveVocabReviewResult,
+  fetchVocabProgressByTopic,
+  recordVocabMistake,   // 👈 NEW
+} from "../../firebase";
 
-const TOPIC_DATA = {
-  travel: travelData,
-  work: workData,
-  people: peopleData   // NEW
-  
-  // work: workData,
-  // health: healthData,
-  // etc.
-};
+import { TOPIC_DATA } from "./data/vocabTopics";
+
 
 export default function TopicTrainer({ topic, onBack, onShowFlashcards }) {
   const user = auth.currentUser;
@@ -27,33 +22,65 @@ export default function TopicTrainer({ topic, onBack, onShowFlashcards }) {
   // Phase 1 = "match", Phase 2 = "review"
   const [phase, setPhase] = useState("match");
 
-  // Load the active set
-const activeSet = topicInfo?.sets?.[setIndex];
+    // Load the active set
+    const activeSet = topicInfo?.sets?.[setIndex] || null;
 
-// Allow either `review` or `practice` as the source field
-const shuffledReview = useMemo(() => {
-  if (!activeSet) return [];
+    // Track vocab progress per set (for ticks, etc.)
+    const [vocabProgress, setVocabProgress] = useState({});
+    const activeSetId =
+      activeSet?.id || (setIndex != null ? String(setIndex) : null);
+    const activeProg = activeSetId ? vocabProgress[activeSetId] || {} : {};
+    const reviewAlreadyDone = !!activeProg.completedReview;
+  
+    // Allow either `review` or `practice` as the source field
+    const shuffledReview = useMemo(() => {
+      if (!activeSet) return [];
+  
+      const source =
+        activeSet.review && Array.isArray(activeSet.review)
+          ? activeSet.review
+          : activeSet.practice && Array.isArray(activeSet.practice)
+          ? activeSet.practice
+          : [];
+  
+      return shuffle(source);
+    }, [activeSet]);
+  
+    // Load vocab progress for this topic (once user + topic are known)
+    useEffect(() => {
+      let alive = true;
+  
+      async function loadProgress() {
+        if (!isSignedIn || !topicInfo) {
+          if (alive) setVocabProgress({});
+          return;
+        }
+        try {
+          const map = await fetchVocabProgressByTopic(topic);
+          if (alive) setVocabProgress(map);
+        } catch (err) {
+          console.error("[TopicTrainer] vocab progress load failed", err);
+        }
+      }
+  
+      loadProgress();
+      return () => {
+        alive = false;
+      };
+    }, [isSignedIn, topic, topicInfo]);
+  
+    // --- MATCH STATE ---
+    const [matchedTerms, setMatchedTerms] = useState([]);
+    const [matchedDefs, setMatchedDefs] = useState([]);
+    const [selectedDef, setSelectedDef] = useState(null);
+    const [selectedTerm, setSelectedTerm] = useState(null);
+    const [feedbackFlash, setFeedbackFlash] = useState(null);
+    const [shakeDef, setShakeDef] = useState(null);
+    const [shakeTerm, setShakeTerm] = useState(null);
+    const [pulseItems, setPulseItems] = useState({ def: null, term: null });
+    const [showDefs, setShowDefs] = useState({});
+  
 
-  const source =
-    activeSet.review && Array.isArray(activeSet.review)
-      ? activeSet.review
-      : activeSet.practice && Array.isArray(activeSet.practice)
-      ? activeSet.practice
-      : [];
-
-  return shuffle(source);
-}, [activeSet]);
-
-  // --- MATCH STATE ---
-const [matchedTerms, setMatchedTerms] = useState([]);
-const [matchedDefs, setMatchedDefs] = useState([]);
-const [selectedDef, setSelectedDef] = useState(null);
-const [selectedTerm, setSelectedTerm] = useState(null);
-const [feedbackFlash, setFeedbackFlash] = useState(null);
-const [shakeDef, setShakeDef] = useState(null);
-const [shakeTerm, setShakeTerm] = useState(null);
-const [pulseItems, setPulseItems] = useState({ def: null, term: null });
-const [showDefs, setShowDefs] = useState({});
 
 
 
@@ -189,6 +216,55 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
   const totalItems = shuffledReview.length;
   const firstRunCorrect = totalItems - mistakes.length;
 
+  // ✅ Save vocab review result when the FIRST full review run finishes
+  useEffect(() => {
+    if (!isSignedIn || !activeSetId) return;
+
+    const isEndOfFirstRun =
+      phase === "review" &&
+      !mistakeMode &&
+      totalItems > 0 &&
+      !reviewItem; // reviewItem is undefined once we've stepped past the end
+
+    if (!isEndOfFirstRun) return;
+    if (reviewAlreadyDone) return;
+
+    const mistakesCount = mistakes.length;
+
+    (async () => {
+      try {
+        await saveVocabReviewResult({
+          topic,
+          setId: activeSetId,
+          totalItems,
+          correctFirstTry: firstRunCorrect,
+          mistakesCount,
+        });
+
+        setVocabProgress((prev) => ({
+          ...prev,
+          [activeSetId]: {
+            ...(prev[activeSetId] || {}),
+            completedReview: true,
+          },
+        }));
+      } catch (err) {
+        console.error("[TopicTrainer] saveVocabReviewResult failed", err);
+      }
+    })();
+  }, [
+    isSignedIn,
+    phase,
+    mistakeMode,
+    totalItems,
+    reviewItem,
+    mistakes.length,
+    firstRunCorrect,
+    activeSetId,
+    reviewAlreadyDone,
+    topic,
+  ]);
+
 // 🔍 Focus input whenever we go into review / move on
 useEffect(() => {
   if (phase === "review" && inputRef.current) {
@@ -247,7 +323,21 @@ function checkTypedAnswer() {
       if (already) return prev;
       return [...prev, reviewItem];
     });
+
+    // 🔹 NEW: log to Firestore (if signed in)
+    if (isSignedIn) {
+      recordVocabMistake({
+        topic,
+        setId: activeSetId,
+        sentence: reviewItem.sentence,
+        correctAnswer: reviewItem.answer,
+        userAnswer: typedAnswer.trim(),
+      }).catch((err) =>
+        console.error("[TopicTrainer] recordVocabMistake failed", err)
+      );
+    }
   }
+
 
   if (correct) {
     // ✅ Auto-advance after short delay
@@ -323,33 +413,40 @@ function checkTypedAnswer() {
 
             {/* Compact SET selector – only after a set is chosen */}
             {hasChosenSet && (
-        <div className="set-tabs">
-          <span className="set-label">Set:</span>
-          <div className="set-pill-row">
-            {topicInfo.sets.map((set, idx) => (
-              <button
-                key={set.id}
-                className={
-                  "set-pill " +
-                  (idx === setIndex ? "active" : "") +
-                  (!isSignedIn && idx >= 2 ? " locked" : "")
-                }
-                onClick={() => {
-                  // 🔒 guests only get first two sets
-                  if (!isSignedIn && idx >= 2) {
-                    toast("Sign in to unlock this set 🔒");
-                    return;
-                  }
-                  setSetIndex(idx);
-                  setHasChosenSet(true);
-                }}
-              >
-                {set.title}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+  <div className="set-tabs">
+    <span className="set-label">Set:</span>
+    <div className="set-pill-row">
+      {topicInfo.sets.map((set, idx) => {
+        const setId = set.id || String(idx);
+        const prog = vocabProgress[setId] || {};
+        const done = !!prog.completedReview; // ✅ finished review at least once
+
+        return (
+          <button
+            key={setId}
+            className={
+              "set-pill " +
+              (idx === setIndex ? "active" : "") +
+              (!isSignedIn && idx >= 2 ? " locked" : "")
+            }
+            onClick={() => {
+              // 🔒 guests only get first two sets
+              if (!isSignedIn && idx >= 2) {
+                toast("Sign in to unlock this set 🔒");
+                return;
+              }
+              setSetIndex(idx);
+              setHasChosenSet(true);
+            }}
+          >
+            <span className="set-pill-title">{set.title}</span>
+            {done && <span className="set-pill-check">✓</span>}
+          </button>
+        );
+      })}
+    </div>
+  </div>
+)}
 
 
 
@@ -1250,7 +1347,22 @@ function checkTypedAnswer() {
   opacity: 0.5;
   cursor: not-allowed;
 }
+.set-pill-row .set-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
 
+.set-pill-title {
+  flex: 1;
+  text-align: left;
+}
+
+.set-pill-check {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
 
 
       `}</style>
