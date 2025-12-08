@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 import { db, auth } from "../../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import TeacherExtrasButton from "../common/TeacherExtrasButton.jsx";
 
 function normalise(text) {
   return text.trim().toLowerCase().replace(/\s+/, " ");
@@ -111,7 +112,7 @@ const RAINY_ITEMS = [
     },
   ];  
 
-export default function SpeakingPart3Similarities() {
+  export default function SpeakingPart3Similarities({ user }) {
   const navigate = useNavigate();
 
   const [answers, setAnswers] = useState({});
@@ -231,15 +232,15 @@ const [freeModelVisible, setFreeModelVisible] = useState({
   const renderGapLine = (item) => {
     const [left, right] = item.gap.split("___");
     const state = checkState[item.id] || {};
-    const { checked, ok, showModel } = state;
-    
+    // 🔧 rename the state flag so it doesn't clash with the function name
+    const { checked, ok, showModel: showModelVisible } = state;
   
     return (
       <div className="gap-item" key={item.id}>
         <label>
           <span style={{ fontWeight: 600 }}>{item.label}</span>
           <div className="gap-row">
-            {/* NEW: text + gap in one block */}
+            {/* text + gap in one block */}
             <div className="gap-text">
               <span>{left}</span>
               <input
@@ -260,7 +261,7 @@ const [freeModelVisible, setFreeModelVisible] = useState({
               <span>{right}</span>
             </div>
   
-            {/* NEW: buttons in their own block */}
+            {/* buttons in their own block */}
             <div className="gap-buttons">
               <button
                 type="button"
@@ -280,16 +281,15 @@ const [freeModelVisible, setFreeModelVisible] = useState({
           </div>
         </label>
   
-        {/* feedback bits stay the same… */}
         {checked && (
-          <p className={`feedback ${ok ? "ok" : "wrong"}`}>
+          <p className={`feedback ${ok ? "ok" : "not-ok"}`}>
             {ok
               ? "Nice – that works well for this comparison."
               : "Not quite – check the target language again or show the suggestion."}
           </p>
         )}
   
-        {showModel && (
+        {showModelVisible && (
           <>
             <p className="feedback">
               Answer:{" "}
@@ -300,13 +300,13 @@ const [freeModelVisible, setFreeModelVisible] = useState({
               </strong>
             </p>
             {item.explanation && (
-              <p className="feedback note">{item.explanation}</p>
+              <p className="feedback muted">{item.explanation}</p>
             )}
           </>
         )}
       </div>
     );
-  };
+  };  
 
   return (
     <div className="game-wrapper speaking-guide">
@@ -326,13 +326,20 @@ const [freeModelVisible, setFreeModelVisible] = useState({
         </div>
 
         <div className="actions">
-          <button
-            className="btn"
-            onClick={() => navigate("/speaking/part3-comparing")}
-          >
-            ← Back to Comparing Menu
-          </button>
-        </div>
+    <button
+      className="btn"
+      onClick={() => navigate("/speaking/part3-comparing")}
+    >
+      ← Back to Comparing Menu
+    </button>
+
+    {/* 🔸 Only visible for teachers/admins */}
+    <TeacherExtrasButton
+      user={user}
+      to="/teacher/extras/speaking-part3-similarities"
+      label="Teacher activities"
+    />
+  </div>
       </header>
 
       <main className="guide-body">

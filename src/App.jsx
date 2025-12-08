@@ -53,6 +53,8 @@ import SpeakingPart3ComparingLanguage from "./components/speaking/SpeakingPart3C
 import SpeakingPart3Similarities from "./components/speaking/SpeakingPart3Similarities.jsx";
 import SpeakingPart3Comparatives from "./components/speaking/SpeakingPart3Comparatives.jsx";
 import VocabMistakeReview from "./components/vocabulary/VocabMistakeReview";
+import RequireTeacher from "./components/common/RequireTeacher.jsx";
+import SpeakingPart3SimilaritiesExtras from "./components/teacher/SpeakingPart3SimilaritiesExtras.jsx";
 
 
 
@@ -502,13 +504,23 @@ return (
 
 <Route
   path="/speaking/part3-comparing/similarities"
-  element={<SpeakingPart3Similarities />}
+  element={<SpeakingPart3Similarities user={user} />}
 />
 
 <Route
   path="/speaking/part3-comparing/comparatives"
   element={<SpeakingPart3Comparatives />}
 />
+
+<Route
+  path="/teacher/extras/speaking-part3-similarities"
+  element={
+    <RequireTeacher user={user}>
+      <SpeakingPart3SimilaritiesExtras />
+    </RequireTeacher>
+  }
+/>
+
 
 {/* vocabulary routes */}
 <Route path="/vocabulary" element={<VocabularyMenu />} />
