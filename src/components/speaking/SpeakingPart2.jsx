@@ -94,29 +94,38 @@ export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSign
       </header>
 
       <SpeakingAutoFlow
-  task={current}
-  onFinished={async () => {
-    try {
-      console.log("[p2] finish → markSpeakingDone", {
-        part: "part2",
-        id: current.id,
-        hasUser: !!user
-      });
+        task={current}
+        onFinished={async () => {
+          try {
+            console.log("[p2] finish → markSpeakingDone", {
+              part: "part2",
+              id: current.id,
+              hasUser: !!user,
+            });
 
-      const updated = await markSpeakingDone("part2", [current.id], fb, user);
+            const updated = await markSpeakingDone("part2", [current.id], fb, user);
 
-      console.log("[p2] result", {
-        updated: updated ? [...updated] : null
-      });
+            console.log("[p2] result", {
+              updated: updated ? [...updated] : null,
+            });
 
-      if (updated) setCompleted(updated);
-      toast("Task marked as completed ✓");
-    } catch (e) {
-      console.error("[p2] error in markSpeakingDone", e);
-      toast("Couldn’t save completion (local only).");
-    }
-  }}
-/>
+            if (updated) setCompleted(updated);
+            toast("Task marked as completed ✓");
+
+            // Log activity: Part 2 speaking task (3 questions)
+            if (user && fb.logSpeakingTaskCompleted) {
+              await fb.logSpeakingTaskCompleted({
+                part: "part2",
+                taskId: current.id,
+                questionCount: 3,
+              });
+            }
+          } catch (e) {
+            console.error("[p2] error in markSpeakingDone / log", e);
+            toast("Couldn’t save completion (local only).");
+          }
+        }}
+      />
     </div>
   );
 }

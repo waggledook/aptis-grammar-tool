@@ -197,7 +197,22 @@ export default function SpeakingPart1({
       if (updated) setCompleted(updated);
       toast?.("Marked these questions as completed ✓");
     } catch {}
+
+    // Log activity: one Part 1 speaking session (3 short questions)
+    try {
+      if (user && fb.logSpeakingTaskCompleted) {
+        await fb.logSpeakingTaskCompleted({
+          part: "part1",
+          taskId: null,          // randomised trio, no fixed "task"
+          questionIds: ids,
+          questionCount: ids.length,
+        });
+      }
+    } catch (e) {
+      console.warn("[Activity] speaking part1 log failed", e);
+    }
   }
+
 
   // -------- TTS + Beep --------
   function cancelTTS(){

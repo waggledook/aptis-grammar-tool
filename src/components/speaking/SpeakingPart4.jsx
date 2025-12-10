@@ -77,9 +77,23 @@ export default function SpeakingPart4({
         prepareSeconds={prepareSeconds}
         speakSeconds={speakSeconds}
         onFinished={async () => {
-          const updated = await markSpeakingDone("part4", [current.id], fb, user);
-          if (updated) setCompleted(updated);
-          toast("Task marked as completed ✓");
+          try {
+            const updated = await markSpeakingDone("part4", [current.id], fb, user);
+            if (updated) setCompleted(updated);
+            toast("Task marked as completed ✓");
+
+            // Log activity: Part 4 long turn (single 2-minute talk with 3 prompts)
+            if (user && fb.logSpeakingTaskCompleted) {
+              await fb.logSpeakingTaskCompleted({
+                part: "part4",
+                taskId: current.id,
+                questionCount: 3,
+              });
+            }
+          } catch (e) {
+            console.error("[p4] error in markSpeakingDone / log", e);
+            toast("Couldn’t save completion (local only).");
+          }
         }}
       />
     </div>

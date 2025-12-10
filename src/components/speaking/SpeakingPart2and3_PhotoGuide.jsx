@@ -2,7 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Seo from "../common/Seo.jsx";
 import UnderConstructionPanel from "../common/UnderConstructionPanel";
-import { db, auth } from "../../firebase";
+import { db, auth, logSpeakingNoteSubmitted } from "../../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import PreppyFlashcards from "./PreppyFlashcards";
 
@@ -416,6 +416,18 @@ const handleSaveSpeculationNote = async (which) => {
           createdAt: serverTimestamp(),
         }
       );
+
+      // 🔍 NEW: log activity
+    try {
+      await logSpeakingNoteSubmitted({
+        guideId: "photoGuide_speculation",
+        photoKey: which,                  // "dad" | "wedding"
+        chars: rawText.length,
+        lines: rawText.split(/\n/).length,
+      });
+    } catch (e) {
+      console.warn("[Activity] speaking note log failed", e);
+    }
   
       if (which === "dad") {
         setFreeSpecDadStatus("saved");

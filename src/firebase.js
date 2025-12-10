@@ -439,6 +439,18 @@ export async function logVocabMatchSession({ topic, setId, totalPairs }) {
   });
 }
 
+// ─── SPEAKING TASK COMPLETION ─────────────────────────────────────────────
+export async function logSpeakingTaskCompleted(details) {
+  // details: { part: "part1"|"part2"|"part3"|"part4", taskId?, questionCount?, questionIds? }
+  return logActivity("speaking_task_completed", details);
+}
+
+// ─── SPEAKING NOTE SUBMITTED ─────────────────────────────────────────────
+export async function logSpeakingNoteSubmitted(details) {
+  // details: { guideId, photoKey, source?, chars?, lines? }
+  return logActivity("speaking_note_submitted", details);
+}
+
 
 
 // ─── REPORTS HELPER ───────────────────────────────────────────────────────────

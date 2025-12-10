@@ -83,9 +83,23 @@ export default function SpeakingPart3({ tasks = PART3_TASKS, user, onRequireSign
       <TaskFlow
         task={current}
         onFinished={async () => {
-          const updated = await markSpeakingDone("part3", [current.id], fb, user);
-          if (updated) setCompleted(updated);
-          toast("Task marked as completed ✓");
+          try {
+            const updated = await markSpeakingDone("part3", [current.id], fb, user);
+            if (updated) setCompleted(updated);
+            toast("Task marked as completed ✓");
+
+            // Log activity: Part 3 speaking task (3 questions)
+            if (user && fb.logSpeakingTaskCompleted) {
+              await fb.logSpeakingTaskCompleted({
+                part: "part3",
+                taskId: current.id,
+                questionCount: 3,
+              });
+            }
+          } catch (e) {
+            console.error("[p3] error in markSpeakingDone / log", e);
+            toast("Couldn’t save completion (local only).");
+          }
         }}
       />
     </div>

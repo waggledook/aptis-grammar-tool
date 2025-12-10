@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
-import { db, auth } from "../../firebase";
+import { db, auth, logSpeakingNoteSubmitted } from "../../firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import TeacherExtrasButton from "../common/TeacherExtrasButton.jsx";
 
@@ -199,6 +199,22 @@ const [freeModelVisible, setFreeModelVisible] = useState({
             createdAt: serverTimestamp(),
           }
         );
+
+        // 🔍 NEW: log activity
+    try {
+      await logSpeakingNoteSubmitted({
+        guideId: "part3_similarities",
+        photoKey:
+          which === "parenting"
+            ? "part3_parenting_similarities"
+            : "part3_customer_similarities",
+        source: "part3Similarities",
+        chars: rawText.length,
+        lines: rawText.split(/\n/).length,
+      });
+    } catch (e) {
+      console.warn("[Activity] speaking note log failed", e);
+    }
   
         setFreeStatus((prev) => ({ ...prev, [which]: "saved" }));
   

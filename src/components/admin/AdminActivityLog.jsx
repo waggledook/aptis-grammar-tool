@@ -53,6 +53,61 @@ const typeLabels = {
         })`;
       }
 
+      case "speaking_task_completed": {
+        const d = log.details || {};
+        const part = d.part || "?";
+  
+        const partLabel =
+          part === "part1" ? "Part 1 – short answers"
+          : part === "part2" ? "Part 2 – photo description"
+          : part === "part3" ? "Part 3 – comparing photos"
+          : part === "part4" ? "Part 4 – 2-minute talk"
+          : part;
+  
+        const qCount =
+          typeof d.questionCount === "number"
+            ? d.questionCount
+            : Array.isArray(d.questionIds)
+            ? d.questionIds.length
+            : null;
+  
+        const qLabel = qCount
+          ? `${qCount} question${qCount === 1 ? "" : "s"}`
+          : "questions";
+  
+        if (part === "part1") {
+          // randomised trio, no fixed task id
+          return `${partLabel} · ${qLabel}`;
+        }
+  
+        const taskId = d.taskId || "task";
+        return `${partLabel} · ${taskId} · ${qLabel}`;
+      }
+
+      case "speaking_note_submitted": {
+        const d = log.details || {};
+        const guide =
+          d.guideId === "photoGuide_speculation"
+            ? "Photo guide – speculation"
+            : d.guideId === "part3_similarities"
+            ? "Part 3 similarities guide"
+            : d.guideId || "Speaking guide";
+  
+        const photo = d.photoKey || "";
+        const chars =
+          typeof d.chars === "number" ? `${d.chars} chars` : null;
+        const lines =
+          typeof d.lines === "number" ? `${d.lines} line${d.lines === 1 ? "" : "s"}` : null;
+  
+        const bits = [guide];
+        if (photo) bits.push(photo);
+        if (chars) bits.push(chars);
+        if (lines) bits.push(lines);
+  
+        return bits.join(" · ");
+      }  
+  
+
       case "vocab_flashcards_session": {
         const topic = d.topic || "Unknown topic";
         const count = d.totalCards ?? "?";
@@ -276,7 +331,9 @@ export default function AdminActivityLog({ user }) {
 {log.type === "grammar_session" ||
  log.type === "vocab_set_completed" ||
  log.type === "vocab_flashcards_session" ||
- log.type === "vocab_match_session" ? (
+ log.type === "vocab_match_session" ||
+ log.type === "speaking_task_completed" ||
+ log.type === "speaking_note_submitted" ? (
     <span
       className="tiny"
       style={{ fontSize: "0.8rem", opacity: 0.9 }}
