@@ -40,14 +40,67 @@ export default function VocabularyTopics({
   }
 
   const topics = [
-    { id: "travel", name: "Travel", emoji: "🧳", desc: "Transport, holidays, accommodation...", active: true },
-    { id: "work",   name: "Work",   emoji: "💼", desc: "Jobs, offices, responsibilities...",  active: true }, // 👈 now active
-    { id: "people", name: "Describing people", emoji: "🧑‍🤝‍🧑", desc: "Appearance and personality vocabulary.", active: true },
-    { id: "education", name: "Education", emoji: "🏫", desc: "School, university, exams..." },
-    { id: "health", name: "Health", emoji: "🍎", desc: "Exercise, medicine, healthy living..." },
-    { id: "technology", name: "Technology", emoji: "💻", desc: "Computers, gadgets, the internet..." },
-    { id: "food", name: "Food", emoji: "🍝", desc: "Cooking, restaurants, ingredients..." },
-  ];
+    {
+      id: "travel",
+      name: "Travel",
+      emoji: "🧳",
+      desc: "Transport, holidays, accommodation...",
+      active: true,
+    },
+    {
+      id: "work",
+      name: "Work",
+      emoji: "💼",
+      desc: "Jobs, offices, responsibilities...",
+      active: true,
+    },
+    {
+      id: "people",
+      name: "Describing people",
+      emoji: "🧑‍🤝‍🧑",
+      desc: "Appearance and personality vocabulary.",
+      active: true,
+    },
+    {
+      id: "relationships",
+      name: "Relationships",
+      emoji: "❤️",
+      desc: "Family, romantic and other relationship verbs.",
+      active: true,
+    },
+    {
+      id: "health",
+      name: "Health",
+      emoji: "🍎",
+      desc: "Exercise, medicine, healthy living...",
+    },
+    {
+      id: "clothes",
+      name: "Clothes & accessories",
+      emoji: "👕",
+      desc: "Clothing, accessories and verb phrases.",
+    },
+    // ── Coming soon topics ───────────────────────────
+    {
+      id: "education",
+      name: "Education",
+      emoji: "🏫",
+      desc: "School, university, exams...",
+      // active: false  // omitted → treated as 'coming soon' by lack of active
+    },
+    {
+      id: "technology",
+      name: "Technology",
+      emoji: "💻",
+      desc: "Computers, gadgets, the internet...",
+    },
+    {
+      id: "food",
+      name: "Food",
+      emoji: "🍝",
+      desc: "Cooking, restaurants, ingredients...",
+    },
+  ];  
 
   return (
     <div className="vocab-topics game-wrapper">
@@ -59,9 +112,9 @@ export default function VocabularyTopics({
       </header>
 
       <UnderConstructionPanel
-        title="Topic practice in progress"
-        message="Right now the Travel and Work topics are available. More topics (Education, Health, etc.) are on the way!"
-      />
+  title="Topic practice in progress"
+  message="Right now the Travel, Work, Describing people, Relationships, Health, and Clothes & accessories topics are available. More topics (Education, Technology, Food, etc.) are on the way!"
+/>
 
       <div className="cards">
         {topics.map((t) => (

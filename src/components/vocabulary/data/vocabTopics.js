@@ -2,15 +2,17 @@
 import { travelData } from "./travelData";
 import { workData } from "./workData";
 import { peopleData } from "./peopleData";
-// later: import { healthData } from "./healthData"; etc.
+import { relationshipsData } from "./relationshipsData"; // 👈 NEW
+import { healthData } from "./healthData";
+import { clothesData } from "./clothesData";
 
-// Single source of truth for all vocab topics
 export const TOPIC_DATA = {
   travel: travelData,
   work: workData,
   people: peopleData,
-  // When you add a new topic, register it here once.
-  // health: healthData,
+  relationships: relationshipsData, // 👈 NEW
+  health: healthData, // 👈 new
+  clothes: clothesData, // 👈 new
 };
 
 // Helper: total number of sets across ALL topics

@@ -3,6 +3,9 @@ import React, { useMemo, useState, useEffect, useRef } from "react";
 import { travelData } from "./data/travelData";
 import { workData } from "./data/workData";   // 👈 new
 import { peopleData } from "./data/peopleData"; // 👈 new
+import { relationshipsData } from "./data/relationshipsData"; // 👈 new
+import { healthData } from "./data/healthData"; // 👈 new
+import { clothesData } from "./data/clothesData"; // 👈 new
 import { logFlashcardsSession } from "../../firebase";
 
 function shuffleArray(array) {
@@ -14,6 +17,9 @@ const TOPIC_DATA = {
   travel: travelData,
   work: workData,
   people: peopleData,
+  relationships: relationshipsData,
+  health: healthData,
+  clothes: clothesData,
   // work: workData,
   // health: healthData,
 };
