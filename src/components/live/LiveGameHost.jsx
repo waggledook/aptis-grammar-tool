@@ -21,6 +21,10 @@ export default function LiveGameHost() {
   const [remainingSeconds, setRemainingSeconds] = useState(null);
   const [selectedExplanationIndex, setSelectedExplanationIndex] = useState(null);
 
+  // 🔊 NEW: sound volume + mute
+  const [soundVolume, setSoundVolume] = useState(0.9); // 0–1
+  const [soundMuted, setSoundMuted] = useState(false);
+
   // Get tick refs + play function from the hook
 const { tickRef, tickFastRef, playTick } = useTickSound();
 
@@ -29,6 +33,26 @@ const revealRef = useRef(null);
 const nextRef = useRef(null);
 const finishRef = useRef(null);
 const timeUpRef = useRef(null);
+
+  // 🔊 Keep all sounds in sync with volume / mute
+  useEffect(() => {
+    const vol = soundMuted ? 0 : soundVolume;
+    const refs = [
+      tickRef,
+      tickFastRef,
+      revealRef,
+      nextRef,
+      finishRef,
+      timeUpRef,
+    ];
+
+    refs.forEach((r) => {
+      if (r.current) {
+        r.current.volume = vol;
+      }
+    });
+  }, [soundVolume, soundMuted, tickRef, tickFastRef, revealRef, nextRef, finishRef, timeUpRef]);
+
 
 const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 // If we already know the PIN, include it as a query param
@@ -525,6 +549,42 @@ useEffect(() => {
           </div>
         )}
 
+                {/* 🔊 Volume / mute controls (host only) */}
+                {isHost && (
+          <div
+            style={{
+              marginTop: "0.6rem",
+              display: "flex",
+              alignItems: "center",
+              gap: "0.6rem",
+              flexWrap: "wrap",
+            }}
+          >
+            <span className="muted small">Sound:</span>
+
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={Math.round(soundVolume * 100)}
+              onChange={(e) =>
+                setSoundVolume(Number(e.target.value) / 100)
+              }
+              style={{ width: "140px" }}
+            />
+
+            <button
+              type="button"
+              className="btn"
+              onClick={() => setSoundMuted((m) => !m)}
+              style={{ padding: "6px 10px", fontSize: "0.8rem" }}
+            >
+              {soundMuted ? "🔇 Muted" : "🔊 On"}
+            </button>
+          </div>
+        )}
+
+
         {isHost ? (
           <div
             className="btn-row"
@@ -774,48 +834,49 @@ useEffect(() => {
         </section>
       )}
 
-      {/* Scoreboard */}
-      <section className="card" style={{ marginTop: "1rem" }}>
-        <h2>Scoreboard</h2>
-        {sortedPlayers.length === 0 ? (
-          <p className="muted">No players joined yet.</p>
-        ) : (
-          <ol
-            style={{
-              listStyle: "none",
-              margin: 0,
-              padding: 0,
-              display: "flex",
-              flexDirection: "column",
-              gap: ".25rem",
-            }}
-          >
-            {sortedPlayers.map((p, idx) => (
-              <li
-                key={p.uid}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: ".25rem .4rem",
-                  borderRadius: ".4rem",
-                  background:
-                    idx === 0
-                      ? "rgba(250, 204, 21, 0.13)"
-                      : "rgba(15,23,42,0.7)",
-                }}
-              >
-                <span>
-                  <strong>#{idx + 1}</strong> {p.name || "Player"}
-                </span>
-                <span style={{ fontVariantNumeric: "tabular-nums" }}>
-                  {p.score ?? 0} pts
-                </span>
-              </li>
-            ))}
-          </ol>
-        )}
-      </section>
+            {/* Scoreboard – only show after reveal or when finished */}
+            {(phase === "reveal" || status === "finished") && (
+        <section className="card" style={{ marginTop: "1rem" }}>
+          <h2>Scoreboard</h2>
+          {sortedPlayers.length === 0 ? (
+            <p className="muted">No players joined yet.</p>
+          ) : (
+            <ol
+              style={{
+                listStyle: "none",
+                margin: 0,
+                padding: 0,
+                display: "flex",
+                flexDirection: "column",
+                gap: ".25rem",
+              }}
+            >
+              {sortedPlayers.map((p, idx) => (
+                <li
+                  key={p.uid}
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "0.3rem 0.4rem",
+                    borderRadius: "999px",
+                    background: "#020617",
+                    border: "1px solid #1f2937",
+                    fontSize: "0.8rem",
+                  }}
+                >
+                  <span>
+                    <strong>{idx + 1}.</strong>{" "}
+                    {p.name || p.displayName || "Player"}
+                  </span>
+                  <span>{p.score ?? 0} pts</span>
+                </li>
+              ))}
+            </ol>
+          )}
+        </section>
+      )}
+
 
       {/* 🔊 Hidden audio elements – only in host view */}
       <audio ref={tickRef} src="/sounds/tick.mp3" preload="auto" />

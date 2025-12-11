@@ -1047,6 +1047,16 @@ export async function listMyGrammarSets() {
   return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
 }
 
+export async function deleteGrammarSet(setId) {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error("You must be signed in to delete a set.");
+  }
+
+  const ref = doc(db, "grammarSets", setId); // adjust collection name if needed
+  await deleteDoc(ref);
+}
+
 export async function submitGrammarSetAttempt({
   setId,
   setTitle,

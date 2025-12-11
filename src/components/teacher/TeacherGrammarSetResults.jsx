@@ -1,8 +1,8 @@
-// src/components/teacher/TeacherGrammarSetResults.jsx
 import React, { useEffect, useState } from "react";
 import {
   listMyGrammarSets,
   listAttemptsForMyGrammarSet,
+  deleteGrammarSet, // 👈 NEW
 } from "../../firebase";
 import { fetchItemsByIds } from "../../api/grammar";
 
@@ -49,6 +49,7 @@ export default function TeacherGrammarSetResults({ user }) {
     return null; // TeacherTools already does the auth gate
   }
 
+  // ───────────────── Handlers ─────────────────
   const handleToggleSet = async (setId) => {
     // Collapse if already active
     if (activeSetId === setId) {
@@ -115,6 +116,36 @@ export default function TeacherGrammarSetResults({ user }) {
     }
   };
 
+  const handleDeleteSet = async (setId) => {
+    const confirmed = window.confirm(
+      "Delete this grammar set permanently? This cannot be undone."
+    );
+    if (!confirmed) return;
+
+    try {
+      await deleteGrammarSet(setId);
+
+      // Remove from local list
+      setSets((prev) => prev.filter((s) => s.id !== setId));
+
+      // Clear any attempt state we cached for this set
+      setAttemptState((prev) => {
+        const next = { ...prev };
+        delete next[setId];
+        return next;
+      });
+
+      // If this set was currently expanded, collapse it
+      setActiveSetId((prev) => (prev === setId ? null : prev));
+
+      window.alert("Set deleted.");
+      // If you prefer, swap this for your toast helper.
+    } catch (err) {
+      console.error("Error deleting grammar set:", err);
+      window.alert("Error deleting set. Please try again.");
+    }
+  };
+
   const formatDate = (ts) => {
     if (!ts) return "—";
     const d = ts.toDate ? ts.toDate() : ts;
@@ -130,12 +161,8 @@ export default function TeacherGrammarSetResults({ user }) {
 
   // ───────────────── Render ─────────────────
   return (
-    <section className="panel" style={{ marginTop: "1.5rem" }}>
-      <h2 className="sec-title">My Grammar Sets &amp; Results</h2>
-      <p className="muted small" style={{ marginBottom: ".75rem" }}>
-        Here you can see the sets you’ve created and any student attempts.
-      </p>
-
+    <div className="teacher-sets small">
+      {/* top message / states – no extra panel, the parent provides it */}
       {loadingSets && <p>Loading your sets…</p>}
 
       {setsError && (
@@ -181,7 +208,14 @@ export default function TeacherGrammarSetResults({ user }) {
                 }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ display: "flex", gap: ".5rem", flexWrap: "wrap" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: ".5rem",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                    }}
+                  >
                     <h3
                       className="small"
                       style={{
@@ -227,63 +261,86 @@ export default function TeacherGrammarSetResults({ user }) {
                     <strong>Created:</strong> {formatDate(meta.createdAt)}
                   </p>
 
-                  {/* Share link (same pattern as GrammarSetRunner) */}
+                  {/* Share link */}
                   <div
-  className="small"
-  style={{
-    marginTop: ".4rem",
-    display: "flex",
-    flexWrap: "wrap",
-    alignItems: "center",
-    gap: ".5rem",
-  }}
->
-  <div
-    style={{
-      flex: "1 1 220px",
-      minWidth: "180px",
-      maxWidth: "360px",
-      padding: "4px 10px",
-      borderRadius: "999px",
-      background: "#020617",
-      border: "1px solid #1f2937",
-      overflow: "hidden",
-      textOverflow: "ellipsis",
-      whiteSpace: "nowrap",
-      fontSize: "0.7rem",
-    }}
-    title={shareUrl} // full link on hover
-  >
-    <span className="muted tiny" style={{ opacity: 0.8 }}>
-      Share link:&nbsp;
-    </span>
-    <span>{shareUrl}</span>
-  </div>
+                    className="small"
+                    style={{
+                      marginTop: ".4rem",
+                      display: "flex",
+                      flexWrap: "wrap",
+                      alignItems: "center",
+                      gap: ".5rem",
+                    }}
+                  >
+                    <div
+                      style={{
+                        flex: "1 1 220px",
+                        minWidth: "180px",
+                        maxWidth: "360px",
+                        padding: "4px 10px",
+                        borderRadius: "999px",
+                        background: "#020617",
+                        border: "1px solid #1f2937",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        fontSize: "0.7rem",
+                      }}
+                      title={shareUrl}
+                    >
+                      <span className="muted tiny" style={{ opacity: 0.8 }}>
+                        Share link:&nbsp;
+                      </span>
+                      <span>{shareUrl}</span>
+                    </div>
 
-  <button
-    type="button"
-    className="review-btn favourites"
-    onClick={() => {
-      if (navigator.clipboard?.writeText) {
-        navigator.clipboard.writeText(shareUrl);
-      }
-    }}
-    style={{ padding: "6px 12px", fontSize: "0.75rem" }}
-  >
-    Copy link
-  </button>
+                    <button
+                      type="button"
+                      className="review-btn favourites"
+                      onClick={() => {
+                        if (navigator.clipboard?.writeText) {
+                          navigator.clipboard.writeText(shareUrl);
+                        }
+                      }}
+                      style={{ padding: "6px 12px", fontSize: "0.75rem" }}
+                    >
+                      Copy link
+                    </button>
                   </div>
                 </div>
 
-                <div>
-                <button
-  type="button"
-  className="review-btn"
-  onClick={() => handleToggleSet(meta.id)}
-  style={{ padding: "8px 12px", fontSize: "0.8rem" }}
->
-  {isActive ? "Hide attempts" : "View attempts"}
-</button>
+                {/* Actions: view attempts + delete */}
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "0.35rem",
+                    alignItems: "flex-end",
+                  }}
+                >
+                  <button
+                    type="button"
+                    className="review-btn"
+                    onClick={() => handleToggleSet(meta.id)}
+                    style={{ padding: "8px 12px", fontSize: "0.8rem" }}
+                  >
+                    {isActive ? "Hide attempts" : "View attempts"}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteSet(meta.id)}
+                    className="review-btn favourites"
+                    style={{
+                      padding: "6px 10px",
+                      fontSize: "0.7rem",
+                      background: "#450a0a",
+                      borderColor: "#f97316",
+                      color: "#fed7aa",
+                    }}
+                  >
+                    Delete set
+                  </button>
                 </div>
               </div>
 
@@ -467,17 +524,17 @@ export default function TeacherGrammarSetResults({ user }) {
                                       }}
                                     >
                                       <details>
-  <summary
-    className="review-btn"
-    style={{
-      cursor: "pointer",
-      display: "inline-block",
-      padding: "6px 10px",
-      fontSize: "0.7rem",
-    }}
-  >
-    View
-  </summary>
+                                        <summary
+                                          className="review-btn"
+                                          style={{
+                                            cursor: "pointer",
+                                            display: "inline-block",
+                                            padding: "6px 10px",
+                                            fontSize: "0.7rem",
+                                          }}
+                                        >
+                                          View
+                                        </summary>
                                         <ul
                                           style={{
                                             margin: "0.25rem 0 0",
@@ -494,7 +551,10 @@ export default function TeacherGrammarSetResults({ user }) {
                                             const isCorrect = !!ans.isCorrect;
 
                                             return (
-                                              <li key={i} style={{ marginBottom: ".2rem" }}>
+                                              <li
+                                                key={i}
+                                                style={{ marginBottom: ".2rem" }}
+                                              >
                                                 <div>
                                                   <span className="muted tiny">
                                                     {label}
@@ -518,7 +578,9 @@ export default function TeacherGrammarSetResults({ user }) {
                                                   {!isCorrect && (
                                                     <span
                                                       className="muted tiny"
-                                                      style={{ marginLeft: ".4rem" }}
+                                                      style={{
+                                                        marginLeft: ".4rem",
+                                                      }}
                                                     >
                                                       Correct:{" "}
                                                       {ans.correctOption ??
@@ -545,6 +607,6 @@ export default function TeacherGrammarSetResults({ user }) {
             </div>
           );
         })}
-    </section>
+    </div>
   );
 }

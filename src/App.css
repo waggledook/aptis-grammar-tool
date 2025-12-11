@@ -621,6 +621,57 @@ button {
   object-fit: contain;
   opacity: 0.9;
 }
+/* === Generic site-wide buttons (used in Live Game, etc.) === */
+.btn {
+  background: #0f2246;              /* dark navy, like .review-btn */
+  border: 1px solid #2a3d6e;
+  color: #cfe2ff;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 0.95rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: filter 0.15s ease, transform 0.1s ease, background 0.15s ease;
+}
+
+.btn:hover:not(:disabled) {
+  filter: brightness(1.05);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Primary action – similar to .primary-btn / .generate-btn */
+.btn.primary {
+  background: linear-gradient(180deg, #ffd36a, #ffb200);
+  border-color: transparent;
+  color: #0a1f44;
+}
+
+/* Danger / stop buttons */
+.btn.danger {
+  background: #7f1d1d;
+  border-color: #f97316;
+  color: #fee2e2;
+}
+
+/* Optional subtle variant (if you need it later) */
+.btn.secondary {
+  background: #0f2246;
+  border-color: #2a3d6e;
+  color: #cfe2ff;
+}
+
 
 
 

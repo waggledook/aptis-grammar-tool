@@ -2,7 +2,6 @@
 import { useRef, useCallback } from "react";
 
 export function useTickSound() {
-  // Base <audio> elements – React will attach DOM nodes to these
   const tickRef = useRef(null);
   const tickFastRef = useRef(null);
 
@@ -10,8 +9,12 @@ export function useTickSound() {
     const base = isFast ? tickFastRef.current : tickRef.current;
     if (!base) return;
 
-    // Clone the audio node so each tick plays on its own "channel"
     const clone = base.cloneNode();
+
+    // 🔊 Make sure clones respect current volume / mute settings
+    clone.volume = base.volume ?? 1;
+    clone.muted = base.muted ?? false;
+
     clone.play().catch(() => {
       // Ignore autoplay / user-gesture issues
     });
