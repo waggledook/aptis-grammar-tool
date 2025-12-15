@@ -1475,7 +1475,7 @@
           "id": "b2_narr_12",
           "level": "B2",
           "tag": "Narrative Tenses",
-          "sentence": "They ___ for hours before they finally reached the campsite.",
+          "sentence": "They ___ for hours when they finally reached the campsite.",
           "options": ["were walking", "walked", "had been walking"],
           "answerIndex": 2,
           "explanations": [

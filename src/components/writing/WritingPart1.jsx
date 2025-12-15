@@ -131,6 +131,9 @@ export default function WritingPart1({ user }) {
   const [sessionQs, setSessionQs] = useState(() => pickRandomQuestions(WRITING_P1_BANK, history));
   const [answers, setAnswers] = useState(() => Array(sessionQs.length).fill(""));
   const [phase, setPhase] = useState("ready"); // ready | typing | summary
+  const submittingRef = useRef(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
 
   // Refs for sequential focusing
   const inputRefs = useRef([]);
@@ -181,35 +184,53 @@ function getSuggestionsFor(qId) {
   }
 
   async function handleSubmit() {
-    const allFilled = answers.every((a) => (a || "").trim().length > 0);
-    if (!allFilled) {
-      toast("Please answer all five questions before submitting.");
-      return;
-    }
-
-    const updated = new Set(history);
-    sessionQs.forEach((q) => updated.add(q.id));
-    setHistory(updated);
-    saveHistory(updated);
-
-    // Save to Firestore (if signed in)
-if (user && fb?.saveWritingP1Submission) {
+    if (submittingRef.current) return; // ✅ prevent double-submit
+    submittingRef.current = true;
+    setIsSubmitting(true);
+  
     try {
-      const items = sessionQs.map((q, i) => ({
-        id: q.id,
-        question: q.text,
-        answer: (answers[i] || "").trim(),
-      }));
-      await fb.saveWritingP1Submission({ items });
-    } catch (err) {
-      console.error("[WritingP1] saveWritingP1Submission failed", err);
-      // keep UX happy even if cloud save fails
+      const allFilled = answers.every((a) => (a || "").trim().length > 0);
+      if (!allFilled) {
+        toast("Please answer all five questions before submitting.");
+        return;
+      }
+  
+      const updated = new Set(history);
+      sessionQs.forEach((q) => updated.add(q.id));
+      setHistory(updated);
+      saveHistory(updated);
+  
+      // Save to Firestore (if signed in)
+      if (user && fb?.saveWritingP1Submission) {
+        try {
+          const items = sessionQs.map((q, i) => ({
+            id: q.id,
+            question: q.text,
+            answer: (answers[i] || "").trim(),
+          }));
+  
+          await fb.saveWritingP1Submission({ items });
+  
+          // ✅ activity log only after successful save
+          await fb.logWritingSubmitted({
+            part: "part1",
+            totalItems: items.length,
+          });
+        } catch (err) {
+          console.error("[WritingP1] saveWritingP1Submission failed", err);
+          // keep UX happy even if cloud save fails
+        }
+      }
+  
+      setPhase("summary");
+      toast("Session saved ✓");
+    } finally {
+      submittingRef.current = false;
+      setIsSubmitting(false);
     }
-  }
+  }  
 
-    setPhase("summary");
-    toast("Session saved ✓");
-  }
+  
 
 
   function newSet() {
@@ -274,7 +295,9 @@ if (user && fb?.saveWritingP1Submission) {
               ))}
 
               <div className="actions" style={{ marginTop: ".5rem" }}>
-                <button type="submit" className="btn primary">Submit</button>
+              <button type="submit" className="btn primary" disabled={isSubmitting}>
+  {isSubmitting ? "Saving…" : "Submit"}
+</button>
                 <button type="button" className="btn" onClick={newSet}>Restart</button>
               </div>
             </form>

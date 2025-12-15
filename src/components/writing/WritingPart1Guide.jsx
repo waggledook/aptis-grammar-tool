@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import * as fb from "../../firebase";
 
 /**
@@ -14,6 +14,62 @@ import * as fb from "../../firebase";
 export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
     // ⬇️ ADD THESE TWO RIGHT HERE (before return)
   const fixRefs = useRef([]);
+
+  const guideStartLoggedRef = useRef({
+    trimItStarted: false,
+    improveStarted: false,
+  });
+  
+  function logGuideStartOnce(which, details) {
+    if (!user) return; // keep it signed-in only (logActivity also checks, but this avoids calls)
+    if (guideStartLoggedRef.current[which]) return;
+  
+    guideStartLoggedRef.current[which] = true;
+  
+    fb.logActivity?.("writing_p1_guide_activity_started", {
+      guideId: "writing_p1_guide",
+      ...details,
+    });
+  }
+  
+
+  useEffect(() => {
+    // Log once per browser tab/session to avoid spamming activityLog
+    const key = "activity_writing_p1_guide_viewed";
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+  
+    // Only log if user is signed in (logActivity already checks too, but this avoids extra calls)
+    if (user) {
+      fb.logActivity?.("writing_guide_viewed", {
+        part: "part1",
+        guideId: "writing_p1_guide",
+      });
+    }
+  }, [user]);  
+
+  function TrimItLogged(props) {
+    const startedRef = useRef(false);
+  
+    function startOnce() {
+      if (startedRef.current) return;
+      startedRef.current = true;
+  
+      // log ONLY once per page load for the Trim It section
+      logGuideStartOnce("trimItStarted", { activity: "trim_it" });
+    }
+  
+    return <TrimIt {...props} onFirstInteraction={startOnce} />;
+  }
+  
+  function FixOpenLogged(props) {
+    function startOnce() {
+      // log ONLY once per page load for the Improve section
+      logGuideStartOnce("improveStarted", { activity: "improve_answer" });
+    }
+  
+    return <FixOpen {...props} onFirstInteraction={startOnce} />;
+  }  
 
   async function saveGuideAttempt(meta, attempt) {
     if (typeof fb.saveWritingP1GuideEdits !== "function") return;
@@ -82,32 +138,32 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
               The following answers are too long and complicated.
               Tap words to <strong>cross out</strong> anything extra. Aim for the shortest possible answer.
             </p>
-            <TrimIt
+            <TrimItLogged
               prompt="What did you do yesterday?"
               sentence="Yesterday I went to the gym after work with my friend."
               keepHint="(I) Went to the gym"
             />
-            <TrimIt
+            <TrimItLogged
               prompt="How do you get to work?"
               sentence="I usually get to work by car in the morning."
               keepHint="By car"
             />
-            <TrimIt
+            <TrimItLogged
               prompt="What do you do at the weekend?"
               sentence="At the weekend I usually meet my friends and go to the cinema."
               keepHint="Meet (my) friends"
             />
-            <TrimIt
+            <TrimItLogged
               prompt="What time do you go to bed?"
               sentence="I usually go to bed at around eleven o'clock at night."
               keepHint="Around 11 o'clock (11 PM)"
             />
-            <TrimIt
+            <TrimItLogged
               prompt="What do you usually do in the evening?"
               sentence="In the evening I normally watch TV or read a book before going to sleep."
               keepHint="Watch TV or read"
             />
-            <TrimIt
+            <TrimItLogged
               prompt="How do you usually celebrate your birthday?"
               sentence="I usually celebrate my birthday by having dinner with my family at home."
               keepHint="Dinner with my family"
@@ -122,7 +178,7 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
     then compare with our <strong>suggested answers</strong>.
   </p>
 
-  <FixOpen
+  <FixOpenLogged
     ref={el => (fixRefs.current[0] = el)}
     q="What time do you get up?"
     bad="It's depends of the day."
@@ -141,7 +197,7 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
     }
   />
 
-  <FixOpen
+<FixOpenLogged
     ref={el => (fixRefs.current[1] = el)}
     q="What did you do at the weekend?"
     bad="I will go to a bar."
@@ -160,7 +216,7 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
     }
   />
 
-  <FixOpen
+<FixOpenLogged
     ref={el => (fixRefs.current[2] = el)}
     q="What’s the weather like today?"
     bad="Today is sunny day."
@@ -179,7 +235,7 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
     }
   />
 
-  <FixOpen
+<FixOpenLogged
     ref={el => (fixRefs.current[3] = el)}
     q="How do you travel around your city?"
     bad="In car."
@@ -198,7 +254,7 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
     }
   />
 
-  <FixOpen
+<FixOpenLogged
     ref={el => (fixRefs.current[4] = el)}
     q="Where do you work or study?"
     bad="I study cinema."
@@ -217,7 +273,7 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
     }
   />
 
-  <FixOpen
+<FixOpenLogged
     ref={el => (fixRefs.current[5] = el)}
     q="Where were you born?"
     bad="I born in Cuba."
@@ -236,7 +292,7 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
     }
   />
 
-  <FixOpen
+<FixOpenLogged
     ref={el => (fixRefs.current[6] = el)}
     q="What do you do?"
     bad="Work."
@@ -255,7 +311,7 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
     }
   />
 
-  <FixOpen
+<FixOpenLogged
     ref={el => (fixRefs.current[7] = el)}
     q="What do you do?"
     bad="Student."
@@ -274,7 +330,7 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
     }
   />
 
-  <FixOpen
+<FixOpenLogged
     ref={el => (fixRefs.current[8] = el)}
     q="What do you do?"
     bad="I'm mechanical engineer."
@@ -293,7 +349,7 @@ export default function WritingPart1Guide({ onBack, onStartPractice, user }) {
     }
   />
 
-  <FixOpen
+<FixOpenLogged
     ref={el => (fixRefs.current[9] = el)}
     q="What’s the weather like today?"
     bad="Sun."
@@ -355,22 +411,30 @@ function GoodBad({ q, good, bad }) {
   );
 }
 
-function TrimIt({ prompt, sentence, keepHint }) {
-    const words = useMemo(() => sentence.split(/(\s+)/), [sentence]); // keep spaces for nicer layout
-    const [off, setOff] = useState(new Set()); // indices of crossed words (skip spaces)
-    const [showHint, setShowHint] = useState(false); // ← NEW: hide hint until revealed
-  
-    function toggle(i) {
-      if (words[i].trim() === "") return; // ignore space tokens
-      const next = new Set(off);
-      next.has(i) ? next.delete(i) : next.add(i);
-      setOff(next);
-    }
-  
-    function reset() {
-      setOff(new Set());
-      setShowHint(false); // optional: also hide the hint on reset
-    }
+function TrimIt({ prompt, sentence, keepHint, onFirstInteraction }) {
+  const words = useMemo(() => sentence.split(/(\s+)/), [sentence]);
+  const [off, setOff] = useState(new Set());
+  const [showHint, setShowHint] = useState(false);
+
+  const startedRef = useRef(false);
+  function startOnce() {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    onFirstInteraction?.();
+  }
+
+  function toggle(i) {
+    if (words[i].trim() === "") return;
+    startOnce(); // ✅ first interaction
+    const next = new Set(off);
+    next.has(i) ? next.delete(i) : next.add(i);
+    setOff(next);
+  }
+
+  function reset() {
+    setOff(new Set());
+    setShowHint(false);
+  }
   
     const compact = words
       .map((w, i) => (off.has(i) ? "" : w))
@@ -410,13 +474,16 @@ function TrimIt({ prompt, sentence, keepHint }) {
         <div style={{ display: "flex", gap: ".5rem", marginTop: ".45rem", flexWrap: "wrap" }}>
           <button className="btn" type="button" onClick={reset}>Reset</button>
           <button
-            className="btn"
-            type="button"
-            onClick={() => setShowHint(s => !s)}
-            aria-expanded={showHint}
-          >
-            {showHint ? "Hide suggestion" : "Show suggestion"}
-          </button>
+  className="btn"
+  type="button"
+  onClick={() => {
+    startOnce();                 // ✅ log Trim It started (once)
+    setShowHint(s => !s);
+  }}
+  aria-expanded={showHint}
+>
+  {showHint ? "Hide suggestion" : "Show suggestion"}
+</button>
         </div>
   
         {/* Only show hint if user asks */}
@@ -432,7 +499,7 @@ function TrimIt({ prompt, sentence, keepHint }) {
 
   // Drop-in replacement for FixOpen
 const FixOpen = React.forwardRef(function FixOpen(
-    { q, bad, model, explanation, onEnterNext, onReveal },
+  { q, bad, model, explanation, onEnterNext, onReveal, onFirstInteraction },
     ref
   ) {
     const [val, setVal] = useState("");
@@ -451,6 +518,7 @@ const FixOpen = React.forwardRef(function FixOpen(
           (async () => {
             try {
               // Save to Firestore via your provided callback
+              onFirstInteraction?.();
               await onReveal?.(val);     // <- this should call saveGuideAttempt(...)
               setShow(true);             // reveal suggestion/explanation
               onEnterNext?.();           // focus the next box
@@ -484,7 +552,9 @@ const FixOpen = React.forwardRef(function FixOpen(
           <button
             className="btn"
             onClick={async () => {
-              if (!show) await onReveal?.(val);
+              if (!show) 
+                onFirstInteraction?.();
+                await onReveal?.(val);
               setShow((s) => !s);
             }}
           >

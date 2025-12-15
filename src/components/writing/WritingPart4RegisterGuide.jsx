@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import * as fb from "../../firebase";
 
 /**
@@ -12,8 +12,35 @@ import * as fb from "../../firebase";
  *  - onBack(): go back to Part 4 Guide hub
  *  - onStartPractice(): open the live Part 4 Emails tool
  */
-export default function WritingPart4RegisterGuide({ onBack, onStartPractice }) {
+export default function WritingPart4RegisterGuide({ onBack, onStartPractice, user }) {
   const fixRefs = useRef([]);
+
+  const guideStartLoggedRef = useRef({
+    quizStarted: false,
+    transformStarted: false,
+  });
+  
+  function logGuideStartOnce(which, details) {
+    if (guideStartLoggedRef.current[which]) return;
+    guideStartLoggedRef.current[which] = true;
+  
+    fb.logActivity?.("writing_p4_register_guide_activity_started", {
+      guideId: "writing_p4_register_guide",
+      ...details,
+    });
+  }
+  
+  useEffect(() => {
+    const key = "activity_writing_p4_register_guide_viewed";
+    if (sessionStorage.getItem(key)) return;
+    sessionStorage.setItem(key, "1");
+  
+    fb.logActivity?.("writing_guide_viewed", {
+      part: "part4",
+      guideId: "writing_p4_register_guide",
+    });
+  }, []);
+  
 
 // --- Activity 2 bank (mix of informal ↔ formal) ---
 const TRANSFORM_ITEMS = [
@@ -211,6 +238,9 @@ async function saveRegisterAttempt(meta, attempt) {
                   why: "Standard formal sign-off (use when recipient’s name is unknown). Compare the informal 'Best wishes,' or 'Speak soon,'.",
                 },
               ]}
+              onFirstInteraction={() =>
+                logGuideStartOnce("quizStarted", { activity: "formal_informal_quiz" })
+              }
             />
           </Section>
 
@@ -229,6 +259,9 @@ async function saveRegisterAttempt(meta, attempt) {
     why={it.why}
     onEnterNext={() => fixRefs.current[idx + 1]?.focus()}
     onReveal={(attempt) => saveRegisterAttempt(it, attempt)}
+    onFirstInteraction={() =>
+      logGuideStartOnce("transformStarted", { activity: "tone_transformation" })
+    }
   />
 ))}
       </Section>
@@ -257,7 +290,7 @@ function Section({ title, children }) {
   );
 }
 
-function RegisterQuiz({ items }) {
+function RegisterQuiz({ items, onFirstInteraction }) {
   // Shuffle once on mount
   const [shuffled] = useState(() => {
     // shallow copy → Fisher-Yates shuffle
@@ -272,17 +305,18 @@ function RegisterQuiz({ items }) {
   return (
     <div className="rq">
       {shuffled.map((it, i) => (
-        <RegisterItem key={i} item={it} />
+        <RegisterItem key={i} item={it} onFirstInteraction={onFirstInteraction} />
       ))}
     </div>
   );
 }
 
-function RegisterItem({ item }) {
+function RegisterItem({ item, onFirstInteraction }) {
   const [choice, setChoice] = useState(null); // "formal" | "informal"
   const [show, setShow] = useState(false);
 
   function pick(sel) {
+    onFirstInteraction?.();
     setChoice(sel);
     setShow(true);
   }
@@ -319,7 +353,7 @@ function RegisterItem({ item }) {
 }
 
 const FixOpen = React.forwardRef(function FixOpen(
-  { q, original, model, why, onEnterNext, onReveal }, // 👈 added onReveal here
+  { q, original, model, why, onEnterNext, onReveal, onFirstInteraction },
   ref
 ) {
   const [val, setVal] = useState("");
@@ -331,6 +365,7 @@ const FixOpen = React.forwardRef(function FixOpen(
   }));
 
   async function reveal() {
+    onFirstInteraction?.(); // ✅ counts as first interaction
     setShow(true);
     console.log("[FixOpen] reveal fired, attempt =", val);
     if (onReveal) onReveal(val); // 👈 triggers save to Firestore

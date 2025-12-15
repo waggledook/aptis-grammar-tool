@@ -257,6 +257,16 @@ function handleDownload() {
         formalHTML,
         counts: { friend: counts.friend, formal: counts.formal },
       });
+
+      // ✅ activity log — correct placement
+    await fb.logWritingSubmitted({
+      part: "part4",
+      taskId: current.id,
+      counts: { friend: counts.friend, formal: counts.formal },
+      totalWords: (counts.friend || 0) + (counts.formal || 0),
+    });
+
+
     } catch (e) {
       console.warn("[WritingP4] save failed", e);
     }

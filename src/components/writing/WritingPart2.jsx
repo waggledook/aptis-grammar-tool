@@ -200,6 +200,15 @@ export default function WritingPart2({ user, onRequireSignIn }) {
           answerHTML,
           counts: { answer: counts.answer },
         });
+
+        // ✅ activity log — place it here
+    await fb.logWritingSubmitted({
+      part: "part2",
+      taskId: current.id,
+      wordCount: counts.answer,
+    });
+
+
       } catch (e) {
         console.warn("[WritingP2] save failed", e);
       }

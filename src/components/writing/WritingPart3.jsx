@@ -305,6 +305,15 @@ export default function WritingPart3({ user, onRequireSignIn }) {
           answersHTML,
           counts, // [n1, n2, n3]
         });
+
+        // ✅ activity log — correct placement
+    await fb.logWritingSubmitted({
+      part: "part3",
+      taskId: current.id,
+      wordCounts: counts,                 // e.g. [34, 31, 39]
+      totalWords: counts.reduce((a, b) => a + b, 0),
+    });
+    
       } catch (e) {
         console.warn("[WritingP3] save failed", e);
       }

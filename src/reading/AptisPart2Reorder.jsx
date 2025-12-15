@@ -1,5 +1,5 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { saveReadingCompletion, fetchReadingCompletions } from '../firebase';
+import { saveReadingCompletion, fetchReadingCompletions, logReadingReorderCompleted } from '../firebase';
 import { toast } from "../utils/toast"; // your ToastHost helper
 
 /**
@@ -546,14 +546,20 @@ return (
   key={current?.id}
   spec={current.text}
   onChangeCheck={async (fb) => {
-    // fb = array of booleans/null per slot (null = empty)
     if (!user) return;
-    if (fb.length && fb.every(v => v === true)) {
-      await saveReadingCompletion(current.id);     // persist
-      setCompleted(prev => new Set(prev).add(current.id)); // update UI
-      toast("Task marked as completed ✓");
-    }
-  }}
+    if (!fb.length || !fb.every(v => v === true)) return;
+  
+    // avoid re-logging if user revisits a completed task
+    const alreadyDone = completed.has(current.id);
+    if (alreadyDone) return;
+  
+    await saveReadingCompletion(current.id);
+    setCompleted(prev => new Set(prev).add(current.id));
+    toast("Task marked as completed ✓");
+  
+    // ✅ activity log
+    await logReadingReorderCompleted({ taskId: current.id, source: "AptisPart2Reorder" });
+  }}  
 />
     </div>
   </div>

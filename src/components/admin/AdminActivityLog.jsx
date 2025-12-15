@@ -15,6 +15,14 @@ const typeLabels = {
     speaking_task_completed: "Speaking task",
     vocab_flashcards_session: "Vocab flashcards",   // 👈 new
     vocab_match_session: "Vocab match",
+    reading_guide_viewed: "Reading guide viewed",
+  reading_guide_clue_reveal: "Reading guide clue revealed",
+  reading_guide_reorder_check: "Reading guide check",
+  reading_guide_show_answers: "Reading guide answers shown",
+  reading_guide_reorder_completed: "Reading guide reorder completed",
+  reading_reorder_completed: "Reading reorder completed",
+  writing_p1_guide_activity_started: "Writing P1 guide activity started",
+  writing_p4_register_guide_activity_started: "Writing P4 register guide activity started",
   };
   
   function formatDetails(log) {
@@ -129,13 +137,112 @@ const typeLabels = {
         }`;
       }
 
+      case "reading_guide_viewed": {
+        return `${d.guideId || "reading_guide"}`;
+      }
+      
+      case "reading_guide_clue_reveal": {
+        return `${d.taskId || "task"} · clue revealed`;
+      }
+      
+      case "reading_guide_reorder_check": {
+        const task = d.taskId || "task";
+        const result = d.correct ? "✓ correct" : "✗ not yet";
+        return `${task} · ${result}`;
+      }
+      
+      case "reading_guide_show_answers": {
+        return `${d.taskId || "task"} · answers shown`;
+      }
+      
+      case "reading_guide_reorder_completed": {
+        return `${d.taskId || "task"} · completed ✓`;
+      }
+      
+      case "reading_reorder_completed": {
+        return `${d.taskId || "task"} · completed ✓`;
+      }
+      
+      case "writing_submitted": {
+        const part = d.part || "?";
+      
+        const partLabel =
+          part === "part1" ? "Part 1 – short answers"
+          : part === "part2" ? "Part 2 – form (20–30 words)"
+          : part === "part3" ? "Part 3 – chat (3 answers)"
+          : part === "part4" ? "Part 4 – emails (friend + formal)"
+          : part;
+      
+        // Part-specific details you’re logging
+        if (part === "part1") {
+          const n = d.totalItems ?? "?";
+          return `${partLabel} · ${n} item${n === 1 ? "" : "s"}`;
+        }
+      
+        if (part === "part2") {
+          const taskId = d.taskId || "task";
+          const wc = d.wordCount ?? "?";
+          return `${partLabel} · ${taskId} · ${wc} words`;
+        }
+      
+        if (part === "part3") {
+          const taskId = d.taskId || "task";
+          const total = d.totalWords ?? (Array.isArray(d.wordCounts) ? d.wordCounts.reduce((a,b)=>a+b,0) : null);
+          return `${partLabel} · ${taskId} · ${total ?? "?"} words`;
+        }
+      
+        if (part === "part4") {
+          const taskId = d.taskId || "task";
+          const friend = d.counts?.friend ?? "?";
+          const formal = d.counts?.formal ?? "?";
+          const total = d.totalWords ?? ((friend || 0) + (formal || 0));
+          return `${partLabel} · ${taskId} · ${total} words (${friend}+${formal})`;
+        }
+      
+        return partLabel;
+      }
+
+      case "writing_p1_guide_activity_started": {
+        const guide = d.guideId === "writing_p1_guide" ? "P1 guide" : (d.guideId || "guide");
+      
+        const activityLabel =
+          d.activity === "trim_it" ? "Trim It"
+          : d.activity === "improve_answer" ? "Improve the answer"
+          : d.activity || "activity";
+      
+        return `${guide} · started · ${activityLabel}`;
+      }
+
+      case "writing_guide_viewed": {
+        const part =
+          d.part === "part1" ? "Part 1 – short answers"
+          : d.part === "part2" ? "Part 2 – form"
+          : d.part === "part3" ? "Part 3 – chat"
+          : d.part === "part4" ? "Part 4 – emails"
+          : d.part || "writing";
+      
+        return `${part} guide`;
+      }
+
+      case "writing_p4_register_guide_activity_started": {
+        const activityLabel =
+          d.activity === "formal_informal_quiz" ? "Formal vs Informal (quiz)"
+          : d.activity === "tone_transformation" ? "Tone transformation"
+          : d.activity || "activity";
+      
+        return `P4 register guide · started · ${activityLabel}`;
+      }      
 
   
       default:
         // fallback: raw JSON string
         return JSON.stringify(d || {}, null, 2);
     }
+
+    
   }  
+
+  
 
 export default function AdminActivityLog({ user }) {
   const [logs, setLogs] = useState([]);
@@ -236,6 +343,8 @@ export default function AdminActivityLog({ user }) {
             <option value="speaking_task_completed">Speaking task completed</option>
             <option value="vocab_flashcards_session">Vocab flashcards</option>
             <option value="vocab_match_session">Vocab match</option>
+            <option value="writing_p1_guide_activity_started">Writing P1 guide started</option>
+            <option value="writing_p4_register_guide_activity_started">Writing P4 register guide activity started</option>
           </select>
         </div>
 
@@ -326,33 +435,29 @@ export default function AdminActivityLog({ user }) {
   </span>
 </td>
 
-{/* Details */}
 <td style={{ padding: "0.35rem 0.25rem" }}>
-{log.type === "grammar_session" ||
- log.type === "vocab_set_completed" ||
- log.type === "vocab_flashcards_session" ||
- log.type === "vocab_match_session" ||
- log.type === "speaking_task_completed" ||
- log.type === "speaking_note_submitted" ? (
-    <span
-      className="tiny"
-      style={{ fontSize: "0.8rem", opacity: 0.9 }}
-    >
-      {formatDetails(log)}
-    </span>
-  ) : (
-    <pre
-      style={{
-        margin: 0,
-        fontSize: "0.75rem",
-        whiteSpace: "pre-wrap",
-        wordBreak: "break-word",
-        opacity: 0.85,
-      }}
-    >
-      {formatDetails(log)}
-    </pre>
-  )}
+  {(() => {
+    const text = formatDetails(log) || "";
+    const isMultiline = typeof text === "string" && text.includes("\n");
+
+    return isMultiline ? (
+      <pre
+        style={{
+          margin: 0,
+          fontSize: "0.75rem",
+          whiteSpace: "pre-wrap",
+          wordBreak: "break-word",
+          opacity: 0.85,
+        }}
+      >
+        {text}
+      </pre>
+    ) : (
+      <span className="tiny" style={{ fontSize: "0.8rem", opacity: 0.9 }}>
+        {text}
+      </span>
+    );
+  })()}
 </td>
                 </tr>
               ))}

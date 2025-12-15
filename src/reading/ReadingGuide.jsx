@@ -1,4 +1,11 @@
 import React, { useMemo, useState, useEffect } from "react";
+import {
+  logReadingGuideViewed,
+  logReadingGuideClueReveal,
+  logReadingGuideReorderCheck,
+  logReadingGuideShowAnswers,
+  logReadingGuideReorderCompleted,
+} from "../firebase";
 /**
  * ReadingGuide – Guided flow (clue reveal ➜ then reorder)
  * • Both guided tasks on a single page (no dropdown).
@@ -196,7 +203,7 @@ function ClueReveal({ sentence, revealed, onReveal }) {
 }
 
 
-function ApplyReorder({ intro, sentences }){
+function ApplyReorder({ intro, sentences, taskId }){
   // intro becomes fixed slot 0; sentences are 1..N
   const introItem = { id:"__intro__", text:intro, order:0, fixed:true };
   const canonical = [introItem, ...sentences].sort((a,b)=>a.order-b.order);
@@ -226,9 +233,24 @@ function ApplyReorder({ intro, sentences }){
       setFb(null);
     }catch{}
   }
-  function check(){ setFb(state.slots.map((s,i)=>!!s && s.id===canonical[i]?.id)); }
-  function show(){ setState({ slots: canonical, pool: [] }); setFb(canonical.map(()=>true)); }
-
+  async function check() {
+    const nextFb = state.slots.map((s, i) => !!s && s.id === canonical[i]?.id);
+    setFb(nextFb);
+  
+    const allCorrect = nextFb.length && nextFb.every(Boolean);
+    await logReadingGuideReorderCheck({ taskId, correct: allCorrect });
+  
+    if (allCorrect) {
+      await logReadingGuideReorderCompleted({ taskId });
+    }
+  }
+  
+  function show() {
+    setState({ slots: canonical, pool: [] });
+    setFb(canonical.map(() => true));
+    logReadingGuideShowAnswers({ taskId });
+  }
+  
   return (
     <div className="apply">
       <div className="grid">
@@ -267,7 +289,14 @@ function ApplyReorder({ intro, sentences }){
 function GuidedTaskSection({ task }) {
   // per-task state
   const [revealed, setRevealed] = useState(() => new Set());
-  const reveal = (id) => setRevealed(prev => new Set(prev).add(id));
+  const [clueLogged, setClueLogged] = useState(false);
+  const reveal = (id) => {
+    setRevealed(prev => new Set(prev).add(id));
+    if (!clueLogged) {
+      setClueLogged(true);
+      logReadingGuideClueReveal({ taskId: task.id });
+    }
+  };
   const scrambled = useMemo(() => shuffle(task.sentences), [task.sentences]);
 
   return (
@@ -293,7 +322,7 @@ function GuidedTaskSection({ task }) {
 
       {/* Part B – Reorder */}
       <h4 className="subt" style={{ marginTop: '1rem' }}>Apply: Put the sentences in order</h4>
-      <ApplyReorder intro={task.intro} sentences={task.sentences} />
+      <ApplyReorder intro={task.intro} sentences={task.sentences} taskId={task.id} />
     </section>
   );
 }
@@ -304,6 +333,7 @@ export default function ReadingGuide(){
     if (typeof window !== "undefined") {
       window.scrollTo(0, 0);
     }
+    logReadingGuideViewed({ guideId: "reading_guide_reorder" });
   }, []);
   return (
     <div className="reading-guide game-wrapper">

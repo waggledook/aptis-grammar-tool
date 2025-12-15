@@ -451,6 +451,56 @@ export async function logSpeakingNoteSubmitted(details) {
   return logActivity("speaking_note_submitted", details);
 }
 
+// ─── READING ACTIVITY HELPERS ───────────────────────────────────────────────
+
+// Part 2 reorder (the main reorder activity)
+export async function logReadingReorderCompleted({ taskId, source = "AptisPart2Reorder" }) {
+  return logActivity("reading_reorder_completed", {
+    taskId: taskId || null,
+    source,
+  });
+}
+
+// Reading guide page opened
+export async function logReadingGuideViewed({ guideId = "reading_guide_reorder" } = {}) {
+  return logActivity("reading_guide_viewed", { guideId });
+}
+
+// “Show clues” clicked (guide)
+export async function logReadingGuideClueReveal({ taskId }) {
+  return logActivity("reading_guide_clue_reveal", {
+    taskId: taskId || null,
+  });
+}
+
+// “Check” clicked in guide reorder
+export async function logReadingGuideReorderCheck({ taskId, correct }) {
+  return logActivity("reading_guide_reorder_check", {
+    taskId: taskId || null,
+    correct: !!correct,
+  });
+}
+
+// “Show answers” clicked in guide reorder
+export async function logReadingGuideShowAnswers({ taskId }) {
+  return logActivity("reading_guide_show_answers", {
+    taskId: taskId || null,
+  });
+}
+
+// Guide reorder actually completed (all correct on Check)
+export async function logReadingGuideReorderCompleted({ taskId }) {
+  return logActivity("reading_guide_reorder_completed", {
+    taskId: taskId || null,
+  });
+}
+
+// ─── WRITING SUBMISSION ────────────────────────────────────────────────────
+export async function logWritingSubmitted(details) {
+  // details: { part: "part1"|"part2"|"part3"|"part4", taskId?, wordCount?, counts? ... }
+  return logActivity("writing_submitted", details);
+}
+
 
 
 // ─── REPORTS HELPER ───────────────────────────────────────────────────────────
