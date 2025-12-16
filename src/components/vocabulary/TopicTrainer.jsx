@@ -222,20 +222,45 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
   const wordBank = activeSet ? activeSet.pairs.map((p) => p.term) : [];
 
   const answerOptions = reviewItem?.answer
-    ? reviewItem.answer
-        .split("/")
-        .map((a) => a.trim().toLowerCase())
-        .filter(Boolean)
-    : [];
+  ? reviewItem.answer
+      .toLowerCase()
+      .split(/[\/,]/g)               // ✅ allow "/" OR "," as separators
+      .map((a) => a.trim())
+      .filter(Boolean)
+  : [];
 
-  const cluePair =
-    activeSet?.pairs?.find((p) => {
-      const term = p.term.toLowerCase();
-      return answerOptions.some(
-        (opt) =>
-          term === opt || term.includes(opt) || opt.includes(term)
-      );
-    }) || null;
+function escRe(s) {
+  return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+// Only allow partial matches when they match a whole word/token boundary.
+// This prevents "shirt" matching "t-shirt".
+function tokenMatch(term, opt) {
+  if (!term || !opt) return false;
+
+  if (term === opt) return true;
+
+  // normalise hyphens/spaces for boundary checks
+  const t = term.replace(/[-–—]/g, " ");
+  const o = opt.replace(/[-–—]/g, " ");
+
+  // opt as a whole word inside term (e.g. "phone" in "mobile phone")
+  const reOptInTerm = new RegExp(`(^|\\s)${escRe(o)}(\\s|$)`, "i");
+  if (reOptInTerm.test(t)) return true;
+
+  // term as a whole word inside opt (e.g. "formal" in "formal letter")
+  const reTermInOpt = new RegExp(`(^|\\s)${escRe(t)}(\\s|$)`, "i");
+  if (reTermInOpt.test(o)) return true;
+
+  return false;
+}
+
+const cluePair =
+  activeSet?.pairs?.find((p) => {
+    const term = (p.term || "").toLowerCase().trim();
+    return answerOptions.some((opt) => tokenMatch(term, opt));
+  }) || null;
+
 
   const [typedAnswer, setTypedAnswer] = useState("");
   const [isCorrect, setIsCorrect] = useState(false);

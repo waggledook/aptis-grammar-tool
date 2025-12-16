@@ -96,36 +96,18 @@ export const healthData = {
         distractors: ["healthy", "appointment"],
   
         review: [
-          {
-            sentence:
-              "I’ve got a terrible __________. My head really hurts and I can’t concentrate.",
-            answer: "headache"
-          },
-          {
-            sentence:
-              "He stayed at home with the __________ – he had a high temperature and felt very weak.",
-            answer: "flu / fever"
-          },
-          {
-            sentence:
-              "If you have an __________ to nuts, you shouldn’t eat this cake.",
-            answer: "allergy"
-          },
-          {
-            sentence:
-              "My daughter has a __________. I think we need to take her to the dentist.",
-            answer: "toothache"
-          },
-          {
-            sentence:
-              "After lifting something heavy at the gym, she had a bad __________ for two days.",
-            answer: "backache"
-          },
-          {
-            sentence:
-              "He fell off his bike and went to hospital with a head __________.",
-            answer: "injury"
-          }
+          { sentence: "I think I’ve got a __________ — my nose is blocked and I keep sneezing.", answer: "cold" },
+          { sentence: "I had the __________ last week and I felt weak with a high temperature.", answer: "flu" },
+          { sentence: "He’s got a bad __________ and he can’t stop making that sound.", answer: "cough" },
+          { sentence: "She stayed in bed because she had a __________ and felt very hot.", answer: "fever" },
+          { sentence: "I’ve got a __________, so it hurts when I swallow.", answer: "sore throat" },
+          { sentence: "I’ve got a terrible __________. My head really hurts and I can’t concentrate.", answer: "headache" },
+          { sentence: "I’ve got a __________ — my stomach hurts after that meal.", answer: "stomach ache" },
+          { sentence: "After lifting something heavy, I had a __________ for two days.", answer: "backache" },
+          { sentence: "My son has an __________, so he’s been crying and touching his ear.", answer: "earache" },
+          { sentence: "I can’t chew on this side because I’ve got a __________.", answer: "toothache" },
+          { sentence: "If you have an __________ to nuts, you shouldn’t eat this cake.", answer: "allergy" },
+          { sentence: "He fell off his bike and had an __________ to his leg.", answer: "injury" },
         ],
   
         tips: [
@@ -231,36 +213,18 @@ export const healthData = {
         distractors: ["relaxed", "energetic"],
   
         review: [
-          {
-            sentence:
-              "After running up the stairs, I was completely __________ and couldn’t speak.",
-            answer: "out of breath"
-          },
-          {
-            sentence:
-              "My ankle is really __________ after I twisted it during football.",
-            answer: "swollen"
-          },
-          {
-            sentence:
-              "The cut won’t stop __________. I think I need a bandage.",
-            answer: "bleeding"
-          },
-          {
-            sentence:
-              "He felt __________ at work because of the deadline and his noisy office.",
-            answer: "stressed"
-          },
-          {
-            sentence:
-              "I feel a bit __________. Can we sit down for a minute before we continue?",
-            answer: "dizzy / weak / tired"
-          },
-          {
-            sentence:
-              "By the end of the week she was completely __________ and just wanted to sleep.",
-            answer: "exhausted"
-          }
+          { sentence: "I’ve got a sharp __________ in my chest when I breathe in.", answer: "pain" },
+          { sentence: "I stood up too fast and I felt __________.", answer: "dizzy" },
+          { sentence: "I’m really __________ today — I didn’t sleep much last night.", answer: "tired" },
+          { sentence: "After the illness, he still feels very __________ and can’t do much.", answer: "weak" },
+          { sentence: "I’m feeling __________, so I’m going to stay at home today.", answer: "sick" },
+          { sentence: "The smell of that food made me feel __________.", answer: "nauseous" },
+          { sentence: "My ankle is __________ after I twisted it during football.", answer: "swollen" },
+          { sentence: "This cream helped, but my skin is still very __________.", answer: "itchy" },
+          { sentence: "The cut won’t stop __________. I think I need a bandage.", answer: "bleeding" },
+          { sentence: "After running up the stairs, I was __________ and couldn’t speak.", answer: "out of breath" },
+          { sentence: "He felt __________ at work because of the deadline and his noisy office.", answer: "stressed" },
+          { sentence: "By the end of the week she was __________ and just wanted to sleep.", answer: "exhausted" },
         ],
   
         tips: [
@@ -368,36 +332,18 @@ export const healthData = {
         distractors: ["waiting room", "clinic"],
   
         review: [
-          {
-            sentence:
-              "I’ve made an __________ with my __________ for tomorrow morning.",
-            answer: "appointment, doctor"
-          },
-          {
-            sentence:
-              "The doctor gave me a __________ so I can buy the medicine at the pharmacy.",
-            answer: "prescription"
-          },
-          {
-            sentence:
-              "If the cut is bleeding a lot, put a __________ on it to protect it.",
-            answer: "bandage / plaster"
-          },
-          {
-            sentence:
-              "He has to take this __________ twice a day for a week for the infection.",
-            answer: "antibiotic"
-          },
-          {
-            sentence:
-              "She goes for a __________ at the dentist every six months.",
-            answer: "check-up / check up"
-          },
-          {
-            sentence:
-              "He was very nervous before his knee __________, but it went well.",
-            answer: "operation"
-          }
+          { sentence: "The __________ examined my throat and told me to rest at home.", answer: "doctor" },
+          { sentence: "A __________ checked my temperature and asked me some questions.", answer: "nurse" },
+          { sentence: "I’ve got an __________ with the doctor tomorrow morning.", answer: "appointment" },
+          { sentence: "The doctor gave me a __________ so I can buy the medicine at the pharmacy.", answer: "prescription" },
+          { sentence: "This __________ should help your cough, but read the instructions carefully.", answer: "medicine" },
+          { sentence: "Take one __________ after lunch and one after dinner.", answer: "tablet" },
+          { sentence: "He has to take this __________ twice a day for a week for the infection.", answer: "antibiotic" },
+          { sentence: "The nurse gave me an __________ in my arm.", answer: "injection" },
+          { sentence: "He was nervous before his knee __________, but it went well.", answer: "operation" },
+          { sentence: "If the cut is bleeding, put a __________ on it to protect it.", answer: "bandage" },
+          { sentence: "I put a __________ on the small cut on my finger.", answer: "plaster" },
+          { sentence: "She goes for a __________ at the dentist every six months.", answer: "check-up / check up" },
         ],
   
         tips: [
@@ -505,36 +451,18 @@ export const healthData = {
         distractors: ["put on weight", "stay up late"],
   
         review: [
-          {
-            sentence:
-              "If you want to lose weight, you should __________ and __________.",
-            answer: "exercise regularly, eat healthily"
-          },
-          {
-            sentence:
-              "Doctors say we should __________ and not drink too many fizzy drinks.",
-            answer: "cut down on sugar"
-          },
-          {
-            sentence:
-              "I try to __________ by going to bed earlier during the week.",
-            answer: "get enough sleep"
-          },
-          {
-            sentence:
-              "Many people __________ by doing yoga, breathing exercises or going for a walk.",
-            answer: "manage stress / relax"
-          },
-          {
-            sentence:
-              "He decided to __________ after the doctor warned him about his lungs.",
-            answer: "give up smoking"
-          },
-          {
-            sentence:
-              "If you __________ every day, even for 20 minutes, it can really help your heart and mood.",
-            answer: "go for a walk / exercise regularly / work out"
-          }
+          { sentence: "If you want to lose weight, you should __________ three times a week.", answer: "exercise regularly" },
+          { sentence: "I usually __________ at the gym after work.", answer: "work out" },
+          { sentence: "After dinner we often __________ around the neighbourhood.", answer: "go for a walk" },
+          { sentence: "I try to __________ by going to bed earlier during the week.", answer: "get enough sleep" },
+          { sentence: "On hot days you should __________ to stay hydrated.", answer: "drink plenty of water" },
+          { sentence: "He’s trying to __________ and cook more at home.", answer: "eat healthily" },
+          { sentence: "Doctors advise people to __________ every day.", answer: "eat fruit and vegetables" },
+          { sentence: "I’m trying to __________, so I don’t drink fizzy drinks anymore.", answer: "cut down on sugar" },
+          { sentence: "If you want to be healthier, try to __________ during the week.", answer: "avoid junk food" },
+          { sentence: "He decided to __________ after the doctor warned him about his lungs.", answer: "give up smoking" },
+          { sentence: "Breathing exercises can help you __________ before an exam.", answer: "manage stress" },
+          { sentence: "At the weekend, I like to __________ with a book or a film.", answer: "relax" },
         ],
   
         tips: [

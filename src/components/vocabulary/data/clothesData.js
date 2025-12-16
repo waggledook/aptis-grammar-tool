@@ -98,38 +98,31 @@ export const clothesData = {
         distractors: ["boots", "hoodie"],
   
         review: [
-          {
-            sentence:
-              "He usually wears a __________ and jeans to work because the office is quite informal.",
-            answer: "T-shirt / shirt"
-          },
-          {
-            sentence:
-              "It’s cold outside, so don’t forget your __________ over your jumper.",
-            answer: "coat / jacket"
-          },
-          {
-            sentence:
-              "In summer I prefer wearing __________ instead of trousers.",
-            answer: "shorts / skirts (if appropriate)"
-          },
-          {
-            sentence:
-              "She put on a smart __________ and high heels for the party.",
-            answer: "dress"
-          },
-          {
-            sentence:
-              "My new __________ are really comfortable for walking around the city.",
-            answer: "shoes / trainers"
-          },
-          {
-            sentence:
-              "He wore a __________ over his T-shirt because it was getting a bit cold.",
-            answer: "sweater / jumper / jacket"
-          }
+          { sentence: "He usually wears a __________ and jeans to work because the office is quite informal.", answer: "T-shirt / t-shirt" },
+        
+          { sentence: "I bought a smart __________ for the interview to wear with my trousers.", answer: "shirt" },
+        
+          { sentence: "It’s freezing outside, so don’t forget your __________.", answer: "coat" },
+        
+          { sentence: "It might rain later, so take a __________ just in case.", answer: "jacket" },
+        
+          { sentence: "When it’s really hot, I usually wear __________ instead of trousers.", answer: "shorts" },
+        
+          { sentence: "She wore a long __________ with sandals on holiday.", answer: "skirt" },
+        
+          { sentence: "She put on a smart __________ and high heels for the party.", answer: "dress" },
+        
+          { sentence: "My new __________ are really comfortable for walking around the city.", answer: "shoes" },
+        
+          { sentence: "I always wear __________ to the gym because they’re more comfortable than shoes.", answer: "trainers" },
+        
+          { sentence: "I put on a warm __________ because the house was cold.", answer: "jumper / sweater" },
+        
+          { sentence: "She wore a long __________ with sandals on holiday.", answer: "skirt" },
+        
+          { sentence: "I wear a __________ with my suit for important meetings.", answer: "tie" },
         ],
-  
+        
         tips: [
           "In British English, 'trousers' is common; in American English, people often say 'pants'.",
           "A 'jumper' is British English; 'sweater' is more common in American English.",
@@ -234,36 +227,29 @@ export const clothesData = {
         distractors: ["uniform", "skirt"],
   
         review: [
-          {
-            sentence:
-              "He wore a dark __________ and tie for the interview.",
-            answer: "suit"
-          },
-          {
-            sentence:
-              "It’s going to rain all day, so I’m taking my __________ and umbrella.",
-            answer: "raincoat"
-          },
-          {
-            sentence:
-              "I usually wear __________ or flip-flops when I go to the beach.",
-            answer: "sandals"
-          },
-          {
-            sentence:
-              "She bought a new __________ for the gym because they’re more comfortable than jeans.",
-            answer: "leggings"
-          },
-          {
-            sentence:
-              "He changed into his __________ before going to bed.",
-            answer: "pyjamas"
-          },
-          {
-            sentence:
-              "She put on her new __________ with high __________ for the wedding.",
-            answer: "dress, heels"
-          }
+          { sentence: "He wore a dark __________ and tie for the interview.", answer: "suit" },
+        
+          { sentence: "It’s raining hard, so I’m taking my __________.", answer: "raincoat" },
+        
+          { sentence: "I usually wear __________ when I go to the beach.", answer: "sandals" },
+        
+          { sentence: "She bought new __________ for the gym because they’re more comfortable than jeans.", answer: "leggings" },
+        
+          { sentence: "He changed into his __________ before going to bed.", answer: "pyjamas" },
+        
+          { sentence: "She wore high __________ to the wedding.", answer: "heels" },
+        
+          { sentence: "He wore a __________ with his shirt for the meeting.", answer: "tie" },
+        
+          { sentence: "It’s too cold for a T-shirt, so I’ll wear a __________ instead.", answer: "sweatshirt" },
+        
+          { sentence: "For a more casual look, he put on a __________.", answer: "hoodie" },
+        
+          { sentence: "She wore a smart __________ to the party — it looked very elegant.", answer: "blouse" },
+        
+          { sentence: "It was snowing, so I wore my __________ to keep my feet warm.", answer: "boots" },
+        
+          { sentence: "Don’t forget your __________ for the swimming pool.", answer: "swimsuit" },
         ],
   
         tips: [
@@ -371,37 +357,31 @@ export const clothesData = {
         distractors: ["necklace", "umbrella"],
   
         review: [
-          {
-            sentence:
-              "It’s very sunny today, so don’t forget your __________ to protect your eyes.",
-            answer: "sunglasses"
-          },
-          {
-            sentence:
-              "She usually wears a __________ and __________ in winter to keep warm.",
-            answer: "hat, scarf / gloves"
-          },
-          {
-            sentence:
-              "He keeps his money and cards in a __________ in his pocket.",
-            answer: "wallet"
-          },
-          {
-            sentence:
-              "My brother prefers to use a __________ for school instead of a normal bag.",
-            answer: "backpack"
-          },
-          {
-            sentence:
-              "He wears a smart __________ and a leather __________ with his trousers.",
-            answer: "watch, belt"
-          },
-          {
-            sentence:
-              "She bought some new __________ to match her necklace.",
-            answer: "earrings"
-          }
+          { sentence: "It’s very sunny today, so don’t forget your __________ to protect your eyes.", answer: "sunglasses" },
+        
+          { sentence: "I can’t see the board clearly, so I need to wear my __________.", answer: "glasses" },
+        
+          { sentence: "It was cold and windy, so I wore a __________ to keep my neck warm.", answer: "scarf" },
+        
+          { sentence: "My fingers were freezing, so I put on my __________.", answer: "gloves" },
+        
+          { sentence: "He wore a leather __________ with his jeans.", answer: "belt" },
+        
+          { sentence: "She always wears a __________ in summer to protect her head from the sun.", answer: "cap" },
+        
+          { sentence: "He put on a __________ to keep his head warm", answer: "hat" },
+        
+          { sentence: "He keeps his money and cards in a __________ in his pocket.", answer: "wallet" },
+        
+          { sentence: "After she learnt to tell the time, she got a beautiful __________ for her birthday", answer: "watch" },
+        
+          { sentence: "She bought some new __________ to match her necklace.", answer: "earrings" },
+        
+          { sentence: "I carry my laptop to work in a special __________ for computers.", answer: "bag" },
+        
+          { sentence: "When I go hiking, I take a __________ for water and snacks.", answer: "backpack" },
         ],
+        
   
         tips: [
           "Use 'wear' with most accessories: 'wear a hat / glasses / earrings'.",
@@ -427,117 +407,110 @@ export const clothesData = {
           "suit",
           "match",
           "dress up",
-          "dress casually / dress formally"
+          "dress casually"
         ],
   
         pairs: [
           {
             term: "put on",
-            definition:
-              "Start wearing a piece of clothing or an accessory.",
-            image: "/images/vocab/clothes/put-on.png"
+            definition: "Start wearing a piece of clothing or an accessory.",
+            image: "/images/vocab/clothes/put-on.png",
+            collocation: "__________ your jacket"
           },
           {
             term: "take off",
-            definition:
-              "Remove a piece of clothing or an accessory.",
-            image: "/images/vocab/clothes/take-off.png"
+            definition: "Remove a piece of clothing or an accessory.",
+            image: "/images/vocab/clothes/take-off.png",
+            collocation: "__________ your t-shirt"
           },
           {
             term: "get dressed",
-            definition:
-              "Put your clothes on in the morning or before you go out.",
-            image: "/images/vocab/clothes/get-dressed.png"
+            definition: "Put your clothes on, usually in the morning or before you go out.",
+            image: "/images/vocab/clothes/get-dressed.png",
+            collocation: "__________ quickly before work"
           },
           {
             term: "get undressed",
-            definition:
-              "Take your clothes off, for example before bed.",
-            image: "/images/vocab/clothes/get-undressed.png"
+            definition: "Take your clothes off, for example before bed.",
+            image: "/images/vocab/clothes/get-undressed.png",
+            collocation: "__________ before bed"
           },
           {
             term: "wear",
-            definition:
-              "Have clothes, shoes or accessories on your body.",
-            image: "/images/vocab/clothes/wear.png"
+            definition: "Have clothes, shoes or accessories on your body.",
+            image: "/images/vocab/clothes/wear.png",
+            collocation: "__________ a sweater every day"
           },
           {
             term: "try on",
-            definition:
-              "Put clothes on in a shop to see if they are the right size or if you like them.",
-            image: "/images/vocab/clothes/try-on.png"
+            definition: "Put clothes on in a shop to see if they are the right size or if you like them.",
+            image: "/images/vocab/clothes/try-on.png",
+            collocation: "__________ this jacket"
           },
           {
             term: "go shopping",
-            definition:
-              "Go to the shops, for example to buy clothes or food.",
-            image: "/images/vocab/clothes/go-shopping.png"
+            definition: "Go to the shops, for example to buy clothes or food.",
+            image: "/images/vocab/clothes/go-shopping.png",
+            collocation: "__________ for clothes"
           },
           {
             term: "fit",
-            definition:
-              "Be the right size for someone.",
-            image: "/images/vocab/clothes/fit.png"
+            definition: "Be the right size for someone.",
+            image: "/images/vocab/clothes/fit.png",
+            collocation: "This t-shirt will __________ you perfectly. The right size"
           },
           {
             term: "suit",
-            definition:
-              "Look good on someone; be good for their style or appearance.",
-            image: "/images/vocab/clothes/suit.png"
+            definition: "Look good on someone; be good for their style or appearance.",
+            image: "/images/vocab/clothes/suit.png",
+            collocation: "That colour doesn't really __________ you. The wrong style"
           },
           {
             term: "match",
-            definition:
-              "Look good together (for example, same colour or style).",
-            image: "/images/vocab/clothes/match.png"
+            definition: "Look good together (for example, same colour or style).",
+            image: "/images/vocab/clothes/match.png",
+            collocation: "This t-shirt doesn't __________ these trousers"
           },
           {
             term: "dress up",
-            definition:
-              "Wear very smart clothes, often for a special occasion.",
-            image: "/images/vocab/clothes/dress-up.png"
+            definition: "Wear very smart clothes, often for a special occasion.",
+            image: "/images/vocab/clothes/dress-up.png",
+            collocation: "__________ for a wedding"
           },
           {
-            term: "dress casually / dress formally",
-            definition:
-              "Wear relaxed, informal clothes / wear smart, elegant clothes.",
-            image: "/images/vocab/clothes/dress-casually-formally.png"
+            term: "dress casually",
+            definition: "Wear relaxed, informal clothes.",
+            image: "/images/vocab/clothes/dress-casually.png",
+            collocation: "__________ at the weekend"
           }
         ],
   
         distractors: ["change clothes", "try it on in another size"],
   
         review: [
-          {
-            sentence:
-              "This shirt doesn’t __________ me – it’s too small around the shoulders.",
-            answer: "fit"
-          },
-          {
-            sentence:
-              "That colour really __________ you. You should wear it more often.",
-            answer: "suits"
-          },
-          {
-            sentence:
-              "These shoes don’t __________ my jacket. They’re a different style.",
-            answer: "match"
-          },
-          {
-            sentence:
-              "I usually __________ in jeans and a T-shirt at the weekend.",
-            answer: "dress casually"
-          },
-          {
-            sentence:
-              "You should __________ the coat __________ to see if you like it.",
-            answer: "try, on"
-          },
-          {
-            sentence:
-              "It’s hot in here. I’m going to __________ my jacket.",
-            answer: "take off"
-          }
+          { sentence: "This shirt doesn’t __________ me — it’s too small around the shoulders.", answer: "fit" },
+        
+          { sentence: "That colour really __________ you. You should wear it more often.", answer: "suits / suit" },
+        
+          { sentence: "These shoes don’t __________ my jacket. They’re a different style.", answer: "match" },
+        
+          { sentence: "I usually __________ in jeans and a T-shirt at the weekend.", answer: "dress casually" },
+        
+          { sentence: "You should __________ the coat before you buy it.", answer: "try on" },
+        
+          { sentence: "It’s hot in here. I’m going to __________ my jacket.", answer: "take off" },
+        
+          { sentence: "It’s cold outside, so __________ your coat before you go out.", answer: "put on" },
+        
+          { sentence: "She wants to __________ for the wedding, so she’s wearing her best clothes.", answer: "dress up" },
+        
+          { sentence: "He __________ before going to bed.", answer: "got undressed / get undressed" },
+        
+          { sentence: "I need to __________ quickly — we’re leaving in five minutes!", answer: "get dressed" },
+        
+          { sentence: "I don’t usually __________ black clothes, but I like this outfit.", answer: "wear" },
+        
+          { sentence: "They often __________ at the weekend, especially when the sales are on.", answer: "go shopping" },
         ],
   
         tips: [

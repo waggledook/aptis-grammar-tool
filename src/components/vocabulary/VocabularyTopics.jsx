@@ -79,6 +79,7 @@ export default function VocabularyTopics({
       name: "Clothes & accessories",
       emoji: "👕",
       desc: "Clothing, accessories and verb phrases.",
+      active: true,
     },
     // ── Coming soon topics ───────────────────────────
     {
