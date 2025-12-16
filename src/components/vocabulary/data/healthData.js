@@ -17,7 +17,7 @@ export const healthData = {
           "stomach ache",
           "backache",
           "earache",
-          "toothache",
+          "rash",
           "allergy",
           "injury"
         ],
@@ -74,9 +74,10 @@ export const healthData = {
             image: "/images/vocab/health/earache.png"
           },
           {
-            term: "toothache",
-            definition: "Pain in a tooth or in your teeth.",
-            image: "/images/vocab/health/toothache.png"
+            term: "rash",
+            definition:
+              "Red or itchy marks on your skin, often caused by an allergy or illness.",
+            image: "/images/vocab/health/rash.png"
           },
           {
             term: "allergy",
@@ -105,7 +106,10 @@ export const healthData = {
           { sentence: "I’ve got a __________ — my stomach hurts after that meal.", answer: "stomach ache" },
           { sentence: "After lifting something heavy, I had a __________ for two days.", answer: "backache" },
           { sentence: "My son has an __________, so he’s been crying and touching his ear.", answer: "earache" },
-          { sentence: "I can’t chew on this side because I’ve got a __________.", answer: "toothache" },
+          {
+            sentence: "I’ve got a __________ on my arm — it’s red and really itchy.",
+            answer: "rash"
+          },
           { sentence: "If you have an __________ to nuts, you shouldn’t eat this cake.", answer: "allergy" },
           { sentence: "He fell off his bike and had an __________ to his leg.", answer: "injury" },
         ],
@@ -123,109 +127,160 @@ export const healthData = {
         focus: "Words to describe physical and emotional symptoms to a doctor or friend.",
   
         words: [
-          "pain",
           "dizzy",
-          "tired",
           "weak",
-          "sick",
+          "ill / sick",
           "nauseous",
           "swollen",
           "itchy",
           "bleeding",
-          "out of breath",
           "stressed",
-          "exhausted"
+          "sore",
+          "cut",
+          "burnt / burned",
+          "sprained"
         ],
   
         pairs: [
           {
-            term: "pain",
-            definition:
-              "An unpleasant feeling in part of your body; something hurts.",
-            image: "/images/vocab/health/pain.png"
-          },
-          {
             term: "dizzy",
             definition:
               "Feeling that everything is turning around and you might fall.",
-            image: "/images/vocab/health/dizzy.png"
-          },
-          {
-            term: "tired",
-            definition: "Needing rest or sleep; with low energy.",
-            image: "/images/vocab/health/tired.png"
+            image: "/images/vocab/health/dizzy.png",
+            collocation: "feel __________ when you stand up"
           },
           {
             term: "weak",
             definition:
               "Not strong, with very little energy or physical power.",
-            image: "/images/vocab/health/weak.png"
+            image: "/images/vocab/health/weak.png",
+            collocation: "feel __________ after being ill"
           },
           {
-            term: "sick",
+            term: "ill / sick",
             definition:
-              "Not well; you feel ill. In some varieties of English it can also mean feeling like you want to vomit.",
-            image: "/images/vocab/health/sick.png"
+              "Not well; feeling unhealthy or unwell.",
+            image: "/images/vocab/health/sick.png",
+            collocation: "feel __________ and stay at home"
           },
           {
             term: "nauseous",
             definition:
               "Feeling as if you might vomit; your stomach feels very uncomfortable.",
-            image: "/images/vocab/health/nauseous.png"
+            image: "/images/vocab/health/nauseous.png",
+            collocation: "feel __________ after eating"
           },
           {
             term: "swollen",
             definition:
               "Larger than normal because of an injury, infection or insect bite.",
-            image: "/images/vocab/health/swollen.png"
+            image: "/images/vocab/health/swollen.png",
+            collocation: "a __________ ankle / hand"
           },
           {
             term: "itchy",
             definition:
               "Uncomfortable and making you want to scratch your skin.",
-            image: "/images/vocab/health/itchy.png"
+            image: "/images/vocab/health/itchy.png",
+            collocation: "an __________ rash / skin"
           },
           {
             term: "bleeding",
-            definition: "Losing blood from part of your body.",
-            image: "/images/vocab/health/bleeding.png"
-          },
-          {
-            term: "out of breath",
             definition:
-              "Breathing very fast and with difficulty, usually after exercise.",
-            image: "/images/vocab/health/out-of-breath.png"
+              "Losing blood from part of your body.",
+            image: "/images/vocab/health/bleeding.png",
+            collocation: "a __________ cut"
           },
           {
             term: "stressed",
             definition:
               "Feeling worried, nervous or under a lot of pressure.",
-            image: "/images/vocab/health/stressed.png"
+            image: "/images/vocab/health/stressed.png",
+            collocation: "feel __________ at work"
           },
           {
-            term: "exhausted",
+            term: "sore",
             definition:
-              "Extremely tired; with almost no energy left.",
-            image: "/images/vocab/health/exhausted.png"
+              "Painful or uncomfortable, especially in muscles or joints.",
+            image: "/images/vocab/health/sore.png",
+            collocation: "__________ muscles / throat"
+          },
+          {
+            term: "cut",
+            definition:
+              "Having a small injury where the skin is broken.",
+            image: "/images/vocab/health/cut.png",
+            collocation: "a __________ finger / hand"
+          },
+          {
+            term: "burnt / burned",
+            definition:
+              "Injured by heat, fire or something very hot.",
+            image: "/images/vocab/health/burn.png",
+            collocation: "a __________ hand"
+          },
+          {
+            term: "sprained",
+            definition:
+              "Injured by twisting a joint, such as an ankle or wrist.",
+            image: "/images/vocab/health/sprained.png",
+            collocation: "a __________ ankle"
           }
         ],
   
         distractors: ["relaxed", "energetic"],
   
         review: [
-          { sentence: "I’ve got a sharp __________ in my chest when I breathe in.", answer: "pain" },
-          { sentence: "I stood up too fast and I felt __________.", answer: "dizzy" },
-          { sentence: "I’m really __________ today — I didn’t sleep much last night.", answer: "tired" },
-          { sentence: "After the illness, he still feels very __________ and can’t do much.", answer: "weak" },
-          { sentence: "I’m feeling __________, so I’m going to stay at home today.", answer: "sick" },
-          { sentence: "The smell of that food made me feel __________.", answer: "nauseous" },
-          { sentence: "My ankle is __________ after I twisted it during football.", answer: "swollen" },
-          { sentence: "This cream helped, but my skin is still very __________.", answer: "itchy" },
-          { sentence: "The cut won’t stop __________. I think I need a bandage.", answer: "bleeding" },
-          { sentence: "After running up the stairs, I was __________ and couldn’t speak.", answer: "out of breath" },
-          { sentence: "He felt __________ at work because of the deadline and his noisy office.", answer: "stressed" },
-          { sentence: "By the end of the week she was __________ and just wanted to sleep.", answer: "exhausted" },
+          {
+            sentence: "I stood up too fast and I felt __________.",
+            answer: "dizzy"
+          },
+          {
+            sentence: "After the illness, he still feels very __________ and can’t do much.",
+            answer: "weak"
+          },
+          {
+            sentence: "I’m feeling __________, so I’m going to stay at home today.",
+            answer: "ill / sick"
+          },
+          {
+            sentence: "The smell of that food made me feel __________.",
+            answer: "nauseous"
+          },
+          {
+            sentence: "My ankle is __________ after I twisted it during football.",
+            answer: "swollen"
+          },
+          {
+            sentence: "This cream helped, but my skin is still very __________.",
+            answer: "itchy"
+          },
+          {
+            sentence: "The cut won’t stop __________. I think I need a bandage.",
+            answer: "bleeding"
+          },
+          {
+            sentence: "He felt __________ at work because of the deadline and his noisy office.",
+            answer: "stressed"
+          },
+          {
+            sentence: "After the gym, I’ve got really __________ muscles.",
+            answer: "sore"
+          },
+          {
+            sentence: "I __________ my finger while cooking dinner.",
+            answer: "cut"
+          },
+          {
+            sentence: "She touched the pan and __________ her hand.",
+            answer: "burnt / burned"
+          },
+          {
+            sentence: "He __________ his ankle during the match and had to stop playing.",
+            answer: "sprained"
+          }
         ],
+        
   
         tips: [
           "Use 'be' with adjectives: 'I am dizzy / tired / stressed', not *'I have dizzy'.",
@@ -245,12 +300,12 @@ export const healthData = {
           "appointment",
           "prescription",
           "medicine",
-          "tablet",
-          "antibiotic",
+          "tablet / pill",
+          "antibiotics",
           "injection",
           "operation",
           "bandage",
-          "plaster",
+          "plaster / band-aid",
           "check-up"
         ],
   
@@ -259,73 +314,83 @@ export const healthData = {
             term: "doctor",
             definition:
               "Medical professional who examines you, gives you medicine and explains your illness.",
-            image: "/images/vocab/health/doctor.png"
+            image: "/images/vocab/health/doctor.png",
           },
           {
             term: "nurse",
             definition:
               "Person who looks after patients in a hospital or clinic and helps the doctor.",
-            image: "/images/vocab/health/nurse.png"
+            image: "/images/vocab/health/nurse.png",
           },
           {
             term: "appointment",
             definition:
               "A fixed time to see a doctor or other professional.",
-            image: "/images/vocab/health/appointment.png"
+            image: "/images/vocab/health/appointment.png",
+            collocation: "make an __________"
           },
           {
             term: "prescription",
             definition:
               "A piece of paper or electronic note from a doctor telling the pharmacy what medicine you need.",
-            image: "/images/vocab/health/prescription.png"
+            image: "/images/vocab/health/prescription.png",
+            collocation: "get a __________"
           },
           {
             term: "medicine",
             definition:
               "A general word for substances you take to treat an illness.",
-            image: "/images/vocab/health/medicine.png"
+            image: "/images/vocab/health/medicine.png",
+            collocation: "take __________"
           },
           {
-            term: "tablet",
+            term: "tablet / pill",
             definition:
-              "A small, hard piece of medicine that you swallow.",
-            image: "/images/vocab/health/tablet.png"
+              "A small piece of medicine that you swallow.",
+            image: "/images/vocab/health/tablet.png",
+            collocation: "take a __________"
           },
           {
-            term: "antibiotic",
+            term: "antibiotics",
             definition:
               "Strong medicine used to treat infections caused by bacteria.",
-            image: "/images/vocab/health/antibiotic.png"
+            image: "/images/vocab/health/antibiotics.png",
+            collocation: "take __________ for an infection"
           },
           {
             term: "injection",
             definition:
               "Medicine that is pushed into your body with a needle.",
-            image: "/images/vocab/health/injection.png"
+            image: "/images/vocab/health/injection.png",
+            collocation: "have an __________"
           },
           {
             term: "operation",
             definition:
               "Medical treatment where a doctor cuts into your body, usually in a hospital.",
-            image: "/images/vocab/health/operation.png"
+            image: "/images/vocab/health/operation.png",
+            collocation: "have an __________"
           },
           {
             term: "bandage",
             definition:
               "Long piece of soft material that you wrap around a part of the body to protect or support it.",
-            image: "/images/vocab/health/bandage.png"
+            image: "/images/vocab/health/bandage.png",
+            collocation: "put on a __________"
           },
           {
-            term: "plaster",
+            term: "plaster / band-aid",
             definition:
               "Small sticky bandage that you put on a cut on your skin. (US: band-aid)",
-            image: "/images/vocab/health/plaster.png"
+            image: "/images/vocab/health/plaster.png",
+            collocation: "put a __________ on a cut"
           },
           {
             term: "check-up",
             definition:
               "Regular medical examination when you are not very ill, just to make sure you are healthy.",
-            image: "/images/vocab/health/check-up.png"
+            image: "/images/vocab/health/check-up.png",
+            collocation: "have a __________"
           }
         ],
   
@@ -337,12 +402,12 @@ export const healthData = {
           { sentence: "I’ve got an __________ with the doctor tomorrow morning.", answer: "appointment" },
           { sentence: "The doctor gave me a __________ so I can buy the medicine at the pharmacy.", answer: "prescription" },
           { sentence: "This __________ should help your cough, but read the instructions carefully.", answer: "medicine" },
-          { sentence: "Take one __________ after lunch and one after dinner.", answer: "tablet" },
-          { sentence: "He has to take this __________ twice a day for a week for the infection.", answer: "antibiotic" },
+          { sentence: "Take one __________ after lunch and one after dinner.", answer: "tablet / pill" },
+          { sentence: "He has to take these __________ twice a day for a week for the infection.", answer: "antibiotics" },
           { sentence: "The nurse gave me an __________ in my arm.", answer: "injection" },
-          { sentence: "He was nervous before his knee __________, but it went well.", answer: "operation" },
+          { sentence: "He was nervous before his knee __________, but it went well.", answer: "operation / surgery" },
           { sentence: "If the cut is bleeding, put a __________ on it to protect it.", answer: "bandage" },
-          { sentence: "I put a __________ on the small cut on my finger.", answer: "plaster" },
+          { sentence: "I put a __________ on the small cut on my finger.", answer: "plaster / band-aid" },
           { sentence: "She goes for a __________ at the dentist every six months.", answer: "check-up / check up" },
         ],
   
@@ -354,115 +419,139 @@ export const healthData = {
       },
   
       {
-        id: "healthy_habits",
-        title: "Healthy lifestyle and habits",
+        id: "health_verbs",
+        title: "health-related verbs",
         focus: "Actions and habits that help you stay healthy in daily life.",
   
         words: [
-          "exercise regularly",
           "work out",
-          "go for a walk",
-          "get enough sleep",
-          "drink plenty of water",
-          "eat healthily",
-          "eat fruit and vegetables",
-          "cut down on sugar",
-          "avoid junk food",
-          "give up smoking",
-          "manage stress",
-          "relax"
+          "give up",
+          "cut down",
+          "pass out / faint",
+          "sneeze",
+          "throw up / vomit",
+          "get better",
+          "rest",
+          "come down with",
+          "heal"
         ],
   
         pairs: [
           {
-            term: "exercise regularly",
-            definition:
-              "Do physical activity several times a week to keep your body healthy.",
-            image: "/images/vocab/health/exercise-regularly.png"
-          },
-          {
             term: "work out",
             definition:
-              "Do physical exercise, often in a gym.",
-            image: "/images/vocab/health/work-out.png"
+              "Do physical exercise, usually to improve your fitness or health.",
+            image: "/images/vocab/health/work-out.png",
+            collocation: "__________ at the gym"
           },
           {
-            term: "go for a walk",
+            term: "give up",
             definition:
-              "Walk for pleasure or health, not just to go somewhere.",
-            image: "/images/vocab/health/go-for-a-walk.png"
+              "Stop doing something, especially a bad or unhealthy habit.",
+            image: "/images/vocab/health/give-up.png",
+            collocation: "__________ smoking"
           },
           {
-            term: "get enough sleep",
+            term: "cut down",
             definition:
-              "Sleep for the number of hours your body needs to feel good and have energy.",
-            image: "/images/vocab/health/get-enough-sleep.png"
+              "Reduce the amount of something you do or consume.",
+            image: "/images/vocab/health/cut-down.png",
+            collocation: "__________ on sugar"
           },
           {
-            term: "drink plenty of water",
+            term: "pass out / faint",
             definition:
-              "Drink enough water during the day so that your body stays hydrated.",
-            image: "/images/vocab/health/drink-water.png"
+              "Lose consciousness for a short time, often because of heat, illness or shock.",
+            image: "/images/vocab/health/pass-out.png",
+            collocation: "__________ in the heat"
           },
           {
-            term: "eat healthily",
+            term: "sneeze",
             definition:
-              "Have a diet with good food, not too much fat, sugar or salt.",
-            image: "/images/vocab/health/eat-healthily.png"
+              "Send air suddenly out of your nose and mouth, often because of dust or an allergy.",
+            image: "/images/vocab/health/sneeze.png",
+            collocation: "__________ because of dust"
           },
           {
-            term: "eat fruit and vegetables",
+            term: "throw up / vomit",
             definition:
-              "Include fruit and vegetables in your meals every day.",
-            image: "/images/vocab/health/eat-fruit-veg.png"
+              "Bring food back up from your stomach through your mouth.",
+            image: "/images/vocab/health/vomit.png",
+            collocation: "__________ after eating"
           },
           {
-            term: "cut down on sugar",
+            term: "get better",
             definition:
-              "Eat or drink less sugar than before.",
-            image: "/images/vocab/health/cut-down-on-sugar.png"
+              "Recover from an illness or start to feel healthier.",
+            image: "/images/vocab/health/get-better.png",
+            collocation: "__________ after a few days"
           },
           {
-            term: "avoid junk food",
+            term: "rest",
             definition:
-              "Try not to eat unhealthy fast food or snacks very often.",
-            image: "/images/vocab/health/avoid-junk-food.png"
+              "Stop working or moving in order to relax or recover.",
+            image: "/images/vocab/health/rest.png",
+            collocation: "__________ for a few days"
           },
           {
-            term: "give up smoking",
+            term: "come down with",
             definition:
-              "Stop smoking permanently.",
-            image: "/images/vocab/health/give-up-smoking.png"
+              "Become ill, especially suddenly.",
+            image: "/images/vocab/health/come-down-with.png",
+            collocation: "__________ the flu"
           },
           {
-            term: "manage stress",
+            term: "heal",
             definition:
-              "Control your stress levels using healthy strategies.",
-            image: "/images/vocab/health/manage-stress.png"
-          },
-          {
-            term: "relax",
-            definition:
-              "Do something calm and enjoyable to rest your body and mind.",
-            image: "/images/vocab/health/relax.png"
+              "Become healthy again after an injury or illness.",
+            image: "/images/vocab/health/heal.png",
+            collocation: "__________ completely"
           }
         ],
   
         distractors: ["put on weight", "stay up late"],
   
         review: [
-          { sentence: "If you want to lose weight, you should __________ three times a week.", answer: "exercise regularly" },
-          { sentence: "I usually __________ at the gym after work.", answer: "work out" },
-          { sentence: "After dinner we often __________ around the neighbourhood.", answer: "go for a walk" },
-          { sentence: "I try to __________ by going to bed earlier during the week.", answer: "get enough sleep" },
-          { sentence: "On hot days you should __________ to stay hydrated.", answer: "drink plenty of water" },
-          { sentence: "He’s trying to __________ and cook more at home.", answer: "eat healthily" },
-          { sentence: "Doctors advise people to __________ every day.", answer: "eat fruit and vegetables" },
-          { sentence: "I’m trying to __________, so I don’t drink fizzy drinks anymore.", answer: "cut down on sugar" },
-          { sentence: "If you want to be healthier, try to __________ during the week.", answer: "avoid junk food" },
-          { sentence: "He decided to __________ after the doctor warned him about his lungs.", answer: "give up smoking" },
-          { sentence: "Breathing exercises can help you __________ before an exam.", answer: "manage stress" },
-          { sentence: "At the weekend, I like to __________ with a book or a film.", answer: "relax" },
+          {
+            sentence: "I usually __________ at the gym three times a week.",
+            answer: "work out"
+          },
+          {
+            sentence: "He decided to __________ smoking after his doctor warned him.",
+            answer: "give up"
+          },
+          {
+            sentence: "I’m trying to __________ on sugar and eat more healthily.",
+            answer: "cut down"
+          },
+          {
+            sentence: "She __________ on the bus because of the heat.",
+            answer: "passed out / fainted / pass out / faint"
+          },
+          {
+            sentence: "I always __________ when I’m around cats because of my allergy.",
+            answer: "sneeze"
+          },
+          {
+            sentence: "He felt so sick that he __________ after dinner.",
+            answer: "threw up / vomited / throw up / vomit"
+          },
+          {
+            sentence: "After a few days of rest, she started to __________.",
+            answer: "get better / recover"
+          },
+          {
+            sentence: "The doctor told him to __________ for a few days and avoid exercise.",
+            answer: "rest"
+          },
+          {
+            sentence: "I’ve __________ the flu, so I won’t be coming to work today.",
+            answer: "come down with"
+          },
+          {
+            sentence: "It took weeks for his ankle to __________ completely.",
+            answer: "heal"
+          }
         ],
   
         tips: [

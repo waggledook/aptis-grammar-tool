@@ -73,6 +73,7 @@ export default function VocabularyTopics({
       name: "Health",
       emoji: "🍎",
       desc: "Exercise, medicine, healthy living...",
+      active: true,
     },
     {
       id: "clothes",
