@@ -2,6 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getDatabase } from "firebase/database";
+import { sendPasswordResetEmail } from "firebase/auth";
 
 // ⬇️ Use initializeFirestore instead of getFirestore
 import {
@@ -129,6 +130,14 @@ export const doSignUp = async ({ email, pw, name, username }) => {
 export const onAuthChange = (cb)       => onAuthStateChanged(auth, cb);
 export const doSignOut    = ()         => signOut(auth);
 
+export async function doPasswordReset(email, redirectUrl) {
+  const actionCodeSettings = {
+    url: redirectUrl,
+    handleCodeInApp: false,
+  };
+
+  return sendPasswordResetEmail(auth, email, actionCodeSettings);
+}
 /**
  * Ensure there is a /users/{uid} profile doc with at least
  *   - email

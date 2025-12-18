@@ -8,6 +8,11 @@ import { PART4_TASKS } from "../speaking/banks/part4";
 import { auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { getTotalVocabSets } from "../vocabulary/data/vocabTopics";
+import {
+  EmailAuthProvider,
+  reauthenticateWithCredential,
+  updatePassword,
+} from "firebase/auth";
 
 
 export default function Profile({
@@ -73,6 +78,8 @@ export default function Profile({
   const [showSpeakingPanel, setShowSpeakingPanel] = useState(false);
   const [showGrammarPanel, setShowGrammarPanel] = useState(false);
 
+  const [showAccountPanel, setShowAccountPanel] = useState(false);
+
 
   const TOTAL_VOCAB_SETS = getTotalVocabSets();
 
@@ -80,12 +87,85 @@ export default function Profile({
   // but we just won't render the avatar / studio for now.
   const [photoURL, setPhotoURL] = useState(auth.currentUser?.photoURL || "");
 
+
+const [currentPw, setCurrentPw] = useState("");
+const [newPw, setNewPw] = useState("");
+const [confirmPw, setConfirmPw] = useState("");
+const [pwBusy, setPwBusy] = useState(false);
+const [pwError, setPwError] = useState("");
+
+const handleChangePassword = async (e) => {
+  e.preventDefault();
+  setPwError("");
+
+  const u = auth.currentUser;
+
+  if (!u) {
+    setPwError("You need to be signed in.");
+    return;
+  }
+
+  const hasPasswordProvider = (u.providerData || []).some(
+    (p) => p.providerId === "password"
+  );
+
+  if (!hasPasswordProvider) {
+    setPwError("This account doesn’t use a password sign-in method.");
+    return;
+  }
+
+  if (!currentPw || !newPw || !confirmPw) {
+    setPwError("Please fill in all fields.");
+    return;
+  }
+  if (newPw.length < 6) {
+    setPwError("New password must be at least 6 characters.");
+    return;
+  }
+  if (newPw !== confirmPw) {
+    setPwError("New passwords don’t match.");
+    return;
+  }
+  if (!u.email) {
+    setPwError("No email found for this account.");
+    return;
+  }
+
+  setPwBusy(true);
+  try {
+    const cred = EmailAuthProvider.credential(u.email, currentPw);
+    await reauthenticateWithCredential(u, cred);
+    await updatePassword(u, newPw);
+
+    toast("Password updated ✓");
+    setCurrentPw("");
+    setNewPw("");
+    setConfirmPw("");
+  } catch (err) {
+    const msg =
+      err?.code === "auth/wrong-password"
+        ? "Current password is incorrect."
+        : err?.code === "auth/too-many-requests"
+        ? "Too many attempts. Please wait a moment and try again."
+        : err?.code === "auth/requires-recent-login"
+        ? "For security, please sign out and sign back in, then try again."
+        : err?.message || "Couldn’t update password.";
+
+    setPwError(msg);
+  } finally {
+    setPwBusy(false);
+  }
+};
+
+
   const SPEAKING_TOTALS = {
     part1: PART1_QUESTIONS.length,
     part2: PART2_TASKS.length,
     part3: PART3_TASKS.length,
     part4: PART4_TASKS.length,
   };
+
+
 
   // keep photoURL synced if user changes badge in future
   useEffect(() => {
@@ -207,9 +287,72 @@ const totalCompletedVocab = vocabTopicCounts
       {/* NOTE: avatar / Create/Change badge UI + ProfileBadgeStudio REMOVED */}
 
       {loading ? (
-        <p className="muted">Loading…</p>
-      ) : (
-        <>
+  <p className="muted">Loading…</p>
+) : (
+  <>
+
+      <section className="account-strip">
+  <div className="account-strip-head">
+    <div>
+      <div className="account-strip-title">Account &amp; Security</div>
+      <div className="account-strip-sub">Change password</div>
+    </div>
+
+    <button
+      type="button"
+      className="account-strip-toggle"
+      onClick={() => setShowAccountPanel((s) => !s)}
+      aria-expanded={showAccountPanel}
+    >
+      {showAccountPanel ? "Hide" : "Show"}
+    </button>
+  </div>
+
+  {showAccountPanel && (
+    <form onSubmit={handleChangePassword} className="account-strip-form">
+      {pwError && <div className="account-strip-error">{pwError}</div>}
+
+      <input
+        className="input"
+        type="password"
+        placeholder="Current password"
+        value={currentPw}
+        onChange={(e) => setCurrentPw(e.target.value)}
+        autoComplete="current-password"
+        required
+      />
+      <input
+        className="input"
+        type="password"
+        placeholder="New password"
+        value={newPw}
+        onChange={(e) => setNewPw(e.target.value)}
+        autoComplete="new-password"
+        required
+      />
+      <input
+        className="input"
+        type="password"
+        placeholder="Confirm new password"
+        value={confirmPw}
+        onChange={(e) => setConfirmPw(e.target.value)}
+        autoComplete="new-password"
+        required
+      />
+
+      <div className="account-strip-actions">
+        <button className="btn" type="submit" disabled={pwBusy}>
+          {pwBusy ? "Updating…" : "Update password"}
+        </button>
+
+        <div className="account-strip-hint">
+          If you signed in a long time ago, you may need to sign out and sign back in first.
+        </div>
+      </div>
+    </form>
+  )}
+</section>
+
           {/* --- READING PROGRESS --- */}
 <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
   <button
@@ -1278,10 +1421,10 @@ const totalCompletedVocab = vocabTopicCounts
   )}
 </section>
 
-        </>
-      )}
-    </div>
-  );
+      </>
+    )}
+  </div>
+);
 }
 
 /* ---------------- styles, helpers, etc. (mostly unchanged) ---------------- */
@@ -1542,6 +1685,82 @@ function StyleScope() {
   margin-top: 0.75rem;
 }
 
+
+/* Inputs (Profile previously had none explicitly) */
+.input{
+  width:100%;
+  background:#0a1528;
+  border:1px solid #223a68;
+  border-radius:10px;
+  padding:.55rem .6rem;
+  color:#e6f0ff;
+  outline:none;
+}
+.input:focus{
+  border-color:#4a79d8;
+}
+.account-strip{
+  margin: 0 0 14px 0;
+  padding: 14px 14px 12px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  border-radius: 14px;
+}
+
+.account-strip-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 12px;
+}
+
+.account-strip-title{
+  font-weight: 800;
+  font-size: 1.05rem;
+  letter-spacing: .2px;
+  opacity: .95;
+}
+
+.account-strip-sub{
+  margin-top: 2px;
+  font-size: .85rem;
+  opacity: .75;
+}
+
+.account-strip-toggle{
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.14);
+  color: rgba(255,255,255,0.85);
+  padding: 6px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.account-strip-form{
+  margin-top: 12px;
+  display:grid;
+  gap: 10px;
+  max-width: 520px; /* keeps it from feeling huge */
+}
+
+.account-strip-actions{
+  display:grid;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.account-strip-hint{
+  font-size: .82rem;
+  opacity: .70;
+  line-height: 1.25;
+}
+
+.account-strip-error{
+  font-size: .85rem;
+  color: #ffb4b4;
+}
+
+
     `}</style>
   );
 }
@@ -1796,3 +2015,4 @@ function robustEmailForClipboard({ html = "", text = "" }) {
   const plain = plainFromEmail({ html, text });
   return htmlFromPlainEmail(plain);
 }
+
