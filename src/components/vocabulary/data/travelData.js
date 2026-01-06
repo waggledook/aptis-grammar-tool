@@ -92,7 +92,7 @@ export const travelData = {
         {
           sentence:
             "We had to go to the __________ to give them our suitcases and show our booking reference.",
-          answer: "check-in desk"
+          answer: "check-in desk / check in desk"
         },
         {
           sentence:

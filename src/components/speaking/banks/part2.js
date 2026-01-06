@@ -17,7 +17,7 @@ export const PART2_TASKS = [
       alt:
         "Several children are kicking a football around on the grass while their parents watch from a bench.",
       questions: [
-        "Tell me about a sport you enjoyed playing as a child.",
+        "What sports do children in your country usually do or play?",
         "Do you think children should spend more time outdoors? Why or why not?"
       ]
     },
@@ -39,7 +39,7 @@ export const PART2_TASKS = [
       alt:
         "A woman is choosing fruit at an outdoor market stall, while the vendor smiles and holds a bag. Other shoppers walk past in the background.",
       questions: [
-        "Tell me about a time you went shopping in a market.",
+        "Are outdoor markets still popular in your country?",
         "Do you think local markets are better than supermarkets?"
       ]
     },
