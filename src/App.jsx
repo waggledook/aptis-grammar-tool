@@ -30,6 +30,7 @@ import SpeakingPart3 from './components/speaking/SpeakingPart3';
 import SpeakingPart4 from "./components/speaking/SpeakingPart4";
 import SpeakingPart2and3_PhotoGuide from "./components/speaking/SpeakingPart2and3_PhotoGuide.jsx";import AptisPart2Reorder from './reading/AptisPart2Reorder';
 import AptisPart3Matching from './reading/AptisPart3Matching';
+import AptisPart4 from "./reading/AptisPart4";
 import VocabularyMenu from "./components/vocabulary/VocabularyMenu";
 import ToastHost from './components/ToastHost';
 import Footer from "./components/common/Footer";
@@ -411,6 +412,27 @@ return (
     <AptisPart3Matching user={user} onRequireSignIn={() => setShowAuth(true)} />
   </>
 } />
+
+<Route
+  path="/reading/part4"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/reading")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back
+      </button>
+
+      <AptisPart4
+        user={user}
+        onRequireSignIn={() => setShowAuth(true)}
+      />
+    </>
+  }
+/>
+
 
 {/* ——— Speaking routes ——— */}
 <Route path="/speaking" element={<SpeakingMenu />} />
