@@ -64,9 +64,9 @@ export default function VocabularyMenu() {
 
         {/* ⚙️ Collocation Trainer (coming soon) */}
         <button
-          className="card soon-card tease"
-          onClick={() => toast("Collocation Trainer coming soon 👀")}
-        >
+  className="card soon-card tease"
+  onClick={() => navigate("/vocabulary/collocations")}
+>
           <div className="soon-head">
             <h3>Collocation Trainer</h3>
             <span className="soon-pill">Coming soon</span>

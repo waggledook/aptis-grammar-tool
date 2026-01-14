@@ -28,13 +28,17 @@ import SpeakingPart1 from "./components/speaking/SpeakingPart1";
 import SpeakingPart2 from './components/speaking/SpeakingPart2';
 import SpeakingPart3 from './components/speaking/SpeakingPart3';
 import SpeakingPart4 from "./components/speaking/SpeakingPart4";
-import SpeakingPart2and3_PhotoGuide from "./components/speaking/SpeakingPart2and3_PhotoGuide.jsx";import AptisPart2Reorder from './reading/AptisPart2Reorder';
+import SpeakingPart2and3_PhotoGuide from "./components/speaking/SpeakingPart2and3_PhotoGuide.jsx";
+import AptisPart1 from "./reading/AptisPart1";
+import AptisPart2Reorder from './reading/AptisPart2Reorder';
 import AptisPart3Matching from './reading/AptisPart3Matching';
 import AptisPart4 from "./reading/AptisPart4";
 import VocabularyMenu from "./components/vocabulary/VocabularyMenu";
 import ToastHost from './components/ToastHost';
 import Footer from "./components/common/Footer";
 import VocabularyTopics from "./components/vocabulary/VocabularyTopics";
+import CollocationMenu from "./components/vocabulary/collocations/CollocationMenu";
+import CollocationDash from "./components/vocabulary/collocations/CollocationDash";
 import TopicTrainer from "./components/vocabulary/TopicTrainer";
 import Seo from "./components/common/Seo.jsx";
 import './App.css'
@@ -376,6 +380,27 @@ return (
 
 {/* Reading routes */}
 <Route path="/reading" element={<ReadingMenu />} />
+
+<Route
+  path="/reading/part1"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/reading")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back
+      </button>
+
+      <AptisPart1
+        user={user}
+        onRequireSignIn={() => setShowAuth(true)}
+      />
+    </>
+  }
+/>
+
 <Route path="/reading/part2" element={
   <>
     <button
@@ -552,6 +577,25 @@ return (
     path="/vocabulary/topics"
     element={<VocabularyTopics isAuthenticated={!!user} />}
   />
+
+<Route path="/vocabulary/collocations" element={<CollocationMenu />} />
+
+<Route
+  path="/vocabulary/collocations/dash"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/vocabulary")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back
+      </button>
+
+      <CollocationDash user={user} onRequireSignIn={() => setShowAuth(true)} />
+    </>
+  }
+/>
 
 {/* ——— Writing routes ——— */}
 <Route path="/writing" element={<WritingMenu />} />
