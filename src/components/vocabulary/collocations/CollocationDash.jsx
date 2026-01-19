@@ -1,6 +1,8 @@
 // src/components/vocabulary/collocations/CollocationDash.jsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import { COLLOCATION_BANK, VERBS } from "../data/collocationBank";
+import { useTickSound } from "../../../hooks/useTickSound";
+
 // If you already have logActivity in src/firebase.js, you can wire it in:
 // import { logActivity } from "../../../firebase";
 
@@ -42,6 +44,16 @@ export default function CollocationDash({ user, onRequireSignIn }) {
   const [feedback, setFeedback] = useState(null); // { kind, text }
   const [wrongAnswers, setWrongAnswers] = useState([]); // { phrase, selectedVerb, correctVerb }
 
+  // 🔊 Sound controls
+const [soundVolume, setSoundVolume] = useState(0.9); // 0–1
+const [soundMuted, setSoundMuted] = useState(false);
+const nextRef = useRef(null);
+const finishRef = useRef(null);
+const timeUpRef = useRef(null);
+
+// Tick refs + play function
+const { tickRef, tickFastRef, playTick } = useTickSound();
+
   const intervalRef = useRef(null);
 
   const remainingCount = useMemo(() => items.length, [items]);
@@ -70,6 +82,31 @@ export default function CollocationDash({ user, onRequireSignIn }) {
     start();
   };
 
+  const playNext = () => {
+    try {
+      if (!nextRef.current) return;
+      nextRef.current.currentTime = 0;
+      nextRef.current.play();
+    } catch {}
+  };
+  
+  const playFinish = () => {
+    try {
+      if (!finishRef.current) return;
+      finishRef.current.currentTime = 0;
+      finishRef.current.play();
+    } catch {}
+  };
+  
+  const playTimeUp = () => {
+    try {
+      if (!timeUpRef.current) return;
+      timeUpRef.current.currentTime = 0;
+      timeUpRef.current.play();
+    } catch {}
+  };
+  
+
   const stopTimer = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = null;
@@ -77,16 +114,10 @@ export default function CollocationDash({ user, onRequireSignIn }) {
 
   const endGame = () => {
     stopTimer();
+    playFinish();
     setStatus("over");
     setFeedback(null);
     setSelectedId(null);
-
-    // logActivity?.("vocab_collocations_dash_ended", {
-    //   uid: user?.uid ?? null,
-    //   score,
-    //   roundsCompleted: round - 1,
-    //   mistakes: wrongAnswers.length,
-    // });
   };
 
   const nextRound = () => {
@@ -109,7 +140,7 @@ export default function CollocationDash({ user, onRequireSignIn }) {
     intervalRef.current = setInterval(() => {
       setTimeLeft((t) => {
         if (t <= 1) {
-          // reach zero -> end
+          playTimeUp();
           setTimeout(() => endGame(), 0);
           return 0;
         }
@@ -121,14 +152,41 @@ export default function CollocationDash({ user, onRequireSignIn }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, round, roundTime]);
 
-  // When the player clears the round, advance automatically.
+
+  useEffect(() => {
+    const vol = soundMuted ? 0 : soundVolume;
+  
+    [tickRef, tickFastRef, nextRef, finishRef, timeUpRef].forEach((r) => {
+      if (r.current) {
+        r.current.volume = vol;
+        r.current.muted = soundMuted; // optional but nice to keep in sync
+      }
+    });
+  }, [soundVolume, soundMuted, tickRef, tickFastRef]);
+
   useEffect(() => {
     if (status !== "playing") return;
-    if (remainingCount === 0) {
-      nextRound();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [remainingCount, status]);
+    if (timeLeft == null) return;
+    if (timeLeft <= 0) return;
+  
+    // Fast tick for last 3 seconds
+    const isFast = timeLeft <= 5;
+    playTick(isFast);
+  }, [timeLeft, status, playTick]);
+  
+  
+  // When the player clears the round, advance automatically (with "next" sound)
+useEffect(() => {
+  if (status !== "playing") return;
+
+  if (items.length === 0) {
+    playNext();
+    const t = setTimeout(() => nextRound(), 200);
+    return () => clearTimeout(t);
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [items.length, status]);
 
   const submitToVerb = (verb) => {
     if (status !== "playing") return;
@@ -166,6 +224,15 @@ export default function CollocationDash({ user, onRequireSignIn }) {
 
   return (
     <div className="game-wrapper">
+
+      {/* 🔊 Tick sounds (hidden audio elements) */}
+    <audio ref={tickRef} src="/sounds/tick.mp3" preload="auto" />
+    <audio ref={tickFastRef} src="/sounds/tick_fast.mp3" preload="auto" />
+    <audio ref={nextRef} src="/sounds/next.mp3" preload="auto" />
+<audio ref={finishRef} src="/sounds/finish.mp3" preload="auto" />
+<audio ref={timeUpRef} src="/sounds/time_up.mp3" preload="auto" />
+
+
       <div className="game-container" style={{ maxWidth: 920 }}>
         <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
           <div>
@@ -179,6 +246,27 @@ export default function CollocationDash({ user, onRequireSignIn }) {
             <div><strong>Round:</strong> {round}</div>
             <div><strong>Time:</strong> {timeLeft}s</div>
             <div><strong>Score:</strong> {score}</div>
+
+            <div className="cd-sound">
+  <span className="cd-sound-label">Sound:</span>
+
+  <input
+    type="range"
+    min={0}
+    max={100}
+    value={Math.round(soundVolume * 100)}
+    onChange={(e) => setSoundVolume(Number(e.target.value) / 100)}
+  />
+
+  <button
+    type="button"
+    className="cd-sound-btn"
+    onClick={() => setSoundMuted((m) => !m)}
+  >
+    {soundMuted ? "🔇 Muted" : "🔊 On"}
+  </button>
+</div>
+
           </div>
         </div>
 
@@ -390,6 +478,42 @@ export default function CollocationDash({ user, onRequireSignIn }) {
   font-size: 12px;
   margin-top: 4px;
 }
+
+.cd-sound {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.06);
+}
+
+.cd-sound-label {
+  font-size: 0.85rem;
+  opacity: 0.85;
+  font-weight: 700;
+}
+
+.cd-sound input[type="range"] {
+  width: 120px;
+}
+
+.cd-sound-btn {
+  border-radius: 999px;
+  padding: 6px 10px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.08);
+  color: #e6f0ff;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cd-sound-btn:hover {
+  border-color: rgba(255,255,255,0.28);
+  background: rgba(255,255,255,0.12);
+}
+
 
         `}</style>
       </div>
