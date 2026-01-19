@@ -339,8 +339,12 @@ const submitMatch = (verb, phrase) => {
           phrase: selectedItem.phrase,
           selectedVerb: verb,
           correctVerb: selectedItem.correctVerb,
+          hint: selectedItem.hint,
+          definition: selectedItem.definition,
+          example: selectedItem.example,
+          es: selectedItem.es,
         },
-      ];
+      ];      
     });
 
     // optional: keep phrase selected but clear verb (or clear both)
