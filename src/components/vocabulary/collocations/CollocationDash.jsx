@@ -35,8 +35,8 @@ function pickRoundItems({ perRound = 5 }) {
 export default function CollocationDash({ user, onRequireSignIn }) {
   const [status, setStatus] = useState("idle"); // idle | playing | over
   const [round, setRound] = useState(1);
-  const [roundTime, setRoundTime] = useState(25);
-  const [timeLeft, setTimeLeft] = useState(25);
+  const [roundTime, setRoundTime] = useState(40);
+  const [timeLeft, setTimeLeft] = useState(40);
   const [score, setScore] = useState(0);
 
   const [items, setItems] = useState(() => pickRoundItems({ perRound: 5 }));
@@ -65,8 +65,8 @@ const { tickRef, tickFastRef, playTick } = useTickSound();
 
     setStatus("playing");
     setRound(1);
-    setRoundTime(25);
-    setTimeLeft(25);
+    setRoundTime(40);
+    setTimeLeft(40);
     setScore(0);
     setWrongAnswers([]);
     setFeedback(null);
