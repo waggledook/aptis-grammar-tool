@@ -354,6 +354,58 @@ export async function fetchRecentVocabMistakes(max = 8, uid) {
     .filter((doc) => doc.resolved !== true);
 }
 
+// ────────────────────────────────
+// Collocation Dash scores
+// /users/{uid}/collocationDashScores
+// ────────────────────────────────
+
+export async function saveCollocationDashScore(score) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return; // only signed-in users
+
+  const colRef = collection(db, "users", uid, "collocationDashScores");
+
+  // 1) Save score
+  await addDoc(colRef, {
+    score: Number(score) || 0,
+    createdAt: serverTimestamp(),
+    app: "aptis-trainer",
+    gameId: "collocation_dash",
+  });
+
+  // 2) Optional: keep only the most recent 50 (prevents infinite growth)
+  const keepQ = query(colRef, orderBy("createdAt", "desc"), limit(50));
+  const keepSnap = await getDocs(keepQ);
+  const keepIds = new Set(keepSnap.docs.map((d) => d.id));
+
+  const allSnap = await getDocs(colRef);
+  await Promise.all(
+    allSnap.docs
+      .filter((d) => !keepIds.has(d.id))
+      .map((d) => deleteDoc(doc(colRef, d.id)))
+  );
+}
+
+export async function fetchTopCollocationDashScores(n = 3, uid) {
+  const realUid = uid || auth.currentUser?.uid || null;
+  if (!realUid) return [];
+
+  const colRef = collection(db, "users", realUid, "collocationDashScores");
+
+  // Top scores (highest first). Tie-break: newest first.
+  const qy = query(colRef, orderBy("score", "desc"), orderBy("createdAt", "desc"), limit(n));
+  const snap = await getDocs(qy);
+
+  return snap.docs.map((d) => {
+    const data = d.data() || {};
+    return {
+      id: d.id,
+      score: data.score ?? 0,
+      createdAt: data.createdAt || null,
+    };
+  });
+}
+
 // ─── GLOBAL ACTIVITY LOG ─────────────────────────────────────────────────────
 /**
  * Append a single activity event to /activityLog.
