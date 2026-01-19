@@ -62,7 +62,8 @@ export default function CollocationDash({ user, onRequireSignIn }) {
   const [score, setScore] = useState(0);
 
   const [items, setItems] = useState(() => pickRoundItems({ perRound: 5 }));
-  const [selectedId, setSelectedId] = useState(null); // phrase key
+  const [selectedPhrase, setSelectedPhrase] = useState(null);
+const [selectedVerb, setSelectedVerb] = useState(null);
   const [feedback, setFeedback] = useState(null); // { kind, text }
   const [wrongAnswers, setWrongAnswers] = useState([]); // { phrase, selectedVerb, correctVerb }
 
@@ -109,7 +110,8 @@ const { tickRef, tickFastRef, playTick } = useTickSound();
     setScore(0);
     setWrongAnswers([]);
     setFeedback(null);
-    setSelectedId(null);
+    setSelectedPhrase(null);
+setSelectedVerb(null);
     setItems(pickRoundItems({ perRound: 5 }));
 
     // logActivity?.("vocab_collocations_dash_started", { uid: user?.uid ?? null });
@@ -181,7 +183,8 @@ const { tickRef, tickFastRef, playTick } = useTickSound();
   const endGame = () => {
     stopTimer();
     setFeedback(null);
-    setSelectedId(null);
+    setSelectedPhrase(null);
+setSelectedVerb(null);
   
     // ✅ Save ONCE per run (signed-in only)
     if (user?.uid && !savedScoreRef.current) {
@@ -221,7 +224,8 @@ const { tickRef, tickFastRef, playTick } = useTickSound();
     setRoundTime(nextTime);
     setTimeLeft(nextTime);
     setItems(pickRoundItems({ perRound: 5 }));
-    setSelectedId(null);
+    setSelectedPhrase(null);
+setSelectedVerb(null);
     setFeedback(null);
   };
 
@@ -300,47 +304,50 @@ useEffect(() => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [items.length, status]);
 
-  const submitToVerb = (verb) => {
-    if (status !== "playing") return;
-    if (!selectedId) return;
+const submitMatch = (verb, phrase) => {
+  if (status !== "playing") return;
+  if (!verb || !phrase) return;
 
-    const selectedItem = items.find((it) => it.phrase === selectedId);
-    if (!selectedItem) return;
+  const selectedItem = items.find((it) => it.phrase === phrase);
+  if (!selectedItem) return;
 
-    const correct = selectedItem.correctVerb === verb;
+  const correct = selectedItem.correctVerb === verb;
 
-    if (correct) {
-      setScore((s) => s + 10);
-      setItems((prev) => prev.filter((it) => it.phrase !== selectedId));
-      setFeedback({ kind: "ok", text: "Correct." });
-      setSelectedId(null);
-      setTimeout(() => setFeedback(null), 800);
-    } else {
-      setScore((s) => s - 5);
-      setFeedback({ kind: "bad", text: "Try again." });
-      setTimeout(() => setFeedback(null), 800);
+  if (correct) {
+    setScore((s) => s + 10);
+    setItems((prev) => prev.filter((it) => it.phrase !== phrase));
+    setFeedback({ kind: "ok", text: "Correct." });
 
-      setWrongAnswers((prev) => {
-        // de-dupe by phrase + chosen verb
-        const exists = prev.some(
-          (x) => x.phrase === selectedItem.phrase && x.selectedVerb === verb
-        );
-        if (exists) return prev;
-        return [
-          ...prev,
-          {
-            phrase: selectedItem.phrase,
-            selectedVerb: verb,
-            correctVerb: selectedItem.correctVerb,
-            hint: selectedItem.hint,
-            definition: selectedItem.definition,
-            example: selectedItem.example,
-            es: selectedItem.es,
-          },
-        ];
-      });
-    }
-  };
+    setSelectedPhrase(null);
+    setSelectedVerb(null);
+
+    setTimeout(() => setFeedback(null), 800);
+  } else {
+    setScore((s) => s - 5);
+    setFeedback({ kind: "bad", text: "Try again." });
+
+    setTimeout(() => setFeedback(null), 800);
+
+    setWrongAnswers((prev) => {
+      const exists = prev.some(
+        (x) => x.phrase === selectedItem.phrase && x.selectedVerb === verb
+      );
+      if (exists) return prev;
+      return [
+        ...prev,
+        {
+          phrase: selectedItem.phrase,
+          selectedVerb: verb,
+          correctVerb: selectedItem.correctVerb,
+        },
+      ];
+    });
+
+    // optional: keep phrase selected but clear verb (or clear both)
+    setSelectedVerb(null);
+  }
+};
+
 
   function buildUniqueReviewQueue(wrongAnswers) {
     const map = new Map();
@@ -452,10 +459,16 @@ useEffect(() => {
                 <button
                 key={v}
                 type="button"
-                onClick={() => submitToVerb(v)}
-                className="cd-verb-btn"
-                disabled={!selectedId}
-                title={selectedId ? `Submit: ${v}` : "Select a phrase first"}
+                onClick={() => {
+                  if (selectedPhrase) submitMatch(v, selectedPhrase);
+                  else setSelectedVerb(v);
+                }}
+                className={`cd-verb-btn ${selectedVerb === v ? "is-selected" : ""}`}
+                title={
+                  selectedPhrase
+                    ? `Submit: ${v} + ${selectedPhrase}`
+                    : `Select a phrase to match with "${v}"`
+                }
               >
                 {v}
               </button>
@@ -469,12 +482,15 @@ useEffect(() => {
 
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
                 {items.map((it) => {
-                  const active = selectedId === it.phrase;
+                  const active = selectedPhrase === it.phrase;
                   return (
                     <button
   key={it.phrase}
   type="button"
-  onClick={() => setSelectedId(it.phrase)}
+  onClick={() => {
+    if (selectedVerb) submitMatch(selectedVerb, it.phrase);
+    else setSelectedPhrase(it.phrase);
+  }}
   className={`cd-phrase-btn ${active ? "active" : ""}`}
 >
                       <div style={{ fontWeight: 700 }}>{it.phrase}</div>
@@ -678,7 +694,7 @@ useEffect(() => {
             ) : (
               <p style={{ opacity: 0.9 }}>No mistakes recorded. Nice.</p>
             )}
-            
+
             {/* 🔐 Nudge unsigned-in users to sign in (game over) */}
 {!user?.uid && (
   <div className="auth-nudge" style={{ marginTop: 12 }}>
@@ -1209,87 +1225,90 @@ useEffect(() => {
   letter-spacing: 0.5px;
 }
 
-/* ===== LEADERBOARD (bluer, less grey) ===== */
-/* Replace the whole previous "LEADERBOARD OVERRIDE (NUCLEAR)" block with this */
+/* ─────────────────────────────────────────────
+   Leaderboard (match page blue, no grey slab)
+──────────────────────────────────────────── */
 
-.cd-leaderboard .cd-leaderboard-table{
-  border: 1px solid rgba(110,180,255,0.22);
+/* make the table itself transparent (no slab) */
+.cd-leaderboard-table{
+  border: 1px solid rgba(255,255,255,0.14);
   border-radius: 16px;
   overflow: hidden;
-
   background: transparent !important;
-  background-color: transparent !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-/* Row base: noticeably bluer (less grey haze) */
-.cd-leaderboard .cd-lb-row{
+/* rows: use a subtle blue tint instead of grey */
+.cd-lb-row{
   display: grid;
   grid-template-columns: 60px 1fr 120px;
   align-items: center;
 
   padding: 14px 16px;
-  border-top: 1px solid rgba(110,180,255,0.14);
+  border-top: 1px solid rgba(255,255,255,0.10);
 
-  background: rgba(40,120,255,0.14) !important;
-  background-color: rgba(40,120,255,0.14) !important;
+  background: rgba(110,180,255,0.06) !important; /* blue-tinted */
 }
 
-.cd-leaderboard .cd-lb-row:first-child{
+.cd-lb-row:first-child{
   border-top: none;
 }
 
-/* Header: stronger blue, not grey */
-.cd-leaderboard .cd-lb-row.cd-lb-header{
-  font-weight: 900;
+/* header slightly stronger, still blue not grey */
+.cd-lb-header{
+  font-weight: 800;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   font-size: 13px;
 
-  background: rgba(40,120,255,0.22) !important;
-  background-color: rgba(40,120,255,0.22) !important;
+  background: rgba(110,180,255,0.12) !important;
 }
 
-/* Hover: clearly “blue”, not slate */
-.cd-leaderboard .cd-lb-row:not(.cd-lb-header):hover{
-  background: rgba(70,160,255,0.22) !important;
-  background-color: rgba(70,160,255,0.22) !important;
+/* hover = a touch brighter */
+.cd-lb-row:not(.cd-lb-header):hover{
+  background: rgba(110,180,255,0.10) !important;
 }
 
-/* “Me” row: keep warm highlight, but still coherent with the blues */
-.cd-leaderboard .cd-lb-row.is-me{
-  background: rgba(255,200,80,0.14) !important;
-  background-color: rgba(255,200,80,0.14) !important;
-  box-shadow: inset 0 0 0 1px rgba(255,200,80,0.28);
+.cd-lb-rank{
+  opacity: 0.85;
 }
 
-/* Text tweaks (optional but helps the table feel crisper) */
-.cd-leaderboard .cd-lb-rank{ opacity: 0.9; }
-
-.cd-leaderboard .cd-lb-name-text{
-  font-weight: 800;
-  color: rgba(255,255,255,0.94);
+.cd-lb-name-text{
+  font-weight: 700;
+  color: rgba(255,255,255,0.92);
 }
 
-.cd-leaderboard .cd-lb-score{
+.cd-lb-score{
   text-align: right;
-  font-weight: 950;
+  font-weight: 900;
   font-size: 18px;
-  color: rgba(255,255,255,0.96);
+  color: rgba(255,255,255,0.95);
 }
 
-.cd-leaderboard .cd-lb-me{
+/* “you” row: keep the gold highlight, but remove any grey feel */
+.cd-lb-row.is-me{
+  background: rgba(255,200,80,0.10) !important;
+  box-shadow: inset 0 0 0 1px rgba(255,200,80,0.22);
+}
+
+.cd-lb-me{
   margin-left: 10px;
   padding: 3px 10px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 900;
+  font-weight: 800;
 
   color: rgba(255,220,140,0.95);
-  border: 1px solid rgba(255,220,140,0.38);
-  background: rgba(255,200,80,0.16);
+  border: 1px solid rgba(255,220,140,0.35);
+  background: rgba(255,200,80,0.12);
 }
+  .cd-verb-btn.is-selected{
+  border-color: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.14);
+  box-shadow: 0 0 0 2px rgba(110,180,255,0.18);
+}
+
 
 
         `}</style>
