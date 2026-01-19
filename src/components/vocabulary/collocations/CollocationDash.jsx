@@ -200,39 +200,25 @@ export default function CollocationDash({ user, onRequireSignIn }) {
 
         {status === "playing" && (
           <>
-            {feedback && (
-              <div
-                style={{
-                  marginTop: 12,
-                  padding: "10px 12px",
-                  borderRadius: 10,
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  background: feedback.kind === "ok" ? "rgba(0,200,120,0.15)" : "rgba(255,70,70,0.15)",
-                }}
-              >
-                <strong>{feedback.text}</strong>
-              </div>
-            )}
+            <div
+  className={`cd-feedback ${feedback ? "show" : ""} ${feedback?.kind ? `is-${feedback.kind}` : ""}`}
+  aria-live="polite"
+>
+  <strong>{feedback?.text || "\u00A0"}</strong>
+</div>
 
-            <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(5, minmax(120px, 1fr))", gap: 10 }}>
+            <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
               {VERBS.map((v) => (
                 <button
-                  key={v}
-                  type="button"
-                  onClick={() => submitToVerb(v)}
-                  style={{
-                    padding: "14px 10px",
-                    borderRadius: 12,
-                    border: "1px solid rgba(255,255,255,0.15)",
-                    background: "rgba(255,255,255,0.06)",
-                    cursor: selectedId ? "pointer" : "not-allowed",
-                    opacity: selectedId ? 1 : 0.65,
-                    fontWeight: 700,
-                  }}
-                  title={selectedId ? `Submit: ${v}` : "Select a phrase first"}
-                >
-                  {v}
-                </button>
+                key={v}
+                type="button"
+                onClick={() => submitToVerb(v)}
+                className="cd-verb-btn"
+                disabled={!selectedId}
+                title={selectedId ? `Submit: ${v}` : "Select a phrase first"}
+              >
+                {v}
+              </button>
               ))}
             </div>
 
@@ -246,33 +232,33 @@ export default function CollocationDash({ user, onRequireSignIn }) {
                   const active = selectedId === it.phrase;
                   return (
                     <button
-                      key={it.phrase}
-                      type="button"
-                      onClick={() => setSelectedId(it.phrase)}
-                      style={{
-                        textAlign: "left",
-                        padding: "12px 12px",
-                        borderRadius: 12,
-                        border: active ? "1px solid rgba(255,255,255,0.55)" : "1px solid rgba(255,255,255,0.15)",
-                        background: active ? "rgba(255,255,255,0.10)" : "rgba(255,255,255,0.05)",
-                      }}
-                    >
+  key={it.phrase}
+  type="button"
+  onClick={() => setSelectedId(it.phrase)}
+  className={`cd-phrase-btn ${active ? "active" : ""}`}
+>
                       <div style={{ fontWeight: 700 }}>{it.phrase}</div>
                       {it.hint ? (
-                        <div style={{ fontSize: 12, opacity: 0.8, marginTop: 4 }}>{it.hint}</div>
-                      ) : (
-                        <div style={{ fontSize: 12, opacity: 0.5, marginTop: 4 }}> </div>
-                      )}
-                    </button>
+    <div className="cd-hint">{it.hint}</div>
+  ) : (
+    <div className="cd-hint"> </div>
+  )}
+</button>
                   );
                 })}
               </div>
             </div>
 
             <div style={{ marginTop: 18, display: "flex", gap: 10, flexWrap: "wrap" }}>
-              <button className="review-btn" onClick={restart}>Restart</button>
-              <button className="review-btn" onClick={endGame}>End game</button>
-            </div>
+  <button className="review-btn" onClick={restart}>Restart</button>
+  <button
+    className="review-btn"
+    onClick={endGame}
+    style={{ borderColor: "rgba(255,70,70,0.45)" }}
+  >
+    End game
+  </button>
+</div>
           </>
         )}
 
@@ -312,6 +298,100 @@ export default function CollocationDash({ user, onRequireSignIn }) {
             </div>
           </div>
         )}
+      {/* Collocation Dash scoped styles */}
+      <style>{`
+          .cd-feedback {
+            min-height: 52px;
+            margin-top: 12px;
+            margin-bottom: 14px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+            opacity: 0;
+            transform: translateY(-4px);
+            transition: opacity 120ms ease, transform 120ms ease;
+            display: flex;
+            align-items: center;
+            font-weight: 800;
+          }
+
+          .cd-feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+          }
+
+          .cd-verb-btn {
+            padding: 16px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.18);
+            background: rgba(255,255,255,0.08);
+            color: #e6f0ff;
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            transition: transform 80ms ease, box-shadow 80ms ease, border-color 80ms ease, background 80ms ease;
+          }
+
+          .cd-verb-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+            border-color: rgba(255,255,255,0.28);
+          }
+
+          .cd-verb-btn:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+            transform: none;
+            box-shadow: none;
+          }
+
+          .cd-phrase-btn {
+            text-align: left;
+            padding: 12px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: #e6f0ff;
+            cursor: pointer;
+            transition: transform 80ms ease, box-shadow 80ms ease, border-color 80ms ease, background 80ms ease;
+          }
+
+          .cd-phrase-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+            border-color: rgba(255,255,255,0.28);
+          }
+
+          .cd-phrase-btn.active {
+            border-color: rgba(110,180,255,0.95);
+            background: rgba(110,180,255,0.14);
+            box-shadow: 0 0 0 3px rgba(110,180,255,0.25);
+          }
+          .cd-feedback.is-ok {
+  background: rgba(0,200,120,0.15);
+}
+
+.cd-feedback.is-bad {
+  background: rgba(255,70,70,0.15);
+}
+.cd-phrase-btn {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
+.cd-phrase-btn div {
+  color: inherit;
+}
+
+.cd-hint {
+  color: rgba(230,240,255,0.72);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+        `}</style>
       </div>
     </div>
   );
