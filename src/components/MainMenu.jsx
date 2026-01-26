@@ -87,6 +87,14 @@ export default function MainMenu({ onSelect, user }) {
   <p>See your progress and review saved work.</p>
 </button>
 
+{/* Course Pack – only for authorised users */}
+{user?.courseAccess?.["seif-pack-v1"] && (
+  <button className="menu-card" onClick={() => navigate("/course-pack")}>
+    <h3>Course Pack</h3>
+    <p>View the Seif Aptis Trainer Pack (PDF) inside the app.</p>
+  </button>
+)}
+
 {/* Admin tools – only for admins */}
 {user?.role === "admin" && (
   <button

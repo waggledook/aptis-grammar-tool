@@ -36,6 +36,11 @@ body {
   background: transparent;  /* let the body’s navy show behind */
 }
 
+.App--full {
+  max-width: none;
+  width: 100%;
+}
+
 /* === CONTENT CARD === */
 .content-container {
   background: #12254b;
@@ -671,6 +676,18 @@ button {
   border-color: #2a3d6e;
   color: #cfe2ff;
 }
+
+.content-container--full {
+  width: 100%;
+  max-width: none;         /* remove any max-width constraint */
+}
+
+/* optional: if your normal container has heavy side padding/margins */
+.content-container--full {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
 
 
 

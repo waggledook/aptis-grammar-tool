@@ -78,6 +78,28 @@ export default function AdminDashboard({ user }) {
     return <p>⛔ You do not have permission to view this page.</p>;
   }
 
+  // ── Course pack access ────────────────────────────────────────────────
+const PACK_ID = "seif-pack-v1";
+
+async function setPackAccess(uid, allowed) {
+  await updateDoc(doc(db, "users", uid), {
+    [`courseAccess.${PACK_ID}`]: allowed,
+  });
+
+  setUsers((prev) =>
+    prev.map((u) => {
+      if (u.id !== uid) return u;
+      return {
+        ...u,
+        courseAccess: { ...(u.courseAccess || {}), [PACK_ID]: allowed },
+      };
+    })
+  );
+}
+
+const hasPack = (u) => !!(u.courseAccess && u.courseAccess[PACK_ID]);
+
+
   // Teachers = users who can appear in the dropdown
   const teachers = users.filter(
     (u) => u.role === "teacher" || u.role === "admin" // admins can also be teachers
@@ -403,6 +425,24 @@ export default function AdminDashboard({ user }) {
                   >
                     {renderTeacherControl(u)}
 
+                    {/* ✅ paste it here */}
+  <label
+    style={{
+      display: "inline-flex",
+      gap: "0.5rem",
+      alignItems: "center",
+      fontSize: "0.82rem",
+      opacity: 0.9,
+    }}
+  >
+    <input
+      type="checkbox"
+      checked={hasPack(u)}
+      onChange={(e) => setPackAccess(u.id, e.target.checked)}
+    />
+    Pack access (seif-pack-v1)
+  </label>
+
                     <button
                       className="ghost-btn"
                       style={{
@@ -503,21 +543,39 @@ export default function AdminDashboard({ user }) {
                       </td>
 
                       {/* Role + teacher, stacked */}
-                      <td style={{ padding: "0.35rem 0.25rem" }}>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "0.25rem",
-                            alignItems: "flex-start",
-                          }}
-                        >
-                          <span className="badge subtle small">
-                            {u.role}
-                          </span>
-                          {renderTeacherControl(u)}
-                        </div>
-                      </td>
+<td style={{ padding: "0.35rem 0.25rem" }}>
+  <div
+    style={{
+      display: "flex",
+      flexDirection: "column",
+      gap: "0.25rem",
+      alignItems: "flex-start",
+    }}
+  >
+    <span className="badge subtle small">{u.role}</span>
+
+    {renderTeacherControl(u)}
+
+    <label
+      style={{
+        display: "inline-flex",
+        gap: "0.5rem",
+        alignItems: "center",
+        fontSize: "0.78rem",
+        opacity: 0.85,
+        marginTop: "0.15rem",
+      }}
+    >
+      <input
+        type="checkbox"
+        checked={hasPack(u)}
+        onChange={(e) => setPackAccess(u.id, e.target.checked)}
+      />
+      Pack access
+    </label>
+  </div>
+</td>
+
 
                       {/* Role actions */}
                       <td

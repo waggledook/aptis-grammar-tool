@@ -1,6 +1,6 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react'
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { auth, doSignOut, fetchSeenGrammarItemIds, db, ensureUserProfile } from "./firebase";
 import { onAuthStateChanged }      from 'firebase/auth'
 import AuthForm                    from './components/AuthForm'
@@ -61,6 +61,7 @@ import SpeakingPart3Comparatives from "./components/speaking/SpeakingPart3Compar
 import VocabMistakeReview from "./components/vocabulary/VocabMistakeReview";
 import RequireTeacher from "./components/common/RequireTeacher.jsx";
 import SpeakingPart3SimilaritiesExtras from "./components/teacher/SpeakingPart3SimilaritiesExtras.jsx";
+import CoursePackViewer from "./components/coursepack/CoursePackViewer";
 
 
 
@@ -71,6 +72,8 @@ const [user,     setUser]     = useState(null)
 const [showAuth, setShowAuth] = useState(false)
 const [view, setView] = useState('menu'); // 'menu' | 'grammar' | 'readingMenu' | 'reading' | 'readingGuide' | 'mistakes' | 'favourites' | 'speakingMenu' | 'speakingPart2' |
 const navigate = useNavigate();  // 👈 add this
+const location = useLocation();
+const isCoursePack = location.pathname.startsWith("/course-pack");
 
 useEffect(() => {
   const unsub = onAuthStateChanged(auth, async (u) => {
@@ -90,10 +93,11 @@ useEffect(() => {
       setUser({
         ...u,
         role: data.role || "student",
+        courseAccess: data.courseAccess || {},
       });
     } catch (err) {
       console.error("Failed to read user role:", err);
-      setUser({ ...u, role: "student" });
+      setUser({ ...u, role: "student", courseAccess: {} });
     }
   });
 
@@ -322,10 +326,10 @@ const [runKey,  setRunKey]  = useState(0);
   // — RENDER MAIN APP —
 return (
   // in src/App.jsx (inside your App component’s return)
-  <div className="App">
+  <div className={`App ${isCoursePack ? "App--full" : ""}`}>
     <ToastHost />
     <CookieBanner />
-    <div className="content-container">
+    <div className={`content-container ${isCoursePack ? "content-container--full" : ""}`}>
       {/* Auth bar */}
     <div
   style={{
@@ -835,6 +839,20 @@ return (
 />
 
 <Route
+  path="/course-pack"
+  element={
+    user?.courseAccess?.["seif-pack-v1"] ? (
+      <CoursePackViewer />
+    ) : (
+      <p className="muted" style={{ padding: "1rem" }}>
+        You don’t have access to the course pack yet.
+      </p>
+    )
+  }
+/>
+
+
+<Route
   path="/teacher/student/:studentId"
   element={<TeacherStudentProfile user={user} />}
 />
@@ -849,6 +867,7 @@ return (
     onSelect={(next) => setView(next)}
     user={user}               // 👈 pass user down
   />
+  
 )}
 
         {view === 'grammar' && <GrammarPage />}

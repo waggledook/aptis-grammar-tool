@@ -44,7 +44,7 @@ const firebaseConfig = {
   apiKey: "AIzaSyCvpE87D16safq68oFB4fJKPyCURsc-mrU",
   authDomain: "examplay-auth.firebaseapp.com",
   projectId: "examplay-auth",
-  storageBucket: "examplay-auth.appspot.com",
+  storageBucket: "examplay-auth.firebasestorage.app",
   messagingSenderId: "654835226958",
   appId: "1:654835226958:web:a95cd8da4adb09c8a5661f",
   measurementId: "G-DMMT8D3XBR",
