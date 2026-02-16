@@ -73,20 +73,32 @@ useEffect(() => {
   };
 
   // keyboard shortcuts
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.code === "Space") {
-        e.preventDefault();
-        flip();
-      } else if (e.key === "ArrowRight") {
-        goNext();
-      } else if (e.key === "ArrowLeft") {
-        goPrev();
-      }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  });
+useEffect(() => {
+  const handler = (e) => {
+    // Don't hijack keys while the user is typing
+    const t = e.target;
+    const tag = t?.tagName;
+    const isTypingField =
+      tag === "INPUT" ||
+      tag === "TEXTAREA" ||
+      t?.isContentEditable;
+
+    if (isTypingField) return;
+
+    if (e.code === "Space") {
+      e.preventDefault();
+      flip();
+    } else if (e.key === "ArrowRight") {
+      goNext();
+    } else if (e.key === "ArrowLeft") {
+      goPrev();
+    }
+  };
+
+  window.addEventListener("keydown", handler);
+  return () => window.removeEventListener("keydown", handler);
+}, [flip, goNext, goPrev]);
+
 
   if (!current) return null;
 

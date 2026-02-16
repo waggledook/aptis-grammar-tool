@@ -1910,7 +1910,7 @@
         "explanations": [
           "Correct: 'a great deal of' is appropriate for uncountable nouns like 'coverage'. 'a great/good deal of' are more formal ways of saying 'a lot of'.",
           "Incorrect: 'a large number of' is used with countables.",
-          "Incorrect: 'a lot' is missing the preposition 'of' here."
+          "Incorrect: 'a few' is used with countable nouns."
         ]
       },
       {
@@ -2431,7 +2431,7 @@
         "explanations": [
           "Correct: 'don't have to' suggests it isn't necessary.",
           "'can't' = impossibility/prohibition, which is too strong here.",
-          "'mustn't have' = mustn't have is to describe past deductions, (it was impossible) and goes with past participle. You could say 'mustn't bring', but it's a bit strong. "
+          "'mustn't' = suggests prohibition, which is too strong here: the sentence is saying it's unnecessary, not forbidden."
         ]
       },
       {
@@ -2442,7 +2442,7 @@
         "options": ["could", "can't", "must"],
         "answerIndex": 1,
         "explanations": [
-          "A possibility, but then the lights would be on.",
+          "A possibility: but this doesn't make sense with the lights being off.",
           "Correct: strong negative deduction: they are definitely not at home.",
           "Strong positive deduction: they are definitely at home, but then the lights would be on."
         ]

@@ -250,6 +250,7 @@ export default function CoursePackViewer() {
 
         <div style={ui.bar}>
   <button
+    type="button"
     onClick={prevPage}
     disabled={page <= 1}
     style={{ ...ui.btn, ...(page <= 1 ? ui.disabled : null) }}
@@ -260,6 +261,7 @@ export default function CoursePackViewer() {
   <span style={ui.pill}>{page} / {numPages || "…"}</span>
 
   <button
+    type="button"
     onClick={nextPage}
     disabled={!!numPages && page >= numPages}
     style={{ ...ui.btn, ...(!!numPages && page >= numPages ? ui.disabled : null), ...ui.btnPrimary }}
@@ -270,30 +272,31 @@ export default function CoursePackViewer() {
   <div style={ui.divider} />
 
   {/* Jump */}
-<div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-  <input
-    value={pageInput}
-    onChange={(e) => setPageInput(e.target.value.replace(/[^\d]/g, ""))}
-    onKeyDown={(e) => {
-      if (e.key === "Enter") goToPage(Number(pageInput || "1"));
-    }}
-    inputMode="numeric"
-    placeholder="Pg"
-    style={{
-      ...ui.input,
-      width: 48,
-      minWidth: 48,
-      padding: "6px 8px",
-      textAlign: "center",
-    }}
-  />
-  <button
-    onClick={() => goToPage(Number(pageInput || "1"))}
-    style={{ ...ui.btn, ...ui.btnSoft }}
-  >
-    Go
-  </button>
-</div>
+  <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+    <input
+      value={pageInput}
+      onChange={(e) => setPageInput(e.target.value.replace(/[^\d]/g, ""))}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") goToPage(Number(pageInput || "1"));
+      }}
+      inputMode="numeric"
+      placeholder="Pg"
+      style={{
+        ...ui.input,
+        width: 48,
+        minWidth: 48,
+        padding: "6px 8px",
+        textAlign: "center",
+      }}
+    />
+    <button
+      type="button"
+      onClick={() => goToPage(Number(pageInput || "1"))}
+      style={{ ...ui.btn, ...ui.btnSoft }}
+    >
+      Go
+    </button>
+  </div>
 
   <select
     value=""
@@ -316,6 +319,7 @@ export default function CoursePackViewer() {
 
   {/* Zoom */}
   <button
+    type="button"
     onClick={() => setZoom((z) => Math.max(0.5, +(z - 0.1).toFixed(1)))}
     style={{ ...ui.btn, ...ui.btnIcon }}
     aria-label="Zoom out"
@@ -324,19 +328,20 @@ export default function CoursePackViewer() {
   </button>
 
   <span
-  style={{
-    fontSize: 13,
-    opacity: 0.9,
-    minWidth: 0,       // was 52 (or more)
-    textAlign: "center",
-    lineHeight: 1,
-    padding: "0 1px",   // keep it tight
-  }}
->
-  {Math.round(zoom * 100)}%
-</span>
+    style={{
+      fontSize: 13,
+      opacity: 0.9,
+      minWidth: 0,
+      textAlign: "center",
+      lineHeight: 1,
+      padding: "0 1px",
+    }}
+  >
+    {Math.round(zoom * 100)}%
+  </span>
 
   <button
+    type="button"
     onClick={() => setZoom((z) => Math.min(2.5, +(z + 0.1).toFixed(1)))}
     style={{ ...ui.btn, ...ui.btnIcon }}
     aria-label="Zoom in"
@@ -344,11 +349,11 @@ export default function CoursePackViewer() {
     +
   </button>
 
-  <button onClick={resetZoom} style={{ ...ui.btn, ...ui.btnSoft }}>
+  <button type="button" onClick={resetZoom} style={{ ...ui.btn, ...ui.btnSoft }}>
     Reset
   </button>
 
-  <button onClick={openOverlay} style={{ ...ui.btn, ...ui.btnPrimary }}>
+  <button type="button" onClick={openOverlay} style={{ ...ui.btn, ...ui.btnPrimary }}>
     Full screen
   </button>
 </div>
