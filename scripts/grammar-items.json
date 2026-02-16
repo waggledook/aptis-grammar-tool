@@ -4486,5 +4486,200 @@
               "Incorrect: 'we realised' is normal word order and doesn’t follow the 'only + adverbial' inversion rule. We could say 'We only realised after..' but not when starting with 'only'.",
               "Incorrect: 'we did realise' is emphatic but not inverted."
             ]
-          }        
+          },
+            {
+              "id": "a1_qf_02",
+              "level": "A2",
+              "tag": "Question forms",
+              "sentence": "___ from Spain?",
+              "options": ["Are you", "You are", "Do you are"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: With 'be', we invert: 'Are you…?'",
+                "Incorrect: 'You are…?' is statement order (only possible as an echo question with special intonation).",
+                "Incorrect: 'Do you are' mixes 'do' with 'be' (we don't use do-support with 'be')."
+              ]
+            },
+            {
+              "id": "a1_qf_03",
+              "level": "A2",
+              "tag": "Question forms",
+              "sentence": "Where ___ live?",
+              "options": ["do you", "you do", "are you"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: Present simple questions use do-support: 'Where do you live?'",
+                "Incorrect: We need inversion of the subject and auxiliary; 'Where you do live?' is not standard question word order.", 
+                "Incorrect: 'Where are you live?' incorrectly uses 'be' with 'live'. we could use the continuous form 'Where are you living?'."
+              ]
+            },
+            {
+              "id": "a2_qf_01",
+              "level": "B1",
+              "tag": "Question forms",
+              "sentence": "___ any brothers or sisters?",
+              "options": ["Have you got", "Do you got", "Are you got"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: 'Have you got…?' is a common BrE question form for possession.",
+                "Incorrect: We can use do you have in present simple, but 'Do you got' is not correct.",
+                "Incorrect: 'Are you got' is not a valid question structure."
+              ]
+            },
+            {
+              "id": "a2_qf_02",
+              "level": "A2",
+              "tag": "Question forms",
+              "sentence": "What time ___ up on weekdays?",
+              "options": ["do you get", "you get", "are you get"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: Present simple question → 'do you get'.",
+                "Incorrect: Missing auxiliary; 'What time you get up' is not standard question word order.",
+                "Incorrect: 'are you get' incorrectly uses 'be' with a base verb."
+              ]
+            },
+            {
+              "id": "a2_qf_03",
+              "level": "A2",
+              "tag": "Question forms",
+              "sentence": "___ a doctor or a nurse?",
+              "options": ["Are you", "Do you be", "Is you"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: With jobs/identity, we use 'be': 'Are you…?'",
+                "Incorrect: 'Do you a doctor…?' is ungrammatical (missing verb).",
+                "Incorrect: 'Have you a doctor…?' doesn't fit this meaning (possession, not identity)."
+              ]
+            },
+            {
+              "id": "a2_qf_have_01",
+              "level": "A2",
+              "tag": "Question forms",
+              "sentence": "___ any brothers or sisters?",
+              "options": ["Don't you have", "Have you", "Haven't you"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: In this case 'have' is the main verb, so we need the auxiliary 'do' for questions: 'Do you have…?'",
+                "Incorrect: 'Have you…?' is not correct here because 'have' is a main verb, not an auxiliary. We use 'have you' in the present perefect (plus participle).",
+                "Incorrect: 'Haven't you…?' is a negative question and doesn’t fit a neutral question about possession here."
+              ]
+            },
+            {
+              "id": "b1_qf_01",
+              "level": "B2",
+              "tag": "Question forms",
+              "sentence": "How long ___ English?",
+              "options": ["have you been studying", "are you studying", "do you study"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: For duration up to now → present perfect continuous is natural: 'have you been studying'.",
+                "Incorrect: We need present perfect for questions using 'how long' to ask about duration up to now. Present continuous is not used for this meaning.",
+                "Incorrect: Present simple usually describes routine/habit, not duration up to now."
+              ]
+            },
+            {
+              "id": "b1_qf_02",
+              "level": "B1",
+              "tag": "Question forms",
+              "sentence": "Why ___ me last night?",
+              "options": ["didn't you call", "you didn't call", "haven't you called"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: Past time marker ('last night') → past simple question (negative) with inversion: 'didn't you call'.",
+                "Incorrect: we need to invert the subject and auxiliary here.",
+                "Incorrect: Present perfect doesn't fit well with a finished past time ('last night')."
+              ]
+            },
+            {
+              "id": "b1_qf_03",
+              "level": "A2",
+              "tag": "Question forms",
+              "sentence": "___ want to come with us, or would you rather stay in?",
+              "options": ["Do you", "Are you", "Have you"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: Present simple question about preference → 'Do you want…?'",
+                "Incorrect: 'Are you want…?' is ungrammatical (mixing 'be' with a lexical verb).",
+                "Incorrect: 'Have you want…?' is ungrammatical."
+              ]
+            },
+            {
+              "id": "b2_qf_01",
+              "level": "B2",
+              "tag": "Question forms",
+              "sentence": "What ___ so late last night?",
+              "options": ["kept you", "did you keep", "did it keep you"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: 'What kept you…?' is a subject question: 'what' is the subject, so no auxiliary 'did' is needed.",
+                "Incorrect: Subject questions do not use 'did' here; 'What did you keep…?' is ungrammatical. The subject is 'what', you is the object.",
+                "Incorrect: Adds an unnecessary subject ('it') and changes the structure."
+              ]
+            },
+            {
+              "id": "b2_qf_03",
+              "level": "B2",
+              "tag": "Question forms",
+              "sentence": "___ you mind if I opened the window?",
+              "options": ["Would", "Do", "Will"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: Polite request pattern: 'Would you mind if…?', matches the past tense 'opened' in the if-clause.",
+                "Incorrect: do you mind if I open the window? is possible but here we have 'opened', so we need a second conditional..",
+                "Incorrect: 'Will you mind…?' is not the standard polite structure."
+              ]
+            },
+            {
+              "id": "b2_qf_05",
+              "level": "B2",
+              "tag": "Question forms",
+              "sentence": "___ to tell me what happened, or is it private?",
+              "options": ["Are you willing", "Do you willing", "Are you will"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: 'be + adjective' question: 'Are you willing…?'",
+                "Incorrect: Missing 'be': 'Do you willing…?' is ungrammatical.",
+                "Incorrect: 'Are you will' is ungrammatical; 'will' is not an adjective here."
+              ]
+            },
+            {
+              "id": "c1_qf_04",
+              "level": "B2",
+              "tag": "Question forms",
+              "sentence": "I was wondering if you could tell me what time ___.",
+              "options": ["the bank closes", "does the bank close", "the bank close"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: Indirect question → no auxiliary do, and third person singular needs -s: 'the bank closes'.",
+                "Incorrect: In indirect questions we don't invert the subject and auxiliary.",
+                "Incorrect: Missing -s for third person singular in present simple."
+              ]
+            },
+            {
+              "id": "c1_qf_pf_02",
+              "level": "C1",
+              "tag": "Question forms",
+              "sentence": "Could you tell me ___ I should address the complaint?",
+              "options": ["to whom", "who", "to who"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: We need a preposition 'to' with address, and if we place 'to' before the question word, we use 'whom': 'to whom I should address it'.",
+                "Incorrect: 'who' would be fine only if the preposition stayed at the end (e.g., 'who I should address it to'), but not with fronting in this form.",
+                "Incorrect: 'to who' is non-standard; when we use the formal form with the preposition first ('to whom'), we need 'whom' not 'who'."
+              ]
+            },
+            {
+              "id": "b1_qf_itwith_01",
+              "level": "B2",
+              "tag": "Question forms",
+              "sentence": "What did you ___?",
+              "options": ["open it with", "open with", "open it"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: In spoken English, we usually place the preposition at the end of the sentence. We also need the object 'it'.",
+                "Incorrect: 'open with' is missing the object after the verb.",
+                "Incorrect: 'open it' is missing the preposition, which is needed to complete the meaning of the question. We could say 'What did you open?' but not 'What did you open it?' without the preposition."
+              ]
+            }
   ]
