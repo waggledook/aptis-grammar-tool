@@ -27,8 +27,10 @@ export default function useTags() {
           .flat();
 
         // De‑duplicate while preserving insertion order
-        const unique = Array.from(new Set(allTags));
-
+        const unique = Array.from(new Set(allTags)).sort((a, b) =>
+          a.localeCompare(b, "en", { sensitivity: "base" })
+        );
+        
         setTags(unique);
       } catch (err) {
         if (!cancelled) setError(err);

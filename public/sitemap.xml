@@ -1,94 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Main Menu -->
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/</loc>
-    <priority>1.0</priority>
-  </url>
 
-  <!-- Grammar -->
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/grammar</loc>
-    <priority>0.9</priority>
-  </url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/</loc></url>
 
-  <!-- Reading -->
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/reading</loc>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/reading/part2</loc>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/reading/part2-guide</loc>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/reading/part3</loc>
-    <priority>0.8</priority>
-  </url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/grammar</loc></url>
 
-  <!-- Speaking -->
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/speaking</loc>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/speaking/part1</loc>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/speaking/part2</loc>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/speaking/part3</loc>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/speaking/part4</loc>
-  </url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/reading</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/reading/part1</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/reading/part2</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/reading/part2-guide</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/reading/part3</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/reading/part4</loc></url>
 
-  <!-- Writing -->
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/writing</loc>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/writing/part1</loc>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/writing/part1-guide</loc>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/writing/part4</loc>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/writing/part4-guide</loc>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/writing/part4-register</loc>
-  </url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/speaking</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/speaking/part1</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/speaking/part2</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/speaking/part3</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/speaking/part4</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/speaking/photo-guide</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/speaking/part3-comparing</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/speaking/part3-comparing/language</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/speaking/part3-comparing/similarities</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/speaking/part3-comparing/comparatives</loc></url>
 
-  <!-- Vocabulary -->
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/vocabulary</loc>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/vocabulary/topics</loc>
-  </url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/vocabulary</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/vocabulary/topics</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/vocabulary/collocations</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/vocabulary/collocations/dash</loc></url>
 
-  <!-- Profile (lower priority, non-indexed in some cases) -->
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/profile</loc>
-    <priority>0.4</priority>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/profile/mistakes</loc>
-    <priority>0.3</priority>
-  </url>
-  <url>
-    <loc>https://aptis-trainer.beeskillsenglish.com/profile/favourites</loc>
-    <priority>0.3</priority>
-  </url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/writing</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/writing/part1</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/writing/part1-guide</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/writing/part2</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/writing/part3</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/writing/part4</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/writing/part4-guide</loc></url>
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/writing/part4-register</loc></url>
+
+  <url><loc>https://aptis-trainer.beeskillsenglish.com/privacy</loc></url>
+
 </urlset>

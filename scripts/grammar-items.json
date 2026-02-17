@@ -288,7 +288,7 @@
     {
       "id": "c1_advmod_01",
       "level": "B1",
-      "tag": "Adverb Modification",
+      "tag": "Adverbs",
       "sentence": "He drives ___ fast for such narrow roads.",
       "options": ["too", "very", "enough"],
       "answerIndex": 0,
@@ -366,7 +366,7 @@
     {
       "id": "b1_wordorder_01",
       "level": "B1",
-      "tag": "Adverb position",
+      "tag": "Adverbs",
       "sentence": "She  ___ her homework in the library.",
       "options": ["frequent does", "does often", "often does"],
       "answerIndex": 2,
