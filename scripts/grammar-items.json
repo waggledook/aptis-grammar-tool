@@ -4681,5 +4681,448 @@
                 "Incorrect: 'open with' is missing the object after the verb.",
                 "Incorrect: 'open it' is missing the preposition, which is needed to complete the meaning of the question. We could say 'What did you open?' but not 'What did you open it?' without the preposition."
               ]
-            }
+            },
+            {
+              "id": "b1_qf_indir_02",
+              "level": "B1",
+              "tag": "Question forms",
+              "sentence": "Could you tell me where ___?",
+              "options": ["the station is", "is the station", "does the station be"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: Indirect questions use statement word order (Subject + Verb).",
+                "Incorrect: 'is the station' is the order for a direct question, buy after 'Could you tell me where' we need an affirmative statement order.",
+                "Incorrect: 'does the station be' is ungrammatical."
+              ]
+            },
+            {
+              "id": "b1_qf_subj_01",
+              "level": "B1",
+              "tag": "Question forms",
+              "sentence": "Who ___ the window? It's freezing in here.",
+              "options": ["opened", "did open", "did he open"],
+              "answerIndex": 0,
+              "explanations": [
+                "Correct: This is a subject question (Who performed the action?), so no 'did' is needed.",
+                "Incorrect: 'did open' would only be used for emphasis, which is unlikely here.",
+                "Incorrect: 'did he open' is for an object question where the subject is known."
+              ]
+            },
+              {
+                "id": "pv_01",
+                "level": "A2",
+                "tag": "Phrasal verbs",
+                "sentence": "Please don’t forget to turn ___ the lights before you leave.",
+                "options": ["off", "on", "up"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'turn off' means switch off (stop the light).",
+                  "Incorrect: 'turn on' means switch on, the opposite meaning.",
+                  "Incorrect: 'turn up' means increase (volume/heat), not switch a light off."
+                ]
+              },
+              {
+                "id": "pv_02",
+                "level": "B1",
+                "tag": "Phrasal verbs",
+                "sentence": "At 10:30 am, the plane took ___.",
+                "options": ["off", "out", "on"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'take off' means leave the ground (for a plane).",
+                  "Incorrect: 'take out' means remove something or go somewhere with someone.",
+                  "Incorrect: 'take on' means accept work/responsibility or employ someone."
+                ]
+              },
+              {
+                "id": "pv_03",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "I’m sorry to let you ___, but I can’t come to your party.",
+                "options": ["down", "under", "on"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'let someone down' means disappoint someone.",
+                  "Incorrect: 'let you under' is not a phrasal verb in this meaning.",
+                  "Incorrect: 'let you on' means allow someone to know a secret / deceive someone."
+                ]
+              },
+              {
+                "id": "pv_04",
+                "level": "B1",
+                "tag": "Phrasal verbs",
+                "sentence": "I can’t put ___ the noise from the neighbours any more.",
+                "options": ["up with", "up", "on with"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'put up with' means tolerate something unpleasant.",
+                  "Incorrect: 'put up to' doesn’t mean tolerate (it’s used in patterns like 'put someone up to something' = encourage them to do it).",
+                  "Incorrect: 'put on with' is not the correct verb; we say 'carry on with' for continuing."
+                ]
+              },
+              {
+                "id": "pv_05",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "I’m really looking forward ___ you again.",
+                "options": ["to seeing", "to see", "for seeing"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'look forward to' + -ing: 'to seeing'. ('to' is a preposition here, we can also use a noun).",
+                  "Incorrect: 'to see' is not the standard pattern after 'look forward to'.",
+                  "Incorrect: 'for seeing' is ungrammatical here; the fixed expression is 'look forward to' + noun / verb-ing."
+                ]
+              },
+              {
+                "id": "pv_06",
+                "level": "B1",
+                "tag": "Phrasal verbs",
+                "sentence": "He’s always making ___ stories — don’t believe everything he says.",
+                "options": ["up", "out", "off"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'make up' means invent (a story/excuse).",
+                  "Incorrect: 'make out' can mean understand/pretend, but not 'invent stories' in this way.",
+                  "Incorrect: 'make off' means leave quickly (often after stealing)."
+                ]
+              },
+              {
+                "id": "pv_07",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "My grandfather is the person I most look ___.",
+                "options": ["up to", "up", "after"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'look up to' means admire and respect someone.",
+                  "Incorrect: 'look up' means search for information (e.g., look up a word).",
+                  "Incorrect: 'look after' means take care of someone/something."
+                ]
+              },
+              {
+                "id": "pv_08",
+                "level": "B1",
+                "tag": "Phrasal verbs",
+                "sentence": "I used to smoke 20 a day, then I gave ___ completely.",
+                "options": ["up", "out", "off"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'give up' means stop doing something you regularly do.",
+                  "Incorrect: 'give out' means distribute or stop working (for machines).",
+                  "Incorrect: 'give off' means produce (a smell/light/heat)."
+                ]
+              },
+              {
+                "id": "pv_09",
+                "level": "B1",
+                "tag": "Phrasal verbs",
+                "sentence": "We don’t get ___ any more — we argued and stopped being friends.",
+                "options": ["on", "up", "by"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'get on (with someone)' means have a friendly relationship.",
+                  "Incorrect: 'get up' means stand up / rise / wake up.",
+                  "Incorrect: 'get by' means manage (financially or in a situation), not relationship."
+                ]
+              },
+              {
+                "id": "pv_10",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "The factory is planning to take ___ more employees next month.",
+                "options": ["on", "up", "over"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'take on' means employ/accept new staff or responsibilities.",
+                  "Incorrect: 'take up' means start a hobby/activity or use space/time.",
+                  "Incorrect: 'take over' means take control of a business/job."
+                ]
+              },
+              {
+                "id": "pv_11",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "Eva didn’t turn ___ until much later, so the meeting started without her.",
+                "options": ["up", "off", "out"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'turn up' means arrive (often late/unexpectedly).",
+                  "Incorrect: 'turn off' means switch off or stop liking something.",
+                  "Incorrect: 'turn out' means happen in the end / be discovered (not 'arrive')."
+                ]
+              },
+              {
+                "id": "pv_12",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "He turned ___ the job offer because he wanted something different.",
+                "options": ["down", "up", "out"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'turn down' means reject an offer/request.",
+                  "Incorrect: 'turn up' means arrive or increase (volume/heat).",
+                  "Incorrect: 'turn out' means result/happen, not reject."
+                ]
+              },
+              {
+                "id": "pv_13",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "I came ___ my old school reports while I was tidying my room.",
+                "options": ["across", "up with", "across with"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'come across' means find something by chance.",
+                  "Incorrect: 'come up with' means think of an idea/solution, not find by chance.",
+                  "Incorrect: 'come across' does not take the preposition 'with' in English."
+                ]
+              },
+              {
+                "id": "pv_14",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "We need to come ___ a solution before Friday.",
+                "options": ["up with", "across", "after"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'come up with' means think of (an idea/solution).",
+                  "Incorrect: 'come across' means find by chance, not invent a solution.",
+                  "Incorrect: 'come after' means happen later / follow, not create a solution."
+                ]
+              },
+              {
+                "id": "pv_15",
+                "level": "A2",
+                "tag": "Phrasal verbs",
+                "sentence": "Could you look ___ my dog while I’m away this weekend?",
+                "options": ["after", "up", "into"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'look after' means take care of someone/something.",
+                  "Incorrect: 'look up' means search for information.",
+                  "Incorrect: 'look into' means investigate."
+                ]
+              },
+              {
+                "id": "pv_16",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "The police are looking ___ the cause of the fire.",
+                "options": ["into", "up", "up to"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'look into' means investigate to discover facts.",
+                  "Incorrect: 'look up' means to find information, for example in a dictionary, or on the internet.",
+                  "Incorrect: 'look up to' means admire and respect."
+                ]
+              },
+              {
+                "id": "pv_17",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "Researchers are carrying ___ experiments to understand the disease.",
+                "options": ["out", "on", "up"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'carry out' means perform/conduct (research/experiments).",
+                  "Incorrect: 'carry on' means continue, but you 'carry out' experiments.",
+                  "Incorrect: 'carry up' is not used in this meaning."
+                ]
+              },
+              {
+                "id": "pv_18",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "We’ve run ___ milk again — can you buy some?",
+                "options": ["out of", "out", "off of"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'run out of' means use all of something so none is left.",
+                  "Incorrect: 'run out' can work without an object (e.g., 'Time has run out'), but here we need the object 'milk' so we need 'of'.",
+                  "Incorrect: 'run off of' is not a standard phrasal verb in English."
+                ]
+              },
+              {
+                "id": "pv_19",
+                "level": "C1",
+                "tag": "Phrasal verbs",
+                "sentence": "If no one owns ___ breaking the window, the trip will be cancelled.",
+                "options": ["up to", "up for", "up with"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'own up to' means admit/confess you did something wrong.",
+                  "Incorrect: 'own up for' is not the correct preposition (we say 'own up to').",
+                  "Incorrect: 'own up with' is ungrammatical; 'with' doesn’t fit the verb."
+                ]
+              },
+              {
+                "id": "pv_20",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "I can’t make ___ whether to accept the offer or not.",
+                "options": ["up my mind", "out my mind", "over my mind"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'make up my mind' means decide.",
+                  "Incorrect: 'make out my mind' is not a fixed expression for deciding.",
+                  "Incorrect: 'make over my mind' is not used; 'make over' means transfer (property) or change appearance."
+                ]
+              },
+              {
+                "id": "pv_wo_01",
+                "level": "A2",
+                "tag": "Phrasal verbs",
+                "sentence": "It’s too loud. Please turn ___.",
+                "options": ["it down", "down it", "off it"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: With a pronoun object, we put it in the middle: 'turn it down'.",
+                  "Incorrect: 'turn down it' is not used with pronouns in separable phrasal verbs.",
+                  "Incorrect: 'turn off it' has the wrong particle and wrong word order."
+                ]
+              },
+              {
+                "id": "pv_wo_03",
+                "level": "B1",
+                "tag": "Phrasal verbs",
+                "sentence": "I don’t understand this word. Could you look ___ for me?",
+                "options": ["it up", "up it", "it out"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'look it up' = search for information; pronoun goes in the middle.",
+                  "Incorrect: 'look up it' is not standard with pronouns.",
+                  "Incorrect: 'look it out' is not the correct phrasal verb for searching information."
+                ]
+              },
+              {
+                "id": "pv_v_01",
+                "level": "A2",
+                "tag": "Phrasal verbs",
+                "sentence": "I’m trying to stop smoking — I really want to ___ up.",
+                "options": ["give", "take", "make"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'give up' means stop a habit.",
+                  "Incorrect: 'take up' means start a hobby/activity, the opposite idea.",
+                  "Incorrect: 'make up' means invent something (a story/excuse), not stop a habit."
+                ]
+              },
+              {
+                "id": "pv_v_02",
+                "level": "B1",
+                "tag": "Phrasal verbs",
+                "sentence": "Can you ___ up the kids from school today? I’m stuck at work.",
+                "options": ["pick", "take", "bring"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'pick up' means collect someone (e.g., from school).",
+                  "Incorrect: 'take up' means start (a hobby) or use time/space.",
+                  "Incorrect: 'bring up' usually means raise a child or mention a topic."
+                ]
+              },
+              {
+                "id": "pv_v_04",
+                "level": "B1",
+                "tag": "Phrasal verbs",
+                "sentence": "I didn’t understand the joke at first, but then I ___ it out.",
+                "options": ["worked", "made", "brought"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'work out' can mean understand/solve something.",
+                  "Incorrect: 'make out' can mean understand in some contexts, but 'made it out' usually means 'escaped/survived' or 'managed to see'.",
+                  "Incorrect: 'bring out' means make something noticeable or publish/produce something."
+                ]
+              },
+              {
+                "id": "pv_v_06",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "The meeting was ___ because the boss was ill.",
+                "options": ["put off", "turned off", "taken off"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'put off' means postpone.",
+                  "Incorrect: 'turn off' means switch off or make someone lose interest.",
+                  "Incorrect: 'take off' means leave the ground (plane) or remove clothes, not postpone."
+                ]
+              },
+              {
+                "id": "pv_v_12",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "He ran ___ an old friend while he was travelling in Peru.",
+                "options": ["into", "after", "over"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'run into' means meet by chance.",
+                  "Incorrect: 'run after' means chase someone/something.",
+                  "Incorrect: 'run over' means hit with a vehicle or quickly review something."
+                ]
+              },
+              {
+                "id": "pv_c1_looklike_01",
+                "level": "C1",
+                "tag": "Phrasal verbs",
+                "sentence": "Although she ___ her mother in character and sense of humour, they don't get on very well.",
+                "options": ["takes after", "looks like", "reminds of"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'take after' means resemble an older family member in appearance or character; it works naturally with family relationships.",
+                  "Incorrect: 'look like' is used only for physical resemblance, not character or sense of humour.",
+                  "Incorrect: 'reminds of' needs an object: 'reminds me of her mother', not 'reminds of her mother'."
+                ]
+              },
+              {
+                "id": "pv_c1_pattern_01",
+                "level": "C1",
+                "tag": "Phrasal verbs",
+                "sentence": "I was completely ___ by her sudden change of heart — I didn’t see it coming at all.",
+                "options": ["taken aback", "taken away", "taken off"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'taken aback' means surprised/shocked (often suddenly).",
+                  "Incorrect: 'taken away' usually means removed or transported; it doesn’t mean 'surprised' here.",
+                  "Incorrect: 'taken off' means left the ground (plane) or became successful; not 'surprised'."
+                ]
+              },
+              {
+                "id": "pv_adv_heldup_01",
+                "level": "C1",
+                "tag": "Phrasal verbs",
+                "sentence": "Sorry I’m late — I was ___ in traffic for over an hour.",
+                "options": ["held up", "kept up", "hung up"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'held up' means delayed (often by traffic, problems, or interruptions).",
+                  "Incorrect: 'kept up' means continued at the same level or maintained something, not delayed by traffic.",
+                  "Incorrect: 'hung up' usually means ended a phone call, or (informally) became stuck/obsessed, not delayed in traffic."
+                ]
+              },
+              {
+                "id": "pv_setoff_02",
+                "level": "C1",
+                "tag": "Phrasal verbs",
+                "sentence": "Burning toast can easily ___ the smoke alarm.",
+                "options": ["set off", "set up", "set out"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'set off' means trigger an alarm or cause something to start suddenly.",
+                  "Incorrect: 'set up' means arrange/establish something (a meeting, a system).",
+                  "Incorrect: 'set out' means begin a journey with a plan, or explain something clearly."
+                ]
+              },
+              {
+                "id": "pv_setoff_01",
+                "level": "B2",
+                "tag": "Phrasal verbs",
+                "sentence": "We ___ early to avoid the traffic.",
+                "options": ["set off", "took off", "put off"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'set off' means start a journey.",
+                  "Incorrect: 'take off' is used for planes leaving the ground, or clothing being removed.",
+                  "Incorrect: 'put off' means postpone, not start a journey."
+                ]
+              }
+            
   ]
