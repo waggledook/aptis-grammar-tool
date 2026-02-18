@@ -35,6 +35,18 @@ export default function CoursePackViewer() {
     { label: "Core: Grammar", page: 6 },
     { label: "Core: Vocab", page: 16 },
     { label: "Reading: Part 1", page: 21 },
+    { label: "Reading: Part 2", page: 25 },
+    { label: "Reading: Part 3", page: 31 },
+    { label: "Reading: Part 4", page: 37 },
+    { label: "Speaking: Part 1", page: 43 },
+    { label: "Speaking: Part 2", page: 47 },
+    { label: "Speaking: Part 3", page: 57 },
+    { label: "Speaking: Part 4", page: 64 },
+    { label: "Writing: Part 1", page: 71 },
+    { label: "Writing: Part 2", page: 73 },
+    { label: "Writing: Part 3", page: 75 },
+    { label: "Writing: Part 4", page: 77 },
+
   ];
 
   // Safer DPR
