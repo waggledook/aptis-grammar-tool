@@ -62,6 +62,17 @@ import VocabMistakeReview from "./components/vocabulary/VocabMistakeReview";
 import RequireTeacher from "./components/common/RequireTeacher.jsx";
 import SpeakingPart3SimilaritiesExtras from "./components/teacher/SpeakingPart3SimilaritiesExtras.jsx";
 import CoursePackViewer from "./components/coursepack/CoursePackViewer";
+import PackKeyLanding from "./components/coursepack/PackKeyLanding";
+import CoreGrammarKey from "./components/coursepack/CoreGrammarKey";
+import CoreVocabularyKey from "./components/coursepack/CoreVocabularyKey";
+import ReadingPart1Key from "./components/coursepack/ReadingPart1Key";
+import ReadingPart2Key from "./components/coursepack/ReadingPart2Key";
+import ReadingPart3Key from "./components/coursepack/ReadingPart3Key";
+import ReadingPart4Key from "./components/coursepack/ReadingPart4Key";
+
+
+
+
 
 
 
@@ -850,7 +861,94 @@ return (
     )
   }
 />
+<Route
+  path="/pack-key"
+  element={
+    user?.courseAccess?.["seif-pack-v1"] ? (
+      <PackKeyLanding />
+    ) : (
+      <p className="muted" style={{ padding: "1rem" }}>
+        You don’t have access to the pack key yet.
+      </p>
+    )
+  }
+/>
 
+<Route
+  path="/pack-key/core-grammar"
+  element={
+    user?.courseAccess?.["seif-pack-v1"] ? (
+      <CoreGrammarKey />
+    ) : (
+      <p className="muted" style={{ padding: "1rem" }}>
+        You don’t have access to the pack key yet.
+      </p>
+    )
+  }
+/>
+
+<Route
+  path="/pack-key/core-vocabulary"
+  element={
+    user?.courseAccess?.["seif-pack-v1"] ? (
+      <CoreVocabularyKey />
+    ) : (
+      <p className="muted" style={{ padding: "1rem" }}>
+        You don’t have access to the pack key yet.
+      </p>
+    )
+  }
+/>
+
+<Route
+  path="/pack-key/reading-part-1"
+  element={
+    user?.courseAccess?.["seif-pack-v1"] ? (
+      <ReadingPart1Key />
+    ) : (
+      <p className="muted" style={{ padding: "1rem" }}>
+        You don’t have access to the pack key yet.
+      </p>
+    )
+  }
+/>
+
+<Route
+  path="/pack-key/reading-part-2"
+  element={
+    user?.courseAccess?.["seif-pack-v1"]
+      ? <ReadingPart2Key />
+      : <p className="muted" style={{ padding: "1rem" }}>
+          You don’t have access to the pack key yet.
+        </p>
+  }
+/>
+
+<Route
+  path="/pack-key/reading-part-3"
+  element={
+    user?.courseAccess?.["seif-pack-v1"] ? (
+      <ReadingPart3Key />
+    ) : (
+      <p className="muted" style={{ padding: "1rem" }}>
+        You don’t have access to the pack key yet.
+      </p>
+    )
+  }
+/>
+
+<Route
+  path="/pack-key/reading-part-4"
+  element={
+    user?.courseAccess?.["seif-pack-v1"] ? (
+      <ReadingPart4Key />
+    ) : (
+      <p className="muted" style={{ padding: "1rem" }}>
+        You don’t have access to the pack key yet.
+      </p>
+    )
+  }
+/>
 
 <Route
   path="/teacher/student/:studentId"
