@@ -180,6 +180,13 @@ export default function PackKeyLanding() {
   desc="Answer key for Reading Part 4 tasks in the Seif Aptis Trainer pack."
   status="Open"
 />
+
+<Tile
+  to="/pack-key/Speaking-part-1"
+  title="Speaking Part 1"
+  desc="Answer key for Speaking Part 4 tasks in the Seif Aptis Trainer pack."
+  status="Open"
+/>
         </div>
       </div>
     </div>

@@ -69,6 +69,7 @@ import ReadingPart1Key from "./components/coursepack/ReadingPart1Key";
 import ReadingPart2Key from "./components/coursepack/ReadingPart2Key";
 import ReadingPart3Key from "./components/coursepack/ReadingPart3Key";
 import ReadingPart4Key from "./components/coursepack/ReadingPart4Key";
+import SpeakingPart1Key from "./components/coursepack/SpeakingPart1Key";
 
 
 
@@ -949,6 +950,18 @@ return (
     )
   }
 />
+
+<Route
+  path="/pack-key/speaking-part-1"
+  element={
+    user?.courseAccess?.["seif-pack-v1"]
+      ? <SpeakingPart1Key />
+      : <p className="muted" style={{ padding: "1rem" }}>
+          You don’t have access to the pack key yet.
+        </p>
+  }
+/>
+
 
 <Route
   path="/teacher/student/:studentId"
