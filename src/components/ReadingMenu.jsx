@@ -37,6 +37,12 @@ export default function ReadingMenu() {
           <h3>Part 3: Matching Opinions</h3>
           <p>Read four short comments and decide who says what.</p>
         </button>
+
+        {/* 🧠 Part 4: Heading Matching */}
+<button className="card" onClick={() => navigate("/reading/part4")}>
+  <h3>Part 4: Heading Matching</h3>
+  <p>Match headings to paragraphs (one heading is extra).</p>
+</button>
       </div>
 
       {/* Back to main menu */}
