@@ -556,6 +556,15 @@ export async function logReadingGuideReorderCompleted({ taskId }) {
   });
 }
 
+export async function logReadingPart4Completed({ taskId, source = "AptisPart4" }) {
+  return logActivity("reading_part4_completed", {
+    taskId: taskId || null,
+    source,
+  });
+}
+
+
+
 // ─── WRITING SUBMISSION ────────────────────────────────────────────────────
 export async function logWritingSubmitted(details) {
   // details: { part: "part1"|"part2"|"part3"|"part4", taskId?, wordCount?, counts? ... }

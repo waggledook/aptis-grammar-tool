@@ -182,16 +182,23 @@ export default function PackKeyLanding() {
 />
 
 <Tile
-  to="/pack-key/Speaking-part-1"
+  to="/pack-key/speaking-part-1"
   title="Speaking Part 1"
   desc="Answer key for Speaking Part 1 tasks in the Seif Aptis Trainer pack."
   status="Open"
 />
 
 <Tile
-  to="/pack-key/Speaking-part-2"
+  to="/pack-key/speaking-part-2"
   title="Speaking Part 2"
   desc="Answer key for Speaking Part 2 tasks in the Seif Aptis Trainer pack."
+  status="Open"
+/>
+
+<Tile
+  to="/pack-key/speaking-part-3"
+  title="Speaking Part 3"
+  desc="Photo comparison: linkers, comparatives, pros/cons vocab, preferences, and exam-style sample answers."
   status="Open"
 />
 

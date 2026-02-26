@@ -21,6 +21,7 @@ const typeLabels = {
   reading_guide_show_answers: "Reading guide answers shown",
   reading_guide_reorder_completed: "Reading guide reorder completed",
   reading_reorder_completed: "Reading reorder completed",
+  reading_part4_completed: "Reading Part 4 completed",
   writing_p1_guide_activity_started: "Writing P1 guide activity started",
   writing_p4_register_guide_activity_started: "Writing P4 register guide activity started",
   };
@@ -160,6 +161,10 @@ const typeLabels = {
       }
       
       case "reading_reorder_completed": {
+        return `${d.taskId || "task"} · completed ✓`;
+      }
+
+      case "reading_part4_completed": {
         return `${d.taskId || "task"} · completed ✓`;
       }
       
@@ -340,6 +345,7 @@ export default function AdminActivityLog({ user }) {
             <option value="writing_submitted">Writing submitted</option>
             <option value="speaking_note_submitted">Speaking note</option>
             <option value="reading_completed">Reading completed</option>
+            <option value="reading_part4_completed">Reading Part 4 completed</option>
             <option value="speaking_task_completed">Speaking task completed</option>
             <option value="vocab_flashcards_session">Vocab flashcards</option>
             <option value="vocab_match_session">Vocab match</option>
