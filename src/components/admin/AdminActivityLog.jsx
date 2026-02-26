@@ -1,8 +1,10 @@
 // src/components/admin/AdminActivityLog.jsx
 import React, { useEffect, useState } from "react";
-import { collection, getDocs, orderBy, limit, query } from "firebase/firestore";
+import { collection, getDocs, orderBy, limit, query, startAfter } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+
+const PAGE_SIZE = 200;
 
 const typeLabels = {
     grammar_session: "Grammar session",
@@ -21,6 +23,7 @@ const typeLabels = {
   reading_guide_show_answers: "Reading guide answers shown",
   reading_guide_reorder_completed: "Reading guide reorder completed",
   reading_reorder_completed: "Reading reorder completed",
+  reading_part4_attempted: "Reading Part 4 attempt",
   reading_part4_completed: "Reading Part 4 completed",
   writing_p1_guide_activity_started: "Writing P1 guide activity started",
   writing_p4_register_guide_activity_started: "Writing P4 register guide activity started",
@@ -164,6 +167,10 @@ const typeLabels = {
         return `${d.taskId || "task"} · completed ✓`;
       }
 
+      case "reading_part4_attempted":
+  return `${d.taskId || "task"} · ${d.score ?? "?"}/${d.total ?? "?"}`;
+    
+
       case "reading_part4_completed": {
         return `${d.taskId || "task"} · completed ✓`;
       }
@@ -254,30 +261,73 @@ export default function AdminActivityLog({ user }) {
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState("all");
   const [filterEmail, setFilterEmail] = useState("");
+  const [loadingMore, setLoadingMore] = useState(false);
+const [hasMore, setHasMore] = useState(true);
+const [cursorDoc, setCursorDoc] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     if (!user || user.role !== "admin") return;
 
     async function load() {
+      setLoading(true);
+      setHasMore(true);
+      setCursorDoc(null);
+    
       const q = query(
         collection(db, "activityLog"),
         orderBy("createdAt", "desc"),
-        limit(200)
+        limit(PAGE_SIZE)
       );
+    
       const snap = await getDocs(q);
-
+    
       const arr = snap.docs.map((d) => ({
         id: d.id,
         ...d.data(),
       }));
-
+    
       setLogs(arr);
+    
+      const last = snap.docs[snap.docs.length - 1] || null;
+      setCursorDoc(last);
+    
+      // If we got fewer than PAGE_SIZE, there’s no more to load
+      setHasMore(snap.docs.length === PAGE_SIZE);
+    
       setLoading(false);
     }
 
     load();
   }, [user]);
+
+  async function loadMore() {
+    if (loadingMore || !hasMore || !cursorDoc) return;
+  
+    setLoadingMore(true);
+  
+    const q = query(
+      collection(db, "activityLog"),
+      orderBy("createdAt", "desc"),
+      startAfter(cursorDoc),
+      limit(PAGE_SIZE)
+    );
+  
+    const snap = await getDocs(q);
+  
+    const arr = snap.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+  
+    setLogs((prev) => [...prev, ...arr]);
+  
+    const last = snap.docs[snap.docs.length - 1] || null;
+    setCursorDoc(last);
+  
+    setHasMore(snap.docs.length === PAGE_SIZE);
+    setLoadingMore(false);
+  }
 
   if (!user || user.role !== "admin") {
     return <p>⛔ You do not have permission to view this page.</p>;
@@ -306,8 +356,8 @@ export default function AdminActivityLog({ user }) {
 
       <h1 style={{ marginTop: "0.75rem" }}>Activity log</h1>
       <p className="muted small">
-        Last {logs.length} events (e.g. grammar sessions, vocab sets, etc.).
-      </p>
+  Showing {logs.length} events (loaded in batches of {PAGE_SIZE}).
+</p>
 
       {/* Simple filters */}
       <div
@@ -377,15 +427,16 @@ export default function AdminActivityLog({ user }) {
       {loading && <p>Loading activity…</p>}
 
       {!loading && (
-        <div style={{ marginTop: "1rem", overflowX: "auto" }}>
-          <table
-            style={{
-              width: "100%",
-              borderCollapse: "collapse",
-              fontSize: "0.9rem",
-              minWidth: 650,
-            }}
-          >
+  <>
+    <div style={{ marginTop: "1rem", overflowX: "auto" }}>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          fontSize: "0.9rem",
+          minWidth: 650,
+        }}
+      >
             <thead>
               <tr>
                 <th align="left" style={{ padding: "0.4rem 0.25rem" }}>
@@ -470,7 +521,24 @@ export default function AdminActivityLog({ user }) {
             </tbody>
           </table>
         </div>
-      )}
+{/* ✅ PASTE THE LOAD MORE BLOCK HERE */}
+<div style={{ marginTop: "1rem", display: "flex", gap: "0.75rem", alignItems: "center" }}>
+<button
+  className="review-btn"
+  onClick={loadMore}
+  disabled={!hasMore || loadingMore}
+  style={{ opacity: !hasMore ? 0.6 : 1 }}
+>
+  {loadingMore ? "Loading…" : hasMore ? `Load ${PAGE_SIZE} more` : "No more results"}
+</button>
+
+<span className="muted small">
+  {hasMore ? "More results available." : "You’ve reached the end."}
+</span>
+</div>
+</>
+)}
+
     </div>
   );
 }

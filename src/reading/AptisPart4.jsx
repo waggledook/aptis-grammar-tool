@@ -1,7 +1,7 @@
 // src/reading/AptisPart4.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { saveReadingCompletion, fetchReadingCompletions, logReadingPart4Completed } from "../firebase";
+import { saveReadingCompletion, fetchReadingCompletions, logReadingPart4Attempted, logReadingPart4Completed, } from "../firebase";
 import { toast } from "../utils/toast";
 
 /**
@@ -411,20 +411,26 @@ export default function AptisPart4({
     });
     setFeedback(fb);
   
-    const allCorrect = current.paragraphs.every((p) => fb[p.id] === true);
+    const total = current.paragraphs.length;
+    const score = current.paragraphs.reduce((acc, p) => acc + (fb[p.id] === true ? 1 : 0), 0);
+    const allCorrect = score === total;
   
-    if (allCorrect && user) {
-      // avoid duplicate activity spam
-      if (completed.has(current.id)) {
-        toast("Already completed ✓");
-        return;
-      }
+    // ✅ Log an attempt whenever the user clicks "Check"
+    if (user) {
+      await logReadingPart4Attempted({
+        taskId: current.id,
+        score,
+        total,
+        source: "AptisPart4",
+      });
+    }
   
+    // ✅ Only mark as completed if perfect score, and only once
+    if (allCorrect && user && !completed.has(current.id)) {
       await saveReadingCompletion(current.id);
       setCompleted((prev) => new Set(prev).add(current.id));
       toast("Task marked as completed ✓");
   
-      // ✅ Activity monitor event
       await logReadingPart4Completed({ taskId: current.id, source: "AptisPart4" });
     }
   }

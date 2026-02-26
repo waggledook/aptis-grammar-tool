@@ -556,6 +556,15 @@ export async function logReadingGuideReorderCompleted({ taskId }) {
   });
 }
 
+export async function logReadingPart4Attempted({ taskId, score, total, source = "AptisPart4" }) {
+  return logActivity("reading_part4_attempted", {
+    taskId: taskId || null,
+    score: typeof score === "number" ? score : null,
+    total: typeof total === "number" ? total : null,
+    source,
+  });
+}
+
 export async function logReadingPart4Completed({ taskId, source = "AptisPart4" }) {
   return logActivity("reading_part4_completed", {
     taskId: taskId || null,
