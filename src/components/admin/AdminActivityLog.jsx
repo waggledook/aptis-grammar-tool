@@ -354,6 +354,10 @@ const [cursorDoc, setCursorDoc] = useState(null);
         ← Back to Admin
       </button>
 
+      <button className="review-btn" onClick={() => navigate("/admin/activity-charts")}>
+  📊 Charts
+</button>
+
       <h1 style={{ marginTop: "0.75rem" }}>Activity log</h1>
       <p className="muted small">
   Showing {logs.length} events (loaded in batches of {PAGE_SIZE}).

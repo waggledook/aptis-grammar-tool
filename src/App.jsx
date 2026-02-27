@@ -46,6 +46,7 @@ import { doc, getDoc } from "firebase/firestore";
 import GrammarSetRunner from "./components/grammar/GrammarSetRunner";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 import AdminActivityLog from "./components/admin/AdminActivityLog.jsx";
+import AdminActivityCharts from "./components/admin/AdminActivityCharts";
 import TeacherTools from "./components/teacher/TeacherTools"; // ← Add this
 import MyStudents from "./components/teacher/MyStudents";
 import TeacherStudentProfile from "./components/TeacherStudentProfile";
@@ -838,6 +839,8 @@ return (
   path="/admin/activity"
   element={<AdminActivityLog user={user} />}
 />
+
+<Route path="/admin/activity-charts" element={<AdminActivityCharts user={user} />} />
 
 <Route
   path="/my-students"
