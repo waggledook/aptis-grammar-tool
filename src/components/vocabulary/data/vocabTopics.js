@@ -5,6 +5,7 @@ import { peopleData } from "./peopleData";
 import { relationshipsData } from "./relationshipsData"; // 👈 NEW
 import { healthData } from "./healthData";
 import { clothesData } from "./clothesData";
+import { emotionsData } from "./emotionsData";
 
 export const TOPIC_DATA = {
   travel: travelData,
@@ -13,6 +14,7 @@ export const TOPIC_DATA = {
   relationships: relationshipsData, // 👈 NEW
   health: healthData, // 👈 new
   clothes: clothesData, // 👈 new
+  emotions: emotionsData, // 👈 new
 };
 
 // Helper: total number of sets across ALL topics

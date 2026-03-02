@@ -6,6 +6,8 @@ import { peopleData } from "./data/peopleData"; // 👈 new
 import { relationshipsData } from "./data/relationshipsData"; // 👈 new
 import { healthData } from "./data/healthData"; // 👈 new
 import { clothesData } from "./data/clothesData"; // 👈 new
+import { emotionsData } from "./data/emotionsData";
+
 import { logFlashcardsSession } from "../../firebase";
 
 function shuffleArray(array) {
@@ -20,6 +22,7 @@ const TOPIC_DATA = {
   relationships: relationshipsData,
   health: healthData,
   clothes: clothesData,
+  emotions: emotionsData,
   // work: workData,
   // health: healthData,
 };

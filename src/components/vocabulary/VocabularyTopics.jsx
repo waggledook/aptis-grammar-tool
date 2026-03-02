@@ -82,6 +82,13 @@ export default function VocabularyTopics({
       desc: "Clothing, accessories and verb phrases.",
       active: true,
     },
+    {
+      id: "emotions",
+      name: "Describing feelings",
+      emoji: "🎭",
+      desc: "Adjectives and expressions for feelings and emotions.",
+      active: true,
+    },
     // ── Coming soon topics ───────────────────────────
     {
       id: "education",
