@@ -7,6 +7,7 @@ import { relationshipsData } from "./data/relationshipsData"; // 👈 new
 import { healthData } from "./data/healthData"; // 👈 new
 import { clothesData } from "./data/clothesData"; // 👈 new
 import { emotionsData } from "./data/emotionsData";
+import { foodData } from "./data/foodData"; // 👈 new
 
 import { logFlashcardsSession } from "../../firebase";
 
@@ -23,6 +24,7 @@ const TOPIC_DATA = {
   health: healthData,
   clothes: clothesData,
   emotions: emotionsData,
+  food: foodData,
   // work: workData,
   // health: healthData,
 };

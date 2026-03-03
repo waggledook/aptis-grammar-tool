@@ -89,6 +89,13 @@ export default function VocabularyTopics({
       desc: "Adjectives and expressions for feelings and emotions.",
       active: true,
     },
+    {
+      id: "food",
+      name: "Food",
+      emoji: "🍝",
+      desc: "Cooking, restaurants, ingredients...",
+      active: true,
+    },
     // ── Coming soon topics ───────────────────────────
     {
       id: "education",
@@ -102,12 +109,6 @@ export default function VocabularyTopics({
       name: "Technology",
       emoji: "💻",
       desc: "Computers, gadgets, the internet...",
-    },
-    {
-      id: "food",
-      name: "Food",
-      emoji: "🍝",
-      desc: "Cooking, restaurants, ingredients...",
     },
   ];  
 
