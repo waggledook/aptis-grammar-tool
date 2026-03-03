@@ -5,12 +5,12 @@ import { toast } from "../../utils/toast";
 import {
   saveVocabReviewResult,
   fetchVocabProgressByTopic,
-  recordVocabMistake,   // 👈 NEW
 } from "../../firebase";
 
 import { logVocabSetCompleted, logVocabMatchSession } from "../../firebase";
 
 import { TOPIC_DATA } from "./data/vocabTopics";
+import VocabReviewPlayer from "./VocabReviewPlayer";
 
 
 export default function TopicTrainer({ topic, onBack, onShowFlashcards }) {
@@ -191,273 +191,6 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
 
 
 
-  // --- REVIEW STATE ---
-  const [reviewIndex, setReviewIndex] = useState(0);
-  const [chosenAnswer, setChosenAnswer] = useState(null);
-  const [showReviewFeedback, setShowReviewFeedback] = useState(false);
-  const [showReviewImage, setShowReviewImage] = useState(false);
-
-  // Track sentences the student got wrong on the first run
-  const [mistakes, setMistakes] = useState([]);     // array of review items
-  const [mistakeMode, setMistakeMode] = useState(false); // false = full set, true = only mistakes
-
-  if (!topicInfo) {
-    return (
-      <div className="topic-trainer game-wrapper">
-        <header className="header">
-          <h2 className="title">Topic not found</h2>
-          <p className="intro">No data available for this topic yet.</p>
-        </header>
-  
-        <button className="topbar-btn" onClick={onBack}>
-          ← Back to Topics
-        </button>
-      </div>
-    );
-  }
-  
-
-  const currentReviewList = mistakeMode ? mistakes : shuffledReview;
-  const reviewItem = currentReviewList[reviewIndex];  // ✅ use the active list
-  const wordBank = activeSet ? activeSet.pairs.map((p) => p.term) : [];
-
-  const answerOptions = reviewItem?.answer
-  ? reviewItem.answer
-      .toLowerCase()
-      .split(/[\/,]/g)               // ✅ allow "/" OR "," as separators
-      .map((a) => a.trim())
-      .filter(Boolean)
-  : [];
-
-function escRe(s) {
-  return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-}
-
-// Only allow partial matches when they match a whole word/token boundary.
-// This prevents "shirt" matching "t-shirt".
-function tokenMatch(term, opt) {
-  if (!term || !opt) return false;
-
-  if (term === opt) return true;
-
-  // normalise hyphens/spaces for boundary checks
-  const t = term.replace(/[-–—]/g, " ");
-  const o = opt.replace(/[-–—]/g, " ");
-
-  // opt as a whole word inside term (e.g. "phone" in "mobile phone")
-  const reOptInTerm = new RegExp(`(^|\\s)${escRe(o)}(\\s|$)`, "i");
-  if (reOptInTerm.test(t)) return true;
-
-  // term as a whole word inside opt (e.g. "formal" in "formal letter")
-  const reTermInOpt = new RegExp(`(^|\\s)${escRe(t)}(\\s|$)`, "i");
-  if (reTermInOpt.test(o)) return true;
-
-  return false;
-}
-
-const cluePair =
-  activeSet?.pairs?.find((p) => {
-    const term = (p.term || "").toLowerCase().trim();
-    return answerOptions.some((opt) => tokenMatch(term, opt));
-  }) || null;
-
-
-  const [typedAnswer, setTypedAnswer] = useState("");
-  const [isCorrect, setIsCorrect] = useState(false);
-  const inputRef = useRef(null);
-
-  const totalItems = shuffledReview.length;
-  const firstRunCorrect = totalItems - mistakes.length;
-
-  // ✅ Save vocab review result when the FIRST full review run finishes
-  useEffect(() => {
-    if (!isSignedIn || !activeSetId) return;
-
-    const isEndOfFirstRun =
-      phase === "review" &&
-      !mistakeMode &&
-      totalItems > 0 &&
-      !reviewItem; // reviewItem is undefined once we've stepped past the end
-
-    if (!isEndOfFirstRun) return;
-    if (reviewAlreadyDone) return;
-
-    const mistakesCount = mistakes.length;
-
-    (async () => {
-      try {
-        await saveVocabReviewResult({
-          topic,
-          setId: activeSetId,
-          totalItems,
-          correctFirstTry: firstRunCorrect,
-          mistakesCount,
-        });
-
-        // 🔹 NEW: log in global activity log
-      logVocabSetCompleted({
-        topic,
-        setId: activeSetId,
-        mode: "review",
-        totalItems,
-        correctFirstTry: firstRunCorrect,
-        mistakesCount,
-      });
-
-        setVocabProgress((prev) => ({
-          ...prev,
-          [activeSetId]: {
-            ...(prev[activeSetId] || {}),
-            completedReview: true,
-          },
-        }));
-      } catch (err) {
-        console.error("[TopicTrainer] saveVocabReviewResult failed", err);
-      }
-    })();
-  }, [
-    isSignedIn,
-    phase,
-    mistakeMode,
-    totalItems,
-    reviewItem,
-    mistakes.length,
-    firstRunCorrect,
-    activeSetId,
-    reviewAlreadyDone,
-    topic,
-  ]);
-
-// 🔍 Focus input whenever we go into review / move on
-useEffect(() => {
-  if (phase === "review" && inputRef.current) {
-    inputRef.current.focus();
-  }
-}, [phase, reviewIndex]);
-
-// 🔁 Reset everything when we change to a different set
-useEffect(() => {
-  if (!activeSet) return;
-
-  setPhase("match");
-
-  // Match state
-  setMatchedTerms([]);
-  setMatchedDefs([]);
-  setSelectedDef(null);
-  setSelectedTerm(null);
-  setFeedbackFlash(null);
-  setShakeDef(null);
-  setShakeTerm(null);
-  setPulseItems({ def: null, term: null });
-  setShowDefs({});
-
-  // Review state
-  setReviewIndex(0);
-  setChosenAnswer(null);
-  setShowReviewFeedback(false);
-  setTypedAnswer("");
-  setIsCorrect(false);
-  setShowReviewImage(false);   // 👈 reset picture clue
-  setMistakes([]);       // 👈 new
-  setMistakeMode(false); // 👈 new
-}, [activeSet]);
-
-function checkTypedAnswer() {
-  if (!reviewItem) return;
-
-  const cleanUser = typedAnswer.trim().toLowerCase();
-  const cleanCorrect = reviewItem.answer.trim().toLowerCase();
-
-  const acceptableAnswers = cleanCorrect
-    .split("/")
-    .map((a) => a.trim().toLowerCase());
-
-  const correct = acceptableAnswers.includes(cleanUser);
-  setIsCorrect(correct);
-  setShowReviewFeedback(true);
-
-  if (!correct && !mistakeMode) {
-    // Store this sentence as a mistake (only on the first full run)
-    setMistakes((prev) => {
-      const already = prev.some(
-        (item) => item.sentence === reviewItem.sentence
-      );
-      if (already) return prev;
-      return [...prev, reviewItem];
-    });
-
-    // 🔹 NEW: log to Firestore (if signed in)
-    if (isSignedIn) {
-      recordVocabMistake({
-        topic,
-        setId: activeSetId,
-        sentence: reviewItem.sentence,
-        correctAnswer: reviewItem.answer,
-        userAnswer: typedAnswer.trim(),
-      }).catch((err) =>
-        console.error("[TopicTrainer] recordVocabMistake failed", err)
-      );
-    }
-  }
-
-
-  if (correct) {
-    // ✅ Auto-advance after short delay
-    setTimeout(() => {
-      nextReview();
-    }, 1500);
-  }
-  // ❌ Incorrect: waits for Enter → nextReview()
-}
-
-
-  function handleChooseAnswer(ans) {
-    if (showReviewFeedback) return;
-    setChosenAnswer(ans);
-    setShowReviewFeedback(true);
-  }
-
-  function nextReview() {
-    const list = mistakeMode ? mistakes : shuffledReview;
-
-    setShowReviewImage(false); // reset picture clue for the new sentence
-
-    const next = reviewIndex + 1;
-    if (next < list.length) {
-      setReviewIndex(next);
-      setTypedAnswer("");
-      setShowReviewFeedback(false);
-      setIsCorrect(false);
-    } else {
-      // finished this run – move index past the end so reviewItem becomes undefined
-      setReviewIndex(next);
-      setTypedAnswer("");
-      setShowReviewFeedback(false);
-      setIsCorrect(false);
-    }
-  }
-
-  function restartMistakes() {
-    if (mistakes.length === 0) return;
-    setMistakeMode(true);
-    setReviewIndex(0);
-    setTypedAnswer("");
-    setShowReviewFeedback(false);
-    setIsCorrect(false);
-    setShowReviewImage(false);
-  }
-
-  function restartFullReview() {
-    setMistakeMode(false);
-    setMistakes([]);
-    setReviewIndex(0);
-    setTypedAnswer("");
-    setShowReviewFeedback(false);
-    setIsCorrect(false);
-    setShowReviewImage(false);
-  }
-
 
 
   return (
@@ -577,7 +310,7 @@ function checkTypedAnswer() {
       )}
 
       {/* PHASE 1: MATCHING BOARD */}
-      {hasChosenSet && phase === "match" && (
+      {hasChosenSet && phase === "match" && activeSet && (
   <div className="card match-phase">
     <p className="phase-intro">
   Match each picture/definition on the left with the correct word or phrase on the right. 
@@ -698,165 +431,57 @@ function checkTypedAnswer() {
 
 
             {/* PHASE 2: REVIEW (gap-fill ALL items from this set) */}
-            {hasChosenSet && phase === "review" && (
-        <div className="card review-phase">
-          <p className="phase-intro">
-            Type the missing word or phrase to complete each sentence.
-          </p>
+            {/* PHASE 2: REVIEW — shared player */}
+{hasChosenSet && phase === "review" && activeSet && (
+  <VocabReviewPlayer
+    items={shuffledReview.map((it) => ({
+      topicId: topic,
+      setId: activeSetId,
+      sentence: it.sentence,
+      answer: it.answer,
+      topicTitle: topicInfo?.topicTitle || topic,
+      setTitle: activeSet?.title || "",
+    }))}
+    tips={activeSet?.tips || []}
+    isSignedIn={isSignedIn}
+    onExit={() => setPhase("match")}
+    title="✍️ Review"
+    intro="Type the missing word or phrase to complete each sentence."
+    onFirstRunComplete={async ({ totalItems, correctFirstTry, mistakesCount }) => {
+      if (!isSignedIn || !activeSetId) return;
+      if (reviewAlreadyDone) return;
 
-          {reviewItem ? (
-            <>
-              <p className="prompt">{reviewItem.sentence}</p>
+      try {
+        await saveVocabReviewResult({
+          topic,
+          setId: activeSetId,
+          totalItems,
+          correctFirstTry,
+          mistakesCount,
+        });
 
-              {cluePair && cluePair.image && (
-                <div className="clue-area">
-                  <button
-                    type="button"
-                    className="clue-btn"
-                    onClick={() =>
-                      setShowReviewImage((prev) => !prev)
-                    }
-                  >
-                    {showReviewImage ? "Hide picture clue" : "Picture clue"}
-                  </button>
+        await logVocabSetCompleted({
+          topic,
+          setId: activeSetId,
+          mode: "review",
+          totalItems,
+          correctFirstTry,
+          mistakesCount,
+        });
 
-                  {showReviewImage && (
-                    <div className="clue-image-wrapper">
-                      <img
-                        src={cluePair.image}
-                        alt={cluePair.term}
-                        className="clue-image"
-                      />
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <input
-                ref={inputRef}
-                type="text"
-                className="answer-input"
-                placeholder="Type your answer..."
-                value={typedAnswer}
-                onChange={(e) => {
-                  if (showReviewFeedback) return; // freeze text after feedback
-                  setTypedAnswer(e.target.value);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    if (showReviewFeedback) {
-                      nextReview(); // Enter after feedback → next
-                    } else {
-                      checkTypedAnswer(); // first Enter → check
-                    }
-                  }
-                }}
-              />
-
-              {!showReviewFeedback && (
-                <button className="review-btn" onClick={checkTypedAnswer}>
-                  Check
-                </button>
-              )}
-
-              {showReviewFeedback && (
-                <div className="explanation-block">
-                  {isCorrect ? (
-                    <p className="good">
-                      ✅ Great! “{reviewItem.answer}” is correct.
-                    </p>
-                  ) : (
-                    <>
-                      <p className="bad">❌ Not quite.</p>
-                      <p>
-                        Correct answer:{" "}
-                        <strong>{reviewItem.answer}</strong>
-                      </p>
-                    </>
-                  )}
-                  <div className="nav-btns">
-                    <button className="review-btn" onClick={nextReview}>
-                      Next →
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              <p className="counter">
-                {reviewIndex + 1} / {currentReviewList.length}
-              </p>
-            </>
-          ) : (
-            <div className="review-complete">
-              <h3 className="col-title">Set complete</h3>
-
-              {!mistakeMode && (
-                <>
-                  <p>
-                    You answered{" "}
-                    <strong>
-                      {firstRunCorrect} / {totalItems}
-                    </strong>{" "}
-                    correctly on the first try.
-                  </p>
-                  {mistakes.length > 0 ? (
-                    <>
-                      <p>
-                        You had{" "}
-                        <strong>{mistakes.length}</strong> sentence
-                        {mistakes.length === 1 ? "" : "s"} to practise
-                        again.
-                      </p>
-                      <div className="nav-btns">
-                        <button
-                          className="review-btn"
-                          onClick={restartMistakes}
-                        >
-                          Review only my mistakes
-                        </button>
-                        <button
-                          className="review-btn secondary"
-                          onClick={restartFullReview}
-                        >
-                          Start full review again
-                        </button>
-                      </div>
-                    </>
-                  ) : (
-                    <p>Brilliant — you got everything right first time!</p>
-                  )}
-                </>
-              )}
-
-              {mistakeMode && (
-                <>
-                  <p>
-                    You’ve gone through all your mistake sentences again.
-                  </p>
-                  <div className="nav-btns">
-                    <button
-                      className="review-btn secondary"
-                      onClick={restartFullReview}
-                    >
-                      Start full review again
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
-          <div className="tips-block">
-            <h4 className="tips-title">Common mistakes</h4>
-            <ul className="tips-list">
-              {activeSet.tips.map((tip, i) => (
-                <li key={i}>{tip}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      )}
+        setVocabProgress((prev) => ({
+          ...prev,
+          [activeSetId]: {
+            ...(prev[activeSetId] || {}),
+            completedReview: true,
+          },
+        }));
+      } catch (err) {
+        console.error("[TopicTrainer] saveVocabReviewResult failed", err);
+      }
+    }}
+  />
+)}
 
 
       <button

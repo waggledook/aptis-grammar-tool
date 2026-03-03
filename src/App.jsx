@@ -39,6 +39,7 @@ import Footer from "./components/common/Footer";
 import VocabularyTopics from "./components/vocabulary/VocabularyTopics";
 import CollocationMenu from "./components/vocabulary/collocations/CollocationMenu";
 import CollocationDash from "./components/vocabulary/collocations/CollocationDash";
+import VocabLab from "./components/vocabulary/VocabLab";
 import TopicTrainer from "./components/vocabulary/TopicTrainer";
 import Seo from "./components/common/Seo.jsx";
 import './App.css'
@@ -597,6 +598,25 @@ return (
     path="/vocabulary/topics"
     element={<VocabularyTopics isAuthenticated={!!user} />}
   />
+
+<Route
+  path="/vocabulary/lab"
+  element={
+    user ? (
+      <VocabLab user={user} />
+    ) : (
+      <div className="panel">
+        <h2 style={{ marginTop: 0 }}>Vocab Lab</h2>
+        <p className="muted">
+          Please sign in to use global training and track your progress.
+        </p>
+        <button className="topbar-btn" onClick={() => setShowAuth(true)}>
+          Sign in / Sign up
+        </button>
+      </div>
+    )
+  }
+/>
 
 <Route path="/vocabulary/collocations" element={<CollocationMenu />} />
 

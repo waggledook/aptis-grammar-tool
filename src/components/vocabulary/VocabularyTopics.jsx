@@ -126,7 +126,33 @@ export default function VocabularyTopics({
   message="Right now the Travel, Work, Describing people, Relationships, Health, and Clothes & accessories topics are available. More topics (Education, Technology, Food, etc.) are on the way!"
 />
 
-      <div className="cards">
+
+
+<div className="cards">
+  {/* ✅ Full-width banner card */}
+  <button
+    className="card"
+    style={{
+      gridColumn: "1 / -1",
+      padding: "14px 16px",       // makes it thinner
+      minHeight: "unset",
+    }}
+    onClick={() => {
+      if (isAuthenticated) navigate("/vocabulary/lab");
+      else toast("Please sign in to use Vocab Lab 🔒");
+    }}
+  >
+    <div className="card-head" style={{ marginBottom: 8 }}>
+      <h3 style={{ margin: 0 }}>
+        🎯 Vocab Lab (Mixed practice)
+      </h3>
+      <span className="soon-pill">New</span>
+    </div>
+    <p style={{ margin: 0 }}>
+      Generate a random session across topics — flashcards or test sentences.
+    </p>
+  </button>
+  
         {topics.map((t) => (
           <button
             key={t.id}
