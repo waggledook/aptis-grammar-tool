@@ -572,7 +572,26 @@ export async function logReadingPart4Completed({ taskId, source = "AptisPart4" }
   });
 }
 
+export async function logReadingPart3Attempted({
+  taskId,
+  score,
+  total,
+  source = "AptisPart3",
+}) {
+  return logActivity("reading_part3_attempted", {
+    taskId: taskId || null,
+    score: typeof score === "number" ? score : null,
+    total: typeof total === "number" ? total : null,
+    source,
+  });
+}
 
+export async function logReadingPart3Completed({ taskId, source = "AptisPart3" }) {
+  return logActivity("reading_part3_completed", {
+    taskId: taskId || null,
+    source,
+  });
+}
 
 // ─── WRITING SUBMISSION ────────────────────────────────────────────────────
 export async function logWritingSubmitted(details) {

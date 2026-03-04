@@ -62,17 +62,23 @@ export default function VocabularyMenu() {
           </p>
         </button>
 
-        {/* ⚙️ Collocation Trainer (coming soon) */}
-        <button
-  className="card soon-card tease"
+        {/* ⚙️ Collocation Trainer (LIVE) */}
+<button
+  className="card menu-card"
   onClick={() => navigate("/vocabulary/collocations")}
 >
-          <div className="soon-head">
-            <h3>Collocation Trainer</h3>
-            <span className="soon-pill">Coming soon</span>
-          </div>
-          <p>Practise natural word combinations and fixed expressions.</p>
-        </button>
+  <div className="menu-card-header">
+    <h3>Collocation Trainer</h3>
+    <span className="uc-top-wrapper">
+              <img
+                src="/images/ui/under-construction.png"
+                alt="Under construction"
+                className="uc-top-icon"
+              />
+            </span>
+  </div>
+  <p>Practise natural word combinations and fixed expressions.</p>
+</button>
       </div>
 
       <button

@@ -1,6 +1,11 @@
 // src/reading/AptisPart3Matching.jsx
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { saveReadingCompletion, fetchReadingCompletions } from "../firebase";
+import {
+  saveReadingCompletion,
+  fetchReadingCompletions,
+  logReadingPart3Attempted,
+  logReadingPart3Completed,
+} from "../firebase";
 import { toast } from "../utils/toast";
 
 // ---------- Demo dataset ----------
@@ -152,19 +157,38 @@ useEffect(() => {
     if (whyOpen === qid) setWhyOpen(null);
   }
 
-  function handleCheck() {
+  async function handleCheck() {
     const fb = {};
     current.questions.forEach((q) => {
       const given = answers[q.id];
       fb[q.id] = given ? given === q.answer : null;
     });
     setFeedback(fb);
-
-    const allCorrect = Object.values(fb).every((v) => v === true);
-    if (allCorrect && user) {
-      saveReadingCompletion(current.id);
+  
+    const total = current.questions.length;
+    const score = current.questions.reduce(
+      (acc, q) => acc + (fb[q.id] === true ? 1 : 0),
+      0
+    );
+    const allCorrect = score === total;
+  
+    // ✅ Log an attempt whenever the user clicks "Check"
+    if (user) {
+      await logReadingPart3Attempted({
+        taskId: current.id,
+        score,
+        total,
+        source: "AptisPart3",
+      });
+    }
+  
+    // ✅ Only mark as completed if perfect score, and only once
+    if (allCorrect && user && !completed.has(current.id)) {
+      await saveReadingCompletion(current.id);
       setCompleted((p) => new Set(p).add(current.id));
       toast("Task marked as completed ✓");
+  
+      await logReadingPart3Completed({ taskId: current.id, source: "AptisPart3" });
     }
   }
 
