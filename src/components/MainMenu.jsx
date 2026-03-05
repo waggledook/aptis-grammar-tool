@@ -70,15 +70,18 @@ export default function MainMenu({ onSelect, user }) {
 </button>
 
 
-<button
-  className="menu-card soon-card tease"
-  onClick={() => toast("Listening practice coming soon 👀")}
->
-  <div className="soon-head">
+<button className="menu-card" onClick={() => navigate("/listening")}>
+  <div className="menu-card-header">
     <h3>Listening Practice</h3>
-    <span className="soon-pill">Coming soon</span>
+    <span className="uc-top-wrapper">
+      <img
+        src="/images/ui/under-construction.png"
+        alt="Under construction"
+        className="uc-top-icon"
+      />
+    </span>
   </div>
-  <p>Exam-style listening tasks with transcripts and tips.</p>
+  <p>Exam-style listening tasks (Parts 1–4).</p>
 </button>
 
         {/* Profile */}

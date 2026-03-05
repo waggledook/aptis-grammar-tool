@@ -74,7 +74,8 @@ import ReadingPart4Key from "./components/coursepack/ReadingPart4Key";
 import SpeakingPart1Key from "./components/coursepack/SpeakingPart1Key";
 import SpeakingPart2Key from "./components/coursepack/SpeakingPart2Key";
 import SpeakingPart3Key from "./components/coursepack/SpeakingPart3Key";
-
+import ListeningMenu from "./components/listening/ListeningMenu.jsx";
+import ListeningPart3 from "./components/listening/ListeningPart3.jsx";
 
 
 
@@ -591,6 +592,10 @@ return (
   }
 />
 
+{/* listening routes */}
+<Route path="/listening" element={<ListeningMenu />} />
+
+<Route path="/listening/part3" element={<ListeningPart3 user={user} />} />
 
 {/* vocabulary routes */}
 <Route path="/vocabulary" element={<VocabularyMenu />} />
