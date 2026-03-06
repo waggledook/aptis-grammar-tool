@@ -119,6 +119,124 @@ const PART3_LISTENING_TASKS = [
       },
     ],
   },
+
+  {
+    id: "recycling",
+    title: "Recycling",
+    intro:
+      "Listen to two people discussing recycling. Read the statements (a–d) and decide who expresses each opinion — the man, the woman, or both the man and the woman. You can listen to the discussion twice.",
+    audioSrc: "/audio/listening/part3/recycling.mp3",
+    statements: [
+      {
+        key: "a",
+        text: "Individuals can improve recycling outcomes by sorting waste carefully.",
+        answer: "man",
+        scriptLineIndex: 3,
+        evidenceParts: [
+          "When households sort properly at home",
+          "A clean, well-separated collection is much more likely to be reused",
+        ],
+        explanation:
+          "The man argues that careful sorting at home improves the quality of what recycling centres receive, making reuse more likely.",
+      },
+      {
+        key: "b",
+        text: "Recycling rules are inconsistent and this leads people to make mistakes.",
+        answer: "both",
+        scriptLineIndex: 8,
+        evidenceParts: [
+          "lack of consistent rules",
+          "completely different",
+          "wish-cycling",
+          "one wrong item can spoil a whole batch",
+        ],
+        explanation:
+          "Both speakers highlight inconsistency: the woman points out rules change between towns, and the man explains how unclear guidance causes 'wish-cycling' and contamination.",
+      },
+      {
+        key: "c",
+        text: "Cutting waste in the first place matters more than recycling it later.",
+        answer: "woman",
+        scriptLineIndex: 10,
+        evidenceParts: [
+          "Reducing waste",
+          "more effective approach than trying to deal with it afterwards",
+          "doesn’t address the sheer amount of packaging",
+        ],
+        explanation:
+          "The woman says recycling can distract from the bigger issue: reducing packaging and waste at the source is more effective than dealing with it after purchase.",
+      },
+      {
+        key: "d",
+        text: "People recycle more when the process is simple and convenient.",
+        answer: "both",
+        scriptLineIndex: 14,
+        evidenceParts: [
+          "People recycle more when the system is simple and intuitive",
+          "my motivation drops pretty quickly",
+          "path of least resistance",
+        ],
+        explanation:
+          "Both agree convenience drives behaviour: the woman says complicated systems reduce motivation, and the man explicitly states people recycle more when it’s simple and intuitive.",
+      },
+    ],
+    script: [
+      {
+        speaker: "Woman",
+        text:
+          "I watched a documentary last night about plastic recycling, and it really made me question how effective the whole system is.",
+      },
+      { speaker: "Man", text: "In what way?" },
+      {
+        speaker: "Woman",
+        text:
+          "Well, we’re told to carefully separate everything, rinse out jars, and remove labels, but the programme suggested that a huge percentage is still treated as contaminated and burned anyway. It feels like we’re all doing a lot of work for very little return.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "I can see why that’s discouraging, but I wouldn’t call it a lost cause. When households sort properly at home, it changes the quality of the material the centres receive. A clean, well-separated collection is much more likely to be reused than one where people have been careless.",
+      },
+      { speaker: "Woman", text: "But surely one person’s bin doesn’t make much difference." },
+      {
+        speaker: "Man",
+        text:
+          "On its own, maybe not — but the overall pattern of what households do is what determines whether the system can work in the long run.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "That might be true, but the lack of consistent rules makes it almost impossible to get right. You go two towns over and the guidelines for what counts as recyclable plastic are completely different. The labels aren’t much clearer, so people end up putting things in the recycling out of hope rather than certainty.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "The regional variation is definitely a problem. I’ve noticed that items marked as “widely recycled” are sometimes rejected by local facilities. When the guidance is that unclear, you get what people call “wish-cycling”, where one wrong item can spoil a whole batch of good material.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "Which is why I’ve started to think recycling can be a bit of a distraction. Even if we could do it perfectly, it doesn’t address the sheer amount of packaging being produced. Reducing waste — simply not bringing so much of it home in the first place — seems like a more effective approach than trying to deal with it afterwards.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "I see the point, but that feels slightly idealistic. For most people, recycling is still the most realistic way to contribute. I’d be careful about downplaying it just because we’re not living in a “zero-waste” world.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "It’s only realistic if the system supports people. If I’m expected to store four different boxes and take glass to a central depot, my motivation drops pretty quickly.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "And that’s the key issue — the path of least resistance. People recycle more when the system is simple and intuitive. Uniform bin colours across the country, and collections from your home that actually match what’s written on the packaging, would probably do more than any awareness campaign.",
+      },
+      { speaker: "Woman", text: "So if it needs a manual — and a car — it’s going to fail for most people." },
+      { speaker: "Man", text: "Exactly. The more seamless it is, the more likely the habit is to stick." },
+    ],
+  },
 ];
 
 const WHO_OPTIONS = [
