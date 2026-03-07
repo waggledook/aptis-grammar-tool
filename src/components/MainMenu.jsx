@@ -27,6 +27,23 @@ export default function MainMenu({ onSelect, user }) {
 
       <p className="menu-sub">Choose a practice area to begin.</p>
 
+      <div className="whats-new-banner">
+  <div className="whats-new-copy">
+    <span className="whats-new-label">What’s new</span>
+    <p>
+      <strong>Listening Part 3 is now live.</strong> Practise opinion-matching
+      tasks with audio, scripts and feedback.
+    </p>
+  </div>
+
+  <button
+    className="whats-new-btn"
+    onClick={() => navigate("/listening/part3")}
+  >
+    Try it now
+  </button>
+</div>
+
       <div className="menu-grid">
         {/* Grammar */}
 <button className="menu-card" onClick={() => navigate("/grammar")}>
@@ -189,6 +206,73 @@ export default function MainMenu({ onSelect, user }) {
           margin-top: .2rem;
           margin-bottom: .6rem;
         }
+
+        .whats-new-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  padding: .9rem 1rem;
+  border-radius: 14px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 191, 73, 0.10),
+    rgba(255, 191, 73, 0.04)
+  );
+  border: 1px solid rgba(255, 191, 73, 0.35);
+}
+
+.whats-new-copy {
+  min-width: 0;
+}
+
+.whats-new-label {
+  display: inline-block;
+  margin-bottom: .35rem;
+  padding: .2rem .55rem;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+  letter-spacing: .02em;
+  color: #ffcf70;
+  background: rgba(255, 191, 73, 0.12);
+  border: 1px solid rgba(255, 191, 73, 0.28);
+}
+
+.whats-new-copy p {
+  margin: 0;
+  color: #e6f0ff;
+  line-height: 1.4;
+}
+
+.whats-new-btn {
+  flex-shrink: 0;
+  background: linear-gradient(180deg, #f6bd60, #e9a93f);
+  color: #13213b;
+  border: none;
+  border-radius: 12px;
+  padding: .7rem 1rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform .08s ease, box-shadow .08s ease;
+}
+
+.whats-new-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0,0,0,.22);
+}
+
+@media (max-width: 720px) {
+  .whats-new-banner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .whats-new-btn {
+    width: 100%;
+  }
+}
 
         /* ——— Grid ——— */
         .menu-grid {
