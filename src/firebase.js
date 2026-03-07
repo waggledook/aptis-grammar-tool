@@ -593,6 +593,35 @@ export async function logReadingPart3Completed({ taskId, source = "AptisPart3" }
   });
 }
 
+// ─── LISTENING PART 2 (Matching speakers) ───────────────────────────────────
+export async function logListeningPart2Attempted({
+  taskId,
+  score,
+  total,
+  playsUsed = null,
+  source = "ListeningPart2",
+}) {
+  return logActivity("listening_part2_attempted", {
+    taskId: taskId || null,
+    score: typeof score === "number" ? score : null,
+    total: typeof total === "number" ? total : null,
+    playsUsed: typeof playsUsed === "number" ? playsUsed : null,
+    source,
+  });
+}
+
+export async function logListeningPart2Completed({
+  taskId,
+  playsUsed = null,
+  source = "ListeningPart2",
+}) {
+  return logActivity("listening_part2_completed", {
+    taskId: taskId || null,
+    playsUsed: typeof playsUsed === "number" ? playsUsed : null,
+    source,
+  });
+}
+
 // ─── LISTENING PART 3 (Opinion matching) ────────────────────────────────────
 export async function logListeningPart3Attempted({
   taskId,

@@ -27,6 +27,8 @@ const typeLabels = {
   reading_part4_completed: "Reading Part 4 completed",
   reading_part3_attempted: "Reading Part 3 attempt",
   reading_part3_completed: "Reading Part 3 completed",
+  listening_part2_attempted: "Listening Part 2 attempt",
+  listening_part2_completed: "Listening Part 2 completed",
   listening_part3_attempted: "Listening Part 3 attempt",
   listening_part3_completed: "Listening Part 3 completed", 
   writing_p1_guide_activity_started: "Writing P1 guide activity started",
@@ -185,6 +187,11 @@ const typeLabels = {
 case "reading_part3_completed": {
   return `${d.taskId || "task"} · completed ✓`;
 }
+case "listening_part2_attempted":
+  return `${d.taskId || "task"} · ${d.score ?? "?"}/${d.total ?? "?"}${typeof d.playsUsed === "number" ? ` · listens: ${d.playsUsed}/2` : ""}`;
+
+case "listening_part2_completed":
+  return `${d.taskId || "task"} · completed ✓${typeof d.playsUsed === "number" ? ` · listens: ${d.playsUsed}/2` : ""}`;
 
 case "listening_part3_attempted":
   return `${d.taskId || "task"} · ${d.score ?? "?"}/${d.total ?? "?"}${typeof d.playsUsed === "number" ? ` · listens: ${d.playsUsed}/2` : ""}`;
@@ -420,6 +427,8 @@ const [cursorDoc, setCursorDoc] = useState(null);
             <option value="reading_part3_completed">Reading Part 3 completed</option>
             <option value="reading_part4_attempted">Reading Part 4 attempt</option>
             <option value="reading_part4_completed">Reading Part 4 completed</option>
+            <option value="listening_part2_attempted">Listening Part 2 attempt</option>
+            <option value="listening_part2_completed">Listening Part 2 completed</option>
             <option value="listening_part3_attempted">Listening Part 3 attempt</option>
             <option value="listening_part3_completed">Listening Part 3 completed</option>  
             <option value="speaking_task_completed">Speaking task completed</option>

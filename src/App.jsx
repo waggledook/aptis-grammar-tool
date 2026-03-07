@@ -75,6 +75,7 @@ import SpeakingPart1Key from "./components/coursepack/SpeakingPart1Key";
 import SpeakingPart2Key from "./components/coursepack/SpeakingPart2Key";
 import SpeakingPart3Key from "./components/coursepack/SpeakingPart3Key";
 import ListeningMenu from "./components/listening/ListeningMenu.jsx";
+import ListeningPart2 from "./components/listening/ListeningPart2.jsx";
 import ListeningPart3 from "./components/listening/ListeningPart3.jsx";
 
 
@@ -594,6 +595,16 @@ return (
 
 {/* listening routes */}
 <Route path="/listening" element={<ListeningMenu />} />
+
+<Route
+  path="/listening/part2"
+  element={
+    <ListeningPart2
+      user={user}
+      onRequireSignIn={() => setShowAuthModal?.(true)}
+    />
+  }
+/>
 
 <Route
   path="/listening/part3"
