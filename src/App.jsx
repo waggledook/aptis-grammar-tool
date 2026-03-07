@@ -595,7 +595,15 @@ return (
 {/* listening routes */}
 <Route path="/listening" element={<ListeningMenu />} />
 
-<Route path="/listening/part3" element={<ListeningPart3 user={user} />} />
+<Route
+  path="/listening/part3"
+  element={
+    <ListeningPart3
+      user={user}
+      onRequireSignIn={() => setShowAuthModal(true)}
+    />
+  }
+/>
 
 {/* vocabulary routes */}
 <Route path="/vocabulary" element={<VocabularyMenu />} />

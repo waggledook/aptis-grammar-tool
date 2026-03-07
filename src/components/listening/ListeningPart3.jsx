@@ -237,6 +237,142 @@ const PART3_LISTENING_TASKS = [
       { speaker: "Man", text: "Exactly. The more seamless it is, the more likely the habit is to stick." },
     ],
   },
+
+  {
+    id: "homework",
+    title: "Homework",
+    intro:
+      "Listen to two parents discussing homework policies at school. Read the statements (a–d) and decide who expresses each opinion — the man, the woman, or both. You can listen to the discussion twice.",
+    audioSrc: "/audio/listening/part3/homework.mp3",
+    statements: [
+      {
+        key: "a",
+        text: "Pushing students with excessive amounts of work can be counterproductive.",
+        answer: "both",
+        scriptLineIndex: 4,
+        evidenceParts: [
+          "after a certain point, children just stop taking anything in",
+          "only going through the motions because they’re exhausted",
+          "extra work probably stops being useful",
+        ],
+        explanation:
+          "Both speakers express this idea. The woman says that after a certain point children stop taking anything in, and the man supports this by saying that if they are exhausted, the extra work stops being useful.",
+      },
+      {
+        key: "b",
+        text: "Too much parental involvement makes it difficult to assess what children actually know.",
+        answer: "man",
+        scriptLineIndex: 9,
+        evidenceParts: [
+          "That’s a real problem from a teacher’s point of view",
+          "gives a misleading impression",
+          "The teacher may think the child understands",
+          "they may still be struggling",
+        ],
+        explanation:
+          "This is the man’s point. He says that when parents polish the work too heavily, teachers get a misleading impression and cannot judge the child’s real level accurately.",
+      },
+      {
+        key: "c",
+        text: "Homework tasks should be designed so children can complete them without adult help.",
+        answer: "woman",
+        scriptLineIndex: 10,
+        evidenceParts: [
+          "it ought to be within the child’s ability to complete alone",
+          "can’t manage them independently",
+          "depends on adult support",
+        ],
+        explanation:
+          "This idea comes from the woman. She argues that homework set for home should be within the child’s ability to do independently; otherwise, it is no longer really testing the child. The man comments on fairness, but he does not make this task-design point himself.",
+      },
+      {
+        key: "d",
+        text: "Homework would be more valuable if it focused on creative application rather than repetition.",
+        answer: "woman",
+        scriptLineIndex: 16,
+        evidenceParts: [
+          "just repetition",
+          "apply what they’ve learned",
+          "new or more creative way",
+          "far more worthwhile",
+        ],
+        explanation:
+          "This is the woman’s opinion. She criticises repetitive homework and says she would prefer tasks that ask children to apply what they have learned in a new or creative way. The man’s final comment shifts to a different point about basic skills and rote learning, so this answer is not both.",
+      },
+    ],
+    script: [
+      {
+        speaker: "Woman",
+        text:
+          "I was looking at my nephew’s homework planner last night, and the amount of work he’s expected to bring home every evening is astonishing. He’s only ten.",
+      },
+      { speaker: "Man", text: "Ten?" },
+      {
+        speaker: "Woman",
+        text:
+          "Exactly. And some of it looked as if it would take well over an hour.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "It’s a common complaint. I suppose the school’s logic is that high standards require extra practice, but I do wonder where the limit is.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "There’s plenty of evidence suggesting that after a certain point, children just stop taking anything in. You end up with tired pupils who begin to associate learning with pressure.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "That sounds plausible. If they’re only going through the motions because they’re exhausted, the extra work probably stops being useful.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "And then there’s the home dynamic. I know parents who more or less sit beside their children all evening, explaining tasks, correcting sentences, and helping far more than they should.",
+      },
+      { speaker: "Man", text: "Or improving the final version." },
+      { speaker: "Woman", text: "Exactly." },
+      {
+        speaker: "Man",
+        text:
+          "That’s a real problem from a teacher’s point of view. If a parent has polished a piece of work too heavily, it gives a misleading impression. The teacher may think the child understands the topic perfectly well, when in fact they may still be struggling.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "I can see that, but you also have to ask why it happens. Quite often the tasks are so demanding that the child can’t manage them independently. I’ve always thought that if homework is set for home, it ought to be within the child’s ability to complete alone.",
+      },
+      { speaker: "Man", text: "Always?" },
+      {
+        speaker: "Woman",
+        text:
+          "Not every second of it, perhaps. A bit of clarification is one thing. But if the task more or less depends on adult support, then it isn’t really testing the child any more.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "That may be true, although some parents would still say that a bit of support at home is part of the learning process. The difficulty, of course, is that it’s less fair for children whose parents don’t have the time or confidence to help.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "Exactly. And I think the nature of the tasks matters too. So much homework is just repetition — more of the same exercises children have already done in class.",
+      },
+      { speaker: "Man", text: "That’s certainly common." },
+      {
+        speaker: "Woman",
+        text:
+          "I’d rather see homework that asks them to apply what they’ve learned in a new or more creative way. That seems far more worthwhile than simply sending home another worksheet.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "It would probably make the evenings less of a battle as well, though the basics, reading and sums, are gonna serve them their entire lives. Sometimes you've just got to do things by rote I'm afraid.",
+      },
+    ],
+  },
 ];
 
 const WHO_OPTIONS = [
@@ -248,7 +384,7 @@ const WHO_OPTIONS = [
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
-export default function ListeningPart3({ user }) {
+export default function ListeningPart3({ user, onRequireSignIn }) {
   const items = PART3_LISTENING_TASKS;
 
   const [taskIndex, setTaskIndex] = useState(0);
@@ -274,11 +410,15 @@ export default function ListeningPart3({ user }) {
   // task picker items (future-proof)
   const decoratedItems = useMemo(
     () =>
-      items.map((t, i) => ({
-        ...t,
-        title: `${i + 1}. ${t.title}`,
-      })),
-    [items]
+      items.map((t, i) => {
+        const locked = !user && i >= 1; // only first task unlocked
+        return {
+          ...t,
+          locked,
+          title: `${i + 1}. ${t.title}${locked ? " 🔒" : ""}`,
+        };
+      }),
+    [items, user]
   );
 
   // reset on task change
@@ -329,6 +469,10 @@ export default function ListeningPart3({ user }) {
   }, [current?.id]);
 
   function handleSelectTask(nextIndex) {
+    if (!user && nextIndex >= 1) {
+      onRequireSignIn?.();
+      return;
+    }
     setTaskIndex(nextIndex);
   }
 
@@ -474,7 +618,6 @@ export default function ListeningPart3({ user }) {
   <div className="titleblock">
     <h2 className="title">Listening – Part 3 (Opinion Matching)</h2>
 
-    {/* Dropdown sits directly under the title */}
     <div className="tools tools-inline">
       <ChipDropdown
         items={decoratedItems}
@@ -484,7 +627,10 @@ export default function ListeningPart3({ user }) {
       />
     </div>
 
-    {/* Intro comes after */}
+    {!user && (
+      <p className="lock-note">Sign in to unlock the remaining listening tasks.</p>
+    )}
+
     <p className="intro">{current?.intro}</p>
   </div>
 </header>
@@ -677,7 +823,11 @@ function ChipDropdown({ items, value, onChange, label = "Task" }) {
         aria-label={label}
       >
         {items.map((it, i) => (
-          <option key={it.id || i} value={i}>
+          <option
+            key={it.id || i}
+            value={i}
+            disabled={!!it.locked}
+          >
             {it.title}
           </option>
         ))}
@@ -876,6 +1026,11 @@ function StyleScope() {
         padding: .5rem .8rem;
         outline:none;
       }
+      .lock-note {
+  margin: 0 0 .5rem;
+  color: #9fc2ff;
+  font-size: .92rem;
+}
     `}</style>
   );
 }
