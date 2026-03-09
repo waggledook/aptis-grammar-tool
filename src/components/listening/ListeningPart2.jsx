@@ -8,7 +8,7 @@ const PART2_LISTENING_TASKS = [
         id: "learning-languages",
         title: "Learning Languages",
         intro:
-          "Listen to four people talking about learning languages. For questions 1–4, choose from the list (a–f) what each speaker says. Use each letter only once. There are two extra options which you do not need. You can listen to the recording twice.",
+          "Listen to four people talking about learning languages. For questions 1–4, choose from the list what each speaker says. Use each letter only once. There are two extra options which you do not need. You can listen to the recording twice.",
         audioSrc: "/audio/listening/part2/learning-languages.mp3",
       
         choices: [
@@ -93,6 +93,100 @@ const PART2_LISTENING_TASKS = [
             speaker: "Speaker D",
             text:
               "I really kick myself for not putting in the effort when I had every opportunity, but I just didn't see the value back then. Now that I’m travelling and meeting people from all over, I realize what I'm missing out on. I actually really enjoy making my way through grammar books and exercises these days, but I can't help feeling like I've missed the boat — I’m not sure I’ll ever get properly fluent.",
+          },
+        ],
+      },
+
+      {
+        id: "eating-out",
+        title: "Eating Out",
+        intro:
+          "Listen to four people talking about eating out. For questions 1–4, choose from the list what each speaker says. Use each letter only once. There are two extra options which you do not need. You can listen to the recording twice.",
+        audioSrc: "/audio/listening/part2/eating-out.mp3",
+      
+        choices: [
+          { key: "a", text: "prefers eating out on special occasions only." },
+          { key: "b", text: "finds restaurant prices too high these days." },
+          { key: "c", text: "enjoys trying new cuisines when eating out." },
+          { key: "d", text: "thinks eating out is a good way to socialise." },
+          { key: "e", text: "would rather cook at home most of the time." },
+          { key: "f", text: "regrets spending too much on eating out." },
+        ],
+      
+        prompts: [
+          {
+            key: "A",
+            text: "Speaker A",
+            answer: "b",
+            scriptLineIndex: 0,
+            evidenceParts: [
+              "living month to month",
+              "even basic dishes seem over the top now",
+            ],
+            explanation:
+              "Speaker A says restaurant meals now feel too expensive, even for basic dishes, so the best match is that restaurant prices are too high these days.",
+          },
+          {
+            key: "B",
+            text: "Speaker B",
+            answer: "a",
+            scriptLineIndex: 1,
+            evidenceParts: [
+              "reserved strictly for those landmark events",
+              "a big promotion or a family reunion",
+              "a genuine treat rather than just another Tuesday night",
+            ],
+            explanation:
+              "Speaker B says restaurant visits should be saved for important occasions, so this clearly matches eating out on special occasions only.",
+          },
+          {
+            key: "C",
+            text: "Speaker C",
+            answer: "c",
+            scriptLineIndex: 2,
+            evidenceParts: [
+              "I want to encounter something I’ve never come across before",
+              "some unique ingredients",
+              "a style of cooking that’s completely unfamiliar",
+            ],
+            explanation:
+              "Speaker C is motivated by novelty and unfamiliar food, so the best match is enjoying new cuisines when eating out.",
+          },
+          {
+            key: "D",
+            text: "Speaker D",
+            answer: "d",
+            scriptLineIndex: 3,
+            evidenceParts: [
+              "you’re forced to actually look at one another",
+              "those distractions just sort of vanish",
+              "you leave feeling like you’ve had a proper catch-up",
+            ],
+            explanation:
+              "Speaker D focuses on conversation and connection rather than the food itself, so this matches the idea that eating out is a good way to socialise.",
+          },
+        ],
+      
+        script: [
+          {
+            speaker: "Speaker A",
+            text:
+              "Lately, I've cut back on restaurant trips quite a lot. For sure – moving out of the city and having kids has totally taken its toll on our nightlife, but more to the point, what used to be a fun habit with mates after work just feels like overindulgence when you’re living month to month—even basic dishes seem over the top now. I still enjoy the vibe when I do go, but I've been opting for quick home meals or deliveries instead. Let’s face it, it’s probably a good deal healthier too, if I’m honest.",
+          },
+          {
+            speaker: "Speaker B",
+            text:
+              "I’ve never really been the type to head out for a meal just because I can’t be bothered to cook. Most weeknights, I’m perfectly happy just throwing something simple together in my own kitchen after I get home from work; it’s just more practical and fits my routine. I prefer to keep restaurant visits as something to look forward to, reserved strictly for those landmark events like a big promotion or a family reunion. It makes the whole experience feel like a genuine treat rather than just another Tuesday night. Otherwise, it loses that bit of magic, doesn’t it?",
+          },
+          {
+            speaker: "Speaker C",
+            text:
+              "I’m not one for those predictable spots where you already know exactly what to expect from the menu. If I’m heading out, I want to encounter something I’ve never come across before—maybe some unique ingredients or a style of cooking that’s completely unfamiliar. I sometimes try to recreate those sensations in my own kitchen, but in my experience, you just can’t really get that restaurant taste in your own kitchen, can you? I dunno if it’s secret ingredients, or just the whole eating out experience, you know what I mean?",
+          },
+          {
+            speaker: "Speaker D",
+            text:
+              "To be honest, the actual food is almost secondary for me. It’s more about the fact that when you’re tucked away in a booth somewhere, you’re forced to actually look at one another. At home, there’s always a laptop open or the TV humming in the background, but in a restaurant, those distractions just sort of vanish. I try to make space for that once or twice a month with the people closest to me. Even if I sometimes feel like I’m overspending when money’s tight, you leave feeling like you’ve had a proper catch-up, and you really can’t put a price on that.",
           },
         ],
       },
@@ -391,7 +485,7 @@ export default function ListeningPart2({ user, onRequireSignIn }) {
                       <option value="">—</option>
 {current.choices.map((choice) => (
   <option key={choice.key} value={choice.key}>
-    {choice.key}) {choice.text}
+    {choice.text}
   </option>
 ))}
                     </select>
@@ -412,7 +506,6 @@ export default function ListeningPart2({ user, onRequireSignIn }) {
                     <div className="why-row">
                       <span className="why-label">Answer:</span>
                       <strong>
-  {current.choices.find((o) => o.key === s.answer)?.key}){" "}
   {current.choices.find((o) => o.key === s.answer)?.text}
 </strong>
                     </div>
