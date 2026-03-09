@@ -105,67 +105,67 @@ const PART2_LISTENING_TASKS = [
         audioSrc: "/audio/listening/part2/eating-out.mp3",
       
         choices: [
-          { key: "a", text: "prefers eating out on special occasions only." },
-          { key: "b", text: "finds restaurant prices too high these days." },
-          { key: "c", text: "enjoys trying new cuisines when eating out." },
-          { key: "d", text: "thinks eating out is a good way to socialise." },
-          { key: "e", text: "would rather cook at home most of the time." },
-          { key: "f", text: "regrets spending too much on eating out." },
-        ],
+            { key: "a", text: "prefers eating out on special occasions only." },
+            { key: "b", text: "would rather cook at home most of the time." },
+            { key: "c", text: "enjoys trying new cuisines when eating out." },
+            { key: "d", text: "thinks eating out is a good way to socialise." },
+            { key: "e", text: "finds restaurant prices too high these days." },
+            { key: "f", text: "regrets spending too much on eating out." },
+          ],
       
-        prompts: [
-          {
-            key: "A",
-            text: "Speaker A",
-            answer: "b",
-            scriptLineIndex: 0,
-            evidenceParts: [
-              "living month to month",
-              "even basic dishes seem over the top now",
-            ],
-            explanation:
-              "Speaker A says restaurant meals now feel too expensive, even for basic dishes, so the best match is that restaurant prices are too high these days.",
-          },
-          {
-            key: "B",
-            text: "Speaker B",
-            answer: "a",
-            scriptLineIndex: 1,
-            evidenceParts: [
-              "reserved strictly for those landmark events",
-              "a big promotion or a family reunion",
-              "a genuine treat rather than just another Tuesday night",
-            ],
-            explanation:
-              "Speaker B says restaurant visits should be saved for important occasions, so this clearly matches eating out on special occasions only.",
-          },
-          {
-            key: "C",
-            text: "Speaker C",
-            answer: "c",
-            scriptLineIndex: 2,
-            evidenceParts: [
-              "I want to encounter something I’ve never come across before",
-              "some unique ingredients",
-              "a style of cooking that’s completely unfamiliar",
-            ],
-            explanation:
-              "Speaker C is motivated by novelty and unfamiliar food, so the best match is enjoying new cuisines when eating out.",
-          },
-          {
-            key: "D",
-            text: "Speaker D",
-            answer: "d",
-            scriptLineIndex: 3,
-            evidenceParts: [
-              "you’re forced to actually look at one another",
-              "those distractions just sort of vanish",
-              "you leave feeling like you’ve had a proper catch-up",
-            ],
-            explanation:
-              "Speaker D focuses on conversation and connection rather than the food itself, so this matches the idea that eating out is a good way to socialise.",
-          },
-        ],
+          prompts: [
+            {
+              key: "A",
+              text: "Speaker A",
+              answer: "e",
+              scriptLineIndex: 0,
+              evidenceParts: [
+                "living month to month",
+                "even basic dishes seem over the top now",
+              ],
+              explanation:
+                "Speaker A says restaurant meals now feel too expensive, even for basic dishes, so the best match is that restaurant prices are too high these days.",
+            },
+            {
+              key: "B",
+              text: "Speaker B",
+              answer: "a",
+              scriptLineIndex: 1,
+              evidenceParts: [
+                "reserved strictly for those landmark events",
+                "a big promotion or a family reunion",
+                "a genuine treat rather than just another Tuesday night",
+              ],
+              explanation:
+                "Speaker B says restaurant visits should be saved for important occasions, so this clearly matches eating out on special occasions only.",
+            },
+            {
+              key: "C",
+              text: "Speaker C",
+              answer: "c",
+              scriptLineIndex: 2,
+              evidenceParts: [
+                "I want to encounter something I’ve never come across before",
+                "some unique ingredients",
+                "a style of cooking that’s completely unfamiliar",
+              ],
+              explanation:
+                "Speaker C is motivated by novelty and unfamiliar food, so the best match is enjoying new cuisines when eating out.",
+            },
+            {
+              key: "D",
+              text: "Speaker D",
+              answer: "d",
+              scriptLineIndex: 3,
+              evidenceParts: [
+                "you’re forced to actually look at one another",
+                "those distractions just sort of vanish",
+                "you leave feeling like you’ve had a proper catch-up",
+              ],
+              explanation:
+                "Speaker D focuses on conversation and connection rather than the food itself, so this matches the idea that eating out is a good way to socialise.",
+            },
+          ],
       
         script: [
           {
