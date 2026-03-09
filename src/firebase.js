@@ -651,6 +651,35 @@ export async function logListeningPart3Completed({
   });
 }
 
+// ─── LISTENING PART 4 (Longer monologues) ───────────────────────────────────
+export async function logListeningPart4Attempted({
+  taskId,
+  score,
+  total,
+  playsUsed = null,
+  source = "ListeningPart4",
+}) {
+  return logActivity("listening_part4_attempted", {
+    taskId: taskId || null,
+    score: typeof score === "number" ? score : null,
+    total: typeof total === "number" ? total : null,
+    playsUsed: typeof playsUsed === "number" ? playsUsed : null,
+    source,
+  });
+}
+
+export async function logListeningPart4Completed({
+  taskId,
+  playsUsed = null,
+  source = "ListeningPart4",
+}) {
+  return logActivity("listening_part4_completed", {
+    taskId: taskId || null,
+    playsUsed: typeof playsUsed === "number" ? playsUsed : null,
+    source,
+  });
+}
+
 // ─── WRITING SUBMISSION ────────────────────────────────────────────────────
 export async function logWritingSubmitted(details) {
   // details: { part: "part1"|"part2"|"part3"|"part4", taskId?, wordCount?, counts? ... }

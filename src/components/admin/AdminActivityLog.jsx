@@ -31,6 +31,8 @@ const typeLabels = {
   listening_part2_completed: "Listening Part 2 completed",
   listening_part3_attempted: "Listening Part 3 attempt",
   listening_part3_completed: "Listening Part 3 completed", 
+  listening_part4_attempted: "Listening Part 4 attempt",
+  listening_part4_completed: "Listening Part 4 completed",
   writing_p1_guide_activity_started: "Writing P1 guide activity started",
   writing_p4_register_guide_activity_started: "Writing P4 register guide activity started",
   };
@@ -197,6 +199,12 @@ case "listening_part3_attempted":
   return `${d.taskId || "task"} · ${d.score ?? "?"}/${d.total ?? "?"}${typeof d.playsUsed === "number" ? ` · listens: ${d.playsUsed}/2` : ""}`;
 
 case "listening_part3_completed":
+  return `${d.taskId || "task"} · completed ✓${typeof d.playsUsed === "number" ? ` · listens: ${d.playsUsed}/2` : ""}`;
+
+case "listening_part4_attempted":
+  return `${d.taskId || "task"} · ${d.score ?? "?"}/${d.total ?? "?"}${typeof d.playsUsed === "number" ? ` · listens: ${d.playsUsed}/2` : ""}`;
+  
+case "listening_part4_completed":
   return `${d.taskId || "task"} · completed ✓${typeof d.playsUsed === "number" ? ` · listens: ${d.playsUsed}/2` : ""}`;
       
       case "writing_submitted": {
@@ -431,6 +439,8 @@ const [cursorDoc, setCursorDoc] = useState(null);
             <option value="listening_part2_completed">Listening Part 2 completed</option>
             <option value="listening_part3_attempted">Listening Part 3 attempt</option>
             <option value="listening_part3_completed">Listening Part 3 completed</option>  
+            <option value="listening_part4_attempted">Listening Part 4 attempt</option>
+            <option value="listening_part4_completed">Listening Part 4 completed</option> 
             <option value="speaking_task_completed">Speaking task completed</option>
             <option value="vocab_flashcards_session">Vocab flashcards</option>
             <option value="vocab_match_session">Vocab match</option>
