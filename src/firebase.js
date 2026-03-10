@@ -637,9 +637,11 @@ export async function updateListeningPart1TaskProgress({
   if (correct) {
     payload.completions = increment(1);
     payload.lastCorrectAt = serverTimestamp();
+    payload.needsReview = false;
   } else {
     payload.wrongCount = increment(1);
     payload.lastWrongAt = serverTimestamp();
+    payload.needsReview = true;
   }
 
   await setDoc(ref, payload, { merge: true });

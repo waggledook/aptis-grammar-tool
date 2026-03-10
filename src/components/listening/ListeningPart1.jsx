@@ -44,7 +44,7 @@ const PART1_LISTENING_TASKS = [
   {
     id: "PA-shopping-1",
     title: "Shopping centre weekend event",
-    tags: ["public-announcement", "shopping-centre", "events", "children"],
+    tags: ["public-announcement", "shopping-centre"],
     intro:
       "Listen to the announcement and answer the question below. You can listen to the recording twice.",
     audioSrc: "/audio/listening/part1/PA-shopping-1.mp3",
@@ -78,7 +78,7 @@ const PART1_LISTENING_TASKS = [
   {
     id: "message-time-2",
     title: "Colleague changing a meeting time",
-    tags: ["phone-message", "time", "work-message", "meeting"],
+    tags: ["phone-message", "time", "work-message"],
     intro:
       "Listen to the message and answer the question below. You can listen to the recording twice.",
     audioSrc: "/audio/listening/part1/message-time-2.mp3",
@@ -110,7 +110,7 @@ const PART1_LISTENING_TASKS = [
   {
     id: "message-detail-1",
     title: "Friend missing an item after a visit",
-    tags: ["phone-message", "personal-message", "details", "objects"],
+    tags: ["phone-message", "personal-message", "details"],
     intro:
       "Listen to the message and answer the question below. You can listen to the recording twice.",
     audioSrc: "/audio/listening/part1/message-detail-1.mp3",
@@ -142,7 +142,7 @@ const PART1_LISTENING_TASKS = [
   {
     id: "message-detail-2",
     title: "Message about a daughter’s breakfast",
-    tags: ["phone-message", "personal-message", "details", "food-and-drink"],
+    tags: ["phone-message", "personal-message", "details"],
     intro:
       "Listen to the message and answer the question below. You can listen to the recording twice.",
     audioSrc: "/audio/listening/part1/message-detail-2.mp3",
@@ -174,7 +174,7 @@ const PART1_LISTENING_TASKS = [
   {
     id: "message-time-3",
     title: "Neighbour collecting a parcel",
-    tags: ["phone-message", "time", "personal-message", "arrangements"],
+    tags: ["phone-message", "time", "personal-message"],
     intro:
       "Listen to the message and answer the question below. You can listen to the recording twice.",
     audioSrc: "/audio/listening/part1/message-time-3.mp3",
@@ -207,7 +207,7 @@ const PART1_LISTENING_TASKS = [
   {
     id: "PA-sports-1",
     title: "Sports centre announcement",
-    tags: ["public-announcement", "prices", "sports-centre"],
+    tags: ["public-announcement", "prices"],
     intro:
       "Listen to the announcement and answer the question below. You can listen to the recording twice.",
     audioSrc: "/audio/listening/part1/PA-sports-1.mp3",
@@ -238,7 +238,7 @@ const PART1_LISTENING_TASKS = [
   {
     id: "PA-airport-1",
     title: "Airport departure announcement",
-    tags: ["public-announcement", "travel", "airport", "time"],
+    tags: ["public-announcement", "time"],
     intro:
       "Listen to the announcement and answer the question below. You can listen to the recording twice.",
     audioSrc: "/audio/listening/part1/PA-airport-1.mp3",
@@ -269,7 +269,7 @@ const PART1_LISTENING_TASKS = [
   {
     id: "PA-shopping-2",
     title: "Department store weekend offers",
-    tags: ["public-announcement", "shopping", "prices", "discounts"],
+    tags: ["public-announcement", "shopping", "prices"],
     intro:
       "Listen to the announcement and answer the question below. You can listen to the recording twice.",
     audioSrc: "/audio/listening/part1/PA-shopping-2.mp3",
@@ -300,7 +300,7 @@ const PART1_LISTENING_TASKS = [
   {
     id: "reporter-1",
     title: "Reporter on overcrowded trains",
-    tags: ["report", "transport", "cause-and-effect", "news-style"],
+    tags: ["report", "transport"],
     intro:
       "Listen to the report and answer the question below. You can listen to the recording twice.",
     audioSrc: "/audio/listening/part1/reporter-1.mp3",
@@ -341,7 +341,7 @@ const PART1_LISTENING_TASKS = [
   {
     id: "reporter-2",
     title: "Reporter on litter in a public park",
-    tags: ["report", "public-spaces", "cause-and-effect", "news-style"],
+    tags: ["report"],
     intro:
       "Listen to the report and answer the question below. You can listen to the recording twice.",
     audioSrc: "/audio/listening/part1/reporter-2.mp3",
@@ -395,7 +395,7 @@ function buildPrioritisedTaskSet(tasks, statsById, count, mode = "all") {
   let pool = [...tasks];
 
   if (mode === "wrongOnly") {
-    pool = pool.filter((t) => (statsById?.[t.id]?.wrongCount || 0) > 0);
+    pool = pool.filter((t) => statsById?.[t.id]?.needsReview === true);
   }
 
   if (!pool.length) return [];
@@ -454,6 +454,14 @@ function getDefaultSessionCount(taskCount) {
     return Math.min(5, Math.max(1, taskCount));
   }
 
+  function formatTagLabel(tag) {
+    if (tag === "all") return "All task types";
+    return tag
+      .split("-")
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(" ");
+  }
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
@@ -478,6 +486,8 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
   const scriptLineRefs = useRef({});
   const [isPlaying, setIsPlaying] = useState(false);
 
+  const [selectedTag, setSelectedTag] = useState("all");
+
   const availableTasks = useMemo(
     () =>
       user
@@ -486,16 +496,29 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
     [user]
   );
 
+  const availableTags = useMemo(() => {
+    const tagSet = new Set();
+    availableTasks.forEach((task) => {
+      (task.tags || []).forEach((tag) => tagSet.add(tag));
+    });
+    return ["all", ...Array.from(tagSet).sort()];
+  }, [availableTasks]);
+
+  const filteredTasks = useMemo(() => {
+    if (selectedTag === "all") return availableTasks;
+    return availableTasks.filter((task) => (task.tags || []).includes(selectedTag));
+  }, [availableTasks, selectedTag]);
+
   useEffect(() => {
     setSetSize((prev) => {
-      const max = Math.max(1, availableTasks.length);
-      const defaultCount = getDefaultSessionCount(availableTasks.length);
+      const max = Math.max(1, filteredTasks.length);
+      const defaultCount = getDefaultSessionCount(filteredTasks.length);
   
       if (!prev) return defaultCount;
       if (prev > max) return defaultCount;
       return prev;
     });
-  }, [availableTasks.length]);
+  }, [filteredTasks.length]);
 
   useEffect(() => {
     let alive = true;
@@ -560,7 +583,7 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
   const listensLeft = Math.max(0, 2 - playsUsed);
   const playDisabled = !current?.audioSrc || (playsUsed >= 2 && !isPlaying);
 
-  const maxSelectable = Math.min(MAX_SESSION_SIZE, availableTasks.length);
+  const maxSelectable = Math.min(MAX_SESSION_SIZE, filteredTasks.length || 1);
 
   const sessionSummary = useMemo(() => {
     if (!sessionTasks.length) return { checked: 0, correct: 0 };
@@ -594,7 +617,7 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
     }
 
     const picked = buildPrioritisedTaskSet(
-        availableTasks,
+        filteredTasks,
         user ? statsById : {},
         setSize,
         nextMode
@@ -778,21 +801,36 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
         </header>
 
         <section className="panel">
-          <div className="setupRow">
-            <label className="field">
-              <span className="fieldLabel">Number of tasks</span>
-              <select
-                className="select"
-                value={setSize}
-                onChange={(e) => setSetSize(Number(e.target.value))}
-              >
-                {Array.from({ length: maxSelectable }, (_, i) => i + 1).map((n) => (
-                  <option key={n} value={n}>
-                    {n}
-                  </option>
-                ))}
-              </select>
-            </label>
+        <div className="setupRow">
+  <label className="field">
+    <span className="fieldLabel">Number of tasks</span>
+    <select
+      className="select"
+      value={setSize}
+      onChange={(e) => setSetSize(Number(e.target.value))}
+    >
+      {Array.from({ length: maxSelectable }, (_, i) => i + 1).map((n) => (
+        <option key={n} value={n}>
+          {n}
+        </option>
+      ))}
+    </select>
+  </label>
+
+  <label className="field">
+    <span className="fieldLabel">Task type</span>
+    <select
+      className="select"
+      value={selectedTag}
+      onChange={(e) => setSelectedTag(e.target.value)}
+    >
+      {availableTags.map((tag) => (
+  <option key={tag} value={tag}>
+    {formatTagLabel(tag)}
+  </option>
+))}
+    </select>
+  </label>
 
             <div className="setupBtns">
               <button className="btn primary" onClick={() => generateNewSet("all")}>
@@ -853,6 +891,20 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
                 ))}
               </select>
             </label>
+            <label className="field">
+  <span className="fieldLabel">Task type</span>
+  <select
+    className="select"
+    value={selectedTag}
+    onChange={(e) => setSelectedTag(e.target.value)}
+  >
+    {availableTags.map((tag) => (
+  <option key={tag} value={tag}>
+    {formatTagLabel(tag)}
+  </option>
+))}
+  </select>
+</label>
 
             <div className="setupBtns">
               <button className={`modeBtn ${mode === "all" ? "active" : ""}`} onClick={() => generateNewSet("all")}>
@@ -875,10 +927,11 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
           )}
 
 <div className="sessionMeta">
-            <span className="pill">
-              Available tasks <strong>{availableTasks.length}</strong>
-              {!user && ` / ${PART1_LISTENING_TASKS.length}`}
-            </span>
+<span className="pill">
+  Available tasks <strong>{filteredTasks.length}</strong>
+  {selectedTag !== "all" ? ` (${formatTagLabel(selectedTag)})` : ""}
+  {!user ? ` / ${PART1_LISTENING_TASKS.length}` : ""}
+</span>
             <span className="pill">
               Task <strong>{sessionIndex + 1}</strong> / {sessionTasks.length}
             </span>
@@ -931,13 +984,6 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
         </div>
 
         <div className="questionCard">
-          <div className="tagRow">
-            {(current.tags || []).map((tag) => (
-              <span key={tag} className="tag">
-                {tag}
-              </span>
-            ))}
-          </div>
 
           <div className="questionTop">
             <div className="questionText">{current.question}</div>
@@ -1206,24 +1252,6 @@ function StyleScope() {
         border: 1px solid rgba(210,225,255,.14);
         border-radius: 12px;
         padding: .95rem;
-      }
-
-      .tagRow {
-        display: flex;
-        gap: .45rem;
-        flex-wrap: wrap;
-        margin-bottom: .75rem;
-      }
-
-      .tag {
-        display: inline-flex;
-        align-items: center;
-        border-radius: 999px;
-        border: 1px solid rgba(255,255,255,.16);
-        background: rgba(255,255,255,.05);
-        color: #dbe8ff;
-        font-size: .78rem;
-        padding: .2rem .55rem;
       }
 
       .questionTop {
