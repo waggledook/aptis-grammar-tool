@@ -297,6 +297,83 @@ const PART1_LISTENING_TASKS = [
       },
     ],
   },
+  {
+    id: "reporter-1",
+    title: "Reporter on overcrowded trains",
+    tags: ["report", "transport", "cause-and-effect", "news-style"],
+    intro:
+      "Listen to the report and answer the question below. You can listen to the recording twice.",
+    audioSrc: "/audio/listening/part1/reporter-1.mp3",
+    question: "Listen to a reporter talking about overcrowded trains. What was the main reason conditions got worse this year?",
+    stem: "The main reason was __________.",
+    answer: "B",
+    scriptLineIndex: 1,
+    evidenceParts: [
+      "more employees are now going back into the office",
+      "discounted fares have encouraged more people to travel",
+      "what seems to have made the biggest difference is the fact that the operator has been running fewer services since January because of staff shortages",
+    ],
+    explanation:
+      "The report mentions people returning to the office and discounted fares as possible factors, but it then says that what made the biggest difference was that the operator had been running fewer services since January. So the main reason was fewer services running.",
+    options: [
+      { value: "A", text: "Ticket prices were reduced" },
+      { value: "B", text: "Fewer services were running" },
+      { value: "C", text: "More people returned to the office" },
+    ],
+    script: [
+      {
+        speaker: "Reporter",
+        text:
+          "Passengers travelling into the city have been complaining for months about increasingly crowded trains, especially during the morning rush hour. Rail users have suggested a number of possible explanations.",
+      },
+      {
+        speaker: "Reporter",
+        text:
+          "One obvious factor is that more employees are now going back into the office after several years of working partly from home. Some passengers also point out that discounted fares have encouraged more people to travel at busy times. But what seems to have made the biggest difference is the fact that the operator has been running fewer services since January because of staff shortages.",
+      },
+      {
+        speaker: "Reporter",
+        text:
+          "With fewer trains available, even a fairly small rise in passenger numbers has had a noticeable effect on comfort and space.",
+      },
+    ],
+  },
+  {
+    id: "reporter-2",
+    title: "Reporter on litter in a public park",
+    tags: ["report", "public-spaces", "cause-and-effect", "news-style"],
+    intro:
+      "Listen to the report and answer the question below. You can listen to the recording twice.",
+    audioSrc: "/audio/listening/part1/reporter-2.mp3",
+    question: "Listen to a reporter talking about litter in a public park. What was the main reason the problem became worse?",
+    stem: "The main reason was __________.",
+    answer: "B",
+    scriptLineIndex: 1,
+    evidenceParts: [
+      "the park has hosted more concerts and food markets this summer",
+      "the real turning point came when a number of waste containers were removed during renovation work earlier in the year",
+      "Some people have also blamed the later start time for the cleaning teams",
+    ],
+    explanation:
+      "The report mentions more events and later cleaning times, but it says the real turning point came when waste containers were removed during renovation work. So the main reason was that fewer bins were available.",
+    options: [
+      { value: "A", text: "There were more weekend events" },
+      { value: "B", text: "Fewer bins were available" },
+      { value: "C", text: "Cleaning staff started work later" },
+    ],
+    script: [
+      {
+        speaker: "Reporter",
+        text:
+          "Residents have recently been complaining about the amount of litter being left in Westfield Park, particularly on Sundays and after public events. Several contributing factors have been put forward by residents.",
+      },
+      {
+        speaker: "Reporter",
+        text:
+          "It’s certainly true that the park has hosted more concerts and food markets this summer. Even so, local officials say the real turning point came when a number of waste containers were removed during renovation work earlier in the year. Some people have also blamed the later start time for the cleaning teams, especially at weekends, when the park tends to get particularly busy.",
+      },
+    ],
+  },
 ];
 
 const GUEST_TASK_LIMIT = 3;
