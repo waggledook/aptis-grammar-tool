@@ -28,9 +28,20 @@ export default function Profile({
 }) {
   const [loading, setLoading] = useState(true);
 
-  const [readingCount, setReadingCount] = useState(0);
+  const [readingCounts, setReadingCounts] = useState({
+    part2: 0,
+    part3: 0,
+    part4: 0,
+  });
+  
   const [speakingCounts, setSpeakingCounts] = useState({
     part1: 0,
+    part2: 0,
+    part3: 0,
+    part4: 0,
+  });
+  
+  const [listeningCounts, setListeningCounts] = useState({
     part2: 0,
     part3: 0,
     part4: 0,
@@ -77,6 +88,7 @@ export default function Profile({
   const [showVocabPanel, setShowVocabPanel] = useState(false);
   const [showSpeakingPanel, setShowSpeakingPanel] = useState(false);
   const [showGrammarPanel, setShowGrammarPanel] = useState(false);
+  const [showListeningPanel, setShowListeningPanel] = useState(false);
 
   const [showAccountPanel, setShowAccountPanel] = useState(false);
 
@@ -165,6 +177,18 @@ const handleChangePassword = async (e) => {
     part4: PART4_TASKS.length,
   };
 
+  const LISTENING_TOTALS = {
+    part2: 2,
+    part3: 3,
+    part4: 2,
+  };
+
+  const READING_TOTALS = {
+    part2: 6, // update if you have more reorder tasks live
+    part3: 1, // you said there is currently one example
+    part4: 2, // update if you have more live
+  };
+
 
 
   // keep photoURL synced if user changes badge in future
@@ -188,8 +212,9 @@ const handleChangePassword = async (e) => {
     (async () => {
       try {
         const [
-          rCount,
+          rCounts,
           sCounts,
+          lCounts,
           m,
           f,
           w,
@@ -200,11 +225,12 @@ const handleChangePassword = async (e) => {
           wP4,
           p4Reg,
           specNotes,
-          vocabCounts, // 👈 NEW
-          vocabMistakesArr, // 👈 NEW
+          vocabCounts,
+          vocabMistakesArr,
         ] = await Promise.all([
-          fb.fetchReadingProgressCount(uid),
+          fb.fetchReadingCounts?.(uid) ?? Promise.resolve({ part2: 0, part3: 0, part4: 0 }),
           fb.fetchSpeakingCounts(uid),
+          fb.fetchListeningCounts?.(uid) ?? Promise.resolve({ part2: 0, part3: 0, part4: 0 }),
           fb.fetchRecentMistakes(8, uid),
           fb.fetchRecentFavourites(8, uid),
           fb.fetchWritingP1Sessions(10, uid),
@@ -215,13 +241,14 @@ const handleChangePassword = async (e) => {
           fb.fetchWritingP4Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP4RegisterAttempts?.(100, uid) ?? Promise.resolve([]),
           fb.fetchSpeakingSpeculationNotes?.(50, uid) ?? Promise.resolve([]),
-          fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}), // 👈 NEW
-          fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]), // 👈 ADD THIS
-        ]);        
+          fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
+          fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]),
+        ]);  
   
         if (!alive) return;
-        setReadingCount(rCount);
+        setReadingCounts(rCounts || { part2: 0, part3: 0, part4: 0 });
         setSpeakingCounts(sCounts);
+        setListeningCounts(lCounts || { part2: 0, part3: 0, part4: 0 });
         setMistakes(m);
         setFavourites(f);
         setWritingP1(w);
@@ -264,6 +291,25 @@ const totalCompletedVocab = vocabTopicCounts
   )
 : 0;
 
+const totalReadingCompleted =
+  (readingCounts.part2 || 0) +
+  (readingCounts.part3 || 0) +
+  (readingCounts.part4 || 0);
+
+const totalReadingTasks =
+  (READING_TOTALS.part2 || 0) +
+  (READING_TOTALS.part3 || 0) +
+  (READING_TOTALS.part4 || 0);
+
+const totalListeningCompleted =
+  (listeningCounts.part2 || 0) +
+  (listeningCounts.part3 || 0) +
+  (listeningCounts.part4 || 0);
+
+const totalListeningTasks =
+  (LISTENING_TOTALS.part2 || 0) +
+  (LISTENING_TOTALS.part3 || 0) +
+  (LISTENING_TOTALS.part4 || 0);
 
   return (
     <div className="profile-page game-wrapper">
@@ -364,9 +410,11 @@ const totalCompletedVocab = vocabTopicCounts
     <h3 className="sec-title" style={{ margin: 0 }}>
       Reading Progress
     </h3>
+
     <span className="muted small" style={{ flexShrink: 0 }}>
-      {readingCount} task{readingCount === 1 ? "" : "s"} completed
+      {totalReadingCompleted}/{totalReadingTasks} tasks completed
     </span>
+
     <span className={`chev ${showReadingPanel ? "open" : ""}`} aria-hidden>
       ▾
     </span>
@@ -374,11 +422,73 @@ const totalCompletedVocab = vocabTopicCounts
 
   {showReadingPanel && (
     <div className="panel-body">
-      <p>
-        You’ve completed{" "}
-        <strong>{readingCount}</strong> reading task
-        {readingCount === 1 ? "" : "s"} so far.
-      </p>
+      <div className="pbar-group">
+        <ProgressBar
+          value={readingCounts.part2 || 0}
+          max={READING_TOTALS.part2 || 1}
+          label="Part 2"
+          right={`${readingCounts.part2 || 0}/${READING_TOTALS.part2 || 0}`}
+        />
+        <ProgressBar
+          value={readingCounts.part3 || 0}
+          max={READING_TOTALS.part3 || 1}
+          label="Part 3"
+          right={`${readingCounts.part3 || 0}/${READING_TOTALS.part3 || 0}`}
+        />
+        <ProgressBar
+          value={readingCounts.part4 || 0}
+          max={READING_TOTALS.part4 || 1}
+          label="Part 4"
+          right={`${readingCounts.part4 || 0}/${READING_TOTALS.part4 || 0}`}
+        />
+      </div>
+    </div>
+  )}
+</section>
+
+{/* --- LISTENING PROGRESS --- */}
+<section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showListeningPanel}
+    onClick={() => setShowListeningPanel((s) => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      Listening Progress
+    </h3>
+
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      {totalListeningCompleted}/{totalListeningTasks} tasks completed
+    </span>
+
+    <span className={`chev ${showListeningPanel ? "open" : ""}`} aria-hidden>
+      ▾
+    </span>
+  </button>
+
+  {showListeningPanel && (
+    <div className="panel-body">
+      <div className="pbar-group">
+        <ProgressBar
+          value={listeningCounts.part2 || 0}
+          max={LISTENING_TOTALS.part2 || 1}
+          label="Part 2"
+          right={`${listeningCounts.part2 || 0}/${LISTENING_TOTALS.part2 || 0}`}
+        />
+        <ProgressBar
+          value={listeningCounts.part3 || 0}
+          max={LISTENING_TOTALS.part3 || 1}
+          label="Part 3"
+          right={`${listeningCounts.part3 || 0}/${LISTENING_TOTALS.part3 || 0}`}
+        />
+        <ProgressBar
+          value={listeningCounts.part4 || 0}
+          max={LISTENING_TOTALS.part4 || 1}
+          label="Part 4"
+          right={`${listeningCounts.part4 || 0}/${LISTENING_TOTALS.part4 || 0}`}
+        />
+      </div>
     </div>
   )}
 </section>

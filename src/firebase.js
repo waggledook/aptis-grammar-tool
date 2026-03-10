@@ -593,6 +593,86 @@ export async function logReadingPart3Completed({ taskId, source = "AptisPart3" }
   });
 }
 
+
+// ─── LISTENING PART 1 (Short extracts / generated sets) ─────────────────────
+
+export async function getListeningPart1TaskStats() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return {};
+
+  const col = collection(db, "users", uid, "listeningPart1Tasks");
+  const snap = await getDocs(col);
+
+  const out = {};
+  snap.docs.forEach((d) => {
+    out[d.id] = d.data() || {};
+  });
+
+  return out;
+}
+
+export async function updateListeningPart1TaskProgress({
+  taskId,
+  correct,
+  playsUsed = null,
+  tags = [],
+  source = "ListeningPart1",
+}) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !taskId) return;
+
+  const ref = doc(db, "users", uid, "listeningPart1Tasks", taskId);
+
+  const payload = {
+    taskId,
+    source,
+    tags: Array.isArray(tags) ? tags : [],
+    seenAt: serverTimestamp(),
+    lastAttemptAt: serverTimestamp(),
+    lastCorrect: !!correct,
+    attempts: increment(1),
+    playsUsedLast: typeof playsUsed === "number" ? playsUsed : null,
+  };
+
+  if (correct) {
+    payload.completions = increment(1);
+    payload.lastCorrectAt = serverTimestamp();
+  } else {
+    payload.wrongCount = increment(1);
+    payload.lastWrongAt = serverTimestamp();
+  }
+
+  await setDoc(ref, payload, { merge: true });
+}
+
+export async function logListeningPart1Attempted({
+  taskId,
+  score,
+  total,
+  playsUsed = null,
+  source = "ListeningPart1",
+}) {
+  return logActivity("listening_part1_attempted", {
+    taskId: taskId || null,
+    score: typeof score === "number" ? score : null,
+    total: typeof total === "number" ? total : null,
+    playsUsed: typeof playsUsed === "number" ? playsUsed : null,
+    source,
+  });
+}
+
+export async function logListeningPart1Completed({
+  taskId,
+  playsUsed = null,
+  source = "ListeningPart1",
+}) {
+  return logActivity("listening_part1_completed", {
+    taskId: taskId || null,
+    playsUsed: typeof playsUsed === "number" ? playsUsed : null,
+    source,
+  });
+}
+
 // ─── LISTENING PART 2 (Matching speakers) ───────────────────────────────────
 export async function logListeningPart2Attempted({
   taskId,
@@ -755,6 +835,84 @@ export async function fetchReadingCompletions() {
   const done = new Set();
   snap.forEach(d => { if (d.data()?.completed) done.add(d.id); });
   return done;
+}
+
+/** Reading progress counts per part */
+export async function fetchReadingCounts(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return { part2: 0, part3: 0, part4: 0 };
+
+  const counts = { part2: 0, part3: 0, part4: 0 };
+
+  // Part 2 currently uses /users/{uid}/readingProgress
+  const readingSnap = await getDocs(
+    collection(db, "users", realUid, "readingProgress")
+  );
+  counts.part2 = readingSnap.size || 0;
+
+  // Parts 3 and 4 currently log completions to activityLog
+  const actSnap = await getDocs(
+    query(collection(db, "activityLog"), where("userId", "==", realUid))
+  );
+
+  const part3Done = new Set();
+  const part4Done = new Set();
+
+  actSnap.forEach((d) => {
+    const data = d.data() || {};
+    const type = data.type;
+    const taskId = data.details?.taskId;
+
+    if (type === "reading_part3_completed" && taskId) {
+      part3Done.add(taskId);
+    }
+    if (type === "reading_part4_completed" && taskId) {
+      part4Done.add(taskId);
+    }
+  });
+
+  counts.part3 = part3Done.size;
+  counts.part4 = part4Done.size;
+
+  return counts;
+}
+
+/** Listening progress counts per part */
+export async function fetchListeningCounts(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return { part2: 0, part3: 0, part4: 0 };
+
+  const counts = { part2: 0, part3: 0, part4: 0 };
+
+  const actSnap = await getDocs(
+    query(collection(db, "activityLog"), where("userId", "==", realUid))
+  );
+
+  const part2Done = new Set();
+  const part3Done = new Set();
+  const part4Done = new Set();
+
+  actSnap.forEach((d) => {
+    const data = d.data() || {};
+    const type = data.type;
+    const taskId = data.details?.taskId;
+
+    if (type === "listening_part2_completed" && taskId) {
+      part2Done.add(taskId);
+    }
+    if (type === "listening_part3_completed" && taskId) {
+      part3Done.add(taskId);
+    }
+    if (type === "listening_part4_completed" && taskId) {
+      part4Done.add(taskId);
+    }
+  });
+
+  counts.part2 = part2Done.size;
+  counts.part3 = part3Done.size;
+  counts.part4 = part4Done.size;
+
+  return counts;
 }
 
 // — SPEAKING PROGRESS (Parts 1–4) ———————————————————————————————

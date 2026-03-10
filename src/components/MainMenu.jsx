@@ -31,16 +31,16 @@ export default function MainMenu({ onSelect, user }) {
   <div className="whats-new-copy">
     <span className="whats-new-label">What’s new</span>
     <p>
-      <strong>Listening Part 3 is now live.</strong> Practise opinion-matching
-      tasks with audio, scripts and feedback.
+      <strong>Listening Parts 2, 3 and 4 are now live.</strong> Practise a range
+      of listening tasks with audio, scripts and feedback.
     </p>
   </div>
 
   <button
     className="whats-new-btn"
-    onClick={() => navigate("/listening/part3")}
+    onClick={() => navigate("/listening")}
   >
-    Try it now
+    Explore listening
   </button>
 </div>
 

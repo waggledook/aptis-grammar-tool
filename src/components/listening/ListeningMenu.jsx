@@ -33,15 +33,9 @@ export default function ListeningMenu() {
   <p>Multiple choice extracts.</p>
 </button>
 
-        {/* Part 2 (Coming soon) */}
-        <button
-          className="card soon-card"
-          onClick={() => toast("Listening Part 2 coming soon 👀")}
-        >
-          <div className="card-head">
+
+        <button className="card" onClick={() => navigate("/listening/part2")}>
             <h3>Part 2: Information Matching (Q14)</h3>
-            <span className="soon-pill">Coming soon</span>
-          </div>
           <p>Matching speakers.</p>
         </button>
 
@@ -51,15 +45,9 @@ export default function ListeningMenu() {
           <p>Opinion matching.</p>
         </button>
 
-        {/* Part 4 (Coming soon) */}
-        <button
-          className="card soon-card"
-          onClick={() => toast("Listening Part 4 coming soon 👀")}
-        >
-          <div className="card-head">
+        
+        <button className="card" onClick={() => navigate("/listening/part4")}>
             <h3>Part 4: Inference – Longer Monologues (Q16–17)</h3>
-            <span className="soon-pill">Coming soon</span>
-          </div>
           <p>Multiple-choice extracts.</p>
         </button>
       </div>
