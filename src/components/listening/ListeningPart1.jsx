@@ -41,6 +41,39 @@ const PART1_LISTENING_TASKS = [
       },
     ],
   },
+  {
+    id: "PA-shopping-1",
+    title: "Shopping centre weekend event",
+    tags: ["public-announcement", "shopping-centre", "events", "children"],
+    intro:
+      "Listen to the announcement and answer the question below. You can listen to the recording twice.",
+    audioSrc: "/audio/listening/part1/PA-shopping-1.mp3",
+    question: "Listen to the shopping centre announcement. Who is the event mainly for?",
+    stem: "The event is mainly for __________.",
+    answer: "2",
+    scriptLineIndex: 0,
+    evidenceParts: [
+      "there will be a cooking demonstration",
+      "fashion stores will be presenting their new collections aimed at younger shoppers",
+      "our main event begins at midday",
+      "families can enjoy face painting, storytelling and games",
+      "if you’re visiting with little ones this weekend",
+    ],
+    explanation:
+      "The announcement mentions cooking and fashion events, but it says the main event begins at midday and then describes activities like face painting, storytelling and games for families with little ones. So it is mainly for parents with young children.",
+    options: [
+      { value: "1", text: "people who enjoy cooking" },
+      { value: "2", text: "parents with young children" },
+      { value: "3", text: "teenagers interested in fashion" },
+    ],
+    script: [
+      {
+        speaker: "",
+        text:
+          "Welcome to Riverside Shopping Centre. This Saturday, we’ll be holding a number of special events throughout the day. At eleven o’clock, there will be a cooking demonstration in the food hall for anyone interested in easy summer meals. Later in the afternoon, several fashion stores will be presenting their new collections aimed at younger shoppers. However, our main event begins at midday in the central atrium, where families can enjoy face painting, storytelling and games, as well as live music and free balloons. So if you’re visiting with little ones this weekend, there’ll be plenty to keep them entertained while you shop. We look forward to seeing you.",
+      },
+    ],
+  },
 
   {
     id: "message-time-2",
@@ -167,6 +200,100 @@ const PART1_LISTENING_TASKS = [
         speaker: "Nina",
         text:
           "Hi Tom, it’s Nina next door. Thanks for taking in my parcel this morning. I finish work at five, so at first I thought I’d come straight over then. But the bus home has been terrible this week, and I usually get in a bit later because of traffic. So I’ll probably knock on your door at about half past five. Hope that’s alright, and thanks again.",
+      },
+    ],
+  },
+
+  {
+    id: "PA-sports-1",
+    title: "Sports centre announcement",
+    tags: ["public-announcement", "prices", "sports-centre"],
+    intro:
+      "Listen to the announcement and answer the question below. You can listen to the recording twice.",
+    audioSrc: "/audio/listening/part1/PA-sports-1.mp3",
+    question: "Listen to the announcement at a sports centre. Which class is cheaper this month?",
+    stem: "The cheaper class this month is __________.",
+    answer: "3",
+    scriptLineIndex: 0,
+    evidenceParts: [
+      "yoga classes will continue at the usual rate of eight pounds",
+      "adult swimming sessions are slightly reduced and now cost six pounds",
+      "evening badminton classes ... for just five pounds a session",
+    ],
+    explanation:
+      "Yoga costs eight pounds, swimming costs six, and badminton costs five if booked in advance. That makes badminton the cheapest class this month.",
+    options: [
+      { value: "1", text: "yoga" },
+      { value: "2", text: "swimming" },
+      { value: "3", text: "badminton" },
+    ],
+    script: [
+      {
+        speaker: "",
+        text:
+          "Hello everyone, and welcome to Green Park Sports Centre. We’d just like to let members know about some changes to our class prices this month. Our yoga classes will continue at the usual rate of eight pounds per session. The adult swimming sessions are slightly reduced and now cost six pounds instead of seven. However, the biggest change is in our evening badminton classes, which are available this month for just five pounds a session if booked in advance. These classes are proving very popular, so we recommend booking early. Please ask at reception if you’d like more details about times, equipment or membership discounts.",
+      },
+    ],
+  },
+  {
+    id: "PA-airport-1",
+    title: "Airport departure announcement",
+    tags: ["public-announcement", "travel", "airport", "time"],
+    intro:
+      "Listen to the announcement and answer the question below. You can listen to the recording twice.",
+    audioSrc: "/audio/listening/part1/PA-airport-1.mp3",
+    question: "Listen to the airport announcement. What time will the flight leave?",
+    stem: "The flight will leave at __________.",
+    answer: "3",
+    scriptLineIndex: 0,
+    evidenceParts: [
+      "Boarding was due to begin at 4.20 pm",
+      "We now expect boarding to start at approximately four thirty",
+      "with the flight leaving at ten to five",
+    ],
+    explanation:
+      "The announcement first mentions 4.20 pm, but that was the original boarding time, not the departure time. It then says boarding should start at 4.30 and the flight will leave at ten to five, which is 4.50.",
+    options: [
+      { value: "1", text: "16:20" },
+      { value: "2", text: "17:10" },
+      { value: "3", text: "16:50" },
+    ],
+    script: [
+      {
+        speaker: "",
+        text:
+          "Ladies and gentlemen, may we have your attention please. This is an announcement for passengers travelling on Flight 624 to Rome. Boarding was due to begin at 4.20 pm, but there has been a short delay while the aircraft is prepared for departure. We now expect boarding to start at approximately four thirty, with the flight leaving at ten to five. Please do not go to the gate yet, as staff are still assisting arriving passengers there. We apologise for the inconvenience and thank you for your patience. Further information will be given in around fifteen minutes. Please continue to check the departure screens for updates.",
+      },
+    ],
+  },
+  {
+    id: "PA-shopping-2",
+    title: "Department store weekend offers",
+    tags: ["public-announcement", "shopping", "prices", "discounts"],
+    intro:
+      "Listen to the announcement and answer the question below. You can listen to the recording twice.",
+    audioSrc: "/audio/listening/part1/PA-shopping-2.mp3",
+    question: "Listen to the announcement in a department store. Which items have the biggest discount this weekend?",
+    stem: "The biggest discount is on __________.",
+    answer: "1",
+    scriptLineIndex: 0,
+    evidenceParts: [
+      "winter coats are reduced by 15%",
+      "sports shoes now available at 50% of the original price",
+      "kitchen appliances ... are marked down by 40%",
+    ],
+    explanation:
+      "Winter coats are reduced by 15%, kitchen appliances by 40%, and sports shoes by 50% of the original price. That makes sports shoes the biggest discount.",
+    options: [
+      { value: "1", text: "sports shoes" },
+      { value: "2", text: "kitchen appliances" },
+      { value: "3", text: "winter coats" },
+    ],
+    script: [
+      {
+        speaker: "",
+        text:
+          "Good morning, customers. Here is some information about our weekend offers across the store. On the second floor, all winter coats are reduced by 15%, and there are also lower prices on selected hats, scarves and gloves. If you’re visiting the ground floor, you’ll find a range of sports shoes now available at 50% of the original price on selected brands and sizes only. And on the fourth floor, many kitchen appliances, including kettles, mixers and coffee machines, are marked down by 40% until the end of the weekend. Store card holders can also collect extra points on all purchases made before we close on Sunday.",
       },
     ],
   },
@@ -599,14 +726,14 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
                 onClick={() => generateNewSet("wrongOnly")}
                 disabled={!user}
               >
-                My wrong tasks
+                Review mistakes
               </button>
             </div>
           </div>
 
           {!user && (
             <p className="lock-note">
-              Guest users can practise the starter bank only. Sign in to unlock all Part 1 tasks, unseen-task priority, and wrong-task review.
+              Guest users can practise the starter bank only. Sign in to unlock all Part 1 tasks, review mistakes and avoid completed tasks.
             </p>
           )}
           
@@ -659,7 +786,7 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
                 onClick={() => generateNewSet("wrongOnly")}
                 disabled={!user}
               >
-                Wrong-task review
+                Review mistakes
               </button>
             </div>
           </div>
