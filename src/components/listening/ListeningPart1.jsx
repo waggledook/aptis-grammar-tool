@@ -575,6 +575,68 @@ const PART1_LISTENING_TASKS = [
       },
     ],
   },
+  {
+    id: "dialogue-opinion-2",
+    title: "Two people talking about Sundays",
+    tags: ["dialogue", "opinion"],
+    intro:
+      "Listen to the conversation and answer the question below. You can listen to the recording twice.",
+    audioSrc: "/audio/listening/part1/dialogue-opinion-2.mp3",
+    question: "Listen to the man and woman talking about weekends. What does the woman like doing on Sundays?",
+    stem: "She likes __________.",
+    answer: "A",
+    scriptLineIndex: 3,
+    evidenceParts: [
+      "I can’t stand staying in bed all morning",
+      "if the weather’s good, I really like going for a long walk somewhere quiet",
+      "I do visit my sister sometimes, but not every weekend",
+      "I’d much rather be outside if I get the chance",
+    ],
+    explanation:
+      "The woman says she does not like staying in bed late, and although she sometimes visits her sister, that is not what she usually prefers. She says she really likes going for a long walk if the weather is good, so that is the correct answer.",
+    options: [
+      { value: "A", text: "Going for a long walk" },
+      { value: "B", text: "Visiting her sister" },
+      { value: "C", text: "Staying in bed late" },
+    ],
+    script: [
+      {
+        speaker: "Man",
+        text:
+          "I love Sundays when I’ve got nothing planned and I finally get to sleep in!",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "Really? I can’t stand staying in bed all morning. I feel like I’ve wasted the day.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "So what do you usually do?",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "Well, if the weather’s good, I really like going for a long walk somewhere quiet, maybe by the river or in the hills.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "Not seeing family, then?",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "I do visit my sister sometimes, but not every weekend. I’d much rather be outside if I get the chance.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "That sounds healthier than my Sundays.",
+      },
+    ],
+  },
 ];
 
 const GUEST_TASK_LIMIT = 3;
