@@ -22,14 +22,8 @@ export default function ListeningMenu() {
 
       <div className="cards">
         {/* Part 1 (Coming soon) */}
-        <button
-  className="card soon-card"
-  onClick={() => toast("Listening Part 1 coming soon 👀")}
->
-  <div className="card-head">
-    <h3>Part 1: Information Recognition (Q1–13)</h3>
-    <span className="soon-pill">Coming soon</span>
-  </div>
+        <button className="card" onClick={() => navigate("/listening/part1")}>
+          <h3>Part 1: Information Recognition (Q1–13)</h3>
   <p>Multiple choice extracts.</p>
 </button>
 

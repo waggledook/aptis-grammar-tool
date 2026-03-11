@@ -178,6 +178,7 @@ const handleChangePassword = async (e) => {
   };
 
   const LISTENING_TOTALS = {
+    part1: 11,
     part2: 2,
     part3: 3,
     part4: 2,
@@ -230,7 +231,7 @@ const handleChangePassword = async (e) => {
         ] = await Promise.all([
           fb.fetchReadingCounts?.(uid) ?? Promise.resolve({ part2: 0, part3: 0, part4: 0 }),
           fb.fetchSpeakingCounts(uid),
-          fb.fetchListeningCounts?.(uid) ?? Promise.resolve({ part2: 0, part3: 0, part4: 0 }),
+          fb.fetchListeningCounts?.(uid) ?? Promise.resolve({ part1: 0, part2: 0, part3: 0, part4: 0 }),
           fb.fetchRecentMistakes(8, uid),
           fb.fetchRecentFavourites(8, uid),
           fb.fetchWritingP1Sessions(10, uid),
@@ -248,7 +249,7 @@ const handleChangePassword = async (e) => {
         if (!alive) return;
         setReadingCounts(rCounts || { part2: 0, part3: 0, part4: 0 });
         setSpeakingCounts(sCounts);
-        setListeningCounts(lCounts || { part2: 0, part3: 0, part4: 0 });
+        setListeningCounts(lCounts || { part1: 0, part2: 0, part3: 0, part4: 0 });
         setMistakes(m);
         setFavourites(f);
         setWritingP1(w);
@@ -301,12 +302,14 @@ const totalReadingTasks =
   (READING_TOTALS.part3 || 0) +
   (READING_TOTALS.part4 || 0);
 
-const totalListeningCompleted =
+  const totalListeningCompleted =
+  (listeningCounts.part1 || 0) +
   (listeningCounts.part2 || 0) +
   (listeningCounts.part3 || 0) +
   (listeningCounts.part4 || 0);
 
 const totalListeningTasks =
+  (LISTENING_TOTALS.part1 || 0) +
   (LISTENING_TOTALS.part2 || 0) +
   (LISTENING_TOTALS.part3 || 0) +
   (LISTENING_TOTALS.part4 || 0);
@@ -470,12 +473,19 @@ const totalListeningTasks =
   {showListeningPanel && (
     <div className="panel-body">
       <div className="pbar-group">
-        <ProgressBar
-          value={listeningCounts.part2 || 0}
-          max={LISTENING_TOTALS.part2 || 1}
-          label="Part 2"
-          right={`${listeningCounts.part2 || 0}/${LISTENING_TOTALS.part2 || 0}`}
-        />
+      <ProgressBar
+  value={listeningCounts.part1 || 0}
+  max={LISTENING_TOTALS.part1 || 1}
+  label="Part 1"
+  right={`${listeningCounts.part1 || 0}/${LISTENING_TOTALS.part1 || 0}`}
+/>
+
+<ProgressBar
+  value={listeningCounts.part2 || 0}
+  max={LISTENING_TOTALS.part2 || 1}
+  label="Part 2"
+  right={`${listeningCounts.part2 || 0}/${LISTENING_TOTALS.part2 || 0}`}
+/>
         <ProgressBar
           value={listeningCounts.part3 || 0}
           max={LISTENING_TOTALS.part3 || 1}

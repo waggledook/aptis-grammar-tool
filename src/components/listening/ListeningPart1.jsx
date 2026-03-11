@@ -74,6 +74,75 @@ const PART1_LISTENING_TASKS = [
       },
     ],
   },
+  {
+    id: "dialogue-plan-2",
+    title: "Two colleagues deciding where to have lunch",
+    tags: ["dialogue", "plans"],
+    intro:
+      "Listen to the conversation and answer the question below. You can listen to the recording twice.",
+    audioSrc: "/audio/listening/part1/dialogue-plan-2.mp3",
+    question: "Listen to two colleagues talking about lunch. What do they decide to do?",
+    stem: "They decide to __________.",
+    answer: "A",
+    scriptLineIndex: 0,
+    evidenceParts: [
+      "We could go to the new sandwich shop on King Street",
+      "the café near the station would be nice too",
+      "we’ll probably be waiting ages to get served there",
+      "we haven’t got long",
+      "So, sandwich?",
+      "I guess that makes more sense",
+    ],
+    explanation:
+      "They consider both the café near the station and the new sandwich shop. Because they do not have much time and the café may be slow, they decide to go to the new sandwich shop.",
+    options: [
+      { value: "A", text: "go to the new sandwich shop" },
+      { value: "B", text: "go to the café near the station" },
+      { value: "C", text: "eat in the office" },
+    ],
+    script: [
+      {
+        speaker: "Man",
+        text:
+          "Are you going out for lunch today?",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "I hope so. I can’t face eating at my desk again.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "Same. We could go to the new sandwich shop on King Street.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "Yes, I’ve been meaning to try that. Though the café near the station would be nice too.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "It would, but we’ll probably be waiting ages to get served there.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "True, and we haven’t got long.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "So, sandwich?",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "I guess that makes more sense.",
+      },
+    ],
+  },
 
   {
     id: "message-time-2",
@@ -371,6 +440,138 @@ const PART1_LISTENING_TASKS = [
         speaker: "Reporter",
         text:
           "It’s certainly true that the park has hosted more concerts and food markets this summer. Even so, local officials say the real turning point came when a number of waste containers were removed during renovation work earlier in the year. Some people have also blamed the later start time for the cleaning teams, especially at weekends, when the park tends to get particularly busy.",
+      },
+    ],
+  },
+  {
+    id: "dialogue-plan-1",
+    title: "Two friends making evening plans",
+    tags: ["dialogue", "plans"],
+    intro:
+      "Listen to the conversation and answer the question below. You can listen to the recording twice.",
+    audioSrc: "/audio/listening/part1/dialogue-plan-1.mp3",
+    question: "Listen to two friends discussing their plans. What do they decide to do?",
+    stem: "They decide to __________.",
+    answer: "C",
+    scriptLineIndex: 0,
+    evidenceParts: [
+      "We could go to the cinema",
+      "there’s nothing on I really want to see",
+      "What about eating out somewhere?",
+      "I’m trying not to spend too much this week",
+      "why don’t we just stay at home and cook something nice?",
+      "Yes, that sounds better, actually",
+    ],
+    explanation:
+      "They consider going to the cinema and eating out, but reject both ideas. In the end, they agree to stay at home and cook something, so the correct answer is to stay at home.",
+    options: [
+      { value: "A", text: "go to the cinema" },
+      { value: "B", text: "have dinner out" },
+      { value: "C", text: "stay at home" },
+    ],
+    script: [
+      {
+        speaker: "Man",
+        text:
+          "So, shall we go out this evening? I don’t really want to stay in again.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "No, neither do I. We could go to the cinema, I suppose.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "Maybe, but there’s nothing on I really want to see.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "Fair enough. What about eating out somewhere?",
+      },
+      {
+        speaker: "Man",
+        text:
+          "I’d like that, but I’m trying not to spend too much this week.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "Right. In that case, why don’t we just stay at home and cook something nice?",
+      },
+      {
+        speaker: "Man",
+        text:
+          "Yes, that sounds better, actually.",
+      },
+    ],
+  },
+  
+  {
+    id: "dialogue-opinion-1",
+    title: "Two friends talking about a new neighbour",
+    tags: ["dialogue", "opinion"],
+    intro:
+      "Listen to the conversation and answer the question below. You can listen to the recording twice.",
+    audioSrc: "/audio/listening/part1/dialogue-opinion-1.mp3",
+    question: "Listen to two friends talking about a new neighbour. What does the man think of her?",
+    stem: "He thinks she __________.",
+    answer: "B",
+    scriptLineIndex: 5,
+    evidenceParts: [
+      "She’s not unfriendly or anything",
+      "she’s certainly not noisy",
+      "she’s always knocking on my door trying to get something from me",
+      "I don’t mind helping now and then, but it’s becoming a bit too regular",
+    ],
+    explanation:
+      "The man clearly says she is not unfriendly and not noisy. His only complaint is that she keeps asking him for things and for help, so he feels she asks for too much help.",
+    options: [
+      { value: "A", text: "is noisy" },
+      { value: "B", text: "asks for too much help" },
+      { value: "C", text: "is unfriendly" },
+    ],
+    script: [
+      {
+        speaker: "Woman",
+        text:
+          "How are you getting on with the new woman next door?",
+      },
+      {
+        speaker: "Man",
+        text:
+          "Oh, she seems alright. She’s not unfriendly or anything.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "That’s good, then.",
+      },
+      {
+        speaker: "Man",
+        text:
+          "Yes, and she’s certainly not noisy. I hardly hear a sound from her flat.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "So no complaints?",
+      },
+      {
+        speaker: "Man",
+        text:
+          "Well, only that she’s always knocking on my door trying to get something from me — borrowing milk, asking me to carry boxes, that sort of thing.",
+      },
+      {
+        speaker: "Woman",
+        text:
+          "Already?",
+      },
+      {
+        speaker: "Man",
+        text:
+          "Yes. I don’t mind helping now and then, but it’s becoming a bit too regular.",
       },
     ],
   },

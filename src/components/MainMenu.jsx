@@ -31,7 +31,7 @@ export default function MainMenu({ onSelect, user }) {
   <div className="whats-new-copy">
     <span className="whats-new-label">What’s new</span>
     <p>
-      <strong>Listening Parts 2, 3 and 4 are now live.</strong> Practise a range
+      <strong>Practice tasks for all parts of the listening are now available</strong> Practise a range
       of listening tasks with audio, scripts and feedback.
     </p>
   </div>

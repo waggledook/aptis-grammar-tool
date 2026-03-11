@@ -882,14 +882,15 @@ export async function fetchReadingCounts(uid) {
 /** Listening progress counts per part */
 export async function fetchListeningCounts(uid) {
   const realUid = _uidOrCurrent(uid);
-  if (!realUid) return { part2: 0, part3: 0, part4: 0 };
+  if (!realUid) return { part1: 0, part2: 0, part3: 0, part4: 0 };
 
-  const counts = { part2: 0, part3: 0, part4: 0 };
+  const counts = { part1: 0, part2: 0, part3: 0, part4: 0 };
 
   const actSnap = await getDocs(
     query(collection(db, "activityLog"), where("userId", "==", realUid))
   );
 
+  const part1Done = new Set();
   const part2Done = new Set();
   const part3Done = new Set();
   const part4Done = new Set();
@@ -899,6 +900,9 @@ export async function fetchListeningCounts(uid) {
     const type = data.type;
     const taskId = data.details?.taskId;
 
+    if (type === "listening_part1_completed" && taskId) {
+      part1Done.add(taskId);
+    }
     if (type === "listening_part2_completed" && taskId) {
       part2Done.add(taskId);
     }
@@ -910,6 +914,7 @@ export async function fetchListeningCounts(uid) {
     }
   });
 
+  counts.part1 = part1Done.size;
   counts.part2 = part2Done.size;
   counts.part3 = part3Done.size;
   counts.part4 = part4Done.size;
