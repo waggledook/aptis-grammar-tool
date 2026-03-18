@@ -178,7 +178,7 @@ const handleChangePassword = async (e) => {
   };
 
   const LISTENING_TOTALS = {
-    part1: 11,
+    part1: 15,
     part2: 2,
     part3: 3,
     part4: 2,

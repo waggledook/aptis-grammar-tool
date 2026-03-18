@@ -43,7 +43,7 @@ const TASKS = [
   Thank you,
   The Debate Club Committee`,
       friendPrompt: "Write a message to your friend. Tell them how you feel about the club’s website project and ask what they think you should include in your comment. (About 50 words)",
-      formalPrompt: "Write your comment for the club website. Explain what you have gained from being a member of the debate club and why you would recommend it to others. (120–150 words)",
+      formalPrompt: "Write an email to the debate club committee. Explain what you have gained from being a member of the debate club and why you would recommend it to others. (120–150 words)",
     },
     {
       id: "volunteer-change",
