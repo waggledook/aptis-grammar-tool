@@ -566,6 +566,7 @@ export async function logReadingPart4Attempted({ taskId, score, total, source = 
 }
 
 export async function logReadingPart4Completed({ taskId, source = "AptisPart4" }) {
+  await saveReadingProgress(taskId, "part4");
   return logActivity("reading_part4_completed", {
     taskId: taskId || null,
     source,
@@ -587,6 +588,7 @@ export async function logReadingPart3Attempted({
 }
 
 export async function logReadingPart3Completed({ taskId, source = "AptisPart3" }) {
+  await saveReadingProgress(taskId, "part3");
   return logActivity("reading_part3_completed", {
     taskId: taskId || null,
     source,
@@ -668,6 +670,7 @@ export async function logListeningPart1Completed({
   playsUsed = null,
   source = "ListeningPart1",
 }) {
+  await saveListeningProgress(taskId, "part1");
   return logActivity("listening_part1_completed", {
     taskId: taskId || null,
     playsUsed: typeof playsUsed === "number" ? playsUsed : null,
@@ -697,6 +700,7 @@ export async function logListeningPart2Completed({
   playsUsed = null,
   source = "ListeningPart2",
 }) {
+  await saveListeningProgress(taskId, "part2");
   return logActivity("listening_part2_completed", {
     taskId: taskId || null,
     playsUsed: typeof playsUsed === "number" ? playsUsed : null,
@@ -726,6 +730,7 @@ export async function logListeningPart3Completed({
   playsUsed = null,
   source = "ListeningPart3",
 }) {
+  await saveListeningProgress(taskId, "part3");
   return logActivity("listening_part3_completed", {
     taskId: taskId || null,
     playsUsed: typeof playsUsed === "number" ? playsUsed : null,
@@ -755,11 +760,29 @@ export async function logListeningPart4Completed({
   playsUsed = null,
   source = "ListeningPart4",
 }) {
+  await saveListeningProgress(taskId, "part4");
   return logActivity("listening_part4_completed", {
     taskId: taskId || null,
     playsUsed: typeof playsUsed === "number" ? playsUsed : null,
     source,
   });
+}
+
+export async function saveListeningProgress(taskId, part = "part1") {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !taskId) return;
+
+  const ref = doc(db, "users", uid, "listeningProgress", `${part}:${taskId}`);
+  await setDoc(
+    ref,
+    {
+      part,
+      taskId,
+      completed: true,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
 }
 
 // ─── WRITING SUBMISSION ────────────────────────────────────────────────────
@@ -826,6 +849,23 @@ export async function saveReadingCompletion(taskId) {
   await setDoc(ref, { completed: true, updatedAt: serverTimestamp() }, { merge: true });
 }
 
+export async function saveReadingProgress(taskId, part = "part2") {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !taskId) return;
+
+  const ref = doc(db, "users", uid, "readingProgress", `${part}:${taskId}`);
+  await setDoc(
+    ref,
+    {
+      part,
+      taskId,
+      completed: true,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
 /**
  * Fetch a Set of completed reading task IDs for the current user.
  * @returns {Promise<Set<string>>}
@@ -846,35 +886,18 @@ export async function fetchReadingCounts(uid) {
 
   const counts = { part2: 0, part3: 0, part4: 0 };
 
-  // Part 2 currently uses /users/{uid}/readingProgress
-  const readingSnap = await getDocs(
-    collection(db, "users", realUid, "readingProgress")
-  );
-  counts.part2 = readingSnap.size || 0;
+  const snap = await getDocs(collection(db, "users", realUid, "readingProgress"));
 
-  // Parts 3 and 4 currently log completions to activityLog
-  const actSnap = await getDocs(
-    query(collection(db, "activityLog"), where("userId", "==", realUid))
-  );
-
-  const part3Done = new Set();
-  const part4Done = new Set();
-
-  actSnap.forEach((d) => {
+  snap.forEach((d) => {
     const data = d.data() || {};
-    const type = data.type;
-    const taskId = data.details?.taskId;
+    const part = data.part;
 
-    if (type === "reading_part3_completed" && taskId) {
-      part3Done.add(taskId);
-    }
-    if (type === "reading_part4_completed" && taskId) {
-      part4Done.add(taskId);
-    }
+    // Backward compatibility:
+    // old Part 2 docs may not have a part field, so count them as part2
+    if (!part || part === "part2") counts.part2 += 1;
+    if (part === "part3") counts.part3 += 1;
+    if (part === "part4") counts.part4 += 1;
   });
-
-  counts.part3 = part3Done.size;
-  counts.part4 = part4Done.size;
 
   return counts;
 }
@@ -886,38 +909,17 @@ export async function fetchListeningCounts(uid) {
 
   const counts = { part1: 0, part2: 0, part3: 0, part4: 0 };
 
-  const actSnap = await getDocs(
-    query(collection(db, "activityLog"), where("userId", "==", realUid))
-  );
+  const snap = await getDocs(collection(db, "users", realUid, "listeningProgress"));
 
-  const part1Done = new Set();
-  const part2Done = new Set();
-  const part3Done = new Set();
-  const part4Done = new Set();
-
-  actSnap.forEach((d) => {
+  snap.forEach((d) => {
     const data = d.data() || {};
-    const type = data.type;
-    const taskId = data.details?.taskId;
+    const part = data.part;
 
-    if (type === "listening_part1_completed" && taskId) {
-      part1Done.add(taskId);
-    }
-    if (type === "listening_part2_completed" && taskId) {
-      part2Done.add(taskId);
-    }
-    if (type === "listening_part3_completed" && taskId) {
-      part3Done.add(taskId);
-    }
-    if (type === "listening_part4_completed" && taskId) {
-      part4Done.add(taskId);
-    }
+    if (part === "part1") counts.part1 += 1;
+    if (part === "part2") counts.part2 += 1;
+    if (part === "part3") counts.part3 += 1;
+    if (part === "part4") counts.part4 += 1;
   });
-
-  counts.part1 = part1Done.size;
-  counts.part2 = part2Done.size;
-  counts.part3 = part3Done.size;
-  counts.part4 = part4Done.size;
 
   return counts;
 }
