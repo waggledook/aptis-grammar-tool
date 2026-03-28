@@ -1,0 +1,17 @@
+{
+  "uid": "oWQisaiJBtRXWR4cWc83b0KL7SF3",
+  "existsInFirestore": true,
+  "existsInAuth": false,
+  "email": "nicholas@beeskillsenglish.com",
+  "username": "nickybeeskills",
+  "role": "student",
+  "createdAt": "2025-11-25T21:12:58.518Z",
+  "data": {
+    "role": "student",
+    "email": "nicholas@beeskillsenglish.com",
+    "createdAt": "2025-11-25T21:12:58.518Z",
+    "name": "Nicholas Beeson",
+    "username": "nickybeeskills"
+  },
+  "subcollections": {}
+}

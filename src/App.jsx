@@ -79,6 +79,13 @@ import ListeningPart1 from "./components/listening/ListeningPart1.jsx";
 import ListeningPart2 from "./components/listening/ListeningPart2.jsx";
 import ListeningPart3 from "./components/listening/ListeningPart3.jsx";
 import ListeningPart4 from "./components/listening/ListeningPart4.jsx";
+import HubLanding from "./components/hub/HubLanding.jsx";
+import HubGrammarMenu from "./components/hub/HubGrammarMenu.jsx";
+import HubMiniGrammarTests from "./components/hub/HubMiniGrammarTests.jsx";
+import HubGrammarActivityRunner from "./components/hub/HubGrammarActivityRunner.jsx";
+import HubListeningMenu from "./components/hub/HubListeningMenu.jsx";
+import HubDictationTrainer from "./components/hub/HubDictationTrainer.jsx";
+import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 
 
@@ -95,6 +102,12 @@ const [view, setView] = useState('menu'); // 'menu' | 'grammar' | 'readingMenu' 
 const navigate = useNavigate();  // 👈 add this
 const location = useLocation();
 const isCoursePack = location.pathname.startsWith("/course-pack");
+const isAdminRoute = location.pathname.startsWith("/admin");
+const currentSite = getSiteVariant();
+const isSeifHubSite = currentSite.id === "seifhub";
+const siteHomePath = getSiteHomePath();
+const siteProfilePath = getSitePath("/profile");
+const isWideLayout = isCoursePack || isAdminRoute;
 
 useEffect(() => {
   const unsub = onAuthStateChanged(auth, async (u) => {
@@ -115,15 +128,23 @@ useEffect(() => {
         ...u,
         role: data.role || "student",
         courseAccess: data.courseAccess || {},
+        siteAccess: data.siteAccess || {},
       });
     } catch (err) {
       console.error("Failed to read user role:", err);
-      setUser({ ...u, role: "student", courseAccess: {} });
+      setUser({ ...u, role: "student", courseAccess: {}, siteAccess: {} });
     }
   });
 
   return unsub;
 }, []);
+
+const hasSeifHubAccess = canAccessSeifHub(user);
+const showSeifHubGate =
+  isSeifHubSite &&
+  !hasSeifHubAccess &&
+  location.pathname !== "/privacy" &&
+  !location.pathname.startsWith("/admin");
 
 
   // — EXERCISE STATE — 
@@ -347,10 +368,10 @@ const [runKey,  setRunKey]  = useState(0);
   // — RENDER MAIN APP —
 return (
   // in src/App.jsx (inside your App component’s return)
-  <div className={`App ${isCoursePack ? "App--full" : ""}`}>
+  <div className={`App ${isWideLayout ? "App--full" : ""}`}>
     <ToastHost />
     <CookieBanner />
-    <div className={`content-container ${isCoursePack ? "content-container--full" : ""}`}>
+    <div className={`content-container ${isWideLayout ? "content-container--full" : ""}`}>
       {/* Auth bar */}
     <div
   style={{
@@ -367,7 +388,7 @@ return (
       // keep old behaviour…
       setView("menu");
       // …but also tell the router to go "home"
-      navigate("/");
+      navigate(siteHomePath);
     }}
   >
     Home
@@ -379,16 +400,18 @@ return (
         Sign Out
       </button>
 
-      <button
-  onClick={() => navigate("/profile")}
-  className="profile-badge-btn"
-  aria-label="Open profile"
-  title={user.email || "My Profile"}
->
-  <span className="avatar">
-    {((user.displayName || user.email || "U")[0] || "U").toUpperCase()}
-  </span>
-</button>
+      {(!isSeifHubSite || hasSeifHubAccess) && (
+        <button
+          onClick={() => navigate(siteProfilePath)}
+          className="profile-badge-btn"
+          aria-label="Open profile"
+          title={user.email || "My Profile"}
+        >
+          <span className="avatar">
+            {((user.displayName || user.email || "U")[0] || "U").toUpperCase()}
+          </span>
+        </button>
+      )}
     </>
   ) : (
     <button onClick={() => setShowAuth(true)} className="topbar-btn">
@@ -399,9 +422,34 @@ return (
 
    {/* ————— Show the right “page” ————— */}
 <Routes>
+  {showSeifHubGate ? (
+    <>
+      <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/admin" element={<AdminDashboard user={user} />} />
+      <Route path="/admin/activity" element={<AdminActivityLog user={user} />} />
+      <Route path="/admin/activity-charts" element={<AdminActivityCharts user={user} />} />
+      <Route
+        path="*"
+        element={
+          <HubLanding
+            user={user}
+            hasAccess={hasSeifHubAccess}
+            onSignIn={() => setShowAuth(true)}
+          />
+        }
+      />
+    </>
+  ) : (
+    <>
 
   {/* ——— Grammar route ——— */}
-  <Route path="/grammar" element={<GrammarPage />} />
+  <Route
+    path="/grammar"
+    element={isSeifHubSite ? <HubGrammarMenu /> : <GrammarPage />}
+  />
+  <Route path="/grammar/aptis" element={<GrammarPage />} />
+  <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests />} />
+  <Route path="/grammar/activity/:activityId" element={<HubGrammarActivityRunner />} />
 
 {/* Reading routes */}
 <Route path="/reading" element={<ReadingMenu />} />
@@ -596,7 +644,12 @@ return (
 />
 
 {/* listening routes */}
-<Route path="/listening" element={<ListeningMenu />} />
+<Route path="/listening" element={isSeifHubSite ? <HubListeningMenu /> : <ListeningMenu />} />
+
+<Route
+  path="/listening/dictation"
+  element={isSeifHubSite ? <HubDictationTrainer /> : <ListeningMenu />}
+/>
 
 <Route
   path="/listening/part1"
@@ -832,6 +885,7 @@ return (
   element={
     <Profile
       user={user}
+      siteMode={currentSite.id}
       onBack={() => navigate("/")}
       onGoMistakes={() => navigate("/profile/mistakes")}
       onGoFavourites={() => navigate("/profile/favourites")}
@@ -845,7 +899,7 @@ return (
   element={
     <>
       <button
-        onClick={() => navigate("/profile")}
+        onClick={() => navigate(siteProfilePath)}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
@@ -861,7 +915,7 @@ return (
   element={
     <>
       <button
-        onClick={() => navigate("/profile")}
+        onClick={() => navigate(siteProfilePath)}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
@@ -877,14 +931,14 @@ return (
   element={
     <>
       <button
-        onClick={() => navigate("/profile")}
+        onClick={() => navigate(siteProfilePath)}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
         ← Back to profile
       </button>
       <VocabMistakeReview
-        onBack={() => navigate("/profile")}
+        onBack={() => navigate(siteProfilePath)}
       />
     </>
   }
@@ -1068,17 +1122,24 @@ return (
 />
 <Route path="/privacy" element={<PrivacyPolicy />} />
 
-  <Route
-    path="/*"
-    element={
+<Route
+  path="/*"
+  element={
       <>
         {view === 'menu' && (
-  <MainMenu
-    onSelect={(next) => setView(next)}
-    user={user}               // 👈 pass user down
-  />
-  
-)}
+          isSeifHubSite ? (
+            <HubLanding
+              user={user}
+              hasAccess={hasSeifHubAccess}
+              onSignIn={() => setShowAuth(true)}
+            />
+          ) : (
+            <MainMenu
+              onSelect={(next) => setView(next)}
+              user={user}
+            />
+          )
+        )}
 
         {view === 'grammar' && <GrammarPage />}
 
@@ -1264,6 +1325,7 @@ return (
         {view === 'profile' && (
           <Profile
             user={user}
+            siteMode={currentSite.id}
             onBack={() => setView('menu')}
             onGoMistakes={() => setView('mistakes')}
             onGoFavourites={() => setView('favourites')}
@@ -1272,6 +1334,8 @@ return (
       </>
     }
   />
+    </>
+  )}
 </Routes>
 
 {/* Footer stays visible on all routes */}

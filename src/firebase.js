@@ -797,6 +797,7 @@ export async function logWritingSubmitted(details) {
 
 // re-create the old reports collection helper
 const reportsCollection = collection(db, "reports");
+const hubAccessRequestsCollection = collection(db, "hubAccessRequests");
 
 /**
  * Send a report document, now including the full question text.
@@ -833,6 +834,79 @@ export async function sendReport({
     userEmail: user?.email ?? null,
     createdAt: serverTimestamp(),
   });
+}
+
+export async function sendHubAccessRequest({ note = "" } = {}) {
+  const user = auth.currentUser;
+
+  return addDoc(hubAccessRequestsCollection, {
+    site: "seifhub",
+    note: note.trim(),
+    userId: user?.uid ?? null,
+    userEmail: user?.email ?? null,
+    userName: user?.displayName ?? "",
+    createdAt: serverTimestamp(),
+    status: "new",
+  });
+}
+
+export async function saveHubGrammarSubmission(payload) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+
+  const colRef = collection(db, "users", uid, "hubGrammarSubmissions");
+  await addDoc(colRef, {
+    ...payload,
+    app: "seifhub",
+    createdAt: serverTimestamp(),
+  });
+
+  await logActivity("hub_grammar_submitted", {
+    activityId: payload.activityId || "",
+    activityTitle: payload.activityTitle || "",
+    score: payload.score ?? null,
+    correct: payload.correct ?? null,
+    total: payload.total ?? null,
+  });
+}
+
+export async function saveHubDictationSession(payload) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+
+  const colRef = collection(db, "users", uid, "hubDictationSessions");
+  await addDoc(colRef, {
+    ...payload,
+    app: "seifhub",
+    createdAt: serverTimestamp(),
+  });
+
+  await logActivity("hub_dictation_completed", {
+    mode: payload.mode || "game",
+    setId: payload.setId || "",
+    setLabel: payload.setLabel || "",
+    score: payload.score ?? null,
+    completed: payload.completed ?? null,
+    totalPlayed: payload.totalPlayed ?? null,
+    trainingTarget: payload.trainingTarget ?? null,
+  });
+}
+
+export async function fetchHubGrammarSubmissions(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "hubGrammarSubmissions"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
 }
 
 // — READING PROGRESS (Part 2 reorder) ————————————————
@@ -1687,5 +1761,3 @@ if (import.meta.env.DEV) {
     return result;
   };
 }
-
-

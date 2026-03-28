@@ -42,6 +42,8 @@ const typeLabels = {
   reading_reorder_completed: "Reading reorder completed",
   reading_part4_attempted: "Reading Part 4 attempt",
   reading_part4_completed: "Reading Part 4 completed",
+  hub_grammar_submitted: "Hub grammar submitted",
+  hub_dictation_completed: "Hub dictation completed",
   writing_p1_guide_activity_started: "Writing P1 guide activity started",
   writing_p4_register_guide_activity_started:
     "Writing P4 register guide activity started",

@@ -35,6 +35,8 @@ const typeLabels = {
   listening_part3_completed: "Listening Part 3 completed", 
   listening_part4_attempted: "Listening Part 4 attempt",
   listening_part4_completed: "Listening Part 4 completed",
+  hub_grammar_submitted: "Hub grammar submitted",
+  hub_dictation_completed: "Hub dictation completed",
   writing_p1_guide_activity_started: "Writing P1 guide activity started",
   writing_p4_register_guide_activity_started: "Writing P4 register guide activity started",
   };
@@ -214,6 +216,12 @@ case "listening_part4_attempted":
   
 case "listening_part4_completed":
   return `${d.taskId || "task"} · completed ✓${typeof d.playsUsed === "number" ? ` · listens: ${d.playsUsed}/2` : ""}`;
+
+case "hub_grammar_submitted":
+  return `${d.activityTitle || d.activityId || "Grammar activity"} · ${d.score ?? "?"}% · ${d.correct ?? "?"}/${d.total ?? "?"}`;
+
+case "hub_dictation_completed":
+  return `${d.mode || "game"} · ${d.setLabel || d.setId || "All sentences"} · score ${d.score ?? "?"} · ${d.completed ?? "?"}/${d.totalPlayed ?? "?"}`;
       
       case "writing_submitted": {
         const part = d.part || "?";
@@ -451,6 +459,8 @@ const [cursorDoc, setCursorDoc] = useState(null);
             <option value="listening_part3_completed">Listening Part 3 completed</option>  
             <option value="listening_part4_attempted">Listening Part 4 attempt</option>
             <option value="listening_part4_completed">Listening Part 4 completed</option> 
+            <option value="hub_grammar_submitted">Hub grammar submitted</option>
+            <option value="hub_dictation_completed">Hub dictation completed</option>
             <option value="speaking_task_completed">Speaking task completed</option>
             <option value="vocab_flashcards_session">Vocab flashcards</option>
             <option value="vocab_match_session">Vocab match</option>

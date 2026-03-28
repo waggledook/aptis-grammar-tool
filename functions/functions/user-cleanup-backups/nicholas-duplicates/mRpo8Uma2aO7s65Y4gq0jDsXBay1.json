@@ -1,0 +1,18 @@
+{
+  "uid": "mRpo8Uma2aO7s65Y4gq0jDsXBay1",
+  "existsInFirestore": true,
+  "existsInAuth": false,
+  "email": "nicholas@beeskillsenglish.com",
+  "username": "waggledook",
+  "role": "student",
+  "createdAt": "2025-11-19T13:25:04.143Z",
+  "data": {
+    "role": "student",
+    "email": "nicholas@beeskillsenglish.com",
+    "createdAt": "2025-11-19T13:25:04.143Z",
+    "name": "Nicholas Beeson",
+    "username": "waggledook",
+    "teacherId": "zDjCgrOjIGOAZRlHEn8rzKeOsTh2"
+  },
+  "subcollections": {}
+}

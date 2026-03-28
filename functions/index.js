@@ -100,6 +100,65 @@ exports.emailReport = functions.region("europe-west1")
     return null;
   });
 
+exports.emailHubAccessRequest = functions.region("europe-west1")
+  .firestore.document("hubAccessRequests/{requestId}")
+  .onCreate(async (snap) => {
+    const r = snap.data() || {};
+    const when = new Date().toLocaleString("en-GB", { timeZone: "Europe/Madrid" });
+    const userEmail = r.userEmail || null;
+
+    const lines = [
+      "New Seif Hub access request",
+      "",
+      `Site: ${r.site || "seifhub"}`,
+      `User: ${r.userName || "-"}`,
+      `Email: ${userEmail || "-"}`,
+      `UID: ${r.userId || "-"}`,
+      `Note: ${r.note || "none"}`,
+      `At: ${when}`,
+    ];
+
+    const esc = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const toHtml = (arr) => arr.map((l) => `<p>${esc(l)}</p>`).join("");
+
+    const adminMsg = {
+      from: FROM_ADDRESS,
+      to: TEACHER_EMAIL || FROM_ADDRESS,
+      subject: `Seif Hub access request — ${userEmail || r.userName || "unknown user"}`,
+      text: lines.join("\n"),
+      html: toHtml(lines),
+      replyTo: userEmail && userEmail.includes("@") ? userEmail : undefined,
+    };
+
+    const userMsg = userEmail && userEmail.includes("@")
+      ? {
+          from: FROM_ADDRESS,
+          to: userEmail,
+          subject: "We’ve received your Seif Hub access request",
+          text: [
+            "Thanks for your request. We’ve received it and will review your Seif Hub access shortly.",
+            "",
+            ...lines,
+          ].join("\n"),
+          html:
+            "<p>Thanks for your request. We’ve received it and will review your Seif Hub access shortly.</p>" +
+            "<hr/>" +
+            toHtml(lines),
+          replyTo: TEACHER_EMAIL || FROM_ADDRESS,
+        }
+      : null;
+
+    try {
+      await transporter.sendMail(adminMsg);
+      if (userMsg) await transporter.sendMail(userMsg);
+      console.log("MAIL_OK hub access request", { id: snap.id, to: adminMsg.to, copy: !!userMsg });
+    } catch (err) {
+      console.error("MAIL_FAIL hub access request", err?.message || String(err));
+    }
+
+    return null;
+  });
+
 // =============== NEW: notify when a user becomes a TEACHER ===============
 exports.onUserRoleChange = functions
   .region("europe-west1")
@@ -302,5 +361,4 @@ exports.speak = functions.region('europe-west1').https.onRequest(async (req, res
     }
   });
 });
-
 

@@ -25,7 +25,9 @@ export default function Profile({
   targetUid,              // optional: which user to load data for
   titleOverride,          // optional: override "My Profile"
   viewerLabelOverride,    // optional: override "Signed in as …"
+  siteMode = "aptis",
 }) {
+  const isSeifHubProfile = siteMode === "seifhub";
   const [loading, setLoading] = useState(true);
 
   const [readingCounts, setReadingCounts] = useState({
@@ -89,8 +91,10 @@ export default function Profile({
   const [showSpeakingPanel, setShowSpeakingPanel] = useState(false);
   const [showGrammarPanel, setShowGrammarPanel] = useState(false);
   const [showListeningPanel, setShowListeningPanel] = useState(false);
+  const [showHubGrammarPanel, setShowHubGrammarPanel] = useState(false);
 
   const [showAccountPanel, setShowAccountPanel] = useState(false);
+  const [hubGrammarSubmissions, setHubGrammarSubmissions] = useState([]);
 
 
   const TOTAL_VOCAB_SETS = getTotalVocabSets();
@@ -228,6 +232,7 @@ const handleChangePassword = async (e) => {
           specNotes,
           vocabCounts,
           vocabMistakesArr,
+          hubGrammarSubs,
         ] = await Promise.all([
           fb.fetchReadingCounts?.(uid) ?? Promise.resolve({ part2: 0, part3: 0, part4: 0 }),
           fb.fetchSpeakingCounts(uid),
@@ -244,6 +249,7 @@ const handleChangePassword = async (e) => {
           fb.fetchSpeakingSpeculationNotes?.(50, uid) ?? Promise.resolve([]),
           fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
           fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]),
+          fb.fetchHubGrammarSubmissions?.(20, uid) ?? Promise.resolve([]),
         ]);  
   
         if (!alive) return;
@@ -262,6 +268,7 @@ const handleChangePassword = async (e) => {
         setSpeakingNotes(specNotes);
         setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
         setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
+        setHubGrammarSubmissions(hubGrammarSubs || []);
       } catch (e) {
         console.error("[Profile] load failed", e);
         toast("Couldn’t load some profile data.");
@@ -402,6 +409,8 @@ const totalListeningTasks =
   )}
 </section>
 
+          {!isSeifHubProfile && (
+          <>
           {/* --- READING PROGRESS --- */}
 <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
   <button
@@ -502,6 +511,8 @@ const totalListeningTasks =
     </div>
   )}
 </section>
+          </>
+          )}
 
 {/* --- VOCABULARY PROGRESS --- */}
 <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
@@ -599,6 +610,8 @@ const totalListeningTasks =
   )}
 </section>
 
+{!isSeifHubProfile && (
+<>
 {/* --- SPEAKING PROGRESS --- */}
 <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
   <button
@@ -722,7 +735,154 @@ const totalListeningTasks =
     </div>
   )}
 </section>
+ </>
+)}
 
+{isSeifHubProfile && (
+<section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showGrammarPanel}
+    onClick={() => setShowGrammarPanel((s) => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      Grammar Progress
+    </h3>
+
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      {grammarDash.answered}/{grammarDash.total || 0} items attempted
+    </span>
+
+    <span className={`chev ${showGrammarPanel ? "open" : ""}`} aria-hidden>
+      ▾
+    </span>
+  </button>
+
+  {showGrammarPanel && (
+    <div className="panel-body">
+      <ProgressBar
+        label="Answered"
+        value={grammarDash.answered}
+        max={grammarDash.total || 1}
+        right={`${grammarDash.answered}/${grammarDash.total || 0}`}
+      />
+      <div style={{ height: 8 }} />
+      <ProgressBar
+        label="Correct"
+        value={grammarDash.correct}
+        max={grammarDash.total || 1}
+        right={`${grammarDash.correct}/${grammarDash.total || 0}`}
+      />
+
+      {(onGoMistakes || onGoFavourites) && (
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap",
+            gap: ".5rem",
+            marginTop: "0.75rem",
+          }}
+        >
+          {onGoMistakes && (
+            <button
+              className="btn"
+              type="button"
+              onClick={() => onGoMistakes && onGoMistakes()}
+            >
+              Review Mistakes
+            </button>
+          )}
+
+          {onGoFavourites && (
+            <button
+              className="btn"
+              type="button"
+              onClick={() => onGoFavourites && onGoFavourites()}
+            >
+              Review Favourites
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  )}
+</section>
+)}
+
+{isSeifHubProfile && (
+<section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showHubGrammarPanel}
+    onClick={() => setShowHubGrammarPanel((s) => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      Mini Grammar Tests
+    </h3>
+
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      {hubGrammarSubmissions.length} submission{hubGrammarSubmissions.length === 1 ? "" : "s"}
+    </span>
+
+    <span className={`chev ${showHubGrammarPanel ? "open" : ""}`} aria-hidden>
+      ▾
+    </span>
+  </button>
+
+  {showHubGrammarPanel && (
+    <div className="panel-body">
+      {!hubGrammarSubmissions.length ? (
+        <p className="muted small">No mini grammar test submissions yet.</p>
+      ) : (
+        <ul className="wlist">
+          {hubGrammarSubmissions.map((submission, idx) => {
+            const when = submission.createdAt?.toDate?.()
+              ? submission.createdAt.toDate().toLocaleString()
+              : submission.createdAt || "—";
+
+            return (
+              <li key={submission.id || idx} className="wcard">
+                <div className="whead">
+                  <div>
+                    <strong>{submission.activityTitle || "Mini grammar test"}</strong>
+                    <div className="muted small">{when}</div>
+                    <div className="muted small">
+                      Score: {submission.score ?? 0}% ({submission.correct ?? 0}/{submission.total ?? 0})
+                    </div>
+                  </div>
+                </div>
+
+                <div className="qa" style={{ listStyle: "none", paddingLeft: 0 }}>
+                  {(submission.items || []).map((item) => (
+                    <div key={item.id} style={{ marginBottom: ".85rem" }}>
+                      <div className="q">{item.prompt}</div>
+                      {(item.gaps || []).map((gap) => (
+                        <div key={`${item.id}:${gap.gapId}`} className="a">
+                          <strong>Your answer:</strong> {gap.answer || <em>(no answer)</em>}
+                          {!gap.isCorrect && (
+                            <div className="muted small" style={{ marginTop: ".2rem" }}>
+                              Accepted: {(gap.acceptedAnswers || []).join(" / ")}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ))}
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  )}
+</section>
+)}
+
+{!isSeifHubProfile && (
+<>
 {/* --- WRITING HISTORY / GUIDE GROUPED --- */}
 <section className="panel collapsible" style={{ marginTop: "1rem" }}>
   <button
@@ -1406,8 +1566,12 @@ const totalListeningTasks =
     </div>
   )}
 </section>
+ </>
+)}
 
-      {/* --- SPEAKING NOTES --- */}
+{!isSeifHubProfile && (
+<>
+{/* --- SPEAKING NOTES --- */}
       <section className="panel collapsible" style={{ marginTop: "1rem" }}>
   <button
     type="button"
@@ -1540,6 +1704,8 @@ const totalListeningTasks =
     </>
   )}
 </section>
+ </>
+)}
 
       </>
     )}
@@ -2135,4 +2301,3 @@ function robustEmailForClipboard({ html = "", text = "" }) {
   const plain = plainFromEmail({ html, text });
   return htmlFromPlainEmail(plain);
 }
-
