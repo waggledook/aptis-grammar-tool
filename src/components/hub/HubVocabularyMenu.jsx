@@ -1,54 +1,19 @@
-import React, { useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
-import { sendHubAccessRequest } from "../../firebase";
-import { toast } from "../../utils/toast";
 
-export default function HubLanding({ user, hasAccess, onSignIn }) {
+export default function HubVocabularyMenu() {
   const navigate = useNavigate();
-  const [sendingRequest, setSendingRequest] = useState(false);
-  const statusLabel = !user
-    ? "Member access"
-    : hasAccess
-      ? "Welcome back"
-      : "Access pending";
-  const statusCopy = !user
-    ? "Sign in with your academy account to enter the private hub and open your activities."
-    : hasAccess
-      ? "Your account has access to the academy hub. Choose an activity area to continue."
-      : "Your account is signed in, but it is not currently enabled for the hub. If you think this should already be active, you can request access below.";
-
-  async function handleRequestAccess() {
-    if (sendingRequest) return;
-    setSendingRequest(true);
-
-    try {
-      await sendHubAccessRequest();
-      toast(
-        user?.email
-          ? `Request sent. We’ve emailed a copy to ${user.email}.`
-          : "Request sent. We’ll review your Seif Hub access shortly."
-      );
-    } catch (err) {
-      console.error("Hub access request failed:", err);
-      toast("Sorry — failed to send the request. Please try again.");
-    } finally {
-      setSendingRequest(false);
-    }
-  }
 
   return (
     <div className="menu-wrapper hub-menu-wrapper">
       <Seo
-        title="Seif Hub | BeeSkills English"
-        description="Private learning hub for BeeSkills English academy students. Sign in to access your activities, practice pages and course resources."
+        title="Vocabulary Activities | Seif Hub"
+        description="Choose a vocabulary activity inside the Seif English Hub."
       />
 
-      <header
-        className="main-header"
-        style={{ textAlign: "center", marginBottom: "0rem" }}
-      >
+      <header className="main-header" style={{ textAlign: "center", marginBottom: "0rem" }}>
         <img
           src="/images/seif-english-hub-logo.png"
           alt="Seif English Hub Logo"
@@ -57,100 +22,31 @@ export default function HubLanding({ user, hasAccess, onSignIn }) {
         />
       </header>
 
-      <p className="menu-sub">
-        Private student hub for Seif English students.
-      </p>
+      <p className="menu-sub">Choose a vocabulary activity to begin.</p>
 
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
-          <span className="whats-new-label">{statusLabel}</span>
-          <p>{statusCopy}</p>
+          <span className="whats-new-label">Vocabulary area</span>
+          <p>
+            Build vocabulary through topic-based practice and keep your work inside the
+            Seif Hub learning space.
+          </p>
         </div>
 
-        {!user && (
-          <button className="whats-new-btn" onClick={onSignIn}>
-            Sign in
-          </button>
-        )}
-
-        {user && hasAccess && (
-          <button className="whats-new-btn" onClick={() => navigate(getSitePath("/grammar"))}>
-            Open hub
-          </button>
-        )}
-
-        {user && !hasAccess && (
-          <button className="whats-new-btn" onClick={handleRequestAccess} disabled={sendingRequest}>
-            {sendingRequest ? "Sending..." : "Request access"}
-          </button>
-        )}
+        <button className="whats-new-btn" onClick={() => navigate(getSitePath("/"))}>
+          Back to hub
+        </button>
       </div>
 
-      {!!user && (
-        <>
-          <div className="menu-grid">
-            <button
-              className="menu-card"
-              onClick={() => (hasAccess ? navigate(getSitePath("/grammar")) : onSignIn?.())}
-            >
-              <h3>Grammar Activities</h3>
-              <p>Practise grammar through guided activities, mini tests, and focused study tasks.</p>
-            </button>
-
-            <button
-              className="menu-card"
-              onClick={() => (hasAccess ? navigate(getSitePath("/listening")) : onSignIn?.())}
-            >
-              <h3>Listening Activities</h3>
-              <p>Build listening accuracy through dictation practice and other guided listening work.</p>
-            </button>
-
-            <button
-              className="menu-card"
-              onClick={() => (hasAccess ? navigate(getSitePath("/vocabulary")) : onSignIn?.())}
-            >
-              <h3>Vocabulary Activities</h3>
-              <p>Expand topic vocabulary and review useful words and expressions in context.</p>
-            </button>
-
-            <button
-              className="menu-card"
-              onClick={() => (hasAccess ? navigate(getSitePath("/profile")) : onSignIn?.())}
-            >
-              <h3>Student Profile</h3>
-              <p>Check your progress, review your activity, and keep track of your learning.</p>
-            </button>
-
-            <button
-              className="menu-card"
-              onClick={() => (hasAccess ? navigate(getSitePath("/use-of-english")) : onSignIn?.())}
-            >
-              <h3>Use Of English</h3>
-              <p>Practise key word transformations and word formation with instant corrective feedback.</p>
-            </button>
-
-            {user?.role === "admin" && (
-              <button
-                className="menu-card"
-                onClick={() => navigate(getSitePath("/admin"))}
-              >
-                <h3>Admin Tools</h3>
-                <p>Manage access, user roles, and activity data across the shared student platform.</p>
-              </button>
-            )}
-          </div>
-
-          <div className="promo-banner hub-promo-banner">
-            <p>
-              Current academy students only.
-              <span>
-                {" "}If your account should already be active for the hub, contact BeeSkills
-                English and we can enable access.
-              </span>
-            </p>
-          </div>
-        </>
-      )}
+      <div className="menu-grid">
+        <button className="menu-card" onClick={() => navigate(getSitePath("/vocabulary/topics"))}>
+          <h3>Topic Trainer</h3>
+          <p>
+            Practise useful vocabulary by topic and review words in context through
+            guided study sets.
+          </p>
+        </button>
+      </div>
 
       <style>{`
         .hub-menu-wrapper {

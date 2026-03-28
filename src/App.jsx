@@ -85,6 +85,10 @@ import HubMiniGrammarTests from "./components/hub/HubMiniGrammarTests.jsx";
 import HubGrammarActivityRunner from "./components/hub/HubGrammarActivityRunner.jsx";
 import HubListeningMenu from "./components/hub/HubListeningMenu.jsx";
 import HubDictationTrainer from "./components/hub/HubDictationTrainer.jsx";
+import HubUseOfEnglishMenu from "./components/hub/HubUseOfEnglishMenu.jsx";
+import HubKeywordTrainer from "./components/hub/HubKeywordTrainer.jsx";
+import HubWordFormationTrainer from "./components/hub/HubWordFormationTrainer.jsx";
+import HubVocabularyMenu from "./components/hub/HubVocabularyMenu.jsx";
 import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 
@@ -451,6 +455,10 @@ return (
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests />} />
   <Route path="/grammar/activity/:activityId" element={<HubGrammarActivityRunner />} />
 
+  <Route path="/use-of-english" element={<HubUseOfEnglishMenu />} />
+  <Route path="/use-of-english/keyword" element={<HubKeywordTrainer />} />
+  <Route path="/use-of-english/word-formation" element={<HubWordFormationTrainer />} />
+
 {/* Reading routes */}
 <Route path="/reading" element={<ReadingMenu />} />
 
@@ -693,7 +701,7 @@ return (
 />
 
 {/* vocabulary routes */}
-<Route path="/vocabulary" element={<VocabularyMenu />} />
+<Route path="/vocabulary" element={isSeifHubSite ? <HubVocabularyMenu /> : <VocabularyMenu />} />
   <Route
     path="/vocabulary/topics"
     element={<VocabularyTopics isAuthenticated={!!user} />}

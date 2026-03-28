@@ -430,18 +430,61 @@ export async function logActivity(type, details = {}) {
   if (!user) return; // silently skip if not signed in
 
   try {
+    const { app = "aptis-trainer", ...safeDetails } = details || {};
     await addDoc(collection(db, "activityLog"), {
       userId: user.uid,
       userEmail: user.email || null,
       type,                    // e.g. "grammar_session", "vocab_set_completed"
-      details: details || {},  // small object with context
+      details: safeDetails || {},  // small object with context
       createdAt: serverTimestamp(),
-      app: "aptis-trainer",    // helps if you ever share a project
+      app,    // helps if you ever share a project
     });
   } catch (err) {
     // logging should never break the app
     console.error("[activityLog] Failed to log activity:", err);
   }
+}
+
+export async function logHubKeywordStarted(details = {}) {
+  return logActivity("hub_keyword_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubKeywordReviewLoaded(details = {}) {
+  return logActivity("hub_keyword_review_loaded", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubKeywordCompleted(details = {}) {
+  return logActivity("hub_keyword_completed", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubWordFormationStarted(details = {}) {
+  return logActivity("hub_word_formation_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubWordFormationReviewLoaded(details = {}) {
+  return logActivity("hub_word_formation_review_loaded", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubWordFormationCompleted(details = {}) {
+  return logActivity("hub_word_formation_completed", {
+    app: "seifhub",
+    ...details,
+  });
 }
 
 // ─── ACTIVITY HELPERS ────────────────────────────────────────────────────
@@ -898,6 +941,323 @@ export async function fetchHubGrammarSubmissions(n = 20, uid) {
 
   const qy = query(
     collection(db, "users", realUid, "hubGrammarSubmissions"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function fetchKeywordTransformations() {
+  const ref = doc(db, "masterSentences", "all");
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return [];
+
+  const data = snap.data() || {};
+  return Array.isArray(data.list) ? data.list : [];
+}
+
+export async function saveHubKeywordResult(itemId, tags, isCorrect) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  const ref = doc(db, "users", uid, "hubKeywordProgress", itemId);
+  await setDoc(
+    ref,
+    {
+      itemId,
+      tags: tags || "",
+      attempts: increment(1),
+      everCorrect: isCorrect ? true : increment(0),
+      lastCorrect: !!isCorrect,
+      lastAnsweredAt: serverTimestamp(),
+      app: "seifhub",
+    },
+    { merge: true }
+  );
+}
+
+export async function fetchHubKeywordDashboard(uid) {
+  const realUid = _uidOrCurrent(uid);
+  const items = await fetchKeywordTransformations();
+  const totalsByLevel = { b1: 0, b2: 0, c1: 0, c2: 0 };
+
+  items.forEach((item) => {
+    const tags = String(item.tags || "")
+      .split(",")
+      .map((s) => s.trim().toLowerCase());
+    ["b1", "b2", "c1", "c2"].forEach((level) => {
+      if (tags.includes(level)) totalsByLevel[level] += 1;
+    });
+  });
+
+  if (!realUid) {
+    return {
+      answered: 0,
+      correct: 0,
+      total: items.length,
+      byLevel: Object.fromEntries(
+        Object.entries(totalsByLevel).map(([level, total]) => [level, { answered: 0, correct: 0, total }])
+      ),
+    };
+  }
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubKeywordProgress"));
+  let answered = 0;
+  let correct = 0;
+  const byLevel = {
+    b1: { answered: 0, correct: 0, total: totalsByLevel.b1 },
+    b2: { answered: 0, correct: 0, total: totalsByLevel.b2 },
+    c1: { answered: 0, correct: 0, total: totalsByLevel.c1 },
+    c2: { answered: 0, correct: 0, total: totalsByLevel.c2 },
+  };
+
+  snap.forEach((docSnap) => {
+    answered += 1;
+    const data = docSnap.data() || {};
+    if (data.everCorrect) correct += 1;
+    const tags = String(data.tags || "")
+      .split(",")
+      .map((s) => s.trim().toLowerCase());
+    ["b1", "b2", "c1", "c2"].forEach((level) => {
+      if (tags.includes(level)) {
+        byLevel[level].answered += 1;
+        if (data.everCorrect) byLevel[level].correct += 1;
+      }
+    });
+  });
+
+  return { answered, correct, total: items.length, byLevel };
+}
+
+export async function fetchWordFormationItems() {
+  const snap = await getDocs(collection(db, "masterWordFormations"));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveHubWordFormationResult(itemId, tags, isCorrect) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  const ref = doc(db, "users", uid, "hubWordFormationProgress", itemId);
+  await setDoc(
+    ref,
+    {
+      itemId,
+      tags: tags || "",
+      attempts: increment(1),
+      everCorrect: isCorrect ? true : increment(0),
+      lastCorrect: !!isCorrect,
+      lastAnsweredAt: serverTimestamp(),
+      app: "seifhub",
+    },
+    { merge: true }
+  );
+}
+
+export async function fetchHubWordFormationDashboard(uid) {
+  const realUid = _uidOrCurrent(uid);
+  const items = await fetchWordFormationItems();
+  const totalsByLevel = { b1: 0, b2: 0, c1: 0, c2: 0 };
+
+  items.forEach((item) => {
+    const tags = String(item.tags || "")
+      .split(",")
+      .map((s) => s.trim().toLowerCase());
+    ["b1", "b2", "c1", "c2"].forEach((level) => {
+      if (tags.includes(level)) totalsByLevel[level] += 1;
+    });
+  });
+
+  if (!realUid) {
+    return {
+      answered: 0,
+      correct: 0,
+      total: items.length,
+      byLevel: Object.fromEntries(
+        Object.entries(totalsByLevel).map(([level, total]) => [level, { answered: 0, correct: 0, total }])
+      ),
+    };
+  }
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubWordFormationProgress"));
+  let answered = 0;
+  let correct = 0;
+  const byLevel = {
+    b1: { answered: 0, correct: 0, total: totalsByLevel.b1 },
+    b2: { answered: 0, correct: 0, total: totalsByLevel.b2 },
+    c1: { answered: 0, correct: 0, total: totalsByLevel.c1 },
+    c2: { answered: 0, correct: 0, total: totalsByLevel.c2 },
+  };
+
+  snap.forEach((docSnap) => {
+    answered += 1;
+    const data = docSnap.data() || {};
+    if (data.everCorrect) correct += 1;
+    const tags = String(data.tags || "")
+      .split(",")
+      .map((s) => s.trim().toLowerCase());
+    ["b1", "b2", "c1", "c2"].forEach((level) => {
+      if (tags.includes(level)) {
+        byLevel[level].answered += 1;
+        if (data.everCorrect) byLevel[level].correct += 1;
+      }
+    });
+  });
+
+  return { answered, correct, total: items.length, byLevel };
+}
+
+export async function fetchHubWordFormationFavourites(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubWordFormationFavourites"));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveHubWordFormationFavourite(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  const ref = doc(db, "users", uid, "hubWordFormationFavourites", item.itemId);
+  await setDoc(
+    ref,
+    {
+      ...item,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      app: "seifhub",
+    },
+    { merge: true }
+  );
+}
+
+export async function removeHubWordFormationFavourite(itemId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  await deleteDoc(doc(db, "users", uid, "hubWordFormationFavourites", itemId));
+}
+
+export async function recordHubWordFormationMistake(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  await addDoc(collection(db, "users", uid, "hubWordFormationMistakes"), {
+    ...item,
+    app: "seifhub",
+    createdAt: serverTimestamp(),
+  });
+}
+
+export async function clearHubWordFormationMistakes(itemId, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !itemId) return;
+
+  const snap = await getDocs(
+    query(
+      collection(db, "users", realUid, "hubWordFormationMistakes"),
+      where("itemId", "==", itemId)
+    )
+  );
+
+  await Promise.all(snap.docs.map((entry) => deleteDoc(entry.ref)));
+}
+
+export async function fetchHubWordFormationMistakes(n = 15, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "hubWordFormationMistakes"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function fetchHubKeywordFavourites(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubKeywordFavourites"));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveHubKeywordFavourite(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  const ref = doc(db, "users", uid, "hubKeywordFavourites", item.itemId);
+  await setDoc(
+    ref,
+    {
+      ...item,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      app: "seifhub",
+    },
+    { merge: true }
+  );
+}
+
+export async function removeHubKeywordFavourite(itemId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  await deleteDoc(doc(db, "users", uid, "hubKeywordFavourites", itemId));
+}
+
+export async function recordHubKeywordMistake(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  await addDoc(collection(db, "users", uid, "hubKeywordMistakes"), {
+    ...item,
+    app: "seifhub",
+    createdAt: serverTimestamp(),
+  });
+}
+
+export async function clearHubKeywordMistakes(itemId, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !itemId) return;
+
+  const snap = await getDocs(
+    query(
+      collection(db, "users", realUid, "hubKeywordMistakes"),
+      where("itemId", "==", itemId)
+    )
+  );
+
+  await Promise.all(snap.docs.map((entry) => deleteDoc(entry.ref)));
+}
+
+export async function fetchHubKeywordMistakes(n = 15, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "hubKeywordMistakes"),
     orderBy("createdAt", "desc"),
     limit(n)
   );

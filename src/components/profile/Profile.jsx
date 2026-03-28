@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import * as fb from "../../firebase";
 import { toast } from "../../utils/toast";
+import { getSitePath } from "../../siteConfig.js";
 import { PART1_QUESTIONS } from "../speaking/banks/part1";
 import { PART2_TASKS } from "../speaking/banks/part2";
 import { PART3_TASKS } from "../speaking/banks/part3";
@@ -27,6 +29,7 @@ export default function Profile({
   viewerLabelOverride,    // optional: override "Signed in as …"
   siteMode = "aptis",
 }) {
+  const navigate = useNavigate();
   const isSeifHubProfile = siteMode === "seifhub";
   const [loading, setLoading] = useState(true);
 
@@ -92,9 +95,22 @@ export default function Profile({
   const [showGrammarPanel, setShowGrammarPanel] = useState(false);
   const [showListeningPanel, setShowListeningPanel] = useState(false);
   const [showHubGrammarPanel, setShowHubGrammarPanel] = useState(false);
+  const [showUseOfEnglishPanel, setShowUseOfEnglishPanel] = useState(false);
 
   const [showAccountPanel, setShowAccountPanel] = useState(false);
   const [hubGrammarSubmissions, setHubGrammarSubmissions] = useState([]);
+  const [hubKeywordDash, setHubKeywordDash] = useState({
+    answered: 0,
+    correct: 0,
+    total: 0,
+    byLevel: { b1: { answered: 0, total: 0 }, b2: { answered: 0, total: 0 }, c1: { answered: 0, total: 0 }, c2: { answered: 0, total: 0 } },
+  });
+  const [hubWordFormationDash, setHubWordFormationDash] = useState({
+    answered: 0,
+    correct: 0,
+    total: 0,
+    byLevel: { b1: { answered: 0, total: 0 }, b2: { answered: 0, total: 0 }, c1: { answered: 0, total: 0 }, c2: { answered: 0, total: 0 } },
+  });
 
 
   const TOTAL_VOCAB_SETS = getTotalVocabSets();
@@ -233,6 +249,8 @@ const handleChangePassword = async (e) => {
           vocabCounts,
           vocabMistakesArr,
           hubGrammarSubs,
+          keywordDash,
+          wordFormationDash,
         ] = await Promise.all([
           fb.fetchReadingCounts?.(uid) ?? Promise.resolve({ part2: 0, part3: 0, part4: 0 }),
           fb.fetchSpeakingCounts(uid),
@@ -250,6 +268,8 @@ const handleChangePassword = async (e) => {
           fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
           fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]),
           fb.fetchHubGrammarSubmissions?.(20, uid) ?? Promise.resolve([]),
+          fb.fetchHubKeywordDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
+          fb.fetchHubWordFormationDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
         ]);  
   
         if (!alive) return;
@@ -269,6 +289,8 @@ const handleChangePassword = async (e) => {
         setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
         setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
         setHubGrammarSubmissions(hubGrammarSubs || []);
+        setHubKeywordDash(keywordDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
+        setHubWordFormationDash(wordFormationDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
       } catch (e) {
         console.error("[Profile] load failed", e);
         toast("Couldn’t load some profile data.");
@@ -805,6 +827,49 @@ const totalListeningTasks =
           )}
         </div>
       )}
+    </div>
+  )}
+</section>
+)}
+
+{isSeifHubProfile && (
+<section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showUseOfEnglishPanel}
+    onClick={() => setShowUseOfEnglishPanel((s) => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      Use Of English Progress
+    </h3>
+
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      {(hubKeywordDash.answered || 0) + (hubWordFormationDash.answered || 0)} items attempted
+    </span>
+
+    <span className={`chev ${showUseOfEnglishPanel ? "open" : ""}`} aria-hidden>
+      ▾
+    </span>
+  </button>
+
+  {showUseOfEnglishPanel && (
+    <div className="panel-body">
+      <HubUseOfEnglishProfileCard
+        title="Keyword Transformations"
+        dash={hubKeywordDash}
+        onReviewMistakes={() => navigate(getSitePath("/use-of-english/keyword?mode=mistakes"))}
+        onReviewFavourites={() => navigate(getSitePath("/use-of-english/keyword?mode=favourites"))}
+      />
+
+      <div style={{ height: 12 }} />
+
+      <HubUseOfEnglishProfileCard
+        title="Word Formation"
+        dash={hubWordFormationDash}
+        onReviewMistakes={() => navigate(getSitePath("/use-of-english/word-formation?mode=mistakes"))}
+        onReviewFavourites={() => navigate(getSitePath("/use-of-english/word-formation?mode=favourites"))}
+      />
     </div>
   )}
 </section>
@@ -2061,6 +2126,90 @@ function ProgressBar({ label, value, max, right }) {
       </div>
       <div className="track">
         <div className="fill" style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function ProgressBarTinted({ label, value, max, right, color }) {
+  const pct = Math.min(100, Math.round((value / (max || 1)) * 100));
+  return (
+    <div className="pb">
+      <div className="row">
+        <span className="lbl">{label}</span>
+        <span className="val">{right}</span>
+      </div>
+      <div className="track">
+        <div className="fill" style={{ width: `${pct}%`, background: color || undefined }} />
+      </div>
+    </div>
+  );
+}
+
+function HubUseOfEnglishProfileCard({ title, dash, onReviewMistakes, onReviewFavourites }) {
+  const levelColors = {
+    b1: "#7fb4ff",
+    b2: "#f0c35b",
+    c1: "#e69aa0",
+    c2: "#c7a6ff",
+  };
+  const byLevel = dash?.byLevel || {};
+
+  return (
+    <div className="subpanel" style={{ padding: "0.9rem 1rem" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: ".75rem", alignItems: "center" }}>
+        <strong>{title}</strong>
+        <span className="muted small">
+          {dash?.answered || 0}/{dash?.total || 0} answered
+        </span>
+      </div>
+
+      <div style={{ height: 10 }} />
+
+      <ProgressBar
+        label="Answered"
+        value={dash?.answered || 0}
+        max={dash?.total || 1}
+        right={`${dash?.answered || 0}/${dash?.total || 0}`}
+      />
+      <div style={{ height: 8 }} />
+      <ProgressBar
+        label="Correct"
+        value={dash?.correct || 0}
+        max={dash?.total || 1}
+        right={`${dash?.correct || 0}/${dash?.total || 0}`}
+      />
+
+      <div style={{ height: 12 }} />
+      <div className="muted small" style={{ marginBottom: ".35rem" }}>By level</div>
+      {["b1", "b2", "c1", "c2"]
+        .filter((level) => (byLevel[level]?.total || 0) > 0)
+        .map((level) => (
+          <div key={level} style={{ marginBottom: 8 }}>
+            <ProgressBarTinted
+              label={level.toUpperCase()}
+              value={byLevel[level]?.answered || 0}
+              max={byLevel[level]?.total || 1}
+              right={`${byLevel[level]?.answered || 0}/${byLevel[level]?.total || 0}`}
+              color={levelColors[level]}
+            />
+          </div>
+        ))}
+
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: ".5rem",
+          marginTop: "0.75rem",
+        }}
+      >
+        <button className="btn" type="button" onClick={onReviewMistakes}>
+          Review Mistakes
+        </button>
+        <button className="btn" type="button" onClick={onReviewFavourites}>
+          Review Favourites
+        </button>
       </div>
     </div>
   );

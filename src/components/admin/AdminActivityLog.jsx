@@ -37,6 +37,12 @@ const typeLabels = {
   listening_part4_completed: "Listening Part 4 completed",
   hub_grammar_submitted: "Hub grammar submitted",
   hub_dictation_completed: "Hub dictation completed",
+  hub_keyword_started: "Hub keyword started",
+  hub_keyword_review_loaded: "Hub keyword review loaded",
+  hub_keyword_completed: "Hub keyword completed",
+  hub_word_formation_started: "Hub word formation started",
+  hub_word_formation_review_loaded: "Hub word formation review loaded",
+  hub_word_formation_completed: "Hub word formation completed",
   writing_p1_guide_activity_started: "Writing P1 guide activity started",
   writing_p4_register_guide_activity_started: "Writing P4 register guide activity started",
   };
@@ -222,6 +228,24 @@ case "hub_grammar_submitted":
 
 case "hub_dictation_completed":
   return `${d.mode || "game"} · ${d.setLabel || d.setId || "All sentences"} · score ${d.score ?? "?"} · ${d.completed ?? "?"}/${d.totalPlayed ?? "?"}`;
+
+case "hub_keyword_started":
+  return `${d.mode || "normal"} · pool ${d.poolSize ?? "?"} · set ${d.total ?? "?"}`;
+
+case "hub_keyword_review_loaded":
+  return `${d.mode || "review"} · ${d.total ?? "?"} item${d.total === 1 ? "" : "s"}`;
+
+case "hub_keyword_completed":
+  return `${d.mode || "normal"} · ${d.correct ?? "?"}/${d.total ?? "?"} correct`;
+
+case "hub_word_formation_started":
+  return `${d.mode || "normal"} · pool ${d.poolSize ?? "?"} · set ${d.total ?? "?"}`;
+
+case "hub_word_formation_review_loaded":
+  return `${d.mode || "review"} · ${d.total ?? "?"} item${d.total === 1 ? "" : "s"}`;
+
+case "hub_word_formation_completed":
+  return `${d.mode || "normal"} · ${d.correct ?? "?"}/${d.total ?? "?"} correct`;
       
       case "writing_submitted": {
         const part = d.part || "?";
