@@ -22,14 +22,13 @@ export default function HubUseOfEnglishMenu() {
         />
       </header>
 
-      <p className="menu-sub">Choose a use of English activity to begin.</p>
+      <p className="menu-sub">Choose a Use of English activity to begin.</p>
 
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
           <span className="whats-new-label">Use of English</span>
           <p>
-            This area starts by bringing your older BeeSkills use-of-English tools
-            into the hub as native activities.
+            Practise sentence transformations and word-building tasks, then save useful items to review again later.
           </p>
         </div>
 
@@ -42,15 +41,14 @@ export default function HubUseOfEnglishMenu() {
         <button className="menu-card" onClick={() => navigate(getSitePath("/use-of-english/keyword"))}>
           <h3>Keyword Transformations</h3>
           <p>
-            Rephrase sentences using a given key word and train grammar flexibility
-            with your Firebase-backed item bank.
+            Rewrite sentences with a key word while keeping the same meaning and build confidence with exam-style reformulations.
           </p>
         </button>
 
         <button className="menu-card" onClick={() => navigate(getSitePath("/use-of-english/word-formation"))}>
           <h3>Word Formation</h3>
           <p>
-            Transform base words into the correct form to complete each sentence.
+            Change base words into the correct form to complete each sentence accurately.
           </p>
         </button>
       </div>

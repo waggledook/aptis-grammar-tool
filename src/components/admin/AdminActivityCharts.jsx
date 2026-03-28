@@ -44,6 +44,7 @@ const typeLabels = {
   reading_part4_completed: "Reading Part 4 completed",
   hub_grammar_submitted: "Hub grammar submitted",
   hub_dictation_completed: "Hub dictation completed",
+  hub_flashcards_started: "Hub flashcards started",
   hub_keyword_started: "Hub keyword started",
   hub_keyword_review_loaded: "Hub keyword review loaded",
   hub_keyword_completed: "Hub keyword completed",

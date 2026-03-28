@@ -2,7 +2,13 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Star } from "lucide-react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
-import { auth, fetchHubSavedFlashcards, removeHubFlashcard, saveHubFlashcard } from "../../firebase.js";
+import {
+  auth,
+  fetchHubSavedFlashcards,
+  logHubFlashcardsStarted,
+  removeHubFlashcard,
+  saveHubFlashcard,
+} from "../../firebase.js";
 import { getHubGrammarFlashcardDeck } from "../../data/hubGrammarFlashcards.js";
 import { getSitePath } from "../../siteConfig.js";
 
@@ -136,6 +142,7 @@ export default function HubFlashcardsDeckPlayer() {
   const [reviewMode, setReviewMode] = useState("deck");
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
   const [savedRandomOrder, setSavedRandomOrder] = useState([]);
+  const [hasLoggedFirstFlip, setHasLoggedFirstFlip] = useState(false);
 
   const uid = auth.currentUser?.uid || "";
 
@@ -188,6 +195,7 @@ export default function HubFlashcardsDeckPlayer() {
     setFocusedFlipped(false);
     setGridFlipped({});
     setReviewMode("deck");
+    setHasLoggedFirstFlip(false);
   }, [deckId]);
 
   useEffect(() => {
@@ -262,6 +270,7 @@ export default function HubFlashcardsDeckPlayer() {
     setFocusIndex(0);
     setFocusedFlipped(false);
     setGridFlipped({});
+    setHasLoggedFirstFlip(false);
     if (reviewMode === "saved-random") {
       setSavedRandomOrder(shuffle(savedCards));
     }
@@ -315,6 +324,19 @@ export default function HubFlashcardsDeckPlayer() {
   const hasSavedCards = savedCards.length > 0;
   const gridScale = Math.max(0.72, Math.min(1.7, cardWidth / 320));
 
+  async function logFirstFlipIfNeeded(card) {
+    if (hasLoggedFirstFlip) return;
+
+    setHasLoggedFirstFlip(true);
+    await logHubFlashcardsStarted({
+      mode: reviewMode === "saved-random" ? "saved-random" : reviewMode === "saved" ? "saved" : "deck",
+      deckId: isSavedReviewDeck ? "saved-review" : card?.deckId || deck.id,
+      deckTitle: isSavedReviewDeck ? "Saved Flashcards Review" : card?.deckTitle || deck.title,
+      total: visibleCards.length,
+      sourceDeckTitle: card?.deckTitle || "",
+    });
+  }
+
   async function toggleSaved(card) {
     if (!uid) return;
 
@@ -354,10 +376,11 @@ export default function HubFlashcardsDeckPlayer() {
     }
   }
 
-  function toggleGridFlip(cardId) {
+  function toggleGridFlip(card) {
+    logFirstFlipIfNeeded(card);
     setGridFlipped((current) => ({
       ...current,
-      [cardId]: !current[cardId],
+      [card.id]: !current[card.id],
     }));
   }
 
@@ -571,7 +594,7 @@ export default function HubFlashcardsDeckPlayer() {
                 className={`hub-flashcard tile-card ${isFlipped ? "is-flipped" : ""} ${
                   isPromptedCard ? "is-prompted-card" : ""
                 }`}
-                onClick={() => toggleGridFlip(card.id)}
+                onClick={() => toggleGridFlip(card)}
                 style={{
                   "--hub-flashcard-scale": gridScale,
                   "--hub-card-width": `${cardWidth}px`,
@@ -632,7 +655,10 @@ export default function HubFlashcardsDeckPlayer() {
             key={focusCard.id}
             type="button"
             className={`hub-flashcard focus-card ${focusedFlipped ? "is-flipped" : ""}`}
-            onClick={() => setFocusedFlipped((current) => !current)}
+            onClick={() => {
+              logFirstFlipIfNeeded(focusCard);
+              setFocusedFlipped((current) => !current);
+            }}
           >
             <div className="hub-flashcard-inner">
               <div className="hub-flashcard-face hub-flashcard-front">

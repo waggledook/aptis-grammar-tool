@@ -29,10 +29,9 @@ export default function HubGrammarMenu() {
 
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
-          <span className="whats-new-label">Grammar area</span>
+          <span className="whats-new-label">Grammar</span>
           <p>
-            This menu lives inside the hub, but it can open the existing Aptis
-            grammar tool as one of your student activities.
+            Practise grammar in different ways, from gap-fill training to flashcards and short review tests.
           </p>
         </div>
 
@@ -45,22 +44,19 @@ export default function HubGrammarMenu() {
         <button className="menu-card" onClick={() => navigate(getSitePath("/grammar/aptis"))}>
           <h3>Aptis Grammar Tool</h3>
           <p>
-            Open the existing gap-fill generator and use it as a grammar activity
-            inside the Seif English Hub.
+            Practise gap-fill grammar questions with instant checking and progress tracking.
           </p>
         </button>
         <button className="menu-card" onClick={() => navigate(getSitePath("/grammar/flashcards"))}>
           <h3>Flashcards</h3>
           <p>
-            Study grammar points with flippable cards in grid view or one card at
-            a time, then save cards to review later.
+            Review grammar points with flip cards, either across a full page or one card at a time, and save cards for later review.
           </p>
         </button>
         <button className="menu-card" onClick={() => navigate(getSitePath("/grammar/mini-tests"))}>
           <h3>Mini Grammar Tests</h3>
           <p>
-            Open short focused grammar tests with instant corrective feedback and
-            saved submissions.
+            Take short focused tests and get instant feedback to help you notice and fix mistakes.
           </p>
         </button>
       </div>

@@ -29,10 +29,9 @@ export default function HubListeningMenu() {
 
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
-          <span className="whats-new-label">Listening area</span>
+          <span className="whats-new-label">Listening</span>
           <p>
-            This section will hold hub listening tasks. Dictation Trainer is the
-            first activity we’re bringing in from the separate prototype.
+            Build listening accuracy through short audio tasks and focused practice that helps you notice small details.
           </p>
         </div>
 
@@ -45,8 +44,7 @@ export default function HubListeningMenu() {
         <button className="menu-card" onClick={() => navigate(getSitePath("/listening/dictation"))}>
           <h3>Dictation Trainer</h3>
           <p>
-            Open the new listening dictation area and prepare for the Seif Hub
-            version of the trainer.
+            Listen carefully, write what you hear, and check your answers with word-by-word feedback.
           </p>
         </button>
       </div>

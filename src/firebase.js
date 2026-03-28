@@ -487,6 +487,13 @@ export async function logHubWordFormationCompleted(details = {}) {
   });
 }
 
+export async function logHubFlashcardsStarted(details = {}) {
+  return logActivity("hub_flashcards_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
 // ─── ACTIVITY HELPERS ────────────────────────────────────────────────────
 
 /**

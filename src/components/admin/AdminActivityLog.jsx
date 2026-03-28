@@ -37,6 +37,7 @@ const typeLabels = {
   listening_part4_completed: "Listening Part 4 completed",
   hub_grammar_submitted: "Hub grammar submitted",
   hub_dictation_completed: "Hub dictation completed",
+  hub_flashcards_started: "Hub flashcards started",
   hub_keyword_started: "Hub keyword started",
   hub_keyword_review_loaded: "Hub keyword review loaded",
   hub_keyword_completed: "Hub keyword completed",
@@ -228,6 +229,9 @@ case "hub_grammar_submitted":
 
 case "hub_dictation_completed":
   return `${d.mode || "game"} · ${d.setLabel || d.setId || "All sentences"} · score ${d.score ?? "?"} · ${d.completed ?? "?"}/${d.totalPlayed ?? "?"}`;
+
+case "hub_flashcards_started":
+  return `${d.mode || "deck"} · ${d.deckTitle || d.deckId || "Flashcards"} · ${d.total ?? "?"} card${d.total === 1 ? "" : "s"}`;
 
 case "hub_keyword_started":
   return `${d.mode || "normal"} · pool ${d.poolSize ?? "?"} · set ${d.total ?? "?"}`;
@@ -485,6 +489,7 @@ const [cursorDoc, setCursorDoc] = useState(null);
             <option value="listening_part4_completed">Listening Part 4 completed</option> 
             <option value="hub_grammar_submitted">Hub grammar submitted</option>
             <option value="hub_dictation_completed">Hub dictation completed</option>
+            <option value="hub_flashcards_started">Hub flashcards started</option>
             <option value="speaking_task_completed">Speaking task completed</option>
             <option value="vocab_flashcards_session">Vocab flashcards</option>
             <option value="vocab_match_session">Vocab match</option>
