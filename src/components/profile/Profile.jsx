@@ -313,6 +313,7 @@ const handleChangePassword = async (e) => {
   writingP4.length +
   p4Register.length;
 
+
   // 👇 Add this derived value for vocab progress
 const totalCompletedVocab = vocabTopicCounts
 ? Object.values(vocabTopicCounts).reduce(

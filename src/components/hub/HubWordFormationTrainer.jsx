@@ -8,6 +8,7 @@ import {
   clearHubWordFormationMistakes,
   fetchHubWordFormationFavourites,
   fetchHubWordFormationMistakes,
+  fetchSeenHubWordFormationItemIds,
   logHubWordFormationCompleted,
   logHubWordFormationReviewLoaded,
   logHubWordFormationStarted,
@@ -168,6 +169,7 @@ export default function HubWordFormationTrainer() {
   const [searchParams] = useSearchParams();
   const completionLoggedRef = useRef(false);
   const [items, setItems] = useState([]);
+  const [seenItemIds, setSeenItemIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [levels, setLevels] = useState(["b1", "b2", "c1", "c2"]);
   const [primaryTag, setPrimaryTag] = useState("all");
@@ -210,14 +212,16 @@ export default function HubWordFormationTrainer() {
     async function load() {
       setLoading(true);
       try {
-        const [data, favourites] = await Promise.all([
+        const [data, favourites, seenIds] = await Promise.all([
           fetchWordFormationItems(),
           auth.currentUser ? fetchHubWordFormationFavourites() : Promise.resolve([]),
+          auth.currentUser ? fetchSeenHubWordFormationItemIds() : Promise.resolve([]),
         ]);
 
         if (!cancelled) {
           setItems((Array.isArray(data) ? data : []).map(prepareWordFormationItem));
           setFavouriteIds(new Set(favourites.map((item) => item.itemId)));
+          setSeenItemIds(new Set(seenIds));
         }
       } catch (error) {
         console.error("[HubWordFormationTrainer] load failed", error);
@@ -293,17 +297,22 @@ export default function HubWordFormationTrainer() {
       return;
     }
 
+    const unseen = challengePool.filter((item) => !seenItemIds.has(item.itemId));
+    const seen = challengePool.filter((item) => seenItemIds.has(item.itemId));
+    const nextSet = [...shuffle(unseen), ...shuffle(seen)].slice(0, 8);
+
     logHubWordFormationStarted({
       mode: "normal",
-      total: Math.min(8, challengePool.length),
+      total: nextSet.length,
       poolSize: challengePool.length,
+      unseenPoolSize: unseen.length,
       levels,
       primaryTag,
       secondaryTag,
       source: "HubWordFormationTrainer",
     });
     setCurrentSetMode("normal");
-    resetChallengeState(shuffle(challengePool).slice(0, 8));
+    resetChallengeState(nextSet);
   }
 
   async function loadFavouriteChallenges() {

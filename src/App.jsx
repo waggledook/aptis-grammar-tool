@@ -81,6 +81,8 @@ import ListeningPart3 from "./components/listening/ListeningPart3.jsx";
 import ListeningPart4 from "./components/listening/ListeningPart4.jsx";
 import HubLanding from "./components/hub/HubLanding.jsx";
 import HubGrammarMenu from "./components/hub/HubGrammarMenu.jsx";
+import HubGrammarFlashcardsMenu from "./components/hub/HubGrammarFlashcardsMenu.jsx";
+import HubFlashcardsDeckPlayer from "./components/hub/HubFlashcardsDeckPlayer.jsx";
 import HubMiniGrammarTests from "./components/hub/HubMiniGrammarTests.jsx";
 import HubGrammarActivityRunner from "./components/hub/HubGrammarActivityRunner.jsx";
 import HubListeningMenu from "./components/hub/HubListeningMenu.jsx";
@@ -107,11 +109,12 @@ const navigate = useNavigate();  // 👈 add this
 const location = useLocation();
 const isCoursePack = location.pathname.startsWith("/course-pack");
 const isAdminRoute = location.pathname.startsWith("/admin");
+const isFlashcardsPlayerRoute = /^\/grammar\/flashcards\/[^/]+$/.test(location.pathname);
 const currentSite = getSiteVariant();
 const isSeifHubSite = currentSite.id === "seifhub";
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
-const isWideLayout = isCoursePack || isAdminRoute;
+const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute;
 
 useEffect(() => {
   const unsub = onAuthStateChanged(auth, async (u) => {
@@ -452,6 +455,8 @@ return (
     element={isSeifHubSite ? <HubGrammarMenu /> : <GrammarPage />}
   />
   <Route path="/grammar/aptis" element={<GrammarPage />} />
+  <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu />} />
+  <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer />} />
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests />} />
   <Route path="/grammar/activity/:activityId" element={<HubGrammarActivityRunner />} />
 

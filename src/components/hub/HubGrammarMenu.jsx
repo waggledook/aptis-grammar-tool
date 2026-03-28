@@ -49,6 +49,13 @@ export default function HubGrammarMenu() {
             inside the Seif English Hub.
           </p>
         </button>
+        <button className="menu-card" onClick={() => navigate(getSitePath("/grammar/flashcards"))}>
+          <h3>Flashcards</h3>
+          <p>
+            Study grammar points with flippable cards in grid view or one card at
+            a time, then save cards to review later.
+          </p>
+        </button>
         <button className="menu-card" onClick={() => navigate(getSitePath("/grammar/mini-tests"))}>
           <h3>Mini Grammar Tests</h3>
           <p>

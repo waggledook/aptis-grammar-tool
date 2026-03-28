@@ -1034,6 +1034,14 @@ export async function fetchHubKeywordDashboard(uid) {
   return { answered, correct, total: items.length, byLevel };
 }
 
+export async function fetchSeenHubKeywordItemIds(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubKeywordProgress"));
+  return snap.docs.map((d) => d.id);
+}
+
 export async function fetchWordFormationItems() {
   const snap = await getDocs(collection(db, "masterWordFormations"));
   return snap.docs.map((d) => ({
@@ -1113,6 +1121,59 @@ export async function fetchHubWordFormationDashboard(uid) {
   });
 
   return { answered, correct, total: items.length, byLevel };
+}
+
+export async function fetchSeenHubWordFormationItemIds(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubWordFormationProgress"));
+  return snap.docs.map((d) => d.id);
+}
+
+export async function fetchHubSavedFlashcards({ uid, category = "", deckId = "" } = {}) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  let qy = collection(db, "users", realUid, "hubSavedFlashcards");
+
+  if (category && deckId) {
+    qy = query(qy, where("category", "==", category), where("deckId", "==", deckId));
+  } else if (category) {
+    qy = query(qy, where("category", "==", category));
+  } else if (deckId) {
+    qy = query(qy, where("deckId", "==", deckId));
+  }
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveHubFlashcard(card) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !card?.saveId) return;
+
+  const ref = doc(db, "users", uid, "hubSavedFlashcards", card.saveId);
+  await setDoc(
+    ref,
+    {
+      ...card,
+      app: "seifhub",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
+export async function removeHubFlashcard(saveId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !saveId) return;
+
+  await deleteDoc(doc(db, "users", uid, "hubSavedFlashcards", saveId));
 }
 
 export async function fetchHubWordFormationFavourites(uid) {

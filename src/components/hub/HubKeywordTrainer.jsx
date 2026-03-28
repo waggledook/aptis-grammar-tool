@@ -9,6 +9,7 @@ import {
   fetchHubKeywordFavourites,
   fetchHubKeywordMistakes,
   fetchKeywordTransformations,
+  fetchSeenHubKeywordItemIds,
   logHubKeywordCompleted,
   logHubKeywordReviewLoaded,
   logHubKeywordStarted,
@@ -198,6 +199,7 @@ export default function HubKeywordTrainer() {
   const [searchParams] = useSearchParams();
   const completionLoggedRef = useRef(false);
   const [items, setItems] = useState([]);
+  const [seenItemIds, setSeenItemIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [levels, setLevels] = useState(["b2", "c1", "c2"]);
   const [primaryTag, setPrimaryTag] = useState("all");
@@ -240,14 +242,16 @@ export default function HubKeywordTrainer() {
     async function load() {
       setLoading(true);
       try {
-        const [data, favourites] = await Promise.all([
+        const [data, favourites, seenIds] = await Promise.all([
           fetchKeywordTransformations(),
           auth.currentUser ? fetchHubKeywordFavourites() : Promise.resolve([]),
+          auth.currentUser ? fetchSeenHubKeywordItemIds() : Promise.resolve([]),
         ]);
 
         if (!cancelled) {
           setItems((Array.isArray(data) ? data : []).map(prepareKeywordItem));
           setFavouriteIds(new Set(favourites.map((item) => item.itemId)));
+          setSeenItemIds(new Set(seenIds));
         }
       } catch (error) {
         console.error("[HubKeywordTrainer] load failed", error);
@@ -328,17 +332,22 @@ export default function HubKeywordTrainer() {
       return;
     }
 
+    const unseen = challengePool.filter((item) => !seenItemIds.has(item.itemId));
+    const seen = challengePool.filter((item) => seenItemIds.has(item.itemId));
+    const nextSet = [...shuffle(unseen), ...shuffle(seen)].slice(0, 8);
+
     logHubKeywordStarted({
       mode: "normal",
-      total: Math.min(8, challengePool.length),
+      total: nextSet.length,
       poolSize: challengePool.length,
+      unseenPoolSize: unseen.length,
       levels,
       primaryTag,
       secondaryTag,
       source: "HubKeywordTrainer",
     });
     setCurrentSetMode("normal");
-    resetChallengeState(shuffle(challengePool).slice(0, 8));
+    resetChallengeState(nextSet);
   }
 
   async function loadFavouriteChallenges() {
