@@ -152,9 +152,13 @@ useEffect(() => {
 }, []);
 
 const hasSeifHubAccess = canAccessSeifHub(user);
+const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-it/join";
+const isPublicSpanglishPlayRoute = /^\/games\/spanglish-fix-it\/play\/[^/]+$/.test(location.pathname);
 const showSeifHubGate =
   isSeifHubSite &&
   !hasSeifHubAccess &&
+  !isPublicSpanglishJoinRoute &&
+  !isPublicSpanglishPlayRoute &&
   location.pathname !== "/privacy" &&
   !location.pathname.startsWith("/admin");
 
