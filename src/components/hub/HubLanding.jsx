@@ -129,6 +129,14 @@ export default function HubLanding({ user, hasAccess, onSignIn }) {
               <p>Practise key word transformations and word formation with instant corrective feedback.</p>
             </button>
 
+            <button
+              className="menu-card"
+              onClick={() => (hasAccess ? navigate(getSitePath("/games")) : onSignIn?.())}
+            >
+              <h3>Games</h3>
+              <p>Practise through quick challenge-style activities that help you notice mistakes and react fast.</p>
+            </button>
+
             {user?.role === "admin" && (
               <button
                 className="menu-card"

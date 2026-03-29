@@ -91,6 +91,11 @@ import HubUseOfEnglishMenu from "./components/hub/HubUseOfEnglishMenu.jsx";
 import HubKeywordTrainer from "./components/hub/HubKeywordTrainer.jsx";
 import HubWordFormationTrainer from "./components/hub/HubWordFormationTrainer.jsx";
 import HubVocabularyMenu from "./components/hub/HubVocabularyMenu.jsx";
+import HubGamesMenu from "./components/hub/HubGamesMenu.jsx";
+import HubSpanglishFixIt from "./components/hub/HubSpanglishFixIt.jsx";
+import HubSpanglishLiveHost from "./components/hub/HubSpanglishLiveHost.jsx";
+import HubSpanglishLiveJoin from "./components/hub/HubSpanglishLiveJoin.jsx";
+import HubSpanglishLivePlayer from "./components/hub/HubSpanglishLivePlayer.jsx";
 import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 
@@ -463,6 +468,11 @@ return (
   <Route path="/use-of-english" element={<HubUseOfEnglishMenu />} />
   <Route path="/use-of-english/keyword" element={<HubKeywordTrainer />} />
   <Route path="/use-of-english/word-formation" element={<HubWordFormationTrainer />} />
+  <Route path="/games" element={<HubGamesMenu />} />
+  <Route path="/games/spanglish-fix-it" element={<HubSpanglishFixIt user={user} />} />
+  <Route path="/games/spanglish-fix-it/host/:gameId" element={<HubSpanglishLiveHost user={user} />} />
+  <Route path="/games/spanglish-fix-it/join" element={<HubSpanglishLiveJoin />} />
+  <Route path="/games/spanglish-fix-it/play/:gameId" element={<HubSpanglishLivePlayer />} />
 
 {/* Reading routes */}
 <Route path="/reading" element={<ReadingMenu />} />

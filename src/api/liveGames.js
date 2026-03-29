@@ -28,6 +28,9 @@ import {
   runTransaction,
 } from "firebase/database";
 
+const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
+const SPANGLISH_GUEST_TOKEN_STORAGE_KEY = "spanglish_fixit_guest_token";
+
 // 6-digit PIN like "742190"
 function generatePin() {
   const n = Math.floor(100000 + Math.random() * 900000);
@@ -83,6 +86,22 @@ export async function findGameByPin(pin) {
 
   const [gameId, data] = Object.entries(snap.val())[0];
   return { gameId, ...data };
+}
+
+export async function findPublicGameByPin(pin) {
+  const pinRef = ref(rtdb, `liveGamePins/${String(pin).trim()}`);
+  const pinSnap = await get(pinRef);
+  if (!pinSnap.exists()) return null;
+
+  const pinData = pinSnap.val();
+  const gameId = pinData?.gameId;
+  if (!gameId) return null;
+
+  const gameRef = ref(rtdb, `liveGames/${gameId}`);
+  const gameSnap = await get(gameRef);
+  if (!gameSnap.exists()) return null;
+
+  return { gameId, ...gameSnap.val() };
 }
 
 /**
@@ -156,7 +175,19 @@ export async function setLiveGameState(gameId, partialState) {
     if (typeof partialState.questionDuration === "number") {
       updates.questionDuration = partialState.questionDuration;
     }
-    if (partialState.questionDeadline) {
+    if (typeof partialState.roundIndex === "number") {
+      updates.roundIndex = partialState.roundIndex;
+    }
+    if (typeof partialState.clickDuration === "number") {
+      updates.clickDuration = partialState.clickDuration;
+    }
+    if (typeof partialState.correctionDuration === "number") {
+      updates.correctionDuration = partialState.correctionDuration;
+    }
+    if ("scoreDeadline" in partialState) {
+      updates.scoreDeadline = partialState.scoreDeadline;
+    }
+    if ("questionDeadline" in partialState) {
       updates.questionDeadline = partialState.questionDeadline;
     }
   
@@ -224,6 +255,219 @@ export async function submitLiveGameAnswer({
       score: prevScore + safeDelta,
       lastAnswerIndex: selectedIndex,
       lastAnswerCorrect: !!correct,
+    };
+  });
+}
+
+export function getSpanglishGuestPlayerId() {
+  if (typeof window === "undefined") return null;
+  let playerId = window.localStorage.getItem(SPANGLISH_GUEST_STORAGE_KEY);
+  if (playerId) return playerId;
+
+  if (window.crypto?.randomUUID) {
+    playerId = `guest_${window.crypto.randomUUID()}`;
+  } else {
+    playerId = `guest_${Math.random().toString(36).slice(2, 10)}`;
+  }
+
+  window.localStorage.setItem(SPANGLISH_GUEST_STORAGE_KEY, playerId);
+  return playerId;
+}
+
+export function getSpanglishGuestPlayerToken() {
+  if (typeof window === "undefined") return null;
+  let token = window.localStorage.getItem(SPANGLISH_GUEST_TOKEN_STORAGE_KEY);
+  if (token) return token;
+
+  if (window.crypto?.randomUUID) {
+    token = `token_${window.crypto.randomUUID()}`;
+  } else {
+    token = `token_${Math.random().toString(36).slice(2, 14)}`;
+  }
+
+  window.localStorage.setItem(SPANGLISH_GUEST_TOKEN_STORAGE_KEY, token);
+  return token;
+}
+
+export async function createSpanglishLiveGame({
+  items,
+  title = "Spanglish Fix-It",
+  clickDuration = 25,
+  correctionDuration = 25,
+}) {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error("You must be signed in to host a live game.");
+  }
+  if (!Array.isArray(items) || !items.length) {
+    throw new Error("createSpanglishLiveGame: items are required.");
+  }
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  const now = Date.now();
+
+  const initialData = {
+    ownerUid: user.uid,
+    pin,
+    title,
+    type: "spanglish_fixit",
+    publicJoinEnabled: true,
+    createdAt: now,
+    status: "lobby",
+    items,
+    state: {
+      phase: "lobby",
+      roundIndex: 0,
+      clickDuration,
+      correctionDuration,
+      questionDeadline: null,
+    },
+  };
+
+  await set(gameRef, initialData);
+  await set(ref(rtdb, `liveGamePins/${pin}`), {
+    gameId,
+    type: "spanglish_fixit",
+    publicJoinEnabled: true,
+    status: "lobby",
+  });
+  return { gameId, pin };
+}
+
+export async function joinPublicSpanglishGameByPin({ pin, name, playerId, playerToken }) {
+  const trimmedPin = String(pin || "").trim();
+  const trimmedName = String(name || "").trim();
+  const stablePlayerId = String(playerId || "").trim() || getSpanglishGuestPlayerId();
+  const stablePlayerToken = String(playerToken || "").trim() || getSpanglishGuestPlayerToken();
+
+  if (!trimmedPin) throw new Error("Please enter the game PIN.");
+  if (!trimmedName) throw new Error("Please enter your name.");
+  if (!stablePlayerId) throw new Error("Could not create a guest player id.");
+  if (!stablePlayerToken) throw new Error("Could not create a guest player token.");
+
+  const game = await findPublicGameByPin(trimmedPin);
+  if (!game) {
+    throw new Error("No game found with that PIN.");
+  }
+  if (game.type !== "spanglish_fixit" || !game.publicJoinEnabled) {
+    throw new Error("That PIN is not for an open Spanglish game.");
+  }
+  if (game.status === "finished") {
+    throw new Error("This game has already finished.");
+  }
+
+  const playerRef = ref(rtdb, `liveGames/${game.gameId}/players/${stablePlayerId}`);
+  const existingPlayerSnap = await get(playerRef);
+  const existingPlayer = existingPlayerSnap.exists() ? existingPlayerSnap.val() : null;
+
+  await set(playerRef, {
+    name: trimmedName,
+    isGuest: true,
+    score: existingPlayer?.score || 0,
+    joinedAt: existingPlayer?.joinedAt || Date.now(),
+    lastActiveAt: Date.now(),
+    playerToken: existingPlayer?.playerToken || stablePlayerToken,
+  });
+
+  return { gameId: game.gameId, playerId: stablePlayerId, playerToken: existingPlayer?.playerToken || stablePlayerToken };
+}
+
+export async function submitSpanglishLiveClick({
+  gameId,
+  roundIndex,
+  playerId,
+  playerToken,
+  selectedWord,
+  correct,
+  scoreDelta = 0,
+}) {
+  if (!gameId || typeof roundIndex !== "number" || !playerId) {
+    throw new Error("Missing click answer details.");
+  }
+
+  const answerRef = ref(
+    rtdb,
+    `liveGames/${gameId}/rounds/${roundIndex}/clickAnswers/${playerId}`
+  );
+  const playerRef = ref(rtdb, `liveGames/${gameId}/players/${playerId}`);
+  const now = Date.now();
+  const safeDelta = correct ? Math.max(0, scoreDelta || 0) : 0;
+
+  await set(answerRef, {
+    selectedWord,
+    correct: !!correct,
+    timestamp: now,
+    scoreDelta: safeDelta,
+    playerToken,
+  });
+
+  await runTransaction(playerRef, (current) => {
+    const base = current || {
+      name: "Guest",
+      score: 0,
+      isGuest: true,
+      joinedAt: now,
+      playerToken,
+    };
+
+    return {
+      ...base,
+      score: (base.score || 0) + safeDelta,
+      lastActiveAt: now,
+      lastClickWord: selectedWord,
+      lastClickCorrect: !!correct,
+      playerToken: base.playerToken || playerToken,
+    };
+  });
+}
+
+export async function submitSpanglishLiveCorrection({
+  gameId,
+  roundIndex,
+  playerId,
+  playerToken,
+  answer,
+  correct,
+  scoreDelta = 0,
+}) {
+  if (!gameId || typeof roundIndex !== "number" || !playerId) {
+    throw new Error("Missing correction details.");
+  }
+
+  const answerRef = ref(
+    rtdb,
+    `liveGames/${gameId}/rounds/${roundIndex}/correctionAnswers/${playerId}`
+  );
+  const playerRef = ref(rtdb, `liveGames/${gameId}/players/${playerId}`);
+  const now = Date.now();
+  const safeDelta = correct ? Math.max(0, scoreDelta || 0) : 0;
+
+  await set(answerRef, {
+    answer,
+    correct: !!correct,
+    timestamp: now,
+    scoreDelta: safeDelta,
+    playerToken,
+  });
+
+  await runTransaction(playerRef, (current) => {
+    const base = current || {
+      name: "Guest",
+      score: 0,
+      isGuest: true,
+      joinedAt: now,
+      playerToken,
+    };
+
+    return {
+      ...base,
+      score: (base.score || 0) + safeDelta,
+      lastActiveAt: now,
+      lastCorrection: answer,
+      lastCorrectionCorrect: !!correct,
+      playerToken: base.playerToken || playerToken,
     };
   });
 }
