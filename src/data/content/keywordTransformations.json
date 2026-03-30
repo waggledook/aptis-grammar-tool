@@ -1,0 +1,4218 @@
+[
+  {
+    "itemId": "kw_0001",
+    "fullSentence": "When it comes to geography, there is very little that Luis doesn’t know.",
+    "gapFill": "There are very __________________ when it comes to geography.",
+    "keyWord": "gaps",
+    "answer": [
+      "few gaps in Luis's knowledge",
+      "few gaps in Luis' knowledge"
+    ],
+    "tags": "C1, noun phrases, quantifiers"
+  },
+  {
+    "itemId": "kw_0002",
+    "fullSentence": "Daniel was going to take his sister to the concert, but it looks as if he’s forgotten.",
+    "gapFill": "Daniel __________________ taking his sister to the concert.",
+    "keyWord": "must",
+    "answer": [
+      "must have forgotten about",
+      "must have forgotten he was",
+      "must have forgotten that he was"
+    ],
+    "tags": "C1, modals, past modals, probability"
+  },
+  {
+    "itemId": "kw_0003",
+    "fullSentence": "The fence was removed and, as a result, the neighbours no longer feel they have privacy.",
+    "gapFill": "Removing the fence has __________________ for the neighbours.",
+    "keyWord": "loss",
+    "answer": [
+      "resulted in a loss of privacy",
+      "resulted in the loss of privacy",
+      "led to a loss of privacy",
+      "led to the loss of privacy",
+      "caused a loss of privacy",
+      "caused the loss of privacy",
+      "meant a loss of privacy",
+      "meant the loss of privacy"
+    ],
+    "tags": "C1, result, noun phrases, linking"
+  },
+  {
+    "itemId": "kw_0004",
+    "fullSentence": "Sasha definitely didn’t plan to return to the flat until the heating was fixed.",
+    "gapFill": "Sasha had absolutely no __________________ to the flat until the heating was fixed.",
+    "keyWord": "intention",
+    "answer": [
+      "intention of returning",
+      "intention at all of returning",
+      "intention of going back",
+      "intention at all of going back",
+      "intention whatsoever of returning",
+      "intention whatsoever of going back"
+    ],
+    "tags": "C1, verb patterns, fixed phrase, formal"
+  },
+  {
+    "itemId": "kw_0005",
+    "fullSentence": "Irene was going to join us this evening, but it seems she’s decided not to.",
+    "gapFill": "Irene seems __________________ joining us this evening.",
+    "keyWord": "changed",
+    "answer": "to have changed her mind about",
+    "tags": "C1, perfect, verb patterns, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0006",
+    "fullSentence": "Alessio thought the driving test would be easy to pass.",
+    "gapFill": "Alessio was under the __________________ be easy to pass the driving test.",
+    "keyWord": "impression",
+    "answer": [
+      "impression it would",
+      "impression that it would"
+    ],
+    "tags": "C1, fixed phrase, future"
+  },
+  {
+    "itemId": "kw_0007",
+    "fullSentence": "Dr Lee’s negotiating skills quickly impressed her colleagues.",
+    "gapFill": "Among her colleagues, Dr Lee soon gained __________________ a skilled negotiator.",
+    "keyWord": "reputation",
+    "answer": [
+      "a reputation for being",
+      "an impressive reputation for being",
+      "the reputation for being",
+      "the reputation of being",
+      "the impressive reputation of being",
+      "a reputation of being"
+    ],
+    "tags": "C1, noun phrases, fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0008",
+    "fullSentence": "If you hadn’t helped me, I would never have got the sofa through the door.",
+    "gapFill": "But __________________, I would never have got the sofa through the door.",
+    "keyWord": "help",
+    "answer": [
+      "for your help",
+      "for the help you gave me",
+      "for the help that you gave me",
+      "for the help which you gave me"
+    ],
+    "tags": "C1, fixed phrase, conditionals"
+  },
+  {
+    "itemId": "kw_0009",
+    "fullSentence": "Most fans think Brazil will win the final against France.",
+    "gapFill": "Most fans think France __________________ the final.",
+    "keyWord": "beaten",
+    "answer": [
+      "will be beaten by Brazil in",
+      "will get beaten by Brazil in"
+    ],
+    "tags": "C1, passive voice, future"
+  },
+  {
+    "itemId": "kw_0010",
+    "fullSentence": "The alarm system is there so that no valuables can be stolen during the night.",
+    "gapFill": "The alarm system is designed to __________________ stolen during the night.",
+    "keyWord": "prevent",
+    "answer": [
+      "prevent valuables from being",
+      "prevent valuables from getting",
+      "prevent valuables being",
+      "prevent valuables getting"
+    ],
+    "tags": "C1, passive voice, verb patterns, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0011",
+    "fullSentence": "The hacker used special software so as not to leave any trace of the attack.",
+    "gapFill": "The hacker used software in __________________ any trace of the attack.",
+    "keyWord": "avoid",
+    "answer": [
+      "order to avoid leaving",
+      "an attempt to avoid leaving",
+      "effort to avoid leaving"
+    ],
+    "tags": "C1, verb patterns, purpose, linking, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0012",
+    "fullSentence": "Even if your phone is beyond repair, you’ll still be charged for the service.",
+    "gapFill": "Whether your phone __________________ not, you’ll still be charged for the repair service.",
+    "keyWord": "can",
+    "answer": [
+      "can be repaired or",
+      "can be fixed or",
+      "can be mended or"
+    ],
+    "tags": "C1, passive voice, modal verbs, possibility"
+  },
+  {
+    "itemId": "kw_0013",
+    "fullSentence": "I had no success in contacting Javier before the deadline.",
+    "gapFill": "I __________________ hold of Javier before the deadline.",
+    "keyWord": "manage",
+    "answer": [
+      "couldn't manage to get",
+      "didn't manage to get"
+    ],
+    "tags": "C1, verb patterns, modal verbs, ability"
+  },
+  {
+    "itemId": "kw_0014",
+    "fullSentence": "Because of the metro strike, all of the guests arrived late to the event.",
+    "gapFill": "Because of the metro strike, not __________________ to the event on time.",
+    "keyWord": "turned",
+    "answer": [
+      "even one guest turned up",
+      "even one of the guests turned up",
+      "a single guest turned up",
+      "one of the guests turned up"
+    ],
+    "tags": "C1, quantifiers, exceptions"
+  },
+  {
+    "itemId": "kw_0015",
+    "fullSentence": "It was a mistake to make Lena responsible for leading the tour group on her first day.",
+    "gapFill": "Lena should __________________ of leading the tour group on her first day.",
+    "keyWord": "charge",
+    "answer": [
+      "not have been put in charge",
+      "never have been put in charge",
+      "not have been left in charge",
+      "never have been left in charge",
+      "not have been placed in charge",
+      "never have been placed in charge"
+    ],
+    "tags": "C1, passive voice, past modals, modals"
+  },
+  {
+    "itemId": "kw_0016",
+    "fullSentence": "Someone has suggested changing the school’s uniform policy.",
+    "gapFill": "A suggestion has __________________ the school’s uniform policy.",
+    "keyWord": "forward",
+    "answer": [
+      "been put forward to change",
+      "been put forward for changing",
+      "been put forward about changing"
+    ],
+    "tags": "C1, passive voice, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0017",
+    "fullSentence": "The guide says it will take us less than a week to cross the mountains.",
+    "gapFill": "The guide says that we __________________ in less than a week.",
+    "keyWord": "crossed",
+    "answer": "will have crossed the mountains",
+    "tags": "C1, future, perfect"
+  },
+  {
+    "itemId": "kw_0018",
+    "fullSentence": "By the end of the discussion, the team had agreed on the proposed changes.",
+    "gapFill": "By the end of the discussion, an __________________ the proposed changes.",
+    "keyWord": "reached",
+    "answer": [
+      "agreement had been reached about",
+      "agreement had been reached on",
+      "agreement was reached about",
+      "agreement was reached on"
+    ],
+    "tags": "C1, passive voice, noun phrases, formal"
+  },
+  {
+    "itemId": "kw_0019",
+    "fullSentence": "Maya succeeded in passing the exam, even though she had a cold.",
+    "gapFill": "Despite __________________ pass the exam.",
+    "keyWord": "managed",
+    "answer": [
+      "having a cold, Maya managed to",
+      "her cold, Maya managed to"
+    ],
+    "tags": "C1, concession, ability, linking"
+  },
+  {
+    "itemId": "kw_0020",
+    "fullSentence": "Hardly any of my students know who James Baldwin is.",
+    "gapFill": "Among my students, very __________________ the author James Baldwin.",
+    "keyWord": "heard",
+    "answer": [
+      "few have heard of",
+      "few of them have heard of",
+      "few have heard about",
+      "few of them have heard about"
+    ],
+    "tags": "C1, quantifiers, prepositions, perfect"
+  },
+  {
+    "itemId": "kw_0021",
+    "fullSentence": "Emma would do anything at all to help her family.",
+    "gapFill": "There is absolutely __________________ to help her family.",
+    "keyWord": "not",
+    "answer": [
+      "nothing that Emma would not do",
+      "nothing which Emma would not do",
+      "nothing Emma would not do"
+    ],
+    "tags": "C1, Quantifiers, modals"
+  },
+  {
+    "itemId": "kw_0022",
+    "fullSentence": "I don’t think we’ll see Max before he flies to Tokyo.",
+    "gapFill": "There’s __________________ Max before he flies to Tokyo.",
+    "keyWord": "likelihood",
+    "answer": [
+      "little likelihood of seeing",
+      "little likelihood that we will see",
+      "little likelihood we will see"
+    ],
+    "tags": "C1, probability, noun phrases, formal"
+  },
+  {
+    "itemId": "kw_0023",
+    "fullSentence": "Although Peter travels frequently, he’s always losing his suitcase.",
+    "gapFill": "Although Peter travels frequently, this __________________ he’s lost his suitcase.",
+    "keyWord": "first",
+    "answer": [
+      "is not the first time",
+      "will not be the first time",
+      "is not the first occasion",
+      "will not be the first occasion"
+    ],
+    "tags": "C1, Linking"
+  },
+  {
+    "itemId": "kw_0024",
+    "fullSentence": "When I finally got to the platform, the train was about to leave.",
+    "gapFill": "The train was on the point __________________ I arrived at the platform.",
+    "keyWord": "time",
+    "answer": [
+      "of leaving by the time",
+      "of leaving by the time that"
+    ],
+    "tags": "C1, Fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0025",
+    "fullSentence": "Olivia couldn’t possibly afford any of the meals in that restaurant.",
+    "gapFill": "The meals in that restaurant are __________________ pay for.",
+    "keyWord": "far",
+    "answer": "far too expensive for Olivia to",
+    "tags": "C1, comparatives and superlatives, intensifiers"
+  },
+  {
+    "itemId": "kw_0026",
+    "fullSentence": "Could Sofia have forgotten her umbrella this morning?",
+    "gapFill": "I __________________ her umbrella at home this morning.",
+    "keyWord": "wonder",
+    "answer": [
+      "wonder if Sofia has left",
+      "wonder if Sofia could have left",
+      "wonder whether Sofia has left",
+      "wonder whether Sofia could have left"
+    ],
+    "tags": "C1, modal verbs, past modals, indirect questions, questions"
+  },
+  {
+    "itemId": "kw_0027",
+    "fullSentence": "The accident last year led to the imposition of tougher safety rules.",
+    "gapFill": "Tougher rules __________________ result of last year's accident.",
+    "keyWord": "imposed",
+    "answer": "were imposed as a",
+    "tags": "C1, passive voice, result, linking"
+  },
+  {
+    "itemId": "kw_0028",
+    "fullSentence": "We could do our chores first and then go to the football match.",
+    "gapFill": "Why don’t __________________ to the football match?",
+    "keyWord": "before",
+    "answer": [
+      "we do our chores before going",
+      "we finish our chores before going",
+      "we do our chores before we go",
+      "we finish our chores before we go",
+      "we complete our chores before going",
+      "we complete our chores before we go"
+    ],
+    "tags": "C1, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0029",
+    "fullSentence": "I was really shocked when my cousin told me what had happened the day before.",
+    "gapFill": "I was shocked by my __________________ what had happened the day before.",
+    "keyWord": "account",
+    "answer": "cousin’s account of",
+    "tags": "C1, noun phrases, formal, fixed phrase"
+  },
+  {
+    "itemId": "kw_0030",
+    "fullSentence": "A woman led a major space mission several decades ago.",
+    "gapFill": "It __________________ a woman first led a major space mission.",
+    "keyWord": "since",
+    "answer": [
+      "is several decades since",
+      "has been several decades since"
+    ],
+    "tags": "C1, perfect, verb forms"
+  },
+  {
+    "itemId": "kw_0031",
+    "fullSentence": "People often say that Jenny looks and behaves just like her aunt.",
+    "gapFill": "People often comment on the extent to __________________ her aunt.",
+    "keyWord": "takes",
+    "answer": "which Jenny takes after",
+    "tags": "C1, Relative clauses, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0032",
+    "fullSentence": "By the end of the workshop, the group had agreed on the next steps.",
+    "gapFill": "By the end of the workshop, an __________________ how to proceed.",
+    "keyWord": "agreement",
+    "answer": [
+      "agreement had been reached about",
+      "agreement had been reached on",
+      "agreement was reached about",
+      "agreement was reached on"
+    ],
+    "tags": "C1, passive voice, noun phrases, formal"
+  },
+  {
+    "itemId": "kw_0033",
+    "fullSentence": "By the end of the week, it will be two years since Samantha came to Paris.",
+    "gapFill": "By the end of the week, Samantha _____________________ two years.",
+    "keyWord": "for",
+    "answer": [
+      "will have been in Paris for",
+      " will have lived in Paris for",
+      "will have been living in Paris for"
+    ],
+    "tags": "C1, future, perfect"
+  },
+  {
+    "itemId": "kw_0034",
+    "fullSentence": "A number of open-air shows had to be cancelled owing to the stormy weather.",
+    "gapFill": "Stormy weather _____________________ of a number of open-air shows.",
+    "keyWord": "led",
+    "answer": [
+      "led to the cancellation",
+      "led to the cancelling"
+    ],
+    "tags": "C1, result, linking"
+  },
+  {
+    "itemId": "kw_0035",
+    "fullSentence": "During the meeting, the director did not mention the training programme.",
+    "gapFill": "During the meeting, the director _____________________ the training programme.",
+    "keyWord": "reference",
+    "answer": [
+      "did not make reference to",
+      "did not make any reference to",
+      "made no reference to"
+    ],
+    "tags": "C1, fixed phrase, formal"
+  },
+  {
+    "itemId": "kw_0036",
+    "fullSentence": "\"I'm not staying late again,\" said Daniel.",
+    "gapFill": "Daniel made _____________________ willing to stay late at the office.",
+    "keyWord": "clear",
+    "answer": [
+      "it clear he was not",
+      "it clear that he was not"
+    ],
+    "tags": "C1, fixed phrase"
+  },
+  {
+    "itemId": "kw_0037",
+    "fullSentence": "Jordan was just about to leave the flat when the doorbell rang.",
+    "gapFill": "Jordan _____________________ the flat when the doorbell rang.",
+    "keyWord": "point",
+    "answer": "was on the point of leaving",
+    "tags": "C1, fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0038",
+    "fullSentence": "Ivy was thrilled to be selected for the scholarship.",
+    "gapFill": "Much to _____________________ selected for the scholarship.",
+    "keyWord": "delight",
+    "answer": [
+      "her delight, Ivy was",
+      "Ivy's delight, she was"
+    ],
+    "tags": "C1, fronting, intensifiers"
+  },
+  {
+    "itemId": "kw_0039",
+    "fullSentence": "The ticket discount led to a rise in attendance at the event.",
+    "gapFill": "Attendance at the event _____________________ the ticket discount.",
+    "keyWord": "result",
+    "answer": [
+      "grew as a result of",
+      "increased as a result of",
+      "went up as a result of",
+      "rose as a result of"
+    ],
+    "tags": "C1, linking, result"
+  },
+  {
+    "itemId": "kw_0040",
+    "fullSentence": "Maya would have emailed back if she had had more time.",
+    "gapFill": "Maya didn’t email back _____________________ time.",
+    "keyWord": "short",
+    "answer": [
+      "because she was short of",
+      "as she was short of",
+      "since she was short of"
+    ],
+    "tags": "C1, linking, fixed phrase"
+  },
+  {
+    "itemId": "kw_0041",
+    "fullSentence": "Elliot promised to call as soon as he arrived at the station.",
+    "gapFill": "Elliot said that _____________________ he arrived at the station.",
+    "keyWord": "moment",
+    "answer": [
+      "he would call the moment",
+      "he would call the moment that",
+      "he was going to call the moment that",
+      "he was going to call the moment"
+    ],
+    "tags": "C1, reported speech, linking"
+  },
+  {
+    "itemId": "kw_0042",
+    "fullSentence": "Leo doesn't plan to travel abroad this summer.",
+    "gapFill": "Leo has _____________________ abroad this summer.",
+    "keyWord": "intention",
+    "answer": [
+      "no intention of travelling",
+      "no intention of traveling",
+      "no intention of going"
+    ],
+    "tags": "C1, prepositions, noun phrases, formal"
+  },
+  {
+    "itemId": "kw_0043",
+    "fullSentence": "Hopefully, the economy will improve soon.",
+    "gapFill": "Hopefully, there’ll be _____________________ better in the economy soon.",
+    "keyWord": "change",
+    "answer": "a change for the",
+    "tags": "C1, fixed phrase"
+  },
+  {
+    "itemId": "kw_0044",
+    "fullSentence": "'Do you fancy seeing the new film at the cinema?' Liam asked his cousin.",
+    "gapFill": "Liam asked his cousin whether _____________________ the new film at the cinema.",
+    "keyWord": "interested",
+    "answer": [
+      "he was interested in seeing",
+      "he would be interested in seeing",
+      "she was interested in seeing",
+      "she would be interested in seeing"
+    ],
+    "tags": "C1, gerunds and infinitives, reported speech"
+  },
+  {
+    "itemId": "kw_0045",
+    "fullSentence": "Luis hasn't messaged me in ages.",
+    "gapFill": "I _____________________ ages.",
+    "keyWord": "heard",
+    "answer": [
+      "have not heard from Luis for",
+      "have not heard from Luis in",
+      "have heard nothing from Luis for",
+      "have heard nothing from Luis in",
+      "have not heard anything from Luis for",
+      "have not heard anything from Luis in"
+    ],
+    "tags": "C1, perfect, prepositions"
+  },
+  {
+    "itemId": "kw_0046",
+    "fullSentence": "The team is almost certain to win the tournament.",
+    "gapFill": "The team has _____________________ the tournament.",
+    "keyWord": "every",
+    "answer": "every chance of winning",
+    "tags": "C1, fixed phrase, probability"
+  },
+  {
+    "itemId": "kw_0047",
+    "fullSentence": "The cost of vegetables has gone up significantly recently.",
+    "gapFill": "There _____________________ the cost of vegetables recently.",
+    "keyWord": "rise",
+    "answer": [
+      "has been a sharp rise in",
+      "has been a significant rise in"
+    ],
+    "tags": "C1, noun phrases, trends"
+  },
+  {
+    "itemId": "kw_0048",
+    "fullSentence": "If she fails the course, who knows what will happen next!",
+    "gapFill": "If she fails the course, _____________________ what will happen next!",
+    "keyWord": "knowing",
+    "answer": "there is no knowing",
+    "tags": "C1, fixed phrase, probability"
+  },
+  {
+    "itemId": "kw_0049",
+    "fullSentence": "We've all been impressed by Amira’s attitude to challenges.",
+    "gapFill": "Amira’s attitude to challenges has _____________________ us.",
+    "keyWord": "made",
+    "answer": [
+      "made a great impression on",
+      "made a big impression on"
+    ],
+    "tags": "C1, fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0050",
+    "fullSentence": "Jay’s startup didn’t achieve much success during its first year.",
+    "gapFill": "Jay’s startup _____________________ during its first year.",
+    "keyWord": "so",
+    "answer": "was not so successful",
+    "tags": "C1, comparatives and superlatives, intensifiers, so/such"
+  },
+  {
+    "itemId": "kw_0051",
+    "fullSentence": "It was probably a bad idea to lend your laptop to Ben.",
+    "gapFill": "I don’t think _____________________ your laptop to Ben.",
+    "keyWord": "should",
+    "answer": "you should have lent",
+    "tags": "C1, modal verbs, past modals"
+  },
+  {
+    "itemId": "kw_0052",
+    "fullSentence": "The teacher thought it was strange that Mark hadn't replied to the email.",
+    "gapFill": "The teacher found _____________________ the email quite unusual.",
+    "keyWord": "failure",
+    "answer": [
+      "mark's failure to answer",
+      "mark's failure to reply to",
+      "mark's failure to respond to"
+    ],
+    "tags": "C1, fixed phrase, formal"
+  },
+  {
+    "itemId": "kw_0053",
+    "fullSentence": "I doubt you'll have much trouble following the instructions.",
+    "gapFill": "I doubt _____________________ to follow the instructions.",
+    "keyWord": "find",
+    "answer": [
+      "you will find it difficult",
+      "you will find it hard"
+    ],
+    "tags": "C1, fixed phrase"
+  },
+  {
+    "itemId": "kw_0054",
+    "fullSentence": "Experts think Leila has the ability to win the national title in tennis.",
+    "gapFill": "Experts think Leila _____________________ the national title in tennis.",
+    "keyWord": "capable",
+    "answer": "is capable of winning",
+    "tags": "C1, ability, prepositions"
+  },
+  {
+    "itemId": "kw_0055",
+    "fullSentence": "Gina was asked to give an explanation for making the error.",
+    "gapFill": "Gina was asked to _____________________ the error.",
+    "keyWord": "why",
+    "answer": [
+      "explain why she made",
+      "explain why she had made"
+    ],
+    "tags": "C1, reported speech, verb patterns"
+  },
+  {
+    "itemId": "kw_0056",
+    "fullSentence": "They put Omar in charge of organising the school event.",
+    "gapFill": "Omar _____________________ organising the school event.",
+    "keyWord": "made",
+    "answer": "was made responsible for",
+    "tags": "C1, passive voice, prepositions"
+  },
+  {
+    "itemId": "kw_0057",
+    "fullSentence": "Do you think Arjun is likely to win the election?",
+    "gapFill": "Do you think Arjun is in _____________________ the election?",
+    "keyWord": "chance",
+    "answer": [
+      "with a chance of winning",
+      "with any chance of winning"
+    ],
+    "tags": "C1, fixed phrase, probability, prepositions"
+  },
+  {
+    "itemId": "kw_0058",
+    "fullSentence": "Theo says that only his cousin knows about the surprise party.",
+    "gapFill": "Theo claims that _____________________ knows about the surprise party.",
+    "keyWord": "apart",
+    "answer": [
+      "apart from his cousin nobody",
+      "apart from his cousin no one",
+      "nobody apart from his cousin",
+      "no one apart from his cousin"
+    ],
+    "tags": "C1, exceptions, quantifiers"
+  },
+  {
+    "itemId": "kw_0059",
+    "fullSentence": "Rita really should get her glasses repaired.",
+    "gapFill": "It's _____________________ her glasses repaired.",
+    "keyWord": "high",
+    "answer": [
+      "high time Rita got",
+      "high time Rita had"
+    ],
+    "tags": "C1, fixed phrase, unreal forms"
+  },
+  {
+    "itemId": "kw_0060",
+    "fullSentence": "Despite all their efforts, the door wouldn’t open.",
+    "gapFill": "No matter _____________________, the door wouldn’t open.",
+    "keyWord": "hard",
+    "answer": "how hard they tried",
+    "tags": "C1, linking, concession"
+  },
+  {
+    "itemId": "kw_0061",
+    "fullSentence": "When it comes to science fiction, Daria knows everything.",
+    "gapFill": "As _____________________, Daria knows everything.",
+    "keyWord": "concerned",
+    "answer": "far as science fiction is concerned",
+    "tags": "C1, linking, fixed phrase"
+  },
+  {
+    "itemId": "kw_0062",
+    "fullSentence": "Nina never thought of asking me for help.",
+    "gapFill": "It _____________________ me for help.",
+    "keyWord": "occurred",
+    "answer": [
+      "never occurred to Nina to ask",
+      "had never occurred to Nina to ask"
+    ],
+    "tags": "C1, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0063",
+    "fullSentence": "Cavalli painted exotic scenes of the jungle although he had never set foot outside Europe.",
+    "gapFill": "Cavalli painted exotic scenes of the jungle _______________________ set foot outside Europe.",
+    "keyWord": "spite",
+    "answer": [
+      "in spite of never having",
+      "in spite of having never"
+    ],
+    "tags": "C1, concession, linking"
+  },
+  {
+    "itemId": "kw_0064",
+    "fullSentence": "Zara didn’t fully grasp the situation until she listened to Luis’s voicemail.",
+    "gapFill": "It _______________________ she listened to Luis’s voicemail that Zara fully grasped the situation.",
+    "keyWord": "only",
+    "answer": [
+      "was only when",
+      "was only after",
+      "was only once"
+    ],
+    "tags": "C1, concession, linking"
+  },
+  {
+    "itemId": "kw_0065",
+    "fullSentence": "Due to its high cost, the new gadget might never gain widespread popularity.",
+    "gapFill": "The cost of the new gadget may _______________________ widely popular.",
+    "keyWord": "prevent",
+    "answer": [
+      "prevent it from becoming",
+      "prevent it from being",
+      "prevent it becoming",
+      "prevent it being"
+    ],
+    "tags": "C1, formal, verb patterns, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0066",
+    "fullSentence": "The island is abundant in terms of biodiversity and untouched ecosystems.",
+    "gapFill": "The island has a lot _______________________ terms of biodiversity.",
+    "keyWord": "offer",
+    "answer": "to offer in",
+    "tags": "C1, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0067",
+    "fullSentence": "Simone says she prefers to cook dinner by herself.",
+    "gapFill": "Simone says that _______________________ cook dinner with anyone else.",
+    "keyWord": "rather",
+    "answer": [
+      "she would rather not",
+      "she'd rather not"
+    ],
+    "tags": "C1, modal verbs, formal, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0068",
+    "fullSentence": "To succeed as a nurse, you need to have an enormous amount of patience.",
+    "gapFill": "Being a nurse calls _______________________ these days.",
+    "keyWord": "deal",
+    "answer": [
+      "for a great deal of patience",
+      "for a good deal of patience"
+    ],
+    "tags": "C1, phrasal verbs, noun phrases, quantifiers, formal"
+  },
+  {
+    "itemId": "kw_0069",
+    "fullSentence": "The suspect insisted that he hadn't gone anywhere near the building that night.",
+    "gapFill": "The suspect claimed not _______________________ near the building that night.",
+    "keyWord": "to",
+    "answer": [
+      "to have been",
+      "to have been anywhere"
+    ],
+    "tags": "C1, verb patterns, gerunds and infinitives, perfect"
+  },
+  {
+    "itemId": "kw_0070",
+    "fullSentence": "I need to renew my ID before travelling next month.",
+    "gapFill": "I need _______________________ before travelling next month.",
+    "keyWord": "get",
+    "answer": "to get my ID renewed",
+    "tags": "C1, causative, passive voice"
+  },
+  {
+    "itemId": "kw_0071",
+    "fullSentence": "I'm going to eat fewer crisps this year.",
+    "gapFill": "I'm going to _______________________ of crisps I eat this year.",
+    "keyWord": "down",
+    "answer": [
+      "cut down on the amount",
+      "cut down on the quantity",
+      "cut down the amount",
+      "cut down the quantity"
+    ],
+    "tags": "C1, phrasal verbs, quantifiers"
+  },
+  {
+    "itemId": "kw_0072",
+    "fullSentence": "The majority of the issues came about because no one was leading the team.",
+    "gapFill": "It was the _______________________ most of the issues within the team.",
+    "keyWord": "caused",
+    "answer": [
+      "lack of leadership that caused",
+      "absence of leadership that caused",
+      "lack of leadership which caused",
+      "absence of leadership which caused"
+    ],
+    "tags": "C1, noun phrases, relative clauses, cleft sentences"
+  },
+  {
+    "itemId": "kw_0073",
+    "fullSentence": "Experts believe that many people find it hard to manage their finances.",
+    "gapFill": "Many people are thought _______________________ their finances under control.",
+    "keyWord": "unable",
+    "answer": "to be unable to keep",
+    "tags": "C1, fixed phrase, passive voice"
+  },
+  {
+    "itemId": "kw_0074",
+    "fullSentence": "Leo insisted that he had never seen the missing notebook.",
+    "gapFill": "Leo _______________________ the missing notebook.",
+    "keyWord": "having",
+    "answer": "denied having seen",
+    "tags": "C1, verb patterns, gerunds and infinitives, reported speech, reporting verbs"
+  },
+  {
+    "itemId": "kw_0075",
+    "fullSentence": "This suitcase is incredibly heavy — I'd really appreciate some help getting it to the taxi.",
+    "gapFill": "This suitcase is really heavy so I'd _______________________ help me carry it to the taxi.",
+    "keyWord": "grateful",
+    "answer": [
+      "be grateful if you would",
+      "be grateful if you could"
+    ],
+    "tags": "C1, conditionals"
+  },
+  {
+    "itemId": "kw_0076",
+    "fullSentence": "The team started testing the new app immediately after the planning phase.",
+    "gapFill": "The team lost _______________________ testing the new app after the planning phase.",
+    "keyWord": "time",
+    "answer": [
+      "no time in getting started",
+      "no time getting started",
+      "little time in getting started",
+      "little time getting started",
+      "no time starting",
+      "no time in starting"
+    ],
+    "tags": "C1, fixed phrase, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0077",
+    "fullSentence": "The sculpture is so well preserved that it’s difficult to believe it's over 500 years old.",
+    "gapFill": "The sculpture is in such good _______________________ believe it’s over 500 years old.",
+    "keyWord": "hard",
+    "answer": [
+      "condition that it is hard to",
+      "condition it is hard to"
+    ],
+    "tags": "C1, fixed phrase, noun phrases, intensifiers, so/such"
+  },
+  {
+    "itemId": "kw_0078",
+    "fullSentence": "By the time we got to the bakery, all the bread had gone.",
+    "gapFill": "By the time we got to the bakery, there _______________________ loaf left.",
+    "keyWord": "single",
+    "answer": [
+      "was not a single",
+      "was not one single"
+    ],
+    "tags": "C1, quantifiers, exceptions, intensifiers"
+  },
+  {
+    "itemId": "kw_0079",
+    "fullSentence": "The performance was too loud for us to stay until the end.",
+    "gapFill": "If _______________________ noise, we might have stayed until the end of the performance.",
+    "keyWord": "so",
+    "answer": "there had not been so much",
+    "tags": "C1, conditionals, intensifiers, so/such"
+  },
+  {
+    "itemId": "kw_0080",
+    "fullSentence": "The number of students registering for evening classes went down last year.",
+    "gapFill": "There _______________________ number of students registering for evening classes last year.",
+    "keyWord": "fall",
+    "answer": "was a fall in the",
+    "tags": "C1, noun phrases, trends"
+  },
+  {
+    "itemId": "kw_0081",
+    "fullSentence": "If you pay late, your reservation will be cancelled.",
+    "gapFill": "Failure to _______________________ your reservation being cancelled.",
+    "keyWord": "result",
+    "answer": [
+      "pay on time will result in"
+    ],
+    "tags": "C1, result, formal, linking"
+  },
+  {
+    "itemId": "kw_0082",
+    "fullSentence": "After her operation, Ella recovered quickly and rejoined the team.",
+    "gapFill": "After her operation, Ella _______________________ and rejoined the team.",
+    "keyWord": "made",
+    "answer": [
+      "made a fast recovery",
+      "made a speedy recovery",
+      "made a quick recovery"
+    ],
+    "tags": "C1, fixed phrase"
+  },
+  {
+    "itemId": "kw_0083",
+    "fullSentence": "Most students didn’t pay attention to what the teacher said.",
+    "gapFill": "Few students _______________________ what the teacher said.",
+    "keyWord": "notice",
+    "answer": [
+      "took any notice of",
+      "took much notice of"
+    ],
+    "tags": "C1, fixed phrase, exceptions, prepositions"
+  },
+  {
+    "itemId": "kw_0084",
+    "fullSentence": "I hadn’t realised how small the performer was until I saw him live.",
+    "gapFill": "It was only _______________________ me realise how small the performer was.",
+    "keyWord": "made",
+    "answer": [
+      "seeing him live that made"
+    ],
+    "tags": "C1, cleft sentences, relative clauses"
+  },
+  {
+    "itemId": "kw_0085",
+    "fullSentence": "It’s really tough creating new content for the event each year.",
+    "gapFill": "How difficult _______________________ with new content for the event each year.",
+    "keyWord": "come",
+    "answer": [
+      "it is to come up",
+      "it can be to come up"
+    ],
+    "tags": "C1, phrasal verbs, emphasis"
+  },
+  {
+    "itemId": "kw_0086",
+    "fullSentence": "Claims for pay must be submitted before the deadline.",
+    "gapFill": "You have _______________________ your pay claims before the end of the month.",
+    "keyWord": "put",
+    "answer": [
+      "to put in"
+    ],
+    "tags": "C1, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0087",
+    "fullSentence": "There are various ways of avoiding mosquito bites.",
+    "gapFill": "Mosquito bites can _______________________ various ways.",
+    "keyWord": "prevented",
+    "answer": [
+      "be prevented in"
+    ],
+    "tags": "C1, passive voice, prepositions"
+  },
+  {
+    "itemId": "kw_0088",
+    "fullSentence": "Learning to use a fax machine is a waste of time.",
+    "gapFill": "I can’t _______________________ how to use a fax machine.",
+    "keyWord": "point",
+    "answer": [
+      "see the point in learning",
+      "see the point of learning",
+      "see any point in learning"
+    ],
+    "tags": "C1, gerunds and infinitives, fixed phrase"
+  },
+  {
+    "itemId": "kw_0089",
+    "fullSentence": "Turn off your phone completely during the performance.",
+    "gapFill": "Under no _______________________ your phone switched on during the performance.",
+    "keyWord": "should",
+    "answer": [
+      "circumstances should you keep",
+      "circumstances should you have",
+      "circumstances should you leave"
+    ],
+    "tags": "C1, inversion, formal, modals"
+  },
+  {
+    "itemId": "kw_0090",
+    "fullSentence": "This firm has a great reputation locally.",
+    "gapFill": "The firm _______________________ of in the local area.",
+    "keyWord": "highly",
+    "answer": [
+      "is highly thought",
+      "is highly spoken"
+    ],
+    "tags": "C1, passive voice, formal"
+  },
+  {
+    "itemId": "kw_0091",
+    "fullSentence": "I’m sure Yara will become a famous architect one day.",
+    "gapFill": "I think it’s only _______________________ Yara becomes a famous architect.",
+    "keyWord": "matter",
+    "answer": [
+      "a matter of time before"
+    ],
+    "tags": "C1, fixed phrase, future, noun phrases"
+  },
+  {
+    "itemId": "kw_0092",
+    "fullSentence": "This food festival should attract everyone—up to twenty food trucks are expected.",
+    "gapFill": "This festival will appeal _______________________ as twenty food trucks are expected.",
+    "keyWord": "many",
+    "answer": [
+      "to everyone because as many",
+      "to everyone as as many",
+      "to everyone since as many"
+    ],
+    "tags": "C1, quantifiers, result"
+  },
+  {
+    "itemId": "kw_0093",
+    "fullSentence": "At the start of the show, the presenters discussed online privacy.",
+    "gapFill": "The presenters began the show _______________________ online privacy.",
+    "keyWord": "discussion",
+    "answer": [
+      "with a discussion about",
+      "with a discussion on",
+      "with a discussion of",
+      "by having a discussion on",
+      "by having a discussion about",
+      "by having a discussion of"
+    ],
+    "tags": "C1, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0094",
+    "fullSentence": "Camila’s parents were certain she’d become a great violinist.",
+    "gapFill": "Camila’s parents were _______________________ she’d become a great violinist.",
+    "keyWord": "doubt",
+    "answer": [
+      "in no doubt",
+      "not in any doubt",
+      "in no doubt that",
+      "not in any doubt that"
+    ],
+    "tags": "C1, formal, fixed phrase, prepositions, noun phrases"
+  },
+  {
+    "itemId": "kw_0095",
+    "fullSentence": "My uncle had completely forgotten that he emailed me.",
+    "gapFill": "My uncle didn’t _______________________ emailing me.",
+    "keyWord": "recollection",
+    "answer": [
+      "have any recollection of"
+    ],
+    "tags": "C1, noun phrases, formal, prepositions"
+  },
+  {
+    "itemId": "kw_0096",
+    "fullSentence": "If Asha hadn’t pursued photography, she might have become a famous chef.",
+    "gapFill": "If Asha hadn’t pursued photography, she might have _______________________ herself as a chef.",
+    "keyWord": "name",
+    "answer": [
+      "made a name for"
+    ],
+    "tags": "C1, fixed phrase"
+  },
+  {
+    "itemId": "kw_0097",
+    "fullSentence": "Staff shouldn’t expect a guaranteed locker.",
+    "gapFill": "The staff shouldn’t _______________________ allocated a locker.",
+    "keyWord": "count",
+    "answer": [
+      "count on being"
+    ],
+    "tags": "C1, phrasal verbs, passive voice"
+  },
+  {
+    "itemId": "kw_0098",
+    "fullSentence": "‘I’ve had enough of people being rude to me,’ said Ava.",
+    "gapFill": "‘I’m not prepared _______________________ from people any longer,’ said Ava.",
+    "keyWord": "put",
+    "answer": [
+      "to put up with any rudeness",
+      "to put up with rudeness",
+      "to put up with rude behaviour",
+      "to put up with any rude behaviour"
+    ],
+    "tags": "C1, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0099",
+    "fullSentence": "This holiday is affordable, provided we don’t eat at expensive places.",
+    "gapFill": "We _______________________ as we avoid expensive places.",
+    "keyWord": "afford",
+    "answer": [
+      "can afford this holiday as long",
+      "can afford the holiday as long",
+      "can afford this holiday so long",
+      "can afford the holiday so long"
+    ],
+    "tags": "C1, conditionals, linking"
+  },
+  {
+    "itemId": "kw_0100",
+    "fullSentence": "Since Carlos is out of practice, he probably won’t win the race.",
+    "gapFill": "Carlos has almost _______________________ the race, since he’s out of practice.",
+    "keyWord": "chance",
+    "answer": [
+      "no chance of winning"
+    ],
+    "tags": "C1, probability, noun phrases, fixed phrase"
+  },
+  {
+    "itemId": "kw_0101",
+    "fullSentence": "Nina was just about to leave the café when her cousin arrived.",
+    "gapFill": "Nina was just _______________________ the café when her cousin arrived.",
+    "keyWord": "point",
+    "answer": [
+      "on the point of leaving"
+    ],
+    "tags": "C1, fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0102",
+    "fullSentence": "Due to the storm, Theo wasn’t able to leave his apartment.",
+    "gapFill": "The storm _______________________ Theo to leave his apartment.",
+    "keyWord": "impossible",
+    "answer": [
+      "made it impossible for"
+    ],
+    "tags": "C1, causative, formal"
+  },
+  {
+    "itemId": "kw_0103",
+    "fullSentence": "Theo’s likely to be dismissed if he keeps arguing with his manager.",
+    "gapFill": "If he keeps arguing with his manager, Theo’s _______________________ from his job.",
+    "keyWord": "danger",
+    "answer": [
+      "in danger of being fired",
+      "in danger of being dismissed",
+      "in danger of being sacked",
+      "in danger of getting fired",
+      "in danger of getting dismissed",
+      "in danger of getting sacked"
+    ],
+    "tags": "C1, probability, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0104",
+    "fullSentence": "Although the students weren’t listening, the lecturer stayed calm.",
+    "gapFill": "Although the students weren’t _______________________ saying, the lecturer stayed calm.",
+    "keyWord": "attention",
+    "answer": [
+      "paying attention to what he was",
+      "paying attention to what she was",
+      "paying any attention to what she",
+      "paying any attention to what she"
+    ],
+    "tags": "C1, fixed phrase, relative clauses"
+  },
+  {
+    "itemId": "kw_0105",
+    "fullSentence": "Can Andre handle this task with no previous experience?",
+    "gapFill": "Will Andre's _______________________ ability to handle this task?",
+    "keyWord": "affect",
+    "answer": [
+      "lack of experience affect his",
+      "inexperience affect his",
+      "absence of experience affect his"
+    ],
+    "tags": "C1, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0106",
+    "fullSentence": "'Don't forget to write or message me,' said Beatriz as she left.",
+    "gapFill": "'Don’t _______________________,' said Beatriz as she left.",
+    "keyWord": "touch",
+    "answer": [
+      "forget to keep in touch",
+      "forget to stay in touch"
+    ],
+    "tags": "C1, fixed phrase, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0107",
+    "fullSentence": "No changes are planned for the event.",
+    "gapFill": "This event will _______________________ to plan.",
+    "keyWord": "ahead",
+    "answer": [
+      "go ahead according"
+    ],
+    "tags": "C1, future, fixed phrase, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0108",
+    "fullSentence": "Leo no longer believes he’ll find a flat by June.",
+    "gapFill": "He has given _______________________ a flat by June.",
+    "keyWord": "hope",
+    "answer": [
+      "up hope of finding",
+      "up hope of getting",
+      "up any hope of finding",
+      "up all hope of finding"
+    ],
+    "tags": "C1, noun phrases, phrasal verbs, prepositions"
+  },
+  {
+    "itemId": "kw_0109",
+    "fullSentence": "It’s hard to say what I’d have done in that scenario.",
+    "gapFill": "I’m not _______________________ in that scenario.",
+    "keyWord": "how",
+    "answer": [
+      "sure how I would have reacted",
+      "certain how I would have reacted"
+    ],
+    "tags": "C1, indirect questions, past modals, modals"
+  },
+  {
+    "itemId": "kw_0110",
+    "fullSentence": "I don’t think the business will break even this year, considering the economy.",
+    "gapFill": "Given the economic climate, _______________________ the business made a profit this year.",
+    "keyWord": "surprised",
+    "answer": [
+      "I would be surprised if",
+      "I will be surprised if"
+    ],
+    "tags": "C1, conditionals, probability"
+  },
+  {
+    "itemId": "kw_0111",
+    "fullSentence": "This gate must remain open at all times.",
+    "gapFill": "On no _______________________ closed.",
+    "keyWord": "should",
+    "answer": [
+      "account should this gate be",
+      "account should this gate be kept",
+      "account must this gate be",
+      "account must this gate be kept"
+    ],
+    "tags": "C1, modal verbs, inversion, passive voice"
+  },
+  {
+    "itemId": "kw_0112",
+    "fullSentence": "None of Anna’s suggestions were backed by the rest of the team.",
+    "gapFill": "Anna’s suggestions met with _______________________ the rest of the team.",
+    "keyWord": "support",
+    "answer": "no support from",
+    "tags": "C1, formal, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0113",
+    "fullSentence": "Alba is quickly gaining a reputation as a talented filmmaker.",
+    "gapFill": "Alba is making _______________________ herself as a filmmaker.",
+    "keyWord": "name",
+    "answer": "a name for",
+    "tags": "C1, fixed phrase"
+  },
+  {
+    "itemId": "kw_0114",
+    "fullSentence": "After this morning’s briefing, there will be a short feedback session.",
+    "gapFill": "This morning’s briefing _______________________ a short feedback session.",
+    "keyWord": "by",
+    "answer": "will be followed by",
+    "tags": "C1, passive voice, future"
+  },
+  {
+    "itemId": "kw_0115",
+    "fullSentence": "I’d love to show you around when you come to Lisbon.",
+    "gapFill": "It will be a _______________________ tour when you come to Lisbon.",
+    "keyWord": "take",
+    "answer": [
+      "pleasure to take you on a",
+      "pleasure to take you for a",
+      "pleasure to take you on"
+    ],
+    "tags": "C1, fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0116",
+    "fullSentence": "Omar volunteered with a local youth charity last summer.",
+    "gapFill": "Omar used _______________________ with a local youth charity.",
+    "keyWord": "as",
+    "answer": "to work as a volunteer",
+    "tags": "C1, modal verbs, noun phrases"
+  },
+  {
+    "itemId": "kw_0117",
+    "fullSentence": "Isla was just about to step out when she got the call.",
+    "gapFill": "Isla was _______________________ out when she got the call.",
+    "keyWord": "point",
+    "answer": "on the point of stepping",
+    "tags": "C1, fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0118",
+    "fullSentence": "I didn’t know that Nina had chosen to attend the workshop.",
+    "gapFill": "I was unaware _______________________ attend the workshop.",
+    "keyWord": "decision",
+    "answer": "of Nina's decision to",
+    "tags": "C1, prepositions, noun phrases"
+  },
+  {
+    "itemId": "kw_0119",
+    "fullSentence": "When it comes to reliability, Luca is just like his father.",
+    "gapFill": "As _______________________, Luca is just like his father.",
+    "keyWord": "concerned",
+    "answer": "far as reliability is concerned",
+    "tags": "C1, linking, passive voice"
+  },
+  {
+    "itemId": "kw_0120",
+    "fullSentence": "It took Jules ten minutes to find her sunglasses.",
+    "gapFill": "Jules _______________________ for her sunglasses.",
+    "keyWord": "spent",
+    "answer": [
+      "spent ten minutes looking",
+      "spent ten minutes searching"
+    ],
+    "tags": "C1, verb patterns, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0121",
+    "fullSentence": "'Sorry sir, is this your wallet?' the attendant asked.",
+    "gapFill": "''Excuse me sir, but _______________________?' the attendant asked.",
+    "keyWord": "belong",
+    "answer": "does this wallet belong to you",
+    "tags": "C1, questions, prepositions"
+  },
+  {
+    "itemId": "kw_0122",
+    "fullSentence": "Please let us know if you change your booking.",
+    "gapFill": "Please ensure that _______________________ change in your booking.",
+    "keyWord": "notify",
+    "answer": "you notify us of any",
+    "tags": "C1, formal, prepositions, verb patterns"
+  },
+  {
+    "itemId": "kw_0123",
+    "fullSentence": "The roof repairs are planned for next Saturday.",
+    "gapFill": "The roof repairs _______________________ place next Saturday.",
+    "keyWord": "scheduled",
+    "answer": [
+      "are scheduled to take",
+      "have been scheduled to take"
+    ],
+    "tags": "C1, fixed phrase, passive voice, prepositions"
+  },
+  {
+    "itemId": "kw_0124",
+    "fullSentence": "Layla struggled a lot to convince her manager to approve the leave.",
+    "gapFill": "Layla had _______________________ her manager to approve the leave.",
+    "keyWord": "great",
+    "answer": [
+      "great difficulty in convincing",
+      "great difficulty convincing",
+      "great difficulty in persuading",
+      "great difficulty persuading"
+    ],
+    "tags": "C1, gerunds and infinitives, noun phrases"
+  },
+  {
+    "itemId": "kw_0125",
+    "fullSentence": "Americans continue to eat fast food even though it’s unhealthy.",
+    "gapFill": "Americans still eat fast food despite _______________________ unhealthy.",
+    "keyWord": "fact",
+    "answer": [
+      "the fact it is",
+      "the fact that it is"
+    ],
+    "tags": "B2, linking, contrast, concession"
+  },
+  {
+    "itemId": "kw_0126",
+    "fullSentence": "The tomatoes would have ripened earlier if the weather had been sunnier.",
+    "gapFill": "The tomatoes would have ripened earlier last year _______________________ more sunshine.",
+    "keyWord": "there",
+    "answer": [
+      "if there had been"
+    ],
+    "tags": "B2, conditionals, past perfect"
+  },
+  {
+    "itemId": "kw_0127",
+    "fullSentence": "They say the new restaurant is excellent.",
+    "gapFill": "The new restaurant _______________________ excellent.",
+    "keyWord": "said",
+    "answer": [
+      "is said to be"
+    ],
+    "tags": "B2, passive voice, reported speech"
+  },
+  {
+    "itemId": "kw_0128",
+    "fullSentence": "I’ve worked here for a few months and I’m only just beginning to feel comfortable.",
+    "gapFill": "It’s taken me a few months _______________________ in this company.",
+    "keyWord": "used",
+    "answer": [
+      "to get used to working",
+      "to get used to being"
+    ],
+    "tags": "B2, verb patterns, used to"
+  },
+  {
+    "itemId": "kw_0129",
+    "fullSentence": "Ali said he would not apologise and stormed out of the room.",
+    "gapFill": "Ali _______________________ sorry and stormed out of the room.",
+    "keyWord": "refused",
+    "answer": [
+      "refused to say"
+    ],
+    "tags": "B2, reporting verbs, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0130",
+    "fullSentence": "In my view, wearing jeans to a wedding is inappropriate.",
+    "gapFill": "In my view, _______________________ to a wedding wearing jeans.",
+    "keyWord": "ought",
+    "answer": [
+      "you ought not to go"
+    ],
+    "tags": "B2, modal verbs, advice"
+  },
+  {
+    "itemId": "kw_0131",
+    "fullSentence": "Emily found a bracelet in her bag but had no idea who it belonged to.",
+    "gapFill": "Emily found a bracelet in her bag but had no _______________________ be.",
+    "keyWord": "whose",
+    "answer": [
+      "idea whose it might",
+      "idea whose it could",
+      "idea whose bracelet it might",
+      "idea whose bracelet it could"
+    ],
+    "tags": "B2, relative clauses, indirect questions, questions"
+  },
+  {
+    "itemId": "kw_0132",
+    "fullSentence": "All the chairs were broken except that wooden one.",
+    "gapFill": "That wooden chair was the _______________________ broken.",
+    "keyWord": "only",
+    "answer": [
+      "only one not to be",
+      "only one to not be",
+      "only one not to get",
+      "only one to not get"
+    ],
+    "tags": "B2, emphasis, passive voice"
+  },
+  {
+    "itemId": "kw_0133",
+    "fullSentence": "Lara felt hurt because nobody had invited her to the picnic.",
+    "gapFill": "Lara felt hurt because she _______________________ to the picnic.",
+    "keyWord": "been",
+    "answer": [
+      "had not been invited"
+    ],
+    "tags": "B2, passive voice, past perfect"
+  },
+  {
+    "itemId": "kw_0134",
+    "fullSentence": "Social workers don't earn nearly as much as doctors.",
+    "gapFill": "Doctors _______________________ social workers.",
+    "keyWord": "far",
+    "answer": [
+      "earn far more than",
+      "earn far more money than",
+      "get far more than",
+      "get far more money than"
+    ],
+    "tags": "B2, comparatives and superlatives, quantifiers"
+  },
+  {
+    "itemId": "kw_0135",
+    "fullSentence": "Tania doesn’t want to go to the cinema tonight.",
+    "gapFill": "Tania _______________________ going to the cinema tonight.",
+    "keyWord": "feel",
+    "answer": [
+      "does not feel like"
+    ],
+    "tags": "B2, phrasal verbs, verb patterns, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0136",
+    "fullSentence": "I didn’t expect the book to be so moving.",
+    "gapFill": "The book _______________________ really moving.",
+    "keyWord": "turned",
+    "answer": [
+      "turned out to be"
+    ],
+    "tags": "B2, phrasal verbs, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0137",
+    "fullSentence": "They completed the hike even though it rained all day.",
+    "gapFill": "Despite the _______________________ completing the hike.",
+    "keyWord": "succeeded",
+    "answer": [
+      "rain they succeeded in"
+    ],
+    "tags": "B2, linking, contrast, concession, ability"
+  },
+  {
+    "itemId": "kw_0138",
+    "fullSentence": "Our hotel menu includes more than forty different dishes.",
+    "gapFill": "There _______________________ over forty different dishes on our menu.",
+    "keyWord": "choice",
+    "answer": [
+      "is a choice of"
+    ],
+    "tags": "B2, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0139",
+    "fullSentence": "'We don't believe that more roads will solve traffic problems,' said the engineers.",
+    "gapFill": "The engineers announced that they _______________________ solve traffic problems.",
+    "keyWord": "doubted",
+    "answer": [
+      "doubted that more roads would",
+      "doubted that more roads will",
+      "doubted if more roads would",
+      "doubted if more roads will",
+      "doubted whether more roads would",
+      "doubted whether more roads will"
+    ],
+    "tags": "B2, reporting verbs, future"
+  },
+  {
+    "itemId": "kw_0140",
+    "fullSentence": "'I'm definitely not leaving the country this year,' said Mr Riley.",
+    "gapFill": "'I have _______________________ the country this year,' said Mr Riley.",
+    "keyWord": "intention",
+    "answer": [
+      "no intention of leaving"
+    ],
+    "tags": "B2, fixed phrase, noun phrases, formal"
+  },
+  {
+    "itemId": "kw_0141",
+    "fullSentence": "'Maybe I was wrong about the time of the interview,' said Zoe.",
+    "gapFill": "'I may _______________________ about the time of the interview,' said Zoe.",
+    "keyWord": "mistake",
+    "answer": [
+      "have made a mistake"
+    ],
+    "tags": "B2, modal verbs, deduction, past modals"
+  },
+  {
+    "itemId": "kw_0142",
+    "fullSentence": "It’s too late now to go to the party.",
+    "gapFill": "There is _______________________ to the party now.",
+    "keyWord": "point",
+    "answer": [
+      "little point in going",
+      "no point in going",
+      "Little point going",
+      "No point going",
+      "Is not any point going"
+    ],
+    "tags": "B2, fixed phrase, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0143",
+    "fullSentence": "Sam said, 'You can borrow my camera, if you agree to look after it.'",
+    "gapFill": "Sam said I could borrow his camera _______________________ to look after it.",
+    "keyWord": "long",
+    "answer": [
+      "as long as I agreed",
+      "so long as I agreed",
+      "as long I promised",
+      "so long as I promised"
+    ],
+    "tags": "B2, conditionals, reported speech"
+  },
+  {
+    "itemId": "kw_0144",
+    "fullSentence": "The popularity of yoga has grown over the past ten years.",
+    "gapFill": "Yoga _______________________ now than ten years ago.",
+    "keyWord": "much",
+    "answer": [
+      "is much more popular"
+    ],
+    "tags": "B2, comparatives and superlatives"
+  },
+  {
+    "itemId": "kw_0145",
+    "fullSentence": "My uncle has decided not to smoke anymore, which is a smart choice.",
+    "gapFill": "My uncle's decision _______________________ is a smart one.",
+    "keyWord": "give",
+    "answer": [
+      "to give up smoking"
+    ],
+    "tags": "B2, verb patterns, gerunds and infinitives, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0146",
+    "fullSentence": "My students did very few writings this term",
+    "gapFill": "Hardly _______________________ by my students this term.",
+    "keyWord": "were",
+    "answer": [
+      "any writings were done"
+    ],
+    "tags": "B2, passive voice, quantifiers"
+  },
+  {
+    "itemId": "kw_0147",
+    "fullSentence": "I ignored how Ben was acting during the meeting.",
+    "gapFill": "I didn’t pay _______________________ Ben was acting.",
+    "keyWord": "attention",
+    "answer": [
+      "any attention to how",
+      "any attention to the way",
+      "Attention to how",
+      "Attention to the way"
+    ],
+    "tags": "B2, fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0148",
+    "fullSentence": "Sophie still finds it odd to write emails in English at work.",
+    "gapFill": "Sophie still has not _______________________ emails in English at work.",
+    "keyWord": "used",
+    "answer": [
+      "got used to writing",
+      "got used to sending"
+    ],
+    "tags": "B2, verb patterns, used to, prepositions"
+  },
+  {
+    "itemId": "kw_0149",
+    "fullSentence": "‘Can my son try this jumper on?’ asked Maria.",
+    "gapFill": "Maria asked the assistant _______________________ on that jumper.",
+    "keyWord": "could",
+    "answer": [
+      "if her son could try",
+      "whether her son could try"
+    ],
+    "tags": "B2, indirect questions, reported speech, questions"
+  },
+  {
+    "itemId": "kw_0150",
+    "fullSentence": "‘Don't sit too close to the TV screen for a long time,’ the optician told us.",
+    "gapFill": "The optician _______________________________________ too close to the TV screen for a long time.",
+    "keyWord": "warned",
+    "answer": [
+      "warned us not to sit"
+    ],
+    "tags": "B2, reported speech, reporting verbs, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0151",
+    "fullSentence": "We got lost trying to get back from the museum.",
+    "gapFill": "We couldn't _______________________________________ from the museum.",
+    "keyWord": "way",
+    "answer": [
+      "find the way home",
+      "find our way home"
+    ],
+    "tags": "B2, fixed phrase"
+  },
+  {
+    "itemId": "kw_0152",
+    "fullSentence": "Tom passed his final exam easily.",
+    "gapFill": "Tom had _______________________________________ his final exam.",
+    "keyWord": "difficulty",
+    "answer": [
+      "no difficulty passing",
+      "little difficulty in passing",
+      "no difficulty in passing",
+      "little difficulty passing"
+    ],
+    "tags": "B2, fixed phrase, noun phrases, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0153",
+    "fullSentence": "I always rely on David’s advice.",
+    "gapFill": "David _______________________________________ advice I always rely on.",
+    "keyWord": "somebody",
+    "answer": [
+      "is somebody whose",
+      "is someone whose"
+    ],
+    "tags": "B2, relative clauses"
+  },
+  {
+    "itemId": "kw_0154",
+    "fullSentence": "We appear to have gone to the wrong train platform.",
+    "gapFill": "It _______________________________________ we've gone to the wrong train platform.",
+    "keyWord": "as",
+    "answer": [
+      "seems as if",
+      "appears as if",
+      "looks as though",
+      "looks as if",
+      "seems as though",
+      "appears as though"
+    ],
+    "tags": "B2, linking, speculation"
+  },
+  {
+    "itemId": "kw_0155",
+    "fullSentence": "I didn’t understand the explanation for the maths problem.",
+    "gapFill": "The explanation for the maths problem didn’t _______________________________________ me.",
+    "keyWord": "sense",
+    "answer": [
+      "make any sense to",
+      "make much sense to",
+      "make sense to"
+    ],
+    "tags": "B2, fixed phrase, quantifiers"
+  },
+  {
+    "itemId": "kw_0156",
+    "fullSentence": "It's a shame we didn’t travel more when we lived abroad.",
+    "gapFill": "I wish that we _______________________________________ more when we lived abroad.",
+    "keyWord": "could",
+    "answer": [
+      "could have travelled",
+      "could have done"
+    ],
+    "tags": "B2, unreal forms, modal verbs, past modals"
+  },
+  {
+    "itemId": "kw_0157",
+    "fullSentence": "She described the apartment to us in detail.",
+    "gapFill": "She _______________________________________ of the apartment.",
+    "keyWord": "detailed",
+    "answer": [
+      "gave us a detailed description"
+    ],
+    "tags": "B2, noun phrases, formal"
+  },
+  {
+    "itemId": "kw_0158",
+    "fullSentence": "The instructions were so tricky that none of the students could follow them.",
+    "gapFill": "The instructions were _______________________________________ the students to follow.",
+    "keyWord": "too",
+    "answer": [
+      "too complicated for",
+      "too tricky for"
+    ],
+    "tags": "B2, quantifiers, prepositions, intensifiers, so/such"
+  },
+  {
+    "itemId": "kw_0159",
+    "fullSentence": "Sandra broke the window by mistake.",
+    "gapFill": "Sandra _______________________________________ break the window.",
+    "keyWord": "mean",
+    "answer": [
+      "did not mean to"
+    ],
+    "tags": "B2, verb patterns, past simple, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0160",
+    "fullSentence": "Lena has already planned her next trip to Italy.",
+    "gapFill": "Lena has already _______________________________________ her next trip to Italy.",
+    "keyWord": "arrangements",
+    "answer": [
+      "made arrangements for",
+      "made the arrangements for"
+    ],
+    "tags": "B2, fixed phrase, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0161",
+    "fullSentence": "They say the forests in this region are disappearing.",
+    "gapFill": "The forests in this region _______________________________________ disappearing.",
+    "keyWord": "said",
+    "answer": [
+      "are said to be"
+    ],
+    "tags": "B2, passive voice, reported speech"
+  },
+  {
+    "itemId": "kw_0162",
+    "fullSentence": "We didn’t enjoy our meal outside because it started to rain.",
+    "gapFill": "The rain _______________________________________ our meal outside.",
+    "keyWord": "prevented",
+    "answer": [
+      "prevented us from enjoying"
+    ],
+    "tags": "B2, gerunds and infinitives, verb patterns, prepositions"
+  },
+  {
+    "itemId": "kw_0163",
+    "fullSentence": "It looks like Luca has left his wallet at home.",
+    "gapFill": "Luca _______________________________________ his wallet at home.",
+    "keyWord": "seems",
+    "answer": [
+      "seems to have left"
+    ],
+    "tags": "B2, perfect, speculation"
+  },
+  {
+    "itemId": "kw_0164",
+    "fullSentence": "A trainee dentist took out Mr Silva’s tooth.",
+    "gapFill": "Mr Silva _______________________________________ by a trainee dentist.",
+    "keyWord": "had",
+    "answer": [
+      "had his tooth taken out",
+      "had his tooth extracted",
+      "had a tooth taken out",
+      "had a tooth extracted"
+    ],
+    "tags": "B2, causative, passive voice"
+  },
+  {
+    "itemId": "kw_0165",
+    "fullSentence": "Ben only failed the test because he overslept.",
+    "gapFill": "If Ben had _______________________________________ passed the test.",
+    "keyWord": "not",
+    "answer": [
+      "not overslept he would have"
+    ],
+    "tags": "B2, conditionals, past perfect"
+  },
+  {
+    "itemId": "kw_0166",
+    "fullSentence": "The manager postponed the excursion until after the inspection.",
+    "gapFill": "The trip to the castle _______________________________________ manager until after the inspection.",
+    "keyWord": "off",
+    "answer": [
+      "was put off by the"
+    ],
+    "tags": "B2, phrasal verbs, passive voice"
+  },
+  {
+    "itemId": "kw_0167",
+    "fullSentence": "‘Can you tell me how wide this sofa is?’ Liam asked his dad.",
+    "gapFill": "Liam asked his dad _______________________________________ was.",
+    "keyWord": "wide",
+    "answer": [
+      "how wide the sofa"
+    ],
+    "tags": "B2, indirect questions, questions"
+  },
+  {
+    "itemId": "kw_0168",
+    "fullSentence": "Ella spent ages sorting out her files.",
+    "gapFill": "It _______________________________________ out her files.",
+    "keyWord": "took",
+    "answer": [
+      "took Ella ages to sort"
+    ],
+    "tags": "B2, causality, emphasis"
+  },
+  {
+    "itemId": "kw_0169",
+    "fullSentence": "An architect designed the building for Professor Klein.",
+    "gapFill": "Professor Klein _______________________________________ by an architect.",
+    "keyWord": "had",
+    "answer": [
+      "had the building designed"
+    ],
+    "tags": "B2, causative have, passive voice, causative"
+  },
+  {
+    "itemId": "kw_0170",
+    "fullSentence": "'Luca, you broke the window!' shouted his neighbour.",
+    "gapFill": "Luca’s neighbour _______________________________________ the window.",
+    "keyWord": "accused",
+    "answer": [
+      "accused him of breaking",
+      "accused him of having broken"
+    ],
+    "tags": "B2, reporting verbs, gerunds and infinitives, reported speech"
+  },
+  {
+    "itemId": "kw_0171",
+    "fullSentence": "Freya fell down the stairs because she wasn’t watching where she was going.",
+    "gapFill": "If Freya  _______________________________________ to where she was going, she wouldn’t have fallen.",
+    "keyWord": "paying",
+    "answer": [
+      "had been paying attention",
+      "had been paying any attention"
+    ],
+    "tags": "B2, conditionals, fixed phrase"
+  },
+  {
+    "itemId": "kw_0172",
+    "fullSentence": "It might not be easy for us to find accommodation at short notice.",
+    "gapFill": "It _______________________________________ us to find accommodation at short notice.",
+    "keyWord": "could",
+    "answer": [
+      "could be difficult for",
+      "could be hard for",
+      " could be tricky for",
+      "could be tough for"
+    ],
+    "tags": "B2, speculation, modal verbs, prepositions"
+  },
+  {
+    "itemId": "kw_0173",
+    "fullSentence": "You should have asked me before borrowing my shoes.",
+    "gapFill": "You _______________________________________ me before borrowing my shoes.",
+    "keyWord": "ought",
+    "answer": [
+      "ought to have asked"
+    ],
+    "tags": "B2, modal verbs, past modals"
+  },
+  {
+    "itemId": "kw_0174",
+    "fullSentence": "Several flights were cancelled as a result of the heavy fog.",
+    "gapFill": "Several flights were cancelled _______________________________________ so heavy.",
+    "keyWord": "because",
+    "answer": [
+      "because the fog was"
+    ],
+    "tags": "B2, linking, causality"
+  },
+  {
+    "itemId": "kw_0175",
+    "fullSentence": "I last got a message from Clara six months ago.",
+    "gapFill": "I _______________________________________ Clara for six months.",
+    "keyWord": "heard",
+    "answer": [
+      "have not heard from"
+    ],
+    "tags": "B2, present perfect, verb forms"
+  },
+  {
+    "itemId": "kw_0176",
+    "fullSentence": "I don’t recommend booking tickets through that website.",
+    "gapFill": "It’s _______________________________________ tickets through that website.",
+    "keyWord": "advisable",
+    "answer": [
+      "not advisable to book"
+    ],
+    "tags": "B2, formal, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0177",
+    "fullSentence": "Lara’s aunt founded the travel agency in 1988.",
+    "gapFill": "The travel agency _______________________________________ Lara’s aunt in 1988.",
+    "keyWord": "set",
+    "answer": [
+      "was set up by"
+    ],
+    "tags": "B2, phrasal verbs, passive voice"
+  },
+  {
+    "itemId": "kw_0178",
+    "fullSentence": "The number of people working from home has gone up in the last two years.",
+    "gapFill": "There _______________________________________ in the number of people working from home in the last two years.",
+    "keyWord": "rise",
+    "answer": [
+      "has been a rise"
+    ],
+    "tags": "B2, noun phrases, trends"
+  },
+  {
+    "itemId": "kw_0179",
+    "fullSentence": "Jacob said he would never mention the incident again.",
+    "gapFill": "Jacob promised never _______________________________________ again.",
+    "keyWord": "discuss",
+    "answer": [
+      "to discuss the incident"
+    ],
+    "tags": "B2, reported speech, gerunds and infinitives, verb patterns"
+  },
+  {
+    "itemId": "kw_0180",
+    "fullSentence": "'This is the nicest Airbnb I've ever stayed in,' said Jordan.",
+    "gapFill": "'I've _______________________________________ Airbnb than this,' said Jordan.",
+    "keyWord": "never",
+    "answer": [
+      "never stayed in a nicer",
+      "never stayed in a better"
+    ],
+    "tags": "B2, comparatives and superlatives, present perfect"
+  },
+  {
+    "itemId": "kw_0181",
+    "fullSentence": "There were very few people at the poetry reading on Monday.",
+    "gapFill": "Hardly _______________________________________ the poetry reading on Monday.",
+    "keyWord": "came",
+    "answer": [
+      "anyone came to",
+      "anybody came to"
+    ],
+    "tags": "B2, quantifiers, past simple"
+  },
+  {
+    "itemId": "kw_0182",
+    "fullSentence": "We had to complete the report before we could leave the office.",
+    "gapFill": "We had to stay in the office ____________________________ the report.",
+    "keyWord": "until",
+    "answer": [
+      "until we had completed",
+      "until we completed"
+    ],
+    "tags": "B2, linking, past perfect"
+  },
+  {
+    "itemId": "kw_0183",
+    "fullSentence": "Ella hadn’t expected the exhibition to be so interesting.",
+    "gapFill": "The exhibition ____________________________ Ella had expected.",
+    "keyWord": "better",
+    "answer": [
+      "was better than"
+    ],
+    "tags": "B2, comparatives and superlatives"
+  },
+  {
+    "itemId": "kw_0184",
+    "fullSentence": "If Josh doesn’t study more, he won’t pass the final exam.",
+    "gapFill": "Josh won’t pass the final exam ____________________________ studying.",
+    "keyWord": "does",
+    "answer": [
+      "unless he does more"
+    ],
+    "tags": "B2, conditionals, verb forms"
+  },
+  {
+    "itemId": "kw_0185",
+    "fullSentence": "“Do you know what the problem is, Alex?” asked Priya.",
+    "gapFill": "Priya asked Alex ____________________________.",
+    "keyWord": "what",
+    "answer": [
+      "what the problem was"
+    ],
+    "tags": "B2, indirect questions, reported speech, questions"
+  },
+  {
+    "itemId": "kw_0186",
+    "fullSentence": "The school decided to advertise the vacancy online.",
+    "gapFill": "The school decided to ____________________________ the vacancy online.",
+    "keyWord": "put",
+    "answer": [
+      "put an advertisement for",
+      "put an ad for",
+      "put an advert for"
+    ],
+    "tags": "B2, fixed phrase"
+  },
+  {
+    "itemId": "kw_0187",
+    "fullSentence": "At the end of her presentation, the student congratulated her teacher.",
+    "gapFill": "The student ____________________________ her teacher.",
+    "keyWord": "finished",
+    "answer": [
+      "finished her presentation by congratulating"
+    ],
+    "tags": "B2, gerunds and infinitives, verb patterns"
+  },
+  {
+    "itemId": "kw_0188",
+    "fullSentence": "I sent off my university application a month ago.",
+    "gapFill": "It ____________________________ I sent off my university application.",
+    "keyWord": "month",
+    "answer": [
+      "has been a month since",
+      "is a month since",
+      "'s a month since",
+      "'s been a month since"
+    ],
+    "tags": "B2, present perfect, time expressions"
+  },
+  {
+    "itemId": "kw_0189",
+    "fullSentence": "The band received loads of fan mail after they had appeared on TV.",
+    "gapFill": "The band received loads of fan mail ____________________________ on TV.",
+    "keyWord": "following",
+    "answer": [
+      "following their appearance"
+    ],
+    "tags": "B2, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0190",
+    "fullSentence": "Mia is interested in learning more about photography.",
+    "gapFill": "Mia would ____________________________ more about photography.",
+    "keyWord": "like",
+    "answer": [
+      "like to learn",
+      "like to know"
+    ],
+    "tags": "B2, verb patterns, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0191",
+    "fullSentence": "Because of the roadworks, the police didn’t allow us to drive through the tunnel.",
+    "gapFill": "The police wouldn’t ____________________________ through the tunnel.",
+    "keyWord": "let",
+    "answer": [
+      "let us drive"
+    ],
+    "tags": "B2, causative, modal verbs, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0192",
+    "fullSentence": "“Did you see the football match on Sunday?” asked Marco.",
+    "gapFill": "Marco wanted to know if I had ____________________________ on Sunday.",
+    "keyWord": "seen",
+    "answer": [
+      "seen the football match"
+    ],
+    "tags": "B2, reported speech, past perfect"
+  },
+  {
+    "itemId": "kw_0193",
+    "fullSentence": "“I think this shirt is torn,” said Anna to the cashier.",
+    "gapFill": "“I think ____________________________ this shirt,” Anna said to the cashier.",
+    "keyWord": "there",
+    "answer": [
+      "there is a tear in"
+    ],
+    "tags": "B2, noun phrases"
+  },
+  {
+    "itemId": "kw_0194",
+    "fullSentence": "Leo always ignores everything I suggest.",
+    "gapFill": "Leo never pays ____________________________ I suggest.",
+    "keyWord": "attention",
+    "answer": [
+      "attention to what"
+    ],
+    "tags": "B2, fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0195",
+    "fullSentence": "“Could I borrow your tablet, Jason?” asked Emma.",
+    "gapFill": "Emma asked Jason ____________________________ his tablet.",
+    "keyWord": "lend",
+    "answer": [
+      "to lend her",
+      "If he could lend her",
+      "if he would lend her"
+    ],
+    "tags": "B2, reporting verbs, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0196",
+    "fullSentence": "Maybe Tom didn’t remember that we moved the deadline.",
+    "gapFill": "Tom ____________________________ that we moved the deadline.",
+    "keyWord": "might",
+    "answer": [
+      "might have forgotten"
+    ],
+    "tags": "B2, past modals, speculation"
+  },
+  {
+    "itemId": "kw_0197",
+    "fullSentence": "All the students have a great time during the science workshop.",
+    "gapFill": "Every ____________________________ during the science workshop.",
+    "keyWord": "fun",
+    "answer": [
+      "student has fun",
+      "student has a lot of fun"
+    ],
+    "tags": "B2, noun phrases, quantifiers"
+  },
+  {
+    "itemId": "kw_0198",
+    "fullSentence": "While I was in Berlin, I had some unforgettable experiences.",
+    "gapFill": "During ____________________________ had some unforgettable experiences.",
+    "keyWord": "my",
+    "answer": [
+      "my trip to Berlin I",
+      "my time in Berlin I",
+      "my holiday in Berlin I"
+    ],
+    "tags": "B2, noun phrases, past simple"
+  },
+  {
+    "itemId": "kw_0199",
+    "fullSentence": "You were careless to go out without switching the oven off.",
+    "gapFill": "You ____________________________ the oven off before you went out.",
+    "keyWord": "ought",
+    "answer": [
+      "ought to have switched",
+      "ought to have turned"
+    ],
+    "tags": "B2, past modals, advice"
+  },
+  {
+    "itemId": "kw_0200",
+    "fullSentence": "“Is there any possibility that James will leave his partner?” asked Zoe.",
+    "gapFill": "Zoe asked if there was any ____________________________ leaving his partner.",
+    "keyWord": "chance",
+    "answer": [
+      "chance of James",
+      "chance of James’s"
+    ],
+    "tags": "B2, noun phrases, speculation"
+  },
+  {
+    "itemId": "kw_0201",
+    "fullSentence": "Sophie is the only one who responded to the email.",
+    "gapFill": "Apart ____________________________ responded to the email.",
+    "keyWord": "nobody",
+    "answer": [
+      "from Sophie nobody"
+    ],
+    "tags": "B2, prepositions, quantifiers"
+  },
+  {
+    "itemId": "kw_0202",
+    "fullSentence": "Do you feel comfortable with the new software yet?",
+    "gapFill": "Have you ____________________________ the new software yet?",
+    "keyWord": "used",
+    "answer": [
+      "got used to",
+      "gotten used to"
+    ],
+    "tags": "B2, used to, verb patterns, perfect"
+  },
+  {
+    "itemId": "kw_0203",
+    "fullSentence": "It was such a cold day that nobody wanted to go outside.",
+    "gapFill": "Nobody ____________________________ outside because it was so cold.",
+    "keyWord": "felt",
+    "answer": [
+      "felt like going"
+    ],
+    "tags": "B2, Gerunds and infinitives, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0204",
+    "fullSentence": "Daniel couldn’t speak or understand French.",
+    "gapFill": "Besides ____________________________ French, Daniel couldn’t understand it either.",
+    "keyWord": "unable",
+    "answer": [
+      "being unable to speak"
+    ],
+    "tags": "B2, gerunds and infinitives, ability"
+  },
+  {
+    "itemId": "kw_0205",
+    "fullSentence": "The meeting will begin immediately upon the CEO’s entrance.",
+    "gapFill": "The meeting will begin ____________________________ the CEO enters.",
+    "keyWord": "soon",
+    "answer": [
+      "as soon as"
+    ],
+    "tags": "B2, linking, time expressions"
+  },
+  {
+    "itemId": "kw_0206",
+    "fullSentence": "That’s the weirdest book I’ve ever read!",
+    "gapFill": "I’ve never ____________________________ book!",
+    "keyWord": "strange",
+    "answer": [
+      "read such a strange"
+    ],
+    "tags": "B2, emphasis, comparatives and superlatives"
+  },
+  {
+    "itemId": "kw_0207",
+    "fullSentence": "A cheerful guide took us around the city.",
+    "gapFill": "We ____________________________ by a cheerful guide.",
+    "keyWord": "around",
+    "answer": [
+      "were taken around the city"
+    ],
+    "tags": "B2, Passive voice, verb forms, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0208",
+    "fullSentence": "My dad was determined to pay the bill.",
+    "gapFill": "My dad ____________________________ the bill.",
+    "keyWord": "insisted",
+    "answer": [
+      "insisted on paying"
+    ],
+    "tags": "B2, reporting verbs, gerunds and infinitives, reported speech, prepositions"
+  },
+  {
+    "itemId": "kw_0209",
+    "fullSentence": "The coach didn’t manage to convince Mia to join the team.",
+    "gapFill": "The coach didn’t ____________________________ Mia to join the team.",
+    "keyWord": "succeed",
+    "answer": [
+      "succeed in convincing"
+    ],
+    "tags": "B2, verb patterns, prepositions, gerunds and infinitives, formal"
+  },
+  {
+    "itemId": "kw_0210",
+    "fullSentence": "“I’d prefer it if you didn’t eat in this room,” said the teacher.",
+    "gapFill": "“Would you ____________________________ in this room?” said the teacher.",
+    "keyWord": "mind",
+    "answer": [
+      "mind not eating"
+    ],
+    "tags": "B2, Gerunds and infinitives, verb patterns"
+  },
+  {
+    "itemId": "kw_0211",
+    "fullSentence": "Rachel impressed her interviewer by answering confidently.",
+    "gapFill": "Rachel ____________________________ her interviewer by answering confidently.",
+    "keyWord": "good",
+    "answer": [
+      "made a good impression on"
+    ],
+    "tags": "B2, fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0212",
+    "fullSentence": "Hannah regrets not telling her friend the truth.",
+    "gapFill": "Hannah ____________________________ her friend the truth.",
+    "keyWord": "wishes",
+    "answer": [
+      "wishes she had told"
+    ],
+    "tags": "B2, unreal forms, past perfect, perfect"
+  },
+  {
+    "itemId": "kw_0213",
+    "fullSentence": "I struggled to understand the safety guidelines.",
+    "gapFill": "I ____________________________ the safety guidelines.",
+    "keyWord": "trouble",
+    "answer": [
+      "had trouble understanding"
+    ],
+    "tags": "B2, Gerunds and infinitives, fixed phrase, noun phrases"
+  },
+  {
+    "itemId": "kw_0214",
+    "fullSentence": "Lara was so nervous she had difficulty following the examiner’s instructions.",
+    "gapFill": "Lara was so nervous she ____________________________ the examiner’s instructions.",
+    "keyWord": "IT",
+    "answer": [
+      "found it hard to follow",
+      "found it difficult to follow",
+      "found it tough to follow"
+    ],
+    "tags": "B2, fixed phrase, verb patterns"
+  },
+  {
+    "itemId": "kw_0215",
+    "fullSentence": "They have postponed the concert and it will now happen next month.",
+    "gapFill": "The concert ____________________________ until next month.",
+    "keyWord": "PUT",
+    "answer": [
+      "has been put off",
+      "'s been put off"
+    ],
+    "tags": "B2, phrasal verbs, passive voice, verbs forms"
+  },
+  {
+    "itemId": "kw_0216",
+    "fullSentence": "I don’t plan on playing with Marcus again.",
+    "gapFill": "I’ve got ____________________________ with Marcus again.",
+    "keyWord": "INTENTION",
+    "answer": [
+      "no intention of playing",
+      "little intention of playing"
+    ],
+    "tags": "B2, noun phrase, verb pattern (preposition + -ing)"
+  },
+  {
+    "itemId": "kw_0217",
+    "fullSentence": "It seems a short circuit caused the explosion.",
+    "gapFill": "The explosion ____________________________ by a short circuit.",
+    "keyWord": "HAVE",
+    "answer": "seems to have been caused",
+    "tags": "B2, passive voice, perfect, speculation"
+  },
+  {
+    "itemId": "kw_0218",
+    "fullSentence": "The town was dead in winter, so it wasn’t worth going out.",
+    "gapFill": "The town was dead in winter, so ____________________________ going out.",
+    "keyWord": "POINT",
+    "answer": [
+      "there was no point in",
+      "there was little point in",
+      "there was no point",
+      "there was little point",
+      "there was not any point"
+    ],
+    "tags": "B2, fixed phrase, verb patterns, noun phrases"
+  },
+  {
+    "itemId": "kw_0219",
+    "fullSentence": "I called the doctor, but they told me I didn’t need an appointment.",
+    "gapFill": "I called the doctor, but they said I ____________________________ an appointment.",
+    "keyWord": "HAVE",
+    "answer": "did not have to make",
+    "tags": "B2, modal verbs, obligation, reported speech"
+  },
+  {
+    "itemId": "kw_0220",
+    "fullSentence": "“I’ll take you to the airport if you’re packed,” said Jake.",
+    "gapFill": "Jake said he’d take me to the airport ____________________________ packed.",
+    "keyWord": "LONG",
+    "answer": [
+      "as long as I was",
+      "so long as I was",
+      "as long as I had",
+      "so long as I had"
+    ],
+    "tags": "B2, conditionals, reported speech, linking"
+  },
+  {
+    "itemId": "kw_0221",
+    "fullSentence": "My phone needs to be fixed again.",
+    "gapFill": "I’ll have to ____________________________ again.",
+    "keyWord": "GET",
+    "answer": [
+      "get my phone fixed",
+      "get my phone repaired",
+      "get my phone mended"
+    ],
+    "tags": "B2, causative, passive voice"
+  },
+  {
+    "itemId": "kw_0222",
+    "fullSentence": "Sales decreased because of the pandemic, the company said.",
+    "gapFill": "The company blamed the ____________________________ the pandemic.",
+    "keyWord": "FALL",
+    "answer": "fall in sales on",
+    "tags": "B2, noun phrase, prepositions, reporting verbs, reported speech"
+  },
+  {
+    "itemId": "kw_0223",
+    "fullSentence": "Ellie regretted wasting so much time online.",
+    "gapFill": "Ellie ____________________________ so much time online.",
+    "keyWord": "WISHED",
+    "answer": "wished she had not wasted",
+    "tags": "B2, wish, past perfect, verb forms, unreal forms"
+  },
+  {
+    "itemId": "kw_0224",
+    "fullSentence": "People think the song was about his childhood.",
+    "gapFill": "That song ____________________________ written about his childhood.",
+    "keyWord": "HAVE",
+    "answer": [
+      "is thought to have been",
+      "is believed to have been"
+    ],
+    "tags": "B2, passive voice, reported speech, perfect"
+  },
+  {
+    "itemId": "kw_0225",
+    "fullSentence": "I couldn’t have passed the exam if you hadn’t helped.",
+    "gapFill": "I wouldn’t have passed the exam if ____________________________ your help.",
+    "keyWord": "BEEN",
+    "answer": "it had not been for",
+    "tags": "B2, unreal conditional, fixed expression (if it hadn’t been for)"
+  },
+  {
+    "itemId": "kw_0226",
+    "fullSentence": "The platoon left almost no soldiers behind.",
+    "gapFill": "Hardly ____________________________ by the platoon.",
+    "keyWord": "WERE",
+    "answer": [
+      "any soldiers were left behind",
+      "any soldiers were abandoned"
+    ],
+    "tags": "B2, passive voice, quantifiers, emphasis"
+  },
+  {
+    "itemId": "kw_0227",
+    "fullSentence": "“What’s the height of that mountain?” She asked.",
+    "gapFill": "She asked ____________________________ was.",
+    "keyWord": "HOW",
+    "answer": "how high the mountain",
+    "tags": "B2, indirect questions, questions, reported speech"
+  },
+  {
+    "itemId": "kw_0228",
+    "fullSentence": "This sofa is almost the same as the one we saw yesterday.",
+    "gapFill": "There isn’t ____________________________ this sofa and the one we saw yesterday.",
+    "keyWord": "MUCH",
+    "answer": "much difference between",
+    "tags": "B2, comparatives and superlatives, noun phrases"
+  },
+  {
+    "itemId": "kw_0229",
+    "fullSentence": "Maria wouldn’t apologise for shouting at us.",
+    "gapFill": "Maria refused to ____________________________ shouting at us.",
+    "keyWord": "WAS",
+    "answer": "say she was sorry for",
+    "tags": "B2, reporting verbs, verb forms, prepositions, reported speech"
+  },
+  {
+    "itemId": "kw_0230",
+    "fullSentence": "This town’s restaurants are what visitors enjoy the most.",
+    "gapFill": "What most visitors ____________________________ this town is its restaurants.",
+    "keyWord": "FIND",
+    "answer": "find most enjoyable about",
+    "tags": "B2, verb patterns, fixed phrase, cleft sentences, comparatives and superlatives"
+  },
+  {
+    "itemId": "kw_0231",
+    "fullSentence": "Our team probably won’t manage to get the grant.",
+    "gapFill": "Our team is unlikely to ____________________________ the grant.",
+    "keyWord": "SUCCEED",
+    "answer": [
+      "succeed in getting",
+      "succeed in obtaining"
+    ],
+    "tags": "B2, verb patterns, gerunds and infinitives, probability, speculation"
+  },
+  {
+    "itemId": "kw_0232",
+    "fullSentence": "We last spoke on the phone two years ago.",
+    "gapFill": "It’s ____________________________ we last spoke on the phone.",
+    "keyWord": "BEEN",
+    "answer": "been two years since",
+    "tags": "B2, time expressions, present perfect, verb forms"
+  },
+  {
+    "itemId": "kw_0233",
+    "fullSentence": "“You weren’t honest with me,” Anna told Paul.",
+    "gapFill": "Anna ____________________________ honest with her.",
+    "keyWord": "ACCUSED",
+    "answer": "accused Paul of not being",
+    "tags": "B2, reporting verbs, verb patterns, reported speech, prepositions"
+  },
+  {
+    "itemId": "kw_0234",
+    "fullSentence": "You really ought to get to the interview on time.",
+    "gapFill": "I strongly advise you ____________________________ for the interview.",
+    "keyWord": "LATE",
+    "answer": [
+      "not to be late",
+      "not to arrive late"
+    ],
+    "tags": "B2, reporting verbs, verb forms, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0235",
+    "fullSentence": "We managed to win the race, even though we weren’t well prepared.",
+    "gapFill": "We won the race ____________________________ badly prepared.",
+    "keyWord": "SPITE",
+    "answer": [
+      "in spite of being",
+      "in spite of having been"
+    ],
+    "tags": "B2, concession, prepositions, linking, contrast"
+  },
+  {
+    "itemId": "kw_0236",
+    "fullSentence": "The journey to Barcelona lasts two hours by plane.",
+    "gapFill": "It ____________________________ to Barcelona.",
+    "keyWord": "FLY",
+    "answer": "takes two hours to fly",
+    "tags": "B2, verb forms, time expressions, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0237",
+    "fullSentence": "I didn’t know the hotel was that far from the station.",
+    "gapFill": "I didn’t know the hotel ____________________________ way from the station.",
+    "keyWord": "SUCH",
+    "answer": "was such a long",
+    "tags": "B2, emphasis, noun phrases, intensifiers"
+  },
+  {
+    "itemId": "kw_0238",
+    "fullSentence": "Dan missed the bus because he didn’t leave on time.",
+    "gapFill": "If Dan had left on time, he would ____________________________ bus.",
+    "keyWord": "HAVE",
+    "answer": "not have missed the",
+    "tags": "B2, conditionals, past modals, modal verbs"
+  },
+  {
+    "itemId": "kw_0239",
+    "fullSentence": "None of the other apps perform better than this one.",
+    "gapFill": "The other apps don’t work ____________________________ this one.",
+    "keyWord": "NEARLY",
+    "answer": "nearly as well as",
+    "tags": "B2, comparatives and superlatives, emphasis, intensifiers"
+  },
+  {
+    "itemId": "kw_0240",
+    "fullSentence": "“Could I use your laptop for a second?” Mia asked Ben.",
+    "gapFill": "Mia asked Ben ____________________________ his laptop for a second.",
+    "keyWord": "WHETHER",
+    "answer": "whether she could use",
+    "tags": "B2, reported speech, questions, indirect questions, modal verbs"
+  },
+  {
+    "itemId": "kw_0241",
+    "fullSentence": "Lucas show so much talent as a photographer—his pictures look unreal.",
+    "gapFill": "Lucas is ____________________________ photographer that his pictures look unreal.",
+    "keyWord": "SUCH",
+    "answer": "such a talented",
+    "tags": "B2, emphasis, noun phrases, intensifiers, so/such"
+  },
+  {
+    "itemId": "kw_0242",
+    "fullSentence": "I wish I hadn’t drunk so much at the weekend.",
+    "gapFill": "I should ____________________________ at the weekend.",
+    "keyWord": "NOT",
+    "answer": "not have drunk so much",
+    "tags": "B2, advice, past modals, quantifiers, modal verbs, wish"
+  },
+  {
+    "itemId": "kw_0243",
+    "fullSentence": "The train was delayed because a signal failed.",
+    "gapFill": "The train’s delay ____________________________ signal failure.",
+    "keyWord": "CAUSED",
+    "answer": [
+      "was caused by a",
+      "was caused by the"
+    ],
+    "tags": "B2, causality, verb forms, passive voice"
+  },
+  {
+    "itemId": "kw_0244",
+    "fullSentence": "“Do you want to go to my presentation, Leo?” asked Mia.",
+    "gapFill": "Mia ____________________________ presentation.",
+    "keyWord": "INVITED",
+    "answer": "invited Leo to her",
+    "tags": "B2, reporting verbs, verb patterns, reported speech"
+  },
+  {
+    "itemId": "kw_0245",
+    "fullSentence": "Several drivers ignored the roadwork signs.",
+    "gapFill": "Several drivers ____________________________ the roadwork signs.",
+    "keyWord": "PAID",
+    "answer": [
+      "paid no attention to",
+      "paid little attention to"
+    ],
+    "tags": "B2, fixed phrase, verb forms, noun phrases"
+  },
+  {
+    "itemId": "kw_0246",
+    "fullSentence": "The volunteers had too little water for all the hikers.",
+    "gapFill": "There ____________________________ the volunteers to give to all the hikers.",
+    "keyWord": "NOT",
+    "answer": [
+      "was not enough water for",
+      "was not sufficient water for"
+    ],
+    "tags": "B2, quantifiers, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0247",
+    "fullSentence": "Eva gets no exercise other than cycling to school.",
+    "gapFill": "The ____________________________  cycling to school.",
+    "keyWord": "ONLY",
+    "answer": [
+      "only exercise Eva gets is",
+      "only exercise Eva does is"
+    ],
+    "tags": "B2, noun phrases, emphasis, cleft sentences"
+  },
+  {
+    "itemId": "kw_0248",
+    "fullSentence": "Leo wanted to start painting so he quit his job as a coach.",
+    "gapFill": "Leo ____________________________ become a painter.",
+    "keyWord": "GAVE",
+    "answer": [
+      "gave up coaching to",
+      "gave coaching up to"
+    ],
+    "tags": "B2, phrasal verbs, verb patterns, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0249",
+    "fullSentence": "There’s far less pollution in Madrid than there once was.",
+    "gapFill": "There isn’t ____________________________ Madrid as there used to be.",
+    "keyWord": "NEARLY",
+    "answer": "nearly as much pollution in",
+    "tags": "B2, comparatives and superlatives, quantifiers, intensifiers"
+  },
+  {
+    "itemId": "kw_0250",
+    "fullSentence": "In the documentary, witnesses describe their experiences vividly.",
+    "gapFill": "The documentary ____________________________ the witnesses’ experiences.",
+    "keyWord": "ACCOUNT",
+    "answer": [
+      "gives a vivid account of",
+      "contains a vivid account of",
+      "includes a vivid account of",
+      "is a vivid account of"
+    ],
+    "tags": "C2, fixed phrase, noun phrases"
+  },
+  {
+    "itemId": "kw_0251",
+    "fullSentence": "These delicate herbs are frequently damaged by mites and aphids.",
+    "gapFill": "These herbs ____________________________ by mites and aphids.",
+    "keyWord": "PRONE",
+    "answer": [
+      "are prone to getting damaged by",
+      "are prone to being damaged",
+      "are prone to damage"
+    ],
+    "tags": "C2, adjectives, prepositions, passive voice"
+  },
+  {
+    "itemId": "kw_0252",
+    "fullSentence": "Do you have any idea how Marta managed to fund such a lavish wedding?",
+    "gapFill": "Can anyone ____________________________ Marta paid for such a lavish wedding?",
+    "keyWord": "LIGHT",
+    "answer": [
+      "shed some light on how",
+      "cast some light on how",
+      "throw some light on how",
+      "shed any light on how",
+      "cast any light on how",
+      "throw any light on how",
+      "shed light on how",
+      "cast light on how",
+      "throw light on how"
+    ],
+    "tags": "C2, fixed phrase, indirect questions, questions"
+  },
+  {
+    "itemId": "kw_0253",
+    "fullSentence": "It took Oliver a while to accept that he wouldn’t be returning to the company.",
+    "gapFill": "Oliver has finally ____________________________ he won't be going back to the company.",
+    "keyWord": "TERMS",
+    "answer": [
+      "come to terms with the fact that",
+      "Come to terms with the fact"
+    ],
+    "tags": "C2, fixed phrase, noun phrases"
+  },
+  {
+    "itemId": "kw_0254",
+    "fullSentence": "The attendees didn't expect Nina to start rapping during the presentation.",
+    "gapFill": "It ____________________________ rapping during the presentation.",
+    "keyWord": "TOOK",
+    "answer": [
+      "took the attendees by surprise when Nina began",
+      "took the attendees aback when Nina began",
+      "took the attendees by surprise when Nina started",
+      "took the attendees aback when Nina started"
+    ],
+    "tags": "C2, fixed phrase, prepositions, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0255",
+    "fullSentence": "Leo bounced back from the flu in just a few days.",
+    "gapFill": "It did ____________________________ the flu.",
+    "keyWord": "GET",
+    "answer": [
+      "not take Leo long to get over",
+      "not take long for Leo to get over"
+    ],
+    "tags": "C2, verb patterns, time expressions, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0256",
+    "fullSentence": "We had no idea how much destruction the fire had caused until it was out.",
+    "gapFill": "It wasn’t until the fire was ____________________________ became apparent.",
+    "keyWord": "EXTENT",
+    "answer": [
+      "extinguished that the extent of the destruction",
+      "put out the extent of the destruction",
+      "out that the extent of the destruction",
+      "extinguished extent of the destruction",
+      "out the extent of the destruction"
+    ],
+    "tags": "C2, cleft sentences, time expressions"
+  },
+  {
+    "itemId": "kw_0257",
+    "fullSentence": "As soon as she heard the news, Maya began to realise how fortunate she'd been.",
+    "gapFill": "When she heard the news, it began ____________________________ how lucky she had been.",
+    "keyWord": "DAWN",
+    "answer": [
+      "to dawn on Maya"
+    ],
+    "tags": "C2, fixed phrase, idioms"
+  },
+  {
+    "itemId": "kw_0258",
+    "fullSentence": "Only students with advanced passes are allowed to access the research library.",
+    "gapFill": "Access to the research library ____________________________ with advanced passes.",
+    "keyWord": "RESTRICTED",
+    "answer": [
+      "is restricted to students",
+      "is restricted to those students"
+    ],
+    "tags": "C2, passive voice, prepositions"
+  },
+  {
+    "itemId": "kw_0259",
+    "fullSentence": "You must never leave this storeroom locked during opening hours.",
+    "gapFill": "Under no ____________________________ left locked during opening hours.",
+    "keyWord": "CIRCUMSTANCES",
+    "answer": [
+      "circumstances should this storeroom be",
+      "circumstances must this storeroom be",
+      "circumstances is this storeroom to be"
+    ],
+    "tags": "C2, inversion, modal verbs"
+  },
+  {
+    "itemId": "kw_0260",
+    "fullSentence": "Carla always felt embarrassed when her mother laughed in public.",
+    "gapFill": "Her mother’s laugh ____________________________ Carla.",
+    "keyWord": "SOURCE",
+    "answer": [
+      "was a constant source of embarrassment to",
+      "was always a source of embarrassment to",
+      "was a constant source of embarrassment for",
+      "was always a source of embarrassment for"
+    ],
+    "tags": "C2, fixed phrase, noun phrases"
+  },
+  {
+    "itemId": "kw_0261",
+    "fullSentence": "Is the company likely to launch the new app successfully?",
+    "gapFill": "What ____________________________ the company launching the new app successfully?",
+    "keyWord": "PROSPECTS",
+    "answer": [
+      "are the prospects of",
+      "prospects are there of",
+      "prospects does the company have of"
+    ],
+    "tags": "C2, noun phrases, speculation, probability"
+  },
+  {
+    "itemId": "kw_0262",
+    "fullSentence": "Mia ignored every warning her sister gave her.",
+    "gapFill": "Mia didn’t ____________________________ her sister’s warnings.",
+    "keyWord": "NOTICE",
+    "answer": [
+      "take much notice of",
+      "take any notice of",
+      "take a lot of notice of"
+    ],
+    "tags": "C2, fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0263",
+    "fullSentence": "In Vanessa’s opinion, she has nothing to feel guilty about.",
+    "gapFill": "As ____________________________, she has nothing to feel guilty about.",
+    "keyWord": "CONCERNED",
+    "answer": [
+      "far as Vanessa is concerned"
+    ],
+    "tags": "C2, fixed phrase, linking"
+  },
+  {
+    "itemId": "kw_0264",
+    "fullSentence": "Professor Ling was upset by several comments made during the conference.",
+    "gapFill": "Professor Ling ____________________________ some of the comments made at the conference.",
+    "keyWord": "EXCEPTION",
+    "answer": [
+      "took exception to"
+    ],
+    "tags": "C2, fixed phrase, idioms"
+  },
+  {
+    "itemId": "kw_0265",
+    "fullSentence": "James refused to share anything, for personal reasons.",
+    "gapFill": "James kept us ____________________________ reasons.",
+    "keyWord": "DARK",
+    "answer": [
+      "in the dark for personal"
+    ],
+    "tags": "C2, Idioms, fixed phrase"
+  },
+  {
+    "itemId": "kw_0266",
+    "fullSentence": "I really wish I hadn’t believed everything Lucas told me.",
+    "gapFill": "I wish ____________________________ by what Lucas told me!",
+    "keyWord": "TAKEN",
+    "answer": [
+      "I hadn’t been taken in"
+    ],
+    "tags": "C2, unreal forms, passive voice, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0267",
+    "fullSentence": "The board made it clear that there would be no more talk of the proposal.",
+    "gapFill": "The board said that further ____________________________ question.",
+    "keyWord": "DISCUSSION",
+    "answer": [
+      "discussion of the proposal was out of the"
+    ],
+    "tags": "C2, fixed phrase, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0268",
+    "fullSentence": "Without Laura’s creative thinking, the whole project would have failed.",
+    "gapFill": "But ____________________________, the whole project would have failed.",
+    "keyWord": "INGENUITY",
+    "answer": [
+      "for the ingenuity of Laura’s thinking"
+    ],
+    "tags": "C2, prepositions, noun phrases, conditionals"
+  },
+  {
+    "itemId": "kw_0269",
+    "fullSentence": "Jonah enrolled in a nutrition course because he planned to become a dietician.",
+    "gapFill": "Jonah enrolled in the course ____________________________ a dietician.",
+    "keyWord": "VIEW",
+    "answer": [
+      "with a view to becoming"
+    ],
+    "tags": "C2, verb patterns, fixed phrase"
+  },
+  {
+    "itemId": "kw_0270",
+    "fullSentence": "The professor’s elegant essays were completely different from his clumsy speech.",
+    "gapFill": "There ____________________________ the professor’s clumsy speech and his elegant essays.",
+    "keyWord": "CONTRAST",
+    "answer": [
+      "was a sharp contrast between",
+      "was a clear contrast between"
+    ],
+    "tags": "C2, comparatives and superlatives, noun phrases"
+  },
+  {
+    "itemId": "kw_0271",
+    "fullSentence": "It’s unlikely that Theo will be asked to lead the next phase of the project.",
+    "gapFill": "Theo has ____________________________ the next phase of the project.",
+    "keyWord": "CHANCE",
+    "answer": [
+      "little chance of leading",
+      "Little chance of being asked to lead",
+      "Almost no chance if leading",
+      "almost no chance of being asked to lead"
+    ],
+    "tags": "C2, noun phrases, probability"
+  },
+  {
+    "itemId": "kw_0272",
+    "fullSentence": "When I started the internship, I didn’t even know how to set up a printer.",
+    "gapFill": "I didn’t ____________________________ set up a printer when I started the internship.",
+    "keyWord": "CLUE",
+    "answer": [
+      "have a clue how to",
+      "have any clue how to",
+      "Have a clue about how to",
+      "Have any clue about how to"
+    ],
+    "tags": "C2, informal, noun phrases, fixed phrase"
+  },
+  {
+    "itemId": "kw_0273",
+    "fullSentence": "It was a few months before Teresa fully recovered from her illness.",
+    "gapFill": "Only after a few months ____________________________ from her illness.",
+    "keyWord": "MAKE",
+    "answer": [
+      "did Teresa make a full recovery",
+      "did Teresa make a complete recovery",
+      "did Teresa make a total recovery"
+    ],
+    "tags": "C2, inversion, fixed phrase"
+  },
+  {
+    "itemId": "kw_0274",
+    "fullSentence": "Lots of people assume that all French wine is better than Spanish, but that’s just not true.",
+    "gapFill": "Contrary ____________________________ French wine is better than Spanish.",
+    "keyWord": "POPULAR",
+    "answer": [
+      "to popular belief not all"
+    ],
+    "tags": "C2, fixed phrase, contrast, linking"
+  },
+  {
+    "itemId": "kw_0275",
+    "fullSentence": "Luke’s was not an ambitious person, and that’s why he was so satisfied.",
+    "gapFill": "Luke’s ____________________________ of ambition.",
+    "keyWord": "DUE",
+    "answer": [
+      "satisfaction was due to a lack",
+      "satisfaction was due to his lack",
+      "satisfaction was due to an absence",
+      "satisfaction was due to his absence",
+      "Being satisfied was due to a lack",
+      "Being satisfied was due to his lack"
+    ],
+    "tags": "C2, noun phrases, causality, linking"
+  },
+  {
+    "itemId": "kw_0276",
+    "fullSentence": "“This is unbelievable – I’ve just won an electric car!” cried Hannah.",
+    "gapFill": "Hannah couldn’t ____________________________ won an electric car.",
+    "keyWord": "LUCK",
+    "answer": [
+      "believe her luck when she"
+    ],
+    "tags": "C2, Idioms, fixed phrase"
+  },
+  {
+    "itemId": "kw_0277",
+    "fullSentence": "The team made no progress until Andrea suggested a new strategy.",
+    "gapFill": "The team were getting ____________________________ a new strategy.",
+    "keyWord": "CAME",
+    "answer": [
+      "nowhere until Andrea came up with",
+      "Nowhere before Andrea came up with"
+    ],
+    "tags": "C2, phrasal verbs, linking, fixed phrase"
+  },
+  {
+    "itemId": "kw_0278",
+    "fullSentence": "Max is not very aware when people around him are uncomfortable.",
+    "gapFill": "Max ____________________________ comes to people around him feeling uncomfortable.",
+    "keyWord": "LACKS",
+    "answer": [
+      "lacks awareness when it"
+    ],
+    "tags": "C2, noun phrases, fixed phrase, linking"
+  },
+  {
+    "itemId": "kw_0279",
+    "fullSentence": "If you haven't done this kind of thing before, don’t try to disassemble the engine.",
+    "gapFill": "Don’t ____________________________ you’ve done this kind of thing before.",
+    "keyWord": "APART",
+    "answer": [
+      "take the engine apart unless",
+      "take apart the engine unless",
+      "Try taking the engine apart unless",
+      "Try taking apart the engine unless",
+      "Try to take the engine apart unless",
+      "Try to take apart the engine unless"
+    ],
+    "tags": "C2, phrasal verbs, conditionals"
+  },
+  {
+    "itemId": "kw_0280",
+    "fullSentence": "Do you think Josh will still be able to play guitar after spraining his wrist?",
+    "gapFill": "Will Josh’s ____________________________ to play guitar?",
+    "keyWord": "AFFECT",
+    "answer": [
+      "sprained wrist affect his ability"
+    ],
+    "tags": "C2, noun phrases, ability"
+  },
+  {
+    "itemId": "kw_0281",
+    "fullSentence": "Liam will forever regret saying no to the chance to move abroad.",
+    "gapFill": "Liam will always wish ____________________________ the chance to move abroad.",
+    "keyWord": "TURNED",
+    "answer": [
+      "he had not turned down"
+    ],
+    "tags": "C2, unreal forms, perfect, wish"
+  },
+  {
+    "itemId": "kw_0282",
+    "fullSentence": "Construction was delayed due to licensing issues no one had foreseen.",
+    "gapFill": "The construction work ____________________________ licensing issues.",
+    "keyWord": "HELD",
+    "answer": [
+      "was held up by unforeseen",
+      "was held up due to unforeseen",
+      "was held up on account of unforeseen",
+      "was held up as a result of unforeseen"
+    ],
+    "tags": "C2, passive voice, causative, linking"
+  },
+  {
+    "itemId": "kw_0283",
+    "fullSentence": "I had no other option but to wait it out in silence.",
+    "gapFill": "There ____________________________ wait it out in silence.",
+    "keyWord": "ANYTHING",
+    "answer": [
+      "was not anything I could do except",
+      "Was not anything else I could do except",
+      "was not anything I could do but",
+      "Was not anything else I could do but",
+      "was not anything I could do apart from",
+      "was not anything for me to do but",
+      "was not anything for me to do except"
+    ],
+    "tags": "C2, fixed phrase, negatives"
+  },
+  {
+    "itemId": "kw_0284",
+    "fullSentence": "Nora wouldn't have landed the role had her sister not advised her for the audition.",
+    "gapFill": "Nora wouldn’t have landed the role ____________________________ for the audition.",
+    "keyWord": "WITHOUT",
+    "answer": [
+      "without her sister’s advice",
+      "without her sister having advised her",
+      "without the advice of her sister",
+      "Without being advised by her sister",
+      "Without having been advised by her sister",
+      "Without her sister's advising her"
+    ],
+    "tags": "C2, conditionals, prepositions, time clauses"
+  },
+  {
+    "itemId": "kw_0285",
+    "fullSentence": "The expansion of the school will go ahead if the board approves the updated design.",
+    "gapFill": "The expansion will proceed ____________________________ of the updated design.",
+    "keyWord": "SUBJECT",
+    "answer": [
+      "subject to the board's approval",
+      "subject to the board approving to",
+      "subject to the approval of the board",
+      "subject to the board's approving"
+    ],
+    "tags": "C2, conditionals, formal"
+  },
+  {
+    "itemId": "kw_0286",
+    "fullSentence": "'Carl pronounces things unclearly, which means I can't understand most of his instructions', Jack explained.",
+    "gapFill": "Jack explained that it was ____________________________ understanding him difficult.",
+    "keyWord": "WHICH",
+    "answer": [
+      "Carl's unclear pronunciation which made",
+      "Carl's unclear pronunciation which rendered",
+      "Carl's pronouncing things unclearly which made",
+      "Carl pronouncing things unclearly which made"
+    ],
+    "tags": "C2, relative clauses, causative, reported speech, cleft sentences"
+  },
+  {
+    "itemId": "kw_0287",
+    "fullSentence": "Lily hardly has any opportunities to perform her own songs.",
+    "gapFill": "Rarely ____________________________ perform her own songs.",
+    "keyWord": "GET",
+    "answer": [
+      "does Lily get the opportunity to",
+      "Does Lily get an opportunity to",
+      "Does Lily get any opportunity to",
+      "does Lily get any chance to",
+      "does Lily get a chance to",
+      "Does Lily get the chance to",
+      "Does Lily get to"
+    ],
+    "tags": "C2, inversion, adverbs of frequency"
+  },
+  {
+    "itemId": "kw_0288",
+    "fullSentence": "The historian pointed out to us the inscriptions over the entrance.",
+    "gapFill": "The historian ____________________________ the inscriptions over the entrance.",
+    "keyWord": "DREW",
+    "answer": [
+      "drew our attention to",
+      "drew our attentions to"
+    ],
+    "tags": "C2, phrasal verbs, fixed phrase"
+  },
+  {
+    "itemId": "kw_0289",
+    "fullSentence": "Visitors are asked not to leave their seats until the lecture has ended.",
+    "gapFill": "Visitors are ____________________________ until the lecture has ended.",
+    "keyWord": "REMAIN",
+    "answer": [
+      "asked to remain seated",
+      "Asked to remain in their seats",
+      "requested to remain in their seats",
+      "Requested to remain seated"
+    ],
+    "tags": "C2, passive voice, formal"
+  },
+  {
+    "itemId": "kw_0290",
+    "fullSentence": "Playing violin demands significantly more technique than playing ukulele.",
+    "gapFill": "Playing violin requires ____________________________ playing ukulele.",
+    "keyWord": "DEAL",
+    "answer": [
+      "a great deal more skill than",
+      "a good deal more skill than"
+    ],
+    "tags": "C2, comparatives and superlatives, noun phrases, quantifiers"
+  },
+  {
+    "itemId": "kw_0291",
+    "fullSentence": "Ava’s remarks about the project weren’t particularly appreciated by the team.",
+    "gapFill": "Ava’s remarks about the project ____________________________ well with the team.",
+    "keyWord": "GO",
+    "answer": [
+      "did not go down",
+      "did not go over",
+      "did not go down particularly",
+      "did not go down very",
+      "did not go down so",
+      "did not go over particularly",
+      "did not go over very",
+      "did not go over so"
+    ],
+    "tags": "C2, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0292",
+    "fullSentence": "Nobody ever explained why she suddenly quit the company.",
+    "gapFill": "No ____________________________ for her sudden decision to quit the company.",
+    "keyWord": "GIVEN",
+    "answer": [
+      "explanations were ever given",
+      "explanation was ever given"
+    ],
+    "tags": "C2, passive voice, noun phrases"
+  },
+  {
+    "itemId": "kw_0293",
+    "fullSentence": "Everyone was shocked when Pablo resigned.",
+    "gapFill": "Pablo’s resignation ____________________________ everyone.",
+    "keyWord": "CAME",
+    "answer": [
+      "came as a complete surprise to",
+      "came as a total surprise to",
+      "came as a surprise to",
+      "came as a complete shock to",
+      "came as a total shock to",
+      "came as a shock to"
+    ],
+    "tags": "C2, fixed phrase, noun phrases"
+  },
+  {
+    "itemId": "kw_0294",
+    "fullSentence": "I was literally heading out the door when the doorbell rang.",
+    "gapFill": "I was ____________________________ the house when the doorbell rang.",
+    "keyWord": "VERGE",
+    "answer": [
+      "on the verge of leaving",
+      "on the verge of going out of",
+      "On the verge of heading out",
+      "On the verge of heading out of"
+    ],
+    "tags": "C2, idioms, verb patterns"
+  },
+  {
+    "itemId": "kw_0295",
+    "fullSentence": "Amira made the choice to stay at the resort for another fortnight.",
+    "gapFill": "Amira decided ____________________________ two weeks.",
+    "keyWord": "EXTEND",
+    "answer": [
+      "to extend her stay at the resort by",
+      "To extend her stay at the resort for"
+    ],
+    "tags": "C2, verb patterns, time expressions"
+  },
+  {
+    "itemId": "kw_0296",
+    "fullSentence": "Sorry — I really wasn’t trying to disturb the meeting.",
+    "gapFill": "I’m sorry, I ____________________________ the meeting.",
+    "keyWord": "INTENTION",
+    "answer": [
+      "had no intention of disturbing",
+      "didn’t have any intention of disturbing"
+    ],
+    "tags": "C2, noun phrases, formal, prepositions"
+  },
+  {
+    "itemId": "kw_0297",
+    "fullSentence": "I wonder why Eliza hasn’t arrived yet — she’s always punctual.",
+    "gapFill": "I wonder what’s happened to Eliza; it’s ____________________________ late.",
+    "keyWord": "UNLIKE",
+    "answer": [
+      "unlike her to be",
+      "unlike her to arrive",
+      "unlike her to turn up",
+      "unlike her to show up",
+      "most unlike her to be",
+      "most unlike her to arrive",
+      "most unlike her to turn up",
+      "most unlike her to show up",
+      "Quite unlike her to be",
+      "Quite unlike her to arrive",
+      "Quite unlike her to turn up",
+      "Quite unlike her to show up"
+    ],
+    "tags": "C2, contrast, fixed phrase"
+  },
+  {
+    "itemId": "kw_0298",
+    "fullSentence": "These days, there’s almost no demand for used printers and monitors.",
+    "gapFill": "There is ____________________________ used printers and monitors these days.",
+    "keyWord": "CALL",
+    "answer": [
+      "almost no call for",
+      "virtually no call for",
+      "hardly any call for",
+      "scarcely any call for",
+      "no call for",
+      "not any call for",
+      "Little call for",
+      "Very little call for"
+    ],
+    "tags": "C2, quantifiers, formal, noun phrases, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0299",
+    "fullSentence": "The clause clearly states that you’re entitled to extend your contract.",
+    "gapFill": "This clause makes ____________________________ extend your contract.",
+    "keyWord": "RIGHT",
+    "answer": [
+      "it clear you have the right to",
+      "it clear it is your right to",
+      "it clear you have every right to",
+      "it clear you have a right to"
+    ],
+    "tags": "C2, formal, noun phrases"
+  },
+  {
+    "itemId": "kw_0300",
+    "fullSentence": "Camilla was very annoyed when she found out her daughter had taken her laptop.",
+    "gapFill": "To ____________________________, her daughter had taken her laptop.",
+    "keyWord": "GREAT",
+    "answer": [
+      "Camilla’s great annoyance"
+    ],
+    "tags": "C2, noun phrases, formal, possessive"
+  },
+  {
+    "itemId": "kw_0301",
+    "fullSentence": "This substance must always be attended at all times.",
+    "gapFill": "Under ____________________________ left unattended.",
+    "keyWord": "IS",
+    "answer": [
+      "no circumstances is this substance to be",
+      "no circumstances is the substance to be"
+    ],
+    "tags": "C2, inversion, formal, passive voice"
+  },
+  {
+    "itemId": "kw_0302",
+    "fullSentence": "It’s almost certain that Mia will complete the manuscript by next week.",
+    "gapFill": "Mia ____________________________ by next week.",
+    "keyWord": "BOUND",
+    "answer": [
+      "is bound to have completed the manuscript",
+      "is bound to have completed her manuscript"
+    ],
+    "tags": "C2, probability, perfect, future"
+  },
+  {
+    "itemId": "kw_0303",
+    "fullSentence": "Eventually, Dylan will break into the music industry.",
+    "gapFill": "It’s only ____________________________ into the music industry.",
+    "keyWord": "MATTER",
+    "answer": [
+      "a matter of time before Dylan breaks",
+      "a matter of time until Dylan breaks"
+    ],
+    "tags": "C2, fixed phrase, future, time expressions"
+  },
+  {
+    "itemId": "kw_0304",
+    "fullSentence": "Due to heavy snow, delays are expected on certain bus routes.",
+    "gapFill": "Some bus routes ____________________________ because of the heavy snow.",
+    "keyWord": "SUBJECT",
+    "answer": [
+      "will be subject to delay",
+      "are subject to delay",
+      "will be subject to delays",
+      "are subject to delays"
+    ],
+    "tags": "C2, passive voice, formal"
+  },
+  {
+    "itemId": "kw_0305",
+    "fullSentence": "I have no preference regarding the brand of coffee you go for.",
+    "gapFill": "It ____________________________ brand of coffee you choose.",
+    "keyWord": "CONSEQUENCE",
+    "answer": [
+      "is of no consequence to me which",
+      "is of little consequence to me which",
+      "is of no consequence to me what",
+      "is of little consequence to me what"
+    ],
+    "tags": "C2, formal, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0306",
+    "fullSentence": "The population of wild horses is now significantly lower than it was a decade ago.",
+    "gapFill": "The number of wild horses on the reserve ____________________________ decade.",
+    "keyWord": "DECLINED",
+    "answer": [
+      "has declined significantly over the past",
+      "has declined significantly in the past",
+      "has declined significantly during the last",
+      "has declined significantly over the last",
+      "has declined significantly during the past",
+      "has declined significantly in the last"
+    ],
+    "tags": "C2, present perfect, trends, time expressions"
+  },
+  {
+    "itemId": "kw_0307",
+    "fullSentence": "I told Natalie to send us a quick message to say she’d got there okay.",
+    "gapFill": "I asked Natalie ____________________________ to say she’d got there safely.",
+    "keyWord": "DROP",
+    "answer": [
+      "to drop us a line",
+      "to drop us a quick line",
+      "to drop a line",
+      "to drop a quick line"
+    ],
+    "tags": "C2, informal, idioms, fixed phrase"
+  },
+  {
+    "itemId": "kw_0308",
+    "fullSentence": "Darren was furious that Emily hadn’t responded to his proposal.",
+    "gapFill": "Darren thought that ____________________________ was enfuriating.",
+    "keyWord": "FAILURE",
+    "answer": [
+      "Emily’s failure to reply to his proposal",
+      "Emily's failure to respond to his proposal",
+      "Emily’s failure to answer his proposal"
+    ],
+    "tags": "C2, noun phrases, formal, possessive"
+  },
+  {
+    "itemId": "kw_0309",
+    "fullSentence": "Emma believed it would be feasible for someone to turn the cracked jug into a flower pot.",
+    "gapFill": "Emma thought ____________________________ a flower pot.",
+    "keyWord": "MADE",
+    "answer": [
+      "the cracked jug could be made into",
+      "the cracked jug might be made into"
+    ],
+    "tags": "C2, passive voice, modal verbs"
+  },
+  {
+    "itemId": "kw_0310",
+    "fullSentence": "Zak typically runs half marathons on Sundays.",
+    "gapFill": "Zak is ____________________________ half marathons on Sundays.",
+    "keyWord": "HABIT",
+    "answer": [
+      "in the habit of running"
+    ],
+    "tags": "C2, habit, prepositions, gerunds and infinitives, noun phrases"
+  },
+  {
+    "itemId": "kw_0311",
+    "fullSentence": "During her most successful period, the CEO had exceptional authority.",
+    "gapFill": "At ____________________________, the CEO had exceptional authority.",
+    "keyWord": "HEIGHT",
+    "answer": [
+      "the height of her success"
+    ],
+    "tags": "C2, noun phrases, time expressions, formal"
+  },
+  {
+    "itemId": "kw_0312",
+    "fullSentence": "Leo makes far more use of the lab than most of his classmates.",
+    "gapFill": "Unlike ____________________________, Leo makes extensive use of the lab.",
+    "keyWord": "MAJORITY",
+    "answer": [
+      "the vast majority of his classmates",
+      "the majority of his classmates",
+      "the great majority of his classmates"
+    ],
+    "tags": "C2, contrast, quantifiers, noun phrases, formal"
+  },
+  {
+    "itemId": "kw_0313",
+    "fullSentence": "In my opinion, his skill as a debater was most thrilling.",
+    "gapFill": "I was most ____________________________ debater Daniel was.",
+    "keyWord": "HOW",
+    "answer": [
+      "thrilled by how skilled a",
+      "thrilled by how skilful a",
+      "Thrilled by how skillful a",
+      "thrilled at how skilled a",
+      "thrilled at how skilful a",
+      "Thrilled at how skillful a"
+    ],
+    "tags": "C2, emphasis, noun phrases, passive voice"
+  },
+  {
+    "itemId": "kw_0314",
+    "fullSentence": "Paula has consistently shown outstanding dedication to her career.",
+    "gapFill": "Paula has always ____________________________ most outstanding way.",
+    "keyWord": "herself",
+    "answer": [
+      "dedicated herself to her career in the",
+      "committed herself to her career in the"
+    ],
+    "tags": "C2, reflexive pronouns, present perfect, collocations, prepositions"
+  },
+  {
+    "itemId": "kw_0315",
+    "fullSentence": "This hold-up is annoying, but I’m confident Fran will solve these issues.",
+    "gapFill": "This hold-up is annoying, but I’m sure Fran can ____________________________ to these issues.",
+    "keyWord": "come",
+    "answer": [
+      "come up with a solution",
+      "come up with the answer",
+      "come up with the solution"
+    ],
+    "tags": "C2, phrasal verbs, modals"
+  },
+  {
+    "itemId": "kw_0316",
+    "fullSentence": "Lara was thrilled to be chosen for the national choir.",
+    "gapFill": "Much ____________________________ chosen for the national choir.",
+    "keyWord": "delight",
+    "answer": [
+      "to Lara’s delight, she was",
+      "to the delight of Lara, she was"
+    ],
+    "tags": "C2, fixed phrase, passive voice, fronting, possessive"
+  },
+  {
+    "itemId": "kw_0317",
+    "fullSentence": "Fatima wanted to make sure that every detail of the event went according to plan.",
+    "gapFill": "Fatima didn’t ____________________________ on the day of the event.",
+    "keyWord": "leave",
+    "answer": [
+      "want to leave anything to chance",
+      "intend to leave anything to chance"
+    ],
+    "tags": "C2, idioms, verb patterns, gerunds and infinitives"
+  },
+  {
+    "itemId": "kw_0318",
+    "fullSentence": "The director organised a meeting to go over the department’s employee turnover.",
+    "gapFill": "The director’s ____________________________ to review the department’s employee turnover.",
+    "keyWord": "purpose",
+    "answer": [
+      "purpose in organising a meeting was",
+      "purpose for organising a meeting was",
+      "purpose for organising the meeting was",
+      "purpose in organising the meeting was"
+    ],
+    "tags": "C2, gerunds and infinitives, noun phrases, purpose, prepositions"
+  },
+  {
+    "itemId": "kw_0319",
+    "fullSentence": "It may appear odd, the designer has no official qualifications in fashion.",
+    "gapFill": "Odd ____________________________ formal qualifications in fashion.",
+    "keyWord": "lacks",
+    "answer": [
+      "as it seems, the designer lacks any",
+      "though it seems, the designer lacks any",
+      "though it appears, the designer lacks any",
+      "as it appears, the designer lacks any",
+      "as it seems, the designer lacks",
+      "though it seems, the designer lacks",
+      "though it appears, the designer lacks",
+      "as it appears, the designer lacks",
+      "though it may appear the designer lacks",
+      "as it may appear the designer lacks",
+      "though it may seem the designer lacks",
+      "though it may appear the designer lacks any",
+      "as it may appear the designer lacks any",
+      "though it may seem the designer lacks any"
+    ],
+    "tags": "C2, concession, contrast, fronting"
+  },
+  {
+    "itemId": "kw_0320",
+    "fullSentence": "It never crossed my mind to ask the concierge where to eat.",
+    "gapFill": "It has never ____________________________ the concierge for dining advice.",
+    "keyWord": "occurred",
+    "answer": [
+      "occurred to me to ask",
+      "occurred to me that I could ask",
+      "occurred to me I could ask"
+    ],
+    "tags": "C2, fixed phrase, past simple, negatives"
+  },
+  {
+    "itemId": "kw_0321",
+    "fullSentence": "Even though I tried everything, I couldn’t convince Mia to attend the show.",
+    "gapFill": "No matter ____________________________, I couldn’t convince Mia to attend the show.",
+    "keyWord": "hard",
+    "answer": [
+      "how hard I tried",
+      "how much I tried"
+    ],
+    "tags": "C2, concession, emphasis"
+  },
+  {
+    "itemId": "kw_0322",
+    "fullSentence": "The authorities were forced to release the accused after new proof emerged.",
+    "gapFill": "The authorities had to release the accused ____________________________ evidence that emerged.",
+    "keyWord": "light",
+    "answer": [
+      "in light of the new",
+      "in the light of the new",
+      "in the light of new",
+      "in light of new"
+    ],
+    "tags": "C2, linking, formal, noun phrases, idioms"
+  },
+  {
+    "itemId": "kw_0323",
+    "fullSentence": "The price of wood and cement has gone up significantly in recent months.",
+    "gapFill": "There has been ____________________________ wood and cement in recent months.",
+    "keyWord": "sharp",
+    "answer": [
+      "a sharp rise in the price of",
+      "a sharp increase in the price of"
+    ],
+    "tags": "C2, noun phrases, quantifiers, trends"
+  },
+  {
+    "itemId": "kw_0324",
+    "fullSentence": "Lena didn’t break the news to Josh until he’d cleared his plate.",
+    "gapFill": "Lena ____________________________ before breaking the news.",
+    "keyWord": "waited",
+    "answer": [
+      "waited for Josh to clear his plate",
+      "waited until Josh had cleared his plate"
+    ],
+    "tags": "C2, past perfect, time clauses, verb patterns"
+  },
+  {
+    "itemId": "kw_0325",
+    "fullSentence": "Don’t be fooled by Max’s casual style — he’s extremely sharp in negotiations.",
+    "gapFill": "Don’t let ____________________________ his casual style. He's extremely sharp in negotiations.",
+    "keyWord": "taken",
+    "answer": [
+      "yourself be taken in by",
+      "yourself get taken in by"
+    ],
+    "tags": "C2, passive voice, reflexive pronouns, idioms, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0326",
+    "fullSentence": "We’ll leave in the evening unless the situation changes dramatically.",
+    "gapFill": "Providing ____________________________  the situation, we’ll leave in the evening.",
+    "keyWord": "no",
+    "answer": [
+      "there is no dramatic change in",
+      "there are no dramatic changes in",
+      "there is no dramatic change to",
+      "there are no dramatic changes to"
+    ],
+    "tags": "C2, conditionals, noun phrases, linking, formal"
+  },
+  {
+    "itemId": "kw_0327",
+    "fullSentence": "Mateo struggled to accept that he was no longer employed.",
+    "gapFill": "Mateo found it difficult ____________________________ losing his job.",
+    "keyWord": "terms",
+    "answer": [
+      "to come to terms with",
+      "coming to terms with"
+    ],
+    "tags": "C2, idioms, gerunds and infinitives, fixed phrase"
+  },
+  {
+    "itemId": "kw_0328",
+    "fullSentence": "Ben never intends to visit his cousin again.",
+    "gapFill": "Ben ____________________________ his cousin again.",
+    "keyWord": "has",
+    "answer": [
+      "has no intention of visiting",
+      "has no plans of visiting",
+      "has no intention of ever visiting",
+      "has no plans of ever visiting"
+    ],
+    "tags": "C2, fixed phrase, noun phrases, formal, prepositions"
+  },
+  {
+    "itemId": "kw_0329",
+    "fullSentence": "They made Sam think he would to win the competition.",
+    "gapFill": "Sam ____________________________ he would win the competition.",
+    "keyWord": "believe",
+    "answer": [
+      "was led to believe that",
+      "was given to believe that",
+      "was led to believe",
+      "was given to believe"
+    ],
+    "tags": "C2, passive voice, gerunds and infinitives, formal"
+  },
+  {
+    "itemId": "kw_0330",
+    "fullSentence": "Kyra is completely unaware of the difficulty of getting a table at that restaurant.",
+    "gapFill": "Little does ____________________________ a table at that restaurant is.",
+    "keyWord": "how",
+    "answer": [
+      "Kyra know how difficult getting",
+      "Kyra realise how difficult getting",
+      "Kyra suspect how difficult getting",
+      "Kyra know how hard getting",
+      "Kyra realise how hard getting",
+      "Kyra suspect how hard getting"
+    ],
+    "tags": "C2, inversion, indirect questions, emphasis"
+  },
+  {
+    "itemId": "kw_0331",
+    "fullSentence": "From the moment he spoke, the panel were impressed by his confidence.",
+    "gapFill": "The first speaker ____________________________ the panel.",
+    "keyWord": "made",
+    "answer": [
+      "made an instant impression on",
+      "made an immediate impression on"
+    ],
+    "tags": "C2, fixed phrase, noun phrases, formal"
+  },
+  {
+    "itemId": "kw_0332",
+    "fullSentence": "Sam’s parents greeted me so warmly that I felt comfortable.",
+    "gapFill": "Sam’s parents ____________________________ their warm greeting.",
+    "keyWord": "ease",
+    "answer": [
+      "put me at ease with",
+      "made me feel at ease with"
+    ],
+    "tags": "C2, idioms, verb patterns, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0333",
+    "fullSentence": "The quarry was completely devoid of valuable minerals.",
+    "gapFill": "There ____________________________  the quarry.",
+    "keyWord": "whatsoever",
+    "answer": [
+      "were no valuable minerals whatsoever in",
+      "were not any valuable materials whatsoever in"
+    ],
+    "tags": "C2, emphasis, formal, quantifiers"
+  },
+  {
+    "itemId": "kw_0334",
+    "fullSentence": "We’ve made it clear we won’t collaborate with that brand again — no exceptions.",
+    "gapFill": "Under ____________________________ with that band again.",
+    "keyWord": "ever",
+    "answer": [
+      "no circumstances will we ever collaborate",
+      "no circumstances whatsoever will we ever collaborate"
+    ],
+    "tags": "C2, inversion, fixed phrase, emphasis"
+  },
+  {
+    "itemId": "kw_0335",
+    "fullSentence": "Eventually, Leo concluded that accepting the offer was the best option.",
+    "gapFill": "Leo ____________________________ that accepting the offer was best.",
+    "keyWord": "came",
+    "answer": [
+      "came to the conclusion",
+      "came to the realisation",
+      "came to the realization",
+      "came to the conclusion that",
+      "came to the realisation that",
+      "came to the realization that"
+    ],
+    "tags": "C2, fixed phrase, noun phrases, prepositions, formal"
+  },
+  {
+    "itemId": "kw_0336",
+    "fullSentence": "Last night, Bella didn't feel like doing anything social.",
+    "gapFill": "Bella ____________________________ anything social last night.",
+    "keyWord": "mood",
+    "answer": [
+      "was not in the mood to do",
+      "was not in any mood to do",
+      "was not in the mood for doing",
+      "was in no mood to do",
+      "was in no mood for doing"
+    ],
+    "tags": "C2, idioms, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0337",
+    "fullSentence": "The announcement that the president had been arrested was a great shock.",
+    "gapFill": "Everyone ____________________________ the president’s arrest.",
+    "keyWord": "aback",
+    "answer": [
+      "was taken aback by the announcement of",
+      "was taken aback at the announcement of"
+    ],
+    "tags": "C2, passive voice, phrasal verbs, noun phrases"
+  },
+  {
+    "itemId": "kw_0338",
+    "fullSentence": "If he hadn't had a new fitness routine, Ravi would never have qualified for the finals.",
+    "gapFill": "Had ____________________________ the new fitness routine, Ravi would never have qualified.",
+    "keyWord": "it",
+    "answer": [
+      "it not been for"
+    ],
+    "tags": "C2, inversion, conditionals, formal, emphasis"
+  },
+  {
+    "itemId": "kw_0339",
+    "fullSentence": "‘What I choose to do with my time is none of your business!’ Finn said to his mother.",
+    "gapFill": "Finn told his mother that what he ____________________________ of hers.",
+    "keyWord": "concern",
+    "answer": [
+      "did with his time was no concern",
+      "was doing with his time was no concern"
+    ],
+    "tags": "C2, reported speech, noun phrases, cleft sentences, emphasis"
+  },
+  {
+    "itemId": "kw_0340",
+    "fullSentence": "I was just about to leave the gym when Leo called.",
+    "gapFill": "I ____________________________ when Leo arrived.",
+    "keyWord": "point",
+    "answer": [
+      "was on the point of leaving the gym",
+      "was on the point of leaving"
+    ],
+    "tags": "C2, time expressions, fixed phrase, prepositions"
+  },
+  {
+    "itemId": "kw_0341",
+    "fullSentence": "I’d barely got into the taxi when I realised I’d left my bag at home.",
+    "gapFill": "No ____________________________ I realised I’d left my bag at home.",
+    "keyWord": "sooner",
+    "answer": [
+      "sooner had I got into the taxi than",
+      "sooner had I got in the taxi than"
+    ],
+    "tags": "C2, inversion, time clauses, past perfect, emphasis"
+  },
+  {
+    "itemId": "kw_0342",
+    "fullSentence": "Lucas paid no attention at all to what his brother told him.",
+    "gapFill": "Lucas ____________________________ his brother’s advice.",
+    "keyWord": "notice",
+    "answer": [
+      "took absolutely no notice of",
+      "took no notice whatsoever of",
+      "took no notice of",
+      "took no notice at all of",
+      "did not take any notice of",
+      "did not take notice at all of",
+      "did not take any notice whatsoever of"
+    ],
+    "tags": "C2, emphasis, fixed phrase, prepositions, noun phrases"
+  },
+  {
+    "itemId": "kw_0343",
+    "fullSentence": "Erin has left school early without telling anyone in the past.",
+    "gapFill": "This is ____________________________ school early without telling anyone.",
+    "keyWord": "time",
+    "answer": [
+      "not the first time Erin has left",
+      "not the first time that Erin has left"
+    ],
+    "tags": "C2, present perfect, time expressions"
+  },
+  {
+    "itemId": "kw_0344",
+    "fullSentence": "Most people know more about Sonia’s journalism than her poetry.",
+    "gapFill": "Sonia is ____________________________ than as a poet.",
+    "keyWord": "better",
+    "answer": [
+      "better known as a journalist",
+      "better known as a writer"
+    ],
+    "tags": "C2, comparatives and superlatives, passive voice, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0345",
+    "fullSentence": "I've just been informed you’ve missed every deadline this month.",
+    "gapFill": "It ____________________________ that you’ve missed every deadline this month.",
+    "keyWord": "brought",
+    "answer": [
+      "has been brought to my attention",
+      "has just been brought to my attention"
+    ],
+    "tags": "C2, passive voice, formal, present perfect, noun phrases"
+  },
+  {
+    "itemId": "kw_0346",
+    "fullSentence": "The two directors didn’t trust each other in any way.",
+    "gapFill": "There was _________________________ the two directors.",
+    "keyWord": "complete",
+    "answer": [
+      "complete distrust between",
+      "a complete lack of trust between",
+      "a complete absence of trust",
+      "complete mistrust between"
+    ],
+    "tags": "C2, noun phrases, emphasis, quantifiers"
+  },
+  {
+    "itemId": "kw_0347",
+    "fullSentence": "In her memoirs, the actress didn’t acknowledge the impact of her drama coach.",
+    "gapFill": "In her memoirs, the actress _________________________ of her drama coach.",
+    "keyWord": "reference",
+    "answer": [
+      "made no reference to the impact",
+      "did not make any reference to the impact"
+    ],
+    "tags": "C2, noun phrases, reporting, prepositions"
+  },
+  {
+    "itemId": "kw_0348",
+    "fullSentence": "If his party wins, they will hold the celebration indoors.",
+    "gapFill": "The celebration _________________________ his party’s victory.",
+    "keyWord": "event",
+    "answer": [
+      "will be held indoors in the event of",
+      "will take place indoors in the event of"
+    ],
+    "tags": "C2, conditionals, formal, prepositions, linking"
+  },
+  {
+    "itemId": "kw_0349",
+    "fullSentence": "We were surprised when Maya arrived suddenly at the party",
+    "gapFill": "Maya took _________________________ at the party.",
+    "keyWord": "arrival",
+    "answer": [
+      "us by surprise with her sudden arrival",
+      "us by surprise by her sudden arrival"
+    ],
+    "tags": "C2, fixed phrase, noun phrases"
+  },
+  {
+    "itemId": "kw_0350",
+    "fullSentence": "What I’d love more than anything is to spend some time living abroad.",
+    "gapFill": "There’s _________________________ to spend some time living abroad.",
+    "keyWord": "more",
+    "answer": [
+      "nothing I would love more than",
+      "nothing that I would love more than",
+      "nothing would please me more than",
+      "nothing that would please me more than",
+      "nothing would give me more pleasure than",
+      "nothing that would give me more pleasure than",
+      "Nothing that I would like more than",
+      "Nothing I would like more than"
+    ],
+    "tags": "C2, emphasis, cleft sentences, noun phrases, comparatives and superlatives"
+  },
+  {
+    "itemId": "kw_0351",
+    "fullSentence": "The manager explained that the executive’s language skills was the sole reason she avoided dismissal.",
+    "gapFill": "The manager explained that had _________________________ executive would have been dismissed.",
+    "keyWord": "her",
+    "answer": [
+      "it not been for her language skills the"
+    ],
+    "tags": "C2, conditionals, inversion, emphasis, unreal conditionals"
+  },
+  {
+    "itemId": "kw_0352",
+    "fullSentence": "To the best of my knowledge, the factory followed all safety procedures.",
+    "gapFill": "I’ve _________________________ the factory ignored safety procedures.",
+    "keyWord": "suppose",
+    "answer": [
+      "no reason to suppose",
+      "no grounds to suppose"
+    ],
+    "tags": "C2, negation, noun phrases"
+  },
+  {
+    "itemId": "kw_0353",
+    "fullSentence": "My phone says there could be storms in the mountains later.",
+    "gapFill": "My phone says _________________________ in the mountains later.",
+    "keyWord": "threat",
+    "answer": [
+      "there is a threat of storms",
+      "there is the threat of storms",
+      "That there is a threat of storms",
+      "That there is the threat of storms"
+    ],
+    "tags": "C2, probability, noun phrases, future, idioms"
+  },
+  {
+    "itemId": "kw_0354",
+    "fullSentence": "The technician spent more than four hours repairing the server.",
+    "gapFill": "It _________________________ the server.",
+    "keyWord": "over",
+    "answer": [
+      "took the technician over four hours to repair"
+    ],
+    "tags": "C2, time expressions, verb patterns"
+  },
+  {
+    "itemId": "kw_0355",
+    "fullSentence": "I couldn’t find a single place that had the book in stock.",
+    "gapFill": "I was _________________________ that had the book in stock.",
+    "keyWord": "anywhere",
+    "answer": [
+      "unable to find anywhere",
+      "not able to find anywhere"
+    ],
+    "tags": "C2, ability, modality, negation"
+  },
+  {
+    "itemId": "kw_0356",
+    "fullSentence": "I refuse to spend the whole afternoon speaking to technical support operators.",
+    "gapFill": "I _________________________ to technical support operators all afternoon",
+    "keyWord": "intention",
+    "answer": [
+      "have no intention of speaking",
+      "do not have any intention of speaking",
+      "have not got any intention of speaking",
+      "have little intention of speaking"
+    ],
+    "tags": "C2, verb patterns, modality, noun phrases, negation, formal"
+  },
+  {
+    "itemId": "kw_0357",
+    "fullSentence": "The two candidates started to debate passionately about education policy.",
+    "gapFill": "A _________________________ the two candidates over education policy.",
+    "keyWord": "broke",
+    "answer": [
+      "passionate debate broke out between"
+    ],
+    "tags": "C2, phrasal verbs, noun phrases"
+  },
+  {
+    "itemId": "kw_0358",
+    "fullSentence": "I respect Jasper’s creativity, but his leadership style leaves much to be desired.",
+    "gapFill": "Much _________________________ his leadership style.",
+    "keyWord": "dislike",
+    "answer": [
+      "as I respect Jasper’s creativity I dislike"
+    ],
+    "tags": "C2, contrast, concession, linking, fronting"
+  },
+  {
+    "itemId": "kw_0359",
+    "fullSentence": "From what I can tell, Claudia’s settling in well abroad.",
+    "gapFill": "As _________________________, Claudia is settling in well abroad.",
+    "keyWord": "aware",
+    "answer": [
+      "far as I am aware"
+    ],
+    "tags": "C2, fixed phrase, linking"
+  },
+  {
+    "itemId": "kw_0360",
+    "fullSentence": "Technical issues were held responsible for the delayed release of the software update.",
+    "gapFill": "Technical issues were given _________________________ in releasing the update.",
+    "keyWord": "reason",
+    "answer": [
+      "as the reason for the delay",
+      "as the reason for a delay"
+    ],
+    "tags": "C2, noun phrases, causality, linking"
+  },
+  {
+    "itemId": "kw_0361",
+    "fullSentence": "Fans were underwhelmed by the author’s highly anticipated latest novel.",
+    "gapFill": "The author’s latest novel _________________________ of the fans.",
+    "keyWord": "live",
+    "answer": [
+      "did not live up to the expectations",
+      "failed to live up to the expectations"
+    ],
+    "tags": "C2, idioms, noun phrases, phrasal verbs"
+  },
+  {
+    "itemId": "kw_0362",
+    "fullSentence": "Everyone was surprised when the company changed its objectives",
+    "gapFill": "The company’s _________________________ surprise.",
+    "keyWord": "took",
+    "answer": [
+      "change in objectives took everyone by",
+      "change of objectives took everyone by",
+      "objective change took everyone by"
+    ],
+    "tags": "C2, fixed phrase, noun phrases, prepositions"
+  },
+  {
+    "itemId": "kw_0363",
+    "fullSentence": "After studying for years, Tomas was eventually able to finish his thesis.",
+    "gapFill": "Only _________________________ to finish his thesis.",
+    "keyWord": "did",
+    "answer": [
+      "After years of studying did Tomas manage",
+      "after studying for years did Tomas manage",
+      "After years of study did Tomas manage"
+    ],
+    "tags": "C2, inversion, emphasis, time expressions"
+  },
+  {
+    "itemId": "kw_0364",
+    "fullSentence": "Nobody could have realized how fast the temperature would change.",
+    "gapFill": "The _________________________ change could not have been foreseen.",
+    "keyWord": "speed",
+    "answer": [
+      "speed at which the temperature would",
+      "speed with which the temperature would",
+      "speed of the temperature"
+    ],
+    "tags": "C2, relative clauses, noun phrases, emphasis"
+  },
+  {
+    "itemId": "kw_0365",
+    "fullSentence": "The teacher revealed absolutely nothing to his students about the next exam.",
+    "gapFill": "The teacher _________________________ about the next exam.",
+    "keyWord": "dark",
+    "answer": [
+      "kept his students in the dark",
+      "left his students in the dark"
+    ],
+    "tags": "C2, idioms, prepositions"
+  },
+  {
+    "itemId": "kw_0366",
+    "fullSentence": "His parents appear to find the way Max behaves more enjoyable than a cause for shock.",
+    "gapFill": "Far _________________________ behaviour, his parents seem to enjoy it.",
+    "keyWord": "being",
+    "answer": [
+      "from being shocked by Max’s"
+    ],
+    "tags": "C2, contrast, fixed phrase, linking"
+  },
+  {
+    "itemId": "kw_0367",
+    "fullSentence": "Mr Holt is known for his reliability and knowledge as an economist.",
+    "gapFill": "Mr Holt _________________________ economist.",
+    "keyWord": "reputed",
+    "answer": [
+      "is reputed to be a reliable and knowledgeable",
+      "is reputed for being a reliable and knowledgeable"
+    ],
+    "tags": "C2, passive voice, verb patterns"
+  },
+  {
+    "itemId": "kw_0368",
+    "fullSentence": "Without access to the lab results, I won’t be able to finish the analysis.",
+    "gapFill": "Unless I _________________________ the lab results, I won’t be able to complete the analysis.",
+    "keyWord": "hold",
+    "answer": [
+      "get hold of",
+      "can get hold of",
+      "get a hold of",
+      "can get a hold of"
+    ],
+    "tags": "C2, fixed phrase, conditionals, informal"
+  },
+  {
+    "itemId": "kw_0369",
+    "fullSentence": "All the dancers put in extra hours in order to get a spot in the national company.",
+    "gapFill": "The dancers trained intensively _________________________ a spot in the national company.",
+    "keyWord": "hope",
+    "answer": [
+      "in the hope of getting",
+      "with the hope of getting"
+    ],
+    "tags": "C2, noun phrases, purpose, verb patterns"
+  },
+  {
+    "itemId": "kw_0370",
+    "fullSentence": "Silvia believes the journalist has sold the story to another publication.",
+    "gapFill": "According to Silvia, the journalist _________________________ the story to another publication.",
+    "keyWord": "rumoured",
+    "answer": [
+      "is rumoured to have sold"
+    ],
+    "tags": "C2, reporting verbs, modality, perfect, passive voice, reported speech"
+  },
+  {
+    "itemId": "kw_0371",
+    "fullSentence": "Noah didn’t expect that the proposal would work out.",
+    "gapFill": "Noah had little _________________________ a success.",
+    "keyWord": "of",
+    "answer": [
+      "expectation of the proposal being",
+      "expectation of the proposal’s being",
+      "expectation of her proposal being",
+      "expectation of her proposal’s being"
+    ],
+    "tags": "C2, noun phrases, modality, verb patterns, formal"
+  },
+  {
+    "itemId": "kw_0372",
+    "fullSentence": "Henry knows every department inside out, apart from logistics.",
+    "gapFill": "With _________________________, Henry is an expert in every department.",
+    "keyWord": "exception",
+    "answer": [
+      "the exception of logistics"
+    ],
+    "tags": "C2, exceptions, prepositions, noun phrases"
+  },
+  {
+    "itemId": "kw_0373",
+    "fullSentence": "Zoe really loves her early morning run.",
+    "gapFill": "What Zoe _________________________ running first thing in the morning.",
+    "keyWord": "on",
+    "answer": [
+      "is keen on doing is",
+      "is really keen on doing is",
+      "is keen on is",
+      "is really keen on is"
+    ],
+    "tags": "C2, verb patterns, emphasis, cleft sentences"
+  },
+  {
+    "itemId": "kw_0374",
+    "fullSentence": "The updated tablet is completely different from last year’s version.",
+    "gapFill": "This updated tablet _________________________ last year’s model.",
+    "keyWord": "bears",
+    "answer": [
+      "bears no resemblance to",
+      "bears little resemblance to",
+      "bears no similarity to",
+      "bears little similarity to"
+    ],
+    "tags": "C2, emphasis, noun phrases, comparatives and superlatives, formal"
+  },
+  {
+    "itemId": "kw_0375",
+    "fullSentence": "Maria visited New York primarily to improve her accent.",
+    "gapFill": "Maria’s _________________________ to work on her accent.",
+    "keyWord": "reason",
+    "answer": [
+      "reason for visiting New York was",
+      "main reason for visiting New York was",
+      "primary reason for visiting New York was"
+    ],
+    "tags": "C2, noun phrases, purpose, linking"
+  },
+  {
+    "itemId": "kw_0376",
+    "fullSentence": "The board plans to warn employees about restructuring plans.",
+    "gapFill": "Employees _________________________ restructuring plans by the board.",
+    "keyWord": "are",
+    "answer": [
+      "are to be warned about",
+      "are to be warned regarding",
+      "are to be warned concerning",
+      "are to be warned over",
+      "are expected to be warned about",
+      "are set to be warned about"
+    ],
+    "tags": "C2, passive voice, modality, formal, future"
+  },
+  {
+    "itemId": "kw_0377",
+    "fullSentence": "It cannot be denied that we’ll need to speed things up if we want to meet the deadline.",
+    "gapFill": "There is  _________________________ we’ll have to work faster to meet the deadline.",
+    "keyWord": "escaping",
+    "answer": [
+      "no escaping the fact that",
+      "no escaping the fact",
+      "no way of escaping the fact",
+      "no way of escaping the fact that",
+      "Little escaping the fact that",
+      "Little escaping that fact"
+    ],
+    "tags": "C2, fixed phrase, emphasis, modality, probability"
+  }
+]

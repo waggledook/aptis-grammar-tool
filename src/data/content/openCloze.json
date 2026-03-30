@@ -1,0 +1,1001 @@
+[
+  {
+    "itemId": "oc_0001",
+    "gappedSentence": "Apparently, there ___ several such options available online.",
+    "answer": "are",
+    "tags": "B1, verbs, existential there, auxiliaries"
+  },
+  {
+    "itemId": "oc_0002",
+    "gappedSentence": "The birds usually return to the cliffs ___ they nested last spring.",
+    "answer": "where",
+    "tags": "B2, relative pronouns, relative clauses"
+  },
+  {
+    "itemId": "oc_0003",
+    "gappedSentence": "If you’re hoping to get close ___ the truth, you’d better be careful.",
+    "answer": "to",
+    "tags": "B2, prepositions, dependent prepositions, adjective + preposition"
+  },
+  {
+    "itemId": "oc_0004",
+    "gappedSentence": "All participants must be equipped ___ a helmet and high-visibility vest before entering.",
+    "answer": "with",
+    "tags": "B2, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0005",
+    "gappedSentence": "He stared at the puzzle for hours, trying to work ___ the solution.",
+    "answer": "out",
+    "tags": "B2, particle, phrasal verbs, adverbs"
+  },
+  {
+    "itemId": "oc_0006",
+    "gappedSentence": "I asked him ___ he meant, but he just smiled and walked away.",
+    "answer": "what",
+    "tags": "B2, question words, reported speech"
+  },
+  {
+    "itemId": "oc_0007",
+    "gappedSentence": "I’d met her only once, she greeted me as if we were old friends.",
+    "answer": [
+      "although",
+      "though"
+    ],
+    "tags": "B2, conjunctions, contrast, concession, linking"
+  },
+  {
+    "itemId": "oc_0008",
+    "gappedSentence": "Most kids ___ used to living in a new city quickly.",
+    "answer": "get",
+    "tags": "B2, verbs, fixed phrases"
+  },
+  {
+    "itemId": "oc_0009",
+    "gappedSentence": "Do you think aliens would _____ contact with us if they could?",
+    "answer": "make",
+    "tags": "B1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0010",
+    "gappedSentence": "She writes historical novels, _____ are mostly set in 19th century Spain.",
+    "answer": "Which",
+    "tags": "B2, relative pronouns, relative clauses, non-defining"
+  },
+  {
+    "itemId": "oc_0011",
+    "gappedSentence": "His resignation didn’t ___ as much of a surprise to the director.",
+    "answer": "come",
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0012",
+    "gappedSentence": "What’s most impressive about her ___ how quickly she adapted to the role.",
+    "answer": "is",
+    "tags": "B2, verbs, cleft sentences, auxiliaries"
+  },
+  {
+    "itemId": "oc_0013",
+    "gappedSentence": "What’s even ___ unusual is you realise he taught himself everything.",
+    "answer": "more",
+    "tags": "B2, adverbs, intensifiers, comparatives and superlatives"
+  },
+  {
+    "itemId": "oc_0014",
+    "gappedSentence": "They moved into the house about five years ___.",
+    "answer": "ago",
+    "tags": "B1, adverbs, time expressions"
+  },
+  {
+    "itemId": "oc_0015",
+    "gappedSentence": "She got her inspiration ____ her father’s poems.",
+    "answer": "From",
+    "tags": "B1, prepositions, dependent prepositions"
+  },
+  {
+    "itemId": "oc_0016",
+    "gappedSentence": "She promised she ___ call me as soon as she arrived.",
+    "answer": "would",
+    "tags": "B1, modal verbs, verbs, auxiliaries, future"
+  },
+  {
+    "itemId": "oc_0017",
+    "gappedSentence": "He studied all night ___ that he wouldn’t fail the exam again.",
+    "answer": "so",
+    "tags": "B2, conjunctions, purpose, linking"
+  },
+  {
+    "itemId": "oc_0018",
+    "gappedSentence": "I can’t believe ___ fast the weather changed!",
+    "answer": "how",
+    "tags": "B2, question words, adverbs"
+  },
+  {
+    "itemId": "oc_0019",
+    "gappedSentence": "He bought a brand new set ___ speakers for his home studio.",
+    "answer": "of",
+    "tags": "B1, prepositions"
+  },
+  {
+    "itemId": "oc_0020",
+    "gappedSentence": "You need to ___ more thought into how you present your argument.",
+    "answer": "put",
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0021",
+    "gappedSentence": "It might seem obvious, ___ there are actually many ways to improve your English.",
+    "answer": "But",
+    "tags": "B1, conjunctions, linking, contrast"
+  },
+  {
+    "itemId": "oc_0022",
+    "gappedSentence": "What’s ___, the museum also offers free guided tours in the afternoon.",
+    "answer": "more",
+    "tags": "B2, adverb, discourse markers, sentence connectors, linking"
+  },
+  {
+    "itemId": "oc_0023",
+    "gappedSentence": "She’s writing a quick guide ___ the city’s best cafés.",
+    "answer": "to",
+    "tags": "B2, prepositions, dependent prepositions, noun + preposition"
+  },
+  {
+    "itemId": "oc_0024",
+    "gappedSentence": "___ I understand your concerns, I don’t think we should change our plans.",
+    "answer": [
+      "while",
+      "although"
+    ],
+    "tags": "B2, conjunctions, contrast, linking"
+  },
+  {
+    "itemId": "oc_0025",
+    "gappedSentence": "We’re looking for a design ___ can be printed at scale.",
+    "answer": [
+      "that",
+      "which"
+    ],
+    "tags": "B2, relative pronouns, relative clauses, defining"
+  },
+  {
+    "itemId": "oc_0026",
+    "gappedSentence": "This style is widely known ___ brutalist architecture.",
+    "answer": "as",
+    "tags": "B2, prepositions, dependent prepositions"
+  },
+  {
+    "itemId": "oc_0027",
+    "gappedSentence": "You need to ___ your responsibilities more seriously.",
+    "answer": "take",
+    "tags": "B1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0028",
+    "gappedSentence": "She’s probably the ___ talented writer in her department.",
+    "answer": "most",
+    "tags": "B1, adverbs, comparatives and superlatives"
+  },
+  {
+    "itemId": "oc_0029",
+    "gappedSentence": "I can ___ hear the sound of the waves from that morning. It’s so clear!",
+    "answer": "still",
+    "tags": "B1, adverbs, adverbs of time, time expressions"
+  },
+  {
+    "itemId": "oc_0030",
+    "gappedSentence": "I didn’t believe it until I saw it for ___.",
+    "answer": "myself",
+    "tags": "B1, pronouns, reflexive pronouns"
+  },
+  {
+    "itemId": "oc_0031",
+    "gappedSentence": "___ only did she finish early, but the quality was outstanding.",
+    "answer": "not",
+    "tags": "C1, adverbs, inversion, negative"
+  },
+  {
+    "itemId": "oc_0032",
+    "gappedSentence": "He now has to ____ care of his elderly parents.",
+    "answer": "take",
+    "tags": "B1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0033",
+    "gappedSentence": "Can you think of _____ to do this afternoon?",
+    "answer": [
+      "something",
+      "anything"
+    ],
+    "tags": "B1, pronouns, indefinite pronouns"
+  },
+  {
+    "itemId": "oc_0034",
+    "gappedSentence": "Even ____ it was very salty, the food was delicious.",
+    "answer": "though",
+    "tags": "B2, conjunctions, contrast, linking"
+  },
+  {
+    "itemId": "oc_0035",
+    "gappedSentence": "I’d like to ____ your attention to this painting over here.",
+    "answer": "draw",
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0036",
+    "gappedSentence": "The impact of her contributions cannot ___ overestimated by any reasonable measure.",
+    "answer": "be",
+    "tags": "B2, verbs, passive, fixed phrases"
+  },
+  {
+    "itemId": "oc_0037",
+    "gappedSentence": "Students benefit from seeing examples that prove to ___ that success is possible.",
+    "answer": "them",
+    "tags": "B2, pronouns, personal pronouns"
+  },
+  {
+    "itemId": "oc_0038",
+    "gappedSentence": "This programme is designed for professionals ___ the ages of 30 and 50.",
+    "answer": "between",
+    "tags": "B2, prepositions"
+  },
+  {
+    "itemId": "oc_0039",
+    "gappedSentence": "Many applicants already have ___ own equipment and materials.",
+    "answer": "their",
+    "tags": "B1, pronouns, possessive"
+  },
+  {
+    "itemId": "oc_0040",
+    "gappedSentence": "His research aims to ___ the world a better place.",
+    "answer": "make",
+    "tags": "B2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0041",
+    "gappedSentence": "Something unexpected happened ___ her just before the interview began.",
+    "answer": "to",
+    "tags": "B2, dependent prepositions, prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0042",
+    "gappedSentence": "I hadn't noticed ___ quiet the room had grown until the music stopped.",
+    "answer": "how",
+    "tags": "C1, adverbs, question words, indirect questions"
+  },
+  {
+    "itemId": "oc_0043",
+    "gappedSentence": "She was looking for a more creative way of ___ productive at work.",
+    "answer": [
+      "being",
+      "staying"
+    ],
+    "tags": "B2, gerunds and infinitives, verb patterns, verbs, auxiliaries"
+  },
+  {
+    "itemId": "oc_0044",
+    "gappedSentence": "The gallery houses the most ambitious exhibition of ___ kind in recent years.",
+    "answer": "its",
+    "tags": "B2, pronouns, possessive"
+  },
+  {
+    "itemId": "oc_0045",
+    "gappedSentence": "Her new partner was anything ___ boring.",
+    "answer": "but",
+    "tags": "C2, adverbs, fixed phrases, contrast"
+  },
+  {
+    "itemId": "oc_0046",
+    "gappedSentence": "Many businesses are moving away ___ traditional forms of advertising.",
+    "answer": "from",
+    "tags": "B2, phrasal verbs, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0047",
+    "gappedSentence": "The second season is a ____ deal more enjoyable than the first.",
+    "answer": [
+      "great",
+      "good"
+    ],
+    "tags": "C2, adverbs, intensifiers, quantifiers"
+  },
+  {
+    "itemId": "oc_0048",
+    "gappedSentence": "The campsite had everything — a pool, a tennis court, a gym, and so ___.",
+    "answer": "on",
+    "tags": "C1, discourse markers, adverbs, ellipsis"
+  },
+  {
+    "itemId": "oc_0049",
+    "gappedSentence": "The board approved a proposal ___ increasing salaries across all departments.",
+    "answer": "for",
+    "tags": "B2, prepositions, dependent prepositions, noun + preposition"
+  },
+  {
+    "itemId": "oc_0050",
+    "gappedSentence": "The engineer suggested that ___ a device could transform the industry.",
+    "answer": "such",
+    "tags": "C1, determiners, so/such"
+  },
+  {
+    "itemId": "oc_0051",
+    "gappedSentence": "The starter pack will consist ___ three cables, an adapter, and an instruction manual.",
+    "answer": "of",
+    "tags": "B2, verbs, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0052",
+    "gappedSentence": "It was the first vaccine ___ be approved for widespread use.",
+    "answer": "to",
+    "tags": "B2, verbs, infinitives, passive voice"
+  },
+  {
+    "itemId": "oc_0053",
+    "gappedSentence": "The collection includes rare maps, scrolls, and ___ handwritten documents.",
+    "answer": "other",
+    "tags": "B2, determiners, adjectives"
+  },
+  {
+    "itemId": "oc_0054",
+    "gappedSentence": "Two items stood out ___ particular: the painting and the original letter.",
+    "answer": "in",
+    "tags": "B2, adverbials, discourse markers, prepositions"
+  },
+  {
+    "itemId": "oc_0055",
+    "gappedSentence": "The annual meeting will take ___ in late October this year.",
+    "answer": "place",
+    "tags": "C1, collocations, fixed phrases, nouns"
+  },
+  {
+    "itemId": "oc_0056",
+    "gappedSentence": "He worked on apps created ___ help users manage their time more effectively.",
+    "answer": "to",
+    "tags": "B2, verbs, infinitives, purpose"
+  },
+  {
+    "itemId": "oc_0057",
+    "gappedSentence": "He popped ___ the office just to drop off a package.",
+    "answer": "into",
+    "tags": "C1, phrasal verbs, prepositions, movement, verb + preposition"
+  },
+  {
+    "itemId": "oc_0058",
+    "gappedSentence": "I slowed down so ___ she could catch up.",
+    "answer": "that",
+    "tags": "B2, conjunctions, purpose, linking"
+  },
+  {
+    "itemId": "oc_0059",
+    "gappedSentence": "He plays the guitar as ___ as the piano.",
+    "answer": "well",
+    "tags": "B2, adverbs, linking"
+  },
+  {
+    "itemId": "oc_0060",
+    "gappedSentence": "The author even managed to ___ older readers hooked on the series.",
+    "answer": "get",
+    "tags": "C1, causative verbs, verbs, verb + adjective"
+  },
+  {
+    "itemId": "oc_0061",
+    "gappedSentence": "___ the first time in weeks, they were all home together.",
+    "answer": "For",
+    "tags": "B2, prepositions, time expressions, dependent prepositions, preposition + noun"
+  },
+  {
+    "itemId": "oc_0062",
+    "gappedSentence": "The author published a best-selling book, ___ selection of autobiographical short stories.",
+    "answer": "a",
+    "tags": "B2, articles, determiners"
+  },
+  {
+    "itemId": "oc_0063",
+    "gappedSentence": "She took ___ in several workshops before applying for the job.",
+    "answer": "part",
+    "tags": "C1, fixed phrases, collocations"
+  },
+  {
+    "itemId": "oc_0064",
+    "gappedSentence": "It ___ Anna who first suggested the idea, not me.",
+    "answer": "was",
+    "tags": "C1, cleft sentences, emphasis, verbs, auxiliaries"
+  },
+  {
+    "itemId": "oc_0065",
+    "gappedSentence": "___ is most surprising is how calm she remained.",
+    "answer": "What",
+    "tags": "C1, pronouns, cleft sentences, question words, emphasis"
+  },
+  {
+    "itemId": "oc_0066",
+    "gappedSentence": "He’s an excellent speaker, not ___ mention a gifted writer.",
+    "answer": "to",
+    "tags": "C1, discourse markers, infinitives, fixed phrases, linking"
+  },
+  {
+    "itemId": "oc_0067",
+    "gappedSentence": "___ from one minor error, your essay was excellent.",
+    "answer": "Apart",
+    "tags": "C1, discourse markers, prepositions, exception"
+  },
+  {
+    "itemId": "oc_0068",
+    "gappedSentence": "___ managing a full-time job, she also cared for her elderly parents.",
+    "answer": [
+      "While",
+      "Besides"
+    ],
+    "tags": "C1, conjunctions, linking"
+  },
+  {
+    "itemId": "oc_0069",
+    "gappedSentence": "___ a good first impression is often half the battle.",
+    "answer": "Making",
+    "tags": "C1, gerunds, verb patterns, fixed phrases"
+  },
+  {
+    "itemId": "oc_0070",
+    "gappedSentence": "The precision with ___ the dancers moved was mesmerising.",
+    "answer": "which",
+    "tags": "C1, relative clauses, formal, preposition + relative pronoun"
+  },
+  {
+    "itemId": "oc_0071",
+    "gappedSentence": "He could be reached at ___ hours of the day.",
+    "answer": "all",
+    "tags": "C1, adverbs, fixed phrases, time expressions"
+  },
+  {
+    "itemId": "oc_0072",
+    "gappedSentence": "I see why she wants to do it, but ___ it really appropriate?",
+    "answer": "is",
+    "tags": "B1, verbs, auxiliaries, questions"
+  },
+  {
+    "itemId": "oc_0073",
+    "gappedSentence": "But ___ if you had never told her the truth? Everything might have been different.",
+    "answer": "what",
+    "tags": "B2, question words, fixed phrases"
+  },
+  {
+    "itemId": "oc_0074",
+    "gappedSentence": "The performance was nothing ___ than breathtaking. Truly amazing stuff!",
+    "answer": "less",
+    "tags": "C1, comparatives and superlatives, adverbs"
+  },
+  {
+    "itemId": "oc_0075",
+    "gappedSentence": "He stayed at home ___ of going out with his friends.",
+    "answer": "instead",
+    "tags": "B2, adverbs, discourse markers, linking"
+  },
+  {
+    "itemId": "oc_0076",
+    "gappedSentence": "It’s important to ___ attention during the safety briefing.",
+    "answer": "pay",
+    "tags": "B2, collocations, verbs, fixed phrases"
+  },
+  {
+    "itemId": "oc_0077",
+    "gappedSentence": "Frustrated with delays, the committee has ___ matters into their own hands.",
+    "answer": "taken",
+    "tags": "C2, idioms, participles, verbs, fixed phrases, idioms"
+  },
+  {
+    "itemId": "oc_0078",
+    "gappedSentence": "The task can be completed ___ identifying the exceptions in the lists of words.",
+    "answer": "by",
+    "tags": "C1, prepositions, preposition + gerund"
+  },
+  {
+    "itemId": "oc_0079",
+    "gappedSentence": "He always gets distracted doing things ___ checking emails or scrolling through his phone.",
+    "answer": "like",
+    "tags": "B2, prepositions, examples, like/as"
+  },
+  {
+    "itemId": "oc_0080",
+    "gappedSentence": "___ of worrying about the past, try focusing on what you can change.",
+    "answer": "Instead",
+    "tags": "B2, prepositions, fixed phrases, linking"
+  },
+  {
+    "itemId": "oc_0081",
+    "gappedSentence": "Try to concentrate ___ what the speaker is actually saying.",
+    "answer": "on",
+    "tags": "B2, verbs, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0082",
+    "gappedSentence": "___ the room was crowded, it still felt strangely quiet.",
+    "answer": "Although",
+    "tags": "B2, conjunctions, contrast, linking"
+  },
+  {
+    "itemId": "oc_0083",
+    "gappedSentence": "She was clearly distracted, thinking about ___ else entirely.",
+    "answer": "something",
+    "tags": "B2, pronouns, indefinite pronouns"
+  },
+  {
+    "itemId": "oc_0084",
+    "gappedSentence": "If you’re ___ careful, the interview might go badly.",
+    "answer": "not",
+    "tags": "B1, adverbs, negation"
+  },
+  {
+    "itemId": "oc_0085",
+    "gappedSentence": "My daughter never makes up her own mind, preferring to ___ her decisions made by her siblings.",
+    "answer": "have",
+    "tags": "C1, passive voice, causative, verbs"
+  },
+  {
+    "itemId": "oc_0086",
+    "gappedSentence": "Wildlife in the area is currently ___ serious threat due to deforestation.",
+    "answer": "under",
+    "tags": "C1, prepositions, collocations, preposition + noun"
+  },
+  {
+    "itemId": "oc_0087",
+    "gappedSentence": "___ small changes at a time is key to long-term gains.",
+    "answer": "Making",
+    "tags": "B2, gerunds, gerunds and infinitives"
+  },
+  {
+    "itemId": "oc_0088",
+    "gappedSentence": "It’s never ___ late to take up a new hobby.",
+    "answer": "too",
+    "tags": "B1, adverbs, intensifiers"
+  },
+  {
+    "itemId": "oc_0089",
+    "gappedSentence": "Jefferson underlined our right to ___ pursuit of happiness.",
+    "answer": "the",
+    "tags": "B2, articles, determiners"
+  },
+  {
+    "itemId": "oc_0090",
+    "gappedSentence": "Your success depends on ___ well you prepare in advance.",
+    "answer": "how",
+    "tags": "B2, question words, adverbs"
+  },
+  {
+    "itemId": "oc_0091",
+    "gappedSentence": "She’s put a lot of energy ___ learning Japanese from scratch.",
+    "answer": "into",
+    "tags": "C1, prepositions, dependent prepositions, fixed phrases, noun + preposition"
+  },
+  {
+    "itemId": "oc_0092",
+    "gappedSentence": "These results ___ be replicated using the same method, as long as you follow the instructions carefully.",
+    "answer": [
+      "can",
+      "could"
+    ],
+    "tags": "B2, modal verbs, passive voice"
+  },
+  {
+    "itemId": "oc_0093",
+    "gappedSentence": "Some people make greater use of the left-hand side of ___ brains.",
+    "answer": "their",
+    "tags": "B2, possessive, determiners, adjectives"
+  },
+  {
+    "itemId": "oc_0094",
+    "gappedSentence": "They struggled to keep inflation ___ check during the crisis.",
+    "answer": "in",
+    "tags": "C1, prepositions, idioms, preposition + noun, fixed phrase"
+  },
+  {
+    "itemId": "oc_0095",
+    "gappedSentence": "I thought the meeting was at 9 — apparently ___. It’s at 10.",
+    "answer": "not",
+    "tags": "C1, adverbs, negation, fixed phrase"
+  },
+  {
+    "itemId": "oc_0096",
+    "gappedSentence": "A good night's sleep can ___ a big difference during exams.",
+    "answer": "make",
+    "tags": "B2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0097",
+    "gappedSentence": "Over the past few months, she’s been building ___ data on his case.",
+    "answer": "up",
+    "tags": "c1, phrasal verbs, verbs, particles"
+  },
+  {
+    "itemId": "oc_0098",
+    "gappedSentence": "The artist, ___ latest exhibition received critical acclaim, is gaining international attention.",
+    "answer": "whose",
+    "tags": "C1, relative pronouns, possessive"
+  },
+  {
+    "itemId": "oc_0099",
+    "gappedSentence": "You can choose ___ you like from the menu — it’s all included in the price.",
+    "answer": [
+      "whatever",
+      "what"
+    ],
+    "tags": "C1, pronouns, questions words"
+  },
+  {
+    "itemId": "oc_0100",
+    "gappedSentence": "In actual ___, the figures were far worse than expected.",
+    "answer": "fact",
+    "tags": "C2, fixed phrases, nouns, linking"
+  },
+  {
+    "itemId": "oc_0101",
+    "gappedSentence": "___ his older brother, he prefers reading to playing video games.",
+    "answer": [
+      "Like",
+      "Unlike"
+    ],
+    "tags": "B2, comparison, prepositions"
+  },
+  {
+    "itemId": "oc_0102",
+    "gappedSentence": "As a child, she ___ already read books far above her age level.",
+    "answer": [
+      "could",
+      "would"
+    ],
+    "tags": "C1, modal verbs, past ability, past habit, verbs, auxiliaries"
+  },
+  {
+    "itemId": "oc_0103",
+    "gappedSentence": "They carried ___ an experiment to test the hypothesis.",
+    "answer": "out",
+    "tags": "c1, phrasal verbs, particles, adverbs"
+  },
+  {
+    "itemId": "oc_0104",
+    "gappedSentence": "The candidate was presented ___ a range of unexpected questions.",
+    "answer": "with",
+    "tags": "B2, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0105",
+    "gappedSentence": "___ he decide to go, let me know in advance.",
+    "answer": "Should",
+    "tags": "C2, inversion, conditionals, modal verbs"
+  },
+  {
+    "itemId": "oc_0106",
+    "gappedSentence": "If you hide the toy ___ else, he’ll spend hours trying to find it.",
+    "answer": [
+      "somewhere",
+      "anywhere"
+    ],
+    "tags": "B2, adverbs, indefinite adverbs"
+  },
+  {
+    "itemId": "oc_0107",
+    "gappedSentence": "A ___ students complained about the difficulty of the exam.",
+    "answer": "few",
+    "tags": "c1, quantifiers, determiners"
+  },
+  {
+    "itemId": "oc_0108",
+    "gappedSentence": "There’s very ___ evidence to support their claim.",
+    "answer": "little",
+    "tags": "c1, quantifiers, uncountable nouns"
+  },
+  {
+    "itemId": "oc_0109",
+    "gappedSentence": "The repairs were done by ___ of a specialist contractor.",
+    "answer": [
+      "means",
+      "way"
+    ],
+    "tags": "C2, noun phrases, fixed expressions"
+  },
+  {
+    "itemId": "oc_0110",
+    "gappedSentence": "He appears to ___ forgotten all about the meeting.",
+    "answer": "have",
+    "tags": "C1, perfect infinitive, verbs, auxiliaries"
+  },
+  {
+    "itemId": "oc_0111",
+    "gappedSentence": "Regular physical activity ___ a great effect on metal wellbeing.",
+    "answer": "has",
+    "tags": "B2, verbs, fixed phrases"
+  },
+  {
+    "itemId": "oc_0112",
+    "gappedSentence": "This species can defend ___ when threatened.",
+    "answer": "itself",
+    "tags": "B2, pronouns, reflexive"
+  },
+  {
+    "itemId": "oc_0113",
+    "gappedSentence": "He refused to leave, even ___ the police asked him to.",
+    "answer": [
+      "though",
+      "when",
+      "if"
+    ],
+    "tags": "C1, conjunctions, condition, concession, time clauses"
+  },
+  {
+    "itemId": "oc_0114",
+    "gappedSentence": "There are very ___ job opportunities in this field.",
+    "answer": "few",
+    "tags": "B2, quantifiers, countable nouns, determiners"
+  },
+  {
+    "itemId": "oc_0115",
+    "gappedSentence": "Nobody turned up on time other ___ Jane.",
+    "answer": "than",
+    "tags": "c2, comparison, exception, linking"
+  },
+  {
+    "itemId": "oc_0116",
+    "gappedSentence": "___ from a few spelling errors, the essay was excellent.",
+    "answer": [
+      "Apart"
+    ],
+    "tags": "C1, discourse markers, linking, exception"
+  },
+  {
+    "itemId": "oc_0117",
+    "gappedSentence": "He struggled to ____ a living as a freelance writer.",
+    "answer": [
+      "make",
+      "scrape"
+    ],
+    "tags": "C1, collocations, idioms, fixed phrases"
+  },
+  {
+    "itemId": "oc_0118",
+    "gappedSentence": "___ this stage, there’s not an awful lot more we can do.",
+    "answer": "At",
+    "tags": "C1, prepositions, preposition + noun"
+  },
+  {
+    "itemId": "oc_0119",
+    "gappedSentence": "The ceremony will take ___ at noon.",
+    "answer": "place",
+    "tags": "B2, fixed phrases, fixed phrases"
+  },
+  {
+    "itemId": "oc_0120",
+    "gappedSentence": "After moving to Spain, she took ___ residence in a small village.",
+    "answer": "up",
+    "tags": "C2, phrasal verbs, particles"
+  },
+  {
+    "itemId": "oc_0121",
+    "gappedSentence": "___ all the fuss they made, they were happy with the final product.",
+    "answer": "Despite",
+    "tags": "C1, contrast, concession, linking, prepositions"
+  },
+  {
+    "itemId": "oc_0122",
+    "gappedSentence": "This material is not ___ of holding that much weight.",
+    "answer": "capable",
+    "tags": "C1, adjectives, adjective + preposition, ability"
+  },
+  {
+    "itemId": "oc_0123",
+    "gappedSentence": "It’s important not to draw sweeping conclusion on ___ basis.",
+    "answer": [
+      "this",
+      "that"
+    ],
+    "tags": "c1, determiners, demonstratives"
+  },
+  {
+    "itemId": "oc_0124",
+    "gappedSentence": "It’s rare to find ___ a good restaurant in this part of town.",
+    "answer": "such",
+    "tags": "C1, determiners, degree"
+  },
+  {
+    "itemId": "oc_0125",
+    "gappedSentence": "Passing the exam is most definitely ___ a matter of grinding our way through practice tests.",
+    "answer": "not",
+    "tags": "B1, adverbs, negation"
+  },
+  {
+    "itemId": "oc_0126",
+    "gappedSentence": "She slowly drifted ___ a deep sleep.",
+    "answer": "into",
+    "tags": "C2, prepositions, phrasal verbs, verb + preposition"
+  },
+  {
+    "itemId": "oc_0127",
+    "gappedSentence": "Surprising though it ____ be, she never actually lived in Spain.",
+    "answer": [
+      "may",
+      "might",
+      "can"
+    ],
+    "tags": "C2, modal verbs, concession, verbs, auxiliaries"
+  },
+  {
+    "itemId": "oc_0128",
+    "gappedSentence": "We evaluated the proposals in ___ of cost and feasibility.",
+    "answer": "terms",
+    "tags": "C2, fixed phrases, prepositional phrase"
+  },
+  {
+    "itemId": "oc_0129",
+    "gappedSentence": "___ of the severity of the burn, you should seek medical attention.",
+    "answer": [
+      "Regardless",
+      "irrespective"
+    ],
+    "tags": "C2, discourse markers, linking, contrast, prepositional phrase"
+  },
+  {
+    "itemId": "oc_0130",
+    "gappedSentence": "He arrived just in ___ to see the final goal.",
+    "answer": "time",
+    "tags": "B2, fixed phrases, time expressions, prepositions + noun"
+  },
+  {
+    "itemId": "oc_0131",
+    "gappedSentence": "After lunch, I was finally ___ rest.",
+    "answer": "at",
+    "tags": "C2, prepositions, fixed phrase, formal, preposition + noun"
+  },
+  {
+    "itemId": "oc_0132",
+    "gappedSentence": "It’s not unusual ___ people to feel nervous before exams.",
+    "answer": "for",
+    "tags": "C1, prepositions, for + noun"
+  },
+  {
+    "itemId": "oc_0133",
+    "gappedSentence": "___ confident in one’s work does not mean one must be arrogant.",
+    "answer": "Being",
+    "tags": "C1, gerunds, verbs, auxiliaries"
+  },
+  {
+    "itemId": "oc_0134",
+    "gappedSentence": "You should proofread your own work several times, ___ as to be sure of its quality.",
+    "answer": "so",
+    "tags": "C1, linking, purpose, formal"
+  },
+  {
+    "itemId": "oc_0135",
+    "gappedSentence": "She chose to wait ___ than rush into a decision.",
+    "answer": "rather",
+    "tags": "C1, adverbs, linking"
+  },
+  {
+    "itemId": "oc_0136",
+    "gappedSentence": "Many workers suffer from stress as a direct ___ of overwork.",
+    "answer": [
+      "result",
+      "consequence"
+    ],
+    "tags": "C2, linking, nouns"
+  },
+  {
+    "itemId": "oc_0137",
+    "gappedSentence": "He can’t speak French, ___ alone write it.",
+    "answer": "let",
+    "tags": "C2, idioms, emphasis, fixed phrase"
+  },
+  {
+    "itemId": "oc_0138",
+    "gappedSentence": "___ needs our immediate attention is the insufficient budget provided.",
+    "answer": "What",
+    "tags": "C1, relative clauses, cleft sentences"
+  },
+  {
+    "itemId": "oc_0139",
+    "gappedSentence": "We made a few changes with ___ in mind.",
+    "answer": [
+      "this",
+      "that"
+    ],
+    "tags": "C1, demonstratives, pronouns"
+  },
+  {
+    "itemId": "oc_0140",
+    "gappedSentence": "You can always reevaluate your life views, _______ deep-seated your cultural roots.",
+    "answer": "however",
+    "tags": "C2, adverbs, contrast, discourse markers"
+  },
+  {
+    "itemId": "oc_0141",
+    "gappedSentence": "The scientist described a technique ___ improves memory in rats.",
+    "answer": [
+      "which",
+      "that"
+    ],
+    "tags": "B1, relative pronouns, pronouns"
+  },
+  {
+    "itemId": "oc_0142",
+    "gappedSentence": "___ was during the pandemic that many people started working from home.",
+    "answer": "It",
+    "tags": "B2, cleft sentences, pronouns, personal pronouns"
+  },
+  {
+    "itemId": "oc_0143",
+    "gappedSentence": "She formed an immediate attachment ___ the small group of volunteers.",
+    "answer": "to",
+    "tags": "c1, dependent prepositions, noun + preposition"
+  },
+  {
+    "itemId": "oc_0144",
+    "gappedSentence": "No ___ had I left the building than the fire alarm went off.",
+    "answer": "sooner",
+    "tags": "C2, inversion, negative adverbials, emphasis"
+  },
+  {
+    "itemId": "oc_0145",
+    "gappedSentence": "They changed the layout in ___ to make it more accessible.",
+    "answer": "order",
+    "tags": "C1, purpose, linking, prepositional phrases"
+  },
+  {
+    "itemId": "oc_0146",
+    "gappedSentence": "___ this process go wrong, there’s no knowing what may happen.",
+    "answer": [
+      "Should"
+    ],
+    "tags": "C2, inversion, conditionals, modal verbs"
+  },
+  {
+    "itemId": "oc_0147",
+    "gappedSentence": "In such hazardous conditions, climbers are likely to ____ to harm",
+    "answer": "come",
+    "tags": "C2, fixed phrases, verbs, idioms"
+  },
+  {
+    "itemId": "oc_0148",
+    "gappedSentence": "Given ___ the deadline is so tight, we’ll need to start now.",
+    "answer": "that",
+    "tags": "C2, conjunctions, reason, lining"
+  },
+  {
+    "itemId": "oc_0149",
+    "gappedSentence": "They managed to complete the work ___ any outside help.",
+    "answer": "without",
+    "tags": "C1, prepositions, negation"
+  },
+  {
+    "itemId": "oc_0150",
+    "gappedSentence": "The whole interview was over in ___ matter of minutes.",
+    "answer": "a",
+    "tags": "c1, adverbs, emphasis"
+  },
+  {
+    "itemId": "oc_0151",
+    "gappedSentence": "If you heat the metal, it ___ expand.",
+    "answer": "will",
+    "tags": "B1, modal verbs, conditionals"
+  },
+  {
+    "itemId": "oc_0152",
+    "gappedSentence": "You can use ___ as a password if it’s secure enough.",
+    "answer": "anything",
+    "tags": "B2, pronouns, indefinite pronouns"
+  },
+  {
+    "itemId": "oc_0153",
+    "gappedSentence": "___ it happens to be somebody we know, our reactions are quite different.",
+    "answer": [
+      "if",
+      "when"
+    ],
+    "tags": "B2, conjunctions, conditionals"
+  },
+  {
+    "itemId": "oc_0154",
+    "gappedSentence": "If you are not cautious, you ___ the risk of becoming lost with little chance of rescue.",
+    "answer": [
+      "run",
+      "face"
+    ],
+    "tags": "C2, verbs, idioms, fixed phrases"
+  }
+]

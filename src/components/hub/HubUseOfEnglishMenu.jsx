@@ -45,6 +45,13 @@ export default function HubUseOfEnglishMenu() {
           </p>
         </button>
 
+        <button className="menu-card" onClick={() => navigate(getSitePath("/use-of-english/open-cloze"))}>
+          <h3>Open Cloze</h3>
+          <p>
+            Fill each gap with the word that fits naturally and practise the grammar, linking, and functional language that ties a text together.
+          </p>
+        </button>
+
         <button className="menu-card" onClick={() => navigate(getSitePath("/use-of-english/word-formation"))}>
           <h3>Word Formation</h3>
           <p>
@@ -157,7 +164,7 @@ export default function HubUseOfEnglishMenu() {
 
         .hub-menu-wrapper .menu-grid {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 1rem;
         }
 
@@ -204,6 +211,12 @@ export default function HubUseOfEnglishMenu() {
 
           .hub-menu-wrapper .menu-grid {
             grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 980px) and (min-width: 721px) {
+          .hub-menu-wrapper .menu-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
         }
       `}</style>

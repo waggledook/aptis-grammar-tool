@@ -7,7 +7,13 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "content:export:keyword": "node scripts/export-keyword-content.mjs",
+    "content:export:opencloze": "node scripts/export-open-cloze-content.mjs",
+    "content:export:wordformation": "node scripts/export-word-formation-content.mjs",
+    "content:sync:keyword": "node scripts/sync-keyword-content.mjs",
+    "content:sync:opencloze": "node scripts/sync-open-cloze-content.mjs",
+    "content:sync:wordformation": "node scripts/sync-word-formation-content.mjs"
   },
   "dependencies": {
     "firebase": "^12.0.0",

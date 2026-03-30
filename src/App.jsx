@@ -89,6 +89,7 @@ import HubListeningMenu from "./components/hub/HubListeningMenu.jsx";
 import HubDictationTrainer from "./components/hub/HubDictationTrainer.jsx";
 import HubUseOfEnglishMenu from "./components/hub/HubUseOfEnglishMenu.jsx";
 import HubKeywordTrainer from "./components/hub/HubKeywordTrainer.jsx";
+import HubOpenClozeTrainer from "./components/hub/HubOpenClozeTrainer.jsx";
 import HubWordFormationTrainer from "./components/hub/HubWordFormationTrainer.jsx";
 import HubVocabularyMenu from "./components/hub/HubVocabularyMenu.jsx";
 import HubGamesMenu from "./components/hub/HubGamesMenu.jsx";
@@ -473,6 +474,7 @@ return (
 
   <Route path="/use-of-english" element={<HubUseOfEnglishMenu />} />
   <Route path="/use-of-english/keyword" element={<HubKeywordTrainer />} />
+  <Route path="/use-of-english/open-cloze" element={<HubOpenClozeTrainer />} />
   <Route path="/use-of-english/word-formation" element={<HubWordFormationTrainer />} />
   <Route path="/games" element={<HubGamesMenu />} />
   <Route path="/games/leaderboards" element={<HubGameLeaderboards user={user} />} />

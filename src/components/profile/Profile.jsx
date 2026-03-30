@@ -111,6 +111,12 @@ export default function Profile({
     total: 0,
     byLevel: { b1: { answered: 0, total: 0 }, b2: { answered: 0, total: 0 }, c1: { answered: 0, total: 0 }, c2: { answered: 0, total: 0 } },
   });
+  const [hubOpenClozeDash, setHubOpenClozeDash] = useState({
+    answered: 0,
+    correct: 0,
+    total: 0,
+    byLevel: { b1: { answered: 0, total: 0 }, b2: { answered: 0, total: 0 }, c1: { answered: 0, total: 0 }, c2: { answered: 0, total: 0 } },
+  });
 
 
   const TOTAL_VOCAB_SETS = getTotalVocabSets();
@@ -251,6 +257,7 @@ const handleChangePassword = async (e) => {
           hubGrammarSubs,
           keywordDash,
           wordFormationDash,
+          openClozeDash,
         ] = await Promise.all([
           fb.fetchReadingCounts?.(uid) ?? Promise.resolve({ part2: 0, part3: 0, part4: 0 }),
           fb.fetchSpeakingCounts(uid),
@@ -270,6 +277,7 @@ const handleChangePassword = async (e) => {
           fb.fetchHubGrammarSubmissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchHubKeywordDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
           fb.fetchHubWordFormationDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
+          fb.fetchHubOpenClozeDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
         ]);  
   
         if (!alive) return;
@@ -291,6 +299,7 @@ const handleChangePassword = async (e) => {
         setHubGrammarSubmissions(hubGrammarSubs || []);
         setHubKeywordDash(keywordDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
         setHubWordFormationDash(wordFormationDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
+        setHubOpenClozeDash(openClozeDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
       } catch (e) {
         console.error("[Profile] load failed", e);
         toast("Couldn’t load some profile data.");
@@ -846,7 +855,7 @@ const totalListeningTasks =
     </h3>
 
     <span className="muted small" style={{ flexShrink: 0 }}>
-      {(hubKeywordDash.answered || 0) + (hubWordFormationDash.answered || 0)} items attempted
+      {(hubKeywordDash.answered || 0) + (hubOpenClozeDash.answered || 0) + (hubWordFormationDash.answered || 0)} items attempted
     </span>
 
     <span className={`chev ${showUseOfEnglishPanel ? "open" : ""}`} aria-hidden>
@@ -861,6 +870,15 @@ const totalListeningTasks =
         dash={hubKeywordDash}
         onReviewMistakes={() => navigate(getSitePath("/use-of-english/keyword?mode=mistakes"))}
         onReviewFavourites={() => navigate(getSitePath("/use-of-english/keyword?mode=favourites"))}
+      />
+
+      <div style={{ height: 12 }} />
+
+      <HubUseOfEnglishProfileCard
+        title="Open Cloze"
+        dash={hubOpenClozeDash}
+        onReviewMistakes={() => navigate(getSitePath("/use-of-english/open-cloze?mode=mistakes"))}
+        onReviewFavourites={() => navigate(getSitePath("/use-of-english/open-cloze?mode=favourites"))}
       />
 
       <div style={{ height: 12 }} />

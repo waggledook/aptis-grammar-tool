@@ -50,12 +50,32 @@ function getProgressPercent(points) {
   return ((points - PHASE_MIN_SCORE) / (PHASE_MAX_SCORE - PHASE_MIN_SCORE)) * 100;
 }
 
+function replaySound(audioRef) {
+  const audio = audioRef?.current;
+  if (!audio) return;
+  try {
+    audio.pause();
+    audio.currentTime = 0;
+  } catch {
+    // Ignore reset failures and still attempt playback.
+  }
+  audio.play().catch(() => {});
+}
+
 export default function HubSpanglishFixIt({ user }) {
   const navigate = useNavigate();
   const answerRef = useRef(null);
   const timerRef = useRef(null);
+  const nextTimeoutRef = useRef(null);
   const phaseStartRef = useRef(0);
+  const startAudioRef = useRef(null);
+  const correctAudioRef = useRef(null);
+  const incorrectAudioRef = useRef(null);
+  const summaryAudioRef = useRef(null);
+  const finishAudioRef = useRef(null);
+  const submitLockedRef = useRef(false);
   const savedScoreRef = useRef(false);
+  const summarySoundPlayedRef = useRef(false);
   const activityLoggedRef = useRef({
     normalStarted: false,
     reviewStarted: false,
@@ -101,9 +121,18 @@ export default function HubSpanglishFixIt({ user }) {
     }
   }
 
+  function clearNextTimeout() {
+    if (nextTimeoutRef.current) {
+      window.clearTimeout(nextTimeoutRef.current);
+      nextTimeoutRef.current = null;
+    }
+  }
+
   function startPhaseTimer(nextPhase) {
     stopPhaseTimer();
+    clearNextTimeout();
     phaseStartRef.current = Date.now();
+    submitLockedRef.current = false;
     setPhase(nextPhase);
     setPhasePoints(PHASE_MAX_SCORE);
     setPhaseRunKey((current) => current + 1);
@@ -115,6 +144,8 @@ export default function HubSpanglishFixIt({ user }) {
   }
 
   function resetForCurrentSentence() {
+    clearNextTimeout();
+    submitLockedRef.current = false;
     setSelectedWord("");
     setAnswer("");
     setRevealedCorrectWord("");
@@ -136,7 +167,10 @@ export default function HubSpanglishFixIt({ user }) {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
-    return () => stopPhaseTimer();
+    return () => {
+      stopPhaseTimer();
+      clearNextTimeout();
+    };
   }, []);
 
   useEffect(() => {
@@ -163,9 +197,16 @@ export default function HubSpanglishFixIt({ user }) {
   }, [user?.uid]);
 
   useEffect(() => {
+    if (!showSummary || summarySoundPlayedRef.current) return;
+    summarySoundPlayedRef.current = true;
+    replaySound(summaryAudioRef);
+  }, [showSummary]);
+
+  useEffect(() => {
     if (!showSummary || reviewMode || savedScoreRef.current || !user?.uid || score <= 0) return;
 
     savedScoreRef.current = true;
+    const wasNewBest = score > (myTopScores[0]?.score ?? 0);
     saveHubGameScore(GAME_ID, score, {
       totalItems: currentSet.length,
       wrongAnswers: wrongAnswers.length,
@@ -177,11 +218,14 @@ export default function HubSpanglishFixIt({ user }) {
         ]);
         setGlobalLeaderboard(global);
         setMyTopScores(personal);
+        if (wasNewBest) {
+          replaySound(finishAudioRef);
+        }
       })
       .catch((error) => {
         console.error("[HubSpanglishFixIt] leaderboard save failed", error);
       });
-  }, [showSummary, reviewMode, score, user?.uid, currentSet.length, wrongAnswers.length]);
+  }, [showSummary, reviewMode, score, user?.uid, currentSet.length, wrongAnswers.length, myTopScores]);
 
   useEffect(() => {
     if (!showSummary || reviewMode || activityLoggedRef.current.completed) return;
@@ -209,6 +253,7 @@ export default function HubSpanglishFixIt({ user }) {
       savedScoreRef.current = false;
       activityLoggedRef.current.completed = false;
     }
+    summarySoundPlayedRef.current = false;
     const source =
       mode === "review"
         ? shuffle(wrongAnswers)
@@ -229,6 +274,7 @@ export default function HubSpanglishFixIt({ user }) {
     setCurrentIndex(0);
     setPhase("idle");
     setPhasePoints(PHASE_MAX_SCORE);
+    replaySound(startAudioRef);
 
     if (mode === "review") {
       activityLoggedRef.current.reviewStarted = true;
@@ -264,6 +310,7 @@ export default function HubSpanglishFixIt({ user }) {
       if (!reviewMode) {
         setScore((s) => s + clickScore);
       }
+      replaySound(correctAudioRef);
       setFeedback({
         tone: "ok",
         text: `Nice spot. You selected "${word}". Now type the correction.`,
@@ -276,6 +323,7 @@ export default function HubSpanglishFixIt({ user }) {
           return [...current, currentItem];
         });
       }
+      replaySound(incorrectAudioRef);
       setFeedback({
         tone: "bad",
         text: `That wasn’t the target word. The incorrect word is "${currentItem.errorWord}". Now type the correction.`,
@@ -288,6 +336,8 @@ export default function HubSpanglishFixIt({ user }) {
 
   function moveNext() {
     stopPhaseTimer();
+    clearNextTimeout();
+    submitLockedRef.current = false;
     if (currentIndex + 1 >= currentSet.length) {
       setShowSummary(true);
       setStarted(false);
@@ -304,9 +354,11 @@ export default function HubSpanglishFixIt({ user }) {
       setFeedback({ tone: "bad", text: "Click the wrong word before you type the correction." });
       return;
     }
-    if (phase !== "correction") return;
+    if (phase !== "correction" || submitLockedRef.current) return;
 
+    submitLockedRef.current = true;
     stopPhaseTimer();
+    setPhase("locked");
 
     const normalizedAnswer = normalizeWord(answer);
     const accepted = currentItem.correctAnswers.map(normalizeWord);
@@ -317,11 +369,12 @@ export default function HubSpanglishFixIt({ user }) {
       if (!reviewMode) {
         setScore((s) => s + correctionScore);
       }
+      replaySound(correctAudioRef);
       setFeedback({
         tone: "ok",
         text: `Correct. Accepted answer${currentItem.correctAnswers.length > 1 ? "s" : ""}: ${currentItem.correctAnswers.join(" / ")}.`,
       });
-      window.setTimeout(moveNext, 900);
+      nextTimeoutRef.current = window.setTimeout(moveNext, 900);
       return;
     }
 
@@ -332,11 +385,12 @@ export default function HubSpanglishFixIt({ user }) {
         return [...current, currentItem];
       });
     }
+    replaySound(incorrectAudioRef);
     setFeedback({
       tone: "bad",
       text: `Not quite. Accepted answer${currentItem.correctAnswers.length > 1 ? "s" : ""}: ${currentItem.correctAnswers.join(" / ")}.`,
     });
-    window.setTimeout(moveNext, 1100);
+    nextTimeoutRef.current = window.setTimeout(moveNext, 1100);
   }
 
   async function handleHostLiveGame() {
@@ -548,6 +602,12 @@ export default function HubSpanglishFixIt({ user }) {
           </div>
         </div>
       )}
+
+      <audio ref={startAudioRef} src="/sounds/game_start.mp3" preload="auto" />
+      <audio ref={correctAudioRef} src="/sounds/correct.mp3" preload="auto" />
+      <audio ref={incorrectAudioRef} src="/sounds/incorrect.mp3" preload="auto" />
+      <audio ref={summaryAudioRef} src="/sounds/whoosh.mp3" preload="auto" />
+      <audio ref={finishAudioRef} src="/sounds/finish.mp3" preload="auto" />
 
       <style>{`
         .hub-spanglish-shell {

@@ -51,6 +51,9 @@ const typeLabels = {
   hub_keyword_started: "Hub keyword started",
   hub_keyword_review_loaded: "Hub keyword review loaded",
   hub_keyword_completed: "Hub keyword completed",
+  hub_open_cloze_started: "Hub open cloze started",
+  hub_open_cloze_review_loaded: "Hub open cloze review loaded",
+  hub_open_cloze_completed: "Hub open cloze completed",
   hub_word_formation_started: "Hub word formation started",
   hub_word_formation_review_loaded: "Hub word formation review loaded",
   hub_word_formation_completed: "Hub word formation completed",
@@ -280,6 +283,15 @@ case "hub_keyword_review_loaded":
   return `${d.mode || "review"} · ${d.total ?? "?"} item${d.total === 1 ? "" : "s"}`;
 
 case "hub_keyword_completed":
+  return `${d.mode || "normal"} · ${d.correct ?? "?"}/${d.total ?? "?"} correct`;
+
+case "hub_open_cloze_started":
+  return `${d.mode || "normal"} · pool ${d.poolSize ?? "?"} · set ${d.total ?? "?"}`;
+
+case "hub_open_cloze_review_loaded":
+  return `${d.mode || "review"} · ${d.total ?? "?"} item${d.total === 1 ? "" : "s"}`;
+
+case "hub_open_cloze_completed":
   return `${d.mode || "normal"} · ${d.correct ?? "?"}/${d.total ?? "?"} correct`;
 
 case "hub_word_formation_started":
@@ -540,6 +552,9 @@ const [cursorDoc, setCursorDoc] = useState(null);
             <option value="hub_dependent_preps_started">Hub dependent preps started</option>
             <option value="hub_dependent_preps_review_started">Hub dependent preps review started</option>
             <option value="hub_dependent_preps_completed">Hub dependent preps completed</option>
+            <option value="hub_open_cloze_started">Hub open cloze started</option>
+            <option value="hub_open_cloze_review_loaded">Hub open cloze review loaded</option>
+            <option value="hub_open_cloze_completed">Hub open cloze completed</option>
             <option value="speaking_task_completed">Speaking task completed</option>
             <option value="vocab_flashcards_session">Vocab flashcards</option>
             <option value="vocab_match_session">Vocab match</option>

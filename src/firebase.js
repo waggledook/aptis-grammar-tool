@@ -573,6 +573,27 @@ export async function logHubWordFormationCompleted(details = {}) {
   });
 }
 
+export async function logHubOpenClozeStarted(details = {}) {
+  return logActivity("hub_open_cloze_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubOpenClozeReviewLoaded(details = {}) {
+  return logActivity("hub_open_cloze_review_loaded", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubOpenClozeCompleted(details = {}) {
+  return logActivity("hub_open_cloze_completed", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
 export async function logHubFlashcardsStarted(details = {}) {
   return logActivity("hub_flashcards_started", {
     app: "seifhub",
@@ -1124,6 +1145,15 @@ export async function fetchKeywordTransformations() {
   return Array.isArray(data.list) ? data.list : [];
 }
 
+export async function fetchOpenClozeItems() {
+  const ref = doc(db, "masterOpenCloze", "all");
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return [];
+
+  const data = snap.data() || {};
+  return Array.isArray(data.list) ? data.list : [];
+}
+
 export async function saveHubKeywordResult(itemId, tags, isCorrect) {
   const uid = auth.currentUser?.uid;
   if (!uid || !itemId) return;
@@ -1203,6 +1233,87 @@ export async function fetchSeenHubKeywordItemIds(uid) {
 
   const snap = await getDocs(collection(db, "users", realUid, "hubKeywordProgress"));
   return snap.docs.map((d) => d.id);
+}
+
+export async function saveHubOpenClozeResult(itemId, tags, isCorrect) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  const ref = doc(db, "users", uid, "hubOpenClozeProgress", itemId);
+  await setDoc(
+    ref,
+    {
+      itemId,
+      tags: tags || "",
+      attempts: increment(1),
+      everCorrect: isCorrect ? true : increment(0),
+      lastCorrect: !!isCorrect,
+      lastAnsweredAt: serverTimestamp(),
+      app: "seifhub",
+    },
+    { merge: true }
+  );
+}
+
+export async function fetchSeenHubOpenClozeItemIds(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubOpenClozeProgress"));
+  return snap.docs.map((d) => d.id);
+}
+
+export async function fetchHubOpenClozeDashboard(uid) {
+  const realUid = _uidOrCurrent(uid);
+  const items = await fetchOpenClozeItems();
+  const totalsByLevel = { b1: 0, b2: 0, c1: 0, c2: 0 };
+
+  items.forEach((item) => {
+    const tags = String(item.tags || "")
+      .split(",")
+      .map((s) => s.trim().toLowerCase());
+    ["b1", "b2", "c1", "c2"].forEach((level) => {
+      if (tags.includes(level)) totalsByLevel[level] += 1;
+    });
+  });
+
+  if (!realUid) {
+    return {
+      answered: 0,
+      correct: 0,
+      total: items.length,
+      byLevel: Object.fromEntries(
+        Object.entries(totalsByLevel).map(([level, total]) => [level, { answered: 0, correct: 0, total }])
+      ),
+    };
+  }
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubOpenClozeProgress"));
+  let answered = 0;
+  let correct = 0;
+  const byLevel = {
+    b1: { answered: 0, correct: 0, total: totalsByLevel.b1 },
+    b2: { answered: 0, correct: 0, total: totalsByLevel.b2 },
+    c1: { answered: 0, correct: 0, total: totalsByLevel.c1 },
+    c2: { answered: 0, correct: 0, total: totalsByLevel.c2 },
+  };
+
+  snap.forEach((docSnap) => {
+    answered += 1;
+    const data = docSnap.data() || {};
+    if (data.everCorrect) correct += 1;
+    const tags = String(data.tags || "")
+      .split(",")
+      .map((s) => s.trim().toLowerCase());
+    ["b1", "b2", "c1", "c2"].forEach((level) => {
+      if (tags.includes(level)) {
+        byLevel[level].answered += 1;
+        if (data.everCorrect) byLevel[level].correct += 1;
+      }
+    });
+  });
+
+  return { answered, correct, total: items.length, byLevel };
 }
 
 export async function fetchWordFormationItems() {
@@ -1344,6 +1455,83 @@ export async function fetchHubWordFormationFavourites(uid) {
   if (!realUid) return [];
 
   const snap = await getDocs(collection(db, "users", realUid, "hubWordFormationFavourites"));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function fetchHubOpenClozeFavourites(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubOpenClozeFavourites"));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveHubOpenClozeFavourite(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  const ref = doc(db, "users", uid, "hubOpenClozeFavourites", item.itemId);
+  await setDoc(
+    ref,
+    {
+      ...item,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      app: "seifhub",
+    },
+    { merge: true }
+  );
+}
+
+export async function removeHubOpenClozeFavourite(itemId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  await deleteDoc(doc(db, "users", uid, "hubOpenClozeFavourites", itemId));
+}
+
+export async function recordHubOpenClozeMistake(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  await addDoc(collection(db, "users", uid, "hubOpenClozeMistakes"), {
+    ...item,
+    app: "seifhub",
+    createdAt: serverTimestamp(),
+  });
+}
+
+export async function clearHubOpenClozeMistakes(itemId, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !itemId) return;
+
+  const snap = await getDocs(
+    query(
+      collection(db, "users", realUid, "hubOpenClozeMistakes"),
+      where("itemId", "==", itemId)
+    )
+  );
+
+  await Promise.all(snap.docs.map((entry) => deleteDoc(entry.ref)));
+}
+
+export async function fetchHubOpenClozeMistakes(n = 15, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "hubOpenClozeMistakes"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
   return snap.docs.map((d) => ({
     id: d.id,
     ...d.data(),

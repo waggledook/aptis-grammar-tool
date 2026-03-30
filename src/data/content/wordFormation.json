@@ -1,0 +1,2840 @@
+[
+  {
+    "itemId": "0hhZM9o3MDrSbfWcV6Ki",
+    "gappedSentence": "The child’s legal ______ was present during the interview.",
+    "base": "GUARD",
+    "answer": "guardian",
+    "tags": "B2, nouns, people, suffix -ian"
+  },
+  {
+    "itemId": "0JZGnNeGxhKvkGHmUnWV",
+    "gappedSentence": "The person at fault will remain ______ at this time.",
+    "base": "NAME",
+    "answer": "nameless",
+    "tags": "C1, adjectives, negative, suffix -less, ful/less"
+  },
+  {
+    "itemId": "0NypCKaRmQfe6jKJjU5a",
+    "gappedSentence": "His arguments were not ______ developed in the essay.",
+    "base": "SUFFICE",
+    "answer": "sufficiently",
+    "tags": "C1, adverbs, suffix -ent, formal"
+  },
+  {
+    "itemId": "0SiwVFtFz2x2gOQqYXNA",
+    "gappedSentence": "His clothes were far too bright and ______ for the occasion.",
+    "base": "FLASH",
+    "answer": "flashy",
+    "tags": "C1, adjectives, suffix -y"
+  },
+  {
+    "itemId": "0ZCFwiRZA1sPgMCc5NuP",
+    "gappedSentence": "The painting ______ various features of her signature styles",
+    "base": "CORPORATE",
+    "answer": "incorporated",
+    "tags": "C1, past participles, participles, prefixes"
+  },
+  {
+    "itemId": "178UeTBS7SZBhnhJjygL",
+    "gappedSentence": "The elephant is a ______ animal in both size and strength.",
+    "base": "MASS",
+    "answer": "massive",
+    "tags": "B2, adjectives, suffix -ive"
+  },
+  {
+    "itemId": "1CsHoD21Ay7E5w5pwuDY",
+    "gappedSentence": "His sudden ______ shocked everyone in the office.",
+    "base": "ABSENT",
+    "answer": "absence",
+    "tags": "B2, nouns, abstract nouns, suffix -ence, ence/ance"
+  },
+  {
+    "itemId": "1eq7wvVLsJrUUfN4zuuS",
+    "gappedSentence": "The article was of such high quality that the editor left it completely _____.",
+    "base": "MODIFY",
+    "answer": "unmodified",
+    "tags": "C1, adjectives, past participles, negative, prefixes, participles, verb forms"
+  },
+  {
+    "itemId": "1g0mvoRyOMJx7barSQwK",
+    "gappedSentence": "They spent a ______ weekend in the countryside.",
+    "base": "ROMANCE",
+    "answer": "romantic",
+    "tags": "B1, adjectives, suffix -ic"
+  },
+  {
+    "itemId": "1KjlBj0rsY7CSZpSu096",
+    "gappedSentence": "She receives a monthly ______ from her parents to help with living expenses.",
+    "base": "ALLOW",
+    "answer": "allowance",
+    "tags": "B2, nouns, abstract nouns, suffix -ance"
+  },
+  {
+    "itemId": "1Wp0alKL7iEclcsyOxL4",
+    "gappedSentence": "The island had been ______ by humans for thousands of years.",
+    "base": "HABIT",
+    "answer": "inhabited",
+    "tags": "C1, verbs, past participles, adjectives, participles"
+  },
+  {
+    "itemId": "2LSGxB685Tz2NwtpPkBj",
+    "gappedSentence": "I lay awake all night, completely ______.",
+    "base": "REST",
+    "answer": "restless",
+    "tags": "C1, adjectives, negative, personality, ful/less, suffix -less"
+  },
+  {
+    "itemId": "2nS0ZentoslYyUk1Dt3M",
+    "gappedSentence": "Their views turned out to be completely ______.",
+    "base": "SIMILAR",
+    "answer": "dissimilar",
+    "tags": "C1, adjectives, negative, prefixes"
+  },
+  {
+    "itemId": "2y9Qja759RFuMH964Vz0",
+    "gappedSentence": "That isn’t ______ true — it depends on the situation.",
+    "base": "NECESSARY",
+    "answer": "necessarily",
+    "tags": "B2, adverbs"
+  },
+  {
+    "itemId": "2ZMqjbHF9fOccww3OTtT",
+    "gappedSentence": "Whether the claim is true is still ______.",
+    "base": "DEBATE",
+    "answer": "debatable",
+    "tags": "B2, adjectives, able/ible, suffix -able"
+  },
+  {
+    "itemId": "3l2mOgy2EICE50LtOTLb",
+    "gappedSentence": "These tendencies are _____ of serious addiction.",
+    "base": "SYMPTOM",
+    "answer": "symptomatic",
+    "tags": "C2, adjectives, suffix -ic"
+  },
+  {
+    "itemId": "3PCSa0pz3RvO5qGH5hR0",
+    "gappedSentence": "The museum was full of artefacts studied by famous ______.",
+    "base": "HISTORY",
+    "answer": "historians",
+    "tags": "B2, nouns, people, plural, suffix -ian"
+  },
+  {
+    "itemId": "3qIWwfmhDoW93WdLOXJZ",
+    "gappedSentence": "She claimed to be a direct ______ of the famous explorer.",
+    "base": "DESCEND",
+    "answer": "descendant",
+    "tags": "C1, nouns, people, suffix -ant"
+  },
+  {
+    "itemId": "3uIfT03vE2duGuYamqII",
+    "gappedSentence": "Waiting lists for such operations have become ____ longer.",
+    "base": "PROGRESS",
+    "answer": "progressively",
+    "tags": "C1, adverbs, suffix -ive"
+  },
+  {
+    "itemId": "3ypUgf4haSjUtGF7laX8",
+    "gappedSentence": "She has shown incredible ______ throughout the crisis.",
+    "base": "STRONG",
+    "answer": "strength",
+    "tags": "B2, nouns, abstract nouns, irregular nouns, irregular"
+  },
+  {
+    "itemId": "4AeCINejgh5s5c1AM2uu",
+    "gappedSentence": "The movers were instructed to report any ______ during transport.",
+    "base": "BREAK",
+    "answer": "breakages",
+    "tags": "C2, nouns, plural, suffix -age"
+  },
+  {
+    "itemId": "4CjEpzbxP3fM6jCZFN0a",
+    "gappedSentence": "The military's resources were gradually ______ over the years.",
+    "base": "STRONG",
+    "answer": "strengthened",
+    "tags": "C1, verbs, past participles, verb formation, suffix -en"
+  },
+  {
+    "itemId": "4dhQvRqz5DdZRUA0WzWD",
+    "gappedSentence": "The country is proud of its cultural ______.",
+    "base": "DIVERSE",
+    "answer": "diversity",
+    "tags": "B2, nouns, abstract nouns, suffix -ity"
+  },
+  {
+    "itemId": "4hdKAzkYIAhxTjvWn6ly",
+    "gappedSentence": "The ______ panicked when the housing market crashed.",
+    "base": "SPECULATE",
+    "answer": [
+      "speculator",
+      "speculators"
+    ],
+    "tags": "C1, nouns, people, suffix -or"
+  },
+  {
+    "itemId": "586WjJuwZv4D5tUHFNIB",
+    "gappedSentence": "The article revealed several common ______ about the disease.",
+    "base": "CONCEPT",
+    "answer": "misconceptions",
+    "tags": "C2, nouns, plural, negative, prefixes, suffix -ion"
+  },
+  {
+    "itemId": "5PwlAH75C2VDqttIlZPc",
+    "gappedSentence": "We need to find an ______ solution that doesn’t involve increasing costs.",
+    "base": "ALTERNATE",
+    "answer": "alternative",
+    "tags": "B2, adjectives, suffix -ive"
+  },
+  {
+    "itemId": "5rC8SdEEaTSkACKsBEn8",
+    "gappedSentence": "She received a formal ______ to attend the award ceremony.",
+    "base": "NOMINATE",
+    "answer": "nomination",
+    "tags": "B2, nouns, abstract nouns, suffix -ion"
+  },
+  {
+    "itemId": "63L1o8PccMRaiXanVVdo",
+    "gappedSentence": "The plan had several serious ______ that needed addressing.",
+    "base": "DRAW",
+    "answer": "drawbacks",
+    "tags": "C1, nouns, plural, compound nouns, negative"
+  },
+  {
+    "itemId": "6aWsKTekhziWRgGOWtMN",
+    "gappedSentence": "The team improved its ______ by using new software.",
+    "base": "EFFECT",
+    "answer": "efficiency",
+    "tags": "C1, nouns, abstract nouns, suffix -cy"
+  },
+  {
+    "itemId": "6INLXWuapixuo5ld2WBZ",
+    "gappedSentence": "The police are awaiting formal ______ of the suspect.",
+    "base": "IDENTITY",
+    "answer": "identification",
+    "tags": "B2, nouns, abstract nouns, formal, suffix -ion"
+  },
+  {
+    "itemId": "6kjdlF2IxKF8lDUZaC7u",
+    "gappedSentence": "The ______ music set the tone for the evening",
+    "base": "ATMOSPHERE",
+    "answer": "atmospheric",
+    "tags": "C1, adjectives, suffix -ic"
+  },
+  {
+    "itemId": "6L0BjHeLK6J3ECef8eEs",
+    "gappedSentence": "As a strict ______, she believed in enforcing rules to the letter.",
+    "base": "DISCIPLINE",
+    "answer": "disciplinarian",
+    "tags": "C2, nouns, people, suffix -ian"
+  },
+  {
+    "itemId": "6uoe2dnI0WK3ZuV2mJT5",
+    "gappedSentence": "The task was completed quickly and ______.",
+    "base": "EASY",
+    "answer": "easily",
+    "tags": "B2, adverbs, manner"
+  },
+  {
+    "itemId": "6xurQ53pXMRMjBRwdCM5",
+    "gappedSentence": "The report provided ______ evidence of corruption.",
+    "base": "SUBSTANCE",
+    "answer": "substantial",
+    "tags": "C1, adjectives, suffix -ial, cial/tial"
+  },
+  {
+    "itemId": "6ZmmO1fICGenkwLGKtUY",
+    "gappedSentence": "Valentine’s Day is popular among ______ who want to celebrate their relationship.",
+    "base": "LOVE",
+    "answer": "lovers",
+    "tags": "B1, nouns, people, suffix -er"
+  },
+  {
+    "itemId": "6ZYXwCPyqiowFmY4rbsB",
+    "gappedSentence": "The area has become a ______ location for families.",
+    "base": "DESIRE",
+    "answer": "desirable",
+    "tags": "B2, adjectives, able/ible, suffix -able"
+  },
+  {
+    "itemId": "7eSlrhL6MX79eFMlcWdk",
+    "gappedSentence": "The visit was completely ______ and caught everyone by surprise.",
+    "base": "ANNOUNCE",
+    "answer": "unannounced",
+    "tags": "C1, adjectives, prefixes, negative, participles, past participles"
+  },
+  {
+    "itemId": "7L0LbqXoVGH7iI2bcwVs",
+    "gappedSentence": "The file contains strictly ______ information and must not be shared.",
+    "base": "CONFIDENT",
+    "answer": "confidential",
+    "tags": "B2, adjectives, suffix -ial, cial/tial"
+  },
+  {
+    "itemId": "7T7GxwbBzT1Lg2iI0SSf",
+    "gappedSentence": "The plants need a certain level of ______ to grow properly.",
+    "base": "MOIST",
+    "answer": "moisture",
+    "tags": "C1, nouns, suffix -ure"
+  },
+  {
+    "itemId": "7W1M2UToOQHjp5BkxoSG",
+    "gappedSentence": "The forecast suggests ______ weather conditions next week.",
+    "base": "FAVOUR",
+    "answer": [
+      "unfavourable",
+      "unfavorable"
+    ],
+    "tags": "C1, adjectives, prefixes, negative, formal, suffix -able, able/ible"
+  },
+  {
+    "itemId": "81qoenDvZN4hW5pXctyD",
+    "gappedSentence": "It's ____ in Spain to stuff a stupid number of grapes into your mouth on New Year's Eve.",
+    "base": "CUSTOM",
+    "answer": "customary",
+    "tags": "C2, adjectives, suffix -ary"
+  },
+  {
+    "itemId": "8BnTZqCZRy3ZUUmkgI0d",
+    "gappedSentence": "The website is not ______ to users outside the EU.",
+    "base": "ACCESS",
+    "answer": "accessible",
+    "tags": "C1, adjectives, able/ible, suffix -ible"
+  },
+  {
+    "itemId": "8FdQz1lY90Qj4G43FlYU",
+    "gappedSentence": "After the nap, she felt much more ______.",
+    "base": "FRESH",
+    "answer": "refreshed",
+    "tags": "C2, adjectives, participles, past participles, prefixes"
+  },
+  {
+    "itemId": "8isTTXdjW0ZRd7aQ1BOq",
+    "gappedSentence": "The contract was signed but left completely ______ by the client.",
+    "base": "ANSWER",
+    "answer": "unanswered",
+    "tags": "C1, adjectives, prefixes, negative, participles, past participles"
+  },
+  {
+    "itemId": "8NZGbQFL5EASVVZrVsBf",
+    "gappedSentence": "Their personal ______ had a big impact on the project.",
+    "base": "RELATION",
+    "answer": [
+      "relationships",
+      "relationship"
+    ],
+    "tags": "B2, nouns, plural, suffix -ship"
+  },
+  {
+    "itemId": "8PTQ2yD4HVCQFSEhXGCS",
+    "gappedSentence": "The soldiers approached with ______ determination.",
+    "base": "FEAR",
+    "answer": "fearsome",
+    "tags": "C2, adjectives, suffix -some"
+  },
+  {
+    "itemId": "8Qj74r9H9Y5mmrD46If3",
+    "gappedSentence": "The summit was attended by political ______ from across the globe.",
+    "base": "LEAD",
+    "answer": "leaders",
+    "tags": "B1, nouns, people, plural, suffix -er"
+  },
+  {
+    "itemId": "8Zig2fiJpI6JFpdanQAX",
+    "gappedSentence": "The new system allows employees to work in a more ______ way.",
+    "base": "AUTONOMY",
+    "answer": "autonomous",
+    "tags": "C1, adjectives, suffix -ous, personality"
+  },
+  {
+    "itemId": "948RhC2JL4jaT6n2hSDW",
+    "gappedSentence": "She spoke ______, impressing everyone with her fluency.",
+    "base": "ELOQUENCE",
+    "answer": "eloquently",
+    "tags": "C1, adverbs, formal, suffix -ent"
+  },
+  {
+    "itemId": "9okrr0YPLcsnsJSsciA0",
+    "gappedSentence": "The food had an ______ aftertaste that lingered for hours.",
+    "base": "PLEASE",
+    "answer": "unpleasant",
+    "tags": "B2, adjectives, negative, prefixes, suffix -ant"
+  },
+  {
+    "itemId": "9tnEHuzBFti6b4b8VddQ",
+    "gappedSentence": "The discovery of water on the planet was highly ______.",
+    "base": "SIGNIFY",
+    "answer": "significant",
+    "tags": "B2, adjectives, suffix -ant"
+  },
+  {
+    "itemId": "a415MUFX4Zbz9oMGVWqs",
+    "gappedSentence": "The chef prepared a meal of ______ quality.",
+    "base": "PRESTIGE",
+    "answer": "prestigious",
+    "tags": "C1, adjectives, suffix -ous"
+  },
+  {
+    "itemId": "ahFsbxkbWE20OAd8mQtf",
+    "gappedSentence": "His influence has had a ______ impact on the community.",
+    "base": "LAST",
+    "answer": "lasting",
+    "tags": "B2, adjectives, participles, present participles"
+  },
+  {
+    "itemId": "AJsveHhlgvvKBX3mMHYo",
+    "gappedSentence": "Her ______ impressed the judges.",
+    "base": "PERFORM",
+    "answer": "performance",
+    "tags": "B1, nouns, suffix -ance, ence/ance"
+  },
+  {
+    "itemId": "amMQfx1S86twVwFHgjGh",
+    "gappedSentence": "The child’s ______ improved after taking part in group activities.",
+    "base": "BEHAVE",
+    "answer": [
+      "behaviour",
+      "behavior"
+    ],
+    "tags": "B2, nouns, abstract nouns, suffix -our"
+  },
+  {
+    "itemId": "Atsndgway0LDMrv5kPzj",
+    "gappedSentence": "There have been several ______ of this phenomenon in recent months.",
+    "base": "OCCUR",
+    "answer": "occurrences",
+    "tags": "B2, nouns, plural, abstract nouns, suffix -ence, ence/ance"
+  },
+  {
+    "itemId": "aUKMIq6atMUa2xB8DsDq",
+    "gappedSentence": "She gave an ______ description of her journey through the Andes.",
+    "base": "EXPAND",
+    "answer": "expansive",
+    "tags": "C2, adjectives, suffix -ive"
+  },
+  {
+    "itemId": "AuTUhcdbbrxNOAaAAn3p",
+    "gappedSentence": "Her success is ______ proof of her talent and work ethic.",
+    "base": "DISPUTE",
+    "answer": "indisputable",
+    "tags": "C2, adjectives, negative, prefixes, able/ible, suffix -able"
+  },
+  {
+    "itemId": "AwlvTQIK5PsETVHusRHk",
+    "gappedSentence": "The police arrested the suspected ______ after a long investigation.",
+    "base": "FRAUD",
+    "answer": "fraudster",
+    "tags": "C2, nouns, people, suffix -ster"
+  },
+  {
+    "itemId": "aZfhK0strZKlyoltavcd",
+    "gappedSentence": "The area experiences heavy ______ during the winter months.",
+    "base": "RAIN",
+    "answer": "rainfall",
+    "tags": "C1, nouns, compound nouns"
+  },
+  {
+    "itemId": "azNGyXH1yNme7IRiX6Ha",
+    "gappedSentence": "She kept the ______ of the novel in mind while writing the review.",
+    "base": "ENTIRE",
+    "answer": "entirety",
+    "tags": "C1, nouns, abstract nouns, formal, suffix -ty"
+  },
+  {
+    "itemId": "B7Y5hrX82H7kZ2R5ZaZa",
+    "gappedSentence": "She's very ______ and easily adjusts to new environments.",
+    "base": "ADAPT",
+    "answer": "adaptable",
+    "tags": "B2, adjectives, suffix -able, personality, ible/able"
+  },
+  {
+    "itemId": "BD2Ya5CwOazPQ5k2TZiP",
+    "gappedSentence": "New measures were introduced to ______ the impact of tourism.",
+    "base": "LESS",
+    "answer": "lessen",
+    "tags": "C1, verbs, irregular, verb formation, suffix -en"
+  },
+  {
+    "itemId": "bMBjq79MdFWwmmOrIiTR",
+    "gappedSentence": "The study was purely ______ and not intended for practical use.",
+    "base": "REFERENCE",
+    "answer": "referential",
+    "tags": "C2, adjectives, suffix -ial, cial/tial, formal"
+  },
+  {
+    "itemId": "BNjPnBQ0lbTFObCaC4eh",
+    "gappedSentence": "The author’s legacy was ______ by future generations.",
+    "base": "MORTAL",
+    "answer": "immortalised",
+    "tags": "C2, verbs, prefixes, negative, past participles, participles"
+  },
+  {
+    "itemId": "bPnFt1JHpE4Ujbx8f9YI",
+    "gappedSentence": "His brilliance as a performer makes him the ______ champion.",
+    "base": "DISPUTE",
+    "answer": "undisputed",
+    "tags": "C1, adjectives, negative, prefixes, participles, past participles"
+  },
+  {
+    "itemId": "bTst9Gbc3k83nDsgOknZ",
+    "gappedSentence": "The ritual required the ______ killing of animals.",
+    "base": "SACRIFICE",
+    "answer": "sacrificial",
+    "tags": "C1, adjectives, suffix -ial, cial/tial"
+  },
+  {
+    "itemId": "bu92782QdKlhecLZU4iN",
+    "gappedSentence": "Her donation was extremely generous and was going to a  ______ cause.",
+    "base": "WORTH",
+    "answer": "worthy",
+    "tags": "C1, adjectives, suffix -y"
+  },
+  {
+    "itemId": "BxHCTXMcVVBAaqeEZvBd",
+    "gappedSentence": "She was hired for her technical skills and ______ in the field.",
+    "base": "EXPERT",
+    "answer": "expertise",
+    "tags": "C1, nouns, abstract nouns, suffix -ise"
+  },
+  {
+    "itemId": "c1iaJGOW6fQ5QvWabhxg",
+    "gappedSentence": "That plan sounds good in theory, but it’s completely ______ in practice.",
+    "base": "WORK",
+    "answer": "unworkable",
+    "tags": "C2, adjectives, negative, prefixes, suffix -able, able/ible"
+  },
+  {
+    "itemId": "c4UohEMYynr7pEzo2iAR",
+    "gappedSentence": "They had to accept his version once he provided ______ evidence.",
+    "base": "REFUTE",
+    "answer": "irrefutable",
+    "tags": "C1, adjectives, negative, prefixes, suffix -able, formal, ible/able"
+  },
+  {
+    "itemId": "CFjwmh2vzsoOdqsodSFR",
+    "gappedSentence": "The ______ villages are popular weekend destinations.",
+    "base": "SURROUND",
+    "answer": "surrounding",
+    "tags": "C1, adjectives, present participles, participles"
+  },
+  {
+    "itemId": "ciNMVt2TGmDY1bnQYplG",
+    "gappedSentence": "The novel explores deep and ______ questions about life.",
+    "base": "PHILOSOPHY",
+    "answer": "philosophical",
+    "tags": "B2, adjectives, suffix -al"
+  },
+  {
+    "itemId": "cIupGZVifSv4RB2Mbtjb",
+    "gappedSentence": "The witness was admired for their honesty and ______.",
+    "base": "TRUE",
+    "answer": "truth",
+    "tags": "B2, nouns, suffix -th, irregular nouns"
+  },
+  {
+    "itemId": "cqZ0n0ZVijqnarmd00cJ",
+    "gappedSentence": "The meeting was organised for information ______ before the report.",
+    "base": "GATHER",
+    "answer": "gathering",
+    "tags": "C1, nouns, gerunds"
+  },
+  {
+    "itemId": "cswKeYUfhdR4fHoH4hFE",
+    "gappedSentence": "The project turned out to be highly ______ despite the challenges.",
+    "base": "SUCCESS",
+    "answer": "successful",
+    "tags": "B2, adjectives, suffix -ful, ful/less"
+  },
+  {
+    "itemId": "ctbmETeinhsBJw5rFNqN",
+    "gappedSentence": "______ , he was unaware of the mistake he had made.",
+    "base": "APPEAR",
+    "answer": "apparently",
+    "tags": "B2, adverbs, comment adverbs, suffix -ent"
+  },
+  {
+    "itemId": "DFVmjMlsxmJcj956XuwC",
+    "gappedSentence": "His comments were completely ______ to the topic being discussed.",
+    "base": "RELATE",
+    "answer": "unrelated",
+    "tags": "B2, adjectives, negative, prefixes, past participles, participles"
+  },
+  {
+    "itemId": "dI9oyPUG7QkGASWwSqi5",
+    "gappedSentence": "The bird suddenly dropped from a great ______.",
+    "base": "HIGH",
+    "answer": "height",
+    "tags": "B2, nouns, irregular, irregular nouns"
+  },
+  {
+    "itemId": "DJVbCZyNOf0WZMbvBYiK",
+    "gappedSentence": "The training course proved far more ______ than we had expected.",
+    "base": "WORTH",
+    "answer": "worthwhile",
+    "tags": "C1, adjectives, compound adjectives"
+  },
+  {
+    "itemId": "dmcZHQMPQxUDmBNjcKBg",
+    "gappedSentence": "The architecture of the city reflects its ______ organisation.",
+    "base": "SPACE",
+    "answer": "spatial",
+    "tags": "C1, adjectives, suffix -ial, cial/tial"
+  },
+  {
+    "itemId": "DMmNVTCyEJ0KpLlIxNUD",
+    "gappedSentence": "He gave a short but ______ speech thanking the volunteers.",
+    "base": "APPRECIATE",
+    "answer": "appreciative",
+    "tags": "C1, adjectives, suffix -ive, feelings"
+  },
+  {
+    "itemId": "Dp4lT9yEfhBtHJLblddu",
+    "gappedSentence": "He ______ brushed off the suggestion without explanation.",
+    "base": "DISMISS",
+    "answer": "dismissively",
+    "tags": "C1, adverbs, suffix -ive"
+  },
+  {
+    "itemId": "DSNYtBJk23P7Wixv5NKB",
+    "gappedSentence": "The town's ______ location makes it vulnerable to flooding.",
+    "base": "COAST",
+    "answer": "coastal",
+    "tags": "B2, adjectives, suffix -al"
+  },
+  {
+    "itemId": "DtVgZVvmCmYLTEssoqO8",
+    "gappedSentence": "It's universally accepted that humans are ______ of primates.",
+    "base": "DESCEND",
+    "answer": "descendants",
+    "tags": "C1, nouns, people, plural, suffix -ant"
+  },
+  {
+    "itemId": "DukvbmvA1sOmmgFH1uhX",
+    "gappedSentence": "His behaviour was absolutely ______, and I had to leave the room.",
+    "base": "BEAR",
+    "answer": "unbearable",
+    "tags": "B2, adjectives, prefixes, negative, able/ible, suffix -able"
+  },
+  {
+    "itemId": "DuzlOGwWNy21QYAtAE8Y",
+    "gappedSentence": "The company announced an ______ into the Asian market.",
+    "base": "EXPAND",
+    "answer": "expansion",
+    "tags": "B2, nouns, abstract nouns, singular, suffix -ion"
+  },
+  {
+    "itemId": "dzbABalPAZ2nF72zfGf7",
+    "gappedSentence": "The sound is almost _____ to the human ear.",
+    "base": "DETECT",
+    "answer": "undetectable/indetectable",
+    "tags": "C1, adjectives, negative, prefixes, suffix -able, ible/able"
+  },
+  {
+    "itemId": "DZtx9mzxJH3BmvQaNDph",
+    "gappedSentence": "They finally found a ______ to the long-standing problem.",
+    "base": "SOLVE",
+    "answer": "solution",
+    "tags": "B1, nouns, abstract, suffix -ion"
+  },
+  {
+    "itemId": "E4S770ujNQwPMkkx9XxM",
+    "gappedSentence": "Although popular today, the sport was ______ developed for military purposes.",
+    "base": "ORIGIN",
+    "answer": "originally",
+    "tags": "B2, adverbs, time expressions, suffix -al"
+  },
+  {
+    "itemId": "ecSQI1l2yb21QP47SthP",
+    "gappedSentence": "The room was filled with colourful ______.",
+    "base": "DECORATE",
+    "answer": "decoration/decorations",
+    "tags": "B1, nouns, suffix -ion"
+  },
+  {
+    "itemId": "ED8iad0ZvdtAaQ0O7C2Z",
+    "gappedSentence": "His actions were criticised as deeply ______ by the media.",
+    "base": "ETHIC",
+    "answer": "unethical",
+    "tags": "C1, adjectives, negative, prefixes, suffix -al"
+  },
+  {
+    "itemId": "eeFOHfrI6teTBQx6aUGz",
+    "gappedSentence": "His performance in the use of English was absolutely _____.",
+    "base": "STAND",
+    "answer": "outstanding",
+    "tags": "C2, adjectives, prefixes, present participles, phrasal verbs"
+  },
+  {
+    "itemId": "eI2CFzbTI2c9IjaPTHx1",
+    "gappedSentence": "His secret ______ with offshore companies were eventually exposed.",
+    "base": "DEAL",
+    "answer": "dealings",
+    "tags": "C2, nouns, plural, gerunds"
+  },
+  {
+    "itemId": "EicnNlZeoimfULh94zAk",
+    "gappedSentence": "The company is expanding its ______ to cover electric vehicles.",
+    "base": "WORK",
+    "answer": "workforce",
+    "tags": "C2, nouns, compound nouns"
+  },
+  {
+    "itemId": "eRfh21rWBVzIJdQyKO1l",
+    "gappedSentence": "The magazine promotes an ______ lifestyle of luxury and success.",
+    "base": "ASPIRE",
+    "answer": "aspirational",
+    "tags": "C2, adjectives, suffix -al"
+  },
+  {
+    "itemId": "eSkvhXo8zJKdejM4SubB",
+    "gappedSentence": "The scientist’s report included a detailed ______ of the findings.",
+    "base": "ANALYSE",
+    "answer": "analysis",
+    "tags": "B2, nouns, abstract nouns, irregular nouns, irregular, suffix -is"
+  },
+  {
+    "itemId": "eY9QivlT6xvQcpaQHPLI",
+    "gappedSentence": "Long periods without rain have caused severe ______ across the region.",
+    "base": "DRY",
+    "answer": "droughts/drought",
+    "tags": "C2, nouns, plural, irregular nouns"
+  },
+  {
+    "itemId": "eyjfeJzh9dJAS2jLm8yM",
+    "gappedSentence": "The earthquake managed to ______ the boulder from the cliff edge.",
+    "base": "LODGE",
+    "answer": "dislodge",
+    "tags": "C1, verbs, prefixes, negative"
+  },
+  {
+    "itemId": "f2liWukdDuTD5qtrgcXT",
+    "gappedSentence": "They made a ______ decision to expand into new markets.",
+    "base": "STRATEGY",
+    "answer": "strategic",
+    "tags": "B2, adjectives, suffix -ic"
+  },
+  {
+    "itemId": "f5pP21o4MlSkBCf2mk4B",
+    "gappedSentence": "The documentary focused on the actor’s sudden rise to ______.",
+    "base": "NOTE",
+    "answer": "notoriety",
+    "tags": "C1, nouns, abstract nouns, suffix -iety"
+  },
+  {
+    "itemId": "FmRW7nioAESgMSIhhqUu",
+    "gappedSentence": "Their costumes were clever ______ of desert animals.",
+    "base": "ADAPT",
+    "answer": "adaptations",
+    "tags": "B2, nouns, plural, suffix -ion"
+  },
+  {
+    "itemId": "FpeJDgxqjUU5Qt0HpwIN",
+    "gappedSentence": "The winner had been carefully ______ by a panel of experts.",
+    "base": "CHOOSE",
+    "answer": "chosen",
+    "tags": "B2, verbs, past participles, participles, irregular verbs, irregular"
+  },
+  {
+    "itemId": "FUxM3oDirUl6L8xLE8T8",
+    "gappedSentence": "They questioned the ______ of the advice given.",
+    "base": "USE",
+    "answer": "usefulness",
+    "tags": "B2, nouns, abstract nouns, suffix -ful, suffix -ness, ful/less"
+  },
+  {
+    "itemId": "fWOMRq2gOcxpbhOQCwTv",
+    "gappedSentence": "The film explores a world that is vast and seemingly ______.",
+    "base": "LIMIT",
+    "answer": "limitless",
+    "tags": "C1, adjectives, ful/less, negative, suffix -less"
+  },
+  {
+    "itemId": "FX3UKuesYwJ9rpgDDn34",
+    "gappedSentence": "The risk of damage was severely ______ by the team.",
+    "base": "ESTIMATE",
+    "answer": "underestimated",
+    "tags": "C2, verbs, past participles, negative, prefixes, participles, adjectives"
+  },
+  {
+    "itemId": "FXSFy2GMLRlaKA3Ol1Pm",
+    "gappedSentence": "The ______ for submissions is the 30th of June.",
+    "base": "DEAD",
+    "answer": "deadline",
+    "tags": "C1, nouns, compound nouns"
+  },
+  {
+    "itemId": "fz3CdT4PtUbwicuD40vJ",
+    "gappedSentence": "Doctors warn that overuse of certain ______ can be harmful.",
+    "base": "STIMULATE",
+    "answer": "stimulants",
+    "tags": "C1, nouns, plural, suffix -ant"
+  },
+  {
+    "itemId": "gBBtJe7HKGFAe0MFZ8oC",
+    "gappedSentence": "The manager is open and very ______ of different working styles.",
+    "base": "TOLERATE",
+    "answer": "tolerant",
+    "tags": "B2, adjectives, personality, suffix -ant"
+  },
+  {
+    "itemId": "GCmra4ufmuWLtsfjoLCT",
+    "gappedSentence": "Total language ______ is one of the best ways to learn quickly.",
+    "base": "IMMERSE",
+    "answer": "immersion",
+    "tags": "C1, nouns, suffix -ion"
+  },
+  {
+    "itemId": "GHW1nsqZbn27zMDzYbie",
+    "gappedSentence": "Please keep your ______ as proof of payment.",
+    "base": "RECEIVE",
+    "answer": "receipt",
+    "tags": "C1, nouns, irregular nouns, irregular"
+  },
+  {
+    "itemId": "GIGH05G2UnygnRLmmdBY",
+    "gappedSentence": "She was named after her great-grandmother, her ______.",
+    "base": "NAME",
+    "answer": "namesake",
+    "tags": "C2, nouns, people, suffix-sake"
+  },
+  {
+    "itemId": "gjGPGkFjvSsgT6kSSwXO",
+    "gappedSentence": "The company showed a complete ______ for environmental regulations.",
+    "base": "REGARD",
+    "answer": "disregard",
+    "tags": "C1, nouns, negative, prefixes, abstract nouns"
+  },
+  {
+    "itemId": "Gr8gyKAVhVkM4lD14n8f",
+    "gappedSentence": "The company has _____ extraordinary changes since the new CEO was hired.",
+    "base": "GO",
+    "answer": "undergone",
+    "tags": "C2, verbs, irregular verbs, prefixes"
+  },
+  {
+    "itemId": "h13MWiKWtnG6zcLRa4FZ",
+    "gappedSentence": "Snow-capped peaks and ______ cliffs surrounded the valley.",
+    "base": "TOWER",
+    "answer": "towering",
+    "tags": "B2, adjectives, present participles, participles"
+  },
+  {
+    "itemId": "H8gm1UZqlDFB9g1yg8CO",
+    "gappedSentence": "These materials are highly ______ to water damage.",
+    "base": "RESIST",
+    "answer": "resistant",
+    "tags": "B2, adjectives, suffix -ant"
+  },
+  {
+    "itemId": "hbxCrVRrhvPeumN4jAdE",
+    "gappedSentence": "The sudden ______ of the volcano caught residents off guard.",
+    "base": "ERUPT",
+    "answer": "eruption",
+    "tags": "B2, nouns, suffix -ion"
+  },
+  {
+    "itemId": "Hc7djPcAQzM0XRK0fXi3",
+    "gappedSentence": "The company became famous for hiring talented young ______.",
+    "base": "INNOVATE",
+    "answer": "innovators",
+    "tags": "C1, nouns, people, plural, suffix -or"
+  },
+  {
+    "itemId": "He3YCCDnixOISWqbstaj",
+    "gappedSentence": "The training programme was known for its ______ standards.",
+    "base": "RIGOUR",
+    "answer": "rigorous",
+    "tags": "C1, adjectives, formal, suffix -ous"
+  },
+  {
+    "itemId": "HEs7uSfkPhT2HO4B6JPC",
+    "gappedSentence": "The athlete was completely ______ and needed guidance from the start.",
+    "base": "TRAIN",
+    "answer": "untrained",
+    "tags": "C1, adjectives, prefixes, negative, past participles, participles"
+  },
+  {
+    "itemId": "hEUM1WJqNPAglIKDURBA",
+    "gappedSentence": "The vegetables had been ______ to preserve their freshness.",
+    "base": "FREEZE",
+    "answer": "frozen",
+    "tags": "B1, adjectives, irregular verbs, past participles, participles"
+  },
+  {
+    "itemId": "Hjpsv6MinEqL0ebycRjx",
+    "gappedSentence": "The capital is located in the ______ part of the country.",
+    "base": "CENTRE",
+    "answer": "central",
+    "tags": "B2, adjectives, suffix -al"
+  },
+  {
+    "itemId": "hNTpeoKpdwA0fzF8ATOf",
+    "gappedSentence": "The new product is seen as a suitable ______ for the old one.",
+    "base": "PLACE",
+    "answer": "replacement",
+    "tags": "B2, nouns, suffix -ment, prefixes"
+  },
+  {
+    "itemId": "i9nBmN6TGeEzbYzkueoE",
+    "gappedSentence": "She led a _____ existence, away from the public eye.",
+    "base": "SOLITUDE",
+    "answer": "solitary",
+    "tags": "C1, adjectives, personality, suffix -ary"
+  },
+  {
+    "itemId": "Ia0ASWXK172e8qAFoEhr",
+    "gappedSentence": "It's incredible the sacrifices people make in ____ of fame and riches.",
+    "base": "PURSUE",
+    "answer": "pursuit",
+    "tags": "C2, nouns, abstract nouns, irregular nouns"
+  },
+  {
+    "itemId": "iahpSgsxSaTqllIeJsk3",
+    "gappedSentence": "The restaurant is ______ for its traditional recipes and friendly staff.",
+    "base": "KNOW",
+    "answer": [
+      "well-known",
+      "well known"
+    ],
+    "tags": "B2, adjectives, compound adjectives, participles, past participles"
+  },
+  {
+    "itemId": "iC2PKpzRRLCGrzRzQ7dq",
+    "gappedSentence": "Some ______ argue that climate change is reversible.",
+    "base": "SCIENCE",
+    "answer": "scientists",
+    "tags": "B2, nouns, people, plural, suffix -ist"
+  },
+  {
+    "itemId": "IDOkbV4sLnt7cAug5UnP",
+    "gappedSentence": "He gave a ______ glance at the dark alley before moving on.",
+    "base": "FEAR",
+    "answer": "fearful",
+    "tags": "C1, adjectives, suffix -ful, feelings, ful/less"
+  },
+  {
+    "itemId": "iGsvAD9S23oenXfU41Ay",
+    "gappedSentence": "The region is known for its ______ terrain and dramatic views.",
+    "base": "MOUNTAIN",
+    "answer": "mountainous",
+    "tags": "B2, adjectives, suffix -ous"
+  },
+  {
+    "itemId": "ijNi4zzAR6t29Qb6zvDQ",
+    "gappedSentence": "He lost his ______ after staring directly at the sun.",
+    "base": "SEE",
+    "answer": "sight",
+    "tags": "B2, nouns, irregular, irregular nouns"
+  },
+  {
+    "itemId": "iJToLvHrx93tuVmW2bPI",
+    "gappedSentence": "______ , the plan succeeded despite early doubts.",
+    "base": "HOPE",
+    "answer": "Hopefully",
+    "tags": "B2, adverbs, discourse markers, comment adverbs, suffix -ful, ful/less"
+  },
+  {
+    "itemId": "ILpp3iwx2aihYDwaAZvW",
+    "gappedSentence": "The witness was later ______ for lying under oath.",
+    "base": "CREDIT",
+    "answer": "discredited",
+    "tags": "C2, verbs, past participles, negative, prefixes, formal, participles, adjectives"
+  },
+  {
+    "itemId": "ira5aToP9M27Yv8MA2gp",
+    "gappedSentence": "The ad campaign targets young, ______ professionals.",
+    "base": "ASPIRE",
+    "answer": "aspiring",
+    "tags": "C1, adjectives, present participles, participles"
+  },
+  {
+    "itemId": "iV0w532BXsDNNSZ8aRGi",
+    "gappedSentence": "It is highly ______ to arrive late for an interview.",
+    "base": "APPROPRIATE",
+    "answer": "inappropriate",
+    "tags": "B2, adjectives, negative, prefixes, suffix -ate"
+  },
+  {
+    "itemId": "iwrLFm1Og49tVVNoUxuy",
+    "gappedSentence": "Her ______ was key to the success of the entire project.",
+    "base": "CONTRIBUTE",
+    "answer": "contribution",
+    "tags": "B2, nouns, suffix -ion"
+  },
+  {
+    "itemId": "j6zGADqtFilLoZsGCHTN",
+    "gappedSentence": "He's one of the most ______ employees I've ever worked with.",
+    "base": "DEPEND",
+    "answer": "dependable",
+    "tags": "C1, adjectives, suffix -able, personality, able/ible"
+  },
+  {
+    "itemId": "jb9iKdZIh7am48qo3FOU",
+    "gappedSentence": "My morning ______ includes cardio and stretching.",
+    "base": "WORK",
+    "answer": "workout",
+    "tags": "C1, nouns, compound nouns, phrasal verbs"
+  },
+  {
+    "itemId": "jC9Bp6oqi4NAw8RW4j5C",
+    "gappedSentence": "The warehouse was converted into a secure ______ facility.",
+    "base": "STORE",
+    "answer": "storage",
+    "tags": "C1, nouns, suffix -age"
+  },
+  {
+    "itemId": "jG9vecGt2dFZJBJxG3ty",
+    "gappedSentence": "The team worked ______ hard to meet the deadline.",
+    "base": "EXCEPT",
+    "answer": "exceptionally",
+    "tags": "C1, adverbs, suffix -ion, suffix -al"
+  },
+  {
+    "itemId": "jQjEmDJ2h1TPn9pASICZ",
+    "gappedSentence": "The pressure of the situation only ______ the conflict.",
+    "base": "INTENSE",
+    "answer": [
+      "intensifies",
+      "intensified"
+    ],
+    "tags": "C1, verbs, verb forms, regular verbs, suffix -ify"
+  },
+  {
+    "itemId": "Jufu1vTIjRXYuxb1aifk",
+    "gappedSentence": "He only has a ______ understanding of the situation.",
+    "base": "PART",
+    "answer": "partial",
+    "tags": "C1, adjectives, suffix -ial, cial/tial"
+  },
+  {
+    "itemId": "JVh5G4uIDYgjf1KHFIte",
+    "gappedSentence": "Visitors must follow strict ______ to avoid accidents.",
+    "base": "CAUTION",
+    "answer": "precautions",
+    "tags": "C1, nouns, plural, prefixes, suffix -ion"
+  },
+  {
+    "itemId": "jyxynLZLDJ54DOPvWZ1R",
+    "gappedSentence": "The dog responded to the ______ of the ringing bell.",
+    "base": "STIMULATE",
+    "answer": "stimulus",
+    "tags": "C1, nouns, formal"
+  },
+  {
+    "itemId": "K4jaR4UtAaK5XLhtYBYv",
+    "gappedSentence": "The study was carried out by a team of experienced ______.",
+    "base": "RESEARCH",
+    "answer": "researchers",
+    "tags": "B2, nouns, people, plural, suffix -er"
+  },
+  {
+    "itemId": "kIxA53OFLi5wLj6HK1wl",
+    "gappedSentence": "Archaeologists discovered the ______ of a long-forgotten structure.",
+    "base": "REMAIN",
+    "answer": "remains",
+    "tags": "B2, nouns, plural"
+  },
+  {
+    "itemId": "KonyMWgrPhkH9wXiPwce",
+    "gappedSentence": "The news is updated on a ______ basis.",
+    "base": "DAY",
+    "answer": "daily",
+    "tags": "B2, adjectives, time expressions, suffix -ly"
+  },
+  {
+    "itemId": "KsMStGFsUrxXPv3AD5cQ",
+    "gappedSentence": "It was ______ that she had put a lot of effort into the project.",
+    "base": "EVIDENCE",
+    "answer": "evident",
+    "tags": "B2, adjectives, suffix -ent"
+  },
+  {
+    "itemId": "l9793Go1U7NjHzSN3KtZ",
+    "gappedSentence": "Although he is usually confident, he felt quite ______ in that situation.",
+    "base": "CERTAIN",
+    "answer": "uncertain",
+    "tags": "B1, adjectives, negative, prefixes"
+  },
+  {
+    "itemId": "LdrvtSoNYSbl9Bnwpwkn",
+    "gappedSentence": "The film's dark tone was criticised as a weak ______ of the novel.",
+    "base": "CHARACTER",
+    "answer": [
+      "characterization",
+      "characterisation"
+    ],
+    "tags": "C1, nouns, abstract nouns, suffix -ion, verb formation, suffix -ise"
+  },
+  {
+    "itemId": "lEoPUwfOfLSrlepgvXBQ",
+    "gappedSentence": "The colours she chose were dull and quite ______.",
+    "base": "APPEAL",
+    "answer": "unappealing",
+    "tags": "C1, adjectives, negative, prefixes, participles"
+  },
+  {
+    "itemId": "lKzrIjy70tPq8oA7gFsO",
+    "gappedSentence": "The patient was found to be extremely ______ to light and noise.",
+    "base": "SENSE",
+    "answer": "sensitive",
+    "tags": "B2, adjectives, suffix -ive, feelings, personality"
+  },
+  {
+    "itemId": "LmulaNbQbC608j7EKAtq",
+    "gappedSentence": "There has been an ______ increase in the number of complaints.",
+    "base": "ADD",
+    "answer": "additional",
+    "tags": "B2, adjectives, suffix -al, suffix -ion"
+  },
+  {
+    "itemId": "lRwAmrq0Ngos0pGfFE5N",
+    "gappedSentence": "His ______ made it difficult for him to admit he was wrong.",
+    "base": "STUBBORN",
+    "answer": "stubbornness",
+    "tags": "C1, nouns, abstract nouns, personality, suffix -ness"
+  },
+  {
+    "itemId": "LSw7hgcBV0Z0x1gnjNRe",
+    "gappedSentence": "The colours she chose were dull and quite ______.",
+    "base": "APPEAL",
+    "answer": "unappealing",
+    "tags": "C1, adjectives, negative, prefixes, participles, present participles"
+  },
+  {
+    "itemId": "lU80Hl4ZXWv7Str4uSv5",
+    "gappedSentence": "The museum is located even ______ from the station than I thought.",
+    "base": "FAR",
+    "answer": "farther/further",
+    "tags": "B2, adjectives, comparatives and superlatives, irregular adjectives"
+  },
+  {
+    "itemId": "lwM9zTkouDgNbDFrSkyh",
+    "gappedSentence": "The new policy proved surprisingly ______.",
+    "base": "EFFECT",
+    "answer": "effective",
+    "tags": "B2, adjectives, suffix -ive"
+  },
+  {
+    "itemId": "LyDpcu825NouLeNCzvM8",
+    "gappedSentence": "A useful ______ was made between two different cases.",
+    "base": "COMPARE",
+    "answer": "comparison",
+    "tags": "C1, nouns, abstract nouns, irregular nouns"
+  },
+  {
+    "itemId": "m1lrAr2GL0g8ItMkCO0z",
+    "gappedSentence": "Regular ______ is compulsory if students want to pass the course.",
+    "base": "ATTEND",
+    "answer": "attendance",
+    "tags": "B2, nouns, abstract nouns, suffix -ance"
+  },
+  {
+    "itemId": "m4qJzP1VpZ1paNTPBdzI",
+    "gappedSentence": "Whether this policy will work remains ______.",
+    "base": "DEBATE",
+    "answer": "debatable",
+    "tags": "B2, adjectives, able/ible, suffix -able"
+  },
+  {
+    "itemId": "M73sfa2vkBPOffEdopXC",
+    "gappedSentence": "Years of unfair treatment had left him deeply ______.",
+    "base": "BITTER",
+    "answer": "embittered",
+    "tags": "C2, adjectives, prefixes, past participles, feelings"
+  },
+  {
+    "itemId": "M7PaCOuHPkU9dmx8i7GG",
+    "gappedSentence": "Could you give a brief ______ of the suspect?",
+    "base": "DESCRIBE",
+    "answer": "description",
+    "tags": "B1, nouns, suffix -ion"
+  },
+  {
+    "itemId": "mEW6jK51PaMKIlBhXeFj",
+    "gappedSentence": "This technique is ______ used in scientific research around the world.",
+    "base": "WIDE",
+    "answer": "widely",
+    "tags": "B1, adverbs"
+  },
+  {
+    "itemId": "MHWSDZdIImmZF4i1lUvl",
+    "gappedSentence": "The evidence was strong enough to be considered ______.",
+    "base": "CONCLUDE",
+    "answer": "conclusive",
+    "tags": "C1, adjectives, suffix -ive"
+  },
+  {
+    "itemId": "mJgrhUtSiLGTCbGQvbwH",
+    "gappedSentence": "Their close ______ made them work very well as a team.",
+    "base": "RELATION",
+    "answer": "relationship",
+    "tags": "B2, nouns, abstract nouns, suffix -ship"
+  },
+  {
+    "itemId": "mkraMlJ2eqWEzkHtMbNf",
+    "gappedSentence": "The scientists carried out detailed ______ into the disease.",
+    "base": "SEARCH",
+    "answer": "research",
+    "tags": "B2, nouns, uncountable, prefixes"
+  },
+  {
+    "itemId": "mO29deTmKzzkVBXPRdA4",
+    "gappedSentence": "The guide's help was absolutely ______  when we got lost in the mountains.",
+    "base": "VALUE",
+    "answer": "invaluable",
+    "tags": "C2, adjectives, prefixes"
+  },
+  {
+    "itemId": "MosZzrPozoD9itaNtfwM",
+    "gappedSentence": "Her constant interruptions caused great ______.",
+    "base": "ANNOY",
+    "answer": "annoyance",
+    "tags": "C1, nouns, abstract nouns, formal, suffix -ance"
+  },
+  {
+    "itemId": "mS5F5G31Wf9y2wEhxm03",
+    "gappedSentence": "His speech style became too ______ and lacked originality.",
+    "base": "REPEAT",
+    "answer": "repetitive",
+    "tags": "C1, adjectives, suffix -ive"
+  },
+  {
+    "itemId": "MsdpsLzVSyQOQRWgrTgD",
+    "gappedSentence": "I admire her ______ in admitting the mistake so openly.",
+    "base": "HONEST",
+    "answer": "honesty",
+    "tags": "B2, nouns, abstract nouns, personality, suffix -y"
+  },
+  {
+    "itemId": "MXPe73exiIHcc4MUNZv9",
+    "gappedSentence": "His constant negativity gave him a reputation as a ______.",
+    "base": "DEFEAT",
+    "answer": "defeatist",
+    "tags": "C2, nouns, people, personality, suffix -ist"
+  },
+  {
+    "itemId": "N5kMojSwTWHpbSJfdWep",
+    "gappedSentence": "Many of her ______ were also active in the art world.",
+    "base": "CONTEMPORARY",
+    "answer": "contemporaries",
+    "tags": "C1, nouns, plural, people"
+  },
+  {
+    "itemId": "N5wVLuoRYQgptYJnRJZG",
+    "gappedSentence": "She's incredibly ______ and notices every small detail.",
+    "base": "OBSERVE",
+    "answer": "observant",
+    "tags": "B2, adjectives, suffix -ant"
+  },
+  {
+    "itemId": "NaGbRIuFxAkak7JH5eUO",
+    "gappedSentence": "It was a truly ______ outcome that no one had predicted.",
+    "base": "SURPRISE",
+    "answer": "surprising",
+    "tags": "B2, adjectives, participles, present participles"
+  },
+  {
+    "itemId": "NGq0hWWdcR02ObWwN558",
+    "gappedSentence": "Please include a full list of ______ in your CV.",
+    "base": "REFER",
+    "answer": "references",
+    "tags": "B2, nouns, abstract nouns, suffix -ence"
+  },
+  {
+    "itemId": "NkKfoMzCvV6jIWxRTAas",
+    "gappedSentence": "The judge is honest, and known for being completely ______ in all decisions.",
+    "base": "PART",
+    "answer": "impartial",
+    "tags": "C1, adjectives, suffix -ial, cial/tial, prefixes, negative"
+  },
+  {
+    "itemId": "noo8ejrOb7av6jjbmQtO",
+    "gappedSentence": "There were three reported ______ from the plane crash.",
+    "base": "FATAL",
+    "answer": "fatalities",
+    "tags": "C1, nouns, plural, formal, suffix -ity"
+  },
+  {
+    "itemId": "NPYCE5SBvIDPy5z6lFQU",
+    "gappedSentence": "The documents turned out to be entirely ______.",
+    "base": "FABRICATE",
+    "answer": "fabricated",
+    "tags": "B2, adjectives, past participles, participles"
+  },
+  {
+    "itemId": "NV3cQhqqjmR56rc5VHQx",
+    "gappedSentence": "He spoke ______ at the opening ceremony.",
+    "base": "FORMAL",
+    "answer": "formally",
+    "tags": "B1, adverbs, regular, suffix -al"
+  },
+  {
+    "itemId": "OeajJYDTRrjr7zia7LWd",
+    "gappedSentence": "He spoke ______, unwilling to reveal too much.",
+    "base": "GUARD",
+    "answer": "guardedly",
+    "tags": "C2, adverbs, past participles, participles"
+  },
+  {
+    "itemId": "OhoeTKaKy4DqPgnju2rv",
+    "gappedSentence": "The showroom was located next to the main car ______.",
+    "base": "DEAL",
+    "answer": "dealership",
+    "tags": "C2, nouns, compound nouns, suffix -ship"
+  },
+  {
+    "itemId": "OMeBQCKi50M50JCkuTjJ",
+    "gappedSentence": "The correct ______ must be followed in all surgical operations.",
+    "base": "PROCEED",
+    "answer": [
+      "procedure",
+      "process"
+    ],
+    "tags": "B2, nouns, formal, suffix -ure"
+  },
+  {
+    "itemId": "opFdCAJJ9RXYoE3DidHv",
+    "gappedSentence": "The play received ______ reviews in the national press.",
+    "base": "CONTROVERSY",
+    "answer": "controversial",
+    "tags": "C1, adjectives, suffix -ial"
+  },
+  {
+    "itemId": "osf1ibZYfyyqQU3oRpZK",
+    "gappedSentence": "The entire ______ was affected by rising sea levels.",
+    "base": "COAST",
+    "answer": "coastline",
+    "tags": "C1, nouns, compound nouns"
+  },
+  {
+    "itemId": "ozl2Gr1gxZ7YwHq3LlND",
+    "gappedSentence": "The new government policy reduced the country's economic ______ on oil.",
+    "base": "RELY",
+    "answer": "reliance",
+    "tags": "C1, nouns, abstract nouns, suffix -ance"
+  },
+  {
+    "itemId": "p0VKkgHWmjtNObBtxrx6",
+    "gappedSentence": "The villagers relied on wild fruit and roots for basic ______.",
+    "base": "NOURISH",
+    "answer": "nourishment",
+    "tags": "C1, nouns, abstract nouns, suffix -ment"
+  },
+  {
+    "itemId": "p3drGRzhYwkZMdN5DlNj",
+    "gappedSentence": "The following tools may be necessary in the _____ of the furniture.",
+    "base": "ASSEMBLE",
+    "answer": "assembly",
+    "tags": "C1, nouns, abstract nouns, suffix -y"
+  },
+  {
+    "itemId": "P593Vn1cZC7HbY0nAFed",
+    "gappedSentence": "The interview was meant to be a simple ______, not a second job offer.",
+    "base": "FOLLOW",
+    "answer": [
+      "follow-up",
+      "followup"
+    ],
+    "tags": "C1, nouns, compound nouns, phrasal verbs"
+  },
+  {
+    "itemId": "P7fyRlREDf1OsUXT5o5t",
+    "gappedSentence": "You’re not ______ required to complete the task by Friday, but it would help.",
+    "base": "NECESSARY",
+    "answer": "necessarily",
+    "tags": "B2, adverbs"
+  },
+  {
+    "itemId": "pFEBLOGKMCr7tdxcb5bm",
+    "gappedSentence": "The product was heavily ______ on social media before its launch.",
+    "base": "ADVERT",
+    "answer": [
+      "advertised",
+      "advertized"
+    ],
+    "tags": "B1, verbs, past participles, regular, verb forms, participles"
+  },
+  {
+    "itemId": "PFhjtFVjuejz0gxwXduT",
+    "gappedSentence": "The country fought hard to gain its ______.",
+    "base": "DEPEND",
+    "answer": "independence",
+    "tags": "B2, nouns, abstract nouns, prefixes, negative, singular, suffix -ence"
+  },
+  {
+    "itemId": "PI4wWPUNqmuOCeW2GLNJ",
+    "gappedSentence": "She explained her opinion very ______, leaving no room for doubt.",
+    "base": "CLEAR",
+    "answer": "clearly",
+    "tags": "B2, adverbs, manner"
+  },
+  {
+    "itemId": "plGSVaGDUnD9QzQcV16D",
+    "gappedSentence": "It was one of the most ______ lectures I’ve attended.",
+    "base": "STIMULATE",
+    "answer": "stimulating",
+    "tags": "B2, adjectives, present participles, participles"
+  },
+  {
+    "itemId": "pW8UIykJWvPDRZqm79cN",
+    "gappedSentence": "After her illness, she returned to her usual energy and ______.",
+    "base": "VITAL",
+    "answer": "vitality",
+    "tags": "C1, nouns, abstract nouns, suffix -ity"
+  },
+  {
+    "itemId": "Pw9uNNcG6uJTWHoyukho",
+    "gappedSentence": "The event was so badly organised it was almost ______ embarrassing.",
+    "base": "DREAD",
+    "answer": "dreadfully",
+    "tags": "C2, adverbs, intensifier, negative, suffix -ful"
+  },
+  {
+    "itemId": "PxDPaBF4Efu5dHvtUCuW",
+    "gappedSentence": "The play was one of the most successful ______ of the year.",
+    "base": "PRODUCE",
+    "answer": "productions",
+    "tags": "B2, nouns, plural, suffix -ion"
+  },
+  {
+    "itemId": "PyNXBOniQZsKDBVkNL42",
+    "gappedSentence": "She came up with ______ examples to support her point.",
+    "base": "NUMBER",
+    "answer": "numerous",
+    "tags": "C1, adjectives, irregular, irregular adjectives, suffix -ous"
+  },
+  {
+    "itemId": "qaNDEaPnk2Jk3LtCtJJa",
+    "gappedSentence": "The test results will help to ______ whether the drug is effective.",
+    "base": "CERTAIN",
+    "answer": "ascertain",
+    "tags": "C2, verbs, formal, verb formation, prefixes"
+  },
+  {
+    "itemId": "QAPabBdaz7O7PRkO4yfd",
+    "gappedSentence": "The journalist became highly ______ in political affairs.",
+    "base": "INFLUENCE",
+    "answer": "influential",
+    "tags": "C1, adjectives, cial/tial, suffix -ial"
+  },
+  {
+    "itemId": "QDZmacJY09JXsJYhu1ri",
+    "gappedSentence": "She was extremely ______ of all the support she received.",
+    "base": "APPRECIATE",
+    "answer": "appreciative",
+    "tags": "C1, adjectives, suffix -ive, feelings"
+  },
+  {
+    "itemId": "QKj2O9aWXZQf9Dv6xCBA",
+    "gappedSentence": "The athlete’s ______ helped her complete the race despite the pain.",
+    "base": "ENDURE",
+    "answer": "endurance",
+    "tags": "B2, nouns, abstract nouns, suffix -ance"
+  },
+  {
+    "itemId": "qM6MIOKNkn8fVOq8pmih",
+    "gappedSentence": "It's perfectly ______ that this kind of event could happen again.",
+    "base": "CONCEIVE",
+    "answer": "conceivable",
+    "tags": "C1, adjectives, able/ible, suffix -able"
+  },
+  {
+    "itemId": "qpi5AInULCOWsqbAXr2I",
+    "gappedSentence": "I found her answer to be perfectly ______ and sincere.",
+    "base": "TRUE",
+    "answer": "truthful",
+    "tags": "B2, adjectives, ful/less, suffix -ful"
+  },
+  {
+    "itemId": "qRf59unPOgk6WdIhKz6I",
+    "gappedSentence": "The government's ______ helped prevent a major crisis.",
+    "base": "INTERVENE",
+    "answer": "intervention",
+    "tags": "B2, nouns, formal, suffix -ion"
+  },
+  {
+    "itemId": "QRREEbn4xWAEnGYIRDN8",
+    "gappedSentence": "You're not just taking a risk — you're ______ other people's lives.",
+    "base": "DANGER",
+    "answer": "endangering",
+    "tags": "C1, verbs, present participle, prefixes"
+  },
+  {
+    "itemId": "QtvuMpbm3TdZ7fahqJCW",
+    "gappedSentence": "The condition may lead to long-term ______ if untreated.",
+    "base": "DEPRESS",
+    "answer": "depression",
+    "tags": "B2, nouns, abstract nouns, suffix -ion"
+  },
+  {
+    "itemId": "qXC7AGUtmQX9s3R9FePh",
+    "gappedSentence": "The ______ of the city has doubled in the last decade.",
+    "base": "POPULATE",
+    "answer": "population",
+    "tags": "B1, nouns, suffix -ion"
+  },
+  {
+    "itemId": "QXV4FBD00oRI74g3TU93",
+    "gappedSentence": "From above, the desert appeared to stretch out in an endless ______.",
+    "base": "EXPAND",
+    "answer": "expanse",
+    "tags": "C1, nouns, suffix -anse"
+  },
+  {
+    "itemId": "R2XmgB2eLkVwtGKh652y",
+    "gappedSentence": "His story was so strange it seemed almost ______.",
+    "base": "CREDIBLE",
+    "answer": "incredible",
+    "tags": "B1, adjectives, negative, prefixes"
+  },
+  {
+    "itemId": "rCwIyr0ZqD5GInCpTLPh",
+    "gappedSentence": "He is ______ the most talented student in the class.",
+    "base": "DOUBT",
+    "answer": [
+      "undoubtedly",
+      "doubtless"
+    ],
+    "tags": "C1, adverbs, negative, prefixes, suffix -less, ful/less"
+  },
+  {
+    "itemId": "rdxZN4LICf2IjGSr4IJh",
+    "gappedSentence": "Her tone remained calm and ______ despite repeated interruptions.",
+    "base": "PERSIST",
+    "answer": "persistent",
+    "tags": "B2, adjectives, suffix -ent, personality"
+  },
+  {
+    "itemId": "rEwlInhOLnYZyKDa0kte",
+    "gappedSentence": "It's ______ that children have access to healthy food.",
+    "base": "ESSENCE",
+    "answer": "essential",
+    "tags": "B2, adjectives, suffix -ial, cial/tial"
+  },
+  {
+    "itemId": "rF7HgnrR0wjvCR4S6TzD",
+    "gappedSentence": "All the items were packed together in a large ______.",
+    "base": "PACK",
+    "answer": "package",
+    "tags": "B2, nouns, suffix -age"
+  },
+  {
+    "itemId": "Rjl8OGQOPI9NEYPr69oJ",
+    "gappedSentence": "The report offers an ______ analysis of the issue, covering every possible angle.",
+    "base": "EXHAUST",
+    "answer": "exhaustive",
+    "tags": "C1, adjectives, suffix -ive, formal, suffix -ive"
+  },
+  {
+    "itemId": "RKal4MP6VoSq6Ctjiznt",
+    "gappedSentence": "The dancer’s ______ amazed the judges and audience alike.",
+    "base": "ENDURE",
+    "answer": "endurance",
+    "tags": "B2, nouns, abstract nouns, suffix -ance"
+  },
+  {
+    "itemId": "RkTEAvnLWMAtyxr0N5Vz",
+    "gappedSentence": "The fireworks had an impressive and ______ effect.",
+    "base": "EXPLODE",
+    "answer": "explosive",
+    "tags": "B2, adjectives, suffix -ive"
+  },
+  {
+    "itemId": "rnRVFVkpmBFr4BLvorXX",
+    "gappedSentence": "The new regime focused on the ______ of the national economy.",
+    "base": "STRONG",
+    "answer": "strengthening",
+    "tags": "C1, nouns, gerunds, verbs, irregular, irregular, suffix -en"
+  },
+  {
+    "itemId": "ROqi1o0KlWh57I92aXis",
+    "gappedSentence": "There's a growing sense of ______ among the younger generation.",
+    "base": "DEFEAT",
+    "answer": "defeatism",
+    "tags": "C2, nouns, abstract nouns, suffix -ism"
+  },
+  {
+    "itemId": "RtG9gCFICcqBd8lmqUJt",
+    "gappedSentence": "Several ancient _____ were discovered in the caves.",
+    "base": "CARVE",
+    "answer": "carvings",
+    "tags": "C2, nouns, plural, gerunds"
+  },
+  {
+    "itemId": "rWKhl967sV8Lp6HcchIz",
+    "gappedSentence": "The new system was designed to ______ efficiency without increasing costs.",
+    "base": "MAXIMUM",
+    "answer": [
+      "maximise",
+      "maximize"
+    ],
+    "tags": "C1, verbs, suffix -ise"
+  },
+  {
+    "itemId": "S3DnASuhv0YBov6Iisjn",
+    "gappedSentence": "The election result was fiercely ______ by the opposition.",
+    "base": "CONTEST",
+    "answer": "contested",
+    "tags": "B2, verbs, past participles, participles"
+  },
+  {
+    "itemId": "S8h1YR8e50rbWXhXvCRD",
+    "gappedSentence": "The scientist shared her most recent ______ at the conference.",
+    "base": "FIND",
+    "answer": "findings",
+    "tags": "C1, nouns, plural, formal"
+  },
+  {
+    "itemId": "S8zL6OHXwWnF35WzXDUG",
+    "gappedSentence": "She gave a cold and ______ response to the proposal.",
+    "base": "DISMISS",
+    "answer": "dismissive",
+    "tags": "C1, adjectives, suffix -ive"
+  },
+  {
+    "itemId": "SDGpaeytrzDYHAp3NtMm",
+    "gappedSentence": "It was a beautiful night — the first time Matilda enjoyed a full night of ____ sleep.",
+    "base": "INTERRUPT",
+    "answer": "uninterrupted",
+    "tags": "C1, adjectives, negative, prefixes, past participles"
+  },
+  {
+    "itemId": "sehHt82OtA6ah5CrnShF",
+    "gappedSentence": "It was a rather ______ decision to invest all his money in that scheme.",
+    "base": "FOOL",
+    "answer": "foolish",
+    "tags": "B2, adjectives, suffix -ish, personality"
+  },
+  {
+    "itemId": "SKRD0La87dGwkqKzh19k",
+    "gappedSentence": "His lifelong ______ to the craft was evident in every movement.",
+    "base": "DEDICATE",
+    "answer": "dedication",
+    "tags": "B2, nouns, abstract nouns, suffix -ion"
+  },
+  {
+    "itemId": "sLl512jyuNmbRpNomduk",
+    "gappedSentence": "Political ______ can lead to a breakdown in trust.",
+    "base": "STABLE",
+    "answer": "instability",
+    "tags": "C1, nouns, abstract nouns, negative, prefixes, suffix -ity"
+  },
+  {
+    "itemId": "so0nnI64NIWeVzjJDlRj",
+    "gappedSentence": "He was accused of acting ______ to obtain the contract.",
+    "base": "FRAUD",
+    "answer": "fraudulently",
+    "tags": "C2, adverbs, formal, suffix -ent"
+  },
+  {
+    "itemId": "SssRyvvaiQ5hPi3guVBH",
+    "gappedSentence": "The new law will have a ______ impact on low-income families.",
+    "base": "BENEFIT",
+    "answer": "beneficial",
+    "tags": "C1, adjectives, suffix -ial, cial/tial"
+  },
+  {
+    "itemId": "t4UgxNSWpApGbZtpY5Cs",
+    "gappedSentence": "The hotel is ______ in the heart of the old town.",
+    "base": "SITE",
+    "answer": "situated",
+    "tags": "B2, past participles, adjectives, verbs, regular verbs"
+  },
+  {
+    "itemId": "T9gCPkT4T3MpTjm6JvBG",
+    "gappedSentence": "The scientists collected ______ evidence to support their theory.",
+    "base": "SUBSTANCE",
+    "answer": "substantial",
+    "tags": "C1, adjectives, suffix -ial, cial/tial"
+  },
+  {
+    "itemId": "TcdU8pb1hHEfKahfB5Iz",
+    "gappedSentence": "His remarks were deeply offensive and clearly ______.",
+    "base": "PREJUDICE",
+    "answer": "prejudicial",
+    "tags": "C2, adjectives, suffix -ial, cial/tial, negative, formal"
+  },
+  {
+    "itemId": "tKwty2JmS6SdbUgxZlCY",
+    "gappedSentence": "She was completely ______ to the demands of the role.",
+    "base": "SUIT",
+    "answer": "unsuited",
+    "tags": "C1, adjectives, prefixes, negative, past participles, participles"
+  },
+  {
+    "itemId": "TmjPMpmLmcsdIZt3PVYF",
+    "gappedSentence": "______, you could just tell her the truth.",
+    "base": "ALTERNATE",
+    "answer": "Alternatively",
+    "tags": "C1, adverbs, suffix -ive"
+  },
+  {
+    "itemId": "tRNeWWTsDzJ5wwAjSZBv",
+    "gappedSentence": "Despite all efforts, the customer remained completely ______.",
+    "base": "RESPOND",
+    "answer": "unresponsive",
+    "tags": "C1, adjectives, prefixes, negative, suffix -ive"
+  },
+  {
+    "itemId": "TtFY0mwo97MTg9fjmBWG",
+    "gappedSentence": "The meal had an ______ taste that most people disliked.",
+    "base": "PLEASE",
+    "answer": "unpleasant",
+    "tags": "C1, adjectives, negative, prefixes, suffix -ant"
+  },
+  {
+    "itemId": "TvLKegEAXwkvDauRXBOL",
+    "gappedSentence": "Their new flatmate turned out to be a respectful and tidy ______.",
+    "base": "LODGE",
+    "answer": "lodger",
+    "tags": "C1, nouns, people, suffix -er"
+  },
+  {
+    "itemId": "TY2XzFCs1tSOGbu72pCK",
+    "gappedSentence": "The lawyer was unable to ______ the allegations.",
+    "base": "PROOF",
+    "answer": "disprove",
+    "tags": "C1, verbs, negative, prefixes, formal, verb formation"
+  },
+  {
+    "itemId": "u24UolmPPTJm8jOeI8jV",
+    "gappedSentence": "The course is perfect for complete ______.",
+    "base": "BEGIN",
+    "answer": "beginners",
+    "tags": "B2, nouns, people, plural, suffix -er"
+  },
+  {
+    "itemId": "u5yQNZldFRjpE3A68CMe",
+    "gappedSentence": "Her ______ was obvious in the way she interpreted the rhythm.",
+    "base": "MUSIC",
+    "answer": "musicality",
+    "tags": "C1, nouns, abstract nouns, suffix -ity"
+  },
+  {
+    "itemId": "u87vLVR4yaF6lDiUinr9",
+    "gappedSentence": "Taking exams is one of many student ______.",
+    "base": "ANXIOUS",
+    "answer": "anxieties",
+    "tags": "C1, nouns, plural, abstract nouns, suffix -iety"
+  },
+  {
+    "itemId": "uEKZA9XMOXAErsUTnWP4",
+    "gappedSentence": "The country’s government is a ______ system headed by a king.",
+    "base": "MONARCHY",
+    "answer": "monarchical",
+    "tags": "B2, adjectives, suffix -al"
+  },
+  {
+    "itemId": "UiNFZlkLZbeTO25Fzkjs",
+    "gappedSentence": "The palace was restored to its former ______.",
+    "base": "GRAND",
+    "answer": "grandeur",
+    "tags": "C2, nouns, abstract nouns, formal, sufix -eur"
+  },
+  {
+    "itemId": "ukB5jkZejGJrmJjwdof5",
+    "gappedSentence": "The government is facing a ______ need for reform.",
+    "base": "PRESS",
+    "answer": "pressing",
+    "tags": "C2, adjectives, present participles, formal, participles"
+  },
+  {
+    "itemId": "UnieKSpqvzejYpkOCoSI",
+    "gappedSentence": "The restaurant was filled with regular ______ enjoying their meals.",
+    "base": "DINE",
+    "answer": "diners",
+    "tags": "B2, nouns, people, plural, suffix -er"
+  },
+  {
+    "itemId": "uOdQsLXhauMneu2ZqdHU",
+    "gappedSentence": "Their situation was difficult, if not completely ______.",
+    "base": "ESCAPE",
+    "answer": "inescapable",
+    "tags": "C1, adjectives, negative, prefixes, able/ible, suffix -able"
+  },
+  {
+    "itemId": "uOsRPk4WehvIyKMb7yXu",
+    "gappedSentence": "Customer ______ is a key part of running a successful business.",
+    "base": "SATISFY",
+    "answer": "satisfaction",
+    "tags": "B1, nouns, suffix -tion"
+  },
+  {
+    "itemId": "UuosjkfFEwcTCjuhXdZT",
+    "gappedSentence": "The area suffered ______ rainfall throughout the month.",
+    "base": "TORRENT",
+    "answer": "torrential",
+    "tags": "C1, adjectives, suffix -ial, cial/tial"
+  },
+  {
+    "itemId": "UWE2r63e3THdQfPtfcch",
+    "gappedSentence": "The journey was long and often ______.",
+    "base": "DANGER",
+    "answer": "dangerous",
+    "tags": "B1, adjectives, suffix -ous"
+  },
+  {
+    "itemId": "V12MQwmWzGy4pnt7OtUd",
+    "gappedSentence": "She's always been so ______ in her story telling.",
+    "base": "IMAGINE",
+    "answer": "imaginative",
+    "tags": "B2, adjectives, suffix -ive"
+  },
+  {
+    "itemId": "vBTxS3Av4la3IvuvrM8O",
+    "gappedSentence": "This software ______ users to track their progress easily.",
+    "base": "ABLE",
+    "answer": "enables",
+    "tags": "C1, verbs, regular verbs, verb formation"
+  },
+  {
+    "itemId": "VHiBDTOaovYxRCwFFY5e",
+    "gappedSentence": "______, nobody was injured in the accident.",
+    "base": "FORTUNATE",
+    "answer": "Unfortunately",
+    "tags": "B2, adverbs, negative, prefixes, comment adverbs"
+  },
+  {
+    "itemId": "VJ7yW0yslGbmPycG1WEN",
+    "gappedSentence": "The current situation is deeply ______ and needs urgent attention.",
+    "base": "PROBLEM",
+    "answer": "problematic",
+    "tags": "C1, adjectives, suffix -ic"
+  },
+  {
+    "itemId": "vplGJYkm3j8LDBmmfOF1",
+    "gappedSentence": "The dress was completely ______ for the formal event, so she had to change.",
+    "base": "SUIT",
+    "answer": "unsuitable",
+    "tags": "B2, adjectives, negative, prefixes, suffix -able, able/ible"
+  },
+  {
+    "itemId": "vQOzdiZ34NHjHmAOxuLP",
+    "gappedSentence": "His remarks were offensive and showed complete ______.",
+    "base": "RESPECT",
+    "answer": "disrespect",
+    "tags": "B2, nouns, abstract nouns, negative, prefixes"
+  },
+  {
+    "itemId": "Vs0jAc0FTqXpsIkx2hXf",
+    "gappedSentence": "There has been a clear ______ in his attitude over the last year.",
+    "base": "IMPROVE",
+    "answer": "improvement",
+    "tags": "B2, nouns, suffix -ment"
+  },
+  {
+    "itemId": "vWukRgEWF23CKzPaHa4K",
+    "gappedSentence": "After the peace agreement, dissenters formed a _______ group in protest.",
+    "base": "BREAK",
+    "answer": "breakaway",
+    "tags": "C2, adjectives, compound adjectives, phrasal verbs"
+  },
+  {
+    "itemId": "VX8oAaHpu2Kw4zstrtgi",
+    "gappedSentence": "Eating too much fast food can be ______.",
+    "base": "HEALTH",
+    "answer": "unhealthy",
+    "tags": "B2, adjectives, prefixes, negative, suffix -y"
+  },
+  {
+    "itemId": "VZOYKhtqV24NusSXIrt9",
+    "gappedSentence": "He drove ______ because the roads were icy.",
+    "base": "CARE",
+    "answer": "carefully",
+    "tags": "B1, adverbs, manner, suffix -ful, ful/less"
+  },
+  {
+    "itemId": "vztcqBxB25LVyJG1hsff",
+    "gappedSentence": "The region relies heavily on ______ for economic growth.",
+    "base": "TOUR",
+    "answer": "tourism",
+    "tags": "B1, nouns, abstract nouns, suffix -ism"
+  },
+  {
+    "itemId": "W7bnLzWEGJV1JdiLt5OO",
+    "gappedSentence": "His first ______ of the city left a lasting memory.",
+    "base": "IMPRESS",
+    "answer": "impression",
+    "tags": "B1, nouns, abstract nouns, suffix -ion"
+  },
+  {
+    "itemId": "W7R7UnYNP9uCm6v1EqoS",
+    "gappedSentence": "Social media has increased her online ______.",
+    "base": "POPULAR",
+    "answer": "popularity",
+    "tags": "B2, nouns, abstract nouns, suffix -ity"
+  },
+  {
+    "itemId": "WaalUqygTMm3EVD2YLjF",
+    "gappedSentence": "A long life does not necessarily result in greater ____.",
+    "base": "WISE",
+    "answer": "wisdom",
+    "tags": "C1, nouns, abstract nouns, irregular nouns"
+  },
+  {
+    "itemId": "WCBMWymlSHMmmJgKmUol",
+    "gappedSentence": "The task was formidable but has been _____ successfully",
+    "base": "TAKE",
+    "answer": "undertaken",
+    "tags": "C2, verbs, past participles, prefixes, irregular verbs"
+  },
+  {
+    "itemId": "wCKZmRcVfNnVFvi7MzAj",
+    "gappedSentence": "She had no ______ in passing the driving test.",
+    "base": "DIFFICULT",
+    "answer": "difficulty",
+    "tags": "B1, nouns, abstract nouns, suffix -y"
+  },
+  {
+    "itemId": "WGv7YYkbVO9sC2ot9Xl1",
+    "gappedSentence": "They were surprised to ______ a new species in the forest.",
+    "base": "COVER",
+    "answer": "discover",
+    "tags": "B2, verbs, prefixes, negative"
+  },
+  {
+    "itemId": "WlnLTeWwpWM4hqi82bb6",
+    "gappedSentence": "The evidence provided was ______ and failed to convince the jury.",
+    "base": "CONCLUSIVE",
+    "answer": "inconclusive",
+    "tags": "C1, adjectives, negative, prefixes, suffix -ive"
+  },
+  {
+    "itemId": "WmmYuheog7J4DQm0jLpW",
+    "gappedSentence": "He made an offensive comment that caused great ______.",
+    "base": "OFFEND",
+    "answer": "offence",
+    "tags": "B2, nouns, abstract nouns, suffix -ence"
+  },
+  {
+    "itemId": "woMxrMWJLSQQRFt3kb8j",
+    "gappedSentence": "The village was ______ by trees and mountains on all sides.",
+    "base": "SHELTER",
+    "answer": "sheltered",
+    "tags": "B2, adjectives, past participles, participles"
+  },
+  {
+    "itemId": "WvVMH81gEpFypwI4RIqB",
+    "gappedSentence": "The film was incredibly ______ and brought many people to tears.",
+    "base": "EMOTION",
+    "answer": "emotional",
+    "tags": "B2, adjectives, feelings, suffix -al"
+  },
+  {
+    "itemId": "x5VMmulrCbRuwboRLNqM",
+    "gappedSentence": "The company refused to ______ the details of the agreement.",
+    "base": "CLOSE",
+    "answer": "disclose",
+    "tags": "C1, verbs, prefixes, formal"
+  },
+  {
+    "itemId": "xFJKLvz3pw5JPGcmyF9Q",
+    "gappedSentence": "The performance was absolutely ______ and received a standing ovation.",
+    "base": "PHENOMENON",
+    "answer": "phenomenal",
+    "tags": "C1, adjectives, suffix -al"
+  },
+  {
+    "itemId": "xjwxz9pLclxjnUfZR9bZ",
+    "gappedSentence": "The continued ______ of such species depends on conservation efforts.",
+    "base": "EXIST",
+    "answer": "existence",
+    "tags": "B2, nouns, suffix -ence"
+  },
+  {
+    "itemId": "xQYLTDgNAjMgiGB5bCsi",
+    "gappedSentence": "The changes brought about a ______ shift in society.",
+    "base": "REVOLUTION",
+    "answer": "revolutionary",
+    "tags": "B2, adjectives, suffix -ary"
+  },
+  {
+    "itemId": "XTDdsJDYUbWyU9yeSFNc",
+    "gappedSentence": "The sudden ______ of the employee caught everyone off guard.",
+    "base": "DISMISS",
+    "answer": "dismissal",
+    "tags": "C1, nouns, abstract nouns, suffix -al"
+  },
+  {
+    "itemId": "xZ7tBa66SSbxVYmvUNj6",
+    "gappedSentence": "The report highlighted several ______ risks to the global economy.",
+    "base": "FINANCE",
+    "answer": "financial",
+    "tags": "B2, adjectives, suffix -ial, cial/tial"
+  },
+  {
+    "itemId": "y3hiGIterLExXU8FBjpj",
+    "gappedSentence": "It’s ______ to drive without a valid licence.",
+    "base": "LEGAL",
+    "answer": "illegal",
+    "tags": "B2, adjectives, negative, prefixes"
+  },
+  {
+    "itemId": "yad1HZnDhqtuwOI0WAh9",
+    "gappedSentence": "She spoke ______ bluntly, surprising even her closest friends.",
+    "base": "CHARACTER",
+    "answer": "uncharacteristically",
+    "tags": "C2, adverbs, prefixes, negative, suffix -ic, style/discourse markers"
+  },
+  {
+    "itemId": "YMCNpuh6bwx4dOlK5ynx",
+    "gappedSentence": "The region is ______ difficult to access by road.",
+    "base": "NOTORIETY",
+    "answer": "notoriously",
+    "tags": "C2, adverbs, suffix -ous, negative"
+  },
+  {
+    "itemId": "yo0ClyJFx9Uis4SgN4WY",
+    "gappedSentence": "Modern ______ are more concerned about sustainability than ever before.",
+    "base": "CONSUME",
+    "answer": "consumers",
+    "tags": "B1, nouns, people, suffix -er"
+  },
+  {
+    "itemId": "yvj6BANKMEgrTsAiD6nX",
+    "gappedSentence": "The town became ______ for its harsh prison conditions.",
+    "base": "NOTE",
+    "answer": "notorious",
+    "tags": "C1, adjectives, suffix -ous"
+  },
+  {
+    "itemId": "YWyLn4MTz1a8A9pvkhSr",
+    "gappedSentence": "The document turned out to be ______, leading to an internal inquiry.",
+    "base": "FRAUD",
+    "answer": "fraudulent",
+    "tags": "C1, adjectives, formal, suffix -ent"
+  },
+  {
+    "itemId": "YXePZ40ubxKH845ov4WE",
+    "gappedSentence": "That idea is absolutely ______ — you can’t be serious!",
+    "base": "RIDICULE",
+    "answer": "ridiculous",
+    "tags": "B2, adjectives, suffix -ous"
+  },
+  {
+    "itemId": "Z2Xy7OqShf1ClwIbA5sT",
+    "gappedSentence": "They found temporary ______ in a small village outside the city.",
+    "base": "LODGE",
+    "answer": "lodgings",
+    "tags": "C2, nouns, plural, gerunds"
+  },
+  {
+    "itemId": "z3w9YDAPbxREmEFXcKzP",
+    "gappedSentence": "Such a climb should only be undertaken by experienced ______.",
+    "base": "MOUNTAIN",
+    "answer": "mountaineers",
+    "tags": "C1, nouns, people, plural, suffix -eer"
+  },
+  {
+    "itemId": "Z4Q0RXUN5fm0eHKfHFFH",
+    "gappedSentence": "The new farming methods proved surprisingly ______.",
+    "base": "FRUIT",
+    "answer": "fruitful",
+    "tags": "C1, adjectives, suffix -ful, ful/less"
+  },
+  {
+    "itemId": "zJqWrZpbNYMIN9n18XsP",
+    "gappedSentence": "Coastal cliffs are particularly vulnerable to ______ over time.",
+    "base": "ERODE",
+    "answer": "erosion",
+    "tags": "B2, nouns, suffix -ion"
+  },
+  {
+    "itemId": "ZlnbXp2OSvolv9e14bwo",
+    "gappedSentence": "Her dancing showed both precision and strong ______.",
+    "base": "PERFORM",
+    "answer": "performance",
+    "tags": "B2, nouns, abstract nouns, suffix -ance"
+  },
+  {
+    "itemId": "zQckh2MWUJwZ6tDbl5ig",
+    "gappedSentence": "The practice is believed to have ______ in ancient Persia.",
+    "base": "ORIGIN",
+    "answer": "originated",
+    "tags": "C1, verbs, regular verbs, verb formation"
+  },
+  {
+    "itemId": "Zr8P78fIxrBelcdGIKkp",
+    "gappedSentence": "His protests were ________ and business went on as usual.",
+    "base": "CONSEQUENCE",
+    "answer": "inconsequential",
+    "tags": "C2, adjectives, suffix -ial, cial/tial, negative, prefixes"
+  },
+  {
+    "itemId": "zrVio148OMwDJpu5DuZQ",
+    "gappedSentence": "The children were severely ______ and in urgent need of care.",
+    "base": "NOURISH",
+    "answer": "malnourished",
+    "tags": "C2, adjectives, negative, prefixes, past participles, participles"
+  },
+  {
+    "itemId": "zVg2rVcswqBLPK9pyWuh",
+    "gappedSentence": "The liberals have won by massive margins in most ______ elections.",
+    "base": "PROVINCE",
+    "answer": "provincial",
+    "tags": "C1, adjectives, suffix -ial, cial/tial"
+  },
+  {
+    "itemId": "wf_add_0001",
+    "gappedSentence": "There is still deep ______ among experts about how the problem should be solved.",
+    "base": "AGREE",
+    "answer": "disagreement",
+    "tags": "B2, nouns, abstract nouns, negative, prefixes, suffix -ment"
+  },
+  {
+    "itemId": "wf_add_0002",
+    "gappedSentence": "His public comments caused a wave of ______ among local residents.",
+    "base": "ANGRY",
+    "answer": "anger",
+    "tags": "B2, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0003",
+    "gappedSentence": "The sudden ______ of dark clouds suggested a storm was coming.",
+    "base": "APPEAR",
+    "answer": "appearance",
+    "tags": "B2, nouns, abstract nouns, suffix -ance"
+  },
+  {
+    "itemId": "wf_add_0004",
+    "gappedSentence": "You must complete the online ______ before the closing date.",
+    "base": "APPLY",
+    "answer": "application",
+    "tags": "B1, nouns, abstract nouns, suffix -ion"
+  },
+  {
+    "itemId": "wf_add_0005",
+    "gappedSentence": "The project cannot go ahead without official ______ from the committee.",
+    "base": "APPROVE",
+    "answer": "approval",
+    "tags": "B2, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0006",
+    "gappedSentence": "The doors open and close ______ at the end of the working day.",
+    "base": "AUTOMATIC",
+    "answer": "automatically",
+    "tags": "B2, adverbs, suffix -ally"
+  },
+  {
+    "itemId": "wf_add_0007",
+    "gappedSentence": "The recipe is a simple ______ of traditional and modern techniques.",
+    "base": "COMBINE",
+    "answer": "combination",
+    "tags": "B2, nouns, abstract nouns, suffix -ion"
+  },
+  {
+    "itemId": "wf_add_0008",
+    "gappedSentence": "The country’s climate is strongly influenced by warm ______ air masses.",
+    "base": "CONTINENT",
+    "answer": "continental",
+    "tags": "C1, adjectives, suffix -al"
+  },
+  {
+    "itemId": "wf_add_0009",
+    "gappedSentence": "She paused ______ before answering the interviewer’s question.",
+    "base": "DELIBERATE",
+    "answer": "deliberately",
+    "tags": "C1, adverbs, manner"
+  },
+  {
+    "itemId": "wf_add_0010",
+    "gappedSentence": "There are clear ______ between the two approaches to teaching reading.",
+    "base": "DIFFERENT",
+    "answer": "differences",
+    "tags": "B1, nouns, plural, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0011",
+    "gappedSentence": "After several long ______, the group finally reached a decision.",
+    "base": "DISCUSS",
+    "answer": "discussions",
+    "tags": "B1, nouns, plural, abstract nouns, suffix -ion"
+  },
+  {
+    "itemId": "wf_add_0012",
+    "gappedSentence": "The country has seen strong ______ growth over the last decade.",
+    "base": "ECONOMY",
+    "answer": "economic",
+    "tags": "B2, adjectives, suffix -ic"
+  },
+  {
+    "itemId": "wf_add_0013",
+    "gappedSentence": "The issue has grown in ______ over the past few years.",
+    "base": "IMPORTANT",
+    "answer": "importance",
+    "tags": "B1, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0014",
+    "gappedSentence": "The young ______ became famous after developing a low-cost water filter.",
+    "base": "INVENT",
+    "answer": "inventor",
+    "tags": "B1, nouns, people, suffix -or"
+  },
+  {
+    "itemId": "wf_add_0015",
+    "gappedSentence": "It seems highly ______ that the results were caused by chance alone.",
+    "base": "LIKE",
+    "answer": "unlikely",
+    "tags": "B2, adjectives, negative, prefixes"
+  },
+  {
+    "itemId": "wf_add_0016",
+    "gappedSentence": "The exact ______ of the missing documents remains unknown.",
+    "base": "LOCATE",
+    "answer": "location",
+    "tags": "B1, nouns, suffix -ion"
+  },
+  {
+    "itemId": "wf_add_0017",
+    "gappedSentence": "The plant is still used for ______ purposes in some rural areas.",
+    "base": "MEDICINE",
+    "answer": "medicinal",
+    "tags": "C1, adjectives, suffix -al"
+  },
+  {
+    "itemId": "wf_add_0018",
+    "gappedSentence": "Even young children will ______ turn towards a familiar voice.",
+    "base": "NATURE",
+    "answer": "naturally",
+    "tags": "B1, adverbs"
+  },
+  {
+    "itemId": "wf_add_0019",
+    "gappedSentence": "There’s a lovely café in the square and several ______ bookshops.",
+    "base": "NEAR",
+    "answer": "nearby",
+    "tags": "B1, adjectives, location"
+  },
+  {
+    "itemId": "wf_add_0020",
+    "gappedSentence": "The decision was deeply ______ with voters across the region.",
+    "base": "POPULAR",
+    "answer": "unpopular",
+    "tags": "B2, adjectives, negative, prefixes"
+  },
+  {
+    "itemId": "wf_add_0021",
+    "gappedSentence": "At first the business was small, but it soon became highly ______.",
+    "base": "PROFIT",
+    "answer": "profitable",
+    "tags": "B2, adjectives, able/ible, suffix -able"
+  },
+  {
+    "itemId": "wf_add_0022",
+    "gappedSentence": "The region enjoyed a period of peace and ______ in the early 2000s.",
+    "base": "PROSPER",
+    "answer": "prosperity",
+    "tags": "C1, nouns, abstract nouns, suffix -ity"
+  },
+  {
+    "itemId": "wf_add_0023",
+    "gappedSentence": "His full ______ from illness took longer than expected.",
+    "base": "RECOVER",
+    "answer": "recovery",
+    "tags": "B2, nouns, abstract nouns, suffix -y"
+  },
+  {
+    "itemId": "wf_add_0024",
+    "gappedSentence": "I was surprised by the speed of her ______ to the news.",
+    "base": "RESPOND",
+    "answer": "response",
+    "tags": "B1, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0025",
+    "gappedSentence": "Many graduates go on to work in education, health, or public ______.",
+    "base": "SERVE",
+    "answer": "service",
+    "tags": "B1, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0026",
+    "gappedSentence": "After qualifying as a general teacher, she decided to ______ in special educational needs.",
+    "base": "SPECIAL",
+    "answer": [
+      "specialise",
+      "specialize"
+    ],
+    "tags": "C1, verbs, suffix -ise, verb formation"
+  },
+  {
+    "itemId": "wf_add_0027",
+    "gappedSentence": "The animal’s chances of ______ were low without immediate treatment.",
+    "base": "SURVIVE",
+    "answer": "survival",
+    "tags": "B2, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0028",
+    "gappedSentence": "______ , no one had expected the team to perform so well.",
+    "base": "TRUE",
+    "answer": "truly",
+    "tags": "B2, adverbs, discourse markers"
+  },
+  {
+    "itemId": "wf_add_0029",
+    "gappedSentence": "The museum attracts visitors for a ______ of reasons, from art to architecture.",
+    "base": "VARIOUS",
+    "answer": "variety",
+    "tags": "B2, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0030",
+    "gappedSentence": "The path was almost ______ in the thick morning fog.",
+    "base": "VISIBLE",
+    "answer": "invisible",
+    "tags": "B2, adjectives, negative, prefixes"
+  },
+  {
+    "itemId": "wf_add_0031",
+    "gappedSentence": "He was accused ______ her self-destructive behaviour.",
+    "base": "ABLE",
+    "answer": "enabling",
+    "tags": "C2, adjectives, present participles, participles"
+  },
+  {
+    "itemId": "wf_add_0032",
+    "gappedSentence": "Even a tiny error in measurement can affect the ______ of the final result.",
+    "base": "ACCURATE",
+    "answer": "accuracy",
+    "tags": "B2, nouns, abstract nouns, suffix -acy"
+  },
+  {
+    "itemId": "wf_add_0033",
+    "gappedSentence": "Long hours at a desk can lead to stiffness and physical ______.",
+    "base": "ACTIVITY",
+    "answer": "inactivity",
+    "tags": "B2, nouns, abstract nouns, negative, prefixes"
+  },
+  {
+    "itemId": "wf_add_0034",
+    "gappedSentence": "Archaeologists uncovered traces of an ancient ______ buried beneath the sand.",
+    "base": "CIVIL",
+    "answer": [
+      "civilisation",
+      "civilization"
+    ],
+    "tags": "C1, nouns, abstract nouns, suffix -ation"
+  },
+  {
+    "itemId": "wf_add_0035",
+    "gappedSentence": "The documentary offers a ______ argument for urgent reform.",
+    "base": "COMPEL",
+    "answer": "compelling",
+    "tags": "C1, adjectives, present participles, participles"
+  },
+  {
+    "itemId": "wf_add_0036",
+    "gappedSentence": "As the fog lifted, a narrow path was slowly ______ in front of us.",
+    "base": "COVER",
+    "answer": "uncovered",
+    "tags": "C1, adjectives, past participles, participles, prefixes, negative"
+  },
+  {
+    "itemId": "wf_add_0037",
+    "gappedSentence": "Recent ______ in battery technology have transformed the electric car market.",
+    "base": "DEVELOP",
+    "answer": "developments",
+    "tags": "B2, nouns, plural, abstract nouns, suffix -ment"
+  },
+  {
+    "itemId": "wf_add_0038",
+    "gappedSentence": "The safe ______ of chemical waste is strictly regulated.",
+    "base": "DISPOSE",
+    "answer": "disposal",
+    "tags": "C1, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0039",
+    "gappedSentence": "The lights dimmed, and the music changed ______ as the final scene began.",
+    "base": "DRAMA",
+    "answer": "dramatically",
+    "tags": "C1, adverbs, manner"
+  },
+  {
+    "itemId": "wf_add_0040",
+    "gappedSentence": "After several days in the heat, the food was completely ______.",
+    "base": "EDIBLE",
+    "answer": "inedible",
+    "tags": "B2, adjectives, negative, prefixes, able/ible, suffix -ible"
+  },
+  {
+    "itemId": "wf_add_0041",
+    "gappedSentence": "The company now offers free language classes to all new ______.",
+    "base": "EMPLOY",
+    "answer": "employees",
+    "tags": "B1, nouns, people, plural, suffix -ee"
+  },
+  {
+    "itemId": "wf_add_0042",
+    "gappedSentence": "Space ______ has always depended on a mixture of ambition and engineering skill.",
+    "base": "EXPLORE",
+    "answer": "exploration",
+    "tags": "B2, nouns, abstract nouns, suffix -ation"
+  },
+  {
+    "itemId": "wf_add_0043",
+    "gappedSentence": "As a child, he used to ______ about living on a distant planet.",
+    "base": "FANTASY",
+    "answer": [
+      "fantasise",
+      "fantasize"
+    ],
+    "tags": "C1, verbs, suffix -ise, verb formation"
+  },
+  {
+    "itemId": "wf_add_0044",
+    "gappedSentence": "The ______ of service has improved since the software update.",
+    "base": "FREQUENT",
+    "answer": "frequency",
+    "tags": "B2, nouns, abstract nouns, suffix -cy"
+  },
+  {
+    "itemId": "wf_add_0045",
+    "gappedSentence": "Despite delays, the negotiations are still ______ and a resolution seems close.",
+    "base": "GO",
+    "answer": "ongoing",
+    "tags": "C2, adjectives, present participles, participles, prefixes"
+  },
+  {
+    "itemId": "wf_add_0046",
+    "gappedSentence": "Her movements were so ______ that the dance looked effortless.",
+    "base": "GRACE",
+    "answer": "graceful",
+    "tags": "B2, adjectives, suffix -ful, ful/less"
+  },
+  {
+    "itemId": "wf_add_0047",
+    "gappedSentence": "Online learning is becoming ______ common in workplace training.",
+    "base": "INCREASE",
+    "answer": "increasingly",
+    "tags": "C1, adverbs"
+  },
+  {
+    "itemId": "wf_add_0048",
+    "gappedSentence": "The first ______ of the island had to adapt quickly to its harsh climate.",
+    "base": "INHABIT",
+    "answer": "inhabitants",
+    "tags": "B2, nouns, people, plural"
+  },
+  {
+    "itemId": "wf_add_0049",
+    "gappedSentence": "There is little ______ of the plan succeeding without further funding.",
+    "base": "LIKE",
+    "answer": "likelihood",
+    "tags": "C1, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0050",
+    "gappedSentence": "Most of her hard work went ______ by the wider public.",
+    "base": "NOTICE",
+    "answer": "unnoticed",
+    "tags": "C1, adjectives, past participles, negative, prefixes, participles"
+  },
+  {
+    "itemId": "wf_add_0051",
+    "gappedSentence": "Repeat ______ will be removed from the venue without a refund.",
+    "base": "OFFENCE",
+    "answer": "offenders",
+    "tags": "C1, nouns, people, plural"
+  },
+  {
+    "itemId": "wf_add_0052",
+    "gappedSentence": "There was a mood of deep ______ after the team conceded a late goal.",
+    "base": "PESSIMIST",
+    "answer": "pessimism",
+    "tags": "C1, nouns, abstract nouns, suffix -ism"
+  },
+  {
+    "itemId": "wf_add_0053",
+    "gappedSentence": "The emergency ______ of food and water was organised overnight.",
+    "base": "PROVIDE",
+    "answer": "provision",
+    "tags": "C1, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0054",
+    "gappedSentence": "Compared with previous years, prices have risen only ______ modestly.",
+    "base": "RELATE",
+    "answer": "relatively",
+    "tags": "B2, adverbs"
+  },
+  {
+    "itemId": "wf_add_0055",
+    "gappedSentence": "The hilltop village were ______ untouched by modern life.",
+    "base": "SEEM",
+    "answer": "seemingly",
+    "tags": "C2, adverbs"
+  },
+  {
+    "itemId": "wf_add_0056",
+    "gappedSentence": "The campaign has been ______ expanded into several new regions.",
+    "base": "SUCCEED",
+    "answer": "successfully",
+    "tags": "C1, adverbs"
+  },
+  {
+    "itemId": "wf_add_0057",
+    "gappedSentence": "Her early ______ reveal a sharp eye for detail and style.",
+    "base": "WRITE",
+    "answer": "writings",
+    "tags": "C1, nouns, plural"
+  },
+  {
+    "itemId": "wf_add_0058",
+    "gappedSentence": "The cave was filled with strange sounds and a ______ atmosphere.",
+    "base": "MYSTERY",
+    "answer": "mysterious",
+    "tags": "B2, adjectives, suffix -ous"
+  },
+  {
+    "itemId": "wf_add_0059",
+    "gappedSentence": "The children were happily ______ with one another by the end of the workshop.",
+    "base": "ACT",
+    "answer": "interacting",
+    "tags": "C1, verbs, present participles, participles"
+  },
+  {
+    "itemId": "wf_add_0060",
+    "gappedSentence": "Living near the station proved highly ______ for commuters.",
+    "base": "ADVANTAGE",
+    "answer": "advantageous",
+    "tags": "C1, adjectives, formal, suffix -ous"
+  },
+  {
+    "itemId": "wf_add_0061",
+    "gappedSentence": "She took the day off to recover from a minor ______.",
+    "base": "AIL",
+    "answer": "ailment",
+    "tags": "C2, nouns, suffix -ment"
+  },
+  {
+    "itemId": "wf_add_0062",
+    "gappedSentence": "The documents were ______ leaked to the press by a former employee.",
+    "base": "ALLEGE",
+    "answer": "allegedly",
+    "tags": "C2, adverbs, formal"
+  },
+  {
+    "itemId": "wf_add_0063",
+    "gappedSentence": "Students must submit all written ______ by the end of the week.",
+    "base": "ASSIGN",
+    "answer": "assignments",
+    "tags": "B2, nouns, plural, suffix -ment"
+  },
+  {
+    "itemId": "wf_add_0064",
+    "gappedSentence": "Experts questioned the ______ of the painting after several inconsistencies were found.",
+    "base": "AUTHENTIC",
+    "answer": "authenticity",
+    "tags": "C1, nouns, abstract nouns, suffix -ity"
+  },
+  {
+    "itemId": "wf_add_0065",
+    "gappedSentence": "The museum café felt oddly ______, despite its attempt at vintage charm.",
+    "base": "AUTHENTIC",
+    "answer": "inauthentic",
+    "tags": "C1, adjectives, negative, prefixes"
+  },
+  {
+    "itemId": "wf_add_0066",
+    "gappedSentence": "After years abroad, she still felt a strong sense of ______ to the town where she grew up.",
+    "base": "BELONG",
+    "answer": "belonging",
+    "tags": "B2, nouns, abstract nouns, gerunds"
+  },
+  {
+    "itemId": "wf_add_0067",
+    "gappedSentence": "We stopped at the cliff edge to admire the ______ view of the coast.",
+    "base": "BREATH",
+    "answer": "breathtaking",
+    "tags": "C1, adjectives, compound adjectives"
+  },
+  {
+    "itemId": "wf_add_0068",
+    "gappedSentence": "One ______ of his writing is the unusually short opening paragraph.",
+    "base": "CHARACTER",
+    "answer": "characteristic",
+    "tags": "C1, nouns, suffix -istic"
+  },
+  {
+    "itemId": "wf_add_0069",
+    "gappedSentence": "It was a bright but ______ morning, so we kept our coats on.",
+    "base": "CHILL",
+    "answer": "chilly",
+    "tags": "B2, adjectives, suffix -y"
+  },
+  {
+    "itemId": "wf_add_0070",
+    "gappedSentence": "Several members of the group remained ______ to the project after the first meeting.",
+    "base": "COMMIT",
+    "answer": "uncommitted",
+    "tags": "C1, adjectives, negative, prefixes, past participles"
+  },
+  {
+    "itemId": "wf_add_0071",
+    "gappedSentence": "Her results have been remarkably ______ over the last three years.",
+    "base": "CONSIST",
+    "answer": "consistent",
+    "tags": "B2, adjectives, suffix -ent"
+  },
+  {
+    "itemId": "wf_add_0072",
+    "gappedSentence": "She is widely seen as the strongest ______ for the role.",
+    "base": "CONTEND",
+    "answer": "contender",
+    "tags": "C1, nouns, people, suffix -er"
+  },
+  {
+    "itemId": "wf_add_0073",
+    "gappedSentence": "He was always ______ to visitors, even at the end of a long day.",
+    "base": "COURTESY",
+    "answer": "courteous",
+    "tags": "C2, adjectives, formal"
+  },
+  {
+    "itemId": "wf_add_0074",
+    "gappedSentence": "The advert was criticised for giving a ______ impression of the product.",
+    "base": "DECEIVE",
+    "answer": "deceptive",
+    "tags": "C2, adjectives, suffix -ive"
+  },
+  {
+    "itemId": "wf_add_0075",
+    "gappedSentence": "Given the amount of evidence available, their decision now seems ______.",
+    "base": "DEFEND",
+    "answer": "indefensible",
+    "tags": "C2, adjectives, negative, prefixes, suffix -ible"
+  },
+  {
+    "itemId": "wf_add_0076",
+    "gappedSentence": "The proposed cuts could have a ______ effect on small local businesses.",
+    "base": "DETRIMENT",
+    "answer": "detrimental",
+    "tags": "C1, adjectives, formal"
+  },
+  {
+    "itemId": "wf_add_0077",
+    "gappedSentence": "The minister issued a clear ______ to all regional offices.",
+    "base": "DIRECT",
+    "answer": "directive",
+    "tags": "C1, nouns, formal"
+  },
+  {
+    "itemId": "wf_add_0078",
+    "gappedSentence": "The software is designed for ______ of use rather than advanced functionality.",
+    "base": "EASY",
+    "answer": "ease",
+    "tags": "C1, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0079",
+    "gappedSentence": "With enough practice, the movement begins to look almost ______.",
+    "base": "EFFORT",
+    "answer": "effortless",
+    "tags": "C1, adjectives, negative, suffix -less, ful/less"
+  },
+  {
+    "itemId": "wf_add_0080",
+    "gappedSentence": "His ______ with the subject made the interview much more relaxed.",
+    "base": "FAMILIAR",
+    "answer": "familiarity",
+    "tags": "C1, nouns, abstract nouns, suffix -ity"
+  },
+  {
+    "itemId": "wf_add_0081",
+    "gappedSentence": "The school is currently ______ its computer system.",
+    "base": "GRADE",
+    "answer": "upgrading",
+    "tags": "C2, verbs, present participles, prefixes"
+  },
+  {
+    "itemId": "wf_add_0082",
+    "gappedSentence": "Her silence was ______ of how disappointed she really was.",
+    "base": "INDICATE",
+    "answer": "indicative",
+    "tags": "C1, adjectives, formal, suffix -ive"
+  },
+  {
+    "itemId": "wf_add_0083",
+    "gappedSentence": "The restaurant is famous for its ______ seafood stew.",
+    "base": "LEGEND",
+    "answer": "legendary",
+    "tags": "B2, adjectives, suffix -ary"
+  },
+  {
+    "itemId": "wf_add_0084",
+    "gappedSentence": "His calm expression ______ the panic he was actually feeling.",
+    "base": "LIE",
+    "answer": "belies",
+    "tags": "C2, verbs, formal"
+  },
+  {
+    "itemId": "wf_add_0085",
+    "gappedSentence": "The report focuses on the ______ causes of the crisis rather than its immediate effects.",
+    "base": "LIE",
+    "answer": "underlying",
+    "tags": "C2, adjectives, present participles, prefixes"
+  },
+  {
+    "itemId": "wf_add_0086",
+    "gappedSentence": "Winning the scholarship was the opportunity of a ______.",
+    "base": "LIFE",
+    "answer": "lifetime",
+    "tags": "C1, nouns, compound nouns"
+  },
+  {
+    "itemId": "wf_add_0087",
+    "gappedSentence": "Several economists were quick to ______ the long-term risks of the policy.",
+    "base": "LINE",
+    "answer": "underline",
+    "tags": "C2, verbs, prefixes"
+  },
+  {
+    "itemId": "wf_add_0088",
+    "gappedSentence": "The donation has ______ improved conditions at the shelter.",
+    "base": "MEASURE",
+    "answer": "immeasurably",
+    "tags": "C2, adverbs, negative, prefixes, formal"
+  },
+  {
+    "itemId": "wf_add_0089",
+    "gappedSentence": "It was one of the most ______ evenings of the entire trip.",
+    "base": "MEMORY",
+    "answer": "memorable",
+    "tags": "B2, adjectives, suffix -able"
+  },
+  {
+    "itemId": "wf_add_0090",
+    "gappedSentence": "The child ______ survived the fall with only minor injuries.",
+    "base": "MIRACLE",
+    "answer": "miraculously",
+    "tags": "C1, adverbs"
+  },
+  {
+    "itemId": "wf_add_0091",
+    "gappedSentence": "There is no ______ to replace the whole system at this stage.",
+    "base": "NECESSARY",
+    "answer": "necessity",
+    "tags": "B2, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0092",
+    "gappedSentence": "The athlete’s performance this season has been ______.",
+    "base": "PARALLEL",
+    "answer": "unparalleled",
+    "tags": "C2, adjectives, negative, prefixes"
+  },
+  {
+    "itemId": "wf_add_0093",
+    "gappedSentence": "Schools are expected to inform parents about their ______ responsibilities.",
+    "base": "PARENT",
+    "answer": "parental",
+    "tags": "B2, adjectives, suffix -al"
+  },
+  {
+    "itemId": "wf_add_0094",
+    "gappedSentence": "The speaker gave a clear and highly ______ argument in favour of reform.",
+    "base": "PERSUADE",
+    "answer": "persuasive",
+    "tags": "C1, adjectives, suffix -ive"
+  },
+  {
+    "itemId": "wf_add_0095",
+    "gappedSentence": "We spent the afternoon wandering through the town’s ______ old streets.",
+    "base": "PICTURE",
+    "answer": "picturesque",
+    "tags": "C2, adjectives"
+  },
+  {
+    "itemId": "wf_add_0096",
+    "gappedSentence": "The novel explores the harsh ______ of life in a remote community.",
+    "base": "REAL",
+    "answer": "realities",
+    "tags": "C1, nouns, plural, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0097",
+    "gappedSentence": "The cast has its first full ______ tomorrow afternoon.",
+    "base": "REHEARSE",
+    "answer": "rehearsal",
+    "tags": "C1, nouns"
+  },
+  {
+    "itemId": "wf_add_0098",
+    "gappedSentence": "A long bath is her usual way of achieving complete ______ after work.",
+    "base": "RELAX",
+    "answer": "relaxation",
+    "tags": "B2, nouns, abstract nouns, suffix -ation"
+  },
+  {
+    "itemId": "wf_add_0099",
+    "gappedSentence": "The smell of fresh bread was ______ once we walked past the bakery.",
+    "base": "RESIST",
+    "answer": "irresistible",
+    "tags": "C1, adjectives, negative, prefixes, suffix -ible"
+  },
+  {
+    "itemId": "wf_add_0100",
+    "gappedSentence": "The first ______ built their homes close to the river.",
+    "base": "SETTLE",
+    "answer": "settlers",
+    "tags": "B2, nouns, people, plural, suffix -er"
+  },
+  {
+    "itemId": "wf_add_0101",
+    "gappedSentence": "The book offers a fascinating ______ into the lives of migrant workers.",
+    "base": "SIGHT",
+    "answer": "insight",
+    "tags": "C2, nouns, abstract nouns, prefixes"
+  },
+  {
+    "itemId": "wf_add_0102",
+    "gappedSentence": "Everyone stopped talking when the curtains opened on the ______ set.",
+    "base": "SPECTACLE",
+    "answer": "spectacular",
+    "tags": "B2, adjectives"
+  },
+  {
+    "itemId": "wf_add_0103",
+    "gappedSentence": "The project only succeeded because of the excellent ______ between departments.",
+    "base": "TEAM",
+    "answer": "teamwork",
+    "tags": "C1, nouns, compound nouns"
+  },
+  {
+    "itemId": "wf_add_0104",
+    "gappedSentence": "Employees with permanent contracts have full ______ to paid leave.",
+    "base": "TITLE",
+    "answer": "entitlement",
+    "tags": "C1, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0105",
+    "gappedSentence": "Each new ______ is assigned a mentor during the first month.",
+    "base": "TRAIN",
+    "answer": "trainee",
+    "tags": "B2, nouns, people, suffix -ee"
+  },
+  {
+    "itemId": "wf_add_0106",
+    "gappedSentence": "The camp was intended as a ______ stop rather than a permanent base.",
+    "base": "TRANSIT",
+    "answer": "transitory",
+    "tags": "C2, adjectives"
+  },
+  {
+    "itemId": "wf_add_0107",
+    "gappedSentence": "One ______ of the painting is its unusual use of light.",
+    "base": "UNIQUE",
+    "answer": "uniqueness",
+    "tags": "C2, nouns, abstract nouns"
+  },
+  {
+    "itemId": "wf_add_0108",
+    "gappedSentence": "She was the only ______ of the accident willing to speak publicly.",
+    "base": "SURVIVE",
+    "answer": "survivor",
+    "tags": "B2, nouns, people"
+  }
+]

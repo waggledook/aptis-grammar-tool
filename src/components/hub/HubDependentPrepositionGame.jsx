@@ -76,6 +76,18 @@ function getNextRoundItem(items, queueState) {
   };
 }
 
+function replaySound(audioRef) {
+  const audio = audioRef?.current;
+  if (!audio) return;
+  try {
+    audio.pause();
+    audio.currentTime = 0;
+  } catch {
+    // ignore media reset issues
+  }
+  audio.play().catch(() => {});
+}
+
 export default function HubDependentPrepositionGame({ user }) {
   const navigate = useNavigate();
   const inputRef = useRef(null);
@@ -90,7 +102,12 @@ export default function HubDependentPrepositionGame({ user }) {
   const timeUpRef = useRef(null);
   const correctRef = useRef(null);
   const incorrectRef = useRef(null);
+  const startRef = useRef(null);
+  const whooshRef = useRef(null);
+  const finishRef = useRef(null);
   const previousTimeRef = useRef(ROUND_SECONDS);
+  const reportSoundPlayedRef = useRef(false);
+  const highScoreSoundPlayedRef = useRef(false);
   const { tickRef, tickFastRef, playTick } = useTickSound();
 
   const [selectedLevel, setSelectedLevel] = useState("a2");
@@ -202,6 +219,10 @@ export default function HubDependentPrepositionGame({ user }) {
   useEffect(() => {
     if (mode !== "report" || savedScoreRef.current || !stats.attempted || !user?.uid) return;
 
+    const previousBest = myTopScores.length
+      ? Math.max(...myTopScores.map((entry) => Number(entry.score) || 0))
+      : null;
+
     savedScoreRef.current = true;
     saveHubGameScore(leaderboardGameId, score, {
       level: currentLevel.label,
@@ -216,11 +237,16 @@ export default function HubDependentPrepositionGame({ user }) {
         ]);
         setGlobalLeaderboard(global);
         setMyTopScores(personal);
+        if (!soundMuted && !highScoreSoundPlayedRef.current && (previousBest === null || score > previousBest)) {
+          highScoreSoundPlayedRef.current = true;
+          if (finishRef.current) finishRef.current.currentTime = 0;
+          finishRef.current?.play().catch(() => {});
+        }
       })
       .catch((error) => {
         console.error("[HubDependentPrepositionGame] leaderboard save failed", error);
       });
-  }, [mode, score, stats, user?.uid, currentLevel.label, leaderboardGameId]);
+  }, [mode, score, stats, user?.uid, currentLevel.label, leaderboardGameId, myTopScores, soundMuted]);
 
   useEffect(() => {
     if (mode !== "report" || activityLoggedRef.current.completed || !stats.attempted) return;
@@ -255,16 +281,30 @@ export default function HubDependentPrepositionGame({ user }) {
   }, [mode, playTick, soundMuted, timeLeft]);
 
   useEffect(() => {
-    [tickRef, tickFastRef, timeUpRef, correctRef, incorrectRef].forEach((audioRef) => {
+    [tickRef, tickFastRef, timeUpRef, correctRef, incorrectRef, startRef, whooshRef, finishRef].forEach((audioRef) => {
       if (audioRef.current) {
         audioRef.current.muted = soundMuted;
       }
     });
   }, [soundMuted, tickRef, tickFastRef]);
 
+  useEffect(() => {
+    if (mode !== "report") {
+      reportSoundPlayedRef.current = false;
+      return;
+    }
+
+    if (!stats.attempted || soundMuted || reportSoundPlayedRef.current) return;
+    reportSoundPlayedRef.current = true;
+    if (whooshRef.current) whooshRef.current.currentTime = 0;
+    whooshRef.current?.play().catch(() => {});
+  }, [mode, stats.attempted, soundMuted]);
+
   function resetLevelView(levelId = selectedLevel) {
     const level = getDependentPrepositionLevel(levelId);
     savedScoreRef.current = false;
+    reportSoundPlayedRef.current = false;
+    highScoreSoundPlayedRef.current = false;
     setMode("setup");
     setCurrentItem(null);
     setAnswer("");
@@ -294,6 +334,8 @@ export default function HubDependentPrepositionGame({ user }) {
 
   function startRound() {
     savedScoreRef.current = false;
+    reportSoundPlayedRef.current = false;
+    highScoreSoundPlayedRef.current = false;
     activityLoggedRef.current.completed = false;
     if (advanceTimeoutRef.current) {
       window.clearTimeout(advanceTimeoutRef.current);
@@ -325,6 +367,11 @@ export default function HubDependentPrepositionGame({ user }) {
       tone: "info",
       text: "Fill the gap with the missing preposition and press Enter. The round keeps going until time runs out.",
     });
+
+    if (!soundMuted) {
+      if (startRef.current) startRef.current.currentTime = 0;
+      startRef.current?.play().catch(() => {});
+    }
 
     activityLoggedRef.current.started = true;
     logHubDependentPrepsStarted({
@@ -400,7 +447,7 @@ export default function HubDependentPrepositionGame({ user }) {
     if (isCorrect) {
       setAnswerTone("ok");
       if (!soundMuted) {
-        correctRef.current?.play().catch(() => {});
+        replaySound(correctRef);
       }
       setScore((current) => current + 5);
       setFeedback({
@@ -411,7 +458,7 @@ export default function HubDependentPrepositionGame({ user }) {
     } else {
       setAnswerTone("bad");
       if (!soundMuted) {
-        incorrectRef.current?.play().catch(() => {});
+        replaySound(incorrectRef);
       }
       setScore((current) => current - 1);
       setReviewItems((current) => {
@@ -447,12 +494,12 @@ export default function HubDependentPrepositionGame({ user }) {
     if (isCorrect) {
       setAnswerTone("ok");
       if (!soundMuted) {
-        correctRef.current?.play().catch(() => {});
+        replaySound(correctRef);
       }
     } else {
       setAnswerTone("bad");
       if (!soundMuted) {
-        incorrectRef.current?.play().catch(() => {});
+        replaySound(incorrectRef);
       }
     }
 
@@ -1149,6 +1196,9 @@ export default function HubDependentPrepositionGame({ user }) {
       <audio ref={timeUpRef} src="/sounds/time_up.mp3" preload="auto" />
       <audio ref={correctRef} src="/sounds/correct.mp3" preload="auto" />
       <audio ref={incorrectRef} src="/sounds/incorrect.mp3" preload="auto" />
+      <audio ref={startRef} src="/sounds/game_start.mp3" preload="auto" />
+      <audio ref={whooshRef} src="/sounds/whoosh.mp3" preload="auto" />
+      <audio ref={finishRef} src="/sounds/finish.mp3" preload="auto" />
     </div>
   );
 }
