@@ -1531,7 +1531,9 @@
     "gappedSentence": "The article ______ a clear distinction between privacy and secrecy.",
     "answer": [
       "draws",
-      "makes"
+      "makes",
+      "drew",
+      "made"
     ],
     "tags": "C2, verbs, collocations, fixed phrases, formal"
   },
@@ -1555,7 +1557,8 @@
     "gappedSentence": "The new policy is intended to ______ the needs of both students and teachers.",
     "answer": [
       "meet",
-      "address"
+      "address",
+      "satisfy"
     ],
     "tags": "C1, verbs, collocations, fixed phrases"
   },
@@ -1717,8 +1720,7 @@
     "itemId": "oc_0262",
     "gappedSentence": "The project was a success, largely ______ dint of the team's unwavering dedication.",
     "answer": [
-      "by",
-      "means"
+      "by"
     ],
     "tags": "C2, prepositions, linking, reason, fixed phrases"
   },

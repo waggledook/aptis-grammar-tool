@@ -412,6 +412,11 @@ export default function HubOpenClozeTrainer() {
 
     try {
       await saveHubOpenClozeResult(challenge.itemId, challenge.tags || "", isCorrect);
+      setSeenItemIds((prev) => {
+        const next = new Set(prev);
+        next.add(challenge.itemId);
+        return next;
+      });
     } catch (error) {
       console.error("[HubOpenClozeTrainer] save result failed", error);
     }

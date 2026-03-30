@@ -436,6 +436,11 @@ export default function HubKeywordTrainer() {
 
     try {
       await saveHubKeywordResult(challenge.itemId, challenge.tags || "", isCorrect);
+      setSeenItemIds((prev) => {
+        const next = new Set(prev);
+        next.add(challenge.itemId);
+        return next;
+      });
     } catch (error) {
       console.error("[HubKeywordTrainer] save result failed", error);
     }
