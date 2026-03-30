@@ -332,6 +332,7 @@ export default function HubDictationTrainer() {
     const sentence = sentences[getSentenceIndex(index, currentOrder)];
     return {
       sentence: sentence.text,
+      acceptedTexts: sentence.acceptedTexts || [sentence.text],
       audio: sentence.audio,
       attempts: [],
       answeredCorrectly: false,
@@ -428,7 +429,9 @@ export default function HubDictationTrainer() {
   function submitAnswer() {
     if (currentIndex < 0 || roundOver || !currentRoundEntry) return;
 
-    const target = activeSentences[getSentenceIndex()].text;
+    const sentenceConfig = activeSentences[getSentenceIndex()];
+    const target = sentenceConfig.text;
+    const acceptedTargets = sentenceConfig.acceptedTexts || [target];
     const typed = inputValue;
     const updatedEntry = {
       ...currentRoundEntry,
@@ -437,7 +440,7 @@ export default function HubDictationTrainer() {
     setCurrentRoundEntry(updatedEntry);
     setFeedbackHtml(compareWords(typed, target));
 
-    if (normalize(typed) === normalize(target)) {
+    if (acceptedTargets.some((candidate) => normalize(typed) === normalize(candidate))) {
       const points = attempt === 1 ? 10 : 5;
       const correctEntry = {
         ...updatedEntry,
