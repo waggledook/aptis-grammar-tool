@@ -92,6 +92,8 @@ import HubKeywordTrainer from "./components/hub/HubKeywordTrainer.jsx";
 import HubWordFormationTrainer from "./components/hub/HubWordFormationTrainer.jsx";
 import HubVocabularyMenu from "./components/hub/HubVocabularyMenu.jsx";
 import HubGamesMenu from "./components/hub/HubGamesMenu.jsx";
+import HubGameLeaderboards from "./components/hub/HubGameLeaderboards.jsx";
+import HubDependentPrepositionGame from "./components/hub/HubDependentPrepositionGame.jsx";
 import HubSpanglishFixIt from "./components/hub/HubSpanglishFixIt.jsx";
 import HubSpanglishLiveHost from "./components/hub/HubSpanglishLiveHost.jsx";
 import HubSpanglishLiveJoin from "./components/hub/HubSpanglishLiveJoin.jsx";
@@ -473,6 +475,8 @@ return (
   <Route path="/use-of-english/keyword" element={<HubKeywordTrainer />} />
   <Route path="/use-of-english/word-formation" element={<HubWordFormationTrainer />} />
   <Route path="/games" element={<HubGamesMenu />} />
+  <Route path="/games/leaderboards" element={<HubGameLeaderboards user={user} />} />
+  <Route path="/games/dependent-prepositions" element={<HubDependentPrepositionGame user={user} />} />
   <Route path="/games/spanglish-fix-it" element={<HubSpanglishFixIt user={user} />} />
   <Route path="/games/spanglish-fix-it/host/:gameId" element={<HubSpanglishLiveHost user={user} />} />
   <Route path="/games/spanglish-fix-it/join" element={<HubSpanglishLiveJoin />} />

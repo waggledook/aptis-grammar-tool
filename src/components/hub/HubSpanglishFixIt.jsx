@@ -5,12 +5,22 @@ import { getSitePath } from "../../siteConfig.js";
 import { HUB_SPANGLISH_FIX_IT_ITEMS } from "../../data/hubSpanglishFixItItems.js";
 import { createSpanglishLiveGame } from "../../api/liveGames";
 import { toast } from "../../utils/toast";
+import {
+  fetchMyTopHubGameScores,
+  fetchTopHubGameScores,
+  logHubSpanglishCompleted,
+  logHubSpanglishLiveHosted,
+  logHubSpanglishReviewStarted,
+  logHubSpanglishStarted,
+  saveHubGameScore,
+} from "../../firebase.js";
 
 const ROUND_SIZE = 15;
 const PHASE_MAX_SCORE = 100;
 const PHASE_MIN_SCORE = 10;
 const PHASE_DURATION_MS = 30000;
 const WRONG_PENALTY = 50;
+const GAME_ID = "hub_spanglish_fixit";
 
 function shuffle(array) {
   const copy = [...array];
@@ -45,6 +55,12 @@ export default function HubSpanglishFixIt({ user }) {
   const answerRef = useRef(null);
   const timerRef = useRef(null);
   const phaseStartRef = useRef(0);
+  const savedScoreRef = useRef(false);
+  const activityLoggedRef = useRef({
+    normalStarted: false,
+    reviewStarted: false,
+    completed: false,
+  });
 
   const [items, setItems] = useState([]);
   const [started, setStarted] = useState(false);
@@ -64,6 +80,8 @@ export default function HubSpanglishFixIt({ user }) {
   const [phase, setPhase] = useState("idle");
   const [phasePoints, setPhasePoints] = useState(PHASE_MAX_SCORE);
   const [phaseRunKey, setPhaseRunKey] = useState(0);
+  const [myTopScores, setMyTopScores] = useState([]);
+  const [globalLeaderboard, setGlobalLeaderboard] = useState([]);
 
   const currentSet = reviewMode ? reviewQueue : items;
   const currentItem = currentSet[currentIndex] || null;
@@ -122,6 +140,62 @@ export default function HubSpanglishFixIt({ user }) {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadBoards() {
+      try {
+        const [global, personal] = await Promise.all([
+          fetchTopHubGameScores(GAME_ID, 10),
+          user?.uid ? fetchMyTopHubGameScores(GAME_ID, 3, user.uid) : Promise.resolve([]),
+        ]);
+        if (cancelled) return;
+        setGlobalLeaderboard(global);
+        setMyTopScores(personal);
+      } catch (error) {
+        console.error("[HubSpanglishFixIt] leaderboard load failed", error);
+      }
+    }
+
+    loadBoards();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uid]);
+
+  useEffect(() => {
+    if (!showSummary || reviewMode || savedScoreRef.current || !user?.uid || score <= 0) return;
+
+    savedScoreRef.current = true;
+    saveHubGameScore(GAME_ID, score, {
+      totalItems: currentSet.length,
+      wrongAnswers: wrongAnswers.length,
+    })
+      .then(async () => {
+        const [global, personal] = await Promise.all([
+          fetchTopHubGameScores(GAME_ID, 10),
+          fetchMyTopHubGameScores(GAME_ID, 3, user.uid),
+        ]);
+        setGlobalLeaderboard(global);
+        setMyTopScores(personal);
+      })
+      .catch((error) => {
+        console.error("[HubSpanglishFixIt] leaderboard save failed", error);
+      });
+  }, [showSummary, reviewMode, score, user?.uid, currentSet.length, wrongAnswers.length]);
+
+  useEffect(() => {
+    if (!showSummary || reviewMode || activityLoggedRef.current.completed) return;
+
+    activityLoggedRef.current.completed = true;
+    logHubSpanglishCompleted({
+      mode: "normal",
+      score,
+      totalItems: currentSet.length,
+      wrongAnswers: wrongAnswers.length,
+    });
+  }, [showSummary, reviewMode, score, currentSet.length, wrongAnswers.length]);
+
+  useEffect(() => {
     if (!started || !currentItem) {
       stopPhaseTimer();
       return;
@@ -131,6 +205,10 @@ export default function HubSpanglishFixIt({ user }) {
   }, [started, currentIndex, reviewMode]);
 
   function startRound(mode = "normal") {
+    if (mode === "normal") {
+      savedScoreRef.current = false;
+      activityLoggedRef.current.completed = false;
+    }
     const source =
       mode === "review"
         ? shuffle(wrongAnswers)
@@ -151,6 +229,22 @@ export default function HubSpanglishFixIt({ user }) {
     setCurrentIndex(0);
     setPhase("idle");
     setPhasePoints(PHASE_MAX_SCORE);
+
+    if (mode === "review") {
+      activityLoggedRef.current.reviewStarted = true;
+      logHubSpanglishReviewStarted({
+        mode: "review",
+        total: source.length,
+      });
+      return;
+    }
+
+    activityLoggedRef.current.normalStarted = true;
+    logHubSpanglishStarted({
+      mode: "normal",
+      total: source.length,
+      poolSize: HUB_SPANGLISH_FIX_IT_ITEMS.length,
+    });
   }
 
   function handleWordClick(word) {
@@ -254,6 +348,11 @@ export default function HubSpanglishFixIt({ user }) {
     try {
       const items = shuffle(HUB_SPANGLISH_FIX_IT_ITEMS).slice(0, ROUND_SIZE);
       const { gameId, pin } = await createSpanglishLiveGame({ items });
+      await logHubSpanglishLiveHosted({
+        gameId,
+        pin,
+        roundCount: items.length,
+      });
       toast(`Live game created – PIN ${pin}`);
       navigate(getSitePath(`/games/spanglish-fix-it/host/${gameId}`));
     } catch (error) {
@@ -408,6 +507,45 @@ export default function HubSpanglishFixIt({ user }) {
               Play again
             </button>
           </div>
+
+          <div className="hub-spanglish-leaderboards">
+            <div className="hub-spanglish-board">
+              <h3>Your top scores</h3>
+              {user?.uid ? (
+                myTopScores.length ? (
+                  <div className="hub-spanglish-board-list">
+                    {myTopScores.map((entry, index) => (
+                      <div key={entry.id} className="hub-spanglish-board-row">
+                        <span>#{index + 1}</span>
+                        <strong>{entry.score}</strong>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="hub-spanglish-board-empty">No saved scores yet.</p>
+                )
+              ) : (
+                <p className="hub-spanglish-board-empty">Sign in to save your top 3 scores.</p>
+              )}
+            </div>
+
+            <div className="hub-spanglish-board">
+              <h3>Global leaderboard</h3>
+              {globalLeaderboard.length ? (
+                <div className="hub-spanglish-board-list">
+                  {globalLeaderboard.map((entry, index) => (
+                    <div key={entry.id} className="hub-spanglish-board-row">
+                      <span>#{index + 1}</span>
+                      <em>{entry.displayName}</em>
+                      <strong>{entry.score}</strong>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="hub-spanglish-board-empty">No leaderboard scores yet.</p>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -539,6 +677,51 @@ export default function HubSpanglishFixIt({ user }) {
           gap: .65rem;
           flex-wrap: wrap;
           margin-top: 1rem;
+        }
+
+        .hub-spanglish-leaderboards {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 1rem;
+          margin-top: 1rem;
+        }
+
+        .hub-spanglish-board {
+          border-radius: 18px;
+          padding: 1rem;
+          background: rgba(16, 24, 46, 0.42);
+          border: 1px solid rgba(108, 136, 199, 0.22);
+        }
+
+        .hub-spanglish-board h3 {
+          margin: 0 0 .75rem;
+          color: #eef4ff;
+        }
+
+        .hub-spanglish-board-list {
+          display: grid;
+          gap: .55rem;
+        }
+
+        .hub-spanglish-board-row {
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          gap: .75rem;
+          align-items: center;
+          color: rgba(230, 240, 255, 0.9);
+        }
+
+        .hub-spanglish-board-row em {
+          font-style: normal;
+          opacity: .88;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .hub-spanglish-board-empty {
+          margin: 0;
+          color: rgba(230, 240, 255, 0.72);
         }
 
         .hub-spanglish-host-actions {
@@ -691,6 +874,10 @@ export default function HubSpanglishFixIt({ user }) {
         }
 
         @media (max-width: 720px) {
+          .hub-spanglish-leaderboards {
+            grid-template-columns: 1fr;
+          }
+
           .hub-spanglish-topbar {
             min-height: 0;
           }

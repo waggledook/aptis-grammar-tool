@@ -406,6 +406,92 @@ export async function fetchTopCollocationDashScores(n = 3, uid) {
   });
 }
 
+// ────────────────────────────────
+// Seif Hub game leaderboards
+// Personal: /users/{uid}/hubGameLeaderboards/{gameId}/scores
+// Global:   /leaderboards/{gameId}/scores
+// ────────────────────────────────
+
+function getHubGameUserScoresCol(uid, gameId) {
+  return collection(db, "users", uid, "hubGameLeaderboards", gameId, "scores");
+}
+
+function getHubGameGlobalScoresCol(gameId) {
+  return collection(db, "leaderboards", gameId, "scores");
+}
+
+export async function saveHubGameScore(gameId, score, details = {}) {
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const numericScore = Number(score) || 0;
+  if (numericScore <= 0) return;
+
+  const displayName =
+    details.displayName ||
+    user.displayName ||
+    details.name ||
+    user.email ||
+    "User";
+
+  const payload = {
+    uid: user.uid,
+    score: numericScore,
+    createdAt: serverTimestamp(),
+    displayName,
+    userEmail: user.email || null,
+    app: "seifhub",
+    gameId,
+    ...details,
+  };
+
+  await addDoc(getHubGameUserScoresCol(user.uid, gameId), payload);
+  await addDoc(getHubGameGlobalScoresCol(gameId), payload);
+}
+
+export async function fetchMyTopHubGameScores(gameId, n = 3, uid) {
+  const realUid = uid || auth.currentUser?.uid || null;
+  if (!realUid) return [];
+
+  const qy = query(
+    getHubGameUserScoresCol(realUid, gameId),
+    orderBy("score", "desc"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => {
+    const data = d.data() || {};
+    return {
+      id: d.id,
+      score: data.score ?? 0,
+      createdAt: data.createdAt || null,
+      displayName: data.displayName || null,
+      details: data.details || null,
+    };
+  });
+}
+
+export async function fetchTopHubGameScores(gameId, n = 10) {
+  const qy = query(
+    getHubGameGlobalScoresCol(gameId),
+    orderBy("score", "desc"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => {
+    const data = d.data() || {};
+    return {
+      id: d.id,
+      uid: data.uid || null,
+      score: data.score ?? 0,
+      createdAt: data.createdAt || null,
+      displayName: data.displayName || data.userEmail || "User",
+    };
+  });
+}
+
 // ─── GLOBAL ACTIVITY LOG ─────────────────────────────────────────────────────
 /**
  * Append a single activity event to /activityLog.
@@ -489,6 +575,76 @@ export async function logHubWordFormationCompleted(details = {}) {
 
 export async function logHubFlashcardsStarted(details = {}) {
   return logActivity("hub_flashcards_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubSpanglishStarted(details = {}) {
+  return logActivity("hub_spanglish_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubSpanglishCompleted(details = {}) {
+  return logActivity("hub_spanglish_completed", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubSpanglishReviewStarted(details = {}) {
+  return logActivity("hub_spanglish_review_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubDependentPrepsStarted(details = {}) {
+  return logActivity("hub_dependent_preps_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubDependentPrepsCompleted(details = {}) {
+  return logActivity("hub_dependent_preps_completed", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubDependentPrepsReviewStarted(details = {}) {
+  return logActivity("hub_dependent_preps_review_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubSpanglishLiveHosted(details = {}) {
+  return logActivity("hub_spanglish_live_hosted", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubSpanglishLiveStarted(details = {}) {
+  return logActivity("hub_spanglish_live_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubSpanglishLiveFinished(details = {}) {
+  return logActivity("hub_spanglish_live_finished", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubSpanglishLiveReportViewed(details = {}) {
+  return logActivity("hub_spanglish_live_report_viewed", {
     app: "seifhub",
     ...details,
   });

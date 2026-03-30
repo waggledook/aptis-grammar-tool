@@ -3,7 +3,12 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ref, onValue } from "firebase/database";
 import { QRCodeSVG } from "qrcode.react";
 import Seo from "../common/Seo.jsx";
-import { rtdb } from "../../firebase";
+import {
+  logHubSpanglishLiveFinished,
+  logHubSpanglishLiveReportViewed,
+  logHubSpanglishLiveStarted,
+  rtdb,
+} from "../../firebase";
 import { getSitePath } from "../../siteConfig.js";
 import { setLiveGameState, setLiveGameStatus } from "../../api/liveGames";
 import { toast } from "../../utils/toast";
@@ -49,6 +54,11 @@ export default function HubSpanglishLiveHost({ user }) {
   const [soundVolume, setSoundVolume] = useState(0.9);
   const [soundMuted, setSoundMuted] = useState(false);
   const [musicSrc, setMusicSrc] = useState("");
+  const liveActivityRef = useRef({
+    started: false,
+    finished: false,
+    reportViewed: false,
+  });
   const { tickRef, tickFastRef, playTick } = useTickSound();
   const revealRef = useRef(null);
   const finishRef = useRef(null);
@@ -234,6 +244,13 @@ export default function HubSpanglishLiveHost({ user }) {
         scoreDeadline: Date.now() + clickDuration * 1000,
         questionDeadline: Date.now() + clickDuration * 1000,
       });
+      liveActivityRef.current.started = true;
+      logHubSpanglishLiveStarted({
+        gameId,
+        pin: game?.pin || null,
+        playerCount: players.length,
+        roundCount: items.length,
+      });
     } catch (error) {
       console.error("[HubSpanglishLiveHost] start failed", error);
       toast("Could not start the live game.");
@@ -272,6 +289,14 @@ export default function HubSpanglishLiveHost({ user }) {
       }
       await setLiveGameStatus(gameId, "finished");
       await setPhase("finished", { scoreDeadline: null, questionDeadline: null });
+      liveActivityRef.current.finished = true;
+      logHubSpanglishLiveFinished({
+        gameId,
+        pin: game?.pin || null,
+        playerCount: players.length,
+        roundCount: items.length,
+        completedRounds: roundIndex + 1,
+      });
       if (finishRef.current) {
         try {
           finishRef.current.currentTime = 0;
@@ -332,6 +357,18 @@ export default function HubSpanglishLiveHost({ user }) {
   }, [isHost, isGraceActive, remainingSeconds, playTick]);
 
   useEffect(() => {
+    if (game?.status !== "finished" || liveActivityRef.current.finished) return;
+    liveActivityRef.current.finished = true;
+    logHubSpanglishLiveFinished({
+      gameId,
+      pin: game?.pin || null,
+      playerCount: players.length,
+      roundCount: items.length,
+      completedRounds: items.length,
+    });
+  }, [game?.status, gameId, game?.pin, players.length, items.length]);
+
+  useEffect(() => {
     const isMainPhase = (phase === "click" || phase === "correction") && !!scoreDeadline && questionDeadline === scoreDeadline;
     if (!isHost || !musicRef.current) return;
 
@@ -368,6 +405,20 @@ export default function HubSpanglishLiveHost({ user }) {
     return <div className="page narrow"><p>You are not the host of this Spanglish game.</p></div>;
   }
 
+  function handleToggleReport() {
+    const next = !showReport;
+    setShowReport(next);
+    if (next && !liveActivityRef.current.reportViewed) {
+      liveActivityRef.current.reportViewed = true;
+      logHubSpanglishLiveReportViewed({
+        gameId,
+        pin: game?.pin || null,
+        playerCount: players.length,
+        roundCount: items.length,
+      });
+    }
+  }
+
   return (
     <div className="menu-wrapper hub-spanglish-live-shell">
       <Seo title="Host Spanglish Fix-It Live | Seif Hub" description="Host a live Spanglish Fix-It game." />
@@ -390,7 +441,7 @@ export default function HubSpanglishLiveHost({ user }) {
               <h2>Game complete</h2>
               <p className="hub-live-copy">Open the report for a full stats breakdown and question-by-question review.</p>
             </div>
-            <button className="whats-new-btn" onClick={() => setShowReport((current) => !current)}>
+            <button className="whats-new-btn" onClick={handleToggleReport}>
               {showReport ? "Hide game report" : "See game report"}
             </button>
           </div>

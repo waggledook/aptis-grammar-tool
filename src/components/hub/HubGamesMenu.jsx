@@ -38,10 +38,24 @@ export default function HubGamesMenu() {
       </div>
 
       <div className="menu-grid">
+        <button className="menu-card" onClick={() => navigate(getSitePath("/games/leaderboards"))}>
+          <h3>Leaderboards</h3>
+          <p>
+            See your best scores, compare levels, and check how players across the hub are doing in each game.
+          </p>
+        </button>
+
         <button className="menu-card" onClick={() => navigate(getSitePath("/games/spanglish-fix-it"))}>
           <h3>Spanglish Fix-It</h3>
           <p>
             Find the wrong word, correct it quickly, and build awareness of common Spanish-to-English mistakes.
+          </p>
+        </button>
+
+        <button className="menu-card" onClick={() => navigate(getSitePath("/games/dependent-prepositions"))}>
+          <h3>Dependent Preposition Challenge</h3>
+          <p>
+            Practise the prepositions that naturally follow common verbs, adjectives, and nouns, with levels from A2 up to C1/2.
           </p>
         </button>
       </div>
@@ -185,7 +199,7 @@ export default function HubGamesMenu() {
           line-height: 1.45;
         }
 
-        .hub-menu-wrapper .menu-card:first-child {
+        .hub-menu-wrapper .menu-card {
           min-height: 190px;
           display: flex;
           flex-direction: column;

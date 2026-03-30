@@ -38,6 +38,16 @@ const typeLabels = {
   hub_grammar_submitted: "Hub grammar submitted",
   hub_dictation_completed: "Hub dictation completed",
   hub_flashcards_started: "Hub flashcards started",
+  hub_spanglish_started: "Hub Spanglish started",
+  hub_spanglish_review_started: "Hub Spanglish review started",
+  hub_spanglish_completed: "Hub Spanglish completed",
+  hub_spanglish_live_hosted: "Hub Spanglish live hosted",
+  hub_spanglish_live_started: "Hub Spanglish live started",
+  hub_spanglish_live_finished: "Hub Spanglish live finished",
+  hub_spanglish_live_report_viewed: "Hub Spanglish live report viewed",
+  hub_dependent_preps_started: "Hub dependent preps started",
+  hub_dependent_preps_review_started: "Hub dependent preps review started",
+  hub_dependent_preps_completed: "Hub dependent preps completed",
   hub_keyword_started: "Hub keyword started",
   hub_keyword_review_loaded: "Hub keyword review loaded",
   hub_keyword_completed: "Hub keyword completed",
@@ -232,6 +242,36 @@ case "hub_dictation_completed":
 
 case "hub_flashcards_started":
   return `${d.mode || "deck"} · ${d.deckTitle || d.deckId || "Flashcards"} · ${d.total ?? "?"} card${d.total === 1 ? "" : "s"}`;
+
+case "hub_spanglish_started":
+  return `${d.mode || "normal"} · ${d.totalItems ?? "?"} item${d.totalItems === 1 ? "" : "s"}`;
+
+case "hub_spanglish_review_started":
+  return `${d.mode || "review"} · ${d.total ?? "?"} item${d.total === 1 ? "" : "s"}`;
+
+case "hub_spanglish_completed":
+  return `${d.score ?? "?"} pts · ${d.wrongAnswers ?? "?"} saved for review · ${d.totalItems ?? "?"} item${d.totalItems === 1 ? "" : "s"}`;
+
+case "hub_spanglish_live_hosted":
+  return `PIN ${d.pin ?? "?"} · ${d.roundCount ?? "?"} round${d.roundCount === 1 ? "" : "s"}`;
+
+case "hub_spanglish_live_started":
+  return `PIN ${d.pin ?? "?"} · ${d.playerCount ?? "?"} player${d.playerCount === 1 ? "" : "s"} · ${d.roundCount ?? "?"} round${d.roundCount === 1 ? "" : "s"}`;
+
+case "hub_spanglish_live_finished":
+  return `PIN ${d.pin ?? "?"} · ${d.playerCount ?? "?"} player${d.playerCount === 1 ? "" : "s"} · ${d.completedRounds ?? d.roundCount ?? "?"}/${d.roundCount ?? "?"} round${d.roundCount === 1 ? "" : "s"}`;
+
+case "hub_spanglish_live_report_viewed":
+  return `PIN ${d.pin ?? "?"} · ${d.playerCount ?? "?"} player${d.playerCount === 1 ? "" : "s"}`;
+
+case "hub_dependent_preps_started":
+  return `${d.level || d.levelId || "level"} · ${d.roundSeconds ?? "?"}s round · pool ${d.totalItems ?? "?"}`;
+
+case "hub_dependent_preps_review_started":
+  return `${d.level || d.levelId || "level"} · ${d.total ?? "?"} item${d.total === 1 ? "" : "s"}`;
+
+case "hub_dependent_preps_completed":
+  return `${d.level || d.levelId || "level"} · ${d.score ?? "?"} pts · ${d.correct ?? "?"}/${d.attempted ?? "?"}`;
 
 case "hub_keyword_started":
   return `${d.mode || "normal"} · pool ${d.poolSize ?? "?"} · set ${d.total ?? "?"}`;
@@ -490,6 +530,16 @@ const [cursorDoc, setCursorDoc] = useState(null);
             <option value="hub_grammar_submitted">Hub grammar submitted</option>
             <option value="hub_dictation_completed">Hub dictation completed</option>
             <option value="hub_flashcards_started">Hub flashcards started</option>
+            <option value="hub_spanglish_started">Hub Spanglish started</option>
+            <option value="hub_spanglish_review_started">Hub Spanglish review started</option>
+            <option value="hub_spanglish_completed">Hub Spanglish completed</option>
+            <option value="hub_spanglish_live_hosted">Hub Spanglish live hosted</option>
+            <option value="hub_spanglish_live_started">Hub Spanglish live started</option>
+            <option value="hub_spanglish_live_finished">Hub Spanglish live finished</option>
+            <option value="hub_spanglish_live_report_viewed">Hub Spanglish live report viewed</option>
+            <option value="hub_dependent_preps_started">Hub dependent preps started</option>
+            <option value="hub_dependent_preps_review_started">Hub dependent preps review started</option>
+            <option value="hub_dependent_preps_completed">Hub dependent preps completed</option>
             <option value="speaking_task_completed">Speaking task completed</option>
             <option value="vocab_flashcards_session">Vocab flashcards</option>
             <option value="vocab_match_session">Vocab match</option>
