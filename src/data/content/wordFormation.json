@@ -1539,7 +1539,7 @@
   },
   {
     "itemId": "rnRVFVkpmBFr4BLvorXX",
-    "gappedSentence": "The new regime focused on the ______ of the national economy.",
+    "gappedSentence": "The new regime focused on ______ the national economy.",
     "base": "STRONG",
     "answer": "strengthening",
     "tags": "C1, nouns, gerunds, verbs, irregular, irregular, suffix -en"

@@ -997,5 +997,771 @@
       "face"
     ],
     "tags": "C2, verbs, idioms, fixed phrases"
+  },
+  {
+    "itemId": "oc_0155",
+    "gappedSentence": "Many temporary attractions end ___ remaining in place far longer than originally planned.",
+    "answer": "up",
+    "tags": "C1, phrasal verbs, particles, fixed phrases"
+  },
+  {
+    "itemId": "oc_0156",
+    "gappedSentence": "The old market hall is still thought highly ___ by local residents.",
+    "answer": "of",
+    "tags": "C1, prepositions, fixed phrases, dependent prepositions"
+  },
+  {
+    "itemId": "oc_0157",
+    "gappedSentence": "There is very ___ doubt that the scheme has improved the area.",
+    "answer": "little",
+    "tags": "B2, quantifiers, uncountable nouns, fixed phrases"
+  },
+  {
+    "itemId": "oc_0158",
+    "gappedSentence": "The tower was designed to be used ___ a viewing platform as well as a landmark.",
+    "answer": "as",
+    "tags": "B2, prepositions, fixed phrases"
+  },
+  {
+    "itemId": "oc_0159",
+    "gappedSentence": "After seeing similar projects elsewhere, the council developed ___ strong sense of competition.",
+    "answer": "a",
+    "tags": "B2, articles, determiners, fixed phrases"
+  },
+  {
+    "itemId": "oc_0160",
+    "gappedSentence": "They felt driven ___ create something even more ambitious.",
+    "answer": "to",
+    "tags": "C1, prepositions, adjective + infinitive, verb patterns"
+  },
+  {
+    "itemId": "oc_0161",
+    "gappedSentence": "She’s really ___ adventure sports and is always planning her next trip.",
+    "answer": "into",
+    "tags": "B2, prepositions, adjective + preposition, fixed phrases"
+  },
+  {
+    "itemId": "oc_0162",
+    "gappedSentence": "They organised the event to raise money ___ a local charity.",
+    "answer": "for",
+    "tags": "B2, prepositions, fixed phrases"
+  },
+  {
+    "itemId": "oc_0163",
+    "gappedSentence": "Experienced climbers try not to leave anything ___ chance.",
+    "answer": "to",
+    "tags": "C1, prepositions, fixed phrases, collocations"
+  },
+  {
+    "itemId": "oc_0164",
+    "gappedSentence": "In activities with few formal rules, participants often invent solutions as they go ___.",
+    "answer": "along",
+    "tags": "C1, adverbs, fixed phrases, discourse markers"
+  },
+  {
+    "itemId": "oc_0165",
+    "gappedSentence": "Central to the whole process ___ the trust people develop in one another.",
+    "answer": "is",
+    "tags": "C1, verbs, inversion, emphasis, auxiliaries"
+  },
+  {
+    "itemId": "oc_0166",
+    "gappedSentence": "We live in a period ___ health and safety concerns dominate public debate.",
+    "answer": "when",
+    "tags": "B2, relative adverbs, relative clauses, time clauses"
+  },
+  {
+    "itemId": "oc_0167",
+    "gappedSentence": "___ surprisingly, the children were far calmer than the adults.",
+    "answer": "Not",
+    "tags": "C1, adverbs, fixed phrases, negation"
+  },
+  {
+    "itemId": "oc_0168",
+    "gappedSentence": "The volunteers managed to round ___ all the escaped animals before dark.",
+    "answer": "up",
+    "tags": "C1, phrasal verbs, particles"
+  },
+  {
+    "itemId": "oc_0169",
+    "gappedSentence": "The school introduced gardening and outdoor projects into the curriculum, all of ___ had a positive effect on behaviour.",
+    "answer": "which",
+    "tags": "C1, relative pronouns, non-defining relative clauses"
+  },
+  {
+    "itemId": "oc_0170",
+    "gappedSentence": "Nobody expected the influence the project would seem to have ___ the students’ attitudes.",
+    "answer": "on",
+    "tags": "C1, prepositions, noun + preposition, dependent prepositions"
+  },
+  {
+    "itemId": "oc_0171",
+    "gappedSentence": "___ helping children reflect on their responsibilities, the activity also encouraged cooperation.",
+    "answer": "While",
+    "tags": "C1, conjunctions, contrast, concession, linking"
+  },
+  {
+    "itemId": "oc_0172",
+    "gappedSentence": "Getting young children to think beyond themselves can sometimes prove ___ real challenge.",
+    "answer": "a",
+    "tags": "B2, articles, determiners"
+  },
+  {
+    "itemId": "oc_0173",
+    "gappedSentence": "This species is commonly referred to ___ the green basilisk.",
+    "answer": "as",
+    "tags": "B2, prepositions, fixed phrases, verb + preposition"
+  },
+  {
+    "itemId": "oc_0174",
+    "gappedSentence": "These lizards are abundant ___ the wet forests of the region.",
+    "answer": "in",
+    "tags": "B2, prepositions, adjective + preposition, dependent prepositions"
+  },
+  {
+    "itemId": "oc_0175",
+    "gappedSentence": "They tend to stay close to streams, ___ they can escape quickly if threatened.",
+    "answer": "where",
+    "tags": "B2, relative adverbs, relative clauses"
+  },
+  {
+    "itemId": "oc_0176",
+    "gappedSentence": "The animals are never far ___ a source of water.",
+    "answer": "from",
+    "tags": "B2, prepositions, fixed phrases"
+  },
+  {
+    "itemId": "oc_0177",
+    "gappedSentence": "When alarmed, they can run across the surface of the water at ___ speed of over a metre per second.",
+    "answer": "a",
+    "tags": "B2, articles, determiners"
+  },
+  {
+    "itemId": "oc_0178",
+    "gappedSentence": "They are able not only to sprint across water but also ___ climb with remarkable speed.",
+    "answer": "to",
+    "tags": "C1, infinitives, parallel structures, verb patterns"
+  },
+  {
+    "itemId": "oc_0179",
+    "gappedSentence": "In the wild, they survive ___ a varied diet of fruit, insects, and small animals.",
+    "answer": "on",
+    "tags": "B2, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0180",
+    "gappedSentence": "Many young people struggle to cope ___ the pressure of constant online comparison.",
+    "answer": "with",
+    "tags": "B2, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0181",
+    "gappedSentence": "The success of the campaign depends largely ___ how well the message is targeted.",
+    "answer": [
+      "on",
+      "upon"
+    ],
+    "tags": "B2, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0182",
+    "gappedSentence": "She insisted ___ paying for dinner, despite our attempts to stop her.",
+    "answer": "on",
+    "tags": "B2, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0183",
+    "gappedSentence": "Several residents have complained ___ the noise from the new construction site.",
+    "answer": [
+      "about",
+      "of"
+    ],
+    "tags": "B1, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0184",
+    "gappedSentence": "The committee is responsible ___ ensuring that all safety procedures are followed.",
+    "answer": "for",
+    "tags": "B2, prepositions, dependent prepositions, adjective + preposition"
+  },
+  {
+    "itemId": "oc_0185",
+    "gappedSentence": "I wasn’t aware ___ how much time had passed until I looked at the clock.",
+    "answer": "of",
+    "tags": "B2, prepositions, dependent prepositions, adjective + preposition"
+  },
+  {
+    "itemId": "oc_0186",
+    "gappedSentence": "His argument was based ___ a number of outdated assumptions.",
+    "answer": [
+      "on",
+      "upon"
+    ],
+    "tags": "B1, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0187",
+    "gappedSentence": "The book provides a useful introduction ___ the history of the region.",
+    "answer": "to",
+    "tags": "B2, prepositions, dependent prepositions, noun + preposition"
+  },
+  {
+    "itemId": "oc_0188",
+    "gappedSentence": "We were all surprised ___ the speed with which the decision was made.",
+    "answer": [
+      "at",
+      "by"
+    ],
+    "tags": "B2, prepositions, dependent prepositions, adjective + preposition"
+  },
+  {
+    "itemId": "oc_0189",
+    "gappedSentence": "There is growing demand ___ cheaper housing in the city centre.",
+    "answer": "for",
+    "tags": "B2, prepositions, dependent prepositions, noun + preposition"
+  },
+  {
+    "itemId": "oc_0190",
+    "gappedSentence": "The report draws attention ___ the lack of support available for carers.",
+    "answer": "to",
+    "tags": "C1, prepositions, dependent prepositions, noun + preposition, fixed phrases"
+  },
+  {
+    "itemId": "oc_0191",
+    "gappedSentence": "He succeeded ___ convincing them to delay the launch for another week.",
+    "answer": "in",
+    "tags": "B2, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0192",
+    "gappedSentence": "Children are often curious ___ the way adults behave in unfamiliar situations.",
+    "answer": "about",
+    "tags": "B2, prepositions, dependent prepositions, adjective + preposition"
+  },
+  {
+    "itemId": "oc_0193",
+    "gappedSentence": "The sudden increase ___ prices has affected small businesses badly.",
+    "answer": "in",
+    "tags": "B2, prepositions, dependent prepositions, noun + preposition"
+  },
+  {
+    "itemId": "oc_0194",
+    "gappedSentence": "She apologised ___ not replying sooner, but said she had been overwhelmed with work.",
+    "answer": "for",
+    "tags": "B2, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0195",
+    "gappedSentence": "The final outcome was quite different ___ what we had originally expected.",
+    "answer": [
+      "from",
+      "to"
+    ],
+    "tags": "B2, prepositions, dependent prepositions, adjective + preposition"
+  },
+  {
+    "itemId": "oc_0196",
+    "gappedSentence": "Their decision had a major impact ___ the future of the organisation.",
+    "answer": [
+      "on",
+      "upon"
+    ],
+    "tags": "C1, prepositions, dependent prepositions, noun + preposition"
+  },
+  {
+    "itemId": "oc_0197",
+    "gappedSentence": "The speaker referred briefly ___ the earlier stages of the project.",
+    "answer": "to",
+    "tags": "C1, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0198",
+    "gappedSentence": "Many voters are dissatisfied ___ the way the issue has been handled.",
+    "answer": "with",
+    "tags": "C1, prepositions, dependent prepositions, adjective + preposition"
+  },
+  {
+    "itemId": "oc_0199",
+    "gappedSentence": "There is no simple solution ___ the problem of declining attendance.",
+    "answer": "to",
+    "tags": "B2, prepositions, dependent prepositions, noun + preposition"
+  },
+  {
+    "itemId": "oc_0200",
+    "gappedSentence": "Researchers are now focusing ___ the long-term effects of sleep deprivation.",
+    "answer": [
+      "on",
+      "upon"
+    ],
+    "tags": "B2, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0201",
+    "gappedSentence": "She has always been interested ___ how languages change over time.",
+    "answer": "in",
+    "tags": "B1, prepositions, dependent prepositions, adjective + preposition"
+  },
+  {
+    "itemId": "oc_0202",
+    "gappedSentence": "The company’s response ___ the criticism was surprisingly calm and measured.",
+    "answer": "to",
+    "tags": "B2, prepositions, dependent prepositions, noun + preposition"
+  },
+  {
+    "itemId": "oc_0203",
+    "gappedSentence": "He objected ___ the proposal on the grounds that it was too expensive.",
+    "answer": "to",
+    "tags": "C1, prepositions, dependent prepositions, verb + preposition"
+  },
+  {
+    "itemId": "oc_0204",
+    "gappedSentence": "Teachers need to be sensitive ___ the different needs of their students.",
+    "answer": "to",
+    "tags": "B2, prepositions, dependent prepositions, adjective + preposition"
+  },
+  {
+    "itemId": "oc_0205",
+    "gappedSentence": "Any decision on expansion is contingent ___ further funding being approved.",
+    "answer": "on",
+    "tags": "C2, prepositions, dependent prepositions, adjective + preposition, formal"
+  },
+  {
+    "itemId": "oc_0206",
+    "gappedSentence": "His comments were regarded as tantamount ___ an admission of guilt.",
+    "answer": "to",
+    "tags": "C2, prepositions, dependent prepositions, adjective + preposition, formal"
+  },
+  {
+    "itemId": "oc_0207",
+    "gappedSentence": "The symptoms are often indicative ___ a deeper underlying condition.",
+    "answer": "of",
+    "tags": "C1, prepositions, dependent prepositions, adjective + preposition, formal"
+  },
+  {
+    "itemId": "oc_0208",
+    "gappedSentence": "The entire proposal hinges ___ whether the board accepts the revised budget.",
+    "answer": "on",
+    "tags": "C2, prepositions, dependent prepositions, verb + preposition, formal"
+  },
+  {
+    "itemId": "oc_0209",
+    "gappedSentence": "Several later reforms stemmed directly ___ the unrest of the previous decade.",
+    "answer": "from",
+    "tags": "C1, prepositions, dependent prepositions, verb + preposition, formal"
+  },
+  {
+    "itemId": "oc_0210",
+    "gappedSentence": "Many older policies are no longer compatible ___ current environmental standards.",
+    "answer": "with",
+    "tags": "B2, prepositions, dependent prepositions, adjective + preposition"
+  },
+  {
+    "itemId": "oc_0211",
+    "gappedSentence": "The company’s strict adherence ___ safety regulations has earned it a strong reputation.",
+    "answer": "to",
+    "tags": "C2, prepositions, dependent prepositions, noun + preposition, formal"
+  },
+  {
+    "itemId": "oc_0212",
+    "gappedSentence": "There is little incentive ___ younger staff to remain in such poorly paid roles.",
+    "answer": "for",
+    "tags": "C1, prepositions, dependent prepositions, noun + preposition"
+  },
+  {
+    "itemId": "oc_0213",
+    "gappedSentence": "The new measures were introduced in response ___ growing public concern.",
+    "answer": "to",
+    "tags": "B2, prepositions, fixed phrases, noun + preposition, formal"
+  },
+  {
+    "itemId": "oc_0214",
+    "gappedSentence": "Some of his claims are completely at odds ___ the available evidence.",
+    "answer": "with",
+    "tags": "C2, prepositions, fixed phrases, adjective + preposition, formal"
+  },
+  {
+    "itemId": "oc_0215",
+    "gappedSentence": "The new mentoring scheme has already begun to ___ a difference in staff retention.",
+    "answer": "make",
+    "tags": "B2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0216",
+    "gappedSentence": "It didn’t ___ much sense to continue the meeting without the main speaker.",
+    "answer": "make",
+    "tags": "B2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0217",
+    "gappedSentence": "Several members of staff were asked to ___ responsibility for the mistake.",
+    "answer": "take",
+    "tags": "B2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0218",
+    "gappedSentence": "The annual awards ceremony usually ___ place in early December.",
+    "answer": "takes",
+    "tags": "B2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0219",
+    "gappedSentence": "Parents are encouraged to ___ an active part in the learning process.",
+    "answer": [
+      "play",
+      "take"
+    ],
+    "tags": "B2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0220",
+    "gappedSentence": "The speaker paused to ___ attention to the final point on the slide.",
+    "answer": [
+      "draw",
+      "call"
+    ],
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0221",
+    "gappedSentence": "The campaign was designed to ___ awareness of mental health issues in teenagers.",
+    "answer": "raise",
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0222",
+    "gappedSentence": "Some critics have ___ doubts about whether the policy can actually work.",
+    "answer": [
+      "raised",
+      "expressed"
+    ],
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0223",
+    "gappedSentence": "You really need to ___ attention during the safety demonstration.",
+    "answer": "pay",
+    "tags": "B2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0224",
+    "gappedSentence": "The sculpture ___ a striking resemblance to one found in a nearby museum.",
+    "answer": [
+      "bears",
+      "has"
+    ],
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0225",
+    "gappedSentence": "The findings may ___ an important role in shaping future policy.",
+    "answer": [
+      "play",
+      "have"
+    ],
+    "tags": "B2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0226",
+    "gappedSentence": "The proposed changes could ___ a serious threat to smaller local businesses.",
+    "answer": [
+      "pose",
+      "present"
+    ],
+    "tags": "C1, verbs, collocations, fixed phrases, formal"
+  },
+  {
+    "itemId": "oc_0227",
+    "gappedSentence": "When reviewing the data, we need to ___ into account the age of the participants.",
+    "answer": "take",
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0228",
+    "gappedSentence": "The committee hopes the new measures will ___ effect before the end of the year.",
+    "answer": "take",
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0229",
+    "gappedSentence": "Her remarks are likely to ___ offence, even if none was intended.",
+    "answer": [
+      "cause",
+      "give"
+    ],
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0230",
+    "gappedSentence": "The board refused to ___ a decision until all the evidence had been reviewed.",
+    "answer": [
+      "make",
+      "reach"
+    ],
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0231",
+    "gappedSentence": "The report ___ the conclusion that further investment is urgently needed.",
+    "answer": [
+      "draws",
+      "reaches"
+    ],
+    "tags": "C1, verbs, collocations, fixed phrases, formal"
+  },
+  {
+    "itemId": "oc_0232",
+    "gappedSentence": "We should ___ every effort to resolve the issue before it escalates.",
+    "answer": "make",
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0233",
+    "gappedSentence": "The organisation has struggled to ___ progress in reducing long waiting times.",
+    "answer": "make",
+    "tags": "B2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0234",
+    "gappedSentence": "The findings ______ serious doubt on the reliability of the original study.",
+    "answer": "cast",
+    "tags": "C2, verbs, collocations, fixed phrases, formal"
+  },
+  {
+    "itemId": "oc_0235",
+    "gappedSentence": "The article ______ a clear distinction between privacy and secrecy.",
+    "answer": [
+      "draws",
+      "makes"
+    ],
+    "tags": "C2, verbs, collocations, fixed phrases, formal"
+  },
+  {
+    "itemId": "oc_0236",
+    "gappedSentence": "At the end of the speech, the minister ______ tribute to the emergency services.",
+    "answer": "paid",
+    "tags": "C2, verbs, collocations, fixed phrases, formal"
+  },
+  {
+    "itemId": "oc_0237",
+    "gappedSentence": "A good manager knows how to ______ a balance between efficiency and staff wellbeing.",
+    "answer": [
+      "strike",
+      "find"
+    ],
+    "tags": "C2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0238",
+    "gappedSentence": "The new policy is intended to ______ the needs of both students and teachers.",
+    "answer": [
+      "meet",
+      "address"
+    ],
+    "tags": "C1, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0239",
+    "gappedSentence": "The proposals were unable to ______ up to close scrutiny from independent experts.",
+    "answer": [
+      "stand",
+      "hold"
+    ],
+    "tags": "C2, verbs, collocations, fixed phrases, formal"
+  },
+  {
+    "itemId": "oc_0240",
+    "gappedSentence": "Her remarks only ______ further speculation about her future at the company.",
+    "answer": [
+      "fuelled",
+      "fueled"
+    ],
+    "tags": "C2, verbs, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0241",
+    "gappedSentence": "The lead architect took grave ______ to the committee’s suggestion that the building’s facade was 'derivative' and lacked original character.",
+    "answer": "exception",
+    "tags": "C2, nouns, collocations, fixed phrases, formal"
+  },
+  {
+    "itemId": "oc_0242",
+    "gappedSentence": "She had prepared for the presentation for weeks, yet when the board members asked about the projected overheads, she suddenly drew a complete ______.",
+    "answer": "blank",
+    "tags": "C2, nouns, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0243",
+    "gappedSentence": "It took the veteran several years to fully come to ______ with the psychological toll his service had taken on his family life.",
+    "answer": "terms",
+    "tags": "C2, nouns, collocations, fixed phrases"
+  },
+  {
+    "itemId": "oc_0244",
+    "gappedSentence": "In the center of the gallery, a recently restored marble sculpture by Rodin takes ______ of place, drawing the eye of every visitor who enters.",
+    "answer": "pride",
+    "tags": "C2, nouns, collocations, fixed phrases, formal"
+  },
+  {
+    "itemId": "oc_0245",
+    "gappedSentence": "______ the forecast looked promising, the organisers decided to cancel the outdoor event.",
+    "answer": [
+      "Although",
+      "Though"
+    ],
+    "tags": "B2, conjunctions, linking, contrast, concession"
+  },
+  {
+    "itemId": "oc_0246",
+    "gappedSentence": "The solution is expensive. ______, it is by far the most reliable option available.",
+    "answer": [
+      "Nevertheless",
+      "Nonetheless",
+      "However"
+    ],
+    "tags": "C1, discourse markers, linking, contrast, concession, sentence connectors"
+  },
+  {
+    "itemId": "oc_0247",
+    "gappedSentence": "The team had very limited resources. Even ______, they managed to complete the project on time.",
+    "answer": "so",
+    "tags": "C1, discourse markers, linking, concession, sentence connectors"
+  },
+  {
+    "itemId": "oc_0248",
+    "gappedSentence": "The instructions were unclear, ______ many participants made avoidable mistakes.",
+    "answer": "so",
+    "tags": "B1, conjunctions, linking, result"
+  },
+  {
+    "itemId": "oc_0249",
+    "gappedSentence": "The data is incomplete. ______ a result, we need to be cautious about drawing firm conclusions.",
+    "answer": "As",
+    "tags": "C1, discourse markers, linking, result, sentence connectors"
+  },
+  {
+    "itemId": "oc_0250",
+    "gappedSentence": "The company expanded rapidly, ______ its competitors were still cutting costs.",
+    "answer": "while",
+    "tags": "B2, conjunctions, linking, contrast"
+  },
+  {
+    "itemId": "oc_0251",
+    "gappedSentence": "The proposal was well argued. ______ that, it addressed several concerns that had been ignored before.",
+    "answer": [
+      "Besides",
+      "Beyond"
+    ],
+    "tags": "C2, discourse markers, linking, addition, sentence connectors"
+  },
+  {
+    "itemId": "oc_0252",
+    "gappedSentence": "The museum attracts thousands of tourists each year, as ______ as a large number of local visitors.",
+    "answer": "well",
+    "tags": "B2, discourse markers, linking, addition, fixed phrases"
+  },
+  {
+    "itemId": "oc_0253",
+    "gappedSentence": "The policy was introduced ______ to reduce costs, but to improve efficiency.",
+    "answer": "not",
+    "tags": "C1, conjunctions, linking, addition, correlative structures"
+  },
+  {
+    "itemId": "oc_0254",
+    "gappedSentence": "The village remained largely untouched by tourism, ______ though the new railway line had opened nearby.",
+    "answer": "even",
+    "tags": "B2, conjunctions, linking, concession, contrast"
+  },
+  {
+    "itemId": "oc_0255",
+    "gappedSentence": "She left early ______ she could avoid the rush-hour traffic.",
+    "answer": "so",
+    "tags": "B2, conjunctions, linking, purpose"
+  },
+  {
+    "itemId": "oc_0256",
+    "gappedSentence": "The experiment was repeated several times so ______ to rule out the possibility of human error.",
+    "answer": "as",
+    "tags": "C1, linking, purpose, formal, fixed phrases"
+  },
+  {
+    "itemId": "oc_0257",
+    "gappedSentence": "______ the fact that the evidence was weak, the case still went to trial.",
+    "answer": "Despite",
+    "tags": "B2, prepositions, linking, concession, contrast"
+  },
+  {
+    "itemId": "oc_0258",
+    "gappedSentence": "Nobody objected to the plan, apart ______ one member who abstained.",
+    "answer": "from",
+    "tags": "C1, discourse markers, linking, exception, fixed phrases"
+  },
+  {
+    "itemId": "oc_0259",
+    "gappedSentence": "The figures look impressive. ______ practice, however, the scheme has achieved very little.",
+    "answer": "In",
+    "tags": "C1, discourse markers, linking, contrast, fixed phrases"
+  },
+  {
+    "itemId": "oc_0260",
+    "gappedSentence": "______ as I would love to attend the ceremony, my current work commitments make it impossible.",
+    "answer": "Much",
+    "tags": "C2, conjunctions, linking, concession, contrast"
+  },
+  {
+    "itemId": "oc_0261",
+    "gappedSentence": "But ______ the timely intervention of a passer-by, the situation could have ended in tragedy.",
+    "answer": "for",
+    "tags": "C2, prepositions, linking, condition, fixed phrases"
+  },
+  {
+    "itemId": "oc_0262",
+    "gappedSentence": "The project was a success, largely ______ dint of the team's unwavering dedication.",
+    "answer": [
+      "by",
+      "means"
+    ],
+    "tags": "C2, prepositions, linking, reason, fixed phrases"
+  },
+  {
+    "itemId": "oc_0263",
+    "gappedSentence": "The new legislation is controversial inasmuch ______ it limits the power of local authorities.",
+    "answer": "as",
+    "tags": "C2, conjunctions, linking, reason, extent"
+  },
+  {
+    "itemId": "oc_0264",
+    "gappedSentence": "He decided to undergo the training with a ______ to improving his long-term career prospects.",
+    "answer": "view",
+    "tags": "C1, linking, purpose, fixed phrases"
+  },
+  {
+    "itemId": "oc_0265",
+    "gappedSentence": "The results were disappointing. Be that ______ it may, we have gained valuable insights for the next phase.",
+    "answer": "as",
+    "tags": "C2, discourse markers, linking, concession, fixed phrases"
+  },
+  {
+    "itemId": "oc_0266",
+    "gappedSentence": "The application was rejected on the ______ that the candidate lacked the necessary field experience.",
+    "answer": "grounds",
+    "tags": "C1, discourse markers, linking, reason, fixed phrases"
+  },
+  {
+    "itemId": "oc_0267",
+    "gappedSentence": "______ all I know, the meeting might have been cancelled hours ago.",
+    "answer": "For",
+    "tags": "C2, prepositions, linking, concession, contrast"
+  },
+  {
+    "itemId": "oc_0268",
+    "gappedSentence": "The company implemented a new policy ______ all employees are required to undergo annual reviews.",
+    "answer": "whereby",
+    "tags": "C2, conjunctions, linking, result, means"
+  },
+  {
+    "itemId": "oc_0269",
+    "gappedSentence": "The report highlights several flaws. ______ so, the overall conclusion remains positive.",
+    "answer": "Even",
+    "tags": "C1, discourse markers, linking, concession"
   }
 ]
