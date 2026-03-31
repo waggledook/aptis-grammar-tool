@@ -90,6 +90,8 @@ export default function HubSpanglishLivePlayer() {
   const correctionAnswer = game?.rounds?.[roundIndex]?.correctionAnswers?.[playerId] || null;
   const acceptedAnswers = item?.correctAnswers || [];
   const acceptedNormalized = acceptedAnswers.map(normalizeWord);
+  const hasSubmittedCorrection = !!correctionAnswer;
+  const submittedCorrectionText = correctionAnswer?.answer || correction.trim();
   const leaderboard = Object.entries(game?.players || {})
     .map(([id, data]) => ({ id, ...data }))
     .sort((a, b) => (b.score || 0) - (a.score || 0));
@@ -107,6 +109,13 @@ export default function HubSpanglishLivePlayer() {
   const phaseDuration = phase === "click" ? clickDuration : correctionDuration;
   const pointsBarKey = `${roundIndex}-${phase}-${scoreDeadline ?? "none"}`;
   const isGraceActive = (phase === "click" || phase === "correction") && !!questionDeadline && !!scoreDeadline && questionDeadline !== scoreDeadline;
+
+  function playBubblePop() {
+    if (typeof window === "undefined") return;
+    const audio = new window.Audio("/sounds/bubble_pop.mp3");
+    audio.volume = 0.88;
+    audio.play().catch(() => {});
+  }
 
   useEffect(() => {
     if ((phase !== "click" && phase !== "correction") || !scoreDeadline) {
@@ -145,6 +154,7 @@ export default function HubSpanglishLivePlayer() {
       const scoreDelta = correct
         ? computeScore(scoreDeadline, clickDuration)
         : 0;
+      playBubblePop();
       setSelectedWord(word);
       setFeedback(correct ? "Correct word selected." : `Not quite. The error is "${item.errorWord}".`);
       await submitSpanglishLiveClick({
@@ -165,19 +175,29 @@ export default function HubSpanglishLivePlayer() {
   async function handleCorrectionSubmit(event) {
     event.preventDefault();
     if (!item || phase !== "correction" || correctionAnswer) return;
+    const trimmedCorrection = String(correction || "").trim();
+    if (!trimmedCorrection) {
+      toast("Type a correction before submitting.");
+      return;
+    }
     try {
-      const normalizedAnswer = normalizeWord(correction);
+      const normalizedAnswer = normalizeWord(trimmedCorrection);
       const correct = acceptedNormalized.includes(normalizedAnswer);
       const scoreDelta = correct
         ? computeScore(scoreDeadline, correctionDuration)
         : 0;
-      setFeedback(correct ? "Correction submitted." : "Correction submitted. You’ll see the accepted answer in the reveal phase.");
+      playBubblePop();
+      setFeedback(
+        correct
+          ? "Correction locked in. Nice one."
+          : "Correction submitted. It’s locked in now. You’ll see the accepted answer in the reveal phase."
+      );
       await submitSpanglishLiveCorrection({
         gameId,
         roundIndex,
         playerId,
         playerToken,
-        answer: correction,
+        answer: trimmedCorrection,
         correct,
         scoreDelta,
       });
@@ -285,32 +305,47 @@ export default function HubSpanglishLivePlayer() {
             ))}
           </div>
 
-          {feedback ? <div className="hub-live-feedback">{feedback}</div> : null}
+          {feedback && !hasSubmittedCorrection ? <div className="hub-live-feedback">{feedback}</div> : null}
 
           {phase === "correction" || correctionAnswer || phase === "reveal" ? (
             <form className="hub-live-form" onSubmit={handleCorrectionSubmit}>
               <label>
                 Correction
-                <textarea
-                  value={correction}
-                  onChange={(e) => setCorrection(e.target.value)}
-                  disabled={phase !== "correction" || !!correctionAnswer}
-                  rows={2}
-                  autoComplete="off"
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  spellCheck={false}
-                  onKeyDown={(event) => {
-                    if (event.key === "Enter" && !event.shiftKey) {
-                      event.preventDefault();
-                      handleCorrectionSubmit(event);
-                    }
-                  }}
-                />
+                {hasSubmittedCorrection ? (
+                  <div className="hub-live-submitted-box" role="status" aria-live="polite">
+                    <div className="hub-live-submitted-text">
+                      You submitted <strong>{submittedCorrectionText || "(blank)"}</strong>.
+                    </div>
+                  </div>
+                ) : (
+                  <textarea
+                    value={correction}
+                    onChange={(e) => setCorrection(e.target.value)}
+                    disabled={phase !== "correction"}
+                    rows={2}
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="off"
+                    spellCheck={false}
+                    placeholder="Type the corrected word or phrase..."
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        handleCorrectionSubmit(event);
+                      }
+                    }}
+                  />
+                )}
               </label>
-              <button className="whats-new-btn" type="submit" disabled={phase !== "correction" || !!correctionAnswer}>
-                Submit correction
-              </button>
+              {!hasSubmittedCorrection ? (
+                <button
+                  className="whats-new-btn"
+                  type="submit"
+                  disabled={phase !== "correction" || !correction.trim()}
+                >
+                  Submit correction
+                </button>
+              ) : null}
             </form>
           ) : null}
 
@@ -395,6 +430,22 @@ export default function HubSpanglishLivePlayer() {
         .hub-live-form { display:grid; gap:.8rem; }
         .hub-live-form label { display:grid; gap:.45rem; color:#e8f0ff; font-weight:700; }
         .hub-live-form textarea { resize:none; padding:.85rem 1rem; border-radius:14px; border:2px solid #35508e; background:#020617; color:#eef4ff; font-size:1rem; font-family:inherit; }
+        .hub-live-form textarea::placeholder { color:rgba(190,204,232,.56); }
+        .hub-live-submitted-box {
+          padding:.9rem 1rem;
+          border-radius:16px;
+          background:rgba(143,197,255,.08);
+          border:1px solid rgba(143,197,255,.28);
+          box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
+        }
+        .hub-live-submitted-text {
+          color:#eef4ff;
+          font-size:1rem;
+          line-height:1.45;
+          font-weight:600;
+          word-break:break-word;
+        }
+        .hub-live-submitted-text strong { color:#ffffff; font-weight:800; }
         .hub-live-feedback { margin:.65rem 0 1rem; padding:.8rem .95rem; border-radius:14px; background:rgba(104,140,221,.12); border:1px solid rgba(104,140,221,.28); color:#eef4ff; line-height:1.45; }
         .hub-live-reveal { margin-top:1rem; padding:.9rem 1rem; border-radius:16px; background:rgba(104,140,221,.12); border:1px solid rgba(104,140,221,.28); color:#eef4ff; line-height:1.5; }
         .hub-live-answer-list { display:flex; flex-wrap:wrap; gap:.45rem; margin:.45rem 0 .75rem; }

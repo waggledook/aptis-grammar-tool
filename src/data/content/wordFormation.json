@@ -277,7 +277,7 @@
   },
   {
     "itemId": "7W1M2UToOQHjp5BkxoSG",
-    "gappedSentence": "The forecast suggests ______ weather conditions next week.",
+    "gappedSentence": "The forecast suggests ______ weather conditions next week, with terrible storms expected.",
     "base": "FAVOUR",
     "answer": [
       "unfavourable",

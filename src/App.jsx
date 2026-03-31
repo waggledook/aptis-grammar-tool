@@ -45,6 +45,7 @@ import Seo from "./components/common/Seo.jsx";
 import './App.css'
 import { doc, getDoc } from "firebase/firestore";
 import GrammarSetRunner from "./components/grammar/GrammarSetRunner";
+import UseOfEnglishCustomQuizRunner from "./components/grammar/UseOfEnglishCustomQuizRunner.jsx";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 import AdminActivityLog from "./components/admin/AdminActivityLog.jsx";
 import AdminActivityCharts from "./components/admin/AdminActivityCharts";
@@ -1008,6 +1009,11 @@ return (
 <Route
   path="/grammar-sets/:setId"
   element={<GrammarSetRunner user={user} />}
+/>
+
+<Route
+  path="/use-of-english/custom/:setId"
+  element={<UseOfEnglishCustomQuizRunner user={user} />}
 />
 
 <Route

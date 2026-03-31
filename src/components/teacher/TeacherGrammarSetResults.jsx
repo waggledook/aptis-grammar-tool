@@ -6,6 +6,36 @@ import {
 } from "../../firebase";
 import { fetchItemsByIds } from "../../api/grammar";
 
+function getShareUrl(meta, shareUrlBase) {
+  if (meta?.setType === "use_of_english_custom") {
+    return shareUrlBase
+      ? `${shareUrlBase}/use-of-english/custom/${meta.id}`
+      : `/use-of-english/custom/${meta.id}`;
+  }
+
+  return shareUrlBase
+    ? `${shareUrlBase}/grammar-sets/${meta.id}`
+    : `/grammar-sets/${meta.id}`;
+}
+
+function getSetTypeLabel(meta) {
+  return meta?.setType === "use_of_english_custom"
+    ? "Use of English quiz"
+    : "Grammar set";
+}
+
+function getAttemptLabel(ans, item) {
+  return (
+    ans?.prompt ||
+    item?.title ||
+    item?.gappedSentence ||
+    item?.gapFill ||
+    item?.sentence ||
+    item?.text ||
+    `Item ${ans?.itemId}`
+  );
+}
+
 export default function TeacherGrammarSetResults({ user }) {
   const [loadingSets, setLoadingSets] = useState(true);
   const [setsError, setSetsError] = useState(null);
@@ -71,6 +101,7 @@ export default function TeacherGrammarSetResults({ user }) {
 
     try {
       const attempts = await listAttemptsForMyGrammarSet(setId);
+      const setMeta = sets.find((entry) => entry.id === setId);
 
       // Collect all itemIds used in any attempt
       const allItemIds = Array.from(
@@ -86,7 +117,12 @@ export default function TeacherGrammarSetResults({ user }) {
       );
 
       let itemsById = {};
-      if (allItemIds.length) {
+      if (Array.isArray(setMeta?.quizItems) && setMeta.quizItems.length) {
+        itemsById = setMeta.quizItems.reduce((acc, item) => {
+          if (item?.id != null) acc[item.id] = item;
+          return acc;
+        }, {});
+      } else if (allItemIds.length) {
         const items = await fetchItemsByIds(allItemIds);
         itemsById = items.reduce((acc, itm) => {
           if (itm && itm.id != null) acc[itm.id] = itm;
@@ -118,7 +154,7 @@ export default function TeacherGrammarSetResults({ user }) {
 
   const handleDeleteSet = async (setId) => {
     const confirmed = window.confirm(
-      "Delete this grammar set permanently? This cannot be undone."
+      "Delete this created set or quiz permanently? This cannot be undone."
     );
     if (!confirmed) return;
 
@@ -182,9 +218,7 @@ export default function TeacherGrammarSetResults({ user }) {
         !setsError &&
         sets.map((set) => {
           const meta = set || {};
-          const shareUrl = shareUrlBase
-            ? `${shareUrlBase}/grammar-sets/${meta.id}`
-            : `/grammar-sets/${meta.id}`;
+          const shareUrl = getShareUrl(meta, shareUrlBase);
           const metaAttempts = attemptState[meta.id] || {};
           const isActive = activeSetId === meta.id;
 
@@ -240,6 +274,15 @@ export default function TeacherGrammarSetResults({ user }) {
                         {meta.visibility}
                       </span>
                     )}
+                    <span
+                      className="badge"
+                      style={{
+                        fontSize: "0.7rem",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {getSetTypeLabel(meta)}
+                    </span>
                   </div>
 
                   {meta.description && (
@@ -256,7 +299,11 @@ export default function TeacherGrammarSetResults({ user }) {
 
                   <p className="muted tiny" style={{ margin: 0 }}>
                     <strong>Items:</strong>{" "}
-                    {Array.isArray(meta.itemIds) ? meta.itemIds.length : "—"}{" "}
+                    {Array.isArray(meta.quizItems)
+                      ? meta.quizItems.length
+                      : Array.isArray(meta.itemIds)
+                      ? meta.itemIds.length
+                      : "—"}{" "}
                     &nbsp;·&nbsp;
                     <strong>Created:</strong> {formatDate(meta.createdAt)}
                   </p>
@@ -433,7 +480,7 @@ export default function TeacherGrammarSetResults({ user }) {
                                     borderBottom: "1px solid #1f2937",
                                   }}
                                 >
-                                  %
+                                  Progress
                                 </th>
                                 <th
                                   style={{
@@ -442,7 +489,7 @@ export default function TeacherGrammarSetResults({ user }) {
                                     borderBottom: "1px solid #1f2937",
                                   }}
                                 >
-                                  Submitted
+                                  Last activity
                                 </th>
                                 <th
                                   style={{
@@ -459,11 +506,12 @@ export default function TeacherGrammarSetResults({ user }) {
                               {metaAttempts.attempts.map((att, index) => {
                                 const score = att.score ?? 0;
                                 const total = att.total ?? 0;
+                                const checkedCount = att.checkedCount ?? total;
                                 const percent =
                                   typeof att.percent === "number"
                                     ? att.percent
-                                    : total > 0
-                                    ? Math.round((score / total) * 100)
+                                    : checkedCount > 0
+                                    ? Math.round((score / checkedCount) * 100)
                                     : 0;
 
                                 const answers = Array.isArray(att.answers)
@@ -499,7 +547,7 @@ export default function TeacherGrammarSetResults({ user }) {
                                         verticalAlign: "top",
                                       }}
                                     >
-                                      {score}/{total}
+                                      {score}/{checkedCount}
                                     </td>
                                     <td
                                       style={{
@@ -507,7 +555,7 @@ export default function TeacherGrammarSetResults({ user }) {
                                         verticalAlign: "top",
                                       }}
                                     >
-                                      {percent}%
+                                      {checkedCount}/{total} checked · {percent}%
                                     </td>
                                     <td
                                       style={{
@@ -515,7 +563,12 @@ export default function TeacherGrammarSetResults({ user }) {
                                         verticalAlign: "top",
                                       }}
                                     >
-                                      {formatDate(att.submittedAt)}
+                                      {formatDate(
+                                        att.updatedAt || att.submittedAt || att.startedAt
+                                      )}
+                                      <div className="muted tiny" style={{ marginTop: ".12rem" }}>
+                                        {att.completed ? "Completed" : "In progress"}
+                                      </div>
                                     </td>
                                     <td
                                       style={{
@@ -544,11 +597,13 @@ export default function TeacherGrammarSetResults({ user }) {
                                           {answers.map((ans, i) => {
                                             const item =
                                               itemsById[ans.itemId];
-                                            const label =
-                                              item?.sentence ||
-                                              item?.text ||
-                                              `Item ${ans.itemId}`;
-                                            const isCorrect = !!ans.isCorrect;
+                                            const label = getAttemptLabel(ans, item);
+                                            const isCorrect =
+                                              typeof ans.firstAttemptCorrect === "boolean"
+                                                ? ans.firstAttemptCorrect
+                                                : !!ans.isCorrect;
+                                            const latestAnswer =
+                                              ans.studentAnswer ?? ans.selectedOption ?? "";
 
                                             return (
                                               <li
@@ -572,8 +627,7 @@ export default function TeacherGrammarSetResults({ user }) {
                                                     }}
                                                   >
                                                     Student:{" "}
-                                                    {ans.selectedOption ??
-                                                      "(no answer)"}
+                                                    {ans.firstAttempt ?? latestAnswer ?? "(no answer)"}
                                                   </span>
                                                   {!isCorrect && (
                                                     <span
@@ -583,11 +637,30 @@ export default function TeacherGrammarSetResults({ user }) {
                                                       }}
                                                     >
                                                       Correct:{" "}
-                                                      {ans.correctOption ??
+                                                      {ans.correctAnswer ??
+                                                        ans.correctOption ??
                                                         "(unknown)"}
                                                     </span>
                                                   )}
                                                 </div>
+                                                {ans.firstAttempt &&
+                                                  ans.firstAttempt !== latestAnswer && (
+                                                    <div className="muted tiny" style={{ marginTop: ".15rem" }}>
+                                                      Latest checked answer: {latestAnswer || "(blank)"}
+                                                    </div>
+                                                  )}
+                                                {Array.isArray(ans.attempts) && ans.attempts.length > 1 && (
+                                                  <div className="muted tiny" style={{ marginTop: ".15rem" }}>
+                                                    Attempts:{" "}
+                                                    {ans.attempts
+                                                      .map((attempt, attemptIndex) => {
+                                                        const label = attempt?.answer || "(blank)";
+                                                        const suffix = attempt?.isCorrect ? "✓" : "✗";
+                                                        return `${attemptIndex + 1}. ${label} ${suffix}`;
+                                                      })
+                                                      .join(" · ")}
+                                                  </div>
+                                                )}
                                               </li>
                                             );
                                           })}

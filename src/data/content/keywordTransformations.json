@@ -562,7 +562,10 @@
     "keyWord": "made",
     "answer": [
       "made a great impression on",
-      "made a big impression on"
+      "made a big impression on",
+      "made a great impression on all of",
+      "made a big impression on all of",
+      "made an impression on all of"
     ],
     "tags": "C1, fixed phrase, prepositions"
   },
@@ -1177,7 +1180,8 @@
     "keyWord": "touch",
     "answer": [
       "forget to keep in touch",
-      "forget to stay in touch"
+      "forget to stay in touch",
+      "forget to get in touch"
     ],
     "tags": "C1, fixed phrase, gerunds and infinitives"
   },

@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import TeacherGrammarTool from "./TeacherGrammarTool";
 import TeacherGrammarSetResults from "./TeacherGrammarSetResults";
+import TeacherUseOfEnglishQuizBuilder from "./TeacherUseOfEnglishQuizBuilder";
 
 export default function TeacherTools({ user }) {
   // ---------- Auth gate ----------
@@ -22,6 +23,7 @@ export default function TeacherTools({ user }) {
   // ---------- Local UI state ----------
   const [showBuilder, setShowBuilder] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [showUseOfEnglishBuilder, setShowUseOfEnglishBuilder] = useState(false);
 
   return (
     <div className="teacher-tools-page game-wrapper">
@@ -33,7 +35,8 @@ export default function TeacherTools({ user }) {
           <h1 className="title">Teacher Tools</h1>
           <p className="intro small">
             Welcome, <strong>{user.email}</strong> ({user.role}). Use this area
-            to create custom grammar sets and review how your students did.
+            to build Aptis grammar sets, create mixed Use of English quizzes,
+            and review how your students did.
           </p>
         </div>
       </header>
@@ -46,10 +49,9 @@ export default function TeacherTools({ user }) {
           onClick={() => setShowBuilder((v) => !v)}
         >
           <div className="head-left">
-            <h2 className="sec-title">Create / edit a grammar set</h2>
+            <h2 className="sec-title">Create / edit an Aptis grammar set</h2>
             <p className="muted small">
-              Search the full bank, build your set, and choose practice or test
-              mode.
+              Build multiple-choice Aptis-style grammar sets, then save them as drafts or publish them for students.
             </p>
           </div>
           <span className={`chev ${showBuilder ? "open" : ""}`} aria-hidden>
@@ -64,6 +66,30 @@ export default function TeacherTools({ user }) {
         )}
       </section>
 
+      <section className="panel collapsible" style={{ marginTop: "0.9rem" }}>
+        <button
+          type="button"
+          className="collapse-head"
+          onClick={() => setShowUseOfEnglishBuilder((v) => !v)}
+        >
+          <div className="head-left">
+            <h2 className="sec-title">Create a custom Use of English quiz</h2>
+            <p className="muted small">
+              Mix keyword, word formation, and open cloze items into a custom quiz, or generate one quickly from source counts.
+            </p>
+          </div>
+          <span className={`chev ${showUseOfEnglishBuilder ? "open" : ""}`} aria-hidden>
+            ▾
+          </span>
+        </button>
+
+        {showUseOfEnglishBuilder && (
+          <div className="panel-body">
+            <TeacherUseOfEnglishQuizBuilder user={user} />
+          </div>
+        )}
+      </section>
+
       {/* 2) My grammar sets & student results */}
       <section className="panel collapsible" style={{ marginTop: "0.9rem" }}>
         <button
@@ -74,8 +100,8 @@ export default function TeacherTools({ user }) {
           <div className="head-left">
             <h2 className="sec-title">My grammar sets &amp; student results</h2>
             <p className="muted small">
-              Review the sets you&apos;ve created, share links, and monitor how
-              students did.
+              Review your Aptis grammar sets and custom quizzes, share links,
+              and monitor how students did.
             </p>
           </div>
           <span className={`chev ${showResults ? "open" : ""}`} aria-hidden>

@@ -2380,13 +2380,62 @@ export async function submitGrammarSetAttempt({
     // later you can also load username from the users doc if you like
     score,
     total,
+    checkedCount: total,
     percent,
     answers,
     startedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
     submittedAt: serverTimestamp(),
+    completed: true,
   });
 
   return docRef.id;
+}
+
+export async function createGrammarSetAttemptDraft({
+  setId,
+  setTitle,
+  ownerUid,
+  studentUid,
+  studentEmail,
+  score,
+  total,
+  checkedCount,
+  answers,
+}) {
+  const user = auth.currentUser;
+
+  const docRef = await addDoc(collection(db, "grammarSetAttempts"), {
+    setId,
+    setTitle,
+    ownerUid,
+    studentUid,
+    studentEmail,
+    studentName: user?.displayName || null,
+    score,
+    total,
+    checkedCount,
+    percent: checkedCount > 0 ? Math.round((score / checkedCount) * 100) : 0,
+    answers,
+    startedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    completed: false,
+  });
+
+  return docRef.id;
+}
+
+export async function updateGrammarSetAttemptDraft(attemptId, data) {
+  if (!attemptId) throw new Error("Attempt ID is required.");
+
+  const checkedCount = Number(data?.checkedCount || 0);
+  const score = Number(data?.score || 0);
+
+  await updateDoc(doc(db, "grammarSetAttempts", attemptId), {
+    ...data,
+    percent: checkedCount > 0 ? Math.round((score / checkedCount) * 100) : 0,
+    updatedAt: serverTimestamp(),
+  });
 }
 
 /**
@@ -2400,12 +2449,25 @@ export async function listAttemptsForMyGrammarSet(setId) {
   const q = query(
     collection(db, "grammarSetAttempts"),
     where("ownerUid", "==", uid),
-    where("setId", "==", setId),
-    orderBy("submittedAt", "desc")
+    where("setId", "==", setId)
   );
 
   const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  return snap.docs
+    .map((d) => ({ id: d.id, ...d.data() }))
+    .sort((a, b) => {
+      const aTime =
+        a.updatedAt?.toMillis?.() ??
+        a.submittedAt?.toMillis?.() ??
+        a.startedAt?.toMillis?.() ??
+        0;
+      const bTime =
+        b.updatedAt?.toMillis?.() ??
+        b.submittedAt?.toMillis?.() ??
+        b.startedAt?.toMillis?.() ??
+        0;
+      return bTime - aTime;
+    });
 }
 
 /**
