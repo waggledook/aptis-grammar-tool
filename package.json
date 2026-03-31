@@ -13,7 +13,9 @@
     "content:export:wordformation": "node scripts/export-word-formation-content.mjs",
     "content:sync:keyword": "node scripts/sync-keyword-content.mjs",
     "content:sync:opencloze": "node scripts/sync-open-cloze-content.mjs",
-    "content:sync:wordformation": "node scripts/sync-word-formation-content.mjs"
+    "content:sync:wordformation": "node scripts/sync-word-formation-content.mjs",
+    "coursepack:split": "python3 scripts/split_course_pack_sections.py",
+    "coursepack:upload": "node scripts/upload-course-pack-sections.mjs"
   },
   "dependencies": {
     "firebase": "^12.0.0",

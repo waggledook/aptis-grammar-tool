@@ -43,3 +43,10 @@ export function getFirestoreAdmin() {
 
   return admin.firestore();
 }
+
+export function getStorageBucketAdmin() {
+  if (!admin.apps.length) {
+    getFirestoreAdmin();
+  }
+  return admin.storage().bucket("examplay-auth.firebasestorage.app");
+}

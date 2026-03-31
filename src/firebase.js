@@ -1154,6 +1154,57 @@ export async function fetchOpenClozeItems() {
   return Array.isArray(data.list) ? data.list : [];
 }
 
+export async function fetchCoursePackAnnotations(page, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !Number.isFinite(page)) return [];
+
+  const ref = doc(db, "users", realUid, "coursePackAnnotations", `page-${page}`);
+  const snap = await getDoc(ref);
+  if (!snap.exists()) return [];
+
+  const data = snap.data() || {};
+  return Array.isArray(data.annotations) ? data.annotations : [];
+}
+
+export async function saveCoursePackAnnotations(page, annotations, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !Number.isFinite(page)) return;
+
+  const safeAnnotations = Array.isArray(annotations)
+    ? annotations.map((annotation) => ({
+        id: String(annotation?.id || ""),
+        type: String(annotation?.type || ""),
+        x: Number.isFinite(annotation?.x) ? annotation.x : 0,
+        y: Number.isFinite(annotation?.y) ? annotation.y : 0,
+        w: Number.isFinite(annotation?.w) ? annotation.w : undefined,
+        h: Number.isFinite(annotation?.h) ? annotation.h : undefined,
+        text: typeof annotation?.text === "string" ? annotation.text : undefined,
+        color: typeof annotation?.color === "string" ? annotation.color : undefined,
+        fontSize: Number.isFinite(annotation?.fontSize) ? annotation.fontSize : undefined,
+        points: Array.isArray(annotation?.points)
+          ? annotation.points
+              .map((point) => ({
+                x: Number.isFinite(point?.x) ? point.x : 0,
+                y: Number.isFinite(point?.y) ? point.y : 0,
+              }))
+              .filter((point) => Number.isFinite(point.x) && Number.isFinite(point.y))
+          : undefined,
+      }))
+    : [];
+
+  const ref = doc(db, "users", realUid, "coursePackAnnotations", `page-${page}`);
+  await setDoc(
+    ref,
+    {
+      page,
+      annotations: safeAnnotations,
+      updatedAt: serverTimestamp(),
+      app: "coursepack",
+    },
+    { merge: true }
+  );
+}
+
 export async function saveHubKeywordResult(itemId, tags, isCorrect) {
   const uid = auth.currentUser?.uid;
   if (!uid || !itemId) return;
