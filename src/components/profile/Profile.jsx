@@ -10,11 +10,69 @@ import { PART4_TASKS } from "../speaking/banks/part4";
 import { auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { getTotalVocabSets } from "../vocabulary/data/vocabTopics";
+import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
 import {
   EmailAuthProvider,
   reauthenticateWithCredential,
   updatePassword,
 } from "firebase/auth";
+
+const HUB_GRAMMAR_LEVELS = ["a2", "b1", "b2", "c1", "c2"];
+const HUB_GRAMMAR_LEVEL_COLORS = {
+  a2: "#7ef0c2",
+  b1: "#8fb6ff",
+  b2: "#f6d26b",
+  c1: "#f2b0b7",
+  c2: "#c7a4ff",
+};
+
+function buildHubGrammarDashboard(submissions = []) {
+  const byLevel = Object.fromEntries(
+    HUB_GRAMMAR_LEVELS.map((level) => [level, { completed: 0, total: 0 }])
+  );
+
+  const completedIds = new Set(
+    submissions
+      .map((submission) => submission?.activityId)
+      .filter(Boolean)
+  );
+
+  HUB_GRAMMAR_ACTIVITIES.forEach((activity) => {
+    const levels = Array.isArray(activity.levels) ? activity.levels : [];
+    levels.forEach((level) => {
+      if (!byLevel[level]) return;
+      byLevel[level].total += 1;
+      if (completedIds.has(activity.id)) {
+        byLevel[level].completed += 1;
+      }
+    });
+  });
+
+  return {
+    completed: completedIds.size,
+    total: HUB_GRAMMAR_ACTIVITIES.length,
+    byLevel,
+  };
+}
+
+function renderSavedGrammarSentence(parts, gaps = []) {
+  if (!Array.isArray(parts) || !parts.length) return null;
+
+  const gapMap = new Map(gaps.map((gap) => [gap.gapId, gap]));
+
+  return parts.map((part, index) => {
+    if (typeof part === "string") {
+      return <React.Fragment key={`part-${index}`}>{part}</React.Fragment>;
+    }
+
+    const gap = gapMap.get(part.gapId);
+    return (
+      <span key={`gap-${part.gapId}`} style={{ fontWeight: 700, color: "#eef4ff" }}>
+        {gap?.answer || "_____"}
+      </span>
+    );
+  });
+}
 
 
 export default function Profile({
@@ -99,6 +157,9 @@ export default function Profile({
 
   const [showAccountPanel, setShowAccountPanel] = useState(false);
   const [hubGrammarSubmissions, setHubGrammarSubmissions] = useState([]);
+  const [hubGrammarDash, setHubGrammarDash] = useState(() =>
+    buildHubGrammarDashboard([])
+  );
   const [hubKeywordDash, setHubKeywordDash] = useState({
     answered: 0,
     correct: 0,
@@ -274,7 +335,7 @@ const handleChangePassword = async (e) => {
           fb.fetchSpeakingSpeculationNotes?.(50, uid) ?? Promise.resolve([]),
           fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
           fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]),
-          fb.fetchHubGrammarSubmissions?.(20, uid) ?? Promise.resolve([]),
+          fb.fetchHubGrammarSubmissions?.(200, uid) ?? Promise.resolve([]),
           fb.fetchHubKeywordDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
           fb.fetchHubWordFormationDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
           fb.fetchHubOpenClozeDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
@@ -297,6 +358,7 @@ const handleChangePassword = async (e) => {
         setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
         setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
         setHubGrammarSubmissions(hubGrammarSubs || []);
+        setHubGrammarDash(buildHubGrammarDashboard(hubGrammarSubs || []));
         setHubKeywordDash(keywordDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
         setHubWordFormationDash(wordFormationDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
         setHubOpenClozeDash(openClozeDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
@@ -907,7 +969,7 @@ const totalListeningTasks =
     </h3>
 
     <span className="muted small" style={{ flexShrink: 0 }}>
-      {hubGrammarSubmissions.length} submission{hubGrammarSubmissions.length === 1 ? "" : "s"}
+      {hubGrammarDash.completed || 0}/{hubGrammarDash.total || 0} tests completed
     </span>
 
     <span className={`chev ${showHubGrammarPanel ? "open" : ""}`} aria-hidden>
@@ -917,6 +979,46 @@ const totalListeningTasks =
 
   {showHubGrammarPanel && (
     <div className="panel-body">
+      <div className="hub-grammar-profile-card" style={{ marginBottom: "1rem" }}>
+        <div className="hub-grammar-profile-top">
+          <div>
+            <strong>Mini Grammar Tests Progress</strong>
+            <div className="muted small">
+              {hubGrammarDash.completed || 0} of {hubGrammarDash.total || 0} tests completed
+            </div>
+          </div>
+        </div>
+
+        <div className="pbar-group" style={{ marginTop: ".8rem" }}>
+          <ProgressBar
+            label="Overall"
+            value={hubGrammarDash.completed || 0}
+            max={hubGrammarDash.total || 1}
+            right={`${hubGrammarDash.completed || 0}/${hubGrammarDash.total || 0}`}
+          />
+
+          {HUB_GRAMMAR_LEVELS
+            .filter((level) => (hubGrammarDash.byLevel?.[level]?.total || 0) > 0)
+            .map((level) => (
+              <ProgressBar
+                key={`hub-grammar-${level}`}
+                label={
+                  <span className="hub-mini-level-label">
+                    <span
+                      className="hub-mini-level-dot"
+                      style={{ background: HUB_GRAMMAR_LEVEL_COLORS[level] || "#8aa0ff" }}
+                    />
+                    {level.toUpperCase()}
+                  </span>
+                }
+                value={hubGrammarDash.byLevel?.[level]?.completed || 0}
+                max={hubGrammarDash.byLevel?.[level]?.total || 1}
+                right={`${hubGrammarDash.byLevel?.[level]?.completed || 0}/${hubGrammarDash.byLevel?.[level]?.total || 0}`}
+              />
+            ))}
+        </div>
+      </div>
+
       {!hubGrammarSubmissions.length ? (
         <p className="muted small">No mini grammar test submissions yet.</p>
       ) : (
@@ -941,17 +1043,53 @@ const totalListeningTasks =
                 <div className="qa" style={{ listStyle: "none", paddingLeft: 0 }}>
                   {(submission.items || []).map((item) => (
                     <div key={item.id} style={{ marginBottom: ".85rem" }}>
-                      <div className="q">{item.prompt}</div>
-                      {(item.gaps || []).map((gap) => (
-                        <div key={`${item.id}:${gap.gapId}`} className="a">
-                          <strong>Your answer:</strong> {gap.answer || <em>(no answer)</em>}
-                          {!gap.isCorrect && (
-                            <div className="muted small" style={{ marginTop: ".2rem" }}>
-                              Accepted: {(gap.acceptedAnswers || []).join(" / ")}
+                      {item.type === "multiple-choice" ? (
+                        <>
+                          <div className="q">{item.question || item.prompt}</div>
+                          <div className="a">
+                            <strong>Your answer:</strong> {item.selectedOption || <em>(no answer)</em>}
+                            {!item.isCorrect && (
+                              <div className="muted small" style={{ marginTop: ".2rem" }}>
+                                Correct: {item.correctOption || "—"}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : item.type === "error-correction" ? (
+                        <>
+                          <div className="q">{item.sentence || item.prompt}</div>
+                          <div className="a">
+                            <strong>Your choice:</strong> {item.selectedLabel || <em>(no answer)</em>}
+                            {!item.isCorrect && (
+                              <div className="muted small" style={{ marginTop: ".2rem" }}>
+                                Correct: {item.expectedLabel || "—"}
+                                {item.correction ? ` — ${item.correction}` : ""}
+                              </div>
+                            )}
+                            {item.answer === "wrong" && (
+                              <div className="muted small" style={{ marginTop: ".2rem" }}>
+                                Your correction: {item.correctionAnswer || <em>(blank)</em>}
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div className="q">
+                            {item.parts ? renderSavedGrammarSentence(item.parts, item.gaps || []) : item.prompt}
+                          </div>
+                          {(item.gaps || []).map((gap) => (
+                            <div key={`${item.id}:${gap.gapId}`} className="a">
+                              <strong>Your answer:</strong> {gap.answer || <em>(no answer)</em>}
+                              {!gap.isCorrect && (
+                                <div className="muted small" style={{ marginTop: ".2rem" }}>
+                                  Accepted: {(gap.acceptedAnswers || []).join(" / ")}
+                                </div>
+                              )}
                             </div>
-                          )}
-                        </div>
-                      ))}
+                          ))}
+                        </>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -1867,6 +2005,30 @@ function StyleScope() {
       }
 
       .pbar-group{ display:grid; gap:.6rem; }
+      .hub-grammar-profile-card{
+        background:#0f1b31;
+        border:1px solid #2c416f;
+        border-radius:12px;
+        padding:.85rem;
+      }
+      .hub-grammar-profile-top{
+        display:flex;
+        align-items:flex-start;
+        justify-content:space-between;
+        gap:.75rem;
+      }
+      .hub-mini-level-label{
+        display:inline-flex;
+        align-items:center;
+        gap:.45rem;
+      }
+      .hub-mini-level-dot{
+        width:.65rem;
+        height:.65rem;
+        border-radius:999px;
+        box-shadow:0 0 0 2px rgba(255,255,255,.08);
+        flex-shrink:0;
+      }
 
       .pb .row{
         display:flex;

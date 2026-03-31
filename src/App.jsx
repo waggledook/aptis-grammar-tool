@@ -156,11 +156,13 @@ useEffect(() => {
 }, []);
 
 const hasSeifHubAccess = canAccessSeifHub(user);
+const isTeacherToolsRoute = location.pathname === "/teacher-tools";
 const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-it/join";
 const isPublicSpanglishPlayRoute = /^\/games\/spanglish-fix-it\/play\/[^/]+$/.test(location.pathname);
 const showSeifHubGate =
   isSeifHubSite &&
   !hasSeifHubAccess &&
+  !(isTeacherToolsRoute && (user?.role === "teacher" || user?.role === "admin")) &&
   !isPublicSpanglishJoinRoute &&
   !isPublicSpanglishPlayRoute &&
   location.pathname !== "/privacy" &&
@@ -448,6 +450,12 @@ return (
       <Route path="/admin" element={<AdminDashboard user={user} />} />
       <Route path="/admin/activity" element={<AdminActivityLog user={user} />} />
       <Route path="/admin/activity-charts" element={<AdminActivityCharts user={user} />} />
+      <Route
+        path="/teacher-tools"
+        element={
+          user ? <TeacherTools user={user} /> : <p className="muted">Please log in.</p>
+        }
+      />
       <Route
         path="*"
         element={

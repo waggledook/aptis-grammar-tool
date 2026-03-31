@@ -35,6 +35,13 @@ function normalizeAnswer(text) {
 function buildInitialAnswers(activity) {
   const state = {};
   activity.items.forEach((item) => {
+    if (item.type === "multiple-choice" || item.type === "error-correction") {
+      state[item.id] = "";
+      if (item.type === "error-correction") {
+        state[`${item.id}:correction`] = "";
+      }
+      return;
+    }
     item.gaps.forEach((gap) => {
       state[`${item.id}:${gap.id}`] = "";
     });
@@ -42,21 +49,72 @@ function buildInitialAnswers(activity) {
   return state;
 }
 
+function highlightSentence(sentence, highlighted) {
+  const full = String(sentence || "");
+  const target = String(highlighted || "");
+  if (!target) return full;
+
+  const normalizedFull = full
+    .toLowerCase()
+    .replace(/[\u2018\u2019\u201B\u0060\u00B4]/g, "'");
+  const normalizedTarget = target
+    .toLowerCase()
+    .replace(/[\u2018\u2019\u201B\u0060\u00B4]/g, "'");
+
+  const index = normalizedFull.indexOf(normalizedTarget);
+  if (index === -1) return full;
+
+  return (
+    <>
+      {full.slice(0, index)}
+      <mark className="hub-grammar-highlight">{full.slice(index, index + target.length)}</mark>
+      {full.slice(index + target.length)}
+    </>
+  );
+}
+
 function renderSentence(
-  parts,
-  itemId,
+  item,
   answers,
   handleChange,
   handleAdvance,
   disabled,
-  registerInput
+  registerInput,
+  handleChoiceSelect
 ) {
+  const gapMap = new Map((item.gaps || []).map((gap) => [gap.id, gap]));
+
+  const parts = item.parts || [];
+  const itemId = item.id;
+
   return parts.map((part, index) => {
     if (typeof part === "string") {
       return <React.Fragment key={`${itemId}-text-${index}`}>{part}</React.Fragment>;
     }
 
     const key = `${itemId}:${part.gapId}`;
+    const gap = gapMap.get(part.gapId);
+
+    if (Array.isArray(gap?.choices) && gap.choices.length) {
+      return (
+        <select
+          key={key}
+          className="hub-grammar-gap hub-grammar-inline-select"
+          value={answers[key] || ""}
+          onChange={(event) => handleChoiceSelect(item, gap, event.target.value)}
+          disabled={disabled}
+          ref={registerInput(`${key}:option:0`)}
+        >
+          <option value="">Choose...</option>
+          {gap.choices.map((choice) => (
+            <option key={`${key}:${choice}`} value={choice}>
+              {choice}
+            </option>
+          ))}
+        </select>
+      );
+    }
+
     return (
       <input
         key={key}
@@ -81,21 +139,70 @@ export default function HubGrammarActivityRunner() {
   const navigate = useNavigate();
   const { activityId } = useParams();
   const activity = getHubGrammarActivity(activityId);
-  const inputRefs = useRef([]);
+  const inputRefs = useRef({});
   const [answers, setAnswers] = useState(() => (activity ? buildInitialAnswers(activity) : {}));
+  const [confirmedCorrections, setConfirmedCorrections] = useState({});
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState(null);
 
+  const orderedInputKeys = useMemo(() => {
+    if (!activity) return [];
+
+    return activity.items.flatMap((item) => {
+      if (item.type === "error-correction") {
+        return [`${item.id}:correction`];
+      }
+
+      if (item.type === "multiple-choice") {
+        return [];
+      }
+
+      return item.gaps.map((gap) => `${item.id}:${gap.id}`);
+    });
+  }, [activity]);
+
+  const firstControlKeysByItem = useMemo(() => {
+    if (!activity) return {};
+
+    return Object.fromEntries(
+      activity.items.map((item) => {
+        if (item.type === "multiple-choice") {
+          return [item.id, `${item.id}:option:0`];
+        }
+
+        if (item.type === "error-correction") {
+          return [item.id, `${item.id}:judge:correct`];
+        }
+
+        const firstGap = item.gaps[0];
+        if (Array.isArray(firstGap?.choices) && firstGap.choices.length) {
+          return [item.id, `${item.id}:${firstGap.id}:option:0`];
+        }
+
+        return [item.id, `${item.id}:${firstGap?.id}`];
+      })
+    );
+  }, [activity]);
+
   const totalGaps = useMemo(
-    () => (activity ? activity.items.reduce((sum, item) => sum + item.gaps.length, 0) : 0),
+    () =>
+      activity
+        ? activity.items.reduce((sum, item) => {
+            if (item.type === "multiple-choice" || item.type === "error-correction") {
+              return sum + 1;
+            }
+            return sum + item.gaps.length;
+          }, 0)
+        : 0,
     [activity]
   );
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    inputRefs.current = [];
+    inputRefs.current = {};
     setAnswers(activity ? buildInitialAnswers(activity) : {});
+    setConfirmedCorrections({});
     setSubmitted(false);
     setSaving(false);
     setResult(null);
@@ -103,9 +210,12 @@ export default function HubGrammarActivityRunner() {
 
   useEffect(() => {
     if (!submitted) {
-      inputRefs.current[0]?.focus();
+      const firstKey = orderedInputKeys[0];
+      if (firstKey) {
+        inputRefs.current[firstKey]?.focus();
+      }
     }
-  }, [activityId, submitted]);
+  }, [activityId, orderedInputKeys, submitted]);
 
   if (!activity) {
     return (
@@ -123,48 +233,172 @@ export default function HubGrammarActivityRunner() {
   };
 
   const registerInput = (key) => (node) => {
-    if (!node) return;
-
-    const existingIndex = inputRefs.current.findIndex(
-      (input) => input?.dataset.answerKey === key
-    );
+    if (!node) {
+      delete inputRefs.current[key];
+      return;
+    }
 
     node.dataset.answerKey = key;
+    inputRefs.current[key] = node;
+  };
 
-    if (existingIndex >= 0) {
-      inputRefs.current[existingIndex] = node;
-    } else {
-      inputRefs.current.push(node);
+  const focusControl = (key) => {
+    const node = inputRefs.current[key];
+    if (!node) return false;
+    node.focus();
+    node.select?.();
+    return true;
+  };
+
+  const focusNextQuestion = (itemId) => {
+    if (!activity) return;
+
+    const currentIndex = activity.items.findIndex((item) => item.id === itemId);
+    const nextItem = currentIndex >= 0 ? activity.items[currentIndex + 1] : null;
+    if (!nextItem) return;
+
+    const nextKey = firstControlKeysByItem[nextItem.id];
+    if (nextKey) {
+      focusControl(nextKey);
     }
   };
 
   const focusNextInput = (key) => {
-    const currentIndex = inputRefs.current.findIndex(
-      (input) => input?.dataset.answerKey === key
-    );
+    const currentIndex = orderedInputKeys.indexOf(key);
+    const nextKey = currentIndex >= 0 ? orderedInputKeys[currentIndex + 1] : null;
 
-    if (currentIndex >= 0) {
-      const nextInput = inputRefs.current[currentIndex + 1];
-      if (nextInput) {
-        nextInput.focus();
-        nextInput.select?.();
+    if (nextKey && inputRefs.current[nextKey]) {
+      focusControl(nextKey);
+    }
+  };
+
+  const handleJudgeSelection = (itemId, value) => {
+    handleChange(itemId, value);
+
+    if (value === "wrong") {
+      setConfirmedCorrections((prev) => ({ ...prev, [itemId]: false }));
+      requestAnimationFrame(() => {
+        focusControl(`${itemId}:correction`);
+      });
+      return;
+    }
+
+    setConfirmedCorrections((prev) => ({ ...prev, [itemId]: false }));
+  };
+
+  const confirmCorrection = (itemId) => {
+    const correctionKey = `${itemId}:correction`;
+    const value = String(answers[correctionKey] || "").trim();
+    if (!value) {
+      focusControl(correctionKey);
+      return;
+    }
+
+    setConfirmedCorrections((prev) => ({ ...prev, [itemId]: true }));
+    requestAnimationFrame(() => {
+      focusNextQuestion(itemId);
+    });
+  };
+
+  const handleGapChoiceSelect = (item, gap, choice) => {
+    const key = `${item.id}:${gap.id}`;
+    handleChange(key, choice);
+
+    const gapIndex = item.gaps.findIndex((entry) => entry.id === gap.id);
+    const nextGap = gapIndex >= 0 ? item.gaps[gapIndex + 1] : null;
+
+    requestAnimationFrame(() => {
+      if (nextGap) {
+        if (Array.isArray(nextGap.choices) && nextGap.choices.length) {
+          focusControl(`${item.id}:${nextGap.id}:option:0`);
+        } else {
+          focusControl(`${item.id}:${nextGap.id}`);
+        }
         return;
       }
-    }
 
-    if (!submitted) {
-      handleSubmit();
-    }
+      focusNextQuestion(item.id);
+    });
   };
 
   const handleReset = () => {
     setAnswers(buildInitialAnswers(activity));
+    setConfirmedCorrections({});
     setSubmitted(false);
     setResult(null);
   };
 
   const handleSubmit = async () => {
     const evaluatedItems = activity.items.map((item) => {
+      if (item.type === "multiple-choice") {
+        const rawAnswer = answers[item.id];
+        const selectedIndex =
+          rawAnswer === "" || rawAnswer == null ? null : Number(rawAnswer);
+        const isCorrect = selectedIndex === item.answerIndex;
+
+        return {
+          id: item.id,
+          type: "multiple-choice",
+          prompt: item.prompt,
+          question: item.question,
+          options: item.options,
+          answer: selectedIndex,
+          selectedOption:
+            selectedIndex != null && selectedIndex >= 0 ? item.options[selectedIndex] : "",
+          correctOption: item.options[item.answerIndex],
+          isCorrect,
+          explanation: item.explanation,
+        };
+      }
+
+      if (item.type === "error-correction") {
+        const rawAnswer = answers[item.id];
+        const selectedValue = String(rawAnswer || "");
+        const correctionText = answers[`${item.id}:correction`] || "";
+        const normalizedCorrection = normalizeAnswer(correctionText);
+        const acceptedCorrections = Array.isArray(item.correction)
+          ? item.correction
+          : String(item.correction || "")
+              .split("/")
+              .map((entry) => entry.trim())
+              .filter(Boolean);
+        const normalizedExpectedCorrections = acceptedCorrections.map((entry) =>
+          normalizeAnswer(entry)
+        );
+        const selectedIsCorrect = selectedValue === "correct";
+        const selectedIsWrong = selectedValue === "wrong";
+        const hasAnswer = selectedIsCorrect || selectedIsWrong;
+        const correctionMatches =
+          !item.isCorrect && normalizedExpectedCorrections.length
+            ? normalizedExpectedCorrections.includes(normalizedCorrection)
+            : true;
+        const isCorrect = hasAnswer
+          ? item.isCorrect
+            ? selectedIsCorrect
+            : selectedIsWrong && correctionMatches
+          : false;
+
+        return {
+          id: item.id,
+          type: "error-correction",
+          prompt: item.prompt,
+          sentence: item.sentence,
+          highlighted: item.highlighted,
+          answer: selectedValue,
+          correctionAnswer: correctionText,
+          selectedLabel:
+            selectedValue === "correct"
+              ? "Correct"
+              : selectedValue === "wrong"
+                ? "Wrong"
+                : "",
+          expectedLabel: item.isCorrect ? "Correct" : "Wrong",
+          isCorrect,
+          correction: acceptedCorrections,
+          explanation: item.explanation,
+        };
+      }
+
       const evaluatedGaps = item.gaps.map((gap) => {
         const answerKey = `${item.id}:${gap.id}`;
         const rawAnswer = answers[answerKey] || "";
@@ -184,13 +418,20 @@ export default function HubGrammarActivityRunner() {
 
       return {
         id: item.id,
+        type: "gap-fill",
         prompt: item.prompt,
+        parts: item.parts,
         gaps: evaluatedGaps,
       };
     });
 
     const correct = evaluatedItems.reduce(
-      (sum, item) => sum + item.gaps.filter((gap) => gap.isCorrect).length,
+      (sum, item) => {
+        if (item.type === "multiple-choice" || item.type === "error-correction") {
+          return sum + (item.isCorrect ? 1 : 0);
+        }
+        return sum + item.gaps.filter((gap) => gap.isCorrect).length;
+      },
       0
     );
     const score = totalGaps ? Math.round((correct / totalGaps) * 100) : 0;
@@ -268,34 +509,172 @@ export default function HubGrammarActivityRunner() {
                   <p>{item.prompt}</p>
                 </div>
 
-                <label className="hub-grammar-sentence">
-                  {renderSentence(
-                    item.parts,
-                    item.id,
-                    answers,
-                    handleChange,
-                    focusNextInput,
-                    submitted,
-                    registerInput
-                  )}
-                </label>
+                {item.type === "multiple-choice" ? (
+                  <>
+                    <div className="hub-grammar-sentence hub-grammar-question-text">
+                      {item.question}
+                    </div>
+                    <div className="hub-grammar-options">
+                      {item.options.map((option, optionIndex) => {
+                        const selected = answers[item.id] === String(optionIndex);
+                        const isRightAnswer = submitted && optionIndex === item.answerIndex;
+                        const isWrongSelection =
+                          submitted && selected && optionIndex !== item.answerIndex;
+
+                        return (
+                          <button
+                            key={`${item.id}-option-${optionIndex}`}
+                            type="button"
+                            className={[
+                              "hub-grammar-option",
+                              selected ? "is-selected" : "",
+                              isRightAnswer ? "is-correct" : "",
+                              isWrongSelection ? "is-wrong" : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            onClick={() => handleChange(item.id, String(optionIndex))}
+                            disabled={submitted}
+                          >
+                            {option}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </>
+                ) : item.type === "error-correction" ? (
+                  <>
+                    <div className="hub-grammar-sentence hub-grammar-question-text">
+                      {highlightSentence(item.sentence, item.highlighted)}
+                    </div>
+                    <div className="hub-grammar-options">
+                      {[
+                        { value: "correct", label: "Correct" },
+                        { value: "wrong", label: "Wrong" },
+                      ].map((option) => {
+                        const selected = answers[item.id] === option.value;
+                        const shouldBeSelected =
+                          submitted &&
+                          ((item.isCorrect && option.value === "correct") ||
+                            (!item.isCorrect && option.value === "wrong"));
+                        const wrongSelection =
+                          submitted && selected && !shouldBeSelected;
+
+                        return (
+                          <button
+                            key={`${item.id}-${option.value}`}
+                            type="button"
+                            className={[
+                              "hub-grammar-option",
+                              selected ? "is-selected" : "",
+                              shouldBeSelected ? "is-correct" : "",
+                              wrongSelection ? "is-wrong" : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            onClick={() => handleJudgeSelection(item.id, option.value)}
+                            ref={registerInput(`${item.id}:judge:${option.value}`)}
+                            disabled={submitted}
+                          >
+                            {option.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {answers[item.id] === "wrong" ? (
+                      <label className="hub-grammar-correction-block">
+                        <span>Write the correction</span>
+                        <div className="hub-grammar-correction-row">
+                          <input
+                            type="text"
+                            className="hub-grammar-gap hub-grammar-inline-correction"
+                            value={answers[`${item.id}:correction`] || ""}
+                            onChange={(event) => {
+                              handleChange(`${item.id}:correction`, event.target.value);
+                              setConfirmedCorrections((prev) => ({ ...prev, [item.id]: false }));
+                            }}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter") {
+                                event.preventDefault();
+                                confirmCorrection(item.id);
+                              }
+                            }}
+                            ref={registerInput(`${item.id}:correction`)}
+                            disabled={submitted || Boolean(confirmedCorrections[item.id])}
+                            placeholder="Type the corrected form..."
+                          />
+                          <button
+                            type="button"
+                            className="hub-grammar-inline-btn"
+                            onClick={() => confirmCorrection(item.id)}
+                            disabled={submitted}
+                          >
+                            OK
+                          </button>
+                        </div>
+                      </label>
+                    ) : null}
+                  </>
+                ) : (
+                  <label className="hub-grammar-sentence">
+                    {renderSentence(
+                      item,
+                      answers,
+                      handleChange,
+                      focusNextInput,
+                      submitted,
+                      registerInput,
+                      handleGapChoiceSelect
+                    )}
+                  </label>
+                )}
 
                 {submitted && evaluatedItem && (
                   <div className="hub-grammar-feedback-list">
-                    {evaluatedItem.gaps.map((gap) => (
+                    {evaluatedItem.type === "multiple-choice" ? (
                       <div
-                        key={`${item.id}:${gap.gapId}`}
-                        className={`hub-grammar-feedback ${gap.isCorrect ? "is-correct" : "is-wrong"}`}
+                        className={`hub-grammar-feedback ${evaluatedItem.isCorrect ? "is-correct" : "is-wrong"}`}
                       >
-                        <strong>{gap.isCorrect ? "Correct" : "Try again"}</strong>
-                        {!gap.isCorrect && (
-                          <p>
-                            Accepted answers: {gap.acceptedAnswers.join(" / ")}
-                          </p>
-                        )}
-                        <p>{gap.feedback}</p>
+                        <strong>{evaluatedItem.isCorrect ? "Correct" : "Try again"}</strong>
+                        {!evaluatedItem.isCorrect ? (
+                          <p>Correct answer: {evaluatedItem.correctOption}</p>
+                        ) : null}
+                        <p>{evaluatedItem.explanation}</p>
                       </div>
-                    ))}
+                    ) : evaluatedItem.type === "error-correction" ? (
+                      <div
+                        className={`hub-grammar-feedback ${evaluatedItem.isCorrect ? "is-correct" : "is-wrong"}`}
+                      >
+                        <strong>{evaluatedItem.isCorrect ? "Correct" : "Try again"}</strong>
+                        {!evaluatedItem.isCorrect ? (
+                          <p>
+                            Correct answer: {evaluatedItem.expectedLabel}
+                            {evaluatedItem.correction?.length
+                              ? ` — ${evaluatedItem.correction.join(" / ")}`
+                              : ""}
+                          </p>
+                        ) : null}
+                        {!evaluatedItem.isCorrect && evaluatedItem.answer === "wrong" ? (
+                          <p>Your correction: {evaluatedItem.correctionAnswer || "(blank)"}</p>
+                        ) : null}
+                        <p>{evaluatedItem.explanation}</p>
+                      </div>
+                    ) : (
+                      evaluatedItem.gaps.map((gap) => (
+                        <div
+                          key={`${item.id}:${gap.gapId}`}
+                          className={`hub-grammar-feedback ${gap.isCorrect ? "is-correct" : "is-wrong"}`}
+                        >
+                          <strong>{gap.isCorrect ? "Correct" : "Try again"}</strong>
+                          {!gap.isCorrect && (
+                            <p>
+                              Accepted answers: {gap.acceptedAnswers.join(" / ")}
+                            </p>
+                          )}
+                          <p>{gap.feedback}</p>
+                        </div>
+                      ))
+                    )}
                   </div>
                 )}
               </article>
@@ -304,7 +683,11 @@ export default function HubGrammarActivityRunner() {
         </div>
 
         <div className="hub-grammar-actions">
-          <button className="generate-btn" onClick={handleSubmit} disabled={submitted || saving}>
+          <button
+            className="generate-btn"
+            onClick={handleSubmit}
+            disabled={submitted || saving}
+          >
             {submitted ? "Submitted" : "Submit answers"}
           </button>
           <button className="ghost-btn" onClick={handleReset}>
@@ -451,6 +834,111 @@ export default function HubGrammarActivityRunner() {
           font-size: 1rem;
         }
 
+        .hub-grammar-question-text {
+          font-size: 1.02rem;
+          line-height: 1.65;
+        }
+
+        .hub-grammar-inline-choice-set {
+          display: inline-flex;
+          vertical-align: middle;
+          margin: 0 0.25rem;
+        }
+
+        .hub-grammar-inline-select {
+          width: auto;
+          min-width: 5.8rem;
+          margin: 0 0.25rem;
+          padding-right: 2rem;
+        }
+
+        .hub-grammar-correction-block {
+          display: grid;
+          gap: 0.4rem;
+          margin-top: 0.85rem;
+          color: #dbe7ff;
+          font-weight: 600;
+        }
+
+        .hub-grammar-correction-row {
+          display: flex;
+          gap: 0.6rem;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+
+        .hub-grammar-inline-correction {
+          margin: 0;
+          width: min(100%, 24rem);
+        }
+
+        .hub-grammar-inline-btn {
+          min-height: 44px;
+          padding: 0.65rem 0.95rem;
+          border-radius: 0.75rem;
+          border: 1px solid rgba(74, 107, 192, 0.55);
+          background: rgba(2, 6, 23, 0.42);
+          color: #eef4ff;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .hub-grammar-inline-btn:hover:not(:disabled) {
+          border-color: rgba(115, 146, 223, 0.72);
+        }
+
+        .hub-grammar-options {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.7rem;
+          margin-top: 0.9rem;
+        }
+
+        .hub-grammar-option {
+          padding: 0.7rem 0.95rem;
+          border-radius: 0.8rem;
+          border: 1px solid rgba(74, 107, 192, 0.55);
+          background: rgba(2,6,23,0.42);
+          color: #eef4ff;
+          font-size: 0.98rem;
+          font-weight: 700;
+          cursor: pointer;
+          transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+        }
+
+        .hub-grammar-option:hover:not(:disabled) {
+          transform: translateY(-1px);
+          border-color: rgba(115, 146, 223, 0.72);
+        }
+
+        .hub-grammar-option.is-selected {
+          background: rgba(74,107,192,0.22);
+          border-color: rgba(115, 146, 223, 0.8);
+        }
+
+        .hub-grammar-option.is-correct {
+          background: rgba(52, 211, 153, 0.16);
+          border-color: rgba(52, 211, 153, 0.34);
+          color: #d1fae5;
+        }
+
+        .hub-grammar-option.is-wrong {
+          background: rgba(248, 113, 113, 0.14);
+          border-color: rgba(248, 113, 113, 0.32);
+          color: #fee2e2;
+        }
+
+        .hub-grammar-highlight {
+          display: inline-block;
+          margin: 0 0.18rem;
+          padding: 0.02rem 0.45rem;
+          border-radius: 0.55rem;
+          background: rgba(246, 189, 96, 0.18);
+          border: 1px solid rgba(246, 189, 96, 0.32);
+          color: #fff0bf;
+          font-weight: 700;
+        }
+
         .hub-grammar-feedback-list {
           margin-top: 0.85rem;
           display: flex;
@@ -502,6 +990,29 @@ export default function HubGrammarActivityRunner() {
             width: 100%;
             margin: 0.35rem 0;
             display: block;
+          }
+
+          .hub-grammar-inline-choice-set {
+            display: flex;
+            margin: 0.35rem 0;
+          }
+
+          .hub-grammar-inline-select {
+            width: 100%;
+            margin: 0.35rem 0;
+            display: block;
+          }
+
+          .hub-grammar-options {
+            flex-direction: column;
+          }
+
+          .hub-grammar-correction-row {
+            align-items: stretch;
+          }
+
+          .hub-grammar-inline-btn {
+            width: 100%;
           }
         }
       `}</style>

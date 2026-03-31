@@ -137,6 +137,19 @@ export default function HubLanding({ user, hasAccess, onSignIn }) {
               <p>Practise through quick challenge-style activities that help you notice mistakes and react fast.</p>
             </button>
 
+            {(user?.role === "teacher" || user?.role === "admin") && (
+              <button
+                className="menu-card"
+                onClick={() => navigate(getSitePath("/teacher-tools"))}
+              >
+                <h3>Teacher Tools</h3>
+                <p>
+                  Build Aptis grammar sets, create custom Use of English quizzes,
+                  and review student performance from one shared teacher workspace.
+                </p>
+              </button>
+            )}
+
             {user?.role === "admin" && (
               <button
                 className="menu-card"

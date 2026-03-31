@@ -1,5 +1,6 @@
 const singleGap = (id, prompt, parts, acceptedAnswers, feedback) => ({
   id,
+  type: "gap-fill",
   prompt,
   parts,
   gaps: [
@@ -11,11 +12,108 @@ const singleGap = (id, prompt, parts, acceptedAnswers, feedback) => ({
   ],
 });
 
+const multipleChoiceItem = (id, prompt, question, options, answerIndex, explanation) => ({
+  id,
+  type: "multiple-choice",
+  prompt,
+  question,
+  options,
+  answerIndex,
+  explanation,
+});
+
+const errorCorrectionItem = (
+  id,
+  prompt,
+  sentence,
+  highlighted,
+  isCorrect,
+  correction,
+  explanation
+) => ({
+  id,
+  type: "error-correction",
+  prompt,
+  sentence,
+  highlighted,
+  isCorrect,
+  correction,
+  explanation,
+});
+
+const placeholderGapItem = (
+  id,
+  prompt,
+  sentence,
+  answer,
+  alternatives = [],
+  explanation
+) => {
+  const marker = "__________";
+  const index = String(sentence || "").indexOf(marker);
+  const before = index >= 0 ? sentence.slice(0, index) : sentence;
+  const after = index >= 0 ? sentence.slice(index + marker.length) : "";
+
+  return singleGap(
+    id,
+    prompt,
+    [before, { gapId: "g1" }, after],
+    [answer, ...alternatives],
+    explanation
+  );
+};
+
+const placeholderChoiceGapItem = (
+  id,
+  prompt,
+  sentence,
+  answers = [],
+  explanation,
+  choices = ["a", "an", "the", "—"]
+) => {
+  const marker = "____";
+  const source = String(sentence || "");
+  const parts = [];
+  const gaps = [];
+  let cursor = 0;
+  let gapIndex = 0;
+
+  while (true) {
+    const index = source.indexOf(marker, cursor);
+    if (index === -1) break;
+
+    parts.push(source.slice(cursor, index));
+
+    const gapId = `g${gapIndex + 1}`;
+    parts.push({ gapId });
+    gaps.push({
+      id: gapId,
+      acceptedAnswers: [answers[gapIndex]],
+      feedback: explanation,
+      choices,
+    });
+
+    cursor = index + marker.length;
+    gapIndex += 1;
+  }
+
+  parts.push(source.slice(cursor));
+
+  return {
+    id,
+    type: "gap-fill",
+    prompt,
+    parts,
+    gaps,
+  };
+};
+
 export const HUB_GRAMMAR_ACTIVITIES = [
   {
     id: "second-conditional-reformulation",
     title: "Second Conditional Reformulation",
     shortDescription: "Rewrite each sentence using the second conditional.",
+    levels: ["b1", "b2"],
     intro:
       "Complete each reformulation with the missing clause. You’ll get instant feedback after you submit.",
     items: [
@@ -113,6 +211,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     id: "used-to-forms",
     title: "Used To Forms",
     shortDescription: "Practise used to, didn’t use to, and be used to.",
+    levels: ["b2"],
     intro:
       "Fill each gap with the correct used to form. Focus on past habits versus being accustomed to something.",
     items: [
@@ -224,6 +323,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     id: "present-simple-or-continuous",
     title: "Present Simple or Continuous",
     shortDescription: "Choose between present simple and present continuous.",
+    levels: ["b1"],
     intro:
       "Complete each sentence with the best present simple or present continuous form. Watch for stative verbs and temporary situations.",
     items: [
@@ -414,6 +514,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     id: "present-perfect-simple-or-continuous",
     title: "Present Perfect Simple or Continuous",
     shortDescription: "Choose between present perfect simple and continuous.",
+    levels: ["b1", "b2"],
     intro:
       "Complete each sentence with the correct present perfect form. Think about finished results versus ongoing duration.",
     items: [
@@ -602,167 +703,168 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     id: "question-tags",
     title: "Question Tags Trainer",
     shortDescription: "Build the correct question tag for each sentence.",
+    levels: ["b1", "b2"],
     intro:
       "Type the full tag. The checker accepts natural punctuation variants, so you can focus on the grammar.",
     items: [
       singleGap(
         "qt1",
         "She’s from Madrid,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["isn't she"],
         "A positive statement with 'be' takes a negative tag: isn't she?"
       ),
       singleGap(
         "qt2",
         "You play the guitar,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["don't you"],
         "A positive present simple statement takes a negative 'do' tag: don't you?"
       ),
       singleGap(
         "qt3",
         "We aren't meeting at six,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["are we"],
         "A negative present continuous statement takes a positive tag: are we?"
       ),
       singleGap(
         "qt4",
         "It was expensive,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["wasn't it"],
         "A positive past simple 'be' statement takes a negative tag: wasn't it?"
       ),
       singleGap(
         "qt5",
         "They finished early,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["didn't they"],
         "A positive past simple statement takes a negative 'did' tag."
       ),
       singleGap(
         "qt6",
         "She wasn't studying all night,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["was she"],
         "A negative past continuous statement takes a positive tag."
       ),
       singleGap(
         "qt7",
         "He’s already eaten,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["hasn't he"],
         "Present perfect positive statements take a negative 'has' tag."
       ),
       singleGap(
         "qt8",
         "They hadn't left before noon,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["had they"],
         "A negative past perfect statement takes a positive tag."
       ),
       singleGap(
         "qt9",
         "She’s going to call later,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["isn't she"],
         "With 'going to', keep the auxiliary 'be' in the tag: isn't she?"
       ),
       singleGap(
         "qt10",
         "They won't be working on Friday,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["will they"],
         "A negative future continuous statement takes a positive 'will' tag."
       ),
       singleGap(
         "qt11",
         "He’ll have finished by six,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["won't he"],
         "A positive future perfect statement usually takes a negative tag: won't he?"
       ),
       singleGap(
         "qt12",
         "We shouldn't start now,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["should we"],
         "A negative modal statement takes a positive tag: should we?"
       ),
       singleGap(
         "qt13",
         "They must be tired,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["mustn't they"],
-        "A positive 'must' statement takes a negative tag."
+        "A positive 'must' statement takes a negative tag. Some speakers, especially Americans, might say 'aren't they?'"
       ),
       singleGap(
         "qt14",
         "She could have told us,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["couldn't she"],
         "A positive modal perfect statement takes a negative tag."
       ),
       singleGap(
         "qt15",
         "Close the window,",
-        [{ gapId: "g1" }],
-        ["will you", "would you", "can you", "can't you"],
+        [{ gapId: "g1" }, "?"],
+        ["will you", "would you", "won't you"],
         "Imperatives often take 'will you?' as the standard tag. Other polite variants are common too."
       ),
       singleGap(
         "qt16",
         "Don’t be late,",
-        [{ gapId: "g1" }],
-        ["will you"],
+        [{ gapId: "g1" }, "?"],
+        ["will you", "would you", "won't you"],
         "Negative imperatives typically take 'will you?'"
       ),
       singleGap(
         "qt17",
         "Let’s start the meeting,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["shall we"],
         "After 'Let's...', the normal tag is 'shall we?'"
       ),
       singleGap(
         "qt18",
         "He used to smoke,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["didn't he"],
         "With 'used to', the tag is usually formed with 'did': didn't he?"
       ),
       singleGap(
         "qt19",
         "They would visit every summer,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["wouldn't they"],
         "A positive 'would' statement takes a negative tag."
       ),
       singleGap(
         "qt20",
         "Nobody called,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["did they"],
         "Negative words like 'nobody' make the sentence negative in meaning, so the tag is positive."
       ),
       singleGap(
         "qt21",
         "Nothing works in this old laptop,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["does it"],
         "Negative words like 'nothing' take a positive tag."
       ),
       singleGap(
         "qt22",
         "They haven't been waiting long,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["have they"],
         "A negative present perfect continuous statement takes a positive tag."
       ),
       singleGap(
         "qt23",
         "The match was postponed,",
-        [{ gapId: "g1" }],
+        [{ gapId: "g1" }, "?"],
         ["wasn't it"],
         "A positive passive statement still follows the normal auxiliary pattern: wasn't it?"
       ),
@@ -772,6 +874,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     id: "passive-voice-reformulation",
     title: "Passive Voice Reformulation",
     shortDescription: "Rewrite active sentences in the passive.",
+    levels: ["b1", "b2"],
     intro:
       "Transform each sentence so the passive form is grammatically correct. Watch the tense and modal structure carefully.",
     items: [
@@ -879,6 +982,1721 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         ["The tests ", { gapId: "g1" }, " by next week."],
         ["will have been completed", "will have been finished"],
         "Use the future perfect passive: will have been completed."
+      ),
+    ],
+  },
+  {
+    id: "future-forms-mixed",
+    title: "Future Forms",
+    shortDescription: "Mix predictions, plans, arrangements, and instant decisions.",
+    levels: ["b1"],
+    intro:
+      "Work through a mixed future forms test. Some items are multiple choice, and others ask you to judge whether the highlighted future form is correct.",
+    items: [
+      multipleChoiceItem(
+        "ff-mc-1",
+        "Choose the best future form.",
+        "The phone's ringing. I ____ it.",
+        ["'m going to answer", "'ll answer", "'m answering"],
+        1,
+        "Use 'will' for an instant decision made at the moment of speaking."
+      ),
+      multipleChoiceItem(
+        "ff-mc-2",
+        "Choose the best future form.",
+        "Look at those black clouds. It ____ soon.",
+        ["'s raining", "'ll rain", "'s going to rain"],
+        2,
+        "Use 'be going to' for a prediction based on present evidence."
+      ),
+      multipleChoiceItem(
+        "ff-mc-3",
+        "Choose the best future form.",
+        "We ____ the estate agent at 4:30 tomorrow. It's already in the diary.",
+        ["'re meeting", "'ll meet", "'re going to meet"],
+        0,
+        "Use the present continuous for a fixed future arrangement."
+      ),
+      multipleChoiceItem(
+        "ff-mc-4",
+        "Choose the best future form.",
+        "I've decided to save money, so I ____ a cheaper phone next month.",
+        ["'m going to buy", "'m buying", "'ll buy"],
+        0,
+        "Use 'be going to' for a prior intention or plan."
+      ),
+      multipleChoiceItem(
+        "ff-mc-5",
+        "Choose the best future form.",
+        "Don't worry — I ____ anybody your secret.",
+        ["'m not telling", "won't tell", "'m not going to tell"],
+        1,
+        "Use 'will not / won't' for a promise."
+      ),
+      multipleChoiceItem(
+        "ff-mc-6",
+        "Choose the best future form.",
+        "A: This suitcase is really heavy. B: OK, I ____ you with it.",
+        ["'m helping", "'ll help", "'m going to help"],
+        1,
+        "Use 'will' for an offer made at the moment of speaking."
+      ),
+      multipleChoiceItem(
+        "ff-mc-7",
+        "Choose the best future form.",
+        "Barcelona are playing really well. I think they ____ the match.",
+        ["'ll win", "'re winning", "'re going to win"],
+        0,
+        "Use 'will' for a prediction based on opinion."
+      ),
+      multipleChoiceItem(
+        "ff-mc-8",
+        "Choose the best future form.",
+        "Sorry, I can't talk now. I ____ dinner with my cousins tonight.",
+        ["'ll have", "'m having", "'m going to have"],
+        1,
+        "Use the present continuous for a personal arrangement."
+      ),
+      multipleChoiceItem(
+        "ff-mc-9",
+        "Choose the best future form.",
+        "Careful! You ____ that glass if you put it there.",
+        ["'re going to break", "'ll break", "'re breaking"],
+        0,
+        "Use 'be going to' for a prediction based on what is happening now."
+      ),
+      multipleChoiceItem(
+        "ff-mc-10",
+        "Choose the best future form.",
+        "I’m sure you ____ New York. It’s an amazing city.",
+        ["'re loving", "'re going to love", "'ll love"],
+        2,
+        "Use 'will' for a general prediction."
+      ),
+      errorCorrectionItem(
+        "ff-ec-1",
+        "Decide whether the highlighted future form is correct.",
+        "I can’t come to the cinema on Friday because I’m going to meet my tutor at 6:30.",
+        "I’m going to meet",
+        false,
+        "I’m meeting",
+        "For a fixed arrangement with a time already set, the present continuous is the best choice."
+      ),
+      errorCorrectionItem(
+        "ff-ec-2",
+        "Decide whether the highlighted future form is correct.",
+        "That child is playing too close to the pool — he’ll fall in.",
+        "he’ll fall in",
+        false,
+        "he’s going to fall in",
+        "Use 'be going to' for a prediction based on present evidence."
+      ),
+      errorCorrectionItem(
+        "ff-ec-3",
+        "Decide whether the highlighted future form is correct.",
+        "I think people will live longer in the future.",
+        "will live",
+        true,
+        "",
+        "A general prediction based on opinion commonly takes 'will'."
+      ),
+      errorCorrectionItem(
+        "ff-ec-4",
+        "Decide whether the highlighted future form is correct.",
+        "A: I haven’t got a pen. B: Wait, I’m going to lend you one.",
+        "I’m going to lend",
+        false,
+        "I'll lend",
+        "An offer made at the moment of speaking normally takes 'will'."
+      ),
+      errorCorrectionItem(
+        "ff-ec-5",
+        "Decide whether the highlighted future form is correct.",
+        "We’re staying with my aunt in Seville this weekend.",
+        "We’re staying",
+        true,
+        "",
+        "The present continuous is correct for a personal arrangement."
+      ),
+      errorCorrectionItem(
+        "ff-ec-6",
+        "Decide whether the highlighted future form is correct.",
+        "I’ve already made up my mind — I’ll look for another job after the summer.",
+        "I’ll look for",
+        false,
+        "I’m going to look for",
+        "Use 'be going to' for a plan or intention decided before the moment of speaking."
+      ),
+      errorCorrectionItem(
+        "ff-ec-7",
+        "Decide whether the highlighted future form is correct.",
+        "Don’t worry, I’ll help you with the report if you want.",
+        "I’ll help",
+        true,
+        "",
+        "This is an offer or promise, so 'will' is correct."
+      ),
+      errorCorrectionItem(
+        "ff-ec-8",
+        "Decide whether the highlighted future form is correct.",
+        "Look at the way that chair is balanced — it’ll fall over.",
+        "it’ll fall over",
+        false,
+        "it’s going to fall over",
+        "When the prediction comes from what we can see now, 'going to' is the more natural choice."
+      ),
+      errorCorrectionItem(
+        "ff-ec-9",
+        "Decide whether the highlighted future form is correct.",
+        "A: These boxes are really heavy. B: OK, I carry the one on the left.",
+        "I carry",
+        false,
+        "I'll carry",
+        "Use 'will' for an instant decision made at the moment of speaking."
+      ),
+      errorCorrectionItem(
+        "ff-ec-10",
+        "Decide whether the highlighted future form is correct.",
+        "She’s going to start her driving lessons next month — she’s already paid for them.",
+        "She’s going to start",
+        true,
+        "",
+        "This is a prior plan or intention, so 'be going to' works well."
+      ),
+    ],
+  },
+  {
+    id: "present-perfect-or-past-simple-mixed",
+    title: "Present Perfect or Past Simple",
+    shortDescription: "Practise finished past time and present relevance.",
+    levels: ["b1"],
+    intro:
+      "Judge whether the highlighted verb form is correct first, then complete the gap-fill items in the second half.",
+    items: [
+      errorCorrectionItem(
+        "ppps-ec-1",
+        "Decide whether the highlighted verb form is correct.",
+        "I’ve lost my keys yesterday.",
+        "I’ve lost",
+        false,
+        "I lost",
+        "Use the past simple with a finished past time expression like 'yesterday'."
+      ),
+      errorCorrectionItem(
+        "ppps-ec-2",
+        "Decide whether the highlighted verb form is correct.",
+        "She’s just finished her homework, so she can come out now.",
+        "She’s just finished",
+        true,
+        "",
+        "The present perfect is correct here because it describes a recent action with a present result."
+      ),
+      errorCorrectionItem(
+        "ppps-ec-3",
+        "Decide whether the highlighted verb form is correct.",
+        "Did you ever try Japanese food?",
+        "Did you ever try",
+        false,
+        "Have you ever tried",
+        "Use the present perfect to talk about life experience when the time is not specified."
+      ),
+      errorCorrectionItem(
+        "ppps-ec-4",
+        "Decide whether the highlighted verb form is correct.",
+        "We went to Rome twice.",
+        "went",
+        true,
+        "",
+        "The past simple can be correct here if the speaker is thinking of two finished trips in the past."
+      ),
+      errorCorrectionItem(
+        "ppps-ec-5",
+        "Decide whether the highlighted verb form is correct.",
+        "My brother hasn’t called me last week.",
+        "hasn’t called",
+        false,
+        "didn't call",
+        "Use the past simple with a finished time reference like 'last week'."
+      ),
+      errorCorrectionItem(
+        "ppps-ec-6",
+        "Decide whether the highlighted verb form is correct.",
+        "Have you seen Marta this morning?",
+        "Have you seen",
+        true,
+        "",
+        "The present perfect is possible if 'this morning' is still part of the current unfinished time period."
+      ),
+      errorCorrectionItem(
+        "ppps-ec-7",
+        "Decide whether the highlighted verb form is correct.",
+        "I didn’t finish my project yet.",
+        "didn’t finish",
+        false,
+        "haven't finished",
+        "Use the present perfect with 'yet' when talking about something unfinished up to now."
+      ),
+      errorCorrectionItem(
+        "ppps-ec-8",
+        "Decide whether the highlighted verb form is correct.",
+        "He’s been to London in 2019.",
+        "He’s been",
+        false,
+        "He went",
+        "Use the past simple when a specific finished time is mentioned."
+      ),
+      errorCorrectionItem(
+        "ppps-ec-9",
+        "Decide whether the highlighted verb form is correct.",
+        "I’ve already told you three times!",
+        "I’ve already told",
+        true,
+        "",
+        "The present perfect is correct because the speaker is focusing on the connection to now."
+      ),
+      errorCorrectionItem(
+        "ppps-ec-10",
+        "Decide whether the highlighted verb form is correct.",
+        "When have you bought that jacket?",
+        "have you bought",
+        false,
+        "did you buy",
+        "Use the past simple with 'when' questions about finished past actions."
+      ),
+      placeholderGapItem(
+        "ppps-gf-1",
+        "Complete the sentence with the correct form.",
+        "I __________ my homework an hour ago, so I can relax now. (finish)",
+        "finished",
+        [],
+        "Use the past simple with a finished past time expression like 'an hour ago'."
+      ),
+      placeholderGapItem(
+        "ppps-gf-2",
+        "Complete the sentence with the correct form.",
+        "She  __________ the train, so she’ll be here in a minute. (just/catch)",
+        "has just caught",
+        ["'s just caught"],
+        "Use the present perfect for a recent action with a present result."
+      ),
+      placeholderGapItem(
+        "ppps-gf-3",
+        "Complete the sentence with the correct form.",
+        "__________ sushi? (you/ever/eat)",
+        "Have you ever eaten",
+        [],
+        "Use the present perfect to talk about life experience when no specific time is mentioned."
+      ),
+      placeholderGapItem(
+        "ppps-gf-4",
+        "Complete the sentence with the correct form.",
+        "We __________ that museum when we were in Paris last summer. (visit)",
+        "visited",
+        [],
+        "Use the past simple because the action happened in a finished past time period."
+      ),
+      placeholderGapItem(
+        "ppps-gf-5",
+        "Complete the sentence with the correct form.",
+        "I __________ my keys — can you help me look for them? (lose)",
+        "have lost",
+        ["'ve lost"],
+        "Use the present perfect for a past action with an important result now."
+      ),
+      placeholderGapItem(
+        "ppps-gf-6",
+        "Complete the sentence with the correct form.",
+        "My parents __________ to Italy three times. (be)",
+        "have been",
+        [],
+        "Use the present perfect for past experiences when the exact time is not given."
+      ),
+      placeholderGapItem(
+        "ppps-gf-7",
+        "Complete the sentence with the correct form.",
+        "What time __________ yesterday? (he/leave)",
+        "did he leave",
+        [],
+        "Use the past simple when asking about a finished past action with a past time reference."
+      ),
+      placeholderGapItem(
+        "ppps-gf-8",
+        "Complete the sentence with the correct form.",
+        "We __________ dinner yet, so I’m getting hungry. (not have)",
+        "haven't had",
+        ["have not had"],
+        "Use the present perfect with 'yet' for something unfinished up to now."
+      ),
+      placeholderGapItem(
+        "ppps-gf-9",
+        "Complete the sentence with the correct form.",
+        "She __________ her ankle last week, so she can’t do PE today. (hurt)",
+        "hurt",
+        [],
+        "Use the past simple with a finished past time expression like 'last week'."
+      ),
+      placeholderGapItem(
+        "ppps-gf-10",
+        "Complete the sentence with the correct form.",
+        "I __________ that film already, so I don’t really want to watch it again. (see)",
+        "have seen",
+        ["'ve seen"],
+        "Use the present perfect with 'already' when the exact time is not important."
+      ),
+    ],
+  },
+  {
+    id: "comparatives-and-superlatives-mixed",
+    title: "Comparatives and Superlatives",
+    shortDescription: "Practise comparison structures through reformulation and error correction.",
+    levels: ["b1"],
+    intro:
+      "Decide whether the highlighted comparison form is correct first, then complete the reformulation items in the second half.",
+    items: [
+      errorCorrectionItem(
+        "cs-ec-1",
+        "Decide whether the highlighted comparison form is correct.",
+        "My new laptop is more lighter than my old one.",
+        "more lighter than",
+        false,
+        "lighter than",
+        "Don't use both 'more' and '-er' together. Use 'lighter than'."
+      ),
+      errorCorrectionItem(
+        "cs-ec-2",
+        "Decide whether the highlighted comparison form is correct.",
+        "This is the most boring film I’ve seen all year.",
+        "the most boring",
+        true,
+        "",
+        "This is correct. Longer adjectives usually form the superlative with 'the most'."
+      ),
+      errorCorrectionItem(
+        "cs-ec-3",
+        "Decide whether the highlighted comparison form is correct.",
+        "My sister drives more carefully than I do.",
+        "more carefully than",
+        true,
+        "",
+        "This is correct. Adverbs like 'carefully' usually form the comparative with 'more'."
+      ),
+      errorCorrectionItem(
+        "cs-ec-4",
+        "Decide whether the highlighted comparison form is correct.",
+        "Your bag is the same than mine.",
+        "the same than",
+        false,
+        "the same as",
+        "Use 'the same as', not 'the same than'."
+      ),
+      errorCorrectionItem(
+        "cs-ec-5",
+        "Decide whether the highlighted comparison form is correct.",
+        "Today is hotter that yesterday.",
+        "hotter that",
+        false,
+        "hotter than",
+        "Use 'than' after a comparative, not 'that'."
+      ),
+      errorCorrectionItem(
+        "cs-ec-6",
+        "Decide whether the highlighted comparison form is correct.",
+        "Of all the students in the class, Marta works the hardest.",
+        "the hardest",
+        true,
+        "",
+        "This is correct. 'Hard' can form the superlative adverb with '-est': 'the hardest'."
+      ),
+      errorCorrectionItem(
+        "cs-ec-7",
+        "Decide whether the highlighted comparison form is correct.",
+        "This exercise isn’t as difficult than the last one.",
+        "as difficult than",
+        false,
+        "as difficult as",
+        "Use 'as ... as' in this structure, not 'as ... than'."
+      ),
+      errorCorrectionItem(
+        "cs-ec-8",
+        "Decide whether the highlighted comparison form is correct.",
+        "He’s the best player of the team.",
+        "of the team",
+        false,
+        "in the team",
+        "After superlatives with groups, we normally use 'in': 'the best player in the team'."
+      ),
+      errorCorrectionItem(
+        "cs-ec-9",
+        "Decide whether the highlighted comparison form is correct.",
+        "I don’t earn as much money as my brother.",
+        "as much money as",
+        true,
+        "",
+        "This is correct. Use 'as much ... as' with uncountable nouns like 'money'."
+      ),
+      errorCorrectionItem(
+        "cs-ec-10",
+        "Decide whether the highlighted comparison form is correct.",
+        "The journey by coach was more cheaper than the train.",
+        "more cheaper than",
+        false,
+        "cheaper than",
+        "Don't use 'more' with a short adjective that already takes '-er'."
+      ),
+      placeholderGapItem(
+        "cs-rf-1",
+        "Complete the second sentence so that it has a similar meaning.",
+        "My brother is taller than me.\nI’m not __________ my brother.",
+        "as tall as",
+        [],
+        "Use 'not as ... as' to express an inferior comparison."
+      ),
+      placeholderGapItem(
+        "cs-rf-2",
+        "Complete the second sentence so that it has a similar meaning.",
+        "This test is easier than the last one.\nThe last test was __________ this one.",
+        "more difficult than",
+        ["harder than"],
+        "You can reverse the comparison by using the opposite comparative."
+      ),
+      placeholderGapItem(
+        "cs-rf-3",
+        "Complete the second sentence so that it has a similar meaning.",
+        "No one in the class is as hardworking as Julia.\nJulia is __________ student in the class.",
+        "the most hardworking",
+        ["the hardest-working", "the most hard-working"],
+        "Use a superlative to compare one person with the whole group."
+      ),
+      placeholderGapItem(
+        "cs-rf-4",
+        "Complete the second sentence so that it has a similar meaning.",
+        "My phone and yours cost exactly the same.\nYour phone costs __________ mine.",
+        "the same as",
+        [],
+        "Use 'the same as' to show equality here: your phone costs the same as mine."
+      ),
+      placeholderGapItem(
+        "cs-rf-5",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Travelling by train is more relaxing than driving.\nDriving isn’t __________ travelling by train.",
+        "as relaxing as",
+        [],
+        "Use 'not as ... as' to reformulate the comparative."
+      ),
+      placeholderGapItem(
+        "cs-rf-6",
+        "Complete the second sentence so that it has a similar meaning.",
+        "This is the most expensive restaurant in town.\nNo other restaurant in town is __________ this one.",
+        "as expensive as",
+        [],
+        "A superlative can often be reformulated with 'No other...' + 'as ... as'."
+      ),
+      placeholderGapItem(
+        "cs-rf-7",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Sara speaks English more confidently than I do.\nI don’t speak English __________ Sara does.",
+        "as confidently as",
+        [],
+        "Use 'as ... as' with an adverb to compare actions."
+      ),
+      placeholderGapItem(
+        "cs-rf-8",
+        "Complete the second sentence so that it has a similar meaning.",
+        "This is the best meal I’ve had in ages.\nI’ve never had __________ this one.",
+        "a better meal than",
+        [],
+        "A superlative sentence can often be reformulated with a comparative after 'never'."
+      ),
+      placeholderGapItem(
+        "cs-rf-9",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Her new job is less stressful than her old one.\nHer old job was __________ her new one.",
+        "more stressful than",
+        [],
+        "Reverse the comparison by changing 'less' to the opposite comparative."
+      ),
+      placeholderGapItem(
+        "cs-rf-10",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Nobody in my family gets up earlier than my dad.\nMy dad gets up __________ in my family.",
+        "the earliest",
+        ["earlier than anyone", "earlier than anybody", "earlier than anyone else", "earlier than anybody else"],
+        "Both the superlative form and a comparative form with 'anyone/anybody' can express the same idea here."
+      ),
+    ],
+  },
+  {
+    id: "articles-mixed",
+    title: "Articles",
+    shortDescription: "Practise a, an, the, and zero article in common B1 contexts.",
+    levels: ["b1"],
+    intro:
+      "Start with error correction, then choose the correct article for each gap using a, an, the, or — when no article is needed.",
+    items: [
+      errorCorrectionItem(
+        "art-ec-1",
+        "Decide whether the highlighted article use is correct.",
+        "My sister is engineer in a big company.",
+        "is engineer",
+        false,
+        "is an engineer",
+        "Use 'a / an' with singular countable nouns when we say what somebody does."
+      ),
+      errorCorrectionItem(
+        "art-ec-2",
+        "Decide whether the highlighted article use is correct.",
+        "I usually have breakfast at home before work.",
+        "have breakfast at home before work",
+        true,
+        "",
+        "No article is needed with meals, 'home', or 'work' in this general sense."
+      ),
+      errorCorrectionItem(
+        "art-ec-3",
+        "Decide whether the highlighted article use is correct.",
+        "We went to cinema on Saturday night.",
+        "to cinema",
+        false,
+        "to the cinema",
+        "Use 'the' with places in town such as 'the cinema' and 'the theatre'."
+      ),
+      errorCorrectionItem(
+        "art-ec-4",
+        "Decide whether the highlighted article use is correct.",
+        "She bought an beautiful dress for the wedding.",
+        "an beautiful dress",
+        false,
+        "a beautiful dress",
+        "Use 'a' before a consonant sound and 'an' before a vowel sound."
+      ),
+      errorCorrectionItem(
+        "art-ec-5",
+        "Decide whether the highlighted article use is correct.",
+        "The moon looked really bright last night.",
+        "The moon",
+        true,
+        "",
+        "Use 'the' when there is only one of something, like 'the moon'."
+      ),
+      errorCorrectionItem(
+        "art-ec-6",
+        "Decide whether the highlighted article use is correct.",
+        "I love the dogs, but I’m afraid of the ones next door.",
+        "the dogs",
+        false,
+        "dogs",
+        "When speaking about things in general, we usually use no article with plural nouns."
+      ),
+      errorCorrectionItem(
+        "art-ec-7",
+        "Decide whether the highlighted article use is correct.",
+        "Can you close window, please?",
+        "close window",
+        false,
+        "close the window",
+        "Use 'the' when it is clear which thing we are referring to."
+      ),
+      errorCorrectionItem(
+        "art-ec-8",
+        "Decide whether the highlighted article use is correct.",
+        "He never drinks coffee after the dinner.",
+        "the dinner",
+        false,
+        "dinner",
+        "We normally use no article before meals: breakfast, lunch, and dinner."
+      ),
+      errorCorrectionItem(
+        "art-ec-9",
+        "Decide whether the highlighted article use is correct.",
+        "She’s the best student in the class.",
+        "the best student",
+        true,
+        "",
+        "Use 'the' with superlatives."
+      ),
+      errorCorrectionItem(
+        "art-ec-10",
+        "Decide whether the highlighted article use is correct.",
+        "I’ll see you on the Friday after work.",
+        "on the Friday",
+        false,
+        "on Friday",
+        "We usually use no article before days of the week."
+      ),
+      errorCorrectionItem(
+        "art-ec-11",
+        "Decide whether the highlighted article use is correct.",
+        "My dad comes home late because he usually leaves the work at 8:00.",
+        "the work",
+        false,
+        "work",
+        "After verbs like 'leave' and prepositions like 'from', we usually use no article with 'work'."
+      ),
+      errorCorrectionItem(
+        "art-ec-12",
+        "Decide whether the highlighted article use is correct.",
+        "What amazing idea!",
+        "What amazing idea",
+        false,
+        "What an amazing idea",
+        "Use 'a / an' in exclamations with singular countable nouns: 'What an amazing idea!'"
+      ),
+      errorCorrectionItem(
+        "art-ec-13",
+        "Decide whether the highlighted article use is correct.",
+        "We had lunch in a small café near the station.",
+        "a small café",
+        true,
+        "",
+        "Use 'a' when mentioning a singular countable noun for the first time."
+      ),
+      errorCorrectionItem(
+        "art-ec-14",
+        "Decide whether the highlighted article use is correct.",
+        "Children often learn languages more easily than the adults.",
+        "the adults",
+        false,
+        "adults",
+        "When speaking about people in general, we usually use no article with plural nouns."
+      ),
+      errorCorrectionItem(
+        "art-ec-15",
+        "Decide whether the highlighted article use is correct.",
+        "I think this is best café in the neighbourhood.",
+        "is best café",
+        false,
+        "is the best café",
+        "Use 'the' with superlatives such as 'the best'."
+      ),
+      errorCorrectionItem(
+        "art-ec-16",
+        "Decide whether the highlighted article use is correct.",
+        "She was tired, so she went straight to bed after the school.",
+        "the school",
+        false,
+        "school",
+        "With nouns like 'school', 'work', and 'home', we often use no article in common expressions such as 'after school'."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-1",
+        "Choose the correct article for each gap.",
+        "My brother is ____ doctor at ____ local hospital.",
+        ["a", "the"],
+        "Use 'a' for jobs, and 'the' when the place is specific or known in the context."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-2",
+        "Choose the correct article for each gap.",
+        "We usually have ____ lunch at home, but today we’re going to ____ restaurant near the beach.",
+        ["—", "a"],
+        "Use no article with meals in general, and 'a' when mentioning a singular countable noun for the first time."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-3",
+        "Choose the correct article for each gap.",
+        "Can you open ____ window? It’s ____ hottest room in the house.",
+        ["the", "the"],
+        "Use 'the' when it is clear which thing we mean, and also with superlatives."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-4",
+        "Choose the correct article for each gap.",
+        "She bought ____ umbrella and ____ orange scarf yesterday.",
+        ["an", "an"],
+        "Use 'an' before vowel sounds."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-5",
+        "Choose the correct article for each gap.",
+        "I don’t like ____ spiders, but I’m not afraid of ____ ones in that photo.",
+        ["—", "the"],
+        "Use no article for plural nouns in general, and 'the' for specific ones."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-6",
+        "Choose the correct article for each gap.",
+        "What ____ amazing story! You should write ____ book about it.",
+        ["an", "a"],
+        "Use 'an' in exclamations with singular countable nouns, and 'a' for a singular noun mentioned for the first time."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-7",
+        "Choose the correct article for each gap.",
+        "I’ll meet you at ____ station after ____ work.",
+        ["the", "—"],
+        "Use 'the' for a specific place, but no article in the expression 'after work'."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-8",
+        "Choose the correct article for each gap.",
+        "We went to ____ cinema on Friday, then had dinner at ____ friend’s house.",
+        ["the", "a"],
+        "Use 'the' with places in town like 'the cinema', and 'a' when introducing 'a friend'."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-9",
+        "Choose the correct article for each gap.",
+        "____ children in my street often play football after ____ school.",
+        ["the", "—"],
+        "Use 'the' for a specific group of children, and no article in the expression 'after school'."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-10",
+        "Choose the correct article for each gap.",
+        "This is ____ most interesting article I’ve read in ____ long time.",
+        ["the", "a"],
+        "Use 'the' with superlatives and 'a' in the expression 'in a long time'."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-11",
+        "Choose the correct article for each gap.",
+        "My aunt is ____ teacher, and my uncle works from ____ home.",
+        ["a", "—"],
+        "Use 'a' with jobs and no article in the expression 'from home'."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-12",
+        "Choose the correct article for each gap.",
+        "Have you ever seen ____ moon look so bright?",
+        ["the"],
+        "Use 'the' when there is only one of something."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-13",
+        "Choose the correct article for each gap.",
+        "I need to buy ____ new phone because ____ old one is broken.",
+        ["a", "the"],
+        "Use 'a' when introducing something for the first time, then 'the' for the one already known."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-14",
+        "Choose the correct article for each gap.",
+        "He never eats ____ breakfast, but he always has ____ big lunch.",
+        ["—", "a"],
+        "Use no article with meals in general, but 'a' with a singular countable noun phrase like 'a big lunch'."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-15",
+        "Choose the correct article for each gap.",
+        "What time do you usually get back from ____ work on ____ Tuesdays?",
+        ["—", "—"],
+        "Use no article with 'work' and before days of the week."
+      ),
+      placeholderChoiceGapItem(
+        "art-gf-16",
+        "Choose the correct article for each gap.",
+        "It’s ____ best café in town, but it isn’t ____ cheapest.",
+        ["the", "the"],
+        "Use 'the' with superlatives."
+      ),
+    ],
+  },
+  {
+    id: "obligation-and-prohibition-mixed",
+    title: "Modals: Obligation and Prohibition",
+    shortDescription: "Practise must, have to, should, ought to, and mustn't at B1 level.",
+    levels: ["b1"],
+    intro:
+      "Start with error correction, then move into gapfill and reformulation to practise obligation, prohibition, advice, and lack of necessity.",
+    items: [
+      errorCorrectionItem(
+        "op-ec-1",
+        "Decide whether the highlighted modal form is correct.",
+        "You don’t have to smoke inside the building. It’s against the rules.",
+        "don’t have to smoke",
+        false,
+        "mustn't smoke",
+        "Use 'mustn't' when something is prohibited. 'Don't have to' means it isn't necessary."
+      ),
+      errorCorrectionItem(
+        "op-ec-2",
+        "Decide whether the highlighted modal form is correct.",
+        "You ought wear a helmet when you ride a bike.",
+        "ought wear",
+        false,
+        "ought to wear",
+        "Use 'ought to' + infinitive."
+      ),
+      errorCorrectionItem(
+        "op-ec-3",
+        "Decide whether the highlighted modal form is correct.",
+        "I had to get up early yesterday for a dentist appointment.",
+        "had to get up",
+        true,
+        "",
+        "Use 'had to' for past obligation or necessity."
+      ),
+      errorCorrectionItem(
+        "op-ec-4",
+        "Decide whether the highlighted modal form is correct.",
+        "Students mustn’t wear a uniform at this school, so they can choose their own clothes.",
+        "mustn't wear",
+        false,
+        "don't have to wear",
+        "Use 'don't have to' when something is not necessary. 'Mustn't' means it is forbidden."
+      ),
+      errorCorrectionItem(
+        "op-ec-5",
+        "Decide whether the highlighted modal form is correct.",
+        "You should to talk to your manager before making a complaint.",
+        "should to talk",
+        false,
+        "should talk",
+        "Use 'should' + infinitive without 'to'."
+      ),
+      errorCorrectionItem(
+        "op-ec-6",
+        "Decide whether the highlighted modal form is correct.",
+        "We won’t have to take the car if the weather stays good — we can walk.",
+        "won't have to take",
+        true,
+        "",
+        "Use 'won't have to' for future lack of necessity."
+      ),
+      errorCorrectionItem(
+        "op-ec-7",
+        "Decide whether the highlighted modal form is correct.",
+        "You must finish this book — it’s brilliant.",
+        "must finish",
+        true,
+        "",
+        "We can use 'must' for a strong recommendation."
+      ),
+      errorCorrectionItem(
+        "op-ec-8",
+        "Decide whether the highlighted modal form is correct.",
+        "I’m sorry, but passengers mustn’t show their tickets before boarding.",
+        "mustn't show",
+        false,
+        "have to show / must show",
+        "Use 'have to' or 'must' when something is required by a rule. 'Mustn't' would mean it is forbidden."
+      ),
+      errorCorrectionItem(
+        "op-ec-9",
+        "Decide whether the highlighted modal form is correct.",
+        "Tomorrow I’ll have to leave early because I’ve got a hospital appointment.",
+        "I'll have to leave",
+        true,
+        "",
+        "Use 'will have to' for future necessity."
+      ),
+      errorCorrectionItem(
+        "op-ec-10",
+        "Decide whether the highlighted modal form is correct.",
+        "You ought not drive so fast in the rain.",
+        "ought not drive",
+        false,
+        "ought not to drive",
+        "The negative form is 'ought not to' + infinitive."
+      ),
+      placeholderGapItem(
+        "op-gf-1",
+        "Complete the sentence with the correct modal form.",
+        "You __________ wear a seat belt in a car. It’s the law.",
+        "have to",
+        ["must"],
+        "Both are possible here for obligation, though 'have to' is often more natural for rules and laws."
+      ),
+      placeholderGapItem(
+        "op-gf-2",
+        "Complete the sentence with the correct modal form.",
+        "We __________ get up early tomorrow because our train leaves at 6:15.",
+        "will have to",
+        [],
+        "Use 'will have to' for future necessity."
+      ),
+      placeholderGapItem(
+        "op-gf-3",
+        "Complete the sentence with the correct modal form.",
+        "You __________ touch that wire — it’s dangerous.",
+        "mustn't",
+        ["must not"],
+        "Use 'mustn't' when something is prohibited or strongly warned against."
+      ),
+      placeholderGapItem(
+        "op-gf-4",
+        "Complete the sentence with the correct modal form.",
+        "I __________ wear a suit to work, so I usually go in jeans and a jumper.",
+        "don't have to",
+        ["do not have to"],
+        "Use 'don't have to' when something is not necessary."
+      ),
+      placeholderGapItem(
+        "op-gf-5",
+        "Complete the sentence with the correct modal form.",
+        "You look exhausted. You __________ go to bed earlier.",
+        "should",
+        ["ought to"],
+        "Use 'should' or 'ought to' to give advice."
+      ),
+      placeholderGapItem(
+        "op-gf-6",
+        "Complete the sentence with the correct modal form.",
+        "When my mum was at school, she __________ wear a uniform every day.",
+        "had to",
+        [],
+        "Use 'had to' for obligation in the past."
+      ),
+      placeholderGapItem(
+        "op-gf-7",
+        "Complete the sentence with the correct modal form.",
+        "We __________ book tickets yet — my uncle might be able to get them for free.",
+        "don't have to",
+        ["do not have to"],
+        "Use 'don't have to' when something is not necessary."
+      ),
+      placeholderGapItem(
+        "op-gf-8",
+        "Complete the sentence with the correct modal form.",
+        "You __________ be rude to the waiter. He is only trying to help.",
+        "shouldn't",
+        ["should not", "ought not to"],
+        "Use 'shouldn't' or 'ought not to' to give negative advice."
+      ),
+      placeholderGapItem(
+        "op-gf-9",
+        "Complete the sentence with the correct modal form.",
+        "Visitors __________ leave their bags at reception before entering the museum.",
+        "have to",
+        ["must"],
+        "Both are possible for obligation, though 'have to' is often more natural for rules."
+      ),
+      placeholderGapItem(
+        "op-gf-10",
+        "Complete the sentence with the correct modal form.",
+        "You __________ bring any food — there’ll be plenty at the party.",
+        "don't have to",
+        ["do not have to"],
+        "Use 'don't have to' when something is not necessary."
+      ),
+      placeholderGapItem(
+        "op-rf-1",
+        "Complete the second sentence so that it has a similar meaning.",
+        "It isn’t necessary to bring a towel.\nYou __________ a towel.",
+        "don't have to bring",
+        ["do not have to bring"],
+        "Use 'don't have to' to express lack of necessity."
+      ),
+      placeholderGapItem(
+        "op-rf-2",
+        "Complete the second sentence so that it has a similar meaning.",
+        "It’s forbidden to park here.\nYou __________ here.",
+        "mustn't park",
+        ["must not park"],
+        "Use 'mustn't' to express prohibition."
+      ),
+      placeholderGapItem(
+        "op-rf-3",
+        "Complete the second sentence so that it has a similar meaning.",
+        "It’s a good idea to call your grandmother.\nYou __________ your grandmother.",
+        "should call",
+        ["ought to call"],
+        "Use 'should' or 'ought to' to give advice."
+      ),
+      placeholderGapItem(
+        "op-rf-4",
+        "Complete the second sentence so that it has a similar meaning.",
+        "It was necessary for us to leave early.\nWe __________ early.",
+        "had to leave",
+        [],
+        "Use 'had to' for past necessity."
+      ),
+      placeholderGapItem(
+        "op-rf-5",
+        "Complete the second sentence so that it has a similar meaning.",
+        "It will be necessary for me to buy a new charger.\nI __________ a new charger.",
+        "will have to buy",
+        [],
+        "Use 'will have to' for future necessity."
+      ),
+      placeholderGapItem(
+        "op-rf-6",
+        "Complete the second sentence so that it has a similar meaning.",
+        "It isn’t a good idea to stay up so late.\nYou __________ so late.",
+        "shouldn't stay up",
+        ["should not stay up", "ought not to stay up"],
+        "Use 'shouldn't' or 'ought not to' for negative advice."
+      ),
+      placeholderGapItem(
+        "op-rf-7",
+        "Complete the second sentence so that it has a similar meaning.",
+        "It isn’t necessary for Sam to come if he’s busy.\nSam __________ if he’s busy.",
+        "doesn't have to come",
+        ["does not have to come"],
+        "Use 'doesn't have to' to show that something is not necessary."
+      ),
+      placeholderGapItem(
+        "op-rf-8",
+        "Complete the second sentence so that it has a similar meaning.",
+        "It’s forbidden to use your phone during the exam.\nYou __________ your phone during the exam.",
+        "mustn't use",
+        ["must not use"],
+        "Use 'mustn't' for prohibition."
+      ),
+    ],
+  },
+  {
+    id: "ability-possibility-mixed",
+    title: "Ability: Can, Could, or Be Able To?",
+    shortDescription: "25 items to master ability in every tense and form.",
+    levels: ["b1"],
+    intro:
+      "Choose the correct way to express ability. Remember: use can/could for present or past, but switch to 'be able to' for everything else.",
+    items: [
+      errorCorrectionItem(
+        "ab1",
+        "Check the highlighted phrase for errors.",
+        "I will can help you with your homework tomorrow.",
+        "will can",
+        false,
+        "will be able to",
+        "We cannot use two modal verbs together. Use 'will be able to' for the future."
+      ),
+      errorCorrectionItem(
+        "ab2",
+        "Check the highlighted phrase for errors.",
+        "I've always wanted to be able to speak Italian.",
+        "be able to",
+        true,
+        "",
+        "Correct. After 'want to', we need the infinitive 'be able to'."
+      ),
+      errorCorrectionItem(
+        "ab3",
+        "Check the highlighted phrase for errors.",
+        "She hasn't could find her keys all morning.",
+        "hasn't could",
+        false,
+        "hasn't been able to",
+        "'Could' doesn't have a past participle. Use 'been able to' for the present perfect."
+      ),
+      errorCorrectionItem(
+        "ab4",
+        "Check the highlighted phrase for errors.",
+        "I love being able to work from home.",
+        "being able to",
+        true,
+        "",
+        "Correct. Use the -ing form (gerund) after verbs of liking like 'love'."
+      ),
+      errorCorrectionItem(
+        "ab5",
+        "Check the highlighted phrase for errors.",
+        "We might can come to the party on Friday.",
+        "might can",
+        false,
+        "might be able to",
+        "After modals like 'might', 'may', or 'should', we must use 'be able to'."
+      ),
+      multipleChoiceItem(
+        "ab6",
+        "Choose the best option.",
+        "When I was five, I ____ already read very well.",
+        ["can", "could", "been able to"],
+        1,
+        "Use 'could' for general ability in the past."
+      ),
+      multipleChoiceItem(
+        "ab7",
+        "Choose the best option.",
+        "I haven't ____ sleep lately.",
+        ["could", "can", "been able to"],
+        2,
+        "Present perfect requires the past participle 'been able to'."
+      ),
+      multipleChoiceItem(
+        "ab8",
+        "Choose the best option.",
+        "I'm sorry, I ____ come to the meeting tomorrow.",
+        ["can't", "couldn't", "not being able to"],
+        0,
+        "For future arrangements, we often use 'can't' or the present continuous."
+      ),
+      multipleChoiceItem(
+        "ab9",
+        "Choose the best option.",
+        "You should ____ swim if you want to go on the boat.",
+        ["can", "could", "be able to"],
+        2,
+        "After the modal 'should', we need the infinitive 'be able to'."
+      ),
+      multipleChoiceItem(
+        "ab10",
+        "Choose the best option.",
+        "After three hours of trying, I ____ finally open the jar.",
+        ["can", "was able to", "couldn't"],
+        1,
+        "For a specific success in the past, 'was able to' is better than 'could'."
+      ),
+      placeholderGapItem(
+        "ab11",
+        "Fill the gap.",
+        "I'd love __________ play the piano like you.",
+        "to be able to",
+        ["to can"],
+        "Use the infinitive 'to be able to' after 'would love'."
+      ),
+      placeholderGapItem(
+        "ab12",
+        "Fill the gap.",
+        "I __________ finish the report yesterday, so I'll do it now.",
+        "couldn't",
+        ["wasn't able to", "was not able to"],
+        "Negative past ability can use 'couldn't' or 'wasn't able to'."
+      ),
+      placeholderGapItem(
+        "ab13",
+        "Fill the gap.",
+        "One day, humans __________ live on Mars.",
+        "will be able to",
+        ["'ll be able to"],
+        "Use 'will be able to' for future possibility."
+      ),
+      placeholderGapItem(
+        "ab14",
+        "Fill the gap.",
+        "I've never __________ understand why he's so popular.",
+        "been able to",
+        [],
+        "Present perfect requires 'been able to'."
+      ),
+      placeholderGapItem(
+        "ab15",
+        "Fill the gap.",
+        "He hates __________ drive in the dark.",
+        "not being able to",
+        ["not to be able to"],
+        "After 'hate', use the -ing form: 'not being able to'."
+      ),
+      placeholderGapItem(
+        "ab16",
+        "Fill the gap.",
+        "If you don't hurry, you __________ finish the exam on time.",
+        "won't be able to",
+        ["will not be able to"],
+        "Future inability."
+      ),
+      placeholderGapItem(
+        "ab17",
+        "Fill the gap.",
+        "When he was younger, my grandfather __________ speak five languages.",
+        "could",
+        ["was able to"],
+        "General ability in the past."
+      ),
+      placeholderGapItem(
+        "ab18",
+        "Fill the gap.",
+        "I hope __________ come to your party next week.",
+        "to be able to",
+        [],
+        "Use 'to be able to' after 'hope'."
+      ),
+      placeholderGapItem(
+        "ab19",
+        "Fill the gap.",
+        "I __________ find my wallet anywhere! Have you seen it?",
+        "can't",
+        ["cannot"],
+        "Present inability."
+      ),
+      placeholderGapItem(
+        "ab20",
+        "Fill the gap.",
+        "We're so happy! We __________ buy a new car last week.",
+        "were able to",
+        ["managed to"],
+        "For a specific achievement in the past, 'were able to' is preferred."
+      ),
+      singleGap(
+        "ab21",
+        "Rewrite using 'be able to'.",
+        ["I can't swim. -> I'd love ", { gapId: "g1" }, "."],
+        ["to be able to swim"],
+        "Change 'can' to the infinitive 'to be able to' after 'would love'."
+      ),
+      singleGap(
+        "ab22",
+        "Rewrite using 'be able to'.",
+        ["He could ski. -> He has ", { gapId: "g1" }, " since he was ten."],
+        ["been able to ski"],
+        "Use the present perfect form of 'be able to'."
+      ),
+      singleGap(
+        "ab23",
+        "Rewrite using 'be able to'.",
+        ["We can go. -> We might ", { gapId: "g1" }, " tomorrow."],
+        ["be able to go"],
+        "After 'might', use the base form 'be able to'."
+      ),
+      singleGap(
+        "ab24",
+        "Rewrite using 'be able to'.",
+        ["I will call you. -> I hope ", { gapId: "g1" }, " tomorrow."],
+        ["to be able to call you"],
+        "Use the infinitive after 'hope'."
+      ),
+      singleGap(
+        "ab25",
+        "Rewrite using 'be able to'.",
+        ["I can't see the screen. -> I hate ", { gapId: "g1" }, "."],
+        ["not being able to see the screen", "not being able to see"],
+        "After 'hate', use the negative gerund form."
+      ),
+    ],
+  },
+  {
+    id: "habits-and-states",
+    title: "Habits and States: Used to & Usually",
+    shortDescription: "Master 'used to', 'usually', and getting accustomed to things.",
+    levels: ["b1"],
+    intro:
+      "Learn to talk about your past and present routines. Remember: 'used to' is only for the past. For present habits, we use 'usually' with the present simple.",
+    items: [
+      errorCorrectionItem(
+        "hs1",
+        "Check the highlighted phrase for errors.",
+        "I use to get up early when I was at school.",
+        "use to",
+        false,
+        "used to",
+        "In the positive past form, we always use 'used to' with a 'd'."
+      ),
+      errorCorrectionItem(
+        "hs2",
+        "Check the highlighted phrase for errors.",
+        "I use to play tennis twice a week now.",
+        "use to",
+        false,
+        "usually play",
+        "'Used to' doesn't exist for present habits. Use 'usually' + present simple."
+      ),
+      errorCorrectionItem(
+        "hs3",
+        "Check the highlighted phrase for errors.",
+        "Did you used to have long hair?",
+        "used to",
+        false,
+        "use to",
+        "In questions and negatives with 'did/didn't', we remove the 'd' from 'use to'."
+      ),
+      errorCorrectionItem(
+        "hs4",
+        "Check the highlighted phrase for errors.",
+        "I'm used to getting up early every day.",
+        "getting up",
+        true,
+        "",
+        "Correct. After 'be used to', we use the -ing form of the verb."
+      ),
+      errorCorrectionItem(
+        "hs5",
+        "Check the highlighted phrase for errors.",
+        "We didn't used to like sushi, but we love it now.",
+        "used to",
+        false,
+        "use to",
+        "Negative form: didn't + use to (no 'd')."
+      ),
+      errorCorrectionItem(
+        "hs6",
+        "Check the highlighted phrase for errors.",
+        "Nowadays, we usually go to the cinema on Fridays.",
+        "usually go",
+        true,
+        "",
+        "Correct. Use 'usually' for a present habit."
+      ),
+      multipleChoiceItem(
+        "hs7",
+        "Choose the correct option.",
+        "I ____ like vegetables, but now I love them.",
+        ["didn't use to", "don't usually", "wasn't used to"],
+        0,
+        "Use 'didn't use to' for a past state that changed."
+      ),
+      multipleChoiceItem(
+        "hs8",
+        "Choose the correct option.",
+        "It's taking me a long time to ____ living in the city.",
+        ["be used to", "get used to", "used to"],
+        1,
+        "Use 'get used to' for the process of becoming accustomed to something."
+      ),
+      multipleChoiceItem(
+        "hs9",
+        "Choose the correct option.",
+        "British people ____ on the left.",
+        ["used to drive", "usually drive", "are get used to driving"],
+        1,
+        "This is a general present habit."
+      ),
+      multipleChoiceItem(
+        "hs10",
+        "Choose the correct option.",
+        "I ____ be very shy when I was a child.",
+        ["usually", "was used to", "used to"],
+        2,
+        "Use 'used to' for a past state."
+      ),
+      multipleChoiceItem(
+        "hs11",
+        "Choose the correct option.",
+        "I can't ____ the cold weather here.",
+        ["get used to", "use to", "usually"],
+        0,
+        "Use 'get used to' with 'can't' to show difficulty in adjusting."
+      ),
+      multipleChoiceItem(
+        "hs12",
+        "Choose the correct option.",
+        "Did you ____ to work by bus?",
+        ["usually go", "used to go", "use to go"],
+        2,
+        "In a question about a past habit, use 'use to'."
+      ),
+      placeholderGapItem(
+        "hs13",
+        "Complete the sentence.",
+        "I __________ have a dog, but he died last year.",
+        "used to",
+        [],
+        "Past state or possession."
+      ),
+      placeholderGapItem(
+        "hs14",
+        "Complete the sentence.",
+        "We __________ our friends at the weekend these days. (meet)",
+        "usually meet",
+        ["normally meet"],
+        "Present routine."
+      ),
+      placeholderGapItem(
+        "hs15",
+        "Complete the sentence.",
+        "I __________ living on my own yet. It feels strange.",
+        "am not used to",
+        ["'m not used to"],
+        "Current state of being accustomed, or not, to something."
+      ),
+      placeholderGapItem(
+        "hs16",
+        "Complete the sentence.",
+        "Where __________ live before you moved here?",
+        "did you use to",
+        [],
+        "Question about a past habit."
+      ),
+      placeholderGapItem(
+        "hs17",
+        "Complete the sentence.",
+        "I __________ like coffee, but now I drink three cups a day.",
+        "never used to",
+        ["didn't use to"],
+        "'Never used to' is a common alternative to 'didn't use to'."
+      ),
+      placeholderGapItem(
+        "hs18",
+        "Complete the sentence.",
+        "She __________ very slim, but she's lost a lot of weight.",
+        "didn't use to be",
+        ["never used to be"],
+        "Past state."
+      ),
+      placeholderGapItem(
+        "hs19",
+        "Complete the sentence.",
+        "Don't worry, you'll soon __________ the new software.",
+        "get used to",
+        [],
+        "The process of becoming accustomed."
+      ),
+      placeholderGapItem(
+        "hs20",
+        "Complete the sentence.",
+        "They __________ go out much during the week.",
+        "don't normally",
+        ["don't usually"],
+        "Present negative habit."
+      ),
+      singleGap(
+        "hs21",
+        "Rewrite the sentence.",
+        ["It was my habit to smoke. -> I ", { gapId: "g1" }, "."],
+        ["used to smoke"],
+        "Change a past habit to 'used to'."
+      ),
+      singleGap(
+        "hs22",
+        "Rewrite the sentence.",
+        ["It is still strange for me to drive on the right. -> I'm not ", { gapId: "g1" }, " on the right."],
+        ["used to driving"],
+        "Be used to + -ing."
+      ),
+      singleGap(
+        "hs23",
+        "Rewrite the sentence.",
+        ["He was a teacher in the past. -> He ", { gapId: "g1" }, " a teacher."],
+        ["used to be"],
+        "Use 'used to' for past states."
+      ),
+      singleGap(
+        "hs24",
+        "Rewrite the sentence.",
+        ["I'm becoming accustomed to the noise. -> I'm ", { gapId: "g1" }, " the noise."],
+        ["getting used to"],
+        "Use 'get used to' for the process of adjusting."
+      ),
+      singleGap(
+        "hs25",
+        "Rewrite the sentence.",
+        ["Is it your normal routine to walk to work? -> Do you ", { gapId: "g1" }, " to work?"],
+        ["usually walk", "normally walk"],
+        "Use 'usually' or 'normally' for present routines."
+      ),
+    ],
+  },
+  {
+    id: "past-narrative-tenses",
+    title: "Past and Narrative Tenses",
+    shortDescription: "Practise past simple, past continuous, and past perfect together.",
+    levels: ["b1"],
+    intro:
+      "Work through past simple, past continuous, and past perfect in a mixed test. Focus on sequence, interruption, and background description.",
+    items: [
+      errorCorrectionItem(
+        "pt-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I was having a shower when the phone rang.",
+        "was having",
+        true,
+        "",
+        "This is correct. Use the past continuous for an action in progress when another action happened."
+      ),
+      errorCorrectionItem(
+        "pt-ec-2",
+        "Check the highlighted phrase for errors.",
+        "When we got to the cinema, the film already started.",
+        "already started",
+        false,
+        "had already started",
+        "Use the past perfect for an action that happened before another past action."
+      ),
+      errorCorrectionItem(
+        "pt-ec-3",
+        "Check the highlighted phrase for errors.",
+        "While I did my homework, my brother was playing video games.",
+        "did my homework",
+        false,
+        "was doing my homework",
+        "Use the past continuous with 'while' for two actions happening at the same time."
+      ),
+      errorCorrectionItem(
+        "pt-ec-4",
+        "Check the highlighted phrase for errors.",
+        "She didn’t recognise me because I wore a hat and sunglasses.",
+        "wore",
+        false,
+        "was wearing",
+        "Use the past continuous to describe the temporary appearance or situation at that moment in the past."
+      ),
+      errorCorrectionItem(
+        "pt-ec-5",
+        "Check the highlighted phrase for errors.",
+        "By the time the police arrived, the thieves escaped.",
+        "escaped",
+        false,
+        "had escaped",
+        "Use the past perfect after 'by the time' for the earlier past action."
+      ),
+      errorCorrectionItem(
+        "pt-ec-6",
+        "Check the highlighted phrase for errors.",
+        "It was snowing, and the wind blew really hard.",
+        "was snowing",
+        true,
+        "",
+        "This is correct. The past continuous can set the scene, while the past simple gives the main event or detail."
+      ),
+      errorCorrectionItem(
+        "pt-ec-7",
+        "Check the highlighted phrase for errors.",
+        "When the teacher came in, we wrote the last question.",
+        "wrote",
+        false,
+        "were writing",
+        "Use the past continuous for an action already in progress when another past action happened."
+      ),
+      errorCorrectionItem(
+        "pt-ec-8",
+        "Check the highlighted phrase for errors.",
+        "After I had turned off the lights, I locked the door.",
+        "had turned off",
+        true,
+        "",
+        "This is correct. The past perfect shows the earlier of the two past actions."
+      ),
+      errorCorrectionItem(
+        "pt-ec-9",
+        "Check the highlighted phrase for errors.",
+        "He was knowing the answer, but he was too nervous to speak.",
+        "was knowing",
+        false,
+        "knew",
+        "We don't normally use stative verbs like 'know' in the past continuous."
+      ),
+      errorCorrectionItem(
+        "pt-ec-10",
+        "Check the highlighted phrase for errors.",
+        "The match had finished, and then the fans were leaving the stadium.",
+        "were leaving",
+        false,
+        "left",
+        "Use the past simple for the next completed action in a narrative sequence."
+      ),
+      placeholderGapItem(
+        "pt-gf-1",
+        "Fill the gap.",
+        "I __________ dinner when the lights went out. (cook)",
+        "was cooking",
+        [],
+        "Use the past continuous for an action in progress when another action happened."
+      ),
+      placeholderGapItem(
+        "pt-gf-2",
+        "Fill the gap.",
+        "By the time we arrived at the station, the train __________. (leave)",
+        "had left",
+        [],
+        "Use the past perfect for an action that happened before another past action."
+      ),
+      placeholderGapItem(
+        "pt-gf-3",
+        "Fill the gap.",
+        "While the children __________ in the garden, their parents prepared lunch. (play)",
+        "were playing",
+        [],
+        "Use the past continuous with 'while' for an action in progress."
+      ),
+      placeholderGapItem(
+        "pt-gf-4",
+        "Fill the gap.",
+        "She __________ her leg while she was skiing. (hurt)",
+        "hurt",
+        [],
+        "Use the past simple for the main completed event."
+      ),
+      placeholderGapItem(
+        "pt-gf-5",
+        "Fill the gap.",
+        "When I opened the door, I realised that someone __________ my bag. (take)",
+        "had taken",
+        [],
+        "Use the past perfect for the earlier past action."
+      ),
+      placeholderGapItem(
+        "pt-gf-6",
+        "Fill the gap.",
+        "It __________ heavily, so we decided to stay inside. (rain)",
+        "was raining",
+        [],
+        "Use the past continuous to describe the background situation."
+      ),
+      placeholderGapItem(
+        "pt-gf-7",
+        "Fill the gap.",
+        "After they __________ the match, they went out for dinner. (win)",
+        "had won",
+        [],
+        "Use the past perfect for the earlier action before another past event."
+      ),
+      placeholderGapItem(
+        "pt-gf-8",
+        "Fill the gap.",
+        "What __________ at 9 o’clock last night? (you/do)",
+        "were you doing",
+        [],
+        "Use the past continuous for an action in progress at a specific time in the past."
+      ),
+      placeholderGapItem(
+        "pt-gf-9",
+        "Fill the gap.",
+        "We __________ TV when we heard a loud crash outside. (watch)",
+        "were watching",
+        [],
+        "Use the past continuous for the background action interrupted by another event."
+      ),
+      placeholderGapItem(
+        "pt-gf-10",
+        "Fill the gap.",
+        "I was really tired because I __________ very little the night before. (sleep)",
+        "had slept",
+        [],
+        "Use the past perfect for the earlier cause in the past."
+      ),
+      placeholderGapItem(
+        "pt-rf-1",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Event 1: We finished dinner. Event 2: The guests arrived.\nBy the time the guests arrived, we __________ dinner.",
+        "had finished",
+        ["had eaten", "'d finished", "'d eaten"],
+        "Use the Past Perfect to show dinner was completed before the arrival."
+      ),
+      placeholderGapItem(
+        "pt-rf-2",
+        "Complete the second sentence so that it has a similar meaning.",
+        "I walked to work this morning. On the way, I saw the accident.\nWhile I __________ to work, I saw the accident.",
+        "was walking",
+        [],
+        "Use the past continuous for an action in progress when another action happened."
+      ),
+      placeholderGapItem(
+        "pt-rf-3",
+        "Complete the second sentence so that it has a similar meaning.",
+        // Prompt uses Past Simple to show a sequence
+        "The plane took off at 6:00. We reached the airport at 6:15.\nBy the time we reached the airport, the plane __________ off.",
+        "had already taken",
+        ["had taken", "'d already taken", "'d taken"],
+        "Use the past perfect (had + past participle) to show an action happened before another point in the past."
+      ),
+      placeholderGapItem(
+        "pt-rf-4",
+        "Complete the second sentence so that it has a similar meaning.",
+        "I started reading at 7:00. My friend called at 7:30.\nI __________ when my friend called.",
+        "was reading",
+        ["had been reading"],
+        "The reading was an 'in-progress' background action when the call interrupted."
+      ),
+      placeholderGapItem(
+        "pt-rf-5",
+        "Complete the second sentence so that it has a similar meaning.",
+        "The children played in the garden. At the same time. their parents made lunch.\nWhile the children __________ in the garden, their parents made lunch.",
+        "were playing",
+        [],
+        "Use the past continuous with 'while' for an action in progress."
+      ),
+      placeholderGapItem(
+        "pt-rf-6",
+        "Complete the second sentence so that it has a similar meaning.",
+        "She ate too much. Later, she felt sick.\nShe felt sick because she __________ too much.",
+        "had eaten",
+        [],
+        "Use the past perfect for the earlier cause in the past."
+      ),
+      placeholderGapItem(
+        "pt-rf-7",
+        "Complete the second sentence so that it has a similar meaning.",
+        "The film started, and then we arrived at the cinema.\nWhen we arrived at the cinema, the film __________.",
+        "had started",
+        ["had already started"],
+        "Use the past perfect for the action that happened before we arrived."
+      ),
+      placeholderGapItem(
+        "pt-rf-8",
+        "Complete the second sentence so that it has a similar meaning.",
+        "I began watching TV at 7:00 and finished at 9:00.\nAt 8:00 last night, I __________ TV.",
+        "was watching",
+        "Use Past Continuous for an action in progress at a specific point in time."
       ),
     ],
   },
