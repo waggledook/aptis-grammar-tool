@@ -231,6 +231,7 @@ export default function HubNegatrisGame() {
   const [lifePopup, setLifePopup] = useState(false);
   const [myTopScores, setMyTopScores] = useState([]);
   const [globalLeaderboard, setGlobalLeaderboard] = useState([]);
+  const [soundVolume, setSoundVolume] = useState(0.9);
   const [soundMuted, setSoundMuted] = useState(() => {
     try {
       return localStorage.getItem(SOUND_STORAGE_KEY) === "1";
@@ -327,25 +328,25 @@ export default function HubNegatrisGame() {
     } catch {}
     if (musicRef.current) {
       musicRef.current.muted = soundMuted;
-      musicRef.current.volume = soundMuted ? 0 : 0.55;
+      musicRef.current.volume = soundMuted ? 0 : soundVolume * 0.55;
     }
     if (lifeSoundRef.current) {
       lifeSoundRef.current.muted = soundMuted;
-      lifeSoundRef.current.volume = soundMuted ? 0 : 0.9;
+      lifeSoundRef.current.volume = soundMuted ? 0 : soundVolume * 0.9;
     }
     if (incorrectSoundRef.current) {
       incorrectSoundRef.current.muted = soundMuted;
-      incorrectSoundRef.current.volume = soundMuted ? 0 : 0.85;
+      incorrectSoundRef.current.volume = soundMuted ? 0 : soundVolume * 0.85;
     }
     if (correctSoundRef.current) {
       correctSoundRef.current.muted = soundMuted;
-      correctSoundRef.current.volume = soundMuted ? 0 : 0.68;
+      correctSoundRef.current.volume = soundMuted ? 0 : soundVolume * 0.68;
     }
     if (gameOverSoundRef.current) {
       gameOverSoundRef.current.muted = soundMuted;
-      gameOverSoundRef.current.volume = soundMuted ? 0 : 0.92;
+      gameOverSoundRef.current.volume = soundMuted ? 0 : soundVolume * 0.92;
     }
-  }, [soundMuted]);
+  }, [soundMuted, soundVolume]);
 
   useEffect(() => {
     return () => {
@@ -440,7 +441,7 @@ export default function HubNegatrisGame() {
       musicRef.current.loop = true;
     }
     musicRef.current.muted = soundMuted;
-    musicRef.current.volume = soundMuted ? 0 : 0.55;
+    musicRef.current.volume = soundMuted ? 0 : soundVolume * 0.55;
     musicRef.current.play().catch(() => {});
   }
 
@@ -456,7 +457,7 @@ export default function HubNegatrisGame() {
       lifeSoundRef.current = new window.Audio("/sounds/negatris-1up.mp3");
     }
     lifeSoundRef.current.muted = soundMuted;
-    lifeSoundRef.current.volume = soundMuted ? 0 : 0.9;
+    lifeSoundRef.current.volume = soundMuted ? 0 : soundVolume * 0.9;
     lifeSoundRef.current.currentTime = 0;
     lifeSoundRef.current.play().catch(() => {});
   }
@@ -467,7 +468,7 @@ export default function HubNegatrisGame() {
       incorrectSoundRef.current = new window.Audio("/sounds/incorrect.mp3");
     }
     incorrectSoundRef.current.muted = soundMuted;
-    incorrectSoundRef.current.volume = soundMuted ? 0 : 0.85;
+    incorrectSoundRef.current.volume = soundMuted ? 0 : soundVolume * 0.85;
     incorrectSoundRef.current.currentTime = 0;
     incorrectSoundRef.current.play().catch(() => {});
   }
@@ -478,7 +479,7 @@ export default function HubNegatrisGame() {
       correctSoundRef.current = new window.Audio("/sounds/whoosh.mp3");
     }
     correctSoundRef.current.muted = soundMuted;
-    correctSoundRef.current.volume = soundMuted ? 0 : 0.68;
+    correctSoundRef.current.volume = soundMuted ? 0 : soundVolume * 0.68;
     correctSoundRef.current.currentTime = 0;
     correctSoundRef.current.play().catch(() => {});
   }
@@ -489,7 +490,7 @@ export default function HubNegatrisGame() {
       gameOverSoundRef.current = new window.Audio("/sounds/negatris-game-over.mp3");
     }
     gameOverSoundRef.current.muted = soundMuted;
-    gameOverSoundRef.current.volume = soundMuted ? 0 : 0.92;
+    gameOverSoundRef.current.volume = soundMuted ? 0 : soundVolume * 0.92;
     gameOverSoundRef.current.currentTime = 0;
     gameOverSoundRef.current.play().catch(() => {});
   }
@@ -665,17 +666,31 @@ export default function HubNegatrisGame() {
           <p className="negatris-sub">
             Build negative words at speed by guiding each word into the correct prefix bucket.
           </p>
-          <button
-            type="button"
-            className={`negatris-sound-toggle ${soundMuted ? "muted" : ""}`}
-            onClick={() => setSoundMuted((current) => !current)}
-            aria-pressed={soundMuted}
-          >
-            <span className="negatris-sound-icon" aria-hidden="true">
-              {soundMuted ? "🔇" : "🔊"}
-            </span>
-            <span>{soundMuted ? "Sound off" : "Sound on"}</span>
-          </button>
+          <div className="negatris-sound-row">
+            <label className="negatris-sound-slider">
+              <span className="negatris-sound-label">Volume</span>
+              <input
+                type="range"
+                min="0"
+                max="100"
+                step="1"
+                value={Math.round(soundVolume * 100)}
+                onChange={(event) => setSoundVolume(Number(event.target.value) / 100)}
+                aria-label="Negatris volume"
+              />
+            </label>
+            <button
+              type="button"
+              className={`negatris-sound-toggle ${soundMuted ? "muted" : ""}`}
+              onClick={() => setSoundMuted((current) => !current)}
+              aria-pressed={soundMuted}
+            >
+              <span className="negatris-sound-icon" aria-hidden="true">
+                {soundMuted ? "🔇" : "🔊"}
+              </span>
+              <span>{soundMuted ? "Sound off" : "Sound on"}</span>
+            </button>
+          </div>
         </header>
 
         <div className="negatris-panel">
@@ -985,8 +1000,34 @@ export default function HubNegatrisGame() {
           line-height: 1.45;
         }
 
-        .negatris-sound-toggle {
+        .negatris-sound-row {
           margin-top: .85rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: .75rem;
+          flex-wrap: wrap;
+        }
+
+        .negatris-sound-slider {
+          display: inline-flex;
+          align-items: center;
+          gap: .55rem;
+          color: #d8e6ff;
+          font-weight: 700;
+        }
+
+        .negatris-sound-label {
+          color: #d8e6ff;
+          font-size: .95rem;
+        }
+
+        .negatris-sound-slider input[type="range"] {
+          width: 140px;
+          accent-color: #f0b956;
+        }
+
+        .negatris-sound-toggle {
           display: inline-flex;
           align-items: center;
           gap: .55rem;
@@ -1192,19 +1233,29 @@ export default function HubNegatrisGame() {
           min-width: var(--word-min-width);
           max-width: var(--word-max-width);
           padding: var(--word-pad-y) var(--word-pad-x);
-          border-radius: 18px;
-          background: linear-gradient(180deg, #43e6ff, #1fb8ff);
-          color: #0b1a2f;
+          border-radius: 20px;
+          background:
+            linear-gradient(180deg, rgba(111, 240, 255, 0.24), rgba(111, 240, 255, 0.06) 18%, rgba(111, 240, 255, 0) 22%),
+            linear-gradient(180deg, #203d98 0%, #172f7f 52%, #0f245f 100%);
+          color: #f7fbff;
+          border: 3px solid rgba(62, 235, 255, 0.98);
           font-weight: 900;
           font-size: var(--word-font-size);
           line-height: 1.05;
           text-align: center;
-          box-shadow: 0 10px 20px rgba(0,0,0,.22);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.22),
+            inset 0 -5px 0 rgba(4, 15, 42, 0.45),
+            0 0 0 2px rgba(8, 27, 72, 0.9),
+            0 0 18px rgba(32, 208, 255, 0.32),
+            0 0 30px rgba(32, 208, 255, 0.18),
+            0 10px 20px rgba(0,0,0,.24);
           text-transform: lowercase;
           letter-spacing: .01em;
           white-space: nowrap;
           z-index: 3;
-          transition: left .08s linear, background .14s ease, box-shadow .14s ease;
+          text-shadow: 0 1px 0 rgba(7, 18, 51, 0.45);
+          transition: left .08s linear, background .14s ease, box-shadow .14s ease, border-color .14s ease;
           animation: fall-word var(--fall-duration) linear forwards;
         }
 
@@ -1212,15 +1263,35 @@ export default function HubNegatrisGame() {
           z-index: 2;
           animation: none;
           top: ${IMPACT_TOP};
-          transform: translateX(-50%) scale(0.96);
+          transform: translateX(-50%) scale(0.95);
         }
 
         .falling-word.is-correct {
-          background: linear-gradient(180deg, #7af58f, #39d97a);
+          background:
+            linear-gradient(180deg, rgba(201, 255, 182, 0.22), rgba(201, 255, 182, 0.05) 18%, rgba(201, 255, 182, 0) 22%),
+            linear-gradient(180deg, #1c7b53 0%, #176845 50%, #114c32 100%);
+          border-color: rgba(136, 255, 174, 0.98);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.18),
+            inset 0 -5px 0 rgba(5, 32, 17, 0.4),
+            0 0 0 2px rgba(8, 27, 72, 0.9),
+            0 0 18px rgba(101, 245, 146, 0.28),
+            0 0 28px rgba(101, 245, 146, 0.16),
+            0 10px 20px rgba(0,0,0,.24);
         }
 
         .falling-word.is-wrong {
-          background: linear-gradient(180deg, #ff9b9b, #ff6363);
+          background:
+            linear-gradient(180deg, rgba(255, 190, 190, 0.2), rgba(255, 190, 190, 0.05) 18%, rgba(255, 190, 190, 0) 22%),
+            linear-gradient(180deg, #8e2742 0%, #742039 48%, #57182b 100%);
+          border-color: rgba(255, 132, 132, 0.98);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.16),
+            inset 0 -5px 0 rgba(41, 8, 15, 0.42),
+            0 0 0 2px rgba(8, 27, 72, 0.9),
+            0 0 18px rgba(255, 104, 126, 0.24),
+            0 0 28px rgba(255, 104, 126, 0.14),
+            0 10px 20px rgba(0,0,0,.24);
         }
 
         .lane-row {
@@ -1615,6 +1686,21 @@ export default function HubNegatrisGame() {
 
           .negatris-status {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .negatris-sound-row {
+            width: 100%;
+            justify-content: stretch;
+          }
+
+          .negatris-sound-slider {
+            width: 100%;
+            justify-content: space-between;
+          }
+
+          .negatris-sound-slider input[type="range"] {
+            flex: 1;
+            min-width: 0;
           }
 
           .game-stage {
