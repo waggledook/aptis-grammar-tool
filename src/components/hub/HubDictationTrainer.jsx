@@ -354,8 +354,12 @@ export default function HubDictationTrainer() {
     playAudioFromPath(sentences[getSentenceIndex(index, currentOrder)].audio);
   }
 
-  function endGame(finalScore = score, finalCompleted = completed, finalHistory = roundHistory) {
-    if (roundOver) return;
+  function endGame(
+    finalScore = latestScoreRef.current,
+    finalCompleted = latestCompletedRef.current,
+    finalHistory = latestHistoryRef.current
+  ) {
+    if (roundOverRef.current) return;
 
     stopTimers();
     stopAudio();
@@ -402,8 +406,12 @@ export default function HubDictationTrainer() {
   function nextSentence(forceAdvance = false) {
     if ((!nextEnabled && !forceAdvance) || roundOver) return;
 
-    if (isTrainingMode && roundHistory.length >= trainingSentenceCount) {
-      endGame();
+    if (isTrainingMode && latestHistoryRef.current.length >= trainingSentenceCount) {
+      endGame(
+        latestScoreRef.current,
+        latestCompletedRef.current,
+        latestHistoryRef.current
+      );
       return;
     }
 
