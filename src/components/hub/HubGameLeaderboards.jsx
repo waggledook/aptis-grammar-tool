@@ -9,6 +9,7 @@ import {
 } from "../../data/hubDependentPrepositionItems.js";
 
 const SPANGLISH_GAME_ID = "hub_spanglish_fixit";
+const NEGATRIS_GAME_ID = "hub_negatris";
 
 function boardGameIdForDependent(levelId) {
   return `hub_dependent_prepositions_${levelId}`;
@@ -69,6 +70,8 @@ function BoardSection({ title, subtitle, personalScores, globalScores, user }) {
 export default function HubGameLeaderboards({ user }) {
   const navigate = useNavigate();
   const [activePrepsLevel, setActivePrepsLevel] = useState("a2");
+  const [negatrisPersonal, setNegatrisPersonal] = useState([]);
+  const [negatrisGlobal, setNegatrisGlobal] = useState([]);
   const [spanglishPersonal, setSpanglishPersonal] = useState([]);
   const [spanglishGlobal, setSpanglishGlobal] = useState([]);
   const [dependentPersonal, setDependentPersonal] = useState([]);
@@ -78,6 +81,29 @@ export default function HubGameLeaderboards({ user }) {
     () => HUB_DEPENDENT_PREPOSITION_BANKS[activePrepsLevel],
     [activePrepsLevel],
   );
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadNegatris() {
+      try {
+        const [global, personal] = await Promise.all([
+          fetchTopHubGameScores(NEGATRIS_GAME_ID, 10),
+          user?.uid ? fetchMyTopHubGameScores(NEGATRIS_GAME_ID, 3, user.uid) : Promise.resolve([]),
+        ]);
+        if (cancelled) return;
+        setNegatrisGlobal(global);
+        setNegatrisPersonal(personal);
+      } catch (error) {
+        console.error("[HubGameLeaderboards] Negatris leaderboard load failed", error);
+      }
+    }
+
+    loadNegatris();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uid]);
 
   useEffect(() => {
     let cancelled = false;
@@ -146,6 +172,14 @@ export default function HubGameLeaderboards({ user }) {
           Track your best scores, compare them with other players, and see how each game is shaping up across the hub.
         </p>
       </header>
+
+      <BoardSection
+        title="Negatris"
+        subtitle="One shared board for the game."
+        personalScores={negatrisPersonal}
+        globalScores={negatrisGlobal}
+        user={user}
+      />
 
       <BoardSection
         title="Spanglish Fix-It"
@@ -395,4 +429,3 @@ export default function HubGameLeaderboards({ user }) {
     </div>
   );
 }
-

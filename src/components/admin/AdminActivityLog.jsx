@@ -48,6 +48,8 @@ const typeLabels = {
   hub_dependent_preps_started: "Hub dependent preps started",
   hub_dependent_preps_review_started: "Hub dependent preps review started",
   hub_dependent_preps_completed: "Hub dependent preps completed",
+  hub_negatris_started: "Hub Negatris started",
+  hub_negatris_completed: "Hub Negatris completed",
   hub_keyword_started: "Hub keyword started",
   hub_keyword_review_loaded: "Hub keyword review loaded",
   hub_keyword_completed: "Hub keyword completed",
@@ -277,6 +279,12 @@ case "hub_dependent_preps_review_started":
 
 case "hub_dependent_preps_completed":
   return `${d.level || d.levelId || "level"} · ${d.score ?? "?"} pts · ${d.correct ?? "?"}/${d.attempted ?? "?"}`;
+
+case "hub_negatris_started":
+  return `lives ${d.startingLives ?? "?"} · extra life every ${d.extraLifeStreak ?? "?"}`;
+
+case "hub_negatris_completed":
+  return `score ${d.score ?? "?"} · mistakes ${d.mistakes ?? "?"} · streak ${d.streak ?? "?"} · lives left ${d.livesRemaining ?? "?"}`;
 
 case "hub_keyword_started":
   return `${d.mode || "normal"} · pool ${d.poolSize ?? "?"} · set ${d.total ?? "?"}`;
@@ -560,6 +568,8 @@ const [cursorDoc, setCursorDoc] = useState(null);
             <option value="hub_dependent_preps_started">Hub dependent preps started</option>
             <option value="hub_dependent_preps_review_started">Hub dependent preps review started</option>
             <option value="hub_dependent_preps_completed">Hub dependent preps completed</option>
+            <option value="hub_negatris_started">Hub Negatris started</option>
+            <option value="hub_negatris_completed">Hub Negatris completed</option>
             <option value="hub_open_cloze_started">Hub open cloze started</option>
             <option value="hub_open_cloze_review_loaded">Hub open cloze review loaded</option>
             <option value="hub_open_cloze_completed">Hub open cloze completed</option>

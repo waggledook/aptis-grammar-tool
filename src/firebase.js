@@ -657,6 +657,20 @@ export async function logHubDependentPrepsReviewStarted(details = {}) {
   });
 }
 
+export async function logHubNegatrisStarted(details = {}) {
+  return logActivity("hub_negatris_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubNegatrisCompleted(details = {}) {
+  return logActivity("hub_negatris_completed", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
 export async function logHubSpanglishLiveHosted(details = {}) {
   return logActivity("hub_spanglish_live_hosted", {
     app: "seifhub",

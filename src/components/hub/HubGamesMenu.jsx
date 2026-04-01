@@ -58,6 +58,13 @@ export default function HubGamesMenu() {
             Practise the prepositions that naturally follow common verbs, adjectives, and nouns, with levels from A2 up to C1/2.
           </p>
         </button>
+
+        <button className="menu-card" onClick={() => navigate(getSitePath("/games/negatris"))}>
+          <h3>Negatris</h3>
+          <p>
+            Steer falling words into the correct negative-prefix lane and build speed, streaks, and word-building accuracy.
+          </p>
+        </button>
       </div>
 
       <style>{`

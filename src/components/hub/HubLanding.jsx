@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
@@ -8,15 +8,67 @@ import { toast } from "../../utils/toast";
 export default function HubLanding({ user, hasAccess, onSignIn }) {
   const navigate = useNavigate();
   const [sendingRequest, setSendingRequest] = useState(false);
+  const spotlight = useMemo(() => {
+    if (!user || !hasAccess) return null;
+
+    const options = [
+      {
+        label: "Try this next",
+        title: "Use Of English",
+        copy: "Jump back into keyword transformations, word formation, or open cloze with instant corrective feedback.",
+        button: "Open Use of English",
+        action: () => navigate(getSitePath("/use-of-english")),
+      },
+      {
+        label: "Try this next",
+        title: "Mini Grammar Tests",
+        copy: "Do a short focused grammar test and build your level-by-level mini test record.",
+        button: "Open mini tests",
+        action: () => navigate(getSitePath("/grammar/mini-tests")),
+      },
+      {
+        label: "Worth exploring",
+        title: "Games",
+        copy: "Switch gears with faster challenge-style practice to notice mistakes and react quickly.",
+        button: "Open games",
+        action: () => navigate(getSitePath("/games")),
+      },
+      {
+        label: "Worth exploring",
+        title: "Listening Activities",
+        copy: "Work on listening accuracy through dictation and other guided listening tasks.",
+        button: "Open listening",
+        action: () => navigate(getSitePath("/listening")),
+      },
+      {
+        label: "Worth exploring",
+        title: "Vocabulary Activities",
+        copy: "Review useful words and expressions in context and build topic vocabulary.",
+        button: "Open vocabulary",
+        action: () => navigate(getSitePath("/vocabulary")),
+      },
+      {
+        label: "Keep going",
+        title: "Student Profile",
+        copy: "Check your recent activity, see what you’ve completed, and decide what to tackle next.",
+        button: "Open profile",
+        action: () => navigate(getSitePath("/profile")),
+      },
+    ];
+
+    return options[Math.floor(Math.random() * options.length)];
+  }, [user, hasAccess, navigate]);
+
   const statusLabel = !user
     ? "Member access"
     : hasAccess
-      ? "Welcome back"
+      ? spotlight?.label || "Welcome back"
       : "Access pending";
+  const statusTitle = hasAccess ? spotlight?.title || "Welcome back" : null;
   const statusCopy = !user
     ? "Sign in with your academy account to enter the private hub and open your activities."
     : hasAccess
-      ? "Your account has access to the academy hub. Choose an activity area to continue."
+      ? spotlight?.copy || "Your account has access to the academy hub. Choose an activity area to continue."
       : "Your account is signed in, but it is not currently enabled for the hub. If you think this should already be active, you can request access below.";
 
   async function handleRequestAccess() {
@@ -64,6 +116,7 @@ export default function HubLanding({ user, hasAccess, onSignIn }) {
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
           <span className="whats-new-label">{statusLabel}</span>
+          {statusTitle ? <h3>{statusTitle}</h3> : null}
           <p>{statusCopy}</p>
         </div>
 
@@ -74,8 +127,8 @@ export default function HubLanding({ user, hasAccess, onSignIn }) {
         )}
 
         {user && hasAccess && (
-          <button className="whats-new-btn" onClick={() => navigate(getSitePath("/grammar"))}>
-            Open hub
+          <button className="whats-new-btn" onClick={() => spotlight?.action?.()}>
+            {spotlight?.button || "Open hub"}
           </button>
         )}
 
@@ -256,6 +309,13 @@ export default function HubLanding({ user, hasAccess, onSignIn }) {
           margin: 0;
           color: #e6f0ff;
           line-height: 1.4;
+        }
+
+        .hub-menu-wrapper .whats-new-copy h3 {
+          margin: 0 0 .3rem;
+          color: #eef4ff;
+          font-size: 1.05rem;
+          line-height: 1.2;
         }
 
         .hub-menu-wrapper .whats-new-btn {

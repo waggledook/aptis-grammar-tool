@@ -100,6 +100,7 @@ import HubSpanglishFixIt from "./components/hub/HubSpanglishFixIt.jsx";
 import HubSpanglishLiveHost from "./components/hub/HubSpanglishLiveHost.jsx";
 import HubSpanglishLiveJoin from "./components/hub/HubSpanglishLiveJoin.jsx";
 import HubSpanglishLivePlayer from "./components/hub/HubSpanglishLivePlayer.jsx";
+import HubNegatrisGame from "./components/hub/HubNegatrisGame.jsx";
 import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 
@@ -488,6 +489,7 @@ return (
   <Route path="/games" element={<HubGamesMenu />} />
   <Route path="/games/leaderboards" element={<HubGameLeaderboards user={user} />} />
   <Route path="/games/dependent-prepositions" element={<HubDependentPrepositionGame user={user} />} />
+  <Route path="/games/negatris" element={<HubNegatrisGame />} />
   <Route path="/games/spanglish-fix-it" element={<HubSpanglishFixIt user={user} />} />
   <Route path="/games/spanglish-fix-it/host/:gameId" element={<HubSpanglishLiveHost user={user} />} />
   <Route path="/games/spanglish-fix-it/join" element={<HubSpanglishLiveJoin />} />
