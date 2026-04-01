@@ -810,6 +810,29 @@ export default function HubNegatrisGame() {
                   "--word-pad-x": `${boardMetrics.wordPaddingX}px`,
                 }}
               >
+                <div className="stage-backdrop" aria-hidden="true">
+                  <div className="stage-vignette" />
+                  <div className="stage-reactor">
+                    <span className="stage-reactor-ring stage-reactor-ring-a" />
+                    <span className="stage-reactor-ring stage-reactor-ring-b" />
+                    <span className="stage-reactor-core" />
+                  </div>
+                  <div className="stage-circuits">
+                    <span className="stage-circuit stage-circuit-tl" />
+                    <span className="stage-circuit stage-circuit-tr" />
+                    <span className="stage-circuit stage-circuit-bl" />
+                    <span className="stage-circuit stage-circuit-br" />
+                  </div>
+                  <div className="stage-fragments">
+                    <span className="stage-fragment frag-a">un</span>
+                    <span className="stage-fragment frag-b">dis</span>
+                    <span className="stage-fragment frag-c">im</span>
+                    <span className="stage-fragment frag-d">ir</span>
+                    <span className="stage-fragment frag-e">il</span>
+                    <span className="stage-fragment frag-f">in</span>
+                  </div>
+                  <div className="stage-scanlines" />
+                </div>
                 <div className="stage-track" />
                 {lifePopup ? (
                   <div className="life-popup" aria-hidden="true">
@@ -1236,6 +1259,192 @@ export default function HubNegatrisGame() {
           border: 1px solid rgba(98, 139, 218, 0.28);
         }
 
+        .stage-backdrop,
+        .stage-vignette,
+        .stage-reactor,
+        .stage-circuits,
+        .stage-fragments,
+        .stage-scanlines {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        .stage-backdrop {
+          z-index: 0;
+          overflow: hidden;
+        }
+
+        .stage-vignette {
+          background:
+            radial-gradient(circle at 50% 56%, rgba(27, 126, 255, 0.08), transparent 28%),
+            radial-gradient(circle at 50% 80%, rgba(38, 100, 205, 0.12), transparent 42%),
+            radial-gradient(circle at 0% 0%, rgba(26, 90, 184, 0.08), transparent 24%),
+            radial-gradient(circle at 100% 0%, rgba(26, 90, 184, 0.08), transparent 24%),
+            radial-gradient(circle at 50% 120%, rgba(0, 0, 0, 0.34), transparent 52%),
+            linear-gradient(180deg, rgba(5, 10, 26, 0.12), rgba(4, 8, 20, 0.22));
+        }
+
+        .stage-reactor {
+          display: grid;
+          place-items: center;
+        }
+
+        .stage-reactor-ring,
+        .stage-reactor-core {
+          position: absolute;
+          left: 50%;
+          top: 54%;
+          transform: translate(-50%, -50%);
+          border-radius: 50%;
+        }
+
+        .stage-reactor-ring-a {
+          width: 40%;
+          height: 30%;
+          border: 1px solid rgba(65, 183, 255, 0.12);
+          box-shadow: 0 0 28px rgba(30, 184, 255, 0.08);
+          animation: reactor-drift 10s linear infinite;
+        }
+
+        .stage-reactor-ring-b {
+          width: 28%;
+          height: 21%;
+          border: 1px solid rgba(122, 103, 255, 0.12);
+          box-shadow: 0 0 22px rgba(122, 103, 255, 0.08);
+          animation: reactor-drift-reverse 14s linear infinite;
+        }
+
+        .stage-reactor-core {
+          width: 20%;
+          height: 14%;
+          background:
+            radial-gradient(circle, rgba(68, 214, 255, 0.24) 0%, rgba(68, 214, 255, 0.1) 38%, rgba(68, 214, 255, 0) 70%);
+          filter: blur(6px);
+          animation: reactor-pulse 3.2s ease-in-out infinite;
+        }
+
+        .stage-circuit {
+          position: absolute;
+          width: 26%;
+          height: 18%;
+          opacity: .18;
+        }
+
+        .stage-circuit::before,
+        .stage-circuit::after {
+          content: "";
+          position: absolute;
+          background: linear-gradient(90deg, rgba(70, 192, 255, 0.34), rgba(70, 192, 255, 0));
+          box-shadow: 0 0 10px rgba(42, 180, 255, 0.1);
+        }
+
+        .stage-circuit::before {
+          height: 1px;
+          left: 0;
+          right: 16%;
+          top: 36%;
+        }
+
+        .stage-circuit::after {
+          width: 1px;
+          top: 0;
+          bottom: 24%;
+          left: 34%;
+          background: linear-gradient(180deg, rgba(70, 192, 255, 0.34), rgba(70, 192, 255, 0));
+        }
+
+        .stage-circuit-tl {
+          left: 2%;
+          top: 5%;
+        }
+
+        .stage-circuit-tr {
+          right: 2%;
+          top: 5%;
+          transform: scaleX(-1);
+        }
+
+        .stage-circuit-bl {
+          left: 4%;
+          bottom: 20%;
+          transform: scaleY(-1);
+          opacity: .12;
+        }
+
+        .stage-circuit-br {
+          right: 4%;
+          bottom: 20%;
+          transform: scale(-1);
+          opacity: .12;
+        }
+
+        .stage-fragment {
+          position: absolute;
+          font-weight: 800;
+          font-size: clamp(14px, 1.6vw, 18px);
+          text-transform: lowercase;
+          letter-spacing: .08em;
+          opacity: .12;
+          filter: blur(.2px);
+          text-shadow: 0 0 10px currentColor;
+          animation: fragment-float 11s ease-in-out infinite;
+        }
+
+        .frag-a {
+          left: 10%;
+          top: 18%;
+          color: rgba(91, 227, 255, 0.7);
+          animation-delay: -1.2s;
+        }
+
+        .frag-b {
+          right: 12%;
+          top: 24%;
+          color: rgba(206, 104, 255, 0.64);
+          animation-delay: -4.3s;
+        }
+
+        .frag-c {
+          left: 18%;
+          bottom: 31%;
+          color: rgba(95, 171, 255, 0.62);
+          animation-delay: -2.6s;
+        }
+
+        .frag-d {
+          right: 18%;
+          bottom: 38%;
+          color: rgba(115, 221, 255, 0.62);
+          animation-delay: -6.1s;
+        }
+
+        .frag-e {
+          left: 40%;
+          top: 12%;
+          color: rgba(126, 149, 255, 0.6);
+          animation-delay: -8.2s;
+        }
+
+        .frag-f {
+          right: 34%;
+          bottom: 24%;
+          color: rgba(126, 210, 255, 0.6);
+          animation-delay: -3.4s;
+        }
+
+        .stage-scanlines {
+          background: repeating-linear-gradient(
+            to bottom,
+            rgba(255,255,255,.018) 0px,
+            rgba(255,255,255,.018) 1px,
+            transparent 2px,
+            transparent 4px
+          );
+          opacity: .22;
+          mix-blend-mode: screen;
+        }
+
         .stage-track {
           position: absolute;
           inset: 0;
@@ -1244,6 +1453,7 @@ export default function HubNegatrisGame() {
             linear-gradient(to right, rgba(255,255,255,0.04) 1px, transparent 1px);
           background-size: 100% 46px, calc(100% / 6) 100%;
           pointer-events: none;
+          z-index: 1;
         }
 
         .falling-word {
@@ -1513,21 +1723,44 @@ export default function HubNegatrisGame() {
           left: 50%;
           transform: translateX(-50%);
           z-index: 4;
-          padding: .55rem .85rem;
-          border-radius: 999px;
+          min-width: 132px;
+          padding: .55rem .9rem;
+          border-radius: 18px;
           font-weight: 800;
           letter-spacing: .01em;
-          box-shadow: 0 10px 18px rgba(0,0,0,.22);
+          text-align: center;
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.18),
+            0 0 0 2px rgba(8, 27, 72, 0.88),
+            0 10px 18px rgba(0,0,0,.22);
         }
 
         .impact-badge.correct {
-          background: rgba(69, 219, 135, 0.95);
-          color: #0d1c2d;
+          background:
+            linear-gradient(180deg, rgba(201, 255, 182, 0.18), rgba(201, 255, 182, 0.04) 18%, rgba(201, 255, 182, 0) 22%),
+            linear-gradient(180deg, #1c7b53 0%, #176845 50%, #114c32 100%);
+          color: #f6fffb;
+          border: 2px solid rgba(136, 255, 174, 0.96);
+          text-shadow: 0 1px 0 rgba(4, 21, 11, 0.45);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.16),
+            0 0 0 2px rgba(8, 27, 72, 0.88),
+            0 0 18px rgba(101, 245, 146, 0.26),
+            0 10px 18px rgba(0,0,0,.22);
         }
 
         .impact-badge.incorrect {
-          background: rgba(255, 109, 109, 0.96);
-          color: white;
+          background:
+            linear-gradient(180deg, rgba(255, 190, 190, 0.14), rgba(255, 190, 190, 0.04) 18%, rgba(255, 190, 190, 0) 22%),
+            linear-gradient(180deg, #8e2742 0%, #742039 48%, #57182b 100%);
+          color: #fff5f7;
+          border: 2px solid rgba(255, 132, 132, 0.96);
+          text-shadow: 0 1px 0 rgba(30, 5, 11, 0.45);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.12),
+            0 0 0 2px rgba(8, 27, 72, 0.88),
+            0 0 18px rgba(255, 104, 126, 0.24),
+            0 10px 18px rgba(0,0,0,.22);
         }
 
         .life-popup {
@@ -1631,6 +1864,46 @@ export default function HubNegatrisGame() {
           }
           to {
             top: ${IMPACT_TOP};
+          }
+        }
+
+        @keyframes reactor-pulse {
+          0%, 100% {
+            opacity: .72;
+            transform: translate(-50%, -50%) scale(1);
+          }
+          50% {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1.08);
+          }
+        }
+
+        @keyframes reactor-drift {
+          from {
+            transform: translate(-50%, -50%) rotate(0deg);
+          }
+          to {
+            transform: translate(-50%, -50%) rotate(360deg);
+          }
+        }
+
+        @keyframes reactor-drift-reverse {
+          from {
+            transform: translate(-50%, -50%) rotate(360deg);
+          }
+          to {
+            transform: translate(-50%, -50%) rotate(0deg);
+          }
+        }
+
+        @keyframes fragment-float {
+          0%, 100% {
+            transform: translate3d(0, 0, 0);
+            opacity: .08;
+          }
+          50% {
+            transform: translate3d(0, -8px, 0);
+            opacity: .16;
           }
         }
 
@@ -1873,6 +2146,16 @@ export default function HubNegatrisGame() {
           .lane-row {
             gap: .22rem;
             padding: .25rem;
+          }
+
+          .lane-button span {
+            min-width: 0;
+            width: 64%;
+            padding: .12rem .2rem .16rem;
+            border-radius: 8px;
+            border-width: 1.5px;
+            font-size: .9em;
+            transform: translateY(-10%);
           }
 
           .control-row {
