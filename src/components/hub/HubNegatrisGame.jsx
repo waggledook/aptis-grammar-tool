@@ -170,6 +170,23 @@ function getLaneIndexFromPercent(xPercent) {
   return clamp(Math.floor((xPercent / 100) * PREFIXES.length), 0, PREFIXES.length - 1);
 }
 
+function estimateWordWidth(text, metrics) {
+  return clamp(
+    text.length * metrics.wordFontSize * 0.58 + metrics.wordPaddingX * 2,
+    metrics.wordMinWidth,
+    metrics.wordMaxWidth,
+  );
+}
+
+function getWordBoundsPercent(text, metrics, width) {
+  const estimatedWidth = estimateWordWidth(text, metrics);
+  const halfPercent = ((estimatedWidth / 2) / width) * 100;
+  return {
+    minX: Math.max(10, halfPercent + 2),
+    maxX: Math.min(90, 100 - halfPercent - 2),
+  };
+}
+
 function wrapPercent(value, min, max) {
   const range = max - min;
   if (range <= 0) return min;
@@ -181,14 +198,7 @@ function wrapPercent(value, min, max) {
 function buildWordState(score, metrics, width) {
   const words = Object.keys(WORD_TO_PREFIX);
   const text = words[Math.floor(Math.random() * words.length)];
-  const estimatedWidth = clamp(
-    text.length * metrics.wordFontSize * 0.58 + metrics.wordPaddingX * 2,
-    metrics.wordMinWidth,
-    metrics.wordMaxWidth,
-  );
-  const halfPercent = ((estimatedWidth / 2) / width) * 100;
-  const minX = Math.max(10, halfPercent + 2);
-  const maxX = Math.min(90, 100 - halfPercent - 2);
+  const { minX, maxX } = getWordBoundsPercent(text, metrics, width);
   return {
     id: `${text}-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     text,
@@ -571,6 +581,13 @@ export default function HubNegatrisGame() {
     const nextStreak = correct ? currentStreak + 1 : 0;
     const earnedLife = correct && nextStreak > 0 && nextStreak % EXTRA_LIFE_STREAK === 0;
 
+    const { minX, maxX } = getWordBoundsPercent(
+      word.text,
+      boardMetrics,
+      boardWidth || DEFAULT_BOARD_WIDTH,
+    );
+    const resolvedX = clamp(getLaneCenterPercent(laneIndex), minX, maxX);
+
     if (!correct) {
       setMistakes((current) => [
         ...current,
@@ -604,7 +621,7 @@ export default function HubNegatrisGame() {
     setActiveWord({
       ...word,
       resolved: true,
-      xPercent: getLaneCenterPercent(laneIndex),
+      xPercent: resolvedX,
     });
 
     if (earnedLife) {
@@ -631,11 +648,7 @@ export default function HubNegatrisGame() {
   function moveWord(direction) {
     setActiveWord((current) => {
       if (!current || current.resolved) return current;
-      const estimatedWidth = clamp(
-        current.text.length * boardMetrics.wordFontSize * 0.58 + boardMetrics.wordPaddingX * 2,
-        boardMetrics.wordMinWidth,
-        boardMetrics.wordMaxWidth,
-      );
+      const estimatedWidth = estimateWordWidth(current.text, boardMetrics);
       const halfPercent = ((estimatedWidth / 2) / (boardWidth || DEFAULT_BOARD_WIDTH)) * 100;
       // Let the word travel partly off-stage before wrapping so the move feels intentional.
       const wrapMin = -halfPercent + 1;
