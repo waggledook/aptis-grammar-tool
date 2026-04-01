@@ -1,13 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, doc, getDocs, query, serverTimestamp, setDoc, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, where } from "firebase/firestore";
 import {
   db,
   fetchHubGrammarSubmissions,
+  fetchWritingP1Sessions,
   fetchWritingP2Submissions,
   fetchWritingP3Submissions,
   fetchWritingP4Submissions,
 } from "../../firebase";
+import { fetchItemsByIds } from "../../api/grammar";
+import { toast } from "../../utils/toast";
 
 function timestampToMs(value) {
   if (!value) return 0;
@@ -40,12 +43,122 @@ function formatRelative(value) {
   return formatDate(value);
 }
 
+function looksLikeHtml(text = "") {
+  return /<([a-z][\w:-]*)\b[^>]*>/i.test(text);
+}
+
+function toSubmissionPlainText(html = "", text = "") {
+  if (html && looksLikeHtml(html)) {
+    let normalized = String(html).replace(/^\u200E+/, "");
+    normalized = normalized
+      .replace(/<\/p\s*>/gi, "\n\n")
+      .replace(/<\/div\s*>/gi, "\n\n")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/h[1-6]\s*>/gi, "\n\n")
+      .replace(/<[^>]+>/g, "")
+      .replace(/\r\n/g, "\n");
+
+    return normalized.replace(/\n{3,}/g, "\n\n").trimEnd();
+  }
+
+  return String(text || "").replace(/\r\n/g, "\n");
+}
+
+function escapeHtml(text = "") {
+  return String(text || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function escHtml(text = "") {
+  const safe = String(text || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+  return safe.replace(/\n/g, "<br/>");
+}
+
+function plainTextToClipboardHtml(text = "") {
+  const safe = escapeHtml(String(text || "").replace(/\r\n/g, "\n"));
+  const paragraphs = safe.split(/\n{2,}/).map((chunk) => chunk.replace(/\n/g, "<br/>"));
+  return `<p>${paragraphs.join("</p><p>")}</p>`;
+}
+
+async function copyHtmlWithFallback({ html = "", text = "" }) {
+  try {
+    if (navigator.clipboard && window.ClipboardItem) {
+      const item = new window.ClipboardItem({
+        "text/html": new Blob([html], { type: "text/html" }),
+        "text/plain": new Blob([text], { type: "text/plain" }),
+      });
+      await navigator.clipboard.write([item]);
+    } else {
+      const ta = document.createElement("textarea");
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand("copy");
+      document.body.removeChild(ta);
+    }
+    toast("Submission copied with formatting.");
+  } catch (error) {
+    console.warn("[MyStudents] Copy submission failed", error);
+    toast("Could not copy that submission.");
+  }
+}
+
+function plainFromEmail({ html = "", text = "" }) {
+  if (html && /<([a-z][\w:-]*)\b[^>]*>/i.test(html)) {
+    let s = html;
+    s = s
+      .replace(/<\/p\s*>/gi, "\n\n")
+      .replace(/<\/div\s*>/gi, "\n\n")
+      .replace(/<br\s*\/?>/gi, "\n")
+      .replace(/<\/h[1-6]\s*>/gi, "\n\n")
+      .replace(/<[^>]+>/g, "")
+      .replace(/\r\n/g, "\n");
+
+    s = s.replace(/\n{3,}/g, "\n\n").trimEnd();
+    return s;
+  }
+
+  return String(text || "").replace(/\r\n/g, "\n");
+}
+
+function htmlFromPlainEmail(text = "") {
+  const lines = String(text || "").replace(/\r\n/g, "\n").split("\n");
+  const paragraphs = [];
+  let buffer = [];
+
+  const flush = () => {
+    const joined = buffer.join(" ").trim();
+    paragraphs.push(joined.length ? escHtml(joined) : "&nbsp;");
+    buffer = [];
+  };
+
+  for (const line of lines) {
+    if (line.trim() === "") flush();
+    else buffer.push(line.trim());
+  }
+
+  flush();
+  return `<p>${paragraphs.join("</p><p>")}</p>`;
+}
+
+function robustEmailForClipboard({ html = "", text = "" }) {
+  const plain = plainFromEmail({ html, text });
+  return htmlFromPlainEmail(plain);
+}
+
 function buildActivitySummary(studentId, attemptStats, submissionBundle) {
   const attemptMeta = attemptStats[studentId] || null;
-  const latestWriting = [submissionBundle?.part2, submissionBundle?.part3, submissionBundle?.part4]
-    .filter(Boolean)
+      const latestWriting = (submissionBundle?.recentWriting || [])
+    .slice()
     .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))[0] || null;
-  const latestGrammar = submissionBundle?.grammar || null;
+  const latestGrammar = (submissionBundle?.grammarSubmissions || [])
+    .slice()
+    .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))[0] || null;
   const latestAttemptAt = attemptMeta?.latestSubmittedAt || null;
 
   const candidates = [
@@ -94,11 +207,45 @@ function buildActivitySummary(studentId, attemptStats, submissionBundle) {
   };
 }
 
+function getAttemptLabel(ans = {}) {
+  return (
+    ans?.prompt ||
+    ans?.title ||
+    ans?.gappedSentence ||
+    ans?.gapFill ||
+    ans?.sentence ||
+    ans?.text ||
+    `Item ${ans?.itemId || "?"}`
+  );
+}
+
+function renderSavedGrammarSentence(parts, gaps = []) {
+  if (!Array.isArray(parts) || !parts.length) return null;
+
+  const gapMap = new Map(gaps.map((gap) => [gap.gapId, gap]));
+
+  return parts.map((part, index) => {
+    if (typeof part === "string") {
+      return <React.Fragment key={`part-${index}`}>{part}</React.Fragment>;
+    }
+
+    const gap = gapMap.get(part.gapId);
+    return (
+      <span key={`gap-${part.gapId}`} style={{ fontWeight: 700, color: "#eef4ff" }}>
+        {gap?.answer || "_____"}
+      </span>
+    );
+  });
+}
+
 export default function MyStudents({ user }) {
   const navigate = useNavigate();
+  const latestReadMapRef = useRef({});
+  const persistQueueRef = useRef(Promise.resolve());
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [attemptStats, setAttemptStats] = useState({});
+  const [grammarCompletionNotifications, setGrammarCompletionNotifications] = useState([]);
   const [submissionStats, setSubmissionStats] = useState({});
   const [rosterMeta, setRosterMeta] = useState({});
   const [classDrafts, setClassDrafts] = useState({});
@@ -106,6 +253,10 @@ export default function MyStudents({ user }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [classFilter, setClassFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
+  const [notificationOpen, setNotificationOpen] = useState(false);
+  const [readSubmissionKeys, setReadSubmissionKeys] = useState({});
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [selectedAttemptItemsById, setSelectedAttemptItemsById] = useState({});
 
   if (!user || (user.role !== "teacher" && user.role !== "admin")) {
     return <p>⛔ Only teachers and admins can view this page.</p>;
@@ -123,10 +274,12 @@ export default function MyStudents({ user }) {
 
       const usersCol = collection(db, "users");
       const studentQuery = query(usersCol, where("teacherId", "==", user.uid));
-      const [studentSnap, rosterSnap, attemptsSnap] = await Promise.all([
+      const [studentSnap, rosterSnap, attemptsSnap, dashboardSnap, setsSnap] = await Promise.all([
         getDocs(studentQuery),
         getDocs(collection(db, "users", user.uid, "studentRoster")),
         getDocs(query(collection(db, "grammarSetAttempts"), where("ownerUid", "==", user.uid))),
+        getDoc(doc(db, "users", user.uid, "teacherDashboards", "myStudents")),
+        getDocs(query(collection(db, "grammarSets"), where("ownerId", "==", user.uid))),
       ]);
 
       if (!alive) return;
@@ -141,7 +294,19 @@ export default function MyStudents({ user }) {
         nextRosterMeta[entry.id] = entry.data() || {};
       });
 
+      const nextTeacherSetsById = {};
+      setsSnap.forEach((entry) => {
+        nextTeacherSetsById[entry.id] = { id: entry.id, ...entry.data() };
+      });
+
       const nextAttemptStats = {};
+      const studentLabelById = studentRows.reduce((acc, studentRow) => {
+        acc[studentRow.id] =
+          studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id;
+        return acc;
+      }, {});
+      const nextGrammarNotifications = [];
+
       attemptsSnap.forEach((entry) => {
         const data = entry.data() || {};
         const studentUid = data.studentUid;
@@ -164,6 +329,28 @@ export default function MyStudents({ user }) {
         if (timestampToMs(candidateLatest) > currentLatest) {
           nextAttemptStats[studentUid].latestSubmittedAt = candidateLatest;
         }
+
+        nextGrammarNotifications.push({
+          id: `grammar-set:${entry.id}`,
+          kind: "grammar-set",
+          studentId: studentUid,
+          studentLabel:
+            data.studentName ||
+            data.studentEmail ||
+            studentLabelById[studentUid] ||
+            studentUid,
+          createdAt: candidateLatest,
+          title: data.setTitle || data.title || "Grammar set",
+          setId: data.setId || null,
+          setType: nextTeacherSetsById[data.setId]?.setType || "grammar_set",
+          setMeta: nextTeacherSetsById[data.setId] || null,
+          percent: Number(data.percent || 0),
+          correct: data.correctCount ?? data.correct ?? null,
+          total: data.totalQuestions ?? data.total ?? null,
+          checkedCount: data.checkedCount ?? data.totalQuestions ?? data.total ?? null,
+          completed: !!data.completed,
+          answers: Array.isArray(data.answers) ? data.answers : [],
+        });
       });
 
       Object.keys(nextAttemptStats).forEach((studentUid) => {
@@ -180,29 +367,39 @@ export default function MyStudents({ user }) {
         }, {})
       );
       setAttemptStats(nextAttemptStats);
+      const loadedReadMap = dashboardSnap.exists() ? dashboardSnap.data()?.readSubmissionKeys || {} : {};
+      latestReadMapRef.current = loadedReadMap;
+      setReadSubmissionKeys(loadedReadMap);
 
       const statsEntries = await Promise.all(
         studentRows.map(async (studentRow) => {
-          const [part2, part3, part4, grammar] = await Promise.all([
-            fetchWritingP2Submissions(1, studentRow.id),
-            fetchWritingP3Submissions(1, studentRow.id),
-            fetchWritingP4Submissions(1, studentRow.id),
-            fetchHubGrammarSubmissions(1, studentRow.id),
+          const [part1, part2, part3, part4, grammar] = await Promise.all([
+            fetchWritingP1Sessions(3, studentRow.id),
+            fetchWritingP2Submissions(3, studentRow.id),
+            fetchWritingP3Submissions(3, studentRow.id),
+            fetchWritingP4Submissions(3, studentRow.id),
+            fetchHubGrammarSubmissions(3, studentRow.id),
           ]);
+
+          const recentWriting = [
+            ...part1.map((entry) => ({ ...entry, partLabel: "P1" })),
+            ...part2.map((entry) => ({ ...entry, partLabel: "P2" })),
+            ...part3.map((entry) => ({ ...entry, partLabel: "P3" })),
+            ...part4.map((entry) => ({ ...entry, partLabel: "P4" })),
+          ].sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt));
 
           return [
             studentRow.id,
             {
-              part2: part2[0] ? { ...part2[0], partLabel: "P2" } : null,
-              part3: part3[0] ? { ...part3[0], partLabel: "P3" } : null,
-              part4: part4[0] ? { ...part4[0], partLabel: "P4" } : null,
-              grammar: grammar[0] || null,
+              recentWriting,
+              grammarSubmissions: grammar || [],
             },
           ];
         })
       );
 
       if (!alive) return;
+      setGrammarCompletionNotifications(nextGrammarNotifications);
       setSubmissionStats(Object.fromEntries(statsEntries));
       setLoading(false);
     }
@@ -216,6 +413,30 @@ export default function MyStudents({ user }) {
       alive = false;
     };
   }, [user.uid]);
+
+  useEffect(() => {
+    latestReadMapRef.current = readSubmissionKeys;
+  }, [readSubmissionKeys]);
+
+  function persistReadMap(nextReadMap) {
+    persistQueueRef.current = persistQueueRef.current
+      .catch(() => {})
+      .then(() =>
+        setDoc(
+          doc(db, "users", user.uid, "teacherDashboards", "myStudents"),
+          {
+            readSubmissionKeys: nextReadMap,
+            updatedAt: serverTimestamp(),
+          }
+        )
+      )
+      .catch((error) => {
+        console.error("[MyStudents] Could not persist notification state", error);
+        throw error;
+      });
+
+    return persistQueueRef.current;
+  }
 
   async function saveClassName(studentId) {
     setSavingStudentId(studentId);
@@ -244,6 +465,31 @@ export default function MyStudents({ user }) {
     } finally {
       setSavingStudentId("");
     }
+  }
+
+  async function markSubmissionRead(notificationKey) {
+    if (!notificationKey || latestReadMapRef.current[notificationKey]) return;
+
+    const nextReadMap = {
+      ...latestReadMapRef.current,
+      [notificationKey]: true,
+    };
+    latestReadMapRef.current = nextReadMap;
+    setReadSubmissionKeys(nextReadMap);
+
+    await persistReadMap(nextReadMap);
+  }
+
+  async function markSubmissionUnread(notificationKey) {
+    if (!notificationKey || !latestReadMapRef.current[notificationKey]) return;
+
+    const nextReadMap = { ...latestReadMapRef.current };
+    delete nextReadMap[notificationKey];
+    latestReadMapRef.current = nextReadMap;
+    setReadSubmissionKeys(nextReadMap);
+
+    await persistReadMap(nextReadMap);
+    toast("Marked as unread.");
   }
 
   const classOptions = useMemo(() => {
@@ -319,12 +565,258 @@ export default function MyStudents({ user }) {
     };
   }, [hydratedStudents]);
 
+  const writingNotifications = useMemo(() => {
+    return hydratedStudents.flatMap((studentRow) =>
+      (submissionStats[studentRow.id]?.recentWriting || []).map((entry) => ({
+        id: `${studentRow.id}:${entry.partLabel}:${entry.id}`,
+        kind: "writing",
+        studentId: studentRow.id,
+        studentLabel:
+          studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        createdAt: entry.createdAt,
+        partLabel: entry.partLabel,
+        submission: entry,
+      }))
+    );
+  }, [hydratedStudents, submissionStats]);
+
+  const miniTestNotifications = useMemo(() => {
+    return hydratedStudents.flatMap((studentRow) =>
+      (submissionStats[studentRow.id]?.grammarSubmissions || []).map((entry) => ({
+        id: `mini-test:${studentRow.id}:${entry.id}`,
+        kind: "mini-test",
+        studentId: studentRow.id,
+        studentLabel:
+          studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        createdAt: entry.createdAt,
+        title: entry.activityTitle || "Mini grammar test",
+        submission: entry,
+      }))
+    );
+  }, [hydratedStudents, submissionStats]);
+
+  const teacherNotifications = useMemo(() => {
+    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications]
+      .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
+      .slice(0, 24);
+  }, [grammarCompletionNotifications, miniTestNotifications, writingNotifications]);
+
+  const unreadNotificationCount = useMemo(() => {
+    return teacherNotifications.filter((entry) => !readSubmissionKeys[entry.id]).length;
+  }, [readSubmissionKeys, teacherNotifications]);
+
+  function openNotification(entry) {
+    setSelectedNotification(entry);
+    setSelectedAttemptItemsById({});
+    void markSubmissionRead(entry.id);
+  }
+
+  useEffect(() => {
+    let alive = true;
+
+    async function loadAttemptItems() {
+      if (!selectedNotification || selectedNotification.kind !== "grammar-set") {
+        if (alive) setSelectedAttemptItemsById({});
+        return;
+      }
+
+      if (Array.isArray(selectedNotification.setMeta?.quizItems) && selectedNotification.setMeta.quizItems.length) {
+        if (!alive) return;
+        setSelectedAttemptItemsById(
+          selectedNotification.setMeta.quizItems.reduce((acc, item) => {
+            if (item?.id != null) acc[item.id] = item;
+            return acc;
+          }, {})
+        );
+        return;
+      }
+
+      const itemIds = Array.from(
+        new Set(
+          (selectedNotification.answers || [])
+            .map((ans) => ans?.itemId)
+            .filter((id) => typeof id === "string" || typeof id === "number")
+        )
+      );
+
+      if (!itemIds.length) {
+        if (alive) setSelectedAttemptItemsById({});
+        return;
+      }
+
+      try {
+        const items = await fetchItemsByIds(itemIds);
+        if (!alive) return;
+        setSelectedAttemptItemsById(
+          (items || []).reduce((acc, item) => {
+            if (item?.id != null) acc[item.id] = item;
+            return acc;
+          }, {})
+        );
+      } catch (error) {
+        console.error("[MyStudents] Could not load grammar attempt items", error);
+        if (alive) setSelectedAttemptItemsById({});
+      }
+    }
+
+    loadAttemptItems();
+
+    return () => {
+      alive = false;
+    };
+  }, [selectedNotification]);
+
+async function copySelectedSubmission() {
+    if (!selectedNotification || selectedNotification.kind !== "writing") return;
+
+    const sections = [];
+
+    if (selectedNotification.partLabel === "P1") {
+      (selectedNotification.submission.items || []).forEach((item, index) => {
+        sections.push({
+          heading: item.prompt || `Prompt ${index + 1}`,
+          html: plainTextToClipboardHtml(item.answer || item.response || "—"),
+          text: toSubmissionPlainText("", item.answer || item.response || "—"),
+        });
+      });
+    }
+
+    if (selectedNotification.partLabel === "P2") {
+      sections.push({
+        heading: "Answer",
+        html: robustEmailForClipboard({
+          html: selectedNotification.submission.answerHTML,
+          text: selectedNotification.submission.answerText || "—",
+        }),
+        text: toSubmissionPlainText(
+          selectedNotification.submission.answerHTML,
+          selectedNotification.submission.answerText || "—"
+        ),
+      });
+    }
+
+    if (selectedNotification.partLabel === "P3") {
+      (selectedNotification.submission.answersText || []).forEach((answer, index) => {
+        sections.push({
+          heading: `Reply ${index + 1}`,
+          html: robustEmailForClipboard({
+            html: selectedNotification.submission.answersHTML?.[index],
+            text: answer || "—",
+          }),
+          text: toSubmissionPlainText(
+            selectedNotification.submission.answersHTML?.[index],
+            answer || "—"
+          ),
+        });
+      });
+    }
+
+    if (selectedNotification.partLabel === "P4") {
+      sections.push({
+        heading: "Informal email",
+        html: robustEmailForClipboard({
+          html: selectedNotification.submission.friendHTML,
+          text: selectedNotification.submission.friendText || "—",
+        }),
+        text: toSubmissionPlainText(
+          selectedNotification.submission.friendHTML,
+          selectedNotification.submission.friendText || "—"
+        ),
+      });
+      sections.push({
+        heading: "Formal email",
+        html: robustEmailForClipboard({
+          html: selectedNotification.submission.formalHTML,
+          text: selectedNotification.submission.formalText || "—",
+        }),
+        text: toSubmissionPlainText(
+          selectedNotification.submission.formalHTML,
+          selectedNotification.submission.formalText || "—"
+        ),
+      });
+    }
+
+    const plain = [
+      `${selectedNotification.partLabel} submission`,
+      `${selectedNotification.studentLabel}`,
+      `${formatDate(selectedNotification.createdAt)}`,
+      "",
+      ...sections.flatMap((section) => [section.heading, section.text, ""]),
+    ].join("\n").trim();
+
+    const html = `
+      <div>
+        <h3 style="margin:0 0 .35rem 0;">${escapeHtml(selectedNotification.partLabel)} submission</h3>
+        <p style="margin:.25rem 0;"><strong>${escapeHtml(selectedNotification.studentLabel)}</strong></p>
+        <p style="margin:.25rem 0 1rem 0;"><em>${escapeHtml(formatDate(selectedNotification.createdAt))}</em></p>
+        ${sections
+          .map(
+            (section) => `
+              <h4 style="margin:.9rem 0 .35rem 0;">${escapeHtml(section.heading)}</h4>
+              ${section.html || plainTextToClipboardHtml(section.text)}
+            `
+          )
+          .join("")}
+      </div>
+    `;
+
+    await copyHtmlWithFallback({ html, text: plain });
+  }
+
   return (
     <div className="my-students-page">
       <div className="my-students-topbar">
         <button className="review-btn" onClick={() => navigate(-1)}>
           ← Back
         </button>
+
+        <div className="teacher-notifications">
+          <button type="button" className="teacher-notify-btn" onClick={() => setNotificationOpen((prev) => !prev)}>
+            <span aria-hidden="true">🔔</span>
+            <span>Notifications</span>
+            {unreadNotificationCount > 0 ? <span className="teacher-notify-count">{unreadNotificationCount}</span> : null}
+          </button>
+
+          {notificationOpen ? (
+            <div className="teacher-notify-panel">
+              <div className="teacher-notify-head">
+                <strong>Latest student activity</strong>
+                <span>{teacherNotifications.length} shown</span>
+              </div>
+
+              {teacherNotifications.length ? (
+                <div className="teacher-notify-list">
+                  {teacherNotifications.map((entry) => (
+                    <button
+                      key={entry.id}
+                      type="button"
+                      className={`teacher-notify-item ${readSubmissionKeys[entry.id] ? "" : "is-unread"}`}
+                      onClick={() => openNotification(entry)}
+                    >
+                      <div>
+                        <strong>{entry.studentLabel}</strong>
+                        <span>
+                          {entry.kind === "writing"
+                            ? `${entry.partLabel} submission`
+                            : entry.kind === "mini-test"
+                              ? `Mini test completed · ${entry.title}`
+                            : `${
+                                entry.setType === "use_of_english_custom"
+                                  ? "Use of English quiz completed"
+                                  : "Grammar set completed"
+                              } · ${entry.title}`}
+                        </span>
+                      </div>
+                      <em>{formatRelative(entry.createdAt)}</em>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <p className="muted" style={{ margin: 0 }}>No teacher notifications yet.</p>
+              )}
+            </div>
+          ) : null}
+        </div>
       </div>
 
       <header className="my-students-hero">
@@ -505,6 +997,310 @@ export default function MyStudents({ user }) {
         <p className="muted">No students match the current search and class filter.</p>
       )}
 
+      {selectedNotification ? (
+        <div className="teacher-review-overlay" onClick={() => setSelectedNotification(null)}>
+          <div className="teacher-review-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="teacher-review-head">
+              <div>
+                <h3>{selectedNotification.studentLabel}</h3>
+                <p>
+                  {selectedNotification.partLabel} submission · {formatDate(selectedNotification.createdAt)}
+                </p>
+              </div>
+              <div className="teacher-review-top-actions">
+                <button
+                  type="button"
+                  className="ghost-btn"
+                  onClick={() => void markSubmissionUnread(selectedNotification.id)}
+                >
+                  Mark as unread
+                </button>
+                {selectedNotification.kind === "writing" ? (
+                  <button type="button" className="ghost-btn" onClick={copySelectedSubmission}>
+                    Copy submission
+                  </button>
+                ) : null}
+                <button type="button" className="ghost-btn" onClick={() => setSelectedNotification(null)}>
+                  Close
+                </button>
+              </div>
+            </div>
+
+            <div className="teacher-review-body">
+              {selectedNotification.kind === "grammar-set" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">
+                    {selectedNotification.setType === "use_of_english_custom"
+                      ? "Use of English quiz completion"
+                      : "Grammar set completion"}
+                  </span>
+                  <div className="teacher-review-answer">
+                    <strong>{selectedNotification.title}</strong>
+                    <div className="teacher-review-plain">
+                      Completed {formatRelative(selectedNotification.createdAt)}.
+                      {selectedNotification.correct != null && selectedNotification.checkedCount != null
+                        ? ` Score: ${selectedNotification.correct}/${selectedNotification.checkedCount}`
+                        : ""}
+                      {selectedNotification.percent != null ? ` (${selectedNotification.percent}%).` : ""}
+                    </div>
+                  </div>
+                  {Array.isArray(selectedNotification.answers) && selectedNotification.answers.length ? (
+                    <div className="teacher-review-answer">
+                      <strong>Answer review</strong>
+                      <div className="teacher-review-attempt-list">
+                        {selectedNotification.answers.map((ans, index) => {
+                          const item = selectedAttemptItemsById[ans.itemId];
+                          const label = getAttemptLabel({
+                            ...item,
+                            ...ans,
+                          });
+                          const latestAnswer = ans.studentAnswer ?? ans.selectedOption ?? "";
+                          const firstAnswer = ans.firstAttempt ?? latestAnswer ?? "(no answer)";
+                          const isCorrect =
+                            typeof ans.firstAttemptCorrect === "boolean"
+                              ? ans.firstAttemptCorrect
+                              : !!ans.isCorrect;
+
+                          return (
+                            <div
+                              key={`${ans.itemId || "item"}-${index}`}
+                              className={`teacher-review-attempt ${isCorrect ? "is-correct" : "is-wrong"}`}
+                            >
+                              <div className="teacher-review-attempt-head">
+                                <span className="teacher-review-attempt-label">{label}</span>
+                                <span className={`teacher-review-attempt-chip ${isCorrect ? "is-correct" : "is-wrong"}`}>
+                                  {isCorrect ? "Correct" : "Needs review"}
+                                </span>
+                              </div>
+                              <div className="teacher-review-attempt-body">
+                                <div>
+                                  <span className="panel-label">Scored answer</span>
+                                  <p>{firstAnswer || "(blank)"}</p>
+                                </div>
+                                {!isCorrect ? (
+                                  <div>
+                                    <span className="panel-label">Correct answer</span>
+                                    <p>{ans.correctAnswer ?? ans.correctOption ?? "(unknown)"}</p>
+                                  </div>
+                                ) : null}
+                              </div>
+                              {ans.source === "keyword" && (item?.keyWord || item?.fullSentence || item?.gapFill) ? (
+                                <div className="teacher-review-attempt-note">
+                                  {item?.fullSentence ? `Sentence: ${item.fullSentence} ` : ""}
+                                  {item?.gapFill ? `Gap: ${item.gapFill} ` : ""}
+                                  {item?.keyWord ? `Key word: ${String(item.keyWord).toUpperCase()}` : ""}
+                                </div>
+                              ) : null}
+                              {ans.source === "word-formation" && (item?.base || item?.gappedSentence) ? (
+                                <div className="teacher-review-attempt-note">
+                                  {item?.gappedSentence ? `Sentence: ${item.gappedSentence} ` : ""}
+                                  {item?.base ? `Base word: ${item.base}` : ""}
+                                </div>
+                              ) : null}
+                              {ans.firstAttempt && ans.firstAttempt !== latestAnswer ? (
+                                <div className="teacher-review-attempt-note">
+                                  Latest checked answer: {latestAnswer || "(blank)"}
+                                </div>
+                              ) : null}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {selectedNotification.kind === "mini-test" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">Mini grammar test completion</span>
+                  <div className="teacher-review-answer">
+                    <strong>{selectedNotification.title}</strong>
+                    <div className="teacher-review-plain">
+                      Completed {formatRelative(selectedNotification.createdAt)}.
+                      {" "}
+                      Score: {selectedNotification.submission?.score ?? 0}% (
+                      {selectedNotification.submission?.correct ?? 0}/
+                      {selectedNotification.submission?.total ?? 0}).
+                    </div>
+                  </div>
+                  {Array.isArray(selectedNotification.submission?.items) &&
+                  selectedNotification.submission.items.length ? (
+                    <div className="teacher-review-answer">
+                      <strong>Answer review</strong>
+                      <div className="teacher-review-attempt-list">
+                        {selectedNotification.submission.items.map((item, index) => (
+                          <div
+                            key={`${item.id || "item"}-${index}`}
+                            className={`teacher-review-attempt ${item.isCorrect ? "is-correct" : "is-wrong"}`}
+                          >
+                            <div className="teacher-review-attempt-head">
+                              <span className="teacher-review-attempt-label">
+                                {item.type === "multiple-choice"
+                                  ? item.question || item.prompt
+                                  : item.type === "error-correction"
+                                    ? item.sentence || item.prompt
+                                    : item.parts
+                                      ? renderSavedGrammarSentence(item.parts, item.gaps || [])
+                                      : item.prompt}
+                              </span>
+                              <span className={`teacher-review-attempt-chip ${item.isCorrect ? "is-correct" : "is-wrong"}`}>
+                                {item.isCorrect ? "Correct" : "Needs review"}
+                              </span>
+                            </div>
+
+                            {item.type === "multiple-choice" ? (
+                              <div className="teacher-review-attempt-body">
+                                <div>
+                                  <span className="panel-label">Your answer</span>
+                                  <p>{item.selectedOption || "(no answer)"}</p>
+                                </div>
+                                {!item.isCorrect ? (
+                                  <div>
+                                    <span className="panel-label">Correct answer</span>
+                                    <p>{item.correctOption || "—"}</p>
+                                  </div>
+                                ) : null}
+                              </div>
+                            ) : item.type === "error-correction" ? (
+                              <>
+                                <div className="teacher-review-attempt-body">
+                                  <div>
+                                    <span className="panel-label">Your choice</span>
+                                    <p>{item.selectedLabel || "(no answer)"}</p>
+                                  </div>
+                                  {!item.isCorrect ? (
+                                    <div>
+                                      <span className="panel-label">Correct answer</span>
+                                      <p>
+                                        {item.expectedLabel || "—"}
+                                        {item.correction?.length ? ` — ${item.correction.join(" / ")}` : ""}
+                                      </p>
+                                    </div>
+                                  ) : null}
+                                </div>
+                                {item.answer === "wrong" ? (
+                                  <div className="teacher-review-attempt-note">
+                                    Your correction: {item.correctionAnswer || "(blank)"}
+                                  </div>
+                                ) : null}
+                              </>
+                            ) : (
+                              <div className="teacher-review-attempt-list" style={{ marginTop: 0 }}>
+                                {(item.gaps || []).map((gap) => (
+                                  <div
+                                    key={`${item.id}:${gap.gapId}`}
+                                    className={`teacher-review-attempt ${gap.isCorrect ? "is-correct" : "is-wrong"}`}
+                                    style={{ padding: "0.7rem 0.8rem" }}
+                                  >
+                                    <div className="teacher-review-attempt-body">
+                                      <div>
+                                        <span className="panel-label">Your answer</span>
+                                        <p>{gap.answer || "(no answer)"}</p>
+                                      </div>
+                                      {!gap.isCorrect ? (
+                                        <div>
+                                          <span className="panel-label">Accepted answers</span>
+                                          <p>{(gap.acceptedAnswers || []).join(" / ") || "—"}</p>
+                                        </div>
+                                      ) : null}
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {selectedNotification.kind === "writing" && selectedNotification.partLabel === "P1" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">Writing Part 1</span>
+                  {(selectedNotification.submission.items || []).map((item, index) => (
+                    <div key={item.prompt || index} className="teacher-review-answer">
+                      <strong>{item.prompt || `Prompt ${index + 1}`}</strong>
+                      <div className="teacher-review-plain">
+                        {toSubmissionPlainText("", item.answer || item.response || "—")}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              {selectedNotification.kind === "writing" && selectedNotification.partLabel === "P2" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">Writing Part 2</span>
+                  <div className="teacher-review-answer">
+                    <strong>Answer</strong>
+                    <div className="teacher-review-plain">
+                      {toSubmissionPlainText(
+                        selectedNotification.submission.answerHTML,
+                        selectedNotification.submission.answerText || "—"
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {selectedNotification.kind === "writing" && selectedNotification.partLabel === "P3" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">Writing Part 3</span>
+                  {(selectedNotification.submission.answersText || []).map((answer, index) => (
+                    <div key={index} className="teacher-review-answer">
+                      <strong>Reply {index + 1}</strong>
+                      <div className="teacher-review-plain">
+                        {toSubmissionPlainText(
+                          selectedNotification.submission.answersHTML?.[index],
+                          answer || "—"
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+
+              {selectedNotification.kind === "writing" && selectedNotification.partLabel === "P4" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">Writing Part 4</span>
+                  <div className="teacher-review-answer">
+                    <strong>Informal email</strong>
+                    <div className="teacher-review-plain">
+                      {toSubmissionPlainText(
+                        selectedNotification.submission.friendHTML,
+                        selectedNotification.submission.friendText || "—"
+                      )}
+                    </div>
+                  </div>
+                  <div className="teacher-review-answer">
+                    <strong>Formal email</strong>
+                    <div className="teacher-review-plain">
+                      {toSubmissionPlainText(
+                        selectedNotification.submission.formalHTML,
+                        selectedNotification.submission.formalText || "—"
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="teacher-review-actions">
+              <button
+                type="button"
+                className="review-btn"
+                onClick={() => navigate(`/teacher/student/${selectedNotification.studentId}`)}
+              >
+                Open student profile
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <style>{`
         .my-students-page {
           max-width: 1100px;
@@ -513,6 +1309,269 @@ export default function MyStudents({ user }) {
 
         .my-students-topbar {
           margin-bottom: 0.9rem;
+          display: flex;
+          justify-content: space-between;
+          gap: 1rem;
+          align-items: flex-start;
+          position: relative;
+        }
+
+        .teacher-notifications {
+          position: relative;
+        }
+
+        .teacher-notify-btn {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.6rem;
+          border-radius: 999px;
+          border: 1px solid rgba(103, 132, 197, 0.36);
+          background: rgba(20, 33, 59, 0.92);
+          color: #eef4ff;
+          padding: 0.75rem 1rem;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .teacher-notify-count {
+          min-width: 1.6rem;
+          height: 1.6rem;
+          border-radius: 999px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          background: linear-gradient(180deg, #f6bd60, #e9a93f);
+          color: #16233f;
+          font-size: 0.78rem;
+          font-weight: 900;
+          padding: 0 0.35rem;
+        }
+
+        .teacher-notify-panel {
+          position: absolute;
+          top: calc(100% + 0.55rem);
+          right: 0;
+          width: min(420px, calc(100vw - 2rem));
+          background: rgba(20, 33, 59, 0.98);
+          border: 1px solid rgba(77, 110, 184, 0.42);
+          border-radius: 18px;
+          box-shadow: 0 16px 30px rgba(0, 0, 0, 0.22);
+          padding: 0.95rem;
+          z-index: 10;
+        }
+
+        .teacher-notify-head {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+          margin-bottom: 0.8rem;
+          color: rgba(230, 240, 255, 0.78);
+          font-size: 0.86rem;
+        }
+
+        .teacher-notify-list {
+          display: grid;
+          gap: 0.55rem;
+          max-height: 420px;
+          overflow: auto;
+        }
+
+        .teacher-notify-item {
+          width: 100%;
+          text-align: left;
+          border-radius: 14px;
+          border: 1px solid rgba(108, 136, 199, 0.18);
+          background: rgba(11, 18, 37, 0.68);
+          color: #eef4ff;
+          padding: 0.8rem 0.9rem;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.9rem;
+        }
+
+        .teacher-notify-item.is-unread {
+          border-color: rgba(245, 193, 90, 0.38);
+          background: rgba(37, 31, 16, 0.28);
+        }
+
+        .teacher-notify-item strong,
+        .teacher-notify-item span,
+        .teacher-notify-item em {
+          display: block;
+        }
+
+        .teacher-notify-item span {
+          color: rgba(230, 240, 255, 0.68);
+          font-size: 0.86rem;
+          margin-top: 0.2rem;
+        }
+
+        .teacher-notify-item em {
+          font-style: normal;
+          color: #9cc1ff;
+          font-size: 0.82rem;
+          white-space: nowrap;
+        }
+
+        .teacher-review-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(3, 8, 20, 0.72);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 1rem;
+          z-index: 30;
+        }
+
+        .teacher-review-modal {
+          width: min(760px, 100%);
+          max-height: min(84vh, 900px);
+          overflow: auto;
+          background: rgba(20, 33, 59, 0.98);
+          border: 1px solid rgba(77, 110, 184, 0.42);
+          border-radius: 22px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
+          padding: 1.1rem;
+        }
+
+        .teacher-review-head,
+        .teacher-review-actions {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 1rem;
+        }
+
+        .teacher-review-head {
+          margin-bottom: 1rem;
+        }
+
+        .teacher-review-top-actions {
+          display: flex;
+          gap: 0.6rem;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+
+        .teacher-review-head h3 {
+          margin: 0 0 0.2rem;
+          color: #eef4ff;
+        }
+
+        .teacher-review-head p {
+          margin: 0;
+          color: rgba(230, 240, 255, 0.72);
+        }
+
+        .teacher-review-body {
+          display: grid;
+          gap: 0.9rem;
+        }
+
+        .teacher-review-block {
+          background: rgba(11, 18, 37, 0.62);
+          border: 1px solid rgba(108, 136, 199, 0.18);
+          border-radius: 16px;
+          padding: 1rem;
+        }
+
+        .teacher-review-answer + .teacher-review-answer {
+          margin-top: 0.9rem;
+          padding-top: 0.9rem;
+          border-top: 1px solid rgba(108, 136, 199, 0.18);
+        }
+
+        .teacher-review-answer strong {
+          display: block;
+          color: #eef4ff;
+          margin-bottom: 0.4rem;
+        }
+
+        .teacher-review-plain {
+          color: rgba(230, 240, 255, 0.92);
+          line-height: 1.6;
+          white-space: pre-wrap;
+        }
+
+        .teacher-review-attempt-list {
+          display: grid;
+          gap: 0.75rem;
+          margin-top: 0.35rem;
+        }
+
+        .teacher-review-attempt {
+          border-radius: 14px;
+          border: 1px solid rgba(108, 136, 199, 0.18);
+          background: rgba(255, 255, 255, 0.02);
+          padding: 0.85rem 0.9rem;
+        }
+
+        .teacher-review-attempt.is-correct {
+          border-color: rgba(34, 197, 94, 0.25);
+          background: rgba(11, 45, 28, 0.24);
+        }
+
+        .teacher-review-attempt.is-wrong {
+          border-color: rgba(249, 115, 22, 0.25);
+          background: rgba(58, 29, 8, 0.22);
+        }
+
+        .teacher-review-attempt-head {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 0.8rem;
+          margin-bottom: 0.55rem;
+        }
+
+        .teacher-review-attempt-label {
+          color: #eef4ff;
+          font-weight: 700;
+          line-height: 1.45;
+        }
+
+        .teacher-review-attempt-chip {
+          flex: 0 0 auto;
+          border-radius: 999px;
+          padding: 0.25rem 0.6rem;
+          font-size: 0.75rem;
+          font-weight: 800;
+        }
+
+        .teacher-review-attempt-chip.is-correct {
+          background: rgba(34, 197, 94, 0.18);
+          color: #bdf7cf;
+        }
+
+        .teacher-review-attempt-chip.is-wrong {
+          background: rgba(249, 115, 22, 0.16);
+          color: #fed7aa;
+        }
+
+        .teacher-review-attempt-body {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.8rem;
+        }
+
+        .teacher-review-attempt-body p {
+          margin: 0;
+          color: rgba(230, 240, 255, 0.92);
+          line-height: 1.5;
+        }
+
+        .teacher-review-attempt-note {
+          margin-top: 0.6rem;
+          color: rgba(230, 240, 255, 0.7);
+          font-size: 0.84rem;
+        }
+
+        .teacher-review-actions {
+          margin-top: 1rem;
         }
 
         .my-students-hero {
@@ -734,6 +1793,15 @@ export default function MyStudents({ user }) {
           .my-students-controls,
           .student-meta-grid,
           .student-activity-panel {
+            grid-template-columns: 1fr;
+          }
+
+          .my-students-topbar {
+            flex-direction: column;
+            align-items: stretch;
+          }
+
+          .teacher-review-attempt-body {
             grid-template-columns: 1fr;
           }
 

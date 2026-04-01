@@ -1,7 +1,18 @@
 // src/App.jsx
 import React, { useState, useEffect } from 'react'
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { auth, doSignOut, fetchSeenGrammarItemIds, db, ensureUserProfile } from "./firebase";
+import {
+  auth,
+  doSignOut,
+  fetchSeenGrammarItemIds,
+  db,
+  ensureUserProfile,
+  fetchHubGrammarSubmissions,
+  fetchWritingP1Sessions,
+  fetchWritingP2Submissions,
+  fetchWritingP3Submissions,
+  fetchWritingP4Submissions,
+} from "./firebase";
 import { onAuthStateChanged }      from 'firebase/auth'
 import AuthForm                    from './components/AuthForm'
 import FilterPanel                 from './components/FilterPanel'
@@ -43,7 +54,7 @@ import VocabLab from "./components/vocabulary/VocabLab";
 import TopicTrainer from "./components/vocabulary/TopicTrainer";
 import Seo from "./components/common/Seo.jsx";
 import './App.css'
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, onSnapshot, query, where } from "firebase/firestore";
 import GrammarSetRunner from "./components/grammar/GrammarSetRunner";
 import UseOfEnglishCustomQuizRunner from "./components/grammar/UseOfEnglishCustomQuizRunner.jsx";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
@@ -103,6 +114,33 @@ import HubSpanglishLivePlayer from "./components/hub/HubSpanglishLivePlayer.jsx"
 import HubNegatrisGame from "./components/hub/HubNegatrisGame.jsx";
 import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
+function BellIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width="21"
+      height="21"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M15 18H5.8c-.9 0-1.3-1.1-.6-1.7l.8-.7c.7-.6 1.1-1.5 1.1-2.4v-2.1a4.9 4.9 0 1 1 9.8 0v2.1c0 .9.4 1.8 1.1 2.4l.8.7c.7.6.3 1.7-.6 1.7H15" />
+      <path d="M10 20a2.2 2.2 0 0 0 4 0" />
+    </svg>
+  );
+}
+
+function timestampToMs(value) {
+  if (!value) return 0;
+  if (typeof value.toMillis === "function") return value.toMillis();
+  if (value.seconds) return value.seconds * 1000;
+  const parsed = new Date(value).getTime();
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 
 
 
@@ -125,6 +163,8 @@ const isSeifHubSite = currentSite.id === "seifhub";
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
 const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute;
+const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
+const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 
 useEffect(() => {
   const unsub = onAuthStateChanged(auth, async (u) => {
@@ -155,6 +195,106 @@ useEffect(() => {
 
   return unsub;
 }, []);
+
+useEffect(() => {
+  if (!user || (user.role !== "teacher" && user.role !== "admin")) {
+    setTeacherReadSubmissionKeys({});
+    return undefined;
+  }
+
+  return onSnapshot(
+    doc(db, "users", user.uid, "teacherDashboards", "myStudents"),
+    (snap) => {
+      setTeacherReadSubmissionKeys(snap.exists() ? snap.data()?.readSubmissionKeys || {} : {});
+    },
+    (error) => {
+      console.error("[App] Could not watch teacher dashboard", error);
+    }
+  );
+}, [user]);
+
+useEffect(() => {
+  let alive = true;
+
+  async function loadTeacherUnreadCount() {
+    if (!user || (user.role !== "teacher" && user.role !== "admin")) {
+      if (alive) setTeacherUnreadCount(0);
+      return;
+    }
+
+    try {
+      const studentSnap = await getDocs(query(collection(db, "users"), where("teacherId", "==", user.uid)));
+
+      if (!alive) return;
+
+      const readSubmissionKeys = teacherReadSubmissionKeys || {};
+      const studentIds = studentSnap.docs.map((entry) => entry.id);
+
+      const grammarSnap = await getDocs(query(collection(db, "grammarSetAttempts"), where("ownerUid", "==", user.uid)));
+
+      const notificationIds = (
+        await Promise.all(
+          studentIds.map(async (studentId) => {
+            const [part1, part2, part3, part4, miniTests] = await Promise.all([
+              fetchWritingP1Sessions(3, studentId),
+              fetchWritingP2Submissions(3, studentId),
+              fetchWritingP3Submissions(3, studentId),
+              fetchWritingP4Submissions(3, studentId),
+              fetchHubGrammarSubmissions(3, studentId),
+            ]);
+
+            return [
+              ...part1.map((entry) => ({ id: `${studentId}:P1:${entry.id}`, createdAt: entry.createdAt })),
+              ...part2.map((entry) => ({ id: `${studentId}:P2:${entry.id}`, createdAt: entry.createdAt })),
+              ...part3.map((entry) => ({ id: `${studentId}:P3:${entry.id}`, createdAt: entry.createdAt })),
+              ...part4.map((entry) => ({ id: `${studentId}:P4:${entry.id}`, createdAt: entry.createdAt })),
+              ...miniTests.map((entry) => ({ id: `mini-test:${studentId}:${entry.id}`, createdAt: entry.createdAt })),
+            ];
+          })
+        )
+      )
+        .flat();
+
+      const grammarNotifications = grammarSnap.docs
+        .map((entry) => {
+          const data = entry.data() || {};
+          if (!data.studentUid) return null;
+          return {
+            id: `grammar-set:${entry.id}`,
+            createdAt: data.updatedAt || data.submittedAt || null,
+          };
+        })
+        .filter(Boolean);
+
+      const latestNotifications = [...notificationIds, ...grammarNotifications]
+        .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
+        .slice(0, 24);
+
+      if (!alive) return;
+      setTeacherUnreadCount(latestNotifications.filter((entry) => !readSubmissionKeys[entry.id]).length);
+    } catch (error) {
+      console.error("[App] Could not load teacher unread count", error);
+      if (alive) setTeacherUnreadCount(0);
+    }
+  }
+
+  loadTeacherUnreadCount();
+
+  const handleFocus = () => {
+    loadTeacherUnreadCount();
+  };
+
+  window.addEventListener("focus", handleFocus);
+  const intervalId = window.setInterval(() => {
+    loadTeacherUnreadCount();
+  }, 20000);
+
+  return () => {
+    alive = false;
+    window.removeEventListener("focus", handleFocus);
+    window.clearInterval(intervalId);
+  };
+}, [location.pathname, teacherReadSubmissionKeys, user]);
 
 const hasSeifHubAccess = canAccessSeifHub(user);
 const isTeacherToolsRoute = location.pathname === "/teacher-tools";
@@ -419,6 +559,22 @@ return (
 
   {user ? (
     <>
+      {(user.role === "teacher" || user.role === "admin") && (
+        <button
+          onClick={() => navigate("/my-students")}
+          className="topbar-btn topbar-notify-btn"
+          aria-label="Open student notifications"
+          title={
+            teacherUnreadCount > 0
+              ? `${teacherUnreadCount} unread writing notifications`
+              : "Student notifications"
+          }
+        >
+          <BellIcon />
+          {teacherUnreadCount > 0 ? <span className="topbar-notify-count">{teacherUnreadCount}</span> : null}
+        </button>
+      )}
+
       <button onClick={doSignOut} className="topbar-btn">
         Sign Out
       </button>
