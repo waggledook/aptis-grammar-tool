@@ -3,6 +3,43 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 
+const GUIDE_CARDS = [
+  {
+    title: "Guide: describing pictures",
+    description: "Useful phrases, prepositions, and speculation for Speaking Parts 2 and 3.",
+    path: "/speaking/photo-guide",
+    underConstruction: true,
+  },
+  {
+    title: "Guide: comparing photos (Part 3)",
+    description: "Useful language and focused practice for comparing two pictures in Part 3.",
+    path: "/speaking/part3-comparing",
+    underConstruction: true,
+  },
+];
+
+const PRACTICE_CARDS = [
+  {
+    title: "Part 1: Personal Questions",
+    description: "Practise answering 3 short personal questions.",
+    path: "/speaking/part1",
+  },
+  {
+    title: "Part 2: Describe a Photograph",
+    description: "1 picture, 3 questions. Describe a photo and answer related questions.",
+    path: "/speaking/part2",
+  },
+  {
+    title: "Part 3: Describe & Compare",
+    description: "Compare two photographs and answer related questions.",
+    path: "/speaking/part3",
+  },
+  {
+    title: "Part 4: Presentation & Discussion",
+    description: "1-minute prep, then a 2-minute talk answering 3 questions.",
+    path: "/speaking/part4",
+  },
+];
 
 export default function SpeakingMenu() {
   const navigate = useNavigate();
@@ -16,68 +53,58 @@ export default function SpeakingMenu() {
       <header className="header">
         <h2 className="title">Speaking</h2>
         <p className="intro">
-          Practise Aptis Speaking Tasks part 1 to 4.
+          Practise Aptis Speaking Parts 1 to 4. Use the guides when you want support, or go straight into exam-style speaking tasks.
         </p>
       </header>
 
-      <div className="cards">
-        <button className="card" onClick={() => navigate("/speaking/part1")}>
-          <h3>Part 1: Personal Questions</h3>
-          <p>Practice answering 3 short personal questions.</p>
-        </button>
+      <section className="menu-section guides">
+        <div className="section-header">
+          <h3>Guides</h3>
+          <p>Build the language and task confidence you need before doing the timed speaking parts.</p>
+        </div>
+        <div className="cards">
+          {GUIDE_CARDS.map((card) => (
+            <button className="card guide-card" key={card.path} onClick={() => navigate(card.path)}>
+              <div className="menu-card-header">
+                <h3>{card.title}</h3>
+                {card.underConstruction ? (
+                  <span className="uc-top-wrapper">
+                    <img
+                      src="/images/ui/under-construction.png"
+                      alt="Under construction"
+                      className="uc-top-icon"
+                    />
+                  </span>
+                ) : null}
+              </div>
+              <p>{card.description}</p>
+            </button>
+          ))}
+        </div>
+      </section>
 
-        <button className="card" onClick={() => navigate("/speaking/part2")}>
-          <h3>Part 2: Describe a Photograph</h3>
-          <p>1 picture · 3 questions. Describe a photo and answer related questions.</p>
-        </button>
+      <section className="menu-section practice">
+        <div className="section-header">
+          <h3>Exam Practice</h3>
+          <p>Work through the four speaking parts in exam-style practice, from personal questions to the final talk.</p>
+        </div>
+        <div className="cards">
+          {PRACTICE_CARDS.map((card) => (
+            <button className="card practice-card" key={card.path} onClick={() => navigate(card.path)}>
+              <h3>{card.title}</h3>
+              <p>{card.description}</p>
+            </button>
+          ))}
+        </div>
+      </section>
 
-        <button className="card" onClick={() => navigate("/speaking/part3")}>
-          <h3>Part 3: Describe & Compare</h3>
-          <p>Compare two photographs, and answer related questions.</p>
-        </button>
-
-        <button
-  className="card"
-  onClick={() => navigate("/speaking/photo-guide")}
->
-  <div className="menu-card-header">
-    <h3>Guide: describing pictures</h3>
-    <span className="uc-top-wrapper">
-      <img
-        src="/images/ui/under-construction.png"
-        alt="Under construction"
-        className="uc-top-icon"
-      />
-    </span>
-  </div>
-  <p>Useful phrases, prepositions & speculation for Parts 2 and 3.</p>
-</button>
-
-<button
-  className="card"
-  onClick={() => navigate("/speaking/part3-comparing")}
->
-  <div className="menu-card-header">
-    <h3>Guide: comparing photos (Part 3)</h3>
-    <span className="uc-top-wrapper">
-      <img
-        src="/images/ui/under-construction.png"
-        alt="Under construction"
-        className="uc-top-icon"
-      />
-    </span>
-  </div>
-  <p>Useful language and practice for comparing two pictures in Part 3.</p>
-</button>
-
-        <button className="card" onClick={() => navigate("/speaking/part4")}>
-          <h3>Part 4: Presentation & Discussion</h3>
-          <p>1-minute prep, then a 2-minute talk answering 3 questions.</p>
-        </button>
-      </div>
-
-      {/* External mock test link (unchanged) */}
-      <div className="mock-test-link">
+      <section className="full-test-card">
+        <div>
+          <div className="section-kicker">Full Test</div>
+          <h3>Complete speaking test</h3>
+          <p>Do the whole speaking paper in exam conditions when you want a fuller challenge.</p>
+        </div>
+        <div className="mock-test-link">
         <a
           href="https://aptis-gen.speaking1.beeskillsenglish.com/"
           target="_blank"
@@ -86,7 +113,8 @@ export default function SpeakingMenu() {
         >
           🎤 Try a complete speaking test in exam conditions!
         </a>
-      </div>
+        </div>
+      </section>
 
       {/* Back to main menu via router */}
       <button
@@ -101,22 +129,127 @@ export default function SpeakingMenu() {
         .header { margin-bottom: 1rem; }
         .title { font-size: 1.6rem; margin-bottom: .3rem; }
         .intro { color: #a9b7d1; max-width: 600px; }
-        .cards { display:grid; gap:1rem; grid-template-columns:1fr; }
-        @media (min-width:720px){ .cards{ grid-template-columns: repeat(2,1fr);} }
-        .card {
-          background:#13213b; border:1px solid #2c4b83; border-radius:12px;
-          color:#e6f0ff; padding:1rem; text-align:left; cursor:pointer;
-          transition: transform .08s ease, box-shadow .08s ease, border-color .08s;
+
+        .menu-section {
+          margin-top: 1.2rem;
         }
-        .card:hover { transform: translateY(-2px); box-shadow:0 6px 18px rgba(0,0,0,.25); border-color:#4a79d8; }
-        .card h3 { margin:0 0 .35rem; }
-        .card p { margin:0; color:#cfd9f3; }
-        .card.disabled { cursor:default; opacity:.55; }
-        .card.disabled:hover { transform:none; box-shadow:none; border-color:#2c4b83; }
+
+        .section-header {
+          margin-bottom: .85rem;
+        }
+
+        .section-header h3 {
+          margin: 0 0 .25rem;
+          color: #e6f0ff;
+        }
+
+        .section-header p {
+          margin: 0;
+          color: #a9b7d1;
+          max-width: 680px;
+        }
+
+        .cards {
+          display:grid;
+          gap:1rem;
+          grid-template-columns:1fr;
+        }
+
+        @media (min-width:720px){
+          .cards{
+            grid-template-columns: repeat(2,1fr);
+          }
+        }
+
+        .card {
+          background:#13213b;
+          border:1px solid #2c4b83;
+          border-radius:12px;
+          color: #e6f0ff;
+          padding:1rem;
+          text-align:left;
+          cursor:pointer;
+          transition: transform .08s ease, box-shadow .08s ease, border-color .08s, background .08s ease;
+        }
+
+        .card:hover {
+          transform: translateY(-2px);
+          box-shadow:0 6px 18px rgba(0,0,0,.25);
+        }
+
+        .card h3 {
+          margin:0 0 .35rem;
+          display:flex;
+          align-items:center;
+          flex-wrap:wrap;
+          gap:.35rem;
+        }
+
+        .card p {
+          margin:0;
+          color:#cfd9f3;
+        }
+
+        .guide-card {
+          background: linear-gradient(180deg, #13213b 0%, #122846 100%);
+          border-color: #3d5f99;
+        }
+
+        .guide-card:hover {
+          border-color: #5f83c0;
+        }
+
+        .practice-card {
+          background: linear-gradient(180deg, #172440 0%, #13213b 100%);
+          border-color: rgba(255, 207, 64, 0.48);
+        }
+
+        .practice-card:hover {
+          border-color: rgba(255, 207, 64, 0.82);
+        }
+
+        .section-kicker {
+          display: inline-flex;
+          align-items: center;
+          font-size: .76rem;
+          font-weight: 700;
+          letter-spacing: .06em;
+          text-transform: uppercase;
+          color: #ffcf40;
+          margin-bottom: .35rem;
+        }
 
         /* ---- Mock test CTA (BeeSkills palette) ---- */
+        .full-test-card {
+          margin-top: 1.4rem;
+          display: grid;
+          gap: 1rem;
+          align-items: center;
+          background: linear-gradient(180deg, #13213b 0%, #10203a 100%);
+          border: 1px solid #2c4b83;
+          border-radius: 16px;
+          padding: 1rem;
+          box-shadow: 0 10px 24px rgba(0,0,0,.18);
+        }
+
+        .full-test-card h3 {
+          margin: 0 0 .35rem;
+          color: #e6f0ff;
+        }
+
+        .full-test-card p {
+          margin: 0;
+          color: #cfd9f3;
+          max-width: 62ch;
+        }
+
+        @media (min-width: 760px) {
+          .full-test-card {
+            grid-template-columns: 1.4fr auto;
+          }
+        }
+
         .mock-test-link {
-          margin-top: 1.6rem;
           text-align: center;
         }
 

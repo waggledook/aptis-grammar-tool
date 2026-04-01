@@ -594,6 +594,20 @@ export async function logHubOpenClozeCompleted(details = {}) {
   });
 }
 
+export async function logCollocationDashStarted(details = {}) {
+  return logActivity("collocation_dash_started", {
+    app: "aptis-trainer",
+    ...details,
+  });
+}
+
+export async function logCollocationDashCompleted(details = {}) {
+  return logActivity("collocation_dash_completed", {
+    app: "aptis-trainer",
+    ...details,
+  });
+}
+
 export async function logHubFlashcardsStarted(details = {}) {
   return logActivity("hub_flashcards_started", {
     app: "seifhub",

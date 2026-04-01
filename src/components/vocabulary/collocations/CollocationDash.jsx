@@ -2,7 +2,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { COLLOCATION_BANK, VERBS } from "../data/collocationBank";
 import { useTickSound } from "../../../hooks/useTickSound";
-import { saveCollocationDashScore, fetchTopCollocationDashScores } from "../../../firebase";
+import {
+  saveCollocationDashScore,
+  fetchTopCollocationDashScores,
+  logCollocationDashStarted,
+  logCollocationDashCompleted,
+} from "../../../firebase";
 
 import {
   addDoc,
@@ -88,6 +93,7 @@ const [topScores, setTopScores] = useState([]);
 
 const [leaderboard, setLeaderboard] = useState([]); // top 10
 const savedScoreRef = useRef(false);
+const activityLoggedRef = useRef({ started: false, completed: false });
 
 // Tick refs + play function
 const { tickRef, tickFastRef, playTick } = useTickSound();
@@ -98,6 +104,7 @@ const { tickRef, tickFastRef, playTick } = useTickSound();
 
   const start = () => {
     savedScoreRef.current = false; // ✅ allow saving again for the new run
+    activityLoggedRef.current.completed = false;
 
     // Optional: gate by sign-in if you want (your old game didn’t)
     // If you want this gated:
@@ -114,7 +121,13 @@ const { tickRef, tickFastRef, playTick } = useTickSound();
 setSelectedVerb(null);
     setItems(pickRoundItems({ perRound: 5 }));
 
-    // logActivity?.("vocab_collocations_dash_started", { uid: user?.uid ?? null });
+    if (!activityLoggedRef.current.started) {
+      activityLoggedRef.current.started = true;
+      logCollocationDashStarted({
+        roundsPlanned: 5,
+        roundSeconds: 40,
+      }).catch((e) => console.error("[CollocationDash] start log failed:", e));
+    }
   };
 
   const saveLeaderboardScore = async (finalScore) => {
@@ -146,6 +159,8 @@ setSelectedVerb(null);
   const restart = () => {
     stopTimer();
     savedScoreRef.current = false; // optional (start() already does it)
+    activityLoggedRef.current.started = false;
+    activityLoggedRef.current.completed = false;
     setStatus("idle");
     start();
   };
@@ -199,6 +214,16 @@ setSelectedVerb(null);
       saveLeaderboardScore(score)
         .then(loadLeaderboard)
         .catch((e) => console.error("[CollocationDash] leaderboard save failed:", e));
+    }
+
+    if (!activityLoggedRef.current.completed) {
+      activityLoggedRef.current.completed = true;
+      logCollocationDashCompleted({
+        score,
+        roundsReached: round,
+        wrongCount: wrongAnswers.length,
+        reviewCount: buildUniqueReviewQueue(wrongAnswers).length,
+      }).catch((e) => console.error("[CollocationDash] completion log failed:", e));
     }
   
     const q = buildUniqueReviewQueue(wrongAnswers);

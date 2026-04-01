@@ -3,12 +3,44 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 
+const GUIDE_CARDS = [
+  {
+    title: "Part 1 Guide",
+    description: "How to write effective 1–5 word answers, with mini-practice.",
+    path: "/writing/part1-guide",
+  },
+  {
+    title: "Part 4 Guide",
+    description: "Understand the task and explore register, structure, and language choices.",
+    path: "/writing/part4-guide",
+  },
+];
+
+const PRACTICE_CARDS = [
+  {
+    title: "Part 1: Word-level writing",
+    description: "Answer 5 short messages with single words or short phrases. Fast and focused.",
+    path: "/writing/part1",
+  },
+  {
+    title: "Part 2: Short text",
+    description: "Fill in a short form or write a short sentence response (20–30 words).",
+    path: "/writing/part2",
+  },
+  {
+    title: "Part 3: Three responses",
+    description: "Reply to three social-style messages. Keep each answer to 30–40 words.",
+    path: "/writing/part3",
+  },
+  {
+    title: "Part 4: Emails",
+    description: "Write two emails: an informal one and a formal one in full exam format.",
+    path: "/writing/part4",
+  },
+];
 
 export default function WritingMenu() {
   const navigate = useNavigate();
-  function comingSoon() {
-    alert("Coming soon! Parts 2–4 will be available shortly.");
-  }
 
   return (
     <div className="writing-menu game-wrapper">
@@ -20,61 +52,55 @@ export default function WritingMenu() {
       <header className="header">
         <h2 className="title">Writing</h2>
         <p className="intro">
-          Practise Aptis Writing tasks (Parts 1–4). Start short, build up to full emails.
+          Practise Aptis Writing Parts 1–4. Use the guides when you want support, or go straight into exam-style practice.
         </p>
       </header>
 
-      <div className="cards">
-      <button className="card" onClick={() => navigate("/writing/part1")}>
-          <h3>Part 1: Word-level writing</h3>
-          <p>Answer 5 short messages with single words or short phrases. Fast and focused.</p>
-        </button>
+      <section className="menu-section guides">
+        <div className="section-header">
+          <h3>Guides</h3>
+          <p>Learn the task type, see examples, and build confidence before you practise.</p>
+        </div>
+        <div className="cards">
+          {GUIDE_CARDS.map((card) => (
+            <button className="card guide-card" key={card.path} onClick={() => navigate(card.path)}>
+              <h3>{card.title}</h3>
+              <p>{card.description}</p>
+            </button>
+          ))}
+        </div>
+      </section>
 
-        <button className="card" onClick={() => navigate("/writing/part1-guide")}>
-  <h3>Part 1 Guide</h3>
-  <p>How to write effective 1–5 word answers, with mini-practice.</p>
-</button>
+      <section className="menu-section practice">
+        <div className="section-header">
+          <h3>Exam Practice</h3>
+          <p>Work through the writing parts in exam-style tasks, from short answers to full emails.</p>
+        </div>
+        <div className="cards">
+          {PRACTICE_CARDS.map((card) => (
+            <button className="card practice-card" key={card.path} onClick={() => navigate(card.path)}>
+              <h3>{card.title}</h3>
+              <p>{card.description}</p>
+            </button>
+          ))}
+        </div>
+      </section>
 
-<button className="card" onClick={() => navigate("/writing/part2")}>
-  <h3>Part 2: Short text</h3>
-  <p>Fill in a short form or write a short sentence response (20–30 words).</p>
-</button>
-
-<button className="card" onClick={() => navigate("/writing/part3")}>
-  <h3>Part 3: Three responses</h3>
-  <p>Reply to three social-style messages. Keep each answer to 30–40 words.</p>
-</button>
-
-        <button
-    className="card"
-    onClick={() => navigate("/writing/part4-guide")}
-  >
-    <h3>Part 4 Guide</h3>
-    <p>Understand the task and explore Register, Structure, Language, and more.</p>
-  </button>
-
-        <button
-  className="card"
-  onClick={() => navigate("/writing/part4")}
->
-  <h3>Part 4: Emails</h3>
-  <p>Write two emails: an informal one (40–50 words) and a formal one (120–150 words).</p>
-</button>
-
-
-      </div>
-
-{/* External mock test link */}
-<div className="mock-test-link">
-  <a
-    href="https://aptis-gen.writing1.beeskillsenglish.com/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className="mock-test-btn sleek"
-  >
-    🚀 Try a complete writing test in exam conditions!
-  </a>
-</div>
+      <section className="full-test-card">
+        <div>
+          <div className="section-kicker">Full Test</div>
+          <h3>Complete writing test</h3>
+          <p>Do the whole writing paper in exam conditions when you want a fuller challenge.</p>
+        </div>
+        <a
+          href="https://aptis-gen.writing1.beeskillsenglish.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mock-test-btn sleek"
+        >
+          Open full writing test
+        </a>
+      </section>
 
 
 <button
@@ -90,57 +116,131 @@ export default function WritingMenu() {
         .title { font-size: 1.6rem; margin-bottom: .3rem; }
         .intro { color: #a9b7d1; max-width: 640px; }
 
-        .cards { display:grid; gap:1rem; grid-template-columns:1fr; }
-        @media (min-width:720px){ .cards{ grid-template-columns: repeat(2,1fr);} }
+        .menu-section {
+          margin-top: 1.2rem;
+        }
+
+        .section-header {
+          margin-bottom: .85rem;
+        }
+
+        .section-header h3 {
+          margin: 0 0 .25rem;
+          color: #e6f0ff;
+        }
+
+        .section-header p {
+          margin: 0;
+          color: #a9b7d1;
+          max-width: 680px;
+        }
+
+        .cards {
+          display:grid;
+          gap:1rem;
+          grid-template-columns:1fr;
+        }
+
+        @media (min-width:720px){
+          .cards{
+            grid-template-columns: repeat(2,1fr);
+          }
+        }
+
+        .full-test-card {
+          background: linear-gradient(180deg, #13213b 0%, #10203a 100%);
+          border: 1px solid #2c4b83;
+          border-radius: 16px;
+          padding: 1rem;
+          box-shadow: 0 10px 24px rgba(0,0,0,.18);
+        }
+
+        .section-kicker {
+          display: inline-flex;
+          align-items: center;
+          font-size: .76rem;
+          font-weight: 700;
+          letter-spacing: .06em;
+          text-transform: uppercase;
+          color: #ffcf40;
+          margin-bottom: .35rem;
+        }
+
+        .full-test-card h3 {
+          margin: 0 0 .35rem;
+          color: #e6f0ff;
+        }
+
+        .full-test-card p {
+          margin: 0;
+          color: #cfd9f3;
+          max-width: 62ch;
+        }
 
         .card {
-          background:#13213b; border:1px solid #2c4b83; border-radius:12px;
-          color:#e6f0ff; padding:1rem; text-align:left; cursor:pointer;
-          transition: transform .08s ease, box-shadow .08s ease, border-color .08s;
+          background:#13213b;
+          border:1px solid #2c4b83;
+          border-radius:12px;
+          color: #e6f0ff;
+          padding:1rem;
+          text-align:left;
+          cursor:pointer;
+          transition: transform .08s ease, box-shadow .08s ease, border-color .08s, background .08s ease;
         }
+
         .card:hover {
           transform: translateY(-2px);
           box-shadow:0 6px 18px rgba(0,0,0,.25);
-          border-color:#4a79d8;
         }
 
-        .card h3 { margin:0 0 .35rem; display:flex; align-items:center; flex-wrap:wrap; gap:.35rem; }
-        .card p { margin:0; color:#cfd9f3; }
-
-        .card.disabled {
-          cursor:default;
-          opacity:.55;
-        }
-        .card.disabled:hover {
-          transform:none;
-          box-shadow:none;
-          border-color:#2c4b83;
+        .card h3 {
+          margin:0 0 .35rem;
+          display:flex;
+          align-items:center;
+          flex-wrap:wrap;
+          gap:.35rem;
         }
 
-        .soon {
-          font-size:.75em;
-          background:#2c4b83;
-          color:#fff;
-          padding:.1rem .45rem;
-          border-radius:6px;
-          text-transform:uppercase;
-          letter-spacing:.03em;
+        .card p {
+          margin:0;
+          color:#cfd9f3;
         }
-          .mock-test-link {
-  margin-top: 1.8rem;
-  text-align: center;
-}
 
-/* Container */
-.mock-test-link {
-  margin-top: 1.6rem;
-  text-align: center;
-}
+        .guide-card {
+          background: linear-gradient(180deg, #13213b 0%, #122846 100%);
+          border-color: #3d5f99;
+        }
+
+        .guide-card:hover {
+          border-color: #5f83c0;
+        }
+
+        .practice-card {
+          background: linear-gradient(180deg, #172440 0%, #13213b 100%);
+          border-color: rgba(255, 207, 64, 0.48);
+        }
+
+        .practice-card:hover {
+          border-color: rgba(255, 207, 64, 0.82);
+        }
+
+        .full-test-card {
+          margin-top: 1.4rem;
+          display: grid;
+          gap: 1rem;
+          align-items: center;
+        }
+
+        @media (min-width: 760px) {
+          .full-test-card {
+            grid-template-columns: 1.4fr auto;
+          }
+        }
 
 /* Sleek 3-D pill button */
 .mock-test-btn.sleek {
-  position: relative;
-  display: inline-block;
+          position: relative;
+          display: inline-block;
   padding: 1rem 1.6rem;
   border-radius: 16px;
   text-decoration: none;
@@ -215,7 +315,6 @@ export default function WritingMenu() {
     inset 0 1px 0 rgba(255,255,255,.06),
     inset 0 -8px 14px rgba(0,0,0,.25);
 }
-
 
       `}</style>
     </div>

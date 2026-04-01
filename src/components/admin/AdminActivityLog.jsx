@@ -57,6 +57,8 @@ const typeLabels = {
   hub_word_formation_started: "Hub word formation started",
   hub_word_formation_review_loaded: "Hub word formation review loaded",
   hub_word_formation_completed: "Hub word formation completed",
+  collocation_dash_started: "Collocation Dash started",
+  collocation_dash_completed: "Collocation Dash completed",
   writing_p1_guide_activity_started: "Writing P1 guide activity started",
   writing_p4_register_guide_activity_started: "Writing P4 register guide activity started",
   };
@@ -302,6 +304,12 @@ case "hub_word_formation_review_loaded":
 
 case "hub_word_formation_completed":
   return `${d.mode || "normal"} · ${d.correct ?? "?"}/${d.total ?? "?"} correct`;
+
+case "collocation_dash_started":
+  return `${d.roundsPlanned ?? "?"} round${d.roundsPlanned === 1 ? "" : "s"} · ${d.roundSeconds ?? "?"}s`;
+
+case "collocation_dash_completed":
+  return `${d.score ?? "?"} pts · round ${d.roundsReached ?? "?"} · ${d.reviewCount ?? "?"} review`;
       
       case "writing_submitted": {
         const part = d.part || "?";
