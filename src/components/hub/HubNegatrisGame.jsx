@@ -173,8 +173,8 @@ function getLaneIndexFromPercent(xPercent) {
 function wrapPercent(value, min, max) {
   const range = max - min;
   if (range <= 0) return min;
-  if (value < min) return max - (min - value);
-  if (value > max) return min + (value - max);
+  if (value < min) return max;
+  if (value > max) return min;
   return value;
 }
 
@@ -282,6 +282,17 @@ export default function HubNegatrisGame() {
 
   useEffect(() => {
     activeWordRef.current = activeWord;
+  }, [activeWord]);
+
+  useEffect(() => {
+    if (!activeWord?.wrapJump) return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      setActiveWord((current) => {
+        if (!current || current.id !== activeWord.id || !current.wrapJump) return current;
+        return { ...current, wrapJump: false };
+      });
+    });
+    return () => window.cancelAnimationFrame(frame);
   }, [activeWord]);
 
   useEffect(() => {
@@ -627,6 +638,9 @@ export default function HubNegatrisGame() {
       return {
         ...current,
         xPercent: wrapPercent(current.xPercent + direction * boardMetrics.moveStepPercent, wrapMin, wrapMax),
+        wrapJump:
+          current.xPercent + direction * boardMetrics.moveStepPercent < wrapMin ||
+          current.xPercent + direction * boardMetrics.moveStepPercent > wrapMax,
       };
     });
   }
@@ -807,7 +821,7 @@ export default function HubNegatrisGame() {
                 ) : null}
                 {activeWord ? (
                   <div
-                    className={`falling-word ${activeWord.resolved ? "resolved" : ""} ${impactState?.correct ? "is-correct" : ""} ${impactState && !impactState.correct ? "is-wrong" : ""}`}
+                    className={`falling-word ${activeWord.resolved ? "resolved" : ""} ${activeWord.wrapJump ? "wrap-jump" : ""} ${impactState?.correct ? "is-correct" : ""} ${impactState && !impactState.correct ? "is-wrong" : ""}`}
                     style={{
                       left: wordLeft,
                       "--fall-duration": `${activeWord.durationMs}ms`,
@@ -861,6 +875,12 @@ export default function HubNegatrisGame() {
                     />
                   </svg>
                 </button>
+                <img
+                  src="/images/games/negatris-title.png"
+                  alt="Negatris"
+                  className="control-logo"
+                  draggable="false"
+                />
                 <button
                   className="control-btn"
                   onMouseDown={() => startMoveHold(1)}
@@ -1259,6 +1279,10 @@ export default function HubNegatrisGame() {
           animation: fall-word var(--fall-duration) linear forwards;
         }
 
+        .falling-word.wrap-jump {
+          transition: none;
+        }
+
         .falling-word.resolved {
           z-index: 2;
           animation: none;
@@ -1322,18 +1346,21 @@ export default function HubNegatrisGame() {
 
         .lane-button {
           height: 100%;
-          border-radius: var(--bucket-radius);
+          border-radius: calc(var(--bucket-radius) + 2px);
           background:
-            linear-gradient(180deg, rgba(255,255,255,0.1), rgba(255,255,255,0) 36%),
-            linear-gradient(180deg, #79dfa5 0%, #63cdb9 42%, #57a9ea 100%);
+            linear-gradient(180deg, rgba(138, 248, 255, 0.12), rgba(138, 248, 255, 0) 24%),
+            linear-gradient(180deg, #14265f 0%, #111d4b 44%, #0b1331 100%);
           color: white;
           font-size: var(--bucket-font-size);
           line-height: 1;
           font-weight: 900;
           box-shadow:
-            inset 0 1px 0 rgba(255,255,255,.22),
-            inset 0 -5px 0 rgba(10, 25, 45, 0.18),
-            0 4px 10px rgba(0,0,0,.16);
+            inset 0 1px 0 rgba(255,255,255,.12),
+            inset 0 -10px 18px rgba(2, 7, 22, 0.72),
+            0 0 0 2px rgba(18, 55, 124, 0.92),
+            0 0 14px rgba(0, 191, 255, 0.22),
+            0 10px 18px rgba(0,0,0,.22);
+          border: 2px solid rgba(46, 224, 255, 0.94);
           touch-action: manipulation;
           display: flex;
           align-items: center;
@@ -1346,50 +1373,138 @@ export default function HubNegatrisGame() {
         .lane-button::before {
           content: "";
           position: absolute;
-          inset: 3px 3px auto;
-          height: 34%;
-          border-radius: calc(var(--bucket-radius) - 4px);
-          background: linear-gradient(180deg, rgba(255,255,255,.14), rgba(255,255,255,0));
+          left: 9%;
+          right: 9%;
+          top: 10%;
+          height: 22%;
+          border-radius: 10px;
+          background: linear-gradient(180deg, rgba(153, 244, 255, .24), rgba(153, 244, 255, 0));
           pointer-events: none;
         }
 
         .lane-button::after {
           content: "";
           position: absolute;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          height: 18%;
-          background: linear-gradient(180deg, rgba(7, 18, 36, 0), rgba(7, 18, 36, .22));
+          left: 10%;
+          right: 10%;
+          bottom: 8%;
+          height: 16%;
+          border-radius: 999px;
+          background: radial-gradient(circle, rgba(35, 218, 255, .78), rgba(35, 218, 255, 0) 72%);
+          opacity: .9;
           pointer-events: none;
+        }
+
+        .lane-button:nth-child(2),
+        .lane-button:nth-child(4),
+        .lane-button:nth-child(5),
+        .lane-button:nth-child(6) {
+          border-color: rgba(89, 173, 255, 0.95);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.12),
+            inset 0 -10px 18px rgba(3, 10, 29, 0.72),
+            0 0 0 2px rgba(26, 47, 116, 0.92),
+            0 0 16px rgba(85, 150, 255, 0.24),
+            0 10px 18px rgba(0,0,0,.22);
+        }
+
+        .lane-button:nth-child(2)::before,
+        .lane-button:nth-child(4)::before,
+        .lane-button:nth-child(5)::before,
+        .lane-button:nth-child(6)::before {
+          background: linear-gradient(180deg, rgba(171, 213, 255, .24), rgba(171, 213, 255, 0));
+        }
+
+        .lane-button:nth-child(2)::after,
+        .lane-button:nth-child(4)::after,
+        .lane-button:nth-child(5)::after,
+        .lane-button:nth-child(6)::after {
+          background: radial-gradient(circle, rgba(85, 150, 255, .82), rgba(85, 150, 255, 0) 72%);
+        }
+
+        .lane-button:nth-child(3) {
+          border-color: rgba(198, 78, 255, 0.94);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.12),
+            inset 0 -10px 18px rgba(14, 4, 27, 0.72),
+            0 0 0 2px rgba(74, 32, 122, 0.92),
+            0 0 16px rgba(201, 70, 255, 0.24),
+            0 10px 18px rgba(0,0,0,.22);
+        }
+
+        .lane-button:nth-child(3)::before {
+          background: linear-gradient(180deg, rgba(229, 151, 255, .24), rgba(229, 151, 255, 0));
+        }
+
+        .lane-button:nth-child(3)::after {
+          background: radial-gradient(circle, rgba(214, 92, 255, .82), rgba(214, 92, 255, 0) 72%);
         }
 
         .lane-button span {
           position: relative;
           z-index: 1;
-          display: block;
-          transform: translateY(2px);
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 56%;
+          padding: .18rem .42rem .22rem;
+          border-radius: 10px;
+          background: linear-gradient(180deg, rgba(34, 58, 126, 0.96), rgba(22, 37, 87, 0.98));
+          border: 2px solid rgba(111, 220, 255, 0.85);
+          transform: translateY(-12%);
           letter-spacing: -.01em;
           text-shadow: 0 1px 0 rgba(0,0,0,.12);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.12),
+            0 0 10px rgba(26, 184, 255, 0.16);
+        }
+
+        .lane-button:nth-child(2) span,
+        .lane-button:nth-child(4) span,
+        .lane-button:nth-child(5) span,
+        .lane-button:nth-child(6) span {
+          border-color: rgba(133, 191, 255, 0.86);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.12),
+            0 0 10px rgba(85, 150, 255, 0.18);
+        }
+
+        .lane-button:nth-child(3) span {
+          border-color: rgba(226, 132, 255, 0.84);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.12),
+            0 0 10px rgba(198, 83, 255, 0.16);
         }
 
         .lane-button.active {
-          outline: 3px solid rgba(255, 207, 64, 0.85);
-          transform: translateY(-1px);
+          outline: 3px solid rgba(255, 207, 64, 0.92);
+          transform: translateY(-1px) scale(1.01);
         }
 
         .lane-button.flash-correct {
           background:
-            linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0) 36%),
-            linear-gradient(180deg, #91f6a2 0%, #54dc79 48%, #28be69 100%);
-          box-shadow: 0 0 0 3px rgba(122, 245, 143, 0.18);
+            linear-gradient(180deg, rgba(208,255,194,0.16), rgba(208,255,194,0) 26%),
+            linear-gradient(180deg, #16593f 0%, #114531 48%, #0b2f22 100%);
+          border-color: rgba(132, 255, 176, 0.96);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.12),
+            inset 0 -10px 18px rgba(3, 20, 11, 0.72),
+            0 0 0 2px rgba(14, 72, 39, 0.92),
+            0 0 18px rgba(122, 245, 143, 0.3),
+            0 10px 18px rgba(0,0,0,.22);
         }
 
         .lane-button.flash-incorrect {
           background:
-            linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0) 36%),
-            linear-gradient(180deg, #ffb2a2 0%, #ff7d7d 45%, #f14f68 100%);
-          box-shadow: 0 0 0 3px rgba(255, 106, 106, 0.15);
+            linear-gradient(180deg, rgba(255,208,208,0.12), rgba(255,208,208,0) 26%),
+            linear-gradient(180deg, #6f2238 0%, #54192a 48%, #3a111d 100%);
+          border-color: rgba(255, 132, 132, 0.96);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,.1),
+            inset 0 -10px 18px rgba(23, 4, 9, 0.72),
+            0 0 0 2px rgba(92, 25, 39, 0.92),
+            0 0 18px rgba(255, 106, 106, 0.28),
+            0 10px 18px rgba(0,0,0,.22);
         }
 
         .impact-badge {
@@ -1540,61 +1655,94 @@ export default function HubNegatrisGame() {
 
         .control-row {
           display: flex;
-          justify-content: space-between;
+          justify-content: center;
           align-items: center;
-          gap: 1.5rem;
+          gap: 1rem;
           margin-top: 1rem;
-          padding: 0 .4rem;
+          padding: 0 1.15rem;
+        }
+
+        .control-logo {
+          width: min(170px, 28%);
+          height: auto;
+          object-fit: contain;
+          filter: drop-shadow(0 8px 14px rgba(0, 0, 0, 0.28));
+          user-select: none;
+          pointer-events: none;
+          flex: 0 0 auto;
         }
 
         .control-btn {
-          width: 88px;
-          height: 88px;
-          border-radius: 50%;
+          width: 104px;
+          height: 96px;
+          clip-path: polygon(22% 6%, 78% 6%, 96% 50%, 78% 94%, 22% 94%, 4% 50%);
           background:
-            radial-gradient(circle at 30% 28%, rgba(255,255,255,.38), rgba(255,255,255,0) 34%),
-            linear-gradient(180deg, #87ddff 0%, #66bdf3 48%, #4d8ce9 100%);
-          border: 2px solid rgba(255,255,255,0.22);
+            linear-gradient(180deg, rgba(119, 228, 255, .22), rgba(119, 228, 255, 0) 24%),
+            linear-gradient(180deg, #203c93 0%, #182f78 48%, #11245a 100%);
+          border: none;
           box-shadow:
-            inset 0 2px 0 rgba(255,255,255,.28),
-            inset 0 -8px 16px rgba(18, 53, 112, 0.28),
-            0 10px 18px rgba(0,0,0,.2),
-            0 0 0 3px rgba(92, 167, 241, .12);
+            inset 0 1px 0 rgba(255,255,255,.14),
+            inset 0 -10px 18px rgba(10, 21, 54, 0.55),
+            0 0 0 2px rgba(14, 36, 86, 0.95),
+            0 0 0 4px rgba(15, 193, 255, .16),
+            0 0 18px rgba(15, 193, 255, .24),
+            0 10px 18px rgba(0,0,0,.22);
           touch-action: manipulation;
           position: relative;
           overflow: hidden;
+          display: grid;
+          place-items: center;
         }
 
         .control-btn::before {
           content: "";
           position: absolute;
-          inset: 8px;
-          border-radius: 50%;
-          border: 1px solid rgba(255,255,255,.18);
+          inset: 10px;
+          clip-path: polygon(22% 7%, 78% 7%, 95% 50%, 78% 93%, 22% 93%, 5% 50%);
+          border: 2px solid rgba(41, 222, 255, 0.82);
+          background: linear-gradient(180deg, rgba(141, 237, 255, .1), rgba(141, 237, 255, 0));
+          pointer-events: none;
+        }
+
+        .control-btn::after {
+          content: "";
+          position: absolute;
+          left: 18%;
+          right: 18%;
+          bottom: 16%;
+          height: 16%;
+          border-radius: 999px;
+          background: radial-gradient(circle, rgba(28, 220, 255, .75), rgba(28, 220, 255, 0) 72%);
           pointer-events: none;
         }
 
         .control-btn:hover {
           transform: translateY(-1px);
           box-shadow:
-            inset 0 2px 0 rgba(255,255,255,.3),
-            inset 0 -8px 16px rgba(18, 53, 112, 0.24),
-            0 12px 20px rgba(0,0,0,.22),
-            0 0 0 3px rgba(92, 167, 241, .16);
+            inset 0 1px 0 rgba(255,255,255,.16),
+            inset 0 -10px 18px rgba(10, 21, 54, 0.52),
+            0 0 0 2px rgba(14, 36, 86, 0.95),
+            0 0 0 4px rgba(15, 193, 255, .2),
+            0 0 22px rgba(15, 193, 255, .3),
+            0 12px 20px rgba(0,0,0,.22);
         }
 
         .control-btn:active {
-          transform: translateY(2px) scale(0.98);
+          transform: translateY(2px) scale(0.985);
           box-shadow:
-            inset 0 2px 0 rgba(255,255,255,.18),
-            inset 0 -4px 12px rgba(18, 53, 112, 0.24),
+            inset 0 1px 0 rgba(255,255,255,.1),
+            inset 0 -6px 12px rgba(10, 21, 54, 0.42),
+            0 0 0 2px rgba(14, 36, 86, 0.95),
+            0 0 12px rgba(15, 193, 255, .18),
             0 5px 10px rgba(0,0,0,.18);
         }
 
         .control-icon {
-          width: 44%;
-          height: 44%;
+          width: 38%;
+          height: 38%;
           overflow: visible;
+          position: relative;
+          z-index: 1;
         }
 
         .control-icon-shadow,
@@ -1605,15 +1753,15 @@ export default function HubNegatrisGame() {
         }
 
         .control-icon-shadow {
-          stroke: rgba(16, 42, 84, 0.38);
-          stroke-width: 11;
+          stroke: rgba(3, 20, 54, 0.52);
+          stroke-width: 12;
           transform: translateY(3px);
         }
 
         .control-icon-main {
-          stroke: #f7fbff;
+          stroke: #58e7ff;
           stroke-width: 8;
-          filter: drop-shadow(0 1px 0 rgba(255,255,255,.12));
+          filter: drop-shadow(0 0 6px rgba(88, 231, 255, .42));
         }
 
         .control-btn:active .control-icon {
@@ -1728,17 +1876,20 @@ export default function HubNegatrisGame() {
           }
 
           .control-row {
-            justify-content: space-between;
-            gap: .75rem;
-            padding: 0;
+            justify-content: center;
+            gap: .45rem;
+            padding: 0 .2rem;
           }
 
           .control-btn {
-            flex: 1;
-            max-width: none;
+            flex: 0 1 42%;
+            max-width: 148px;
             width: auto;
-            height: 68px;
-            border-radius: 999px;
+            height: 72px;
+          }
+
+          .control-logo {
+            width: min(112px, 24%);
           }
 
           .control-icon {
