@@ -18,6 +18,9 @@ const DEFAULT_BOARD_WIDTH = 640;
 const START_TOP = "-12%";
 const IMPACT_TOP = "82%";
 const LEADERBOARD_GAME_ID = "hub_negatris";
+const MAX_SPEED_SCORE = 700;
+const MIN_FALL_DURATION_MS = 900;
+const MIN_SPAWN_DELAY_MS = 90;
 const NEGATRIS_TRACKS = [
   "/sounds/negatris-track-1.mp3",
   "/sounds/negatris-track-2.mp3",
@@ -141,21 +144,17 @@ function shuffle(array) {
 }
 
 function getWordDuration(score) {
-  const points = Math.max(0, score);
-  const tier = Math.floor(points / 50);
-  const withinTier = points % 50;
-  const baseDuration = 5200 - tier * 340;
-  const rampWithinTier = withinTier * 18;
-  return Math.max(1320, baseDuration - rampWithinTier);
+  const points = clamp(score, 0, MAX_SPEED_SCORE);
+  const progress = points / MAX_SPEED_SCORE;
+  const eased = 1 - Math.pow(1 - progress, 1.7);
+  return Math.round(5200 - (5200 - MIN_FALL_DURATION_MS) * eased);
 }
 
 function getSpawnDelay(score) {
-  const points = Math.max(0, score);
-  const tier = Math.floor(points / 50);
-  const withinTier = points % 50;
-  const baseDelay = 520 - tier * 38;
-  const rampWithinTier = withinTier * 1.4;
-  return Math.max(160, Math.round(baseDelay - rampWithinTier));
+  const points = clamp(score, 0, MAX_SPEED_SCORE);
+  const progress = points / MAX_SPEED_SCORE;
+  const eased = 1 - Math.pow(1 - progress, 1.55);
+  return Math.round(520 - (520 - MIN_SPAWN_DELAY_MS) * eased);
 }
 
 function clamp(value, min, max) {

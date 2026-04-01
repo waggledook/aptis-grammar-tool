@@ -267,9 +267,9 @@ export const coreGrammarKey = {
               {
                 label: "16",
                 prompt: "You really ______ to study harder if you hope to pass the exam!",
-                answer: "should",
+                answer: "ought",
                 explanation:
-                  "Correct: advice/recommendation → 'should'. 'Must' is stronger (obligation); 'ought' is possible but normally 'ought to' is needed, so the option 'ought' alone doesn’t fit."
+                  "Correct: the sentence already includes 'to', so the natural form is 'ought' → 'You really ought to study harder...'. 'Should' would only work if the sentence were 'You really should study harder...' without 'to'."
               },
               {
                 label: "17",

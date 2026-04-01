@@ -492,6 +492,14 @@ export async function fetchTopHubGameScores(gameId, n = 10) {
   });
 }
 
+export async function deleteHubGameLeaderboardScore(gameId, scoreId) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Must be signed in");
+  if (!gameId || !scoreId) throw new Error("Missing leaderboard score reference");
+
+  await deleteDoc(doc(db, "leaderboards", gameId, "scores", scoreId));
+}
+
 // ─── GLOBAL ACTIVITY LOG ─────────────────────────────────────────────────────
 /**
  * Append a single activity event to /activityLog.

@@ -2,7 +2,11 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
-import { fetchMyTopHubGameScores, fetchTopHubGameScores } from "../../firebase.js";
+import {
+  deleteHubGameLeaderboardScore,
+  fetchMyTopHubGameScores,
+  fetchTopHubGameScores,
+} from "../../firebase.js";
 import {
   HUB_DEPENDENT_PREPOSITION_BANKS,
   HUB_DEPENDENT_PREPOSITION_LEVEL_ORDER,
@@ -15,7 +19,17 @@ function boardGameIdForDependent(levelId) {
   return `hub_dependent_prepositions_${levelId}`;
 }
 
-function BoardSection({ title, subtitle, personalScores, globalScores, user }) {
+function BoardSection({
+  title,
+  subtitle,
+  personalScores,
+  globalScores,
+  user,
+  deletingId,
+  onDeleteGlobalScore,
+}) {
+  const canModerate = user?.role === "admin";
+
   return (
     <section className="hub-game-board">
       <div className="hub-game-board-head">
@@ -55,6 +69,16 @@ function BoardSection({ title, subtitle, personalScores, globalScores, user }) {
                   <span>#{index + 1}</span>
                   <em>{entry.displayName}</em>
                   <strong>{entry.score}</strong>
+                  {canModerate ? (
+                    <button
+                      type="button"
+                      className="hub-game-board-delete"
+                      onClick={() => onDeleteGlobalScore?.(entry)}
+                      disabled={deletingId === entry.id}
+                    >
+                      {deletingId === entry.id ? "Deleting..." : "Delete"}
+                    </button>
+                  ) : null}
                 </div>
               ))}
             </div>
@@ -76,6 +100,7 @@ export default function HubGameLeaderboards({ user }) {
   const [spanglishGlobal, setSpanglishGlobal] = useState([]);
   const [dependentPersonal, setDependentPersonal] = useState([]);
   const [dependentGlobal, setDependentGlobal] = useState([]);
+  const [deletingScoreKey, setDeletingScoreKey] = useState("");
 
   const activeDependentLevel = useMemo(
     () => HUB_DEPENDENT_PREPOSITION_BANKS[activePrepsLevel],
@@ -152,6 +177,33 @@ export default function HubGameLeaderboards({ user }) {
     };
   }, [activePrepsLevel, user?.uid]);
 
+  async function handleDeleteGlobalScore(gameId, entry, setRows) {
+    if (!user || user.role !== "admin" || !entry?.id) return;
+
+    const confirmed = window.confirm(
+      `Delete ${entry.displayName || "this player"}'s ${entry.score} score from the global leaderboard?`,
+    );
+    if (!confirmed) return;
+
+    const deleteKey = `${gameId}:${entry.id}`;
+    setDeletingScoreKey(deleteKey);
+
+    try {
+      await deleteHubGameLeaderboardScore(gameId, entry.id);
+      setRows((prev) => prev.filter((row) => row.id !== entry.id));
+    } catch (error) {
+      console.error("[HubGameLeaderboards] Leaderboard delete failed", error);
+      window.alert("Could not delete that leaderboard score.");
+    } finally {
+      setDeletingScoreKey("");
+    }
+  }
+
+  function getDeletingIdFor(gameId) {
+    if (!deletingScoreKey.startsWith(`${gameId}:`)) return "";
+    return deletingScoreKey.slice(gameId.length + 1);
+  }
+
   return (
     <div className="menu-wrapper hub-game-leaderboards-wrapper">
       <Seo
@@ -179,6 +231,8 @@ export default function HubGameLeaderboards({ user }) {
         personalScores={negatrisPersonal}
         globalScores={negatrisGlobal}
         user={user}
+        deletingId={getDeletingIdFor(NEGATRIS_GAME_ID)}
+        onDeleteGlobalScore={(entry) => handleDeleteGlobalScore(NEGATRIS_GAME_ID, entry, setNegatrisGlobal)}
       />
 
       <BoardSection
@@ -187,6 +241,8 @@ export default function HubGameLeaderboards({ user }) {
         personalScores={spanglishPersonal}
         globalScores={spanglishGlobal}
         user={user}
+        deletingId={getDeletingIdFor(SPANGLISH_GAME_ID)}
+        onDeleteGlobalScore={(entry) => handleDeleteGlobalScore(SPANGLISH_GAME_ID, entry, setSpanglishGlobal)}
       />
 
       <section className="hub-game-board">
@@ -246,6 +302,24 @@ export default function HubGameLeaderboards({ user }) {
                     <span>#{index + 1}</span>
                     <em>{entry.displayName}</em>
                     <strong>{entry.score}</strong>
+                    {user?.role === "admin" ? (
+                      <button
+                        type="button"
+                        className="hub-game-board-delete"
+                        onClick={() =>
+                          handleDeleteGlobalScore(
+                            boardGameIdForDependent(activePrepsLevel),
+                            entry,
+                            setDependentGlobal,
+                          )
+                        }
+                        disabled={getDeletingIdFor(boardGameIdForDependent(activePrepsLevel)) === entry.id}
+                      >
+                        {getDeletingIdFor(boardGameIdForDependent(activePrepsLevel)) === entry.id
+                          ? "Deleting..."
+                          : "Delete"}
+                      </button>
+                    ) : null}
                   </div>
                 ))}
               </div>
@@ -372,6 +446,10 @@ export default function HubGameLeaderboards({ user }) {
           color: rgba(230, 240, 255, 0.9);
         }
 
+        .hub-game-board-row.is-global {
+          grid-template-columns: auto minmax(0, 1fr) auto auto;
+        }
+
         .hub-game-board-row em {
           font-style: normal;
           opacity: .88;
@@ -383,6 +461,22 @@ export default function HubGameLeaderboards({ user }) {
         .hub-game-board-empty {
           margin: 0;
           color: rgba(230, 240, 255, 0.72);
+        }
+
+        .hub-game-board-delete {
+          border: 1px solid rgba(255, 122, 122, 0.45);
+          background: rgba(78, 24, 39, 0.58);
+          color: #ffd5d5;
+          border-radius: 999px;
+          padding: 0.42rem 0.72rem;
+          font-size: 0.82rem;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .hub-game-board-delete:disabled {
+          opacity: 0.65;
+          cursor: wait;
         }
 
         .hub-game-levels {
