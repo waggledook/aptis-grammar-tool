@@ -216,6 +216,8 @@ export default function HubNegatrisGame() {
   const gameOverSoundRef = useRef(null);
   const scoreSavedRef = useRef(false);
   const activityLoggedRef = useRef({ started: false, completed: false });
+  const touchRepeatTimeoutRef = useRef(null);
+  const touchLockRef = useRef(false);
 
   const [user, setUser] = useState(null);
   const [mode, setMode] = useState("intro");
@@ -364,6 +366,8 @@ export default function HubNegatrisGame() {
       if (pendingNextWordRef.current) window.clearTimeout(pendingNextWordRef.current);
       if (resolveTimeoutRef.current) window.clearTimeout(resolveTimeoutRef.current);
       if (controlHoldRef.current) window.clearInterval(controlHoldRef.current);
+      if (touchRepeatTimeoutRef.current) window.clearTimeout(touchRepeatTimeoutRef.current);
+      touchLockRef.current = false;
       if (musicRef.current) {
         musicRef.current.pause();
         musicRef.current.currentTime = 0;
@@ -513,6 +517,7 @@ export default function HubNegatrisGame() {
     activityLoggedRef.current.completed = false;
     if (pendingNextWordRef.current) window.clearTimeout(pendingNextWordRef.current);
     if (resolveTimeoutRef.current) window.clearTimeout(resolveTimeoutRef.current);
+    if (touchRepeatTimeoutRef.current) window.clearTimeout(touchRepeatTimeoutRef.current);
     setScore(0);
     setLives(3);
     setStreak(0);
@@ -648,13 +653,38 @@ export default function HubNegatrisGame() {
   function startMoveHold(direction) {
     moveWord(direction);
     if (controlHoldRef.current) window.clearInterval(controlHoldRef.current);
+    if (touchRepeatTimeoutRef.current) window.clearTimeout(touchRepeatTimeoutRef.current);
+
+    const isTouchDevice =
+      typeof window !== "undefined" &&
+      ("ontouchstart" in window || navigator.maxTouchPoints > 0);
+
+    if (isTouchDevice) {
+      return;
+    }
+
     controlHoldRef.current = window.setInterval(() => moveWord(direction), 95);
+  }
+
+  function handleTouchMove(direction, event) {
+    event.preventDefault();
+    touchLockRef.current = true;
+    startMoveHold(direction);
   }
 
   function stopMoveHold() {
     if (controlHoldRef.current) {
       window.clearInterval(controlHoldRef.current);
       controlHoldRef.current = null;
+    }
+    if (touchRepeatTimeoutRef.current) {
+      window.clearTimeout(touchRepeatTimeoutRef.current);
+      touchRepeatTimeoutRef.current = null;
+    }
+    if (touchLockRef.current) {
+      window.setTimeout(() => {
+        touchLockRef.current = false;
+      }, 80);
     }
   }
 
@@ -880,10 +910,13 @@ export default function HubNegatrisGame() {
               <div className="control-row">
                 <button
                   className="control-btn"
-                  onMouseDown={() => startMoveHold(-1)}
+                  onMouseDown={() => {
+                    if (touchLockRef.current) return;
+                    startMoveHold(-1);
+                  }}
                   onMouseUp={stopMoveHold}
                   onMouseLeave={stopMoveHold}
-                  onTouchStart={() => startMoveHold(-1)}
+                  onTouchStart={(event) => handleTouchMove(-1, event)}
                   onTouchEnd={stopMoveHold}
                   aria-label="Move left"
                 >
@@ -906,10 +939,13 @@ export default function HubNegatrisGame() {
                 />
                 <button
                   className="control-btn"
-                  onMouseDown={() => startMoveHold(1)}
+                  onMouseDown={() => {
+                    if (touchLockRef.current) return;
+                    startMoveHold(1);
+                  }}
                   onMouseUp={stopMoveHold}
                   onMouseLeave={stopMoveHold}
-                  onTouchStart={() => startMoveHold(1)}
+                  onTouchStart={(event) => handleTouchMove(1, event)}
                   onTouchEnd={stopMoveHold}
                   aria-label="Move right"
                 >
@@ -2126,6 +2162,14 @@ export default function HubNegatrisGame() {
 
           .game-stage {
             border-radius: 18px;
+          }
+
+          .falling-word {
+            transform: translateX(-50%) scale(0.82);
+          }
+
+          .falling-word.resolved {
+            transform: translateX(-50%) scale(0.78);
           }
 
           .life-popup {
