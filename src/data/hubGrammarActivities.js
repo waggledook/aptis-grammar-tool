@@ -108,6 +108,37 @@ const placeholderChoiceGapItem = (
   };
 };
 
+const commaPlacementItem = (id, prompt, sentence, needsCommas, corrected, explanation) => {
+  const words = String(sentence || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const correctedWords = String(corrected || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+
+  const commaPositions = correctedWords.reduce((positions, token, index) => {
+    if (index < words.length - 1 && token.includes(",")) {
+      positions.push(index);
+    }
+    return positions;
+  }, []);
+
+  return {
+    id,
+    type: "comma-placement",
+    prompt,
+    sentence,
+    words,
+    needsCommas,
+    corrected,
+    commaPositions,
+    explanation,
+  };
+};
+
 export const HUB_GRAMMAR_ACTIVITIES = [
   {
     id: "second-conditional-reformulation",
@@ -352,7 +383,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
           },
           {
             id: "g2",
-            acceptedAnswers: ["is wearing"],
+            acceptedAnswers: ["is wearing", "'s wearing"],
             feedback: "Use the present continuous for today's temporary situation.",
           },
         ],
@@ -382,7 +413,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
           },
           {
             id: "g2",
-            acceptedAnswers: ["is taking", "takes"],
+            acceptedAnswers: ["is taking", "'s taking", "takes"],
             feedback: "The idea is a temporary arrangement this week, so 'is taking' is best. 'Takes' is also accepted as a practical variant.",
           },
         ],
@@ -2697,6 +2728,1676 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "I began watching TV at 7:00 and finished at 9:00.\nAt 8:00 last night, I __________ TV.",
         "was watching",
         "Use Past Continuous for an action in progress at a specific point in time."
+      ),
+    ],
+  },
+  {
+    id: "first-conditional-and-future-clauses",
+    title: "First Conditional & Future Time Clauses",
+    shortDescription: "Master 'if', 'unless', 'when', 'until', and 'as soon as'.",
+    levels: ["b1"],
+    intro:
+      "Practice using the present tense after 'if', 'unless', and time expressions like 'when' or 'as soon as' to talk about the future.",
+    items: [
+      errorCorrectionItem(
+        "fc-ec-1",
+        "Check the highlighted phrase for errors.",
+        "If you will work hard, you'll pass your exams.",
+        "will work",
+        false,
+        "work",
+        "We use the present tense, not the future, after 'if' in first conditional sentences."
+      ),
+      errorCorrectionItem(
+        "fc-ec-2",
+        "Check the highlighted phrase for errors.",
+        "I'll have a quick lunch before I leave.",
+        "before I leave",
+        true,
+        "",
+        "Correct. We use the present simple after 'before' when talking about the future."
+      ),
+      errorCorrectionItem(
+        "fc-ec-3",
+        "Check the highlighted phrase for errors.",
+        "Alison won't get into university unless she will get good grades.",
+        "will get",
+        false,
+        "gets",
+        "Use the present simple after 'unless' to talk about a future condition."
+      ),
+      errorCorrectionItem(
+        "fc-ec-4",
+        "Check the highlighted phrase for errors.",
+        "As soon as you get your exam results, call me.",
+        "call me",
+        true,
+        "",
+        "Correct. You can use an imperative instead of a 'will' clause in conditionals."
+      ),
+      errorCorrectionItem(
+        "fc-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I won't go to bed until you will come home.",
+        "will come",
+        false,
+        "come",
+        "Use the present simple, not 'will', after 'until'."
+      ),
+      multipleChoiceItem(
+        "fc-mc-1",
+        "Choose the correct word.",
+        "I won't go ____ you go too.",
+        ["unless", "if", "until"],
+        0,
+        "Use 'unless' to mean 'if... not'."
+      ),
+      multipleChoiceItem(
+        "fc-mc-2",
+        "Choose the correct verb form.",
+        "That girl ____ into trouble if she doesn't wear her uniform.",
+        ["gets", "will get", "got"],
+        1,
+        "Use 'will + infinitive' for the consequence in a first conditional sentence."
+      ),
+      multipleChoiceItem(
+        "fc-mc-3",
+        "Choose the correct word.",
+        "Don't turn over the exam paper ____ the teacher tells you to.",
+        ["after", "until", "when"],
+        1,
+        "Use 'until' to mean 'up to that time'."
+      ),
+      multipleChoiceItem(
+        "fc-mc-4",
+        "Choose the correct verb form.",
+        "I'll look for a job after I ____ back from holiday.",
+        ["will come", "come", "am coming"],
+        1,
+        "Use the present simple after 'after' when referring to future time."
+      ),
+      multipleChoiceItem(
+        "fc-mc-5",
+        "Choose the correct word.",
+        "The job is very urgent, so please do it ____ you can.",
+        ["as soon as", "until", "before"],
+        0,
+        "Use 'as soon as' to mean 'at the moment that'."
+      ),
+      placeholderGapItem(
+        "fc-gf-1",
+        "Complete with the present simple or 'will' form.",
+        "If you __________ in your homework late, the teacher won't mark it. (hand)",
+        "hand",
+        [],
+        "Use the present simple after 'if'."
+      ),
+      placeholderGapItem(
+        "fc-gf-2",
+        "Complete with the present simple or 'will' form.",
+        "Gary __________ expelled if his behaviour doesn't improve. (be)",
+        "will be",
+        ["'ll be"],
+        "Use 'will' for the result clause."
+      ),
+      placeholderGapItem(
+        "fc-gf-3",
+        "Complete with the present simple or 'will' form.",
+        "They'll be late for school unless they __________. (hurry)",
+        "hurry",
+        [],
+        "Use the present simple after 'unless'."
+      ),
+      placeholderGapItem(
+        "fc-gf-4",
+        "Complete with the present simple or 'will' form.",
+        "Ask me if you __________ what to do. (not know)",
+        "don't know",
+        ["do not know"],
+        "Use the present simple after 'if'."
+      ),
+      placeholderGapItem(
+        "fc-gf-5",
+        "Complete with the present simple or 'will' form.",
+        "Johnny __________ punished if he shouts at the teacher again. (be)",
+        "will be",
+        ["'ll be"],
+        "The result clause uses 'will'."
+      ),
+      placeholderGapItem(
+        "fc-gf-6",
+        "Complete with the present simple or 'will' form.",
+        "My sister __________ university this year if she passes all her exams. (finish)",
+        "will finish",
+        ["'ll finish"],
+        "The result clause uses 'will'."
+      ),
+      placeholderGapItem(
+        "fc-gf-7",
+        "Complete with the present simple or 'will' form.",
+        "I __________ tonight unless I finish my homework quickly. (not go out)",
+        "won't go out",
+        ["will not go out"],
+        "Use 'will not' in the negative result clause."
+      ),
+      placeholderGapItem(
+        "fc-gf-8",
+        "Complete with the present simple or 'will' form.",
+        "Call me if you __________ some help with your project. (need)",
+        "need",
+        [],
+        "Use the present simple after 'if'."
+      ),
+      placeholderGapItem(
+        "fc-gf-9",
+        "Complete with the present simple or 'will' form.",
+        "We'll stay in the library as soon as it __________. (open)",
+        "opens",
+        [],
+        "Use the present simple after 'as soon as'."
+      ),
+      placeholderGapItem(
+        "fc-gf-10",
+        "Complete with the present simple or 'will' form.",
+        "Give Mummy a kiss before she __________ to work. (go)",
+        "goes",
+        [],
+        "Use the present simple after 'before'."
+      ),
+      singleGap(
+        "fc-rf-1",
+        "Rewrite using 'unless'.",
+        [
+          "I won't go to the party if you don't come with me. -> I won't go to the party ",
+          { gapId: "g1" },
+          " with me.",
+        ],
+        ["unless you come"],
+        "Replace 'if... not' with 'unless' + present simple."
+      ),
+      singleGap(
+        "fc-rf-2",
+        "Complete the time clause.",
+        [
+          "I'm going to finish university. Then I'll travel. -> After I ",
+          { gapId: "g1" },
+          ", I'll probably travel.",
+        ],
+        ["finish university"],
+        "Use the present simple after 'after' to talk about the future."
+      ),
+      singleGap(
+        "fc-rf-3",
+        "Complete the sentence.",
+        [
+          "The teacher will be angry if we are late. -> If we are late, the teacher ",
+          { gapId: "g1" },
+          ".",
+        ],
+        ["will be angry", "'ll be angry"],
+        "Changing the order of the clauses doesn't change the tense pattern."
+      ),
+      singleGap(
+        "fc-rf-4",
+        "Rewrite using 'until'.",
+        [
+          "It's snowing. We can't go out yet. -> We won't go out ",
+          { gapId: "g1" },
+          " snowing.",
+        ],
+        ["until it stops"],
+        "Use 'until' + present simple for the time condition."
+      ),
+      singleGap(
+        "fc-rf-5",
+        "Complete the imperative conditional.",
+        [
+          "Have time? Come and see us. -> Come and see us next week if you ",
+          { gapId: "g1" },
+          ".",
+        ],
+        ["have time"],
+        "Use the present simple after 'if' even with an imperative main clause."
+      ),
+    ],
+  },
+  {
+    id: "modals-of-deduction",
+    title: "Modals of Deduction",
+    shortDescription: "Practise must, might, and can't for present deduction.",
+    levels: ["b1"],
+    intro:
+      "Use 'must', 'might', and 'can't' to make deductions about the present, including actions happening now.",
+    items: [
+      multipleChoiceItem(
+        "md-mc-1",
+        "Choose the correct option.",
+        "All the lights are off and there’s no car outside. They ____ at home.",
+        ["must be", "might be", "can't be"],
+        2,
+        "Use 'can't be' when you are sure something is not true based on the evidence."
+      ),
+      multipleChoiceItem(
+        "md-mc-2",
+        "Choose the correct option.",
+        "Anna’s been studying medicine for six years. She ____ a doctor by now.",
+        ["can't be", "might be", "must be"],
+        2,
+        "Use 'must be' when the evidence makes you feel sure something is true."
+      ),
+      multipleChoiceItem(
+        "md-mc-3",
+        "Choose the correct option.",
+        "I’m not sure where Leo is. He ____ at the gym, but I haven’t checked.",
+        ["must be", "might be", "can't be"],
+        1,
+        "Use 'might be' when something is possible, but you are not sure."
+      ),
+      multipleChoiceItem(
+        "md-mc-4",
+        "Choose the correct option.",
+        "That girl ____ a university student — she looks about twelve.",
+        ["must be", "might be", "can't be"],
+        2,
+        "Use 'can't be' when you think something is impossible or clearly untrue."
+      ),
+      multipleChoiceItem(
+        "md-mc-5",
+        "Choose the correct option.",
+        "Listen to that music! They ____ a party.",
+        ["must be having", "might have", "can't be having"],
+        0,
+        "Use 'must be having' when the evidence strongly suggests an action is happening now."
+      ),
+      multipleChoiceItem(
+        "md-mc-6",
+        "Choose the correct option.",
+        "She hasn’t replied to my messages. She ____ her phone.",
+        ["must lose", "might not have", "can't to have"],
+        1,
+        "Use 'might not have' when you think something is possibly not true. Here 'have' is a main verb."
+      ),
+      multipleChoiceItem(
+        "md-mc-7",
+        "Choose the correct option.",
+        "He’s wearing a wedding ring, so he ____ married.",
+        ["might be", "must be", "can't be"],
+        1,
+        "Use 'must be' for a strong logical deduction."
+      ),
+      multipleChoiceItem(
+        "md-mc-8",
+        "Choose the correct option.",
+        "Why isn’t Marta answering? She ____ asleep already; it's quite late.",
+        ["might be", "mustn't be", "can't be"],
+        0,
+        "Use 'might be' when something is a possible explanation."
+      ),
+      multipleChoiceItem(
+        "md-mc-9",
+        "Choose the correct option.",
+        "He drives a Ferrari and owns three houses. He ____ a lot of money.",
+        ["can't have", "might have", "must have"],
+        2,
+        "Use 'must have' when you are making a strong deduction about possession."
+      ),
+      multipleChoiceItem(
+        "md-mc-10",
+        "Choose the correct option.",
+        "She’s laughing and dancing with everyone. She ____ the party.",
+        ["can't be enjoying", "must be enjoying", "must enjoy"],
+        1,
+        "Use 'must be enjoying' when the evidence clearly suggests something is happening now."
+      ),
+      errorCorrectionItem(
+        "md-ec-1",
+        "Check the highlighted phrase for errors.",
+        "That man mustn't be a teacher — he’s wearing a police uniform.",
+        "mustn't be",
+        false,
+        "can't be",
+        "Use 'can't be' for deduction when you think something is impossible. 'Mustn't' is usually used for prohibition."
+      ),
+      errorCorrectionItem(
+        "md-ec-2",
+        "Check the highlighted phrase for errors.",
+        "I’m not sure where Eva is. She can be in the library.",
+        "can be",
+        false,
+        "might be",
+        "In this meaning, we use 'might' for possibility, not 'can'."
+      ),
+      errorCorrectionItem(
+        "md-ec-3",
+        "Check the highlighted phrase for errors.",
+        "Look at his suit and tie — he must be a businessman.",
+        "must be",
+        true,
+        "",
+        "This is correct. Use 'must be' for a strong deduction about the present."
+      ),
+      errorCorrectionItem(
+        "md-ec-4",
+        "Check the highlighted phrase for errors.",
+        "She might not likes that film. It’s not really her kind of thing.",
+        "might not likes",
+        false,
+        "might not like",
+        "After a modal verb, use the base form of the verb: 'might not like'."
+      ),
+      errorCorrectionItem(
+        "md-ec-5",
+        "Check the highlighted phrase for errors.",
+        "They must to be at home — the kitchen light is on.",
+        "must to be",
+        false,
+        "must be",
+        "After 'must', use the infinitive without 'to'."
+      ),
+      errorCorrectionItem(
+        "md-ec-6",
+        "Check the highlighted phrase for errors.",
+        "I’m not sure, but he might be working late tonight.",
+        "might be working",
+        true,
+        "",
+        "This is correct. We can use 'might be + -ing' for a possible action happening around now."
+      ),
+      errorCorrectionItem(
+        "md-ec-7",
+        "Check the highlighted phrase for errors.",
+        "That can’t be Jenny’s coat — hers is blue, not black.",
+        "can't be",
+        true,
+        "",
+        "This is correct. Use 'can't be' when you are sure something is not true."
+      ),
+      errorCorrectionItem(
+        "md-ec-8",
+        "Check the highlighted phrase for errors.",
+        "He must being very tired after that ten-hour journey.",
+        "must being",
+        false,
+        "must be",
+        "After 'must', use 'be', not 'being', unless you are forming 'must be + -ing'."
+      ),
+      errorCorrectionItem(
+        "md-ec-9",
+        "Check the highlighted phrase for errors.",
+        "She’s in a meeting, so she can’t answer her phone right now.",
+        "can't answer",
+        true,
+        "",
+        "This is correct. 'Can't' expresses impossibility here."
+      ),
+      errorCorrectionItem(
+        "md-ec-10",
+        "Check the highlighted phrase for errors.",
+        "They might not be at home — the lights are on in every room.",
+        "might not be",
+        false,
+        "must be",
+        "The evidence suggests a strong positive deduction, so 'must be' is better than 'might not be'."
+      ),
+      placeholderGapItem(
+        "md-rf-1",
+        "Complete the second sentence so that it has a similar meaning.",
+        "I’m sure he’s at work.\nHe __________ at work.",
+        "must be",
+        [],
+        "Use 'must be' when you are sure something is true."
+      ),
+      placeholderGapItem(
+        "md-rf-2",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Maybe she’s asleep.\nShe __________ asleep.",
+        "might be",
+        ["may be", "could be"],
+        "Use 'might be' for a possible explanation when you are not sure."
+      ),
+      placeholderGapItem(
+        "md-rf-3",
+        "Complete the second sentence so that it has a similar meaning.",
+        "I’m sure that isn’t their house.\nThat __________ their house.",
+        "can't be",
+        ["cannot be"],
+        "Use 'can't be' when you are sure something is not true."
+      ),
+      placeholderGapItem(
+        "md-rf-4",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Perhaps they’re having lunch.\nThey __________ lunch.",
+        "might be having",
+        ["may be having", "could be having"],
+        "Use 'might be + -ing' for a possible action happening now."
+      ),
+      placeholderGapItem(
+        "md-rf-5",
+        "Complete the second sentence so that it has a similar meaning.",
+        "I’m sure she has a lot of money.\nShe __________ a lot of money.",
+        "must have",
+        [],
+        "Use 'must have' here with 'have' as a main verb to express a strong deduction about possession."
+      ),
+      placeholderGapItem(
+        "md-rf-6",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Maybe he doesn’t like seafood.\nHe __________ seafood.",
+        "might not like",
+        ["may not like"],
+        "Use 'might not' when something is possibly not true."
+      ),
+      placeholderGapItem(
+        "md-rf-7",
+        "Complete the second sentence so that it has a similar meaning.",
+        "I’m sure they aren’t ready yet.\nThey __________ ready yet.",
+        "can't be",
+        ["cannot be"],
+        "Use 'can't be' for a strong negative deduction."
+      ),
+      placeholderGapItem(
+        "md-rf-8",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Perhaps your parents are watching TV.\nYour parents __________ TV.",
+        "might be watching",
+        ["may be watching", "could be watching"],
+        "Use 'might be + -ing' to talk about a possible action happening now."
+      ),
+    ],
+  },
+  {
+    id: "gerunds-and-infinitives",
+    title: "Gerunds and Infinitives",
+    shortDescription: "Practise gerunds, to-infinitives, and bare infinitives.",
+    levels: ["b1"],
+    intro:
+      "Work on common gerund, to-infinitive, and bare infinitive patterns in a mixed mini test.",
+    items: [
+      multipleChoiceItem(
+        "gi-mc-1",
+        "Choose the correct option.",
+        "I’m really good at ____ in a team.",
+        ["work", "to work", "working"],
+        2,
+        "Use the gerund after prepositions like 'at'."
+      ),
+      multipleChoiceItem(
+        "gi-mc-2",
+        "Choose the correct option.",
+        "She decided ____ early because she wasn’t feeling well.",
+        ["leave", "to leave", "leaving"],
+        1,
+        "Use the to-infinitive after 'decide'."
+      ),
+      multipleChoiceItem(
+        "gi-mc-3",
+        "Choose the correct option.",
+        "You must ____ your phone off during the exam.",
+        ["switch", "to switch", "switching"],
+        0,
+        "Use the bare infinitive after modal verbs like 'must'."
+      ),
+      multipleChoiceItem(
+        "gi-mc-4",
+        "Choose the correct option.",
+        "They enjoy ____ out for dinner at weekends.",
+        ["go", "to go", "going"],
+        2,
+        "Use the gerund after 'enjoy'."
+      ),
+      multipleChoiceItem(
+        "gi-mc-5",
+        "Choose the correct option.",
+        "My parents want me ____ medicine at university.",
+        ["study", "to study", "studying"],
+        1,
+        "Use verb + person + to-infinitive after 'want'."
+      ),
+      multipleChoiceItem(
+        "gi-mc-6",
+        "Choose the correct option.",
+        "This software is easy ____ once you get used to it.",
+        ["use", "to use", "using"],
+        1,
+        "Use the to-infinitive after adjectives like 'easy'."
+      ),
+      multipleChoiceItem(
+        "gi-mc-7",
+        "Choose the correct option.",
+        "The teacher made us ____ the exercise again.",
+        ["do", "to do", "doing"],
+        0,
+        "Use the bare infinitive after 'make' + object."
+      ),
+      multipleChoiceItem(
+        "gi-mc-8",
+        "Choose the correct option.",
+        "He’s thinking of ____ abroad for a year.",
+        ["work", "to work", "working"],
+        2,
+        "Use the gerund after prepositions like 'of'."
+      ),
+      multipleChoiceItem(
+        "gi-mc-9",
+        "Choose the correct option.",
+        "We went to the shop ____ some milk.",
+        ["buy", "to buy", "buying"],
+        1,
+        "Use the to-infinitive to express purpose."
+      ),
+      multipleChoiceItem(
+        "gi-mc-10",
+        "Choose the correct option.",
+        "My boss let me ____ home early yesterday.",
+        ["go", "to go", "going"],
+        0,
+        "Use the bare infinitive after 'let' + object."
+      ),
+      errorCorrectionItem(
+        "gi-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I’m interested in to learn more about graphic design.",
+        "in to learn",
+        false,
+        "in learning",
+        "Use the gerund after prepositions like 'in'."
+      ),
+      errorCorrectionItem(
+        "gi-ec-2",
+        "Check the highlighted phrase for errors.",
+        "She promised to call me after the meeting.",
+        "promised to call",
+        true,
+        "",
+        "This is correct. Use the to-infinitive after 'promise'."
+      ),
+      errorCorrectionItem(
+        "gi-ec-3",
+        "Check the highlighted phrase for errors.",
+        "You shouldn’t to tell him anything yet.",
+        "shouldn't to tell",
+        false,
+        "shouldn't tell",
+        "Use the bare infinitive after modal verbs like 'should'."
+      ),
+      errorCorrectionItem(
+        "gi-ec-4",
+        "Check the highlighted phrase for errors.",
+        "My parents don’t let me going out late on school nights.",
+        "let me going",
+        false,
+        "let me go",
+        "Use the bare infinitive after 'let' + object."
+      ),
+      errorCorrectionItem(
+        "gi-ec-5",
+        "Check the highlighted phrase for errors.",
+        "We agreed meeting outside the station at six.",
+        "agreed meeting",
+        false,
+        "agreed to meet",
+        "Use the to-infinitive after 'agree'."
+      ),
+      errorCorrectionItem(
+        "gi-ec-6",
+        "Check the highlighted phrase for errors.",
+        "She’s very good at solving practical problems.",
+        "at solving",
+        true,
+        "",
+        "This is correct. Use the gerund after prepositions like 'at'."
+      ),
+      placeholderGapItem(
+        "gi-gf-1",
+        "Fill the gap.",
+        "I can’t afford __________ a new laptop right now. (buy)",
+        "to buy",
+        [],
+        "Use the to-infinitive after 'afford'."
+      ),
+      placeholderGapItem(
+        "gi-gf-2",
+        "Fill the gap.",
+        "She suggested __________ a taxi because it was getting late. (take)",
+        "taking",
+        [],
+        "Use the gerund after 'suggest'."
+      ),
+      placeholderGapItem(
+        "gi-gf-3",
+        "Fill the gap.",
+        "You must __________ your passport with you at all times. (carry)",
+        "carry",
+        [],
+        "Use the bare infinitive after 'must'."
+      ),
+      placeholderGapItem(
+        "gi-gf-4",
+        "Fill the gap.",
+        "I’d like __________ abroad for a few years after university. (work)",
+        "to work",
+        [],
+        "Use the to-infinitive after 'would like'."
+      ),
+      placeholderGapItem(
+        "gi-gf-5",
+        "Fill the gap.",
+        "They spend a lot of time __________ for cheap flights online. (look)",
+        "looking",
+        [],
+        "Use the gerund after expressions like 'spend time'."
+      ),
+      placeholderGapItem(
+        "gi-gf-6",
+        "Fill the gap.",
+        "The film made me __________ really emotional. (feel)",
+        "feel",
+        [],
+        "Use the bare infinitive after 'make' + object."
+      ),
+      placeholderGapItem(
+        "gi-gf-7",
+        "Fill the gap.",
+        "He hopes __________ his driving test next month. (pass)",
+        "to pass",
+        [],
+        "Use the to-infinitive after 'hope'."
+      ),
+      placeholderGapItem(
+        "gi-gf-8",
+        "Fill the gap.",
+        "I don’t mind __________ late if the work is interesting. (stay)",
+        "staying",
+        [],
+        "Use the gerund after 'mind'."
+      ),
+    ],
+  },
+  {
+    id: "third-conditional-regrets",
+    title: "Third Conditional: Past Regrets",
+    shortDescription: "Master 'if + past perfect' and 'would have' for hypothetical pasts.",
+    levels: ["b1"],
+    intro:
+      "Use the third conditional to talk about things that didn't happen in the past and their hypothetical consequences. Remember: if + past perfect, ... would have + past participle.",
+    items: [
+      errorCorrectionItem(
+        "tc-ec-1",
+        "Check the highlighted phrase for errors.",
+        "If I would have known you were coming, I'd have made a cake.",
+        "would have known",
+        false,
+        "had known",
+        "We never use 'would have' in the if-clause. Use the past perfect instead."
+      ),
+      errorCorrectionItem(
+        "tc-ec-2",
+        "Check the highlighted phrase for errors.",
+        "I would have been late if I hadn't taken a taxi.",
+        "would have been",
+        true,
+        "",
+        "Correct. 'Would have' + past participle is the correct structure for the result clause."
+      ),
+      errorCorrectionItem(
+        "tc-ec-3",
+        "Check the highlighted phrase for errors.",
+        "If we had played better, we might won the match.",
+        "might won",
+        false,
+        "might have won",
+        "The modal 'might' needs 'have' + past participle in the third conditional."
+      ),
+      errorCorrectionItem(
+        "tc-ec-4",
+        "Check the highlighted phrase for errors.",
+        "If he hadn't died so young, he would been a great musician.",
+        "would been",
+        false,
+        "would have been",
+        "Don't forget the 'have'. It's 'would have been'."
+      ),
+      errorCorrectionItem(
+        "tc-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I might have forgotten if you hadn't reminded me.",
+        "hadn't reminded",
+        true,
+        "",
+        "Correct. Use the past perfect in the if-clause."
+      ),
+      multipleChoiceItem(
+        "tc-mc-1",
+        "Choose the correct verb form.",
+        "If I ____ more time, I could have finished the exam.",
+        ["had", "had had", "would have had"],
+        1,
+        "Use the past perfect, had + past participle, in the if-clause."
+      ),
+      multipleChoiceItem(
+        "tc-mc-2",
+        "Choose the correct verb form.",
+        "We ____ the flight if we'd left five minutes later.",
+        ["would miss", "will miss", "would have missed"],
+        2,
+        "Use 'would have' + past participle for the hypothetical result in the past."
+      ),
+      multipleChoiceItem(
+        "tc-mc-3",
+        "Choose the correct verb form.",
+        "If you ____ told me about the problem, I would have helped you.",
+        ["had", "have", "would have"],
+        0,
+        "The if-clause requires the past perfect."
+      ),
+      multipleChoiceItem(
+        "tc-mc-4",
+        "Choose the correct modal.",
+        "I ____ if I'd known it was a formal party.",
+        ["wouldn't go", "wouldn't have gone", "hadn't gone"],
+        1,
+        "Use 'wouldn't have gone' for the hypothetical past result."
+      ),
+      multipleChoiceItem(
+        "tc-mc-5",
+        "Choose the correct verb form.",
+        "If they ____ the map, they wouldn't have got lost.",
+        ["checked", "had checked", "would have checked"],
+        1,
+        "Use the past perfect after 'if'."
+      ),
+      placeholderGapItem(
+        "tc-gf-1",
+        "Complete the sentence.",
+        "If you __________ to that party, you wouldn't have met him. (not / go)",
+        "hadn't gone",
+        ["had not gone"],
+        "Use if + past perfect in the negative."
+      ),
+      placeholderGapItem(
+        "tc-gf-2",
+        "Complete the sentence.",
+        "I __________ you the money if you'd asked me. (lend)",
+        "would have lent",
+        ["'d have lent", "could have lent"],
+        "The result clause uses would have + past participle."
+      ),
+      placeholderGapItem(
+        "tc-gf-3",
+        "Complete the sentence.",
+        "If I __________ it was your birthday, I'd have bought you a present. (know)",
+        "had known",
+        ["'d known"],
+        "Use if + past perfect."
+      ),
+      placeholderGapItem(
+        "tc-gf-4",
+        "Complete the sentence.",
+        "We __________ late if we hadn't taken the shortcut. (be)",
+        "would have been",
+        ["'d have been"],
+        "Use the third conditional result clause."
+      ),
+      placeholderGapItem(
+        "tc-gf-5",
+        "Complete the sentence.",
+        "If they __________ us, we wouldn't have finished on time. (not / help)",
+        "hadn't helped",
+        ["had not helped"],
+        "Use the past perfect negative."
+      ),
+      placeholderGapItem(
+        "tc-gf-6",
+        "Complete the sentence.",
+        "You __________ the film if you'd come with us. (enjoy)",
+        "would have enjoyed",
+        ["'d have enjoyed", "might have enjoyed"],
+        "Use the result clause for the hypothetical consequence."
+      ),
+      placeholderGapItem(
+        "tc-gf-7",
+        "Complete the sentence.",
+        "If I __________ it with my own eyes, I wouldn't have believed it. (not / see)",
+        "hadn't seen",
+        ["had not seen"],
+        "Use if + past perfect negative."
+      ),
+      placeholderGapItem(
+        "tc-gf-8",
+        "Complete the sentence.",
+        "He __________ the exam if he'd studied harder. (not / fail)",
+        "wouldn't have failed",
+        ["would not have failed"],
+        "Use the negative result clause."
+      ),
+      placeholderGapItem(
+        "tc-gf-9",
+        "Complete the sentence.",
+        "What __________ if you'd lost your passport? (you / do)",
+        "would you have done",
+        [],
+        "Question form: would + subject + have + past participle."
+      ),
+      placeholderGapItem(
+        "tc-gf-10",
+        "Complete the sentence.",
+        "If we __________ more money, we would have stayed in a better hotel. (have)",
+        "had had",
+        ["'d had"],
+        "The past perfect of 'have' is 'had had'."
+      ),
+      singleGap(
+        "tc-rf-1",
+        "Rewrite the facts as a third conditional sentence.",
+        [
+          "I didn't see you, so I didn't say hello. -> If I'd seen you, I ",
+          { gapId: "g1" },
+          " hello.",
+        ],
+        ["would have said", "'d have said"],
+        "Convert the past fact into a hypothetical result."
+      ),
+      singleGap(
+        "tc-rf-2",
+        "Rewrite the facts as a third conditional sentence.",
+        [
+          "He was driving too fast, so he had an accident. -> He wouldn't have had an accident if he ",
+          { gapId: "g1" },
+          " so fast.",
+        ],
+        ["hadn't been driving", "hadn't driven"],
+        "Both past perfect simple and continuous work here to show the cause."
+      ),
+      singleGap(
+        "tc-rf-3",
+        "Rewrite the facts as a third conditional sentence.",
+        [
+          "We didn't go out because it was raining. -> If it hadn't been raining, we ",
+          { gapId: "g1" },
+          " out.",
+        ],
+        ["would have gone", "'d have gone"],
+        "Use the hypothetical past result."
+      ),
+      singleGap(
+        "tc-rf-4",
+        "Rewrite the facts as a third conditional sentence.",
+        [
+          "I forgot my phone, so I couldn't call you. -> I ",
+          { gapId: "g1" },
+          " you if I hadn't forgotten my phone.",
+        ],
+        ["could have called", "would have called", "would have been able to call"],
+        "Use a third conditional result form here. 'Could have called' and 'would have called' are both natural answers."
+      ),
+      singleGap(
+        "tc-rf-5",
+        "Rewrite the facts as a third conditional sentence.",
+        [
+          "She didn't know the truth, so she was angry. -> She wouldn't have been angry if she ",
+          { gapId: "g1" },
+          " the truth.",
+        ],
+        ["had known", "'d known"],
+        "Use if + past perfect."
+      ),
+    ],
+  },
+  {
+    id: "reported-speech",
+    title: "Reported Speech",
+    shortDescription: "Practise backshift, pronoun changes, and reported questions.",
+    levels: ["b1"],
+    intro:
+      "Work on tense backshift, time and place changes, and the structure of reported statements and questions.",
+    items: [
+      multipleChoiceItem(
+        "rs-mc-1",
+        "Choose the best reported version.",
+        "Direct speech: 'I’m feeling tired.'\nWhich is the best reported version?",
+        [
+          "She said that she is feeling tired.",
+          "She said that she was feeling tired.",
+          "She told that she was feeling tired.",
+        ],
+        1,
+        "Use backshift after a past reporting verb: 'am feeling' becomes 'was feeling'. Also, we say 'said that', not 'told that'."
+      ),
+      multipleChoiceItem(
+        "rs-mc-2",
+        "Choose the best reported version.",
+        "Direct speech: 'I’ll call you tomorrow.'\nWhich is the best reported version?",
+        [
+          "He said that he would call me the next day.",
+          "He said that he will call me tomorrow.",
+          "He told that he would call me the next day.",
+        ],
+        0,
+        "Backshift 'will' to 'would', and change 'tomorrow' to 'the next day'."
+      ),
+      multipleChoiceItem(
+        "rs-mc-3",
+        "Choose the best reported version.",
+        "Direct speech: 'We’ve finished our homework.'\nWhich is the best reported version?",
+        [
+          "They said that they had finished their homework.",
+          "They said that they have finished their homework.",
+          "They told that they had finished their homework.",
+        ],
+        0,
+        "Present perfect usually backshifts to past perfect in reported speech."
+      ),
+      multipleChoiceItem(
+        "rs-mc-4",
+        "Choose the best reported version.",
+        "Direct question: 'Are you busy?'\nWhich is the best reported version?",
+        [
+          "She asked me if was I busy.",
+          "She asked me if I was busy.",
+          "She asked me whether I am busy.",
+        ],
+        1,
+        "In reported yes or no questions, use 'if' or 'whether' and normal subject + verb word order. With a past reporting verb, the tense usually backshifts too."
+      ),
+      multipleChoiceItem(
+        "rs-mc-5",
+        "Choose the best reported version.",
+        "Direct question: 'Where do you live?'\nWhich is the best reported version?",
+        [
+          "He asked me where did I live.",
+          "He asked me where I lived.",
+          "He asked me where do I live.",
+        ],
+        1,
+        "In reported questions, keep the question word but change to statement word order."
+      ),
+      multipleChoiceItem(
+        "rs-mc-6",
+        "Choose the best reported version.",
+        "Direct speech: 'I can’t come today.'\nWhich is the best reported version?",
+        [
+          "She said that she couldn't come that day.",
+          "She said me that she couldn't come that day.",
+          "She told that she couldn't come that day.",
+        ],
+        0,
+        "Backshift 'can’t' to 'couldn’t' and change 'today' to 'that day'. Use 'said that' or 'told me that', not 'said me' or 'told that'."
+      ),
+      multipleChoiceItem(
+        "rs-mc-7",
+        "Choose the best reported version.",
+        "Direct speech: 'This is my favourite jacket.'\nWhich is the best reported version?",
+        [
+          "He said that this was his favourite jacket.",
+          "He said that that was his favourite jacket.",
+          "He told that that was his favourite jacket.",
+        ],
+        1,
+        "We often change 'this' to 'that' in reported speech, and 'my' changes to 'his'."
+      ),
+      multipleChoiceItem(
+        "rs-mc-8",
+        "Choose the best reported version.",
+        "Direct question: 'Did Lucy phone?'\nWhich is the best reported version?",
+        [
+          "He asked me whether Lucy had phoned.",
+          "He asked me whether did Lucy phone.",
+          "He asked me if had Lucy phoned.",
+        ],
+        0,
+        "For reported yes or no questions, use 'if' or 'whether' and normal word order. Past simple often backshifts to past perfect."
+      ),
+      multipleChoiceItem(
+        "rs-mc-9",
+        "Choose the best reported version.",
+        "Direct speech: 'I must go now.'\nWhich is the best reported version?",
+        [
+          "She said that she must go then.",
+          "She said that she had to go then.",
+          "She told that she had to go then.",
+        ],
+        1,
+        "In reported speech, 'must' often changes to 'had to'. 'Now' can change to 'then'."
+      ),
+      multipleChoiceItem(
+        "rs-mc-10",
+        "Choose the best reported version.",
+        "Direct speech: 'We’re meeting here tonight.'\nWhich is the best reported version?",
+        [
+          "They said that they were meeting there that night.",
+          "They said that they are meeting here tonight.",
+          "They told that they were meeting there that night.",
+        ],
+        0,
+        "Backshift the tense and change place/time words: 'here' to 'there' and 'tonight' to 'that night'."
+      ),
+      errorCorrectionItem(
+        "rs-ec-1",
+        "Check the highlighted phrase for errors.",
+        "She told that she was too tired to go out.",
+        "told that",
+        false,
+        ["said that", "told me that", "told us that", "told him that", "told her that", "told them that"],
+        "Use 'said that' or 'told + object + that'. We don't say 'told that' without an object."
+      ),
+      errorCorrectionItem(
+        "rs-ec-2",
+        "Check the highlighted phrase for errors.",
+        "He asked me where did I work.",
+        "where did I work",
+        false,
+        "where I worked",
+        "In reported questions, use statement word order, not question word order."
+      ),
+      errorCorrectionItem(
+        "rs-ec-3",
+        "Check the highlighted phrase for errors.",
+        "Marta said me that she couldn’t stay long.",
+        "said me that",
+        false,
+        "told me that",
+        "After 'said', we don't use an object pronoun directly. Use 'told me that' or 'said that'."
+      ),
+      errorCorrectionItem(
+        "rs-ec-4",
+        "Check the highlighted phrase for errors.",
+        "He said that he would see us the next day.",
+        "would see us the next day",
+        true,
+        "",
+        "This is correct. 'Will' changes to 'would' and 'tomorrow' often changes to 'the next day'."
+      ),
+      errorCorrectionItem(
+        "rs-ec-5",
+        "Check the highlighted phrase for errors.",
+        "She asked if was I feeling OK.",
+        "if was I feeling",
+        false,
+        "if I was feeling",
+        "In reported yes or no questions, use 'if' or 'whether' and normal subject + verb order."
+      ),
+      errorCorrectionItem(
+        "rs-ec-6",
+        "Check the highlighted phrase for errors.",
+        "They said that they have already finished.",
+        "have already finished",
+        false,
+        "had already finished",
+        "In reported speech with a past reporting verb, present perfect usually changes to past perfect."
+      ),
+      errorCorrectionItem(
+        "rs-ec-7",
+        "Check the highlighted phrase for errors.",
+        "My brother told me that he was leaving that night.",
+        "told me that",
+        true,
+        "",
+        "This is correct. 'Told' needs an object, and the tense and time expression are correctly backshifted."
+      ),
+      errorCorrectionItem(
+        "rs-ec-8",
+        "Check the highlighted phrase for errors.",
+        "She asked me did I want some coffee.",
+        "did I want",
+        false,
+        "if I wanted",
+        "For reported yes or no questions, use 'if' or 'whether' and statement word order."
+      ),
+      placeholderGapItem(
+        "rs-rf-1",
+        "Complete the second sentence so that it has a similar meaning.",
+        "'I’m working late tonight,' Ben said.\nBen said that __________ late that night.",
+        "he was working",
+        [],
+        "Backshift the present continuous to past continuous and change the pronoun."
+      ),
+      placeholderGapItem(
+        "rs-rf-2",
+        "Complete the second sentence so that it has a similar meaning.",
+        "'We’ve never been to Greece,' they told us.\nThey told us that __________ to Greece.",
+        "they had never been",
+        [],
+        "Present perfect usually changes to past perfect in reported speech."
+      ),
+      placeholderGapItem(
+        "rs-rf-3",
+        "Complete the second sentence so that it has a similar meaning.",
+        "'I’ll help you tomorrow,' she said to me.\nShe told me that __________ the next day.",
+        "she would help me",
+        [],
+        "Use 'told me that' with an object, and change 'will' to 'would'."
+      ),
+      placeholderGapItem(
+        "rs-rf-4",
+        "Complete the second sentence so that it has a similar meaning.",
+        "'Are you feeling better?' my aunt asked me.\nMy aunt asked me __________ feeling better.",
+        "if I was",
+        ["whether I was"],
+        "For reported yes or no questions, use 'if' or 'whether' and statement word order."
+      ),
+      placeholderGapItem(
+        "rs-rf-5",
+        "Complete the second sentence so that it has a similar meaning.",
+        "'Where do your cousins live?' he asked us.\nHe asked us where __________.",
+        "our cousins lived",
+        [],
+        "Keep the question word, but change the order to subject + verb."
+      ),
+      placeholderGapItem(
+        "rs-rf-6",
+        "Complete the second sentence so that it has a similar meaning.",
+        "'This is my favourite café,' Laura said.\nLaura said that __________ favourite café.",
+        "that was her",
+        ["was her"],
+        "Change 'this' to 'that' and 'my' to 'her' in reported speech."
+      ),
+      placeholderGapItem(
+        "rs-rf-7",
+        "Complete the second sentence so that it has a similar meaning.",
+        "'I can’t find my keys,' Dan said.\nDan said that __________ keys.",
+        "he couldn't find his",
+        [],
+        "Change 'can’t' to 'couldn’t' and adjust the pronouns."
+      ),
+      placeholderGapItem(
+        "rs-rf-8",
+        "Complete the second sentence so that it has a similar meaning.",
+        "'Did you enjoy the concert?' she asked him.\nShe asked him __________ the concert.",
+        "if he had enjoyed",
+        ["whether he had enjoyed"],
+        "For reported yes or no questions, use 'if' or 'whether'. Past simple often changes to past perfect."
+      ),
+    ],
+  },
+  {
+    id: "quantifiers",
+    title: "Quantifiers",
+    shortDescription: "Practise much, many, few, little, enough, too, and plenty.",
+    levels: ["b1"],
+    intro:
+      "Work on common quantifiers with countable and uncountable nouns, plus structures like 'too', 'enough', and 'plenty of'.",
+    items: [
+      multipleChoiceItem(
+        "q-mc-1",
+        "Choose the correct option.",
+        "There are ____ books on the floor — can you pick them up?",
+        ["too much", "too many", "too"],
+        1,
+        "Use 'too many' with plural countable nouns like 'books'."
+      ),
+      multipleChoiceItem(
+        "q-mc-2",
+        "Choose the correct option.",
+        "I don’t have ____ time to cook tonight, so I’ll order something.",
+        ["many", "much", "a few"],
+        1,
+        "Use 'much' with uncountable nouns like 'time', especially in negative sentences."
+      ),
+      multipleChoiceItem(
+        "q-mc-3",
+        "Choose the correct option.",
+        "We’ve got ____ milk in the fridge, so there’s no need to buy any.",
+        ["plenty of", "too many", "a few"],
+        0,
+        "Use 'plenty of' to mean more than enough."
+      ),
+      multipleChoiceItem(
+        "q-mc-4",
+        "Choose the correct option.",
+        "Only ____ students came to class today, so the room felt really empty.",
+        ["a little", "a few", "much"],
+        1,
+        "Use 'a few' with plural countable nouns like 'students'."
+      ),
+      multipleChoiceItem(
+        "q-mc-5",
+        "Choose the correct option.",
+        "You’re driving ____ fast. Slow down!",
+        ["too much", "enough", "too"],
+        2,
+        "Use 'too' before adjectives and adverbs: 'too fast'."
+      ),
+      multipleChoiceItem(
+        "q-mc-6",
+        "Choose the correct option.",
+        "There isn’t ____ sugar left. We need to buy some more.",
+        ["any", "no", "none"],
+        0,
+        "Use 'any' with a negative verb to talk about zero quantity."
+      ),
+      multipleChoiceItem(
+        "q-mc-7",
+        "Choose the correct option.",
+        "My suitcase isn’t big ____ for all my clothes.",
+        ["too", "enough", "much"],
+        1,
+        "Use 'adjective + enough': 'big enough'."
+      ),
+      multipleChoiceItem(
+        "q-mc-8",
+        "Choose the correct option.",
+        "There are very ____ parking spaces near my flat, so it’s hard to park.",
+        ["little", "few", "a few"],
+        1,
+        "Use 'very few' with plural countable nouns when you mean almost none."
+      ),
+      multipleChoiceItem(
+        "q-mc-9",
+        "Choose the correct option.",
+        "I don’t want any more cake, thanks. I’ve had ____ already.",
+        ["a lot", "many", "plenty of"],
+        0,
+        "Use 'a lot' when there is no noun after it."
+      ),
+      multipleChoiceItem(
+        "q-mc-10",
+        "Choose the correct option.",
+        "There are ____ people in the village during the colder months.",
+        ["few", "too much", "little"],
+        0,
+        "Use 'few' with plural countable nouns like 'people'."
+      ),
+      errorCorrectionItem(
+        "q-ec-1",
+        "Check the highlighted phrase for errors.",
+        "There are too much cars in the city centre at rush hour.",
+        "too much cars",
+        false,
+        "too many cars",
+        "Use 'too many' with plural countable nouns like 'cars'."
+      ),
+      errorCorrectionItem(
+        "q-ec-2",
+        "Check the highlighted phrase for errors.",
+        "We’ve got plenty of time, so we don’t need to hurry.",
+        "plenty of time",
+        true,
+        "",
+        "This is correct. Use 'plenty of' to mean more than enough."
+      ),
+      errorCorrectionItem(
+        "q-ec-3",
+        "Check the highlighted phrase for errors.",
+        "There aren’t enough chairs for everyone in the room.",
+        "enough chairs",
+        true,
+        "",
+        "This is correct. Use 'enough' before a noun."
+      ),
+      errorCorrectionItem(
+        "q-ec-4",
+        "Check the highlighted phrase for errors.",
+        "My coffee is too much hot to drink.",
+        "too much hot",
+        false,
+        "too hot",
+        "Use 'too' before adjectives: 'too hot', not 'too much hot'."
+      ),
+      errorCorrectionItem(
+        "q-ec-5",
+        "Check the highlighted phrase for errors.",
+        "There were very little people at the meeting, so we finished early.",
+        "very little people",
+        false,
+        "very few people",
+        "Use 'few' with plural countable nouns like 'people'. 'Little' is used with uncountable nouns."
+      ),
+      errorCorrectionItem(
+        "q-ec-6",
+        "Check the highlighted phrase for errors.",
+        "I’ve only got a few money left, so I can’t buy that jacket.",
+        "a few money",
+        false,
+        "a little money",
+        "Use 'a little' with uncountable nouns like 'money'."
+      ),
+      errorCorrectionItem(
+        "q-ec-7",
+        "Check the highlighted phrase for errors.",
+        "A: How many biscuits are left? B: None.",
+        "None",
+        true,
+        "",
+        "This is correct. We use 'none' in short answers when the quantity is zero."
+      ),
+      errorCorrectionItem(
+        "q-ec-8",
+        "Check the highlighted phrase for errors.",
+        "This bag isn’t enough big for my laptop.",
+        "enough big",
+        false,
+        "big enough",
+        "Put 'enough' after an adjective: 'big enough'."
+      ),
+      placeholderGapItem(
+        "q-gf-1",
+        "Fill the gap.",
+        "There isn’t __________ milk left, so we need to buy some. (zero quantity)",
+        "any",
+        [],
+        "Use 'any' with a negative verb to talk about zero quantity."
+      ),
+      placeholderGapItem(
+        "q-gf-2",
+        "Fill the gap.",
+        "We’ve got __________ of food for the weekend, so don’t go shopping. (more than enough)",
+        "plenty",
+        [],
+        "Use 'plenty of' to mean more than enough. The missing word here is 'plenty'."
+      ),
+      placeholderGapItem(
+        "q-gf-3",
+        "Fill the gap.",
+        "There were only __________ people at the talk, so the hall looked empty. (small number)",
+        "a few",
+        [],
+        "Use 'a few' with plural countable nouns for a small number."
+      ),
+      placeholderGapItem(
+        "q-gf-4",
+        "Fill the gap.",
+        "You’re speaking __________ quietly — I can’t hear you. (more than is good)",
+        "too",
+        [],
+        "Use 'too' before an adverb: 'too quietly'."
+      ),
+      placeholderGapItem(
+        "q-gf-5",
+        "Fill the gap.",
+        "I don’t have __________ time to read during the week. (uncountable noun in a negative sentence)",
+        "much",
+        [],
+        "Use 'much' with uncountable nouns in negative sentences."
+      ),
+      placeholderGapItem(
+        "q-gf-6",
+        "Fill the gap.",
+        "This soup isn’t hot __________. Can you warm it up? (not sufficiently)",
+        "enough",
+        [],
+        "Use 'adjective + enough': 'hot enough'."
+      ),
+      placeholderGapItem(
+        "q-gf-7",
+        "Fill the gap.",
+        "There are __________ tourists in the town this weekend than usual. (plural countable noun, comparative)",
+        "more",
+        [],
+        "Use 'more' with plural countable nouns when making a comparative."
+      ),
+      placeholderGapItem(
+        "q-gf-8",
+        "Fill the gap.",
+        "A: How many eggs have we got? B: __________. I used the last two this morning. (short answer)",
+        "None",
+        ["none"],
+        "Use 'none' in short answers when there is zero quantity."
+      ),
+    ],
+  },
+  {
+    id: "relative-clauses",
+    title: "Relative Clauses",
+    shortDescription: "Practise who, which, where, whose, and comma use in relative clauses.",
+    levels: ["b1"],
+    intro:
+      "Work on defining and non-defining relative clauses, including the correct relative word and when commas are needed.",
+    items: [
+      multipleChoiceItem(
+        "rc-mc-1",
+        "Choose the correct option.",
+        "That’s the woman ____ works with my brother.",
+        ["which", "who", "where"],
+        1,
+        "Use 'who' for people."
+      ),
+      multipleChoiceItem(
+        "rc-mc-2",
+        "Choose the correct option.",
+        "This is the café ____ we had lunch yesterday.",
+        ["where", "which", "whose"],
+        0,
+        "Use 'where' for places."
+      ),
+      multipleChoiceItem(
+        "rc-mc-3",
+        "Choose the correct option.",
+        "The book ____ I bought last week is really interesting.",
+        ["who", "where", "which"],
+        2,
+        "Use 'which' for things."
+      ),
+      multipleChoiceItem(
+        "rc-mc-4",
+        "Choose the correct option.",
+        "She’s the girl ____ brother is a professional footballer.",
+        ["whose", "which", "that"],
+        0,
+        "Use 'whose' to show possession."
+      ),
+      multipleChoiceItem(
+        "rc-mc-5",
+        "Choose the correct option.",
+        "The man ____ we met at the station was very friendly.",
+        ["who", "which", "where"],
+        0,
+        "Use 'who' for people. In this sentence, 'that' could also work, but 'who' is the best option here."
+      ),
+      multipleChoiceItem(
+        "rc-mc-6",
+        "Choose the correct option.",
+        "The film ____ won the award was directed by a Spanish woman.",
+        ["where", "which", "whose"],
+        1,
+        "Use 'which' for things."
+      ),
+      multipleChoiceItem(
+        "rc-mc-7",
+        "Choose the correct option.",
+        "That’s the town ____ my grandparents were born.",
+        ["who", "where", "which"],
+        1,
+        "Use 'where' for places."
+      ),
+      multipleChoiceItem(
+        "rc-mc-8",
+        "Choose the correct option.",
+        "My neighbour, ____ son goes to my school, is a doctor.",
+        ["that", "whose", "who"],
+        1,
+        "Use 'whose' for possession. In non-defining clauses, we don't use 'that'."
+      ),
+      multipleChoiceItem(
+        "rc-mc-9",
+        "Choose the correct option.",
+        "The phone ____ you lent me has stopped working.",
+        ["which", "where", "who"],
+        0,
+        "Use 'which' for things."
+      ),
+      multipleChoiceItem(
+        "rc-mc-10",
+        "Choose the correct option.",
+        "This is the park ____ I learned to ride a bike.",
+        ["which", "whose", "where"],
+        2,
+        "Use 'where' for places."
+      ),
+      placeholderGapItem(
+        "rc-gf-1",
+        "Fill the gap.",
+        "That’s the teacher __________ helped me with my project. (person)",
+        "who",
+        ["that"],
+        "Use 'who' for people. 'That' is also possible in a defining relative clause."
+      ),
+      placeholderGapItem(
+        "rc-gf-2",
+        "Fill the gap.",
+        "The house __________ we stayed in was right by the sea. (thing/place)",
+        "which",
+        ["that"],
+        "Use 'which' or 'that' for things in defining clauses. Here the pronoun is the object of 'stayed in'."
+      ),
+      placeholderGapItem(
+        "rc-gf-3",
+        "Fill the gap.",
+        "She’s the woman __________ daughter won the singing competition. (possession)",
+        "whose",
+        [],
+        "Use 'whose' to show possession."
+      ),
+      placeholderGapItem(
+        "rc-gf-4",
+        "Fill the gap.",
+        "This is the café __________ we usually meet after class. (place)",
+        "where",
+        [],
+        "Use 'where' for places."
+      ),
+      placeholderGapItem(
+        "rc-gf-5",
+        "Fill the gap.",
+        "The shoes __________ I bought online were too small. (thing)",
+        "which",
+        ["that"],
+        "Use 'which' or 'that' for things in defining clauses."
+      ),
+      placeholderGapItem(
+        "rc-gf-6",
+        "Fill the gap.",
+        "My aunt, __________ lives in Canada, is visiting us next month. (person, non-defining)",
+        "who",
+        [],
+        "Use 'who' in a non-defining clause about a person. We can't use 'that' here."
+      ),
+      placeholderGapItem(
+        "rc-gf-7",
+        "Fill the gap.",
+        "The man __________ you saw at the party is my cousin. (person)",
+        "who",
+        ["that"],
+        "Use 'who' or 'that' for people in defining clauses."
+      ),
+      placeholderGapItem(
+        "rc-gf-8",
+        "Fill the gap.",
+        "Stratford-upon-Avon, __________ Shakespeare was born, is a popular tourist destination. (place, non-defining)",
+        "where",
+        [],
+        "Use 'where' for places. In non-defining clauses, we don't use 'that'."
+      ),
+      placeholderGapItem(
+        "rc-gf-9",
+        "Fill the gap.",
+        "That’s the laptop __________ screen is cracked. (possession)",
+        "whose",
+        [],
+        "Use 'whose' to show possession."
+      ),
+      placeholderGapItem(
+        "rc-gf-10",
+        "Fill the gap.",
+        "The film __________ we watched last night was really disappointing. (thing)",
+        "which",
+        ["that"],
+        "Use 'which' or 'that' for things in defining clauses."
+      ),
+      commaPlacementItem(
+        "rc-comma-1",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "My brother who lives in Berlin is coming to stay next week. (I have more than one brother)",
+        false,
+        "My brother who lives in Berlin is coming to stay next week.",
+        "No commas. This is a defining relative clause because it identifies which brother."
+      ),
+      commaPlacementItem(
+        "rc-comma-2",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "My brother Tom who lives in Berlin is coming to stay next week.",
+        true,
+        "My brother Tom, who lives in Berlin, is coming to stay next week.",
+        "Use commas because the clause gives extra information about Tom, who is already identified."
+      ),
+      commaPlacementItem(
+        "rc-comma-3",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "The restaurant that we went to last night was excellent.",
+        false,
+        "The restaurant that we went to last night was excellent.",
+        "No commas. The clause is defining because it tells us which restaurant."
+      ),
+      commaPlacementItem(
+        "rc-comma-4",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "Paris which is one of my favourite cities is beautiful in spring.",
+        true,
+        "Paris, which is one of my favourite cities, is beautiful in spring.",
+        "Use commas because the clause adds non-essential extra information about Paris."
+      ),
+      commaPlacementItem(
+        "rc-comma-5",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "The students who finished early were allowed to leave.",
+        false,
+        "The students who finished early were allowed to leave.",
+        "No commas. The clause identifies which students."
+      ),
+      commaPlacementItem(
+        "rc-comma-6",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "My car which I bought last year has already broken down twice.",
+        true,
+        "My car, which I bought last year, has already broken down twice.",
+        "Use commas because the speaker is referring to one specific car, and the clause is extra information."
+      ),
+      commaPlacementItem(
+        "rc-comma-7",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "The people who were sitting near the door heard everything.",
+        false,
+        "The people who were sitting near the door heard everything.",
+        "No commas. The clause is necessary to identify which people."
+      ),
+      commaPlacementItem(
+        "rc-comma-8",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "Oxford where my sister studied is a lovely city.",
+        true,
+        "Oxford, where my sister studied, is a lovely city.",
+        "Use commas because the clause gives extra information about Oxford."
+      ),
+      commaPlacementItem(
+        "rc-comma-9",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "The book that I borrowed from you was really useful.",
+        false,
+        "The book that I borrowed from you was really useful.",
+        "No commas. The clause defines which book."
+      ),
+      commaPlacementItem(
+        "rc-comma-10",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "Our next-door neighbours whose son is in my class are moving to Valencia. (there is only one set of neighbours)",
+        true,
+        "Our next-door neighbours, whose son is in my class, are moving to Valencia.",
+        "Use commas because the clause gives extra information about already identified neighbours."
+      ),
+      commaPlacementItem(
+        "rc-comma-11",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "The shoes which I wore to the wedding were really uncomfortable.",
+        false,
+        "The shoes which I wore to the wedding were really uncomfortable.",
+        "No commas. The clause tells us which shoes."
+      ),
+      commaPlacementItem(
+        "rc-comma-12",
+        "Click where commas are needed, or choose 'No commas needed'.",
+        "Mr Lewis who teaches us maths is leaving the school next term.",
+        true,
+        "Mr Lewis, who teaches us maths, is leaving the school next term.",
+        "Use commas because the clause adds extra information about a person already identified by name."
       ),
     ],
   },

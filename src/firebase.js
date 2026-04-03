@@ -2631,6 +2631,275 @@ export async function uploadAvatarAndSave(file) {
   return url;
 }
 
+function normalizeTargetStudentIds(targetStudentIds = []) {
+  return [...new Set((Array.isArray(targetStudentIds) ? targetStudentIds : []).filter(Boolean))];
+}
+
+function buildCourseTestPin() {
+  return Math.floor(100000 + Math.random() * 900000).toString();
+}
+
+export async function createCourseTestSession({
+  templateId,
+  templateTitle,
+  level,
+  testKind,
+  className = "",
+  notes = "",
+  targetStudentIds = [],
+  startsAt = null,
+  endsAt = null,
+  accessMode = "assigned",
+  requirePin = false,
+  status = "scheduled",
+  controlMode = "teacher-controlled",
+}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in.");
+
+  const normalizedStudents = normalizeTargetStudentIds(targetStudentIds);
+  const pin = requirePin ? buildCourseTestPin() : null;
+  const normalizedControlMode =
+    controlMode === "self-controlled" ? "self-controlled" : "teacher-controlled";
+  const mainPaperState = normalizedControlMode === "self-controlled" ? "open" : "locked";
+  const listeningState = normalizedControlMode === "self-controlled" ? "open" : "locked";
+  const defaultEndBase =
+    startsAt instanceof Date && !Number.isNaN(startsAt.getTime()) ? startsAt : new Date();
+  const resolvedEndsAt =
+    endsAt instanceof Date && !Number.isNaN(endsAt.getTime())
+      ? endsAt
+      : new Date(defaultEndBase.getTime() + 7 * 24 * 60 * 60 * 1000);
+
+  const ref = await addDoc(collection(db, "courseTestSessions"), {
+    templateId,
+    templateTitle,
+    level: level || null,
+    testKind: testKind || null,
+    teacherUid: user.uid,
+    teacherEmail: user.email || null,
+    teacherName: user.displayName || null,
+    className: String(className || "").trim(),
+    notes: String(notes || "").trim(),
+    targetStudentIds: normalizedStudents,
+    accessMode,
+    controlMode: normalizedControlMode,
+    mainPaperState,
+    listeningState,
+    accessPin: pin,
+    requirePin: Boolean(requirePin),
+    status,
+    startsAt,
+    endsAt: resolvedEndsAt,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  return { id: ref.id, accessPin: pin };
+}
+
+export async function listMyCourseTestSessions() {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return [];
+
+  const q = query(collection(db, "courseTestSessions"), where("teacherUid", "==", uid));
+  const snap = await getDocs(q);
+  return snap.docs
+    .map((entry) => ({ id: entry.id, ...entry.data() }))
+    .sort((a, b) => {
+      const aTime = a.createdAt?.toMillis?.() || 0;
+      const bTime = b.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    });
+}
+
+export async function listStudentCourseTestSessions(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const q = query(
+    collection(db, "courseTestSessions"),
+    where("targetStudentIds", "array-contains", realUid)
+  );
+  const snap = await getDocs(q);
+  return snap.docs
+    .map((entry) => ({ id: entry.id, ...entry.data() }))
+    .sort((a, b) => {
+      const aTime = a.createdAt?.toMillis?.() || 0;
+      const bTime = b.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    });
+}
+
+export async function listStudentCourseTestAttempts(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const q = query(collection(db, "courseTestAttempts"), where("studentUid", "==", realUid));
+  const snap = await getDocs(q);
+  const rows = sortCourseTestAttempts(snap.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+  const bySession = new Map();
+
+  for (const row of rows) {
+    if (!row.sessionId || bySession.has(row.sessionId)) continue;
+    bySession.set(row.sessionId, row);
+  }
+
+  return Array.from(bySession.values());
+}
+
+export async function getCourseTestSession(sessionId) {
+  if (!sessionId) return null;
+  const snap = await getDoc(doc(db, "courseTestSessions", sessionId));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
+}
+
+export async function updateCourseTestSession(sessionId, data = {}) {
+  if (!sessionId) throw new Error("Session ID is required.");
+  await updateDoc(doc(db, "courseTestSessions", sessionId), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function startCourseTestAttempt({
+  sessionId,
+  templateId,
+  templateTitle,
+  level,
+  testKind,
+  teacherUid,
+  studentUid,
+  studentEmail,
+  studentName,
+}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in.");
+
+  const ref = await addDoc(collection(db, "courseTestAttempts"), {
+    sessionId,
+    templateId,
+    templateTitle,
+    level: level || null,
+    testKind: testKind || null,
+    teacherUid,
+    studentUid: studentUid || user.uid,
+    studentEmail: studentEmail || user.email || null,
+    studentName: studentName || user.displayName || null,
+    sections: [],
+    autoScore: 0,
+    autoTotal: 0,
+    percent: 0,
+    completed: false,
+    reviewRequired: false,
+    reviewStatus: "not-submitted",
+    startedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  return ref.id;
+}
+
+export async function saveCourseTestAttemptDraft(attemptId, data = {}) {
+  if (!attemptId) throw new Error("Attempt ID is required.");
+
+  const autoScore = Number(data.autoScore || 0);
+  const autoTotal = Number(data.autoTotal || 0);
+
+  await updateDoc(doc(db, "courseTestAttempts", attemptId), {
+    ...data,
+    percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function submitCourseTestAttempt(attemptId, data = {}) {
+  if (!attemptId) throw new Error("Attempt ID is required.");
+
+  const autoScore = Number(data.autoScore || 0);
+  const autoTotal = Number(data.autoTotal || 0);
+
+  await updateDoc(doc(db, "courseTestAttempts", attemptId), {
+    ...data,
+    percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+    completed: true,
+    reviewRequired: true,
+    reviewStatus: "pending",
+    submittedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+export async function saveCourseTestAttemptReview(attemptId, data = {}) {
+  if (!attemptId) throw new Error("Attempt ID is required.");
+
+  const teacherScore = Number(data.teacherScore || 0);
+  const teacherTotal = Number(data.teacherTotal || 0);
+
+  await updateDoc(doc(db, "courseTestAttempts", attemptId), {
+    ...data,
+    finalPercent: teacherTotal > 0 ? Math.round((teacherScore / teacherTotal) * 100) : 0,
+    reviewRequired: false,
+    reviewStatus: "reviewed",
+    reviewedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+}
+
+function courseTestAttemptPriority(attempt = {}) {
+  if (attempt.reviewStatus === "reviewed" || attempt.reviewedAt) return 3;
+  if (attempt.completed || attempt.submittedAt) return 2;
+  if (attempt.startedAt || attempt.updatedAt) return 1;
+  return 0;
+}
+
+function courseTestAttemptSortTime(attempt = {}) {
+  return (
+    attempt.reviewedAt?.toMillis?.() ??
+    attempt.submittedAt?.toMillis?.() ??
+    attempt.updatedAt?.toMillis?.() ??
+    attempt.startedAt?.toMillis?.() ??
+    0
+  );
+}
+
+function sortCourseTestAttempts(rows = []) {
+  return [...rows].sort((a, b) => {
+    const priorityDiff = courseTestAttemptPriority(b) - courseTestAttemptPriority(a);
+    if (priorityDiff !== 0) return priorityDiff;
+    return courseTestAttemptSortTime(b) - courseTestAttemptSortTime(a);
+  });
+}
+
+export async function listAttemptsForMyCourseTestSession(sessionId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !sessionId) return [];
+
+  const q = query(
+    collection(db, "courseTestAttempts"),
+    where("teacherUid", "==", uid),
+    where("sessionId", "==", sessionId)
+  );
+  const snap = await getDocs(q);
+  return sortCourseTestAttempts(snap.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+}
+
+export async function getMyCourseTestAttemptForSession(sessionId, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !sessionId) return null;
+
+  const q = query(
+    collection(db, "courseTestAttempts"),
+    where("studentUid", "==", realUid),
+    where("sessionId", "==", sessionId)
+  );
+  const snap = await getDocs(q);
+
+  const rows = sortCourseTestAttempts(snap.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+
+  return rows[0] || null;
+}
+
 /** Optional: use a preset image that already lives in your app bundle or CDN */
 export async function setPresetAvatar(url) {
   const user = auth.currentUser;

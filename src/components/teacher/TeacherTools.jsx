@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import TeacherGrammarTool from "./TeacherGrammarTool";
 import TeacherGrammarSetResults from "./TeacherGrammarSetResults";
 import TeacherUseOfEnglishQuizBuilder from "./TeacherUseOfEnglishQuizBuilder";
+import TeacherCourseTests from "./TeacherCourseTests";
 
 export default function TeacherTools({ user }) {
   // ---------- Auth gate ----------
@@ -24,6 +25,7 @@ export default function TeacherTools({ user }) {
   const [showBuilder, setShowBuilder] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [showUseOfEnglishBuilder, setShowUseOfEnglishBuilder] = useState(false);
+  const [showCourseTests, setShowCourseTests] = useState(false);
 
   return (
     <div className="teacher-tools-page game-wrapper">
@@ -36,7 +38,7 @@ export default function TeacherTools({ user }) {
           <p className="intro small">
             Welcome, <strong>{user.email}</strong> ({user.role}). Use this area
             to build Aptis grammar sets, create mixed Use of English quizzes,
-            and review how your students did.
+            set up fixed course-test sessions, and review how your students did.
           </p>
         </div>
       </header>
@@ -86,6 +88,30 @@ export default function TeacherTools({ user }) {
         {showUseOfEnglishBuilder && (
           <div className="panel-body">
             <TeacherUseOfEnglishQuizBuilder user={user} />
+          </div>
+        )}
+      </section>
+
+      <section className="panel collapsible" style={{ marginTop: "0.9rem" }}>
+        <button
+          type="button"
+          className="collapse-head"
+          onClick={() => setShowCourseTests((v) => !v)}
+        >
+          <div className="head-left">
+            <h2 className="sec-title">Set up course tests</h2>
+            <p className="muted small">
+              Create teacher-run B1 progress and end-of-course test sessions from the fixed Oxford templates, then assign them to a class or selected students.
+            </p>
+          </div>
+          <span className={`chev ${showCourseTests ? "open" : ""}`} aria-hidden>
+            ▾
+          </span>
+        </button>
+
+        {showCourseTests && (
+          <div className="panel-body">
+            <TeacherCourseTests user={user} />
           </div>
         )}
       </section>

@@ -112,6 +112,8 @@ import HubSpanglishLiveHost from "./components/hub/HubSpanglishLiveHost.jsx";
 import HubSpanglishLiveJoin from "./components/hub/HubSpanglishLiveJoin.jsx";
 import HubSpanglishLivePlayer from "./components/hub/HubSpanglishLivePlayer.jsx";
 import HubNegatrisGame from "./components/hub/HubNegatrisGame.jsx";
+import HubYourClass from "./components/hub/HubYourClass.jsx";
+import HubCourseTestRunner from "./components/hub/HubCourseTestRunner.jsx";
 import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 function BellIcon() {
@@ -230,7 +232,10 @@ useEffect(() => {
       const readSubmissionKeys = teacherReadSubmissionKeys || {};
       const studentIds = studentSnap.docs.map((entry) => entry.id);
 
-      const grammarSnap = await getDocs(query(collection(db, "grammarSetAttempts"), where("ownerUid", "==", user.uid)));
+      const [grammarSnap, courseAttemptSnap] = await Promise.all([
+        getDocs(query(collection(db, "grammarSetAttempts"), where("ownerUid", "==", user.uid))),
+        getDocs(query(collection(db, "courseTestAttempts"), where("teacherUid", "==", user.uid))),
+      ]);
 
       const notificationIds = (
         await Promise.all(
@@ -266,7 +271,19 @@ useEffect(() => {
         })
         .filter(Boolean);
 
-      const latestNotifications = [...notificationIds, ...grammarNotifications]
+      const courseTestNotifications = courseAttemptSnap.docs
+        .map((entry) => {
+          const data = entry.data() || {};
+          if (!data.studentUid) return null;
+          if (!data.completed && !data.submittedAt) return null;
+          return {
+            id: `course-test:${entry.id}`,
+            createdAt: data.submittedAt || data.updatedAt || data.startedAt || null,
+          };
+        })
+        .filter(Boolean);
+
+      const latestNotifications = [...notificationIds, ...grammarNotifications, ...courseTestNotifications]
         .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
         .slice(0, 24);
 
@@ -642,6 +659,8 @@ return (
   <Route path="/use-of-english/keyword" element={<HubKeywordTrainer />} />
   <Route path="/use-of-english/open-cloze" element={<HubOpenClozeTrainer />} />
   <Route path="/use-of-english/word-formation" element={<HubWordFormationTrainer />} />
+  <Route path="/your-class" element={<HubYourClass user={user} />} />
+  <Route path="/your-class/tests/:sessionId" element={<HubCourseTestRunner user={user} />} />
   <Route path="/games" element={<HubGamesMenu />} />
   <Route path="/games/leaderboards" element={<HubGameLeaderboards user={user} />} />
   <Route path="/games/dependent-prepositions" element={<HubDependentPrepositionGame user={user} />} />

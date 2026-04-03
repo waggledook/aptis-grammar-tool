@@ -144,6 +144,14 @@ export default function HubLanding({ user, hasAccess, onSignIn }) {
           <div className="menu-grid">
             <button
               className="menu-card"
+              onClick={() => (hasAccess ? navigate(getSitePath("/your-class")) : onSignIn?.())}
+            >
+              <h3>Your Class</h3>
+              <p>See teacher-assigned tests and the class activity that’s been set up for you in the hub.</p>
+            </button>
+
+            <button
+              className="menu-card"
               onClick={() => (hasAccess ? navigate(getSitePath("/grammar")) : onSignIn?.())}
             >
               <h3>Grammar Activities</h3>

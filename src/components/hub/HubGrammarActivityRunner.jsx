@@ -32,6 +32,23 @@ function normalizeAnswer(text) {
     .replace(/[?!.,]+$/g, "");
 }
 
+function buildCommaSentence(words = [], positions = []) {
+  if (!Array.isArray(words) || !words.length) return "";
+
+  const activePositions = new Set(Array.isArray(positions) ? positions : []);
+  return words
+    .map((word, index) => {
+      if (index === words.length - 1) return word;
+      return activePositions.has(index) ? `${word},` : word;
+    })
+    .join(" ");
+}
+
+function sameCommaPositions(left = [], right = []) {
+  if (left.length !== right.length) return false;
+  return left.every((value, index) => value === right[index]);
+}
+
 function buildInitialAnswers(activity) {
   const state = {};
   activity.items.forEach((item) => {
@@ -42,6 +59,12 @@ function buildInitialAnswers(activity) {
       }
       return;
     }
+
+    if (item.type === "comma-placement") {
+      state[item.id] = [];
+      return;
+    }
+
     item.gaps.forEach((gap) => {
       state[`${item.id}:${gap.id}`] = "";
     });
@@ -140,6 +163,7 @@ export default function HubGrammarActivityRunner() {
   const { activityId } = useParams();
   const activity = getHubGrammarActivity(activityId);
   const inputRefs = useRef({});
+  const itemRefs = useRef({});
   const [answers, setAnswers] = useState(() => (activity ? buildInitialAnswers(activity) : {}));
   const [confirmedCorrections, setConfirmedCorrections] = useState({});
   const [submitted, setSubmitted] = useState(false);
@@ -152,6 +176,10 @@ export default function HubGrammarActivityRunner() {
     return activity.items.flatMap((item) => {
       if (item.type === "error-correction") {
         return [`${item.id}:correction`];
+      }
+
+      if (item.type === "comma-placement") {
+        return [];
       }
 
       if (item.type === "multiple-choice") {
@@ -175,6 +203,10 @@ export default function HubGrammarActivityRunner() {
           return [item.id, `${item.id}:judge:correct`];
         }
 
+        if (item.type === "comma-placement") {
+          return [item.id, `${item.id}:comma:none`];
+        }
+
         const firstGap = item.gaps[0];
         if (Array.isArray(firstGap?.choices) && firstGap.choices.length) {
           return [item.id, `${item.id}:${firstGap.id}:option:0`];
@@ -189,7 +221,11 @@ export default function HubGrammarActivityRunner() {
     () =>
       activity
         ? activity.items.reduce((sum, item) => {
-            if (item.type === "multiple-choice" || item.type === "error-correction") {
+            if (
+              item.type === "multiple-choice" ||
+              item.type === "error-correction" ||
+              item.type === "comma-placement"
+            ) {
               return sum + 1;
             }
             return sum + item.gaps.length;
@@ -201,6 +237,7 @@ export default function HubGrammarActivityRunner() {
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     inputRefs.current = {};
+    itemRefs.current = {};
     setAnswers(activity ? buildInitialAnswers(activity) : {});
     setConfirmedCorrections({});
     setSubmitted(false);
@@ -216,6 +253,18 @@ export default function HubGrammarActivityRunner() {
       }
     }
   }, [activityId, orderedInputKeys, submitted]);
+
+  useEffect(() => {
+    if (!submitted || !result || !activity?.items?.length) return;
+
+    const firstItemId = activity.items[0]?.id;
+    const node = firstItemId ? itemRefs.current[firstItemId] : null;
+    if (!node) return;
+
+    requestAnimationFrame(() => {
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  }, [submitted, result, activity]);
 
   if (!activity) {
     return (
@@ -240,6 +289,15 @@ export default function HubGrammarActivityRunner() {
 
     node.dataset.answerKey = key;
     inputRefs.current[key] = node;
+  };
+
+  const registerItem = (itemId) => (node) => {
+    if (!node) {
+      delete itemRefs.current[itemId];
+      return;
+    }
+
+    itemRefs.current[itemId] = node;
   };
 
   const focusControl = (key) => {
@@ -321,6 +379,19 @@ export default function HubGrammarActivityRunner() {
     });
   };
 
+  const handleCommaToggle = (item, position) => {
+    const current = Array.isArray(answers[item.id]) ? answers[item.id] : [];
+    const next = current.includes(position)
+      ? current.filter((entry) => entry !== position)
+      : [...current, position].sort((a, b) => a - b);
+
+    handleChange(item.id, next);
+  };
+
+  const clearCommas = (itemId) => {
+    handleChange(itemId, []);
+  };
+
   const handleReset = () => {
     setAnswers(buildInitialAnswers(activity));
     setConfirmedCorrections({});
@@ -399,6 +470,33 @@ export default function HubGrammarActivityRunner() {
         };
       }
 
+      if (item.type === "comma-placement") {
+        const selectedPositions = Array.isArray(answers[item.id]) ? answers[item.id] : [];
+        const expectedPositions = Array.isArray(item.commaPositions) ? item.commaPositions : [];
+        const words = Array.isArray(item.words)
+          ? item.words
+          : String(item.sentence || "")
+              .trim()
+              .split(/\s+/)
+              .filter(Boolean);
+        const isCorrect = sameCommaPositions(selectedPositions, expectedPositions);
+
+        return {
+          id: item.id,
+          type: "comma-placement",
+          prompt: item.prompt,
+          sentence: item.sentence,
+          words,
+          selectedCommaPositions: selectedPositions,
+          expectedCommaPositions: expectedPositions,
+          selectedSentence: buildCommaSentence(words, selectedPositions),
+          corrected: item.corrected,
+          needsCommas: item.needsCommas,
+          isCorrect,
+          explanation: item.explanation,
+        };
+      }
+
       const evaluatedGaps = item.gaps.map((gap) => {
         const answerKey = `${item.id}:${gap.id}`;
         const rawAnswer = answers[answerKey] || "";
@@ -427,7 +525,11 @@ export default function HubGrammarActivityRunner() {
 
     const correct = evaluatedItems.reduce(
       (sum, item) => {
-        if (item.type === "multiple-choice" || item.type === "error-correction") {
+        if (
+          item.type === "multiple-choice" ||
+          item.type === "error-correction" ||
+          item.type === "comma-placement"
+        ) {
           return sum + (item.isCorrect ? 1 : 0);
         }
         return sum + item.gaps.filter((gap) => gap.isCorrect).length;
@@ -503,7 +605,11 @@ export default function HubGrammarActivityRunner() {
             const evaluatedItem = result?.items.find((entry) => entry.id === item.id);
 
             return (
-              <article key={item.id} className="hub-grammar-card">
+              <article
+                key={item.id}
+                className="hub-grammar-card"
+                ref={registerItem(item.id)}
+              >
                 <div className="hub-grammar-card-head">
                   <span className="hub-grammar-number">{index + 1}</span>
                   <p>{item.prompt}</p>
@@ -615,6 +721,54 @@ export default function HubGrammarActivityRunner() {
                       </label>
                     ) : null}
                   </>
+                ) : item.type === "comma-placement" ? (
+                  <div className="hub-grammar-comma-builder">
+                    <div className="hub-grammar-comma-sentence">
+                      {(item.words || []).map((word, wordIndex) => {
+                        const selectedPositions = Array.isArray(answers[item.id]) ? answers[item.id] : [];
+                        const isLast = wordIndex === item.words.length - 1;
+                        const isActive = selectedPositions.includes(wordIndex);
+
+                        return (
+                          <React.Fragment key={`${item.id}:word:${wordIndex}`}>
+                            <span className="hub-grammar-comma-word">{word}</span>
+                            {!isLast ? (
+                              <button
+                                type="button"
+                                className={[
+                                  "hub-grammar-comma-toggle",
+                                  isActive ? "is-active" : "",
+                                ]
+                                  .filter(Boolean)
+                                  .join(" ")}
+                                onClick={() => handleCommaToggle(item, wordIndex)}
+                                disabled={submitted}
+                                ref={wordIndex === 0 ? registerInput(`${item.id}:comma:none`) : undefined}
+                              >
+                                ,
+                              </button>
+                            ) : null}
+                          </React.Fragment>
+                        );
+                      })}
+                    </div>
+                    <button
+                      type="button"
+                      className={[
+                        "hub-grammar-inline-btn",
+                        "hub-grammar-no-commas-btn",
+                        Array.isArray(answers[item.id]) && answers[item.id].length === 0
+                          ? "is-selected"
+                          : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      onClick={() => clearCommas(item.id)}
+                      disabled={submitted}
+                    >
+                      No commas needed
+                    </button>
+                  </div>
                 ) : (
                   <label className="hub-grammar-sentence">
                     {renderSentence(
@@ -656,6 +810,17 @@ export default function HubGrammarActivityRunner() {
                         ) : null}
                         {!evaluatedItem.isCorrect && evaluatedItem.answer === "wrong" ? (
                           <p>Your correction: {evaluatedItem.correctionAnswer || "(blank)"}</p>
+                        ) : null}
+                        <p>{evaluatedItem.explanation}</p>
+                      </div>
+                    ) : evaluatedItem.type === "comma-placement" ? (
+                      <div
+                        className={`hub-grammar-feedback ${evaluatedItem.isCorrect ? "is-correct" : "is-wrong"}`}
+                      >
+                        <strong>{evaluatedItem.isCorrect ? "Correct" : "Try again"}</strong>
+                        <p>Your version: {evaluatedItem.selectedSentence || evaluatedItem.sentence}</p>
+                        {!evaluatedItem.isCorrect ? (
+                          <p>Correct version: {evaluatedItem.corrected || "—"}</p>
                         ) : null}
                         <p>{evaluatedItem.explanation}</p>
                       </div>
@@ -885,6 +1050,71 @@ export default function HubGrammarActivityRunner() {
 
         .hub-grammar-inline-btn:hover:not(:disabled) {
           border-color: rgba(115, 146, 223, 0.72);
+        }
+
+        .hub-grammar-comma-builder {
+          display: flex;
+          flex-direction: column;
+          gap: 0.9rem;
+        }
+
+        .hub-grammar-comma-sentence {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.35rem;
+          padding: 1rem 1.05rem;
+          border-radius: 0.85rem;
+          background: rgba(2, 6, 23, 0.38);
+          border: 1px solid rgba(51, 65, 85, 0.8);
+          color: #e5efff;
+          line-height: 1.85;
+        }
+
+        .hub-grammar-comma-word {
+          font-size: 1.02rem;
+          color: #eef4ff;
+        }
+
+        .hub-grammar-comma-toggle {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          width: 1.45rem;
+          height: 1.45rem;
+          border-radius: 999px;
+          border: 1px dashed rgba(121, 152, 230, 0.55);
+          background: rgba(10, 16, 34, 0.95);
+          color: rgba(160, 187, 255, 0.55);
+          font-size: 1rem;
+          font-weight: 800;
+          cursor: pointer;
+          transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease,
+            color 0.12s ease, box-shadow 0.12s ease;
+        }
+
+        .hub-grammar-comma-toggle:hover:not(:disabled) {
+          transform: translateY(-1px);
+          border-color: rgba(115, 146, 223, 0.72);
+          color: #dbeafe;
+        }
+
+        .hub-grammar-comma-toggle.is-active {
+          border-style: solid;
+          border-color: rgba(94, 234, 212, 0.65);
+          background: rgba(20, 184, 166, 0.18);
+          color: #d7fff6;
+          box-shadow: 0 0 0 3px rgba(45, 212, 191, 0.12);
+        }
+
+        .hub-grammar-no-commas-btn {
+          align-self: flex-start;
+        }
+
+        .hub-grammar-no-commas-btn.is-selected {
+          border-color: rgba(94, 234, 212, 0.65);
+          background: rgba(20, 184, 166, 0.16);
+          color: #d7fff6;
         }
 
         .hub-grammar-options {

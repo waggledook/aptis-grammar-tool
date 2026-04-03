@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, where } from "firebase/firestore";
+import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
 import {
   db,
   fetchHubGrammarSubmissions,
@@ -238,6 +239,232 @@ function renderSavedGrammarSentence(parts, gaps = []) {
   });
 }
 
+function normalizeReviewAnswer(value = "") {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[’']/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isInlineTextInputItem(item) {
+  return (
+    item?.type === "text-input" &&
+    Array.isArray(item.inlineParts) &&
+    item.inlineParts.some((part) => part && typeof part === "object" && part.gapId)
+  );
+}
+
+function isSortBySoundItem(item) {
+  return (
+    !item?.type &&
+    typeof item?.prompt === "string" &&
+    typeof item?.answer === "string" &&
+    Array.isArray(item?.options)
+  );
+}
+
+function buildSortBySoundDistractorItems(section) {
+  const sourceItems = Array.isArray(section?.items) ? section.items : [];
+  const exampleWords = Array.isArray(section?.sharedPrompt?.exampleWords)
+    ? section.sharedPrompt.exampleWords.map((entry) => String(entry).toLowerCase())
+    : [];
+
+  return (Array.isArray(section?.sharedPrompt?.values) ? section.sharedPrompt.values : [])
+    .filter((entry) => {
+      const text = String(typeof entry === "string" ? entry : entry?.text || "").toLowerCase();
+      if (!text) return false;
+      if (exampleWords.includes(text)) return false;
+      return !sourceItems.some((item) => String(item.prompt || "").toLowerCase() === text);
+    })
+    .map((entry, index) => ({
+      id: `__distractor__:${index}:${typeof entry === "string" ? entry : entry?.text || ""}`,
+    }));
+}
+
+function getSortBySoundPenalty(section, sectionAnswerMap = {}) {
+  if (section?.taskType !== "sort-by-sound") return 0;
+  return buildSortBySoundDistractorItems(section).reduce((sum, item) => {
+    return sum + (sectionAnswerMap?.[item.id] ? 1 : 0);
+  }, 0);
+}
+
+function getCourseTestAutoItemScore(item, answer) {
+  if (item?.type === "choice") {
+    if (Array.isArray(item.acceptedAnswerIndexes) && item.acceptedAnswerIndexes.length) {
+      return item.acceptedAnswerIndexes.map(String).includes(String(answer)) ? 1 : 0;
+    }
+    return String(answer) === String(item.answerIndex) ? 1 : 0;
+  }
+  if (item?.type === "stress-choice") return String(answer) === String(item.answerIndex) ? 1 : 0;
+  if (item?.type === "matching-select") {
+    const normalized = normalizeReviewAnswer(answer);
+    if (Array.isArray(item.acceptedAnswers) && item.acceptedAnswers.length) {
+      return item.acceptedAnswers.some((entry) => normalizeReviewAnswer(entry) === normalized) ? 1 : 0;
+    }
+    return normalized === normalizeReviewAnswer(item.answer) ? 1 : 0;
+  }
+
+  if (isSortBySoundItem(item)) {
+    return normalizeReviewAnswer(answer) === normalizeReviewAnswer(item.answer) ? 1 : 0;
+  }
+  if (item?.type === "text-input") {
+    if (isInlineTextInputItem(item)) {
+      const acceptedByGap = item.inlineAcceptedAnswers || {};
+      const answerMap = answer && typeof answer === "object" ? answer : {};
+      const fullCredit = Object.entries(acceptedByGap).every(([gapId, acceptedValues]) => {
+        const normalized = normalizeReviewAnswer(answerMap[gapId] || "");
+        return (acceptedValues || []).some((entry) => normalizeReviewAnswer(entry) === normalized);
+      });
+      if (fullCredit) return 1;
+      const partialByGap = item.inlinePartialAcceptedAnswers || {};
+      const hasPartial = Object.keys(partialByGap).length > 0 &&
+        Object.entries(partialByGap).every(([gapId, acceptedValues]) => {
+          const normalized = normalizeReviewAnswer(answerMap[gapId] || "");
+          return (acceptedValues || []).some((entry) => normalizeReviewAnswer(entry) === normalized);
+        });
+      if (hasPartial) return Number(item.partialCreditValue ?? 0.5);
+      return 0;
+    }
+    const accepted = Array.isArray(item.acceptedAnswers) ? item.acceptedAnswers : [];
+    const normalized = normalizeReviewAnswer(answer);
+    if (accepted.some((entry) => normalizeReviewAnswer(entry) === normalized)) return 1;
+    const partialAccepted = Array.isArray(item.partialAcceptedAnswers) ? item.partialAcceptedAnswers : [];
+    if (partialAccepted.some((entry) => normalizeReviewAnswer(entry) === normalized)) {
+      return Number(item.partialCreditValue ?? 0.5);
+    }
+    return 0;
+  }
+  return 0;
+}
+
+function isCourseTestItemCorrect(item, answer) {
+  return getCourseTestAutoItemScore(item, answer) >= 1;
+}
+
+function formatCourseTestAnswer(item, answer) {
+  if (!answer || (typeof answer === "string" && !answer.trim())) return "—";
+  if (isInlineTextInputItem(item)) {
+    const answerMap = answer && typeof answer === "object" ? answer : {};
+    return item.inlineParts
+      .filter((part) => part && typeof part === "object" && part.gapId)
+      .map((part, index) => `Gap ${index + 1}: ${answerMap[part.gapId] || "—"}`)
+      .join(" · ");
+  }
+  if (item?.type === "choice") {
+    const selected = item.options?.[Number(answer)];
+    return typeof selected === "string" ? selected : selected?.text || "—";
+  }
+  if (item?.type === "stress-choice") {
+    const syllables = Array.isArray(item.syllables) ? item.syllables : [];
+    const chosen = syllables[Number(answer)];
+    if (!chosen) return "—";
+    return `${item.prompt}: ${chosen}`;
+  }
+
+  if (isSortBySoundItem(item)) {
+    return answer ? String(answer) : "—";
+  }
+  return String(answer);
+}
+
+function formatCourseTestKey(item) {
+  if (isInlineTextInputItem(item)) {
+    return Object.entries(item.inlineAcceptedAnswers || {})
+      .map(([gapId, values], index) => `Gap ${index + 1}: ${(values || []).join(" / ")}`)
+      .join(" · ");
+  }
+  if (item?.type === "choice") {
+    if (Array.isArray(item.acceptedAnswerIndexes) && item.acceptedAnswerIndexes.length) {
+      return item.acceptedAnswerIndexes
+        .map((index) => item.options?.[Number(index)])
+        .map((selected) => (typeof selected === "string" ? selected : selected?.text || "—"))
+        .join(" / ");
+    }
+    const selected = item.options?.[Number(item.answerIndex)];
+    return typeof selected === "string" ? selected : selected?.text || "—";
+  }
+  if (item?.type === "stress-choice") {
+    const syllables = Array.isArray(item.syllables) ? item.syllables : [];
+    const chosen = syllables[Number(item.answerIndex)];
+    if (!chosen) return "—";
+    return `${item.prompt}: ${chosen}`;
+  }
+  if (item?.type === "matching-select") {
+    if (Array.isArray(item.acceptedAnswers) && item.acceptedAnswers.length) {
+      return item.acceptedAnswers.join(" / ");
+    }
+    return item.answer || "—";
+  }
+
+  if (isSortBySoundItem(item)) {
+    return item.answer || "—";
+  }
+  if (Array.isArray(item?.acceptedAnswers)) return item.acceptedAnswers.join(" / ");
+  return "—";
+}
+
+function buildCourseTestSectionBreakdown(template, attempt) {
+  if (!template || !attempt) return [];
+  const answers = attempt.runnerState?.sectionAnswers || {};
+  const teacherItemScores = attempt.teacherReview?.itemScores || {};
+  const bySkill = new Map();
+
+  (template.sections || []).forEach((section) => {
+    const skill = section.skill || section.id;
+    if (!bySkill.has(skill)) {
+      bySkill.set(skill, {
+        skill,
+        label:
+          skill === "grammar"
+            ? "Grammar"
+            : skill === "vocabulary"
+              ? "Vocabulary"
+              : skill === "pronunciation"
+                ? "Pronunciation"
+                : skill === "practical-english"
+                  ? "Practical English"
+                : skill === "reading"
+                  ? "Reading"
+                  : skill === "listening"
+                    ? "Listening"
+                    : skill,
+        score: 0,
+        total: 0,
+        sections: [],
+      });
+    }
+
+    const group = bySkill.get(skill);
+    const reviewItems = (section.items || []).map((item) => {
+      const answer = answers?.[section.id]?.[item.id];
+      const key = `${section.id}:${item.id}`;
+      const autoScore = getCourseTestAutoItemScore(item, answer);
+      const autoCorrect = autoScore >= 1;
+      const assignedScore =
+        teacherItemScores[key] != null ? Number(teacherItemScores[key]) : autoScore;
+
+      group.score += assignedScore;
+      group.total += 1;
+
+      return { item, answer, autoCorrect, autoScore, assignedScore };
+    });
+
+    group.score -= getSortBySoundPenalty(section, answers?.[section.id] || {});
+    group.score = Math.max(0, group.score);
+
+    group.sections.push({
+      id: section.id,
+      title: section.title,
+      penalty: getSortBySoundPenalty(section, answers?.[section.id] || {}),
+      reviewItems,
+    });
+  });
+
+  return Array.from(bySkill.values());
+}
+
 export default function MyStudents({ user }) {
   const navigate = useNavigate();
   const latestReadMapRef = useRef({});
@@ -246,6 +473,7 @@ export default function MyStudents({ user }) {
   const [loading, setLoading] = useState(true);
   const [attemptStats, setAttemptStats] = useState({});
   const [grammarCompletionNotifications, setGrammarCompletionNotifications] = useState([]);
+  const [courseTestNotifications, setCourseTestNotifications] = useState([]);
   const [submissionStats, setSubmissionStats] = useState({});
   const [rosterMeta, setRosterMeta] = useState({});
   const [classDrafts, setClassDrafts] = useState({});
@@ -274,10 +502,11 @@ export default function MyStudents({ user }) {
 
       const usersCol = collection(db, "users");
       const studentQuery = query(usersCol, where("teacherId", "==", user.uid));
-      const [studentSnap, rosterSnap, attemptsSnap, dashboardSnap, setsSnap] = await Promise.all([
+      const [studentSnap, rosterSnap, attemptsSnap, courseAttemptsSnap, dashboardSnap, setsSnap] = await Promise.all([
         getDocs(studentQuery),
         getDocs(collection(db, "users", user.uid, "studentRoster")),
         getDocs(query(collection(db, "grammarSetAttempts"), where("ownerUid", "==", user.uid))),
+        getDocs(query(collection(db, "courseTestAttempts"), where("teacherUid", "==", user.uid))),
         getDoc(doc(db, "users", user.uid, "teacherDashboards", "myStudents")),
         getDocs(query(collection(db, "grammarSets"), where("ownerId", "==", user.uid))),
       ]);
@@ -306,6 +535,7 @@ export default function MyStudents({ user }) {
         return acc;
       }, {});
       const nextGrammarNotifications = [];
+      const nextCourseTestNotifications = [];
 
       attemptsSnap.forEach((entry) => {
         const data = entry.data() || {};
@@ -350,6 +580,29 @@ export default function MyStudents({ user }) {
           checkedCount: data.checkedCount ?? data.totalQuestions ?? data.total ?? null,
           completed: !!data.completed,
           answers: Array.isArray(data.answers) ? data.answers : [],
+        });
+      });
+
+      courseAttemptsSnap.forEach((entry) => {
+        const data = entry.data() || {};
+        if (!data.completed && !data.submittedAt) return;
+
+        const template = data.templateId ? getHubCourseTestTemplate(data.templateId) : null;
+        nextCourseTestNotifications.push({
+          id: `course-test:${entry.id}`,
+          kind: "course-test",
+          attemptId: entry.id,
+          studentId: data.studentUid || "",
+          studentLabel:
+            data.studentName ||
+            data.studentEmail ||
+            studentLabelById[data.studentUid] ||
+            data.studentUid ||
+            "Student",
+          createdAt: data.submittedAt || data.updatedAt || data.startedAt || null,
+          title: data.templateTitle || template?.title || "Course test",
+          attempt: { id: entry.id, ...data },
+          template,
         });
       });
 
@@ -400,6 +653,7 @@ export default function MyStudents({ user }) {
 
       if (!alive) return;
       setGrammarCompletionNotifications(nextGrammarNotifications);
+      setCourseTestNotifications(nextCourseTestNotifications);
       setSubmissionStats(Object.fromEntries(statsEntries));
       setLoading(false);
     }
@@ -596,10 +850,10 @@ export default function MyStudents({ user }) {
   }, [hydratedStudents, submissionStats]);
 
   const teacherNotifications = useMemo(() => {
-    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications]
+    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...courseTestNotifications]
       .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
       .slice(0, 24);
-  }, [grammarCompletionNotifications, miniTestNotifications, writingNotifications]);
+  }, [courseTestNotifications, grammarCompletionNotifications, miniTestNotifications, writingNotifications]);
 
   const unreadNotificationCount = useMemo(() => {
     return teacherNotifications.filter((entry) => !readSubmissionKeys[entry.id]).length;
@@ -798,6 +1052,8 @@ async function copySelectedSubmission() {
                         <span>
                           {entry.kind === "writing"
                             ? `${entry.partLabel} submission`
+                            : entry.kind === "course-test"
+                              ? `${entry.attempt?.reviewStatus === "reviewed" ? "Course test reviewed" : "Course test submitted"} · ${entry.title}`
                             : entry.kind === "mini-test"
                               ? `Mini test completed · ${entry.title}`
                             : `${
@@ -1140,6 +1396,8 @@ async function copySelectedSubmission() {
                                   ? item.question || item.prompt
                                   : item.type === "error-correction"
                                     ? item.sentence || item.prompt
+                                    : item.type === "comma-placement"
+                                      ? item.sentence || item.prompt
                                     : item.parts
                                       ? renderSavedGrammarSentence(item.parts, item.gaps || [])
                                       : item.prompt}
@@ -1185,6 +1443,19 @@ async function copySelectedSubmission() {
                                   </div>
                                 ) : null}
                               </>
+                            ) : item.type === "comma-placement" ? (
+                              <div className="teacher-review-attempt-body">
+                                <div>
+                                  <span className="panel-label">Student version</span>
+                                  <p>{item.selectedSentence || item.sentence || "(no answer)"}</p>
+                                </div>
+                                {!item.isCorrect ? (
+                                  <div>
+                                    <span className="panel-label">Correct version</span>
+                                    <p>{item.corrected || "—"}</p>
+                                  </div>
+                                ) : null}
+                              </div>
                             ) : (
                               <div className="teacher-review-attempt-list" style={{ marginTop: 0 }}>
                                 {(item.gaps || []).map((gap) => (
@@ -1214,6 +1485,74 @@ async function copySelectedSubmission() {
                       </div>
                     </div>
                   ) : null}
+                </div>
+              ) : null}
+
+              {selectedNotification.kind === "course-test" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">Course test submission</span>
+                  <div className="teacher-review-answer">
+                    <strong>{selectedNotification.title}</strong>
+                    <div className="teacher-review-plain">
+                      Submitted {formatRelative(selectedNotification.createdAt)}.
+                      {" "}
+                      {selectedNotification.attempt?.reviewStatus === "reviewed"
+                        ? `Reviewed score: ${selectedNotification.attempt?.teacherScore ?? 0}/${selectedNotification.attempt?.teacherTotal ?? 0} (${selectedNotification.attempt?.finalPercent ?? 0}%).`
+                        : `Automatic score: ${selectedNotification.attempt?.autoScore ?? 0}/${selectedNotification.attempt?.autoTotal ?? 0} (${selectedNotification.attempt?.percent ?? 0}%). Awaiting teacher review.`}
+                    </div>
+                  </div>
+
+                  {buildCourseTestSectionBreakdown(selectedNotification.template, selectedNotification.attempt).map((group) => (
+                    <div key={group.skill} className="teacher-review-answer">
+                      <strong>
+                        {group.label} · {group.score}/{group.total}
+                      </strong>
+                      <div className="teacher-review-attempt-list">
+                        {group.sections.map((section) => (
+                          <div key={section.id} className="teacher-review-attempt">
+                            <div className="teacher-review-attempt-head">
+                              <span className="teacher-review-attempt-label">{section.title}</span>
+                            </div>
+                            {section.penalty ? (
+                              <div className="teacher-review-plain" style={{ marginBottom: "0.5rem" }}>
+                                Extra word penalty: -{section.penalty}
+                              </div>
+                            ) : null}
+                            <div className="teacher-review-attempt-list" style={{ marginTop: 0 }}>
+                              {section.reviewItems.map(({ item, answer, autoCorrect, assignedScore }, index) => (
+                                <div
+                                  key={`${section.id}:${item.id || index}`}
+                                  className={`teacher-review-attempt ${assignedScore >= 1 ? "is-correct" : assignedScore > 0 ? "is-partial" : "is-wrong"}`}
+                                  style={{ padding: "0.7rem 0.8rem" }}
+                                >
+                                  <div className="teacher-review-attempt-head">
+                                    <span className="teacher-review-attempt-label">{item.prompt}</span>
+                                    <span className={`teacher-review-attempt-chip ${assignedScore >= 1 ? "is-correct" : assignedScore > 0 ? "is-partial" : "is-wrong"}`}>
+                                      {assignedScore >= 1 ? "Correct" : assignedScore > 0 ? "Partial" : "Wrong"}
+                                    </span>
+                                  </div>
+                                  <div className="teacher-review-attempt-body">
+                                    <div>
+                                      <span className="panel-label">Student answer</span>
+                                      <p>{formatCourseTestAnswer(item, answer)}</p>
+                                    </div>
+                                    <div>
+                                      <span className="panel-label">Answer key</span>
+                                      <p>{formatCourseTestKey(item)}</p>
+                                    </div>
+                                    <div>
+                                      <span className="panel-label">Auto-check</span>
+                                      <p>{autoCorrect ? "Correct" : "Wrong / needs review"}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               ) : null}
 
@@ -1515,6 +1854,11 @@ async function copySelectedSubmission() {
           background: rgba(11, 45, 28, 0.24);
         }
 
+        .teacher-review-attempt.is-partial {
+          border-color: rgba(245, 158, 11, 0.28);
+          background: rgba(73, 48, 8, 0.24);
+        }
+
         .teacher-review-attempt.is-wrong {
           border-color: rgba(249, 115, 22, 0.25);
           background: rgba(58, 29, 8, 0.22);
@@ -1545,6 +1889,11 @@ async function copySelectedSubmission() {
         .teacher-review-attempt-chip.is-correct {
           background: rgba(34, 197, 94, 0.18);
           color: #bdf7cf;
+        }
+
+        .teacher-review-attempt-chip.is-partial {
+          background: rgba(245, 158, 11, 0.18);
+          color: #fde68a;
         }
 
         .teacher-review-attempt-chip.is-wrong {

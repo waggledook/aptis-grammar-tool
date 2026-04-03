@@ -1073,6 +1073,18 @@ const totalListeningTasks =
                             )}
                           </div>
                         </>
+                      ) : item.type === "comma-placement" ? (
+                        <>
+                          <div className="q">{item.sentence || item.prompt}</div>
+                          <div className="a">
+                            <strong>Your version:</strong> {item.selectedSentence || item.sentence || <em>(no answer)</em>}
+                            {!item.isCorrect && (
+                              <div className="muted small" style={{ marginTop: ".2rem" }}>
+                                Correct: {item.corrected || "—"}
+                              </div>
+                            )}
+                          </div>
+                        </>
                       ) : (
                         <>
                           <div className="q">
