@@ -1566,31 +1566,9 @@ export default function HubCourseTestRunner({ user }) {
                 <h2>{mainPaperAvailable ? "Ready to begin" : "Waiting for teacher"}</h2>
                 <p>
                   {mainPaperAvailable
-                    ? `The main paper gives you ${mainPaperDurationMinutes} minutes for grammar, vocabulary, pronunciation and reading. You can move freely between sections and come back to them.`
+                    ? `${mainPaperDurationMinutes} minutes. Complete the main paper, then listening will follow separately.`
                     : "Your teacher has not opened the main paper yet. You’ll be able to start as soon as they open this stage."}
                 </p>
-              </div>
-            </div>
-
-            <div className="hub-course-test-summary-grid">
-              <div className="hub-course-test-summary-card">
-                <span>Main paper timing</span>
-                <strong>{mainPaperDurationMinutes} minutes</strong>
-                <p>Shared time for grammar, vocabulary, pronunciation and reading.</p>
-              </div>
-              <div className="hub-course-test-summary-card">
-                <span>Listening</span>
-                <strong>Separate stage</strong>
-                <p>
-                  {controlMode === "self-controlled"
-                    ? "Listening will follow after the main paper."
-                    : "Listening will begin after your teacher opens the listening stage."}
-                </p>
-              </div>
-              <div className="hub-course-test-summary-card">
-                <span>Sections</span>
-                <strong>{mainSections.length + listeningSections.length}</strong>
-                <p>{mainSections.length} main-paper sections and {listeningSections.length} listening sections.</p>
               </div>
             </div>
 
@@ -1870,6 +1848,13 @@ export default function HubCourseTestRunner({ user }) {
                               <p>{renderHighlightedPassage(passage.text, passage.highlightWords)}</p>
                             </article>
                           ))}
+                          {Array.isArray(currentSection.sharedPrompt.footerLines) && currentSection.sharedPrompt.footerLines.length ? (
+                            <div className="hub-course-test-shared-prompt">
+                              {currentSection.sharedPrompt.footerLines.map((line) => (
+                                <p key={line}>{line}</p>
+                              ))}
+                            </div>
+                          ) : null}
                         </div>
                       ) : null}
 
@@ -1990,12 +1975,6 @@ export default function HubCourseTestRunner({ user }) {
                     </div>
                     )
                   ) : null}
-
-                  <div className="hub-course-test-footnote">
-                    <p>
-                      Listening is handled separately and will be teacher-controlled, with double playback.
-                    </p>
-                  </div>
 
                   {currentSectionIndex === mainSections.length - 1 ? (
                     <div className="hub-course-test-submit-row">

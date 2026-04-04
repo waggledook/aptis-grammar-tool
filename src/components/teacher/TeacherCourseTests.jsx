@@ -224,6 +224,50 @@ function formatAcceptedAnswer(item) {
   return "—";
 }
 
+function renderPreviewLabel(option) {
+  if (!option || typeof option === "string") return option || "";
+
+  const text = String(option.text || "");
+  const highlightMeta = option.highlight;
+  const highlight = typeof highlightMeta === "string" ? highlightMeta : String(highlightMeta?.text || "");
+  const occurrence = typeof highlightMeta === "object" ? highlightMeta?.occurrence : "first";
+  if (!highlight) return text;
+
+  const lowerText = text.toLowerCase();
+  const lowerHighlight = highlight.toLowerCase();
+  const index = occurrence === "last" ? lowerText.lastIndexOf(lowerHighlight) : lowerText.indexOf(lowerHighlight);
+  if (index === -1) return text;
+
+  return (
+    <>
+      {text.slice(0, index)}
+      <span className="teacher-course-preview-highlight">{text.slice(index, index + highlight.length)}</span>
+      {text.slice(index + highlight.length)}
+    </>
+  );
+}
+
+function renderPreviewPassage(text = "", highlights = []) {
+  const safeText = String(text || "");
+  const safeHighlights = (Array.isArray(highlights) ? highlights : [])
+    .map((entry) => String(entry || "").trim())
+    .filter(Boolean);
+
+  if (!safeHighlights.length) return safeText;
+
+  const pattern = new RegExp(
+    `\\b(${safeHighlights.map((entry) => entry.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`,
+    "gi"
+  );
+
+  return safeText.split(pattern).map((part, index) => {
+    const isHighlight = safeHighlights.some((entry) => entry.toLowerCase() === part.toLowerCase());
+    return isHighlight
+      ? <span key={`${part}-${index}`} className="teacher-course-preview-highlight">{part}</span>
+      : <React.Fragment key={`${part}-${index}`}>{part}</React.Fragment>;
+  });
+}
+
 export default function TeacherCourseTests({ user }) {
   const templates = useMemo(() => listHubCourseTestTemplates(), []);
   const [students, setStudents] = useState([]);
@@ -246,6 +290,7 @@ export default function TeacherCourseTests({ user }) {
   const [selectedAttempt, setSelectedAttempt] = useState(null);
   const [reviewScores, setReviewScores] = useState({});
   const [reviewSaving, setReviewSaving] = useState(false);
+  const [previewTemplate, setPreviewTemplate] = useState(null);
 
   useEffect(() => {
     let alive = true;
@@ -377,6 +422,15 @@ export default function TeacherCourseTests({ user }) {
     setSelectedAttempt(null);
     setReviewScores({});
     setReviewSaving(false);
+  };
+
+  const openPreviewTemplate = (template) => {
+    if (!template) return;
+    setPreviewTemplate(template);
+  };
+
+  const closePreviewTemplate = () => {
+    setPreviewTemplate(null);
   };
 
   const handleCreateSession = async () => {
@@ -645,6 +699,9 @@ export default function TeacherCourseTests({ user }) {
               <button className="btn" type="button" onClick={handleCreateSession} disabled={saving}>
                 {saving ? "Creating..." : "Create session"}
               </button>
+              <button className="ghost-btn" type="button" onClick={() => openPreviewTemplate(selectedTemplate)} disabled={!selectedTemplate || saving}>
+                View exam
+              </button>
               <button className="ghost-btn" type="button" onClick={resetForm} disabled={saving}>
                 Reset
               </button>
@@ -761,6 +818,9 @@ export default function TeacherCourseTests({ user }) {
                         </button>
                       </>
                     ) : null}
+                    <button type="button" className="ghost-btn" onClick={() => openPreviewTemplate(getHubCourseTestTemplate(session.templateId))}>
+                      View exam
+                    </button>
                     <button type="button" className="ghost-btn" onClick={() => openReviewSession(session)}>
                       Review submissions
                     </button>
@@ -903,6 +963,101 @@ export default function TeacherCourseTests({ user }) {
                   </>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {previewTemplate ? (
+        <div className="teacher-course-review-overlay" onClick={closePreviewTemplate}>
+          <div className="teacher-course-preview-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="teacher-course-review-head">
+              <div>
+                <h3>{previewTemplate.title}</h3>
+                <p>Read-only teacher preview of the full paper.</p>
+              </div>
+              <button type="button" className="ghost-btn" onClick={closePreviewTemplate}>
+                Close
+              </button>
+            </div>
+
+            <div className="teacher-course-preview-sections">
+              {(previewTemplate.sections || []).map((section) => (
+                <section key={section.id} className="teacher-course-preview-section">
+                  <div className="teacher-course-preview-section-head">
+                    <h4>{section.title}</h4>
+                    <span className="muted small">{section.itemCount} items</span>
+                  </div>
+                  {section.notes ? <p className="muted small">{section.notes}</p> : null}
+
+                  {section.sharedPrompt?.type === "reading-passage" ? (
+                    <div className="teacher-course-preview-passage">
+                      {(section.sharedPrompt.passages || []).map((passage) => (
+                        <article key={`${section.id}-${passage.heading}`} className="teacher-course-preview-passage-card">
+                          <strong>{passage.heading}</strong>
+                          <p>{renderPreviewPassage(passage.text, passage.highlightWords)}</p>
+                        </article>
+                      ))}
+                      {Array.isArray(section.sharedPrompt.footerLines) && section.sharedPrompt.footerLines.length ? (
+                        <div className="teacher-course-preview-block">
+                          {section.sharedPrompt.footerLines.map((line) => <p key={line}>{line}</p>)}
+                        </div>
+                      ) : null}
+                    </div>
+                  ) : null}
+
+                  {section.sharedPrompt?.type === "text-block" ? (
+                    <div className="teacher-course-preview-block">
+                      {section.sharedPrompt.title ? <strong>{section.sharedPrompt.title}</strong> : null}
+                      {(section.sharedPrompt.exampleLines || []).map((line) => <p key={line}>{line}</p>)}
+                    </div>
+                  ) : null}
+
+                  {section.sharedPrompt?.type === "word-bank" ? (
+                    <div className="teacher-course-preview-block">
+                      {section.sharedPrompt.title ? <strong>{section.sharedPrompt.title}</strong> : null}
+                      <div className="teacher-course-preview-chip-row">
+                        {(section.sharedPrompt.values || []).map((value, index) => (
+                          <span key={`${section.id}-value-${index}`} className="teacher-course-preview-chip">
+                            {renderPreviewLabel(value)}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+
+                  <div className="teacher-course-preview-items">
+                    {(section.items || []).map((item, index) => (
+                      <div key={item.id || `${section.id}-${index}`} className="teacher-course-preview-item">
+                        <div className="teacher-course-preview-item-index">{index + 1}</div>
+                        <div className="teacher-course-preview-item-body">
+                          <p>
+                            {item.highlight ? renderPreviewLabel({ text: item.prompt, highlight: item.highlight }) : item.prompt}
+                          </p>
+                          {item.type === "choice" || item.type === "matching-select" ? (
+                            <div className="teacher-course-preview-chip-row">
+                              {(item.options || []).map((option, optionIndex) => (
+                                <span key={`${item.id}-${optionIndex}`} className="teacher-course-preview-chip">
+                                  {renderPreviewLabel(option)}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
+                          {item.type === "stress-choice" ? (
+                            <div className="teacher-course-preview-chip-row">
+                              {(item.syllables || []).map((syllable, syllableIndex) => (
+                                <span key={`${item.id}-${syllableIndex}`} className="teacher-course-preview-chip">
+                                  {syllable}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ))}
             </div>
           </div>
         </div>
@@ -1053,6 +1208,18 @@ export default function TeacherCourseTests({ user }) {
           gap: 1rem;
         }
 
+        .teacher-course-preview-modal {
+          width: min(1100px, 100%);
+          max-height: 88vh;
+          overflow: auto;
+          border-radius: 16px;
+          border: 1px solid rgba(60, 89, 150, 0.75);
+          background: rgba(11, 19, 42, 0.98);
+          padding: 1rem;
+          display: grid;
+          gap: 1rem;
+        }
+
         .teacher-course-review-head {
           display: flex;
           justify-content: space-between;
@@ -1161,12 +1328,86 @@ export default function TeacherCourseTests({ user }) {
           flex: 0 0 auto;
         }
 
+        .teacher-course-preview-sections,
+        .teacher-course-preview-items,
+        .teacher-course-preview-passage {
+          display: grid;
+          gap: 0.9rem;
+        }
+
+        .teacher-course-preview-section,
+        .teacher-course-preview-item,
+        .teacher-course-preview-block,
+        .teacher-course-preview-passage-card {
+          border: 1px solid rgba(44, 75, 131, 0.55);
+          border-radius: 12px;
+          background: rgba(19, 33, 59, 0.72);
+          padding: 0.9rem;
+        }
+
+        .teacher-course-preview-section-head {
+          display: flex;
+          justify-content: space-between;
+          gap: 0.75rem;
+          align-items: baseline;
+          margin-bottom: 0.35rem;
+        }
+
+        .teacher-course-preview-section h4,
+        .teacher-course-preview-block p,
+        .teacher-course-preview-passage-card p,
+        .teacher-course-preview-item p {
+          margin: 0;
+        }
+
+        .teacher-course-preview-item {
+          display: grid;
+          grid-template-columns: 36px minmax(0, 1fr);
+          gap: 0.75rem;
+          align-items: start;
+        }
+
+        .teacher-course-preview-item-index {
+          display: inline-flex;
+          width: 36px;
+          height: 36px;
+          border-radius: 999px;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(90, 126, 198, 0.8);
+          background: rgba(25, 45, 82, 0.9);
+          font-weight: 700;
+        }
+
+        .teacher-course-preview-item-body,
+        .teacher-course-preview-chip-row {
+          display: flex;
+          gap: 0.55rem;
+          flex-wrap: wrap;
+        }
+
+        .teacher-course-preview-chip {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.38rem 0.7rem;
+          border-radius: 999px;
+          border: 1px solid rgba(90, 126, 198, 0.7);
+          background: rgba(25, 45, 82, 0.88);
+          font-size: 0.92rem;
+        }
+
+        .teacher-course-preview-highlight {
+          color: #8dd8ff;
+          font-weight: 700;
+        }
+
         @media (max-width: 860px) {
           .teacher-course-row,
           .teacher-course-session-meta,
           .teacher-course-review-grid,
           .teacher-course-review-summary,
-          .teacher-course-review-item-grid {
+          .teacher-course-review-item-grid,
+          .teacher-course-preview-item {
             grid-template-columns: 1fr;
           }
         }
