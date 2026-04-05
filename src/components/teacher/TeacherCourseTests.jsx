@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 import {
   db,
   createCourseTestSession,
@@ -9,6 +10,7 @@ import {
   updateCourseTestSession,
 } from "../../firebase";
 import { getHubCourseTestTemplate, listHubCourseTestTemplates } from "../../data/hubCourseTestTemplates.js";
+import { getSitePath } from "../../siteConfig.js";
 import { toast } from "../../utils/toast";
 
 function formatDateTime(value) {
@@ -269,6 +271,7 @@ function renderPreviewPassage(text = "", highlights = []) {
 }
 
 export default function TeacherCourseTests({ user }) {
+  const navigate = useNavigate();
   const templates = useMemo(() => listHubCourseTestTemplates(), []);
   const [students, setStudents] = useState([]);
   const [sessions, setSessions] = useState([]);
@@ -820,6 +823,15 @@ export default function TeacherCourseTests({ user }) {
                     ) : null}
                     <button type="button" className="ghost-btn" onClick={() => openPreviewTemplate(getHubCourseTestTemplate(session.templateId))}>
                       View exam
+                    </button>
+                    <button
+                      type="button"
+                      className="ghost-btn"
+                      onClick={() =>
+                        navigate(getSitePath(`/your-class/tests/${session.id}?teacherPreview=1`))
+                      }
+                    >
+                      Do session
                     </button>
                     <button type="button" className="ghost-btn" onClick={() => openReviewSession(session)}>
                       Review submissions

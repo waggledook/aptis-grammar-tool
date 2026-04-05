@@ -13,6 +13,8 @@ import {
 import { fetchItemsByIds } from "../../api/grammar";
 import { toast } from "../../utils/toast";
 
+const TEACHER_NOTIFICATION_LIMIT = 100;
+
 function timestampToMs(value) {
   if (!value) return 0;
   if (typeof value.toMillis === "function") return value.toMillis();
@@ -869,7 +871,7 @@ export default function MyStudents({ user }) {
   const teacherNotifications = useMemo(() => {
     return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...courseTestNotifications]
       .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
-      .slice(0, 24);
+      .slice(0, TEACHER_NOTIFICATION_LIMIT);
   }, [courseTestNotifications, grammarCompletionNotifications, miniTestNotifications, writingNotifications]);
 
   const unreadNotificationCount = useMemo(() => {

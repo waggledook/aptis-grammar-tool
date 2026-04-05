@@ -78,6 +78,8 @@ import SpeakingPart3SimilaritiesExtras from "./components/teacher/SpeakingPart3S
 import CoursePackViewer from "./components/coursepack/CoursePackViewer";
 import PackKeyLanding from "./components/coursepack/PackKeyLanding";
 import CoreGrammarKey from "./components/coursepack/CoreGrammarKey";
+
+const TEACHER_NOTIFICATION_LIMIT = 100;
 import CoreVocabularyKey from "./components/coursepack/CoreVocabularyKey";
 import ReadingPart1Key from "./components/coursepack/ReadingPart1Key";
 import ReadingPart2Key from "./components/coursepack/ReadingPart2Key";
@@ -285,7 +287,7 @@ useEffect(() => {
 
       const latestNotifications = [...notificationIds, ...grammarNotifications, ...courseTestNotifications]
         .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
-        .slice(0, 24);
+        .slice(0, TEACHER_NOTIFICATION_LIMIT);
 
       if (!alive) return;
       setTeacherUnreadCount(latestNotifications.filter((entry) => !readSubmissionKeys[entry.id]).length);

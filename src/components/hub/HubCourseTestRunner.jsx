@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
 import {
   getCourseTestSession,
@@ -359,10 +359,17 @@ function buildPronunciationColumns(section, sectionAnswerMap = {}) {
 
 function formatMatchingOption(option) {
   const raw = option && typeof option === "object" ? String(option.text || option.value || "") : String(option);
-  const [value, ...rest] = raw.split(" ");
+  const letterMatch = raw.match(/^([A-Z])\s+(.+)$/);
+  if (letterMatch) {
+    return {
+      value: letterMatch[1],
+      label: `${letterMatch[1]} — ${letterMatch[2]}`,
+    };
+  }
+
   return {
-    value,
-    label: rest.length ? `${value} — ${rest.join(" ")}` : value,
+    value: raw,
+    label: raw,
   };
 }
 
@@ -615,7 +622,12 @@ function calculateSkillBreakdown(sections = [], sectionAnswers = {}, teacherItem
 
 export default function HubCourseTestRunner({ user }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { sessionId } = useParams();
+  const teacherPreview =
+    (user?.role === "teacher" || user?.role === "admin") &&
+    new URLSearchParams(location.search).get("teacherPreview") === "1";
+  const backPath = teacherPreview ? "/teacher-tools" : "/your-class";
 
   const [loading, setLoading] = useState(true);
   const [starting, setStarting] = useState(false);
@@ -672,10 +684,10 @@ export default function HubCourseTestRunner({ user }) {
 
       setLoading(true);
       try {
-        const [sessionRow, attemptRow] = await Promise.all([
-          getCourseTestSession(sessionId),
-          getMyCourseTestAttemptForSession(sessionId, user.uid),
-        ]);
+        const sessionRow = await getCourseTestSession(sessionId);
+        const attemptRow = teacherPreview
+          ? null
+          : await getMyCourseTestAttemptForSession(sessionId, user.uid);
 
         if (!alive) return;
 
@@ -693,7 +705,7 @@ export default function HubCourseTestRunner({ user }) {
     return () => {
       alive = false;
     };
-  }, [sessionId, user]);
+  }, [sessionId, teacherPreview, user]);
 
   useEffect(() => {
     if (!user || !sessionId) return;
@@ -745,6 +757,32 @@ export default function HubCourseTestRunner({ user }) {
     [template]
   );
   const allSections = useMemo(() => [...mainSections, ...listeningSections], [mainSections, listeningSections]);
+
+  function buildTeacherPreviewAttempt() {
+    const initialRunnerState = {
+      mainPaperStartedAt: new Date().toISOString(),
+      currentSectionId: mainSections[0]?.id || "",
+      sectionStatuses: deriveStateMap(mainSections, {}),
+      sectionAnswers: deriveAnswerMap(allSections, {}),
+      sectionNotes: {},
+      mainPaperStatus: "in-progress",
+      listeningSectionIndex: 0,
+      listeningPhase: "idle",
+    };
+
+    return {
+      id: `teacher-preview:${sessionId}`,
+      isTeacherPreview: true,
+      sessionId,
+      templateId: template?.id || session?.templateId || "",
+      runnerState: initialRunnerState,
+      autoScore: 0,
+      autoTotal: 0,
+      percent: 0,
+      completed: false,
+      reviewStatus: "preview",
+    };
+  }
 
   useEffect(() => {
     if (!attempt?.id) return;
@@ -878,6 +916,21 @@ export default function HubCourseTestRunner({ user }) {
       };
 
       const { autoScore, autoTotal } = calculateAutoScore(mainSections, stateSource.sectionAnswers);
+      if (activeAttempt.isTeacherPreview) {
+        setAttempt((prev) =>
+          prev
+            ? {
+                ...prev,
+                runnerState: nextRunnerState,
+                autoScore,
+                autoTotal,
+                percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+              }
+            : prev
+        );
+        return;
+      }
+
       await saveCourseTestAttemptDraft(activeAttempt.id, {
         runnerState: nextRunnerState,
         autoScore,
@@ -1156,7 +1209,7 @@ export default function HubCourseTestRunner({ user }) {
   }
 
   useEffect(() => {
-    if (!attempt?.id || !hydrationDoneRef.current) return;
+    if (!attempt?.id || !hydrationDoneRef.current || attempt?.isTeacherPreview) return;
     if (listeningComplete) return;
     if (autosaveIntervalRef.current) {
       window.clearInterval(autosaveIntervalRef.current);
@@ -1173,7 +1226,7 @@ export default function HubCourseTestRunner({ user }) {
   }, [attempt?.id, listeningComplete]);
 
   useEffect(() => {
-    if (!attempt?.id || !hydrationDoneRef.current) return;
+    if (!attempt?.id || !hydrationDoneRef.current || attempt?.isTeacherPreview) return;
     if (listeningComplete) return;
     if (!previousSectionIdRef.current) {
       previousSectionIdRef.current = currentSectionId;
@@ -1203,6 +1256,25 @@ export default function HubCourseTestRunner({ user }) {
     if (!session || !template || !user) return;
     setStarting(true);
     try {
+      if (teacherPreview) {
+        const previewAttempt = buildTeacherPreviewAttempt();
+        setAttempt(previewAttempt);
+        setSectionStatuses(previewAttempt.runnerState.sectionStatuses);
+        setSectionAnswers(previewAttempt.runnerState.sectionAnswers);
+        setSectionNotes(previewAttempt.runnerState.sectionNotes);
+        setCurrentSectionId(previewAttempt.runnerState.currentSectionId);
+        latestStateRef.current = {
+          sectionStatuses: previewAttempt.runnerState.sectionStatuses,
+          sectionAnswers: previewAttempt.runnerState.sectionAnswers,
+          sectionNotes: previewAttempt.runnerState.sectionNotes,
+          currentSectionId: previewAttempt.runnerState.currentSectionId,
+        };
+        hydrationDoneRef.current = true;
+        hydratedAttemptIdRef.current = previewAttempt.id;
+        toast("Teacher preview started.");
+        return;
+      }
+
       const attemptId = await startCourseTestAttempt({
         sessionId: session.id,
         templateId: template.id,
@@ -1254,6 +1326,22 @@ export default function HubCourseTestRunner({ user }) {
       };
       const { autoScore, autoTotal } = calculateAutoScore(mainSections, stateSource.sectionAnswers);
 
+      if (attempt.isTeacherPreview) {
+        setAttempt((prev) =>
+          prev
+            ? {
+                ...prev,
+                runnerState: nextRunnerState,
+                autoScore,
+                autoTotal,
+                percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+              }
+            : prev
+        );
+        setSubmitConfirmOpen(false);
+        return;
+      }
+
       await saveCourseTestAttemptDraft(attempt.id, {
         runnerState: nextRunnerState,
         autoScore,
@@ -1298,6 +1386,24 @@ export default function HubCourseTestRunner({ user }) {
         listeningSubmittedAt: new Date().toISOString(),
       };
       const { autoScore, autoTotal } = calculateAutoScore(allSections, stateSource.sectionAnswers);
+
+      if (attempt.isTeacherPreview) {
+        setAttempt((prev) =>
+          prev
+            ? {
+                ...prev,
+                runnerState: nextRunnerState,
+                autoScore,
+                autoTotal,
+                percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+                completed: true,
+                submittedAt: new Date().toISOString(),
+              }
+            : prev
+        );
+        setListeningPhase("completed");
+        return;
+      }
 
       await submitCourseTestAttempt(attempt.id, {
         runnerState: nextRunnerState,
@@ -1464,8 +1570,8 @@ export default function HubCourseTestRunner({ user }) {
   const controlMode = session?.controlMode === "self-controlled" ? "self-controlled" : "teacher-controlled";
   const mainPaperState = session?.mainPaperState || (controlMode === "self-controlled" ? "open" : "locked");
   const listeningState = session?.listeningState || (controlMode === "self-controlled" ? "open" : "locked");
-  const mainPaperAvailable = controlMode === "self-controlled" || mainPaperState === "open";
-  const listeningAvailable = controlMode === "self-controlled" || listeningState === "open";
+  const mainPaperAvailable = teacherPreview || controlMode === "self-controlled" || mainPaperState === "open";
+  const listeningAvailable = teacherPreview || controlMode === "self-controlled" || listeningState === "open";
 
   useEffect(() => {
     if (!attempt?.id || !hydrationDoneRef.current) return;
@@ -1491,8 +1597,8 @@ export default function HubCourseTestRunner({ user }) {
     return (
       <div className="menu-wrapper hub-course-test-wrapper">
         <div className="hub-course-test-shell">
-          <button className="review-btn" onClick={() => navigate(getSitePath("/your-class"))}>
-            ← Back to your class
+          <button className="review-btn" onClick={() => navigate(getSitePath(backPath))}>
+            {teacherPreview ? "← Back to teacher tools" : "← Back to your class"}
           </button>
           <section className="hub-course-test-panel">
             <h1 className="hub-course-test-title">Course test</h1>
@@ -1508,8 +1614,8 @@ export default function HubCourseTestRunner({ user }) {
     return (
       <div className="menu-wrapper hub-course-test-wrapper">
         <div className="hub-course-test-shell">
-          <button className="review-btn" onClick={() => navigate(getSitePath("/your-class"))}>
-            ← Back to your class
+          <button className="review-btn" onClick={() => navigate(getSitePath(backPath))}>
+            {teacherPreview ? "← Back to teacher tools" : "← Back to your class"}
           </button>
           <section className="hub-course-test-panel">
             <p className="hub-course-test-copy">Loading test session…</p>
@@ -1524,8 +1630,8 @@ export default function HubCourseTestRunner({ user }) {
     return (
       <div className="menu-wrapper hub-course-test-wrapper">
         <div className="hub-course-test-shell">
-          <button className="review-btn" onClick={() => navigate(getSitePath("/your-class"))}>
-            ← Back to your class
+          <button className="review-btn" onClick={() => navigate(getSitePath(backPath))}>
+            {teacherPreview ? "← Back to teacher tools" : "← Back to your class"}
           </button>
           <section className="hub-course-test-panel">
             <h1 className="hub-course-test-title">Course test not available</h1>
@@ -1543,11 +1649,11 @@ export default function HubCourseTestRunner({ user }) {
     <div className="menu-wrapper hub-course-test-wrapper">
       <div className="hub-course-test-shell">
         <div className="hub-course-test-topbar">
-          <button className="review-btn" onClick={() => navigate(getSitePath("/your-class"))}>
-            ← Back to your class
+          <button className="review-btn" onClick={() => navigate(getSitePath(backPath))}>
+            {teacherPreview ? "← Back to teacher tools" : "← Back to your class"}
           </button>
           <div className="hub-course-test-save">
-            {saving ? <span>Saving…</span> : <span>Auto-saved</span>}
+            {teacherPreview ? <span>Teacher preview</span> : saving ? <span>Saving…</span> : <span>Auto-saved</span>}
           </div>
         </div>
 
@@ -1559,6 +1665,9 @@ export default function HubCourseTestRunner({ user }) {
               {(template.testKind === "end-of-course" ? "End-of-course test" : "Progress test")} ·{" "}
               {(template.level || "b1").toUpperCase()} · Teacher: {session.teacherName || session.teacherEmail || "Your teacher"}
             </p>
+            {teacherPreview ? (
+              <p className="hub-course-test-copy">Preview mode. No student submission will be recorded.</p>
+            ) : null}
           </div>
           {!mainPaperSubmitted ? (
             <div className={`hub-course-test-timer ${timeUp ? "is-over" : ""}`}>
@@ -1574,7 +1683,9 @@ export default function HubCourseTestRunner({ user }) {
               <div>
                 <h2>{mainPaperAvailable ? "Ready to begin" : "Waiting for teacher"}</h2>
                 <p>
-                  {mainPaperAvailable
+                  {teacherPreview
+                    ? "Run through this session exactly as a student would, with full access to the whole paper and listening stages."
+                    : mainPaperAvailable
                     ? `${mainPaperDurationMinutes} minutes. Complete the main paper, then listening will follow separately.`
                     : "Your teacher has not opened the main paper yet. You’ll be able to start as soon as they open this stage."}
                 </p>
@@ -1584,7 +1695,7 @@ export default function HubCourseTestRunner({ user }) {
             <div className="hub-course-test-actions">
               {mainPaperAvailable ? (
                 <button className="btn" type="button" onClick={handleStartMainPaper} disabled={starting}>
-                  {starting ? "Starting..." : "Start main paper"}
+                  {starting ? "Starting..." : teacherPreview ? "Start preview" : "Start main paper"}
                 </button>
               ) : (
                 <button className="ghost-btn" type="button" disabled>
@@ -1596,27 +1707,33 @@ export default function HubCourseTestRunner({ user }) {
         ) : listeningComplete ? (
           <section className="hub-course-test-panel">
             <div className="hub-course-test-report">
-              <div className="hub-course-test-report-hero">
-                <span className="hub-course-test-kicker">Result</span>
-                <h2>Test submitted</h2>
-                <p>
-                  {reviewStatus === "reviewed"
+                <div className="hub-course-test-report-hero">
+                  <span className="hub-course-test-kicker">Result</span>
+                  <h2>{teacherPreview ? "Preview complete" : "Test submitted"}</h2>
+                  <p>
+                    {teacherPreview
+                      ? "You’ve completed the full teacher walkthrough. No student attempt was submitted."
+                      : reviewStatus === "reviewed"
                     ? "Your teacher has reviewed this test. Here is your final report."
                     : "Your test has been submitted successfully. Your teacher will review it and confirm the final result."}
-                </p>
-              </div>
+                  </p>
+                </div>
 
               <div className="hub-course-test-report-score">
                 <span className="hub-course-test-report-status">
-                  {reviewStatus === "reviewed" ? "Reviewed" : "Awaiting review"}
+                  {teacherPreview ? "Teacher preview" : reviewStatus === "reviewed" ? "Reviewed" : "Awaiting review"}
                 </span>
                 <strong>
-                  {reviewStatus === "reviewed"
+                  {teacherPreview
+                    ? `${provisionalTotal ? Math.round((provisionalScore / provisionalTotal) * 100) : 0}%`
+                    : reviewStatus === "reviewed"
                     ? `${attempt?.finalPercent ?? 0}%`
                     : `${provisionalTotal ? Math.round((provisionalScore / provisionalTotal) * 100) : 0}%`}
                 </strong>
                 <p>
-                  {reviewStatus === "reviewed"
+                  {teacherPreview
+                    ? `${provisionalScore}/${provisionalTotal} points in preview`
+                    : reviewStatus === "reviewed"
                     ? `${attempt?.teacherScore ?? 0}/${attempt?.teacherTotal ?? 0} points`
                     : `${provisionalScore}/${provisionalTotal} auto-marked points so far`}
                 </p>
@@ -1653,9 +1770,11 @@ export default function HubCourseTestRunner({ user }) {
               <div className="hub-course-test-report">
                 <div className="hub-course-test-report-hero">
                   <span className="hub-course-test-kicker">Main paper submitted</span>
-                  <h2>Waiting for listening</h2>
+                  <h2>{teacherPreview ? "Listening ready" : "Waiting for listening"}</h2>
                   <p>
-                    Your main paper has been submitted. Listening will begin once your teacher opens the listening stage.
+                    {teacherPreview
+                      ? "You can continue straight into listening from this teacher preview."
+                      : "Your main paper has been submitted. Listening will begin once your teacher opens the listening stage."}
                   </p>
                 </div>
               </div>
@@ -1906,9 +2025,7 @@ export default function HubCourseTestRunner({ user }) {
                           >
                             <div className="hub-course-test-item-head">
                               <span className="hub-course-test-item-index">{index + 1}</span>
-                              {currentSection.taskType === "word-formation" ? (
-                                <p className="hub-course-test-word-formation-prompt">{item.prompt}</p>
-                              ) : item.type === "stress-choice" ? (
+                              {item.type === "stress-choice" ? (
                                 <p>{item.prompt}</p>
                               ) : (
                                 <p className={inlineTextInput ? "hub-course-test-inline-prompt" : ""}>
@@ -1946,19 +2063,6 @@ export default function HubCourseTestRunner({ user }) {
                               </button>
                             ))}
                           </div>
-                        ) : inlineTextInput ? null : currentSection.taskType === "word-formation" ? (
-                          <input
-                            className="input hub-course-test-word-formation-input"
-                            value={answer}
-                            onChange={(e) => setItemAnswer(currentSection.id, item.id, e.target.value)}
-                            onKeyDown={handleExamTextInputKeyDown}
-                            placeholder="Answer"
-                            spellCheck={false}
-                            autoComplete="off"
-                            autoCorrect="off"
-                            autoCapitalize="none"
-                            disabled={timeUp}
-                          />
                         ) : inlineTextInput ? null : (
                           <input
                             className="input"
@@ -2111,7 +2215,7 @@ export default function HubCourseTestRunner({ user }) {
                       onClick={handleSubmitMainPaper}
                       disabled={submittingMainPaper}
                     >
-                      {submittingMainPaper ? "Submitting..." : "Confirm submit"}
+                      {submittingMainPaper ? "Submitting..." : teacherPreview ? "Confirm and continue" : "Confirm submit"}
                     </button>
                   </div>
                 </div>
