@@ -184,9 +184,10 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
+            title: "Example",
             exampleLines: [
-              "Lucy and Emilia have known (know) each other for years.",
+              "Lucy and Emilia have ________ each other for years. (know)",
+              "Correct answer: known",
             ],
           },
           items: [
@@ -269,8 +270,11 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
-            exampleLines: ["What a sad story!"],
+            title: "Example",
+            exampleLines: [
+              "What a ________ story!",
+              "Correct answer: sad",
+            ],
           },
           items: [
             textInputItem("g2-1", "Please can you play ________ quietly? You’re too loud!", ["more"]),
@@ -298,9 +302,9 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
+            title: "Example",
             exampleLines: [
-              "You must tell Yasmin.",
+              "You must tell Yasmin. ->",
               "You mustn't tell Yasmin.",
             ],
           },
@@ -325,10 +329,10 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
+            title: "Example",
             exampleLines: [
               "like you do food vegetarian ?",
-              "Do you like vegetarian food?",
+              "Correct answer: Do you like vegetarian food?",
             ],
           },
           items: [
@@ -352,9 +356,11 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
+            title: "Example",
             exampleLines: [
-              "I was watching TV when I heard / was hearing a noise.",
+              "I was watching TV when I ________ a noise.",
+              "A heard    B was hearing",
+              "Correct answer: A heard",
             ],
           },
           items: [
@@ -383,8 +389,8 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
-            exampleLines: ["cut → e down on chocolate"],
+            title: "Example",
+            exampleLines: ["cut -> down on chocolate"],
           },
           items: [
             matchingItem("v6-1", "spend", ["a in common", "b of petrol", "c money from a relative", "d another team", "e down on chocolate", "f with someone", "g before a match", "h money for a holiday", "i at a restaurant", "j money on clothes", "k touch with someone"], "j"),
@@ -412,9 +418,11 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
+            title: "Example",
             exampleLines: [
-              "Ella can be patient / sociable / stubborn. She doesn’t often change her mind.",
+              "Ella can be ________. She doesn't often change her mind.",
+              "A patient    B sociable    C stubborn",
+              "Correct answer: C stubborn",
             ],
           },
           items: [
@@ -445,7 +453,8 @@ export const HUB_COURSE_TEST_TEMPLATES = [
             type: "word-bank",
             title: "Use the words in the box. There are three words you don’t need.",
             exampleLines: [
-              "This is my flatmate Eric. Seb’s moved out and Eric has his old room.",
+              "This is my ________ Eric. Seb's moved out and Eric has his old room.",
+              "Correct answer: flatmate",
             ],
             values: [
               "bill",
@@ -490,9 +499,10 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
+            title: "Example",
             exampleLines: [
-              "It’s a long journey so I think we should set off as early as possible.",
+              "It's a long journey so I think we should set ________ as early as possible.",
+              "Correct answer: off",
             ],
           },
           items: [
@@ -822,8 +832,11 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
-            exampleLines: ["If I knew (know) the answer, I'd tell you."],
+            title: "Example",
+            exampleLines: [
+              "If I ________ the answer, I'd tell you. (know)",
+              "Correct answer: knew",
+            ],
           },
           items: [
             textInputItem("g1-1", "You’re late! I ______________ (stand) here in the cold for 20 minutes.", ["have been standing", "'ve been standing", "i've been standing"]),
@@ -910,8 +923,11 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
-            exampleLines: ["You don’t have to shout. I can hear you."],
+            title: "Example",
+            exampleLines: [
+              "You don't have to shout. I can hear you.",
+              "Correct answer: don't have to",
+            ],
           },
           items: [
             textInputItem("g2-1", "There are only ________ ________ people in the world who have been in space.", ["a few"], "", {
@@ -961,10 +977,10 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
+            title: "Example",
             exampleLines: [
               "The buses are quite easy to use. The Underground is easier.",
-              "The Underground is easier to use than the buses.",
+              "Complete: The Underground is easier to use than the buses.",
             ],
           },
           items: [
@@ -1099,8 +1115,12 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
-            exampleLines: ["Do you have to / must leave now?"],
+            title: "Example",
+            exampleLines: [
+              "Do you ________ leave now?",
+              "A have to    B must",
+              "Correct answer: A have to",
+            ],
           },
           items: [
             choiceItem("g4-1", "I’m sorry, ______________ you.", ["I’m not recognizing", "I don’t recognize"], 1),
@@ -1132,8 +1152,8 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
-            exampleLines: ["borrow → d money from the bank"],
+            title: "Example",
+            exampleLines: ["borrow -> money from the bank"],
           },
           items: [
             matchingItem("v5-1", "borrow", ["a money to a friend", "b at a joke", "c a business", "d money from the bank", "e a part in a film", "f something is true", "g a salary", "h yoga"], "d"),
@@ -1159,8 +1179,11 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
-            exampleLines: ["cabbage    mango    aubergine    pepper"],
+            title: "Example",
+            exampleLines: [
+              "cabbage    mango    aubergine    pepper",
+              "Correct answer: mango",
+            ],
           },
           items: [
             choiceItem("v6-1", "Choose the odd one out.", ["cast", "extra", "review", "critic"], 2),
@@ -1184,7 +1207,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
           sharedPrompt: {
             type: "word-bank",
             title: "Prefixes and suffixes",
-            exampleLines: ["imaginative → unimaginative"],
+            exampleLines: ["imaginative -> unimaginative"],
             values: ["-ful", "-able", "-ment", "self-", "il-", "un-", "dis-", "-ation", "-ian", "-ist"],
           },
           items: [
@@ -1210,8 +1233,11 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
-            exampleLines: ["Can you turn the radio up, please? I can’t hear it properly."],
+            title: "Example",
+            exampleLines: [
+              "Can you turn the radio ________, please? I can't hear it properly.",
+              "Correct answer: up",
+            ],
           },
           items: [
             textInputItem("v8-1", "I parked in the wrong place so I had to pay a ___________.", ["fine"]),
@@ -1239,8 +1265,12 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         {
           sharedPrompt: {
             type: "text-block",
-            title: "Worked example",
-            exampleLines: ["I’ve been wasting my money on silly things like trainers.  saving / wasting / buying"],
+            title: "Example",
+            exampleLines: [
+              "I've been ________ my money on silly things like trainers.",
+              "A saving    B wasting    C buying",
+              "Correct answer: B wasting",
+            ],
           },
           items: [
             choiceItem("v9-1", "The bus was late, which was really ________.", ["frustrated", "frustration", "frustrating"], 2),
@@ -1528,7 +1558,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 15, true, "Complete the sentences with the correct form of the verb in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["He lives (live) in London."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Example answer: He lives in London."] },
         items: [
           textInputItem("g1-1", "What kind of films _______ you _______ (like)?", ["do you like"], "", { inlineParts: ["What kind of films ", { gapId: "g1", width: "short" }, " you ", { gapId: "g2", width: "medium" }, " (like)?"], inlineAcceptedAnswers: { g1: ["do"], g2: ["like"] } }),
           textInputItem("g1-2", "_______ (be) they Italian or Spanish?", ["are"], "", { inlineParts: [{ gapId: "g1", width: "short" }, " (be) they Italian or Spanish?"], inlineAcceptedAnswers: { g1: ["are"] } }),
@@ -1548,7 +1578,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: One-word completion", "grammar", "one-word-gap-fill", "gap-fill-word-or-phrase", 15, true, "Complete the sentences with one word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["What is her name?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Example answer: her"] },
         items: [
           textInputItem("g2-1", "What time _______ you have lunch?", ["do"]),
           textInputItem("g2-2", "This is my sister. _______ name’s Carla.", ["her"]),
@@ -1568,7 +1598,15 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Underline the correct form", "grammar", "multiple-choice-inline", "multiple-choice-single", 10, true, "Underline the correct word or phrase.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["We hardly ever go on holiday in / at spring."] },
+        sharedPrompt: {
+          type: "text-block",
+          title: "Example",
+          exampleLines: [
+            "We hardly ever go on holiday ______ spring.",
+            "A in    B at",
+            "Correct answer: A in",
+          ],
+        },
         items: [
           choiceItem("g3-1", "________ play the accordion?", ["Does he can", "Can he"], 1),
           choiceItem("g3-2", "They ________ football with their friends.", ["sometimes play", "play sometimes"], 0),
@@ -1583,7 +1621,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-4", "Vocabulary 4: Odd one out", "vocabulary", "odd-one-out", "odd-one-out", 10, true, "Underline the odd word out.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["April    summer    June    October"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["April    summer    June    October", "Correct answer: summer"] },
         items: [
           choiceItem("v4-1", "Choose the odd one out.", ["French", "Germany", "Mexican", "Polish"], 1),
           choiceItem("v4-2", "Choose the odd one out.", ["bored", "stressed", "sad", "relaxed"], 3),
@@ -1598,7 +1636,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-5", "Vocabulary 5: Opposites", "vocabulary", "word-opposites", "gap-fill-word-or-phrase", 10, true, "Write the opposite.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["finish → start"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["finish -> start"] },
         items: [
           textInputItem("v5-1", "happy", ["sad"]),
           textInputItem("v5-2", "good", ["bad"]),
@@ -1613,7 +1651,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-6", "Vocabulary 6: Complete the word", "vocabulary", "complete-the-word", "gap-fill-word-or-phrase", 10, true, "Complete the words in the sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Let’s go out to eat."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Let's go out to e________.", "Correct answer: eat"] },
         items: [
           textInputItem("v6-1", "Do you like t_________ photos?", ["taking", "aking"]),
           textInputItem("v6-2", "This is the classroom where I learn English. I’m a s_________.", ["student", "tudent"]),
@@ -1628,7 +1666,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-7", "Vocabulary 7: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Complete the sentences with the correct word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["My grandfather sings in a choir. orchestra    percussion    choir"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["My grandfather sings in a _______.", "A orchestra    B percussion    C choir", "Correct answer: C choir"] },
         items: [
           choiceItem("v7-1", "They always ________ the gym on Tuesdays after work.", ["do", "go to", "play"], 1),
           choiceItem("v7-2", "Matt works in an office. He’s an ________.", ["administrator", "actor", "receptionist"], 0),
@@ -1643,7 +1681,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("pronunciation-part-8", "Pronunciation 8: Stress", "pronunciation", "stress-identification", "pronunciation-stress", 10, true, "Underline the stressed syllable.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Click the stressed syllable: com | pu | ter"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["computer -> click pu"] },
         items: [
           { id: "p8-1", type: "stress-choice", prompt: "guitar", syllables: ["gui", "tar"], answerIndex: 1 },
           { id: "p8-2", type: "stress-choice", prompt: "beautiful", syllables: ["beau", "ti", "ful"], answerIndex: 0 },
@@ -1660,7 +1698,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
       buildSection("pronunciation-part-9", "Pronunciation 9: Same sounds", "pronunciation", "word-matching", "listening-matching", 10, true, "Match the words with the same sounds.", {
         sharedPrompt: {
           type: "word-bank",
-          title: "Worked example: that → there",
+          title: "Example: that -> there",
           values: [
             highlightedOption("do", "o"),
             highlightedOption("fish", "i"),
@@ -1793,7 +1831,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Complete the sentences", "grammar", "complete-the-sentence", "gap-fill-word-or-phrase", 16, true, "Complete the sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Franco phoned me five minutes ago."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Example answer: ago"] },
         items: [
           textInputItem("g1-1", "A Do you think it’s ________ to snow tomorrow?\nB Yes, it’s very cold.", ["going"]),
           textInputItem("g1-2", "A ________ you have a good time at the party last night?\nB Yes, it was great.", ["did"]),
@@ -1814,7 +1852,15 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: Underline the correct form", "grammar", "multiple-choice-inline", "multiple-choice-single", 10, true, "Underline the correct form.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I don’t like getting up early at / in weekends."] },
+        sharedPrompt: {
+          type: "text-block",
+          title: "Example",
+          exampleLines: [
+            "I don't like getting up early ______ weekends.",
+            "A at    B in",
+            "Correct answer: A at",
+          ],
+        },
         items: [
           choiceItem("g2-1", "Renata drove the car ________ the garage.", ["through", "into"], 1),
           choiceItem("g2-2", "This is a ________.", ["cheap phone", "phone cheap"], 0),
@@ -1829,7 +1875,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 14, true, "Complete the sentences with the correct form of the verbs in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["We waited (wait) a long time for the bus yesterday evening."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Example answer: waited"] },
         items: [
           textInputItem("g3-1", "I ________ (look) for my keys.", ["am looking", "i am looking", "i'm looking", "'m looking"]),
           textInputItem("g3-2", "Jackie ________ (not be) born in the USA.", ["wasn't born", "was not born"]),
@@ -1848,7 +1894,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-4", "Vocabulary 4: Complete the word", "vocabulary", "complete-the-word", "gap-fill-word-or-phrase", 10, true, "Complete the words in the sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["This road is dangerous so I always drive carefully."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["This road is dangerous so I always drive c________.", "Correct answer: carefully"] },
         items: [
           textInputItem("v4-1", "I’m going to take the dog for a w________ now.", ["walk", "alk"]),
           textInputItem("v4-2", "She n________ eats meat. She’s a vegetarian.", ["never", "ever"]),
@@ -1863,7 +1909,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-5", "Vocabulary 5: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Tick A, B, or C to complete the sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I had a shower in the kitchen / bedroom / bathroom."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I had a shower in the _______.", "A kitchen    B bedroom    C bathroom", "Correct answer: C bathroom"] },
         items: [
           choiceItem("v5-1", "Ivan works in a hotel. He’s a ________.", ["receptionist", "lawyer", "journalist"], 0),
           choiceItem("v5-2", "My ________ visited on Sunday. She’s my brother’s daughter.", ["cousin", "aunt", "niece"], 2),
@@ -1878,7 +1924,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-6", "Vocabulary 6: Next word", "vocabulary", "sequence-completion", "gap-fill-word-or-phrase", 6, true, "What is the next word?", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["ten, eleven, twelve"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["ten, eleven, twelve", "Next word: thirteen"] },
         items: [
           textInputItem("v6-1", "Friday, Saturday, ________", ["sunday"]),
           textInputItem("v6-2", "first, second, ________", ["third"]),
@@ -1889,7 +1935,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-7", "Vocabulary 7: Complete the word", "vocabulary", "complete-the-word", "gap-fill-word-or-phrase", 14, true, "Complete the words in the sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["She works in an office. She’s an administrator."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["She works in an office. She's an a____________.", "Correct answer: administrator"] },
         items: [
           textInputItem("v7-1", "She told me a s________. I can’t tell you what she said.", ["secret", "ecret"]),
           textInputItem("v7-2", "I want to t________ a selfie of us on the bridge.", ["take", "ake"]),
@@ -1910,7 +1956,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
       buildSection("pronunciation-part-8", "Pronunciation 8: Same sounds", "pronunciation", "word-matching", "listening-matching", 10, true, "Match the words with the same sounds.", {
         sharedPrompt: {
           type: "word-bank",
-          title: "Worked example: key → police / cheese",
+          title: "Example: key -> police / cheese",
           values: [
             highlightedOption("bread", "ea"),
             highlightedOption("there", "ere"),
@@ -1938,7 +1984,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("pronunciation-part-9", "Pronunciation 9: Stress", "pronunciation", "stress-identification", "pronunciation-stress", 10, true, "Underline the stressed syllable.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Click the stressed syllable: pro | blem"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["problem -> click pro"] },
         items: [
           { id: "p9-1", type: "stress-choice", prompt: "engineer", syllables: ["en", "gi", "neer"], answerIndex: 2 },
           { id: "p9-2", type: "stress-choice", prompt: "ceiling", syllables: ["cei", "ling"], answerIndex: 0 },
@@ -2057,7 +2103,15 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Multiple choice", "grammar", "multiple-choice-inline", "multiple-choice-single", 15, true, "Tick A, B, or C to complete the sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Gerardo is from Mexico."] },
+        sharedPrompt: {
+          type: "text-block",
+          title: "Example",
+          exampleLines: [
+            "Gerardo ______ from Mexico.",
+            "A am    B are    C is",
+            "Correct answer: C is",
+          ],
+        },
         items: [
           choiceItem("g1-1", "A Are you from Brazil? B No, ________.", ["I'm", "I not", "I'm not"], 2),
           choiceItem("g1-2", "A Do you want a chicken sandwich? B No, thank you. I ________ eat meat.", ["don't", "doesn't", "not"], 0),
@@ -2077,7 +2131,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: Put the words in order", "grammar", "sentence-transformation", "sentence-transformation", 7, true, "Put the words in the correct order to make sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["from she Mexico is -> She is from Mexico.", "Items 1 and 6 are questions." ] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["from she Mexico is -> She is from Mexico.", "Remember: 1 and 6 are questions."] },
         items: [
           textInputItem("g2-1", "this is your T-shirt ?", ["is this your t-shirt", "is this your t shirt", "is this your tee-shirt", "is this your tee shirt"]),
           textInputItem("g2-2", "daughter Ellie Joanna's is", ["ellie is joanna's daughter", "ellie is joannas daughter"]),
@@ -2089,7 +2143,15 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Underline the correct word", "grammar", "multiple-choice-inline", "multiple-choice-single", 8, true, "Underline the correct word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Where are / is you from?"] },
+        sharedPrompt: {
+          type: "text-block",
+          title: "Example",
+          exampleLines: [
+            "Where ______ you from?",
+            "A are    B is",
+            "Correct answer: A are",
+          ],
+        },
         items: [
           choiceItem("g3-1", "A Are you French? B ___, I'm not.", ["No", "Yes"], 0, "", { choiceStyle: "word-buttons" }),
           choiceItem("g3-2", "___ speak English.", ["They", "They're"], 0, "", { choiceStyle: "word-buttons" }),
@@ -2102,7 +2164,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-1", "Vocabulary 1: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 15, true, "Tick A, B, or C to complete the sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Are you from Egypt?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Vanessa is _______.", "A France    B Italy    C Italian", "Correct answer: C Italian"] },
         items: [
           choiceItem("v1-1", "Vanessa is _______.", ["France", "Italy", "Italian"], 2),
           choiceItem("v1-2", "Do you ________ Spanish?", ["do", "say", "speak"], 2),
@@ -2122,7 +2184,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-2", "Vocabulary 2: Complete the sentences", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 15, true, "Complete the sentences. Write one word in each gap.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["My mother works in a school. She's a teacher."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["My mother works in a school. She's a t________.", "Correct answer: teacher"] },
         items: [
           textInputItem("v2-1", "What time do you g__________ u_______ in the morning?", [], "", { inlineParts: ["What time do you g", { gapId: "g1", width: "short" }, " u", { gapId: "g2", width: "short" }, " in the morning?"], inlineAcceptedAnswers: { g1: ["et", "get"], g2: ["p", "up"] } }),
           textInputItem("v2-2", "I have a sh__________ every morning.", [], "", { inlineParts: ["I have a sh", { gapId: "g1", width: "medium" }, " every morning."], inlineAcceptedAnswers: { g1: ["ower", "shower"] } }),
@@ -2146,7 +2208,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
           type: "word-bank",
           title: "Verb box",
           values: ["live", "finish", "eat", "drink", "do", "play", "read", "speak", "work", "have", "listen", "go"],
-          exampleLines: ["eat fruit and vegetables"],
+          exampleLines: ["eat fruit and vegetables", "Example answer: eat"],
         },
         items: [
           matchingItem("v3-1", "________ a newspaper", ["live", "finish", "eat", "drink", "do", "play", "read", "speak", "work", "have", "listen", "go"], "read"),
@@ -2162,7 +2224,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("pronunciation-part-1", "Pronunciation 1: Different sound", "pronunciation", "odd-one-out", "multiple-choice-single", 10, true, "Underline the word with a different sound.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["want have work"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["want   have   work", "Choose: have"] },
         items: [
           choiceItem("p1-1", "Which word has a different sound?", [highlightedOption("three", "ee"), highlightedOption("tea", "ea"), highlightedOption("nice", "i")], 2, "", { choiceStyle: "word-buttons" }),
           choiceItem("p1-2", "Which word has a different sound?", [highlightedOption("five", "i"), highlightedOption("six", "i"), highlightedOption("bike", "i")], 1, "", { choiceStyle: "word-buttons" }),
@@ -2177,7 +2239,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("pronunciation-part-2", "Pronunciation 2: Stress", "pronunciation", "stress-identification", "pronunciation-stress", 10, true, "Underline the stressed syllable.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Click the stressed syllable: A | me | ri | can"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["American -> click ri"] },
         items: [
           { id: "p2-1", type: "stress-choice", prompt: "Brazil", syllables: ["Bra", "zil"], answerIndex: 1 },
           { id: "p2-2", type: "stress-choice", prompt: "eleven", syllables: ["e", "le", "ven"], answerIndex: 1 },
@@ -2317,7 +2379,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Multiple choice", "grammar", "multiple-choice-inline", "multiple-choice-single", 15, true, "Complete the sentences. Tick A, B, or C.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Where is Jasmine from?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Where is Jasmine from? -> answer with one word or phrase from the text."] },
         items: [
           choiceItem("g1-1", "A Hello. Are you Michael? B No, I________.", ["'m not", "isn't", "not"], 0),
           choiceItem("g1-2", "A What nationality are Veronique and Lysiane? B They ________.", ["'re France", "French", "'re French"], 2),
@@ -2337,7 +2399,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 10, true, "Complete the text with the correct form of the verb in brackets. Use the present simple or the past simple tense.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Antonia Bianchi is Italian. She lives in a small flat in the centre of Milan."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Read the model text first, then complete the sentences."] },
         items: [
           textInputItem("g2-1", "She _______________ (not be) married,", ["isn't", "is not"]),
           textInputItem("g2-2", "but she _______________ (have) a boyfriend.", ["has"]),
@@ -2352,7 +2414,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Put the words in order", "grammar", "sentence-transformation", "sentence-transformation", 5, true, "Put the words in the correct order to make sentences or questions.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["usually to you time bed go what do -> What time do you usually go to bed?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["usually to you time bed go what do -> What time do you usually go to bed?"] },
         items: [
           textInputItem("g3-1", "up weekend at do get when the you ?", ["when do you get up at the weekend"]),
           textInputItem("g3-2", "wearing Tina a red is dress beautiful", ["tina is wearing a beautiful red dress"]),
@@ -2362,7 +2424,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-1", "Vocabulary 1: Complete the sentences", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 10, true, "Complete the sentences. Write ONE word in each gap.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Pedro is a waiter. He works in a Spanish restaurant."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Pedro is a waiter. He works in a Spanish r__________.", "Correct answer: restaurant"] },
         items: [
           textInputItem("v1-1", "My sister has two children. A son and a d___________.", ["daughter", "aughter"]),
           textInputItem("v1-2", "Yvonne is married. Her h__________ is Brazilian.", ["husband", "usband"]),
@@ -2377,7 +2439,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-2", "Vocabulary 2: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 15, true, "Complete the sentences. Tick A, B, or C.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["What time did you go to the cinema?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I'm very _______. I need some water.", "A hungry    B thirsty    C tired", "Correct answer: B thirsty"] },
         items: [
           choiceItem("v2-1", "I'm very _______. I need some water.", ["hungry", "thirsty", "tired"], 1),
           choiceItem("v2-2", "When it rains you need ________.", ["a camera", "an ID card", "an umbrella"], 2),
@@ -2397,7 +2459,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-3", "Vocabulary 3: Missing word", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 15, true, "Write the missing word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["one - first, two - second"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["one -> first", "two -> second"] },
         items: [
           textInputItem("v3-1", "man - men, person - ____________", ["people"]),
           textInputItem("v3-2", "Poland - Polish, Brazil - ____________", ["brazilian"]),
@@ -2417,7 +2479,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("pronunciation-part-1", "Pronunciation 1: Stress", "pronunciation", "stress-identification", "pronunciation-stress", 10, true, "Underline the stressed syllable.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Click the stressed syllable: cam | er | a"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["camera -> click cam"] },
         items: [
           { id: "p1-1", type: "stress-choice", prompt: "cupboard", syllables: ["cup", "board"], answerIndex: 0 },
           { id: "p1-2", type: "stress-choice", prompt: "Brazilian", syllables: ["Bra", "zil", "i", "an"], answerIndex: 1 },
@@ -2614,7 +2676,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 10, true, "Complete the sentences. Use the correct form of the verb in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Shhh. The film has just started (start)."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Shhh. The film has just s__________. (start)", "Correct answer: started"] },
         items: [
           textInputItem("g1-1", "'_______________ you _______________ (wash) the car yet?' 'No, I haven’t.'", ["have you washed"], "", {
             inlineParts: ["'", { gapId: "g1", width: "short" }, " you ", { gapId: "g2", width: "medium" }, " (wash) the car yet?' 'No, I haven’t.'"],
@@ -2635,7 +2697,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: Put the words in order", "grammar", "sentence-transformation", "sentence-transformation", 5, true, "Put the words in the correct order.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["old you how are ? -> How old are you?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["old you how are ? -> How old are you?"] },
         items: [
           textInputItem("g2-1", "do you last what did weekend ?", ["what did you do last weekend"]),
           textInputItem("g2-2", "you any pets do have ?", ["do you have any pets"]),
@@ -2645,7 +2707,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Underline the correct form", "grammar", "multiple-choice-inline", "multiple-choice-single", 10, true, "Underline the correct form.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Kim broke / has broken her arm while she was on holiday."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Kim ______ her arm while she was on holiday.", "A broke    B has broken", "Correct answer: A broke"] },
         items: [
           choiceItem("g3-1", "Lianne ________ to Moscow more than once.", ["has been", "has gone"], 0),
           choiceItem("g3-2", "I ________.", ["every day exercise", "exercise every day"], 1),
@@ -2660,7 +2722,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-4", "Grammar 4: Negative sentences", "grammar", "sentence-transformation", "sentence-transformation", 5, true, "Write negative sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I’m 24 years old. -> I’m not 24 years old."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I'm 24 years old. -> I'm not 24 years old."] },
         items: [
           textInputItem("g4-1", "Dani went to Nigeria.", ["dani didn't go to nigeria", "dani did not go to nigeria"]),
           textInputItem("g4-2", "You’ve finished your homework.", ["you haven't finished your homework", "you have not finished your homework"]),
@@ -2670,7 +2732,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-5", "Grammar 5: One-word completion", "grammar", "one-word-gap-fill", "gap-fill-word-or-phrase", 10, true, "Complete the sentences with one word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["The job was difficult, but Conchita worked hard and soon made a good impression."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["The job was difficult, but Conchita worked hard and soon made a good i__________.","Correct answer: impression"] },
         items: [
           textInputItem("g5-1", "Mikhail and Sonya are going to the park and __________ that they’re going for a meal.", ["after"]),
           textInputItem("g5-2", "__________ Bryony was frightened, she walked into the dark room.", ["although"]),
@@ -2707,7 +2769,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         sharedPrompt: {
           type: "word-bank",
           title: "Word box",
-          exampleLines: ["Example: I went camping with my cousins. We slept in a tent for three nights."],
+          exampleLines: ["I went camping with my cousins. We slept in a tent for three nights.", "Example answer: camping"],
           values: ["looking", "next-day", "keys", "harbour", "luggage", "ironing", "failed", "polluted", "camping", "bridge", "name", "medium-sized", "basket"],
         },
         items: [
@@ -2724,7 +2786,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-3", "Vocabulary 3: One-word completion", "vocabulary", "one-word-gap-fill", "gap-fill-word-or-phrase", 10, true, "Complete the sentences with one word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["There’s a queue for passport control. Please wait behind the line."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["There's a queue for passport control. Please wait b________ the line.", "Correct answer: behind"] },
         items: [
           textInputItem("v3-1", "‘Noor, we need to talk __________ your essay plan,’ said the teacher.", ["about"]),
           textInputItem("v3-2", "I’m sorry. I don’t agree __________ your opinion.", ["with"]),
@@ -2739,7 +2801,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-4", "Vocabulary 4: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Mill Street Café only sells healthy salads. medical / nutritionist / healthy"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Mill Street Cafe only sells ______ salads.", "A medical    B nutritionist    C healthy", "Correct answer: C healthy"] },
         items: [
           choiceItem("v4-1", "Phoebe has __________ hair.", ["medium", "tall", "curly"], 2),
           choiceItem("v4-2", "Javier often stays in bed all morning. He’s a bit __________.", ["lazy", "hard-working", "relaxed"], 0),
@@ -2918,7 +2980,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Put the words in order", "grammar", "sentence-transformation", "sentence-transformation", 6, true, "Put the words in the correct order.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["is favourite what your sport ? -> What is your favourite sport?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["is favourite what your sport ? -> What is your favourite sport?"] },
         items: [
           textInputItem("g1-1", "you we get a taxi think do should ?", ["do you think we should get a taxi"]),
           textInputItem("g1-2", "usually does Michael get work how to ?", ["how does michael usually get to work"]),
@@ -2929,7 +2991,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 12, true, "Complete the sentences. Use the correct form of the verb in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I usually leave (leave) home at eight o’clock."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I usually l________ home at eight o'clock. (leave)", "Correct answer: leave"] },
         items: [
           textInputItem("g2-1", "Blanca _______________ (write) an important email at the moment.", ["is writing", "'s writing", "blanca's writing"]),
           textInputItem("g2-2", "Ed _______________ (work) in a pet shop before he became a vet.", ["worked"]),
@@ -2949,7 +3011,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: One-word completion", "grammar", "one-word-gap-fill", "gap-fill-word-or-phrase", 10, true, "Complete the sentences with one word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["What is the matter?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["What is the m________?", "Correct answer: matter"] },
         items: [
           textInputItem("g3-1", "If you were my neighbour, I __________ be very happy.", ["would", "'d"]),
           textInputItem("g3-2", "We’ll finish as quickly __________ we can.", ["as"]),
@@ -2964,7 +3026,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-4", "Grammar 4: Underline the correct word(s)", "grammar", "multiple-choice-inline", "multiple-choice-single", 12, true, "Underline the correct word(s) in each sentence.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["That was the most / more expensive restaurant I’ve ever eaten in."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["That was the ______ expensive restaurant I've ever eaten in.", "A most    B more", "Correct answer: A most"] },
         items: [
           choiceItem("g4-1", "My drawing is __________ than yours.", ["worst", "worse"], 1),
           choiceItem("g4-2", "I’ve __________ finished reading the new best-selling book by Maya Linnet.", ["yet", "just"], 1),
@@ -2981,7 +3043,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-1", "Vocabulary 1: Write the opposite", "vocabulary", "word-opposites", "gap-fill-word-or-phrase", 5, true, "Write the opposite.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["noisy → quiet"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["noisy -> quiet"] },
         items: [
           textInputItem("v1-1", "curly", ["straight"]),
           textInputItem("v1-2", "buy", ["sell"]),
@@ -2991,7 +3053,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-2", "Vocabulary 2: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 7, true, "Complete the sentences with the correct word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["My mum likes designer jewellery, for example rings and bracelets. bags / jewellery / clothes"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["My mum likes designer ______, for example rings and bracelets.", "A bags    B jewellery    C clothes", "Correct answer: B jewellery"] },
         items: [
           choiceItem("v2-1", "Arianna __________ to be ill. But she wasn’t sick at all.", ["felt", "said", "pretended"], 2),
           choiceItem("v2-2", "The shop assistant __________ to help Nell look for a dress.", ["preferred", "offered", "complained"], 1),
@@ -3006,7 +3068,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         sharedPrompt: {
           type: "word-bank",
           title: "Word box",
-          exampleLines: ["receipt checkout shelves → trolley"],
+          exampleLines: ["receipt, checkout, shelves -> trolley"],
           values: ["passport", "trolley", "tie", "historic", "rabbit", "happiness", "goal", "washing machine", "geography", "mean", "athletics"],
         },
         items: [
@@ -3019,7 +3081,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-4", "Vocabulary 4: One-word completion", "vocabulary", "one-word-gap-fill", "gap-fill-word-or-phrase", 7, true, "Complete the sentences with one word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I’m afraid of spiders."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I'm afraid of s________.", "Correct answer: spiders"] },
         items: [
           textInputItem("v4-1", "Don’t forget to take that shirt __________ to the shop. You need a smaller size.", ["back"]),
           textInputItem("v4-2", "Ellie wants to get __________. She’s going swimming twice a week.", ["fit"]),
@@ -3031,7 +3093,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-5", "Vocabulary 5: Click the correct verb", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Click the correct verb.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["________ after a pet"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["______ after a pet", "A listen    B look    C see", "Correct answer: B look"] },
         items: [
           choiceItem("v5-1", "________ the furniture", ["load", "dust", "do"], 1),
           choiceItem("v5-2", "________ on with someone", ["get", "meet", "wait"], 0),
@@ -3046,7 +3108,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-6", "Vocabulary 6: Word formation", "vocabulary", "word-formation", "word-formation", 5, true, "Change the word given to the word form in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["compete → competition (noun)"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["compete -> competition (noun)"] },
         items: [
           textInputItem("v6-1", "talent (adjective)", ["talented"]),
           textInputItem("v6-2", "lazy (adverb)", ["lazily"]),
@@ -3205,7 +3267,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Complete the sentences", "grammar", "multiple-choice-inline", "multiple-choice-single", 14, true, "Complete the sentences with the correct option.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Svetlana __________ go to school last week."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Svetlana __________ go to school last week.", "A didn't    B wasn't    C hasn't", "Correct answer: A didn't"] },
         items: [
           choiceItem("g1-1", "This test was much __________ than the last one.", ["easier", "easyer"], 0),
           choiceItem("g1-2", "How long __________ been working here?", ["you have", "have you"], 1),
@@ -3224,7 +3286,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: Correct the mistakes", "grammar", "sentence-transformation", "sentence-transformation", 12, true, "Correct the mistakes in the underlined words / phrases.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I'm reading a book very interesting. -> a very interesting book"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I'm reading a book very interesting. -> a very interesting book"] },
         items: [
           textInputItem("g2-1", "My daughter is more sportier than my son.", ["much sportier than", "sportier than"], "", { highlight: "more sportier than" }),
           textInputItem("g2-2", "Delilah is very good in photography.", ["good at"], "", { highlight: "good in" }),
@@ -3241,7 +3303,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 14, true, "Complete the sentences with the correct form of the verb(s) in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I can't find Lorenzo. Where has he gone? (go)"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I can't find Lorenzo. Where has he g________? (go)", "Correct answer: gone"] },
         items: [
           textInputItem("g3-1", "They ________________ a meeting when I arrived, so I had a coffee and waited. (have)", ["were having"]),
           textInputItem("g3-2", "How ________ you ________________ to school when you were a child? (use / travel)", ["did you use to travel"], "", {
@@ -3269,7 +3331,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-1", "Vocabulary 1: Complete the sentences", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 14, true, "Complete the sentences. Write one word in each gap.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["The walk was lovely, but I got wet when I fell in a stream."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["The walk was lovely, but I got wet when I fell in a s________.", "Correct answer: stream"] },
         items: [
           textInputItem("v1-1", "She has brown eyes but she e________ all her photos so they look blue.", ["edits", "dits"]),
           textInputItem("v1-2", "This house is more s________ than our old flat. Now we have plenty of room.", ["spacious", "pacious"]),
@@ -3288,7 +3350,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-2", "Vocabulary 2: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 12, true, "Choose the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Don't drop sweet wrappers on the floor! wrappers / cans / lids"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Don't drop sweet ________ on the floor!", "A wrappers    B cans    C lids", "Correct answer: A wrappers"] },
         items: [
           choiceItem("v2-1", "I love this ________ photo. The mountains look purple and the clouds are beautiful.", ["landscape", "portrait", "close-up"], 0),
           choiceItem("v2-2", "The ________ said it would be sunny today but it has rained all day.", ["documentary", "weather forecast", "advert"], 1),
@@ -3305,7 +3367,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-3", "Vocabulary 3: Complete the sentences with a verb", "vocabulary", "gap-fill-verb-form", "gap-fill-word-or-phrase", 7, true, "Complete the sentences with a verb in the correct form.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Stuart likes to climb mountains when he's on holiday."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Stuart likes to c________ mountains when he's on holiday.", "Correct answer: climb"] },
         items: [
           textInputItem("v3-1", "Where do you s_________ your photos? I keep mine on my laptop.", ["store", "tore"]),
           textInputItem("v3-2", "Is there a changing room where I can t________ on this skirt, please?", ["try", "ry"]),
@@ -3320,7 +3382,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-4", "Vocabulary 4: Odd one out", "vocabulary", "odd-one-out", "odd-one-out", 7, true, "Underline the odd word out.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["leaf   branch   lake   stick"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["leaf   branch   lake   stick", "Correct answer: lake"] },
         items: [
           choiceItem("v4-1", "Choose the odd one out.", ["background", "foreground", "flash", "centre"], 2),
           choiceItem("v4-2", "Choose the odd one out.", ["news", "current affairs", "documentaries", "adverts"], 3),
@@ -3489,7 +3551,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Complete the sentences", "grammar", "multiple-choice-inline", "multiple-choice-single", 15, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I don’t mind cooking tonight if you want to relax. cooking / to cook / cook"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I don't mind __________ tonight if you want to relax.", "A cooking    B to cook    C cook", "Correct answer: A cooking"] },
         items: [
           choiceItem("g1-1", "Ibrahim ________________ me for a long time. We're old school friends.", ["has been knowing", "has known", "knows"], 1),
           choiceItem("g1-2", "If I ________________ that it was broken, I would have fixed it.", ["would have seen", "had seen", "would see"], 1),
@@ -3509,7 +3571,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: Complete the second sentence", "grammar", "sentence-transformation", "sentence-transformation", 10, true, "Complete the second sentence so that it means the same as the first.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Someone’s stolen my purse! -> My purse has been stolen."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Someone's stolen my purse! -> My purse has been stolen."] },
         items: [
           textInputItem("g2-1", "I don't know a cheaper outlet shop than this one. -> This is ________________ outlet shop I know.", ["the cheapest"]),
           textInputItem("g2-2", "Our hotel room wasn't ready. Someone was cleaning it. -> Our hotel room wasn't ready. It ________________.", ["was being cleaned"]),
@@ -3524,7 +3586,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 15, true, "Complete the sentences with the correct form of the verb in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I have to go. My train leaves in five minutes. (leave)"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I have to go. My train l________ in five minutes. (leave)", "Correct answer: leaves"] },
         items: [
           textInputItem("g3-1", "Which musical instrument would you like ________________ play? (be able to)", ["to be able to"]),
           textInputItem("g3-2", "They told us ________________ in the first three rows. (not sit)", ["not to sit"]),
@@ -3547,7 +3609,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-1", "Vocabulary 1: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 15, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["take out the rubbish"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["take out the r________", "Correct answer: rubbish"] },
         items: [
           choiceItem("v1-1", "Fredrik is very ________ and usually gets what he wants.", ["assertive", "assertious", "assertful"], 0),
           choiceItem("v1-2", "If you want to do well at university, you should ________ every seminar.", ["assist", "attend", "apply"], 1),
@@ -3567,7 +3629,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-2", "Vocabulary 2: Odd one out", "vocabulary", "odd-one-out", "odd-one-out", 10, true, "Underline the odd one out.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["hedge   gate   cockerel   fence"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["hedge   gate   cockerel   fence", "Correct answer: cockerel"] },
         items: [
           choiceItem("v2-1", "Choose the odd one out.", ["bridesmaid", "dustman", "pageboy", "bride"], 1),
           choiceItem("v2-2", "Choose the odd one out.", ["straightened", "mended", "bleached", "curled"], 1),
@@ -3582,7 +3644,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-3", "Vocabulary 3: Read the definition then complete the word", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 15, true, "Read the definition then complete the word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["a break during a theatre performance → interval"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["a break during a theatre performance -> interval"] },
         items: [
           textInputItem("v3-1", "a child that has recently learned to walk: t________", ["toddler", "oddler"]),
           textInputItem("v3-2", "another word for very dark blue: n________", ["navy", "avy"]),
@@ -3745,7 +3807,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 16, true, "Complete the sentences. Use the correct form of the verb in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Have you ever been (go) to Berlin?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Have you ever b________ to Berlin? (go)", "Correct answer: been"] },
         items: [
           textInputItem("g1-1", "We _______ (climb) for about an hour when the fog came down.", ["'d been climbing", "had been climbing", "we'd been climbing", "we had been climbing"], "", {
             inlineParts: ["We ", { gapId: "g1", width: "long" }, " (climb) for about an hour when the fog came down."],
@@ -3814,7 +3876,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: Order the words", "grammar", "sentence-transformation", "sentence-transformation", 12, true, "Order the words to make sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["boots / yesterday / you / buy / did / sale / the / in / those / ? -> Did you buy those boots in the sale yesterday?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["boots / yesterday / you / buy / did / sale / the / in / those / ? -> Did you buy those boots in the sale yesterday?"] },
         items: [
           textInputItem("g2-1", "get / sooner / the / there / we’ll / take / quicker / , / we / off / the", ["the sooner we take off, the quicker we'll get there", "the sooner we take off the quicker we'll get there"]),
           textInputItem("g2-2", "such / decided / barbecue / weather / have / it / hot / we / a / was / to", ["it was such hot weather we decided to have a barbecue"]),
@@ -3831,7 +3893,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Complete the sentences", "grammar", "multiple-choice-inline", "multiple-choice-single", 12, true, "Complete the sentences with the correct form.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I like reading mystery stories, but my sister does / doesn’t."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I like reading mystery stories, but my sister does / doesn't.", "Correct answer: doesn't"] },
         items: [
           choiceItem("g3-1", "________ should pay a lot more tax than they do.", ["The rich", "The rich people"], 0),
           choiceItem("g3-2", "Your brother doesn’t do extreme sports, ________ he?", ["does", "doesn't"], 0),
@@ -3848,7 +3910,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-1", "Vocabulary 1: Complete the words", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 10, true, "Complete the words in the sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I’ve had a sore throat for three days now. I’m going to see the doctor."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I've had a sore throat for three days now. I'm going to see the d________.", "Correct answer: doctor"] },
         items: [
           textInputItem("v1-1", "We’re having another h________ this month. It’s been over 35 degrees for weeks.", ["heatwave", "eatwave"]),
           textInputItem("v1-2", "Antonia is a________ to eggs. She comes out in a rash if she eats any.", ["allergic", "llergic"]),
@@ -3866,7 +3928,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-2", "Vocabulary 2: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Viktor has sprained his ankle, so he can’t walk very far."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Viktor has sprained his ankle, so he can't walk very far.", "Choose the best word(s) to complete the sentence."] },
         items: [
           choiceItem("v2-1", "I was horrified when Sam started ________ on that fish bone!", ["sneezing", "fainting", "choking"], 2),
           choiceItem("v2-2", "I’m so ________ that job interview’s over – they asked some really tough questions!", ["relieved", "fed up", "offended"], 0),
@@ -3881,7 +3943,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-3", "Vocabulary 3: Odd one out", "vocabulary", "odd-one-out", "odd-one-out", 10, true, "Underline the odd word out.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["temperature   blister   bandage   rash"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["temperature   blister   bandage   rash", "Correct answer: temperature"] },
         items: [
           choiceItem("v3-1", "Choose the odd one out.", ["freezing", "chilly", "boiling", "cool"], 2),
           choiceItem("v3-2", "Choose the odd one out.", ["suit", "match", "fit", "undress"], 3),
@@ -3896,7 +3958,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-4", "Vocabulary 4: Complete the sentences", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Our hotel is nearly / near the beach."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Our hotel is nearly / near the beach.", "Correct answer: near"] },
         items: [
           choiceItem("v4-1", "I’m going to take ________ of the dry weather and cut the grass.", ["notice", "advantage"], 1),
           choiceItem("v4-2", "I hate having to eat in a rush. I prefer to take my ________.", ["easy", "time"], 1),
@@ -4069,7 +4131,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 15, true, "Complete the sentences. Use the correct form of the verb in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["We’ve lived (live) next door to the Parkers for 20 years."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["We've l________ next door to the Parkers for 20 years. (live)", "Correct answer: lived"] },
         items: [
           textInputItem("g1-1", "I wanted to meet Anja, but she ________ (already leave) when I got to the barbecue.", ["'d already left", "had already left", "she'd already left", "she had already left"]),
           textInputItem("g1-2", "I ________ (write) my report for an hour when my computer crashed and lost it all.", ["'d been writing", "had been writing", "i'd been writing", "i had been writing"]),
@@ -4089,7 +4151,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: One-word completion", "grammar", "one-word-gap-fill", "gap-fill-word-or-phrase", 15, true, "Complete the sentences with one word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["A I loved the play. B So did I."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["A I loved the play. B So d________ I.", "Correct answer: did"] },
         items: [
           textInputItem("g2-1", "Oh dear, it sounds as ________ the neighbours are arguing again.", ["if"]),
           textInputItem("g2-2", "Don’t ________ me for forgetting to feed the cat – it’s your responsibility!", ["blame"]),
@@ -4109,7 +4171,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Complete the sentences with the correct word(s)", "grammar", "multiple-choice-inline", "multiple-choice-single", 10, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Who painted this picture? I love it!"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Who painted this picture? I love it!", "Choose the correct word(s) to complete the sentence."] },
         items: [
           choiceItem("g3-1", "________ are becoming an increasingly large proportion of many societies.", ["Elderly", "The elderly", "The elderly people"], 1),
           choiceItem("g3-2", "I really like my neighbour’s cat, but generally I prefer ________ dogs.", ["some", "the", "(–)"], 2),
@@ -4124,7 +4186,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-1", "Vocabulary 1: Write the words after the definitions", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 15, true, "Write the words after the definitions.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["the thing which planes take off from and land on = runway"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["the thing which planes take off from and land on = runway"] },
         items: [
           textInputItem("v1-1", "feeling like you have little hope and are ready to do anything to get out of the situation", ["desperate"]),
           textInputItem("v1-2", "not allowing water to go through it", ["waterproof"]),
@@ -4144,7 +4206,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-2", "Vocabulary 2: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 15, true, "Complete the sentences with the correct word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Oh no, it’s drizzling today. How am I going to get my washing dry?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Oh no, it's drizzling today. How am I going to get my washing dry?", "Choose the correct word to complete the sentence."] },
         items: [
           choiceItem("v2-1", "The man was charged ________ both fraud and bribery.", ["of", "with", "for"], 1),
           choiceItem("v2-2", "I’m ________ and tired of listening to you complaining about your job – why don’t you just quit?", ["fed up", "bored", "sick"], 2),
@@ -4164,7 +4226,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-3", "Vocabulary 3: Word formation", "vocabulary", "word-formation", "word-formation", 10, true, "Complete the sentences with one word made from the word in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["We misunderstood the instructions so we couldn’t set up the new TV properly. (understand)"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["We m________ the instructions so we couldn't set up the new TV properly. (understand)", "Correct answer: misunderstood"] },
         items: [
           textInputItem("v3-1", "This phone is_________, even if you drop it on a hard surface! (break)", ["unbreakable"]),
           textInputItem("v3-2", "We have a lot of ________ people in the capital because housing costs are so high. (home)", ["homeless"]),
@@ -4301,7 +4363,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 16, true, "Complete the sentences with the correct form of the verb in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Does he have to (have to) start work at 6.30 in the morning?"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Does he h________ to start work at 6.30 in the morning? (have to)", "Correct answer: have"] },
         items: [
           textInputItem("g1-1", "I wish I ________ (know) how to help you, but I’m afraid I don’t know how to fix computers.", ["knew"]),
           textInputItem("g1-2", "We were watching a scary film when we ________ (hear) a strange noise outside in the garden!", ["heard"]),
@@ -4328,7 +4390,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: Underline the correct word(s)", "grammar", "multiple-choice-inline", "multiple-choice-single", 12, true, "Underline the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["When I was a child, we used / would go skiing in the Alps every winter."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["When I was a child, we used / would go skiing in the Alps every winter.", "Correct answer: would"] },
         items: [
           choiceItem("g2-1", "________, Nina and Marek are going to buy a flat in Sheffield.", ["According", "Apparently"], 1),
           choiceItem("g2-2", "Amalia’s just called to say her train’s delayed so she ________ be here until after lunch.", ["won't", "unlikely"], 0),
@@ -4336,7 +4398,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
           choiceItem("g2-4", "Eric’s stopped playing football ________ he injured his knee last year.", ["due to", "since"], 1),
           choiceItem("g2-5", "I enjoyed visiting both cities but ________ I’d say I preferred Siena.", ["after all", "all in all"], 1),
           choiceItem("g2-6", "________ that we no longer need to worry about Zac – he’s finally got a job.", ["It seems", "It's seems"], 0),
-          choiceItem("g2-7", "The couple is ________ have driven to Mexico with a suitcase full of money.", ["is understood", "understood to"], 1),
+          choiceItem("g2-7", "The couple is ________ have driven to Mexico with a suitcase full of money.", ["understood", "understood to"], 1),
           choiceItem("g2-8", "I was late for the interview and ________, I didn’t get the job.", ["consequently", "owing"], 0),
           choiceItem("g2-9", "My interview didn’t go well at all. ________, it was a complete disaster!", ["In other words", "Otherwise"], 0),
           choiceItem("g2-10", "Arun lost his wallet, ________ he had to phone the bank and cancel his credit card.", ["so", "because"], 0),
@@ -4345,7 +4407,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Complete the sentences", "grammar", "multiple-choice-inline", "multiple-choice-single", 12, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["My sister and I give each other a box of chocolates every year on our birthdays."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["My sister and I give __________ a box of chocolates every year on our birthdays.", "Correct answer: each other"] },
         items: [
           choiceItem("g3-1", "Could you ask Stefan ________ and see me after lunch, please?", ["come", "coming", "to come"], 2),
           choiceItem("g3-2", "Don’t worry. ________ all have problems remembering things sometimes.", ["One", "Ourselves", "We"], 2),
@@ -4358,11 +4420,11 @@ export const HUB_COURSE_TEST_TEMPLATES = [
           choiceItem("g3-9", "Rarely ________ so excited. The interview went perfectly and they offered me my dream job!", ["have been I", "have I been", "I have been"], 1),
           choiceItem("g3-10", "My two-year-old ________ taking some sweets from the shop. I had to pay for them of course!", ["was got caught", "got someone caught", "got caught"], 2),
           choiceItem("g3-11", "I need time to think and to relax on my own so I spend some time ________ every day.", ["myself", "myselves", "by myself"], 2),
-          choiceItem("g3-12", "A Have you ever ________ to living away from the seaside? B No, I still miss walking on the beach every day.", ["got use", "got used to", "got use"], 1),
+          choiceItem("g3-12", "A Have you ever ________ to living away from the seaside? B No, I still miss walking on the beach every day.", ["got use", "got used", "to got use"], 1),
         ],
       }),
       buildSection("vocabulary-part-1", "Vocabulary 1: Odd one out", "vocabulary", "odd-one-out", "odd-one-out", 10, true, "Underline the odd word out.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["bang    crash    whistle    crunch"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["bang    crash    whistle    crunch", "Correct answer: whistle"] },
         items: [
           choiceItem("v1-1", "Choose the odd word out.", ["well-off", "penniless", "affluent", "loaded"], 1),
           choiceItem("v1-2", "Choose the odd word out.", ["intriguing", "thought-provoking", "creepy", "gripping"], 2),
@@ -4377,7 +4439,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-2", "Vocabulary 2: One-word completion", "vocabulary", "one-word-gap-fill", "gap-fill-word-or-phrase", 10, true, "Complete the sentences with one word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["A tight-fisted person is not generous with money."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["A ________-fisted person is not generous with money.", "Correct answer: tight"] },
         items: [
           textInputItem("v2-1", "You have to stop spending so much money – you’re living beyond your ________!", ["means"]),
           textInputItem("v2-2", "Vita loves living in Montreal. She’s having the time of her ________.", ["life"]),
@@ -4392,11 +4454,11 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-3", "Vocabulary 3: Underline the correct word(s)", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Underline the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["If you get some qualifications / benefits, then you’ll probably get a better job."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["If you get some qualifications / benefits, then you'll probably get a better job.", "Correct answer: qualifications"] },
         items: [
           choiceItem("v3-1", "I’m going to get a new bicycle next week, but for the time ________, I’m taking the bus.", ["now", "being"], 1),
           choiceItem("v3-2", "It took Alan a long time to get ________ being made redundant, but he’s happy now.", ["anywhere", "over"], 1),
-          choiceItem("v3-3", "If only everyone was as sensible and quick / down to earth as you. It’d make life a lot easier!", ["quick", "down to earth"], 1),
+          choiceItem("v3-3", "If only everyone was as sensible and ________ as you. It’d make life a lot easier!", ["quick", "down to earth"], 1),
           choiceItem("v3-4", "I started training to be a cartographer, but I ________ my mind at college and decided to become a geologist instead.", ["swapped", "changed"], 1),
           choiceItem("v3-5", "Don’t feel you need to stop. Just carry ________ with what you’re doing.", ["out", "on"], 1),
           choiceItem("v3-6", "Sometimes you have to do what someone else wants to do. You can’t always get ________.", ["together", "your own way"], 1),
@@ -4407,7 +4469,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-4", "Vocabulary 4: Complete the words", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 10, true, "Complete the words in the sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I’m a bit short of cash. I’m going to have to tighten my belt until pay day."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I'm a bit short of cash. I'm going to have to tighten my b________ until pay day.", "Correct answer: belt"] },
         items: [
           textInputItem("v4-1", "I did a lot of u________ work as a volunteer but now I really need to find a job with a salary.", ["unpaid", "npaid"]),
           textInputItem("v4-2", "You need to have a very v________ imagination if you want to write children’s books.", ["vivid", "ivid"]),
@@ -4426,19 +4488,30 @@ export const HUB_COURSE_TEST_TEMPLATES = [
           type: "word-bank",
           title: "Word bank",
           exampleLines: ["profession -> synonym"],
-          values: ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"],
+          values: [
+            highlightedOption("claim", "ai"),
+            highlightedOption("mortgage", "g"),
+            highlightedOption("tedious", "ous"),
+            highlightedOption("joke", "j"),
+            highlightedOption("experience", "x"),
+            highlightedOption("rip-off", "r"),
+            highlightedOption("surface", "ur"),
+            highlightedOption("screech", "ch"),
+            highlightedOption("value", "ue"),
+            highlightedOption("mumble", "le"),
+          ],
         },
         items: [
-          matchingItem("p1-1", "enormous", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "tedious"),
-          matchingItem("p1-2", "question", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "screech"),
-          matchingItem("p1-3", "besiege", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "joke"),
-          matchingItem("p1-4", "inhale", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "claim"),
-          matchingItem("p1-5", "unwrap", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "rip-off"),
-          matchingItem("p1-6", "usually", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "value"),
-          matchingItem("p1-7", "aversion", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "surface"),
-          matchingItem("p1-8", "giggle", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "mortgage"),
-          matchingItem("p1-9", "yell", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "mumble"),
-          matchingItem("p1-10", "knick-knacks", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "experience"),
+          matchingItem("p1-1", "enormous", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "tedious", "", { highlight: "ous" }),
+          matchingItem("p1-2", "question", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "screech", "", { highlight: "ti" }),
+          matchingItem("p1-3", "besiege", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "joke", "", { highlight: "g" }),
+          matchingItem("p1-4", "inhale", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "claim", "", { highlight: "a" }),
+          matchingItem("p1-5", "unwrap", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "rip-off", "", { highlight: "wr" }),
+          matchingItem("p1-6", "usually", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "value", "", { highlight: "u" }),
+          matchingItem("p1-7", "aversion", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "surface", "", { highlight: "er" }),
+          matchingItem("p1-8", "giggle", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "mortgage", "", { highlight: "gg" }),
+          matchingItem("p1-9", "yell", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "mumble", "", { highlight: "ll" }),
+          matchingItem("p1-10", "knick-knacks", ["claim", "mortgage", "tedious", "joke", "experience", "synonym", "rip-off", "surface", "screech", "value", "mumble"], "experience", "", { highlight: "cks" }),
         ],
       }),
       buildSection("pronunciation-part-2", "Pronunciation 2: Stress", "pronunciation", "stress-identification", "pronunciation-stress", 10, true, "Underline the stressed syllable.", {
@@ -4482,7 +4555,18 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("reading-part-2", "Reading 2: Which section?", "reading", "reading-speaker-identification", "lexical-matching", 5, true, "Which section of the article (A–E) contains the following?", {
-        sharedPrompt: { type: "text-block", title: "Which section contains the following?", exampleLines: ["Write A, B, C, D, or E."] },
+        sharedPrompt: {
+          type: "reading-passage",
+          title: "Which section contains the following?",
+          exampleLines: ["Write A, B, C, D, or E."],
+          passages: [
+            { heading: "A", text: "These days, savvy businesses are using a vast array of terms to suggest that they are environmentally friendly. Consumers want to hear phrases like ‘eco’, ‘green’, ‘fully recyclable’, ‘organic’, ‘plant-based’, and ‘energy efficient’ associated with their favourite products and brands. Recognizing the consumer shift towards more sustainable shopping choices is a step in the right direction for our increasingly fragile, resource-stretched planet, but is it enough? Greenwashing – the use of misleading advertising to give the illusion of ‘green’ without actually being ‘green’ in reality – is sadly quite common in competitive brand marketing. So how do you know you’re making the best possible green choices when you’re shopping? There’s one phrase that really does indicate a greater commitment to the planet. As a conscientious shopper with an increasingly anti-capitalist attitude, I’m searching for companies – preferably small businesses – which operate a closed-loop system." },
+            { heading: "B", text: "A closed-loop system ensures that any waste from a business is reused or repurposed in order to conserve natural resources and prevent waste. This clever concept is fast becoming popular, particularly with entrepreneurs and new small businesses at the forefront of innovation. The term ‘closed-loop’ came about because it is easier to explain business concepts in terms of real shapes – in this case loops or circles. In a traditional linear business model, raw materials move in a straight line through the manufacturing process to the consumer’s purchase of the end product, and ultimately, at the end of that product’s life, it ends up in landfill. So, in traditional models, there is a beginning, a middle, and an end, and that end usually results in waste. In comparison, with a closed-loop system, the materials are constantly moving through a loop, never reaching an end. Instead, they are repurposed and move back to the beginning of the process, therefore never creating any waste. Perhaps one of the most original and obvious examples of a closed-loop system is the collection and reuse or recycling of cans or bottles by drinks companies. Of course, recyclable materials such as aluminium and glass can be recycled or refilled thousands of times, creating little if any waste. But here are some more unusual and innovative examples of closed-loop businesses." },
+            { heading: "C", text: "In response to consumer demand, some fashion companies are developing closed-loop clothing systems to ensure that their fast fashion is sustainable. One example is the clothing company For Days which offers its customers the chance to swap their used clothing items for discounted new items. You can shop for new, trendy clothes on the website, or opt for a ‘5-item, risk-free trial kit’. Once you feel it’s time to get rid of used or damaged items, you can return them to For Days where they are recycled into new clothing using a waterless and chemical-free recycling process. The company claims to be zero waste and carbon neutral on transportation. What’s not to like?" },
+            { heading: "D", text: "Although For Days operates an entirely closed-loop system of its own, some companies are working together to collectively achieve their closed-loop goals. For example, Dutch company DyeCoo has responded to a serious environmental issue which arises from the clothing and textile industries. In order to produce different coloured fabrics, these industries require vast quantities of water and chemicals. The dyeing process produces huge amounts of toxic waste, which is a major problem particularly in Asia. However, DyeCoo has developed a dyeing process that uses no water, and no additional chemicals apart from the coloured dyes. The process uses ‘supercritical’ carbon dioxide – halfway between a liquid and a gas – which dissolves the dyes and fixes them into the cloth material. Vibrant colours are achieved because 98% of the dye is absorbed. The carbon dioxide evaporates, and is then recycled and reused. As the process does not require water, it is faster, more cost-effective, and uses less energy. The company has already established partnerships with major clothing brands wishing to reduce their carbon footprints." },
+            { heading: "E", text: "Another type of industry that works well as a closed-loop model is food manufacturing. It is estimated that around 24 million slices of bread are thrown away every day in Britain. However, a number of food businesses have found innovative ways to put bread waste to good use. One artisan bakery chain takes any pieces of bread that aren’t sold and turns them into tiny breadcrumbs. These are added to bread mixes to make delicious new freshly baked loaves. By reusing their waste bread in this way, the bakery chain estimates that they save approximately 10kg of bread per day. Other successful innovative uses of waste products include specialist beers and a range of healthy snacks made from dried leftover bread with herbs and flavourings added. Now that’s certainly food for thought!" },
+          ],
+        },
         items: [
           matchingItem("r2-1", "a description of an industrial process", ["A", "B", "C", "D", "E"], "D"),
           matchingItem("r2-2", "drawing attention to a food waste problem which is being tackled through the closed-loop system", ["A", "B", "C", "D", "E"], "E"),
@@ -4567,7 +4651,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 14, true, "Complete the sentences with the correct form of the verb(s) in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Luca had to (have to) work late last Friday night."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Luca h________ to work late last Friday night. (have to)", "Correct answer: had"] },
         items: [
           textInputItem("g1-1", "You wouldn’t be in a rush now if you ________ (wake up) earlier this morning.", ["had woken up"]),
           textInputItem("g1-2", "If I ________ (be pay) attention to the match, I would’ve seen the winning goal!", ["'d been paying", "had been paying", "'d paid", "had paid"]),
@@ -4592,7 +4676,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: One-word completion", "grammar", "one-word-gap-fill", "gap-fill-word-or-phrase", 14, true, "Complete the sentences with one word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["We had a good holiday even though it rained quite a lot."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["We had a good holiday even t________ it rained quite a lot.", "Correct answer: though"] },
         items: [
           textInputItem("g2-1", "________ Mario wants to do is play football. Nothing else!", ["all"]),
           textInputItem("g2-2", "Excuse me. Are you the woman ________ bag was stolen?", ["whose"]),
@@ -4611,7 +4695,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Complete the sentences", "grammar", "multiple-choice-inline", "multiple-choice-single", 12, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["You really need to look after yourself – you’ve got such a bad cold."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["You really need to look after yourself - you've got s________ a bad cold.", "Correct answer: such"] },
         items: [
           choiceItem("g3-1", "It looks ________ it’s going to rain in a few minutes.", ["that", "as if", "though"], 1),
           choiceItem("g3-2", "Please could you wash these ________?", ["coffee's cups", "coffee cups", "cups of coffee"], 1),
@@ -4628,7 +4712,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-1", "Vocabulary 1: Definitions", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 10, true, "Read the definitions and complete the words.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["remove from power using force = to overthrow"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["remove from power using force = to overthrow"] },
         items: [
           textInputItem("v1-1", "expressing opinions strongly and with confidence so people take notice = a________", ["assertive", "ssertive"]),
           textInputItem("v1-2", "speak in a very soft voice = to w________", ["whisper", "hisper"]),
@@ -4643,7 +4727,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-2", "Vocabulary 2: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Every time a boy walked past them, the girls started giggling."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Every time a boy walked past them, the girls started g________.", "Correct answer: giggling"] },
         items: [
           choiceItem("v2-1", "Working for an animal charity might not pay that well, but it’s a very ________ job.", ["reliable", "rewarding", "heavy going"], 1),
           choiceItem("v2-2", "It was a very ________ film. I couldn’t stop thinking about it all day.", ["haunting", "witty", "depressing"], 0),
@@ -4658,7 +4742,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-3", "Vocabulary 3: Underline the correct word(s)", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Underline the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["The door of the spooky castle crunched / creaked when it closed behind us!"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["The door of the spooky castle crunched / creaked when it closed behind us!", "Correct answer: creaked"] },
         items: [
           choiceItem("v3-1", "OK, the omelette’s almost ready – I’ll just flip it over with a ________.", ["sieve", "spatula"], 1),
           choiceItem("v3-2", "It’s the summer holidays, so I’ve got time on my ________.", ["hands", "head"], 0),
@@ -4673,7 +4757,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-4", "Vocabulary 4: Word formation", "vocabulary", "word-formation", "word-formation", 10, true, "Complete the sentences with one word made from the word in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["After the crash, the wounded (wound) were taken to hospital for treatment."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["After the crash, the w________ (wound) were taken to hospital for treatment.", "Correct answer: wounded"] },
         items: [
           textInputItem("v4-1", "Before you can hire the skis, I need to know your ________ (high) and shoe size.", ["height"]),
           textInputItem("v4-2", "We ________ (estimate) how many people would want the job. We’ve had far more applications than we were expecting.", ["underestimated"]),
@@ -4834,7 +4918,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Complete the sentences", "grammar", "multiple-choice-inline", "multiple-choice-single", 10, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["The taxi didn’t come, so our neighbour kindly offered to drive us. hence / for this reason / so"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["The taxi didn't come, ________ our neighbour kindly offered to drive us.", "A hence    B for this reason    C so", "Correct answer: C so"] },
         items: [
           choiceItem("g1-1", "He refused to pay the bank charges ________________________ they had sent his letter to the wrong address.", ["owing to", "on the grounds that", "given"], 1),
           choiceItem("g1-2", "________ Scottish wildcat is one of several animal species protected by law in the UK.", ["A", "-", "The"], 2),
@@ -4849,7 +4933,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 10, true, "Complete the sentences with the correct form of the verb in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Stella was still getting (get) ready when I arrived to give her a lift."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Stella was still g________ ready when I arrived to give her a lift. (get)", "Correct answer: getting"] },
         items: [
           textInputItem("g2-1", "Do you know that man ________ (sit) over there by the window?", ["sitting"]),
           textInputItem("g2-2", "I understand you’re frustrated but you really shouldn’t ________ (say) that!", ["have said"]),
@@ -4870,7 +4954,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: Underline the correct word(s)", "grammar", "multiple-choice-inline", "multiple-choice-single", 10, true, "Underline the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I can’t wait to see you. I’ve got a lot / lots of / some of things to tell you!"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I can't wait to see you. I've got a lot / lots of / some of things to tell you!", "Correct answer: lots of"] },
         items: [
           choiceItem("g3-1", "This is so frustrating! My mobile phone just ________ charge!", ["won’t", "couldn’t", "wouldn’t"], 0),
           choiceItem("g3-2", "The train pulled into the station. ________ on the platform was my old friend Alexandra!", ["To stand", "Standing", "Being stood"], 1),
@@ -4885,7 +4969,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-1", "Vocabulary 1: Complete the words and phrases", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 10, true, "Complete the words and phrases in the sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I’d prefer to discuss this matter face to face rather than on the telephone."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I'd prefer to discuss this matter face to f________ rather than on the telephone.", "Correct answer: face"] },
         items: [
           textInputItem("v1-1", "I’m trying to get an earlier flight. They’ve put me on s________ for the eleven twenty – I’ll let you know as soon as I do!", ["standby", "tandby"]),
           textInputItem("v1-2", "Jay took me on a wild g________ c________ to look for some little restaurant in the mountains.", ["goose chase", "oose chase"], "", {
@@ -4909,7 +4993,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-2", "Vocabulary 2: Underline the correct word(s)", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Underline the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["The numbers reached a state / rise / peak at 300 before decreasing rapidly to just 87."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["The numbers reached a state / rise / peak at 300 before decreasing rapidly to just 87.", "Correct answer: peak"] },
         items: [
           choiceItem("v2-1", "Would you like me to help you pack your ________ when you move out of your flat?", ["thing", "stuff", "bits"], 1),
           choiceItem("v2-2", "The man ________ over to us and demanded to know what we were doing.", ["strode", "skulked", "crept"], 0),
@@ -4924,7 +5008,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-3", "Vocabulary 3: Particles and chunks", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 10, true, "Complete the words or phrases in the sentences with a particle.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["It was information contained in a private email that led to the president’s downfall."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["It was information contained in a private email that led to the president's d________.", "Correct answer: downfall"] },
         items: [
           textInputItem("v3-1", "I just moved to the city last week so I haven’t managed to get ________ and about much yet.", ["out"]),
           textInputItem("v3-2", "It might be nearly 100 years old but this watch still tells the time with great accur________.", ["acy"]),
@@ -5094,7 +5178,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     },
     sections: [
       buildSection("grammar-part-1", "Grammar 1: Complete the sentences", "grammar", "multiple-choice-inline", "multiple-choice-single", 10, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["If I didn’t love opera so much, I wouldn’t go to the expense of buying tickets."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["If I didn't love opera so much, I wouldn't go to the expense of buying tickets.", "Choose the correct option to complete the sentence."] },
         items: [
           choiceItem("g1-1", "We would have expected ________ in advance of any changes to our flight times.", ["to be informed", "being informed", "to be inform"], 0),
           choiceItem("g1-2", "________ able to train for the event due to injury puts Andy at a disadvantage for the tournament next year.", ["Not to be", "Not being", "To be not"], 1),
@@ -5109,7 +5193,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-2", "Grammar 2: Verb forms", "grammar", "complete-the-sentence", "gap-fill-verb-form", 10, true, "Complete the sentences with the correct form of the verb(s) in brackets.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["We’ve been told (tell) to research thoroughly before we decide on an assignment topic."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["We've been t________ (tell) to research thoroughly before we decide on an assignment topic.", "Correct answer: told"] },
         items: [
           textInputItem("g2-1", "Take your ticket and show it to the woman ________ (stand) over there.", ["standing"]),
           textInputItem("g2-2", "Guess what? Milo has just ________ (accept) onto the medical course at Edinburgh University!", ["been accepted"]),
@@ -5124,7 +5208,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("grammar-part-3", "Grammar 3: One-word completion", "grammar", "one-word-gap-fill", "gap-fill-word-or-phrase", 10, true, "Complete the sentences with one word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["There were no lectures this week as the professors are at a conference."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["There were no l________ this week as the professors are at a conference.", "Correct answer: lectures"] },
         items: [
           textInputItem("g3-1", "If you could ________ wait here, I’ll go and see if Ms McCall is free.", ["just"]),
           textInputItem("g3-2", "Dogs should ________ kept under strict control at all times.", ["be"]),
@@ -5139,7 +5223,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-1", "Vocabulary 1: Complete the words", "vocabulary", "gap-fill", "gap-fill-word-or-phrase", 10, true, "Complete the words in the sentences.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["I was frustrated with the application process, but it was worth it in the end."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["I was frustrated with the application process, but it was w________ it in the end.", "Correct answer: worth"] },
         items: [
           textInputItem("v1-1", "Researchers o________ the species over several months in order to learn more about its behaviour.", ["observed", "bserved"]),
           textInputItem("v1-2", "The police questioned the suspect but he c________ denied all charges.", ["categorically", "ategorically"]),
@@ -5154,7 +5238,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-2", "Vocabulary 2: Underline the correct word(s)", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Underline the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Look at this stone – it’s translucent / anaemic / unilateral – you can see light through it."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Look at this stone - it's translucent / anaemic / unilateral - you can see light through it.", "Correct answer: translucent"] },
         items: [
           choiceItem("v2-1", "We’re still working on the machine’s accuracy – it can be a bit ________ sometimes.", ["hit and miss", "cut and dried", "rough and ready"], 0),
           choiceItem("v2-2", "We were just sitting down to ________ a roast dinner when the doorbell rang.", ["pick at", "put away", "tuck into"], 2),
@@ -5169,7 +5253,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("vocabulary-part-3", "Vocabulary 3: Complete the sentences", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 10, true, "Complete the sentences with the correct word(s).", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["Sorry, but I didn’t order this item. It must be some sort of a mix-up!"] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Sorry, but I didn't order this item. It must be some sort of a mix-up!", "Choose the correct option to complete the sentence."] },
         items: [
           choiceItem("v3-1", "An interesting proposal was put forward, but was later ________ as it was going to be too expensive to implement.", ["perceived", "concluded", "discounted"], 2),
           choiceItem("v3-2", "We’re hoping to ________ lions, leopards and elephants when we go to South Africa.", ["glance at", "gawp", "spot"], 2),
@@ -5184,7 +5268,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         ],
       }),
       buildSection("use-of-english-part-1", "Use of English 1: Sentence transformation", "grammar", "sentence-transformation", "sentence-transformation", 10, true, "Complete the sentence so that it has a similar meaning to the first sentence. Use three to six words, including the bold word.", {
-        sharedPrompt: { type: "text-block", title: "Worked example", exampleLines: ["The tutor asked us to take our books, jackets and bags and follow her outside. We were asked to gather our stuff and follow our tutor outside."] },
+        sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["The tutor asked us to take our books, jackets and bags and follow her outside.", "We were asked to gather our stuff and follow our tutor outside."] },
         items: [
           textInputItem("u1-1", "Why is this model only a ……………………………………… of that one? FRACTION", ["fraction of the cost"]),
           textInputItem("u1-2", "………………………………………. that we would end up working together. LITTLE", ["Little did we know"]),

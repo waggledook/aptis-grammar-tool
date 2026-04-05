@@ -222,6 +222,15 @@ function renderOptionLabel(option) {
   );
 }
 
+function getSharedPromptHeading(sharedPrompt) {
+  if (!sharedPrompt?.title) return "";
+  if (sharedPrompt.title === "Worked example") return "Example";
+  if (sharedPrompt.title.startsWith("Worked example:")) {
+    return sharedPrompt.title.replace("Worked example:", "Example:");
+  }
+  return sharedPrompt.title;
+}
+
 function renderHighlightedWord(text = "", highlight = "") {
   const safeText = String(text || "");
   const safeHighlight = typeof highlight === "string"
@@ -1812,8 +1821,8 @@ export default function HubCourseTestRunner({ user }) {
 
                   {currentSection.sharedPrompt && currentSection.taskType !== "sort-by-sound" ? (
                     <div className="hub-course-test-shared-prompt">
-                      {currentSection.sharedPrompt.title ? (
-                        <p className="hub-course-test-shared-title">{currentSection.sharedPrompt.title}</p>
+                      {getSharedPromptHeading(currentSection.sharedPrompt) ? (
+                        <p className="hub-course-test-shared-title">{getSharedPromptHeading(currentSection.sharedPrompt)}</p>
                       ) : null}
 
                       {Array.isArray(currentSection.sharedPrompt.exampleLines) &&
@@ -1864,11 +1873,6 @@ export default function HubCourseTestRunner({ user }) {
                         </p>
                       ) : null}
 
-                      {currentSection.sharedPrompt.type === "text-block" ? (
-                        <p className="hub-course-test-shared-title">
-                          {currentSection.sharedPrompt.title}
-                        </p>
-                      ) : null}
                     </div>
                   ) : null}
 
@@ -2487,10 +2491,13 @@ function HubCourseTestRunnerStyles() {
         margin: 0;
         color: #eef4ff;
         line-height: 1.5;
+        min-width: 0;
+        flex: 1 1 auto;
       }
 
       .hub-course-test-inline-prompt {
         line-height: 1.9;
+        min-width: 0;
       }
 
       .hub-course-test-item-index {
