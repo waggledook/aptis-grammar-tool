@@ -502,13 +502,25 @@ export default function MyStudents({ user }) {
 
       const usersCol = collection(db, "users");
       const studentQuery = query(usersCol, where("teacherId", "==", user.uid));
-      const [studentSnap, rosterSnap, attemptsSnap, courseAttemptsSnap, dashboardSnap, setsSnap] = await Promise.all([
+      const [studentSnap, rosterSnap, attemptsResult, courseAttemptsResult, dashboardResult, setsResult] = await Promise.all([
         getDocs(studentQuery),
         getDocs(collection(db, "users", user.uid, "studentRoster")),
-        getDocs(query(collection(db, "grammarSetAttempts"), where("ownerUid", "==", user.uid))),
-        getDocs(query(collection(db, "courseTestAttempts"), where("teacherUid", "==", user.uid))),
-        getDoc(doc(db, "users", user.uid, "teacherDashboards", "myStudents")),
-        getDocs(query(collection(db, "grammarSets"), where("ownerId", "==", user.uid))),
+        getDocs(query(collection(db, "grammarSetAttempts"), where("ownerUid", "==", user.uid))).catch((error) => {
+          console.warn("[MyStudents] Could not load grammarSetAttempts for teacher", error);
+          return null;
+        }),
+        getDocs(query(collection(db, "courseTestAttempts"), where("teacherUid", "==", user.uid))).catch((error) => {
+          console.warn("[MyStudents] Could not load courseTestAttempts for teacher", error);
+          return null;
+        }),
+        getDoc(doc(db, "users", user.uid, "teacherDashboards", "myStudents")).catch((error) => {
+          console.warn("[MyStudents] Could not load teacher dashboard state", error);
+          return null;
+        }),
+        getDocs(query(collection(db, "grammarSets"), where("ownerId", "==", user.uid))).catch((error) => {
+          console.warn("[MyStudents] Could not load grammar sets for teacher", error);
+          return null;
+        }),
       ]);
 
       if (!alive) return;
@@ -517,6 +529,11 @@ export default function MyStudents({ user }) {
         id: entry.id,
         ...entry.data(),
       }));
+
+      const attemptsSnap = attemptsResult || { forEach: () => {} };
+      const courseAttemptsSnap = courseAttemptsResult || { forEach: () => {} };
+      const dashboardSnap = dashboardResult;
+      const setsSnap = setsResult || { forEach: () => {} };
 
       const nextRosterMeta = {};
       rosterSnap.forEach((entry) => {
@@ -620,7 +637,7 @@ export default function MyStudents({ user }) {
         }, {})
       );
       setAttemptStats(nextAttemptStats);
-      const loadedReadMap = dashboardSnap.exists() ? dashboardSnap.data()?.readSubmissionKeys || {} : {};
+      const loadedReadMap = dashboardSnap?.exists?.() ? dashboardSnap.data()?.readSubmissionKeys || {} : {};
       latestReadMapRef.current = loadedReadMap;
       setReadSubmissionKeys(loadedReadMap);
 
