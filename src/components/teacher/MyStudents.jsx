@@ -135,7 +135,7 @@ function htmlFromPlainEmail(text = "") {
   let buffer = [];
 
   const flush = () => {
-    const joined = buffer.join(" ").trim();
+    const joined = buffer.join("\n").trim();
     paragraphs.push(joined.length ? escHtml(joined) : "&nbsp;");
     buffer = [];
   };
