@@ -258,6 +258,10 @@ function isInlineTextInputItem(item) {
   );
 }
 
+function hasPerGapAcceptedAnswers(item) {
+  return Boolean(item?.inlineAcceptedAnswers && Object.keys(item.inlineAcceptedAnswers).length > 0);
+}
+
 function isSortBySoundItem(item) {
   return (
     !item?.type &&
@@ -312,7 +316,7 @@ function getCourseTestAutoItemScore(item, answer) {
     return normalizeReviewAnswer(answer) === normalizeReviewAnswer(item.answer) ? 1 : 0;
   }
   if (item?.type === "text-input") {
-    if (isInlineTextInputItem(item)) {
+    if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
       const acceptedByGap = item.inlineAcceptedAnswers || {};
       const answerMap = answer && typeof answer === "object" ? answer : {};
       const fullCredit = Object.entries(acceptedByGap).every(([gapId, acceptedValues]) => {
@@ -347,7 +351,7 @@ function isCourseTestItemCorrect(item, answer) {
 
 function formatCourseTestAnswer(item, answer) {
   if (!answer || (typeof answer === "string" && !answer.trim())) return "—";
-  if (isInlineTextInputItem(item)) {
+  if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
     const answerMap = answer && typeof answer === "object" ? answer : {};
     return item.inlineParts
       .filter((part) => part && typeof part === "object" && part.gapId)
@@ -372,7 +376,7 @@ function formatCourseTestAnswer(item, answer) {
 }
 
 function formatCourseTestKey(item) {
-  if (isInlineTextInputItem(item)) {
+  if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
     return Object.entries(item.inlineAcceptedAnswers || {})
       .map(([gapId, values], index) => `Gap ${index + 1}: ${(values || []).join(" / ")}`)
       .join(" · ");

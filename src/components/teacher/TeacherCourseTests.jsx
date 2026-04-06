@@ -56,6 +56,10 @@ function isInlineTextInputItem(item) {
   );
 }
 
+function hasPerGapAcceptedAnswers(item) {
+  return Boolean(item?.inlineAcceptedAnswers && Object.keys(item.inlineAcceptedAnswers).length > 0);
+}
+
 function isSortBySoundItem(item) {
   return (
     !item?.type &&
@@ -115,7 +119,7 @@ function getAutoItemScore(item, answer) {
   }
 
   if (item?.type === "text-input") {
-    if (isInlineTextInputItem(item)) {
+    if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
       const acceptedByGap = item.inlineAcceptedAnswers || {};
       const answerMap = answer && typeof answer === "object" ? answer : {};
 
@@ -156,7 +160,7 @@ function isItemCorrect(item, answer) {
 function formatAttemptAnswer(item, answer) {
   if (!answer || (typeof answer === "string" && !answer.trim())) return "—";
 
-  if (isInlineTextInputItem(item)) {
+  if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
     const answerMap = answer && typeof answer === "object" ? answer : {};
     const gapParts = item.inlineParts.filter((part) => part && typeof part === "object" && part.gapId);
     return gapParts
@@ -184,7 +188,7 @@ function formatAttemptAnswer(item, answer) {
 }
 
 function formatAcceptedAnswer(item) {
-  if (isInlineTextInputItem(item)) {
+  if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
     return Object.entries(item.inlineAcceptedAnswers || {})
       .map(([gapId, values], index) => `Gap ${index + 1}: ${(values || []).join(" / ")}`)
       .join(" · ");

@@ -73,6 +73,10 @@ function isInlineTextInputItem(item) {
   );
 }
 
+function hasPerGapAcceptedAnswers(item) {
+  return Boolean(item?.inlineAcceptedAnswers && Object.keys(item.inlineAcceptedAnswers).length > 0);
+}
+
 function isSortBySoundItem(item) {
   return (
     !item?.type &&
@@ -136,7 +140,7 @@ function getAutoItemScore(item, answer) {
   }
 
   if (item?.type === "text-input") {
-    if (isInlineTextInputItem(item)) {
+    if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
       const acceptedByGap = item.inlineAcceptedAnswers || {};
       const answerMap = answer && typeof answer === "object" ? answer : {};
 
@@ -241,9 +245,25 @@ function renderHighlightedWord(text = "", highlight = "") {
 
   const lowerText = safeText.toLowerCase();
   const lowerHighlight = safeHighlight.toLowerCase();
-  const index = occurrence === "last"
-    ? lowerText.lastIndexOf(lowerHighlight)
-    : lowerText.indexOf(lowerHighlight);
+  let index = -1;
+  if (occurrence === "last") {
+    index = lowerText.lastIndexOf(lowerHighlight);
+  } else if (typeof occurrence === "number" && occurrence > 1) {
+    let searchFrom = 0;
+    let seen = 0;
+    while (searchFrom <= lowerText.length) {
+      const foundAt = lowerText.indexOf(lowerHighlight, searchFrom);
+      if (foundAt === -1) break;
+      seen += 1;
+      if (seen === occurrence) {
+        index = foundAt;
+        break;
+      }
+      searchFrom = foundAt + lowerHighlight.length;
+    }
+  } else {
+    index = lowerText.indexOf(lowerHighlight);
+  }
   if (index === -1) return safeText;
 
   const before = safeText.slice(0, index);
@@ -287,6 +307,15 @@ function renderHighlightedPassage(text = "", highlights = []) {
       </span>
     );
   });
+}
+
+function renderMultilineText(text = "") {
+  return String(text || "").split("\n").map((line, index, lines) => (
+    <React.Fragment key={`multiline:${index}`}>
+      {line}
+      {index < lines.length - 1 ? <br /> : null}
+    </React.Fragment>
+  ));
 }
 
 function buildPronunciationColumns(section, sectionAnswerMap = {}) {
@@ -472,6 +501,55 @@ function getSkillLabel(skill = "") {
   return skill || "Section";
 }
 
+function isInlineUseOfEnglishChoiceSection(section) {
+  return (
+    Array.isArray(section?.items) &&
+    section.items.length > 0 &&
+    section.items.every(
+      (item) => item?.type === "choice" && typeof item?.prompt === "string" && /^\[\d+\]$/.test(item.prompt.trim())
+    ) &&
+    section?.sharedPrompt?.type === "reading-passage"
+  );
+}
+
+function isMissingParagraphSection(section) {
+  return (
+    section?.taskType === "reading-speaker-identification" &&
+    section?.sharedPrompt?.type === "reading-passage" &&
+    Array.isArray(section?.items) &&
+    section.items.length > 0 &&
+    section.items.every((item) => /^Gap\s+\d+$/i.test(String(item?.prompt || "").trim()))
+  );
+}
+
+function isWordFormationTextSection(section) {
+  return section?.sharedPrompt?.type === "word-formation-passage";
+}
+
+function fillReadingPassageGaps(text = "", sourceSection, sourceAnswers = {}) {
+  const safeText = String(text || "");
+  if (!safeText.includes("[")) return safeText;
+  if (!sourceSection || !Array.isArray(sourceSection.items)) return safeText;
+
+  return safeText.replace(/\[(\d+)\]/g, (match, gapNumber) => {
+    const item = sourceSection.items.find((entry) => String(entry.prompt || "").match(/(\d+)/)?.[1] === gapNumber);
+    if (!item) return match;
+
+    const answerValue = String(sourceAnswers?.[item.id] || item.answer || "");
+    if (!answerValue) return match;
+
+    const selectedOption = (item.options || []).find((option) => {
+      const meta = formatMatchingOption(option);
+      return String(meta.value) === answerValue;
+    });
+
+    if (!selectedOption) return match;
+    const label = formatMatchingOption(selectedOption).label;
+    const paragraphText = label.replace(/^[A-Z]\s+/, "").trim();
+    return `\n\n${paragraphText}\n\n`;
+  });
+}
+
 function renderChoiceControls(item, answer, onSelect, disabled = false) {
   if (item?.choiceStyle === "word-buttons") {
     return (
@@ -587,6 +665,282 @@ function MatchingSelectControl({ section, item, answer, onSelect, disabled = fal
   );
 }
 
+function UseOfEnglishInlineChoicePassage({ section, answers, onSelect, disabled = false }) {
+  const passage = section?.sharedPrompt?.passages?.[0]?.text || "";
+  const itemByGap = new Map(
+    (section?.items || []).map((item) => [String(item.prompt || "").replace(/[\[\]\s]/g, ""), item])
+  );
+  const parts = passage.split(/(\[\d+\])/g);
+
+  return (
+    <div className="hub-course-test-uoe-passage">
+      <p>
+        {parts.map((part, index) => {
+          const match = part.match(/^\[(\d+)\]$/);
+          if (!match) {
+            return <React.Fragment key={`uoe:text:${index}`}>{part}</React.Fragment>;
+          }
+
+          const gapNumber = match[1];
+          const item = itemByGap.get(gapNumber);
+          if (!item) {
+            return (
+              <span key={`uoe:label:${gapNumber}`} className="hub-course-test-uoe-gap-label">
+                {part}
+              </span>
+            );
+          }
+
+          const answer = answers?.[item.id] ?? "";
+          return (
+            <label key={`uoe:gap:${gapNumber}`} className="hub-course-test-uoe-gap">
+              <span className="hub-course-test-uoe-gap-number">{gapNumber}</span>
+              <select
+                className={`input hub-course-test-uoe-select ${answer !== "" ? "is-selected" : ""}`}
+                value={answer}
+                onChange={(e) => onSelect(item.id, e.target.value)}
+                disabled={disabled}
+              >
+                <option value="">Choose…</option>
+                {item.options.map((option, optionIndex) => (
+                  <option key={`${item.id}:${optionIndex}`} value={String(optionIndex)}>
+                    {String.fromCharCode(65 + optionIndex)}. {typeof option === "string" ? option : option?.text || ""}
+                  </option>
+                ))}
+              </select>
+            </label>
+          );
+        })}
+      </p>
+    </div>
+  );
+}
+
+function WordFormationTextPassage({ section, answers, onAnswer, disabled = false }) {
+  const lines = Array.isArray(section?.sharedPrompt?.lines) ? section.sharedPrompt.lines : [];
+  const itemById = new Map((section?.items || []).map((item) => [item.id, item]));
+
+  return (
+    <div className="hub-course-test-word-formation-text hub-course-test-active-input-scope">
+      {lines.map((line, index) => {
+        const text = String(line?.text || "");
+        const rootWord = String(line?.rootWord || "").trim();
+        const item = line?.itemId ? itemById.get(line.itemId) : null;
+        const answer = item ? answers?.[item.id] ?? "" : "";
+        const parts = text.split(/(\[\d+\][^\s]*)/g).filter(Boolean);
+
+        return (
+          <div key={`wf-line:${index}`} className="hub-course-test-word-formation-line">
+            <div className="hub-course-test-word-formation-line-text">
+              {parts.map((part, partIndex) => {
+                const tokenMatch = part.match(/^\[(\d+)\](.*)$/);
+                if (!tokenMatch) {
+                  return (
+                    <React.Fragment key={`wf-part:${index}:${partIndex}`}>
+                      {part.replace(/_{4,}/g, "")}
+                    </React.Fragment>
+                  );
+                }
+
+                const suffix = tokenMatch[2] || "";
+                if (line.exampleAnswer) {
+                  return (
+                    <React.Fragment key={`wf-part:${index}:${partIndex}`}>
+                      <span className="hub-course-test-word-formation-example-answer">{line.exampleAnswer}</span>
+                      {suffix}
+                    </React.Fragment>
+                  );
+                }
+
+                if (!item) {
+                  return <React.Fragment key={`wf-part:${index}:${partIndex}`}>{part}</React.Fragment>;
+                }
+
+                return (
+                  <React.Fragment key={`wf-part:${index}:${partIndex}`}>
+                    <input
+                      type="text"
+                      className="input hub-course-test-inline-gap is-medium"
+                      value={typeof answer === "string" ? answer : ""}
+                      onChange={(e) => onAnswer(item.id, e.target.value)}
+                      onKeyDown={handleExamTextInputKeyDown}
+                      spellCheck={false}
+                      autoComplete="off"
+                      autoCorrect="off"
+                      autoCapitalize="none"
+                      disabled={disabled}
+                    />
+                    {suffix}
+                  </React.Fragment>
+                );
+              })}
+            </div>
+
+            <div className="hub-course-test-word-formation-line-root">
+              {rootWord || null}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function MissingParagraphsBoard({ section, answers, onSelect, disabled = false }) {
+  const [activeGapId, setActiveGapId] = useState(section?.items?.[0]?.id || "");
+  const options = section?.items?.[0]?.options || [];
+  const optionMeta = options.map((option, index) => {
+    const formatted = formatMatchingOption(option);
+    return {
+      key: `${formatted.value}:${index}`,
+      value: String(formatted.value),
+      label: formatted.label,
+    };
+  });
+
+  const assignedByGap = new Map(
+    (section?.items || []).map((item) => [item.id, String(answers?.[item.id] || "")])
+  );
+  const gapIdByValue = new Map();
+  for (const [gapId, value] of assignedByGap.entries()) {
+    if (value) gapIdByValue.set(value, gapId);
+  }
+
+  function getFirstEmptyGapId() {
+    return section?.items?.find((item) => !assignedByGap.get(item.id))?.id || section?.items?.[0]?.id || "";
+  }
+
+  function assignOption(value) {
+    const targetGapId = activeGapId || getFirstEmptyGapId();
+    if (!targetGapId) return;
+
+    const existingGapId = gapIdByValue.get(value);
+    if (existingGapId && existingGapId !== targetGapId) {
+      onSelect(existingGapId, "");
+    }
+    onSelect(targetGapId, value);
+    const nextEmpty = section?.items?.find(
+      (item) => item.id !== targetGapId && !assignedByGap.get(item.id)
+    )?.id;
+    setActiveGapId(nextEmpty || targetGapId);
+  }
+
+  function clearGap(gapId) {
+    onSelect(gapId, "");
+    setActiveGapId(gapId);
+  }
+
+  const passage = section?.sharedPrompt?.passages?.[0]?.text || "";
+  const parts = passage.split(/(\[\d+\])/g);
+  const itemByGapNumber = new Map(
+    (section?.items || []).map((item) => {
+      const numberMatch = String(item.prompt || "").match(/(\d+)/);
+      return [numberMatch ? numberMatch[1] : "", item];
+    })
+  );
+
+  return (
+    <div className="hub-course-test-missing-grid">
+      <div className="hub-course-test-missing-article">
+        <div className="hub-course-test-passage-card is-missing">
+          <p>
+            {parts.map((part, index) => {
+              const match = part.match(/^\[(\d+)\]$/);
+              if (!match) {
+                return <React.Fragment key={`missing:text:${index}`}>{part}</React.Fragment>;
+              }
+
+              const gapNumber = match[1];
+              const item = itemByGapNumber.get(gapNumber);
+              if (!item) return <React.Fragment key={`missing:raw:${index}`}>{part}</React.Fragment>;
+              const assignedValue = assignedByGap.get(item.id) || "";
+              const isActive = activeGapId === item.id;
+
+              return (
+                <button
+                  key={`missing:gap:${gapNumber}`}
+                  type="button"
+                  className={`hub-course-test-missing-gap ${isActive ? "is-active" : ""} ${assignedValue ? "is-filled" : ""}`}
+                  onClick={() => !disabled && setActiveGapId(item.id)}
+                  disabled={disabled}
+                >
+                  <span className="hub-course-test-missing-gap-number">{gapNumber}</span>
+                  <span className="hub-course-test-missing-gap-value">{assignedValue || "Choose paragraph"}</span>
+                </button>
+              );
+            })}
+          </p>
+        </div>
+      </div>
+
+      <aside className="hub-course-test-missing-options">
+        {optionMeta.map((option) => {
+          const assignedGapId = gapIdByValue.get(option.value);
+          const assignedGapNumber = assignedGapId
+            ? String((section?.items || []).find((item) => item.id === assignedGapId)?.prompt || "").match(/(\d+)/)?.[1]
+            : "";
+
+          return (
+            <div
+              key={option.key}
+              className={`hub-course-test-missing-option ${assignedGapId ? "is-used" : ""}`}
+            >
+              <button
+                type="button"
+                className="hub-course-test-missing-option-main"
+                onClick={() => !disabled && assignOption(option.value)}
+                disabled={disabled}
+              >
+                <span className="hub-course-test-missing-option-label">{option.label}</span>
+              </button>
+              {assignedGapId ? (
+                <button
+                  type="button"
+                  className="hub-course-test-missing-option-clear"
+                  onClick={() => !disabled && clearGap(assignedGapId)}
+                  disabled={disabled}
+                  title={`Remove from gap ${assignedGapNumber}`}
+                >
+                  Gap {assignedGapNumber} ×
+                </button>
+              ) : null}
+            </div>
+          );
+        })}
+      </aside>
+    </div>
+  );
+}
+
+function MissingParagraphsWorkspace({ section, answers, onSelect, disabled = false, onClose }) {
+  return (
+    <div className="hub-course-test-reading-workspace" onClick={onClose}>
+      <div className="hub-course-test-reading-workspace-card" onClick={(e) => e.stopPropagation()}>
+        <div className="hub-course-test-reading-workspace-head">
+          <div>
+            <span className="hub-course-test-kicker">Reading workspace</span>
+            <h3>{section?.title || "Reading task"}</h3>
+            <p>{section?.notes}</p>
+          </div>
+          <button className="ghost-btn" type="button" onClick={onClose}>
+            Close
+          </button>
+        </div>
+
+        <div className="hub-course-test-reading-workspace-body">
+          <MissingParagraphsBoard
+            section={section}
+            answers={answers}
+            onSelect={onSelect}
+            disabled={disabled}
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
 function calculateSkillBreakdown(sections = [], sectionAnswers = {}, teacherItemScores = {}) {
   const grouped = new Map();
 
@@ -641,6 +995,7 @@ export default function HubCourseTestRunner({ user }) {
   const [nowMs, setNowMs] = useState(Date.now());
   const [draggedItemId, setDraggedItemId] = useState("");
   const [sectionMenuOpen, setSectionMenuOpen] = useState(false);
+  const [readingWorkspaceOpen, setReadingWorkspaceOpen] = useState(false);
   const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
   const [submittingMainPaper, setSubmittingMainPaper] = useState(false);
   const [startingListening, setStartingListening] = useState(false);
@@ -882,6 +1237,28 @@ export default function HubCourseTestRunner({ user }) {
     currentSectionIndex >= 0 && currentSectionIndex < mainSections.length - 1
       ? mainSections[currentSectionIndex + 1]
       : null;
+  const currentSectionAllSectionsIndex = Math.max(
+    0,
+    allSections.findIndex((section) => section.id === currentSection?.id)
+  );
+  const currentSectionSupportingMissingParagraphSection =
+    currentSection?.sharedPrompt?.type === "reading-passage" &&
+    Array.isArray(currentSection.sharedPrompt.passages) &&
+    currentSection.sharedPrompt.passages.some((passage) => String(passage?.text || "").includes("["))
+      ? [...allSections]
+          .slice(0, currentSectionAllSectionsIndex)
+          .reverse()
+          .find((section) => isMissingParagraphSection(section))
+      : null;
+
+  useEffect(() => {
+    if (currentSection && isMissingParagraphSection(currentSection)) {
+      setReadingWorkspaceOpen(true);
+      return;
+    }
+    setReadingWorkspaceOpen(false);
+  }, [currentSection]);
+
   const answeredSections = useMemo(
     () =>
       mainSections.filter((section) =>
@@ -1786,8 +2163,14 @@ export default function HubCourseTestRunner({ user }) {
                   </span>
                   <h2>{activeListeningSection.title}</h2>
                   <p className="hub-course-test-listening-instruction">
-                    {activeListeningSection.sharedPrompt?.title || activeListeningSection.notes}
+                    {activeListeningSection.notes || activeListeningSection.sharedPrompt?.title}
                   </p>
+                  {activeListeningSection.sharedPrompt?.title &&
+                  activeListeningSection.sharedPrompt.title !== activeListeningSection.notes ? (
+                    <p className="hub-course-test-listening-subtitle">
+                      {activeListeningSection.sharedPrompt.title}
+                    </p>
+                  ) : null}
                   <p className="hub-course-test-listening-status">
                     {listeningPhase === "idle"
                       ? "Get ready. Reading time will begin automatically."
@@ -1968,12 +2351,21 @@ export default function HubCourseTestRunner({ user }) {
                         </div>
                       ) : null}
 
-                      {currentSection.sharedPrompt.type === "reading-passage" ? (
+                      {currentSection.sharedPrompt.type === "reading-passage" &&
+                      !isInlineUseOfEnglishChoiceSection(currentSection) &&
+                      !isMissingParagraphSection(currentSection) ? (
                         <div className="hub-course-test-passage">
                           {currentSection.sharedPrompt.passages.map((passage) => (
                             <article key={passage.heading} className="hub-course-test-passage-card">
                               <h3>{passage.heading}</h3>
-                              <p>{renderHighlightedPassage(passage.text, passage.highlightWords)}</p>
+                              <p>{renderHighlightedPassage(
+                                fillReadingPassageGaps(
+                                  passage.text,
+                                  currentSectionSupportingMissingParagraphSection,
+                                  sectionAnswers?.[currentSectionSupportingMissingParagraphSection?.id] || {}
+                                ),
+                                passage.highlightWords
+                              )}</p>
                             </article>
                           ))}
                           {Array.isArray(currentSection.sharedPrompt.footerLines) && currentSection.sharedPrompt.footerLines.length ? (
@@ -1983,6 +2375,39 @@ export default function HubCourseTestRunner({ user }) {
                               ))}
                             </div>
                           ) : null}
+                        </div>
+                      ) : null}
+
+                      {isInlineUseOfEnglishChoiceSection(currentSection) ? (
+                        <UseOfEnglishInlineChoicePassage
+                          section={currentSection}
+                          answers={sectionAnswers?.[currentSection.id] || {}}
+                          onSelect={(itemId, value) => setItemAnswer(currentSection.id, itemId, value)}
+                          disabled={timeUp}
+                        />
+                      ) : null}
+
+                      {isWordFormationTextSection(currentSection) ? (
+                        <WordFormationTextPassage
+                          section={currentSection}
+                          answers={sectionAnswers?.[currentSection.id] || {}}
+                          onAnswer={(itemId, value) => setItemAnswer(currentSection.id, itemId, value)}
+                          disabled={timeUp}
+                        />
+                      ) : null}
+
+                      {isMissingParagraphSection(currentSection) ? (
+                        <div className="hub-course-test-reading-launch">
+                          <p className="hub-course-test-reading-launch-copy">
+                            Open the reading workspace to place the missing paragraphs with a larger side-by-side layout.
+                          </p>
+                          <button
+                            className="btn"
+                            type="button"
+                            onClick={() => setReadingWorkspaceOpen(true)}
+                          >
+                            Open reading workspace
+                          </button>
                         </div>
                       ) : null}
 
@@ -2005,7 +2430,9 @@ export default function HubCourseTestRunner({ user }) {
                         onDropItem={handlePronunciationDrop}
                         timeUp={timeUp}
                       />
-                    ) : (
+                    ) : isInlineUseOfEnglishChoiceSection(currentSection) ||
+                      isWordFormationTextSection(currentSection) ||
+                      isMissingParagraphSection(currentSection) ? null : (
                     <div className="hub-course-test-items is-plain hub-course-test-active-input-scope">
                       {currentSection.items.map((item, index) => {
                         const answer = sectionAnswers?.[currentSection.id]?.[item.id] ?? "";
@@ -2026,10 +2453,10 @@ export default function HubCourseTestRunner({ user }) {
                             <div className="hub-course-test-item-head">
                               <span className="hub-course-test-item-index">{index + 1}</span>
                               {item.type === "stress-choice" ? (
-                                <p>{item.prompt}</p>
+                                <p>{renderMultilineText(item.prompt)}</p>
                               ) : (
                                 <p className={inlineTextInput ? "hub-course-test-inline-prompt" : ""}>
-                                  {inlineTextInput || (item.highlight ? renderHighlightedWord(item.prompt, item.highlight) : item.prompt)}
+                                  {inlineTextInput || (item.highlight ? renderHighlightedWord(item.prompt, item.highlight) : renderMultilineText(item.prompt))}
                                 </p>
                               )}
                             </div>
@@ -2100,6 +2527,16 @@ export default function HubCourseTestRunner({ user }) {
             </main>
           </div>
         )}
+
+        {currentSection && isMissingParagraphSection(currentSection) && readingWorkspaceOpen ? (
+          <MissingParagraphsWorkspace
+            section={currentSection}
+            answers={sectionAnswers?.[currentSection.id] || {}}
+            onSelect={(itemId, value) => setItemAnswer(currentSection.id, itemId, value)}
+            disabled={timeUp}
+            onClose={() => setReadingWorkspaceOpen(false)}
+          />
+        ) : null}
 
         {attempt && !mainPaperSubmitted ? (
           <>
@@ -2234,12 +2671,18 @@ function HubCourseTestRunnerStyles() {
   return (
     <style>{`
       .hub-course-test-wrapper {
-        width: min(1160px, 100%);
+        width: 100%;
+        margin-inline: auto;
+        box-sizing: border-box;
       }
 
       .hub-course-test-shell {
         display: grid;
         gap: 1rem;
+        width: 100%;
+        max-width: 1160px;
+        margin-inline: auto;
+        min-width: 0;
       }
 
       .hub-course-test-topbar {
@@ -2261,6 +2704,9 @@ function HubCourseTestRunnerStyles() {
         border: 1px solid rgba(70, 102, 170, 0.42);
         background: linear-gradient(180deg, rgba(11, 21, 48, 0.98), rgba(14, 28, 63, 0.96));
         box-shadow: 0 24px 60px rgba(2, 8, 24, 0.34);
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
       }
 
       .hub-course-test-hero {
@@ -2548,6 +2994,277 @@ function HubCourseTestRunnerStyles() {
         white-space: pre-wrap;
       }
 
+      .hub-course-test-uoe-passage {
+        margin-top: 0.35rem;
+        padding: 1rem 1.05rem;
+        border-radius: 18px;
+        border: 1px solid rgba(88, 125, 197, 0.34);
+        background: rgba(12, 23, 52, 0.52);
+      }
+
+      .hub-course-test-uoe-passage p {
+        margin: 0;
+        color: #dde8ff;
+        line-height: 2.05;
+        white-space: pre-wrap;
+      }
+
+      .hub-course-test-uoe-gap {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        margin: 0 0.2rem;
+        vertical-align: middle;
+      }
+
+      .hub-course-test-uoe-gap-number,
+      .hub-course-test-uoe-gap-label {
+        font-size: 0.8rem;
+        font-weight: 700;
+        color: #8fb4ff;
+      }
+
+      .hub-course-test-uoe-select {
+        width: auto;
+        min-width: 13rem;
+        max-width: min(24rem, 72vw);
+        padding: 0.65rem 2rem 0.65rem 0.8rem;
+        border-radius: 12px;
+        font-size: 0.96rem;
+        line-height: 1.2;
+      }
+
+      .hub-course-test-uoe-select.is-selected {
+        border-color: rgba(124, 236, 198, 0.52);
+        box-shadow: 0 0 0 1px rgba(124, 236, 198, 0.18);
+      }
+
+      .hub-course-test-word-formation-text {
+        display: grid;
+        gap: 0.2rem;
+        margin-top: 0.2rem;
+      }
+
+      .hub-course-test-word-formation-line {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 140px;
+        gap: 1rem;
+        align-items: baseline;
+      }
+
+      .hub-course-test-word-formation-line-text {
+        color: #dde8ff;
+        line-height: 1.65;
+        white-space: normal;
+      }
+
+      .hub-course-test-word-formation-line-root {
+        color: #eef4ff;
+        font-weight: 800;
+        letter-spacing: 0.03em;
+        text-transform: uppercase;
+        text-align: left;
+      }
+
+      .hub-course-test-word-formation-example-answer {
+        color: #eef4ff;
+        font-style: italic;
+        text-decoration: underline;
+        text-underline-offset: 0.14em;
+      }
+
+      .hub-course-test-missing-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1.45fr) minmax(320px, 0.95fr);
+        gap: 1rem;
+        align-items: start;
+        min-width: 0;
+      }
+
+      .hub-course-test-missing-article {
+        min-width: 0;
+        max-height: calc(100vh - 13rem);
+        overflow: auto;
+        padding-right: 0.25rem;
+      }
+
+      .hub-course-test-passage-card.is-missing {
+        padding: 1rem 1.05rem;
+      }
+
+      .hub-course-test-missing-gap {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.55rem;
+        margin: 0.45rem 0;
+        min-width: 13rem;
+        max-width: min(100%, 22rem);
+        padding: 0.55rem 0.8rem;
+        border-radius: 12px;
+        border: 1px dashed rgba(110, 158, 238, 0.6);
+        background: rgba(13, 24, 56, 0.76);
+        color: #e9f1ff;
+        vertical-align: middle;
+      }
+
+      .hub-course-test-missing-gap.is-active {
+        border-style: solid;
+        border-color: rgba(124, 236, 198, 0.72);
+        box-shadow: 0 0 0 1px rgba(124, 236, 198, 0.24);
+      }
+
+      .hub-course-test-missing-gap.is-filled {
+        border-style: solid;
+      }
+
+      .hub-course-test-missing-gap-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 1.8rem;
+        height: 1.8rem;
+        border-radius: 999px;
+        background: rgba(110, 158, 238, 0.18);
+        color: #8fb4ff;
+        font-weight: 800;
+        flex: 0 0 auto;
+      }
+
+      .hub-course-test-missing-gap-value {
+        font-size: 0.95rem;
+        text-align: left;
+      }
+
+      .hub-course-test-missing-options {
+        display: grid;
+        gap: 0.75rem;
+        max-height: calc(100vh - 13rem);
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding-right: 0.2rem;
+        align-content: start;
+        overscroll-behavior: contain;
+        min-width: 0;
+      }
+
+      .hub-course-test-reading-launch {
+        display: grid;
+        gap: 0.8rem;
+        justify-items: start;
+        padding: 0.35rem 0 0.1rem;
+      }
+
+      .hub-course-test-reading-launch-copy {
+        margin: 0;
+        color: #cfe0fb;
+        line-height: 1.55;
+        max-width: 52rem;
+      }
+
+      .hub-course-test-reading-workspace {
+        position: fixed;
+        inset: 0;
+        z-index: 85;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        background: rgba(2, 8, 24, 0.78);
+        backdrop-filter: blur(8px);
+      }
+
+      .hub-course-test-reading-workspace-card {
+        width: min(1380px, calc(100vw - 2rem));
+        height: min(88vh, 960px);
+        border-radius: 22px;
+        border: 1px solid rgba(70, 102, 170, 0.42);
+        background: linear-gradient(180deg, rgba(11, 21, 48, 0.99), rgba(14, 28, 63, 0.98));
+        box-shadow: 0 24px 60px rgba(2, 8, 24, 0.42);
+        padding: 1rem;
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
+        gap: 1rem;
+      }
+
+      .hub-course-test-reading-workspace-head {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+
+      .hub-course-test-reading-workspace-head h3 {
+        margin: 0.45rem 0 0.25rem;
+        color: #eef4ff;
+        font-size: clamp(1.6rem, 3vw, 2rem);
+      }
+
+      .hub-course-test-reading-workspace-head p {
+        margin: 0;
+        color: #a9b7d1;
+        line-height: 1.55;
+        max-width: 64rem;
+      }
+
+      .hub-course-test-reading-workspace-body {
+        min-height: 0;
+      }
+
+      .hub-course-test-reading-workspace-body .hub-course-test-missing-grid {
+        grid-template-columns: minmax(0, 1.7fr) minmax(360px, 1fr);
+        gap: 1.25rem;
+        height: 100%;
+      }
+
+      .hub-course-test-reading-workspace-body .hub-course-test-missing-article,
+      .hub-course-test-reading-workspace-body .hub-course-test-missing-options {
+        max-height: none;
+        height: 100%;
+      }
+
+      .hub-course-test-missing-option {
+        display: grid;
+        gap: 0.45rem;
+        padding: 0.7rem;
+        border-radius: 14px;
+        border: 1px solid rgba(88, 125, 197, 0.34);
+        background: rgba(9, 18, 42, 0.58);
+      }
+
+      .hub-course-test-missing-option.is-used {
+        border-color: rgba(124, 236, 198, 0.38);
+        background: rgba(12, 28, 46, 0.72);
+      }
+
+      .hub-course-test-missing-option-main {
+        display: block;
+        width: 100%;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #eef4ff;
+        text-align: left;
+      }
+
+      .hub-course-test-missing-option-label {
+        display: block;
+        font-size: 0.96rem;
+        line-height: 1.45;
+        white-space: normal;
+        overflow-wrap: anywhere;
+      }
+
+      .hub-course-test-missing-option-clear {
+        justify-self: start;
+        padding: 0.28rem 0.55rem;
+        border-radius: 999px;
+        border: 1px solid rgba(124, 236, 198, 0.28);
+        background: rgba(124, 236, 198, 0.08);
+        color: #aee7d2;
+        font-size: 0.82rem;
+      }
+
+
       .hub-course-test-word-chip {
         display: inline-flex;
         align-items: center;
@@ -2597,6 +3314,7 @@ function HubCourseTestRunnerStyles() {
         line-height: 1.5;
         min-width: 0;
         flex: 1 1 auto;
+        white-space: pre-wrap;
       }
 
       .hub-course-test-inline-prompt {
@@ -3187,6 +3905,12 @@ function HubCourseTestRunnerStyles() {
         color: #eef4ff;
       }
 
+      .hub-course-test-listening-subtitle {
+        margin: 0;
+        color: #b8c8e6;
+        line-height: 1.5;
+      }
+
       .hub-course-test-listening-instruction,
       .hub-course-test-listening-status {
         margin: 0;
@@ -3267,6 +3991,48 @@ function HubCourseTestRunnerStyles() {
         .hub-course-test-matching-select {
           margin-left: 0;
           width: 100%;
+        }
+
+        .hub-course-test-missing-grid {
+          grid-template-columns: 1fr;
+        }
+
+        .hub-course-test-word-formation-line {
+          grid-template-columns: 1fr;
+          gap: 0.2rem;
+        }
+
+        .hub-course-test-reading-workspace-card {
+          width: min(100vw - 1rem, 100%);
+          height: min(92vh, 960px);
+          padding: 0.9rem;
+        }
+
+        .hub-course-test-reading-workspace-body .hub-course-test-missing-grid {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+
+        .hub-course-test-reading-workspace-body .hub-course-test-missing-article,
+        .hub-course-test-reading-workspace-body .hub-course-test-missing-options {
+          height: auto;
+        }
+
+        .hub-course-test-missing-options {
+          max-height: none;
+          overflow: visible;
+        }
+
+        .hub-course-test-missing-article {
+          max-height: none;
+          overflow: visible;
+          padding-right: 0;
+        }
+
+        .hub-course-test-missing-gap {
+          display: flex;
+          width: 100%;
+          max-width: 100%;
         }
 
         .hub-course-test-submit-row,
