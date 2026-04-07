@@ -318,11 +318,13 @@ function renderPreviewPassage(text = "", highlights = []) {
 export default function TeacherCourseTests({ user }) {
   const navigate = useNavigate();
   const templates = useMemo(() => listHubCourseTestTemplates(), []);
+  const isAdmin = user?.role === "admin";
   const [students, setStudents] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deletingSessionId, setDeletingSessionId] = useState("");
+  const [studentScope, setStudentScope] = useState("my");
 
   const [templateId, setTemplateId] = useState(templates[0]?.id || "");
   const [sessionTitle, setSessionTitle] = useState("");
@@ -347,31 +349,86 @@ export default function TeacherCourseTests({ user }) {
     async function load() {
       setLoading(true);
       try {
-        const studentQuery = query(collection(db, "users"), where("teacherId", "==", user.uid));
-        const [studentSnap, rosterSnap, sessionRows] = await Promise.all([
-          getDocs(studentQuery),
-          getDocs(collection(db, "users", user.uid, "studentRoster")),
-          listMyCourseTestSessions(),
-        ]);
+        let studentRows = [];
+        let sessionRows = [];
 
-        if (!alive) return;
+        if (isAdmin && studentScope === "all") {
+          const [allUsersSnap, sessionResults] = await Promise.all([
+            getDocs(collection(db, "users")),
+            listMyCourseTestSessions(),
+          ]);
 
-        const rosterMeta = {};
-        rosterSnap.forEach((entry) => {
-          rosterMeta[entry.id] = entry.data() || {};
-        });
+          if (!alive) return;
 
-        const studentRows = studentSnap.docs.map((entry) => {
-          const data = entry.data() || {};
-          const meta = rosterMeta[entry.id] || {};
+          const allUsers = allUsersSnap.docs.map((entry) => ({ id: entry.id, ...(entry.data() || {}) }));
+          const teacherRows = allUsers.filter((entry) => entry.role === "teacher" || entry.role === "admin");
+          const rosterSnaps = await Promise.all(
+            teacherRows.map((teacher) => getDocs(collection(db, "users", teacher.id, "studentRoster")))
+          );
 
-          return {
-            id: entry.id,
-            email: data.email || "",
-            displayName: data.displayName || data.name || data.username || data.email || entry.id,
-            className: (meta.className || "").trim(),
-          };
-        });
+          if (!alive) return;
+
+          const rosterMeta = {};
+          rosterSnaps.forEach((snap, index) => {
+            const teacher = teacherRows[index];
+            snap.forEach((entry) => {
+              const meta = entry.data() || {};
+              if (!rosterMeta[entry.id] || (meta.className || "").trim()) {
+                rosterMeta[entry.id] = {
+                  ...meta,
+                  rosterTeacherUid: teacher.id,
+                  rosterTeacherName: teacher.displayName || teacher.name || teacher.email || teacher.id,
+                };
+              }
+            });
+          });
+
+          studentRows = allUsers
+            .filter((entry) => entry.role === "student")
+            .map((entry) => {
+              const meta = rosterMeta[entry.id] || {};
+              return {
+                id: entry.id,
+                email: entry.email || "",
+                displayName: entry.displayName || entry.name || entry.username || entry.email || entry.id,
+                className: (meta.className || "").trim(),
+                teacherUid: entry.teacherId || meta.rosterTeacherUid || "",
+                teacherLabel: meta.rosterTeacherName || "",
+              };
+            });
+
+          sessionRows = sessionResults || [];
+        } else {
+          const studentQuery = query(collection(db, "users"), where("teacherId", "==", user.uid));
+          const [studentSnap, rosterSnap, sessionResults] = await Promise.all([
+            getDocs(studentQuery),
+            getDocs(collection(db, "users", user.uid, "studentRoster")),
+            listMyCourseTestSessions(),
+          ]);
+
+          if (!alive) return;
+
+          const rosterMeta = {};
+          rosterSnap.forEach((entry) => {
+            rosterMeta[entry.id] = entry.data() || {};
+          });
+
+          studentRows = studentSnap.docs.map((entry) => {
+            const data = entry.data() || {};
+            const meta = rosterMeta[entry.id] || {};
+
+            return {
+              id: entry.id,
+              email: data.email || "",
+              displayName: data.displayName || data.name || data.username || data.email || entry.id,
+              className: (meta.className || "").trim(),
+              teacherUid: data.teacherId || "",
+              teacherLabel: user.displayName || user.name || user.email || user.uid,
+            };
+          });
+
+          sessionRows = sessionResults || [];
+        }
 
         setStudents(studentRows);
         setSessions(sessionRows || []);
@@ -387,7 +444,7 @@ export default function TeacherCourseTests({ user }) {
     return () => {
       alive = false;
     };
-  }, [user.uid]);
+  }, [isAdmin, studentScope, user.displayName, user.email, user.uid]);
 
   const classOptions = useMemo(() => {
     return [...new Set(students.map((student) => student.className).filter(Boolean))].sort((a, b) =>
@@ -665,6 +722,16 @@ export default function TeacherCourseTests({ user }) {
             </label>
 
             <div className="teacher-course-row">
+              {isAdmin ? (
+                <label>
+                  <span className="panel-label">Student scope</span>
+                  <select className="input" value={studentScope} onChange={(e) => setStudentScope(e.target.value)}>
+                    <option value="my">My students</option>
+                    <option value="all">All students</option>
+                  </select>
+                </label>
+              ) : null}
+
               <label>
                 <span className="panel-label">Class filter</span>
                 <select className="input" value={classFilter} onChange={(e) => setClassFilter(e.target.value)}>
@@ -761,6 +828,7 @@ export default function TeacherCourseTests({ user }) {
                       <span className="muted small" style={{ display: "block" }}>
                         {student.email || student.id}
                         {student.className ? ` · ${student.className}` : ""}
+                        {isAdmin && studentScope === "all" && student.teacherLabel ? ` · ${student.teacherLabel}` : ""}
                       </span>
                     </span>
                   </label>
