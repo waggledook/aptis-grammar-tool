@@ -811,7 +811,9 @@ export default function HubMeaningfulPrefixesLesson() {
   const [isAdvancingMcq, setIsAdvancingMcq] = useState(false);
   const [challengeItems, setChallengeItems] = useState(() => shuffle(CHALLENGE_BANK).slice(0, CHALLENGE_SET_SIZE));
   const [challengeAnswers, setChallengeAnswers] = useState({});
-  const [challengeChecked, setChallengeChecked] = useState(false);
+  const [activeChallengeIndex, setActiveChallengeIndex] = useState(0);
+  const [challengeFeedback, setChallengeFeedback] = useState(null);
+  const [isAdvancingChallenge, setIsAdvancingChallenge] = useState(false);
 
   const stage = LESSON_STAGES[stageIndex];
   const totalStages = LESSON_STAGES.length;
@@ -824,13 +826,16 @@ export default function HubMeaningfulPrefixesLesson() {
       setActiveMcqIndex(nextUnanswered >= 0 ? nextUnanswered : Math.min(stage.items.length - 1, 0));
     }
     if (stage.kind === "challenge") {
-      setChallengeChecked(false);
+      const nextUnanswered = challengeItems.findIndex((item) => !String(challengeAnswers[item.id] || "").trim());
+      setActiveChallengeIndex(nextUnanswered >= 0 ? nextUnanswered : Math.min(challengeItems.length - 1, 0));
+      setChallengeFeedback(null);
+      setIsAdvancingChallenge(false);
     }
   }, [stageIndex]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const meaningOptions = useMemo(() => {
     if (stage.kind !== "match") return [];
-    return stage.items.map((item) => item.meaning);
+    return shuffle(stage.items.map((item) => item.meaning));
   }, [stage]);
 
   const stageSummary = useMemo(() => {
@@ -868,6 +873,8 @@ export default function HubMeaningfulPrefixesLesson() {
 
   const currentMcqItem = stage.kind === "mcq" ? stage.items[activeMcqIndex] : null;
   const currentMcqAnswer = currentMcqItem ? mcqAnswers[currentMcqItem.id] || { value: "", correct: null } : null;
+  const currentChallengeItem = stage.kind === "challenge" ? challengeItems[activeChallengeIndex] : null;
+  const currentChallengeAnswer = currentChallengeItem ? challengeAnswers[currentChallengeItem.id] || "" : "";
 
   function handleMatchSelect(item, value) {
     setMatchAnswers((prev) => ({
@@ -890,14 +897,13 @@ export default function HubMeaningfulPrefixesLesson() {
     }));
   }
 
-  function checkChallengeAnswers() {
-    setChallengeChecked(true);
-  }
-
   function replayChallenge() {
-    setChallengeItems(shuffle(CHALLENGE_BANK).slice(0, CHALLENGE_SET_SIZE));
+    const nextItems = shuffle(CHALLENGE_BANK).slice(0, CHALLENGE_SET_SIZE);
+    setChallengeItems(nextItems);
     setChallengeAnswers({});
-    setChallengeChecked(false);
+    setActiveChallengeIndex(0);
+    setChallengeFeedback(null);
+    setIsAdvancingChallenge(false);
   }
 
   function handleMcqChoice(item, value) {
@@ -928,6 +934,41 @@ export default function HubMeaningfulPrefixesLesson() {
       setMcqFeedback(null);
       setIsAdvancingMcq(false);
     }, MCQ_FEEDBACK_DELAY_MS);
+  }
+
+  function submitChallengeAnswer() {
+    if (!currentChallengeItem || isAdvancingChallenge) return;
+
+    const userAnswer = currentChallengeAnswer;
+    if (!String(userAnswer).trim()) return;
+
+    const correct =
+      normalizeChallengeAnswer(userAnswer) === normalizeChallengeAnswer(currentChallengeItem.answer);
+    setChallengeFeedback({
+      correct,
+      text: correct
+        ? `Correct: ${currentChallengeItem.answer}`
+        : `Not quite. The answer is ${currentChallengeItem.answer}.`,
+    });
+    setIsAdvancingChallenge(true);
+
+    window.setTimeout(() => {
+      const isLastQuestion = activeChallengeIndex >= challengeItems.length - 1;
+      if (isLastQuestion) {
+        setChallengeFeedback(null);
+        setIsAdvancingChallenge(false);
+        return;
+      }
+      setActiveChallengeIndex((prev) => prev + 1);
+      setChallengeFeedback(null);
+      setIsAdvancingChallenge(false);
+    }, MCQ_FEEDBACK_DELAY_MS);
+  }
+
+  function handleChallengeKeyDown(event) {
+    if (event.key !== "Enter") return;
+    event.preventDefault();
+    submitChallengeAnswer();
   }
 
   function renderMatchStage() {
@@ -1082,12 +1123,19 @@ export default function HubMeaningfulPrefixesLesson() {
   }
 
   function renderChallengeStage() {
+    if (!currentChallengeItem) return null;
+
+    const isCurrentCorrect =
+      normalizeChallengeAnswer(currentChallengeAnswer) === normalizeChallengeAnswer(currentChallengeItem.answer);
+    const challengeToneClass =
+      challengeFeedback == null ? "" : challengeFeedback.correct ? "is-correct" : "is-wrong";
+
     return (
       <>
         <section className="hub-prefixes-summary">
           <div>
-            <span className="hub-prefixes-summary-label">Set size</span>
-            <strong>{challengeSummary.total}</strong>
+            <span className="hub-prefixes-summary-label">Question</span>
+            <strong>{Math.min(activeChallengeIndex + 1, challengeSummary.total)}/{challengeSummary.total}</strong>
           </div>
           <div>
             <span className="hub-prefixes-summary-label">Answered</span>
@@ -1095,60 +1143,70 @@ export default function HubMeaningfulPrefixesLesson() {
           </div>
           <div>
             <span className="hub-prefixes-summary-label">Correct</span>
-            <strong>{challengeChecked ? `${challengeSummary.correct}/${challengeSummary.total}` : "Check at the end"}</strong>
+            <strong>{challengeSummary.correct}/{challengeSummary.total}</strong>
           </div>
         </section>
 
-        <section className="hub-prefixes-list">
-          {challengeItems.map((item, index) => {
-            const userAnswer = challengeAnswers[item.id] || "";
-            const isCorrect =
-              normalizeChallengeAnswer(userAnswer) === normalizeChallengeAnswer(item.answer);
-            const toneClass = challengeChecked ? (isCorrect ? "is-correct" : "is-wrong") : "";
-
-            return (
-              <article key={item.id} className={`hub-prefixes-card ${toneClass}`}>
-                <div className="hub-prefixes-card-head">
-                  <span className="hub-prefixes-number">{index + 1}</span>
-                  <div className="hub-prefixes-challenge-head">
-                    <p className="hub-prefixes-sentence">{item.prompt}</p>
-                    <div className="hub-prefixes-prefix-chip">
-                      Base word: <strong>{item.base}</strong>
-                    </div>
-                  </div>
+        <section className="hub-prefixes-mcq-stage">
+          <article
+            key={currentChallengeItem.id}
+            className={`hub-prefixes-mcq-card ${challengeToneClass} ${isAdvancingChallenge ? "is-locked" : ""}`}
+          >
+            <div className="hub-prefixes-mcq-top">
+              <span className="hub-prefixes-number">{activeChallengeIndex + 1}</span>
+              <div className="hub-prefixes-mcq-prompt-wrap">
+                <span className="hub-prefixes-kicker hub-prefixes-mcq-kicker">Word formation challenge</span>
+                <p className="hub-prefixes-mcq-prompt">{currentChallengeItem.prompt}</p>
+                <div className="hub-prefixes-prefix-chip">
+                  Base word: <strong>{currentChallengeItem.base}</strong>
                 </div>
+              </div>
+            </div>
 
-                <div className="hub-prefixes-challenge-input-row">
-                  <label className="hub-prefixes-answer-label" htmlFor={`challenge-${item.id}`}>
-                    Missing word
-                  </label>
-                  <input
-                    id={`challenge-${item.id}`}
-                    className={`input hub-prefixes-text-input ${toneClass}`}
-                    type="text"
-                    value={userAnswer}
-                    onChange={(event) => handleChallengeAnswerChange(item.id, event.target.value)}
-                    placeholder="Type your answer"
-                    autoComplete="off"
-                    spellCheck="false"
-                  />
-                </div>
+            <div className="hub-prefixes-challenge-input-row hub-prefixes-challenge-input-row--stacked">
+              <label className="hub-prefixes-answer-label" htmlFor={`challenge-${currentChallengeItem.id}`}>
+                Missing word
+              </label>
+              <input
+                id={`challenge-${currentChallengeItem.id}`}
+                className={`input hub-prefixes-text-input ${challengeToneClass}`}
+                type="text"
+                value={currentChallengeAnswer}
+                onChange={(event) => handleChallengeAnswerChange(currentChallengeItem.id, event.target.value)}
+                onKeyDown={handleChallengeKeyDown}
+                placeholder="Type your answer and press Enter"
+                autoComplete="off"
+                spellCheck="false"
+                disabled={isAdvancingChallenge}
+              />
+            </div>
 
-                {challengeChecked ? (
-                  isCorrect ? (
-                    <p className="hub-prefixes-feedback is-correct">Correct</p>
-                  ) : (
-                    <p className="hub-prefixes-feedback is-wrong">Correct answer: {item.answer}</p>
-                  )
-                ) : null}
-              </article>
-            );
-          })}
+            <div className="hub-prefixes-mcq-feedback-row">
+              {challengeFeedback ? (
+                <p className={`hub-prefixes-feedback ${challengeFeedback.correct ? "is-correct" : "is-wrong"}`}>
+                  {challengeFeedback.text}
+                </p>
+              ) : currentChallengeAnswer ? (
+                <p className="hub-prefixes-feedback hub-prefixes-feedback-placeholder">
+                  Press Enter to check your answer.
+                </p>
+              ) : (
+                <p className="hub-prefixes-feedback hub-prefixes-feedback-placeholder">
+                  Type the missing word.
+                </p>
+              )}
+            </div>
+          </article>
         </section>
 
         <section className="hub-prefixes-challenge-controls">
-          <button type="button" className="generate-btn" onClick={checkChallengeAnswers}>
-            Check answers
+          <button
+            type="button"
+            className="generate-btn"
+            onClick={submitChallengeAnswer}
+            disabled={isAdvancingChallenge || !String(currentChallengeAnswer).trim()}
+          >
+            Check answer
           </button>
           <button type="button" className="ghost-btn" onClick={replayChallenge}>
             Replay with a new set
@@ -1547,6 +1605,11 @@ export default function HubMeaningfulPrefixesLesson() {
           grid-template-columns: 7rem minmax(0, 20rem);
           gap: 0.8rem;
           align-items: center;
+        }
+
+        .hub-prefixes-challenge-input-row--stacked {
+          grid-template-columns: 1fr;
+          max-width: 32rem;
         }
 
         .hub-prefixes-challenge-controls {

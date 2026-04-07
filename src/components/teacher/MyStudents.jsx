@@ -149,6 +149,54 @@ function htmlFromPlainEmail(text = "") {
   return `<p>${paragraphs.join("</p><p>")}</p>`;
 }
 
+function normalizeReviewAnswer(value = "") {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[’']/g, "")
+    .replace(/[-.,!?;:()[\]{}"“”]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getMatchingOptionCode(value = "") {
+  const match = String(value || "").trim().match(/^([a-z])\b/i);
+  return match ? match[1].toLowerCase() : "";
+}
+
+function resolveMatchingOptionLabel(item, value = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return "—";
+
+  const code = getMatchingOptionCode(raw);
+  if (!code) return raw;
+
+  const options = Array.isArray(item?.options) ? item.options : [];
+  const matched = options.find((option) => {
+    const text = String(typeof option === "string" ? option : option?.text || "").trim();
+    return getMatchingOptionCode(text) === code;
+  });
+
+  if (!matched) return raw;
+  return String(typeof matched === "string" ? matched : matched?.text || raw);
+}
+
+function isMatchingSelectCorrect(item, answer) {
+  const normalized = normalizeReviewAnswer(answer);
+  if (!normalized) return 0;
+
+  const normalizedCode = getMatchingOptionCode(normalized);
+  const acceptedValues = Array.isArray(item?.acceptedAnswers) && item.acceptedAnswers.length
+    ? item.acceptedAnswers
+    : [item?.answer];
+
+  return acceptedValues.some((entry) => {
+    const acceptedNormalized = normalizeReviewAnswer(entry);
+    if (acceptedNormalized === normalized) return true;
+    const acceptedCode = getMatchingOptionCode(acceptedNormalized);
+    return Boolean(acceptedCode && normalizedCode && acceptedCode === normalizedCode);
+  }) ? 1 : 0;
+}
+
 function robustEmailForClipboard({ html = "", text = "" }) {
   const plain = plainFromEmail({ html, text });
   return htmlFromPlainEmail(plain);
@@ -241,15 +289,6 @@ function renderSavedGrammarSentence(parts, gaps = []) {
   });
 }
 
-function normalizeReviewAnswer(value = "") {
-  return String(value || "")
-    .toLowerCase()
-    .replace(/[’']/g, "")
-    .replace(/[-.,!?;:()[\]{}"“”]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
 function isInlineTextInputItem(item) {
   return (
     item?.type === "text-input" &&
@@ -305,12 +344,7 @@ function getCourseTestAutoItemScore(item, answer) {
   }
   if (item?.type === "stress-choice") return String(answer) === String(item.answerIndex) ? 1 : 0;
   if (item?.type === "matching-select") {
-    const normalized = normalizeReviewAnswer(answer);
-    if (!normalized) return 0;
-    if (Array.isArray(item.acceptedAnswers) && item.acceptedAnswers.length) {
-      return item.acceptedAnswers.some((entry) => normalizeReviewAnswer(entry) === normalized) ? 1 : 0;
-    }
-    return normalized === normalizeReviewAnswer(item.answer) ? 1 : 0;
+    return isMatchingSelectCorrect(item, answer);
   }
 
   if (isSortBySoundItem(item)) {
@@ -374,6 +408,9 @@ function formatCourseTestAnswer(item, answer) {
   if (isSortBySoundItem(item)) {
     return answer ? String(answer) : "—";
   }
+  if (item?.type === "matching-select") {
+    return resolveMatchingOptionLabel(item, answer);
+  }
   return String(answer);
 }
 
@@ -401,9 +438,9 @@ function formatCourseTestKey(item) {
   }
   if (item?.type === "matching-select") {
     if (Array.isArray(item.acceptedAnswers) && item.acceptedAnswers.length) {
-      return item.acceptedAnswers.join(" / ");
+      return item.acceptedAnswers.map((entry) => resolveMatchingOptionLabel(item, entry)).join(" / ");
     }
-    return item.answer || "—";
+    return resolveMatchingOptionLabel(item, item.answer);
   }
 
   if (isSortBySoundItem(item)) {

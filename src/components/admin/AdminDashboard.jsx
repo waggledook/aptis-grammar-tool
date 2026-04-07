@@ -1,6 +1,6 @@
 // src/components/admin/AdminDashboard.jsx
 import React, { useEffect, useState } from "react";
-import { db } from "../../firebase";
+import { db, deleteCourseTestSession, listAllCourseTestSessions } from "../../firebase";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { getSeifHubAccessConfig, SEIF_HUB_ACCESS_KEY } from "../../siteConfig.js";
@@ -24,6 +24,9 @@ export default function AdminDashboard({ user }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [hubDrafts, setHubDrafts] = useState({});
   const [savingHub, setSavingHub] = useState({});
+  const [courseTestSessions, setCourseTestSessions] = useState([]);
+  const [loadingSessions, setLoadingSessions] = useState(true);
+  const [deletingSessionId, setDeletingSessionId] = useState("");
 
   const navigate = useNavigate();
 
@@ -56,6 +59,26 @@ export default function AdminDashboard({ user }) {
     loadUsers();
   }, []);
 
+  useEffect(() => {
+    let alive = true;
+
+    async function loadCourseSessions() {
+      try {
+        const rows = await listAllCourseTestSessions();
+        if (alive) setCourseTestSessions(rows || []);
+      } catch (error) {
+        console.error("[AdminDashboard] load course test sessions failed", error);
+      } finally {
+        if (alive) setLoadingSessions(false);
+      }
+    }
+
+    loadCourseSessions();
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   async function updateRole(uid, role) {
     await updateDoc(doc(db, "users", uid), { role });
 
@@ -81,6 +104,26 @@ export default function AdminDashboard({ user }) {
       );
     } finally {
       setAssigning(null);
+    }
+  }
+
+  async function removeCourseTestSession(session) {
+    if (!session?.id) return;
+    const label = session.templateTitle || "this course test session";
+    const confirmed = window.confirm(
+      `Delete ${label}? This removes it from teacher and student session lists.`
+    );
+    if (!confirmed) return;
+
+    setDeletingSessionId(session.id);
+    try {
+      await deleteCourseTestSession(session.id);
+      const rows = await listAllCourseTestSessions();
+      setCourseTestSessions(rows || []);
+    } catch (error) {
+      console.error("[AdminDashboard] delete course test session failed", error);
+    } finally {
+      setDeletingSessionId("");
     }
   }
 
@@ -714,6 +757,156 @@ function renderHubAccessControl(u, compact = false) {
                 ))}
               </select>
             </label>
+          </div>
+
+          <div
+            style={{
+              marginTop: "0.9rem",
+              padding: "0.95rem 1rem",
+              borderRadius: "1rem",
+              background: "linear-gradient(180deg, rgba(24, 41, 79, 0.98), rgba(20, 36, 71, 0.98))",
+              border: "1px solid #27406f",
+              boxShadow: "0 10px 22px rgba(0,0,0,0.12)",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "0.8rem",
+                alignItems: "center",
+                flexWrap: "wrap",
+                marginBottom: "0.85rem",
+              }}
+            >
+              <div>
+                <div style={{ color: "#f8fafc", fontSize: "1.05rem", fontWeight: 700 }}>
+                  All course test sessions
+                </div>
+                <div style={{ marginTop: "0.25rem", color: "#9fb4da", fontSize: "0.88rem" }}>
+                  Admin view of every assigned Oxford test session, regardless of teacher.
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: "0.34rem 0.7rem",
+                  borderRadius: "999px",
+                  background: "rgba(253, 191, 45, 0.14)",
+                  border: "1px solid rgba(253, 191, 45, 0.28)",
+                  color: "#ffd56e",
+                  fontSize: "0.78rem",
+                  fontWeight: 700,
+                }}
+              >
+                {courseTestSessions.length} session{courseTestSessions.length === 1 ? "" : "s"}
+              </div>
+            </div>
+
+            {loadingSessions ? (
+              <p style={{ margin: 0, color: "#cbd5e1" }}>Loading sessions…</p>
+            ) : !courseTestSessions.length ? (
+              <p style={{ margin: 0, color: "#94a3b8" }}>No course test sessions found.</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                {courseTestSessions.map((session) => (
+                  <section
+                    key={session.id}
+                    style={{
+                      borderRadius: "0.95rem",
+                      border: "1px solid rgba(51, 65, 85, 0.7)",
+                      background: "rgba(2, 6, 23, 0.22)",
+                      padding: "0.95rem 1rem",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: "0.8rem",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                        marginBottom: "0.8rem",
+                      }}
+                    >
+                      <div>
+                        <div style={{ color: "#f8fafc", fontWeight: 700 }}>
+                          {session.templateTitle || "Course test session"}
+                        </div>
+                        <div style={{ color: "#9fb4da", fontSize: "0.85rem", marginTop: "0.2rem" }}>
+                          {session.teacherName || session.teacherEmail || session.teacherUid || "Unknown teacher"}
+                        </div>
+                      </div>
+                      <span
+                        style={{
+                          padding: "0.3rem 0.65rem",
+                          borderRadius: "999px",
+                          background: "rgba(59, 130, 246, 0.12)",
+                          border: "1px solid rgba(59, 130, 246, 0.28)",
+                          color: "#bfdbfe",
+                          fontSize: "0.75rem",
+                          fontWeight: 700,
+                          textTransform: "capitalize",
+                        }}
+                      >
+                        {session.status || "scheduled"}
+                      </span>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: isNarrow ? "1fr" : "repeat(4, minmax(0, 1fr))",
+                        gap: "0.75rem",
+                        marginBottom: "0.8rem",
+                      }}
+                    >
+                      <div>
+                        <div style={{ fontSize: "0.73rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Level</div>
+                        <div style={{ color: "#e5e7eb" }}>{session.level ? String(session.level).toUpperCase() : "—"}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.73rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Type</div>
+                        <div style={{ color: "#e5e7eb" }}>{session.testKind || "—"}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.73rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Students</div>
+                        <div style={{ color: "#e5e7eb" }}>{Array.isArray(session.targetStudentIds) ? session.targetStudentIds.length : 0}</div>
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.73rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Created</div>
+                        <div style={{ color: "#e5e7eb" }}>
+                          {typeof session.createdAt?.toDate === "function"
+                            ? session.createdAt.toDate().toLocaleString("en-GB")
+                            : "—"}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: "0.7rem",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div style={{ color: "#9fb4da", fontSize: "0.84rem" }}>
+                        {session.className ? `Class: ${session.className}` : "No class label"}
+                      </div>
+                      <button
+                        type="button"
+                        className="btn danger"
+                        onClick={() => removeCourseTestSession(session)}
+                        disabled={deletingSessionId === session.id}
+                      >
+                        {deletingSessionId === session.id ? "Deleting..." : "Delete session"}
+                      </button>
+                    </div>
+                  </section>
+                ))}
+              </div>
+            )}
           </div>
 
           <div

@@ -2839,6 +2839,17 @@ export async function listMyCourseTestSessions() {
     });
 }
 
+export async function listAllCourseTestSessions() {
+  const snap = await getDocs(collection(db, "courseTestSessions"));
+  return snap.docs
+    .map((entry) => ({ id: entry.id, ...entry.data() }))
+    .sort((a, b) => {
+      const aTime = a.createdAt?.toMillis?.() || 0;
+      const bTime = b.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    });
+}
+
 export async function listStudentCourseTestSessions(uid) {
   const realUid = _uidOrCurrent(uid);
   if (!realUid) return [];
@@ -2887,6 +2898,11 @@ export async function updateCourseTestSession(sessionId, data = {}) {
     ...data,
     updatedAt: serverTimestamp(),
   });
+}
+
+export async function deleteCourseTestSession(sessionId) {
+  if (!sessionId) throw new Error("Session ID is required.");
+  await deleteDoc(doc(db, "courseTestSessions", sessionId));
 }
 
 export async function startCourseTestAttempt({

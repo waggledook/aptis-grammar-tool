@@ -115,6 +115,45 @@ function getSortBySoundPenalty(section, sectionAnswerMap = {}) {
   }, 0);
 }
 
+function getMatchingOptionCode(value = "") {
+  const match = String(value || "").trim().match(/^([a-z])\b/i);
+  return match ? match[1].toLowerCase() : "";
+}
+
+function resolveMatchingOptionLabel(item, value = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return "—";
+
+  const code = getMatchingOptionCode(raw);
+  if (!code) return raw;
+
+  const options = Array.isArray(item?.options) ? item.options : [];
+  const matched = options.find((option) => {
+    const text = String(typeof option === "string" ? option : option?.text || "").trim();
+    return getMatchingOptionCode(text) === code;
+  });
+
+  if (!matched) return raw;
+  return String(typeof matched === "string" ? matched : matched?.text || raw);
+}
+
+function isMatchingSelectCorrect(item, answer) {
+  const normalized = normalizeAnswer(answer);
+  if (!normalized) return 0;
+
+  const normalizedCode = getMatchingOptionCode(normalized);
+  const acceptedValues = Array.isArray(item?.acceptedAnswers) && item.acceptedAnswers.length
+    ? item.acceptedAnswers
+    : [item?.answer];
+
+  return acceptedValues.some((entry) => {
+    const acceptedNormalized = normalizeAnswer(entry);
+    if (acceptedNormalized === normalized) return true;
+    const acceptedCode = getMatchingOptionCode(acceptedNormalized);
+    return Boolean(acceptedCode && normalizedCode && acceptedCode === normalizedCode);
+  }) ? 1 : 0;
+}
+
 function getAutoItemScore(item, answer) {
   if (item?.type === "choice") {
     if (Array.isArray(item.acceptedAnswerIndexes) && item.acceptedAnswerIndexes.length) {
@@ -128,12 +167,7 @@ function getAutoItemScore(item, answer) {
   }
 
   if (item?.type === "matching-select") {
-    const normalized = normalizeAnswer(answer);
-    if (!normalized) return 0;
-    if (Array.isArray(item.acceptedAnswers) && item.acceptedAnswers.length) {
-      return item.acceptedAnswers.some((entry) => normalizeAnswer(entry) === normalized) ? 1 : 0;
-    }
-    return normalized === normalizeAnswer(item.answer) ? 1 : 0;
+    return isMatchingSelectCorrect(item, answer);
   }
 
   if (isSortBySoundItem(item)) {
@@ -209,9 +243,25 @@ function renderOptionLabel(option) {
 
   const lowerText = text.toLowerCase();
   const lowerHighlight = highlight.toLowerCase();
-  const index = occurrence === "last"
-    ? lowerText.lastIndexOf(lowerHighlight)
-    : lowerText.indexOf(lowerHighlight);
+  let index = -1;
+  if (occurrence === "last") {
+    index = lowerText.lastIndexOf(lowerHighlight);
+  } else if (typeof occurrence === "number" && occurrence > 1) {
+    let searchFrom = 0;
+    let seen = 0;
+    while (searchFrom <= lowerText.length) {
+      const foundAt = lowerText.indexOf(lowerHighlight, searchFrom);
+      if (foundAt === -1) break;
+      seen += 1;
+      if (seen === occurrence) {
+        index = foundAt;
+        break;
+      }
+      searchFrom = foundAt + lowerHighlight.length;
+    }
+  } else {
+    index = lowerText.indexOf(lowerHighlight);
+  }
 
   if (index === -1) return text;
 

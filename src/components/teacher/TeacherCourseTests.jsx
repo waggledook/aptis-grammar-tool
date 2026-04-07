@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import {
   db,
   createCourseTestSession,
+  deleteCourseTestSession,
   listAttemptsForMyCourseTestSession,
   listMyCourseTestSessions,
   saveCourseTestAttemptReview,
@@ -46,6 +47,45 @@ function normalizeReviewAnswer(value = "") {
     .replace(/[-.,!?;:()[\]{}"“”]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function getMatchingOptionCode(value = "") {
+  const match = String(value || "").trim().match(/^([a-z])\b/i);
+  return match ? match[1].toLowerCase() : "";
+}
+
+function resolveMatchingOptionLabel(item, value = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return "—";
+
+  const code = getMatchingOptionCode(raw);
+  if (!code) return raw;
+
+  const options = Array.isArray(item?.options) ? item.options : [];
+  const matched = options.find((option) => {
+    const text = String(typeof option === "string" ? option : option?.text || "").trim();
+    return getMatchingOptionCode(text) === code;
+  });
+
+  if (!matched) return raw;
+  return String(typeof matched === "string" ? matched : matched?.text || raw);
+}
+
+function isMatchingSelectCorrect(item, answer) {
+  const normalized = normalizeReviewAnswer(answer);
+  if (!normalized) return 0;
+
+  const normalizedCode = getMatchingOptionCode(normalized);
+  const acceptedValues = Array.isArray(item?.acceptedAnswers) && item.acceptedAnswers.length
+    ? item.acceptedAnswers
+    : [item?.answer];
+
+  return acceptedValues.some((entry) => {
+    const acceptedNormalized = normalizeReviewAnswer(entry);
+    if (acceptedNormalized === normalized) return true;
+    const acceptedCode = getMatchingOptionCode(acceptedNormalized);
+    return Boolean(acceptedCode && normalizedCode && acceptedCode === normalizedCode);
+  }) ? 1 : 0;
 }
 
 function isInlineTextInputItem(item) {
@@ -107,12 +147,7 @@ function getAutoItemScore(item, answer) {
   }
 
   if (item?.type === "matching-select") {
-    const normalized = normalizeReviewAnswer(answer);
-    if (!normalized) return 0;
-    if (Array.isArray(item.acceptedAnswers) && item.acceptedAnswers.length) {
-      return item.acceptedAnswers.some((entry) => normalizeReviewAnswer(entry) === normalized) ? 1 : 0;
-    }
-    return normalized === normalizeReviewAnswer(item.answer) ? 1 : 0;
+    return isMatchingSelectCorrect(item, answer);
   }
 
   if (isSortBySoundItem(item)) {
@@ -186,6 +221,10 @@ function formatAttemptAnswer(item, answer) {
     return answer ? String(answer) : "—";
   }
 
+  if (item?.type === "matching-select") {
+    return resolveMatchingOptionLabel(item, answer);
+  }
+
   return String(answer);
 }
 
@@ -216,9 +255,9 @@ function formatAcceptedAnswer(item) {
 
   if (item?.type === "matching-select") {
     if (Array.isArray(item.acceptedAnswers) && item.acceptedAnswers.length) {
-      return item.acceptedAnswers.join(" / ");
+      return item.acceptedAnswers.map((entry) => resolveMatchingOptionLabel(item, entry)).join(" / ");
     }
-    return item.answer || "—";
+    return resolveMatchingOptionLabel(item, item.answer);
   }
 
   if (isSortBySoundItem(item)) {
@@ -283,6 +322,7 @@ export default function TeacherCourseTests({ user }) {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deletingSessionId, setDeletingSessionId] = useState("");
 
   const [templateId, setTemplateId] = useState(templates[0]?.id || "");
   const [sessionTitle, setSessionTitle] = useState("");
@@ -485,6 +525,31 @@ export default function TeacherCourseTests({ user }) {
       toast("Could not create that test session.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleDeleteSession = async (session) => {
+    if (!session?.id) return;
+    const label = session.templateTitle || session.title || "this course test session";
+    const confirmed = window.confirm(
+      `Delete ${label}? Students will no longer see this assigned test session.`
+    );
+    if (!confirmed) return;
+
+    setDeletingSessionId(session.id);
+    try {
+      await deleteCourseTestSession(session.id);
+      const refreshed = await listMyCourseTestSessions();
+      setSessions(refreshed || []);
+      if (reviewSession?.id === session.id) {
+        closeReviewSession();
+      }
+      toast("Course test session deleted.");
+    } catch (error) {
+      console.error("[TeacherCourseTests] delete session failed", error);
+      toast("Could not delete that session.");
+    } finally {
+      setDeletingSessionId("");
     }
   };
 
@@ -841,6 +906,14 @@ export default function TeacherCourseTests({ user }) {
                     </button>
                     <button type="button" className="ghost-btn" onClick={() => openReviewSession(session)}>
                       Review submissions
+                    </button>
+                    <button
+                      type="button"
+                      className="btn danger"
+                      onClick={() => handleDeleteSession(session)}
+                      disabled={deletingSessionId === session.id}
+                    >
+                      {deletingSessionId === session.id ? "Deleting..." : "Delete session"}
                     </button>
                   </div>
                 </div>
