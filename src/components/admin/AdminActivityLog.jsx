@@ -3,6 +3,13 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs, orderBy, limit, query, startAfter } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+import { fetchAptisWritingGeneralRecentActivity } from "../../api/adminActivityBridge";
+import {
+  buildWritingGeneralSubmissionActivity,
+  sortActivitiesByDateDesc,
+  WRITING_GENERAL_GUEST_USER_ID,
+  WRITING_GENERAL_SUBMISSION_TYPE,
+} from "../../utils/adminActivity";
 
 const PAGE_SIZE = 200;
 
@@ -63,6 +70,7 @@ const typeLabels = {
   collocation_dash_completed: "Collocation Dash completed",
   writing_p1_guide_activity_started: "Writing P1 guide activity started",
   writing_p4_register_guide_activity_started: "Writing P4 register guide activity started",
+  writing_general_submission: "Writing General mock submitted",
   };
   
   function formatDetails(log) {
@@ -387,7 +395,22 @@ case "collocation_dash_completed":
           : d.activity || "activity";
       
         return `P4 register guide · started · ${activityLabel}`;
-      }      
+      }
+
+      case WRITING_GENERAL_SUBMISSION_TYPE: {
+        const attemptedParts = d.attemptedParts ?? "?";
+        const totalWords = d.totalWords ?? "?";
+        const part1Answered = d.part1Answered ?? 0;
+        const part2Words = d.part2Words ?? 0;
+        const part3Total = Array.isArray(d.part3WordCounts)
+          ? d.part3WordCounts.reduce((sum, count) => sum + count, 0)
+          : 0;
+        const part4Total = Array.isArray(d.part4WordCounts)
+          ? d.part4WordCounts.reduce((sum, count) => sum + count, 0)
+          : 0;
+
+        return `Guest mock test · ${attemptedParts}/4 parts attempted · ${totalWords} words · P1 ${part1Answered}/5 · P2 ${part2Words} · P3 ${part3Total} · P4 ${part4Total}`;
+      }
 
   
       default:
@@ -406,8 +429,13 @@ export default function AdminActivityLog({ user }) {
   const [filterType, setFilterType] = useState("all");
   const [filterEmail, setFilterEmail] = useState("");
   const [loadingMore, setLoadingMore] = useState(false);
-const [hasMore, setHasMore] = useState(true);
-const [cursorDoc, setCursorDoc] = useState(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [activityCursorDoc, setActivityCursorDoc] = useState(null);
+  const [submissionCursorDoc, setSubmissionCursorDoc] = useState(null);
+  const [hasMoreActivity, setHasMoreActivity] = useState(true);
+  const [hasMoreSubmissions, setHasMoreSubmissions] = useState(true);
+  const [remoteCursor, setRemoteCursor] = useState("");
+  const [hasMoreRemote, setHasMoreRemote] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -416,29 +444,71 @@ const [cursorDoc, setCursorDoc] = useState(null);
     async function load() {
       setLoading(true);
       setHasMore(true);
-      setCursorDoc(null);
-    
-      const q = query(
+      setActivityCursorDoc(null);
+      setSubmissionCursorDoc(null);
+      setRemoteCursor("");
+      setHasMoreRemote(true);
+
+      const activityQuery = query(
         collection(db, "activityLog"),
         orderBy("createdAt", "desc"),
         limit(PAGE_SIZE)
       );
-    
-      const snap = await getDocs(q);
-    
-      const arr = snap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      }));
-    
-      setLogs(arr);
-    
-      const last = snap.docs[snap.docs.length - 1] || null;
-      setCursorDoc(last);
-    
-      // If we got fewer than PAGE_SIZE, there’s no more to load
-      setHasMore(snap.docs.length === PAGE_SIZE);
-    
+
+      const submissionQuery = query(
+        collection(db, "submissions"),
+        orderBy("createdAt", "desc"),
+        limit(PAGE_SIZE)
+      );
+
+      const [activitySnap, submissionSnap] = await Promise.all([
+        getDocs(activityQuery),
+        getDocs(submissionQuery),
+      ]);
+
+      const activityLogs = activitySnap.docs
+        .map((d) => {
+          const data = d.data();
+          const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
+          if (!createdAt) return null;
+
+          return {
+            id: d.id,
+            ...data,
+            createdAt,
+          };
+        })
+        .filter(Boolean);
+
+      const submissionLogs = submissionSnap.docs
+        .map((docSnap) => buildWritingGeneralSubmissionActivity(docSnap))
+        .filter(Boolean);
+
+      const remoteSubmissionLogs = await fetchAptisWritingGeneralRecentActivity({
+        limit: PAGE_SIZE,
+      }).catch((error) => {
+        console.error("[AdminActivityLog] remote Aptis Writing General load failed", error);
+        return [];
+      });
+
+      setLogs(
+        [...activityLogs, ...submissionLogs, ...remoteSubmissionLogs].sort(sortActivitiesByDateDesc)
+      );
+
+      const lastActivity = activitySnap.docs[activitySnap.docs.length - 1] || null;
+      const lastSubmission = submissionSnap.docs[submissionSnap.docs.length - 1] || null;
+      setActivityCursorDoc(lastActivity);
+      setSubmissionCursorDoc(lastSubmission);
+      setHasMoreActivity(activitySnap.docs.length === PAGE_SIZE);
+      setHasMoreSubmissions(submissionSnap.docs.length === PAGE_SIZE);
+      setRemoteCursor(getOldestCreatedAtIso(remoteSubmissionLogs));
+      setHasMoreRemote(remoteSubmissionLogs.length === PAGE_SIZE);
+      setHasMore(
+        activitySnap.docs.length === PAGE_SIZE ||
+        submissionSnap.docs.length === PAGE_SIZE ||
+        remoteSubmissionLogs.length === PAGE_SIZE
+      );
+
       setLoading(false);
     }
 
@@ -446,30 +516,103 @@ const [cursorDoc, setCursorDoc] = useState(null);
   }, [user]);
 
   async function loadMore() {
-    if (loadingMore || !hasMore || !cursorDoc) return;
+    if (loadingMore || !hasMore) return;
   
     setLoadingMore(true);
-  
-    const q = query(
-      collection(db, "activityLog"),
-      orderBy("createdAt", "desc"),
-      startAfter(cursorDoc),
-      limit(PAGE_SIZE)
+
+    const requests = [];
+
+    if (hasMoreActivity && activityCursorDoc) {
+      requests.push(
+        getDocs(
+          query(
+            collection(db, "activityLog"),
+            orderBy("createdAt", "desc"),
+            startAfter(activityCursorDoc),
+            limit(PAGE_SIZE)
+          )
+        )
+      );
+    } else {
+      requests.push(Promise.resolve(null));
+    }
+
+    if (hasMoreSubmissions && submissionCursorDoc) {
+      requests.push(
+        getDocs(
+          query(
+            collection(db, "submissions"),
+            orderBy("createdAt", "desc"),
+            startAfter(submissionCursorDoc),
+            limit(PAGE_SIZE)
+          )
+        )
+      );
+    } else {
+      requests.push(Promise.resolve(null));
+    }
+
+    const [activitySnap, submissionSnap] = await Promise.all(requests);
+
+    const nextActivityLogs = activitySnap
+      ? activitySnap.docs
+          .map((d) => {
+            const data = d.data();
+            const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
+            if (!createdAt) return null;
+
+            return {
+              id: d.id,
+              ...data,
+              createdAt,
+            };
+          })
+          .filter(Boolean)
+      : [];
+
+    const nextSubmissionLogs = submissionSnap
+      ? submissionSnap.docs
+          .map((docSnap) => buildWritingGeneralSubmissionActivity(docSnap))
+          .filter(Boolean)
+      : [];
+
+    const remoteSubmissionLogs = hasMoreRemote
+      ? await fetchAptisWritingGeneralRecentActivity({
+          limit: PAGE_SIZE,
+          before: remoteCursor,
+        }).catch((error) => {
+          console.error("[AdminActivityLog] remote Aptis Writing General pagination failed", error);
+          return [];
+        })
+      : [];
+
+    setLogs((prev) =>
+      [...prev, ...nextActivityLogs, ...nextSubmissionLogs, ...remoteSubmissionLogs].sort(sortActivitiesByDateDesc)
     );
-  
-    const snap = await getDocs(q);
-  
-    const arr = snap.docs.map((d) => ({
-      id: d.id,
-      ...d.data(),
-    }));
-  
-    setLogs((prev) => [...prev, ...arr]);
-  
-    const last = snap.docs[snap.docs.length - 1] || null;
-    setCursorDoc(last);
-  
-    setHasMore(snap.docs.length === PAGE_SIZE);
+
+    const lastActivity =
+      activitySnap && activitySnap.docs.length
+        ? activitySnap.docs[activitySnap.docs.length - 1]
+        : activityCursorDoc;
+    const lastSubmission =
+      submissionSnap && submissionSnap.docs.length
+        ? submissionSnap.docs[submissionSnap.docs.length - 1]
+        : submissionCursorDoc;
+    const moreActivity = activitySnap ? activitySnap.docs.length === PAGE_SIZE : hasMoreActivity;
+    const moreSubmissions = submissionSnap
+      ? submissionSnap.docs.length === PAGE_SIZE
+      : hasMoreSubmissions;
+
+    setActivityCursorDoc(lastActivity);
+    setSubmissionCursorDoc(lastSubmission);
+    setHasMoreActivity(moreActivity);
+    setHasMoreSubmissions(moreSubmissions);
+    const moreRemote = hasMoreRemote && remoteSubmissionLogs.length === PAGE_SIZE;
+    setRemoteCursor(
+      remoteSubmissionLogs.length ? getOldestCreatedAtIso(remoteSubmissionLogs) : remoteCursor
+    );
+    setHasMoreRemote(moreRemote);
+    setHasMore(moreActivity || moreSubmissions || moreRemote);
     setLoadingMore(false);
   }
 
@@ -578,6 +721,7 @@ const [cursorDoc, setCursorDoc] = useState(null);
             <option value="vocab_match_session">Vocab match</option>
             <option value="writing_p1_guide_activity_started">Writing P1 guide started</option>
             <option value="writing_p4_register_guide_activity_started">Writing P4 register guide activity started</option>
+            <option value="writing_general_submission">Writing General mock submitted</option>
           </select>
         </div>
 
@@ -640,27 +784,31 @@ const [cursorDoc, setCursorDoc] = useState(null);
                   }}
                 >
                   <td style={{ padding: "0.35rem 0.25rem", whiteSpace: "nowrap" }}>
-                    {log.createdAt?.toDate
-                      ? log.createdAt.toDate().toLocaleString()
-                      : "—"}
+                    {log.createdAt instanceof Date ? log.createdAt.toLocaleString() : "—"}
                   </td>
                   <td style={{ padding: "0.35rem 0.25rem" }}>
-                    <button
-                      type="button"
-                      onClick={() => goToProfile(log.userId)}
-                      style={{
-                        background: "none",
-                        border: "none",
-                        padding: 0,
-                        margin: 0,
-                        color: "inherit",
-                        textAlign: "left",
-                        cursor: "pointer",
-                        fontSize: "0.85rem",
-                      }}
-                    >
-                      {log.userEmail || log.userId}
-                    </button>
+                    {log.userId && log.userId !== WRITING_GENERAL_GUEST_USER_ID ? (
+                      <button
+                        type="button"
+                        onClick={() => goToProfile(log.userId)}
+                        style={{
+                          background: "none",
+                          border: "none",
+                          padding: 0,
+                          margin: 0,
+                          color: "inherit",
+                          textAlign: "left",
+                          cursor: "pointer",
+                          fontSize: "0.85rem",
+                        }}
+                      >
+                        {log.userEmail || log.userId}
+                      </button>
+                    ) : (
+                      <span style={{ fontSize: "0.85rem" }}>
+                        {log.userEmail || "Guest"}
+                      </span>
+                    )}
                   </td>
                   {/* Type */}
 <td style={{ padding: "0.35rem 0.25rem" }}>
@@ -718,4 +866,11 @@ const [cursorDoc, setCursorDoc] = useState(null);
 
     </div>
   );
+}
+
+function getOldestCreatedAtIso(items) {
+  const datedItems = items.filter((item) => item?.createdAt instanceof Date);
+  if (!datedItems.length) return "";
+
+  return datedItems[datedItems.length - 1].createdAt.toISOString();
 }

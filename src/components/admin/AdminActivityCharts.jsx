@@ -11,6 +11,11 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+import { fetchAptisWritingGeneralRangeActivity } from "../../api/adminActivityBridge";
+import {
+  buildWritingGeneralSubmissionActivity,
+  WRITING_GENERAL_SUBMISSION_TYPE,
+} from "../../utils/adminActivity";
 
 import {
   ResponsiveContainer,
@@ -67,6 +72,7 @@ const typeLabels = {
   writing_p1_guide_activity_started: "Writing P1 guide activity started",
   writing_p4_register_guide_activity_started:
     "Writing P4 register guide activity started",
+  writing_general_submission: "Writing General mock submitted",
 };
 
 function isoDate(d) {
@@ -295,45 +301,77 @@ export default function AdminActivityCharts({ user }) {
     const fromTs = Timestamp.fromDate(fromD);
     const toTs = Timestamp.fromDate(toD);
 
-    let q;
-    if (typeFilter === "all") {
-      q = query(
-        collection(db, "activityLog"),
-        where("createdAt", ">=", fromTs),
-        where("createdAt", "<=", toTs),
-        orderBy("createdAt", "asc")
-      );
-    } else {
-      // requires composite index: (type, createdAt)
-      q = query(
-        collection(db, "activityLog"),
-        where("type", "==", typeFilter),
-        where("createdAt", ">=", fromTs),
-        where("createdAt", "<=", toTs),
-        orderBy("createdAt", "asc")
-      );
-    }
+    const shouldLoadActivityLog = typeFilter === "all" || typeFilter !== WRITING_GENERAL_SUBMISSION_TYPE;
+    const shouldLoadSubmissions = typeFilter === "all" || typeFilter === WRITING_GENERAL_SUBMISSION_TYPE;
 
-    const snap = await getDocs(q);
+    const activityPromise = shouldLoadActivityLog
+      ? getDocs(
+          typeFilter === "all"
+            ? query(
+                collection(db, "activityLog"),
+                where("createdAt", ">=", fromTs),
+                where("createdAt", "<=", toTs),
+                orderBy("createdAt", "asc")
+              )
+            : query(
+                collection(db, "activityLog"),
+                where("type", "==", typeFilter),
+                where("createdAt", ">=", fromTs),
+                where("createdAt", "<=", toTs),
+                orderBy("createdAt", "asc")
+              )
+        )
+      : Promise.resolve(null);
 
-    const arr = snap.docs
-      .map((doc) => {
-        const data = doc.data();
-        const dt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
-        if (!dt) return null;
+    const submissionsPromise = shouldLoadSubmissions
+      ? getDocs(
+          query(
+            collection(db, "submissions"),
+            where("createdAt", ">=", fromTs),
+            where("createdAt", "<=", toTs),
+            orderBy("createdAt", "asc")
+          )
+        )
+      : Promise.resolve(null);
 
-        return {
-          id: doc.id,
-          userId: data.userId || "",
-          userEmail: data.userEmail || "",
-          type: data.type || "",
-          details: data.details || {},
-          createdAt: dt,
-        };
-      })
-      .filter(Boolean);
+    const [activitySnap, submissionsSnap] = await Promise.all([
+      activityPromise,
+      submissionsPromise,
+    ]);
 
-    setRawLogs(arr);
+    const activityRows = activitySnap
+      ? activitySnap.docs
+          .map((doc) => {
+            const data = doc.data();
+            const dt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
+            if (!dt) return null;
+
+            return {
+              id: doc.id,
+              userId: data.userId || "",
+              userEmail: data.userEmail || "",
+              type: data.type || "",
+              details: data.details || {},
+              createdAt: dt,
+            };
+          })
+          .filter(Boolean)
+      : [];
+
+    const submissionRows = submissionsSnap
+      ? submissionsSnap.docs
+          .map((docSnap) => buildWritingGeneralSubmissionActivity(docSnap))
+          .filter(Boolean)
+      : [];
+
+    const remoteSubmissionRows = shouldLoadSubmissions
+      ? await fetchAptisWritingGeneralRangeActivity({ from, to }).catch((error) => {
+          console.error("[AdminActivityCharts] remote Aptis Writing General load failed", error);
+          return [];
+        })
+      : [];
+
+    setRawLogs([...activityRows, ...submissionRows, ...remoteSubmissionRows]);
     setLoading(false);
   }
 

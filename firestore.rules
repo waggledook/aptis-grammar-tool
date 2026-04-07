@@ -366,14 +366,25 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
-    // ── 11) Seif Hub access requests ────────────────────────────────────
+    // ── 11) Public Aptis Writing General submissions ───────────────────
+    match /submissions/{submissionId} {
+      allow create: if request.resource.data.keys().hasOnly([
+        "answers",
+        "createdAt"
+      ]);
+      allow get: if true;
+      allow list: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ── 12) Seif Hub access requests ────────────────────────────────────
     match /hubAccessRequests/{requestId} {
       allow create: if isSignedIn();
       allow get, list: if isAdmin();
       allow update, delete: if false;
     }
 
-    // ── 12) Everything else locked down ─────────────────────────────────
+    // ── 13) Everything else locked down ─────────────────────────────────
     match /{document=**} {
       allow read, write: if false;
     }
