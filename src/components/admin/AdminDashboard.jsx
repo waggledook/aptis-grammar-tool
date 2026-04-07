@@ -1,14 +1,232 @@
 // src/components/admin/AdminDashboard.jsx
-import React, { useEffect, useState } from "react";
-import { db, deleteCourseTestSession, listAllCourseTestSessions } from "../../firebase";
+import React, { useEffect, useMemo, useState } from "react";
+import {
+  db,
+  deleteCourseTestSession,
+  listAllCourseTestSessions,
+  listAttemptsForCourseTestSession,
+  saveCourseTestAttemptReview,
+} from "../../firebase";
 import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { getSeifHubAccessConfig, SEIF_HUB_ACCESS_KEY } from "../../siteConfig.js";
+import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
 
 function getTodayLocalIsoDate() {
   const now = new Date();
   const tzOffset = now.getTimezoneOffset() * 60000;
   return new Date(now.getTime() - tzOffset).toISOString().slice(0, 10);
+}
+
+function formatDateTime(value) {
+  if (!value) return "—";
+  const date =
+    typeof value?.toDate === "function"
+      ? value.toDate()
+      : value instanceof Date
+        ? value
+        : new Date(value);
+
+  if (Number.isNaN(date.getTime())) return "—";
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function normalizeReviewAnswer(value = "") {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[’']/g, "")
+    .replace(/[-.,!?;:()[\]{}"“”]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function getMatchingOptionCode(value = "") {
+  const match = String(value || "").trim().match(/^([a-z])\b/i);
+  return match ? match[1].toLowerCase() : "";
+}
+
+function resolveMatchingOptionLabel(item, value = "") {
+  const raw = String(value || "").trim();
+  if (!raw) return "—";
+  const code = getMatchingOptionCode(raw);
+  if (!code) return raw;
+  const options = Array.isArray(item?.options) ? item.options : [];
+  const matched = options.find((option) => {
+    const text = String(typeof option === "string" ? option : option?.text || "").trim();
+    return getMatchingOptionCode(text) === code;
+  });
+  if (!matched) return raw;
+  return String(typeof matched === "string" ? matched : matched?.text || raw);
+}
+
+function isMatchingSelectCorrect(item, answer) {
+  const normalized = normalizeReviewAnswer(answer);
+  if (!normalized) return 0;
+  const normalizedCode = getMatchingOptionCode(normalized);
+  const acceptedValues = Array.isArray(item?.acceptedAnswers) && item.acceptedAnswers.length
+    ? item.acceptedAnswers
+    : [item?.answer];
+  return acceptedValues.some((entry) => {
+    const acceptedNormalized = normalizeReviewAnswer(entry);
+    if (acceptedNormalized === normalized) return true;
+    const acceptedCode = getMatchingOptionCode(acceptedNormalized);
+    return Boolean(acceptedCode && normalizedCode && acceptedCode === normalizedCode);
+  }) ? 1 : 0;
+}
+
+function isInlineTextInputItem(item) {
+  return (
+    item?.type === "text-input" &&
+    Array.isArray(item.inlineParts) &&
+    item.inlineParts.some((part) => part && typeof part === "object" && part.gapId)
+  );
+}
+
+function hasPerGapAcceptedAnswers(item) {
+  return Boolean(item?.inlineAcceptedAnswers && Object.keys(item.inlineAcceptedAnswers).length > 0);
+}
+
+function isSortBySoundItem(item) {
+  return (
+    !item?.type &&
+    typeof item?.prompt === "string" &&
+    typeof item?.answer === "string" &&
+    Array.isArray(item?.options)
+  );
+}
+
+function buildSortBySoundDistractorItems(section) {
+  const sourceItems = Array.isArray(section?.items) ? section.items : [];
+  const exampleWords = Array.isArray(section?.sharedPrompt?.exampleWords)
+    ? section.sharedPrompt.exampleWords.map((entry) => String(entry).toLowerCase())
+    : [];
+
+  return (Array.isArray(section?.sharedPrompt?.values) ? section.sharedPrompt.values : [])
+    .filter((entry) => {
+      const text = String(typeof entry === "string" ? entry : entry?.text || "").toLowerCase();
+      if (!text) return false;
+      if (exampleWords.includes(text)) return false;
+      return !sourceItems.some((item) => String(item.prompt || "").toLowerCase() === text);
+    })
+    .map((entry, index) => ({
+      id: `__distractor__:${index}:${typeof entry === "string" ? entry : entry?.text || ""}`,
+    }));
+}
+
+function getSortBySoundPenalty(section, sectionAnswerMap = {}) {
+  if (section?.taskType !== "sort-by-sound") return 0;
+  return buildSortBySoundDistractorItems(section).reduce((sum, item) => {
+    return sum + (sectionAnswerMap?.[item.id] ? 1 : 0);
+  }, 0);
+}
+
+function getAutoItemScore(item, answer) {
+  if (item?.type === "choice") {
+    if (Array.isArray(item.acceptedAnswerIndexes) && item.acceptedAnswerIndexes.length) {
+      return item.acceptedAnswerIndexes.map(String).includes(String(answer)) ? 1 : 0;
+    }
+    return String(answer) === String(item.answerIndex) ? 1 : 0;
+  }
+  if (item?.type === "stress-choice") return String(answer) === String(item.answerIndex) ? 1 : 0;
+  if (item?.type === "matching-select") return isMatchingSelectCorrect(item, answer);
+  if (isSortBySoundItem(item)) {
+    if (!normalizeReviewAnswer(answer)) return 0;
+    return normalizeReviewAnswer(answer) === normalizeReviewAnswer(item.answer) ? 1 : 0;
+  }
+  if (item?.type === "text-input") {
+    if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
+      const acceptedByGap = item.inlineAcceptedAnswers || {};
+      const answerMap = answer && typeof answer === "object" ? answer : {};
+      const fullCredit = Object.entries(acceptedByGap).every(([gapId, acceptedValues]) => {
+        const normalized = normalizeReviewAnswer(answerMap[gapId] || "");
+        return (acceptedValues || []).some((entry) => normalizeReviewAnswer(entry) === normalized);
+      });
+      if (fullCredit) return 1;
+      const partialByGap = item.inlinePartialAcceptedAnswers || {};
+      const hasPartial = Object.keys(partialByGap).length > 0 &&
+        Object.entries(partialByGap).every(([gapId, acceptedValues]) => {
+          const normalized = normalizeReviewAnswer(answerMap[gapId] || "");
+          return (acceptedValues || []).some((entry) => normalizeReviewAnswer(entry) === normalized);
+        });
+      if (hasPartial) return Number(item.partialCreditValue ?? 0.5);
+      return 0;
+    }
+    const accepted = Array.isArray(item.acceptedAnswers) ? item.acceptedAnswers : [];
+    const normalized = normalizeReviewAnswer(answer);
+    if (accepted.some((entry) => normalizeReviewAnswer(entry) === normalized)) return 1;
+    const partialAccepted = Array.isArray(item.partialAcceptedAnswers) ? item.partialAcceptedAnswers : [];
+    if (partialAccepted.some((entry) => normalizeReviewAnswer(entry) === normalized)) {
+      return Number(item.partialCreditValue ?? 0.5);
+    }
+    return 0;
+  }
+  return 0;
+}
+
+function isItemCorrect(item, answer) {
+  return getAutoItemScore(item, answer) >= 1;
+}
+
+function formatAttemptAnswer(item, answer) {
+  if (!answer || (typeof answer === "string" && !answer.trim())) return "—";
+  if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
+    const answerMap = answer && typeof answer === "object" ? answer : {};
+    const gapParts = item.inlineParts.filter((part) => part && typeof part === "object" && part.gapId);
+    return gapParts.map((part, index) => `Gap ${index + 1}: ${answerMap[part.gapId] || "—"}`).join(" · ");
+  }
+  if (item?.type === "choice") {
+    const selected = item.options?.[Number(answer)];
+    return typeof selected === "string" ? selected : selected?.text || "—";
+  }
+  if (item?.type === "stress-choice") {
+    const syllables = Array.isArray(item.syllables) ? item.syllables : [];
+    const chosen = syllables[Number(answer)];
+    if (!chosen) return "—";
+    return `${item.prompt}: ${chosen}`;
+  }
+  if (isSortBySoundItem(item)) return answer ? String(answer) : "—";
+  if (item?.type === "matching-select") return resolveMatchingOptionLabel(item, answer);
+  return String(answer);
+}
+
+function formatAcceptedAnswer(item) {
+  if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
+    return Object.entries(item.inlineAcceptedAnswers || {})
+      .map(([gapId, values], index) => `Gap ${index + 1}: ${(values || []).join(" / ")}`)
+      .join(" · ");
+  }
+  if (item?.type === "choice") {
+    if (Array.isArray(item.acceptedAnswerIndexes) && item.acceptedAnswerIndexes.length) {
+      return item.acceptedAnswerIndexes
+        .map((index) => item.options?.[Number(index)])
+        .map((selected) => (typeof selected === "string" ? selected : selected?.text || "—"))
+        .join(" / ");
+    }
+    const selected = item.options?.[Number(item.answerIndex)];
+    return typeof selected === "string" ? selected : selected?.text || "—";
+  }
+  if (item?.type === "stress-choice") {
+    const syllables = Array.isArray(item.syllables) ? item.syllables : [];
+    const chosen = syllables[Number(item.answerIndex)];
+    if (!chosen) return "—";
+    return `${item.prompt}: ${chosen}`;
+  }
+  if (item?.type === "matching-select") {
+    if (Array.isArray(item.acceptedAnswers) && item.acceptedAnswers.length) {
+      return item.acceptedAnswers.map((entry) => resolveMatchingOptionLabel(item, entry)).join(" / ");
+    }
+    return resolveMatchingOptionLabel(item, item.answer);
+  }
+  if (isSortBySoundItem(item)) return item.answer || "—";
+  if (Array.isArray(item?.acceptedAnswers)) return item.acceptedAnswers.join(" / ");
+  return "—";
 }
 
 export default function AdminDashboard({ user }) {
@@ -27,6 +245,13 @@ export default function AdminDashboard({ user }) {
   const [courseTestSessions, setCourseTestSessions] = useState([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
   const [deletingSessionId, setDeletingSessionId] = useState("");
+  const [showCourseTestSessions, setShowCourseTestSessions] = useState(false);
+  const [reviewSession, setReviewSession] = useState(null);
+  const [reviewAttempts, setReviewAttempts] = useState([]);
+  const [reviewAttemptsLoading, setReviewAttemptsLoading] = useState(false);
+  const [selectedAttempt, setSelectedAttempt] = useState(null);
+  const [reviewScores, setReviewScores] = useState({});
+  const [reviewSaving, setReviewSaving] = useState(false);
 
   const navigate = useNavigate();
 
@@ -124,6 +349,110 @@ export default function AdminDashboard({ user }) {
       console.error("[AdminDashboard] delete course test session failed", error);
     } finally {
       setDeletingSessionId("");
+    }
+  }
+
+  async function openReviewSession(session) {
+    setReviewSession(session);
+    setSelectedAttempt(null);
+    setReviewScores({});
+    setReviewAttemptsLoading(true);
+    try {
+      const rows = await listAttemptsForCourseTestSession(session.id);
+      setReviewAttempts(rows || []);
+    } catch (error) {
+      console.error("[AdminDashboard] review load failed", error);
+    } finally {
+      setReviewAttemptsLoading(false);
+    }
+  }
+
+  function closeReviewSession() {
+    setReviewSession(null);
+    setReviewAttempts([]);
+    setSelectedAttempt(null);
+    setReviewScores({});
+    setReviewSaving(false);
+  }
+
+  const selectedAttemptTemplate = selectedAttempt?.templateId
+    ? getHubCourseTestTemplate(selectedAttempt.templateId)
+    : null;
+
+  const selectedAttemptReviewRows = useMemo(() => {
+    if (!selectedAttemptTemplate || !selectedAttempt) return [];
+
+    const answers = selectedAttempt.runnerState?.sectionAnswers || {};
+    return (selectedAttemptTemplate.sections || []).map((section) => ({
+      ...section,
+      penalty: getSortBySoundPenalty(section, answers?.[section.id] || {}),
+      reviewItems: (section.items || []).map((item) => {
+        const answer = answers?.[section.id]?.[item.id];
+        return {
+          item,
+          key: `${section.id}:${item.id}`,
+          answer,
+          autoCorrect: isItemCorrect(item, answer),
+          autoScore: getAutoItemScore(item, answer),
+        };
+      }),
+    }));
+  }, [selectedAttempt, selectedAttemptTemplate]);
+
+  useEffect(() => {
+    if (!selectedAttempt) return;
+
+    const savedScores = selectedAttempt.teacherReview?.itemScores || {};
+    const nextScores = {};
+
+    selectedAttemptReviewRows.forEach((section) => {
+      section.reviewItems.forEach(({ key, autoScore }) => {
+        nextScores[key] =
+          savedScores[key] != null ? Number(savedScores[key]) : Number(autoScore || 0);
+      });
+    });
+
+    setReviewScores(nextScores);
+  }, [selectedAttempt, selectedAttemptReviewRows]);
+
+  const reviewTotals = useMemo(() => {
+    const total = selectedAttemptReviewRows.reduce((sum, section) => sum + section.reviewItems.length, 0);
+    const score = selectedAttemptReviewRows.reduce(
+      (sum, section) =>
+        sum +
+        section.reviewItems.reduce((sectionSum, entry) => {
+          return sectionSum + Number(reviewScores[entry.key] ?? (entry.autoCorrect ? 1 : 0));
+        }, 0) -
+        Number(section.penalty || 0),
+      0
+    );
+
+    return { score: Math.max(0, score), total };
+  }, [selectedAttemptReviewRows, reviewScores]);
+
+  async function handleSaveReview() {
+    if (!selectedAttempt) return;
+
+    setReviewSaving(true);
+    try {
+      await saveCourseTestAttemptReview(selectedAttempt.id, {
+        teacherReview: {
+          itemScores: reviewScores,
+        },
+        teacherScore: reviewTotals.score,
+        teacherTotal: reviewTotals.total,
+        reviewedByUid: user.uid,
+        reviewedByName: user.displayName || user.email || "Admin",
+      });
+
+      const refreshed = await listAttemptsForCourseTestSession(reviewSession.id);
+      setReviewAttempts(refreshed || []);
+      const updatedAttempt = (refreshed || []).find((entry) => entry.id === selectedAttempt.id) || null;
+      setSelectedAttempt(updatedAttempt);
+    } catch (error) {
+      console.error("[AdminDashboard] save review failed", error);
+    } finally {
+      setReviewSaving(false);
     }
   }
 
@@ -777,32 +1106,46 @@ function renderHubAccessControl(u, compact = false) {
                 alignItems: "center",
                 flexWrap: "wrap",
                 marginBottom: "0.85rem",
-              }}
-            >
-              <div>
-                <div style={{ color: "#f8fafc", fontSize: "1.05rem", fontWeight: 700 }}>
-                  All course test sessions
-                </div>
-                <div style={{ marginTop: "0.25rem", color: "#9fb4da", fontSize: "0.88rem" }}>
-                  Admin view of every assigned Oxford test session, regardless of teacher.
-                </div>
-              </div>
-              <div
-                style={{
-                  padding: "0.34rem 0.7rem",
-                  borderRadius: "999px",
-                  background: "rgba(253, 191, 45, 0.14)",
-                  border: "1px solid rgba(253, 191, 45, 0.28)",
-                  color: "#ffd56e",
-                  fontSize: "0.78rem",
-                  fontWeight: 700,
                 }}
               >
-                {courseTestSessions.length} session{courseTestSessions.length === 1 ? "" : "s"}
+                <div>
+                  <div style={{ color: "#f8fafc", fontSize: "1.05rem", fontWeight: 700 }}>
+                    All course test sessions
+                  </div>
+                <div style={{ marginTop: "0.25rem", color: "#9fb4da", fontSize: "0.88rem" }}>
+                  Admin view of every assigned Oxford test session, regardless of teacher.
+                  </div>
+                </div>
+              <div style={{ display: "flex", gap: "0.6rem", alignItems: "center", flexWrap: "wrap" }}>
+                <div
+                  style={{
+                    padding: "0.34rem 0.7rem",
+                    borderRadius: "999px",
+                    background: "rgba(253, 191, 45, 0.14)",
+                    border: "1px solid rgba(253, 191, 45, 0.28)",
+                    color: "#ffd56e",
+                    fontSize: "0.78rem",
+                    fontWeight: 700,
+                  }}
+                >
+                  {courseTestSessions.length} session{courseTestSessions.length === 1 ? "" : "s"}
+                </div>
+                <button
+                  type="button"
+                  className="ghost-btn"
+                  style={{ fontSize: "0.85rem", padding: "0.5rem 0.8rem", marginLeft: 0 }}
+                  onClick={() => setShowCourseTestSessions((prev) => !prev)}
+                >
+                  {showCourseTestSessions ? "Hide sessions" : "Show sessions"}
+                </button>
               </div>
             </div>
 
-            {loadingSessions ? (
+            {!showCourseTestSessions ? (
+              <p style={{ margin: 0, color: "#94a3b8" }}>
+                Hidden by default so the dashboard stays focused on student management.
+              </p>
+            ) : loadingSessions ? (
               <p style={{ margin: 0, color: "#cbd5e1" }}>Loading sessions…</p>
             ) : !courseTestSessions.length ? (
               <p style={{ margin: 0, color: "#94a3b8" }}>No course test sessions found.</p>
@@ -894,14 +1237,24 @@ function renderHubAccessControl(u, compact = false) {
                       <div style={{ color: "#9fb4da", fontSize: "0.84rem" }}>
                         {session.className ? `Class: ${session.className}` : "No class label"}
                       </div>
-                      <button
-                        type="button"
-                        className="btn danger"
-                        onClick={() => removeCourseTestSession(session)}
-                        disabled={deletingSessionId === session.id}
-                      >
-                        {deletingSessionId === session.id ? "Deleting..." : "Delete session"}
-                      </button>
+                      <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+                        <button
+                          type="button"
+                          className="ghost-btn"
+                          style={{ marginLeft: 0 }}
+                          onClick={() => openReviewSession(session)}
+                        >
+                          View submissions
+                        </button>
+                        <button
+                          type="button"
+                          className="btn danger"
+                          onClick={() => removeCourseTestSession(session)}
+                          disabled={deletingSessionId === session.id}
+                        >
+                          {deletingSessionId === session.id ? "Deleting..." : "Delete session"}
+                        </button>
+                      </div>
                     </div>
                   </section>
                 ))}
@@ -1124,6 +1477,233 @@ function renderHubAccessControl(u, compact = false) {
           </div>
         </>
       )}
+
+      {reviewSession ? (
+        <div
+          onClick={closeReviewSession}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(2, 6, 23, 0.78)",
+            zIndex: 70,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1.2rem",
+          }}
+        >
+          <div
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "min(1180px, 100%)",
+              maxHeight: "88vh",
+              overflow: "auto",
+              borderRadius: "1.1rem",
+              border: "1px solid #27406f",
+              background: "linear-gradient(180deg, rgba(24, 41, 79, 0.98), rgba(20, 36, 71, 0.98))",
+              boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
+              padding: "1rem",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "0.8rem",
+                alignItems: "center",
+                flexWrap: "wrap",
+                marginBottom: "1rem",
+              }}
+            >
+              <div>
+                <h3 style={{ margin: 0, color: "#f8fafc" }}>{reviewSession.templateTitle || "Course test review"}</h3>
+                <p style={{ margin: "0.3rem 0 0", color: "#b7c6e6" }}>
+                  Review submissions, inspect full answers, and adjust scoring if needed.
+                </p>
+              </div>
+              <button type="button" className="ghost-btn" onClick={closeReviewSession}>
+                Close
+              </button>
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gridTemplateColumns: isNarrow ? "1fr" : "280px minmax(0, 1fr)",
+                gap: "1rem",
+              }}
+            >
+              <div
+                style={{
+                  borderRadius: "0.95rem",
+                  border: "1px solid rgba(51, 65, 85, 0.7)",
+                  background: "rgba(2, 6, 23, 0.22)",
+                  padding: "0.9rem",
+                }}
+              >
+                <strong style={{ color: "#f8fafc" }}>Submissions</strong>
+                {reviewAttemptsLoading ? (
+                  <p style={{ color: "#94a3b8" }}>Loading submissions…</p>
+                ) : !reviewAttempts.length ? (
+                  <p style={{ color: "#94a3b8" }}>No submissions yet for this session.</p>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem", marginTop: "0.8rem" }}>
+                    {reviewAttempts.map((attempt) => (
+                      <button
+                        key={attempt.id}
+                        type="button"
+                        onClick={() => setSelectedAttempt(attempt)}
+                        style={{
+                          textAlign: "left",
+                          borderRadius: "0.85rem",
+                          padding: "0.8rem",
+                          border: selectedAttempt?.id === attempt.id ? "1px solid #60a5fa" : "1px solid rgba(51, 65, 85, 0.7)",
+                          background: selectedAttempt?.id === attempt.id ? "rgba(37, 99, 235, 0.18)" : "rgba(15, 23, 42, 0.65)",
+                          color: "#e5e7eb",
+                        }}
+                      >
+                        <strong>{attempt.studentName || attempt.studentEmail || attempt.studentUid}</strong>
+                        <div style={{ marginTop: "0.25rem", fontSize: "0.82rem", color: "#9fb4da" }}>
+                          {attempt.reviewStatus === "reviewed"
+                            ? `Reviewed · ${attempt.finalPercent ?? 0}%`
+                            : `Submitted · ${attempt.percent ?? 0}% auto`}
+                        </div>
+                        <div style={{ marginTop: "0.2rem", fontSize: "0.78rem", color: "#94a3b8" }}>
+                          {formatDateTime(attempt.submittedAt || attempt.updatedAt)}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                {!selectedAttempt ? (
+                  <p style={{ color: "#94a3b8" }}>Choose a submission to review.</p>
+                ) : (
+                  <>
+                    <div
+                      style={{
+                        display: "grid",
+                        gridTemplateColumns: isNarrow ? "1fr" : "repeat(3, minmax(0, 1fr))",
+                        gap: "0.75rem",
+                        marginBottom: "1rem",
+                      }}
+                    >
+                      <div style={{ padding: "0.85rem", borderRadius: "0.9rem", border: "1px solid rgba(51, 65, 85, 0.7)", background: "rgba(2, 6, 23, 0.22)" }}>
+                        <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Student</div>
+                        <div style={{ marginTop: "0.35rem", color: "#e5e7eb" }}>{selectedAttempt.studentName || selectedAttempt.studentEmail || selectedAttempt.studentUid}</div>
+                      </div>
+                      <div style={{ padding: "0.85rem", borderRadius: "0.9rem", border: "1px solid rgba(51, 65, 85, 0.7)", background: "rgba(2, 6, 23, 0.22)" }}>
+                        <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Submitted</div>
+                        <div style={{ marginTop: "0.35rem", color: "#e5e7eb" }}>{formatDateTime(selectedAttempt.submittedAt || selectedAttempt.updatedAt)}</div>
+                      </div>
+                      <div style={{ padding: "0.85rem", borderRadius: "0.9rem", border: "1px solid rgba(51, 65, 85, 0.7)", background: "rgba(2, 6, 23, 0.22)" }}>
+                        <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Teacher score</div>
+                        <div style={{ marginTop: "0.35rem", color: "#e5e7eb" }}>
+                          {reviewTotals.score}/{reviewTotals.total}
+                          {reviewTotals.total ? ` · ${Math.round((reviewTotals.score / reviewTotals.total) * 100)}%` : ""}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
+                      {selectedAttemptReviewRows.map((section) => (
+                        <div
+                          key={section.id}
+                          style={{
+                            borderRadius: "0.95rem",
+                            border: "1px solid rgba(51, 65, 85, 0.7)",
+                            background: "rgba(2, 6, 23, 0.22)",
+                            padding: "0.95rem",
+                          }}
+                        >
+                          <h4 style={{ marginTop: 0, marginBottom: "0.35rem", color: "#f8fafc" }}>{section.title}</h4>
+                          {section.penalty ? (
+                            <p style={{ marginTop: 0, color: "#94a3b8", fontSize: "0.84rem" }}>
+                              Extra word penalty: -{section.penalty}
+                            </p>
+                          ) : null}
+                          <div style={{ display: "flex", flexDirection: "column", gap: "0.8rem" }}>
+                            {section.reviewItems.map(({ item, key, answer, autoCorrect, autoScore }) => {
+                              const scoreValue = Number(reviewScores[key] ?? Number(autoScore || 0));
+                              const borderColor = scoreValue >= 1
+                                ? "rgba(62, 175, 124, 0.7)"
+                                : scoreValue > 0
+                                  ? "rgba(253, 191, 45, 0.7)"
+                                  : "rgba(202, 96, 109, 0.8)";
+
+                              return (
+                                <div
+                                  key={key}
+                                  style={{
+                                    borderRadius: "0.85rem",
+                                    border: `1px solid ${borderColor}`,
+                                    background: "rgba(15, 23, 42, 0.6)",
+                                    padding: "0.85rem",
+                                  }}
+                                >
+                                  <div style={{ display: "flex", justifyContent: "space-between", gap: "0.8rem", flexWrap: "wrap", alignItems: "center" }}>
+                                    <strong style={{ color: "#f8fafc" }}>{item.prompt}</strong>
+                                    <select
+                                      className="input"
+                                      style={{ width: "90px" }}
+                                      value={String(reviewScores[key] ?? (autoCorrect ? 1 : 0))}
+                                      onChange={(event) =>
+                                        setReviewScores((prev) => ({
+                                          ...prev,
+                                          [key]: Number(event.target.value),
+                                        }))
+                                      }
+                                    >
+                                      <option value="0">0</option>
+                                      <option value="0.5">0.5</option>
+                                      <option value="1">1</option>
+                                    </select>
+                                  </div>
+                                  <div
+                                    style={{
+                                      display: "grid",
+                                      gridTemplateColumns: isNarrow ? "1fr" : "repeat(3, minmax(0, 1fr))",
+                                      gap: "0.8rem",
+                                      marginTop: "0.8rem",
+                                    }}
+                                  >
+                                    <div>
+                                      <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Student answer</div>
+                                      <p style={{ color: "#e5e7eb" }}>{formatAttemptAnswer(item, answer)}</p>
+                                    </div>
+                                    <div>
+                                      <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Answer key</div>
+                                      <p style={{ color: "#e5e7eb" }}>{formatAcceptedAnswer(item)}</p>
+                                    </div>
+                                    <div>
+                                      <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Auto-check</div>
+                                      <p style={{ color: autoScore >= 1 ? "#8be0b2" : autoScore > 0 ? "#fde68a" : "#ffb4bf" }}>
+                                        {autoScore >= 1 ? "Correct" : autoScore > 0 ? `Partial credit (${autoScore})` : "Wrong / needs teacher review"}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end" }}>
+                      <button type="button" className="btn" onClick={handleSaveReview} disabled={reviewSaving}>
+                        {reviewSaving ? "Saving..." : "Save review"}
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

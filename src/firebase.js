@@ -3027,6 +3027,17 @@ export async function listAttemptsForMyCourseTestSession(sessionId) {
   return sortCourseTestAttempts(snap.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
 }
 
+export async function listAttemptsForCourseTestSession(sessionId) {
+  if (!sessionId) return [];
+
+  const q = query(
+    collection(db, "courseTestAttempts"),
+    where("sessionId", "==", sessionId)
+  );
+  const snap = await getDocs(q);
+  return sortCourseTestAttempts(snap.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+}
+
 export async function getMyCourseTestAttemptForSession(sessionId, uid) {
   const realUid = _uidOrCurrent(uid);
   if (!realUid || !sessionId) return null;
