@@ -2,7 +2,6 @@
 const functions = require("firebase-functions");
 const admin     = require("firebase-admin");
 const nodemailer = require("nodemailer");
-const {getFirestore, Timestamp} = require("firebase-admin/firestore");
 
 // ---------- init Admin (safe if called twice) ----------
 try { admin.app(); } catch { admin.initializeApp(); }
@@ -266,98 +265,6 @@ const textToSpeech = require("@google-cloud/text-to-speech");
 
 const ttsClient = new textToSpeech.TextToSpeechClient();
 
-const APTIS_WRITING_PROJECT_ID = "aptis-writing";
-const APTIS_WRITING_APP_NAME = "aptisWritingProject";
-
-function getAptisWritingApp() {
-  try {
-    return admin.app(APTIS_WRITING_APP_NAME);
-  } catch (error) {
-    return admin.initializeApp({projectId: APTIS_WRITING_PROJECT_ID}, APTIS_WRITING_APP_NAME);
-  }
-}
-
-function getAptisWritingDb() {
-  return getFirestore(getAptisWritingApp());
-}
-
-function stripHtmlToText(html = "") {
-  return String(html).replace(/<[^>]*>/g, " ");
-}
-
-function countWords(text = "") {
-  const matches = String(text).trim().match(/\S+/g);
-  return matches ? matches.length : 0;
-}
-
-function getWordCountFromHtml(html = "") {
-  return countWords(stripHtmlToText(html));
-}
-
-function summarizeWritingSubmission(docSnap) {
-  const data = docSnap.data() || {};
-  const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
-  if (!createdAt) return null;
-
-  const answers = data.answers || {};
-  const part1Answers = Array.isArray(answers[1]) ? answers[1] : [];
-  const part2Answer = typeof answers[2] === "string" ? answers[2] : "";
-  const part3Answers = Array.isArray(answers[3]) ? answers[3] : [];
-  const part4Answers = Array.isArray(answers[4]) ? answers[4] : [];
-
-  const part1Answered = part1Answers.filter((answer) => stripHtmlToText(answer).trim()).length;
-  const part2Words = getWordCountFromHtml(part2Answer);
-  const part3WordCounts = part3Answers.map((answer) => getWordCountFromHtml(answer));
-  const part4WordCounts = part4Answers.map((answer) => getWordCountFromHtml(answer));
-  const attemptedParts = [
-    part1Answered > 0,
-    part2Words > 0,
-    part3WordCounts.some(Boolean),
-    part4WordCounts.some(Boolean),
-  ].filter(Boolean).length;
-  const totalWords =
-    part1Answers.reduce((sum, answer) => sum + getWordCountFromHtml(answer), 0) +
-    part2Words +
-    part3WordCounts.reduce((sum, value) => sum + value, 0) +
-    part4WordCounts.reduce((sum, value) => sum + value, 0);
-
-  return {
-    id: `aptis-writing:${docSnap.id}`,
-    userId: "__guest_aptis_writing_general__",
-    userEmail: "Guest (Aptis Writing General)",
-    type: "writing_general_submission",
-    createdAt: createdAt.toISOString(),
-    details: {
-      submissionId: docSnap.id,
-      attemptedParts,
-      totalWords,
-      part1Answered,
-      part2Words,
-      part3WordCounts,
-      part4WordCounts,
-      sourceCollection: "submissions",
-      sourceProject: APTIS_WRITING_PROJECT_ID,
-    },
-  };
-}
-
-async function requireAdmin(req) {
-  const header = req.get("Authorization") || "";
-  const token = header.startsWith("Bearer ") ? header.slice(7).trim() : "";
-  if (!token) {
-    throw Object.assign(new Error("Missing bearer token."), {statusCode: 401});
-  }
-
-  const decoded = await admin.auth().verifyIdToken(token);
-  const userSnap = await admin.firestore().collection("users").doc(decoded.uid).get();
-  if (!userSnap.exists || userSnap.data()?.role !== "admin") {
-    throw Object.assign(new Error("Admin access required."), {statusCode: 403});
-  }
-
-  return decoded;
-}
-
-
 /**
  * POST /speak
  * Body: { text, voice?, rate?, pitch?, format? }
@@ -450,74 +357,6 @@ exports.speak = functions.region('europe-west1').https.onRequest(async (req, res
       console.error('[speak] error', err);
       res.set('Access-Control-Allow-Origin', '*');
       return res.status(500).json({ error: err.message || 'TTS failed' });
-    }
-  });
-});
-
-exports.adminAptisWritingSubmissions = functions.region("europe-west1").https.onRequest(async (req, res) => {
-  cors(req, res, async () => {
-    if (req.method === "OPTIONS") {
-      res.set("Access-Control-Allow-Origin", "*");
-      res.set("Access-Control-Allow-Methods", "GET, OPTIONS");
-      res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-      return res.status(204).send("");
-    }
-
-    try {
-      if (req.method !== "GET") {
-        res.set("Access-Control-Allow-Origin", "*");
-        return res.status(405).json({error: "Method not allowed"});
-      }
-
-      await requireAdmin(req);
-
-      const mode = String(req.query.mode || "recent");
-      const db = getAptisWritingDb();
-      let queryRef = db.collection("submissions");
-
-      if (mode === "range") {
-        const from = new Date(String(req.query.from || ""));
-        const to = new Date(String(req.query.to || ""));
-
-        if (Number.isNaN(from.getTime()) || Number.isNaN(to.getTime())) {
-          res.set("Access-Control-Allow-Origin", "*");
-          return res.status(400).json({error: "Invalid from/to date range."});
-        }
-
-        from.setHours(0, 0, 0, 0);
-        to.setHours(23, 59, 59, 999);
-
-        queryRef = queryRef
-          .where("createdAt", ">=", Timestamp.fromDate(from))
-          .where("createdAt", "<=", Timestamp.fromDate(to))
-          .orderBy("createdAt", "asc");
-      } else {
-        const limitValue = Math.min(Math.max(parseInt(req.query.limit, 10) || 200, 1), 500);
-        const before = String(req.query.before || "").trim();
-
-        queryRef = queryRef.orderBy("createdAt", "desc");
-        if (before) {
-          const beforeDate = new Date(before);
-          if (!Number.isNaN(beforeDate.getTime())) {
-            queryRef = queryRef.where("createdAt", "<", Timestamp.fromDate(beforeDate));
-          }
-        }
-        queryRef = queryRef.limit(limitValue);
-      }
-
-      const snap = await queryRef.get();
-      const items = snap.docs
-        .map((docSnap) => summarizeWritingSubmission(docSnap))
-        .filter(Boolean);
-
-      res.set("Access-Control-Allow-Origin", "*");
-      return res.json({items});
-    } catch (error) {
-      console.error("[adminAptisWritingSubmissions] error", error);
-      res.set("Access-Control-Allow-Origin", "*");
-      return res.status(error.statusCode || 500).json({
-        error: error.message || "Could not load Aptis Writing General submissions.",
-      });
     }
   });
 });

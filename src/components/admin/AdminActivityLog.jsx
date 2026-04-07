@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { collection, getDocs, orderBy, limit, query, startAfter } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
-import { fetchAptisWritingGeneralRecentActivity } from "../../api/adminActivityBridge";
 import {
   buildWritingGeneralSubmissionActivity,
   sortActivitiesByDateDesc,
@@ -434,8 +433,6 @@ export default function AdminActivityLog({ user }) {
   const [submissionCursorDoc, setSubmissionCursorDoc] = useState(null);
   const [hasMoreActivity, setHasMoreActivity] = useState(true);
   const [hasMoreSubmissions, setHasMoreSubmissions] = useState(true);
-  const [remoteCursor, setRemoteCursor] = useState("");
-  const [hasMoreRemote, setHasMoreRemote] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -446,8 +443,6 @@ export default function AdminActivityLog({ user }) {
       setHasMore(true);
       setActivityCursorDoc(null);
       setSubmissionCursorDoc(null);
-      setRemoteCursor("");
-      setHasMoreRemote(true);
 
       const activityQuery = query(
         collection(db, "activityLog"),
@@ -484,16 +479,7 @@ export default function AdminActivityLog({ user }) {
         .map((docSnap) => buildWritingGeneralSubmissionActivity(docSnap))
         .filter(Boolean);
 
-      const remoteSubmissionLogs = await fetchAptisWritingGeneralRecentActivity({
-        limit: PAGE_SIZE,
-      }).catch((error) => {
-        console.error("[AdminActivityLog] remote Aptis Writing General load failed", error);
-        return [];
-      });
-
-      setLogs(
-        [...activityLogs, ...submissionLogs, ...remoteSubmissionLogs].sort(sortActivitiesByDateDesc)
-      );
+      setLogs([...activityLogs, ...submissionLogs].sort(sortActivitiesByDateDesc));
 
       const lastActivity = activitySnap.docs[activitySnap.docs.length - 1] || null;
       const lastSubmission = submissionSnap.docs[submissionSnap.docs.length - 1] || null;
@@ -501,13 +487,7 @@ export default function AdminActivityLog({ user }) {
       setSubmissionCursorDoc(lastSubmission);
       setHasMoreActivity(activitySnap.docs.length === PAGE_SIZE);
       setHasMoreSubmissions(submissionSnap.docs.length === PAGE_SIZE);
-      setRemoteCursor(getOldestCreatedAtIso(remoteSubmissionLogs));
-      setHasMoreRemote(remoteSubmissionLogs.length === PAGE_SIZE);
-      setHasMore(
-        activitySnap.docs.length === PAGE_SIZE ||
-        submissionSnap.docs.length === PAGE_SIZE ||
-        remoteSubmissionLogs.length === PAGE_SIZE
-      );
+      setHasMore(activitySnap.docs.length === PAGE_SIZE || submissionSnap.docs.length === PAGE_SIZE);
 
       setLoading(false);
     }
@@ -576,18 +556,8 @@ export default function AdminActivityLog({ user }) {
           .filter(Boolean)
       : [];
 
-    const remoteSubmissionLogs = hasMoreRemote
-      ? await fetchAptisWritingGeneralRecentActivity({
-          limit: PAGE_SIZE,
-          before: remoteCursor,
-        }).catch((error) => {
-          console.error("[AdminActivityLog] remote Aptis Writing General pagination failed", error);
-          return [];
-        })
-      : [];
-
     setLogs((prev) =>
-      [...prev, ...nextActivityLogs, ...nextSubmissionLogs, ...remoteSubmissionLogs].sort(sortActivitiesByDateDesc)
+      [...prev, ...nextActivityLogs, ...nextSubmissionLogs].sort(sortActivitiesByDateDesc)
     );
 
     const lastActivity =
@@ -607,12 +577,7 @@ export default function AdminActivityLog({ user }) {
     setSubmissionCursorDoc(lastSubmission);
     setHasMoreActivity(moreActivity);
     setHasMoreSubmissions(moreSubmissions);
-    const moreRemote = hasMoreRemote && remoteSubmissionLogs.length === PAGE_SIZE;
-    setRemoteCursor(
-      remoteSubmissionLogs.length ? getOldestCreatedAtIso(remoteSubmissionLogs) : remoteCursor
-    );
-    setHasMoreRemote(moreRemote);
-    setHasMore(moreActivity || moreSubmissions || moreRemote);
+    setHasMore(moreActivity || moreSubmissions);
     setLoadingMore(false);
   }
 
@@ -866,11 +831,4 @@ export default function AdminActivityLog({ user }) {
 
     </div>
   );
-}
-
-function getOldestCreatedAtIso(items) {
-  const datedItems = items.filter((item) => item?.createdAt instanceof Date);
-  if (!datedItems.length) return "";
-
-  return datedItems[datedItems.length - 1].createdAt.toISOString();
 }

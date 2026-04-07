@@ -22,10 +22,6 @@
         "function": { "functionId": "speak", "region": "europe-west1", "codebase": "default" }
       },
       {
-        "source": "/admin-api/aptis-writing-submissions",
-        "function": { "functionId": "adminAptisWritingSubmissions", "region": "europe-west1", "codebase": "default" }
-      },
-      {
         "source": "**",
         "destination": "/index.html"
       }

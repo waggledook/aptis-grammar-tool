@@ -7,7 +7,7 @@ import {
   listAttemptsForCourseTestSession,
   saveCourseTestAttemptReview,
 } from "../../firebase";
-import { collection, getDocs, updateDoc, doc } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, query, orderBy, limit, startAfter } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { getSeifHubAccessConfig, SEIF_HUB_ACCESS_KEY } from "../../siteConfig.js";
 import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
@@ -36,6 +36,55 @@ function formatDateTime(value) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);
+}
+
+function stripHtmlToText(html = "") {
+  if (typeof document === "undefined") {
+    return String(html).replace(/<[^>]*>/g, " ");
+  }
+
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  return div.innerText || div.textContent || "";
+}
+
+function countWordsFromHtml(html = "") {
+  const matches = stripHtmlToText(html).trim().match(/\S+/g);
+  return matches ? matches.length : 0;
+}
+
+function normalizeWritingGeneralSubmission(entry) {
+  const answers = entry?.answers || {};
+  const part1 = Array.isArray(answers?.[1]) ? answers[1] : Array(5).fill("");
+  const part2 = typeof answers?.[2] === "string" ? answers[2] : "";
+  const part3 = Array.isArray(answers?.[3]) ? answers[3] : Array(3).fill("");
+  const part4 = Array.isArray(answers?.[4]) ? answers[4] : Array(2).fill("");
+
+  return { part1, part2, part3, part4 };
+}
+
+function getWritingGeneralSummary(entry) {
+  const submission = normalizeWritingGeneralSubmission(entry);
+  const part1Answered = submission.part1.filter((value) => stripHtmlToText(value).trim()).length;
+  const part1Words = submission.part1.reduce((sum, value) => sum + countWordsFromHtml(value), 0);
+  const part2Words = countWordsFromHtml(submission.part2);
+  const part3Words = submission.part3.map((value) => countWordsFromHtml(value));
+  const part4Words = submission.part4.map((value) => countWordsFromHtml(value));
+  const attemptedParts = [
+    part1Answered > 0,
+    part2Words > 0,
+    part3Words.some(Boolean),
+    part4Words.some(Boolean),
+  ].filter(Boolean).length;
+
+  return {
+    attemptedParts,
+    totalWords: part1Words + part2Words + part3Words.reduce((sum, value) => sum + value, 0) + part4Words.reduce((sum, value) => sum + value, 0),
+    part1Answered,
+    part2Words,
+    part3Words,
+    part4Words,
+  };
 }
 
 function normalizeReviewAnswer(value = "") {
@@ -252,6 +301,13 @@ export default function AdminDashboard({ user }) {
   const [selectedAttempt, setSelectedAttempt] = useState(null);
   const [reviewScores, setReviewScores] = useState({});
   const [reviewSaving, setReviewSaving] = useState(false);
+  const [showWritingGeneral, setShowWritingGeneral] = useState(false);
+  const [writingGeneralSubmissions, setWritingGeneralSubmissions] = useState([]);
+  const [writingGeneralLoading, setWritingGeneralLoading] = useState(false);
+  const [writingGeneralLoadingMore, setWritingGeneralLoadingMore] = useState(false);
+  const [writingGeneralCursorDoc, setWritingGeneralCursorDoc] = useState(null);
+  const [writingGeneralHasMore, setWritingGeneralHasMore] = useState(true);
+  const [selectedWritingGeneralSubmission, setSelectedWritingGeneralSubmission] = useState(null);
 
   const navigate = useNavigate();
 
@@ -303,6 +359,12 @@ export default function AdminDashboard({ user }) {
       alive = false;
     };
   }, []);
+
+  useEffect(() => {
+    if (!showWritingGeneral || writingGeneralSubmissions.length) return;
+    loadWritingGeneralSubmissions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showWritingGeneral]);
 
   async function updateRole(uid, role) {
     await updateDoc(doc(db, "users", uid), { role });
@@ -453,6 +515,48 @@ export default function AdminDashboard({ user }) {
       console.error("[AdminDashboard] save review failed", error);
     } finally {
       setReviewSaving(false);
+    }
+  }
+
+  async function loadWritingGeneralSubmissions({ loadMore = false } = {}) {
+    if (loadMore) {
+      if (writingGeneralLoadingMore || !writingGeneralHasMore || !writingGeneralCursorDoc) return;
+      setWritingGeneralLoadingMore(true);
+    } else {
+      setWritingGeneralLoading(true);
+    }
+
+    try {
+      const qy = loadMore
+        ? query(
+            collection(db, "submissions"),
+            orderBy("createdAt", "desc"),
+            startAfter(writingGeneralCursorDoc),
+            limit(25)
+          )
+        : query(
+            collection(db, "submissions"),
+            orderBy("createdAt", "desc"),
+            limit(25)
+          );
+
+      const snap = await getDocs(qy);
+      const rows = snap.docs.map((entry) => ({
+        id: entry.id,
+        ...entry.data(),
+      }));
+
+      setWritingGeneralSubmissions((prev) => (loadMore ? [...prev, ...rows] : rows));
+      setWritingGeneralCursorDoc(snap.docs[snap.docs.length - 1] || null);
+      setWritingGeneralHasMore(snap.docs.length === 25);
+    } catch (error) {
+      console.error("[AdminDashboard] load writing general submissions failed", error);
+    } finally {
+      if (loadMore) {
+        setWritingGeneralLoadingMore(false);
+      } else {
+        setWritingGeneralLoading(false);
+      }
     }
   }
 
@@ -1264,6 +1368,163 @@ function renderHubAccessControl(u, compact = false) {
 
           <div
             style={{
+              marginTop: "0.95rem",
+              padding: "0.95rem 1rem",
+              borderRadius: "1rem",
+              background: "linear-gradient(180deg, rgba(2,6,23,0.95), rgba(15,23,42,0.9))",
+              border: "1px solid #1e293b",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "0.8rem",
+                alignItems: "center",
+                flexWrap: "wrap",
+                marginBottom: "0.85rem",
+              }}
+            >
+              <div>
+                <div style={{ color: "#f8fafc", fontSize: "1.05rem", fontWeight: 700 }}>
+                  Writing General submissions
+                </div>
+                <div style={{ marginTop: "0.25rem", color: "#94a3b8", fontSize: "0.88rem" }}>
+                  Browse the anonymous mock-test submissions now being saved in `examplay-auth`.
+                </div>
+              </div>
+              <div style={{ display: "flex", gap: "0.6rem", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  className="ghost-btn"
+                  style={{ marginLeft: 0 }}
+                  onClick={() => setShowWritingGeneral((prev) => !prev)}
+                >
+                  {showWritingGeneral ? "Hide submissions" : "Show submissions"}
+                </button>
+                {showWritingGeneral ? (
+                  <button
+                    type="button"
+                    className="review-btn"
+                    onClick={() => loadWritingGeneralSubmissions()}
+                    disabled={writingGeneralLoading}
+                  >
+                    {writingGeneralLoading ? "Refreshing..." : "Refresh"}
+                  </button>
+                ) : null}
+              </div>
+            </div>
+
+            {!showWritingGeneral ? (
+              <p style={{ margin: 0, color: "#94a3b8" }}>
+                Hidden by default. Open it when you want to inspect saved mock-test writing.
+              </p>
+            ) : writingGeneralLoading ? (
+              <p style={{ margin: 0, color: "#cbd5e1" }}>Loading submissions…</p>
+            ) : !writingGeneralSubmissions.length ? (
+              <p style={{ margin: 0, color: "#94a3b8" }}>No submissions found yet.</p>
+            ) : (
+              <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
+                {writingGeneralSubmissions.map((submission) => {
+                  const summary = getWritingGeneralSummary(submission);
+                  return (
+                    <section
+                      key={submission.id}
+                      style={{
+                        borderRadius: "0.95rem",
+                        border: "1px solid rgba(51, 65, 85, 0.7)",
+                        background: "rgba(15, 23, 42, 0.65)",
+                        padding: "0.9rem 1rem",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          justifyContent: "space-between",
+                          gap: "0.8rem",
+                          flexWrap: "wrap",
+                          alignItems: "center",
+                        }}
+                      >
+                        <div>
+                          <div style={{ color: "#f8fafc", fontWeight: 700 }}>
+                            Submission {submission.id}
+                          </div>
+                          <div style={{ marginTop: "0.25rem", color: "#94a3b8", fontSize: "0.82rem" }}>
+                            {formatDateTime(submission.createdAt)}
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          className="review-btn"
+                          onClick={() => setSelectedWritingGeneralSubmission(submission)}
+                        >
+                          Open submission
+                        </button>
+                      </div>
+
+                      <div
+                        style={{
+                          marginTop: "0.8rem",
+                          display: "grid",
+                          gridTemplateColumns: isNarrow ? "1fr" : "repeat(5, minmax(0, 1fr))",
+                          gap: "0.75rem",
+                        }}
+                      >
+                        <div>
+                          <div style={{ fontSize: "0.73rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                            Attempted
+                          </div>
+                          <div style={{ color: "#e5e7eb" }}>{summary.attemptedParts}/4 parts</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: "0.73rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                            Total words
+                          </div>
+                          <div style={{ color: "#e5e7eb" }}>{summary.totalWords}</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: "0.73rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                            Part 1
+                          </div>
+                          <div style={{ color: "#e5e7eb" }}>{summary.part1Answered}/5 answered</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: "0.73rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                            Part 2
+                          </div>
+                          <div style={{ color: "#e5e7eb" }}>{summary.part2Words} words</div>
+                        </div>
+                        <div>
+                          <div style={{ fontSize: "0.73rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                            Parts 3/4
+                          </div>
+                          <div style={{ color: "#e5e7eb" }}>
+                            {summary.part3Words.reduce((sum, value) => sum + value, 0)} / {summary.part4Words.reduce((sum, value) => sum + value, 0)} words
+                          </div>
+                        </div>
+                      </div>
+                    </section>
+                  );
+                })}
+
+                <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                  <button
+                    type="button"
+                    className="ghost-btn"
+                    onClick={() => loadWritingGeneralSubmissions({ loadMore: true })}
+                    disabled={!writingGeneralHasMore || writingGeneralLoadingMore}
+                    style={{ marginLeft: 0 }}
+                  >
+                    {writingGeneralLoadingMore ? "Loading..." : writingGeneralHasMore ? "Load more" : "No more submissions"}
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div
+            style={{
               marginTop: "1rem",
               display: "flex",
               flexDirection: "column",
@@ -1477,6 +1738,135 @@ function renderHubAccessControl(u, compact = false) {
           </div>
         </>
       )}
+
+      {selectedWritingGeneralSubmission ? (
+        <div
+          onClick={() => setSelectedWritingGeneralSubmission(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(2, 6, 23, 0.78)",
+            zIndex: 69,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1.2rem",
+          }}
+        >
+          <div
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "min(1000px, 100%)",
+              maxHeight: "88vh",
+              overflow: "auto",
+              borderRadius: "1.1rem",
+              border: "1px solid #27406f",
+              background: "linear-gradient(180deg, rgba(24, 41, 79, 0.98), rgba(20, 36, 71, 0.98))",
+              boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
+              padding: "1rem",
+            }}
+          >
+            {(() => {
+              const submission = normalizeWritingGeneralSubmission(selectedWritingGeneralSubmission);
+              return (
+                <>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      gap: "0.8rem",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      marginBottom: "1rem",
+                    }}
+                  >
+                    <div>
+                      <h3 style={{ margin: 0, color: "#f8fafc" }}>
+                        Writing General submission
+                      </h3>
+                      <p style={{ margin: "0.3rem 0 0", color: "#b7c6e6" }}>
+                        {selectedWritingGeneralSubmission.id} · {formatDateTime(selectedWritingGeneralSubmission.createdAt)}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      className="ghost-btn"
+                      onClick={() => setSelectedWritingGeneralSubmission(null)}
+                    >
+                      Close
+                    </button>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem" }}>
+                    <section style={{ borderRadius: "0.95rem", border: "1px solid rgba(51, 65, 85, 0.7)", background: "rgba(2, 6, 23, 0.22)", padding: "0.95rem" }}>
+                      <h4 style={{ marginTop: 0, color: "#f8fafc" }}>Part 1</h4>
+                      <div style={{ display: "grid", gap: "0.7rem" }}>
+                        {submission.part1.map((answer, index) => (
+                          <div key={`p1-${index}`} style={{ borderRadius: "0.8rem", background: "rgba(15, 23, 42, 0.65)", padding: "0.75rem" }}>
+                            <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                              Question {index + 1}
+                            </div>
+                            <div style={{ color: "#e5e7eb", marginTop: "0.35rem" }}>
+                              {stripHtmlToText(answer).trim() || <em>(no answer)</em>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+
+                    <section style={{ borderRadius: "0.95rem", border: "1px solid rgba(51, 65, 85, 0.7)", background: "rgba(2, 6, 23, 0.22)", padding: "0.95rem" }}>
+                      <h4 style={{ marginTop: 0, color: "#f8fafc" }}>Part 2</h4>
+                      <div style={{ borderRadius: "0.8rem", background: "rgba(15, 23, 42, 0.65)", padding: "0.85rem", color: "#e5e7eb" }}>
+                        {stripHtmlToText(submission.part2).trim() ? (
+                          <div dangerouslySetInnerHTML={{ __html: submission.part2 }} />
+                        ) : (
+                          <em>(no answer)</em>
+                        )}
+                      </div>
+                    </section>
+
+                    <section style={{ borderRadius: "0.95rem", border: "1px solid rgba(51, 65, 85, 0.7)", background: "rgba(2, 6, 23, 0.22)", padding: "0.95rem" }}>
+                      <h4 style={{ marginTop: 0, color: "#f8fafc" }}>Part 3</h4>
+                      <div style={{ display: "grid", gap: "0.7rem" }}>
+                        {submission.part3.map((answer, index) => (
+                          <div key={`p3-${index}`} style={{ borderRadius: "0.8rem", background: "rgba(15, 23, 42, 0.65)", padding: "0.85rem", color: "#e5e7eb" }}>
+                            <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "0.35rem" }}>
+                              Response {index + 1}
+                            </div>
+                            {stripHtmlToText(answer).trim() ? (
+                              <div dangerouslySetInnerHTML={{ __html: answer }} />
+                            ) : (
+                              <em>(no answer)</em>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+
+                    <section style={{ borderRadius: "0.95rem", border: "1px solid rgba(51, 65, 85, 0.7)", background: "rgba(2, 6, 23, 0.22)", padding: "0.95rem" }}>
+                      <h4 style={{ marginTop: 0, color: "#f8fafc" }}>Part 4</h4>
+                      <div style={{ display: "grid", gap: "0.7rem" }}>
+                        {submission.part4.map((answer, index) => (
+                          <div key={`p4-${index}`} style={{ borderRadius: "0.8rem", background: "rgba(15, 23, 42, 0.65)", padding: "0.85rem", color: "#e5e7eb" }}>
+                            <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em", marginBottom: "0.35rem" }}>
+                              {index === 0 ? "Email to friend" : "Email to club president"}
+                            </div>
+                            {stripHtmlToText(answer).trim() ? (
+                              <div dangerouslySetInnerHTML={{ __html: answer }} />
+                            ) : (
+                              <em>(no answer)</em>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </section>
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </div>
+      ) : null}
 
       {reviewSession ? (
         <div

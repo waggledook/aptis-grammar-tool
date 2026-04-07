@@ -11,7 +11,6 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
-import { fetchAptisWritingGeneralRangeActivity } from "../../api/adminActivityBridge";
 import {
   buildWritingGeneralSubmissionActivity,
   WRITING_GENERAL_SUBMISSION_TYPE,
@@ -364,14 +363,7 @@ export default function AdminActivityCharts({ user }) {
           .filter(Boolean)
       : [];
 
-    const remoteSubmissionRows = shouldLoadSubmissions
-      ? await fetchAptisWritingGeneralRangeActivity({ from, to }).catch((error) => {
-          console.error("[AdminActivityCharts] remote Aptis Writing General load failed", error);
-          return [];
-        })
-      : [];
-
-    setRawLogs([...activityRows, ...submissionRows, ...remoteSubmissionRows]);
+    setRawLogs([...activityRows, ...submissionRows]);
     setLoading(false);
   }
 
