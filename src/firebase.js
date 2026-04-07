@@ -130,9 +130,14 @@ export const doSignUp = async ({ email, pw, name, username }) => {
 export const onAuthChange = (cb)       => onAuthStateChanged(auth, cb);
 export const doSignOut    = ()         => signOut(auth);
 
-export async function doPasswordReset(email, redirectUrl) {
+export async function doPasswordReset(email, redirectUrl = "") {
+  const safeRedirect = String(redirectUrl || "").trim();
+  if (!safeRedirect) {
+    return sendPasswordResetEmail(auth, email);
+  }
+
   const actionCodeSettings = {
-    url: redirectUrl,
+    url: safeRedirect,
     handleCodeInApp: false,
   };
 

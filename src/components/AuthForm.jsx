@@ -71,15 +71,22 @@ export default function AuthForm({ onSuccess }) {
           return;
         }
 
-        const redirectUrl = `${window.location.origin}/login`;
-
         try {
-          await doPasswordReset(emailToUse.toLowerCase(), redirectUrl);
+          await doPasswordReset(emailToUse.toLowerCase());
         } catch (err) {
+          console.error("[AuthForm] password reset failed", err);
           // IMPORTANT: don’t reveal whether the account exists
           // Only special-case invalid email format if Firebase returns it
           if (err?.code === "auth/invalid-email") {
             setError("Please enter a valid email address.");
+            return;
+          }
+          if (
+            err?.code === "auth/unauthorized-continue-uri" ||
+            err?.code === "auth/invalid-continue-uri" ||
+            err?.code === "auth/missing-continue-uri"
+          ) {
+            setError("The password reset link is misconfigured. Please try again in a moment.");
             return;
           }
         }
