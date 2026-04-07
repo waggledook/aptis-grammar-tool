@@ -769,19 +769,26 @@ export default function HubGrammarActivityRunner() {
                       No commas needed
                     </button>
                   </div>
-                ) : (
-                  <label className="hub-grammar-sentence">
-                    {renderSentence(
-                      item,
-                      answers,
-                      handleChange,
-                      focusNextInput,
-                      submitted,
-                      registerInput,
-                      handleGapChoiceSelect
-                    )}
-                  </label>
-                )}
+	                ) : (
+	                  <>
+	                    {item.originalSentence ? (
+	                      <p className="hub-grammar-original-sentence">
+	                        <strong>{item.originalSentence}</strong>
+	                      </p>
+	                    ) : null}
+	                    <label className="hub-grammar-sentence">
+	                      {renderSentence(
+	                        item,
+	                        answers,
+	                        handleChange,
+	                        focusNextInput,
+	                        submitted,
+	                        registerInput,
+	                        handleGapChoiceSelect
+	                      )}
+	                    </label>
+	                  </>
+	                )}
 
                 {submitted && evaluatedItem && (
                   <div className="hub-grammar-feedback-list">
@@ -986,6 +993,12 @@ export default function HubGrammarActivityRunner() {
           border: 1px solid rgba(51,65,85,0.8);
           color: #e5efff;
           line-height: 1.7;
+        }
+
+        .hub-grammar-original-sentence {
+          margin: 0 0 0.75rem;
+          color: #eef4ff;
+          line-height: 1.55;
         }
 
         .hub-grammar-gap {

@@ -4,6 +4,7 @@ import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
 import * as fb from "../../firebase";
+import { toast } from "../../utils/toast";
 
 const LEVELS = ["a2", "b1", "b2", "c1", "c2"];
 const LEVEL_COLORS = {
@@ -21,11 +22,20 @@ function getSearchText(activity) {
     .toLowerCase();
 }
 
-export default function HubMiniGrammarTests() {
+export default function HubMiniGrammarTests({ user }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [completedActivityIds, setCompletedActivityIds] = useState(new Set());
+  const [students, setStudents] = useState([]);
+  const [assignOverlayActivity, setAssignOverlayActivity] = useState(null);
+  const [assignTargetMode, setAssignTargetMode] = useState("all");
+  const [assignClassName, setAssignClassName] = useState("");
+  const [assignSelectedStudentIds, setAssignSelectedStudentIds] = useState([]);
+  const [assignNotes, setAssignNotes] = useState("");
+  const [assignSaving, setAssignSaving] = useState(false);
+
+  const isTeacher = user?.role === "teacher" || user?.role === "admin";
 
   useEffect(() => {
     let alive = true;
@@ -46,6 +56,28 @@ export default function HubMiniGrammarTests() {
       alive = false;
     };
   }, []);
+
+  useEffect(() => {
+    let alive = true;
+    if (!isTeacher) {
+      setStudents([]);
+      return undefined;
+    }
+
+    (async () => {
+      try {
+        const rows = (await fb.listTeacherStudentsWithRosterMeta?.(user?.uid)) || [];
+        if (!alive) return;
+        setStudents(rows);
+      } catch (error) {
+        console.error("[HubMiniGrammarTests] teacher student load failed", error);
+      }
+    })();
+
+    return () => {
+      alive = false;
+    };
+  }, [isTeacher, user]);
 
   const filteredActivities = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -71,6 +103,83 @@ export default function HubMiniGrammarTests() {
   function clearFilters() {
     setQuery("");
     setSelectedLevels([]);
+  }
+
+  const classOptions = useMemo(
+    () =>
+      [...new Set(students.map((student) => String(student.className || "").trim()).filter(Boolean))].sort((a, b) =>
+        a.localeCompare(b)
+      ),
+    [students]
+  );
+
+  function openAssignOverlay(activity) {
+    setAssignOverlayActivity(activity);
+    setAssignTargetMode("all");
+    setAssignClassName("");
+    setAssignSelectedStudentIds([]);
+    setAssignNotes("");
+  }
+
+  function closeAssignOverlay() {
+    if (assignSaving) return;
+    setAssignOverlayActivity(null);
+    setAssignTargetMode("all");
+    setAssignClassName("");
+    setAssignSelectedStudentIds([]);
+    setAssignNotes("");
+  }
+
+  function toggleStudent(studentId) {
+    setAssignSelectedStudentIds((prev) =>
+      prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
+    );
+  }
+
+  async function handleAssignMiniTest() {
+    if (!assignOverlayActivity || !isTeacher) return;
+
+    let targetStudentIds = [];
+    if (assignTargetMode === "all") {
+      targetStudentIds = students.map((student) => student.id);
+    } else if (assignTargetMode === "class") {
+      targetStudentIds = students
+        .filter((student) => String(student.className || "").trim() === assignClassName)
+        .map((student) => student.id);
+    } else {
+      targetStudentIds = assignSelectedStudentIds;
+    }
+
+    targetStudentIds = [...new Set(targetStudentIds)].filter(Boolean);
+
+    if (!targetStudentIds.length) {
+      toast("Choose at least one student for this mini test.");
+      return;
+    }
+
+    setAssignSaving(true);
+    try {
+      await fb.createAssignedActivity({
+        teacherUid: user.uid,
+        teacherName: user.displayName || user.name || user.email || "Teacher",
+        teacherEmail: user.email || null,
+        activityType: "mini-test",
+        activityId: assignOverlayActivity.id,
+        activityLabel: assignOverlayActivity.title,
+        routePath: getSitePath(`/grammar/activity/${assignOverlayActivity.id}`),
+        targetMode: assignTargetMode,
+        className: assignTargetMode === "class" ? assignClassName : "",
+        targetStudentIds,
+        notes: String(assignNotes || "").trim(),
+      });
+      toast("Mini test assigned.");
+      closeAssignOverlay();
+    } catch (error) {
+      console.error("[HubMiniGrammarTests] assignment failed", error);
+      toast("Could not assign that mini test.");
+    } finally {
+      setAssignSaving(false);
+    }
   }
 
   return (
@@ -164,20 +273,24 @@ export default function HubMiniGrammarTests() {
         {filteredActivities.map((activity) => {
           const isCompleted = completedActivityIds.has(activity.id);
           return (
-          <button
+          <article
             key={activity.id}
-            className={`menu-card ${isCompleted ? "is-completed" : ""}`}
-            onClick={() => navigate(getSitePath(`/grammar/activity/${activity.id}`))}
+            className={`menu-card hub-mini-card-shell ${isCompleted ? "is-completed" : ""}`}
           >
-            <div className="hub-mini-card-top">
-              <h3>{activity.title}</h3>
-              {isCompleted ? (
-                <span className="hub-mini-complete" aria-label="Completed">
-                  ✓
-                </span>
-              ) : null}
-            </div>
-            <div className="hub-mini-card-levels">
+            <button
+              type="button"
+              className="hub-mini-card-main"
+              onClick={() => navigate(getSitePath(`/grammar/activity/${activity.id}`))}
+            >
+              <div className="hub-mini-card-top">
+                <h3>{activity.title}</h3>
+                {isCompleted ? (
+                  <span className="hub-mini-complete" aria-label="Completed">
+                    ✓
+                  </span>
+                ) : null}
+              </div>
+              <div className="hub-mini-card-levels">
                 {(activity.levels || []).map((level) => (
                   <span
                     key={`${activity.id}-${level}`}
@@ -187,12 +300,104 @@ export default function HubMiniGrammarTests() {
                     {level.toUpperCase()}
                   </span>
                 ))}
-            </div>
-            <p>{activity.shortDescription}</p>
-          </button>
+              </div>
+              <p>{activity.shortDescription}</p>
+            </button>
+            {isTeacher ? (
+              <div className="hub-mini-card-actions">
+                <button
+                  type="button"
+                  className="hub-mini-assign-btn"
+                  onClick={() => openAssignOverlay(activity)}
+                >
+                  Assign
+                </button>
+              </div>
+            ) : null}
+          </article>
           );
         })}
       </div>
+
+      {assignOverlayActivity ? (
+        <div className="hub-mini-assign-overlay" onClick={closeAssignOverlay}>
+          <div className="hub-mini-assign-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="hub-mini-assign-head">
+              <div>
+                <h3>Assign mini test</h3>
+                <p>{assignOverlayActivity.title}</p>
+              </div>
+              <button type="button" className="ghost-btn" onClick={closeAssignOverlay}>
+                Close
+              </button>
+            </div>
+
+            <div className="hub-mini-assign-grid">
+              <label className="hub-mini-field">
+                <span>Assign to</span>
+                <select value={assignTargetMode} onChange={(event) => setAssignTargetMode(event.target.value)}>
+                  <option value="all">All my students</option>
+                  <option value="class">One class label</option>
+                  <option value="selected">Selected students</option>
+                </select>
+              </label>
+
+              {assignTargetMode === "class" ? (
+                <label className="hub-mini-field">
+                  <span>Class label</span>
+                  <select value={assignClassName} onChange={(event) => setAssignClassName(event.target.value)}>
+                    <option value="">Choose a class</option>
+                    {classOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : null}
+            </div>
+
+            {assignTargetMode === "selected" ? (
+              <div className="hub-mini-assign-students">
+                <span className="hub-mini-field-label">Students</span>
+                <div className="hub-mini-assign-student-list">
+                  {students.map((student) => {
+                    const label =
+                      student.displayName || student.name || student.username || student.email || student.id;
+                    return (
+                      <label key={student.id} className="hub-mini-assign-student-item">
+                        <input
+                          type="checkbox"
+                          checked={assignSelectedStudentIds.includes(student.id)}
+                          onChange={() => toggleStudent(student.id)}
+                        />
+                        <span>{label}</span>
+                        {student.className ? <em>{student.className}</em> : null}
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            <label className="hub-mini-field">
+              <span>Teacher note</span>
+              <textarea
+                rows={3}
+                value={assignNotes}
+                onChange={(event) => setAssignNotes(event.target.value)}
+                placeholder="Optional note shown on the student side"
+              />
+            </label>
+
+            <div className="hub-mini-assign-actions">
+              <button type="button" className="review-btn" onClick={handleAssignMiniTest} disabled={assignSaving}>
+                {assignSaving ? "Assigning..." : "Assign mini test"}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {!filteredActivities.length ? (
         <div className="hub-mini-empty">
@@ -261,6 +466,193 @@ export default function HubMiniGrammarTests() {
             rgba(255, 191, 73, 0.04)
           );
           border: 1px solid rgba(255, 191, 73, 0.35);
+        }
+
+        .hub-mini-card-shell {
+          display: grid;
+          gap: 0.75rem;
+        }
+
+        .hub-mini-card-main {
+          all: unset;
+          cursor: pointer;
+          display: grid;
+          gap: 0.55rem;
+        }
+
+        .hub-mini-card-actions {
+          display: flex;
+          justify-content: flex-start;
+        }
+
+        .hub-mini-assign-btn {
+          border-radius: 999px;
+          border: 1px solid rgba(120, 182, 255, 0.34);
+          background: rgba(120, 182, 255, 0.12);
+          color: #dce8ff;
+          padding: 0.48rem 0.85rem;
+          font: inherit;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .hub-mini-assign-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(2, 6, 18, 0.72);
+          display: grid;
+          place-items: center;
+          padding: 1rem;
+          z-index: 1100;
+        }
+
+        .hub-mini-assign-modal {
+          width: min(780px, 100%);
+          display: grid;
+          gap: 0.9rem;
+          border-radius: 20px;
+          border: 1px solid rgba(70, 102, 170, 0.42);
+          background: linear-gradient(180deg, rgba(11, 21, 48, 0.98), rgba(14, 28, 63, 0.96));
+          box-shadow: 0 24px 60px rgba(2, 8, 24, 0.44);
+          padding: 1.1rem;
+        }
+
+        .hub-mini-assign-head {
+          display: flex;
+          justify-content: space-between;
+          gap: 0.8rem;
+          align-items: flex-start;
+        }
+
+        .hub-mini-assign-head h3 {
+          margin: 0;
+          color: #eef4ff;
+        }
+
+        .hub-mini-assign-head p {
+          margin: 0.25rem 0 0;
+          color: #a9b7d1;
+        }
+
+        .hub-mini-assign-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.85rem;
+        }
+
+        .hub-mini-field {
+          display: grid;
+          gap: 0.45rem;
+        }
+
+        .hub-mini-field span {
+          display: block;
+          color: rgba(230, 240, 255, 0.72);
+          font-size: 0.86rem;
+        }
+
+        .hub-mini-field select,
+        .hub-mini-field textarea {
+          width: 100%;
+          border-radius: 14px;
+          border: 1px solid rgba(103, 132, 197, 0.36);
+          background: rgba(11, 18, 37, 0.95);
+          color: #eef4ff;
+          padding: 0.82rem 0.95rem;
+          font: inherit;
+          box-sizing: border-box;
+          appearance: none;
+        }
+
+        .hub-mini-field select {
+          padding-right: 2.7rem;
+          background-image:
+            linear-gradient(45deg, transparent 50%, #9fd0ff 50%),
+            linear-gradient(135deg, #9fd0ff 50%, transparent 50%);
+          background-position:
+            calc(100% - 20px) calc(50% - 3px),
+            calc(100% - 14px) calc(50% - 3px);
+          background-size: 6px 6px, 6px 6px;
+          background-repeat: no-repeat;
+        }
+
+        .hub-mini-field textarea {
+          min-height: 110px;
+          resize: vertical;
+          line-height: 1.45;
+        }
+
+        .hub-mini-field select:focus,
+        .hub-mini-field textarea:focus {
+          outline: none;
+          border-color: rgba(133, 183, 255, 0.72);
+          box-shadow: 0 0 0 3px rgba(84, 136, 255, 0.18);
+        }
+
+        .hub-mini-assign-students {
+          display: grid;
+          gap: 0.5rem;
+        }
+
+        .hub-mini-field-label {
+          color: #8ea5c8;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+
+        .hub-mini-assign-student-list {
+          display: grid;
+          gap: 0.55rem;
+          max-height: 260px;
+          overflow: auto;
+          padding-right: 0.2rem;
+        }
+
+        .hub-mini-assign-student-item {
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          gap: 0.7rem;
+          align-items: center;
+          border-radius: 14px;
+          border: 1px solid rgba(63, 94, 155, 0.46);
+          background: rgba(8, 16, 38, 0.46);
+          padding: 0.75rem 0.8rem;
+          color: #e6f0ff;
+        }
+
+        .hub-mini-assign-student-item em {
+          color: #9fb3d5;
+          font-style: normal;
+          font-size: 0.88rem;
+        }
+
+        .hub-mini-assign-actions {
+          display: flex;
+          justify-content: flex-start;
+        }
+
+        .hub-mini-assign-actions .review-btn {
+          min-width: 220px;
+        }
+
+        @media (max-width: 760px) {
+          .hub-mini-assign-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .hub-mini-assign-head {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .hub-mini-assign-student-item {
+            grid-template-columns: auto 1fr;
+          }
+
+          .hub-mini-assign-student-item em {
+            grid-column: 2;
+          }
         }
 
         .hub-menu-wrapper .whats-new-copy {

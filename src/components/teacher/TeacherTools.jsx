@@ -4,6 +4,7 @@ import TeacherGrammarTool from "./TeacherGrammarTool";
 import TeacherGrammarSetResults from "./TeacherGrammarSetResults";
 import TeacherUseOfEnglishQuizBuilder from "./TeacherUseOfEnglishQuizBuilder";
 import TeacherCourseTests from "./TeacherCourseTests";
+import TeacherAssignedActivities from "./TeacherAssignedActivities";
 
 export default function TeacherTools({ user }) {
   // ---------- Auth gate ----------
@@ -26,6 +27,7 @@ export default function TeacherTools({ user }) {
   const [showResults, setShowResults] = useState(false);
   const [showUseOfEnglishBuilder, setShowUseOfEnglishBuilder] = useState(false);
   const [showCourseTests, setShowCourseTests] = useState(false);
+  const [showAssignments, setShowAssignments] = useState(false);
 
   return (
     <div className="teacher-tools-page game-wrapper">
@@ -64,6 +66,30 @@ export default function TeacherTools({ user }) {
         {showBuilder && (
           <div className="panel-body">
             <TeacherGrammarTool user={user} />
+          </div>
+        )}
+      </section>
+
+      <section className="panel collapsible" style={{ marginTop: "0.9rem" }}>
+        <button
+          type="button"
+          className="collapse-head"
+          onClick={() => setShowAssignments((v) => !v)}
+        >
+          <div className="head-left">
+            <h2 className="sec-title">Assign class activities</h2>
+            <p className="muted small">
+              Send mini tests, grammar sets, Use of English sets, and writing tasks to your students.
+            </p>
+          </div>
+          <span className={`chev ${showAssignments ? "open" : ""}`} aria-hidden>
+            ▾
+          </span>
+        </button>
+
+        {showAssignments && (
+          <div className="panel-body">
+            <TeacherAssignedActivities user={user} />
           </div>
         )}
       </section>

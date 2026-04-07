@@ -1,11 +1,41 @@
 rules_version = '2';
-
-// Craft rules based on data in your Firestore database
-// allow write: if firestore.get(
-//    /databases/(default)/documents/users/$(request.auth.uid)).data.isAdmin;
 service firebase.storage {
   match /b/{bucket}/o {
-    match /{allPaths=**} {
+
+    // ── Helper functions ────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function userDoc() {
+      return firestore.get(/databases/(default)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function hasPackAccess(packId) {
+      return isSignedIn()
+        && userDoc().courseAccess[packId] == true;
+    }
+
+    // ── Avatars ─────────────────────────────────────────────────────────
+    match /userAvatars/{uid}/{fileName=**} {
+      allow read:  if isSignedIn();
+      allow write: if isSignedIn()
+                   && request.auth.uid == uid
+                   && request.resource.contentType.matches('image/.*');
+    }
+
+    // ── Course packs (PDFs etc.) ────────────────────────────────────────
+    match /packs/{packId}/{fileName=**} {
+      // Anyone signed in + granted access can read
+      allow read: if hasPackAccess(packId);
+
+      // Optional: only allow writes from admins via client
+      // (If you upload packs manually in the console, you can keep this false.)
+      allow write: if isSignedIn() && userDoc().role == "admin";
+    }
+
+    // ── Default deny ────────────────────────────────────────────────────
+    match /{path=**} {
       allow read, write: if false;
     }
   }

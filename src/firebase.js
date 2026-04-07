@@ -1172,6 +1172,52 @@ export async function fetchHubGrammarSubmissions(n = 20, uid) {
   }));
 }
 
+export async function listTeacherStudents(uid) {
+  const realUid = uid || auth.currentUser?.uid;
+  if (!realUid) return [];
+
+  const snap = await getDocs(query(collection(db, "users"), where("teacherId", "==", realUid)));
+  return snap.docs
+    .map((entry) => ({ id: entry.id, ...entry.data() }))
+    .sort((a, b) => {
+      const aLabel = String(a.displayName || a.name || a.username || a.email || a.id || "").toLowerCase();
+      const bLabel = String(b.displayName || b.name || b.username || b.email || b.id || "").toLowerCase();
+      return aLabel.localeCompare(bLabel);
+    });
+}
+
+export async function listTeacherStudentsWithRosterMeta(uid) {
+  const realUid = uid || auth.currentUser?.uid;
+  if (!realUid) return [];
+
+  const [studentSnap, rosterSnap] = await Promise.all([
+    getDocs(query(collection(db, "users"), where("teacherId", "==", realUid))),
+    getDocs(collection(db, "users", realUid, "studentRoster")),
+  ]);
+
+  const rosterMetaById = {};
+  rosterSnap.forEach((entry) => {
+    rosterMetaById[entry.id] = entry.data() || {};
+  });
+
+  return studentSnap.docs
+    .map((entry) => {
+      const data = entry.data() || {};
+      const rosterMeta = rosterMetaById[entry.id] || {};
+      return {
+        id: entry.id,
+        ...data,
+        ...rosterMeta,
+        className: String(rosterMeta.className || data.className || "").trim(),
+      };
+    })
+    .sort((a, b) => {
+      const aLabel = String(a.displayName || a.name || a.username || a.email || a.id || "").toLowerCase();
+      const bLabel = String(b.displayName || b.name || b.username || b.email || b.id || "").toLowerCase();
+      return aLabel.localeCompare(bLabel);
+    });
+}
+
 export async function fetchKeywordTransformations() {
   const ref = doc(db, "masterSentences", "all");
   const snap = await getDoc(ref);
@@ -2459,6 +2505,82 @@ export async function createGrammarSetAttemptDraft({
   });
 
   return docRef.id;
+}
+
+export async function listGrammarSetAttemptsForStudent(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(
+    query(collection(db, "grammarSetAttempts"), where("studentUid", "==", realUid))
+  );
+
+  return snap.docs
+    .map((entry) => ({ id: entry.id, ...entry.data() }))
+    .sort((a, b) => {
+      const aTime =
+        a?.submittedAt?.toMillis?.() ||
+        a?.updatedAt?.toMillis?.() ||
+        a?.startedAt?.toMillis?.() ||
+        0;
+      const bTime =
+        b?.submittedAt?.toMillis?.() ||
+        b?.updatedAt?.toMillis?.() ||
+        b?.startedAt?.toMillis?.() ||
+        0;
+      return bTime - aTime;
+    });
+}
+
+export async function createAssignedActivity(data) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) throw new Error("Must be signed in to create an assignment.");
+
+  const ref = await addDoc(collection(db, "assignedActivities"), {
+    ...data,
+    teacherUid: data.teacherUid || uid,
+    teacherEmail: data.teacherEmail || auth.currentUser?.email || null,
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    status: data.status || "active",
+  });
+
+  return ref.id;
+}
+
+export async function listAssignedActivitiesForTeacher(uid) {
+  const realUid = uid || auth.currentUser?.uid;
+  if (!realUid) return [];
+
+  const snap = await getDocs(
+    query(collection(db, "assignedActivities"), where("teacherUid", "==", realUid))
+  );
+
+  return snap.docs
+    .map((entry) => ({ id: entry.id, ...entry.data() }))
+    .sort((a, b) => {
+      const aTime = a?.createdAt?.toMillis?.() || 0;
+      const bTime = b?.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    });
+}
+
+export async function listAssignedActivitiesForStudent(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(
+    query(collection(db, "assignedActivities"), where("targetStudentIds", "array-contains", realUid))
+  );
+
+  return snap.docs
+    .map((entry) => ({ id: entry.id, ...entry.data() }))
+    .filter((entry) => (entry.status || "active") !== "archived")
+    .sort((a, b) => {
+      const aTime = a?.createdAt?.toMillis?.() || 0;
+      const bTime = b?.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    });
 }
 
 export async function updateGrammarSetAttemptDraft(attemptId, data) {

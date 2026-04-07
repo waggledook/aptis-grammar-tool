@@ -12,6 +12,8 @@ import {
   fetchWritingP2Submissions,
   fetchWritingP3Submissions,
   fetchWritingP4Submissions,
+  listAssignedActivitiesForStudent,
+  listGrammarSetAttemptsForStudent,
 } from "./firebase";
 import { onAuthStateChanged }      from 'firebase/auth'
 import AuthForm                    from './components/AuthForm'
@@ -105,6 +107,7 @@ import HubUseOfEnglishMenu from "./components/hub/HubUseOfEnglishMenu.jsx";
 import HubKeywordTrainer from "./components/hub/HubKeywordTrainer.jsx";
 import HubOpenClozeTrainer from "./components/hub/HubOpenClozeTrainer.jsx";
 import HubWordFormationTrainer from "./components/hub/HubWordFormationTrainer.jsx";
+import HubMeaningfulPrefixesLesson from "./components/hub/HubMeaningfulPrefixesLesson.jsx";
 import HubVocabularyMenu from "./components/hub/HubVocabularyMenu.jsx";
 import HubGamesMenu from "./components/hub/HubGamesMenu.jsx";
 import HubGameLeaderboards from "./components/hub/HubGameLeaderboards.jsx";
@@ -145,6 +148,24 @@ function timestampToMs(value) {
   return Number.isFinite(parsed) ? parsed : 0;
 }
 
+function buildLatestMap(items, keyName) {
+  return (items || []).reduce((acc, item) => {
+    const key = item?.[keyName];
+    if (!key) return acc;
+    const nextTime = timestampToMs(item.createdAt || item.updatedAt || item.submittedAt || item.startedAt);
+    if (!acc[key] || nextTime > acc[key]) acc[key] = nextTime;
+    return acc;
+  }, {});
+}
+
+function getWritingBucket(type) {
+  if (type === "writing-part-1") return "p1";
+  if (type === "writing-part-2") return "p2";
+  if (type === "writing-part-3") return "p3";
+  if (type === "writing-part-4") return "p4";
+  return "";
+}
+
 
 
 
@@ -169,6 +190,7 @@ const siteProfilePath = getSitePath("/profile");
 const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
+const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
 
 useEffect(() => {
   const unsub = onAuthStateChanged(auth, async (u) => {
@@ -314,6 +336,86 @@ useEffect(() => {
     window.clearInterval(intervalId);
   };
 }, [location.pathname, teacherReadSubmissionKeys, user]);
+
+useEffect(() => {
+  let alive = true;
+
+  async function loadStudentAssignmentCount() {
+    if (!user || user.role === "teacher" || user.role === "admin") {
+      if (alive) setStudentAssignmentCount(0);
+      return;
+    }
+
+    try {
+      const [assignments, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+        listAssignedActivitiesForStudent(user.uid),
+        fetchHubGrammarSubmissions(200, user.uid),
+        listGrammarSetAttemptsForStudent(user.uid),
+        fetchWritingP1Sessions(100, user.uid),
+        fetchWritingP2Submissions(100, user.uid),
+        fetchWritingP3Submissions(100, user.uid),
+        fetchWritingP4Submissions(100, user.uid),
+      ]);
+
+      if (!alive) return;
+
+      const completionSources = {
+        miniTests: buildLatestMap(miniTests || [], "activityId"),
+        grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
+          if (!attempt?.setId) return acc;
+          if (!attempt.completed && !attempt.submittedAt) return acc;
+          const nextTime = timestampToMs(attempt.submittedAt || attempt.updatedAt || attempt.startedAt);
+          if (!acc[attempt.setId] || nextTime > acc[attempt.setId]) acc[attempt.setId] = nextTime;
+          return acc;
+        }, {}),
+        writing: {
+          p1: Math.max(0, ...(p1 || []).map((entry) => timestampToMs(entry.createdAt))),
+          p2: Math.max(0, ...(p2 || []).map((entry) => timestampToMs(entry.createdAt))),
+          p3: Math.max(0, ...(p3 || []).map((entry) => timestampToMs(entry.createdAt))),
+          p4: Math.max(0, ...(p4 || []).map((entry) => timestampToMs(entry.createdAt))),
+        },
+      };
+
+      const pendingCount = (assignments || []).filter((assignment) => {
+        const assignedAt = timestampToMs(assignment.createdAt);
+        if (assignment.activityType === "mini-test") {
+          return (completionSources.miniTests?.[assignment.activityId] || 0) < assignedAt;
+        }
+        if (assignment.activityType === "grammar-set" || assignment.activityType === "use-of-english") {
+          return (completionSources.grammarSets?.[assignment.activityId] || 0) < assignedAt;
+        }
+        if (assignment.activityType === "writing") {
+          const bucket = getWritingBucket(assignment.activityId);
+          return (completionSources.writing?.[bucket] || 0) < assignedAt;
+        }
+        return true;
+      }).length;
+
+      if (!alive) return;
+      setStudentAssignmentCount(pendingCount);
+    } catch (error) {
+      console.error("[App] Could not load student assignment count", error);
+      if (alive) setStudentAssignmentCount(0);
+    }
+  }
+
+  loadStudentAssignmentCount();
+
+  const handleFocus = () => {
+    loadStudentAssignmentCount();
+  };
+
+  window.addEventListener("focus", handleFocus);
+  const intervalId = window.setInterval(() => {
+    loadStudentAssignmentCount();
+  }, 20000);
+
+  return () => {
+    alive = false;
+    window.removeEventListener("focus", handleFocus);
+    window.clearInterval(intervalId);
+  };
+}, [location.pathname, user]);
 
 const hasSeifHubAccess = canAccessSeifHub(user);
 const isTeacherToolsRoute = location.pathname === "/teacher-tools";
@@ -594,6 +696,24 @@ return (
         </button>
       )}
 
+      {user.role !== "teacher" && user.role !== "admin" && (
+        <button
+          onClick={() => navigate(getSitePath("/your-class"))}
+          className="topbar-btn topbar-notify-btn"
+          aria-label="Open student notifications"
+          title={
+            studentAssignmentCount > 0
+              ? `${studentAssignmentCount} assigned activities to do`
+              : "Your class"
+          }
+        >
+          <BellIcon />
+          {studentAssignmentCount > 0 ? (
+            <span className="topbar-notify-count">{studentAssignmentCount}</span>
+          ) : null}
+        </button>
+      )}
+
       <button onClick={doSignOut} className="topbar-btn">
         Sign Out
       </button>
@@ -654,13 +774,14 @@ return (
   <Route path="/grammar/aptis" element={<GrammarPage />} />
   <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu />} />
   <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer />} />
-  <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests />} />
+  <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests user={user} />} />
   <Route path="/grammar/activity/:activityId" element={<HubGrammarActivityRunner />} />
 
   <Route path="/use-of-english" element={<HubUseOfEnglishMenu />} />
   <Route path="/use-of-english/keyword" element={<HubKeywordTrainer />} />
   <Route path="/use-of-english/open-cloze" element={<HubOpenClozeTrainer />} />
   <Route path="/use-of-english/word-formation" element={<HubWordFormationTrainer />} />
+  <Route path="/use-of-english/meaningful-prefixes" element={<HubMeaningfulPrefixesLesson />} />
   <Route path="/your-class" element={<HubYourClass user={user} />} />
   <Route path="/your-class/tests/:sessionId" element={<HubCourseTestRunner user={user} />} />
   <Route path="/games" element={<HubGamesMenu />} />

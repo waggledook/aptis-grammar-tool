@@ -43,7 +43,7 @@ function normalizeReviewAnswer(value = "") {
   return String(value || "")
     .toLowerCase()
     .replace(/[’']/g, "")
-    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/[-.,!?;:()[\]{}"“”]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -108,6 +108,7 @@ function getAutoItemScore(item, answer) {
 
   if (item?.type === "matching-select") {
     const normalized = normalizeReviewAnswer(answer);
+    if (!normalized) return 0;
     if (Array.isArray(item.acceptedAnswers) && item.acceptedAnswers.length) {
       return item.acceptedAnswers.some((entry) => normalizeReviewAnswer(entry) === normalized) ? 1 : 0;
     }
@@ -115,6 +116,7 @@ function getAutoItemScore(item, answer) {
   }
 
   if (isSortBySoundItem(item)) {
+    if (!normalizeReviewAnswer(answer)) return 0;
     return normalizeReviewAnswer(answer) === normalizeReviewAnswer(item.answer) ? 1 : 0;
   }
 

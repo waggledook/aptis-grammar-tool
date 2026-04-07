@@ -1,0 +1,381 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Helper functions ────────────────────────────────────────────────
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // Admin is any user whose /users/{uid}.role == "admin"
+    function isAdmin() {
+      return isSignedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid))
+             .data.role == "admin";
+    }
+
+    // NEW: teacher OR admin (for teacher tools)
+    function isTeacherOrAdmin() {
+      return isSignedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid))
+             .data.role in ['teacher', 'admin'];
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isTeacherOf(userId) {
+      return isSignedIn()
+        && get(/databases/$(database)/documents/users/$(userId))
+             .data.teacherId == request.auth.uid;
+    }
+
+    function canAccessUser(userId) {
+      return isOwner(userId)
+        || isAdmin()
+        || isTeacherOf(userId);
+    }
+
+    function changedKeys() {
+      return resource == null
+        ? request.resource.data.keys()
+        : request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function touchesRestrictedUserFields() {
+      return changedKeys().hasAny([
+        "role",
+        "teacherId",
+        "courseAccess",
+        "siteAccess"
+      ]);
+    }
+    
+    function isAssignedToCourseTestSession(sessionId) {
+      return isSignedIn()
+        && request.auth.uid in get(/databases/$(database)/documents/courseTestSessions/$(sessionId)).data.targetStudentIds;
+    }
+
+    // ── 0) masterSentences (keyword compiler) ───────────────────────────
+    match /masterSentences/{masterDocId}/sentences/{sentenceId} {
+      allow get, list: if isSignedIn();
+    }
+
+    match /masterSentences/{masterDocId} {
+      allow get, list: if isSignedIn();
+    }
+
+    // ── 1) masterWordFormations ─────────────────────────────────────────
+    match /masterWordFormations/{formationId} {
+      allow get, list: if isSignedIn();
+    }
+    
+    // ── 1b) masterOpenCloze ─────────────────────────────────────────────
+    match /masterOpenCloze/{docId} {
+      allow get, list: if isSignedIn();
+    }
+
+    // ── 2) sharedSets ───────────────────────────────────────────────────
+    match /sharedSets/{setId} {
+      allow read, create: if isSignedIn();
+      allow update, delete:
+        if isSignedIn() && resource.data.ownerUid == request.auth.uid;
+    }
+
+    // ── 2b) (teacher-made grammar collections) ──────────────────────────
+    match /grammarSets/{setId} {
+      allow create: if isTeacherOrAdmin();
+
+      allow read: if (
+        isSignedIn() &&
+        (
+          resource.data.visibility == "published" ||
+          (isTeacherOrAdmin() && resource.data.ownerId == request.auth.uid)
+        )
+      );
+
+      allow update, delete: if
+        isTeacherOrAdmin() &&
+        resource.data.ownerId == request.auth.uid;
+    }
+
+    // ── 3) Per-user data: EVERYTHING under /users/{userId} ─────────────
+    match /users/{userId} {
+
+      allow read: if
+        isOwner(userId) ||
+        isAdmin() ||
+        (isSignedIn() && resource.data.teacherId == request.auth.uid);
+
+      allow create: if
+        isOwner(userId)
+        && (!("role" in request.resource.data) || request.resource.data.role == "student")
+        && !("courseAccess" in request.resource.data)
+        && !("siteAccess" in request.resource.data)
+        && (!("teacherId" in request.resource.data) || request.resource.data.teacherId == null);
+
+      allow update: if
+        isAdmin() ||
+        (isOwner(userId) && !touchesRestrictedUserFields());
+
+      allow delete: if false;
+      
+      match /hubGameLeaderboards/{gameId}/scores/{scoreId} {
+        allow read, create: if
+          isOwner(userId) ||
+          isAdmin() ||
+          isTeacherOf(userId);
+
+        allow update, delete: if false;
+      }
+
+      match /{subcol}/{docId} {
+        allow read: if
+          isOwner(userId) ||
+          isAdmin() ||
+          isTeacherOf(userId);
+
+        allow write: if
+          isOwner(userId) ||
+          isAdmin();
+      }
+    }
+
+    // ── 4) Global leaderboards ──────────────────────────────────────────
+    match /leaderboards/{gameId}/scores/{scoreId} {
+      allow get, list, create: if isSignedIn();
+      allow update: if false;
+      allow delete: if isAdmin();
+    }
+
+    // ── 5) Public contact form submissions ──────────────────────────────
+    match /contactMessages/{messageId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+
+    // ── 6) Public grammarItems (question bank) ──────────────────────────
+    match /grammarItems/{itemId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ── 7) Reports from the gap-fill app ────────────────────────────────
+    match /reports/{reportId} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+
+    // ── 8) Grammar set attempts (results) ───────────────────────────────
+    match /grammarSetAttempts/{attemptId} {
+      allow create: if isSignedIn()
+        && (
+          isAdmin() ||
+          request.resource.data.studentUid == request.auth.uid
+        );
+
+      allow get: if isSignedIn()
+        && (
+          resource.data.studentUid == request.auth.uid ||
+          resource.data.ownerUid == request.auth.uid ||
+          isAdmin()
+        );
+
+      allow list: if isSignedIn();
+
+      allow update: if isSignedIn()
+        && (
+          isAdmin() ||
+          (
+            resource.data.studentUid == request.auth.uid &&
+            request.resource.data.studentUid == resource.data.studentUid &&
+            request.resource.data.ownerUid == resource.data.ownerUid &&
+            request.resource.data.setId == resource.data.setId &&
+            request.resource.data.setTitle == resource.data.setTitle &&
+            request.resource.data.studentEmail == resource.data.studentEmail &&
+            request.resource.data.studentName == resource.data.studentName &&
+            changedKeys().hasOnly([
+              "score",
+              "total",
+              "checkedCount",
+              "percent",
+              "answers",
+              "completed",
+              "submittedAt",
+              "updatedAt"
+            ])
+          )
+        );
+
+      allow delete: if false;
+    }
+
+    // ── 8b) Course test sessions (teacher-created fixed-test runs) ─────
+    match /courseTestSessions/{sessionId} {
+      allow create: if
+        isTeacherOrAdmin() &&
+        request.resource.data.teacherUid == request.auth.uid;
+
+      allow get, list: if isSignedIn() && (
+        isAdmin() ||
+        resource.data.teacherUid == request.auth.uid ||
+        request.auth.uid in resource.data.targetStudentIds
+      );
+
+      allow update, delete: if
+        isAdmin() ||
+        resource.data.teacherUid == request.auth.uid;
+    }
+
+    // ── 8c) Course test attempts (student test submissions) ────────────
+    match /courseTestAttempts/{attemptId} {
+      allow create: if isSignedIn() && (
+        isAdmin() ||
+        (
+          request.resource.data.studentUid == request.auth.uid &&
+          isAssignedToCourseTestSession(request.resource.data.sessionId) &&
+          request.resource.data.teacherUid ==
+            get(/databases/$(database)/documents/courseTestSessions/$(request.resource.data.sessionId)).data.teacherUid &&
+          request.resource.data.templateId ==
+            get(/databases/$(database)/documents/courseTestSessions/$(request.resource.data.sessionId)).data.templateId
+        )
+      );
+
+      allow get, list: if isSignedIn() && (
+        isAdmin() ||
+        resource.data.studentUid == request.auth.uid ||
+        resource.data.teacherUid == request.auth.uid
+      );
+
+      allow update: if isSignedIn() && (
+        isAdmin() ||
+        (
+          resource.data.teacherUid == request.auth.uid &&
+          request.resource.data.studentUid == resource.data.studentUid &&
+          request.resource.data.teacherUid == resource.data.teacherUid &&
+          request.resource.data.sessionId == resource.data.sessionId &&
+          request.resource.data.templateId == resource.data.templateId &&
+          request.resource.data.templateTitle == resource.data.templateTitle &&
+          request.resource.data.level == resource.data.level &&
+          request.resource.data.testKind == resource.data.testKind &&
+          request.resource.data.studentEmail == resource.data.studentEmail &&
+          request.resource.data.studentName == resource.data.studentName &&
+          request.resource.data.startedAt == resource.data.startedAt &&
+          changedKeys().hasOnly([
+            "teacherReview",
+            "teacherScore",
+            "teacherTotal",
+            "finalPercent",
+            "reviewRequired",
+            "reviewStatus",
+            "reviewedAt",
+            "reviewedByUid",
+            "reviewedByName",
+            "updatedAt"
+          ])
+        ) ||
+        (
+          resource.data.studentUid == request.auth.uid &&
+          request.resource.data.studentUid == resource.data.studentUid &&
+          request.resource.data.teacherUid == resource.data.teacherUid &&
+          request.resource.data.sessionId == resource.data.sessionId &&
+          request.resource.data.templateId == resource.data.templateId &&
+          request.resource.data.templateTitle == resource.data.templateTitle &&
+          request.resource.data.level == resource.data.level &&
+          request.resource.data.testKind == resource.data.testKind &&
+          request.resource.data.studentEmail == resource.data.studentEmail &&
+          request.resource.data.studentName == resource.data.studentName &&
+          request.resource.data.startedAt == resource.data.startedAt &&
+          changedKeys().hasOnly([
+            "sections",
+            "runnerState",
+            "autoScore",
+            "autoTotal",
+            "percent",
+            "completed",
+            "reviewRequired",
+            "reviewStatus",
+            "submittedAt",
+            "updatedAt"
+          ])
+        )
+      );
+
+      allow delete: if false;
+    }
+
+    // ── 8d) Assigned activities (teacher-assigned site tasks) ──────────
+    match /assignedActivities/{assignmentId} {
+      allow create: if
+        isTeacherOrAdmin() &&
+        request.resource.data.teacherUid == request.auth.uid;
+
+      allow get, list: if isSignedIn() && (
+        isAdmin() ||
+        resource.data.teacherUid == request.auth.uid ||
+        request.auth.uid in resource.data.targetStudentIds
+      );
+
+      allow update: if
+        isAdmin() ||
+        (
+          resource.data.teacherUid == request.auth.uid &&
+          request.resource.data.teacherUid == resource.data.teacherUid &&
+          request.resource.data.teacherName == resource.data.teacherName &&
+          request.resource.data.teacherEmail == resource.data.teacherEmail &&
+          request.resource.data.activityType == resource.data.activityType &&
+          request.resource.data.activityId == resource.data.activityId &&
+          request.resource.data.activityLabel == resource.data.activityLabel &&
+          request.resource.data.routePath == resource.data.routePath &&
+          request.resource.data.targetMode == resource.data.targetMode &&
+          request.resource.data.targetStudentIds == resource.data.targetStudentIds &&
+          request.resource.data.createdAt == resource.data.createdAt &&
+          changedKeys().hasOnly([
+            "className",
+            "notes",
+            "status",
+            "updatedAt"
+          ])
+        );
+
+      allow delete: if
+        isAdmin() ||
+        resource.data.teacherUid == request.auth.uid;
+    }
+
+    // ── 9) Public username index for login ──────────────────────────────
+    match /usernames/{username} {
+      allow get: if true;
+      allow create: if
+        isSignedIn() &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.keys().hasOnly([
+          "email",
+          "uid",
+          "createdAt"
+        ]);
+      allow list: if false;
+      allow update, delete: if false;
+    }
+
+    // ── 10) Activity log (site usage events) ────────────────────────────
+    match /activityLog/{logId} {
+      allow create: if isSignedIn();
+      allow get, list: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ── 11) Seif Hub access requests ────────────────────────────────────
+    match /hubAccessRequests/{requestId} {
+      allow create: if isSignedIn();
+      allow get, list: if isAdmin();
+      allow update, delete: if false;
+    }
+
+    // ── 12) Everything else locked down ─────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

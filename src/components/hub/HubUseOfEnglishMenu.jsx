@@ -58,6 +58,13 @@ export default function HubUseOfEnglishMenu() {
             Change base words into the correct form to complete each sentence accurately.
           </p>
         </button>
+
+        <button className="menu-card" onClick={() => navigate(getSitePath("/use-of-english/meaningful-prefixes"))}>
+          <h3>Meaningful Prefixes</h3>
+          <p>
+            Match common prefixes to their meanings through a staged lesson with highlighted target words and instant feedback.
+          </p>
+        </button>
       </div>
 
       <style>{`

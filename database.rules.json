@@ -1,0 +1,108 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "secondConditionalTests": {
+      "$id": { ".write": "!data.exists()" }
+    },
+    "presentSimpleContTests": {
+      "$id": { ".write": "!data.exists()" }
+    },
+    "presentPerfectSimpleContTests": {
+      "$id": { ".write": "!data.exists()" }
+    },
+    "passiveVoiceTests": {
+      "$id": { ".write": "!data.exists()" }
+    },
+    "usedToTests": {
+      "$id": { ".write": "!data.exists()" }
+    },
+    "questionTagTests": {
+      "$id": { ".write": "!data.exists()" }
+    },
+
+    "liveGamePins": {
+      ".read": true,
+      "$pin": {
+        ".write": "auth != null && !data.exists()",
+        ".validate": "newData.hasChildren(['gameId', 'type', 'publicJoinEnabled', 'status'])"
+      }
+    },
+
+    "liveGames": {
+      ".read": "auth != null",
+      ".indexOn": ["pin"],
+
+      "$gameId": {
+        ".read": "auth != null || (data.child('type').val() === 'spanglish_fixit' && data.child('publicJoinEnabled').val() === true)",
+
+        ".write": "auth != null && !data.exists()",
+
+        "ownerUid": {
+          ".write": "auth != null && !data.exists()"
+        },
+        "pin": {
+          ".write": "auth != null && !data.exists()"
+        },
+        "title": {
+          ".write": "auth != null && !data.exists()"
+        },
+        "setId": {
+          ".write": "auth != null && !data.exists()"
+        },
+        "type": {
+          ".write": "auth != null && !data.exists()"
+        },
+        "publicJoinEnabled": {
+          ".write": "auth != null && !data.exists()"
+        },
+        "createdAt": {
+          ".write": "auth != null && !data.exists()"
+        },
+        "items": {
+          ".write": "auth != null && newData.parent().child('ownerUid').val() === auth.uid"
+        },
+
+        "status": {
+          ".write": "auth != null && newData.parent().child('ownerUid').val() === auth.uid"
+        },
+        "state": {
+          ".write": "auth != null && newData.parent().child('ownerUid').val() === auth.uid"
+        },
+
+        "players": {
+          "$playerId": {
+            ".read": "auth != null || (root.child('liveGames').child($gameId).child('type').val() === 'spanglish_fixit' && root.child('liveGames').child($gameId).child('publicJoinEnabled').val() === true)",
+            ".write": "(auth != null && auth.uid === $playerId) || (!data.exists() && newData.hasChildren(['name', 'isGuest', 'score', 'joinedAt', 'lastActiveAt', 'playerToken']) && newData.child('isGuest').val() === true && newData.child('score').val() === 0) || (data.exists() && data.child('playerToken').val() === newData.child('playerToken').val()) || (auth != null && root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid)"
+          }
+        },
+
+        "rounds": {
+          "$roundIndex": {
+            "clickAnswers": {
+              "$playerId": {
+                ".read": "auth != null || (root.child('liveGames').child($gameId).child('type').val() === 'spanglish_fixit' && root.child('liveGames').child($gameId).child('publicJoinEnabled').val() === true)",
+                ".write": "(!data.exists() && root.child('liveGames').child($gameId).child('players').child($playerId).child('playerToken').val() === newData.child('playerToken').val()) || (auth != null && root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid)"
+              }
+            },
+            "correctionAnswers": {
+              "$playerId": {
+                ".read": "auth != null || (root.child('liveGames').child($gameId).child('type').val() === 'spanglish_fixit' && root.child('liveGames').child($gameId).child('publicJoinEnabled').val() === true)",
+                ".write": "(!data.exists() && root.child('liveGames').child($gameId).child('players').child($playerId).child('playerToken').val() === newData.child('playerToken').val()) || (auth != null && root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid)"
+              }
+            }
+          }
+        },
+
+        "answers": {
+          "$questionIndex": {
+            "$uid": {
+              ".write": "auth != null && auth.uid === $uid && !data.exists()"
+            }
+          }
+        }
+      }
+    }
+  }
+}

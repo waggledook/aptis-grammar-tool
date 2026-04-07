@@ -1,4 +1,4 @@
-const singleGap = (id, prompt, parts, acceptedAnswers, feedback) => ({
+const singleGap = (id, prompt, parts, acceptedAnswers, feedback, extra = {}) => ({
   id,
   type: "gap-fill",
   prompt,
@@ -10,6 +10,7 @@ const singleGap = (id, prompt, parts, acceptedAnswers, feedback) => ({
       feedback,
     },
   ],
+  ...extra,
 });
 
 const multipleChoiceItem = (id, prompt, question, options, answerIndex, explanation) => ({
@@ -159,14 +160,16 @@ export const HUB_GRAMMAR_ACTIVITIES = [
           "he would be able to buy a computer",
           "he'd be able to buy a computer",
         ],
-        "Use the second conditional: if + past simple, then would/could + base verb."
+        "Use the second conditional: if + past simple, then would/could + base verb.",
+        { originalSentence: "He doesn’t save money, so he can’t buy a computer." }
       ),
       singleGap(
         "sc2",
         "Use the second conditional.",
         ["I would wake up early ", { gapId: "g1" }, "."],
         ["if i set the alarm", "if i set an alarm"],
-        "The missing clause should be an if-clause in the past simple: if I set the alarm."
+        "The missing clause should be an if-clause in the past simple: if I set the alarm.",
+        { originalSentence: "I don’t wake up early because I don’t set the alarm." }
       ),
       singleGap(
         "sc3",
@@ -176,21 +179,24 @@ export const HUB_GRAMMAR_ACTIVITIES = [
           "she could communicate in paris",
           "she would be able to communicate in paris",
         ],
-        "After the if-clause, use would/could + base verb to describe the imaginary result."
+        "After the if-clause, use would/could + base verb to describe the imaginary result.",
+        { originalSentence: "She doesn’t learn French, so she can’t communicate in Paris." }
       ),
       singleGap(
         "sc4",
         "Use the second conditional.",
         ["We would grow vegetables ", { gapId: "g1" }, "."],
         ["if we had a garden"],
-        "Use the unreal condition with past simple: if we had a garden."
+        "Use the unreal condition with past simple: if we had a garden.",
+        { originalSentence: "We don’t have a garden, so we don’t grow vegetables." }
       ),
       singleGap(
         "sc5",
         "Use the second conditional.",
         ["If they liked art, ", { gapId: "g1" }, "."],
         ["they would visit museums", "they'd visit museums"],
-        "The result clause should use would + base verb: they would visit museums."
+        "The result clause should use would + base verb: they would visit museums.",
+        { originalSentence: "They don’t visit museums because they don’t like art." }
       ),
       singleGap(
         "sc6",
@@ -201,14 +207,16 @@ export const HUB_GRAMMAR_ACTIVITIES = [
           "if i baked more often",
           "if i were to bake more often",
         ],
-        "Both forms are natural here. The key is the if-clause in the past simple."
+        "Both forms are natural here. The key is the if-clause in the past simple.",
+        { originalSentence: "I don’t bake often, so I don’t have fresh bread." }
       ),
       singleGap(
         "sc7",
         "Use the second conditional.",
         ["He wouldn’t miss the news ", { gapId: "g1" }, "."],
         ["if he read headlines", "if he read the headlines"],
-        "Use the if-clause in the past simple: if he read headlines."
+        "Use the if-clause in the past simple: if he read headlines.",
+        { originalSentence: "He misses the news because he doesn’t read the headlines." }
       ),
       singleGap(
         "sc8",
@@ -220,21 +228,24 @@ export const HUB_GRAMMAR_ACTIVITIES = [
           "if it weren't cloudy",
           "if it wasn't cloudy",
         ],
-        "Both 'were' and 'was' are accepted here. The important part is the unreal condition."
+        "Both 'were' and 'was' are accepted here. The important part is the unreal condition.",
+        { originalSentence: "She doesn’t wear sunglasses because it isn’t sunny." }
       ),
       singleGap(
         "sc9",
         "Use the second conditional.",
         ["If we ate vegetables, ", { gapId: "g1" }, "."],
         ["we wouldn't lack vitamins", "we would not lack vitamins"],
-        "Use wouldn't + base verb in the result clause: we wouldn't lack vitamins."
+        "Use wouldn't + base verb in the result clause: we wouldn't lack vitamins.",
+        { originalSentence: "We lack vitamins because we don’t eat vegetables." }
       ),
       singleGap(
         "sc10",
         "Use the second conditional.",
         ["They wouldn’t make mistakes ", { gapId: "g1" }, "."],
         ["if they practiced speaking", "if they practised speaking"],
-        "The if-clause should use the past simple: if they practiced speaking."
+        "The if-clause should use the past simple: if they practiced speaking.",
+        { originalSentence: "They make mistakes because they don’t practise speaking." }
       ),
     ],
   },

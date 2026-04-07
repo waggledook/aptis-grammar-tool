@@ -1,7 +1,17 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSitePath } from "../../siteConfig.js";
-import { listStudentCourseTestAttempts, listStudentCourseTestSessions } from "../../firebase";
+import {
+  fetchHubGrammarSubmissions,
+  fetchWritingP1Sessions,
+  fetchWritingP2Submissions,
+  fetchWritingP3Submissions,
+  fetchWritingP4Submissions,
+  listAssignedActivitiesForStudent,
+  listGrammarSetAttemptsForStudent,
+  listStudentCourseTestAttempts,
+  listStudentCourseTestSessions,
+} from "../../firebase";
 
 function timestampToDate(value) {
   if (!value) return null;
@@ -23,6 +33,10 @@ function formatDateTime(value) {
   }).format(date);
 }
 
+function timestampToMs(value) {
+  return timestampToDate(value)?.getTime?.() || 0;
+}
+
 function getSessionState(session) {
   const now = Date.now();
   const startsAt = timestampToDate(session?.startsAt)?.getTime() || 0;
@@ -38,9 +52,64 @@ function getControlMode(session) {
   return session?.controlMode === "self-controlled" ? "self-controlled" : "teacher-controlled";
 }
 
+function getAssignmentTypeLabel(type) {
+  switch (type) {
+    case "mini-test":
+      return "Mini test";
+    case "grammar-set":
+      return "Aptis grammar set";
+    case "use-of-english":
+      return "Use of English set";
+    case "writing":
+      return "Writing task";
+    default:
+      return "Assigned activity";
+  }
+}
+
+function getWritingBucket(type) {
+  if (type === "writing-part-1") return "p1";
+  if (type === "writing-part-2") return "p2";
+  if (type === "writing-part-3") return "p3";
+  if (type === "writing-part-4") return "p4";
+  return "";
+}
+
+function buildLatestTimeMap(items, keyName) {
+  return (items || []).reduce((acc, item) => {
+    const key = item?.[keyName];
+    if (!key) return acc;
+    const nextTime = timestampToMs(item.createdAt || item.updatedAt || item.submittedAt || item.startedAt);
+    if (!acc[key] || nextTime > acc[key]) acc[key] = nextTime;
+    return acc;
+  }, {});
+}
+
+function resolveAssignedCompletion(assignment, sources) {
+  const assignedAt = timestampToMs(assignment?.createdAt);
+  if (assignment?.activityType === "mini-test") {
+    const completedAt = sources.miniTests?.[assignment.activityId] || 0;
+    return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+  }
+
+  if (assignment?.activityType === "grammar-set" || assignment?.activityType === "use-of-english") {
+    const completedAt = sources.grammarSets?.[assignment.activityId] || 0;
+    return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+  }
+
+  if (assignment?.activityType === "writing") {
+    const bucket = getWritingBucket(assignment.activityId);
+    const completedAt = sources.writing?.[bucket] || 0;
+    return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+  }
+
+  return { completed: false, completedAt: 0 };
+}
+
 export default function HubYourClass({ user }) {
   const navigate = useNavigate();
   const [sessions, setSessions] = useState([]);
+  const [assignments, setAssignments] = useState([]);
   const [attemptsBySessionId, setAttemptsBySessionId] = useState({});
   const [loading, setLoading] = useState(true);
 
@@ -56,12 +125,41 @@ export default function HubYourClass({ user }) {
 
       setLoading(true);
       try {
-        const [rows, attempts] = await Promise.all([
+        const [rows, attempts, assignedRows, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
           listStudentCourseTestSessions(user.uid),
           listStudentCourseTestAttempts(user.uid),
+          listAssignedActivitiesForStudent(user.uid),
+          fetchHubGrammarSubmissions(200, user.uid),
+          listGrammarSetAttemptsForStudent(user.uid),
+          fetchWritingP1Sessions(100, user.uid),
+          fetchWritingP2Submissions(100, user.uid),
+          fetchWritingP3Submissions(100, user.uid),
+          fetchWritingP4Submissions(100, user.uid),
         ]);
         if (!alive) return;
         setSessions(rows || []);
+        const completionSources = {
+          miniTests: buildLatestTimeMap(miniTests || [], "activityId"),
+          grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
+            if (!attempt?.setId) return acc;
+            if (!attempt.completed && !attempt.submittedAt) return acc;
+            const nextTime = timestampToMs(attempt.submittedAt || attempt.updatedAt || attempt.startedAt);
+            if (!acc[attempt.setId] || nextTime > acc[attempt.setId]) acc[attempt.setId] = nextTime;
+            return acc;
+          }, {}),
+          writing: {
+            p1: Math.max(0, ...(p1 || []).map((entry) => timestampToMs(entry.createdAt))),
+            p2: Math.max(0, ...(p2 || []).map((entry) => timestampToMs(entry.createdAt))),
+            p3: Math.max(0, ...(p3 || []).map((entry) => timestampToMs(entry.createdAt))),
+            p4: Math.max(0, ...(p4 || []).map((entry) => timestampToMs(entry.createdAt))),
+          },
+        };
+        setAssignments(
+          (assignedRows || []).map((assignment) => ({
+            ...assignment,
+            completion: resolveAssignedCompletion(assignment, completionSources),
+          }))
+        );
         setAttemptsBySessionId(
           (attempts || []).reduce((acc, attempt) => {
             if (attempt?.sessionId && !acc[attempt.sessionId]) acc[attempt.sessionId] = attempt;
@@ -72,6 +170,7 @@ export default function HubYourClass({ user }) {
         console.error("[HubYourClass] load failed", error);
         if (alive) {
           setSessions([]);
+          setAssignments([]);
           setAttemptsBySessionId({});
         }
       } finally {
@@ -100,6 +199,18 @@ export default function HubYourClass({ user }) {
     return { open, scheduled, closed };
   }, [sessions]);
 
+  const assignmentGroups = useMemo(() => {
+    const pending = [];
+    const completed = [];
+
+    for (const assignment of assignments) {
+      if (assignment?.completion?.completed) completed.push(assignment);
+      else pending.push(assignment);
+    }
+
+    return { pending, completed };
+  }, [assignments]);
+
   if (!user) {
     return (
       <div className="menu-wrapper hub-class-wrapper">
@@ -110,8 +221,8 @@ export default function HubYourClass({ user }) {
             </button>
           </div>
           <section className="hub-class-panel">
-            <h1 className="hub-class-title">Your Class</h1>
-            <p className="hub-class-copy">Sign in to see teacher-assigned tests and other class activity here.</p>
+          <h1 className="hub-class-title">Your Class</h1>
+          <p className="hub-class-copy">Sign in to see teacher-assigned activities, tests, and class work here.</p>
           </section>
         </div>
         <HubYourClassStyles />
@@ -132,10 +243,31 @@ export default function HubYourClass({ user }) {
           <span className="hub-class-kicker">Student dashboard</span>
           <h1 className="hub-class-title">Your Class</h1>
           <p className="hub-class-copy">
-            This is where teacher-assigned tests and class activity will appear. For now, you can already see the
-            course-test sessions your teacher has set up for you.
+            This is where your teacher can assign work across the site. Completed activities are marked automatically
+            once you finish them.
           </p>
         </header>
+
+        <section className="hub-class-panel">
+          <div className="hub-class-panel-head">
+            <div>
+              <h2>Assigned activities</h2>
+              <p>Mini tests, grammar sets, Use of English sets, and writing tasks from your teacher.</p>
+            </div>
+            <span className="hub-class-count">{assignments.length}</span>
+          </div>
+
+          {loading ? (
+            <p className="hub-class-empty">Loading assigned activities…</p>
+          ) : !assignments.length ? (
+            <p className="hub-class-empty">No assigned activities yet.</p>
+          ) : (
+            <div className="hub-class-groups">
+              <HubAssignmentGroup title="To do" assignments={assignmentGroups.pending} navigate={navigate} />
+              <HubAssignmentGroup title="Completed" assignments={assignmentGroups.completed} navigate={navigate} />
+            </div>
+          )}
+        </section>
 
         <section className="hub-class-panel">
           <div className="hub-class-panel-head">
@@ -164,6 +296,80 @@ export default function HubYourClass({ user }) {
 
       <HubYourClassStyles />
     </div>
+  );
+}
+
+function HubAssignmentGroup({ title, assignments, navigate }) {
+  if (!assignments.length) return null;
+
+  return (
+    <div className="hub-class-group">
+      <div className="hub-class-group-head">
+        <h3>{title}</h3>
+        <span>{assignments.length}</span>
+      </div>
+
+      <div className="hub-class-session-list">
+        {assignments.map((assignment) => (
+          <HubAssignmentCard key={assignment.id} assignment={assignment} navigate={navigate} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function HubAssignmentCard({ assignment, navigate }) {
+  const isCompleted = !!assignment?.completion?.completed;
+  const completedAt = assignment?.completion?.completedAt
+    ? new Date(assignment.completion.completedAt)
+    : null;
+
+  return (
+    <article className="hub-class-session-card">
+      <div className="hub-class-session-head">
+        <div>
+          <h4>{assignment.activityLabel || "Assigned activity"}</h4>
+          <p>
+            {getAssignmentTypeLabel(assignment.activityType)} · {assignment.teacherName || assignment.teacherEmail || "Teacher"}
+          </p>
+        </div>
+        <span className={`hub-class-state ${isCompleted ? "is-open" : "is-scheduled"}`}>
+          {isCompleted ? "completed" : "assigned"}
+        </span>
+      </div>
+
+      <div className="hub-class-session-meta">
+        <div>
+          <span>Assigned</span>
+          <p>{formatDateTime(assignment.createdAt)}</p>
+        </div>
+        <div>
+          <span>Status</span>
+          <p>{isCompleted ? "Completed" : "Not completed yet"}</p>
+        </div>
+        <div>
+          <span>Completed</span>
+          <p>{completedAt ? formatDateTime(completedAt) : "—"}</p>
+        </div>
+      </div>
+
+      {assignment.notes ? (
+        <div className="hub-class-session-note">
+          <span>Teacher notes</span>
+          <p>{assignment.notes}</p>
+        </div>
+      ) : null}
+
+      <div className="hub-class-session-actions">
+        <button
+          className="review-btn"
+          type="button"
+          onClick={() => navigate(assignment.routePath || getSitePath("/"))}
+        >
+          {isCompleted ? "Open again" : "Start activity"}
+        </button>
+      </div>
+    </article>
   );
 }
 
