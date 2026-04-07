@@ -211,6 +211,19 @@ export default function HubLanding({ user, hasAccess, onSignIn }) {
               </button>
             )}
 
+            {(user?.role === "teacher" || user?.role === "admin") && (
+              <button
+                className="menu-card"
+                onClick={() => navigate(getSitePath("/my-students"))}
+              >
+                <h3>My Students</h3>
+                <p>
+                  View your class list, open submissions, track assigned work,
+                  and check student progress from one place.
+                </p>
+              </button>
+            )}
+
             {user?.role === "admin" && (
               <button
                 className="menu-card"
