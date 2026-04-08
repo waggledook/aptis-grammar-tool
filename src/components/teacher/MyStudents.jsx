@@ -1324,6 +1324,15 @@ async function copySelectedSubmission() {
                 <p>
                   {selectedNotification.partLabel} submission · {formatDate(selectedNotification.createdAt)}
                 </p>
+                {selectedNotification.kind === "course-test" ? (
+                  <div
+                    className={`teacher-review-status-chip ${
+                      selectedNotification.attempt?.reviewStatus === "reviewed" ? "is-reviewed" : "is-pending"
+                    }`}
+                  >
+                    {selectedNotification.attempt?.reviewStatus === "reviewed" ? "Reviewed" : "Requires review"}
+                  </div>
+                ) : null}
               </div>
               <div className="teacher-review-top-actions">
                 <button
@@ -1866,6 +1875,30 @@ async function copySelectedSubmission() {
         .teacher-review-head p {
           margin: 0;
           color: rgba(230, 240, 255, 0.72);
+        }
+
+        .teacher-review-status-chip {
+          display: inline-flex;
+          align-items: center;
+          margin-top: 0.55rem;
+          padding: 0.28rem 0.7rem;
+          border-radius: 999px;
+          font-size: 0.76rem;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+
+        .teacher-review-status-chip.is-reviewed {
+          background: rgba(34, 197, 94, 0.18);
+          color: #bdf7cf;
+          border: 1px solid rgba(34, 197, 94, 0.24);
+        }
+
+        .teacher-review-status-chip.is-pending {
+          background: rgba(245, 158, 11, 0.18);
+          color: #fde68a;
+          border: 1px solid rgba(245, 158, 11, 0.24);
         }
 
         .teacher-review-body {

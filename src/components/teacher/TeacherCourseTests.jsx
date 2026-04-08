@@ -34,6 +34,15 @@ function formatDateTime(value) {
   }).format(date);
 }
 
+function timestampToMs(value) {
+  if (!value) return 0;
+  if (typeof value?.toMillis === "function") return value.toMillis();
+  if (typeof value?.toDate === "function") return value.toDate().getTime();
+  if (value instanceof Date) return value.getTime();
+  const parsed = new Date(value).getTime();
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+
 function toDateOrNull(value) {
   if (!value) return null;
   const date = new Date(value);
@@ -315,6 +324,117 @@ function renderPreviewPassage(text = "", highlights = []) {
   });
 }
 
+function formatRemainingLabel(ms = 0) {
+  const clamped = Math.max(0, Math.round(Number(ms) || 0));
+  const totalSeconds = Math.floor(clamped / 1000);
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  if (hours > 0) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+  return `${minutes}:${String(seconds).padStart(2, "0")}`;
+}
+
+function getListeningPhaseLabel(phase = "", sectionIndex = 0, totalSections = 0) {
+  const position = totalSections ? `Part ${sectionIndex + 1}/${totalSections}` : "Listening";
+  if (phase === "preread") return `${position} · reading time`;
+  if (phase === "playing-first") return `${position} · play 1`;
+  if (phase === "playing-second") return `${position} · play 2`;
+  if (phase === "pause") return `${position} · between plays`;
+  if (phase === "between-sections") return `${position} · moving to next part`;
+  if (phase === "awaiting-first-play") return `${position} · waiting to play 1`;
+  if (phase === "awaiting-second-play") return `${position} · waiting to play 2`;
+  if (phase === "ready-finish") return "Listening complete · ready to submit";
+  if (phase === "resume-blocked") return `${position} · paused after refresh`;
+  if (phase === "completed") return "Listening submitted";
+  return `${position} · ready`;
+}
+
+function getAttemptMonitorEntry(attempt, session, template, nowMs) {
+  const runnerState = attempt?.runnerState || {};
+  const mainStartedAtMs = timestampToMs(runnerState.mainPaperStartedAt || attempt?.startedAt);
+  const mainSubmittedAtMs = timestampToMs(runnerState.mainPaperSubmittedAt);
+  const listeningStartedAtMs = timestampToMs(runnerState.listeningStageStartedAt);
+  const listeningSubmittedAtMs = timestampToMs(runnerState.listeningSubmittedAt || attempt?.submittedAt);
+  const mainDurationMinutes = Number(template?.deliveryPlan?.mainPaper?.durationMinutes || 70);
+  const mainDeadlineMs = mainStartedAtMs ? mainStartedAtMs + mainDurationMinutes * 60 * 1000 : 0;
+  const listeningSections = (template?.sections || []).filter((section) => section.deliveryGroup === "listening-paper");
+  const listeningPhase = runnerState.listeningPhase || "idle";
+  const listeningIndex = Number(runnerState.listeningSectionIndex || 0);
+
+  if (!mainStartedAtMs) {
+    return {
+      id: attempt.id,
+      studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+      stateLabel: "Not started",
+      detailLabel: "Student has not started the test yet.",
+      tone: "idle",
+    };
+  }
+
+  if (!mainSubmittedAtMs) {
+    const remainingMs = Math.max(0, mainDeadlineMs - nowMs);
+    return {
+      id: attempt.id,
+      studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+      stateLabel: "Main paper running",
+      detailLabel: remainingMs > 0
+        ? `${formatRemainingLabel(remainingMs)} left`
+        : "Time reached · waiting for submit",
+      tone: remainingMs > 0 ? "active" : "warning",
+    };
+  }
+
+  if (attempt?.reviewStatus === "reviewed") {
+    return {
+      id: attempt.id,
+      studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+      stateLabel: "Reviewed",
+      detailLabel: `${attempt.finalPercent ?? 0}% final`,
+      tone: "done",
+    };
+  }
+
+  if (attempt?.completed || listeningSubmittedAtMs) {
+    return {
+      id: attempt.id,
+      studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+      stateLabel: "Submitted",
+      detailLabel: "Finished and awaiting review.",
+      tone: "done",
+    };
+  }
+
+  if (!listeningSections.length) {
+    return {
+      id: attempt.id,
+      studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+      stateLabel: "Main paper done",
+      detailLabel: "No listening stage in this test.",
+      tone: "idle",
+    };
+  }
+
+  if (!listeningStartedAtMs) {
+    return {
+      id: attempt.id,
+      studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+      stateLabel: session?.listeningState === "open" ? "Listening available" : "Waiting for listening",
+      detailLabel: session?.listeningState === "open"
+        ? "Student can begin listening now."
+        : "Main paper submitted. Listening has not started yet.",
+      tone: session?.listeningState === "open" ? "active" : "idle",
+    };
+  }
+
+  return {
+    id: attempt.id,
+    studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+    stateLabel: "Listening running",
+    detailLabel: getListeningPhaseLabel(listeningPhase, listeningIndex, listeningSections.length),
+    tone: "active",
+  };
+}
+
 export default function TeacherCourseTests({ user }) {
   const navigate = useNavigate();
   const templates = useMemo(() => listHubCourseTestTemplates(), []);
@@ -342,6 +462,10 @@ export default function TeacherCourseTests({ user }) {
   const [reviewScores, setReviewScores] = useState({});
   const [reviewSaving, setReviewSaving] = useState(false);
   const [previewTemplate, setPreviewTemplate] = useState(null);
+  const [monitorSession, setMonitorSession] = useState(null);
+  const [monitorAttempts, setMonitorAttempts] = useState([]);
+  const [monitorLoading, setMonitorLoading] = useState(false);
+  const [monitorNowMs, setMonitorNowMs] = useState(Date.now());
 
   useEffect(() => {
     let alive = true;
@@ -610,6 +734,32 @@ export default function TeacherCourseTests({ user }) {
     }
   };
 
+  const loadMonitorAttempts = async (session) => {
+    if (!session?.id) return;
+    setMonitorLoading(true);
+    try {
+      const rows = await listAttemptsForMyCourseTestSession(session.id);
+      setMonitorAttempts(rows || []);
+    } catch (error) {
+      console.error("[TeacherCourseTests] monitor load failed", error);
+      toast("Could not load live session timings.");
+    } finally {
+      setMonitorLoading(false);
+    }
+  };
+
+  const openMonitorSession = async (session) => {
+    setMonitorSession(session);
+    setMonitorAttempts([]);
+    await loadMonitorAttempts(session);
+  };
+
+  const closeMonitorSession = () => {
+    setMonitorSession(null);
+    setMonitorAttempts([]);
+    setMonitorLoading(false);
+  };
+
   const selectedAttemptReviewRows = useMemo(() => {
     if (!selectedAttemptTemplate || !selectedAttempt) return [];
 
@@ -660,6 +810,38 @@ export default function TeacherCourseTests({ user }) {
 
     return { score: Math.max(0, score), total };
   }, [selectedAttemptReviewRows, reviewScores]);
+
+  const monitorTemplate = monitorSession?.templateId
+    ? getHubCourseTestTemplate(monitorSession.templateId)
+    : null;
+  const monitorEntries = useMemo(
+    () => monitorAttempts.map((attempt) => getAttemptMonitorEntry(attempt, monitorSession, monitorTemplate, monitorNowMs)),
+    [monitorAttempts, monitorSession, monitorTemplate, monitorNowMs]
+  );
+  const monitorSummary = useMemo(() => {
+    return monitorEntries.reduce((totals, entry) => {
+      if (entry.stateLabel === "Not started") totals.notStarted += 1;
+      else if (entry.stateLabel === "Main paper running") totals.mainPaper += 1;
+      else if (entry.stateLabel === "Listening running") totals.listening += 1;
+      else if (entry.stateLabel === "Submitted" || entry.stateLabel === "Reviewed") totals.finished += 1;
+      else totals.waiting += 1;
+      return totals;
+    }, { notStarted: 0, mainPaper: 0, listening: 0, waiting: 0, finished: 0 });
+  }, [monitorEntries]);
+
+  useEffect(() => {
+    if (!monitorSession) return undefined;
+
+    const tick = window.setInterval(() => setMonitorNowMs(Date.now()), 1000);
+    const refresh = window.setInterval(() => {
+      void loadMonitorAttempts(monitorSession);
+    }, 15000);
+
+    return () => {
+      window.clearInterval(tick);
+      window.clearInterval(refresh);
+    };
+  }, [monitorSession]);
 
   const handleSaveReview = async () => {
     if (!selectedAttempt) return;
@@ -972,6 +1154,9 @@ export default function TeacherCourseTests({ user }) {
                     >
                       Do session
                     </button>
+                    <button type="button" className="ghost-btn" onClick={() => void openMonitorSession(session)}>
+                      Live timings
+                    </button>
                     <button type="button" className="ghost-btn" onClick={() => openReviewSession(session)}>
                       Review submissions
                     </button>
@@ -1000,6 +1185,15 @@ export default function TeacherCourseTests({ user }) {
                 <p>
                   Review submissions, inspect full answers, and override item scores where needed.
                 </p>
+                {selectedAttempt ? (
+                  <div
+                    className={`teacher-course-review-status-chip ${
+                      selectedAttempt.reviewStatus === "reviewed" ? "is-reviewed" : "is-pending"
+                    }`}
+                  >
+                    {selectedAttempt.reviewStatus === "reviewed" ? "Reviewed" : "Requires review"}
+                  </div>
+                ) : null}
               </div>
               <button type="button" className="ghost-btn" onClick={closeReviewSession}>
                 Close
@@ -1048,6 +1242,10 @@ export default function TeacherCourseTests({ user }) {
                       <div>
                         <span className="panel-label">Submitted</span>
                         <p>{formatDateTime(selectedAttempt.submittedAt || selectedAttempt.updatedAt)}</p>
+                      </div>
+                      <div>
+                        <span className="panel-label">Status</span>
+                        <p>{selectedAttempt.reviewStatus === "reviewed" ? "Reviewed" : "Requires review"}</p>
                       </div>
                       <div>
                         <span className="panel-label">Teacher score</span>
@@ -1122,6 +1320,68 @@ export default function TeacherCourseTests({ user }) {
                   </>
                 )}
               </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {monitorSession ? (
+        <div className="teacher-course-review-overlay" onClick={closeMonitorSession}>
+          <div className="teacher-course-review-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="teacher-course-review-head">
+              <div>
+                <h3>{monitorSession.templateTitle || "Live timings"}</h3>
+                <p>
+                  Students may be out of sync. Main paper timings are exact; listening shows each student’s current phase.
+                </p>
+              </div>
+              <div className="teacher-course-review-head-actions">
+                <button type="button" className="ghost-btn" onClick={() => void loadMonitorAttempts(monitorSession)}>
+                  Refresh
+                </button>
+                <button type="button" className="ghost-btn" onClick={closeMonitorSession}>
+                  Close
+                </button>
+              </div>
+            </div>
+
+            <div className="teacher-course-review-summary">
+              <div>
+                <span className="panel-label">Not started</span>
+                <p>{monitorSummary.notStarted}</p>
+              </div>
+              <div>
+                <span className="panel-label">Main paper</span>
+                <p>{monitorSummary.mainPaper}</p>
+              </div>
+              <div>
+                <span className="panel-label">Listening</span>
+                <p>{monitorSummary.listening}</p>
+              </div>
+              <div>
+                <span className="panel-label">Waiting</span>
+                <p>{monitorSummary.waiting}</p>
+              </div>
+              <div>
+                <span className="panel-label">Finished</span>
+                <p>{monitorSummary.finished}</p>
+              </div>
+            </div>
+
+            <div className="teacher-course-monitor-list">
+              {monitorLoading && !monitorEntries.length ? (
+                <p className="muted small">Loading live timings…</p>
+              ) : !monitorEntries.length ? (
+                <p className="muted small">No student attempts yet for this session.</p>
+              ) : (
+                monitorEntries.map((entry) => (
+                  <div key={entry.id} className={`teacher-course-monitor-card is-${entry.tone}`}>
+                    <strong>{entry.studentLabel}</strong>
+                    <span>{entry.stateLabel}</span>
+                    <small>{entry.detailLabel}</small>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>
@@ -1386,6 +1646,13 @@ export default function TeacherCourseTests({ user }) {
           align-items: flex-start;
         }
 
+        .teacher-course-review-head-actions {
+          display: flex;
+          gap: 0.6rem;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+
         .teacher-course-review-head h3,
         .teacher-course-review-section h4 {
           margin: 0 0 0.25rem;
@@ -1393,6 +1660,30 @@ export default function TeacherCourseTests({ user }) {
 
         .teacher-course-review-head p {
           margin: 0;
+        }
+
+        .teacher-course-review-status-chip {
+          display: inline-flex;
+          align-items: center;
+          margin-top: 0.6rem;
+          padding: 0.28rem 0.7rem;
+          border-radius: 999px;
+          font-size: 0.76rem;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+          text-transform: uppercase;
+        }
+
+        .teacher-course-review-status-chip.is-reviewed {
+          background: rgba(34, 197, 94, 0.18);
+          border: 1px solid rgba(34, 197, 94, 0.24);
+          color: #bdf7cf;
+        }
+
+        .teacher-course-review-status-chip.is-pending {
+          background: rgba(245, 158, 11, 0.18);
+          border: 1px solid rgba(245, 158, 11, 0.24);
+          color: #fde68a;
         }
 
         .teacher-course-review-grid {
@@ -1429,9 +1720,48 @@ export default function TeacherCourseTests({ user }) {
         .teacher-course-review-body,
         .teacher-course-review-sections,
         .teacher-course-review-items,
-        .teacher-course-review-attempt-list {
+        .teacher-course-review-attempt-list,
+        .teacher-course-monitor-list {
           display: grid;
           gap: 0.8rem;
+        }
+
+        .teacher-course-monitor-card {
+          border: 1px solid rgba(44, 75, 131, 0.55);
+          border-radius: 12px;
+          background: rgba(19, 33, 59, 0.72);
+          padding: 0.9rem;
+          display: grid;
+          gap: 0.22rem;
+        }
+
+        .teacher-course-monitor-card strong {
+          color: #eef4ff;
+        }
+
+        .teacher-course-monitor-card span {
+          color: #dbe8ff;
+          font-weight: 700;
+        }
+
+        .teacher-course-monitor-card small {
+          color: #a9bfdc;
+          line-height: 1.45;
+        }
+
+        .teacher-course-monitor-card.is-active {
+          border-color: rgba(120, 182, 255, 0.7);
+          background: rgba(16, 39, 74, 0.78);
+        }
+
+        .teacher-course-monitor-card.is-warning {
+          border-color: rgba(245, 158, 11, 0.52);
+          background: rgba(73, 52, 14, 0.46);
+        }
+
+        .teacher-course-monitor-card.is-done {
+          border-color: rgba(79, 190, 120, 0.55);
+          background: rgba(18, 58, 34, 0.5);
         }
 
         .teacher-course-review-attempt-btn {

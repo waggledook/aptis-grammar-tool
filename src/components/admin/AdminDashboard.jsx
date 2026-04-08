@@ -1910,6 +1910,27 @@ function renderHubAccessControl(u, compact = false) {
                 <p style={{ margin: "0.3rem 0 0", color: "#b7c6e6" }}>
                   Review submissions, inspect full answers, and adjust scoring if needed.
                 </p>
+                {selectedAttempt ? (
+                  <div style={{ marginTop: "0.6rem" }}>
+                    <span
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        padding: "0.28rem 0.7rem",
+                        borderRadius: "999px",
+                        fontSize: "0.76rem",
+                        fontWeight: 800,
+                        letterSpacing: "0.04em",
+                        textTransform: "uppercase",
+                        background: selectedAttempt.reviewStatus === "reviewed" ? "rgba(34, 197, 94, 0.18)" : "rgba(245, 158, 11, 0.18)",
+                        border: selectedAttempt.reviewStatus === "reviewed" ? "1px solid rgba(34, 197, 94, 0.24)" : "1px solid rgba(245, 158, 11, 0.24)",
+                        color: selectedAttempt.reviewStatus === "reviewed" ? "#bdf7cf" : "#fde68a",
+                      }}
+                    >
+                      {selectedAttempt.reviewStatus === "reviewed" ? "Reviewed" : "Requires review"}
+                    </span>
+                  </div>
+                ) : null}
               </div>
               <button type="button" className="ghost-btn" onClick={closeReviewSession}>
                 Close
@@ -1975,7 +1996,7 @@ function renderHubAccessControl(u, compact = false) {
                     <div
                       style={{
                         display: "grid",
-                        gridTemplateColumns: isNarrow ? "1fr" : "repeat(3, minmax(0, 1fr))",
+                        gridTemplateColumns: isNarrow ? "1fr" : "repeat(4, minmax(0, 1fr))",
                         gap: "0.75rem",
                         marginBottom: "1rem",
                       }}
@@ -1987,6 +2008,28 @@ function renderHubAccessControl(u, compact = false) {
                       <div style={{ padding: "0.85rem", borderRadius: "0.9rem", border: "1px solid rgba(51, 65, 85, 0.7)", background: "rgba(2, 6, 23, 0.22)" }}>
                         <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Submitted</div>
                         <div style={{ marginTop: "0.35rem", color: "#e5e7eb" }}>{formatDateTime(selectedAttempt.submittedAt || selectedAttempt.updatedAt)}</div>
+                      </div>
+                      <div style={{ padding: "0.85rem", borderRadius: "0.9rem", border: "1px solid rgba(51, 65, 85, 0.7)", background: "rgba(2, 6, 23, 0.22)" }}>
+                        <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Status</div>
+                        <div style={{ marginTop: "0.35rem" }}>
+                          <span
+                            style={{
+                              display: "inline-flex",
+                              alignItems: "center",
+                              padding: "0.28rem 0.7rem",
+                              borderRadius: "999px",
+                              fontSize: "0.76rem",
+                              fontWeight: 800,
+                              letterSpacing: "0.04em",
+                              textTransform: "uppercase",
+                              background: selectedAttempt.reviewStatus === "reviewed" ? "rgba(34, 197, 94, 0.18)" : "rgba(245, 158, 11, 0.18)",
+                              border: selectedAttempt.reviewStatus === "reviewed" ? "1px solid rgba(34, 197, 94, 0.24)" : "1px solid rgba(245, 158, 11, 0.24)",
+                              color: selectedAttempt.reviewStatus === "reviewed" ? "#bdf7cf" : "#fde68a",
+                            }}
+                          >
+                            {selectedAttempt.reviewStatus === "reviewed" ? "Reviewed" : "Requires review"}
+                          </span>
+                        </div>
                       </div>
                       <div style={{ padding: "0.85rem", borderRadius: "0.9rem", border: "1px solid rgba(51, 65, 85, 0.7)", background: "rgba(2, 6, 23, 0.22)" }}>
                         <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>Teacher score</div>

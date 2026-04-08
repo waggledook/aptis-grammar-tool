@@ -1026,6 +1026,110 @@ function calculateSkillBreakdown(sections = [], sectionAnswers = {}, teacherItem
   return Array.from(grouped.values());
 }
 
+function formatCourseTestAnswer(item, answer) {
+  if (!answer || (typeof answer === "string" && !answer.trim())) return "—";
+  if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
+    const answerMap = answer && typeof answer === "object" ? answer : {};
+    return item.inlineParts
+      .filter((part) => part && typeof part === "object" && part.gapId)
+      .map((part, index) => `Gap ${index + 1}: ${answerMap[part.gapId] || "—"}`)
+      .join(" · ");
+  }
+  if (item?.type === "choice") {
+    const selected = item.options?.[Number(answer)];
+    return typeof selected === "string" ? selected : selected?.text || "—";
+  }
+  if (item?.type === "stress-choice") {
+    const syllables = Array.isArray(item.syllables) ? item.syllables : [];
+    const chosen = syllables[Number(answer)];
+    if (!chosen) return "—";
+    return `${item.prompt}: ${chosen}`;
+  }
+  if (isSortBySoundItem(item)) return String(answer || "—");
+  if (item?.type === "matching-select") return resolveMatchingOptionLabel(item, answer);
+  return String(answer);
+}
+
+function formatCourseTestKey(item) {
+  if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
+    return Object.entries(item.inlineAcceptedAnswers || {})
+      .map(([, values], index) => `Gap ${index + 1}: ${(values || []).join(" / ")}`)
+      .join(" · ");
+  }
+  if (item?.type === "choice") {
+    if (Array.isArray(item.acceptedAnswerIndexes) && item.acceptedAnswerIndexes.length) {
+      return item.acceptedAnswerIndexes
+        .map((index) => item.options?.[Number(index)])
+        .map((selected) => (typeof selected === "string" ? selected : selected?.text || "—"))
+        .join(" / ");
+    }
+    const selected = item.options?.[Number(item.answerIndex)];
+    return typeof selected === "string" ? selected : selected?.text || "—";
+  }
+  if (item?.type === "stress-choice") {
+    const syllables = Array.isArray(item.syllables) ? item.syllables : [];
+    const chosen = syllables[Number(item.answerIndex)];
+    if (!chosen) return "—";
+    return `${item.prompt}: ${chosen}`;
+  }
+  if (item?.type === "matching-select") {
+    if (Array.isArray(item.acceptedAnswers) && item.acceptedAnswers.length) {
+      return item.acceptedAnswers.map((entry) => resolveMatchingOptionLabel(item, entry)).join(" / ");
+    }
+    return resolveMatchingOptionLabel(item, item.answer);
+  }
+  if (isSortBySoundItem(item)) return item.answer || "—";
+  if (Array.isArray(item?.acceptedAnswers)) return item.acceptedAnswers.join(" / ");
+  return "—";
+}
+
+function buildCourseTestSectionBreakdown(template, attempt) {
+  if (!template || !attempt) return [];
+  const answers = attempt.runnerState?.sectionAnswers || {};
+  const teacherItemScores = attempt.teacherReview?.itemScores || {};
+  const bySkill = new Map();
+
+  (template.sections || []).forEach((section) => {
+    const skill = section.skill || section.id;
+    if (!bySkill.has(skill)) {
+      bySkill.set(skill, {
+        skill,
+        label: getSkillLabel(skill),
+        score: 0,
+        total: 0,
+        sections: [],
+      });
+    }
+
+    const group = bySkill.get(skill);
+    const reviewItems = (section.items || []).map((item) => {
+      const answer = answers?.[section.id]?.[item.id];
+      const key = `${section.id}:${item.id}`;
+      const autoScore = getAutoItemScore(item, answer);
+      const autoCorrect = autoScore >= 1;
+      const assignedScore =
+        teacherItemScores[key] != null ? Number(teacherItemScores[key]) : autoScore;
+
+      group.score += assignedScore;
+      group.total += 1;
+
+      return { item, answer, autoCorrect, assignedScore };
+    });
+
+    group.score -= getSortBySoundPenalty(section, answers?.[section.id] || {});
+    group.score = Math.max(0, group.score);
+
+    group.sections.push({
+      id: section.id,
+      title: section.title,
+      penalty: getSortBySoundPenalty(section, answers?.[section.id] || {}),
+      reviewItems,
+    });
+  });
+
+  return Array.from(bySkill.values());
+}
+
 export default function HubCourseTestRunner({ user }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -1049,6 +1153,7 @@ export default function HubCourseTestRunner({ user }) {
   const [sectionMenuOpen, setSectionMenuOpen] = useState(false);
   const [readingWorkspaceOpen, setReadingWorkspaceOpen] = useState(false);
   const [submitConfirmOpen, setSubmitConfirmOpen] = useState(false);
+  const [detailedFeedbackOpen, setDetailedFeedbackOpen] = useState(false);
   const [submittingMainPaper, setSubmittingMainPaper] = useState(false);
   const [startingListening, setStartingListening] = useState(false);
   const [finishingListening, setFinishingListening] = useState(false);
@@ -1987,6 +2092,24 @@ export default function HubCourseTestRunner({ user }) {
     () => calculateSkillBreakdown(allSections, sectionAnswers, teacherItemScores),
     [allSections, sectionAnswers, teacherItemScores]
   );
+  const detailedReviewAttempt = useMemo(
+    () => (
+      attempt
+        ? {
+            ...attempt,
+            runnerState: {
+              ...(attempt.runnerState || {}),
+              sectionAnswers,
+            },
+          }
+        : null
+    ),
+    [attempt, sectionAnswers]
+  );
+  const detailedSectionBreakdown = useMemo(
+    () => buildCourseTestSectionBreakdown(template, detailedReviewAttempt),
+    [template, detailedReviewAttempt]
+  );
   const provisionalScore = useMemo(
     () => sectionBreakdown.reduce((sum, entry) => sum + entry.score, 0),
     [sectionBreakdown]
@@ -2001,6 +2124,12 @@ export default function HubCourseTestRunner({ user }) {
   const listeningState = session?.listeningState || (controlMode === "self-controlled" ? "open" : "locked");
   const mainPaperAvailable = teacherPreview || controlMode === "self-controlled" || mainPaperState === "open";
   const listeningAvailable = teacherPreview || controlMode === "self-controlled" || listeningState === "open";
+  const canOpenDetailedFeedback = teacherPreview || reviewStatus === "reviewed";
+
+  useEffect(() => {
+    if (canOpenDetailedFeedback) return;
+    setDetailedFeedbackOpen(false);
+  }, [canOpenDetailedFeedback]);
 
   useEffect(() => {
     if (!attempt?.id || !hydrationDoneRef.current) return;
@@ -2166,6 +2295,17 @@ export default function HubCourseTestRunner({ user }) {
                     ? `${attempt?.teacherScore ?? 0}/${attempt?.teacherTotal ?? 0} points`
                     : `${provisionalScore}/${provisionalTotal} auto-marked points so far`}
                 </p>
+                {canOpenDetailedFeedback ? (
+                  <div className="hub-course-test-report-actions">
+                    <button
+                      className="ghost-btn"
+                      type="button"
+                      onClick={() => setDetailedFeedbackOpen(true)}
+                    >
+                      {teacherPreview ? "Open detailed preview" : "Open detailed feedback"}
+                    </button>
+                  </div>
+                ) : null}
               </div>
 
               {sectionBreakdown.length ? (
@@ -2712,6 +2852,93 @@ export default function HubCourseTestRunner({ user }) {
             ) : null}
           </>
         ) : null}
+
+        {detailedFeedbackOpen && canOpenDetailedFeedback ? (
+          <div className="hub-course-test-modal" onClick={() => setDetailedFeedbackOpen(false)}>
+            <div className="hub-course-test-modal-card hub-course-test-feedback-modal" onClick={(e) => e.stopPropagation()}>
+              <div className="hub-course-test-modal-head">
+                <div>
+                  <h3>{teacherPreview ? "Detailed preview report" : "Detailed feedback"}</h3>
+                  <p>
+                    {session.templateTitle || template.title} ·{" "}
+                    {teacherPreview
+                      ? "Teacher preview"
+                      : `Reviewed ${formatDateTime(attempt?.reviewedAt || attempt?.updatedAt || attempt?.submittedAt)}`}
+                  </p>
+                </div>
+                <button className="ghost-btn" type="button" onClick={() => setDetailedFeedbackOpen(false)}>
+                  Close
+                </button>
+              </div>
+
+              <div className="hub-course-test-feedback-body">
+                <div className="hub-course-test-feedback-block">
+                  <span className="panel-label">Course test report</span>
+                  <div className="hub-course-test-feedback-answer">
+                    <strong>{session.templateTitle || template.title}</strong>
+                    <div className="hub-course-test-feedback-plain">
+                      {teacherPreview
+                        ? `Preview score: ${provisionalScore}/${provisionalTotal} (${provisionalTotal ? Math.round((provisionalScore / provisionalTotal) * 100) : 0}%).`
+                        : `Reviewed score: ${attempt?.teacherScore ?? 0}/${attempt?.teacherTotal ?? 0} (${attempt?.finalPercent ?? 0}%).`}
+                    </div>
+                  </div>
+
+                  {detailedSectionBreakdown.map((group) => (
+                    <div key={group.skill} className="hub-course-test-feedback-answer">
+                      <strong>
+                        {group.label} · {group.score}/{group.total}
+                      </strong>
+                      <div className="hub-course-test-feedback-attempt-list">
+                        {group.sections.map((section) => (
+                          <div key={section.id} className="hub-course-test-feedback-attempt">
+                            <div className="hub-course-test-feedback-attempt-head">
+                              <span className="hub-course-test-feedback-attempt-label">{section.title}</span>
+                            </div>
+                            {section.penalty ? (
+                              <div className="hub-course-test-feedback-plain" style={{ marginBottom: "0.5rem" }}>
+                                Extra word penalty: -{section.penalty}
+                              </div>
+                            ) : null}
+                            <div className="hub-course-test-feedback-attempt-list" style={{ marginTop: 0 }}>
+                              {section.reviewItems.map(({ item, answer, autoCorrect, assignedScore }, index) => (
+                                <div
+                                  key={`${section.id}:${item.id || index}`}
+                                  className={`hub-course-test-feedback-attempt ${assignedScore >= 1 ? "is-correct" : assignedScore > 0 ? "is-partial" : "is-wrong"}`}
+                                  style={{ padding: "0.7rem 0.8rem" }}
+                                >
+                                  <div className="hub-course-test-feedback-attempt-head">
+                                    <span className="hub-course-test-feedback-attempt-label">{item.prompt}</span>
+                                    <span className={`hub-course-test-feedback-attempt-chip ${assignedScore >= 1 ? "is-correct" : assignedScore > 0 ? "is-partial" : "is-wrong"}`}>
+                                      {assignedScore >= 1 ? "Correct" : assignedScore > 0 ? "Partial" : "Wrong"}
+                                    </span>
+                                  </div>
+                                  <div className="hub-course-test-feedback-attempt-body">
+                                    <div>
+                                      <span className="panel-label">Your answer</span>
+                                      <p>{formatCourseTestAnswer(item, answer)}</p>
+                                    </div>
+                                    <div>
+                                      <span className="panel-label">Answer key</span>
+                                      <p>{formatCourseTestKey(item)}</p>
+                                    </div>
+                                    <div>
+                                      <span className="panel-label">Auto-check</span>
+                                      <p>{autoCorrect ? "Correct" : "Wrong / needs review"}</p>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
       </div>
 
       <HubCourseTestRunnerStyles />
@@ -2818,6 +3045,10 @@ function HubCourseTestRunnerStyles() {
         margin: 0.15rem 0 0;
         color: #cfe0fb;
         font-size: 1rem;
+      }
+
+      .hub-course-test-report-actions {
+        margin-top: 0.65rem;
       }
 
       .hub-course-test-report-breakdown {
@@ -3816,6 +4047,118 @@ function HubCourseTestRunnerStyles() {
         gap: 0.85rem;
       }
 
+      .hub-course-test-feedback-modal {
+        width: min(900px, calc(100vw - 2rem));
+        max-height: min(88vh, 920px);
+      }
+
+      .hub-course-test-feedback-body {
+        display: grid;
+        gap: 0.9rem;
+      }
+
+      .hub-course-test-feedback-block {
+        background: rgba(11, 18, 37, 0.62);
+        border: 1px solid rgba(108, 136, 199, 0.18);
+        border-radius: 16px;
+        padding: 1rem;
+      }
+
+      .hub-course-test-feedback-answer + .hub-course-test-feedback-answer {
+        margin-top: 0.9rem;
+        padding-top: 0.9rem;
+        border-top: 1px solid rgba(108, 136, 199, 0.18);
+      }
+
+      .hub-course-test-feedback-answer strong {
+        display: block;
+        color: #eef4ff;
+        margin-bottom: 0.4rem;
+      }
+
+      .hub-course-test-feedback-plain {
+        color: rgba(230, 240, 255, 0.92);
+        line-height: 1.6;
+        white-space: pre-wrap;
+      }
+
+      .hub-course-test-feedback-attempt-list {
+        display: grid;
+        gap: 0.75rem;
+        margin-top: 0.35rem;
+      }
+
+      .hub-course-test-feedback-attempt {
+        border-radius: 14px;
+        border: 1px solid rgba(108, 136, 199, 0.18);
+        background: rgba(255, 255, 255, 0.02);
+        padding: 0.85rem 0.9rem;
+      }
+
+      .hub-course-test-feedback-attempt.is-correct {
+        border-color: rgba(34, 197, 94, 0.25);
+        background: rgba(11, 45, 28, 0.24);
+      }
+
+      .hub-course-test-feedback-attempt.is-partial {
+        border-color: rgba(245, 158, 11, 0.28);
+        background: rgba(73, 48, 8, 0.24);
+      }
+
+      .hub-course-test-feedback-attempt.is-wrong {
+        border-color: rgba(249, 115, 22, 0.25);
+        background: rgba(58, 29, 8, 0.22);
+      }
+
+      .hub-course-test-feedback-attempt-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.8rem;
+        margin-bottom: 0.55rem;
+      }
+
+      .hub-course-test-feedback-attempt-label {
+        color: #eef4ff;
+        font-weight: 700;
+        line-height: 1.45;
+      }
+
+      .hub-course-test-feedback-attempt-chip {
+        flex: 0 0 auto;
+        border-radius: 999px;
+        padding: 0.25rem 0.6rem;
+        font-size: 0.75rem;
+        font-weight: 800;
+      }
+
+      .hub-course-test-feedback-attempt-chip.is-correct {
+        background: rgba(34, 197, 94, 0.18);
+        color: #bdf7cf;
+      }
+
+      .hub-course-test-feedback-attempt-chip.is-partial {
+        background: rgba(245, 158, 11, 0.18);
+        color: #fde68a;
+      }
+
+      .hub-course-test-feedback-attempt-chip.is-wrong {
+        background: rgba(249, 115, 22, 0.16);
+        color: #fed7aa;
+      }
+
+      .hub-course-test-feedback-attempt-body {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.8rem;
+      }
+
+      .hub-course-test-feedback-attempt-body p {
+        margin: 0;
+        color: rgba(230, 240, 255, 0.92);
+        line-height: 1.5;
+      }
+
       .hub-course-test-nav-btn,
       .hub-course-test-listening-card,
       .hub-course-test-summary-card,
@@ -4116,6 +4459,10 @@ function HubCourseTestRunnerStyles() {
       }
 
       @media (max-width: 640px) {
+        .hub-course-test-feedback-attempt-body {
+          grid-template-columns: 1fr;
+        }
+
         .hub-course-test-drag-grid {
           grid-template-columns: 1fr;
         }
