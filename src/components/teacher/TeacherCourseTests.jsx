@@ -349,6 +349,40 @@ function getListeningPhaseLabel(phase = "", sectionIndex = 0, totalSections = 0)
   return `${position} · ready`;
 }
 
+function getSkillLabel(skill = "") {
+  if (skill === "grammar") return "Grammar";
+  if (skill === "vocabulary") return "Vocabulary";
+  if (skill === "pronunciation") return "Pronunciation";
+  if (skill === "practical-english") return "Practical English";
+  if (skill === "reading") return "Reading";
+  if (skill === "listening") return "Listening";
+  return skill || "Section";
+}
+
+function buildSkillTotals(reviewRows = [], reviewScores = {}) {
+  const orderedSkills = ["grammar", "vocabulary", "pronunciation", "reading", "listening"];
+  const totals = new Map(
+    orderedSkills.map((skill) => [skill, { skill, label: getSkillLabel(skill), score: 0, total: 0 }])
+  );
+
+  reviewRows.forEach((section) => {
+    const skill = section.skill || section.id;
+    if (!totals.has(skill)) {
+      totals.set(skill, { skill, label: getSkillLabel(skill), score: 0, total: 0 });
+    }
+
+    const entry = totals.get(skill);
+    section.reviewItems.forEach(({ key, autoScore }) => {
+      entry.score += Number(reviewScores[key] ?? Number(autoScore || 0));
+      entry.total += 1;
+    });
+    entry.score -= Number(section.penalty || 0);
+    entry.score = Math.max(0, entry.score);
+  });
+
+  return Array.from(totals.values()).filter((entry) => entry.total > 0 || orderedSkills.includes(entry.skill));
+}
+
 function getAttemptMonitorEntry(attempt, session, template, nowMs) {
   const runnerState = attempt?.runnerState || {};
   const mainStartedAtMs = timestampToMs(runnerState.mainPaperStartedAt || attempt?.startedAt);
@@ -810,6 +844,10 @@ export default function TeacherCourseTests({ user }) {
 
     return { score: Math.max(0, score), total };
   }, [selectedAttemptReviewRows, reviewScores]);
+  const reviewSkillTotals = useMemo(
+    () => buildSkillTotals(selectedAttemptReviewRows, reviewScores),
+    [selectedAttemptReviewRows, reviewScores]
+  );
 
   const monitorTemplate = monitorSession?.templateId
     ? getHubCourseTestTemplate(monitorSession.templateId)
@@ -1254,6 +1292,15 @@ export default function TeacherCourseTests({ user }) {
                           {reviewTotals.total ? ` · ${Math.round((reviewTotals.score / reviewTotals.total) * 100)}%` : ""}
                         </p>
                       </div>
+                    </div>
+
+                    <div className="teacher-course-review-skill-totals">
+                      {reviewSkillTotals.map((entry) => (
+                        <div key={entry.skill} className="teacher-course-review-skill-card">
+                          <span className="panel-label">{entry.label}</span>
+                          <p>{entry.score}/{entry.total}</p>
+                        </div>
+                      ))}
                     </div>
 
                     <div className="teacher-course-review-sections">
@@ -1788,6 +1835,25 @@ export default function TeacherCourseTests({ user }) {
           gap: 0.8rem;
         }
 
+        .teacher-course-review-skill-totals {
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 0.8rem;
+        }
+
+        .teacher-course-review-skill-card {
+          border: 1px solid rgba(44, 75, 131, 0.55);
+          border-radius: 12px;
+          background: rgba(10, 20, 41, 0.9);
+          padding: 0.8rem;
+        }
+
+        .teacher-course-review-skill-card p {
+          margin: 0.25rem 0 0;
+          color: #eef4ff;
+          font-weight: 700;
+        }
+
         .teacher-course-review-summary p,
         .teacher-course-review-item-grid p {
           margin: 0.2rem 0 0;
@@ -1895,6 +1961,7 @@ export default function TeacherCourseTests({ user }) {
           .teacher-course-session-meta,
           .teacher-course-review-grid,
           .teacher-course-review-summary,
+          .teacher-course-review-skill-totals,
           .teacher-course-review-item-grid,
           .teacher-course-preview-item {
             grid-template-columns: 1fr;

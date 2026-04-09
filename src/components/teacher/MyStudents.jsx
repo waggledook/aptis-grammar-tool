@@ -510,6 +510,28 @@ function buildCourseTestSectionBreakdown(template, attempt) {
   return Array.from(bySkill.values());
 }
 
+function buildCourseTestSkillSummaryRows(template, attempt) {
+  const orderedSkills = ["grammar", "vocabulary", "pronunciation", "reading", "listening"];
+  const breakdown = buildCourseTestSectionBreakdown(template, attempt);
+  const bySkill = new Map(breakdown.map((entry) => [entry.skill, entry]));
+
+  return orderedSkills.map((skill) => ({
+    skill,
+    label:
+      skill === "grammar"
+        ? "Grammar"
+        : skill === "vocabulary"
+          ? "Vocabulary"
+          : skill === "pronunciation"
+            ? "Pronunciation"
+            : skill === "reading"
+              ? "Reading"
+              : "Listening",
+    score: bySkill.get(skill)?.score ?? 0,
+    total: bySkill.get(skill)?.total ?? 0,
+  }));
+}
+
 export default function MyStudents({ user }) {
   const navigate = useNavigate();
   const latestReadMapRef = useRef({});
@@ -1573,6 +1595,15 @@ async function copySelectedSubmission() {
                     </div>
                   </div>
 
+                  <div className="teacher-review-skill-summary">
+                    {buildCourseTestSkillSummaryRows(selectedNotification.template, selectedNotification.attempt).map((row) => (
+                      <div key={row.skill} className="teacher-review-skill-card">
+                        <span className="panel-label">{row.label}</span>
+                        <p>{row.score}/{row.total}</p>
+                      </div>
+                    ))}
+                  </div>
+
                   {buildCourseTestSectionBreakdown(selectedNotification.template, selectedNotification.attempt).map((group) => (
                     <div key={group.skill} className="teacher-review-answer">
                       <strong>
@@ -1925,6 +1956,25 @@ async function copySelectedSubmission() {
           margin-bottom: 0.4rem;
         }
 
+        .teacher-review-skill-summary {
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 0.75rem;
+        }
+
+        .teacher-review-skill-card {
+          border-radius: 14px;
+          border: 1px solid rgba(108, 136, 199, 0.18);
+          background: rgba(255, 255, 255, 0.02);
+          padding: 0.8rem 0.85rem;
+        }
+
+        .teacher-review-skill-card p {
+          margin: 0.25rem 0 0;
+          color: rgba(230, 240, 255, 0.92);
+          font-weight: 700;
+        }
+
         .teacher-review-plain {
           color: rgba(230, 240, 255, 0.92);
           line-height: 1.6;
@@ -2245,6 +2295,7 @@ async function copySelectedSubmission() {
             align-items: stretch;
           }
 
+          .teacher-review-skill-summary,
           .teacher-review-attempt-body {
             grid-template-columns: 1fr;
           }

@@ -405,6 +405,7 @@ export default function HubGrammarActivityRunner() {
         const rawAnswer = answers[item.id];
         const selectedIndex =
           rawAnswer === "" || rawAnswer == null ? null : Number(rawAnswer);
+        const hasAnswer = selectedIndex != null && selectedIndex >= 0;
         const isCorrect = selectedIndex === item.answerIndex;
 
         return {
@@ -414,6 +415,7 @@ export default function HubGrammarActivityRunner() {
           question: item.question,
           options: item.options,
           answer: selectedIndex,
+          hasAnswer,
           selectedOption:
             selectedIndex != null && selectedIndex >= 0 ? item.options[selectedIndex] : "",
           correctOption: item.options[item.answerIndex],
@@ -456,6 +458,7 @@ export default function HubGrammarActivityRunner() {
           sentence: item.sentence,
           highlighted: item.highlighted,
           answer: selectedValue,
+          hasAnswer,
           correctionAnswer: correctionText,
           selectedLabel:
             selectedValue === "correct"
@@ -776,6 +779,12 @@ export default function HubGrammarActivityRunner() {
 	                        <strong>{item.originalSentence}</strong>
 	                      </p>
 	                    ) : null}
+                      {item.keyWord ? (
+                        <div className="hub-grammar-keyline">
+                          <span className="hub-grammar-keylabel">Key word</span>
+                          <strong>{String(item.keyWord).toUpperCase()}</strong>
+                        </div>
+                      ) : null}
 	                    <label className="hub-grammar-sentence">
 	                      {renderSentence(
 	                        item,
@@ -796,7 +805,13 @@ export default function HubGrammarActivityRunner() {
                       <div
                         className={`hub-grammar-feedback ${evaluatedItem.isCorrect ? "is-correct" : "is-wrong"}`}
                       >
-                        <strong>{evaluatedItem.isCorrect ? "Correct" : "Try again"}</strong>
+                        <strong>
+                          {evaluatedItem.isCorrect
+                            ? "Correct"
+                            : evaluatedItem.hasAnswer
+                              ? "Try again"
+                              : "Not answered"}
+                        </strong>
                         {!evaluatedItem.isCorrect ? (
                           <p>Correct answer: {evaluatedItem.correctOption}</p>
                         ) : null}
@@ -806,7 +821,13 @@ export default function HubGrammarActivityRunner() {
                       <div
                         className={`hub-grammar-feedback ${evaluatedItem.isCorrect ? "is-correct" : "is-wrong"}`}
                       >
-                        <strong>{evaluatedItem.isCorrect ? "Correct" : "Try again"}</strong>
+                        <strong>
+                          {evaluatedItem.isCorrect
+                            ? "Correct"
+                            : evaluatedItem.hasAnswer
+                              ? "Try again"
+                              : "Not answered"}
+                        </strong>
                         {!evaluatedItem.isCorrect ? (
                           <p>
                             Correct answer: {evaluatedItem.expectedLabel}
@@ -999,6 +1020,29 @@ export default function HubGrammarActivityRunner() {
           margin: 0 0 0.75rem;
           color: #eef4ff;
           line-height: 1.55;
+        }
+
+        .hub-grammar-keyline {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.55rem;
+          margin: 0 0 0.75rem;
+          padding: 0.45rem 0.7rem;
+          border-radius: 999px;
+          background: rgba(253, 191, 45, 0.12);
+          border: 1px solid rgba(253, 191, 45, 0.24);
+        }
+
+        .hub-grammar-keylabel {
+          font-size: 0.78rem;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: #f8d98b;
+        }
+
+        .hub-grammar-keyline strong {
+          color: #fff2bf;
+          letter-spacing: 0.08em;
         }
 
         .hub-grammar-gap {

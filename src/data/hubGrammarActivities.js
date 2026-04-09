@@ -48,7 +48,8 @@ const placeholderGapItem = (
   sentence,
   answer,
   alternatives = [],
-  explanation
+  explanation,
+  extra = {}
 ) => {
   const marker = "__________";
   const index = String(sentence || "").indexOf(marker);
@@ -60,7 +61,8 @@ const placeholderGapItem = (
     prompt,
     [before, { gapId: "g1" }, after],
     [answer, ...alternatives],
-    explanation
+    explanation,
+    extra
   );
 };
 
@@ -4143,6 +4145,246 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "None",
         ["none"],
         "Use 'none' in short answers when there is zero quantity."
+      ),
+    ],
+  },
+  {
+    id: "contrast-and-purpose",
+    title: "Contrast and Purpose",
+    shortDescription:
+      "Practise contrast linkers and purpose structures through multiple choice, error correction, and reformulation.",
+    levels: ["b2"],
+    intro:
+      "Work on despite, although, in spite of, to, for, so that, and negative purpose forms in a mixed mini test.",
+    items: [
+      multipleChoiceItem(
+        "da-mc-1",
+        "Choose the correct option.",
+        "__________ the rain, we still went for a walk.",
+        ["Despite", "Although"],
+        0,
+        "Use 'despite' before a noun phrase: 'despite the rain'."
+      ),
+      multipleChoiceItem(
+        "da-mc-2",
+        "Choose the correct option.",
+        "__________ she was feeling ill, she went to work.",
+        ["Despite", "Although"],
+        1,
+        "Use 'although' before a full clause: 'although she was feeling ill'."
+      ),
+      multipleChoiceItem(
+        "da-mc-3",
+        "Choose the correct option.",
+        "__________ being very tired, he finished the report.",
+        ["Despite", "Although"],
+        0,
+        "Use 'despite' before a gerund: 'despite being very tired'."
+      ),
+      multipleChoiceItem(
+        "da-mc-4",
+        "Choose the correct option.",
+        "__________ the hotel was expensive, we decided to stay there.",
+        ["Despite", "Although"],
+        1,
+        "Use 'although' before a clause with subject + verb."
+      ),
+      multipleChoiceItem(
+        "da-mc-5",
+        "Choose the correct option.",
+        "__________ the fact that it was late, nobody wanted to go home.",
+        ["Despite", "Although"],
+        0,
+        "Use 'despite the fact that...' as a fixed expression."
+      ),
+      multipleChoiceItem(
+        "da-mc-6",
+        "Choose the correct option.",
+        "__________ I don't usually like horror films, I enjoyed this one.",
+        ["Despite", "Although"],
+        1,
+        "Use 'although' before a full clause."
+      ),
+      multipleChoiceItem(
+        "pc-mc-1",
+        "Choose the correct option.",
+        "I left home early ____ catch the first train.",
+        ["to", "for", "so that"],
+        0,
+        "Use 'to' + infinitive to express purpose when the subject stays the same."
+      ),
+      multipleChoiceItem(
+        "pc-mc-2",
+        "Choose the correct option.",
+        "She wrote the instructions down ____ she wouldn't forget them.",
+        ["to", "for", "so that"],
+        2,
+        "Use 'so that' when there is a subject + modal verb in the purpose clause."
+      ),
+      multipleChoiceItem(
+        "pc-mc-3",
+        "Choose the correct option.",
+        "We stopped at a cafe ____ a quick coffee before the meeting.",
+        ["for", "to", "so as"],
+        0,
+        "Use 'for' before a noun phrase: 'for a quick coffee'."
+      ),
+      multipleChoiceItem(
+        "pc-mc-4",
+        "Choose the correct option.",
+        "He turned the TV down ____ wake the baby.",
+        ["so that", "in order not to", "for"],
+        1,
+        "Use 'in order not to' + infinitive for negative purpose."
+      ),
+      multipleChoiceItem(
+        "pc-mc-5",
+        "Choose the correct option.",
+        "I'm saving money ____ buy a new laptop this summer.",
+        ["for", "to", "so that"],
+        1,
+        "Use 'to' + infinitive to express purpose."
+      ),
+      multipleChoiceItem(
+        "pc-mc-6",
+        "Choose the correct option.",
+        "They bought a bigger car ____ the children would have more space.",
+        ["to", "so that", "for"],
+        1,
+        "Use 'so that' when the purpose clause has a different subject."
+      ),
+      multipleChoiceItem(
+        "pc-mc-7",
+        "Choose the correct option.",
+        "This brush is ____ cleaning bottles.",
+        ["to", "for", "so that"],
+        1,
+        "Use 'for' + gerund to describe the purpose or function of an object."
+      ),
+      multipleChoiceItem(
+        "pc-mc-8",
+        "Choose the correct option.",
+        "We used a map ____ get lost in the old town.",
+        ["for not", "so as not to", "so that not"],
+        1,
+        "Use 'so as not to' + infinitive for negative purpose."
+      ),
+      errorCorrectionItem(
+        "cp-ec-1",
+        "Check the highlighted phrase for errors.",
+        "Despite of the bad weather, we went hiking anyway.",
+        "Despite of",
+        false,
+        ["Despite", "In spite of"],
+        "Use 'despite' without 'of', or use 'in spite of': 'despite the bad weather' / 'in spite of the bad weather'."
+      ),
+      errorCorrectionItem(
+        "cp-ec-2",
+        "Check the highlighted phrase for errors.",
+        "Although being very tired, she stayed up to finish the report.",
+        "Although being",
+        false,
+        ["Despite being", "In spite of being", "Although she was"],
+        "Use 'despite' / 'in spite of' before a noun or gerund, or change it to a full clause with 'although she was'."
+      ),
+      errorCorrectionItem(
+        "cp-ec-3",
+        "Check the highlighted phrase for errors.",
+        "We left early so that avoid the traffic.",
+        "so that avoid",
+        false,
+        ["to avoid", "in order to avoid", "so as to avoid"],
+        "Use 'to' / 'in order to' / 'so as to' + infinitive when the subject stays the same. 'So that' needs a subject and verb."
+      ),
+      errorCorrectionItem(
+        "cp-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I wrote her address down in order not forgetting it.",
+        "in order not forgetting",
+        false,
+        "in order not to forget",
+        "Use 'in order not to' + infinitive for negative purpose."
+      ),
+      errorCorrectionItem(
+        "cp-ec-5",
+        "Check the highlighted phrase for errors.",
+        "In spite of the fact that he was nervous, he gave a very good presentation.",
+        "In spite of the fact that",
+        true,
+        "",
+        "This is correct. 'In spite of the fact that...' is a correct contrast structure."
+      ),
+      errorCorrectionItem(
+        "cp-ec-6",
+        "Check the highlighted phrase for errors.",
+        "She took a notebook for write down the key points.",
+        "for write down",
+        false,
+        "to write down",
+        "Use 'to' + infinitive to express purpose. 'For' is followed by a noun or gerund, not an infinitive."
+      ),
+      errorCorrectionItem(
+        "cp-ec-7",
+        "Check the highlighted phrase for errors.",
+        "He spoke quietly so as not to wake the baby.",
+        "so as not to wake",
+        true,
+        "",
+        "This is correct. 'So as not to' is a correct form for negative purpose."
+      ),
+      placeholderGapItem(
+        "cp-rf-1",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Although it was raining, we went for a walk.\nDespite __________, we went for a walk.",
+        "the rain",
+        [],
+        "Use 'despite' before a noun phrase here. The target structure is 'despite the rain'.",
+        { keyWord: "despite" }
+      ),
+      placeholderGapItem(
+        "cp-rf-2",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Despite being very tired, she finished the essay.\nAlthough __________, she finished the essay.",
+        "she was very tired",
+        [],
+        "Use 'although' before a full clause with subject + verb.",
+        { keyWord: "tired" }
+      ),
+      placeholderGapItem(
+        "cp-rf-3",
+        "Complete the second sentence so that it has a similar meaning.",
+        "I'm leaving early so that I won't miss the bus.\nI'm leaving early __________ miss the bus.",
+        "in order not to",
+        ["so as not to"],
+        "Use a negative purpose form: 'in order not to' or 'so as not to' + infinitive.",
+        { keyWord: "to" }
+      ),
+      placeholderGapItem(
+        "cp-rf-4",
+        "Complete the second sentence so that it has a similar meaning.",
+        "He went to the bank to get some cash.\nHe went to the bank __________ some cash.",
+        "so as to get",
+        [],
+        "Use 'so as to' + infinitive to express purpose here.",
+        { keyWord: "as" }
+      ),
+      placeholderGapItem(
+        "cp-rf-5",
+        "Complete the second sentence so that it has a similar meaning.",
+        "She wore a coat because she didn't want to get cold.\nShe wore a coat __________ get cold.",
+        "so as not to",
+        ["in order not to"],
+        "Use a negative purpose form such as 'so as not to' or 'in order not to' + infinitive.",
+        { keyWord: "not" }
+      ),
+      placeholderGapItem(
+        "cp-rf-6",
+        "Complete the second sentence so that it has a similar meaning.",
+        "Although he had very little experience, he got the job.\nIn spite of __________, he got the job.",
+        "his lack of experience",
+        [],
+        "Use the noun phrase 'his lack of experience' after 'in spite of'.",
+        { keyWord: "lack" }
       ),
     ],
   },
