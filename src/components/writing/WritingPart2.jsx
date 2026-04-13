@@ -1,8 +1,11 @@
 // src/components/writing/WritingPart2.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import * as fb from "../../firebase";
 import { toast } from "../../utils/toast";
 import RichTextExamEditor from "../common/RichTextExamEditor";
+import WritingAssignButton from "./WritingAssignButton";
+import { getSitePath } from "../../siteConfig.js";
 
 /**
  * Aptis Writing – Part 2 (short form, 20–30 words)
@@ -70,6 +73,7 @@ const TASKS = [
 ];
 
 export default function WritingPart2({ user, onRequireSignIn }) {
+  const [searchParams] = useSearchParams();
   const [taskIndex, setTaskIndex] = useState(0);
   const current = TASKS[taskIndex] || TASKS[0];
 
@@ -88,6 +92,16 @@ export default function WritingPart2({ user, onRequireSignIn }) {
 
   // decorate tasks with lock info + numbered titles
   const decoratedTasks = useMemo(() => decorateTasks(TASKS, user), [user]);
+
+  useEffect(() => {
+    const requestedTaskId = searchParams.get("task");
+    if (!requestedTaskId) return;
+
+    const nextIdx = TASKS.findIndex((task) => task.id === requestedTaskId);
+    if (nextIdx === -1) return;
+    if (!user && nextIdx >= 2) return;
+    setTaskIndex(nextIdx);
+  }, [searchParams, user]);
 
   // reset editor when task changes
   useEffect(() => {
@@ -243,6 +257,14 @@ export default function WritingPart2({ user, onRequireSignIn }) {
             value={taskIndex}
             onChange={handleSelectTask}
             label="Task"
+          />
+          <WritingAssignButton
+            user={user}
+            activityId="writing-part-2"
+            activityLabel={`Aptis Writing Part 2 — ${current.title}`}
+            routePath={getSitePath(`/writing/part2?task=${encodeURIComponent(current.id)}`)}
+            taskId={current.id}
+            taskTitle={current.title}
           />
         </div>
       </header>

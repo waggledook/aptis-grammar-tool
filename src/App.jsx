@@ -158,6 +158,16 @@ function buildLatestMap(items, keyName) {
   }, {});
 }
 
+function buildLatestWritingTaskMap(items = []) {
+  return (items || []).reduce((acc, item) => {
+    const key = item?.taskId;
+    if (!key) return acc;
+    const nextTime = timestampToMs(item.createdAt || item.updatedAt || item.submittedAt || item.startedAt);
+    if (!acc[key] || nextTime > acc[key]) acc[key] = nextTime;
+    return acc;
+  }, {});
+}
+
 function getWritingBucket(type) {
   if (type === "writing-part-1") return "p1";
   if (type === "writing-part-2") return "p2";
@@ -373,6 +383,9 @@ useEffect(() => {
           p2: Math.max(0, ...(p2 || []).map((entry) => timestampToMs(entry.createdAt))),
           p3: Math.max(0, ...(p3 || []).map((entry) => timestampToMs(entry.createdAt))),
           p4: Math.max(0, ...(p4 || []).map((entry) => timestampToMs(entry.createdAt))),
+          p2ByTask: buildLatestWritingTaskMap(p2 || []),
+          p3ByTask: buildLatestWritingTaskMap(p3 || []),
+          p4ByTask: buildLatestWritingTaskMap(p4 || []),
         },
       };
 
@@ -386,7 +399,11 @@ useEffect(() => {
         }
         if (assignment.activityType === "writing") {
           const bucket = getWritingBucket(assignment.activityId);
-          return (completionSources.writing?.[bucket] || 0) < assignedAt;
+          const taskMap = completionSources.writing?.[`${bucket}ByTask`] || {};
+          const completedAt = assignment?.taskId
+            ? taskMap?.[assignment.taskId] || 0
+            : completionSources.writing?.[bucket] || 0;
+          return completedAt < assignedAt;
         }
         return true;
       }).length;

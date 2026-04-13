@@ -220,7 +220,7 @@ export default function HubDictationTrainer() {
   const latestHistoryRef = useRef([]);
   const roundOverRef = useRef(false);
 
-  const [mode, setMode] = useState("game");
+  const [mode, setMode] = useState("training");
   const [selectedSetId, setSelectedSetId] = useState(HUB_DICTATION_ALL_SET_ID);
   const [trainingSentenceCount, setTrainingSentenceCount] = useState(5);
   const [playbackRate, setPlaybackRate] = useState(1);
@@ -491,6 +491,19 @@ export default function HubDictationTrainer() {
     setNextEnabled(true);
   }
 
+  function revealAnswer() {
+    if (!isTrainingMode || currentIndex < 0 || roundOver || !currentRoundEntry) return;
+
+    const sentenceConfig = activeSentences[getSentenceIndex()];
+    setFeedbackHtml(renderCorrectSentence(sentenceConfig.text));
+    setStatusText("Answer revealed");
+    setMessage({
+      tone: "info",
+      text: "Answer revealed. Replay it if you want, then move on when you're ready.",
+    });
+    setNextEnabled(true);
+  }
+
   function startGame() {
     stopTimers();
     stopAudio();
@@ -557,6 +570,12 @@ export default function HubDictationTrainer() {
       stopAudio();
     };
   }, []);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.playbackRate = playbackRate;
+    }
+  }, [playbackRate]);
 
   useEffect(() => {
     if (!gameStarted || roundOver || isTrainingMode) return;
@@ -632,15 +651,17 @@ export default function HubDictationTrainer() {
                   <input
                     id="modeToggle"
                     type="checkbox"
-                    checked={isTrainingMode}
-                    onChange={(event) => setMode(event.target.checked ? "training" : "game")}
+                    checked={!isTrainingMode}
+                    onChange={(event) => setMode(event.target.checked ? "game" : "training")}
                     disabled={gameStarted}
                   />
                   <span className="slider" />
                 </label>
                 <div className="mode-toggle-text">
                   <div className="mode-toggle-label">{isTrainingMode ? "Training mode" : "Game mode"}</div>
-                  <div className="mode-toggle-value">Switch on for training</div>
+                  <div className="mode-toggle-value">
+                    {isTrainingMode ? "Switch on for game mode" : "Switch off for training mode"}
+                  </div>
                 </div>
               </div>
             </div>
@@ -689,7 +710,6 @@ export default function HubDictationTrainer() {
                     step="0.05"
                     value={playbackRate}
                     onChange={(event) => setPlaybackRate(Number(event.target.value))}
-                    disabled={gameStarted}
                   />
                   <div className="help">{Math.round(playbackRate * 100)}%</div>
                 </div>
@@ -733,6 +753,11 @@ export default function HubDictationTrainer() {
                 <button onClick={() => playAudioFromPath(activeSentences[getSentenceIndex()].audio)}>
                   ↻ Replay
                 </button>
+                {isTrainingMode && (
+                  <button onClick={revealAnswer}>
+                    Show answer
+                  </button>
+                )}
                 <button className="warn" onClick={() => nextSentence()} disabled={!nextEnabled}>
                   Next sentence
                 </button>

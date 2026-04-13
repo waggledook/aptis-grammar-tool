@@ -1,8 +1,11 @@
 // src/components/writing/WritingPart3.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import * as fb from "../../firebase";
 import { toast } from "../../utils/toast";
 import RichTextExamEditor from "../common/RichTextExamEditor";
+import WritingAssignButton from "./WritingAssignButton";
+import { getSitePath } from "../../siteConfig.js";
 
 /**
  * Aptis Writing – Part 3 (three short responses, 30–40 words each)
@@ -178,6 +181,7 @@ const TASKS = [
   ];
 
 export default function WritingPart3({ user, onRequireSignIn }) {
+  const [searchParams] = useSearchParams();
   const [taskIndex, setTaskIndex] = useState(0);
   const current = TASKS[taskIndex] || TASKS[0];
 
@@ -200,6 +204,16 @@ export default function WritingPart3({ user, onRequireSignIn }) {
     setAnswersText(["", "", ""]);
     setShowSummary(false);
   }, [current.id]);
+
+  useEffect(() => {
+    const requestedTaskId = searchParams.get("task");
+    if (!requestedTaskId) return;
+
+    const nextIdx = TASKS.findIndex((task) => task.id === requestedTaskId);
+    if (nextIdx === -1) return;
+    if (!user && nextIdx >= 2) return;
+    setTaskIndex(nextIdx);
+  }, [searchParams, user]);
 
   function handleSelectTask(nextIdx) {
     if (!user && nextIdx >= 2) {
@@ -350,12 +364,22 @@ export default function WritingPart3({ user, onRequireSignIn }) {
             <strong>30–40 words</strong> each.
           </p>
         </div>
-        <ChipDropdown
-          items={decorated}
-          value={taskIndex}
-          onChange={handleSelectTask}
-          label="Task"
-        />
+        <div className="actions">
+          <ChipDropdown
+            items={decorated}
+            value={taskIndex}
+            onChange={handleSelectTask}
+            label="Task"
+          />
+          <WritingAssignButton
+            user={user}
+            activityId="writing-part-3"
+            activityLabel={`Aptis Writing Part 3 — ${current.title}`}
+            routePath={getSitePath(`/writing/part3?task=${encodeURIComponent(current.id)}`)}
+            taskId={current.id}
+            taskTitle={current.title}
+          />
+        </div>
       </header>
 
       <div className="grid">

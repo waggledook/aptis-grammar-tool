@@ -1,8 +1,11 @@
 // src/components/writing/WritingPart4Emails.jsx
 import React, { useEffect, useMemo, useState, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
 import * as fb from "../../firebase";
 import { toast } from "../../utils/toast";
 import RichTextExamEditor from "../common/RichTextExamEditor";
+import WritingAssignButton from "./WritingAssignButton";
+import { getSitePath } from "../../siteConfig.js";
 
 /**
  * Aptis Writing – Part 4 (two emails: informal ~50w, formal 120–150w)
@@ -129,6 +132,7 @@ const TASKS = [
   
 
 export default function WritingPart4Emails({ user, onRequireSignIn }) {
+  const [searchParams] = useSearchParams();
   // lock tasks 3+ if signed out
   const [taskIndex, setTaskIndex] = useState(0);
   const current = TASKS[taskIndex] || TASKS[0];
@@ -232,6 +236,16 @@ function handleDownload() {
     setFormalText("");
   }, [current.id]);
 
+  useEffect(() => {
+    const requestedTaskId = searchParams.get("task");
+    if (!requestedTaskId) return;
+
+    const nextIdx = TASKS.findIndex((task) => task.id === requestedTaskId);
+    if (nextIdx === -1) return;
+    if (!user && nextIdx >= 2) return;
+    setTaskIndex(nextIdx);
+  }, [searchParams, user]);
+
   function handleSelectTask(nextIdx) {
     if (!user && nextIdx >= 2) {
       onRequireSignIn?.();
@@ -294,6 +308,14 @@ function handleDownload() {
             value={taskIndex}
             onChange={handleSelectTask}
             label="Task"
+          />
+          <WritingAssignButton
+            user={user}
+            activityId="writing-part-4"
+            activityLabel={`Aptis Writing Part 4 — ${current.title}`}
+            routePath={getSitePath(`/writing/part4?task=${encodeURIComponent(current.id)}`)}
+            taskId={current.id}
+            taskTitle={current.title}
           />
         </div>
       </header>

@@ -22,6 +22,16 @@ const WRITING_OPTIONS = [
   { id: "writing-part-4", label: "Aptis Writing Part 4", routePath: getSitePath("/writing/part4") },
 ];
 
+const WRITING_TASKS = [
+  { id: "sports-fee", label: "Sports Club" },
+  { id: "debate-club", label: "Debate Club" },
+  { id: "volunteer-change", label: "Volunteer Group" },
+  { id: "travel-club", label: "Travel Club" },
+  { id: "ebook-switch", label: "Book Club" },
+  { id: "book-exchange", label: "Book Exchange Website" },
+  { id: "film-club", label: "Film Club" },
+];
+
 function formatDateTime(value) {
   if (!value) return "—";
   const date = typeof value?.toDate === "function" ? value.toDate() : new Date(value);
@@ -94,6 +104,16 @@ function buildLatestTimeMap(items, keyName) {
   }, {});
 }
 
+function buildLatestWritingTaskMap(items = []) {
+  return (items || []).reduce((acc, item) => {
+    const key = item?.taskId;
+    if (!key) return acc;
+    const nextTime = timestampToMs(item.createdAt || item.updatedAt || item.submittedAt || item.startedAt);
+    if (!acc[key] || nextTime > acc[key]) acc[key] = nextTime;
+    return acc;
+  }, {});
+}
+
 function resolveAssignmentCompletion(assignment, sources) {
   const assignedAt = timestampToMs(assignment?.createdAt);
   if (assignment?.activityType === "mini-test") {
@@ -108,7 +128,10 @@ function resolveAssignmentCompletion(assignment, sources) {
 
   if (assignment?.activityType === "writing") {
     const bucket = getWritingBucket(assignment.activityId);
-    const completedAt = sources.writing?.[bucket] || 0;
+    const taskMap = sources.writing?.[`${bucket}ByTask`] || {};
+    const completedAt = assignment?.taskId
+      ? taskMap?.[assignment.taskId] || 0
+      : sources.writing?.[bucket] || 0;
     return { completed: completedAt >= assignedAt, completedAt };
   }
 
@@ -123,6 +146,11 @@ function getActivityRoute({ activityType, activityId, routePath }) {
   return getSitePath("/");
 }
 
+function buildWritingRoutePath(baseRoutePath, taskId) {
+  if (!baseRoutePath || !taskId) return baseRoutePath;
+  return `${baseRoutePath}?task=${encodeURIComponent(taskId)}`;
+}
+
 export default function TeacherAssignedActivities({ user }) {
   const [students, setStudents] = useState([]);
   const [grammarSets, setGrammarSets] = useState([]);
@@ -131,6 +159,7 @@ export default function TeacherAssignedActivities({ user }) {
   const [saving, setSaving] = useState(false);
   const [activityType, setActivityType] = useState("mini-test");
   const [activityId, setActivityId] = useState("");
+  const [writingTaskId, setWritingTaskId] = useState("");
   const [targetMode, setTargetMode] = useState("all");
   const [className, setClassName] = useState("");
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
@@ -180,6 +209,9 @@ export default function TeacherAssignedActivities({ user }) {
                     p2: Math.max(0, ...(p2 || []).map((entry) => timestampToMs(entry.createdAt))),
                     p3: Math.max(0, ...(p3 || []).map((entry) => timestampToMs(entry.createdAt))),
                     p4: Math.max(0, ...(p4 || []).map((entry) => timestampToMs(entry.createdAt))),
+                    p2ByTask: buildLatestWritingTaskMap(p2 || []),
+                    p3ByTask: buildLatestWritingTaskMap(p3 || []),
+                    p4ByTask: buildLatestWritingTaskMap(p4 || []),
                   },
                 },
               ];
@@ -283,6 +315,12 @@ export default function TeacherAssignedActivities({ user }) {
     return miniTestOptions;
   }, [activityType, miniTestOptions, publishedGrammarSetOptions, useOfEnglishOptions]);
 
+  const currentWritingTaskOptions = useMemo(() => {
+    if (activityType !== "writing") return [];
+    if (!["writing-part-2", "writing-part-3", "writing-part-4"].includes(activityId)) return [];
+    return WRITING_TASKS;
+  }, [activityType, activityId]);
+
   const assignmentsWithProgress = useMemo(() => assignments || [], [assignments]);
 
   useEffect(() => {
@@ -304,6 +342,16 @@ export default function TeacherAssignedActivities({ user }) {
     }
   }, [targetMode]);
 
+  useEffect(() => {
+    if (!currentWritingTaskOptions.length) {
+      setWritingTaskId("");
+      return;
+    }
+
+    const exists = currentWritingTaskOptions.some((option) => option.id === writingTaskId);
+    if (!exists) setWritingTaskId("");
+  }, [currentWritingTaskOptions, writingTaskId]);
+
   function toggleStudent(studentId) {
     setSelectedStudentIds((prev) =>
       prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
@@ -316,6 +364,11 @@ export default function TeacherAssignedActivities({ user }) {
       toast("Choose an activity to assign.");
       return;
     }
+
+    const chosenWritingTask =
+      activityType === "writing" && writingTaskId
+        ? currentWritingTaskOptions.find((option) => option.id === writingTaskId) || null
+        : null;
 
     let targetStudentIds = [];
     if (targetMode === "all") {
@@ -337,18 +390,25 @@ export default function TeacherAssignedActivities({ user }) {
 
     setSaving(true);
     try {
+      const routePath =
+        activityType === "writing"
+          ? buildWritingRoutePath(chosenOption.routePath, chosenWritingTask?.id || "")
+          : getActivityRoute({
+              activityType,
+              activityId: chosenOption.id,
+              routePath: chosenOption.routePath,
+            });
+
       await createAssignedActivity({
         teacherUid: user.uid,
         teacherName: user.displayName || user.name || user.email || "Teacher",
         teacherEmail: user.email || null,
         activityType,
         activityId: chosenOption.id,
-        activityLabel: chosenOption.label,
-        routePath: getActivityRoute({
-          activityType,
-          activityId: chosenOption.id,
-          routePath: chosenOption.routePath,
-        }),
+        activityLabel: chosenWritingTask ? `${chosenOption.label} — ${chosenWritingTask.label}` : chosenOption.label,
+        routePath,
+        taskId: chosenWritingTask?.id || "",
+        taskTitle: chosenWritingTask?.label || "",
         targetMode,
         className: targetMode === "class" ? className : "",
         targetStudentIds,
@@ -358,6 +418,7 @@ export default function TeacherAssignedActivities({ user }) {
       const refreshed = await listAssignedActivitiesForTeacher(user.uid);
       setAssignments(refreshed || []);
       setNotes("");
+      setWritingTaskId("");
       if (targetMode === "selected") setSelectedStudentIds([]);
       toast("Assignment created.");
     } catch (error) {
@@ -417,6 +478,20 @@ export default function TeacherAssignedActivities({ user }) {
                 )}
               </select>
             </label>
+
+            {activityType === "writing" && currentWritingTaskOptions.length ? (
+              <label className="field">
+                <span>Specific task</span>
+                <select value={writingTaskId} onChange={(event) => setWritingTaskId(event.target.value)}>
+                  <option value="">Any task in this part</option>
+                  {currentWritingTaskOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
 
             {targetMode === "class" ? (
               <label className="field">
