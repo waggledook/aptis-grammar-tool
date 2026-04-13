@@ -1,7 +1,7 @@
 // src/reading/AptisPart4.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 
-import { saveReadingCompletion, fetchReadingCompletions, logReadingPart4Attempted, logReadingPart4Completed, } from "../firebase";
+import { fetchReadingCompletionsByPart, logReadingPart4Attempted, logReadingPart4Completed, } from "../firebase";
 import { toast } from "../utils/toast";
 
 /**
@@ -358,7 +358,7 @@ export default function AptisPart4({
     let alive = true;
     (async () => {
       if (!user) return setCompleted(new Set());
-      const done = await fetchReadingCompletions();
+      const done = await fetchReadingCompletionsByPart("part4");
       if (alive) setCompleted(done);
     })();
     return () => {
@@ -403,6 +403,19 @@ export default function AptisPart4({
     if (whyOpen === paraId) setWhyOpen(null);
   }
 
+  async function markCurrentTaskCompleted() {
+    if (!user || completed.has(current.id)) return;
+
+    try {
+      await logReadingPart4Completed({ taskId: current.id, source: "AptisPart4" });
+      setCompleted((prev) => new Set(prev).add(current.id));
+      toast("Task marked as completed ✓");
+    } catch (err) {
+      console.warn("[reading p4] completion save failed:", err);
+      toast("We couldn’t save this completion.");
+    }
+  }
+
   async function handleCheck() {
     const fb = {};
     current.paragraphs.forEach((p) => {
@@ -426,12 +439,8 @@ export default function AptisPart4({
     }
   
     // ✅ Only mark as completed if perfect score, and only once
-    if (allCorrect && user && !completed.has(current.id)) {
-      await saveReadingCompletion(current.id);
-      setCompleted((prev) => new Set(prev).add(current.id));
-      toast("Task marked as completed ✓");
-  
-      await logReadingPart4Completed({ taskId: current.id, source: "AptisPart4" });
+    if (allCorrect) {
+      await markCurrentTaskCompleted();
     }
   }
 

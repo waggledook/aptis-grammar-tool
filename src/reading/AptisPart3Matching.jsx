@@ -1,8 +1,7 @@
 // src/reading/AptisPart3Matching.jsx
 import React, { useState, useEffect, useMemo, useRef } from "react";
 import {
-  saveReadingCompletion,
-  fetchReadingCompletions,
+  fetchReadingCompletionsByPart,
   logReadingPart3Attempted,
   logReadingPart3Completed,
 } from "../firebase";
@@ -122,7 +121,7 @@ export default function AptisPart3Matching({ tasks = DEMO_TASKS, user, onRequire
     let alive = true;
     (async () => {
       if (!user) return setCompleted(new Set());
-      const done = await fetchReadingCompletions();
+      const done = await fetchReadingCompletionsByPart("part3");
       if (alive) setCompleted(done);
     })();
     return () => {
@@ -157,6 +156,19 @@ useEffect(() => {
     if (whyOpen === qid) setWhyOpen(null);
   }
 
+  async function markCurrentTaskCompleted() {
+    if (!user || completed.has(current.id)) return;
+
+    try {
+      await logReadingPart3Completed({ taskId: current.id, source: "AptisPart3" });
+      setCompleted((p) => new Set(p).add(current.id));
+      toast("Task marked as completed ✓");
+    } catch (err) {
+      console.warn("[reading p3] completion save failed:", err);
+      toast("We couldn’t save this completion.");
+    }
+  }
+
   async function handleCheck() {
     const fb = {};
     current.questions.forEach((q) => {
@@ -183,16 +195,12 @@ useEffect(() => {
     }
   
     // ✅ Only mark as completed if perfect score, and only once
-    if (allCorrect && user && !completed.has(current.id)) {
-      await saveReadingCompletion(current.id);
-      setCompleted((p) => new Set(p).add(current.id));
-      toast("Task marked as completed ✓");
-  
-      await logReadingPart3Completed({ taskId: current.id, source: "AptisPart3" });
+    if (allCorrect) {
+      await markCurrentTaskCompleted();
     }
   }
 
-  function handleShowAnswers() {
+  async function handleShowAnswers() {
     const fb = {};
     const ans = {};
     current.questions.forEach((q) => {
@@ -202,6 +210,8 @@ useEffect(() => {
     setAnswers(ans);
     setFeedback(fb);
     setWhyOpen(null); // close explanations so they can open them one by one
+
+    await markCurrentTaskCompleted();
   }
 
   function handleReset() {

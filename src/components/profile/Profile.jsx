@@ -290,8 +290,10 @@ const handleChangePassword = async (e) => {
   // load all profile data
   useEffect(() => {
     let alive = true;
-  
-    const uid = targetUid || auth.currentUser?.uid;
+
+    setLoading(true);
+
+    const uid = targetUid || user?.uid || auth.currentUser?.uid;
     if (!uid) {
       setLoading(false);
       return;
@@ -373,7 +375,7 @@ const handleChangePassword = async (e) => {
     return () => {
       alive = false;
     };
-  }, [targetUid]);  
+  }, [targetUid, user?.uid]);  
 
 
   const totalWritingItems =

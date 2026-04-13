@@ -1859,7 +1859,45 @@ export async function fetchReadingCompletions() {
   if (!uid) return new Set();
   const snap = await getDocs(collection(db, "users", uid, "readingProgress"));
   const done = new Set();
-  snap.forEach(d => { if (d.data()?.completed) done.add(d.id); });
+  snap.forEach((d) => {
+    const data = d.data() || {};
+    if (!data.completed) return;
+
+    const normalizedTaskId =
+      typeof data.taskId === "string" && data.taskId
+        ? data.taskId
+        : typeof d.id === "string" && d.id.includes(":")
+        ? d.id.split(":").slice(1).join(":")
+        : d.id;
+
+    if (normalizedTaskId) done.add(normalizedTaskId);
+  });
+  return done;
+}
+
+export async function fetchReadingCompletionsByPart(part = "part2") {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return new Set();
+
+  const snap = await getDocs(
+    query(collection(db, "users", uid, "readingProgress"), where("part", "==", part))
+  );
+
+  const done = new Set();
+  snap.forEach((d) => {
+    const data = d.data() || {};
+    if (!data.completed) return;
+
+    const taskId =
+      typeof data.taskId === "string" && data.taskId
+        ? data.taskId
+        : typeof d.id === "string" && d.id.includes(":")
+        ? d.id.split(":").slice(1).join(":")
+        : d.id;
+
+    if (taskId) done.add(taskId);
+  });
+
   return done;
 }
 
@@ -1871,16 +1909,61 @@ export async function fetchReadingCounts(uid) {
   const counts = { part2: 0, part3: 0, part4: 0 };
 
   const snap = await getDocs(collection(db, "users", realUid, "readingProgress"));
+  const docs = snap.docs.map((d) => ({ id: d.id, data: d.data() || {} }));
+  const explicitTaskParts = new Map();
+  const seen = new Set();
 
-  snap.forEach((d) => {
-    const data = d.data() || {};
+  docs.forEach(({ data, id }) => {
+    if (!data.completed) return;
     const part = data.part;
+    const taskId =
+      typeof data.taskId === "string" && data.taskId
+        ? data.taskId
+        : typeof id === "string" && id.includes(":")
+        ? id.split(":").slice(1).join(":")
+        : id;
 
-    // Backward compatibility:
-    // old Part 2 docs may not have a part field, so count them as part2
-    if (!part || part === "part2") counts.part2 += 1;
-    if (part === "part3") counts.part3 += 1;
-    if (part === "part4") counts.part4 += 1;
+    if (!part || !taskId) return;
+    if (!explicitTaskParts.has(taskId)) explicitTaskParts.set(taskId, new Set());
+    explicitTaskParts.get(taskId).add(part);
+  });
+
+  const inferLegacyReadingPart = (taskId) => {
+    // Legacy Part 2 completions were stored as raw doc IDs like `topic__text`.
+    // Raw docs without a part marker from later parts should not be counted as Part 2.
+    if (typeof taskId === "string" && taskId.includes("__")) return "part2";
+    return null;
+  };
+
+  docs.forEach(({ data, id }) => {
+    if (!data.completed) return;
+
+    const explicitPart = data.part;
+    const taskId =
+      typeof data.taskId === "string" && data.taskId
+        ? data.taskId
+        : typeof id === "string" && id.includes(":")
+        ? id.split(":").slice(1).join(":")
+        : id;
+
+    if (!taskId) return;
+
+    // Old raw IDs were used for Part 2, but some historic Part 3/4 completions
+    // also created a raw doc alongside a part-specific doc. Ignore the raw copy
+    // when a newer explicit record already exists for the same task.
+    const normalizedPart =
+      explicitPart ||
+      (explicitTaskParts.has(taskId) ? null : inferLegacyReadingPart(taskId));
+
+    if (!normalizedPart) return;
+
+    const key = `${normalizedPart}:${taskId}`;
+    if (seen.has(key)) return;
+    seen.add(key);
+
+    if (normalizedPart === "part2") counts.part2 += 1;
+    if (normalizedPart === "part3") counts.part3 += 1;
+    if (normalizedPart === "part4") counts.part4 += 1;
   });
 
   return counts;
