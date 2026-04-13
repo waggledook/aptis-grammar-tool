@@ -4,21 +4,34 @@ import { useRef, useCallback } from "react";
 export function useTickSound() {
   const tickRef = useRef(null);
   const tickFastRef = useRef(null);
+  const lastPlayedRef = useRef(null);
 
   const playTick = useCallback((isFast = false) => {
     const base = isFast ? tickFastRef.current : tickRef.current;
     if (!base) return;
 
-    const clone = base.cloneNode();
+    if (lastPlayedRef.current && lastPlayedRef.current !== base) {
+      lastPlayedRef.current.pause();
+      lastPlayedRef.current.currentTime = 0;
+    }
 
-    // 🔊 Make sure clones respect current volume / mute settings
-    clone.volume = base.volume ?? 1;
-    clone.muted = base.muted ?? false;
+    base.pause();
+    base.currentTime = 0;
+    lastPlayedRef.current = base;
 
-    clone.play().catch(() => {
+    base.play().catch(() => {
       // Ignore autoplay / user-gesture issues
     });
   }, []);
 
-  return { tickRef, tickFastRef, playTick };
+  const stopTicks = useCallback(() => {
+    [tickRef.current, tickFastRef.current].forEach((audio) => {
+      if (!audio) return;
+      audio.pause();
+      audio.currentTime = 0;
+    });
+    lastPlayedRef.current = null;
+  }, []);
+
+  return { tickRef, tickFastRef, playTick, stopTicks };
 }

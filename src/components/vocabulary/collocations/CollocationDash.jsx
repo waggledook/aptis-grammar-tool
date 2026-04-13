@@ -26,6 +26,40 @@ import { db } from "../../../firebase"; // <-- adjust path to where your firebas
 // If you already have logActivity in src/firebase.js, you can wire it in:
 // import { logActivity } from "../../../firebase";
 
+function getVerbThemeClass(verb) {
+  switch (verb) {
+    case "make":
+      return "theme-make";
+    case "do":
+      return "theme-do";
+    case "take":
+      return "theme-take";
+    case "give":
+      return "theme-give";
+    case "have":
+      return "theme-have";
+    default:
+      return "";
+  }
+}
+
+function renderHint(hint) {
+  if (!hint) return null;
+
+  const trimmed = hint.trim();
+  if (!trimmed.toLowerCase().startsWith("not with ")) {
+    return <div className="cd-hint">{trimmed}</div>;
+  }
+
+  const highlight = trimmed.slice(9);
+  return (
+    <div className="cd-hint cd-hint-warning">
+      <span className="cd-hint-prefix">not with</span>{" "}
+      <span className="cd-hint-focus">‘{highlight}’</span>
+    </div>
+  );
+}
+
 function pickRoundItems({ perRound = 5 }) {
   // Flatten bank into items with correctVerb
   const all = [];
@@ -88,6 +122,8 @@ const [soundMuted, setSoundMuted] = useState(false);
 const nextRef = useRef(null);
 const finishRef = useRef(null);
 const timeUpRef = useRef(null);
+const correctRef = useRef(null);
+const incorrectRef = useRef(null);
 
 const [topScores, setTopScores] = useState([]);
 
@@ -96,13 +132,14 @@ const savedScoreRef = useRef(false);
 const activityLoggedRef = useRef({ started: false, completed: false });
 
 // Tick refs + play function
-const { tickRef, tickFastRef, playTick } = useTickSound();
+const { tickRef, tickFastRef, playTick, stopTicks } = useTickSound();
 
   const intervalRef = useRef(null);
 
   const remainingCount = useMemo(() => items.length, [items]);
 
   const start = () => {
+    stopTicks();
     savedScoreRef.current = false; // ✅ allow saving again for the new run
     activityLoggedRef.current.completed = false;
 
@@ -188,11 +225,28 @@ setSelectedVerb(null);
       timeUpRef.current.play();
     } catch {}
   };
+
+  const playCorrect = () => {
+    try {
+      if (!correctRef.current) return;
+      correctRef.current.currentTime = 0;
+      correctRef.current.play();
+    } catch {}
+  };
+
+  const playIncorrect = () => {
+    try {
+      if (!incorrectRef.current) return;
+      incorrectRef.current.currentTime = 0;
+      incorrectRef.current.play();
+    } catch {}
+  };
   
 
   const stopTimer = () => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = null;
+    stopTicks();
   };
 
   const endGame = () => {
@@ -288,11 +342,23 @@ setSelectedVerb(null);
 
   useEffect(() => {
     const vol = soundMuted ? 0 : soundVolume;
+    const tickVolume = Math.min(1, vol * 0.48);
+    const tickFastVolume = Math.min(1, vol * 0.58);
   
-    [tickRef, tickFastRef, nextRef, finishRef, timeUpRef].forEach((r) => {
+    if (tickRef.current) {
+      tickRef.current.volume = tickVolume;
+      tickRef.current.muted = soundMuted;
+    }
+
+    if (tickFastRef.current) {
+      tickFastRef.current.volume = tickFastVolume;
+      tickFastRef.current.muted = soundMuted;
+    }
+
+    [nextRef, finishRef, timeUpRef, correctRef, incorrectRef].forEach((r) => {
       if (r.current) {
         r.current.volume = vol;
-        r.current.muted = soundMuted; // optional but nice to keep in sync
+        r.current.muted = soundMuted;
       }
     });
   }, [soundVolume, soundMuted, tickRef, tickFastRef]);
@@ -339,6 +405,7 @@ const submitMatch = (verb, phrase) => {
   const correct = selectedItem.correctVerb === verb;
 
   if (correct) {
+    playCorrect();
     setScore((s) => s + 10);
     setItems((prev) => prev.filter((it) => it.phrase !== phrase));
     setFeedback({ kind: "ok", text: "Correct." });
@@ -348,6 +415,7 @@ const submitMatch = (verb, phrase) => {
 
     setTimeout(() => setFeedback(null), 800);
   } else {
+    playIncorrect();
     setScore((s) => s - 5);
     setFeedback({ kind: "bad", text: "Try again." });
 
@@ -399,47 +467,59 @@ const submitMatch = (verb, phrase) => {
     <audio ref={nextRef} src="/sounds/next.mp3" preload="auto" />
 <audio ref={finishRef} src="/sounds/finish.mp3" preload="auto" />
 <audio ref={timeUpRef} src="/sounds/time_up.mp3" preload="auto" />
+<audio ref={correctRef} src="/sounds/correct.mp3" preload="auto" />
+<audio ref={incorrectRef} src="/sounds/incorrect.mp3" preload="auto" />
 
 
-      <div className="game-container" style={{ maxWidth: 920 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
-          <div>
-            <h1 style={{ margin: 0 }}>Collocation Dash</h1>
-            <p style={{ marginTop: 6, opacity: 0.85 }}>
+      <div className="game-container cd-shell" style={{ maxWidth: 1180 }}>
+        <div className="cd-hero">
+          <div className="cd-hero-copy">
+            <h1 className="cd-title">Collocation Dash</h1>
+            <p className="cd-subtitle">
               Select a phrase, then choose the verb it collocates with.
             </p>
           </div>
 
-          <div style={{ display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
-            <div><strong>Round:</strong> {round}</div>
-            <div><strong>Time:</strong> {timeLeft}s</div>
-            <div><strong>Score:</strong> {score}</div>
+          <div className="cd-status-bar">
+            <div className="cd-stat-stack">
+              <div className="cd-stat-pill"><strong>Round:</strong> {round}</div>
+              {status === "playing" && (
+                <div className="cd-stat-pill"><strong>Left:</strong> {remainingCount}</div>
+              )}
+            </div>
 
-            <div className="cd-sound">
-  <span className="cd-sound-label">Sound:</span>
+            <div className="cd-timer-orb" aria-label={`Time left ${timeLeft} seconds`}>
+              <div className="cd-timer-ring" />
+              <div className="cd-timer-core">
+                <span className="cd-timer-number">{timeLeft}</span>
+              </div>
+            </div>
 
-  <input
-    type="range"
-    min={0}
-    max={100}
-    value={Math.round(soundVolume * 100)}
-    onChange={(e) => setSoundVolume(Number(e.target.value) / 100)}
-  />
-
-  <button
-    type="button"
-    className="cd-sound-btn"
-    onClick={() => setSoundMuted((m) => !m)}
-  >
-    {soundMuted ? "🔇 Muted" : "🔊 On"}
-  </button>
-</div>
-
+            <div className="cd-status-right">
+              <div className="cd-score-inline"><strong>Score:</strong> {score}</div>
+              <div className="cd-sound">
+                <span className="cd-sound-label">Sound</span>
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={Math.round(soundVolume * 100)}
+                  onChange={(e) => setSoundVolume(Number(e.target.value) / 100)}
+                />
+                <button
+                  type="button"
+                  className="cd-sound-btn"
+                  onClick={() => setSoundMuted((m) => !m)}
+                >
+                  {soundMuted ? "🔇" : "🔊"} {soundMuted ? "Off" : "On"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
 
         {status === "idle" && (
-          <div style={{ marginTop: 16 }}>
+          <div className="cd-panel" style={{ marginTop: 16 }}>
             <div style={{ opacity: 0.9, lineHeight: 1.5 }}>
               <ul style={{ marginTop: 8 }}>
                 <li>+10 points for a correct match</li>
@@ -468,7 +548,7 @@ const submitMatch = (verb, phrase) => {
 )}
 
 
-            <button className="review-btn" onClick={start}>
+            <button className="review-btn cd-primary-btn" onClick={start}>
               Start
             </button>
           </div>
@@ -483,7 +563,7 @@ const submitMatch = (verb, phrase) => {
   <strong>{feedback?.text || "\u00A0"}</strong>
 </div>
 
-            <div style={{ marginTop: 16, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 10 }}>
+            <div className="cd-verb-grid">
               {VERBS.map((v) => (
                 <button
                 key={v}
@@ -492,7 +572,7 @@ const submitMatch = (verb, phrase) => {
                   if (selectedPhrase) submitMatch(v, selectedPhrase);
                   else setSelectedVerb(v);
                 }}
-                className={`cd-verb-btn ${selectedVerb === v ? "is-selected" : ""}`}
+                className={`cd-verb-btn ${getVerbThemeClass(v)} ${selectedVerb === v ? "is-selected" : ""}`}
                 title={
                   selectedPhrase
                     ? `Submit: ${v} + ${selectedPhrase}`
@@ -504,12 +584,12 @@ const submitMatch = (verb, phrase) => {
               ))}
             </div>
 
-            <div style={{ marginTop: 18 }}>
-              <div style={{ opacity: 0.8, marginBottom: 8 }}>
+            <div className="cd-section">
+              <div className="cd-section-label">
                 Select one:
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 }}>
+              <div className="cd-phrase-grid">
                 {items.map((it) => {
                   const active = selectedPhrase === it.phrase;
                   return (
@@ -523,23 +603,18 @@ const submitMatch = (verb, phrase) => {
   className={`cd-phrase-btn ${active ? "active" : ""}`}
 >
                       <div style={{ fontWeight: 700 }}>{it.phrase}</div>
-                      {it.hint ? (
-    <div className="cd-hint">{it.hint}</div>
-  ) : (
-    <div className="cd-hint"> </div>
-  )}
+                      {it.hint ? renderHint(it.hint) : <div className="cd-hint"> </div>}
 </button>
                   );
                 })}
               </div>
             </div>
 
-            <div style={{ marginTop: 18, display: "flex", gap: 10, flexWrap: "wrap" }}>
-  <button className="review-btn" onClick={restart}>Restart</button>
+            <div className="cd-actions">
+  <button className="review-btn cd-secondary-btn" onClick={restart}>Restart</button>
   <button
-    className="review-btn"
+    className="review-btn cd-danger-btn"
     onClick={endGame}
-    style={{ borderColor: "rgba(255,70,70,0.45)" }}
   >
     End game
   </button>
@@ -548,7 +623,7 @@ const submitMatch = (verb, phrase) => {
         )}
 
 {status === "review" && (
-  <div style={{ marginTop: 16 }}>
+  <div className="cd-panel" style={{ marginTop: 16 }}>
     <h2 style={{ marginTop: 0 }}>Review mistakes</h2>
 
     <p style={{ opacity: 0.9 }}>
@@ -585,9 +660,11 @@ const submitMatch = (verb, phrase) => {
         const correct = v === current.correctVerb;
 
         if (correct) {
+          playCorrect();
           setReviewFeedback({ kind: "ok", text: "Correct ✅" });
           setReviewScore((s) => s + 1);
         } else {
+          playIncorrect();
           setReviewFeedback({
             kind: "bad",
             text: `Not quite — it’s "${current.correctVerb} ${current.phrase}".`,
@@ -827,520 +904,1027 @@ const submitMatch = (verb, phrase) => {
             
 
             <div style={{ marginTop: 16 }}>
-              <button className="review-btn" onClick={restart}>Play again</button>
+              <button className="review-btn cd-primary-btn" onClick={restart}>Play again</button>
             </div>
           </div>
         )}
 
       {/* Collocation Dash scoped styles */}
       <style>{`
-          .cd-feedback {
-            min-height: 52px;
-            margin-top: 12px;
-            margin-bottom: 14px;
-            padding: 10px 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.06);
-            opacity: 0;
-            transform: translateY(-4px);
-            transition: opacity 120ms ease, transform 120ms ease;
-            display: flex;
-            align-items: center;
-            font-weight: 800;
+        .cd-shell {
+          position: relative;
+          overflow: hidden;
+          padding: 28px;
+          border-radius: 32px;
+          background:
+            radial-gradient(circle at 50% 18%, rgba(255, 186, 72, 0.22), transparent 20%),
+            radial-gradient(circle at 18% 78%, rgba(90, 170, 255, 0.16), transparent 28%),
+            radial-gradient(circle at 82% 72%, rgba(255, 110, 160, 0.14), transparent 22%),
+            linear-gradient(180deg, #132250 0%, #1a295c 52%, #16244f 100%);
+          border: 1px solid rgba(150, 186, 255, 0.14);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.08),
+            0 24px 64px rgba(3, 8, 23, 0.42);
+        }
+
+        .cd-shell::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background:
+            radial-gradient(circle, rgba(255,255,255,0.18) 0 1px, transparent 1.5px) 0 0 / 22px 22px,
+            radial-gradient(circle, rgba(255,214,128,0.14) 0 1px, transparent 1.5px) 11px 9px / 28px 28px;
+          opacity: 0.18;
+          mask-image: linear-gradient(180deg, transparent, rgba(0,0,0,0.85) 18%, rgba(0,0,0,0.9) 78%, transparent);
+        }
+
+        .cd-hero {
+          position: relative;
+          z-index: 1;
+          display: grid;
+          gap: 18px;
+          justify-items: center;
+          text-align: center;
+          margin-bottom: 10px;
+        }
+
+        .cd-hero-copy {
+          display: grid;
+          gap: 8px;
+          justify-items: center;
+        }
+
+        .cd-title {
+          margin: 0;
+          font-size: clamp(3rem, 7vw, 4.8rem);
+          line-height: 0.95;
+          letter-spacing: -0.04em;
+          font-weight: 900;
+          color: #ffc94d;
+          text-shadow:
+            0 3px 0 rgba(120, 66, 0, 0.45),
+            0 12px 28px rgba(255, 186, 72, 0.18);
+        }
+
+        .cd-subtitle {
+          margin: 0;
+          max-width: 760px;
+          font-size: clamp(1.05rem, 2.2vw, 1.7rem);
+          color: rgba(233, 241, 255, 0.9);
+        }
+
+        .cd-status-bar {
+          width: 100%;
+          max-width: 980px;
+          display: grid;
+          grid-template-columns: 1fr auto 1fr;
+          align-items: center;
+          gap: 22px;
+          padding: 18px 22px;
+          border-radius: 32px;
+          background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+          border: 1px solid rgba(175, 203, 255, 0.18);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.08),
+            0 14px 34px rgba(5, 10, 28, 0.28);
+        }
+
+        .cd-stat-stack {
+          display: grid;
+          gap: 12px;
+          justify-items: start;
+        }
+
+        .cd-stat-pill {
+          min-width: 136px;
+          padding: 10px 16px;
+          border-radius: 999px;
+          background: rgba(255,255,255,0.06);
+          border: 1px solid rgba(255,255,255,0.1);
+          color: rgba(242, 246, 255, 0.95);
+          font-size: 0.98rem;
+          font-weight: 700;
+          text-align: left;
+        }
+
+        .cd-timer-orb {
+          position: relative;
+          width: 118px;
+          height: 118px;
+          display: grid;
+          place-items: center;
+          filter: drop-shadow(0 14px 26px rgba(0,0,0,0.35));
+        }
+
+        .cd-timer-ring {
+          position: absolute;
+          inset: 0;
+          border-radius: 50%;
+          background: conic-gradient(from -90deg, #3ca7ff 0 35%, #ffb32f 35% 100%);
+          box-shadow:
+            0 0 0 4px rgba(255,255,255,0.08),
+            0 0 28px rgba(255, 183, 77, 0.22);
+        }
+
+        .cd-timer-ring::after {
+          content: "";
+          position: absolute;
+          inset: 8px;
+          border-radius: 50%;
+          background: linear-gradient(180deg, rgba(15, 32, 82, 0.96), rgba(9, 21, 60, 0.96));
+          border: 2px solid rgba(255,255,255,0.08);
+        }
+
+        .cd-timer-core {
+          position: relative;
+          z-index: 1;
+          width: 80px;
+          height: 80px;
+          display: grid;
+          place-items: center;
+          border-radius: 50%;
+          background: radial-gradient(circle at 35% 30%, rgba(255,255,255,0.2), rgba(34, 58, 126, 0.88) 60%);
+          box-shadow: inset 0 2px 10px rgba(255,255,255,0.08);
+        }
+
+        .cd-timer-number {
+          font-size: 2.55rem;
+          font-weight: 900;
+          line-height: 1;
+          color: #f7f3ee;
+          text-shadow: 0 2px 8px rgba(0,0,0,0.28);
+        }
+
+        .cd-status-right {
+          display: grid;
+          gap: 12px;
+          justify-items: end;
+          align-items: center;
+        }
+
+        .cd-score-inline {
+          color: rgba(242, 246, 255, 0.96);
+          font-size: 1.28rem;
+          font-weight: 800;
+          text-align: right;
+        }
+
+        .cd-panel,
+        .cd-feedback {
+          min-height: 52px;
+          margin-top: 12px;
+          margin-bottom: 14px;
+          padding: 12px 14px;
+          border-radius: 18px;
+          border: 1px solid rgba(255,255,255,0.15);
+          background: rgba(255,255,255,0.06);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+
+        .cd-panel {
+          min-height: unset;
+        }
+
+        .cd-feedback {
+          opacity: 0;
+          transform: translateY(-4px);
+          transition: opacity 120ms ease, transform 120ms ease;
+          display: flex;
+          align-items: center;
+          font-weight: 800;
+        }
+
+        .cd-feedback.show {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .cd-feedback.is-ok {
+          background: rgba(0,200,120,0.15);
+        }
+
+        .cd-feedback.is-bad {
+          background: rgba(255,70,70,0.15);
+        }
+
+        .cd-verb-grid {
+          margin-top: 18px;
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 14px;
+        }
+
+        .cd-verb-btn {
+          position: relative;
+          padding: 18px 14px;
+          border-radius: 22px;
+          border: 1px solid rgba(255,255,255,0.24);
+          background: linear-gradient(180deg, rgba(67,91,156,0.92), rgba(34,53,109,0.96));
+          color: #f3f6ff;
+          font-weight: 800;
+          font-size: 1.15rem;
+          letter-spacing: 0.2px;
+          cursor: pointer;
+          text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.18),
+            inset 0 -4px 0 rgba(0,0,0,0.18),
+            0 10px 24px rgba(0,0,0,0.22);
+          transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease, background 120ms ease, filter 120ms ease;
+        }
+
+        .cd-verb-btn:hover {
+          transform: translateY(-2px) scale(1.01);
+          filter: brightness(1.04);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.2),
+            inset 0 -4px 0 rgba(0,0,0,0.18),
+            0 14px 30px rgba(0,0,0,0.28);
+        }
+
+        .cd-verb-btn:disabled {
+          cursor: not-allowed;
+          opacity: 0.55;
+          transform: none;
+          box-shadow: none;
+        }
+
+        .cd-verb-btn.theme-make {
+          background: linear-gradient(180deg, #2f8eff 0%, #174dc7 100%);
+          border-color: rgba(117, 197, 255, 0.5);
+        }
+
+        .cd-verb-btn.theme-do {
+          background: linear-gradient(180deg, #8f5dff 0%, #5328c8 100%);
+          border-color: rgba(176, 140, 255, 0.48);
+        }
+
+        .cd-verb-btn.theme-take {
+          background: linear-gradient(180deg, #ffb43c 0%, #e06d1c 100%);
+          border-color: rgba(255, 215, 109, 0.5);
+        }
+
+        .cd-verb-btn.theme-give {
+          background: linear-gradient(180deg, #6fd84d 0%, #2f8e33 100%);
+          border-color: rgba(169, 245, 121, 0.46);
+        }
+
+        .cd-verb-btn.theme-have {
+          background: linear-gradient(180deg, #f16087 0%, #b52959 100%);
+          border-color: rgba(255, 152, 188, 0.44);
+        }
+
+        .cd-verb-btn.is-selected {
+          transform: translateY(-2px) scale(1.02);
+          border-color: rgba(255,255,255,0.78);
+          box-shadow:
+            0 0 0 3px rgba(255,255,255,0.14),
+            0 0 24px rgba(255,255,255,0.12),
+            inset 0 1px 0 rgba(255,255,255,0.22),
+            inset 0 -4px 0 rgba(0,0,0,0.18);
+        }
+
+        .cd-section {
+          margin-top: 24px;
+        }
+
+        .cd-section-label {
+          opacity: 0.92;
+          margin-bottom: 12px;
+          font-size: 1.05rem;
+          font-weight: 800;
+        }
+
+        .cd-phrase-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
+        }
+
+        .cd-phrase-btn {
+          text-align: left;
+          min-height: 96px;
+          padding: 16px 18px;
+          border-radius: 20px;
+          border: 1px solid rgba(162, 191, 255, 0.14);
+          background: linear-gradient(180deg, rgba(42,59,116,0.86), rgba(29,43,92,0.9));
+          color: #eef3ff;
+          cursor: pointer;
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.08),
+            0 8px 22px rgba(0,0,0,0.18);
+          transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease, background 120ms ease;
+        }
+
+        .cd-phrase-btn:hover {
+          transform: translateY(-2px);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.1),
+            0 12px 28px rgba(0,0,0,0.26);
+          border-color: rgba(180, 207, 255, 0.3);
+        }
+
+        .cd-phrase-btn.active {
+          border-color: rgba(255, 221, 102, 0.95);
+          background: linear-gradient(180deg, rgba(39,81,180,0.94), rgba(22,44,109,0.96));
+          box-shadow:
+            0 0 0 3px rgba(255, 212, 82, 0.24),
+            0 0 22px rgba(255, 212, 82, 0.18),
+            inset 0 1px 0 rgba(255,255,255,0.1);
+        }
+
+        .cd-phrase-btn div {
+          color: inherit;
+        }
+
+        .cd-hint {
+          color: rgba(230,240,255,0.72);
+          font-size: 0.96rem;
+          margin-top: 8px;
+        }
+
+        .cd-hint-warning {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          width: fit-content;
+          padding: 4px 10px;
+          border-radius: 999px;
+          background: rgba(255, 214, 102, 0.1);
+          border: 1px solid rgba(255, 214, 102, 0.18);
+          color: rgba(255, 237, 184, 0.92);
+        }
+
+        .cd-hint-prefix {
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          font-size: 0.68rem;
+          font-weight: 900;
+          color: rgba(255, 225, 150, 0.76);
+        }
+
+        .cd-hint-focus {
+          font-weight: 800;
+          color: rgba(255, 245, 210, 0.98);
+        }
+
+        .cd-sound {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 8px;
+          padding: 6px 10px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.15);
+          background: rgba(255,255,255,0.06);
+        }
+
+        .cd-sound-label {
+          font-size: 0.88rem;
+          opacity: 0.9;
+          font-weight: 700;
+        }
+
+        .cd-sound input[type="range"] {
+          width: 120px;
+        }
+
+        .cd-sound-btn {
+          border-radius: 999px;
+          padding: 6px 10px;
+          border: 1px solid rgba(255,255,255,0.18);
+          background: rgba(255,255,255,0.08);
+          color: #e6f0ff;
+          font-weight: 800;
+          font-size: 0.88rem;
+          cursor: pointer;
+          white-space: nowrap;
+        }
+
+        .cd-sound-btn:hover {
+          border-color: rgba(255,255,255,0.28);
+          background: rgba(255,255,255,0.12);
+        }
+
+        .cd-actions {
+          margin-top: 28px;
+          display: flex;
+          justify-content: center;
+          gap: 18px;
+          flex-wrap: wrap;
+        }
+
+        .cd-primary-btn,
+        .cd-secondary-btn,
+        .cd-danger-btn {
+          min-width: 180px;
+          border-radius: 20px;
+          padding: 14px 22px;
+          font-size: 1rem;
+          font-weight: 900;
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.12),
+            0 12px 28px rgba(0,0,0,0.2);
+        }
+
+        .cd-primary-btn,
+        .cd-secondary-btn {
+          background: linear-gradient(180deg, rgba(43,77,170,0.9), rgba(30,53,116,0.95));
+          border-color: rgba(130, 174, 255, 0.38);
+        }
+
+        .cd-danger-btn {
+          background: linear-gradient(180deg, rgba(181,55,89,0.95), rgba(116,28,51,0.98));
+          border-color: rgba(255, 117, 149, 0.35) !important;
+        }
+
+        .cd-mistake-card{
+          width: 100%;
+          text-align: left;
+          padding: 12px 14px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,0.15);
+          background: rgba(255,255,255,0.05);
+          color: #e6f0ff;
+          cursor: pointer;
+          animation: cdPulse 700ms ease 1;
+        }
+
+        .cd-mistake-card:hover{
+          border-color: rgba(110,180,255,0.55);
+          background: rgba(110,180,255,0.10);
+        }
+
+        .cd-modal-backdrop{
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.55);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 18px;
+          z-index: 9999;
+        }
+
+        .cd-modal{
+          width: min(680px, 100%);
+          border-radius: 16px;
+          border: 1px solid rgba(255,255,255,0.16);
+          background: #0f1b33;
+          box-shadow: 0 18px 60px rgba(0,0,0,0.55);
+          padding: 14px;
+        }
+
+        .cd-modal-head{
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: flex-start;
+          padding: 6px 6px 10px;
+          border-bottom: 1px solid rgba(255,255,255,0.10);
+        }
+
+        .cd-modal-title{
+          font-weight: 900;
+          font-size: 1.15rem;
+          color: #e6f0ff;
+        }
+
+        .cd-modal-hint{
+          margin-top: 4px;
+          color: rgba(230,240,255,0.75);
+          font-size: 0.9rem;
+        }
+
+        .cd-modal-close{
+          border-radius: 10px;
+          border: 1px solid rgba(255,255,255,0.18);
+          background: rgba(255,255,255,0.08);
+          color: #e6f0ff;
+          font-weight: 900;
+          cursor: pointer;
+          padding: 6px 10px;
+        }
+
+        .cd-modal-close:hover{
+          background: rgba(255,255,255,0.12);
+        }
+
+        .cd-modal-body{
+          padding: 12px 6px 6px;
+          display: grid;
+          gap: 12px;
+        }
+
+        .cd-modal-row{
+          display: grid;
+          gap: 6px;
+        }
+
+        .cd-modal-label{
+          font-size: 0.85rem;
+          opacity: 0.8;
+          font-weight: 800;
+        }
+
+        .cd-modal-text{
+          line-height: 1.45;
+          color: rgba(230,240,255,0.92);
+        }
+
+        .cd-modal-actions{
+          display: flex;
+          gap: 10px;
+          align-items: center;
+        }
+
+        .cd-flag-btn{
+          border-radius: 999px;
+          padding: 8px 12px;
+          border: 1px solid rgba(255,255,255,0.18);
+          background: rgba(255,255,255,0.08);
+          color: #e6f0ff;
+          font-weight: 900;
+          cursor: pointer;
+        }
+
+        .cd-flag-btn:hover{
+          background: rgba(255,255,255,0.12);
+          border-color: rgba(110,180,255,0.55);
+        }
+
+        .cd-modal-es{
+          margin-top: 8px;
+          padding: 10px 12px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,0.14);
+          background: rgba(255,255,255,0.06);
+          color: rgba(230,240,255,0.92);
+          font-weight: 800;
+        }
+
+        .cd-mistake-wrap{
+          display: grid;
+          gap: 8px;
+        }
+
+        .cd-mistake-expand{
+          padding: 12px 12px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,0.14);
+          background: rgba(255,255,255,0.06);
+          color: rgba(230,240,255,0.92);
+        }
+
+        .cd-expand-title{
+          margin-bottom: 10px;
+          font-size: 1rem;
+        }
+
+        .cd-expand-hint{
+          color: rgba(230,240,255,0.72);
+          font-weight: 700;
+        }
+
+        .cd-expand-row{
+          display: grid;
+          gap: 6px;
+          margin-top: 10px;
+        }
+
+        .cd-expand-label{
+          font-size: 0.85rem;
+          opacity: 0.8;
+          font-weight: 800;
+        }
+
+        .cd-expand-text{
+          line-height: 1.45;
+        }
+
+        .cd-expand-actions{
+          margin-top: 12px;
+        }
+
+        .cd-mistakes-hint{
+          margin: 6px 0 10px;
+          opacity: 0.9;
+          color: rgba(230,240,255,0.82);
+          font-weight: 700;
+        }
+
+        .cd-mistake-line{
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          gap: 14px;
+        }
+
+        .cd-details-cue{
+          flex: 0 0 auto;
+          font-weight: 900;
+          font-size: 0.85rem;
+          color: rgba(230,240,255,0.75);
+          opacity: 0.95;
+          white-space: nowrap;
+        }
+
+        .cd-caret{
+          display: inline-block;
+          transform: translateY(-1px);
+          transition: transform 120ms ease;
+        }
+
+        .cd-caret.open{
+          transform: rotate(180deg) translateY(1px);
+        }
+
+        .cd-mistake-card:focus-visible{
+          outline: none;
+          border-color: rgba(110,180,255,0.85);
+          box-shadow: 0 0 0 3px rgba(110,180,255,0.25);
+        }
+
+        @keyframes cdPulse {
+          0% { box-shadow: 0 0 0 0 rgba(110,180,255,0.0); }
+          40% { box-shadow: 0 0 0 6px rgba(110,180,255,0.12); }
+          100% { box-shadow: 0 0 0 0 rgba(110,180,255,0.0); }
+        }
+
+        .cd-review-card{
+          margin-top: 12px;
+          padding: 16px;
+          border-radius: 18px;
+          border: 1px solid rgba(255,255,255,0.14);
+          background: rgba(255,255,255,0.06);
+        }
+
+        .cd-review-phrase{
+          font-size: 1.05rem;
+          margin-bottom: 6px;
+        }
+
+        .cd-review-hint{
+          margin-top: 6px;
+          opacity: 0.8;
+          font-size: 0.9rem;
+        }
+
+        .cd-review-prompt{
+          margin: 10px 0 8px;
+          opacity: 0.85;
+          font-weight: 700;
+        }
+
+        .cd-review-verbs{
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+          gap: 10px;
+        }
+
+        .cd-review-verb {
+          min-width: 0;
+        }
+
+        .cd-review-actions{
+          display: flex;
+          gap: 10px;
+          margin-top: 12px;
+          flex-wrap: wrap;
+        }
+
+        .cd-review-feedback.ok{
+          border: 1px solid rgba(0,200,120,0.35);
+          background: rgba(0,200,120,0.12);
+          padding: 10px 12px;
+          border-radius: 10px;
+        }
+
+        .cd-review-feedback.bad{
+          border: 1px solid rgba(255,70,70,0.35);
+          background: rgba(255,70,70,0.12);
+          padding: 10px 12px;
+          border-radius: 10px;
+        }
+
+        .cd-top-scores-list {
+          display: grid;
+          gap: 10px;
+          margin-top: 10px;
+          max-width: 420px;
+        }
+
+        .cd-top-score-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 12px;
+          padding: 12px 14px;
+          border-radius: 14px;
+          background: rgba(255, 255, 255, 0.06);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .cd-top-score-rank {
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+        }
+
+        .cd-top-score-medal {
+          font-size: 18px;
+          line-height: 1;
+        }
+
+        .cd-top-score-label {
+          font-size: 12px;
+          opacity: 0.8;
+        }
+
+        .cd-top-score-value {
+          font-size: 20px;
+          font-weight: 800;
+          letter-spacing: 0.5px;
+        }
+
+        .cd-leaderboard-table{
+          border: 1px solid rgba(255,255,255,0.14);
+          border-radius: 16px;
+          overflow: hidden;
+          background: transparent !important;
+          backdrop-filter: none !important;
+          -webkit-backdrop-filter: none !important;
+        }
+
+        .cd-lb-row{
+          display: grid;
+          grid-template-columns: 60px 1fr 120px;
+          align-items: center;
+          padding: 14px 16px;
+          border-top: 1px solid rgba(255,255,255,0.10);
+          background: rgba(110,180,255,0.06) !important;
+        }
+
+        .cd-lb-row:first-child{
+          border-top: none;
+        }
+
+        .cd-lb-header{
+          font-weight: 800;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          font-size: 13px;
+          background: rgba(110,180,255,0.12) !important;
+        }
+
+        .cd-lb-row:not(.cd-lb-header):hover{
+          background: rgba(110,180,255,0.10) !important;
+        }
+
+        .cd-lb-rank{
+          opacity: 0.85;
+        }
+
+        .cd-lb-name-text{
+          font-weight: 700;
+          color: rgba(255,255,255,0.92);
+        }
+
+        .cd-lb-score{
+          text-align: right;
+          font-weight: 900;
+          font-size: 18px;
+          color: rgba(255,255,255,0.95);
+        }
+
+        .cd-lb-row.is-me{
+          background: rgba(255,200,80,0.10) !important;
+          box-shadow: inset 0 0 0 1px rgba(255,200,80,0.22);
+        }
+
+        .cd-lb-me{
+          margin-left: 10px;
+          padding: 3px 10px;
+          border-radius: 999px;
+          font-size: 12px;
+          font-weight: 800;
+          color: rgba(255,220,140,0.95);
+          border: 1px solid rgba(255,220,140,0.35);
+          background: rgba(255,200,80,0.12);
+        }
+
+        @media (max-width: 980px) {
+          .cd-status-bar {
+            grid-template-columns: 1fr;
+            justify-items: center;
           }
 
-          .cd-feedback.show {
-            opacity: 1;
-            transform: translateY(0);
+          .cd-stat-stack,
+          .cd-status-right,
+          .cd-sound {
+            justify-items: center;
+            justify-content: center;
+          }
+
+          .cd-verb-grid {
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+          }
+
+          .cd-phrase-grid {
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+          }
+        }
+
+        @media (max-width: 700px) {
+          .cd-shell {
+            padding: 14px 10px;
+            border-radius: 20px;
+          }
+
+          .cd-title {
+            font-size: clamp(2.1rem, 12vw, 3rem);
+          }
+
+          .cd-subtitle {
+            font-size: 0.96rem;
+          }
+
+          .cd-hero {
+            gap: 12px;
+          }
+
+          .cd-status-bar {
+            padding: 12px;
+            gap: 10px;
+            border-radius: 22px;
+          }
+
+          .cd-stat-stack {
+            width: 100%;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+          }
+
+          .cd-stat-pill {
+            min-width: 0;
+            width: 100%;
+            padding: 8px 10px;
+            font-size: 0.9rem;
+            text-align: center;
+          }
+
+          .cd-timer-orb {
+            width: 88px;
+            height: 88px;
+          }
+
+          .cd-timer-core {
+            width: 60px;
+            height: 60px;
+          }
+
+          .cd-timer-number {
+            font-size: 1.8rem;
+          }
+
+          .cd-status-right {
+            width: 100%;
+            gap: 8px;
+          }
+
+          .cd-score-inline {
+            width: 100%;
+            font-size: 1rem;
+            text-align: center;
+          }
+
+          .cd-sound {
+            width: 100%;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 8px;
+          }
+
+          .cd-sound input[type="range"] {
+            width: 100%;
+            min-width: 0;
+          }
+
+          .cd-sound-label {
+            font-size: 0.8rem;
+          }
+
+          .cd-sound-btn {
+            padding: 5px 8px;
+            font-size: 0.8rem;
+          }
+
+          .cd-feedback,
+          .cd-panel {
+            padding: 10px 12px;
+            border-radius: 14px;
+            margin-bottom: 10px;
+          }
+
+          .cd-verb-grid {
+            margin-top: 12px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 8px;
           }
 
           .cd-verb-btn {
-            padding: 16px 12px;
+            padding: 12px 8px;
             border-radius: 16px;
-            border: 1px solid rgba(255,255,255,0.18);
-            background: rgba(255,255,255,0.08);
-            color: #e6f0ff;
-            font-weight: 800;
-            font-size: 1.05rem;
-            letter-spacing: 0.2px;
-            cursor: pointer;
-            transition: transform 80ms ease, box-shadow 80ms ease, border-color 80ms ease, background 80ms ease;
+            font-size: 0.95rem;
           }
 
-          .cd-verb-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(0,0,0,0.25);
-            border-color: rgba(255,255,255,0.28);
+          .cd-section {
+            margin-top: 16px;
           }
 
-          .cd-verb-btn:disabled {
-            cursor: not-allowed;
-            opacity: 0.55;
-            transform: none;
-            box-shadow: none;
+          .cd-section-label {
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+          }
+
+          .cd-phrase-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
           }
 
           .cd-phrase-btn {
-            text-align: left;
-            padding: 12px 12px;
-            border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.15);
-            background: rgba(255,255,255,0.05);
-            color: #e6f0ff;
-            cursor: pointer;
-            transition: transform 80ms ease, box-shadow 80ms ease, border-color 80ms ease, background 80ms ease;
+            min-height: 68px;
+            padding: 12px 14px;
+            border-radius: 16px;
           }
 
-          .cd-phrase-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 22px rgba(0,0,0,0.25);
-            border-color: rgba(255,255,255,0.28);
+          .cd-phrase-btn div:first-child {
+            font-size: 0.95rem;
           }
 
-          .cd-phrase-btn.active {
-            border-color: rgba(110,180,255,0.95);
-            background: rgba(110,180,255,0.14);
-            box-shadow: 0 0 0 3px rgba(110,180,255,0.25);
+          .cd-hint {
+            font-size: 0.82rem;
+            margin-top: 6px;
           }
-          .cd-feedback.is-ok {
-  background: rgba(0,200,120,0.15);
-}
 
-.cd-feedback.is-bad {
-  background: rgba(255,70,70,0.15);
-}
-.cd-phrase-btn {
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.18);
-}
+          .cd-hint-warning {
+            padding: 3px 8px;
+            gap: 5px;
+          }
 
-.cd-phrase-btn div {
-  color: inherit;
-}
+          .cd-hint-prefix {
+            font-size: 0.6rem;
+          }
 
-.cd-hint {
-  color: rgba(230,240,255,0.72);
-  font-size: 12px;
-  margin-top: 4px;
-}
+          .cd-actions {
+            margin-top: 18px;
+            gap: 10px;
+          }
 
-.cd-sound {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.06);
-}
+          .cd-primary-btn,
+          .cd-secondary-btn,
+          .cd-danger-btn {
+            min-width: 0;
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 16px;
+            font-size: 0.92rem;
+          }
 
-.cd-sound-label {
-  font-size: 0.85rem;
-  opacity: 0.85;
-  font-weight: 700;
-}
+          .cd-review-verbs {
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          }
+        }
 
-.cd-sound input[type="range"] {
-  width: 120px;
-}
+        @media (max-width: 520px) {
+          .cd-review-card {
+            padding: 12px;
+            border-radius: 16px;
+          }
 
-.cd-sound-btn {
-  border-radius: 999px;
-  padding: 6px 10px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.08);
-  color: #e6f0ff;
-  font-weight: 800;
-  cursor: pointer;
-}
+          .cd-review-verbs {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+          }
 
-.cd-sound-btn:hover {
-  border-color: rgba(255,255,255,0.28);
-  background: rgba(255,255,255,0.12);
-}
-.cd-mistake-card{
-  text-align: left;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.15);
-  background: rgba(255,255,255,0.05);
-  color: #e6f0ff;
-  cursor: pointer;
-}
-.cd-mistake-card:hover{
-  border-color: rgba(110,180,255,0.55);
-  background: rgba(110,180,255,0.10);
-}
+          .cd-review-verb {
+            padding: 12px 8px;
+            min-width: 0;
+            font-size: 0.95rem;
+          }
 
-.cd-modal-backdrop{
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.55);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 18px;
-  z-index: 9999;
-}
-.cd-modal{
-  width: min(680px, 100%);
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.16);
-  background: #0f1b33;
-  box-shadow: 0 18px 60px rgba(0,0,0,0.55);
-  padding: 14px;
-}
-.cd-modal-head{
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-  align-items: flex-start;
-  padding: 6px 6px 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.10);
-}
-.cd-modal-title{
-  font-weight: 900;
-  font-size: 1.15rem;
-  color: #e6f0ff;
-}
-.cd-modal-hint{
-  margin-top: 4px;
-  color: rgba(230,240,255,0.75);
-  font-size: 0.9rem;
-}
-.cd-modal-close{
-  border-radius: 10px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.08);
-  color: #e6f0ff;
-  font-weight: 900;
-  cursor: pointer;
-  padding: 6px 10px;
-}
-.cd-modal-close:hover{
-  background: rgba(255,255,255,0.12);
-}
+          .cd-review-actions {
+            gap: 8px;
+          }
 
-.cd-modal-body{
-  padding: 12px 6px 6px;
-  display: grid;
-  gap: 12px;
-}
-.cd-modal-row{
-  display: grid;
-  gap: 6px;
-}
-.cd-modal-label{
-  font-size: 0.85rem;
-  opacity: 0.8;
-  font-weight: 800;
-}
-.cd-modal-text{
-  line-height: 1.45;
-  color: rgba(230,240,255,0.92);
-}
-.cd-modal-actions{
-  display: flex;
-  gap: 10px;
-  align-items: center;
-}
-.cd-flag-btn{
-  border-radius: 999px;
-  padding: 8px 12px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(255,255,255,0.08);
-  color: #e6f0ff;
-  font-weight: 900;
-  cursor: pointer;
-}
-.cd-flag-btn:hover{
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(110,180,255,0.55);
-}
-.cd-modal-es{
-  margin-top: 8px;
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.06);
-  color: rgba(230,240,255,0.92);
-  font-weight: 800;
-}
-.cd-mistake-wrap{
-  display: grid;
-  gap: 8px;
-}
-
-.cd-mistake-expand{
-  padding: 12px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.06);
-  color: rgba(230,240,255,0.92);
-}
-
-.cd-expand-title{
-  margin-bottom: 10px;
-  font-size: 1rem;
-}
-
-.cd-expand-hint{
-  color: rgba(230,240,255,0.72);
-  font-weight: 700;
-}
-
-.cd-expand-row{
-  display: grid;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.cd-expand-label{
-  font-size: 0.85rem;
-  opacity: 0.8;
-  font-weight: 800;
-}
-
-.cd-expand-text{
-  line-height: 1.45;
-}
-
-.cd-expand-actions{
-  margin-top: 12px;
-}
-.cd-mistakes-hint{
-  margin: 6px 0 10px;
-  opacity: 0.9;
-  color: rgba(230,240,255,0.82);
-  font-weight: 700;
-}
-.cd-mistake-line{
-  display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 14px;
-}
-
-.cd-details-cue{
-  flex: 0 0 auto;
-  font-weight: 900;
-  font-size: 0.85rem;
-  color: rgba(230,240,255,0.75);
-  opacity: 0.95;
-  white-space: nowrap;
-}
-
-.cd-caret{
-  display: inline-block;
-  transform: translateY(-1px);
-  transition: transform 120ms ease;
-}
-
-.cd-caret.open{
-  transform: rotate(180deg) translateY(1px);
-}
-.cd-mistake-card{
-  width: 100%;
-}
-
-.cd-mistake-card:focus-visible{
-  outline: none;
-  border-color: rgba(110,180,255,0.85);
-  box-shadow: 0 0 0 3px rgba(110,180,255,0.25);
-}
-@keyframes cdPulse {
-  0% { box-shadow: 0 0 0 0 rgba(110,180,255,0.0); }
-  40% { box-shadow: 0 0 0 6px rgba(110,180,255,0.12); }
-  100% { box-shadow: 0 0 0 0 rgba(110,180,255,0.0); }
-}
-
-.cd-mistake-card{
-  animation: cdPulse 700ms ease 1;
-}
-
-.cd-review-card{
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(255,255,255,0.06);
-}
-
-.cd-review-phrase{
-  font-size: 1.05rem;
-  margin-bottom: 6px;
-}
-
-.cd-review-hint{
-  margin-top: 6px;
-  opacity: 0.8;
-  font-size: 0.9rem;
-}
-
-.cd-review-prompt{
-  margin: 10px 0 8px;
-  opacity: 0.85;
-  font-weight: 700;
-}
-
-.cd-review-verbs{
-  display: grid;
-  grid-template-columns: repeat(5, minmax(120px, 1fr));
-  gap: 10px;
-}
-
-
-.cd-review-actions{
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-  flex-wrap: wrap;
-}
-
-.cd-review-feedback.ok{
-  border: 1px solid rgba(0,200,120,0.35);
-  background: rgba(0,200,120,0.12);
-  padding: 10px 12px;
-  border-radius: 10px;
-}
-
-.cd-review-feedback.bad{
-  border: 1px solid rgba(255,70,70,0.35);
-  background: rgba(255,70,70,0.12);
-  padding: 10px 12px;
-  border-radius: 10px;
-}
-
-.cd-top-scores-list {
-  display: grid;
-  gap: 10px;
-  margin-top: 10px;
-  max-width: 420px;
-}
-
-.cd-top-score-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-
-  padding: 12px 14px;
-  border-radius: 14px;
-
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-.cd-top-score-rank {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.cd-top-score-medal {
-  font-size: 18px;
-  line-height: 1;
-}
-
-.cd-top-score-label {
-  font-size: 12px;
-  opacity: 0.8;
-}
-
-.cd-top-score-value {
-  font-size: 20px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-}
-
-/* ─────────────────────────────────────────────
-   Leaderboard (match page blue, no grey slab)
-──────────────────────────────────────────── */
-
-/* make the table itself transparent (no slab) */
-.cd-leaderboard-table{
-  border: 1px solid rgba(255,255,255,0.14);
-  border-radius: 16px;
-  overflow: hidden;
-  background: transparent !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
-}
-
-/* rows: use a subtle blue tint instead of grey */
-.cd-lb-row{
-  display: grid;
-  grid-template-columns: 60px 1fr 120px;
-  align-items: center;
-
-  padding: 14px 16px;
-  border-top: 1px solid rgba(255,255,255,0.10);
-
-  background: rgba(110,180,255,0.06) !important; /* blue-tinted */
-}
-
-.cd-lb-row:first-child{
-  border-top: none;
-}
-
-/* header slightly stronger, still blue not grey */
-.cd-lb-header{
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  font-size: 13px;
-
-  background: rgba(110,180,255,0.12) !important;
-}
-
-/* hover = a touch brighter */
-.cd-lb-row:not(.cd-lb-header):hover{
-  background: rgba(110,180,255,0.10) !important;
-}
-
-.cd-lb-rank{
-  opacity: 0.85;
-}
-
-.cd-lb-name-text{
-  font-weight: 700;
-  color: rgba(255,255,255,0.92);
-}
-
-.cd-lb-score{
-  text-align: right;
-  font-weight: 900;
-  font-size: 18px;
-  color: rgba(255,255,255,0.95);
-}
-
-/* “you” row: keep the gold highlight, but remove any grey feel */
-.cd-lb-row.is-me{
-  background: rgba(255,200,80,0.10) !important;
-  box-shadow: inset 0 0 0 1px rgba(255,200,80,0.22);
-}
-
-.cd-lb-me{
-  margin-left: 10px;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 800;
-
-  color: rgba(255,220,140,0.95);
-  border: 1px solid rgba(255,220,140,0.35);
-  background: rgba(255,200,80,0.12);
-}
-  .cd-verb-btn.is-selected{
-  border-color: rgba(255,255,255,0.55);
-  background: rgba(255,255,255,0.14);
-  box-shadow: 0 0 0 2px rgba(110,180,255,0.18);
-}
-
-
-
-        `}</style>
+          .cd-review-actions .review-btn {
+            width: 100%;
+          }
+        }
+      `}</style>
       </div>
     </div>
   );
