@@ -2035,6 +2035,22 @@ export async function fetchSpeakingCompletions(part = "part2") {
   return snap.docs.map(d => d.id); // `${part}:${taskId}`
 }
 
+export async function fetchSpeakingProgressMap(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return {};
+
+  const snap = await getDocs(collection(db, "users", realUid, "speakingProgress"));
+  const out = {};
+
+  snap.forEach((d) => {
+    const data = d.data() || {};
+    if (!data.completed) return;
+    out[d.id] = data.updatedAt || null;
+  });
+
+  return out;
+}
+
 
 // — WRITING PART 1: save a session (questions + answers) ————————————————
 /**

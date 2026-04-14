@@ -13,6 +13,7 @@ import {
   fetchWritingP3Submissions,
   fetchWritingP4Submissions,
   fetchVocabProgressMap,
+  fetchSpeakingProgressMap,
   fetchRecentVocabProgress,
   listAssignedActivitiesForStudent,
   listGrammarSetAttemptsForStudent,
@@ -169,6 +170,13 @@ function buildLatestWritingTaskMap(items = []) {
     if (!acc[key] || nextTime > acc[key]) acc[key] = nextTime;
     return acc;
   }, {});
+}
+
+function getSpeakingPartKey(type) {
+  if (type === "speaking-part-2") return "part2";
+  if (type === "speaking-part-3") return "part3";
+  if (type === "speaking-part-4") return "part4";
+  return "";
 }
 
 function getWritingBucket(type) {
@@ -362,9 +370,10 @@ useEffect(() => {
     }
 
     try {
-      const [assignments, vocabProgress, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+      const [assignments, vocabProgress, speakingProgress, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
         listAssignedActivitiesForStudent(user.uid),
         fetchVocabProgressMap(user.uid),
+        fetchSpeakingProgressMap(user.uid),
         fetchHubGrammarSubmissions(200, user.uid),
         listGrammarSetAttemptsForStudent(user.uid),
         fetchWritingP1Sessions(100, user.uid),
@@ -377,6 +386,7 @@ useEffect(() => {
 
       const completionSources = {
         vocabulary: vocabProgress || {},
+        speaking: speakingProgress || {},
         miniTests: buildLatestMap(miniTests || [], "activityId"),
         grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
           if (!attempt?.setId) return acc;
@@ -410,6 +420,20 @@ useEffect(() => {
           const completedAt = assignment?.taskId
             ? taskMap?.[assignment.taskId] || 0
             : completionSources.writing?.[bucket] || 0;
+          return completedAt < assignedAt;
+        }
+        if (assignment.activityType === "speaking") {
+          const partKey = getSpeakingPartKey(assignment.activityId);
+          if (!partKey) return true;
+
+          if (assignment?.taskId) {
+            return timestampToMs(completionSources.speaking?.[`${partKey}:${assignment.taskId}`]) < assignedAt;
+          }
+
+          const completionTimes = Object.entries(completionSources.speaking || {})
+            .filter(([key]) => key.startsWith(`${partKey}:`))
+            .map(([, value]) => timestampToMs(value));
+          const completedAt = completionTimes.length ? Math.max(...completionTimes) : 0;
           return completedAt < assignedAt;
         }
         if (assignment.activityType === "vocabulary-topic") {

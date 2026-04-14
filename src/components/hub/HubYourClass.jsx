@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getSitePath } from "../../siteConfig.js";
 import {
   fetchVocabProgressMap,
+  fetchSpeakingProgressMap,
   fetchHubGrammarSubmissions,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
@@ -64,6 +65,8 @@ function getAssignmentTypeLabel(type) {
       return "Use of English set";
     case "writing":
       return "Writing task";
+    case "speaking":
+      return "Speaking task";
     case "vocabulary-topic":
       return "Vocabulary set";
     default:
@@ -99,6 +102,13 @@ function buildLatestWritingTaskMap(items = []) {
   }, {});
 }
 
+function getSpeakingPartKey(type) {
+  if (type === "speaking-part-2") return "part2";
+  if (type === "speaking-part-3") return "part3";
+  if (type === "speaking-part-4") return "part4";
+  return "";
+}
+
 function resolveAssignedCompletion(assignment, sources) {
   const assignedAt = timestampToMs(assignment?.createdAt);
   if (assignment?.activityType === "mini-test") {
@@ -117,6 +127,22 @@ function resolveAssignedCompletion(assignment, sources) {
     const completedAt = assignment?.taskId
       ? taskMap?.[assignment.taskId] || 0
       : sources.writing?.[bucket] || 0;
+    return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+  }
+
+  if (assignment?.activityType === "speaking") {
+    const partKey = getSpeakingPartKey(assignment.activityId);
+    if (!partKey) return { completed: false, completedAt: 0 };
+
+    if (assignment?.taskId) {
+      const completedAt = timestampToMs(sources.speaking?.[`${partKey}:${assignment.taskId}`]);
+      return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+    }
+
+    const completionTimes = Object.entries(sources.speaking || {})
+      .filter(([key]) => key.startsWith(`${partKey}:`))
+      .map(([, value]) => timestampToMs(value));
+    const completedAt = completionTimes.length ? Math.max(...completionTimes) : 0;
     return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
   }
 
@@ -162,11 +188,12 @@ export default function HubYourClass({ user }) {
 
       setLoading(true);
       try {
-        const [rows, attempts, assignedRows, vocabProgress, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
           listStudentCourseTestSessions(user.uid),
           listStudentCourseTestAttempts(user.uid),
           listAssignedActivitiesForStudent(user.uid),
           fetchVocabProgressMap(user.uid),
+          fetchSpeakingProgressMap(user.uid),
           fetchHubGrammarSubmissions(200, user.uid),
           listGrammarSetAttemptsForStudent(user.uid),
           fetchWritingP1Sessions(100, user.uid),
@@ -178,6 +205,7 @@ export default function HubYourClass({ user }) {
         setSessions(rows || []);
         const completionSources = {
           vocabulary: vocabProgress || {},
+          speaking: speakingProgress || {},
           miniTests: buildLatestTimeMap(miniTests || [], "activityId"),
           grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
             if (!attempt?.setId) return acc;

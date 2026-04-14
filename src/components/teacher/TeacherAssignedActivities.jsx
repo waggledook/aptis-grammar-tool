@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   createAssignedActivity,
   fetchVocabProgressMap,
+  fetchSpeakingProgressMap,
   fetchHubGrammarSubmissions,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
@@ -13,6 +14,9 @@ import {
   listTeacherStudentsWithRosterMeta,
 } from "../../firebase";
 import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
+import { PART2_TASKS } from "../speaking/banks/part2";
+import { PART3_TASKS } from "../speaking/banks/part3";
+import { PART4_TASKS } from "../speaking/banks/part4";
 import { getTopicSetIds } from "../vocabulary/data/vocabTopics.js";
 import { getSitePath } from "../../siteConfig.js";
 import { toast } from "../../utils/toast";
@@ -33,6 +37,18 @@ const WRITING_TASKS = [
   { id: "book-exchange", label: "Book Exchange Website" },
   { id: "film-club", label: "Film Club" },
 ];
+
+const SPEAKING_OPTIONS = [
+  { id: "speaking-part-2", label: "Aptis Speaking Part 2", routePath: getSitePath("/speaking/part2") },
+  { id: "speaking-part-3", label: "Aptis Speaking Part 3", routePath: getSitePath("/speaking/part3") },
+  { id: "speaking-part-4", label: "Aptis Speaking Part 4", routePath: getSitePath("/speaking/part4") },
+];
+
+const SPEAKING_TASK_OPTIONS = {
+  "speaking-part-2": PART2_TASKS.map((task) => ({ id: task.id, label: task.title })),
+  "speaking-part-3": PART3_TASKS.map((task) => ({ id: task.id, label: task.title })),
+  "speaking-part-4": PART4_TASKS.map((task) => ({ id: task.id, label: task.title })),
+};
 
 function formatDateTime(value) {
   if (!value) return "—";
@@ -83,6 +99,8 @@ function getAssignmentTypeLabel(type) {
       return "Use of English set";
     case "writing":
       return "Writing task";
+    case "speaking":
+      return "Speaking task";
     case "vocabulary-topic":
       return "Vocabulary set";
     default:
@@ -118,6 +136,13 @@ function buildLatestWritingTaskMap(items = []) {
   }, {});
 }
 
+function getSpeakingPartKey(type) {
+  if (type === "speaking-part-2") return "part2";
+  if (type === "speaking-part-3") return "part3";
+  if (type === "speaking-part-4") return "part4";
+  return "";
+}
+
 function resolveAssignmentCompletion(assignment, sources) {
   const assignedAt = timestampToMs(assignment?.createdAt);
   if (assignment?.activityType === "mini-test") {
@@ -136,6 +161,22 @@ function resolveAssignmentCompletion(assignment, sources) {
     const completedAt = assignment?.taskId
       ? taskMap?.[assignment.taskId] || 0
       : sources.writing?.[bucket] || 0;
+    return { completed: completedAt >= assignedAt, completedAt };
+  }
+
+  if (assignment?.activityType === "speaking") {
+    const partKey = getSpeakingPartKey(assignment.activityId);
+    if (!partKey) return { completed: false, completedAt: 0 };
+
+    if (assignment?.taskId) {
+      const completedAt = timestampToMs(sources.speaking?.[`${partKey}:${assignment.taskId}`]);
+      return { completed: completedAt >= assignedAt, completedAt };
+    }
+
+    const completionTimes = Object.entries(sources.speaking || {})
+      .filter(([key]) => key.startsWith(`${partKey}:`))
+      .map(([, value]) => timestampToMs(value));
+    const completedAt = completionTimes.length ? Math.max(...completionTimes) : 0;
     return { completed: completedAt >= assignedAt, completedAt };
   }
 
@@ -173,6 +214,11 @@ function buildWritingRoutePath(baseRoutePath, taskId) {
   return `${baseRoutePath}?task=${encodeURIComponent(taskId)}`;
 }
 
+function buildSpeakingRoutePath(baseRoutePath, taskId) {
+  if (!baseRoutePath || !taskId) return baseRoutePath;
+  return `${baseRoutePath}?task=${encodeURIComponent(taskId)}`;
+}
+
 export default function TeacherAssignedActivities({ user }) {
   const [students, setStudents] = useState([]);
   const [grammarSets, setGrammarSets] = useState([]);
@@ -182,6 +228,7 @@ export default function TeacherAssignedActivities({ user }) {
   const [activityType, setActivityType] = useState("mini-test");
   const [activityId, setActivityId] = useState("");
   const [writingTaskId, setWritingTaskId] = useState("");
+  const [speakingTaskId, setSpeakingTaskId] = useState("");
   const [targetMode, setTargetMode] = useState("all");
   const [className, setClassName] = useState("");
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
@@ -206,8 +253,9 @@ export default function TeacherAssignedActivities({ user }) {
         const completionByStudentId = Object.fromEntries(
           await Promise.all(
             (studentRows || []).map(async (student) => {
-              const [vocabProgress, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+              const [vocabProgress, speakingProgress, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
                 fetchVocabProgressMap(student.id),
+                fetchSpeakingProgressMap(student.id),
                 fetchHubGrammarSubmissions(200, student.id),
                 listGrammarSetAttemptsForStudent(student.id),
                 fetchWritingP1Sessions(100, student.id),
@@ -220,6 +268,7 @@ export default function TeacherAssignedActivities({ user }) {
                 student.id,
                 {
                   vocabulary: vocabProgress || {},
+                  speaking: speakingProgress || {},
                   miniTests: buildLatestTimeMap(miniTests || [], "activityId"),
                   grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
                     if (!attempt?.setId) return acc;
@@ -250,7 +299,7 @@ export default function TeacherAssignedActivities({ user }) {
               const student = studentMap[studentId];
               const completion = resolveAssignmentCompletion(
                 assignment,
-                completionByStudentId[studentId] || { miniTests: {}, grammarSets: {}, writing: {} }
+                completionByStudentId[studentId] || { miniTests: {}, grammarSets: {}, writing: {}, speaking: {}, vocabulary: {} }
               );
 
               return {
@@ -336,6 +385,7 @@ export default function TeacherAssignedActivities({ user }) {
     if (activityType === "grammar-set") return publishedGrammarSetOptions;
     if (activityType === "use-of-english") return useOfEnglishOptions;
     if (activityType === "writing") return WRITING_OPTIONS;
+    if (activityType === "speaking") return SPEAKING_OPTIONS;
     return miniTestOptions;
   }, [activityType, miniTestOptions, publishedGrammarSetOptions, useOfEnglishOptions]);
 
@@ -343,6 +393,11 @@ export default function TeacherAssignedActivities({ user }) {
     if (activityType !== "writing") return [];
     if (!["writing-part-2", "writing-part-3", "writing-part-4"].includes(activityId)) return [];
     return WRITING_TASKS;
+  }, [activityType, activityId]);
+
+  const currentSpeakingTaskOptions = useMemo(() => {
+    if (activityType !== "speaking") return [];
+    return SPEAKING_TASK_OPTIONS[activityId] || [];
   }, [activityType, activityId]);
 
   const assignmentsWithProgress = useMemo(() => assignments || [], [assignments]);
@@ -376,6 +431,16 @@ export default function TeacherAssignedActivities({ user }) {
     if (!exists) setWritingTaskId("");
   }, [currentWritingTaskOptions, writingTaskId]);
 
+  useEffect(() => {
+    if (!currentSpeakingTaskOptions.length) {
+      setSpeakingTaskId("");
+      return;
+    }
+
+    const exists = currentSpeakingTaskOptions.some((option) => option.id === speakingTaskId);
+    if (!exists) setSpeakingTaskId("");
+  }, [currentSpeakingTaskOptions, speakingTaskId]);
+
   function toggleStudent(studentId) {
     setSelectedStudentIds((prev) =>
       prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
@@ -392,6 +457,10 @@ export default function TeacherAssignedActivities({ user }) {
     const chosenWritingTask =
       activityType === "writing" && writingTaskId
         ? currentWritingTaskOptions.find((option) => option.id === writingTaskId) || null
+        : null;
+    const chosenSpeakingTask =
+      activityType === "speaking" && speakingTaskId
+        ? currentSpeakingTaskOptions.find((option) => option.id === speakingTaskId) || null
         : null;
 
     let targetStudentIds = [];
@@ -417,6 +486,8 @@ export default function TeacherAssignedActivities({ user }) {
       const routePath =
         activityType === "writing"
           ? buildWritingRoutePath(chosenOption.routePath, chosenWritingTask?.id || "")
+          : activityType === "speaking"
+            ? buildSpeakingRoutePath(chosenOption.routePath, chosenSpeakingTask?.id || "")
           : getActivityRoute({
               activityType,
               activityId: chosenOption.id,
@@ -429,10 +500,15 @@ export default function TeacherAssignedActivities({ user }) {
         teacherEmail: user.email || null,
         activityType,
         activityId: chosenOption.id,
-        activityLabel: chosenWritingTask ? `${chosenOption.label} — ${chosenWritingTask.label}` : chosenOption.label,
+        activityLabel:
+          chosenWritingTask
+            ? `${chosenOption.label} — ${chosenWritingTask.label}`
+            : chosenSpeakingTask
+              ? `${chosenOption.label} — ${chosenSpeakingTask.label}`
+              : chosenOption.label,
         routePath,
-        taskId: chosenWritingTask?.id || "",
-        taskTitle: chosenWritingTask?.label || "",
+        taskId: chosenWritingTask?.id || chosenSpeakingTask?.id || "",
+        taskTitle: chosenWritingTask?.label || chosenSpeakingTask?.label || "",
         targetMode,
         className: targetMode === "class" ? className : "",
         targetStudentIds,
@@ -443,6 +519,7 @@ export default function TeacherAssignedActivities({ user }) {
       setAssignments(refreshed || []);
       setNotes("");
       setWritingTaskId("");
+      setSpeakingTaskId("");
       if (targetMode === "selected") setSelectedStudentIds([]);
       toast("Assignment created.");
     } catch (error) {
@@ -459,7 +536,7 @@ export default function TeacherAssignedActivities({ user }) {
         <div className="teacher-assign-head">
           <div>
             <h3>Create an assigned activity</h3>
-            <p>Send mini tests, grammar sets, Use of English sets, or writing tasks to your class.</p>
+            <p>Send mini tests, grammar sets, Use of English sets, writing tasks, or speaking tasks to your class.</p>
           </div>
         </div>
 
@@ -475,6 +552,7 @@ export default function TeacherAssignedActivities({ user }) {
                   <option value="grammar-set">Aptis grammar set</option>
                   <option value="use-of-english">Use of English set</option>
                   <option value="writing">Writing task</option>
+                  <option value="speaking">Speaking task</option>
                 </select>
               </label>
 
@@ -509,6 +587,20 @@ export default function TeacherAssignedActivities({ user }) {
                 <select value={writingTaskId} onChange={(event) => setWritingTaskId(event.target.value)}>
                   <option value="">Any task in this part</option>
                   {currentWritingTaskOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            ) : null}
+
+            {activityType === "speaking" && currentSpeakingTaskOptions.length ? (
+              <label className="field">
+                <span>Specific task</span>
+                <select value={speakingTaskId} onChange={(event) => setSpeakingTaskId(event.target.value)}>
+                  <option value="">Any task in this part</option>
+                  {currentSpeakingTaskOptions.map((option) => (
                     <option key={option.id} value={option.id}>
                       {option.label}
                     </option>

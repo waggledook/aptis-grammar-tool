@@ -1,8 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
 import { loadSpeakingDone, markSpeakingDone } from "../../utils/speakingProgress";
 import { PART3_TASKS } from "./banks/part3";
+import SpeakingAssignButton from "./SpeakingAssignButton";
+import { getSitePath } from "../../siteConfig.js";
 
 /**
  * Speaking – Part 3 (Compare two photos) — Exam-like
@@ -21,6 +24,7 @@ import { PART3_TASKS } from "./banks/part3";
  */
 
 export default function SpeakingPart3({ tasks = PART3_TASKS, user, onRequireSignIn }) {
+  const [searchParams] = useSearchParams();
   const items = tasks;
 
   const [taskIndex, setTaskIndex] = useState(0);
@@ -36,6 +40,16 @@ export default function SpeakingPart3({ tasks = PART3_TASKS, user, onRequireSign
     })();
     return () => { alive = false; };
   }, [user]);
+
+  useEffect(() => {
+    const requestedTaskId = searchParams.get("task");
+    if (!requestedTaskId) return;
+
+    const nextIndex = items.findIndex((task) => task.id === requestedTaskId);
+    if (nextIndex === -1) return;
+    if (!user && nextIndex >= 2) return;
+    setTaskIndex(nextIndex);
+  }, [searchParams, items, user]);
 
   // decorate picker items (✓ for done, 🔒 for locked 3+ when signed-out)
   const decorated = useMemo(() =>
@@ -76,6 +90,14 @@ export default function SpeakingPart3({ tasks = PART3_TASKS, user, onRequireSign
             value={taskIndex}
             onChange={handleSelectTask}
             label="Task"
+          />
+          <SpeakingAssignButton
+            user={user}
+            activityId="speaking-part-3"
+            activityLabel={`Aptis Speaking Part 3 — ${current.title}`}
+            routePath={getSitePath(`/speaking/part3?task=${encodeURIComponent(current.id)}`)}
+            taskId={current.id}
+            taskTitle={current.title}
           />
         </div>
       </header>
@@ -733,4 +755,3 @@ function StyleScope(){
     `}</style>
   );
 }
-

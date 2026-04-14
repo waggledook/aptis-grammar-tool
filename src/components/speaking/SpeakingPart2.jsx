@@ -1,9 +1,12 @@
 // src/components/speaking/SpeakingPart2.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
 import { loadSpeakingDone, markSpeakingDone } from "../../utils/speakingProgress";
 import { PART2_TASKS } from "./banks/part2";
+import SpeakingAssignButton from "./SpeakingAssignButton";
+import { getSitePath } from "../../siteConfig.js";
 
 
 /**
@@ -25,6 +28,7 @@ import { PART2_TASKS } from "./banks/part2";
  */
 
 export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSignIn }) {
+  const [searchParams] = useSearchParams();
   const items = tasks;
 
   // Picker / current task
@@ -41,6 +45,16 @@ export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSign
     })();
     return () => { alive = false; };
   }, [user]);
+
+  useEffect(() => {
+    const requestedTaskId = searchParams.get("task");
+    if (!requestedTaskId) return;
+
+    const nextIndex = items.findIndex((task) => task.id === requestedTaskId);
+    if (nextIndex === -1) return;
+    if (!user && nextIndex >= 2) return;
+    setTaskIndex(nextIndex);
+  }, [searchParams, items, user]);
 
   // 🔍 Debug: check user + Firebase exports
   useEffect(() => {
@@ -89,6 +103,14 @@ export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSign
             value={taskIndex}
             onChange={handleSelectTask}
             label="Task"
+          />
+          <SpeakingAssignButton
+            user={user}
+            activityId="speaking-part-2"
+            activityLabel={`Aptis Speaking Part 2 — ${current.title}`}
+            routePath={getSitePath(`/speaking/part2?task=${encodeURIComponent(current.id)}`)}
+            taskId={current.id}
+            taskTitle={current.title}
           />
         </div>
       </header>
