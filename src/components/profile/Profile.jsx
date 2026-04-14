@@ -86,6 +86,7 @@ export default function Profile({
   titleOverride,          // optional: override "My Profile"
   viewerLabelOverride,    // optional: override "Signed in as …"
   siteMode = "aptis",
+  allowAccountSecurity = true,
 }) {
   const navigate = useNavigate();
   const isSeifHubProfile = siteMode === "seifhub";
@@ -443,6 +444,7 @@ const totalListeningTasks =
 ) : (
   <>
 
+      {allowAccountSecurity && (
       <section className="account-strip">
   <div className="account-strip-head">
     <div>
@@ -504,6 +506,7 @@ const totalListeningTasks =
     </form>
   )}
 </section>
+      )}
 
           {!isSeifHubProfile && (
           <>

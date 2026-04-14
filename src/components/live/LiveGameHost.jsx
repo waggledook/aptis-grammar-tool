@@ -9,30 +9,50 @@ import { toast } from "../../utils/toast";
 import { useTickSound } from "../../hooks/useTickSound";
 import { QRCodeSVG } from "qrcode.react";
 
+const ROUND_TICK_TRACKS = [
+  "/sounds/live-host-round-1.mp3",
+  "/sounds/live-host-round-2.mp3",
+  "/sounds/live-host-round-3.mp3",
+  "/sounds/live-host-round-4.mp3",
+];
+
+function pickNextRoundTick(previousTrack) {
+  if (ROUND_TICK_TRACKS.length <= 1) {
+    return ROUND_TICK_TRACKS[0] || "/sounds/tick.mp3";
+  }
+
+  const availableTracks = ROUND_TICK_TRACKS.filter((track) => track !== previousTrack);
+  return availableTracks[Math.floor(Math.random() * availableTracks.length)] || ROUND_TICK_TRACKS[0];
+}
 
 export default function LiveGameHost() {
   const { gameId } = useParams();
   const [game, setGame] = useState(null);
   const [loadingGame, setLoadingGame] = useState(true);
+  const [copyState, setCopyState] = useState("");
 
   const [items, setItems] = useState([]);
   const [loadingItems, setLoadingItems] = useState(true);
 
   const [remainingSeconds, setRemainingSeconds] = useState(null);
   const [selectedExplanationIndex, setSelectedExplanationIndex] = useState(null);
+  const [roundTickSrc, setRoundTickSrc] = useState(() => ROUND_TICK_TRACKS[0] || "/sounds/tick.mp3");
 
   // 🔊 NEW: sound volume + mute
   const [soundVolume, setSoundVolume] = useState(0.9); // 0–1
   const [soundMuted, setSoundMuted] = useState(false);
 
-  // Get tick refs + play function from the hook
-const { tickRef, tickFastRef, playTick } = useTickSound();
+// Get tick refs + play function from the hook
+const { tickRef, tickFastRef, playTick, stopTicks } = useTickSound();
 
 // 🔊 Other audio refs (host-only sounds)
 const revealRef = useRef(null);
 const nextRef = useRef(null);
 const finishRef = useRef(null);
 const timeUpRef = useRef(null);
+const answerSelectRef = useRef(null);
+const previousRoundTickRef = useRef(null);
+const previousAnsweredCountRef = useRef(0);
 
   // 🔊 Keep all sounds in sync with volume / mute
   useEffect(() => {
@@ -44,6 +64,7 @@ const timeUpRef = useRef(null);
       nextRef,
       finishRef,
       timeUpRef,
+      answerSelectRef,
     ];
 
     refs.forEach((r) => {
@@ -60,6 +81,19 @@ const joinUrl =
 game && game.pin
   ? `${baseUrl}/live/join?pin=${encodeURIComponent(game.pin)}`
   : `${baseUrl}/live/join`;
+
+  async function handleCopyJoinLink() {
+    if (!joinUrl || typeof window === "undefined" || !navigator?.clipboard?.writeText) return;
+    try {
+      await navigator.clipboard.writeText(joinUrl);
+      setCopyState("Copied");
+      window.setTimeout(() => setCopyState(""), 1800);
+    } catch (error) {
+      console.error("[LiveGameHost] copy join link failed", error);
+      setCopyState("Copy failed");
+      window.setTimeout(() => setCopyState(""), 1800);
+    }
+  }
 
   // Subscribe to liveGames/{gameId}
   useEffect(() => {
@@ -130,6 +164,7 @@ game && game.pin
   const questionIndex = game?.state?.questionIndex ?? 0;
   const questionDuration = game?.state?.questionDuration ?? 20;
   const deadline = game?.state?.questionDeadline ?? null;
+  const hasRoundStarted = status === "in-progress" || status === "finished";
 
   // Countdown timer based on questionDeadline
 useEffect(() => {
@@ -157,13 +192,61 @@ useEffect(() => {
 
   useEffect(() => {
     if (status !== "in-progress" || phase !== "question") return;
-    if (remainingSeconds == null || remainingSeconds <= 0) return;
-  
-    const isFast = remainingSeconds <= 3;
-    playTick(isFast);
-  }, [remainingSeconds, status, phase]);
-  
-  
+
+    const nextTrack = pickNextRoundTick(previousRoundTickRef.current);
+    previousRoundTickRef.current = nextTrack;
+    setRoundTickSrc(nextTrack);
+
+    if (tickRef.current) {
+      tickRef.current.pause();
+      tickRef.current.currentTime = 0;
+    }
+  }, [status, phase, questionIndex, tickRef]);
+
+  useEffect(() => {
+    const roundAudio = tickRef.current;
+    if (!roundAudio) return;
+
+    const shouldPlayRoundMusic =
+      status === "in-progress" &&
+      phase === "question" &&
+      remainingSeconds != null &&
+      remainingSeconds > 3;
+
+    if (!shouldPlayRoundMusic) {
+      roundAudio.pause();
+      roundAudio.currentTime = 0;
+      return;
+    }
+
+    roundAudio.loop = true;
+    roundAudio.play().catch(() => {
+      // Ignore autoplay / user-gesture issues
+    });
+  }, [remainingSeconds, status, phase, roundTickSrc, tickRef]);
+
+  useEffect(() => {
+    if (status !== "in-progress" || phase !== "question") return;
+    if (remainingSeconds == null || remainingSeconds <= 0 || remainingSeconds > 3) return;
+
+    if (tickRef.current) {
+      tickRef.current.pause();
+      tickRef.current.currentTime = 0;
+    }
+
+    playTick(true);
+  }, [remainingSeconds, status, phase, playTick, tickRef]);
+
+  useEffect(() => {
+    if (status === "in-progress" && phase === "question") return;
+    stopTicks();
+  }, [status, phase, stopTicks]);
+
+  useEffect(() => {
+    return () => {
+      stopTicks();
+    };
+  }, [stopTicks]);
 
   // 🔊 Time-up sound when countdown reaches 0 (host only)
 useEffect(() => {
@@ -179,11 +262,10 @@ useEffect(() => {
       // ignore audio errors
     }
   }, [remainingSeconds, status, phase, isHost]);
-  
 
   const totalQuestions = items.length;
   const currentItem =
-    !loadingItems && totalQuestions > 0 && questionIndex < totalQuestions
+    hasRoundStarted && !loadingItems && totalQuestions > 0 && questionIndex < totalQuestions
       ? items[questionIndex]
       : null;
 
@@ -191,6 +273,24 @@ useEffect(() => {
   const answersForQ =
     (game && game.answers && game.answers[questionIndex]) || {};
   const answeredCount = Object.keys(answersForQ).length;
+
+  useEffect(() => {
+    if (status !== "in-progress" || phase !== "question") {
+      previousAnsweredCountRef.current = answeredCount;
+      return;
+    }
+
+    if (answeredCount > previousAnsweredCountRef.current && answerSelectRef.current) {
+      try {
+        answerSelectRef.current.currentTime = 0;
+        answerSelectRef.current.play().catch(() => {});
+      } catch {
+        // ignore audio errors
+      }
+    }
+
+    previousAnsweredCountRef.current = answeredCount;
+  }, [answeredCount, status, phase]);
 
   const isLastQuestion =
     totalQuestions > 0 && questionIndex === totalQuestions - 1;
@@ -417,9 +517,6 @@ useEffect(() => {
         </style>  
       <header className="page-header">
         <h1>Host Live Game</h1>
-        <p className="muted">
-          Game ID: <code>{gameId}</code>
-        </p>
       </header>
 
       <section className="card">
@@ -450,6 +547,20 @@ useEffect(() => {
               Ask students to open the{" "}
               <strong>Join Live Game</strong> page and enter this PIN.
             </p>
+            <div
+              style={{
+                marginTop: ".65rem",
+                display: "flex",
+                alignItems: "center",
+                gap: ".5rem",
+                flexWrap: "wrap",
+              }}
+            >
+              <button type="button" className="btn" onClick={handleCopyJoinLink}>
+                Copy join link
+              </button>
+              {copyState ? <span className="tiny muted">{copyState}</span> : null}
+            </div>
           </div>
 
           {/* QR code */}
@@ -642,7 +753,9 @@ useEffect(() => {
 
         {!loadingItems && !currentItem && (
           <p className="muted">
-            No question available. You may have reached the end of the set.
+            {status === "lobby"
+              ? "The first question will appear here when you start the game."
+              : "No question available. You may have reached the end of the set."}
           </p>
         )}
 
@@ -674,6 +787,7 @@ useEffect(() => {
                 const isCorrect = idx === responseStats.correctIndex;
                 const total = Math.max(answeredCount, 1);
                 const pct = Math.round((count / total) * 100);
+                const showResponseStats = phase === "reveal";
 
                 const highlight =
                   phase === "reveal" && isCorrect
@@ -737,8 +851,9 @@ useEffect(() => {
                       <div
                         style={{
                           fontSize: ".8rem",
-                          opacity: 0.8,
+                          opacity: showResponseStats ? 0.8 : 0,
                           textAlign: "right",
+                          visibility: showResponseStats ? "visible" : "hidden",
                         }}
                       >
                         <div>{count} answers</div>
@@ -879,12 +994,13 @@ useEffect(() => {
 
 
       {/* 🔊 Hidden audio elements – only in host view */}
-      <audio ref={tickRef} src="/sounds/tick.mp3" preload="auto" />
+      <audio ref={tickRef} src={roundTickSrc} preload="auto" />
       <audio ref={tickFastRef} src="/sounds/tick_fast.mp3" preload="auto" />
       <audio ref={revealRef} src="/sounds/reveal.mp3" preload="auto" />
       <audio ref={nextRef} src="/sounds/next.mp3" preload="auto" />
       <audio ref={finishRef} src="/sounds/finish.mp3" preload="auto" />
       <audio ref={timeUpRef} src="/sounds/time_up.mp3" preload="auto" /> {/* 👈 NEW */}
+      <audio ref={answerSelectRef} src="/sounds/bubble_pop.mp3" preload="auto" />
     </div>
   );
 }

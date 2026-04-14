@@ -1,5 +1,5 @@
 // src/components/live/LiveGamePlayer.jsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { ref, onValue } from "firebase/database";
 import { rtdb, auth } from "../../firebase";
@@ -17,6 +17,7 @@ export default function LiveGamePlayer() {
   const [answerSubmitting, setAnswerSubmitting] = useState(false);
   const [answeredQuestionIndex, setAnsweredQuestionIndex] = useState(null);
   const [remainingSeconds, setRemainingSeconds] = useState(null);
+  const answerSelectRef = useRef(null);
 
   // NEW: keep track of the last score the player has "seen" (after reveal)
   const [lastRevealedScore, setLastRevealedScore] = useState(null);
@@ -98,6 +99,7 @@ export default function LiveGamePlayer() {
   const status = game?.status || "lobby";
   const questionIndex = game?.state?.questionIndex ?? 0;
   const questionDuration = game?.state?.questionDuration ?? 20;
+  const hasRoundStarted = status === "in-progress";
 
   const playersObj = game?.players || {};
   const players = Object.entries(playersObj).map(([pUid, p]) => ({
@@ -162,7 +164,7 @@ export default function LiveGamePlayer() {
   }
 
   const currentItem =
-    !loadingItems && items.length > 0 ? items[questionIndex] : null;
+    hasRoundStarted && !loadingItems && items.length > 0 ? items[questionIndex] : null;
 
   const hasAnsweredThisQuestion =
     answeredQuestionIndex !== null &&
@@ -172,6 +174,16 @@ export default function LiveGamePlayer() {
     phase === "question" && lastRevealedScore != null
       ? lastRevealedScore
       : me?.score ?? 0;
+
+  function playAnswerSelectSound() {
+    if (!answerSelectRef.current) return;
+    try {
+      answerSelectRef.current.currentTime = 0;
+      answerSelectRef.current.play().catch(() => {});
+    } catch {
+      // ignore audio errors
+    }
+  }
 
   // Handle clicking an option
   const handleAnswerClick = async (optionIndex) => {
@@ -210,6 +222,7 @@ export default function LiveGamePlayer() {
 
     try {
       setAnswerSubmitting(true);
+      playAnswerSelectSound();
       await submitLiveGameAnswer({
         gameId,
         questionIndex,
@@ -419,7 +432,7 @@ export default function LiveGamePlayer() {
       <div className="card" style={{ marginTop: "1rem" }}>
         <p>{message}</p>
         <p className="muted" style={{ marginTop: ".25rem" }}>
-          Question: <strong>{questionIndex + 1}</strong>
+          Question: <strong>{hasRoundStarted ? questionIndex + 1 : 0}</strong>
         </p>
         {me && (
           <p className="muted">
@@ -446,8 +459,9 @@ export default function LiveGamePlayer() {
 
           {!loadingItems && !currentItem && (
             <p className="muted">
-              No question available. Your teacher may have reached the end of the
-              game.
+              {status === "lobby"
+                ? "Waiting for your teacher to start the game."
+                : "No question available. Your teacher may have reached the end of the game."}
             </p>
           )}
 
@@ -531,6 +545,7 @@ export default function LiveGamePlayer() {
         )}
       </div>
       )}
+      <audio ref={answerSelectRef} src="/sounds/bubble_pop.mp3" preload="auto" />
     </div>
   );
 }
