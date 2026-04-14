@@ -1,19 +1,28 @@
 // src/components/vocabulary/VocabularyTopics.jsx
 import React from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import TopicTrainer from "./TopicTrainer";
 import TopicFlashcards from "./TopicFlashcards";
 import { toast } from "../../utils/toast";
 import UnderConstructionPanel from "../common/UnderConstructionPanel";
+import { getSitePath } from "../../siteConfig.js";
 
 export default function VocabularyTopics({
   onSelect,
   onBack,
   isAuthenticated = false,
+  user = null,
 }) {
   const navigate = useNavigate();
-  const [selectedTopic, setSelectedTopic] = React.useState(null);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const topicFromUrl = searchParams.get("topic");
+  const setFromUrl = searchParams.get("set");
+  const [selectedTopic, setSelectedTopic] = React.useState(topicFromUrl || null);
   const [topicView, setTopicView] = React.useState("practice");
+
+  React.useEffect(() => {
+    setSelectedTopic(topicFromUrl || null);
+  }, [topicFromUrl]);
 
   if (selectedTopic) {
     if (topicView === "flashcards") {
@@ -26,15 +35,25 @@ export default function VocabularyTopics({
       );
     }
 
-    return (
-      <TopicTrainer
-        topic={selectedTopic}
-        onBack={() => {
-          setSelectedTopic(null);
-          setTopicView("practice");
-        }}
-        isAuthenticated={isAuthenticated}
-        onShowFlashcards={() => setTopicView("flashcards")}
+      return (
+        <TopicTrainer
+          topic={selectedTopic}
+          initialSetId={setFromUrl || ""}
+          user={user}
+          onSetChange={(setId) => {
+            const next = new URLSearchParams(searchParams);
+            next.set("topic", selectedTopic);
+            if (setId) next.set("set", setId);
+            else next.delete("set");
+            setSearchParams(next);
+          }}
+          onBack={() => {
+            setSearchParams({});
+            setSelectedTopic(null);
+            setTopicView("practice");
+          }}
+          isAuthenticated={isAuthenticated}
+          onShowFlashcards={() => setTopicView("flashcards")}
       />
     );
   }
@@ -159,7 +178,7 @@ export default function VocabularyTopics({
             className={`card ${t.active ? "" : "soon-card"}`}
             onClick={() =>
               t.active
-                ? setSelectedTopic(t.id)
+                ? setSearchParams({ topic: t.id })
                 : toast(`${t.name} topic coming soon 👀`)
             }
           >
@@ -176,7 +195,7 @@ export default function VocabularyTopics({
 
       <button
         className="topbar-btn"
-        onClick={() => navigate("/vocabulary")}
+        onClick={() => navigate(getSitePath("/vocabulary"))}
         style={{ marginTop: "1rem" }}
       >
         ← Back to Vocabulary Menu

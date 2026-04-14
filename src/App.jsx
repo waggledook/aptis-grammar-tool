@@ -12,6 +12,8 @@ import {
   fetchWritingP2Submissions,
   fetchWritingP3Submissions,
   fetchWritingP4Submissions,
+  fetchVocabProgressMap,
+  fetchRecentVocabProgress,
   listAssignedActivitiesForStudent,
   listGrammarSetAttemptsForStudent,
 } from "./firebase";
@@ -50,6 +52,7 @@ import VocabularyMenu from "./components/vocabulary/VocabularyMenu";
 import ToastHost from './components/ToastHost';
 import Footer from "./components/common/Footer";
 import VocabularyTopics from "./components/vocabulary/VocabularyTopics";
+import { getTopicSetIds } from "./components/vocabulary/data/vocabTopics";
 import CollocationMenu from "./components/vocabulary/collocations/CollocationMenu";
 import CollocationDash from "./components/vocabulary/collocations/CollocationDash";
 import VocabLab from "./components/vocabulary/VocabLab";
@@ -274,12 +277,13 @@ useEffect(() => {
       const notificationIds = (
         await Promise.all(
           studentIds.map(async (studentId) => {
-            const [part1, part2, part3, part4, miniTests] = await Promise.all([
+            const [part1, part2, part3, part4, miniTests, vocabSets] = await Promise.all([
               fetchWritingP1Sessions(3, studentId),
               fetchWritingP2Submissions(3, studentId),
               fetchWritingP3Submissions(3, studentId),
               fetchWritingP4Submissions(3, studentId),
               fetchHubGrammarSubmissions(3, studentId),
+              fetchRecentVocabProgress(3, studentId),
             ]);
 
             return [
@@ -288,6 +292,7 @@ useEffect(() => {
               ...part3.map((entry) => ({ id: `${studentId}:P3:${entry.id}`, createdAt: entry.createdAt })),
               ...part4.map((entry) => ({ id: `${studentId}:P4:${entry.id}`, createdAt: entry.createdAt })),
               ...miniTests.map((entry) => ({ id: `mini-test:${studentId}:${entry.id}`, createdAt: entry.createdAt })),
+              ...vocabSets.map((entry) => ({ id: `vocab-topic:${studentId}:${entry.id}`, createdAt: entry.updatedAt })),
             ];
           })
         )
@@ -357,8 +362,9 @@ useEffect(() => {
     }
 
     try {
-      const [assignments, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+      const [assignments, vocabProgress, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
         listAssignedActivitiesForStudent(user.uid),
+        fetchVocabProgressMap(user.uid),
         fetchHubGrammarSubmissions(200, user.uid),
         listGrammarSetAttemptsForStudent(user.uid),
         fetchWritingP1Sessions(100, user.uid),
@@ -370,6 +376,7 @@ useEffect(() => {
       if (!alive) return;
 
       const completionSources = {
+        vocabulary: vocabProgress || {},
         miniTests: buildLatestMap(miniTests || [], "activityId"),
         grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
           if (!attempt?.setId) return acc;
@@ -404,6 +411,20 @@ useEffect(() => {
             ? taskMap?.[assignment.taskId] || 0
             : completionSources.writing?.[bucket] || 0;
           return completedAt < assignedAt;
+        }
+        if (assignment.activityType === "vocabulary-topic") {
+          const topicId = assignment?.topicId || assignment.activityId;
+
+          if (assignment?.setId) {
+            return timestampToMs(completionSources.vocabulary?.[`${topicId}:${assignment.setId}`]) < assignedAt;
+          }
+
+          const setIds = getTopicSetIds(topicId);
+          if (!setIds.length) return true;
+
+          return setIds.some(
+            (setId) => timestampToMs(completionSources.vocabulary?.[`${topicId}:${setId}`]) < assignedAt
+          );
         }
         return true;
       }).length;
@@ -803,6 +824,10 @@ return (
   <Route path="/your-class/tests/:sessionId" element={<HubCourseTestRunner user={user} />} />
   <Route path="/games" element={<HubGamesMenu />} />
   <Route path="/games/leaderboards" element={<HubGameLeaderboards user={user} />} />
+  <Route
+    path="/games/collocation-dash"
+    element={<CollocationDash user={user} onRequireSignIn={() => setShowAuth(true)} />}
+  />
   <Route path="/games/dependent-prepositions" element={<HubDependentPrepositionGame user={user} />} />
   <Route path="/games/negatris" element={<HubNegatrisGame />} />
   <Route path="/games/spanglish-fix-it" element={<HubSpanglishFixIt user={user} />} />
@@ -1055,7 +1080,7 @@ return (
 <Route path="/vocabulary" element={isSeifHubSite ? <HubVocabularyMenu /> : <VocabularyMenu />} />
   <Route
     path="/vocabulary/topics"
-    element={<VocabularyTopics isAuthenticated={!!user} />}
+    element={<VocabularyTopics isAuthenticated={!!user} user={user} />}
   />
 
 <Route
@@ -1683,6 +1708,7 @@ return (
           <VocabularyTopics
             onBack={() => setView("vocabularyMenu")}
             isAuthenticated={!!user}
+            user={user}
           />
         )}
 

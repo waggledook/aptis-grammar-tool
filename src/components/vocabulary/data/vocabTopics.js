@@ -26,3 +26,9 @@ export function getTotalVocabSets() {
     return sum + (Array.isArray(sets) ? sets.length : 0);
   }, 0);
 }
+
+export function getTopicSetIds(topicId) {
+  const topic = TOPIC_DATA?.[topicId];
+  if (!Array.isArray(topic?.sets)) return [];
+  return topic.sets.map((set, idx) => set?.id || String(idx)).filter(Boolean);
+}

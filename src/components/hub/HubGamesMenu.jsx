@@ -59,6 +59,13 @@ export default function HubGamesMenu() {
           </p>
         </button>
 
+        <button className="menu-card" onClick={() => navigate(getSitePath("/games/collocation-dash"))}>
+          <h3>Collocation Dash</h3>
+          <p>
+            Match common verb collocations at speed, build recall, and push for a higher score as the pace ramps up.
+          </p>
+        </button>
+
         <button className="menu-card" onClick={() => navigate(getSitePath("/games/negatris"))}>
           <h3>Negatris</h3>
           <p>

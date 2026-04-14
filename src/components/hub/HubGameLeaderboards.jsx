@@ -4,6 +4,7 @@ import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import {
   deleteHubGameLeaderboardScore,
+  fetchTopCollocationDashScores,
   fetchMyTopHubGameScores,
   fetchTopHubGameScores,
 } from "../../firebase.js";
@@ -14,6 +15,7 @@ import {
 
 const SPANGLISH_GAME_ID = "hub_spanglish_fixit";
 const NEGATRIS_GAME_ID = "hub_negatris";
+const COLLOCATION_DASH_GAME_ID = "collocation_dash";
 
 function boardGameIdForDependent(levelId) {
   return `hub_dependent_prepositions_${levelId}`;
@@ -98,6 +100,8 @@ export default function HubGameLeaderboards({ user }) {
   const [negatrisGlobal, setNegatrisGlobal] = useState([]);
   const [spanglishPersonal, setSpanglishPersonal] = useState([]);
   const [spanglishGlobal, setSpanglishGlobal] = useState([]);
+  const [collocationPersonal, setCollocationPersonal] = useState([]);
+  const [collocationGlobal, setCollocationGlobal] = useState([]);
   const [dependentPersonal, setDependentPersonal] = useState([]);
   const [dependentGlobal, setDependentGlobal] = useState([]);
   const [deletingScoreKey, setDeletingScoreKey] = useState("");
@@ -148,6 +152,29 @@ export default function HubGameLeaderboards({ user }) {
     }
 
     loadSpanglish();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uid]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadCollocationDash() {
+      try {
+        const [global, personal] = await Promise.all([
+          fetchTopHubGameScores(COLLOCATION_DASH_GAME_ID, 10),
+          user?.uid ? fetchTopCollocationDashScores(3, user.uid) : Promise.resolve([]),
+        ]);
+        if (cancelled) return;
+        setCollocationGlobal(global);
+        setCollocationPersonal(personal);
+      } catch (error) {
+        console.error("[HubGameLeaderboards] Collocation Dash leaderboard load failed", error);
+      }
+    }
+
+    loadCollocationDash();
     return () => {
       cancelled = true;
     };
@@ -243,6 +270,18 @@ export default function HubGameLeaderboards({ user }) {
         user={user}
         deletingId={getDeletingIdFor(SPANGLISH_GAME_ID)}
         onDeleteGlobalScore={(entry) => handleDeleteGlobalScore(SPANGLISH_GAME_ID, entry, setSpanglishGlobal)}
+      />
+
+      <BoardSection
+        title="Collocation Dash"
+        subtitle="One shared board for the game."
+        personalScores={collocationPersonal}
+        globalScores={collocationGlobal}
+        user={user}
+        deletingId={getDeletingIdFor(COLLOCATION_DASH_GAME_ID)}
+        onDeleteGlobalScore={(entry) =>
+          handleDeleteGlobalScore(COLLOCATION_DASH_GAME_ID, entry, setCollocationGlobal)
+        }
       />
 
       <section className="hub-game-board">

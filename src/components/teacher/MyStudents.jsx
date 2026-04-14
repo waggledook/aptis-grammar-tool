@@ -5,11 +5,13 @@ import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
 import {
   db,
   fetchHubGrammarSubmissions,
+  fetchRecentVocabProgress,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
   fetchWritingP3Submissions,
   fetchWritingP4Submissions,
 } from "../../firebase";
+import { TOPIC_DATA } from "../vocabulary/data/vocabTopics";
 import { fetchItemsByIds } from "../../api/grammar";
 import { toast } from "../../utils/toast";
 
@@ -204,12 +206,15 @@ function robustEmailForClipboard({ html = "", text = "" }) {
 
 function buildActivitySummary(studentId, attemptStats, submissionBundle) {
   const attemptMeta = attemptStats[studentId] || null;
-      const latestWriting = (submissionBundle?.recentWriting || [])
+  const latestWriting = (submissionBundle?.recentWriting || [])
     .slice()
     .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))[0] || null;
   const latestGrammar = (submissionBundle?.grammarSubmissions || [])
     .slice()
     .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))[0] || null;
+  const latestVocab = (submissionBundle?.recentVocab || [])
+    .slice()
+    .sort((a, b) => timestampToMs(b.updatedAt) - timestampToMs(a.updatedAt))[0] || null;
   const latestAttemptAt = attemptMeta?.latestSubmittedAt || null;
 
   const candidates = [
@@ -237,6 +242,13 @@ function buildActivitySummary(studentId, attemptStats, submissionBundle) {
                 : "Completed",
         }
       : null,
+    latestVocab
+      ? {
+          kind: "Vocabulary set",
+          createdAt: latestVocab.updatedAt,
+          detail: latestVocab.setTitle || latestVocab.setId || latestVocab.topicTitle || latestVocab.topic || "Completed",
+        }
+      : null,
     latestAttemptAt
       ? {
           kind: "Teacher quiz",
@@ -254,7 +266,21 @@ function buildActivitySummary(studentId, attemptStats, submissionBundle) {
   return {
     latestWriting,
     latestGrammar,
+    latestVocab,
     latestActivity,
+  };
+}
+
+function resolveVocabMeta(topic, setId) {
+  const topicInfo = TOPIC_DATA?.[topic] || null;
+  const topicTitle = topicInfo?.topicTitle || topicInfo?.title || topic;
+  const set = Array.isArray(topicInfo?.sets)
+    ? topicInfo.sets.find((entry, idx) => (entry.id || String(idx)) === setId)
+    : null;
+
+  return {
+    topicTitle: topicTitle || topic || "Vocabulary",
+    setTitle: set?.title || setId || "Set",
   };
 }
 
@@ -710,12 +736,13 @@ export default function MyStudents({ user }) {
 
       const statsEntries = await Promise.all(
         studentRows.map(async (studentRow) => {
-          const [part1, part2, part3, part4, grammar] = await Promise.all([
+          const [part1, part2, part3, part4, grammar, vocab] = await Promise.all([
             fetchWritingP1Sessions(3, studentRow.id),
             fetchWritingP2Submissions(3, studentRow.id),
             fetchWritingP3Submissions(3, studentRow.id),
             fetchWritingP4Submissions(3, studentRow.id),
             fetchHubGrammarSubmissions(3, studentRow.id),
+            fetchRecentVocabProgress(3, studentRow.id),
           ]);
 
           const recentWriting = [
@@ -730,6 +757,13 @@ export default function MyStudents({ user }) {
             {
               recentWriting,
               grammarSubmissions: grammar || [],
+              recentVocab: (vocab || []).map((entry) => {
+                const meta = resolveVocabMeta(entry.topic, entry.setId);
+                return {
+                  ...entry,
+                  ...meta,
+                };
+              }),
             },
           ];
         })
@@ -933,11 +967,27 @@ export default function MyStudents({ user }) {
     );
   }, [hydratedStudents, submissionStats]);
 
+  const vocabNotifications = useMemo(() => {
+    return hydratedStudents.flatMap((studentRow) =>
+      (submissionStats[studentRow.id]?.recentVocab || []).map((entry) => ({
+        id: `vocab-topic:${studentRow.id}:${entry.id}`,
+        kind: "vocabulary",
+        studentId: studentRow.id,
+        studentLabel:
+          studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        createdAt: entry.updatedAt,
+        topicTitle: entry.topicTitle || entry.topic || "Vocabulary",
+        setTitle: entry.setTitle || entry.setId || "Set",
+        submission: entry,
+      }))
+    );
+  }, [hydratedStudents, submissionStats]);
+
   const teacherNotifications = useMemo(() => {
-    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...courseTestNotifications]
+    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...vocabNotifications, ...courseTestNotifications]
       .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
       .slice(0, TEACHER_NOTIFICATION_LIMIT);
-  }, [courseTestNotifications, grammarCompletionNotifications, miniTestNotifications, writingNotifications]);
+  }, [courseTestNotifications, grammarCompletionNotifications, miniTestNotifications, vocabNotifications, writingNotifications]);
 
   const unreadNotificationCount = useMemo(() => {
     return teacherNotifications.filter((entry) => !readSubmissionKeys[entry.id]).length;
@@ -1140,6 +1190,8 @@ async function copySelectedSubmission() {
                               ? `${entry.attempt?.reviewStatus === "reviewed" ? "Course test reviewed" : "Course test submitted"} · ${entry.title}`
                             : entry.kind === "mini-test"
                               ? `Mini test completed · ${entry.title}`
+                            : entry.kind === "vocabulary"
+                              ? `Vocabulary set completed · ${entry.topicTitle} · ${entry.setTitle}`
                             : `${
                                 entry.setType === "use_of_english_custom"
                                   ? "Use of English quiz completed"
@@ -1230,8 +1282,6 @@ async function copySelectedSubmission() {
             const label =
               studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id;
             const latestActivity = studentRow.activitySummary?.latestActivity;
-            const latestWriting = studentRow.activitySummary?.latestWriting;
-            const latestGrammar = studentRow.activitySummary?.latestGrammar;
             const isSaving = savingStudentId === studentRow.id;
 
             return (
@@ -1258,34 +1308,13 @@ async function copySelectedSubmission() {
                       <strong>{formatDate(studentRow.createdAt)}</strong>
                     </div>
                     <div className="student-meta">
-                      <span>Grammar sets</span>
-                      <strong>
-                        {studentRow.attemptMeta.count}
-                        {studentRow.attemptMeta.count ? ` · avg ${studentRow.attemptMeta.avgPercent}%` : ""}
-                      </strong>
+                      <span>Last active</span>
+                      <strong>{latestActivity ? formatRelative(latestActivity.createdAt) : "No activity yet"}</strong>
                     </div>
                     <div className="student-meta">
                       <span>Latest activity</span>
                       <strong>{latestActivity ? latestActivity.kind : "No activity yet"}</strong>
-                    </div>
-                  </div>
-
-                  <div className="student-activity-panel">
-                    <div>
-                      <span className="panel-label">Recent writing</span>
-                      <p>
-                        {latestWriting
-                          ? `${latestWriting.partLabel} · ${formatRelative(latestWriting.createdAt)}`
-                          : "No writing submitted yet"}
-                      </p>
-                    </div>
-                    <div>
-                      <span className="panel-label">Recent grammar</span>
-                      <p>
-                        {latestGrammar
-                          ? `${latestGrammar.activityTitle || "Hub grammar"} · ${formatRelative(latestGrammar.createdAt)}`
-                          : "No grammar activity yet"}
-                      </p>
+                      {latestActivity?.detail ? <em>{latestActivity.detail}</em> : null}
                     </div>
                   </div>
                 </div>
@@ -1578,6 +1607,30 @@ async function copySelectedSubmission() {
                       </div>
                     </div>
                   ) : null}
+                </div>
+              ) : null}
+
+              {selectedNotification.kind === "vocabulary" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">Vocabulary set completion</span>
+                  <div className="teacher-review-answer">
+                    <strong>
+                      {selectedNotification.topicTitle} · {selectedNotification.setTitle}
+                    </strong>
+                    <div className="teacher-review-plain">
+                      Completed {formatRelative(selectedNotification.createdAt)}.
+                      {" "}
+                      Attempts: {selectedNotification.submission?.attempts ?? 0}.
+                      {" "}
+                      Mistakes across runs: {selectedNotification.submission?.mistakesTotal ?? 0}.
+                    </div>
+                    {selectedNotification.submission?.lastRun ? (
+                      <div className="teacher-review-plain" style={{ marginTop: "0.45rem" }}>
+                        Last run: {selectedNotification.submission.lastRun.correctFirstTry ?? 0}/
+                        {selectedNotification.submission.lastRun.totalItems ?? 0} correct first try.
+                      </div>
+                    ) : null}
+                  </div>
                 </div>
               ) : null}
 
@@ -2218,9 +2271,7 @@ async function copySelectedSubmission() {
         }
 
         .student-row-main {
-          display: grid;
-          grid-template-columns: minmax(260px, 0.95fr) minmax(280px, 1.05fr);
-          gap: 1rem;
+          display: block;
           border-bottom: 1px solid rgba(39, 64, 111, 0.55);
         }
 
@@ -2238,24 +2289,18 @@ async function copySelectedSubmission() {
         }
 
         .student-meta strong {
+          display: block;
           color: #eef4ff;
           font-size: 0.95rem;
         }
 
-        .student-activity-panel {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 0.8rem;
-          background: rgba(11, 18, 37, 0.48);
-          border: 1px solid rgba(108, 136, 199, 0.18);
-          border-radius: 16px;
-          padding: 0.9rem;
-        }
-
-        .student-activity-panel p {
-          margin: 0;
-          color: rgba(230, 240, 255, 0.9);
-          line-height: 1.45;
+        .student-meta em {
+          display: block;
+          margin-top: 0.35rem;
+          color: rgba(230, 240, 255, 0.68);
+          font-style: normal;
+          font-size: 0.84rem;
+          line-height: 1.35;
         }
 
         .student-row-side {
@@ -2285,8 +2330,7 @@ async function copySelectedSubmission() {
         @media (max-width: 900px) {
           .my-students-summary,
           .my-students-controls,
-          .student-meta-grid,
-          .student-activity-panel {
+          .student-meta-grid {
             grid-template-columns: 1fr;
           }
 
@@ -2301,7 +2345,7 @@ async function copySelectedSubmission() {
           }
 
           .student-row-main {
-            grid-template-columns: 1fr;
+            display: block;
           }
 
           .student-card-head,

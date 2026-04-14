@@ -2445,6 +2445,50 @@ export async function fetchVocabTopicCounts(uid) {
 
   return stats;
 }
+
+export async function fetchVocabProgressMap(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return {};
+
+  const snap = await getDocs(collection(db, "users", realUid, "vocabProgress"));
+  const out = {};
+
+  snap.forEach((d) => {
+    const data = d.data() || {};
+    if (!data.completedReview) return;
+    out[d.id] = data.updatedAt || null;
+  });
+
+  return out;
+}
+
+export async function fetchRecentVocabProgress(n = 10, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "vocabProgress"),
+    orderBy("updatedAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs
+    .map((d) => {
+      const data = d.data() || {};
+      return {
+        id: d.id,
+        topic: data.topic || (d.id.split(":")[0] || ""),
+        setId: data.setId || (d.id.split(":")[1] || ""),
+        completedReview: !!data.completedReview,
+        updatedAt: data.updatedAt || null,
+        attempts: data.attempts ?? 0,
+        mistakesTotal: data.mistakesTotal ?? 0,
+        lastRun: data.lastRun || null,
+      };
+    })
+    .filter((entry) => entry.completedReview);
+}
 /**
  * Create a new grammar set owned by the current user.
  * @param {Object} data - { title, description, itemIds, levels, tags, visibility }

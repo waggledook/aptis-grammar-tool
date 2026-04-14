@@ -315,6 +315,21 @@ export default function HubSpanglishLiveHost({ user }) {
 
   useEffect(() => {
     if (!isHost || game?.status !== "in-progress") return;
+    if (phase !== "click") return;
+    if (players.length < 1) return;
+    if (clickCount < players.length) return;
+    if (transitionLockRef.current) return;
+
+    transitionLockRef.current = true;
+    handleAdvance().finally(() => {
+      window.setTimeout(() => {
+        transitionLockRef.current = false;
+      }, 400);
+    });
+  }, [isHost, game?.status, phase, clickCount, players.length]);
+
+  useEffect(() => {
+    if (!isHost || game?.status !== "in-progress") return;
     if (phase !== "click" && phase !== "correction") return;
 
     const answerCount = phase === "click" ? clickCount : correctionCount;

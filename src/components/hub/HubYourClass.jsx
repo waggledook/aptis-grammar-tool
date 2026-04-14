@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getSitePath } from "../../siteConfig.js";
 import {
+  fetchVocabProgressMap,
   fetchHubGrammarSubmissions,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
@@ -12,6 +13,7 @@ import {
   listStudentCourseTestAttempts,
   listStudentCourseTestSessions,
 } from "../../firebase";
+import { getTopicSetIds } from "../vocabulary/data/vocabTopics.js";
 
 function timestampToDate(value) {
   if (!value) return null;
@@ -62,6 +64,8 @@ function getAssignmentTypeLabel(type) {
       return "Use of English set";
     case "writing":
       return "Writing task";
+    case "vocabulary-topic":
+      return "Vocabulary set";
     default:
       return "Assigned activity";
   }
@@ -116,6 +120,26 @@ function resolveAssignedCompletion(assignment, sources) {
     return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
   }
 
+  if (assignment?.activityType === "vocabulary-topic") {
+    const topicId = assignment?.topicId || assignment?.activityId;
+
+    if (assignment?.setId) {
+      const completedAt = timestampToMs(sources.vocabulary?.[`${topicId}:${assignment.setId}`]);
+      return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+    }
+
+    const setIds = getTopicSetIds(topicId);
+    if (!setIds.length) return { completed: false, completedAt: 0 };
+
+    const completionTimes = setIds.map((setId) =>
+      timestampToMs(sources.vocabulary?.[`${topicId}:${setId}`])
+    );
+    const completed = completionTimes.every((time) => time >= assignedAt);
+    return completed
+      ? { completed: true, completedAt: Math.max(...completionTimes) }
+      : { completed: false, completedAt: 0 };
+  }
+
   return { completed: false, completedAt: 0 };
 }
 
@@ -138,10 +162,11 @@ export default function HubYourClass({ user }) {
 
       setLoading(true);
       try {
-        const [rows, attempts, assignedRows, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+        const [rows, attempts, assignedRows, vocabProgress, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
           listStudentCourseTestSessions(user.uid),
           listStudentCourseTestAttempts(user.uid),
           listAssignedActivitiesForStudent(user.uid),
+          fetchVocabProgressMap(user.uid),
           fetchHubGrammarSubmissions(200, user.uid),
           listGrammarSetAttemptsForStudent(user.uid),
           fetchWritingP1Sessions(100, user.uid),
@@ -152,6 +177,7 @@ export default function HubYourClass({ user }) {
         if (!alive) return;
         setSessions(rows || []);
         const completionSources = {
+          vocabulary: vocabProgress || {},
           miniTests: buildLatestTimeMap(miniTests || [], "activityId"),
           grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
             if (!attempt?.setId) return acc;

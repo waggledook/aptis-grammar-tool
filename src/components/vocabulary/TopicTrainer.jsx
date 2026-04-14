@@ -11,10 +11,11 @@ import { logVocabSetCompleted, logVocabMatchSession } from "../../firebase";
 
 import { TOPIC_DATA } from "./data/vocabTopics";
 import VocabReviewPlayer from "./VocabReviewPlayer";
+import VocabAssignButton from "./VocabAssignButton";
 
 
-export default function TopicTrainer({ topic, onBack, onShowFlashcards }) {
-  const user = auth.currentUser;
+export default function TopicTrainer({ topic, onBack, onShowFlashcards, initialSetId = "", onSetChange, user: userProp = null }) {
+  const user = userProp || auth.currentUser;
   const isSignedIn = !!user;
   const topicInfo = TOPIC_DATA[topic] || null;
 
@@ -34,6 +35,15 @@ export default function TopicTrainer({ topic, onBack, onShowFlashcards }) {
     const [vocabProgress, setVocabProgress] = useState({});
     const activeSetId =
       activeSet?.id || (setIndex != null ? String(setIndex) : null);
+
+  useEffect(() => {
+    if (!topicInfo || !initialSetId) return;
+    const nextIdx = topicInfo.sets.findIndex((set, idx) => (set.id || String(idx)) === initialSetId);
+    if (nextIdx === -1) return;
+    if (!isSignedIn && nextIdx >= 2) return;
+    setSetIndex(nextIdx);
+    setHasChosenSet(true);
+  }, [initialSetId, topicInfo, isSignedIn]);
 
   // Reset match logging flag when we move to a different set
   useEffect(() => {
@@ -233,6 +243,7 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
               }
               setSetIndex(idx);
               setHasChosenSet(true);
+              onSetChange?.(setId);
             }}
           >
             <span className="set-pill-title">{set.title}</span>
@@ -266,6 +277,7 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
             }
             setSetIndex(idx);
             setHasChosenSet(true);
+            onSetChange?.(set.id || String(idx));
           }}
           
         >
@@ -306,6 +318,15 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
           >
             ✍️ Review
           </button>
+          {activeSet ? (
+            <VocabAssignButton
+              user={user}
+              topicId={topic}
+              setId={activeSetId}
+              topicTitle={topicInfo?.topicTitle || topic}
+              setTitle={activeSet.title}
+            />
+          ) : null}
         </div>
       )}
 
