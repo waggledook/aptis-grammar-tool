@@ -10,6 +10,7 @@ import {
   fetchWritingP2Submissions,
   fetchWritingP3Submissions,
   fetchWritingP4Submissions,
+  fetchReadingProgressMap,
   listAssignedActivitiesForStudent,
   listGrammarSetAttemptsForStudent,
   listStudentCourseTestAttempts,
@@ -68,6 +69,8 @@ function getAssignmentTypeLabel(type) {
       return "Writing task";
     case "speaking":
       return "Speaking task";
+    case "reading":
+      return "Reading task";
     case "dictation":
       return "Dictation task";
     case "vocabulary-topic":
@@ -112,6 +115,13 @@ function getSpeakingPartKey(type) {
   return "";
 }
 
+function getReadingPartKey(type) {
+  if (type === "reading-part-2") return "part2";
+  if (type === "reading-part-3") return "part3";
+  if (type === "reading-part-4") return "part4";
+  return "";
+}
+
 function resolveAssignedCompletion(assignment, sources) {
   const assignedAt = timestampToMs(assignment?.createdAt);
   if (assignment?.activityType === "mini-test") {
@@ -145,6 +155,22 @@ function resolveAssignedCompletion(assignment, sources) {
     const completionTimes = Object.entries(sources.speaking || {})
       .filter(([key]) => key.startsWith(`${partKey}:`))
       .map(([, value]) => timestampToMs(value));
+    const completedAt = completionTimes.length ? Math.max(...completionTimes) : 0;
+    return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+  }
+
+  if (assignment?.activityType === "reading") {
+    const partKey = getReadingPartKey(assignment.activityId);
+    if (!partKey) return { completed: false, completedAt: 0 };
+
+    if (assignment?.taskId) {
+      const completedAt = timestampToMs(sources.reading?.[`${partKey}:${assignment.taskId}`]?.updatedAt);
+      return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+    }
+
+    const completionTimes = Object.entries(sources.reading || {})
+      .filter(([key]) => key.startsWith(`${partKey}:`))
+      .map(([, value]) => timestampToMs(value?.updatedAt));
     const completedAt = completionTimes.length ? Math.max(...completionTimes) : 0;
     return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
   }
@@ -196,12 +222,13 @@ export default function HubYourClass({ user }) {
 
       setLoading(true);
       try {
-        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, dictationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, readingProgress, dictationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
           listStudentCourseTestSessions(user.uid),
           listStudentCourseTestAttempts(user.uid),
           listAssignedActivitiesForStudent(user.uid),
           fetchVocabProgressMap(user.uid),
           fetchSpeakingProgressMap(user.uid),
+          fetchReadingProgressMap(user.uid),
           fetchHubDictationSessions(200, user.uid),
           fetchHubGrammarSubmissions(200, user.uid),
           listGrammarSetAttemptsForStudent(user.uid),
@@ -215,6 +242,7 @@ export default function HubYourClass({ user }) {
         const completionSources = {
           vocabulary: vocabProgress || {},
           speaking: speakingProgress || {},
+          reading: readingProgress || {},
           dictation: buildLatestTimeMap(dictationSessions || [], "assignmentId"),
           miniTests: buildLatestTimeMap(miniTests || [], "activityId"),
           grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {

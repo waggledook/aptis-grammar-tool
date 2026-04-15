@@ -6,17 +6,17 @@ export default function SpeakingPart3SimilaritiesExtras() {
   return (
     <div className="game-wrapper speaking-guide">
       <Seo
-        title="Speaking Part 3 – Teacher Activities | Seif Aptis Trainer"
-        description="Extra picture pairs and prompts for practising similarities and differences in Aptis Speaking Part 3."
+        title="Speaking Part 3 – Similarities and Differences | Seif Aptis Trainer"
+        description="Extra picture pairs for practising similarities and differences in Aptis Speaking Part 3."
       />
 
       <header className="header">
         <div>
-          <h2 className="title">Teacher activities – Similarities &amp; differences</h2>
+          <h2 className="title">Speaking Part 3 – Similarities &amp; differences</h2>
           <p className="intro">
-            Use these extra picture pairs to get students comparing similarities
-            and differences in pairs or small groups. This page isn&apos;t
-            visible in the student menu – you share it only when you want to.
+            Look carefully at each pair of pictures. Say one thing that is similar,
+            then explain two important differences. Try to use clear linking phrases
+            and give a little detail in every answer.
           </p>
         </div>
       </header>
@@ -32,15 +32,15 @@ export default function SpeakingPart3SimilaritiesExtras() {
           />
           <ul className="panel-text">
             <li>
-              Students describe <strong>one similarity</strong> and{" "}
+              Describe <strong>one similarity</strong> and{" "}
               <strong>two differences</strong> between the pictures.
             </li>
             <li>
-              Prompt them to use phrases like{" "}
+              Useful phrases:{" "}
               <em>both pictures…, whereas…, unlike the first photo…</em>.
             </li>
             <li>
-              Quick follow-up:{" "}
+              Follow-up question:{" "}
               <em>Which situation would you prefer, and why?</em>
             </li>
           </ul>
@@ -56,15 +56,14 @@ export default function SpeakingPart3SimilaritiesExtras() {
           />
           <ul className="panel-text">
             <li>
-              Focus on <strong>how people spend their time</strong> in each photo.
+              Compare <strong>how people spend their free time</strong> in each photo.
             </li>
             <li>
               Useful language:{" "}
               <em>They both…, in the first picture…, while in the second one…</em>.
             </li>
             <li>
-              In pairs: one student finds similarities, the other differences,
-              then they swap and report back.
+              Give your opinion: <em>Which way of enjoying free time do you prefer?</em>
             </li>
           </ul>
         </section>
@@ -79,10 +78,10 @@ export default function SpeakingPart3SimilaritiesExtras() {
           />
           <ul className="panel-text">
             <li>
-              Students describe what is happening and how the people might feel.
+              Describe what is happening and say how the people might feel.
             </li>
             <li>
-              Encourage connectors:{" "}
+              Useful connectors:{" "}
               <em>
                 both pictures show…, the photos are similar because…, unlike
                 the first picture…
@@ -90,7 +89,7 @@ export default function SpeakingPart3SimilaritiesExtras() {
               .
             </li>
             <li>
-              Short discussion:{" "}
+              Follow-up question:{" "}
               <em>Would you feel comfortable sleeping in these places?</em>
             </li>
           </ul>

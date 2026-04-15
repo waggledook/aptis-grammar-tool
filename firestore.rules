@@ -384,6 +384,23 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ── 12b) Teacher requests to link existing students ─────────────────
+    match /teacherStudentRequests/{requestId} {
+      allow create: if isTeacherOrAdmin()
+        && request.resource.data.teacherUid == request.auth.uid
+        && request.resource.data.status == "pending"
+        && request.resource.data.studentEmailLower is string
+        && request.resource.data.studentEmailLower.size() > 3;
+
+      allow get, list: if isAdmin() || (
+        isTeacherOrAdmin() &&
+        resource.data.teacherUid == request.auth.uid
+      );
+
+      allow update: if isAdmin();
+      allow delete: if false;
+    }
+
     // ── 13) Everything else locked down ─────────────────────────────────
     match /{document=**} {
       allow read, write: if false;

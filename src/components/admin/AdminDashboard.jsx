@@ -7,7 +7,7 @@ import {
   listAttemptsForCourseTestSession,
   saveCourseTestAttemptReview,
 } from "../../firebase";
-import { collection, getDocs, updateDoc, doc, query, orderBy, limit, startAfter } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, query, orderBy, limit, startAfter, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { getSeifHubAccessConfig, SEIF_HUB_ACCESS_KEY } from "../../siteConfig.js";
 import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
@@ -248,7 +248,7 @@ function formatAttemptAnswer(item, answer) {
 function formatAcceptedAnswer(item) {
   if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
     return Object.entries(item.inlineAcceptedAnswers || {})
-      .map(([gapId, values], index) => `Gap ${index + 1}: ${(values || []).join(" / ")}`)
+      .map(([, values], index) => `Gap ${index + 1}: ${(values || []).join(" / ")}`)
       .join(" · ");
   }
   if (item?.type === "choice") {
@@ -308,6 +308,9 @@ export default function AdminDashboard({ user }) {
   const [writingGeneralCursorDoc, setWritingGeneralCursorDoc] = useState(null);
   const [writingGeneralHasMore, setWritingGeneralHasMore] = useState(true);
   const [selectedWritingGeneralSubmission, setSelectedWritingGeneralSubmission] = useState(null);
+  const [studentRequests, setStudentRequests] = useState([]);
+  const [loadingStudentRequests, setLoadingStudentRequests] = useState(true);
+  const [resolvingRequestId, setResolvingRequestId] = useState("");
 
   const navigate = useNavigate();
 
@@ -338,6 +341,21 @@ export default function AdminDashboard({ user }) {
     }
 
     loadUsers();
+  }, []);
+
+  useEffect(() => {
+    async function loadStudentRequests() {
+      try {
+        const snap = await getDocs(query(collection(db, "teacherStudentRequests"), orderBy("createdAt", "desc")));
+        setStudentRequests(snap.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+      } catch (error) {
+        console.error("[AdminDashboard] load teacher student requests failed", error);
+      } finally {
+        setLoadingStudentRequests(false);
+      }
+    }
+
+    loadStudentRequests();
   }, []);
 
   useEffect(() => {
@@ -391,6 +409,57 @@ export default function AdminDashboard({ user }) {
       );
     } finally {
       setAssigning(null);
+    }
+  }
+
+  async function resolveStudentRequest(request, status) {
+    if (!request?.id) return;
+
+    const student = users.find(
+      (entry) => (entry.email || "").trim().toLowerCase() === request.studentEmailLower
+    );
+
+    if (status === "approved" && !student) {
+      window.alert("No user with that email exists yet.");
+      return;
+    }
+
+    if (status === "approved" && student.teacherId && student.teacherId !== request.teacherUid) {
+      const currentTeacher = teacherLabelForStudent(student) || "another teacher";
+      const confirmed = window.confirm(
+        `This student is already linked to ${currentTeacher}. Reassign them to ${request.teacherName || request.teacherEmail || "the requesting teacher"}?`
+      );
+      if (!confirmed) return;
+    }
+
+    setResolvingRequestId(request.id);
+    try {
+      if (status === "approved") {
+        await updateDoc(doc(db, "users", student.id), { teacherId: request.teacherUid });
+        setUsers((prev) =>
+          prev.map((entry) => (entry.id === student.id ? { ...entry, teacherId: request.teacherUid } : entry))
+        );
+      }
+
+      const patch = {
+        status,
+        updatedAt: serverTimestamp(),
+        resolvedAt: serverTimestamp(),
+        resolvedByUid: user.uid,
+        resolvedByEmail: user.email || null,
+      };
+
+      if (student) {
+        patch.studentUid = student.id;
+        patch.studentName = student.displayName || student.name || student.username || student.email || student.id;
+      }
+
+      await updateDoc(doc(db, "teacherStudentRequests", request.id), patch);
+      setStudentRequests((prev) =>
+        prev.map((entry) => (entry.id === request.id ? { ...entry, ...patch } : entry))
+      );
+    } finally {
+      setResolvingRequestId("");
     }
   }
 
@@ -639,10 +708,6 @@ async function saveSeifHubAccess(uid) {
   } finally {
     setSavingHub((prev) => ({ ...prev, [uid]: false }));
   }
-}
-
-function hasSeifHub(u) {
-  return getSeifHubAccessConfig(u).active;
 }
 
 function getHubStatus(u) {
@@ -965,6 +1030,7 @@ function renderHubAccessControl(u, compact = false) {
   const activeHubCount = users.filter((u) => getHubStatus(u).tone === "success").length;
   const teacherCount = users.filter((u) => u.role === "teacher" || u.role === "admin").length;
   const studentCount = users.filter((u) => u.role === "student").length;
+  const pendingStudentRequests = studentRequests.filter((request) => request.status === "pending");
   const emailGroups = users.reduce((acc, u) => {
     const email = (u.email || "").trim().toLowerCase();
     if (!email) return acc;
@@ -1122,6 +1188,120 @@ function renderHubAccessControl(u, compact = false) {
               </div>
             </div>
           )}
+
+          <div
+            style={{
+              marginTop: "0.9rem",
+              padding: "0.95rem 1rem",
+              borderRadius: "1rem",
+              background: "linear-gradient(180deg, rgba(2,6,23,0.95), rgba(15,23,42,0.9))",
+              border: "1px solid #1e293b",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "0.8rem",
+                alignItems: "center",
+                flexWrap: "wrap",
+                marginBottom: "0.85rem",
+              }}
+            >
+              <div>
+                <div style={{ color: "#f8fafc", fontSize: "1.05rem", fontWeight: 700 }}>
+                  Student link requests
+                </div>
+                <div style={{ marginTop: "0.25rem", color: "#94a3b8", fontSize: "0.88rem" }}>
+                  Teachers can request students by email; approval links the matching user to that teacher.
+                </div>
+              </div>
+              <div
+                style={{
+                  padding: "0.34rem 0.7rem",
+                  borderRadius: "999px",
+                  background: "rgba(253, 191, 45, 0.14)",
+                  border: "1px solid rgba(253, 191, 45, 0.28)",
+                  color: "#ffd56e",
+                  fontSize: "0.78rem",
+                  fontWeight: 700,
+                }}
+              >
+                {pendingStudentRequests.length} pending
+              </div>
+            </div>
+
+            {loadingStudentRequests ? (
+              <p style={{ margin: 0, color: "#cbd5e1" }}>Loading requests…</p>
+            ) : !pendingStudentRequests.length ? (
+              <p style={{ margin: 0, color: "#94a3b8" }}>No pending student link requests.</p>
+            ) : (
+              <div style={{ display: "grid", gap: "0.7rem" }}>
+                {pendingStudentRequests.map((request) => {
+                  const student = users.find(
+                    (entry) => (entry.email || "").trim().toLowerCase() === request.studentEmailLower
+                  );
+                  const teacher = teachers.find((entry) => entry.id === request.teacherUid);
+                  const busy = resolvingRequestId === request.id;
+
+                  return (
+                    <section
+                      key={request.id}
+                      style={{
+                        borderRadius: "0.85rem",
+                        border: "1px solid rgba(51, 65, 85, 0.7)",
+                        background: "rgba(2, 6, 23, 0.22)",
+                        padding: "0.9rem 1rem",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        gap: "0.85rem",
+                        flexWrap: "wrap",
+                        alignItems: "center",
+                      }}
+                    >
+                      <div>
+                        <div style={{ color: "#f8fafc", fontWeight: 700 }}>
+                          {request.studentEmail || request.studentEmailLower}
+                        </div>
+                        <div style={{ color: "#94a3b8", fontSize: "0.84rem", marginTop: "0.25rem" }}>
+                          Requested by {request.teacherName || request.teacherEmail || labelForTeacher(teacher || {}) || request.teacherUid}
+                          {request.createdAt ? ` · ${formatDateTime(request.createdAt)}` : ""}
+                        </div>
+                        {!student ? (
+                          <div style={{ color: "#fbbf24", fontSize: "0.8rem", marginTop: "0.35rem" }}>
+                            No matching user exists yet.
+                          </div>
+                        ) : student.teacherId && student.teacherId !== request.teacherUid ? (
+                          <div style={{ color: "#fbbf24", fontSize: "0.8rem", marginTop: "0.35rem" }}>
+                            Currently linked to {teacherLabelForStudent(student) || "another teacher"}.
+                          </div>
+                        ) : null}
+                      </div>
+                      <div style={{ display: "flex", gap: "0.55rem", flexWrap: "wrap" }}>
+                        <button
+                          type="button"
+                          className="review-btn"
+                          onClick={() => resolveStudentRequest(request, "approved")}
+                          disabled={busy || !student}
+                        >
+                          {busy ? "Saving..." : "Approve"}
+                        </button>
+                        <button
+                          type="button"
+                          className="ghost-btn"
+                          style={{ marginLeft: 0 }}
+                          onClick={() => resolveStudentRequest(request, "rejected")}
+                          disabled={busy}
+                        >
+                          Reject
+                        </button>
+                      </div>
+                    </section>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           <div
             style={{

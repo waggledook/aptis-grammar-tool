@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, where } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, where } from "firebase/firestore";
 import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
 import {
   db,
@@ -11,12 +11,20 @@ import {
   fetchWritingP2Submissions,
   fetchWritingP3Submissions,
   fetchWritingP4Submissions,
+  fetchReadingProgressMap,
 } from "../../firebase";
 import { TOPIC_DATA } from "../vocabulary/data/vocabTopics";
 import { fetchItemsByIds } from "../../api/grammar";
 import { toast } from "../../utils/toast";
 
 const TEACHER_NOTIFICATION_LIMIT = 100;
+
+function getReadingPartLabel(part) {
+  if (part === "part2") return "Reading Part 2";
+  if (part === "part3") return "Reading Part 3";
+  if (part === "part4") return "Reading Part 4";
+  return "Reading";
+}
 
 function timestampToMs(value) {
   if (!value) return 0;
@@ -314,6 +322,9 @@ function buildActivitySummary(studentId, attemptStats, submissionBundle) {
   const latestVocab = (submissionBundle?.recentVocab || [])
     .slice()
     .sort((a, b) => timestampToMs(b.updatedAt) - timestampToMs(a.updatedAt))[0] || null;
+  const latestReading = (submissionBundle?.readingProgress || [])
+    .slice()
+    .sort((a, b) => timestampToMs(b.updatedAt) - timestampToMs(a.updatedAt))[0] || null;
   const latestAttemptAt = attemptMeta?.latestSubmittedAt || null;
 
   const candidates = [
@@ -348,6 +359,13 @@ function buildActivitySummary(studentId, attemptStats, submissionBundle) {
           detail: latestVocab.setTitle || latestVocab.setId || latestVocab.topicTitle || latestVocab.topic || "Completed",
         }
       : null,
+    latestReading
+      ? {
+          kind: getReadingPartLabel(latestReading.part),
+          createdAt: latestReading.updatedAt,
+          detail: "Completed",
+        }
+      : null,
     latestAttemptAt
       ? {
           kind: "Teacher quiz",
@@ -366,6 +384,7 @@ function buildActivitySummary(studentId, attemptStats, submissionBundle) {
     latestWriting,
     latestGrammar,
     latestVocab,
+    latestReading,
     latestActivity,
   };
 }
@@ -506,10 +525,6 @@ function getCourseTestAutoItemScore(item, answer) {
   return 0;
 }
 
-function isCourseTestItemCorrect(item, answer) {
-  return getCourseTestAutoItemScore(item, answer) >= 1;
-}
-
 function formatCourseTestAnswer(item, answer) {
   if (!answer || (typeof answer === "string" && !answer.trim())) return "—";
   if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
@@ -542,7 +557,7 @@ function formatCourseTestAnswer(item, answer) {
 function formatCourseTestKey(item) {
   if (isInlineTextInputItem(item) && hasPerGapAcceptedAnswers(item)) {
     return Object.entries(item.inlineAcceptedAnswers || {})
-      .map(([gapId, values], index) => `Gap ${index + 1}: ${(values || []).join(" / ")}`)
+      .map(([, values], index) => `Gap ${index + 1}: ${(values || []).join(" / ")}`)
       .join(" · ");
   }
   if (item?.type === "choice") {
@@ -657,8 +672,15 @@ function buildCourseTestSkillSummaryRows(template, attempt) {
   }));
 }
 
-export default function MyStudents({ user }) {
+export default function MyStudents({
+  user,
+  onReadSubmissionKeysChange,
+  onUnreadCountAdjust,
+  onUnreadCountChange,
+}) {
   const navigate = useNavigate();
+  const canView = user?.role === "teacher" || user?.role === "admin";
+  const userUid = user?.uid || "";
   const latestReadMapRef = useRef({});
   const persistQueueRef = useRef(Promise.resolve());
   const [students, setStudents] = useState([]);
@@ -673,14 +695,13 @@ export default function MyStudents({ user }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [classFilter, setClassFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
+  const [requestEmail, setRequestEmail] = useState("");
+  const [studentRequests, setStudentRequests] = useState([]);
+  const [requestingStudent, setRequestingStudent] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const [readSubmissionKeys, setReadSubmissionKeys] = useState({});
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [selectedAttemptItemsById, setSelectedAttemptItemsById] = useState({});
-
-  if (!user || (user.role !== "teacher" && user.role !== "admin")) {
-    return <p>⛔ Only teachers and admins can view this page.</p>;
-  }
 
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
@@ -690,26 +711,35 @@ export default function MyStudents({ user }) {
     let alive = true;
 
     async function load() {
+      if (!canView || !userUid) {
+        setLoading(false);
+        return;
+      }
+
       setLoading(true);
 
       const usersCol = collection(db, "users");
-      const studentQuery = query(usersCol, where("teacherId", "==", user.uid));
-      const [studentSnap, rosterSnap, attemptsResult, courseAttemptsResult, dashboardResult, setsResult] = await Promise.all([
+      const studentQuery = query(usersCol, where("teacherId", "==", userUid));
+      const [studentSnap, rosterSnap, requestsResult, attemptsResult, courseAttemptsResult, dashboardResult, setsResult] = await Promise.all([
         getDocs(studentQuery),
-        getDocs(collection(db, "users", user.uid, "studentRoster")),
-        getDocs(query(collection(db, "grammarSetAttempts"), where("ownerUid", "==", user.uid))).catch((error) => {
+        getDocs(collection(db, "users", userUid, "studentRoster")),
+        getDocs(query(collection(db, "teacherStudentRequests"), where("teacherUid", "==", userUid))).catch((error) => {
+          console.warn("[MyStudents] Could not load teacher student requests", error);
+          return null;
+        }),
+        getDocs(query(collection(db, "grammarSetAttempts"), where("ownerUid", "==", userUid))).catch((error) => {
           console.warn("[MyStudents] Could not load grammarSetAttempts for teacher", error);
           return null;
         }),
-        getDocs(query(collection(db, "courseTestAttempts"), where("teacherUid", "==", user.uid))).catch((error) => {
+        getDocs(query(collection(db, "courseTestAttempts"), where("teacherUid", "==", userUid))).catch((error) => {
           console.warn("[MyStudents] Could not load courseTestAttempts for teacher", error);
           return null;
         }),
-        getDoc(doc(db, "users", user.uid, "teacherDashboards", "myStudents")).catch((error) => {
+        getDoc(doc(db, "users", userUid, "teacherDashboards", "myStudents")).catch((error) => {
           console.warn("[MyStudents] Could not load teacher dashboard state", error);
           return null;
         }),
-        getDocs(query(collection(db, "grammarSets"), where("ownerId", "==", user.uid))).catch((error) => {
+        getDocs(query(collection(db, "grammarSets"), where("ownerId", "==", userUid))).catch((error) => {
           console.warn("[MyStudents] Could not load grammar sets for teacher", error);
           return null;
         }),
@@ -724,6 +754,7 @@ export default function MyStudents({ user }) {
 
       const attemptsSnap = attemptsResult || { forEach: () => {} };
       const courseAttemptsSnap = courseAttemptsResult || { forEach: () => {} };
+      const requestsSnap = requestsResult || { docs: [] };
       const dashboardSnap = dashboardResult;
       const setsSnap = setsResult || { forEach: () => {} };
 
@@ -822,6 +853,11 @@ export default function MyStudents({ user }) {
 
       setStudents(studentRows);
       setRosterMeta(nextRosterMeta);
+      setStudentRequests(
+        requestsSnap.docs
+          .map((entry) => ({ id: entry.id, ...entry.data() }))
+          .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
+      );
       setClassDrafts(
         studentRows.reduce((acc, studentRow) => {
           acc[studentRow.id] = nextRosterMeta[studentRow.id]?.className || "";
@@ -835,7 +871,7 @@ export default function MyStudents({ user }) {
 
       const statsEntries = await Promise.all(
         studentRows.map(async (studentRow) => {
-          const [part1, part2, part3, part4, grammar, dictation, vocab] = await Promise.all([
+          const [part1, part2, part3, part4, grammar, dictation, vocab, reading] = await Promise.all([
             fetchWritingP1Sessions(3, studentRow.id),
             fetchWritingP2Submissions(3, studentRow.id),
             fetchWritingP3Submissions(3, studentRow.id),
@@ -843,6 +879,7 @@ export default function MyStudents({ user }) {
             fetchHubGrammarSubmissions(3, studentRow.id),
             fetchHubDictationSessions(3, studentRow.id),
             fetchRecentVocabProgress(3, studentRow.id),
+            fetchReadingProgressMap(studentRow.id),
           ]);
 
           const recentWriting = [
@@ -858,6 +895,9 @@ export default function MyStudents({ user }) {
               recentWriting,
               grammarSubmissions: grammar || [],
               dictationSessions: dictation || [],
+              readingProgress: Object.values(reading || {})
+                .sort((a, b) => timestampToMs(b.updatedAt) - timestampToMs(a.updatedAt))
+                .slice(0, 5),
               recentVocab: (vocab || []).map((entry) => {
                 const meta = resolveVocabMeta(entry.topic, entry.setId);
                 return {
@@ -885,7 +925,55 @@ export default function MyStudents({ user }) {
     return () => {
       alive = false;
     };
-  }, [user.uid]);
+  }, [canView, userUid]);
+
+  async function requestStudentLink(event) {
+    event.preventDefault();
+    if (!canView || !userUid) return;
+
+    const studentEmail = requestEmail.trim().toLowerCase();
+    if (!studentEmail || !studentEmail.includes("@")) {
+      toast("Enter the student's email address.");
+      return;
+    }
+
+    const alreadyLinked = students.some((studentRow) => (studentRow.email || "").trim().toLowerCase() === studentEmail);
+    if (alreadyLinked) {
+      toast("That student is already linked to you.");
+      return;
+    }
+
+    const alreadyPending = studentRequests.some(
+      (request) => request.status === "pending" && request.studentEmailLower === studentEmail
+    );
+    if (alreadyPending) {
+      toast("You already have a pending request for that email.");
+      return;
+    }
+
+    setRequestingStudent(true);
+    try {
+      const payload = {
+        teacherUid: userUid,
+        teacherEmail: user.email || null,
+        teacherName: user.displayName || user.name || user.username || user.email || user.uid,
+        studentEmail,
+        studentEmailLower: studentEmail,
+        status: "pending",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      };
+      const ref = await addDoc(collection(db, "teacherStudentRequests"), payload);
+      setStudentRequests((prev) => [{ id: ref.id, ...payload, createdAt: new Date(), updatedAt: new Date() }, ...prev]);
+      setRequestEmail("");
+      toast("Student request sent for admin approval.");
+    } catch (error) {
+      console.error("[MyStudents] Could not create student request", error);
+      toast("Could not send that request.");
+    } finally {
+      setRequestingStudent(false);
+    }
+  }
 
   useEffect(() => {
     latestReadMapRef.current = readSubmissionKeys;
@@ -896,7 +984,7 @@ export default function MyStudents({ user }) {
       .catch(() => {})
       .then(() =>
         setDoc(
-          doc(db, "users", user.uid, "teacherDashboards", "myStudents"),
+          doc(db, "users", userUid, "teacherDashboards", "myStudents"),
           {
             readSubmissionKeys: nextReadMap,
             updatedAt: serverTimestamp(),
@@ -949,6 +1037,8 @@ export default function MyStudents({ user }) {
     };
     latestReadMapRef.current = nextReadMap;
     setReadSubmissionKeys(nextReadMap);
+    onReadSubmissionKeysChange?.(nextReadMap);
+    onUnreadCountAdjust?.(-1);
 
     await persistReadMap(nextReadMap);
   }
@@ -960,6 +1050,8 @@ export default function MyStudents({ user }) {
     delete nextReadMap[notificationKey];
     latestReadMapRef.current = nextReadMap;
     setReadSubmissionKeys(nextReadMap);
+    onReadSubmissionKeysChange?.(nextReadMap);
+    onUnreadCountAdjust?.(1);
 
     await persistReadMap(nextReadMap);
     toast("Marked as unread.");
@@ -1024,6 +1116,11 @@ export default function MyStudents({ user }) {
 
     return result;
   }, [classFilter, hydratedStudents, searchTerm, sortBy]);
+
+  const visibleStudentRequests = useMemo(
+    () => studentRequests.filter((request) => request.status === "pending").slice(0, 5),
+    [studentRequests]
+  );
 
   const summary = useMemo(() => {
     const recentThreshold = Date.now() - 14 * 86400000;
@@ -1099,15 +1196,35 @@ export default function MyStudents({ user }) {
     );
   }, [hydratedStudents, submissionStats]);
 
+  const readingNotifications = useMemo(() => {
+    return hydratedStudents.flatMap((studentRow) =>
+      (submissionStats[studentRow.id]?.readingProgress || []).map((entry) => ({
+        id: `reading:${studentRow.id}:${entry.part}:${entry.taskId}`,
+        kind: "reading",
+        studentId: studentRow.id,
+        studentLabel:
+          studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        createdAt: entry.updatedAt,
+        partLabel: getReadingPartLabel(entry.part),
+        taskId: entry.taskId,
+        submission: entry,
+      }))
+    );
+  }, [hydratedStudents, submissionStats]);
+
   const teacherNotifications = useMemo(() => {
-    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...dictationNotifications, ...vocabNotifications, ...courseTestNotifications]
+    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...dictationNotifications, ...readingNotifications, ...vocabNotifications, ...courseTestNotifications]
       .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
       .slice(0, TEACHER_NOTIFICATION_LIMIT);
-  }, [courseTestNotifications, dictationNotifications, grammarCompletionNotifications, miniTestNotifications, vocabNotifications, writingNotifications]);
+  }, [courseTestNotifications, dictationNotifications, grammarCompletionNotifications, miniTestNotifications, readingNotifications, vocabNotifications, writingNotifications]);
 
   const unreadNotificationCount = useMemo(() => {
     return teacherNotifications.filter((entry) => !readSubmissionKeys[entry.id]).length;
   }, [readSubmissionKeys, teacherNotifications]);
+
+  useEffect(() => {
+    onUnreadCountChange?.(unreadNotificationCount);
+  }, [onUnreadCountChange, unreadNotificationCount]);
 
   function openNotification(entry) {
     setSelectedNotification(entry);
@@ -1267,6 +1384,10 @@ async function copySelectedSubmission() {
     await copyHtmlWithFallback({ html, text: plain });
   }
 
+  if (!canView) {
+    return <p>Only teachers and admins can view this page.</p>;
+  }
+
   return (
     <div className="my-students-page">
       <div className="my-students-topbar">
@@ -1308,6 +1429,8 @@ async function copySelectedSubmission() {
                               ? `Mini test completed · ${entry.title}`
                             : entry.kind === "dictation"
                               ? `Dictation completed · ${entry.title}`
+                            : entry.kind === "reading"
+                              ? `${entry.partLabel} completed`
                             : entry.kind === "vocabulary"
                               ? `Vocabulary set completed · ${entry.topicTitle} · ${entry.setTitle}`
                             : `${
@@ -1353,6 +1476,21 @@ async function copySelectedSubmission() {
       </section>
 
       <section className="my-students-controls">
+        <form className="student-request-form" onSubmit={requestStudentLink}>
+          <label className="field grow">
+            <span>Request student</span>
+            <input
+              type="email"
+              value={requestEmail}
+              onChange={(event) => setRequestEmail(event.target.value)}
+              placeholder="student@email.com"
+            />
+          </label>
+          <button type="submit" className="review-btn" disabled={requestingStudent}>
+            {requestingStudent ? "Sending..." : "Request link"}
+          </button>
+        </form>
+
         <label className="field">
           <span>Search</span>
           <input
@@ -1385,6 +1523,18 @@ async function copySelectedSubmission() {
           </select>
         </label>
       </section>
+
+      {visibleStudentRequests.length > 0 && (
+        <section className="student-request-list">
+          <span className="panel-label">Pending requests</span>
+          {visibleStudentRequests.map((request) => (
+            <div key={request.id} className="student-request-row">
+              <strong>{request.studentEmail || request.studentEmailLower}</strong>
+              <span>{formatRelative(request.createdAt)}</span>
+            </div>
+          ))}
+        </section>
+      )}
 
       {loading && <p className="muted">Loading students…</p>}
 
@@ -1498,6 +1648,8 @@ async function copySelectedSubmission() {
                         ? "Mini test"
                         : selectedNotification.kind === "vocabulary"
                           ? "Vocabulary"
+                          : selectedNotification.kind === "reading"
+                            ? selectedNotification.partLabel || "Reading"
                           : selectedNotification.kind === "grammar-set"
                             ? "Grammar set"
                             : selectedNotification.kind === "course-test"
@@ -1759,6 +1911,19 @@ async function copySelectedSubmission() {
                         {selectedNotification.submission.lastRun.totalItems ?? 0} correct first try.
                       </div>
                     ) : null}
+                  </div>
+                </div>
+              ) : null}
+
+              {selectedNotification.kind === "reading" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">Reading completion</span>
+                  <div className="teacher-review-answer">
+                    <strong>{selectedNotification.partLabel}</strong>
+                    <div className="teacher-review-plain">
+                      Completed {formatRelative(selectedNotification.createdAt)}.
+                      {selectedNotification.taskId ? ` Task: ${selectedNotification.taskId}.` : ""}
+                    </div>
                   </div>
                 </div>
               ) : null}
@@ -2400,6 +2565,10 @@ async function copySelectedSubmission() {
           margin-bottom: 1rem;
         }
 
+        .my-students-controls {
+          grid-template-columns: minmax(260px, 1.5fr) repeat(3, minmax(0, 1fr));
+        }
+
         .my-students-stat,
         .my-students-controls,
         .student-card {
@@ -2430,6 +2599,37 @@ async function copySelectedSubmission() {
         .my-students-controls {
           padding: 1rem 1.1rem;
           align-items: end;
+        }
+
+        .student-request-form {
+          display: flex;
+          gap: 0.75rem;
+          align-items: end;
+          min-width: 0;
+        }
+
+        .student-request-list {
+          margin: -0.2rem 0 1rem;
+          padding: 0.95rem 1.05rem;
+          border-radius: 16px;
+          background: rgba(11, 18, 37, 0.52);
+          border: 1px solid rgba(108, 136, 199, 0.18);
+          display: grid;
+          gap: 0.55rem;
+        }
+
+        .student-request-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 0.8rem;
+          color: #eef4ff;
+          font-size: 0.9rem;
+        }
+
+        .student-request-row span {
+          color: rgba(230, 240, 255, 0.62);
+          white-space: nowrap;
         }
 
         .field {
@@ -2605,6 +2805,7 @@ async function copySelectedSubmission() {
 
           .student-card-head,
           .student-row-side,
+          .student-request-form,
           .student-class-editor {
             flex-direction: column;
             align-items: stretch;

@@ -6,6 +6,8 @@ import {
   logReadingPart3Completed,
 } from "../firebase";
 import { toast } from "../utils/toast";
+import { getSitePath } from "../siteConfig.js";
+import ReadingAssignButton from "./ReadingAssignButton.jsx";
 
 // ---------- Demo dataset ----------
 const DEMO_TASKS = [
@@ -107,7 +109,9 @@ const DEMO_TASKS = [
 
 // ---------- Component ----------
 export default function AptisPart3Matching({ tasks = DEMO_TASKS, user, onRequireSignIn }) {
-  const [taskIndex, setTaskIndex] = useState(0);
+  const initialTaskId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("task") : "";
+  const initialTaskIndex = Math.max(0, tasks.findIndex((task) => task.id === initialTaskId));
+  const [taskIndex, setTaskIndex] = useState(initialTaskIndex);
   const [answers, setAnswers] = useState({});
   const [feedback, setFeedback] = useState({});
   const [completed, setCompleted] = useState(new Set());
@@ -278,8 +282,18 @@ useEffect(() => {
     <div className="aptis-matching game-wrapper">
       <StyleScope />
       <header className="header">
-        <h2 className="title">Reading – Part 3 (Matching Opinions)</h2>
-        <p className="intro"><em>{current.title}</em></p>
+        <div>
+          <h2 className="title">Reading – Part 3 (Matching Opinions)</h2>
+          <p className="intro"><em>{current.title}</em></p>
+        </div>
+        <ReadingAssignButton
+          user={user}
+          activityId="reading-part-3"
+          activityLabel={`Aptis Reading Part 3 — ${current?.title || "Matching opinions"}`}
+          routePath={getSitePath(`/reading/part3?task=${encodeURIComponent(current?.id || "")}`)}
+          taskId={current?.id || ""}
+          taskTitle={current?.title || ""}
+        />
       </header>
 
       {/* ---------- Comments section ---------- */}

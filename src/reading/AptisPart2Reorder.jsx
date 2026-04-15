@@ -1,6 +1,8 @@
 import React, { useMemo, useState, useEffect } from "react";
 import { saveReadingCompletion, fetchReadingCompletions, logReadingReorderCompleted } from '../firebase';
 import { toast } from "../utils/toast"; // your ToastHost helper
+import { getSitePath } from "../siteConfig.js";
+import ReadingAssignButton from "./ReadingAssignButton.jsx";
 
 /**
  * Aptis Part 2 – Sentence Reordering (drag sentences into slots)
@@ -472,7 +474,9 @@ export default function AptisPart2Reorder({ tasks = DEMO_TASKS, user, onRequireS
     return out;
   }, [tasks]);
 
-  const [taskIndex, setTaskIndex] = useState(0);
+  const initialTaskId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("task") : "";
+  const initialTaskIndex = Math.max(0, flattened.findIndex((task) => task.id === initialTaskId));
+  const [taskIndex, setTaskIndex] = useState(initialTaskIndex);
   const current = flattened[taskIndex] || flattened[0];
 
   // ✅ NEW: track which tasks are completed for this user
@@ -531,6 +535,14 @@ return (
       </div>
 
       <div className="picker">
+        <ReadingAssignButton
+          user={user}
+          activityId="reading-part-2"
+          activityLabel={`Aptis Reading Part 2 — ${current?.title || "Sentence order"}`}
+          routePath={getSitePath(`/reading/part2?task=${encodeURIComponent(current?.id || "")}`)}
+          taskId={current?.id || ""}
+          taskTitle={current?.title || ""}
+        />
         <ChipDropdown
           items={decoratedItems}          // ⬅️ use decorated labels
           value={taskIndex}

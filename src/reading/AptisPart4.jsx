@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { fetchReadingCompletionsByPart, logReadingPart4Attempted, logReadingPart4Completed, } from "../firebase";
 import { toast } from "../utils/toast";
+import { getSitePath } from "../siteConfig.js";
+import ReadingAssignButton from "./ReadingAssignButton.jsx";
 
 /**
  * Aptis Reading – Part 4 (Heading matching)
@@ -342,7 +344,9 @@ export default function AptisPart4({
   user,
   onRequireSignIn,
 }) {
-  const [taskIndex, setTaskIndex] = useState(0);
+  const initialTaskId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("task") : "";
+  const initialTaskIndex = Math.max(0, tasks.findIndex((task) => task.id === initialTaskId));
+  const [taskIndex, setTaskIndex] = useState(initialTaskIndex);
   const [answers, setAnswers] = useState({}); // { [paraId]: headingKey }
   const [feedback, setFeedback] = useState({}); // { [paraId]: true|false|null }
   const [completed, setCompleted] = useState(new Set());
@@ -475,6 +479,14 @@ export default function AptisPart4({
         </div>
 
         <div className="p4-tools">
+          <ReadingAssignButton
+            user={user}
+            activityId="reading-part-4"
+            activityLabel={`Aptis Reading Part 4 — ${current?.title || "Heading matching"}`}
+            routePath={getSitePath(`/reading/part4?task=${encodeURIComponent(current?.id || "")}`)}
+            taskId={current?.id || ""}
+            taskTitle={current?.title || ""}
+          />
           <ChipDropdown
             items={decoratedItems}
             value={taskIndex}

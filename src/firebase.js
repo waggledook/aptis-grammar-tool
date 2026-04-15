@@ -1919,6 +1919,46 @@ export async function fetchReadingCompletionsByPart(part = "part2") {
   return done;
 }
 
+export async function fetchReadingProgressMap(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return {};
+
+  const snap = await getDocs(collection(db, "users", realUid, "readingProgress"));
+  const progress = {};
+
+  snap.forEach((entry) => {
+    const data = entry.data() || {};
+    if (!data.completed) return;
+
+    const taskId =
+      typeof data.taskId === "string" && data.taskId
+        ? data.taskId
+        : typeof entry.id === "string" && entry.id.includes(":")
+          ? entry.id.split(":").slice(1).join(":")
+          : entry.id;
+
+    const part =
+      typeof data.part === "string" && data.part
+        ? data.part
+        : typeof entry.id === "string" && entry.id.includes(":")
+          ? entry.id.split(":")[0]
+          : "part2";
+
+    if (!taskId) return;
+
+    const key = `${part}:${taskId}`;
+    progress[key] = {
+      id: entry.id,
+      part,
+      taskId,
+      completed: true,
+      updatedAt: data.updatedAt || null,
+    };
+  });
+
+  return progress;
+}
+
 /** Reading progress counts per part */
 export async function fetchReadingCounts(uid) {
   const realUid = _uidOrCurrent(uid);

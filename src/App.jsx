@@ -15,6 +15,7 @@ import {
   fetchWritingP4Submissions,
   fetchVocabProgressMap,
   fetchSpeakingProgressMap,
+  fetchReadingProgressMap,
   fetchRecentVocabProgress,
   listAssignedActivitiesForStudent,
   listGrammarSetAttemptsForStudent,
@@ -188,6 +189,13 @@ function getWritingBucket(type) {
   return "";
 }
 
+function getReadingPartKey(type) {
+  if (type === "reading-part-2") return "part2";
+  if (type === "reading-part-3") return "part3";
+  if (type === "reading-part-4") return "part4";
+  return "";
+}
+
 
 
 
@@ -213,6 +221,18 @@ const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
+
+function updateTeacherReadSubmissionKeys(nextReadMap) {
+  setTeacherReadSubmissionKeys(nextReadMap || {});
+}
+
+function adjustTeacherUnreadCount(delta) {
+  setTeacherUnreadCount((prev) => Math.max(0, prev + delta));
+}
+
+function syncTeacherUnreadCount(nextCount) {
+  setTeacherUnreadCount(Math.max(0, Number(nextCount || 0)));
+}
 
 useEffect(() => {
   const unsub = onAuthStateChanged(auth, async (u) => {
@@ -286,7 +306,7 @@ useEffect(() => {
       const notificationIds = (
         await Promise.all(
           studentIds.map(async (studentId) => {
-            const [part1, part2, part3, part4, miniTests, dictationSessions, vocabSets] = await Promise.all([
+            const [part1, part2, part3, part4, miniTests, dictationSessions, vocabSets, readingProgress] = await Promise.all([
               fetchWritingP1Sessions(3, studentId),
               fetchWritingP2Submissions(3, studentId),
               fetchWritingP3Submissions(3, studentId),
@@ -294,6 +314,7 @@ useEffect(() => {
               fetchHubGrammarSubmissions(3, studentId),
               fetchHubDictationSessions(3, studentId),
               fetchRecentVocabProgress(3, studentId),
+              fetchReadingProgressMap(studentId),
             ]);
 
             return [
@@ -304,6 +325,10 @@ useEffect(() => {
               ...miniTests.map((entry) => ({ id: `mini-test:${studentId}:${entry.id}`, createdAt: entry.createdAt })),
               ...dictationSessions.map((entry) => ({ id: `dictation:${studentId}:${entry.id}`, createdAt: entry.createdAt })),
               ...vocabSets.map((entry) => ({ id: `vocab-topic:${studentId}:${entry.id}`, createdAt: entry.updatedAt })),
+              ...Object.values(readingProgress || {}).map((entry) => ({
+                id: `reading:${studentId}:${entry.part}:${entry.taskId}`,
+                createdAt: entry.updatedAt,
+              })),
             ];
           })
         )
@@ -373,10 +398,11 @@ useEffect(() => {
     }
 
     try {
-      const [assignments, vocabProgress, speakingProgress, dictationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+      const [assignments, vocabProgress, speakingProgress, readingProgress, dictationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
         listAssignedActivitiesForStudent(user.uid),
         fetchVocabProgressMap(user.uid),
         fetchSpeakingProgressMap(user.uid),
+        fetchReadingProgressMap(user.uid),
         fetchHubDictationSessions(200, user.uid),
         fetchHubGrammarSubmissions(200, user.uid),
         listGrammarSetAttemptsForStudent(user.uid),
@@ -391,6 +417,7 @@ useEffect(() => {
       const completionSources = {
         vocabulary: vocabProgress || {},
         speaking: speakingProgress || {},
+        reading: readingProgress || {},
         dictation: buildLatestMap(dictationSessions || [], "assignmentId"),
         miniTests: buildLatestMap(miniTests || [], "activityId"),
         grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
@@ -438,6 +465,20 @@ useEffect(() => {
           const completionTimes = Object.entries(completionSources.speaking || {})
             .filter(([key]) => key.startsWith(`${partKey}:`))
             .map(([, value]) => timestampToMs(value));
+          const completedAt = completionTimes.length ? Math.max(...completionTimes) : 0;
+          return completedAt < assignedAt;
+        }
+        if (assignment.activityType === "reading") {
+          const partKey = getReadingPartKey(assignment.activityId);
+          if (!partKey) return true;
+
+          if (assignment?.taskId) {
+            return timestampToMs(completionSources.reading?.[`${partKey}:${assignment.taskId}`]?.updatedAt) < assignedAt;
+          }
+
+          const completionTimes = Object.entries(completionSources.reading || {})
+            .filter(([key]) => key.startsWith(`${partKey}:`))
+            .map(([, value]) => timestampToMs(value?.updatedAt));
           const completedAt = completionTimes.length ? Math.max(...completionTimes) : 0;
           return completedAt < assignedAt;
         }
@@ -1381,7 +1422,14 @@ return (
 
 <Route
   path="/my-students"
-  element={<MyStudents user={user} />}
+  element={
+    <MyStudents
+      user={user}
+      onReadSubmissionKeysChange={updateTeacherReadSubmissionKeys}
+      onUnreadCountAdjust={adjustTeacherUnreadCount}
+      onUnreadCountChange={syncTeacherUnreadCount}
+    />
+  }
 />
 
 <Route path="/live/join" element={<LiveGameJoin />} />
