@@ -79,7 +79,7 @@ export default function TeacherTools({ user }) {
           <div className="head-left">
             <h2 className="sec-title">Assign class activities</h2>
             <p className="muted small">
-              Send mini tests, grammar sets, Use of English sets, and writing tasks to your students.
+              Send mini tests, grammar sets, Use of English sets, writing tasks, and dictation tasks to your students.
             </p>
           </div>
           <span className={`chev ${showAssignments ? "open" : ""}`} aria-hidden>

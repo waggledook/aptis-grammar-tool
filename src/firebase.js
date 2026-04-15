@@ -1153,11 +1153,29 @@ export async function saveHubDictationSession(payload) {
     mode: payload.mode || "game",
     setId: payload.setId || "",
     setLabel: payload.setLabel || "",
+    assignmentId: payload.assignmentId || "",
     score: payload.score ?? null,
     completed: payload.completed ?? null,
     totalPlayed: payload.totalPlayed ?? null,
     trainingTarget: payload.trainingTarget ?? null,
   });
+}
+
+export async function fetchHubDictationSessions(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "hubDictationSessions"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
 }
 
 export async function fetchHubGrammarSubmissions(n = 20, uid) {
@@ -2684,8 +2702,15 @@ export async function createAssignedActivity(data) {
   const uid = auth.currentUser?.uid;
   if (!uid) throw new Error("Must be signed in to create an assignment.");
 
-  const ref = await addDoc(collection(db, "assignedActivities"), {
+  const ref = doc(collection(db, "assignedActivities"));
+  const routePath =
+    typeof data.routePath === "string"
+      ? data.routePath.replace("__ASSIGNMENT_ID__", ref.id)
+      : data.routePath;
+
+  await setDoc(ref, {
     ...data,
+    routePath,
     teacherUid: data.teacherUid || uid,
     teacherEmail: data.teacherEmail || auth.currentUser?.email || null,
     createdAt: serverTimestamp(),
@@ -2694,6 +2719,13 @@ export async function createAssignedActivity(data) {
   });
 
   return ref.id;
+}
+
+export async function getAssignedActivity(assignmentId) {
+  if (!assignmentId) return null;
+  const snap = await getDoc(doc(db, "assignedActivities", assignmentId));
+  if (!snap.exists()) return null;
+  return { id: snap.id, ...snap.data() };
 }
 
 export async function listAssignedActivitiesForTeacher(uid) {

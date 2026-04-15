@@ -4,6 +4,7 @@ import { getSitePath } from "../../siteConfig.js";
 import {
   fetchVocabProgressMap,
   fetchSpeakingProgressMap,
+  fetchHubDictationSessions,
   fetchHubGrammarSubmissions,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
@@ -67,6 +68,8 @@ function getAssignmentTypeLabel(type) {
       return "Writing task";
     case "speaking":
       return "Speaking task";
+    case "dictation":
+      return "Dictation task";
     case "vocabulary-topic":
       return "Vocabulary set";
     default:
@@ -166,6 +169,11 @@ function resolveAssignedCompletion(assignment, sources) {
       : { completed: false, completedAt: 0 };
   }
 
+  if (assignment?.activityType === "dictation") {
+    const completedAt = sources.dictation?.[assignment.id] || 0;
+    return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+  }
+
   return { completed: false, completedAt: 0 };
 }
 
@@ -188,12 +196,13 @@ export default function HubYourClass({ user }) {
 
       setLoading(true);
       try {
-        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, dictationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
           listStudentCourseTestSessions(user.uid),
           listStudentCourseTestAttempts(user.uid),
           listAssignedActivitiesForStudent(user.uid),
           fetchVocabProgressMap(user.uid),
           fetchSpeakingProgressMap(user.uid),
+          fetchHubDictationSessions(200, user.uid),
           fetchHubGrammarSubmissions(200, user.uid),
           listGrammarSetAttemptsForStudent(user.uid),
           fetchWritingP1Sessions(100, user.uid),
@@ -206,6 +215,7 @@ export default function HubYourClass({ user }) {
         const completionSources = {
           vocabulary: vocabProgress || {},
           speaking: speakingProgress || {},
+          dictation: buildLatestTimeMap(dictationSessions || [], "assignmentId"),
           miniTests: buildLatestTimeMap(miniTests || [], "activityId"),
           grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
             if (!attempt?.setId) return acc;

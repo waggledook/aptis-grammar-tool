@@ -1,9 +1,9 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { HUB_DICTATION_ALL_SET_ID, HUB_DICTATION_SETS } from "../../data/hubDictationSets.js";
-import { saveHubDictationSession } from "../../firebase";
+import { getAssignedActivity, saveHubDictationSession } from "../../firebase";
 import { toast } from "../../utils/toast";
 
 const ROUND_DURATION = 90;
@@ -210,6 +210,7 @@ function buildReportMarkup(history) {
 
 export default function HubDictationTrainer() {
   const navigate = useNavigate();
+  const location = useLocation();
   const timerRef = useRef(null);
   const timeoutRef = useRef(null);
   const audioRef = useRef(null);
@@ -247,8 +248,21 @@ export default function HubDictationTrainer() {
     Number(window.localStorage.getItem(BEST_SCORE_KEY) || 0)
   );
   const [reportHtml, setReportHtml] = useState("");
+  const [assignment, setAssignment] = useState(null);
+  const [assignmentLoading, setAssignmentLoading] = useState(false);
 
-  const isTrainingMode = mode === "training";
+  const assignmentId = useMemo(() => {
+    const params = new URLSearchParams(location.search);
+    const directAssignmentId = params.get("assignment");
+    if (directAssignmentId) return directAssignmentId;
+
+    const malformedSiteValue = params.get("site") || "";
+    const malformedMatch = malformedSiteValue.match(/[?&]assignment=([^&]+)/);
+    return malformedMatch ? decodeURIComponent(malformedMatch[1]) : "";
+  }, [location.search]);
+  const assignmentSentences = assignment?.dictationConfig?.sentences || [];
+  const isAssignmentMode = !!assignmentId && !!assignment && assignmentSentences.length > 0;
+  const isTrainingMode = isAssignmentMode || mode === "training";
 
   const setOptions = useMemo(
     () => [
@@ -259,9 +273,10 @@ export default function HubDictationTrainer() {
   );
 
   const selectedSetLabel = useMemo(() => {
+    if (isAssignmentMode) return assignment.activityLabel || "Assigned dictation";
     if (selectedSetId === HUB_DICTATION_ALL_SET_ID) return "All sentences";
     return HUB_DICTATION_SETS.find((set) => set.id === selectedSetId)?.label || "All sentences";
-  }, [selectedSetId]);
+  }, [assignment, isAssignmentMode, selectedSetId]);
 
   const statOneValue = isTrainingMode
     ? `${Math.min(roundHistory.length, trainingSentenceCount)} / ${trainingSentenceCount}`
@@ -303,6 +318,13 @@ export default function HubDictationTrainer() {
   }
 
   function getSelectedSentences() {
+    if (isAssignmentMode) {
+      return assignmentSentences.map((sentence) => ({
+        text: sentence.text,
+        acceptedTexts: sentence.acceptedTexts || [sentence.text],
+        audio: sentence.audio,
+      }));
+    }
     if (selectedSetId === HUB_DICTATION_ALL_SET_ID) {
       return HUB_DICTATION_SETS.flatMap((set) => set.sentences);
     }
@@ -390,6 +412,10 @@ export default function HubDictationTrainer() {
 
     saveHubDictationSession({
       mode,
+      assignmentId: assignment?.id || "",
+      assignmentLabel: assignment?.activityLabel || "",
+      teacherUid: assignment?.teacherUid || "",
+      teacherName: assignment?.teacherName || "",
       setId: selectedSetId,
       setLabel: selectedSetLabel,
       score: finalScore,
@@ -505,6 +531,16 @@ export default function HubDictationTrainer() {
   }
 
   function startGame() {
+    if (assignmentId && assignmentLoading) {
+      toast("Still loading the assigned dictation.");
+      return;
+    }
+
+    if (assignmentId && !isAssignmentMode) {
+      toast("This assigned dictation could not be loaded.");
+      return;
+    }
+
     stopTimers();
     stopAudio();
 
@@ -572,6 +608,54 @@ export default function HubDictationTrainer() {
   }, []);
 
   useEffect(() => {
+    let alive = true;
+
+    async function loadAssignment() {
+      if (!assignmentId) {
+        setAssignment(null);
+        setAssignmentLoading(false);
+        return;
+      }
+
+      setAssignmentLoading(true);
+      try {
+        const row = await getAssignedActivity(assignmentId);
+        if (!alive) return;
+        if (row?.activityType === "dictation" && Array.isArray(row?.dictationConfig?.sentences)) {
+          setAssignment(row);
+          setMode("training");
+          setTrainingSentenceCount(row.dictationConfig.sentences.length || 1);
+          setMessage({
+            tone: "info",
+            text: "Assigned dictation loaded. Press start when you're ready.",
+          });
+        } else {
+          setAssignment(null);
+          setMessage({
+            tone: "bad",
+            text: "This assigned dictation could not be found.",
+          });
+        }
+      } catch (error) {
+        console.error("[HubDictationTrainer] failed to load assignment", error);
+        if (!alive) return;
+        setAssignment(null);
+        setMessage({
+          tone: "bad",
+          text: "This assigned dictation could not be loaded.",
+        });
+      } finally {
+        if (alive) setAssignmentLoading(false);
+      }
+    }
+
+    loadAssignment();
+    return () => {
+      alive = false;
+    };
+  }, [assignmentId]);
+
+  useEffect(() => {
     if (audioRef.current) {
       audioRef.current.playbackRate = playbackRate;
     }
@@ -617,9 +701,11 @@ export default function HubDictationTrainer() {
           <button className="review-btn" onClick={() => navigate(getSitePath("/listening"))}>
             ← Back to listening
           </button>
-          <h1>Dictation Trainer</h1>
+          <h1>{isAssignmentMode ? "Assigned Dictation" : "Dictation Trainer"}</h1>
           <p className="hub-dictation-sub">
-            Listen carefully, type what you hear, and train your listening accuracy inside the hub.
+            {isAssignmentMode
+              ? `${assignment.teacherName || "Your teacher"} set ${assignmentSentences.length} sentence${assignmentSentences.length === 1 ? "" : "s"} for you.`
+              : "Listen carefully, type what you hear, and train your listening accuracy inside the hub."}
           </p>
         </div>
 
@@ -643,6 +729,7 @@ export default function HubDictationTrainer() {
         </div>
 
         <div className="hub-dictation-card">
+          {!isAssignmentMode ? (
           <div className="hub-dictation-settings">
             <div className="field">
               <label><strong>Mode</strong></label>
@@ -716,9 +803,17 @@ export default function HubDictationTrainer() {
               </>
             )}
           </div>
+          ) : (
+            <div className="hub-dictation-assignment-note">
+              <strong>{assignment.activityLabel || "Assigned dictation"}</strong>
+              {assignment.notes ? <p>{assignment.notes}</p> : null}
+            </div>
+          )}
 
           <p className="mode-summary">
-            {isTrainingMode
+            {isAssignmentMode
+              ? "Complete this custom set in training mode. Your teacher will see the same attempt feedback after you finish."
+              : isTrainingMode
               ? "Training mode lets you choose 1 to 10 sentences, removes the timer, and plays audio at your chosen speed."
               : "Game mode uses a 1 minute 30 second round with shuffled sentences and scoring."}
           </p>
@@ -729,8 +824,8 @@ export default function HubDictationTrainer() {
             <p style={{ marginTop: 0 }}><strong>How it works</strong></p>
             <ul className="list">
               <li>Click <strong>Start</strong> to begin.</li>
-              <li>If you leave the set on <strong>All sentences</strong>, the round mixes every sentence in the app.</li>
-              <li>You have <strong>1 minute 30 seconds</strong> per round in game mode.</li>
+              {!isAssignmentMode ? <li>If you leave the set on <strong>All sentences</strong>, the round mixes every sentence in the app.</li> : null}
+              {!isAssignmentMode ? <li>You have <strong>1 minute 30 seconds</strong> per round in game mode.</li> : null}
               <li>Each sentence can be answered twice.</li>
               <li>You get <strong>10 points</strong> on the first attempt and <strong>5 points</strong> on the second.</li>
               <li>Press <strong>Enter</strong> to check your answer.</li>

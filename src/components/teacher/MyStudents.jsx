@@ -4,6 +4,7 @@ import { collection, doc, getDoc, getDocs, query, serverTimestamp, setDoc, where
 import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
 import {
   db,
+  fetchHubDictationSessions,
   fetchHubGrammarSubmissions,
   fetchRecentVocabProgress,
   fetchWritingP1Sessions,
@@ -74,6 +75,104 @@ function escapeHtml(text = "") {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+const dictationSpellingVariants = new Map([
+  ["apologise", "apologize"],
+  ["apologised", "apologized"],
+  ["apologising", "apologizing"],
+  ["apologises", "apologizes"],
+  ["cheque", "check"],
+  ["cheques", "checks"],
+  ["checkout", "check out"],
+  ["favourite", "favorite"],
+  ["favourites", "favorites"],
+  ["grey", "gray"],
+  ["realise", "realize"],
+  ["realised", "realized"],
+  ["realising", "realizing"],
+  ["realises", "realizes"],
+]);
+
+function normalizeDictationText(text) {
+  return String(text || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[“”]/g, '"')
+    .replace(/[’‘]/g, "'")
+    .replace(/[.,!?;:]/g, "")
+    .replace(/\b[\w']+\b/g, (word) => dictationSpellingVariants.get(word) || word)
+    .replace(/\s+/g, " ");
+}
+
+function tokenizeDictationText(text) {
+  const normalized = normalizeDictationText(text);
+  return normalized ? normalized.split(" ") : [];
+}
+
+function renderDictationCorrectMarkup(text) {
+  return tokenizeDictationText(text)
+    .map((token) => `<span class="dictation-token is-correct">${escapeHtml(token)}</span>`)
+    .join("");
+}
+
+function renderDictationComparisonMarkup(userText, correctText) {
+  const userWords = tokenizeDictationText(userText);
+  const correctWords = tokenizeDictationText(correctText);
+  const dp = Array.from({ length: userWords.length + 1 }, () =>
+    Array(correctWords.length + 1).fill(0)
+  );
+
+  for (let i = 0; i <= userWords.length; i += 1) dp[i][0] = i;
+  for (let j = 0; j <= correctWords.length; j += 1) dp[0][j] = j;
+
+  for (let i = 1; i <= userWords.length; i += 1) {
+    for (let j = 1; j <= correctWords.length; j += 1) {
+      if (userWords[i - 1] === correctWords[j - 1]) {
+        dp[i][j] = dp[i - 1][j - 1];
+      } else {
+        dp[i][j] = Math.min(
+          dp[i - 1][j - 1] + 1,
+          dp[i - 1][j] + 1,
+          dp[i][j - 1] + 1
+        );
+      }
+    }
+  }
+
+  const aligned = [];
+  let i = userWords.length;
+  let j = correctWords.length;
+
+  while (i > 0 || j > 0) {
+    if (
+      i > 0 &&
+      j > 0 &&
+      userWords[i - 1] === correctWords[j - 1] &&
+      dp[i][j] === dp[i - 1][j - 1]
+    ) {
+      aligned.push({ token: correctWords[j - 1], className: "is-correct" });
+      i -= 1;
+      j -= 1;
+    } else if (j > 0 && (i === 0 || dp[i][j] === dp[i][j - 1] + 1)) {
+      aligned.push({ token: "&nbsp;", className: "is-missing" });
+      j -= 1;
+    } else if (i > 0 && j > 0 && dp[i][j] === dp[i - 1][j - 1] + 1) {
+      aligned.push({ token: userWords[i - 1], className: "is-wrong" });
+      i -= 1;
+      j -= 1;
+    } else if (i > 0 && dp[i][j] === dp[i - 1][j] + 1) {
+      i -= 1;
+    }
+  }
+
+  return aligned
+    .reverse()
+    .map(({ token, className }) => {
+      const content = token === "&nbsp;" ? token : escapeHtml(token);
+      return `<span class="dictation-token ${className}">${content}</span>`;
+    })
+    .join("");
 }
 
 function escHtml(text = "") {
@@ -736,12 +835,13 @@ export default function MyStudents({ user }) {
 
       const statsEntries = await Promise.all(
         studentRows.map(async (studentRow) => {
-          const [part1, part2, part3, part4, grammar, vocab] = await Promise.all([
+          const [part1, part2, part3, part4, grammar, dictation, vocab] = await Promise.all([
             fetchWritingP1Sessions(3, studentRow.id),
             fetchWritingP2Submissions(3, studentRow.id),
             fetchWritingP3Submissions(3, studentRow.id),
             fetchWritingP4Submissions(3, studentRow.id),
             fetchHubGrammarSubmissions(3, studentRow.id),
+            fetchHubDictationSessions(3, studentRow.id),
             fetchRecentVocabProgress(3, studentRow.id),
           ]);
 
@@ -757,6 +857,7 @@ export default function MyStudents({ user }) {
             {
               recentWriting,
               grammarSubmissions: grammar || [],
+              dictationSessions: dictation || [],
               recentVocab: (vocab || []).map((entry) => {
                 const meta = resolveVocabMeta(entry.topic, entry.setId);
                 return {
@@ -983,11 +1084,26 @@ export default function MyStudents({ user }) {
     );
   }, [hydratedStudents, submissionStats]);
 
+  const dictationNotifications = useMemo(() => {
+    return hydratedStudents.flatMap((studentRow) =>
+      (submissionStats[studentRow.id]?.dictationSessions || []).map((entry) => ({
+        id: `dictation:${studentRow.id}:${entry.id}`,
+        kind: "dictation",
+        studentId: studentRow.id,
+        studentLabel:
+          studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        createdAt: entry.createdAt,
+        title: entry.assignmentLabel || entry.setLabel || "Dictation",
+        submission: entry,
+      }))
+    );
+  }, [hydratedStudents, submissionStats]);
+
   const teacherNotifications = useMemo(() => {
-    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...vocabNotifications, ...courseTestNotifications]
+    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...dictationNotifications, ...vocabNotifications, ...courseTestNotifications]
       .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
       .slice(0, TEACHER_NOTIFICATION_LIMIT);
-  }, [courseTestNotifications, grammarCompletionNotifications, miniTestNotifications, vocabNotifications, writingNotifications]);
+  }, [courseTestNotifications, dictationNotifications, grammarCompletionNotifications, miniTestNotifications, vocabNotifications, writingNotifications]);
 
   const unreadNotificationCount = useMemo(() => {
     return teacherNotifications.filter((entry) => !readSubmissionKeys[entry.id]).length;
@@ -1190,6 +1306,8 @@ async function copySelectedSubmission() {
                               ? `${entry.attempt?.reviewStatus === "reviewed" ? "Course test reviewed" : "Course test submitted"} · ${entry.title}`
                             : entry.kind === "mini-test"
                               ? `Mini test completed · ${entry.title}`
+                            : entry.kind === "dictation"
+                              ? `Dictation completed · ${entry.title}`
                             : entry.kind === "vocabulary"
                               ? `Vocabulary set completed · ${entry.topicTitle} · ${entry.setTitle}`
                             : `${
@@ -1373,7 +1491,18 @@ async function copySelectedSubmission() {
               <div>
                 <h3>{selectedNotification.studentLabel}</h3>
                 <p>
-                  {selectedNotification.partLabel} submission · {formatDate(selectedNotification.createdAt)}
+                  {selectedNotification.partLabel ||
+                    (selectedNotification.kind === "dictation"
+                      ? "Dictation"
+                      : selectedNotification.kind === "mini-test"
+                        ? "Mini test"
+                        : selectedNotification.kind === "vocabulary"
+                          ? "Vocabulary"
+                          : selectedNotification.kind === "grammar-set"
+                            ? "Grammar set"
+                            : selectedNotification.kind === "course-test"
+                              ? "Course test"
+                              : "Student")} submission · {formatDate(selectedNotification.createdAt)}
                 </p>
                 {selectedNotification.kind === "course-test" ? (
                   <div
@@ -1631,6 +1760,81 @@ async function copySelectedSubmission() {
                       </div>
                     ) : null}
                   </div>
+                </div>
+              ) : null}
+
+              {selectedNotification.kind === "dictation" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">Dictation completion</span>
+                  <div className="teacher-review-answer">
+                    <strong>{selectedNotification.title}</strong>
+                    <div className="teacher-review-plain">
+                      Completed {formatRelative(selectedNotification.createdAt)}.
+                      {" "}
+                      Correct: {selectedNotification.submission?.completed ?? 0}/
+                      {selectedNotification.submission?.trainingTarget ?? selectedNotification.submission?.totalPlayed ?? 0}.
+                      {" "}
+                      Score: {selectedNotification.submission?.score ?? 0}.
+                    </div>
+                  </div>
+
+                  {Array.isArray(selectedNotification.submission?.history) &&
+                  selectedNotification.submission.history.length ? (
+                    <div className="teacher-review-answer">
+                      <strong>Sentence feedback</strong>
+                      <div className="teacher-review-attempt-list">
+                        {selectedNotification.submission.history.map((entry, index) => (
+                          <div
+                            key={`${entry.audio || "sentence"}-${index}`}
+                            className={`teacher-review-attempt ${entry.answeredCorrectly ? "is-correct" : "is-wrong"}`}
+                          >
+                            <div className="teacher-review-attempt-head">
+                              <span className="teacher-review-attempt-label">Sentence {index + 1}</span>
+                              <span className={`teacher-review-attempt-chip ${entry.answeredCorrectly ? "is-correct" : "is-wrong"}`}>
+                                {entry.answeredCorrectly
+                                  ? `Correct on attempt ${entry.correctAttempt || 1}`
+                                  : "Needs review"}
+                              </span>
+                            </div>
+                            <div className="teacher-review-attempt-body is-dictation">
+                              <div>
+                                <span className="panel-label">Correct sentence</span>
+                                <div
+                                  className="teacher-dictation-feedback"
+                                  dangerouslySetInnerHTML={{
+                                    __html: renderDictationCorrectMarkup(entry.sentence || ""),
+                                  }}
+                                />
+                              </div>
+                              <div>
+                                <span className="panel-label">Student attempts</span>
+                                {(entry.attempts || []).length ? (
+                                  (entry.attempts || []).map((attemptText, attemptIndex) => (
+                                    <div key={`${index}:attempt:${attemptIndex}`} className="teacher-dictation-attempt-row">
+                                      <span className="teacher-dictation-attempt-label">
+                                        Attempt {attemptIndex + 1}
+                                      </span>
+                                      <div
+                                        className="teacher-dictation-feedback"
+                                        dangerouslySetInnerHTML={{
+                                          __html:
+                                            entry.answeredCorrectly && entry.correctAttempt === attemptIndex + 1
+                                              ? renderDictationCorrectMarkup(entry.sentence || "")
+                                              : renderDictationComparisonMarkup(attemptText, entry.sentence || ""),
+                                        }}
+                                      />
+                                    </div>
+                                  ))
+                                ) : (
+                                  <p>(no answer submitted)</p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               ) : null}
 
@@ -2105,10 +2309,61 @@ async function copySelectedSubmission() {
           gap: 0.8rem;
         }
 
+        .teacher-review-attempt-body.is-dictation {
+          grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+        }
+
         .teacher-review-attempt-body p {
           margin: 0;
           color: rgba(230, 240, 255, 0.92);
           line-height: 1.5;
+        }
+
+        .teacher-dictation-attempt-row {
+          display: grid;
+          gap: 0.35rem;
+          margin-bottom: 0.65rem;
+        }
+
+        .teacher-dictation-attempt-label {
+          color: rgba(230, 240, 255, 0.68);
+          font-size: 0.8rem;
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 0.04em;
+        }
+
+        .teacher-dictation-feedback {
+          line-height: 1.85;
+        }
+
+        .dictation-token {
+          display: inline-block;
+          margin: 0 6px 8px 0;
+          padding: 3px 8px;
+          border-radius: 10px;
+          border: 1px solid transparent;
+          background: #0b1220;
+          color: rgba(230, 240, 255, 0.92);
+        }
+
+        .dictation-token.is-correct {
+          color: #bbf7d0;
+          background: rgba(34, 197, 94, 0.14);
+          border-color: rgba(34, 197, 94, 0.35);
+        }
+
+        .dictation-token.is-wrong {
+          color: #fecaca;
+          background: rgba(239, 68, 68, 0.14);
+          border-color: rgba(239, 68, 68, 0.35);
+        }
+
+        .dictation-token.is-missing {
+          color: transparent;
+          background: rgba(239, 68, 68, 0.2);
+          border-color: rgba(239, 68, 68, 0.45);
+          min-width: 38px;
         }
 
         .teacher-review-attempt-note {

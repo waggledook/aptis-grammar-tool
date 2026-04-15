@@ -3,6 +3,7 @@ import {
   createAssignedActivity,
   fetchVocabProgressMap,
   fetchSpeakingProgressMap,
+  fetchHubDictationSessions,
   fetchHubGrammarSubmissions,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
@@ -14,6 +15,7 @@ import {
   listTeacherStudentsWithRosterMeta,
 } from "../../firebase";
 import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
+import { HUB_DICTATION_SETS } from "../../data/hubDictationSets.js";
 import { PART2_TASKS } from "../speaking/banks/part2";
 import { PART3_TASKS } from "../speaking/banks/part3";
 import { PART4_TASKS } from "../speaking/banks/part4";
@@ -49,6 +51,15 @@ const SPEAKING_TASK_OPTIONS = {
   "speaking-part-3": PART3_TASKS.map((task) => ({ id: task.id, label: task.title })),
   "speaking-part-4": PART4_TASKS.map((task) => ({ id: task.id, label: task.title })),
 };
+
+const ALL_DICTATION_SENTENCES = HUB_DICTATION_SETS.flatMap((set) =>
+  (set.sentences || []).map((sentence, index) => ({
+    ...sentence,
+    id: `${set.id}:${index}`,
+    setId: set.id,
+    setLabel: set.label,
+  }))
+);
 
 function formatDateTime(value) {
   if (!value) return "—";
@@ -101,6 +112,8 @@ function getAssignmentTypeLabel(type) {
       return "Writing task";
     case "speaking":
       return "Speaking task";
+    case "dictation":
+      return "Dictation task";
     case "vocabulary-topic":
       return "Vocabulary set";
     default:
@@ -198,6 +211,11 @@ function resolveAssignmentCompletion(assignment, sources) {
     return { completed, completedAt: completed ? Math.max(...completionTimes) : 0 };
   }
 
+  if (assignment?.activityType === "dictation") {
+    const completedAt = sources.dictation?.[assignment.id] || 0;
+    return { completed: completedAt >= assignedAt, completedAt };
+  }
+
   return { completed: false, completedAt: 0 };
 }
 
@@ -219,6 +237,12 @@ function buildSpeakingRoutePath(baseRoutePath, taskId) {
   return `${baseRoutePath}?task=${encodeURIComponent(taskId)}`;
 }
 
+function buildDictationRoutePath(assignmentId) {
+  const basePath = getSitePath("/listening/dictation");
+  const separator = basePath.includes("?") ? "&" : "?";
+  return `${basePath}${separator}assignment=${encodeURIComponent(assignmentId)}`;
+}
+
 export default function TeacherAssignedActivities({ user }) {
   const [students, setStudents] = useState([]);
   const [grammarSets, setGrammarSets] = useState([]);
@@ -229,6 +253,11 @@ export default function TeacherAssignedActivities({ user }) {
   const [activityId, setActivityId] = useState("");
   const [writingTaskId, setWritingTaskId] = useState("");
   const [speakingTaskId, setSpeakingTaskId] = useState("");
+  const [dictationTitle, setDictationTitle] = useState("");
+  const [dictationSentenceCount, setDictationSentenceCount] = useState(5);
+  const [dictationSourceSetIds, setDictationSourceSetIds] = useState(() => HUB_DICTATION_SETS.map((set) => set.id));
+  const [dictationSearch, setDictationSearch] = useState("");
+  const [selectedDictationSentenceIds, setSelectedDictationSentenceIds] = useState([]);
   const [targetMode, setTargetMode] = useState("all");
   const [className, setClassName] = useState("");
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
@@ -253,9 +282,10 @@ export default function TeacherAssignedActivities({ user }) {
         const completionByStudentId = Object.fromEntries(
           await Promise.all(
             (studentRows || []).map(async (student) => {
-              const [vocabProgress, speakingProgress, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+              const [vocabProgress, speakingProgress, dictationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
                 fetchVocabProgressMap(student.id),
                 fetchSpeakingProgressMap(student.id),
+                fetchHubDictationSessions(200, student.id),
                 fetchHubGrammarSubmissions(200, student.id),
                 listGrammarSetAttemptsForStudent(student.id),
                 fetchWritingP1Sessions(100, student.id),
@@ -269,6 +299,7 @@ export default function TeacherAssignedActivities({ user }) {
                 {
                   vocabulary: vocabProgress || {},
                   speaking: speakingProgress || {},
+                  dictation: buildLatestTimeMap(dictationSessions || [], "assignmentId"),
                   miniTests: buildLatestTimeMap(miniTests || [], "activityId"),
                   grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
                     if (!attempt?.setId) return acc;
@@ -299,7 +330,7 @@ export default function TeacherAssignedActivities({ user }) {
               const student = studentMap[studentId];
               const completion = resolveAssignmentCompletion(
                 assignment,
-                completionByStudentId[studentId] || { miniTests: {}, grammarSets: {}, writing: {}, speaking: {}, vocabulary: {} }
+                completionByStudentId[studentId] || { miniTests: {}, grammarSets: {}, writing: {}, speaking: {}, vocabulary: {}, dictation: {} }
               );
 
               return {
@@ -382,12 +413,33 @@ export default function TeacherAssignedActivities({ user }) {
   );
 
   const currentOptions = useMemo(() => {
+    if (activityType === "dictation") {
+      return [{ id: "custom-dictation", label: "Custom dictation task", routePath: getSitePath("/listening/dictation") }];
+    }
     if (activityType === "grammar-set") return publishedGrammarSetOptions;
     if (activityType === "use-of-english") return useOfEnglishOptions;
     if (activityType === "writing") return WRITING_OPTIONS;
     if (activityType === "speaking") return SPEAKING_OPTIONS;
     return miniTestOptions;
   }, [activityType, miniTestOptions, publishedGrammarSetOptions, useOfEnglishOptions]);
+
+  const filteredDictationSentences = useMemo(() => {
+    const sourceIds = new Set(dictationSourceSetIds);
+    const needle = dictationSearch.trim().toLowerCase();
+    return ALL_DICTATION_SENTENCES.filter((sentence) => {
+      if (!sourceIds.has(sentence.setId)) return false;
+      if (!needle) return true;
+      return (
+        sentence.text.toLowerCase().includes(needle) ||
+        sentence.setLabel.toLowerCase().includes(needle)
+      );
+    });
+  }, [dictationSearch, dictationSourceSetIds]);
+
+  const selectedDictationSentences = useMemo(() => {
+    const byId = Object.fromEntries(ALL_DICTATION_SENTENCES.map((sentence) => [sentence.id, sentence]));
+    return selectedDictationSentenceIds.map((id) => byId[id]).filter(Boolean);
+  }, [selectedDictationSentenceIds]);
 
   const currentWritingTaskOptions = useMemo(() => {
     if (activityType !== "writing") return [];
@@ -447,6 +499,28 @@ export default function TeacherAssignedActivities({ user }) {
     );
   }
 
+  function toggleDictationSet(setId) {
+    setDictationSourceSetIds((prev) => {
+      const next = prev.includes(setId) ? prev.filter((id) => id !== setId) : [...prev, setId];
+      return next.length ? next : prev;
+    });
+  }
+
+  function toggleDictationSentence(sentenceId) {
+    setSelectedDictationSentenceIds((prev) =>
+      prev.includes(sentenceId) ? prev.filter((id) => id !== sentenceId) : [...prev, sentenceId]
+    );
+  }
+
+  function randomizeDictationSentences() {
+    const pool = [...filteredDictationSentences];
+    for (let i = pool.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    setSelectedDictationSentenceIds(pool.slice(0, dictationSentenceCount).map((sentence) => sentence.id));
+  }
+
   async function handleCreateAssignment() {
     const chosenOption = currentOptions.find((option) => option.id === activityId);
     if (!chosenOption) {
@@ -462,6 +536,15 @@ export default function TeacherAssignedActivities({ user }) {
       activityType === "speaking" && speakingTaskId
         ? currentSpeakingTaskOptions.find((option) => option.id === speakingTaskId) || null
         : null;
+    const dictationSentences =
+      activityType === "dictation"
+        ? selectedDictationSentences
+        : [];
+
+    if (activityType === "dictation" && !dictationSentences.length) {
+      toast("Choose at least one dictation sentence, or use Random set.");
+      return;
+    }
 
     let targetStudentIds = [];
     if (targetMode === "all") {
@@ -494,7 +577,7 @@ export default function TeacherAssignedActivities({ user }) {
               routePath: chosenOption.routePath,
             });
 
-      await createAssignedActivity({
+      const assignmentPayload = {
         teacherUid: user.uid,
         teacherName: user.displayName || user.name || user.email || "Teacher",
         teacherEmail: user.email || null,
@@ -513,13 +596,41 @@ export default function TeacherAssignedActivities({ user }) {
         className: targetMode === "class" ? className : "",
         targetStudentIds,
         notes: String(notes || "").trim(),
-      });
+      };
+
+      if (activityType === "dictation") {
+        const trimmedTitle = String(dictationTitle || "").trim();
+        const fallbackTitle = `Dictation — ${dictationSentences.length} sentence${dictationSentences.length === 1 ? "" : "s"}`;
+        assignmentPayload.activityLabel = trimmedTitle || fallbackTitle;
+        assignmentPayload.routePath = buildDictationRoutePath("__ASSIGNMENT_ID__");
+        assignmentPayload.taskTitle = trimmedTitle || fallbackTitle;
+        assignmentPayload.dictationConfig = {
+          title: trimmedTitle,
+          sentenceCount: dictationSentences.length,
+          sourceSetIds: dictationSourceSetIds,
+          search: String(dictationSearch || "").trim(),
+          sentences: dictationSentences.map((sentence) => ({
+            id: sentence.id,
+            text: sentence.text,
+            acceptedTexts: sentence.acceptedTexts || [sentence.text],
+            audio: sentence.audio,
+            setId: sentence.setId,
+            setLabel: sentence.setLabel,
+          })),
+        };
+      }
+
+      await createAssignedActivity(assignmentPayload);
 
       const refreshed = await listAssignedActivitiesForTeacher(user.uid);
       setAssignments(refreshed || []);
       setNotes("");
       setWritingTaskId("");
       setSpeakingTaskId("");
+      if (activityType === "dictation") {
+        setSelectedDictationSentenceIds([]);
+        setDictationTitle("");
+      }
       if (targetMode === "selected") setSelectedStudentIds([]);
       toast("Assignment created.");
     } catch (error) {
@@ -553,6 +664,7 @@ export default function TeacherAssignedActivities({ user }) {
                   <option value="use-of-english">Use of English set</option>
                   <option value="writing">Writing task</option>
                   <option value="speaking">Speaking task</option>
+                  <option value="dictation">Dictation task</option>
                 </select>
               </label>
 
@@ -607,6 +719,85 @@ export default function TeacherAssignedActivities({ user }) {
                   ))}
                 </select>
               </label>
+            ) : null}
+
+            {activityType === "dictation" ? (
+              <div className="teacher-dictation-builder">
+                <label className="field">
+                  <span>Assignment name</span>
+                  <input
+                    type="text"
+                    value={dictationTitle}
+                    onChange={(event) => setDictationTitle(event.target.value)}
+                    placeholder="e.g. Articles dictation homework"
+                  />
+                </label>
+
+                <div className="teacher-assign-grid">
+                  <label className="field">
+                    <span>Random sentence count</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max={ALL_DICTATION_SENTENCES.length}
+                      value={dictationSentenceCount}
+                      onChange={(event) =>
+                        setDictationSentenceCount(Math.max(1, Number(event.target.value || 1)))
+                      }
+                    />
+                  </label>
+
+                  <label className="field">
+                    <span>Search sentences</span>
+                    <input
+                      type="search"
+                      value={dictationSearch}
+                      onChange={(event) => setDictationSearch(event.target.value)}
+                      placeholder="Filter by words or set name"
+                    />
+                  </label>
+                </div>
+
+                <div className="teacher-dictation-sets">
+                  <span className="field-label">Sentence sets</span>
+                  <div className="teacher-dictation-set-list">
+                    {HUB_DICTATION_SETS.map((set) => (
+                      <label key={set.id} className="teacher-assign-student-item">
+                        <input
+                          type="checkbox"
+                          checked={dictationSourceSetIds.includes(set.id)}
+                          onChange={() => toggleDictationSet(set.id)}
+                        />
+                        <span>{set.label}</span>
+                        <em>{set.sentences.length}</em>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="teacher-assign-actions">
+                  <button type="button" className="ghost-btn" onClick={randomizeDictationSentences}>
+                    Random set
+                  </button>
+                  <span className="muted small">
+                    {selectedDictationSentences.length} selected manually; random will choose {dictationSentenceCount} from {filteredDictationSentences.length} visible sentences
+                  </span>
+                </div>
+
+                <div className="teacher-dictation-browser">
+                  {filteredDictationSentences.map((sentence) => (
+                    <label key={sentence.id} className="teacher-dictation-sentence">
+                      <input
+                        type="checkbox"
+                        checked={selectedDictationSentenceIds.includes(sentence.id)}
+                        onChange={() => toggleDictationSentence(sentence.id)}
+                      />
+                      <span>{sentence.text}</span>
+                      <em>{sentence.setLabel}</em>
+                    </label>
+                  ))}
+                </div>
+              </div>
             ) : null}
 
             {targetMode === "class" ? (
@@ -848,6 +1039,7 @@ export default function TeacherAssignedActivities({ user }) {
         }
 
         .field select,
+        .field input,
         .field textarea {
           width: 100%;
           border-radius: 14px;
@@ -870,6 +1062,45 @@ export default function TeacherAssignedActivities({ user }) {
             calc(100% - 14px) calc(50% - 3px);
           background-size: 6px 6px, 6px 6px;
           background-repeat: no-repeat;
+        }
+
+        .teacher-dictation-builder,
+        .teacher-dictation-sets {
+          display: grid;
+          gap: 0.8rem;
+        }
+
+        .teacher-dictation-set-list {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.55rem;
+        }
+
+        .teacher-dictation-browser {
+          display: grid;
+          gap: 0.5rem;
+          max-height: 360px;
+          overflow: auto;
+          padding-right: 0.2rem;
+        }
+
+        .teacher-dictation-sentence {
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          gap: 0.65rem;
+          align-items: start;
+          border-radius: 12px;
+          border: 1px solid rgba(63, 94, 155, 0.38);
+          background: rgba(8, 16, 38, 0.36);
+          padding: 0.7rem 0.78rem;
+          color: #e6f0ff;
+        }
+
+        .teacher-dictation-sentence em {
+          color: #9fb3d5;
+          font-style: normal;
+          font-size: 0.84rem;
+          white-space: nowrap;
         }
 
         .field textarea {

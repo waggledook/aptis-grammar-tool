@@ -8,6 +8,7 @@ import {
   db,
   ensureUserProfile,
   fetchHubGrammarSubmissions,
+  fetchHubDictationSessions,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
   fetchWritingP3Submissions,
@@ -285,12 +286,13 @@ useEffect(() => {
       const notificationIds = (
         await Promise.all(
           studentIds.map(async (studentId) => {
-            const [part1, part2, part3, part4, miniTests, vocabSets] = await Promise.all([
+            const [part1, part2, part3, part4, miniTests, dictationSessions, vocabSets] = await Promise.all([
               fetchWritingP1Sessions(3, studentId),
               fetchWritingP2Submissions(3, studentId),
               fetchWritingP3Submissions(3, studentId),
               fetchWritingP4Submissions(3, studentId),
               fetchHubGrammarSubmissions(3, studentId),
+              fetchHubDictationSessions(3, studentId),
               fetchRecentVocabProgress(3, studentId),
             ]);
 
@@ -300,6 +302,7 @@ useEffect(() => {
               ...part3.map((entry) => ({ id: `${studentId}:P3:${entry.id}`, createdAt: entry.createdAt })),
               ...part4.map((entry) => ({ id: `${studentId}:P4:${entry.id}`, createdAt: entry.createdAt })),
               ...miniTests.map((entry) => ({ id: `mini-test:${studentId}:${entry.id}`, createdAt: entry.createdAt })),
+              ...dictationSessions.map((entry) => ({ id: `dictation:${studentId}:${entry.id}`, createdAt: entry.createdAt })),
               ...vocabSets.map((entry) => ({ id: `vocab-topic:${studentId}:${entry.id}`, createdAt: entry.updatedAt })),
             ];
           })
@@ -370,10 +373,11 @@ useEffect(() => {
     }
 
     try {
-      const [assignments, vocabProgress, speakingProgress, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+      const [assignments, vocabProgress, speakingProgress, dictationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
         listAssignedActivitiesForStudent(user.uid),
         fetchVocabProgressMap(user.uid),
         fetchSpeakingProgressMap(user.uid),
+        fetchHubDictationSessions(200, user.uid),
         fetchHubGrammarSubmissions(200, user.uid),
         listGrammarSetAttemptsForStudent(user.uid),
         fetchWritingP1Sessions(100, user.uid),
@@ -387,6 +391,7 @@ useEffect(() => {
       const completionSources = {
         vocabulary: vocabProgress || {},
         speaking: speakingProgress || {},
+        dictation: buildLatestMap(dictationSessions || [], "assignmentId"),
         miniTests: buildLatestMap(miniTests || [], "activityId"),
         grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
           if (!attempt?.setId) return acc;
@@ -449,6 +454,9 @@ useEffect(() => {
           return setIds.some(
             (setId) => timestampToMs(completionSources.vocabulary?.[`${topicId}:${setId}`]) < assignedAt
           );
+        }
+        if (assignment.activityType === "dictation") {
+          return (completionSources.dictation?.[assignment.id] || 0) < assignedAt;
         }
         return true;
       }).length;

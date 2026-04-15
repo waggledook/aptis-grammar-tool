@@ -47,7 +47,7 @@ export function getSiteVariant(locationLike = getWindowLocation()) {
   const hostname = locationLike?.hostname || "";
   const search = locationLike?.search || "";
   const params = new URLSearchParams(search);
-  const forcedSite = params.get("site");
+  const forcedSite = String(params.get("site") || "").split("?")[0];
 
   const isSeifHub =
     forcedSite === SEIF_HUB_ACCESS_KEY ||
