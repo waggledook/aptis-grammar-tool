@@ -44,10 +44,52 @@ function buildCommaSentence(words = [], positions = []) {
     .join(" ");
 }
 
+function displayPlacedAdverb(adverb, slotIndex) {
+  const frontedCommentAdverbs = new Set([
+    "apparently",
+    "clearly",
+    "hopefully",
+    "honestly",
+    "unfortunately",
+  ]);
+
+  if (slotIndex === 0 && frontedCommentAdverbs.has(normalizeAnswer(adverb))) {
+    return `${adverb},`;
+  }
+
+  return adverb;
+}
+
+function buildAdverbPlacementSentence(tokens = [], placements = {}, finalPunctuation = "") {
+  const words = [];
+  const slotCount = tokens.length + 1;
+
+  for (let slotIndex = 0; slotIndex < slotCount; slotIndex += 1) {
+    Object.entries(placements).forEach(([adverb, targetSlot]) => {
+      if (Number(targetSlot) === slotIndex) {
+        words.push(displayPlacedAdverb(adverb, slotIndex));
+      }
+    });
+
+    if (slotIndex < tokens.length) {
+      words.push(tokens[slotIndex]);
+    }
+  }
+
+  return `${words.join(" ").replace(/\s+([,.!?])/g, "$1")}${finalPunctuation}`;
+}
+
 function sameCommaPositions(left = [], right = []) {
   if (left.length !== right.length) return false;
   return left.every((value, index) => value === right[index]);
 }
+
+const textAnswerInputProps = {
+  autoCapitalize: "off",
+  autoComplete: "off",
+  autoCorrect: "off",
+  spellCheck: false,
+};
 
 function buildInitialAnswers(activity) {
   const state = {};
@@ -62,6 +104,11 @@ function buildInitialAnswers(activity) {
 
     if (item.type === "comma-placement") {
       state[item.id] = [];
+      return;
+    }
+
+    if (item.type === "adverb-placement") {
+      state[item.id] = {};
       return;
     }
 
@@ -142,6 +189,7 @@ function renderSentence(
       <input
         key={key}
         type="text"
+        {...textAnswerInputProps}
         className="hub-grammar-gap"
         value={answers[key] || ""}
         onChange={(event) => handleChange(key, event.target.value)}
@@ -166,6 +214,7 @@ export default function HubGrammarActivityRunner() {
   const itemRefs = useRef({});
   const [answers, setAnswers] = useState(() => (activity ? buildInitialAnswers(activity) : {}));
   const [confirmedCorrections, setConfirmedCorrections] = useState({});
+  const [selectedAdverb, setSelectedAdverb] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState(null);
@@ -179,6 +228,10 @@ export default function HubGrammarActivityRunner() {
       }
 
       if (item.type === "comma-placement") {
+        return [];
+      }
+
+      if (item.type === "adverb-placement") {
         return [];
       }
 
@@ -207,6 +260,10 @@ export default function HubGrammarActivityRunner() {
           return [item.id, `${item.id}:comma:none`];
         }
 
+        if (item.type === "adverb-placement") {
+          return [item.id, `${item.id}:adverb:0`];
+        }
+
         const firstGap = item.gaps[0];
         if (Array.isArray(firstGap?.choices) && firstGap.choices.length) {
           return [item.id, `${item.id}:${firstGap.id}:option:0`];
@@ -224,7 +281,8 @@ export default function HubGrammarActivityRunner() {
             if (
               item.type === "multiple-choice" ||
               item.type === "error-correction" ||
-              item.type === "comma-placement"
+              item.type === "comma-placement" ||
+              item.type === "adverb-placement"
             ) {
               return sum + 1;
             }
@@ -240,6 +298,7 @@ export default function HubGrammarActivityRunner() {
     itemRefs.current = {};
     setAnswers(activity ? buildInitialAnswers(activity) : {});
     setConfirmedCorrections({});
+    setSelectedAdverb(null);
     setSubmitted(false);
     setSaving(false);
     setResult(null);
@@ -392,9 +451,35 @@ export default function HubGrammarActivityRunner() {
     handleChange(itemId, []);
   };
 
+  const placeAdverb = (itemId, adverb, slotIndex) => {
+    if (!adverb) return;
+
+    setAnswers((prev) => {
+      const currentPlacements = { ...(prev[itemId] || {}) };
+      currentPlacements[adverb] = slotIndex;
+      return { ...prev, [itemId]: currentPlacements };
+    });
+    setSelectedAdverb(null);
+  };
+
+  const removePlacedAdverb = (itemId, adverb) => {
+    setAnswers((prev) => {
+      const currentPlacements = { ...(prev[itemId] || {}) };
+      delete currentPlacements[adverb];
+      return { ...prev, [itemId]: currentPlacements };
+    });
+  };
+
+  const handleAdverbDrop = (event, item, slotIndex) => {
+    event.preventDefault();
+    const adverb = event.dataTransfer.getData("text/plain") || selectedAdverb?.adverb;
+    placeAdverb(item.id, adverb, slotIndex);
+  };
+
   const handleReset = () => {
     setAnswers(buildInitialAnswers(activity));
     setConfirmedCorrections({});
+    setSelectedAdverb(null);
     setSubmitted(false);
     setResult(null);
   };
@@ -500,6 +585,34 @@ export default function HubGrammarActivityRunner() {
         };
       }
 
+      if (item.type === "adverb-placement") {
+        const placements = answers[item.id] || {};
+        const correctPlacements = item.correctPlacements || {};
+        const isCorrect =
+          item.adverbs.length > 0 &&
+          item.adverbs.every(
+            (adverb) => Number(placements[adverb]) === Number(correctPlacements[adverb])
+          );
+
+        return {
+          id: item.id,
+          type: "adverb-placement",
+          prompt: item.prompt,
+          baseSentence: item.baseSentence,
+          tokens: item.tokens,
+          adverbs: item.adverbs,
+          placements,
+          selectedSentence: buildAdverbPlacementSentence(
+            item.tokens,
+            placements,
+            item.finalPunctuation
+          ),
+          correctSentence: item.correctSentence,
+          isCorrect,
+          explanation: item.explanation,
+        };
+      }
+
       const evaluatedGaps = item.gaps.map((gap) => {
         const answerKey = `${item.id}:${gap.id}`;
         const rawAnswer = answers[answerKey] || "";
@@ -531,7 +644,8 @@ export default function HubGrammarActivityRunner() {
         if (
           item.type === "multiple-choice" ||
           item.type === "error-correction" ||
-          item.type === "comma-placement"
+          item.type === "comma-placement" ||
+          item.type === "adverb-placement"
         ) {
           return sum + (item.isCorrect ? 1 : 0);
         }
@@ -696,6 +810,7 @@ export default function HubGrammarActivityRunner() {
                         <div className="hub-grammar-correction-row">
                           <input
                             type="text"
+                            {...textAnswerInputProps}
                             className="hub-grammar-gap hub-grammar-inline-correction"
                             value={answers[`${item.id}:correction`] || ""}
                             onChange={(event) => {
@@ -724,6 +839,128 @@ export default function HubGrammarActivityRunner() {
                       </label>
                     ) : null}
                   </>
+                ) : item.type === "adverb-placement" ? (
+                  <div className="hub-grammar-adverb-builder">
+                    <p className="hub-grammar-placement-base">{item.baseSentence}</p>
+                    <div className="hub-grammar-adverb-bank" aria-label="Adverbs to place">
+                      {item.adverbs.map((adverb, adverbIndex) => {
+                        const placements = answers[item.id] || {};
+                        const isPlaced = placements[adverb] != null;
+                        const isSelected =
+                          selectedAdverb?.itemId === item.id && selectedAdverb.adverb === adverb;
+
+                        return (
+                          <button
+                            key={`${item.id}:adverb:${adverb}`}
+                            type="button"
+                            className={[
+                              "hub-grammar-adverb-chip",
+                              isPlaced ? "is-placed" : "",
+                              isSelected ? "is-selected" : "",
+                            ]
+                              .filter(Boolean)
+                              .join(" ")}
+                            draggable={!submitted && !isPlaced}
+                            onDragStart={(event) => {
+                              event.dataTransfer.setData("text/plain", adverb);
+                              event.dataTransfer.effectAllowed = "move";
+                            }}
+                            onClick={() => {
+                              if (submitted) return;
+                              if (isPlaced) {
+                                removePlacedAdverb(item.id, adverb);
+                                return;
+                              }
+                              setSelectedAdverb(isSelected ? null : { itemId: item.id, adverb });
+                            }}
+                            ref={adverbIndex === 0 ? registerInput(`${item.id}:adverb:0`) : undefined}
+                            disabled={submitted}
+                          >
+                            {adverb}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div className="hub-grammar-adverb-sentence">
+                      {Array.from({ length: (item.tokens || []).length + 1 }, (_, slotIndex) => {
+                        const placements = answers[item.id] || {};
+                        const slotAdverbs = item.adverbs.filter(
+                          (adverb) => Number(placements[adverb]) === slotIndex
+                        );
+                        const correctAdverbsForSlot = submitted
+                          ? item.adverbs.filter(
+                              (adverb) =>
+                                Number(item.correctPlacements?.[adverb]) === slotIndex &&
+                                Number(placements[adverb]) !== slotIndex
+                            )
+                          : [];
+                        const token = item.tokens?.[slotIndex];
+
+                        return (
+                          <React.Fragment key={`${item.id}:slot:${slotIndex}`}>
+                            <button
+                              type="button"
+                              className={[
+                                "hub-grammar-adverb-slot",
+                                slotAdverbs.length ? "has-adverb" : "",
+                                correctAdverbsForSlot.length ? "has-correction" : "",
+                                selectedAdverb?.itemId === item.id ? "can-place" : "",
+                              ]
+                                .filter(Boolean)
+                                .join(" ")}
+                              onDragOver={(event) => {
+                                if (!submitted) event.preventDefault();
+                              }}
+                              onDrop={(event) => handleAdverbDrop(event, item, slotIndex)}
+                              onClick={() => {
+                                if (submitted) return;
+                                if (selectedAdverb?.itemId === item.id) {
+                                  placeAdverb(item.id, selectedAdverb.adverb, slotIndex);
+                                }
+                              }}
+                              disabled={submitted}
+                              aria-label={`Place adverb in position ${slotIndex + 1}`}
+                            >
+                              {slotAdverbs.length ? (
+                                slotAdverbs.map((adverb) => (
+                                  <span
+                                    key={`${item.id}:placed:${adverb}`}
+                                    className={[
+                                      "hub-grammar-adverb-placed",
+                                      submitted
+                                        ? Number(item.correctPlacements?.[adverb]) === slotIndex
+                                          ? "is-correct"
+                                          : "is-wrong"
+                                        : "",
+                                    ]
+                                      .filter(Boolean)
+                                      .join(" ")}
+                                  >
+                                    {displayPlacedAdverb(adverb, slotIndex)}
+                                  </span>
+                                ))
+                              ) : null}
+                              {correctAdverbsForSlot.map((adverb) => (
+                                <span
+                                  key={`${item.id}:correct:${adverb}`}
+                                  className="hub-grammar-adverb-placed is-correction"
+                                >
+                                  {displayPlacedAdverb(adverb, slotIndex)}
+                                </span>
+                              ))}
+                              {!slotAdverbs.length && !correctAdverbsForSlot.length ? (
+                                <span className="hub-grammar-adverb-slot-mark">+</span>
+                              ) : null}
+                            </button>
+                            {token ? <span className="hub-grammar-adverb-token">{token}</span> : null}
+                          </React.Fragment>
+                        );
+                      })}
+                      {item.finalPunctuation ? (
+                        <span className="hub-grammar-adverb-token">{item.finalPunctuation}</span>
+                      ) : null}
+                    </div>
+                  </div>
                 ) : item.type === "comma-placement" ? (
                   <div className="hub-grammar-comma-builder">
                     <div className="hub-grammar-comma-sentence">
@@ -849,6 +1086,17 @@ export default function HubGrammarActivityRunner() {
                         <p>Your version: {evaluatedItem.selectedSentence || evaluatedItem.sentence}</p>
                         {!evaluatedItem.isCorrect ? (
                           <p>Correct version: {evaluatedItem.corrected || "—"}</p>
+                        ) : null}
+                        <p>{evaluatedItem.explanation}</p>
+                      </div>
+                    ) : evaluatedItem.type === "adverb-placement" ? (
+                      <div
+                        className={`hub-grammar-feedback ${evaluatedItem.isCorrect ? "is-correct" : "is-wrong"}`}
+                      >
+                        <strong>{evaluatedItem.isCorrect ? "Correct" : "Try again"}</strong>
+                        <p>Your sentence: {evaluatedItem.selectedSentence || evaluatedItem.baseSentence}</p>
+                        {!evaluatedItem.isCorrect ? (
+                          <p>Correct sentence: {evaluatedItem.correctSentence}</p>
                         ) : null}
                         <p>{evaluatedItem.explanation}</p>
                       </div>
@@ -1172,6 +1420,132 @@ export default function HubGrammarActivityRunner() {
           border-color: rgba(94, 234, 212, 0.65);
           background: rgba(20, 184, 166, 0.16);
           color: #d7fff6;
+        }
+
+        .hub-grammar-adverb-builder {
+          display: grid;
+          gap: 0.95rem;
+        }
+
+        .hub-grammar-placement-base {
+          margin: 0;
+          color: #c7d2fe;
+          font-weight: 700;
+        }
+
+        .hub-grammar-adverb-bank,
+        .hub-grammar-adverb-sentence {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.45rem;
+        }
+
+        .hub-grammar-adverb-bank {
+          min-height: 3rem;
+          padding: 0.75rem;
+          border-radius: 0.85rem;
+          background: rgba(15, 23, 42, 0.62);
+          border: 1px solid rgba(51, 65, 85, 0.8);
+        }
+
+        .hub-grammar-adverb-sentence {
+          padding: 1rem 1.05rem;
+          border-radius: 0.85rem;
+          background: rgba(2, 6, 23, 0.38);
+          border: 1px solid rgba(51, 65, 85, 0.8);
+          color: #e5efff;
+          line-height: 1.9;
+        }
+
+        .hub-grammar-adverb-chip,
+        .hub-grammar-adverb-slot {
+          min-height: 2.45rem;
+          border-radius: 999px;
+          border: 1px solid rgba(115, 146, 223, 0.55);
+          color: #eef4ff;
+          font-weight: 800;
+          cursor: pointer;
+          transition: transform 0.12s ease, border-color 0.12s ease, background 0.12s ease,
+            opacity 0.12s ease;
+        }
+
+        .hub-grammar-adverb-chip {
+          padding: 0.55rem 0.85rem;
+          background: rgba(74, 107, 192, 0.22);
+        }
+
+        .hub-grammar-adverb-chip:hover:not(:disabled),
+        .hub-grammar-adverb-slot:hover:not(:disabled) {
+          transform: translateY(-1px);
+          border-color: rgba(94, 234, 212, 0.65);
+        }
+
+        .hub-grammar-adverb-chip.is-selected {
+          border-color: rgba(94, 234, 212, 0.75);
+          background: rgba(20, 184, 166, 0.2);
+          color: #d7fff6;
+        }
+
+        .hub-grammar-adverb-chip.is-placed {
+          opacity: 0.45;
+          cursor: pointer;
+        }
+
+        .hub-grammar-adverb-slot {
+          min-width: 2.45rem;
+          padding: 0.25rem 0.45rem;
+          background: rgba(10, 16, 34, 0.95);
+          border-style: dashed;
+        }
+
+        .hub-grammar-adverb-slot.can-place {
+          border-color: rgba(94, 234, 212, 0.58);
+          background: rgba(20, 184, 166, 0.1);
+        }
+
+        .hub-grammar-adverb-slot.has-adverb {
+          border-style: solid;
+          border-color: rgba(147, 197, 253, 0.58);
+          background: rgba(59, 130, 246, 0.14);
+          color: #dbeafe;
+        }
+
+        .hub-grammar-adverb-slot.has-correction {
+          border-style: solid;
+          border-color: rgba(52, 211, 153, 0.7);
+          background: rgba(22, 101, 52, 0.18);
+        }
+
+        .hub-grammar-adverb-slot-mark {
+          color: rgba(160, 187, 255, 0.62);
+        }
+
+        .hub-grammar-adverb-placed {
+          display: inline-flex;
+          align-items: center;
+          padding: 0 0.25rem;
+        }
+
+        .hub-grammar-adverb-placed.is-correct,
+        .hub-grammar-adverb-placed.is-correction {
+          color: #bbf7d0;
+        }
+
+        .hub-grammar-adverb-placed.is-wrong {
+          color: #fecaca;
+          text-decoration: line-through;
+          text-decoration-thickness: 2px;
+        }
+
+        .hub-grammar-adverb-placed.is-correction::before {
+          content: "✓ ";
+          color: #86efac;
+        }
+
+        .hub-grammar-adverb-token {
+          color: #eef4ff;
+          font-size: 1.02rem;
         }
 
         .hub-grammar-options {

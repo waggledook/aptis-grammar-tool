@@ -5123,6 +5123,201 @@
                   "Incorrect: 'take off' is used for planes leaving the ground, or clothing being removed.",
                   "Incorrect: 'put off' means postpone, not start a journey."
                 ]
+              },
+              {
+                "id": "adv_pos_subj_01",
+                "level": "B2",
+                "tag": "Adverbs",
+                "sentence": "___ be able to finish the report by tomorrow.",
+                "options": ["I will probably", "Probably I will", "I probably will"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: In affirmative sentences, the adverb normally follows the auxiliary verb 'will'.",
+                  "Incorrect: 'Probably' should not start the sentence in this context.",
+                  "Incorrect: This is possible for emphasis, but the neutral position is after 'will'."
+                ]
+              },
+              {
+                "id": "adv_pos_subj_02",
+                "level": "B2",
+                "tag": "Adverbs",
+                "sentence": "___ go on holiday this year because of the price increase.",
+                "options": ["They probably won't", "They won't probably", "Probably they won't"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: In negative sentences, 'probably' usually comes before the negative auxiliary.",
+                  "Incorrect: Unlike affirmative sentences, 'probably' does not normally follow a negative auxiliary.",
+                  "Incorrect: We usually avoid starting this sentence with 'Probably' before the subject."
+                ]
+              },
+              {
+                "id": "adv_pos_subj_03",
+                "level": "B2",
+                "tag": "Adverbs",
+                "sentence": "___ the best candidate for the job.",
+                "options": ["He is definitely", "Definitely he is", "He definitely is"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: Adverbs of certainty normally follow the verb 'to be' in affirmative statements.",
+                  "Incorrect: Placing the adverb at the beginning is not the natural neutral order here.",
+                  "Incorrect: This order can be emphatic, but after 'be' is the neutral position."
+                ]
+              },
+              {
+                "id": "adv_pos_20",
+                "level": "B2",
+                "tag": "Adverbs",
+                "sentence": "The children played ___.",
+                "options": ["happily upstairs all afternoon", "all afternoon happily upstairs", "upstairs happily all afternoon"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: Manner (happily) usually comes before place (upstairs) and time (all afternoon).",
+                  "Incorrect: Time usually comes after manner and place.",
+                  "Incorrect: Manner should normally come before place in this sentence."
+                ]
+              },
+              {
+                "id": "adv_pos_18",
+                "level": "B2",
+                "tag": "Adverbs",
+                "sentence": "Please write your name ___.",
+                "options": ["clearly here", "here clearly", "clearly in here"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: Manner (clearly) comes before place (here).",
+                  "Incorrect: Manner should generally come before place.",
+                  "Incorrect: 'In here' is unnecessary; 'here' is enough."
+                ]
+              },
+              {
+                "id": "adv_pos_13",
+                "level": "C1",
+                "tag": "Adverbs",
+                "sentence": "___ had we started our lunch than the doorbell rang.",
+                "options": ["Hardly", "No sooner", "Almost"],
+                "answerIndex": 1,
+                "explanations": [
+                  "Incorrect: 'Hardly' normally pairs with 'when', not 'than'.",
+                  "Correct: 'No sooner' at the start triggers inversion and pairs with 'than'.",
+                  "Incorrect: 'Almost' does not trigger inversion."
+                ]
+              },
+              {
+                "id": "adv_pos_05",
+                "level": "B2",
+                "tag": "Adverbs",
+                "sentence": "I ___ understand what he is saying.",
+                "options": ["can hardly", "hardly can", "can hard"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'Hardly' meaning 'almost not' goes after the modal verb.",
+                  "Incorrect: The adverb belongs between the modal and the main verb.",
+                  "Incorrect: 'Hard' refers to physical effort, not degree of understanding."
+                ]
+              },
+              {
+                "id": "adv_pos_02",
+                "level": "B1",
+                "tag": "Adverbs",
+                "sentence": "I ___ late for work.",
+                "options": ["am often", "often am", "often be"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: Adverbs of frequency go after the verb 'to be'.",
+                  "Incorrect: Adverbs of frequency usually go before main verbs, but after 'be'.",
+                  "Incorrect: This sentence needs the conjugated form of the verb."
+                ]
+              },
+              {
+                "id": "adv_pos_01",
+                "level": "B1",
+                "tag": "Adverbs",
+                "sentence": "He speaks ___.",
+                "options": ["English very well", "very well English", "well very English"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: Adverbs of manner go after the direct object.",
+                  "Incorrect: You cannot put this adverb between the verb and its direct object.",
+                  "Incorrect: 'Well very English' is not possible."
+                ]
+              },
+              {
+                "id": "b1_advpos_01",
+                "level": "B1",
+                "tag": "Adverbs",
+                "sentence": "She ___ before work.",
+                "options": ["always eats breakfast", "eats always breakfast", "always breakfasts"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: Adverbs of frequency usually go before the main verb.",
+                  "Incorrect: 'Eats always breakfast' is not the normal word order in English.",
+                  "Incorrect: 'Breakfast' is normally a noun here, so we say 'eat breakfast'."
+                ]
+              },
+              {
+                "id": "a2_adv_03",
+                "level": "A2",
+                "tag": "Adverbs",
+                "sentence": "The baby is sleeping ___.",
+                "options": ["quiet", "quietly", "quieter"],
+                "answerIndex": 1,
+                "explanations": [
+                  "Incorrect: 'Quiet' is usually an adjective. Here we need an adverb.",
+                  "Correct: 'Quietly' describes how the baby is sleeping.",
+                  "Incorrect: 'Quieter' is a comparative form and does not fit."
+                ]
+              },
+              {
+                "id": "a2_adv_05",
+                "level": "A2",
+                "tag": "Adverbs",
+                "sentence": "She sings very ___.",
+                "options": ["beautiful", "beautifully", "beauty"],
+                "answerIndex": 1,
+                "explanations": [
+                  "Incorrect: 'Beautiful' is an adjective. We need an adverb after 'sings'.",
+                  "Correct: 'Beautifully' is the correct adverb form.",
+                  "Incorrect: 'Beauty' is a noun, not the right form here."
+                ]
+              },
+              {
+                "id": "a2_adv_01",
+                "level": "A2",
+                "tag": "Adverbs",
+                "sentence": "She speaks English very ___.",
+                "options": ["good", "well", "better"],
+                "answerIndex": 1,
+                "explanations": [
+                  "Incorrect: 'Good' is an adjective. We need an adverb to describe how she speaks.",
+                  "Correct: 'Well' is the adverb form used to describe speaking.",
+                  "Incorrect: 'Better' is a comparative form and does not fit here."
+                ]
+              },
+              {
+                "id": "b2_iradv_08",
+                "level": "B2",
+                "tag": "Adverbs",
+                "sentence": "The birds were flying ___ above the lake.",
+                "options": ["highly", "high", "higherly"],
+                "answerIndex": 1,
+                "explanations": [
+                  "Incorrect: 'Highly' is used more figuratively, not for physical height here.",
+                  "Correct: 'High' refers to physical height.",
+                  "Incorrect: 'Higherly' is not a word."
+                ]
+              },
+              {
+                "id": "b2_iradv_01",
+                "level": "B2",
+                "tag": "Adverbs",
+                "sentence": "She works very ___ during the week, so she likes to relax at weekends.",
+                "options": ["hard", "hardly", "hardly ever"],
+                "answerIndex": 0,
+                "explanations": [
+                  "Correct: 'Work hard' means to put in a lot of effort.",
+                  "Incorrect: 'Hardly' means 'almost not', so it changes the meaning completely.",
+                  "Incorrect: 'Hardly ever' means 'almost never', which does not fit the context."
+                ]
               }
             
   ]

@@ -31,16 +31,16 @@ export default function MainMenu({ onSelect, user }) {
   <div className="whats-new-copy">
     <span className="whats-new-label">What’s new</span>
     <p>
-      <strong>Practice tasks for all parts of the listening are now available</strong> Practise a range
-      of listening tasks with audio, scripts and feedback.
+      <strong>New Adverbs tag in Grammar Practice</strong> Filter by Adverbs for fresh practice on
+      adverb position, degree, frequency, and tricky forms like hard/hardly.
     </p>
   </div>
 
   <button
     className="whats-new-btn"
-    onClick={() => navigate("/listening")}
+    onClick={() => navigate("/grammar")}
   >
-    Explore listening
+    Open grammar
   </button>
 </div>
 

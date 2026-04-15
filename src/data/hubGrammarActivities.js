@@ -13,6 +13,34 @@ const singleGap = (id, prompt, parts, acceptedAnswers, feedback, extra = {}) => 
   ...extra,
 });
 
+const doubleGap = (
+  id,
+  prompt,
+  parts,
+  firstAcceptedAnswers,
+  secondAcceptedAnswers,
+  feedback,
+  extra = {}
+) => ({
+  id,
+  type: "gap-fill",
+  prompt,
+  parts,
+  gaps: [
+    {
+      id: "g1",
+      acceptedAnswers: firstAcceptedAnswers,
+      feedback,
+    },
+    {
+      id: "g2",
+      acceptedAnswers: secondAcceptedAnswers,
+      feedback,
+    },
+  ],
+  ...extra,
+});
+
 const multipleChoiceItem = (id, prompt, question, options, answerIndex, explanation) => ({
   id,
   type: "multiple-choice",
@@ -138,6 +166,41 @@ const commaPlacementItem = (id, prompt, sentence, needsCommas, corrected, explan
     needsCommas,
     corrected,
     commaPositions,
+    explanation,
+  };
+};
+
+const adverbPlacementItem = (
+  id,
+  prompt,
+  baseSentence,
+  adverbs,
+  correctPlacements,
+  correctSentence,
+  explanation
+) => {
+  const tokens = String(baseSentence || "")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean);
+  const lastToken = tokens[tokens.length - 1] || "";
+  const finalPunctuationMatch = lastToken.match(/([.!?])$/);
+  const finalPunctuation = finalPunctuationMatch?.[1] || "";
+
+  if (finalPunctuation) {
+    tokens[tokens.length - 1] = lastToken.slice(0, -1);
+  }
+
+  return {
+    id,
+    type: "adverb-placement",
+    prompt,
+    baseSentence,
+    tokens,
+    finalPunctuation,
+    adverbs,
+    correctPlacements,
+    correctSentence,
     explanation,
   };
 };
@@ -4145,6 +4208,1522 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "None",
         ["none"],
         "Use 'none' in short answers when there is zero quantity."
+      ),
+    ],
+  },
+  {
+    id: "question-formation-mastery",
+    title: "Question Formation: Direct & Indirect",
+    shortDescription: "Master indirect questions, negative questions, and prepositions.",
+    levels: ["b2"],
+    intro:
+      "Practice the nuances of English questions. Remember: in indirect questions, we use statement word order (subject before verb)!",
+    items: [
+      errorCorrectionItem(
+        "q-ec-1",
+        "Check the highlighted phrase for errors.",
+        "Could you tell me what time does the film start?",
+        "does the film start",
+        false,
+        "the film starts",
+        "In indirect questions, we don't use the auxiliary 'do/does/did' and we use statement word order."
+      ),
+      errorCorrectionItem(
+        "q-ec-2",
+        "Check the highlighted phrase for errors.",
+        "Who did you go to the cinema with?",
+        "Who did you go to the cinema with",
+        true,
+        "",
+        "Correct! In informal English, we usually put the preposition at the end of the question."
+      ),
+      errorCorrectionItem(
+        "q-ec-3",
+        "Check the highlighted phrase for errors.",
+        "Don't you like the soup? It's delicious!",
+        "Don't you like",
+        true,
+        "",
+        "Correct. Negative questions are often used to express surprise."
+      ),
+      errorCorrectionItem(
+        "q-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I wonder where has she gone.",
+        "has she gone",
+        false,
+        "she has gone",
+        "Even with 'I wonder', which isn't technically a question, we use statement word order for the following clause."
+      ),
+      errorCorrectionItem(
+        "q-ec-5",
+        "Check the highlighted phrase for errors.",
+        "What is your new boss like?",
+        "What is your new boss like",
+        true,
+        "",
+        "Correct. Use 'What... like?' to ask for a description of someone's personality or appearance."
+      ),
+      multipleChoiceItem(
+        "q-mc-1",
+        "Choose the correct option.",
+        "____ you see the news last night? It was shocking!",
+        ["Didn't", "Don't", "Hadn't"],
+        0,
+        "Use a negative question in the past simple to check information or express surprise."
+      ),
+      multipleChoiceItem(
+        "q-mc-2",
+        "Choose the correct option.",
+        "Do you have any idea ____?",
+        ["where is the key", "where the key is", "where did the key go"],
+        1,
+        "Indirect questions use subject + verb order."
+      ),
+      multipleChoiceItem(
+        "q-mc-3",
+        "Choose the correct option.",
+        "____ does this umbrella belong to?",
+        ["Who", "Whom", "Whose"],
+        0,
+        "In modern English, we use 'Who' at the start and 'to' at the end."
+      ),
+      multipleChoiceItem(
+        "q-mc-4",
+        "Choose the correct option.",
+        "I'd like to know why ____.",
+        ["you are late", "are you late", "did you be late"],
+        0,
+        "Statement word order after 'I'd like to know'."
+      ),
+      multipleChoiceItem(
+        "q-mc-5",
+        "Choose the correct option.",
+        "Which flat ____?",
+        ["they live in", "do they live in", "do they live"],
+        1,
+        "Direct question word order with the preposition at the end."
+      ),
+      placeholderGapItem(
+        "q-gf-1",
+        "Complete the question.",
+        "__________ you found your keys? You've been looking for ages! (negative)",
+        "Haven't",
+        ["Have you not"],
+        "Use a negative present perfect question to express frustration or surprise."
+      ),
+      placeholderGapItem(
+        "q-gf-2",
+        "Complete the indirect question.",
+        "Can you tell me what __________? (your name / be)",
+        "your name is",
+        [],
+        "Indirect question: subject + verb."
+      ),
+      placeholderGapItem(
+        "q-gf-3",
+        "Complete the question with a preposition at the end.",
+        "Who __________? (you / wait)",
+        "are you waiting for",
+        [],
+        "Preposition 'for' goes at the end."
+      ),
+      placeholderGapItem(
+        "q-gf-4",
+        "Complete the question.",
+        "What __________ like? (the weather / be)",
+        "is the weather",
+        ["'s the weather"],
+        "Asking for a description."
+      ),
+      placeholderGapItem(
+        "q-gf-5",
+        "Complete the indirect question.",
+        "I wonder if __________ to the party. (they / come)",
+        "they are coming",
+        ["they're coming", "they will come", "they'll come"],
+        "Use statement word order after 'if' in an indirect question."
+      ),
+      singleGap(
+        "q-gf-6",
+        "Change this into a negative question.",
+        [
+          "I thought you wanted another coffee. -> ",
+          { gapId: "g1" },
+          " another coffee?",
+        ],
+        ["Didn't you want", "Did you not want"],
+        "Use a negative past simple question to show surprise or check your understanding."
+      ),
+      placeholderGapItem(
+        "q-gf-7",
+        "Complete the indirect question.",
+        "Do you know when __________? (the train / leave)",
+        "the train leaves",
+        ["the train is leaving"],
+        "Remove the auxiliary 'does' and use statement word order."
+      ),
+      placeholderGapItem(
+        "q-gf-8",
+        "Complete the question.",
+        "Which company __________? (he / work / for)",
+        "does he work for",
+        [],
+        "Standard direct question with a preposition at the end."
+      ),
+      placeholderGapItem(
+        "q-gf-9",
+        "Complete the question.",
+        "How many people __________ to the wedding? (come)",
+        "are coming",
+        ["will come"],
+        "Who/How many as a subject doesn't need 'do' (though 'are coming' is the intended future use here)."
+      ),
+      placeholderGapItem(
+        "q-gf-10",
+        "Complete the indirect question.",
+        "Could you tell me how much __________? (this / cost)",
+        "this costs",
+        [],
+        "Indirect question: subject + verb (with third person 's')."
+      ),
+      singleGap(
+        "q-rf-1",
+        "Turn the direct question into an indirect one.",
+        ["Where is the nearest bank? -> Can you tell me ", { gapId: "g1" }, "?"],
+        ["where the nearest bank is"],
+        "Switch from verb-subject to subject-verb."
+      ),
+      singleGap(
+        "q-rf-2",
+        "Turn the direct question into an indirect one.",
+        ["Why did she leave early? -> I'd like to know ", { gapId: "g1" }, "."],
+        ["why she left early"],
+        "Remove 'did' and change the verb to the past simple."
+      ),
+      singleGap(
+        "q-rf-3",
+        "Rewrite this sentence.",
+        ["To which city are you flying? -> Which city ", { gapId: "g1" }, "?"],
+        ["are you flying to"],
+        "In neutral English, the preposition 'to' moves to the end."
+      ),
+      singleGap(
+        "q-rf-4",
+        "Rewrite as an indirect question using 'if'.",
+        ["Is the shop open? -> Do you know ", { gapId: "g1" }, "?"],
+        ["if the shop is open", "whether the shop is open"],
+        "Use 'if' or 'whether' for yes/no indirect questions."
+      ),
+      singleGap(
+        "q-rf-5",
+        "Turn the fact into a negative question expressing surprise.",
+        ["You haven't finished yet! -> ", { gapId: "g1" }, " yet?"],
+        ["Haven't you finished"],
+        "Use a negative auxiliary to show surprise."
+      ),
+    ],
+  },
+  {
+    id: "auxiliary-verb-mastery",
+    title: "Auxiliary Verbs: Echoes and Emphasis",
+    shortDescription: "Master 'so/neither', question tags, and using 'do' for emphasis.",
+    levels: ["b2"],
+    intro:
+      "Practice using auxiliary verbs to avoid repetition, show interest, and add emphasis to your sentences.",
+    items: [
+      errorCorrectionItem(
+        "aux-ec-1",
+        "Check the highlighted phrase for errors. If it's correct, mark it so.",
+        "A: I'm a bit tired today. B: So do I.",
+        "So do I",
+        false,
+        "So am I",
+        "The auxiliary must match the original sentence. Since 'A' used 'am', the agreement must also use 'am'."
+      ),
+      errorCorrectionItem(
+        "aux-ec-2",
+        "Check the highlighted phrase for errors. If it's correct, mark it so.",
+        "A: I've never been to Asia. B: Neither I have.",
+        "Neither I have",
+        false,
+        "Neither have I",
+        "In agreements with 'So' and 'Neither', we use inverted word order: Auxiliary + Subject."
+      ),
+      errorCorrectionItem(
+        "aux-ec-3",
+        "Check the highlighted phrase for errors. If it's correct, mark it so.",
+        "You've been to London before, haven't you?",
+        "haven't you",
+        true,
+        "",
+        "Correct! A positive statement in the Present Perfect takes a negative 'haven't' tag."
+      ),
+      errorCorrectionItem(
+        "aux-ec-4",
+        "Check the highlighted phrase for errors. If it's correct, mark it so.",
+        "A: Why didn't you go to the party? B: I did went! I just left early.",
+        "did went",
+        false,
+        "did go",
+        "When using 'do/does/did' for emphasis, the main verb must be in the base form (infinitive)."
+      ),
+      errorCorrectionItem(
+        "aux-ec-5",
+        "Check the highlighted phrase for errors. If it's correct, mark it so.",
+        "A: We really enjoyed the film. B: Have you? I thought it was a bit slow.",
+        "Have you",
+        false,
+        "Did you",
+        "The echo question must match the tense of the original statement. 'Enjoyed' is Past Simple, so use 'Did'."
+      ),
+      multipleChoiceItem(
+        "aux-mc-1",
+        "Choose the correct response.",
+        "A: I haven't finished the report yet. B: ____.",
+        ["So have I", "Neither have I", "I haven't too"],
+        1,
+        "Use 'neither' + auxiliary to agree with a negative statement."
+      ),
+      multipleChoiceItem(
+        "aux-mc-2",
+        "Choose the correct response.",
+        "A: I'm exhausted. B: ____. It's been a long day.",
+        ["So am I", "So do I", "I am so"],
+        0,
+        "Match the auxiliary 'am' from the original sentence."
+      ),
+      multipleChoiceItem(
+        "aux-mc-3",
+        "Choose the correct tag.",
+        "You'll remember to call me, ____?",
+        ["will you", "don't you", "won't you"],
+        2,
+        "A positive 'will' statement takes a negative 'won't' tag."
+      ),
+      multipleChoiceItem(
+        "aux-mc-4",
+        "Choose the correct option.",
+        "I ____ want to come with you, I'm just very busy today.",
+        ["do", "am", "have"],
+        0,
+        "Use 'do' for emphasis when the listener might think the opposite."
+      ),
+      multipleChoiceItem(
+        "aux-mc-5",
+        "Choose the correct response.",
+        "A: We went to that new Italian restaurant. B: ____? Was it good?",
+        ["Did you", "Went you", "Have you"],
+        0,
+        "Use the auxiliary 'did' to show interest in a Past Simple action."
+      ),
+      placeholderGapItem(
+        "aux-gf-1",
+        "Complete the sentence to avoid repetition.",
+        "He doesn't like football, but his brother __________.",
+        "does",
+        [],
+        "Use the auxiliary 'does' to replace the verb 'likes'."
+      ),
+      placeholderGapItem(
+        "aux-gf-2",
+        "Complete with a 'so' or 'neither' structure.",
+        "A: I'm not going to the party. B: __________ I.",
+        "Neither am",
+        ["Neither'm"],
+        "Negative agreement with 'be'."
+      ),
+      placeholderGapItem(
+        "aux-gf-3",
+        "Complete the question tag.",
+        "They've lived here for years, __________ they?",
+        "haven't",
+        ["have not"],
+        "Negative tag for a positive Present Perfect statement."
+      ),
+      placeholderGapItem(
+        "aux-gf-4",
+        "Add emphasis to the sentence.",
+        "I __________ hope you can come to the wedding! (hope)",
+        "do",
+        [],
+        "Use 'do' to emphasize the verb."
+      ),
+      placeholderGapItem(
+        "aux-gf-5",
+        "Complete the echo question.",
+        "A: I can't find my glasses. B: __________ you? Have you looked in the kitchen?",
+        "Can't",
+        ["Can you not"],
+        "Echo the auxiliary to show interest/surprise."
+      ),
+      placeholderGapItem(
+        "aux-gf-6",
+        "Complete with a 'so' or 'neither' structure.",
+        "A: I'd love a cup of tea. B: __________ I.",
+        "So would",
+        ["So'd"],
+        "Positive agreement with 'would'."
+      ),
+      placeholderGapItem(
+        "aux-gf-7",
+        "Complete the sentence to avoid repetition.",
+        "I've seen that movie, but Sarah __________.",
+        "hasn't",
+        ["has not"],
+        "Use the negative auxiliary to show contrast."
+      ),
+      placeholderGapItem(
+        "aux-gf-8",
+        "Complete the question tag.",
+        "That isn't your bag, __________ it?",
+        "is",
+        [],
+        "Positive tag for a negative statement."
+      ),
+      placeholderGapItem(
+        "aux-gf-9",
+        "Add emphasis to the sentence.",
+        "She __________ look like her mother, doesn't she? (look)",
+        "does",
+        [],
+        "Use 'does' for third-person emphasis."
+      ),
+      placeholderGapItem(
+        "aux-gf-10",
+        "Complete the echo question.",
+        "A: We've bought a new house. B: __________ you? That's amazing!",
+        "Have",
+        [],
+        "Echo question for the Present Perfect."
+      ),
+      singleGap(
+        "aux-rf-1",
+        "Rewrite using 'so' or 'neither'.",
+        [
+          "I'm a teacher and my wife is a teacher too. -> I'm a teacher and ",
+          { gapId: "g1" },
+          " my wife.",
+        ],
+        ["so is"],
+        "Use 'so + auxiliary + subject'."
+      ),
+      singleGap(
+        "aux-rf-2",
+        "Rewrite the sentence to add emphasis.",
+        ["I saw him yesterday, I promise! -> I ", { gapId: "g1" }, " him yesterday!"],
+        ["did see"],
+        "Change the Past Simple to 'did + infinitive' for emphasis."
+      ),
+      singleGap(
+        "aux-rf-3",
+        "Rewrite using 'neither'.",
+        [
+          "I don't like eggs and I don't like mushrooms either. -> I don't like eggs and ",
+          { gapId: "g1" },
+          " I.",
+        ],
+        ["neither do"],
+        "Negative agreement with the Present Simple."
+      ),
+      singleGap(
+        "aux-rf-4",
+        "Rewrite using a question tag.",
+        ["I'm sure it will rain. -> It will rain, ", { gapId: "g1" }, "?"],
+        ["won't it"],
+        "Convert a statement into a question tag."
+      ),
+      singleGap(
+        "aux-rf-5",
+        "Complete using an auxiliary.",
+        [
+          "I thought she was coming, but I was wrong. -> I thought she was coming, but she ",
+          { gapId: "g1" },
+          ".",
+        ],
+        ["wasn't"],
+        "Shorten the sentence using just the auxiliary."
+      ),
+    ],
+  },
+  {
+    id: "adjectives-order-and-groups",
+    title: "Adjectives: Order, Groups, and -ed/-ing",
+    shortDescription: "Master adjective order, collective nouns, and participle adjectives.",
+    levels: ["b2"],
+    intro:
+      "Practice the natural order of adjectives (Opinion > Size > Color, etc.) and how to use adjectives to describe groups of people.",
+    items: [
+      errorCorrectionItem(
+        "adj-ec-1",
+        "Is this word order correct?",
+        "She wore a silk expensive vintage scarf.",
+        "silk expensive vintage",
+        false,
+        "expensive vintage silk",
+        "Opinion (expensive) should come before Age (vintage) and Material (silk)."
+      ),
+      errorCorrectionItem(
+        "adj-ec-2",
+        "Check the highlighted phrase for errors.",
+        "The government should do more for the unemployeds.",
+        "the unemployeds",
+        false,
+        "the unemployed",
+        "When using 'the + adjective' for a group, we never add an 's'."
+      ),
+      errorCorrectionItem(
+        "adj-ec-3",
+        "Check the highlighted phrase for errors.",
+        "I’m very confused by these instructions.",
+        "confused",
+        true,
+        "",
+        "Correct. Use -ed for how a person feels."
+      ),
+      errorCorrectionItem(
+        "adj-ec-4",
+        "Check the highlighted phrase for errors.",
+        "The French people are famous for their food.",
+        "The French people",
+        false,
+        ["The French", "French people"],
+        "Nationalities ending in -ch, -sh, -ese, or -ss don't take an 's' when used as a collective noun."
+      ),
+      errorCorrectionItem(
+        "adj-ec-5",
+        "Check the highlighted phrase for errors.",
+        "He’s a very interesting person.",
+        "interesting",
+        true,
+        "",
+        "Correct. Use -ing for the person/thing that causes the feeling."
+      ),
+      multipleChoiceItem(
+        "adj-mc-1",
+        "Choose the most natural adjective order.",
+        "We stayed in a ____ cabin.",
+        ["charming small old wooden", "small charming wooden old", "old small wooden charming"],
+        0,
+        "Order: Opinion (charming) > Size (small) > Age (old) > Material (wooden)."
+      ),
+      multipleChoiceItem(
+        "adj-mc-2",
+        "Choose the correct collective noun.",
+        "____ in this region are calling for better accessibility in public transport.",
+        ["The disableds", "The disabled", "The disabled people"],
+        1,
+        "Use 'the + adjective' for a group; we never add a plural 's' to the adjective."
+      ),
+      multipleChoiceItem(
+        "adj-mc-3",
+        "Choose the correct option.",
+        "The match was really ____. I almost fell asleep.",
+        ["bored", "boring", "bores"],
+        1,
+        "The match is the 'cause' of the feeling, so use -ing."
+      ),
+      multipleChoiceItem(
+        "adj-mc-4",
+        "Choose the most natural adjective order.",
+        "He found an ____ coin in the garden.",
+        ["ancient gold round tiny", "tiny round ancient gold", "tiny ancient round gold"],
+        1,
+        "Order: Size (tiny) > Shape (round) > Age (ancient) > Material (gold)."
+      ),
+      multipleChoiceItem(
+        "adj-mc-5",
+        "Choose the correct option.",
+        "I am so ____ that the weekend is finally here!",
+        ["excited", "exciting", "excite"],
+        0,
+        "Use -ed to describe a person's emotion."
+      ),
+      placeholderGapItem(
+        "adj-gf-1",
+        "Complete the group noun.",
+        "__________ (people who don't have enough money) often struggle during the winter months.",
+        "The underprivileged",
+        ["The poor"],
+        "Use 'The' + adjective to describe a collective group in society."
+      ),
+      placeholderGapItem(
+        "adj-gf-2",
+        "Put the adjectives in the correct order.",
+        "A pair of __________ sunglasses. (expensive / Italian / designer)",
+        "expensive designer Italian",
+        ["expensive Italian designer"],
+        "Opinion (expensive) usually leads, followed by the specific type/origin."
+      ),
+      placeholderGapItem(
+        "adj-gf-3",
+        "Complete with the -ed or -ing form.",
+        "It was a __________ experience. I'll never forget it. (terrify)",
+        "terrifying",
+        [],
+        "-ing describes the nature of the experience."
+      ),
+      placeholderGapItem(
+        "adj-gf-4",
+        "Complete the nationality phrase.",
+        "__________ (People from the Netherlands) are famous for their engineering skills.",
+        "The Dutch",
+        [],
+        "Some nationalities have a specific collective noun that doesn't end in -s."
+      ),
+      placeholderGapItem(
+        "adj-gf-5",
+        "Complete the collective noun.",
+        "Resources are limited for __________ (people who are looking for work) in rural areas.",
+        "the unemployed",
+        [],
+        "Use 'the' + adjective for the group; do not add an 's'."
+      ),
+      placeholderGapItem(
+        "adj-gf-6",
+        "Put the adjectives in the correct order.",
+        "He lives in a __________ house. (big / old / beautiful)",
+        "beautiful big old",
+        [],
+        "Opinion (beautiful) > Size (big) > Age (old)."
+      ),
+      placeholderGapItem(
+        "adj-gf-7",
+        "Complete with the -ed or -ing form.",
+        "Are you __________ in classical music? (interest)",
+        "interested",
+        [],
+        "-ed for personal interest/feelings."
+      ),
+      placeholderGapItem(
+        "adj-gf-8",
+        "Complete the nationality phrase.",
+        "__________ (People from Wales) have a very rich musical tradition.",
+        "The Welsh",
+        [],
+        "Nationalities ending in -sh take 'The' for the collective group."
+      ),
+      placeholderGapItem(
+        "adj-gf-9",
+        "Put the adjectives in the correct order.",
+        "I bought some __________ curtains. ( striped / cotton / lovely)",
+        "lovely striped cotton",
+        [],
+        "Order: Opinion (lovely) > Pattern (striped) > Colour (blue) > Material (cotton)."
+      ),
+      placeholderGapItem(
+        "adj-gf-10",
+        "Complete with the -ed or -ing form.",
+        "I find city maps very __________. (confuse)",
+        "confusing",
+        [],
+        "The maps are the cause of the confusion."
+      ),
+      singleGap(
+        "adj-rf-1",
+        "Rewrite the sentence using the adjectives in brackets.",
+        ["He has a car. (fast / red / German) -> He has a ", { gapId: "g1" }, "."],
+        ["fast red German car"],
+        "Opinion (fast) > Color (red) > Origin (German)."
+      ),
+      singleGap(
+        "adj-rf-2",
+        "Rewrite using a group noun.",
+        [
+          "People who don't have a home need our help. -> ",
+          { gapId: "g1" },
+          " need our help. (two words)",
+        ],
+        ["The homeless"],
+        "Convert 'People who are [adj]' into 'The [adj]'."
+      ),
+      singleGap(
+        "adj-rf-3",
+        "Rewrite the description in the correct order.",
+        ["A box (metal / small / square). -> A ", { gapId: "g1" }, "."],
+        ["small square metal box"],
+        "Size (small) > Shape (square) > Material (metal)."
+      ),
+      singleGap(
+        "adj-rf-4",
+        "Complete the sentence based on the feeling.",
+        ["The news came as a shock to me. -> I was ", { gapId: "g1" }, " by the news."],
+        ["shocked"],
+        "Use the -ed form for the person's reaction."
+      ),
+      placeholderGapItem(
+        "adj-rf-5",
+        "Complete the collective noun.",
+        "Society has a duty to look after __________ (people who have been injured in war).",
+        "the wounded",
+        ["the injured"],
+        "Collective group nouns often use the past participle after 'the'."
+      ),
+    ],
+  },
+  {
+    id: "narrative-tenses-storytelling",
+    title: "Narrative Tenses: Storytelling",
+    shortDescription: "Master Past Simple, Continuous, and Perfect (Simple & Continuous).",
+    levels: ["b2"],
+    intro:
+      "Practice using narrative tenses to tell stories. Use the Past Simple for main events, Continuous for background actions, and the Past Perfect for events that happened earlier.",
+    items: [
+      errorCorrectionItem(
+        "nt-ec-1",
+        "Check the highlighted phrase for errors.",
+        "We arrived at the cinema, but the film already started.",
+        "already started",
+        false,
+        "had already started",
+        "Use the Past Perfect for an action that happened before the main story event (arriving)."
+      ),
+      errorCorrectionItem(
+        "nt-ec-2",
+        "Check the highlighted phrase for errors.",
+        "I was walking to the station when it started to rain.",
+        "was walking",
+        true,
+        "",
+        "Correct! Use the Past Continuous for a background action interrupted by a main event."
+      ),
+      errorCorrectionItem(
+        "nt-ec-3",
+        "Check the highlighted phrase for errors.",
+        "They were exhausted because they were working all day.",
+        "were working",
+        false,
+        "had been working",
+        "Use the Past Perfect Continuous to show the cause of a past situation (being exhausted)."
+      ),
+      errorCorrectionItem(
+        "nt-ec-4",
+        "Check the highlighted phrase for errors.",
+        "When I reached the platform, the train had left.",
+        "had left",
+        true,
+        "",
+        "Correct. The train left *before* you reached the platform."
+      ),
+      errorCorrectionItem(
+        "nt-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I didn't recognize him because he was changing a lot.",
+        "was changing",
+        false,
+        "had changed",
+        "Use the Past Perfect Simple for a completed change that happened before you saw him."
+      ),
+      multipleChoiceItem(
+        "nt-mc-1",
+        "Choose the correct tense.",
+        "When we got to the airport, we realized we ____ our passports at home.",
+        ["left", "had left", "were leaving"],
+        1,
+        "The leaving happened before the realizing, so use the Past Perfect."
+      ),
+      multipleChoiceItem(
+        "nt-mc-2",
+        "Choose the correct tense.",
+        "I ____ a book when I heard a loud bang in the kitchen.",
+        ["read", "was reading", "had read"],
+        1,
+        "Use the Past Continuous for an action in progress when something else happened."
+      ),
+      multipleChoiceItem(
+        "nt-mc-3",
+        "Choose the correct tense.",
+        "The streets were wet because it ____ for hours.",
+        ["rained", "was raining", "had been raining"],
+        2,
+        "Use the Past Perfect Continuous for a continuous action that finished just before the main past time."
+      ),
+      multipleChoiceItem(
+        "nt-mc-4",
+        "Choose the correct tense.",
+        "By the time the police arrived, the thieves ____.",
+        ["escaped", "were escaping", "had escaped"],
+        2,
+        "The escape was completed before the police arrived."
+      ),
+      multipleChoiceItem(
+        "nt-mc-5",
+        "Choose the correct tense.",
+        "While we ____ through the park, we saw a rare bird.",
+        ["walked", "were walking", "had walked"],
+        1,
+        "Use the Past Continuous after 'while' for background actions."
+      ),
+      placeholderGapItem(
+        "nt-gf-1",
+        "Complete the sentence with the correct narrative tense.",
+        "I __________ (never / see) a volcano until I went to Iceland last year.",
+        "had never seen",
+        ["'d never seen"],
+        "Past Perfect for an experience (or lack of) before a specific point in the past."
+      ),
+      placeholderGapItem(
+        "nt-gf-2",
+        "Complete the sentence.",
+        "We __________ (walk) along the beach when we found a message in a bottle.",
+        "were walking",
+        [],
+        "Background action in progress."
+      ),
+      placeholderGapItem(
+        "nt-gf-3",
+        "Complete the sentence.",
+        "He __________ (wait) for an hour before the bus finally arrived.",
+        "had been waiting",
+        ["'d been waiting"],
+        "Duration of an action leading up to a past event."
+      ),
+      placeholderGapItem(
+        "nt-gf-4",
+        "Complete the sentence.",
+        "When I opened the fridge, I saw that someone __________ (eat) all the cake.",
+        "had eaten",
+        ["'d eaten"],
+        "Past Perfect for the earlier action."
+      ),
+      placeholderGapItem(
+        "nt-gf-5",
+        "Complete the sentence.",
+        "I __________ (cook) dinner when the lights went out.",
+        "was cooking",
+        [],
+        "Action interrupted by a main event."
+      ),
+      placeholderGapItem(
+        "nt-gf-6",
+        "Complete the sentence.",
+        "She __________ (not / want) to go to the cinema because she'd seen the film before.",
+        "didn't want",
+        ["did not want"],
+        "Past Simple for the main state/reaction."
+      ),
+      placeholderGapItem(
+        "nt-gf-7",
+        "Complete the sentence.",
+        "I was out of breath because I __________ (run).",
+        "had been running",
+        ["'d been running"],
+        "Past Perfect Continuous to explain a past state."
+      ),
+      placeholderGapItem(
+        "nt-gf-8",
+        "Complete the sentence.",
+        "He __________ (sleep) when the alarm went off at 7:00.",
+        "was sleeping",
+        [],
+        "Background action in progress at a specific time."
+      ),
+      placeholderGapItem(
+        "nt-gf-9",
+        "Complete the sentence.",
+        "They __________ (finish) the meeting by the time I got there.",
+        "had finished",
+        ["'d finished"],
+        "Action completed before a point in the past."
+      ),
+      placeholderGapItem(
+        "nt-gf-10",
+        "Complete the sentence.",
+        "I __________ (watch) TV when I remembered I hadn't locked the door.",
+        "was watching",
+        [],
+        "Action in progress when a thought or event occurred."
+      ),
+      singleGap(
+        "nt-rf-1",
+        "Rewrite the sequence of events using 'By the time'.",
+        [
+          "I finished the report. Then I went to bed. -> By the time I went to bed, I ",
+          { gapId: "g1" },
+          " the report.",
+        ],
+        ["had finished", "'d finished"],
+        "The finishing happened first, so use the Past Perfect."
+      ),
+      singleGap(
+        "nt-rf-2",
+        "Rewrite using 'While'.",
+        [
+          "The sun was shining when I woke up. -> While I ",
+          { gapId: "g1" },
+          ", the sun was shining.",
+        ],
+        ["was waking up"],
+        "Note: Though 'When I woke up' is more common, 'While I was waking up' focuses on the process."
+      ),
+      singleGap(
+        "nt-rf-3",
+        "Combine the facts using the Past Perfect Continuous.",
+        [
+          "They started playing at 2:00. I arrived at 4:00. -> They ",
+          { gapId: "g1" },
+          " for two hours when I arrived.",
+        ],
+        ["had been playing", "'d been playing"],
+        "Show the duration of the earlier action."
+      ),
+      singleGap(
+        "nt-rf-4",
+        "Rewrite using 'because'.",
+        [
+          "I didn't recognize him. He was very different from before. -> I didn't recognize him because he ",
+          { gapId: "g1" },
+          " a lot.",
+        ],
+        ["had changed", "'d changed"],
+        "The change happened before the meeting."
+      ),
+      singleGap(
+        "nt-rf-5",
+        "Rewrite the background action using 'have'.",
+        [
+          "I was in the middle of a bath. The doorbell rang. -> The doorbell rang while I ",
+          { gapId: "g1" },
+          " a bath.",
+        ],
+        ["was having", "was taking"],
+        "Use Past Continuous for the background action."
+      ),
+    ],
+  },
+  {
+    id: "b2-adverb-position-expanded",
+    title: "Adverb Position: B2 Practice",
+    shortDescription: "Original exercises for Manner, Place, Time, and Degree adverbs.",
+    levels: ["b2"],
+    intro:
+      "Test your instincts on where adverbs naturally belong in English. Remember that the 'where' usually comes before the 'when'!",
+    items: [
+      multipleChoiceItem(
+        "adv-mc-ext-1",
+        "Choose the most natural sentence.",
+        "Which word order is correct?",
+        [
+          "We met yesterday in the park.",
+          "We met in the park yesterday.",
+          "We yesterday met in the park.",
+        ],
+        1,
+        "Adverbs of place (in the park) normally go before adverbs of time (yesterday)."
+      ),
+      multipleChoiceItem(
+        "adv-mc-ext-2",
+        "Choose the most natural sentence.",
+        "Which word order is correct?",
+        [
+          "The files have already been uploaded to the server.",
+          "The files have been uploaded already to the server.",
+          "Already the files have been uploaded to the server.",
+        ],
+        0,
+        "'Already' usually goes after the first auxiliary in a present perfect passive structure."
+      ),
+      multipleChoiceItem(
+        "adv-mc-ext-3",
+        "Choose the most natural sentence.",
+        "Which word order is correct?",
+        [
+          "She works a lot at the library.",
+          "She works at the library a lot.",
+          "She a lot works at the library.",
+        ],
+        0,
+        "Adverbs of degree like 'a lot' should go after the verb or verb phrase."
+      ),
+      multipleChoiceItem(
+        "adv-mc-ext-4",
+        "Choose the most natural sentence.",
+        "Which word order is correct?",
+        [
+          "He is always late for the presentation.",
+          "He always is late for the presentation.",
+          "He is late always for the presentation.",
+        ],
+        0,
+        "Adverbs of frequency go after the verb 'to be'."
+      ),
+      multipleChoiceItem(
+        "adv-mc-ext-5",
+        "Choose the most natural sentence.",
+        "Which word order is correct?",
+        [
+          "The package probably will arrive tomorrow.",
+          "The package will arrive probably tomorrow.",
+          "The package will probably arrive tomorrow.",
+        ],
+        2,
+        "Adverbs like 'probably' usually go in mid-position after the first auxiliary verb."
+      ),
+      multipleChoiceItem(
+        "adv-mc-ext-6",
+        "Choose the most natural sentence.",
+        "Which word order is correct?",
+        [
+          "She almost missed the bus.",
+          "She missed almost the bus.",
+          "She missed the bus almost.",
+        ],
+        0,
+        "Adverbs of degree like 'almost' or 'nearly' go before the verb or verb phrase."
+      ),
+      errorCorrectionItem(
+        "adv-ec-ext-1",
+        "Is this word order correct?",
+        "I'll see you tomorrow at the office.",
+        "tomorrow at the office",
+        false,
+        "at the office tomorrow",
+        "Adverbs of place (at the office) should come before adverbs of time (tomorrow)."
+      ),
+      errorCorrectionItem(
+        "adv-ec-ext-2",
+        "Is this word order correct?",
+        "Obviously, we need to find a better way to do this.",
+        "Obviously, we need",
+        true,
+        "",
+        "Correct! Comment adverbs that give the speaker's opinion usually go at the beginning of the sentence."
+      ),
+      errorCorrectionItem(
+        "adv-ec-ext-3",
+        "Is this word order correct?",
+        "That soup is hot extremely.",
+        "hot extremely",
+        false,
+        "extremely hot",
+        "Adverbs of degree like 'extremely' or 'incredibly' go before the adjective they modify."
+      ),
+      errorCorrectionItem(
+        "adv-ec-ext-4",
+        "Is this word order correct?",
+        "The application was successfully submitted online.",
+        "was successfully submitted",
+        true,
+        "",
+        "Correct! In passive constructions, the adverb of manner usually sits in mid-position."
+      ),
+      errorCorrectionItem(
+        "adv-ec-ext-5",
+        "Is this word order correct?",
+        "He drives carefully his new car.",
+        "carefully his new car",
+        false,
+        "his new car carefully",
+        "Adverbs of manner usually go after the verb phrase or the object."
+      ),
+      errorCorrectionItem(
+        "adv-ec-ext-6",
+        "Is this word order correct?",
+        "The director never is satisfied with the first draft.",
+        "never is",
+        false,
+        "is never",
+        "Adverbs of frequency go after the verb 'to be'."
+      ),
+      adverbPlacementItem(
+        "adv-place-1",
+        "Place the adverbs in the correct position.",
+        "I'll finish this project.",
+        ["Hopefully", "tonight"],
+        { Hopefully: 0, tonight: 4 },
+        "Hopefully, I'll finish this project tonight.",
+        "Comment adverbs can start the sentence, and the time adverb usually goes at the end."
+      ),
+      adverbPlacementItem(
+        "adv-place-2",
+        "Place the adverbs in the correct position.",
+        "The website will be updated.",
+        ["automatically", "every hour"],
+        { automatically: 4, "every hour": 5 },
+        "The website will be automatically updated every hour.",
+        "In passive structures, manner often goes before the main verb; frequency/time goes at the end."
+      ),
+      adverbPlacementItem(
+        "adv-place-3",
+        "Place the adverbs in the correct position.",
+        "She arrives late.",
+        ["Unfortunately", "often"],
+        { Unfortunately: 0, often: 1 },
+        "Unfortunately, she often arrives late.",
+        "Comment adverbs can introduce the whole sentence; frequency goes before the main verb."
+      ),
+      adverbPlacementItem(
+        "adv-place-4",
+        "Place the adverbs in the correct position.",
+        "The car was parked.",
+        ["badly", "outside"],
+        { badly: 3, outside: 4 },
+        "The car was badly parked outside.",
+        "In the passive, 'badly' sits before the main verb; place normally comes after the verb phrase."
+      ),
+      adverbPlacementItem(
+        "adv-place-5",
+        "Place the adverbs in the correct position.",
+        "The film was scary.",
+        ["Clearly", "quite"],
+        { Clearly: 0, quite: 3 },
+        "Clearly, the film was quite scary.",
+        "Comment adverbs can start the sentence; degree adverbs go before the adjective."
+      ),
+      adverbPlacementItem(
+        "adv-place-6",
+        "Place the adverbs in the correct position.",
+        "I missed the train.",
+        ["almost", "this morning"],
+        { almost: 1, "this morning": 4 },
+        "I almost missed the train this morning.",
+        "'Almost' goes before the verb phrase, and the time expression usually goes at the end."
+      ),
+      adverbPlacementItem(
+        "adv-place-7",
+        "Place the adverbs in the correct position.",
+        "I watch horror films.",
+        ["Honestly", "never"],
+        { Honestly: 0, never: 1 },
+        "Honestly, I never watch horror films.",
+        "Comment adverbs can go first; frequency adverbs go before the main verb."
+      ),
+      adverbPlacementItem(
+        "adv-place-8",
+        "Place the adverbs in the correct position.",
+        "He'll arrive.",
+        ["probably", "later"],
+        { probably: 1, later: 2 },
+        "He'll probably arrive later.",
+        "'Probably' goes after the auxiliary, and the time adverb goes at the end."
+      ),
+    ],
+  },
+  {
+    id: "advanced-future-mechanics",
+    title: "Future Continuous vs. Future Perfect",
+    shortDescription: "Original scenarios focusing on deadlines, ongoing actions, and planned events.",
+    levels: ["b2"],
+    intro:
+      "Can you tell the difference between a project in progress and a finished result? Test your future-tense instincts with these brand-new challenges.",
+    items: [
+      multipleChoiceItem(
+        "adv-f-mc-1",
+        "Choose the most logical future form.",
+        "The renovation starts in June and finishes in August. In July, they ____ the kitchen.",
+        ["will renovate", "will be renovating", "will have renovated"],
+        1,
+        "Since the work is right in the middle of its schedule, it will be in progress."
+      ),
+      multipleChoiceItem(
+        "adv-f-mc-2",
+        "Choose the most logical future form.",
+        "Our interns start at 9:00 and leave at 5:00. If you arrive at 5:30, they ____ for the day.",
+        ["will leave", "will be leaving", "will have left"],
+        2,
+        "By 5:30, the act of leaving is already finished."
+      ),
+      multipleChoiceItem(
+        "adv-f-mc-3",
+        "Choose the most logical future form.",
+        "Don't call between 8:00 and 9:00 tonight; I ____ of questions for tomorrow's podcast.",
+        ["will think", "will be thinking", "will have thought"],
+        1,
+        "The time window makes the thinking an action in progress, so the Future Continuous is the clearest choice."
+      ),
+      multipleChoiceItem(
+        "adv-f-mc-4",
+        "Choose the most logical future form.",
+        "In six months' time, the developers ____ the entire app from scratch.",
+        ["will rewrite", "will be rewriting", "will have rewritten"],
+        2,
+        "This indicates the completion of a major project within a specific timeframe."
+      ),
+      multipleChoiceItem(
+        "adv-f-mc-5",
+        "Choose the most logical future form.",
+        "Don't visit the office at noon; the staff ____ their lunch break then.",
+        ["will have", "will be having", "will have had"],
+        1,
+        "At exactly noon, the lunch break will be an ongoing activity."
+      ),
+      multipleChoiceItem(
+        "adv-f-mc-6",
+        "Choose the most logical future form.",
+        "The marathon starts at 8:00 AM. By noon, most of the elite runners ____ the finish line.",
+        ["will cross", "will be crossing", "will have crossed"],
+        2,
+        "The runners will have completed the race by that specific time."
+      ),
+      multipleChoiceItem(
+        "adv-f-mc-7",
+        "Choose the most logical future form.",
+        "I ____ to the post office later today. Can I drop anything off for you?",
+        ["will go", "will be going", "will have gone"],
+        1,
+        "Future Continuous is used here for a planned action that is part of a routine or decision."
+      ),
+      multipleChoiceItem(
+        "adv-f-mc-8",
+        "Choose the most logical future form.",
+        "If you check the news in an hour, they ____ the election results.",
+        ["will announce", "will be announcing", "will have announced"],
+        2,
+        "By the time you check, the announcement will be a finished event."
+      ),
+      errorCorrectionItem(
+        "adv-f-ec-1",
+        "Check the tense: Does it fit the timeline?",
+        "The lecture begins at 2:00. At 2:15, the professor will have started speaking.",
+        "will have started speaking",
+        true,
+        "",
+        "Correct! By 2:15, the act of starting is already complete. 'Will be speaking' would also be possible if we focused on the lecture in progress."
+      ),
+      errorCorrectionItem(
+        "adv-f-ec-2",
+        "Check the tense: Does it fit the timeline?",
+        "By the end of this decade, scientists will have found a more efficient fuel.",
+        "will have found",
+        true,
+        "",
+        "Correct! 'By the end of' is the perfect trigger for a completed future result."
+      ),
+      errorCorrectionItem(
+        "adv-f-ec-3",
+        "Check the tense: Does it fit the timeline?",
+        "At midnight tonight, most people in the city will have slept.",
+        "will have slept",
+        false,
+        "will be sleeping",
+        "At midnight, the act of sleeping is usually in progress, not finished."
+      ),
+      errorCorrectionItem(
+        "adv-f-ec-4",
+        "Check the tense: Does it fit the timeline?",
+        "I'll be seeing the director tomorrow, so I'll mention your proposal.",
+        "I'll be seeing",
+        true,
+        "",
+        "Correct! Use Future Continuous for pre-planned professional arrangements."
+      ),
+      errorCorrectionItem(
+        "adv-f-ec-5",
+        "Check the tense: Does it fit the timeline?",
+        "In two years' time, we will be doubling our production capacity.",
+        "will be doubling",
+        false,
+        "will have doubled",
+        "With 'In X time', we usually focus on the final result that has been achieved."
+      ),
+      errorCorrectionItem(
+        "adv-f-ec-6",
+        "Check the tense: Does it fit the timeline?",
+        "Wait! Don't go yet. I'll have finished this email in just a second.",
+        "I'll have finished",
+        true,
+        "",
+        "Correct! This shows the action will be complete within a very short future window."
+      ),
+      errorCorrectionItem(
+        "adv-f-ec-7",
+        "Check the tense: Does it fit the timeline?",
+        "When the guests arrive, I will be cooking the main course.",
+        "will be cooking",
+        true,
+        "",
+        "Correct! This shows the cooking is in progress when the interruption (arrival) happens."
+      ),
+      errorCorrectionItem(
+        "adv-f-ec-8",
+        "Check the tense: Does it fit the timeline?",
+        "By the time you get home, I will be cleaning the whole house.",
+        "will be cleaning",
+        false,
+        "will have cleaned",
+        "The speaker likely means the house will be clean (finished) when the other person arrives."
+      ),
+      placeholderGapItem(
+        "adv-f-slot-1",
+        "Use the verb prompt and place the adverb naturally.",
+        "The software team __________ the bug by next week. (fix / completely)",
+        "will have completely fixed",
+        [],
+        "Use Future Perfect for a resolved issue by a deadline. 'Completely' naturally goes before the main verb."
+      ),
+      placeholderGapItem(
+        "adv-f-slot-2",
+        "Use the verb prompt and place the adverb naturally.",
+        "I wonder if people __________ printed books in fifty years. (read / still)",
+        "will still be reading",
+        [],
+        "Future Continuous shows an ongoing habit in the future. 'Still' sits after the first auxiliary."
+      ),
+      placeholderGapItem(
+        "adv-f-slot-3",
+        "Use the verb prompt and place the adverb naturally.",
+        "The storm __________ by the time we land. (pass / probably)",
+        "will probably have passed",
+        ["will have probably passed"],
+        "Future Perfect describes an event completed by a future point. 'Probably' is a mid-position adverb."
+      ),
+      placeholderGapItem(
+        "adv-f-slot-4",
+        "Use the verb prompt and place the adverb naturally.",
+        "I __________ the report by midnight. (finish / definitely)",
+        "will definitely have finished",
+        [],
+        "Future Perfect fits the deadline. 'Definitely' comes after the first auxiliary."
+      ),
+      placeholderGapItem(
+        "adv-f-slot-5",
+        "Use the verb prompt and place the adverb naturally.",
+        "They __________ for the results all day tomorrow. (wait / patiently)",
+        "will be waiting patiently",
+        [],
+        "Future Continuous shows an action in progress for a duration. Manner normally follows the verb phrase."
+      ),
+      placeholderGapItem(
+        "adv-f-slot-6",
+        "Use the verb prompt and place the adverb naturally.",
+        "By 5 PM, the sun __________. (set / nearly)",
+        "will have nearly set",
+        [],
+        "Future Perfect fits the future deadline. Degree adverbs like 'nearly' go before the participle."
+      ),
+      placeholderGapItem(
+        "adv-f-slot-7",
+        "Use the verb prompt and place the adverb naturally.",
+        "At 3:00 tomorrow, she __________ in the library. (study / quietly)",
+        "will be studying quietly",
+        [],
+        "Future Continuous describes the action in progress. Manner comes before the place phrase."
+      ),
+      placeholderGapItem(
+        "adv-f-slot-8",
+        "Use the verb prompt and place the adverb naturally.",
+        "The garden __________ by next summer. (grow / fully)",
+        "will have fully grown",
+        [],
+        "Future Perfect shows the completed process by a future deadline. 'Fully' modifies the participle."
+      ),
+    ],
+  },
+  {
+    id: "b2-conditionals-and-time-clauses",
+    title: "Logic of the Future: Conditionals & Time Clauses",
+    shortDescription: "Advanced practice with if, unless, in case, and future deadlines.",
+    levels: ["b2"],
+    intro:
+      "Can you navigate the present-tense rule after future linkers? Test your ability to link conditions and consequences without falling for the 'will' trap.",
+    items: [
+      multipleChoiceItem(
+        "ct-mc-1",
+        "Choose the most natural future form.",
+        "If the software ____ updated by tomorrow, the system might crash.",
+        ["isn't being", "won't be", "hasn't been"],
+        2,
+        "We use the present perfect in the 'if' clause to show a condition that must be completed first."
+      ),
+      multipleChoiceItem(
+        "ct-mc-2",
+        "Choose the most natural future form.",
+        "I'll buy some extra snacks ____ our guests are hungrier than expected.",
+        ["if", "unless", "in case"],
+        2,
+        "Use 'in case' for a precaution taken now to prepare for a possible future situation."
+      ),
+      multipleChoiceItem(
+        "ct-mc-3",
+        "Choose the most natural future form.",
+        "We'll have collected all the data ____ the meeting starts at 3:00.",
+        ["until", "by the time", "as soon as"],
+        1,
+        "Use 'by the time' to indicate a deadline for a completed future result."
+      ),
+      multipleChoiceItem(
+        "ct-mc-4",
+        "Choose the most natural future form.",
+        "If they ____ currently working on a solution, we shouldn't interrupt them.",
+        ["are", "will be", "have been"],
+        0,
+        "Zero conditional: use present continuous for an ongoing state that leads to a general result."
+      ),
+      multipleChoiceItem(
+        "ct-mc-5",
+        "Choose the most natural future form.",
+        "I’m not signing the contract ____ my lawyer has checked the small print.",
+        ["when", "until", "after"],
+        1,
+        "Use 'until' to show an action is delayed up to a specific point of completion."
+      ),
+      multipleChoiceItem(
+        "ct-mc-6",
+        "Choose the most natural future form.",
+        "____ you've finished the report, take the rest of the afternoon off.",
+        ["Unless", "As soon as", "In case"],
+        1,
+        "Use 'as soon as' + present perfect to give an imperative based on a finished action."
+      ),
+      multipleChoiceItem(
+        "ct-mc-7",
+        "Choose the most natural future form.",
+        "The battery ____ lasts if you leave the screen brightness on its highest setting.",
+        ["never", "will never", "doesn't usually"],
+        0,
+        "Zero conditional for general truths often uses frequency adverbs like 'never' or 'usually' with the present simple."
+      ),
+      multipleChoiceItem(
+        "ct-mc-8",
+        "Choose the most natural future form.",
+        "I'll call you ____ I see anything suspicious.",
+        ["in case", "if", "unless"],
+        1,
+        "Use 'if' because the phone call only happens if the condition is actually met."
+      ),
+      multipleChoiceItem(
+        "ct-mc-9",
+        "Choose the most natural future form.",
+        "You'll be exhausted tomorrow ____ you get some sleep now.",
+        ["if", "in case", "unless"],
+        2,
+        "Use 'unless' to mean 'except if' or 'if... not'."
+      ),
+      errorCorrectionItem(
+        "ct-ec-1",
+        "Check the tense: Does it follow the 'Present for Future' rule?",
+        "If you will be visiting the city next month, I'll show you around.",
+        "will be visiting",
+        false,
+        ["are visiting", "visit"],
+        "After 'if', use a present tense for future meaning. Present continuous works for an arrangement; present simple also works here."
+      ),
+      errorCorrectionItem(
+        "ct-ec-2",
+        "Check the tense: Does it follow the 'Present for Future' rule?",
+        "Don't worry, the taxi will be waiting in case the train is late.",
+        "is",
+        true,
+        "",
+        "Correct! We use the present simple after 'in case' for a possible future problem."
+      ),
+      errorCorrectionItem(
+        "ct-ec-3",
+        "Check the tense: Does it follow the 'Present for Future' rule?",
+        "We'll stay here until it stops raining.",
+        "stops",
+        true,
+        "",
+        "Correct! Use the present simple after 'until' to talk about the future."
+      ),
+      errorCorrectionItem(
+        "ct-ec-4",
+        "Check the tense: Does it follow the 'Present for Future' rule?",
+        "Unless the weather will improve, we'll have to cancel the match.",
+        "will improve",
+        false,
+        "improves",
+        "After 'unless', use the present simple to describe a future condition."
+      ),
+      errorCorrectionItem(
+        "ct-ec-5",
+        "Check the tense: Does it follow the 'Present for Future' rule?",
+        "As soon as I've found my keys, I'll meet you at the car.",
+        "I've found",
+        true,
+        "",
+        "Correct! The present perfect shows that the first action must be finished first."
+      ),
+      errorCorrectionItem(
+        "ct-ec-6",
+        "Check the tense: Does it follow the 'Present for Future' rule?",
+        "If people are often stressed, they won't sleep well.",
+        "are often stressed",
+        true,
+        "",
+        "Correct! This is a zero conditional describing a general result of a state."
+      ),
+      errorCorrectionItem(
+        "ct-ec-7",
+        "Check the tense: Does it follow the 'Present for Future' rule?",
+        "I'll give you a lift when I'll finish work.",
+        "I'll finish",
+        false,
+        "I finish",
+        "Use the present simple after 'when' to refer to a future time."
+      ),
+      errorCorrectionItem(
+        "ct-ec-8",
+        "Check the tense: Does it follow the 'Present for Future' rule?",
+        "In case you won't hear me, I'll send you a text as well.",
+        "won't hear",
+        false,
+        "don't hear",
+        "After 'in case', we use a present tense to talk about a potential future problem."
+      ),
+      placeholderGapItem(
+        "ct-slot-1",
+        "Choose the best linker: (unless / in case / if)",
+        "Pack an extra power bank __________ your phone battery dies during the hike.",
+        "in case",
+        [],
+        "You pack the bank now as a precaution, regardless of whether the battery actually dies."
+      ),
+      placeholderGapItem(
+        "ct-slot-2",
+        "Choose the best linker: (until / as soon as / when)",
+        "We can't start the presentation __________ everyone has arrived.",
+        "until",
+        [],
+        "The delay continues up to the specific point of arrival."
+      ),
+      placeholderGapItem(
+        "ct-slot-3",
+        "Choose the best linker: (before / after / unless)",
+        "Please back up all your files __________ you turn off your computer.",
+        "before",
+        [],
+        "This describes the necessary sequence of actions."
+      ),
+      placeholderGapItem(
+        "ct-slot-4",
+        "Choose the best linker: (if / in case / unless)",
+        "The alarm goes off __________ anyone tries to open this window.",
+        "if",
+        ["whenever"],
+        "A zero conditional describing a direct cause and effect."
+      ),
+      placeholderGapItem(
+        "ct-slot-5",
+        "Choose the best linker: (as soon as / unless / in case)",
+        "I'll send you the link __________ I get back to my desk.",
+        "as soon as",
+        ["when"],
+        "This shows the action will happen immediately after the first one is complete."
+      ),
+      placeholderGapItem(
+        "ct-slot-6",
+        "Choose the best linker: (unless / until / if)",
+        "Don't click 'subscribe' __________ you've read the terms and conditions.",
+        "unless",
+        ["until"],
+        "Both linkers work here to show a necessary condition or a time limit."
+      ),
+      placeholderGapItem(
+        "ct-slot-7",
+        "Choose the best linker: (after / in case / when)",
+        "I'll keep the receipt __________ the jacket doesn't fit and I need to return it.",
+        "in case",
+        [],
+        "Keeping the receipt is a precaution for a possible future problem."
+      ),
+      placeholderGapItem(
+        "ct-slot-8",
+        "Choose the best linker: (once / until / unless)",
+        "__________ you've tried the new version, you won't want to go back to the old one.",
+        "Once",
+        ["As soon as", "When"],
+        "This indicates that after the experience is complete, the result is certain."
       ),
     ],
   },
