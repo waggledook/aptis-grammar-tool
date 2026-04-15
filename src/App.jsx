@@ -325,10 +325,13 @@ useEffect(() => {
               ...miniTests.map((entry) => ({ id: `mini-test:${studentId}:${entry.id}`, createdAt: entry.createdAt })),
               ...dictationSessions.map((entry) => ({ id: `dictation:${studentId}:${entry.id}`, createdAt: entry.createdAt })),
               ...vocabSets.map((entry) => ({ id: `vocab-topic:${studentId}:${entry.id}`, createdAt: entry.updatedAt })),
-              ...Object.values(readingProgress || {}).map((entry) => ({
-                id: `reading:${studentId}:${entry.part}:${entry.taskId}`,
-                createdAt: entry.updatedAt,
-              })),
+              ...Object.values(readingProgress || {})
+                .sort((a, b) => timestampToMs(b.updatedAt) - timestampToMs(a.updatedAt))
+                .slice(0, 5)
+                .map((entry) => ({
+                  id: `reading:${studentId}:${entry.part}:${entry.taskId}`,
+                  createdAt: entry.updatedAt,
+                })),
             ];
           })
         )
