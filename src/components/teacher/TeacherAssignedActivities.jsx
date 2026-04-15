@@ -412,16 +412,37 @@ export default function TeacherAssignedActivities({ user }) {
     [grammarSets]
   );
 
+  const dictationPresetOptions = useMemo(
+    () =>
+      (assignments || [])
+        .filter(
+          (assignment) =>
+            assignment.activityType === "dictation" &&
+            Array.isArray(assignment.dictationConfig?.sentences) &&
+            assignment.dictationConfig.sentences.length
+        )
+        .map((assignment) => ({
+          id: assignment.id,
+          label: assignment.activityLabel || assignment.taskTitle || "Untitled dictation set",
+          routePath: assignment.routePath || getSitePath("/listening/dictation"),
+          dictationConfig: assignment.dictationConfig,
+        })),
+    [assignments]
+  );
+
   const currentOptions = useMemo(() => {
     if (activityType === "dictation") {
-      return [{ id: "custom-dictation", label: "Custom dictation task", routePath: getSitePath("/listening/dictation") }];
+      return [
+        { id: "custom-dictation", label: "New custom dictation task", routePath: getSitePath("/listening/dictation") },
+        ...dictationPresetOptions,
+      ];
     }
     if (activityType === "grammar-set") return publishedGrammarSetOptions;
     if (activityType === "use-of-english") return useOfEnglishOptions;
     if (activityType === "writing") return WRITING_OPTIONS;
     if (activityType === "speaking") return SPEAKING_OPTIONS;
     return miniTestOptions;
-  }, [activityType, miniTestOptions, publishedGrammarSetOptions, useOfEnglishOptions]);
+  }, [activityType, dictationPresetOptions, miniTestOptions, publishedGrammarSetOptions, useOfEnglishOptions]);
 
   const filteredDictationSentences = useMemo(() => {
     const sourceIds = new Set(dictationSourceSetIds);
@@ -492,6 +513,24 @@ export default function TeacherAssignedActivities({ user }) {
     const exists = currentSpeakingTaskOptions.some((option) => option.id === speakingTaskId);
     if (!exists) setSpeakingTaskId("");
   }, [currentSpeakingTaskOptions, speakingTaskId]);
+
+  useEffect(() => {
+    if (activityType !== "dictation" || !activityId || activityId === "custom-dictation") return;
+
+    const preset = dictationPresetOptions.find((option) => option.id === activityId);
+    if (!preset?.dictationConfig) return;
+
+    const presetSentences = preset.dictationConfig.sentences || [];
+    setDictationTitle(preset.label || "");
+    setDictationSentenceCount(Number(preset.dictationConfig.sentenceCount || presetSentences.length || 5));
+    setDictationSourceSetIds(
+      preset.dictationConfig.sourceSetIds?.length
+        ? preset.dictationConfig.sourceSetIds
+        : [...new Set(presetSentences.map((sentence) => sentence.setId).filter(Boolean))]
+    );
+    setDictationSearch(preset.dictationConfig.search || "");
+    setSelectedDictationSentenceIds(presetSentences.map((sentence) => sentence.id).filter(Boolean));
+  }, [activityId, activityType, dictationPresetOptions]);
 
   function toggleStudent(studentId) {
     setSelectedStudentIds((prev) =>
@@ -679,7 +718,7 @@ export default function TeacherAssignedActivities({ user }) {
             </div>
 
             <label className="field">
-              <span>Activity</span>
+              <span>{activityType === "dictation" ? "Dictation set" : "Activity"}</span>
               <select value={activityId} onChange={(event) => setActivityId(event.target.value)}>
                 {currentOptions.length ? (
                   currentOptions.map((option) => (
