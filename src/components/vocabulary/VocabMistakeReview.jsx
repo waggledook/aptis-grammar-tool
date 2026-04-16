@@ -6,6 +6,7 @@ import {
   resolveVocabMistake,
 } from "../../firebase";
 import { TOPIC_DATA } from "./data/vocabTopics";
+import { isAcceptedAnswer, normalizeAnswers } from "./utils/vocabAnswers";
 
 export default function VocabMistakeReview({ onBack }) {
   const [items, setItems] = useState([]);
@@ -15,7 +16,6 @@ export default function VocabMistakeReview({ onBack }) {
   const [typedAnswer, setTypedAnswer] = useState("");
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [showReviewImage, setShowReviewImage] = useState(false);
 
   const inputRef = useRef(null);
 
@@ -50,11 +50,6 @@ export default function VocabMistakeReview({ onBack }) {
   useEffect(() => {
     if (inputRef.current) inputRef.current.focus();
   }, [index, showFeedback]);
-
-  // Reset picture clue on item change
-  useEffect(() => {
-    setShowReviewImage(false);
-  }, [index]);
 
   if (loading) {
     return (
@@ -91,10 +86,7 @@ export default function VocabMistakeReview({ onBack }) {
 
   const current = items[index];
 
-  const acceptable = current.correctAnswer
-    .split("/")
-    .map((a) => a.trim().toLowerCase())
-    .filter(Boolean);
+  const acceptable = normalizeAnswers(current.correctAnswer);
 
   // Try to find a matching pair for picture clue
   let cluePair = null;
@@ -118,8 +110,7 @@ export default function VocabMistakeReview({ onBack }) {
   }
 
   function checkAnswer() {
-    const user = typedAnswer.trim().toLowerCase();
-    const ok = acceptable.includes(user);
+    const ok = isAcceptedAnswer(typedAnswer, current.correctAnswer);
     setIsCorrect(ok);
     setShowFeedback(true);
 
@@ -133,7 +124,6 @@ export default function VocabMistakeReview({ onBack }) {
         setIndex((prev) => Math.min(prev, items.length - 2));
         setTypedAnswer("");
         setShowFeedback(false);
-        setShowReviewImage(false);
       }, 1200);
     }
   }
@@ -147,7 +137,6 @@ export default function VocabMistakeReview({ onBack }) {
     }
     setTypedAnswer("");
     setShowFeedback(false);
-    setShowReviewImage(false);
   }
 
   return (
@@ -172,23 +161,13 @@ export default function VocabMistakeReview({ onBack }) {
 
         {cluePair && cluePair.image && (
           <div className="clue-area">
-            <button
-              type="button"
-              className="clue-btn"
-              onClick={() => setShowReviewImage((prev) => !prev)}
-            >
-              {showReviewImage ? "Hide picture clue" : "Picture clue"}
-            </button>
-
-            {showReviewImage && (
-              <div className="clue-image-wrapper">
-                <img
-                  src={cluePair.image}
-                  alt={cluePair.term}
-                  className="clue-image"
-                />
-              </div>
-            )}
+            <div className="clue-image-wrapper">
+              <img
+                src={cluePair.image}
+                alt={cluePair.term}
+                className="clue-image"
+              />
+            </div>
           </div>
         )}
 

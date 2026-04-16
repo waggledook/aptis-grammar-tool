@@ -60,6 +60,22 @@ export default function VocabularyTopics({
 
   const topics = [
     {
+      id: "education",
+      name: "Education",
+      emoji: "🏫",
+      desc: "School, university, exams...",
+      active: true,
+      isNew: true,
+    },
+    {
+      id: "tv_cinema",
+      name: "TV & Cinema",
+      emoji: "🎬",
+      desc: "TV programmes, film genres, and screen vocabulary.",
+      active: true,
+      isNew: true,
+    },
+    {
       id: "travel",
       name: "Travel",
       emoji: "🧳",
@@ -117,13 +133,6 @@ export default function VocabularyTopics({
     },
     // ── Coming soon topics ───────────────────────────
     {
-      id: "education",
-      name: "Education",
-      emoji: "🏫",
-      desc: "School, university, exams...",
-      // active: false  // omitted → treated as 'coming soon' by lack of active
-    },
-    {
       id: "technology",
       name: "Technology",
       emoji: "💻",
@@ -142,7 +151,7 @@ export default function VocabularyTopics({
 
       <UnderConstructionPanel
   title="Topic practice in progress"
-  message="Right now the Travel, Work, Describing people, Relationships, Health, and Clothes & accessories topics are available. More topics (Education, Technology, Food, etc.) are on the way!"
+  message="Right now you can practise Travel, Work, Describing people, Relationships, Health, Clothes & accessories, Describing feelings, Food, Education, and TV & Cinema. More topics, including Technology, are on the way!"
 />
 
 
@@ -186,7 +195,11 @@ export default function VocabularyTopics({
               <h3>
                 <span style={{ fontSize: "1.3rem" }}>{t.emoji}</span> {t.name}
               </h3>
-              {!t.active && <span className="soon-pill">Coming soon</span>}
+              {t.isNew ? (
+                <span className="new-pill">New</span>
+              ) : !t.active ? (
+                <span className="soon-pill">Coming soon</span>
+              ) : null}
             </div>
             <p>{t.desc}</p>
           </button>
@@ -262,6 +275,18 @@ export default function VocabularyTopics({
           padding: .2rem .5rem;
           border-radius: 999px;
           font-weight: 600;
+          white-space: nowrap;
+        }
+
+        .new-pill {
+          background: rgba(255, 196, 86, 0.14);
+          border: 1px solid rgba(255, 196, 86, 0.42);
+          color: #ffd36a;
+          font-size: .75rem;
+          line-height: 1.2;
+          padding: .2rem .55rem;
+          border-radius: 999px;
+          font-weight: 700;
           white-space: nowrap;
         }
 

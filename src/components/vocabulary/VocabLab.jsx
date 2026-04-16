@@ -366,10 +366,10 @@ if (!started) {
         items={sessionItems}
         onBack={exitSession}
         isAuthenticated={isSignedIn}
-        storageKey="vocabFlashcards_lab"
         logTopic="lab"
+        enableSavedMode={false}
         title="Vocab Lab • Flashcards"
-        subtitle="Flip each card, mark whether you knew it, then practise only the wrong ones."
+        subtitle="Flip through a mixed deck of cards from your chosen topics."
       />
     );
   }

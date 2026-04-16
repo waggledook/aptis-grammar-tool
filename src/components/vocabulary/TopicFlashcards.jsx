@@ -1,26 +1,8 @@
 // src/components/vocabulary/TopicFlashcards.jsx
 import React, { useMemo } from "react";
 import FlashcardsPlayer from "./FlashcardsPlayer";
-
-import { travelData } from "./data/travelData";
-import { workData } from "./data/workData";
-import { peopleData } from "./data/peopleData";
-import { relationshipsData } from "./data/relationshipsData";
-import { healthData } from "./data/healthData";
-import { clothesData } from "./data/clothesData";
-import { emotionsData } from "./data/emotionsData";
-import { foodData } from "./data/foodData";
-
-const TOPIC_DATA = {
-  travel: travelData,
-  work: workData,
-  people: peopleData,
-  relationships: relationshipsData,
-  health: healthData,
-  clothes: clothesData,
-  emotions: emotionsData,
-  food: foodData,
-};
+import { TOPIC_DATA } from "./data/vocabTopics";
+import { makeVocabFavouriteId } from "./utils/vocabFavourites";
 
 export default function TopicFlashcards({ topic, onBack, isAuthenticated = false }) {
   const topicInfo = TOPIC_DATA[topic] || null;
@@ -50,6 +32,11 @@ export default function TopicFlashcards({ topic, onBack, isAuthenticated = false
     return allowedSets.flatMap((set) =>
       (set.pairs || []).map((p) => ({
         key: `${set.id}::${p.term}`, // keep existing key format
+        favouriteId: makeVocabFavouriteId({
+          topicId: topic,
+          setId: set.id,
+          term: p.term,
+        }),
         term: p.term,
         definition: p.definition,
         image: p.image,
@@ -71,10 +58,10 @@ export default function TopicFlashcards({ topic, onBack, isAuthenticated = false
         items={fullDeck}
         onBack={onBack}
         isAuthenticated={isAuthenticated}
-        storageKey={`vocabFlashcards_${topic}`}
         logTopic={topic}
+        savedModeLabel={`Saved in ${topicInfo.topicTitle || topic}`}
         title={`${topic} • Flashcards`}
-        subtitle="Flip each card to check the answer. Mark whether you knew it or not, then review only the unknown cards."
+        subtitle="Flip through the cards, save useful ones, and come back to your saved set anytime."
       />
     </>
   );

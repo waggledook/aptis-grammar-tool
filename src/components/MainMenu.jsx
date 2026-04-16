@@ -31,16 +31,16 @@ export default function MainMenu({ onSelect, user }) {
   <div className="whats-new-copy">
     <span className="whats-new-label">What’s new</span>
     <p>
-      <strong>New Adverbs tag in Grammar Practice</strong> Filter by Adverbs for fresh practice on
-      adverb position, degree, frequency, and tricky forms like hard/hardly.
+      <strong>New topic sets in Vocabulary Practice</strong> Try the new
+      Education and TV & Cinema collections in Topic Trainer.
     </p>
   </div>
 
   <button
     className="whats-new-btn"
-    onClick={() => navigate("/grammar")}
+    onClick={() => navigate("/vocabulary/topics")}
   >
-    Open grammar
+    Open vocabulary
   </button>
 </div>
 

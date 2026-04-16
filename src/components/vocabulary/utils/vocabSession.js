@@ -1,4 +1,5 @@
 import { TOPIC_DATA } from "../data/vocabTopics";
+import { makeVocabFavouriteId } from "./vocabFavourites";
 
 function shuffle(arr) {
   const a = [...arr];
@@ -41,6 +42,11 @@ export function flattenFlashcardPool(selectedTopicIds) {
         pool.push({
           kind: "flashcard",
           key: `${topicId}__${setId}__p${i}`,
+          favouriteId: makeVocabFavouriteId({
+            topicId,
+            setId,
+            term: p.term,
+          }),
           topicId,
           topicTitle: topic.topicTitle || topic.title || topicId,
           setId,

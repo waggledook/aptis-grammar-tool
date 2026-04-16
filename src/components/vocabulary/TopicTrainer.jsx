@@ -50,6 +50,19 @@ export default function TopicTrainer({ topic, onBack, onShowFlashcards, initialS
     hasLoggedMatchForSet.current = false;
   }, [activeSetId]);
 
+  useEffect(() => {
+    setMatchedTerms([]);
+    setMatchedDefs([]);
+    setSelectedDef(null);
+    setSelectedTerm(null);
+    setFeedbackFlash(null);
+    setShakeDef(null);
+    setShakeTerm(null);
+    setPulseItems({ def: null, term: null });
+    setShowDefs({});
+    setPhase("match");
+  }, [activeSetId]);
+
     const activeProg = activeSetId ? vocabProgress[activeSetId] || {} : {};
     const reviewAlreadyDone = !!activeProg.completedReview;
   
@@ -217,46 +230,6 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
         </p>
       </header>
 
-            {/* Compact SET selector – only after a set is chosen */}
-            {hasChosenSet && (
-  <div className="set-tabs">
-    <span className="set-label">Set:</span>
-    <div className="set-pill-row">
-      {topicInfo.sets.map((set, idx) => {
-        const setId = set.id || String(idx);
-        const prog = vocabProgress[setId] || {};
-        const done = !!prog.completedReview; // ✅ finished review at least once
-
-        return (
-          <button
-            key={setId}
-            className={
-              "set-pill " +
-              (idx === setIndex ? "active" : "") +
-              (!isSignedIn && idx >= 2 ? " locked" : "")
-            }
-            onClick={() => {
-              // 🔒 guests only get first two sets
-              if (!isSignedIn && idx >= 2) {
-                toast("Sign in to unlock this set 🔒");
-                return;
-              }
-              setSetIndex(idx);
-              setHasChosenSet(true);
-              onSetChange?.(setId);
-            }}
-          >
-            <span className="set-pill-title">{set.title}</span>
-            {done && <span className="set-pill-check">✓</span>}
-          </button>
-        );
-      })}
-    </div>
-  </div>
-)}
-
-
-
       {/* If no set selected yet, show intro + big buttons */}
 {!hasChosenSet && (
   <div className="card set-select">
@@ -267,9 +240,7 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
       {topicInfo.sets.map((set, idx) => (
         <button
           key={set.id}
-          className={
-            "review-btn" + (!isSignedIn && idx >= 2 ? " locked" : "")
-          }
+          className={`control-pill set-choice-pill${!isSignedIn && idx >= 2 ? " locked" : ""}`}
           onClick={() => {
             if (!isSignedIn && idx >= 2) {
               toast("Sign in to unlock this set 🔒");
@@ -288,45 +259,76 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
   </div>
 )}
 
-      {/* Flashcards CTA – now below the set chooser */}
-      {onShowFlashcards && (
-        <div className="flashcards-cta">
-          <button
-            className="flashcards-btn"
-            onClick={onShowFlashcards}
-          >
-            🃏 Flashcards for this topic
-          </button>
-          <p className="flashcards-sub">
-            Review all the words in this topic as simple flip cards.
-          </p>
-        </div>
-      )}
-
-      {/* PHASE TOGGLE / PROGRESSION – only once a set is chosen */}
       {hasChosenSet && (
-        <div className="stage-tabs">
-          <button
-            className={`tab-btn ${phase === "match" ? "active" : ""}`}
-            onClick={() => setPhase("match")}
-          >
-            🔗 Match
-          </button>
-          <button
-            className={`tab-btn ${phase === "review" ? "active" : ""}`}
-            onClick={() => setPhase("review")}
-          >
-            ✍️ Review
-          </button>
-          {activeSet ? (
-            <VocabAssignButton
-              user={user}
-              topicId={topic}
-              setId={activeSetId}
-              topicTitle={topicInfo?.topicTitle || topic}
-              setTitle={activeSet.title}
-            />
-          ) : null}
+        <div className="card topic-toolbar">
+          <div className="toolbar-row toolbar-row-top">
+            <span className="set-label">Set</span>
+            <div className="set-pill-row">
+              {topicInfo.sets.map((set, idx) => {
+                const setId = set.id || String(idx);
+                const prog = vocabProgress[setId] || {};
+                const done = !!prog.completedReview;
+
+                return (
+                  <button
+                    key={setId}
+                    className={
+                      "set-pill " +
+                      (idx === setIndex ? "active" : "") +
+                      (!isSignedIn && idx >= 2 ? " locked" : "")
+                    }
+                    onClick={() => {
+                      if (!isSignedIn && idx >= 2) {
+                        toast("Sign in to unlock this set 🔒");
+                        return;
+                      }
+                      setSetIndex(idx);
+                      setHasChosenSet(true);
+                      onSetChange?.(setId);
+                    }}
+                  >
+                    <span className="set-pill-title">{set.title}</span>
+                    {done && <span className="set-pill-check">✓</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="toolbar-row toolbar-row-bottom">
+            {onShowFlashcards && (
+              <button
+                className="control-pill flashcards-btn"
+                onClick={onShowFlashcards}
+              >
+                🃏 Topic flashcards
+              </button>
+            )}
+
+            <div className="stage-tabs">
+              <button
+                className={`control-pill stage-pill ${phase === "match" ? "active" : ""}`}
+                onClick={() => setPhase("match")}
+              >
+                🔗 Match
+              </button>
+              <button
+                className={`control-pill stage-pill ${phase === "review" ? "active" : ""}`}
+                onClick={() => setPhase("review")}
+              >
+                ✍️ Review
+              </button>
+              {activeSet ? (
+                <VocabAssignButton
+                  user={user}
+                  topicId={topic}
+                  setId={activeSetId}
+                  topicTitle={topicInfo?.topicTitle || topic}
+                  setTitle={activeSet.title}
+                />
+              ) : null}
+            </div>
+          </div>
         </div>
       )}
 
@@ -455,6 +457,7 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
             {/* PHASE 2: REVIEW — shared player */}
 {hasChosenSet && phase === "review" && activeSet && (
   <VocabReviewPlayer
+    key={activeSetId || `${topic}-${setIndex}`}
     items={shuffledReview.map((it) => ({
       topicId: topic,
       setId: activeSetId,
@@ -516,33 +519,85 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
       <style>{`
         .stage-tabs {
           display:flex;
-          justify-content:center;
-          gap:1rem;
-          margin-bottom:1rem;
+          justify-content:flex-start;
+          gap:.75rem;
           flex-wrap:wrap;
-        }
-        .tab-btn {
-          background:#101b32;
-          border:1px solid #2c4b83;
-          border-radius:8px;
-          color:#cfd9f3;
-          padding:.5rem 1rem;
-          cursor:pointer;
-          transition:all .15s ease;
-        }
-        .tab-btn.active {
-          background:#1f3560;
-          border-color:#4a79d8;
-          color:#fff;
+          align-items:center;
+          margin:0;
         }
 
-                .set-tabs {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: center;
+        .control-pill {
+          border-radius: 999px;
+          border: 1px solid #31528e;
+          background: linear-gradient(180deg, #17284a 0%, #101b32 100%);
+          color: #d9e4ff;
+          padding: .55rem 1rem;
+          font-size: .95rem;
+          font-weight: 700;
+          line-height: 1.1;
+          cursor: pointer;
+          transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+        }
+
+        .control-pill:hover {
+          transform: translateY(-1px);
+          border-color: #4a79d8;
+          background: linear-gradient(180deg, #1b3159 0%, #142547 100%);
+          box-shadow: 0 4px 12px rgba(0,0,0,.2);
+        }
+
+        .control-pill.active,
+        .set-pill.active {
+          background: linear-gradient(180deg, #4c67b8 0%, #3d549b 100%);
+          border-color: #6f87cd;
+          color: #ffffff;
+          box-shadow: 0 6px 16px rgba(44,71,140,.26);
+        }
+
+        .control-pill.locked,
+        .set-pill.locked {
+          opacity: .58;
+          cursor: not-allowed;
+          box-shadow: none;
+        }
+
+        .control-pill.locked:hover,
+        .set-pill.locked:hover {
+          transform: none;
+          background: linear-gradient(180deg, #17284a 0%, #101b32 100%);
+          border-color: #31528e;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+        }
+
+        .stage-pill {
+          min-width: 108px;
           justify-content: center;
-          gap: .5rem .75rem;
-          margin-bottom: 1rem;
+        }
+
+        .topic-toolbar {
+          display:grid;
+          gap:1rem;
+          padding:1rem 1.1rem;
+        }
+
+        .toolbar-row {
+          display:flex;
+          flex-wrap:wrap;
+          align-items:center;
+          gap:.75rem 1rem;
+        }
+
+        .toolbar-row-top {
+          align-items:flex-start;
+          padding-bottom: .9rem;
+          border-bottom: 1px solid rgba(111, 135, 205, 0.24);
+        }
+
+        .toolbar-row-bottom {
+          justify-content:space-between;
+          gap: .9rem 1rem;
+          padding-top: .15rem;
         }
 
         .set-label {
@@ -550,35 +605,74 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
           text-transform: uppercase;
           letter-spacing: .08em;
           color: #9fb0e0;
+          min-width: 2.5rem;
+          padding-top: .45rem;
         }
 
         .set-pill-row {
           display: flex;
           flex-wrap: wrap;
           gap: .5rem;
+          flex:1;
         }
 
         .set-pill {
           border-radius: 999px;
-          border: 1px solid #2c4b83;
-          background: #101b32;
-          color: #cfd9f3;
-          padding: .25rem .8rem;
-          font-size: .85rem;
+          border: 1px solid #31528e;
+          background: linear-gradient(180deg, #17284a 0%, #101b32 100%);
+          color: #d9e4ff;
+          padding: .45rem .95rem;
+          font-size: .92rem;
+          font-weight: 700;
           cursor: pointer;
-          transition: all .15s ease;
+          transition: transform .14s ease, background .14s ease, border-color .14s ease, box-shadow .14s ease;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
         }
 
         .set-pill:hover {
-          background: #182544;
-        }
-
-        .set-pill.active {
-          background: #1f3560;
+          transform: translateY(-1px);
           border-color: #4a79d8;
-          color: #fff;
+          background: linear-gradient(180deg, #1b3159 0%, #142547 100%);
+          box-shadow: 0 4px 12px rgba(0,0,0,.2);
         }
 
+        .set-pill-title {
+          display:inline-flex;
+          align-items:center;
+          gap:.4rem;
+        }
+
+        .set-pill-check {
+          font-size:.9rem;
+          opacity:.95;
+        }
+
+        .set-select {
+          text-align:center;
+          max-width: 1100px;
+          margin-inline: auto;
+        }
+
+        .set-select .phase-intro {
+          font-size:1rem;
+          margin-bottom:1.15rem;
+        }
+
+        .set-choice-pill {
+          min-width: 240px;
+          justify-content:center;
+        }
+
+        .flashcards-btn {
+          min-width: 190px;
+          justify-content:center;
+        }
+
+        .topic-toolbar .review-btn {
+          border-radius: 999px;
+          padding: .55rem 1rem;
+          min-width: 108px;
+        }
 
         .card {
           background:#13213b;
@@ -605,6 +699,23 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
         @media(min-width:700px){
           .match-columns {
             flex-direction:row;
+          }
+        }
+
+        @media (max-width: 720px) {
+          .set-choice-pill,
+          .flashcards-btn,
+          .topic-toolbar .review-btn {
+            min-width: unset;
+            width: 100%;
+          }
+
+          .toolbar-row-bottom {
+            justify-content:flex-start;
+          }
+
+          .stage-tabs {
+            width:100%;
           }
         }
 

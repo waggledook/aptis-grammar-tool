@@ -2,6 +2,7 @@
 import React, { useMemo, useRef, useState, useEffect } from "react";
 import { recordVocabMistake } from "../../firebase";
 import { TOPIC_DATA } from "./data/vocabTopics";
+import { isAcceptedAnswer, normalizeAnswers } from "./utils/vocabAnswers";
 
 function escRe(s) {
   return String(s).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -21,14 +22,6 @@ function tokenMatch(term, opt) {
   if (reTermInOpt.test(o)) return true;
 
   return false;
-}
-
-function normalizeAnswers(answerStr) {
-  return String(answerStr || "")
-    .toLowerCase()
-    .split(/[\/,]/g)
-    .map((a) => a.trim())
-    .filter(Boolean);
 }
 
 function getPairsFor(topicId, setId) {
@@ -57,7 +50,6 @@ export default function VocabReviewPlayer({
   const [typedAnswer, setTypedAnswer] = useState("");
   const [showReviewFeedback, setShowReviewFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
-  const [showReviewImage, setShowReviewImage] = useState(false);
 
   const [mistakes, setMistakes] = useState([]); // store review items
   const [mistakeMode, setMistakeMode] = useState(false);
@@ -113,10 +105,7 @@ export default function VocabReviewPlayer({
   function checkTypedAnswer() {
     if (!reviewItem) return;
 
-    const cleanUser = typedAnswer.trim().toLowerCase();
-    const acceptable = normalizeAnswers(reviewItem.answer);
-
-    const correct = acceptable.includes(cleanUser);
+    const correct = isAcceptedAnswer(typedAnswer, reviewItem.answer);
     setIsCorrect(correct);
     setShowReviewFeedback(true);
 
@@ -149,8 +138,6 @@ export default function VocabReviewPlayer({
   function nextReview() {
     const list = mistakeMode ? mistakes : items;
 
-    setShowReviewImage(false);
-
     const next = reviewIndex + 1;
     if (next < list.length) {
       setReviewIndex(next);
@@ -172,7 +159,6 @@ export default function VocabReviewPlayer({
     setTypedAnswer("");
     setShowReviewFeedback(false);
     setIsCorrect(false);
-    setShowReviewImage(false);
   }
 
   function restartFullReview() {
@@ -183,7 +169,6 @@ export default function VocabReviewPlayer({
     setTypedAnswer("");
     setShowReviewFeedback(false);
     setIsCorrect(false);
-    setShowReviewImage(false);
   }
 
   if (!items.length) {
@@ -226,23 +211,13 @@ export default function VocabReviewPlayer({
 
             {cluePair && cluePair.image ? (
               <div className="clue-area">
-                <button
-                  type="button"
-                  className="clue-btn"
-                  onClick={() => setShowReviewImage((prev) => !prev)}
-                >
-                  {showReviewImage ? "Hide picture clue" : "Picture clue"}
-                </button>
-
-                {showReviewImage && (
-                  <div className="clue-image-wrapper">
-                    <img
-                      src={cluePair.image}
-                      alt={cluePair.term}
-                      className="clue-image"
-                    />
-                  </div>
-                )}
+                <div className="clue-image-wrapper">
+                  <img
+                    src={cluePair.image}
+                    alt={cluePair.term}
+                    className="clue-image"
+                  />
+                </div>
               </div>
             ) : null}
 
@@ -379,19 +354,6 @@ export default function VocabReviewPlayer({
     align-items:center;
     gap:.75rem;
     margin:.2rem 0 1rem;
-  }
-
-  .clue-btn{
-    background:#101b32;
-    border:1px solid #2c4b83;
-    color:#e6f0ff;
-    padding:.55rem 1.1rem;
-    border-radius:12px;
-    cursor:pointer;
-  }
-
-  .clue-btn:hover{
-    border-color:#4a79d8;
   }
 
   .clue-image-wrapper{
