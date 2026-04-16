@@ -2372,7 +2372,16 @@ function renderHubAccessControl(u, compact = false) {
                       ))}
                     </div>
 
-                    <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end" }}>
+                    <div style={{ marginTop: "1rem", display: "flex", justifyContent: "flex-end", gap: "0.75rem", flexWrap: "wrap" }}>
+                      <button
+                        type="button"
+                        className="ghost-btn"
+                        onClick={() =>
+                          navigate(`/teacher/course-test-report/${reviewSession.id}/${selectedAttempt.id}`)
+                        }
+                      >
+                        Printable report
+                      </button>
                       <button type="button" className="btn" onClick={handleSaveReview} disabled={reviewSaving}>
                         {reviewSaving ? "Saving..." : "Save review"}
                       </button>

@@ -70,6 +70,7 @@ import AdminActivityLog from "./components/admin/AdminActivityLog.jsx";
 import AdminActivityCharts from "./components/admin/AdminActivityCharts";
 import TeacherTools from "./components/teacher/TeacherTools"; // ← Add this
 import MyStudents from "./components/teacher/MyStudents";
+import TeacherCourseTestPrintableReport from "./components/teacher/TeacherCourseTestPrintableReport.jsx";
 import TeacherStudentProfile from "./components/TeacherStudentProfile";
 import CookieBanner from "./components/CookieBanner.jsx";
 import PrivacyPolicy from "./components/legal/PrivacyPolicy.jsx";
@@ -1433,6 +1434,11 @@ return (
       onUnreadCountChange={syncTeacherUnreadCount}
     />
   }
+/>
+
+<Route
+  path="/teacher/course-test-report/:sessionId/:attemptId"
+  element={<TeacherCourseTestPrintableReport user={user} />}
 />
 
 <Route path="/live/join" element={<LiveGameJoin />} />

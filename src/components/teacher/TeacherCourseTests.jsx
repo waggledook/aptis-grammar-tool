@@ -1360,6 +1360,15 @@ export default function TeacherCourseTests({ user }) {
                     </div>
 
                     <div className="teacher-course-actions">
+                      <button
+                        type="button"
+                        className="ghost-btn"
+                        onClick={() =>
+                          navigate(getSitePath(`/teacher/course-test-report/${reviewSession.id}/${selectedAttempt.id}`))
+                        }
+                      >
+                        Printable report
+                      </button>
                       <button type="button" className="btn" onClick={handleSaveReview} disabled={reviewSaving}>
                         {reviewSaving ? "Saving..." : "Save review"}
                       </button>
