@@ -38,6 +38,31 @@ function formatDateTime(value) {
   }).format(date);
 }
 
+function normalizeStudentLookup(value = "") {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function getStudentRequestLookup(request = {}) {
+  return (
+    request.studentLookup ||
+    request.studentEmail ||
+    request.studentLookupLower ||
+    request.studentEmailLower ||
+    ""
+  );
+}
+
+function labelForUser(user = {}) {
+  return user.displayName || user.name || user.username || user.email || user.id || "Student";
+}
+
+function getUserLookupText(user = {}) {
+  return [user.email, user.username, user.name, user.displayName, user.id]
+    .filter(Boolean)
+    .map((value) => normalizeStudentLookup(value))
+    .join(" ");
+}
+
 function stripHtmlToText(html = "") {
   if (typeof document === "undefined") {
     return String(html).replace(/<[^>]*>/g, " ");
@@ -412,15 +437,17 @@ export default function AdminDashboard({ user }) {
     }
   }
 
-  async function resolveStudentRequest(request, status) {
+  async function resolveStudentRequest(request, status, matchedStudent = null) {
     if (!request?.id) return;
 
-    const student = users.find(
-      (entry) => (entry.email || "").trim().toLowerCase() === request.studentEmailLower
-    );
+    const lookup = normalizeStudentLookup(getStudentRequestLookup(request));
+    const student =
+      matchedStudent ||
+      users.find((entry) => entry.role === "student" && normalizeStudentLookup(entry.email) === lookup) ||
+      null;
 
     if (status === "approved" && !student) {
-      window.alert("No user with that email exists yet.");
+      window.alert("Choose a matching student account before approving.");
       return;
     }
 
@@ -451,7 +478,8 @@ export default function AdminDashboard({ user }) {
 
       if (student) {
         patch.studentUid = student.id;
-        patch.studentName = student.displayName || student.name || student.username || student.email || student.id;
+        patch.studentName = labelForUser(student);
+        patch.matchedLookup = lookup;
       }
 
       await updateDoc(doc(db, "teacherStudentRequests", request.id), patch);
@@ -969,6 +997,26 @@ function renderHubAccessControl(u, compact = false) {
     return t ? labelForTeacher(t).toLowerCase() : "";
   };
 
+  const getStudentRequestMatches = (request) => {
+    const lookup = normalizeStudentLookup(getStudentRequestLookup(request));
+    if (!lookup) return [];
+
+    return users
+      .filter((entry) => entry.role === "student" && getUserLookupText(entry).includes(lookup))
+      .sort((a, b) => {
+        const aEmail = normalizeStudentLookup(a.email) === lookup ? 0 : 1;
+        const bEmail = normalizeStudentLookup(b.email) === lookup ? 0 : 1;
+        if (aEmail !== bEmail) return aEmail - bEmail;
+
+        const aUsername = normalizeStudentLookup(a.username) === lookup ? 0 : 1;
+        const bUsername = normalizeStudentLookup(b.username) === lookup ? 0 : 1;
+        if (aUsername !== bUsername) return aUsername - bUsername;
+
+        return labelForUser(a).localeCompare(labelForUser(b));
+      })
+      .slice(0, 5);
+  };
+
   // NEW: filter by teacher / assignment
   let filtered = users;
   if (teacherFilter === "no-teacher") {
@@ -1238,11 +1286,11 @@ function renderHubAccessControl(u, compact = false) {
             ) : (
               <div style={{ display: "grid", gap: "0.7rem" }}>
                 {pendingStudentRequests.map((request) => {
-                  const student = users.find(
-                    (entry) => (entry.email || "").trim().toLowerCase() === request.studentEmailLower
-                  );
+                  const matches = getStudentRequestMatches(request);
+                  const firstMatch = matches[0] || null;
                   const teacher = teachers.find((entry) => entry.id === request.teacherUid);
                   const busy = resolvingRequestId === request.id;
+                  const lookup = getStudentRequestLookup(request);
 
                   return (
                     <section
@@ -1261,31 +1309,50 @@ function renderHubAccessControl(u, compact = false) {
                     >
                       <div>
                         <div style={{ color: "#f8fafc", fontWeight: 700 }}>
-                          {request.studentEmail || request.studentEmailLower}
+                          {lookup}
                         </div>
                         <div style={{ color: "#94a3b8", fontSize: "0.84rem", marginTop: "0.25rem" }}>
                           Requested by {request.teacherName || request.teacherEmail || labelForTeacher(teacher || {}) || request.teacherUid}
                           {request.createdAt ? ` · ${formatDateTime(request.createdAt)}` : ""}
                         </div>
-                        {!student ? (
+                        {!matches.length ? (
                           <div style={{ color: "#fbbf24", fontSize: "0.8rem", marginTop: "0.35rem" }}>
-                            No matching user exists yet.
+                            No matching student account found yet.
                           </div>
-                        ) : student.teacherId && student.teacherId !== request.teacherUid ? (
+                        ) : firstMatch.teacherId && firstMatch.teacherId !== request.teacherUid ? (
                           <div style={{ color: "#fbbf24", fontSize: "0.8rem", marginTop: "0.35rem" }}>
-                            Currently linked to {teacherLabelForStudent(student) || "another teacher"}.
+                            First match is currently linked to {teacherLabelForStudent(firstMatch) || "another teacher"}.
                           </div>
                         ) : null}
+                        {matches.length > 1 && (
+                          <div style={{ color: "#cbd5e1", fontSize: "0.8rem", marginTop: "0.35rem" }}>
+                            {matches.length} possible matches found. Approve the correct account below.
+                          </div>
+                        )}
                       </div>
                       <div style={{ display: "flex", gap: "0.55rem", flexWrap: "wrap" }}>
-                        <button
-                          type="button"
-                          className="review-btn"
-                          onClick={() => resolveStudentRequest(request, "approved")}
-                          disabled={busy || !student}
-                        >
-                          {busy ? "Saving..." : "Approve"}
-                        </button>
+                        {matches.length <= 1 ? (
+                          <button
+                            type="button"
+                            className="review-btn"
+                            onClick={() => resolveStudentRequest(request, "approved", firstMatch)}
+                            disabled={busy || !firstMatch}
+                          >
+                            {busy ? "Saving..." : "Approve"}
+                          </button>
+                        ) : (
+                          matches.map((student) => (
+                            <button
+                              key={student.id}
+                              type="button"
+                              className="review-btn"
+                              onClick={() => resolveStudentRequest(request, "approved", student)}
+                              disabled={busy}
+                            >
+                              {busy ? "Saving..." : `Approve ${labelForUser(student)}`}
+                            </button>
+                          ))
+                        )}
                         <button
                           type="button"
                           className="ghost-btn"

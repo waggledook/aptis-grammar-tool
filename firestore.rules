@@ -389,8 +389,12 @@ service cloud.firestore {
       allow create: if isTeacherOrAdmin()
         && request.resource.data.teacherUid == request.auth.uid
         && request.resource.data.status == "pending"
-        && request.resource.data.studentEmailLower is string
-        && request.resource.data.studentEmailLower.size() > 3;
+        && (
+          (request.resource.data.studentLookupLower is string
+            && request.resource.data.studentLookupLower.size() > 2) ||
+          (request.resource.data.studentEmailLower is string
+            && request.resource.data.studentEmailLower.size() > 3)
+        );
 
       allow get, list: if isAdmin() || (
         isTeacherOrAdmin() &&

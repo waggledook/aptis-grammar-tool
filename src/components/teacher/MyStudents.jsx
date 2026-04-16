@@ -57,6 +57,34 @@ function formatRelative(value) {
   return formatDate(value);
 }
 
+function normalizeStudentLookup(value = "") {
+  return String(value || "").trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function getStudentRequestLookup(request = {}) {
+  return (
+    request.studentLookup ||
+    request.studentEmail ||
+    request.studentLookupLower ||
+    request.studentEmailLower ||
+    ""
+  );
+}
+
+function studentMatchesLookup(studentRow = {}, lookup = "") {
+  const normalizedLookup = normalizeStudentLookup(lookup);
+  if (!normalizedLookup) return false;
+
+  return [
+    studentRow.email,
+    studentRow.username,
+    studentRow.name,
+    studentRow.displayName,
+  ]
+    .filter(Boolean)
+    .some((value) => normalizeStudentLookup(value).includes(normalizedLookup));
+}
+
 function looksLikeHtml(text = "") {
   return /<([a-z][\w:-]*)\b[^>]*>/i.test(text);
 }
@@ -695,7 +723,7 @@ export default function MyStudents({
   const [searchTerm, setSearchTerm] = useState("");
   const [classFilter, setClassFilter] = useState("all");
   const [sortBy, setSortBy] = useState("recent");
-  const [requestEmail, setRequestEmail] = useState("");
+  const [requestLookup, setRequestLookup] = useState("");
   const [studentRequests, setStudentRequests] = useState([]);
   const [requestingStudent, setRequestingStudent] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
@@ -931,23 +959,26 @@ export default function MyStudents({
     event.preventDefault();
     if (!canView || !userUid) return;
 
-    const studentEmail = requestEmail.trim().toLowerCase();
-    if (!studentEmail || !studentEmail.includes("@")) {
-      toast("Enter the student's email address.");
+    const studentLookup = requestLookup.trim();
+    const studentLookupLower = normalizeStudentLookup(studentLookup);
+    const looksLikeEmail = studentLookupLower.includes("@");
+
+    if (studentLookupLower.length < 3) {
+      toast("Enter a student email, username, or name.");
       return;
     }
 
-    const alreadyLinked = students.some((studentRow) => (studentRow.email || "").trim().toLowerCase() === studentEmail);
+    const alreadyLinked = students.some((studentRow) => studentMatchesLookup(studentRow, studentLookupLower));
     if (alreadyLinked) {
       toast("That student is already linked to you.");
       return;
     }
 
     const alreadyPending = studentRequests.some(
-      (request) => request.status === "pending" && request.studentEmailLower === studentEmail
+      (request) => request.status === "pending" && normalizeStudentLookup(getStudentRequestLookup(request)) === studentLookupLower
     );
     if (alreadyPending) {
-      toast("You already have a pending request for that email.");
+      toast("You already have a pending request for that student.");
       return;
     }
 
@@ -957,15 +988,18 @@ export default function MyStudents({
         teacherUid: userUid,
         teacherEmail: user.email || null,
         teacherName: user.displayName || user.name || user.username || user.email || user.uid,
-        studentEmail,
-        studentEmailLower: studentEmail,
+        studentLookup,
+        studentLookupLower,
+        studentEmail: looksLikeEmail ? studentLookupLower : "",
+        studentEmailLower: studentLookupLower,
+        lookupKind: looksLikeEmail ? "email" : "text",
         status: "pending",
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
       };
       const ref = await addDoc(collection(db, "teacherStudentRequests"), payload);
       setStudentRequests((prev) => [{ id: ref.id, ...payload, createdAt: new Date(), updatedAt: new Date() }, ...prev]);
-      setRequestEmail("");
+      setRequestLookup("");
       toast("Student request sent for admin approval.");
     } catch (error) {
       console.error("[MyStudents] Could not create student request", error);
@@ -1480,10 +1514,10 @@ async function copySelectedSubmission() {
           <label className="field grow">
             <span>Request student</span>
             <input
-              type="email"
-              value={requestEmail}
-              onChange={(event) => setRequestEmail(event.target.value)}
-              placeholder="student@email.com"
+              type="text"
+              value={requestLookup}
+              onChange={(event) => setRequestLookup(event.target.value)}
+              placeholder="Email, username, or name"
             />
           </label>
           <button type="submit" className="review-btn" disabled={requestingStudent}>
@@ -1529,7 +1563,7 @@ async function copySelectedSubmission() {
           <span className="panel-label">Pending requests</span>
           {visibleStudentRequests.map((request) => (
             <div key={request.id} className="student-request-row">
-              <strong>{request.studentEmail || request.studentEmailLower}</strong>
+              <strong>{getStudentRequestLookup(request)}</strong>
               <span>{formatRelative(request.createdAt)}</span>
             </div>
           ))}
