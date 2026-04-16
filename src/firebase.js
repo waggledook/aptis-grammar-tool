@@ -39,6 +39,7 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
+import { TOPIC_DATA } from "./components/vocabulary/data/vocabTopics";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCvpE87D16safq68oFB4fJKPyCURsc-mrU",
@@ -2503,7 +2504,15 @@ export async function fetchVocabTopicCounts(uid) {
   const colRef = collection(db, "users", realUid, "vocabProgress");
   const snap = await getDocs(colRef);
 
-  const stats = {}; // { [topic]: { completed, total } }
+  const stats = Object.fromEntries(
+    Object.entries(TOPIC_DATA).map(([topicKey, topic]) => [
+      topicKey,
+      {
+        completed: 0,
+        total: Array.isArray(topic?.sets) ? topic.sets.length : 0,
+      },
+    ])
+  );
 
   snap.forEach((d) => {
     const data = d.data() || {};
@@ -2511,7 +2520,6 @@ export async function fetchVocabTopicCounts(uid) {
     if (!stats[topic]) {
       stats[topic] = { completed: 0, total: 0 };
     }
-    stats[topic].total += 1;
     if (data.completedReview) {
       stats[topic].completed += 1;
     }

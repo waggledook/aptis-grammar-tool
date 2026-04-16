@@ -9,7 +9,7 @@ import { PART3_TASKS } from "../speaking/banks/part3";
 import { PART4_TASKS } from "../speaking/banks/part4";
 import { auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
-import { getTotalVocabSets } from "../vocabulary/data/vocabTopics";
+import { getTotalVocabSets, TOPIC_DATA } from "../vocabulary/data/vocabTopics";
 import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
 import {
   EmailAuthProvider,
@@ -654,14 +654,14 @@ const totalListeningTasks =
           {Object.entries(vocabTopicCounts).map(([topicKey, stats]) => (
             <li key={topicKey} className="vocab-row">
               <span className="vocab-topic-label">
-                {topicKey.charAt(0).toUpperCase() + topicKey.slice(1)}
+                {TOPIC_DATA?.[topicKey]?.topicTitle || topicKey.charAt(0).toUpperCase() + topicKey.slice(1)}
               </span>
               <span className="vocab-topic-count">
                 {stats.completed} set{stats.completed === 1 ? "" : "s"} completed
                 {typeof stats.total === "number" && stats.total > 0 && (
                   <span className="vocab-topic-sub">
                     {" "}
-                    (out of {stats.total} practised)
+                    (out of {stats.total} total)
                   </span>
                 )}
               </span>
