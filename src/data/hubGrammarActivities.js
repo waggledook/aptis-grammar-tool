@@ -5510,6 +5510,1937 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     ],
   },
   {
+    id: "unreal-conditionals-mastery",
+    title: "Unreal Conditionals: 2nd, 3rd & Mixed",
+    shortDescription: "Master hypothetical situations in the past, present, and mixed timelines.",
+    levels: ["b2"],
+    intro:
+      "Test your ability to imagine different realities. We'll cover Second and Third conditionals, plus those tricky Mixed conditionals where the past affects the present.",
+    items: [
+      multipleChoiceItem(
+        "cond-mc-1",
+        "Choose the correct verb form.",
+        "If I ____ more time, I'd definitely take up a new hobby like photography.",
+        ["have", "had", "would have"],
+        1,
+        "Second conditional: Use the past simple in the 'if' clause to describe an imaginary present or future situation."
+      ),
+      multipleChoiceItem(
+        "cond-mc-2",
+        "Choose the correct verb form.",
+        "We ____ the deadline if the server hadn't crashed last night.",
+        ["would meet", "would have met", "had met"],
+        1,
+        "Third conditional: Use 'would have + past participle' for a hypothetical past result."
+      ),
+      multipleChoiceItem(
+        "cond-mc-3",
+        "Choose the correct verb form (Mixed Conditional).",
+        "If I hadn't missed my flight, I ____ on a beach in Bali right now.",
+        ["would be sitting", "would have sat", "would sit"],
+        0,
+        "Mixed conditional (Past action/Present result): Use 'would + be + -ing' for a hypothetical present result of a past event."
+      ),
+      multipleChoiceItem(
+        "cond-mc-4",
+        "Choose the correct verb form.",
+        "I ____ to the party if I were you; it's going to be very crowded.",
+        ["won't go", "didn't go", "wouldn't go"],
+        2,
+        "Second conditional: Use 'wouldn't' for advice or imaginary choices in the present."
+      ),
+      multipleChoiceItem(
+        "cond-mc-5",
+        "Choose the correct verb form (Mixed Conditional).",
+        "If he ____ so afraid of heights, he would have gone skydiving with us yesterday.",
+        ["wasn't", "hadn't been", "wouldn't be"],
+        0,
+        "Mixed conditional (Present state/Past result): Use the past simple for a permanent state that affected a past event."
+      ),
+      multipleChoiceItem(
+        "cond-mc-6",
+        "Choose the correct verb form.",
+        "If they ____ about the traffic, they would have left much earlier.",
+        ["knew", "would have known", "had known"],
+        2,
+        "Third conditional: Use the past perfect in the 'if' clause for a hypothetical past condition."
+      ),
+      errorCorrectionItem(
+        "cond-ec-1",
+        "Is the conditional structure correct?",
+        "If I would have known it was your birthday, I would have bought a gift.",
+        "would have known",
+        false,
+        "had known",
+        "Never use 'would have' in the 'if' clause. Use the past perfect for third conditionals."
+      ),
+      errorCorrectionItem(
+        "cond-ec-2",
+        "Is the conditional structure correct?",
+        "If I won the lottery, I would travel around the world.",
+        "won",
+        true,
+        "",
+        "Correct! Second conditional uses the past simple for the condition."
+      ),
+      errorCorrectionItem(
+        "cond-ec-3",
+        "Is the conditional structure correct?",
+        "I'd have a better job now if I worked harder at university.",
+        "I'd have",
+        true,
+        "",
+        "Correct! This is a mixed conditional: a past action (working at university) affecting the present (having a job)."
+      ),
+      errorCorrectionItem(
+        "cond-ec-4",
+        "Is the conditional structure correct?",
+        "If we had more money, we would have moved to a bigger house years ago.",
+        "had",
+        true,
+        "",
+        "Correct! This can work as a mixed conditional: a present state (not having enough money) explains a past result (not moving years ago)."
+      ),
+      errorCorrectionItem(
+        "cond-ec-5",
+        "Is the conditional structure correct?",
+        "I wouldn't be so tired today if I hadn't stayed up so late last night.",
+        "wouldn't be",
+        true,
+        "",
+        "Correct! This is a mixed conditional: past action (staying up late) affecting the present feeling (tired)."
+      ),
+      errorCorrectionItem(
+        "cond-ec-6",
+        "Is the conditional structure correct?",
+        "If you would be taller, you could reach the top shelf.",
+        "would be",
+        false,
+        "were",
+        "In second conditionals, use 'were' or 'was' in the 'if' clause, not 'would be'."
+      ),
+      singleGap(
+        "cond-rf-1",
+        "Rewrite the facts as a 3rd conditional sentence.",
+        ["I didn't see the sign, so I didn't stop. -> If I'd seen the sign, I ", { gapId: "g1" }, "."],
+        ["would have stopped"],
+        "Hypothetical past result: would have + past participle."
+      ),
+      singleGap(
+        "cond-rf-2",
+        "Rewrite the facts as a 2nd conditional sentence.",
+        ["I don't have a car, so I walk to work. -> If I had a car, I ", { gapId: "g1" }, " to work."],
+        ["wouldn't walk", "would not walk"],
+        "Imaginary present: would/wouldn't + infinitive."
+      ),
+      singleGap(
+        "cond-rf-3",
+        "Combine the facts using a Mixed Conditional.",
+        ["He isn't very clever. He failed the exam. -> He would have passed the exam if he ", { gapId: "g1" }, " cleverer."],
+        ["were", "was"],
+        "Mixed conditional: Present state (being clever) affecting a past result."
+      ),
+      singleGap(
+        "cond-rf-4",
+        "Rewrite the facts as a 3rd conditional sentence.",
+        ["The team played badly, so they lost. -> If the team ", { gapId: "g1" }, ", they wouldn't have lost."],
+        ["had played better", "hadn't played so badly"],
+        "Hypothetical past condition: past perfect."
+      ),
+      singleGap(
+        "cond-rf-5",
+        "Combine the facts using a Mixed Conditional.",
+        ["I forgot to buy milk. Now I can't have cereal. -> I could have cereal now if I ", { gapId: "g1" }, " to buy milk."],
+        ["hadn't forgotten", "had not forgotten", "had remembered"],
+        "Mixed conditional: A past action affects the present possibility. Both 'hadn't forgotten' and 'had remembered' express the needed idea here."
+      ),
+      singleGap(
+        "cond-rf-6",
+        "Combine the facts using a Mixed Conditional.",
+        ["I don't have a map. I got lost in the city center. -> I wouldn't have got lost in the city center if I ", { gapId: "g1" }, "."],
+        ["had a map"],
+        "Mixed conditional: A permanent or present state (not having a map) affecting a specific result in the past."
+      ),
+      singleGap(
+        "cond-rf-7",
+        "Rewrite the facts as a 3rd conditional sentence.",
+        ["The shop was closed. We didn't buy any bread. -> If the shop had been open, we ", { gapId: "g1" }, " some bread."],
+        ["would have bought", "could have bought"],
+        "Third conditional: An imaginary past condition and its hypothetical result."
+      ),
+    ],
+  },
+  {
+    id: "uses-of-wish-mastery",
+    title: "Wishes and Regrets",
+    shortDescription: "Master 'wish' for present desires, past regrets, and annoying behaviors.",
+    levels: ["b2"],
+    intro:
+      "When we 'wish' for things, the tense we choose tells the story. Use the past to talk about the present, the past perfect for regrets, and 'would' when something is annoying you.",
+    items: [
+      multipleChoiceItem(
+        "wish-mc-1",
+        "Choose the most natural option.",
+        "I’m so busy this week. I wish I ____ more free time.",
+        ["would have", "had", "have had"],
+        1,
+        "Use the past simple to talk about something you want to be different in the present."
+      ),
+      multipleChoiceItem(
+        "wish-mc-2",
+        "Choose the most natural option.",
+        "I'm sorry I was rude to you. I wish I ____ that.",
+        ["didn't say", "wouldn't say", "hadn't said"],
+        2,
+        "Use the past perfect to express a regret about a finished action in the past."
+      ),
+      multipleChoiceItem(
+        "wish-mc-3",
+        "Choose the most natural option.",
+        "I wish the person in front of me ____ their phone; I can't see the screen!",
+        ["put away", "would put away", "had put away"],
+        1,
+        "Use 'wish + would' to talk about a behavior that is annoying you or something you want to change."
+      ),
+      multipleChoiceItem(
+        "wish-mc-4",
+        "Choose the most natural option.",
+        "This flat is tiny. I wish it ____ a bit bigger.",
+        ["would be", "was", "has been"],
+        1,
+        "We use the past simple (was/were) for present states. We don't use 'would' for stative verbs like 'be'."
+      ),
+      multipleChoiceItem(
+        "wish-mc-5",
+        "Choose the most natural option.",
+        "I wish I ____ to the concert with you last night. It sounds like it was amazing.",
+        ["went", "could have gone", "would go"],
+        1,
+        "To talk about an ability or possibility that didn't happen in the past, use 'could have' + past participle."
+      ),
+      multipleChoiceItem(
+        "wish-mc-6",
+        "Choose the most natural option.",
+        "I wish you ____ whistling! It's really distracting me.",
+        ["would stop", "stopped", "had stopped"],
+        0,
+        "Use 'wish + would' when you want someone to change a specific, annoying action."
+      ),
+      errorCorrectionItem(
+        "wish-ec-1",
+        "Is the tense correct for this context?",
+        "I wish I would have a faster car.",
+        "would have",
+        false,
+        "had",
+        "When wishing for a different present state for yourself, use the past simple, not 'would'."
+      ),
+      errorCorrectionItem(
+        "wish-ec-2",
+        "Is the tense correct for this context?",
+        "I wish I hadn't spent so much money on that laptop.",
+        "hadn't spent",
+        true,
+        "",
+        "Correct! Use the past perfect for a regret about a past decision."
+      ),
+      errorCorrectionItem(
+        "wish-ec-3",
+        "Is the tense correct for this context?",
+        "I wish my apartment would be bigger.",
+        "would be bigger",
+        false,
+        "was bigger",
+        "We don't use 'would' for stative verbs like 'be'. Use the past simple to talk about a present situation you want to be different."
+      ),
+      errorCorrectionItem(
+        "wish-ec-4",
+        "Is the tense correct for this context?",
+        "I wish my brother wouldn't leave his dirty dishes in the sink.",
+        "wouldn't leave",
+        true,
+        "",
+        "Correct! Use 'wish + wouldn't' to complain about an annoying habit."
+      ),
+      errorCorrectionItem(
+        "wish-ec-5",
+        "Is the tense correct for this context?",
+        "I wish I didn't lose my passport last year.",
+        "didn't lose",
+        false,
+        "hadn't lost",
+        "For a regret about a specific event in the past, you must use the past perfect."
+      ),
+      errorCorrectionItem(
+        "wish-ec-6",
+        "Is the tense correct for this context?",
+        "I wish I knew where they were.",
+        "knew",
+        true,
+        "",
+        "Correct! Use the past simple to talk about a present situation you are unhappy about."
+      ),
+      placeholderGapItem(
+        "wish-rf-1",
+        "Express the desire: I don't live near the coast.",
+        "I wish I __________ near the coast.",
+        "lived",
+        [],
+        "Use the past simple to express a desire for a different present situation."
+      ),
+      placeholderGapItem(
+        "wish-rf-2",
+        "Express the regret: I didn't check the weather forecast.",
+        "I wish I __________ the weather forecast.",
+        "had checked",
+        ["'d checked"],
+        "Use the past perfect for regrets about past actions."
+      ),
+      placeholderGapItem(
+        "wish-rf-3",
+        "Express the annoyance: You keep interrupting me.",
+        "I wish you __________ interrupting me.",
+        "would stop",
+        ["wouldn't keep"],
+        "Use 'wish + would' to ask for a change in someone's behavior."
+      ),
+      placeholderGapItem(
+        "wish-rf-4",
+        "Express the desire: My phone is broken.",
+        "I wish my phone __________ broken.",
+        "wasn't",
+        ["weren't"],
+        "Use the negative past simple for a present state."
+      ),
+      placeholderGapItem(
+        "wish-rf-5",
+        "Express the regret: I forgot to back up my files.",
+        "I wish I __________ to back up my files.",
+        "hadn't forgotten",
+        ["had not forgotten"],
+        "Past perfect for past regrets."
+      ),
+      placeholderGapItem(
+        "wish-rf-6",
+        "Express the annoyance: It's raining and I want to go for a run.",
+        "I wish it __________ raining.",
+        "would stop",
+        [],
+        "Use 'would' for things you want to change but cannot control."
+      ),
+      placeholderGapItem(
+        "wish-rf-7",
+        "Express the desire: I am not very good at public speaking.",
+        "I wish I __________ better at public speaking.",
+        "was",
+        ["were"],
+        "Past simple of 'be' (was or were) for present desires."
+      ),
+      placeholderGapItem(
+        "wish-rf-8",
+        "Express the regret: He didn't tell me the truth.",
+        "I wish he __________ me the truth.",
+        "had told",
+        ["'d told"],
+        "Past perfect for a past event that didn't happen as you wanted."
+      ),
+    ],
+  },
+  {
+    id: "gerunds-and-infinitives-mastery",
+    title: "Gerunds and Infinitives: B2 Level",
+    shortDescription: "Master the patterns of -ing, to-infinitive, and the bare infinitive.",
+    levels: ["b2"],
+    intro:
+      "Some verbs follow a strict pattern, while others change meaning entirely based on the form you choose. Test your ability to navigate these nuances.",
+    items: [
+      multipleChoiceItem(
+        "gim-mc-1",
+        "Choose the most natural option.",
+        "We've finished the project, so I'm really looking forward to ____ on holiday.",
+        ["going", "to go", "go"],
+        0,
+        "The expression 'looking forward to' ends with a preposition, so it must be followed by a gerund (-ing)."
+      ),
+      multipleChoiceItem(
+        "gim-mc-2",
+        "Choose the most natural option.",
+        "You can't afford ____ a car like that if you're trying to save money.",
+        ["buying", "to buy", "buy"],
+        1,
+        "The verb 'afford' is followed by the to-infinitive."
+      ),
+      multipleChoiceItem(
+        "gim-mc-3",
+        "Choose the most natural option.",
+        "The security guard made everyone ____ their bags at the entrance.",
+        ["opening", "to open", "open"],
+        2,
+        "The verb 'make' (+ object) is followed by the bare infinitive (without 'to')."
+      ),
+      multipleChoiceItem(
+        "gim-mc-4",
+        "Choose the most natural option.",
+        "I remember ____ that film when I was a child, but I don't remember the ending.",
+        ["seeing", "to see", "see"],
+        0,
+        "Use 'remember + gerund' to talk about a memory of an action that happened in the past."
+      ),
+      multipleChoiceItem(
+        "gim-mc-5",
+        "Choose the most natural option.",
+        "I'd prefer ____ at home tonight rather than going to the loud party.",
+        ["staying", "to stay", "stay"],
+        1,
+        "When 'prefer' is used with 'would', it must be followed by the to-infinitive."
+      ),
+      multipleChoiceItem(
+        "gim-mc-6",
+        "Choose the most natural option.",
+        "If the soup is too bland, try ____ some salt; it might taste better.",
+        ["adding", "to add", "add"],
+        0,
+        "Use 'try + gerund' when you are experimenting or testing something to see if it works."
+      ),
+      multipleChoiceItem(
+        "gim-mc-7",
+        "Choose the most natural option.",
+        "The central heating really needs ____ before the winter starts.",
+        ["servicing", "to service", "service"],
+        0,
+        "Use 'need + gerund' for passive constructions where something needs to be done to an object."
+      ),
+      multipleChoiceItem(
+        "gim-mc-8",
+        "Choose the most natural option.",
+        "He admitted ____ the mistake, although he wasn't happy about it.",
+        ["making", "to make", "make"],
+        0,
+        "The verb 'admit' is followed by the gerund (-ing)."
+      ),
+      errorCorrectionItem(
+        "gim-ec-1",
+        "Check the highlighted phrase for errors.",
+        "He decided changing his career after ten years in the same office.",
+        "decided changing",
+        false,
+        "decided to change",
+        "The verb 'decide' is followed by the to-infinitive."
+      ),
+      errorCorrectionItem(
+        "gim-ec-2",
+        "Check the highlighted phrase for errors.",
+        "I don't feel like to go out in this weather.",
+        "feel like to go",
+        false,
+        "feel like going",
+        "The expression 'feel like' is followed by the gerund (-ing)."
+      ),
+      errorCorrectionItem(
+        "gim-ec-3",
+        "Check the highlighted phrase for errors.",
+        "The manager let us leave the office early because of the storm.",
+        "let us leave",
+        true,
+        "",
+        "Correct! 'Let' (+ object) is followed by the bare infinitive."
+      ),
+      errorCorrectionItem(
+        "gim-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I'll never forget meeting the president last year.",
+        "forget meeting",
+        true,
+        "",
+        "Correct! Use 'forget + gerund' when you cannot remember an image or event from the past."
+      ),
+      errorCorrectionItem(
+        "gim-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I forgot locking the door, so I had to drive all the way back home.",
+        "forgot locking",
+        false,
+        "forgot to lock",
+        "Use 'forget + to-infinitive' when you didn't remember to do a task or action."
+      ),
+      errorCorrectionItem(
+        "gim-ec-6",
+        "Check the highlighted phrase for errors.",
+        "We'd rather staying at a small hotel than a large resort.",
+        "rather staying",
+        false,
+        "rather stay",
+        "The expression 'would rather' is followed by the bare infinitive."
+      ),
+      errorCorrectionItem(
+        "gim-ec-7",
+        "Check the highlighted phrase for errors.",
+        "The rain continued to fall throughout the entire afternoon.",
+        "continued to fall",
+        true,
+        "",
+        "Correct! Verbs like 'continue', 'start', and 'begin' can be followed by either form without a change in meaning."
+      ),
+      errorCorrectionItem(
+        "gim-ec-8",
+        "Check the highlighted phrase for errors.",
+        "You should avoid to make mistakes like that in the final report.",
+        "avoid to make",
+        false,
+        "avoid making",
+        "The verb 'avoid' is followed by the gerund (-ing)."
+      ),
+      placeholderGapItem(
+        "gim-gf-1",
+        "Complete the sentence with the correct form.",
+        "Please remember __________ the cat before you leave for work. (feed)",
+        "to feed",
+        [],
+        "Use 'remember + to-infinitive' for a task you need to do."
+      ),
+      placeholderGapItem(
+        "gim-gf-2",
+        "Complete the sentence with the correct form.",
+        "I tried __________ the window but it was painted shut. (open)",
+        "to open",
+        [],
+        "Use 'try + to-infinitive' when making an effort to do something difficult."
+      ),
+      placeholderGapItem(
+        "gim-gf-3",
+        "Complete the sentence with the correct form.",
+        "She has given up __________ sugar in her tea. (take)",
+        "taking",
+        [],
+        "Phrasal verbs like 'give up' are followed by the gerund (-ing)."
+      ),
+      placeholderGapItem(
+        "gim-gf-4",
+        "Complete the sentence with the correct form.",
+        "It's no use __________ about things you can't change. (worry)",
+        "worrying",
+        [],
+        "The expression 'it's no use' is followed by the gerund (-ing)."
+      ),
+      placeholderGapItem(
+        "gim-gf-5",
+        "Complete the sentence with the correct form.",
+        "I regret __________ you that your application has been unsuccessful. (tell)",
+        "to tell",
+        [],
+        "Use 'regret + to-infinitive' for formal announcements or giving bad news."
+      ),
+      placeholderGapItem(
+        "gim-gf-6",
+        "Complete the sentence with the correct form.",
+        "He managed __________ the mountain despite the terrible weather. (climb)",
+        "to climb",
+        [],
+        "The verb 'manage' is followed by the to-infinitive."
+      ),
+      placeholderGapItem(
+        "gim-gf-7",
+        "Complete the sentence with the correct form.",
+        "I don't mind __________ extra hours if the pay is good. (work)",
+        "working",
+        [],
+        "The expression 'don't mind' is followed by the gerund (-ing)."
+      ),
+      placeholderGapItem(
+        "gim-gf-8",
+        "Complete the sentence with the correct form.",
+        "My parents didn't allow me __________ out late on school nights. (go)",
+        "to go",
+        [],
+        "The verb 'allow' (+ object) is followed by the to-infinitive."
+      ),
+    ],
+  },
+  {
+    id: "past-modals-mastery",
+    title: "Past Modals: Deduction & Regret",
+    shortDescription: "Master 'must have', 'can't have', and 'should have' for past situations.",
+    levels: ["b2"],
+    intro:
+      "When we look back at the past, we use modals to show how certain we are or how we feel about what happened. Remember: use 'must/can't have' for deduction and 'should have' for regrets.",
+    items: [
+      multipleChoiceItem(
+        "pm-mc-1",
+        "Choose the most logical future form.",
+        "The kitchen is a mess! The kids ____ a snack while we were out.",
+        ["must have made", "should have made", "can't have made"],
+        0,
+        "Use 'must have' when you are almost sure something happened based on the evidence."
+      ),
+      multipleChoiceItem(
+        "pm-mc-2",
+        "Choose the most logical future form.",
+        "I'm not sure why they didn't come. They ____ the invitation.",
+        ["must have missed", "might have missed", "should have missed"],
+        1,
+        "Use 'might have' or 'could have' when you think something was possible, but you aren't sure."
+      ),
+      multipleChoiceItem(
+        "pm-mc-3",
+        "Choose the most logical future form.",
+        "It's a shame you didn't see the show. You ____ it.",
+        ["must have loved", "might have loved", "would have loved"],
+        2,
+        "Use 'would have' to describe a hypothetical past reaction."
+      ),
+      multipleChoiceItem(
+        "pm-mc-4",
+        "Choose the most logical future form.",
+        "I saw Jack in London today, so he ____ at the meeting in Manchester.",
+        ["can't have been", "mustn't have been", "shouldn't have been"],
+        0,
+        "Use 'can't have' when you are almost sure something didn't happen because it's impossible."
+      ),
+      multipleChoiceItem(
+        "pm-mc-5",
+        "Choose the most logical future form.",
+        "We're completely lost. We ____ the map more carefully before we left.",
+        ["must have checked", "should have checked", "could have checked"],
+        1,
+        "Use 'should have' to express regret or criticism about a past action that didn't happen."
+      ),
+      multipleChoiceItem(
+        "pm-mc-6",
+        "Choose the most logical future form.",
+        "She didn't answer her phone. She ____ it at home.",
+        ["could have left", "ought to leave", "must leave"],
+        0,
+        "Use 'could have' + past participle to speculate about a past possibility."
+      ),
+      errorCorrectionItem(
+        "pm-ec-1",
+        "Check the highlighted phrase for errors.",
+        "You must have told me it was a formal party! I feel ridiculous in these jeans.",
+        "must have told",
+        false,
+        ["should have told", "ought to have told"],
+        "Use 'should have' or 'ought to have' to criticize someone for not doing the right thing. 'Must have' is for logical deduction."
+      ),
+      errorCorrectionItem(
+        "pm-ec-2",
+        "Check the highlighted phrase for errors.",
+        "I suppose he couldn't have seen your message yet, but I'm not certain.",
+        "couldn't have seen",
+        false,
+        "might not have seen",
+        "Use 'might not have' for a possibility. 'Couldn't have' implies you are almost certain it was impossible."
+      ),
+      errorCorrectionItem(
+        "pm-ec-3",
+        "Check the highlighted phrase for errors.",
+        "They ought have arrived by now; they left over three hours ago.",
+        "ought have arrived",
+        false,
+        "ought to have arrived",
+        "The full structure is 'ought to have' + past participle."
+      ),
+      errorCorrectionItem(
+        "pm-ec-4",
+        "Check the highlighted phrase for errors.",
+        "He can't have forgotten the meeting; I reminded him twice this morning.",
+        "can't have forgotten",
+        true,
+        "",
+        "Correct! Use 'can't have' when you are almost sure something didn't happen."
+      ),
+      errorCorrectionItem(
+        "pm-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I shouldn't have eaten that third piece of cake. I feel quite ill now.",
+        "shouldn't have eaten",
+        true,
+        "",
+        "Correct! Use 'shouldn't have' to express regret about a past action."
+      ),
+      errorCorrectionItem(
+        "pm-ec-6",
+        "Check the highlighted phrase for errors.",
+        "The document must been deleted by mistake.",
+        "must been",
+        false,
+        "must have been",
+        "Don't forget the 'have' in the past modal structure: must + have + past participle."
+      ),
+      placeholderGapItem(
+        "pm-gf-1",
+        "Complete the deduction: I'm sure she was at the office.",
+        "She __________ at the office.",
+        "must have been",
+        [],
+        "Use 'must have' when you are almost sure about a past state."
+      ),
+      placeholderGapItem(
+        "pm-gf-2",
+        "Complete the regret: It was a mistake for you to say that.",
+        "You __________ that.",
+        "shouldn't have said",
+        ["should not have said", "oughtn't to have said"],
+        "Use 'shouldn't have' to express that a past action was the wrong thing to do."
+      ),
+      placeholderGapItem(
+        "pm-gf-3",
+        "Complete the speculation: Maybe he didn't receive the email.",
+        "He __________ the email.",
+        "might not have received",
+        ["may not have received"],
+        "Use 'might not have' or 'may not have' to talk about a negative possibility."
+      ),
+      placeholderGapItem(
+        "pm-gf-4",
+        "Complete the deduction: I'm sure they didn't finish the work.",
+        "They __________ the work.",
+        "can't have finished",
+        ["couldn't have finished"],
+        "Use 'can't have' or 'couldn't have' when you are sure something didn't happen."
+      ),
+      placeholderGapItem(
+        "pm-gf-5",
+        "Complete the criticism: Why didn't you lock the door?",
+        "You __________ the door.",
+        "should have locked",
+        ["ought to have locked"],
+        "Use 'should have' to suggest the right action that was missed."
+      ),
+      placeholderGapItem(
+        "pm-gf-6",
+        "Complete the speculation: It's possible that someone found your wallet.",
+        "Someone __________ your wallet.",
+        "might have found",
+        ["could have found", "may have found"],
+        "Use 'might', 'could', or 'may have' to talk about a past possibility."
+      ),
+      placeholderGapItem(
+        "pm-gf-7",
+        "Complete the deduction: I'm certain he wasn't driving the car.",
+        "He __________ the car.",
+        "can't have been driving",
+        ["couldn't have been driving"],
+        "Use the continuous form of the past modal for an action in progress."
+      ),
+      placeholderGapItem(
+        "pm-gf-8",
+        "Complete the regret: I'm sorry I didn't listen to your advice.",
+        "I __________ to your advice.",
+        "should have listened",
+        ["ought to have listened"],
+        "Use 'should have' for personal regrets about past actions."
+      ),
+    ],
+  },
+  {
+    id: "verbs-of-the-senses-mastery",
+    title: "Verbs of the Senses",
+    shortDescription: "Master 'look', 'feel', 'smell', 'sound', and 'taste' plus the many uses of 'as'.",
+    levels: ["b2"],
+    intro:
+      "When describing our impressions, the structure changes depending on what follows the verb. Practice the difference between using adjectives, 'like', and 'as if', as well as the functional uses of 'as'.",
+    items: [
+      multipleChoiceItem(
+        "vs-mc-1",
+        "Choose the most natural option.",
+        "The music from the apartment next door ____ a bit too loud.",
+        ["sounds", "sounds like", "sounds as if"],
+        0,
+        "Use 'verb + adjective' to describe a direct impression."
+      ),
+      multipleChoiceItem(
+        "vs-mc-2",
+        "Choose the most natural option.",
+        "This new sauce ____ curry, don't you think?",
+        ["tastes", "tastes like", "tastes as if"],
+        1,
+        "Use 'verb + like + noun' when comparing one thing to another."
+      ),
+      multipleChoiceItem(
+        "vs-mc-3",
+        "Choose the most natural option.",
+        "The athlete ____ completely exhausted after the race.",
+        ["looks", "looks like", "looks as if"],
+        0,
+        "Use 'verb + adjective' to describe a direct impression."
+      ),
+      multipleChoiceItem(
+        "vs-mc-4",
+        "Choose the most natural option.",
+        "It's a long walk, but I ____ going for a stroll in the park.",
+        ["feel", "feel like", "feel as if"],
+        1,
+        "Use 'feel like + gerund' to mean 'want' or 'would like'."
+      ),
+      multipleChoiceItem(
+        "vs-mc-5",
+        "Choose the most natural option.",
+        "She is currently working ____ a project manager for a tech firm.",
+        ["as", "like", "as if"],
+        0,
+        "Use 'as' to describe someone's job or function."
+      ),
+      multipleChoiceItem(
+        "vs-mc-6",
+        "Choose the most natural option.",
+        "The bread ____ fresh from the oven. It's delicious!",
+        ["smells", "smells like", "smells as though"],
+        0,
+        "Use 'verb + adjective' to describe a quality."
+      ),
+      multipleChoiceItem(
+        "vs-mc-7",
+        "Choose the most natural option.",
+        "____ it was a holiday, the shops were all closed.",
+        ["As", "Like", "As if"],
+        0,
+        "Use 'as' as a synonym for 'because' to give a reason."
+      ),
+      multipleChoiceItem(
+        "vs-mc-8",
+        "Choose the most natural option.",
+        "I need a tool for the garden, ____ a shovel or a rake.",
+        ["as", "such as", "as if"],
+        1,
+        "Use 'such as' to provide specific examples."
+      ),
+      errorCorrectionItem(
+        "vs-ec-1",
+        "Check the highlighted phrase for errors.",
+        "You look like tired after your long flight.",
+        "look like tired",
+        false,
+        "look tired",
+        "Don't use 'like' before an adjective. Simply use the verb + adjective."
+      ),
+      errorCorrectionItem(
+        "vs-ec-2",
+        "Check the highlighted phrase for errors.",
+        "This perfume smells as jasmine; it's very floral.",
+        "smells as",
+        false,
+        "smells like",
+        "Use 'verb + like' when followed by a noun to make a comparison."
+      ),
+      errorCorrectionItem(
+        "vs-ec-3",
+        "Check the highlighted phrase for errors.",
+        "It sounds as though it's going to be a stormy night.",
+        "sounds as though",
+        true,
+        "",
+        "Correct! 'As though' is a valid alternative to 'as if' before a clause."
+      ),
+      errorCorrectionItem(
+        "vs-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I feel like to go to the cinema tonight.",
+        "feel like to go",
+        false,
+        "feel like going",
+        "The expression 'feel like' must be followed by a gerund (-ing) or a noun."
+      ),
+      errorCorrectionItem(
+        "vs-ec-5",
+        "Check the highlighted phrase for errors.",
+        "He seems as if he's a very reliable person.",
+        "seems as if",
+        true,
+        "",
+        "Correct! 'Seem' can be followed by the same structures as 'look'."
+      ),
+      errorCorrectionItem(
+        "vs-ec-6",
+        "Check the highlighted phrase for errors.",
+        "I used my phone like a flashlight when the power went out.",
+        "like a flashlight",
+        false,
+        "as a flashlight",
+        "Use 'as' to describe the function or role of an object."
+      ),
+      errorCorrectionItem(
+        "vs-ec-7",
+        "Check the highlighted phrase for errors.",
+        "As we were leaving, it started to rain heavily.",
+        "As",
+        true,
+        "",
+        "Correct! 'As' can be used to mean 'when' or 'at the same time'."
+      ),
+      errorCorrectionItem(
+        "vs-ec-8",
+        "Check the highlighted phrase for errors.",
+        "That actor looks his father when he was young.",
+        "looks his father",
+        false,
+        "looks like his father",
+        "When comparing a person to a noun, you must use 'look like'."
+      ),
+      placeholderGapItem(
+        "vs-gf-1",
+        "Complete the sentence with the correct form.",
+        "This room __________ it hasn't been aired in days. (smell)",
+        "smells as if",
+        ["smells as though"],
+        "Use 'smell + as if/as though' before a clause."
+      ),
+      placeholderGapItem(
+        "vs-gf-2",
+        "Complete the sentence with the correct form.",
+        "That idea __________ very interesting to me. (sound)",
+        "sounds",
+        [],
+        "Use 'sound + adjective' for a direct impression."
+      ),
+      placeholderGapItem(
+        "vs-gf-3",
+        "Complete the sentence with the correct form.",
+        "Your new dog __________ a small wolf! (look)",
+        "looks like",
+        [],
+        "Use 'look + like' before a noun."
+      ),
+      placeholderGapItem(
+        "vs-gf-4",
+        "Complete the sentence.",
+        "I don't feel like __________ a big meal tonight. (feel like / cook)",
+        "cooking",
+        [],
+        "Use a gerund after 'feel like'."
+      ),
+      placeholderGapItem(
+        "vs-gf-5",
+        "Complete the sentence.",
+        "I am working __________ a volunteer at the film festival. (as/like)",
+        "as",
+        [],
+        "Use 'as' to describe a job or role."
+      ),
+      placeholderGapItem(
+        "vs-gf-6",
+        "Complete the sentence.",
+        "It __________ that the morning meeting has been cancelled. (seem)",
+        "seems",
+        [],
+        "Use 'seem' to describe a general impression or a fact you've learned."
+      ),
+      placeholderGapItem(
+        "vs-gf-7",
+        "Complete the sentence.",
+        "This cold tea __________ honey and lemon. (taste)",
+        "tastes like",
+        [],
+        "Use 'taste + like' before a noun phrase."
+      ),
+      placeholderGapItem(
+        "vs-gf-8",
+        "Complete the sentence.",
+        "He was running for the platform __________ the train was pulling away. (as/like)",
+        "as",
+        [],
+        "Use 'as' to show that two actions were happening at the same time."
+      ),
+    ],
+  },
+  {
+    id: "passive-voice-advanced",
+    title: "The Passive: Advanced Forms",
+    shortDescription: "Master all tenses, causative 'have', and formal reported passives.",
+    levels: ["b2"],
+    intro:
+      "Go beyond the basics. This test covers passives in every tense, 'have something done' for services, and formal structures like 'He is believed to have...'.",
+    items: [
+      multipleChoiceItem(
+        "pv-mc-1",
+        "Choose the correct passive form.",
+        "The stolen paintings ____ yet, despite a massive police search.",
+        ["haven't been found", "aren't being found", "haven't found"],
+        0,
+        "Use the present perfect passive (have been + past participle) for a finished result with present relevance."
+      ),
+      multipleChoiceItem(
+        "pv-mc-2",
+        "Choose the correct passive form.",
+        "By the time the inspectors arrive next month, all the seats in the new stadium ____.",
+        ["will be installed", "will have been installed", "are being installed"],
+        1,
+        "Use the future perfect passive for an action that will be completed by a certain time in the future."
+      ),
+      multipleChoiceItem(
+        "pv-mc-3",
+        "Choose the correct passive form.",
+        "I'm going to ____ before I go on holiday next week.",
+        ["have my car serviced", "have serviced my car", "get serviced my car"],
+        0,
+        "Use the causative structure: have + object + past participle for services you arrange."
+      ),
+      multipleChoiceItem(
+        "pv-mc-4",
+        "Choose the correct passive form.",
+        "The suspect is believed ____ the country shortly after the robbery.",
+        ["to leave", "to be leaving", "to have left"],
+        2,
+        "Use the perfect infinitive (to have + past participle) to report an action that happened in the past."
+      ),
+      multipleChoiceItem(
+        "pv-mc-5",
+        "Choose the correct passive form.",
+        "It ____ that the government will announce a tax cut tomorrow.",
+        ["is thought", "is thinking", "thought"],
+        0,
+        "Use the impersonal passive 'It is said/thought that...' to report general beliefs."
+      ),
+      multipleChoiceItem(
+        "pv-mc-6",
+        "Choose the correct passive form.",
+        "The CEO is thought ____ on a secret new project at the moment.",
+        ["to work", "to be working", "to have worked"],
+        1,
+        "Use the continuous infinitive (to be + -ing) for a reported action that is currently in progress."
+      ),
+      multipleChoiceItem(
+        "pv-mc-7",
+        "Choose the correct passive form.",
+        "The patient complained about ____ enough information by the doctors.",
+        ["not being given", "not to be given", "not having given"],
+        0,
+        "After prepositions like 'about', use the gerund passive (being + past participle)."
+      ),
+      multipleChoiceItem(
+        "pv-mc-8",
+        "Choose the correct passive form.",
+        "These laws ____ years ago to prevent such accidents.",
+        ["should have passed", "should have been passed", "ought to pass"],
+        1,
+        "Use modal perfect passive (should have been + past participle) for something that was necessary but didn't happen."
+      ),
+      errorCorrectionItem(
+        "pv-ec-1",
+        "Check the highlighted phrase for errors.",
+        "The bridge was being repaired when we drove past it.",
+        "was being repaired",
+        true,
+        "",
+        "Correct! Use the past continuous passive for an action that was in progress at a specific moment in the past."
+      ),
+      errorCorrectionItem(
+        "pv-ec-2",
+        "Check the highlighted phrase for errors.",
+        "I need to have my hair cut this afternoon.",
+        "have my hair cut",
+        true,
+        "",
+        "Correct! Causative 'have' (have + object + past participle) for an arranged service."
+      ),
+      errorCorrectionItem(
+        "pv-ec-3",
+        "Check the highlighted phrase for errors.",
+        "The man is said to be living abroad for several years.",
+        "is said to be living",
+        false,
+        "is said to have been living",
+        "To report an action that started in the past and is still continuing, use the perfect continuous infinitive (to have been + -ing)."
+      ),
+      errorCorrectionItem(
+        "pv-ec-4",
+        "Check the highlighted phrase for errors.",
+        "It is believed that the strike will end soon.",
+        "It is believed that",
+        true,
+        "",
+        "Correct! Impersonal passive structure for formal reporting."
+      ),
+      errorCorrectionItem(
+        "pv-ec-5",
+        "Check the highlighted phrase for errors.",
+        "He is thought that he has escaped from prison.",
+        "He is thought that he has escaped",
+        false,
+        ["He is thought to have escaped", "It is thought that he has escaped"],
+        "In the personal structure, use: Subject + is thought + to-infinitive. The impersonal structure 'It is thought that...' is also correct."
+      ),
+      errorCorrectionItem(
+        "pv-ec-6",
+        "Check the highlighted phrase for errors.",
+        "We had our passports stolen while we were on holiday.",
+        "had our passports stolen",
+        true,
+        "",
+        "Correct! Causative 'had' can also refer to unexpected bad things that happen to us."
+      ),
+      errorCorrectionItem(
+        "pv-ec-7",
+        "Check the highlighted phrase for errors.",
+        "The documents are reported to have been destroyed in the fire.",
+        "to have been destroyed",
+        true,
+        "",
+        "Correct! Use the perfect passive infinitive to report a past passive action."
+      ),
+      errorCorrectionItem(
+        "pv-ec-8",
+        "Check the highlighted phrase for errors.",
+        "A new park is going to be open by the Mayor.",
+        "be open",
+        false,
+        "be opened",
+        "Passive structures always require the past participle: be + opened."
+      ),
+      placeholderGapItem(
+        "pv-rf-1",
+        "Rewrite in the passive: People say that he is a genius.",
+        "He __________ a genius.",
+        "is said to be",
+        [],
+        "Personal reported passive: Subject + is said + to-infinitive."
+      ),
+      placeholderGapItem(
+        "pv-rf-2",
+        "Rewrite in the passive: They believe the fire was started by an electrical fault.",
+        "The fire __________ by an electrical fault.",
+        "is believed to have been started",
+        [],
+        "Personal passive for a past action: Subject + is believed + perfect passive infinitive."
+      ),
+      placeholderGapItem(
+        "pv-rf-3",
+        "Rewrite using 'have something done': Someone is painting my house today.",
+        "I __________ today.",
+        "am having my house painted",
+        ["'m having my house painted"],
+        "Use the causative structure in the present continuous."
+      ),
+      placeholderGapItem(
+        "pv-rf-4",
+        "Rewrite in the passive: We expect that the company will make a profit.",
+        "The company __________ a profit.",
+        "is expected to make",
+        [],
+        "Personal passive for a future expectation."
+      ),
+      placeholderGapItem(
+        "pv-rf-5",
+        "Rewrite in the passive: People think he is hiding in the forest.",
+        "He __________ in the forest.",
+        "is thought to be hiding",
+        [],
+        "Use the continuous infinitive (to be + -ing) for a reported action in progress."
+      ),
+      placeholderGapItem(
+        "pv-rf-6",
+        "Rewrite in the passive: They say the price of oil has fallen again.",
+        "The price of oil __________ again.",
+        "is said to have fallen",
+        [],
+        "Use the perfect infinitive (to have + past participle) to report a completed action."
+      ),
+      placeholderGapItem(
+        "pv-rf-7",
+        "Rewrite using 'have something done': The dentist checked my teeth yesterday.",
+        "I __________ yesterday.",
+        "had my teeth checked",
+        [],
+        "Causative structure in the past simple."
+      ),
+      placeholderGapItem(
+        "pv-rf-8",
+        "Rewrite in the passive: They report that the missing explorers are safe.",
+        "It __________ the missing explorers are safe.",
+        "is reported that",
+        ["is reported"],
+        "Use the impersonal passive: It + is + past participle + that + clause. In formal English, 'that' is sometimes omitted."
+      ),
+    ],
+  },
+  {
+    id: "reporting-verbs-mastery",
+    title: "Reporting Verbs: B2 Level",
+    shortDescription: "Master the patterns of infinitives and gerunds after reporting verbs.",
+    levels: ["b2"],
+    intro:
+      "Beyond 'say' and 'tell', English uses specific verbs to report actions. The challenge is remembering which pattern follows each verb: to + infinitive, person + to + infinitive, or the -ing form.",
+    items: [
+      multipleChoiceItem(
+        "rv-mc-1",
+        "Choose the correct grammatical pattern.",
+        "The doctor suggested ____ more exercise to improve my health.",
+        ["me to do", "doing", "to do"],
+        1,
+        "The verb 'suggest' is followed by the -ing form, not 'person + to'."
+      ),
+      multipleChoiceItem(
+        "rv-mc-2",
+        "Choose the correct grammatical pattern.",
+        "They threatened ____ the contract if we didn't meet the deadline.",
+        ["to cancel", "cancelling", "us to cancel"],
+        0,
+        "The verb 'threaten' is followed by the to-infinitive."
+      ),
+      multipleChoiceItem(
+        "rv-mc-3",
+        "Choose the correct grammatical pattern.",
+        "My manager reminded ____ the report before the weekend.",
+        ["to finish", "me to finish", "me finishing"],
+        1,
+        "The verb 'remind' is followed by a person + to + infinitive."
+      ),
+      multipleChoiceItem(
+        "rv-mc-4",
+        "Choose the correct grammatical pattern.",
+        "The neighbor blamed us ____ all the noise last night.",
+        ["for making", "to make", "of making"],
+        0,
+        "The verb 'blame' is followed by a person + for + -ing form."
+      ),
+      multipleChoiceItem(
+        "rv-mc-5",
+        "Choose the correct grammatical pattern.",
+        "They've invited ____ to their wedding in June.",
+        ["us to come", "us coming", "to come"],
+        0,
+        "The verb 'invite' is followed by a person + to + infinitive."
+      ),
+      multipleChoiceItem(
+        "rv-mc-6",
+        "Choose the correct grammatical pattern.",
+        "The suspect denied ____ anywhere near the scene of the crime.",
+        ["to be", "being", "him to be"],
+        1,
+        "The verb 'deny' is followed by the -ing form."
+      ),
+      multipleChoiceItem(
+        "rv-mc-7",
+        "Choose the correct grammatical pattern.",
+        "He insisted ____ for the meal, even though we wanted to split the bill.",
+        ["to pay", "on paying", "paying"],
+        1,
+        "The verb 'insist' is followed by the preposition 'on' and then the gerund."
+      ),
+      multipleChoiceItem(
+        "rv-mc-8",
+        "Choose the correct grammatical pattern.",
+        "She promised ____ anyone our secret.",
+        ["to not tell", "not to tell", "not telling"],
+        1,
+        "In negative sentences, the 'not' comes before the to-infinitive."
+      ),
+      errorCorrectionItem(
+        "rv-ec-1",
+        "Check the highlighted phrase for errors.",
+        "He suggested me to take a holiday, but I was too busy.",
+        "suggested me to take",
+        false,
+        ["suggested that I take", "suggested taking"],
+        "You cannot use 'suggest + person + to'. Use 'suggest + -ing' or a 'that' clause."
+      ),
+      errorCorrectionItem(
+        "rv-ec-2",
+        "Check the highlighted phrase for errors.",
+        "She refused to help us with the preparations.",
+        "refused to help",
+        true,
+        "",
+        "Correct! 'Refuse' is followed by the to-infinitive."
+      ),
+      errorCorrectionItem(
+        "rv-ec-3",
+        "Check the highlighted phrase for errors.",
+        "The guide warned us not to touch the artifacts.",
+        "warned us not to touch",
+        true,
+        "",
+        "Correct! 'Warn' is followed by a person + to + infinitive, and the 'not' is in the correct place."
+      ),
+      errorCorrectionItem(
+        "rv-ec-4",
+        "Check the highlighted phrase for errors.",
+        "They apologized for be so late to the meeting.",
+        "apologized for be",
+        false,
+        ["apologized for being", "apologised for being"],
+        "After a preposition like 'for', you must use the -ing form."
+      ),
+      errorCorrectionItem(
+        "rv-ec-5",
+        "Check the highlighted phrase for errors.",
+        "He admitted to have broken the window by accident.",
+        "admitted to have broken",
+        false,
+        ["admitted breaking", "admitted having broken", "admitted to having broken"],
+        "After 'admit', we use an -ing form. Several natural corrections are possible here."
+      ),
+      errorCorrectionItem(
+        "rv-ec-6",
+        "Check the highlighted phrase for errors.",
+        "I recommend to visit the old town while you are there.",
+        "recommend to visit",
+        false,
+        "recommend visiting",
+        "The verb 'recommend' is followed by the -ing form, not the to-infinitive."
+      ),
+      errorCorrectionItem(
+        "rv-ec-7",
+        "Check the highlighted phrase for errors.",
+        "The police accused him of stealing the car.",
+        "accused him of stealing",
+        true,
+        "",
+        "Correct! 'Accuse' is followed by a person + of + -ing."
+      ),
+      errorCorrectionItem(
+        "rv-ec-8",
+        "Check the highlighted phrase for errors.",
+        "My friends encouraged me to apply for the new job.",
+        "encouraged me to apply",
+        true,
+        "",
+        "Correct! 'Encourage' is followed by a person + to + infinitive."
+      ),
+      placeholderGapItem(
+        "rv-rf-1",
+        "Rewrite the speech using the verb: 'I didn't break the vase!' (deny)",
+        "She __________ the vase.",
+        "denied breaking",
+        ["denied having broken", "denied that she broke"],
+        "Use 'deny + -ing' to report a negative statement about the past."
+      ),
+      placeholderGapItem(
+        "rv-rf-2",
+        "Rewrite the speech to us: 'Don't forget to lock the door.' (remind)",
+        "He __________ the door.",
+        "reminded us to lock",
+        [],
+        "Use 'remind + person + to + infinitive'."
+      ),
+      placeholderGapItem(
+        "rv-rf-3",
+        "Rewrite the speech to us: 'Would you like to stay for dinner?' (invite)",
+        "They __________ for dinner.",
+        "invited us to stay",
+        [],
+        "Use 'invite + person + to + infinitive'."
+      ),
+      placeholderGapItem(
+        "rv-rf-4",
+        "Rewrite the speech: 'No, I won't do your homework for you.' (refuse)",
+        "She __________ my homework for me.",
+        "refused to do",
+        [],
+        "Use 'refuse + to + infinitive'."
+      ),
+      placeholderGapItem(
+        "rv-rf-5",
+        "Rewrite the speech: 'You should go to the doctor.' (advise)",
+        "The pharmacist __________ to the doctor.",
+        "advised me to go",
+        ["advised us to go"],
+        "Use 'advise + person + to + infinitive'."
+      ),
+      placeholderGapItem(
+        "rv-rf-6",
+        "Rewrite the speech: 'I'm sorry I'm so late.' (apologize)",
+        "He __________ so late.",
+        "apologized for being",
+        ["apologised for being"],
+        "Use 'apologize/apologise (to someone) for + -ing'."
+      ),
+      placeholderGapItem(
+        "rv-rf-7",
+        "Rewrite the speech about him: 'You stole the money!' (accuse)",
+        "They __________ the money.",
+        "accused him of stealing",
+        [],
+        "Use 'accuse + person + of + -ing'."
+      ),
+      placeholderGapItem(
+        "rv-rf-8",
+        "Rewrite the speech: 'I'll give you a lift to the station.' (offer)",
+        "She __________ me a lift to the station.",
+        "offered to give",
+        [],
+        "Use 'offer + to + infinitive'."
+      ),
+    ],
+  },
+  {
+    id: "countable-uncountable-mastery",
+    title: "Countable and Uncountable Nouns",
+    shortDescription: "Master the tricky grammar of advice, furniture, news, and plural nouns.",
+    levels: ["b2"],
+    intro:
+      "Some nouns in English refuse to be counted, while others are always plural. Test your knowledge of these unique B2 noun patterns.",
+    items: [
+      multipleChoiceItem(
+        "noun-mc-1",
+        "Choose the correct option.",
+        "The news about the company's merger ____ better than we expected.",
+        ["is", "are", "have been"],
+        0,
+        "Even though 'news' ends in -s, it is uncountable and always takes a singular verb."
+      ),
+      multipleChoiceItem(
+        "noun-mc-2",
+        "Choose the correct option.",
+        "I need to buy ____ new trousers for the wedding.",
+        ["a", "some", "a piece of"],
+        1,
+        "Trousers are plural nouns. Use 'some' or 'a pair of', but never 'a'."
+      ),
+      multipleChoiceItem(
+        "noun-mc-3",
+        "Choose the correct option.",
+        "The police ____ currently investigating the cause of the fire.",
+        ["is", "are", "has been"],
+        1,
+        "The word 'police' is always followed by a plural verb."
+      ),
+      multipleChoiceItem(
+        "noun-mc-4",
+        "Choose the correct option.",
+        "I've got ____ luggage, so I might need a hand at the station.",
+        ["too many", "too much", "a few"],
+        1,
+        "Luggage is uncountable, so we use 'too much' or 'a lot of' to describe quantity."
+      ),
+      multipleChoiceItem(
+        "noun-mc-5",
+        "Choose the correct option.",
+        "Could you give me a ____ of advice on which laptop to buy?",
+        ["piece", "bit", "Either 'piece' or 'bit'"],
+        2,
+        "To count an individual item of an uncountable noun like advice, use 'a piece of' or 'a bit of'."
+      ),
+      multipleChoiceItem(
+        "noun-mc-6",
+        "Choose the correct option.",
+        "The outskirts of the city ____ much more peaceful than the center.",
+        ["is", "are", "be"],
+        1,
+        "The noun 'outskirts' is always plural and takes a plural verb."
+      ),
+      errorCorrectionItem(
+        "noun-ec-1",
+        "Check the highlighted phrase for errors.",
+        "The sceneries in the mountains were absolutely breathtaking.",
+        "The sceneries",
+        false,
+        "The scenery",
+        "Scenery is an uncountable noun and does not have a plural form."
+      ),
+      errorCorrectionItem(
+        "noun-ec-2",
+        "Check the highlighted phrase for errors.",
+        "We need to buy some new furnitures for the spare bedroom.",
+        "furnitures",
+        false,
+        "furniture",
+        "Furniture is uncountable. You can say 'some furniture' or 'pieces of furniture'."
+      ),
+      errorCorrectionItem(
+        "noun-ec-3",
+        "Check the highlighted phrase for errors.",
+        "His behavior during the meeting was very professional.",
+        "behavior",
+        true,
+        "",
+        "Correct! Behavior (or behaviour) is an uncountable noun."
+      ),
+      errorCorrectionItem(
+        "noun-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I have a great news for you regarding your application!",
+        "a great news",
+        false,
+        "some great news",
+        "News is uncountable. Use 'some news' or just 'news', never 'a news'."
+      ),
+      errorCorrectionItem(
+        "noun-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I've found a pair of scissors in the kitchen drawer.",
+        "a pair of scissors",
+        true,
+        "",
+        "Correct! Use 'a pair of' for nouns made of two parts like scissors or trousers."
+      ),
+      errorCorrectionItem(
+        "noun-ec-6",
+        "Check the highlighted phrase for errors.",
+        "The equipment we used for the experiment were quite old.",
+        "were",
+        false,
+        "was",
+        "Equipment is uncountable and must take a singular verb."
+      ),
+      placeholderGapItem(
+        "noun-gf-1",
+        "Complete the sentence with the correct form.",
+        "I've bought some __________ (paper/papers) to read on the train.",
+        "papers",
+        [],
+        "When 'paper' refers to newspapers, it is a countable noun."
+      ),
+      placeholderGapItem(
+        "noun-gf-2",
+        "Complete the sentence with the correct form.",
+        "I'm sorry, I can't help you because I have too much __________ (homework/homeworks).",
+        "homework",
+        [],
+        "Homework is uncountable and never takes a plural -s."
+      ),
+      placeholderGapItem(
+        "noun-gf-3",
+        "Complete the sentence with the correct form.",
+        "The kitchen floor is covered in __________ (glass/glasses) from the broken bottle.",
+        "glass",
+        [],
+        "Use uncountable 'glass' when referring to the material."
+      ),
+      placeholderGapItem(
+        "noun-gf-4",
+        "Complete the sentence with the correct form.",
+        "My clothes __________ (be) still wet from the rain.",
+        "are",
+        [],
+        "Clothes is a plural noun and always requires a plural verb."
+      ),
+      placeholderGapItem(
+        "noun-gf-5",
+        "Complete the sentence.",
+        "The hotel staff __________ (be) incredibly helpful during our stay.",
+        "are",
+        ["is"],
+        "Collective nouns like staff can take a singular or plural verb, though plural is common in B2 to emphasize individuals."
+      ),
+      placeholderGapItem(
+        "noun-gf-6",
+        "Complete the sentence.",
+        "I've had a lot of __________ (luck/lucks) lately.",
+        "luck",
+        [],
+        "Luck is uncountable and doesn't have a plural form."
+      ),
+      placeholderGapItem(
+        "noun-gf-7",
+        "Complete the sentence.",
+        "Could I have a __________ of water, please? (drinking vessel)",
+        "glass",
+        [],
+        "When referring to a container, 'glass' is countable."
+      ),
+      placeholderGapItem(
+        "noun-gf-8",
+        "Complete the sentence.",
+        "The research __________ (show) that the climate is changing rapidly.",
+        "shows",
+        [],
+        "Research is uncountable, so it takes a singular verb."
+      ),
+    ],
+  },
+  {
+    id: "quantifiers-mastery-all-both-neither",
+    title: "Quantifiers: All, Every, Both & Neither",
+    shortDescription: "Master the tricky grammar of totalities, zero quantity, and choices.",
+    levels: ["b2"],
+    intro:
+      "Quantifiers are all about the details. Do you use a singular or plural verb? Is it 'none' or 'any'? Test your ability to quantify precisely.",
+    items: [
+      multipleChoiceItem(
+        "quant-mc-1",
+        "Choose the correct option.",
+        "I've been working ____ and I'm absolutely exhausted.",
+        ["every day", "all day", "all the days"],
+        1,
+        "Use 'all day' to describe duration (from morning to night). 'Every day' refers to frequency (Monday to Sunday)."
+      ),
+      multipleChoiceItem(
+        "quant-mc-2",
+        "Choose the correct option.",
+        "____ student in the class has to submit their essay by Friday.",
+        ["All", "Every", "Most of"],
+        1,
+        "Use 'Every' with a singular countable noun. 'All' would require a plural noun (students)."
+      ),
+      multipleChoiceItem(
+        "quant-mc-3",
+        "Choose the correct option.",
+        "____ my parents are retired, so they travel quite a lot.",
+        ["Both", "Neither", "Either"],
+        0,
+        "Use 'Both' to refer to two people/things when the statement is positive."
+      ),
+      multipleChoiceItem(
+        "quant-mc-4",
+        "Choose the correct option.",
+        "I've invited ten people, but ____ of them have replied yet.",
+        ["no", "any", "none"],
+        2,
+        "Use 'none' as a pronoun to refer to zero quantity. 'No' must be followed by a noun."
+      ),
+      multipleChoiceItem(
+        "quant-mc-5",
+        "Choose the correct option.",
+        "You can take ____ the 10:00 train or the 10:30 one; they both arrive on time.",
+        ["both", "neither", "either"],
+        2,
+        "Use 'either... or' to talk about a choice between two alternatives."
+      ),
+      multipleChoiceItem(
+        "quant-mc-6",
+        "Choose the correct option.",
+        "____ needs to be ready by the time the guests arrive.",
+        ["All", "Everything", "Most"],
+        1,
+        "Use 'everything' (with a singular verb) to mean 'all things'. 'All' usually needs a noun or a different structure."
+      ),
+      errorCorrectionItem(
+        "quant-ec-1",
+        "Check the highlighted phrase for errors.",
+        "Most of people in my office prefer to work from home.",
+        "Most of people",
+        false,
+        "Most people / Most of the people",
+        "Use 'most' for people in general, or 'most of the' for a specific group. Never 'most of' + noun."
+      ),
+      errorCorrectionItem(
+        "quant-ec-2",
+        "Check the highlighted phrase for errors.",
+        "Neither John nor his sister is coming to the wedding.",
+        "is coming",
+        true,
+        "",
+        "Correct! With 'neither... nor', you can use a singular or plural verb, but singular is often preferred in formal English."
+      ),
+      errorCorrectionItem(
+        "quant-ec-3",
+        "Check the highlighted phrase for errors.",
+        "There isn't none milk in the fridge, so I'll go to the shop.",
+        "isn't none",
+        false,
+        "isn't any / is no",
+        "Don't use a double negative. Use 'any' with negative verbs or 'no' with positive verbs."
+      ),
+      errorCorrectionItem(
+        "quant-ec-4",
+        "Check the highlighted phrase for errors.",
+        "Not everybody likes spicy food.",
+        "Not everybody",
+        true,
+        "",
+        "Correct! We often use 'not' before 'everybody' or 'everything' to show that something isn't true for everyone."
+      ),
+      errorCorrectionItem(
+        "quant-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I've seen both of film, and they were both excellent.",
+        "both of film",
+        false,
+        "both films / both of the films",
+        "Use 'both' or 'both of the' with a plural noun."
+      ),
+      errorCorrectionItem(
+        "quant-ec-6",
+        "Check the highlighted phrase for errors.",
+        "All the scientists at the conference agreed with the findings.",
+        "All the",
+        true,
+        "",
+        "Correct! 'All the' refers to a specific group of people or things."
+      ),
+      placeholderGapItem(
+        "quant-gf-1",
+        "Complete the sentence with the correct word.",
+        "I've lived in this town __________ my life. (all / every)",
+        "all",
+        [],
+        "Use 'all' with time expressions to show duration."
+      ),
+      placeholderGapItem(
+        "quant-gf-2",
+        "Complete the sentence with the correct word.",
+        "Neither my brother __________ my father can cook very well. (or / nor)",
+        "nor",
+        [],
+        "The correct pair is 'neither... nor'."
+      ),
+      placeholderGapItem(
+        "quant-gf-3",
+        "Complete the sentence with the correct word.",
+        "__________ of the students passed the exam; the teacher was very disappointed. (None / No)",
+        "None",
+        [],
+        "Use 'none of' before a noun or pronoun."
+      ),
+      placeholderGapItem(
+        "quant-gf-4",
+        "Complete the sentence with the correct word.",
+        "I go for a run __________ morning before work. (all / every)",
+        "every",
+        [],
+        "Use 'every' to show frequency."
+      ),
+      placeholderGapItem(
+        "quant-gf-5",
+        "Complete the sentence with the correct word.",
+        "Most of __________ were late because of the traffic. (we / us)",
+        "us",
+        [],
+        "Use an object pronoun (us, them, you) after 'most of'."
+      ),
+      placeholderGapItem(
+        "quant-gf-6",
+        "Complete the sentence.",
+        "You can have __________ tea or coffee, but not both. (either / neither)",
+        "either",
+        [],
+        "Use 'either' when choosing between two options."
+      ),
+      placeholderGapItem(
+        "quant-gf-7",
+        "Complete the sentence with the correct verb form.",
+        "Everything __________ (be) ready for the presentation now.",
+        "is",
+        [],
+        "Words like 'everything' and 'everybody' always take a singular verb."
+      ),
+      placeholderGapItem(
+        "quant-gf-8",
+        "Complete the sentence.",
+        "Neither of my sisters __________ (live) in the same city as me.",
+        "lives",
+        ["live"],
+        "Both singular and plural verbs are used with 'neither of', though singular is more formal."
+      ),
+    ],
+  },
+  {
+    id: "articles-advanced-mastery",
+    title: "Articles: Geography, Institutions & Nuance",
+    shortDescription: "Master the use of 'the', 'a/an', and the 'zero article' in complex contexts.",
+    levels: ["b2"],
+    intro:
+      "At B2, articles are about more than just 'a' or 'the'. You need to know when an institution becomes a building, which mountains need an article, and why we don't 'go to the bed'.",
+    items: [
+      multipleChoiceItem(
+        "arta-mc-1",
+        "Choose the correct option.",
+        "____ usually have a better understanding of digital privacy than their parents.",
+        ["The teenagers", "Teenagers", "A teenager"],
+        1,
+        "Do not use an article when speaking in general about plural or uncountable nouns."
+      ),
+      multipleChoiceItem(
+        "arta-mc-2",
+        "Choose the correct option.",
+        "After the accident, he had to stay ____ for three weeks.",
+        ["in hospital", "in the hospital", "at the hospital"],
+        0,
+        "Use no article with institutions like 'hospital' when referring to their primary purpose. Here, he is there as a patient."
+      ),
+      multipleChoiceItem(
+        "arta-mc-3",
+        "Choose the correct option.",
+        "We spent our summer hiking in ____, which was an incredible experience.",
+        ["the Alps", "Alps", "the Mount Alps"],
+        0,
+        "Use 'the' with mountain ranges, but not with individual mountains."
+      ),
+      multipleChoiceItem(
+        "arta-mc-4",
+        "Choose the correct option.",
+        "____ is a beautiful city, but it can be quite expensive in the summer.",
+        ["The Prague", "Prague", "A Prague"],
+        1,
+        "Do not use 'the' with the names of most cities, countries, or continents."
+      ),
+      multipleChoiceItem(
+        "arta-mc-5",
+        "Choose the correct option.",
+        "The cruise ship traveled through ____ to reach the Mediterranean.",
+        ["Suez Canal", "the Suez Canal", "a Suez Canal"],
+        1,
+        "Always use 'the' with the names of canals, rivers, seas, and oceans."
+      ),
+      multipleChoiceItem(
+        "arta-mc-6",
+        "Choose the correct option.",
+        "I’m meeting a friend for lunch on ____ tomorrow.",
+        ["the Regent Street", "Regent Street", "a Regent Street"],
+        1,
+        "Do not use 'the' with the names of most roads, streets, or parks."
+      ),
+      multipleChoiceItem(
+        "arta-mc-7",
+        "Choose the correct option.",
+        "They are planning to build ____ new university on the outskirts of the city.",
+        ["a", "an", "the"],
+        0,
+        "Use 'a' for a non-specific building being mentioned for the first time. Note: 'university' starts with a consonant sound (/j/), so we use 'a'."
+      ),
+      multipleChoiceItem(
+        "arta-mc-8",
+        "Choose the correct option.",
+        "It was ____ honor to be invited to the international gala.",
+        ["a", "an", "the"],
+        1,
+        "Use 'an' because 'honor' starts with a silent 'h', creating a vowel sound (/ˈɒn.ər/)."
+      ),
+      errorCorrectionItem(
+        "arta-ec-1",
+        "Check the highlighted phrase for errors.",
+        "The classical music has a very relaxing effect on me.",
+        "The classical music",
+        false,
+        "Classical music",
+        "Do not use an article for abstract concepts or types of music when speaking generally."
+      ),
+      errorCorrectionItem(
+        "arta-ec-2",
+        "Check the highlighted phrase for errors.",
+        "He went to the prison to visit his brother who works there.",
+        "to the prison",
+        true,
+        "",
+        "Correct! Use 'the' when you are thinking about the building/location rather than the primary purpose (being a prisoner)."
+      ),
+      errorCorrectionItem(
+        "arta-ec-3",
+        "Check the highlighted phrase for errors.",
+        "We are planning a trip to the Lake Geneva next spring.",
+        "the Lake Geneva",
+        false,
+        "Lake Geneva",
+        "Do not use 'the' with individual lakes."
+      ),
+      errorCorrectionItem(
+        "arta-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I'll see you the next Monday at the office.",
+        "the next Monday",
+        false,
+        "next Monday",
+        "We don't use an article in phrases like 'next week', 'last night', or 'at home'."
+      ),
+      errorCorrectionItem(
+        "arta-ec-5",
+        "Check the highlighted phrase for errors.",
+        "The British Museum is one of the most famous in the world.",
+        "The British Museum",
+        true,
+        "",
+        "Correct! We normally use 'the' with the names of museums, galleries, and hotels."
+      ),
+      errorCorrectionItem(
+        "arta-ec-6",
+        "Check the highlighted phrase for errors.",
+        "She moved to United Kingdom to finish her degree.",
+        "United Kingdom",
+        false,
+        "the United Kingdom",
+        "While most countries have no article, names including 'Kingdom', 'Republic', or 'States' require 'the'."
+      ),
+      errorCorrectionItem(
+        "arta-ec-7",
+        "Check the highlighted phrase for errors.",
+        "He has been working as the architect for over twenty years.",
+        "the architect",
+        false,
+        "an architect",
+        "Use 'a/an' when saying what someone's job is."
+      ),
+      errorCorrectionItem(
+        "arta-ec-8",
+        "Check the highlighted phrase for errors.",
+        "Everyone in the department has to wear an uniform.",
+        "an uniform",
+        false,
+        "a uniform",
+        "Although it starts with a vowel letter, 'uniform' is pronounced with a consonant /j/ sound at the start, so it requires 'a'."
+      ),
+      placeholderChoiceGapItem(
+        "arta-gf-1",
+        "Choose the correct article.",
+        "____ Sahara Desert covers a large part of North Africa.",
+        ["the"],
+        "Use 'the' with the names of deserts.",
+        ["a", "an", "the", "—"]
+      ),
+      placeholderChoiceGapItem(
+        "arta-gf-2",
+        "Choose the correct article.",
+        "It was ____ incredibly difficult decision to make at the time.",
+        ["an"],
+        "Use 'an' before an adjective starting with a vowel sound.",
+        ["a", "an", "the", "—"]
+      ),
+      placeholderChoiceGapItem(
+        "arta-gf-3",
+        "Choose the correct article.",
+        "I usually go to ____ bed around 11:00 PM.",
+        ["—"],
+        "In the phrase 'go to bed', we do not use an article.",
+        ["a", "an", "the", "—"]
+      ),
+      placeholderChoiceGapItem(
+        "arta-gf-4",
+        "Choose the correct article.",
+        "My daughter starts ____ university in September.",
+        ["—"],
+        "Use no article when referring to the institution for its primary purpose.",
+        ["a", "an", "the", "—"]
+      ),
+      placeholderChoiceGapItem(
+        "arta-gf-5",
+        "Choose the correct article.",
+        "We stayed in ____ small hotel near the station on our first night.",
+        ["a"],
+        "Use 'a' for a singular countable noun being mentioned for the first time.",
+        ["a", "an", "the", "—"]
+      ),
+      placeholderChoiceGapItem(
+        "arta-gf-6",
+        "Choose the correct article.",
+        "____ Philippines is a country made up of thousands of islands.",
+        ["the"],
+        "Use 'the' with island groups (archipelagos).",
+        ["a", "an", "the", "—"]
+      ),
+      placeholderChoiceGapItem(
+        "arta-gf-7",
+        "Choose the correct article.",
+        "We had a lovely walk through ____ Hyde Park yesterday.",
+        ["—"],
+        "Most names of parks do not require an article.",
+        ["a", "an", "the", "—"]
+      ),
+      placeholderChoiceGapItem(
+        "arta-gf-8",
+        "Choose the correct article.",
+        "____ Danube is the second-longest river in Europe.",
+        ["the"],
+        "Always use 'the' with the names of rivers.",
+        ["a", "an", "the", "—"]
+      ),
+      placeholderChoiceGapItem(
+        "arta-gf-9",
+        "Choose the correct article.",
+        "It took us ____ hour to get to the airport in the end.",
+        ["an"],
+        "Use 'an' because 'hour' begins with a vowel sound; the 'h' is silent.",
+        ["a", "an", "the", "—"]
+      ),
+      placeholderChoiceGapItem(
+        "arta-gf-10",
+        "Choose the correct article.",
+        "They are staying at ____ Hilton Hotel for the conference.",
+        ["the"],
+        "Use 'the' with the names of hotels.",
+        ["a", "an", "the", "—"]
+      ),
+    ],
+  },
+  {
     id: "b2-conditionals-and-time-clauses",
     title: "Logic of the Future: Conditionals & Time Clauses",
     shortDescription: "Advanced practice with if, unless, in case, and future deadlines.",
