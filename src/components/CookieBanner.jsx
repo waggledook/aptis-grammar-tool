@@ -2,7 +2,35 @@
 import React, { useEffect, useState } from "react";
 import { enableAnalytics } from "../firebase";
 
-const CONSENT_KEY = "cookie-consent"; // 'accepted' | 'rejected'
+export const CONSENT_KEY = "cookie-consent"; // 'accepted' | 'rejected'
+const COOKIE_OPEN_EVENT = "cookie-consent:open";
+const COOKIE_CHANGED_EVENT = "cookie-consent:changed";
+
+export function getCookieConsent() {
+  if (typeof window === "undefined") return "";
+  return window.localStorage.getItem(CONSENT_KEY) || "";
+}
+
+export function openCookieBanner() {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(COOKIE_OPEN_EVENT));
+}
+
+function setCookieConsent(value) {
+  if (typeof window === "undefined") return;
+
+  if (value) {
+    window.localStorage.setItem(CONSENT_KEY, value);
+  } else {
+    window.localStorage.removeItem(CONSENT_KEY);
+  }
+
+  window.dispatchEvent(
+    new CustomEvent(COOKIE_CHANGED_EVENT, {
+      detail: { value: value || "" },
+    })
+  );
+}
 
 export default function CookieBanner() {
   const [show, setShow] = useState(false);
@@ -10,7 +38,7 @@ export default function CookieBanner() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const stored = window.localStorage.getItem(CONSENT_KEY);
+    const stored = getCookieConsent();
 
     if (stored === "accepted") {
       // User already accepted in the past → enable analytics silently
@@ -23,20 +51,23 @@ export default function CookieBanner() {
       // No choice saved yet → show banner
       setShow(true);
     }
+
+    const handleOpen = () => setShow(true);
+
+    window.addEventListener(COOKIE_OPEN_EVENT, handleOpen);
+    return () => {
+      window.removeEventListener(COOKIE_OPEN_EVENT, handleOpen);
+    };
   }, []);
 
   const handleAccept = () => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(CONSENT_KEY, "accepted");
-    }
+    setCookieConsent("accepted");
     enableAnalytics();
     setShow(false);
   };
 
   const handleReject = () => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(CONSENT_KEY, "rejected");
-    }
+    setCookieConsent("rejected");
     // Do NOT call enableAnalytics()
     setShow(false);
   };

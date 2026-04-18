@@ -2657,7 +2657,6 @@ export async function submitGrammarSetAttempt({
   setTitle,
   ownerUid,
   studentUid,
-  studentEmail,
   score,
   total,
   answers,
@@ -2671,7 +2670,6 @@ export async function submitGrammarSetAttempt({
     setTitle,
     ownerUid,
     studentUid,
-    studentEmail,
     studentName: user?.displayName || null,
     // later you can also load username from the users doc if you like
     score,
@@ -2693,7 +2691,6 @@ export async function createGrammarSetAttemptDraft({
   setTitle,
   ownerUid,
   studentUid,
-  studentEmail,
   score,
   total,
   checkedCount,
@@ -2706,7 +2703,6 @@ export async function createGrammarSetAttemptDraft({
     setTitle,
     ownerUid,
     studentUid,
-    studentEmail,
     studentName: user?.displayName || null,
     score,
     total,
@@ -3136,7 +3132,6 @@ export async function startCourseTestAttempt({
   testKind,
   teacherUid,
   studentUid,
-  studentEmail,
   studentName,
 }) {
   const user = auth.currentUser;
@@ -3150,7 +3145,6 @@ export async function startCourseTestAttempt({
     testKind: testKind || null,
     teacherUid,
     studentUid: studentUid || user.uid,
-    studentEmail: studentEmail || user.email || null,
     studentName: studentName || user.displayName || null,
     sections: [],
     autoScore: 0,

@@ -1,5 +1,6 @@
 // src/components/common/Footer.jsx
 import React from "react";
+import { openCookieBanner } from "../CookieBanner";
 
 export default function Footer() {
   return (
@@ -15,6 +16,10 @@ export default function Footer() {
         </a>
         {" "}· All rights reserved ·{" "}
         <a href="/privacy">Privacy Policy</a>
+        {" "}·{" "}
+        <button type="button" className="footer-link-btn" onClick={openCookieBanner}>
+          Cookie Settings
+        </button>
       </p>
 
       <style>{`
@@ -34,7 +39,19 @@ export default function Footer() {
           color: #6ea8ff;
           text-decoration: none;
         }
+        .footer-link-btn {
+          color: #6ea8ff;
+          text-decoration: none;
+          background: none;
+          border: none;
+          padding: 0;
+          font: inherit;
+          cursor: pointer;
+        }
         .app-footer a:hover {
+          text-decoration: underline;
+        }
+        .footer-link-btn:hover {
           text-decoration: underline;
         }
       `}</style>

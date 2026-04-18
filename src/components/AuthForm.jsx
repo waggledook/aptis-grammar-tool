@@ -16,6 +16,7 @@ export default function AuthForm({ onSuccess }) {
 
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
+  const [ageConsent, setAgeConsent] = useState(false);
 
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
@@ -27,6 +28,7 @@ export default function AuthForm({ onSuccess }) {
     setMode((m) => (m === "signIn" ? "signUp" : "signIn"));
     setError("");
     setNotice("");
+    setAgeConsent(false);
   };
 
   const goToReset = () => {
@@ -41,6 +43,7 @@ export default function AuthForm({ onSuccess }) {
     setPassword("");
     setError("");
     setNotice("");
+    setAgeConsent(false);
   };
 
   const submit = async (e) => {
@@ -119,6 +122,11 @@ export default function AuthForm({ onSuccess }) {
       // -----------
       // SIGN UP
       // -----------
+      if (!ageConsent) {
+        setError("Please confirm that you are 14+ or that you have permission from a parent, guardian, school, or teacher.");
+        return;
+      }
+
       await doSignUp({
         email: identifier.trim(),
         pw: password,
@@ -194,6 +202,25 @@ export default function AuthForm({ onSuccess }) {
                 required
                 autoComplete={isSignUp ? "new-password" : "current-password"}
               />
+            </div>
+          )}
+
+          {isSignUp && (
+            <div className="form-row">
+              <label style={{ display: "flex", gap: "0.6rem", alignItems: "flex-start" }}>
+                <input
+                  type="checkbox"
+                  checked={ageConsent}
+                  onChange={(e) => setAgeConsent(e.target.checked)}
+                  required
+                  style={{ marginTop: "0.2rem" }}
+                />
+                <span>
+                  I confirm that I am at least 14 years old, or that I am using
+                  this account with permission from a parent, guardian, school,
+                  or teacher.
+                </span>
+              </label>
             </div>
           )}
 

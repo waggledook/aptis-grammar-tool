@@ -182,7 +182,12 @@ service cloud.firestore {
           isAdmin()
         );
 
-      allow list: if isSignedIn();
+      allow list: if isSignedIn()
+        && (
+          resource.data.studentUid == request.auth.uid ||
+          resource.data.ownerUid == request.auth.uid ||
+          isAdmin()
+        );
 
       allow update: if isSignedIn()
         && (
@@ -193,7 +198,6 @@ service cloud.firestore {
             request.resource.data.ownerUid == resource.data.ownerUid &&
             request.resource.data.setId == resource.data.setId &&
             request.resource.data.setTitle == resource.data.setTitle &&
-            request.resource.data.studentEmail == resource.data.studentEmail &&
             request.resource.data.studentName == resource.data.studentName &&
             changedKeys().hasOnly([
               "score",
@@ -259,7 +263,6 @@ service cloud.firestore {
           request.resource.data.templateTitle == resource.data.templateTitle &&
           request.resource.data.level == resource.data.level &&
           request.resource.data.testKind == resource.data.testKind &&
-          request.resource.data.studentEmail == resource.data.studentEmail &&
           request.resource.data.studentName == resource.data.studentName &&
           request.resource.data.startedAt == resource.data.startedAt &&
           changedKeys().hasOnly([
@@ -284,7 +287,6 @@ service cloud.firestore {
           request.resource.data.templateTitle == resource.data.templateTitle &&
           request.resource.data.level == resource.data.level &&
           request.resource.data.testKind == resource.data.testKind &&
-          request.resource.data.studentEmail == resource.data.studentEmail &&
           request.resource.data.studentName == resource.data.studentName &&
           request.resource.data.startedAt == resource.data.startedAt &&
           changedKeys().hasOnly([

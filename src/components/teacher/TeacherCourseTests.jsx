@@ -384,6 +384,7 @@ function buildSkillTotals(reviewRows = [], reviewScores = {}) {
 }
 
 function getAttemptMonitorEntry(attempt, session, template, nowMs) {
+  const studentLabel = attempt.studentName || attempt.studentEmail || attempt.studentUid;
   const runnerState = attempt?.runnerState || {};
   const mainStartedAtMs = timestampToMs(runnerState.mainPaperStartedAt || attempt?.startedAt);
   const mainSubmittedAtMs = timestampToMs(runnerState.mainPaperSubmittedAt);
@@ -398,7 +399,7 @@ function getAttemptMonitorEntry(attempt, session, template, nowMs) {
   if (!mainStartedAtMs) {
     return {
       id: attempt.id,
-      studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+      studentLabel,
       stateLabel: "Not started",
       detailLabel: "Student has not started the test yet.",
       tone: "idle",
@@ -409,7 +410,7 @@ function getAttemptMonitorEntry(attempt, session, template, nowMs) {
     const remainingMs = Math.max(0, mainDeadlineMs - nowMs);
     return {
       id: attempt.id,
-      studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+      studentLabel,
       stateLabel: "Main paper running",
       detailLabel: remainingMs > 0
         ? `${formatRemainingLabel(remainingMs)} left`
@@ -421,7 +422,7 @@ function getAttemptMonitorEntry(attempt, session, template, nowMs) {
   if (attempt?.reviewStatus === "reviewed") {
     return {
       id: attempt.id,
-      studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+      studentLabel,
       stateLabel: "Reviewed",
       detailLabel: `${attempt.finalPercent ?? 0}% final`,
       tone: "done",
@@ -431,7 +432,7 @@ function getAttemptMonitorEntry(attempt, session, template, nowMs) {
   if (attempt?.completed || listeningSubmittedAtMs) {
     return {
       id: attempt.id,
-      studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+      studentLabel,
       stateLabel: "Submitted",
       detailLabel: "Finished and awaiting review.",
       tone: "done",
@@ -441,7 +442,7 @@ function getAttemptMonitorEntry(attempt, session, template, nowMs) {
   if (!listeningSections.length) {
     return {
       id: attempt.id,
-      studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+      studentLabel,
       stateLabel: "Main paper done",
       detailLabel: "No listening stage in this test.",
       tone: "idle",
@@ -462,7 +463,7 @@ function getAttemptMonitorEntry(attempt, session, template, nowMs) {
 
   return {
     id: attempt.id,
-    studentLabel: attempt.studentName || attempt.studentEmail || attempt.studentUid,
+    studentLabel,
     stateLabel: "Listening running",
     detailLabel: getListeningPhaseLabel(listeningPhase, listeningIndex, listeningSections.length),
     tone: "active",

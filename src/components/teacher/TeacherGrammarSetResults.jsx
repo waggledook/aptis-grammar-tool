@@ -537,7 +537,8 @@ export default function TeacherGrammarSetResults({ user }) {
                                         verticalAlign: "top",
                                       }}
                                     >
-                                      {att.studentEmail ||
+                                      {att.studentName ||
+                                        att.studentEmail ||
                                         att.studentUid ||
                                         "Unknown"}
                                     </td>

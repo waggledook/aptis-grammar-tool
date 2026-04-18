@@ -94,6 +94,25 @@ const placeholderGapItem = (
   );
 };
 
+const wordOrderItem = (
+  id,
+  prompt,
+  tokens,
+  answer,
+  explanation,
+  alternatives = [],
+  extra = {}
+) => ({
+  id,
+  type: "word-order",
+  prompt,
+  tokens,
+  answer,
+  acceptedAnswers: [answer, ...alternatives],
+  explanation,
+  ...extra,
+});
+
 const placeholderChoiceGapItem = (
   id,
   prompt,
@@ -1089,6 +1108,429 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         ["The tests ", { gapId: "g1" }, " by next week."],
         ["will have been completed", "will have been finished"],
         "Use the future perfect passive: will have been completed."
+      ),
+    ],
+  },
+  {
+    id: "question-word-order-a2-b1",
+    title: "Question Formation Mastery",
+    shortDescription: "Master ASI and QuASI patterns in Present and Past Simple.",
+    levels: ["a2", "b1"],
+    intro:
+      "Practice building questions correctly. Remember: use inversion for 'be' and 'can', but use ASI/QuASI for other verbs. Finish by unjumbling some question forms.",
+    items: [
+      multipleChoiceItem(
+        "qwo-mc-1",
+        "Choose the correct auxiliary.",
+        "____ your parents live in a big house?",
+        ["Are", "Do", "Does"],
+        1,
+        "Use 'Do' for present simple questions with 'I/you/we/they'."
+      ),
+      multipleChoiceItem(
+        "qwo-mc-2",
+        "Choose the correct question form.",
+        "____ a bank near here?",
+        ["Is there", "Does there", "There is"],
+        0,
+        "For questions with 'be', we invert the verb and the subject: 'Is there...?'."
+      ),
+      multipleChoiceItem(
+        "qwo-mc-3",
+        "Choose the correct auxiliary.",
+        "Where ____ you go on holiday last year?",
+        ["do", "were", "did"],
+        2,
+        "Use 'did' for past simple questions with most verbs."
+      ),
+      multipleChoiceItem(
+        "qwo-mc-5",
+        "Choose the correct auxiliary.",
+        "____ you sit here, please?",
+        ["Can", "Do", "Are"],
+        0,
+        "Use 'Can' for requests or asking about ability; it follows the inversion pattern."
+      ),
+      errorCorrectionItem(
+        "qwo-ec-1",
+        "Check the highlighted phrase for errors.",
+        "When did you started studying English?",
+        "did you started",
+        false,
+        "did you start",
+        "After 'did', always use the infinitive (base form) of the verb."
+      ),
+      errorCorrectionItem(
+        "qwo-ec-2",
+        "Check the highlighted phrase for errors.",
+        "Where were you born?",
+        "were you born",
+        true,
+        "",
+        "Correct! With the verb 'be', we invert the subject and verb: 'you were' -> 'were you'."
+      ),
+      errorCorrectionItem(
+        "qwo-ec-3",
+        "Check the highlighted phrase for errors.",
+        "Does your sister works in an office?",
+        "Does your sister works",
+        false,
+        "Does your sister work",
+        "In questions with 'Does', the main verb loses its '-s' and stays in the infinitive form."
+      ),
+      errorCorrectionItem(
+        "qwo-ec-4",
+        "Check the highlighted phrase for errors.",
+        "Who do you live with?",
+        "Who do you live with",
+        true,
+        "",
+        "Correct! In English, we often put the preposition (with) at the end of the question."
+      ),
+      placeholderGapItem(
+        "qwo-gf-1",
+        "Build the question from the prompt.",
+        "What __________? (that noise / was)",
+        "was that noise",
+        [],
+        "For questions with 'be' in the past, invert the verb and the subject."
+      ),
+      placeholderGapItem(
+        "qwo-gf-2",
+        "Build the question in present simple.",
+        "Where __________? (your parents / live)",
+        "do your parents live",
+        [],
+        "Follow the QuASI pattern: Question word (Where) + Auxiliary (do) + Subject (your parents) + Infinitive (live)."
+      ),
+      placeholderGapItem(
+        "qwo-gf-4",
+        "Build the question with the preposition at the end.",
+        "Who __________? (you / wait / for)",
+        "are you waiting for",
+        ["do you wait for"],
+        "Put the preposition 'for' at the end of the question."
+      ),
+      wordOrderItem(
+        "qwo-wo-1",
+        "Unjumble the question.",
+        ["sister", "work", "your", "where", "does", "?"],
+        "Where does your sister work?",
+        "Use QuASI order here: question word + auxiliary + subject + infinitive."
+      ),
+      wordOrderItem(
+        "qwo-wo-2",
+        "Unjumble the question.",
+        ["start", "when", "studying", "you", "did", "English", "?"],
+        "When did you start studying English?",
+        "After 'did', use the base form 'start', then continue with 'studying English'."
+      ),
+      wordOrderItem(
+        "qwo-wo-3",
+        "Unjumble the question.",
+        ["you", "do", "with", "who", "live", "?"],
+        "Who do you live with?",
+        "This tests the common pattern with the preposition at the end: 'Who do you live with?'"
+      ),
+      wordOrderItem(
+        "qwo-wo-4",
+        "Unjumble the question.",
+        ["bank", "near", "is", "here", "there", "a", "?"],
+        "Is there a bank near here?",
+        "With the verb 'be', make the question by inversion: 'Is there ...?'"
+      ),
+      wordOrderItem(
+        "qwo-wo-5",
+        "Unjumble the question.",
+        ["talk", "what", "about", "they", "did", "?"],
+        "What did they talk about?",
+        "Use QuASI order, and keep the preposition 'about' at the end."
+      ),
+      wordOrderItem(
+        "qwo-wo-6",
+        "Unjumble the question.",
+        ["born", "where", "were", "you", "?"],
+        "Where were you born?",
+        "Another inversion pattern with 'be' in the past: 'Where were you born?'"
+      ),
+    ],
+  },
+  {
+    id: "present-simple-frequency-a2-b1",
+    title: "Present Simple & Frequency",
+    shortDescription: "Master third-person forms and the position of frequency adverbs.",
+    levels: ["a2", "b1"],
+    intro:
+      "Practice the present simple for habits and general truths. Pay close attention to third-person singular (-s) and where you place words like 'often' or 'usually'!",
+    items: [
+      multipleChoiceItem(
+        "psf-mc-1",
+        "Choose the correct form.",
+        "My brother ____ in the city centre.",
+        ["work", "works", "is work"],
+        1,
+        "Use the third-person singular ending (-s) for 'he/she/it' in the present simple."
+      ),
+      multipleChoiceItem(
+        "psf-mc-2",
+        "Choose the most natural sentence.",
+        "Which sentence is correct?",
+        [
+          "We often go out on Friday night.",
+          "We go often out on Friday night.",
+          "We often are go out on Friday night.",
+        ],
+        0,
+        "Adverbs of frequency usually go before the main verb."
+      ),
+      multipleChoiceItem(
+        "psf-mc-3",
+        "Choose the correct option.",
+        "It ____ in the desert.",
+        ["doesn't never rain", "never rains", "never doesn't rain"],
+        1,
+        "Use a positive verb with 'never'."
+      ),
+      multipleChoiceItem(
+        "psf-mc-4",
+        "Choose the correct form.",
+        "She ____ at weekends.",
+        ["doesn't usually study", "doesn't usually studies", "not usually study"],
+        0,
+        "In negative sentences, use 'doesn't' + the infinitive (base form) of the verb."
+      ),
+      multipleChoiceItem(
+        "psf-mc-5",
+        "Choose the correct position.",
+        "He ____ for work.",
+        ["is always late", "always is late", "late is always"],
+        0,
+        "Adverbs of frequency go after the verb 'be'."
+      ),
+      errorCorrectionItem(
+        "psf-ec-1",
+        "Check the spelling of the highlighted verb.",
+        "My friend studys every evening.",
+        "studys",
+        false,
+        "studies",
+        "For verbs ending in consonant + y, change the 'y' to 'i' and add '-es'."
+      ),
+      errorCorrectionItem(
+        "psf-ec-2",
+        "Check the highlighted phrase for errors.",
+        "She doesn't usually study at weekends.",
+        "doesn't usually study",
+        true,
+        "",
+        "Correct! This uses the negative 'doesn't' with the infinitive and the correct adverb position."
+      ),
+      errorCorrectionItem(
+        "psf-ec-3",
+        "Check the highlighted phrase for errors.",
+        "He has English classes two times a week.",
+        "two times a week",
+        false,
+        "twice a week",
+        "For frequency expressions, use 'once' or 'twice' instead of 'one time' or 'two times'."
+      ),
+      errorCorrectionItem(
+        "psf-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I'm never ill.",
+        "I'm never ill",
+        true,
+        "",
+        "Correct! The adverb 'never' comes after the verb 'be'."
+      ),
+      errorCorrectionItem(
+        "psf-ec-5",
+        "Check the highlighted phrase for errors.",
+        "My parents don't live near here.",
+        "don't live",
+        true,
+        "",
+        "Correct! Use 'don't' for negative sentences with 'I/you/we/they'."
+      ),
+      adverbPlacementItem(
+        "psf-place-1",
+        "Place the adverb in the correct position.",
+        "She gets up early.",
+        ["every day"],
+        { "every day": 4 },
+        "She gets up early every day.",
+        "Expressions of frequency like 'every day' usually go at the end of a sentence."
+      ),
+      adverbPlacementItem(
+        "psf-place-2",
+        "Place the adverb in the correct position.",
+        "We go to the cinema.",
+        ["sometimes"],
+        { sometimes: 1 },
+        "We sometimes go to the cinema.",
+        "Adverbs of frequency go before the main verb."
+      ),
+      adverbPlacementItem(
+        "psf-place-3",
+        "Place the adverb in the correct position.",
+        "They are tired after work.",
+        ["usually"],
+        { usually: 2 },
+        "They are usually tired after work.",
+        "Adverbs of frequency go after the verb 'be'."
+      ),
+      singleGap(
+        "psf-gf-1",
+        "Complete the sentence with the correct form of the verb.",
+        ["The lesson ", { gapId: "g1" }, " at 9:00. (finish)"],
+        ["finishes"],
+        "Add '-es' to verbs ending in -sh, -ch, -s, or -x."
+      ),
+      singleGap(
+        "psf-gf-2",
+        "Complete the sentence with the correct form of the verb.",
+        ["She ", { gapId: "g1" }, " pop music. (not like)"],
+        ["doesn't like", "does not like"],
+        "Use 'doesn't' for negative sentences with 'she'."
+      ),
+    ],
+  },
+  {
+    id: "simple-vs-continuous-a2-b1",
+    title: "Present Simple or Continuous?",
+    shortDescription: "Contrast habits with actions happening right now.",
+    levels: ["a2", "b1"],
+    intro:
+      "Do you know when to use the simple or continuous? Focus on temporary situations, things happening now, and verbs that describe feelings (stative verbs)!",
+    items: [
+      multipleChoiceItem(
+        "psc-mc-1",
+        "Choose the correct response.",
+        "A: What do you do? B: ____.",
+        [
+          "I'm working for an IT company.",
+          "I work for an IT company.",
+          "I working for an IT company.",
+        ],
+        1,
+        "Use the present simple to talk about your general job or routine."
+      ),
+      multipleChoiceItem(
+        "psc-mc-2",
+        "Choose the correct form.",
+        "I ____ this painting; it's beautiful!",
+        ["am liking", "like", "likes"],
+        1,
+        "Verbs that describe feelings, like 'like', are normally used in the present simple, not continuous."
+      ),
+      multipleChoiceItem(
+        "psc-mc-3",
+        "Choose the correct form for an action happening now.",
+        "Look! The woman ____ near the table.",
+        ["is standing", "stands", "standing"],
+        0,
+        "Use the present continuous (be + verb + -ing) to describe what is happening in a picture or at this moment."
+      ),
+      multipleChoiceItem(
+        "psc-mc-4",
+        "Choose the correct spelling.",
+        "They are ____ through the park.",
+        ["runing", "running", "runing"],
+        1,
+        "If a verb finishes in consonant-vowel-consonant, double the final consonant before adding -ing."
+      ),
+      multipleChoiceItem(
+        "psc-mc-5",
+        "Choose the correct form for a temporary situation.",
+        "My brother ____ a two-month course in the UK.",
+        ["does", "is doing", "doing"],
+        1,
+        "Use the present continuous for temporary things happening around now, even if they aren't happening at this exact second."
+      ),
+      errorCorrectionItem(
+        "psc-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I'm needing a coffee right now.",
+        "I'm needing",
+        false,
+        "I need",
+        "Verbs like 'need', 'want', and 'like' are stative verbs and are not usually used in the continuous form."
+      ),
+      errorCorrectionItem(
+        "psc-ec-2",
+        "Check the spelling of the highlighted verb.",
+        "Are you liveing in the city centre?",
+        "liveing",
+        false,
+        "living",
+        "For verbs ending in 'e', cut the 'e' before adding -ing."
+      ),
+      errorCorrectionItem(
+        "psc-ec-3",
+        "Check the highlighted phrase for errors.",
+        "What are you doing? I'm checking my messages.",
+        "I'm checking",
+        true,
+        "",
+        "Correct! Use the present continuous for an action happening now."
+      ),
+      errorCorrectionItem(
+        "psc-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I'm liking Italian food.",
+        "I'm liking",
+        false,
+        "I like",
+        "We normally use verbs describing feelings in the present simple."
+      ),
+      errorCorrectionItem(
+        "psc-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I'm sending a message to Sarah.",
+        "I'm sending",
+        true,
+        "",
+        "Correct! This is an action happening at the moment of speaking."
+      ),
+      placeholderGapItem(
+        "psc-gf-1",
+        "Complete the sentence with the correct form.",
+        "Be quiet! The baby __________. (sleep)",
+        "is sleeping",
+        [],
+        "Use the present continuous for an action happening right now."
+      ),
+      placeholderGapItem(
+        "psc-gf-2",
+        "Complete the sentence.",
+        "I __________ to go home now. (want)",
+        "want",
+        [],
+        "'Want' is a non-action verb, so use the present simple even when talking about 'now'."
+      ),
+      placeholderGapItem(
+        "psc-gf-3",
+        "Complete the sentence with the correct form.",
+        "She usually wears jeans, but today she __________ a dress. (wear)",
+        "is wearing",
+        [],
+        "Contrast a routine (usually) with a temporary situation (today) using the continuous."
+      ),
+      placeholderGapItem(
+        "psc-gf-4",
+        "Complete the sentence.",
+        "What __________ on TV? (you / watch)",
+        "are you watching",
+        [],
+        "Use the present continuous question form for an action in progress."
+      ),
+      placeholderGapItem(
+        "psc-gf-5",
+        "Complete the sentence.",
+        "My parents __________ near here. (not live)",
+        "don't live",
+        ["do not live"],
+        "Use the present simple for things that are generally true."
       ),
     ],
   },
