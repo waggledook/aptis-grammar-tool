@@ -79,12 +79,13 @@ function buildAdverbPlacementSentence(tokens = [], placements = {}, finalPunctua
   return `${words.join(" ").replace(/\s+([,.!?])/g, "$1")}${finalPunctuation}`;
 }
 
-function buildWordOrderSentence(tokens = [], selectedOrder = []) {
+function buildWordOrderSentence(tokens = [], selectedOrder = [], finalPunctuation = "") {
   const chosenTokens = selectedOrder
     .map((tokenIndex) => tokens[tokenIndex])
     .filter((token) => token != null);
 
-  return chosenTokens.join(" ").replace(/\s+([,.!?])/g, "$1");
+  const sentence = chosenTokens.join(" ").replace(/\s+([,.!?])/g, "$1");
+  return `${sentence}${finalPunctuation}`;
 }
 
 function sameCommaPositions(left = [], right = []) {
@@ -228,7 +229,6 @@ export default function HubGrammarActivityRunner() {
   const [answers, setAnswers] = useState(() => (activity ? buildInitialAnswers(activity) : {}));
   const [confirmedCorrections, setConfirmedCorrections] = useState({});
   const [selectedAdverb, setSelectedAdverb] = useState(null);
-  const [selectedWordToken, setSelectedWordToken] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState(null);
@@ -322,7 +322,6 @@ export default function HubGrammarActivityRunner() {
     setAnswers(activity ? buildInitialAnswers(activity) : {});
     setConfirmedCorrections({});
     setSelectedAdverb(null);
-    setSelectedWordToken(null);
     setSubmitted(false);
     setSaving(false);
     setResult(null);
@@ -525,25 +524,11 @@ export default function HubGrammarActivityRunner() {
 
   const clearWordOrder = (itemId) => {
     handleChange(itemId, []);
-    setSelectedWordToken(null);
-  };
-
-  const handleWordDrop = (event, itemId, insertIndex = null) => {
-    event.preventDefault();
-    const rawIndex = event.dataTransfer.getData("text/plain");
-    const tokenIndex =
-      rawIndex !== ""
-        ? Number(rawIndex)
-        : selectedWordToken?.itemId === itemId
-          ? selectedWordToken.tokenIndex
-          : null;
-
-    if (tokenIndex == null || Number.isNaN(tokenIndex)) return;
-    placeWordToken(itemId, tokenIndex, insertIndex);
   };
 
   const handleAdverbDrop = (event, item, slotIndex) => {
     event.preventDefault();
+    event.stopPropagation();
     const adverb = event.dataTransfer.getData("text/plain") || selectedAdverb?.adverb;
     placeAdverb(item.id, adverb, slotIndex);
   };
@@ -552,7 +537,6 @@ export default function HubGrammarActivityRunner() {
     setAnswers(buildInitialAnswers(activity));
     setConfirmedCorrections({});
     setSelectedAdverb(null);
-    setSelectedWordToken(null);
     setSubmitted(false);
     setResult(null);
   };
@@ -688,7 +672,11 @@ export default function HubGrammarActivityRunner() {
 
       if (item.type === "word-order") {
         const selectedOrder = Array.isArray(answers[item.id]) ? answers[item.id] : [];
-        const selectedSentence = buildWordOrderSentence(item.tokens || [], selectedOrder);
+        const selectedSentence = buildWordOrderSentence(
+          item.tokens || [],
+          selectedOrder,
+          item.finalPunctuation || ""
+        );
         const acceptedAnswers = Array.isArray(item.acceptedAnswers)
           ? item.acceptedAnswers
           : [item.answer].filter(Boolean);
@@ -829,6 +817,21 @@ export default function HubGrammarActivityRunner() {
                   <span className="hub-grammar-number">{index + 1}</span>
                   <p>{item.prompt}</p>
                 </div>
+
+                {item.imageSrc ? (
+                  <figure className="hub-grammar-figure">
+                    <img
+                      src={item.imageSrc}
+                      alt={item.imageAlt || item.prompt}
+                      className="hub-grammar-figure-image"
+                    />
+                    {item.imageCaption ? (
+                      <figcaption className="hub-grammar-figure-caption">
+                        {item.imageCaption}
+                      </figcaption>
+                    ) : null}
+                  </figure>
+                ) : null}
 
                 {item.type === "multiple-choice" ? (
                   <>
@@ -1109,20 +1112,18 @@ export default function HubGrammarActivityRunner() {
                   </div>
                 ) : item.type === "word-order" ? (
                   <div className="hub-grammar-word-order">
+                    <p className="hub-grammar-word-help">
+                      Tap the words in the correct order. Tap a placed word to send it back and try again.
+                    </p>
                     <div
                       className={[
                         "hub-grammar-word-dropzone",
                         Array.isArray(answers[item.id]) && answers[item.id].length
                           ? ""
                           : "is-empty",
-                        selectedWordToken?.itemId === item.id ? "is-active" : "",
                       ]
                         .filter(Boolean)
                         .join(" ")}
-                      onDragOver={(event) => {
-                        if (!submitted) event.preventDefault();
-                      }}
-                      onDrop={(event) => handleWordDrop(event, item.id)}
                     >
                       {(answers[item.id] || []).map((tokenIndex, tokenPosition) => {
                         const token = item.tokens?.[tokenIndex];
@@ -1133,11 +1134,6 @@ export default function HubGrammarActivityRunner() {
                             key={`${item.id}:answer:${tokenIndex}:${tokenPosition}`}
                             type="button"
                             className="hub-grammar-word-pill is-placed"
-                            draggable={!submitted}
-                            onDragStart={(event) => {
-                              event.dataTransfer.setData("text/plain", String(tokenIndex));
-                              event.dataTransfer.effectAllowed = "move";
-                            }}
                             onClick={() => {
                               if (submitted) return;
                               removeWordToken(item.id, tokenIndex);
@@ -1148,15 +1144,17 @@ export default function HubGrammarActivityRunner() {
                           </button>
                         );
                       })}
+                      {item.finalPunctuation ? (
+                        <span className="hub-grammar-word-final-punctuation">
+                          {item.finalPunctuation}
+                        </span>
+                      ) : null}
                     </div>
 
                     <div className="hub-grammar-word-bank" aria-label="Words to arrange">
                       {(item.tokens || []).map((token, tokenIndex) => {
                         const currentOrder = Array.isArray(answers[item.id]) ? answers[item.id] : [];
                         const isPlaced = currentOrder.includes(tokenIndex);
-                        const isSelected =
-                          selectedWordToken?.itemId === item.id &&
-                          selectedWordToken.tokenIndex === tokenIndex;
 
                         return (
                           <button
@@ -1165,26 +1163,12 @@ export default function HubGrammarActivityRunner() {
                             className={[
                               "hub-grammar-word-pill",
                               isPlaced ? "is-disabled" : "",
-                              isSelected ? "is-selected" : "",
                             ]
                               .filter(Boolean)
                               .join(" ")}
-                            draggable={!submitted && !isPlaced}
-                            onDragStart={(event) => {
-                              event.dataTransfer.setData("text/plain", String(tokenIndex));
-                              event.dataTransfer.effectAllowed = "move";
-                            }}
                             onClick={() => {
                               if (submitted) return;
-                              if (isPlaced) {
-                                removeWordToken(item.id, tokenIndex);
-                                return;
-                              }
-                              if (isSelected) {
-                                setSelectedWordToken(null);
-                                return;
-                              }
-                              setSelectedWordToken({ itemId: item.id, tokenIndex });
+                              if (isPlaced) return;
                               placeWordToken(item.id, tokenIndex);
                             }}
                             ref={tokenIndex === 0 ? registerInput(`${item.id}:word-bank:0`) : undefined}
@@ -1463,6 +1447,27 @@ export default function HubGrammarActivityRunner() {
           line-height: 1.45;
         }
 
+        .hub-grammar-figure {
+          margin: 0 0 0.9rem;
+          display: grid;
+          gap: 0.5rem;
+        }
+
+        .hub-grammar-figure-image {
+          display: block;
+          width: 100%;
+          max-width: 720px;
+          border-radius: 0.95rem;
+          border: 1px solid rgba(53, 80, 142, 0.8);
+          background: rgba(2, 6, 23, 0.45);
+        }
+
+        .hub-grammar-figure-caption {
+          color: #c7d2fe;
+          line-height: 1.45;
+          font-size: 0.95rem;
+        }
+
         .hub-grammar-sentence {
           display: block;
           padding: 0.9rem 1rem;
@@ -1641,6 +1646,13 @@ export default function HubGrammarActivityRunner() {
           gap: 0.9rem;
         }
 
+        .hub-grammar-word-help {
+          margin: 0;
+          color: #b8c8e6;
+          line-height: 1.5;
+          font-size: 0.95rem;
+        }
+
         .hub-grammar-word-dropzone,
         .hub-grammar-word-bank {
           display: flex;
@@ -1655,11 +1667,6 @@ export default function HubGrammarActivityRunner() {
 
         .hub-grammar-word-dropzone {
           background: rgba(2, 6, 23, 0.42);
-        }
-
-        .hub-grammar-word-dropzone.is-active {
-          border-color: rgba(94, 234, 212, 0.62);
-          background: rgba(20, 184, 166, 0.08);
         }
 
         .hub-grammar-word-dropzone.is-empty::after {
@@ -1698,12 +1705,6 @@ export default function HubGrammarActivityRunner() {
           cursor: grabbing;
         }
 
-        .hub-grammar-word-pill.is-selected {
-          border-color: rgba(94, 234, 212, 0.75);
-          background: rgba(20, 184, 166, 0.2);
-          color: #d7fff6;
-        }
-
         .hub-grammar-word-pill.is-placed {
           cursor: pointer;
         }
@@ -1717,6 +1718,13 @@ export default function HubGrammarActivityRunner() {
           display: flex;
           flex-wrap: wrap;
           gap: 0.65rem;
+        }
+
+        .hub-grammar-word-final-punctuation {
+          color: #eef4ff;
+          font-size: 1.15rem;
+          font-weight: 800;
+          margin-left: -0.1rem;
         }
 
         .hub-grammar-word-clear {

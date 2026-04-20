@@ -110,6 +110,10 @@ const wordOrderItem = (
   answer,
   acceptedAnswers: [answer, ...alternatives],
   explanation,
+  finalPunctuation:
+    extra.finalPunctuation ||
+    String(answer || "").trim().match(/([?!])$/)?.[1] ||
+    "",
   ...extra,
 });
 
@@ -119,7 +123,8 @@ const placeholderChoiceGapItem = (
   sentence,
   answers = [],
   explanation,
-  choices = ["a", "an", "the", "—"]
+  choices = ["a", "an", "the", "—"],
+  extra = {}
 ) => {
   const marker = "____";
   const source = String(sentence || "");
@@ -155,6 +160,7 @@ const placeholderChoiceGapItem = (
     prompt,
     parts,
     gaps,
+    ...extra,
   };
 };
 
@@ -1214,42 +1220,42 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       wordOrderItem(
         "qwo-wo-1",
         "Unjumble the question.",
-        ["sister", "work", "your", "where", "does", "?"],
+        ["sister", "work", "your", "where", "does"],
         "Where does your sister work?",
         "Use QuASI order here: question word + auxiliary + subject + infinitive."
       ),
       wordOrderItem(
         "qwo-wo-2",
         "Unjumble the question.",
-        ["start", "when", "studying", "you", "did", "English", "?"],
+        ["start", "when", "studying", "you", "did", "English"],
         "When did you start studying English?",
         "After 'did', use the base form 'start', then continue with 'studying English'."
       ),
       wordOrderItem(
         "qwo-wo-3",
         "Unjumble the question.",
-        ["you", "do", "with", "who", "live", "?"],
+        ["you", "do", "with", "who", "live"],
         "Who do you live with?",
         "This tests the common pattern with the preposition at the end: 'Who do you live with?'"
       ),
       wordOrderItem(
         "qwo-wo-4",
         "Unjumble the question.",
-        ["bank", "near", "is", "here", "there", "a", "?"],
+        ["bank", "near", "is", "here", "there", "a"],
         "Is there a bank near here?",
         "With the verb 'be', make the question by inversion: 'Is there ...?'"
       ),
       wordOrderItem(
         "qwo-wo-5",
         "Unjumble the question.",
-        ["talk", "what", "about", "they", "did", "?"],
+        ["talk", "what", "about", "they", "did"],
         "What did they talk about?",
         "Use QuASI order, and keep the preposition 'about' at the end."
       ),
       wordOrderItem(
         "qwo-wo-6",
         "Unjumble the question.",
-        ["born", "where", "were", "you", "?"],
+        ["born", "where", "were", "you"],
         "Where were you born?",
         "Another inversion pattern with 'be' in the past: 'Where were you born?'"
       ),
@@ -1328,11 +1334,11 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       errorCorrectionItem(
         "psf-ec-3",
         "Check the highlighted phrase for errors.",
-        "He has English classes two times a week.",
-        "two times a week",
+        "He has English classes every Mondays.",
+        "every Mondays",
         false,
-        "twice a week",
-        "For frequency expressions, use 'once' or 'twice' instead of 'one time' or 'two times'."
+        "every Monday",
+        "Use 'every' with the singular form: 'every Monday', not 'every Mondays'."
       ),
       errorCorrectionItem(
         "psf-ec-4",
@@ -7653,6 +7659,230 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "lives",
         ["live"],
         "Both singular and plural verbs are used with 'neither of', though singular is more formal."
+      ),
+      placeholderChoiceGapItem(
+        "quant-pic-1",
+        "Look at the classroom scene and choose the best quantifier.",
+        "____ is allowed to use their phone.",
+        ["Nobody"],
+        "Use 'nobody' when no person is allowed to do something.",
+        ["Nobody", "every", "any", "no", "anybody", "None", "both"],
+        {
+          imageSrc: "/images/grammar/classroom-scene.png",
+          imageAlt: "A chaotic classroom scene with a stressed teacher, messy desks, and distracted students.",
+          imageCaption: "Look at the picture and complete the sentences with the best quantifier.",
+        }
+      ),
+      placeholderChoiceGapItem(
+        "quant-pic-2",
+        "Use the same picture to choose the best quantifier.",
+        "Classes are ____ Tuesday and Thursday.",
+        ["every"],
+        "Use 'every' before singular time expressions like days of the week.",
+        ["Nobody", "every", "any", "no", "anybody", "None", "both"]
+      ),
+      placeholderChoiceGapItem(
+        "quant-pic-3",
+        "Use the same picture to choose the best quantifier.",
+        "You can go to reception ____ time between 9am and 10pm.",
+        ["any"],
+        "Use 'any' with singular nouns in expressions like 'any time' to mean 'it doesn't matter which'.",
+        ["Nobody", "every", "any", "no", "anybody", "None", "both"]
+      ),
+      placeholderChoiceGapItem(
+        "quant-pic-4",
+        "Use the same picture to choose the best quantifier.",
+        "There are ____ classes on Friday afternoons.",
+        ["no"],
+        "Use 'no' directly before a plural noun to mean zero quantity.",
+        ["Nobody", "every", "any", "no", "anybody", "None", "both"]
+      ),
+      placeholderChoiceGapItem(
+        "quant-pic-5",
+        "Use the same picture to choose the best quantifier.",
+        "The self-study room is available to ____ taking an exam.",
+        ["anybody"],
+        "Use 'anybody' to mean any person in that situation.",
+        ["Nobody", "every", "any", "no", "anybody", "None", "both"]
+      ),
+      placeholderChoiceGapItem(
+        "quant-pic-6",
+        "Use the same picture to choose the best quantifier.",
+        "____ of the students are paying attention to their teacher.",
+        ["None"],
+        "Use 'none of' before a plural noun phrase to mean zero people in the group.",
+        ["Nobody", "every", "any", "no", "anybody", "None", "both"]
+      ),
+      placeholderChoiceGapItem(
+        "quant-pic-7",
+        "Use the same picture to choose the best quantifier.",
+        "The teacher has broken ____ his board pens.",
+        ["both"],
+        "Use 'both' for two things when the statement is positive.",
+        ["Nobody", "every", "any", "no", "anybody", "None", "both"]
+      ),
+    ],
+  },
+  {
+    id: "ed-ing-adjectives-mastery",
+    title: "-ed and -ing Adjectives",
+    shortDescription: "Master the difference between describing feelings and describing situations.",
+    levels: ["b1", "b2"],
+    intro:
+      "Are you 'bored' or 'boring'? The answer depends on whether you're talking about your feelings or your personality. This test helps you choose the right ending every time.",
+    items: [
+      multipleChoiceItem(
+        "adj-ed-mc-1",
+        "Choose the most natural option.",
+        "The instructions for the new software were very ____, so I had to call for help.",
+        ["confused", "confusing", "confuse"],
+        1,
+        "Use -ing to describe the thing (the instructions) that causes the feeling."
+      ),
+      multipleChoiceItem(
+        "adj-ed-mc-2",
+        "Choose the most natural option.",
+        "I was quite ____ when I saw the final score of the match.",
+        ["surprising", "surprised", "surprise"],
+        1,
+        "Use -ed to describe how a person feels in response to a situation."
+      ),
+      multipleChoiceItem(
+        "adj-ed-mc-3",
+        "Choose the most natural option.",
+        "He’s such an ____ person; he’s traveled to over fifty countries!",
+        ["interested", "interesting", "interest"],
+        1,
+        "Use -ing to describe someone's personality or the qualities they have that affect others."
+      ),
+      multipleChoiceItem(
+        "adj-ed-mc-4",
+        "Choose the most natural option.",
+        "Working in a hospital can be very ____ at the end of a long shift.",
+        ["exhausted", "exhausting", "exhaust"],
+        1,
+        "The job is the cause of the feeling, so we use the -ing form."
+      ),
+      multipleChoiceItem(
+        "adj-ed-mc-5",
+        "Choose the most natural option.",
+        "I always feel ____ after a long walk by the sea.",
+        ["relaxing", "relaxed", "relax"],
+        1,
+        "Use -ed to describe how a person feels after an experience."
+      ),
+      errorCorrectionItem(
+        "adj-ed-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I’m very boring in this meeting. Can we take a break?",
+        "very boring",
+        false,
+        "very bored",
+        "If you are the one feeling the lack of interest, use 'bored'. 'Boring' would mean you are a dull person!"
+      ),
+      errorCorrectionItem(
+        "adj-ed-ec-2",
+        "Check the highlighted phrase for errors.",
+        "The documentary was absolutely fascinated.",
+        "fascinated",
+        false,
+        "fascinating",
+        "Inanimate objects like documentaries cannot 'feel' fascinated; they are 'fascinating' to the audience."
+      ),
+      errorCorrectionItem(
+        "adj-ed-ec-3",
+        "Check the highlighted phrase for errors.",
+        "She was so embarrassed when she realized her mistake.",
+        "embarrassed",
+        true,
+        "",
+        "Correct! Use -ed for the person's internal feeling of shame or awkwardness."
+      ),
+      errorCorrectionItem(
+        "adj-ed-ec-4",
+        "Check the highlighted phrase for errors.",
+        "It was a really frightened experience for everyone involved.",
+        "frightened",
+        false,
+        "frightening",
+        "The experience is the cause of the fear, so it must be 'frightening'."
+      ),
+      errorCorrectionItem(
+        "adj-ed-ec-5",
+        "Check the highlighted phrase for errors.",
+        "After the exam, everyone looked very tiring.",
+        "very tiring",
+        false,
+        "very tired",
+        "Use -ed to describe the students' feeling after a lot of mental effort."
+      ),
+      placeholderGapItem(
+        "adj-ed-gf-1",
+        "Complete the sentence with the correct form.",
+        "I find city maps very __________. (confuse)",
+        "confusing",
+        [],
+        "The maps are the cause of the confusion."
+      ),
+      placeholderGapItem(
+        "adj-ed-gf-2",
+        "Complete the sentence with the correct form.",
+        "Are you __________ in visiting the museum this afternoon? (interest)",
+        "interested",
+        [],
+        "Use -ed for personal interest or feelings."
+      ),
+      placeholderGapItem(
+        "adj-ed-gf-3",
+        "Complete the sentence with the correct form.",
+        "The results of the test were quite __________. (disappoint)",
+        "disappointing",
+        [],
+        "Use -ing to describe the nature of the results."
+      ),
+      placeholderGapItem(
+        "adj-ed-gf-4",
+        "Complete the sentence with the correct form.",
+        "He looked really __________ when he heard the bad news. (depress)",
+        "depressed",
+        [],
+        "Use -ed to describe the person's emotional state."
+      ),
+      placeholderGapItem(
+        "adj-ed-gf-5",
+        "Complete the sentence with the correct form.",
+        "I love listening to jazz because I find it very __________. (relax)",
+        "relaxing",
+        [],
+        "Use -ing to describe the thing that creates the feeling."
+      ),
+      singleGap(
+        "adj-ed-rf-1",
+        "Rewrite the sentence using an -ed adjective.",
+        ["The news shocked everyone. -> Everyone was ", { gapId: "g1" }, " by the news."],
+        ["shocked"],
+        "Convert the verb into a feeling adjective."
+      ),
+      singleGap(
+        "adj-ed-rf-2",
+        "Rewrite the sentence using an -ing adjective.",
+        ["This book bores me. -> This is a very ", { gapId: "g1" }, " book."],
+        ["boring"],
+        "Convert the verb into a characteristic adjective."
+      ),
+      singleGap(
+        "adj-ed-rf-3",
+        "Rewrite the sentence based on the feeling.",
+        ["The long flight made us feel exhausted. -> The long flight was ", { gapId: "g1" }, "."],
+        ["exhausting"],
+        "Describe the cause of the exhaustion."
+      ),
+      singleGap(
+        "adj-ed-rf-4",
+        "Rewrite the sentence using an -ing adjective.",
+        ["The ten-hour journey tired us all out. -> The ten-hour journey was very ", { gapId: "g1" }, "."],
+        ["tiring"],
+        "Use the -ing adjective to describe the thing that causes the feeling."
       ),
     ],
   },
