@@ -1541,6 +1541,425 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     ],
   },
   {
+    id: "past-simple-mastery-a2-b1",
+    title: "Past Simple: Regular & Irregular",
+    shortDescription: "Master finished actions, spelling rules, and negatives.",
+    levels: ["a2", "b1"],
+    intro:
+      "Practice talking about the past. Remember the spelling rules for regular verbs and watch out for those tricky irregular forms!",
+    items: [
+      multipleChoiceItem(
+        "ps-mc-1",
+        "Choose the correct regular form.",
+        "We ____ at a wonderful hotel last summer.",
+        ["stay", "stayed", "staiyed"],
+        1,
+        "To make the past simple of most regular verbs, just add -ed."
+      ),
+      multipleChoiceItem(
+        "ps-mc-2",
+        "Choose the correct irregular form.",
+        "I ____ to Turkey twice last year.",
+        ["goed", "was go", "went"],
+        2,
+        "The verb 'go' is irregular; its past simple form is 'went'."
+      ),
+      multipleChoiceItem(
+        "ps-mc-3",
+        "Choose the correct negative form.",
+        "She ____ to France with her family.",
+        ["didn't go", "didn't went", "not went"],
+        0,
+        "Use 'didn't' + the infinitive (base form) for negative sentences in the past simple."
+      ),
+      multipleChoiceItem(
+        "ps-mc-4",
+        "Choose the correct auxiliary for a question.",
+        "____ you stay for the weekend?",
+        ["Were", "Did", "Do"],
+        1,
+        "Use 'Did' as the auxiliary for questions in the past simple."
+      ),
+      multipleChoiceItem(
+        "ps-mc-5",
+        "Choose the correct question.",
+        "Where ____ you stay?",
+        ["did", "were", "are"],
+        0,
+        "Follow the QuASI pattern: Question word + did + subject + infinitive."
+      ),
+      errorCorrectionItem(
+        "ps-ec-1",
+        "Check the spelling of the highlighted verb.",
+        "I studyed for three hours last night.",
+        "studyed",
+        false,
+        "studied",
+        "For verbs ending in consonant + y, change the 'y' to 'i' and add -ed."
+      ),
+      errorCorrectionItem(
+        "ps-ec-2",
+        "Check the highlighted phrase for errors.",
+        "Did you saw the news this morning?",
+        "did you saw",
+        false,
+        "did you see",
+        "In questions, use 'did' + the infinitive. Do not use the past simple form of the main verb."
+      ),
+      errorCorrectionItem(
+        "ps-ec-3",
+        "Check the spelling of the highlighted verb.",
+        "We stoped at the park for a picnic.",
+        "stoped",
+        false,
+        "stopped",
+        "If a verb finishes in consonant-vowel-consonant, double the final consonant before adding -ed."
+      ),
+      errorCorrectionItem(
+        "ps-ec-4",
+        "Check the highlighted phrase for errors.",
+        "He didn't stay with friends.",
+        "didn't stay",
+        true,
+        "",
+        "Correct! Use 'didn't' + infinitive for negative sentences."
+      ),
+      errorCorrectionItem(
+        "ps-ec-5",
+        "Check the highlighted phrase for errors.",
+        "Why did you go to Madrid?",
+        "Why did you go",
+        true,
+        "",
+        "Correct! This follows the QuASI (Question word, Auxiliary, Subject, Infinitive) pattern."
+      ),
+      placeholderGapItem(
+        "ps-gf-1",
+        "Complete the sentence with the past simple form.",
+        "I __________ (see) a great movie on Friday night.",
+        "saw",
+        [],
+        "'See' is an irregular verb. Its past simple form is 'saw'."
+      ),
+      placeholderGapItem(
+        "ps-gf-2",
+        "Complete the sentence.",
+        "They __________ (not like) the food at the restaurant.",
+        "didn't like",
+        ["did not like"],
+        "Use 'didn't' + infinitive for negative past simple sentences."
+      ),
+      placeholderGapItem(
+        "ps-gf-3",
+        "Complete the question.",
+        "What time __________ (you / arrive) yesterday?",
+        "did you arrive",
+        [],
+        "Use 'did' + subject + infinitive to form a past simple question."
+      ),
+      placeholderGapItem(
+        "ps-gf-4",
+        "Complete the sentence with the correct spelling.",
+        "The cat __________ (stop) running suddenly.",
+        "stopped",
+        [],
+        "Remember to double the 'p' in 'stop' before adding -ed."
+      ),
+      placeholderGapItem(
+        "ps-gf-5",
+        "Complete the sentence with the past simple form.",
+        "We __________ (stay) at home all weekend.",
+        "stayed",
+        [],
+        "'Stay' is a regular verb; simply add -ed."
+      ),
+      wordOrderItem(
+        "ps-wo-1",
+        "Unjumble the question.",
+        ["last", "you", "stay", "where", "did", "summer"],
+        "Where did you stay last summer?",
+        "Use QuASI order: question word + did + subject + infinitive + time expression."
+      ),
+      wordOrderItem(
+        "ps-wo-2",
+        "Unjumble the sentence.",
+        ["Turkey", "year", "I", "to", "went", "last"],
+        "I went to Turkey last year.",
+        "This is a past simple statement: subject + past verb + place + time."
+      ),
+      wordOrderItem(
+        "ps-wo-3",
+        "Unjumble the question.",
+        ["go", "why", "Madrid", "did", "you", "to"],
+        "Why did you go to Madrid?",
+        "Use QuASI order again: question word + did + subject + infinitive + destination."
+      ),
+    ],
+  },
+  {
+    id: "past-simple-vs-continuous-a2-b1",
+    title: "The Narrative Timeline",
+    shortDescription: "Contrast the background (Continuous) with the interruption (Simple).",
+    levels: ["a2", "b1"],
+    intro:
+      "Can you manage two actions at once? Use the Past Continuous for the longer background action and the Past Simple for the shorter event that interrupts it.",
+    items: [
+      multipleChoiceItem(
+        "pscn-mc-1",
+        "Which action was already happening?",
+        "I was walking in the park when I saw a strange bird.",
+        ["I was walking", "I saw a strange bird", "Both happened at once"],
+        0,
+        "The Past Continuous (was walking) describes the longer background action that was already in progress."
+      ),
+      multipleChoiceItem(
+        "pscn-mc-2",
+        "Choose the correct interruption.",
+        "The birds were singing when suddenly __________.",
+        ["it started to rain", "it was starting to rain", "it rain"],
+        0,
+        "Use the Past Simple for the sudden event that interrupts the background situation."
+      ),
+      multipleChoiceItem(
+        "pscn-mc-3",
+        "Choose the correct combination.",
+        "What __________ when the accident happened?",
+        ["were you doing", "did you do", "you were doing"],
+        0,
+        "Use the Past Continuous to ask about the action in progress at the specific moment of the accident."
+      ),
+      errorCorrectionItem(
+        "pscn-ec-1",
+        "Check the highlighted phrase for errors.",
+        "When the phone rang, I was answering it.",
+        "was answering",
+        false,
+        "answered",
+        "If one action follows another in a sequence, use the Past Simple for both: 'The phone rang and I answered it'."
+      ),
+      errorCorrectionItem(
+        "pscn-ec-2",
+        "Check the highlighted phrase for errors.",
+        "My sister arrived while I was having lunch.",
+        "was having lunch",
+        true,
+        "",
+        "Correct! 'Arrived' is the shorter interruption, and 'was having lunch' is the longer background action."
+      ),
+      errorCorrectionItem(
+        "pscn-ec-3",
+        "Check the highlighted phrase for errors.",
+        "I was seeing a famous actor while I was waiting for the bus.",
+        "was seeing",
+        false,
+        "saw",
+        "Even in the middle of another action, 'seeing' the actor is a short, completed event (interruption)."
+      ),
+      doubleGap(
+        "pscn-dg-1",
+        "Complete the story with the correct tenses.",
+        ["It ", { gapId: "g1" }, " when I ", { gapId: "g2" }, " the house. (rain / leave)"],
+        ["was raining"],
+        ["left"],
+        "Background: It was raining. Interruption: I left the house."
+      ),
+      doubleGap(
+        "pscn-dg-2",
+        "Complete the story with the correct tenses.",
+        ["We ", { gapId: "g1" }, " in the gardens when he ", { gapId: "g2" }, " a photo of us. (walk / take)"],
+        ["were walking"],
+        ["took"],
+        "Background: We were walking. Interruption: He took a photo."
+      ),
+      doubleGap(
+        "pscn-dg-3",
+        "Complete the story with the correct tenses.",
+        ["When I ", { gapId: "g1" }, ", you ", { gapId: "g2" }, " on the sofa! (arrive / sleep)"],
+        ["arrived"],
+        ["were sleeping"],
+        "The sleeping was already in progress (Background) when the arrival happened (Interruption)."
+      ),
+      doubleGap(
+        "pscn-dg-4",
+        "Complete the story with the correct tenses.",
+        ["What ", { gapId: "g1" }, " when the phone ", { gapId: "g2" }, "? (you / do / ring)"],
+        ["were you doing"],
+        ["rang"],
+        "Question about the background action interrupted by the phone ringing."
+      ),
+      placeholderGapItem(
+        "pscn-gf-1",
+        "Complete the background description.",
+        "In 1972, my parents __________ in London. (live)",
+        "were living",
+        [],
+        "Use the Past Continuous to describe the background situation at the beginning of a story."
+      ),
+      placeholderGapItem(
+        "pscn-gf-2",
+        "Fill the gap.",
+        "I broke my leg while I __________ in the mountains. (ski)",
+        "was skiing",
+        [],
+        "Use the Past Continuous after 'while' for the longer action."
+      ),
+      placeholderGapItem(
+        "pscn-gf-3",
+        "Fill the gap.",
+        "When the teacher came in, the students __________ quietly. (not / work)",
+        "weren't working",
+        ["were not working"],
+        "Describe the background state (not working) when the teacher entered."
+      ),
+      placeholderGapItem(
+        "pscn-gf-4",
+        "Fill the gap.",
+        "I __________ the news on the radio this morning. (hear)",
+        "heard",
+        [],
+        "Hearing the news is a finished, shorter action."
+      ),
+      placeholderGapItem(
+        "pscn-gf-5",
+        "Fill the gap.",
+        "At 8:00 AM yesterday, she __________ breakfast. (have)",
+        "was having",
+        [],
+        "Use the Past Continuous for an action in progress at a specific moment in the past."
+      ),
+    ],
+  },
+  {
+    id: "connector-logic-a2-b1",
+    title: "Connectors: Reason, Result & Contrast",
+    shortDescription: "Choose between so, because, but, and although to link your ideas.",
+    levels: ["a2", "b1"],
+    intro:
+      "Decide how the two parts of the sentence relate to each other. Are you giving a reason, a result, or showing a contrast?",
+    items: [
+      placeholderChoiceGapItem(
+        "cl-1",
+        "Choose the correct connector.",
+        "She was driving fast ____ she was in a hurry.",
+        ["because"],
+        "Use 'because' to express a reason: [Sentence 1] is happening because of [Sentence 2].",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-2",
+        "Choose the correct connector.",
+        "She was in a hurry, ____ she was driving fast.",
+        ["so"],
+        "Use 'so' to express a result: [Sentence 1] happened, and as a result, [Sentence 2] occurred.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-3",
+        "Choose the correct connector.",
+        "She tried to stop the car, ____ she hit the man.",
+        ["but"],
+        "Use 'but' to show a simple contrast between two ideas.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-4",
+        "Choose the correct connector.",
+        "____ she tried to stop the car, she hit the man.",
+        ["although"],
+        "Use 'although' at the beginning of a sentence to introduce a contrast.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-5",
+        "Choose the correct connector.",
+        "She was very tired, ____ she couldn't sleep.",
+        ["but"],
+        "Use 'but' to link two contrasting ideas in the middle of a sentence.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-6",
+        "Choose the correct connector.",
+        "She couldn't sleep, ____ she was very tired.",
+        ["although"],
+        "Use 'although' to show contrast. It can be used in the middle of a sentence to mean 'despite the fact'.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-7",
+        "Choose the correct connector.",
+        "We stayed at home ____ it was raining.",
+        ["because"],
+        "The rain is the reason for staying at home, so use 'because'.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-8",
+        "Choose the correct connector.",
+        "It was raining, ____ we stayed at home.",
+        ["so"],
+        "Staying at home is the result of the rain, so use 'so'.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-9",
+        "Choose the correct connector.",
+        "____ it was raining, we went for a walk.",
+        ["although"],
+        "Use 'although' at the start to show that the second action happened despite the first condition.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-10",
+        "Choose the correct connector.",
+        "We went for a walk, ____ it was raining.",
+        ["but"],
+        "Use 'but' for a standard contrast between these two clauses.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-11",
+        "Choose the correct connector.",
+        "I didn't go to the party ____ I was busy.",
+        ["because"],
+        "Being busy is the reason for not going to the party.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-12",
+        "Choose the correct connector.",
+        "I was busy, ____ I didn't go to the party.",
+        ["so"],
+        "Not going to the party is the result of being busy.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-13",
+        "Choose the correct connector.",
+        "____ I was busy, I finished the report.",
+        ["although"],
+        "This shows a contrast: I finished the report even though (although) I was busy.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-14",
+        "Choose the correct connector.",
+        "The food was delicious, ____ the service was slow.",
+        ["but"],
+        "A clear contrast between a positive and a negative point.",
+        ["so", "because", "but", "although"]
+      ),
+      placeholderChoiceGapItem(
+        "cl-15",
+        "Choose the correct connector.",
+        "I enjoyed the film, ____ it was quite long.",
+        ["although"],
+        "Use 'although' to show that you enjoyed it despite the length.",
+        ["so", "because", "but", "although"]
+      ),
+    ],
+  },
+  {
     id: "future-forms-mixed",
     title: "Future Forms",
     shortDescription: "Mix predictions, plans, arrangements, and instant decisions.",

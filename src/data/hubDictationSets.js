@@ -168,6 +168,27 @@ export const HUB_DICTATION_SETS = [
       { text: "She complained about the noise from the flat upstairs.", audio: "/audio/dictation/prepositions/sentence-20.mp3" },
     ],
   },
+  {
+    id: "word-pairs",
+    label: "Word pairs (Binomials)",
+    sentences: [
+      { text: "I just want some peace and quiet this weekend.", audio: "/audio/dictation/word-pairs/01.mp3" },
+      { text: "We need to weigh up the pros and cons first.", audio: "/audio/dictation/word-pairs/02.mp3" },
+      { text: "They arrived home safe and sound after the storm.", audio: "/audio/dictation/word-pairs/03.mp3" },
+      { text: "I'm sick and tired of this rainy weather.", audio: "/audio/dictation/word-pairs/04.mp3" },
+      { text: "The presentation was short and sweet.", audio: "/audio/dictation/word-pairs/05.mp3" },
+      { text: "It's all part and parcel of the job, unfortunately.", audio: "/audio/dictation/word-pairs/06.mp3" },
+      { text: "We walked back and forth while we waited.", audio: "/audio/dictation/word-pairs/07.mp3" },
+      { text: "Everything was in black and white in the old photos.", audio: "/audio/dictation/word-pairs/08.mp3" },
+      { text: "It takes a bit of give and take to make a marriage work.", audio: "/audio/dictation/word-pairs/09.mp3" },
+      { text: "I can hear you loud and clear now.", audio: "/audio/dictation/word-pairs/10.mp3" },
+      { text: "There are only a few bits and pieces left to finish.", audio: "/audio/dictation/word-pairs/11.mp3" },
+      { text: "Every relationship has its ups and downs.", audio: "/audio/dictation/word-pairs/12.mp3" },
+      { text: "First and foremost, we must consider the cost.", audio: "/audio/dictation/word-pairs/13.mp3" },
+      { text: "Stop pacing to and fro, you're making me nervous!", audio: "/audio/dictation/word-pairs/14.mp3" },
+      { text: "The law and order situation has improved recently.", audio: "/audio/dictation/word-pairs/15.mp3" },
+    ],
+  },
 ];
 
 export const HUB_DICTATION_ALL_SET_ID = "all";
