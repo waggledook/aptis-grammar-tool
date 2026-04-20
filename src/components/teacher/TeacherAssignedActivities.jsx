@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   createAssignedActivity,
+  deleteAssignedActivity,
   fetchVocabProgressMap,
   fetchSpeakingProgressMap,
   fetchHubDictationSessions,
@@ -281,6 +282,7 @@ export default function TeacherAssignedActivities({ user }) {
   const [assignments, setAssignments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [deletingAssignmentId, setDeletingAssignmentId] = useState("");
   const [activityType, setActivityType] = useState("mini-test");
   const [activityId, setActivityId] = useState("");
   const [writingTaskId, setWritingTaskId] = useState("");
@@ -715,6 +717,27 @@ export default function TeacherAssignedActivities({ user }) {
     }
   }
 
+  async function handleDeleteAssignment(assignment) {
+    if (!assignment?.id) return;
+    const label = assignment.activityLabel || "this assignment";
+    const confirmed = window.confirm(
+      `Delete ${label}? Students will no longer see this assigned activity.`
+    );
+    if (!confirmed) return;
+
+    setDeletingAssignmentId(assignment.id);
+    try {
+      await deleteAssignedActivity(assignment.id);
+      setAssignments((prev) => prev.filter((entry) => entry.id !== assignment.id));
+      toast("Assignment deleted.");
+    } catch (error) {
+      console.error("[TeacherAssignedActivities] delete failed", error);
+      toast("Could not delete that assignment.");
+    } finally {
+      setDeletingAssignmentId("");
+    }
+  }
+
   return (
     <div className="teacher-assignments">
       <section className="teacher-assign-panel">
@@ -962,7 +985,17 @@ export default function TeacherAssignedActivities({ user }) {
                     <h4>{assignment.activityLabel || "Assigned activity"}</h4>
                     <p>{getAssignmentTypeLabel(assignment.activityType)}</p>
                   </div>
-                  <span className="teacher-assign-chip">{buildTargetLabel(assignment)}</span>
+                  <div className="teacher-assign-card-actions">
+                    <span className="teacher-assign-chip">{buildTargetLabel(assignment)}</span>
+                    <button
+                      type="button"
+                      className="ghost-btn danger"
+                      onClick={() => handleDeleteAssignment(assignment)}
+                      disabled={deletingAssignmentId === assignment.id}
+                    >
+                      {deletingAssignmentId === assignment.id ? "Deleting..." : "Delete"}
+                    </button>
+                  </div>
                 </div>
 
                 <div className="teacher-assign-meta">
@@ -1065,6 +1098,23 @@ export default function TeacherAssignedActivities({ user }) {
           justify-content: space-between;
           gap: 0.8rem;
           align-items: flex-start;
+        }
+
+        .teacher-assign-card-actions {
+          display: flex;
+          align-items: center;
+          gap: 0.55rem;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+        }
+
+        .teacher-assign-card-actions .ghost-btn.danger {
+          color: #ffb4b4;
+          border-color: rgba(255, 120, 120, 0.35);
+        }
+
+        .teacher-assign-card-actions .ghost-btn.danger:hover {
+          border-color: rgba(255, 120, 120, 0.7);
         }
 
         .teacher-assign-head h3,

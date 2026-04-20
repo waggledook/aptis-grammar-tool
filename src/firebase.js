@@ -2807,6 +2807,11 @@ export async function listAssignedActivitiesForStudent(uid) {
     });
 }
 
+export async function deleteAssignedActivity(assignmentId) {
+  if (!assignmentId) throw new Error("Assignment ID is required.");
+  await deleteDoc(doc(db, "assignedActivities", assignmentId));
+}
+
 export async function updateGrammarSetAttemptDraft(attemptId, data) {
   if (!attemptId) throw new Error("Attempt ID is required.");
 
