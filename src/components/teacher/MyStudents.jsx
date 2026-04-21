@@ -152,6 +152,22 @@ function renderDictationCorrectMarkup(text) {
     .join("");
 }
 
+function renderDictationClueMarkup(text, clueLevels = {}) {
+  const used = tokenizeDictationText(text)
+    .map((token, index) => ({ token, index, level: Number(clueLevels?.[index] || 0) }))
+    .filter((entry) => entry.level > 0);
+
+  if (!used.length) return "";
+
+  return used
+    .map(({ token, index, level }) => {
+      const label = level >= 2 ? token : `${token.charAt(0)}…`;
+      const className = level >= 2 ? "is-clue-word" : "is-clue-letter";
+      return `<span class="dictation-token ${className}">Word ${index + 1}: ${escapeHtml(label)}</span>`;
+    })
+    .join("");
+}
+
 function renderDictationComparisonMarkup(userText, correctText) {
   const userWords = tokenizeDictationText(userText);
   const correctWords = tokenizeDictationText(correctText);
@@ -2006,6 +2022,19 @@ async function copySelectedSubmission() {
                                 />
                               </div>
                               <div>
+                                <span className="panel-label">Clues used</span>
+                                {renderDictationClueMarkup(entry.sentence || "", entry.clueLevels) ? (
+                                  <div
+                                    className="teacher-dictation-feedback"
+                                    dangerouslySetInnerHTML={{
+                                      __html: renderDictationClueMarkup(entry.sentence || "", entry.clueLevels),
+                                    }}
+                                  />
+                                ) : (
+                                  <p>(no clues used)</p>
+                                )}
+                              </div>
+                              <div>
                                 <span className="panel-label">Student attempts</span>
                                 {(entry.attempts || []).length ? (
                                   (entry.attempts || []).map((attemptText, attemptIndex) => (
@@ -2563,6 +2592,18 @@ async function copySelectedSubmission() {
           background: rgba(239, 68, 68, 0.2);
           border-color: rgba(239, 68, 68, 0.45);
           min-width: 38px;
+        }
+
+        .dictation-token.is-clue-letter {
+          color: #fde68a;
+          background: rgba(245, 158, 11, 0.14);
+          border-color: rgba(245, 158, 11, 0.35);
+        }
+
+        .dictation-token.is-clue-word {
+          color: #bfdbfe;
+          background: rgba(59, 130, 246, 0.16);
+          border-color: rgba(59, 130, 246, 0.36);
         }
 
         .teacher-review-attempt-note {

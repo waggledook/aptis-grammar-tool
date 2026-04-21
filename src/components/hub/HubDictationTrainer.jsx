@@ -99,7 +99,29 @@ function renderCorrectSentence(text) {
     .join("");
 }
 
-function compareWords(userText, correctText) {
+function maskToken(token) {
+  const length = Math.max(String(token || "").length, 1);
+  return "•".repeat(length);
+}
+
+function renderClueSummaryMarkup(text, clueLevels = {}) {
+  const tokens = tokenize(text);
+  const used = tokens
+    .map((token, index) => ({ token, index, level: Number(clueLevels?.[index] || 0) }))
+    .filter((entry) => entry.level > 0);
+
+  if (!used.length) return "";
+
+  return used
+    .map(({ token, index, level }) => {
+      const label = level >= 2 ? token : `${token.charAt(0)}…`;
+      const className = level >= 2 ? "clue-word" : "clue-letter";
+      return `<span class="token ${className}">Word ${index + 1}: ${escapeHtml(label)}</span>`;
+    })
+    .join("");
+}
+
+function getComparisonTokens(userText, correctText) {
   const userWords = tokenize(userText);
   const correctWords = tokenize(correctText);
   const dp = Array.from({ length: userWords.length + 1 }, () =>
@@ -134,23 +156,47 @@ function compareWords(userText, correctText) {
       userWords[i - 1] === correctWords[j - 1] &&
       dp[i][j] === dp[i - 1][j - 1]
     ) {
-      aligned.push({ token: correctWords[j - 1], className: "correct" });
+      aligned.push({
+        token: correctWords[j - 1],
+        className: "correct",
+        correctIndex: j - 1,
+        correctToken: correctWords[j - 1],
+      });
       i -= 1;
       j -= 1;
     } else if (j > 0 && (i === 0 || dp[i][j] === dp[i][j - 1] + 1)) {
-      aligned.push({ token: "&nbsp;", className: "missing" });
+      aligned.push({
+        token: "&nbsp;",
+        className: "missing",
+        correctIndex: j - 1,
+        correctToken: correctWords[j - 1],
+      });
       j -= 1;
     } else if (i > 0 && j > 0 && dp[i][j] === dp[i - 1][j - 1] + 1) {
-      aligned.push({ token: userWords[i - 1], className: "wrong" });
+      aligned.push({
+        token: userWords[i - 1],
+        className: "wrong",
+        correctIndex: j - 1,
+        correctToken: correctWords[j - 1],
+      });
       i -= 1;
       j -= 1;
     } else if (i > 0 && dp[i][j] === dp[i - 1][j] + 1) {
+      aligned.push({
+        token: userWords[i - 1],
+        className: "wrong",
+        correctIndex: null,
+        correctToken: "",
+      });
       i -= 1;
     }
   }
 
-  return aligned
-    .reverse()
+  return aligned.reverse();
+}
+
+function compareWords(userText, correctText) {
+  return getComparisonTokens(userText, correctText)
     .map(({ token, className }) => {
       const content = token === "&nbsp;" ? token : escapeHtml(token);
       return `<span class="token ${className}">${content}</span>`;
@@ -170,12 +216,10 @@ function buildReportMarkup(history) {
       const attemptRows = [];
 
       if (entry.answeredCorrectly) {
-        statusLabel =
-          entry.correctAttempt === 1 ? "Correct on attempt 1" : "Correct on attempt 2";
+        statusLabel = `Correct on attempt ${entry.correctAttempt || 1}`;
         statusClass = "ok";
       } else if (entry.attempts.length > 0) {
-        statusLabel =
-          entry.attempts.length === 1 ? "Incorrect after 1 attempt" : "Incorrect after 2 attempts";
+        statusLabel = `Incorrect after ${entry.attempts.length} attempt${entry.attempts.length === 1 ? "" : "s"}`;
       }
 
       entry.attempts.forEach((attemptText, attemptIndex) => {
@@ -197,6 +241,8 @@ function buildReportMarkup(history) {
       if (!attemptRows.length) {
         attemptRows.push('<p class="report-empty">No answer submitted.</p>');
       }
+
+      const clueMarkup = renderClueSummaryMarkup(entry.sentence, entry.clueLevels);
 
       const reportButtons = [
         `<button class="small-btn report-replay-btn" type="button" data-audio="${escapeHtml(
@@ -225,6 +271,9 @@ function buildReportMarkup(history) {
             <span>Sentence ${index + 1}</span>
             <span class="report-status ${statusClass}">${statusLabel}</span>
           </div>
+          ${clueMarkup
+            ? `<div class="report-clues"><div class="report-attempt-label">Clues used</div><div class="feedback">${clueMarkup}</div></div>`
+            : ""}
           <div class="report-attempts">${attemptRows.join("")}</div>
           <div class="report-actions">${reportButtons.join("")}</div>
           ${correctSentenceBlock}
@@ -264,6 +313,7 @@ export default function HubDictationTrainer() {
   const [gameStarted, setGameStarted] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [feedbackHtml, setFeedbackHtml] = useState("");
+  const [feedbackTokens, setFeedbackTokens] = useState([]);
   const [message, setMessage] = useState({
     tone: "info",
     text: "Choose a set and press start when you're ready.",
@@ -307,6 +357,19 @@ export default function HubDictationTrainer() {
   const statOneValue = isTrainingMode
     ? `${Math.min(roundHistory.length, trainingSentenceCount)} / ${trainingSentenceCount}`
     : formatTime(timeLeft);
+  const answerAlreadyCorrect = !!currentRoundEntry?.answeredCorrectly;
+  const attemptDisplayValue =
+    currentIndex >= 0 && gameStarted
+      ? isTrainingMode
+        ? String(attempt)
+        : `${attempt} / 2`
+      : "—";
+  const canShowClueHint =
+    isTrainingMode &&
+    !answerAlreadyCorrect &&
+    currentRoundEntry &&
+    currentRoundEntry.attempts.length > 0 &&
+    feedbackTokens.some((token) => token.className === "wrong" || token.className === "missing");
 
   useEffect(() => {
     latestScoreRef.current = score;
@@ -383,15 +446,106 @@ export default function HubDictationTrainer() {
       acceptedTexts: sentence.acceptedTexts || [sentence.text],
       audio: sentence.audio,
       attempts: [],
+      clueLevels: {},
+      clueEvents: [],
       answeredCorrectly: false,
       correctAttempt: null,
     };
+  }
+
+  function updateCurrentRoundEntry(updater) {
+    setCurrentRoundEntry((prev) => {
+      if (!prev) return prev;
+      const next = updater(prev);
+      setRoundHistory((historyPrev) => {
+        if (!historyPrev.length) return historyPrev;
+        const nextHistory = [...historyPrev];
+        nextHistory[nextHistory.length - 1] = next;
+        return nextHistory;
+      });
+      return next;
+    });
+  }
+
+  function handleClueWordClick(wordIndex) {
+    if (!isTrainingMode || roundOver || answerAlreadyCorrect || !currentRoundEntry) return;
+
+    const clueToken = tokenize(currentRoundEntry.sentence)?.[wordIndex] || "";
+    const currentLevel = Number(currentRoundEntry.clueLevels?.[wordIndex] || 0);
+    if (!clueToken || currentLevel >= 2) return;
+
+    updateCurrentRoundEntry((prev) => ({
+      ...prev,
+      clueLevels: {
+        ...(prev.clueLevels || {}),
+        [wordIndex]: currentLevel + 1,
+      },
+      clueEvents: [
+        ...(prev.clueEvents || []),
+        { wordIndex, level: currentLevel + 1, attempt },
+      ],
+    }));
+
+    setStatusText("Clue used");
+    setMessage({
+      tone: "info",
+      text:
+        currentLevel === 0
+          ? `Clue: word ${wordIndex + 1} starts with "${clueToken.charAt(0)}".`
+          : `Clue revealed: word ${wordIndex + 1} is "${clueToken}".`,
+    });
+  }
+
+  function renderFeedbackToken(token, index) {
+    const clueLevel = Number(currentRoundEntry?.clueLevels?.[token.correctIndex] || 0);
+    const canShowClue =
+      isTrainingMode &&
+      !answerAlreadyCorrect &&
+      currentRoundEntry &&
+      currentRoundEntry.attempts.length > 0 &&
+      (token.className === "wrong" || token.className === "missing") &&
+      Number.isInteger(token.correctIndex);
+
+    const isClued = canShowClue && clueLevel > 0;
+    const displayText = isClued
+      ? clueLevel >= 2
+        ? token.correctToken
+        : `${token.correctToken?.charAt(0) || ""}…`
+      : token.token;
+    const className = isClued
+      ? clueLevel >= 2
+        ? "clue-word"
+        : "clue-letter"
+      : token.className;
+    const content = displayText === "&nbsp;" ? "\u00A0" : displayText;
+
+    if (canShowClue) {
+      return (
+        <button
+          key={`feedback-token-${index}`}
+          type="button"
+          className={`token token-button ${className}`}
+          onClick={() => handleClueWordClick(token.correctIndex)}
+          disabled={clueLevel >= 2}
+          title={clueLevel === 0 ? "Click for first-letter clue" : clueLevel === 1 ? "Click to reveal the word" : "Word revealed"}
+        >
+          {content}
+        </button>
+      );
+    }
+
+    return (
+      <span key={`feedback-token-${index}`} className={`token ${className}`}>
+        {content}
+      </span>
+    );
   }
 
   function loadSentence(sentences, currentOrder, index) {
     if (roundOver) return;
     const entry = beginRoundEntry(sentences, currentOrder, index);
     setFeedbackHtml("");
+    setFeedbackTokens([]);
     setMessage({ tone: "info", text: "Listen and type the sentence." });
     setStatusText(selectedSetLabel);
     setInputValue("");
@@ -487,7 +641,7 @@ export default function HubDictationTrainer() {
   }
 
   function submitAnswer() {
-    if (currentIndex < 0 || roundOver || !currentRoundEntry) return;
+    if (currentIndex < 0 || roundOver || !currentRoundEntry || answerAlreadyCorrect) return;
 
     const sentenceConfig = activeSentences[getSentenceIndex()];
     const target = sentenceConfig.text;
@@ -498,10 +652,11 @@ export default function HubDictationTrainer() {
       attempts: [...currentRoundEntry.attempts, typed],
     };
     setCurrentRoundEntry(updatedEntry);
+    setFeedbackTokens(getComparisonTokens(typed, target));
     setFeedbackHtml(compareWords(typed, target));
 
     if (acceptedTargets.some((candidate) => normalize(typed) === normalize(candidate))) {
-      const points = attempt === 1 ? 10 : 5;
+      const points = isTrainingMode ? 0 : attempt === 1 ? 10 : 5;
       const correctEntry = {
         ...updatedEntry,
         answeredCorrectly: true,
@@ -512,15 +667,31 @@ export default function HubDictationTrainer() {
 
       setCurrentRoundEntry(correctEntry);
       setRoundHistory(nextHistory);
-      setScore((prev) => prev + points);
+      if (!isTrainingMode) {
+        setScore((prev) => prev + points);
+      }
       setCompleted((prev) => prev + 1);
       setStatusText("Correct");
-      setMessage({ tone: "ok", text: `Correct. +${points} points.` });
+      setMessage({
+        tone: "ok",
+        text: isTrainingMode ? `Correct on attempt ${attempt}.` : `Correct. +${points} points.`,
+      });
       setNextEnabled(false);
 
       timeoutRef.current = window.setTimeout(() => {
         if (!roundOverRef.current) nextSentence(true);
       }, 700);
+      return;
+    }
+
+    if (isTrainingMode) {
+      const nextHistory = [...roundHistory];
+      nextHistory[nextHistory.length - 1] = updatedEntry;
+      setRoundHistory(nextHistory);
+      setAttempt((prev) => prev + 1);
+      setStatusText("Try again");
+      setMessage({ tone: "bad", text: `Attempt ${attempt} incorrect. Listen again and try attempt ${attempt + 1}.` });
+      playAudioFromPath(activeSentences[getSentenceIndex()].audio);
       return;
     }
 
@@ -548,6 +719,14 @@ export default function HubDictationTrainer() {
 
     const sentenceConfig = activeSentences[getSentenceIndex()];
     setFeedbackHtml(renderCorrectSentence(sentenceConfig.text));
+    setFeedbackTokens(
+      tokenize(sentenceConfig.text).map((token, index) => ({
+        token,
+        className: "correct",
+        correctIndex: index,
+        correctToken: token,
+      }))
+    );
     setStatusText("Answer revealed");
     setMessage({
       tone: "info",
@@ -615,6 +794,7 @@ export default function HubDictationTrainer() {
     setRoundHistory([firstEntry]);
     setCurrentRoundEntry(firstEntry);
     setFeedbackHtml("");
+    setFeedbackTokens([]);
     setInputValue("");
     setNextEnabled(false);
 
@@ -688,6 +868,13 @@ export default function HubDictationTrainer() {
   }, [playbackRate]);
 
   useEffect(() => {
+    if (!gameStarted || roundOver || answerAlreadyCorrect) return;
+    window.setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+  }, [currentIndex, gameStarted, roundOver, answerAlreadyCorrect]);
+
+  useEffect(() => {
     if (!gameStarted || roundOver || isTrainingMode) return;
     if (timeLeft <= 0) {
       endGame();
@@ -714,6 +901,10 @@ export default function HubDictationTrainer() {
   const finalSummary = isTrainingMode
     ? `Training complete. Correct sentences: ${completed} out of ${trainingSentenceCount}.`
     : `Time's up. Final score: ${score}. Sentences completed: ${completed}. Best score: ${bestScore}.`;
+  const headerSummary = isAssignmentMode
+    ? `${assignment.teacherName || "Your teacher"} set ${assignmentSentences.length} sentence${assignmentSentences.length === 1 ? "" : "s"} for you.`
+    : "Listen carefully, type what you hear, and train your listening accuracy.";
+  const statusTone = message.tone === "bad" ? "warn" : message.tone === "ok" ? "success" : "neutral";
 
   return (
     <div className="hub-dictation-page">
@@ -724,115 +915,144 @@ export default function HubDictationTrainer() {
 
       <div className="hub-dictation-app">
         <div className="hub-dictation-header">
-          <button className="review-btn" onClick={() => navigate(getSitePath("/listening"))}>
-            ← Back to listening
-          </button>
-          <h1>{isAssignmentMode ? "Assigned Dictation" : "Dictation Trainer"}</h1>
-          <p className="hub-dictation-sub">
-            {isAssignmentMode
-              ? `${assignment.teacherName || "Your teacher"} set ${assignmentSentences.length} sentence${assignmentSentences.length === 1 ? "" : "s"} for you.`
-              : "Listen carefully, type what you hear, and train your listening accuracy inside the hub."}
-          </p>
-        </div>
-
-        <div className="hub-dictation-stats">
-          <div className="hub-dictation-stat">
-            <div className="stat-label">{isTrainingMode ? "Sentence" : "Time Left"}</div>
-            <div className="stat-value">{statOneValue}</div>
+          <div className="hub-dictation-header-top">
+            <button className="review-btn" onClick={() => navigate(getSitePath("/listening"))}>
+              ← Back to listening
+            </button>
           </div>
-          <div className="hub-dictation-stat">
-            <div className="stat-label">Attempt</div>
-            <div className="stat-value">{currentIndex >= 0 && gameStarted ? `${attempt} / 2` : "—"}</div>
-          </div>
-          <div className="hub-dictation-stat">
-            <div className="stat-label">{isTrainingMode ? "Correct" : "Score"}</div>
-            <div className="stat-value">{isTrainingMode ? completed : score}</div>
-          </div>
-          <div className="hub-dictation-stat">
-            <div className="stat-label">Status</div>
-            <div className="stat-value">{statusText}</div>
+          <div className="hub-dictation-title-row">
+            <div>
+              <h1>{isAssignmentMode ? "Assigned Dictation" : "Dictation Trainer"}</h1>
+              <p className="hub-dictation-sub">{headerSummary}</p>
+            </div>
           </div>
         </div>
 
-        <div className="hub-dictation-card">
+        <div className="hub-dictation-statusbar">
+          <span className="statusbar-item">
+            <span className="statusbar-label">{isTrainingMode ? "Sentence" : "Time"}</span>
+            <strong className="statusbar-value">{statOneValue}</strong>
+          </span>
+          <span className="statusbar-sep" aria-hidden="true">·</span>
+          <span className="statusbar-item">
+            <span className="statusbar-label">Attempt</span>
+            <strong className="statusbar-value">{attemptDisplayValue}</strong>
+          </span>
+          <span className="statusbar-sep" aria-hidden="true">·</span>
+          <span className="statusbar-item">
+            <span className="statusbar-label">{isTrainingMode ? "Correct" : "Score"}</span>
+            <strong className="statusbar-value">{isTrainingMode ? completed : score}</strong>
+          </span>
+          <span className="statusbar-sep" aria-hidden="true">·</span>
+          <span className={`statusbar-item statusbar-status tone-${statusTone}`}>
+            <span className="statusbar-label">Status</span>
+            <strong className="statusbar-value">{statusText}</strong>
+          </span>
+        </div>
+
+        <div className="hub-dictation-card settings-card">
           {!isAssignmentMode ? (
           <div className="hub-dictation-settings">
-            <div className="field">
-              <label><strong>Mode</strong></label>
-              <div className="mode-toggle">
-                <label className="switch" htmlFor="modeToggle">
-                  <input
-                    id="modeToggle"
-                    type="checkbox"
-                    checked={!isTrainingMode}
-                    onChange={(event) => setMode(event.target.checked ? "game" : "training")}
-                    disabled={gameStarted}
-                  />
-                  <span className="slider" />
-                </label>
-                <div className="mode-toggle-text">
-                  <div className="mode-toggle-label">{isTrainingMode ? "Training mode" : "Game mode"}</div>
-                  <div className="mode-toggle-value">
-                    {isTrainingMode ? "Switch on for game mode" : "Switch off for training mode"}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="field">
-              <label htmlFor="setSelect"><strong>Sentence set</strong></label>
-              <select
-                id="setSelect"
-                value={selectedSetId}
-                onChange={(event) => setSelectedSetId(event.target.value)}
-                disabled={gameStarted}
-              >
-                {setOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {isTrainingMode && (
+            {!gameStarted ? (
               <>
                 <div className="field">
-                  <label htmlFor="trainingCountSelect"><strong>Training sentences</strong></label>
+                  <label><strong>Mode</strong></label>
+                  <div className="mode-toggle">
+                    <label className="switch" htmlFor="modeToggle">
+                      <input
+                        id="modeToggle"
+                        type="checkbox"
+                        checked={!isTrainingMode}
+                        onChange={(event) => setMode(event.target.checked ? "game" : "training")}
+                        disabled={gameStarted}
+                      />
+                      <span className="slider" />
+                    </label>
+                    <div className="mode-toggle-text">
+                      <div className="mode-toggle-label">{isTrainingMode ? "Training mode" : "Game mode"}</div>
+                      <div className="mode-toggle-value">
+                        {isTrainingMode ? "Switch on for game mode" : "Switch off for training mode"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="field">
+                  <label htmlFor="setSelect"><strong>Sentence set</strong></label>
                   <select
-                    id="trainingCountSelect"
-                    value={trainingSentenceCount}
-                    onChange={(event) => setTrainingSentenceCount(Number(event.target.value))}
+                    id="setSelect"
+                    value={selectedSetId}
+                    onChange={(event) => setSelectedSetId(event.target.value)}
                     disabled={gameStarted}
                   >
-                    {Array.from({ length: 10 }, (_, index) => index + 1).map((count) => (
-                      <option key={count} value={count}>
-                        {count}
+                    {setOptions.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
                       </option>
                     ))}
                   </select>
                 </div>
 
-                <div className="field">
-                  <label htmlFor="speedRange"><strong>Playback speed</strong></label>
-                  <input
-                    id="speedRange"
-                    type="range"
-                    min="0.5"
-                    max="1"
-                    step="0.05"
-                    value={playbackRate}
-                    onChange={(event) => setPlaybackRate(Number(event.target.value))}
-                  />
-                  <div className="help">{Math.round(playbackRate * 100)}%</div>
-                </div>
+                {isTrainingMode && (
+                <div className="field compact-select">
+                  <label htmlFor="trainingCountSelect"><strong>Training sentences</strong></label>
+                  <select
+                    id="trainingCountSelect"
+                      value={trainingSentenceCount}
+                      onChange={(event) => setTrainingSentenceCount(Number(event.target.value))}
+                      disabled={gameStarted}
+                    >
+                      {Array.from({ length: 10 }, (_, index) => index + 1).map((count) => (
+                        <option key={count} value={count}>
+                          {count}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                )}
               </>
-            )}
+            ) : null}
+
+            {isTrainingMode ? (
+              <div className="field">
+                <label htmlFor="speedRange"><strong>Playback speed</strong></label>
+                <input
+                  id="speedRange"
+                  type="range"
+                  min="0.5"
+                  max="1"
+                  step="0.05"
+                  value={playbackRate}
+                  onChange={(event) => setPlaybackRate(Number(event.target.value))}
+                />
+                <div className="help">{Math.round(playbackRate * 100)}%</div>
+              </div>
+            ) : !gameStarted ? (
+              <div className="field settings-static-note">
+                <label><strong>Round</strong></label>
+                <div className="help">Game mode uses a 1 minute 30 second timed round.</div>
+              </div>
+            ) : null}
           </div>
           ) : (
             <div className="hub-dictation-assignment-note">
-              <strong>{assignment.activityLabel || "Assigned dictation"}</strong>
-              {assignment.notes ? <p>{assignment.notes}</p> : null}
+              <div className="assignment-note-head">
+                <strong>{assignment.activityLabel || "Assigned dictation"}</strong>
+                {assignment.notes ? <p>{assignment.notes}</p> : null}
+              </div>
+              <div className="field">
+                <label htmlFor="assignmentSpeedRange"><strong>Playback speed</strong></label>
+                <input
+                  id="assignmentSpeedRange"
+                  type="range"
+                  min="0.5"
+                  max="1"
+                  step="0.05"
+                  value={playbackRate}
+                  onChange={(event) => setPlaybackRate(Number(event.target.value))}
+                />
+                <div className="help">{Math.round(playbackRate * 100)}%</div>
+              </div>
             </div>
           )}
 
@@ -843,36 +1063,27 @@ export default function HubDictationTrainer() {
               ? "Training mode lets you choose 1 to 10 sentences, removes the timer, and plays audio at your chosen speed."
               : "Game mode uses a 1 minute 30 second round with shuffled sentences and scoring."}
           </p>
-        </div>
-
-        {!gameStarted && !roundOver && (
-          <div className="hub-dictation-card">
-            <p style={{ marginTop: 0 }}><strong>How it works</strong></p>
-            <ul className="list">
-              <li>Click <strong>Start</strong> to begin.</li>
-              {!isAssignmentMode ? <li>If you leave the set on <strong>All sentences</strong>, the round mixes every sentence in the app.</li> : null}
-              {!isAssignmentMode ? <li>You have <strong>1 minute 30 seconds</strong> per round in game mode.</li> : null}
-              <li>Each sentence can be answered twice.</li>
-              <li>You get <strong>10 points</strong> on the first attempt and <strong>5 points</strong> on the second.</li>
-              <li>Press <strong>Enter</strong> to check your answer.</li>
-            </ul>
-            <div className="controls">
-              <button className="primary" onClick={startGame}>
+          {!gameStarted && !roundOver ? (
+            <div className="settings-footer">
+              <ul className="list compact-list">
+                <li>Press Start when you’re ready.</li>
+                <li>{isTrainingMode ? "If your answer is wrong, the audio plays again and your next attempt begins." : "Each sentence gives you two tries and score-based feedback."}</li>
+                {!isAssignmentMode && !isTrainingMode ? <li>You have 1 minute 30 seconds to score as highly as possible.</li> : null}
+                <li>Press <strong>Enter</strong> to check your answer.</li>
+              </ul>
+              <button className="primary settings-start-btn" onClick={startGame}>
                 {isTrainingMode ? "Start training" : "Start"}
               </button>
             </div>
-          </div>
-        )}
+          ) : null}
+        </div>
 
         {gameStarted && (
           <>
             <div className="hub-dictation-card">
               <div className="controls" style={{ marginTop: 0, marginBottom: "14px" }}>
                 <button className="primary" onClick={() => playAudioFromPath(activeSentences[getSentenceIndex()].audio)}>
-                  ▶ Play audio
-                </button>
-                <button onClick={() => playAudioFromPath(activeSentences[getSentenceIndex()].audio)}>
-                  ↻ Replay
+                  ↻ Replay audio
                 </button>
                 {isTrainingMode && (
                   <button onClick={revealAnswer}>
@@ -891,6 +1102,7 @@ export default function HubDictationTrainer() {
                 value={inputValue}
                 onChange={(event) => setInputValue(event.target.value)}
                 placeholder="Type the sentence here..."
+                disabled={answerAlreadyCorrect}
                 spellCheck={false}
                 autoCorrect="off"
                 autoCapitalize="off"
@@ -907,7 +1119,7 @@ export default function HubDictationTrainer() {
               </div>
 
               <div className="controls">
-                <button className="success" onClick={submitAnswer}>
+                <button className="success" onClick={submitAnswer} disabled={answerAlreadyCorrect}>
                   Check answer
                 </button>
               </div>
@@ -915,7 +1127,14 @@ export default function HubDictationTrainer() {
 
             <div className="hub-dictation-card">
               <p style={{ marginTop: 0 }}><strong>Feedback</strong></p>
-              <div className="feedback" dangerouslySetInnerHTML={{ __html: feedbackHtml }} />
+              <div className="feedback">
+                {feedbackTokens.length
+                  ? feedbackTokens.map((token, index) => renderFeedbackToken(token, index))
+                  : null}
+              </div>
+              {canShowClueHint ? (
+                <div className="feedback-hint">Tip: click a red word or gap for a clue.</div>
+              ) : null}
               <div className={`message ${message.tone}`}>{message.text}</div>
             </div>
           </>
@@ -949,27 +1168,36 @@ export default function HubDictationTrainer() {
         }
 
         .hub-dictation-header {
-          margin-bottom: 1rem;
+          margin-bottom: 0.85rem;
+        }
+
+        .hub-dictation-header-top {
+          margin-bottom: 0.55rem;
+        }
+
+        .hub-dictation-title-row {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 16px;
         }
 
         .hub-dictation-header h1 {
-          margin: 0.9rem 0 0.5rem;
+          margin: 0;
+          font-size: clamp(2rem, 4vw, 3.4rem);
+          line-height: 0.95;
+          letter-spacing: -0.04em;
+          color: #f8c44f;
         }
 
         .hub-dictation-sub {
-          margin: 0;
+          margin: 0.45rem 0 0;
           color: #cdd9f4;
-          line-height: 1.5;
+          line-height: 1.35;
+          font-size: 1rem;
         }
 
-        .hub-dictation-stats {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 12px;
-          margin-bottom: 1rem;
-        }
-
-        .hub-dictation-stat,
+        .hub-dictation-statusbar,
         .hub-dictation-card {
           background: linear-gradient(180deg, rgba(24,41,79,0.98), rgba(20,36,71,0.98));
           border: 1px solid rgba(53, 80, 142, 0.8);
@@ -977,43 +1205,101 @@ export default function HubDictationTrainer() {
           box-shadow: 0 10px 22px rgba(0,0,0,0.12);
         }
 
-        .hub-dictation-stat {
-          padding: 14px;
+        .hub-dictation-statusbar {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 0.85rem;
+          padding: 10px 14px;
         }
 
         .hub-dictation-card {
-          padding: 20px;
-          margin-bottom: 18px;
+          padding: 16px;
+          margin-bottom: 14px;
         }
 
-        .stat-label {
+        .statusbar-item {
+          display: inline-flex;
+          align-items: baseline;
+          gap: 8px;
+          min-width: 0;
+        }
+
+        .statusbar-label {
           color: #94a3b8;
-          font-size: 13px;
-          margin-bottom: 6px;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+          letter-spacing: 0.06em;
         }
 
-        .stat-value {
-          font-size: 24px;
+        .statusbar-value {
+          font-size: 1.15rem;
           font-weight: 700;
           color: #f8fafc;
+          line-height: 1;
+        }
+
+        .statusbar-sep {
+          color: rgba(148, 163, 184, 0.65);
+          font-size: 1rem;
+        }
+
+        .statusbar-status.tone-success .statusbar-value {
+          color: #86efac;
+        }
+
+        .statusbar-status.tone-warn .statusbar-value {
+          color: #fca5a5;
         }
 
         .hub-dictation-settings {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-          gap: 16px;
+          grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+          gap: 14px;
           align-items: end;
+        }
+
+        .settings-card {
+          padding-bottom: 14px;
+        }
+
+        .settings-footer {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 14px;
+          margin-top: 12px;
+          padding-top: 12px;
+          border-top: 1px solid rgba(71, 85, 105, 0.55);
+        }
+
+        .settings-start-btn {
+          border: 0;
+          border-radius: 12px;
+          padding: 11px 18px;
+          font-size: 14px;
+          font-weight: 700;
+          cursor: pointer;
+          background: #38bdf8;
+          color: #082f49;
+          min-width: 160px;
         }
 
         .field {
           display: grid;
-          gap: 8px;
+          gap: 6px;
+        }
+
+        .field.compact-select {
+          max-width: 180px;
         }
 
         .mode-toggle {
-          display: inline-flex;
-          align-items: center;
-          gap: 12px;
+          display: flex;
+          align-items: flex-start;
+          gap: 10px;
+          min-height: 52px;
         }
 
         .switch {
@@ -1065,10 +1351,13 @@ export default function HubDictationTrainer() {
         .mode-toggle-text {
           display: grid;
           gap: 2px;
+          min-width: 0;
+          flex: 1;
         }
 
         .mode-toggle-label {
           font-weight: 700;
+          line-height: 1.1;
         }
 
         .mode-toggle-value,
@@ -1081,8 +1370,9 @@ export default function HubDictationTrainer() {
         }
 
         .mode-summary {
-          margin: 14px 0 0;
-          line-height: 1.5;
+          margin: 12px 0 0;
+          line-height: 1.35;
+          font-size: 0.95rem;
         }
 
         select,
@@ -1097,10 +1387,10 @@ export default function HubDictationTrainer() {
         }
 
         textarea {
-          min-height: 88px;
+          min-height: 72px;
           resize: vertical;
-          font-size: 18px;
-          line-height: 1.5;
+          font-size: 17px;
+          line-height: 1.45;
         }
 
         input[type="range"] {
@@ -1112,15 +1402,15 @@ export default function HubDictationTrainer() {
           display: flex;
           gap: 10px;
           flex-wrap: wrap;
-          margin-top: 16px;
+          margin-top: 12px;
         }
 
         .controls button,
         .small-btn {
           border: 0;
           border-radius: 12px;
-          padding: 12px 16px;
-          font-size: 15px;
+          padding: 11px 15px;
+          font-size: 14px;
           font-weight: 700;
           cursor: pointer;
           background: #334155;
@@ -1148,9 +1438,15 @@ export default function HubDictationTrainer() {
         }
 
         .feedback {
-          min-height: 92px;
-          line-height: 1.8;
-          font-size: 20px;
+          min-height: 56px;
+          line-height: 1.65;
+          font-size: 18px;
+        }
+
+        .feedback-hint {
+          margin-top: 6px;
+          color: rgba(148, 163, 184, 0.82);
+          font-size: 13px;
         }
 
         .token {
@@ -1160,6 +1456,11 @@ export default function HubDictationTrainer() {
           border-radius: 10px;
           border: 1px solid transparent;
           background: #0b1220;
+        }
+
+        .token-button {
+          font: inherit;
+          cursor: pointer;
         }
 
         .correct {
@@ -1182,8 +1483,20 @@ export default function HubDictationTrainer() {
           text-decoration: none;
         }
 
+        .clue-letter {
+          color: #fde68a;
+          background: rgba(245,158,11,.14);
+          border-color: rgba(245,158,11,.35);
+        }
+
+        .clue-word {
+          color: #bfdbfe;
+          background: rgba(59,130,246,.16);
+          border-color: rgba(59,130,246,.36);
+        }
+
         .message {
-          margin-top: 14px;
+          margin-top: 10px;
           font-weight: 700;
         }
 
@@ -1204,13 +1517,24 @@ export default function HubDictationTrainer() {
         .list {
           margin: 0;
           padding-left: 20px;
-          line-height: 1.7;
+          line-height: 1.55;
+        }
+
+        .compact-list {
+          font-size: 0.94rem;
+          max-width: 700px;
         }
 
         .report-list,
         .report-attempts {
           display: grid;
           gap: 14px;
+        }
+
+        .report-clues {
+          display: grid;
+          gap: 6px;
+          margin-bottom: 4px;
         }
 
         .report-item,
@@ -1224,6 +1548,12 @@ export default function HubDictationTrainer() {
           border: 1px solid #334155;
           border-radius: 14px;
           padding: 14px;
+        }
+
+        .assignment-note-head p {
+          margin: 0.35rem 0 0;
+          color: #cdd9f4;
+          line-height: 1.35;
         }
 
         .report-meta {
@@ -1259,13 +1589,19 @@ export default function HubDictationTrainer() {
           border-radius: 10px;
         }
 
+        .token-button:disabled {
+          opacity: .92;
+          cursor: default;
+        }
+
         .hidden {
           display: none;
         }
 
         @media (max-width: 700px) {
-          .hub-dictation-stats {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+          .settings-footer {
+            flex-direction: column;
+            align-items: stretch;
           }
 
           .feedback {
@@ -1273,7 +1609,40 @@ export default function HubDictationTrainer() {
           }
 
           textarea {
-            min-height: 110px;
+            min-height: 96px;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .hub-dictation-title-row {
+            align-items: start;
+          }
+
+          .hub-dictation-statusbar {
+            gap: 6px;
+            padding: 10px 12px;
+          }
+
+          .hub-dictation-settings {
+            grid-template-columns: 1fr;
+          }
+
+          .statusbar-sep {
+            display: none;
+          }
+
+          .statusbar-item {
+            width: 100%;
+            justify-content: space-between;
+          }
+
+          .controls {
+            flex-direction: column;
+          }
+
+          .controls button,
+          .small-btn {
+            width: 100%;
           }
         }
       `}</style>

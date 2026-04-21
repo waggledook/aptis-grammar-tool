@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { getHubGrammarActivity } from "../../data/hubGrammarActivities.js";
@@ -220,7 +221,7 @@ function renderSentence(
   });
 }
 
-export default function HubGrammarActivityRunner() {
+export default function HubGrammarActivityRunner({ user }) {
   const navigate = useNavigate();
   const { activityId } = useParams();
   const activity = getHubGrammarActivity(activityId);
@@ -232,6 +233,8 @@ export default function HubGrammarActivityRunner() {
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState(null);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const isTeacher = user?.role === "teacher" || user?.role === "admin";
 
   const orderedInputKeys = useMemo(() => {
     if (!activity) return [];
@@ -541,6 +544,21 @@ export default function HubGrammarActivityRunner() {
     setResult(null);
   };
 
+  const shareUrl =
+    typeof window === "undefined"
+      ? getSitePath(`/grammar/activity/${activityId}`)
+      : `${window.location.origin}${getSitePath(`/grammar/activity/${activityId}`)}`;
+
+  const handleCopyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast("Mini test link copied.");
+    } catch (error) {
+      console.error("[HubGrammarActivityRunner] copy share link failed", error);
+      toast("Could not copy that link.");
+    }
+  };
+
   const handleSubmit = async () => {
     const evaluatedItems = activity.items.map((item) => {
       if (item.type === "multiple-choice") {
@@ -779,10 +797,68 @@ export default function HubGrammarActivityRunner() {
         </div>
 
         <header className="hub-grammar-header">
-          <span className="hub-grammar-kicker">Seif Hub Grammar Activity</span>
+          <div className="hub-grammar-kicker-row">
+            <span className="hub-grammar-kicker">Seif Hub Grammar Activity</span>
+            {isTeacher ? (
+              <button
+                type="button"
+                className="hub-grammar-share-pill"
+                onClick={() => setShowShareModal(true)}
+              >
+                QR Share
+              </button>
+            ) : null}
+          </div>
           <h1>{activity.title}</h1>
           <p>{activity.intro}</p>
         </header>
+
+        {showShareModal ? (
+          <div className="hub-grammar-share-overlay" onClick={() => setShowShareModal(false)}>
+            <div className="hub-grammar-share-modal" onClick={(event) => event.stopPropagation()}>
+              <div className="hub-grammar-share-head">
+                <div>
+                  <h3>Share mini test</h3>
+                  <p>{activity.title}</p>
+                </div>
+                <button
+                  type="button"
+                  className="ghost-btn"
+                  onClick={() => setShowShareModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+
+              <div className="hub-grammar-share-body">
+                <div className="hub-grammar-share-code">
+                  <QRCodeSVG
+                    value={shareUrl}
+                    size={180}
+                    bgColor="transparent"
+                    fgColor="#eef4ff"
+                  />
+                </div>
+
+                <div className="hub-grammar-share-copy">
+                  <p className="hub-grammar-share-label">Student link</p>
+                  <input
+                    type="text"
+                    value={shareUrl}
+                    readOnly
+                    onFocus={(event) => event.target.select()}
+                  />
+                  <p className="hub-grammar-share-help">
+                    Students can scan the QR code from the classroom screen or open the same link directly.
+                  </p>
+                  <button type="button" className="review-btn" onClick={handleCopyShareLink}>
+                    Copy link
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         {result && (
           <section className="hub-grammar-summary">
@@ -1353,9 +1429,16 @@ export default function HubGrammarActivityRunner() {
           border: 1px solid rgba(53, 80, 142, 0.8);
         }
 
+        .hub-grammar-kicker-row {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 0.55rem;
+          margin-bottom: 0.5rem;
+        }
+
         .hub-grammar-kicker {
           display: inline-block;
-          margin-bottom: 0.5rem;
           padding: 0.2rem 0.55rem;
           border-radius: 999px;
           background: rgba(253, 191, 45, 0.12);
@@ -1365,6 +1448,118 @@ export default function HubGrammarActivityRunner() {
           font-weight: 700;
           letter-spacing: 0.03em;
           text-transform: uppercase;
+        }
+
+        .hub-grammar-share-pill {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.2rem 0.65rem;
+          border-radius: 999px;
+          border: 1px solid rgba(253, 191, 45, 0.24);
+          background: rgba(253, 191, 45, 0.08);
+          color: #ffd56e;
+          font: inherit;
+          font-size: 0.78rem;
+          font-weight: 700;
+          letter-spacing: 0.03em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+        }
+
+        .hub-grammar-share-pill:hover {
+          transform: translateY(-1px);
+          background: rgba(253, 191, 45, 0.14);
+          border-color: rgba(253, 191, 45, 0.36);
+        }
+
+        .hub-grammar-share-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(2, 6, 18, 0.78);
+          display: grid;
+          place-items: center;
+          padding: 1rem;
+          z-index: 1150;
+        }
+
+        .hub-grammar-share-modal {
+          width: min(640px, 100%);
+          display: grid;
+          gap: 1rem;
+          border-radius: 20px;
+          border: 1px solid rgba(70, 102, 170, 0.42);
+          background: linear-gradient(180deg, rgba(11, 21, 48, 0.98), rgba(14, 28, 63, 0.96));
+          box-shadow: 0 24px 60px rgba(2, 8, 24, 0.44);
+          padding: 1.1rem;
+        }
+
+        .hub-grammar-share-head {
+          display: flex;
+          justify-content: space-between;
+          gap: 0.8rem;
+          align-items: flex-start;
+        }
+
+        .hub-grammar-share-head h3 {
+          margin: 0;
+          color: #eef4ff;
+        }
+
+        .hub-grammar-share-head p {
+          margin: 0.25rem 0 0;
+          color: #a9b7d1;
+        }
+
+        .hub-grammar-share-body {
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr);
+          gap: 1rem;
+          align-items: center;
+        }
+
+        .hub-grammar-share-code {
+          display: grid;
+          place-items: center;
+          padding: 1rem;
+          border-radius: 18px;
+          border: 1px solid rgba(63, 94, 155, 0.46);
+          background: rgba(8, 16, 38, 0.7);
+        }
+
+        .hub-grammar-share-copy {
+          display: grid;
+          gap: 0.7rem;
+        }
+
+        .hub-grammar-share-label {
+          margin: 0;
+          color: #ffd56e;
+          font-weight: 700;
+        }
+
+        .hub-grammar-share-copy input {
+          width: 100%;
+          border-radius: 14px;
+          border: 1px solid rgba(103, 132, 197, 0.36);
+          background: rgba(11, 18, 37, 0.95);
+          color: #eef4ff;
+          padding: 0.82rem 0.95rem;
+          font: inherit;
+          box-sizing: border-box;
+        }
+
+        .hub-grammar-share-copy input:focus {
+          outline: none;
+          border-color: rgba(133, 183, 255, 0.72);
+          box-shadow: 0 0 0 3px rgba(84, 136, 255, 0.18);
+        }
+
+        .hub-grammar-share-help {
+          margin: 0;
+          color: #a9b7d1;
+          line-height: 1.45;
         }
 
         .hub-grammar-header h1 {
@@ -1950,6 +2145,19 @@ export default function HubGrammarActivityRunner() {
         @media (max-width: 720px) {
           .hub-grammar-summary {
             grid-template-columns: 1fr;
+          }
+
+          .hub-grammar-share-head {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .hub-grammar-share-body {
+            grid-template-columns: 1fr;
+          }
+
+          .hub-grammar-share-code {
+            justify-self: center;
           }
 
           .hub-grammar-gap {

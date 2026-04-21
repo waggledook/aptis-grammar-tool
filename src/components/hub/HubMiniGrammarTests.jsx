@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { QRCodeSVG } from "qrcode.react";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
@@ -34,6 +35,7 @@ export default function HubMiniGrammarTests({ user }) {
   const [assignSelectedStudentIds, setAssignSelectedStudentIds] = useState([]);
   const [assignNotes, setAssignNotes] = useState("");
   const [assignSaving, setAssignSaving] = useState(false);
+  const [shareOverlayActivity, setShareOverlayActivity] = useState(null);
 
   const isTeacher = user?.role === "teacher" || user?.role === "admin";
 
@@ -128,6 +130,32 @@ export default function HubMiniGrammarTests({ user }) {
     setAssignClassName("");
     setAssignSelectedStudentIds([]);
     setAssignNotes("");
+  }
+
+  function getActivityShareUrl(activityId) {
+    if (typeof window === "undefined") return getSitePath(`/grammar/activity/${activityId}`);
+    return `${window.location.origin}${getSitePath(`/grammar/activity/${activityId}`)}`;
+  }
+
+  function openShareOverlay(activity) {
+    setShareOverlayActivity(activity);
+  }
+
+  function closeShareOverlay() {
+    setShareOverlayActivity(null);
+  }
+
+  async function handleCopyShareLink(activity) {
+    const shareUrl = getActivityShareUrl(activity?.id);
+    if (!shareUrl) return;
+
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      toast("Mini test link copied.");
+    } catch (error) {
+      console.error("[HubMiniGrammarTests] copy share link failed", error);
+      toast("Could not copy that link.");
+    }
   }
 
   function toggleStudent(studentId) {
@@ -312,6 +340,14 @@ export default function HubMiniGrammarTests({ user }) {
                 >
                   Assign
                 </button>
+                <button
+                  type="button"
+                  className="hub-mini-share-btn"
+                  onClick={() => openShareOverlay(activity)}
+                  aria-label={`Show QR code for ${activity.title}`}
+                >
+                  QR
+                </button>
               </div>
             ) : null}
           </article>
@@ -394,6 +430,53 @@ export default function HubMiniGrammarTests({ user }) {
               <button type="button" className="review-btn" onClick={handleAssignMiniTest} disabled={assignSaving}>
                 {assignSaving ? "Assigning..." : "Assign mini test"}
               </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {shareOverlayActivity ? (
+        <div className="hub-mini-share-overlay" onClick={closeShareOverlay}>
+          <div className="hub-mini-share-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="hub-mini-share-head">
+              <div>
+                <h3>Share mini test</h3>
+                <p>{shareOverlayActivity.title}</p>
+              </div>
+              <button type="button" className="ghost-btn" onClick={closeShareOverlay}>
+                Close
+              </button>
+            </div>
+
+            <div className="hub-mini-share-body">
+              <div className="hub-mini-share-code">
+                <QRCodeSVG
+                  value={getActivityShareUrl(shareOverlayActivity.id)}
+                  size={180}
+                  bgColor="transparent"
+                  fgColor="#eef4ff"
+                />
+              </div>
+
+              <div className="hub-mini-share-copy">
+                <p className="hub-mini-share-label">Student link</p>
+                <input
+                  type="text"
+                  value={getActivityShareUrl(shareOverlayActivity.id)}
+                  readOnly
+                  onFocus={(event) => event.target.select()}
+                />
+                <p className="hub-mini-share-help">
+                  Students can scan the QR code on their phones or open the same link directly.
+                </p>
+                <button
+                  type="button"
+                  className="review-btn"
+                  onClick={() => handleCopyShareLink(shareOverlayActivity)}
+                >
+                  Copy link
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -483,6 +566,7 @@ export default function HubMiniGrammarTests({ user }) {
         .hub-mini-card-actions {
           display: flex;
           justify-content: flex-start;
+          gap: 0.55rem;
         }
 
         .hub-mini-assign-btn {
@@ -491,6 +575,18 @@ export default function HubMiniGrammarTests({ user }) {
           background: rgba(120, 182, 255, 0.12);
           color: #dce8ff;
           padding: 0.48rem 0.85rem;
+          font: inherit;
+          font-weight: 700;
+          cursor: pointer;
+        }
+
+        .hub-mini-share-btn {
+          border-radius: 999px;
+          border: 1px solid rgba(255, 213, 110, 0.32);
+          background: rgba(255, 213, 110, 0.1);
+          color: #dce8ff;
+          min-width: 3.25rem;
+          padding: 0.48rem 0.8rem;
           font: inherit;
           font-weight: 700;
           cursor: pointer;
@@ -506,10 +602,31 @@ export default function HubMiniGrammarTests({ user }) {
           z-index: 1100;
         }
 
+        .hub-mini-share-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(2, 6, 18, 0.78);
+          display: grid;
+          place-items: center;
+          padding: 1rem;
+          z-index: 1150;
+        }
+
         .hub-mini-assign-modal {
           width: min(780px, 100%);
           display: grid;
           gap: 0.9rem;
+          border-radius: 20px;
+          border: 1px solid rgba(70, 102, 170, 0.42);
+          background: linear-gradient(180deg, rgba(11, 21, 48, 0.98), rgba(14, 28, 63, 0.96));
+          box-shadow: 0 24px 60px rgba(2, 8, 24, 0.44);
+          padding: 1.1rem;
+        }
+
+        .hub-mini-share-modal {
+          width: min(640px, 100%);
+          display: grid;
+          gap: 1rem;
           border-radius: 20px;
           border: 1px solid rgba(70, 102, 170, 0.42);
           background: linear-gradient(180deg, rgba(11, 21, 48, 0.98), rgba(14, 28, 63, 0.96));
@@ -524,7 +641,19 @@ export default function HubMiniGrammarTests({ user }) {
           align-items: flex-start;
         }
 
+        .hub-mini-share-head {
+          display: flex;
+          justify-content: space-between;
+          gap: 0.8rem;
+          align-items: flex-start;
+        }
+
         .hub-mini-assign-head h3 {
+          margin: 0;
+          color: #eef4ff;
+        }
+
+        .hub-mini-share-head h3 {
           margin: 0;
           color: #eef4ff;
         }
@@ -532,6 +661,61 @@ export default function HubMiniGrammarTests({ user }) {
         .hub-mini-assign-head p {
           margin: 0.25rem 0 0;
           color: #a9b7d1;
+        }
+
+        .hub-mini-share-head p {
+          margin: 0.25rem 0 0;
+          color: #a9b7d1;
+        }
+
+        .hub-mini-share-body {
+          display: grid;
+          grid-template-columns: auto minmax(0, 1fr);
+          gap: 1rem;
+          align-items: center;
+        }
+
+        .hub-mini-share-code {
+          display: grid;
+          place-items: center;
+          padding: 1rem;
+          border-radius: 18px;
+          border: 1px solid rgba(63, 94, 155, 0.46);
+          background: rgba(8, 16, 38, 0.7);
+        }
+
+        .hub-mini-share-copy {
+          display: grid;
+          gap: 0.7rem;
+        }
+
+        .hub-mini-share-label {
+          margin: 0;
+          color: #ffd56e;
+          font-weight: 700;
+        }
+
+        .hub-mini-share-copy input {
+          width: 100%;
+          border-radius: 14px;
+          border: 1px solid rgba(103, 132, 197, 0.36);
+          background: rgba(11, 18, 37, 0.95);
+          color: #eef4ff;
+          padding: 0.82rem 0.95rem;
+          font: inherit;
+          box-sizing: border-box;
+        }
+
+        .hub-mini-share-copy input:focus {
+          outline: none;
+          border-color: rgba(133, 183, 255, 0.72);
+          box-shadow: 0 0 0 3px rgba(84, 136, 255, 0.18);
+        }
+
+        .hub-mini-share-help {
+          margin: 0;
+          color: #a9b7d1;
+          line-height: 1.45;
         }
 
         .hub-mini-assign-grid {
@@ -644,6 +828,19 @@ export default function HubMiniGrammarTests({ user }) {
           .hub-mini-assign-head {
             flex-direction: column;
             align-items: flex-start;
+          }
+
+          .hub-mini-share-head {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .hub-mini-share-body {
+            grid-template-columns: 1fr;
+          }
+
+          .hub-mini-share-code {
+            justify-self: center;
           }
 
           .hub-mini-assign-student-item {

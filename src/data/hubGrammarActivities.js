@@ -2596,6 +2596,166 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     ],
   },
   {
+    id: "comparatives-logic-a2-b1",
+    title: "Comparatives: Adjectives and Adverbs",
+    shortDescription: "Master the rules for comparing people, places, and actions.",
+    levels: ["a2", "b1"],
+    intro:
+      "Practice using comparatives to explain differences. Pay close attention to spelling rules and the difference between comparing things and comparing how people do things.",
+    items: [
+      multipleChoiceItem(
+        "comp-mc-1",
+        "Choose the correct comparative form.",
+        "The new office is much ____ than the old one in the city centre.",
+        ["bigerr", "bigger", "more big"],
+        1,
+        "For one-syllable adjectives ending in vowel + consonant, double the final letter before adding -er."
+      ),
+      multipleChoiceItem(
+        "comp-mc-2",
+        "Choose the correct comparative form.",
+        "I find learning Italian ____ than learning German.",
+        ["easyer", "more easy", "easier"],
+        2,
+        "Two-syllable adjectives ending in -y change the 'y' to 'i' and add -er."
+      ),
+      multipleChoiceItem(
+        "comp-mc-3",
+        "Choose the correct adverb form.",
+        "She plays the piano ____ than anyone else in the family.",
+        ["more beautifully", "beautifuller", "more beautiful"],
+        0,
+        "To compare an action (playing), use 'more' + the adverb ending in -ly."
+      ),
+      multipleChoiceItem(
+        "comp-mc-4",
+        "Choose the correct option.",
+        "This year's exam was ____ than last year's.",
+        ["badder", "worse", "worser"],
+        1,
+        "'Bad' is an irregular adjective. Its comparative form is 'worse'."
+      ),
+      multipleChoiceItem(
+        "comp-mc-5",
+        "Choose the correct pronoun structure.",
+        "My brother is a lot taller than ____.",
+        ["I", "me", "my"],
+        1,
+        "After 'than', we use an object pronoun like 'me', 'him', or 'her'."
+      ),
+      multipleChoiceItem(
+        "comp-mc-6",
+        "Choose the correct option.",
+        "The journey by train is ____ expensive than going by coach.",
+        ["least", "less", "as"],
+        1,
+        "Use 'less + adjective' to show that something has a lower quality or amount."
+      ),
+      errorCorrectionItem(
+        "comp-ec-1",
+        "Check the highlighted phrase for errors.",
+        "The weather today is more hotter than it was yesterday.",
+        "more hotter",
+        false,
+        "hotter",
+        "Don't use 'more' with one-syllable adjectives that already end in -er."
+      ),
+      errorCorrectionItem(
+        "comp-ec-2",
+        "Check the highlighted phrase for errors.",
+        "He doesn't drive as well than his father.",
+        "as well than",
+        false,
+        "as well as",
+        "The structure for equality is 'as + adverb + as'. Never use 'than' with 'as'."
+      ),
+      errorCorrectionItem(
+        "comp-ec-3",
+        "Check the highlighted phrase for errors.",
+        "The station is further than I thought.",
+        "further",
+        true,
+        "",
+        "Correct! 'Further' is the irregular comparative of 'far'."
+      ),
+      errorCorrectionItem(
+        "comp-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I can run more fast than my best friend.",
+        "more fast",
+        false,
+        "faster",
+        "'Fast' is an irregular adverb; its comparative form is 'faster', not 'more fast'."
+      ),
+      errorCorrectionItem(
+        "comp-ec-5",
+        "Check the highlighted phrase for errors.",
+        "This restaurant isn't as good than the one we visited last week.",
+        "as good than",
+        false,
+        "as good as",
+        "Always use '(not) as... as' for comparisons of equality or inequality."
+      ),
+      errorCorrectionItem(
+        "comp-ec-6",
+        "Check the highlighted phrase for errors.",
+        "She is more impatient today than she was this morning.",
+        "more impatient",
+        true,
+        "",
+        "Correct! For longer adjectives, use 'more' + adjective."
+      ),
+      placeholderGapItem(
+        "comp-rf-1",
+        "Complete the second sentence.",
+        "My car is faster than yours.\nYour car isn't __________ mine.",
+        "as fast as",
+        [],
+        "Use 'not as + adjective + as' to show that the second thing has less of a quality."
+      ),
+      placeholderGapItem(
+        "comp-rf-2",
+        "Complete the second sentence.",
+        "I'm older than her.\nShe is __________ me.",
+        "younger than",
+        [],
+        "You can reverse the comparison by using an opposite comparative."
+      ),
+      placeholderGapItem(
+        "comp-rf-3",
+        "Complete the second sentence.",
+        "He speaks more slowly than I do.\nI speak __________ he does.",
+        "faster than",
+        ["more quickly than"],
+        "Reverse the adverb comparison using an opposite comparative adverb."
+      ),
+      placeholderGapItem(
+        "comp-rf-4",
+        "Complete the second sentence.",
+        "The film was less interesting than the book.\nThe film wasn't __________ the book.",
+        "as interesting as",
+        [],
+        "'Less + adjective' has a similar meaning to 'not as + adjective + as'."
+      ),
+      placeholderGapItem(
+        "comp-rf-5",
+        "Complete the second sentence.",
+        "I don't play tennis as well as you.\nYou play tennis __________ me.",
+        "better than",
+        [],
+        "The opposite of 'not as well as' is 'better than'."
+      ),
+      placeholderGapItem(
+        "comp-rf-6",
+        "Complete the second sentence.",
+        "This bag and that bag are exactly the same price.\nThis bag costs __________ that one.",
+        "the same as",
+        ["as much as"],
+        "Use 'the same as' to show total equality."
+      ),
+    ],
+  },
+  {
     id: "articles-mixed",
     title: "Articles",
     shortDescription: "Practise a, an, the, and zero article in common B1 contexts.",
@@ -9003,6 +9163,187 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "have never visited",
         ["'ve never visited"],
         "A statement about a life experience using 'never'."
+      ),
+    ],
+  },
+  {
+    id: "indefinite-pronouns-logic",
+    title: "Something, Anything, Nothing",
+    shortDescription: "Master the use of someone, anywhere, nothing, and more.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use 'some-' for positive sentences, 'any-' for questions and negatives, and 'no-' for negative meanings with a positive verb. Practice choosing the right compound for people, things, and places.",
+    items: [
+      multipleChoiceItem(
+        "ind-mc-1",
+        "Choose the correct option.",
+        "I'm bored. I have ____ to do today.",
+        ["something", "anything", "nothing"],
+        2,
+        "Use 'nothing' with a positive verb to give a negative meaning."
+      ),
+      multipleChoiceItem(
+        "ind-mc-2",
+        "Choose the correct option.",
+        "I didn't see ____ I liked in the department store.",
+        ["anything", "nothing", "something"],
+        0,
+        "Use 'any-' compounds in negative sentences."
+      ),
+      multipleChoiceItem(
+        "ind-mc-3",
+        "Choose the correct option.",
+        "Wait! I think I've forgotten ____, but I can't remember what.",
+        ["anything", "nothing", "something"],
+        2,
+        "Use 'something' in positive statements."
+      ),
+      multipleChoiceItem(
+        "ind-mc-4",
+        "Choose the correct option.",
+        "Is there ____ at home right now?",
+        ["anybody", "nobody", "somebody"],
+        0,
+        "Use 'anybody' (or 'anyone') for questions about people."
+      ),
+      multipleChoiceItem(
+        "ind-mc-5",
+        "Choose the correct option (Nuance).",
+        "I'm so hungry I could eat ____!",
+        ["anything", "something", "nothing"],
+        0,
+        "In positive sentences, 'anything' means 'it doesn't matter what'."
+      ),
+      multipleChoiceItem(
+        "ind-mc-6",
+        "Choose the correct option.",
+        "Let's go ____ hot for our holiday this year.",
+        ["anywhere", "nowhere", "somewhere"],
+        2,
+        "Use 'somewhere' for positive suggestions about places."
+      ),
+      errorCorrectionItem(
+        "ind-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I didn't talk to nobody at the party.",
+        "didn't talk to nobody",
+        false,
+        "didn't talk to anybody",
+        "Avoid double negatives. Use 'anybody' with negative verbs like 'didn't'."
+      ),
+      errorCorrectionItem(
+        "ind-ec-2",
+        "Check the highlighted phrase for errors.",
+        "Somebody has left their umbrella in the hallway.",
+        "Somebody",
+        true,
+        "",
+        "Correct! Use 'somebody' when you don't know exactly who did something."
+      ),
+      errorCorrectionItem(
+        "ind-ec-3",
+        "Check the highlighted phrase for errors.",
+        "There's anywhere to park near the city centre.",
+        "anywhere",
+        false,
+        "nowhere",
+        "Use 'nowhere' with a positive verb to show that a place does not exist."
+      ),
+      errorCorrectionItem(
+        "ind-ec-4",
+        "Check the highlighted phrase for errors.",
+        "Do you want anything to drink?",
+        "anything",
+        true,
+        "",
+        "Correct! 'Anything' is fine in questions. In offers, 'something' is also very common, but this sentence is acceptable as it is."
+      ),
+      errorCorrectionItem(
+        "ind-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I looked for my keys, but I found anything.",
+        "found anything",
+        false,
+        ["found nothing", "didn't find anything"],
+        "Both 'found nothing' and 'didn't find anything' are correct. Avoid 'found anything' in this positive statement."
+      ),
+      errorCorrectionItem(
+        "ind-ec-6",
+        "Check the highlighted phrase for errors.",
+        "Anyone can come to the club; it's open to everyone.",
+        "Anyone",
+        true,
+        "",
+        "Correct! 'Anyone' in a positive sentence means 'it doesn't matter who'."
+      ),
+      placeholderGapItem(
+        "ind-gf-1",
+        "Complete with the correct indefinite pronoun.",
+        "I'm looking for my glasses. Has __________ seen them? (people / ?)",
+        "anybody",
+        ["anyone"],
+        "Use 'any-' for questions about people."
+      ),
+      placeholderGapItem(
+        "ind-gf-2",
+        "Complete with the correct indefinite pronoun.",
+        "The room was completely empty. There was __________ there. (people / -)",
+        "nobody",
+        ["no one"],
+        "Use 'no-' with a positive verb to show zero quantity."
+      ),
+      placeholderGapItem(
+        "ind-gf-3",
+        "Complete with the correct indefinite pronoun.",
+        "I'm really thirsty. I need __________ to drink. (thing / +)",
+        "something",
+        [],
+        "Use 'some-' for positive statements about things."
+      ),
+      placeholderGapItem(
+        "ind-gf-4",
+        "Complete with the correct indefinite pronoun.",
+        "I've looked __________, but I still can't find my wallet. (place / all)",
+        "everywhere",
+        [],
+        "Use 'everywhere' to mean all places."
+      ),
+      placeholderGapItem(
+        "ind-gf-5",
+        "Complete with the correct indefinite pronoun.",
+        "You don't need a reservation. You can sit __________ you like. (place / no matter)",
+        "anywhere",
+        [],
+        "Use 'anywhere' in a positive sentence to mean 'it doesn't matter where'."
+      ),
+      placeholderGapItem(
+        "ind-gf-6",
+        "Complete with the correct indefinite pronoun.",
+        "I'm sorry, I can't help you. I know __________ about fixing cars. (thing / -)",
+        "nothing",
+        [],
+        "Use 'nothing' for zero quantity with a positive verb."
+      ),
+      wordOrderItem(
+        "ind-wo-1",
+        "Unjumble the sentence.",
+        ["anybody", "didn't", "I", "know", "the", "at", "party"],
+        "I didn't know anybody at the party.",
+        "Subject + negative verb + indefinite pronoun + place."
+      ),
+      wordOrderItem(
+        "ind-wo-2",
+        "Unjumble the sentence.",
+        ["nothing", "is", "fridge", "the", "in", "there"],
+        "There is nothing in the fridge.",
+        "There + be + indefinite pronoun + location."
+      ),
+      wordOrderItem(
+        "ind-wo-3",
+        "Unjumble the question.",
+        ["you", "anywhere", "did", "weekend", "go", "this"],
+        "Did you go anywhere this weekend?",
+        "Auxiliary + Subject + Verb + Indefinite Pronoun + Time."
       ),
     ],
   },

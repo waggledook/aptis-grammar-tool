@@ -890,7 +890,7 @@ return (
   <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu />} />
   <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer />} />
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests user={user} />} />
-  <Route path="/grammar/activity/:activityId" element={<HubGrammarActivityRunner />} />
+  <Route path="/grammar/activity/:activityId" element={<HubGrammarActivityRunner user={user} />} />
 
   <Route path="/use-of-english" element={<HubUseOfEnglishMenu />} />
   <Route path="/use-of-english/keyword" element={<HubKeywordTrainer />} />
