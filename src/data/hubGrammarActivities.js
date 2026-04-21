@@ -1698,8 +1698,8 @@ export const HUB_GRAMMAR_ACTIVITIES = [
   },
   {
     id: "past-simple-vs-continuous-a2-b1",
-    title: "The Narrative Timeline",
-    shortDescription: "Contrast the background (Continuous) with the interruption (Simple).",
+    title: "Past Continuous vs Past Simple",
+    shortDescription: "Use the past continuous for background actions and the past simple for interruptions.",
     levels: ["a2", "b1"],
     intro:
       "Can you manage two actions at once? Use the Past Continuous for the longer background action and the Past Simple for the shorter event that interrupts it.",
@@ -1832,130 +1832,226 @@ export const HUB_GRAMMAR_ACTIVITIES = [
   {
     id: "connector-logic-a2-b1",
     title: "Connectors: Reason, Result & Contrast",
-    shortDescription: "Choose between so, because, but, and although to link your ideas.",
+    shortDescription: "Link your ideas using so, because, but, and although.",
     levels: ["a2", "b1"],
     intro:
-      "Decide how the two parts of the sentence relate to each other. Are you giving a reason, a result, or showing a contrast?",
+      "Practice how to connect two ideas. Are you explaining 'why' (reason), 'what happened next' (result), or a 'surprise' (contrast)?",
     items: [
       placeholderChoiceGapItem(
         "cl-1",
         "Choose the correct connector.",
-        "She was driving fast ____ she was in a hurry.",
+        "The outdoor concert was cancelled ____ there was a massive thunderstorm.",
         ["because"],
-        "Use 'because' to express a reason: [Sentence 1] is happening because of [Sentence 2].",
+        "The storm is the reason the concert was cancelled.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-2",
         "Choose the correct connector.",
-        "She was in a hurry, ____ she was driving fast.",
+        "There was a massive thunderstorm, ____ the outdoor concert was cancelled.",
         ["so"],
-        "Use 'so' to express a result: [Sentence 1] happened, and as a result, [Sentence 2] occurred.",
+        "The cancellation is the result of the storm.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-3",
         "Choose the correct connector.",
-        "She tried to stop the car, ____ she hit the man.",
+        "He didn't study at all, ____ he still passed the exam with an 'A'.",
         ["but"],
-        "Use 'but' to show a simple contrast between two ideas.",
+        "Use 'but' for a simple contrast between not studying and passing.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-4",
         "Choose the correct connector.",
-        "____ she tried to stop the car, she hit the man.",
+        "____ he didn't study at all, he still passed the exam with an 'A'.",
         ["although"],
-        "Use 'although' at the beginning of a sentence to introduce a contrast.",
+        "Use 'although' at the start to show a surprising contrast.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-5",
         "Choose the correct connector.",
-        "She was very tired, ____ she couldn't sleep.",
+        "The hotel was very cheap, ____ it was quite far from the city center.",
         ["but"],
-        "Use 'but' to link two contrasting ideas in the middle of a sentence.",
+        "A contrast between a positive (cheap) and a negative (far away).",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-6",
         "Choose the correct connector.",
-        "She couldn't sleep, ____ she was very tired.",
-        ["although"],
-        "Use 'although' to show contrast. It can be used in the middle of a sentence to mean 'despite the fact'.",
+        "We chose that hotel ____ it was very cheap.",
+        ["because"],
+        "The low price was the reason for choosing it.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-7",
         "Choose the correct connector.",
-        "We stayed at home ____ it was raining.",
-        ["because"],
-        "The rain is the reason for staying at home, so use 'because'.",
+        "The hotel was very cheap, ____ we decided to stay there for a week.",
+        ["so"],
+        "The long stay is the result of the low price.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-8",
         "Choose the correct connector.",
-        "It was raining, ____ we stayed at home.",
-        ["so"],
-        "Staying at home is the result of the rain, so use 'so'.",
+        "____ the hotel was cheap, it was actually very clean and modern.",
+        ["although"],
+        "A surprise contrast: usually cheap hotels aren't very modern.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-9",
         "Choose the correct connector.",
-        "____ it was raining, we went for a walk.",
-        ["although"],
-        "Use 'although' at the start to show that the second action happened despite the first condition.",
+        "I forgot my umbrella, ____ I got completely wet in the rain.",
+        ["so"],
+        "Getting wet was the result of forgetting the umbrella.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-10",
         "Choose the correct connector.",
-        "We went for a walk, ____ it was raining.",
-        ["but"],
-        "Use 'but' for a standard contrast between these two clauses.",
+        "I got completely wet in the rain ____ I forgot my umbrella.",
+        ["because"],
+        "Forgetting the umbrella was the reason for getting wet.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-11",
         "Choose the correct connector.",
-        "I didn't go to the party ____ I was busy.",
-        ["because"],
-        "Being busy is the reason for not going to the party.",
+        "I had an umbrella, ____ I still got a bit wet because of the wind.",
+        ["but"],
+        "A contrast: having an umbrella didn't keep the person 100% dry.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-12",
         "Choose the correct connector.",
-        "I was busy, ____ I didn't go to the party.",
-        ["so"],
-        "Not going to the party is the result of being busy.",
+        "____ I had an umbrella, I still got a bit wet because of the wind.",
+        ["although"],
+        "Starting the contrast with 'although'.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-13",
         "Choose the correct connector.",
-        "____ I was busy, I finished the report.",
-        ["although"],
-        "This shows a contrast: I finished the report even though (although) I was busy.",
+        "I was feeling very lazy, ____ I went to the gym anyway.",
+        ["but"],
+        "Contrast: feeling lazy vs. going to the gym.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-14",
         "Choose the correct connector.",
-        "The food was delicious, ____ the service was slow.",
-        ["but"],
-        "A clear contrast between a positive and a negative point.",
+        "____ the new laptop was very expensive, he decided to buy it.",
+        ["although"],
+        "Surprising contrast: high price vs. buying it anyway.",
         ["so", "because", "but", "although"]
       ),
       placeholderChoiceGapItem(
         "cl-15",
         "Choose the correct connector.",
-        "I enjoyed the film, ____ it was quite long.",
-        ["although"],
-        "Use 'although' to show that you enjoyed it despite the length.",
+        "He bought the laptop ____ his old one was broken.",
+        ["because"],
+        "The broken laptop is the reason for the new purchase.",
         ["so", "because", "but", "although"]
+      ),
+    ],
+  },
+  {
+    id: "relative-clauses-a2-b1",
+    title: "Who, Which, and Where",
+    shortDescription: "Use relative pronouns to describe people, things, and places.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use 'who' for people, 'which' for things, and 'where' for places. These words help you join ideas and define what or who you mean.",
+    items: [
+      multipleChoiceItem(
+        "rel-mc-1",
+        "Choose the correct word.",
+        "The tour guide is the person ____ shows us the historic monuments.",
+        ["who", "which", "where"],
+        0,
+        "We use 'who' to give more information about a person."
+      ),
+      multipleChoiceItem(
+        "rel-mc-2",
+        "Choose the correct word.",
+        "A souvenir is something ____ you buy to remember your holiday.",
+        ["who", "which", "where"],
+        1,
+        "We use 'which' (or 'that') for objects or things."
+      ),
+      multipleChoiceItem(
+        "rel-mc-3",
+        "Choose the correct word.",
+        "The museum is the place ____ we saw the famous paintings.",
+        ["who", "which", "where"],
+        2,
+        "We use 'where' for locations and buildings."
+      ),
+      errorCorrectionItem(
+        "rel-ec-1",
+        "Is the relative pronoun correct?",
+        "I found a small café which sells the best coffee in the city centre.",
+        "which",
+        true,
+        "",
+        "Correct! We use 'which' because the café is the subject performing the action (selling coffee)."
+      ),
+      errorCorrectionItem(
+        "rel-ec-2",
+        "Is the relative pronoun correct?",
+        "The woman where checked our passports was very friendly.",
+        "where",
+        false,
+        "who",
+        "Since we are talking about a person (the woman), we must use 'who'."
+      ),
+      errorCorrectionItem(
+        "rel-ec-3",
+        "Is the relative pronoun correct?",
+        "That's the hotel where we stayed last summer.",
+        "where",
+        true,
+        "",
+        "Correct! We use 'where' to describe a place where an action happened."
+      ),
+      placeholderGapItem(
+        "rel-gf-1",
+        "Complete the definition: A suitcase is a large bag __________ you use for carrying clothes.",
+        "which",
+        ["that"],
+        "Defining an object (a bag)."
+      ),
+      placeholderGapItem(
+        "rel-gf-2",
+        "Complete the definition: A receptionist is the person __________ works at the front desk.",
+        "who",
+        ["that"],
+        "Defining a person."
+      ),
+      placeholderGapItem(
+        "rel-gf-3",
+        "Complete the definition: An airport is a place __________ planes land and take off.",
+        "where",
+        [],
+        "Defining a location."
+      ),
+      singleGap(
+        "rel-rf-1",
+        "Combine the ideas: 'I met a traveller. He spoke five languages.'",
+        ["I met a traveller ", { gapId: "g1" }, " five languages."],
+        ["who spoke", "that spoke"],
+        "Join the sentences using 'who' to describe the person."
+      ),
+      singleGap(
+        "rel-rf-2",
+        "Combine the ideas: 'This is the map. I bought it at the station centre.'",
+        ["This is the map ", { gapId: "g1" }, " at the station centre."],
+        ["which I bought", "that I bought"],
+        "Join the sentences using 'which' to describe the thing."
       ),
     ],
   },
@@ -8302,6 +8398,611 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         ["The ten-hour journey tired us all out. -> The ten-hour journey was very ", { gapId: "g1" }, "."],
         ["tiring"],
         "Use the -ing adjective to describe the thing that causes the feeling."
+      ),
+    ],
+  },
+  {
+    id: "be-going-to-mastery",
+    title: "Be Going To: Plans vs. Predictions",
+    shortDescription: "Practice intentions and predictions based on present evidence.",
+    levels: ["a2", "b1"],
+    intro:
+      "We use 'be going to' for two main reasons: intentions we've already made (plans) or things we can see are about to happen (predictions).",
+    items: [
+      multipleChoiceItem(
+        "bgt-mc-1",
+        "Is this a plan or a prediction?",
+        "Look at those dark clouds! It's going to rain.",
+        ["Plan", "Prediction"],
+        1,
+        "Prediction: We can see evidence (the clouds) that something is about to happen."
+      ),
+      multipleChoiceItem(
+        "bgt-mc-2",
+        "Is this a plan or a prediction?",
+        "I've bought a new camera because I'm going to take up photography.",
+        ["Plan", "Prediction"],
+        0,
+        "Plan: This is an intention made before the moment of speaking."
+      ),
+      multipleChoiceItem(
+        "bgt-mc-3",
+        "Is this a plan or a prediction?",
+        "Watch out! That ladder is going to fall!",
+        ["Plan", "Prediction"],
+        1,
+        "Prediction: You can see the ladder wobbling right now."
+      ),
+      multipleChoiceItem(
+        "bgt-mc-4",
+        "Is this a plan or a prediction?",
+        "We're going to move house next month; we've already signed the contract.",
+        ["Plan", "Prediction"],
+        0,
+        "Plan: A clear intention with previous arrangement."
+      ),
+      placeholderGapItem(
+        "bgt-gf-1",
+        "Complete with 'be going to' + verb.",
+        "I __________ (not / work) this weekend. I need a rest.",
+        "am not going to work",
+        ["'m not going to work"],
+        "Negative intention/plan."
+      ),
+      placeholderGapItem(
+        "bgt-gf-2",
+        "Complete with 'be going to' + verb.",
+        "__________ (you / invite) Mark to the party?",
+        "Are you going to invite",
+        [],
+        "Question form for intentions."
+      ),
+      placeholderGapItem(
+        "bgt-gf-3",
+        "Complete with 'be going to' + verb.",
+        "Be careful! You __________ (drop) that glass!",
+        "are going to drop",
+        ["'re going to drop"],
+        "Prediction based on what we can see happening now."
+      ),
+      placeholderGapItem(
+        "bgt-gf-4",
+        "Complete with 'be going to' + verb.",
+        "They __________ (get) married in the summer.",
+        "are going to get",
+        ["'re going to get"],
+        "A future plan."
+      ),
+      placeholderGapItem(
+        "bgt-visual-1",
+        "Look at the picture and complete the prediction.",
+        "He __________ the bus.",
+        "is going to miss",
+        ["'s going to miss"],
+        "The evidence shows the bus is leaving without him.",
+        {
+          imageSrc: "/images/grammar/going-to/bus.png",
+          imageAlt: "A man running after a bus while the doors are closing and it is moving away.",
+          imageMaxWidth: "320px",
+        }
+      ),
+      placeholderGapItem(
+        "bgt-visual-2",
+        "Look at the picture and complete the prediction.",
+        "The plates __________.",
+        "are going to fall",
+        ["are going to break", "'re going to fall", "'re going to break"],
+        "We can see the plates are about to fall.",
+        {
+          imageSrc: "/images/grammar/going-to/waiter.png",
+          imageAlt: "A waiter carrying a dangerously leaning stack of plates.",
+          imageMaxWidth: "320px",
+        }
+      ),
+      placeholderGapItem(
+        "bgt-visual-3",
+        "Look at the picture and complete the prediction.",
+        "She __________.",
+        "is going to slip",
+        ["is going to fall", "'s going to fall", "'s going to slip"],
+        "The immediate evidence is the ice on her path.",
+        {
+          imageSrc: "/images/grammar/going-to/ice.png",
+          imageAlt: "A young woman looking at her phone while walking towards a patch of ice.",
+          imageMaxWidth: "320px",
+        }
+      ),
+      placeholderGapItem(
+        "bgt-visual-4",
+        "Look at the picture and complete the prediction.",
+        "They __________ lost.",
+        "are going to get",
+        ["'re going to get"],
+        "The evidence suggests they don't know where they are going.",
+        {
+          imageSrc: "/images/grammar/going-to/map.png",
+          imageAlt: "A confused traveler holding a map upside down at a crossroads.",
+          imageMaxWidth: "320px",
+        }
+      ),
+    ],
+  },
+  {
+    id: "arrangements-vs-plans-a2-b1",
+    title: "Arrangements or Intentions?",
+    shortDescription: "Decide between the Present Continuous and 'be going to'.",
+    levels: ["a2", "b1"],
+    intro:
+      "Is it a fixed arrangement in your diary, or just a general plan? Use the Present Continuous for fixed appointments and 'be going to' for intentions.",
+    items: [
+      multipleChoiceItem(
+        "fut-mc-1",
+        "Which is more natural for a fixed appointment?",
+        "I ____ the manager at 10:00 AM in her office.",
+        ["am meeting", "going to meet", "meet"],
+        0,
+        "Present Continuous is best for fixed arrangements with a specific time and place."
+      ),
+      multipleChoiceItem(
+        "fut-mc-2",
+        "Which is more natural for a general goal?",
+        "One day, I ____ my own business, but I need to save money first.",
+        ["am starting", "am going to start", "start"],
+        1,
+        "Use 'be going to' for an intention or a goal that doesn't have a fixed date yet."
+      ),
+      multipleChoiceItem(
+        "fut-mc-3",
+        "Which is more natural for travel arrangements?",
+        "We ____ from Heathrow Airport at 6:00 AM on Tuesday.",
+        ["are flying", "are going to fly", "fly"],
+        0,
+        "For travel with a specific time and location, we almost always use the Present Continuous."
+      ),
+      errorCorrectionItem(
+        "fut-ec-1",
+        "Check the highlighted phrase.",
+        "I'm going to see the doctor tomorrow at 3:30.",
+        "going to see",
+        true,
+        "",
+        "Correct! 'Going to see' is perfectly possible here. 'I'm seeing the doctor tomorrow at 3:30' is also very natural because it sounds more like a fixed appointment."
+      ),
+      errorCorrectionItem(
+        "fut-ec-2",
+        "Check the highlighted phrase.",
+        "We are having a big party next Saturday; I've already sent the invites.",
+        "are having",
+        true,
+        "",
+        "Correct! Because the invites are sent, this is a fixed arrangement."
+      ),
+      errorCorrectionItem(
+        "fut-ec-3",
+        "Check the highlighted phrase.",
+        "I am learning to play the guitar next year.",
+        "am learning",
+        false,
+        "am going to learn",
+        "Use 'be going to' for a new year's resolution or a general intention."
+      ),
+      placeholderGapItem(
+        "fut-gf-1",
+        "Complete the sentence.",
+        "Fixed Arrangement: My sister __________ (get) married on June 12th.",
+        "is getting",
+        [],
+        "A wedding is a very fixed arrangement!"
+      ),
+      placeholderGapItem(
+        "fut-gf-2",
+        "Complete the sentence.",
+        "General Plan: I __________ (travel) around South America when I finish university.",
+        "am going to travel",
+        ["'m going to travel"],
+        "This is a big plan for the future, but it's not a fixed arrangement yet."
+      ),
+      placeholderGapItem(
+        "fut-gf-3",
+        "Complete the sentence.",
+        "Fixed Appointment: I __________ (see) the dentist after work today.",
+        "am seeing",
+        ["'m seeing"],
+        "A specific appointment in the diary."
+      ),
+      placeholderGapItem(
+        "fut-gf-4",
+        "Complete the sentence.",
+        "Decision: We've decided that we __________ (buy) a new car soon.",
+        "are going to buy",
+        ["'re going to buy"],
+        "An intention/decision made before the moment of speaking."
+      ),
+      singleGap(
+        "fut-rf-1",
+        "Rewrite using the Present Continuous: 'I have a table booked at the Italian restaurant for 8:00 PM.'",
+        ["I ", { gapId: "g1" }, " at the Italian restaurant tonight."],
+        ["am having dinner", "am eating"],
+        "Use the Present Continuous for a social arrangement that is already booked."
+      ),
+      singleGap(
+        "fut-rf-2",
+        "Rewrite using 'be going to': 'I intend to look for a better job.'",
+        ["I ", { gapId: "g1" }, " for a better job."],
+        ["am going to look"],
+        "Turn the verb 'intend' into the 'be going to' structure."
+      ),
+    ],
+  },
+  {
+    id: "present-perfect-extended-a2b1",
+    title: "Present Perfect: Adverbs & Form",
+    shortDescription: "Complete practice for have/has and the adverbs just, already, and yet.",
+    levels: ["a2", "b1"],
+    intro:
+      "Master the present perfect by practicing regular and irregular forms, alongside the three key time adverbs: just, already, and yet.",
+    items: [
+      placeholderGapItem(
+        "pp-form-1",
+        "Complete with the present perfect.",
+        "I __________ (wash) the car. It looks much better now.",
+        "have washed",
+        ["'ve washed"],
+        "Regular verb: add -ed."
+      ),
+      placeholderGapItem(
+        "pp-form-2",
+        "Complete with the present perfect.",
+        "She __________ (buy) a new pair of trainers for the gym.",
+        "has bought",
+        ["'s bought"],
+        "Irregular verb: buy -> bought."
+      ),
+      placeholderGapItem(
+        "pp-form-3",
+        "Complete with the present perfect.",
+        "They __________ (not / see) the new exhibition at the gallery.",
+        "haven't seen",
+        ["have not seen"],
+        "Negative form: haven't + irregular past participle."
+      ),
+      placeholderGapItem(
+        "pp-form-4",
+        "Complete with the present perfect.",
+        "__________ (you / finish) that report for the meeting?",
+        "Have you finished",
+        [],
+        "Question form: Have + subject + past participle."
+      ),
+      placeholderGapItem(
+        "pp-form-5",
+        "Complete with the present perfect.",
+        "We __________ (not / start) the film. You're just in time!",
+        "haven't started",
+        ["have not started"],
+        "Negative form with a regular verb."
+      ),
+      placeholderGapItem(
+        "pp-form-6",
+        "Complete with the present perfect.",
+        "__________ (he / send) the photos of the wedding to everyone?",
+        "Has he sent",
+        [],
+        "Question form with an irregular verb: send -> sent."
+      ),
+      multipleChoiceItem(
+        "pp-adv-1",
+        "Choose the best adverb.",
+        "I'm not hungry, thank you. I've ____ had a large lunch.",
+        ["yet", "just", "already"],
+        1,
+        "Use 'just' for an action that happened very recently."
+      ),
+      multipleChoiceItem(
+        "pp-adv-2",
+        "Choose the best adverb.",
+        "Have you spoken to the manager about your holiday ____?",
+        ["yet", "just", "already"],
+        0,
+        "Use 'yet' at the end of questions."
+      ),
+      multipleChoiceItem(
+        "pp-adv-3",
+        "Choose the best adverb.",
+        "Don't worry about the bins. I've ____ taken them out.",
+        ["yet", "just", "already"],
+        2,
+        "Use 'already' for something that happened earlier than expected."
+      ),
+      multipleChoiceItem(
+        "pp-adv-4",
+        "Choose the best adverb.",
+        "We haven't received the confirmation email ____.",
+        ["yet", "just", "already"],
+        0,
+        "Use 'yet' at the end of negative sentences."
+      ),
+      multipleChoiceItem(
+        "pp-adv-5",
+        "Choose the best adverb.",
+        "Is the news on? No, sorry, it has ____ finished.",
+        ["yet", "just", "already"],
+        1,
+        "Use 'just' to indicate the news finished a moment ago."
+      ),
+      multipleChoiceItem(
+        "pp-adv-6",
+        "Choose the best adverb.",
+        "I don't need to read that book. I've ____ read it twice.",
+        ["yet", "just", "already"],
+        2,
+        "Use 'already' to show the action was completed in the past."
+      ),
+      singleGap(
+        "pp-rf-1",
+        "Rewrite using 'just': 'He finished the phone call a few seconds ago.'",
+        ["He ", { gapId: "g1" }, " the phone call."],
+        ["has just finished", "'s just finished"],
+        "Position 'just' between the auxiliary and the main verb."
+      ),
+      singleGap(
+        "pp-rf-2",
+        "Rewrite using 'yet': 'Is the cake ready? (ask as a question)'",
+        ["Have ", { gapId: "g1" }, "?"],
+        ["you finished the cake yet", "you made the cake yet"],
+        "Add 'yet' to the end of the question."
+      ),
+      singleGap(
+        "pp-rf-3",
+        "Rewrite using 'already': 'I tidied the kitchen earlier than planned.'",
+        ["I ", { gapId: "g1" }, " the kitchen."],
+        ["have already tidied", "'ve already tidied"],
+        "Position 'already' before the past participle."
+      ),
+      singleGap(
+        "pp-rf-4",
+        "Rewrite using 'yet': 'I am still waiting for the bus to arrive.'",
+        ["The bus ", { gapId: "g1" }, "."],
+        ["hasn't arrived yet", "has not arrived yet"],
+        "Use a negative present perfect with 'yet' for expected actions."
+      ),
+      singleGap(
+        "pp-rf-5",
+        "Rewrite using 'just': 'The postman delivered the mail a moment ago.'",
+        ["The postman ", { gapId: "g1" }, " the mail."],
+        ["has just delivered", "'s just delivered"],
+        "Use 'just' to describe a very recent event."
+      ),
+      singleGap(
+        "pp-rf-6",
+        "Rewrite using 'yet': 'Are you still doing your homework?'",
+        ["Have ", { gapId: "g1" }, "?"],
+        ["you finished your homework yet"],
+        "Change the continuous question into a present perfect 'yet' question."
+      ),
+    ],
+  },
+  {
+    id: "present-perfect-vs-past-simple-a2b1",
+    title: "Present Perfect or Past Simple?",
+    shortDescription: "Master the difference between finished past actions and life experiences.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use the Past Simple for finished actions with a specific time. Use the Present Perfect for life experiences or recent news where the time isn't mentioned.",
+    items: [
+      multipleChoiceItem(
+        "ppvsps-mc-1",
+        "Choose the correct verb form.",
+        "I ____ to Italy three times, but I'd love to go again.",
+        ["have been", "went", "was going"],
+        0,
+        "Use Present Perfect for life experiences when we don't say exactly when."
+      ),
+      multipleChoiceItem(
+        "ppvsps-mc-2",
+        "Choose the correct verb form.",
+        "I ____ to Italy for the first time in 2018.",
+        ["have gone", "went", "have been"],
+        1,
+        "Use Past Simple because 'in 2018' is a finished time."
+      ),
+      multipleChoiceItem(
+        "ppvsps-mc-3",
+        "Choose the correct verb form.",
+        "Oh no! I ____ my phone. The screen is completely cracked.",
+        ["have broken", "broke", "break"],
+        0,
+        "Use Present Perfect for recent news that has a result in the present."
+      ),
+      multipleChoiceItem(
+        "ppvsps-mc-4",
+        "Choose the correct verb form.",
+        "I ____ my phone while I was running for the bus yesterday.",
+        ["have broken", "broke", "had broken"],
+        1,
+        "Use Past Simple because 'yesterday' is a finished time."
+      ),
+      multipleChoiceItem(
+        "ppvsps-mc-5",
+        "Choose the correct verb form.",
+        "Oh no! I ____ my keys. I can't get into my flat!",
+        ["lost", "have lost", "was losing"],
+        1,
+        "Use the Present Perfect for a recent action that has a direct result in the present (I can't get in)."
+      ),
+      multipleChoiceItem(
+        "ppvsps-mc-6",
+        "Choose the correct verb form.",
+        "They ____ to a lovely Indian restaurant for dinner last night.",
+        ["went", "have gone", "have been"],
+        0,
+        "Use the Past Simple because 'last night' is a finished time."
+      ),
+      errorCorrectionItem(
+        "ppvsps-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I have seen that film last night at the cinema.",
+        "have seen",
+        false,
+        "saw",
+        "You cannot use the Present Perfect with a finished time like 'last night'."
+      ),
+      errorCorrectionItem(
+        "ppvsps-ec-2",
+        "Check the highlighted phrase for errors.",
+        "Have you ever eaten Japanese food?",
+        "Have you ever eaten",
+        true,
+        "",
+        "Correct! Use Present Perfect to ask about general life experiences."
+      ),
+      errorCorrectionItem(
+        "ppvsps-ec-3",
+        "Check the highlighted phrase for errors.",
+        "We have moved to this house three years ago.",
+        "have moved",
+        false,
+        "moved",
+        "The word 'ago' always requires the Past Simple."
+      ),
+      errorCorrectionItem(
+        "ppvsps-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I have spoken to the manager about the problem ten minutes ago.",
+        "have spoken",
+        false,
+        "spoke",
+        "You cannot use the Present Perfect with 'ago'. Use the Past Simple instead."
+      ),
+      errorCorrectionItem(
+        "ppvsps-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I have won a trophy for sport at school in 2019.",
+        "have won",
+        false,
+        "won",
+        "Use the Past Simple with a finished time expression like 'in 2019'."
+      ),
+      errorCorrectionItem(
+        "ppvsps-ec-6",
+        "Check the highlighted phrase for errors.",
+        "She has travelled to many different countries in her life.",
+        "has travelled",
+        true,
+        "",
+        "Correct! Use the Present Perfect to describe experiences throughout someone's life up to now."
+      ),
+      placeholderChoiceGapItem(
+        "bg-1",
+        "Choose been or gone.",
+        "He isn't here at the moment. He has ____ to the shops.",
+        ["gone"],
+        "Use 'gone' because he is still at the shops (he hasn't returned).",
+        ["been", "gone"]
+      ),
+      placeholderChoiceGapItem(
+        "bg-2",
+        "Choose been or gone.",
+        "I've ____ to the shops, so the fridge is full now.",
+        ["been"],
+        "Use 'been' because the speaker has returned from the shops.",
+        ["been", "gone"]
+      ),
+      placeholderChoiceGapItem(
+        "bg-3",
+        "Choose been or gone.",
+        "Have you ever ____ to Mexico?",
+        ["been"],
+        "Use 'been' when asking about a completed trip in someone's life.",
+        ["been", "gone"]
+      ),
+      placeholderChoiceGapItem(
+        "bg-4",
+        "Choose been or gone.",
+        "My parents are on holiday. They've ____ to Portugal for two weeks.",
+        ["gone"],
+        "They are currently in Portugal, so use 'gone'.",
+        ["been", "gone"]
+      ),
+      placeholderChoiceGapItem(
+        "bg-5",
+        "Choose been or gone.",
+        "I'm exhausted! I've ____ to the gym every day this week.",
+        ["been"],
+        "The speaker is currently 'here' (exhausted), so the trips are complete.",
+        ["been", "gone"]
+      ),
+      placeholderChoiceGapItem(
+        "bg-6",
+        "Choose been or gone.",
+        "Where is Sarah? She's ____ to lunch with her manager.",
+        ["gone"],
+        "She is still at lunch, so use 'gone'.",
+        ["been", "gone"]
+      ),
+      placeholderChoiceGapItem(
+        "bg-7",
+        "Choose been or gone.",
+        "The house is very quiet because everyone has ____ to the cinema.",
+        ["gone"],
+        "They are at the cinema now, so use 'gone'.",
+        ["been", "gone"]
+      ),
+      placeholderChoiceGapItem(
+        "bg-8",
+        "Choose been or gone.",
+        "I've ____ to the cinema twice this month.",
+        ["been"],
+        "The speaker is telling you about their experience, not currently at the cinema.",
+        ["been", "gone"]
+      ),
+      placeholderGapItem(
+        "ppvsps-gf-1",
+        "Complete with the correct tense.",
+        "A: Have you seen my keys? \nB: Yes, I __________ (see) them on the table five minutes ago.",
+        "saw",
+        [],
+        "The second sentence mentions a specific time (five minutes ago)."
+      ),
+      placeholderGapItem(
+        "ppvsps-gf-2",
+        "Complete with the correct tense.",
+        "My sister is a famous writer. She __________ (write) over twenty books.",
+        "has written",
+        ["'s written"],
+        "This is an ongoing experience/achievement in her life."
+      ),
+      placeholderGapItem(
+        "ppvsps-gf-3",
+        "Complete with the correct tense.",
+        "I __________ (not / go) to work yesterday because I was ill.",
+        "didn't go",
+        ["did not go"],
+        "Use Past Simple for 'yesterday'."
+      ),
+      placeholderGapItem(
+        "ppvsps-gf-4",
+        "Complete with the correct tense.",
+        "__________ (you / ever / try) skydiving?",
+        "Have you ever tried",
+        [],
+        "A question about a life experience."
+      ),
+      placeholderGapItem(
+        "ppvsps-gf-5",
+        "Complete with the correct tense.",
+        "We __________ (arrive) at the airport very late last night.",
+        "arrived",
+        [],
+        "Use Past Simple for 'last night'."
+      ),
+      placeholderGapItem(
+        "ppvsps-gf-6",
+        "Complete with the correct tense.",
+        "I __________ (never / visit) London, but I'd like to go next year.",
+        "have never visited",
+        ["'ve never visited"],
+        "A statement about a life experience using 'never'."
       ),
     ],
   },

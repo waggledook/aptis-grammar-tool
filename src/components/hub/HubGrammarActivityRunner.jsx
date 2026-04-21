@@ -824,6 +824,7 @@ export default function HubGrammarActivityRunner() {
                       src={item.imageSrc}
                       alt={item.imageAlt || item.prompt}
                       className="hub-grammar-figure-image"
+                      style={item.imageMaxWidth ? { maxWidth: item.imageMaxWidth } : undefined}
                     />
                     {item.imageCaption ? (
                       <figcaption className="hub-grammar-figure-caption">
