@@ -208,6 +208,7 @@ function renderSentence(
         className="hub-grammar-gap"
         value={answers[key] || ""}
         onChange={(event) => handleChange(key, event.target.value)}
+        placeholder={gap?.placeholder || ""}
         onKeyDown={(event) => {
           if (event.key === "Enter") {
             event.preventDefault();

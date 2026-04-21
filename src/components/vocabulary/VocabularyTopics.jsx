@@ -60,6 +60,14 @@ export default function VocabularyTopics({
 
   const topics = [
     {
+      id: "transport",
+      name: "Transport",
+      emoji: "🚌",
+      desc: "Means of transport and getting around.",
+      active: true,
+      isNew: true,
+    },
+    {
       id: "education",
       name: "Education",
       emoji: "🏫",
@@ -151,7 +159,7 @@ export default function VocabularyTopics({
 
       <UnderConstructionPanel
   title="Topic practice in progress"
-  message="Right now you can practise Travel, Work, Describing people, Relationships, Health, Clothes & accessories, Describing feelings, Food, Education, and TV & Cinema. More topics, including Technology, are on the way!"
+  message="Right now you can practise Transport, Travel, Work, Describing people, Relationships, Health, Clothes & accessories, Describing feelings, Food, Education, and TV & Cinema. More topics, including Technology, are on the way!"
 />
 
 

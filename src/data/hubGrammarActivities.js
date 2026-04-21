@@ -21,25 +21,31 @@ const doubleGap = (
   secondAcceptedAnswers,
   feedback,
   extra = {}
-) => ({
-  id,
-  type: "gap-fill",
-  prompt,
-  parts,
-  gaps: [
-    {
-      id: "g1",
-      acceptedAnswers: firstAcceptedAnswers,
-      feedback,
-    },
-    {
-      id: "g2",
-      acceptedAnswers: secondAcceptedAnswers,
-      feedback,
-    },
-  ],
-  ...extra,
-});
+) => {
+  const gapExtras = extra.gapExtras || {};
+
+  return {
+    id,
+    type: "gap-fill",
+    prompt,
+    parts,
+    gaps: [
+      {
+        id: "g1",
+        acceptedAnswers: firstAcceptedAnswers,
+        feedback,
+        ...(gapExtras.g1 || {}),
+      },
+      {
+        id: "g2",
+        acceptedAnswers: secondAcceptedAnswers,
+        feedback,
+        ...(gapExtras.g2 || {}),
+      },
+    ],
+    ...extra,
+  };
+};
 
 const multipleChoiceItem = (id, prompt, question, options, answerIndex, explanation) => ({
   id,
@@ -2756,6 +2762,166 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     ],
   },
   {
+    id: "superlatives-logic-a2-b1",
+    title: "Superlatives: The Best & The Worst",
+    shortDescription: "Master superlative adjectives and common B1 structures.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use superlatives to compare one thing with a whole group. Practice the spelling rules, irregular forms, and how to use superlatives with your own life experiences.",
+    items: [
+      multipleChoiceItem(
+        "sup-mc-1",
+        "Choose the correct superlative form.",
+        "That was ____ film I've ever seen at the cinema.",
+        ["the baddest", "the worst", "the most bad"],
+        1,
+        "'Bad' is an irregular adjective. Its superlative form is 'the worst'."
+      ),
+      multipleChoiceItem(
+        "sup-mc-2",
+        "Choose the correct superlative form.",
+        "My sister is ____ person in our family.",
+        ["the thinnest", "the thinest", "the most thin"],
+        0,
+        "For adjectives ending in vowel + consonant, double the final letter before adding -est."
+      ),
+      multipleChoiceItem(
+        "sup-mc-3",
+        "Choose the correct option.",
+        "She is the best student ____ the class.",
+        ["of", "in", "at"],
+        1,
+        "Use 'in' with singular words for groups like 'class', 'team', or 'family'."
+      ),
+      multipleChoiceItem(
+        "sup-mc-4",
+        "Choose the correct option.",
+        "It was ____ experience of my life.",
+        ["the most terrifying", "the terrifyingest", "the more terrifying"],
+        0,
+        "Use 'the most' for adjectives with three or more syllables."
+      ),
+      multipleChoiceItem(
+        "sup-mc-5",
+        "Choose the correct superlative form.",
+        "Which is ____ city in the world?",
+        ["the noisest", "the noisiyest", "the noisiest"],
+        2,
+        "Two-syllable adjectives ending in -y change 'y' to 'i' before adding -est."
+      ),
+      multipleChoiceItem(
+        "sup-mc-6",
+        "Choose the correct option.",
+        "That is the most delicious cake I have ____ eaten.",
+        ["never", "ever", "already"],
+        1,
+        "We often use 'the + superlative' with the present perfect and 'ever' to talk about experiences."
+      ),
+      errorCorrectionItem(
+        "sup-ec-1",
+        "Check the highlighted phrase for errors.",
+        "This is the most cheapest restaurant in the city centre.",
+        "the most cheapest",
+        false,
+        "the cheapest",
+        "Don't use 'most' with short adjectives that already end in -est."
+      ),
+      errorCorrectionItem(
+        "sup-ec-2",
+        "Check the highlighted phrase for errors.",
+        "He is the more intelligent person I know.",
+        "the more intelligent",
+        false,
+        "the most intelligent",
+        "Use 'the most' to compare one person with a whole group."
+      ),
+      errorCorrectionItem(
+        "sup-ec-3",
+        "Check the highlighted phrase for errors.",
+        "It was the best holiday I ever had.",
+        "I ever had",
+        false,
+        "I've ever had",
+        "Use the present perfect ('I have ever had') when using 'ever' with a superlative."
+      ),
+      errorCorrectionItem(
+        "sup-ec-4",
+        "Check the highlighted phrase for errors.",
+        "Vatican City is the smallest country in the world.",
+        "the smallest",
+        true,
+        "",
+        "Correct! 'Small' is a one-syllable adjective, so add -est."
+      ),
+      errorCorrectionItem(
+        "sup-ec-5",
+        "Check the highlighted phrase for errors.",
+        "He is the baddest player in the team.",
+        "the baddest",
+        false,
+        "the worst",
+        "'Bad' is irregular; the correct superlative is 'the worst'."
+      ),
+      errorCorrectionItem(
+        "sup-ec-6",
+        "Check the highlighted phrase for errors.",
+        "This exercise is the most easy in the book.",
+        "the most easy",
+        false,
+        "the easiest",
+        "Two-syllable adjectives ending in -y usually take the -est ending."
+      ),
+      placeholderGapItem(
+        "sup-rf-1",
+        "Complete the second sentence.",
+        "No one in the class is taller than Julia.\nJulia is __________ student in the class.",
+        "the tallest",
+        [],
+        "Use a superlative to show that Julia is at the top of the group."
+      ),
+      placeholderGapItem(
+        "sup-rf-2",
+        "Complete the second sentence.",
+        "I've never seen a more beautiful sunset.\nThat is __________ I've ever seen.",
+        "the most beautiful sunset",
+        ["the most beautiful one"],
+        "Combine the superlative with 'ever' to describe a unique experience."
+      ),
+      placeholderGapItem(
+        "sup-rf-3",
+        "Complete the second sentence.",
+        "All the other hotels are more expensive than this one.\nThis is __________ hotel in town.",
+        "the least expensive",
+        ["the cheapest"],
+        "You can use 'the least + adjective' to show something is at the bottom of a group."
+      ),
+      placeholderGapItem(
+        "sup-rf-4",
+        "Complete the second sentence.",
+        "This book is better than any other book I've read.\nThis is __________ book I've ever read.",
+        "the best",
+        [],
+        "The superlative of 'good' is 'the best'."
+      ),
+      placeholderGapItem(
+        "sup-rf-5",
+        "Complete the second sentence.",
+        "No other city is as noisy as this one.\nThis is __________ city I've ever visited.",
+        "the noisiest",
+        [],
+        "Convert an 'as...as' comparison into a superlative."
+      ),
+      placeholderGapItem(
+        "sup-rf-6",
+        "Complete the second sentence.",
+        "My old laptop was much heavier than my new one.\nMy new laptop is __________ one I've owned.",
+        "the lightest",
+        ["the least heavy"],
+        "Use the opposite superlative to describe the new situation."
+      ),
+    ],
+  },
+  {
     id: "articles-mixed",
     title: "Articles",
     shortDescription: "Practise a, an, the, and zero article in common B1 contexts.",
@@ -5331,6 +5497,304 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "None",
         ["none"],
         "Use 'none' in short answers when there is zero quantity."
+      ),
+    ],
+  },
+  {
+    id: "quantifiers-full-b1-test",
+    title: "Quantifiers: Too and Enough Mastery",
+    shortDescription: "A four-phase test covering conceptual logic, common errors, visual construction, and word order.",
+    levels: ["a2", "b1"],
+    intro:
+      "Welcome to the comprehensive quantifier test. Master the use of 'too', 'too much', 'too many', and 'enough' with adjectives and nouns. Pay attention to the difference between 'more than is necessary' (too) and 'all that is necessary' (enough).",
+    items: [
+      multipleChoiceItem(
+        "qfull-mc-1",
+        "Choose the correct quantifier.",
+        "This programme is very interesting, but it's ____ long.",
+        ["too", "enough", "too many"],
+        0,
+        "Use 'too' before an adjective to show a negative degree."
+      ),
+      multipleChoiceItem(
+        "qfull-mc-2",
+        "Choose the correct quantifier.",
+        "The water in the swimming pool isn't warm ____.",
+        ["too", "enough", "too much"],
+        1,
+        "Use 'enough' after an adjective (warm) to mean 'sufficiently'."
+      ),
+      multipleChoiceItem(
+        "qfull-mc-3",
+        "Choose the correct quantifier.",
+        "We didn't buy the tickets because there were ____ people in the queue.",
+        ["too many", "too much", "too"],
+        0,
+        "Use 'too many' with countable nouns like 'people'."
+      ),
+      multipleChoiceItem(
+        "qfull-mc-4",
+        "Choose the correct quantifier.",
+        "I need a bigger suitcase; I've got ____ clothes.",
+        ["too many", "too much", "enough"],
+        0,
+        "Use 'too many' with plural countable nouns like 'clothes'."
+      ),
+      multipleChoiceItem(
+        "qfull-mc-5",
+        "Choose the correct quantifier.",
+        "Don't put ____ salt in the soup, please.",
+        ["too many", "too much", "too"],
+        1,
+        "Use 'too much' with uncountable nouns like 'salt'."
+      ),
+      multipleChoiceItem(
+        "qfull-mc-6",
+        "Choose the correct quantifier (British English).",
+        "He isn't fast ____ to win the race.",
+        ["too", "enough", "too many"],
+        1,
+        "Use 'enough' after an adjective: 'fast enough'."
+      ),
+      errorCorrectionItem(
+        "qfull-ec-1",
+        "Check the highlighted phrase for errors.",
+        "The water isn't enough hot for a bath.",
+        "enough hot",
+        false,
+        "hot enough",
+        "With adjectives, 'enough' must come after the adjective: 'hot enough'."
+      ),
+      errorCorrectionItem(
+        "qfull-ec-2",
+        "Check the highlighted phrase for errors.",
+        "He has too much problems at work.",
+        "too much",
+        false,
+        "too many",
+        "Use 'too many' with countable nouns like 'problems'."
+      ),
+      errorCorrectionItem(
+        "qfull-ec-3",
+        "Check the highlighted phrase for errors.",
+        "I am looking for too much people to help with the project.",
+        "too much",
+        false,
+        "too many",
+        "Use 'too many' with countable people."
+      ),
+      errorCorrectionItem(
+        "qfull-ec-4",
+        "Check the highlighted phrase for errors.",
+        "That exam was too easy to be a good test.",
+        "too easy",
+        true,
+        "",
+        "Correct! 'Too easy' works here because there is a clear negative consequence: it wasn't a good test."
+      ),
+      errorCorrectionItem(
+        "qfull-ec-5",
+        "Check the highlighted phrase for errors.",
+        "The film wasn't good enough to win an award.",
+        "good enough",
+        true,
+        "",
+        "Correct! 'Enough' follows the adjective, so 'good enough' is the right structure."
+      ),
+      errorCorrectionItem(
+        "qfull-ec-6",
+        "Check the highlighted phrase for errors.",
+        "I don't have time enough to see you today.",
+        "time enough",
+        false,
+        "enough time",
+        "With nouns, 'enough' must come before the noun: 'enough time'."
+      ),
+      doubleGap(
+        "qfull-img-1",
+        "Look at the bus illustration and complete the conversation.",
+        [
+          "A: Look at that bus! I think it ",
+          { gapId: "g1" },
+          ".\nB: Yes, there definitely ",
+          { gapId: "g2" },
+          " for everyone.",
+        ],
+        ["has too many people", "has too many people in it", "is too crowded", "is too full"],
+        ["isn't enough space", "isn't enough room"],
+        "Use 'too many' with countable people, and 'enough' before the noun 'space'.",
+        {
+          imageSrc: "/images/grammar/quantifiers/busquant.png",
+          imageAlt: "A crowded bus with too many passengers and someone unable to get on.",
+          imageCaption: "Complete the conversation.",
+          imageMaxWidth: "420px",
+          gapExtras: {
+            g1: { placeholder: "crowded / people" },
+            g2: { placeholder: "space / room" },
+          },
+        }
+      ),
+      doubleGap(
+        "qfull-img-2",
+        "Look at the painter and complete the conversation.",
+        [
+          "A: He can't reach the ceiling because the ladder ",
+          { gapId: "g1" },
+          ".\nB: Exactly. It ",
+          { gapId: "g2" },
+          " to reach the top.",
+        ],
+        ["is too short", "isn't tall enough"],
+        ["isn't tall enough", "is too short"],
+        "Use one 'too + adjective' structure and one 'adjective + enough' structure. Either order is fine.",
+        {
+          imageSrc: "/images/grammar/quantifiers/paintquant.png",
+          imageAlt: "A painter standing on a ladder that is too short to reach the ceiling.",
+          imageCaption: "Complete the conversation.",
+          imageMaxWidth: "420px",
+          gapExtras: {
+            g1: { placeholder: "short / tall" },
+            g2: { placeholder: "tall / short" },
+          },
+        }
+      ),
+      doubleGap(
+        "qfull-img-3",
+        "Look at the soup scene and complete the conversation.",
+        [
+          "A: Yuck! He has put ",
+          { gapId: "g1" },
+          " on his soup.\nB: I know. The soup ",
+          { gapId: "g2" },
+          " to eat now.",
+        ],
+        ["too much salt", "far too much salt"],
+        ["is too salty", "is much too salty"],
+        "Use 'too much' with the uncountable noun 'salt', then 'too' before the adjective 'salty'.",
+        {
+          imageSrc: "/images/grammar/quantifiers/saltquant.png",
+          imageAlt: "A man disgusted by soup with too much salt on it.",
+          imageCaption: "Complete the conversation.",
+          imageMaxWidth: "420px",
+          gapExtras: {
+            g1: { placeholder: "salt" },
+            g2: { placeholder: "salty" },
+          },
+        }
+      ),
+      doubleGap(
+        "qfull-img-4",
+        "Look at the trainers in the shop window and complete the conversation.",
+        [
+          "A: Those trainers are amazing, but they ",
+          { gapId: "g1" },
+          ".\nB: Yes, he ",
+          { gapId: "g2" },
+          " in his wallet to buy them.",
+        ],
+        ["are too expensive", "cost too much"],
+        ["doesn't have enough money", "hasn't got enough money"],
+        "Use 'too' before 'expensive' and 'enough' before the noun 'money'.",
+        {
+          imageSrc: "/images/grammar/quantifiers/shoequant.png",
+          imageAlt: "A teenager looking at expensive trainers with an empty wallet.",
+          imageCaption: "Complete the conversation.",
+          imageMaxWidth: "420px",
+          gapExtras: {
+            g1: { placeholder: "expensive / cost" },
+            g2: { placeholder: "money" },
+          },
+        }
+      ),
+      doubleGap(
+        "qfull-img-5",
+        "Look at the wardrobe scene and complete the conversation.",
+        [
+          "A: She has got ",
+          { gapId: "g1" },
+          " to fit in there.\nB: Her wardrobe definitely ",
+          { gapId: "g2" },
+          " for all her clothes.",
+        ],
+        ["too many coats", "too many clothes", "too many things"],
+        ["isn't big enough", "is too small"],
+        "Use 'too many' with plural countable nouns and 'enough' after the adjective 'big'.",
+        {
+          imageSrc: "/images/grammar/quantifiers/wardrobequant.png",
+          imageAlt: "A woman trying to force too many coats into a wardrobe that is too small.",
+          imageCaption: "Complete the conversation.",
+          imageMaxWidth: "420px",
+          gapExtras: {
+            g1: { placeholder: "coats / clothes" },
+            g2: { placeholder: "big / small" },
+          },
+        }
+      ),
+      doubleGap(
+        "qfull-img-6",
+        "Look at the computer scene and complete the conversation.",
+        [
+          "A: His computer takes ",
+          { gapId: "g1" },
+          " to start up.\nB: Yes, it really ",
+          { gapId: "g2" },
+          " for modern work.",
+        ],
+        ["too much time", "too long", "a long time"],
+        ["isn't fast enough", "is too slow", "isn't quick enough"],
+        "In A, use a time expression. In B, use an adjective phrase about speed.",
+        {
+          imageSrc: "/images/grammar/quantifiers/computerquant.png",
+          imageAlt: "A frustrated office worker waiting for a slow computer to load.",
+          imageCaption: "Complete the conversation.",
+          imageMaxWidth: "420px",
+          gapExtras: {
+            g1: { placeholder: "time / long" },
+            g2: { placeholder: "fast / slow" },
+          },
+        }
+      ),
+      wordOrderItem(
+        "qfull-jumb-1",
+        "Unjumble the sentence.",
+        ["coffee", "to", "is", "hot", "drink", "the", "too"],
+        "The coffee is too hot to drink.",
+        "Pattern: Too + adjective + infinitive."
+      ),
+      wordOrderItem(
+        "qfull-jumb-2",
+        "Unjumble the sentence.",
+        ["enough", "haven't", "I", "to", "got", "time", "finish"],
+        "I haven't got enough time to finish.",
+        "Pattern: Enough + noun + infinitive."
+      ),
+      wordOrderItem(
+        "qfull-jumb-3",
+        "Unjumble the sentence.",
+        ["there", "too", "people", "many", "queue", "the", "in", "are"],
+        "There are too many people in the queue.",
+        "Pattern: There are + too many + plural countable noun."
+      ),
+      wordOrderItem(
+        "qfull-jumb-4",
+        "Unjumble the sentence.",
+        ["strong", "not", "he", "to", "carry", "box", "enough", "that", "is"],
+        "He is not strong enough to carry that box.",
+        "Pattern: Adjective + enough + infinitive."
+      ),
+      wordOrderItem(
+        "qfull-jumb-5",
+        "Unjumble the sentence.",
+        ["sugar", "put", "too", "the", "in", "cake", "didn't", "much", "I"],
+        "I didn't put too much sugar in the cake.",
+        "Pattern: Didn't + verb + too much + uncountable noun."
+      ),
+      wordOrderItem(
+        "qfull-jumb-6",
+        "Unjumble the sentence.",
+        ["well", "she", "didn't", "the", "programme", "do", "on", "enough"],
+        "She didn't do well enough on the programme.",
+        "Pattern: Negative verb + adverb + enough."
       ),
     ],
   },
