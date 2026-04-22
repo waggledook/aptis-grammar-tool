@@ -23,7 +23,24 @@ import { getSitePath } from "../../siteConfig.js";
  * }
  */
 
-export default function SpeakingPart3({ tasks = PART3_TASKS, user, onRequireSignIn }) {
+export default function SpeakingPart3({
+  tasks = PART3_TASKS,
+  user,
+  onRequireSignIn,
+  partKey = "part3",
+  activityId = "speaking-part-3",
+  routeBasePath = getSitePath("/speaking/part3"),
+  showAssignButton = true,
+  trackProgress = true,
+  lockAfterIndex = 2,
+  heading = "Speaking – Part 3 (Describe & Compare)",
+  intro = (
+    <>
+      You will see <strong>two photographs</strong>. For each question, we’ll read it aloud, play a beep,
+      and then you speak for <strong>45 seconds</strong>.
+    </>
+  ),
+}) {
   const [searchParams] = useSearchParams();
   const items = tasks;
 
@@ -33,13 +50,17 @@ export default function SpeakingPart3({ tasks = PART3_TASKS, user, onRequireSign
   // completions
   const [completed, setCompleted] = useState(new Set());
   useEffect(() => {
+    if (!trackProgress) {
+      setCompleted(new Set());
+      return;
+    }
     let alive = true;
     (async () => {
-      const done = await loadSpeakingDone("part3", fb, user);
+      const done = await loadSpeakingDone(partKey, fb, user);
       if (alive) setCompleted(done);
     })();
     return () => { alive = false; };
-  }, [user]);
+  }, [partKey, trackProgress, user]);
 
   useEffect(() => {
     const requestedTaskId = searchParams.get("task");
@@ -47,14 +68,14 @@ export default function SpeakingPart3({ tasks = PART3_TASKS, user, onRequireSign
 
     const nextIndex = items.findIndex((task) => task.id === requestedTaskId);
     if (nextIndex === -1) return;
-    if (!user && nextIndex >= 2) return;
+    if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) return;
     setTaskIndex(nextIndex);
-  }, [searchParams, items, user]);
+  }, [lockAfterIndex, searchParams, items, user]);
 
   // decorate picker items (✓ for done, 🔒 for locked 3+ when signed-out)
   const decorated = useMemo(() =>
     items.map((t, i) => {
-      const locked = !user && i >= 2;
+      const locked = !user && lockAfterIndex != null && i >= lockAfterIndex;
       const done = completed.has(t.id);
       return {
         ...t,
@@ -62,10 +83,10 @@ export default function SpeakingPart3({ tasks = PART3_TASKS, user, onRequireSign
         title: `${i + 1}. ${t.title}${done ? " ✓" : ""}${locked ? " 🔒" : ""}`,
       };
     }),
-  [items, completed, user]);
+  [items, completed, lockAfterIndex, user]);
 
   function handleSelectTask(nextIndex) {
-    if (!user && nextIndex >= 2) {
+    if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) {
       onRequireSignIn?.(); // open your sign-in modal/sheet
       return;
     }
@@ -78,11 +99,8 @@ export default function SpeakingPart3({ tasks = PART3_TASKS, user, onRequireSign
 
       <header className="header">
         <div>
-          <h2 className="title">Speaking – Part 3 (Describe & Compare)</h2>
-          <p className="intro">
-            You will see <strong>two photographs</strong>. For each question, we’ll read it aloud, play a beep,
-            and then you speak for <strong>45 seconds</strong>.
-          </p>
+          <h2 className="title">{heading}</h2>
+          <p className="intro">{intro}</p>
         </div>
         <div className="picker">
           <ChipDropdown
@@ -91,29 +109,32 @@ export default function SpeakingPart3({ tasks = PART3_TASKS, user, onRequireSign
             onChange={handleSelectTask}
             label="Task"
           />
-          <SpeakingAssignButton
-            user={user}
-            activityId="speaking-part-3"
-            activityLabel={`Aptis Speaking Part 3 — ${current.title}`}
-            routePath={getSitePath(`/speaking/part3?task=${encodeURIComponent(current.id)}`)}
-            taskId={current.id}
-            taskTitle={current.title}
-          />
+          {showAssignButton ? (
+            <SpeakingAssignButton
+              user={user}
+              activityId={activityId}
+              activityLabel={`Aptis Speaking Part 3 — ${current.title}`}
+              routePath={`${routeBasePath}?task=${encodeURIComponent(current.id)}`}
+              taskId={current.id}
+              taskTitle={current.title}
+            />
+          ) : null}
         </div>
       </header>
 
       <TaskFlow
         task={current}
         onFinished={async () => {
+          if (!trackProgress) return;
           try {
-            const updated = await markSpeakingDone("part3", [current.id], fb, user);
+            const updated = await markSpeakingDone(partKey, [current.id], fb, user);
             if (updated) setCompleted(updated);
             toast("Task marked as completed ✓");
 
             // Log activity: Part 3 speaking task (3 questions)
             if (user && fb.logSpeakingTaskCompleted) {
               await fb.logSpeakingTaskCompleted({
-                part: "part3",
+                part: partKey,
                 taskId: current.id,
                 questionCount: 3,
               });

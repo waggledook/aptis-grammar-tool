@@ -45,6 +45,7 @@ import SpeakingMenu from './components/speaking/SpeakingMenu';
 import SpeakingPart1 from "./components/speaking/SpeakingPart1";
 import SpeakingPart2 from './components/speaking/SpeakingPart2';
 import SpeakingPart3 from './components/speaking/SpeakingPart3';
+import SpeakingPart3Custom from './components/speaking/SpeakingPart3Custom';
 import SpeakingPart4 from "./components/speaking/SpeakingPart4";
 import SpeakingPart2and3_PhotoGuide from "./components/speaking/SpeakingPart2and3_PhotoGuide.jsx";
 import AptisPart1 from "./reading/AptisPart1";
@@ -223,6 +224,23 @@ const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
+
+useEffect(() => {
+  const params = new URLSearchParams(location.search);
+  const open = params.get("open");
+  if (open !== "speaking-part-3-custom") return;
+  if (location.pathname === "/speaking/part3-custom") return;
+
+  navigate("/speaking/part3-custom", { replace: true });
+}, [location.pathname, location.search, navigate]);
+
+useEffect(() => {
+  const hash = window.location.hash || "";
+  if (hash !== "#/speaking/part3-custom") return;
+  if (location.pathname === "/speaking/part3-custom") return;
+
+  navigate("/speaking/part3-custom", { replace: true });
+}, [location.pathname, navigate]);
 
 function updateTeacherReadSubmissionKeys(nextReadMap) {
   setTeacherReadSubmissionKeys(nextReadMap || {});
@@ -1045,6 +1063,22 @@ return (
         ← Back
       </button>
       <SpeakingPart3 user={user} />
+    </>
+  }
+/>
+
+<Route
+  path="/speaking/part3-custom"
+  element={
+    <>
+      <button
+        onClick={() => navigate("/speaking")}
+        className="review-btn"
+        style={{ marginBottom: "1rem" }}
+      >
+        ← Back
+      </button>
+      <SpeakingPart3Custom user={user} />
     </>
   }
 />
