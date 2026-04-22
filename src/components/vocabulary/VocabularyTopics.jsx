@@ -3,8 +3,8 @@ import React from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import TopicTrainer from "./TopicTrainer";
 import TopicFlashcards from "./TopicFlashcards";
+import VocabMistakeReview from "./VocabMistakeReview";
 import { toast } from "../../utils/toast";
-import UnderConstructionPanel from "../common/UnderConstructionPanel";
 import { getSitePath } from "../../siteConfig.js";
 
 export default function VocabularyTopics({
@@ -24,6 +24,14 @@ export default function VocabularyTopics({
     setSelectedTopic(topicFromUrl || null);
   }, [topicFromUrl]);
 
+  if (topicView === "mistakes") {
+    return (
+      <VocabMistakeReview
+        onBack={() => setTopicView("practice")}
+      />
+    );
+  }
+
   if (selectedTopic) {
     if (topicView === "flashcards") {
       return (
@@ -31,6 +39,14 @@ export default function VocabularyTopics({
           topic={selectedTopic}
           onBack={() => setTopicView("practice")}
           isAuthenticated={isAuthenticated}
+        />
+      );
+    }
+
+    if (topicView === "mistakes") {
+      return (
+        <VocabMistakeReview
+          onBack={() => setTopicView("practice")}
         />
       );
     }
@@ -156,23 +172,9 @@ export default function VocabularyTopics({
           Choose a topic to explore key vocabulary and practise using it in context.
         </p>
       </header>
-
-      <UnderConstructionPanel
-  title="Topic practice in progress"
-  message="Right now you can practise Transport, Travel, Work, Describing people, Relationships, Health, Clothes & accessories, Describing feelings, Food, Education, and TV & Cinema. More topics, including Technology, are on the way!"
-/>
-
-
-
-<div className="cards">
-  {/* ✅ Full-width banner card */}
+<div className="featured-cards">
   <button
-    className="card"
-    style={{
-      gridColumn: "1 / -1",
-      padding: "14px 16px",       // makes it thinner
-      minHeight: "unset",
-    }}
+    className="card featured-card"
     onClick={() => {
       if (isAuthenticated) navigate("/vocabulary/lab");
       else toast("Please sign in to use Vocab Lab 🔒");
@@ -188,6 +190,26 @@ export default function VocabularyTopics({
       Generate a random session across topics — flashcards or test sentences.
     </p>
   </button>
+
+  <button
+    className="card featured-card"
+    onClick={() => {
+      if (isAuthenticated) setTopicView("mistakes");
+      else toast("Please sign in to review saved mistakes 🔒");
+    }}
+  >
+    <div className="card-head" style={{ marginBottom: 8 }}>
+      <h3 style={{ margin: 0 }}>
+        🔁 Review mistakes
+      </h3>
+    </div>
+    <p style={{ margin: 0 }}>
+      Revisit vocabulary mistakes saved across all topic sets.
+    </p>
+  </button>
+</div>
+
+<div className="cards">
   
         {topics.map((t) => (
           <button
@@ -232,10 +254,23 @@ export default function VocabularyTopics({
           gap: 1rem;
           grid-template-columns: 1fr;
         }
+        .featured-cards {
+          display: grid;
+          gap: 1rem;
+          grid-template-columns: 1fr;
+          margin-bottom: 1rem;
+        }
         @media (min-width: 720px) {
+          .featured-cards {
+            grid-template-columns: repeat(2, 1fr);
+          }
           .cards {
             grid-template-columns: repeat(3, 1fr);
           }
+        }
+        .featured-card {
+          min-height: unset;
+          padding: 14px 16px;
         }
 
         .card {

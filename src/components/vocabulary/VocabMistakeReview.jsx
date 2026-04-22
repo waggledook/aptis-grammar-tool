@@ -67,7 +67,7 @@ export default function VocabMistakeReview({ onBack }) {
           <p className="intro">All caught up – no active vocab mistakes 🎉</p>
         </header>
         <button className="topbar-btn" onClick={onBack}>
-          ← Back to profile
+          ← Back
         </button>
 
         <style>{`
@@ -229,7 +229,7 @@ export default function VocabMistakeReview({ onBack }) {
       </div>
 
       <button className="topbar-btn" onClick={onBack}>
-        ← Back to profile
+        ← Back
       </button>
 
       {/* 🔹 Borrowed styles from TopicTrainer for visual parity */}

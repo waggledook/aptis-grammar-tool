@@ -2,8 +2,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "../../utils/toast";
-import UnderConstructionPanel from "../common/UnderConstructionPanel";
-import UnderConstructionBadge from "../common/UnderConstructionBadge";
 import Seo from "../common/Seo.jsx";
 
 
@@ -23,27 +21,13 @@ export default function VocabularyMenu() {
         </p>
       </header>
 
-      {/* 🛠 Big under-construction notice for the whole vocab area */}
-      <UnderConstructionPanel
-        title="Vocabulary module in progress"
-        message="Right now you can practise topic-based vocabulary. Synonym and collocation trainers are on the way!"
-      />
-
       <div className="cards">
-        {/* 🧩 Topic Practice (active, but marked as in progress) */}
         <button
           className="card menu-card"
           onClick={() => navigate("/vocabulary/topics")}
         >
           <div className="menu-card-header">
             <h3>Topic Practice</h3>
-            <span className="uc-top-wrapper">
-              <img
-                src="/images/ui/under-construction.png"
-                alt="Under construction"
-                className="uc-top-icon"
-              />
-            </span>
           </div>
           <p>Study words by theme (e.g. Travel, Education...).</p>
         </button>

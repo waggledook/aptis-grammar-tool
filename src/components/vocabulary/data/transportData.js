@@ -131,7 +131,7 @@ export const transportData = {
         {
           sentence:
             "In many European cities, the __________ is a popular way to get around the centre.",
-          answer: "tram",
+          answer: "tram / streetcar",
         },
         {
           sentence:
@@ -141,7 +141,7 @@ export const transportData = {
         {
           sentence:
             "In Madrid, many people use the __________ every day to avoid road traffic.",
-          answer: "underground / metro",
+          answer: "underground / metro / subway / tube",
         },
       ],
       tips: [
@@ -389,7 +389,7 @@ export const transportData = {
         {
           sentence:
             "Drivers must stop if someone is waiting at the __________.",
-          answer: "pedestrian crossing",
+          answer: "pedestrian crossing / crosswalk",
         },
         {
           sentence:
@@ -408,22 +408,22 @@ export const transportData = {
         {
           sentence:
             "It's almost impossible to find a __________ in the city centre on a Saturday.",
-          answer: "parking space",
+          answer: "parking space / parking spot",
         },
         {
           sentence:
             "The city has introduced a charge to reduce traffic __________.",
-          answer: "congestion",
+          answer: "congestion / traffic congestion",
         },
         {
           sentence:
             "Take the second right after the __________ near the petrol station.",
-          answer: "junction",
+          answer: "junction / intersection",
         },
         {
           sentence:
             "For safety, children should walk on the __________, not in the road.",
-          answer: "pavement",
+          answer: "pavement / sidewalk",
         },
       ],
       tips: [
@@ -533,7 +533,7 @@ export const transportData = {
         {
           sentence:
             "Cycling is the most __________ way to get around the city.",
-          answer: "eco-friendly",
+          answer: "eco-friendly / environmentally friendly",
         },
         {
           sentence:
@@ -553,12 +553,12 @@ export const transportData = {
         {
           sentence:
             "They live in a __________ area that is only accessible by boat.",
-          answer: "remote",
+          answer: "remote / isolated",
         },
         {
           sentence:
             "The first-class carriage was so __________ that everyone had plenty of room for their bags.",
-          answer: "spacious",
+          answer: "spacious / roomy",
         },
         {
           sentence:
