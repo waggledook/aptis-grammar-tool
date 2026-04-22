@@ -59,6 +59,7 @@ import { getTopicSetIds } from "./components/vocabulary/data/vocabTopics";
 import CollocationMenu from "./components/vocabulary/collocations/CollocationMenu";
 import CollocationDash from "./components/vocabulary/collocations/CollocationDash";
 import VocabLab from "./components/vocabulary/VocabLab";
+import SynonymTrainer from "./components/vocabulary/SynonymTrainer";
 import TopicTrainer from "./components/vocabulary/TopicTrainer";
 import Seo from "./components/common/Seo.jsx";
 import './App.css'
@@ -1178,6 +1179,8 @@ return (
     )
   }
 />
+
+<Route path="/vocabulary/synonyms" element={<SynonymTrainer />} />
 
 <Route path="/vocabulary/collocations" element={<CollocationMenu />} />
 

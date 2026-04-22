@@ -622,6 +622,27 @@ export async function logCollocationDashCompleted(details = {}) {
   });
 }
 
+export async function logSynonymTrainerStarted(details = {}) {
+  return logActivity("synonym_trainer_started", {
+    app: "aptis-trainer",
+    ...details,
+  });
+}
+
+export async function logSynonymTrainerReviewLoaded(details = {}) {
+  return logActivity("synonym_trainer_review_loaded", {
+    app: "aptis-trainer",
+    ...details,
+  });
+}
+
+export async function logSynonymTrainerCompleted(details = {}) {
+  return logActivity("synonym_trainer_completed", {
+    app: "aptis-trainer",
+    ...details,
+  });
+}
+
 export async function logHubFlashcardsStarted(details = {}) {
   return logActivity("hub_flashcards_started", {
     app: "seifhub",
@@ -1750,6 +1771,111 @@ export async function fetchHubWordFormationMistakes(n = 15, uid) {
 
   const qy = query(
     collection(db, "users", realUid, "hubWordFormationMistakes"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveSynonymTrainerResult(itemId, tags, isCorrect) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  const ref = doc(db, "users", uid, "synonymTrainerProgress", itemId);
+  await setDoc(
+    ref,
+    {
+      itemId,
+      tags: tags || "",
+      attempts: increment(1),
+      everCorrect: isCorrect ? true : increment(0),
+      lastCorrect: !!isCorrect,
+      lastAnsweredAt: serverTimestamp(),
+      app: "aptis-trainer",
+    },
+    { merge: true }
+  );
+}
+
+export async function fetchSeenSynonymTrainerItemIds(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "synonymTrainerProgress"));
+  return snap.docs.map((d) => d.id);
+}
+
+export async function fetchSynonymTrainerFavourites(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "synonymTrainerFavourites"));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveSynonymTrainerFavourite(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  const ref = doc(db, "users", uid, "synonymTrainerFavourites", item.itemId);
+  await setDoc(
+    ref,
+    {
+      ...item,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      app: "aptis-trainer",
+    },
+    { merge: true }
+  );
+}
+
+export async function removeSynonymTrainerFavourite(itemId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  await deleteDoc(doc(db, "users", uid, "synonymTrainerFavourites", itemId));
+}
+
+export async function recordSynonymTrainerMistake(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  await addDoc(collection(db, "users", uid, "synonymTrainerMistakes"), {
+    ...item,
+    app: "aptis-trainer",
+    createdAt: serverTimestamp(),
+  });
+}
+
+export async function clearSynonymTrainerMistakes(itemId, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !itemId) return;
+
+  const snap = await getDocs(
+    query(
+      collection(db, "users", realUid, "synonymTrainerMistakes"),
+      where("itemId", "==", itemId)
+    )
+  );
+
+  await Promise.all(snap.docs.map((entry) => deleteDoc(entry.ref)));
+}
+
+export async function fetchSynonymTrainerMistakes(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "synonymTrainerMistakes"),
     orderBy("createdAt", "desc"),
     limit(n)
   );

@@ -1,7 +1,6 @@
 // src/components/vocabulary/VocabularyMenu.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { toast } from "../../utils/toast";
 import Seo from "../common/Seo.jsx";
 
 
@@ -12,7 +11,7 @@ export default function VocabularyMenu() {
     <div className="vocab-menu game-wrapper">
       <Seo
         title="Aptis Vocabulary Practice | Seif Aptis Trainer"
-        description="Build vocabulary for Aptis through topic-based practice and upcoming synonym and collocation trainers."
+        description="Build vocabulary for Aptis through topic-based practice, synonym training, and collocation practice."
       />
       <header className="header">
         <h2 className="title">Vocabulary Practice</h2>
@@ -32,17 +31,17 @@ export default function VocabularyMenu() {
           <p>Study words by theme (e.g. Travel, Education...).</p>
         </button>
 
-        {/* 🔁 Synonym Trainer (coming soon) */}
+        {/* 🔁 Synonym Trainer */}
         <button
-          className="card soon-card tease"
-          onClick={() => toast("Synonym Trainer coming soon 👀")}
+          className="card menu-card"
+          onClick={() => navigate("/vocabulary/synonyms")}
         >
-          <div className="soon-head">
+          <div className="menu-card-header">
             <h3>Synonym Trainer</h3>
-            <span className="soon-pill">Coming soon</span>
+            <span className="soon-pill">New</span>
           </div>
           <p>
-            Learn subtle differences between similar words and expand your lexical range.
+            Practise closest-meaning matching with exam-style sets, favourites, and mistake review.
           </p>
         </button>
 

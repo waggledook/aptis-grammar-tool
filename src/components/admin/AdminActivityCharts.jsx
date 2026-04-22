@@ -12,6 +12,8 @@ import {
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import {
+  getActivityTypeLabel,
+  getActivityTypeOptions,
   buildWritingGeneralSubmissionActivity,
   WRITING_GENERAL_SUBMISSION_TYPE,
 } from "../../utils/adminActivity";
@@ -25,54 +27,6 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
-
-// Reuse your existing type labels (copy/paste from AdminActivityLog.jsx)
-const typeLabels = {
-  grammar_session: "Grammar session",
-  vocab_set_completed: "Vocab set completed",
-  grammar_set_completed: "Grammar set completed",
-  live_game_played: "Live game played",
-  writing_submitted: "Writing submitted",
-  speaking_note_submitted: "Speaking note",
-  reading_completed: "Reading activity",
-  speaking_task_completed: "Speaking task",
-  vocab_flashcards_session: "Vocab flashcards",
-  vocab_match_session: "Vocab match",
-  reading_guide_viewed: "Reading guide viewed",
-  reading_guide_clue_reveal: "Reading guide clue revealed",
-  reading_guide_reorder_check: "Reading guide check",
-  reading_guide_show_answers: "Reading guide answers shown",
-  reading_guide_reorder_completed: "Reading guide reorder completed",
-  reading_reorder_completed: "Reading reorder completed",
-  reading_part4_attempted: "Reading Part 4 attempt",
-  reading_part4_completed: "Reading Part 4 completed",
-  hub_grammar_submitted: "Hub grammar submitted",
-  hub_dictation_completed: "Hub dictation completed",
-  hub_flashcards_started: "Hub flashcards started",
-  hub_spanglish_started: "Hub Spanglish started",
-  hub_spanglish_review_started: "Hub Spanglish review started",
-  hub_spanglish_completed: "Hub Spanglish completed",
-  hub_spanglish_live_hosted: "Hub Spanglish live hosted",
-  hub_spanglish_live_started: "Hub Spanglish live started",
-  hub_spanglish_live_finished: "Hub Spanglish live finished",
-  hub_spanglish_live_report_viewed: "Hub Spanglish live report viewed",
-  hub_dependent_preps_started: "Hub dependent preps started",
-  hub_dependent_preps_review_started: "Hub dependent preps review started",
-  hub_dependent_preps_completed: "Hub dependent preps completed",
-  hub_keyword_started: "Hub keyword started",
-  hub_keyword_review_loaded: "Hub keyword review loaded",
-  hub_keyword_completed: "Hub keyword completed",
-  hub_open_cloze_started: "Hub open cloze started",
-  hub_open_cloze_review_loaded: "Hub open cloze review loaded",
-  hub_open_cloze_completed: "Hub open cloze completed",
-  hub_word_formation_started: "Hub word formation started",
-  hub_word_formation_review_loaded: "Hub word formation review loaded",
-  hub_word_formation_completed: "Hub word formation completed",
-  writing_p1_guide_activity_started: "Writing P1 guide activity started",
-  writing_p4_register_guide_activity_started:
-    "Writing P4 register guide activity started",
-  writing_general_submission: "Writing General mock submitted",
-};
 
 function isoDate(d) {
   // Local YYYY-MM-DD (NOT UTC)
@@ -169,6 +123,7 @@ export default function AdminActivityCharts({ user }) {
 
   const [groupBy, setGroupBy] = useState("day"); // "day" | "week"
   const [typeFilter, setTypeFilter] = useState("all");
+  const typeOptions = useMemo(() => getActivityTypeOptions(), []);
 
   // fetched logs for the current range/type
   const [rawLogs, setRawLogs] = useState([]); // [{ userId, userEmail, type, createdAt: Date, details }]
@@ -224,7 +179,7 @@ export default function AdminActivityCharts({ user }) {
     return Array.from(counts.entries())
       .map(([type, count]) => ({
         type,
-        label: typeLabels[type] || type,
+        label: getActivityTypeLabel(type),
         count,
       }))
       .sort((a, b) => b.count - a.count)
@@ -441,9 +396,9 @@ export default function AdminActivityCharts({ user }) {
             onChange={(e) => setTypeFilter(e.target.value)}
           >
             <option value="all">All types</option>
-            {Object.keys(typeLabels).map((t) => (
-              <option key={t} value={t}>
-                {typeLabels[t]}
+            {typeOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
               </option>
             ))}
           </select>
@@ -665,7 +620,7 @@ export default function AdminActivityCharts({ user }) {
         <div className="muted small" style={{ marginBottom: "0.5rem" }}>
           Showing <strong>{rows.length}</strong>{" "}
           {groupBy === "week" ? "weeks" : "days"}
-          {typeFilter === "all" ? "" : ` · ${typeLabels[typeFilter] || typeFilter}`}
+          {typeFilter === "all" ? "" : ` · ${getActivityTypeLabel(typeFilter)}`}
           {selectedUserId ? ` · ${selectedUserEmail || selectedUserId}` : ""}
         </div>
 
