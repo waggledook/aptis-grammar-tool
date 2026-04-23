@@ -6,9 +6,9 @@ import {
   auth,
   fetchHubSavedFlashcards,
   getAssignedActivity,
-  logHubFlashcardsCompleted,
   logHubFlashcardsStarted,
   removeHubFlashcard,
+  saveHubFlashcardSession,
   saveHubFlashcard,
 } from "../../firebase.js";
 import { getHubGrammarFlashcardDeck } from "../../data/hubGrammarFlashcards.js";
@@ -326,7 +326,7 @@ export default function HubFlashcardsDeckPlayer({ user }) {
     if (!deck.cards?.length || reviewedCardIds.size < deck.cards.length) return;
 
     setHasLoggedCompletion(true);
-    void logHubFlashcardsCompleted({
+    void saveHubFlashcardSession({
       mode: "deck",
       deckId: deck.id,
       deckTitle: deck.title,

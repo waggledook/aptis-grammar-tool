@@ -657,7 +657,39 @@ export async function logHubFlashcardsCompleted(details = {}) {
   });
 }
 
+export async function saveHubFlashcardSession(payload = {}) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+
+  const colRef = collection(db, "users", uid, "hubFlashcardSessions");
+  await addDoc(colRef, {
+    ...payload,
+    app: "seifhub",
+    createdAt: serverTimestamp(),
+  });
+
+  await logHubFlashcardsCompleted(payload);
+}
+
 export async function fetchHubFlashcardSessions(n = 50, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "hubFlashcardSessions"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+
+  return snap.docs.map((entry) => ({
+    id: entry.id,
+    ...entry.data(),
+  }));
+}
+
+export async function fetchHubFlashcardActivityLogSessions(n = 50, uid) {
   const realUid = _uidOrCurrent(uid);
   if (!realUid) return [];
 
