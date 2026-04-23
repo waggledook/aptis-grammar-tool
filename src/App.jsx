@@ -906,8 +906,8 @@ return (
     element={isSeifHubSite ? <HubGrammarMenu /> : <GrammarPage />}
   />
   <Route path="/grammar/aptis" element={<GrammarPage />} />
-  <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu />} />
-  <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer />} />
+  <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu user={user} />} />
+  <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer user={user} />} />
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests user={user} />} />
   <Route path="/grammar/activity/:activityId" element={<HubGrammarActivityRunner user={user} />} />
 

@@ -5,6 +5,7 @@ import {
   fetchVocabProgressMap,
   fetchSpeakingProgressMap,
   fetchHubDictationSessions,
+  fetchHubFlashcardSessions,
   fetchHubGrammarSubmissions,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
@@ -61,6 +62,8 @@ function getAssignmentTypeLabel(type) {
   switch (type) {
     case "mini-test":
       return "Mini test";
+    case "flashcards":
+      return "Grammar flashcards";
     case "grammar-set":
       return "Aptis grammar set";
     case "use-of-english":
@@ -126,6 +129,11 @@ function resolveAssignedCompletion(assignment, sources) {
   const assignedAt = timestampToMs(assignment?.createdAt);
   if (assignment?.activityType === "mini-test") {
     const completedAt = sources.miniTests?.[assignment.activityId] || 0;
+    return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+  }
+
+  if (assignment?.activityType === "flashcards") {
+    const completedAt = sources.flashcards?.[assignment.id] || sources.flashcards?.[assignment.activityId] || 0;
     return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
   }
 
@@ -222,7 +230,7 @@ export default function HubYourClass({ user }) {
 
       setLoading(true);
       try {
-        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, readingProgress, dictationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, readingProgress, dictationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
           listStudentCourseTestSessions(user.uid),
           listStudentCourseTestAttempts(user.uid),
           listAssignedActivitiesForStudent(user.uid),
@@ -230,6 +238,7 @@ export default function HubYourClass({ user }) {
           fetchSpeakingProgressMap(user.uid),
           fetchReadingProgressMap(user.uid),
           fetchHubDictationSessions(200, user.uid),
+          fetchHubFlashcardSessions(200, user.uid),
           fetchHubGrammarSubmissions(200, user.uid),
           listGrammarSetAttemptsForStudent(user.uid),
           fetchWritingP1Sessions(100, user.uid),
@@ -244,6 +253,10 @@ export default function HubYourClass({ user }) {
           speaking: speakingProgress || {},
           reading: readingProgress || {},
           dictation: buildLatestTimeMap(dictationSessions || [], "assignmentId"),
+          flashcards: {
+            ...buildLatestTimeMap(flashcardSessions || [], "deckId"),
+            ...buildLatestTimeMap(flashcardSessions || [], "assignmentId"),
+          },
           miniTests: buildLatestTimeMap(miniTests || [], "activityId"),
           grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
             if (!attempt?.setId) return acc;

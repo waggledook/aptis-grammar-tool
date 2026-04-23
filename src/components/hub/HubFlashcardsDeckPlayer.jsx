@@ -5,6 +5,8 @@ import Seo from "../common/Seo.jsx";
 import {
   auth,
   fetchHubSavedFlashcards,
+  getAssignedActivity,
+  logHubFlashcardsCompleted,
   logHubFlashcardsStarted,
   removeHubFlashcard,
   saveHubFlashcard,
@@ -113,10 +115,11 @@ function isPromptedFront(card) {
   return labels.includes("transform using") || labels.includes("prompt");
 }
 
-export default function HubFlashcardsDeckPlayer() {
+export default function HubFlashcardsDeckPlayer({ user }) {
   const navigate = useNavigate();
   const { deckId } = useParams();
   const [searchParams] = useSearchParams();
+  const assignmentId = searchParams.get("assignment") || "";
   const isSavedReviewDeck = deckId === "saved-review";
   const deck = useMemo(
     () =>
@@ -143,6 +146,9 @@ export default function HubFlashcardsDeckPlayer() {
   const [isLoadingSaved, setIsLoadingSaved] = useState(false);
   const [savedRandomOrder, setSavedRandomOrder] = useState([]);
   const [hasLoggedFirstFlip, setHasLoggedFirstFlip] = useState(false);
+  const [assignment, setAssignment] = useState(null);
+  const [reviewedCardIds, setReviewedCardIds] = useState(() => new Set());
+  const [hasLoggedCompletion, setHasLoggedCompletion] = useState(false);
 
   const uid = auth.currentUser?.uid || "";
 
@@ -196,7 +202,34 @@ export default function HubFlashcardsDeckPlayer() {
     setGridFlipped({});
     setReviewMode("deck");
     setHasLoggedFirstFlip(false);
-  }, [deckId]);
+    setReviewedCardIds(new Set());
+    setHasLoggedCompletion(false);
+  }, [deckId, assignmentId]);
+
+  useEffect(() => {
+    let alive = true;
+
+    async function loadAssignment() {
+      if (!assignmentId) {
+        setAssignment(null);
+        return;
+      }
+
+      try {
+        const row = await getAssignedActivity(assignmentId);
+        if (!alive) return;
+        setAssignment(row?.activityType === "flashcards" ? row : null);
+      } catch (error) {
+        console.error("[HubFlashcardsDeckPlayer] failed to load assignment", error);
+        if (alive) setAssignment(null);
+      }
+    }
+
+    loadAssignment();
+    return () => {
+      alive = false;
+    };
+  }, [assignmentId]);
 
   useEffect(() => {
     if (isSavedReviewDeck) {
@@ -251,6 +284,9 @@ export default function HubFlashcardsDeckPlayer() {
     if (reviewMode === "saved-random") return savedRandomOrder;
     return deck.cards;
   }, [deck, reviewMode, savedCards, savedRandomOrder]);
+  const focusCard = visibleCards[focusIndex] || null;
+  const hasSavedCards = savedCards.length > 0;
+  const gridScale = Math.max(0.72, Math.min(1.7, cardWidth / 320));
 
   const moveFocusCard = useCallback((direction) => {
     if (visibleCards.length === 0) return;
@@ -286,6 +322,24 @@ export default function HubFlashcardsDeckPlayer() {
   }, [visibleCards.length]);
 
   useEffect(() => {
+    if (!assignmentId || !assignment?.id || !deck || isSavedReviewDeck || hasLoggedCompletion) return;
+    if (!deck.cards?.length || reviewedCardIds.size < deck.cards.length) return;
+
+    setHasLoggedCompletion(true);
+    void logHubFlashcardsCompleted({
+      mode: "deck",
+      deckId: deck.id,
+      deckTitle: deck.title,
+      total: deck.cards.length,
+      reviewedCards: reviewedCardIds.size,
+      assignmentId: assignment.id,
+      assignmentLabel: assignment.activityLabel || deck.title,
+      teacherUid: assignment.teacherUid || "",
+      teacherName: assignment.teacherName || "",
+    });
+  }, [assignment, assignmentId, deck, hasLoggedCompletion, isSavedReviewDeck, reviewedCardIds]);
+
+  useEffect(() => {
     if (displayMode !== "focus") return;
 
     function onKeyDown(event) {
@@ -301,13 +355,13 @@ export default function HubFlashcardsDeckPlayer() {
         moveFocusCard(-1);
       } else if (event.key === " " || event.key === "Enter") {
         event.preventDefault();
-        setFocusedFlipped((current) => !current);
+        handleFocusFlip();
       }
     }
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [displayMode, moveFocusCard, visibleCards.length]);
+  }, [displayMode, focusCard, moveFocusCard, visibleCards.length]);
 
   if (!deck) {
     return (
@@ -320,10 +374,6 @@ export default function HubFlashcardsDeckPlayer() {
     );
   }
 
-  const focusCard = visibleCards[focusIndex] || null;
-  const hasSavedCards = savedCards.length > 0;
-  const gridScale = Math.max(0.72, Math.min(1.7, cardWidth / 320));
-
   async function logFirstFlipIfNeeded(card) {
     if (hasLoggedFirstFlip) return;
 
@@ -334,6 +384,16 @@ export default function HubFlashcardsDeckPlayer() {
       deckTitle: isSavedReviewDeck ? "Saved Flashcards Review" : card?.deckTitle || deck.title,
       total: visibleCards.length,
       sourceDeckTitle: card?.deckTitle || "",
+    });
+  }
+
+  function markCardReviewed(card) {
+    if (!card?.id || isSavedReviewDeck || reviewMode !== "deck") return;
+    setReviewedCardIds((current) => {
+      if (current.has(card.id)) return current;
+      const next = new Set(current);
+      next.add(card.id);
+      return next;
     });
   }
 
@@ -378,10 +438,21 @@ export default function HubFlashcardsDeckPlayer() {
 
   function toggleGridFlip(card) {
     logFirstFlipIfNeeded(card);
-    setGridFlipped((current) => ({
-      ...current,
-      [card.id]: !current[card.id],
-    }));
+    if (!gridFlipped[card.id]) markCardReviewed(card);
+    setGridFlipped((current) => {
+      const nextFlipped = !current[card.id];
+      return {
+        ...current,
+        [card.id]: nextFlipped,
+      };
+    });
+  }
+
+  function handleFocusFlip() {
+    if (!focusCard) return;
+    logFirstFlipIfNeeded(focusCard);
+    if (!focusedFlipped) markCardReviewed(focusCard);
+    setFocusedFlipped((current) => !current);
   }
 
   function renderCardFace(card, isFlipped, layoutMode = "grid") {
@@ -655,10 +726,7 @@ export default function HubFlashcardsDeckPlayer() {
             key={focusCard.id}
             type="button"
             className={`hub-flashcard focus-card ${focusedFlipped ? "is-flipped" : ""}`}
-            onClick={() => {
-              logFirstFlipIfNeeded(focusCard);
-              setFocusedFlipped((current) => !current);
-            }}
+            onClick={handleFocusFlip}
           >
             <div className="hub-flashcard-inner">
               <div className="hub-flashcard-face hub-flashcard-front">

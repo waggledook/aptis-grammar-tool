@@ -85,10 +85,12 @@ const placeholderGapItem = (
   explanation,
   extra = {}
 ) => {
-  const marker = "__________";
-  const index = String(sentence || "").indexOf(marker);
-  const before = index >= 0 ? sentence.slice(0, index) : sentence;
-  const after = index >= 0 ? sentence.slice(index + marker.length) : "";
+  const normalizedSentence = String(sentence || "");
+  const markerMatch = normalizedSentence.match(/_{3,}/);
+  const index = markerMatch ? markerMatch.index : -1;
+  const markerLength = markerMatch ? markerMatch[0].length : 0;
+  const before = index >= 0 ? normalizedSentence.slice(0, index) : normalizedSentence;
+  const after = index >= 0 ? normalizedSentence.slice(index + markerLength) : "";
 
   return singleGap(
     id,
@@ -2026,21 +2028,24 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       ),
       placeholderGapItem(
         "rel-gf-1",
-        "Complete the definition: A suitcase is a large bag __________ you use for carrying clothes.",
+        "Complete the definition.",
+        "A suitcase is a large bag _________ you use for carrying clothes.",
         "which",
         ["that"],
         "Defining an object (a bag)."
       ),
       placeholderGapItem(
         "rel-gf-2",
-        "Complete the definition: A receptionist is the person __________ works at the front desk.",
+        "Complete the definition.",
+        "A receptionist is the person _________ works at the front desk.",
         "who",
         ["that"],
         "Defining a person."
       ),
       placeholderGapItem(
         "rel-gf-3",
-        "Complete the definition: An airport is a place __________ planes land and take off.",
+        "Complete the definition.",
+        "An airport is a place _________ planes land and take off.",
         "where",
         [],
         "Defining a location."
@@ -4097,6 +4102,228 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     ],
   },
   {
+    id: "first-conditional-8b-a2b1",
+    title: "First Conditional: Future Possibilities",
+    shortDescription: "Master the structure of 'if + present' to talk about future results.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use the First Conditional to talk about things that are likely to happen in the future. Remember: use the Present Simple after 'if', and 'will' or 'won't' for the result. You can also use 'can' or an imperative for the consequence.",
+    items: [
+      multipleChoiceItem(
+        "fc2-mc-1",
+        "Choose the correct verb form.",
+        "If I ____ time this evening, I'll help you with your project.",
+        ["have", "will have", "had"],
+        0,
+        "We use the Present Simple after 'if' to talk about a future condition."
+      ),
+      multipleChoiceItem(
+        "fc2-mc-2",
+        "Choose the correct verb form.",
+        "She ____ very happy if she doesn't get that job.",
+        ["isn't", "won't be", "don't be"],
+        1,
+        "Use 'will / won't' for the consequence or result of the condition."
+      ),
+      multipleChoiceItem(
+        "fc2-mc-3",
+        "Choose the correct verb form.",
+        "If they ____ to the party, they'll have a great time.",
+        ["will go", "go", "goes"],
+        1,
+        "The if-clause requires the Present Simple."
+      ),
+      multipleChoiceItem(
+        "fc2-mc-4",
+        "Choose the correct option.",
+        "We'll go for a walk if the sun ____ tomorrow.",
+        ["shines", "will shine", "is shine"],
+        0,
+        "Use the Present Simple (third person -s) after 'if'."
+      ),
+      multipleChoiceItem(
+        "fc2-mc-5",
+        "Choose the correct negative form.",
+        "If you ____ your coat, you'll be cold outside.",
+        ["won't wear", "don't wear", "not wear"],
+        1,
+        "Use 'don't / doesn't' for negative if-clauses in the Present Simple."
+      ),
+      multipleChoiceItem(
+        "fc2-mc-6",
+        "Choose the correct result.",
+        "What ____ if you lose your phone?",
+        ["do you do", "will you do", "you will do"],
+        1,
+        "Question form: Will + subject + infinitive for the result."
+      ),
+      errorCorrectionItem(
+        "fc2-ec-1",
+        "Check the highlighted phrase for errors.",
+        "If I will see Mark, I'll tell him about the meeting.",
+        "will see",
+        false,
+        "see",
+        "Never use 'will' in the if-clause. Use the Present Simple instead."
+      ),
+      errorCorrectionItem(
+        "fc2-ec-2",
+        "Check the highlighted phrase for errors.",
+        "We'll be late if we will not hurry.",
+        "if we will not",
+        false,
+        "if we don't",
+        "Use 'don't / doesn't' for negative conditions, not 'will not'."
+      ),
+      errorCorrectionItem(
+        "fc2-ec-3",
+        "Check the highlighted phrase for errors.",
+        "If it rains tomorrow we won't go to the park.",
+        "rains tomorrow we",
+        false,
+        "rains tomorrow, we",
+        "If the if-clause comes first, a comma is normally used before the result clause."
+      ),
+      errorCorrectionItem(
+        "fc2-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I give you the money if you need it.",
+        "give",
+        false,
+        "will give / 'll give",
+        "The result clause needs 'will' to show it's a future consequence."
+      ),
+      errorCorrectionItem(
+        "fc2-ec-5",
+        "Check the highlighted phrase for errors.",
+        "If you see Sarah, tell her I'm looking for her.",
+        "tell",
+        true,
+        "",
+        "Correct! You can use an imperative (tell) instead of 'will' in the consequence clause."
+      ),
+      errorCorrectionItem(
+        "fc2-ec-6",
+        "Check the highlighted phrase for errors.",
+        "If you have a car, you can drive to the coast.",
+        "can drive",
+        true,
+        "",
+        "Correct! You can use 'can' instead of 'will' to talk about possibility."
+      ),
+      doubleGap(
+        "fc2-gf-1",
+        "Complete the sentence.",
+        ["If you ", { gapId: "g1" }, " (not / hurry), we ", { gapId: "g2" }, " (be) late."],
+        ["don't hurry", "do not hurry"],
+        ["'ll be", "will be"],
+        "Present simple negative after 'if', will + infinitive for result."
+      ),
+      doubleGap(
+        "fc2-gf-2",
+        "Complete the sentence.",
+        ["We ", { gapId: "g1" }, " (have) a picnic if the weather ", { gapId: "g2" }, " (be) good."],
+        ["'ll have", "will have"],
+        ["is"],
+        "If the if-clause comes second, do not use a comma."
+      ),
+      doubleGap(
+        "fc2-gf-3",
+        "Complete the sentence.",
+        ["If she ", { gapId: "g1" }, " (find) your keys, she ", { gapId: "g2" }, " (call) you immediately."],
+        ["finds"],
+        ["'ll call", "will call"],
+        "Third person singular -s in the present simple, then ''ll for result."
+      ),
+      doubleGap(
+        "fc2-gf-4",
+        "Complete the sentence.",
+        ["They ", { gapId: "g1" }, " (not / come) to the party if they ", { gapId: "g2" }, " (be) tired."],
+        ["won't come", "will not come"],
+        ["'re", "are"],
+        "Use 'won't' for a negative consequence."
+      ),
+      doubleGap(
+        "fc2-gf-5",
+        "Complete the sentence.",
+        ["If you ", { gapId: "g1" }, " (be) cold, ", { gapId: "g2" }, " (put on) a sweater."],
+        ["are", "'re"],
+        ["put on"],
+        "The imperative can replace the 'will' clause."
+      ),
+      doubleGap(
+        "fc2-gf-6",
+        "Complete the sentence.",
+        ["What ", { gapId: "g1" }, " (you / do) if you ", { gapId: "g2" }, " (not / find) your passport?"],
+        ["will you do"],
+        ["don't find", "do not find"],
+        "Question form: Will + subject + infinitive... if + subject + don't + infinitive."
+      ),
+      singleGap(
+        "fc2-rf-1",
+        "Change the order of the clauses.",
+        ["If ", { gapId: "g1" }, "."],
+        [
+          "I pass the exam, I'll be very happy",
+          "I pass the exam, I will be very happy",
+          "I pass the exam I'll be very happy",
+          "I pass the exam I will be very happy",
+          "i pass the exam, i'll be very happy",
+          "i pass the exam, i will be very happy",
+          "i pass the exam i'll be very happy",
+          "i pass the exam i will be very happy",
+        ],
+        "When the if-clause comes first, a comma is common, but we won't be strict about punctuation here.",
+        { originalSentence: "I'll be very happy if I pass the exam." }
+      ),
+      singleGap(
+        "fc2-rf-2",
+        "Rewrite as a negative condition.",
+        ["You'll be cold if ", { gapId: "g1" }, "."],
+        ["you don't wear a coat", "you do not wear a coat"],
+        "The negative present simple is used for negative conditions.",
+        { originalSentence: "If you wear a coat, you won't be cold." }
+      ),
+      singleGap(
+        "fc2-rf-3",
+        "Rewrite using 'can' for the result.",
+        ["If the weather stays good, we ", { gapId: "g1" }, " to the beach."],
+        ["can go"],
+        "Use 'can' to show a possible consequence.",
+        { originalSentence: "If the weather stays good, it is possible for us to go to the beach." }
+      ),
+      singleGap(
+        "fc2-rf-4",
+        "Rewrite using an imperative for advice.",
+        ["If you see Mark, ", { gapId: "g1" }, " him to call me."],
+        ["tell"],
+        "Use the base form for an imperative command.",
+        { originalSentence: "If you see Mark, you will tell him to call me." }
+      ),
+      singleGap(
+        "fc2-rf-5",
+        "Rewrite as a question.",
+        ["", { gapId: "g1" }, " if you don't leave now?"],
+        ["Will you miss the train"],
+        "Form a question by moving 'will' before the subject.",
+        { originalSentence: "You'll miss the train if you don't leave now." }
+      ),
+      singleGap(
+        "fc2-rf-6",
+        "Combine the ideas.",
+        ["If ", { gapId: "g1" }, " at home."],
+        [
+          "it rains, we'll stay",
+          "it rains, we will stay",
+          "it rains we'll stay",
+          "it rains we will stay",
+        ],
+        "Combine two facts into a conditional sentence. We won't be strict about the comma.",
+        { originalSentence: "It might rain. Then we'll stay at home." }
+      ),
+    ],
+  },
+  {
     id: "first-conditional-and-future-clauses",
     title: "First Conditional & Future Time Clauses",
     shortDescription: "Master 'if', 'unless', 'when', 'until', and 'as soon as'.",
@@ -4775,6 +5002,166 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "staying",
         [],
         "Use the gerund after 'mind'."
+      ),
+    ],
+  },
+  {
+    id: "gerund-infinitive-review-a2b1",
+    title: "Gerunds and Infinitives Review",
+    shortDescription: "Master the patterns of 'to + verb' and 'verb + -ing' in context.",
+    levels: ["a2", "b1"],
+    intro:
+      "Some verbs need an infinitive (to go), while others need a gerund (going). We also use infinitives for purpose and gerunds after prepositions. Practice these patterns with original scenarios.",
+    items: [
+      multipleChoiceItem(
+        "gi2-mc-1",
+        "Choose the correct form.",
+        "They've decided ____ a new car next month.",
+        ["buying", "to buy", "buy"],
+        1,
+        "The verb 'decide' is followed by the to-infinitive."
+      ),
+      multipleChoiceItem(
+        "gi2-mc-2",
+        "Choose the correct form.",
+        "I really enjoy ____ to music while I study.",
+        ["listening", "to listen", "listen"],
+        0,
+        "The verb 'enjoy' is followed by the gerund (-ing)."
+      ),
+      multipleChoiceItem(
+        "gi2-mc-3",
+        "Choose the correct form.",
+        "He promised ____ me with my project this weekend.",
+        ["helping", "to help", "help"],
+        1,
+        "The verb 'promise' is followed by the to-infinitive."
+      ),
+      multipleChoiceItem(
+        "gi2-mc-4",
+        "Choose the correct form.",
+        "Do you mind ____ the window? It's a bit cold.",
+        ["closing", "to close", "close"],
+        0,
+        "The verb 'mind' is followed by the gerund (-ing)."
+      ),
+      multipleChoiceItem(
+        "gi2-mc-5",
+        "Choose the correct form.",
+        "I'd like ____ to that new Italian restaurant for dinner.",
+        ["going", "to go", "go"],
+        1,
+        "Use 'would like' + to-infinitive."
+      ),
+      multipleChoiceItem(
+        "gi2-mc-6",
+        "Choose the correct form.",
+        "She spends a lot of time ____ photos for her blog.",
+        ["taking", "to take", "take"],
+        0,
+        "After 'spend (time)', use the gerund (-ing)."
+      ),
+      errorCorrectionItem(
+        "gi2-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I went to the pharmacy for buy some aspirin.",
+        "for buy",
+        false,
+        "to buy",
+        "To express purpose, use 'to + infinitive', not 'for'."
+      ),
+      errorCorrectionItem(
+        "gi2-ec-2",
+        "Check the highlighted phrase for errors.",
+        "It was very difficult understanding the instructions.",
+        "understanding",
+        false,
+        "to understand",
+        "After adjectives like 'difficult', 'nice', or 'important', use the to-infinitive."
+      ),
+      errorCorrectionItem(
+        "gi2-ec-3",
+        "Check the highlighted phrase for errors.",
+        "He left the room without to say goodbye.",
+        "without to say",
+        false,
+        "without saying",
+        "After prepositions like 'without', 'before', or 'after', use the gerund (-ing)."
+      ),
+      errorCorrectionItem(
+        "gi2-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I forgot telling you about the meeting.",
+        "telling",
+        false,
+        "to tell",
+        "Use 'forget + to-infinitive' for a task you didn't remember to do."
+      ),
+      errorCorrectionItem(
+        "gi2-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I don't feel like to go to the gym today.",
+        "to go",
+        false,
+        "going",
+        "The expression 'feel like' is followed by the gerund (-ing)."
+      ),
+      errorCorrectionItem(
+        "gi2-ec-6",
+        "Check the highlighted phrase for errors.",
+        "Swimming in the sea is my favourite hobby.",
+        "Swimming",
+        true,
+        "",
+        "Correct! We use the gerund (-ing) when a verb is the subject of a sentence."
+      ),
+      placeholderGapItem(
+        "gi2-gf-1",
+        "Complete the sentence.",
+        "I'm saving money __________ (buy) a new laptop.",
+        "to buy",
+        [],
+        "Use the infinitive of purpose."
+      ),
+      placeholderGapItem(
+        "gi2-gf-2",
+        "Complete the sentence.",
+        "It's important __________ (not / be) late for the interview.",
+        "not to be",
+        [],
+        "The negative infinitive is 'not to + verb'."
+      ),
+      placeholderGapItem(
+        "gi2-gf-3",
+        "Complete the sentence.",
+        "I'm not sure __________ (what / do) about the problem.",
+        "what to do",
+        [],
+        "Use the to-infinitive after question words."
+      ),
+      placeholderGapItem(
+        "gi2-gf-4",
+        "Complete the sentence.",
+        "__________ (learn) a new language takes a lot of time.",
+        "Learning",
+        [],
+        "Use the gerund as the subject of the sentence."
+      ),
+      placeholderGapItem(
+        "gi2-gf-5",
+        "Complete the sentence.",
+        "She finished __________ (cook) dinner at 8:00.",
+        "cooking",
+        [],
+        "The verb 'finish' is followed by the gerund."
+      ),
+      placeholderGapItem(
+        "gi2-gf-6",
+        "Complete the sentence.",
+        "I hate __________ (wait) in long queues.",
+        "waiting",
+        ["to wait"],
+        "Verbs like 'hate', 'love', and 'like' can take the gerund or the infinitive."
       ),
     ],
   },
@@ -9152,6 +9539,1011 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     ],
   },
   {
+    id: "predictions-will-wont-a2b1",
+    title: "Future Predictions: Will and Won't",
+    shortDescription: "Practice making guesses and sharing opinions about the future.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use 'will' (or ''ll) and 'won't' to say what you think or guess will happen in the future. Remember to use 'I don't think...' for negative predictions.",
+    items: [
+      multipleChoiceItem(
+        "will-mc-1",
+        "Choose the correct future form.",
+        "It's a great book. I'm sure you ____ it.",
+        ["'ll like", "will liking", "won't like"],
+        0,
+        "Use ''ll' (will) for a positive prediction after 'I'm sure'."
+      ),
+      multipleChoiceItem(
+        "will-mc-2",
+        "Choose the correct future form.",
+        "The film is in French. We ____ understand anything.",
+        ["'ll", "won't", "don't"],
+        1,
+        "Use 'won't' for a negative prediction based on a current situation."
+      ),
+      multipleChoiceItem(
+        "will-mc-3",
+        "Choose the correct future form.",
+        "A: Is Jessica coming?\nB: Yes, but she ____ late.",
+        ["will", "be", "'ll be"],
+        2,
+        "Always use 'will' (or ''ll) followed by the infinitive 'be'."
+      ),
+      errorCorrectionItem(
+        "will-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I think he won't pass the exam.",
+        "I think he won't pass",
+        false,
+        "I don't think he'll pass",
+        "It is much more natural to say 'I don't think... will' than 'I think... won't'."
+      ),
+      errorCorrectionItem(
+        "will-ec-2",
+        "Check the highlighted phrase for errors.",
+        "I'm sure you will to enjoy the party.",
+        "will to enjoy",
+        false,
+        "will enjoy",
+        "Never use 'to' after will. Use the infinitive without 'to'."
+      ),
+      errorCorrectionItem(
+        "will-ec-3",
+        "Check the highlighted phrase for errors.",
+        "Do you think they'll win the match?",
+        "they'll win",
+        true,
+        "",
+        "Correct! Use 'Do you think... will' for questions about predictions."
+      ),
+      singleGap(
+        "will-rf-1",
+        "Rewrite using 'don't think'.",
+        ["I ", { gapId: "g1" }, " rain tomorrow."],
+        ["don't think it will", "don't think it'll"],
+        "Move the negative to the start of the sentence with 'I don't think'.",
+        { originalSentence: "I think it won't rain tomorrow." }
+      ),
+      singleGap(
+        "will-rf-2",
+        "Rewrite using a contraction.",
+        ["I'm sure you ", { gapId: "g1" }, " a famous artist."],
+        ["'ll be"],
+        "Use the contraction ''ll' for a more natural spoken prediction.",
+        { originalSentence: "I am sure that you will be a famous artist." }
+      ),
+      placeholderGapItem(
+        "will-gf-1",
+        "Complete the sentence.",
+        "He is very tired. He __________ (not / stay) for the whole party.",
+        "won't stay",
+        ["will not stay"],
+        "Use 'won't' + infinitive for a negative prediction."
+      ),
+      placeholderGapItem(
+        "will-gf-2",
+        "Complete the sentence.",
+        "__________ (you / be) at home this evening?",
+        "Will you be",
+        [],
+        "Question form: Will + subject + be."
+      ),
+      placeholderGapItem(
+        "will-gf-3",
+        "Complete the sentence.",
+        "Wait! I'm sure I __________ (find) your keys in a minute.",
+        "'ll find",
+        ["will find"],
+        "Use 'will' for a positive prediction about finding something."
+      ),
+      multipleChoiceItem(
+        "pred-con-1",
+        "Which form is more natural?",
+        "Look at those dark clouds! It ____ rain in a minute.",
+        ["will", "is going to"],
+        1,
+        "The clouds are visible evidence that it is about to rain."
+      ),
+      multipleChoiceItem(
+        "pred-con-2",
+        "Which form is more natural?",
+        "I'm not sure, but I think the price of petrol ____ up again next month.",
+        ["will go", "is going to go"],
+        0,
+        "Use 'will' because this is a guess or opinion, not based on something you see right now."
+      ),
+      multipleChoiceItem(
+        "pred-con-3",
+        "Which form is more natural?",
+        "Watch out! That vase ____ off the shelf!",
+        ["will fall", "is going to fall"],
+        1,
+        "Use 'be going to' for an immediate prediction based on what you can see."
+      ),
+      multipleChoiceItem(
+        "pred-con-4",
+        "Which form is more natural?",
+        "I've seen his test paper; it's full of mistakes. He ____ pass the exam.",
+        ["won't", "is not going to"],
+        1,
+        "The mistakes on the paper are the current evidence for the prediction."
+      ),
+      multipleChoiceItem(
+        "pred-con-5",
+        "Which form is more natural?",
+        "I'm sure you ____ a wonderful time on your holiday in Spain.",
+        ["'ll have", "are going to have"],
+        0,
+        "Use 'will' (or ''ll') after 'I'm sure' to express a personal belief about the future."
+      ),
+    ],
+  },
+  {
+    id: "will-shall-functions-a2b1",
+    title: "Will and Shall: Decisions and Offers",
+    shortDescription: "Master the use of will and shall for instant decisions, promises, and offers.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use 'will' for instant decisions and promises. Use 'shall' in questions when you want to offer help or suggest an idea to someone else.",
+    items: [
+      multipleChoiceItem(
+        "ws-mc-1",
+        "Choose the correct option.",
+        "Instant Decision: 'A: We've run out of sugar.'\n'B: Don't worry, ____ some when I go to the supermarket.'",
+        ["I'll buy", "I buy", "I'm going to buy"],
+        0,
+        "Use 'will' for a decision made at the moment of speaking."
+      ),
+      multipleChoiceItem(
+        "ws-mc-2",
+        "Choose the correct option.",
+        "Offer: 'You look lost. ____ I show you the way on the map?'",
+        ["Will", "Shall", "Do"],
+        1,
+        "Use 'Shall I...?' to offer help in the form of a question."
+      ),
+      multipleChoiceItem(
+        "ws-mc-3",
+        "Choose the correct option.",
+        "Suggestion: 'It's very hot in here. ____ we open a window?'",
+        ["Shall", "Will", "Are"],
+        0,
+        "Use 'Shall we...?' to make a suggestion for the group."
+      ),
+      multipleChoiceItem(
+        "ws-mc-4",
+        "Choose the correct option.",
+        "Promise: 'Thank you for the money. I ____ you back on Friday.'",
+        ["pay", "shall pay", "will pay"],
+        2,
+        "Use 'will' to make a promise about a future action."
+      ),
+      errorCorrectionItem(
+        "ws-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I help you with those heavy suitcases.",
+        "I help",
+        false,
+        "I'll help",
+        "Use 'will' or ''ll' for an instant offer. Don't use the present simple."
+      ),
+      errorCorrectionItem(
+        "ws-ec-2",
+        "Check the highlighted phrase for errors.",
+        "Shall I will carry your bag for you?",
+        "Shall I will",
+        false,
+        "Shall I",
+        "Do not use 'will' after 'shall'. Use 'Shall I' + infinitive."
+      ),
+      errorCorrectionItem(
+        "ws-ec-3",
+        "Check the highlighted phrase for errors.",
+        "I promise I won't tell anybody your secret.",
+        "won't tell",
+        true,
+        "",
+        "Correct! Use 'won't' for a negative promise."
+      ),
+      errorCorrectionItem(
+        "ws-ec-4",
+        "Check the highlighted phrase for errors.",
+        "Will we go for a coffee after the lesson?",
+        "Will we",
+        false,
+        "Shall we",
+        "Use 'Shall we...?' when making a suggestion or asking for an opinion on a plan."
+      ),
+      placeholderGapItem(
+        "ws-gf-1",
+        "Complete the sentence.",
+        "Instant Decision: 'A: The phone is ringing!'\n'B: ____________________ (answer) it!'",
+        "I'll answer",
+        ["I will answer"],
+        "Use 'I'll' + infinitive for an instant reaction to a situation."
+      ),
+      placeholderGapItem(
+        "ws-gf-2",
+        "Complete the sentence.",
+        "Offer: 'A: I'm really thirsty.'\n'B: ____________________ (get) you a glass of water?'",
+        "Shall I get",
+        ["Should I get"],
+        "Use 'Shall I' to offer to do something for someone else."
+      ),
+      placeholderGapItem(
+        "ws-gf-3",
+        "Complete the sentence.",
+        "Promise: 'Don't worry about the mess. ____________________ (tidy) it up later.'",
+        "I'll tidy",
+        ["I will tidy"],
+        "Use the contraction ''ll' for a natural-sounding promise."
+      ),
+      placeholderGapItem(
+        "ws-gf-4",
+        "Complete the sentence.",
+        "Suggestion: 'A: I'm bored. ____________________ (watch) a film?'",
+        "Shall we watch",
+        [],
+        "Use 'Shall we' + infinitive to suggest an activity."
+      ),
+      wordOrderItem(
+        "ws-wo-1",
+        "Unjumble the offer.",
+        ["the", "dinner", "I", "shall", "make"],
+        "Shall I make the dinner?",
+        "Structure: Shall + I + infinitive + object?"
+      ),
+      wordOrderItem(
+        "ws-wo-2",
+        "Unjumble the promise.",
+        ["be", "late", "promise", "I", "won't", "I"],
+        "I promise I won't be late.",
+        "Structure: Subject + promise + Subject + won't + be."
+      ),
+      wordOrderItem(
+        "ws-wo-3",
+        "Unjumble the decision.",
+        ["take", "I", "it", "think", "I'll"],
+        "I think I'll take it.",
+        "Structure: I think + I'll + infinitive."
+      ),
+      wordOrderItem(
+        "ws-wo-4",
+        "Unjumble the suggestion.",
+        ["to", "park", "we", "the", "shall", "go"],
+        "Shall we go to the park?",
+        "Structure: Shall + we + verb + prepositional phrase?"
+      ),
+    ],
+  },
+  {
+    id: "second-conditional-intro-a2b1",
+    title: "Second Conditional: Dreams and Hypotheses",
+    shortDescription: "A first look at using 'if + past' to talk about imaginary situations.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use the second conditional to talk about imaginary or hypothetical situations in the present or future. Remember: use the past simple after 'if', and 'would' or 'wouldn't' for the result.",
+    items: [
+      multipleChoiceItem(
+        "sc2-mc-1",
+        "Choose the correct verb form for an imaginary situation.",
+        "If I ____ more money, I'd buy a faster computer.",
+        ["have", "had", "would have"],
+        1,
+        "In the if-clause, use the past simple to show the situation is imaginary."
+      ),
+      multipleChoiceItem(
+        "sc2-mc-2",
+        "Choose the correct verb form for the result.",
+        "We ____ much happier if we lived near the beach.",
+        ["would be", "will be", "were"],
+        0,
+        "In the result clause, use 'would' + the base form of the verb."
+      ),
+      multipleChoiceItem(
+        "sc2-mc-3",
+        "Choose the correct negative result.",
+        "If she had a car, she ____ the bus to work.",
+        ["doesn't take", "won't take", "wouldn't take"],
+        2,
+        "Use 'wouldn't' (would not) for a negative result in an imaginary scenario."
+      ),
+      multipleChoiceItem(
+        "sc2-mc-4",
+        "Which word can replace 'would' to talk about possibility?",
+        "If we went by train, we ____ get there faster.",
+        ["could", "can", "did"],
+        0,
+        "You can use 'could' + infinitive instead of 'would' in the second conditional."
+      ),
+      multipleChoiceItem(
+        "sc2-log-1",
+        "Choose the correct form.",
+        "Context: I have a ticket for the concert tonight.\n'If I ____, I'll see you there!'",
+        ["go", "went"],
+        0,
+        "Use the first conditional (if + present) for real, possible situations."
+      ),
+      multipleChoiceItem(
+        "sc2-log-2",
+        "Choose the correct form.",
+        "Context: I don't have a ticket and the concert is sold out.\n'If I ____ a ticket, I'd go with you.'",
+        ["have", "had"],
+        1,
+        "Use the second conditional (if + past) for imaginary or impossible situations."
+      ),
+      placeholderChoiceGapItem(
+        "sc2-were-1",
+        "Choose the correct form.",
+        "Formal advice: If I ____ you, I wouldn't buy that old car.",
+        ["were"],
+        "Use 'If I were you' for giving advice.",
+        ["was", "were", "am"]
+      ),
+      placeholderChoiceGapItem(
+        "sc2-were-2",
+        "Choose the correct form.",
+        "Hypothesis: If he ____ here, he would tell us what to do.",
+        ["were"],
+        "With the verb 'be', we can use 'were' instead of 'was' after I/he/she/it.",
+        ["was", "were", "be"]
+      ),
+      placeholderGapItem(
+        "sc2-gf-1",
+        "Complete the sentence.",
+        "If I __________ (be) famous, I'd live in a big house.",
+        "were",
+        ["was"],
+        "Use the past simple of 'be' (were/was) in the if-clause."
+      ),
+      placeholderGapItem(
+        "sc2-gf-2",
+        "Complete the sentence.",
+        "They __________ (travel) more if they had more holiday time.",
+        "would travel",
+        ["'d travel"],
+        "Use 'would' + infinitive for the imaginary result."
+      ),
+      placeholderGapItem(
+        "sc2-gf-3",
+        "Complete the sentence.",
+        "If I were you, I __________ (not / tell) him the truth yet.",
+        "wouldn't tell",
+        ["would not tell"],
+        "Use the negative 'wouldn't' for negative advice."
+      ),
+      placeholderGapItem(
+        "sc2-gf-4",
+        "Complete the sentence.",
+        "We could go for a walk if it __________ (not / rain).",
+        "didn't rain",
+        ["did not rain", "weren't raining", "were not raining", "wasn't raining", "was not raining"],
+        "Use the negative past simple or past continuous in the if-clause."
+      ),
+    ],
+  },
+  {
+    id: "possessive-pronouns-8c-a2b1",
+    title: "Possessive Pronouns and Adjectives",
+    shortDescription: "Master the difference between possessive adjectives (my, your) and pronouns (mine, yours).",
+    levels: ["a2", "b1"],
+    intro:
+      "Use possessive adjectives (my, your, his...) before a noun. Use possessive pronouns (mine, yours, hers...) when you don't use a noun. Use 'Whose' to ask about possession.",
+    items: [
+      multipleChoiceItem(
+        "pos-mc-1",
+        "Choose the correct word.",
+        "I've got my suitcase, but I can't see ____.",
+        ["your", "yours", "the yours"],
+        1,
+        "Use the possessive pronoun 'yours' because there is no noun after it."
+      ),
+      multipleChoiceItem(
+        "pos-mc-2",
+        "Choose the correct word.",
+        "This isn't ____ coat. Mine is blue.",
+        ["my", "mine", "my one"],
+        0,
+        "Use the possessive adjective 'my' because it is followed by the noun 'coat'."
+      ),
+      multipleChoiceItem(
+        "pos-mc-3",
+        "Choose the correct word.",
+        "We've lost our keys. Are these ____?",
+        ["our", "ours", "ours keys"],
+        1,
+        "Use 'ours' as a stand-alone pronoun to replace 'our keys'."
+      ),
+      multipleChoiceItem(
+        "pos-mc-4",
+        "Choose the correct word.",
+        "That's his car, and this one is ____.",
+        ["her", "hers", "she's"],
+        1,
+        "Use the possessive pronoun 'hers' to show possession without repeating 'car'."
+      ),
+      errorCorrectionItem(
+        "pos-ec-1",
+        "Check the highlighted phrase for errors.",
+        "Is this the yours? I found it on the table.",
+        "the yours",
+        false,
+        "yours",
+        "Never use 'the' with possessive pronouns."
+      ),
+      errorCorrectionItem(
+        "pos-ec-2",
+        "Check the highlighted phrase for errors.",
+        "That isn't mine book. I think it belongs to Sarah.",
+        "mine book",
+        false,
+        "my book",
+        "Do not use possessive pronouns (mine) with a noun. Use a possessive adjective (my) instead."
+      ),
+      errorCorrectionItem(
+        "pos-ec-3",
+        "Check the highlighted phrase for errors.",
+        "Who's phone is this? It's been ringing for ages.",
+        "Who's",
+        false,
+        "Whose",
+        "Use 'Whose' to ask about possession. 'Who's' is a contraction of 'Who is'."
+      ),
+      errorCorrectionItem(
+        "pos-ec-4",
+        "Check the highlighted phrase for errors.",
+        "The house is theirs, but the garden is ours.",
+        "theirs",
+        true,
+        "",
+        "Correct! 'Theirs' is the possessive pronoun for 'they'."
+      ),
+      placeholderGapItem(
+        "pos-gf-1",
+        "Complete the sentence.",
+        "__________ (jacket / be) this?",
+        "Whose jacket is",
+        [],
+        "Use 'Whose' + noun + 'is' to ask who something belongs to."
+      ),
+      doubleGap(
+        "pos-gf-2",
+        "Complete the sentence.",
+        ["It isn't ", { gapId: "g1" }, " (my / jacket). It's ", { gapId: "g2" }, " (your)."],
+        ["my jacket"],
+        ["yours"],
+        "Adjective (my) before the noun; pronoun (yours) at the end."
+      ),
+      placeholderGapItem(
+        "pos-gf-3",
+        "Complete the sentence.",
+        "These are their trainers, and those __________ (be / our).",
+        "are ours",
+        [],
+        "Use the plural verb 'are' with the possessive pronoun 'ours'."
+      ),
+      singleGap(
+        "pos-rf-1",
+        "Rewrite using a pronoun.",
+        ["It's ", { gapId: "g1" }, "."],
+        ["mine"],
+        "The pronoun 'mine' replaces 'my coat'.",
+        { originalSentence: "It's my coat." }
+      ),
+      singleGap(
+        "pos-rf-2",
+        "Rewrite using a pronoun.",
+        ["Is it ", { gapId: "g1" }, "?"],
+        ["hers"],
+        "The pronoun 'hers' replaces 'her bag'.",
+        { originalSentence: "Is it her bag?" }
+      ),
+      singleGap(
+        "pos-rf-3",
+        "Rewrite using 'Whose'.",
+        ["", { gapId: "g1" }, " is this?"],
+        ["Whose phone"],
+        "Start with 'Whose' + the noun to ask about possession.",
+        { originalSentence: "Who does this phone belong to?" }
+      ),
+    ],
+  },
+  {
+    id: "advice-should-ought-a2b1",
+    title: "Giving Advice: Should and Shouldn't",
+    shortDescription: "Master giving advice and sharing opinions using should, shouldn't, and ought to.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use 'should' to give advice or say what you think is a good idea. Remember the natural rule: say 'I don't think you should...' rather than 'I think you shouldn't...'.",
+    items: [
+      multipleChoiceItem(
+        "adv-mc-1",
+        "Choose the best advice for the situation.",
+        "Your phone battery is very low. You ____ it now.",
+        ["should charge", "should to charge", "ought charge"],
+        0,
+        "After 'should', use the infinitive without 'to'. 'Ought' would require 'to'."
+      ),
+      multipleChoiceItem(
+        "adv-mc-2",
+        "Choose the best advice for the situation.",
+        "It's a very formal party. You ____ wear those old trainers.",
+        ["shouldn't", "don't should", "ought not"],
+        0,
+        "Use 'shouldn't' (should not) to advise against an action."
+      ),
+      multipleChoiceItem(
+        "adv-mc-3",
+        "Choose the correct synonym.",
+        "He looks very stressed. He ____ take a few days off work.",
+        ["should", "ought to", "Either of these"],
+        2,
+        "'Should' and 'ought to' have the same meaning when giving advice."
+      ),
+      multipleChoiceItem(
+        "adv-mc-4",
+        "Choose the best advice for the situation.",
+        "The road is icy. You ____ too fast.",
+        ["shouldn't drive", "shouldn't to drive", "don't should drive"],
+        0,
+        "After 'shouldn't', use the base form of the verb without 'to'."
+      ),
+      errorCorrectionItem(
+        "adv-ec-1",
+        "Check the highlighted phrase for errors.",
+        "You should to call your parents more often.",
+        "should to",
+        false,
+        "should",
+        "Never use 'to' after 'should'. Use the base form of the verb."
+      ),
+      errorCorrectionItem(
+        "adv-ec-2",
+        "Check the highlighted phrase for errors.",
+        "I think you should to rest before the exam.",
+        "should to rest",
+        false,
+        "should rest",
+        "After 'should', use the base form of the verb without 'to'."
+      ),
+      errorCorrectionItem(
+        "adv-ec-3",
+        "Check the highlighted phrase for errors.",
+        "She ought to see a doctor about that cough.",
+        "ought to",
+        true,
+        "",
+        "Correct! 'Ought to' is a slightly more formal but correct way to say 'should'."
+      ),
+      errorCorrectionItem(
+        "adv-ec-4",
+        "Check the highlighted phrase for errors.",
+        "What do you think I should do?",
+        "do you think I should",
+        true,
+        "",
+        "Correct! Use this structure to ask for someone's advice."
+      ),
+      placeholderGapItem(
+        "adv-gf-1",
+        "Complete the sentence.",
+        "A: I'm really tired all the time.\nB: I think you __________ (go) to bed earlier.",
+        "should go",
+        ["ought to go"],
+        "Give a positive recommendation using should or ought to."
+      ),
+      placeholderGapItem(
+        "adv-gf-2",
+        "Complete the sentence.",
+        "A: Should I tell him the truth?\nB: No, I __________ (think / tell) him yet.",
+        "don't think you should tell",
+        ["do not think you should tell"],
+        "Use the natural negative advice structure: I don't think + you + should."
+      ),
+      placeholderGapItem(
+        "adv-gf-3",
+        "Complete the sentence.",
+        "A: I have a lot of work to do.\nB: Then you __________ (not / watch) TV all evening!",
+        "shouldn't watch",
+        ["should not watch"],
+        "Give negative advice based on the situation."
+      ),
+      singleGap(
+        "adv-rf-1",
+        "Rewrite using 'ought to'.",
+        ["You ", { gapId: "g1" }, " your boyfriend."],
+        ["ought to leave"],
+        "Replace 'should' with the synonym 'ought to'.",
+        { originalSentence: "You should leave your boyfriend." }
+      ),
+      singleGap(
+        "adv-rf-2",
+        "Rewrite using 'should'.",
+        ["You ", { gapId: "g1" }, "."],
+        ["should take a break"],
+        "Use 'should' + base verb to give advice.",
+        { originalSentence: "It's a good idea to take a break." }
+      ),
+    ],
+  },
+  {
+    id: "obligation-prohibition-7c-a2b1",
+    title: "Obligation and Prohibition: Must and Have to",
+    shortDescription: "Master rules, recommendations, and prohibitions using modal verbs.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use 'have to' for rules and 'must' for strong advice or personal obligations. Be careful: 'mustn't' means something is forbidden, while 'don't have to' means it isn't necessary.",
+    items: [
+      multipleChoiceItem(
+        "op2-mc-1",
+        "Choose the correct modal.",
+        "It's a secret. You ____ tell anybody!",
+        ["mustn't", "don't have to", "must"],
+        0,
+        "Use 'mustn't' when something is prohibited or forbidden."
+      ),
+      multipleChoiceItem(
+        "op2-mc-2",
+        "Choose the correct modal.",
+        "We've got plenty of time. We ____ hurry.",
+        ["mustn't", "don't have to", "must"],
+        1,
+        "Use 'don't have to' when an action is not obligatory or necessary."
+      ),
+      multipleChoiceItem(
+        "op2-mc-3",
+        "Choose the correct modal.",
+        "At this school, students ____ wear a uniform; they can wear their own clothes.",
+        ["mustn't", "don't have to", "have to"],
+        1,
+        "The lack of a rule means you 'don't have to' do it."
+      ),
+      multipleChoiceItem(
+        "op2-mc-4",
+        "Choose the correct modal.",
+        "You ____ touch that wire! It's extremely dangerous.",
+        ["mustn't", "don't have to", "have to"],
+        0,
+        "Use 'mustn't' for strong warnings or prohibitions."
+      ),
+      errorCorrectionItem(
+        "op2-ec-1",
+        "Check the highlighted phrase for errors.",
+        "What time must you to leave tomorrow?",
+        "must you to",
+        false,
+        ["must you", "do you have to"],
+        "After 'must', use the infinitive without 'to'. You can also use 'do you have to' to ask about obligation."
+      ),
+      errorCorrectionItem(
+        "op2-ec-2",
+        "Check the highlighted phrase for errors.",
+        "Do you have to work on Saturdays?",
+        "have to",
+        true,
+        "",
+        "Correct! We use 'do/does' to make questions with 'have to'."
+      ),
+      errorCorrectionItem(
+        "op2-ec-3",
+        "Check the highlighted phrase for errors.",
+        "She hasn't to go to the office today.",
+        "hasn't to",
+        false,
+        "doesn't have to",
+        "For negatives, use 'don't/doesn't have to'."
+      ),
+      errorCorrectionItem(
+        "op2-ec-4",
+        "Check the highlighted phrase for errors.",
+        "You mustn't drink the water in that river; it's dirty.",
+        "mustn't",
+        true,
+        "",
+        "Correct! 'Mustn't' is used to say something is a bad idea or forbidden."
+      ),
+      placeholderGapItem(
+        "op2-gf-1",
+        "Complete the sentence.",
+        "You __________ (wear) a seatbelt in the car. It's the law.",
+        "have to wear",
+        ["must wear"],
+        "Both work for rules, though 'have to' is common for laws."
+      ),
+      placeholderGapItem(
+        "op2-gf-2",
+        "Complete the sentence.",
+        "__________ (I / buy) a ticket for the museum, or is it free?",
+        "Do I have to buy",
+        [],
+        "Use 'do + subject + have to' for questions about rules."
+      ),
+      placeholderGapItem(
+        "op2-gf-3",
+        "Complete the sentence.",
+        "Visitors __________ (take) photos inside the gallery.",
+        "mustn't take",
+        ["must not take"],
+        "Use 'mustn't' for formal prohibitions."
+      ),
+      placeholderGapItem(
+        "op2-gf-4",
+        "Complete the sentence.",
+        "He __________ (get up) early tomorrow because he's on holiday.",
+        "doesn't have to get up",
+        ["does not have to get up"],
+        "Use 'doesn't have to' for a lack of necessity."
+      ),
+      placeholderGapItem(
+        "op2-gf-5",
+        "Complete the sentence.",
+        "I __________ (remember) to call my mum tonight.",
+        "must remember",
+        ["have to remember"],
+        "Use 'must' for personal obligations you impose on yourself."
+      ),
+      placeholderGapItem(
+        "op2-gf-6",
+        "Complete the sentence.",
+        "She __________ (work) very hard at her new job.",
+        "has to work",
+        [],
+        "Use 'has to' (third person) for workplace requirements."
+      ),
+      placeholderGapItem(
+        "sign-gap-1",
+        "Complete the rule from the sign.",
+        "You ____________________ (take) photos inside this gallery.",
+        "mustn't take",
+        ["must not take"],
+        "Use 'mustn't' when an action is prohibited or forbidden.",
+        {
+          imageSrc: "/images/grammar/signs/photos.png",
+          imageAlt: "A museum gallery with a no-photos sign showing a camera with a red line through it.",
+          imageCaption: "Look at the sign and complete the rule.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      placeholderGapItem(
+        "sign-gap-2",
+        "Complete the rule from the sign.",
+        "The light is on, so you ____________________ (wear) your seatbelt now.",
+        "have to wear",
+        ["must wear"],
+        "Both 'must' and 'have to' work for rules, but 'have to' is common for external requirements.",
+        {
+          imageSrc: "/images/grammar/signs/seat-belt.png",
+          imageAlt: "An airplane cabin with the illuminated seatbelt sign switched on.",
+          imageCaption: "Look at the sign and complete the rule.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      placeholderGapItem(
+        "sign-gap-3",
+        "Complete the rule from the sign.",
+        "You ____________________ (pay) to use the internet here.",
+        "don't have to pay",
+        ["do not have to pay"],
+        "Use 'don't have to' to show that something is not necessary or obligatory.",
+        {
+          imageSrc: "/images/grammar/signs/wifi.png",
+          imageAlt: "A cafe window with a large sign that says free wifi for customers.",
+          imageCaption: "Look at the sign and complete the rule.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      placeholderGapItem(
+        "sign-gap-4",
+        "Complete the rule from the sign.",
+        "Visitors ____________________ (use) their mobile phones in this area.",
+        "mustn't use",
+        ["must not use"],
+        "A red line through a sign indicates that an action is forbidden.",
+        {
+          imageSrc: "/images/grammar/signs/mobile.png",
+          imageAlt: "A hospital area with a no-mobile-phone sign on the wall.",
+          imageCaption: "Look at the sign and complete the rule.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      placeholderGapItem(
+        "sign-gap-5",
+        "Complete the rule from the sign.",
+        "Employees ____________________ (wash) their hands before starting work.",
+        "have to wash",
+        ["must wash"],
+        "Use 'have to' for general obligations like work rules or laws.",
+        {
+          imageSrc: "/images/grammar/signs/restaurant.png",
+          imageAlt: "A restaurant kitchen with an all staff wash hands sign and a chef washing his hands.",
+          imageCaption: "Look at the sign and complete the rule.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      placeholderGapItem(
+        "sign-gap-6",
+        "Complete the rule from the sign.",
+        "On this part of the coast, you ____________________ (wear) a swimsuit.",
+        "don't have to wear",
+        ["do not have to wear"],
+        "If something is 'optional', it means you can do it if you want, but it isn't necessary or obligatory.",
+        {
+          imageSrc: "/images/grammar/signs/beach.png",
+          imageAlt: "A sunny beach with a sign saying nudist beach swimsuit optional.",
+          imageCaption: "Look at the sign and complete the rule.",
+          imageMaxWidth: "420px",
+        }
+      ),
+    ],
+  },
+  {
+    id: "verb-form-review-6c",
+    title: "The Big Verb Review",
+    shortDescription: "A comprehensive test of present, past, and future forms.",
+    levels: ["a2", "b1"],
+    intro:
+      "This review covers all the major verb forms. Look closely at the context of each sentence to decide if it's a habit, a finished past action, a life experience, or a future plan.",
+    items: [
+      multipleChoiceItem(
+        "rev-mc-1",
+        "Choose the correct form.",
+        "We ____ a really good film at the cinema last night.",
+        ["have seen", "saw", "were seeing"],
+        1,
+        "Use the Past Simple for finished actions with a specific time (last night)."
+      ),
+      multipleChoiceItem(
+        "rev-mc-2",
+        "Choose the correct form.",
+        "He ____ for a new job at the moment.",
+        ["looks", "is looking", "has looked"],
+        1,
+        "Use the Present Continuous for things happening now or around now."
+      ),
+      multipleChoiceItem(
+        "rev-mc-3",
+        "Choose the correct form.",
+        "I'm sure you ____ the exhibition. It's fantastic.",
+        ["'ll love", "going to love", "love"],
+        0,
+        "Use 'will' for predictions based on what we think or feel."
+      ),
+      multipleChoiceItem(
+        "rev-mc-4",
+        "Choose the correct form.",
+        "____ you ever ____ to South America?",
+        ["Did / go", "Have / been", "Are / going"],
+        1,
+        "Use the Present Perfect to ask about life experiences (ever)."
+      ),
+      multipleChoiceItem(
+        "rev-mc-5",
+        "Choose the correct form.",
+        "I ____ my parents for dinner this Sunday.",
+        ["meet", "am meeting", "will meet"],
+        1,
+        "Use the Present Continuous for fixed future arrangements."
+      ),
+      errorCorrectionItem(
+        "rev-ec-1",
+        "Check the highlighted phrase for errors.",
+        "She doesn't smoke since she was a teenager.",
+        "doesn't smoke",
+        false,
+        "hasn't smoked",
+        "Use the Present Perfect for actions that started in the past and continue to now."
+      ),
+      errorCorrectionItem(
+        "rev-ec-2",
+        "Check the highlighted phrase for errors.",
+        "What were you doing at 7.00 last night?",
+        "were you doing",
+        true,
+        "",
+        "Correct! Use the Past Continuous for actions in progress at a specific past time."
+      ),
+      errorCorrectionItem(
+        "rev-ec-3",
+        "Check the highlighted phrase for errors.",
+        "Look at those clouds! It will rain.",
+        "will rain",
+        false,
+        ["is going to rain", "'s going to rain"],
+        "Use 'be going to' for predictions when you have visible evidence (the clouds)."
+      ),
+      errorCorrectionItem(
+        "rev-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I saw a great play last weekend.",
+        "saw",
+        true,
+        "",
+        "Correct! Use the Past Simple for finished actions."
+      ),
+      placeholderGapItem(
+        "rev-gf-1",
+        "Complete the sentence.",
+        "A: Where's John?\nB: He __________ (work) in the garden right now.",
+        "is working",
+        ["'s working"],
+        "Present Continuous for an action happening now."
+      ),
+      placeholderGapItem(
+        "rev-gf-2",
+        "Complete the sentence.",
+        "I __________ (not / see) that new TV series yet.",
+        "haven't seen",
+        ["have not seen"],
+        "Present Perfect with 'yet' for recently finished actions."
+      ),
+      placeholderGapItem(
+        "rev-gf-3",
+        "Complete the sentence.",
+        "A: I'm really cold.\nB: I __________ (close) the window for you.",
+        "will close",
+        ["'ll close"],
+        "Use 'will' for an instant decision or offer."
+      ),
+      placeholderGapItem(
+        "rev-gf-4",
+        "Complete the sentence.",
+        "We __________ (move) to a new flat next month. We've already signed the contract.",
+        "are moving",
+        ["'re moving"],
+        "Present Continuous for a fixed future arrangement."
+      ),
+      placeholderGapItem(
+        "rev-gf-5",
+        "Complete the sentence.",
+        "What __________ (you / do) when the phone rang?",
+        "were you doing",
+        [],
+        "Past Continuous for an action in progress when another action happened."
+      ),
+      placeholderGapItem(
+        "rev-gf-6",
+        "Complete the sentence.",
+        "He __________ (not / go) to the gym yesterday because he was ill.",
+        "didn't go",
+        ["did not go"],
+        "Past Simple for a finished past action."
+      ),
+      placeholderGapItem(
+        "rev-gf-7",
+        "Complete the sentence.",
+        "I __________ (buy) a new car next week. I've already chosen the model.",
+        "am going to buy",
+        ["'m going to buy"],
+        "Use 'be going to' for future plans."
+      ),
+      placeholderGapItem(
+        "rev-gf-8",
+        "Complete the sentence.",
+        "She __________ (live) in the city centre, so she walks to work.",
+        "lives",
+        [],
+        "Present Simple for things that usually happen."
+      ),
+      placeholderGapItem(
+        "rev-gf-9",
+        "Complete the sentence.",
+        "I __________ (already / finish) my homework, so I can go out now.",
+        "have already finished",
+        ["'ve already finished"],
+        "Present Perfect with 'already' for completed actions."
+      ),
+      placeholderGapItem(
+        "rev-gf-10",
+        "Complete the sentence.",
+        "I promise I __________ (not / be) late for the meeting.",
+        "won't be",
+        ["will not be"],
+        "Use 'won't' for a future promise."
+      ),
+    ],
+  },
+  {
     id: "arrangements-vs-plans-a2-b1",
     title: "Arrangements or Intentions?",
     shortDescription: "Decide between the Present Continuous and 'be going to'.",
@@ -9255,6 +10647,181 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         ["I ", { gapId: "g1" }, " for a better job."],
         ["am going to look"],
         "Turn the verb 'intend' into the 'be going to' structure."
+      ),
+    ],
+  },
+  {
+    id: "pp-duration-9b-a2b1",
+    title: "Present Perfect: For and Since",
+    shortDescription: "Practice talking about how long you have done something.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use the Present Perfect with 'for' and 'since' to talk about actions that started in the past and are still true now. Use 'for' for a period of time and 'since' for the starting point.",
+    items: [
+      multipleChoiceItem(
+        "dur-mc-1",
+        "Choose the correct word for the period of time.",
+        "I've lived in this flat ____ three years.",
+        ["for", "since", "from"],
+        0,
+        "Use 'for' with a period of time (three years)."
+      ),
+      multipleChoiceItem(
+        "dur-mc-2",
+        "Choose the correct word for the starting point.",
+        "She's been a doctor ____ 2015.",
+        ["for", "since", "ago"],
+        1,
+        "Use 'since' with a specific point in time (2015)."
+      ),
+      multipleChoiceItem(
+        "dur-mc-3",
+        "Choose the correct question form.",
+        "____ have you been married?",
+        ["How many time", "How long", "Since when"],
+        1,
+        "Use 'How long...?' to ask about the duration of a state or action."
+      ),
+      errorCorrectionItem(
+        "dur-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I live in Manchester for twenty years.",
+        "live",
+        false,
+        "have lived / 've lived",
+        "Don't use the present simple for things that started in the past and are still true. Use the present perfect."
+      ),
+      errorCorrectionItem(
+        "dur-ec-2",
+        "Check the highlighted phrase for errors.",
+        "He's had this car since three months.",
+        "since three months",
+        false,
+        "for three months",
+        "Three months is a period of time, so you must use 'for'."
+      ),
+      errorCorrectionItem(
+        "dur-ec-3",
+        "Check the highlighted phrase for errors.",
+        "We've been afraid of spiders since we were children.",
+        "since we were",
+        true,
+        "",
+        "Correct! You can use 'since' with a point-in-time clause in the past."
+      ),
+      doubleGap(
+        "dur-gf-1",
+        "Complete the sentence.",
+        ["Mark moved to London in June. It is now October.\nMark ", { gapId: "g1" }, " (live) in London ", { gapId: "g2" }, " four months."],
+        ["has lived", "'s lived"],
+        ["for"],
+        "Present perfect (has lived) + 'for' (period of four months)."
+      ),
+      doubleGap(
+        "dur-gf-2",
+        "Complete the sentence.",
+        ["You met your best friend at primary school, and you are still friends.\nI ", { gapId: "g1" }, " (know) my best friend ", { gapId: "g2" }, " we were at primary school."],
+        ["have known", "'ve known"],
+        ["since"],
+        "Present perfect (have known) + 'since' (starting point)."
+      ),
+      wordOrderItem(
+        "dur-wo-1",
+        "Unjumble the duration sentence.",
+        ["for", "has", "Sarah", "married", "been", "years", "ten"],
+        "Sarah has been married for ten years.",
+        "Structure: Subject + has + been + for + period."
+      ),
+      wordOrderItem(
+        "dur-wo-2",
+        "Unjumble the question.",
+        ["long", "you", "how", "worked", "have", "there"],
+        "How long have you worked there?",
+        "Structure: How long + have + subject + past participle."
+      ),
+      doubleGap(
+        "dur-vis-1",
+        "Look at the picture and complete the sentence.",
+        ["She ", { gapId: "g1" }, " (work) at this company ", { gapId: "g2" }, "."],
+        ["has worked", "'s worked"],
+        ["since January"],
+        "Use 'has' (3rd person) + 'since' for a specific month starting point.",
+        {
+          imageSrc: "/images/grammar/for-since/job.png",
+          imageAlt: "A woman at a new desk with a caption showing January.",
+          imageCaption: "Use the picture and the time caption to complete the sentence.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      doubleGap(
+        "dur-vis-2",
+        "Look at the picture and complete the sentence.",
+        ["They ", { gapId: "g1" }, " (be) best friends ", { gapId: "g2" }, "."],
+        ["have been", "'ve been"],
+        ["for eight years"],
+        "Use 'have' (plural) + 'for' for a period of time.",
+        {
+          imageSrc: "/images/grammar/for-since/friends.png",
+          imageAlt: "Two teenagers smiling together with a caption showing 8 years.",
+          imageCaption: "Use the picture and the time caption to complete the sentence.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      doubleGap(
+        "dur-vis-3",
+        "Look at the picture and complete the sentence.",
+        ["We ", { gapId: "g1" }, " (live) in this house ", { gapId: "g2" }, "."],
+        ["have lived", "'ve lived"],
+        ["since 2012"],
+        "Use 'since' for a specific year starting point.",
+        {
+          imageSrc: "/images/grammar/for-since/house.png",
+          imageAlt: "A family standing outside their house with a caption showing 2012.",
+          imageCaption: "Use the picture and the time caption to complete the sentence.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      doubleGap(
+        "dur-vis-4",
+        "Look at the picture and complete the sentence.",
+        ["He ", { gapId: "g1" }, " (play) the guitar ", { gapId: "g2" }, "."],
+        ["has played", "'s played"],
+        ["for six months"],
+        "Use 'has' + 'for' for a duration of months.",
+        {
+          imageSrc: "/images/grammar/for-since/guitar.png",
+          imageAlt: "A man with a guitar and a caption showing 6 months.",
+          imageCaption: "Use the picture and the time caption to complete the sentence.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      doubleGap(
+        "dur-vis-5",
+        "Look at the picture and complete the sentence.",
+        ["I ", { gapId: "g1" }, " (be) in hospital ", { gapId: "g2" }, "."],
+        ["have been", "'ve been"],
+        ["since Tuesday"],
+        "Use 'since' for a specific day of the week.",
+        {
+          imageSrc: "/images/grammar/for-since/hospital.png",
+          imageAlt: "A patient in bed with a caption showing Tuesday.",
+          imageCaption: "Use the picture and the time caption to complete the sentence.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      doubleGap(
+        "dur-vis-6",
+        "Look at the picture and complete the sentence.",
+        ["She ", { gapId: "g1" }, " (have) her puppy ", { gapId: "g2" }, "."],
+        ["has had", "'s had"],
+        ["for three weeks"],
+        "Don't forget the past participle of 'have' is 'had'. Pattern: has + had + for.",
+        {
+          imageSrc: "/images/grammar/for-since/puppy.png",
+          imageAlt: "A girl holding a puppy with a caption showing 3 weeks.",
+          imageCaption: "Use the picture and the time caption to complete the sentence.",
+          imageMaxWidth: "420px",
+        }
       ),
     ],
   },
@@ -10492,6 +12059,223 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         [],
         "Use the noun phrase 'his lack of experience' after 'in spite of'.",
         { keyWord: "lack" }
+      ),
+    ],
+  },
+  {
+    id: "unreal-past-tenses-c1",
+    title: "C1 Mastery: Unreal Past Tenses",
+    shortDescription: "Practise wish, if only, would rather, and it's high time with unreal past forms.",
+    levels: ["c1"],
+    intro:
+      "Use unreal past forms after 'wish', 'if only', 'would rather', and 'it's high time' to talk about regrets, preferences, annoyance, and urgent changes.",
+    items: [
+      multipleChoiceItem(
+        "unreal-past-c1-mc-1",
+        "Choose the most appropriate option.",
+        "I'm exhausted. I wish we __________ so much work to do this weekend.",
+        ["didn't have", "hadn't had", "wouldn't have"],
+        0,
+        "Use wish + past simple for a present situation you want to be different."
+      ),
+      multipleChoiceItem(
+        "unreal-past-c1-mc-2",
+        "Choose the most appropriate option.",
+        "If only you __________ to me before you signed that contract! I could have warned you.",
+        ["spoke", "had spoken", "would speak"],
+        1,
+        "Use if only + past perfect for regret about a past action."
+      ),
+      multipleChoiceItem(
+        "unreal-past-c1-mc-3",
+        "Choose the most appropriate option.",
+        "I'd rather you __________ my phone without asking first.",
+        ["don't use", "didn't use", "hadn't used"],
+        1,
+        "Use would rather + subject + past simple for a present or future preference."
+      ),
+      multipleChoiceItem(
+        "unreal-past-c1-mc-4",
+        "Choose the most appropriate option.",
+        "It's high time the government __________ something about the rising cost of living.",
+        ["did", "does", "had done"],
+        0,
+        "Use it's high time + past simple for an action that should happen now."
+      ),
+      multipleChoiceItem(
+        "unreal-past-c1-mc-5",
+        "Choose the most appropriate option.",
+        "I wish my flatmate __________ his music down; it's nearly midnight!",
+        ["turned", "had turned", "would turn"],
+        2,
+        "Use wish + would to complain about behaviour you want someone to change."
+      ),
+      multipleChoiceItem(
+        "unreal-past-c1-mc-6",
+        "Choose the most appropriate option.",
+        "I'd rather __________ at home tonight if you don't mind. I'm not in the mood for a party.",
+        ["stay", "stayed", "have stayed"],
+        0,
+        "Use would rather + base verb when the subject is the same."
+      ),
+      multipleChoiceItem(
+        "unreal-past-c1-mc-7",
+        "Choose the most appropriate option.",
+        "If only the weather __________ a bit warmer last week, we could have gone hiking.",
+        ["were", "had been", "would be"],
+        1,
+        "Use if only + past perfect for regret about a past situation."
+      ),
+      multipleChoiceItem(
+        "unreal-past-c1-mc-8",
+        "Choose the most appropriate option.",
+        "Don't you think it's time you __________ an apology for what you said?",
+        ["make", "made", "have made"],
+        1,
+        "Use it's time + subject + past simple for something that should happen now."
+      ),
+      errorCorrectionItem(
+        "unreal-past-c1-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I wish I could afford a new car, but they are just too expensive.",
+        "could afford",
+        true,
+        "",
+        "Correct! Wish + could is used for a present ability or possibility you want to be different."
+      ),
+      errorCorrectionItem(
+        "unreal-past-c1-ec-2",
+        "Check the highlighted phrase for errors.",
+        "I'd rather you don't tell anyone what I just said.",
+        "don't tell",
+        false,
+        ["didn't tell", "did not tell"],
+        "Use would rather + subject + past simple."
+      ),
+      errorCorrectionItem(
+        "unreal-past-c1-ec-3",
+        "Check the highlighted phrase for errors.",
+        "If only we would have more money, we could move to a bigger house.",
+        "would have",
+        false,
+        "had",
+        "Use wish / if only + past simple for present states."
+      ),
+      errorCorrectionItem(
+        "unreal-past-c1-ec-4",
+        "Check the highlighted phrase for errors.",
+        "It's about time you learned how to cook for yourself.",
+        "learned",
+        true,
+        "",
+        "Correct! It's about time + past simple is used for an action that should happen now."
+      ),
+      errorCorrectionItem(
+        "unreal-past-c1-ec-5",
+        "Check the highlighted phrase for errors.",
+        "I wish the neighbors stopped arguing; I can't concentrate.",
+        "stopped",
+        false,
+        "would stop",
+        "Use wish + would to complain about another person's repeated behaviour."
+      ),
+      errorCorrectionItem(
+        "unreal-past-c1-ec-6",
+        "Check the highlighted phrase for errors.",
+        "Would you rather I would pay you in cash or by bank transfer?",
+        "would pay",
+        false,
+        "paid",
+        "Use would rather + subject + past simple."
+      ),
+      errorCorrectionItem(
+        "unreal-past-c1-ec-7",
+        "Check the highlighted phrase for errors.",
+        "If only I hadn't forgotten the map, we wouldn't be lost now.",
+        "hadn't forgotten",
+        true,
+        "",
+        "Correct! The past perfect can express regret about a past action with a present result."
+      ),
+      singleGap(
+        "unreal-past-c1-rf-1",
+        "Complete the second sentence using the word in bold: REGRET.",
+        ["I wish ", { gapId: "g1" }, " that job offer in Paris."],
+        ["I had taken", "I'd taken"],
+        "Use wish + past perfect for regret about the past.",
+        { originalSentence: "I really regret not taking that job offer in Paris.", keyWord: "regret" }
+      ),
+      singleGap(
+        "unreal-past-c1-rf-2",
+        "Complete the second sentence using the word in bold: PREFERENCE.",
+        ["I'd rather ", { gapId: "g1" }, " at 8:00 instead of 7:00."],
+        ["you came"],
+        "Use would rather + subject + past simple for a preference about another person.",
+        { originalSentence: "I would prefer you to come at 8:00 instead of 7:00.", keyWord: "preference" }
+      ),
+      singleGap(
+        "unreal-past-c1-rf-3",
+        "Complete the second sentence using the word in bold: ANNOYANCE.",
+        ["I wish ", { gapId: "g1" }, " me."],
+        ["you wouldn't keep interrupting", "you would not keep interrupting"],
+        "Use wish + would to complain about annoying behaviour.",
+        { originalSentence: "It's really annoying that you keep interrupting me.", keyWord: "annoyance" }
+      ),
+      singleGap(
+        "unreal-past-c1-rf-4",
+        "Complete the second sentence using the word in bold: URGENCY.",
+        ["It's high ", { gapId: "g1" }, " for your finals."],
+        ["time you started studying"],
+        "Use it's high time + subject + past simple.",
+        { originalSentence: "You really ought to start studying for your finals.", keyWord: "urgency" }
+      ),
+      singleGap(
+        "unreal-past-c1-rf-5",
+        "Complete the second sentence using the word in bold: IMPOSSIBILITY.",
+        ["If only ", { gapId: "g1" }, " you with your move this weekend."],
+        ["I could help"],
+        "Use if only + could for a present or future impossibility.",
+        { originalSentence: "I'm sorry I can't help you with your move this weekend.", keyWord: "impossibility" }
+      ),
+      placeholderGapItem(
+        "unreal-past-c1-gf-1",
+        "Fill in the gap with the correct form of the verb in brackets.",
+        "I'm allergic to dogs. I'd rather you __________ (leave) your dog in the garden.",
+        "left",
+        [],
+        "Use would rather + subject + past simple."
+      ),
+      placeholderGapItem(
+        "unreal-past-c1-gf-2",
+        "Fill in the gap with the correct form of the verb in brackets.",
+        "I wish I __________ (know) how to play the piano; it would be such a lovely skill.",
+        "knew",
+        [],
+        "Use wish + past simple for a present situation."
+      ),
+      placeholderGapItem(
+        "unreal-past-c1-gf-3",
+        "Fill in the gap with the correct form of the verb in brackets.",
+        "It's already 11:00 PM. It's time the children __________ (be) in bed.",
+        "were",
+        [],
+        "Use it's time + subject + past simple. 'Were' is common in this unreal-past pattern."
+      ),
+      placeholderGapItem(
+        "unreal-past-c1-gf-4",
+        "Fill in the gap with the correct form of the verb in brackets.",
+        "If only the bus __________ (come)! I've been waiting here for forty minutes.",
+        "would come",
+        [],
+        "Use if only + would for impatience or a desired change."
+      ),
+      placeholderGapItem(
+        "unreal-past-c1-gf-5",
+        "Fill in the gap with the correct form of the verb in brackets.",
+        "I wish I __________ (not/be) so stubborn during the meeting yesterday.",
+        "hadn't been",
+        ["had not been"],
+        "Use wish + past perfect for regret about a past situation."
       ),
     ],
   },

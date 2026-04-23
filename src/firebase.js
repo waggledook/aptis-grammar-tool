@@ -650,6 +650,52 @@ export async function logHubFlashcardsStarted(details = {}) {
   });
 }
 
+export async function logHubFlashcardsCompleted(details = {}) {
+  return logActivity("hub_flashcards_completed", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function fetchHubFlashcardSessions(n = 50, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(
+    query(
+      collection(db, "activityLog"),
+      where("userId", "==", realUid),
+      where("type", "==", "hub_flashcards_completed"),
+      limit(n)
+    )
+  );
+
+  return snap.docs
+    .map((entry) => {
+      const data = entry.data() || {};
+      const details = data.details || {};
+      return {
+        id: entry.id,
+        createdAt: data.createdAt || null,
+        userId: data.userId || realUid,
+        userEmail: data.userEmail || null,
+        deckId: details.deckId || "",
+        deckTitle: details.deckTitle || "Grammar flashcards",
+        assignmentId: details.assignmentId || "",
+        assignmentLabel: details.assignmentLabel || "",
+        teacherUid: details.teacherUid || "",
+        teacherName: details.teacherName || "",
+        reviewedCards: details.reviewedCards ?? null,
+        total: details.total ?? null,
+      };
+    })
+    .sort((a, b) => {
+      const aTime = a?.createdAt?.toMillis?.() || 0;
+      const bTime = b?.createdAt?.toMillis?.() || 0;
+      return bTime - aTime;
+    });
+}
+
 export async function logHubSpanglishStarted(details = {}) {
   return logActivity("hub_spanglish_started", {
     app: "seifhub",

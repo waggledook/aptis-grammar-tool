@@ -84,17 +84,29 @@ export default function HubMiniGrammarTests({ user }) {
   const filteredActivities = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    return HUB_GRAMMAR_ACTIVITIES.filter((activity) => {
-      const levels = activity.levels || [];
-      const matchesLevel =
-        selectedLevels.length === 0 ||
-        selectedLevels.some((level) => levels.includes(level));
-      const matchesQuery =
-        !normalizedQuery || getSearchText(activity).includes(normalizedQuery);
+    return HUB_GRAMMAR_ACTIVITIES.map((activity, index) => ({ activity, index }))
+      .filter(({ activity }) => {
+        const levels = activity.levels || [];
+        const matchesLevel =
+          selectedLevels.length === 0 ||
+          selectedLevels.some((level) => levels.includes(level));
+        const matchesQuery =
+          !normalizedQuery || getSearchText(activity).includes(normalizedQuery);
 
-      return matchesLevel && matchesQuery;
-    });
-  }, [query, selectedLevels]);
+        return matchesLevel && matchesQuery;
+      })
+      .sort((left, right) => {
+        const leftCompleted = completedActivityIds.has(left.activity.id);
+        const rightCompleted = completedActivityIds.has(right.activity.id);
+
+        if (leftCompleted !== rightCompleted) {
+          return leftCompleted ? 1 : -1;
+        }
+
+        return left.index - right.index;
+      })
+      .map(({ activity }) => activity);
+  }, [completedActivityIds, query, selectedLevels]);
 
   function toggleLevel(level) {
     setSelectedLevels((prev) =>

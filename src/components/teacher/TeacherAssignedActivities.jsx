@@ -5,6 +5,7 @@ import {
   fetchVocabProgressMap,
   fetchSpeakingProgressMap,
   fetchHubDictationSessions,
+  fetchHubFlashcardSessions,
   fetchHubGrammarSubmissions,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
@@ -17,6 +18,7 @@ import {
   listTeacherStudentsWithRosterMeta,
 } from "../../firebase";
 import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
+import { HUB_GRAMMAR_FLASHCARD_DECKS } from "../../data/hubGrammarFlashcards.js";
 import { HUB_DICTATION_SETS } from "../../data/hubDictationSets.js";
 import { PART2_TASKS } from "../speaking/banks/part2";
 import { PART3_TASKS } from "../speaking/banks/part3";
@@ -112,6 +114,8 @@ function getAssignmentTypeLabel(type) {
   switch (type) {
     case "mini-test":
       return "Mini test";
+    case "flashcards":
+      return "Grammar flashcards";
     case "grammar-set":
       return "Aptis grammar set";
     case "use-of-english":
@@ -177,6 +181,11 @@ function resolveAssignmentCompletion(assignment, sources) {
   const assignedAt = timestampToMs(assignment?.createdAt);
   if (assignment?.activityType === "mini-test") {
     const completedAt = sources.miniTests?.[assignment.activityId] || 0;
+    return { completed: completedAt >= assignedAt, completedAt };
+  }
+
+  if (assignment?.activityType === "flashcards") {
+    const completedAt = sources.flashcards?.[assignment.id] || sources.flashcards?.[assignment.activityId] || 0;
     return { completed: completedAt >= assignedAt, completedAt };
   }
 
@@ -255,6 +264,7 @@ function resolveAssignmentCompletion(assignment, sources) {
 function getActivityRoute({ activityType, activityId, routePath }) {
   if (routePath) return routePath;
   if (activityType === "mini-test") return getSitePath(`/grammar/activity/${activityId}`);
+  if (activityType === "flashcards") return getSitePath(`/grammar/flashcards/${activityId}`);
   if (activityType === "grammar-set") return `/grammar-sets/${activityId}`;
   if (activityType === "use-of-english") return `/use-of-english/custom/${activityId}`;
   return getSitePath("/");
@@ -316,11 +326,12 @@ export default function TeacherAssignedActivities({ user }) {
         const completionByStudentId = Object.fromEntries(
           await Promise.all(
             (studentRows || []).map(async (student) => {
-              const [vocabProgress, speakingProgress, readingProgress, dictationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+              const [vocabProgress, speakingProgress, readingProgress, dictationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
                 fetchVocabProgressMap(student.id),
                 fetchSpeakingProgressMap(student.id),
                 fetchReadingProgressMap(student.id),
                 fetchHubDictationSessions(200, student.id),
+                fetchHubFlashcardSessions(200, student.id),
                 fetchHubGrammarSubmissions(200, student.id),
                 listGrammarSetAttemptsForStudent(student.id),
                 fetchWritingP1Sessions(100, student.id),
@@ -336,6 +347,10 @@ export default function TeacherAssignedActivities({ user }) {
                   speaking: speakingProgress || {},
                   reading: readingProgress || {},
                   dictation: buildLatestTimeMap(dictationSessions || [], "assignmentId"),
+                  flashcards: {
+                    ...buildLatestTimeMap(flashcardSessions || [], "deckId"),
+                    ...buildLatestTimeMap(flashcardSessions || [], "assignmentId"),
+                  },
                   miniTests: buildLatestTimeMap(miniTests || [], "activityId"),
                   grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
                     if (!attempt?.setId) return acc;
@@ -366,7 +381,7 @@ export default function TeacherAssignedActivities({ user }) {
               const student = studentMap[studentId];
               const completion = resolveAssignmentCompletion(
                 assignment,
-                completionByStudentId[studentId] || { miniTests: {}, grammarSets: {}, writing: {}, speaking: {}, reading: {}, vocabulary: {}, dictation: {} }
+                completionByStudentId[studentId] || { miniTests: {}, flashcards: {}, grammarSets: {}, writing: {}, speaking: {}, reading: {}, vocabulary: {}, dictation: {} }
               );
 
               return {
@@ -418,6 +433,17 @@ export default function TeacherAssignedActivities({ user }) {
         label: activity.title,
         description: activity.shortDescription || "",
         routePath: getSitePath(`/grammar/activity/${activity.id}`),
+      })),
+    []
+  );
+
+  const flashcardDeckOptions = useMemo(
+    () =>
+      HUB_GRAMMAR_FLASHCARD_DECKS.map((deck) => ({
+        id: deck.id,
+        label: deck.title,
+        description: deck.description || "",
+        routePath: getSitePath(`/grammar/flashcards/${deck.id}`),
       })),
     []
   );
@@ -474,12 +500,13 @@ export default function TeacherAssignedActivities({ user }) {
       ];
     }
     if (activityType === "grammar-set") return publishedGrammarSetOptions;
+    if (activityType === "flashcards") return flashcardDeckOptions;
     if (activityType === "use-of-english") return useOfEnglishOptions;
     if (activityType === "writing") return WRITING_OPTIONS;
     if (activityType === "speaking") return SPEAKING_OPTIONS;
     if (activityType === "reading") return READING_OPTIONS;
     return miniTestOptions;
-  }, [activityType, dictationPresetOptions, miniTestOptions, publishedGrammarSetOptions, useOfEnglishOptions]);
+  }, [activityType, dictationPresetOptions, flashcardDeckOptions, miniTestOptions, publishedGrammarSetOptions, useOfEnglishOptions]);
 
   const filteredDictationSentences = useMemo(() => {
     const sourceIds = new Set(dictationSourceSetIds);
@@ -647,6 +674,12 @@ export default function TeacherAssignedActivities({ user }) {
           ? buildWritingRoutePath(chosenOption.routePath, chosenWritingTask?.id || "")
           : activityType === "speaking"
             ? buildSpeakingRoutePath(chosenOption.routePath, chosenSpeakingTask?.id || "")
+            : activityType === "flashcards"
+              ? `${getActivityRoute({
+                  activityType,
+                  activityId: chosenOption.id,
+                  routePath: chosenOption.routePath,
+                })}?assignment=__ASSIGNMENT_ID__`
               : getActivityRoute({
                   activityType,
                   activityId: chosenOption.id,
@@ -744,7 +777,7 @@ export default function TeacherAssignedActivities({ user }) {
         <div className="teacher-assign-head">
           <div>
             <h3>Create an assigned activity</h3>
-            <p>Send mini tests, grammar sets, Use of English sets, reading, writing, speaking, or dictation tasks to your class.</p>
+            <p>Send mini tests, flashcards, grammar sets, Use of English sets, reading, writing, speaking, or dictation tasks to your class.</p>
           </div>
         </div>
 
@@ -757,6 +790,7 @@ export default function TeacherAssignedActivities({ user }) {
                 <span>Activity type</span>
                 <select value={activityType} onChange={(event) => setActivityType(event.target.value)}>
                   <option value="mini-test">Mini test</option>
+                  <option value="flashcards">Grammar flashcards</option>
                   <option value="grammar-set">Aptis grammar set</option>
                   <option value="use-of-english">Use of English set</option>
                   <option value="writing">Writing task</option>

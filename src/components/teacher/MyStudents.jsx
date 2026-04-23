@@ -5,6 +5,7 @@ import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
 import {
   db,
   fetchHubDictationSessions,
+  fetchHubFlashcardSessions,
   fetchHubGrammarSubmissions,
   fetchRecentVocabProgress,
   fetchWritingP1Sessions,
@@ -915,13 +916,14 @@ export default function MyStudents({
 
       const statsEntries = await Promise.all(
         studentRows.map(async (studentRow) => {
-          const [part1, part2, part3, part4, grammar, dictation, vocab, reading] = await Promise.all([
+          const [part1, part2, part3, part4, grammar, dictation, flashcards, vocab, reading] = await Promise.all([
             fetchWritingP1Sessions(3, studentRow.id),
             fetchWritingP2Submissions(3, studentRow.id),
             fetchWritingP3Submissions(3, studentRow.id),
             fetchWritingP4Submissions(3, studentRow.id),
             fetchHubGrammarSubmissions(3, studentRow.id),
             fetchHubDictationSessions(3, studentRow.id),
+            fetchHubFlashcardSessions(3, studentRow.id),
             fetchRecentVocabProgress(3, studentRow.id),
             fetchReadingProgressMap(studentRow.id),
           ]);
@@ -939,6 +941,7 @@ export default function MyStudents({
               recentWriting,
               grammarSubmissions: grammar || [],
               dictationSessions: dictation || [],
+              flashcardSessions: flashcards || [],
               readingProgress: Object.values(reading || {})
                 .sort((a, b) => timestampToMs(b.updatedAt) - timestampToMs(a.updatedAt))
                 .slice(0, 5),
@@ -1246,6 +1249,21 @@ export default function MyStudents({
     );
   }, [hydratedStudents, submissionStats]);
 
+  const flashcardNotifications = useMemo(() => {
+    return hydratedStudents.flatMap((studentRow) =>
+      (submissionStats[studentRow.id]?.flashcardSessions || []).map((entry) => ({
+        id: `flashcards:${studentRow.id}:${entry.id}`,
+        kind: "flashcards",
+        studentId: studentRow.id,
+        studentLabel:
+          studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        createdAt: entry.createdAt,
+        title: entry.assignmentLabel || entry.deckTitle || "Grammar flashcards",
+        submission: entry,
+      }))
+    );
+  }, [hydratedStudents, submissionStats]);
+
   const readingNotifications = useMemo(() => {
     return hydratedStudents.flatMap((studentRow) =>
       (submissionStats[studentRow.id]?.readingProgress || []).map((entry) => ({
@@ -1263,10 +1281,10 @@ export default function MyStudents({
   }, [hydratedStudents, submissionStats]);
 
   const teacherNotifications = useMemo(() => {
-    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...dictationNotifications, ...readingNotifications, ...vocabNotifications, ...courseTestNotifications]
+    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...dictationNotifications, ...flashcardNotifications, ...readingNotifications, ...vocabNotifications, ...courseTestNotifications]
       .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
       .slice(0, TEACHER_NOTIFICATION_LIMIT);
-  }, [courseTestNotifications, dictationNotifications, grammarCompletionNotifications, miniTestNotifications, readingNotifications, vocabNotifications, writingNotifications]);
+  }, [courseTestNotifications, dictationNotifications, flashcardNotifications, grammarCompletionNotifications, miniTestNotifications, readingNotifications, vocabNotifications, writingNotifications]);
 
   const unreadNotificationCount = useMemo(() => {
     return teacherNotifications.filter((entry) => !readSubmissionKeys[entry.id]).length;
@@ -1479,6 +1497,8 @@ async function copySelectedSubmission() {
                               ? `Mini test completed · ${entry.title}`
                             : entry.kind === "dictation"
                               ? `Dictation completed · ${entry.title}`
+                            : entry.kind === "flashcards"
+                              ? `Flashcards completed · ${entry.title}`
                             : entry.kind === "reading"
                               ? `${entry.partLabel} completed`
                             : entry.kind === "vocabulary"
@@ -1696,6 +1716,8 @@ async function copySelectedSubmission() {
                       ? "Dictation"
                       : selectedNotification.kind === "mini-test"
                         ? "Mini test"
+                        : selectedNotification.kind === "flashcards"
+                          ? "Flashcards"
                         : selectedNotification.kind === "vocabulary"
                           ? "Vocabulary"
                           : selectedNotification.kind === "reading"
@@ -1973,6 +1995,21 @@ async function copySelectedSubmission() {
                     <div className="teacher-review-plain">
                       Completed {formatRelative(selectedNotification.createdAt)}.
                       {selectedNotification.taskId ? ` Task: ${selectedNotification.taskId}.` : ""}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {selectedNotification.kind === "flashcards" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">Flashcards completion</span>
+                  <div className="teacher-review-answer">
+                    <strong>{selectedNotification.title}</strong>
+                    <div className="teacher-review-plain">
+                      Completed {formatRelative(selectedNotification.createdAt)}.
+                      {" "}
+                      Cards reviewed: {selectedNotification.submission?.reviewedCards ?? selectedNotification.submission?.total ?? "—"}/
+                      {selectedNotification.submission?.total ?? "—"}.
                     </div>
                   </div>
                 </div>

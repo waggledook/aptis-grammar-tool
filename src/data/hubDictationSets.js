@@ -92,6 +92,44 @@ export const HUB_DICTATION_SETS = [
     ],
   },
   {
+    id: "unreal-forms",
+    label: "Unreal forms",
+    sentences: [
+      { text: "It's high time you started looking for a new apartment.", audio: "/audio/dictation/unreal-forms/01.mp3" },
+      { text: "I wish I hadn't said that to him yesterday.", audio: "/audio/dictation/unreal-forms/02.mp3" },
+      { text: "I'd rather she didn't drive home in this weather.", audio: "/audio/dictation/unreal-forms/03.mp3" },
+      { text: "Do you ever wish you lived in a warmer country?", audio: "/audio/dictation/unreal-forms/04.mp3" },
+      { text: "It's about time we had a serious conversation about this.", audio: "/audio/dictation/unreal-forms/05.mp3" },
+      { text: "I'd rather you hadn't invited him to the wedding.", audio: "/audio/dictation/unreal-forms/06.mp3" },
+      { text: "I wish it would stop snowing; I'm tired of the cold.", audio: "/audio/dictation/unreal-forms/07.mp3" },
+      { text: "Would you sooner we postponed the meeting until next week?", audio: "/audio/dictation/unreal-forms/08.mp3" },
+      { text: "I wish I knew the answer to your question.", audio: "/audio/dictation/unreal-forms/09.mp3" },
+      { text: "It's time they found a way to resolve the conflict.", audio: "/audio/dictation/unreal-forms/10.mp3" },
+      { text: "She'd sooner they hadn't spent all their money on that car.", audio: "/audio/dictation/unreal-forms/11.mp3" },
+      { text: "I wish I had more free time to spend with my family.", audio: "/audio/dictation/unreal-forms/12.mp3" },
+      { text: "I'd rather you didn't mention this to anyone else.", audio: "/audio/dictation/unreal-forms/13.mp3" },
+      { text: "I wish you would listen to me for once!", audio: "/audio/dictation/unreal-forms/14.mp3" },
+      { text: "It's about time you realized that I was right all along.", audio: "/audio/dictation/unreal-forms/15.mp3" },
+      { text: "I'd rather you hadn't borrowed my phone without asking.", audio: "/audio/dictation/unreal-forms/16.mp3" },
+      {
+        text: "She wishes she'd taken the job when she had the chance.",
+        acceptedTexts: [
+          "She wishes she'd taken the job when she had the chance.",
+          "She wishes she had taken the job when she had the chance.",
+        ],
+        audio: "/audio/dictation/unreal-forms/17.mp3",
+      },
+      {
+        text: "I wish we'd stayed at the party a bit longer.",
+        acceptedTexts: [
+          "I wish we'd stayed at the party a bit longer.",
+          "I wish we had stayed at the party a bit longer.",
+        ],
+        audio: "/audio/dictation/unreal-forms/18.mp3",
+      },
+    ],
+  },
+  {
     id: "articles",
     label: "Articles",
     sentences: [

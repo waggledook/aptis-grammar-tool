@@ -150,6 +150,29 @@ const usedToAndGetUsedToCards = [
   { id: "ut21", frontText: "At first, I found it difficult to _______________________ (think) in English.", backText: "At first, I found it difficult to get used to thinking in English.", emphasisTexts: ["get used to thinking"] },
 ];
 
+const unrealPastTensesCards = [
+  { id: "upt1", frontBlocks: [{ label: "Sentence", text: "I wish I __________ (can) speak Mandarin; it would be so useful for my career." }], backText: "I wish I could speak Mandarin; it would be so useful for my career.", emphasisTexts: ["could"] },
+  { id: "upt2", frontBlocks: [{ label: "Sentence", text: "If only we __________ (not / tell) him the truth last night. He's devastated." }], backText: "If only we hadn't told him the truth last night. He's devastated.", emphasisTexts: ["hadn't told"] },
+  { id: "upt3", frontBlocks: [{ label: "Sentence", text: "I'd rather you __________ (not / smoke) in the house, if you don't mind." }], backText: "I'd rather you didn't smoke in the house, if you don't mind.", emphasisTexts: ["didn't smoke"] },
+  { id: "upt4", frontBlocks: [{ label: "Sentence", text: "It's high time the council __________ (repair) these potholes; they're dangerous." }], backText: "It's high time the council repaired these potholes; they're dangerous.", emphasisTexts: ["repaired"] },
+  { id: "upt5", frontBlocks: [{ label: "Sentence", text: "I wish my boss __________ (stop) emailing me after 8:00 PM every night." }], backText: "I wish my boss would stop emailing me after 8:00 PM every night.", emphasisTexts: ["would stop"] },
+  { id: "upt6", frontBlocks: [{ label: "Sentence", text: "I'd rather __________ (stay) in tonight than go to that loud club." }], backText: "I'd rather stay in tonight than go to that loud club.", emphasisTexts: ["stay"] },
+  { id: "upt7", frontBlocks: [{ label: "Sentence", text: "If only she __________ (be) more open to new ideas, we could finish this project." }], backText: "If only she were / was more open to new ideas, we could finish this project.", emphasisTexts: ["were", "was"] },
+  { id: "upt8", frontBlocks: [{ label: "Sentence", text: "It's about time you __________ (find) a place of your own." }], backText: "It's about time you found a place of your own.", emphasisTexts: ["found"] },
+  { id: "upt9", frontBlocks: [{ label: "Sentence", text: "I wish I __________ (know) about the meeting yesterday; I would have attended." }], backText: "I wish I had known about the meeting yesterday; I would have attended.", emphasisTexts: ["had known"] },
+  { id: "upt10", frontBlocks: [{ label: "Sentence", text: "Would you rather I __________ (call) you back when you're less busy?" }], backText: "Would you rather I called you back when you're less busy?", emphasisTexts: ["called"] },
+  { id: "upt11", frontBlocks: [{ label: "Sentence", text: "I wish the sun __________ (come) out; I'm tired of all this rain!" }], backText: "I wish the sun would come out; I'm tired of all this rain!", emphasisTexts: ["would come"] },
+  { id: "upt12", frontBlocks: [{ label: "Sentence", text: "If only we __________ (buy) those shares when they were cheap!" }], backText: "If only we had bought those shares when they were cheap!", emphasisTexts: ["had bought"] },
+  { id: "upt13", frontBlocks: [{ label: "Sentence", text: "I'd rather __________ (not / talk) about what happened at the party." }], backText: "I'd rather not talk about what happened at the party.", emphasisTexts: ["not talk"] },
+  { id: "upt14", frontBlocks: [{ label: "Sentence", text: "It's time we __________ (go) now, or we'll miss the last train." }], backText: "It's time we went now, or we'll miss the last train.", emphasisTexts: ["went"] },
+  { id: "upt15", frontBlocks: [{ label: "Sentence", text: "I wish you __________ (not / be) so stubborn during the negotiation earlier." }], backText: "I wish you hadn't been so stubborn during the negotiation earlier.", emphasisTexts: ["hadn't been"] },
+  { id: "upt16", frontBlocks: [{ label: "Sentence", text: "If only I __________ (have) enough money to travel first class." }], backText: "If only I had enough money to travel first class.", emphasisTexts: ["had"] },
+  { id: "upt17", frontBlocks: [{ label: "Sentence", text: "I'd rather you __________ (pay) me in cash than by cheque." }], backText: "I'd rather you paid me in cash than by cheque.", emphasisTexts: ["paid"] },
+  { id: "upt18", frontBlocks: [{ label: "Sentence", text: "Don't you think it's high time you __________ (start) taking your studies seriously?" }], backText: "Don't you think it's high time you started taking your studies seriously?", emphasisTexts: ["started"] },
+  { id: "upt19", frontBlocks: [{ label: "Sentence", text: "I wish it __________ (not / be) so cold today; I wanted to eat outside." }], backText: "I wish it weren't / wasn't so cold today; I wanted to eat outside.", emphasisTexts: ["weren't", "wasn't"] },
+  { id: "upt20", frontBlocks: [{ label: "Sentence", text: "If only the neighbors __________ (not / play) their music so loudly every weekend!" }], backText: "If only the neighbors wouldn't play their music so loudly every weekend!", emphasisTexts: ["wouldn't play"] },
+];
+
 export const HUB_GRAMMAR_FLASHCARD_DECKS = [
   {
     id: "phrasal-verb-pronoun-placement",
@@ -213,6 +236,15 @@ export const HUB_GRAMMAR_FLASHCARD_DECKS = [
     studyTip: "Before you flip, decide whether the meaning is about a past habit, a normal routine, or adapting to something.",
     tags: ["used to", "usually", "habits"],
     cards: usedToAndGetUsedToCards,
+  },
+  {
+    id: "unreal-past-tenses",
+    category: "grammar",
+    title: "Unreal Past Tenses",
+    description: "Practise wish, if only, would rather, and it's high time through gapped sentence flashcards.",
+    studyTip: "Before flipping, decide whether the context is present regret, past regret, preference, annoyance, or urgency.",
+    tags: ["wish", "if only", "would rather", "unreal past"],
+    cards: unrealPastTensesCards,
   },
 ];
 
