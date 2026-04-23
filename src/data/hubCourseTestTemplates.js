@@ -3579,7 +3579,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
           textInputItem("g2-4", "Their father said they had to wash the car. -> Their father made ________________ the car.", ["them wash"]),
           textInputItem("g2-5", "Does the optician check your eyes regularly? -> Do you have your ________________ regularly?", ["eyes checked"]),
           textInputItem("g2-6", "You don't have to worry about your practical exam. You'll be fine. -> You ________________ worry about your practical exam.", ["needn't", "need not", "don't have to", "do not have to"]),
-          textInputItem("g2-7", "We don't really like spicy food. -> We ________________ on spicy food.", ["aren't very keen", "are not very keen", "'re not keen", "are not keen", "not keen"]),
+          textInputItem("g2-7", "We don't really like spicy food. -> We ________________ on spicy food.", ["aren't very keen", "aren't keen", "are not very keen", "'re not keen", "are not keen", "not keen"]),
           textInputItem("g2-8", "They never crowned Catherine Queen of England. -> Catherine ________________ Queen of England.", ["was never crowned"]),
           textInputItem("g2-9", "The first series was more exciting than this one. -> This series isn't ________________ the first one.", ["as exciting as"]),
           textInputItem("g2-10", "‘Did he pass his driving test?’ I asked. -> I asked if he ________________ his driving test.", ["had passed"]),
