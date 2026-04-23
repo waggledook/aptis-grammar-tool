@@ -27,7 +27,25 @@ import { getSitePath } from "../../siteConfig.js";
  *   - If speechSynthesis or mic permission is unavailable, it gracefully continues.
  */
 
-export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSignIn }) {
+export default function SpeakingPart2({
+  tasks = PART2_TASKS,
+  user,
+  onRequireSignIn,
+  partKey = "part2",
+  activityId = "speaking-part-2",
+  routeBasePath = getSitePath("/speaking/part2"),
+  showAssignButton = true,
+  trackProgress = true,
+  lockAfterIndex = 2,
+  headerActions = null,
+  heading = "Speaking – Part 2 (Describe a Photograph)",
+  intro = (
+    <>
+      Click <strong>Start task</strong>. Each question is read aloud, then a beep plays and your
+      <strong> 45-second</strong> recording begins. Q1 is always <em>“Describe the photograph.”</em>
+    </>
+  ),
+}) {
   const [searchParams] = useSearchParams();
   const items = tasks;
 
@@ -38,13 +56,17 @@ export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSign
   // Completions (✓ shown in picker)
   const [completed, setCompleted] = useState(new Set());
   useEffect(() => {
+    if (!trackProgress) {
+      setCompleted(new Set());
+      return;
+    }
     let alive = true;
     (async () => {
-      const done = await loadSpeakingDone("part2", fb, user);
+      const done = await loadSpeakingDone(partKey, fb, user);
       if (alive) setCompleted(done);
     })();
     return () => { alive = false; };
-  }, [user]);
+  }, [partKey, trackProgress, user]);
 
   useEffect(() => {
     const requestedTaskId = searchParams.get("task");
@@ -52,9 +74,9 @@ export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSign
 
     const nextIndex = items.findIndex((task) => task.id === requestedTaskId);
     if (nextIndex === -1) return;
-    if (!user && nextIndex >= 2) return;
+    if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) return;
     setTaskIndex(nextIndex);
-  }, [searchParams, items, user]);
+  }, [lockAfterIndex, searchParams, items, user]);
 
   // 🔍 Debug: check user + Firebase exports
   useEffect(() => {
@@ -63,7 +85,7 @@ export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSign
   }, [user]);
 
   function handleSelectTask(nextIndex) {
-    if (!user && nextIndex >= 2) {
+    if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) {
       onRequireSignIn?.();     // match Reading behaviour + use the prop
       return;
     }
@@ -73,7 +95,7 @@ export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSign
   const decorated = useMemo(
     () =>
       items.map((t, i) => {
-        const locked = !user && i >= 2; // lock tasks 3+ unless signed in
+        const locked = !user && lockAfterIndex != null && i >= lockAfterIndex; // lock tasks 3+ unless signed in
         const done = completed.has(t.id);
         const title =
           `${i + 1}. ${t.title}` +
@@ -81,7 +103,7 @@ export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSign
           (locked ? " 🔒" : "");
         return { ...t, locked, title };
       }),
-    [items, completed, user]
+    [items, completed, lockAfterIndex, user]
   );
 
   return (
@@ -91,11 +113,8 @@ export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSign
       {/* Header + picker */}
       <header className="header">
         <div>
-          <h2 className="title">Speaking – Part 2 (Describe a Photograph)</h2>
-          <p className="intro">
-            Click <strong>Start task</strong>. Each question is read aloud, then a beep plays and your
-            <strong> 45-second</strong> recording begins. Q1 is always <em>“Describe the photograph.”</em>
-          </p>
+          <h2 className="title">{heading}</h2>
+          <p className="intro">{intro}</p>
         </div>
         <div className="picker">
           <ChipDropdown
@@ -104,28 +123,32 @@ export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSign
             onChange={handleSelectTask}
             label="Task"
           />
-          <SpeakingAssignButton
-            user={user}
-            activityId="speaking-part-2"
-            activityLabel={`Aptis Speaking Part 2 — ${current.title}`}
-            routePath={getSitePath(`/speaking/part2?task=${encodeURIComponent(current.id)}`)}
-            taskId={current.id}
-            taskTitle={current.title}
-          />
+          {showAssignButton ? (
+            <SpeakingAssignButton
+              user={user}
+              activityId={activityId}
+              activityLabel={`Aptis Speaking Part 2 — ${current.title}`}
+              routePath={`${routeBasePath}?task=${encodeURIComponent(current.id)}`}
+              taskId={current.id}
+              taskTitle={current.title}
+            />
+          ) : null}
+          {headerActions}
         </div>
       </header>
 
       <SpeakingAutoFlow
         task={current}
         onFinished={async () => {
+          if (!trackProgress) return;
           try {
             console.log("[p2] finish → markSpeakingDone", {
-              part: "part2",
+              part: partKey,
               id: current.id,
               hasUser: !!user,
             });
 
-            const updated = await markSpeakingDone("part2", [current.id], fb, user);
+            const updated = await markSpeakingDone(partKey, [current.id], fb, user);
 
             console.log("[p2] result", {
               updated: updated ? [...updated] : null,
@@ -137,7 +160,7 @@ export default function SpeakingPart2({ tasks = PART2_TASKS, user, onRequireSign
             // Log activity: Part 2 speaking task (3 questions)
             if (user && fb.logSpeakingTaskCompleted) {
               await fb.logSpeakingTaskCompleted({
-                part: "part2",
+                part: partKey,
                 taskId: current.id,
                 questionCount: 3,
               });

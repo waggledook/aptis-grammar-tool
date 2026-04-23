@@ -33,6 +33,7 @@ export default function SpeakingPart3({
   showAssignButton = true,
   trackProgress = true,
   lockAfterIndex = 2,
+  headerActions = null,
   heading = "Speaking – Part 3 (Describe & Compare)",
   intro = (
     <>
@@ -119,6 +120,7 @@ export default function SpeakingPart3({
               taskTitle={current.title}
             />
           ) : null}
+          {headerActions}
         </div>
       </header>
 

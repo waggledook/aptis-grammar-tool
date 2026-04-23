@@ -44,6 +44,7 @@ import ReadingMenu from './components/ReadingMenu';
 import SpeakingMenu from './components/speaking/SpeakingMenu';
 import SpeakingPart1 from "./components/speaking/SpeakingPart1";
 import SpeakingPart2 from './components/speaking/SpeakingPart2';
+import SpeakingPart2Secret from './components/speaking/SpeakingPart2Secret';
 import SpeakingPart3 from './components/speaking/SpeakingPart3';
 import SpeakingPart3Custom from './components/speaking/SpeakingPart3Custom';
 import SpeakingPart4 from "./components/speaking/SpeakingPart4";
@@ -76,6 +77,7 @@ import TeacherCourseTestPrintableReport from "./components/teacher/TeacherCourse
 import TeacherStudentProfile from "./components/TeacherStudentProfile";
 import CookieBanner from "./components/CookieBanner.jsx";
 import PrivacyPolicy from "./components/legal/PrivacyPolicy.jsx";
+import TeacherExtrasButton from "./components/common/TeacherExtrasButton.jsx";
 import LiveGameJoin from "./components/live/LiveGameJoin";
 import LiveGameHost from "./components/live/LiveGameHost";
 import LiveGamePlayer from "./components/live/LiveGamePlayer";
@@ -91,6 +93,8 @@ import PackKeyLanding from "./components/coursepack/PackKeyLanding";
 import CoreGrammarKey from "./components/coursepack/CoreGrammarKey";
 
 const TEACHER_NOTIFICATION_LIMIT = 100;
+const TEACHER_BADGE_REFRESH_MS = 10 * 60 * 1000;
+
 import CoreVocabularyKey from "./components/coursepack/CoreVocabularyKey";
 import ReadingPart1Key from "./components/coursepack/ReadingPart1Key";
 import ReadingPart2Key from "./components/coursepack/ReadingPart2Key";
@@ -149,12 +153,34 @@ function BellIcon() {
   );
 }
 
+function RequireSignedIn({ user, onSignIn, children }) {
+  if (user) return <>{children}</>;
+
+  return (
+    <div className="game-wrapper">
+      <div className="panel" style={{ marginTop: "1rem" }}>
+        <h2 className="title">Registered users only</h2>
+        <p className="intro">
+          Please sign in or create an account to use this extra speaking activity.
+        </p>
+        <button className="topbar-btn" type="button" onClick={onSignIn}>
+          Sign in / Sign up
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function timestampToMs(value) {
   if (!value) return 0;
   if (typeof value.toMillis === "function") return value.toMillis();
   if (value.seconds) return value.seconds * 1000;
   const parsed = new Date(value).getTime();
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function isPageVisible() {
+  return typeof document === "undefined" || document.visibilityState === "visible";
 }
 
 function buildLatestMap(items, keyName) {
@@ -228,18 +254,28 @@ const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
 useEffect(() => {
   const params = new URLSearchParams(location.search);
   const open = params.get("open");
-  if (open !== "speaking-part-3-custom") return;
-  if (location.pathname === "/speaking/part3-custom") return;
+  const openRoutes = {
+    "speaking-part-2-secret": "/speaking/part2-secret",
+    "speaking-part-3-custom": "/speaking/part3-custom",
+  };
+  const targetPath = openRoutes[open];
+  if (!targetPath) return;
+  if (location.pathname === targetPath) return;
 
-  navigate("/speaking/part3-custom", { replace: true });
+  navigate(targetPath, { replace: true });
 }, [location.pathname, location.search, navigate]);
 
 useEffect(() => {
   const hash = window.location.hash || "";
-  if (hash !== "#/speaking/part3-custom") return;
-  if (location.pathname === "/speaking/part3-custom") return;
+  const hashRoutes = {
+    "#/speaking/part2-secret": "/speaking/part2-secret",
+    "#/speaking/part3-custom": "/speaking/part3-custom",
+  };
+  const targetPath = hashRoutes[hash];
+  if (!targetPath) return;
+  if (location.pathname === targetPath) return;
 
-  navigate("/speaking/part3-custom", { replace: true });
+  navigate(targetPath, { replace: true });
 }, [location.pathname, navigate]);
 
 function updateTeacherReadSubmissionKeys(nextReadMap) {
@@ -303,12 +339,16 @@ useEffect(() => {
 
 useEffect(() => {
   let alive = true;
+  let loading = false;
 
   async function loadTeacherUnreadCount() {
     if (!user || (user.role !== "teacher" && user.role !== "admin")) {
       if (alive) setTeacherUnreadCount(0);
       return;
     }
+
+    if (loading) return;
+    loading = true;
 
     try {
       const studentSnap = await getDocs(query(collection(db, "users"), where("teacherId", "==", user.uid)));
@@ -326,16 +366,17 @@ useEffect(() => {
       const notificationIds = (
         await Promise.all(
           studentIds.map(async (studentId) => {
-            const [part1, part2, part3, part4, miniTests, dictationSessions, vocabSets, readingProgress] = await Promise.all([
-              fetchWritingP1Sessions(3, studentId),
-              fetchWritingP2Submissions(3, studentId),
-              fetchWritingP3Submissions(3, studentId),
-              fetchWritingP4Submissions(3, studentId),
-              fetchHubGrammarSubmissions(3, studentId),
-              fetchHubDictationSessions(3, studentId),
-              fetchRecentVocabProgress(3, studentId),
-              fetchReadingProgressMap(studentId),
-            ]);
+            const [part1, part2, part3, part4, miniTests, dictationSessions, vocabSets, readingProgress] =
+              await Promise.all([
+                fetchWritingP1Sessions(3, studentId),
+                fetchWritingP2Submissions(3, studentId),
+                fetchWritingP3Submissions(3, studentId),
+                fetchWritingP4Submissions(3, studentId),
+                fetchHubGrammarSubmissions(3, studentId),
+                fetchHubDictationSessions(3, studentId),
+                fetchRecentVocabProgress(3, studentId),
+                fetchReadingProgressMap(studentId),
+              ]);
 
             return [
               ...part1.map((entry) => ({ id: `${studentId}:P1:${entry.id}`, createdAt: entry.createdAt })),
@@ -355,8 +396,7 @@ useEffect(() => {
             ];
           })
         )
-      )
-        .flat();
+      ).flat();
 
       const grammarNotifications = grammarSnap.docs
         .map((entry) => {
@@ -385,11 +425,14 @@ useEffect(() => {
         .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
         .slice(0, TEACHER_NOTIFICATION_LIMIT);
 
-      if (!alive) return;
-      setTeacherUnreadCount(latestNotifications.filter((entry) => !readSubmissionKeys[entry.id]).length);
+      if (alive) {
+        setTeacherUnreadCount(latestNotifications.filter((entry) => !readSubmissionKeys[entry.id]).length);
+      }
     } catch (error) {
-      console.error("[App] Could not load teacher unread count", error);
+      console.error("[App] Could not refresh teacher unread count", error);
       if (alive) setTeacherUnreadCount(0);
+    } finally {
+      loading = false;
     }
   }
 
@@ -401,15 +444,16 @@ useEffect(() => {
 
   window.addEventListener("focus", handleFocus);
   const intervalId = window.setInterval(() => {
+    if (!isPageVisible()) return;
     loadTeacherUnreadCount();
-  }, 20000);
+  }, TEACHER_BADGE_REFRESH_MS);
 
   return () => {
     alive = false;
     window.removeEventListener("focus", handleFocus);
     window.clearInterval(intervalId);
   };
-}, [location.pathname, teacherReadSubmissionKeys, user]);
+}, [teacherReadSubmissionKeys, user]);
 
 useEffect(() => {
   let alive = true;
@@ -541,8 +585,9 @@ useEffect(() => {
 
   window.addEventListener("focus", handleFocus);
   const intervalId = window.setInterval(() => {
+    if (!isPageVisible()) return;
     loadStudentAssignmentCount();
-  }, 20000);
+  }, 5 * 60 * 1000);
 
   return () => {
     alive = false;
@@ -1046,8 +1091,33 @@ return (
         user={user}
         onBack={() => navigate("/speaking")}
         onRequireSignIn={() => navigate("/")} // or setShowAuth(true) if you prefer
+        headerActions={
+          <TeacherExtrasButton
+            user={user}
+            to="/speaking/part2-secret"
+            label="Extra Part 2 tasks"
+          />
+        }
       />
     </>
+  }
+/>
+
+<Route
+  path="/speaking/part2-secret"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <>
+        <button
+          onClick={() => navigate("/speaking")}
+          className="review-btn"
+          style={{ marginBottom: "1rem" }}
+        >
+          ← Back
+        </button>
+        <SpeakingPart2Secret user={user} />
+      </>
+    </RequireSignedIn>
   }
 />
 
@@ -1062,7 +1132,16 @@ return (
       >
         ← Back
       </button>
-      <SpeakingPart3 user={user} />
+      <SpeakingPart3
+        user={user}
+        headerActions={
+          <TeacherExtrasButton
+            user={user}
+            to="/speaking/part3-custom"
+            label="Extra Part 3 tasks"
+          />
+        }
+      />
     </>
   }
 />
@@ -1070,16 +1149,18 @@ return (
 <Route
   path="/speaking/part3-custom"
   element={
-    <>
-      <button
-        onClick={() => navigate("/speaking")}
-        className="review-btn"
-        style={{ marginBottom: "1rem" }}
-      >
-        ← Back
-      </button>
-      <SpeakingPart3Custom user={user} />
-    </>
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <>
+        <button
+          onClick={() => navigate("/speaking")}
+          className="review-btn"
+          style={{ marginBottom: "1rem" }}
+        >
+          ← Back
+        </button>
+        <SpeakingPart3Custom user={user} />
+      </>
+    </RequireSignedIn>
   }
 />
 
@@ -1808,12 +1889,26 @@ return (
             onBack={() => setView('speakingMenu')}
             user={user}
             onRequireSignIn={() => setView('menu')}
+            headerActions={
+              <TeacherExtrasButton
+                user={user}
+                to="/speaking/part2-secret"
+                label="Extra Part 2 tasks"
+              />
+            }
           />
         )}
 
         {view === 'speakingPart3' && (
           <SpeakingPart3
             user={user}
+            headerActions={
+              <TeacherExtrasButton
+                user={user}
+                to="/speaking/part3-custom"
+                label="Extra Part 3 tasks"
+              />
+            }
           />
         )}
 
