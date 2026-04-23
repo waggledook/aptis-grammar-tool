@@ -258,9 +258,9 @@ useEffect(() => {
     "speaking-part-2-secret": "/speaking/part2-secret",
     "speaking-part-3-custom": "/speaking/part3-custom",
   };
-  const targetPath = openRoutes[open];
+  const targetPath = openRoutes[open] ? getSitePath(openRoutes[open]) : "";
   if (!targetPath) return;
-  if (location.pathname === targetPath) return;
+  if (location.pathname === openRoutes[open]) return;
 
   navigate(targetPath, { replace: true });
 }, [location.pathname, location.search, navigate]);

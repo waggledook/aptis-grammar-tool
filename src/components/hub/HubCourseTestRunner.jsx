@@ -2153,7 +2153,7 @@ export default function HubCourseTestRunner({ user }) {
 
   if (!user) {
     return (
-      <div className="menu-wrapper hub-course-test-wrapper">
+      <div className="menu-wrapper hub-course-test-wrapper notranslate" translate="no">
         <div className="hub-course-test-shell">
           <button className="review-btn" onClick={() => navigate(getSitePath(backPath))}>
             {teacherPreview ? "← Back to teacher tools" : "← Back to your class"}
@@ -2170,7 +2170,7 @@ export default function HubCourseTestRunner({ user }) {
 
   if (loading) {
     return (
-      <div className="menu-wrapper hub-course-test-wrapper">
+      <div className="menu-wrapper hub-course-test-wrapper notranslate" translate="no">
         <div className="hub-course-test-shell">
           <button className="review-btn" onClick={() => navigate(getSitePath(backPath))}>
             {teacherPreview ? "← Back to teacher tools" : "← Back to your class"}
@@ -2186,7 +2186,7 @@ export default function HubCourseTestRunner({ user }) {
 
   if (!session || !template) {
     return (
-      <div className="menu-wrapper hub-course-test-wrapper">
+      <div className="menu-wrapper hub-course-test-wrapper notranslate" translate="no">
         <div className="hub-course-test-shell">
           <button className="review-btn" onClick={() => navigate(getSitePath(backPath))}>
             {teacherPreview ? "← Back to teacher tools" : "← Back to your class"}
@@ -2204,7 +2204,7 @@ export default function HubCourseTestRunner({ user }) {
   }
 
   return (
-    <div className="menu-wrapper hub-course-test-wrapper">
+    <div className="menu-wrapper hub-course-test-wrapper notranslate" translate="no">
       <div className="hub-course-test-shell">
         <div className="hub-course-test-topbar">
           <button className="review-btn" onClick={() => navigate(getSitePath(backPath))}>

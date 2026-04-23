@@ -1,6 +1,7 @@
 // src/components/common/TeacherExtrasButton.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { getSitePath } from "../../siteConfig.js";
 import teacherIcon from "/images/ui/teacher-hat.png"; 
 // ^ adjust path to match where you place the PNG
 
@@ -9,17 +10,17 @@ export default function TeacherExtrasButton({
   to,
   label = "Teacher activities"
 }) {
+  const navigate = useNavigate();
+
   if (!user || (user.role !== "teacher" && user.role !== "admin")) {
     return null; // students never see it
   }
-
-  const navigate = useNavigate();
 
   return (
     <button
       type="button"
       className="btn teacher-extras-btn"
-      onClick={() => navigate(to)}
+      onClick={() => navigate(getSitePath(to))}
     >
       <img
         src={teacherIcon}
