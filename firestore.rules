@@ -371,9 +371,23 @@ service cloud.firestore {
     // ── 11) Public Aptis Writing General submissions ───────────────────
     match /submissions/{submissionId} {
       allow create: if request.resource.data.keys().hasOnly([
-        "answers",
-        "createdAt"
-      ]);
+          "answers",
+          "createdAt"
+        ])
+        || (
+          isSignedIn()
+          && request.resource.data.keys().hasOnly([
+            "answers",
+            "createdAt",
+            "mockId",
+            "userId",
+            "userEmail",
+            "displayName",
+            "username"
+          ])
+          && request.resource.data.userId == request.auth.uid
+          && request.resource.data.userEmail == request.auth.token.email
+        );
       allow get: if true;
       allow list: if isAdmin();
       allow update, delete: if false;

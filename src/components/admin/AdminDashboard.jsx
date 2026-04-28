@@ -112,6 +112,15 @@ function getWritingGeneralSummary(entry) {
   };
 }
 
+function getWritingGeneralStudentLabel(entry) {
+  if (!entry) return "Anonymous submission";
+
+  if (entry.username) return `@${entry.username}`;
+  if (entry.displayName) return entry.displayName;
+  if (entry.userEmail) return entry.userEmail;
+  return "Anonymous submission";
+}
+
 function normalizeReviewAnswer(value = "") {
   return String(value || "")
     .toLowerCase()
@@ -1697,6 +1706,9 @@ function renderHubAccessControl(u, compact = false) {
                           <div style={{ color: "#f8fafc", fontWeight: 700 }}>
                             Submission {submission.id}
                           </div>
+                          <div style={{ marginTop: "0.2rem", color: "#cbd5e1", fontSize: "0.88rem" }}>
+                            {getWritingGeneralStudentLabel(submission)}
+                          </div>
                           <div style={{ marginTop: "0.25rem", color: "#94a3b8", fontSize: "0.82rem" }}>
                             {formatDateTime(submission.createdAt)}
                           </div>
@@ -2033,6 +2045,9 @@ function renderHubAccessControl(u, compact = false) {
                       </h3>
                       <p style={{ margin: "0.3rem 0 0", color: "#b7c6e6" }}>
                         {selectedWritingGeneralSubmission.id} · {formatDateTime(selectedWritingGeneralSubmission.createdAt)}
+                      </p>
+                      <p style={{ margin: "0.25rem 0 0", color: "#dbeafe" }}>
+                        {getWritingGeneralStudentLabel(selectedWritingGeneralSubmission)}
                       </p>
                     </div>
                     <button

@@ -150,14 +150,14 @@ export default function AdminActivityCharts({ user }) {
     const m = new Map(); // userId -> { userId, email, events, days:Set }
     rawLogs.forEach((l) => {
       const uid = l.userId || "unknown";
-      const email = l.userEmail || uid;
+      const email = l.userLabel || l.userEmail || uid;
 
       if (!m.has(uid))
         m.set(uid, { userId: uid, email, events: 0, days: new Set() });
       const entry = m.get(uid);
       entry.events += 1;
       entry.days.add(isoDate(l.createdAt));
-      if (entry.email === uid && l.userEmail) entry.email = l.userEmail;
+      if (entry.email === uid && (l.userLabel || l.userEmail)) entry.email = l.userLabel || l.userEmail;
     });
 
     return Array.from(m.values())
@@ -304,6 +304,7 @@ export default function AdminActivityCharts({ user }) {
               id: doc.id,
               userId: data.userId || "",
               userEmail: data.userEmail || "",
+              userLabel: data.userLabel || data.userEmail || "",
               type: data.type || "",
               details: data.details || {},
               createdAt: dt,

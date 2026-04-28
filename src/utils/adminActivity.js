@@ -99,6 +99,13 @@ function getNonEmptyCount(items) {
   return items.filter((item) => stripHtmlToText(item).trim()).length;
 }
 
+function getWritingGeneralUserLabel(data = {}) {
+  if (data.username) return `@${data.username}`;
+  if (data.displayName) return data.displayName;
+  if (data.userEmail) return data.userEmail;
+  return WRITING_GENERAL_GUEST_LABEL;
+}
+
 export function buildWritingGeneralSubmissionActivity(docSnap) {
   const data = docSnap.data() || {};
   const createdAt = getDate(data.createdAt);
@@ -127,14 +134,17 @@ export function buildWritingGeneralSubmissionActivity(docSnap) {
     part2Words +
     part3WordCounts.reduce((sum, count) => sum + count, 0) +
     part4WordCounts.reduce((sum, count) => sum + count, 0);
+  const userLabel = getWritingGeneralUserLabel(data);
 
   return {
     id: `submission:${docSnap.id}`,
-    userId: WRITING_GENERAL_GUEST_USER_ID,
-    userEmail: WRITING_GENERAL_GUEST_LABEL,
+    userId: data.userId || WRITING_GENERAL_GUEST_USER_ID,
+    userEmail: data.userEmail || userLabel,
+    userLabel,
     type: WRITING_GENERAL_SUBMISSION_TYPE,
     details: {
       submissionId: docSnap.id,
+      mockId: data.mockId || answers.__mockId || "",
       attemptedParts,
       totalWords,
       part1Answered,
@@ -382,7 +392,7 @@ export function formatActivityDetails(log) {
       const part3Total = Array.isArray(d.part3WordCounts) ? d.part3WordCounts.reduce((sum, count) => sum + count, 0) : 0;
       const part4Total = Array.isArray(d.part4WordCounts) ? d.part4WordCounts.reduce((sum, count) => sum + count, 0) : 0;
       return joinParts([
-        "Guest mock test",
+        d.mockId ? `Mock ${d.mockId}` : "Mock test",
         `Parts ${d.attemptedParts ?? "?"}/4`,
         `${d.totalWords ?? "?"} words`,
         `P1 ${d.part1Answered ?? 0}/5`,

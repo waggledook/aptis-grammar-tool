@@ -14,7 +14,7 @@ import {
 } from "../../utils/adminActivity";
 
 const PAGE_SIZE = 200;
-const CACHE_KEY = "admin-activity-log-cache-v1";
+const CACHE_KEY = "admin-activity-log-cache-v2";
 const CACHE_TTL_MS = 2 * 60 * 1000;
 
 function serializeLog(log) {
@@ -459,9 +459,14 @@ export default function AdminActivityLog({ user }) {
 
   const filteredLogs = logs.filter((log) => {
     if (filterType !== "all" && log.type !== filterType) return false;
+    const userSearchText = [
+      log.userLabel,
+      log.userEmail,
+      log.userId,
+    ].filter(Boolean).join(" ").toLowerCase();
     if (
       filterEmail &&
-      !(log.userEmail || "").toLowerCase().includes(filterEmail.toLowerCase())
+      !userSearchText.includes(filterEmail.toLowerCase())
     ) {
       return false;
     }
@@ -541,7 +546,7 @@ export default function AdminActivityLog({ user }) {
             type="text"
             value={filterEmail}
             onChange={(e) => setFilterEmail(e.target.value)}
-            placeholder="filter by email"
+            placeholder="filter by user"
             style={{
               fontSize: "0.8rem",
               padding: "0.2rem 0.4rem",
@@ -612,11 +617,11 @@ export default function AdminActivityLog({ user }) {
                           fontSize: "0.85rem",
                         }}
                       >
-                        {log.userEmail || log.userId}
+                        {log.userLabel || log.userEmail || log.userId}
                       </button>
                     ) : (
                       <span style={{ fontSize: "0.85rem" }}>
-                        {log.userEmail || "Guest"}
+                        {log.userLabel || log.userEmail || "Guest"}
                       </span>
                     )}
                   </td>
