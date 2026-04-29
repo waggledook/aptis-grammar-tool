@@ -48,6 +48,7 @@ import SpeakingPart2Secret from './components/speaking/SpeakingPart2Secret';
 import SpeakingPart3 from './components/speaking/SpeakingPart3';
 import SpeakingPart3Custom from './components/speaking/SpeakingPart3Custom';
 import SpeakingPart4 from "./components/speaking/SpeakingPart4";
+import SpeakingPart4Extra from "./components/speaking/SpeakingPart4Extra";
 import SpeakingPart2and3_PhotoGuide from "./components/speaking/SpeakingPart2and3_PhotoGuide.jsx";
 import AptisPart1 from "./reading/AptisPart1";
 import AptisPart2Reorder from './reading/AptisPart2Reorder';
@@ -268,6 +269,7 @@ useEffect(() => {
   const openRoutes = {
     "speaking-part-2-secret": "/speaking/part2-secret",
     "speaking-part-3-custom": "/speaking/part3-custom",
+    "speaking-part-4-extra": "/speaking/part4-extra",
   };
   const targetPath = openRoutes[open] ? getSitePath(openRoutes[open]) : "";
   if (!targetPath) return;
@@ -281,6 +283,7 @@ useEffect(() => {
   const hashRoutes = {
     "#/speaking/part2-secret": "/speaking/part2-secret",
     "#/speaking/part3-custom": "/speaking/part3-custom",
+    "#/speaking/part4-extra": "/speaking/part4-extra",
   };
   const targetPath = hashRoutes[hash];
   if (!targetPath) return;
@@ -1200,8 +1203,35 @@ return (
       >
         ← Back
       </button>
-      <SpeakingPart4 user={user} />
+      <SpeakingPart4
+        user={user}
+        headerActions={
+          <TeacherExtrasButton
+            user={user}
+            to="/speaking/part4-extra"
+            label="Extra Part 4 tasks"
+          />
+        }
+      />
     </>
+  }
+/>
+
+<Route
+  path="/speaking/part4-extra"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <>
+        <button
+          onClick={() => navigate("/speaking")}
+          className="review-btn"
+          style={{ marginBottom: "1rem" }}
+        >
+          ← Back
+        </button>
+        <SpeakingPart4Extra user={user} />
+      </>
+    </RequireSignedIn>
   }
 />
 
@@ -1940,6 +1970,13 @@ return (
         {view === 'speakingPart4' && (
           <SpeakingPart4
             user={user}
+            headerActions={
+              <TeacherExtrasButton
+                user={user}
+                to="/speaking/part4-extra"
+                label="Extra Part 4 tasks"
+              />
+            }
           />
         )}
 

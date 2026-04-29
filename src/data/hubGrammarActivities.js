@@ -102,6 +102,25 @@ const placeholderGapItem = (
   );
 };
 
+const audioResponseItem = (
+  id,
+  prompt,
+  audioSrc,
+  answer,
+  explanation,
+  alternatives = [],
+  extra = {}
+) => ({
+  id,
+  type: "audio-response",
+  prompt,
+  audioSrc,
+  acceptedAnswers: [answer, ...alternatives],
+  answer,
+  explanation,
+  ...extra,
+});
+
 const wordOrderItem = (
   id,
   prompt,
@@ -12814,6 +12833,1109 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "into",
         ["in"],
         "Use 'into' or 'in' to describe arriving inside his sleeping spot."
+      ),
+    ],
+  },
+  {
+    id: "phrasal-verb-precision-10b",
+    title: "Phrasal Verbs: Word Order Mastery",
+    shortDescription: "A curated 15-item test on separable and inseparable phrasal verbs.",
+    levels: ["a2", "b1"],
+    intro:
+      "Practice where to put the object. Remember: pronouns like 'it' or 'them' must go between the verb and the particle for separable verbs.",
+    items: [
+      multipleChoiceItem(
+        "pvp-mc-1",
+        "Which response to 'Put on your coat' is correct?",
+        "Okay, I'll ____.",
+        ["put on it", "put it on", "it put on"],
+        1,
+        "When the object is a pronoun (it), it must go between the verb and the particle for separable verbs."
+      ),
+      multipleChoiceItem(
+        "pvp-mc-2",
+        "I can't find my keys. I'm ____.",
+        "____.",
+        ["looking them for", "looking for them", "looking for it"],
+        1,
+        "The phrasal verb 'look for' is inseparable; the object (them) always follows the particle."
+      ),
+      multipleChoiceItem(
+        "pvp-mc-3",
+        "Which is NOT possible with a noun object?",
+        "Can you ____?",
+        ["turn off the TV", "turn the TV off", "turn off it"],
+        2,
+        "A noun can go before or after the particle, but a pronoun (it) cannot go after the particle here."
+      ),
+      multipleChoiceItem(
+        "pvp-mc-4",
+        "Which verb does NOT take an object?",
+        "I usually ____ at 7:30 AM.",
+        ["get up", "get up it", "get it up"],
+        0,
+        "Some phrasal verbs like 'get up' or 'go out' don't have an object at all."
+      ),
+      errorCorrectionItem(
+        "pvp-ec-1",
+        "Check the pronoun position.",
+        "Your shoes are dirty. Take off them!",
+        "Take off them",
+        false,
+        "Take them off",
+        "Pronouns (them) must go between the verb and the particle in separable verbs."
+      ),
+      errorCorrectionItem(
+        "pvp-ec-2",
+        "Check the word order.",
+        "I'm looking for my glasses.",
+        "looking for my glasses",
+        true,
+        "",
+        "Correct! 'Look for' is inseparable, so the object follows the particle."
+      ),
+      errorCorrectionItem(
+        "pvp-ec-3",
+        "Check the word order.",
+        "Please turn the music down.",
+        "turn the music down",
+        true,
+        "",
+        "Correct! With a noun (the music), you can put the particle before or after the object."
+      ),
+      errorCorrectionItem(
+        "pvp-ec-4",
+        "Check the phrasal verb type.",
+        "I don't usually go out it during the week.",
+        "go out it",
+        false,
+        "go out",
+        "'Go out' does not take an object. You cannot 'go out' a thing."
+      ),
+      errorCorrectionItem(
+        "pvp-ec-5",
+        "Check the pronoun position.",
+        "I found your pen. I'll give back it tomorrow.",
+        "give back it",
+        false,
+        "give it back",
+        "For separable verbs like 'give back', the pronoun 'it' must go in the middle."
+      ),
+      wordOrderItem(
+        "pvp-wo-1",
+        "Context: It's dark in here.",
+        ["can", "on", "turn", "you", "it", "?"],
+        "Can you turn it on?",
+        "With separable verbs, the pronoun 'it' must go in the middle."
+      ),
+      wordOrderItem(
+        "pvp-wo-2",
+        "Context: The TV is too loud.",
+        ["off", "TV", "the", "turn", "please", "."],
+        "Please turn the TV off.",
+        "With a noun, the particle 'off' can go before or after the object.",
+        ["Please turn off the TV."]
+      ),
+      wordOrderItem(
+        "pvp-wo-3",
+        "Context: I'm looking for my sister.",
+        ["looking", "I", "for", "her", "am", "."],
+        "I am looking for her.",
+        "The verb 'look for' is inseparable; the object (her) follows the particle."
+      ),
+      wordOrderItem(
+        "pvp-wo-4",
+        "Context: If you find the address...",
+        ["it", "write", "down", "."],
+        "Write it down.",
+        "When using a pronoun with 'write down', it must go in the middle."
+      ),
+      wordOrderItem(
+        "pvp-wo-5",
+        "Context: Here is your coat.",
+        ["on", "should", "put", "you", "it", "."],
+        "You should put it on.",
+        "The pronoun 'it' must separate the verb 'put' and the particle 'on'."
+      ),
+      wordOrderItem(
+        "pvp-wo-6",
+        "Context: I finished with your book.",
+        ["back", "I'll", "it", "give", "tomorrow", "."],
+        "I'll give it back tomorrow.",
+        "The pronoun 'it' sits in the middle for the separable verb 'give back'."
+      ),
+    ],
+  },
+  {
+    id: "passive-voice-precision-10c",
+    title: "The Passive: Focus and Form",
+    shortDescription: "Master present and past passive structures without unjumbling.",
+    levels: ["a2", "b1"],
+    intro:
+      "Focus on the object of the action. Remember: use 'be' + the past participle of the main verb.",
+    items: [
+      multipleChoiceItem(
+        "passive-mc-1",
+        "Complete the general fact about toys.",
+        "20 billion pieces of Lego ____ every year.",
+        ["produce", "are produced", "are produce"],
+        1,
+        "Use 'are' + the past participle for plural objects in the present passive."
+      ),
+      multipleChoiceItem(
+        "passive-mc-2",
+        "Choose the correct negative form.",
+        "CDs ____ very much nowadays because of streaming.",
+        ["aren't used", "don't used", "isn't used"],
+        0,
+        "Use 'aren't' + past participle for negative plural present passive sentences."
+      ),
+      placeholderGapItem(
+        "passive-gf-3",
+        "Complete the question.",
+        "__________ Spanish __________ in New Mexico? (speak)",
+        "Is spoken",
+        ["is spoken"],
+        "In questions, the verb 'be' (Is) comes before the subject."
+      ),
+      multipleChoiceItem(
+        "passive-mc-4",
+        "Identify the manufacturing location.",
+        "Volvo cars ____ in Sweden.",
+        ["made", "is made", "are made"],
+        2,
+        "Plural subjects (cars) require 'are' in the present passive."
+      ),
+      multipleChoiceItem(
+        "passive-mc-5",
+        "Complete the historical fact.",
+        "The first hot-air balloon ____ by two Frenchmen.",
+        ["invented", "was invented", "were invented"],
+        1,
+        "Use 'was' for singular past passive subjects like 'the balloon'."
+      ),
+      placeholderGapItem(
+        "passive-gf-6",
+        "Complete the negative past fact.",
+        "Stamps __________ (not / invent) until 1840.",
+        "weren't invented",
+        ["were not invented"],
+        "Use 'weren't' for plural negative past passive sentences."
+      ),
+      multipleChoiceItem(
+        "passive-mc-7",
+        "Choose the correct question word order.",
+        "When ____ the watch ____?",
+        ["the watch was invented", "was the watch invented", "did the watch invent"],
+        1,
+        "The auxiliary 'was' must come before the subject in a passive question."
+      ),
+      multipleChoiceItem(
+        "passive-mc-8",
+        "Identify the author (the agent).",
+        "The Lord of the Rings was written ____ Tolkien.",
+        ["by", "from", "for"],
+        0,
+        "Use 'by' to identify the person who did the action in a passive sentence."
+      ),
+      errorCorrectionItem(
+        "passive-ec-9",
+        "Is the focus on the car or the thief?",
+        "My car was stolen last week.",
+        "was stolen",
+        true,
+        "",
+        "Correct! We use the passive when we don't know who did the action or it isn't important."
+      ),
+      errorCorrectionItem(
+        "passive-ec-10",
+        "Check the past participle spelling.",
+        "Dynamite was invent by Alfred Nobel.",
+        "was invent",
+        false,
+        "was invented",
+        "The passive always requires the past participle (invented), not the base form."
+      ),
+      errorCorrectionItem(
+        "passive-ec-11",
+        "Check the verb 'be'.",
+        "A lot of tea grown in India.",
+        "grown",
+        false,
+        "is grown",
+        "Don't forget the verb 'be' (am/is/are) in present passive sentences."
+      ),
+      singleGap(
+        "passive-rf-12",
+        "Rewrite to focus more on the invention: 'Alfred Nobel invented dynamite.'",
+        ["Dynamite ", { gapId: "g1" }, " Alfred Nobel."],
+        ["was invented by"],
+        "To change focus to the invention, use the past passive with 'by'."
+      ),
+      singleGap(
+        "passive-rf-13",
+        "Rewrite to focus on the book: 'Tolkien wrote The Lord of the Rings.'",
+        ["The Lord of the Rings ", { gapId: "g1" }, " Tolkien."],
+        ["was written by"],
+        "The title is treated as a singular subject, so use 'was written'."
+      ),
+      singleGap(
+        "passive-rf-14",
+        "Rewrite as a question: 'Do people speak Spanish in New Mexico?'",
+        ["", { gapId: "g1" }, " in New Mexico?"],
+        ["Is Spanish spoken", "is spanish spoken"],
+        "The passive question focuses on the language rather than 'people'."
+      ),
+      singleGap(
+        "passive-rf-15",
+        "Rewrite to focus on the objects: 'They make Volvo cars in Sweden.'",
+        ["Volvo cars ", { gapId: "g1" }, " Sweden."],
+        ["are made in"],
+        "For plural objects in the present, use 'are' + the past participle."
+      ),
+    ],
+  },
+  {
+    id: "past-habits-used-to-11a",
+    title: "Habits: used to and usually",
+    shortDescription: "Contrast past habits with present routines using 'used to' and 'usually'.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use 'used to' for past habits that are not true now. For present habits, use 'usually' + the present simple.",
+    items: [
+      multipleChoiceItem(
+        "ut-mc-1",
+        "Context: A habit in the past.",
+        "When I was a child, I ____ play in the streets.",
+        ["use to", "used to", "usually"],
+        1,
+        "Use 'used to' for things that happened repeatedly in the past but are not true now."
+      ),
+      multipleChoiceItem(
+        "ut-mc-2",
+        "Context: A habit in the present.",
+        "I ____ cook in the evenings now.",
+        ["usually", "use to", "used to"],
+        0,
+        "For habits in the present, use 'usually' + the present simple. Do not use 'use to'."
+      ),
+      multipleChoiceItem(
+        "ut-mc-3",
+        "Choose the correct negative form.",
+        "I ____ like vegetables, but now I love them.",
+        ["didn't used to", "didn't use to", "not used to"],
+        1,
+        "In negative sentences, use 'didn't' + 'use to' without the 'd'."
+      ),
+      multipleChoiceItem(
+        "ut-mc-4",
+        "Choose the correct question form.",
+        "____ wear a uniform at school?",
+        ["Did you used to", "Did you use to", "Do you used to"],
+        1,
+        "In questions, use 'Did' + 'use to' without the 'd'."
+      ),
+      errorCorrectionItem(
+        "ut-ec-1",
+        "Check the spelling of the negative form.",
+        "I didn't used to like maths at school.",
+        "didn't used to",
+        false,
+        "didn't use to",
+        "Be careful! In negatives, the 'd' is removed from 'use to'."
+      ),
+      errorCorrectionItem(
+        "ut-ec-2",
+        "Check the question structure.",
+        "Did you used to like your teachers?",
+        "used to",
+        false,
+        "use to",
+        "After 'Did', use 'use to' without the 'd'."
+      ),
+      errorCorrectionItem(
+        "ut-ec-3",
+        "Check the present habit form.",
+        "I use to play tennis on Saturday mornings now.",
+        "use to play",
+        false,
+        "usually play",
+        "'Used to' is only for the past. For present habits, use 'usually' + present simple."
+      ),
+      errorCorrectionItem(
+        "ut-ec-4",
+        "Check the highlighted phrase for errors.",
+        "My brother used to have very long hair.",
+        "used to have",
+        true,
+        "",
+        "Correct! 'Used to' can describe states that were true for a long period in the past."
+      ),
+      singleGap(
+        "ut-rf-1",
+        "Rewrite using 'used to': 'When I was a child I often played in the street.'",
+        ["When I was a child, I ", { gapId: "g1" }, " in the street."],
+        ["used to play"],
+        "You can replace the past simple + adverb of frequency with 'used to'."
+      ),
+      singleGap(
+        "ut-rf-2",
+        "Rewrite as a negative: 'I liked vegetables when I was young.'",
+        ["I ", { gapId: "g1" }, " vegetables, but now I love them."],
+        ["didn't use to like", "did not use to like"],
+        "Use 'didn't use to' to show a past state has changed to a present one."
+      ),
+      singleGap(
+        "ut-rf-3",
+        "Rewrite as a present habit: 'I cooked every night in the past.'",
+        ["I ", { gapId: "g1" }, " in the evenings now."],
+        ["usually cook"],
+        "For current habits, switch from 'used to' to 'usually' + present simple."
+      ),
+      singleGap(
+        "sn-1",
+        "Look at the hair in the first photo.",
+        ["Sarah ", { gapId: "g1" }, " (have) very long, messy hair when she was 20."],
+        ["used to have"],
+        "Use 'used to' for a state that was true for a long time in the past.",
+        {
+          imageSrc: "/images/grammar/used-to/sarah-then-now.png",
+          imageAlt:
+            "Two-panel illustration comparing Sarah at age 20, stressed in a messy bedroom, with Sarah at age 40, relaxed in a bright kitchen preparing salad.",
+          imageMaxWidth: "640px",
+        }
+      ),
+      singleGap(
+        "sn-2",
+        "Look at the food Sarah is eating at age 20.",
+        ["She ", { gapId: "g1" }, " (not / eat) healthy salad; she preferred pizza."],
+        ["didn't use to eat", "did not use to eat"],
+        "Use the negative 'didn't use to' for past habits that have changed."
+      ),
+      singleGap(
+        "sn-3",
+        "Look at the textbooks on the floor in the first photo.",
+        ["Sarah ", { gapId: "g1" }, " (study) maths and calculus all day."],
+        ["used to study"],
+        "Use 'used to' for repeated past actions."
+      ),
+      singleGap(
+        "sn-4",
+        "Look at Sarah in her kitchen now.",
+        ["Now that she is 40, she ", { gapId: "g1" }, " (prepare) fresh meals for dinner."],
+        ["usually prepares"],
+        "For present habits, use 'usually' with the present simple."
+      ),
+      singleGap(
+        "sn-5",
+        "Look at Sarah's expression and the cloud in the first photo.",
+        ["She ", { gapId: "g1" }, " (be) very stressed and worried about her life."],
+        ["used to be"],
+        "Use 'used to' for a past state that is no longer true."
+      ),
+      singleGap(
+        "sn-6",
+        "Look through the window in the second photo.",
+        ["Sarah ", { gapId: "g1" }, " (not / have) a car when she was a student."],
+        ["didn't use to have", "did not use to have"],
+        "Use 'didn't use to' for things that were not true in the past."
+      ),
+    ],
+  },
+  {
+    id: "possibility-might-general-11b",
+    title: "Possibility: might and might not",
+    shortDescription: "Master 'might' for future possibilities and uncertainty without visual aids.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use 'might' or 'might not' + verb without 'to' to say that perhaps something will or won't happen.",
+    items: [
+      multipleChoiceItem(
+        "mig-mc-1",
+        "Choose the correct structure for a future possibility.",
+        "We ____ a picnic tomorrow; it depends on the rain.",
+        ["might have", "might to have", "mights have"],
+        0,
+        "After 'might', use the infinitive without 'to'. Do not add '-s' for he/she/it."
+      ),
+      multipleChoiceItem(
+        "mig-mc-2",
+        "Choose the correct negative form.",
+        "I'm not sure yet, so I ____ come to the party.",
+        ["might not", "mightn't", "don't might"],
+        0,
+        "Use 'might not' for negative possibilities. In English, it is usually not contracted to 'mightn't'."
+      ),
+      multipleChoiceItem(
+        "mig-mc-3",
+        "Identify the synonym.",
+        "Which word can replace 'might' in this sentence: 'We might go to the beach.'",
+        ["can", "may", "must"],
+        1,
+        "You can also use 'may' instead of 'might' to express possibility."
+      ),
+      errorCorrectionItem(
+        "mig-ec-1",
+        "Check the highlighted phrase for errors.",
+        "He mights come to the meeting later.",
+        "mights come",
+        false,
+        "might come",
+        "The form 'might' is the same for all persons. Never add an '-s'."
+      ),
+      errorCorrectionItem(
+        "mig-ec-2",
+        "Check the highlighted phrase for errors.",
+        "I might to buy a new laptop next week.",
+        "might to buy",
+        false,
+        "might buy",
+        "Use 'might' + verb (infinitive without 'to')."
+      ),
+      errorCorrectionItem(
+        "mig-ec-3",
+        "Check the highlighted phrase for errors.",
+        "We might not see the boss today because she is away.",
+        "might not see",
+        true,
+        "",
+        "Correct! Use 'might not' to say perhaps something won't happen."
+      ),
+      errorCorrectionItem(
+        "mig-ec-4",
+        "Check the highlighted phrase for errors.",
+        "I may not take my laptop on holiday.",
+        "may not take",
+        true,
+        "",
+        "Correct! 'May not' is a valid alternative to 'might not'."
+      ),
+      placeholderGapItem(
+        "mig-gf-1",
+        "Rewrite: 'Perhaps it will rain later.'",
+        "It __________ later. (might)",
+        "might rain",
+        [],
+        "Use 'might' to replace 'perhaps... will'."
+      ),
+      placeholderGapItem(
+        "mig-gf-2",
+        "Rewrite: 'Perhaps she won't be at home.'",
+        "She __________ at home. (might not)",
+        "might not be",
+        [],
+        "Use 'might not' to replace 'perhaps... won't'."
+      ),
+      placeholderGapItem(
+        "mig-gf-3",
+        "Rewrite: 'Perhaps they will win the match.'",
+        "They __________ the match. (may)",
+        "may win",
+        ["might win"],
+        "You can use 'may' as a synonym for 'might'."
+      ),
+      singleGap(
+        "mig-sg-1",
+        "Complete the sentence for uncertainty.",
+        ["I'm not sure yet. I ", { gapId: "g1" }, " (go) to the cinema tonight."],
+        ["might go", "may go"],
+        "Use 'might' + infinitive when you haven't decided yet."
+      ),
+      singleGap(
+        "mig-sg-2",
+        "Complete with a negative possibility.",
+        ["The weather is bad, so the plane ", { gapId: "g1" }, " (not / leave) on time."],
+        ["might not leave", "may not leave"],
+        "Use 'might not' + verb for a possible negative outcome."
+      ),
+      singleGap(
+        "mig-sg-3",
+        "Complete with a state verb.",
+        ["Take an umbrella. It ", { gapId: "g1" }, " (be) wet outside."],
+        ["might be", "may be"],
+        "Use 'might be' for a possible current state or future condition."
+      ),
+      placeholderGapItem(
+        "mig-gf-4",
+        "Complete the thought.",
+        "I'm worried. I __________ (not / pass) my driving test.",
+        "might not pass",
+        ["may not pass"],
+        "Use 'might not' to express worry or uncertainty about the future."
+      ),
+      placeholderGapItem(
+        "mig-gf-5",
+        "Complete the thought.",
+        "Ask Karen. She __________ (know) the answer.",
+        "might know",
+        ["may know"],
+        "Use 'might' to suggest a possibility."
+      ),
+    ],
+  },
+  {
+    id: "so-neither-auxiliaries-11c",
+    title: "Agreements: So and Neither",
+    shortDescription:
+      "Master agreeing with positive and negative statements using the correct auxiliary.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use 'So' to agree with positive statements and 'Neither' to agree with negative ones. Remember to match the auxiliary to the speaker's tense.",
+    items: [
+      multipleChoiceItem(
+        "sn-mc-1",
+        "Agree with the statement.",
+        "A: I live near the city centre.",
+        ["So do I.", "Neither do I.", "So am I."],
+        0,
+        "Use 'So + do + I' to agree with a positive Present Simple statement."
+      ),
+      multipleChoiceItem(
+        "sn-mc-2",
+        "Agree with the statement.",
+        "A: I'm not married.",
+        ["So am I.", "Neither do I.", "Neither am I."],
+        2,
+        "Use 'Neither + am + I' to agree with a negative 'be' statement."
+      ),
+      multipleChoiceItem(
+        "sn-mc-3",
+        "Agree with the past event.",
+        "A: I watched the match yesterday.",
+        ["So did I.", "Neither did I.", "So was I."],
+        0,
+        "Match the Past Simple with the auxiliary 'did'."
+      ),
+      multipleChoiceItem(
+        "sn-mc-4",
+        "Agree with the inability.",
+        "A: I can't drive.",
+        ["Neither can I.", "So can I.", "Neither do I."],
+        0,
+        "Use 'Neither' for negative statements and match the modal 'can'."
+      ),
+      errorCorrectionItem(
+        "sn-ec-1",
+        "Check the word order.",
+        "A: I like films. B: So I do.",
+        "So I do",
+        false,
+        "So do I",
+        "The auxiliary must come before the subject: 'So do I'."
+      ),
+      errorCorrectionItem(
+        "sn-ec-2",
+        "Check the tense and agreement type.",
+        "A: I was late this morning. B: Neither did I.",
+        "Neither did I",
+        false,
+        "So was I",
+        "The auxiliary must match the original verb, and positive statements use 'So'."
+      ),
+      errorCorrectionItem(
+        "sn-ec-3",
+        "Check the auxiliary.",
+        "A: I've finished my homework. B: So do I.",
+        "So do I",
+        false,
+        "So have I",
+        "For the Present Perfect, use 'have' or 'has' to agree."
+      ),
+      errorCorrectionItem(
+        "sn-ec-4",
+        "Check the agreement type.",
+        "A: I don't want to get married. B: So do I.",
+        "So do I",
+        false,
+        "Neither do I",
+        "Use 'Neither' to agree with negative statements (don't/can't/wasn't)."
+      ),
+      placeholderGapItem(
+        "sn-gf-1",
+        "Complete the response: 'A: I'm learning Spanish.'",
+        "B: __________ I.",
+        "So am",
+        [],
+        "Match the Present Continuous 'am' and use 'So' for the positive statement."
+      ),
+      placeholderGapItem(
+        "sn-gf-2",
+        "Complete the response: 'A: I didn't like the film.'",
+        "B: __________ I.",
+        "Neither did",
+        ["Nor did"],
+        "Use 'Neither' (or 'Nor') to agree with a negative Past Simple statement."
+      ),
+      placeholderGapItem(
+        "sn-gf-3",
+        "Complete the response: 'A: I wouldn't buy that car.'",
+        "B: __________ I.",
+        "Neither would",
+        ["Nor would"],
+        "Match the modal 'would' in the negative agreement."
+      ),
+      audioResponseItem(
+        "sn-au-1",
+        "Listen and type your agreement.",
+        "/audio/11c/love-classical.mp3",
+        "So do I",
+        "Match the positive Present Simple with 'So do I'."
+      ),
+      audioResponseItem(
+        "sn-au-2",
+        "Listen and type your agreement.",
+        "/audio/11c/wasnt-tired.mp3",
+        "Neither was I",
+        "Match the negative past state 'wasn't' with 'Neither was I'.",
+        ["Nor was I"]
+      ),
+      audioResponseItem(
+        "sn-au-3",
+        "Listen and type your agreement.",
+        "/audio/11c/concert-last-night.mp3",
+        "So did I",
+        "Match the positive Past Simple action with 'So did I'."
+      ),
+      audioResponseItem(
+        "sn-au-4",
+        "Listen and type your agreement.",
+        "/audio/11c/been-to-brazil.mp3",
+        "So have I",
+        "Match the positive Present Perfect with 'So have I'."
+      ),
+      audioResponseItem(
+        "sn-au-5",
+        "Listen and type your agreement.",
+        "/audio/11c/cant-swim.mp3",
+        "Neither can I",
+        "Match the negative modal 'can't' with 'Neither can I'.",
+        ["Nor can I"]
+      ),
+      audioResponseItem(
+        "sn-au-6",
+        "Listen and type your agreement.",
+        "/audio/11c/great-time.mp3",
+        "So am I",
+        "Match the positive Present Continuous 'am' with 'So am I'."
+      ),
+      audioResponseItem(
+        "sn-au-7",
+        "Listen and type your agreement.",
+        "/audio/11c/dont-like-classical.mp3",
+        "Neither do I",
+        "Match the negative Present Simple 'don't' with 'Neither do I'.",
+        ["Nor do I"]
+      ),
+      audioResponseItem(
+        "sn-au-8",
+        "Listen and type your agreement.",
+        "/audio/11c/wouldnt-like-to-go.mp3",
+        "Neither would I",
+        "Match the negative modal 'wouldn't' with 'Neither would I'.",
+        ["Nor would I"]
+      ),
+    ],
+  },
+  {
+    id: "past-perfect-logic-12a",
+    title: "The Past Perfect: Logic & Form",
+    shortDescription: "Master the 'past of the past' using had and the past participle.",
+    levels: ["a2", "b1"],
+    intro:
+      "Use the past perfect to talk about an action that happened before the time you are currently talking about. Form: had / hadn't + past participle.",
+    items: [
+      multipleChoiceItem(
+        "ppl-mc-1",
+        "Which action happened FIRST?",
+        "When I woke up, the garden was all white. It had snowed during the night.",
+        ["I woke up", "It snowed", "Both happened together"],
+        1,
+        "The past perfect (had snowed) shows that the snowing happened before the waking up."
+      ),
+      multipleChoiceItem(
+        "ppl-mc-2",
+        "Choose the correct negative form.",
+        "We got home just in time-the match ____.",
+        ["didn't started", "hadn't started", "hadn't start"],
+        1,
+        "Use 'hadn't' + the past participle (started) for negative past perfect."
+      ),
+      multipleChoiceItem(
+        "ppl-mc-3",
+        "Form the question.",
+        "A: I went to Paris last weekend. B: ____ there before?",
+        ["Did you been", "Had you been", "Were you been"],
+        1,
+        "Use 'Had' + subject + past participle for questions about earlier experiences."
+      ),
+      multipleChoiceItem(
+        "ppl-mc-4",
+        "Identify the 'd contraction.",
+        "I didn't know that you'd found a new job.",
+        ["you had", "you would", "you did"],
+        0,
+        "In this context, 'd represents 'had' because it is followed by a past participle (found)."
+      ),
+      errorCorrectionItem(
+        "ppl-ec-1",
+        "Check the highlighted phrase for errors.",
+        "I suddenly realized that I'd left my phone in the taxi.",
+        "I'd left",
+        true,
+        "",
+        "Correct! 'I'd' is the contraction for 'I had', used here for an earlier action."
+      ),
+      errorCorrectionItem(
+        "ppl-ec-2",
+        "Check the past participle.",
+        "When she got to class, she realized that she hadn't brought her book.",
+        "hadn't brought",
+        true,
+        "",
+        "Correct! 'Brought' is the past participle of 'bring'."
+      ),
+      errorCorrectionItem(
+        "ppl-ec-3",
+        "Check the form.",
+        "The film had already began when we arrived.",
+        "had already began",
+        false,
+        "had already begun",
+        "Always use the past participle after 'had'. The participle of 'begin' is 'begun', not 'began'."
+      ),
+      errorCorrectionItem(
+        "ppl-ec-4",
+        "Had or would?",
+        "If you went by taxi, you'd get there much quicker.",
+        "you'd",
+        true,
+        "",
+        "Correct! Here, 'd means 'would' because it is followed by an infinitive (get), not a past participle."
+      ),
+      errorCorrectionItem(
+        "ppl-ec-5",
+        "Check the logic.",
+        "I arrived at the station, but the train had left.",
+        "had left",
+        true,
+        "",
+        "Correct! The train left before the arrival."
+      ),
+      placeholderGapItem(
+        "ppl-gf-1",
+        "Complete the sentence with the past perfect.",
+        "When I woke up, the garden was white because it __________ (snow) during the night.",
+        "had snowed",
+        [],
+        "Use 'had' + past participle to show an earlier past action."
+      ),
+      placeholderGapItem(
+        "ppl-gf-2",
+        "Complete the negative thought.",
+        "She __________ (not / see) the film before, so she really enjoyed it.",
+        "hadn't seen",
+        ["had not seen"],
+        "Use 'hadn't' + past participle for negative past perfect."
+      ),
+      placeholderGapItem(
+        "ppl-gf-3",
+        "Complete the realization.",
+        "I suddenly realized that I __________ (leave) my keys at home.",
+        "had left",
+        ["'d left"],
+        "Use the past perfect for something that happened before you realized it."
+      ),
+      placeholderGapItem(
+        "ppl-gf-4",
+        "Complete the question.",
+        "__________ (you / eat) before you went to the cinema?",
+        "Had you eaten",
+        ["had you eaten"],
+        "In questions, place 'Had' before the subject."
+      ),
+      placeholderGapItem(
+        "ppl-gf-5",
+        "Complete the sequence.",
+        "The meeting __________ (already / finish) by the time I arrived.",
+        "had already finished",
+        [],
+        "Past perfect shows the meeting was over before the arrival."
+      ),
+      placeholderGapItem(
+        "ppl-gf-6",
+        "Complete the negative past state.",
+        "He was nervous because he __________ (not / fly) before.",
+        "hadn't flown",
+        ["had not flown"],
+        "Use the past perfect to talk about lack of experience before a past point."
+      ),
+    ],
+  },
+  {
+    id: "reported-speech-mastery-12b",
+    title: "Reported Speech: Backshift & Form",
+    shortDescription:
+      "Practice reporting what people said using tense backshifting and pronoun changes.",
+    levels: ["a2", "b1"],
+    intro:
+      "When reporting speech, we usually change the tense (backshift) and the pronouns. Use 'say' without an object and 'tell' with an object.",
+    items: [
+      multipleChoiceItem(
+        "rsm-mc-1",
+        "Direct: 'I can help you.'",
+        "He said that he ____ help me.",
+        ["can", "could", "will"],
+        1,
+        "The modal 'can' backshifts to 'could' in reported speech."
+      ),
+      multipleChoiceItem(
+        "rsm-mc-2",
+        "Direct: 'I'm driving.'",
+        "She said that she ____.",
+        ["is driving", "was driving", "drove"],
+        1,
+        "The present continuous backshifts to the past continuous."
+      ),
+      multipleChoiceItem(
+        "rsm-mc-3",
+        "Direct: 'I'll call you.'",
+        "He told me that he ____ call me.",
+        ["will", "would", "shall"],
+        1,
+        "The future 'will' backshifts to 'would'."
+      ),
+      multipleChoiceItem(
+        "rsm-mc-4",
+        "Direct: 'I've broken my arm.'",
+        "Sara said that she ____ her arm.",
+        ["broke", "has broken", "had broken"],
+        2,
+        "The present perfect backshifts to the past perfect."
+      ),
+      multipleChoiceItem(
+        "rsm-mc-5",
+        "Choose the correct reporting verb.",
+        "He ____ that he loved me.",
+        ["said", "told", "told to me"],
+        0,
+        "Use 'say' without an object or pronoun."
+      ),
+      multipleChoiceItem(
+        "rsm-mc-6",
+        "Choose the correct reporting verb.",
+        "He ____ me that he loved me.",
+        ["said", "told", "said me"],
+        1,
+        "Use 'tell' with an object or pronoun like 'me'."
+      ),
+      errorCorrectionItem(
+        "rsm-ec-1",
+        "Check the highlighted phrase for errors.",
+        "She told that she was tired.",
+        "told that",
+        false,
+        "said that",
+        "You cannot use 'told' without an object. Use 'said that' or 'told me that'."
+      ),
+      errorCorrectionItem(
+        "rsm-ec-2",
+        "Check the highlighted phrase for errors.",
+        "He said me that he was hungry.",
+        "said me",
+        false,
+        "told me",
+        "We use 'tell' with an object (me). We don't say 'said me'."
+      ),
+      errorCorrectionItem(
+        "rsm-ec-3",
+        "Check the pronoun change.",
+        "Direct: 'I love you.' -> He said that he loved me.",
+        "he loved me",
+        true,
+        "",
+        "Correct! Pronouns often change: 'I' becomes 'he' and 'you' becomes 'me'."
+      ),
+      errorCorrectionItem(
+        "rsm-ec-4",
+        "Check the tense.",
+        "Direct: 'I met a girl.' -> John told me that he had met a girl.",
+        "had met",
+        true,
+        "",
+        "Correct! The past simple backshifts to the past perfect."
+      ),
+      singleGap(
+        "rsm-rf-1",
+        "Report this: 'I've just arrived,' she said.",
+        ["She said that she ", { gapId: "g1" }, "."],
+        ["had just arrived"],
+        "Backshift the present perfect to the past perfect."
+      ),
+      singleGap(
+        "rsm-rf-2",
+        "Report this: 'We'll come at eight,' they said.",
+        ["They told me that they ", { gapId: "g1" }, " at eight."],
+        ["would come"],
+        "Backshift 'will' to 'would'."
+      ),
+      placeholderGapItem(
+        "rsm-gf-1",
+        "Report this: 'I don't want to go,' Jack told Anna.",
+        "Jack told Anna that he __________ to go.",
+        "didn't want",
+        ["did not want"],
+        "Backshift the present simple to the past simple and change 'I' to 'he'."
+      ),
+      placeholderGapItem(
+        "rsm-gf-2",
+        "Report this: 'I'm tired,' she said.",
+        "She __________ she was tired.",
+        "said",
+        ["said that"],
+        "Since there is no object, use 'said'. The word 'that' is optional."
+      ),
+      placeholderGapItem(
+        "rsm-gf-3",
+        "Report this: 'I can help you,' he said to me.",
+        "He __________ that he could help me.",
+        "told me",
+        ["said"],
+        "Use 'told me' or 'said'."
+      ),
+    ],
+  },
+  {
+    id: "subject-questions-12c",
+    title: "Questions without auxiliaries",
+    shortDescription: "Master 'subject questions' where we don't use do, does, or did.",
+    levels: ["a2", "b1"],
+    intro:
+      "When the question word is the subject of the sentence, we don't use an auxiliary verb. We just use the verb in the correct tense.",
+    items: [
+      multipleChoiceItem(
+        "sq-mc-1",
+        "Subject Question: Identify the painter.",
+        "Who ____ 'The Milkmaid'?",
+        ["did paint", "painted", "did painted"],
+        1,
+        "When 'Who' is the subject, we don't use 'did'. Use the past simple form: 'Who painted...?'"
+      ),
+      multipleChoiceItem(
+        "sq-mc-2",
+        "Object Question Contrast: Identify preferences.",
+        "What music ____?",
+        ["you like", "do you like", "likes you"],
+        1,
+        "In most other questions where 'you' is the subject, we must use the auxiliary 'do'."
+      ),
+      multipleChoiceItem(
+        "sq-mc-3",
+        "Subject Question: Statistics.",
+        "Which city ____ the most honest people?",
+        ["has", "does have", "is having"],
+        0,
+        "When 'Which city' is the subject, we use the verb 'has' directly."
+      ),
+      multipleChoiceItem(
+        "sq-mc-4",
+        "Subject Question: Social offers.",
+        "Who ____ a cup of coffee?",
+        ["does want", "wants", "want"],
+        1,
+        "Use the third-person singular verb directly after 'Who' in a subject question."
+      ),
+      errorCorrectionItem(
+        "sq-ec-1",
+        "Check for unnecessary auxiliaries.",
+        "Who did paint 'The Milkmaid'?",
+        "did paint",
+        false,
+        "painted",
+        "We don't use an auxiliary verb when the question word is the subject."
+      ),
+      errorCorrectionItem(
+        "sq-ec-2",
+        "Check the word order.",
+        "How many people live near the school?",
+        "live",
+        true,
+        "",
+        "Correct! 'How many people' is the subject, so no auxiliary is needed."
+      ),
+      errorCorrectionItem(
+        "sq-ec-3",
+        "Check the auxiliary use.",
+        "What music you like?",
+        "you like",
+        false,
+        "do you like",
+        "This is an object question, so we need the auxiliary verb 'do'."
+      ),
+      errorCorrectionItem(
+        "sq-ec-4",
+        "Check the verb form.",
+        "Who wants a cup of coffee?",
+        "wants",
+        true,
+        "",
+        "Correct! The question word is the subject, so we use the verb directly."
+      ),
+      errorCorrectionItem(
+        "sq-ec-5",
+        "Check for redundant 'did'.",
+        "Which team did win the match?",
+        "did win",
+        false,
+        "won",
+        "If the question word is the subject, use the past simple 'won' without 'did'."
+      ),
+      placeholderGapItem(
+        "sq-gf-1",
+        "Build the question.",
+        "__________ (paint) 'The Milkmaid'?",
+        "Who painted",
+        [],
+        "Use the verb directly in the past simple for this subject question."
+      ),
+      placeholderGapItem(
+        "sq-gf-2",
+        "Build the question.",
+        "How many people __________ (live) near the school?",
+        "live",
+        [],
+        "No auxiliary is needed when asking about the subject 'How many people'."
+      ),
+      placeholderGapItem(
+        "sq-gf-3",
+        "Build the question.",
+        "Which city __________ (have) the most honest people?",
+        "has",
+        [],
+        "The question word is the subject, so use 'has' directly."
+      ),
+      placeholderGapItem(
+        "sq-gf-4",
+        "Build the question.",
+        "What __________ (happen) last night?",
+        "happened",
+        [],
+        "When 'What' is the subject of the action, don't use 'did'."
+      ),
+      placeholderGapItem(
+        "sq-gf-5",
+        "Build the question.",
+        "Who __________ (write) the email?",
+        "wrote",
+        [],
+        "A subject question about a past action uses the past simple verb directly."
+      ),
+      placeholderGapItem(
+        "sq-gf-6",
+        "Build the question.",
+        "Which bus __________ (go) to the airport?",
+        "goes",
+        [],
+        "Use the present simple verb directly for this subject question."
       ),
     ],
   },

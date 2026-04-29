@@ -127,6 +127,11 @@ function buildInitialAnswers(activity) {
       return;
     }
 
+    if (item.type === "audio-response") {
+      state[item.id] = "";
+      return;
+    }
+
     item.gaps.forEach((gap) => {
       state[`${item.id}:${gap.id}`] = "";
     });
@@ -257,6 +262,10 @@ export default function HubGrammarActivityRunner({ user }) {
         return [];
       }
 
+      if (item.type === "audio-response") {
+        return [item.id];
+      }
+
       if (item.type === "multiple-choice") {
         return [];
       }
@@ -290,6 +299,10 @@ export default function HubGrammarActivityRunner({ user }) {
           return [item.id, `${item.id}:word-bank:0`];
         }
 
+        if (item.type === "audio-response") {
+          return [item.id, item.id];
+        }
+
         const firstGap = item.gaps[0];
         if (Array.isArray(firstGap?.choices) && firstGap.choices.length) {
           return [item.id, `${item.id}:${firstGap.id}:option:0`];
@@ -309,7 +322,8 @@ export default function HubGrammarActivityRunner({ user }) {
               item.type === "error-correction" ||
               item.type === "comma-placement" ||
               item.type === "adverb-placement" ||
-              item.type === "word-order"
+              item.type === "word-order" ||
+              item.type === "audio-response"
             ) {
               return sum + 1;
             }
@@ -717,6 +731,28 @@ export default function HubGrammarActivityRunner({ user }) {
         };
       }
 
+      if (item.type === "audio-response") {
+        const rawAnswer = answers[item.id] || "";
+        const acceptedAnswers = Array.isArray(item.acceptedAnswers)
+          ? item.acceptedAnswers
+          : [item.answer].filter(Boolean);
+        const isCorrect = acceptedAnswers.some(
+          (accepted) => normalizeAnswer(accepted) === normalizeAnswer(rawAnswer)
+        );
+
+        return {
+          id: item.id,
+          type: "audio-response",
+          prompt: item.prompt,
+          audioSrc: item.audioSrc,
+          answer: rawAnswer,
+          acceptedAnswers,
+          correctAnswer: item.answer || acceptedAnswers[0] || "",
+          isCorrect,
+          explanation: item.explanation,
+        };
+      }
+
       const evaluatedGaps = item.gaps.map((gap) => {
         const answerKey = `${item.id}:${gap.id}`;
         const rawAnswer = answers[answerKey] || "";
@@ -750,7 +786,8 @@ export default function HubGrammarActivityRunner({ user }) {
           item.type === "error-correction" ||
           item.type === "comma-placement" ||
           item.type === "adverb-placement" ||
-          item.type === "word-order"
+          item.type === "word-order" ||
+          item.type === "audio-response"
         ) {
           return sum + (item.isCorrect ? 1 : 0);
         }
@@ -1269,6 +1306,36 @@ export default function HubGrammarActivityRunner({ user }) {
                       </button>
                     </div>
                   </div>
+                ) : item.type === "audio-response" ? (
+                  <div className="hub-grammar-audio-response">
+                    <audio
+                      className="hub-grammar-audio-player"
+                      controls
+                      preload="metadata"
+                      src={item.audioSrc}
+                    >
+                      <track kind="captions" />
+                    </audio>
+                    <label className="hub-grammar-audio-answer">
+                      <span>Type your agreement</span>
+                      <input
+                        type="text"
+                        {...textAnswerInputProps}
+                        className="hub-grammar-gap hub-grammar-audio-input"
+                        value={answers[item.id] || ""}
+                        onChange={(event) => handleChange(item.id, event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            focusNextQuestion(item.id);
+                          }
+                        }}
+                        ref={registerInput(item.id)}
+                        disabled={submitted}
+                        placeholder="So do I / Neither do I..."
+                      />
+                    </label>
+                  </div>
 	                ) : (
 	                  <>
 	                    {item.originalSentence ? (
@@ -1368,6 +1435,17 @@ export default function HubGrammarActivityRunner({ user }) {
                         <p>Your question: {evaluatedItem.selectedSentence || "(blank)"}</p>
                         {!evaluatedItem.isCorrect ? (
                           <p>Correct question: {evaluatedItem.answer}</p>
+                        ) : null}
+                        <p>{evaluatedItem.explanation}</p>
+                      </div>
+                    ) : evaluatedItem.type === "audio-response" ? (
+                      <div
+                        className={`hub-grammar-feedback ${evaluatedItem.isCorrect ? "is-correct" : "is-wrong"}`}
+                      >
+                        <strong>{evaluatedItem.isCorrect ? "Correct" : "Try again"}</strong>
+                        <p>Your answer: {evaluatedItem.answer || "(blank)"}</p>
+                        {!evaluatedItem.isCorrect ? (
+                          <p>Accepted answers: {evaluatedItem.acceptedAnswers.join(" / ")}</p>
                         ) : null}
                         <p>{evaluatedItem.explanation}</p>
                       </div>
@@ -2054,6 +2132,30 @@ export default function HubGrammarActivityRunner({ user }) {
           flex-wrap: wrap;
           gap: 0.7rem;
           margin-top: 0.9rem;
+        }
+
+        .hub-grammar-audio-response {
+          display: grid;
+          gap: 0.85rem;
+          margin-top: 0.85rem;
+          max-width: 34rem;
+        }
+
+        .hub-grammar-audio-player {
+          width: 100%;
+        }
+
+        .hub-grammar-audio-answer {
+          display: grid;
+          gap: 0.35rem;
+          color: #dbe7ff;
+          font-size: 0.92rem;
+          font-weight: 800;
+        }
+
+        .hub-grammar-audio-input {
+          width: 100%;
+          margin: 0;
         }
 
         .hub-grammar-option {
