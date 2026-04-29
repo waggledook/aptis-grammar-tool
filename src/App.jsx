@@ -94,6 +94,7 @@ import CoreGrammarKey from "./components/coursepack/CoreGrammarKey";
 
 const TEACHER_NOTIFICATION_LIMIT = 100;
 const TEACHER_BADGE_REFRESH_MS = 10 * 60 * 1000;
+const THEME_STORAGE_KEY = "aptis-theme";
 
 import CoreVocabularyKey from "./components/coursepack/CoreVocabularyKey";
 import ReadingPart1Key from "./components/coursepack/ReadingPart1Key";
@@ -236,6 +237,10 @@ export default function App() {
   // — AUTH STATE —
 const [user,     setUser]     = useState(null)
 const [showAuth, setShowAuth] = useState(false)
+const [theme, setTheme] = useState(() => {
+  if (typeof window === "undefined") return "dark";
+  return window.localStorage.getItem(THEME_STORAGE_KEY) === "light" ? "light" : "dark";
+});
 const [view, setView] = useState('menu'); // 'menu' | 'grammar' | 'readingMenu' | 'reading' | 'readingGuide' | 'mistakes' | 'favourites' | 'speakingMenu' | 'speakingPart2' |
 const navigate = useNavigate();  // 👈 add this
 const location = useLocation();
@@ -250,6 +255,12 @@ const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
+
+useEffect(() => {
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme;
+  window.localStorage.setItem(THEME_STORAGE_KEY, theme);
+}, [theme]);
 
 useEffect(() => {
   const params = new URLSearchParams(location.search);
@@ -609,6 +620,10 @@ const showSeifHubGate =
   location.pathname !== "/privacy" &&
   !location.pathname.startsWith("/admin");
 
+const toggleTheme = () => {
+  setTheme((current) => (current === "light" ? "dark" : "light"));
+};
+
 
   // — EXERCISE STATE — 
   // **Moved above any return** so hooks are always called
@@ -831,7 +846,7 @@ const [runKey,  setRunKey]  = useState(0);
   // — RENDER MAIN APP —
 return (
   // in src/App.jsx (inside your App component’s return)
-  <div className={`App ${isWideLayout ? "App--full" : ""}`}>
+  <div className={`App ${isWideLayout ? "App--full" : ""}`} data-theme={theme}>
     <ToastHost />
     <CookieBanner />
     <div className={`content-container ${isWideLayout ? "content-container--full" : ""}`}>
@@ -855,6 +870,16 @@ return (
     }}
   >
     Home
+  </button>
+
+  <button
+    type="button"
+    className="topbar-btn theme-toggle-btn"
+    onClick={toggleTheme}
+    aria-pressed={theme === "light"}
+    title={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
+  >
+    {theme === "light" ? "Dark" : "Light"}
   </button>
 
   {user ? (

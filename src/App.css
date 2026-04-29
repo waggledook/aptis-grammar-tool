@@ -10,10 +10,10 @@
 html,
 body {
   width: 100%;
-  /* paint the navy on both elements */
-  background-color: #0a1f44;
-  color: #fff;
+  background-color: var(--color-page-bg);
+  color: var(--color-text);
   font-family: Arial, sans-serif;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Make body a flex container so it centers .App */
@@ -43,10 +43,10 @@ body {
 
 /* === CONTENT CARD === */
 .content-container {
-  background: #12254b;
+  background: var(--color-surface);
   padding: 30px;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow: 0 4px 20px var(--color-shadow);
   width: 100%;
 }
 
@@ -801,5 +801,2183 @@ button {
   padding-right: 16px;
 }
 
+/* === Theme foundation overrides === */
+.App,
+.content-container,
+.card,
+.panel,
+.auth-card,
+.toast,
+.hub-note,
+.auth-nudge,
+.promo-banner,
+.explanation,
+.explanation-card {
+  color: var(--color-text);
+}
 
+h1,
+h2,
+.title,
+.sec-title,
+.col-title,
+.explanation-title,
+.filter-panel legend,
+.auth-title {
+  color: var(--color-accent);
+}
 
+.content-container,
+.auth-card,
+.toast {
+  background: var(--color-surface);
+  border-color: var(--color-border);
+  box-shadow: 0 12px 32px var(--color-shadow);
+}
+
+.card,
+.panel,
+.explanation,
+.explanation-card {
+  background: var(--color-surface-2);
+  border-color: var(--color-border);
+  box-shadow: 0 4px 14px var(--color-shadow-soft);
+}
+
+.hub-hero {
+  background: var(--hero-gradient);
+}
+
+.hub-copy,
+.hub-note p,
+.hub-panel p,
+.intro,
+.muted,
+.auth-switch,
+.progress-tracker,
+.form-row label,
+.explanation-text,
+.promo-banner,
+.auth-nudge,
+.count-label {
+  color: var(--color-text-soft);
+}
+
+.input,
+.select,
+.filter-panel select,
+.report-input {
+  background: var(--color-surface-3);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+}
+
+.input:focus,
+.select:focus,
+.report-input:focus {
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.topbar-btn,
+.review-btn,
+.btn,
+.btn.secondary,
+.ghost-btn,
+.count-chip,
+.theme-toggle-btn {
+  background: var(--color-surface-3);
+  border-color: var(--color-border);
+  color: var(--color-link);
+}
+
+.topbar-btn:hover,
+.review-btn:hover,
+.btn:hover:not(:disabled),
+.ghost-btn:hover,
+.count-chip:hover {
+  background: var(--color-surface-2);
+  border-color: var(--color-border-strong);
+}
+
+.generate-btn,
+.primary-btn,
+.btn.primary,
+.count-chip.selected {
+  background: var(--primary-gradient);
+  border-color: transparent;
+  color: var(--primary-text);
+}
+
+.review-btn.mistakes,
+.error-text {
+  color: var(--color-danger);
+}
+
+.review-btn.favourites {
+  color: var(--color-link);
+}
+
+.btn.danger {
+  background: var(--color-danger-bg);
+  border-color: var(--color-danger-border);
+  color: var(--color-danger);
+}
+
+.profile-badge-btn .avatar,
+.topbar-btn.profile-badge .avatar {
+  background: var(--color-surface-2);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.auth-nudge {
+  background: var(--color-surface-raised);
+  border-color: var(--color-border);
+}
+
+.auth-nudge-text strong,
+.promo-banner a,
+.hub-kicker {
+  color: var(--color-accent);
+}
+
+.promo-banner {
+  background: var(--surface-glass);
+  border-color: var(--color-border);
+}
+
+.toast {
+  color: var(--color-text);
+}
+
+.select-wrap::after {
+  border-color: var(--color-link);
+}
+
+.theme-toggle-btn {
+  min-width: 68px;
+}
+
+:root[data-theme="light"] .content-container {
+  border: 1px solid var(--color-border);
+}
+
+:root[data-theme="light"] .hub-note,
+:root[data-theme="light"] .card,
+:root[data-theme="light"] .panel,
+:root[data-theme="light"] .explanation,
+:root[data-theme="light"] .explanation-card {
+  border: 1px solid var(--color-border);
+}
+
+:root[data-theme="light"] .option-btn.correct,
+:root[data-theme="light"] .explanation-item.correct {
+  background: rgba(22, 128, 60, 0.1);
+  color: #075e2c;
+}
+
+:root[data-theme="light"] .option-btn.incorrect,
+:root[data-theme="light"] .explanation-item.incorrect {
+  background: rgba(180, 35, 24, 0.1);
+  color: #9f1c14;
+}
+
+:root[data-theme="light"] .topbar-notify-count {
+  border-color: var(--color-surface);
+}
+
+/* === Menu page theme pass === */
+.reading-menu .intro,
+.speaking-menu .intro,
+.writing-menu .intro,
+.vocab-menu .intro,
+.listening-menu .intro,
+.hub-menu-wrapper .menu-sub,
+.reading-menu .section-header p,
+.speaking-menu .section-header p,
+.writing-menu .section-header p {
+  color: var(--color-text-soft);
+}
+
+.reading-menu .section-header h3,
+.speaking-menu .section-header h3,
+.writing-menu .section-header h3,
+.hub-menu-wrapper .whats-new-copy h3 {
+  color: var(--color-text);
+}
+
+.hub-menu-wrapper .whats-new-label,
+.section-kicker {
+  color: var(--color-accent);
+}
+
+.hub-menu-wrapper .whats-new-copy p,
+.hub-menu-wrapper .menu-card p,
+.reading-menu .card p,
+.speaking-menu .card p,
+.writing-menu .card p,
+.vocab-menu .card p,
+.listening-menu .card p,
+.full-test-card p {
+  color: var(--color-text-soft);
+}
+
+.hub-menu-wrapper .menu-card h3,
+.reading-menu .card h3,
+.speaking-menu .card h3,
+.writing-menu .card h3,
+.vocab-menu .card h3,
+.listening-menu .card h3,
+.full-test-card h3 {
+  color: var(--color-text);
+}
+
+.hub-menu-wrapper .whats-new-btn {
+  background: var(--primary-gradient);
+  color: var(--primary-text);
+}
+
+.hub-menu-wrapper .menu-card,
+.reading-menu .card,
+.speaking-menu .card,
+.writing-menu .card,
+.vocab-menu .card,
+.listening-menu .card,
+.full-test-card {
+  background: var(--color-surface-2);
+  border-color: var(--color-border);
+  color: var(--color-text);
+  box-shadow: 0 8px 22px var(--color-shadow-soft);
+}
+
+.hub-menu-wrapper .menu-card:hover,
+.reading-menu .card:hover,
+.speaking-menu .card:hover,
+.writing-menu .card:hover,
+.vocab-menu .card:hover,
+.listening-menu .card:hover {
+  border-color: var(--color-border-strong);
+  box-shadow: 0 12px 26px var(--color-shadow-soft);
+}
+
+.soon-pill,
+.live-pill {
+  background: var(--color-surface-3);
+  border-color: var(--color-border);
+  color: var(--color-muted);
+}
+
+.soon-card {
+  background: var(--color-surface-3);
+  border-color: var(--color-border);
+}
+
+.mock-test-btn.sleek {
+  background: var(--color-surface-3);
+  border-color: rgba(255, 207, 64, 0.75);
+  color: var(--color-accent);
+}
+
+:root[data-theme="light"] .hub-menu-wrapper .whats-new-banner,
+:root[data-theme="light"] .whats-new-banner {
+  background: linear-gradient(90deg, rgba(253, 191, 45, 0.12), rgba(255, 255, 255, 0.7));
+  border-color: rgba(253, 191, 45, 0.38);
+}
+
+:root[data-theme="light"] .hub-menu-wrapper .whats-new-copy p,
+:root[data-theme="light"] .whats-new-copy p {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] .hub-menu-wrapper .whats-new-copy h3,
+:root[data-theme="light"] .whats-new-copy h3 {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .hub-menu-wrapper .whats-new-label,
+:root[data-theme="light"] .whats-new-label {
+  color: var(--color-accent) !important;
+}
+
+:root[data-theme="light"] .hub-menu-wrapper .main-header {
+  background: #13213b;
+  border-radius: 12px;
+  margin-bottom: .8rem;
+  padding: .75rem;
+}
+
+:root[data-theme="light"] .hub-menu-wrapper .menu-logo {
+  filter:
+    drop-shadow(0 4px 12px rgba(15, 23, 42, 0.35))
+    drop-shadow(0 0 18px rgba(255, 180, 64, 0.18));
+}
+
+:root[data-theme="light"] .hub-menu-wrapper .menu-card,
+:root[data-theme="light"] .reading-menu .card,
+:root[data-theme="light"] .speaking-menu .card,
+:root[data-theme="light"] .writing-menu .card,
+:root[data-theme="light"] .vocab-menu .card,
+:root[data-theme="light"] .listening-menu .card,
+:root[data-theme="light"] .full-test-card {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .reading-menu .guide-card,
+:root[data-theme="light"] .speaking-menu .guide-card,
+:root[data-theme="light"] .writing-menu .guide-card {
+  background: linear-gradient(180deg, #ffffff 0%, #eef4ff 100%) !important;
+  border-color: #b9c8df !important;
+}
+
+:root[data-theme="light"] .reading-menu .practice-card,
+:root[data-theme="light"] .speaking-menu .practice-card,
+:root[data-theme="light"] .writing-menu .practice-card {
+  background: linear-gradient(180deg, #fffdf7 0%, #f7faff 100%) !important;
+  border-color: rgba(154, 103, 0, 0.34) !important;
+}
+
+:root[data-theme="light"] .full-test-card {
+  background: linear-gradient(180deg, #ffffff 0%, #f7faff 100%) !important;
+}
+
+:root[data-theme="light"] .mock-test-btn.sleek {
+  background: linear-gradient(180deg, #ffffff 0%, #eef4ff 100%) !important;
+  border-color: rgba(154, 103, 0, 0.5) !important;
+  color: var(--color-accent) !important;
+  box-shadow: 0 10px 24px var(--color-shadow-soft) !important;
+}
+
+:root[data-theme="light"] .mock-test-btn.sleek::after {
+  background: radial-gradient(60% 120% at 50% 0%, rgba(154, 103, 0, .16), rgba(154, 103, 0, 0)),
+              radial-gradient(80% 140% at 50% 100%, rgba(30, 41, 59, .12), rgba(30, 41, 59, 0));
+}
+
+/* Component-level menu styles are injected after App.css, so light mode needs explicit priority here. */
+:root[data-theme="light"] .menu-wrapper button[class*="card"],
+:root[data-theme="light"] .menu-wrapper .menu-card,
+:root[data-theme="light"] .hub-menu-wrapper .menu-card,
+:root[data-theme="light"] .hub-flashcards-menu-card,
+:root[data-theme="light"] .hub-mini-card-shell,
+:root[data-theme="light"] .reading-menu .card,
+:root[data-theme="light"] .speaking-menu .card,
+:root[data-theme="light"] .writing-menu .card,
+:root[data-theme="light"] .vocab-menu .card,
+:root[data-theme="light"] .listening-menu .card {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .menu-wrapper button[class*="card"] :is(h1, h2, h3, h4, strong),
+:root[data-theme="light"] .menu-wrapper .menu-card :is(h1, h2, h3, h4, strong),
+:root[data-theme="light"] .hub-menu-wrapper .menu-card :is(h1, h2, h3, h4, strong),
+:root[data-theme="light"] .hub-flashcards-menu-card :is(h1, h2, h3, h4, strong),
+:root[data-theme="light"] .hub-mini-card-shell :is(h1, h2, h3, h4, strong),
+:root[data-theme="light"] .reading-menu .card :is(h1, h2, h3, h4, strong),
+:root[data-theme="light"] .speaking-menu .card :is(h1, h2, h3, h4, strong),
+:root[data-theme="light"] .writing-menu .card :is(h1, h2, h3, h4, strong),
+:root[data-theme="light"] .vocab-menu .card :is(h1, h2, h3, h4, strong),
+:root[data-theme="light"] .listening-menu .card :is(h1, h2, h3, h4, strong) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .menu-wrapper button[class*="card"] :is(p, span, em, small),
+:root[data-theme="light"] .menu-wrapper .menu-card :is(p, span, em, small),
+:root[data-theme="light"] .hub-menu-wrapper .menu-card :is(p, span, em, small),
+:root[data-theme="light"] .hub-flashcards-menu-card :is(p, span, em, small),
+:root[data-theme="light"] .hub-mini-card-shell :is(p, span, em, small),
+:root[data-theme="light"] .reading-menu .card :is(p, span, em, small),
+:root[data-theme="light"] .speaking-menu .card :is(p, span, em, small),
+:root[data-theme="light"] .writing-menu .card :is(p, span, em, small),
+:root[data-theme="light"] .vocab-menu .card :is(p, span, em, small),
+:root[data-theme="light"] .listening-menu .card :is(p, span, em, small) {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] .menu-wrapper button[class*="card"] .soon-pill,
+:root[data-theme="light"] .menu-wrapper .menu-card .soon-pill,
+:root[data-theme="light"] .hub-flashcards-menu-card-pill,
+:root[data-theme="light"] .hub-mini-complete {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+}
+
+/* === Aptis Trainer activity light-mode pass === */
+:root[data-theme="light"] :is(
+  .aptis-writing-p1,
+  .aptis-writing-p1-guide,
+  .aptis-writing-p2,
+  .aptis-writing-p3,
+  .aptis-writing-p4,
+  .writing-p4-main,
+  .p4-register,
+  .aptis-reorder,
+  .aptis-matching,
+  .aptis-p4-headings,
+  .reading-guide,
+  .uoe-custom-shell
+) {
+  --panel: var(--color-surface-2) !important;
+  --ink: var(--color-text) !important;
+  --muted: var(--color-text-soft) !important;
+  --bg: var(--color-page-bg) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p1,
+  .aptis-writing-p1-guide,
+  .aptis-writing-p2,
+  .aptis-writing-p3,
+  .aptis-writing-p4,
+  .writing-p4-main,
+  .p4-register,
+  .aptis-reorder,
+  .aptis-matching,
+  .aptis-p4-headings,
+  .reading-guide,
+  .uoe-custom-shell
+) :is(.title, h1, h2, h3, h4, strong, .card-title, .chat-name, .task-title) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p1,
+  .aptis-writing-p1-guide,
+  .aptis-writing-p2,
+  .aptis-writing-p3,
+  .aptis-writing-p4,
+  .writing-p4-main,
+  .p4-register,
+  .aptis-reorder,
+  .aptis-matching,
+  .aptis-p4-headings,
+  .reading-guide,
+  .uoe-custom-shell
+) :is(.intro, .muted, .chat-label, .card-meta, .why-explain, .pool-empty, .slot-placeholder, .hint, .hub-subtitle, .hub-keyword-meta, .why) {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p1 .panel,
+  .aptis-writing-p1-guide .panel,
+  .aptis-writing-p2 .panel,
+  .aptis-writing-p3 .panel,
+  .aptis-writing-p4 .panel,
+  .writing-p4-main .panel,
+  .p4-register .panel,
+  .p4-register .rq-item,
+  .p4-register .fix,
+  .p4-register .suggest-panel,
+  .aptis-reorder .text-card,
+  .aptis-matching .comment,
+  .aptis-matching .questions-section,
+  .aptis-matching .why-box,
+  .aptis-p4-headings .p4-card,
+  .aptis-p4-headings .p4-text,
+  .aptis-p4-headings .why-box,
+  .reading-guide .intro-box,
+  .reading-guide .task-block,
+  .reading-guide .card,
+  .reading-guide .slot,
+  .reading-guide .pool-item,
+  .uoe-custom-shell .hub-keyword-header,
+  .uoe-custom-shell .hub-keyword-card,
+  .uoe-custom-shell .hub-keyword-summary > div
+) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 8px 22px var(--color-shadow-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .summary .card,
+  .aptis-writing-p3 .summary .card,
+  .aptis-writing-p4 .summary .card,
+  .aptis-writing-p2 .summary .preview,
+  .aptis-writing-p3 .preview,
+  .aptis-writing-p4 .summary .preview,
+  .aptis-writing-p1-guide .gb,
+  .aptis-writing-p1-guide .trim-box,
+  .aptis-writing-p1-guide .fix,
+  .aptis-writing-p1-guide .fixopen,
+  .aptis-writing-p1-guide .fixopen-suggest,
+  .aptis-reorder .slot,
+  .aptis-reorder .pool-item,
+  .aptis-matching li,
+  .aptis-p4-headings .p4-row,
+  .aptis-p4-headings .p4-option,
+  .uoe-custom-shell .hub-keyword-feedback
+) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p1 .input,
+  .aptis-writing-p1-guide .opt,
+  .aptis-writing-p1-guide .fixopen-input,
+  .p4-register .opt.ta,
+  .aptis-writing-p2 .rte-editable,
+  .aptis-writing-p3 .rte-editable,
+  .aptis-writing-p4 .rte-editable,
+  .aptis-writing-p4 .ta,
+  .aptis-matching select,
+  .aptis-p4-headings select,
+  .uoe-custom-shell input,
+  .reading-assign-field select,
+  .reading-assign-field textarea,
+  .writing-assign-field select,
+  .writing-assign-field textarea
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .rte-editable,
+  .aptis-writing-p3 .rte-editable,
+  .aptis-writing-p4 .rte-editable,
+  .aptis-writing-p2 .summary .preview,
+  .aptis-writing-p3 .preview,
+  .aptis-writing-p4 .summary .preview,
+  .aptis-writing-p4 .submitted-html
+) :is(p, div, span, strong, em, li) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .rte-editable:empty::before,
+  .aptis-writing-p3 .rte-editable:empty::before,
+  .aptis-writing-p4 .rte-editable:empty::before
+) {
+  color: var(--color-muted) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p1 .btn,
+  .aptis-writing-p1-guide .btn,
+  .aptis-writing-p1-guide .wbtn,
+  .writing-p4-main .btn,
+  .writing-p4-main .menu-card,
+  .writing-p4-main .soon,
+  .p4-register .btn,
+  .p4-register .opt,
+  .p4-register .tag,
+  .aptis-writing-p2 .btn,
+  .aptis-writing-p2 .count-chip,
+  .aptis-writing-p3 .btn,
+  .aptis-writing-p3 .count-chip,
+  .aptis-writing-p4 .btn,
+  .aptis-writing-p4 .count-chip,
+  .aptis-writing-p4 .rte-btn,
+  .aptis-reorder .btn,
+  .aptis-reorder .count-chip,
+  .aptis-matching .btn,
+  .aptis-matching .why-btn,
+  .aptis-p4-headings .count-chip,
+  .aptis-p4-headings .why-btn,
+  .reading-guide .btn,
+  .uoe-custom-shell .review-btn,
+  .uoe-custom-shell .generate-btn
+) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p1-guide .btn.primary,
+  .p4-register .btn.primary,
+  .aptis-writing-p2 .btn.primary,
+  .aptis-writing-p3 .btn.primary,
+  .aptis-writing-p4 .btn.primary,
+  .aptis-reorder .btn.primary,
+  .aptis-matching .btn.primary,
+  .reading-guide .btn.primary,
+  .uoe-custom-shell .generate-btn
+) {
+  background: var(--primary-gradient) !important;
+  border-color: transparent !important;
+  color: var(--primary-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .chip-menu,
+  .aptis-writing-p3 .chip-menu,
+  .aptis-writing-p4 .chip-menu,
+  .aptis-reorder .chip-menu,
+  .aptis-p4-headings .chip-menu
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  box-shadow: 0 14px 30px var(--color-shadow) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .chip-option,
+  .aptis-writing-p3 .chip-option,
+  .aptis-writing-p4 .chip-option,
+  .aptis-reorder .chip-option,
+  .aptis-p4-headings .chip-option
+) {
+  background: transparent !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .chip-option .num,
+  .aptis-writing-p2 .chip-option .ttl,
+  .aptis-writing-p3 .chip-option .num,
+  .aptis-writing-p3 .chip-option .ttl,
+  .aptis-writing-p4 .chip-option .num,
+  .aptis-writing-p4 .chip-option .ttl,
+  .aptis-reorder .chip-option .num,
+  .aptis-reorder .chip-option .ttl,
+  .aptis-p4-headings .chip-option .num,
+  .aptis-p4-headings .chip-option .ttl
+) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .chip-option:hover,
+  .aptis-writing-p3 .chip-option:hover,
+  .aptis-writing-p4 .chip-option:hover,
+  .aptis-reorder .chip-option:hover,
+  .aptis-p4-headings .chip-option:hover
+) {
+  background: var(--color-surface-3) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .chip-option.active,
+  .aptis-writing-p3 .chip-option.active,
+  .aptis-writing-p4 .chip-option.active,
+  .aptis-reorder .chip-option.active,
+  .aptis-p4-headings .chip-option.active,
+  .aptis-writing-p2 .count-chip.selected,
+  .aptis-writing-p3 .count-chip.selected,
+  .aptis-writing-p4 .count-chip.selected,
+  .aptis-reorder .count-chip.selected,
+  .aptis-p4-headings .count-chip.selected
+) {
+  background: #dbeafe !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-reorder .slot-index,
+  .aptis-reorder .slot-actions .icon
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-matching mark.evidence,
+  .aptis-p4-headings mark.evidence
+) {
+  background: rgba(253, 191, 45, 0.22) !important;
+  border-color: rgba(154, 103, 0, 0.34) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .reading-assign-modal,
+  .writing-assign-modal
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .reading-assign-head p,
+  .writing-assign-head p,
+  .reading-assign-label,
+  .writing-assign-label,
+  .reading-assign-field span,
+  .writing-assign-field span
+) {
+  color: var(--color-text-soft) !important;
+}
+
+/* Targeted fixes for nested activity elements that keep their own dark styles. */
+:root[data-theme="light"] :is(
+  .aptis-p4-headings .panel,
+  .aptis-p4-headings .headings-inline,
+  .aptis-p4-headings .p4-block,
+  .aptis-p4-headings .why-box,
+  .aptis-writing-p4 .block,
+  .aptis-writing-p4 .email-source pre,
+  .aptis-writing-p1 .list li,
+  .aptis-writing-p1 .suggest-panel,
+  .aptis-writing-p1-guide .suggest-panel,
+  .aptis-writing-p1-guide .gb,
+  .aptis-writing-p1-guide .trim-box,
+  .aptis-writing-p1-guide .fix.open,
+  .aptis-writing-p1-guide .fixopen,
+  .aptis-writing-p1-guide .fixopen-suggest
+) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 8px 22px var(--color-shadow-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-p4-headings .p4-select,
+  .aptis-writing-p1 .input,
+  .aptis-writing-p1-guide .fix .opt.ta,
+  .aptis-writing-p1-guide .fixopen-input,
+  .aptis-writing-p4 .ta,
+  .aptis-writing-p2 .rte-editable,
+  .aptis-writing-p3 .rte-editable,
+  .aptis-writing-p4 .rte-editable
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .rte-toolbar,
+  .aptis-writing-p3 .rte-toolbar,
+  .aptis-writing-p4 .rte-toolbar
+) {
+  background: transparent !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .rte-btn,
+  .aptis-writing-p3 .rte-btn,
+  .aptis-writing-p4 .rte-btn,
+  .aptis-writing-p2 .pill,
+  .aptis-writing-p3 .pill,
+  .aptis-writing-p4 .pill,
+  .aptis-writing-p1 .pill,
+  .aptis-writing-p1-guide .tag,
+  .aptis-writing-p1-guide .wbtn,
+  .aptis-p4-headings .btn,
+  .aptis-p4-headings .why-btn
+) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .rte-btn:hover,
+  .aptis-writing-p3 .rte-btn:hover,
+  .aptis-writing-p4 .rte-btn:hover,
+  .aptis-p4-headings .btn:hover,
+  .aptis-p4-headings .why-btn:hover
+) {
+  background: #dbeafe !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-writing-p2 .rte-btn.active,
+  .aptis-writing-p3 .rte-btn.active,
+  .aptis-writing-p4 .rte-btn.active,
+  .aptis-writing-p2 .pill.ok,
+  .aptis-writing-p3 .pill.ok,
+  .aptis-writing-p4 .pill.ok
+) {
+  background: rgba(22, 128, 60, 0.1) !important;
+  border-color: rgba(22, 128, 60, 0.42) !important;
+  color: #075e2c !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-p4-headings .btn.primary
+) {
+  background: var(--primary-gradient) !important;
+  border-color: transparent !important;
+  color: var(--primary-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-p4-headings .p4-text p,
+  .aptis-p4-headings .headings-inline li,
+  .aptis-writing-p4 .email-source pre,
+  .aptis-writing-p4 .block,
+  .aptis-writing-p1 .list .p,
+  .aptis-writing-p1 .list .ans,
+  .aptis-writing-p1 .qlabel,
+  .aptis-writing-p1 .num,
+  .aptis-writing-p1 .suggest-panel h4,
+  .aptis-writing-p1 .chip,
+  .aptis-writing-p1-guide .gb-text,
+  .aptis-writing-p1-guide .gb-q,
+  .aptis-writing-p1-guide .trim-q,
+  .aptis-writing-p1-guide .trim-sentence,
+  .aptis-writing-p1-guide .fix-q,
+  .aptis-writing-p1-guide .ans
+) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-p4-headings .hint,
+  .aptis-p4-headings .p4-num,
+  .aptis-writing-p2 .meter,
+  .aptis-writing-p3 .meter,
+  .aptis-writing-p4 .meter,
+  .aptis-writing-p1-guide .hint
+) {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] .aptis-writing-p1 .chip {
+  background: #dbeafe !important;
+  border-color: var(--color-border) !important;
+}
+
+/* Writing Part 4 guide and register/tone activities. */
+:root[data-theme="light"] :is(
+  .writing-p4-main .menu-card:hover,
+  .p4-register .btn:hover,
+  .p4-register .opt:hover
+) {
+  background: #dbeafe !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+  filter: none !important;
+}
+
+:root[data-theme="light"] :is(
+  .writing-p4-main .menu-card h4,
+  .writing-p4-main .bullets,
+  .writing-p4-main .bullets li,
+  .p4-register .section-title,
+  .p4-register .rq-phrase,
+  .p4-register .fix .fix-q,
+  .p4-register .bullets,
+  .p4-register .bullets li
+) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .writing-p4-main .menu-card p,
+  .p4-register .why,
+  .p4-register .suggest-panel .muted
+) {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] .writing-p4-main .menu-card.disabled {
+  opacity: 0.72 !important;
+  background: var(--color-surface-3) !important;
+  border-style: dashed !important;
+}
+
+:root[data-theme="light"] .writing-p4-main .soon {
+  background: #dbeafe !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] .p4-register .opt.chosen {
+  background: #dbeafe !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+  outline-color: var(--color-border-strong) !important;
+}
+
+:root[data-theme="light"] .p4-register .fix .bad {
+  background: rgba(180, 35, 24, 0.08) !important;
+  border: 1px solid rgba(180, 35, 24, 0.22) !important;
+  border-radius: 8px !important;
+  color: #7a180f !important;
+  padding: 0.4rem 0.5rem !important;
+}
+
+:root[data-theme="light"] .p4-register .tag.bad {
+  background: rgba(180, 35, 24, 0.1) !important;
+  border-color: rgba(180, 35, 24, 0.34) !important;
+  color: #7a180f !important;
+}
+
+:root[data-theme="light"] .p4-register .result.ok {
+  color: #075e2c !important;
+}
+
+:root[data-theme="light"] .p4-register .result.no {
+  color: #7a180f !important;
+}
+
+:root[data-theme="light"] .p4-register kbd {
+  background: var(--color-surface-3) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+  border-radius: 4px !important;
+  padding: 0.08rem 0.28rem !important;
+}
+
+/* Speaking activities and guide pages keep much of their own dark CSS. */
+:root[data-theme="light"] :is(
+  .aptis-speaking1,
+  .aptis-speaking,
+  .aptis-speaking3,
+  .aptis-speaking4,
+  .speaking-guide,
+  .preppy3-wrapper
+) {
+  --panel: var(--color-surface-2) !important;
+  --ink: var(--color-text) !important;
+  --muted: var(--color-text-soft) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-speaking1,
+  .aptis-speaking,
+  .aptis-speaking3,
+  .aptis-speaking4,
+  .speaking-guide,
+  .preppy3-wrapper
+) :is(.title, h1, h2, h3, h4, strong, .qnum, .target, .chat-name) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-speaking1,
+  .aptis-speaking,
+  .aptis-speaking3,
+  .aptis-speaking4,
+  .speaking-guide,
+  .preppy3-wrapper
+) :is(.intro, .muted, .panel-text, .lead, .tip, .chat-label, .card-meta, .hint, p) {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-speaking1 .panel,
+  .aptis-speaking1 .q,
+  .aptis-speaking .panel,
+  .aptis-speaking .q,
+  .aptis-speaking .imgwrap,
+  .aptis-speaking3 .panel,
+  .aptis-speaking3 .q,
+  .aptis-speaking3 .imgwrap,
+  .aptis-speaking4 .panel,
+  .aptis-speaking4 .qs3 li,
+  .speaking-guide .panel,
+  .speaking-guide .menu-card,
+  .speaking-guide .phrase-box,
+  .speaking-guide .gap-exercise,
+  .speaking-guide .gap-item,
+  .speaking-guide .spec-block,
+  .speaking-guide .spec-item-card,
+  .speaking-guide .free-spec-summary,
+  .speaking-guide .free-spec-preview,
+  .speaking-guide .model-answer,
+  .speaking-guide .inline-example,
+  .speaking-guide .example,
+  .preppy3-card,
+  .preppy3-inner
+) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 8px 22px var(--color-shadow-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-speaking1 .btn,
+  .aptis-speaking1 .pill,
+  .aptis-speaking1 .toggle-btn,
+  .aptis-speaking .btn,
+  .aptis-speaking .pill,
+  .aptis-speaking .count-chip,
+  .aptis-speaking3 .btn,
+  .aptis-speaking3 .pill,
+  .aptis-speaking3 .count-chip,
+  .aptis-speaking4 .btn,
+  .aptis-speaking4 .pill,
+  .aptis-speaking4 .count-chip,
+  .speaking-guide .btn,
+  .speaking-guide .btn.tiny,
+  .speaking-guide .soon,
+  .speaking-guide .target-pill,
+  .preppy3-wrapper .btn
+) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-speaking1 .btn:hover,
+  .aptis-speaking1 .toggle-btn:hover,
+  .aptis-speaking .btn:hover,
+  .aptis-speaking3 .btn:hover,
+  .aptis-speaking4 .btn:hover,
+  .speaking-guide .btn:hover,
+  .speaking-guide .menu-card:hover,
+  .preppy3-wrapper .btn:hover
+) {
+  background: #dbeafe !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+  filter: none !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-speaking1 .btn.primary,
+  .aptis-speaking1 .toggle-btn.selected,
+  .aptis-speaking .btn.primary,
+  .aptis-speaking3 .btn.primary,
+  .aptis-speaking4 .btn.primary,
+  .speaking-guide .btn.primary
+) {
+  background: var(--primary-gradient) !important;
+  border-color: transparent !important;
+  color: var(--primary-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .preppy3-gap,
+  .preppy3-full,
+  .preppy3-key
+) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .preppy3-face-label,
+  .preppy3-hint
+) {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] .preppy3-answer {
+  color: #9a6700 !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-speaking .count-chip.selected,
+  .aptis-speaking3 .count-chip.selected,
+  .aptis-speaking4 .count-chip.selected,
+  .aptis-speaking .chip-option.active,
+  .aptis-speaking3 .chip-option.active,
+  .aptis-speaking4 .chip-option.active
+) {
+  background: #dbeafe !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-speaking .chip-menu,
+  .aptis-speaking3 .chip-menu,
+  .aptis-speaking4 .chip-menu
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  box-shadow: 0 14px 30px var(--color-shadow) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-speaking .chip-option,
+  .aptis-speaking3 .chip-option,
+  .aptis-speaking4 .chip-option
+) {
+  background: transparent !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-speaking .chip-option:hover,
+  .aptis-speaking3 .chip-option:hover,
+  .aptis-speaking4 .chip-option:hover
+) {
+  background: var(--color-surface-3) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-speaking .chip-option .num,
+  .aptis-speaking .chip-option .ttl,
+  .aptis-speaking3 .chip-option .num,
+  .aptis-speaking3 .chip-option .ttl,
+  .aptis-speaking4 .chip-option .num,
+  .aptis-speaking4 .chip-option .ttl
+) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .speaking-guide .spec-gap-input,
+  .speaking-guide .free-spec-textarea,
+  .speaking-assign-field select,
+  .speaking-assign-field textarea
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .speaking-assign-modal {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .speaking-assign-head p,
+  .speaking-assign-field span,
+  .speaking-assign-label,
+  .speaking-assign-student-item em
+) {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] .speaking-assign-students,
+:root[data-theme="light"] .speaking-assign-student-item {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .speaking-guide .feedback.ok {
+  background: rgba(22, 128, 60, 0.1) !important;
+  border-color: rgba(22, 128, 60, 0.38) !important;
+  color: #075e2c !important;
+}
+
+:root[data-theme="light"] :is(
+  .speaking-guide .feedback.wrong,
+  .speaking-guide .feedback.not-ok
+) {
+  background: rgba(180, 35, 24, 0.1) !important;
+  border-color: rgba(180, 35, 24, 0.35) !important;
+  color: #7a180f !important;
+}
+
+/* Vocabulary pages: keep Collocation Dash game styling separate from this pass. */
+:root[data-theme="light"] :is(
+  .vocab-menu,
+  .vocab-topics,
+  .topic-trainer,
+  .synonym-page
+) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .vocab-menu,
+  .vocab-topics,
+  .topic-trainer,
+  .synonym-page
+) :is(.title, h1, h2, h3, h4, strong, .question-word, .prompt, .flash-answer, .col-title) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .vocab-menu,
+  .vocab-topics,
+  .topic-trainer,
+  .synonym-page
+) :is(.intro, .phase-intro, .muted, .small, .counter, .saved-meta, .mode-pill, .flash-meta, .flash-hint, .face-label, .review-label, .tips-list, .muted-note, .synonym-meta, .synonym-progress, .question-label, .feedback-note, .exam-head p, .flashcards-sub, p) {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .vocab-menu .card,
+  .vocab-topics .card,
+  .topic-trainer .card,
+  .topic-trainer .review-phase,
+  .topic-trainer .flashcard-shell,
+  .topic-trainer .flash-inner,
+  .topic-trainer .tips-block,
+  .topic-trainer .explanation-block,
+  .topic-trainer .review-prompt,
+  .synonym-page .synonym-setup,
+  .synonym-page .synonym-card,
+  .synonym-page .exam-row,
+  .synonym-page .feedback-box,
+  .writing-assign-modal
+) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 8px 22px var(--color-shadow-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .synonym-page .synonym-card,
+  .synonym-page .synonym-question-card
+) {
+  border-radius: 12px !important;
+  border: 1px solid var(--color-border) !important;
+  padding: 1rem !important;
+  margin-top: 1rem !important;
+}
+
+:root[data-theme="light"] :is(
+  .topic-trainer .match-item,
+  .topic-trainer .tile,
+  .topic-trainer .bank-word,
+  .topic-trainer .clue-btn,
+  .topic-trainer .mode-chip,
+  .topic-trainer .pill,
+  .topic-trainer .overlay-btn,
+  .topic-trainer .flash-fav-btn,
+  .topic-trainer .lab-pill,
+  .topic-trainer .lab-topic-tile,
+  .topic-trainer .lab-topic-check,
+  .topic-trainer .set-pill,
+  .topic-trainer .control-pill,
+  .synonym-page .mode-pill,
+  .synonym-page .option-btn,
+  .synonym-page .fav-btn,
+  .synonym-page .mini-tag,
+  .vocab-menu .soon-pill,
+  .vocab-topics .soon-pill,
+  .vocab-topics .new-pill
+) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="light"] :is(
+  .topic-trainer .match-item:hover,
+  .topic-trainer .tile:hover,
+  .topic-trainer .bank-word:hover,
+  .topic-trainer .clue-btn:hover,
+  .topic-trainer .mode-chip:hover,
+  .topic-trainer .overlay-btn:hover,
+  .topic-trainer .lab-pill:hover,
+  .topic-trainer .lab-topic-tile:hover,
+  .topic-trainer .set-pill:hover,
+  .topic-trainer .control-pill:hover,
+  .synonym-page .mode-pill:hover,
+  .synonym-page .option-btn:hover,
+  .vocab-menu .card:hover,
+  .vocab-topics .card:hover
+) {
+  background: #dbeafe !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+  filter: none !important;
+}
+
+:root[data-theme="light"] :is(
+  .topic-trainer .control-pill.active,
+  .topic-trainer .set-pill.active,
+  .topic-trainer .stage-pill.active,
+  .topic-trainer .mode-chip.active,
+  .topic-trainer .lab-pill.active,
+  .topic-trainer .lab-topic-tile.selected,
+  .synonym-page .mode-pill.active,
+  .synonym-page .option-btn.selected
+) {
+  background: #dbeafe !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 0 0 2px rgba(30, 99, 180, 0.12) !important;
+}
+
+:root[data-theme="light"] :is(
+  .topic-trainer .review-btn,
+  .writing-assign-actions .btn.primary
+) {
+  background: var(--primary-gradient) !important;
+  border-color: transparent !important;
+  color: var(--primary-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .topic-trainer .review-btn.secondary,
+  .synonym-page .review-btn.secondary
+) {
+  background: var(--color-surface-3) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] :is(
+  .topic-trainer .answer-input,
+  .topic-trainer .lab-select,
+  .synonym-page .select,
+  .writing-assign-field select,
+  .writing-assign-field textarea
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .topic-trainer .answer-input:focus,
+  .topic-trainer .lab-select:focus,
+  .synonym-page .select:focus
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border-strong) !important;
+  box-shadow: 0 0 0 2px rgba(30, 99, 180, 0.15) !important;
+}
+
+:root[data-theme="light"] :is(
+  .topic-trainer .def-pop,
+  .topic-trainer .all-done-note
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .topic-trainer .thumb,
+  .topic-trainer .match-thumb,
+  .topic-trainer .clue-image,
+  .topic-trainer .flash-img-wrap img
+) {
+  filter: none !important;
+}
+
+:root[data-theme="light"] :is(
+  .topic-trainer .match-item.done,
+  .topic-trainer .tile.done,
+  .topic-trainer .bank-word.correct
+) {
+  background: rgba(22, 128, 60, 0.12) !important;
+  border-color: rgba(22, 128, 60, 0.42) !important;
+  color: #075e2c !important;
+}
+
+:root[data-theme="light"] :is(
+  .topic-trainer .match-item.shake,
+  .topic-trainer .bank-word.wrong
+) {
+  background: rgba(180, 35, 24, 0.1) !important;
+  border-color: rgba(180, 35, 24, 0.36) !important;
+  color: #7a180f !important;
+}
+
+:root[data-theme="light"] .topic-trainer .info-dot {
+  background: #fdbf2d !important;
+  color: #172033 !important;
+}
+
+:root[data-theme="light"] .topic-trainer .collocation-hint {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] .synonym-page .question-word {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .synonym-page .mini-tag.ghost {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] .synonym-page .feedback-box.is-correct {
+  background: rgba(22, 128, 60, 0.1) !important;
+  border-color: rgba(22, 128, 60, 0.38) !important;
+  color: #075e2c !important;
+}
+
+:root[data-theme="light"] .synonym-page .feedback-box.is-wrong {
+  background: rgba(180, 35, 24, 0.1) !important;
+  border-color: rgba(180, 35, 24, 0.35) !important;
+  color: #7a180f !important;
+}
+
+:root[data-theme="light"] :is(
+  .writing-assign-head p,
+  .writing-assign-field span,
+  .writing-assign-label,
+  .writing-assign-student-item em
+) {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .writing-assign-students,
+  .writing-assign-student-item
+) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+/* Keep Synonym Trainer controls aligned with the Grammar Trainer's light-mode buttons. */
+:root[data-theme="light"] .synonym-page :is(
+  .review-btn,
+  .mode-pill,
+  .option-btn,
+  .fav-btn
+) {
+  background: var(--color-surface-3) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 6px 18px var(--color-shadow-soft), inset 0 0 0 9999px rgba(255, 255, 255, 0.02) !important;
+  filter: none !important;
+}
+
+:root[data-theme="light"] .synonym-page :is(
+  .review-btn:hover:not(:disabled),
+  .mode-pill:hover:not(:disabled),
+  .option-btn:hover:not(:disabled),
+  .fav-btn:hover:not(:disabled)
+) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 8px 22px var(--color-shadow-soft), 0 0 0 3px var(--focus-ring) !important;
+}
+
+:root[data-theme="light"] .synonym-page :is(
+  .mode-pill.active,
+  .option-btn.selected
+) {
+  background: #dbeafe !important;
+  border-color: #2563eb !important;
+  color: #172033 !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18) !important;
+}
+
+:root[data-theme="light"] .synonym-page .fav-btn.active {
+  background: rgba(253, 191, 45, 0.14) !important;
+  border-color: rgba(154, 103, 0, 0.38) !important;
+  color: #9a6700 !important;
+  box-shadow: 0 0 0 2px rgba(253, 191, 45, 0.16) !important;
+}
+
+:root[data-theme="light"] .synonym-page .review-btn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  filter: none !important;
+  box-shadow: none !important;
+}
+
+/* Listening activities: Parts 1-4 use scoped dark styles. */
+:root[data-theme="light"] :is(
+  .aptis-listening1,
+  .aptis-listening2,
+  .aptis-listening3,
+  .aptis-listening4
+) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1,
+  .aptis-listening2,
+  .aptis-listening3,
+  .aptis-listening4
+) :is(.title, h1, h2, h3, h4, strong, .minihead, .questionText, .stmt, .scriptTitle, .speaker, .text) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1,
+  .aptis-listening2,
+  .aptis-listening3,
+  .aptis-listening4
+) :is(.intro, .fieldLabel, .smallnote, .lock-note, .chiplabel, .stem, .why-evidence) {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .panel,
+  .aptis-listening1 .questionCard,
+  .aptis-listening1 .why-box,
+  .aptis-listening1 .scriptPanel,
+  .aptis-listening2 .panel,
+  .aptis-listening2 .row,
+  .aptis-listening2 .why-box,
+  .aptis-listening2 .scriptPanel,
+  .aptis-listening3 .panel,
+  .aptis-listening3 .row,
+  .aptis-listening3 .why-box,
+  .aptis-listening3 .scriptPanel,
+  .aptis-listening4 .panel,
+  .aptis-listening4 .questionCard,
+  .aptis-listening4 .why-box,
+  .aptis-listening4 .scriptPanel
+) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 8px 22px var(--color-shadow-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .audioBox,
+  .aptis-listening2 .audioBox,
+  .aptis-listening3 .audioBox,
+  .aptis-listening4 .audioBox
+) {
+  background: transparent !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .btn,
+  .aptis-listening1 .modeBtn,
+  .aptis-listening1 .why-btn,
+  .aptis-listening1 .pill,
+  .aptis-listening1 .dot,
+  .aptis-listening2 .btn,
+  .aptis-listening2 .why-btn,
+  .aptis-listening2 .pill,
+  .aptis-listening3 .btn,
+  .aptis-listening3 .why-btn,
+  .aptis-listening3 .pill,
+  .aptis-listening4 .btn,
+  .aptis-listening4 .why-btn,
+  .aptis-listening4 .pill
+) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .btn:hover:not(:disabled),
+  .aptis-listening1 .modeBtn:hover:not(:disabled),
+  .aptis-listening1 .why-btn:hover:not(:disabled),
+  .aptis-listening2 .btn:hover:not(:disabled),
+  .aptis-listening2 .why-btn:hover:not(:disabled),
+  .aptis-listening3 .btn:hover:not(:disabled),
+  .aptis-listening3 .why-btn:hover:not(:disabled),
+  .aptis-listening4 .btn:hover:not(:disabled),
+  .aptis-listening4 .why-btn:hover:not(:disabled)
+) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+  filter: none !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .btn.primary,
+  .aptis-listening1 .modeBtn.active,
+  .aptis-listening2 .btn.primary,
+  .aptis-listening3 .btn.primary,
+  .aptis-listening4 .btn.primary
+) {
+  background: #dbeafe !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.14) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .btn.danger,
+  .aptis-listening2 .btn.danger,
+  .aptis-listening3 .btn.danger,
+  .aptis-listening4 .btn.danger
+) {
+  background: rgba(180, 35, 24, 0.1) !important;
+  border-color: rgba(180, 35, 24, 0.35) !important;
+  color: #7a180f !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .btn.ghost,
+  .aptis-listening2 .btn.ghost,
+  .aptis-listening3 .btn.ghost,
+  .aptis-listening4 .btn.ghost
+) {
+  background: transparent !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .select,
+  .aptis-listening1 .chipselect,
+  .aptis-listening2 .select,
+  .aptis-listening2 .chipselect,
+  .aptis-listening3 .select,
+  .aptis-listening3 .chipselect,
+  .aptis-listening4 .select,
+  .aptis-listening4 .chipselect
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .optionBtn,
+  .aptis-listening2 .optionBtn,
+  .aptis-listening3 .optionBtn,
+  .aptis-listening4 .optionBtn
+) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .optionBtn:hover,
+  .aptis-listening2 .optionBtn:hover,
+  .aptis-listening3 .optionBtn:hover,
+  .aptis-listening4 .optionBtn:hover
+) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border-strong) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .optionBtn.selected,
+  .aptis-listening4 .optionBtn.selected
+) {
+  background: #dbeafe !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.14) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .optionLetter,
+  .aptis-listening4 .optionLetter
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .optionBtn.selected .optionLetter,
+  .aptis-listening4 .optionBtn.selected .optionLetter
+) {
+  background: rgba(37, 99, 235, 0.14) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .optionBtn.selected .optionText,
+  .aptis-listening4 .optionBtn.selected .optionText
+) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .optionBtn.ok,
+  .aptis-listening4 .optionBtn.ok,
+  .aptis-listening2 .select.ok,
+  .aptis-listening3 .select.ok
+) {
+  background: rgba(22, 128, 60, 0.08) !important;
+  border-color: rgba(22, 128, 60, 0.42) !important;
+  color: #075e2c !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .optionBtn.bad,
+  .aptis-listening4 .optionBtn.bad,
+  .aptis-listening2 .select.bad,
+  .aptis-listening3 .select.bad
+) {
+  background: rgba(180, 35, 24, 0.08) !important;
+  border-color: rgba(180, 35, 24, 0.36) !important;
+  color: #7a180f !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .linkbtn,
+  .aptis-listening2 .linkbtn,
+  .aptis-listening3 .linkbtn,
+  .aptis-listening4 .linkbtn,
+  .aptis-listening1 .why-label,
+  .aptis-listening2 .why-label,
+  .aptis-listening3 .why-label,
+  .aptis-listening4 .why-label,
+  .aptis-listening1 .num,
+  .aptis-listening2 .num,
+  .aptis-listening3 .num,
+  .aptis-listening4 .qnum
+) {
+  color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 mark.evidence,
+  .aptis-listening2 mark.evidence,
+  .aptis-listening3 mark.evidence,
+  .aptis-listening4 mark.evidence
+) {
+  background: rgba(253, 191, 45, 0.22) !important;
+  border-color: rgba(154, 103, 0, 0.34) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .aptis-listening1 .scriptLine.active-script-line,
+  .aptis-listening2 .scriptLine.active-script-line,
+  .aptis-listening3 .scriptLine.active-script-line,
+  .aptis-listening4 .scriptLine.active-script-line
+) {
+  border-left-color: var(--color-border-strong) !important;
+}
+
+/* Seif Hub learning tools: component styles are injected locally, so keep this late and explicit. */
+:root[data-theme="light"] :is(
+  .hub-flashcards-menu-shell,
+  .hub-flashcards-shell,
+  .hub-mini-browser,
+  .hub-dictation-page,
+  .hub-grammar-page,
+  .hub-keyword-page,
+  .hub-prefixes-page
+) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcards-title,
+  .hub-flashcards-heading,
+  .hub-flashcards-heading h1,
+  .hub-flashcards-menu-card h2,
+  .hub-flashcards-menu-card h3,
+  .hub-flashcards-assign-head h2,
+  .hub-mini-browser-head h2,
+  .hub-mini-card-shell h3,
+  .hub-mini-assign-head h2,
+  .hub-mini-share-head h2,
+  .hub-dictation-header h1,
+  .hub-grammar-header h1,
+  .hub-grammar-card-head p,
+  .hub-grammar-summary strong,
+  .hub-grammar-card strong,
+  .hub-keyword-header h1,
+  .hub-keyword-card h2,
+  .hub-keyword-card h3,
+  .hub-keyword-card strong,
+  .hub-prefixes-header h1,
+  .hub-prefixes-summary strong,
+  .hub-prefixes-card strong,
+  .hub-prefixes-mcq-card strong
+) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcards-copy,
+  .hub-flashcards-subcopy,
+  .hub-flashcards-menu-card p,
+  .hub-flashcards-mini-note,
+  .hub-flashcard-hint,
+  .hub-flashcards-review-context,
+  .hub-flashcards-review-origin,
+  .hub-mini-browser-head p,
+  .hub-mini-card-shell p,
+  .hub-mini-share-help,
+  .hub-dictation-sub,
+  .mode-toggle-value,
+  .mode-summary,
+  .hub-dictation-page .help,
+  .hub-dictation-page .list,
+  .hub-dictation-page .report-meta,
+  .hub-grammar-header p,
+  .hub-grammar-share-head p,
+  .hub-grammar-share-help,
+  .hub-grammar-figure-caption,
+  .hub-grammar-word-help,
+  .hub-grammar-placement-base,
+  .hub-keyword-header p,
+  .hub-keyword-meta,
+  .hub-keyword-gapfill,
+  .hub-keyword-source,
+  .hub-prefixes-header p,
+  .hub-prefixes-bank-label,
+  .hub-prefixes-answer-label,
+  .hub-prefixes-feedback-placeholder
+) {
+  color: var(--color-text-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcards-menu-card,
+  .hub-flashcards-toolbar,
+  .hub-flashcards-toolbar-group,
+  .hub-flashcards-summary .pill,
+  .hub-flashcard-face,
+  .hub-flashcards-review-context,
+  .hub-flashcards-empty,
+  .hub-flashcards-assign-modal,
+  .hub-flashcards-assign-student-list,
+  .hub-mini-browser,
+  .hub-mini-card-shell,
+  .hub-mini-assign-modal,
+  .hub-mini-share-modal,
+  .hub-mini-share-code,
+  .hub-mini-empty,
+  .hub-dictation-statusbar,
+  .hub-dictation-card,
+  .hub-dictation-page .report-item,
+  .hub-grammar-header,
+  .hub-grammar-card,
+  .hub-grammar-summary > div,
+  .hub-grammar-share-modal,
+  .hub-keyword-header,
+  .hub-keyword-card,
+  .hub-keyword-summary > div,
+  .hub-prefixes-header,
+  .hub-prefixes-summary > div,
+  .hub-prefixes-bank,
+  .hub-prefixes-card,
+  .hub-prefixes-mcq-card
+) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 8px 22px var(--color-shadow-soft) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcards-menu-card:hover,
+  .hub-mini-card-shell:hover,
+  .hub-prefixes-option-btn:hover:not(:disabled)
+) {
+  border-color: var(--color-border-strong) !important;
+  box-shadow: 0 12px 26px var(--color-shadow) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcard-front,
+  .hub-flashcard-back
+) {
+  background: linear-gradient(180deg, #ffffff 0%, #eef4ff 100%) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcards-menu-card-pill,
+  .hub-flashcard-tag,
+  .hub-flashcard-save,
+  .selected-pill,
+  .hub-mini-count,
+  .hub-mini-complete,
+  .level-pill,
+  .hub-prefixes-progress-chip,
+  .hub-prefixes-kicker,
+  .hub-prefixes-number,
+  .hub-prefixes-prefix-chip,
+  .hub-prefixes-bank-chip,
+  .hub-prefixes-option-letter,
+  .hub-grammar-kicker,
+  .hub-grammar-share-pill,
+  .hub-grammar-number,
+  .hub-grammar-keyline,
+  .hub-keyword-kicker,
+  .cefr-badge
+) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] :is(
+  .level-pill.selected,
+  .hub-mini-filter-group .level-pill.selected,
+  .hub-grammar-option.is-selected,
+  .hub-grammar-adverb-chip.is-selected,
+  .hub-grammar-adverb-slot.has-adverb,
+  .hub-grammar-comma-toggle.is-active,
+  .hub-grammar-no-commas-btn.is-selected,
+  .hub-grammar-word-pill.is-placed,
+  .hub-prefixes-option-btn.is-selected
+) {
+  background: #dbeafe !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcards-eyebrow,
+  .hub-flashcards-kicker,
+  .hub-flashcards-toolbar-label,
+  .hub-flashcards-slider-value,
+  .hub-flashcard-block-label,
+  .hub-flashcard-label,
+  .hub-flashcard-prompt-row-label,
+  .hub-mini-filter-label,
+  .hub-mini-share-label,
+  .statusbar-label,
+  .hub-keyword-keylabel,
+  .hub-grammar-summary-label,
+  .hub-grammar-keylabel,
+  .hub-grammar-share-label,
+  .field-label,
+  .hub-keyword-summary-label,
+  .hub-prefixes-summary-label
+) {
+  color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcard-block-text,
+  .hub-flashcard-text,
+  .hub-flashcard-prompt-row,
+  .hub-flashcard-prompt-row-text,
+  .statusbar-value,
+  .mode-toggle-label,
+  .hub-grammar-card-head p,
+  .hub-grammar-sentence,
+  .hub-grammar-original-sentence,
+  .hub-grammar-comma-sentence,
+  .hub-grammar-comma-word,
+  .hub-grammar-adverb-sentence,
+  .hub-grammar-adverb-token,
+  .hub-grammar-word-final-punctuation,
+  .hub-grammar-keyline strong,
+  .hub-keyword-keyline strong,
+  .hub-prefixes-sentence,
+  .hub-prefixes-mcq-prompt,
+  .hub-prefixes-target
+) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcards-field input,
+  .hub-flashcards-field select,
+  .hub-flashcards-field textarea,
+  .hub-mini-search,
+  .hub-mini-field select,
+  .hub-mini-field textarea,
+  .hub-mini-share-copy input,
+  .hub-dictation-page select,
+  .hub-dictation-page textarea,
+  .hub-grammar-gap,
+  .hub-grammar-share-copy input,
+  .field-block select,
+  .hub-keyword-answer-row input,
+  .hub-keyword-page .select,
+  .hub-keyword-page .report-input,
+  .hub-prefixes-select,
+  .hub-prefixes-text-input
+) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: inset 0 1px 0 rgba(30, 41, 59, 0.04) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcards-assign-student-item,
+  .hub-mini-assign-student-item,
+  .hub-keyword-feedback,
+  .hub-grammar-sentence,
+  .hub-grammar-comma-sentence,
+  .hub-grammar-adverb-bank,
+  .hub-grammar-adverb-sentence,
+  .hub-grammar-word-dropzone,
+  .hub-grammar-word-bank,
+  .hub-grammar-share-code,
+  .report-bar,
+  .hub-prefixes-option-btn,
+  .hub-dictation-page .token
+) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcards-menu-card-actions .review-btn,
+  .hub-flashcards-assign-btn,
+  .hub-flashcards-menu-topbar .review-btn,
+  .hub-flashcards-header-row .review-btn,
+  .hub-mini-clear,
+  .hub-mini-assign-btn,
+  .hub-mini-share-btn,
+  .hub-mini-assign-actions .review-btn,
+  .hub-mini-share-copy .review-btn,
+  .hub-mini-share-head .ghost-btn,
+  .hub-dictation-page .controls button,
+  .hub-dictation-page .small-btn,
+  .hub-keyword-page .review-btn,
+  .hub-keyword-page .generate-btn,
+  .hub-grammar-page .review-btn,
+  .hub-grammar-page .ghost-btn,
+  .hub-grammar-page .generate-btn,
+  .hub-grammar-inline-btn,
+  .hub-grammar-option,
+  .hub-grammar-comma-toggle,
+  .hub-grammar-adverb-chip,
+  .hub-grammar-adverb-slot,
+  .hub-grammar-word-pill,
+  .hub-prefixes-page .review-btn,
+  .hub-prefixes-page .ghost-btn,
+  .hub-prefixes-page .generate-btn
+) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-dictation-page .controls .primary,
+  .hub-dictation-page .settings-start-btn,
+  .hub-keyword-page .generate-btn,
+  .hub-keyword-page .hub-check-btn,
+  .hub-grammar-page .generate-btn,
+  .hub-prefixes-page .generate-btn
+) {
+  background: var(--primary-gradient) !important;
+  border-color: transparent !important;
+  color: var(--primary-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-dictation-page .controls .success,
+  .hub-keyword-feedback.is-correct,
+  .hub-grammar-feedback.is-correct,
+  .hub-grammar-option.is-correct,
+  .hub-grammar-adverb-placed.is-correct,
+  .hub-grammar-adverb-placed.is-correction,
+  .hub-prefixes-feedback.is-correct
+) {
+  background: rgba(22, 128, 60, 0.08) !important;
+  border-color: rgba(22, 128, 60, 0.35) !important;
+  color: var(--color-success-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-dictation-page .controls .warn,
+  .hub-keyword-feedback.is-wrong,
+  .hub-grammar-feedback.is-wrong,
+  .hub-grammar-option.is-wrong,
+  .hub-grammar-adverb-placed.is-wrong,
+  .hub-prefixes-feedback.is-wrong
+) {
+  background: rgba(180, 35, 24, 0.08) !important;
+  border-color: rgba(180, 35, 24, 0.32) !important;
+  color: var(--color-danger) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-footer-fav-btn,
+  .hub-report-btn
+) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] .hub-footer-fav-btn.active {
+  background: rgba(154, 103, 0, 0.12) !important;
+  border-color: rgba(154, 103, 0, 0.34) !important;
+  color: var(--color-accent) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-flashcard-highlight,
+  .hub-grammar-highlight,
+  .hub-prefixes-highlight
+) {
+  background: rgba(253, 191, 45, 0.22) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-prefixes-card.is-correct,
+  .hub-prefixes-mcq-card.is-correct,
+  .hub-prefixes-option-btn.is-correct,
+  .hub-prefixes-select.is-correct,
+  .hub-prefixes-text-input.is-correct
+) {
+  background: rgba(22, 128, 60, 0.08) !important;
+  border-color: rgba(22, 128, 60, 0.45) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-prefixes-card.is-wrong,
+  .hub-prefixes-mcq-card.is-wrong,
+  .hub-prefixes-option-btn.is-wrong,
+  .hub-prefixes-select.is-wrong,
+  .hub-prefixes-text-input.is-wrong
+) {
+  background: rgba(180, 35, 24, 0.08) !important;
+  border-color: rgba(180, 35, 24, 0.38) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-keyword-token.correct,
+  .hub-opencloze-letter.correct,
+  .hub-wordformation-letter.correct,
+  .hub-dictation-page .correct
+) {
+  background: rgba(22, 128, 60, 0.1) !important;
+  border-color: rgba(22, 128, 60, 0.35) !important;
+  color: var(--color-success-text) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-keyword-token.wrong,
+  .hub-opencloze-letter.wrong,
+  .hub-wordformation-letter.wrong,
+  .hub-dictation-page .wrong
+) {
+  background: rgba(180, 35, 24, 0.1) !important;
+  border-color: rgba(180, 35, 24, 0.32) !important;
+  color: var(--color-danger) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-keyword-token.missing,
+  .hub-opencloze-letter.missing,
+  .hub-wordformation-letter.missing,
+  .hub-dictation-page .missing,
+  .hub-dictation-page .clue-letter
+) {
+  background: rgba(253, 191, 45, 0.18) !important;
+  border-color: rgba(154, 103, 0, 0.34) !important;
+  color: var(--color-accent) !important;
+}
+
+:root[data-theme="light"] :is(
+  .hub-keyword-token.extra,
+  .hub-opencloze-letter.extra,
+  .hub-wordformation-letter.extra,
+  .hub-dictation-page .clue-word
+) {
+  background: rgba(37, 99, 235, 0.09) !important;
+  border-color: rgba(37, 99, 235, 0.28) !important;
+  color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] .hub-dictation-page .switch .slider {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+}
+
+:root[data-theme="light"] .hub-dictation-page .switch input:checked + .slider {
+  background: rgba(37, 99, 235, 0.18) !important;
+}
+
+:root[data-theme="light"] .hub-grammar-word-dropzone.is-empty::after,
+:root[data-theme="light"] .hub-grammar-adverb-slot-mark {
+  color: var(--color-muted) !important;
+}

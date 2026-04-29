@@ -1,11 +1,9 @@
 import React from "react";
-import { toast } from "../utils/toast"; // only needed if you pick Option B
-import UnderConstructionBadge from "./common/UnderConstructionBadge";
 import { useNavigate } from "react-router-dom";
 import Seo from "./common/Seo.jsx"; // adjust path if your folder structure differs
 
 
-export default function MainMenu({ onSelect, user }) {
+export default function MainMenu({ user }) {
   const navigate = useNavigate();
   return (
     <div className="menu-wrapper">
@@ -203,6 +201,7 @@ export default function MainMenu({ onSelect, user }) {
 
         .menu-sub {
           opacity: .85;
+          color: var(--color-text-soft);
           margin-top: .2rem;
           margin-bottom: .6rem;
         }
@@ -235,21 +234,21 @@ export default function MainMenu({ onSelect, user }) {
   font-size: .75rem;
   font-weight: 700;
   letter-spacing: .02em;
-  color: #ffcf70;
+  color: var(--color-accent);
   background: rgba(255, 191, 73, 0.12);
   border: 1px solid rgba(255, 191, 73, 0.28);
 }
 
 .whats-new-copy p {
   margin: 0;
-  color: #e6f0ff;
+  color: var(--color-text-soft);
   line-height: 1.4;
 }
 
 .whats-new-btn {
   flex-shrink: 0;
-  background: linear-gradient(180deg, #f6bd60, #e9a93f);
-  color: #13213b;
+  background: var(--primary-gradient);
+  color: var(--primary-text);
   border: none;
   border-radius: 12px;
   padding: .7rem 1rem;
@@ -289,9 +288,9 @@ export default function MainMenu({ onSelect, user }) {
 
         /* ——— Cards ——— */
         .menu-card {
-          background: #13213b;
-          border: 1px solid #2c4b83;
-          color: #e6f0ff;
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
+          color: var(--color-text);
           border-radius: 14px;
           padding: 1rem;
           text-align: left;
@@ -303,14 +302,16 @@ export default function MainMenu({ onSelect, user }) {
         }
         .menu-card:hover {
           transform: translateY(-2px);
-          box-shadow: 0 6px 18px rgba(0,0,0,.25);
-          border-color: #4a79d8;
+          box-shadow: 0 6px 18px var(--color-shadow-soft);
+          border-color: var(--color-border-strong);
         }
         .menu-card h3 {
           margin: .1rem 0 .35rem;
+          color: var(--color-text);
         }
         .menu-card p {
           margin: 0;
+          color: var(--color-text-soft);
           opacity: .9;
         }
 
@@ -319,13 +320,13 @@ export default function MainMenu({ onSelect, user }) {
           position: relative;
           cursor: not-allowed;
           opacity: 0.6;
-          background: #1a2747;
-          border: 1px dashed #3a5ba0;
+          background: var(--color-surface-3);
+          border: 1px dashed var(--color-border);
         }
         .soon-card:hover {
           transform: none;
           box-shadow: none;
-          border-color: #3a5ba0;
+          border-color: var(--color-border);
         }
 
         .soon-head {
@@ -342,9 +343,9 @@ export default function MainMenu({ onSelect, user }) {
         }
 
         .soon-pill {
-          background: #24365d;
-          border: 1px solid #37598e;
-          color: #9eb7e5;
+          background: var(--color-surface-3);
+          border: 1px solid var(--color-border);
+          color: var(--color-muted);
           font-size: .75rem;
           line-height: 1.2;
           padding: .2rem .5rem;
@@ -361,8 +362,27 @@ export default function MainMenu({ onSelect, user }) {
 .soon-card.tease:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 18px rgba(0,0,0,.25);
-  border-color: #4a79d8;
-  background: #223463;
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-3);
+}
+
+:root[data-theme="light"] .main-header {
+  background: #13213b;
+  border-radius: 12px;
+  margin-bottom: .8rem;
+  padding: .75rem;
+}
+
+:root[data-theme="light"] .menu-logo {
+  filter:
+    drop-shadow(0 4px 12px rgba(15, 23, 42, 0.35))
+    drop-shadow(0 0 18px rgba(255, 180, 64, 0.18));
+}
+
+:root[data-theme="light"] .menu-logo:hover {
+  filter:
+    drop-shadow(0 5px 14px rgba(15, 23, 42, 0.45))
+    drop-shadow(0 0 22px rgba(255, 180, 64, 0.24));
 }
 
       `}</style>

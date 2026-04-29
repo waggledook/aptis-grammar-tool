@@ -835,6 +835,80 @@ function HubYourClassStyles() {
         color: #a9b7d1;
       }
 
+      :root[data-theme="light"] .hub-class-wrapper {
+        color: var(--color-text);
+      }
+
+      :root[data-theme="light"] .hub-class-wrapper :is(.hub-class-hero, .hub-class-panel) {
+        background: var(--color-surface-2);
+        border-color: var(--color-border);
+        color: var(--color-text);
+        box-shadow: 0 12px 30px var(--color-shadow-soft);
+      }
+
+      :root[data-theme="light"] .hub-class-wrapper :is(
+        .hub-class-title,
+        .hub-class-panel-head h2,
+        .hub-class-group-head h3,
+        .hub-class-session-head h4,
+        .hub-class-session-meta p,
+        .hub-class-session-note p
+      ) {
+        color: var(--color-text);
+      }
+
+      :root[data-theme="light"] .hub-class-wrapper :is(
+        .hub-class-copy,
+        .hub-class-panel-head p,
+        .hub-class-session-head p,
+        .hub-class-empty
+      ) {
+        color: var(--color-text-soft);
+      }
+
+      :root[data-theme="light"] .hub-class-wrapper :is(
+        .hub-class-kicker,
+        .hub-class-count,
+        .hub-class-group-head span
+      ) {
+        background: var(--color-surface-3);
+        border-color: var(--color-border);
+        color: var(--color-link);
+      }
+
+      :root[data-theme="light"] .hub-class-wrapper .hub-class-session-card {
+        background: var(--color-surface);
+        border-color: var(--color-border);
+        color: var(--color-text);
+        box-shadow: 0 4px 14px var(--color-shadow-soft);
+      }
+
+      :root[data-theme="light"] .hub-class-wrapper :is(.hub-class-session-meta span, .hub-class-session-note span) {
+        color: var(--color-link);
+      }
+
+      :root[data-theme="light"] .hub-class-wrapper .hub-class-session-note {
+        border-top-color: var(--color-border);
+      }
+
+      :root[data-theme="light"] .hub-class-wrapper .hub-class-state.is-open {
+        color: var(--color-success-text);
+        background: rgba(22, 128, 60, 0.1);
+        border-color: rgba(22, 128, 60, 0.34);
+      }
+
+      :root[data-theme="light"] .hub-class-wrapper .hub-class-state.is-scheduled {
+        color: var(--color-accent);
+        background: rgba(154, 103, 0, 0.1);
+        border-color: rgba(154, 103, 0, 0.3);
+      }
+
+      :root[data-theme="light"] .hub-class-wrapper .hub-class-state.is-closed {
+        color: var(--color-danger);
+        background: rgba(180, 35, 24, 0.08);
+        border-color: rgba(180, 35, 24, 0.32);
+      }
+
       @media (max-width: 760px) {
         .hub-class-panel,
         .hub-class-hero {

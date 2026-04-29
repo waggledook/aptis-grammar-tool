@@ -2309,6 +2309,102 @@ function StyleScope() {
   color: #ffb4b4;
 }
 
+:root[data-theme="light"] .profile-page {
+  --panel: var(--color-surface-2);
+  --ink: var(--color-text);
+  --muted: var(--color-text-soft);
+  color: var(--color-text);
+}
+
+:root[data-theme="light"] .profile-page :is(.title, .sec-title, .inner-title, h3, h4, strong) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .profile-page :is(.intro, .muted, .small, .account-strip-sub, .account-strip-hint, .vocab-topic-sub) {
+  color: var(--color-text-soft) !important;
+  opacity: 1;
+}
+
+:root[data-theme="light"] .profile-page :is(.card, .panel, .account-strip) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 8px 22px var(--color-shadow-soft);
+}
+
+:root[data-theme="light"] .profile-page :is(.wcard, .subpanel, .hub-grammar-profile-card) {
+  background: var(--color-surface) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+  box-shadow: 0 4px 14px var(--color-shadow-soft);
+}
+
+:root[data-theme="light"] .profile-page .subpanel:hover {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border-strong) !important;
+}
+
+:root[data-theme="light"] .profile-page :is(.collapse-head, .collapse-head.inner) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .profile-page :is(.q, .a, .pb .lbl, .pb .val, .p4-col .p4-title, .vocab-row, .vocab-topic-label, .vocab-topic-count) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .profile-page :is(.submitted-html, .input) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .profile-page .submitted-html :is(p, div, span, strong, em, li) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .profile-page .input:focus {
+  border-color: var(--color-border-strong) !important;
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+:root[data-theme="light"] .profile-page .pb .track {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+}
+
+:root[data-theme="light"] .profile-page .pb .fill:not(.is-tinted) {
+  background: var(--color-border-strong) !important;
+}
+
+:root[data-theme="light"] .profile-page :is(.btn, .account-strip-toggle) {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border) !important;
+  color: var(--color-link) !important;
+  box-shadow: none;
+}
+
+:root[data-theme="light"] .profile-page :is(.btn, .account-strip-toggle):hover:not(:disabled) {
+  background: var(--color-surface-2) !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .profile-page .account-strip-error {
+  color: var(--color-danger) !important;
+}
+
+:root[data-theme="light"] .profile-page .hub-mini-level-dot {
+  box-shadow: 0 0 0 2px rgba(30, 41, 59, 0.08);
+}
+
+:root[data-theme="light"] .profile-page .subpanel + .subpanel {
+  border-top-color: var(--color-border) !important;
+}
+
+:root[data-theme="light"] .profile-page .chev {
+  color: var(--color-link);
+}
+
 
     `}</style>
   );
@@ -2338,7 +2434,7 @@ function ProgressBarTinted({ label, value, max, right, color }) {
         <span className="val">{right}</span>
       </div>
       <div className="track">
-        <div className="fill" style={{ width: `${pct}%`, background: color || undefined }} />
+        <div className="fill is-tinted" style={{ width: `${pct}%`, background: color || undefined }} />
       </div>
     </div>
   );

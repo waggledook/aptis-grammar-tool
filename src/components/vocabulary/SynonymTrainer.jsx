@@ -994,6 +994,44 @@ export default function SynonymTrainer() {
           color: #8fb0f5;
           font-weight: 700;
         }
+        :root[data-theme="light"] .synonym-page .review-btn,
+        :root[data-theme="light"] .synonym-page .mode-pill,
+        :root[data-theme="light"] .synonym-page .option-btn,
+        :root[data-theme="light"] .synonym-page .fav-btn {
+          background: var(--color-surface-3);
+          border: 1px solid var(--color-border);
+          color: var(--color-text);
+          box-shadow: 0 6px 18px var(--color-shadow-soft), inset 0 0 0 9999px rgba(255, 255, 255, 0.02);
+          filter: none;
+        }
+        :root[data-theme="light"] .synonym-page .review-btn:hover:not(:disabled),
+        :root[data-theme="light"] .synonym-page .mode-pill:hover:not(:disabled),
+        :root[data-theme="light"] .synonym-page .option-btn:hover:not(:disabled),
+        :root[data-theme="light"] .synonym-page .fav-btn:hover:not(:disabled) {
+          background: var(--color-surface-2);
+          border-color: var(--color-border-strong);
+          color: var(--color-text);
+          box-shadow: 0 8px 22px var(--color-shadow-soft), 0 0 0 3px var(--focus-ring);
+        }
+        :root[data-theme="light"] .synonym-page .mode-pill.active,
+        :root[data-theme="light"] .synonym-page .option-btn.selected {
+          background: #dbeafe;
+          border-color: #2563eb;
+          color: #172033;
+          box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+        }
+        :root[data-theme="light"] .synonym-page .fav-btn.active {
+          background: rgba(253, 191, 45, 0.14);
+          border-color: rgba(154, 103, 0, 0.38);
+          color: #9a6700;
+          box-shadow: 0 0 0 2px rgba(253, 191, 45, 0.16);
+        }
+        :root[data-theme="light"] .synonym-page .review-btn:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          filter: none;
+          box-shadow: none;
+        }
         @media (max-width: 820px) {
           .synonym-filters,
           .option-grid {

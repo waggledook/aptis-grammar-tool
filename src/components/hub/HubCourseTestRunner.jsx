@@ -4337,6 +4337,282 @@ function HubCourseTestRunnerStyles() {
         flex-wrap: wrap;
       }
 
+      :root[data-theme="light"] .hub-course-test-wrapper {
+        color: var(--color-text);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper :is(
+        .hub-course-test-hero,
+        .hub-course-test-panel,
+        .hub-course-test-modal-card,
+        .hub-course-test-reading-workspace-card
+      ) {
+        background: var(--color-surface-2);
+        border-color: var(--color-border);
+        color: var(--color-text);
+        box-shadow: 0 12px 30px var(--color-shadow-soft);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper :is(
+        .hub-course-test-title,
+        .hub-course-test-panel-head h2,
+        .hub-course-test-report-hero h2,
+        .hub-course-test-report-score strong,
+        .hub-course-test-timer strong,
+        .hub-course-test-passage-card h3,
+        .hub-course-test-item-head p,
+        .hub-course-test-word-formation-line-root,
+        .hub-course-test-word-formation-example-answer,
+        .hub-course-test-reading-workspace-head h3,
+        .hub-course-test-drag-bank h3,
+        .hub-course-test-drag-column h3,
+        .hub-course-test-drag-column-example,
+        .hub-course-test-modal-head h3,
+        .hub-course-test-modal-listening h4,
+        .hub-course-test-feedback-answer strong,
+        .hub-course-test-feedback-attempt-label,
+        .hub-course-test-nav-copy strong,
+        .hub-course-test-listening-card strong,
+        .hub-course-test-summary-card strong,
+        .hub-course-test-detail-card strong,
+        .hub-course-test-listening-hero h2
+      ) {
+        color: var(--color-text);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper :is(
+        .hub-course-test-save,
+        .hub-course-test-copy,
+        .hub-course-test-panel-head p,
+        .hub-course-test-footnote p,
+        .hub-course-test-listening-card p,
+        .hub-course-test-report-hero p,
+        .hub-course-test-report-score p,
+        .hub-course-test-report-row small,
+        .hub-course-test-timer span,
+        .hub-course-test-shared-title,
+        .hub-course-test-example-line,
+        .hub-course-test-passage-card p,
+        .hub-course-test-uoe-passage p,
+        .hub-course-test-word-formation-line-text,
+        .hub-course-test-reading-launch-copy,
+        .hub-course-test-reading-workspace-head p,
+        .hub-course-test-drag-help,
+        .hub-course-test-modal-head p,
+        .hub-course-test-feedback-plain,
+        .hub-course-test-feedback-attempt-body p,
+        .hub-course-test-nav-copy small,
+        .hub-course-test-summary-card p,
+        .hub-course-test-detail-card span,
+        .hub-course-test-confirm-copy,
+        .hub-course-test-listening-subtitle,
+        .hub-course-test-listening-instruction
+      ) {
+        color: var(--color-text-soft);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper :is(
+        .hub-course-test-kicker,
+        .hub-course-test-pill,
+        .hub-course-test-report-status,
+        .hub-course-test-uoe-gap-number,
+        .hub-course-test-uoe-gap-label,
+        .hub-course-test-item-index,
+        .hub-course-test-choice-letter,
+        .hub-course-test-matching-trigger-icon,
+        .hub-course-test-nav-index,
+        .hub-course-test-listening-kicker,
+        .hub-course-test-listening-status,
+        .hub-course-test-sound-highlight,
+        .hub-course-test-status-label,
+        .hub-course-test-summary-card span,
+        .hub-course-test-detail-card span,
+        .hub-course-test-note-block span
+      ) {
+        background: var(--color-surface-3);
+        border-color: var(--color-border);
+        color: var(--color-link);
+        text-shadow: none;
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper :is(
+        .hub-course-test-report-score,
+        .hub-course-test-report-row,
+        .hub-course-test-scorebar,
+        .hub-course-test-shared-prompt,
+        .hub-course-test-example-block,
+        .hub-course-test-passage-card,
+        .hub-course-test-uoe-passage,
+        .hub-course-test-missing-option,
+        .hub-course-test-item-card,
+        .hub-course-test-drag-bank,
+        .hub-course-test-drag-column,
+        .hub-course-test-dropzone,
+        .hub-course-test-feedback-block,
+        .hub-course-test-feedback-attempt,
+        .hub-course-test-nav-btn,
+        .hub-course-test-listening-card,
+        .hub-course-test-summary-card,
+        .hub-course-test-detail-card,
+        .hub-course-test-note-block
+      ) {
+        background: var(--color-surface);
+        border-color: var(--color-border);
+        color: var(--color-text);
+        box-shadow: none;
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-item-card.is-plain {
+        background: transparent;
+        border-bottom-color: var(--color-border);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper :is(
+        .hub-course-test-inline-gap,
+        .hub-course-test-word-formation-input,
+        .hub-course-test-uoe-select,
+        .input
+      ) {
+        background: var(--color-surface-3);
+        border-color: var(--color-border);
+        color: var(--color-text);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper :is(
+        .hub-course-test-choice-card,
+        .hub-course-test-matching-trigger,
+        .hub-course-test-matching-option,
+        .hub-course-test-stress-btn,
+        .hub-course-test-drag-chip,
+        .hub-course-test-word-chip,
+        .hub-course-test-missing-gap,
+        .hub-course-test-missing-option-clear,
+        .hub-course-test-fab,
+        .hub-course-test-fab.is-secondary
+      ) {
+        background: var(--color-surface-3);
+        border-color: var(--color-border);
+        color: var(--color-text);
+        box-shadow: none;
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper :is(
+        .hub-course-test-choice-card:hover:not(:disabled),
+        .hub-course-test-matching-option:hover,
+        .hub-course-test-stress-btn:hover,
+        .hub-course-test-fab:hover:not(:disabled)
+      ) {
+        background: var(--color-surface-2);
+        border-color: var(--color-border-strong);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper :is(
+        .hub-course-test-choice-card.is-selected,
+        .hub-course-test-choice-word-btn.is-selected,
+        .hub-course-test-matching-trigger.is-selected,
+        .hub-course-test-matching-option.is-selected,
+        .hub-course-test-stress-btn.is-selected,
+        .hub-course-test-nav-btn.active,
+        .hub-course-test-status-actions .ghost-btn.is-selected,
+        .hub-course-test-missing-gap.is-active,
+        .hub-course-test-dropzone.is-active
+      ) {
+        background: linear-gradient(180deg, #c7dcff 0%, #b7d3ff 100%);
+        border-color: #2563eb;
+        color: var(--color-text);
+        box-shadow:
+          inset 0 0 0 2px rgba(37, 99, 235, 0.28),
+          0 10px 24px rgba(37, 99, 235, 0.14);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper :is(
+        .hub-course-test-choice-card.is-selected .hub-course-test-choice-letter,
+        .hub-course-test-missing-gap-number
+      ) {
+        background: #e0ecff;
+        border-color: #2563eb;
+        color: #1e3a8a;
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper :is(
+        .hub-course-test-choice-text,
+        .hub-course-test-matching-trigger-text,
+        .hub-course-test-missing-gap-value,
+        .hub-course-test-missing-option-main,
+        .hub-course-test-missing-option-label,
+        .hub-course-test-drag-chip-text
+      ) {
+        color: var(--color-text);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-matching-menu {
+        background: var(--color-surface);
+        border-color: var(--color-border);
+        box-shadow: 0 16px 34px var(--color-shadow);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-timer {
+        background: var(--color-surface);
+        border-color: var(--color-border);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-timer.is-over {
+        background: rgba(180, 35, 24, 0.08);
+        border-color: rgba(180, 35, 24, 0.35);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-report-track {
+        background: var(--color-surface-3);
+        border: 1px solid var(--color-border);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-report-fill {
+        background: linear-gradient(90deg, #2563eb, #16803c);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-modal,
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-reading-workspace {
+        background: rgba(30, 41, 59, 0.32);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-dropzone.is-empty::after {
+        color: var(--color-muted);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-feedback-attempt.is-correct,
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-item-feedback.is-correct {
+        background: rgba(22, 128, 60, 0.08);
+        border-color: rgba(22, 128, 60, 0.34);
+        color: var(--color-success-text);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-feedback-attempt.is-partial {
+        background: rgba(154, 103, 0, 0.1);
+        border-color: rgba(154, 103, 0, 0.34);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-feedback-attempt.is-wrong,
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-item-feedback.is-wrong {
+        background: rgba(180, 35, 24, 0.08);
+        border-color: rgba(180, 35, 24, 0.32);
+        color: var(--color-danger);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-feedback-attempt-chip.is-correct {
+        background: rgba(22, 128, 60, 0.12);
+        color: var(--color-success-text);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-feedback-attempt-chip.is-partial {
+        background: rgba(154, 103, 0, 0.12);
+        color: var(--color-accent);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-feedback-attempt-chip.is-wrong {
+        background: rgba(180, 35, 24, 0.1);
+        color: var(--color-danger);
+      }
+
       @media (max-width: 920px) {
         .hub-course-test-hero,
         .hub-course-test-layout,
