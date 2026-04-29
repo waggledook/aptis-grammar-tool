@@ -1,6 +1,7 @@
 import React from "react";
 import SpeakingPart2 from "./SpeakingPart2";
 import { MORE_PART2_TASKS } from "./banks/part2More";
+import { getSitePath } from "../../siteConfig.js";
 
 export default function SpeakingPart2Secret({ user, onRequireSignIn }) {
   return (
@@ -8,7 +9,8 @@ export default function SpeakingPart2Secret({ user, onRequireSignIn }) {
       tasks={MORE_PART2_TASKS}
       user={user}
       onRequireSignIn={onRequireSignIn}
-      showAssignButton={false}
+      routeBasePath={getSitePath("/speaking/part2-secret")}
+      showAssignButton={true}
       trackProgress={false}
       lockAfterIndex={null}
       heading="Speaking – Part 2 (Extra Practice)"

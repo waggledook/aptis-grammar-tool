@@ -1,6 +1,7 @@
 import React from "react";
 import SpeakingPart3 from "./SpeakingPart3";
 import { PART3_CUSTOM_TASKS } from "./banks/part3Custom";
+import { getSitePath } from "../../siteConfig.js";
 
 export default function SpeakingPart3Custom({ user, onRequireSignIn }) {
   return (
@@ -8,7 +9,8 @@ export default function SpeakingPart3Custom({ user, onRequireSignIn }) {
       tasks={PART3_CUSTOM_TASKS}
       user={user}
       onRequireSignIn={onRequireSignIn}
-      showAssignButton={false}
+      routeBasePath={getSitePath("/speaking/part3-custom")}
+      showAssignButton={true}
       trackProgress={false}
       lockAfterIndex={null}
       heading="Speaking – Part 3 (Extra Practice)"
