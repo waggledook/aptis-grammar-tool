@@ -12545,6 +12545,278 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       ),
     ],
   },
+  {
+    id: "expressing-movement-mastery",
+    title: "Expressing Movement",
+    shortDescription: "Master prepositions and adverbs of direction.",
+    levels: ["a2", "b1"],
+    intro:
+      "Learn how to describe direction. Use 'into' or 'out of' when followed by a noun, and 'in' or 'out' when used alone.",
+    items: [
+      multipleChoiceItem(
+        "mov-mc-1",
+        "Choose the correct preposition.",
+        "The ball went ____ the goalkeeper's head.",
+        ["under", "over", "along"],
+        1,
+        "Use 'over' when something moves above an object."
+      ),
+      multipleChoiceItem(
+        "mov-mc-2",
+        "Choose the correct preposition.",
+        "He drove ____ the car park and onto the main road.",
+        ["out of", "out", "outside"],
+        0,
+        "Use 'out of' when it is followed by a noun like 'the car park'."
+      ),
+      multipleChoiceItem(
+        "mov-mc-3",
+        "Towards or away?",
+        "I'm at the office. Please ____ here and bring the documents.",
+        ["go", "come", "walk"],
+        1,
+        "Use 'come' for movement towards the speaker."
+      ),
+      multipleChoiceItem(
+        "mov-mc-4",
+        "Choose the correct preposition.",
+        "The children ran ____ the bridge to the other side of the river.",
+        ["across", "along", "into"],
+        0,
+        "Use 'across' for movement from one side of something to the other."
+      ),
+      multipleChoiceItem(
+        "mov-mc-5",
+        "Choose the correct adverb.",
+        "It's very cold outside. Please come ____.",
+        ["into", "in", "inside of"],
+        1,
+        "Use 'in' (not 'into') when there is no noun following the verb."
+      ),
+      errorCorrectionItem(
+        "mov-ec-1",
+        "Check the highlighted phrase for errors.",
+        "She went out the room because she was angry.",
+        "out the room",
+        false,
+        "out of the room",
+        "You must use 'out of' before a noun."
+      ),
+      errorCorrectionItem(
+        "mov-ec-2",
+        "Check the highlighted phrase for errors.",
+        "He walked along the street to the end of the block.",
+        "along the street",
+        true,
+        "",
+        "Correct! 'Along' is used for movement following a line or path."
+      ),
+      errorCorrectionItem(
+        "mov-ec-3",
+        "Check the highlighted phrase for errors.",
+        "The cat jumped in the box.",
+        "in the box",
+        false,
+        "into the box",
+        "Use 'into' for movement that results in being inside a space."
+      ),
+      errorCorrectionItem(
+        "mov-ec-4",
+        "Check the highlighted phrase for errors.",
+        "Go here, please! I want to show you this.",
+        "Go here",
+        false,
+        "Come here",
+        "Use 'come' for movement towards the person speaking."
+      ),
+      errorCorrectionItem(
+        "mov-ec-5",
+        "Check the highlighted phrase for errors.",
+        "They ran over the bridge.",
+        "over the bridge",
+        true,
+        "",
+        "Correct! 'Over' describes movement from one side of a high surface to the other."
+      ),
+      placeholderGapItem(
+        "mov-gf-1",
+        "Complete the sentence.",
+        "He ran __________ the park to get to the station on the other side.",
+        "across",
+        ["through"],
+        "Use 'across' for movement to the other side of an area. 'Through' is also natural when the person moves inside the area."
+      ),
+      placeholderGapItem(
+        "mov-gf-2",
+        "Complete the sentence.",
+        "The car drove __________ of the garage.",
+        "out",
+        ["out of"],
+        "When followed by 'of' + noun, the adverb is 'out'."
+      ),
+      placeholderGapItem(
+        "mov-gf-3",
+        "Complete the sentence.",
+        "Get __________ the car! We're going to be late.",
+        "into",
+        ["in"],
+        "Use 'into' when movement enters a noun/object."
+      ),
+      placeholderGapItem(
+        "mov-gf-4",
+        "Complete the sentence.",
+        "The athletes ran __________ the track for 10 laps.",
+        "around",
+        ["along"],
+        "Use 'around' or 'along' to describe movement following a specific path."
+      ),
+      placeholderGapItem(
+        "ge-1",
+        "The house",
+        "Jax was bored inside, so he jumped __________ the sofa.",
+        "off",
+        ["down from"],
+        "Use 'off' to describe moving away from a surface.",
+        {
+          imageSrc: "/images/grammar/expressing-movement/the-house.png",
+          imageAlt: "Jax the cat inside the house near the sofa and an open window.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      placeholderGapItem(
+        "ge-2",
+        "The house",
+        "He saw an open window and walked __________ the living room.",
+        "out of",
+        [],
+        "Use 'out of' because it is followed by the noun 'the living room'."
+      ),
+      placeholderGapItem(
+        "ge-3",
+        "The house",
+        "He jumped __________ the window and landed in the garden.",
+        "out",
+        ["through", "out of"],
+        "Use 'out' when there is no noun immediately following the movement verb."
+      ),
+      placeholderGapItem(
+        "ge-4",
+        "The garden",
+        "Jax ran __________ the garden path toward the back fence.",
+        "along",
+        ["down"],
+        "Use 'along' to describe movement following a line or path.",
+        {
+          imageSrc: "/images/grammar/expressing-movement/the-garden.png",
+          imageAlt: "Jax the cat running along a garden path towards a wooden fence.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      placeholderGapItem(
+        "ge-5",
+        "The garden",
+        "He saw a tall wooden fence and climbed __________ it.",
+        "up",
+        [],
+        "Use 'up' for vertical movement away from the ground."
+      ),
+      placeholderGapItem(
+        "ge-6",
+        "The garden",
+        "From the top, he looked down and then jumped __________ the fence to the other side.",
+        "off",
+        ["down from"],
+        "Use 'off' or 'down from' to describe moving away from a high surface."
+      ),
+      placeholderGapItem(
+        "ge-7",
+        "The park",
+        "He was now in the park. He walked __________ the grass to the pond.",
+        "across",
+        ["through"],
+        "Use 'across' for movement from one side of an area to another. 'Through' is also natural when moving inside the area.",
+        {
+          imageSrc: "/images/grammar/expressing-movement/the-park.png",
+          imageAlt: "Jax the cat crossing a park with grass, a pond, and a small bridge.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      placeholderGapItem(
+        "ge-8",
+        "The park",
+        "He saw a small bridge and ran __________ it to avoid the water.",
+        "over",
+        [],
+        "Use 'over' to describe movement above or across a high surface."
+      ),
+      placeholderGapItem(
+        "ge-9",
+        "The park",
+        "Suddenly, he saw a dog! He ran __________ from the dog as fast as he could.",
+        "away",
+        [],
+        "Use 'away' (or 'away from') for movement in the opposite direction of something."
+      ),
+      placeholderGapItem(
+        "ge-10",
+        "The neighbourhood",
+        "Jax reached the street and ran __________ the sidewalk.",
+        "along",
+        ["down"],
+        "Use 'along' to describe following the length of the sidewalk.",
+        {
+          imageSrc: "/images/grammar/expressing-movement/the-neighbourhood.png",
+          imageAlt: "Jax the cat running along a neighbourhood sidewalk near houses and garages.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      placeholderGapItem(
+        "ge-11",
+        "The neighbourhood",
+        "He found an open garage and walked __________.",
+        "in",
+        ["inside"],
+        "Use 'in' when there is no noun following the verb."
+      ),
+      placeholderGapItem(
+        "ge-12",
+        "The neighbourhood",
+        "He realized it wasn't his house and quickly ran __________ the garage.",
+        "out of",
+        [],
+        "Use 'out of' followed by the noun 'the garage'."
+      ),
+      placeholderGapItem(
+        "ge-13",
+        "The return",
+        "Jax was tired. He saw his owner at the door. '__________ here, Jax!' she called.",
+        "Come",
+        ["come"],
+        "Use 'come' for movement towards the speaker.",
+        {
+          imageSrc: "/images/grammar/expressing-movement/the-return.png",
+          imageAlt: "Jax the cat returning home to his owner at the door.",
+          imageMaxWidth: "420px",
+        }
+      ),
+      placeholderGapItem(
+        "ge-14",
+        "The return",
+        "He was happy to be home. He ran __________ the house through the cat flap.",
+        "into",
+        [],
+        "Use 'into' for movement entering a space followed by a noun."
+      ),
+      placeholderGapItem(
+        "ge-15",
+        "The return",
+        "Finally, he climbed __________ his bed and fell fast asleep.",
+        "into",
+        ["in"],
+        "Use 'into' or 'in' to describe arriving inside his sleeping spot."
+      ),
+    ],
+  },
 ];
 
 export function getHubGrammarActivity(activityId) {
