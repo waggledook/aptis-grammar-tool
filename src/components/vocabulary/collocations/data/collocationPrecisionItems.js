@@ -128,6 +128,10 @@ const CURATED_COLLOCATION_CONTENT = {
     definition: "A tendency to become angry or annoyed very easily.",
     example: "His bad temper often caused arguments with colleagues over small problems.",
   },
+  "bright light": {
+    definition: "Strong light that is easy to see and can sometimes hurt your eyes.",
+    example: "The bright light from the camera made everyone blink for a second.",
+  },
   "balanced diet": {
     definition: "Eating a variety of foods in the right amounts to maintain good health.",
     example: "The doctor emphasized that a balanced diet is the foundation of a healthy immune system.",
@@ -3176,6 +3180,74 @@ const CURATED_COLLOCATION_CONTENT = {
     definition: "To produce income, especially for a company or government.",
     example: "The new tax is expected to generate significant revenue for the city council.",
   },
+  "private school": {
+    definition: "A school that is not run by the government and usually charges fees.",
+    example: "Their daughter attends a private school on the other side of the city.",
+  },
+  "sentimental value": {
+    definition: "Special emotional importance that something has because it reminds you of a person or time in your life.",
+    example: "The ring is not expensive, but it has great sentimental value because it belonged to my grandmother.",
+  },
+  "sentimental attachment": {
+    definition: "A strong emotional connection to a person, place, or object.",
+    example: "He kept the old guitar because of his sentimental attachment to it.",
+  },
+  "sentimental reasons": {
+    definition: "Emotional motives rather than practical ones.",
+    example: "She decided to keep the house for sentimental reasons after her parents passed away.",
+  },
+  "sentimental feelings": {
+    definition: "Emotions connected with affection, nostalgia, or personal memories.",
+    example: "Seeing the old photos brought back strong sentimental feelings.",
+  },
+  "shiny surface": {
+    definition: "A smooth surface that reflects light brightly.",
+    example: "The table had such a shiny surface that it reflected the ceiling lights.",
+  },
+  "shiny hair": {
+    definition: "Hair that looks smooth, healthy, and bright.",
+    example: "The conditioner leaves your hair soft and shiny after one wash.",
+  },
+  "shiny shoes": {
+    definition: "Shoes that have been polished until they look bright and clean.",
+    example: "He wore shiny shoes for the job interview to make a good impression.",
+  },
+  "shiny object": {
+    definition: "Something bright and reflective that easily attracts attention.",
+    example: "The child picked up the shiny object from the ground out of curiosity.",
+  },
+  "tasty meal": {
+    definition: "A meal that tastes very good.",
+    example: "We had a tasty meal at the small family restaurant near the station.",
+  },
+  "tasty snack": {
+    definition: "A small amount of food that is enjoyable to eat.",
+    example: "She packed a tasty snack for the train journey.",
+  },
+  "tasty dish": {
+    definition: "A prepared food item that has a pleasant flavour.",
+    example: "The chef served a simple but extremely tasty dish of roasted vegetables.",
+  },
+  "tasty treat": {
+    definition: "Something enjoyable to eat, often as a reward or pleasure.",
+    example: "After the exam, they bought themselves a tasty treat from the bakery.",
+  },
+  "close friend": {
+    definition: "A friend you know well and trust deeply.",
+    example: "She has been a close friend of mine since primary school.",
+  },
+  "close family": {
+    definition: "Family members who have a strong emotional bond and regular contact.",
+    example: "They are a very close family and spend most weekends together.",
+  },
+  "close relationship": {
+    definition: "A strong personal connection between people.",
+    example: "Good teachers often build a close relationship with their students over time.",
+  },
+  "close contact": {
+    definition: "Direct or frequent interaction with a person, especially one that may involve risk of spreading illness.",
+    example: "Anyone who was in close contact with the patient was asked to stay at home.",
+  },
   "grant access": {
     definition: "To give someone permission to enter a place or use a particular resource, such as a building or a database.",
     example: "The administrator will grant access to the secure server once your identity is verified.",
@@ -3824,9 +3896,10 @@ const ADJECTIVE_NOUN_BATCH = [
   makeAdjectiveNounItem("Big", ["Decision", "Disappointment", "Mistake", "Surprise"], ["Schedule", "Window", "Meeting"], "B1", ["daily-life"]),
   makeAdjectiveNounItem("Blind", ["Faith", "Loyalty", "Obedience", "Spot"], ["Carpet", "Pencil", "Kitchen"], "C1", ["people"]),
   makeAdjectiveNounItem("Brief", ["Chat", "Meeting", "Description", "Visit"], ["Schedule", "Window", "Budget"], "B1", ["work"]),
-  makeAdjectiveNounItem("Bright", ["Future", "Idea", "Colour", "Smile"], ["Window", "Bottle", "Carpet"], "B1", ["daily-life"]),
+  makeAdjectiveNounItem("Bright", ["Future", "Idea", "Colour", "Smile", "Light"], ["Window", "Bottle", "Carpet"], "B1", ["daily-life"]),
   makeAdjectiveNounItem("Casual", ["Clothes", "Relationship", "Acquaintance"], ["Schedule", "Window", "Budget"], "B1", ["people"]),
   makeAdjectiveNounItem("Clean", ["Energy", "Record", "Break", "Conscience", "Power", "Air"], ["Opinion", "Result", "Story"], "B2", ["environment"]),
+  makeAdjectiveNounItem("Close", ["Friend", "Family", "Relationship", "Contact"], ["Window", "Budget", "Bottle"], "B1", ["people", "health"]),
   makeAdjectiveNounItem("Clear", ["Message", "Understanding", "Evidence", "View"], ["Schedule", "Person", "Meeting"], "B1", ["education"]),
   makeAdjectiveNounItem("Common", ["Knowledge", "Language", "Sense", "Goal"], ["Schedule", "Window", "Meeting"], "B1", ["education"]),
   makeAdjectiveNounItem("Complete", ["Agreement", "Idiot", "Surprise", "Silence"], ["Promise", "Person", "Window"], "B2", ["daily-life"]),
@@ -3864,7 +3937,7 @@ const ADJECTIVE_NOUN_BATCH = [
   makeAdjectiveNounItem("Late", ["Night", "Departure", "Arrival", "Fee"], ["Time", "Slow", "End"], "B1", ["travel"]),
   makeAdjectiveNounItem("Legal", ["Advice", "Action", "System", "Requirement"], ["Office", "Salary", "Window"], "B2", ["politics"]),
   makeAdjectiveNounItem("Live", ["Music", "Broadcast", "Performance", "Show"], ["Window", "Salary", "Deadline"], "B1", ["daily-life"]),
-  makeAdjectiveNounItem("Long", ["Time", "Distance", "Term", "Run"], ["Way", "Space", "High"], "B1", ["daily-life"]),
+  makeAdjectiveNounItem("Long", ["Time", "Distance", "Term", "Run", "Hours"], ["Way", "Space", "High"], "B1", ["daily-life"]),
   makeAdjectiveNounItem("Maiden", ["Voyage", "Flight", "Speech", "Name"], ["Trip", "Start", "First"], "C1", ["travel", "people"]),
   makeAdjectiveNounItem("Main", ["Course", "Road", "Thing", "Reason"], ["Way", "Street", "Part"], "B1", ["daily-life"]),
   makeAdjectiveNounItem("Major", ["Problem", "Issue", "Role", "Concern"], ["Window", "Bottle", "Garden"], "B2", ["work"]),
@@ -3887,7 +3960,7 @@ const ADJECTIVE_NOUN_BATCH_2 = [
   makeAdjectiveNounItem("Political", ["Prisoner", "Party", "System", "Leader"], ["Window", "Salary", "Furniture"], "B2", ["politics"]),
   makeAdjectiveNounItem("Poor", ["Eyesight", "Health", "Performance", "Quality"], ["Schedule", "Window", "Salary"], "B2", ["health"]),
   makeAdjectiveNounItem("Popular", ["Belief", "Culture", "Demand", "Opinion"], ["Schedule", "Window", "Salary"], "B1", ["daily-life"]),
-  makeAdjectiveNounItem("Private", ["Life", "Property", "Sector", "Conversation"], ["Schedule", "Weather", "Traffic"], "B1", ["people"]),
+  makeAdjectiveNounItem("Private", ["Life", "Property", "Sector", "Conversation", "School"], ["Schedule", "Weather", "Traffic"], "B1", ["people"]),
   makeAdjectiveNounItem("Public", ["Opinion", "Transport", "Service", "Holiday"], ["Sight", "Way", "Look"], "B1", ["politics"]),
   makeAdjectiveNounItem("Quick", ["Fix", "Reply", "Response", "Snack"], ["Way", "Fast", "Fastness"], "B1", ["daily-life"]),
   makeAdjectiveNounItem("Quiet", ["Life", "Night", "Neighborhood", "Voice"], ["Budget", "Deadline", "Salary"], "B1", ["daily-life"]),
@@ -3899,14 +3972,17 @@ const ADJECTIVE_NOUN_BATCH_2 = [
   makeAdjectiveNounItem("Rich", ["History", "Culture", "Vocabulary", "Source"], ["Window", "Bottle", "Carpet"], "B2", ["people", "education"]),
   makeAdjectiveNounItem("Rough", ["Draft", "Estimate", "Idea", "Sea"], ["Window", "Bottle", "Garden"], "B2", ["work", "travel"]),
   makeAdjectiveNounItem("Safe", ["Distance", "Bet", "Hands", "Haven"], ["Budget", "Deadline", "Salary"], "B1", ["daily-life"]),
+  makeAdjectiveNounItem("Sentimental", ["Value", "Attachment", "Reasons", "Feelings"], ["Window", "Bottle", "Deadline"], "B2", ["feelings", "people"]),
   makeAdjectiveNounItem("Serious", ["Accident", "Illness", "Injury", "Relationship"], ["Window", "Furniture", "Weather"], "B2", ["health"]),
   makeAdjectiveNounItem("Severe", ["Weather", "Penalty", "Shortage", "Pressure", "Pain"], ["Window", "Meeting", "Salary"], "C1", ["environment"]),
+  makeAdjectiveNounItem("Shiny", ["Surface", "Hair", "Shoes", "Object"], ["Deadline", "Budget", "Weather"], "B1", ["daily-life"]),
   makeAdjectiveNounItem("Speedy", ["Recovery", "Response", "Trial", "Exit"], ["Fastness", "Bottle", "Move"], "B2", ["health", "work"]),
   makeAdjectiveNounItem("Steady", ["Job", "Relationship", "Progress", "Hand"], ["Deadline", "Window", "Salary"], "B2", ["work", "people"]),
   makeAdjectiveNounItem("Stiff", ["Competition", "Breeze", "Drink", "Neck"], ["Hard", "Rigid", "Match"], "C1", ["work", "daily-life"]),
   makeAdjectiveNounItem("Subject", ["Matter", "Change", "Debate", "Opinion"], ["Window", "Salary", "Furniture"], "C1", ["education"]),
   makeAdjectiveNounItem("Substantial", ["Amount", "Increase", "Portion", "Change"], ["Window", "Bottle", "Deadline"], "C1", ["shopping", "work"]),
   makeAdjectiveNounItem("Superficial", ["Wound", "Knowledge", "Relationship", "Link"], ["Skin", "Top", "Fast"], "C1", ["health", "people"]),
+  makeAdjectiveNounItem("Tasty", ["Meal", "Snack", "Dish", "Treat"], ["Window", "Traffic", "Budget"], "B1", ["daily-life", "food"]),
   makeAdjectiveNounItem("Tight", ["Schedule", "Grip", "Budget", "Corner"], ["Window", "Salary", "Meeting"], "B2", ["work", "daily-life"]),
   makeAdjectiveNounItem("Total", ["Bliss", "Failure", "Disaster", "Disbelief"], ["Window", "Salary", "Meeting"], "B2", ["feelings", "daily-life"]),
   makeAdjectiveNounItem("Typical", ["Example", "Behavior", "Day", "Symptom"], ["Window", "Bottle", "Garden"], "B1", ["education", "health"]),

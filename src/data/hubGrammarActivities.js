@@ -129,20 +129,35 @@ const wordOrderItem = (
   explanation,
   alternatives = [],
   extra = {}
-) => ({
-  id,
-  type: "word-order",
-  prompt,
-  tokens,
-  answer,
-  acceptedAnswers: [answer, ...alternatives],
-  explanation,
-  finalPunctuation:
-    extra.finalPunctuation ||
-    String(answer || "").trim().match(/([?!])$/)?.[1] ||
-    "",
-  ...extra,
-});
+) => {
+  const trimmedAnswer = String(answer || "").trim();
+  const derivedFinalPunctuation =
+    String(extra.finalPunctuation || "").trim() ||
+    trimmedAnswer.match(/([.?!])$/)?.[1] ||
+    "";
+  const cleanedTokens = Array.isArray(tokens)
+    ? tokens.filter((token, index) => {
+        if (token == null) return false;
+        const normalizedToken = String(token).trim();
+        const isStandalonePunctuation = /^[.?!]$/.test(normalizedToken);
+        const isFinalToken = index === tokens.length - 1;
+
+        return !(isStandalonePunctuation && isFinalToken && normalizedToken === derivedFinalPunctuation);
+      })
+    : [];
+
+  return {
+    id,
+    type: "word-order",
+    prompt,
+    tokens: cleanedTokens,
+    answer,
+    acceptedAnswers: [answer, ...alternatives],
+    explanation,
+    finalPunctuation: derivedFinalPunctuation,
+    ...extra,
+  };
+};
 
 const placeholderChoiceGapItem = (
   id,
@@ -681,21 +696,21 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "pp1",
         "Complete the sentence with the correct form of the verb.",
         ["Be careful — I ", { gapId: "g1" }, " coffee on the floor! (just/spill)"],
-        ["have just spilled", "have just spilt"],
+        ["have just spilled", "have just spilt", "'ve just spilled", "'ve just spilt"],
         "Use the present perfect simple for a very recent completed result."
       ),
       singleGap(
         "pp2",
         "Complete the sentence with the correct form of the verb.",
         ["Sorry I’m out of breath. I ", { gapId: "g1" }, " all the way here. (run)"],
-        ["have been running"],
+        ["have been running", "'ve been running"],
         "Use the present perfect continuous to focus on the recent activity causing the current result."
       ),
       singleGap(
         "pp3",
         "Complete the sentence with the correct form of the verb.",
         ["She ", { gapId: "g1" }, " her homework already. (finish)"],
-        ["has finished"],
+        ["has finished", "'s finished"],
         "Use the present perfect simple because the homework is complete."
       ),
       {
@@ -728,12 +743,12 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         gaps: [
           {
             id: "g1",
-            acceptedAnswers: ["have cleaned"],
+            acceptedAnswers: ["have cleaned", "'ve cleaned"],
             feedback: "Use the present perfect simple for the finished visible result.",
           },
           {
             id: "g2",
-            acceptedAnswers: ["have been scrubbing"],
+            acceptedAnswers: ["have been scrubbing", "'ve been scrubbing"],
             feedback: "Use the present perfect continuous for the duration/activity.",
           },
         ],
@@ -742,14 +757,14 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "pp6",
         "Complete the sentence with the correct form of the verb.",
         ["It ", { gapId: "g1" }, " all day; the streets are soaked. (rain)"],
-        ["has been raining"],
+        ["has been raining", "'s been raining"],
         "Use the present perfect continuous because the action has been continuing up to now."
       ),
       singleGap(
         "pp7",
         "Complete the sentence with the correct form of the verb.",
         ["It ", { gapId: "g1" }, " three times this week. (rain)"],
-        ["has rained"],
+        ["has rained", "'s rained"],
         "Use the present perfect simple to count completed events."
       ),
       {
@@ -765,12 +780,12 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         gaps: [
           {
             id: "g1",
-            acceptedAnswers: ["have been studying"],
+            acceptedAnswers: ["have been studying", "'ve been studying"],
             feedback: "Use the present perfect continuous for an activity over a period of time.",
           },
           {
             id: "g2",
-            acceptedAnswers: ["have learned", "have learnt"],
+            acceptedAnswers: ["have learned", "have learnt", "'ve learned", "'ve learnt"],
             feedback: "Use the present perfect simple for the accumulated result.",
           },
         ],
@@ -788,12 +803,12 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         gaps: [
           {
             id: "g1",
-            acceptedAnswers: ["has repaired", "has fixed"],
+            acceptedAnswers: ["has repaired", "has fixed", "'s repaired", "'s fixed"],
             feedback: "Use the present perfect simple for the finished result: the car is ready now.",
           },
           {
             id: "g2",
-            acceptedAnswers: ["has been working"],
+            acceptedAnswers: ["has been working", "'s been working"],
             feedback: "Use the present perfect continuous for the ongoing activity over time.",
           },
         ],
@@ -802,14 +817,14 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "pp10",
         "Complete the sentence with the correct form of the verb.",
         ["I ", { gapId: "g1" }, " my keys! Have you seen them? (lose)"],
-        ["have lost"],
+        ["have lost", "'ve lost"],
         "Use the present perfect simple for a completed action with a present consequence."
       ),
       singleGap(
         "pp11",
         "Complete the sentence with the correct form of the verb.",
         ["I’m covered in flour because I ", { gapId: "g1" }, ". (bake)"],
-        ["have been baking"],
+        ["have been baking", "'ve been baking"],
         "Use the present perfect continuous to explain the current evidence."
       ),
       {
@@ -825,12 +840,12 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         gaps: [
           {
             id: "g1",
-            acceptedAnswers: ["has been cooking"],
+            acceptedAnswers: ["has been cooking", "'s been cooking"],
             feedback: "Use the present perfect continuous for the recent activity causing the current smell.",
           },
           {
             id: "g2",
-            acceptedAnswers: ["has made"],
+            acceptedAnswers: ["has made", "'s made"],
             feedback: "Use the present perfect simple for the finished result: the lasagna now exists.",
           },
         ],
@@ -839,21 +854,21 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "pp13",
         "Complete the sentence with the correct form of the verb.",
         ["He ", { gapId: "g1" }, " that book for days. (read)"],
-        ["has been reading"],
+        ["has been reading", "'s been reading"],
         "Use the present perfect continuous for an activity continuing over several days."
       ),
       singleGap(
         "pp14",
         "Complete the sentence with the correct form of the verb.",
         ["We ", { gapId: "g1" }, " for you since 5:00. (wait)"],
-        ["have been waiting"],
+        ["have been waiting", "'ve been waiting"],
         "Use the present perfect continuous with 'since' to show duration."
       ),
       singleGap(
         "pp15",
         "Complete the sentence with the correct form of the verb.",
         ["They ", { gapId: "g1" }, " London twice this year. (visit)"],
-        ["have visited"],
+        ["have visited", "'ve visited"],
         "Use the present perfect simple because you are counting completed visits."
       ),
     ],
@@ -9847,7 +9862,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "sc2-mc-1",
         "Choose the correct verb form for an imaginary situation.",
-        "If I ____ more money, I'd buy a faster computer.",
+        "If I ____ more free time, I'd learn to cook properly.",
         ["have", "had", "would have"],
         1,
         "In the if-clause, use the past simple to show the situation is imaginary."
@@ -9855,7 +9870,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "sc2-mc-2",
         "Choose the correct verb form for the result.",
-        "We ____ much happier if we lived near the beach.",
+        "My parents ____ less stressed if they worked fewer hours.",
         ["would be", "will be", "were"],
         0,
         "In the result clause, use 'would' + the base form of the verb."
@@ -9863,7 +9878,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "sc2-mc-3",
         "Choose the correct negative result.",
-        "If she had a car, she ____ the bus to work.",
+        "If he lived closer to the office, he ____ two trains every morning.",
         ["doesn't take", "won't take", "wouldn't take"],
         2,
         "Use 'wouldn't' (would not) for a negative result in an imaginary scenario."
@@ -9871,7 +9886,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "sc2-mc-4",
         "Which word can replace 'would' to talk about possibility?",
-        "If we went by train, we ____ get there faster.",
+        "If we borrowed Anna's satnav, we ____ find the hotel more easily.",
         ["could", "can", "did"],
         0,
         "You can use 'could' + infinitive instead of 'would' in the second conditional."
@@ -9879,15 +9894,15 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "sc2-log-1",
         "Choose the correct form.",
-        "Context: I have a ticket for the concert tonight.\n'If I ____, I'll see you there!'",
-        ["go", "went"],
+        "Context: The restaurant is open and we've already booked a table.\n'If we ____ early, we'll get the best seats.'",
+        ["leave", "left"],
         0,
         "Use the first conditional (if + present) for real, possible situations."
       ),
       multipleChoiceItem(
         "sc2-log-2",
         "Choose the correct form.",
-        "Context: I don't have a ticket and the concert is sold out.\n'If I ____ a ticket, I'd go with you.'",
+        "Context: I don't have enough money for the course this year.\n'If I ____ the money, I'd sign up tomorrow.'",
         ["have", "had"],
         1,
         "Use the second conditional (if + past) for imaginary or impossible situations."
@@ -9895,7 +9910,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       placeholderChoiceGapItem(
         "sc2-were-1",
         "Choose the correct form.",
-        "Formal advice: If I ____ you, I wouldn't buy that old car.",
+        "Formal advice: If I ____ you, I wouldn't reply while you were angry.",
         ["were"],
         "Use 'If I were you' for giving advice.",
         ["was", "were", "am"]
@@ -9903,7 +9918,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       placeholderChoiceGapItem(
         "sc2-were-2",
         "Choose the correct form.",
-        "Hypothesis: If he ____ here, he would tell us what to do.",
+        "Hypothesis: If she ____ here, she would know how to fix this printer.",
         ["were"],
         "With the verb 'be', we can use 'were' instead of 'was' after I/he/she/it.",
         ["was", "were", "be"]
@@ -9911,7 +9926,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       placeholderGapItem(
         "sc2-gf-1",
         "Complete the sentence.",
-        "If I __________ (be) famous, I'd live in a big house.",
+        "If I __________ (be) better at maths, I'd study engineering.",
         "were",
         ["was"],
         "Use the past simple of 'be' (were/was) in the if-clause."
@@ -9919,26 +9934,26 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       placeholderGapItem(
         "sc2-gf-2",
         "Complete the sentence.",
-        "They __________ (travel) more if they had more holiday time.",
-        "would travel",
-        ["'d travel"],
+        "We __________ (eat) out more often if restaurants were cheaper here.",
+        "would eat",
+        ["'d eat"],
         "Use 'would' + infinitive for the imaginary result."
       ),
       placeholderGapItem(
         "sc2-gf-3",
         "Complete the sentence.",
-        "If I were you, I __________ (not / tell) him the truth yet.",
-        "wouldn't tell",
-        ["would not tell"],
+        "If I were you, I __________ (not / lend) him any more money.",
+        "wouldn't lend",
+        ["would not lend"],
         "Use the negative 'wouldn't' for negative advice."
       ),
       placeholderGapItem(
         "sc2-gf-4",
         "Complete the sentence.",
-        "We could go for a walk if it __________ (not / rain).",
-        "didn't rain",
-        ["did not rain", "weren't raining", "were not raining", "wasn't raining", "was not raining"],
-        "Use the negative past simple or past continuous in the if-clause."
+        "We could have lunch outside if the wind __________ (not / be) so strong.",
+        "weren't",
+        ["were not", "wasn't", "was not"],
+        "Use the past simple of 'be' in the if-clause for a second conditional sentence."
       ),
     ],
   },
@@ -10680,23 +10695,23 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "dur-mc-1",
         "Choose the correct word for the period of time.",
-        "I've lived in this flat ____ three years.",
+        "We've had this sofa ____ ages.",
         ["for", "since", "from"],
         0,
-        "Use 'for' with a period of time (three years)."
+        "Use 'for' with a period of time."
       ),
       multipleChoiceItem(
         "dur-mc-2",
         "Choose the correct word for the starting point.",
-        "She's been a doctor ____ 2015.",
+        "My uncle has worked nights ____ last November.",
         ["for", "since", "ago"],
         1,
-        "Use 'since' with a specific point in time (2015)."
+        "Use 'since' with a specific point in time."
       ),
       multipleChoiceItem(
         "dur-mc-3",
         "Choose the correct question form.",
-        "____ have you been married?",
+        "____ have you known Carla?",
         ["How many time", "How long", "Since when"],
         1,
         "Use 'How long...?' to ask about the duration of a state or action."
@@ -10704,7 +10719,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       errorCorrectionItem(
         "dur-ec-1",
         "Check the highlighted phrase for errors.",
-        "I live in Manchester for twenty years.",
+        "My grandparents live in this village for forty years.",
         "live",
         false,
         "have lived / 've lived",
@@ -10713,17 +10728,17 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       errorCorrectionItem(
         "dur-ec-2",
         "Check the highlighted phrase for errors.",
-        "He's had this car since three months.",
-        "since three months",
+        "She's had that phone since two years.",
+        "since two years",
         false,
-        "for three months",
-        "Three months is a period of time, so you must use 'for'."
+        "for two years",
+        "A number of years is a period of time, so you must use 'for'."
       ),
       errorCorrectionItem(
         "dur-ec-3",
         "Check the highlighted phrase for errors.",
-        "We've been afraid of spiders since we were children.",
-        "since we were",
+        "I've loved jazz since I was at university.",
+        "since I was",
         true,
         "",
         "Correct! You can use 'since' with a point-in-time clause in the past."
@@ -10731,31 +10746,31 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       doubleGap(
         "dur-gf-1",
         "Complete the sentence.",
-        ["Mark moved to London in June. It is now October.\nMark ", { gapId: "g1" }, " (live) in London ", { gapId: "g2" }, " four months."],
-        ["has lived", "'s lived"],
+        ["Nora started her new job in April. It is now December.\nNora ", { gapId: "g1" }, " (work) there ", { gapId: "g2" }, " eight months."],
+        ["has worked", "'s worked"],
         ["for"],
-        "Present perfect (has lived) + 'for' (period of four months)."
+        "Present perfect + 'for' + period of time."
       ),
       doubleGap(
         "dur-gf-2",
         "Complete the sentence.",
-        ["You met your best friend at primary school, and you are still friends.\nI ", { gapId: "g1" }, " (know) my best friend ", { gapId: "g2" }, " we were at primary school."],
-        ["have known", "'ve known"],
+        ["You started learning English in Year 5, and you're still learning it now.\nI ", { gapId: "g1" }, " (study) English ", { gapId: "g2" }, " Year 5."],
+        ["have studied", "'ve studied", "have been studying", "'ve been studying"],
         ["since"],
-        "Present perfect (have known) + 'since' (starting point)."
+        "Use the present perfect with 'since' for the starting point."
       ),
       wordOrderItem(
         "dur-wo-1",
         "Unjumble the duration sentence.",
-        ["for", "has", "Sarah", "married", "been", "years", "ten"],
-        "Sarah has been married for ten years.",
-        "Structure: Subject + has + been + for + period."
+        ["for", "has", "my", "brother", "worked", "here", "years", "five"],
+        "My brother has worked here for five years.",
+        "Structure: Subject + has + past participle + for + period."
       ),
       wordOrderItem(
         "dur-wo-2",
         "Unjumble the question.",
-        ["long", "you", "how", "worked", "have", "there"],
-        "How long have you worked there?",
+        ["long", "known", "have", "how", "them", "you"],
+        "How long have you known them?",
         "Structure: How long + have + subject + past participle."
       ),
       doubleGap(
@@ -10804,7 +10819,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "dur-vis-4",
         "Look at the picture and complete the sentence.",
         ["He ", { gapId: "g1" }, " (play) the guitar ", { gapId: "g2" }, "."],
-        ["has played", "'s played"],
+        ["has played", "'s played", "has been playing", "'s been playing"],
         ["for six months"],
         "Use 'has' + 'for' for a duration of months.",
         {
@@ -11003,65 +11018,65 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "ppvsps-mc-1",
         "Choose the correct verb form.",
-        "I ____ to Italy three times, but I'd love to go again.",
-        ["have been", "went", "was going"],
+        "I ____ Thai food lots of times, but I still can't cook it.",
+        ["have eaten", "ate", "was eating"],
         0,
         "Use Present Perfect for life experiences when we don't say exactly when."
       ),
       multipleChoiceItem(
         "ppvsps-mc-2",
         "Choose the correct verb form.",
-        "I ____ to Italy for the first time in 2018.",
+        "We ____ to Lisbon for the first time in 2022.",
         ["have gone", "went", "have been"],
         1,
-        "Use Past Simple because 'in 2018' is a finished time."
+        "Use Past Simple because 'in 2022' is a finished time."
       ),
       multipleChoiceItem(
         "ppvsps-mc-3",
         "Choose the correct verb form.",
-        "Oh no! I ____ my phone. The screen is completely cracked.",
-        ["have broken", "broke", "break"],
+        "Oh no! I ____ my glasses. I can't read anything now.",
+        ["have lost", "lost", "lose"],
         0,
         "Use Present Perfect for recent news that has a result in the present."
       ),
       multipleChoiceItem(
         "ppvsps-mc-4",
         "Choose the correct verb form.",
-        "I ____ my phone while I was running for the bus yesterday.",
-        ["have broken", "broke", "had broken"],
+        "I ____ my glasses on the train yesterday morning.",
+        ["have lost", "lost", "had lost"],
         1,
         "Use Past Simple because 'yesterday' is a finished time."
       ),
       multipleChoiceItem(
         "ppvsps-mc-5",
         "Choose the correct verb form.",
-        "Oh no! I ____ my keys. I can't get into my flat!",
-        ["lost", "have lost", "was losing"],
+        "Oh no! We ____ the tickets. We can't get into the stadium!",
+        ["lost", "have lost", "were losing"],
         1,
         "Use the Present Perfect for a recent action that has a direct result in the present (I can't get in)."
       ),
       multipleChoiceItem(
         "ppvsps-mc-6",
         "Choose the correct verb form.",
-        "They ____ to a lovely Indian restaurant for dinner last night.",
+        "My cousins ____ to a street-food market on Friday night.",
         ["went", "have gone", "have been"],
         0,
-        "Use the Past Simple because 'last night' is a finished time."
+        "Use the Past Simple because 'on Friday night' is a finished time."
       ),
       errorCorrectionItem(
         "ppvsps-ec-1",
         "Check the highlighted phrase for errors.",
-        "I have seen that film last night at the cinema.",
-        "have seen",
+        "I have met your brother last weekend.",
+        "have met",
         false,
-        "saw",
-        "You cannot use the Present Perfect with a finished time like 'last night'."
+        "met",
+        "You cannot use the Present Perfect with a finished time like 'last weekend'."
       ),
       errorCorrectionItem(
         "ppvsps-ec-2",
         "Check the highlighted phrase for errors.",
-        "Have you ever eaten Japanese food?",
-        "Have you ever eaten",
+        "Have you ever flown in a helicopter?",
+        "Have you ever flown",
         true,
         "",
         "Correct! Use Present Perfect to ask about general life experiences."
@@ -11069,28 +11084,28 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       errorCorrectionItem(
         "ppvsps-ec-3",
         "Check the highlighted phrase for errors.",
-        "We have moved to this house three years ago.",
-        "have moved",
+        "She has changed schools two years ago.",
+        "has changed",
         false,
-        "moved",
+        "changed",
         "The word 'ago' always requires the Past Simple."
       ),
       errorCorrectionItem(
         "ppvsps-ec-4",
         "Check the highlighted phrase for errors.",
-        "I have spoken to the manager about the problem ten minutes ago.",
-        "have spoken",
+        "They have emailed us an hour ago.",
+        "have emailed",
         false,
-        "spoke",
+        "emailed",
         "You cannot use the Present Perfect with 'ago'. Use the Past Simple instead."
       ),
       errorCorrectionItem(
         "ppvsps-ec-5",
         "Check the highlighted phrase for errors.",
-        "I have won a trophy for sport at school in 2019.",
-        "have won",
+        "He has broken his wrist in 2021.",
+        "has broken",
         false,
-        "won",
+        "broke",
         "Use the Past Simple with a finished time expression like 'in 2019'."
       ),
       errorCorrectionItem(
@@ -12218,43 +12233,46 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       ),
       singleGap(
         "unreal-past-c1-rf-1",
-        "Complete the second sentence using the word in bold: REGRET.",
-        ["I wish ", { gapId: "g1" }, " that job offer in Paris."],
+        "Complete the second sentence using the word in bold: TAKEN.",
+        ["If only ", { gapId: "g1" }, " that job offer in Paris."],
         ["I had taken", "I'd taken"],
-        "Use wish + past perfect for regret about the past.",
-        { originalSentence: "I really regret not taking that job offer in Paris.", keyWord: "regret" }
+        "Use if only + past perfect for regret about the past.",
+        { originalSentence: "I really regret not taking that job offer in Paris.", keyWord: "taken" }
       ),
       singleGap(
         "unreal-past-c1-rf-2",
-        "Complete the second sentence using the word in bold: PREFERENCE.",
-        ["I'd rather ", { gapId: "g1" }, " at 8:00 instead of 7:00."],
-        ["you came"],
+        "Complete the second sentence using the word in bold: RATHER.",
+        ["I would ", { gapId: "g1" }, " you came at 8:00 instead of 7:00."],
+        ["rather"],
         "Use would rather + subject + past simple for a preference about another person.",
-        { originalSentence: "I would prefer you to come at 8:00 instead of 7:00.", keyWord: "preference" }
+        { originalSentence: "I would prefer you to come at 8:00 instead of 7:00.", keyWord: "rather" }
       ),
       singleGap(
         "unreal-past-c1-rf-3",
-        "Complete the second sentence using the word in bold: ANNOYANCE.",
-        ["I wish ", { gapId: "g1" }, " me."],
-        ["you wouldn't keep interrupting", "you would not keep interrupting"],
+        "Complete the second sentence using the word in bold: STOP.",
+        ["I wish ", { gapId: "g1" }, " interrupting me."],
+        [
+          "you'd stop",
+          "you would stop",
+        ],
         "Use wish + would to complain about annoying behaviour.",
-        { originalSentence: "It's really annoying that you keep interrupting me.", keyWord: "annoyance" }
+        { originalSentence: "It's really annoying that you keep interrupting me.", keyWord: "stop" }
       ),
       singleGap(
         "unreal-past-c1-rf-4",
-        "Complete the second sentence using the word in bold: URGENCY.",
-        ["It's high ", { gapId: "g1" }, " for your finals."],
-        ["time you started studying"],
+        "Complete the second sentence using the word in bold: TIME.",
+        ["It's ", { gapId: "g1" }, " you started studying for your finals."],
+        ["high time"],
         "Use it's high time + subject + past simple.",
-        { originalSentence: "You really ought to start studying for your finals.", keyWord: "urgency" }
+        { originalSentence: "You really ought to start studying for your finals.", keyWord: "time" }
       ),
       singleGap(
         "unreal-past-c1-rf-5",
-        "Complete the second sentence using the word in bold: IMPOSSIBILITY.",
-        ["If only ", { gapId: "g1" }, " you with your move this weekend."],
-        ["I could help"],
+        "Complete the second sentence using the word in bold: ONLY.",
+        [{ gapId: "g1" }, " I could help you with your move this weekend."],
+        ["If only"],
         "Use if only + could for a present or future impossibility.",
-        { originalSentence: "I'm sorry I can't help you with your move this weekend.", keyWord: "impossibility" }
+        { originalSentence: "I'm sorry I can't help you with your move this weekend.", keyWord: "only" }
       ),
       placeholderGapItem(
         "unreal-past-c1-gf-1",
@@ -12862,11 +12880,11 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       ),
       multipleChoiceItem(
         "pvp-mc-3",
-        "Which is NOT possible with a noun object?",
+        "Which option is correct with a pronoun object?",
         "Can you ____?",
-        ["turn off the TV", "turn the TV off", "turn off it"],
-        2,
-        "A noun can go before or after the particle, but a pronoun (it) cannot go after the particle here."
+        ["turn off it", "turn it off", "it turn off"],
+        1,
+        "With a separable phrasal verb, a pronoun object like 'it' must go between the verb and the particle: 'turn it off'."
       ),
       multipleChoiceItem(
         "pvp-mc-4",
@@ -12969,129 +12987,129 @@ export const HUB_GRAMMAR_ACTIVITIES = [
   {
     id: "passive-voice-precision-10c",
     title: "The Passive: Focus and Form",
-    shortDescription: "Master present and past passive structures without unjumbling.",
+    shortDescription: "Build confidence with present and past passive forms through recognition, correction, and reformulation.",
     levels: ["a2", "b1"],
     intro:
-      "Focus on the object of the action. Remember: use 'be' + the past participle of the main verb.",
+      "Start by choosing the right passive form, then complete a few short gap tasks, correct common mistakes, and finally rewrite active sentences to shift the focus.",
     items: [
       multipleChoiceItem(
         "passive-mc-1",
-        "Complete the general fact about toys.",
-        "20 billion pieces of Lego ____ every year.",
-        ["produce", "are produced", "are produce"],
+        "Complete the general fact.",
+        "Most coffee ____ in tropical countries.",
+        ["grow", "is grown", "are grown"],
         1,
-        "Use 'are' + the past participle for plural objects in the present passive."
+        "Use 'is' + past participle with singular or uncountable subjects like 'coffee'."
       ),
       multipleChoiceItem(
         "passive-mc-2",
         "Choose the correct negative form.",
-        "CDs ____ very much nowadays because of streaming.",
-        ["aren't used", "don't used", "isn't used"],
+        "Some emails ____ because the address is entered incorrectly.",
+        ["aren't delivered", "don't delivered", "isn't delivered"],
         0,
         "Use 'aren't' + past participle for negative plural present passive sentences."
       ),
-      placeholderGapItem(
-        "passive-gf-3",
-        "Complete the question.",
-        "__________ Spanish __________ in New Mexico? (speak)",
-        "Is spoken",
-        ["is spoken"],
-        "In questions, the verb 'be' (Is) comes before the subject."
-      ),
       multipleChoiceItem(
         "passive-mc-4",
-        "Identify the manufacturing location.",
-        "Volvo cars ____ in Sweden.",
-        ["made", "is made", "are made"],
+        "Choose the correct present passive form.",
+        "Many animated films ____ by large teams of artists.",
+        ["create", "is created", "are created"],
         2,
-        "Plural subjects (cars) require 'are' in the present passive."
+        "Plural subjects like 'films' take 'are' in the passive."
       ),
       multipleChoiceItem(
         "passive-mc-5",
-        "Complete the historical fact.",
-        "The first hot-air balloon ____ by two Frenchmen.",
-        ["invented", "was invented", "were invented"],
+        "Complete the past passive sentence.",
+        "The old theatre ____ in 1926.",
+        ["built", "was built", "were built"],
         1,
-        "Use 'was' for singular past passive subjects like 'the balloon'."
-      ),
-      placeholderGapItem(
-        "passive-gf-6",
-        "Complete the negative past fact.",
-        "Stamps __________ (not / invent) until 1840.",
-        "weren't invented",
-        ["were not invented"],
-        "Use 'weren't' for plural negative past passive sentences."
+        "Use 'was' for singular subjects in the past passive."
       ),
       multipleChoiceItem(
         "passive-mc-7",
         "Choose the correct question word order.",
-        "When ____ the watch ____?",
-        ["the watch was invented", "was the watch invented", "did the watch invent"],
+        "When ____ the bridge ____?",
+        ["the bridge was opened", "was the bridge opened", "did the bridge opened"],
         1,
-        "The auxiliary 'was' must come before the subject in a passive question."
+        "In passive questions, the auxiliary comes before the subject: 'was the bridge opened'."
       ),
       multipleChoiceItem(
         "passive-mc-8",
-        "Identify the author (the agent).",
-        "The Lord of the Rings was written ____ Tolkien.",
+        "Choose the correct agent word.",
+        "The mural was painted ____ a local art teacher.",
         ["by", "from", "for"],
         0,
-        "Use 'by' to identify the person who did the action in a passive sentence."
+        "Use 'by' to say who did the action in a passive sentence."
+      ),
+      doubleGap(
+        "passive-gf-3",
+        "Complete the question.",
+        [{ gapId: "g1" }, " fresh bread ", { gapId: "g2" }, " here every morning?"],
+        ["Is", "is"],
+        ["sold"],
+        "In present passive questions, 'be' comes before the subject and the past participle comes after it: 'Is fresh bread sold...?'"
+      ),
+      placeholderGapItem(
+        "passive-gf-6",
+        "Complete the negative past fact.",
+        "The exam results __________ (not / publish) until Friday morning.",
+        "weren't published",
+        ["were not published"],
+        "Use 'weren't' + past participle for negative plural past passive sentences."
       ),
       errorCorrectionItem(
         "passive-ec-9",
-        "Is the focus on the car or the thief?",
-        "My car was stolen last week.",
-        "was stolen",
+        "Check the passive sentence.",
+        "My bike was repaired yesterday.",
+        "was repaired",
         true,
         "",
-        "Correct! We use the passive when we don't know who did the action or it isn't important."
+        "Correct! The passive works well here because the action is more important than the person who did it."
       ),
       errorCorrectionItem(
         "passive-ec-10",
         "Check the past participle spelling.",
-        "Dynamite was invent by Alfred Nobel.",
-        "was invent",
+        "The school play was write by the students last year.",
+        "was write",
         false,
-        "was invented",
-        "The passive always requires the past participle (invented), not the base form."
+        "was written",
+        "The passive needs the past participle: 'written', not 'write'."
       ),
       errorCorrectionItem(
         "passive-ec-11",
         "Check the verb 'be'.",
-        "A lot of tea grown in India.",
-        "grown",
+        "These phones made in South Korea.",
+        "made",
         false,
-        "is grown",
-        "Don't forget the verb 'be' (am/is/are) in present passive sentences."
+        "are made",
+        "Don't forget the verb 'be' in the present passive: 'These phones are made...'"
       ),
       singleGap(
         "passive-rf-12",
-        "Rewrite to focus more on the invention: 'Alfred Nobel invented dynamite.'",
-        ["Dynamite ", { gapId: "g1" }, " Alfred Nobel."],
-        ["was invented by"],
-        "To change focus to the invention, use the past passive with 'by'."
+        "Rewrite to focus on the recipe: 'A local chef created the recipe.'",
+        ["The recipe ", { gapId: "g1" }, " a local chef."],
+        ["was created by"],
+        "To focus on the object, use the past passive with 'by'."
       ),
       singleGap(
         "passive-rf-13",
-        "Rewrite to focus on the book: 'Tolkien wrote The Lord of the Rings.'",
-        ["The Lord of the Rings ", { gapId: "g1" }, " Tolkien."],
-        ["was written by"],
-        "The title is treated as a singular subject, so use 'was written'."
+        "Rewrite to focus on the classrooms: 'Workers clean the classrooms every evening.'",
+        ["The classrooms ", { gapId: "g1" }, " workers every evening."],
+        ["are cleaned by"],
+        "Use the present passive to focus on what receives the action."
       ),
       singleGap(
         "passive-rf-14",
-        "Rewrite as a question: 'Do people speak Spanish in New Mexico?'",
-        ["", { gapId: "g1" }, " in New Mexico?"],
-        ["Is Spanish spoken", "is spanish spoken"],
-        "The passive question focuses on the language rather than 'people'."
+        "Rewrite as a question: 'Do they deliver parcels here on Saturdays?'",
+        ["", { gapId: "g1" }, " here on Saturdays?"],
+        ["Are parcels delivered", "are parcels delivered"],
+        "In a passive question, use 'be' before the subject and the past participle after it."
       ),
       singleGap(
         "passive-rf-15",
-        "Rewrite to focus on the objects: 'They make Volvo cars in Sweden.'",
-        ["Volvo cars ", { gapId: "g1" }, " Sweden."],
-        ["are made in"],
-        "For plural objects in the present, use 'are' + the past participle."
+        "Rewrite to focus on the backpack: 'Someone stole my backpack on the train.'",
+        ["My backpack ", { gapId: "g1" }, " on the train."],
+        ["was stolen"],
+        "Use the past passive when the action matters more than the unknown person who did it."
       ),
     ],
   },
@@ -13253,8 +13271,8 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "mig-mc-1",
         "Choose the correct structure for a future possibility.",
-        "We ____ a picnic tomorrow; it depends on the rain.",
-        ["might have", "might to have", "mights have"],
+        "Ella ____ us after work, but she isn't sure yet.",
+        ["might join", "might to join", "mights join"],
         0,
         "After 'might', use the infinitive without 'to'. Do not add '-s' for he/she/it."
       ),
@@ -13286,17 +13304,17 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       errorCorrectionItem(
         "mig-ec-2",
         "Check the highlighted phrase for errors.",
-        "I might to buy a new laptop next week.",
-        "might to buy",
+        "We might to need a taxi later tonight.",
+        "might to need",
         false,
-        "might buy",
+        "might need",
         "Use 'might' + verb (infinitive without 'to')."
       ),
       errorCorrectionItem(
         "mig-ec-3",
         "Check the highlighted phrase for errors.",
-        "We might not see the boss today because she is away.",
-        "might not see",
+        "They might not open the cafe tomorrow because of the storm.",
+        "might not open",
         true,
         "",
         "Correct! Use 'might not' to say perhaps something won't happen."
@@ -13304,34 +13322,34 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       errorCorrectionItem(
         "mig-ec-4",
         "Check the highlighted phrase for errors.",
-        "I may not take my laptop on holiday.",
-        "may not take",
+        "I may not go swimming this afternoon.",
+        "may not go",
         true,
         "",
         "Correct! 'May not' is a valid alternative to 'might not'."
       ),
       placeholderGapItem(
         "mig-gf-1",
-        "Rewrite: 'Perhaps it will rain later.'",
-        "It __________ later. (might)",
-        "might rain",
+        "Rewrite: 'Perhaps Tom will call later.'",
+        "Tom __________ later. (might)",
+        "might call",
         [],
         "Use 'might' to replace 'perhaps... will'."
       ),
       placeholderGapItem(
         "mig-gf-2",
-        "Rewrite: 'Perhaps she won't be at home.'",
-        "She __________ at home. (might not)",
+        "Rewrite: 'Perhaps the keys won't be in the car.'",
+        "The keys __________ in the car. (might not)",
         "might not be",
         [],
         "Use 'might not' to replace 'perhaps... won't'."
       ),
       placeholderGapItem(
         "mig-gf-3",
-        "Rewrite: 'Perhaps they will win the match.'",
-        "They __________ the match. (may)",
-        "may win",
-        ["might win"],
+        "Rewrite: 'Perhaps our team will finish first.'",
+        "Our team __________ first. (may)",
+        "may finish",
+        ["might finish"],
         "You can use 'may' as a synonym for 'might'."
       ),
       singleGap(
@@ -13547,15 +13565,15 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "ppl-mc-1",
         "Which action happened FIRST?",
-        "When I woke up, the garden was all white. It had snowed during the night.",
-        ["I woke up", "It snowed", "Both happened together"],
+        "By the time we got to the cinema, the trailers had already started.",
+        ["We got to the cinema", "The trailers started", "Both happened together"],
         1,
-        "The past perfect (had snowed) shows that the snowing happened before the waking up."
+        "The past perfect shows the earlier action: the trailers started before we arrived."
       ),
       multipleChoiceItem(
         "ppl-mc-2",
         "Choose the correct negative form.",
-        "We got home just in time-the match ____.",
+        "We sat down just in time, but the concert ____ yet.",
         ["didn't started", "hadn't started", "hadn't start"],
         1,
         "Use 'hadn't' + the past participle (started) for negative past perfect."
@@ -13563,23 +13581,23 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "ppl-mc-3",
         "Form the question.",
-        "A: I went to Paris last weekend. B: ____ there before?",
-        ["Did you been", "Had you been", "Were you been"],
+        "A: I tried sushi last night. B: ____ it before?",
+        ["Did you tried", "Had you tried", "Were you tried"],
         1,
         "Use 'Had' + subject + past participle for questions about earlier experiences."
       ),
       multipleChoiceItem(
         "ppl-mc-4",
         "Identify the 'd contraction.",
-        "I didn't know that you'd found a new job.",
-        ["you had", "you would", "you did"],
+        "She was thrilled because she'd won the prize.",
+        ["she had", "she would", "she did"],
         0,
-        "In this context, 'd represents 'had' because it is followed by a past participle (found)."
+        "In this context, 'd represents 'had' because it is followed by a past participle (won)."
       ),
       errorCorrectionItem(
         "ppl-ec-1",
         "Check the highlighted phrase for errors.",
-        "I suddenly realized that I'd left my phone in the taxi.",
+        "When I got to the office, I realized that I'd left my wallet at home.",
         "I'd left",
         true,
         "",
@@ -13588,11 +13606,11 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       errorCorrectionItem(
         "ppl-ec-2",
         "Check the past participle.",
-        "When she got to class, she realized that she hadn't brought her book.",
-        "hadn't brought",
+        "At the airport, he realized that he hadn't packed his passport.",
+        "hadn't packed",
         true,
         "",
-        "Correct! 'Brought' is the past participle of 'bring'."
+        "Correct! The past perfect is formed with 'hadn't' + past participle."
       ),
       errorCorrectionItem(
         "ppl-ec-3",
@@ -13603,14 +13621,13 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "had already begun",
         "Always use the past participle after 'had'. The participle of 'begin' is 'begun', not 'began'."
       ),
-      errorCorrectionItem(
-        "ppl-ec-4",
-        "Had or would?",
-        "If you went by taxi, you'd get there much quicker.",
-        "you'd",
-        true,
-        "",
-        "Correct! Here, 'd means 'would' because it is followed by an infinitive (get), not a past participle."
+      multipleChoiceItem(
+        "ppl-mc-5",
+        "What does 'd mean here?",
+        "If we left now, we'd catch the last bus.",
+        ["had", "would", "did"],
+        1,
+        "Here, 'd means 'would' because it is followed by the base verb 'catch', not a past participle."
       ),
       errorCorrectionItem(
         "ppl-ec-5",
@@ -13624,33 +13641,33 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       placeholderGapItem(
         "ppl-gf-1",
         "Complete the sentence with the past perfect.",
-        "When I woke up, the garden was white because it __________ (snow) during the night.",
-        "had snowed",
+        "By breakfast time, the streets were wet because it __________ (rain) all night.",
+        "had rained",
         [],
         "Use 'had' + past participle to show an earlier past action."
       ),
       placeholderGapItem(
         "ppl-gf-2",
         "Complete the negative thought.",
-        "She __________ (not / see) the film before, so she really enjoyed it.",
-        "hadn't seen",
-        ["had not seen"],
+        "She __________ (not / meet) him before, so she was nervous.",
+        "hadn't met",
+        ["had not met"],
         "Use 'hadn't' + past participle for negative past perfect."
       ),
       placeholderGapItem(
         "ppl-gf-3",
         "Complete the realization.",
-        "I suddenly realized that I __________ (leave) my keys at home.",
-        "had left",
-        ["'d left"],
-        "Use the past perfect for something that happened before you realized it."
+        "I suddenly remembered that I __________ (promise) to call Eva.",
+        "had promised",
+        ["'d promised"],
+        "Use the past perfect for something that happened before you remembered it."
       ),
       placeholderGapItem(
         "ppl-gf-4",
         "Complete the question.",
-        "__________ (you / eat) before you went to the cinema?",
-        "Had you eaten",
-        ["had you eaten"],
+        "__________ (you / ever / fly) before that trip to Japan?",
+        "Had you ever flown",
+        ["had you ever flown"],
         "In questions, place 'Had' before the subject."
       ),
       placeholderGapItem(
@@ -13682,40 +13699,40 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     items: [
       multipleChoiceItem(
         "rsm-mc-1",
-        "Direct: 'I can help you.'",
-        "He said that he ____ help me.",
+        "Direct: 'I can lend you my notes.'",
+        "He said that he ____ lend me his notes.",
         ["can", "could", "will"],
         1,
         "The modal 'can' backshifts to 'could' in reported speech."
       ),
       multipleChoiceItem(
         "rsm-mc-2",
-        "Direct: 'I'm driving.'",
+        "Direct: 'I'm waiting outside.'",
         "She said that she ____.",
-        ["is driving", "was driving", "drove"],
+        ["is waiting outside", "was waiting outside", "waited outside"],
         1,
         "The present continuous backshifts to the past continuous."
       ),
       multipleChoiceItem(
         "rsm-mc-3",
-        "Direct: 'I'll call you.'",
-        "He told me that he ____ call me.",
+        "Direct: 'I'll send you the file tonight.'",
+        "He told me that he ____ send me the file that night.",
         ["will", "would", "shall"],
         1,
         "The future 'will' backshifts to 'would'."
       ),
       multipleChoiceItem(
         "rsm-mc-4",
-        "Direct: 'I've broken my arm.'",
-        "Sara said that she ____ her arm.",
-        ["broke", "has broken", "had broken"],
+        "Direct: 'I've lost my keys.'",
+        "Sara said that she ____ her keys.",
+        ["lost", "has lost", "had lost"],
         2,
         "The present perfect backshifts to the past perfect."
       ),
       multipleChoiceItem(
         "rsm-mc-5",
         "Choose the correct reporting verb.",
-        "He ____ that he loved me.",
+        "She ____ that the meeting was cancelled.",
         ["said", "told", "told to me"],
         0,
         "Use 'say' without an object or pronoun."
@@ -13723,7 +13740,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "rsm-mc-6",
         "Choose the correct reporting verb.",
-        "He ____ me that he loved me.",
+        "She ____ me that the meeting was cancelled.",
         ["said", "told", "said me"],
         1,
         "Use 'tell' with an object or pronoun like 'me'."
@@ -13731,7 +13748,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       errorCorrectionItem(
         "rsm-ec-1",
         "Check the highlighted phrase for errors.",
-        "She told that she was tired.",
+        "Marco told that he was too busy to come.",
         "told that",
         false,
         "said that",
@@ -13740,7 +13757,7 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       errorCorrectionItem(
         "rsm-ec-2",
         "Check the highlighted phrase for errors.",
-        "He said me that he was hungry.",
+        "My sister said me that she was upset.",
         "said me",
         false,
         "told me",
@@ -13749,58 +13766,56 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       errorCorrectionItem(
         "rsm-ec-3",
         "Check the pronoun change.",
-        "Direct: 'I love you.' -> He said that he loved me.",
-        "he loved me",
+        "Direct: 'I miss you.' -> She said that she missed me.",
+        "she missed me",
         true,
         "",
-        "Correct! Pronouns often change: 'I' becomes 'he' and 'you' becomes 'me'."
+        "Correct! Pronouns often change in reported speech."
       ),
       errorCorrectionItem(
         "rsm-ec-4",
         "Check the tense.",
-        "Direct: 'I met a girl.' -> John told me that he had met a girl.",
-        "had met",
+        "Direct: 'I found your keys.' -> Tom told me that he had found my keys.",
+        "had found",
         true,
         "",
         "Correct! The past simple backshifts to the past perfect."
       ),
       singleGap(
         "rsm-rf-1",
-        "Report this: 'I've just arrived,' she said.",
+        "Report this: 'I've just finished work,' she said.",
         ["She said that she ", { gapId: "g1" }, "."],
-        ["had just arrived"],
+        ["had just finished work"],
         "Backshift the present perfect to the past perfect."
       ),
       singleGap(
         "rsm-rf-2",
-        "Report this: 'We'll come at eight,' they said.",
-        ["They told me that they ", { gapId: "g1" }, " at eight."],
-        ["would come"],
+        "Report this: 'We'll meet you outside,' they said.",
+        ["They told me that they ", { gapId: "g1" }, " outside."],
+        ["would meet me"],
         "Backshift 'will' to 'would'."
       ),
       placeholderGapItem(
         "rsm-gf-1",
-        "Report this: 'I don't want to go,' Jack told Anna.",
-        "Jack told Anna that he __________ to go.",
-        "didn't want",
-        ["did not want"],
+        "Report this: 'I don't feel well,' Jack told Anna.",
+        "Jack told Anna that he __________ well.",
+        "didn't feel",
+        ["did not feel"],
         "Backshift the present simple to the past simple and change 'I' to 'he'."
       ),
-      placeholderGapItem(
+      singleGap(
         "rsm-gf-2",
-        "Report this: 'I'm tired,' she said.",
-        "She __________ she was tired.",
-        "said",
-        ["said that"],
-        "Since there is no object, use 'said'. The word 'that' is optional."
+        "Report this: 'I'm ready to leave,' she said.",
+        ["She said that ", { gapId: "g1" }, "."],
+        ["she was ready to leave"],
+        "Backshift 'am' to 'was' and keep the clause after 'said that'."
       ),
-      placeholderGapItem(
+      singleGap(
         "rsm-gf-3",
-        "Report this: 'I can help you,' he said to me.",
-        "He __________ that he could help me.",
-        "told me",
-        ["said"],
-        "Use 'told me' or 'said'."
+        "Report this: 'I can carry that bag,' he said to me.",
+        ["He told me ", { gapId: "g1" }, "."],
+        ["he could carry that bag", "that he could carry that bag"],
+        "Backshift 'can' to 'could'. 'That' is optional after 'told me'."
       ),
     ],
   },
@@ -13815,52 +13830,52 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       multipleChoiceItem(
         "sq-mc-1",
         "Subject Question: Identify the painter.",
-        "Who ____ 'The Milkmaid'?",
-        ["did paint", "painted", "did painted"],
+        "Who ____ the poster for the school play?",
+        ["did design", "designed", "did designed"],
         1,
-        "When 'Who' is the subject, we don't use 'did'. Use the past simple form: 'Who painted...?'"
+        "When 'Who' is the subject, we don't use 'did'. Use the past simple form directly."
       ),
       multipleChoiceItem(
         "sq-mc-2",
         "Object Question Contrast: Identify preferences.",
-        "What music ____?",
-        ["you like", "do you like", "likes you"],
+        "Which films ____ most?",
+        ["you enjoy", "do you enjoy", "enjoy you"],
         1,
         "In most other questions where 'you' is the subject, we must use the auxiliary 'do'."
       ),
       multipleChoiceItem(
         "sq-mc-3",
         "Subject Question: Statistics.",
-        "Which city ____ the most honest people?",
-        ["has", "does have", "is having"],
+        "Which shop ____ fresh bread the earliest?",
+        ["sells", "does sell", "is selling"],
         0,
-        "When 'Which city' is the subject, we use the verb 'has' directly."
+        "When the question phrase is the subject, we use the main verb directly."
       ),
       multipleChoiceItem(
         "sq-mc-4",
         "Subject Question: Social offers.",
-        "Who ____ a cup of coffee?",
-        ["does want", "wants", "want"],
+        "Who ____ a charger for their phone?",
+        ["does need", "needs", "need"],
         1,
         "Use the third-person singular verb directly after 'Who' in a subject question."
       ),
       errorCorrectionItem(
         "sq-ec-1",
         "Check for unnecessary auxiliaries.",
-        "Who did paint 'The Milkmaid'?",
-        "did paint",
+        "Who did design the poster?",
+        "did design",
         false,
-        "painted",
+        "designed",
         "We don't use an auxiliary verb when the question word is the subject."
       ),
       errorCorrectionItem(
         "sq-ec-2",
         "Check the word order.",
-        "How many people live near the school?",
-        "live",
+        "Which teacher lives near the station?",
+        "lives",
         true,
         "",
-        "Correct! 'How many people' is the subject, so no auxiliary is needed."
+        "Correct! The question phrase is the subject, so no auxiliary is needed."
       ),
       errorCorrectionItem(
         "sq-ec-3",
@@ -13874,8 +13889,8 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       errorCorrectionItem(
         "sq-ec-4",
         "Check the verb form.",
-        "Who wants a cup of coffee?",
-        "wants",
+        "Who needs some help with the printer?",
+        "needs",
         true,
         "",
         "Correct! The question word is the subject, so we use the verb directly."
@@ -13892,26 +13907,26 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       placeholderGapItem(
         "sq-gf-1",
         "Build the question.",
-        "__________ (paint) 'The Milkmaid'?",
-        "Who painted",
+        "__________ (design) the website?",
+        "Who designed",
         [],
         "Use the verb directly in the past simple for this subject question."
       ),
       placeholderGapItem(
         "sq-gf-2",
         "Build the question.",
-        "How many people __________ (live) near the school?",
-        "live",
+        "How many guests __________ (need) a taxi?",
+        "need",
         [],
-        "No auxiliary is needed when asking about the subject 'How many people'."
+        "No auxiliary is needed when asking about the subject."
       ),
       placeholderGapItem(
         "sq-gf-3",
         "Build the question.",
-        "Which city __________ (have) the most honest people?",
-        "has",
+        "Which player __________ (want) to take the penalty?",
+        "wants",
         [],
-        "The question word is the subject, so use 'has' directly."
+        "The question phrase is the subject, so use the main verb directly."
       ),
       placeholderGapItem(
         "sq-gf-4",
