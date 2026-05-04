@@ -10,20 +10,20 @@ export default function CollocationMenu() {
     <div className="vocab-topics game-wrapper">
       <Seo
         title="Collocation Trainer | Seif Aptis Trainer"
-        description="Practise common collocations for Aptis. Collocation Dash is available now; more modes coming soon."
+        description="Practise common collocations for Aptis with multi-select training and Collocation Dash."
       />
 
       <header className="header">
         <h2 className="title">Collocation Trainer</h2>
         <p className="intro">
-          Practise natural word combinations (make/do/take/have/give) and fixed
-          expressions.
+          Practise natural word combinations, fixed expressions, and the choices
+          that sound right in English.
         </p>
       </header>
 
       <UnderConstructionPanel
         title="Collocation module in progress"
-        message="Collocation Dash is ready to play. More modes (sets by topic, review, and exams) are coming soon."
+        message="A new multi-select collocation trainer is ready for testing with a small starter set. More content and review modes can grow from here."
       />
 
       <div className="cards">
@@ -41,15 +41,28 @@ export default function CollocationMenu() {
           <p>Fast matching game: choose the correct verb for each phrase.</p>
         </button>
 
+        <button
+          className="card"
+          onClick={() => navigate("/vocabulary/collocations/trainer")}
+        >
+          <div className="card-head">
+            <h3>
+              <span style={{ fontSize: "1.3rem" }}>🧩</span> Collocation Trainer
+            </h3>
+            <span className="live-pill">New</span>
+          </div>
+          <p>Choose all natural word partnerships, review mistakes, and save useful examples.</p>
+        </button>
+
         {/* Coming soon card */}
         <button className="card soon-card" onClick={() => {}}>
           <div className="card-head">
             <h3>
-              <span style={{ fontSize: "1.3rem" }}>🧩</span> Collocation Sets
+              <span style={{ fontSize: "1.3rem" }}>📚</span> Collocation Sets
             </h3>
             <span className="soon-pill">Coming soon</span>
           </div>
-          <p>Practise by topic (Travel, Work…) with spaced review.</p>
+          <p>Practise larger topic sets with spaced review.</p>
         </button>
       </div>
 

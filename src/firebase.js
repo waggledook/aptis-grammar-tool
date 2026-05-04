@@ -622,6 +622,27 @@ export async function logCollocationDashCompleted(details = {}) {
   });
 }
 
+export async function logCollocationPrecisionStarted(details = {}) {
+  return logActivity("collocation_precision_started", {
+    app: "aptis-trainer",
+    ...details,
+  });
+}
+
+export async function logCollocationPrecisionReviewLoaded(details = {}) {
+  return logActivity("collocation_precision_review_loaded", {
+    app: "aptis-trainer",
+    ...details,
+  });
+}
+
+export async function logCollocationPrecisionCompleted(details = {}) {
+  return logActivity("collocation_precision_completed", {
+    app: "aptis-trainer",
+    ...details,
+  });
+}
+
 export async function logSynonymTrainerStarted(details = {}) {
   return logActivity("synonym_trainer_started", {
     app: "aptis-trainer",
@@ -1956,6 +1977,154 @@ export async function fetchSynonymTrainerMistakes(n = 20, uid) {
     collection(db, "users", realUid, "synonymTrainerMistakes"),
     orderBy("createdAt", "desc"),
     limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveCollocationPrecisionResult(itemId, tags, isCorrect) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  const ref = doc(db, "users", uid, "collocationPrecisionProgress", itemId);
+  await setDoc(
+    ref,
+    {
+      itemId,
+      tags: tags || "",
+      attempts: increment(1),
+      everCorrect: isCorrect ? true : increment(0),
+      lastCorrect: !!isCorrect,
+      lastAnsweredAt: serverTimestamp(),
+      app: "aptis-trainer",
+    },
+    { merge: true }
+  );
+}
+
+export async function fetchSeenCollocationPrecisionItemIds(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "collocationPrecisionProgress"));
+  return snap.docs.map((d) => d.id);
+}
+
+export async function recordCollocationPrecisionMistake(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  await addDoc(collection(db, "users", uid, "collocationPrecisionMistakes"), {
+    ...item,
+    app: "aptis-trainer",
+    createdAt: serverTimestamp(),
+  });
+}
+
+export async function fetchCollocationPrecisionMistakes(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "collocationPrecisionMistakes"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function clearCollocationPrecisionMistakes(itemId, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !itemId) return;
+
+  const snap = await getDocs(
+    query(
+      collection(db, "users", realUid, "collocationPrecisionMistakes"),
+      where("itemId", "==", itemId)
+    )
+  );
+
+  await Promise.all(snap.docs.map((entry) => deleteDoc(entry.ref)));
+}
+
+export async function fetchCollocationPrecisionFavourites(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "collocationPrecisionFavourites"));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveCollocationPrecisionFavourite(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  const ref = doc(db, "users", uid, "collocationPrecisionFavourites", item.itemId);
+  await setDoc(
+    ref,
+    {
+      ...item,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      app: "aptis-trainer",
+    },
+    { merge: true }
+  );
+}
+
+export async function removeCollocationPrecisionFavourite(itemId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  await deleteDoc(doc(db, "users", uid, "collocationPrecisionFavourites", itemId));
+}
+
+function diaryEntryId(entry) {
+  return [entry?.itemId, entry?.word]
+    .filter(Boolean)
+    .join("__")
+    .replace(/[^a-zA-Z0-9_-]+/g, "-")
+    .slice(0, 140);
+}
+
+export async function saveCollocationPrecisionDiaryEntry(entry) {
+  const uid = auth.currentUser?.uid;
+  const id = diaryEntryId(entry);
+  if (!uid || !id) return;
+
+  const ref = doc(db, "users", uid, "collocationPrecisionDiary", id);
+  await setDoc(
+    ref,
+    {
+      ...entry,
+      updatedAt: serverTimestamp(),
+      createdAt: serverTimestamp(),
+      app: "aptis-trainer",
+    },
+    { merge: true }
+  );
+}
+
+export async function fetchCollocationPrecisionDiary(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "collocationPrecisionDiary"),
+    orderBy("updatedAt", "desc"),
+    limit(100)
   );
 
   const snap = await getDocs(qy);

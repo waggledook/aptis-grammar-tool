@@ -57,6 +57,9 @@ export const ACTIVITY_TYPE_LABELS = {
   hub_word_formation_completed: "Hub Word Formation Completed",
   collocation_dash_started: "Collocation Dash Started",
   collocation_dash_completed: "Collocation Dash Completed",
+  collocation_precision_started: "Collocation Trainer Started",
+  collocation_precision_review_loaded: "Collocation Trainer Review Loaded",
+  collocation_precision_completed: "Collocation Trainer Completed",
   synonym_trainer_started: "Synonym Trainer Started",
   synonym_trainer_review_loaded: "Synonym Trainer Review Loaded",
   synonym_trainer_completed: "Synonym Trainer Completed",
@@ -328,6 +331,23 @@ export function formatActivityDetails(log) {
       return joinParts([formatCount(d.roundsPlanned, "round"), `${d.roundSeconds ?? "?"}s`]);
     case "collocation_dash_completed":
       return joinParts([`${d.score ?? "?"} pts`, `Round ${d.roundsReached ?? "?"}`, `Review ${d.reviewCount ?? "?"}`]);
+    case "collocation_precision_started":
+      return joinParts([
+        d.mode || "normal",
+        d.pattern || "",
+        d.topic || "",
+        `Pool ${d.poolSize ?? "?"}`,
+        `Set ${d.total ?? "?"}`,
+      ]);
+    case "collocation_precision_review_loaded":
+      return joinParts([d.mode || "review", formatCount(d.total, "item")]);
+    case "collocation_precision_completed":
+      return joinParts([
+        d.mode || "normal",
+        d.pattern || "",
+        d.topic || "",
+        `Perfect ${formatScore(d.correct, d.total)}`,
+      ]);
     case "synonym_trainer_started":
       return joinParts([
         d.practiceMode || "learn",

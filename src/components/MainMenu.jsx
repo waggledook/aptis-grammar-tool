@@ -29,16 +29,15 @@ export default function MainMenu({ user }) {
   <div className="whats-new-copy">
     <span className="whats-new-label">What’s new</span>
     <p>
-      <strong>New topic sets in Vocabulary Practice</strong> Try the new
-      Education and TV & Cinema collections in Topic Trainer.
+      <strong>New collocation trainer</strong> Practise the most common word combinations for Aptis Vocabulary Task 5!
     </p>
   </div>
 
   <button
     className="whats-new-btn"
-    onClick={() => navigate("/vocabulary/topics")}
+    onClick={() => navigate("/vocabulary/collocations")}
   >
-    Open vocabulary
+    Open collocations
   </button>
 </div>
 
