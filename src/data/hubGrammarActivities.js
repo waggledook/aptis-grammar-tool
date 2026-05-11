@@ -9852,6 +9852,255 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     ],
   },
   {
+    id: "conditional-choice-7b",
+    title: "Second Conditional: Choosing Between Conditionals",
+    shortDescription:
+      "Choose between first and second conditional by deciding if the situation is real or unreal.",
+    levels: ["b1"],
+    intro:
+      "Read the situation first. Use the first conditional for real, likely future possibilities, and the second conditional for imaginary, impossible, or very unlikely situations.",
+    items: [
+      multipleChoiceItem(
+        "cc7b-mc-1",
+        "Choose the best sentence.",
+        "Situation: You are a student with very little money. You don't have enough to buy a car.",
+        [
+          "If I have enough money, I'll buy a car.",
+          "If I had enough money, I'd buy a car.",
+        ],
+        1,
+        "Because you don't have the money now, this is an unreal or hypothetical situation, so the second conditional fits best."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-2",
+        "Choose the best sentence.",
+        "Situation: You're at a restaurant. You might order dessert, but you're quite full.",
+        [
+          "If I'm still hungry, I'll order a cake.",
+          "If I were still hungry, I'd order a cake.",
+        ],
+        0,
+        "This is a real possibility later in the meal, so use the first conditional."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-3",
+        "Choose the best sentence.",
+        "Situation: You are 30 years old and you are imagining being a teenager again.",
+        [
+          "If I am a teenager again, I'll study harder.",
+          "If I were a teenager again, I'd study harder.",
+        ],
+        1,
+        "This is an impossible or unreal situation, so use the second conditional."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-4",
+        "Choose the best sentence.",
+        "Situation: It's a bit cloudy outside and there is a chance of rain this afternoon.",
+        ["If it rains, we'll stay home.", "If it rained, we'd stay home."],
+        0,
+        "There is a real chance of rain, so the first conditional is the better choice."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-5",
+        "Choose the best sentence.",
+        "Situation: You don't speak French and you are not planning to learn it.",
+        [
+          "If you speak French, you can communicate in Paris.",
+          "If you spoke French, you could communicate in Paris.",
+        ],
+        1,
+        "Because this is not true now, the unreal option with the second conditional is more logical."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-6",
+        "Choose the best sentence.",
+        "Situation: You're at home and your phone might ring.",
+        [
+          "If your phone rings, you'll answer it.",
+          "If your phone rang, you would answer it.",
+        ],
+        0,
+        "This is a real possibility in the near future, so use the first conditional."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-7",
+        "Choose the best sentence.",
+        "Situation: You don't have any money and you know you won't win the lottery.",
+        [
+          "If you have money, you can buy a ticket.",
+          "If you had money, you could buy a ticket.",
+        ],
+        1,
+        "This situation is unreal, so the second conditional is the better match."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-8",
+        "Choose the best option.",
+        "If I had a job, I ____ much more social.",
+        ["will be", "would be", "am"],
+        1,
+        "Use 'would' + infinitive in the result clause of the second conditional."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-9",
+        "Choose the best option.",
+        "If it ____ later, we'll have the party inside.",
+        ["rains", "rained", "would rain"],
+        0,
+        "Use the present simple after 'if' in the first conditional."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-10",
+        "Choose the best option.",
+        "If I ____ nearer the office, I wouldn't need to drive every day.",
+        ["live", "lived", "will live"],
+        1,
+        "Use the past simple in the if-clause for the second conditional."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-11",
+        "Choose the best option.",
+        "If she ____ her homework now, she'll be free later.",
+        ["finishes", "finished", "would finish"],
+        0,
+        "Use the present simple in the if-clause for a real future possibility."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-12",
+        "Choose the best option.",
+        "If we ____ more time, we'd visit the museum too.",
+        ["have", "had", "will have"],
+        1,
+        "This is a hypothetical situation, so use the past simple after 'if'."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-13",
+        "Choose the best option.",
+        "If my train is late, I ____ you a message.",
+        ["send", "'d send", "'ll send"],
+        2,
+        "Use 'will' in the result clause for the first conditional."
+      ),
+      multipleChoiceItem(
+        "cc7b-mc-14",
+        "Choose the best option.",
+        "If I ____ you, I wouldn't wait much longer.",
+        ["am", "were", "will be"],
+        1,
+        "Use 'If I were you' for advice."
+      ),
+      errorCorrectionItem(
+        "cc7b-ec-1",
+        "Check the highlighted phrase for errors.",
+        "If I would live in London, I'd visit the museums every week.",
+        "If I would live",
+        false,
+        "If I lived",
+        "Never use 'would' in the if-clause. Use the past simple in the second conditional."
+      ),
+      errorCorrectionItem(
+        "cc7b-ec-2",
+        "Check the highlighted phrase for errors.",
+        "If it will be sunny tomorrow, we'll go to the beach.",
+        "If it will be",
+        false,
+        "If it is",
+        "Use the present simple after 'if' for a real future possibility."
+      ),
+      errorCorrectionItem(
+        "cc7b-ec-3",
+        "Check the highlighted phrase for errors.",
+        "If he studied more, he will pass all his exams easily.",
+        "he will pass",
+        false,
+        "he would pass",
+        "With a hypothetical if-clause in the past simple, the result clause should use 'would'."
+      ),
+      errorCorrectionItem(
+        "cc7b-ec-4",
+        "Check the highlighted phrase for errors.",
+        "If I were you, I would take that offer.",
+        "If I were you",
+        true,
+        "",
+        "Correct. 'If I were you' is the standard advice structure in the second conditional."
+      ),
+      singleGap(
+        "cc7b-rf-1",
+        "Real: I don't have a car, so I walk to work. Complete the unreal sentence.",
+        ["If I had a car, I ", { gapId: "g1" }, " to work."],
+        ["wouldn't walk", "would not walk"],
+        "Use the second conditional to imagine the opposite of the real situation."
+      ),
+      singleGap(
+        "cc7b-rf-2",
+        "Real: She is shy, so she doesn't go to many parties. Complete the unreal sentence.",
+        ["If she ", { gapId: "g1" }, " shy, she'd go to more parties."],
+        ["weren't", "were not", "wasn't", "was not"],
+        "Use the past simple negative in the if-clause for a hypothetical present situation."
+      ),
+      singleGap(
+        "cc7b-rf-3",
+        "Complete the advice sentence.",
+        ["If I ", { gapId: "g1" }, " you, I'd tell her the truth."],
+        ["were", "was"],
+        "Use 'If I were you' to give advice."
+      ),
+      doubleGap(
+        "cc7b-gf-1",
+        "Complete the sentence with the correct forms.",
+        ["If I ", { gapId: "g1" }, " (win) a trip to space, I ", { gapId: "g2" }, " (go) tomorrow."],
+        ["won"],
+        ["'d go", "would go"],
+        "Because this is a very unlikely dream, use the second conditional: past simple + would."
+      ),
+      doubleGap(
+        "cc7b-gf-2",
+        "Complete the sentence with the correct forms.",
+        ["I ", { gapId: "g1" }, " (call) you if I ", { gapId: "g2" }, " (finish) my homework early tonight."],
+        ["'ll call", "will call"],
+        ["finish"],
+        "This is a real possibility, so use the first conditional: will + infinitive, then present simple."
+      ),
+      singleGap(
+        "cc7b-rf-4",
+        "Real: I'm cold because the heating is off. Complete the unreal sentence.",
+        ["I would not be cold if the heating ", { gapId: "g1" }, " on."],
+        ["was", "were"],
+        "Use the past simple of 'be' in the if-clause to imagine a different present situation."
+      ),
+      singleGap(
+        "cc7b-rf-5",
+        "Real: I'm lazy, so I don't exercise. Complete the unreal sentence.",
+        ["If I wasn't lazy, I ", { gapId: "g1" }, "."],
+        ["would exercise", "'d exercise", "would do more exercise", "'d do more exercise"],
+        "Use the second conditional to imagine the opposite result in the present."
+      ),
+      singleGap(
+        "cc7b-rf-6",
+        "Real: I'm tired because I go to bed too late. Complete the unreal sentence.",
+        ["If I did not go to bed so late, I ", { gapId: "g1" }, "."],
+        ["would not be tired", "wouldn't be tired", "would be less tired", "'d be less tired"],
+        "Change the present cause into a hypothetical condition and use 'would' in the result clause."
+      ),
+      singleGap(
+        "cc7b-rf-7",
+        "Real: I live in the city, so I don't see the stars. Complete the unreal sentence.",
+        ["I would see the stars if I ", { gapId: "g1" }, " in the city."],
+        ["didn't live", "did not live", "lived somewhere else", "lived outside the city"],
+        "Use a negative or contrasting idea in the if-clause to imagine a different present reality."
+      ),
+      singleGap(
+        "cc7b-rf-8",
+        "Real: They don't have more money because they spend too much. Complete the unreal sentence.",
+        ["If they did not spend so much, they ", { gapId: "g1" }, " more money."],
+        ["would have", "'d have"],
+        "Use the second conditional to imagine a different result from a different present habit."
+      ),
+    ],
+  },
+  {
     id: "second-conditional-intro-a2b1",
     title: "Second Conditional: Dreams and Hypotheses",
     shortDescription: "A first look at using 'if + past' to talk about imaginary situations.",
