@@ -1,8 +1,10 @@
 import React, { useMemo, useState, useEffect } from "react";
-import { saveReadingCompletion, fetchReadingCompletions, logReadingReorderCompleted } from '../firebase';
+import { useSearchParams } from "react-router-dom";
+import { saveReadingCompletion, saveReadingProgress, fetchReadingCompletions, logReadingReorderCompleted } from '../firebase';
 import { toast } from "../utils/toast"; // your ToastHost helper
 import { getSitePath } from "../siteConfig.js";
 import ReadingAssignButton from "./ReadingAssignButton.jsx";
+import { READING_PART2_TASKS } from "./part2Tasks.js";
 
 /**
  * Aptis Part 2 – Sentence Reordering (drag sentences into slots)
@@ -24,150 +26,6 @@ import ReadingAssignButton from "./ReadingAssignButton.jsx";
 /** @typedef {{ id: string, text: string, order: number, fixed?: boolean }} Sentence */
 /** @typedef {{ id: string, title: string, prompt?: string, sentences: Sentence[] }} TextSpec */
 /** @typedef {{ id: string, title: string, intro?: string, texts: TextSpec[] }} AptisReorderTask */
-
-// ---------- Demo dataset (inspired by your screenshots, paraphrased) ----------
-const DEMO_TASKS /** @type {AptisReorderTask[]} */ = [
-  {
-    id: "cycling-lanes",
-    title: "New cycling lanes in the city",
-    texts: [
-      {
-        id: "t1",
-        title: "Cycling lanes report",
-        sentences: [
-          {
-            id: "intro1",
-            text: "This report describes recent improvements to cycling infrastructure.",
-            order: 0,
-            fixed: true
-          },
-          { id: "a", text: "The lanes are separated from car traffic by low barriers to improve safety for cyclists.", order: 1 },
-          { id: "b", text: "They can now travel directly from the suburbs into the city centre.", order: 2 },
-          { id: "c", text: "Early surveys show a 40% increase in daily bike journeys.", order: 3 },
-          { id: "d", text: "For this reason, we recommend extending the scheme to additional districts.", order: 4 },
-          { id: "e", text: "Further monitoring will help us decide where such expansion is most urgent.", order: 5 }
-        ]
-      }
-    ]
-  },
-  {
-    id: "ebooks",
-    title: "Borrowing e-books from the university library",
-    texts: [
-      {
-        id: "t1",
-        title: "Library instructions",
-        sentences: [
-          {
-            id: "intro2",
-            text: "Please follow these steps to access the new digital collection.",
-            order: 0,
-            fixed: true
-          },
-          { id: "a", text: "Log in with your student ID and password.", order: 1 },
-          { id: "b", text: "Then, search the catalogue for the title you require.", order: 2 },
-          { id: "c", text: "Click “Borrow e-book” and select your loan period.", order: 3 },
-          { id: "d", text: "The system will confirm your loan and provide a download link.", order: 4 },
-          { id: "e", text: "Remember to return the book digitally before the due date to avoid restrictions.", order: 5 }
-        ]
-      }
-    ]
-  },
-  {
-    id: "helen-graves",
-    title: "Dr. Helen Graves",
-    texts: [
-      {
-        id: "t1",
-        title: "Biography",
-        sentences: [
-          {
-            id: "intro3",
-            text: "Helen Graves was born in 1974 in the northern city of Leeds.",
-            order: 0,
-            fixed: true
-          },
-          { id: "a", text: "She studied physics and mathematics at Oxford University.", order: 1 },
-          { id: "b", text: "After completing her PhD, she worked on renewable energy projects in Germany.", order: 2 },
-          { id: "c", text: "Her breakthrough paper on solar storage was published in 2005.", order: 3 },
-          { id: "d", text: "Ten years later she received an award for outstanding contributions to science.", order: 4 },
-          { id: "e", text: "Today, she combines research with advising governments on climate policy.", order: 5 }
-        ]
-      }
-    ]
-  },
-  {
-    id: "film-festival",
-    title: "Submitting a film to the International Festival",
-    texts: [
-      {
-        id: "t1",
-        title: "Submission process",
-        sentences: [
-          {
-            id: "intro4",
-            text: "Please read these guidelines before sending your film to the committee.",
-            order: 0,
-            fixed: true
-          },
-          { id: "a", text: "Before beginning the process, ensure it is under 120 minutes and has English subtitles.", order: 1 },
-          { id: "b", text: "Fill in the online application form with all required details.", order: 2 },
-          { id: "c", text: "Once this is completed, upload a digital copy in one of the accepted formats.", order: 3 },
-          { id: "d", text: "Pay the submission fee through the secure portal.", order: 4 },
-          { id: "e", text: "Once this is received, you will receive an email confirmation and your application will be reviewed.", order: 5 }
-        ]
-      }
-    ]
-  },
-  {
-    id: "remote-work",
-    title: "Productivity and remote work",
-    texts: [
-      {
-        id: "t1",
-        title: "Remote work report",
-        sentences: [
-          {
-            id: "intro5",
-            text: "This report presents findings from a recent survey of remote workers.",
-            order: 0,
-            fixed: true
-          },
-          { id: "a", text: "Respondents reported saving an average of 70 minutes a day on commuting.", order: 1 },
-          { id: "b", text: "Many said they used the time for additional work or exercise.", order: 2 },
-          { id: "c", text: "However, 35% noted that communication with colleagues had become more difficult.", order: 3 },
-          { id: "d", text: "Similarly, managers highlighted challenges in monitoring progress fairly.", order: 4 },
-          { id: "e", text: "Overall, the study concludes that hybrid arrangements may be the most effective.", order: 5 }
-        ]
-      }
-    ]
-  },
-  {
-    id: "plastic-reduction",
-    title: "Plastic reduction initiative",
-    texts: [
-      {
-        id: "t1",
-        title: "Plastic reduction report",
-        sentences: [
-          {
-            id: "intro6",
-            text: "This report outlines measures taken to reduce plastic waste in our town.",
-            order: 0,
-            fixed: true
-          },
-          { id: "a", text: "Single-use bags have been banned in all major supermarkets.", order: 1 },
-          { id: "b", text: "What is more, local cafés now provide discounts for customers bringing reusable cups.", order: 2 },
-          { id: "c", text: "As a result, plastic consumption has dropped by 25% in the last year.", order: 3 },
-          { id: "d", text: "Nevertheless, many smaller shops still rely heavily on plastic packaging.", order: 4 },
-          { id: "e", text: "For this reason, we recommend launching an education campaign to raise awareness.", order: 5 }
-        ]
-      }
-    ]
-  }
-];
-
-  
 
 // ---------- Helpers ----------
 function shuffleArray(arr) {
@@ -455,7 +313,21 @@ function ChipDropdown({ items, value, onChange, label = "Task" }) {
   }
 
 // ---------- Main container showing two texts side‑by‑side ----------
-export default function AptisPart2Reorder({ tasks = DEMO_TASKS, user, onRequireSignIn }) {
+export default function AptisPart2Reorder({
+  tasks = READING_PART2_TASKS,
+  user,
+  onRequireSignIn,
+  routeBasePath = getSitePath("/reading/part2"),
+  activityId = "reading-part-2",
+  showAssignButton = true,
+  trackProgress = true,
+  progressPart = null,
+  lockAfterIndex = 2,
+  headerActions = null,
+  heading = "Reading – Sentence Order (Aptis Part 2)",
+  intro = "Put the sentences in the correct order to build a coherent text.",
+}) {
+  const [searchParams] = useSearchParams();
   // Flatten: each text becomes its own selectable task
   const flattened = useMemo(() => {
     const out = [];
@@ -474,7 +346,7 @@ export default function AptisPart2Reorder({ tasks = DEMO_TASKS, user, onRequireS
     return out;
   }, [tasks]);
 
-  const initialTaskId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("task") : "";
+  const initialTaskId = searchParams.get("task") || "";
   const initialTaskIndex = Math.max(0, flattened.findIndex((task) => task.id === initialTaskId));
   const [taskIndex, setTaskIndex] = useState(initialTaskIndex);
   const current = flattened[taskIndex] || flattened[0];
@@ -483,6 +355,10 @@ export default function AptisPart2Reorder({ tasks = DEMO_TASKS, user, onRequireS
   const [completed, setCompleted] = useState(new Set());
 
   useEffect(() => {
+    if (!trackProgress) {
+      setCompleted(new Set());
+      return;
+    }
     let alive = true;
     (async () => {
       if (!user) { setCompleted(new Set()); return; }
@@ -490,11 +366,21 @@ export default function AptisPart2Reorder({ tasks = DEMO_TASKS, user, onRequireS
       if (alive) setCompleted(done);
     })();
     return () => { alive = false; };
-  }, [user]);
+  }, [trackProgress, user]);
+
+  useEffect(() => {
+    const requestedTaskId = searchParams.get("task");
+    if (!requestedTaskId) return;
+
+    const nextIndex = flattened.findIndex((task) => task.id === requestedTaskId);
+    if (nextIndex === -1) return;
+    if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) return;
+    setTaskIndex(nextIndex);
+  }, [flattened, lockAfterIndex, searchParams, user]);
 
  // ✅ guard selection – tasks 3+ require sign-in (index >= 2)
 function handleSelectTask(nextIndex) {
-  if (!user && nextIndex >= 2) {
+  if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) {
     onRequireSignIn?.(); // open your sign-in modal
     return;
   }
@@ -505,7 +391,7 @@ function handleSelectTask(nextIndex) {
 const decoratedItems = useMemo(
   () =>
     flattened.map((f, i) => {
-      const locked = !user && i >= 2;
+      const locked = !user && lockAfterIndex != null && i >= lockAfterIndex;
       return {
         ...f,
         locked,
@@ -515,7 +401,7 @@ const decoratedItems = useMemo(
           (locked ? " 🔒" : "")
       };
     }),
-  [flattened, completed, user]
+  [flattened, completed, lockAfterIndex, user]
 );
 
 return (
@@ -524,9 +410,8 @@ return (
 
     <header className="header">
       <div>
-        <h2 className="title">Reading – Sentence Order (Aptis Part 2)</h2>
-        {/* If the intro sentence is now inside the slots as fixed, remove this next line */}
-        {/* {current?.intro && <p className="intro">{current.intro}</p>} */}
+        <h2 className="title">{heading}</h2>
+        {intro ? <p className="intro">{intro}</p> : null}
         {current?.subtitle && (
           <p className="intro" style={{ opacity: 0.8 }}>
             <em>From: {current.subtitle}</em>
@@ -535,20 +420,23 @@ return (
       </div>
 
       <div className="picker">
-        <ReadingAssignButton
-          user={user}
-          activityId="reading-part-2"
-          activityLabel={`Aptis Reading Part 2 — ${current?.title || "Sentence order"}`}
-          routePath={getSitePath(`/reading/part2?task=${encodeURIComponent(current?.id || "")}`)}
-          taskId={current?.id || ""}
-          taskTitle={current?.title || ""}
-        />
+        {showAssignButton ? (
+          <ReadingAssignButton
+            user={user}
+            activityId={activityId}
+            activityLabel={`Aptis Reading Part 2 — ${current?.title || "Sentence order"}`}
+            routePath={`${routeBasePath}?task=${encodeURIComponent(current?.id || "")}`}
+            taskId={current?.id || ""}
+            taskTitle={current?.title || ""}
+          />
+        ) : null}
         <ChipDropdown
           items={decoratedItems}          // ⬅️ use decorated labels
           value={taskIndex}
           onChange={handleSelectTask}     // ⬅️ call the guard, not setTaskIndex
           label="Task"
         />
+        {headerActions}
       </div>
     </header>
 
@@ -560,12 +448,17 @@ return (
   onChangeCheck={async (fb) => {
     if (!user) return;
     if (!fb.length || !fb.every(v => v === true)) return;
+    if (!trackProgress) return;
   
     // avoid re-logging if user revisits a completed task
     const alreadyDone = completed.has(current.id);
     if (alreadyDone) return;
   
-    await saveReadingCompletion(current.id);
+    if (progressPart) {
+      await saveReadingProgress(current.id, progressPart);
+    } else {
+      await saveReadingCompletion(current.id);
+    }
     setCompleted(prev => new Set(prev).add(current.id));
     toast("Task marked as completed ✓");
   

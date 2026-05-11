@@ -52,6 +52,7 @@ import SpeakingPart4Extra from "./components/speaking/SpeakingPart4Extra";
 import SpeakingPart2and3_PhotoGuide from "./components/speaking/SpeakingPart2and3_PhotoGuide.jsx";
 import AptisPart1 from "./reading/AptisPart1";
 import AptisPart2Reorder from './reading/AptisPart2Reorder';
+import ReadingPart2Teacher from "./reading/ReadingPart2Teacher.jsx";
 import AptisPart3Matching from './reading/AptisPart3Matching';
 import AptisPart4 from "./reading/AptisPart4";
 import VocabularyMenu from "./components/vocabulary/VocabularyMenu";
@@ -268,6 +269,7 @@ useEffect(() => {
   const params = new URLSearchParams(location.search);
   const open = params.get("open");
   const openRoutes = {
+    "reading-part-2-teacher": "/reading/part2-teacher",
     "speaking-part-2-secret": "/speaking/part2-secret",
     "speaking-part-3-custom": "/speaking/part3-custom",
     "speaking-part-4-extra": "/speaking/part4-extra",
@@ -282,6 +284,7 @@ useEffect(() => {
 useEffect(() => {
   const hash = window.location.hash || "";
   const hashRoutes = {
+    "#/reading/part2-teacher": "/reading/part2-teacher",
     "#/speaking/part2-secret": "/speaking/part2-secret",
     "#/speaking/part3-custom": "/speaking/part3-custom",
     "#/speaking/part4-extra": "/speaking/part4-extra",
@@ -1037,9 +1040,36 @@ return (
     >
       ← Back
     </button>
-    <AptisPart2Reorder user={user} onRequireSignIn={() => setShowAuth(true)} />
+    <AptisPart2Reorder
+      user={user}
+      onRequireSignIn={() => setShowAuth(true)}
+      headerActions={
+        <TeacherExtrasButton
+          user={user}
+          to="/reading/part2-teacher"
+          label="Teacher Part 2 tasks"
+        />
+      }
+    />
   </>
 } />
+<Route
+  path="/reading/part2-teacher"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <>
+        <button
+          onClick={() => navigate("/reading")}
+          className="review-btn"
+          style={{ marginBottom: "1rem" }}
+        >
+          ← Back
+        </button>
+        <ReadingPart2Teacher user={user} onRequireSignIn={() => setShowAuth(true)} />
+      </>
+    </RequireSignedIn>
+  }
+/>
 <Route path="/reading/part2-guide" element={
   <>
     <button
