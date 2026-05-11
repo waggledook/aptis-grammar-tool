@@ -7,3 +7,4 @@ firebase-debug.log
 functions/node_modules/
 serviceAccountKey.json
 coursepack-sections/
+health-vocab-site/
