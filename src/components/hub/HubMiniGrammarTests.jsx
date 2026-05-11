@@ -40,6 +40,17 @@ export default function HubMiniGrammarTests({ user }) {
   const isTeacher = user?.role === "teacher" || user?.role === "admin";
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+
+    if (typeof document !== "undefined") {
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+    }
+  }, []);
+
+  useEffect(() => {
     let alive = true;
 
     (async () => {

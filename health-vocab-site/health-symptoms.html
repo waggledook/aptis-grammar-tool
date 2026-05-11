@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Health Picture Trainer</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-set-slug="health-symptoms">
+    <main class="shell">
+      <section class="hero">
+        <div class="hero__top">
+          <span class="eyebrow">Picture Reveal</span>
+          <h1 data-set-title></h1>
+          <p data-set-focus></p>
+          <div class="toolbar">
+            <button type="button" data-reveal-all>Reveal all</button>
+            <button type="button" data-hide-all>Hide all</button>
+          </div>
+        </div>
+        <nav class="hero__nav" data-nav></nav>
+      </section>
+
+      <section class="panel">
+        <h2>Guess from the mini prompt</h2>
+        <p>Each card keeps just the short collocation cue on the front for a cleaner practice round.</p>
+        <div class="card-grid" data-card-grid></div>
+        <a class="back-link" href="index.html">Back to all sets</a>
+      </section>
+    </main>
+
+    <script src="siteData.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

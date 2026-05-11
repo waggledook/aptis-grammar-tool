@@ -13915,10 +13915,10 @@ export const HUB_GRAMMAR_ACTIVITIES = [
       placeholderGapItem(
         "sq-gf-2",
         "Build the question.",
-        "How many guests __________ (need) a taxi?",
-        "need",
+        "How many guests __________ (need) a taxi after the wedding last night?",
+        "needed",
         [],
-        "No auxiliary is needed when asking about the subject."
+        "No auxiliary is needed when the question phrase is the subject."
       ),
       placeholderGapItem(
         "sq-gf-3",
@@ -13951,6 +13951,2317 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "goes",
         [],
         "Use the present simple verb directly for this subject question."
+      ),
+      placeholderGapItem(
+        "sq-gf-7",
+        "Build the question.",
+        "What music __________ (you / listen to) when you study?",
+        "do you listen to",
+        [],
+        "This is an object question, so you need the auxiliary 'do'."
+      ),
+      placeholderGapItem(
+        "sq-gf-8",
+        "Build the question.",
+        "Which candidate __________ (they / choose) in the end?",
+        "did they choose",
+        [],
+        "This is an object question about the past, so you need the auxiliary 'did'."
+      ),
+    ],
+  },
+  {
+    id: "advanced-have-mastery-1a",
+    title: "Advanced 'Have': Lexical & Grammatical Uses",
+    shortDescription:
+      "Advanced practice with lexical, causative, and idiomatic uses of 'have'.",
+    levels: ["c1"],
+    intro:
+      "Test your control of 'have' in advanced contexts. Pay attention to whether it is stative or dynamic, part of a perfect form, causative, or used inside a fixed expression.",
+    items: [
+      multipleChoiceItem(
+        "adv-h-mc-1",
+        "Choose the most natural form.",
+        "I can't talk right now; I ____ a serious discussion with my landlord about the rent.",
+        ["have", "am having", "'ve got"],
+        1,
+        "When 'have' describes an action or experience, it can be used in continuous tenses."
+      ),
+      multipleChoiceItem(
+        "adv-h-mc-2",
+        "Choose the only correct negative form.",
+        "You ____ come in tomorrow after all; the meeting has been cancelled.",
+        ["don't have to", "haven't to", "mustn't"],
+        0,
+        "Use 'don't have to' to say there is no obligation. 'Haven't to' is not standard, and 'mustn't' means it is forbidden."
+      ),
+      multipleChoiceItem(
+        "adv-h-mc-3",
+        "Choose the correct past form.",
+        "Back when we were at university, we ____ a very small apartment in the suburbs.",
+        ["had got", "had", "were having"],
+        1,
+        "For past possession, standard English normally uses 'had', not 'had got'."
+      ),
+      multipleChoiceItem(
+        "adv-h-mc-4",
+        "Choose the correct form for arranging a service.",
+        "The roof is leaking; we need to ____ as soon as possible.",
+        ["have it fixed", "have fixed it", "get to fix it"],
+        0,
+        "The causative structure is 'have + object + past participle'."
+      ),
+      multipleChoiceItem(
+        "adv-h-mc-5",
+        "Choose the correct future form.",
+        "By this time next Friday, I ____ my final exams.",
+        ["will have finished", "will have been finishing", "will finish"],
+        0,
+        "Use 'will have' + past participle for the future perfect."
+      ),
+      multipleChoiceItem(
+        "adv-h-mc-6",
+        "Choose the most natural expression.",
+        "I ____ what to do next; the situation is completely unprecedented.",
+        ["haven't a clue", "don't have got a clue", "am not having a clue"],
+        0,
+        "In fixed expressions like 'haven't a clue', 'have' can appear without 'got'."
+      ),
+      multipleChoiceItem(
+        "adv-h-mc-7",
+        "Choose the correct form.",
+        "She ____ a very close relationship with her grandmother.",
+        ["is having", "has", "has got to"],
+        1,
+        "'Have' is stative when talking about relationships and is not usually used in continuous tenses."
+      ),
+      multipleChoiceItem(
+        "adv-h-mc-8",
+        "Choose the expression that fits best.",
+        "If he continues to ignore his responsibilities, I'm going to have to ____ him.",
+        ["have it out with", "have him on", "have it in for"],
+        0,
+        "'Have it out with someone' means to discuss a problem openly and directly."
+      ),
+      multipleChoiceItem(
+        "adv-h-mc-9",
+        "Choose the expression that fits best.",
+        "Are you serious about moving to Alaska, or are you just ____?",
+        ["having a go", "having me on", "having a laugh"],
+        1,
+        "To 'have someone on' means to joke with them by making them believe something untrue."
+      ),
+      multipleChoiceItem(
+        "adv-h-mc-10",
+        "Choose the only correct form.",
+        "She ____ a very good relationship with her business partner.",
+        ["has", "is having", "has got to"],
+        0,
+        "Use 'have' as a stative main verb when talking about relationships."
+      ),
+      errorCorrectionItem(
+        "adv-h-ec-1",
+        "Check the contraction.",
+        "I've a small house in the countryside.",
+        "I've a",
+        false,
+        "I have a",
+        "In the standard neutral form tested here, we do not usually contract 'have' when it is a main verb of possession."
+      ),
+      errorCorrectionItem(
+        "adv-h-ec-2",
+        "Check the past tense usage.",
+        "My parents had got a red car when I was young.",
+        "had got",
+        false,
+        "had",
+        "For past possession, use 'had', not 'had got'."
+      ),
+      errorCorrectionItem(
+        "adv-h-ec-3",
+        "Check the stative verb form.",
+        "I'm having a terrible headache today.",
+        "I'm having",
+        false,
+        "I have",
+        "In the standard form tested here, 'have' is treated as stative when talking about illnesses or physical states."
+      ),
+      errorCorrectionItem(
+        "adv-h-ec-4",
+        "Check the causative structure.",
+        "I had stolen my wallet while I was on the bus.",
+        "I had stolen my wallet",
+        false,
+        "I had my wallet stolen",
+        "Use 'have + object + past participle' to describe something bad that happened to you."
+      ),
+      errorCorrectionItem(
+        "adv-h-ec-5",
+        "Check the idiomatic expression.",
+        "I don't think I've got it in for me to run a marathon.",
+        "got it in for me",
+        false,
+        "got it in me",
+        "To feel capable of something is to 'have it in you'; 'have it in for someone' means to dislike them."
+      ),
+      errorCorrectionItem(
+        "adv-h-ec-6",
+        "Check the more neutral form for repeated obligation.",
+        "I've got to wear a suit to work every day.",
+        "I've got to",
+        false,
+        "I have to",
+        "In this test, 'have to' is treated as the more neutral form for a general repeated obligation."
+      ),
+      errorCorrectionItem(
+        "adv-h-ec-7",
+        "Check the dynamic use.",
+        "We had such a laugh at the party last night.",
+        "had such a laugh",
+        true,
+        "",
+        "Correct! 'Have a laugh' is a dynamic expression and is used correctly here."
+      ),
+      errorCorrectionItem(
+        "adv-h-ec-8",
+        "Check the auxiliary form.",
+        "If I had not gone to the party, I wouldn't have met her.",
+        "wouldn't have",
+        true,
+        "",
+        "Correct! Here 'have' is part of the modal perfect structure 'wouldn't have met'."
+      ),
+      errorCorrectionItem(
+        "adv-h-ec-9",
+        "Check the stative possession.",
+        "Are you having any siblings?",
+        "Are you having",
+        false,
+        "Do you have",
+        "'Have' for family relationships is stative and is not used in the continuous form here."
+      ),
+      errorCorrectionItem(
+        "adv-h-ec-10",
+        "Check the perfect form auxiliary.",
+        "How long is she having been waiting?",
+        "is she having",
+        false,
+        "has she",
+        "The auxiliary 'has' is required to form the present perfect continuous."
+      ),
+      placeholderGapItem(
+        "adv-h-gf-1",
+        "Complete the expression.",
+        "I'm not sure if I can fix the car, but I'll __________ at it. (= try)",
+        "have a go",
+        [],
+        "To 'have a go' means to try something."
+      ),
+      placeholderGapItem(
+        "adv-h-gf-2",
+        "Complete the expression.",
+        "My boss really __________ me; she always gives me the worst shifts. (= dislikes me)",
+        "has it in for",
+        [],
+        "To 'have it in for someone' means to dislike them and treat them unfairly."
+      ),
+      placeholderGapItem(
+        "adv-h-gf-3",
+        "Complete the expression.",
+        "I've __________ with this noisy neighborhood; I'm moving next month. (= had enough)",
+        "had it",
+        [],
+        "To 'have had it' with something means to be fed up or to have had enough."
+      ),
+      placeholderGapItem(
+        "adv-h-gf-4",
+        "Complete the expression.",
+        "I can't believe you're moving to Mars! You're __________, right? (= joking)",
+        "having me on",
+        [],
+        "To 'have someone on' means to joke with them."
+      ),
+      placeholderGapItem(
+        "adv-h-gf-5",
+        "Complete the expression.",
+        "I need to __________ with my brother about his behavior. (= speak openly)",
+        "have it out",
+        [],
+        "To 'have it out with someone' means to talk openly about a problem."
+      ),
+      singleGap(
+        "adv-h-rf-1",
+        "Rewrite using a causative: 'The mechanic is servicing my car tomorrow.'",
+        ["I am ", { gapId: "g1" }, " tomorrow."],
+        ["having my car serviced"],
+        "Use 'have + object + past participle' for services."
+      ),
+      singleGap(
+        "adv-h-rf-2",
+        "Rewrite to show specific obligation: 'It is necessary for me to call the bank today.'",
+        ["I ", { gapId: "g1" }, " call the bank today."],
+        ["'ve got to", "have got to"],
+        "Use 'have got to' for a specific present obligation."
+      ),
+      singleGap(
+        "adv-h-rf-3",
+        "Rewrite using an idiom: 'I don't think I am capable of forgiving her.'",
+        ["I don't think I ", { gapId: "g1" }, " to forgive her."],
+        ["have it in me", "have got it in me", "'ve got it in me"],
+        "To 'have it in you' or 'have it in you to...' means to feel capable of doing something."
+      ),
+      singleGap(
+        "adv-h-rf-5",
+        "Rewrite for a bad experience: 'Someone hacked his email account.'",
+        ["He ", { gapId: "g1" }, "."],
+        ["had his email account hacked"],
+        "The causative can also describe negative experiences that happen to someone."
+      ),
+    ],
+  },
+  {
+    id: "advanced-linkers-mastery-1b",
+    title: "Advanced Discourse Markers: Linkers",
+    shortDescription:
+      "Advanced practice with linkers of result, reason, purpose, and contrast.",
+    levels: ["c1"],
+    intro:
+      "Master the nuances of linking ideas. Pay attention to register, punctuation, and the grammatical structures that must follow each linker.",
+    items: [
+      multipleChoiceItem(
+        "dm-mc-1",
+        "Result: choose the most appropriate formal linker.",
+        "The company failed to meet its quarterly targets; ____, the board has decided to restructure the entire department.",
+        ["so", "consequently", "because"],
+        1,
+        "'Consequently' is more formal than 'so' and is often used to introduce a result."
+      ),
+      multipleChoiceItem(
+        "dm-mc-2",
+        "Contrast: which linker is followed by a noun phrase?",
+        "____ the torrential rain, the outdoor music festival continued as planned.",
+        ["Although", "In spite of", "Even though"],
+        1,
+        "'In spite of' must be followed by a noun phrase, a gerund, or 'the fact that'."
+      ),
+      multipleChoiceItem(
+        "dm-mc-3",
+        "Purpose: choose the correct structure for a negative purpose.",
+        "We left the office early ____ we wouldn't get caught in the rush-hour traffic.",
+        ["so that", "in order not to", "despite"],
+        0,
+        "Use 'so that' when the purpose clause has its own subject and verb."
+      ),
+      multipleChoiceItem(
+        "dm-mc-4",
+        "Reason: which option fits the formal register?",
+        "The flight was cancelled ____ a technical fault in the engine.",
+        ["since", "due to", "seeing as"],
+        1,
+        "'Due to' is more formal than 'because of' and is followed by a noun phrase."
+      ),
+      multipleChoiceItem(
+        "dm-mc-5",
+        "Purpose: preparation for a future problem.",
+        "I've packed an extra set of clothes ____ the airline loses my luggage.",
+        ["so that", "in case", "to"],
+        1,
+        "Use 'in case' + clause when doing something to be ready for a possible future problem."
+      ),
+      multipleChoiceItem(
+        "dm-mc-6",
+        "Contrast: choose the sentence-initial formal linker.",
+        "The research is promising. ____, further trials are required before it can be approved.",
+        ["But", "However", "Though"],
+        1,
+        "'However' is commonly used at the beginning of a sentence to show contrast."
+      ),
+      multipleChoiceItem(
+        "dm-mc-7",
+        "Reason: giving a reason for what you are currently saying.",
+        "____ you've already finished your work, you're welcome to head home early.",
+        ["Seeing as", "Due to", "Because of"],
+        0,
+        "'Seeing as' or 'seeing that' is used to give a reason for the current statement."
+      ),
+      multipleChoiceItem(
+        "dm-mc-8",
+        "Result: identify the correct mid-position formal linker.",
+        "The committee has ____ decided to postpone the vote until next month.",
+        ["so", "therefore", "as a result"],
+        1,
+        "'Therefore' can appear before a main verb in a formal sentence."
+      ),
+      multipleChoiceItem(
+        "dm-mc-9",
+        "Contrast: choose the most formal option for linking within a sentence.",
+        "The strategy was ambitious, ____ many experts doubted it would succeed.",
+        ["but", "yet", "although"],
+        1,
+        "'Yet' is often more formal or literary than 'but' in this position."
+      ),
+      multipleChoiceItem(
+        "dm-mc-10",
+        "Purpose: change of subject in the purpose clause.",
+        "The teacher spoke slowly ____ all the students could follow the instructions.",
+        ["so as to", "so that", "in order to"],
+        1,
+        "Use 'so that' when there is a change of subject in the purpose clause."
+      ),
+      errorCorrectionItem(
+        "dm-ec-1",
+        "Check the structure following the contrast linker.",
+        "Despite she felt ill, she insisted on finishing the marathon.",
+        "Despite she felt ill",
+        false,
+        "Despite feeling ill",
+        "After 'despite' or 'in spite of', use a gerund, a noun phrase, or 'the fact that' + clause."
+      ),
+      errorCorrectionItem(
+        "dm-ec-2",
+        "Check the negative purpose structure.",
+        "He wore a disguise so as to not be recognized by the reporters.",
+        "so as to not",
+        false,
+        "so as not to",
+        "The word 'not' comes before 'to' in the structure 'so as not to'."
+      ),
+      errorCorrectionItem(
+        "dm-ec-3",
+        "Check the reason linker usage.",
+        "The match was abandoned because the heavy snow.",
+        "because the heavy snow",
+        false,
+        "because of the heavy snow",
+        "Use 'because of' before a noun phrase; 'because' must be followed by a clause."
+      ),
+      errorCorrectionItem(
+        "dm-ec-4",
+        "Check the register and placement of the result linker.",
+        "I have a lot of experience, as result, I was offered the position.",
+        "as result",
+        false,
+        "as a result",
+        "'As a result' is normally separated with punctuation and often begins a new clause or sentence."
+      ),
+      errorCorrectionItem(
+        "dm-ec-5",
+        "Check the structure after 'in case'.",
+        "Take a map in case you will get lost in the mountains.",
+        "will get lost",
+        false,
+        "get lost",
+        "After 'in case', we normally use a present form to talk about a possible future problem."
+      ),
+      errorCorrectionItem(
+        "dm-ec-6",
+        "Check the structure following the contrast linker.",
+        "Despite of the high cost, the project was approved.",
+        "Despite of",
+        false,
+        "Despite",
+        "Use 'despite' without 'of'."
+      ),
+      errorCorrectionItem(
+        "dm-ec-7",
+        "Check the result linker logic.",
+        "The data was corrupted, because we had to restart the analysis.",
+        "because",
+        false,
+        "so",
+        "The second clause is a result of the first, not the reason for it."
+      ),
+      errorCorrectionItem(
+        "dm-ec-8",
+        "Check the purpose linker structure.",
+        "I'm studying hard in order that pass the exam.",
+        "in order that pass",
+        false,
+        "in order to pass",
+        "Use 'in order to' with an infinitive or 'so that' with a clause."
+      ),
+      errorCorrectionItem(
+        "dm-ec-9",
+        "Check the contrast linker logic.",
+        "The movie was great. As a result, it was a bit too long.",
+        "As a result",
+        false,
+        "However",
+        "Use 'however' or 'nevertheless' to add contrast, not a result."
+      ),
+      errorCorrectionItem(
+        "dm-ec-10",
+        "Check the reason linker structure.",
+        "Due to the weather was bad, the event was moved indoors.",
+        "Due to the weather was bad",
+        false,
+        "Due to the bad weather",
+        "'Due to' is followed by a noun phrase, not a full clause."
+      ),
+      singleGap(
+        "dm-rf-1",
+        "Complete the second sentence using the word in bold: CONSEQUENTLY.",
+        ["The system crashed. ", { gapId: "g1" }, "."],
+        ["Consequently, we lost all our progress"],
+        "Use 'consequently' to introduce the result in a more formal way.",
+        { originalSentence: "The system crashed, so we lost all our progress.", keyWord: "consequently" }
+      ),
+      singleGap(
+        "dm-rf-2",
+        "Complete the second sentence using the word in bold: DESPITE.",
+        ["", { gapId: "g1" }, ", he managed to reach the village."],
+        ["Despite having a broken leg"],
+        "Use 'despite' followed by a gerund phrase.",
+        {
+          originalSentence: "Although he had a broken leg, he managed to walk to the village.",
+          keyWord: "despite",
+        }
+      ),
+      singleGap(
+        "dm-rf-3",
+        "Complete the second sentence using the word in bold: OWING.",
+        ["", { gapId: "g1" }, ", the game was postponed."],
+        ["Owing to the flooded pitch"],
+        "Use 'owing to' followed by a noun phrase.",
+        {
+          originalSentence: "The game was postponed because the pitch was flooded.",
+          keyWord: "owing",
+        }
+      ),
+      singleGap(
+        "dm-rf-4",
+        "Complete the second sentence using the word in bold: SO.",
+        ["He turned down the music ", { gapId: "g1" }, "."],
+        ["so that he wouldn't disturb his neighbours", "so that he would not disturb his neighbours"],
+        "Use 'so that' when the purpose clause has its own subject and verb.",
+        {
+          originalSentence: "He turned down the music in order not to disturb his neighbours.",
+          keyWord: "so",
+        }
+      ),
+      singleGap(
+        "dm-rf-5",
+        "Complete the second sentence using the word in bold: HOWEVER.",
+        ["The plan was perfect. ", { gapId: "g1" }, "."],
+        ["However, the execution was flawed"],
+        "Use 'however' at the start of a new sentence to introduce contrast.",
+        {
+          originalSentence: "The plan was perfect, but the execution was flawed.",
+          keyWord: "however",
+        }
+      ),
+      singleGap(
+        "dm-rf-6",
+        "Complete the second sentence using the word in bold: SEEING.",
+        ["", { gapId: "g1" }, ", you might as well help me."],
+        ["Seeing that you are here", "Seeing as you are here"],
+        "Use 'seeing that' or 'seeing as' to give the reason for what you are saying.",
+        {
+          originalSentence: "Because you are here, you might as well help me.",
+          keyWord: "seeing",
+        }
+      ),
+      singleGap(
+        "dm-rf-7",
+        "Complete the second sentence using the word in bold: ORDER.",
+        ["She saved her money ", { gapId: "g1" }, "."],
+        ["in order to buy a new house"],
+        "Use 'in order to' followed by an infinitive of purpose.",
+        {
+          originalSentence: "She saved her money to buy a new house.",
+          keyWord: "order",
+        }
+      ),
+      singleGap(
+        "dm-rf-8",
+        "Complete the second sentence using the word in bold: THEREFORE.",
+        ["The train was delayed; we were ", { gapId: "g1" }, "."],
+        ["therefore unable to arrive on time"],
+        "Use 'therefore' in mid position in a formal sentence.",
+        {
+          originalSentence: "The train was delayed, and as a result, we were unable to arrive on time.",
+          keyWord: "therefore",
+        }
+      ),
+      singleGap(
+        "dm-rf-9",
+        "Complete the second sentence using the word in bold: SPITE.",
+        ["", { gapId: "g1" }, ", she speaks four languages."],
+        ["In spite of being only ten"],
+        "Use 'in spite of' followed by a gerund phrase.",
+        {
+          originalSentence: "Even though she is only ten, she speaks four languages.",
+          keyWord: "spite",
+        }
+      ),
+      singleGap(
+        "dm-rf-10",
+        "Complete the second sentence using the word in bold: CASE.",
+        ["I'll take an umbrella ", { gapId: "g1" }, "."],
+        ["in case it rains"],
+        "Use 'in case' to show preparation for a possible future situation.",
+        {
+          originalSentence: "I'll take an umbrella because it might rain.",
+          keyWord: "case",
+        }
+      ),
+    ],
+  },
+  {
+    id: "advanced-past-logic-mastery-1c",
+    title: "The Past: Incidents and Habits",
+    shortDescription:
+      "Advanced practice with narrative tenses and past habits.",
+    levels: ["c1"],
+    intro:
+      "Master the subtle differences between narrative incidents and past habits. In the final section, choose which full verb forms are grammatically possible in each context.",
+    items: [
+      multipleChoiceItem(
+        "p-logic-1",
+        "Sequence: which action was already in progress when the main event occurred?",
+        "I was presenting the data when the CEO ____ to ask a question.",
+        ["interrupted", "was interrupting", "had interrupted"],
+        0,
+        "Use the past simple for the main action that interrupts a background activity."
+      ),
+      multipleChoiceItem(
+        "p-logic-2",
+        "Earlier past: why was the result visible?",
+        "The floor was filthy because the contractors ____ all day.",
+        ["worked", "were working", "had been working"],
+        2,
+        "Use the past perfect continuous to show the cause of a past situation."
+      ),
+      multipleChoiceItem(
+        "p-logic-3",
+        "Scene setting: establish the background.",
+        "The rain ____ against the window as we sat down to begin the negotiations.",
+        ["beat", "was beating", "had beaten"],
+        1,
+        "The past continuous is used to set the scene in a narrative."
+      ),
+      multipleChoiceItem(
+        "p-logic-4",
+        "Irritating habits: express annoyance at a past behavior.",
+        "My old boss ____ me on my personal phone during my vacation.",
+        ["would always call", "was always calling", "Either of these"],
+        2,
+        "Both 'would always' and 'was always ...-ing' can describe annoying repeated past behavior."
+      ),
+      multipleChoiceItem(
+        "p-logic-5",
+        "States vs. actions: habitual behavior.",
+        "In the summer, we ____ the antique shops looking for rare books.",
+        ["would scour", "were scouring", "had scoured"],
+        0,
+        "Use 'would' + infinitive for repeated actions in the past when the time frame is clear."
+      ),
+      multipleChoiceItem(
+        "p-logic-6",
+        "Usage check: 'get used to' logic.",
+        "After six months in London, I finally ____ the constant noise.",
+        ["used to", "was getting used to", "got used to"],
+        2,
+        "'Got used to' describes the completed process of becoming familiar with something."
+      ),
+      multipleChoiceItem(
+        "p-logic-7",
+        "Choose the correct form for a past state.",
+        "Before the renovation, the house ____ a large front porch.",
+        ["would have", "used to having", "used to have"],
+        2,
+        "For a past state like possession, 'used to have' is possible, but 'would' is not normally used."
+      ),
+      multipleChoiceItem(
+        "p-logic-8",
+        "Earlier past: completed action.",
+        "I didn't recognize him because he ____ a full beard since our last meeting.",
+        ["grew", "was growing", "had grown"],
+        2,
+        "Use the past perfect simple for a completed change that happened before the main past event."
+      ),
+      multipleChoiceItem(
+        "p-logic-9",
+        "Main action: narrative flow.",
+        "I was scanning the crowd when I ____ my former colleague.",
+        ["spotted", "was spotting", "had spotted"],
+        0,
+        "The past simple describes the main events in a narrative."
+      ),
+      multipleChoiceItem(
+        "p-logic-10",
+        "Stative verbs in narrative.",
+        "Even though he looked confident, he ____ absolutely terrified.",
+        ["was being", "was", "had been being"],
+        1,
+        "Stative verbs like 'be' are usually used in simple forms to describe states."
+      ),
+      errorCorrectionItem(
+        "p-err-1",
+        "Check 'would' with a stative verb.",
+        "I would belong to a tennis club, but I rarely played.",
+        "would belong",
+        false,
+        "used to belong",
+        "'Would' cannot be used for past states; use 'used to' instead."
+      ),
+      errorCorrectionItem(
+        "p-err-2",
+        "Check specific incident logic.",
+        "I had been going to that restaurant three times last month.",
+        "had been going",
+        false,
+        "went",
+        "If you specify the number of times, you normally use the past simple."
+      ),
+      errorCorrectionItem(
+        "p-err-3",
+        "Check narrative sequence.",
+        "The meeting ended and I had been going home.",
+        "had been going",
+        false,
+        "went",
+        "Use the past simple for a sequence of main actions in a story."
+      ),
+      errorCorrectionItem(
+        "p-err-4",
+        "Check 'get used to' structure.",
+        "I'm not used to wake up so early.",
+        "used to wake",
+        false,
+        "used to waking",
+        "The 'to' in 'be used to' is a preposition, so it must be followed by a gerund."
+      ),
+      errorCorrectionItem(
+        "p-err-5",
+        "Check past perfect continuous vs. state.",
+        "I had been knowing him for years before we became partners.",
+        "had been knowing",
+        false,
+        "had known",
+        "'Know' is stative and is not normally used in the continuous form."
+      ),
+      errorCorrectionItem(
+        "p-err-6",
+        "Check habitual time reference.",
+        "I would play the piano.",
+        "would play",
+        false,
+        "used to play",
+        "'Would' for past habits normally needs a clear time frame or narrative context."
+      ),
+      errorCorrectionItem(
+        "p-err-7",
+        "Check state verb in the past.",
+        "She used to have a very different personality when she was younger.",
+        "used to have",
+        true,
+        "",
+        "Correct! 'Used to' works well for past states and long-term situations."
+      ),
+      errorCorrectionItem(
+        "p-err-8",
+        "Check the duration logic.",
+        "They had been married for fifty years and then he died.",
+        "had been married",
+        true,
+        "",
+        "Correct! The past perfect can show a state continuing up to a later point in the past."
+      ),
+      errorCorrectionItem(
+        "p-err-9",
+        "Check scene-setting vs. main action.",
+        "While I worked in the garden, a storm began.",
+        "worked",
+        false,
+        "was working",
+        "Use the past continuous for the background action in progress."
+      ),
+      errorCorrectionItem(
+        "p-err-10",
+        "Check irritating habit placement.",
+        "My brother always was borrowing my clothes without asking.",
+        "always was borrowing",
+        false,
+        "was always borrowing",
+        "With the past continuous, 'always' usually comes after the verb 'be'."
+      ),
+      placeholderChoiceGapItem(
+        "p-cat-1",
+        "Choose the full set of forms that could work here.",
+        "I ____ very shy when I first started working here. (be)",
+        ["was / used to be"],
+        "For past states, the past simple and 'used to' are possible, but not 'would'.",
+        ["was", "was / used to be", "was / used to be / would be"]
+      ),
+      placeholderChoiceGapItem(
+        "p-cat-2",
+        "Choose the full set of forms that could work here.",
+        "We ____ to the coast every weekend during the summer. (drive)",
+        ["drove / used to drive / would drive"],
+        "A repeated past action with a clear time reference allows all three forms.",
+        ["drove", "drove / used to drive", "drove / used to drive / would drive"]
+      ),
+      placeholderChoiceGapItem(
+        "p-cat-3",
+        "Choose the full set of forms that could work here.",
+        "He ____ for that company from 2001 to 2011 before retiring. (work)",
+        ["worked"],
+        "A clearly finished time period with beginning and end dates points to the past simple here.",
+        ["worked", "worked / used to work", "worked / used to work / would work"]
+      ),
+      placeholderChoiceGapItem(
+        "p-cat-4",
+        "Choose the full set of forms that could work here.",
+        "My grandfather ____ a small boat in the harbor. (own)",
+        ["owned / used to own"],
+        "Ownership is a state, so 'would' is not normally possible.",
+        ["owned", "owned / used to own", "owned / used to own / would own"]
+      ),
+      placeholderChoiceGapItem(
+        "p-cat-5",
+        "Choose the full set of forms that could work here.",
+        "I ____ that movie five times when I was a teenager. (see)",
+        ["saw"],
+        "Specifying the number of times normally limits you to the past simple.",
+        ["saw", "saw / used to see", "saw / used to see / would see"]
+      ),
+      placeholderChoiceGapItem(
+        "p-cat-6",
+        "Choose the full set of forms that could work here.",
+        "She ____ me every night to make sure I was okay. (call)",
+        ["called / used to call / would call"],
+        "A repeated past action with a clear time reference allows all three forms.",
+        ["called", "called / used to call", "called / used to call / would call"]
+      ),
+      placeholderChoiceGapItem(
+        "p-cat-7",
+        "Choose the full set of forms that could work here.",
+        "I ____ studying history at university. (love)",
+        ["loved / used to love"],
+        "Emotional states or preferences take the past simple or 'used to', not 'would'.",
+        ["loved", "loved / used to love", "loved / used to love / would love"]
+      ),
+      placeholderChoiceGapItem(
+        "p-cat-8",
+        "Choose the full set of forms that could work here.",
+        "They ____ out together twelve times before they got engaged. (go)",
+        ["went out"],
+        "A specific number of completed occasions points to the past simple rather than a habitual form.",
+        ["went out", "went out / used to go out", "went out / used to go out / would go out"]
+      ),
+      placeholderChoiceGapItem(
+        "p-cat-9",
+        "Choose the full set of forms that could work here.",
+        "In my first job, I ____ the mail by hand every morning. (sort)",
+        ["sorted / used to sort / would sort"],
+        "A repeated task with a clear past time frame allows all three forms.",
+        ["sorted", "sorted / used to sort", "sorted / used to sort / would sort"]
+      ),
+      placeholderChoiceGapItem(
+        "p-cat-10",
+        "Choose the full set of forms that could work here.",
+        "We ____ in a very remote village before we moved here. (live)",
+        ["lived / used to live"],
+        "Living in a place is treated as a state or long-term condition, so 'would' is not normally used.",
+        ["lived", "lived / used to live", "lived / used to live / would live"]
+      ),
+    ],
+  },
+  {
+    id: "advanced-pronouns-mastery-2a",
+    title: "Advanced Pronouns: Generic, Reflexive, & Preparatory Subjects",
+    shortDescription:
+      "Advanced practice with generic pronouns, reflexives, and 'it' vs 'there'.",
+    levels: ["c1"],
+    intro:
+      "Refine your use of pronouns. This test covers formal and informal generic subjects, the mechanics of reflexives and reciprocals, and the correct use of preparatory subjects.",
+    items: [
+      multipleChoiceItem(
+        "pro-mc-1",
+        "Choose the best option.",
+        "____ should always consider the long-term consequences of one's financial decisions.",
+        ["You", "One", "They"],
+        1,
+        "'One' is much more formal than 'you' and is often paired with the possessive 'one's'."
+      ),
+      multipleChoiceItem(
+        "pro-mc-2",
+        "Choose the best option.",
+        "If you park there for too long, ____ give you a fine.",
+        ["They", "One", "We"],
+        0,
+        "In informal English, 'they' is often used to refer to people in authority, such as the government."
+      ),
+      multipleChoiceItem(
+        "pro-mc-3",
+        "Choose the best option.",
+        "Everyone should check their phone before ____ leave the building.",
+        ["they", "he", "one"],
+        0,
+        "We often use singular 'they' after words like 'everyone' when the gender is not specified."
+      ),
+      multipleChoiceItem(
+        "pro-mc-4",
+        "Choose the best option.",
+        "As a society, ____ need to address the rising cost of living together.",
+        ["one", "they", "we"],
+        2,
+        "'We' is used to make a general statement that includes both the speaker and the audience."
+      ),
+      multipleChoiceItem(
+        "pro-mc-5",
+        "Choose the best option.",
+        "It is important to defend ____ rights when facing a legal dispute.",
+        ["one's", "their", "your"],
+        0,
+        "'One's' is the possessive form used with the formal generic pronoun 'one'."
+      ),
+      multipleChoiceItem(
+        "pro-mc-6",
+        "Choose the best option.",
+        "____ say that it's better to have loved and lost than never to have loved at all.",
+        ["One", "They", "We"],
+        1,
+        "'They' is commonly used to refer to people in general in sayings and shared opinions."
+      ),
+      multipleChoiceItem(
+        "pro-mc-7",
+        "Choose the most natural option.",
+        "If ____ want to succeed in this industry, ____ need to network constantly.",
+        ["one / one", "you / you", "they / they"],
+        1,
+        "'You' is the most common generic pronoun in spoken English."
+      ),
+      multipleChoiceItem(
+        "pro-mc-8",
+        "Choose the best option.",
+        "Could the passenger who left ____ umbrella on the train please contact the lost property office?",
+        ["his", "their", "her"],
+        1,
+        "Using 'their' is the standard way to refer to an individual of unknown or unspecified gender."
+      ),
+      multipleChoiceItem(
+        "pro-mc-9",
+        "Choose the best option.",
+        "If one wants to learn a language, ____ must practise every day.",
+        ["they", "you", "one"],
+        2,
+        "When using 'one' as a generic pronoun, it is consistent to continue with 'one'."
+      ),
+      multipleChoiceItem(
+        "pro-mc-10",
+        "Choose the best option.",
+        "If you leave your car there, ____ tow it away.",
+        ["One", "We", "They"],
+        2,
+        "'They' is often used informally to refer to people in authority or institutions."
+      ),
+      errorCorrectionItem(
+        "pro-ec-1",
+        "Check the sentence.",
+        "He got up, washed himself, and had breakfast.",
+        "washed himself",
+        false,
+        "washed",
+        "We do not usually use reflexive pronouns with verbs like 'wash', 'shave', or 'dress' unless we want special emphasis."
+      ),
+      errorCorrectionItem(
+        "pro-ec-2",
+        "Check the sentence.",
+        "He looked in the mirror and saw a shadow behind himself.",
+        "behind himself",
+        false,
+        "behind him",
+        "After prepositions of place, we normally use object pronouns such as 'him' or 'her', not reflexive pronouns."
+      ),
+      errorCorrectionItem(
+        "pro-ec-3",
+        "Check the sentence.",
+        "The party was great; did you enjoy last night?",
+        "enjoy last night",
+        false,
+        "enjoy yourself last night",
+        "'Enjoy' is normally used with a reflexive pronoun when it has no other object."
+      ),
+      errorCorrectionItem(
+        "pro-ec-4",
+        "Check the sentence.",
+        "My two brothers don't speak to themselves anymore.",
+        "to themselves",
+        false,
+        "to each other",
+        "Use 'each other' or 'one another' for reciprocal actions."
+      ),
+      errorCorrectionItem(
+        "pro-ec-6",
+        "Check the sentence.",
+        "There used to be a very good restaurant in this street.",
+        "There used to be",
+        true,
+        "",
+        "Correct! Use 'there + be' to say that something exists in a place."
+      ),
+      errorCorrectionItem(
+        "pro-ec-7",
+        "Check the sentence.",
+        "She put the briefcase on the floor next to herself.",
+        "next to herself",
+        false,
+        "next to her",
+        "After prepositions of place, use the object pronoun even if it refers back to the subject."
+      ),
+      errorCorrectionItem(
+        "pro-ec-8",
+        "Check the sentence.",
+        "I built the entire shelving unit by my own.",
+        "my own",
+        false,
+        "myself",
+        "Use 'by + reflexive pronoun' or 'on + possessive + own' to mean alone."
+      ),
+      errorCorrectionItem(
+        "pro-ec-9",
+        "Check the sentence.",
+        "There is five miles to the nearest petrol station.",
+        "There is",
+        false,
+        "It is",
+        "Use 'it + be' to talk about distance, time, and temperature."
+      ),
+      errorCorrectionItem(
+        "pro-ec-10",
+        "Check the sentence.",
+        "I managed to complete the crossword! I was really pleased with myself.",
+        "with myself",
+        true,
+        "",
+        "Correct! Use a reflexive pronoun when the subject and the object of the preposition refer to the same person."
+      ),
+      placeholderGapItem(
+        "pro-gf-1",
+        "Complete the sentence.",
+        "__________ a lot of noise outside last night.",
+        "There was",
+        [],
+        "Use 'there' to indicate the presence or existence of something."
+      ),
+      placeholderGapItem(
+        "pro-gf-2",
+        "Complete the sentence.",
+        "It's very egocentric behaviour; he only ever thinks about __________.",
+        "himself",
+        [],
+        "Use a reflexive pronoun when the subject and object are the same person."
+      ),
+      placeholderGapItem(
+        "pro-gf-3",
+        "Complete the sentence.",
+        "__________ ten degrees colder than it was yesterday.",
+        "It is",
+        ["It's"],
+        "Use 'it' to talk about temperature."
+      ),
+      placeholderGapItem(
+        "pro-gf-4",
+        "Complete the sentence.",
+        "We don't get along anymore; we don't even look at __________ when we speak.",
+        "each other",
+        ["one another"],
+        "Use 'each other' or 'one another' for reciprocal actions."
+      ),
+      placeholderGapItem(
+        "pro-gf-5",
+        "Complete the sentence.",
+        "I don't mind going to the concert __________. (= alone)",
+        "by myself",
+        ["on my own"],
+        "Use 'by + reflexive pronoun' or 'on + possessive + own' to mean alone."
+      ),
+      singleGap(
+        "pro-rf-1",
+        "Rewrite to be more formal: 'If you want to understand the law, you must study its history.'",
+        ["If ", { gapId: "g1" }, " wants to understand the law, one must study its history."],
+        ["one"],
+        "Use 'one' as a more formal generic subject."
+      ),
+      singleGap(
+        "pro-rf-2",
+        "Rewrite using a preparatory subject: 'To hear that you're moving abroad was a surprise.'",
+        ["", { gapId: "g1" }, " a surprise to hear that you're moving abroad."],
+        ["It was"],
+        "Use 'it' as a preparatory subject."
+      ),
+      singleGap(
+        "pro-rf-3",
+        "Rewrite using 'there': 'The street doesn't have a cinema anymore.'",
+        ["", { gapId: "g1" }, " a cinema in the street anymore."],
+        ["There isn't", "There is no"],
+        "Use 'there + be' to talk about the presence or absence of something."
+      ),
+      singleGap(
+        "pro-rf-4",
+        "Rewrite for emphasis: 'We didn't hire professionals; we painted the office.'",
+        ["We painted the office ", { gapId: "g1" }, "."],
+        ["ourselves"],
+        "Reflexive pronouns can emphasize that the subject performed the action without help."
+      ),
+    ],
+  },
+  {
+    id: "advanced-get-mastery-3a",
+    title: "Advanced 'Get': Syntax and Semantics",
+    shortDescription:
+      "Advanced practice with causatives, passives, and other common uses of 'get'.",
+    levels: ["c1"],
+    intro:
+      "This test looks at several advanced uses of 'get': persuasion, services, change, arrival, and informal passives. Pay attention to the structure after 'get' and to the exact meaning in each sentence.",
+    items: [
+      multipleChoiceItem(
+        "get-mc-1",
+        "Choose the best option.",
+        "After several phone calls, we finally ____ the landlord to replace the broken heater.",
+        ["got the landlord to replace", "got the landlord replace", "got replaced the landlord"],
+        0,
+        "Use 'get + object + to + infinitive' when you persuade or manage to make someone do something."
+      ),
+      multipleChoiceItem(
+        "get-mc-2",
+        "Choose the best option.",
+        "The kitchen is still a mess because we haven't ____ yet.",
+        ["got painted it", "got it paint", "got it painted"],
+        2,
+        "For services, use 'get + object + past participle'."
+      ),
+      multipleChoiceItem(
+        "get-mc-3",
+        "Choose the best option.",
+        "The room was so stuffy that we couldn't even ____ without opening a window.",
+        ["get to breathe", "get any air", "get breathing"],
+        1,
+        "Here, 'get' means receive or obtain something."
+      ),
+      multipleChoiceItem(
+        "get-mc-4",
+        "Choose the best option.",
+        "If traffic is light, we should ____ the gallery before it closes.",
+        ["get", "get at", "get to"],
+        2,
+        "When 'get' means arrive, it is followed by 'to' before most places."
+      ),
+      multipleChoiceItem(
+        "get-mc-5",
+        "Choose the best option.",
+        "She never really ____ speaking in front of large audiences.",
+        ["got used to", "used to", "was used"],
+        0,
+        "'Get used to' describes the process of becoming familiar with something."
+      ),
+      multipleChoiceItem(
+        "get-mc-6",
+        "Choose the best option.",
+        "While we were inside, our car ____ from outside the stadium.",
+        ["had stolen", "got stealing", "got stolen"],
+        2,
+        "Use 'get + past participle' for unexpected or unpleasant things that happen."
+      ),
+      multipleChoiceItem(
+        "get-mc-7",
+        "Choose the best option.",
+        "Could you ____ this before lunch?",
+        ["get someone from IT looking at", "get someone from IT to look at", "get someone from IT look at"],
+        1,
+        "Use 'get + person + to + infinitive' when you want someone to do something."
+      ),
+      multipleChoiceItem(
+        "get-mc-8",
+        "Choose the best option.",
+        "Once you know the shortcuts, you ____ the new booking system quite quickly.",
+        ["are getting used to", "get to used to", "get used to"],
+        2,
+        "Use 'get used to' before a noun or -ing form."
+      ),
+      multipleChoiceItem(
+        "get-mc-9",
+        "Choose the best option.",
+        "I was relieved when I finally ____ after pushing for almost a minute.",
+        ["got the window open", "got open the window", "got the window opened"],
+        0,
+        "Use 'get + object + adjective' to mean manage to make something become a certain state."
+      ),
+      multipleChoiceItem(
+        "get-mc-10",
+        "Choose the best option.",
+        "If we miss the last bus, we'll never ____ before midnight.",
+        ["get home", "get to home", "get at home"],
+        0,
+        "With 'home', we normally say 'get home' without 'to'."
+      ),
+      errorCorrectionItem(
+        "get-ec-1",
+        "Check the sentence.",
+        "We finally got the caretaker to unlock the side gate.",
+        "got the caretaker to unlock",
+        true,
+        "",
+        "Correct! This is the right pattern for persuading or asking someone to do something."
+      ),
+      errorCorrectionItem(
+        "get-ec-2",
+        "Check the sentence.",
+        "I'm going to get cut it next week because it's far too long.",
+        "get cut it",
+        false,
+        "get it cut",
+        "With services, the object comes between 'get' and the past participle."
+      ),
+      errorCorrectionItem(
+        "get-ec-3",
+        "Check the sentence.",
+        "By winter, you'll get used to the earlier sunsets.",
+        "get used to",
+        true,
+        "",
+        "Correct! 'Get used to' is used correctly here."
+      ),
+      errorCorrectionItem(
+        "get-ec-4",
+        "Check the sentence.",
+        "What time did you get to home after the concert?",
+        "get to home",
+        false,
+        "get home",
+        "With 'home', we do not normally use 'to'."
+      ),
+      errorCorrectionItem(
+        "get-ec-5",
+        "Check the sentence.",
+        "The queue is getting longer every minute.",
+        "getting longer",
+        true,
+        "",
+        "Correct! 'Get + comparative' shows change over time."
+      ),
+      errorCorrectionItem(
+        "get-ec-6",
+        "Check the sentence.",
+        "We got the broken lock fixed that same afternoon.",
+        "got the broken lock fixed",
+        true,
+        "",
+        "Correct! This is the right structure for arranging a service."
+      ),
+      errorCorrectionItem(
+        "get-ec-7",
+        "Check the sentence.",
+        "They got their neighbours help them carry the sofa upstairs.",
+        "got their neighbours help",
+        false,
+        "got their neighbours to help",
+        "After 'get + person', use 'to + infinitive'."
+      ),
+      errorCorrectionItem(
+        "get-ec-8",
+        "Check the sentence.",
+        "Her visa got renewing faster than we expected.",
+        "got renewing",
+        false,
+        "got renewed",
+        "Use 'get + past participle' in this passive structure."
+      ),
+      errorCorrectionItem(
+        "get-ec-9",
+        "Check the sentence.",
+        "We got delayed by roadworks on the ring road.",
+        "got delayed",
+        true,
+        "",
+        "Correct! 'Get delayed' is a common informal passive."
+      ),
+      errorCorrectionItem(
+        "get-ec-10",
+        "Check the sentence.",
+        "I'm slowly getting used to work on my own.",
+        "used to work",
+        false,
+        "used to working",
+        "After 'get used to', use a noun or an -ing form."
+      ),
+      singleGap(
+        "get-rf-1",
+        "Complete the second sentence using the word in bold: GOT.",
+        ["I ", { gapId: "g1" }, " the faulty charger."],
+        ["got the shop to replace"],
+        "Use 'get + person + to + infinitive' for persuading someone to do something.",
+        {
+          originalSentence: "I persuaded the shop to replace the faulty charger.",
+          keyWord: "got",
+        }
+      ),
+      singleGap(
+        "get-rf-2",
+        "Complete the second sentence using the word in bold: GET.",
+        ["We're going to ", { gapId: "g1" }, " before Friday."],
+        ["get the windows cleaned"],
+        "Use 'get + object + past participle' for a service someone does for you.",
+        {
+          originalSentence: "A company is going to clean the windows for us before Friday.",
+          keyWord: "get",
+        }
+      ),
+      singleGap(
+        "get-rf-3",
+        "Complete the second sentence using the word in bold: GOT.",
+        ["After a few weeks, I finally ", { gapId: "g1" }, " working late every night."],
+        ["got used to"],
+        "Use 'get used to' for becoming familiar with a situation.",
+        {
+          originalSentence: "After a few weeks, working late every night stopped feeling strange to me.",
+          keyWord: "got",
+        }
+      ),
+      singleGap(
+        "get-rf-4",
+        "Complete the second sentence using the word in bold: TO.",
+        ["What time did you ", { gapId: "g1" }, " the venue?"],
+        ["get to"],
+        "Use 'get to' to mean 'arrive at'.",
+        {
+          originalSentence: "What time did you arrive at the venue?",
+          keyWord: "to",
+        }
+      ),
+      singleGap(
+        "get-rf-5",
+        "Complete the second sentence using the word in bold: GOT.",
+        ["He ", { gapId: "g1" }, " while he was asleep on the train."],
+        ["got his suitcase stolen"],
+        "Use 'get + object + past participle' to describe something bad that happened to someone.",
+        {
+          originalSentence: "Someone stole his suitcase while he was asleep on the train.",
+          keyWord: "got",
+        }
+      ),
+      placeholderGapItem(
+        "get-gf-1",
+        "Complete the sentence.",
+        "After a few weeks, you'll soon __________ the smell of paint in the studio.",
+        "get used to",
+        [],
+        "Use 'get used to' for becoming familiar with something."
+      ),
+      doubleGap(
+        "get-gf-2",
+        "Complete the sentence.",
+        ["Could you ", { gapId: "g1" }, " Lena ", { gapId: "g2" }, " me the updated file tonight?"],
+        ["get"],
+        ["to send"],
+        "Use 'get + person + to + infinitive' when you ask or persuade someone to do something."
+      ),
+      placeholderGapItem(
+        "get-gf-3",
+        "Complete the sentence.",
+        "It's __________ much harder to find a table there without a booking.",
+        "getting",
+        [],
+        "Use 'getting' to show that a situation is changing."
+      ),
+      doubleGap(
+        "get-gf-4",
+        "Complete the sentence using `REPLACE`.",
+        ["We need to ", { gapId: "g1" }, " the hallway lights ", { gapId: "g2" }, " before the guests arrive."],
+        ["get"],
+        ["replaced"],
+        "Use 'get + object + past participle' when you arrange a service."
+      ),
+      placeholderGapItem(
+        "get-gf-5",
+        "Complete the sentence.",
+        "If we leave now, we should __________ before the opening talk begins.",
+        "get there",
+        [],
+        "Use 'get there' to mean arrive at a place already understood from the context."
+      ),
+    ],
+  },
+  {
+    id: "advanced-discourse-markers-3b",
+    title: "Discourse Markers: Adverbs & Adverbial Expressions",
+    shortDescription:
+      "Advanced practice with discourse markers for flow, clarification, and topic change.",
+    levels: ["c1"],
+    intro:
+      "Discourse markers help organize what you say. Some are informal and common in speech, while others are more formal and better suited to professional contexts. Choose the marker that best fits the logic and register of each sentence.",
+    items: [
+      multipleChoiceItem(
+        "dm2-mc-1",
+        "Topic link: choose the best option to connect to a previous mention.",
+        "I saw that the old cinema is being renovated. ____ cinemas, do you still go to the IMAX often?",
+        ["Actually", "Basically", "Talking of"],
+        2,
+        "Use 'Talking of' or 'Speaking of' to link a new point to what has just been mentioned."
+      ),
+      multipleChoiceItem(
+        "dm2-mc-2",
+        "Register: which is the most formal way to change the subject?",
+        "____, I should mention that the budget meeting has been moved to Friday.",
+        ["Incidentally", "By the way", "Anyway"],
+        0,
+        "'Incidentally' is a more formal alternative to 'by the way' for adding a related point."
+      ),
+      multipleChoiceItem(
+        "dm2-mc-3",
+        "Unexpected information: choose the marker that introduces a surprising fact.",
+        "Many people assume the project failed. ____, it was a massive success in terms of engagement.",
+        ["In other words", "As a matter of fact", "On the whole"],
+        1,
+        "Use 'as a matter of fact', 'in fact', or 'actually' to introduce unexpected information."
+      ),
+      multipleChoiceItem(
+        "dm2-mc-4",
+        "Argumentative: introduce a point the listener may have overlooked.",
+        "You shouldn't be so hard on yourself. ____, you only had two days to finish the entire report.",
+        ["Besides", "Anyway", "After all"],
+        2,
+        "Use 'after all' to introduce an argument that the other person may not have considered."
+      ),
+      multipleChoiceItem(
+        "dm2-mc-5",
+        "Generalizing: talk about a situation in a broad sense.",
+        "The software has a few minor bugs but, ____, it is much more stable than the previous version.",
+        ["all in all", "on the whole", "basically"],
+        1,
+        "Use 'on the whole' to make a broad general judgment about a situation."
+      ),
+      multipleChoiceItem(
+        "dm2-mc-6",
+        "Clarification: make a point clearer or more detailed.",
+        "He isn't very reliable. ____, he promised to call this morning and never did.",
+        ["Obviously", "After all", "I mean"],
+        2,
+        "Use 'I mean' in spoken English to clarify or add a more specific detail."
+      ),
+      multipleChoiceItem(
+        "dm2-mc-7",
+        "Result or alternative: say what will happen if things are different.",
+        "We need to leave now. ____, we'll miss the start of the performance.",
+        ["Besides", "Otherwise", "In any case"],
+        1,
+        "Use 'otherwise' to show the result if the advice is not followed."
+      ),
+      multipleChoiceItem(
+        "dm2-mc-8",
+        "Fundamental point: introduce the main idea.",
+        "There are lots of technical details, but ____, the new law is meant to keep personal data safer.",
+        ["All in all", "Actually", "Basically"],
+        2,
+        "Use 'basically' to introduce the most important or fundamental point."
+      ),
+      multipleChoiceItem(
+        "dm2-mc-9",
+        "Topic change: formal introduction of a new subject.",
+        "____ the proposed merger, we are still awaiting legal clearance.",
+        ["By the way", "As regards", "Beside"],
+        1,
+        "Use 'as regards' or 'regarding' to introduce a new topic formally."
+      ),
+      multipleChoiceItem(
+        "dm2-mc-10",
+        "Return to topic: continue after an interruption.",
+        "____, we need to decide on the new marketing strategy by the end of the day.",
+        ["As I was saying", "In other words", "Anyway"],
+        0,
+        "Use 'as I was saying' to return to a previous topic after an interruption."
+      ),
+      multipleChoiceItem(
+        "dm2-mc-11",
+        "Positive point: choose the best option.",
+        "The hotel room was tiny, but ____ it was very clean.",
+        ["at least", "besides", "otherwise"],
+        0,
+        "Use 'at least' to introduce a positive point after negative information."
+      ),
+      multipleChoiceItem(
+        "dm2-mc-12",
+        "Explanation: choose the best option.",
+        "The whole plan needs to be simplified. ____, there are too many stages and too many people involved.",
+        ["Anyway", "In other words", "That is to say"],
+        2,
+        "Use 'that is to say' to introduce an explanation or clarification."
+      ),
+      errorCorrectionItem(
+        "dm2-ec-1",
+        "Check the sentence.",
+        "Regarding to the new office, we will move in January.",
+        "Regarding to",
+        false,
+        "Regarding",
+        "'Regarding' is not followed by 'to'."
+      ),
+      errorCorrectionItem(
+        "dm2-ec-2",
+        "Check the sentence.",
+        "As regards the budget, we need a final decision by Friday.",
+        "As regards",
+        true,
+        "",
+        "Correct! 'As regards' is used correctly here to introduce a topic."
+      ),
+      errorCorrectionItem(
+        "dm2-ec-3",
+        "Check the sentence.",
+        "On one hand, the pay is good, but on the other hand, the hours are long.",
+        "On one hand",
+        true,
+        "",
+        "Correct! Both 'on one hand' and 'on the one hand' are used."
+      ),
+      errorCorrectionItem(
+        "dm2-ec-4",
+        "Check the sentence.",
+        "I didn't enjoy the ending. In other word, the film felt unfinished.",
+        "In other word",
+        false,
+        "In other words",
+        "Use the fixed phrase 'in other words' when you restate something."
+      ),
+      errorCorrectionItem(
+        "dm2-ec-5",
+        "Check the sentence.",
+        "We were very tired. Anyway, we decided to walk home.",
+        "Anyway",
+        true,
+        "",
+        "Correct! 'Anyway' works here to show that the earlier point is less important."
+      ),
+      errorCorrectionItem(
+        "dm2-ec-6",
+        "Check the sentence.",
+        "Beside being expensive, the course starts far too early for me.",
+        "Beside",
+        false,
+        "Besides",
+        "Use 'besides' to add an extra point."
+      ),
+      placeholderGapItem(
+        "dm2-gf-5",
+        "Complete the dialogue.",
+        "A: So what did you think of the restaurant?\nB: __________, it was good, although the service was a bit slow.",
+        "On the whole",
+        ["All in all"],
+        "Use these markers to make a general judgment after considering the whole situation."
+      ),
+      placeholderGapItem(
+        "dm2-gf-6",
+        "Complete the sentence.",
+        "__________ the travel arrangements, I'll email everyone this afternoon.",
+        "As regards",
+        ["Regarding"],
+        "These are formal ways to introduce a new topic."
+      ),
+      placeholderGapItem(
+        "dm2-gf-7",
+        "Complete the dialogue.",
+        "A: Why do you say she's not ready for the job?\nB: __________, she still needs help with basic tasks.",
+        "I mean",
+        [],
+        "Use 'I mean' to add more detail or make your point clearer."
+      ),
+      placeholderGapItem(
+        "dm2-gf-8",
+        "Complete the dialogue.",
+        "A: Did the rain ruin the day out?\nB: Not really. __________, we were planning to visit the museum instead.",
+        "Anyway",
+        ["In any case", "Besides"],
+        "Use 'anyway', 'in any case', or 'besides' here to show the previous point is less important or to add another reason."
+      ),
+      doubleGap(
+        "dm2-gf-9",
+        "Complete the sentence.",
+        [{ gapId: "g1" }, ", the salary is good. But ", { gapId: "g2" }, ", the hours are very long."],
+        ["On the one hand", "On one hand"],
+        ["on the other hand", "on the other"],
+        "Use this pair to balance contrasting facts or points."
+      ),
+      placeholderGapItem(
+        "dm2-gf-10",
+        "Complete the dialogue.",
+        "A: There are lots of details to sort out.\nB: Yes, but __________, we just need to increase sales.",
+        "Basically",
+        [],
+        "Use 'basically' for the most fundamental point."
+      ),
+      placeholderGapItem(
+        "dm2-gf-12",
+        "Complete the dialogue.",
+        "A: The flight was delayed and my suitcase never arrived.\nB: That's awful. __________, nobody was hurt.",
+        "At least",
+        [],
+        "Use 'at least' to introduce a positive point after negative information."
+      ),
+    ],
+  },
+  {
+    id: "advanced-inversion-mastery-4a",
+    title: "Advanced Emphasis: Inversion",
+    shortDescription:
+      "Advanced practice with inversion after negative adverbials.",
+    levels: ["c1"],
+    intro:
+      "Use inversion to make your writing more dramatic or emphatic. After negative adverbials, the auxiliary usually comes before the subject, much like in a question.",
+    items: [
+      multipleChoiceItem(
+        "inv-mc-1",
+        "Form: identify the correct word order after 'Never'.",
+        "____ witnessed such a spectacular display of natural beauty.",
+        ["Never I have", "Never have I", "Never did I have"],
+        1,
+        "When 'never' begins a sentence, the auxiliary must come before the subject."
+      ),
+      multipleChoiceItem(
+        "inv-mc-2",
+        "Connectors: pair 'No sooner' with the correct conjunction.",
+        "No sooner had the CEO finished her speech ____ the reporters began shouting questions.",
+        ["when", "than", "before"],
+        1,
+        "'No sooner' is paired with 'than' to show two actions happening in quick succession."
+      ),
+      multipleChoiceItem(
+        "inv-mc-3",
+        "Simple tense: use the correct auxiliary for a past action.",
+        "Not only ____ the deadline, but they also exceeded the budget.",
+        ["missed they", "did they miss", "they did miss"],
+        1,
+        "For past simple inversion, use 'did + subject + base verb'."
+      ),
+      multipleChoiceItem(
+        "inv-mc-4",
+        "Negative adverbials: pair 'Hardly' with the correct conjunction.",
+        "Hardly had the plane touched down ____ a swarm of photographers surrounded the terminal.",
+        ["than", "when", "that"],
+        1,
+        "'Hardly' and 'scarcely' are usually paired with 'when' or 'before'."
+      ),
+      multipleChoiceItem(
+        "inv-mc-5",
+        "Logic: 'Not until' placement.",
+        "Not until the results were published ____ the magnitude of their discovery.",
+        ["they realized", "did they realize", "realized they"],
+        1,
+        "Inversion happens in the main clause after 'not until' introduces the time condition."
+      ),
+      multipleChoiceItem(
+        "inv-mc-6",
+        "Frequency: emphasizing a rare occurrence.",
+        "____ does a politician admit to making a mistake so publicly.",
+        ["Rarely", "Not only", "No sooner"],
+        0,
+        "'Rarely' is a limiting adverbial that triggers inversion."
+      ),
+      multipleChoiceItem(
+        "inv-mc-7",
+        "Emphasis: consecutive actions.",
+        "Only then ____ the true extent of the damage caused by the storm.",
+        ["I understood", "did I understand", "understood I"],
+        1,
+        "Inversion is used after the expression 'only then'."
+      ),
+      multipleChoiceItem(
+        "inv-mc-8",
+        "Complex structure: 'Not only' with 'be'.",
+        "Not only ____ extremely talented, but she is also remarkably humble.",
+        ["is she", "she is", "does she be"],
+        0,
+        "With the verb 'be', simply invert the subject and the verb."
+      ),
+      multipleChoiceItem(
+        "inv-mc-9",
+        "Negative adverbials: future warning.",
+        "Never again ____ to that restaurant after such terrible service.",
+        ["I will go", "will I go", "do I go"],
+        1,
+        "Use 'never again' + auxiliary + subject to emphasize future resolve."
+      ),
+      multipleChoiceItem(
+        "inv-mc-10",
+        "Context: identify the incorrect pairing.",
+        "Scarcely had the curtains closed ____ the audience burst into applause.",
+        ["than", "when", "before"],
+        0,
+        "'Scarcely' cannot be paired with 'than'; use 'when' or 'before'."
+      ),
+      errorCorrectionItem(
+        "inv-ec-1",
+        "Check word order after a negative adverbial.",
+        "Not only she forgot her keys, but she also left the oven on.",
+        "she forgot",
+        false,
+        "did she forget",
+        "After 'not only', use 'did + subject + base verb' for past simple actions."
+      ),
+      errorCorrectionItem(
+        "inv-ec-2",
+        "Check auxiliary placement.",
+        "Never I have seen such a disorganized office.",
+        "I have seen",
+        false,
+        "have I seen",
+        "The auxiliary must come before the subject after 'never'."
+      ),
+      errorCorrectionItem(
+        "inv-ec-3",
+        "Check 'Not until' word order.",
+        "Not until I saw him did I realized who he was.",
+        "did I realized",
+        false,
+        "did I realize",
+        "After 'did', the main verb must be in the base form."
+      ),
+      errorCorrectionItem(
+        "inv-ec-4",
+        "Check conjunction pairing.",
+        "No sooner had the alarm gone off when the police arrived.",
+        "when",
+        false,
+        "than",
+        "'No sooner' must be followed by 'than'."
+      ),
+      errorCorrectionItem(
+        "inv-ec-5",
+        "Check inversion with 'Only when'.",
+        "Only when you lose something you do realize how much it mattered.",
+        "you do realize",
+        false,
+        "do you realize",
+        "Invert the auxiliary and subject in the main clause after 'only when'."
+      ),
+      errorCorrectionItem(
+        "inv-ec-6",
+        "Check inversion with 'Rarely'.",
+        "Rarely we meet people with such high integrity.",
+        "we meet",
+        false,
+        "do we meet",
+        "Use 'do/does' for present simple inversion after 'rarely'."
+      ),
+      errorCorrectionItem(
+        "inv-ec-7",
+        "Check the conjunction with 'Hardly'.",
+        "Hardly had I started my dinner than the phone rang.",
+        "than",
+        false,
+        "when",
+        "'Hardly' is normally paired with 'when' rather than 'than'."
+      ),
+      errorCorrectionItem(
+        "inv-ec-8",
+        "Check inversion with 'be' in the past.",
+        "Only then the truth was clear to everyone.",
+        "the truth was",
+        false,
+        "was the truth",
+        "Invert the subject and the verb 'be' after 'only then'."
+      ),
+      errorCorrectionItem(
+        "inv-ec-9",
+        "Check 'Not only' logical flow.",
+        "Not only is the food expensive, but it's also not very good.",
+        "is the food",
+        true,
+        "",
+        "Correct! Inversion is used correctly with the verb 'be'."
+      ),
+      errorCorrectionItem(
+        "inv-ec-10",
+        "Check future inversion.",
+        "Never again I will trust his promises.",
+        "I will trust",
+        false,
+        "will I trust",
+        "Move the auxiliary 'will' before the subject after 'never again'."
+      ),
+      singleGap(
+        "inv-rf-1",
+        "Complete the second sentence.",
+        ["Never ", { gapId: "g1" }, " difficult problem."],
+        ["have I encountered such a"],
+        "After 'never', use auxiliary-subject order.",
+        { originalSentence: "I have never encountered such a difficult problem." }
+      ),
+      singleGap(
+        "inv-rf-2",
+        "Complete the second sentence.",
+        ["Not only ", { gapId: "g1" }, ", but he also stole the money."],
+        ["did he lie about his age"],
+        "After 'not only', use inversion in the first clause.",
+        { originalSentence: "He lied about his age, and he also stole the money." }
+      ),
+      singleGap(
+        "inv-rf-3",
+        "Complete the second sentence.",
+        ["No sooner ", { gapId: "g1" }, " it started to rain."],
+        ["had we left the house than"],
+        "Use 'no sooner + had + subject' for immediate sequence.",
+        { originalSentence: "As soon as we left the house, it started to rain." }
+      ),
+      singleGap(
+        "inv-rf-4",
+        "Complete the second sentence.",
+        ["Not until you experience it yourself ", { gapId: "g1" }, "."],
+        ["will you understand it properly"],
+        "Invert the main clause after the 'not until' condition.",
+        { originalSentence: "You will not understand it properly until you experience it yourself." }
+      ),
+      singleGap(
+        "inv-rf-5",
+        "Complete the second sentence.",
+        ["Rarely ", { gapId: "g1" }, " well-preserved artifact."],
+        ["do you find such a", "does one find such a"],
+        "Use 'rarely + do/does' for a present simple statement.",
+        { originalSentence: "You rarely find such a well-preserved artifact." }
+      ),
+      singleGap(
+        "inv-rf-6",
+        "Complete the second sentence.",
+        ["Hardly ", { gapId: "g1" }, " the bell rang."],
+        ["had I sat down when", "had I even sat down when"],
+        "Use 'hardly + had + subject' to show immediate succession.",
+        { originalSentence: "I had only just sat down when the bell rang." }
+      ),
+      singleGap(
+        "inv-rf-7",
+        "Complete the second sentence.",
+        ["Only when ", { gapId: "g1" }, " my mistake."],
+        ["I saw his face did I realize"],
+        "Invert the main clause after 'only when...'.",
+        { originalSentence: "I only realized my mistake when I saw his face." }
+      ),
+      singleGap(
+        "inv-rf-8",
+        "Complete the second sentence.",
+        ["Never again ", { gapId: "g1" }, "."],
+        ["will I speak to her"],
+        "After 'never again', invert the auxiliary and the subject.",
+        { originalSentence: "I will never speak to her again." }
+      ),
+      singleGap(
+        "inv-rf-9",
+        "Complete the second sentence.",
+        ["Only after he had signed ", { gapId: "g1" }, "."],
+        ["did he understand the risk"],
+        "Use 'only after...' followed by 'did + subject + base verb'.",
+        { originalSentence: "He only understood the risk after he had signed." }
+      ),
+      singleGap(
+        "inv-rf-10",
+        "Complete the second sentence.",
+        ["Not only ", { gapId: "g1" }, ", but she is also hardworking."],
+        ["is she smart"],
+        "Invert the verb 'be' after 'not only' when it is the main verb.",
+        { originalSentence: "She is not only smart; she is also hardworking." }
+      ),
+    ],
+  },
+  {
+    id: "advanced-speculation-deduction-4b",
+    title: "Advanced Speculation and Deduction",
+    shortDescription:
+      "Advanced practice with speculation, deduction, and degrees of certainty.",
+    levels: ["c1"],
+    intro:
+      "Refine your control of certainty and possibility. Focus on the difference between present and past deductions, and pay attention to the position of speculative adverbs in negative sentences.",
+    items: [
+      multipleChoiceItem(
+        "spec-mc-1",
+        "Degrees of certainty: choose the best option for a strong positive deduction.",
+        "You've been working on that project for twelve hours straight; you ____ be exhausted.",
+        ["must", "can't", "should"],
+        0,
+        "Use 'must + infinitive' when you are almost sure something is true in the present."
+      ),
+      multipleChoiceItem(
+        "spec-mc-2",
+        "Negative possibility: choose the grammatically correct option.",
+        "I haven't heard back from the recruitment team. They ____ my application yet.",
+        ["couldn't have seen", "might not have seen", "mustn't have seen"],
+        1,
+        "For negative possibility, use 'may not have' or 'might not have'."
+      ),
+      multipleChoiceItem(
+        "spec-mc-3",
+        "Adverb position: identify the correct placement in a negative sentence.",
+        "He ____ come to the party tonight; he mentioned feeling unwell earlier.",
+        ["definitely won't", "won't definitely", "definitely doesn't"],
+        0,
+        "Adverbs like 'definitely' and 'probably' usually go before the auxiliary in negative sentences."
+      ),
+      multipleChoiceItem(
+        "spec-mc-4",
+        "Expectation: past event.",
+        "The results were supposed to be released at noon. They ____ by now.",
+        ["should have arrived", "must have arrived", "can't have arrived"],
+        0,
+        "Use 'should have' + past participle to talk about something you expected to happen in the past."
+      ),
+      multipleChoiceItem(
+        "spec-mc-5",
+        "Past deduction: strong negative.",
+        "He ____ the money; he wasn't even in the building when the theft occurred.",
+        ["mustn't have taken", "can't have taken", "might not have taken"],
+        1,
+        "Use 'can't have' or 'couldn't have' to say you are almost sure something did not happen in the past."
+      ),
+      multipleChoiceItem(
+        "spec-mc-6",
+        "Adjectives for speculation: certainty.",
+        "With her level of experience, she is ____ to be offered the position.",
+        ["probably", "likely", "bound"],
+        2,
+        "'Bound' and 'sure' are adjectives used with 'to + infinitive' to express strong certainty."
+      ),
+      multipleChoiceItem(
+        "spec-mc-7",
+        "Continuous deduction: action in progress.",
+        "There's a light on in his study. He ____ on his thesis.",
+        ["must work", "must be working", "should work"],
+        1,
+        "Use the continuous infinitive for a deduction about an action in progress now."
+      ),
+      multipleChoiceItem(
+        "spec-mc-8",
+        "Possibility: past event.",
+        "The file might still be in the archive folder, but someone ____ it by mistake.",
+        ["must have deleted", "could have deleted", "can have deleted"],
+        1,
+        "Use 'may / might / could have + past participle' to say something is possible in the past."
+      ),
+      multipleChoiceItem(
+        "spec-mc-9",
+        "Adverb position with 'be': negative.",
+        "The diamond in that ring ____ genuine; it looks far too shiny.",
+        ["probably won't be", "isn't probably", "probably isn't"],
+        2,
+        "With the verb 'be', speculative adverbs normally go before the negative form."
+      ),
+      multipleChoiceItem(
+        "spec-mc-10",
+        "Expectation: present or future.",
+        "If the traffic isn't too bad, they ____ arrive within the hour.",
+        ["must", "ought to", "can't"],
+        1,
+        "Use 'should' or 'ought to' for something you expect to happen."
+      ),
+      errorCorrectionItem(
+        "spec-ec-1",
+        "Check the negative deduction modal.",
+        "She hasn't eaten anything all day; she mustn't be very hungry.",
+        "mustn't be",
+        false,
+        "can't be",
+        "Do not use 'mustn't' for deductions; use 'can't' to say you are sure something is not true."
+      ),
+      errorCorrectionItem(
+        "spec-ec-2",
+        "Check the possibility modal.",
+        "I can't find my keys. Someone couldn't have moved them.",
+        "couldn't have moved",
+        false,
+        "might have moved",
+        "Use 'might have' or 'could have' for past possibility."
+      ),
+      errorCorrectionItem(
+        "spec-ec-3",
+        "Check adverb position in positive sentences.",
+        "The flight will definitely be delayed due to the storm.",
+        "will definitely be",
+        true,
+        "",
+        "Correct! In positive sentences, adverbs usually go after the auxiliary."
+      ),
+      errorCorrectionItem(
+        "spec-ec-4",
+        "Check adjective vs. adverb usage.",
+        "It is probably that the economy will recover by next year.",
+        "It is probably",
+        false,
+        "It is likely",
+        "'Probably' is an adverb; after 'It is...', use an adjective such as 'likely' or 'probable'."
+      ),
+      errorCorrectionItem(
+        "spec-ec-5",
+        "Check the past expectation structure.",
+        "They should arrive two hours ago, but they are still not here.",
+        "should arrive",
+        false,
+        "should have arrived",
+        "Use 'should have + past participle' for an expected situation in the past."
+      ),
+      errorCorrectionItem(
+        "spec-ec-6",
+        "Check adverb placement with 'be'.",
+        "He is probably British, given his accent.",
+        "is probably",
+        true,
+        "",
+        "Correct! With the verb 'be', the adverb usually comes after the verb in positive sentences."
+      ),
+      errorCorrectionItem(
+        "spec-ec-7",
+        "Check negative possibility vs. deduction.",
+        "He might not have heard the announcement.",
+        "might not have heard",
+        true,
+        "",
+        "Correct! Use 'might not have' for a negative possibility in the past."
+      ),
+      errorCorrectionItem(
+        "spec-ec-8",
+        "Check the word order for 'bound to'.",
+        "He's bound win the election.",
+        "bound win",
+        false,
+        "bound to win",
+        "'Bound' is used with the structure 'subject + be + bound + to + infinitive'."
+      ),
+      errorCorrectionItem(
+        "spec-ec-9",
+        "Check the adverb position in negatives.",
+        "The painting isn't definitely genuine.",
+        "isn't definitely",
+        false,
+        "definitely isn't",
+        "In this structure, the adverb goes before the negative form of 'be'."
+      ),
+      errorCorrectionItem(
+        "spec-ec-10",
+        "Check the past deduction modal.",
+        "You've only written fifty words; you couldn't have spent long on this.",
+        "couldn't have spent",
+        true,
+        "",
+        "Correct! 'Couldn't have' expresses near-certainty that something did not happen."
+      ),
+      singleGap(
+        "spec-rf-1",
+        "Complete the second sentence using the word in bold: MUST.",
+        ["He ", { gapId: "g1" }, " at the office because the lights are on."],
+        ["must be"],
+        "Use 'must' for a near-certain present deduction.",
+        { originalSentence: "I'm sure he is at the office because the lights are on.", keyWord: "must" }
+      ),
+      singleGap(
+        "spec-rf-2",
+        "Complete the second sentence using the word in bold: LIKELY.",
+        ["The government ", { gapId: "g1" }, " taxes."],
+        ["is likely to increase"],
+        "Use 'It is likely that + clause' to express possibility.",
+        { originalSentence: "Perhaps the government will increase taxes.", keyWord: "likely" }
+      ),
+      singleGap(
+        "spec-rf-3",
+        "Complete the second sentence using the word in bold: CAN'T.",
+        ["She ", { gapId: "g1" }, " you."],
+        ["can't have seen", "couldn't have seen"],
+        "Use 'can't have' or 'couldn't have' for near-certainty about the past.",
+        { originalSentence: "I'm certain she didn't see you.", keyWord: "can't" }
+      ),
+      singleGap(
+        "spec-rf-4",
+        "Complete the second sentence using the word in bold: BOUND.",
+        ["He is ", { gapId: "g1" }, " if he doesn't study."],
+        ["bound to fail", "sure to fail"],
+        "Use 'be bound to' for certainty about future events.",
+        { originalSentence: "It is certain that he will fail if he doesn't study.", keyWord: "bound" }
+      ),
+      singleGap(
+        "spec-rf-5",
+        "Complete the second sentence using the word in bold: DEFINITELY.",
+        ["The film ", { gapId: "g1" }, " be very good."],
+        ["definitely won't"],
+        "Place 'definitely' before the auxiliary in this negative structure.",
+        { originalSentence: "I'm sure the film won't be very good.", keyWord: "definitely" }
+      ),
+      singleGap(
+        "spec-rf-6",
+        "Complete the second sentence using the word in bold: SHOULD.",
+        ["I sent the letter a week ago; it ", { gapId: "g1" }, " by now."],
+        ["should have arrived", "ought to have arrived"],
+        "Use 'should/ought to have' for expectations about the past.",
+        { originalSentence: "I sent the letter a week ago, so it has probably arrived by now.", keyWord: "should" }
+      ),
+      singleGap(
+        "spec-rf-7",
+        "Complete the second sentence using the word in bold: MIGHT.",
+        ["They ", { gapId: "g1" }, " the email yet."],
+        ["might not have received", "may not have received"],
+        "Use 'may/might not' for negative possibility.",
+        { originalSentence: "Perhaps they haven't received the email yet.", keyWord: "might" }
+      ),
+      singleGap(
+        "spec-rf-8",
+        "Complete the second sentence using the word in bold: LIKELY.",
+        ["She is ", { gapId: "g1" }, " the race."],
+        ["likely to win"],
+        "Use 'subject + be + likely + to + infinitive'.",
+        { originalSentence: "It is expected that she will win the race.", keyWord: "likely" }
+      ),
+      singleGap(
+        "spec-rf-9",
+        "Complete the second sentence using the word in bold: MUST.",
+        ["They ", { gapId: "g1" }, " a meeting right now."],
+        ["must be having"],
+        "Use 'must be + -ing' for deductions about an action in progress.",
+        { originalSentence: "I'm sure they are having a meeting right now.", keyWord: "must" }
+      ),
+      singleGap(
+        "spec-rf-10",
+        "Complete the second sentence using the word in bold: MAY.",
+        ["Someone ", { gapId: "g1" }, " your bike."],
+        ["may have stolen", "might have stolen", "could have stolen"],
+        "Use these modals for past possibility.",
+        { originalSentence: "It's possible that someone stole your bike.", keyWord: "may" }
+      ),
+    ],
+  },
+  {
+    id: "advanced-distancing-mastery-5a",
+    title: "Advanced Distancing: Seem, Passive Reporting, & Attribution",
+    shortDescription:
+      "Advanced practice with formal distancing and reported information.",
+    levels: ["c1"],
+    intro:
+      "Learn to distance yourself from information using passives, reporting verbs, and lexical markers. Focus on the difference between impersonal 'it' structures, existential 'there' structures, and subject-driven passive reporting.",
+    items: [
+      multipleChoiceItem(
+        "dist-mc-1",
+        "Choose the best option.",
+        "____ that several pages of the contract were missing from the final version.",
+        ["Apparently", "There would seem", "It would seem"],
+        2,
+        "Using 'It would seem' or 'It would appear' creates more distance and sounds more formal than 'It seems'."
+      ),
+      multipleChoiceItem(
+        "dist-mc-2",
+        "Choose the best option.",
+        "____, the new tax laws will be voted on by the end of the month.",
+        ["According to latest reports", "I claim", "According to me"],
+        0,
+        "We use 'according to' to refer to an external source, not to ourselves."
+      ),
+      multipleChoiceItem(
+        "dist-mc-3",
+        "Choose the best option.",
+        "____ to be a significant discrepancy in the quarterly earnings report.",
+        ["There appears", "It appears", "There is appeared"],
+        0,
+        "Use 'There seems / appears to be' to indicate the existence of something without stating it too directly."
+      ),
+      multipleChoiceItem(
+        "dist-mc-4",
+        "Choose the best option.",
+        "The CEO ____ to announce his resignation during this evening's gala.",
+        ["expects", "is expected", "is expected that"],
+        1,
+        "Use 'subject + passive verb + to + infinitive' in formal reporting structures."
+      ),
+      multipleChoiceItem(
+        "dist-mc-5",
+        "Choose the best option.",
+        "____, the two companies have been secretly negotiating a merger for months.",
+        ["Apparently", "According to", "It is expected"],
+        0,
+        "'Apparently' is common in conversation when you have heard something that may or may not be true."
+      ),
+      multipleChoiceItem(
+        "dist-mc-6",
+        "Choose the best option.",
+        "The defendant ____ to have been at home at the time of the incident, but there are no witnesses.",
+        ["claims", "appears", "seems"],
+        0,
+        "We say somebody 'claims' something when there is doubt about whether it is true."
+      ),
+      multipleChoiceItem(
+        "dist-mc-7",
+        "Choose the best option.",
+        "The missing artifacts ____ to have been sold on the black market years ago.",
+        ["are understood that", "are understood", "understand"],
+        1,
+        "Use 'subject + passive verb + to have + past participle' to report an earlier past situation."
+      ),
+      multipleChoiceItem(
+        "dist-mc-8",
+        "Choose the best option.",
+        "____ that the new railway will cost three times the original budget.",
+        ["There has been announced", "It has been announced", "He is announced"],
+        1,
+        "Use 'It + passive verb + that + clause' to introduce reported information objectively."
+      ),
+      multipleChoiceItem(
+        "dist-mc-9",
+        "Choose the best option.",
+        "Recent data suggests the virus ____ have mutated several weeks ago.",
+        ["claim", "must", "may"],
+        2,
+        "Using 'may' or 'might' suggests possibility rather than certainty."
+      ),
+      multipleChoiceItem(
+        "dist-mc-10",
+        "Choose the best option.",
+        "____ that the trial should be postponed until new evidence is reviewed.",
+        ["It was agreed to", "There was agreed", "It was agreed"],
+        2,
+        "'Agree' is one of the verbs commonly used in the 'It + passive verb + that' pattern."
+      ),
+      errorCorrectionItem(
+        "dist-ec-2",
+        "Check the sentence.",
+        "There are thought be thousands of undiscovered species in the ocean.",
+        "thought be",
+        false,
+        "thought to be",
+        "Use 'There are thought to be ...' in this reporting structure."
+      ),
+      errorCorrectionItem(
+        "dist-ec-3",
+        "Check the sentence.",
+        "He seems that he has forgotten about the meeting again.",
+        "seems that he has forgotten",
+        false,
+        "seems to have forgotten",
+        "Use 'subject + seems + infinitive' here."
+      ),
+      errorCorrectionItem(
+        "dist-ec-4",
+        "Check the sentence.",
+        "It would appear that the funds was stolen from the account.",
+        "funds was",
+        false,
+        "funds were",
+        "Even in distancing structures, subject-verb agreement must still be correct."
+      ),
+      errorCorrectionItem(
+        "dist-ec-5",
+        "Check the sentence.",
+        "The suspect is understood having been hiding in a local cellar.",
+        "understood having been",
+        false,
+        "understood to have been",
+        "Passive reporting verbs are followed by 'to + infinitive', not a gerund."
+      ),
+      errorCorrectionItem(
+        "dist-ec-6",
+        "Check the sentence.",
+        "Jeff and Katie have apparently separated, according to their friends.",
+        "have apparently separated",
+        true,
+        "",
+        "Correct! 'Apparently' can be placed at the beginning, in the middle, or at the end of a sentence."
+      ),
+      errorCorrectionItem(
+        "dist-ec-7",
+        "Check the sentence.",
+        "She claims that she has discovered a cure, but no one believes her.",
+        "claims that she has",
+        true,
+        "",
+        "Correct! 'Claim' can be followed by a 'that' clause or an infinitive."
+      ),
+      errorCorrectionItem(
+        "dist-ec-8",
+        "Check the sentence.",
+        "There seems to being a mistake with your reservation.",
+        "to being",
+        false,
+        "to be",
+        "Use 'There seems / appears to be' with the infinitive 'be'."
+      ),
+      errorCorrectionItem(
+        "dist-ec-9",
+        "Check the sentence.",
+        "It has announced that the athlete failed the drug test.",
+        "has announced",
+        false,
+        "has been announced",
+        "'Announce' is more natural in the impersonal passive 'It has been announced that...'."
+      ),
+      errorCorrectionItem(
+        "dist-ec-10",
+        "Check the sentence.",
+        "It is believed that the strike will end tomorrow.",
+        "It is believed that",
+        true,
+        "",
+        "Correct! This is the standard 'It + passive + that' pattern."
+      ),
+      placeholderGapItem(
+        "dist-gf-1",
+        "Complete the sentence using `WOULD`.",
+        "__________ that the market will not recover until next year.",
+        "It would seem",
+        ["It would appear"],
+        "Use 'It would seem / appear' for a more formal and distant observation."
+      ),
+      placeholderGapItem(
+        "dist-gf-2",
+        "Complete the sentence using `CLAIM`.",
+        "The defendant __________ innocent despite the DNA evidence.",
+        "claims to be",
+        [],
+        "Use 'claim' to report information that is under doubt."
+      ),
+      placeholderGapItem(
+        "dist-gf-5",
+        "Complete the sentence using `ACCORDING TO RESEARCH`.",
+        "__________ dolphins have complex social structures.",
+        "According to research",
+        [],
+        "Use 'according to' to specify a source."
+      ),
+      singleGap(
+        "dist-rf-1",
+        "Complete the second sentence.",
+        ["The suspect ", { gapId: "g1" }, " in the woods."],
+        ["is believed to be hiding"],
+        "Shift from the impersonal 'It' pattern to the subject-driven passive reporting pattern.",
+        { originalSentence: "It is believed that the suspect is hiding in the woods." }
+      ),
+      singleGap(
+        "dist-rf-2",
+        "Complete the second sentence using the word in bold: WOULD.",
+        ["It ", { gapId: "g1" }, " that the company is facing bankruptcy."],
+        ["would seem"],
+        "Use the more formal distancing structure with 'would'.",
+        { originalSentence: "It seems that the company is facing bankruptcy.", keyWord: "would" }
+      ),
+      singleGap(
+        "dist-rf-3",
+        "Complete the second sentence using the word in bold: THERE.",
+        ["", { gapId: "g1" }, " millions of stars in this galaxy."],
+        ["There are thought to be"],
+        "Use the 'There + passive + to be' structure for existence.",
+        {
+          originalSentence: "It is thought that there are millions of stars in this galaxy.",
+          keyWord: "there",
+        }
+      ),
+      singleGap(
+        "dist-rf-4",
+        "Complete the second sentence.",
+        ["Dinosaurs ", { gapId: "g1" }, " due to a meteor."],
+        ["may have died out"],
+        "Use 'may/might have' + past participle for a past possibility.",
+        { originalSentence: "It is possible that the dinosaurs died out due to a meteor." }
+      ),
+      singleGap(
+        "dist-rf-5",
+        "Complete the second sentence using the word in bold: CLAIMS.",
+        ["He ", { gapId: "g1" }, " the project on his own."],
+        ["claims to have finished"],
+        "Use 'claim' to distance yourself from a doubtful statement.",
+        {
+          originalSentence: "I am skeptical that he actually finished the project on his own.",
+          keyWord: "claims",
+        }
       ),
     ],
   },
