@@ -414,6 +414,7 @@ export default function HubSyntaxSentinelGame() {
   const stageRef = useRef(null);
   const gameZoomRef = useRef(null);
   const keysRef = useRef(new Set());
+  const joystickVectorRef = useRef({ x: 0, y: 0 });
   const lastFrameRef = useRef(0);
   const spawnTimerRef = useRef(0);
   const promptTransitionRef = useRef(null);
@@ -448,6 +449,7 @@ export default function HubSyntaxSentinelGame() {
   const [expandedBaseWidth, setExpandedBaseWidth] = useState(GAME_WIDTH);
   const [expandedScale, setExpandedScale] = useState(1.16);
   const [stageSize, setStageSize] = useState(DEFAULT_STAGE_SIZE);
+  const [joystickKnob, setJoystickKnob] = useState({ x: 0, y: 0 });
   const [shipX, setShipX] = useState(SHIP_X);
   const [shipY, setShipY] = useState(GAME_HEIGHT / 2);
   const [debris, setDebris] = useState([]);
@@ -670,6 +672,45 @@ export default function HubSyntaxSentinelGame() {
 
   function updateFeedback(text) {
     setFeedback(text);
+  }
+
+  function updateJoystickFromPointer(event) {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const maxDistance = Math.max(24, Math.min(rect.width, rect.height) * 0.34);
+    const rawX = event.clientX - centerX;
+    const rawY = event.clientY - centerY;
+    const distance = Math.hypot(rawX, rawY);
+    const limitedDistance = Math.min(distance, maxDistance);
+    const angle = Math.atan2(rawY, rawX);
+    const x = distance > 0 ? Math.cos(angle) * limitedDistance : 0;
+    const y = distance > 0 ? Math.sin(angle) * limitedDistance : 0;
+
+    joystickVectorRef.current = {
+      x: x / maxDistance,
+      y: y / maxDistance,
+    };
+    setJoystickKnob({ x, y });
+  }
+
+  function startJoystick(event) {
+    event.preventDefault();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    updateJoystickFromPointer(event);
+  }
+
+  function moveJoystick(event) {
+    if (!event.currentTarget.hasPointerCapture?.(event.pointerId)) return;
+    event.preventDefault();
+    updateJoystickFromPointer(event);
+  }
+
+  function stopJoystick(event) {
+    event.preventDefault();
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+    joystickVectorRef.current = { x: 0, y: 0 };
+    setJoystickKnob({ x: 0, y: 0 });
   }
 
   function openExpandedView() {
@@ -897,6 +938,7 @@ export default function HubSyntaxSentinelGame() {
     pendingPromptLaunchRef.current = false;
     debrisRef.current = [];
     projectilesRef.current = [];
+    joystickVectorRef.current = { x: 0, y: 0 };
     shipXRef.current = SHIP_X;
     shipYRef.current = stageSizeRef.current.height / 2;
     modeRef.current = "playing";
@@ -914,6 +956,7 @@ export default function HubSyntaxSentinelGame() {
     setMode("playing");
     setDebris([]);
     setProjectiles([]);
+    setJoystickKnob({ x: 0, y: 0 });
     setShipX(SHIP_X);
     setShipY(stageSizeRef.current.height / 2);
     setRound(1);
@@ -942,10 +985,13 @@ export default function HubSyntaxSentinelGame() {
     let nextShipY = shipYRef.current;
     const stage = stageSizeRef.current;
     const keys = keysRef.current;
+    const joystick = joystickVectorRef.current;
     if (keys.has("ArrowLeft") || keys.has("a") || keys.has("A")) nextShipX -= 360 * dt;
     if (keys.has("ArrowRight") || keys.has("d") || keys.has("D")) nextShipX += 360 * dt;
     if (keys.has("ArrowUp") || keys.has("w") || keys.has("W")) nextShipY -= 360 * dt;
     if (keys.has("ArrowDown") || keys.has("s") || keys.has("S")) nextShipY += 360 * dt;
+    nextShipX += joystick.x * 390 * dt;
+    nextShipY += joystick.y * 390 * dt;
     nextShipX = clampToStage(nextShipX, 10, stage.width - SHIP_WIDTH - 18);
     nextShipY = clampToStage(nextShipY, 42, stage.height - 42);
 
@@ -1157,7 +1203,19 @@ export default function HubSyntaxSentinelGame() {
           </div>
         </div>
 
-        <div className="sentinel-dpad-shell" aria-hidden="true">
+        <div
+          className="sentinel-dpad-shell"
+          role="application"
+          aria-label="Drag joystick to move"
+          style={{ "--joy-x": `${joystickKnob.x}px`, "--joy-y": `${joystickKnob.y}px` }}
+          onPointerDown={startJoystick}
+          onPointerMove={moveJoystick}
+          onPointerUp={stopJoystick}
+          onPointerCancel={stopJoystick}
+          onPointerLeave={(event) => {
+            if (event.currentTarget.hasPointerCapture?.(event.pointerId)) stopJoystick(event);
+          }}
+        >
           <span />
         </div>
         <button
@@ -2001,6 +2059,8 @@ export default function HubSyntaxSentinelGame() {
 
         .sentinel-dpad-shell {
           pointer-events: none;
+          touch-action: none;
+          user-select: none;
         }
 
         .sentinel-ship-control.up {
@@ -2477,6 +2537,8 @@ export default function HubSyntaxSentinelGame() {
               0 0 34px rgba(178, 104, 255, 0.22),
               inset 0 0 24px rgba(255, 255, 255, 0.08);
             clip-path: polygon(37% 0, 63% 0, 72% 25%, 100% 37%, 100% 63%, 72% 75%, 63% 100%, 37% 100%, 28% 75%, 0 63%, 0 37%, 28% 25%);
+            pointer-events: auto;
+            cursor: grab;
           }
 
           .sentinel-game-shell.expanded .sentinel-dpad-shell span {
@@ -2488,9 +2550,12 @@ export default function HubSyntaxSentinelGame() {
             box-shadow:
               0 0 18px rgba(126, 232, 204, 0.42),
               inset 0 0 18px rgba(255, 255, 255, 0.1);
+            transform: translate(var(--joy-x, 0), var(--joy-y, 0));
+            transition: transform 80ms ease-out;
           }
 
           .sentinel-game-shell.expanded .sentinel-ship-control {
+            display: none;
             width: 42px;
             height: 42px;
             min-height: 0;
@@ -2623,6 +2688,8 @@ export default function HubSyntaxSentinelGame() {
               0 0 34px rgba(178, 104, 255, 0.22),
               inset 0 0 24px rgba(255, 255, 255, 0.08);
             clip-path: polygon(37% 0, 63% 0, 72% 25%, 100% 37%, 100% 63%, 72% 75%, 63% 100%, 37% 100%, 28% 75%, 0 63%, 0 37%, 28% 25%);
+            pointer-events: auto;
+            cursor: grab;
           }
 
           .sentinel-dpad-shell span {
@@ -2634,9 +2701,12 @@ export default function HubSyntaxSentinelGame() {
             box-shadow:
               0 0 18px rgba(126, 232, 204, 0.42),
               inset 0 0 18px rgba(255, 255, 255, 0.1);
+            transform: translate(var(--joy-x, 0), var(--joy-y, 0));
+            transition: transform 80ms ease-out;
           }
 
           .sentinel-ship-control {
+            display: none;
             width: 42px;
             height: 42px;
             min-height: 0;
