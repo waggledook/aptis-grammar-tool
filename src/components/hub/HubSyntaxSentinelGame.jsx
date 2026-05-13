@@ -42,6 +42,11 @@ const MAX_SPAWN_DELAY_MS = 2800;
 const PROMPT_DEPART_DELAY_MS = 760;
 const PROMPT_ARRIVE_DELAY_MS = 980;
 const MAX_SHIELD = 4;
+const EXPANDED_PADDING_X = 28;
+const EXPANDED_PADDING_Y = 34;
+const GAME_HUD_HEIGHT = 34;
+const GAME_HUD_GAP = 7;
+const GAME_FRAME_HEIGHT = GAME_HUD_HEIGHT + GAME_HUD_GAP + GAME_HEIGHT;
 const DEFAULT_STAGE_SIZE = {
   width: GAME_WIDTH,
   height: GAME_HEIGHT,
@@ -405,14 +410,25 @@ function getMaxActiveDebris(difficulty) {
   return difficulty >= 5 ? 2 : 1;
 }
 
-function isTouchViewport() {
-  return typeof window !== "undefined" && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+function getExpandedViewportSize() {
+  const viewport = window.visualViewport;
+  return {
+    width: viewport?.width || window.innerWidth,
+    height: viewport?.height || window.innerHeight,
+  };
+}
+
+function getExpandedScale() {
+  const viewport = getExpandedViewportSize();
+  const availableWidth = Math.max(300, viewport.width - EXPANDED_PADDING_X);
+  const availableHeight = Math.max(260, viewport.height - EXPANDED_PADDING_Y);
+  return Math.min(availableWidth / GAME_WIDTH, availableHeight / GAME_FRAME_HEIGHT);
 }
 
 export default function HubSyntaxSentinelGame() {
   const navigate = useNavigate();
   const stageRef = useRef(null);
-  const gameZoomRef = useRef(null);
+  const gameShellRef = useRef(null);
   const keysRef = useRef(new Set());
   const joystickVectorRef = useRef({ x: 0, y: 0 });
   const joystickPointerIdRef = useRef(null);
@@ -447,9 +463,8 @@ export default function HubSyntaxSentinelGame() {
 
   const [mode, setMode] = useState("intro");
   const [isExpanded, setIsExpanded] = useState(false);
-  const [expandedBaseWidth, setExpandedBaseWidth] = useState(GAME_WIDTH);
   const [expandedScale, setExpandedScale] = useState(1.16);
-  const [stageSize, setStageSize] = useState(DEFAULT_STAGE_SIZE);
+  const [normalScale, setNormalScale] = useState(1);
   const [joystickKnob, setJoystickKnob] = useState({ x: 0, y: 0 });
   const [shipX, setShipX] = useState(SHIP_X);
   const [shipY, setShipY] = useState(GAME_HEIGHT / 2);
@@ -489,36 +504,6 @@ export default function HubSyntaxSentinelGame() {
   useEffect(() => {
     completedCorrectIdsRef.current = new Set(completedCorrectIds);
   }, [completedCorrectIds]);
-
-  useEffect(() => {
-    stageSizeRef.current = stageSize;
-  }, [stageSize]);
-
-  useEffect(() => {
-    const stage = stageRef.current;
-    if (!stage) return undefined;
-
-    function updateStageSize() {
-      const rect = stage.getBoundingClientRect();
-      const nextSize = {
-        width: Math.round(stage.clientWidth || rect.width || GAME_WIDTH),
-        height: Math.round(stage.clientHeight || rect.height || GAME_HEIGHT),
-      };
-      stageSizeRef.current = nextSize;
-      setStageSize(nextSize);
-    }
-
-    updateStageSize();
-
-    if (typeof ResizeObserver === "undefined") {
-      window.addEventListener("resize", updateStageSize);
-      return () => window.removeEventListener("resize", updateStageSize);
-    }
-
-    const observer = new ResizeObserver(updateStageSize);
-    observer.observe(stage);
-    return () => observer.disconnect();
-  }, []);
 
   useEffect(() => {
     scoreRef.current = score;
@@ -609,23 +594,40 @@ export default function HubSyntaxSentinelGame() {
     if (!isExpanded || typeof window === "undefined") return undefined;
 
     function syncExpandedScale() {
-      if (isTouchViewport()) {
-        const fittedWidth = Math.min(window.innerWidth - 28, ((window.innerHeight - 34) * GAME_WIDTH) / (GAME_HEIGHT + 40));
-        setExpandedBaseWidth(Math.max(300, Math.floor(fittedWidth)));
-        setExpandedScale(1);
-        return;
-      }
-
-      setExpandedScale(1.16);
+      setExpandedScale(getExpandedScale());
     }
 
     syncExpandedScale();
     window.addEventListener("resize", syncExpandedScale);
     window.addEventListener("orientationchange", syncExpandedScale);
+    window.visualViewport?.addEventListener("resize", syncExpandedScale);
     return () => {
       window.removeEventListener("resize", syncExpandedScale);
       window.removeEventListener("orientationchange", syncExpandedScale);
+      window.visualViewport?.removeEventListener("resize", syncExpandedScale);
     };
+  }, [isExpanded]);
+
+  useEffect(() => {
+    if (isExpanded) return undefined;
+    const shell = gameShellRef.current;
+    if (!shell) return undefined;
+
+    function syncNormalScale() {
+      const availableWidth = shell.clientWidth || shell.getBoundingClientRect().width || GAME_WIDTH;
+      setNormalScale(Math.min(1, availableWidth / GAME_WIDTH));
+    }
+
+    syncNormalScale();
+
+    if (typeof ResizeObserver === "undefined") {
+      window.addEventListener("resize", syncNormalScale);
+      return () => window.removeEventListener("resize", syncNormalScale);
+    }
+
+    const observer = new ResizeObserver(syncNormalScale);
+    observer.observe(shell);
+    return () => observer.disconnect();
   }, [isExpanded]);
 
   function syncFrame(nextDebris, nextProjectiles, nextShipX, nextShipY) {
@@ -724,17 +726,7 @@ export default function HubSyntaxSentinelGame() {
   }
 
   function openExpandedView() {
-    if (isTouchViewport()) {
-      const fittedWidth = Math.min(window.innerWidth - 28, ((window.innerHeight - 34) * GAME_WIDTH) / (GAME_HEIGHT + 40));
-      setExpandedBaseWidth(Math.max(300, Math.floor(fittedWidth)));
-      setExpandedScale(1);
-      setIsExpanded(true);
-      return;
-    }
-
-    const width = gameZoomRef.current?.getBoundingClientRect().width || GAME_WIDTH;
-    setExpandedBaseWidth(Math.round(width));
-    setExpandedScale(1.16);
+    setExpandedScale(getExpandedScale());
     setIsExpanded(true);
   }
 
@@ -1129,7 +1121,7 @@ export default function HubSyntaxSentinelGame() {
         </div>
       </div>
 
-      <div className={`sentinel-game-shell ${isExpanded ? "expanded" : ""}`}>
+      <div ref={gameShellRef} className={`sentinel-game-shell ${isExpanded ? "expanded" : ""}`}>
         <section className="sentinel-mobile-landscape-card">
           <span>Mobile play mode</span>
           <h2>Open the landscape cockpit</h2>
@@ -1148,14 +1140,14 @@ export default function HubSyntaxSentinelGame() {
           </button>
         ) : null}
         <div
-          ref={gameZoomRef}
-          className="sentinel-game-zoom"
-          style={
-            isExpanded
-              ? { "--expanded-base-width": `${expandedBaseWidth}px`, "--expanded-scale": expandedScale }
-              : undefined
-          }
+          className="sentinel-game-frame"
+          style={{
+            "--game-frame-width": `${Math.round(GAME_WIDTH * (isExpanded ? expandedScale : normalScale))}px`,
+            "--game-frame-height": `${Math.round(GAME_FRAME_HEIGHT * (isExpanded ? expandedScale : normalScale))}px`,
+            "--game-scale": isExpanded ? expandedScale : normalScale,
+          }}
         >
+        <div className="sentinel-game-zoom">
           <div className="sentinel-hud" aria-label="Game status">
             <span>Score {score}</span>
             <span>Streak {streak}</span>
@@ -1329,6 +1321,7 @@ export default function HubSyntaxSentinelGame() {
             </div>
           </section>
         </div>
+        </div>
       </div>
 
       <style>{`
@@ -1416,11 +1409,11 @@ export default function HubSyntaxSentinelGame() {
           position: fixed;
           inset: 0;
           z-index: 50;
-          display: grid;
-          align-items: start;
-          justify-items: center;
-          padding: clamp(0.8rem, 2vw, 1.4rem);
-          overflow: auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.45rem;
+          overflow: hidden;
           background:
             radial-gradient(circle at 20% 20%, rgba(126, 232, 204, 0.18), transparent 28%),
             radial-gradient(circle at 80% 10%, rgba(178, 104, 255, 0.14), transparent 30%),
@@ -1436,28 +1429,33 @@ export default function HubSyntaxSentinelGame() {
           padding: 0 1rem;
         }
 
+        .sentinel-game-frame {
+          width: var(--game-frame-width, ${GAME_WIDTH}px);
+          height: var(--game-frame-height, ${GAME_FRAME_HEIGHT}px);
+          margin: 0 auto;
+        }
+
+        .sentinel-game-shell.expanded .sentinel-game-frame {
+          margin: 0;
+        }
+
         .sentinel-game-zoom {
-          width: min(100%, ${GAME_WIDTH}px);
-          transform-origin: top center;
+          width: ${GAME_WIDTH}px;
+          transform-origin: top left;
+          transform: scale(var(--game-scale, 1));
         }
 
         .sentinel-game-shell.expanded .sentinel-game-zoom {
-          width: var(--expanded-base-width, ${GAME_WIDTH}px);
-          max-width: none;
-          transform: scale(var(--expanded-scale, 1.16));
-          margin-top: 1.2rem;
+          margin-top: 0;
         }
 
         .sentinel-game-shell.expanded .sentinel-stage {
-          width: 100%;
-          height: calc(var(--expanded-base-width, ${GAME_WIDTH}px) * ${GAME_HEIGHT / GAME_WIDTH});
-          min-height: 0;
-          max-height: none;
-          aspect-ratio: auto;
+          width: ${GAME_WIDTH}px;
+          height: ${GAME_HEIGHT}px;
         }
 
         .sentinel-hud {
-          width: min(100%, ${GAME_WIDTH}px);
+          width: ${GAME_WIDTH}px;
           margin: 0 auto 0.45rem;
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1537,10 +1535,8 @@ export default function HubSyntaxSentinelGame() {
 
         .sentinel-stage {
           position: relative;
-          width: min(100%, ${GAME_WIDTH}px);
-          aspect-ratio: ${GAME_WIDTH} / ${GAME_HEIGHT};
-          max-height: calc(100vh - 250px);
-          min-height: 360px;
+          width: ${GAME_WIDTH}px;
+          height: ${GAME_HEIGHT}px;
           margin: 0 auto;
           overflow: hidden;
           outline: none;
@@ -2142,6 +2138,10 @@ export default function HubSyntaxSentinelGame() {
           font-size: 0.84rem;
         }
 
+        .sentinel-game-shell.expanded .sentinel-readout {
+          display: none;
+        }
+
         @keyframes sentinelStarDrift {
           from { background-position: 17px 23px, 73px 41px, 28px 76px; }
           to { background-position: -303px 23px, -387px 41px, -592px 76px; }
@@ -2396,7 +2396,7 @@ export default function HubSyntaxSentinelGame() {
             font-size: 1.65rem;
           }
 
-          .sentinel-game-shell:not(.expanded) .sentinel-game-zoom {
+          .sentinel-game-shell:not(.expanded) .sentinel-game-frame {
             display: none;
           }
 
@@ -2457,44 +2457,20 @@ export default function HubSyntaxSentinelGame() {
             display: none;
           }
 
+          .sentinel-game-shell.expanded .sentinel-game-frame {
+            width: var(--game-frame-width, ${GAME_WIDTH}px);
+            height: var(--game-frame-height, ${GAME_FRAME_HEIGHT}px);
+          }
+
           .sentinel-game-shell.expanded .sentinel-game-zoom {
-            width: var(--expanded-base-width, calc(100vw - 28px));
-            max-width: none;
+            width: ${GAME_WIDTH}px;
             margin-top: 0;
-            transform: none;
+            transform: scale(var(--game-scale, 1));
           }
 
           .sentinel-game-shell.expanded .sentinel-stage {
-            width: 100%;
-            height: calc(var(--expanded-base-width, calc(100vw - 28px)) * ${GAME_HEIGHT / GAME_WIDTH});
-            min-height: 0;
-            max-height: none;
-            aspect-ratio: auto;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-hud {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 0.28rem;
-            margin-bottom: 0.28rem;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-hud span {
-            min-height: 24px;
-            border-radius: 5px;
-            padding: 0.18rem 0.32rem;
-            font-size: 0.56rem;
-            box-shadow: none;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-shield-meter {
-            gap: 0.24rem;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-shield-meter i {
-            min-width: 34px;
-            height: 7px;
-            gap: 2px;
-            padding: 1px;
+            width: ${GAME_WIDTH}px;
+            height: ${GAME_HEIGHT}px;
           }
 
           .sentinel-game-shell.expanded .sentinel-expanded-close {
@@ -2515,171 +2491,12 @@ export default function HubSyntaxSentinelGame() {
             font-weight: 900;
           }
 
-          .sentinel-prompt-base {
-            width: 148px;
-            min-height: 92px;
-          }
-
-          .sentinel-round-badge {
-            left: ${DOCK_LINE_X - BASE_WIDTH - 12}px;
-            min-width: 70px;
-            padding: 0.22rem 0.42rem;
-            font-size: 0.54rem;
-          }
-
-          .sentinel-prompt-base strong {
-            font-size: 1.08rem;
-          }
-
-          .sentinel-debris {
-            font-size: 0.72rem;
-            padding: 0.32rem 0.48rem;
-          }
-
           .sentinel-dpad-shell,
           .sentinel-ship-control,
           .sentinel-fire-control {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-dpad-shell {
-            left: 6px;
-            bottom: 2px;
-            width: 156px;
-            height: 156px;
-            border-radius: 38% 38% 38% 38% / 44% 44% 44% 44%;
-            background:
-              radial-gradient(circle at 50% 50%, rgba(129, 232, 255, 0.3), rgba(94, 143, 255, 0.13) 30%, transparent 33%),
-              radial-gradient(circle at 50% 12%, rgba(126, 232, 204, 0.28), transparent 22%),
-              radial-gradient(circle at 12% 50%, rgba(126, 232, 204, 0.26), transparent 22%),
-              radial-gradient(circle at 88% 50%, rgba(126, 232, 204, 0.26), transparent 22%),
-              radial-gradient(circle at 50% 88%, rgba(178, 104, 255, 0.28), transparent 22%),
-              linear-gradient(145deg, rgba(65, 96, 151, 0.38), rgba(42, 35, 92, 0.42));
-            border: 16px solid transparent;
-            box-shadow:
-              0 0 22px rgba(126, 232, 204, 0.28),
-              0 0 34px rgba(178, 104, 255, 0.22),
-              inset 0 0 24px rgba(255, 255, 255, 0.08);
-            clip-path: polygon(37% 0, 63% 0, 72% 25%, 100% 37%, 100% 63%, 72% 75%, 63% 100%, 37% 100%, 28% 75%, 0 63%, 0 37%, 28% 25%);
-            pointer-events: auto;
-            cursor: grab;
-            background-clip: padding-box;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-dpad-shell::before {
-            content: "";
-            position: absolute;
-            inset: 16px;
-            border: 2px solid rgba(126, 232, 204, 0.58);
-            clip-path: inherit;
-            pointer-events: none;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-dpad-shell span {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 40% 35%, rgba(180, 244, 255, 0.38), rgba(75, 112, 176, 0.22) 62%, rgba(26, 23, 52, 0.62));
-            border: 2px solid rgba(126, 232, 204, 0.7);
-            box-shadow:
-              0 0 18px rgba(126, 232, 204, 0.42),
-              inset 0 0 18px rgba(255, 255, 255, 0.1);
-            transform: translate(var(--joy-x, 0), var(--joy-y, 0));
-            transition: transform 80ms ease-out;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-ship-control {
-            display: none;
-            width: 42px;
-            height: 42px;
-            min-height: 0;
-            padding: 0;
-            border-radius: 16px;
-            color: rgba(219, 255, 249, 0.94);
-            background: transparent;
-            border: 0;
-            box-shadow: none;
-            text-shadow: 0 0 12px rgba(126, 232, 204, 0.8);
-            font-size: 1.05rem;
-            line-height: 1;
-            -webkit-tap-highlight-color: transparent;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-ship-control:active {
-            color: #fff6d9;
-            transform: scale(0.92);
-            filter: drop-shadow(0 0 10px rgba(126, 232, 204, 0.9));
-          }
-
-          .sentinel-game-shell.expanded .sentinel-ship-control.up {
-            left: 63px;
-            bottom: 100px;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-ship-control.left {
-            left: 25px;
-            bottom: 59px;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-ship-control.right {
-            left: 104px;
-            bottom: 59px;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-ship-control.down {
-            left: 63px;
-            bottom: 20px;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-fire-control {
-            right: 26px;
-            bottom: 22px;
-            width: 102px;
-            height: 102px;
-            min-height: 0;
-            padding: 0;
-            flex-direction: column;
-            gap: 0.18rem;
-            border-radius: 28px;
-            color: #fff6d9;
-            background:
-              radial-gradient(circle at 45% 28%, rgba(126, 232, 204, 0.32), transparent 34%),
-              linear-gradient(145deg, rgba(67, 101, 153, 0.5), rgba(45, 37, 95, 0.58));
-            border: 2px solid rgba(126, 232, 204, 0.68);
-            box-shadow:
-              0 0 24px rgba(126, 232, 204, 0.26),
-              0 0 34px rgba(178, 104, 255, 0.24),
-              inset 0 0 26px rgba(255, 255, 255, 0.08),
-              0 11px 0 rgba(0, 0, 0, 0.2);
-            font-size: 1.26rem;
-            text-shadow: 0 0 12px rgba(126, 232, 204, 0.52);
-            -webkit-tap-highlight-color: transparent;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-fire-control span {
-            width: 30px;
-            height: 30px;
-            border: 3px solid rgba(247, 251, 255, 0.86);
-            border-radius: 50%;
-            background:
-              linear-gradient(90deg, transparent 46%, rgba(247, 251, 255, 0.86) 47% 53%, transparent 54%),
-              linear-gradient(0deg, transparent 46%, rgba(247, 251, 255, 0.86) 47% 53%, transparent 54%);
-            box-shadow: 0 0 12px rgba(126, 232, 204, 0.42);
-          }
-
-          .sentinel-game-shell.expanded .sentinel-fire-control b {
-            font: inherit;
-            font-weight: 900;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-fire-control:active {
-            transform: translateY(4px) scale(0.97);
-            box-shadow:
-              0 0 28px rgba(126, 232, 204, 0.36),
-              inset 0 0 28px rgba(255, 255, 255, 0.12),
-              0 5px 0 rgba(0, 0, 0, 0.22);
           }
 
           .sentinel-game-shell.expanded .sentinel-readout {
@@ -2851,44 +2668,20 @@ export default function HubSyntaxSentinelGame() {
             overflow: hidden;
           }
 
+          .sentinel-game-shell.expanded .sentinel-game-frame {
+            width: var(--game-frame-width, ${GAME_WIDTH}px);
+            height: var(--game-frame-height, ${GAME_FRAME_HEIGHT}px);
+          }
+
           .sentinel-game-shell.expanded .sentinel-game-zoom {
-            width: var(--expanded-base-width, calc(100vw - 28px));
-            max-width: none;
+            width: ${GAME_WIDTH}px;
             margin-top: 0;
-            transform: none;
+            transform: scale(var(--game-scale, 1));
           }
 
           .sentinel-game-shell.expanded .sentinel-stage {
-            width: 100%;
-            height: calc(var(--expanded-base-width, calc(100vw - 28px)) * ${GAME_HEIGHT / GAME_WIDTH});
-            min-height: 0;
-            max-height: none;
-            aspect-ratio: auto;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-hud {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 0.28rem;
-            margin-bottom: 0.28rem;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-hud span {
-            min-height: 24px;
-            border-radius: 5px;
-            padding: 0.18rem 0.32rem;
-            font-size: 0.56rem;
-            box-shadow: none;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-shield-meter {
-            gap: 0.24rem;
-          }
-
-          .sentinel-game-shell.expanded .sentinel-shield-meter i {
-            min-width: 34px;
-            height: 7px;
-            gap: 2px;
-            padding: 1px;
+            width: ${GAME_WIDTH}px;
+            height: ${GAME_HEIGHT}px;
           }
 
           .sentinel-game-shell.expanded .sentinel-expanded-close {

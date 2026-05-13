@@ -1,0 +1,38 @@
+{
+  "id": "p6ywplhmDs5cHcp1rQle",
+  "sessionId": "N6WZaXLKe1dIARZLAAlh",
+  "templateId": "oxford-ef4-upper-intermediate-end-of-course-a",
+  "templateTitle": "EF4 Upper-Intermediate End-of-course Test A",
+  "level": "upper-intermediate",
+  "testKind": "end-of-course",
+  "teacherUid": "oE7oJ1jjIPPKTbEZNMdP66OMO2H2",
+  "studentUid": "qvshnMhNQVeHHDzWtdVBEALsO2I3",
+  "studentName": "Irene Porro Núñez",
+  "sections": [],
+  "completed": false,
+  "reviewRequired": false,
+  "reviewStatus": "not-submitted",
+  "startedAt": {
+    "_seconds": 1778667483,
+    "_nanoseconds": 106000000
+  },
+  "autoTotal": 105,
+  "autoScore": 0,
+  "runnerState": {
+    "currentSectionId": "",
+    "listeningSectionIndex": 0,
+    "sectionNotes": {},
+    "listeningStageStartedAt": "2026-05-13T11:36:36.333Z",
+    "listeningPhase": "preread",
+    "sectionAnswers": {},
+    "mainPaperSubmittedAt": "2026-05-13T11:26:30.622Z",
+    "sectionStatuses": {},
+    "mainPaperStatus": "in-progress",
+    "mainPaperStartedAt": "2026-05-13T10:18:03.115Z"
+  },
+  "percent": 0,
+  "updatedAt": {
+    "_seconds": 1778674504,
+    "_nanoseconds": 950000000
+  }
+}
