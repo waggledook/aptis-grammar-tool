@@ -415,6 +415,7 @@ export default function HubSyntaxSentinelGame() {
   const gameZoomRef = useRef(null);
   const keysRef = useRef(new Set());
   const joystickVectorRef = useRef({ x: 0, y: 0 });
+  const joystickPointerIdRef = useRef(null);
   const lastFrameRef = useRef(0);
   const spawnTimerRef = useRef(0);
   const promptTransitionRef = useRef(null);
@@ -696,21 +697,30 @@ export default function HubSyntaxSentinelGame() {
 
   function startJoystick(event) {
     event.preventDefault();
+    if (joystickPointerIdRef.current !== null) return;
+    joystickPointerIdRef.current = event.pointerId;
     event.currentTarget.setPointerCapture?.(event.pointerId);
     updateJoystickFromPointer(event);
   }
 
   function moveJoystick(event) {
-    if (!event.currentTarget.hasPointerCapture?.(event.pointerId)) return;
+    if (joystickPointerIdRef.current !== event.pointerId) return;
     event.preventDefault();
     updateJoystickFromPointer(event);
   }
 
   function stopJoystick(event) {
+    if (joystickPointerIdRef.current !== event.pointerId) return;
     event.preventDefault();
     event.currentTarget.releasePointerCapture?.(event.pointerId);
+    joystickPointerIdRef.current = null;
     joystickVectorRef.current = { x: 0, y: 0 };
     setJoystickKnob({ x: 0, y: 0 });
+  }
+
+  function fireFromPointer(event) {
+    event.preventDefault();
+    fireProjectile();
   }
 
   function openExpandedView() {
@@ -933,6 +943,7 @@ export default function HubSyntaxSentinelGame() {
     if (promptTransitionRef.current) window.clearTimeout(promptTransitionRef.current);
     promptTransitionRef.current = null;
     keysRef.current.clear();
+    joystickPointerIdRef.current = null;
     lastFrameRef.current = performance.now();
     spawnTimerRef.current = 0;
     pendingPromptLaunchRef.current = false;
@@ -1258,7 +1269,7 @@ export default function HubSyntaxSentinelGame() {
         >
           ▼
         </button>
-        <button type="button" className="sentinel-fire-control" onClick={fireProjectile} aria-label="Fire">
+        <button type="button" className="sentinel-fire-control" onPointerDown={fireFromPointer} aria-label="Fire">
           <span aria-hidden="true" />
           <b>Fire</b>
         </button>
@@ -1325,6 +1336,7 @@ export default function HubSyntaxSentinelGame() {
           min-height: 100vh;
           padding: 1.1rem clamp(0.75rem, 3vw, 2rem) 2rem;
           color: #f7fbff;
+          -webkit-tap-highlight-color: transparent;
           background:
             radial-gradient(circle at 12% 18%, rgba(63, 220, 184, 0.22), transparent 28%),
             radial-gradient(circle at 82% 10%, rgba(255, 199, 85, 0.2), transparent 25%),
@@ -1532,6 +1544,10 @@ export default function HubSyntaxSentinelGame() {
           margin: 0 auto;
           overflow: hidden;
           outline: none;
+          touch-action: none;
+          user-select: none;
+          -webkit-user-select: none;
+          -webkit-touch-callout: none;
           border: 3px solid rgba(247, 251, 255, 0.22);
           border-radius: 8px;
           background:
@@ -2061,6 +2077,16 @@ export default function HubSyntaxSentinelGame() {
           pointer-events: none;
           touch-action: none;
           user-select: none;
+          -webkit-user-select: none;
+          -webkit-touch-callout: none;
+        }
+
+        .sentinel-fire-control,
+        .sentinel-ship-control {
+          touch-action: none;
+          user-select: none;
+          -webkit-user-select: none;
+          -webkit-touch-callout: none;
         }
 
         .sentinel-ship-control.up {
