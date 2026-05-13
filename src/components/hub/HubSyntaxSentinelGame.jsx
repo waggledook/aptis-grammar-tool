@@ -402,6 +402,10 @@ function getSpawnDelay(difficulty) {
   return Math.round(MAX_SPAWN_DELAY_MS - (MAX_SPAWN_DELAY_MS - MIN_SPAWN_DELAY_MS) * eased);
 }
 
+function isTouchViewport() {
+  return typeof window !== "undefined" && window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+}
+
 export default function HubSyntaxSentinelGame() {
   const navigate = useNavigate();
   const stageRef = useRef(null);
@@ -598,8 +602,8 @@ export default function HubSyntaxSentinelGame() {
     if (!isExpanded || typeof window === "undefined") return undefined;
 
     function syncExpandedScale() {
-      if (window.matchMedia("(max-width: 760px)").matches) {
-        const fittedWidth = Math.min(window.innerWidth - 28, ((window.innerHeight - 34) * GAME_WIDTH) / (GAME_HEIGHT + 42));
+      if (isTouchViewport()) {
+        const fittedWidth = Math.min(window.innerWidth - 28, ((window.innerHeight - 34) * GAME_WIDTH) / (GAME_HEIGHT + 40));
         setExpandedBaseWidth(Math.max(300, Math.floor(fittedWidth)));
         setExpandedScale(1);
         return;
@@ -665,8 +669,8 @@ export default function HubSyntaxSentinelGame() {
   }
 
   function openExpandedView() {
-    if (typeof window !== "undefined" && window.matchMedia("(max-width: 760px)").matches) {
-      const fittedWidth = Math.min(window.innerWidth - 28, ((window.innerHeight - 34) * GAME_WIDTH) / (GAME_HEIGHT + 42));
+    if (isTouchViewport()) {
+      const fittedWidth = Math.min(window.innerWidth - 28, ((window.innerHeight - 34) * GAME_WIDTH) / (GAME_HEIGHT + 40));
       setExpandedBaseWidth(Math.max(300, Math.floor(fittedWidth)));
       setExpandedScale(1);
       setIsExpanded(true);
@@ -2477,6 +2481,209 @@ export default function HubSyntaxSentinelGame() {
           .sentinel-readout div {
             grid-template-columns: 1fr;
             text-align: left;
+          }
+        }
+
+        @media (hover: none) and (pointer: coarse) {
+          .sentinel-dpad-shell,
+          .sentinel-ship-control,
+          .sentinel-fire-control {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .sentinel-dpad-shell {
+            left: 22px;
+            bottom: 18px;
+            width: 124px;
+            height: 124px;
+            border-radius: 38% 38% 38% 38% / 44% 44% 44% 44%;
+            background:
+              radial-gradient(circle at 50% 50%, rgba(129, 232, 255, 0.3), rgba(94, 143, 255, 0.13) 30%, transparent 33%),
+              radial-gradient(circle at 50% 12%, rgba(126, 232, 204, 0.28), transparent 22%),
+              radial-gradient(circle at 12% 50%, rgba(126, 232, 204, 0.26), transparent 22%),
+              radial-gradient(circle at 88% 50%, rgba(126, 232, 204, 0.26), transparent 22%),
+              radial-gradient(circle at 50% 88%, rgba(178, 104, 255, 0.28), transparent 22%),
+              linear-gradient(145deg, rgba(65, 96, 151, 0.38), rgba(42, 35, 92, 0.42));
+            border: 2px solid rgba(126, 232, 204, 0.58);
+            box-shadow:
+              0 0 22px rgba(126, 232, 204, 0.28),
+              0 0 34px rgba(178, 104, 255, 0.22),
+              inset 0 0 24px rgba(255, 255, 255, 0.08);
+            clip-path: polygon(37% 0, 63% 0, 72% 25%, 100% 37%, 100% 63%, 72% 75%, 63% 100%, 37% 100%, 28% 75%, 0 63%, 0 37%, 28% 25%);
+          }
+
+          .sentinel-dpad-shell span {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 40% 35%, rgba(180, 244, 255, 0.38), rgba(75, 112, 176, 0.22) 62%, rgba(26, 23, 52, 0.62));
+            border: 2px solid rgba(126, 232, 204, 0.7);
+            box-shadow:
+              0 0 18px rgba(126, 232, 204, 0.42),
+              inset 0 0 18px rgba(255, 255, 255, 0.1);
+          }
+
+          .sentinel-ship-control {
+            width: 42px;
+            height: 42px;
+            min-height: 0;
+            padding: 0;
+            border-radius: 16px;
+            color: rgba(219, 255, 249, 0.94);
+            background: transparent;
+            border: 0;
+            box-shadow: none;
+            text-shadow: 0 0 12px rgba(126, 232, 204, 0.8);
+            font-size: 1.05rem;
+            line-height: 1;
+            -webkit-tap-highlight-color: transparent;
+          }
+
+          .sentinel-ship-control:active {
+            color: #fff6d9;
+            transform: scale(0.92);
+            filter: drop-shadow(0 0 10px rgba(126, 232, 204, 0.9));
+          }
+
+          .sentinel-ship-control.up {
+            left: 63px;
+            bottom: 100px;
+          }
+
+          .sentinel-ship-control.left {
+            left: 25px;
+            bottom: 59px;
+          }
+
+          .sentinel-ship-control.right {
+            left: 104px;
+            bottom: 59px;
+          }
+
+          .sentinel-ship-control.down {
+            left: 63px;
+            bottom: 20px;
+          }
+
+          .sentinel-fire-control {
+            right: 26px;
+            bottom: 22px;
+            width: 102px;
+            height: 102px;
+            min-height: 0;
+            padding: 0;
+            flex-direction: column;
+            gap: 0.18rem;
+            border-radius: 28px;
+            color: #fff6d9;
+            background:
+              radial-gradient(circle at 45% 28%, rgba(126, 232, 204, 0.32), transparent 34%),
+              linear-gradient(145deg, rgba(67, 101, 153, 0.5), rgba(45, 37, 95, 0.58));
+            border: 2px solid rgba(126, 232, 204, 0.68);
+            box-shadow:
+              0 0 24px rgba(126, 232, 204, 0.26),
+              0 0 34px rgba(178, 104, 255, 0.24),
+              inset 0 0 26px rgba(255, 255, 255, 0.08),
+              0 11px 0 rgba(0, 0, 0, 0.2);
+            font-size: 1.26rem;
+            text-shadow: 0 0 12px rgba(126, 232, 204, 0.52);
+            -webkit-tap-highlight-color: transparent;
+          }
+
+          .sentinel-fire-control span {
+            width: 30px;
+            height: 30px;
+            border: 3px solid rgba(247, 251, 255, 0.86);
+            border-radius: 50%;
+            background:
+              linear-gradient(90deg, transparent 46%, rgba(247, 251, 255, 0.86) 47% 53%, transparent 54%),
+              linear-gradient(0deg, transparent 46%, rgba(247, 251, 255, 0.86) 47% 53%, transparent 54%);
+            box-shadow: 0 0 12px rgba(126, 232, 204, 0.42);
+          }
+
+          .sentinel-fire-control b {
+            font: inherit;
+            font-weight: 900;
+          }
+
+          .sentinel-fire-control:active {
+            transform: translateY(4px) scale(0.97);
+            box-shadow:
+              0 0 28px rgba(126, 232, 204, 0.36),
+              inset 0 0 28px rgba(255, 255, 255, 0.12),
+              0 5px 0 rgba(0, 0, 0, 0.22);
+          }
+
+          .sentinel-game-shell.expanded {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.45rem;
+            overflow: hidden;
+          }
+
+          .sentinel-game-shell.expanded .sentinel-game-zoom {
+            width: var(--expanded-base-width, calc(100vw - 28px));
+            max-width: none;
+            margin-top: 0;
+            transform: none;
+          }
+
+          .sentinel-game-shell.expanded .sentinel-stage {
+            width: 100%;
+            height: calc(var(--expanded-base-width, calc(100vw - 28px)) * ${GAME_HEIGHT / GAME_WIDTH});
+            min-height: 0;
+            max-height: none;
+            aspect-ratio: auto;
+          }
+
+          .sentinel-game-shell.expanded .sentinel-hud {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 0.28rem;
+            margin-bottom: 0.28rem;
+          }
+
+          .sentinel-game-shell.expanded .sentinel-hud span {
+            min-height: 24px;
+            border-radius: 5px;
+            padding: 0.18rem 0.32rem;
+            font-size: 0.56rem;
+            box-shadow: none;
+          }
+
+          .sentinel-game-shell.expanded .sentinel-shield-meter {
+            gap: 0.24rem;
+          }
+
+          .sentinel-game-shell.expanded .sentinel-shield-meter i {
+            min-width: 34px;
+            height: 7px;
+            gap: 2px;
+            padding: 1px;
+          }
+
+          .sentinel-game-shell.expanded .sentinel-expanded-close {
+            top: 0.42rem;
+            right: 0.42rem;
+            min-height: 30px;
+            width: 30px;
+            padding: 0;
+            border-radius: 999px;
+            font-size: 0;
+            line-height: 1;
+            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.25);
+          }
+
+          .sentinel-game-shell.expanded .sentinel-expanded-close::before {
+            content: "×";
+            font-size: 1.05rem;
+            font-weight: 900;
+          }
+
+          .sentinel-game-shell.expanded .sentinel-readout {
+            display: none;
           }
         }
       `}</style>
