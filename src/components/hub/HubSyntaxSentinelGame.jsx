@@ -37,9 +37,8 @@ const DEBRIS_SPAWN_GAP_MAX = 96;
 const DEBRIS_TOP_BOUND = 48;
 const DEBRIS_BOTTOM_PADDING = 28;
 const DEBRIS_VERTICAL_GAP = 76;
-const MAX_ACTIVE_DEBRIS = 1;
-const MIN_SPAWN_DELAY_MS = 1350;
-const MAX_SPAWN_DELAY_MS = 3200;
+const MIN_SPAWN_DELAY_MS = 850;
+const MAX_SPAWN_DELAY_MS = 2800;
 const PROMPT_DEPART_DELAY_MS = 760;
 const PROMPT_ARRIVE_DELAY_MS = 980;
 const MAX_SHIELD = 4;
@@ -362,7 +361,7 @@ function makeDebris(promptItem, difficulty, stageSize = DEFAULT_STAGE_SIZE, unav
   const distractor = promptItem.distractors[Math.floor(Math.random() * promptItem.distractors.length)];
   const text = correctEnding?.text || distractor;
   const width = estimateDebrisWidth(text);
-  const speed = randomBetween(78 + difficulty * 5.5, 112 + difficulty * 7.5);
+  const speed = randomBetween(82 + difficulty * 9, 118 + difficulty * 12);
   const y = chooseDebrisY(stageSize, activeDebris);
   const drift = randomBetween(10, 24);
   const driftDirection = Math.random() < 0.5 ? -1 : 1;
@@ -394,12 +393,16 @@ function getMultiplier(streak) {
 
 function getDifficultyLevel(stats) {
   const progress = (stats?.docked || 0) + (stats?.protected || 0);
-  return Math.min(12, Math.floor(progress / 4));
+  return Math.min(12, Math.floor(progress / 3));
 }
 
 function getSpawnDelay(difficulty) {
-  const eased = clamp(difficulty / 12, 0, 1);
+  const eased = Math.pow(clamp(difficulty / 12, 0, 1), 0.78);
   return Math.round(MAX_SPAWN_DELAY_MS - (MAX_SPAWN_DELAY_MS - MIN_SPAWN_DELAY_MS) * eased);
+}
+
+function getMaxActiveDebris(difficulty) {
+  return difficulty >= 5 ? 2 : 1;
 }
 
 function isTouchViewport() {
@@ -449,6 +452,7 @@ export default function HubSyntaxSentinelGame() {
   const [shipY, setShipY] = useState(GAME_HEIGHT / 2);
   const [debris, setDebris] = useState([]);
   const [projectiles, setProjectiles] = useState([]);
+  const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
   const [shield, setShield] = useState(MAX_SHIELD);
@@ -776,6 +780,7 @@ export default function HubSyntaxSentinelGame() {
       completedCorrectIdsRef.current = new Set();
       spawnTimerRef.current = 1200;
       setPromptIndex(nextPrompt);
+      setRound((current) => current + 1);
       setCompletedCorrectIds([]);
       setBasePhase("arriving");
       basePhaseRef.current = "arriving";
@@ -911,6 +916,7 @@ export default function HubSyntaxSentinelGame() {
     setProjectiles([]);
     setShipX(SHIP_X);
     setShipY(stageSizeRef.current.height / 2);
+    setRound(1);
     setScore(0);
     setStreak(0);
     setShield(MAX_SHIELD);
@@ -959,7 +965,7 @@ export default function HubSyntaxSentinelGame() {
     if (
       basePhaseRef.current === "active" &&
       spawnTimerRef.current <= 0 &&
-      nextDebris.length < MAX_ACTIVE_DEBRIS
+      nextDebris.length < getMaxActiveDebris(getDifficultyLevel(statsRef.current))
     ) {
       const unavailableCorrectIds = new Set(completedCorrectIdsRef.current);
       nextDebris.forEach((item) => {
@@ -1126,6 +1132,7 @@ export default function HubSyntaxSentinelGame() {
         <div className="sentinel-stars" />
         <div className="sentinel-particles near" aria-hidden="true" />
         <div className="sentinel-particles far" aria-hidden="true" />
+        <div className="sentinel-stream-lines" aria-hidden="true" />
         <img className="sentinel-dock-mouth" src={DOCK_ASSET} alt="" draggable="false" />
         {dockEffect ? (
           <span
@@ -1134,6 +1141,7 @@ export default function HubSyntaxSentinelGame() {
             style={{ left: `${DOCK_LINE_X - 24}px`, top: `${dockEffect.y - 24}px` }}
           />
         ) : null}
+        <div className="sentinel-round-badge">Round {round}</div>
         <div className={`sentinel-prompt-base phase-${basePhase}`}>
           <small>Prompt Core</small>
           <strong>{promptItem.prompt}</strong>
@@ -1487,7 +1495,8 @@ export default function HubSyntaxSentinelGame() {
         .sentinel-atmosphere,
         .sentinel-grid,
         .sentinel-stars,
-        .sentinel-particles {
+        .sentinel-particles,
+        .sentinel-stream-lines {
           position: absolute;
           inset: 0;
           pointer-events: none;
@@ -1496,24 +1505,24 @@ export default function HubSyntaxSentinelGame() {
         .sentinel-atmosphere {
           z-index: 0;
           background:
-            linear-gradient(90deg, rgba(120, 255, 240, 0.19), rgba(166, 82, 255, 0.08) 18%, transparent 42%),
+            linear-gradient(90deg, rgba(120, 255, 240, 0.14), rgba(166, 82, 255, 0.055) 18%, transparent 42%),
             radial-gradient(circle at 20% 42%, rgba(120, 255, 224, 0.2), transparent 30%),
             radial-gradient(circle at 84% 20%, rgba(94, 144, 255, 0.08), transparent 24%);
           filter: blur(10px);
-          opacity: 0.86;
-          animation: dockGlowPulse 5.6s ease-in-out infinite;
+          opacity: 0.7;
+          animation: dockWakePulse 4.8s ease-in-out infinite;
         }
 
         .sentinel-grid {
           z-index: 0;
           background:
-            linear-gradient(rgba(120, 255, 240, 0.055) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(120, 255, 240, 0.04) 1px, transparent 1px),
-            linear-gradient(115deg, transparent 0 47%, rgba(176, 118, 255, 0.045) 48%, transparent 49% 100%);
-          background-size: 118px 84px, 118px 84px, 180px 180px;
-          opacity: 0.33;
+            linear-gradient(rgba(120, 255, 240, 0.035) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(120, 255, 240, 0.018) 1px, transparent 1px),
+            linear-gradient(115deg, transparent 0 48%, rgba(176, 118, 255, 0.026) 49%, transparent 50% 100%);
+          background-size: 170px 112px, 170px 112px, 260px 260px;
+          opacity: 0.22;
           transform: perspective(520px) rotateX(0deg);
-          animation: gridDrift 18s linear infinite;
+          animation: gridDrift 10s linear infinite;
         }
 
         .sentinel-stars {
@@ -1524,7 +1533,7 @@ export default function HubSyntaxSentinelGame() {
             radial-gradient(circle, rgba(195,156,255,.5) 1px, transparent 1.5px);
           background-position: 17px 23px, 73px 41px, 28px 76px;
           background-size: 160px 116px, 230px 170px, 310px 210px;
-          animation: sentinelStarDrift 22s linear infinite;
+          animation: sentinelStarDrift 15s linear infinite;
           opacity: 0.45;
         }
 
@@ -1541,7 +1550,7 @@ export default function HubSyntaxSentinelGame() {
             radial-gradient(circle, rgba(247, 240, 211, 0.32) 1px, transparent 1.8px);
           background-position: 31px 18px, 120px 92px;
           background-size: 260px 190px, 340px 250px;
-          animation: particleDriftFar 26s linear infinite;
+          animation: particleDriftFar 18s linear infinite;
         }
 
         .sentinel-particles.near {
@@ -1550,8 +1559,34 @@ export default function HubSyntaxSentinelGame() {
             radial-gradient(circle, rgba(120, 255, 240, 0.34) 1px, transparent 2px);
           background-position: 80px 130px, 210px 24px;
           background-size: 290px 180px, 410px 260px;
-          animation: particleDriftNear 13s linear infinite;
+          animation: particleDriftNear 7s linear infinite;
           opacity: 0.24;
+        }
+
+        .sentinel-stream-lines {
+          z-index: 1;
+          opacity: 0.24;
+          background:
+            linear-gradient(90deg, transparent 0 18%, rgba(126, 232, 204, 0.12) 20%, transparent 28%),
+            linear-gradient(90deg, transparent 0 58%, rgba(178, 104, 255, 0.09) 60%, transparent 70%);
+          background-size: 620px 100%, 920px 100%;
+          filter: blur(0.8px);
+          mix-blend-mode: screen;
+          animation: syntaxStreamRush 7s linear infinite;
+        }
+
+        .sentinel-stream-lines::before {
+          content: "-ing   to   if   that   []   {}";
+          position: absolute;
+          inset: 0;
+          display: block;
+          color: rgba(126, 232, 204, 0.075);
+          font-size: 0.68rem;
+          font-weight: 900;
+          letter-spacing: 2.6rem;
+          white-space: nowrap;
+          transform: translateX(100%);
+          animation: syntaxGlyphDrift 9s linear infinite;
         }
 
         .sentinel-dock-mouth {
@@ -1566,6 +1601,7 @@ export default function HubSyntaxSentinelGame() {
           object-fit: contain;
           object-position: left center;
           filter: drop-shadow(8px 0 18px rgba(0, 0, 0, 0.38));
+          animation: dockTravelHum 2.8s ease-in-out infinite;
           pointer-events: none;
           user-select: none;
         }
@@ -1621,6 +1657,29 @@ export default function HubSyntaxSentinelGame() {
           clip-path: polygon(50% 0, 61% 37%, 100% 44%, 66% 59%, 76% 100%, 50% 70%, 22% 100%, 34% 59%, 0 44%, 39% 37%);
           background: rgba(255, 245, 206, 0.88);
           transform: scale(0.42);
+        }
+
+        .sentinel-round-badge {
+          position: absolute;
+          top: calc(50% - ${BASE_HEIGHT / 2}px - 34px);
+          left: ${DOCK_LINE_X - BASE_WIDTH - 12}px;
+          z-index: 4;
+          min-width: 82px;
+          padding: 0.28rem 0.52rem;
+          border-radius: 999px;
+          border: 1px solid rgba(248, 211, 93, 0.42);
+          background:
+            linear-gradient(180deg, rgba(59, 44, 18, 0.72), rgba(13, 18, 28, 0.58));
+          box-shadow:
+            0 0 16px rgba(248, 211, 93, 0.14),
+            inset 0 0 14px rgba(248, 211, 93, 0.06);
+          color: #f8d35d;
+          font-size: 0.62rem;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          text-align: center;
+          text-transform: uppercase;
+          pointer-events: none;
         }
 
         .sentinel-prompt-base {
@@ -1720,6 +1779,7 @@ export default function HubSyntaxSentinelGame() {
           height: 100%;
           object-fit: contain;
           filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35));
+          animation: sentinelHover 1.65s ease-in-out infinite;
           user-select: none;
         }
 
@@ -1998,18 +2058,18 @@ export default function HubSyntaxSentinelGame() {
 
         @keyframes sentinelStarDrift {
           from { background-position: 17px 23px, 73px 41px, 28px 76px; }
-          to { background-position: -143px 139px, -157px 211px, -282px 286px; }
+          to { background-position: -303px 23px, -387px 41px, -592px 76px; }
         }
 
-        @keyframes dockGlowPulse {
+        @keyframes dockWakePulse {
           0%, 100% {
             opacity: 0.72;
-            transform: scaleX(1);
+            transform: translateX(0) scaleX(1);
           }
 
           50% {
             opacity: 0.95;
-            transform: scaleX(1.04);
+            transform: translateX(10px) scaleX(1.06);
           }
         }
 
@@ -2019,7 +2079,7 @@ export default function HubSyntaxSentinelGame() {
           }
 
           to {
-            background-position: -118px 84px, -118px 84px, -180px 180px;
+            background-position: -170px 0, -170px 0, -260px 0;
           }
         }
 
@@ -2029,7 +2089,7 @@ export default function HubSyntaxSentinelGame() {
           }
 
           to {
-            background-position: -229px 18px, -220px 92px;
+            background-position: -489px 18px, -560px 92px;
           }
         }
 
@@ -2039,7 +2099,51 @@ export default function HubSyntaxSentinelGame() {
           }
 
           to {
-            background-position: -210px 130px, -200px 24px;
+            background-position: -500px 130px, -610px 24px;
+          }
+        }
+
+        @keyframes syntaxStreamRush {
+          from {
+            background-position: 0 0, 0 0;
+          }
+
+          to {
+            background-position: -620px 0, -920px 0;
+          }
+        }
+
+        @keyframes syntaxGlyphDrift {
+          from {
+            transform: translateX(104%);
+          }
+
+          to {
+            transform: translateX(-120%);
+          }
+        }
+
+        @keyframes dockTravelHum {
+          0%, 100% {
+            transform: translateY(-50%) translateX(0);
+            filter: drop-shadow(8px 0 18px rgba(0, 0, 0, 0.38)) brightness(1);
+          }
+
+          50% {
+            transform: translateY(calc(-50% - 1px)) translateX(1px);
+            filter: drop-shadow(10px 0 22px rgba(126, 232, 204, 0.18)) brightness(1.06);
+          }
+        }
+
+        @keyframes sentinelHover {
+          0%, 100% {
+            transform: translateY(0) rotate(-0.35deg);
+            filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.35)) brightness(1);
+          }
+
+          50% {
+            transform: translateY(-2px) rotate(0.45deg);
+            filter: drop-shadow(0 14px 20px rgba(0, 0, 0, 0.36)) brightness(1.05);
           }
         }
 
@@ -2328,6 +2432,13 @@ export default function HubSyntaxSentinelGame() {
           .sentinel-prompt-base {
             width: 148px;
             min-height: 92px;
+          }
+
+          .sentinel-round-badge {
+            left: ${DOCK_LINE_X - BASE_WIDTH - 12}px;
+            min-width: 70px;
+            padding: 0.22rem 0.42rem;
+            font-size: 0.54rem;
           }
 
           .sentinel-prompt-base strong {
