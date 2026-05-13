@@ -679,7 +679,7 @@ export default function HubSyntaxSentinelGame() {
     const rect = event.currentTarget.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
-    const maxDistance = Math.max(24, Math.min(rect.width, rect.height) * 0.34);
+    const maxDistance = Math.max(24, Math.min(rect.width, rect.height) * 0.24);
     const rawX = event.clientX - centerX;
     const rawY = event.clientY - centerY;
     const distance = Math.hypot(rawX, rawY);
@@ -2545,10 +2545,10 @@ export default function HubSyntaxSentinelGame() {
           }
 
           .sentinel-game-shell.expanded .sentinel-dpad-shell {
-            left: 22px;
-            bottom: 18px;
-            width: 124px;
-            height: 124px;
+            left: 6px;
+            bottom: 2px;
+            width: 156px;
+            height: 156px;
             border-radius: 38% 38% 38% 38% / 44% 44% 44% 44%;
             background:
               radial-gradient(circle at 50% 50%, rgba(129, 232, 255, 0.3), rgba(94, 143, 255, 0.13) 30%, transparent 33%),
@@ -2557,7 +2557,7 @@ export default function HubSyntaxSentinelGame() {
               radial-gradient(circle at 88% 50%, rgba(126, 232, 204, 0.26), transparent 22%),
               radial-gradient(circle at 50% 88%, rgba(178, 104, 255, 0.28), transparent 22%),
               linear-gradient(145deg, rgba(65, 96, 151, 0.38), rgba(42, 35, 92, 0.42));
-            border: 2px solid rgba(126, 232, 204, 0.58);
+            border: 16px solid transparent;
             box-shadow:
               0 0 22px rgba(126, 232, 204, 0.28),
               0 0 34px rgba(178, 104, 255, 0.22),
@@ -2565,6 +2565,16 @@ export default function HubSyntaxSentinelGame() {
             clip-path: polygon(37% 0, 63% 0, 72% 25%, 100% 37%, 100% 63%, 72% 75%, 63% 100%, 37% 100%, 28% 75%, 0 63%, 0 37%, 28% 25%);
             pointer-events: auto;
             cursor: grab;
+            background-clip: padding-box;
+          }
+
+          .sentinel-game-shell.expanded .sentinel-dpad-shell::before {
+            content: "";
+            position: absolute;
+            inset: 16px;
+            border: 2px solid rgba(126, 232, 204, 0.58);
+            clip-path: inherit;
+            pointer-events: none;
           }
 
           .sentinel-game-shell.expanded .sentinel-dpad-shell span {
@@ -2696,10 +2706,10 @@ export default function HubSyntaxSentinelGame() {
           }
 
           .sentinel-dpad-shell {
-            left: 22px;
-            bottom: 18px;
-            width: 124px;
-            height: 124px;
+            left: 6px;
+            bottom: 2px;
+            width: 156px;
+            height: 156px;
             border-radius: 38% 38% 38% 38% / 44% 44% 44% 44%;
             background:
               radial-gradient(circle at 50% 50%, rgba(129, 232, 255, 0.3), rgba(94, 143, 255, 0.13) 30%, transparent 33%),
@@ -2708,7 +2718,7 @@ export default function HubSyntaxSentinelGame() {
               radial-gradient(circle at 88% 50%, rgba(126, 232, 204, 0.26), transparent 22%),
               radial-gradient(circle at 50% 88%, rgba(178, 104, 255, 0.28), transparent 22%),
               linear-gradient(145deg, rgba(65, 96, 151, 0.38), rgba(42, 35, 92, 0.42));
-            border: 2px solid rgba(126, 232, 204, 0.58);
+            border: 16px solid transparent;
             box-shadow:
               0 0 22px rgba(126, 232, 204, 0.28),
               0 0 34px rgba(178, 104, 255, 0.22),
@@ -2716,6 +2726,16 @@ export default function HubSyntaxSentinelGame() {
             clip-path: polygon(37% 0, 63% 0, 72% 25%, 100% 37%, 100% 63%, 72% 75%, 63% 100%, 37% 100%, 28% 75%, 0 63%, 0 37%, 28% 25%);
             pointer-events: auto;
             cursor: grab;
+            background-clip: padding-box;
+          }
+
+          .sentinel-dpad-shell::before {
+            content: "";
+            position: absolute;
+            inset: 16px;
+            border: 2px solid rgba(126, 232, 204, 0.58);
+            clip-path: inherit;
+            pointer-events: none;
           }
 
           .sentinel-dpad-shell span {
