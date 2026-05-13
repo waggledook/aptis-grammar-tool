@@ -805,6 +805,20 @@ export async function logHubNegatrisCompleted(details = {}) {
   });
 }
 
+export async function logHubSyntaxSentinelStarted(details = {}) {
+  return logActivity("hub_syntax_sentinel_started", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
+export async function logHubSyntaxSentinelCompleted(details = {}) {
+  return logActivity("hub_syntax_sentinel_completed", {
+    app: "seifhub",
+    ...details,
+  });
+}
+
 export async function logHubSpanglishLiveHosted(details = {}) {
   return logActivity("hub_spanglish_live_hosted", {
     app: "seifhub",

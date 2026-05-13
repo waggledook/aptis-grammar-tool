@@ -16,6 +16,7 @@ import {
 const SPANGLISH_GAME_ID = "hub_spanglish_fixit";
 const NEGATRIS_GAME_ID = "hub_negatris";
 const COLLOCATION_DASH_GAME_ID = "collocation_dash";
+const SYNTAX_SENTINEL_GAME_ID = "hub_syntax_sentinel";
 
 function boardGameIdForDependent(levelId) {
   return `hub_dependent_prepositions_${levelId}`;
@@ -100,6 +101,8 @@ export default function HubGameLeaderboards({ user }) {
   const [negatrisGlobal, setNegatrisGlobal] = useState([]);
   const [spanglishPersonal, setSpanglishPersonal] = useState([]);
   const [spanglishGlobal, setSpanglishGlobal] = useState([]);
+  const [syntaxSentinelPersonal, setSyntaxSentinelPersonal] = useState([]);
+  const [syntaxSentinelGlobal, setSyntaxSentinelGlobal] = useState([]);
   const [collocationPersonal, setCollocationPersonal] = useState([]);
   const [collocationGlobal, setCollocationGlobal] = useState([]);
   const [dependentPersonal, setDependentPersonal] = useState([]);
@@ -129,6 +132,29 @@ export default function HubGameLeaderboards({ user }) {
     }
 
     loadNegatris();
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.uid]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadSyntaxSentinel() {
+      try {
+        const [global, personal] = await Promise.all([
+          fetchTopHubGameScores(SYNTAX_SENTINEL_GAME_ID, 10),
+          user?.uid ? fetchMyTopHubGameScores(SYNTAX_SENTINEL_GAME_ID, 3, user.uid) : Promise.resolve([]),
+        ]);
+        if (cancelled) return;
+        setSyntaxSentinelGlobal(global);
+        setSyntaxSentinelPersonal(personal);
+      } catch (error) {
+        console.error("[HubGameLeaderboards] Syntax Sentinel leaderboard load failed", error);
+      }
+    }
+
+    loadSyntaxSentinel();
     return () => {
       cancelled = true;
     };
@@ -270,6 +296,18 @@ export default function HubGameLeaderboards({ user }) {
         user={user}
         deletingId={getDeletingIdFor(SPANGLISH_GAME_ID)}
         onDeleteGlobalScore={(entry) => handleDeleteGlobalScore(SPANGLISH_GAME_ID, entry, setSpanglishGlobal)}
+      />
+
+      <BoardSection
+        title="The Syntax Sentinel"
+        subtitle="One shared board for the game."
+        personalScores={syntaxSentinelPersonal}
+        globalScores={syntaxSentinelGlobal}
+        user={user}
+        deletingId={getDeletingIdFor(SYNTAX_SENTINEL_GAME_ID)}
+        onDeleteGlobalScore={(entry) =>
+          handleDeleteGlobalScore(SYNTAX_SENTINEL_GAME_ID, entry, setSyntaxSentinelGlobal)
+        }
       />
 
       <BoardSection

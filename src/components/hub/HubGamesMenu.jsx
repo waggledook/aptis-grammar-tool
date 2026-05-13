@@ -72,6 +72,13 @@ export default function HubGamesMenu() {
             Steer falling words into the correct negative-prefix lane and build speed, streaks, and word-building accuracy.
           </p>
         </button>
+
+        <button className="menu-card" onClick={() => navigate(getSitePath("/games/syntax-sentinel"))}>
+          <h3>The Syntax Sentinel</h3>
+          <p>
+            Protect a sentence stem by blasting bad endings and letting the correct gerund click safely into place.
+          </p>
+        </button>
       </div>
 
       <style>{`
