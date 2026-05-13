@@ -6,10 +6,10 @@ import { getSitePath } from "../../siteConfig.js";
 const GAME_WIDTH = 1000;
 const GAME_HEIGHT = 560;
 const BASE_X = 0;
-const BASE_WIDTH = 148;
-const BASE_HEIGHT = 118;
+const BASE_WIDTH = 190;
+const BASE_HEIGHT = 142;
 const DOCK_WIDTH = 118;
-const DOCK_LINE_X = 170;
+const DOCK_LINE_X = 230;
 const DOCK_LEFT = DOCK_LINE_X;
 const DOCK_ASSET = "/images/syntax-sentinel/docking-gate-slim.png";
 const SHIP_X = DOCK_LINE_X + 58;
@@ -28,15 +28,19 @@ const BAD_DOCK_SOUND = "/sounds/syntax-sentinel-bad-dock.mp3";
 const BAD_DOCK_VOLUME = 0.5;
 const SHATTER_SOUND = "/sounds/syntax-sentinel-shatter.mp3";
 const SHATTER_VOLUME = 0.56;
+const PROMPT_COMPLETE_SOUND = "/sounds/syntax-sentinel-prompt-complete.mp3";
+const PROMPT_COMPLETE_VOLUME = 0.52;
+const CLEAN_KILL_SOUND = "/sounds/syntax-sentinel-clean-kill-pop.mp3";
+const CLEAN_KILL_VOLUME = 0.5;
 const PROJECTILE_HEIGHT = 7;
 const PROJECTILE_WIDTH = 36;
 const PROJECTILE_SPEED = 680;
-const DEBRIS_HEIGHT = 38;
+const DEBRIS_HEIGHT = 46;
 const DEBRIS_SPAWN_GAP_MIN = 28;
 const DEBRIS_SPAWN_GAP_MAX = 96;
 const DEBRIS_TOP_BOUND = 48;
 const DEBRIS_BOTTOM_PADDING = 28;
-const DEBRIS_VERTICAL_GAP = 76;
+const DEBRIS_VERTICAL_GAP = 88;
 const MIN_SPAWN_DELAY_MS = 850;
 const MAX_SPAWN_DELAY_MS = 2800;
 const PROMPT_DEPART_DELAY_MS = 760;
@@ -332,8 +336,12 @@ function buildPromptOrder() {
   return shuffle(PROMPT_SETS.map((_, index) => index));
 }
 
+function cleanPhraseText(text) {
+  return text.replace(/^\s*\.\.\.\s*/, "");
+}
+
 function estimateDebrisWidth(text) {
-  return clamp(text.length * 9.2 + 30, 76, 230);
+  return clamp(text.length * 11.8 + 58, 112, 340);
 }
 
 function clampToStage(value, min, max) {
@@ -364,7 +372,7 @@ function makeDebris(promptItem, difficulty, stageSize = DEFAULT_STAGE_SIZE, unav
   const isGood = remainingCorrect.length > 0 && Math.random() < 0.42;
   const correctEnding = isGood ? remainingCorrect[Math.floor(Math.random() * remainingCorrect.length)] : null;
   const distractor = promptItem.distractors[Math.floor(Math.random() * promptItem.distractors.length)];
-  const text = correctEnding?.text || distractor;
+  const text = cleanPhraseText(correctEnding?.text || distractor);
   const width = estimateDebrisWidth(text);
   const speed = randomBetween(82 + difficulty * 9, 118 + difficulty * 12);
   const y = chooseDebrisY(stageSize, activeDebris);
@@ -443,6 +451,8 @@ export default function HubSyntaxSentinelGame() {
   const correctDockSoundRef = useRef(null);
   const badDockSoundRef = useRef(null);
   const shatterSoundRef = useRef(null);
+  const promptCompleteSoundRef = useRef(null);
+  const cleanKillSoundRef = useRef(null);
   const stageSizeRef = useRef(DEFAULT_STAGE_SIZE);
   const debrisRef = useRef([]);
   const projectilesRef = useRef([]);
@@ -792,9 +802,32 @@ export default function HubSyntaxSentinelGame() {
     sound.play().catch(() => {});
   }
 
+  function playPromptCompleteSound() {
+    if (typeof window === "undefined") return;
+    if (!promptCompleteSoundRef.current) {
+      promptCompleteSoundRef.current = new window.Audio(PROMPT_COMPLETE_SOUND);
+    }
+    const sound = promptCompleteSoundRef.current;
+    sound.volume = PROMPT_COMPLETE_VOLUME;
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+  }
+
+  function playCleanKillSound() {
+    if (typeof window === "undefined") return;
+    if (!cleanKillSoundRef.current) {
+      cleanKillSoundRef.current = new window.Audio(CLEAN_KILL_SOUND);
+    }
+    const sound = cleanKillSoundRef.current;
+    sound.volume = CLEAN_KILL_VOLUME;
+    sound.currentTime = 0;
+    sound.play().catch(() => {});
+  }
+
   function launchNextPromptSet() {
     if (promptTransitionRef.current) window.clearTimeout(promptTransitionRef.current);
 
+    playPromptCompleteSound();
     pendingPromptLaunchRef.current = true;
     basePhaseRef.current = "complete";
     setBasePhase("complete");
@@ -907,6 +940,7 @@ export default function HubSyntaxSentinelGame() {
   }
 
   function rewardShot(debrisItem) {
+    playCleanKillSound();
     const nextStreak = streakRef.current + 1;
     const points = 25 * getMultiplier(nextStreak);
     streakRef.current = nextStreak;
@@ -1732,10 +1766,10 @@ export default function HubSyntaxSentinelGame() {
         .sentinel-round-badge {
           position: absolute;
           top: calc(50% - ${BASE_HEIGHT / 2}px - 34px);
-          left: ${DOCK_LINE_X - BASE_WIDTH - 12}px;
+          left: ${DOCK_LINE_X - BASE_WIDTH - 16}px;
           z-index: 4;
-          min-width: 82px;
-          padding: 0.28rem 0.52rem;
+          min-width: 104px;
+          padding: 0.34rem 0.62rem;
           border-radius: 999px;
           border: 1px solid rgba(248, 211, 93, 0.42);
           background:
@@ -1744,7 +1778,7 @@ export default function HubSyntaxSentinelGame() {
             0 0 16px rgba(248, 211, 93, 0.14),
             inset 0 0 14px rgba(248, 211, 93, 0.06);
           color: #f8d35d;
-          font-size: 0.62rem;
+          font-size: 0.72rem;
           font-weight: 900;
           letter-spacing: 0.08em;
           text-align: center;
@@ -1755,15 +1789,15 @@ export default function HubSyntaxSentinelGame() {
         .sentinel-prompt-base {
           position: absolute;
           top: 50%;
-          left: ${DOCK_LINE_X - BASE_WIDTH - 12}px;
+          left: ${DOCK_LINE_X - BASE_WIDTH - 16}px;
           z-index: 3;
           width: ${BASE_WIDTH}px;
           height: ${BASE_HEIGHT}px;
           box-sizing: border-box;
-          padding: 0.78rem 0.62rem;
+          padding: 0.98rem 0.82rem;
           transform: translateY(-50%);
           border: 1px solid rgba(180, 255, 246, 0.34);
-          border-radius: 6px;
+          border-radius: 8px;
           background: rgba(8, 18, 26, 0.24);
           box-shadow: inset 0 0 28px rgba(126, 232, 204, 0.1);
           opacity: 1;
@@ -1794,15 +1828,15 @@ export default function HubSyntaxSentinelGame() {
           display: block;
           color: rgba(247, 251, 255, 0.68);
           font-style: normal;
-          font-size: 0.62rem;
+          font-size: 0.78rem;
           font-weight: 800;
           transition: opacity 0.28s ease;
         }
 
         .sentinel-prompt-base strong {
           display: block;
-          margin: 0.22rem 0;
-          font-size: 0.98rem;
+          margin: 0.28rem 0;
+          font-size: 1.2rem;
           line-height: 1.05;
           color: #fff6d9;
           transition: opacity 0.28s ease;
@@ -1949,8 +1983,8 @@ export default function HubSyntaxSentinelGame() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          padding: 0.34rem 0.58rem;
-          font-size: 0.8rem;
+          padding: 0.42rem 0.76rem;
+          font-size: 1rem;
           font-weight: 900;
           letter-spacing: 0.02em;
           color: #f7f0d3;
@@ -2525,8 +2559,8 @@ export default function HubSyntaxSentinelGame() {
           .sentinel-dpad-shell {
             left: 6px;
             bottom: 2px;
-            width: 156px;
-            height: 156px;
+            width: 176px;
+            height: 176px;
             border-radius: 38% 38% 38% 38% / 44% 44% 44% 44%;
             background:
               radial-gradient(circle at 50% 50%, rgba(129, 232, 255, 0.3), rgba(94, 143, 255, 0.13) 30%, transparent 33%),
@@ -2556,8 +2590,8 @@ export default function HubSyntaxSentinelGame() {
           }
 
           .sentinel-dpad-shell span {
-            width: 48px;
-            height: 48px;
+            width: 56px;
+            height: 56px;
             border-radius: 50%;
             background: radial-gradient(circle at 40% 35%, rgba(180, 244, 255, 0.38), rgba(75, 112, 176, 0.22) 62%, rgba(26, 23, 52, 0.62));
             border: 2px solid rgba(126, 232, 204, 0.7);
