@@ -12,6 +12,13 @@ const DOCK_WIDTH = 118;
 const DOCK_LINE_X = 230;
 const DOCK_LEFT = DOCK_LINE_X;
 const DOCK_ASSET = "/images/syntax-sentinel/docking-gate-slim.png";
+const ASTEROID_ASSETS = [
+  "/images/syntax-sentinel/asteroid-cyan-round.png",
+  "/images/syntax-sentinel/asteroid-purple-crystal.png",
+  "/images/syntax-sentinel/asteroid-cyan-wreckage.png",
+  "/images/syntax-sentinel/asteroid-cyan-purple-rock.png",
+];
+const ENERGY_CELL_ASSET = "/images/syntax-sentinel/energy-cell-shield.png";
 const SHIP_X = DOCK_LINE_X + 58;
 const SHIP_WIDTH = 91;
 const SHIP_HEIGHT = 77;
@@ -41,8 +48,13 @@ const DEBRIS_SPAWN_GAP_MAX = 96;
 const DEBRIS_TOP_BOUND = 48;
 const DEBRIS_BOTTOM_PADDING = 28;
 const DEBRIS_VERTICAL_GAP = 88;
-const MIN_SPAWN_DELAY_MS = 850;
+const BONUS_SPAWN_DELAY_MIN_MS = 6200;
+const BONUS_SPAWN_DELAY_MAX_MS = 12800;
+const MAX_BONUS_OBJECTS = 2;
+const ENERGY_CELL_SIZE = 62;
+const MIN_SPAWN_DELAY_MS = 520;
 const MAX_SPAWN_DELAY_MS = 2800;
+const MAX_DIFFICULTY = 28;
 const PROMPT_DEPART_DELAY_MS = 760;
 const PROMPT_ARRIVE_DELAY_MS = 980;
 const MAX_SHIELD = 4;
@@ -396,6 +408,36 @@ function makeDebris(promptItem, difficulty, stageSize = DEFAULT_STAGE_SIZE, unav
   };
 }
 
+function getBonusSpawnDelay() {
+  return randomBetween(BONUS_SPAWN_DELAY_MIN_MS, BONUS_SPAWN_DELAY_MAX_MS);
+}
+
+function makeBonusObject(stageSize = DEFAULT_STAGE_SIZE, shield = MAX_SHIELD) {
+  const canSpawnEnergy = shield < MAX_SHIELD;
+  const type = canSpawnEnergy && Math.random() < 0.26 ? "energy" : "asteroid";
+  const size = type === "energy" ? ENERGY_CELL_SIZE : Math.round(randomBetween(54, 98));
+  const speed = type === "energy" ? randomBetween(72, 104) : randomBetween(98, 178);
+  const asset =
+    type === "energy" ? ENERGY_CELL_ASSET : ASTEROID_ASSETS[Math.floor(Math.random() * ASTEROID_ASSETS.length)];
+  const points = type === "energy" ? 0 : Math.round(clamp((104 - size) * 1.2 + speed * 0.28, 35, 95));
+
+  return {
+    id: `bonus-${type}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    type,
+    asset,
+    size,
+    points,
+    x: stageSize.width + randomBetween(42, 130),
+    y: randomBetween(58, stageSize.height - size - 44),
+    speed,
+    rotation: randomBetween(0, 360),
+    spin: randomBetween(28, 86) * (Math.random() < 0.5 ? -1 : 1),
+    wobble: randomBetween(0, Math.PI * 2),
+    drift: randomBetween(8, 22),
+    driftRate: randomBetween(620, 1180),
+  };
+}
+
 function formatMultiplier(streak) {
   return `x${Math.max(1, Math.floor(streak / 3) + 1)}`;
 }
@@ -406,16 +448,19 @@ function getMultiplier(streak) {
 
 function getDifficultyLevel(stats) {
   const progress = (stats?.docked || 0) + (stats?.protected || 0);
-  return Math.min(12, Math.floor(progress / 3));
+  return Math.min(MAX_DIFFICULTY, Math.floor(progress / 4));
 }
 
 function getSpawnDelay(difficulty) {
-  const eased = Math.pow(clamp(difficulty / 12, 0, 1), 0.78);
+  const eased = Math.pow(clamp(difficulty / MAX_DIFFICULTY, 0, 1), 0.82);
   return Math.round(MAX_SPAWN_DELAY_MS - (MAX_SPAWN_DELAY_MS - MIN_SPAWN_DELAY_MS) * eased);
 }
 
 function getMaxActiveDebris(difficulty) {
-  return difficulty >= 5 ? 2 : 1;
+  if (difficulty >= 22) return 4;
+  if (difficulty >= 12) return 3;
+  if (difficulty >= 5) return 2;
+  return 1;
 }
 
 function getExpandedViewportSize() {
@@ -442,6 +487,7 @@ export default function HubSyntaxSentinelGame() {
   const joystickPointerIdRef = useRef(null);
   const lastFrameRef = useRef(0);
   const spawnTimerRef = useRef(0);
+  const bonusSpawnTimerRef = useRef(getBonusSpawnDelay());
   const promptTransitionRef = useRef(null);
   const dockEffectTimeoutRef = useRef(null);
   const shotEffectTimeoutRef = useRef(null);
@@ -455,6 +501,7 @@ export default function HubSyntaxSentinelGame() {
   const cleanKillSoundRef = useRef(null);
   const stageSizeRef = useRef(DEFAULT_STAGE_SIZE);
   const debrisRef = useRef([]);
+  const bonusObjectsRef = useRef([]);
   const projectilesRef = useRef([]);
   const shipXRef = useRef(SHIP_X);
   const shipYRef = useRef(GAME_HEIGHT / 2);
@@ -479,6 +526,7 @@ export default function HubSyntaxSentinelGame() {
   const [shipX, setShipX] = useState(SHIP_X);
   const [shipY, setShipY] = useState(GAME_HEIGHT / 2);
   const [debris, setDebris] = useState([]);
+  const [bonusObjects, setBonusObjects] = useState([]);
   const [projectiles, setProjectiles] = useState([]);
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
@@ -542,6 +590,10 @@ export default function HubSyntaxSentinelGame() {
   useEffect(() => {
     debrisRef.current = debris;
   }, [debris]);
+
+  useEffect(() => {
+    bonusObjectsRef.current = bonusObjects;
+  }, [bonusObjects]);
 
   useEffect(() => {
     projectilesRef.current = projectiles;
@@ -640,13 +692,15 @@ export default function HubSyntaxSentinelGame() {
     return () => observer.disconnect();
   }, [isExpanded]);
 
-  function syncFrame(nextDebris, nextProjectiles, nextShipX, nextShipY) {
+  function syncFrame(nextDebris, nextProjectiles, nextBonusObjects, nextShipX, nextShipY) {
     debrisRef.current = nextDebris;
     projectilesRef.current = nextProjectiles;
+    bonusObjectsRef.current = nextBonusObjects;
     shipXRef.current = nextShipX;
     shipYRef.current = nextShipY;
     setDebris(nextDebris);
     setProjectiles(nextProjectiles);
+    setBonusObjects(nextBonusObjects);
     setShipX(nextShipX);
     setShipY(nextShipY);
   }
@@ -892,7 +946,7 @@ export default function HubSyntaxSentinelGame() {
     }
   }
 
-  function punishFriendlyFire(debrisItem) {
+  function crackShieldWarning(firstWarning, secondWarning) {
     playShatterSound();
     setStreak(0);
     streakRef.current = 0;
@@ -902,7 +956,7 @@ export default function HubSyntaxSentinelGame() {
     if (shieldCracksRef.current > 0) {
       shieldCracksRef.current = 0;
       setShieldCracks(0);
-      damageShield(`Second friendly-fire hit: ${debrisItem.text} shattered a shield segment.`, {
+      damageShield(secondWarning, {
         skipSound: true,
         skipMistake: true,
       });
@@ -911,7 +965,21 @@ export default function HubSyntaxSentinelGame() {
 
     shieldCracksRef.current = 1;
     setShieldCracks(1);
-    updateFeedback(`Careful: ${debrisItem.text} was correct. One more friendly-fire hit will break a shield segment.`);
+    updateFeedback(firstWarning);
+  }
+
+  function punishFriendlyFire(debrisItem) {
+    crackShieldWarning(
+      `Careful: ${debrisItem.text} was correct. One more shield crack will break a segment.`,
+      `Second shield crack: ${debrisItem.text} shattered a shield segment.`,
+    );
+  }
+
+  function punishMissedAsteroid() {
+    crackShieldWarning(
+      "Asteroid breached the gate. One more shield crack will break a segment.",
+      "Second shield crack: asteroid impact shattered a shield segment.",
+    );
   }
 
   function rewardDock(debrisItem) {
@@ -951,6 +1019,25 @@ export default function HubSyntaxSentinelGame() {
     updateFeedback(`${debrisItem.text} neutralised. Keep the correct -ing forms alive.`);
   }
 
+  function rewardAsteroidShot(bonusItem) {
+    playCleanKillSound();
+    scoreRef.current += bonusItem.points;
+    setScore(scoreRef.current);
+    updateFeedback(`Asteroid shattered. Bonus +${bonusItem.points}.`);
+  }
+
+  function collectEnergyCell() {
+    if (shieldRef.current >= MAX_SHIELD) return;
+    playCorrectDockSound();
+    shieldCracksRef.current = 0;
+    setShieldCracks(0);
+    const nextShield = Math.min(MAX_SHIELD, shieldRef.current + 1);
+    shieldRef.current = nextShield;
+    setShield(nextShield);
+    pulse("good");
+    updateFeedback("Energy cell absorbed. Shield restored by one segment.");
+  }
+
   function fireProjectile() {
     playBlasterSound();
     const projectile = {
@@ -972,8 +1059,10 @@ export default function HubSyntaxSentinelGame() {
     joystickPointerIdRef.current = null;
     lastFrameRef.current = performance.now();
     spawnTimerRef.current = 0;
+    bonusSpawnTimerRef.current = getBonusSpawnDelay();
     pendingPromptLaunchRef.current = false;
     debrisRef.current = [];
+    bonusObjectsRef.current = [];
     projectilesRef.current = [];
     joystickVectorRef.current = { x: 0, y: 0 };
     shipXRef.current = SHIP_X;
@@ -992,6 +1081,7 @@ export default function HubSyntaxSentinelGame() {
 
     setMode("playing");
     setDebris([]);
+    setBonusObjects([]);
     setProjectiles([]);
     setJoystickKnob({ x: 0, y: 0 });
     setShipX(SHIP_X);
@@ -1045,10 +1135,32 @@ export default function HubSyntaxSentinelGame() {
       ),
     }));
 
+    const difficulty = getDifficultyLevel(statsRef.current);
+    bonusSpawnTimerRef.current -= dt * 1000;
+    let nextBonusObjects = bonusObjectsRef.current
+      .map((item) => ({
+        ...item,
+        x: item.x - item.speed * dt,
+        y: clamp(
+          item.y + Math.sin(now / item.driftRate + item.wobble) * item.drift * dt,
+          48,
+          stage.height - item.size - 36,
+        ),
+        rotation: item.rotation + item.spin * dt,
+      }))
+      .filter((item) => item.x > -item.size - 24);
+
+    if (bonusSpawnTimerRef.current <= 0 && nextBonusObjects.length < MAX_BONUS_OBJECTS) {
+      const bonusItem = makeBonusObject(stage, shieldRef.current);
+      bonusItem.speed += difficulty * 3.4;
+      nextBonusObjects = [...nextBonusObjects, bonusItem];
+      bonusSpawnTimerRef.current = getBonusSpawnDelay();
+    }
+
     if (
       basePhaseRef.current === "active" &&
       spawnTimerRef.current <= 0 &&
-      nextDebris.length < getMaxActiveDebris(getDifficultyLevel(statsRef.current))
+      nextDebris.length < getMaxActiveDebris(difficulty)
     ) {
       const unavailableCorrectIds = new Set(completedCorrectIdsRef.current);
       nextDebris.forEach((item) => {
@@ -1058,13 +1170,13 @@ export default function HubSyntaxSentinelGame() {
         ...nextDebris,
         makeDebris(
           PROMPT_SETS[promptIndexRef.current],
-          getDifficultyLevel(statsRef.current),
+          difficulty,
           stage,
           unavailableCorrectIds,
           nextDebris,
         ),
       ];
-      spawnTimerRef.current = getSpawnDelay(getDifficultyLevel(statsRef.current));
+      spawnTimerRef.current = getSpawnDelay(difficulty);
     }
 
     let nextProjectiles = projectilesRef.current
@@ -1072,9 +1184,27 @@ export default function HubSyntaxSentinelGame() {
       .filter((projectile) => projectile.x < stage.width - PROJECTILE_WIDTH / 2);
 
     const hitDebrisIds = new Set();
+    const hitBonusIds = new Set();
     const hitProjectileIds = new Set();
 
     for (const projectile of nextProjectiles) {
+      for (const bonusItem of nextBonusObjects) {
+        if (bonusItem.type !== "asteroid" || hitBonusIds.has(bonusItem.id)) continue;
+        const projectileCenterX = projectile.x + PROJECTILE_WIDTH / 2;
+        const projectileCenterY = projectile.y + PROJECTILE_HEIGHT / 2;
+        const bonusCenterX = bonusItem.x + bonusItem.size / 2;
+        const bonusCenterY = bonusItem.y + bonusItem.size / 2;
+        const hitRadius = bonusItem.size * 0.42 + PROJECTILE_WIDTH / 2;
+        if (Math.hypot(projectileCenterX - bonusCenterX, projectileCenterY - bonusCenterY) < hitRadius) {
+          hitBonusIds.add(bonusItem.id);
+          hitProjectileIds.add(projectile.id);
+          showShotEffect("enemy", bonusCenterX, bonusCenterY);
+          rewardAsteroidShot(bonusItem);
+          break;
+        }
+      }
+      if (hitProjectileIds.has(projectile.id)) continue;
+
       for (const item of nextDebris) {
         if (hitDebrisIds.has(item.id)) continue;
         const projectileCenterX = projectile.x + PROJECTILE_WIDTH / 2;
@@ -1099,9 +1229,35 @@ export default function HubSyntaxSentinelGame() {
     }
 
     nextDebris = nextDebris.filter((item) => !hitDebrisIds.has(item.id));
+    nextBonusObjects = nextBonusObjects.filter((item) => !hitBonusIds.has(item.id));
     nextProjectiles = nextProjectiles.filter((projectile) => !hitProjectileIds.has(projectile.id));
 
+    const shipCenterX = nextShipX + SHIP_WIDTH / 2;
+    const shipCenterY = nextShipY;
+    const collectedBonusIds = new Set();
+    for (const bonusItem of nextBonusObjects) {
+      if (bonusItem.type !== "energy") continue;
+      const bonusCenterX = bonusItem.x + bonusItem.size / 2;
+      const bonusCenterY = bonusItem.y + bonusItem.size / 2;
+      if (Math.hypot(shipCenterX - bonusCenterX, shipCenterY - bonusCenterY) < bonusItem.size * 0.52 + 28) {
+        collectedBonusIds.add(bonusItem.id);
+        collectEnergyCell();
+      }
+    }
+    nextBonusObjects = nextBonusObjects.filter((item) => !collectedBonusIds.has(item.id));
+
     const dockedOrDamagedIds = new Set();
+    const breachedBonusIds = new Set();
+    for (const item of nextBonusObjects) {
+      if (item.type !== "asteroid") continue;
+      if (item.x <= DOCK_LINE_X - item.size * 0.5) {
+        breachedBonusIds.add(item.id);
+        showDockEffect("bad", DOCK_LINE_X);
+        punishMissedAsteroid();
+      }
+    }
+    nextBonusObjects = nextBonusObjects.filter((item) => !breachedBonusIds.has(item.id));
+
     for (const item of nextDebris) {
       if (item.x <= DOCK_LINE_X) {
         dockedOrDamagedIds.add(item.id);
@@ -1119,7 +1275,7 @@ export default function HubSyntaxSentinelGame() {
     if (pendingPromptLaunchRef.current && nextDebris.length === 0) {
       beginPromptDeparture();
     }
-    syncFrame(nextDebris, nextProjectiles, nextShipX, nextShipY);
+    syncFrame(nextDebris, nextProjectiles, nextBonusObjects, nextShipX, nextShipY);
     animationRef.current = window.requestAnimationFrame(tick);
   }
 
@@ -1310,6 +1466,21 @@ export default function HubSyntaxSentinelGame() {
             key={projectile.id}
             className="sentinel-bolt"
             style={{ transform: `translate(${projectile.x}px, ${projectile.y}px)` }}
+          />
+        ))}
+
+        {bonusObjects.map((item) => (
+          <img
+            key={item.id}
+            className={`sentinel-bonus-object ${item.type}`}
+            src={item.asset}
+            alt=""
+            draggable="false"
+            style={{
+              width: `${item.size}px`,
+              height: `${item.size}px`,
+              transform: `translate(${item.x}px, ${item.y}px) rotate(${item.rotation}deg)`,
+            }}
           />
         ))}
 
@@ -1911,6 +2082,31 @@ export default function HubSyntaxSentinelGame() {
           box-shadow: 0 0 16px rgba(248, 211, 93, 0.9);
         }
 
+        .sentinel-bonus-object {
+          position: absolute;
+          left: 0;
+          top: 0;
+          z-index: 4;
+          object-fit: contain;
+          pointer-events: none;
+          user-select: none;
+          will-change: transform;
+        }
+
+        .sentinel-bonus-object.asteroid {
+          filter:
+            drop-shadow(0 0 10px rgba(97, 234, 255, 0.22))
+            drop-shadow(0 10px 14px rgba(0, 0, 0, 0.28));
+        }
+
+        .sentinel-bonus-object.energy {
+          z-index: 5;
+          filter:
+            drop-shadow(0 0 12px rgba(96, 247, 255, 0.68))
+            drop-shadow(0 0 22px rgba(126, 232, 204, 0.36));
+          animation: sentinelEnergyPulse 1.25s ease-in-out infinite;
+        }
+
         .sentinel-shot-effect {
           position: absolute;
           z-index: 7;
@@ -2343,6 +2539,22 @@ export default function HubSyntaxSentinelGame() {
           100% {
             opacity: 0;
             transform: scale(2.2);
+          }
+        }
+
+        @keyframes sentinelEnergyPulse {
+          0%, 100% {
+            opacity: 0.88;
+            filter:
+              drop-shadow(0 0 12px rgba(96, 247, 255, 0.62))
+              drop-shadow(0 0 22px rgba(126, 232, 204, 0.32));
+          }
+
+          50% {
+            opacity: 1;
+            filter:
+              drop-shadow(0 0 18px rgba(96, 247, 255, 0.88))
+              drop-shadow(0 0 34px rgba(126, 232, 204, 0.5));
           }
         }
 
