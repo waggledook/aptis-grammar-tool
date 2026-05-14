@@ -1465,20 +1465,23 @@ export default function HubCourseTestRunner({ user }) {
         return;
       }
 
-      await saveCourseTestAttemptDraft(activeAttempt.id, {
+      const saveResult = await saveCourseTestAttemptDraft(activeAttempt.id, {
         runnerState: nextRunnerState,
         autoScore,
         autoTotal,
       });
+      const savedRunnerState = saveResult?.runnerState || nextRunnerState;
+      const savedAutoScore = Number(saveResult?.autoScore ?? autoScore);
+      const savedAutoTotal = Number(saveResult?.autoTotal ?? autoTotal);
 
       setAttempt((prev) =>
         prev
           ? {
               ...prev,
-              runnerState: nextRunnerState,
-              autoScore,
-              autoTotal,
-              percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+              runnerState: savedRunnerState,
+              autoScore: savedAutoScore,
+              autoTotal: savedAutoTotal,
+              percent: savedAutoTotal > 0 ? Math.round((savedAutoScore / savedAutoTotal) * 100) : 0,
             }
           : prev
       );
@@ -1876,20 +1879,23 @@ export default function HubCourseTestRunner({ user }) {
         return;
       }
 
-      await saveCourseTestAttemptDraft(attempt.id, {
+      const saveResult = await saveCourseTestAttemptDraft(attempt.id, {
         runnerState: nextRunnerState,
         autoScore,
         autoTotal,
       });
+      const savedRunnerState = saveResult?.runnerState || nextRunnerState;
+      const savedAutoScore = Number(saveResult?.autoScore ?? autoScore);
+      const savedAutoTotal = Number(saveResult?.autoTotal ?? autoTotal);
 
       setAttempt((prev) =>
         prev
           ? {
               ...prev,
-              runnerState: nextRunnerState,
-              autoScore,
-              autoTotal,
-              percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+              runnerState: savedRunnerState,
+              autoScore: savedAutoScore,
+              autoTotal: savedAutoTotal,
+              percent: savedAutoTotal > 0 ? Math.round((savedAutoScore / savedAutoTotal) * 100) : 0,
             }
           : prev
       );
@@ -1939,20 +1945,23 @@ export default function HubCourseTestRunner({ user }) {
         return;
       }
 
-      await submitCourseTestAttempt(attempt.id, {
+      const saveResult = await submitCourseTestAttempt(attempt.id, {
         runnerState: nextRunnerState,
         autoScore,
         autoTotal,
       });
+      const savedRunnerState = saveResult?.runnerState || nextRunnerState;
+      const savedAutoScore = Number(saveResult?.autoScore ?? autoScore);
+      const savedAutoTotal = Number(saveResult?.autoTotal ?? autoTotal);
 
       setAttempt((prev) =>
         prev
           ? {
               ...prev,
-              runnerState: nextRunnerState,
-              autoScore,
-              autoTotal,
-              percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+              runnerState: savedRunnerState,
+              autoScore: savedAutoScore,
+              autoTotal: savedAutoTotal,
+              percent: savedAutoTotal > 0 ? Math.round((savedAutoScore / savedAutoTotal) * 100) : 0,
               completed: true,
               submittedAt: new Date().toISOString(),
             }
@@ -2019,19 +2028,22 @@ export default function HubCourseTestRunner({ user }) {
         currentSectionId,
       };
       const { autoScore, autoTotal } = calculateAutoScore(mainSections, sectionAnswers);
-      await saveCourseTestAttemptDraft(attempt.id, {
+      const saveResult = await saveCourseTestAttemptDraft(attempt.id, {
         runnerState: nextRunnerState,
         autoScore,
         autoTotal,
       });
+      const savedRunnerState = saveResult?.runnerState || nextRunnerState;
+      const savedAutoScore = Number(saveResult?.autoScore ?? autoScore);
+      const savedAutoTotal = Number(saveResult?.autoTotal ?? autoTotal);
       setAttempt((prev) =>
         prev
           ? {
               ...prev,
-              runnerState: nextRunnerState,
-              autoScore,
-              autoTotal,
-              percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+              runnerState: savedRunnerState,
+              autoScore: savedAutoScore,
+              autoTotal: savedAutoTotal,
+              percent: savedAutoTotal > 0 ? Math.round((savedAutoScore / savedAutoTotal) * 100) : 0,
             }
           : prev
       );

@@ -3555,24 +3555,31 @@ export async function startCourseTestAttempt({
 export async function saveCourseTestAttemptDraft(attemptId, data = {}) {
   if (!attemptId) throw new Error("Attempt ID is required.");
 
-  const autoScore = Number(data.autoScore || 0);
-  const autoTotal = Number(data.autoTotal || 0);
+  const protectedData = await protectCourseTestRunnerState(attemptId, data);
+  const autoScore = Number(protectedData.autoScore || 0);
+  const autoTotal = Number(protectedData.autoTotal || 0);
 
   await updateDoc(doc(db, "courseTestAttempts", attemptId), {
-    ...data,
+    ...protectedData,
     percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
     updatedAt: serverTimestamp(),
   });
+  await appendCourseTestAutosave(attemptId, protectedData, "draft");
+  return {
+    ...protectedData,
+    percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+  };
 }
 
 export async function submitCourseTestAttempt(attemptId, data = {}) {
   if (!attemptId) throw new Error("Attempt ID is required.");
 
-  const autoScore = Number(data.autoScore || 0);
-  const autoTotal = Number(data.autoTotal || 0);
+  const protectedData = await protectCourseTestRunnerState(attemptId, data);
+  const autoScore = Number(protectedData.autoScore || 0);
+  const autoTotal = Number(protectedData.autoTotal || 0);
 
   await updateDoc(doc(db, "courseTestAttempts", attemptId), {
-    ...data,
+    ...protectedData,
     percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
     completed: true,
     reviewRequired: true,
@@ -3580,6 +3587,18 @@ export async function submitCourseTestAttempt(attemptId, data = {}) {
     submittedAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   });
+  await appendCourseTestAutosave(
+    attemptId,
+    { ...protectedData, completed: true, reviewStatus: "pending" },
+    "submit"
+  );
+  return {
+    ...protectedData,
+    percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+    completed: true,
+    reviewRequired: true,
+    reviewStatus: "pending",
+  };
 }
 
 export async function saveCourseTestAttemptReview(attemptId, data = {}) {
@@ -3621,6 +3640,89 @@ function sortCourseTestAttempts(rows = []) {
     if (priorityDiff !== 0) return priorityDiff;
     return courseTestAttemptSortTime(b) - courseTestAttemptSortTime(a);
   });
+}
+
+function courseTestValueHasAnswer(value) {
+  if (value == null) return false;
+  if (Array.isArray(value)) return value.some(courseTestValueHasAnswer);
+  if (typeof value === "object") return Object.values(value).some(courseTestValueHasAnswer);
+  return String(value).trim().length > 0;
+}
+
+function courseTestAnswerMapHasAnswers(sectionAnswers = {}) {
+  return Object.values(sectionAnswers || {}).some((sectionMap) => courseTestValueHasAnswer(sectionMap));
+}
+
+function courseTestMapHasKeys(value = {}) {
+  return Boolean(value && typeof value === "object" && Object.keys(value).length > 0);
+}
+
+async function protectCourseTestRunnerState(attemptId, data = {}) {
+  if (!data.runnerState) return data;
+
+  const nextRunnerState = data.runnerState || {};
+  const nextAnswers = nextRunnerState.sectionAnswers || {};
+  const nextStatuses = nextRunnerState.sectionStatuses || {};
+  const nextHasAnswers = courseTestAnswerMapHasAnswers(nextAnswers);
+  const nextHasAnswerKeys = courseTestMapHasKeys(nextAnswers);
+  const nextHasStatusKeys = courseTestMapHasKeys(nextStatuses);
+
+  if (nextHasAnswers && nextHasAnswerKeys && nextHasStatusKeys) return data;
+
+  const snap = await getDoc(doc(db, "courseTestAttempts", attemptId));
+  const previousData = snap.exists() ? snap.data() || {} : {};
+  const previousRunnerState = previousData.runnerState || {};
+  const previousAnswers = previousRunnerState.sectionAnswers || {};
+  const previousStatuses = previousRunnerState.sectionStatuses || {};
+  const previousHasAnswers = courseTestAnswerMapHasAnswers(previousAnswers);
+
+  if (!previousHasAnswers && !courseTestMapHasKeys(previousAnswers) && !courseTestMapHasKeys(previousStatuses)) {
+    return data;
+  }
+
+  const protectedRunnerState = {
+    ...nextRunnerState,
+    sectionAnswers:
+      !nextHasAnswers && previousHasAnswers
+        ? previousAnswers
+        : (!nextHasAnswerKeys && courseTestMapHasKeys(previousAnswers) ? previousAnswers : nextAnswers),
+    sectionStatuses:
+      !nextHasStatusKeys && courseTestMapHasKeys(previousStatuses)
+        ? previousStatuses
+        : nextStatuses,
+    sectionNotes:
+      !courseTestMapHasKeys(nextRunnerState.sectionNotes) && courseTestMapHasKeys(previousRunnerState.sectionNotes)
+        ? previousRunnerState.sectionNotes
+        : (nextRunnerState.sectionNotes || {}),
+    currentSectionId: nextRunnerState.currentSectionId || previousRunnerState.currentSectionId || "",
+  };
+
+  const shouldPreserveScoring = !nextHasAnswers && previousHasAnswers;
+
+  return {
+    ...data,
+    runnerState: protectedRunnerState,
+    autoScore: shouldPreserveScoring ? Number(previousData.autoScore || 0) : data.autoScore,
+    autoTotal: shouldPreserveScoring ? Number(previousData.autoTotal || 0) : data.autoTotal,
+  };
+}
+
+async function appendCourseTestAutosave(attemptId, data = {}, source = "draft") {
+  if (!attemptId || !data.runnerState) return;
+
+  try {
+    await addDoc(collection(db, "courseTestAttempts", attemptId, "autosaves"), {
+      source,
+      runnerState: data.runnerState,
+      autoScore: Number(data.autoScore || 0),
+      autoTotal: Number(data.autoTotal || 0),
+      completed: Boolean(data.completed),
+      reviewStatus: data.reviewStatus || null,
+      createdAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.warn("[course-test] autosave snapshot failed", error);
+  }
 }
 
 export async function listAttemptsForMyCourseTestSession(sessionId) {

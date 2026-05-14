@@ -305,6 +305,29 @@ service cloud.firestore {
       );
 
       allow delete: if false;
+
+      match /autosaves/{autosaveId} {
+        allow get, list: if isSignedIn() && (
+          isAdmin() ||
+          get(/databases/$(database)/documents/courseTestAttempts/$(attemptId)).data.studentUid == request.auth.uid ||
+          get(/databases/$(database)/documents/courseTestAttempts/$(attemptId)).data.teacherUid == request.auth.uid
+        );
+
+        allow create: if isSignedIn() && (
+          isAdmin() ||
+          get(/databases/$(database)/documents/courseTestAttempts/$(attemptId)).data.studentUid == request.auth.uid
+        ) && request.resource.data.keys().hasOnly([
+          "source",
+          "runnerState",
+          "autoScore",
+          "autoTotal",
+          "completed",
+          "reviewStatus",
+          "createdAt"
+        ]);
+
+        allow update, delete: if false;
+      }
     }
 
     // ── 8d) Assigned activities (teacher-assigned site tasks) ──────────
