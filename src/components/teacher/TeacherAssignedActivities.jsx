@@ -7,6 +7,7 @@ import {
   fetchHubDictationSessions,
   fetchHubFlashcardSessions,
   fetchHubGrammarSubmissions,
+  fetchHubTranslationSessions,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
   fetchWritingP3Submissions,
@@ -20,6 +21,7 @@ import {
 import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
 import { HUB_GRAMMAR_FLASHCARD_DECKS } from "../../data/hubGrammarFlashcards.js";
 import { HUB_DICTATION_SETS } from "../../data/hubDictationSets.js";
+import { HUB_TRANSLATION_ALL_SET_ID, HUB_TRANSLATION_SETS } from "../../data/hubTranslationSets.js";
 import { PART2_TASKS } from "../speaking/banks/part2";
 import { PART3_TASKS } from "../speaking/banks/part3";
 import { PART4_TASKS } from "../speaking/banks/part4";
@@ -68,6 +70,20 @@ const ALL_DICTATION_SENTENCES = HUB_DICTATION_SETS.flatMap((set) =>
     id: `${set.id}:${index}`,
     setId: set.id,
     setLabel: set.label,
+  }))
+);
+
+const TRANSLATION_LEVEL_OPTIONS = ["all", ...new Set(HUB_TRANSLATION_SETS.map((set) => set.level).filter(Boolean))];
+
+const ALL_TRANSLATION_ITEMS = HUB_TRANSLATION_SETS.flatMap((set) =>
+  (set.items || []).map((item) => ({
+    ...item,
+    itemId: item.id || item.itemId,
+    id: `${set.id}:${item.id || item.itemId}`,
+    setId: set.id,
+    setLabel: set.label,
+    level: set.level,
+    tags: [...(set.tags || []), ...(item.tags || [])],
   }))
 );
 
@@ -128,6 +144,8 @@ function getAssignmentTypeLabel(type) {
       return "Reading task";
     case "dictation":
       return "Dictation task";
+    case "translation":
+      return "Translation task";
     case "vocabulary-topic":
       return "Vocabulary set";
     default:
@@ -258,6 +276,11 @@ function resolveAssignmentCompletion(assignment, sources) {
     return { completed: completedAt >= assignedAt, completedAt };
   }
 
+  if (assignment?.activityType === "translation") {
+    const completedAt = sources.translation?.[assignment.id] || 0;
+    return { completed: completedAt >= assignedAt, completedAt };
+  }
+
   return { completed: false, completedAt: 0 };
 }
 
@@ -286,6 +309,12 @@ function buildDictationRoutePath(assignmentId) {
   return `${basePath}${separator}assignment=${encodeURIComponent(assignmentId)}`;
 }
 
+function buildTranslationRoutePath(assignmentId) {
+  const basePath = getSitePath("/grammar/translation");
+  const separator = basePath.includes("?") ? "&" : "?";
+  return `${basePath}${separator}assignment=${encodeURIComponent(assignmentId)}`;
+}
+
 export default function TeacherAssignedActivities({ user }) {
   const [students, setStudents] = useState([]);
   const [grammarSets, setGrammarSets] = useState([]);
@@ -302,6 +331,12 @@ export default function TeacherAssignedActivities({ user }) {
   const [dictationSourceSetIds, setDictationSourceSetIds] = useState(() => HUB_DICTATION_SETS.map((set) => set.id));
   const [dictationSearch, setDictationSearch] = useState("");
   const [selectedDictationSentenceIds, setSelectedDictationSentenceIds] = useState([]);
+  const [translationTitle, setTranslationTitle] = useState("");
+  const [translationSetId, setTranslationSetId] = useState(HUB_TRANSLATION_ALL_SET_ID);
+  const [translationLevel, setTranslationLevel] = useState("all");
+  const [translationQuestionCount, setTranslationQuestionCount] = useState(5);
+  const [translationSearch, setTranslationSearch] = useState("");
+  const [selectedTranslationItemIds, setSelectedTranslationItemIds] = useState([]);
   const [targetMode, setTargetMode] = useState("all");
   const [className, setClassName] = useState("");
   const [selectedStudentIds, setSelectedStudentIds] = useState([]);
@@ -326,11 +361,12 @@ export default function TeacherAssignedActivities({ user }) {
         const completionByStudentId = Object.fromEntries(
           await Promise.all(
             (studentRows || []).map(async (student) => {
-              const [vocabProgress, speakingProgress, readingProgress, dictationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+              const [vocabProgress, speakingProgress, readingProgress, dictationSessions, translationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
                 fetchVocabProgressMap(student.id),
                 fetchSpeakingProgressMap(student.id),
                 fetchReadingProgressMap(student.id),
                 fetchHubDictationSessions(200, student.id),
+                fetchHubTranslationSessions(200, student.id),
                 fetchHubFlashcardSessions(200, student.id),
                 fetchHubGrammarSubmissions(200, student.id),
                 listGrammarSetAttemptsForStudent(student.id),
@@ -347,6 +383,7 @@ export default function TeacherAssignedActivities({ user }) {
                   speaking: speakingProgress || {},
                   reading: readingProgress || {},
                   dictation: buildLatestTimeMap(dictationSessions || [], "assignmentId"),
+                  translation: buildLatestTimeMap(translationSessions || [], "assignmentId"),
                   flashcards: {
                     ...buildLatestTimeMap(flashcardSessions || [], "deckId"),
                     ...buildLatestTimeMap(flashcardSessions || [], "assignmentId"),
@@ -381,7 +418,7 @@ export default function TeacherAssignedActivities({ user }) {
               const student = studentMap[studentId];
               const completion = resolveAssignmentCompletion(
                 assignment,
-                completionByStudentId[studentId] || { miniTests: {}, flashcards: {}, grammarSets: {}, writing: {}, speaking: {}, reading: {}, vocabulary: {}, dictation: {} }
+                completionByStudentId[studentId] || { miniTests: {}, flashcards: {}, grammarSets: {}, writing: {}, speaking: {}, reading: {}, vocabulary: {}, dictation: {}, translation: {} }
               );
 
               return {
@@ -499,6 +536,11 @@ export default function TeacherAssignedActivities({ user }) {
         ...dictationPresetOptions,
       ];
     }
+    if (activityType === "translation") {
+      return [
+        { id: "custom-translation", label: "New translation task", routePath: getSitePath("/grammar/translation") },
+      ];
+    }
     if (activityType === "grammar-set") return publishedGrammarSetOptions;
     if (activityType === "flashcards") return flashcardDeckOptions;
     if (activityType === "use-of-english") return useOfEnglishOptions;
@@ -507,6 +549,35 @@ export default function TeacherAssignedActivities({ user }) {
     if (activityType === "reading") return READING_OPTIONS;
     return miniTestOptions;
   }, [activityType, dictationPresetOptions, flashcardDeckOptions, miniTestOptions, publishedGrammarSetOptions, useOfEnglishOptions]);
+
+  const filteredTranslationSets = useMemo(() => {
+    if (translationLevel === "all") return HUB_TRANSLATION_SETS;
+    return HUB_TRANSLATION_SETS.filter((set) => set.level === translationLevel);
+  }, [translationLevel]);
+
+  const filteredTranslationItems = useMemo(() => {
+    const needle = translationSearch.trim().toLowerCase();
+    return ALL_TRANSLATION_ITEMS.filter((item) => {
+      if (translationLevel !== "all" && item.level !== translationLevel) return false;
+      if (translationSetId !== HUB_TRANSLATION_ALL_SET_ID && item.setId !== translationSetId) return false;
+      if (!needle) return true;
+
+      const answerText = [item.english, ...(item.acceptedAnswers || [])].filter(Boolean).join(" ");
+      return (
+        String(item.spanish || "").toLowerCase().includes(needle) ||
+        answerText.toLowerCase().includes(needle) ||
+        String(item.setLabel || "").toLowerCase().includes(needle) ||
+        String(item.questionType || "").toLowerCase().includes(needle)
+      );
+    });
+  }, [translationLevel, translationSearch, translationSetId]);
+
+  const selectedTranslationItems = useMemo(() => {
+    const byId = Object.fromEntries(ALL_TRANSLATION_ITEMS.map((item) => [item.id, item]));
+    return selectedTranslationItemIds.map((id) => byId[id]).filter(Boolean);
+  }, [selectedTranslationItemIds]);
+
+  const translationQuestionPoolSize = filteredTranslationItems.length;
 
   const filteredDictationSentences = useMemo(() => {
     const sourceIds = new Set(dictationSourceSetIds);
@@ -596,6 +667,13 @@ export default function TeacherAssignedActivities({ user }) {
     setSelectedDictationSentenceIds(presetSentences.map((sentence) => sentence.id).filter(Boolean));
   }, [activityId, activityType, dictationPresetOptions]);
 
+  useEffect(() => {
+    if (translationSetId === HUB_TRANSLATION_ALL_SET_ID) return;
+    if (!filteredTranslationSets.some((set) => set.id === translationSetId)) {
+      setTranslationSetId(HUB_TRANSLATION_ALL_SET_ID);
+    }
+  }, [filteredTranslationSets, translationSetId]);
+
   function toggleStudent(studentId) {
     setSelectedStudentIds((prev) =>
       prev.includes(studentId) ? prev.filter((id) => id !== studentId) : [...prev, studentId]
@@ -615,6 +693,12 @@ export default function TeacherAssignedActivities({ user }) {
     );
   }
 
+  function toggleTranslationItem(itemId) {
+    setSelectedTranslationItemIds((prev) =>
+      prev.includes(itemId) ? prev.filter((id) => id !== itemId) : [...prev, itemId]
+    );
+  }
+
   function randomizeDictationSentences() {
     const pool = [...filteredDictationSentences];
     for (let i = pool.length - 1; i > 0; i -= 1) {
@@ -622,6 +706,15 @@ export default function TeacherAssignedActivities({ user }) {
       [pool[i], pool[j]] = [pool[j], pool[i]];
     }
     setSelectedDictationSentenceIds(pool.slice(0, dictationSentenceCount).map((sentence) => sentence.id));
+  }
+
+  function randomizeTranslationItems() {
+    const pool = [...filteredTranslationItems];
+    for (let i = pool.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [pool[i], pool[j]] = [pool[j], pool[i]];
+    }
+    setSelectedTranslationItemIds(pool.slice(0, translationQuestionCount).map((item) => item.id));
   }
 
   async function handleCreateAssignment() {
@@ -643,9 +736,18 @@ export default function TeacherAssignedActivities({ user }) {
       activityType === "dictation"
         ? selectedDictationSentences
         : [];
+    const translationItems =
+      activityType === "translation"
+        ? selectedTranslationItems
+        : [];
 
     if (activityType === "dictation" && !dictationSentences.length) {
       toast("Choose at least one dictation sentence, or use Random set.");
+      return;
+    }
+
+    if (activityType === "translation" && !translationItems.length) {
+      toast("Choose at least one translation item, or use Random set.");
       return;
     }
 
@@ -729,6 +831,41 @@ export default function TeacherAssignedActivities({ user }) {
         };
       }
 
+      if (activityType === "translation") {
+        const trimmedTitle = String(translationTitle || "").trim();
+        const count = translationItems.length;
+        const setLabel =
+          translationSetId === HUB_TRANSLATION_ALL_SET_ID
+            ? "All translation sets"
+            : HUB_TRANSLATION_SETS.find((set) => set.id === translationSetId)?.label || "Translation set";
+        const levelLabel = translationLevel === "all" ? "All levels" : translationLevel;
+        const fallbackTitle = `Translation — ${levelLabel}, ${count} question${count === 1 ? "" : "s"}`;
+        assignmentPayload.activityLabel = trimmedTitle || fallbackTitle;
+        assignmentPayload.routePath = buildTranslationRoutePath("__ASSIGNMENT_ID__");
+        assignmentPayload.taskTitle = trimmedTitle || fallbackTitle;
+        assignmentPayload.translationConfig = {
+          title: trimmedTitle,
+          setId: translationSetId,
+          setLabel,
+          level: translationLevel,
+          search: String(translationSearch || "").trim(),
+          questionCount: count,
+          items: translationItems.map((item) => ({
+            id: item.itemId || item.id,
+            itemId: item.itemId || item.id,
+            spanish: item.spanish,
+            english: item.english,
+            acceptedAnswers: item.acceptedAnswers || [],
+            setId: item.setId,
+            setLabel: item.setLabel,
+            level: item.level,
+            tags: item.tags || [],
+            questionType: item.questionType || "",
+            warning: item.warning || "",
+          })),
+        };
+      }
+
       await createAssignedActivity(assignmentPayload);
 
       const refreshed = await listAssignedActivitiesForTeacher(user.uid);
@@ -739,6 +876,10 @@ export default function TeacherAssignedActivities({ user }) {
       if (activityType === "dictation") {
         setSelectedDictationSentenceIds([]);
         setDictationTitle("");
+      }
+      if (activityType === "translation") {
+        setTranslationTitle("");
+        setSelectedTranslationItemIds([]);
       }
       if (targetMode === "selected") setSelectedStudentIds([]);
       toast("Assignment created.");
@@ -797,6 +938,7 @@ export default function TeacherAssignedActivities({ user }) {
                   <option value="reading">Reading task</option>
                   <option value="speaking">Speaking task</option>
                   <option value="dictation">Dictation task</option>
+                  <option value="translation">Translation task</option>
                 </select>
               </label>
 
@@ -811,7 +953,7 @@ export default function TeacherAssignedActivities({ user }) {
             </div>
 
             <label className="field">
-              <span>{activityType === "dictation" ? "Dictation set" : "Activity"}</span>
+              <span>{activityType === "dictation" ? "Dictation set" : activityType === "translation" ? "Translation task" : "Activity"}</span>
               <select value={activityId} onChange={(event) => setActivityId(event.target.value)}>
                 {currentOptions.length ? (
                   currentOptions.map((option) => (
@@ -926,6 +1068,98 @@ export default function TeacherAssignedActivities({ user }) {
                       />
                       <span>{sentence.text}</span>
                       <em>{sentence.setLabel}</em>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+
+            {activityType === "translation" ? (
+              <div className="teacher-dictation-builder">
+                <label className="field">
+                  <span>Assignment name</span>
+                  <input
+                    type="text"
+                    value={translationTitle}
+                    onChange={(event) => setTranslationTitle(event.target.value)}
+                    placeholder="e.g. B1 adjective translation homework"
+                  />
+                </label>
+
+                <div className="teacher-assign-grid">
+                  <label className="field">
+                    <span>CEFR level</span>
+                    <select value={translationLevel} onChange={(event) => setTranslationLevel(event.target.value)}>
+                      {TRANSLATION_LEVEL_OPTIONS.map((level) => (
+                        <option key={level} value={level}>
+                          {level === "all" ? "All levels" : level}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="field">
+                    <span>Translation set</span>
+                    <select value={translationSetId} onChange={(event) => setTranslationSetId(event.target.value)}>
+                      <option value={HUB_TRANSLATION_ALL_SET_ID}>All translation sets</option>
+                      {filteredTranslationSets.map((set) => (
+                        <option key={set.id} value={set.id}>
+                          {set.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <label className="field">
+                    <span>Random question count</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max={Math.max(1, translationQuestionPoolSize)}
+                      value={translationQuestionCount}
+                      onChange={(event) =>
+                        setTranslationQuestionCount(Math.max(1, Number(event.target.value || 1)))
+                      }
+                    />
+                  </label>
+
+                  <label className="field">
+                    <span>Search items</span>
+                    <input
+                      type="search"
+                      value={translationSearch}
+                      onChange={(event) => setTranslationSearch(event.target.value)}
+                      placeholder="Filter by Spanish, English, or set"
+                    />
+                  </label>
+                </div>
+
+                <div className="teacher-assign-actions">
+                  <button type="button" className="ghost-btn" onClick={randomizeTranslationItems}>
+                    Random set
+                  </button>
+                  <span className="muted small">
+                    {selectedTranslationItems.length} selected manually; random will choose {translationQuestionCount} from {filteredTranslationItems.length} visible items
+                  </span>
+                </div>
+
+                <p className="muted small">
+                  {translationQuestionPoolSize} available item{translationQuestionPoolSize === 1 ? "" : "s"} match this set and level.
+                </p>
+
+                <div className="teacher-dictation-browser">
+                  {filteredTranslationItems.map((item) => (
+                    <label key={item.id} className="teacher-dictation-sentence teacher-translation-item">
+                      <input
+                        type="checkbox"
+                        checked={selectedTranslationItemIds.includes(item.id)}
+                        onChange={() => toggleTranslationItem(item.id)}
+                      />
+                      <span>
+                        <strong>{item.spanish}</strong>
+                        <small>{item.english}</small>
+                      </span>
+                      <em>{item.level} - {item.setLabel}</em>
                     </label>
                   ))}
                 </div>
@@ -1260,6 +1494,23 @@ export default function TeacherAssignedActivities({ user }) {
           font-style: normal;
           font-size: 0.84rem;
           white-space: nowrap;
+        }
+
+        .teacher-translation-item span {
+          display: grid;
+          gap: 0.25rem;
+          min-width: 0;
+        }
+
+        .teacher-translation-item strong {
+          color: #f4f8ff;
+          font-weight: 800;
+          line-height: 1.35;
+        }
+
+        .teacher-translation-item small {
+          color: #b9c9e4;
+          line-height: 1.35;
         }
 
         .field textarea {

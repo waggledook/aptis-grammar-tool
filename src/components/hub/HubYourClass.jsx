@@ -5,6 +5,7 @@ import {
   fetchVocabProgressMap,
   fetchSpeakingProgressMap,
   fetchHubDictationSessions,
+  fetchHubTranslationSessions,
   fetchHubFlashcardSessions,
   fetchHubGrammarSubmissions,
   fetchWritingP1Sessions,
@@ -76,6 +77,8 @@ function getAssignmentTypeLabel(type) {
       return "Reading task";
     case "dictation":
       return "Dictation task";
+    case "translation":
+      return "Translation task";
     case "vocabulary-topic":
       return "Vocabulary set";
     default:
@@ -208,6 +211,11 @@ function resolveAssignedCompletion(assignment, sources) {
     return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
   }
 
+  if (assignment?.activityType === "translation") {
+    const completedAt = sources.translation?.[assignment.id] || 0;
+    return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+  }
+
   return { completed: false, completedAt: 0 };
 }
 
@@ -230,7 +238,7 @@ export default function HubYourClass({ user }) {
 
       setLoading(true);
       try {
-        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, readingProgress, dictationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, readingProgress, dictationSessions, translationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
           listStudentCourseTestSessions(user.uid),
           listStudentCourseTestAttempts(user.uid),
           listAssignedActivitiesForStudent(user.uid),
@@ -238,6 +246,7 @@ export default function HubYourClass({ user }) {
           fetchSpeakingProgressMap(user.uid),
           fetchReadingProgressMap(user.uid),
           fetchHubDictationSessions(200, user.uid),
+          fetchHubTranslationSessions(200, user.uid),
           fetchHubFlashcardSessions(200, user.uid),
           fetchHubGrammarSubmissions(200, user.uid),
           listGrammarSetAttemptsForStudent(user.uid),
@@ -253,6 +262,7 @@ export default function HubYourClass({ user }) {
           speaking: speakingProgress || {},
           reading: readingProgress || {},
           dictation: buildLatestTimeMap(dictationSessions || [], "assignmentId"),
+          translation: buildLatestTimeMap(translationSessions || [], "assignmentId"),
           flashcards: {
             ...buildLatestTimeMap(flashcardSessions || [], "deckId"),
             ...buildLatestTimeMap(flashcardSessions || [], "assignmentId"),

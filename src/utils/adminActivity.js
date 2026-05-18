@@ -33,6 +33,7 @@ export const ACTIVITY_TYPE_LABELS = {
   listening_part4_completed: "Listening Part 4 Completed",
   hub_grammar_submitted: "Hub Grammar Submitted",
   hub_dictation_completed: "Hub Dictation Completed",
+  hub_translation_completed: "Hub Translation Completed",
   hub_flashcards_started: "Hub Flashcards Started",
   hub_spanglish_started: "Hub Spanglish Started",
   hub_spanglish_review_started: "Hub Spanglish Review Started",
@@ -288,6 +289,7 @@ export function formatActivityDetails(log) {
     case "hub_grammar_submitted":
       return joinParts([d.activityTitle || d.activityId || "Grammar activity", `${d.score ?? "?"}%`, `Correct ${formatScore(d.correct, d.total)}`]);
     case "hub_dictation_completed":
+    case "hub_translation_completed":
       return joinParts([d.mode || "game", d.setLabel || d.setId || "All sentences", `Score ${d.score ?? "?"}`, `Completed ${formatScore(d.completed, d.totalPlayed)}`]);
     case "hub_flashcards_started":
       return joinParts([d.mode || "deck", d.deckTitle || d.deckId || "Flashcards", formatCount(d.total, "card")]);

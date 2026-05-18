@@ -205,7 +205,7 @@ function _uidOrCurrent(uid) {
 
 // — FIRESTORE HELPERS —
 // helper to build a reference to /users/{uid}/{subcol}
-function userCol(subcol) {
+function _userCol(subcol) {
   if (!auth.currentUser) throw new Error("Must be signed in");
   return collection(db, "users", auth.currentUser.uid, subcol);
 }
@@ -1313,6 +1313,47 @@ export async function fetchHubDictationSessions(n = 20, uid) {
   }));
 }
 
+export async function saveHubTranslationSession(payload) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return;
+
+  const colRef = collection(db, "users", uid, "hubTranslationSessions");
+  await addDoc(colRef, {
+    ...payload,
+    app: "seifhub",
+    createdAt: serverTimestamp(),
+  });
+
+  await logActivity("hub_translation_completed", {
+    mode: payload.mode || "training",
+    setId: payload.setId || "",
+    setLabel: payload.setLabel || "",
+    level: payload.level || "",
+    assignmentId: payload.assignmentId || "",
+    score: payload.score ?? null,
+    completed: payload.completed ?? null,
+    totalPlayed: payload.totalPlayed ?? null,
+    trainingTarget: payload.trainingTarget ?? null,
+  });
+}
+
+export async function fetchHubTranslationSessions(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "hubTranslationSessions"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
 export async function fetchHubGrammarSubmissions(n = 20, uid) {
   const realUid = _uidOrCurrent(uid);
   if (!realUid) return [];
@@ -2214,6 +2255,112 @@ export async function fetchHubKeywordMistakes(n = 15, uid) {
 
   const qy = query(
     collection(db, "users", realUid, "hubKeywordMistakes"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function fetchHubTranslationFavourites(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubTranslationFavourites"));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveHubTranslationResult(itemId, tags, isCorrect) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  const ref = doc(db, "users", uid, "hubTranslationProgress", itemId);
+  const payload = {
+    itemId,
+    tags: Array.isArray(tags) ? tags.join(",") : (tags || ""),
+    attempts: increment(1),
+    lastCorrect: !!isCorrect,
+    lastAnsweredAt: serverTimestamp(),
+    app: "seifhub",
+  };
+
+  if (isCorrect) {
+    payload.everCorrect = true;
+  }
+
+  await setDoc(ref, payload, { merge: true });
+}
+
+export async function fetchSeenHubTranslationItemIds(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubTranslationProgress"));
+  return snap.docs.map((d) => d.id);
+}
+
+export async function saveHubTranslationFavourite(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  const ref = doc(db, "users", uid, "hubTranslationFavourites", item.itemId);
+  await setDoc(
+    ref,
+    {
+      ...item,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      app: "seifhub",
+    },
+    { merge: true }
+  );
+}
+
+export async function removeHubTranslationFavourite(itemId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  await deleteDoc(doc(db, "users", uid, "hubTranslationFavourites", itemId));
+}
+
+export async function recordHubTranslationMistake(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  await addDoc(collection(db, "users", uid, "hubTranslationMistakes"), {
+    ...item,
+    app: "seifhub",
+    createdAt: serverTimestamp(),
+  });
+}
+
+export async function clearHubTranslationMistakes(itemId, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !itemId) return;
+
+  const snap = await getDocs(
+    query(
+      collection(db, "users", realUid, "hubTranslationMistakes"),
+      where("itemId", "==", itemId)
+    )
+  );
+
+  await Promise.all(snap.docs.map((entry) => deleteDoc(entry.ref)));
+}
+
+export async function fetchHubTranslationMistakes(n = 15, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "hubTranslationMistakes"),
     orderBy("createdAt", "desc"),
     limit(n)
   );
@@ -3807,7 +3954,9 @@ if (import.meta.env.DEV) {
         try {
           await updateProfile(u, { photoURL: url });
           await setDoc(doc(db, 'users', u.uid), { photoURL: url }, { merge: true });
-        } catch {}
+        } catch (error) {
+          console.error("[test upload] profile update failed:", error);
+        }
         res(url);
       });
     });

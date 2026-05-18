@@ -9,6 +9,7 @@ import {
   ensureUserProfile,
   fetchHubGrammarSubmissions,
   fetchHubDictationSessions,
+  fetchHubTranslationSessions,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
   fetchWritingP3Submissions,
@@ -120,6 +121,7 @@ import HubMiniGrammarTests from "./components/hub/HubMiniGrammarTests.jsx";
 import HubGrammarActivityRunner from "./components/hub/HubGrammarActivityRunner.jsx";
 import HubListeningMenu from "./components/hub/HubListeningMenu.jsx";
 import HubDictationTrainer from "./components/hub/HubDictationTrainer.jsx";
+import HubTranslationTrainer from "./components/hub/HubTranslationTrainer.jsx";
 import HubUseOfEnglishMenu from "./components/hub/HubUseOfEnglishMenu.jsx";
 import HubKeywordTrainer from "./components/hub/HubKeywordTrainer.jsx";
 import HubOpenClozeTrainer from "./components/hub/HubOpenClozeTrainer.jsx";
@@ -484,12 +486,13 @@ useEffect(() => {
     }
 
     try {
-      const [assignments, vocabProgress, speakingProgress, readingProgress, dictationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+      const [assignments, vocabProgress, speakingProgress, readingProgress, dictationSessions, translationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
         listAssignedActivitiesForStudent(user.uid),
         fetchVocabProgressMap(user.uid),
         fetchSpeakingProgressMap(user.uid),
         fetchReadingProgressMap(user.uid),
         fetchHubDictationSessions(200, user.uid),
+        fetchHubTranslationSessions(200, user.uid),
         fetchHubGrammarSubmissions(200, user.uid),
         listGrammarSetAttemptsForStudent(user.uid),
         fetchWritingP1Sessions(100, user.uid),
@@ -505,6 +508,7 @@ useEffect(() => {
         speaking: speakingProgress || {},
         reading: readingProgress || {},
         dictation: buildLatestMap(dictationSessions || [], "assignmentId"),
+        translation: buildLatestMap(translationSessions || [], "assignmentId"),
         miniTests: buildLatestMap(miniTests || [], "activityId"),
         grammarSets: (grammarAttempts || []).reduce((acc, attempt) => {
           if (!attempt?.setId) return acc;
@@ -584,6 +588,9 @@ useEffect(() => {
         }
         if (assignment.activityType === "dictation") {
           return (completionSources.dictation?.[assignment.id] || 0) < assignedAt;
+        }
+        if (assignment.activityType === "translation") {
+          return (completionSources.translation?.[assignment.id] || 0) < assignedAt;
         }
         return true;
       }).length;
@@ -987,6 +994,7 @@ return (
   <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu user={user} />} />
   <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer user={user} />} />
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests user={user} />} />
+  <Route path="/grammar/translation" element={isSeifHubSite ? <HubTranslationTrainer /> : <GrammarPage />} />
   <Route path="/grammar/activity/:activityId" element={<HubGrammarActivityRunner user={user} />} />
 
   <Route path="/use-of-english" element={<HubUseOfEnglishMenu />} />

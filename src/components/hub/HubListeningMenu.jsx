@@ -47,6 +47,7 @@ export default function HubListeningMenu() {
             Listen carefully, write what you hear, and check your answers with word-by-word feedback.
           </p>
         </button>
+
       </div>
 
       <style>{`

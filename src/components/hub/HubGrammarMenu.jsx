@@ -59,6 +59,12 @@ export default function HubGrammarMenu() {
             Take short focused tests and get instant feedback to help you notice and fix mistakes.
           </p>
         </button>
+        <button className="menu-card" onClick={() => navigate(getSitePath("/grammar/translation"))}>
+          <h3>Translation Trainer</h3>
+          <p>
+            Translate Spanish prompts into English and practise accurate question forms with word-by-word feedback.
+          </p>
+        </button>
       </div>
 
       <style>{`
