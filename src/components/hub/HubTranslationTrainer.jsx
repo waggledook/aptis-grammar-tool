@@ -563,9 +563,13 @@ export default function HubTranslationTrainer() {
   const answerAlreadyCorrect = !!currentRoundEntry?.answeredCorrectly;
   const currentPrompt = currentRoundEntry?.spanish || "";
   const currentIsFavourite = currentRoundEntry ? favouriteIds.has(currentRoundEntry.itemId) : false;
+  const hiddenQuestionTypeSetIds = new Set([
+    "b1-ed-ing-adjectives",
+    "b1-present-perfect-already-yet-just",
+  ]);
   const shouldShowQuestionType =
     Boolean(currentRoundEntry?.questionType) &&
-    currentRoundEntry?.setId !== "b1-ed-ing-adjectives";
+    !hiddenQuestionTypeSetIds.has(currentRoundEntry?.setId);
   const showPromptWarning = Boolean(currentRoundEntry?.warning) && !answerAlreadyCorrect && !nextEnabled;
   const reportingEntry = reportingItemId
     ? (currentRoundEntry?.itemId === reportingItemId
