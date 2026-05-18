@@ -786,9 +786,13 @@ export const HUB_TRANSLATION_SETS = [
         spanish: "Las noticias del clima son preocupantes.",
         english: "The weather news is worrying.",
         acceptedAnswers: [
+          "The climate news is worrying.",
+          "The climate news is concerning.",
           "The weather news is concerning.",
           "The news about the weather is worrying.",
           "The news about the weather is concerning.",
+          "The news about the climate is worrying.",
+          "The news about the climate is concerning.",
         ],
       },
       {

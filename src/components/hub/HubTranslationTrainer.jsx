@@ -563,6 +563,9 @@ export default function HubTranslationTrainer() {
   const answerAlreadyCorrect = !!currentRoundEntry?.answeredCorrectly;
   const currentPrompt = currentRoundEntry?.spanish || "";
   const currentIsFavourite = currentRoundEntry ? favouriteIds.has(currentRoundEntry.itemId) : false;
+  const shouldShowQuestionType =
+    Boolean(currentRoundEntry?.questionType) &&
+    currentRoundEntry?.setId !== "b1-ed-ing-adjectives";
   const showPromptWarning = Boolean(currentRoundEntry?.warning) && !answerAlreadyCorrect && !nextEnabled;
   const reportingEntry = reportingItemId
     ? (currentRoundEntry?.itemId === reportingItemId
@@ -1484,7 +1487,7 @@ export default function HubTranslationTrainer() {
                     <div className="translation-prompt-kicker">Spanish prompt</div>
                   </div>
                   <strong>{currentPrompt}</strong>
-                  {currentRoundEntry?.questionType ? (
+                  {shouldShowQuestionType ? (
                     <em>{currentRoundEntry.questionType}</em>
                   ) : null}
                   {showPromptWarning ? (
