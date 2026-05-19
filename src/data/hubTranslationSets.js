@@ -1688,4 +1688,130 @@ export const HUB_TRANSLATION_SETS = [
       },
     ],
   },
+  {
+    id: "b2-the-more-the-more",
+    label: "B2 the more..., the more...",
+    level: "B2",
+    tags: ["correlative-comparatives", "comparatives", "ellipsis", "the-more-the-more"],
+    description: "Practise correlative comparative structures like the more..., the more..., including reduced and verbless variants.",
+    items: [
+      {
+        id: "b2-tmtm-001",
+        spanish: "Cuanto antes, mejor.",
+        english: "The sooner it is, the better it is.",
+        acceptedAnswers: [
+          "The sooner, the better.",
+          "The sooner it is, the better.",
+          "The sooner, the better it is.",
+        ],
+      },
+      {
+        id: "b2-tmtm-002",
+        spanish: "Cuanto más grande sea la casa, más cara será.",
+        english: "The bigger the house is, the more expensive it will be.",
+        acceptedAnswers: [
+          "The bigger the house, the more expensive.",
+          "The bigger the house, the more expensive it will be.",
+          "The larger the house is, the more expensive it will be.",
+          "The larger the house, the more expensive.",
+        ],
+      },
+      {
+        id: "b2-tmtm-003",
+        spanish: "Cuanto más viejo es el vino, mejor sabe.",
+        english: "The older the wine is, the better it tastes.",
+        acceptedAnswers: [
+          "The older the wine, the better it tastes.",
+          "The older the wine, the better the taste.",
+          "The older the wine is, the better the taste.",
+        ],
+      },
+      {
+        id: "b2-tmtm-004",
+        spanish: "Cuanto más practiques, más fácil será.",
+        english: "The more you practise, the easier it will be.",
+        acceptedAnswers: [
+          "The more you practice, the easier it'll be.",
+          "The more you practise, the easier it'll be.",
+          "The more you practice, the easier it will be.",
+          "The more you practise, the easier.",
+          "The more you practice, the easier.",
+        ],
+      },
+      {
+        id: "b2-tmtm-005",
+        spanish: "Mientras más ganes, más impuestos pagarás.",
+        english: "The more you earn, the more taxes you will pay.",
+        acceptedAnswers: [
+          "The more you earn, the more taxes you'll pay.",
+        ],
+      },
+      {
+        id: "b2-tmtm-006",
+        spanish: "Cuanto más duermo, más cansado estoy.",
+        english: "The more I sleep, the more tired I am.",
+        acceptedAnswers: [
+          "The more I sleep, the more tired.",
+          "The more I sleep, the more tired I get.",
+        ],
+      },
+      {
+        id: "b2-tmtm-007",
+        spanish: "Cuanto más frío haga, más ropa necesitaremos.",
+        english: "The colder the weather is, the more clothes we will need.",
+        acceptedAnswers: [
+          "The colder the weather, the more clothes we will need.",
+          "The colder it is, the more clothes we'll need.",
+          "The colder it is, the more clothes we will need.",
+          "The colder the weather, the more clothes we'll need.",
+        ],
+      },
+      {
+        id: "b2-tmtm-008",
+        spanish: "Cuanto más alto subas, más peligrosa será la caída.",
+        english: "The higher you climb, the more dangerous the fall will be.",
+        acceptedAnswers: [
+          "The higher you climb, the more dangerous the fall.",
+          "The higher you climb, the more dangerous the fall it'll be.",
+        ],
+      },
+      {
+        id: "b2-tmtm-009",
+        spanish: "Mientras más pienses en ello, peor te sentirás.",
+        english: "The more you think about it, the worse you will feel.",
+        acceptedAnswers: [
+          "The more you think about it, the worse you'll feel.",
+        ],
+      },
+      {
+        id: "b2-tmtm-010",
+        spanish: "Cuanto más rápido vayas, más peligroso es.",
+        english: "The faster you go, the more dangerous it is.",
+        acceptedAnswers: [
+          "The faster, the more dangerous.",
+          "The faster you go, the more dangerous.",
+        ],
+      },
+      {
+        id: "b2-tmtm-011",
+        spanish: "Cuanto menos sepa la gente, mejor.",
+        english: "The less people know, the better it is.",
+        acceptedAnswers: [
+          "The less people know, the better.",
+          "The fewer people know, the better.",
+          "The fewer people know, the better it is.",
+        ],
+      },
+      {
+        id: "b2-tmtm-012",
+        spanish: "Cuanto más trabajes ahora, menos tendrás que hacer mañana.",
+        english: "The more you work now, the less you will have to do tomorrow.",
+        acceptedAnswers: [
+          "The more you work now, the less you'll have to do tomorrow.",
+          "The more work you do now, the less you'll have to do tomorrow.",
+          "The more work you do now, the less you will have to do tomorrow.",
+        ],
+      },
+    ],
+  },
 ];

@@ -255,6 +255,7 @@ const isAdminRoute = location.pathname.startsWith("/admin");
 const isFlashcardsPlayerRoute = /^\/grammar\/flashcards\/[^/]+$/.test(location.pathname);
 const currentSite = getSiteVariant();
 const isSeifHubSite = currentSite.id === "seifhub";
+const hasTranslationAssignmentParam = new URLSearchParams(location.search).has("assignment");
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
 const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute;
@@ -994,7 +995,8 @@ return (
   <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu user={user} />} />
   <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer user={user} />} />
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests user={user} />} />
-  <Route path="/grammar/translation" element={isSeifHubSite ? <HubTranslationTrainer /> : <GrammarPage />} />
+  <Route path="/grammar/translation" element={isSeifHubSite || hasTranslationAssignmentParam ? <HubTranslationTrainer /> : <GrammarPage />} />
+  <Route path="/translation" element={<HubTranslationTrainer />} />
   <Route path="/grammar/activity/:activityId" element={<HubGrammarActivityRunner user={user} />} />
 
   <Route path="/use-of-english" element={<HubUseOfEnglishMenu />} />
