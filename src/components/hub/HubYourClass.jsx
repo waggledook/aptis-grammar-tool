@@ -86,6 +86,12 @@ function getAssignmentTypeLabel(type) {
   }
 }
 
+function getAssignmentRoutePath(assignment) {
+  const routePath = assignment?.routePath || "/";
+  if (!routePath.startsWith("/") || /[?&]site=/.test(routePath)) return routePath;
+  return getSitePath(routePath);
+}
+
 function getWritingBucket(type) {
   if (type === "writing-part-1") return "p1";
   if (type === "writing-part-2") return "p2";
@@ -495,7 +501,7 @@ function HubAssignmentCard({ assignment, navigate }) {
         <button
           className="review-btn"
           type="button"
-          onClick={() => navigate(assignment.routePath || getSitePath("/"))}
+          onClick={() => navigate(getAssignmentRoutePath(assignment))}
         >
           {isCompleted ? "Open again" : "Start activity"}
         </button>

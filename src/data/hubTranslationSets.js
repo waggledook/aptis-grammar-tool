@@ -489,7 +489,7 @@ export const HUB_TRANSLATION_SETS = [
       { id: "a2-tb-017", spanish: "Ayer no hubo tiempo.", english: "Yesterday there was no time.", acceptedAnswers: ["There wasn't any time yesterday."] },
       { id: "a2-tb-018", spanish: "Hay varias razones.", english: "There are several reasons.", acceptedAnswers: ["There are various reasons."] },
       { id: "a2-tb-019", spanish: "¿Había llaves sobre la mesa cuando entraste?", english: "Were there keys on the table when you came in?", acceptedAnswers: ["Were there any keys on the table when you entered?"] },
-      { id: "a2-tb-020", spanish: "Ya no hay entradas.", english: "There are no more tickets.", acceptedAnswers: ["There aren't any tickets left."] },
+      { id: "a2-tb-020", spanish: "Ya no hay entradas.", english: "There are no more tickets.", acceptedAnswers: ["There aren't any tickets left.","There are no tickets left."] },
     ],
   },
   {
@@ -1113,7 +1113,7 @@ export const HUB_TRANSLATION_SETS = [
       { id: "b1-pas-016", spanish: "¿Cuándo se inventó el teléfono móvil?", english: "When was the mobile phone invented?", acceptedAnswers: ["When was the cell phone invented?"], warning: "Translate using passive voice." },
       { id: "b1-pas-017", spanish: "Las respuestas correctas serán publicadas en la página web.", english: "The correct answers will be published on the website.", acceptedAnswers: ["The right answers will be posted on the webpage."], warning: "Translate using passive voice." },
       { id: "b1-pas-018", spanish: "Se cree que la economía mejorará pronto.", english: "It is believed that the economy will improve soon.", acceptedAnswers: ["The economy is believed to improve soon."], warning: "Translate using passive voice if possible." },
-      { id: "b1-pas-019", spanish: "Los platos principales se sirven con patatas fritas o ensalada.", english: "The main courses are served with chips or salad.", acceptedAnswers: ["Main dishes are served with fries or a salad."], warning: "Translate using passive voice." },
+      { id: "b1-pas-019", spanish: "Los platos principales se sirven con patatas fritas.", english: "The main courses are served with chips.", acceptedAnswers: ["Main dishes are served with fries.", "The main dishes are served with fries.", "Main courses are served with chips."], warning: "Translate using passive voice." },
       { id: "b1-pas-020", spanish: "Este libro de texto ha sido escrito por tres profesores de la academia.", english: "This textbook has been written by three teachers from the academy.", acceptedAnswers: ["This textbook was written by three of the academy's teachers."], warning: "Translate using passive voice." },
     ],
   },
@@ -1145,7 +1145,7 @@ export const HUB_TRANSLATION_SETS = [
       { id: "b1-mod-007", spanish: "Puede que tengan problemas con el coche, van retrasados.", english: "They could have problems with the car, they are late.", acceptedAnswers: ["They might have car trouble, they're running late."], warning: "Use a modal verb in your answer." },
       { id: "b1-mod-008", spanish: "Seguro que están cansados, han trabajado doce horas.", english: "They must be tired, they have worked twelve hours.", acceptedAnswers: ["They must be exhausted, they've been working for twelve hours."], warning: "Use a modal verb in your answer." },
       { id: "b1-mod-009", spanish: "A lo mejor él no sabe la dirección de la oficina.", english: "He might not know the office address.", acceptedAnswers: ["He may not know the address of the office.", "He might not know the address of the office.", "He may not know the office address."], warning: "Use a modal verb in your answer." },
-      { id: "b1-mod-010", spanish: "¿De quién es esta chaqueta? Podría ser de Juan.", english: "Whose jacket is this? It could be Juan's.", acceptedAnswers: ["Whose coat is this? It might be Juan's."], warning: "Use a modal verb in your answer." },
+      { id: "b1-mod-010", spanish: "¿De quién es esta chaqueta? Podría ser de Juan.", english: "Whose jacket is this? It could be Juan's.", acceptedAnswers: ["Whose coat is this? It might be Juan's.", "Whose is this jacket? It might be Juan's.", "Whose is this coat? It might be Juan's."], warning: "Use a modal verb in your answer." },
       {
         id: "b1-mod-011",
         spanish: "No contestan al teléfono, seguro que están fuera.",
@@ -1601,6 +1601,8 @@ export const HUB_TRANSLATION_SETS = [
           "The children have gone to bed already.",
           "The children have already gone to bed.",
           "The kids have gone to bed already.",
+          "The kids have already gone to sleep.",
+          "The kids have already gone to bed.",
         ],
       },
       {

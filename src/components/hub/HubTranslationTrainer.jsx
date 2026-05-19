@@ -45,6 +45,8 @@ const REPORT_REASONS = [
 const spellingVariants = new Map([
   ["apologise", "apologize"],
   ["apologised", "apologized"],
+  ["examination", "exam"],
+  ["examinations", "exams"],
   ["favourite", "favorite"],
   ["favourites", "favorites"],
   ["film", "movie"],
