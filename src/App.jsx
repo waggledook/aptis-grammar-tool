@@ -1397,6 +1397,14 @@ return (
 {/* vocabulary routes */}
 <Route path="/vocabulary" element={isSeifHubSite ? <HubVocabularyMenu /> : <VocabularyMenu />} />
 <Route path="/vocabulary/textbook" element={<HubVocabularyA1Menu />} />
+<Route
+  path="/vocabulary/textbook/mistakes"
+  element={
+    <VocabMistakeReview
+      onBack={() => navigate(getSitePath("/vocabulary/textbook"))}
+    />
+  }
+/>
 <Route path="/vocabulary/textbook/:themeId/:activityId" element={<HubVocabularyActivityRunner />} />
 <Route path="/vocabulary/a1" element={<HubVocabularyA1Menu />} />
 <Route path="/vocabulary/a1/:themeId/:activityId" element={<HubVocabularyActivityRunner />} />

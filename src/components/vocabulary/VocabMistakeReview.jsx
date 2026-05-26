@@ -157,9 +157,25 @@ export default function VocabMistakeReview({ onBack }) {
           Item {index + 1} of {items.length}
         </p>
 
+        {current.source === "hub-textbook" ? (
+          <p className="muted small">
+            {current.themeTitle || current.topic} · {current.activityTitle || current.setId}
+          </p>
+        ) : null}
+
         <p className="prompt">{current.sentence}</p>
 
-        {cluePair && cluePair.image && (
+        {current.image ? (
+          <div className="clue-area">
+            <div className="clue-image-wrapper">
+              <img
+                src={current.image}
+                alt=""
+                className="clue-image"
+              />
+            </div>
+          </div>
+        ) : cluePair && cluePair.image ? (
           <div className="clue-area">
             <div className="clue-image-wrapper">
               <img
@@ -169,7 +185,7 @@ export default function VocabMistakeReview({ onBack }) {
               />
             </div>
           </div>
-        )}
+        ) : null}
 
         <input
           ref={inputRef}

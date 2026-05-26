@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
+import { fetchHubVocabThemeCounts } from "../../firebase.js";
 import {
   getAllHubVocabThemes,
   HUB_VOCAB_LEVELS,
@@ -24,12 +25,29 @@ export default function HubVocabularyA1Menu() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [selectedLevels, setSelectedLevels] = useState([]);
+  const [progressCounts, setProgressCounts] = useState({});
   const themes = useMemo(() => getAllHubVocabThemes(), []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     }
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+
+    fetchHubVocabThemeCounts()
+      .then((counts) => {
+        if (alive) setProgressCounts(counts || {});
+      })
+      .catch((error) => {
+        console.error("[HubVocabularyA1Menu] progress load failed", error);
+      });
+
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const filteredThemes = useMemo(() => {
@@ -80,9 +98,14 @@ export default function HubVocabularyA1Menu() {
           </p>
         </div>
 
-        <button className="whats-new-btn" onClick={() => navigate(getSitePath("/vocabulary"))}>
-          Back to vocabulary
-        </button>
+        <div className="hub-vocab-banner-actions">
+          <button className="whats-new-btn secondary" onClick={() => navigate(getSitePath("/vocabulary/textbook/mistakes"))}>
+            Review mistakes
+          </button>
+          <button className="whats-new-btn" onClick={() => navigate(getSitePath("/vocabulary"))}>
+            Back to vocabulary
+          </button>
+        </div>
       </div>
 
       <section className="hub-mini-browser">
@@ -138,8 +161,15 @@ export default function HubVocabularyA1Menu() {
       </section>
 
       <div className="menu-grid">
-        {filteredThemes.map((theme) => (
-          <article key={theme.id} className="menu-card hub-vocab-topic-card" style={{ "--theme-accent": theme.accent }}>
+        {filteredThemes.map((theme) => {
+          const progress = progressCounts[theme.id] || {
+            completed: 0,
+            total: theme.activities.length,
+          };
+          const isComplete = progress.total > 0 && progress.completed >= progress.total;
+
+          return (
+          <article key={theme.id} className={`menu-card hub-vocab-topic-card ${isComplete ? "completed" : ""}`} style={{ "--theme-accent": theme.accent }}>
             <button
               type="button"
               className="hub-vocab-topic-main"
@@ -162,10 +192,15 @@ export default function HubVocabularyA1Menu() {
                 <span>{theme.itemCount || theme.entries.length} items</span>
                 <span>{theme.activities.length} activity types</span>
               </div>
+              <div className="hub-vocab-topic-progress" aria-label={`${progress.completed} of ${progress.total} activities completed`}>
+                <span>{isComplete ? "Completed" : "Progress"}</span>
+                <strong>{progress.completed}/{progress.total}</strong>
+              </div>
               <span className="hub-vocab-card-cta">Open practice menu</span>
             </button>
           </article>
-        ))}
+          );
+        })}
       </div>
 
       {!filteredThemes.length ? (
@@ -260,6 +295,18 @@ export default function HubVocabularyA1Menu() {
           font-weight: 800;
           cursor: pointer;
           transition: transform .08s ease, box-shadow .08s ease;
+        }
+
+        .hub-vocab-banner-actions {
+          display: flex;
+          flex-shrink: 0;
+          gap: 0.6rem;
+        }
+
+        .hub-menu-wrapper .whats-new-btn.secondary {
+          background: rgba(238, 244, 255, 0.08);
+          border: 1px solid rgba(238, 244, 255, 0.18);
+          color: #eef4ff;
         }
 
         .hub-menu-wrapper .menu-grid {
@@ -457,6 +504,11 @@ export default function HubVocabularyA1Menu() {
           position: relative;
         }
 
+        .hub-vocab-topic-card.completed {
+          border-color: rgba(114, 223, 155, 0.55);
+          box-shadow: 0 0 0 1px rgba(114, 223, 155, 0.18), 0 16px 30px rgba(0,0,0,0.2);
+        }
+
         .hub-vocab-topic-card::before {
           content: "";
           position: absolute;
@@ -494,6 +546,25 @@ export default function HubVocabularyA1Menu() {
           padding: 0.25rem 0.62rem;
         }
 
+        .hub-vocab-topic-progress {
+          align-items: center;
+          background: rgba(255, 255, 255, 0.07);
+          border: 1px solid rgba(238, 244, 255, 0.12);
+          border-radius: 12px;
+          color: rgba(238, 244, 255, 0.76);
+          display: flex;
+          font-size: 0.84rem;
+          font-weight: 850;
+          justify-content: space-between;
+          margin-top: 0.2rem;
+          padding: 0.48rem 0.62rem;
+          width: 100%;
+        }
+
+        .hub-vocab-topic-progress strong {
+          color: #fff;
+        }
+
         .hub-vocab-card-cta {
           justify-self: start;
           border-color: color-mix(in srgb, var(--theme-accent), transparent 42%);
@@ -516,6 +587,11 @@ export default function HubVocabularyA1Menu() {
 
           .hub-menu-wrapper .whats-new-btn {
             width: 100%;
+          }
+
+          .hub-vocab-banner-actions {
+            width: 100%;
+            flex-direction: column;
           }
         }
       `}</style>

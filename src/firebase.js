@@ -40,6 +40,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import { TOPIC_DATA } from "./components/vocabulary/data/vocabTopics";
+import { getAllHubVocabThemes } from "./data/hubVocabularyActivities";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCvpE87D16safq68oFB4fJKPyCURsc-mrU",
@@ -293,6 +294,7 @@ export async function recordVocabMistake({
   sentence,
   correctAnswer,
   userAnswer,
+  ...extra
 }) {
   const uid = auth.currentUser?.uid;
   if (!uid) return;
@@ -304,6 +306,7 @@ export async function recordVocabMistake({
     sentence,
     correctAnswer,
     userAnswer,
+    ...extra,
     resolved: false,          // 👈 NEW
     createdAt: serverTimestamp(),
   });
@@ -358,6 +361,115 @@ export async function fetchRecentVocabMistakes(max = 8, uid) {
   return snap.docs
     .map((d) => ({ id: d.id, ...d.data() }))
     .filter((doc) => doc.resolved !== true);
+}
+
+// Hub textbook vocabulary progress
+// /users/{uid}/hubVocabProgress/{themeId}:{activityId}
+// ────────────────────────────────
+export async function saveHubVocabActivityResult({
+  themeId,
+  themeTitle,
+  level,
+  activityId,
+  activityTitle,
+  activityType,
+  totalItems,
+  correctFirstTry,
+  mistakesCount,
+  mode = "practice",
+}) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !themeId || !activityId) return;
+
+  const docId = `${themeId}:${activityId}`;
+  const ref = doc(db, "users", uid, "hubVocabProgress", docId);
+  const payload = {
+    themeId,
+    themeTitle: themeTitle || "",
+    level: level || "a1",
+    activityId,
+    activityTitle: activityTitle || "",
+    activityType: activityType || "",
+    completed: true,
+    attempts: increment(1),
+    totalItems: totalItems ?? 0,
+    mistakesTotal: increment(mistakesCount ?? 0),
+    lastRun: {
+      totalItems: totalItems ?? 0,
+      correctFirstTry: correctFirstTry ?? null,
+      mistakesCount: mistakesCount ?? 0,
+      mode,
+    },
+    updatedAt: serverTimestamp(),
+  };
+
+  await setDoc(ref, payload, { merge: true });
+
+  await logActivity("hub_vocab_activity_completed", {
+    app: "seifhub",
+    themeId,
+    themeTitle: themeTitle || "",
+    level: level || "a1",
+    activityId,
+    activityTitle: activityTitle || "",
+    activityType: activityType || "",
+    totalItems: totalItems ?? null,
+    correctFirstTry: correctFirstTry ?? null,
+    mistakesCount: mistakesCount ?? null,
+    mode,
+  });
+}
+
+export async function fetchHubVocabProgress(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return {};
+
+  const snap = await getDocs(collection(db, "users", realUid, "hubVocabProgress"));
+  const out = {};
+
+  snap.forEach((d) => {
+    const data = d.data() || {};
+    if (!data.completed) return;
+    const themeId = data.themeId || d.id.split(":")[0] || "";
+    const activityId = data.activityId || d.id.split(":")[1] || "";
+    out[d.id] = {
+      id: d.id,
+      themeId,
+      activityId,
+      completed: true,
+      attempts: data.attempts ?? 0,
+      mistakesTotal: data.mistakesTotal ?? 0,
+      updatedAt: data.updatedAt || null,
+      lastRun: data.lastRun || null,
+    };
+  });
+
+  return out;
+}
+
+export async function fetchHubVocabThemeCounts(uid) {
+  const realUid = _uidOrCurrent(uid);
+  const themes = getAllHubVocabThemes();
+  const stats = Object.fromEntries(
+    themes.map((theme) => [
+      theme.id,
+      {
+        completed: 0,
+        total: Array.isArray(theme.activities) ? theme.activities.length : 0,
+      },
+    ])
+  );
+
+  if (!realUid) return stats;
+
+  const progress = await fetchHubVocabProgress(realUid);
+  Object.values(progress).forEach((entry) => {
+    if (!entry?.themeId) return;
+    if (!stats[entry.themeId]) stats[entry.themeId] = { completed: 0, total: 0 };
+    stats[entry.themeId].completed += 1;
+  });
+
+  return stats;
 }
 
 // ────────────────────────────────

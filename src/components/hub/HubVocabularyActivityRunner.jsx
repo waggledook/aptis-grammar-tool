@@ -1,8 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { getHubVocabActivity, getHubVocabTheme } from "../../data/hubVocabularyActivities.js";
+import {
+  fetchHubVocabProgress,
+  recordVocabMistake,
+  saveHubVocabActivityResult,
+} from "../../firebase.js";
 
 function normalizeAnswer(value = "") {
   return String(value)
@@ -126,13 +131,59 @@ function dedupeById(items = []) {
   });
 }
 
+function ProgressLine({ current, total, label = "complete", action = null }) {
+  const safeTotal = Math.max(Number(total) || 0, 0);
+  const safeCurrent = Math.min(Math.max(Number(current) || 0, 0), safeTotal);
+
+  return (
+    <div className="hub-vocab-progress-line">
+      <span>{safeCurrent}/{safeTotal} {label}</span>
+      {action}
+    </div>
+  );
+}
+
+function getDisplayAnswer(entry, themeId, answerMode = "default") {
+  if (answerMode === "nationality") return entry.nationality || "";
+  if (answerMode === "plural") return entry.plural || "";
+  if (answerMode === "opposite") return entry.opposite || "";
+  if (answerMode === "category") return entry.category || "";
+  if (answerMode === "gap") return entry.gapAnswers?.[0] || "";
+  if (entry.article) return `${entry.article} ${entry.term}`;
+  if (entry.speaker) return entry.speaker === "teacher" ? "The teacher says it" : "You say it";
+  return getTypeAnswer(entry, themeId);
+}
+
+function getMistakePrompt(entry, theme, activity, answerMode = "default") {
+  if (entry.gappedPhrase) return entry.gappedPhrase;
+  if (entry.gapCueText) return entry.gapCueText;
+  if (entry.cueText) return entry.cueText;
+  if (entry.hotspotNumber) return `Number ${entry.hotspotNumber}`;
+  if (answerMode === "nationality") return `Nationality for ${entry.country}`;
+  if (answerMode === "opposite") return `Opposite of ${entry.term}`;
+  if (answerMode === "plural") return `Plural of ${entry.singular || entry.term}`;
+  return getPromptLabel(entry, theme.id) || activity?.title || theme.title;
+}
+
 function ActivityCompleteCard({
   title = "Set complete",
   total = 0,
   mistakes = [],
   onRestart,
   onReviewMistakes,
+  onComplete,
 }) {
+  const didCompleteRef = useRef(false);
+
+  useEffect(() => {
+    if (didCompleteRef.current) return;
+    didCompleteRef.current = true;
+    onComplete?.({
+      total,
+      mistakes: dedupeById(mistakes),
+    });
+  }, [onComplete, total]);
+
   return (
     <section className="hub-vocab-practice-card hub-vocab-complete-card">
       <div className="hub-vocab-complete-copy">
@@ -161,36 +212,62 @@ function ActivityCompleteCard({
   );
 }
 
-function ActivityTabs({ theme, activityId }) {
+function ActivityTabs({ theme, activityId, progressMap = {} }) {
   const navigate = useNavigate();
 
   return (
     <div className="hub-vocab-tabs" aria-label="Vocabulary activity types">
-      {theme.activities.map((activity) => (
-        <button
-          key={activity.id}
-          type="button"
-          className={activity.id === activityId ? "active" : ""}
-          onClick={() => navigate(getSitePath(`/vocabulary/textbook/${theme.id}/${activity.id}`))}
-        >
-          {activity.title}
-        </button>
-      ))}
+      {theme.activities.map((activity) => {
+        const completed = Boolean(progressMap[`${theme.id}:${activity.id}`]?.completed);
+        return (
+          <button
+            key={activity.id}
+            type="button"
+            className={`${activity.id === activityId ? "active" : ""} ${completed ? "completed" : ""}`}
+            onClick={() => navigate(getSitePath(`/vocabulary/textbook/${theme.id}/${activity.id}`))}
+          >
+            {activity.title}
+            {completed ? <span className="hub-vocab-tab-check" aria-label="Completed">✓</span> : null}
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-function FlashcardMode({ theme, items, flagMode = false, phraseMode = false }) {
+function FlashcardMode({ theme, items, flagMode = false, phraseMode = false, onComplete }) {
   const [cardEntries, setCardEntries] = useState(() => shuffle(items));
   const [index, setIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [viewedIds, setViewedIds] = useState(() => new Set());
+  const didCompleteRef = useRef(false);
   const entry = cardEntries[index];
 
   useEffect(() => {
-    setCardEntries(shuffle(items));
+    const nextEntries = shuffle(items);
+    setCardEntries(nextEntries);
     setIndex(0);
     setIsFlipped(false);
+    setViewedIds(nextEntries[0]?.id ? new Set([nextEntries[0].id]) : new Set());
+    didCompleteRef.current = false;
   }, [theme.id, items]);
+
+  useEffect(() => {
+    if (!entry?.id) return;
+    setViewedIds((prev) => {
+      if (prev.has(entry.id)) return prev;
+      const next = new Set(prev);
+      next.add(entry.id);
+      return next;
+    });
+  }, [entry?.id]);
+
+  useEffect(() => {
+    if (!cardEntries.length || didCompleteRef.current) return;
+    if (viewedIds.size < cardEntries.length) return;
+    didCompleteRef.current = true;
+    onComplete?.({ total: cardEntries.length, mistakes: [] });
+  }, [cardEntries.length, onComplete, viewedIds.size]);
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -225,15 +302,18 @@ function FlashcardMode({ theme, items, flagMode = false, phraseMode = false }) {
   }
 
   function reshuffle() {
-    setCardEntries(shuffle(items));
+    const nextEntries = shuffle(items);
+    setCardEntries(nextEntries);
     setIndex(0);
     setIsFlipped(false);
+    setViewedIds(nextEntries[0]?.id ? new Set([nextEntries[0].id]) : new Set());
+    didCompleteRef.current = false;
   }
 
   return (
     <section className="hub-vocab-practice-card">
       <div className="hub-vocab-card-count">
-        <span>Card {index + 1} of {cardEntries.length}</span>
+        <span>Card {index + 1} of {cardEntries.length} · viewed {Math.min(viewedIds.size, cardEntries.length)}/{cardEntries.length}</span>
         <span className="hub-vocab-shortcuts">Space / ↑ / ↓ flip · ← / → move</span>
       </div>
 
@@ -284,7 +364,7 @@ function FlashcardMode({ theme, items, flagMode = false, phraseMode = false }) {
   );
 }
 
-function MatchingMode({ theme, items }) {
+function MatchingMode({ theme, items, onComplete, onMistake }) {
   const [sessionItems, setSessionItems] = useState(() => shuffle(items));
   const [reviewItems, setReviewItems] = useState(null);
   const [round, setRound] = useState(0);
@@ -317,6 +397,10 @@ function MatchingMode({ theme, items }) {
       setStatus("Nice match.");
     } else {
       setMistakeItems((prev) => dedupeById([...prev, selectedLeft]));
+      onMistake?.(selectedLeft, {
+        userAnswer: getPrimaryLabel(entry, theme.id),
+        correctAnswer: getPrimaryLabel(selectedLeft, theme.id),
+      });
       setStatus("Not that one. Try again.");
     }
   }
@@ -349,16 +433,19 @@ function MatchingMode({ theme, items }) {
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
         onRestart={() => startNewRound(items)}
         onReviewMistakes={reviewMistakes}
+        onComplete={reviewItems ? null : onComplete}
       />
     );
   }
 
   return (
     <section className="hub-vocab-practice-card">
-      <div className="hub-vocab-progress-line">
-        <span>{matchedIds.length}/{roundItems.length} matched</span>
-        <button type="button" onClick={() => startNewRound(items)}>New round</button>
-      </div>
+      <ProgressLine
+        current={matchedIds.length}
+        total={roundItems.length}
+        label="matched"
+        action={<button type="button" onClick={() => startNewRound(items)}>New round</button>}
+      />
 
       <div className="hub-vocab-match-grid">
         <div className="hub-vocab-match-column">
@@ -401,7 +488,7 @@ function MatchingMode({ theme, items }) {
   );
 }
 
-function ChoiceMode({ theme, items, mode = "word" }) {
+function ChoiceMode({ theme, items, mode = "word", onComplete, onMistake }) {
   const [sessionItems, setSessionItems] = useState(() => shuffle(items));
   const [reviewItems, setReviewItems] = useState(null);
   const [index, setIndex] = useState(0);
@@ -476,6 +563,11 @@ function ChoiceMode({ theme, items, mode = "word" }) {
       setChoiceStatus("correct");
     } else {
       setMistakeItems((prev) => dedupeById([...prev, entry]));
+      onMistake?.(entry, {
+        userAnswer: option.label,
+        correctAnswer: option.correct ? option.label : getDisplayAnswer(entry, theme.id, mode),
+        answerMode: mode,
+      });
       setChoiceStatus("wrong");
     }
   }
@@ -515,12 +607,15 @@ function ChoiceMode({ theme, items, mode = "word" }) {
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
         onRestart={restart}
         onReviewMistakes={reviewMistakes}
+        onComplete={reviewItems ? null : onComplete}
       />
     );
   }
 
   return (
     <section className="hub-vocab-practice-card">
+      <ProgressLine current={index + 1} total={entries.length} label="questions" />
+
       <div className="hub-vocab-choice-prompt">
         {mode === "opposite" ? (
           <strong className="hub-vocab-country-prompt">{entry.term}</strong>
@@ -582,7 +677,7 @@ function ChoiceMode({ theme, items, mode = "word" }) {
   );
 }
 
-function SpeakerChoiceMode({ items }) {
+function SpeakerChoiceMode({ theme, activity, items, onComplete, onMistake }) {
   const [sessionItems, setSessionItems] = useState(() => shuffle(items));
   const [reviewItems, setReviewItems] = useState(null);
   const [index, setIndex] = useState(0);
@@ -621,6 +716,10 @@ function SpeakerChoiceMode({ items }) {
       setChoiceStatus("correct");
     } else {
       setMistakeItems((prev) => dedupeById([...prev, entry]));
+      onMistake?.(entry, {
+        userAnswer: optionValue === "teacher" ? "The teacher says it" : "You say it",
+        correctAnswer: getDisplayAnswer(entry, theme.id),
+      });
       setChoiceStatus("wrong");
     }
   }
@@ -651,12 +750,15 @@ function SpeakerChoiceMode({ items }) {
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
         onRestart={restart}
         onReviewMistakes={reviewMistakes}
+        onComplete={reviewItems ? null : onComplete}
       />
     );
   }
 
   return (
     <section className="hub-vocab-practice-card">
+      <ProgressLine current={index + 1} total={activeItems.length} label="questions" />
+
       <div className="hub-vocab-choice-prompt">
         <strong className="hub-vocab-country-prompt">{entry.phrase}</strong>
         <p>Who usually says this?</p>
@@ -696,7 +798,7 @@ function SpeakerChoiceMode({ items }) {
   );
 }
 
-function TypeAnswerMode({ theme, items, activity, answerMode = "default" }) {
+function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComplete, onMistake }) {
   const [sessionItems, setSessionItems] = useState(() => shuffle(items));
   const [reviewItems, setReviewItems] = useState(null);
   const [index, setIndex] = useState(0);
@@ -755,6 +857,11 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default" }) {
     const isCorrect = accepted.includes(normalizeAnswer(answer));
     if (!isCorrect) {
       setMistakeItems((prev) => dedupeById([...prev, entry]));
+      onMistake?.(entry, {
+        userAnswer: answer,
+        correctAnswer: getDisplayAnswer(entry, theme.id, answerMode),
+        answerMode,
+      });
     }
     setFeedback(isCorrect ? "correct" : "wrong");
   }
@@ -803,12 +910,15 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default" }) {
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
         onRestart={restart}
         onReviewMistakes={reviewMistakes}
+        onComplete={reviewItems ? null : onComplete}
       />
     );
   }
 
   return (
     <section className="hub-vocab-practice-card">
+      <ProgressLine current={index + 1} total={activeItems.length} label="questions" />
+
       <form className="hub-vocab-type-form" onSubmit={checkAnswer}>
         <div className="hub-vocab-choice-prompt">
           {isNationalityMode ? (
@@ -879,7 +989,7 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default" }) {
   );
 }
 
-function PhraseGapFillMode({ items }) {
+function PhraseGapFillMode({ theme, activity, items, onComplete, onMistake }) {
   const gapItems = useMemo(() => items.filter((entry) => entry.gappedPhrase && entry.gapAnswers?.length), [items]);
   const [sessionItems, setSessionItems] = useState(() => shuffle(gapItems));
   const [reviewItems, setReviewItems] = useState(null);
@@ -913,6 +1023,11 @@ function PhraseGapFillMode({ items }) {
     const isCorrect = accepted.includes(normalizeAnswer(answer));
     if (!isCorrect) {
       setMistakeItems((prev) => dedupeById([...prev, entry]));
+      onMistake?.(entry, {
+        userAnswer: answer,
+        correctAnswer: entry.gapAnswers?.[0] || "",
+        answerMode: "gap",
+      });
     }
     setFeedback(isCorrect ? "correct" : "wrong");
   }
@@ -957,12 +1072,15 @@ function PhraseGapFillMode({ items }) {
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
         onRestart={restart}
         onReviewMistakes={reviewMistakes}
+        onComplete={reviewItems ? null : onComplete}
       />
     );
   }
 
   return (
     <section className="hub-vocab-practice-card">
+      <ProgressLine current={index + 1} total={activeItems.length} label="questions" />
+
       <form className="hub-vocab-type-form" onSubmit={checkAnswer}>
         <div className="hub-vocab-choice-prompt">
           {entry.image ? (
@@ -1040,7 +1158,7 @@ function HotelScene({ image, items, selectedId = null, matchedIds = [], activeId
   );
 }
 
-function ImageHotspotMatchMode({ theme, items, activity }) {
+function ImageHotspotMatchMode({ theme, items, activity, onComplete, onMistake }) {
   const [sessionItems, setSessionItems] = useState(() => shuffle(items));
   const [wordItems, setWordItems] = useState(() => shuffle(items));
   const [selectedHotspot, setSelectedHotspot] = useState(null);
@@ -1067,6 +1185,10 @@ function ImageHotspotMatchMode({ theme, items, activity }) {
       return;
     }
     setMistakeItems((prev) => dedupeById([...prev, selectedHotspot]));
+    onMistake?.(selectedHotspot, {
+      userAnswer: entry.term,
+      correctAnswer: selectedHotspot.term,
+    });
     setStatus("Not quite. Try another word.");
   }
 
@@ -1087,16 +1209,19 @@ function ImageHotspotMatchMode({ theme, items, activity }) {
         mistakes={dedupeById(mistakeItems)}
         onRestart={restart}
         onReviewMistakes={null}
+        onComplete={onComplete}
       />
     );
   }
 
   return (
     <section className="hub-vocab-practice-card hub-vocab-hotspot-card">
-      <div className="hub-vocab-progress-line">
-        <span>{matchedIds.length}/{sessionItems.length} matched</span>
-        <button type="button" onClick={restart}>New round</button>
-      </div>
+      <ProgressLine
+        current={matchedIds.length}
+        total={sessionItems.length}
+        label="matched"
+        action={<button type="button" onClick={restart}>New round</button>}
+      />
 
       <div className="hub-vocab-hotspot-layout">
         <HotelScene
@@ -1134,7 +1259,7 @@ function ImageHotspotMatchMode({ theme, items, activity }) {
   );
 }
 
-function ImageHotspotTypeMode({ theme, items, activity }) {
+function ImageHotspotTypeMode({ theme, items, activity, onComplete, onMistake }) {
   const [sessionItems, setSessionItems] = useState(() => shuffle(items));
   const [reviewItems, setReviewItems] = useState(null);
   const [index, setIndex] = useState(0);
@@ -1165,7 +1290,13 @@ function ImageHotspotTypeMode({ theme, items, activity }) {
     event.preventDefault();
     const accepted = [entry.term, ...(entry.acceptedAnswers || [])].map(normalizeAnswer);
     const isCorrect = accepted.includes(normalizeAnswer(answer));
-    if (!isCorrect) setMistakeItems((prev) => dedupeById([...prev, entry]));
+    if (!isCorrect) {
+      setMistakeItems((prev) => dedupeById([...prev, entry]));
+      onMistake?.(entry, {
+        userAnswer: answer,
+        correctAnswer: entry.term,
+      });
+    }
     setFeedback(isCorrect ? "correct" : "wrong");
   }
 
@@ -1209,12 +1340,15 @@ function ImageHotspotTypeMode({ theme, items, activity }) {
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
         onRestart={restart}
         onReviewMistakes={reviewMistakes}
+        onComplete={reviewItems ? null : onComplete}
       />
     );
   }
 
   return (
     <section className="hub-vocab-practice-card hub-vocab-hotspot-card">
+      <ProgressLine current={index + 1} total={activeItems.length} label="questions" />
+
       <form className="hub-vocab-type-form" onSubmit={checkAnswer}>
         <div className="hub-vocab-choice-prompt">
           <HotelScene image={activity?.sceneImage || theme.sceneImage} items={items} activeId={entry.id} />
@@ -1257,7 +1391,7 @@ function ImageHotspotTypeMode({ theme, items, activity }) {
   );
 }
 
-function ArticleChoiceMode({ items }) {
+function ArticleChoiceMode({ theme, activity, items, onComplete, onMistake }) {
   const [sessionItems, setSessionItems] = useState(() => shuffle(items.filter((entry) => entry.article)));
   const [reviewItems, setReviewItems] = useState(null);
   const [index, setIndex] = useState(0);
@@ -1297,6 +1431,10 @@ function ArticleChoiceMode({ items }) {
       setChoiceStatus("correct");
     } else {
       setMistakeItems((prev) => dedupeById([...prev, entry]));
+      onMistake?.(entry, {
+        userAnswer: `${option} ${entry.term}`,
+        correctAnswer: getDisplayAnswer(entry, theme.id),
+      });
       setChoiceStatus("wrong");
     }
   }
@@ -1327,12 +1465,15 @@ function ArticleChoiceMode({ items }) {
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
         onRestart={restart}
         onReviewMistakes={reviewMistakes}
+        onComplete={reviewItems ? null : onComplete}
       />
     );
   }
 
   return (
     <section className="hub-vocab-practice-card">
+      <ProgressLine current={index + 1} total={activeItems.length} label="questions" />
+
       <div className="hub-vocab-choice-prompt">
         {renderVisualPrompt(entry)}
         <p>Choose the correct article before <strong>{entry.term}</strong>.</p>
@@ -1367,39 +1508,43 @@ function ArticleChoiceMode({ items }) {
   );
 }
 
-function renderActivity(theme, activity) {
+function renderActivity(theme, activity, handlers = {}) {
   const items = getActivityItems(theme, activity);
-  if (activity.type === "flashcards") return <FlashcardMode theme={theme} items={items} />;
-  if (activity.type === "flag-flashcards") return <FlashcardMode theme={theme} items={items} flagMode />;
-  if (activity.type === "phrase-flashcards") return <FlashcardMode theme={theme} items={items} phraseMode />;
+  const props = {
+    onComplete: handlers.onComplete,
+    onMistake: handlers.onMistake,
+  };
+  if (activity.type === "flashcards") return <FlashcardMode theme={theme} items={items} {...props} />;
+  if (activity.type === "flag-flashcards") return <FlashcardMode theme={theme} items={items} flagMode {...props} />;
+  if (activity.type === "phrase-flashcards") return <FlashcardMode theme={theme} items={items} phraseMode {...props} />;
   if (activity.type === "matching" || activity.type === "flag-match") {
-    return <MatchingMode theme={theme} items={items} />;
+    return <MatchingMode theme={theme} items={items} {...props} />;
   }
-  if (activity.type === "quick-choice") return <ChoiceMode theme={theme} items={items} />;
-  if (activity.type === "gap-choice") return <ChoiceMode theme={theme} items={items} mode="gap" />;
-  if (activity.type === "nationality-choice") return <ChoiceMode theme={theme} items={items} mode="nationality" />;
-  if (activity.type === "opposites-choice") return <ChoiceMode theme={theme} items={items} mode="opposite" />;
-  if (activity.type === "category-choice") return <ChoiceMode theme={theme} items={items} mode="category" />;
-  if (activity.type === "speaker-choice") return <SpeakerChoiceMode items={items} />;
-  if (activity.type === "phrase-gap-fill") return <PhraseGapFillMode items={items} />;
-  if (activity.type === "image-hotspot-match") return <ImageHotspotMatchMode theme={theme} items={items} activity={activity} />;
+  if (activity.type === "quick-choice") return <ChoiceMode theme={theme} items={items} {...props} />;
+  if (activity.type === "gap-choice") return <ChoiceMode theme={theme} items={items} mode="gap" {...props} />;
+  if (activity.type === "nationality-choice") return <ChoiceMode theme={theme} items={items} mode="nationality" {...props} />;
+  if (activity.type === "opposites-choice") return <ChoiceMode theme={theme} items={items} mode="opposite" {...props} />;
+  if (activity.type === "category-choice") return <ChoiceMode theme={theme} items={items} mode="category" {...props} />;
+  if (activity.type === "speaker-choice") return <SpeakerChoiceMode theme={theme} activity={activity} items={items} {...props} />;
+  if (activity.type === "phrase-gap-fill") return <PhraseGapFillMode theme={theme} activity={activity} items={items} {...props} />;
+  if (activity.type === "image-hotspot-match") return <ImageHotspotMatchMode theme={theme} items={items} activity={activity} {...props} />;
   if (activity.type === "image-hotspot-type-answer") {
-    return <ImageHotspotTypeMode theme={theme} items={items} activity={activity} />;
+    return <ImageHotspotTypeMode theme={theme} items={items} activity={activity} {...props} />;
   }
-  if (activity.type === "type-answer") return <TypeAnswerMode theme={theme} items={items} activity={activity} />;
+  if (activity.type === "type-answer") return <TypeAnswerMode theme={theme} items={items} activity={activity} {...props} />;
   if (activity.type === "nationality-type-answer") {
-    return <TypeAnswerMode theme={theme} items={items} activity={activity} answerMode="nationality" />;
+    return <TypeAnswerMode theme={theme} items={items} activity={activity} answerMode="nationality" {...props} />;
   }
   if (activity.type === "plural-type-answer") {
-    return <TypeAnswerMode theme={theme} items={items} activity={activity} answerMode="plural" />;
+    return <TypeAnswerMode theme={theme} items={items} activity={activity} answerMode="plural" {...props} />;
   }
   if (activity.type === "opposite-type-answer") {
-    return <TypeAnswerMode theme={theme} items={items} activity={activity} answerMode="opposite" />;
+    return <TypeAnswerMode theme={theme} items={items} activity={activity} answerMode="opposite" {...props} />;
   }
   if (activity.type === "cue-gap-type-answer") {
-    return <TypeAnswerMode theme={theme} items={items} activity={activity} answerMode="gap" />;
+    return <TypeAnswerMode theme={theme} items={items} activity={activity} answerMode="gap" {...props} />;
   }
-  if (activity.type === "article-choice") return <ArticleChoiceMode items={items} />;
+  if (activity.type === "article-choice") return <ArticleChoiceMode theme={theme} activity={activity} items={items} {...props} />;
   return null;
 }
 
@@ -1410,12 +1555,82 @@ export default function HubVocabularyActivityRunner() {
   const theme = result?.theme || getHubVocabTheme(themeId);
   const activity = result?.activity;
   const activityItems = theme && activity ? getActivityItems(theme, activity) : [];
+  const [progressMap, setProgressMap] = useState({});
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     }
   }, [themeId, activityId]);
+
+  useEffect(() => {
+    let alive = true;
+    fetchHubVocabProgress()
+      .then((progress) => {
+        if (alive) setProgressMap(progress || {});
+      })
+      .catch((error) => {
+        console.error("[HubVocabularyActivityRunner] progress load failed", error);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [themeId, activityId]);
+
+  const handleComplete = useCallback(
+    ({ total, mistakes = [] } = {}) => {
+      if (!theme || !activity) return;
+      const uniqueMistakes = dedupeById(mistakes);
+      saveHubVocabActivityResult({
+        themeId: theme.id,
+        themeTitle: theme.title,
+        level: theme.level,
+        activityId: activity.id,
+        activityTitle: activity.title,
+        activityType: activity.type,
+        totalItems: total ?? activityItems.length,
+        correctFirstTry: Math.max((total ?? activityItems.length) - uniqueMistakes.length, 0),
+        mistakesCount: uniqueMistakes.length,
+      })
+        .then(() => {
+          setProgressMap((prev) => ({
+            ...prev,
+            [`${theme.id}:${activity.id}`]: {
+              id: `${theme.id}:${activity.id}`,
+              themeId: theme.id,
+              activityId: activity.id,
+              completed: true,
+            },
+          }));
+        })
+        .catch((error) => {
+          console.error("[HubVocabularyActivityRunner] save progress failed", error);
+        });
+    },
+    [activity, activityItems.length, theme]
+  );
+
+  const handleMistake = useCallback(
+    (entry, details = {}) => {
+      if (!theme || !activity || !entry) return;
+      recordVocabMistake({
+        topic: theme.id,
+        setId: activity.id,
+        sentence: getMistakePrompt(entry, theme, activity, details.answerMode),
+        correctAnswer: details.correctAnswer || getDisplayAnswer(entry, theme.id, details.answerMode),
+        userAnswer: details.userAnswer || "",
+        source: "hub-textbook",
+        itemId: entry.id || "",
+        themeTitle: theme.title,
+        activityTitle: activity.title,
+        activityType: activity.type,
+        image: entry.image || entry.flag4x3 || "",
+      }).catch((error) => {
+        console.error("[HubVocabularyActivityRunner] save mistake failed", error);
+      });
+    },
+    [activity, theme]
+  );
 
   if (!theme || !activity) {
     return (
@@ -1436,9 +1651,14 @@ export default function HubVocabularyActivityRunner() {
         description={activity.shortDescription}
       />
 
-      <button className="review-btn" onClick={() => navigate(getSitePath("/vocabulary/textbook"))}>
-        ← Back to vocabulary topics
-      </button>
+      <div className="hub-vocab-top-actions">
+        <button className="review-btn" onClick={() => navigate(getSitePath("/vocabulary/textbook"))}>
+          ← Back to vocabulary topics
+        </button>
+        <button className="review-btn mistakes" onClick={() => navigate(getSitePath("/vocabulary/textbook/mistakes"))}>
+          Review mistakes
+        </button>
+      </div>
 
       <header className="hub-vocab-runner-head" style={{ "--theme-accent": theme.accent }}>
         <div>
@@ -1453,14 +1673,23 @@ export default function HubVocabularyActivityRunner() {
         </div>
       </header>
 
-      <ActivityTabs theme={theme} activityId={activity.id} />
+      <ActivityTabs theme={theme} activityId={activity.id} progressMap={progressMap} />
 
-      {renderActivity(theme, activity)}
+      {renderActivity(theme, activity, {
+        onComplete: handleComplete,
+        onMistake: handleMistake,
+      })}
 
       <style>{`
         .hub-vocab-runner {
           display: grid;
           gap: 1rem;
+        }
+
+        .hub-vocab-top-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.7rem;
         }
 
         .hub-vocab-runner-head {
@@ -1547,6 +1776,23 @@ export default function HubVocabularyActivityRunner() {
           background: #f6bd60;
           border-color: #f6bd60;
           color: #13213b;
+        }
+
+        .hub-vocab-tabs button.completed:not(.active) {
+          border-color: rgba(114, 223, 155, 0.46);
+        }
+
+        .hub-vocab-tab-check {
+          align-items: center;
+          background: rgba(114, 223, 155, 0.18);
+          border: 1px solid rgba(114, 223, 155, 0.5);
+          border-radius: 999px;
+          display: inline-flex;
+          font-size: 0.78rem;
+          height: 1.15rem;
+          justify-content: center;
+          margin-left: 0.45rem;
+          width: 1.15rem;
         }
 
         .hub-vocab-practice-card {
