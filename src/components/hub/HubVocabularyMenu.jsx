@@ -39,6 +39,14 @@ export default function HubVocabularyMenu() {
       </div>
 
       <div className="menu-grid">
+        <button className="menu-card" onClick={() => navigate(getSitePath("/vocabulary/textbook"))}>
+          <h3>Textbook Vocabulary</h3>
+          <p>
+            Build the primary course vocabulary bank level by level, starting
+            with numbers, countries, nationalities, flags, spelling, and flashcards.
+          </p>
+        </button>
+
         <button className="menu-card" onClick={() => navigate(getSitePath("/vocabulary/topics"))}>
           <h3>Topic Trainer</h3>
           <p>

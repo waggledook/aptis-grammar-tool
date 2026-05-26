@@ -1291,7 +1291,7 @@ export const HUB_TRANSLATION_SETS = [
       { id: "b1-cond-010", spanish: "¿Qué harías si no tuvieras que trabajar mañana?", english: "What would you do if you didn't have to work tomorrow?", acceptedAnswers: ["What'd you do if you did not have to work tomorrow?"], warning: "Do not use would in the if clause." },
       { id: "b1-cond-011", spanish: "Si no comes algo ahora, tendrás hambre más tarde.", english: "If you don't eat something now, you'll be hungry later.", acceptedAnswers: ["If you do not eat something now, you will be hungry later."] },
       { id: "b1-cond-012", spanish: "Si supiera la respuesta correcta, te la diría de inmediato.", english: "If I knew the correct answer, I'd tell you right away.", acceptedAnswers: ["If I knew the right answer, I would tell you immediately."], warning: "Do not use would in the if clause." },
-      { id: "b1-cond-013", spanish: "Si nos invitan a la boda, iremos encantados.", english: "If they invite us to the wedding, we'll be happy to go.", acceptedAnswers: ["If we are invited to the wedding, we will gladly go."] },
+      { id: "b1-cond-013", spanish: "Si nos invitan a la boda, iremos.", english: "If they invite us to the wedding, we will go.", acceptedAnswers: ["If we are invited to the wedding, we will go."] },
       { id: "b1-cond-014", spanish: "Ella sería más feliz si tuviera más tiempo libre.", english: "She would be happier if she had more free time.", acceptedAnswers: ["She'd be happier if she had more spare time."], warning: "Do not use would in the if clause." },
       { id: "b1-cond-015", spanish: "Si dejas la ventana abierta, entrarán los mosquitos.", english: "If you leave the window open, the mosquitoes will come in.", acceptedAnswers: ["If you leave the window open, bugs will get in."] },
       { id: "b1-cond-016", spanish: "¿Qué pasaría si todo el mundo dejara de usar plástico?", english: "What would happen if everyone stopped using plastic?", acceptedAnswers: ["What'd happen if the whole world stopped using plastic?"], warning: "Do not use would in the if clause." },
@@ -1376,7 +1376,7 @@ export const HUB_TRANSLATION_SETS = [
           "I remembered to switch the television off before going to bed.",
         ],
       },
-      { id: "b1-gi-018", spanish: "Ella quiere aprender a tocar el piano este año.", english: "She wants to learn to play the piano this year.", acceptedAnswers: ["She wants to learn how to play the piano this year."] },
+      { id: "b1-gi-018", spanish: "Ella quiere aprender a tocar el piano este año.", english: "She wants to learn to play the piano this year.", acceptedAnswers: ["She wants to learn how to play the piano this year.", "She wants to learn to play piano this year"] },
       { id: "b1-gi-019", spanish: "Estoy harto de estudiar las mismas reglas de gramática.", english: "I am fed up with studying the same grammar rules.", acceptedAnswers: ["I'm sick of studying the same grammar rules."] },
       { id: "b1-gi-020", spanish: "Decidieron no comprar el coche porque era demasiado viejo.", english: "They decided not to buy the car because it was too old.", acceptedAnswers: ["They chose not to buy the car because it was too old."], warning: "Use a negative infinitive." },
     ],
@@ -1772,7 +1772,9 @@ export const HUB_TRANSLATION_SETS = [
         english: "The higher you climb, the more dangerous the fall will be.",
         acceptedAnswers: [
           "The higher you climb, the more dangerous the fall.",
-          "The higher you climb, the more dangerous the fall it'll be.",
+          "The higher you climb, the more dangerous the fall will be.",
+          "the higher you go, the more dangerous the fall",
+          "the higher you go, the more dangerous the fall will be",
         ],
       },
       {

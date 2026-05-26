@@ -128,6 +128,8 @@ import HubOpenClozeTrainer from "./components/hub/HubOpenClozeTrainer.jsx";
 import HubWordFormationTrainer from "./components/hub/HubWordFormationTrainer.jsx";
 import HubMeaningfulPrefixesLesson from "./components/hub/HubMeaningfulPrefixesLesson.jsx";
 import HubVocabularyMenu from "./components/hub/HubVocabularyMenu.jsx";
+import HubVocabularyA1Menu from "./components/hub/HubVocabularyA1Menu.jsx";
+import HubVocabularyActivityRunner from "./components/hub/HubVocabularyActivityRunner.jsx";
 import HubGamesMenu from "./components/hub/HubGamesMenu.jsx";
 import HubGameLeaderboards from "./components/hub/HubGameLeaderboards.jsx";
 import HubDependentPrepositionGame from "./components/hub/HubDependentPrepositionGame.jsx";
@@ -230,6 +232,14 @@ function getReadingPartKey(type) {
   if (type === "reading-part-3") return "part3";
   if (type === "reading-part-4") return "part4";
   return "";
+}
+
+function HubTranslationRoute({ user, hasAccess, onSignIn }) {
+  if (!hasAccess) {
+    return <HubLanding user={user} hasAccess={hasAccess} onSignIn={onSignIn} />;
+  }
+
+  return <HubTranslationTrainer />;
 }
 
 
@@ -994,8 +1004,26 @@ return (
   <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu user={user} />} />
   <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer user={user} />} />
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests user={user} />} />
-  <Route path="/grammar/translation" element={<HubTranslationTrainer />} />
-  <Route path="/translation" element={<HubTranslationTrainer />} />
+  <Route
+    path="/grammar/translation"
+    element={
+      <HubTranslationRoute
+        user={user}
+        hasAccess={hasSeifHubAccess}
+        onSignIn={() => setShowAuth(true)}
+      />
+    }
+  />
+  <Route
+    path="/translation"
+    element={
+      <HubTranslationRoute
+        user={user}
+        hasAccess={hasSeifHubAccess}
+        onSignIn={() => setShowAuth(true)}
+      />
+    }
+  />
   <Route path="/grammar/activity/:activityId" element={<HubGrammarActivityRunner user={user} />} />
 
   <Route path="/use-of-english" element={<HubUseOfEnglishMenu />} />
@@ -1368,6 +1396,10 @@ return (
 
 {/* vocabulary routes */}
 <Route path="/vocabulary" element={isSeifHubSite ? <HubVocabularyMenu /> : <VocabularyMenu />} />
+<Route path="/vocabulary/textbook" element={<HubVocabularyA1Menu />} />
+<Route path="/vocabulary/textbook/:themeId/:activityId" element={<HubVocabularyActivityRunner />} />
+<Route path="/vocabulary/a1" element={<HubVocabularyA1Menu />} />
+<Route path="/vocabulary/a1/:themeId/:activityId" element={<HubVocabularyActivityRunner />} />
   <Route
     path="/vocabulary/topics"
     element={<VocabularyTopics isAuthenticated={!!user} user={user} />}
