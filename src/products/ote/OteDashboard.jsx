@@ -1,53 +1,68 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
+import { getSitePath } from "../../siteConfig.js";
 import "./styles/ote.css";
 
-export default function OteDashboard({ user, onRequireSignIn }) {
+export default function OteDashboard({ user, nativeRoutes = false }) {
   const navigate = useNavigate();
-
-  function openSpeakingMock() {
-    if (!user) {
-      onRequireSignIn?.();
-      return;
-    }
-    navigate("/ote/mock-tests/speaking-1");
-  }
+  const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
+  const writingPath = getSitePath(nativeRoutes ? "/writing" : "/ote/writing");
+  const resultsPath = getSitePath(nativeRoutes ? "/results" : "/ote/results");
 
   return (
-    <main className="ote-dashboard">
+    <main className="menu-wrapper hub-menu-wrapper ote-menu-wrapper">
       <Seo
         title="OTE Training | Seif English"
         description="Oxford Test of English mock-test training for speaking and writing."
       />
 
-      <section className="ote-dashboard-hero">
-        <div>
-          <p className="ote-kicker">Oxford Test of English</p>
-          <h1>OTE Training</h1>
+      <header className="main-header ote-main-header">
+        <img
+          src="/images/seif-ote-trainer-logo.png"
+          alt="Seif OTE Trainer by Seif English Academy"
+          className="menu-logo ote-menu-logo"
+          draggable="false"
+        />
+      </header>
+
+      <p className="menu-sub">Oxford Test of English training for Seif English students.</p>
+
+      <div className="whats-new-banner hub-status-banner">
+        <div className="whats-new-copy">
+          <span className="whats-new-label">Mock-test environment</span>
+          <h3>Speaking mock is ready</h3>
           <p>
-            Exam-style mock tests in a dedicated test environment, connected to
-            your Seif English account.
+            Start with a forward-only speaking module that uses official-style timing,
+            recording windows, and a separate exam interface.
           </p>
         </div>
-        <div className="ote-hero-mark" aria-hidden="true">
-          OTE
-        </div>
-      </section>
+        <button className="whats-new-btn" type="button" onClick={() => navigate(speakingPath)}>
+          Open speaking
+        </button>
+      </div>
 
-      <section className="ote-dashboard-grid" aria-label="OTE mock tests">
-        <button className="ote-dashboard-card" type="button" onClick={openSpeakingMock}>
-          <span>Speaking</span>
-          <strong>Speaking Mock 1</strong>
-          <small>Four-part forward-only speaking module with timed recordings.</small>
+      <div className="menu-grid" aria-label="OTE sections">
+        <button className="menu-card" type="button" onClick={() => navigate(speakingPath)}>
+          <h3>Speaking</h3>
+          <p>Mock tests and speaking training for the four-part OTE speaking module.</p>
         </button>
 
-        <button className="ote-dashboard-card is-disabled" type="button" disabled>
-          <span>Writing</span>
-          <strong>Writing Mock 1</strong>
-          <small>Coming next: exam-style writing module and submission review.</small>
+        <button className="menu-card" type="button" onClick={() => navigate(writingPath)}>
+          <h3>Writing</h3>
+          <p>Writing mocks and task practice will live here as the OTE writing area grows.</p>
         </button>
-      </section>
+
+        <button className="menu-card" type="button" onClick={() => navigate(resultsPath)}>
+          <h3>Results</h3>
+          <p>Review saved mock-test attempts and teacher feedback once review tools are connected.</p>
+        </button>
+
+        <button className="menu-card" type="button" disabled>
+          <h3>Training Library</h3>
+          <p>Future lessons, phrase banks, and focused drills for OTE skills.</p>
+        </button>
+      </div>
     </main>
   );
 }

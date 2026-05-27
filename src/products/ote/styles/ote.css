@@ -80,6 +80,178 @@
   cursor: not-allowed;
 }
 
+.ote-menu-wrapper .ote-main-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.2rem;
+  padding: 0;
+  line-height: 0;
+  text-align: center;
+}
+
+.ote-menu-wrapper .ote-menu-logo {
+  display: block;
+  width: clamp(240px, 28vw, 420px);
+  height: auto;
+  margin: 0 auto;
+  filter:
+    drop-shadow(0 0 10px rgba(255,255,255,0.5))
+    drop-shadow(0 0 18px rgba(255,165,0,0.35));
+  animation: hubLogoFade 1.2s ease both;
+  transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.ote-menu-wrapper .ote-menu-logo:hover {
+  filter:
+    drop-shadow(0 0 12px rgba(255,255,255,0.8))
+    drop-shadow(0 0 25px rgba(255,165,0,0.5));
+  transform: scale(1.01);
+}
+
+.ote-menu-wrapper .menu-sub {
+  margin-top: 0.2rem;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: var(--color-text-soft);
+  opacity: 0.88;
+}
+
+.ote-menu-wrapper .whats-new-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1.25rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgba(255, 191, 73, 0.35);
+  border-radius: 14px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 191, 73, 0.10),
+    rgba(255, 191, 73, 0.04)
+  );
+}
+
+.ote-menu-wrapper .whats-new-copy {
+  min-width: 0;
+}
+
+.ote-menu-wrapper .whats-new-label {
+  display: inline-block;
+  margin-bottom: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border: 1px solid rgba(255, 191, 73, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 191, 73, 0.12);
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.ote-menu-wrapper .whats-new-copy h3 {
+  margin: 0 0 0.3rem;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  line-height: 1.2;
+}
+
+.ote-menu-wrapper .whats-new-copy p {
+  margin: 0;
+  max-width: 46rem;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-menu-wrapper .whats-new-btn {
+  flex-shrink: 0;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary-gradient);
+  color: var(--primary-text);
+  padding: 0.72rem 1.05rem;
+  font-weight: 800;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.ote-menu-wrapper .whats-new-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.18);
+}
+
+.ote-menu-wrapper .menu-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.ote-menu-wrapper .menu-card {
+  min-height: 170px;
+  padding: 1.45rem 1.5rem;
+  border: 2px solid #35508e;
+  border-radius: 22px;
+  background: #1a2847;
+  color: #eef4ff;
+  text-align: left;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.ote-menu-wrapper .menu-card:hover {
+  transform: translateY(-2px);
+  border-color: #4a6bc0;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+}
+
+.ote-menu-wrapper .menu-card h3 {
+  margin: 0 0 0.55rem;
+  color: #eef4ff;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.ote-menu-wrapper .menu-card p {
+  margin: 0;
+  color: rgba(238, 244, 255, 0.88);
+  font-size: 1rem;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.ote-hub-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.85rem;
+  color: var(--color-text);
+  font-size: clamp(2rem, 6vw, 3.5rem);
+  line-height: 1;
+}
+
+.ote-hub-logo .ote-rosette {
+  flex: 0 0 auto;
+  width: clamp(58px, 8vw, 82px);
+  height: clamp(58px, 8vw, 82px);
+  filter:
+    drop-shadow(0 0 10px rgba(255,255,255,0.42))
+    drop-shadow(0 0 18px rgba(255,165,0,0.25));
+}
+
+.ote-menu-wrapper .menu-card:disabled {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.ote-menu-wrapper .menu-card:disabled:hover {
+  transform: none;
+  box-shadow: 0 8px 22px var(--color-shadow-soft);
+}
+
+.ote-back-btn {
+  margin-top: 1rem;
+}
+
 .ote-exam {
   position: relative;
   min-height: 100vh;
@@ -546,5 +718,20 @@
 
   .ote-image-grid {
     padding: 1rem 0 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .ote-menu-wrapper .whats-new-banner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ote-menu-wrapper .whats-new-btn {
+    width: 100%;
+  }
+
+  .ote-menu-wrapper .menu-grid {
+    grid-template-columns: 1fr;
   }
 }

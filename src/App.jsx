@@ -142,6 +142,7 @@ import HubSyntaxSentinelGame from "./components/hub/HubSyntaxSentinelGame.jsx";
 import HubYourClass from "./components/hub/HubYourClass.jsx";
 import HubCourseTestRunner from "./components/hub/HubCourseTestRunner.jsx";
 import OteDashboard from "./products/ote/OteDashboard.jsx";
+import OteSkillMenu from "./products/ote/OteSkillMenu.jsx";
 import OteSpeakingMockRunner from "./products/ote/OteSpeakingMockRunner.jsx";
 import OteSpeakingResults from "./products/ote/OteSpeakingResults.jsx";
 import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
@@ -266,10 +267,12 @@ const location = useLocation();
 const isCoursePack = location.pathname.startsWith("/course-pack");
 const isAdminRoute = location.pathname.startsWith("/admin");
 const isFlashcardsPlayerRoute = /^\/grammar\/flashcards\/[^/]+$/.test(location.pathname);
-const isOteExamRoute = /^\/ote\/mock-tests\/[^/]+/.test(location.pathname);
 const currentSite = getSiteVariant();
 const isSeifHubSite = currentSite.id === "seifhub";
 const isOteSite = currentSite.id === "ote";
+const isOteExamRoute =
+  /^\/ote\/mock-tests\/[^/]+/.test(location.pathname) ||
+  (isOteSite && /^\/mock-tests\/[^/]+/.test(location.pathname));
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
 const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute;
@@ -1052,12 +1055,22 @@ return (
   <Route path="/games/spanglish-fix-it/join" element={<HubSpanglishLiveJoin />} />
   <Route path="/games/spanglish-fix-it/play/:gameId" element={<HubSpanglishLivePlayer />} />
 
-  <Route path="/ote" element={<OteDashboard user={user} onRequireSignIn={() => setShowAuth(true)} />} />
+  <Route path="/ote" element={<OteDashboard user={user} nativeRoutes={false} />} />
+  <Route path="/ote/speaking" element={<OteSkillMenu skill="speaking" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
+  <Route path="/ote/writing" element={<OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
   <Route
     path="/ote/mock-tests/:mockId"
-    element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} />}
+    element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
   />
-  <Route path="/ote/mock-tests/:mockId/results/:attemptId" element={<OteSpeakingResults user={user} />} />
+  <Route path="/ote/mock-tests/:mockId/results/:attemptId" element={<OteSpeakingResults user={user} homePath="/ote" />} />
+
+  {isOteSite && (
+    <>
+      <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
+      <Route path="/mock-tests/:mockId/results/:attemptId" element={<OteSpeakingResults user={user} homePath="/" />} />
+      <Route path="/results" element={<OteSpeakingResults user={user} homePath="/" />} />
+    </>
+  )}
 
 {/* Reading routes */}
 <Route path="/reading" element={<ReadingMenu />} />
@@ -1168,7 +1181,16 @@ return (
 
 
 {/* ——— Speaking routes ——— */}
-<Route path="/speaking" element={<SpeakingMenu />} />
+<Route
+  path="/speaking"
+  element={
+    isOteSite ? (
+      <OteSkillMenu skill="speaking" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />
+    ) : (
+      <SpeakingMenu />
+    )
+  }
+/>
 
 <Route
   path="/speaking/part1"
@@ -1468,7 +1490,16 @@ return (
 />
 
 {/* ——— Writing routes ——— */}
-<Route path="/writing" element={<WritingMenu />} />
+<Route
+  path="/writing"
+  element={
+    isOteSite ? (
+      <OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />
+    ) : (
+      <WritingMenu />
+    )
+  }
+/>
 
 <Route
   path="/writing/part1"
@@ -1882,7 +1913,7 @@ return (
             />
           ) : (
             isOteSite ? (
-              <OteDashboard user={user} onRequireSignIn={() => setShowAuth(true)} />
+              <OteDashboard user={user} nativeRoutes={isOteSite} />
             ) : (
               <MainMenu
                 onSelect={(next) => setView(next)}

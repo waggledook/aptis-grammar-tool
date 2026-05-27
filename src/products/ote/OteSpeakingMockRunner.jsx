@@ -2,6 +2,7 @@ import React, { useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { HelpCircle, Mic, MinusCircle, PlusCircle, Settings, Volume2 } from "lucide-react";
 import { saveOteMockAttempt } from "../../firebase.js";
+import { getSitePath } from "../../siteConfig.js";
 import { toast } from "../../utils/toast.js";
 import { getOteSpeakingMock } from "./mockTests/data/oteSpeakingMockData.js";
 import "./styles/ote.css";
@@ -70,7 +71,7 @@ function buildSteps(mock) {
   ];
 }
 
-export default function OteSpeakingMockRunner({ user, onRequireSignIn }) {
+export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRoutes = false }) {
   const { mockId = "speaking-1" } = useParams();
   const navigate = useNavigate();
   const mock = getOteSpeakingMock(mockId);
@@ -352,7 +353,7 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn }) {
       });
       setAttemptId(id);
       toast("OTE speaking mock submitted.");
-      navigate(`/ote/mock-tests/${mock.id}/results/${id}`);
+      navigate(getSitePath(nativeRoutes ? `/mock-tests/${mock.id}/results/${id}` : `/ote/mock-tests/${mock.id}/results/${id}`));
     } catch (error) {
       console.error("[OTE] submit failed", error);
       toast("Could not submit this mock. Your local recordings are still available.");

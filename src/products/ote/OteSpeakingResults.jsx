@@ -16,13 +16,18 @@ function formatDate(value) {
   }).format(date);
 }
 
-export default function OteSpeakingResults({ user }) {
+export default function OteSpeakingResults({ user, homePath = "/ote" }) {
   const { attemptId } = useParams();
   const navigate = useNavigate();
   const [attempt, setAttempt] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(attemptId));
 
   useEffect(() => {
+    if (!attemptId) {
+      setLoading(false);
+      setAttempt(null);
+      return undefined;
+    }
     let alive = true;
     async function load() {
       setLoading(true);
@@ -44,12 +49,17 @@ export default function OteSpeakingResults({ user }) {
 
   return (
     <main className="ote-results">
-      <button className="ote-secondary-btn" type="button" onClick={() => navigate("/ote")}>
+      <button className="ote-secondary-btn" type="button" onClick={() => navigate(homePath)}>
         Back to OTE
       </button>
       <section className="ote-results-panel">
         <p className="ote-kicker">Speaking mock result</p>
-        <h1>{loading ? "Loading result..." : attempt ? "Submission saved" : "Result not found"}</h1>
+        <h1>{!attemptId ? "Results" : loading ? "Loading result..." : attempt ? "Submission saved" : "Result not found"}</h1>
+        {!attemptId ? (
+          <p className="ote-muted">
+            Saved OTE result history will appear here once the review dashboard is connected.
+          </p>
+        ) : null}
         {attempt ? (
           <>
             <p>

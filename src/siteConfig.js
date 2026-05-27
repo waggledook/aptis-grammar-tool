@@ -102,6 +102,10 @@ export function getSiteHomePath(locationLike = getWindowLocation()) {
     return "/?site=seifhub";
   }
 
+  if (variant.id === "ote" && hostname !== "ote-seif.beeskillsenglish.com") {
+    return "/?site=ote";
+  }
+
   return "/";
 }
 
@@ -109,10 +113,15 @@ export function getSitePath(path, locationLike = getWindowLocation()) {
   const variant = getSiteVariant(locationLike);
   const hostname = locationLike?.hostname || "";
 
-  if (variant.id !== SEIF_HUB_ACCESS_KEY || hostname === "seifhub.beeskillsenglish.com") {
-    return path;
+  if (variant.id === SEIF_HUB_ACCESS_KEY && hostname !== "seifhub.beeskillsenglish.com") {
+    const separator = path.includes("?") ? "&" : "?";
+    return `${path}${separator}site=seifhub`;
   }
 
-  const separator = path.includes("?") ? "&" : "?";
-  return `${path}${separator}site=seifhub`;
+  if (variant.id === "ote" && hostname !== "ote-seif.beeskillsenglish.com") {
+    const separator = path.includes("?") ? "&" : "?";
+    return `${path}${separator}site=ote`;
+  }
+
+    return path;
 }
