@@ -4024,6 +4024,52 @@ export async function getMyCourseTestAttemptForSession(sessionId, uid) {
   return rows[0] || null;
 }
 
+export async function saveOteMockAttempt(payload = {}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in.");
+
+  const ref = doc(collection(db, "users", user.uid, "oteMockAttempts"));
+  const row = {
+    product: "ote",
+    mockId: payload.mockId || "",
+    mockTitle: payload.mockTitle || "",
+    module: payload.module || "speaking",
+    status: payload.status || "submitted",
+    studentUid: user.uid,
+    studentEmail: user.email || null,
+    studentName: user.displayName || null,
+    elapsedSeconds: Number(payload.elapsedSeconds || 0),
+    startedAtClient: payload.startedAtClient || null,
+    recordings: Array.isArray(payload.recordings) ? payload.recordings : [],
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    submittedAt: serverTimestamp(),
+  };
+
+  await setDoc(ref, row);
+  try {
+    await setDoc(doc(db, "oteMockAttempts", ref.id), row);
+  } catch (error) {
+    console.warn("[OTE] Top-level attempt mirror failed", error);
+  }
+  return ref.id;
+}
+
+export async function fetchOteMockAttempt(attemptId, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !attemptId) return null;
+
+  const userAttemptRef = doc(db, "users", realUid, "oteMockAttempts", attemptId);
+  const userSnap = await getDoc(userAttemptRef);
+  if (userSnap.exists()) return { id: userSnap.id, ...userSnap.data() };
+
+  const topLevelSnap = await getDoc(doc(db, "oteMockAttempts", attemptId));
+  if (!topLevelSnap.exists()) return null;
+  const data = topLevelSnap.data() || {};
+  if (data.studentUid !== realUid) return null;
+  return { id: topLevelSnap.id, ...data };
+}
+
 /** Optional: use a preset image that already lives in your app bundle or CDN */
 export async function setPresetAvatar(url) {
   const user = auth.currentUser;

@@ -49,6 +49,18 @@ export function getSiteVariant(locationLike = getWindowLocation()) {
   const params = new URLSearchParams(search);
   const forcedSite = String(params.get("site") || "").split("?")[0];
 
+  const isOte =
+    forcedSite === "ote" ||
+    hostname === "ote-seif.beeskillsenglish.com";
+
+  if (isOte) {
+    return {
+      id: "ote",
+      label: "OTE Seif",
+      requiresMemberAccess: false,
+    };
+  }
+
   const isSeifHub =
     forcedSite === SEIF_HUB_ACCESS_KEY ||
     hostname === "seifhub.beeskillsenglish.com";

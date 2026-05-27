@@ -141,6 +141,9 @@ import HubNegatrisGame from "./components/hub/HubNegatrisGame.jsx";
 import HubSyntaxSentinelGame from "./components/hub/HubSyntaxSentinelGame.jsx";
 import HubYourClass from "./components/hub/HubYourClass.jsx";
 import HubCourseTestRunner from "./components/hub/HubCourseTestRunner.jsx";
+import OteDashboard from "./products/ote/OteDashboard.jsx";
+import OteSpeakingMockRunner from "./products/ote/OteSpeakingMockRunner.jsx";
+import OteSpeakingResults from "./products/ote/OteSpeakingResults.jsx";
 import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 function BellIcon() {
@@ -263,11 +266,13 @@ const location = useLocation();
 const isCoursePack = location.pathname.startsWith("/course-pack");
 const isAdminRoute = location.pathname.startsWith("/admin");
 const isFlashcardsPlayerRoute = /^\/grammar\/flashcards\/[^/]+$/.test(location.pathname);
+const isOteExamRoute = /^\/ote\/mock-tests\/[^/]+/.test(location.pathname);
 const currentSite = getSiteVariant();
 const isSeifHubSite = currentSite.id === "seifhub";
+const isOteSite = currentSite.id === "ote";
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
-const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute;
+const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
@@ -871,12 +876,12 @@ const [runKey,  setRunKey]  = useState(0);
   // — RENDER MAIN APP —
 return (
   // in src/App.jsx (inside your App component’s return)
-  <div className={`App ${isWideLayout ? "App--full" : ""}`} data-theme={theme}>
+  <div className={`App ${isWideLayout ? "App--full" : ""} ${isOteExamRoute ? "App--exam" : ""}`} data-theme={theme}>
     <ToastHost />
-    <CookieBanner />
-    <div className={`content-container ${isWideLayout ? "content-container--full" : ""}`}>
+    {!isOteExamRoute && <CookieBanner />}
+    <div className={`content-container ${isWideLayout ? "content-container--full" : ""} ${isOteExamRoute ? "content-container--exam" : ""}`}>
       {/* Auth bar */}
-    <div
+    {!isOteExamRoute && <div
   style={{
     textAlign: "right",
     marginBottom: "1rem",
@@ -965,7 +970,7 @@ return (
       Sign In / Sign Up
     </button>
   )}
-</div>
+</div>}
 
    {/* ————— Show the right “page” ————— */}
 <Routes>
@@ -1046,6 +1051,13 @@ return (
   <Route path="/games/spanglish-fix-it/host/:gameId" element={<HubSpanglishLiveHost user={user} />} />
   <Route path="/games/spanglish-fix-it/join" element={<HubSpanglishLiveJoin />} />
   <Route path="/games/spanglish-fix-it/play/:gameId" element={<HubSpanglishLivePlayer />} />
+
+  <Route path="/ote" element={<OteDashboard user={user} onRequireSignIn={() => setShowAuth(true)} />} />
+  <Route
+    path="/ote/mock-tests/:mockId"
+    element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} />}
+  />
+  <Route path="/ote/mock-tests/:mockId/results/:attemptId" element={<OteSpeakingResults user={user} />} />
 
 {/* Reading routes */}
 <Route path="/reading" element={<ReadingMenu />} />
@@ -1869,10 +1881,14 @@ return (
               onSignIn={() => setShowAuth(true)}
             />
           ) : (
-            <MainMenu
-              onSelect={(next) => setView(next)}
-              user={user}
-            />
+            isOteSite ? (
+              <OteDashboard user={user} onRequireSignIn={() => setShowAuth(true)} />
+            ) : (
+              <MainMenu
+                onSelect={(next) => setView(next)}
+                user={user}
+              />
+            )
           )
         )}
 
@@ -2095,8 +2111,8 @@ return (
   )}
 </Routes>
 
-{/* Footer stays visible on all routes */}
-<Footer />
+{/* Footer stays visible on normal app routes */}
+{!isOteExamRoute && <Footer />}
 
 
   </div>
