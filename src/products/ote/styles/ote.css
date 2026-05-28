@@ -387,24 +387,6 @@
   padding: 2rem;
 }
 
-.ote-logo-wordmark {
-  position: fixed;
-  top: 1rem;
-  left: 3rem;
-  display: flex;
-  gap: 0.85rem;
-  align-items: center;
-  color: #061f43;
-  font-size: 1.35rem;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.ote-logo-wordmark .ote-exam-mark {
-  width: 48px;
-  height: 48px;
-}
-
 .ote-start-panel,
 .ote-results-panel {
   width: min(720px, calc(100vw - 2rem));
@@ -978,7 +960,6 @@
 }
 
 .ote-exam-header,
-.ote-logo-wordmark,
 .ote-countdown-screen h1,
 .ote-countdown-screen p,
 .ote-large-count,
@@ -1273,10 +1254,6 @@
   .ote-progress-rail,
   .ote-exam-meta {
     grid-column: 1 / -1;
-  }
-
-  .ote-logo-wordmark {
-    display: none;
   }
 
   .ote-status-top {

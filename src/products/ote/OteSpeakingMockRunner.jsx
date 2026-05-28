@@ -606,15 +606,6 @@ function ExamHeader({ mock, activeStep }) {
 function StartScreen({ mock, user, onStart }) {
   return (
     <section className="ote-start-screen">
-      <div className="ote-logo-wordmark">
-        <img
-          src="/images/seif-trainer-logo.png"
-          alt=""
-          className="ote-exam-mark"
-          draggable="false"
-        />
-        <span>Seif OTE Trainer</span>
-      </div>
       <div className="ote-start-panel">
         <p className="ote-kicker">Speaking module</p>
         <h1>{mock.title}</h1>
