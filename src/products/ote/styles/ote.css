@@ -255,13 +255,57 @@
 .ote-exam {
   position: relative;
   min-height: 100vh;
-  background: #fff;
-  color: #2f2f34;
   font-family: Arial, Helvetica, sans-serif;
+  --ote-exam-bg: #fff;
+  --ote-exam-text: #2f2f34;
+  --ote-exam-strong: #061f43;
+  --ote-exam-line: #d7d9dd;
+  --ote-exam-panel: #fff;
+  --ote-exam-muted-icon: #d9d9d9;
+  --ote-exam-active: #5579ae;
+  --ote-exam-accent: #5a9dea;
+  --ote-exam-footer: #fff;
+  --ote-exam-record: #ee2b1f;
+  background: var(--ote-exam-bg);
+  color: var(--ote-exam-text);
 }
 
 .ote-exam button {
   font-family: inherit;
+}
+
+.ote-theme-contrast {
+  --ote-exam-bg: #09264d;
+  --ote-exam-text: #ffffff;
+  --ote-exam-strong: #ffffff;
+  --ote-exam-line: rgba(255, 255, 255, 0.82);
+  --ote-exam-panel: #09264d;
+  --ote-exam-muted-icon: #ffffff;
+  --ote-exam-active: #ffffff;
+  --ote-exam-accent: #ffd43d;
+  --ote-exam-footer: #09264d;
+}
+
+.ote-theme-pastel {
+  --ote-exam-bg: #fff9e9;
+  --ote-exam-text: #333333;
+  --ote-exam-strong: #061f43;
+  --ote-exam-line: #d8d8d8;
+  --ote-exam-panel: #fff9e9;
+  --ote-exam-muted-icon: #d9d9d9;
+  --ote-exam-active: #5579ae;
+  --ote-exam-accent: #5a9dea;
+  --ote-exam-footer: #fff9e9;
+}
+
+.ote-font-large .ote-task-copy,
+.ote-font-large .ote-status-panel {
+  font-size: 1.12rem;
+}
+
+.ote-font-extra-large .ote-task-copy,
+.ote-font-extra-large .ote-status-panel {
+  font-size: 1.24rem;
 }
 
 .ote-exam-header {
@@ -283,6 +327,14 @@
   background:
     repeating-conic-gradient(#132e5f 0 8deg, transparent 8deg 13deg),
     radial-gradient(circle, #132e5f 0 45%, transparent 46%);
+}
+
+.ote-exam-mark {
+  display: block;
+  width: 58px;
+  height: 58px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 8px rgba(2, 15, 40, 0.18));
 }
 
 .ote-exam-title {
@@ -325,6 +377,7 @@
 }
 
 .ote-start-screen,
+.ote-sound-check-screen,
 .ote-countdown-screen,
 .ote-part-card-screen,
 .ote-complete-screen {
@@ -345,6 +398,11 @@
   font-size: 1.35rem;
   font-weight: 900;
   text-transform: uppercase;
+}
+
+.ote-logo-wordmark .ote-exam-mark {
+  width: 48px;
+  height: 48px;
 }
 
 .ote-start-panel,
@@ -395,6 +453,140 @@
   font-weight: 700;
 }
 
+.ote-sound-check-screen {
+  align-items: center;
+  padding-bottom: 6.5rem;
+}
+
+.ote-sound-check-inner {
+  width: min(980px, calc(100vw - 3rem));
+  text-align: center;
+}
+
+.ote-sound-check-inner h1 {
+  margin: 0 0 1.4rem;
+  color: var(--ote-exam-strong);
+  font-size: clamp(2.3rem, 4.8vw, 3.4rem);
+  line-height: 1;
+}
+
+.ote-sound-check-panel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  padding: 2rem 2.2rem 1.7rem;
+  border: 1px solid var(--ote-exam-line);
+  border-radius: 5px;
+  background: var(--ote-exam-panel);
+}
+
+.ote-sound-check-column {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.ote-sound-check-column p {
+  min-height: 3.2rem;
+  margin: 0;
+  color: var(--ote-exam-text);
+  font-size: 1.15rem;
+  line-height: 1.25;
+}
+
+.ote-sound-check-column button:not(.ote-volume-btn) {
+  width: min(250px, 100%);
+  min-height: 44px;
+  border: 1px solid #5a9dea;
+  border-radius: 4px;
+  background: var(--ote-exam-panel);
+  color: var(--ote-exam-active);
+  font-size: 1.15rem;
+}
+
+.ote-sound-check-column button:disabled {
+  border-color: transparent;
+  background: #eeeeee;
+  color: #9a9a9a;
+}
+
+.ote-sound-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  min-height: 94px;
+  color: #fff;
+}
+
+.ote-sound-icon > svg,
+.ote-sound-icon.is-round {
+  display: grid;
+  place-items: center;
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  background: var(--ote-exam-muted-icon);
+  color: var(--ote-exam-bg);
+  padding: 1rem;
+}
+
+.ote-sound-icon.is-active > svg,
+.ote-sound-icon.is-active.is-round {
+  background: var(--ote-exam-active);
+}
+
+.ote-sound-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 86px;
+}
+
+.ote-sound-meter i {
+  display: block;
+  width: 7px;
+  height: 42px;
+  border-radius: 999px;
+  background: var(--ote-exam-line);
+}
+
+.ote-sound-meter i.is-active {
+  background: var(--ote-exam-accent);
+}
+
+.ote-sound-meter i:nth-child(1),
+.ote-sound-meter i:nth-child(8) { height: 22px; }
+.ote-sound-meter i:nth-child(2),
+.ote-sound-meter i:nth-child(7) { height: 34px; }
+.ote-sound-meter i:nth-child(3),
+.ote-sound-meter i:nth-child(6) { height: 48px; }
+.ote-sound-meter i:nth-child(4),
+.ote-sound-meter i:nth-child(5) { height: 64px; }
+
+.ote-sound-volume {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  min-height: 94px;
+  color: var(--ote-exam-accent);
+}
+
+.ote-sound-volume-label {
+  color: var(--ote-exam-text);
+  opacity: 0.58;
+  font-size: 1.1rem;
+}
+
+.ote-sound-check-copy {
+  margin: 1.6rem 0 0;
+  color: var(--ote-exam-text);
+  font-size: 1.25rem;
+  line-height: 1.24;
+}
+
 .ote-countdown-screen h1 {
   margin: 0;
   color: #061f43;
@@ -431,9 +623,9 @@
 .ote-task-screen {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 44vw);
-  gap: 2rem;
+  gap: 1.6rem;
   min-height: calc(100vh - 154px);
-  padding: 3rem 3rem 6.2rem;
+  padding: 2.2rem 2.6rem 5.6rem;
 }
 
 .ote-task-screen.has-image-grid {
@@ -441,15 +633,23 @@
 }
 
 .ote-task-copy h2 {
-  margin: 0 0 1.2rem;
+  margin: 0 0 0.95rem;
   color: #333;
-  font-size: 2rem;
+  font-size: 1.7rem;
   text-align: left;
 }
 
 .ote-instructions {
   color: #333;
-  font-size: 1.35rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.28;
+}
+
+.ote-mode-line {
+  margin: 0 0 0.9rem;
+  color: #333;
+  font-size: 1.15rem;
   font-weight: 800;
   line-height: 1.28;
 }
@@ -461,11 +661,11 @@
 .ote-question-text,
 .ote-prompt-block,
 .ote-topic {
-  margin-top: 1.3rem;
+  margin-top: 1rem;
   max-width: 760px;
   color: #333;
-  font-size: 1.45rem;
-  line-height: 1.36;
+  font-size: 1.18rem;
+  line-height: 1.32;
 }
 
 .ote-prompt-block ul {
@@ -474,7 +674,17 @@
 }
 
 .ote-prompt-block li {
-  margin: 0.85rem 0;
+  margin: 0.65rem 0;
+}
+
+.ote-incoming-script {
+  margin: 1rem 0;
+  padding: 0.9rem 1rem;
+  border-left: 4px solid var(--ote-exam-active);
+  background: color-mix(in srgb, var(--ote-exam-panel) 82%, var(--ote-exam-line));
+  color: var(--ote-exam-text);
+  font-size: 1.1rem;
+  line-height: 1.4;
 }
 
 .ote-help-btn {
@@ -482,7 +692,7 @@
   place-items: center;
   width: 44px;
   height: 44px;
-  margin-top: 2rem;
+  margin-top: 1.4rem;
   padding: 0;
   border: 1px solid #456279;
   border-radius: 6px;
@@ -500,9 +710,9 @@
 .ote-status-top {
   display: flex;
   justify-content: center;
-  gap: 2.2rem;
-  min-height: 250px;
-  padding: 2rem;
+  gap: 1.6rem;
+  min-height: 212px;
+  padding: 1.45rem;
 }
 
 .ote-status-icon,
@@ -517,14 +727,14 @@
 
 .ote-status-icon strong,
 .ote-think-meter strong {
-  font-size: 1.4rem;
+  font-size: 1.2rem;
 }
 
 .ote-status-icon span {
   display: grid;
   place-items: center;
-  width: 118px;
-  height: 118px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
   background: #d9d9d9;
   color: #fff;
@@ -537,14 +747,14 @@
 .ote-status-icon b,
 .ote-think-meter b {
   color: #111;
-  font-size: 2rem;
+  font-size: 1.75rem;
   font-weight: 500;
 }
 
 .ote-vertical-meter {
   position: relative;
-  width: 34px;
-  height: 118px;
+  width: 30px;
+  height: 96px;
   border: 2px solid #102f61;
   border-radius: 999px;
   overflow: hidden;
@@ -563,8 +773,8 @@
   display: flex;
   align-items: center;
   gap: 1.2rem;
-  min-height: 92px;
-  padding: 1rem 2rem;
+  min-height: 76px;
+  padding: 0.75rem 1.6rem;
   border-top: 1px solid #d7d9dd;
   color: #5a9dea;
 }
@@ -593,44 +803,39 @@
 .ote-image-grid {
   grid-column: 1 / -1;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 1.6rem;
+  grid-template-columns: repeat(4, 250px);
+  justify-content: center;
+  gap: 1.25rem;
   align-self: end;
-  padding: 1.5rem 8vw 0;
-  border-top: 18px solid #f0f0f0;
+  padding: 1rem 0 0;
+  border-top: 12px solid #f0f0f0;
 }
 
 .ote-image-choice {
   display: grid;
-  grid-template-rows: minmax(120px, 1fr) auto;
+  grid-template-rows: 188px auto;
+  width: 250px;
+  margin: 0;
   padding: 0;
-  border: 2px solid #d8d8d8;
+  border: 1px solid #d8d8d8;
   border-radius: 4px;
   overflow: hidden;
   background: #fff;
   color: #333;
   text-align: left;
+  cursor: default;
 }
 
 .ote-image-choice img {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  height: 188px;
   object-fit: cover;
 }
 
-.ote-image-choice span {
+.ote-image-choice figcaption {
   display: block;
   padding: 0.55rem;
-  font-size: 1.2rem;
-}
-
-.ote-image-choice.is-selected {
-  border-color: #102f61;
-  box-shadow: 0 0 0 4px rgba(85, 121, 174, 0.18);
-}
-
-.ote-image-grid.is-locked .ote-image-choice:not(.is-selected) {
-  opacity: 0.55;
+  font-size: 1.02rem;
 }
 
 .ote-recording-progress {
@@ -668,6 +873,25 @@
   font-size: 1.1rem;
 }
 
+.ote-exam-footer button:disabled {
+  opacity: 0.52;
+  cursor: not-allowed;
+}
+
+.ote-exam-footer .ote-footer-next {
+  min-width: min(220px, 24vw);
+  min-height: 48px;
+  margin-left: auto;
+  border: none;
+  background: #5579ae;
+  color: #fff;
+}
+
+.ote-exam-footer .ote-footer-next:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
 .ote-complete-actions {
   display: flex;
   justify-content: center;
@@ -677,8 +901,75 @@
 
 .ote-recording-list {
   display: grid;
-  gap: 0.5rem;
+  gap: 0.85rem;
+  margin-top: 1.25rem;
+}
+
+.ote-download-zip-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  width: min(420px, 100%);
+  min-height: 56px;
   margin-top: 1rem;
+  border: 0;
+  border-radius: 6px;
+  background: #5579ae;
+  color: #fff;
+  font-size: 1.08rem;
+  font-weight: 800;
+}
+
+.ote-download-zip-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ote-recording-card {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(220px, 1.25fr) auto;
+  gap: 0.8rem;
+  align-items: center;
+  padding: 0.85rem;
+  border: 1px solid var(--ote-exam-line);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--ote-exam-panel) 92%, var(--ote-exam-line));
+  text-align: left;
+}
+
+.ote-recording-card span,
+.ote-recording-card small {
+  display: block;
+  color: var(--ote-exam-text);
+  opacity: 0.72;
+  font-size: 0.82rem;
+}
+
+.ote-recording-card strong {
+  display: block;
+  margin: 0.15rem 0;
+  color: var(--ote-exam-strong);
+  font-size: 0.98rem;
+}
+
+.ote-recording-card audio {
+  width: 100%;
+  min-width: 220px;
+}
+
+.ote-recording-card a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 38px;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid var(--ote-exam-active);
+  border-radius: 5px;
+  color: var(--ote-exam-active);
+  font-weight: 800;
+  text-decoration: none;
+  white-space: nowrap;
 }
 
 .ote-results {
@@ -686,11 +977,291 @@
   gap: 1rem;
 }
 
+.ote-exam-header,
+.ote-logo-wordmark,
+.ote-countdown-screen h1,
+.ote-countdown-screen p,
+.ote-large-count,
+.ote-part-card-screen > div,
+.ote-exam-title {
+  color: var(--ote-exam-strong);
+}
+
+.ote-exam-header,
+.ote-status-panel,
+.ote-start-panel,
+.ote-results-panel,
+.ote-help-btn,
+.ote-image-choice,
+.ote-exam-footer,
+.ote-secondary-btn {
+  background: var(--ote-exam-panel);
+}
+
+.ote-exam-header {
+  border-bottom-color: var(--ote-exam-strong);
+}
+
+.ote-progress-rail,
+.ote-bars i {
+  background: var(--ote-exam-line);
+}
+
+.ote-progress-rail span,
+.ote-vertical-meter i {
+  background: var(--ote-exam-strong);
+}
+
+.ote-exam-meta,
+.ote-task-copy h2,
+.ote-instructions,
+.ote-mode-line,
+.ote-question-text,
+.ote-prompt-block,
+.ote-topic,
+.ote-status-icon,
+.ote-think-meter,
+.ote-status-icon b,
+.ote-think-meter b,
+.ote-help-btn,
+.ote-image-choice,
+.ote-exam-footer,
+.ote-exam-footer button,
+.ote-secondary-btn,
+.ote-start-panel p,
+.ote-results-panel p {
+  color: var(--ote-exam-text);
+}
+
+.ote-exam-meta small {
+  color: var(--ote-exam-text);
+  opacity: 0.76;
+}
+
+.ote-status-panel,
+.ote-volume-row,
+.ote-exam-footer {
+  border-color: var(--ote-exam-line);
+}
+
+.ote-status-icon span {
+  background: var(--ote-exam-muted-icon);
+  color: var(--ote-exam-strong);
+}
+
+.ote-status-icon.is-active span {
+  background: var(--ote-exam-active);
+  color: var(--ote-exam-bg);
+}
+
+.ote-status-icon.is-active:last-child span {
+  background: var(--ote-exam-record);
+  color: #fff;
+}
+
+.ote-vertical-meter {
+  border-color: var(--ote-exam-strong);
+  background: var(--ote-exam-line);
+}
+
+.ote-volume-row,
+.ote-volume-btn,
+.ote-exam-footer svg {
+  color: var(--ote-exam-accent);
+}
+
+.ote-bars i.is-active {
+  background: var(--ote-exam-accent);
+}
+
+.ote-volume-btn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  min-width: 34px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.ote-exam-footer .ote-settings-btn {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  min-width: 44px;
+  height: 44px;
+  padding: 0;
+  border: none;
+  background: transparent;
+}
+
+.ote-options-drawer {
+  position: fixed;
+  z-index: 30;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: min(430px, 100vw);
+  border-right: 1px solid #d8d8d8;
+  background: #fff;
+  color: #333;
+  box-shadow: 12px 0 28px rgba(0, 0, 0, 0.15);
+}
+
+.ote-options-header {
+  padding: 1.4rem 1.5rem 1.5rem;
+  border-bottom: 1px solid #d8d8d8;
+}
+
+.ote-options-header h2 {
+  margin: 3rem 0 0.5rem;
+  color: #333;
+  font-size: 1.5rem;
+  text-align: left;
+}
+
+.ote-options-header p {
+  margin: 0;
+  font-size: 1.08rem;
+}
+
+.ote-options-close {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  border: 1px solid #9fa5ad;
+  border-radius: 999px;
+  background: #fff;
+  color: #5579ae;
+  padding: 0.45rem 1rem;
+}
+
+.ote-options-section {
+  padding: 1.3rem 1.5rem 1.55rem;
+  border-bottom: 1px solid #d8d8d8;
+}
+
+.ote-options-section h3 {
+  margin: 0 0 1rem;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.ote-font-preview {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: end;
+  margin-bottom: 0.65rem;
+  color: #333;
+  text-align: center;
+  font-weight: 800;
+}
+
+.ote-font-preview span:nth-child(1) { font-size: 1.05rem; }
+.ote-font-preview span:nth-child(2) { font-size: 1.35rem; }
+.ote-font-preview span:nth-child(3) { font-size: 1.7rem; }
+
+.ote-segmented {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border: 1px solid #8f8f8f;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.ote-segmented button {
+  border: 0;
+  border-right: 1px solid #8f8f8f;
+  border-radius: 0;
+  background: #fff;
+  color: #333;
+  padding: 0.6rem 0.35rem;
+}
+
+.ote-segmented button:last-child {
+  border-right: 0;
+}
+
+.ote-segmented button.is-selected {
+  background: #08244c;
+  color: #fff;
+}
+
+.ote-theme-toggle {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  margin-top: 0.9rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #333;
+  text-align: left;
+}
+
+.ote-theme-swatch {
+  width: 26px;
+  height: 26px;
+  border: 1px solid #08244c;
+  border-radius: 50%;
+}
+
+.ote-theme-swatch.is-dark {
+  background: #08244c;
+}
+
+.ote-theme-swatch.is-pastel {
+  background: #fff9e9;
+}
+
+.ote-theme-toggle i {
+  position: relative;
+  width: 64px;
+  height: 36px;
+  border-radius: 999px;
+  background: #6e6e6e;
+}
+
+.ote-theme-toggle i::before {
+  content: "";
+  position: absolute;
+  top: 5px;
+  left: 6px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.16s ease;
+}
+
+.ote-theme-toggle i.is-on::before {
+  transform: translateX(26px);
+}
+
+.ote-options-confirm {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #d8d8d8;
+}
+
+.ote-options-confirm button {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 5px;
+  background: #5579ae;
+  color: #fff;
+}
+
 @media (max-width: 900px) {
   .ote-dashboard-grid,
   .ote-dashboard-hero,
-  .ote-task-screen,
-  .ote-image-grid {
+  .ote-task-screen {
     grid-template-columns: 1fr;
   }
 
@@ -718,6 +1289,14 @@
 
   .ote-image-grid {
     padding: 1rem 0 0;
+  }
+
+  .ote-recording-card {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-recording-card audio {
+    min-width: 0;
   }
 }
 

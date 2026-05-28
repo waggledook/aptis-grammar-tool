@@ -1,9 +1,6 @@
 import React, { useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { HelpCircle, Mic, MinusCircle, PlusCircle, Settings, Volume2 } from "lucide-react";
-import { saveOteMockAttempt } from "../../firebase.js";
-import { getSitePath } from "../../siteConfig.js";
-import { toast } from "../../utils/toast.js";
+import { Download, HelpCircle, Mic, MinusCircle, Play, PlusCircle, Settings, Volume2 } from "lucide-react";
 import { getOteSpeakingMock } from "./mockTests/data/oteSpeakingMockData.js";
 import "./styles/ote.css";
 
@@ -28,43 +25,65 @@ function buildSteps(mock) {
   const part4 = mock.parts.find((part) => part.id === "part-4");
 
   return [
-    { kind: "module-countdown", id: "module-start", seconds: 6 },
+    { kind: "module-countdown", id: "module-start", seconds: 10 },
     { kind: "part-card", id: "part-1-card", part: part1, seconds: 2 },
+    ...(part1.instructionAudioSrc
+      ? [{ kind: "part-instructions", id: "part-1-instructions", part: part1, audioSrc: part1.instructionAudioSrc }]
+      : []),
     ...part1.questions.map((question, index) => ({
       kind: "listen-record",
       id: question.id,
       part: part1,
+      progressIndex: index + 1,
+      progressTotal: part1.questions.length,
       prompt: question.prompt,
+      audioSrc: question.audioSrc,
       label: `Question ${index + 1} of ${part1.questions.length}`,
       responseSeconds: question.responseSeconds,
     })),
     { kind: "part-card", id: "part-2-card", part: part2, seconds: 2 },
+    ...(part2.instructionAudioSrc
+      ? [{ kind: "part-instructions", id: "part-2-instructions", part: part2, audioSrc: part2.instructionAudioSrc }]
+      : []),
     ...part2.tasks.map((task, index) => ({
       kind: "prep-record",
       id: task.id,
       part: part2,
+      progressIndex: index + 1,
+      progressTotal: part2.tasks.length,
       task,
       label: `Voice message ${index + 1} of ${part2.tasks.length}`,
       prepSeconds: task.prepSeconds,
       responseSeconds: task.responseSeconds,
     })),
     { kind: "part-card", id: "part-3-card", part: part3, seconds: 2 },
+    ...(part3.instructionAudioSrc
+      ? [{ kind: "part-instructions", id: "part-3-instructions", part: part3, audioSrc: part3.instructionAudioSrc }]
+      : []),
     {
       kind: "talk-grid",
       id: part3.task.id,
       part: part3,
+      progressIndex: 1,
+      progressTotal: 1,
       task: part3.task,
       label: "Talk",
       prepSeconds: part3.task.prepSeconds,
       responseSeconds: part3.task.responseSeconds,
     },
     { kind: "part-card", id: "part-4-card", part: part4, seconds: 2 },
+    ...(part4.instructionAudioSrc
+      ? [{ kind: "part-instructions", id: "part-4-instructions", part: part4, audioSrc: part4.instructionAudioSrc }]
+      : []),
     ...part4.questions.map((question, index) => ({
       kind: "listen-record",
       id: question.id,
       part: part4,
+      progressIndex: index + 1,
+      progressTotal: part4.questions.length,
       topic: part4.topic,
       prompt: question.prompt,
+      audioSrc: question.audioSrc,
       label: `Question ${index + 1} of ${part4.questions.length}`,
       responseSeconds: question.responseSeconds,
     })),
@@ -88,18 +107,31 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
   const [recordings, setRecordings] = useState([]);
   const [micError, setMicError] = useState("");
-  const [selectedImages, setSelectedImages] = useState([]);
-  const [attemptId, setAttemptId] = useState("");
+  const [volume, setVolume] = useState(0.8);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [soundCheckState, setSoundCheckState] = useState("idle");
+  const [soundCheckSecondsLeft, setSoundCheckSecondsLeft] = useState(10);
+  const [soundCheckUrl, setSoundCheckUrl] = useState("");
+  const [visualSettings, setVisualSettings] = useState({
+    fontSize: "medium",
+    theme: "default",
+  });
 
   const runningRef = useRef(false);
   const streamRef = useRef(null);
   const startedAtRef = useRef(null);
   const elapsedTimerRef = useRef(null);
-  const selectedImagesRef = useRef([]);
+  const volumeRef = useRef(volume);
+  const soundCheckUrlRef = useRef("");
+  const skipRequestedRef = useRef(false);
+  const skipResolverRef = useRef(null);
+  const currentAudioRef = useRef(null);
 
-  function updateSelectedImages(next) {
-    selectedImagesRef.current = next;
-    setSelectedImages(next);
+  function updateVolume(nextValue) {
+    const next = Math.max(0.2, Math.min(1, Number(nextValue)));
+    volumeRef.current = next;
+    if (currentAudioRef.current) currentAudioRef.current.volume = next;
+    setVolume(next);
   }
 
   async function ensureStream() {
@@ -129,10 +161,33 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
     return new Promise((resolve) => window.setTimeout(resolve, ms));
   }
 
+  function waitSkippable(ms) {
+    if (skipRequestedRef.current) return Promise.resolve(false);
+    return new Promise((resolve) => {
+      const timeoutId = window.setTimeout(() => {
+        skipResolverRef.current = null;
+        resolve(true);
+      }, ms);
+      skipResolverRef.current = () => {
+        window.clearTimeout(timeoutId);
+        skipResolverRef.current = null;
+        resolve(false);
+      };
+    });
+  }
+
+  function consumeSkipRequest() {
+    if (!skipRequestedRef.current) return false;
+    skipRequestedRef.current = false;
+    setSecondsLeft(0);
+    return true;
+  }
+
   async function runCountdown(seconds, nextPhase) {
     setPhase(nextPhase);
     setSecondsLeft(seconds);
     for (let left = seconds; left > 0; left -= 1) {
+      if (consumeSkipRequest()) return runningRef.current;
       if (!runningRef.current) return false;
       if (
         startedAtRef.current &&
@@ -142,7 +197,8 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
         return false;
       }
       setSecondsLeft(left);
-      await wait(1000);
+      const waited = await waitSkippable(1000);
+      if (!waited && consumeSkipRequest()) return runningRef.current;
     }
     setSecondsLeft(0);
     return runningRef.current;
@@ -151,20 +207,61 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
   async function speakPrompt(text) {
     setPhase("listen");
     setSecondsLeft(0);
+    if (consumeSkipRequest()) return runningRef.current;
 
     if (!window.speechSynthesis || !window.SpeechSynthesisUtterance) {
-      await wait(Math.min(4200, Math.max(1600, String(text).length * 48)));
+      await waitSkippable(Math.min(4200, Math.max(1600, String(text).length * 48)));
       return runningRef.current;
     }
 
     window.speechSynthesis.cancel();
     return new Promise((resolve) => {
+      let settled = false;
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        skipResolverRef.current = null;
+        resolve(runningRef.current);
+      };
       const utterance = new window.SpeechSynthesisUtterance(text);
       utterance.lang = "en-GB";
       utterance.rate = 0.92;
-      utterance.onend = () => resolve(runningRef.current);
-      utterance.onerror = () => resolve(runningRef.current);
+      utterance.volume = volumeRef.current;
+      utterance.onend = finish;
+      utterance.onerror = finish;
+      skipResolverRef.current = () => {
+        window.speechSynthesis.cancel();
+        finish();
+      };
       window.speechSynthesis.speak(utterance);
+    });
+  }
+
+  async function playAudioFile(src) {
+    if (!src) return runningRef.current;
+    setPhase("listen");
+    setSecondsLeft(0);
+    if (consumeSkipRequest()) return runningRef.current;
+
+    return new Promise((resolve) => {
+      const audio = new Audio(src);
+      let settled = false;
+
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        audio.pause();
+        currentAudioRef.current = null;
+        skipResolverRef.current = null;
+        resolve(runningRef.current);
+      };
+
+      currentAudioRef.current = audio;
+      audio.volume = volumeRef.current;
+      audio.onended = finish;
+      audio.onerror = finish;
+      skipResolverRef.current = finish;
+      audio.play().catch(finish);
     });
   }
 
@@ -176,7 +273,7 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.frequency.value = 880;
-      gain.gain.value = 0.08;
+      gain.gain.value = 0.08 * volumeRef.current;
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start();
@@ -186,6 +283,61 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
     } catch {
       await wait(220);
     }
+  }
+
+  async function recordSoundCheck() {
+    if (soundCheckState === "recording") return;
+    if (soundCheckUrlRef.current) URL.revokeObjectURL(soundCheckUrlRef.current);
+    soundCheckUrlRef.current = "";
+    setSoundCheckUrl("");
+    setSoundCheckState("recording");
+    setSoundCheckSecondsLeft(10);
+
+    const stream = await ensureStream();
+    const mimeType = getSupportedMimeType();
+    const canRecord = stream && typeof MediaRecorder !== "undefined";
+
+    if (!canRecord) {
+      setSoundCheckState("idle");
+      setMicError("Microphone recording is not available in this browser.");
+      return;
+    }
+
+    const chunks = [];
+    const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    const stopped = new Promise((resolve) => {
+      recorder.ondataavailable = (event) => {
+        if (event.data?.size) chunks.push(event.data);
+      };
+      recorder.onstop = () => {
+        const finalType = mimeType || chunks[0]?.type || "audio/webm";
+        const blob = new Blob(chunks, { type: finalType });
+        const url = URL.createObjectURL(blob);
+        soundCheckUrlRef.current = url;
+        setSoundCheckUrl(url);
+        resolve();
+      };
+    });
+
+    recorder.start();
+    for (let left = 10; left > 0; left -= 1) {
+      setSoundCheckSecondsLeft(left);
+      await wait(1000);
+    }
+    setSoundCheckSecondsLeft(0);
+    if (recorder.state === "recording") recorder.stop();
+    await stopped;
+    setSoundCheckState("ready");
+  }
+
+  function playSoundCheck() {
+    if (!soundCheckUrl) return;
+    const audio = new Audio(soundCheckUrl);
+    audio.volume = volumeRef.current;
+    setSoundCheckState("playing");
+    audio.onended = () => setSoundCheckState("ready");
+    audio.onerror = () => setSoundCheckState("ready");
+    audio.play().catch(() => setSoundCheckState("ready"));
   }
 
   async function recordFor(step, seconds) {
@@ -212,7 +364,7 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
             partNumber: step.part?.number || null,
             label: step.label || step.task?.title || step.prompt || step.id,
             prompt: step.prompt || step.task?.lead || step.task?.prompt || "",
-            selectedImageIds: step.kind === "talk-grid" ? [...selectedImagesRef.current] : [],
+            selectedImageIds: [],
             durationSeconds: seconds,
             mimeType: finalType,
             size: blob.size,
@@ -237,7 +389,7 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
         partNumber: step.part?.number || null,
         label: step.label || step.id,
         prompt: step.prompt || step.task?.lead || "",
-        selectedImageIds: step.kind === "talk-grid" ? [...selectedImagesRef.current] : [],
+        selectedImageIds: [],
         durationSeconds: seconds,
         mimeType: "",
         size: 0,
@@ -257,13 +409,21 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
     if (step.kind === "part-card") {
       setPhase("part-card");
       setSecondsLeft(0);
-      await wait(step.seconds * 1000);
+      await waitSkippable(step.seconds * 1000);
+      consumeSkipRequest();
+      return;
+    }
+
+    if (step.kind === "part-instructions") {
+      await playAudioFile(step.audioSrc);
+      consumeSkipRequest();
       return;
     }
 
     if (step.kind === "listen-record") {
-      const heard = await speakPrompt(step.prompt);
+      const heard = step.audioSrc ? await playAudioFile(step.audioSrc) : await speakPrompt(step.prompt);
       if (!heard) return;
+      if (consumeSkipRequest()) return;
       await playTone();
       const recording = await recordFor(step, step.responseSeconds);
       if (recording) setRecordings((prev) => [...prev, recording]);
@@ -271,17 +431,29 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
     }
 
     if (step.kind === "prep-record" || step.kind === "talk-grid") {
+      if (step.task?.instructionAudioSrc) {
+        await playAudioFile(step.task.instructionAudioSrc);
+        consumeSkipRequest();
+      }
+      if (step.task?.taskAudioSrc) {
+        await playAudioFile(step.task.taskAudioSrc);
+        consumeSkipRequest();
+      }
+      if (step.task?.nowListenAudioSrc) {
+        await playAudioFile(step.task.nowListenAudioSrc);
+        consumeSkipRequest();
+      }
+      if (step.task?.incomingAudioSrc) {
+        await playAudioFile(step.task.incomingAudioSrc);
+        consumeSkipRequest();
+      }
+      if (step.task?.thinkingAudioSrc) {
+        await playAudioFile(step.task.thinkingAudioSrc);
+        consumeSkipRequest();
+      }
       setPhase("prep");
-      if (step.kind === "talk-grid") updateSelectedImages([]);
       const prepared = await runCountdown(step.prepSeconds, "prep");
       if (!prepared) return;
-      if (step.kind === "talk-grid" && selectedImagesRef.current.length < 2) {
-        const fallback = step.task.images
-          .map((image) => image.id)
-          .filter((id) => !selectedImagesRef.current.includes(id))
-          .slice(0, 2 - selectedImagesRef.current.length);
-        updateSelectedImages([...selectedImagesRef.current, ...fallback]);
-      }
       await playTone();
       const recording = await recordFor(step, step.responseSeconds);
       if (recording) setRecordings((prev) => [...prev, recording]);
@@ -293,10 +465,21 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
       onRequireSignIn?.();
       return;
     }
+    setStatus("sound-check");
+    setMicError("");
+    await ensureStream();
+  }
+
+  async function handleBeginExam() {
     setStatus("running");
     setRecordings([]);
-    setAttemptId("");
     setMicError("");
+    setElapsedSeconds(0);
+    setActiveStep(null);
+    setPhase("idle");
+    setSecondsLeft(0);
+    skipRequestedRef.current = false;
+    skipResolverRef.current = null;
     runningRef.current = true;
     startedAtRef.current = new Date();
     elapsedTimerRef.current = window.setInterval(() => {
@@ -326,62 +509,34 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
     setStatus("complete");
   }
 
-  async function handleSubmit() {
-    if (!user) {
-      onRequireSignIn?.();
-      return;
-    }
-    try {
-      const id = await saveOteMockAttempt({
-        mockId: mock.id,
-        mockTitle: mock.title,
-        module: "speaking",
-        status: "submitted",
-        elapsedSeconds,
-        startedAtClient: startedAtRef.current ? startedAtRef.current.toISOString() : null,
-        recordings: recordings.map((recording) => ({
-          id: recording.id,
-          partId: recording.partId,
-          partNumber: recording.partNumber,
-          label: recording.label,
-          prompt: recording.prompt,
-          selectedImageIds: recording.selectedImageIds || [],
-          durationSeconds: recording.durationSeconds,
-          mimeType: recording.mimeType,
-          size: recording.size,
-        })),
-      });
-      setAttemptId(id);
-      toast("OTE speaking mock submitted.");
-      navigate(getSitePath(nativeRoutes ? `/mock-tests/${mock.id}/results/${id}` : `/ote/mock-tests/${mock.id}/results/${id}`));
-    } catch (error) {
-      console.error("[OTE] submit failed", error);
-      toast("Could not submit this mock. Your local recordings are still available.");
-    }
-  }
-
-  function toggleImage(imageId) {
-    if (status !== "running" || phase !== "prep" || activeStep?.kind !== "talk-grid") return;
-    const current = selectedImagesRef.current;
-    if (current.includes(imageId)) {
-      updateSelectedImages(current.filter((id) => id !== imageId));
-      return;
-    }
-    if (current.length >= 2) return;
-    updateSelectedImages([...current, imageId]);
+  function handleSkip() {
+    if (status !== "running") return;
+    skipRequestedRef.current = true;
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    if (currentAudioRef.current) currentAudioRef.current.pause();
+    skipResolverRef.current?.();
   }
 
   return (
-    <main className="ote-exam">
-      <ExamHeader mock={mock} activeStep={activeStep} elapsedSeconds={elapsedSeconds} />
+    <main className={`ote-exam ote-font-${visualSettings.fontSize} ote-theme-${visualSettings.theme}`}>
+      <ExamHeader mock={mock} activeStep={activeStep} />
 
       {status === "ready" ? (
         <StartScreen mock={mock} user={user} onStart={handleStart} />
+      ) : status === "sound-check" ? (
+        <SoundCheckScreen
+          micError={micError}
+          soundCheckState={soundCheckState}
+          secondsLeft={soundCheckSecondsLeft}
+          soundCheckUrl={soundCheckUrl}
+          volume={volume}
+          onRecord={recordSoundCheck}
+          onListen={playSoundCheck}
+          onVolumeChange={updateVolume}
+        />
       ) : status === "complete" ? (
         <CompleteScreen
           recordings={recordings}
-          attemptId={attemptId}
-          onSubmit={handleSubmit}
           onDashboard={() => navigate("/ote")}
         />
       ) : (
@@ -390,19 +545,31 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
           phase={phase}
           secondsLeft={secondsLeft}
           micError={micError}
-          selectedImages={selectedImages}
-          onToggleImage={toggleImage}
           completedRecordings={recordings.length}
           totalRecordingSteps={totalRecordingSteps}
+          volume={volume}
+          onVolumeChange={updateVolume}
         />
       )}
 
-      <ExamFooter />
+      <ExamFooter
+        onOpenSettings={() => setSettingsOpen(true)}
+        onSkip={status === "running" ? handleSkip : undefined}
+        nextLabel={status === "sound-check" ? "Next" : ""}
+        onNext={status === "sound-check" ? handleBeginExam : undefined}
+        nextDisabled={status === "sound-check" && soundCheckState === "recording"}
+      />
+      <VisualOptionsDrawer
+        open={settingsOpen}
+        settings={visualSettings}
+        onChange={setVisualSettings}
+        onClose={() => setSettingsOpen(false)}
+      />
     </main>
   );
 }
 
-function ExamHeader({ mock, activeStep, elapsedSeconds }) {
+function ExamHeader({ mock, activeStep }) {
   const part = activeStep?.part;
   const title = part ? (
     <>
@@ -411,19 +578,26 @@ function ExamHeader({ mock, activeStep, elapsedSeconds }) {
   ) : (
     <strong>{mock.title}</strong>
   );
-  const progress = part ? ((part.number - 1) / 4) * 100 : 0;
+  const progress =
+    activeStep?.progressTotal
+      ? ((activeStep.progressIndex - 1) / activeStep.progressTotal) * 100
+      : 0;
 
   return (
     <header className="ote-exam-header">
-      <div className="ote-rosette" aria-hidden="true" />
+      <img
+        src="/images/seif-trainer-logo.png"
+        alt=""
+        className="ote-exam-mark"
+        draggable="false"
+      />
       <div className="ote-exam-title">{title}</div>
       <div className="ote-progress-rail" aria-hidden="true">
         <span style={{ width: `${progress}%` }} />
       </div>
       <div className="ote-exam-meta">
-        <strong>Oxford Test Of English Demo Test</strong>
-        <span>Demo</span>
-        <small>{formatTime(elapsedSeconds)}</small>
+        <strong>Seif OTE Trainer</strong>
+        <span>Mock</span>
       </div>
     </header>
   );
@@ -433,15 +607,20 @@ function StartScreen({ mock, user, onStart }) {
   return (
     <section className="ote-start-screen">
       <div className="ote-logo-wordmark">
-        <span className="ote-rosette" aria-hidden="true" />
-        <span>Oxford Test of English</span>
+        <img
+          src="/images/seif-trainer-logo.png"
+          alt=""
+          className="ote-exam-mark"
+          draggable="false"
+        />
+        <span>Seif OTE Trainer</span>
       </div>
       <div className="ote-start-panel">
         <p className="ote-kicker">Speaking module</p>
         <h1>{mock.title}</h1>
         <p>
-          Your speaking module will run automatically. Once it begins, there are no skip,
-          pause, or back controls.
+          Your speaking module will run automatically. You can use Skip to move through
+          practice questions more quickly.
         </p>
         {!user ? <p className="ote-warning">Sign in to save this mock to your account.</p> : null}
         <button className="ote-primary-btn" type="button" onClick={onStart}>
@@ -452,15 +631,113 @@ function StartScreen({ mock, user, onStart }) {
   );
 }
 
+function SoundCheckScreen({
+  micError,
+  soundCheckState,
+  secondsLeft,
+  soundCheckUrl,
+  volume,
+  onRecord,
+  onListen,
+  onVolumeChange,
+}) {
+  const isRecording = soundCheckState === "recording";
+  const isPlaying = soundCheckState === "playing";
+  const canListen = Boolean(soundCheckUrl) && !isRecording;
+  const activeBars = Math.max(1, Math.round(volume * 6));
+
+  return (
+    <section className="ote-sound-check-screen">
+      <div className="ote-sound-check-inner">
+        <h1>Check your sound</h1>
+        <div className="ote-sound-check-panel">
+          <div className="ote-sound-check-column">
+            <p>
+              Choose <strong>Record</strong>
+              <br />
+              Speak for 10 seconds
+            </p>
+            <div className={`ote-sound-icon ${isRecording ? "is-active" : ""}`}>
+              <Mic size={58} />
+              <span className="ote-sound-meter" aria-hidden="true">
+                {[1, 2, 3, 4, 5, 6, 7, 8].map((bar) => (
+                  <i key={bar} className={isRecording ? "is-active" : ""} />
+                ))}
+              </span>
+            </div>
+            <button type="button" onClick={onRecord} disabled={isRecording}>
+              {isRecording ? formatTime(secondsLeft) : "Record"}
+            </button>
+          </div>
+
+          <div className="ote-sound-check-column">
+            <p>
+              <strong>Listen</strong> to check your
+              <br />
+              recording
+            </p>
+            <div className={`ote-sound-icon is-round ${isPlaying ? "is-active" : ""}`}>
+              <Play size={58} fill="currentColor" />
+            </div>
+            <button type="button" onClick={onListen} disabled={!canListen || isPlaying}>
+              {isPlaying ? "Playing" : "Listen"}
+            </button>
+          </div>
+
+          <div className="ote-sound-check-column">
+            <p>
+              You can change
+              <br />
+              the volume
+            </p>
+            <div className="ote-sound-volume">
+              <button
+                type="button"
+                className="ote-volume-btn"
+                onClick={() => onVolumeChange(volume - 0.15)}
+                aria-label="Decrease sound check volume"
+              >
+                <MinusCircle size={28} />
+              </button>
+              <span className="ote-bars" aria-hidden="true">
+                {[1, 2, 3, 4, 5, 6].map((bar) => (
+                  <i key={bar} className={bar <= activeBars ? "is-active" : ""} />
+                ))}
+              </span>
+              <button
+                type="button"
+                className="ote-volume-btn"
+                onClick={() => onVolumeChange(volume + 0.15)}
+                aria-label="Increase sound check volume"
+              >
+                <PlusCircle size={28} />
+              </button>
+            </div>
+            <span className="ote-sound-volume-label">Change volume</span>
+          </div>
+        </div>
+        <p className="ote-sound-check-copy">
+          Sound checks OK?
+          <br />
+          Yes? Choose <strong>Next.</strong>
+          <br />
+          No? Speak to your teacher.
+        </p>
+        {micError ? <p className="ote-warning">{micError}</p> : null}
+      </div>
+    </section>
+  );
+}
+
 function ExamBody({
   activeStep,
   phase,
   secondsLeft,
   micError,
-  selectedImages,
-  onToggleImage,
   completedRecordings,
   totalRecordingSteps,
+  volume,
+  onVolumeChange,
 }) {
   if (!activeStep) return null;
 
@@ -488,6 +765,7 @@ function ExamBody({
     <section className={`ote-task-screen ${activeStep.kind === "talk-grid" ? "has-image-grid" : ""}`}>
       <div className="ote-task-copy">
         <h2>{activeStep.part.title}</h2>
+        {activeStep.kind === "prep-record" ? <VoicemailModeLine mode={activeStep.task.mode} /> : null}
         <InstructionBlock lines={activeStep.part.instructions} />
         {activeStep.kind === "listen-record" ? (
           <>
@@ -503,16 +781,26 @@ function ExamBody({
         </button>
       </div>
 
-      <StatusPanel phase={phase} secondsLeft={secondsLeft} />
+      <StatusPanel phase={phase} secondsLeft={secondsLeft} volume={volume} onVolumeChange={onVolumeChange} />
 
       {activeStep.kind === "talk-grid" ? (
-        <ImageGrid task={activeStep.task} selectedImages={selectedImages} onToggleImage={onToggleImage} phase={phase} />
+        <ImageGrid task={activeStep.task} />
       ) : null}
 
       <div className="ote-recording-progress">
         Recorded {completedRecordings} of {totalRecordingSteps}
       </div>
     </section>
+  );
+}
+
+function VoicemailModeLine({ mode }) {
+  return (
+    <p className="ote-mode-line">
+      {mode === "reply"
+        ? "You are going to reply to a voice message."
+        : "You are going to leave a voice message."}
+    </p>
   );
 }
 
@@ -530,11 +818,15 @@ function VoicemailPrompt({ task }) {
   return (
     <div className="ote-prompt-block">
       <p>{task.lead}</p>
+      {task.incomingAudioScript ? (
+        <blockquote className="ote-incoming-script">{task.incomingAudioScript}</blockquote>
+      ) : null}
       <ul>
         {task.bullets.map((item) => (
           <li key={item}>{item}</li>
         ))}
       </ul>
+      {task.nowListenAudioSrc ? <strong>Now listen to the message.</strong> : null}
       <strong>You now have some time to think about what you want to say.</strong>
     </div>
   );
@@ -544,16 +836,16 @@ function TalkPrompt({ task }) {
   return (
     <div className="ote-prompt-block">
       <p>{task.prompt}</p>
-      <p>Choose exactly two photographs.</p>
       <strong>You now have some time to think about what you want to say.</strong>
     </div>
   );
 }
 
-function StatusPanel({ phase, secondsLeft }) {
+function StatusPanel({ phase, secondsLeft, volume, onVolumeChange }) {
   const isPrep = phase === "prep";
   const isRecord = phase === "record";
   const isListen = phase === "listen";
+  const activeBars = Math.max(1, Math.round(volume * 6));
 
   return (
     <aside className="ote-status-panel">
@@ -571,16 +863,27 @@ function StatusPanel({ phase, secondsLeft }) {
         <StatusIcon label="Speak" active={isRecord} icon={<Mic size={72} />} time={isRecord ? formatTime(secondsLeft) : "00:00"} />
       </div>
       <div className="ote-volume-row">
-        <MinusCircle size={28} />
-        <span className="ote-bars" aria-hidden="true">
-          <i />
-          <i />
-          <i />
-          <i />
-          <i />
-          <i />
+        <button
+          type="button"
+          className="ote-volume-btn"
+          onClick={() => onVolumeChange(volume - 0.15)}
+          aria-label="Decrease question volume"
+        >
+          <MinusCircle size={28} />
+        </button>
+        <span className="ote-bars" aria-hidden="true" style={{ "--active-bars": activeBars }}>
+          {[1, 2, 3, 4, 5, 6].map((bar) => (
+            <i key={bar} className={bar <= activeBars ? "is-active" : ""} />
+          ))}
         </span>
-        <PlusCircle size={28} />
+        <button
+          type="button"
+          className="ote-volume-btn"
+          onClick={() => onVolumeChange(volume + 0.15)}
+          aria-label="Increase question volume"
+        >
+          <PlusCircle size={28} />
+        </button>
       </div>
     </aside>
   );
@@ -596,51 +899,133 @@ function StatusIcon({ label, active, icon, time }) {
   );
 }
 
-function ImageGrid({ task, selectedImages, onToggleImage, phase }) {
+function ImageGrid({ task }) {
   return (
-    <div className={`ote-image-grid ${phase !== "prep" ? "is-locked" : ""}`}>
-      {task.images.map((image) => {
-        const selected = selectedImages.includes(image.id);
-        return (
-          <button
-            key={image.id}
-            type="button"
-            className={`ote-image-choice ${selected ? "is-selected" : ""}`}
-            onClick={() => onToggleImage(image.id)}
-            disabled={phase !== "prep"}
-          >
-            <img src={image.src} alt="" />
-            <span>{image.label}</span>
-          </button>
-        );
-      })}
+    <div className="ote-image-grid">
+      {task.images.map((image) => (
+        <figure key={image.id} className="ote-image-choice">
+          <img src={image.src} alt="" />
+          <figcaption>{image.label}</figcaption>
+        </figure>
+      ))}
     </div>
   );
 }
 
-function CompleteScreen({ recordings, onSubmit, onDashboard }) {
+async function createZipAndDownload(files, zipName = "recordings.zip") {
+  const enc = new TextEncoder();
+  const centralDir = [];
+  const localParts = [];
+  let offset = 0;
+
+  const u16 = (n) => {
+    const b = new Uint8Array(2);
+    new DataView(b.buffer).setUint16(0, n, true);
+    return b;
+  };
+  const u32 = (n) => {
+    const b = new Uint8Array(4);
+    new DataView(b.buffer).setUint32(0, n, true);
+    return b;
+  };
+  const concatU8 = (parts) => {
+    const total = parts.reduce((n, p) => n + p.byteLength, 0);
+    const out = new Uint8Array(total);
+    let pos = 0;
+    parts.forEach((p) => {
+      out.set(p, pos);
+      pos += p.byteLength;
+    });
+    return out;
+  };
+  const crcTable = (() => {
+    const t = new Uint32Array(256);
+    for (let i = 0; i < 256; i += 1) {
+      let c = i;
+      for (let k = 0; k < 8; k += 1) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+      t[i] = c >>> 0;
+    }
+    return t;
+  })();
+  const crc32 = (buf) => {
+    let c = 0 ^ -1;
+    const v = new Uint8Array(buf);
+    for (let i = 0; i < v.length; i += 1) c = (c >>> 8) ^ crcTable[(c ^ v[i]) & 0xff];
+    return (c ^ -1) >>> 0;
+  };
+
+  for (const f of files) {
+    const data = await f.blob.arrayBuffer();
+    const nameBytes = enc.encode(f.name);
+    const crc = crc32(data);
+    const size = data.byteLength;
+    const localHeader = concatU8([
+      u32(0x04034b50), u16(20), u16(0), u16(0), u16(0), u16(0),
+      u32(crc), u32(size), u32(size), u16(nameBytes.length), u16(0), nameBytes,
+    ]);
+    localParts.push(localHeader, new Uint8Array(data));
+    centralDir.push(concatU8([
+      u32(0x02014b50), u16(20), u16(20), u16(0), u16(0), u16(0), u16(0),
+      u32(crc), u32(size), u32(size), u16(nameBytes.length), u16(0), u16(0),
+      u16(0), u16(0), u32(0), u32(offset), nameBytes,
+    ]));
+    offset += localHeader.byteLength + size;
+  }
+
+  const central = centralDir.length ? concatU8(centralDir) : new Uint8Array();
+  const end = concatU8([
+    u32(0x06054b50), u16(0), u16(0), u16(files.length), u16(files.length),
+    u32(central.byteLength), u32(offset), u16(0),
+  ]);
+  const url = URL.createObjectURL(new Blob([concatU8([...localParts, central, end])], { type: "application/zip" }));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = zipName;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function CompleteScreen({ recordings, onDashboard }) {
+  const downloadableRecordings = recordings.filter((recording) => recording.url && recording.blob);
+
   return (
     <section className="ote-complete-screen">
       <div className="ote-results-panel">
         <p className="ote-kicker">Speaking module complete</p>
-        <h1>Submit your mock test</h1>
+        <h1>Review your recordings</h1>
         <p>
           {recordings.length} timed response{recordings.length === 1 ? "" : "s"} captured.
-          Submit now to save the attempt to your account.
+          Play them back here or download them before leaving this page.
         </p>
+        <button
+          className="ote-download-zip-btn"
+          type="button"
+          onClick={() => createZipAndDownload(downloadableRecordings, "ote-speaking-mock-1-recordings.zip")}
+          disabled={!downloadableRecordings.length}
+        >
+          <Download size={22} />
+          Download full test as ZIP
+        </button>
         <div className="ote-recording-list">
-          {recordings.filter((recording) => recording.url).map((recording, index) => (
-            <a key={recording.id} href={recording.url} download={recording.name}>
-              Download recording {index + 1}
-            </a>
+          {downloadableRecordings.map((recording, index) => (
+            <article key={recording.id} className="ote-recording-card">
+              <div>
+                <span>Recording {index + 1}</span>
+                <strong>{recording.label}</strong>
+                <small>{recording.durationSeconds}s response window</small>
+              </div>
+              <audio controls playsInline preload="metadata" src={recording.url} />
+              <a href={recording.url} download={recording.name}>
+                Download audio
+              </a>
+            </article>
           ))}
         </div>
         <div className="ote-complete-actions">
           <button className="ote-secondary-btn" type="button" onClick={onDashboard}>
             OTE dashboard
-          </button>
-          <button className="ote-primary-btn" type="button" onClick={onSubmit}>
-            Submit
           </button>
         </div>
       </div>
@@ -648,14 +1033,98 @@ function CompleteScreen({ recordings, onSubmit, onDashboard }) {
   );
 }
 
-function ExamFooter() {
+function ExamFooter({ onOpenSettings, onSkip, nextLabel, onNext, nextDisabled = false }) {
   return (
     <footer className="ote-exam-footer">
-      <Settings size={28} />
-      <button type="button" disabled>
-        Jump to
+      <button type="button" className="ote-settings-btn" onClick={onOpenSettings} aria-label="Visual display options">
+        <Settings size={28} />
+      </button>
+      <button type="button" className="ote-skip-btn" onClick={onSkip} disabled={!onSkip}>
+        Skip
       </button>
       <span>© Seif English OTE mock environment</span>
+      {nextLabel ? (
+        <button type="button" className="ote-footer-next" onClick={onNext} disabled={nextDisabled}>
+          {nextLabel}
+        </button>
+      ) : null}
     </footer>
+  );
+}
+
+function VisualOptionsDrawer({ open, settings, onChange, onClose }) {
+  if (!open) return null;
+
+  function setFontSize(fontSize) {
+    onChange((current) => ({ ...current, fontSize }));
+  }
+
+  function setTheme(theme) {
+    onChange((current) => ({ ...current, theme: current.theme === theme ? "default" : theme }));
+  }
+
+  return (
+    <aside className="ote-options-drawer" aria-label="Visual display options">
+      <div className="ote-options-header">
+        <button type="button" className="ote-options-close" onClick={onClose}>
+          Close ×
+        </button>
+        <h2>Visual display options</h2>
+        <p>Choose a display option for your Test.</p>
+      </div>
+
+      <section className="ote-options-section">
+        <h3>Font size</h3>
+        <div className="ote-font-preview" aria-hidden="true">
+          <span>Aa</span>
+          <span>Aa</span>
+          <span>Aa</span>
+        </div>
+        <div className="ote-segmented" role="group" aria-label="Font size">
+          {["medium", "large", "extra-large"].map((size) => (
+            <button
+              key={size}
+              type="button"
+              className={settings.fontSize === size ? "is-selected" : ""}
+              onClick={() => setFontSize(size)}
+            >
+              {size === "medium" ? "Medium" : size === "large" ? "Large" : "Extra Large"}
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="ote-options-section">
+        <h3>Colour themes</h3>
+        <ThemeToggle
+          label="High Contrast Theme"
+          swatch="dark"
+          checked={settings.theme === "contrast"}
+          onClick={() => setTheme("contrast")}
+        />
+        <ThemeToggle
+          label="Pastel Theme"
+          swatch="pastel"
+          checked={settings.theme === "pastel"}
+          onClick={() => setTheme("pastel")}
+        />
+      </section>
+
+      <div className="ote-options-confirm">
+        <button type="button" onClick={onClose}>
+          Confirm
+        </button>
+      </div>
+    </aside>
+  );
+}
+
+function ThemeToggle({ label, swatch, checked, onClick }) {
+  return (
+    <button type="button" className="ote-theme-toggle" onClick={onClick} aria-pressed={checked}>
+      <span className={`ote-theme-swatch is-${swatch}`} aria-hidden="true" />
+      <span>{label}</span>
+      <i className={checked ? "is-on" : ""} aria-hidden="true" />
+    </button>
   );
 }

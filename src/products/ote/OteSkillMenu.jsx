@@ -27,7 +27,6 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
 
       <header className="main-header ote-main-header">
         <div className="ote-hub-logo" aria-label="OTE Seif">
-          <span className="ote-rosette" aria-hidden="true" />
           <strong>{isSpeaking ? "OTE Speaking" : "OTE Writing"}</strong>
         </div>
       </header>
