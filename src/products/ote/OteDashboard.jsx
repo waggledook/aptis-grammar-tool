@@ -31,10 +31,9 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
           <span className="whats-new-label">Mock-test environment</span>
-          <h3>Speaking mock is ready</h3>
+          <h3>Speaking and writing mocks are ready</h3>
           <p>
-            Start with a forward-only speaking module that uses official-style timing,
-            recording windows, and a separate exam interface.
+            Start with OTE-style mock environments for speaking recordings and timed writing practice.
           </p>
         </div>
         <button className="whats-new-btn" type="button" onClick={() => navigate(speakingPath)}>
@@ -50,7 +49,7 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
 
         <button className="menu-card" type="button" onClick={() => navigate(writingPath)}>
           <h3>Writing</h3>
-          <p>Writing mocks and task practice will live here as the OTE writing area grows.</p>
+          <p>Timed writing mocks and task practice for email, essay, and article responses.</p>
         </button>
 
         <button className="menu-card" type="button" onClick={() => navigate(resultsPath)}>

@@ -11,6 +11,11 @@ import { auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { getTotalVocabSets, TOPIC_DATA } from "../vocabulary/data/vocabTopics";
 import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
+import { getOteWritingMock } from "../../products/ote/mockTests/data/oteWritingMockData.js";
+import {
+  downloadOteWritingSubmissionDocx,
+  downloadOteWritingSubmissionText,
+} from "../../products/ote/mockTests/utils/oteWritingSubmissionExport.js";
 import {
   EmailAuthProvider,
   reauthenticateWithCredential,
@@ -139,6 +144,8 @@ export default function Profile({
 
   const [p4Register, setP4Register] = useState([]);
   const [showP4Register, setShowP4Register] = useState(false);
+  const [oteWriting, setOteWriting] = useState([]);
+  const [showOteWriting, setShowOteWriting] = useState(false);
   const [showWritingAll, setShowWritingAll] = useState(false);
 
   const [speakingNotes, setSpeakingNotes] = useState([]);
@@ -315,6 +322,7 @@ const handleChangePassword = async (e) => {
           wP3,
           wP4,
           p4Reg,
+          oteWritingSubs,
           specNotes,
           vocabCounts,
           vocabMistakesArr,
@@ -335,6 +343,7 @@ const handleChangePassword = async (e) => {
           fb.fetchWritingP3Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP4Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP4RegisterAttempts?.(100, uid) ?? Promise.resolve([]),
+          fb.fetchOteWritingSubmissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchSpeakingSpeculationNotes?.(50, uid) ?? Promise.resolve([]),
           fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
           fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]),
@@ -357,6 +366,7 @@ const handleChangePassword = async (e) => {
         setWritingP3(wP3);
         setWritingP4(wP4);
         setP4Register(p4Reg);
+        setOteWriting(oteWritingSubs || []);
         setSpeakingNotes(specNotes);
         setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
         setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
@@ -385,7 +395,8 @@ const handleChangePassword = async (e) => {
   writingP2.length +
   writingP3.length +
   writingP4.length +
-  p4Register.length;
+  p4Register.length +
+  oteWriting.length;
 
 
   // 👇 Add this derived value for vocab progress
@@ -1145,6 +1156,102 @@ const totalListeningTasks =
 
   {showWritingAll && (
     <div className="writing-sections">
+      <div className="subpanel collapsible-inner">
+        <button
+          type="button"
+          className="collapse-head inner"
+          aria-expanded={showOteWriting}
+          onClick={() => setShowOteWriting((s) => !s)}
+        >
+          <div className="inner-head-left">
+            <h4 className="inner-title">OTE Writing Mocks</h4>
+            <span className="muted small">
+              {oteWriting.length} {oteWriting.length === 1 ? "submission" : "submissions"}
+            </span>
+          </div>
+          <span className={`chev ${showOteWriting ? "open" : ""}`} aria-hidden>
+            ▾
+          </span>
+        </button>
+
+        {showOteWriting && (
+          <>
+            {!oteWriting.length ? (
+              <p className="muted" style={{ marginTop: ".5rem" }}>
+                No OTE writing submissions yet.
+              </p>
+            ) : (
+              <ul className="wlist" style={{ marginTop: ".5rem" }}>
+                {oteWriting.map((s, idx) => {
+                  const when = s.createdAt?.toDate?.()
+                    ? s.createdAt.toDate().toLocaleString()
+                    : s.createdAt || "—";
+                  const mock = getOteWritingMock(s.mockId || "writing-1");
+                  const task2 = mock.task2.options[s.task2Choice || "essay"];
+                  return (
+                    <li key={s.id || idx} className="wcard">
+                      <div className="whead">
+                        <div>
+                          <strong>{s.mockTitle || mock.title || "OTE Writing Mock"}</strong>
+                          <div className="muted small">{when}</div>
+                          <div className="muted small">
+                            Task 1: {s.counts?.task1 ?? 0} words · Task 2: {task2.title}, {s.counts?.[s.task2Choice || "essay"] ?? 0} words
+                          </div>
+                        </div>
+                        <div className="actions">
+                          <button
+                            className="btn"
+                            type="button"
+                            onClick={() => {
+                              const text = [
+                                `${s.mockTitle || mock.title}`,
+                                `Task 1 (${s.counts?.task1 ?? 0} words)`,
+                                s.answers?.task1 || "(no answer)",
+                                "",
+                                `Task 2: ${task2.title} (${s.counts?.[s.task2Choice || "essay"] ?? 0} words)`,
+                                s.answers?.[s.task2Choice || "essay"] || "(no answer)",
+                              ].join("\n");
+                              navigator.clipboard.writeText(text).then(() => toast("Copied submission ✓"));
+                            }}
+                          >
+                            Copy
+                          </button>
+                          <button
+                            className="btn"
+                            type="button"
+                            onClick={() => downloadOteWritingSubmissionText({ submissionId: s.id, submission: s, mock })}
+                          >
+                            TXT
+                          </button>
+                          <button
+                            className="btn"
+                            type="button"
+                            onClick={() => downloadOteWritingSubmissionDocx({ submissionId: s.id, submission: s, mock })}
+                          >
+                            DOCX
+                          </button>
+                        </div>
+                      </div>
+
+                      <div className="submitted-p4">
+                        <div className="p4-col">
+                          <div className="p4-title">Task 1 email</div>
+                          <div className="submitted-html">{s.answers?.task1 || "(no answer)"}</div>
+                        </div>
+                        <div className="p4-col">
+                          <div className="p4-title">Task 2 {task2.title}</div>
+                          <div className="submitted-html">{s.answers?.[s.task2Choice || "essay"] || "(no answer)"}</div>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
+        )}
+      </div>
+
       {/* ---------- Subsection: Part 1 practice sessions ---------- */}
       <div className="subpanel collapsible-inner">
         <button

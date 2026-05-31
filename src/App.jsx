@@ -145,6 +145,8 @@ import OteDashboard from "./products/ote/OteDashboard.jsx";
 import OteSkillMenu from "./products/ote/OteSkillMenu.jsx";
 import OteSpeakingMockRunner from "./products/ote/OteSpeakingMockRunner.jsx";
 import OteSpeakingResults from "./products/ote/OteSpeakingResults.jsx";
+import OteWritingMockMenu from "./products/ote/OteWritingMockMenu.jsx";
+import OteWritingMockRunner from "./products/ote/OteWritingMockRunner.jsx";
 import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 function BellIcon() {
@@ -272,7 +274,9 @@ const isSeifHubSite = currentSite.id === "seifhub";
 const isOteSite = currentSite.id === "ote";
 const isOteExamRoute =
   /^\/ote\/mock-tests\/[^/]+/.test(location.pathname) ||
-  (isOteSite && /^\/mock-tests\/[^/]+/.test(location.pathname));
+  /^\/ote\/writing\/mock-tests(?:\/[^/]+)?$/.test(location.pathname) ||
+  (isOteSite && /^\/mock-tests\/[^/]+/.test(location.pathname)) ||
+  (isOteSite && /^\/writing\/mock-tests(?:\/[^/]+)?$/.test(location.pathname));
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
 const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute;
@@ -1059,6 +1063,14 @@ return (
   <Route path="/ote/speaking" element={<OteSkillMenu skill="speaking" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
   <Route path="/ote/writing" element={<OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
   <Route
+    path="/ote/writing/mock-tests"
+    element={<OteWritingMockMenu user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/writing/mock-tests/:mockId"
+    element={<OteWritingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
+  />
+  <Route
     path="/ote/mock-tests/:mockId"
     element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
   />
@@ -1067,6 +1079,8 @@ return (
   {isOteSite && (
     <>
       <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
+      <Route path="/writing/mock-tests" element={<OteWritingMockMenu user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
+      <Route path="/writing/mock-tests/:mockId" element={<OteWritingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
       <Route path="/mock-tests/:mockId/results/:attemptId" element={<OteSpeakingResults user={user} homePath="/" />} />
       <Route path="/results" element={<OteSpeakingResults user={user} homePath="/" />} />
     </>

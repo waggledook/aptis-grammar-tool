@@ -3018,6 +3018,50 @@ export async function fetchWritingP4Submissions(n = 20, uid) {
   });
 }
 
+export async function saveOteWritingSubmission(payload) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return null;
+
+  const colRef = collection(db, "users", uid, "oteWritingSubmissions");
+  const ref = await addDoc(colRef, {
+    product: "ote",
+    type: "ote-writing-mock",
+    ...payload,
+    createdAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function fetchOteWritingSubmissions(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const q = query(
+    collection(db, "users", realUid, "oteWritingSubmissions"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(q);
+  return snap.docs.map((d) => {
+    const data = d.data() || {};
+    return {
+      id: d.id,
+      createdAt: data.createdAt || null,
+      mockId: data.mockId || "",
+      mockTitle: data.mockTitle || "",
+      moduleLabel: data.moduleLabel || "Writing",
+      task2Choice: data.task2Choice || "essay",
+      answers: data.answers || { task1: "", essay: "", article: "" },
+      counts: data.counts || { task1: 0, essay: 0, article: 0 },
+      tasks: data.tasks || {},
+      timings: data.timings || {},
+      finishedAt: data.finishedAt || null,
+      reason: data.reason || "",
+    };
+  });
+}
+
 // — WRITING PART 4 GUIDE: save "Tone Transformation" attempts —————————————
 /**
  * Saves one reformulation attempt from the register guide (formal ↔ informal).

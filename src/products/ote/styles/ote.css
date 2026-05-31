@@ -308,6 +308,28 @@
   font-size: 1.24rem;
 }
 
+.ote-font-large .ote-writing-prompt-pane,
+.ote-font-large .ote-writing-choice-inner,
+.ote-font-large .ote-reply-fields p,
+.ote-font-large .ote-word-count {
+  font-size: 1.2rem;
+}
+
+.ote-font-large .ote-writing-answer-pane textarea {
+  font-size: 1.32rem;
+}
+
+.ote-font-extra-large .ote-writing-prompt-pane,
+.ote-font-extra-large .ote-writing-choice-inner,
+.ote-font-extra-large .ote-reply-fields p,
+.ote-font-extra-large .ote-word-count {
+  font-size: 1.34rem;
+}
+
+.ote-font-extra-large .ote-writing-answer-pane textarea {
+  font-size: 1.46rem;
+}
+
 .ote-exam-header {
   display: grid;
   grid-template-columns: auto auto minmax(180px, 1fr) auto;
@@ -874,6 +896,20 @@
   cursor: not-allowed;
 }
 
+.ote-theme-contrast .ote-exam-footer button {
+  border-color: #ffd43d;
+  color: #ffd43d;
+}
+
+.ote-theme-contrast .ote-exam-footer .ote-footer-next {
+  background: #ffd43d;
+  color: #061f43;
+}
+
+.ote-theme-contrast .ote-exam-footer .ote-settings-btn {
+  color: #ffd43d;
+}
+
 .ote-complete-actions {
   display: flex;
   justify-content: center;
@@ -952,6 +988,596 @@
   font-weight: 800;
   text-decoration: none;
   white-space: nowrap;
+}
+
+.ote-writing-exam {
+  min-height: 100vh;
+  background: #fff;
+}
+
+.ote-writing-header {
+  grid-template-columns: auto auto minmax(220px, 1fr) auto;
+}
+
+.ote-writing-timer {
+  min-width: 140px;
+  padding: 0.25rem 1rem;
+  background: #061f43;
+  color: #fff;
+  font-size: clamp(2.4rem, 4.2vw, 3.6rem);
+  line-height: 1.1;
+  text-align: center;
+}
+
+.ote-writing-start {
+  align-items: center;
+}
+
+.ote-writing-intro {
+  width: min(980px, calc(100vw - 3rem));
+  text-align: center;
+}
+
+.ote-writing-intro h1 {
+  margin: 0 0 1rem;
+  color: #061f43;
+  font-size: clamp(2.4rem, 5vw, 3.5rem);
+  text-align: center;
+}
+
+.ote-writing-intro > p {
+  margin: 0 0 2rem;
+  color: #061f43;
+  font-size: clamp(1.6rem, 3vw, 2.3rem);
+}
+
+.ote-writing-instruction-list {
+  display: grid;
+  gap: 1rem;
+  margin: 0 auto 2rem;
+  width: min(900px, 100%);
+  text-align: left;
+}
+
+.ote-writing-instruction-list div {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #e2e4e8;
+  border-radius: 4px;
+  color: #333;
+  font-size: clamp(1.45rem, 2.4vw, 2.1rem);
+  line-height: 1.2;
+}
+
+.ote-writing-workspace {
+  min-height: calc(100vh - 154px);
+  padding: 1.5rem 0 5.2rem;
+  background: #fff;
+}
+
+.ote-writing-task-tabs {
+  display: flex;
+  gap: 0.6rem;
+  width: min(1320px, calc(100vw - 3rem));
+  margin: 0 auto 1rem;
+}
+
+.ote-writing-task-tabs button,
+.ote-writing-choice-tabs button {
+  min-height: 42px;
+  border: 1px solid #9eb9df;
+  border-radius: 4px;
+  background: #fff;
+  color: #1d4fb7;
+  padding: 0.45rem 1rem;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.ote-writing-task-tabs button.is-selected,
+.ote-writing-choice-tabs button.is-selected {
+  background: #5579ae;
+  color: #fff;
+}
+
+.ote-writing-task-layout {
+  display: grid;
+  grid-template-columns: minmax(360px, 1fr) minmax(430px, 1.12fr);
+  width: min(1320px, calc(100vw - 3rem));
+  min-height: calc(100vh - 240px);
+  margin: 0 auto;
+  background: #f3f3f3;
+}
+
+.ote-writing-choice-screen {
+  min-height: calc(100vh - 154px);
+  padding: 2.2rem 0 5.8rem;
+  background: #fff;
+  color: #333;
+}
+
+.ote-writing-mock-menu-screen {
+  min-height: calc(100vh - 154px);
+  padding: 2.5rem 0 6.5rem;
+  background: #fff;
+  color: #333;
+}
+
+.ote-writing-mock-menu-inner {
+  width: min(1160px, calc(100vw - 3rem));
+  margin: 0 auto;
+  font-size: 1.14rem;
+  line-height: 1.35;
+}
+
+.ote-writing-mock-menu-inner > p {
+  margin: 0 0 0.8rem;
+}
+
+.ote-writing-mock-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.ote-writing-mock-select-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.35rem 1rem;
+  align-items: center;
+  min-height: 220px;
+  padding: 1.55rem 1.65rem;
+  border: 2px solid #5a9dea;
+  border-radius: 0;
+  background: #fff;
+  color: #2451b4;
+  text-align: left;
+  font: inherit;
+  cursor: pointer;
+}
+
+.ote-writing-mock-select-card:hover,
+.ote-writing-mock-select-card:focus-visible {
+  outline: 4px solid rgba(85, 121, 174, 0.2);
+  background: #f9fbff;
+}
+
+.ote-writing-mock-select-card span {
+  grid-column: 1 / -1;
+  color: #333;
+  font-weight: 800;
+}
+
+.ote-writing-mock-select-card strong {
+  display: block;
+  color: #06244d;
+  font-size: 1.6rem;
+}
+
+.ote-writing-mock-select-card em {
+  grid-column: 1 / -1;
+  display: block;
+  color: #333;
+  font-style: normal;
+}
+
+.ote-writing-mock-select-card svg {
+  grid-row: 2;
+  grid-column: 2;
+}
+
+.ote-writing-choice-inner {
+  width: min(1320px, calc(100vw - 3rem));
+  margin: 0 auto;
+  font-size: 1.12rem;
+  line-height: 1.35;
+}
+
+.ote-writing-choice-inner > p {
+  margin: 0 0 0.9rem;
+}
+
+.ote-writing-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.8rem;
+  margin-top: 0.2rem;
+}
+
+.ote-writing-choice-card {
+  display: block;
+  min-height: 360px;
+  padding: 1.35rem 1.45rem;
+  border: 1px solid #5a9dea;
+  border-radius: 0;
+  background: #fff;
+  color: #2451b4;
+  text-align: left;
+  font-size: 1.12rem;
+  line-height: 1.32;
+}
+
+.ote-writing-choice-card.is-selected {
+  outline: 4px solid rgba(85, 121, 174, 0.2);
+  background: #f9fbff;
+}
+
+.ote-writing-choice-card p,
+.ote-writing-option-card p {
+  margin: 0 0 1rem;
+}
+
+.ote-writing-preview-lead {
+  font-weight: 800;
+}
+
+.ote-writing-title-box {
+  margin: 0.6rem 0 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid #d8d8d8;
+  border-radius: 4px;
+  background: #fff;
+  color: #2451b4;
+  font-style: italic;
+}
+
+.ote-writing-title-box strong {
+  display: block;
+  margin-bottom: 0.65rem;
+  font-style: normal;
+}
+
+.ote-writing-prompt-pane {
+  padding: 2rem 2.1rem;
+  background: #fff;
+  color: #333;
+  font-size: 1.08rem;
+  line-height: 1.35;
+  overflow: auto;
+}
+
+.ote-writing-prompt-pane p {
+  margin: 0 0 1rem;
+}
+
+.ote-writing-lead {
+  font-weight: 800;
+}
+
+.ote-writing-answer-pane {
+  display: grid;
+  grid-template-rows: auto minmax(360px, 1fr) auto;
+  gap: 0;
+  padding: 1.8rem 1.8rem 1.4rem;
+  background: #f2f2f2;
+}
+
+.ote-writing-answer-pane textarea {
+  width: 100%;
+  min-height: 420px;
+  resize: none;
+  border: 1px solid #d2d2d2;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+  padding: 1.25rem 1.35rem;
+  font: 1.2rem/1.45 Arial, Helvetica, sans-serif;
+}
+
+.ote-writing-answer-pane textarea:disabled {
+  background: #f7f7f7;
+  color: #555;
+}
+
+.ote-reply-fields {
+  padding: 1rem 1.2rem;
+  border: 1px solid #d2d2d2;
+  border-bottom: 0;
+  border-radius: 4px 4px 0 0;
+  background: #fff;
+}
+
+.ote-reply-fields p {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid #d9d9d9;
+  color: #333;
+  font-size: 1.05rem;
+}
+
+.ote-reply-fields p:last-child {
+  border-bottom: 0;
+}
+
+.ote-reply-fields span {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  padding: 0 0.7rem;
+  border: 1px solid #d8d8d8;
+  border-radius: 999px;
+}
+
+.ote-email-card,
+.ote-writing-option-card {
+  margin-top: 0.75rem;
+  padding: 1.2rem 1.35rem;
+  border: 1px solid #d3d6dc;
+  border-radius: 5px;
+  background: #fff;
+}
+
+.ote-email-card hr {
+  border: 0;
+  border-top: 1px solid #d8d8d8;
+  margin: 0.85rem 0 1rem;
+}
+
+.ote-email-card mark {
+  background: #bcefe8;
+  color: #333;
+  padding: 0 0.12rem;
+}
+
+.ote-email-prompt em {
+  display: block;
+  margin: 0.2rem 0 1rem;
+  color: #247d6b;
+  font-family: "Comic Sans MS", "Bradley Hand", cursive;
+  font-size: 1.35rem;
+  font-style: normal;
+}
+
+.ote-writing-choice-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 0 0 1rem;
+}
+
+.ote-writing-notice {
+  padding: 0.65rem 0.8rem;
+  border: 1px solid #e6b860;
+  border-radius: 4px;
+  background: #fff8e8;
+  color: #5f4300;
+  font-weight: 800;
+}
+
+.ote-word-count {
+  justify-self: end;
+  padding-top: 1rem;
+  color: #111;
+  font-size: 1rem;
+  font-weight: 800;
+}
+
+.ote-word-count.is-low,
+.ote-word-count.is-high {
+  color: #8a4214;
+}
+
+.ote-word-count.is-good {
+  color: #1f6b45;
+}
+
+.ote-writing-results-panel {
+  width: min(1080px, calc(100vw - 3rem));
+}
+
+.ote-submission-status {
+  margin: 0.8rem auto 1rem;
+  padding: 0.7rem 0.9rem;
+  width: min(720px, 100%);
+  border: 1px solid #d8dbe0;
+  border-radius: 6px;
+  background: #f8f9fb;
+  color: #334155;
+  font-weight: 700;
+}
+
+.ote-submission-status.is-saved {
+  border-color: #9bd6b2;
+  background: #effaf3;
+  color: #14532d;
+}
+
+.ote-submission-status.is-error {
+  border-color: #f0b4b4;
+  background: #fff1f1;
+  color: #8a1f1f;
+}
+
+.ote-submission-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin: 1rem 0 1.25rem;
+}
+
+.ote-submission-toolbar button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.ote-writing-review-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+  text-align: left;
+}
+
+.ote-writing-review-grid article {
+  min-height: 220px;
+  padding: 1rem;
+  border: 1px solid #d8dbe0;
+  border-radius: 6px;
+  background: #f8f9fb;
+}
+
+.ote-writing-review-grid h2 {
+  margin: 0 0 0.4rem;
+  color: #061f43;
+  font-size: 1.25rem;
+}
+
+.ote-writing-review-grid pre {
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0.6rem 0 0;
+  color: #333;
+  font: 1rem/1.45 Arial, Helvetica, sans-serif;
+}
+
+@media print {
+  .no-print,
+  .ote-exam-header,
+  .ote-exam-footer,
+  .ote-options-drawer,
+  .ote-complete-actions {
+    display: none !important;
+  }
+
+  .ote-exam,
+  .ote-complete-screen,
+  .ote-results-panel,
+  .ote-writing-results-panel {
+    display: block !important;
+    min-height: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .ote-writing-review-grid {
+    display: block !important;
+  }
+
+  .ote-writing-review-grid article {
+    page-break-inside: avoid;
+    margin: 0 0 1rem;
+    border: 1px solid #bbb;
+    background: #fff;
+  }
+}
+
+.ote-writing-exam.ote-theme-contrast .ote-writing-workspace,
+.ote-writing-exam.ote-theme-contrast .ote-writing-choice-screen,
+.ote-writing-exam.ote-theme-contrast .ote-writing-mock-menu-screen,
+.ote-writing-exam.ote-theme-contrast .ote-writing-prompt-pane,
+.ote-writing-exam.ote-theme-contrast .ote-writing-choice-inner,
+.ote-writing-exam.ote-theme-contrast .ote-writing-mock-menu-inner,
+.ote-writing-exam.ote-theme-contrast .ote-email-card,
+.ote-writing-exam.ote-theme-contrast .ote-writing-option-card,
+.ote-writing-exam.ote-theme-contrast .ote-writing-answer-pane textarea,
+.ote-writing-exam.ote-theme-contrast .ote-reply-fields {
+  background: #09264d;
+  color: #fff;
+}
+
+.ote-writing-exam.ote-theme-contrast .ote-writing-answer-pane,
+.ote-writing-exam.ote-theme-contrast .ote-writing-task-layout {
+  background: #415b80;
+}
+
+.ote-writing-exam.ote-theme-contrast .ote-writing-timer {
+  background: #fff;
+  color: #061f43;
+}
+
+.ote-writing-exam.ote-theme-contrast .ote-email-card,
+.ote-writing-exam.ote-theme-contrast .ote-writing-option-card,
+.ote-writing-exam.ote-theme-contrast .ote-writing-answer-pane textarea,
+.ote-writing-exam.ote-theme-contrast .ote-reply-fields,
+.ote-writing-exam.ote-theme-contrast .ote-reply-fields p,
+.ote-writing-exam.ote-theme-contrast .ote-help-btn,
+.ote-writing-exam.ote-theme-contrast .ote-writing-choice-card,
+.ote-writing-exam.ote-theme-contrast .ote-writing-mock-select-card,
+.ote-writing-exam.ote-theme-contrast .ote-writing-title-box {
+  border-color: rgba(255, 255, 255, 0.84);
+}
+
+.ote-writing-exam.ote-theme-contrast .ote-reply-fields p,
+.ote-writing-exam.ote-theme-contrast .ote-reply-fields span,
+.ote-writing-exam.ote-theme-contrast .ote-word-count,
+.ote-writing-exam.ote-theme-contrast .ote-writing-choice-card,
+.ote-writing-exam.ote-theme-contrast .ote-writing-mock-select-card,
+.ote-writing-exam.ote-theme-contrast .ote-writing-mock-select-card span,
+.ote-writing-exam.ote-theme-contrast .ote-writing-mock-select-card strong,
+.ote-writing-exam.ote-theme-contrast .ote-writing-mock-select-card em,
+.ote-writing-exam.ote-theme-contrast .ote-writing-title-box {
+  color: #fff;
+}
+
+.ote-writing-exam.ote-theme-contrast .ote-writing-answer-pane textarea::placeholder {
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.ote-writing-exam.ote-theme-contrast .ote-email-card mark,
+.ote-writing-exam.ote-theme-contrast .ote-email-prompt em {
+  background: #ffeb3b;
+  color: #09264d;
+}
+
+.ote-writing-exam.ote-theme-contrast .ote-writing-choice-card,
+.ote-writing-exam.ote-theme-contrast .ote-writing-mock-select-card,
+.ote-writing-exam.ote-theme-contrast .ote-writing-title-box {
+  background: #09264d;
+}
+
+.ote-writing-exam.ote-theme-contrast .ote-writing-choice-card.is-selected {
+  outline-color: #ffd43d;
+  background: #123665;
+}
+
+.ote-writing-exam.ote-theme-pastel,
+.ote-writing-exam.ote-theme-pastel .ote-writing-workspace,
+.ote-writing-exam.ote-theme-pastel .ote-writing-choice-screen,
+.ote-writing-exam.ote-theme-pastel .ote-writing-mock-menu-screen,
+.ote-writing-exam.ote-theme-pastel .ote-writing-prompt-pane,
+.ote-writing-exam.ote-theme-pastel .ote-writing-choice-inner,
+.ote-writing-exam.ote-theme-pastel .ote-writing-mock-menu-inner,
+.ote-writing-exam.ote-theme-pastel .ote-email-card,
+.ote-writing-exam.ote-theme-pastel .ote-writing-option-card,
+.ote-writing-exam.ote-theme-pastel .ote-writing-answer-pane textarea,
+.ote-writing-exam.ote-theme-pastel .ote-reply-fields,
+.ote-writing-exam.ote-theme-pastel .ote-writing-title-box {
+  background: #fff9e9;
+  color: #102345;
+}
+
+.ote-writing-exam.ote-theme-pastel .ote-writing-answer-pane,
+.ote-writing-exam.ote-theme-pastel .ote-writing-task-layout {
+  background: #e4e0d2;
+}
+
+.ote-writing-exam.ote-theme-pastel .ote-writing-choice-card {
+  background: #fff9e9;
+  color: #2451b4;
+}
+
+.ote-writing-exam.ote-theme-pastel .ote-writing-mock-select-card {
+  background: #fff9e9;
+  color: #2451b4;
+}
+
+.ote-writing-exam.ote-theme-pastel .ote-writing-choice-card.is-selected {
+  background: #fff3d0;
+}
+
+.ote-writing-exam.ote-theme-pastel .ote-writing-answer-pane textarea::placeholder {
+  color: #6c6c6c;
 }
 
 .ote-results {
@@ -1242,7 +1868,11 @@
 @media (max-width: 900px) {
   .ote-dashboard-grid,
   .ote-dashboard-hero,
-  .ote-task-screen {
+  .ote-task-screen,
+  .ote-writing-task-layout,
+  .ote-writing-review-grid,
+  .ote-writing-choice-grid,
+  .ote-writing-mock-list {
     grid-template-columns: 1fr;
   }
 
@@ -1252,7 +1882,8 @@
   }
 
   .ote-progress-rail,
-  .ote-exam-meta {
+  .ote-exam-meta,
+  .ote-writing-timer {
     grid-column: 1 / -1;
   }
 
@@ -1274,6 +1905,28 @@
 
   .ote-recording-card audio {
     min-width: 0;
+  }
+
+  .ote-writing-task-layout,
+  .ote-writing-task-tabs,
+  .ote-writing-choice-inner,
+  .ote-writing-mock-menu-inner {
+    width: min(100%, calc(100vw - 1rem));
+  }
+
+  .ote-writing-prompt-pane,
+  .ote-writing-answer-pane {
+    padding: 1.1rem;
+  }
+
+  .ote-writing-answer-pane textarea {
+    min-height: 320px;
+  }
+
+  .ote-writing-timer {
+    justify-self: stretch;
+    min-width: 0;
+    font-size: 2.2rem;
   }
 }
 

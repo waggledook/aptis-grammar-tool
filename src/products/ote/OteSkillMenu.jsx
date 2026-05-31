@@ -9,6 +9,7 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
   const isSpeaking = skill === "speaking";
   const homePath = getSitePath(nativeRoutes ? "/" : "/ote");
   const speakingMockPath = getSitePath(nativeRoutes ? "/mock-tests/speaking-1" : "/ote/mock-tests/speaking-1");
+  const writingMockPath = getSitePath(nativeRoutes ? "/writing/mock-tests" : "/ote/writing/mock-tests");
 
   function openSpeakingMock() {
     if (!user) {
@@ -16,6 +17,14 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
       return;
     }
     navigate(speakingMockPath);
+  }
+
+  function openWritingMock() {
+    if (!user) {
+      onRequireSignIn?.();
+      return;
+    }
+    navigate(writingMockPath);
   }
 
   return (
@@ -39,19 +48,17 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
 
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
-          <span className="whats-new-label">{isSpeaking ? "Available now" : "Coming next"}</span>
-          <h3>{isSpeaking ? "Speaking Mock 1" : "Writing Mock 1"}</h3>
+          <span className="whats-new-label">Available now</span>
+          <h3>{isSpeaking ? "Speaking Mock 1" : "Writing mocks"}</h3>
           <p>
             {isSpeaking
               ? "A full four-part OTE-style speaking mock with automatic timing and recordings."
-              : "This area is ready for the first writing mock and focused task training."}
+              : "Choose from the available two-part OTE-style writing mocks with separate task timers, a choice screen, and live word counts."}
           </p>
         </div>
-        {isSpeaking ? (
-          <button className="whats-new-btn" type="button" onClick={openSpeakingMock}>
-            Start mock
-          </button>
-        ) : null}
+        <button className="whats-new-btn" type="button" onClick={isSpeaking ? openSpeakingMock : openWritingMock}>
+          {isSpeaking ? "Start mock" : "Open mocks"}
+        </button>
       </div>
 
       <div className="menu-grid">
@@ -76,9 +83,9 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
           </>
         ) : (
           <>
-            <button className="menu-card" type="button" disabled>
-              <h3>Writing Mock 1</h3>
-              <p>Full OTE-style writing mock with timed task submission.</p>
+            <button className="menu-card" type="button" onClick={openWritingMock}>
+              <h3>Writing Mock Tests</h3>
+              <p>Choose Mock 1 or Mock 2, then run the full OTE-style writing module in the exam environment.</p>
             </button>
             <button className="menu-card" type="button" disabled>
               <h3>Email Task Training</h3>
