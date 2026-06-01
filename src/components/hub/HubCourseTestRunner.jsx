@@ -3915,6 +3915,11 @@ function HubCourseTestRunnerStyles() {
         background: rgba(120, 182, 255, 0.12);
       }
 
+      .hub-course-test-dropzone.can-place {
+        cursor: pointer;
+        border-color: rgba(120, 182, 255, 0.5);
+      }
+
       .hub-course-test-dropzone.is-empty::after {
         content: "Drop words here";
         color: #7f96bb;
@@ -3933,11 +3938,18 @@ function HubCourseTestRunnerStyles() {
         font-weight: 700;
         cursor: grab;
         user-select: none;
+        touch-action: manipulation;
       }
 
       .hub-course-test-drag-chip-text {
         display: inline;
         white-space: nowrap;
+      }
+
+      .hub-course-test-drag-chip.is-selected {
+        border-color: rgba(147, 232, 183, 0.92);
+        background: linear-gradient(180deg, rgba(147, 232, 183, 0.28), rgba(68, 176, 126, 0.16));
+        box-shadow: 0 0 0 3px rgba(147, 232, 183, 0.16);
       }
 
       .hub-course-test-drag-chip:active {
@@ -4776,6 +4788,7 @@ function PronunciationDragBoard({
   timeUp,
 }) {
   const [activeZone, setActiveZone] = useState("");
+  const [selectedItemId, setSelectedItemId] = useState("");
   const { unplaced, columns } = useMemo(
     () => buildPronunciationColumns(section, answers),
     [section, answers]
@@ -4792,6 +4805,45 @@ function PronunciationDragBoard({
     setActiveZone("");
   };
 
+  const handleSelectedDrop = (value) => {
+    if (!selectedItemId || timeUp) return;
+    onDropItem(section.id, selectedItemId, value);
+    setSelectedItemId("");
+    setActiveZone("");
+  };
+
+  const handleChipSelect = (itemId) => {
+    if (timeUp) return;
+    setSelectedItemId((prev) => (prev === itemId ? "" : itemId));
+    onDragStart("");
+  };
+
+  const renderDragChip = (item) => (
+    <button
+      key={item.id}
+      type="button"
+      className={`hub-course-test-drag-chip ${selectedItemId === item.id ? "is-selected" : ""}`}
+      draggable={!timeUp}
+      aria-pressed={selectedItemId === item.id}
+      onClick={(event) => {
+        event.stopPropagation();
+        handleChipSelect(item.id);
+      }}
+      onDragStart={() => {
+        setSelectedItemId("");
+        onDragStart(item.id);
+      }}
+      onDragEnd={() => {
+        onDragStart("");
+        setActiveZone("");
+      }}
+    >
+      <span className="hub-course-test-drag-chip-text">
+        {renderHighlightedWord(item.prompt, item.highlight)}
+      </span>
+    </button>
+  );
+
   return (
     <div className="hub-course-test-drag-board">
       {exampleLines.length ? (
@@ -4805,13 +4857,14 @@ function PronunciationDragBoard({
       ) : null}
 
       <p className="hub-course-test-drag-help">
-        Drag each word into the correct sound column.
+        Drag each word into the correct sound column, or tap a word and then tap a column.
       </p>
 
       <div className="hub-course-test-drag-bank">
         <h3>Word bank</h3>
         <div
-          className={`hub-course-test-dropzone ${activeZone === "__bank__" ? "is-active" : ""} ${unplaced.length ? "" : "is-empty"}`}
+          className={`hub-course-test-dropzone ${activeZone === "__bank__" ? "is-active" : ""} ${selectedItemId ? "can-place" : ""} ${unplaced.length ? "" : "is-empty"}`}
+          onClick={() => handleSelectedDrop("")}
           onDragOver={(e) => {
             if (timeUp) return;
             e.preventDefault();
@@ -4823,23 +4876,7 @@ function PronunciationDragBoard({
             handleDrop("");
           }}
         >
-          {unplaced.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              className="hub-course-test-drag-chip"
-              draggable={!timeUp}
-              onDragStart={() => onDragStart(item.id)}
-              onDragEnd={() => {
-                onDragStart("");
-                setActiveZone("");
-              }}
-            >
-              <span className="hub-course-test-drag-chip-text">
-                {renderHighlightedWord(item.prompt, item.highlight)}
-              </span>
-            </button>
-          ))}
+          {unplaced.map((item) => renderDragChip(item))}
         </div>
       </div>
 
@@ -4857,7 +4894,8 @@ function PronunciationDragBoard({
               </p>
             ) : null}
             <div
-              className={`hub-course-test-dropzone is-column ${activeZone === column.key ? "is-active" : ""} ${column.items.length ? "" : "is-empty"}`}
+              className={`hub-course-test-dropzone is-column ${activeZone === column.key ? "is-active" : ""} ${selectedItemId ? "can-place" : ""} ${column.items.length ? "" : "is-empty"}`}
+              onClick={() => handleSelectedDrop(column.key)}
               onDragOver={(e) => {
                 if (timeUp) return;
                 e.preventDefault();
@@ -4869,23 +4907,7 @@ function PronunciationDragBoard({
                 handleDrop(column.key);
               }}
             >
-              {column.items.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  className="hub-course-test-drag-chip"
-                  draggable={!timeUp}
-                  onDragStart={() => onDragStart(item.id)}
-                  onDragEnd={() => {
-                    onDragStart("");
-                    setActiveZone("");
-                  }}
-                >
-                  <span className="hub-course-test-drag-chip-text">
-                    {renderHighlightedWord(item.prompt, item.highlight)}
-                  </span>
-                </button>
-              ))}
+              {column.items.map((item) => renderDragChip(item))}
             </div>
           </div>
         ))}
