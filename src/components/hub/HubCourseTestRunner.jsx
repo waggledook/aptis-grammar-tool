@@ -3956,6 +3956,22 @@ function HubCourseTestRunnerStyles() {
         cursor: grabbing;
       }
 
+      .hub-course-test-place-target {
+        width: 100%;
+        min-height: 42px;
+        border-radius: 12px;
+        border: 1px solid rgba(147, 232, 183, 0.52);
+        background: rgba(147, 232, 183, 0.12);
+        color: #d9ffe8;
+        font-weight: 800;
+        cursor: pointer;
+        touch-action: manipulation;
+      }
+
+      .hub-course-test-place-target:active {
+        transform: translateY(1px);
+      }
+
       .hub-course-test-drag-help {
         margin: 0;
         color: #9cb2d3;
@@ -4844,6 +4860,21 @@ function PronunciationDragBoard({
     </button>
   );
 
+  const renderTapTarget = (value, label = "Place here") => (
+    selectedItemId ? (
+      <button
+        type="button"
+        className="hub-course-test-place-target"
+        onClick={(event) => {
+          event.stopPropagation();
+          handleSelectedDrop(value);
+        }}
+      >
+        {label}
+      </button>
+    ) : null
+  );
+
   return (
     <div className="hub-course-test-drag-board">
       {exampleLines.length ? (
@@ -4877,6 +4908,7 @@ function PronunciationDragBoard({
           }}
         >
           {unplaced.map((item) => renderDragChip(item))}
+          {renderTapTarget("", "Move back here")}
         </div>
       </div>
 
@@ -4908,6 +4940,7 @@ function PronunciationDragBoard({
               }}
             >
               {column.items.map((item) => renderDragChip(item))}
+              {renderTapTarget(column.key)}
             </div>
           </div>
         ))}

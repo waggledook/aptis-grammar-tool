@@ -143,6 +143,10 @@ import HubYourClass from "./components/hub/HubYourClass.jsx";
 import HubCourseTestRunner from "./components/hub/HubCourseTestRunner.jsx";
 import OteDashboard from "./products/ote/OteDashboard.jsx";
 import OteSkillMenu from "./products/ote/OteSkillMenu.jsx";
+import OteSpeakingPart2Menu from "./products/ote/OteSpeakingPart2Menu.jsx";
+import OteSpeakingPart2Voicemails from "./products/ote/OteSpeakingPart2Voicemails.jsx";
+import OteSpeakingPart2GuidedMessage1 from "./products/ote/OteSpeakingPart2GuidedMessage1.jsx";
+import OteSpeakingPart2GuidedMessage2 from "./products/ote/OteSpeakingPart2GuidedMessage2.jsx";
 import OteSpeakingMockRunner from "./products/ote/OteSpeakingMockRunner.jsx";
 import OteSpeakingResults from "./products/ote/OteSpeakingResults.jsx";
 import OteWritingMockMenu from "./products/ote/OteWritingMockMenu.jsx";
@@ -1061,6 +1065,10 @@ return (
 
   <Route path="/ote" element={<OteDashboard user={user} nativeRoutes={false} />} />
   <Route path="/ote/speaking" element={<OteSkillMenu skill="speaking" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-2-voicemails" element={<OteSpeakingPart2Menu nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-2-voicemails/overview" element={<OteSpeakingPart2Voicemails nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-2-voicemails/guided-message-1" element={<OteSpeakingPart2GuidedMessage1 nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-2-voicemails/guided-message-2" element={<OteSpeakingPart2GuidedMessage2 nativeRoutes={false} />} />
   <Route path="/ote/writing" element={<OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
   <Route
     path="/ote/writing/mock-tests"
@@ -1079,6 +1087,10 @@ return (
   {isOteSite && (
     <>
       <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
+      <Route path="/speaking/part-2-voicemails" element={<OteSpeakingPart2Menu nativeRoutes />} />
+      <Route path="/speaking/part-2-voicemails/overview" element={<OteSpeakingPart2Voicemails nativeRoutes />} />
+      <Route path="/speaking/part-2-voicemails/guided-message-1" element={<OteSpeakingPart2GuidedMessage1 nativeRoutes />} />
+      <Route path="/speaking/part-2-voicemails/guided-message-2" element={<OteSpeakingPart2GuidedMessage2 nativeRoutes />} />
       <Route path="/writing/mock-tests" element={<OteWritingMockMenu user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
       <Route path="/writing/mock-tests/:mockId" element={<OteWritingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
       <Route path="/mock-tests/:mockId/results/:attemptId" element={<OteSpeakingResults user={user} homePath="/" />} />
