@@ -6,11 +6,43 @@ import { doc, getDoc } from "firebase/firestore";
 import Profile from "./profile/Profile";
 import { getSeifHubAccessConfig } from "../siteConfig.js";
 
+function timestampToDate(value) {
+  if (!value) return null;
+  if (typeof value.toDate === "function") return value.toDate();
+  if (typeof value.toMillis === "function") return new Date(value.toMillis());
+  if (value.seconds) return new Date(value.seconds * 1000);
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function formatDate(value) {
+  const date = timestampToDate(value);
+  if (!date) return "";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function labelForPerson(person = {}) {
+  return (
+    person.displayName ||
+    person.name ||
+    person.username ||
+    person.email ||
+    person.id ||
+    ""
+  );
+}
+
 export default function TeacherStudentProfile({ user }) {
   const { studentId } = useParams();
   const navigate = useNavigate();
 
   const [student, setStudent] = useState(null);
+  const [assignedTeacher, setAssignedTeacher] = useState(null);
+  const [rosterMeta, setRosterMeta] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [profileMode, setProfileMode] = useState("aptis");
@@ -27,13 +59,44 @@ export default function TeacherStudentProfile({ user }) {
     let alive = true;
     (async () => {
       try {
+        setError("");
+        setStudent(null);
+        setAssignedTeacher(null);
+        setRosterMeta(null);
         const snap = await getDoc(doc(db, "users", studentId));
         if (!alive) return;
 
         if (!snap.exists()) {
           setError("Student not found.");
         } else {
-          setStudent({ id: snap.id, ...snap.data() });
+          const studentData = { id: snap.id, ...snap.data() };
+          setStudent(studentData);
+
+          const teacherId = studentData.teacherId || "";
+          if (teacherId) {
+            const [teacherResult, rosterResult] = await Promise.all([
+              getDoc(doc(db, "users", teacherId)).catch((teacherError) => {
+                console.warn("[TeacherStudentProfile] teacher lookup failed", teacherError);
+                return null;
+              }),
+              getDoc(doc(db, "users", teacherId, "studentRoster", studentId)).catch((rosterError) => {
+                console.warn("[TeacherStudentProfile] roster lookup failed", rosterError);
+                return null;
+              }),
+            ]);
+
+            if (!alive) return;
+
+            if (teacherResult?.exists()) {
+              setAssignedTeacher({ id: teacherResult.id, ...teacherResult.data() });
+            }
+            if (rosterResult?.exists()) {
+              setRosterMeta(rosterResult.data() || {});
+            }
+          } else {
+            setAssignedTeacher(null);
+            setRosterMeta(null);
+          }
         }
       } catch (e) {
         console.error("[TeacherStudentProfile] load failed", e);
@@ -90,6 +153,28 @@ export default function TeacherStudentProfile({ user }) {
           : "Seif Hub active";
   const profileTitle =
     profileMode === "seifhub" ? "Student Profile · Seif Hub" : "Student Profile · Aptis Trainer";
+  const teacherLabel = assignedTeacher
+    ? labelForPerson(assignedTeacher)
+    : student?.teacherId
+      ? "Assigned teacher unavailable"
+      : "No teacher assigned";
+  const classLabel =
+    rosterMeta?.className ||
+    rosterMeta?.classCode ||
+    student?.className ||
+    student?.classCode ||
+    student?.classId ||
+    "No class label";
+  const joinedLabel = formatDate(student?.createdAt) || "Unknown";
+  const studentName = labelForPerson(student) || "Student";
+  const details = [
+    { label: "Name", value: studentName },
+    { label: "Teacher", value: teacherLabel },
+    { label: "Class", value: classLabel },
+    { label: "Role", value: student?.role || "student" },
+    { label: "Joined", value: joinedLabel },
+    { label: "SeifHub", value: hubStatusLabel },
+  ];
 
   return (
     <div className="profile-page game-wrapper">
@@ -135,6 +220,45 @@ export default function TeacherStudentProfile({ user }) {
           >
             Seif Hub
           </button>
+        </div>
+      </section>
+
+      <section
+        className="panel"
+        style={{
+          marginBottom: "0.9rem",
+          padding: "0.9rem 1rem",
+        }}
+      >
+        <div style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em", color: "#94a3b8", marginBottom: "0.65rem" }}>
+          Student details
+        </div>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
+            gap: "0.7rem",
+          }}
+        >
+          {details.map((item) => (
+            <div
+              key={item.label}
+              style={{
+                border: "1px solid rgba(148, 163, 184, 0.25)",
+                borderRadius: "0.6rem",
+                padding: "0.65rem 0.75rem",
+                background: "rgba(15, 23, 42, 0.32)",
+                minWidth: 0,
+              }}
+            >
+              <div style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8", marginBottom: "0.2rem" }}>
+                {item.label}
+              </div>
+              <div style={{ color: "#e2e8f0", fontWeight: 700, overflowWrap: "anywhere" }}>
+                {item.value}
+              </div>
+            </div>
+          ))}
         </div>
       </section>
 
