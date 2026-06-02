@@ -57,7 +57,7 @@ export function getSiteVariant(locationLike = getWindowLocation()) {
     return {
       id: "ote",
       label: "OTE Seif",
-      requiresMemberAccess: false,
+      requiresMemberAccess: true,
     };
   }
 

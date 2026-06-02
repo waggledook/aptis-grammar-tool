@@ -748,6 +748,14 @@
   padding: 0.95rem 1rem 1rem;
 }
 
+.ote-student-answer-detail h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.02rem;
+  line-height: 1.25;
+  text-align: left;
+}
+
 .ote-mini-challenge {
   display: grid;
   gap: 0.5rem;
@@ -986,6 +994,396 @@
 
 .ote-model-why strong {
   color: var(--color-text);
+}
+
+.ote-reference-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.ote-reference-toolbar .ote-training-back {
+  margin-bottom: 0;
+}
+
+.ote-reference-download {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--primary-gradient);
+  color: var(--primary-text);
+  padding: 0.7rem 0.95rem;
+  font-weight: 900;
+}
+
+.ote-reference-print {
+  display: grid;
+  gap: 1rem;
+}
+
+.ote-reference-hero,
+.ote-reference-section,
+.ote-reference-footer {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+}
+
+.ote-reference-hero {
+  display: grid;
+  grid-template-columns: 150px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  padding: 1.25rem;
+}
+
+.ote-reference-hero img {
+  width: 150px;
+  max-width: 100%;
+  height: auto;
+}
+
+.ote-reference-hero h1 {
+  margin: 0.2rem 0 0.45rem;
+  color: var(--color-accent);
+  font-size: clamp(2rem, 5vw, 3.15rem);
+  line-height: 1.05;
+  text-align: left;
+}
+
+.ote-reference-hero p,
+.ote-reference-section-head p {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.55;
+}
+
+.ote-reference-section {
+  padding: 1.1rem;
+}
+
+.ote-reference-section-head {
+  margin-bottom: 0.9rem;
+}
+
+.ote-reference-section-head span,
+.ote-reference-example > span {
+  color: var(--color-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-reference-section-head h2 {
+  margin: 0.2rem 0 0.35rem;
+  color: var(--color-text);
+  font-size: 1.45rem;
+  text-align: left;
+}
+
+.ote-reference-frame-grid,
+.ote-reference-example-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.ote-reference-frame-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.ote-reference-example-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ote-reference-frame,
+.ote-reference-example {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  padding: 0.9rem;
+}
+
+.ote-reference-frame strong {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin-bottom: 0.55rem;
+  border-radius: 999px;
+  background: var(--primary-gradient);
+  color: var(--primary-text);
+}
+
+.ote-reference-frame h3,
+.ote-reference-example h3 {
+  margin: 0 0 0.55rem;
+  color: var(--color-text);
+  font-size: 1rem;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.ote-reference-frame ul {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding-left: 1.05rem;
+  color: var(--color-text-soft);
+  line-height: 1.42;
+}
+
+.ote-reference-example p {
+  margin: 0.45rem 0;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-reference-example strong {
+  color: var(--color-text);
+}
+
+.ote-reference-example blockquote {
+  margin: 0.65rem 0 0;
+  border-left: 3px solid var(--color-accent);
+  padding-left: 0.8rem;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.ote-reference-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  color: var(--color-text-soft);
+  font-weight: 800;
+}
+
+.ote-practice-set-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.ote-practice-set-card {
+  display: flex;
+  min-height: 210px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.65rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  padding: 1.1rem;
+  text-align: left;
+}
+
+.ote-practice-set-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-1px);
+}
+
+.ote-practice-set-card span,
+.ote-practice-step span {
+  color: var(--color-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-practice-set-card h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.2rem;
+  line-height: 1.2;
+}
+
+.ote-practice-set-card p {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+}
+
+.ote-practice-runner {
+  display: grid;
+  gap: 1rem;
+}
+
+.ote-practice-progress {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ote-practice-step,
+.ote-practice-task-card,
+.ote-practice-complete {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+}
+
+.ote-practice-step {
+  padding: 0.85rem;
+  opacity: 0.72;
+}
+
+.ote-practice-step.is-active,
+.ote-practice-step.is-done {
+  opacity: 1;
+}
+
+.ote-practice-step.is-active {
+  border-color: rgba(253, 191, 45, 0.55);
+}
+
+.ote-practice-step strong {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--color-text);
+}
+
+.ote-practice-task-card,
+.ote-practice-complete {
+  padding: 1rem;
+}
+
+.ote-practice-task-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 1rem 0;
+}
+
+.ote-practice-task-tools button,
+.ote-training-recording-review button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--primary-gradient);
+  color: var(--primary-text);
+  padding: 0.7rem 0.9rem;
+  font-weight: 900;
+}
+
+.ote-practice-instructions {
+  margin: 1rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.85rem 1rem;
+}
+
+.ote-practice-instructions ul {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.55rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.ote-practice-specific-prompt {
+  margin: 1rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  padding: 0.95rem 1rem;
+}
+
+.ote-practice-specific-prompt p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+.ote-practice-bullets {
+  display: grid;
+  gap: 0.55rem;
+  margin: 1rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.9rem 0.9rem 0.9rem 1.55rem;
+  line-height: 1.45;
+}
+
+.ote-practice-complete h2 {
+  margin: 0.2rem 0 0.5rem;
+  color: var(--color-text);
+  text-align: left;
+}
+
+.ote-practice-complete p {
+  margin: 0 0 0.9rem;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+}
+
+.ote-part34-image-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin: 1rem 0;
+}
+
+.ote-part34-image-grid figure {
+  overflow: hidden;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.ote-part34-image-grid img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+}
+
+.ote-part34-image-placeholder {
+  display: grid;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  place-items: center;
+  background:
+    linear-gradient(135deg, rgba(253, 191, 45, 0.14), rgba(158, 195, 255, 0.1)),
+    var(--color-surface-3);
+  color: var(--color-accent);
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.ote-part34-image-placeholder span {
+  font-weight: 900;
+  line-height: 1.2;
+}
+
+.ote-part34-image-grid figcaption {
+  display: grid;
+  gap: 0.25rem;
+  min-height: 74px;
+  padding: 0.65rem;
+  color: var(--color-text);
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.ote-part34-image-grid figcaption span {
+  color: var(--color-text-soft);
+  font-size: 0.82rem;
+  font-weight: 500;
 }
 
 .ote-exam {
@@ -2208,6 +2606,135 @@
   }
 }
 
+@media print {
+  body.ote-reference-print-mode {
+    display: block !important;
+    background: #fff !important;
+    color: #111827 !important;
+  }
+
+  body.ote-reference-print-mode .App,
+  body.ote-reference-print-mode .content-container,
+  body.ote-reference-print-mode .ote-training-page {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  body.ote-reference-print-mode .content-container > div:first-child,
+  body.ote-reference-print-mode footer,
+  body.ote-reference-print-mode .no-print {
+    display: none !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-print {
+    display: block !important;
+    color: #111827 !important;
+    font-family: Arial, Helvetica, sans-serif !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-hero,
+  body.ote-reference-print-mode .ote-reference-section,
+  body.ote-reference-print-mode .ote-reference-footer,
+  body.ote-reference-print-mode .ote-reference-frame,
+  body.ote-reference-print-mode .ote-reference-example {
+    border-color: #d7deea !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  body.ote-reference-print-mode .ote-reference-hero {
+    grid-template-columns: 115px 1fr !important;
+    margin-bottom: 0.18in;
+    padding: 0.18in !important;
+    background: #f4f7fb !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-hero img {
+    width: 105px !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-hero h1 {
+    color: #0a1f44 !important;
+    font-size: 25pt !important;
+  }
+
+  body.ote-reference-print-mode .ote-kicker,
+  body.ote-reference-print-mode .ote-reference-section-head span,
+  body.ote-reference-print-mode .ote-reference-example > span {
+    color: #9a6700 !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-section {
+    margin-bottom: 0.16in;
+    padding: 0.14in !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-section-head {
+    margin-bottom: 0.1in;
+  }
+
+  body.ote-reference-print-mode .ote-reference-section-head h2 {
+    color: #0a1f44 !important;
+    font-size: 16pt !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-hero p,
+  body.ote-reference-print-mode .ote-reference-section-head p,
+  body.ote-reference-print-mode .ote-reference-frame li,
+  body.ote-reference-print-mode .ote-reference-example p,
+  body.ote-reference-print-mode .ote-reference-footer {
+    color: #334155 !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-frame-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.1in !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-example-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.1in !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-frame,
+  body.ote-reference-print-mode .ote-reference-example {
+    padding: 0.12in !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-frame strong {
+    background: #f0ad16 !important;
+    color: #0a1f44 !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-frame h3,
+  body.ote-reference-print-mode .ote-reference-example h3,
+  body.ote-reference-print-mode .ote-reference-example strong {
+    color: #111827 !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-example blockquote {
+    color: #111827 !important;
+    border-left-color: #f0ad16 !important;
+  }
+
+  body.ote-reference-print-mode .ote-reference-footer {
+    display: flex !important;
+    margin-top: 0.12in;
+    padding: 0.1in 0 !important;
+    border-width: 1px 0 0 !important;
+    border-radius: 0 !important;
+    font-size: 9pt !important;
+  }
+}
+
 .ote-writing-exam.ote-theme-contrast .ote-writing-workspace,
 .ote-writing-exam.ote-theme-contrast .ote-writing-choice-screen,
 .ote-writing-exam.ote-theme-contrast .ote-writing-mock-menu-screen,
@@ -2610,6 +3137,11 @@
   .ote-student-answer-grid,
   .ote-takeaway-grid,
   .ote-phrase-grid,
+  .ote-reference-hero,
+  .ote-reference-frame-grid,
+  .ote-reference-example-grid,
+  .ote-practice-set-grid,
+  .ote-practice-progress,
   .ote-task-screen,
   .ote-writing-task-layout,
   .ote-writing-review-grid,
@@ -2737,6 +3269,7 @@
   }
 
   .ote-guided-task-heading,
+  .ote-reference-hero,
   .ote-recorder-top,
   .ote-model-card,
   .ote-training-recording-review {
@@ -2746,13 +3279,29 @@
 
   .ote-guided-task-heading button,
   .ote-guided-task-buttons,
+  .ote-practice-task-tools button,
   .ote-recorder-actions button,
   .ote-model-card button,
+  .ote-training-recording-review button,
   .ote-training-recording-review a {
     width: 100%;
   }
 
   .ote-recorder-timer {
     min-width: 0;
+  }
+
+  .ote-reference-toolbar,
+  .ote-reference-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ote-reference-download {
+    width: 100%;
+  }
+
+  .ote-part34-image-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }

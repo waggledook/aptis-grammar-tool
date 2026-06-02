@@ -10,6 +10,7 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
   const homePath = getSitePath(nativeRoutes ? "/" : "/ote");
   const speakingMockPath = getSitePath(nativeRoutes ? "/mock-tests/speaking-1" : "/ote/mock-tests/speaking-1");
   const voicemailTrainingPath = getSitePath(nativeRoutes ? "/speaking/part-2-voicemails" : "/ote/speaking/part-2-voicemails");
+  const talkPracticePath = getSitePath(nativeRoutes ? "/speaking/parts-3-4-practice" : "/ote/speaking/parts-3-4-practice");
   const writingMockPath = getSitePath(nativeRoutes ? "/writing/mock-tests" : "/ote/writing/mock-tests");
 
   function openSpeakingMock() {
@@ -77,9 +78,9 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
               <h3>Part 2 Voicemail Training</h3>
               <p>Learn the format, compare formal and friendly messages, then check your understanding.</p>
             </button>
-            <button className="menu-card" type="button" disabled>
+            <button className="menu-card" type="button" onClick={() => navigate(talkPracticePath)}>
               <h3>Part 3 and 4 Talk Training</h3>
-              <p>Image selection, comparison, speculation, and follow-up question practice.</p>
+              <p>Practise a picture-based talk, then answer related follow-up questions.</p>
             </button>
           </>
         ) : (

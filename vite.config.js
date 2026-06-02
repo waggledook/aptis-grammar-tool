@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     proxy: {
-      "/speak": {
+      "^/speak$": {
         target: "https://europe-west1-examplay-auth.cloudfunctions.net",
         changeOrigin: true,
         secure: true,

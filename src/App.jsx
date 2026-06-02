@@ -147,6 +147,9 @@ import OteSpeakingPart2Menu from "./products/ote/OteSpeakingPart2Menu.jsx";
 import OteSpeakingPart2Voicemails from "./products/ote/OteSpeakingPart2Voicemails.jsx";
 import OteSpeakingPart2GuidedMessage1 from "./products/ote/OteSpeakingPart2GuidedMessage1.jsx";
 import OteSpeakingPart2GuidedMessage2 from "./products/ote/OteSpeakingPart2GuidedMessage2.jsx";
+import OteSpeakingPart2CheatSheet from "./products/ote/OteSpeakingPart2CheatSheet.jsx";
+import OteSpeakingPart2Practice from "./products/ote/OteSpeakingPart2Practice.jsx";
+import OteSpeakingPart34Practice from "./products/ote/OteSpeakingPart34Practice.jsx";
 import OteSpeakingMockRunner from "./products/ote/OteSpeakingMockRunner.jsx";
 import OteSpeakingResults from "./products/ote/OteSpeakingResults.jsx";
 import OteWritingMockMenu from "./products/ote/OteWritingMockMenu.jsx";
@@ -276,6 +279,7 @@ const isFlashcardsPlayerRoute = /^\/grammar\/flashcards\/[^/]+$/.test(location.p
 const currentSite = getSiteVariant();
 const isSeifHubSite = currentSite.id === "seifhub";
 const isOteSite = currentSite.id === "ote";
+const requiresMemberAccess = !!currentSite.requiresMemberAccess;
 const isOteExamRoute =
   /^\/ote\/mock-tests\/[^/]+/.test(location.pathname) ||
   /^\/ote\/writing\/mock-tests(?:\/[^/]+)?$/.test(location.pathname) ||
@@ -649,12 +653,13 @@ useEffect(() => {
 }, [location.pathname, user]);
 
 const hasSeifHubAccess = canAccessSeifHub(user);
+const hasMemberSiteAccess = !requiresMemberAccess || hasSeifHubAccess;
 const isTeacherToolsRoute = location.pathname === "/teacher-tools";
 const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-it/join";
 const isPublicSpanglishPlayRoute = /^\/games\/spanglish-fix-it\/play\/[^/]+$/.test(location.pathname);
-const showSeifHubGate =
-  isSeifHubSite &&
-  !hasSeifHubAccess &&
+const showMemberAccessGate =
+  requiresMemberAccess &&
+  !hasMemberSiteAccess &&
   !(isTeacherToolsRoute && (user?.role === "teacher" || user?.role === "admin")) &&
   !isPublicSpanglishJoinRoute &&
   !isPublicSpanglishPlayRoute &&
@@ -963,7 +968,7 @@ return (
         Sign Out
       </button>
 
-      {(!isSeifHubSite || hasSeifHubAccess) && (
+      {(!requiresMemberAccess || hasMemberSiteAccess) && (
         <button
           onClick={() => navigate(siteProfilePath)}
           className="profile-badge-btn"
@@ -985,7 +990,7 @@ return (
 
    {/* ————— Show the right “page” ————— */}
 <Routes>
-  {showSeifHubGate ? (
+  {showMemberAccessGate ? (
     <>
       <Route path="/privacy" element={<PrivacyPolicy />} />
       <Route path="/admin" element={<AdminDashboard user={user} />} />
@@ -1002,8 +1007,9 @@ return (
         element={
           <HubLanding
             user={user}
-            hasAccess={hasSeifHubAccess}
+            hasAccess={hasMemberSiteAccess}
             onSignIn={() => setShowAuth(true)}
+            siteVariant={currentSite}
           />
         }
       />
@@ -1069,6 +1075,11 @@ return (
   <Route path="/ote/speaking/part-2-voicemails/overview" element={<OteSpeakingPart2Voicemails nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-2-voicemails/guided-message-1" element={<OteSpeakingPart2GuidedMessage1 nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-2-voicemails/guided-message-2" element={<OteSpeakingPart2GuidedMessage2 nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-2-voicemails/cheat-sheet" element={<OteSpeakingPart2CheatSheet nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-2-voicemails/practice" element={<OteSpeakingPart2Practice nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-2-voicemails/practice/:setId" element={<OteSpeakingPart2Practice nativeRoutes={false} />} />
+  <Route path="/ote/speaking/parts-3-4-practice" element={<OteSpeakingPart34Practice nativeRoutes={false} />} />
+  <Route path="/ote/speaking/parts-3-4-practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={false} />} />
   <Route path="/ote/writing" element={<OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
   <Route
     path="/ote/writing/mock-tests"
@@ -1083,14 +1094,19 @@ return (
     element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
   />
   <Route path="/ote/mock-tests/:mockId/results/:attemptId" element={<OteSpeakingResults user={user} homePath="/ote" />} />
+  <Route path="/speaking/part-2-voicemails" element={<OteSpeakingPart2Menu nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/part-2-voicemails/overview" element={<OteSpeakingPart2Voicemails nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/part-2-voicemails/guided-message-1" element={<OteSpeakingPart2GuidedMessage1 nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/part-2-voicemails/guided-message-2" element={<OteSpeakingPart2GuidedMessage2 nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/part-2-voicemails/cheat-sheet" element={<OteSpeakingPart2CheatSheet nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/part-2-voicemails/practice" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/part-2-voicemails/practice/:setId" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/parts-3-4-practice" element={<OteSpeakingPart34Practice nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/parts-3-4-practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={isOteSite} />} />
 
   {isOteSite && (
     <>
       <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
-      <Route path="/speaking/part-2-voicemails" element={<OteSpeakingPart2Menu nativeRoutes />} />
-      <Route path="/speaking/part-2-voicemails/overview" element={<OteSpeakingPart2Voicemails nativeRoutes />} />
-      <Route path="/speaking/part-2-voicemails/guided-message-1" element={<OteSpeakingPart2GuidedMessage1 nativeRoutes />} />
-      <Route path="/speaking/part-2-voicemails/guided-message-2" element={<OteSpeakingPart2GuidedMessage2 nativeRoutes />} />
       <Route path="/writing/mock-tests" element={<OteWritingMockMenu user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
       <Route path="/writing/mock-tests/:mockId" element={<OteWritingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
       <Route path="/mock-tests/:mockId/results/:attemptId" element={<OteSpeakingResults user={user} homePath="/" />} />

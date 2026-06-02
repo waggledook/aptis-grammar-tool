@@ -5,9 +5,16 @@ import { getSitePath } from "../../siteConfig.js";
 import { sendHubAccessRequest } from "../../firebase";
 import { toast } from "../../utils/toast";
 
-export default function HubLanding({ user, hasAccess, onSignIn }) {
+export default function HubLanding({ user, hasAccess, onSignIn, siteVariant = null }) {
   const navigate = useNavigate();
   const [sendingRequest, setSendingRequest] = useState(false);
+  const isOteSite = siteVariant?.id === "ote";
+  const productName = isOteSite ? "OTE Trainer" : "Seif Hub";
+  const productAlt = isOteSite ? "Seif OTE Trainer by Seif English Academy" : "Seif English Hub Logo";
+  const productLogo = isOteSite ? "/images/seif-ote-trainer-logo.png" : "/images/seif-english-hub-logo.png";
+  const productIntro = isOteSite
+    ? "Oxford Test of English training for Seif English students."
+    : "Private student hub for Seif English students.";
   const spotlight = useMemo(() => {
     if (!user || !hasAccess) return null;
 
@@ -66,10 +73,10 @@ export default function HubLanding({ user, hasAccess, onSignIn }) {
       : "Access pending";
   const statusTitle = hasAccess ? spotlight?.title || "Welcome back" : null;
   const statusCopy = !user
-    ? "Sign in with your academy account to enter the private hub and open your activities."
+    ? `Sign in with your academy account to enter the private ${isOteSite ? "OTE training site" : "hub"} and open your activities.`
     : hasAccess
-      ? spotlight?.copy || "Your account has access to the academy hub. Choose an activity area to continue."
-      : "Your account is signed in, but it is not currently enabled for the hub. If you think this should already be active, you can request access below.";
+      ? spotlight?.copy || `Your account has access to ${productName}. Choose an activity area to continue.`
+      : `Your account is signed in, but it is not currently enabled for ${productName}. Student accounts need SeifHub activation to use this site. If you think this should already be active, you can request access below.`;
 
   async function handleRequestAccess() {
     if (sendingRequest) return;
@@ -93,8 +100,8 @@ export default function HubLanding({ user, hasAccess, onSignIn }) {
   return (
     <div className="menu-wrapper hub-menu-wrapper">
       <Seo
-        title="Seif Hub | BeeSkills English"
-        description="Private learning hub for BeeSkills English academy students. Sign in to access your activities, practice pages and course resources."
+        title={`${productName} | BeeSkills English`}
+        description="Private learning site for BeeSkills English academy students. Sign in to access your activities, practice pages and course resources."
       />
 
       <header
@@ -102,15 +109,15 @@ export default function HubLanding({ user, hasAccess, onSignIn }) {
         style={{ textAlign: "center", marginBottom: "0rem" }}
       >
         <img
-          src="/images/seif-english-hub-logo.png"
-          alt="Seif English Hub Logo"
-          className="menu-logo hub-logo"
+          src={productLogo}
+          alt={productAlt}
+          className={`menu-logo hub-logo ${isOteSite ? "ote-menu-logo" : ""}`}
           draggable="false"
         />
       </header>
 
       <p className="menu-sub">
-        Private student hub for Seif English students.
+        {productIntro}
       </p>
 
       <div className="whats-new-banner hub-status-banner">

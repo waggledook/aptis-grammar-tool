@@ -349,7 +349,7 @@ export default function OteSpeakingPart2GuidedMessage1({ nativeRoutes = false })
               aria-expanded={expandedStudent === "lucas"}
             >
               <span>Student Example 1</span>
-              <strong>Lucas: too short and simple</strong>
+              <strong>Lucas's answer</strong>
               <ChevronDown size={20} aria-hidden="true" />
             </button>
             <blockquote>
@@ -358,6 +358,7 @@ export default function OteSpeakingPart2GuidedMessage1({ nativeRoutes = false })
             </blockquote>
             {expandedStudent === "lucas" && (
               <div className="ote-student-answer-detail">
+                <h3>The problem: too short and simple</h3>
                 <p>
                   Lucas answers the prompts, but he only speaks for about 10 seconds and gives almost
                   no detail. He leaves too much silence on the timer.
@@ -397,7 +398,7 @@ export default function OteSpeakingPart2GuidedMessage1({ nativeRoutes = false })
               aria-expanded={expandedStudent === "sofia"}
             >
               <span>Student Example 2</span>
-              <strong>Sofia: too direct and impolite</strong>
+              <strong>Sofia's answer</strong>
               <ChevronDown size={20} aria-hidden="true" />
             </button>
             <blockquote>
@@ -407,6 +408,7 @@ export default function OteSpeakingPart2GuidedMessage1({ nativeRoutes = false })
             </blockquote>
             {expandedStudent === "sofia" && (
               <div className="ote-student-answer-detail">
+                <h3>The problem: too direct and impolite</h3>
                 <p>
                   Sofia gives the information, but the tone is too demanding for a manager. A formal
                   voicemail needs softer, more polite language.
@@ -441,7 +443,7 @@ export default function OteSpeakingPart2GuidedMessage1({ nativeRoutes = false })
               aria-expanded={expandedStudent === "mateo"}
             >
               <span>Student Example 3</span>
-              <strong>Mateo: goes off-topic</strong>
+              <strong>Mateo's answer</strong>
               <ChevronDown size={20} aria-hidden="true" />
             </button>
             <blockquote>
@@ -452,6 +454,7 @@ export default function OteSpeakingPart2GuidedMessage1({ nativeRoutes = false })
             </blockquote>
             {expandedStudent === "mateo" && (
               <div className="ote-student-answer-detail">
+                <h3>The problem: goes off-topic</h3>
                 <p>
                   Mateo starts well, but he forgets to ask how to get a replacement card. That means
                   he misses a mandatory part of the task.

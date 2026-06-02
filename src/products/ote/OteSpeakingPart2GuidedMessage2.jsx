@@ -357,7 +357,7 @@ export default function OteSpeakingPart2GuidedMessage2({ nativeRoutes = false })
               aria-expanded={expandedStudent === "lucas"}
             >
               <span>Student Example 1</span>
-              <strong>Lucas: too short and simple</strong>
+              <strong>Lucas's answer</strong>
               <ChevronDown size={20} aria-hidden="true" />
             </button>
             <blockquote>
@@ -366,6 +366,7 @@ export default function OteSpeakingPart2GuidedMessage2({ nativeRoutes = false })
             </blockquote>
             {expandedStudent === "lucas" && (
               <div className="ote-student-answer-detail">
+                <h3>The problem: too short and simple</h3>
                 <p>
                   Lucas answers the prompts, but he gives almost no detail and ignores his friend's
                   comment about getting lost. He leaves too much silence on the timer.
@@ -405,7 +406,7 @@ export default function OteSpeakingPart2GuidedMessage2({ nativeRoutes = false })
               aria-expanded={expandedStudent === "sofia"}
             >
               <span>Student Example 2</span>
-              <strong>Sofia: too formal</strong>
+              <strong>Sofia's answer</strong>
               <ChevronDown size={20} aria-hidden="true" />
             </button>
             <blockquote>
@@ -416,6 +417,7 @@ export default function OteSpeakingPart2GuidedMessage2({ nativeRoutes = false })
             </blockquote>
             {expandedStudent === "sofia" && (
               <div className="ote-student-answer-detail">
+                <h3>The problem: too formal</h3>
                 <p>
                   Sofia speaks smoothly, but she sounds like she is writing a formal email. A friend
                   reply needs natural, conversational language.
@@ -450,7 +452,7 @@ export default function OteSpeakingPart2GuidedMessage2({ nativeRoutes = false })
               aria-expanded={expandedStudent === "mateo"}
             >
               <span>Student Example 3</span>
-              <strong>Mateo: goes off-topic</strong>
+              <strong>Mateo's answer</strong>
               <ChevronDown size={20} aria-hidden="true" />
             </button>
             <blockquote>
@@ -461,6 +463,7 @@ export default function OteSpeakingPart2GuidedMessage2({ nativeRoutes = false })
             </blockquote>
             {expandedStudent === "mateo" && (
               <div className="ote-student-answer-detail">
+                <h3>The problem: goes off-topic</h3>
                 <p>
                   Mateo starts with an excellent friendly tone, but then he talks about a teacher and
                   forgets the clubs and meeting arrangement.

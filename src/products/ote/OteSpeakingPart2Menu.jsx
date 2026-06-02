@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, ClipboardList, MessageSquareText, Mic } from "lucide-react";
+import { ArrowLeft, ClipboardList, FileText, MessageSquareText, Mic, PlayCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
@@ -16,6 +16,12 @@ export default function OteSpeakingPart2Menu({ nativeRoutes = false }) {
   );
   const guidedMessage2Path = getSitePath(
     nativeRoutes ? "/speaking/part-2-voicemails/guided-message-2" : "/ote/speaking/part-2-voicemails/guided-message-2"
+  );
+  const cheatSheetPath = getSitePath(
+    nativeRoutes ? "/speaking/part-2-voicemails/cheat-sheet" : "/ote/speaking/part-2-voicemails/cheat-sheet"
+  );
+  const practicePath = getSitePath(
+    nativeRoutes ? "/speaking/part-2-voicemails/practice" : "/ote/speaking/part-2-voicemails/practice"
   );
 
   return (
@@ -59,6 +65,20 @@ export default function OteSpeakingPart2Menu({ nativeRoutes = false }) {
           <span>Activity 3</span>
           <h2>Guided Task: Message 2</h2>
           <p>Reply to a friend's voice message with the right informal tone and clear structure.</p>
+        </button>
+
+        <button className="ote-training-activity-card" type="button" onClick={() => navigate(cheatSheetPath)}>
+          <FileText size={28} aria-hidden="true" />
+          <span>Reference</span>
+          <h2>Part 2 Cheat Sheet</h2>
+          <p>Review useful frameworks and download a branded PDF reference for practice.</p>
+        </button>
+
+        <button className="ote-training-activity-card" type="button" onClick={() => navigate(practicePath)}>
+          <PlayCircle size={28} aria-hidden="true" />
+          <span>Practice</span>
+          <h2>Timed Voicemail Sets</h2>
+          <p>Practise both voicemail types with exam-style timing and downloadable recordings.</p>
         </button>
       </div>
     </main>
