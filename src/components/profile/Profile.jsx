@@ -1243,6 +1243,7 @@ const totalListeningTasks =
                           <div className="submitted-html">{s.answers?.[s.task2Choice || "essay"] || "(no answer)"}</div>
                         </div>
                       </div>
+                      <ProfileAiFeedback feedback={s.aiFeedback} />
                     </li>
                   );
                 })}
@@ -1355,6 +1356,7 @@ const totalListeningTasks =
                           </li>
                         ))}
                       </ol>
+                      <ProfileAiFeedback feedback={s.aiFeedback} />
                     </li>
                   ))}
                 </ul>
@@ -1566,6 +1568,7 @@ const totalListeningTasks =
                           ),
                         }}
                       />
+                      <ProfileAiFeedback feedback={s.aiFeedback} />
                     </li>
                   );
                 })}
@@ -1646,6 +1649,7 @@ const totalListeningTasks =
                           </div>
                         ))}
                       </div>
+                      <ProfileAiFeedback feedback={s.aiFeedback} />
                     </li>
                   );
                 })}
@@ -1901,6 +1905,7 @@ const totalListeningTasks =
                           />
                         </div>
                       </div>
+                      <ProfileAiFeedback feedback={s.aiFeedback} />
                     </li>
                   );
                 })}
@@ -2232,6 +2237,59 @@ function StyleScope() {
       .submitted-html div { margin: 0 0 1rem; }
       .submitted-html p:last-child,
       .submitted-html div:last-child { margin-bottom: 0; }
+
+      .profile-ai-feedback{
+        margin-top:.75rem;
+        border-left:4px solid #5579ae;
+        padding-left:.85rem;
+      }
+      .profile-ai-feedback-full{
+        margin-top:.6rem;
+      }
+      .profile-ai-feedback-full summary{
+        display:inline-flex;
+        align-items:center;
+        border:1px solid #335086;
+        border-radius:10px;
+        background:#24365d;
+        color:#e6f0ff;
+        padding:.35rem .6rem;
+        cursor:pointer;
+        font-weight:700;
+      }
+      .profile-ai-feedback-body{
+        display:grid;
+        gap:.75rem;
+        margin-top:.75rem;
+      }
+      .profile-ai-feedback-card{
+        border:1px solid #223a68;
+        border-radius:10px;
+        background:#081326;
+        padding:.7rem;
+      }
+      .profile-ai-feedback-card p{
+        margin:.35rem 0;
+      }
+      .profile-ai-feedback ul{
+        margin:.35rem 0 0;
+        padding-left:1.15rem;
+      }
+      .profile-ai-feedback li{
+        margin:.25rem 0;
+      }
+      .profile-ai-feedback pre,
+      .profile-ai-feedback-json{
+        overflow:auto;
+        white-space:pre-wrap;
+        border:1px solid #223a68;
+        border-radius:10px;
+        background:#061021;
+        padding:.65rem;
+        color:#e6f0ff;
+        font-family:inherit;
+        line-height:1.55;
+      }
 
       /* --- Writing dropdown spacing polish --- */
 .writing-sections {
@@ -2807,6 +2865,215 @@ function normalizeEmailHtmlForClipboard(html = "") {
   s = s.replace(/(<br\s*\/?>\s*)+<\/p>$/i, "</p><p>&nbsp;</p>");
 
   return s;
+}
+
+function ProfileAiFeedback({ feedback }) {
+  if (!feedback) return null;
+
+  const level = feedback.estimatedWritingLevel?.label || feedback.estimatedLevel?.label || "";
+  const summary = feedback.overall?.summary || "";
+  const strengths = feedback.overall?.mainStrengths || [];
+  const priorities = feedback.overall?.mainPriorities || feedback.priorityAdvice || [];
+  const teacherComment = feedback.teacherComment || feedback.teacherNote || "";
+
+  return (
+    <div className="submitted-html profile-ai-feedback">
+      <div className="p4-title">Feedback</div>
+      <div className="muted small">Generated automatically to help you improve your writing.</div>
+      {level ? <div className="muted small">Estimated level: {level}</div> : null}
+      {summary ? <p>{summary}</p> : null}
+      {strengths.length ? (
+        <p>
+          <strong>Strengths:</strong> {strengths.slice(0, 2).join(" ")}
+        </p>
+      ) : null}
+      {priorities.length ? (
+        <p>
+          <strong>Priorities:</strong> {priorities.slice(0, 2).join(" ")}
+        </p>
+      ) : null}
+      {!summary && teacherComment ? <p>{teacherComment}</p> : null}
+      <details className="profile-ai-feedback-full">
+        <summary>View full feedback</summary>
+        <ProfileAiFeedbackFull feedback={feedback} />
+      </details>
+    </div>
+  );
+}
+
+function ProfileAiFeedbackFull({ feedback }) {
+  if (feedback.taskType === "aptis_writing_part4") {
+    return (
+      <div className="profile-ai-feedback-body">
+        <ProfileAiFeedbackList title="Strengths" items={feedback.overall?.mainStrengths} />
+        <ProfileAiFeedbackList title="Priorities" items={feedback.overall?.mainPriorities} />
+        <ProfileEmailFeedback title="Informal email" data={feedback.informalEmail} />
+        <ProfileEmailFeedback title="Formal email" data={feedback.formalEmail} />
+      </div>
+    );
+  }
+
+  if (feedback.taskType === "ote_writing_feedback") {
+    return (
+      <div className="profile-ai-feedback-body">
+        <ProfileAiFeedbackList title="Strengths" items={feedback.overall?.mainStrengths} />
+        <ProfileAiFeedbackList title="Priorities" items={feedback.overall?.mainPriorities} />
+        {(feedback.tasks || []).map((task, index) => (
+          <ProfileTaskFeedback key={task.taskId || index} title={`Task ${index + 1}`} task={task} />
+        ))}
+      </div>
+    );
+  }
+
+  if (Array.isArray(feedback.answers)) {
+    return (
+      <div className="profile-ai-feedback-body">
+        {feedback.overall?.wordCountComment ? (
+          <p><strong>Word count:</strong> {feedback.overall.wordCountComment}</p>
+        ) : null}
+        {(feedback.answers || []).map((answer, index) => (
+          <ProfileAnswerFeedback key={answer.id || answer.index || index} answer={answer} index={index} />
+        ))}
+        <ProfileAiFeedbackList title="Priority advice" items={feedback.priorityAdvice} />
+        {feedback.teacherComment ? <p><strong>Teacher comment:</strong> {feedback.teacherComment}</p> : null}
+      </div>
+    );
+  }
+
+  return (
+    <pre className="profile-ai-feedback-json">
+      {JSON.stringify(feedback, null, 2)}
+    </pre>
+  );
+}
+
+function ProfileAiFeedbackList({ title, items = [] }) {
+  if (!items.length) return null;
+  return (
+    <div>
+      <strong>{title}</strong>
+      <ul>
+        {items.map((item, index) => <li key={`${title}-${index}`}>{item}</li>)}
+      </ul>
+    </div>
+  );
+}
+
+function ProfileAnswerFeedback({ answer, index }) {
+  return (
+    <article className="profile-ai-feedback-card">
+      <strong>{answer.question ? `${index + 1}. ${answer.question}` : `Answer ${answer.index || index + 1}`}</strong>
+      {answer.answer ? <p><em>Student:</em> {answer.answer}</p> : null}
+      {answer.wordCount !== undefined ? <p><em>Words:</em> {answer.wordCount}</p> : null}
+      {answer.communication?.comment ? <p><em>Communication:</em> {answer.communication.comment}</p> : null}
+      {answer.length?.comment ? <p><em>Length:</em> {answer.length.comment}</p> : null}
+      {answer.taskFulfilment ? <p><em>Task:</em> {answer.taskFulfilment}</p> : null}
+      {answer.grammar ? <p><em>Grammar:</em> {answer.grammar}</p> : null}
+      {answer.vocabulary ? <p><em>Vocabulary:</em> {answer.vocabulary}</p> : null}
+      {answer.punctuationSpelling ? <p><em>Punctuation/spelling:</em> {answer.punctuationSpelling}</p> : null}
+      {answer.cohesion ? <p><em>Cohesion:</em> {answer.cohesion}</p> : null}
+      {answer.learningFeedback ? <p><em>Learning:</em> {answer.learningFeedback}</p> : null}
+      {answer.suggestedAnswer ? <p><em>Try:</em> {answer.suggestedAnswer}</p> : null}
+      {answer.improvedVersion ? <pre>{answer.improvedVersion}</pre> : null}
+    </article>
+  );
+}
+
+function ProfileEmailFeedback({ title, data }) {
+  if (!data) return null;
+  return (
+    <ProfileTaskFeedback
+      title={title}
+      task={{
+        ...data,
+        taskFulfilment: data.taskFulfilment,
+        formatAndRegister: data.register,
+        organization: data.cohesion,
+        lexis: data.vocabulary,
+      }}
+    />
+  );
+}
+
+function ProfileTaskFeedback({ title, task }) {
+  return (
+    <article className="profile-ai-feedback-card">
+      <strong>{title}</strong>
+      {task.wordCount !== undefined ? <p><em>Words:</em> {task.wordCount}</p> : null}
+      {task.wordCountFeedback ? <p><em>Word count:</em> {task.wordCountFeedback}</p> : null}
+      {task.taskFulfilment?.feedback ? <p><em>Content:</em> {task.taskFulfilment.feedback}</p> : null}
+      <ProfileRequiredPoints points={task.taskFulfilment?.requiredPoints} />
+      {task.formatAndRegister?.feedback ? <p><em>Register:</em> {task.formatAndRegister.feedback}</p> : null}
+      <ProfileExamples title="Register examples" examples={task.formatAndRegister?.examples} />
+      {task.organization?.feedback ? <p><em>Organization:</em> {task.organization.feedback}</p> : null}
+      {task.grammar?.feedback ? <p><em>Grammar:</em> {task.grammar.feedback}</p> : null}
+      <ProfileExamples title="Grammar examples" examples={task.grammar?.examples} />
+      {task.lexis?.feedback ? <p><em>Vocabulary:</em> {task.lexis.feedback}</p> : null}
+      <ProfileExamples title="Vocabulary examples" examples={task.lexis?.examples} />
+      <ProfileMistakes mistakes={task.mistakes} />
+      {task.improvedVersion ? (
+        <>
+          <p><em>Improved version:</em></p>
+          <pre>{task.improvedVersion}</pre>
+        </>
+      ) : null}
+      {task.teacherNote ? <p><em>Teacher note:</em> {task.teacherNote}</p> : null}
+    </article>
+  );
+}
+
+function ProfileExamples({ title, examples = [] }) {
+  if (!examples.length) return null;
+  return (
+    <div>
+      <em>{title}:</em>
+      <ul>
+        {examples.map((example, index) => {
+          const replacement = example.correction || example.suggestion || "";
+          return (
+            <li key={`${example.original}-${replacement}-${index}`}>
+              <span>{example.original}</span>
+              {replacement ? <> → <strong>{replacement}</strong></> : null}
+              {example.explanation ? `: ${example.explanation}` : ""}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function ProfileRequiredPoints({ points = [] }) {
+  if (!points.length) return null;
+  return (
+    <div>
+      <em>Required points:</em>
+      <ul>
+        {points.map((point, index) => (
+          <li key={`${point.point}-${index}`}>
+            {point.point} ({point.status}): {point.feedback}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ProfileMistakes({ mistakes = [] }) {
+  if (!mistakes.length) return null;
+  return (
+    <div>
+      <em>Mistakes to fix:</em>
+      <ul>
+        {mistakes.map((mistake, index) => (
+          <li key={`${mistake.original}-${index}`}>
+            <span>{mistake.original}</span> → <strong>{mistake.correction}</strong>
+            {mistake.explanation ? `: ${mistake.explanation}` : ""}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
 function plainFromEmail({ html = "", text = "" }) {

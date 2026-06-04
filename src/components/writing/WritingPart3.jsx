@@ -191,6 +191,11 @@ export default function WritingPart3({ user, onRequireSignIn }) {
 
   // summary toggle
   const [showSummary, setShowSummary] = useState(false);
+  const [feedbackStatus, setFeedbackStatus] = useState("idle");
+  const [feedbackError, setFeedbackError] = useState("");
+  const [aiFeedback, setAiFeedback] = useState(null);
+  const [feedbackMeta, setFeedbackMeta] = useState(null);
+  const [submissionId, setSubmissionId] = useState("");
 
   // derived word counts
   const counts = useMemo(
@@ -203,6 +208,8 @@ export default function WritingPart3({ user, onRequireSignIn }) {
     setAnswersHTML(["", "", ""]);
     setAnswersText(["", "", ""]);
     setShowSummary(false);
+    setSubmissionId("");
+    resetFeedback();
   }, [current.id]);
 
   useEffect(() => {
@@ -313,12 +320,13 @@ export default function WritingPart3({ user, onRequireSignIn }) {
     // Save to Firestore if logged in and helper exists
     if (user && fb?.saveWritingP3Submission) {
       try {
-        await fb.saveWritingP3Submission({
+        const savedId = await fb.saveWritingP3Submission({
           taskId: current.id,
           answersText: trimmed,
           answersHTML,
           counts, // [n1, n2, n3]
         });
+        setSubmissionId(savedId || "");
 
         // ✅ activity log — correct placement
     await fb.logWritingSubmitted({
@@ -338,11 +346,78 @@ export default function WritingPart3({ user, onRequireSignIn }) {
     setShowSummary(true);
   }
 
+  function resetFeedback() {
+    setFeedbackStatus("idle");
+    setFeedbackError("");
+    setAiFeedback(null);
+    setFeedbackMeta(null);
+  }
+
+  async function handleGenerateFeedback() {
+    if (!user) {
+      toast("Sign in to get feedback.");
+      return;
+    }
+    const trimmed = answersText.map((text) => text.trim());
+    if (trimmed.some((text) => !text)) {
+      toast("Please answer all three messages before generating feedback.");
+      return;
+    }
+    if (!submissionId) {
+      toast("Submit your answers first so the feedback can be saved to your profile.");
+      return;
+    }
+
+    setFeedbackStatus("loading");
+    setFeedbackError("");
+    setAiFeedback(null);
+    setFeedbackMeta(null);
+
+    try {
+      const result = await fb.requestAptisWritingPart23Feedback({
+        part: "part3",
+        taskId: current.id,
+        title: current.title,
+        context: current.context,
+        chats: current.chats.map((chat) => ({
+          name: chat.name,
+          question: chat.question,
+        })),
+        answers: trimmed.map((text, index) => ({
+          text,
+          wordCount: counts[index],
+        })),
+      });
+      setAiFeedback(result?.feedback || null);
+      setFeedbackMeta(result?.meta || null);
+      if (submissionId && result?.feedback && fb?.saveWritingAiFeedback) {
+        try {
+          await fb.saveWritingAiFeedback({
+            kind: "part3",
+            submissionId,
+            feedback: result.feedback,
+            meta: result?.meta || null,
+          });
+        } catch (saveError) {
+          console.warn("[WritingP3] AI feedback save failed", saveError);
+          toast("Feedback generated, but it could not be saved to your profile.");
+        }
+      }
+      setFeedbackStatus("ready");
+    } catch (error) {
+      console.warn("[WritingP3] AI feedback failed", error);
+      setFeedbackStatus("error");
+      setFeedbackError(error?.message || "Could not generate feedback.");
+    }
+  }
+
 
   function handleReset() {
     setAnswersHTML(["", "", ""]);
     setAnswersText(["", "", ""]);
     setShowSummary(false);
+    setSubmissionId("");
+    resetFeedback();
   }
 
   /* -------------------------------------------------------------
@@ -398,6 +473,13 @@ export default function WritingPart3({ user, onRequireSignIn }) {
                 <button className="btn" onClick={handleDownload}>
                   Download .txt
                 </button>
+                <button
+                  className="btn primary"
+                  disabled={feedbackStatus === "loading"}
+                  onClick={handleGenerateFeedback}
+                >
+                  {feedbackStatus === "loading" ? "Getting feedback..." : "Get feedback"}
+                </button>
               </div>
             </div>
 
@@ -418,6 +500,11 @@ export default function WritingPart3({ user, onRequireSignIn }) {
                 </div>
               ))}
             </div>
+            <AptisWritingPart23Feedback
+              feedback={aiFeedback}
+              status={feedbackStatus}
+              error={feedbackError}
+            />
           </section>
         ) : (
           /* ------------------ FORM PANEL ------------------ */
@@ -471,6 +558,74 @@ export default function WritingPart3({ user, onRequireSignIn }) {
         )}
       </div>
     </div>
+  );
+}
+
+function AptisWritingPart23Feedback({ feedback, status, error }) {
+  if (status === "idle") return null;
+
+  if (status === "loading") {
+    return (
+      <section className="ai-p23-feedback" aria-live="polite">
+        <h4>Feedback</h4>
+        <p>Checking task fulfilment, language, and word count...</p>
+      </section>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <section className="ai-p23-feedback error" role="alert">
+        <h4>Feedback</h4>
+        <p>{error || "Could not generate feedback."}</p>
+      </section>
+    );
+  }
+
+  if (!feedback) return null;
+
+  return (
+    <section className="ai-p23-feedback">
+      <div className="ai-p23-head">
+        <div>
+          <h4>Feedback</h4>
+          <p className="ai-feedback-note">Generated automatically to help you improve your writing.</p>
+          <p>{feedback.overall?.summary}</p>
+        </div>
+        <span>{feedback.overall?.taskFulfilment?.replace(/_/g, " ")}</span>
+      </div>
+      {feedback.overall?.wordCountComment ? <p>{feedback.overall.wordCountComment}</p> : null}
+
+      <div className="ai-p23-list">
+        {(feedback.answers || []).map((item, index) => (
+          <article key={item.index ?? index}>
+            <div className="ai-p23-card-head">
+              <strong>Reply {index + 1}</strong>
+              <small>{item.wordCount} words · {item.wordCountStatus?.replace(/_/g, " ")}</small>
+            </div>
+            <p><span>Task:</span> {item.taskFulfilment}</p>
+            <p><span>Grammar:</span> {item.grammar}</p>
+            <p><span>Vocabulary:</span> {item.vocabulary}</p>
+            <p><span>Punctuation/spelling:</span> {item.punctuationSpelling}</p>
+            <p><span>Cohesion:</span> {item.cohesion}</p>
+            <div className="ai-p23-improved">
+              <strong>Improved version</strong>
+              <p>{item.improvedVersion}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+
+      {feedback.priorityAdvice?.length ? (
+        <div className="ai-p23-advice">
+          <strong>Priority advice</strong>
+          <ul>
+            {feedback.priorityAdvice.map((item) => <li key={item}>{item}</li>)}
+          </ul>
+        </div>
+      ) : null}
+      <blockquote>{feedback.teacherComment}</blockquote>
+    </section>
   );
 }
 
@@ -727,6 +882,101 @@ function StyleScope() {
 .aptis-writing-p3 .rte-btn:disabled {
   opacity: .55;
   cursor: not-allowed;
+}
+
+.aptis-writing-p3 .ai-p23-feedback {
+  margin-top: .9rem;
+  background:#0f1b31;
+  border:1px solid #2c416f;
+  border-radius:12px;
+  padding:.85rem;
+}
+
+.aptis-writing-p3 .ai-p23-feedback.error {
+  border-color:#c2410c;
+  background:#2a1720;
+}
+
+.aptis-writing-p3 .ai-p23-feedback h4,
+.aptis-writing-p3 .ai-p23-feedback p {
+  margin-top:0;
+}
+
+.aptis-writing-p3 .ai-p23-head,
+.aptis-writing-p3 .ai-p23-card-head {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:.75rem;
+}
+
+.aptis-writing-p3 .ai-p23-head span {
+  flex:0 0 auto;
+  border:1px solid #3a6ebd;
+  border-radius:999px;
+  padding:.2rem .5rem;
+  color:#cfe1ff;
+  text-transform:capitalize;
+}
+
+.aptis-writing-p3 .ai-feedback-note {
+  margin:.1rem 0 .35rem;
+  color:#a9b7d1;
+  font-size:.9rem;
+}
+
+.aptis-writing-p3 .ai-p23-list {
+  display:grid;
+  gap:.65rem;
+}
+
+.aptis-writing-p3 .ai-p23-list article,
+.aptis-writing-p3 .ai-p23-advice,
+.aptis-writing-p3 .ai-p23-improved {
+  background:#13213b;
+  border:1px solid #2c416f;
+  border-radius:10px;
+  padding:.7rem;
+}
+
+.aptis-writing-p3 .ai-p23-card-head small,
+.aptis-writing-p3 .ai-p23-meta {
+  color:#a9b7d1;
+}
+
+.aptis-writing-p3 .ai-p23-list p {
+  margin:.3rem 0;
+  color:#d8e7ff;
+}
+
+.aptis-writing-p3 .ai-p23-list span {
+  color:#cfe1ff;
+  font-weight:700;
+}
+
+.aptis-writing-p3 .ai-p23-improved {
+  margin-top:.55rem;
+}
+
+.aptis-writing-p3 .ai-p23-advice {
+  margin-top:.75rem;
+}
+
+.aptis-writing-p3 .ai-p23-advice ul {
+  margin:.4rem 0 0;
+  padding-left:1.2rem;
+}
+
+.aptis-writing-p3 .ai-p23-feedback blockquote {
+  margin:.8rem 0 0;
+  padding-left:.75rem;
+  border-left:3px solid #4a79d8;
+  color:#d8e7ff;
+}
+
+.aptis-writing-p3 .ai-p23-meta {
+  margin:.65rem 0 0;
+  font-size:.85rem;
 }
 
 /* compact mobile variant */

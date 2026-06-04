@@ -1,7 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Download, FileText, HelpCircle, Printer, Settings } from "lucide-react";
-import { saveOteWritingSubmission } from "../../firebase.js";
+import {
+  requestOteWritingFeedback,
+  saveOteWritingSubmission,
+  saveWritingAiFeedback,
+} from "../../firebase.js";
 import { getOteWritingMock } from "./mockTests/data/oteWritingMockData.js";
 import {
   downloadOteWritingSubmissionDocx,
@@ -24,6 +28,19 @@ function countWords(value) {
   return text.split(/\s+/).filter(Boolean).length;
 }
 
+function getOteTask2Type(option = {}) {
+  const typeText = `${option.id || ""} ${option.noun || ""} ${option.title || ""}`.toLowerCase();
+  if (typeText.includes("review")) return "ote_part2_review";
+  if (typeText.includes("article")) return "ote_part2_article";
+  return "ote_part2_essay";
+}
+
+function isNeutralOteEmailTask(email = {}) {
+  const greeting = String(email.greeting || "").toLowerCase();
+  const from = String(email.from || "").toLowerCase();
+  return greeting.includes("dear") || from.includes("mrs") || from.includes("coordinator");
+}
+
 export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRoutes = false }) {
   const { mockId = "writing-1" } = useParams();
   const navigate = useNavigate();
@@ -41,6 +58,10 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
   const [submissionId, setSubmissionId] = useState("");
   const [submissionStatus, setSubmissionStatus] = useState("idle");
   const [submissionError, setSubmissionError] = useState("");
+  const [feedbackStatus, setFeedbackStatus] = useState("idle");
+  const [feedbackError, setFeedbackError] = useState("");
+  const [aiFeedback, setAiFeedback] = useState(null);
+  const [feedbackMeta, setFeedbackMeta] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [visualSettings, setVisualSettings] = useState({
     fontSize: "medium",
@@ -123,6 +144,10 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
     setSubmissionId("");
     setSubmissionStatus("idle");
     setSubmissionError("");
+    setFeedbackStatus("idle");
+    setFeedbackError("");
+    setAiFeedback(null);
+    setFeedbackMeta(null);
     saveStartedRef.current = false;
     setCountdownLeft(mock.countdownSeconds);
     setPartTitleLeft(WRITING_PART_TITLE_SECONDS);
@@ -209,6 +234,106 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
     };
   }
 
+  async function handleGenerateFeedback(submission) {
+    if (!user) {
+      onRequireSignIn?.();
+      return;
+    }
+    if (!submissionId) {
+      setFeedbackStatus("error");
+      setFeedbackError("Wait for the submission to finish saving, then generate feedback.");
+      return;
+    }
+    setFeedbackStatus("loading");
+    setFeedbackError("");
+    setAiFeedback(null);
+    setFeedbackMeta(null);
+
+    try {
+      const selectedTask = submission.tasks?.task2?.selectedOption || {};
+      const selectedAnswer = (submission.answers?.[submission.task2Choice] || "").trim();
+      const task1 = submission.tasks?.task1 || {};
+      const task1Email = task1.email || {};
+      const task1InputText = [
+        task1.setup,
+        "",
+        `From: ${task1Email.from || ""}`,
+        `Subject: ${task1Email.subject || ""}`,
+        task1Email.greeting || "",
+        ...(task1Email.paragraphs || []),
+        ...(task1Email.prompts || []).map((prompt) => `${prompt.question} [Note: ${prompt.note}]`),
+        ...(task1Email.closing || []),
+      ].filter(Boolean).join("\n");
+
+      const task2Type = getOteTask2Type(selectedTask);
+
+      const result = await requestOteWritingFeedback({
+        exam: "OTE",
+        mode: "full_mock",
+        tasks: [
+          {
+            taskId: `${submission.mockId || "mock"}:task1`,
+            taskType: "ote_part1_email",
+            title: task1.title || "Email",
+            inputText: task1InputText,
+            prompt: task1.setup || "Write an email responding to the input email.",
+            requiredPoints: (task1Email.prompts || []).map((prompt) =>
+              `${prompt.question} Note: ${prompt.note}`.trim()
+            ),
+            targetAudience: task1.replyTo || task1Email.from || "recipient",
+            expectedRegister: isNeutralOteEmailTask(task1Email) ? "neutral" : "informal",
+            answer: {
+              text: (submission.answers?.task1 || "").trim(),
+              wordCount: submission.counts?.task1 || countWords(submission.answers?.task1),
+            },
+          },
+          {
+            taskId: `${submission.mockId || "mock"}:task2:${selectedTask.id || submission.task2Choice}`,
+            taskType: task2Type,
+            title: selectedTask.title || "Part 2",
+            inputText: selectedTask.context || "",
+            prompt: [selectedTask.promptLabel, selectedTask.prompt, selectedTask.instruction]
+              .filter(Boolean)
+              .join("\n"),
+            requiredPoints: [],
+            targetAudience: "English teacher",
+            expectedRegister:
+              task2Type === "ote_part2_essay"
+                ? "essay-style"
+                : task2Type === "ote_part2_review"
+                  ? "review-style"
+                  : "article-style",
+            answer: {
+              text: selectedAnswer,
+              wordCount: submission.counts?.[submission.task2Choice] || countWords(selectedAnswer),
+            },
+          },
+        ],
+      });
+
+      setAiFeedback(result?.feedback || null);
+      setFeedbackMeta(result?.meta || null);
+      if (result?.feedback) {
+        try {
+          await saveWritingAiFeedback({
+            kind: "ote",
+            submissionId,
+            feedback: result.feedback,
+            meta: result?.meta || null,
+          });
+        } catch (saveError) {
+          console.warn("[OTE writing] feedback save failed", saveError);
+          setFeedbackError("Feedback generated, but it could not be saved to your profile.");
+        }
+      }
+      setFeedbackStatus("ready");
+    } catch (error) {
+      console.warn("[OTE writing] feedback failed", error);
+      setFeedbackStatus("error");
+      setFeedbackError(error?.message || "Could not generate feedback.");
+    }
+  }
+
   const homePath = nativeRoutes ? "/" : "/ote";
   const headerState = getHeaderState(status, mock, timerLeft);
 
@@ -255,7 +380,16 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
           submissionId={submissionId}
           submissionStatus={submissionStatus}
           submissionError={submissionError}
-          submission={buildSubmissionPayload()}
+          submission={{
+            ...buildSubmissionPayload(),
+            aiFeedback,
+            aiFeedbackMeta: feedbackMeta,
+          }}
+          aiFeedback={aiFeedback}
+          feedbackMeta={feedbackMeta}
+          feedbackStatus={feedbackStatus}
+          feedbackError={feedbackError}
+          onGenerateFeedback={handleGenerateFeedback}
           onPrint={() => window.print()}
           onDownloadText={(submission) => downloadOteWritingSubmissionText({ submissionId, submission, mock })}
           onDownloadDocx={(submission) => downloadOteWritingSubmissionDocx({ submissionId, submission, mock })}
@@ -624,6 +758,11 @@ function WritingComplete({
   submissionStatus,
   submissionError,
   submission,
+  aiFeedback,
+  feedbackMeta,
+  feedbackStatus,
+  feedbackError,
+  onGenerateFeedback,
   onPrint,
   onDownloadText,
   onDownloadDocx,
@@ -637,11 +776,20 @@ function WritingComplete({
         <p>{notice || "Your answers are locked and ready to review."}</p>
         <div className={`ote-submission-status is-${submissionStatus}`}>
           {submissionStatus === "saving" ? "Saving submission to your profile..." : null}
-          {submissionStatus === "saved" ? `Saved to your profile${submissionId ? ` as ${submissionId}` : ""}.` : null}
+          {submissionStatus === "saved" ? "Saved to your profile." : null}
           {submissionStatus === "error" ? `Could not save automatically: ${submissionError}` : null}
           {submissionStatus === "idle" ? "This attempt can be exported from this page." : null}
         </div>
         <div className="ote-submission-toolbar no-print" aria-label="Submission export tools">
+          <button
+            className="ote-secondary-btn"
+            type="button"
+            disabled={feedbackStatus === "loading"}
+            onClick={() => onGenerateFeedback(submission)}
+          >
+            <FileText size={18} />
+            {feedbackStatus === "loading" ? "Getting feedback..." : "Get feedback"}
+          </button>
           <button className="ote-secondary-btn" type="button" onClick={onPrint}>
             <Printer size={18} />
             Print / Save PDF
@@ -667,6 +815,11 @@ function WritingComplete({
             <pre>{answers[task2Choice] || "No answer written."}</pre>
           </article>
         </div>
+        <WritingAiFeedback
+          feedback={aiFeedback}
+          status={feedbackStatus}
+          error={feedbackError}
+        />
         <div className="ote-complete-actions">
           <button className="ote-secondary-btn" type="button" onClick={onBack}>
             Back to OTE home
@@ -674,5 +827,132 @@ function WritingComplete({
         </div>
       </div>
     </section>
+  );
+}
+
+function WritingAiFeedback({ feedback, status, error }) {
+  if (status === "idle") {
+    return (
+      <section className="ote-ai-feedback-panel">
+        <h2>Feedback</h2>
+        <p>Get a feedback report for the writing above.</p>
+      </section>
+    );
+  }
+
+  if (status === "loading") {
+    return (
+      <section className="ote-ai-feedback-panel" aria-live="polite">
+        <h2>Feedback</h2>
+        <p>Checking the writing against the task...</p>
+      </section>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <section className="ote-ai-feedback-panel is-error" role="alert">
+        <h2>Feedback</h2>
+        <p>{error || "Could not generate feedback."}</p>
+      </section>
+    );
+  }
+
+  if (!feedback) return null;
+
+  return (
+    <section className="ote-ai-feedback-panel">
+      <div className="ote-ai-feedback-heading">
+        <div>
+          <h2>Feedback</h2>
+          <p className="ote-ai-feedback-auto-note">Generated automatically to help you improve your writing.</p>
+          <p>{feedback.overall?.summary}</p>
+        </div>
+        <strong>{feedback.estimatedWritingLevel?.label}</strong>
+      </div>
+
+      <div className="ote-ai-feedback-overview">
+        <article>
+          <h3>Main strengths</h3>
+          <ul>{(feedback.overall?.mainStrengths || []).map((item) => <li key={item}>{item}</li>)}</ul>
+        </article>
+        <article>
+          <h3>Main priorities</h3>
+          <ul>{(feedback.overall?.mainPriorities || []).map((item) => <li key={item}>{item}</li>)}</ul>
+        </article>
+      </div>
+
+      <div className="ote-ai-feedback-task-list">
+        {(feedback.tasks || []).map((task, index) => (
+          <article className="ote-ai-feedback-task" key={`${task.taskId}-${index}`}>
+            <div className="ote-ai-feedback-task-head">
+              <h3>{index === 0 ? "Part 1 Email" : getOteTaskLabel(task.taskType)}</h3>
+              <span>{task.wordCount} words · {task.wordCountStatus?.replace(/_/g, " ")}</span>
+            </div>
+            <p className="ote-ai-feedback-word-count">{task.wordCountFeedback}</p>
+            <p><strong>Task fulfilment:</strong> {task.taskFulfilment?.feedback}</p>
+            {task.taskFulfilment?.requiredPoints?.length ? (
+              <ul className="ote-ai-feedback-points">
+                {task.taskFulfilment.requiredPoints.map((point) => (
+                  <li key={point.point}>
+                    <strong>{point.status?.replace(/_/g, " ")}:</strong> {point.point}
+                    {point.feedback ? <em>{point.feedback}</em> : null}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+            <p><strong>Content:</strong> {task.taskFulfilment?.contentSpecificity?.feedback}</p>
+            {task.mistakes?.length ? (
+              <div className="ote-ai-feedback-mistakes">
+                <h4>Mistakes to fix</h4>
+                <ul>
+                  {task.mistakes.map((mistake) => (
+                    <li key={`${mistake.category}-${mistake.original}-${mistake.correction}`}>
+                      <small>{mistake.category}</small>
+                      <p><span>{mistake.original}</span> → <strong>{mistake.correction}</strong></p>
+                      <em>{mistake.explanation}</em>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+            <p><strong>Format/register:</strong> {task.formatAndRegister?.feedback}</p>
+            <OteExampleList examples={task.formatAndRegister?.examples} type="suggestion" />
+            <p><strong>Organization:</strong> {task.organization?.feedback}</p>
+            <p><strong>Grammar:</strong> {task.grammar?.feedback}</p>
+            <OteExampleList examples={task.grammar?.examples} type="correction" />
+            <p><strong>Lexis:</strong> {task.lexis?.feedback}</p>
+            <OteExampleList examples={task.lexis?.examples} type="suggestion" />
+            <div className="ote-ai-feedback-improved">
+              <strong>Improved version</strong>
+              <pre>{task.improvedVersion}</pre>
+            </div>
+            <blockquote>{task.teacherNote}</blockquote>
+          </article>
+        ))}
+      </div>
+
+      {feedback.estimatedWritingLevel?.note ? <p className="ote-ai-feedback-note">{feedback.estimatedWritingLevel.note}</p> : null}
+    </section>
+  );
+}
+
+function getOteTaskLabel(taskType) {
+  if (taskType === "ote_part2_article") return "Part 2 Article";
+  if (taskType === "ote_part2_review") return "Part 2 Review";
+  return "Part 2 Essay";
+}
+
+function OteExampleList({ examples = [], type }) {
+  if (!examples.length) return null;
+  return (
+    <ul className="ote-ai-feedback-examples">
+      {examples.slice(0, 2).map((example) => (
+        <li key={`${example.original}-${example[type]}`}>
+          <span>{example.original}</span> → <strong>{example[type]}</strong>
+          {example.explanation ? <em>{example.explanation}</em> : null}
+        </li>
+      ))}
+    </ul>
   );
 }

@@ -152,6 +152,11 @@ const counts = useMemo(() => ({
 
 // summary state
 const [showSummary, setShowSummary] = useState(false);
+const [feedbackStatus, setFeedbackStatus] = useState("idle");
+const [feedbackError, setFeedbackError] = useState("");
+const [aiFeedback, setAiFeedback] = useState(null);
+const [feedbackMeta, setFeedbackMeta] = useState(null);
+const [submissionId, setSubmissionId] = useState("");
 
 // Build the plain-text version from the HTML (keeps line breaks)
 function buildSummaryPlain() {
@@ -234,6 +239,8 @@ function handleDownload() {
     setFormalHTML("");
     setFriendText("");
     setFormalText("");
+    setSubmissionId("");
+    resetFeedback();
   }, [current.id]);
 
   useEffect(() => {
@@ -253,6 +260,8 @@ function handleDownload() {
     }
     setTaskIndex(nextIdx);
     setShowSummary(false); // ✅ hide summary on new task
+    setSubmissionId("");
+    resetFeedback();
   }
 
   async function handleSubmit() {
@@ -263,7 +272,7 @@ function handleDownload() {
 
   if (user && fb?.saveWritingP4Submission) {
     try {
-      await fb.saveWritingP4Submission({
+      const savedId = await fb.saveWritingP4Submission({
         taskId: current.id,
         friendText: friendText.trim(),
         formalText: formalText.trim(),
@@ -271,6 +280,7 @@ function handleDownload() {
         formalHTML,
         counts: { friend: counts.friend, formal: counts.formal },
       });
+      setSubmissionId(savedId || "");
 
       // ✅ activity log — correct placement
     await fb.logWritingSubmitted({
@@ -288,6 +298,69 @@ function handleDownload() {
 
   toast("Saved ✓");
   setShowSummary(true);  // ✅ shows the summary panel
+}
+
+function resetFeedback() {
+  setFeedbackStatus("idle");
+  setFeedbackError("");
+  setAiFeedback(null);
+  setFeedbackMeta(null);
+}
+
+async function handleGenerateFeedback() {
+  if (!user) {
+    toast("Sign in to get feedback.");
+    return;
+  }
+  const friend = friendText.trim();
+  const formal = formalText.trim();
+  if (!friend || !formal) {
+    toast("Please write both emails before generating feedback.");
+    return;
+  }
+  if (!submissionId) {
+    toast("Submit your emails first so the feedback can be saved to your profile.");
+    return;
+  }
+
+  setFeedbackStatus("loading");
+  setFeedbackError("");
+  setAiFeedback(null);
+  setFeedbackMeta(null);
+
+  try {
+    const result = await fb.requestAptisWritingPart4Feedback({
+      part: "part4",
+      taskId: current.id,
+      title: current.title,
+      sourceTitle: current.sourceTitle,
+      source: current.source,
+      friendPrompt: current.friendPrompt,
+      formalPrompt: current.formalPrompt,
+      friendEmail: { text: friend, wordCount: counts.friend },
+      formalEmail: { text: formal, wordCount: counts.formal },
+    });
+    setAiFeedback(result?.feedback || null);
+    setFeedbackMeta(result?.meta || null);
+    if (submissionId && result?.feedback && fb?.saveWritingAiFeedback) {
+      try {
+        await fb.saveWritingAiFeedback({
+          kind: "part4",
+          submissionId,
+          feedback: result.feedback,
+          meta: result?.meta || null,
+        });
+      } catch (saveError) {
+        console.warn("[WritingP4] AI feedback save failed", saveError);
+        toast("Feedback generated, but it could not be saved to your profile.");
+      }
+    }
+    setFeedbackStatus("ready");
+  } catch (error) {
+    console.warn("[WritingP4] AI feedback failed", error);
+    setFeedbackStatus("error");
+    setFeedbackError(error?.message || "Could not generate feedback.");
+  }
 }
 
 
@@ -340,6 +413,14 @@ function handleDownload() {
           <button type="button" className="btn" onClick={handleDownload}>
             Download .txt
           </button>
+          <button
+            type="button"
+            className="btn primary"
+            disabled={feedbackStatus === "loading"}
+            onClick={handleGenerateFeedback}
+          >
+            {feedbackStatus === "loading" ? "Getting feedback..." : "Get feedback"}
+          </button>
         </div>
       </div>
 
@@ -362,6 +443,11 @@ function handleDownload() {
           />
         </div>
       </div>
+      <AptisWritingPart4Feedback
+        feedback={aiFeedback}
+        status={feedbackStatus}
+        error={feedbackError}
+      />
     </section>
   ) : (
     /* ---------- FORM PANEL ---------- */
@@ -428,6 +514,7 @@ function handleDownload() {
             setFriendHTML(""); setFormalHTML("");
             setFriendText(""); setFormalText("");
             setShowSummary(false);
+            resetFeedback();
           }}
         >
           Reset
@@ -438,6 +525,113 @@ function handleDownload() {
 </div>
 
     </div>
+  );
+}
+
+function AptisWritingPart4Feedback({ feedback, status, error }) {
+  if (status === "idle") return null;
+
+  if (status === "loading") {
+    return (
+      <section className="ai-p4-feedback" aria-live="polite">
+        <h4>Feedback</h4>
+        <p>Checking content, register contrast, language, and organisation...</p>
+      </section>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <section className="ai-p4-feedback error" role="alert">
+        <h4>Feedback</h4>
+        <p>{error || "Could not generate feedback."}</p>
+      </section>
+    );
+  }
+
+  if (!feedback) return null;
+
+  return (
+    <section className="ai-p4-feedback">
+      <div className="ai-p4-head">
+        <div>
+          <h4>Feedback</h4>
+          <p className="ai-feedback-note">Generated automatically to help you improve your writing.</p>
+          <p>{feedback.overall?.summary}</p>
+        </div>
+        <span>{feedback.estimatedLevel?.label}</span>
+      </div>
+
+      <div className="ai-p4-overview">
+        <article>
+          <strong>Register contrast</strong>
+          <p>{feedback.overall?.registerContrast?.feedback}</p>
+        </article>
+        <article>
+          <strong>Content specificity</strong>
+          <p>{feedback.overall?.contentSpecificity?.feedback}</p>
+        </article>
+      </div>
+
+      <EmailFeedbackCard title="Informal email" data={feedback.informalEmail} />
+      <EmailFeedbackCard title="Formal email" data={feedback.formalEmail} />
+
+      <div className="ai-p4-advice">
+        <div>
+          <strong>Main strengths</strong>
+          <ul>{(feedback.overall?.mainStrengths || []).map((item) => <li key={item}>{item}</li>)}</ul>
+        </div>
+        <div>
+          <strong>Main priorities</strong>
+          <ul>{(feedback.overall?.mainPriorities || []).map((item) => <li key={item}>{item}</li>)}</ul>
+        </div>
+      </div>
+
+      <p className="ai-p4-note">{feedback.estimatedLevel?.note}</p>
+    </section>
+  );
+}
+
+function EmailFeedbackCard({ title, data }) {
+  if (!data) return null;
+  return (
+    <article className="ai-p4-card">
+      <div className="ai-p4-card-head">
+        <strong>{title}</strong>
+        <small>{data.wordCount} words · {data.wordCountStatus?.replace(/_/g, " ")}</small>
+      </div>
+      <p className="ai-p4-length">{data.wordCountFeedback}</p>
+      <p><span>Task:</span> {data.taskFulfilment?.feedback}</p>
+      {data.taskFulfilment?.missingOrWeakContent?.length ? (
+        <p><span>Missing/weak:</span> {data.taskFulfilment.missingOrWeakContent.join("; ")}</p>
+      ) : null}
+      <p><span>Register:</span> {data.register?.feedback}</p>
+      <ExampleList examples={data.register?.examples} type="suggestion" />
+      <p><span>Grammar:</span> {data.grammar?.feedback}</p>
+      <ExampleList examples={data.grammar?.examples} type="correction" />
+      <p><span>Vocabulary:</span> {data.vocabulary?.feedback}</p>
+      <ExampleList examples={data.vocabulary?.examples} type="suggestion" />
+      <p><span>Cohesion:</span> {data.cohesion?.feedback}</p>
+      <div className="ai-p4-improved">
+        <strong>Improved version</strong>
+        <p>{data.improvedVersion}</p>
+      </div>
+      <blockquote>{data.teacherNote}</blockquote>
+    </article>
+  );
+}
+
+function ExampleList({ examples = [], type }) {
+  if (!examples.length) return null;
+  return (
+    <ul className="ai-p4-examples">
+      {examples.slice(0, 2).map((example) => (
+        <li key={`${example.original}-${example[type]}`}>
+          <span>{example.original}</span> → <strong>{example[type]}</strong>
+          {example.explanation ? <em>{example.explanation}</em> : null}
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -759,6 +953,75 @@ function StyleScope(){
 .aptis-writing-p4 .summary .preview p:last-child,
 .aptis-writing-p4 .summary .preview div:last-child { margin-bottom: 0; }
 
+.aptis-writing-p4 .ai-p4-feedback {
+  margin-top:.9rem;
+  background:#0f1b31;
+  border:1px solid #2c416f;
+  border-radius:12px;
+  padding:.85rem;
+}
+.aptis-writing-p4 .ai-p4-feedback.error { border-color:#c2410c; background:#2a1720; }
+.aptis-writing-p4 .ai-p4-feedback h4,
+.aptis-writing-p4 .ai-p4-feedback p { margin-top:0; }
+.aptis-writing-p4 .ai-p4-head,
+.aptis-writing-p4 .ai-p4-card-head {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:.75rem;
+}
+.aptis-writing-p4 .ai-p4-head span {
+  flex:0 0 auto;
+  border:1px solid #3a6ebd;
+  border-radius:999px;
+  padding:.2rem .5rem;
+  color:#cfe1ff;
+}
+.aptis-writing-p4 .ai-feedback-note {
+  margin:.1rem 0 .35rem;
+  color:#a9b7d1;
+  font-size:.9rem;
+}
+.aptis-writing-p4 .ai-p4-overview,
+.aptis-writing-p4 .ai-p4-advice {
+  display:grid;
+  grid-template-columns:1fr;
+  gap:.65rem;
+  margin-top:.75rem;
+}
+@media(min-width:900px){
+  .aptis-writing-p4 .ai-p4-overview,
+  .aptis-writing-p4 .ai-p4-advice { grid-template-columns:1fr 1fr; }
+}
+.aptis-writing-p4 .ai-p4-overview article,
+.aptis-writing-p4 .ai-p4-card,
+.aptis-writing-p4 .ai-p4-advice > div,
+.aptis-writing-p4 .ai-p4-improved {
+  background:#13213b;
+  border:1px solid #2c416f;
+  border-radius:10px;
+  padding:.7rem;
+}
+.aptis-writing-p4 .ai-p4-card { margin-top:.75rem; }
+.aptis-writing-p4 .ai-p4-card-head small,
+.aptis-writing-p4 .ai-p4-meta,
+.aptis-writing-p4 .ai-p4-note { color:#a9b7d1; }
+.aptis-writing-p4 .ai-p4-card p,
+.aptis-writing-p4 .ai-p4-overview p { margin:.3rem 0; color:#d8e7ff; }
+.aptis-writing-p4 .ai-p4-card span { color:#cfe1ff; font-weight:700; }
+.aptis-writing-p4 .ai-p4-length { color:#cfe1ff; }
+.aptis-writing-p4 .ai-p4-examples { margin:.35rem 0; padding-left:1.1rem; color:#d8e7ff; }
+.aptis-writing-p4 .ai-p4-examples em { display:block; color:#a9b7d1; }
+.aptis-writing-p4 .ai-p4-improved { margin-top:.6rem; }
+.aptis-writing-p4 .ai-p4-feedback blockquote {
+  margin:.7rem 0 0;
+  padding-left:.75rem;
+  border-left:3px solid #4a79d8;
+  color:#d8e7ff;
+}
+.aptis-writing-p4 .ai-p4-advice ul { margin:.4rem 0 0; padding-left:1.2rem; }
+.aptis-writing-p4 .ai-p4-note,
+.aptis-writing-p4 .ai-p4-meta { margin:.7rem 0 0; font-size:.85rem; }
 
     `}</style>
   );

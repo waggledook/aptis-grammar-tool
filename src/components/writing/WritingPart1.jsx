@@ -133,6 +133,11 @@ export default function WritingPart1({ user }) {
   const [phase, setPhase] = useState("ready"); // ready | typing | summary
   const submittingRef = useRef(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [feedbackStatus, setFeedbackStatus] = useState("idle");
+  const [feedbackError, setFeedbackError] = useState("");
+  const [aiFeedback, setAiFeedback] = useState(null);
+  const [feedbackMeta, setFeedbackMeta] = useState(null);
+  const [submissionId, setSubmissionId] = useState("");
 
 
   // Refs for sequential focusing
@@ -156,6 +161,7 @@ function getSuggestionsFor(qId) {
 
   function start() {
     setShowSuggestions(false);            // ← reset
+    resetFeedback();
     setPhase("typing");
     setTimeout(() => {
       if (inputRefs.current[0]) inputRefs.current[0].focus();
@@ -209,7 +215,8 @@ function getSuggestionsFor(qId) {
             answer: (answers[i] || "").trim(),
           }));
   
-          await fb.saveWritingP1Submission({ items });
+          const savedId = await fb.saveWritingP1Submission({ items });
+          setSubmissionId(savedId || "");
   
           // ✅ activity log only after successful save
           await fb.logWritingSubmitted({
@@ -230,15 +237,75 @@ function getSuggestionsFor(qId) {
     }
   }  
 
-  
+  function buildSubmittedItems() {
+    return sessionQs.map((q, i) => ({
+      id: q.id,
+      question: q.text,
+      answer: (answers[i] || "").trim(),
+    }));
+  }
+
+  function resetFeedback() {
+    setFeedbackStatus("idle");
+    setFeedbackError("");
+    setAiFeedback(null);
+    setFeedbackMeta(null);
+  }
+
+  async function handleGenerateFeedback() {
+    if (!user) {
+      toast("Sign in to get feedback.");
+      return;
+    }
+    const items = buildSubmittedItems();
+    if (items.length !== 5 || items.some((item) => !item.answer)) {
+      toast("Answer all five questions before generating feedback.");
+      return;
+    }
+    if (!submissionId) {
+      toast("Submit your answers first so the feedback can be saved to your profile.");
+      return;
+    }
+
+    setFeedbackStatus("loading");
+    setFeedbackError("");
+    setAiFeedback(null);
+    setFeedbackMeta(null);
+
+    try {
+      const result = await fb.requestAptisWritingPart1Feedback(items);
+      setAiFeedback(result?.feedback || null);
+      setFeedbackMeta(result?.meta || null);
+      if (submissionId && result?.feedback && fb?.saveWritingAiFeedback) {
+        try {
+          await fb.saveWritingAiFeedback({
+            kind: "part1",
+            submissionId,
+            feedback: result.feedback,
+            meta: result?.meta || null,
+          });
+        } catch (saveError) {
+          console.warn("[WritingP1] AI feedback save failed", saveError);
+          toast("Feedback generated, but it could not be saved to your profile.");
+        }
+      }
+      setFeedbackStatus("ready");
+    } catch (error) {
+      console.warn("[WritingP1] AI feedback failed", error);
+      setFeedbackStatus("error");
+      setFeedbackError(error?.message || "Could not generate feedback.");
+    }
+  }
 
 
   function newSet() {
     setShowSuggestions(false);            // ← reset
+    resetFeedback();
     const h = loadHistory();
     const qs = pickRandomQuestions(WRITING_P1_BANK, h);
     setSessionQs(qs);
     setAnswers(Array(qs.length).fill(""));
+    setSubmissionId("");
     setPhase("ready");
   }
 
@@ -316,6 +383,13 @@ function getSuggestionsFor(qId) {
       >
         {showSuggestions ? "Hide suggested answers" : "Show suggested answers"}
       </button>
+      <button
+        className="btn primary"
+        onClick={handleGenerateFeedback}
+        disabled={feedbackStatus === "loading"}
+      >
+        {feedbackStatus === "loading" ? "Getting feedback..." : "Get feedback"}
+      </button>
     </div>
 
     <ol className="list">
@@ -346,6 +420,11 @@ function getSuggestionsFor(qId) {
         );
       })}
     </ol>
+    <Part1AiFeedback
+      feedback={aiFeedback}
+      status={feedbackStatus}
+      error={feedbackError}
+    />
   </>
 )}
 
@@ -384,6 +463,61 @@ function getSuggestionsFor(qId) {
         </section>
       </div>
     </div>
+  );
+}
+
+function Part1AiFeedback({ feedback, status, error }) {
+  if (status === "idle") return null;
+
+  if (status === "loading") {
+    return (
+      <section className="ai-p1-feedback" aria-live="polite">
+        <h4>Feedback</h4>
+        <p>Checking communication, length, and natural short answers...</p>
+      </section>
+    );
+  }
+
+  if (status === "error") {
+    return (
+      <section className="ai-p1-feedback error" role="alert">
+        <h4>Feedback</h4>
+        <p>{error || "Could not generate feedback."}</p>
+      </section>
+    );
+  }
+
+  if (!feedback) return null;
+
+  return (
+    <section className="ai-p1-feedback">
+      <div className="ai-p1-head">
+        <div>
+          <h4>Feedback</h4>
+          <p className="ai-feedback-note">Generated automatically to help you improve your writing.</p>
+          <p>{feedback.overall?.summary}</p>
+        </div>
+        <span>{feedback.overall?.communication?.replace(/_/g, " ")}</span>
+      </div>
+
+      <div className="ai-p1-list">
+        {(feedback.answers || []).map((item, index) => (
+          <article key={item.id || index}>
+            <div className="ai-p1-question">
+              <strong>{index + 1}. {item.question}</strong>
+              <small>{item.wordCount} words</small>
+            </div>
+            <p><span>Your answer:</span> {item.answer}</p>
+            <p><span>Communication:</span> {item.communication?.comment}</p>
+            <p><span>Length:</span> {item.length?.comment}</p>
+            {item.learningFeedback ? <p><span>Learning:</span> {item.learningFeedback}</p> : null}
+            <p><span>Try:</span> <strong>{item.suggestedAnswer}</strong></p>
+          </article>
+        ))}
+      </div>
+
+      <blockquote>{feedback.teacherComment}</blockquote>
+    </section>
   );
 }
 
@@ -437,6 +571,81 @@ function StyleScope() {
   border-radius:999px;
   font-size:.9rem;
   white-space:nowrap;
+}
+.ai-p1-feedback{
+  margin-top:.9rem;
+  background:#0f1b31;
+  border:1px solid #2c416f;
+  border-radius:10px;
+  padding:.8rem;
+}
+.ai-p1-feedback.error{
+  border-color:#c2410c;
+  background:#2a1720;
+}
+.ai-p1-feedback h4,
+.ai-p1-feedback p{
+  margin-top:0;
+}
+.ai-p1-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:.75rem;
+  margin-bottom:.65rem;
+}
+.ai-p1-head span{
+  flex:0 0 auto;
+  border:1px solid #3a6ebd;
+  border-radius:999px;
+  padding:.2rem .5rem;
+  color:#cfe1ff;
+  text-transform:capitalize;
+}
+.ai-feedback-note{
+  margin:.1rem 0 .35rem;
+  color:var(--muted);
+  font-size:.9rem;
+}
+.ai-p1-list{
+  display:grid;
+  gap:.55rem;
+}
+.ai-p1-list article{
+  background:#13213b;
+  border:1px solid #2c416f;
+  border-radius:8px;
+  padding:.65rem;
+}
+.ai-p1-question{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:.75rem;
+  margin-bottom:.45rem;
+}
+.ai-p1-question small{
+  color:#a9b7d1;
+  white-space:nowrap;
+}
+.ai-p1-list p{
+  margin:.25rem 0;
+  color:#d8e7ff;
+}
+.ai-p1-list span{
+  color:#cfe1ff;
+  font-weight:700;
+}
+.ai-p1-feedback blockquote{
+  margin:.8rem 0 0;
+  padding-left:.75rem;
+  border-left:3px solid #4a79d8;
+  color:#d8e7ff;
+}
+.ai-p1-meta{
+  margin:.65rem 0 0;
+  color:#a9b7d1;
+  font-size:.85rem;
 }
     `}</style>
   );

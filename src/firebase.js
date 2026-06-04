@@ -39,6 +39,11 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
+import {
+  connectFunctionsEmulator,
+  getFunctions,
+  httpsCallable,
+} from "firebase/functions";
 import { TOPIC_DATA } from "./components/vocabulary/data/vocabTopics";
 import { getAllHubVocabThemes } from "./data/hubVocabularyActivities";
 
@@ -85,6 +90,17 @@ export const rtdb = getDatabase(app);
 
 export const auth = getAuth(app);
 export const storage = getStorage(app);
+export const functionsRegion = getFunctions(app, "europe-west1");
+
+if (
+  import.meta.env.DEV &&
+  import.meta.env.VITE_USE_FUNCTIONS_EMULATOR === "true" &&
+  typeof window !== "undefined" &&
+  !window.__seifFunctionsEmulatorConnected
+) {
+  connectFunctionsEmulator(functionsRegion, "127.0.0.1", 5001);
+  window.__seifFunctionsEmulatorConnected = true;
+}
 
 // — AUTH HELPERS (unchanged) —
 export const doSignIn     = (email, pw) => signInWithEmailAndPassword(auth, email, pw);
@@ -131,6 +147,57 @@ export const doSignUp = async ({ email, pw, name, username }) => {
 
 export const onAuthChange = (cb)       => onAuthStateChanged(auth, cb);
 export const doSignOut    = ()         => signOut(auth);
+
+export async function requestWritingFeedback(payload) {
+  const generateWritingFeedback = httpsCallable(functionsRegion, "generateWritingFeedback");
+  const result = await generateWritingFeedback(payload);
+  return result.data;
+}
+
+export async function requestOteWritingFeedback(payload) {
+  const generateOteWritingFeedback = httpsCallable(functionsRegion, "generateOteWritingFeedback");
+  const result = await generateOteWritingFeedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  return result.data;
+}
+
+export async function requestAptisWritingPart1Feedback(items) {
+  const generateAptisWritingPart1Feedback = httpsCallable(
+    functionsRegion,
+    "generateAptisWritingPart1Feedback"
+  );
+  const result = await generateAptisWritingPart1Feedback({
+    items,
+    model: "gpt-5.4-mini",
+  });
+  return result.data;
+}
+
+export async function requestAptisWritingPart23Feedback(payload) {
+  const generateAptisWritingPart23Feedback = httpsCallable(
+    functionsRegion,
+    "generateAptisWritingPart23Feedback"
+  );
+  const result = await generateAptisWritingPart23Feedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  return result.data;
+}
+
+export async function requestAptisWritingPart4Feedback(payload) {
+  const generateAptisWritingPart4Feedback = httpsCallable(
+    functionsRegion,
+    "generateAptisWritingPart4Feedback"
+  );
+  const result = await generateAptisWritingPart4Feedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  return result.data;
+}
 
 export async function doPasswordReset(email, redirectUrl = "") {
   const safeRedirect = String(redirectUrl || "").trim();
@@ -2764,15 +2831,16 @@ export async function fetchSpeakingProgressMap(uid) {
  */
 export async function saveWritingP1Submission(payload) {
   const uid = auth.currentUser?.uid;
-  if (!uid) return; // silently skip if signed out
+  if (!uid) return null; // silently skip if signed out
 
   const colRef = collection(db, "users", uid, "writingP1Sessions");
-  await addDoc(colRef, {
+  const ref = await addDoc(colRef, {
     type: "part1",
     items: payload.items,
     count: payload.items?.length ?? 0,
     createdAt: serverTimestamp(),
   });
+  return ref.id;
 }
 
 // — WRITING PART 2: save short-form answers ————————————————
@@ -2783,14 +2851,15 @@ export async function saveWritingP1Submission(payload) {
  */
 export async function saveWritingP2Submission(payload) {
   const uid = auth.currentUser?.uid;
-  if (!uid) return; // silently skip if signed out
+  if (!uid) return null; // silently skip if signed out
 
   const colRef = collection(db, "users", uid, "writingP2Submissions");
-  await addDoc(colRef, {
+  const ref = await addDoc(colRef, {
     type: "part2",
     ...payload,
     createdAt: serverTimestamp(),
   });
+  return ref.id;
 }
 
 /** Fetch Writing Part 2 submissions (latest first) */
@@ -2814,6 +2883,9 @@ export async function fetchWritingP2Submissions(n = 20, uid) {
       answerText: data.answerText || "",
       answerHTML: data.answerHTML || "",
       counts: data.counts || { answer: 0 },
+      aiFeedback: data.aiFeedback || null,
+      aiFeedbackMeta: data.aiFeedbackMeta || null,
+      aiFeedbackUpdatedAt: data.aiFeedbackUpdatedAt || null,
     };
   });
 }
@@ -2889,6 +2961,9 @@ export async function fetchWritingP1Sessions(n = 20, uid) {
     id: d.id,
     createdAt: d.data()?.createdAt || null,
     items: d.data()?.items || [],
+    aiFeedback: d.data()?.aiFeedback || null,
+    aiFeedbackMeta: d.data()?.aiFeedbackMeta || null,
+    aiFeedbackUpdatedAt: d.data()?.aiFeedbackUpdatedAt || null,
   }));
 }
 
@@ -2936,14 +3011,15 @@ export async function fetchWritingP1GuideEdits(n = 100, uid) {
  */
 export async function saveWritingP3Submission(payload) {
   const uid = auth.currentUser?.uid;
-  if (!uid) return; // silently skip if signed out
+  if (!uid) return null; // silently skip if signed out
 
   const colRef = collection(db, "users", uid, "writingP3Submissions");
-  await addDoc(colRef, {
+  const ref = await addDoc(colRef, {
     type: "part3",
     ...payload,
     createdAt: serverTimestamp(),
   });
+  return ref.id;
 }
 
 /** Fetch Writing Part 3 submissions (latest first) */
@@ -2967,6 +3043,9 @@ export async function fetchWritingP3Submissions(n = 20, uid) {
       answersText: data.answersText || ["", "", ""],
       answersHTML: data.answersHTML || ["", "", ""],
       counts: data.counts || [0, 0, 0],
+      aiFeedback: data.aiFeedback || null,
+      aiFeedbackMeta: data.aiFeedbackMeta || null,
+      aiFeedbackUpdatedAt: data.aiFeedbackUpdatedAt || null,
     };
   });
 }
@@ -2980,14 +3059,15 @@ export async function fetchWritingP3Submissions(n = 20, uid) {
  */
 export async function saveWritingP4Submission(payload) {
   const uid = auth.currentUser?.uid;
-  if (!uid) return; // silently skip if signed out
+  if (!uid) return null; // silently skip if signed out
 
   const colRef = collection(db, "users", uid, "writingP4Submissions");
-  await addDoc(colRef, {
+  const ref = await addDoc(colRef, {
     type: "part4",
     ...payload,
     createdAt: serverTimestamp(),
   });
+  return ref.id;
 }
 
 /** Fetch Writing Part 4 submissions (latest first) */
@@ -3014,8 +3094,37 @@ export async function fetchWritingP4Submissions(n = 20, uid) {
       friendHTML: data.friendHTML || "",
       formalHTML: data.formalHTML || "",
       counts: data.counts || { friend: 0, formal: 0 },
+      aiFeedback: data.aiFeedback || null,
+      aiFeedbackMeta: data.aiFeedbackMeta || null,
+      aiFeedbackUpdatedAt: data.aiFeedbackUpdatedAt || null,
     };
   });
+}
+
+const WRITING_FEEDBACK_COLLECTIONS = {
+  part1: "writingP1Sessions",
+  part2: "writingP2Submissions",
+  part3: "writingP3Submissions",
+  part4: "writingP4Submissions",
+  ote: "oteWritingSubmissions",
+};
+
+export async function saveWritingAiFeedback({ kind, submissionId, feedback, meta = null }) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !submissionId || !feedback) return;
+
+  const collectionName = WRITING_FEEDBACK_COLLECTIONS[kind];
+  if (!collectionName) throw new Error(`Unknown writing feedback kind: ${kind}`);
+
+  await setDoc(
+    doc(db, "users", uid, collectionName, submissionId),
+    {
+      aiFeedback: feedback,
+      aiFeedbackMeta: meta,
+      aiFeedbackUpdatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
 }
 
 export async function saveOteWritingSubmission(payload) {
@@ -3058,6 +3167,9 @@ export async function fetchOteWritingSubmissions(n = 20, uid) {
       timings: data.timings || {},
       finishedAt: data.finishedAt || null,
       reason: data.reason || "",
+      aiFeedback: data.aiFeedback || null,
+      aiFeedbackMeta: data.aiFeedbackMeta || null,
+      aiFeedbackUpdatedAt: data.aiFeedbackUpdatedAt || null,
     };
   });
 }
