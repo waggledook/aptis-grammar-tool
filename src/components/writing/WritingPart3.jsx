@@ -373,8 +373,7 @@ export default function WritingPart3({ user, onRequireSignIn }) {
     setAiFeedback(null);
     setFeedbackMeta(null);
 
-    try {
-      const result = await fb.requestAptisWritingPart23Feedback({
+    const feedbackPayload = {
         part: "part3",
         taskId: current.id,
         title: current.title,
@@ -387,7 +386,10 @@ export default function WritingPart3({ user, onRequireSignIn }) {
           text,
           wordCount: counts[index],
         })),
-      });
+      };
+
+    try {
+      const result = await fb.requestAptisWritingPart23Feedback(feedbackPayload);
       setAiFeedback(result?.feedback || null);
       setFeedbackMeta(result?.meta || null);
       if (submissionId && result?.feedback && fb?.saveWritingAiFeedback) {
@@ -405,9 +407,25 @@ export default function WritingPart3({ user, onRequireSignIn }) {
       }
       setFeedbackStatus("ready");
     } catch (error) {
-      console.warn("[WritingP3] AI feedback failed", error);
+      console.warn("[WritingP3] AI feedback failed", {
+        error,
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        customData: error?.customData,
+        payloadSummary: {
+          taskId: feedbackPayload.taskId,
+          chatCount: feedbackPayload.chats.length,
+          answerCount: feedbackPayload.answers.length,
+          wordCounts: feedbackPayload.answers.map((answer) => answer.wordCount),
+          answerChars: feedbackPayload.answers.map((answer) => answer.text.length),
+        },
+      });
       setFeedbackStatus("error");
-      setFeedbackError(error?.message || "Could not generate feedback.");
+      setFeedbackError(
+        [error?.code, error?.message].filter(Boolean).join(": ") ||
+        "Could not generate feedback."
+      );
     }
   }
 

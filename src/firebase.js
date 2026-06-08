@@ -199,6 +199,18 @@ export async function requestAptisWritingPart4Feedback(payload) {
   return result.data;
 }
 
+export async function requestAptisSpeakingPart1Feedback(payload) {
+  const generateAptisSpeakingPart1Feedback = httpsCallable(
+    functionsRegion,
+    "generateAptisSpeakingPart1Feedback"
+  );
+  const result = await generateAptisSpeakingPart1Feedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  return result.data;
+}
+
 export async function doPasswordReset(email, redirectUrl = "") {
   const safeRedirect = String(redirectUrl || "").trim();
   if (!safeRedirect) {

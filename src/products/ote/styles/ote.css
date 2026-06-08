@@ -577,6 +577,25 @@
   box-shadow: var(--ote-dashboard-shadow);
 }
 
+.ote-training-primary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ote-dashboard-primary);
+  color: var(--ote-dashboard-primary-text);
+  padding: 0.82rem 1.05rem;
+  font-weight: 900;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.14);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.ote-training-primary-link:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--ote-dashboard-shadow);
+}
+
 .ote-training-activity-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1495,6 +1514,84 @@
   color: var(--color-text-soft);
   font-size: 0.82rem;
   font-weight: 500;
+}
+
+.ote-guided-photo-grid {
+  gap: 1rem;
+}
+
+.ote-guided-photo-grid figure {
+  border: 2px solid var(--ote-dashboard-panel-border);
+  background: var(--ote-dashboard-panel);
+  box-shadow: var(--ote-dashboard-shadow);
+}
+
+.ote-guided-photo-grid figcaption {
+  min-height: 96px;
+  padding: 0.9rem 1rem;
+  color: var(--ote-dashboard-text);
+  font-size: 1.22rem;
+  font-weight: 900;
+  line-height: 1.22;
+}
+
+.ote-guided-timing-note {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+.ote-guided-timing-note span {
+  border: 1px solid rgba(255, 191, 73, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 191, 73, 0.12);
+  color: var(--color-accent);
+  padding: 0.35rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 900;
+}
+
+.ote-part3-stage-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ote-part3-stage-grid article {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 0.9rem;
+}
+
+.ote-part3-stage-grid span {
+  color: var(--color-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.ote-part3-stage-grid h3 {
+  margin: 0.3rem 0 0.6rem;
+  color: var(--color-text);
+  font-size: 1rem;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.ote-part3-stage-grid div {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.ote-part3-stage-grid p {
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text-soft);
+  padding: 0.5rem 0.6rem;
+  line-height: 1.35;
 }
 
 .ote-exam {

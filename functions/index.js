@@ -25,6 +25,7 @@ const WRITING_FEEDBACK_CREDIT_COSTS = {
   aptis_part2: 2,
   aptis_part3: 3,
   aptis_part4: 5,
+  aptis_speaking_part1: 2,
   ote_full_mock: 8,
 };
 
@@ -244,6 +245,185 @@ const APTIS_WRITING_PART1_FEEDBACK_SCHEMA = {
   },
 };
 
+const APTIS_SPEAKING_PART1_FEEDBACK_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["taskType", "estimatedLevel", "overall", "answers"],
+  properties: {
+    taskType: { type: "string", enum: ["aptis_speaking_part1"] },
+    estimatedLevel: {
+      type: "object",
+      additionalProperties: false,
+      required: ["label", "confidence", "note"],
+      properties: {
+        label: {
+          type: "string",
+          enum: [
+            "Below A1 / unclear",
+            "A1 range",
+            "A2 range",
+            "B1 range",
+            "B2 range",
+            "C1 range",
+          ],
+        },
+        confidence: { type: "string", enum: ["low", "medium", "high"] },
+        note: { type: "string" },
+      },
+    },
+    overall: {
+      type: "object",
+      additionalProperties: false,
+      required: [
+        "summary",
+        "mainStrengths",
+        "mainPriorities",
+        "developmentAdvice",
+        "pronunciationFluencyCaveat",
+      ],
+      properties: {
+        summary: { type: "string" },
+        mainStrengths: {
+          type: "array",
+          items: { type: "string" },
+        },
+        mainPriorities: {
+          type: "array",
+          items: { type: "string" },
+        },
+        developmentAdvice: { type: "string" },
+        pronunciationFluencyCaveat: { type: "string" },
+      },
+    },
+    answers: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "questionId",
+          "question",
+          "transcript",
+          "durationSeconds",
+          "taskFulfilment",
+          "answerDevelopment",
+          "grammar",
+          "vocabulary",
+          "languageErrors",
+          "fluency",
+          "improvedAnswer",
+          "teacherNote",
+        ],
+        properties: {
+          questionId: { type: "string" },
+          question: { type: "string" },
+          transcript: { type: "string" },
+          durationSeconds: { type: "number" },
+          taskFulfilment: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback"],
+            properties: {
+              status: { type: "string", enum: ["good", "partial", "weak", "off_topic", "unclear"] },
+              feedback: { type: "string" },
+            },
+          },
+          answerDevelopment: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback"],
+            properties: {
+              status: {
+                type: "string",
+                enum: [
+                  "too_minimal",
+                  "basic_but_clear",
+                  "well_developed",
+                  "overlong_or_rambling",
+                  "memorised_or_generic",
+                ],
+              },
+              feedback: { type: "string" },
+            },
+          },
+          grammar: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback", "examples"],
+            properties: {
+              status: { type: "string", enum: ["good", "minor_issues", "needs_work", "unclear"] },
+              feedback: { type: "string" },
+              examples: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  required: ["original", "correction", "explanation"],
+                  properties: {
+                    original: { type: "string" },
+                    correction: { type: "string" },
+                    explanation: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          vocabulary: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback", "examples"],
+            properties: {
+              status: { type: "string", enum: ["good", "sufficient", "limited", "needs_work"] },
+              feedback: { type: "string" },
+              examples: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  required: ["original", "suggestion", "explanation"],
+                  properties: {
+                    original: { type: "string" },
+                    suggestion: { type: "string" },
+                    explanation: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          languageErrors: {
+            type: "array",
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["category", "original", "correction", "explanation"],
+              properties: {
+                category: {
+                  type: "string",
+                  enum: ["grammar", "vocabulary", "word_order", "missing_word"],
+                },
+                original: { type: "string" },
+                correction: { type: "string" },
+                explanation: { type: "string" },
+              },
+            },
+          },
+          fluency: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback"],
+            properties: {
+              status: { type: "string", enum: ["good", "acceptable", "hesitant", "very_limited", "not_assessed"] },
+              feedback: { type: "string" },
+            },
+          },
+          improvedAnswer: { type: "string" },
+          teacherNote: { type: "string" },
+        },
+      },
+    },
+  },
+};
+
 const APTIS_WRITING_PART23_FEEDBACK_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -383,6 +563,7 @@ const APTIS_WRITING_PART4_FEEDBACK_SCHEMA = {
         "register",
         "grammar",
         "vocabulary",
+        "languageErrors",
         "cohesion",
         "improvedVersion",
         "teacherNote",
@@ -468,6 +649,23 @@ const APTIS_WRITING_PART4_FEEDBACK_SCHEMA = {
                   explanation: { type: "string" },
                 },
               },
+            },
+          },
+        },
+        languageErrors: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["category", "original", "correction", "explanation"],
+            properties: {
+              category: {
+                type: "string",
+                enum: ["grammar", "vocabulary", "word_order", "missing_word", "register", "cohesion", "spelling"],
+              },
+              original: { type: "string" },
+              correction: { type: "string" },
+              explanation: { type: "string" },
             },
           },
         },
@@ -496,6 +694,7 @@ const APTIS_WRITING_PART4_FEEDBACK_SCHEMA = {
         "register",
         "grammar",
         "vocabulary",
+        "languageErrors",
         "cohesion",
         "improvedVersion",
         "teacherNote",
@@ -581,6 +780,23 @@ const APTIS_WRITING_PART4_FEEDBACK_SCHEMA = {
                   explanation: { type: "string" },
                 },
               },
+            },
+          },
+        },
+        languageErrors: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["category", "original", "correction", "explanation"],
+            properties: {
+              category: {
+                type: "string",
+                enum: ["grammar", "vocabulary", "word_order", "missing_word", "register", "cohesion", "spelling"],
+              },
+              original: { type: "string" },
+              correction: { type: "string" },
+              explanation: { type: "string" },
             },
           },
         },
@@ -875,6 +1091,77 @@ function normalizePart1Items(items) {
   });
 }
 
+function normalizeSpeakingPart1Questions(questions) {
+  if (!Array.isArray(questions)) return [];
+  return questions.slice(0, 3).map((item, index) => ({
+    id: cleanString(item?.id || `q${index + 1}`, 120),
+    question: cleanString(item?.question || item?.text || "", 500),
+  }));
+}
+
+function normalizeSpeakingAudioItems(recordings) {
+  if (!Array.isArray(recordings)) return [];
+  return recordings.slice(0, 3).map((item, index) => {
+    const base64 = cleanString(item?.base64 || "", 12_000_000);
+    const mime = cleanString(item?.mime || "audio/webm", 80) || "audio/webm";
+    const name = cleanString(item?.name || `speaking-part1-q${index + 1}.webm`, 160);
+    return { base64, mime, name };
+  });
+}
+
+async function transcribeAudioItem(audioItem, index) {
+  const buffer = Buffer.from(audioItem.base64, "base64");
+  if (!buffer.byteLength) {
+    throw new functions.https.HttpsError("invalid-argument", `Recording ${index + 1} is empty.`);
+  }
+  if (buffer.byteLength > 6 * 1024 * 1024) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      `Recording ${index + 1} is too large for this trial. Please keep answers short.`
+    );
+  }
+
+  const blob = new Blob([buffer], { type: audioItem.mime || "audio/webm" });
+  const form = new FormData();
+  form.append("file", blob, audioItem.name || `speaking-part1-q${index + 1}.webm`);
+  form.append("model", "gpt-4o-mini-transcribe");
+  form.append("language", "en");
+  form.append("response_format", "json");
+  form.append(
+    "prompt",
+    [
+      "Transcribe the speaker as literally as possible for English speaking exam feedback.",
+      "Keep grammar mistakes, word choice mistakes, repetitions, false starts, fillers such as um, er, like, you know, and unfinished phrases.",
+      "Do not rewrite, polish, or correct the speaker's English.",
+      "Use normal punctuation only where it helps readability.",
+      "Umm, er, like, you know, I mean, sort of, kind of.",
+    ].join(" ")
+  );
+
+  let apiResponse;
+  try {
+    apiResponse = await fetch("https://api.openai.com/v1/audio/transcriptions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
+      body: form,
+    });
+  } catch (error) {
+    console.error("[transcribeSpeakingPart1] OpenAI request failed", error);
+    throw new functions.https.HttpsError("unavailable", "Could not reach the transcription service.");
+  }
+
+  const responseJson = await apiResponse.json().catch(() => null);
+  if (!apiResponse.ok) {
+    console.error("[transcribeSpeakingPart1] OpenAI error", responseJson);
+    throw new functions.https.HttpsError(
+      "internal",
+      responseJson?.error?.message || "The transcription service returned an error."
+    );
+  }
+
+  return cleanString(responseJson?.text || "", 2000);
+}
+
 function buildAptisWritingPart1Prompt(items) {
   const tooLongCount = items.filter((item) => item.wordCount > 5).length;
   const tooShortCount = items.filter((item) => item.wordCount < 1).length;
@@ -911,6 +1198,65 @@ function buildAptisWritingPart1Prompt(items) {
     "Return only valid JSON using the required schema.",
     "",
     "Student items:",
+    JSON.stringify(items, null, 2),
+  ].join("\n");
+}
+
+function buildAptisSpeakingPart1Prompt(items) {
+  return [
+    "You are an English exam speaking feedback assistant for Aptis Speaking Part 1.",
+    "",
+    "The student answered three simple personal-information questions. Each answer can be up to 30 seconds. This is AI-estimated feedback based on Aptis-style criteria, not official Aptis marking.",
+    "",
+    "Important limitation: you are assessing transcripts, not doing reliable pronunciation analysis. Do not include pronunciation as a normal feedback category. Only mention transcript clarity if the transcript is incomplete, unclear, or impossible to interpret. Do not invent pronunciation, intonation, word-stress, accent, or phoneme-level problems from the transcript.",
+    "",
+    "Part 1 priorities:",
+    "- Task fulfilment and topic relevance: answer the exact question directly, stay on topic, and give a relevant personal response.",
+    "- Answer development: do not reward one-word or ultra-minimal answers just because they are correct. Strong practice answers usually give a direct answer plus one or two useful details, such as a reason, example, frequency, contrast, personal comment, or short explanation.",
+    "- Good target length: usually 2-4 connected sentences and around 25-60 words, depending on the question. Enough to show range, but not a memorised mini-monologue.",
+    "- Grammar: focus on clear simple sentences, present simple for habits/facts, past simple for past questions, present continuous where relevant, auxiliary verbs, word order, subject + verb structure, articles/prepositions where they affect clarity, and simple connectors such as because, but, also, and, so.",
+    "- Vocabulary: reward relevant, natural vocabulary and specific personal detail. Do not push advanced or unnatural words just to sound higher level.",
+    "- Fluency: infer cautiously from the transcript only. You may mention very short answers, fragmented language, repeated restarts, or many transcribed fillers, but do not overstate fluency based only on transcript.",
+    "- Language errors: students especially want explicit language feedback. For each answer, include the most useful grammar/vocabulary/word-order/missing-word fixes in languageErrors. Use exact student words where possible. Do not invent errors that are not supported by the transcript.",
+    "- Keep languageErrors focused: include at most two languageErrors per answer. Prefer clear learner-language errors that affect naturalness or clarity. If the transcript shows no clear learner-language errors, return an empty languageErrors array for that answer.",
+    "",
+    "Native/spontaneous speech calibration:",
+    "- Do not downgrade a strong answer just because it includes normal spoken fillers, discourse markers, self-repairs, restarts, or informal phrasing such as well, let me think, you know, I guess, yeah, or things like this.",
+    "- Spoken native-level answers are often less tidy than written answers. A false start or mid-sentence repair is not automatically a grammar error.",
+    "- Treat obvious transcription artefacts cautiously, especially duplicated articles, repeated words, uncertain numbers, or odd phrases that may be misheard. Do not use these alone to assign a low level.",
+    "- If the answers show idiomatic phrasing, flexible reformulation, natural discourse markers, specific detail, and control of connected speech, estimate B2 range or C1 range even if the transcript is not perfectly polished.",
+    "- If all three answers show advanced/native-like control, specific personal detail, flexible phrasing, and no clear learner-language errors, the observed range should normally be at least B2 range. Use C1 range when the language is highly natural and idiomatic.",
+    "",
+    "Answer development labels:",
+    "- too_minimal: one word, one phrase, or one very short sentence. It may answer the question but does not give enough language for strong Part 1 practice.",
+    "- basic_but_clear: relevant and understandable, but little extra detail. Suggest adding a reason, example, frequency, contrast, or personal detail.",
+    "- well_developed: clear, relevant, and includes useful extra detail without becoming too long.",
+    "- overlong_or_rambling: too long, repetitive, unfocused, or moves away from the question.",
+    "- memorised_or_generic: prepared, unnatural, or not closely connected to the specific question.",
+    "",
+    "Estimated level:",
+    "- Use broad labels only: Below A1 / unclear, A1 range, A2 range, B1 range, B2 range, C1 range.",
+    "- You may recognise stronger performances up to C1 range when the transcript clearly shows strong control, range, natural detail, and very few errors.",
+    "- The fact that Aptis Speaking Part 1 is short should reduce confidence, not artificially cap the label at B1.",
+    "- Use B1 range for genuinely B1-like performance: mostly clear but limited range, simple repetitive structures, noticeable learner errors, and limited flexibility.",
+    "- Use B2 range for clear, developed answers with natural connected speech, flexible everyday vocabulary, generally good control, and only minor/non-disruptive issues.",
+    "- Use C1 range for highly natural, idiomatic, flexible answers with strong control and only occasional slips, repairs, or transcript artefacts.",
+    "- Always caveat the estimate: Aptis Speaking Part 1 is short and personal-information based, so it cannot reliably prove the student's full speaking level on its own.",
+    "- The estimatedLevel.note must say this is AI-estimated Aptis-style feedback, not an official score, and that teacher feedback is preferable where available.",
+    "",
+    "Improved answer rules:",
+    "- Keep the student's original idea where possible.",
+    "- Answer the question directly.",
+    "- Add one or two useful extra details.",
+    "- Use natural spoken English suitable for A1-B1 learners.",
+    "- Aim for 2-4 connected sentences, usually around 25-60 words.",
+    "- Avoid one-word model answers, over-advanced language, and long memorised monologues.",
+    "",
+    "Feedback style: short, encouraging, practical, specific to the question, suitable for learners across A1-C1, and focused on communication. Keep each feedback field to one concise sentence where possible. Avoid long grammar lectures, harsh wording, official score claims, advanced vocabulary for its own sake, and pronunciation feedback without reliable audio analysis.",
+    "Use grammar.examples and vocabulary.examples only when they add something not already covered in languageErrors; otherwise return empty arrays for those fields.",
+    "Return only valid JSON using the required schema.",
+    "",
+    "Transcribed answers:",
     JSON.stringify(items, null, 2),
   ].join("\n");
 }
@@ -1016,6 +1362,7 @@ function buildAptisWritingPart23Prompt(payload) {
     "- Encourage simple cohesive devices where useful: because, also, but, so, for example. Do not force extra linkers into a clear answer.",
     "- Provide an improved version that preserves the student's meaning and stays realistic for A2-B1.",
     "- Give 1-3 specific priority advice points.",
+    "- Keep each feedback field concise. For Part 3, each improvedVersion should usually be one short natural reply, not a long rewrite.",
     "",
     "Tone: friendly, concise, encouraging, suitable for A2-B1 learners.",
     "Avoid harsh wording, long grammar lectures, official scores, and rewarding unnecessary complexity.",
@@ -1109,6 +1456,19 @@ function buildAptisWritingPart4Prompt(payload) {
     "5. Vocabulary range and accuracy.",
     "6. Cohesion and organisation.",
     "",
+    "Explicit mistake feedback:",
+    "- Students especially value concrete language corrections. For each email, include a languageErrors array with the most useful mistakes to fix.",
+    "- Informal email: include 3-5 languageErrors when clear errors are present. Formal email: include 5-8 languageErrors when clear errors are present.",
+    "- Use exact student wording in original where possible, and a concise corrected version in correction.",
+    "- Categories must be grammar, vocabulary, word_order, missing_word, register, cohesion, or spelling.",
+    "- Prefer errors that affect clarity, register, naturalness, or repeated patterns.",
+    "- If the improvedVersion changes a student phrase because it is inaccurate, unnatural, unclear, or register-inappropriate, include that phrase in languageErrors unless it is only a tiny punctuation or formatting cleanup.",
+    "- Keep each languageErrors explanation to one short sentence.",
+    "- Do not invent mistakes. If an email has no clear language errors, return an empty languageErrors array.",
+    "- Use grammar.examples and vocabulary.examples only when they add something not already covered in languageErrors; otherwise return empty arrays for those fields.",
+    "- Register feedback must be specific. If register.feedback mentions tone, formality, politeness, directness, naturalness, or the difference between the two emails, register.examples must include 1-3 concrete examples with exact student wording and a more suitable alternative.",
+    "- For register.examples, include positive examples only when register is strong; otherwise prioritise phrases that need a clearer formal or informal version.",
+    "",
     "Content checking is extremely important. Internally identify what happened in the source, what each prompt requires, and whether each email answers all required content points.",
     "Generic writing must be flagged: vague opinions, memorised phrases, no reference to the specific situation, or formal emails that sound like general complaints rather than responses to the actual prompt.",
     "Reward specific task content: concrete references to the fee, location, e-book change, used book condition, online screenings, transport, refund, seller, committee, or whichever specific situation appears in the source.",
@@ -1146,7 +1506,7 @@ function buildAptisWritingPart4Prompt(payload) {
     "- C1-level Part 4 writing may still contain occasional slips. Judge the overall control, register awareness, task fulfilment, cohesion, and vocabulary range.",
     "- Reserve B1+/B2 range for answers with generally clear communication but limited range, inconsistent register, underdeveloped content, or frequent errors that noticeably reduce control.",
     "- A student with strong register contrast, specific content, confident formal phrasing, and mostly accurate complex language should normally be at least B2+/C1 range.",
-    "Return only valid JSON using the required schema.",
+    "Keep feedback concise so the full JSON response completes. Return only valid JSON using the required schema.",
     "",
     "Submission:",
     JSON.stringify(payload, null, 2),
@@ -1605,6 +1965,146 @@ exports.generateAptisWritingPart1Feedback = functions
     };
   });
 
+exports.generateAptisSpeakingPart1Feedback = functions
+  .region("europe-west1")
+  .runWith({ timeoutSeconds: 120, memory: "512MB" })
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Sign in before generating speaking feedback.");
+    }
+    if (!OPENAI_API_KEY) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Missing OPENAI_API_KEY in the Functions environment."
+      );
+    }
+
+    const questions = normalizeSpeakingPart1Questions(data?.questions);
+    const recordings = normalizeSpeakingAudioItems(data?.recordings);
+    if (
+      questions.length !== 3 ||
+      recordings.length !== 3 ||
+      questions.some((item) => !item.question) ||
+      recordings.some((item) => !item.base64)
+    ) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Aptis Speaking Part 1 feedback requires three questions and three recordings."
+      );
+    }
+
+    const totalBase64Bytes = recordings.reduce((sum, item) => sum + item.base64.length, 0);
+    if (totalBase64Bytes > 9_000_000) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "These recordings are too large for the trial feedback request."
+      );
+    }
+
+    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const creditReservation = await consumeWritingFeedbackCredits(
+      context,
+      "aptis_speaking_part1",
+      WRITING_FEEDBACK_CREDIT_COSTS.aptis_speaking_part1
+    );
+
+    let transcripts;
+    try {
+      transcripts = await Promise.all(recordings.map((item, index) => transcribeAudioItem(item, index)));
+    } catch (error) {
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw error;
+    }
+
+    const items = questions.map((question, index) => {
+      const transcript = cleanString(transcripts[index] || "", 2000);
+      return {
+        questionId: question.id,
+        question: question.question,
+        transcript,
+        durationSeconds: 0,
+        audioAvailable: true,
+        audioAnalysisAvailable: false,
+        transcriptionConfidence: "medium",
+        wordCount: countWords(transcript),
+      };
+    });
+
+    if (items.every((item) => item.wordCount < 2)) {
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "The recordings could not be transcribed clearly enough to assess."
+      );
+    }
+
+    const requestBody = {
+      model,
+      input: buildAptisSpeakingPart1Prompt(items),
+      reasoning: { effort: "low" },
+      max_output_tokens: 3600,
+      text: {
+        verbosity: "low",
+        format: {
+          type: "json_schema",
+          name: "aptis_speaking_part1_feedback",
+          strict: true,
+          schema: APTIS_SPEAKING_PART1_FEEDBACK_SCHEMA,
+        },
+      },
+    };
+
+    let apiResponse;
+    try {
+      apiResponse = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+    } catch (error) {
+      console.error("[generateAptisSpeakingPart1Feedback] OpenAI request failed", error);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("unavailable", "Could not reach the feedback service.");
+    }
+
+    const responseJson = await apiResponse.json().catch(() => null);
+    if (!apiResponse.ok) {
+      console.error("[generateAptisSpeakingPart1Feedback] OpenAI error", responseJson);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "internal",
+        responseJson?.error?.message || "The feedback service returned an error."
+      );
+    }
+
+    const outputText = extractOutputText(responseJson);
+    let feedback;
+    try {
+      feedback = JSON.parse(outputText);
+    } catch (error) {
+      console.error("[generateAptisSpeakingPart1Feedback] JSON parse failed", { outputText, error });
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
+    }
+
+    return {
+      transcripts: items,
+      feedback,
+      meta: {
+        model,
+        transcriptionModel: "gpt-4o-mini-transcribe",
+        responseId: responseJson?.id || null,
+        usage: responseJson?.usage || null,
+        generatedAt: new Date().toISOString(),
+        quota: creditReservation,
+        audioStored: false,
+      },
+    };
+  });
+
 exports.generateAptisWritingPart23Feedback = functions
   .region("europe-west1")
   .https.onCall(async (data, context) => {
@@ -1647,7 +2147,7 @@ exports.generateAptisWritingPart23Feedback = functions
       model,
       input: buildAptisWritingPart23Prompt(payload),
       reasoning: { effort: "low" },
-      max_output_tokens: payload.part === "part2" ? 1500 : 2600,
+      max_output_tokens: payload.part === "part2" ? 1800 : 3800,
       text: {
         verbosity: "medium",
         format: {
@@ -1751,7 +2251,7 @@ exports.generateAptisWritingPart4Feedback = functions
       model,
       input: buildAptisWritingPart4Prompt(payload),
       reasoning: { effort: "low" },
-      max_output_tokens: 4200,
+      max_output_tokens: 5200,
       text: {
         verbosity: "medium",
         format: {

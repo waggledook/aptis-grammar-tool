@@ -605,12 +605,13 @@ function EmailFeedbackCard({ title, data }) {
       {data.taskFulfilment?.missingOrWeakContent?.length ? (
         <p><span>Missing/weak:</span> {data.taskFulfilment.missingOrWeakContent.join("; ")}</p>
       ) : null}
+      <LanguageFixes items={data.languageErrors} />
       <p><span>Register:</span> {data.register?.feedback}</p>
-      <ExampleList examples={data.register?.examples} type="suggestion" />
+      <ExampleList title="Register examples" examples={data.register?.examples} type="suggestion" />
       <p><span>Grammar:</span> {data.grammar?.feedback}</p>
-      <ExampleList examples={data.grammar?.examples} type="correction" />
+      <ExampleList title="Grammar examples" examples={data.grammar?.examples} type="correction" />
       <p><span>Vocabulary:</span> {data.vocabulary?.feedback}</p>
-      <ExampleList examples={data.vocabulary?.examples} type="suggestion" />
+      <ExampleList title="Vocabulary examples" examples={data.vocabulary?.examples} type="suggestion" />
       <p><span>Cohesion:</span> {data.cohesion?.feedback}</p>
       <div className="ai-p4-improved">
         <strong>Improved version</strong>
@@ -621,17 +622,38 @@ function EmailFeedbackCard({ title, data }) {
   );
 }
 
-function ExampleList({ examples = [], type }) {
+function LanguageFixes({ items }) {
+  if (!Array.isArray(items) || !items.length) return null;
+  return (
+    <div className="ai-p4-language-fixes">
+      <h5>Language to fix</h5>
+      <ul>
+        {items.map((item, index) => (
+          <li key={`${item.category}-${item.original}-${index}`}>
+            <small className={item.category}>{String(item.category || "").replace(/_/g, " ")}</small>
+            <p><span>{item.original}</span> → <strong>{item.correction}</strong></p>
+            {item.explanation ? <em>{item.explanation}</em> : null}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ExampleList({ title, examples = [], type }) {
   if (!examples.length) return null;
   return (
-    <ul className="ai-p4-examples">
-      {examples.slice(0, 2).map((example) => (
-        <li key={`${example.original}-${example[type]}`}>
-          <span>{example.original}</span> → <strong>{example[type]}</strong>
-          {example.explanation ? <em>{example.explanation}</em> : null}
-        </li>
-      ))}
-    </ul>
+    <div className="ai-p4-example-block">
+      {title ? <h5>{title}</h5> : null}
+      <ul className="ai-p4-examples">
+        {examples.slice(0, 3).map((example) => (
+          <li key={`${example.original}-${example[type]}`}>
+            <span>{example.original}</span> → <strong>{example[type]}</strong>
+            {example.explanation ? <em>{example.explanation}</em> : null}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -1010,9 +1032,78 @@ function StyleScope(){
 .aptis-writing-p4 .ai-p4-overview p { margin:.3rem 0; color:#d8e7ff; }
 .aptis-writing-p4 .ai-p4-card span { color:#cfe1ff; font-weight:700; }
 .aptis-writing-p4 .ai-p4-length { color:#cfe1ff; }
+.aptis-writing-p4 .ai-p4-example-block {
+  margin:.45rem 0 .7rem;
+}
+.aptis-writing-p4 .ai-p4-example-block h5 {
+  margin:0 0 .3rem;
+  color:#cfe1ff;
+  font-size:.9rem;
+}
 .aptis-writing-p4 .ai-p4-examples { margin:.35rem 0; padding-left:1.1rem; color:#d8e7ff; }
 .aptis-writing-p4 .ai-p4-examples em { display:block; color:#a9b7d1; }
 .aptis-writing-p4 .ai-p4-improved { margin-top:.6rem; }
+.aptis-writing-p4 .ai-p4-language-fixes {
+  margin:.75rem 0;
+  background:#111f38;
+  border:1px solid #315184;
+  border-left:3px solid #f59e0b;
+  border-radius:10px;
+  padding:.75rem;
+}
+.aptis-writing-p4 .ai-p4-language-fixes h5 {
+  margin:0 0 .55rem;
+  color:#f8fbff;
+  font-size:1rem;
+}
+.aptis-writing-p4 .ai-p4-language-fixes ul {
+  display:grid;
+  gap:.55rem;
+  margin:0;
+  padding:0;
+}
+.aptis-writing-p4 .ai-p4-language-fixes li {
+  list-style:none;
+  background:#0f1b31;
+  border:1px solid #27436f;
+  border-radius:8px;
+  padding:.65rem;
+}
+.aptis-writing-p4 .ai-p4-language-fixes small {
+  display:inline-block;
+  margin-bottom:.25rem;
+  padding:.12rem .45rem;
+  border-radius:999px;
+  font-size:.78rem;
+  font-weight:800;
+  text-transform:capitalize;
+}
+.aptis-writing-p4 .ai-p4-language-fixes small.grammar,
+.aptis-writing-p4 .ai-p4-language-fixes small.spelling {
+  color:#fecaca;
+  background:rgba(185,28,28,.18);
+  border:1px solid rgba(248,113,113,.24);
+}
+.aptis-writing-p4 .ai-p4-language-fixes small.vocabulary,
+.aptis-writing-p4 .ai-p4-language-fixes small.register {
+  color:#bbf7d0;
+  background:rgba(4,120,87,.18);
+  border:1px solid rgba(52,211,153,.24);
+}
+.aptis-writing-p4 .ai-p4-language-fixes small.word_order,
+.aptis-writing-p4 .ai-p4-language-fixes small.missing_word,
+.aptis-writing-p4 .ai-p4-language-fixes small.cohesion {
+  color:#bfdbfe;
+  background:rgba(29,78,216,.2);
+  border:1px solid rgba(96,165,250,.25);
+}
+.aptis-writing-p4 .ai-p4-language-fixes p {
+  margin:.25rem 0 .2rem;
+  color:#e6f0ff;
+}
+.aptis-writing-p4 .ai-p4-language-fixes span { color:#fca5a5; font-weight:600; }
+.aptis-writing-p4 .ai-p4-language-fixes strong { color:#86efac; }
+.aptis-writing-p4 .ai-p4-language-fixes em { display:block; color:#a9b7d1; }
 .aptis-writing-p4 .ai-p4-feedback blockquote {
   margin:.7rem 0 0;
   padding-left:.75rem;
@@ -1022,6 +1113,60 @@ function StyleScope(){
 .aptis-writing-p4 .ai-p4-advice ul { margin:.4rem 0 0; padding-left:1.2rem; }
 .aptis-writing-p4 .ai-p4-note,
 .aptis-writing-p4 .ai-p4-meta { margin:.7rem 0 0; font-size:.85rem; }
+
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes {
+  background:#f4f8ff !important;
+  border-color:#bfd3ee !important;
+  border-left-color:#f59e0b !important;
+  color:#172033 !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes h5 {
+  color:#172033 !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes li {
+  background:#ffffff !important;
+  border-color:#d8e4f4 !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes small.grammar,
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes small.spelling {
+  color:#991b1b !important;
+  background:#fee2e2 !important;
+  border-color:#fecaca !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes small.vocabulary,
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes small.register {
+  color:#047857 !important;
+  background:#dcfce7 !important;
+  border-color:#bbf7d0 !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes small.word_order,
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes small.missing_word,
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes small.cohesion {
+  color:#1d4ed8 !important;
+  background:#dbeafe !important;
+  border-color:#bfdbfe !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes p {
+  color:#172033 !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes span {
+  color:#9a3412 !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes strong {
+  color:#166534 !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-language-fixes em {
+  color:#64748b !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-example-block h5 {
+  color:#1f3b63 !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-examples {
+  color:#334155 !important;
+}
+:root[data-theme="light"] .aptis-writing-p4 .ai-p4-examples em {
+  color:#64748b !important;
+}
 
     `}</style>
   );

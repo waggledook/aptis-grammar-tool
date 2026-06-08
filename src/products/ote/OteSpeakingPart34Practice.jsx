@@ -375,8 +375,8 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
   const { setId } = useParams();
   const navigate = useNavigate();
   const { playAudioFile, speak, stop } = useSpeech();
-  const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
-  const basePath = getSitePath(nativeRoutes ? "/speaking/parts-3-4-practice" : "/ote/speaking/parts-3-4-practice");
+  const menuPath = getSitePath(nativeRoutes ? "/speaking/parts-3-4" : "/ote/speaking/parts-3-4");
+  const basePath = getSitePath(nativeRoutes ? "/speaking/parts-3-4/practice" : "/ote/speaking/parts-3-4/practice");
   const selectedSet = useMemo(() => PRACTICE_SETS.find((item) => item.id === setId), [setId]);
 
   const [stepIndex, setStepIndex] = useState(0);
@@ -609,27 +609,13 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
     setPhase("complete");
   }
 
-  function resetSet() {
-    clearTimer();
-    if (recorderRef.current?.state === "recording") recorderRef.current.stop();
-    objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
-    objectUrlsRef.current = [];
-    setRecordings([]);
-    setStepIndex(0);
-    setFlowStep(null);
-    setPhase("ready");
-    setSecondsLeft(30);
-    setMicError("");
-    stop();
-  }
-
   if (!selectedSet) {
     return (
       <main className="ote-training-page">
         <Seo title="OTE Speaking Parts 3 and 4 Practice | Seif English" description="Timed talk and follow-up question practice for OTE Speaking Parts 3 and 4." />
-        <button className="ote-training-back" type="button" onClick={() => navigate(speakingPath)}>
+        <button className="ote-training-back" type="button" onClick={() => navigate(menuPath)}>
           <ArrowLeft size={18} aria-hidden="true" />
-          Back to speaking
+          Back to long talk training
         </button>
         <header className="ote-training-hero">
           <p className="ote-kicker">Parts 3 and 4</p>

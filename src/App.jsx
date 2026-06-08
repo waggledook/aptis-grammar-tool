@@ -149,6 +149,9 @@ import OteSpeakingPart2GuidedMessage1 from "./products/ote/OteSpeakingPart2Guide
 import OteSpeakingPart2GuidedMessage2 from "./products/ote/OteSpeakingPart2GuidedMessage2.jsx";
 import OteSpeakingPart2CheatSheet from "./products/ote/OteSpeakingPart2CheatSheet.jsx";
 import OteSpeakingPart2Practice from "./products/ote/OteSpeakingPart2Practice.jsx";
+import OteSpeakingPart34Menu from "./products/ote/OteSpeakingPart34Menu.jsx";
+import OteSpeakingPart34Guide from "./products/ote/OteSpeakingPart34Guide.jsx";
+import OteSpeakingPart3GuidedTask from "./products/ote/OteSpeakingPart3GuidedTask.jsx";
 import OteSpeakingPart34Practice from "./products/ote/OteSpeakingPart34Practice.jsx";
 import OteSpeakingMockRunner from "./products/ote/OteSpeakingMockRunner.jsx";
 import OteSpeakingResults from "./products/ote/OteSpeakingResults.jsx";
@@ -285,6 +288,14 @@ const isOteExamRoute =
   /^\/ote\/writing\/mock-tests(?:\/[^/]+)?$/.test(location.pathname) ||
   (isOteSite && /^\/mock-tests\/[^/]+/.test(location.pathname)) ||
   (isOteSite && /^\/writing\/mock-tests(?:\/[^/]+)?$/.test(location.pathname));
+const isOteRoute =
+  location.pathname.startsWith("/ote") ||
+  (isOteSite &&
+    (location.pathname === "/" ||
+      location.pathname.startsWith("/speaking") ||
+      location.pathname.startsWith("/writing") ||
+      location.pathname.startsWith("/mock-tests") ||
+      location.pathname.startsWith("/results")));
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
 const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute;
@@ -297,6 +308,16 @@ useEffect(() => {
   document.documentElement.style.colorScheme = theme;
   window.localStorage.setItem(THEME_STORAGE_KEY, theme);
 }, [theme]);
+
+useEffect(() => {
+  if (!isOteRoute) return;
+
+  window.requestAnimationFrame(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  });
+}, [isOteRoute, location.pathname, location.search]);
 
 useEffect(() => {
   const params = new URLSearchParams(location.search);
@@ -1078,6 +1099,12 @@ return (
   <Route path="/ote/speaking/part-2-voicemails/cheat-sheet" element={<OteSpeakingPart2CheatSheet nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-2-voicemails/practice" element={<OteSpeakingPart2Practice nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-2-voicemails/practice/:setId" element={<OteSpeakingPart2Practice nativeRoutes={false} />} />
+  <Route path="/ote/speaking/parts-3-4" element={<OteSpeakingPart34Menu nativeRoutes={false} />} />
+  <Route path="/ote/speaking/parts-3-4/overview" element={<OteSpeakingPart34Guide nativeRoutes={false} />} />
+  <Route path="/ote/speaking/parts-3-4/guided-talk" element={<OteSpeakingPart3GuidedTask nativeRoutes={false} />} />
+  <Route path="/ote/speaking/parts-3-4/practice" element={<OteSpeakingPart34Practice nativeRoutes={false} />} />
+  <Route path="/ote/speaking/parts-3-4/practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={false} />} />
+  <Route path="/ote/speaking/parts-3-4-guide" element={<OteSpeakingPart34Guide nativeRoutes={false} />} />
   <Route path="/ote/speaking/parts-3-4-practice" element={<OteSpeakingPart34Practice nativeRoutes={false} />} />
   <Route path="/ote/speaking/parts-3-4-practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={false} />} />
   <Route path="/ote/writing" element={<OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
@@ -1101,6 +1128,12 @@ return (
   <Route path="/speaking/part-2-voicemails/cheat-sheet" element={<OteSpeakingPart2CheatSheet nativeRoutes={isOteSite} />} />
   <Route path="/speaking/part-2-voicemails/practice" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} />} />
   <Route path="/speaking/part-2-voicemails/practice/:setId" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/parts-3-4" element={<OteSpeakingPart34Menu nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/parts-3-4/overview" element={<OteSpeakingPart34Guide nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/parts-3-4/guided-talk" element={<OteSpeakingPart3GuidedTask nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/parts-3-4/practice" element={<OteSpeakingPart34Practice nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/parts-3-4/practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/parts-3-4-guide" element={<OteSpeakingPart34Guide nativeRoutes={isOteSite} />} />
   <Route path="/speaking/parts-3-4-practice" element={<OteSpeakingPart34Practice nativeRoutes={isOteSite} />} />
   <Route path="/speaking/parts-3-4-practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={isOteSite} />} />
 

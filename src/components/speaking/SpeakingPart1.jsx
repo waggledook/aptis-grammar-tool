@@ -28,6 +28,9 @@ export default function SpeakingPart1({
   const [left, setLeft] = useState(speakSeconds);
   const [recordings, setRecordings] = useState([]); // [ {blob,url,name}, ... ]
   const [micError, setMicError] = useState("");
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackError, setFeedbackError] = useState("");
+  const [speakingFeedback, setSpeakingFeedback] = useState(null);
   const mediaRecorderRef = useRef(null);
   const chunksRef = useRef([]);
   const ttsAudioRef = useRef(null);
@@ -74,6 +77,8 @@ export default function SpeakingPart1({
     setLeft(speakSeconds);
     setRecordings([]);
     setMicError("");
+    setFeedbackError("");
+    setSpeakingFeedback(null);
     stopRecording(true); cancelTTS();
   }
   
@@ -333,9 +338,54 @@ export default function SpeakingPart1({
     setLeft(speakSeconds);
     setRecordings([]);
     setMicError("");
+    setFeedbackError("");
+    setSpeakingFeedback(null);
     stopRecording(true);
     cancelTTS();
     // If you prefer to immediately launch the next run:
+  }
+
+  async function requestPart1Feedback() {
+    if (!user) {
+      setFeedbackError("Sign in to get AI feedback.");
+      return;
+    }
+    const completeRecordings = recordings.filter((item) => item?.blob);
+    if (completeRecordings.length !== 3 || chosen.length !== 3) {
+      setFeedbackError("Record all three answers before requesting feedback.");
+      return;
+    }
+    const totalBytes = completeRecordings.reduce((sum, item) => sum + Number(item.blob?.size || 0), 0);
+    if (totalBytes > 6.5 * 1024 * 1024) {
+      setFeedbackError("These recordings are too large for the trial. Please try again with shorter answers.");
+      return;
+    }
+
+    setFeedbackLoading(true);
+    setFeedbackError("");
+    setSpeakingFeedback(null);
+    try {
+      const payloadRecordings = await Promise.all(
+        completeRecordings.map(async (item) => ({
+          base64: await blobToBase64(item.blob),
+          mime: item.mime || item.blob.type || "audio/webm",
+          name: item.name || "speaking-part1.webm",
+        }))
+      );
+      const result = await fb.requestAptisSpeakingPart1Feedback({
+        questions: chosen.map((item) => ({ id: item.id, question: item.text })),
+        recordings: payloadRecordings,
+      });
+      setSpeakingFeedback(result);
+    } catch (error) {
+      console.error("[Speaking Part 1 feedback] failed", error);
+      setFeedbackError(
+        error?.message ||
+        "Could not generate feedback right now. Please try again with shorter, clearer recordings."
+      );
+    } finally {
+      setFeedbackLoading(false);
+    }
   }
 
   return (
@@ -436,6 +486,12 @@ export default function SpeakingPart1({
 {phase === "summary" && (
   <Summary
     recordings={recordings}
+    questions={chosen}
+    user={user}
+    feedbackResult={speakingFeedback}
+    feedbackLoading={feedbackLoading}
+    feedbackError={feedbackError}
+    onRequestFeedback={requestPart1Feedback}
     onDownloadAll={() => createZipAndDownload(recordings, "aptis-part1.zip")}
     onRestart={() => restartNewSet()}            // single restart
   />
@@ -464,6 +520,110 @@ function StyleScope(){
       .aptis-speaking1 .q { background:#0f1b31; border:1px solid #203258; border-radius:10px; padding:.6rem .75rem; }
       .aptis-speaking1 .muted { color: var(--muted); }
       .aptis-speaking1 .actions { margin-top:.6rem; display:flex; gap:.5rem; flex-wrap:wrap; }
+      .aptis-speaking1 .feedback-panel { margin-top:1rem; background:#0f1b31; border:1px solid #203258; border-radius:10px; padding:.85rem; }
+      .aptis-speaking1 .feedback-panel h4 { margin:.75rem 0 .35rem; }
+      .aptis-speaking1 .feedback-panel h4:first-child { margin-top:0; }
+      .aptis-speaking1 .feedback-panel p { margin:.25rem 0; }
+      .aptis-speaking1 .feedback-list { margin:.4rem 0 0; padding-left:1.1rem; display:grid; gap:.35rem; }
+      .aptis-speaking1 .answer-feedback { border-top:1px solid #203258; padding-top:.7rem; margin-top:.7rem; }
+      .aptis-speaking1 .transcript { color:#dbeafe; font-style:italic; }
+      .aptis-speaking1 .feedback-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:.5rem; margin-top:.65rem; }
+      .aptis-speaking1 .criterion { background:#13213b; border:1px solid #203258; border-radius:8px; padding:.6rem; }
+      .aptis-speaking1 .criterion strong { display:block; margin-bottom:.25rem; color:#f8fbff; }
+      .aptis-speaking1 .status { color:#93c5fd; font-size:.86rem; }
+      .aptis-speaking1 .improved-answer { background:#172a49; border-left:3px solid #60a5fa; border-radius:8px; padding:.65rem; margin-top:.55rem; }
+      .aptis-speaking1 .language-fixes { margin:.75rem 0; background:#111f38; border:1px solid #315184; border-left:3px solid #f59e0b; border-radius:8px; padding:.75rem; box-shadow:inset 0 1px 0 rgba(255,255,255,.03); }
+      .aptis-speaking1 .language-fixes h4 { color:#f8fbff; margin:0 0 .55rem; }
+      .aptis-speaking1 .language-fixes ul { display:grid; gap:.55rem; margin:0; padding:0; }
+      .aptis-speaking1 .language-fixes li { list-style:none; background:#0f1b31; border:1px solid #27436f; border-radius:8px; padding:.65rem; }
+      .aptis-speaking1 .language-fixes small { display:inline-block; margin-bottom:.25rem; padding:.12rem .45rem; border-radius:999px; font-size:.78rem; font-weight:800; text-transform:capitalize; }
+      .aptis-speaking1 .language-fixes small.grammar { color:#fecaca; background:rgba(185,28,28,.18); border:1px solid rgba(248,113,113,.24); }
+      .aptis-speaking1 .language-fixes small.vocabulary { color:#bbf7d0; background:rgba(4,120,87,.18); border:1px solid rgba(52,211,153,.24); }
+      .aptis-speaking1 .language-fixes small.word_order,
+      .aptis-speaking1 .language-fixes small.missing_word { color:#bfdbfe; background:rgba(29,78,216,.2); border:1px solid rgba(96,165,250,.25); }
+      .aptis-speaking1 .language-fixes p { margin:.25rem 0 .2rem; color:#e6f0ff; }
+      .aptis-speaking1 .language-fixes span { color:#fca5a5; }
+      .aptis-speaking1 .language-fixes strong { color:#86efac; }
+      .aptis-speaking1 .language-fixes em { display:block; color:#a9b7d1; }
+      :root[data-theme="light"] .aptis-speaking1 .feedback-panel {
+        background:#f8fbff !important;
+        border-color:#c8d8ef !important;
+        color:#172033 !important;
+        box-shadow:0 8px 22px rgba(15,23,42,.08) !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .feedback-panel :is(h4, strong) {
+        color:#172033 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .feedback-panel :is(p, li) {
+        color:#334155 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .feedback-panel .muted,
+      :root[data-theme="light"] .aptis-speaking1 .feedback-panel .transcript {
+        color:#64748b !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .answer-feedback {
+        border-top-color:#d5e2f3 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .criterion {
+        background:#ffffff !important;
+        border-color:#d5e2f3 !important;
+        color:#172033 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .criterion p {
+        color:#334155 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .status {
+        color:#2563eb !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .language-fixes {
+        background:#f4f8ff !important;
+        border-color:#bfd3ee !important;
+        border-left-color:#f59e0b !important;
+        color:#172033 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .language-fixes h4 {
+        color:#172033 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .language-fixes li {
+        background:#ffffff !important;
+        border-color:#d8e4f4 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .language-fixes small.grammar {
+        color:#991b1b !important;
+        background:#fee2e2 !important;
+        border-color:#fecaca !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .language-fixes small.vocabulary {
+        color:#047857 !important;
+        background:#dcfce7 !important;
+        border-color:#bbf7d0 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .language-fixes small.word_order,
+      :root[data-theme="light"] .aptis-speaking1 .language-fixes small.missing_word {
+        color:#1d4ed8 !important;
+        background:#dbeafe !important;
+        border-color:#bfdbfe !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .language-fixes p {
+        color:#172033 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .language-fixes span {
+        color:#9a3412 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .language-fixes strong {
+        color:#166534 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .language-fixes em {
+        color:#64748b !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .improved-answer {
+        background:#eaf2ff !important;
+        border-left-color:#2563eb !important;
+        color:#172033 !important;
+      }
+      :root[data-theme="light"] .aptis-speaking1 .improved-answer p {
+        color:#334155 !important;
+      }
       /* Toggle button pill */
 .aptis-speaking1 .toggle-btn{
   background:#24365d; border:1px solid #335086; color:#e6f0ff;
@@ -482,7 +642,19 @@ function StyleScope(){
 }
 
 /* ---------- Summary + ZIP ---------- */
-function Summary({ recordings, onDownloadAll, onRestart }) {
+function Summary({
+  recordings,
+  questions,
+  user,
+  feedbackResult,
+  feedbackLoading,
+  feedbackError,
+  onRequestFeedback,
+  onDownloadAll,
+  onRestart
+}) {
+    const feedback = feedbackResult?.feedback;
+    const transcripts = feedbackResult?.transcripts || [];
     return (
       <div className="summary">
         <h3 style={{ marginTop: 0 }}>Recordings</h3>
@@ -498,11 +670,153 @@ function Summary({ recordings, onDownloadAll, onRestart }) {
   
         <div className="actions" style={{ marginTop: ".75rem", display: "flex", gap: ".5rem", flexWrap: "wrap" }}>
           <button className="btn primary" onClick={onDownloadAll}>Download all (.zip)</button>
+          <button
+            className="btn primary"
+            onClick={onRequestFeedback}
+            disabled={!user || feedbackLoading || recordings.filter((item) => item?.blob).length !== 3}
+            title={!user ? "Sign in to get AI feedback" : "Generate transcript-based written feedback"}
+          >
+            {feedbackLoading ? "Getting feedback..." : "Get AI feedback"}
+          </button>
           <button className="btn" onClick={onRestart}>Start another set</button>
         </div>
+        {!user && (
+          <p className="muted" style={{ marginTop: ".5rem" }}>
+            Sign in to test transcript-based AI feedback.
+          </p>
+        )}
+        {feedbackError && (
+          <p className="muted" role="alert" style={{ marginTop: ".5rem" }}>
+            {feedbackError}
+          </p>
+        )}
+        {feedback && (
+          <div className="feedback-panel">
+            <h4>AI feedback</h4>
+            {feedback.estimatedLevel && (
+              <p>
+                <strong>Observed range:</strong> {feedback.estimatedLevel.label}
+                {feedback.estimatedLevel.confidence ? ` (${feedback.estimatedLevel.confidence} confidence)` : ""}
+              </p>
+            )}
+            <p>{feedback.overall?.summary}</p>
+            <p className="muted">
+              {feedback.estimatedLevel?.note || "AI-estimated feedback based on Aptis-style criteria, not an official score."}
+            </p>
+
+            <FeedbackBullets title="Strengths" items={feedback.overall?.mainStrengths} />
+            <FeedbackBullets title="Priorities" items={feedback.overall?.mainPriorities} />
+            {feedback.overall?.developmentAdvice && (
+              <p><strong>Development:</strong> {feedback.overall.developmentAdvice}</p>
+            )}
+
+            {Array.isArray(feedback.answers) && feedback.answers.map((item, index) => {
+              const transcript = transcripts[index]?.transcript || item.transcript || "";
+              return (
+                <div className="answer-feedback" key={item.questionId || index}>
+                  <h4>Q{index + 1}: {questions[index]?.text || item.question}</h4>
+                  <p className="transcript">"{transcript || "No clear transcript."}"</p>
+                  <div className="feedback-grid">
+                    <Criterion title="Task" data={item.taskFulfilment} />
+                    <Criterion title="Development" data={item.answerDevelopment} />
+                    <Criterion title="Grammar" data={item.grammar} />
+                    <Criterion title="Vocabulary" data={item.vocabulary} />
+                    <Criterion title="Fluency" data={item.fluency} />
+                  </div>
+                  <LanguageFixes items={item.languageErrors} />
+                  <ExamplesList title="Grammar examples" items={item.grammar?.examples} type="grammar" />
+                  <ExamplesList title="Vocabulary examples" items={item.vocabulary?.examples} type="vocabulary" />
+                  {item.improvedAnswer && (
+                    <div className="improved-answer">
+                      <strong>Improved answer</strong>
+                      <p>{item.improvedAnswer}</p>
+                    </div>
+                  )}
+                  {item.teacherNote && <p><strong>Teacher note:</strong> {item.teacherNote}</p>}
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
     );
   }
+
+function FeedbackBullets({ title, items }) {
+  if (!Array.isArray(items) || !items.length) return null;
+  return (
+    <>
+      <h4>{title}</h4>
+      <ul className="feedback-list">
+        {items.map((item, index) => <li key={index}>{item}</li>)}
+      </ul>
+    </>
+  );
+}
+
+function Criterion({ title, data }) {
+  if (!data) return null;
+  return (
+    <div className="criterion">
+      <strong>{title}</strong>
+      {data.status && <span className="status">{formatStatus(data.status)}</span>}
+      <p>{data.feedback || data.comment}</p>
+    </div>
+  );
+}
+
+function LanguageFixes({ items }) {
+  if (!Array.isArray(items) || !items.length) return null;
+  return (
+    <div className="language-fixes">
+      <h4>Language to fix</h4>
+      <ul>
+        {items.map((item, index) => (
+          <li key={`${item.category}-${item.original}-${index}`}>
+            <small className={item.category}>{formatStatus(item.category)}</small>
+            <p><span>{item.original}</span> → <strong>{item.correction}</strong></p>
+            {item.explanation ? <em>{item.explanation}</em> : null}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ExamplesList({ title, items, type }) {
+  if (!Array.isArray(items) || !items.length) return null;
+  return (
+    <>
+      <h4>{title}</h4>
+      <ul className="feedback-list">
+        {items.map((item, index) => (
+          <li key={index}>
+            <strong>{item.original}</strong>
+            {" → "}
+            {type === "vocabulary" ? item.suggestion : item.correction}
+            {item.explanation ? ` (${item.explanation})` : ""}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+function formatStatus(status = "") {
+  return String(status).replace(/_/g, " ");
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const value = String(reader.result || "");
+      resolve(value.includes(",") ? value.split(",").pop() : value);
+    };
+    reader.onerror = () => reject(reader.error || new Error("Could not read recording."));
+    reader.readAsDataURL(blob);
+  });
+}
 
 /* Minimal ZIP (store) – same helper used elsewhere */
 async function createZipAndDownload(files, zipName="recordings.zip"){
