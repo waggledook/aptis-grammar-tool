@@ -150,6 +150,8 @@ export default function Profile({
 
   const [speakingNotes, setSpeakingNotes] = useState([]);
   const [showSpeakingNotes, setShowSpeakingNotes] = useState(false);
+  const [speakingFeedback, setSpeakingFeedback] = useState([]);
+  const [showSpeakingFeedback, setShowSpeakingFeedback] = useState(false);
 
   const [vocabTopicCounts, setVocabTopicCounts] = useState(null); // 👈 NEW
   const [vocabMistakes, setVocabMistakes] = useState([]); // 👈 NEW
@@ -324,6 +326,7 @@ const handleChangePassword = async (e) => {
           p4Reg,
           oteWritingSubs,
           specNotes,
+          speakingFeedbackItems,
           vocabCounts,
           vocabMistakesArr,
           hubGrammarSubs,
@@ -345,6 +348,7 @@ const handleChangePassword = async (e) => {
           fb.fetchWritingP4RegisterAttempts?.(100, uid) ?? Promise.resolve([]),
           fb.fetchOteWritingSubmissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchSpeakingSpeculationNotes?.(50, uid) ?? Promise.resolve([]),
+          fb.fetchSpeakingAiFeedback?.(20, uid) ?? Promise.resolve([]),
           fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
           fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]),
           fb.fetchHubGrammarSubmissions?.(200, uid) ?? Promise.resolve([]),
@@ -368,6 +372,7 @@ const handleChangePassword = async (e) => {
         setP4Register(p4Reg);
         setOteWriting(oteWritingSubs || []);
         setSpeakingNotes(specNotes);
+        setSpeakingFeedback(speakingFeedbackItems || []);
         setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
         setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
         setHubGrammarSubmissions(hubGrammarSubs || []);
@@ -1164,7 +1169,7 @@ const totalListeningTasks =
           onClick={() => setShowOteWriting((s) => !s)}
         >
           <div className="inner-head-left">
-            <h4 className="inner-title">OTE Writing Mocks</h4>
+            <h4 className="inner-title">OTE Writing</h4>
             <span className="muted small">
               {oteWriting.length} {oteWriting.length === 1 ? "submission" : "submissions"}
             </span>
@@ -1186,63 +1191,93 @@ const totalListeningTasks =
                   const when = s.createdAt?.toDate?.()
                     ? s.createdAt.toDate().toLocaleString()
                     : s.createdAt || "—";
-                  const mock = getOteWritingMock(s.mockId || "writing-1");
-                  const task2 = mock.task2.options[s.task2Choice || "essay"];
+                  const isPractice = s.type === "ote-writing-practice";
+                  const mock = isPractice ? null : getOteWritingMock(s.mockId || "writing-1");
+                  const task2 = mock?.task2?.options?.[s.task2Choice || "essay"];
+                  const title = s.mockTitle || mock?.title || (isPractice ? "OTE Writing Practice" : "OTE Writing Mock");
+                  const practiceTitle = s.tasks?.practice?.title || title;
+                  const practiceAnswer = s.answers?.task || "";
+                  const practiceWords = s.counts?.task ?? 0;
                   return (
                     <li key={s.id || idx} className="wcard">
                       <div className="whead">
                         <div>
-                          <strong>{s.mockTitle || mock.title || "OTE Writing Mock"}</strong>
+                          <strong>{title}</strong>
                           <div className="muted small">{when}</div>
-                          <div className="muted small">
-                            Task 1: {s.counts?.task1 ?? 0} words · Task 2: {task2.title}, {s.counts?.[s.task2Choice || "essay"] ?? 0} words
-                          </div>
+                          {isPractice ? (
+                            <div className="muted small">
+                              Timed practice: {s.practiceTaskLabel || s.practiceTaskType || "Writing"} · {practiceWords} words
+                            </div>
+                          ) : (
+                            <div className="muted small">
+                              Task 1: {s.counts?.task1 ?? 0} words · Task 2: {task2?.title || "Part 2"}, {s.counts?.[s.task2Choice || "essay"] ?? 0} words
+                            </div>
+                          )}
                         </div>
                         <div className="actions">
                           <button
                             className="btn"
                             type="button"
                             onClick={() => {
-                              const text = [
-                                `${s.mockTitle || mock.title}`,
-                                `Task 1 (${s.counts?.task1 ?? 0} words)`,
-                                s.answers?.task1 || "(no answer)",
-                                "",
-                                `Task 2: ${task2.title} (${s.counts?.[s.task2Choice || "essay"] ?? 0} words)`,
-                                s.answers?.[s.task2Choice || "essay"] || "(no answer)",
-                              ].join("\n");
+                              const text = isPractice
+                                ? [
+                                    title,
+                                    `${practiceTitle} (${practiceWords} words)`,
+                                    practiceAnswer || "(no answer)",
+                                  ].join("\n")
+                                : [
+                                    title,
+                                    `Task 1 (${s.counts?.task1 ?? 0} words)`,
+                                    s.answers?.task1 || "(no answer)",
+                                    "",
+                                    `Task 2: ${task2?.title || "Part 2"} (${s.counts?.[s.task2Choice || "essay"] ?? 0} words)`,
+                                    s.answers?.[s.task2Choice || "essay"] || "(no answer)",
+                                  ].join("\n");
                               navigator.clipboard.writeText(text).then(() => toast("Copied submission ✓"));
                             }}
                           >
                             Copy
                           </button>
-                          <button
-                            className="btn"
-                            type="button"
-                            onClick={() => downloadOteWritingSubmissionText({ submissionId: s.id, submission: s, mock })}
-                          >
-                            TXT
-                          </button>
-                          <button
-                            className="btn"
-                            type="button"
-                            onClick={() => downloadOteWritingSubmissionDocx({ submissionId: s.id, submission: s, mock })}
-                          >
-                            DOCX
-                          </button>
+                          {!isPractice ? (
+                            <>
+                              <button
+                                className="btn"
+                                type="button"
+                                onClick={() => downloadOteWritingSubmissionText({ submissionId: s.id, submission: s, mock })}
+                              >
+                                TXT
+                              </button>
+                              <button
+                                className="btn"
+                                type="button"
+                                onClick={() => downloadOteWritingSubmissionDocx({ submissionId: s.id, submission: s, mock })}
+                              >
+                                DOCX
+                              </button>
+                            </>
+                          ) : null}
                         </div>
                       </div>
 
-                      <div className="submitted-p4">
-                        <div className="p4-col">
-                          <div className="p4-title">Task 1 email</div>
-                          <div className="submitted-html">{s.answers?.task1 || "(no answer)"}</div>
+                      {isPractice ? (
+                        <div className="submitted-p4">
+                          <div className="p4-col">
+                            <div className="p4-title">{practiceTitle}</div>
+                            <div className="submitted-html">{practiceAnswer || "(no answer)"}</div>
+                          </div>
                         </div>
-                        <div className="p4-col">
-                          <div className="p4-title">Task 2 {task2.title}</div>
-                          <div className="submitted-html">{s.answers?.[s.task2Choice || "essay"] || "(no answer)"}</div>
+                      ) : (
+                        <div className="submitted-p4">
+                          <div className="p4-col">
+                            <div className="p4-title">Task 1 email</div>
+                            <div className="submitted-html">{s.answers?.task1 || "(no answer)"}</div>
+                          </div>
+                          <div className="p4-col">
+                            <div className="p4-title">Task 2 {task2?.title || "Part 2"}</div>
+                            <div className="submitted-html">{s.answers?.[s.task2Choice || "essay"] || "(no answer)"}</div>
+                          </div>
                         </div>
-                      </div>
+                      )}
                       <ProfileAiFeedback feedback={s.aiFeedback} />
                     </li>
                   );
@@ -1922,6 +1957,112 @@ const totalListeningTasks =
 
 {!isSeifHubProfile && (
 <>
+{/* --- SPEAKING FEEDBACK --- */}
+      <section className="panel collapsible" style={{ marginTop: "1rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showSpeakingFeedback}
+    onClick={() => setShowSpeakingFeedback((s) => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      Speaking Feedback
+    </h3>
+
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      {speakingFeedback.length} saved item
+      {speakingFeedback.length === 1 ? "" : "s"}
+    </span>
+
+    <span
+      className={`chev ${showSpeakingFeedback ? "open" : ""}`}
+      aria-hidden
+    >
+      ▾
+    </span>
+  </button>
+
+  {showSpeakingFeedback && (
+    <>
+      {!speakingFeedback.length ? (
+        <p className="muted" style={{ marginTop: ".5rem" }}>
+          No saved speaking feedback yet.
+        </p>
+      ) : (
+        <ul className="wlist" style={{ marginTop: ".5rem" }}>
+          {speakingFeedback.map((item, idx) => {
+            const when = item.createdAt?.toDate?.()
+              ? item.createdAt.toDate().toLocaleString()
+              : item.createdAt || "—";
+            const partLabel =
+              item.part === "part1"
+                ? "Speaking Part 1"
+                : item.part === "part2"
+                ? "Speaking Part 2"
+                : item.part || "Speaking";
+            const title = item.taskTitle || partLabel;
+            const transcripts = item.transcripts || [];
+
+            return (
+              <li key={item.id || idx} className="wcard">
+                <div className="whead">
+                  <div>
+                    <strong>{title}</strong>
+                    <div className="muted small">{when}</div>
+                    <div className="muted small">
+                      {partLabel} · transcript-based feedback · audio not stored
+                    </div>
+                  </div>
+                  <div className="actions">
+                    <button
+                      className="btn"
+                      type="button"
+                      onClick={() => {
+                        const text = [
+                          `${title} (${when})`,
+                          "",
+                          ...(transcripts || []).map((entry, index) =>
+                            [
+                              `Q${index + 1}: ${entry.question || item.questions?.[index]?.question || ""}`,
+                              entry.transcript || "(no clear transcript)",
+                            ].join("\n")
+                          ),
+                        ].join("\n\n");
+                        navigator.clipboard.writeText(text).then(() => toast("Copied speaking feedback ✓"));
+                      }}
+                    >
+                      Copy transcripts
+                    </button>
+                  </div>
+                </div>
+
+                {transcripts.length ? (
+                  <details className="profile-ai-feedback-full">
+                    <summary>View transcripts</summary>
+                    <div className="profile-ai-feedback-body">
+                      {transcripts.map((entry, index) => (
+                        <article className="profile-ai-feedback-card" key={entry.questionId || index}>
+                          <strong>Q{index + 1}: {entry.question || item.questions?.[index]?.question || "Question"}</strong>
+                          <p>{entry.transcript || "No clear transcript."}</p>
+                        </article>
+                      ))}
+                    </div>
+                  </details>
+                ) : null}
+
+                <ProfileAiFeedback
+                  feedback={item.feedback}
+                  descriptor="Generated automatically from transcripts. Audio is not stored."
+                />
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </>
+  )}
+</section>
+
 {/* --- SPEAKING NOTES --- */}
       <section className="panel collapsible" style={{ marginTop: "1rem" }}>
   <button
@@ -2867,7 +3008,7 @@ function normalizeEmailHtmlForClipboard(html = "") {
   return s;
 }
 
-function ProfileAiFeedback({ feedback }) {
+function ProfileAiFeedback({ feedback, descriptor = "Generated automatically to help you improve your writing." }) {
   if (!feedback) return null;
 
   const level = feedback.estimatedWritingLevel?.label || feedback.estimatedLevel?.label || "";
@@ -2879,7 +3020,7 @@ function ProfileAiFeedback({ feedback }) {
   return (
     <div className="submitted-html profile-ai-feedback">
       <div className="p4-title">Feedback</div>
-      <div className="muted small">Generated automatically to help you improve your writing.</div>
+      <div className="muted small">{descriptor}</div>
       {level ? <div className="muted small">Estimated level: {level}</div> : null}
       {summary ? <p>{summary}</p> : null}
       {strengths.length ? (
@@ -2960,23 +3101,48 @@ function ProfileAiFeedbackList({ title, items = [] }) {
 }
 
 function ProfileAnswerFeedback({ answer, index }) {
+  const taskFulfilment = getFeedbackCriterionText(answer.taskFulfilment);
+  const content = getFeedbackCriterionText(answer.content);
+  const grammar = getFeedbackCriterionText(answer.grammar);
+  const vocabulary = getFeedbackCriterionText(answer.vocabulary);
+  const cohesion = getFeedbackCriterionText(answer.cohesion);
+  const fluency = getFeedbackCriterionText(answer.fluency);
+
   return (
     <article className="profile-ai-feedback-card">
       <strong>{answer.question ? `${index + 1}. ${answer.question}` : `Answer ${answer.index || index + 1}`}</strong>
+      {answer.transcript ? <p><em>Transcript:</em> {answer.transcript}</p> : null}
       {answer.answer ? <p><em>Student:</em> {answer.answer}</p> : null}
       {answer.wordCount !== undefined ? <p><em>Words:</em> {answer.wordCount}</p> : null}
       {answer.communication?.comment ? <p><em>Communication:</em> {answer.communication.comment}</p> : null}
       {answer.length?.comment ? <p><em>Length:</em> {answer.length.comment}</p> : null}
-      {answer.taskFulfilment ? <p><em>Task:</em> {answer.taskFulfilment}</p> : null}
-      {answer.grammar ? <p><em>Grammar:</em> {answer.grammar}</p> : null}
-      {answer.vocabulary ? <p><em>Vocabulary:</em> {answer.vocabulary}</p> : null}
+      {taskFulfilment ? <p><em>Task:</em> {taskFulfilment}</p> : null}
+      {content ? <p><em>Content:</em> {content}</p> : null}
+      {grammar ? <p><em>Grammar:</em> {grammar}</p> : null}
+      {vocabulary ? <p><em>Vocabulary:</em> {vocabulary}</p> : null}
       {answer.punctuationSpelling ? <p><em>Punctuation/spelling:</em> {answer.punctuationSpelling}</p> : null}
-      {answer.cohesion ? <p><em>Cohesion:</em> {answer.cohesion}</p> : null}
+      {cohesion ? <p><em>Cohesion:</em> {cohesion}</p> : null}
+      {fluency ? <p><em>Fluency:</em> {fluency}</p> : null}
       {answer.learningFeedback ? <p><em>Learning:</em> {answer.learningFeedback}</p> : null}
       {answer.suggestedAnswer ? <p><em>Try:</em> {answer.suggestedAnswer}</p> : null}
+      <ProfileMistakes mistakes={answer.languageErrors} />
+      <ProfileExamples title="Grammar examples" examples={answer.grammar?.examples} />
+      <ProfileExamples title="Vocabulary examples" examples={answer.vocabulary?.examples} />
+      {answer.improvedAnswer ? <p><em>Improved answer:</em> {answer.improvedAnswer}</p> : null}
+      {answer.teacherNote ? <p><em>Teacher note:</em> {answer.teacherNote}</p> : null}
       {answer.improvedVersion ? <pre>{answer.improvedVersion}</pre> : null}
     </article>
   );
+}
+
+function getFeedbackCriterionText(value) {
+  if (!value) return "";
+  if (typeof value === "string") return value;
+  if (typeof value === "object") {
+    const status = value.status ? `${String(value.status).replace(/_/g, " ")}: ` : "";
+    return `${status}${value.feedback || value.comment || ""}`.trim();
+  }
+  return String(value);
 }
 
 function ProfileEmailFeedback({ title, data }) {

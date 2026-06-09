@@ -148,9 +148,34 @@ export const doSignUp = async ({ email, pw, name, username }) => {
 export const onAuthChange = (cb)       => onAuthStateChanged(auth, cb);
 export const doSignOut    = ()         => signOut(auth);
 
+async function logAiFeedbackGenerated(kind, details = {}, resultData = {}) {
+  const meta = resultData?.meta || {};
+  await logActivity("ai_feedback_generated", {
+    kind,
+    product: details.product || "aptis",
+    section: details.section || "",
+    part: details.part || "",
+    mode: details.mode || "",
+    taskId: details.taskId || "",
+    taskTitle: details.taskTitle || details.title || "",
+    answerCount: details.answerCount ?? null,
+    wordCount: details.wordCount ?? null,
+    model: meta.model || details.model || "",
+    feedbackTaskType: meta.feedbackTaskType || meta.taskType || "",
+    creditCost: meta.quota?.cost ?? meta.creditCost ?? null,
+  });
+}
+
 export async function requestWritingFeedback(payload) {
   const generateWritingFeedback = httpsCallable(functionsRegion, "generateWritingFeedback");
   const result = await generateWritingFeedback(payload);
+  await logAiFeedbackGenerated("writing_generic", {
+    product: payload?.exam || "aptis",
+    section: payload?.part || payload?.taskTitle || "writing",
+    part: payload?.part || "",
+    taskTitle: payload?.taskTitle || "",
+    wordCount: payload?.answer ? String(payload.answer).trim().split(/\s+/).filter(Boolean).length : null,
+  }, result.data);
   return result.data;
 }
 
@@ -160,6 +185,16 @@ export async function requestOteWritingFeedback(payload) {
     ...payload,
     model: "gpt-5.4-mini",
   });
+  const tasks = Array.isArray(payload?.tasks) ? payload.tasks : [];
+  await logAiFeedbackGenerated("ote_writing", {
+    product: "ote",
+    section: "writing",
+    mode: payload?.mode || "",
+    taskId: tasks.map((task) => task?.taskId).filter(Boolean).join(", "),
+    taskTitle: tasks.map((task) => task?.title).filter(Boolean).join(" + "),
+    answerCount: tasks.length,
+    wordCount: tasks.reduce((sum, task) => sum + Number(task?.answer?.wordCount || 0), 0) || null,
+  }, result.data);
   return result.data;
 }
 
@@ -172,6 +207,12 @@ export async function requestAptisWritingPart1Feedback(items) {
     items,
     model: "gpt-5.4-mini",
   });
+  await logAiFeedbackGenerated("aptis_writing_part1", {
+    product: "aptis",
+    section: "writing",
+    part: "part1",
+    answerCount: Array.isArray(items) ? items.length : null,
+  }, result.data);
   return result.data;
 }
 
@@ -184,6 +225,17 @@ export async function requestAptisWritingPart23Feedback(payload) {
     ...payload,
     model: "gpt-5.4-mini",
   });
+  await logAiFeedbackGenerated(`aptis_writing_${payload?.part || "part23"}`, {
+    product: "aptis",
+    section: "writing",
+    part: payload?.part || "",
+    taskId: payload?.taskId || "",
+    taskTitle: payload?.title || "",
+    answerCount: Array.isArray(payload?.answers) ? payload.answers.length : null,
+    wordCount: Array.isArray(payload?.answers)
+      ? payload.answers.reduce((sum, answer) => sum + Number(answer?.wordCount || 0), 0)
+      : null,
+  }, result.data);
   return result.data;
 }
 
@@ -196,6 +248,15 @@ export async function requestAptisWritingPart4Feedback(payload) {
     ...payload,
     model: "gpt-5.4-mini",
   });
+  await logAiFeedbackGenerated("aptis_writing_part4", {
+    product: "aptis",
+    section: "writing",
+    part: "part4",
+    taskId: payload?.taskId || "",
+    taskTitle: payload?.title || "",
+    answerCount: 2,
+    wordCount: Number(payload?.friendEmail?.wordCount || 0) + Number(payload?.formalEmail?.wordCount || 0),
+  }, result.data);
   return result.data;
 }
 
@@ -208,6 +269,32 @@ export async function requestAptisSpeakingPart1Feedback(payload) {
     ...payload,
     model: "gpt-5.4-mini",
   });
+  await logAiFeedbackGenerated("aptis_speaking_part1", {
+    product: "aptis",
+    section: "speaking",
+    part: "part1",
+    answerCount: Array.isArray(payload?.recordings) ? payload.recordings.length : null,
+  }, result.data);
+  return result.data;
+}
+
+export async function requestAptisSpeakingPart2Feedback(payload) {
+  const generateAptisSpeakingPart2Feedback = httpsCallable(
+    functionsRegion,
+    "generateAptisSpeakingPart2Feedback"
+  );
+  const result = await generateAptisSpeakingPart2Feedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  await logAiFeedbackGenerated("aptis_speaking_part2", {
+    product: "aptis",
+    section: "speaking",
+    part: "part2",
+    taskId: payload?.task?.id || "",
+    taskTitle: payload?.task?.title || "",
+    answerCount: Array.isArray(payload?.recordings) ? payload.recordings.length : null,
+  }, result.data);
   return result.data;
 }
 
@@ -2929,6 +3016,61 @@ export async function fetchSpeakingCounts(uid) {
   return counts;
 }
 
+export async function saveSpeakingAiFeedback({
+  part,
+  taskId = "",
+  taskTitle = "",
+  questions = [],
+  transcripts = [],
+  feedback,
+  meta = null,
+}) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !part || !feedback) return null;
+
+  const ref = await addDoc(collection(db, "users", uid, "speakingFeedback"), {
+    product: "aptis",
+    part,
+    taskId,
+    taskTitle,
+    questions,
+    transcripts,
+    feedback,
+    meta,
+    audioStored: false,
+    createdAt: serverTimestamp(),
+  });
+  return ref.id;
+}
+
+export async function fetchSpeakingAiFeedback(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "speakingFeedback"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => {
+    const data = d.data() || {};
+    return {
+      id: d.id,
+      createdAt: data.createdAt || null,
+      product: data.product || "aptis",
+      part: data.part || "",
+      taskId: data.taskId || "",
+      taskTitle: data.taskTitle || "",
+      questions: data.questions || [],
+      transcripts: data.transcripts || [],
+      feedback: data.feedback || null,
+      meta: data.meta || null,
+      audioStored: !!data.audioStored,
+    };
+  });
+}
+
 /** Recent mistakes (IDs only) */
 export async function fetchRecentMistakes(n = 10, uid) {
   const realUid = _uidOrCurrent(uid);
@@ -3168,10 +3310,16 @@ export async function fetchOteWritingSubmissions(n = 20, uid) {
     const data = d.data() || {};
     return {
       id: d.id,
+      type: data.type || "ote-writing-mock",
       createdAt: data.createdAt || null,
       mockId: data.mockId || "",
       mockTitle: data.mockTitle || "",
       moduleLabel: data.moduleLabel || "Writing",
+      practiceTaskId: data.practiceTaskId || "",
+      practiceSection: data.practiceSection || "",
+      practiceSectionLabel: data.practiceSectionLabel || "",
+      practiceTaskType: data.practiceTaskType || "",
+      practiceTaskLabel: data.practiceTaskLabel || "",
       task2Choice: data.task2Choice || "essay",
       answers: data.answers || { task1: "", essay: "", article: "" },
       counts: data.counts || { task1: 0, essay: 0, article: 0 },

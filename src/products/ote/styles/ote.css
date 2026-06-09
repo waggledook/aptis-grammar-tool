@@ -291,6 +291,55 @@
   box-shadow: var(--ote-dashboard-shadow);
 }
 
+:root[data-theme="light"] .ote-menu-wrapper .menu-card,
+:root[data-theme="light"] .ote-training-activity-card,
+:root[data-theme="light"] .ote-practice-set-card,
+:root[data-theme="light"] .ote-writing-practice-entry-card {
+  border-color: rgba(53, 80, 142, 0.28);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  box-shadow: 0 10px 24px rgba(16, 35, 69, 0.08);
+}
+
+:root[data-theme="light"] .ote-menu-wrapper .menu-card:hover,
+:root[data-theme="light"] .ote-training-activity-card:hover,
+:root[data-theme="light"] .ote-practice-set-card:hover,
+:root[data-theme="light"] .ote-writing-practice-entry-card:hover {
+  border-color: rgba(74, 107, 192, 0.55);
+  box-shadow: 0 14px 28px rgba(16, 35, 69, 0.12);
+}
+
+:root[data-theme="light"] .ote-menu-wrapper .menu-card h3,
+:root[data-theme="light"] .ote-training-activity-card h2,
+:root[data-theme="light"] .ote-practice-set-card h2,
+:root[data-theme="light"] .ote-writing-practice-entry-card h2,
+:root[data-theme="light"] .ote-menu-wrapper .menu-card :is(strong, h2) {
+  color: var(--color-text);
+}
+
+:root[data-theme="light"] .ote-menu-wrapper .menu-card p,
+:root[data-theme="light"] .ote-training-activity-card p,
+:root[data-theme="light"] .ote-practice-set-card p,
+:root[data-theme="light"] .ote-writing-practice-entry-card p,
+:root[data-theme="light"] .ote-practice-set-theme {
+  color: var(--color-text-soft);
+}
+
+:root[data-theme="light"] .ote-menu-wrapper .menu-card svg,
+:root[data-theme="light"] .ote-training-activity-card svg,
+:root[data-theme="light"] .ote-practice-set-card svg,
+:root[data-theme="light"] .ote-writing-practice-entry-card svg,
+:root[data-theme="light"] .ote-training-activity-card span,
+:root[data-theme="light"] .ote-practice-set-card span {
+  color: #b17405;
+}
+
+:root[data-theme="light"] .ote-menu-wrapper .menu-card:disabled,
+:root[data-theme="light"] .ote-training-activity-card:disabled {
+  background: var(--color-surface-3);
+  color: var(--color-text-soft);
+}
+
 .ote-training-page {
   width: 100%;
   max-width: 1060px;
@@ -1324,6 +1373,12 @@
   color: var(--ote-dashboard-text);
   font-size: 1.2rem;
   line-height: 1.2;
+}
+
+.ote-practice-set-theme {
+  color: var(--ote-dashboard-accent);
+  font-size: 0.86rem;
+  line-height: 1.25;
 }
 
 .ote-practice-set-card p {
@@ -2462,6 +2517,191 @@
   margin-top: 2rem;
 }
 
+.ote-writing-practice-group-list {
+  display: grid;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.ote-writing-practice-group h2 {
+  margin: 0 0 1rem;
+  color: #061f43;
+  font-size: 1.45rem;
+  text-align: left;
+}
+
+.ote-writing-practice-group .ote-writing-mock-list {
+  margin-top: 0;
+}
+
+.ote-writing-practice-entry-card {
+  width: min(420px, 100%);
+}
+
+.ote-writing-practice-task-card {
+  display: grid;
+  gap: 1rem;
+}
+
+.ote-writing-practice-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.92fr) minmax(360px, 1.08fr);
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.ote-writing-floating-timer {
+  position: fixed;
+  z-index: 40;
+  top: 0.85rem;
+  right: max(1rem, calc((100vw - 1060px) / 2));
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.1rem 0.55rem;
+  align-items: center;
+  min-width: 132px;
+  border: 1px solid rgba(253, 191, 45, 0.45);
+  border-radius: 8px;
+  background: var(--ote-dashboard-panel);
+  color: var(--ote-dashboard-text);
+  padding: 0.65rem 0.78rem;
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.24);
+}
+
+.ote-writing-floating-timer svg {
+  grid-row: span 2;
+  color: var(--ote-dashboard-accent);
+}
+
+.ote-writing-floating-timer strong {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.ote-writing-floating-timer span {
+  color: var(--ote-dashboard-text-soft);
+  font-size: 0.74rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-writing-practice-prompt,
+.ote-writing-practice-answer,
+.ote-writing-practice-review article {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  padding: 1rem;
+}
+
+.ote-writing-practice-prompt {
+  color: var(--color-text);
+  line-height: 1.45;
+}
+
+.ote-writing-practice-prompt p {
+  margin: 0 0 0.8rem;
+}
+
+.ote-writing-practice-prompt .ote-email-card,
+.ote-writing-practice-prompt .ote-writing-option-card {
+  margin-top: 0.75rem;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.ote-writing-practice-answer {
+  display: grid;
+  grid-template-rows: auto minmax(300px, 1fr) auto;
+  gap: 0;
+  background: var(--color-surface-2);
+}
+
+.ote-writing-practice-answer textarea {
+  width: 100%;
+  min-height: 320px;
+  resize: vertical;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 1rem;
+  font: 1.1rem/1.5 Arial, Helvetica, sans-serif;
+}
+
+.ote-writing-practice-answer textarea:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+.ote-writing-practice-review {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  width: 100%;
+  margin: 1rem 0;
+}
+
+.ote-writing-practice-review h3 {
+  margin: 0 0 0.5rem;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  text-align: left;
+}
+
+.ote-writing-practice-review p,
+.ote-writing-practice-review pre {
+  margin: 0;
+  color: var(--color-text-soft);
+  white-space: pre-wrap;
+  word-break: break-word;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.ote-writing-register-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.ote-writing-register-section {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-writing-register-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.8rem;
+}
+
+.ote-writing-register-head span {
+  color: var(--color-accent);
+  font-size: 0.86rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-writing-register-head strong {
+  color: var(--color-text-soft);
+}
+
+.ote-writing-register-section .ote-practice-set-grid {
+  grid-template-columns: 1fr;
+}
+
+.ote-writing-register-section .ote-practice-set-card {
+  min-height: 174px;
+}
+
 .ote-writing-mock-select-card {
   position: relative;
   display: grid;
@@ -3561,6 +3801,162 @@
   line-height: 1.55;
 }
 
+.ote-training-page .ote-ai-feedback-panel {
+  border-color: var(--ote-dashboard-panel-border);
+  background: var(--ote-dashboard-panel);
+  color: var(--ote-dashboard-text);
+  box-shadow: var(--ote-dashboard-shadow);
+}
+
+.ote-training-page .ote-ai-feedback-panel.is-error {
+  border-color: rgba(248, 113, 113, 0.58);
+  background: rgba(127, 29, 29, 0.34);
+  color: #fee2e2;
+}
+
+.ote-training-page .ote-ai-feedback-heading strong {
+  background: var(--ote-dashboard-primary);
+  color: var(--ote-dashboard-primary-text);
+}
+
+.ote-training-page .ote-ai-feedback-panel h2,
+.ote-training-page .ote-ai-feedback-panel h3,
+.ote-training-page .ote-ai-feedback-mistakes h4,
+.ote-training-page .ote-ai-feedback-task-head h3 {
+  color: var(--ote-dashboard-text);
+}
+
+.ote-training-page .ote-ai-feedback-panel p,
+.ote-training-page .ote-ai-feedback-panel li,
+.ote-training-page .ote-ai-feedback-panel blockquote {
+  color: var(--ote-dashboard-text-soft);
+}
+
+.ote-training-page .ote-ai-feedback-auto-note,
+.ote-training-page .ote-ai-feedback-word-count,
+.ote-training-page .ote-ai-feedback-note,
+.ote-training-page .ote-ai-feedback-task-head span,
+.ote-training-page .ote-ai-feedback-points em,
+.ote-training-page .ote-ai-feedback-examples em,
+.ote-training-page .ote-ai-feedback-mistakes em {
+  color: rgba(238, 244, 255, 0.72);
+}
+
+.ote-training-page .ote-ai-feedback-overview article,
+.ote-training-page .ote-ai-feedback-task,
+.ote-training-page .ote-ai-feedback-improved {
+  border-color: rgba(126, 153, 207, 0.34);
+  background: rgba(13, 24, 47, 0.42);
+}
+
+.ote-training-page .ote-ai-feedback-mistakes {
+  border-color: rgba(246, 189, 96, 0.36);
+  background: rgba(246, 189, 96, 0.12);
+}
+
+.ote-training-page .ote-ai-feedback-mistakes li {
+  border-color: rgba(246, 189, 96, 0.28);
+  background: rgba(13, 24, 47, 0.44);
+}
+
+.ote-training-page .ote-ai-feedback-mistakes small,
+.ote-training-page .ote-ai-feedback-mistakes span,
+.ote-training-page .ote-ai-feedback-examples span {
+  color: #ffd992;
+}
+
+.ote-training-page .ote-ai-feedback-mistakes strong,
+.ote-training-page .ote-ai-feedback-examples strong,
+.ote-training-page .ote-ai-feedback-improved strong {
+  color: var(--ote-dashboard-text);
+}
+
+.ote-training-page .ote-ai-feedback-improved pre {
+  color: var(--ote-dashboard-text-soft);
+}
+
+.ote-training-page .ote-ai-feedback-panel blockquote {
+  border-left-color: var(--ote-dashboard-accent);
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-panel {
+  border-color: rgba(53, 80, 142, 0.24);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  box-shadow: 0 10px 24px rgba(16, 35, 69, 0.08);
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-panel.is-error {
+  border-color: rgba(220, 38, 38, 0.3);
+  background: #fff1f2;
+  color: #7f1d1d;
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-heading strong {
+  background: var(--ote-dashboard-primary);
+  color: var(--ote-dashboard-primary-text);
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-panel h2,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-panel h3,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-mistakes h4,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-task-head h3 {
+  color: var(--color-text);
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-panel p,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-panel li,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-panel blockquote {
+  color: var(--color-text-soft);
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-auto-note,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-word-count,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-note,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-task-head span,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-points em,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-examples em,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-mistakes em {
+  color: #52627f;
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-overview article,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-task,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-improved {
+  border-color: rgba(53, 80, 142, 0.18);
+  background: var(--color-surface);
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-mistakes {
+  border-color: rgba(217, 119, 6, 0.22);
+  background: #fff7ed;
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-mistakes li {
+  border-color: rgba(217, 119, 6, 0.22);
+  background: #fff;
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-mistakes small,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-mistakes span,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-examples span {
+  color: #9a3412;
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-mistakes strong,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-examples strong,
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-improved strong {
+  color: var(--color-text);
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-improved pre {
+  color: var(--color-text-soft);
+}
+
+:root[data-theme="light"] .ote-training-page .ote-ai-feedback-panel blockquote {
+  border-left-color: #d8942f;
+}
+
 @media (max-width: 900px) {
   .ote-dashboard-grid,
   .ote-dashboard-hero,
@@ -3582,7 +3978,10 @@
   .ote-ai-feedback-versions,
   .ote-ai-feedback-overview,
   .ote-writing-choice-grid,
-  .ote-writing-mock-list {
+  .ote-writing-mock-list,
+  .ote-writing-practice-layout,
+  .ote-writing-practice-review,
+  .ote-writing-register-grid {
     grid-template-columns: 1fr;
   }
 
@@ -3725,6 +4124,12 @@
 
   .ote-recorder-timer {
     min-width: 0;
+  }
+
+  .ote-writing-floating-timer {
+    top: auto;
+    right: 0.75rem;
+    bottom: 0.75rem;
   }
 
   .ote-reference-toolbar,

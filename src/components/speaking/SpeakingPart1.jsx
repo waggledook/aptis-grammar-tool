@@ -377,6 +377,21 @@ export default function SpeakingPart1({
         recordings: payloadRecordings,
       });
       setSpeakingFeedback(result);
+      if (result?.feedback && fb.saveSpeakingAiFeedback) {
+        try {
+          await fb.saveSpeakingAiFeedback({
+            part: "part1",
+            taskId: chosen.map((item) => item.id).join(","),
+            taskTitle: "Speaking Part 1",
+            questions: chosen.map((item) => ({ id: item.id, question: item.text })),
+            transcripts: result?.transcripts || [],
+            feedback: result.feedback,
+            meta: result?.meta || null,
+          });
+        } catch (saveError) {
+          console.warn("[Speaking Part 1 feedback] save failed", saveError);
+        }
+      }
     } catch (error) {
       console.error("[Speaking Part 1 feedback] failed", error);
       setFeedbackError(

@@ -139,6 +139,7 @@ export default function SpeakingPart2({
 
       <SpeakingAutoFlow
         task={current}
+        user={user}
         onFinished={async () => {
           if (!trackProgress) return;
           try {
@@ -178,7 +179,7 @@ export default function SpeakingPart2({
 /* ──────────────────────────────────────────────────────────────────────────
    Auto Flow: Start → (TTS → Beep → Record)x3 → Summary
    ────────────────────────────────────────────────────────────────────────── */
-function SpeakingAutoFlow({ task, onFinished }) {
+function SpeakingAutoFlow({ task, user, onFinished }) {
   const SPEAK_SECONDS = 45;
 
   // Build questions (Q1 fixed)
@@ -200,6 +201,9 @@ function SpeakingAutoFlow({ task, onFinished }) {
   const [recordings, setRecordings] = useState(/** @type {{blob:Blob,url:string,name:string}[]} */([]));
   const [recording, setRecording] = useState(false);
   const [micError, setMicError] = useState("");
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackError, setFeedbackError] = useState("");
+  const [feedbackResult, setFeedbackResult] = useState(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const ttsAudioRef = useRef(null);
@@ -226,6 +230,9 @@ function SpeakingAutoFlow({ task, onFinished }) {
     setLeft(SPEAK_SECONDS);
     setRecordings([]);
     setMicError("");
+    setFeedbackLoading(false);
+    setFeedbackError("");
+    setFeedbackResult(null);
     stopRecording(true);
     cancelTTS();
   }, [task?.id]);
@@ -274,10 +281,69 @@ function SpeakingAutoFlow({ task, onFinished }) {
 
   async function startTask() {
     await ensureAudioContext();         // 👈 important for iOS
+    setFeedbackError("");
+    setFeedbackResult(null);
+    setRecordings([]);
     setOverall("running");
     setSeg(0);
     setSub("announce");
     setLeft(SPEAK_SECONDS);
+  }
+
+  async function requestPart2Feedback() {
+    if (!user) {
+      setFeedbackError("Sign in to get AI feedback.");
+      return;
+    }
+    const completeRecordings = recordings.filter((item) => item?.blob);
+    if (completeRecordings.length !== 3) {
+      setFeedbackError("Record all three answers before requesting feedback.");
+      return;
+    }
+
+    setFeedbackLoading(true);
+    setFeedbackError("");
+    try {
+      const payloadRecordings = await Promise.all(recordings.map(async (item, index) => ({
+        name: item?.name || `speaking-part2-q${index + 1}.webm`,
+        mime: item?.mime || item?.blob?.type || "audio/webm",
+        base64: await blobToBase64(item.blob),
+      })));
+      const result = await fb.requestAptisSpeakingPart2Feedback({
+        task: {
+          id: task?.id || "",
+          title: task?.title || "",
+          alt: task?.alt || "",
+          photoFeedback: task?.photoFeedback || null,
+        },
+        questions: questions.map((text, index) => ({
+          id: `q${index + 1}`,
+          question: text,
+        })),
+        recordings: payloadRecordings,
+      });
+      setFeedbackResult(result);
+      if (result?.feedback && fb.saveSpeakingAiFeedback) {
+        try {
+          await fb.saveSpeakingAiFeedback({
+            part: "part2",
+            taskId: task?.id || "",
+            taskTitle: task?.title || "Speaking Part 2",
+            questions: questions.map((text, index) => ({ id: `q${index + 1}`, question: text })),
+            transcripts: result?.transcripts || [],
+            feedback: result.feedback,
+            meta: result?.meta || null,
+          });
+        } catch (saveError) {
+          console.warn("[Speaking Part 2 feedback] save failed", saveError);
+        }
+      }
+    } catch (error) {
+      console.error("[p2] feedback error", error);
+      setFeedbackError(error?.message || "Could not generate feedback right now.");
+    } finally {
+      setFeedbackLoading(false);
+    }
   }
 
   async function startSegment() {
@@ -475,6 +541,7 @@ function SpeakingAutoFlow({ task, onFinished }) {
   const qText = questions[seg];
 
   return (
+    <>
     <div className="panes">
       {/* Left: prompt */}
 <section className="panel">
@@ -565,13 +632,22 @@ function SpeakingAutoFlow({ task, onFinished }) {
           <Summary
             recordings={recordings}
             taskId={task?.id || "task"}
+            user={user}
+            feedbackLoading={feedbackLoading}
+            feedbackError={feedbackError}
+            onRequestFeedback={requestPart2Feedback}
             onDownloadAll={createZipAndDownload}
+            onRestart={startTask}
           />
         )}
 
         {micError && <p className="muted" role="alert" style={{ marginTop: ".5rem" }}>{micError}</p>}
       </section>
     </div>
+    {overall === "summary" && feedbackResult?.feedback && (
+      <FeedbackPanel feedbackResult={feedbackResult} questions={questions} />
+    )}
+    </>
   );
 }
 
@@ -584,7 +660,16 @@ function formatTime(total) {
 /* ──────────────────────────────────────────────────────────────────────────
    Summary + Download all
    ────────────────────────────────────────────────────────────────────────── */
-function Summary({ recordings, taskId, onDownloadAll }) {
+function Summary({
+  recordings,
+  taskId,
+  user,
+  feedbackLoading,
+  feedbackError,
+  onRequestFeedback,
+  onDownloadAll,
+  onRestart,
+}) {
   return (
     <div className="summary">
       <h3 style={{ marginTop: 0 }}>Recordings</h3>
@@ -606,9 +691,176 @@ function Summary({ recordings, taskId, onDownloadAll }) {
         >
           Download all (.zip)
         </button>
+        <button
+          className="btn primary"
+          onClick={onRequestFeedback}
+          disabled={!user || feedbackLoading || recordings.filter((item) => item?.blob).length !== 3}
+          title={!user ? "Sign in to get AI feedback" : "Generate transcript-based written feedback"}
+        >
+          {feedbackLoading ? "Getting feedback..." : "Get AI feedback"}
+        </button>
+        <button className="btn" onClick={onRestart}>Start another set</button>
       </div>
+      {!user && (
+        <p className="muted" style={{ marginTop: ".5rem" }}>
+          Sign in to test transcript-based AI feedback.
+        </p>
+      )}
+      {feedbackError && (
+        <p className="muted" role="alert" style={{ marginTop: ".5rem" }}>
+          {feedbackError}
+        </p>
+      )}
     </div>
   );
+}
+
+function FeedbackPanel({ feedbackResult, questions }) {
+  const feedback = feedbackResult?.feedback;
+  const transcripts = feedbackResult?.transcripts || [];
+  if (!feedback) return null;
+
+  return (
+    <section className="feedback-panel" aria-label="AI feedback">
+      <div className="feedback-head">
+        <h4>AI feedback</h4>
+        {feedback.estimatedLevel?.label && (
+          <span className="level-badge">
+            {feedback.estimatedLevel.label}
+          </span>
+        )}
+      </div>
+      <p>{feedback.overall?.summary}</p>
+      <p className="muted">
+        {feedback.estimatedLevel?.note || "AI-estimated Aptis-style feedback, not an official score."}
+      </p>
+
+      <div className="feedback-grid">
+        <FeedbackBullets title="Strengths" items={feedback.overall?.mainStrengths} />
+        <FeedbackBullets title="Priorities" items={feedback.overall?.mainPriorities} />
+      </div>
+
+      {feedback.overall?.photoDescriptionAdvice && (
+        <p><strong>Photo description:</strong> {feedback.overall.photoDescriptionAdvice}</p>
+      )}
+      {feedback.overall?.developmentAdvice && (
+        <p><strong>Development:</strong> {feedback.overall.developmentAdvice}</p>
+      )}
+      {feedback.overall?.transcriptCaveat && (
+        <p className="muted">{feedback.overall.transcriptCaveat}</p>
+      )}
+
+      {Array.isArray(feedback.answers) && feedback.answers.map((item, index) => {
+        const transcript = transcripts[index]?.transcript || item.transcript || "";
+        return (
+          <div className="answer-feedback" key={item.questionId || index}>
+            <h4>Q{index + 1}: {questions[index] || item.question}</h4>
+            <p className="transcript">"{transcript || "No clear transcript."}"</p>
+            <div className="feedback-grid">
+              <Criterion title="Task" data={item.taskFulfilment} />
+              <Criterion title="Content" data={item.content} />
+              <Criterion title="Development" data={item.answerDevelopment} />
+              <Criterion title="Grammar" data={item.grammar} />
+              <Criterion title="Vocabulary" data={item.vocabulary} />
+              <Criterion title="Cohesion" data={item.cohesion} />
+              <Criterion title="Fluency" data={item.fluency} />
+            </div>
+            <LanguageFixes items={item.languageErrors} />
+            <ExamplesList title="Grammar examples" items={item.grammar?.examples} type="grammar" />
+            <ExamplesList title="Vocabulary examples" items={item.vocabulary?.examples} type="vocabulary" />
+            {item.improvedAnswer && (
+              <div className="improved-answer">
+                <strong>Improved answer</strong>
+                <p>{item.improvedAnswer}</p>
+              </div>
+            )}
+            {item.teacherNote && <p><strong>Teacher note:</strong> {item.teacherNote}</p>}
+          </div>
+        );
+      })}
+    </section>
+  );
+}
+
+function FeedbackBullets({ title, items }) {
+  if (!Array.isArray(items) || !items.length) return null;
+  return (
+    <div className="criterion">
+      <strong>{title}</strong>
+      <ul className="feedback-list">
+        {items.map((item, index) => <li key={index}>{item}</li>)}
+      </ul>
+    </div>
+  );
+}
+
+function Criterion({ title, data }) {
+  if (!data) return null;
+  return (
+    <div className="criterion">
+      <strong>{title}</strong>
+      {data.status && <span className="status">{formatStatus(data.status)}</span>}
+      <p>{data.feedback || data.comment}</p>
+      {Array.isArray(data.missingIdeas) && data.missingIdeas.length ? (
+        <ul className="feedback-list compact">
+          {data.missingIdeas.map((item, index) => <li key={index}>{item}</li>)}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
+function LanguageFixes({ items }) {
+  if (!Array.isArray(items) || !items.length) return null;
+  return (
+    <div className="language-fixes">
+      <h4>Language to fix</h4>
+      <ul>
+        {items.map((item, index) => (
+          <li key={`${item.category}-${item.original}-${index}`}>
+            <small className={item.category}>{formatStatus(item.category)}</small>
+            <p><span>{item.original}</span> → <strong>{item.correction}</strong></p>
+            {item.explanation ? <em>{item.explanation}</em> : null}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function ExamplesList({ title, items, type }) {
+  if (!Array.isArray(items) || !items.length) return null;
+  return (
+    <>
+      <h4>{title}</h4>
+      <ul className="feedback-list">
+        {items.map((item, index) => (
+          <li key={index}>
+            <strong>{item.original}</strong>
+            {" → "}
+            {type === "vocabulary" ? item.suggestion : item.correction}
+            {item.explanation ? ` (${item.explanation})` : ""}
+          </li>
+        ))}
+      </ul>
+    </>
+  );
+}
+
+function formatStatus(status = "") {
+  return String(status).replace(/_/g, " ");
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const value = String(reader.result || "");
+      resolve(value.includes(",") ? value.split(",").pop() : value);
+    };
+    reader.onerror = () => reject(reader.error || new Error("Could not read recording."));
+    reader.readAsDataURL(blob);
+  });
 }
 
 /* ──────────────────────────────────────────────────────────────────────────
@@ -769,6 +1021,7 @@ function StyleScope(){
       .aptis-speaking .header { display:flex; justify-content:space-between; align-items:flex-end; gap:1rem; margin-bottom:1rem; }
       .aptis-speaking .title { margin:0; font-size:1.4rem; }
       .aptis-speaking .intro { margin:.25rem 0 0; color: var(--muted); }
+      .aptis-speaking .muted { color: var(--muted); }
 
       .aptis-speaking .panes { display:grid; grid-template-columns:1fr; gap:1rem; }
       @media (min-width: 960px){ .aptis-speaking .panes { grid-template-columns: 1.2fr .8fr; } }
@@ -806,6 +1059,32 @@ function StyleScope(){
 
       .aptis-speaking .playback { display:flex; gap:1rem; align-items:center; flex-wrap:wrap; margin-top:.75rem; }
 
+      .aptis-speaking .feedback-panel { margin-top:1.2rem; padding:1rem; border:1px solid #2f4776; border-radius:14px; background:#0f1b31; display:grid; gap:.85rem; }
+      .aptis-speaking .feedback-head { display:flex; align-items:center; justify-content:space-between; gap:.75rem; flex-wrap:wrap; }
+      .aptis-speaking .feedback-head h4 { margin:0; font-size:1.05rem; }
+      .aptis-speaking .level-badge { display:inline-flex; align-items:center; border-radius:999px; padding:.35rem .65rem; background:#f1b84a; color:#17223d; font-weight:800; }
+      .aptis-speaking .feedback-list { margin:.35rem 0 0; padding-left:1.1rem; color:#dbe7ff; }
+      .aptis-speaking .feedback-list.compact { margin-top:.25rem; }
+      .aptis-speaking .feedback-grid { display:grid; grid-template-columns:1fr; gap:.75rem; }
+      @media (min-width: 760px){ .aptis-speaking .feedback-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
+      .aptis-speaking .criterion { border:1px solid #2a416e; border-radius:12px; padding:.75rem; background:#162744; }
+      .aptis-speaking .criterion strong { display:block; margin-bottom:.25rem; }
+      .aptis-speaking .criterion p { margin:.35rem 0 0; color:#dbe7ff; }
+      .aptis-speaking .criterion .status { display:inline-flex; margin-top:.2rem; border-radius:999px; padding:.15rem .45rem; background:#24365d; color:#cfe1ff; font-size:.78rem; text-transform:capitalize; }
+      .aptis-speaking .answer-feedback { border-top:1px solid #2f4776; padding-top:1rem; display:grid; gap:.75rem; }
+      .aptis-speaking .answer-feedback h4 { margin:0; }
+      .aptis-speaking .transcript { margin:0; padding:.75rem; border-radius:12px; background:#101d35; color:#e6f0ff; }
+      .aptis-speaking .language-fixes { border:1px solid #2a416e; border-radius:12px; padding:.75rem; background:#162744; }
+      .aptis-speaking .language-fixes h4 { margin:0 0 .5rem; }
+      .aptis-speaking .language-fixes ul { margin:0; padding:0; list-style:none; display:grid; gap:.65rem; }
+      .aptis-speaking .language-fixes li { border-top:1px solid #2a416e; padding-top:.65rem; }
+      .aptis-speaking .language-fixes li:first-child { border-top:0; padding-top:0; }
+      .aptis-speaking .language-fixes small { display:inline-flex; margin-bottom:.25rem; border-radius:999px; padding:.12rem .45rem; background:#24365d; color:#cfe1ff; text-transform:capitalize; }
+      .aptis-speaking .language-fixes p { margin:.1rem 0; }
+      .aptis-speaking .language-fixes em { color:#a9b7d1; }
+      .aptis-speaking .improved-answer { border:1px solid #345889; border-radius:12px; padding:.75rem; background:#172a4a; }
+      .aptis-speaking .improved-answer p { margin:.4rem 0 0; }
+
       /* Chip dropdown (match reading) */
       .aptis-speaking .chip-select { position: relative; display: inline-block; }
       .aptis-speaking .count-chip { min-width: 2.4rem; justify-content: center; display: inline-flex; align-items: center; gap: .35rem; background:#24365d; border:1px solid #335086; color:var(--ink); padding:.35rem .5rem; border-radius:999px; }
@@ -819,6 +1098,30 @@ function StyleScope(){
       .aptis-speaking .chip-option .ttl { color:#e6f0ff; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
       /* inside StyleScope */
 .aptis-speaking .chip-option.locked { opacity: .5; cursor: not-allowed; }
+
+      :root[data-theme="light"] .aptis-speaking { --panel:#ffffff; --ink:#24314d; --muted:#667085; }
+      :root[data-theme="light"] .aptis-speaking .panel { border-color:#d8e0ee; box-shadow:0 10px 24px rgba(33, 51, 84, .08); }
+      :root[data-theme="light"] .aptis-speaking .imgwrap,
+      :root[data-theme="light"] .aptis-speaking .q,
+      :root[data-theme="light"] .aptis-speaking .feedback-panel,
+      :root[data-theme="light"] .aptis-speaking .transcript { background:#f7f9fc; }
+      :root[data-theme="light"] .aptis-speaking .pill,
+      :root[data-theme="light"] .aptis-speaking .criterion,
+      :root[data-theme="light"] .aptis-speaking .language-fixes,
+      :root[data-theme="light"] .aptis-speaking .improved-answer { background:#ffffff; border-color:#d8e0ee; color:#24314d; }
+      :root[data-theme="light"] .aptis-speaking .feedback-list,
+      :root[data-theme="light"] .aptis-speaking .criterion p,
+      :root[data-theme="light"] .aptis-speaking .transcript { color:#24314d; }
+      :root[data-theme="light"] .aptis-speaking .btn,
+      :root[data-theme="light"] .aptis-speaking .count-chip { background:#eef3fb; border-color:#cbd7ea; color:#24314d; }
+      :root[data-theme="light"] .aptis-speaking .btn.primary,
+      :root[data-theme="light"] .aptis-speaking .count-chip.selected,
+      :root[data-theme="light"] .aptis-speaking .chip-option.active { background:#315f9f; border-color:#315f9f; color:#ffffff; }
+      :root[data-theme="light"] .aptis-speaking .chip-menu { background:#ffffff; border-color:#d8e0ee; box-shadow:0 16px 32px rgba(33, 51, 84, .14); }
+      :root[data-theme="light"] .aptis-speaking .chip-option { color:#24314d; }
+      :root[data-theme="light"] .aptis-speaking .chip-option:hover { background:#f0f5fb; }
+      :root[data-theme="light"] .aptis-speaking .chip-option .num,
+      :root[data-theme="light"] .aptis-speaking .chip-option .ttl { color:inherit; }
     `}</style>
   );
 }

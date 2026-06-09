@@ -328,7 +328,22 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
       }
       setFeedbackStatus("ready");
     } catch (error) {
-      console.warn("[OTE writing] feedback failed", error);
+      console.warn("[OTE writing] feedback failed", {
+        code: error?.code,
+        message: error?.message,
+        details: error?.details,
+        customData: error?.customData,
+        submissionId,
+        mode: "full_mock",
+        taskTypes: [
+          "ote_part1_email",
+          getOteTask2Type(submission.tasks?.task2?.selectedOption || {}),
+        ],
+        wordCounts: {
+          task1: submission.counts?.task1 || countWords(submission.answers?.task1),
+          task2: submission.counts?.[submission.task2Choice] || countWords(submission.answers?.[submission.task2Choice] || ""),
+        },
+      });
       setFeedbackStatus("error");
       setFeedbackError(error?.message || "Could not generate feedback.");
     }
@@ -830,7 +845,7 @@ function WritingComplete({
   );
 }
 
-function WritingAiFeedback({ feedback, status, error }) {
+export function WritingAiFeedback({ feedback, status, error }) {
   if (status === "idle") {
     return (
       <section className="ote-ai-feedback-panel">
@@ -886,7 +901,7 @@ function WritingAiFeedback({ feedback, status, error }) {
         {(feedback.tasks || []).map((task, index) => (
           <article className="ote-ai-feedback-task" key={`${task.taskId}-${index}`}>
             <div className="ote-ai-feedback-task-head">
-              <h3>{index === 0 ? "Part 1 Email" : getOteTaskLabel(task.taskType)}</h3>
+              <h3>{getOteTaskLabel(task.taskType, index)}</h3>
               <span>{task.wordCount} words · {task.wordCountStatus?.replace(/_/g, " ")}</span>
             </div>
             <p className="ote-ai-feedback-word-count">{task.wordCountFeedback}</p>
@@ -937,10 +952,12 @@ function WritingAiFeedback({ feedback, status, error }) {
   );
 }
 
-function getOteTaskLabel(taskType) {
+function getOteTaskLabel(taskType, index = 1) {
+  if (taskType === "ote_part1_email") return "Part 1 Email";
   if (taskType === "ote_part2_article") return "Part 2 Article";
   if (taskType === "ote_part2_review") return "Part 2 Review";
-  return "Part 2 Essay";
+  if (taskType === "ote_part2_essay") return "Part 2 Essay";
+  return index === 0 ? "Writing task" : "Part 2 task";
 }
 
 function OteExampleList({ examples = [], type }) {

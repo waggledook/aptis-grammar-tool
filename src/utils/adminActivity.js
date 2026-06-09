@@ -67,6 +67,7 @@ export const ACTIVITY_TYPE_LABELS = {
   writing_p1_guide_activity_started: "Writing Part 1 Guide Activity Started",
   writing_p4_register_guide_activity_started: "Writing Part 4 Register Guide Activity Started",
   writing_guide_viewed: "Writing Guide Viewed",
+  ai_feedback_generated: "AI Feedback Generated",
   [WRITING_GENERAL_SUBMISSION_TYPE]: "Writing General Mock Submitted",
 };
 
@@ -410,6 +411,23 @@ export function formatActivityDetails(log) {
           ? "Tone transformation"
           : d.activity || "Activity",
       ]);
+    case "ai_feedback_generated": {
+      const productLabel = d.product === "ote" ? "OTE" : d.product === "seifhub" ? "Hub" : "Aptis";
+      const sectionLabel = d.section ? titleCaseFromSnakeCase(d.section) : "";
+      const partLabel = d.part ? `Part ${String(d.part).replace("part", "")}` : "";
+      const taskLabel = d.taskTitle || d.taskId || "";
+      const size =
+        typeof d.wordCount === "number" && d.wordCount > 0
+          ? `${d.wordCount} words`
+          : typeof d.answerCount === "number" && d.answerCount > 0
+          ? formatCount(d.answerCount, "answer")
+          : "";
+      const cost =
+        typeof d.creditCost === "number" && d.creditCost > 0
+          ? `${d.creditCost} credit${d.creditCost === 1 ? "" : "s"}`
+          : "";
+      return joinParts([productLabel, sectionLabel, partLabel, d.mode || "", taskLabel, size, cost]);
+    }
     case WRITING_GENERAL_SUBMISSION_TYPE: {
       const part3Total = Array.isArray(d.part3WordCounts) ? d.part3WordCounts.reduce((sum, count) => sum + count, 0) : 0;
       const part4Total = Array.isArray(d.part4WordCounts) ? d.part4WordCounts.reduce((sum, count) => sum + count, 0) : 0;

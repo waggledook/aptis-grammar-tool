@@ -157,6 +157,9 @@ import OteSpeakingMockRunner from "./products/ote/OteSpeakingMockRunner.jsx";
 import OteSpeakingResults from "./products/ote/OteSpeakingResults.jsx";
 import OteWritingMockMenu from "./products/ote/OteWritingMockMenu.jsx";
 import OteWritingMockRunner from "./products/ote/OteWritingMockRunner.jsx";
+import OteWritingTrainingMenu from "./products/ote/OteWritingTrainingMenu.jsx";
+import OteWritingPracticeMenu from "./products/ote/OteWritingPracticeMenu.jsx";
+import OteWritingPracticeRunner from "./products/ote/OteWritingPracticeRunner.jsx";
 import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 function BellIcon() {
@@ -288,6 +291,9 @@ const isOteExamRoute =
   /^\/ote\/writing\/mock-tests(?:\/[^/]+)?$/.test(location.pathname) ||
   (isOteSite && /^\/mock-tests\/[^/]+/.test(location.pathname)) ||
   (isOteSite && /^\/writing\/mock-tests(?:\/[^/]+)?$/.test(location.pathname));
+const isOteWritingPracticeTaskRoute =
+  /^\/ote\/writing\/training\/[^/]+\/practice\/[^/]+$/.test(location.pathname) ||
+  (isOteSite && /^\/writing\/training\/[^/]+\/practice\/[^/]+$/.test(location.pathname));
 const isOteRoute =
   location.pathname.startsWith("/ote") ||
   (isOteSite &&
@@ -298,7 +304,7 @@ const isOteRoute =
       location.pathname.startsWith("/results")));
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
-const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute;
+const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
@@ -1108,6 +1114,12 @@ return (
   <Route path="/ote/speaking/parts-3-4-practice" element={<OteSpeakingPart34Practice nativeRoutes={false} />} />
   <Route path="/ote/speaking/parts-3-4-practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={false} />} />
   <Route path="/ote/writing" element={<OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/:section" element={<OteWritingTrainingMenu nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/:section/practice" element={<OteWritingPracticeMenu nativeRoutes={false} />} />
+  <Route
+    path="/ote/writing/training/:section/practice/:setId"
+    element={<OteWritingPracticeRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
+  />
   <Route
     path="/ote/writing/mock-tests"
     element={<OteWritingMockMenu user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
@@ -1140,6 +1152,12 @@ return (
   {isOteSite && (
     <>
       <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
+      <Route path="/writing/training/:section" element={<OteWritingTrainingMenu nativeRoutes />} />
+      <Route path="/writing/training/:section/practice" element={<OteWritingPracticeMenu nativeRoutes />} />
+      <Route
+        path="/writing/training/:section/practice/:setId"
+        element={<OteWritingPracticeRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />}
+      />
       <Route path="/writing/mock-tests" element={<OteWritingMockMenu user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
       <Route path="/writing/mock-tests/:mockId" element={<OteWritingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
       <Route path="/mock-tests/:mockId/results/:attemptId" element={<OteSpeakingResults user={user} homePath="/" />} />

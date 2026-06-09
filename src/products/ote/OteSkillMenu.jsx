@@ -12,6 +12,11 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
   const voicemailTrainingPath = getSitePath(nativeRoutes ? "/speaking/part-2-voicemails" : "/ote/speaking/part-2-voicemails");
   const talkTrainingPath = getSitePath(nativeRoutes ? "/speaking/parts-3-4" : "/ote/speaking/parts-3-4");
   const writingMockPath = getSitePath(nativeRoutes ? "/writing/mock-tests" : "/ote/writing/mock-tests");
+  const emailTrainingPath = getSitePath(nativeRoutes ? "/writing/training/email" : "/ote/writing/training/email");
+  const essayTrainingPath = getSitePath(nativeRoutes ? "/writing/training/essay" : "/ote/writing/training/essay");
+  const articleReviewTrainingPath = getSitePath(
+    nativeRoutes ? "/writing/training/article-review" : "/ote/writing/training/article-review"
+  );
 
   function openSpeakingMock() {
     if (!user) {
@@ -89,17 +94,17 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
               <h3>Writing Mock Tests</h3>
               <p>Choose Mock 1 or Mock 2, then run the full OTE-style writing module in the exam environment.</p>
             </button>
-            <button className="menu-card" type="button" disabled>
+            <button className="menu-card" type="button" onClick={() => navigate(emailTrainingPath)}>
               <h3>Email Task Training</h3>
               <p>Plan, write, and improve email responses for OTE writing tasks.</p>
             </button>
-            <button className="menu-card" type="button" disabled>
+            <button className="menu-card" type="button" onClick={() => navigate(essayTrainingPath)}>
               <h3>Essay Task Training</h3>
               <p>Build structure, arguments, linking, and exam-ready paragraphing.</p>
             </button>
-            <button className="menu-card" type="button" disabled>
-              <h3>Writing Feedback</h3>
-              <p>Review saved writing attempts once feedback tools are connected.</p>
+            <button className="menu-card" type="button" onClick={() => navigate(articleReviewTrainingPath)}>
+              <h3>Article / Review Training</h3>
+              <p>Practise engaging article and review responses for the optional extended task.</p>
             </button>
           </>
         )}

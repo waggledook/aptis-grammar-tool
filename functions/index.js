@@ -26,7 +26,9 @@ const WRITING_FEEDBACK_CREDIT_COSTS = {
   aptis_part3: 3,
   aptis_part4: 5,
   aptis_speaking_part1: 2,
+  aptis_speaking_part2: 3,
   ote_full_mock: 8,
+  ote_single_task: 4,
 };
 
 // Gmail requires the "from" to be the authenticated user (or an alias on that account)
@@ -413,6 +415,205 @@ const APTIS_SPEAKING_PART1_FEEDBACK_SCHEMA = {
             required: ["status", "feedback"],
             properties: {
               status: { type: "string", enum: ["good", "acceptable", "hesitant", "very_limited", "not_assessed"] },
+              feedback: { type: "string" },
+            },
+          },
+          improvedAnswer: { type: "string" },
+          teacherNote: { type: "string" },
+        },
+      },
+    },
+  },
+};
+
+const APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["taskType", "estimatedLevel", "overall", "answers"],
+  properties: {
+    taskType: { type: "string", enum: ["aptis_speaking_part2"] },
+    estimatedLevel: {
+      type: "object",
+      additionalProperties: false,
+      required: ["label", "confidence", "note"],
+      properties: {
+        label: {
+          type: "string",
+          enum: [
+            "Below A1 / unclear",
+            "A1 range",
+            "A2 range",
+            "B1 range",
+            "B2 range",
+            "C1 range",
+            "C1+ range",
+            "C2-like / above Aptis range",
+          ],
+        },
+        confidence: { type: "string", enum: ["low", "medium", "high"] },
+        note: { type: "string" },
+      },
+    },
+    overall: {
+      type: "object",
+      additionalProperties: false,
+      required: [
+        "summary",
+        "mainStrengths",
+        "mainPriorities",
+        "photoDescriptionAdvice",
+        "developmentAdvice",
+        "transcriptCaveat",
+      ],
+      properties: {
+        summary: { type: "string" },
+        mainStrengths: { type: "array", items: { type: "string" } },
+        mainPriorities: { type: "array", items: { type: "string" } },
+        photoDescriptionAdvice: { type: "string" },
+        developmentAdvice: { type: "string" },
+        transcriptCaveat: { type: "string" },
+      },
+    },
+    answers: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "questionId",
+          "questionNumber",
+          "questionType",
+          "question",
+          "transcript",
+          "durationSeconds",
+          "taskFulfilment",
+          "answerDevelopment",
+          "content",
+          "grammar",
+          "vocabulary",
+          "cohesion",
+          "languageErrors",
+          "fluency",
+          "improvedAnswer",
+          "teacherNote",
+        ],
+        properties: {
+          questionId: { type: "string" },
+          questionNumber: { type: "integer", enum: [1, 2, 3] },
+          questionType: { type: "string", enum: ["photo_description", "personal_or_descriptive", "extended_opinion"] },
+          question: { type: "string" },
+          transcript: { type: "string" },
+          durationSeconds: { type: "number" },
+          taskFulfilment: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback"],
+            properties: {
+              status: { type: "string", enum: ["good", "partial", "weak", "off_topic", "unclear"] },
+              feedback: { type: "string" },
+            },
+          },
+          answerDevelopment: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback"],
+            properties: {
+              status: {
+                type: "string",
+                enum: [
+                  "too_minimal",
+                  "basic_but_clear",
+                  "well_developed",
+                  "overlong_or_rambling",
+                  "memorised_or_generic",
+                ],
+              },
+              feedback: { type: "string" },
+            },
+          },
+          content: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback", "missingIdeas"],
+            properties: {
+              status: { type: "string", enum: ["strong", "adequate", "thin", "inaccurate", "not_assessable"] },
+              feedback: { type: "string" },
+              missingIdeas: { type: "array", items: { type: "string" } },
+            },
+          },
+          grammar: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback", "examples"],
+            properties: {
+              status: { type: "string", enum: ["good", "minor_issues", "needs_work", "unclear"] },
+              feedback: { type: "string" },
+              examples: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  required: ["original", "correction", "explanation"],
+                  properties: {
+                    original: { type: "string" },
+                    correction: { type: "string" },
+                    explanation: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          vocabulary: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback", "examples"],
+            properties: {
+              status: { type: "string", enum: ["good", "sufficient", "limited", "needs_work"] },
+              feedback: { type: "string" },
+              examples: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  required: ["original", "suggestion", "explanation"],
+                  properties: {
+                    original: { type: "string" },
+                    suggestion: { type: "string" },
+                    explanation: { type: "string" },
+                  },
+                },
+              },
+            },
+          },
+          cohesion: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback"],
+            properties: {
+              status: { type: "string", enum: ["good", "basic", "list_like", "unclear"] },
+              feedback: { type: "string" },
+            },
+          },
+          languageErrors: {
+            type: "array",
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["category", "original", "correction", "explanation"],
+              properties: {
+                category: { type: "string", enum: ["grammar", "vocabulary", "word_order", "missing_word", "transcript_unclear"] },
+                original: { type: "string" },
+                correction: { type: "string" },
+                explanation: { type: "string" },
+              },
+            },
+          },
+          fluency: {
+            type: "object",
+            additionalProperties: false,
+            required: ["status", "feedback"],
+            properties: {
+              status: { type: "string", enum: ["natural", "mostly_smooth", "hesitant", "fragmented", "not_assessed"] },
               feedback: { type: "string" },
             },
           },
@@ -836,6 +1037,8 @@ const OTE_WRITING_FEEDBACK_SCHEMA = {
             "B1 range",
             "B1+/B2 range",
             "Strong B2 range",
+            "C1 range",
+            "C2-like / above OTE range",
           ],
         },
         confidence: { type: "string", enum: ["low", "medium", "high"] },
@@ -1099,6 +1302,35 @@ function normalizeSpeakingPart1Questions(questions) {
   }));
 }
 
+function normalizeSpeakingPart2Task(data = {}) {
+  const task = data?.task || {};
+  const rawQuestions = Array.isArray(data?.questions) ? data.questions : [];
+  const questions = rawQuestions.slice(0, 3).map((item, index) => ({
+    id: cleanString(item?.id || `q${index + 1}`, 120),
+    questionNumber: index + 1,
+    questionType:
+      index === 0 ? "photo_description" : index === 1 ? "personal_or_descriptive" : "extended_opinion",
+    question: cleanString(item?.question || item?.text || "", 500),
+  }));
+
+  const photoFeedback = task?.photoFeedback && typeof task.photoFeedback === "object" ? task.photoFeedback : {};
+  return {
+    taskId: cleanString(task?.id || data?.taskId || "", 120),
+    title: cleanString(task?.title || "", 200),
+    imageAltText: cleanString(task?.alt || task?.imageAltText || "", 1200),
+    photoFeedback: {
+      scene: cleanString(photoFeedback.scene || "", 240),
+      keyDetails: Array.isArray(photoFeedback.keyDetails)
+        ? photoFeedback.keyDetails.slice(0, 8).map((item) => cleanString(item, 180)).filter(Boolean)
+        : [],
+      usefulLanguage: Array.isArray(photoFeedback.usefulLanguage)
+        ? photoFeedback.usefulLanguage.slice(0, 10).map((item) => cleanString(item, 120)).filter(Boolean)
+        : [],
+    },
+    questions,
+  };
+}
+
 function normalizeSpeakingAudioItems(recordings) {
   if (!Array.isArray(recordings)) return [];
   return recordings.slice(0, 3).map((item, index) => {
@@ -1213,19 +1445,20 @@ function buildAptisSpeakingPart1Prompt(items) {
     "Part 1 priorities:",
     "- Task fulfilment and topic relevance: answer the exact question directly, stay on topic, and give a relevant personal response.",
     "- Answer development: do not reward one-word or ultra-minimal answers just because they are correct. Strong practice answers usually give a direct answer plus one or two useful details, such as a reason, example, frequency, contrast, personal comment, or short explanation.",
-    "- Good target length: usually 2-4 connected sentences and around 25-60 words, depending on the question. Enough to show range, but not a memorised mini-monologue.",
+    "- Good target length: usually 1-4 connected sentences and around 15-60 words, depending on the question. A concise but natural answer can still be strong if it answers directly and shows control.",
     "- Grammar: focus on clear simple sentences, present simple for habits/facts, past simple for past questions, present continuous where relevant, auxiliary verbs, word order, subject + verb structure, articles/prepositions where they affect clarity, and simple connectors such as because, but, also, and, so.",
     "- Vocabulary: reward relevant, natural vocabulary and specific personal detail. Do not push advanced or unnatural words just to sound higher level.",
     "- Fluency: infer cautiously from the transcript only. You may mention very short answers, fragmented language, repeated restarts, or many transcribed fillers, but do not overstate fluency based only on transcript.",
     "- Language errors: students especially want explicit language feedback. For each answer, include the most useful grammar/vocabulary/word-order/missing-word fixes in languageErrors. Use exact student words where possible. Do not invent errors that are not supported by the transcript.",
-    "- Keep languageErrors focused: include at most two languageErrors per answer. Prefer clear learner-language errors that affect naturalness or clarity. If the transcript shows no clear learner-language errors, return an empty languageErrors array for that answer.",
+    "- Keep languageErrors focused: include up to three languageErrors per answer when clear learner-language errors are present. Prefer errors that affect naturalness, clarity, or repeated patterns. If the transcript shows no clear learner-language errors, return an empty languageErrors array for that answer.",
     "",
     "Native/spontaneous speech calibration:",
     "- Do not downgrade a strong answer just because it includes normal spoken fillers, discourse markers, self-repairs, restarts, or informal phrasing such as well, let me think, you know, I guess, yeah, or things like this.",
     "- Spoken native-level answers are often less tidy than written answers. A false start or mid-sentence repair is not automatically a grammar error.",
     "- Treat obvious transcription artefacts cautiously, especially duplicated articles, repeated words, uncertain numbers, or odd phrases that may be misheard. Do not use these alone to assign a low level.",
     "- If the answers show idiomatic phrasing, flexible reformulation, natural discourse markers, specific detail, and control of connected speech, estimate B2 range or C1 range even if the transcript is not perfectly polished.",
-    "- If all three answers show advanced/native-like control, specific personal detail, flexible phrasing, and no clear learner-language errors, the observed range should normally be at least B2 range. Use C1 range when the language is highly natural and idiomatic.",
+    "- If all three answers are relevant, clear, natural, and reasonably developed, and there are no frequent clear learner-language errors, the observed range should normally be at least B2 range.",
+    "- If all three answers show advanced/native-like control, specific personal detail, flexible phrasing, and no clear learner-language errors, use C1 range unless the evidence is too limited; if evidence is limited, use B2 range with lower confidence rather than B1.",
     "",
     "Answer development labels:",
     "- too_minimal: one word, one phrase, or one very short sentence. It may answer the question but does not give enough language for strong Part 1 practice.",
@@ -1238,7 +1471,8 @@ function buildAptisSpeakingPart1Prompt(items) {
     "- Use broad labels only: Below A1 / unclear, A1 range, A2 range, B1 range, B2 range, C1 range.",
     "- You may recognise stronger performances up to C1 range when the transcript clearly shows strong control, range, natural detail, and very few errors.",
     "- The fact that Aptis Speaking Part 1 is short should reduce confidence, not artificially cap the label at B1.",
-    "- Use B1 range for genuinely B1-like performance: mostly clear but limited range, simple repetitive structures, noticeable learner errors, and limited flexibility.",
+    "- Be generous when the answer is clearly communicative and natural: when choosing between two adjacent levels, choose the higher label with lower confidence unless there is concrete evidence for the lower label.",
+    "- Use B1 range only for genuinely B1-like performance: mostly clear but limited range, simple repetitive structures, noticeable learner errors, and limited flexibility. Do not use B1 merely because the answers are short or because Part 1 evidence is limited.",
     "- Use B2 range for clear, developed answers with natural connected speech, flexible everyday vocabulary, generally good control, and only minor/non-disruptive issues.",
     "- Use C1 range for highly natural, idiomatic, flexible answers with strong control and only occasional slips, repairs, or transcript artefacts.",
     "- Always caveat the estimate: Aptis Speaking Part 1 is short and personal-information based, so it cannot reliably prove the student's full speaking level on its own.",
@@ -1248,7 +1482,7 @@ function buildAptisSpeakingPart1Prompt(items) {
     "- Keep the student's original idea where possible.",
     "- Answer the question directly.",
     "- Add one or two useful extra details.",
-    "- Use natural spoken English suitable for A1-B1 learners.",
+    "- Use natural spoken English suitable for the student's observed level. Do not simplify strong B2/C1 answers into lower-level model answers.",
     "- Aim for 2-4 connected sentences, usually around 25-60 words.",
     "- Avoid one-word model answers, over-advanced language, and long memorised monologues.",
     "",
@@ -1259,6 +1493,290 @@ function buildAptisSpeakingPart1Prompt(items) {
     "Transcribed answers:",
     JSON.stringify(items, null, 2),
   ].join("\n");
+}
+
+function buildAptisSpeakingPart2Prompt(task, items) {
+  return [
+    "You are an English exam speaking feedback assistant for Aptis Speaking Part 2.",
+    "",
+    "The student answered three 45-second questions based on one photograph. Q1 asks them to describe the photograph. Q2 is a related personal/descriptive question. Q3 is a more developed opinion/reasoning question. This is AI-estimated Aptis-style feedback, not official marking.",
+    "",
+    "Important limitation: you are assessing transcripts. Do not give pronunciation feedback or include pronunciation as a category. Only mention transcript clarity if a transcript is incomplete, unclear, or impossible to interpret. Do not invent accent, intonation, word-stress, phoneme, or sound-level problems.",
+    "",
+    "Part 2 priorities:",
+    "- Q1 photo description: reward grounded description of visible people, place, actions, objects, and the general situation. Two to four relevant observations can be enough if they are clear and connected. Present continuous, there is/there are, and speculative language are useful. Do not require every possible detail.",
+    "- Speculation is encouraged in Aptis-style photo description when it is based on visual evidence. Reward range such as it looks like, it seems as if, they might be, they are probably, perhaps, I imagine, and it appears to be.",
+    "- Do not criticise speculation simply because it goes beyond literal description. Only flag it if it contradicts the image, becomes implausible, or replaces almost all visible description with unsupported storytelling.",
+    "- Q2 should answer the actual related question, usually with personal experience, preference, or concrete descriptive detail. Do not treat Q2 as just more photo description.",
+    "- Q3 should give a clearer opinion or explanation with reasons, examples, comparison, consequence, or speculation. Strong answers are developed but still focused.",
+    "- Task fulfilment and topic relevance matter more than showing advanced language for its own sake.",
+    "- Grammar priorities: present continuous for the photo, there is/there are, present simple, past simple where relevant, comparatives, modals, basic conditionals, connectors, word order, and subject-verb agreement.",
+    "- Vocabulary priorities: concrete topic vocabulary, natural collocations, and specific details. Flag vague words, false friends, or unnatural phrasing only when they are actually present.",
+    "- Cohesion: reward connected sentences. A list of isolated labels is weaker than a short organized description or answer.",
+    "- Fluency: infer cautiously from transcript only. You may mention very short answers, repeated restarts, many transcribed fillers, or fragmented language, but do not overstate fluency from text.",
+    "- Language errors: include up to three clear, useful fixes per answer. Use exact student words when possible. If there are no clear learner-language errors, return an empty languageErrors array for that answer.",
+    "- Do not put preference-only rewrites in languageErrors. If a phrase is correct but could be shorter, simpler, more focused, or more exam-like, mention it in teacherNote, task/content feedback, or priorities instead.",
+    "- Do not create a languageError where original and correction are the same or nearly the same.",
+    "- Do not label repetition, self-correction, filler, or over-explaining as word_order or grammar unless there is a concrete grammar/word-order error. Treat it as fluency, cohesion, or task focus.",
+    "- Do not correct correct grammar. For example, do not mark a correct phrase as an error just because an alternative tense or simpler phrasing is also possible.",
+    "- Do not treat ordinary spoken informality, such as stuff, yeah, you know, why not, or discourse-marker repetition, as a language error in an otherwise advanced answer. Mention register or precision only if it genuinely weakens the answer.",
+    "- For strong B2/C1/C1+ answers, keep improvedAnswer close to the student's level, tone, specificity, and intention. Do not flatten rich, natural speech into a generic lower-level model answer unless the original is unclear or off task.",
+    "- If an answer is already strong, improvedAnswer should be a light polish of the student's own response, not a simplified replacement. Preserve mature ideas, specific references, hedging, discourse markers, and advanced vocabulary where they work.",
+    "- For Q1 content, do not require every visible detail. If the student has already identified the people, action, place, general situation, and has used plausible speculative language, treat this as a strength. Do not add minor missing-detail criticisms unless the omitted detail would materially improve the answer.",
+    "",
+    "Calibration:",
+    "- Do not hard-cap the estimated level because this is a single Part 2 task. Limited evidence should lower confidence, not force B1/B2.",
+    "- Use B1 range only for genuinely B1-like performance: mostly clear but limited range, repetitive structures, noticeable learner errors, thin development, or partial task fulfilment.",
+    "- Use B2 range for clear, relevant, reasonably developed answers with natural connected speech, good everyday vocabulary, and mostly controlled grammar, but limited abstraction or precision.",
+    "- Use C1 range for highly natural, flexible, idiomatic answers with strong control, specific detail, and only occasional slips or transcript artefacts.",
+    "- Use C1+ range as the minimum when all three answers are clear and relevant, reasonably developed, and show advanced spoken control: nuanced hedging/speculation, specific real-world examples, abstraction, topic-specific vocabulary, flexible syntax, and only minor local phrasing issues.",
+    "- Use C2-like / above Aptis range only when the three answers are exceptionally natural, precise, flexible, and essentially error-free for this task type. Keep the confidence realistic.",
+    "- Do not keep a performance at B2 merely because there are a few fillers, self-repairs, informal spoken words like stuff, or one or two local awkward phrases. Those are compatible with C1+ spoken performance if the overall range and control are strong.",
+    "- Spoken answers can include normal fillers, discourse markers, self-repairs, and informal phrasing. Do not downgrade strong spoken English for not looking like polished writing.",
+    "- Treat odd duplicated words or strange phrases cautiously as possible transcription artefacts. Do not use them alone to assign a low level.",
+    "- Be generous when the response is clearly communicative and natural: when choosing between adjacent levels, choose the higher label with lower confidence unless there is concrete evidence for the lower label.",
+    "",
+    "Improved answer rules:",
+    "- Keep the student's original idea where possible.",
+    "- For Q1, model a natural photo description grounded in the image data supplied.",
+    "- For Q2 and Q3, answer the exact question directly and add useful detail.",
+    "- Use natural spoken English suitable for the student's observed level. Do not simplify strong answers into lower-level model answers.",
+    "- For C1/C1+ answers, preserve sophisticated content and phrasing unless there is a real error. Improve local precision, not level.",
+    "- Aim for a concise spoken answer, usually around 35-85 words for each 45-second question.",
+    "- If the student's answer is already excellent, keep improvements minimal and say so.",
+    "",
+    "Set overall.transcriptCaveat to a short note that feedback is transcript-based and audio-level features are not assessed.",
+    "Feedback style: short, encouraging, practical, and specific to the question. Avoid long grammar lectures, harsh wording, official score claims, and pronunciation feedback. Use grammar.examples and vocabulary.examples only when they add something not already covered in languageErrors; otherwise return empty arrays.",
+    "Return only valid JSON using the required schema.",
+    "",
+    "Photo/task data:",
+    JSON.stringify(task, null, 2),
+    "",
+    "Transcribed answers:",
+    JSON.stringify(items, null, 2),
+  ].join("\n");
+}
+
+function normalizeFeedbackText(value = "") {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[“”"'`]/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function isPreferenceOnlySpeakingFix(item = {}) {
+  const original = normalizeFeedbackText(item.original);
+  const correction = normalizeFeedbackText(item.correction || item.suggestion);
+  const explanation = normalizeFeedbackText(item.explanation);
+  if (!original || !correction) return true;
+  if (original === correction) return true;
+  if (explanation.includes("this is correct")) return true;
+  if (explanation.includes("rather than an error")) return true;
+  if (item.category === "word_order" && explanation.includes("repetition")) return true;
+
+  const preferenceSignals = [
+    "could also say",
+    "possible, but",
+    "more natural and safer",
+    "shorter version is clearer",
+    "sounds better",
+    "more specific noun",
+    "more specific",
+  ];
+  const errorSignals = [
+    "awkward",
+    "unclear",
+    "wrong",
+    "incorrect",
+    "missing",
+    "affects meaning",
+    "not natural",
+    "unnatural",
+  ];
+  if (
+    preferenceSignals.some((signal) => explanation.includes(signal)) &&
+    !errorSignals.some((signal) => explanation.includes(signal))
+  ) {
+    return true;
+  }
+  return false;
+}
+
+function isGenericSpeculationCriticism(value = "") {
+  const text = normalizeFeedbackText(value);
+  if (!text) return false;
+  const speculationTerms = [
+    "overly speculative",
+    "over-speculative",
+    "over speculation",
+    "over-speculation",
+    "too speculative",
+    "speculation lighter",
+    "avoid speculating",
+    "reduce speculation",
+  ];
+  if (!speculationTerms.some((term) => text.includes(term))) return false;
+  return !["contradict", "impossible", "implausible", "not visible"].some((term) => text.includes(term));
+}
+
+function getCriterionStatus(value) {
+  return normalizeFeedbackText(value?.status || "");
+}
+
+function hasAdvancedSpeakingEvidence(items = []) {
+  const combined = normalizeFeedbackText(items.map((item) => item.transcript).join(" "));
+  const totalWords = items.reduce((sum, item) => sum + Number(item.wordCount || 0), 0);
+  const allDeveloped = items.length === 3 && items.every((item) => Number(item.wordCount || 0) >= 35);
+  const advancedMarkers = [
+    "obviously",
+    "although",
+    "contemporary",
+    "underwhelming",
+    "fundamental",
+    "stimulate",
+    "variety",
+    "diversity",
+    "by the looks of things",
+    "it appears",
+    "it looks like",
+    "i'm much more interested",
+    "in person",
+    "as much as",
+  ].filter((marker) => combined.includes(marker)).length;
+  return totalWords >= 145 && allDeveloped && advancedMarkers >= 4;
+}
+
+function shouldLiftPart2ToC1Plus(feedback, items = []) {
+  if (!feedback || !Array.isArray(feedback.answers) || feedback.answers.length !== 3) return false;
+  const label = feedback.estimatedLevel?.label || "";
+  if (label === "C1+ range" || label === "C2-like / above Aptis range") return false;
+  if (!["B2 range", "C1 range"].includes(label)) return false;
+
+  const answers = feedback.answers;
+  const allTaskGood = answers.every((answer) =>
+    ["good"].includes(getCriterionStatus(answer.taskFulfilment))
+  );
+  const allDeveloped = answers.every((answer) =>
+    ["well_developed"].includes(getCriterionStatus(answer.answerDevelopment))
+  );
+  const contentStrong = answers.filter((answer) =>
+    ["strong"].includes(getCriterionStatus(answer.content))
+  ).length >= 2;
+  const grammarControlled = answers.every((answer) =>
+    ["good", "minor_issues"].includes(getCriterionStatus(answer.grammar))
+  );
+  const vocabStrong = answers.every((answer) =>
+    ["good", "sufficient"].includes(getCriterionStatus(answer.vocabulary))
+  );
+  const cohesionGood = answers.every((answer) =>
+    ["good", "basic"].includes(getCriterionStatus(answer.cohesion))
+  );
+  const errorCount = answers.reduce(
+    (sum, answer) => sum + (Array.isArray(answer.languageErrors) ? answer.languageErrors.length : 0),
+    0
+  );
+
+  return (
+    allTaskGood &&
+    allDeveloped &&
+    contentStrong &&
+    grammarControlled &&
+    vocabStrong &&
+    cohesionGood &&
+    errorCount <= 6 &&
+    hasAdvancedSpeakingEvidence(items)
+  );
+}
+
+function preventAdvancedAnswerFlattening(feedback, items = []) {
+  if (!["C1+ range", "C2-like / above Aptis range"].includes(feedback?.estimatedLevel?.label)) return feedback;
+  if (!Array.isArray(feedback.answers)) return feedback;
+
+  feedback.answers = feedback.answers.map((answer, index) => {
+    const transcript = cleanString(items[index]?.transcript || answer.transcript || "", 2400);
+    const improved = cleanString(answer.improvedAnswer || "", 2400);
+    const transcriptWords = countWords(transcript);
+    const improvedWords = countWords(improved);
+    if (transcriptWords >= 45 && improvedWords > 0 && improvedWords < transcriptWords * 0.75) {
+      return {
+        ...answer,
+        improvedAnswer: transcript,
+        teacherNote: [
+          answer.teacherNote,
+          "This is already an advanced spoken answer, so feedback should focus on light local polishing rather than simplifying it.",
+        ].filter(Boolean).join(" "),
+      };
+    }
+    return answer;
+  });
+  return feedback;
+}
+
+function postProcessAptisSpeakingPart2Feedback(feedback, items = []) {
+  if (!feedback || !Array.isArray(feedback.answers)) return feedback;
+  if (feedback.overall) {
+    if (Array.isArray(feedback.overall.mainPriorities)) {
+      feedback.overall.mainPriorities = feedback.overall.mainPriorities.filter(
+        (item) => !isGenericSpeculationCriticism(item)
+      );
+    }
+    if (isGenericSpeculationCriticism(feedback.overall.photoDescriptionAdvice)) {
+      feedback.overall.photoDescriptionAdvice =
+        "Use visible details first, then add plausible speculation with phrases like it looks like, they might be, or they are probably.";
+    }
+    if (feedback.overall.transcriptCaveat && normalizeFeedbackText(feedback.overall.transcriptCaveat).includes("pronunciation")) {
+      feedback.overall.transcriptCaveat =
+        "Feedback is based on transcripts, so audio-level features are not assessed.";
+    }
+  }
+  feedback.answers = feedback.answers.map((answer) => {
+    const next = { ...answer };
+    delete next.pronunciation;
+    if (Array.isArray(next.languageErrors)) {
+      next.languageErrors = next.languageErrors.filter((item) => !isPreferenceOnlySpeakingFix(item));
+    }
+    if (next.grammar && Array.isArray(next.grammar.examples)) {
+      next.grammar = {
+        ...next.grammar,
+        examples: next.grammar.examples.filter((item) => !isPreferenceOnlySpeakingFix(item)),
+      };
+    }
+    if (next.vocabulary && Array.isArray(next.vocabulary.examples)) {
+      next.vocabulary = {
+        ...next.vocabulary,
+        examples: next.vocabulary.examples.filter((item) => !isPreferenceOnlySpeakingFix(item)),
+      };
+    }
+    if (next.content && Array.isArray(next.content.missingIdeas)) {
+      next.content = {
+        ...next.content,
+        missingIdeas: next.content.missingIdeas.filter((item) => !isGenericSpeculationCriticism(item)),
+      };
+    }
+    if (next.taskFulfilment && isGenericSpeculationCriticism(next.taskFulfilment.feedback)) {
+      next.taskFulfilment = {
+        ...next.taskFulfilment,
+        feedback:
+          "You describe the scene clearly and use plausible speculation based on visual evidence, which is useful for this task.",
+      };
+    }
+    return next;
+  });
+  if (shouldLiftPart2ToC1Plus(feedback, items)) {
+    feedback.estimatedLevel = {
+      ...(feedback.estimatedLevel || {}),
+      label: "C1+ range",
+      confidence: feedback.estimatedLevel?.confidence === "high" ? "high" : "medium",
+      note:
+        "AI-estimated Aptis-style feedback, not an official score. The transcript shows advanced spoken control across all three Part 2 answers, so the observed range is at least C1+ for this task.",
+    };
+    if (feedback.overall) {
+      feedback.overall.summary =
+        "A strong advanced Part 2 performance with natural speculation, specific examples, mature reasoning, and only minor local phrasing issues.";
+    }
+  }
+  return preventAdvancedAnswerFlattening(feedback, items);
 }
 
 function getPart23WordCountStatus(part, wordCount) {
@@ -1539,12 +2057,166 @@ function describeOteWordCount(taskType, status, wordCount) {
     case "target_range":
       return `${label}: ${words}. In the target range.`;
     case "acceptable_over_range":
-      return `${label}: ${words}. A little over the target range, but acceptable if focused, relevant, and accurate.`;
+      return `${label}: ${words}. Within 20 words of the target range; do not treat this as a problem if the answer is focused, relevant, and accurate.`;
     case "excessive":
-      return `${label}: ${words}. This may be excessive if it becomes repetitive, unfocused, or hard to manage in exam time.`;
+      return `${label}: ${words}. More than 20 words over the target range; mention length only if it creates repetition, loss of focus, unclear task coverage, or exam-management risk.`;
     default:
       return `${label}: ${words}.`;
   }
+}
+
+function hasOnlyCoveredOtePoints(taskFeedback = {}) {
+  const points = taskFeedback.taskFulfilment?.requiredPoints;
+  if (!Array.isArray(points) || !points.length) return true;
+  return points.every((point) => point?.status === "covered");
+}
+
+function isHighControlOteTask(taskFeedback = {}) {
+  const taskStatus = taskFeedback.taskFulfilment?.status;
+  const contentStatus = taskFeedback.taskFulfilment?.contentSpecificity?.status;
+  const registerStatus = taskFeedback.formatAndRegister?.status;
+  const organizationStatus = taskFeedback.organization?.status;
+  const grammarStatus = taskFeedback.grammar?.status;
+  const lexisStatus = taskFeedback.lexis?.status;
+  const wordStatus = taskFeedback.wordCountStatus;
+
+  return (
+    ["strong", "good"].includes(taskStatus) &&
+    ["specific", "partly_generic"].includes(contentStatus) &&
+    ["strong", "mostly_appropriate"].includes(registerStatus) &&
+    ["strong", "good"].includes(organizationStatus) &&
+    ["strong", "good", "minor_issues"].includes(grammarStatus) &&
+    ["strong", "good"].includes(lexisStatus) &&
+    ["target_range", "acceptable_over_range"].includes(wordStatus) &&
+    hasOnlyCoveredOtePoints(taskFeedback)
+  );
+}
+
+function isPreferenceOnlyOteCorrection(mistake = {}) {
+  const text = [
+    mistake.category,
+    mistake.original,
+    mistake.correction,
+    mistake.explanation,
+  ].join(" ").toLowerCase();
+
+  return (
+    /\b(more natural|clearer|smoother|slightly awkward|more idiomatic|sounds better|prefer)\b/.test(text) &&
+    !/\b(error|incorrect|wrong|missing|unclear|confusing|changes the meaning|impede|grammar mistake)\b/.test(text)
+  );
+}
+
+function isLengthPriority(text = "") {
+  return /\b(word count|word limit|length|too long|shorten|closer to the limit|closer to the word limit)\b/i.test(text);
+}
+
+function isVaguePolishPriority(text = "") {
+  return /\b(make .*phrases? more natural|phrases? more natural|smoother wording|wording more natural)\b/i.test(text);
+}
+
+function dedupeOtePriorities(priorities = []) {
+  return priorities.filter((item, index, list) => {
+    const normalized = String(item || "").trim().toLowerCase();
+    return normalized && list.findIndex((other) => String(other || "").trim().toLowerCase() === normalized) === index;
+  });
+}
+
+function postProcessOteWritingFeedback(payload, feedback) {
+  if (!feedback || !Array.isArray(feedback.tasks)) return feedback;
+
+  const processedTasks = feedback.tasks.map((taskFeedback, index) => {
+    const originalTask = payload.tasks[index] || {};
+    const withOriginalCounts = {
+      ...taskFeedback,
+      wordCount: originalTask.answer?.wordCount ?? taskFeedback.wordCount,
+      wordCountStatus: originalTask.answer?.wordCountStatus || taskFeedback.wordCountStatus,
+      wordCountFeedback: describeOteWordCount(
+        originalTask.taskType || taskFeedback.taskType,
+        originalTask.answer?.wordCountStatus || taskFeedback.wordCountStatus,
+        originalTask.answer?.wordCount ?? taskFeedback.wordCount
+      ),
+    };
+
+    if (!isHighControlOteTask(withOriginalCounts)) return withOriginalCounts;
+
+    const filteredMistakes = (withOriginalCounts.mistakes || []).filter(
+      (mistake) => !isPreferenceOnlyOteCorrection(mistake)
+    );
+    const hasNoMeaningfulMistakes = filteredMistakes.length === 0;
+    const studentAnswer = originalTask.answer?.text || withOriginalCounts.studentAnswer || "";
+
+    return {
+      ...withOriginalCounts,
+      mistakes: filteredMistakes,
+      grammar: hasNoMeaningfulMistakes
+        ? {
+            ...withOriginalCounts.grammar,
+            status: withOriginalCounts.grammar?.status === "minor_issues" ? "strong" : withOriginalCounts.grammar?.status,
+            feedback: "Grammar is accurate and controlled; no significant corrections are needed.",
+            examples: [],
+          }
+        : withOriginalCounts.grammar,
+      lexis: hasNoMeaningfulMistakes
+        ? {
+            ...withOriginalCounts.lexis,
+            status: withOriginalCounts.lexis?.status || "strong",
+            feedback: "Vocabulary is natural, precise, and appropriate for the task.",
+            examples: [],
+          }
+        : withOriginalCounts.lexis,
+      improvedVersion: hasNoMeaningfulMistakes && studentAnswer ? studentAnswer : withOriginalCounts.improvedVersion,
+      teacherNote: hasNoMeaningfulMistakes
+        ? "This is a polished response with no significant language corrections needed."
+        : withOriginalCounts.teacherNote,
+    };
+  });
+
+  const hasHighControlTask = processedTasks.some(isHighControlOteTask);
+  const hasOnlyHighControlTasks = processedTasks.length > 0 && processedTasks.every(isHighControlOteTask);
+  const hasMeaningfulMistakes = processedTasks.some((task) => (task.mistakes || []).length > 0);
+
+  const adjusted = {
+    ...feedback,
+    tasks: processedTasks,
+    overall: {
+      ...(feedback.overall || {}),
+      mainPriorities: dedupeOtePriorities(feedback.overall?.mainPriorities || []).filter((priority) => {
+        if (processedTasks.some((task) => task.wordCountStatus === "acceptable_over_range") && isLengthPriority(priority)) {
+          return false;
+        }
+        if (hasOnlyHighControlTasks && isVaguePolishPriority(priority)) {
+          return false;
+        }
+        return true;
+      }),
+    },
+  };
+
+  if (
+    hasHighControlTask &&
+    ["B1+/B2 range", "Strong B2 range"].includes(adjusted.estimatedWritingLevel?.label)
+  ) {
+    adjusted.estimatedWritingLevel = {
+      ...(adjusted.estimatedWritingLevel || {}),
+      label: hasMeaningfulMistakes ? "C1 range" : "C2-like / above OTE range",
+      confidence: adjusted.estimatedWritingLevel?.confidence || "medium",
+      note:
+        "This is AI-estimated training feedback. OTE reports results only up to B2, but the observed writing quality is above that reporting range.",
+    };
+  }
+
+  if (hasOnlyHighControlTasks && !hasMeaningfulMistakes) {
+    adjusted.overall = {
+      ...adjusted.overall,
+      summary:
+        adjusted.overall?.summary && !/minor|awkward|word limit|length/i.test(adjusted.overall.summary)
+          ? adjusted.overall.summary
+          : "This is a polished, natural, task-appropriate response with no significant language corrections needed.",
+      mainPriorities: adjusted.overall?.mainPriorities || [],
+    };
+  }
+
+  return adjusted;
 }
 
 function normalizeOteWritingPayload(data) {
@@ -1601,10 +2273,11 @@ function buildOteWritingFeedbackPrompt(payload) {
     "",
     "Official task context:",
     "- Part 1 email: 80-130 words, responds to an input email, includes three required points, informal or neutral tone, functions such as giving information, responding to opinions/feelings, inviting, requesting, suggesting.",
-    "- Part 2 essay/article/review: 100-160 words. Essay develops an argument. Article/review describes, narrates, expresses opinions/feelings, and may recommend.",
+    "- Part 2 essay/article/review: 100-160 words. Essay develops an argument on a classroom-discussion topic. Article/review tasks describe, narrate, express feelings/opinions, and may recommend. The target reader is usually an English teacher.",
+    "- OTE Writing criteria are Task fulfilment, Organization, Grammar, and Lexis. Task fulfilment includes task requirements, format, register, and length.",
     "",
-    "Assessment categories for every task:",
-    "1. Task fulfilment",
+    "Feedback categories for every task:",
+    "1. Task fulfilment, including format, register, and length",
     "2. Organization",
     "3. Grammar",
     "4. Lexis",
@@ -1614,8 +2287,12 @@ function buildOteWritingFeedbackPrompt(payload) {
     "8. Priority advice",
     "",
     "Estimated writing level:",
-    "- Use only: Below A2 / unclear, A2 range, B1 range, B1+/B2 range, Strong B2 range.",
-    "- Do not estimate above B2 because OTE reports results up to B2.",
+    "- Use only: Below A2 / unclear, A2 range, B1 range, B1+/B2 range, Strong B2 range, C1 range, C2-like / above OTE range.",
+    "- OTE reports results only up to B2, but this training tool may still describe observed writing quality above the OTE reporting range.",
+    "- If the response shows highly natural idiomatic phrasing, flexible syntax, precise register control, strong cohesion, and almost no errors, use C1 range or C2-like / above OTE range even if the official exam would report at most B2.",
+    "- Do not lower an otherwise advanced answer to B1+/B2 because of a small word-count excess, one slightly indirect point, or a minor punctuation choice. Mention those as local issues while keeping the observed language level high.",
+    "- Reserve Strong B2 range for strong but still visibly upper-intermediate writing: generally effective, but with limited idiomatic range, some awkwardness, noticeable simplification, or several correctable issues.",
+    "- If the writing is polished, idiomatic, naturally organized, register-appropriate, and virtually error-free, it should normally be C1 range or C2-like / above OTE range, not Strong B2.",
     "- Do not give a precise official score.",
     "",
     "Task fulfilment and content specificity are high priority. Internally identify the specific task requirements before giving feedback.",
@@ -1636,29 +2313,42 @@ function buildOteWritingFeedbackPrompt(payload) {
     "Word count handling:",
     "- Use the supplied wordCountStatus and do not contradict it.",
     "- Under-length responses should be flagged clearly because OTE specifications penalize under-length writing.",
-    "- Do not over-criticise slightly over-range answers if they are focused, relevant, and accurate.",
-    "- For acceptable_over_range, only recommend shortening if the answer is repetitive, unfocused, unclear, or creates exam-management issues.",
+    "- Acceptable_over_range means the answer is no more than 20 words over the target. Do not list this as a weakness, priority, or correction if the answer is focused, relevant, and accurate.",
+    "- Only make length a meaningful issue when the response is excessive, or when extra length causes repetition, loss of focus, unclear task coverage, or avoidable language errors.",
     "",
     "Mistakes section:",
     "- Include a dedicated mistakes array for each task.",
     "- Each mistake should show the exact student text or a short phrase, a corrected version, and a short explanation.",
-    "- Prioritize mistakes that affect task fulfilment, register, grammar accuracy, lexis accuracy, spelling, punctuation, or clarity.",
-    "- Do not list every tiny error. Aim for the most useful 3-8 mistakes per task.",
+    "- Only include genuine, defensible problems. If nothing is wrong, return an empty mistakes array.",
+    "- Do not invent corrections just because feedback was requested. Do not rewrite natural idiomatic language into blander exam language.",
+    "- Do not correct style choices that are appropriate for the task register, such as contractions, informal phrasing, direct questions, or friendly closings in an email to a friend.",
+    "- Treat natural idiomatic phrases as acceptable even if a simpler alternative exists. For example, do not correct phrases like 'landing you with the mess', 'so long as we book', 'he's gonna love it', or 'lend us a hand' in an informal email when they fit the context.",
+    "- A correction must fix a real problem, not merely replace an advanced or idiomatic phrase with a simpler one.",
+    "- Prioritize mistakes that clearly affect task fulfilment, register, grammar accuracy, lexis accuracy, spelling, punctuation, or clarity.",
+    "- For excellent responses, it is normal to include 0 mistakes and no grammar/lexis examples. For weaker responses, include only the most useful mistakes, usually 1-5.",
     "- If a whole idea is missing, use category 'task', original as 'Missing idea: ...', and correction as a short suggested addition.",
+    "- If a point is handled indirectly but still makes sense in context, describe it as a possible task-development improvement, not as a language error.",
     "",
     "Improved versions:",
     "- Preserve the student's meaning, choices, opinions, examples, and key ideas.",
     "- Do not change task decisions. For example, if the student chose the steep/fast route, keep that route; if the student chose the cafe, keep the cafe; if the student supported shorter holidays, keep that opinion.",
     "- The improved version should be a corrected and upgraded version of the student's answer, not a shorter alternative answer and not a generic model answer.",
+    "- If the student's answer is already excellent and there are no meaningful corrections, keep improvedVersion identical or nearly identical to the original. Do not force changes.",
     "- Keep the version close to the original structure when the structure works.",
     "- Make the writing genuinely better: improve accuracy, naturalness, cohesion, and task clarity while preserving content.",
-    "- Keep the version realistic for the student's likely A2-B2 level, but do not make it simpler than the original when the original idea/language is good.",
+    "- Keep the version realistic for the student's observed level; do not simplify a C1/C2-like answer into a lower-level model answer.",
     "- Do not remove specific details unless they are irrelevant, repetitive, or incorrect.",
     "- Add new ideas only when a required task point is missing or too vague.",
     "- Keep Part 1 improved emails 80-130 words where possible.",
     "- Keep Part 2 improved versions 100-160 words where possible.",
     "",
-    "Feedback style: clear, practical, encouraging, suitable for A2-B2 learners, specific to the answer. Avoid long grammar lectures, vague advice, official score claims, harsh wording, and generic repeated advice.",
+    "Overall feedback and priorities:",
+    "- mainPriorities may be an empty array when there are no meaningful priorities. Do not fill it with artificial advice.",
+    "- If the only issue is a tiny task-development point or a small overage within acceptable_over_range, say so proportionately and do not make it sound like a serious weakness.",
+    "- For excellent answers, the teacherNote should explicitly say that no significant language corrections are needed.",
+    "",
+    "Feedback style: clear, practical, encouraging, suitable for A2-C2 learners, specific to the answer. Avoid long grammar lectures, vague advice, official score claims, harsh wording, generic repeated advice, and unnecessary correction.",
+    "Keep all feedback fields concise. Use one short sentence for most feedback strings, and keep mistake explanations brief so the JSON response can complete cleanly.",
     "Return only valid JSON using the required schema.",
     "",
     "Submission:",
@@ -1782,16 +2472,17 @@ exports.generateOteWritingFeedback = functions
     }
 
     const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const creditTaskType = payload.mode === "single_task" ? "ote_single_task" : "ote_full_mock";
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
-      "ote_full_mock",
-      WRITING_FEEDBACK_CREDIT_COSTS.ote_full_mock
+      creditTaskType,
+      WRITING_FEEDBACK_CREDIT_COSTS[creditTaskType]
     );
     const requestBody = {
       model,
       input: buildOteWritingFeedbackPrompt(payload),
       reasoning: { effort: "low" },
-      max_output_tokens: payload.mode === "full_mock" ? 3600 : 2200,
+      max_output_tokens: payload.mode === "full_mock" ? 5200 : 3400,
       text: {
         verbosity: "medium",
         format: {
@@ -1839,21 +2530,7 @@ exports.generateOteWritingFeedback = functions
       throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
     }
 
-    if (Array.isArray(feedback?.tasks)) {
-      feedback.tasks = feedback.tasks.map((taskFeedback, index) => {
-        const originalTask = payload.tasks[index] || {};
-        return {
-          ...taskFeedback,
-          wordCount: originalTask.answer?.wordCount ?? taskFeedback.wordCount,
-          wordCountStatus: originalTask.answer?.wordCountStatus || taskFeedback.wordCountStatus,
-          wordCountFeedback: describeOteWordCount(
-            originalTask.taskType || taskFeedback.taskType,
-            originalTask.answer?.wordCountStatus || taskFeedback.wordCountStatus,
-            originalTask.answer?.wordCount ?? taskFeedback.wordCount
-          ),
-        };
-      });
-    }
+    feedback = postProcessOteWritingFeedback(payload, feedback);
 
     return {
       feedback,
@@ -2089,6 +2766,150 @@ exports.generateAptisSpeakingPart1Feedback = functions
       await refundWritingFeedbackCredits(context, creditReservation);
       throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
     }
+
+    return {
+      transcripts: items,
+      feedback,
+      meta: {
+        model,
+        transcriptionModel: "gpt-4o-mini-transcribe",
+        responseId: responseJson?.id || null,
+        usage: responseJson?.usage || null,
+        generatedAt: new Date().toISOString(),
+        quota: creditReservation,
+        audioStored: false,
+      },
+    };
+  });
+
+exports.generateAptisSpeakingPart2Feedback = functions
+  .region("europe-west1")
+  .runWith({ timeoutSeconds: 120, memory: "512MB" })
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Sign in before generating speaking feedback.");
+    }
+    if (!OPENAI_API_KEY) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Missing OPENAI_API_KEY in the Functions environment."
+      );
+    }
+
+    const task = normalizeSpeakingPart2Task(data);
+    const recordings = normalizeSpeakingAudioItems(data?.recordings);
+    if (
+      task.questions.length !== 3 ||
+      recordings.length !== 3 ||
+      task.questions.some((item) => !item.question) ||
+      recordings.some((item) => !item.base64)
+    ) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Aptis Speaking Part 2 feedback requires three questions and three recordings."
+      );
+    }
+
+    const totalBase64Bytes = recordings.reduce((sum, item) => sum + item.base64.length, 0);
+    if (totalBase64Bytes > 9_000_000) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "These recordings are too large for the trial feedback request."
+      );
+    }
+
+    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const creditReservation = await consumeWritingFeedbackCredits(
+      context,
+      "aptis_speaking_part2",
+      WRITING_FEEDBACK_CREDIT_COSTS.aptis_speaking_part2
+    );
+
+    let transcripts;
+    try {
+      transcripts = await Promise.all(recordings.map((item, index) => transcribeAudioItem(item, index)));
+    } catch (error) {
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw error;
+    }
+
+    const items = task.questions.map((question, index) => {
+      const transcript = cleanString(transcripts[index] || "", 2400);
+      return {
+        questionId: question.id,
+        questionNumber: question.questionNumber,
+        questionType: question.questionType,
+        question: question.question,
+        transcript,
+        durationSeconds: 45,
+        audioAvailable: true,
+        audioAnalysisAvailable: false,
+        transcriptionConfidence: "medium",
+        wordCount: countWords(transcript),
+      };
+    });
+
+    if (items.every((item) => item.wordCount < 2)) {
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "The recordings could not be transcribed clearly enough to assess."
+      );
+    }
+
+    const requestBody = {
+      model,
+      input: buildAptisSpeakingPart2Prompt(task, items),
+      reasoning: { effort: "low" },
+      max_output_tokens: 4600,
+      text: {
+        verbosity: "low",
+        format: {
+          type: "json_schema",
+          name: "aptis_speaking_part2_feedback",
+          strict: true,
+          schema: APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA,
+        },
+      },
+    };
+
+    let apiResponse;
+    try {
+      apiResponse = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+    } catch (error) {
+      console.error("[generateAptisSpeakingPart2Feedback] OpenAI request failed", error);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("unavailable", "Could not reach the feedback service.");
+    }
+
+    const responseJson = await apiResponse.json().catch(() => null);
+    if (!apiResponse.ok) {
+      console.error("[generateAptisSpeakingPart2Feedback] OpenAI error", responseJson);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "internal",
+        responseJson?.error?.message || "The feedback service returned an error."
+      );
+    }
+
+    const outputText = extractOutputText(responseJson);
+    let feedback;
+    try {
+      feedback = JSON.parse(outputText);
+    } catch (error) {
+      console.error("[generateAptisSpeakingPart2Feedback] JSON parse failed", { outputText, error });
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
+    }
+
+    feedback = postProcessAptisSpeakingPart2Feedback(feedback, items);
 
     return {
       transcripts: items,
