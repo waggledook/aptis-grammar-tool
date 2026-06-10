@@ -121,6 +121,38 @@ async function refundWritingFeedbackCredits(context, reservation) {
   });
 }
 
+async function logAiFeedbackGeneratedServer(context, kind, details = {}, resultMeta = {}) {
+  if (!context.auth?.uid) return;
+
+  const quota = resultMeta?.quota || {};
+  try {
+    await firestore.collection("activityLog").add({
+      userId: context.auth.uid,
+      userEmail: context.auth.token?.email || null,
+      type: "ai_feedback_generated",
+      details: {
+        kind,
+        product: details.product || "aptis",
+        section: details.section || "",
+        part: details.part || "",
+        mode: details.mode || "",
+        taskId: details.taskId || "",
+        taskTitle: details.taskTitle || details.title || "",
+        answerCount: details.answerCount ?? null,
+        wordCount: details.wordCount ?? null,
+        model: resultMeta.model || details.model || "",
+        feedbackTaskType: details.feedbackTaskType || quota.taskType || "",
+        creditCost: quota.creditCost ?? details.creditCost ?? null,
+        loggedBy: "functions",
+      },
+      app: details.app || "aptis-trainer",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+  } catch (error) {
+    console.error("[activityLog] Failed to log AI feedback activity", error);
+  }
+}
+
 const WRITING_FEEDBACK_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -3054,15 +3086,30 @@ exports.generateAptisWritingPart1Feedback = functions
       feedback.overall.lengthControl = "good";
     }
 
+    const meta = {
+      model,
+      responseId: responseJson?.id || null,
+      usage: responseJson?.usage || null,
+      generatedAt: new Date().toISOString(),
+      quota: creditReservation,
+    };
+    await logAiFeedbackGeneratedServer(
+      context,
+      "aptis_writing_part1",
+      {
+        product: "aptis",
+        section: "writing",
+        part: "part1",
+        answerCount: items.length,
+        wordCount: items.reduce((sum, item) => sum + Number(item.wordCount || 0), 0),
+        feedbackTaskType: "aptis_part1",
+      },
+      meta
+    );
+
     return {
       feedback,
-      meta: {
-        model,
-        responseId: responseJson?.id || null,
-        usage: responseJson?.usage || null,
-        generatedAt: new Date().toISOString(),
-        quota: creditReservation,
-      },
+      meta,
     };
   });
 
@@ -3453,15 +3500,32 @@ exports.generateAptisWritingPart23Feedback = functions
         .join(" ");
     }
 
+    const meta = {
+      model,
+      responseId: responseJson?.id || null,
+      usage: responseJson?.usage || null,
+      generatedAt: new Date().toISOString(),
+      quota: creditReservation,
+    };
+    await logAiFeedbackGeneratedServer(
+      context,
+      `aptis_writing_${payload.part || "part23"}`,
+      {
+        product: "aptis",
+        section: "writing",
+        part: payload.part || "",
+        taskId: payload.taskId || "",
+        taskTitle: payload.title || "",
+        answerCount: payload.answers.length,
+        wordCount: payload.answers.reduce((sum, answer) => sum + Number(answer.wordCount || 0), 0),
+        feedbackTaskType,
+      },
+      meta
+    );
+
     return {
       feedback,
-      meta: {
-        model,
-        responseId: responseJson?.id || null,
-        usage: responseJson?.usage || null,
-        generatedAt: new Date().toISOString(),
-        quota: creditReservation,
-      },
+      meta,
     };
   });
 
@@ -3563,15 +3627,32 @@ exports.generateAptisWritingPart4Feedback = functions
       );
     }
 
+    const meta = {
+      model,
+      responseId: responseJson?.id || null,
+      usage: responseJson?.usage || null,
+      generatedAt: new Date().toISOString(),
+      quota: creditReservation,
+    };
+    await logAiFeedbackGeneratedServer(
+      context,
+      "aptis_writing_part4",
+      {
+        product: "aptis",
+        section: "writing",
+        part: "part4",
+        taskId: payload.taskId || "",
+        taskTitle: payload.title || "",
+        answerCount: 2,
+        wordCount: Number(payload.friendEmail.wordCount || 0) + Number(payload.formalEmail.wordCount || 0),
+        feedbackTaskType: "aptis_part4",
+      },
+      meta
+    );
+
     return {
       feedback,
-      meta: {
-        model,
-        responseId: responseJson?.id || null,
-        usage: responseJson?.usage || null,
-        generatedAt: new Date().toISOString(),
-        quota: creditReservation,
-      },
+      meta,
     };
   });
 

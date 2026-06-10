@@ -251,12 +251,7 @@ export async function requestAptisWritingPart1Feedback(items) {
     items,
     model: "gpt-5.4-mini",
   });
-  await logAiFeedbackGenerated("aptis_writing_part1", {
-    product: "aptis",
-    section: "writing",
-    part: "part1",
-    answerCount: Array.isArray(items) ? items.length : null,
-  }, result.data);
+  // Aptis writing feedback is logged by the callable after successful generation.
   return result.data;
 }
 
@@ -269,17 +264,7 @@ export async function requestAptisWritingPart23Feedback(payload) {
     ...payload,
     model: "gpt-5.4-mini",
   });
-  await logAiFeedbackGenerated(`aptis_writing_${payload?.part || "part23"}`, {
-    product: "aptis",
-    section: "writing",
-    part: payload?.part || "",
-    taskId: payload?.taskId || "",
-    taskTitle: payload?.title || "",
-    answerCount: Array.isArray(payload?.answers) ? payload.answers.length : null,
-    wordCount: Array.isArray(payload?.answers)
-      ? payload.answers.reduce((sum, answer) => sum + Number(answer?.wordCount || 0), 0)
-      : null,
-  }, result.data);
+  // Aptis writing feedback is logged by the callable after successful generation.
   return result.data;
 }
 
@@ -292,15 +277,7 @@ export async function requestAptisWritingPart4Feedback(payload) {
     ...payload,
     model: "gpt-5.4-mini",
   });
-  await logAiFeedbackGenerated("aptis_writing_part4", {
-    product: "aptis",
-    section: "writing",
-    part: "part4",
-    taskId: payload?.taskId || "",
-    taskTitle: payload?.title || "",
-    answerCount: 2,
-    wordCount: Number(payload?.friendEmail?.wordCount || 0) + Number(payload?.formalEmail?.wordCount || 0),
-  }, result.data);
+  // Aptis writing feedback is logged by the callable after successful generation.
   return result.data;
 }
 
