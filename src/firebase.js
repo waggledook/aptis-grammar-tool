@@ -198,6 +198,50 @@ export async function requestOteWritingFeedback(payload) {
   return result.data;
 }
 
+export async function requestOteRegisterGapFeedback(payload) {
+  const generateOteRegisterGapFeedback = httpsCallable(functionsRegion, "generateOteRegisterGapFeedback");
+  const result = await generateOteRegisterGapFeedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  const gaps = Array.isArray(payload?.gaps) ? payload.gaps : [];
+  await logAiFeedbackGenerated("ote_register_gap", {
+    product: "ote",
+    section: "writing",
+    mode: "register_gap",
+    taskId: payload?.taskId || "",
+    taskTitle: payload?.title || "",
+    answerCount: gaps.length,
+    wordCount: gaps.reduce(
+      (sum, gap) => sum + String(gap?.studentAnswer || "").trim().split(/\s+/).filter(Boolean).length,
+      0
+    ),
+  }, result.data);
+  return result.data;
+}
+
+export async function requestOteRegisterRewriteFeedback(payload) {
+  const generateOteRegisterRewriteFeedback = httpsCallable(functionsRegion, "generateOteRegisterRewriteFeedback");
+  const result = await generateOteRegisterRewriteFeedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  const items = Array.isArray(payload?.items) ? payload.items : [];
+  await logAiFeedbackGenerated("ote_register_rewrite", {
+    product: "ote",
+    section: "writing",
+    mode: "register_rewrite",
+    taskId: payload?.taskId || "",
+    taskTitle: payload?.title || "",
+    answerCount: items.length,
+    wordCount: items.reduce(
+      (sum, item) => sum + String(item?.studentAnswer || "").trim().split(/\s+/).filter(Boolean).length,
+      0
+    ),
+  }, result.data);
+  return result.data;
+}
+
 export async function requestAptisWritingPart1Feedback(items) {
   const generateAptisWritingPart1Feedback = httpsCallable(
     functionsRegion,

@@ -13,9 +13,33 @@ const TRAINING_SECTIONS = {
     description:
       "Build the skills for OTE email responses: read the input carefully, cover all three notes, choose the right tone, and write inside the word limit.",
     activities: [
-      ["Activity 1", "How Email Tasks Work", "Understand the input email, notes, timing, and word-count expectations.", ClipboardList],
-      ["Activity 2", "Tone and Purpose", "Compare friendly and neutral emails, then choose phrasing that fits the recipient.", Lightbulb],
-      ["Activity 3", "Guided Email Builder", "Plan the three content points and turn them into a clear exam-ready reply.", PenLine],
+      {
+        label: "Activity 1",
+        title: "How Email Tasks Work",
+        copy: "Understand the input email, notes, timing, and word-count expectations.",
+        icon: ClipboardList,
+        route: "guide",
+      },
+      {
+        label: "Activity 2",
+        title: "Register Basics",
+        copy: "Decide whether sentences are formal or informal, then rewrite them in the opposite register.",
+        icon: Lightbulb,
+        route: "register-basics",
+      },
+      {
+        label: "Activity 3",
+        title: "Register Gap Trainer",
+        copy: "Complete parallel formal and informal emails with equivalent meaning in different registers.",
+        icon: PenLine,
+        route: "register-gaps",
+      },
+      {
+        label: "Activity 4",
+        title: "Guided Email Builder",
+        copy: "Plan the three content points and turn them into a clear exam-ready reply.",
+        icon: PenLine,
+      },
     ],
     practiceTitle: "Timed Email Sets",
     practiceCopy: "Choose an individual email task, then write one timed Part 1 response in the native OTE layout.",
@@ -57,6 +81,7 @@ export default function OteWritingTrainingMenu({ nativeRoutes = false }) {
   const practiceMenuPath = getSitePath(
     nativeRoutes ? `/writing/training/${practiceGroup.id}/practice` : `/ote/writing/training/${practiceGroup.id}/practice`
   );
+  const trainingBasePath = nativeRoutes ? `/writing/training/${practiceGroup.id}` : `/ote/writing/training/${practiceGroup.id}`;
 
   return (
     <main className="ote-training-page">
@@ -77,14 +102,27 @@ export default function OteWritingTrainingMenu({ nativeRoutes = false }) {
       </header>
 
       <div className="ote-training-activity-grid" aria-label={`${config.title} activities`}>
-        {config.activities.map(([label, title, copy, Icon]) => (
-          <button key={title} className="ote-training-activity-card" type="button" disabled>
-            <Icon size={28} aria-hidden="true" />
-            <span>{label}</span>
-            <h2>{title}</h2>
-            <p>{copy}</p>
-          </button>
-        ))}
+        {config.activities.map((activity) => {
+          const normalized = Array.isArray(activity)
+            ? { label: activity[0], title: activity[1], copy: activity[2], icon: activity[3] }
+            : activity;
+          const Icon = normalized.icon;
+          const route = nativeRoutes ? normalized.route : "";
+          return (
+            <button
+              key={normalized.title}
+              className="ote-training-activity-card"
+              type="button"
+              disabled={!route}
+              onClick={route ? () => navigate(getSitePath(`${trainingBasePath}/${route}`)) : undefined}
+            >
+              <Icon size={28} aria-hidden="true" />
+              <span>{normalized.label}</span>
+              <h2>{normalized.title}</h2>
+              <p>{normalized.copy}</p>
+            </button>
+          );
+        })}
       </div>
 
       <section className="ote-training-section">

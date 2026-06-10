@@ -160,6 +160,9 @@ import OteWritingMockRunner from "./products/ote/OteWritingMockRunner.jsx";
 import OteWritingTrainingMenu from "./products/ote/OteWritingTrainingMenu.jsx";
 import OteWritingPracticeMenu from "./products/ote/OteWritingPracticeMenu.jsx";
 import OteWritingPracticeRunner from "./products/ote/OteWritingPracticeRunner.jsx";
+import OteWritingEmailGuide from "./products/ote/OteWritingEmailGuide.jsx";
+import OteWritingRegisterBasics from "./products/ote/OteWritingRegisterBasics.jsx";
+import OteWritingRegisterGapTrainer from "./products/ote/OteWritingRegisterGapTrainer.jsx";
 import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 function BellIcon() {
@@ -1153,6 +1156,15 @@ return (
     <>
       <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
       <Route path="/writing/training/:section" element={<OteWritingTrainingMenu nativeRoutes />} />
+      <Route path="/writing/training/email/guide" element={<OteWritingEmailGuide nativeRoutes />} />
+      <Route
+        path="/writing/training/email/register-basics"
+        element={<OteWritingRegisterBasics user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />}
+      />
+      <Route
+        path="/writing/training/email/register-gaps"
+        element={<OteWritingRegisterGapTrainer user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />}
+      />
       <Route path="/writing/training/:section/practice" element={<OteWritingPracticeMenu nativeRoutes />} />
       <Route
         path="/writing/training/:section/practice/:setId"

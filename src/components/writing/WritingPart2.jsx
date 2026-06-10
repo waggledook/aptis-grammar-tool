@@ -602,6 +602,7 @@ function AptisWritingPart23Feedback({ feedback, status, error }) {
             <p><span>Vocabulary:</span> {item.vocabulary}</p>
             <p><span>Punctuation/spelling:</span> {item.punctuationSpelling}</p>
             <p><span>Cohesion:</span> {item.cohesion}</p>
+            <LanguageFixes items={item.languageErrors} />
             <div className="ai-p23-improved">
               <strong>Improved version</strong>
               <p>{item.improvedVersion}</p>
@@ -620,6 +621,24 @@ function AptisWritingPart23Feedback({ feedback, status, error }) {
       ) : null}
       <blockquote>{feedback.teacherComment}</blockquote>
     </section>
+  );
+}
+
+function LanguageFixes({ items }) {
+  if (!Array.isArray(items) || !items.length) return null;
+  return (
+    <div className="ai-p23-language-fixes">
+      <h5>Mistakes to fix</h5>
+      <ul>
+        {items.map((item, index) => (
+          <li key={`${item.category}-${item.original}-${index}`}>
+            <small className={item.category}>{String(item.category || "").replace(/_/g, " ")}</small>
+            <p><span>{item.original}</span> → <strong>{item.correction}</strong></p>
+            {item.explanation ? <em>{item.explanation}</em> : null}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
@@ -1014,6 +1033,92 @@ function StyleScope() {
       .aptis-writing-p2 .ai-p23-list p { margin:.3rem 0; color:#d8e7ff; }
       .aptis-writing-p2 .ai-p23-list span { color:#cfe1ff; font-weight:700; }
       .aptis-writing-p2 .ai-p23-improved { margin-top:.55rem; }
+      .aptis-writing-p2 .ai-p23-language-fixes {
+        margin:.75rem 0;
+        background:#111f38;
+        border:1px solid #315184;
+        border-left:3px solid #f59e0b;
+        border-radius:10px;
+        padding:.75rem;
+      }
+      .aptis-writing-p2 .ai-p23-language-fixes h5 {
+        margin:0 0 .55rem;
+        color:#f8fbff;
+        font-size:1rem;
+      }
+      .aptis-writing-p2 .ai-p23-language-fixes ul {
+        display:grid;
+        gap:.55rem;
+        margin:0;
+        padding:0;
+      }
+      .aptis-writing-p2 .ai-p23-language-fixes li {
+        list-style:none;
+        background:#0f1b31;
+        border:1px solid #27436f;
+        border-radius:8px;
+        padding:.65rem;
+      }
+      .aptis-writing-p2 .ai-p23-language-fixes small {
+        display:inline-block;
+        margin-bottom:.25rem;
+        padding:.12rem .45rem;
+        border-radius:999px;
+        font-size:.78rem;
+        font-weight:800;
+        text-transform:capitalize;
+      }
+      .aptis-writing-p2 .ai-p23-language-fixes small.grammar,
+      .aptis-writing-p2 .ai-p23-language-fixes small.spelling,
+      .aptis-writing-p2 .ai-p23-language-fixes small.punctuation {
+        color:#fecaca;
+        background:rgba(185,28,28,.18);
+        border:1px solid rgba(248,113,113,.24);
+      }
+      .aptis-writing-p2 .ai-p23-language-fixes small.vocabulary {
+        color:#bbf7d0;
+        background:rgba(4,120,87,.18);
+        border:1px solid rgba(52,211,153,.24);
+      }
+      .aptis-writing-p2 .ai-p23-language-fixes small.word_order,
+      .aptis-writing-p2 .ai-p23-language-fixes small.missing_word,
+      .aptis-writing-p2 .ai-p23-language-fixes small.cohesion {
+        color:#bfdbfe;
+        background:rgba(29,78,216,.2);
+        border:1px solid rgba(96,165,250,.25);
+      }
+      .aptis-writing-p2 .ai-p23-language-fixes p {
+        margin:.25rem 0 .2rem;
+        color:#e6f0ff;
+      }
+      .aptis-writing-p2 .ai-p23-language-fixes span { color:#fca5a5; font-weight:600; }
+      .aptis-writing-p2 .ai-p23-language-fixes strong { color:#86efac; }
+      .aptis-writing-p2 .ai-p23-language-fixes em { display:block; color:#a9b7d1; }
+      :root[data-theme="light"] .aptis-writing-p2 .ai-p23-language-fixes {
+        background:#f4f8ff !important;
+        border-color:#bfd3ee !important;
+        border-left-color:#f59e0b !important;
+        color:#172033 !important;
+      }
+      :root[data-theme="light"] .aptis-writing-p2 .ai-p23-language-fixes h5 {
+        color:#172033 !important;
+      }
+      :root[data-theme="light"] .aptis-writing-p2 .ai-p23-language-fixes li {
+        background:#ffffff !important;
+        border-color:#d9e5f3 !important;
+      }
+      :root[data-theme="light"] .aptis-writing-p2 .ai-p23-language-fixes p {
+        color:#172033 !important;
+      }
+      :root[data-theme="light"] .aptis-writing-p2 .ai-p23-language-fixes span {
+        color:#b42318 !important;
+      }
+      :root[data-theme="light"] .aptis-writing-p2 .ai-p23-language-fixes strong {
+        color:#067647 !important;
+      }
+      :root[data-theme="light"] .aptis-writing-p2 .ai-p23-language-fixes em {
+        color:#536171 !important;
+      }
       .aptis-writing-p2 .ai-p23-advice { margin-top:.75rem; }
       .aptis-writing-p2 .ai-p23-advice ul { margin:.4rem 0 0; padding-left:1.2rem; }
       .aptis-writing-p2 .ai-p23-feedback blockquote {

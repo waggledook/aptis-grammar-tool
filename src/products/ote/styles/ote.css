@@ -2702,6 +2702,530 @@
   min-height: 174px;
 }
 
+.ote-register-gap-page .ote-training-hero {
+  margin-bottom: 1.2rem;
+}
+
+.ote-register-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  width: 100%;
+  max-width: 1060px;
+  box-sizing: border-box;
+  margin: 0 auto 1rem;
+}
+
+.ote-register-tabs button {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.7rem 1rem;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.ote-register-tabs button:hover,
+.ote-register-tabs button:focus-visible,
+.ote-register-tabs button.is-active {
+  outline: none;
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 14%, var(--color-surface));
+}
+
+.ote-register-gap-shell {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  max-width: 1060px;
+  box-sizing: border-box;
+  margin: 0 auto;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  padding: 1rem;
+  box-shadow: 0 18px 44px rgba(6, 31, 67, 0.12);
+}
+
+.ote-register-lesson-section {
+  display: grid;
+  gap: 1rem;
+  width: 100%;
+  max-width: 1060px;
+  box-sizing: border-box;
+  margin: 0 auto 1.15rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  padding: 1rem;
+  box-shadow: 0 18px 44px rgba(6, 31, 67, 0.1);
+}
+
+.ote-register-lesson-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.9rem;
+}
+
+.ote-register-lesson-head h2 {
+  margin: 0.15rem 0 0.35rem;
+  color: var(--color-text);
+  font-size: 1.45rem;
+  text-align: left;
+}
+
+.ote-register-lesson-head p {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-register-identification-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ote-register-id-card,
+.ote-register-rewrite-card {
+  display: grid;
+  gap: 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 0.9rem;
+}
+
+.ote-register-id-card.is-correct {
+  border-color: color-mix(in srgb, #188a4d 62%, var(--color-border));
+}
+
+.ote-register-id-card.is-wrong {
+  border-color: color-mix(in srgb, #b88312 70%, var(--color-border));
+}
+
+.ote-register-id-card > span,
+.ote-register-rewrite-top span {
+  color: var(--color-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-register-id-card > p,
+.ote-register-prompt {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.45;
+}
+
+.ote-register-choice-row,
+.ote-register-rewrite-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ote-register-choice-row button,
+.ote-register-rewrite-actions button {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.55rem 0.8rem;
+  font: inherit;
+  font-weight: 900;
+  text-transform: capitalize;
+  cursor: pointer;
+}
+
+.ote-register-choice-row button:hover,
+.ote-register-choice-row button:focus-visible,
+.ote-register-choice-row button.is-selected,
+.ote-register-rewrite-actions button:hover,
+.ote-register-rewrite-actions button:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  background: color-mix(in srgb, var(--color-accent) 12%, var(--color-surface));
+}
+
+.ote-register-card-feedback {
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.65rem;
+}
+
+.ote-register-card-feedback strong {
+  color: var(--color-text);
+}
+
+.ote-register-card-feedback p {
+  margin: 0.3rem 0 0;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-register-card-feedback b,
+.ote-register-prompt b {
+  color: var(--color-text);
+}
+
+.ote-register-rewrite-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.ote-register-rewrite-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.ote-register-rewrite-top strong {
+  color: var(--color-text-soft);
+}
+
+.ote-register-rewrite-card label {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.ote-register-rewrite-card label > span {
+  color: var(--color-text);
+  font-weight: 900;
+  text-transform: capitalize;
+}
+
+.ote-register-rewrite-card textarea {
+  width: 100%;
+  min-height: 82px;
+  resize: vertical;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.75rem;
+  font: inherit;
+  line-height: 1.45;
+}
+
+.ote-register-rewrite-card textarea:focus {
+  outline: 3px solid color-mix(in srgb, var(--color-accent) 24%, transparent);
+  border-color: var(--color-accent);
+}
+
+.ote-register-gap-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: start;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.9rem;
+}
+
+.ote-register-gap-head h2 {
+  margin: 0.15rem 0 0.35rem;
+  color: var(--color-text);
+  font-size: 1.5rem;
+  text-align: left;
+}
+
+.ote-register-gap-head p {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-register-score {
+  display: grid;
+  place-items: center;
+  min-width: 90px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 0.65rem;
+  color: var(--color-text);
+}
+
+.ote-register-score strong {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+
+.ote-register-score span {
+  color: var(--color-text-soft);
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-register-email-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.ote-register-email-panel {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  min-width: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  overflow: hidden;
+}
+
+.ote-register-email-title {
+  border-bottom: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 82%, var(--color-accent));
+  padding: 0.85rem 1rem;
+}
+
+.ote-register-email-title span {
+  display: block;
+  color: var(--color-text-soft);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-register-email-title h3 {
+  margin: 0.15rem 0 0;
+  color: var(--color-text);
+  font-size: 1.15rem;
+  text-align: left;
+}
+
+.ote-register-email-body {
+  padding: 1rem;
+  color: var(--color-text);
+  font-size: 0.98rem;
+  line-height: 1.52;
+}
+
+.ote-register-email-body p {
+  margin: 0 0 0.95rem;
+}
+
+.ote-gap-example {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 35%, var(--color-border));
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.1rem 0.45rem;
+  font-weight: 900;
+}
+
+.ote-gap-wrap {
+  display: inline-grid;
+  grid-template-columns: auto minmax(5.25rem, min(var(--gap-width), 10rem));
+  gap: 0.25rem;
+  align-items: center;
+  vertical-align: middle;
+  margin: 0.12rem 0.15rem;
+}
+
+.ote-gap-number {
+  color: var(--color-text-soft);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.ote-gap-wrap input {
+  width: 100%;
+  min-width: 0;
+  min-height: 2rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.25rem 0.45rem;
+  font: inherit;
+  font-weight: 800;
+}
+
+.ote-gap-wrap input:focus {
+  outline: 3px solid color-mix(in srgb, var(--color-accent) 28%, transparent);
+  border-color: var(--color-accent);
+}
+
+.ote-gap-wrap.is-correct input {
+  border-color: #188a4d;
+  background: color-mix(in srgb, #1f9d5a 14%, var(--color-surface));
+}
+
+.ote-gap-wrap.is-wrong input {
+  border-color: #bf4040;
+  background: color-mix(in srgb, #d94848 12%, var(--color-surface));
+}
+
+.ote-gap-key {
+  grid-column: 1 / -1;
+  color: var(--color-text-soft);
+  font-size: 0.76rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.ote-register-actions {
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.9rem;
+}
+
+.ote-register-feedback {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.ote-register-feedback article {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 0.75rem;
+}
+
+.ote-register-feedback article.is-correct {
+  border-color: color-mix(in srgb, #188a4d 60%, var(--color-border));
+}
+
+.ote-register-feedback article.is-wrong {
+  border-color: color-mix(in srgb, #bf4040 60%, var(--color-border));
+}
+
+.ote-register-feedback strong {
+  display: block;
+  color: var(--color-text);
+  margin-bottom: 0.3rem;
+}
+
+.ote-register-feedback p {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-register-ai-feedback {
+  display: grid;
+  gap: 0.85rem;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-register-ai-feedback.is-loading,
+.ote-register-ai-feedback.is-error {
+  color: var(--color-text);
+}
+
+.ote-register-ai-feedback.is-error {
+  border-color: #bf4040;
+}
+
+.ote-register-ai-feedback.is-error p,
+.ote-register-ai-feedback.is-loading p {
+  margin: 0;
+  color: var(--color-text-soft);
+}
+
+.ote-register-ai-head {
+  display: grid;
+  grid-template-columns: minmax(180px, 0.7fr) minmax(0, 1.3fr);
+  gap: 1rem;
+  align-items: start;
+  border-bottom: 1px solid var(--color-border);
+  padding-bottom: 0.8rem;
+}
+
+.ote-register-ai-head h3 {
+  margin: 0.15rem 0 0;
+  color: var(--color-text);
+  font-size: 1.2rem;
+  text-transform: capitalize;
+}
+
+.ote-register-ai-head p {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-register-ai-gap-list {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+.ote-register-ai-gap-list article {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  padding: 0.8rem;
+}
+
+.ote-register-ai-gap-list article.is-excellent,
+.ote-register-ai-gap-list article.is-acceptable {
+  border-color: color-mix(in srgb, #188a4d 62%, var(--color-border));
+}
+
+.ote-register-ai-gap-list article.is-partly_appropriate {
+  border-color: color-mix(in srgb, #b88312 70%, var(--color-border));
+}
+
+.ote-register-ai-gap-list article.is-not_appropriate,
+.ote-register-ai-gap-list article.is-blank {
+  border-color: color-mix(in srgb, #bf4040 62%, var(--color-border));
+}
+
+.ote-register-ai-gap-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.ote-register-ai-gap-top strong {
+  color: var(--color-text);
+}
+
+.ote-register-ai-gap-top span {
+  border-radius: 999px;
+  background: var(--color-surface-2);
+  color: var(--color-text-soft);
+  padding: 0.18rem 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.ote-register-ai-gap-list p,
+.ote-register-ai-advice {
+  margin: 0.35rem 0 0;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-register-ai-gap-list b {
+  color: var(--color-text);
+}
+
+.ote-register-ai-advice {
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.75rem;
+}
+
 .ote-writing-mock-select-card {
   position: relative;
   display: grid;
@@ -3981,7 +4505,12 @@
   .ote-writing-mock-list,
   .ote-writing-practice-layout,
   .ote-writing-practice-review,
-  .ote-writing-register-grid {
+  .ote-writing-register-grid,
+  .ote-register-identification-grid,
+  .ote-register-email-grid,
+  .ote-register-feedback,
+  .ote-register-ai-head,
+  .ote-register-ai-gap-list {
     grid-template-columns: 1fr;
   }
 
@@ -4093,7 +4622,9 @@
   }
 
   .ote-training-quiz-header,
-  .ote-training-complete {
+  .ote-training-complete,
+  .ote-register-lesson-head,
+  .ote-register-gap-head {
     align-items: stretch;
     flex-direction: column;
   }
@@ -4130,6 +4661,25 @@
     top: auto;
     right: 0.75rem;
     bottom: 0.75rem;
+  }
+
+  .ote-register-gap-shell,
+  .ote-register-lesson-section,
+  .ote-register-tabs {
+    width: 100%;
+  }
+
+  .ote-register-gap-shell {
+    padding: 0.75rem;
+  }
+
+  .ote-register-email-body {
+    padding: 0.85rem;
+    font-size: 0.96rem;
+  }
+
+  .ote-gap-wrap {
+    grid-template-columns: auto minmax(0, min(var(--gap-width), 58vw));
   }
 
   .ote-reference-toolbar,

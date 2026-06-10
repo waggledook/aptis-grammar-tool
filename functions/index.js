@@ -29,6 +29,8 @@ const WRITING_FEEDBACK_CREDIT_COSTS = {
   aptis_speaking_part2: 3,
   ote_full_mock: 8,
   ote_single_task: 4,
+  ote_register_gap: 1,
+  ote_register_rewrite: 1,
 };
 
 // Gmail requires the "from" to be the authenticated user (or an alias on that account)
@@ -657,6 +659,7 @@ const APTIS_WRITING_PART23_FEEDBACK_SCHEMA = {
           "vocabulary",
           "punctuationSpelling",
           "cohesion",
+          "languageErrors",
           "improvedVersion",
         ],
         properties: {
@@ -679,6 +682,23 @@ const APTIS_WRITING_PART23_FEEDBACK_SCHEMA = {
           vocabulary: { type: "string" },
           punctuationSpelling: { type: "string" },
           cohesion: { type: "string" },
+          languageErrors: {
+            type: "array",
+            items: {
+              type: "object",
+              additionalProperties: false,
+              required: ["category", "original", "correction", "explanation"],
+              properties: {
+                category: {
+                  type: "string",
+                  enum: ["grammar", "vocabulary", "word_order", "missing_word", "spelling", "punctuation", "cohesion"],
+                },
+                original: { type: "string" },
+                correction: { type: "string" },
+                explanation: { type: "string" },
+              },
+            },
+          },
           improvedVersion: { type: "string" },
         },
       },
@@ -1220,6 +1240,114 @@ const OTE_WRITING_FEEDBACK_SCHEMA = {
   },
 };
 
+const OTE_REGISTER_GAP_FEEDBACK_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["overall", "gaps", "teacherComment"],
+  properties: {
+    overall: {
+      type: "object",
+      additionalProperties: false,
+      required: ["summary", "registerControl", "mainAdvice"],
+      properties: {
+        summary: { type: "string" },
+        registerControl: {
+          type: "string",
+          enum: ["strong", "mostly_good", "mixed", "needs_work", "too_incomplete"],
+        },
+        mainAdvice: { type: "string" },
+      },
+    },
+    gaps: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "number",
+          "studentAnswer",
+          "verdict",
+          "meaning",
+          "syntax",
+          "lexis",
+          "register",
+          "betterAnswer",
+          "explanation",
+        ],
+        properties: {
+          number: { type: "string" },
+          studentAnswer: { type: "string" },
+          verdict: {
+            type: "string",
+            enum: ["excellent", "acceptable", "partly_appropriate", "not_appropriate", "blank"],
+          },
+          meaning: { type: "string" },
+          syntax: { type: "string" },
+          lexis: { type: "string" },
+          register: { type: "string" },
+          betterAnswer: { type: "string" },
+          explanation: { type: "string" },
+        },
+      },
+    },
+    teacherComment: { type: "string" },
+  },
+};
+
+const OTE_REGISTER_REWRITE_FEEDBACK_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["overall", "items", "teacherComment"],
+  properties: {
+    overall: {
+      type: "object",
+      additionalProperties: false,
+      required: ["summary", "registerControl", "mainAdvice"],
+      properties: {
+        summary: { type: "string" },
+        registerControl: {
+          type: "string",
+          enum: ["strong", "mostly_good", "mixed", "needs_work", "too_incomplete"],
+        },
+        mainAdvice: { type: "string" },
+      },
+    },
+    items: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "id",
+          "studentAnswer",
+          "verdict",
+          "meaning",
+          "syntax",
+          "lexis",
+          "register",
+          "suggestedRewrite",
+          "explanation",
+        ],
+        properties: {
+          id: { type: "string" },
+          studentAnswer: { type: "string" },
+          verdict: {
+            type: "string",
+            enum: ["excellent", "acceptable", "partly_appropriate", "not_appropriate", "blank"],
+          },
+          meaning: { type: "string" },
+          syntax: { type: "string" },
+          lexis: { type: "string" },
+          register: { type: "string" },
+          suggestedRewrite: { type: "string" },
+          explanation: { type: "string" },
+        },
+      },
+    },
+    teacherComment: { type: "string" },
+  },
+};
+
 function cleanString(value, max = 6000) {
   return String(value || "").replace(/\s+\n/g, "\n").trim().slice(0, max);
 }
@@ -1401,32 +1529,32 @@ function buildAptisWritingPart1Prompt(items) {
   return [
     "You are an English exam writing feedback assistant for Aptis Writing Part 1.",
     "",
-    "Aptis Writing Part 1 requires five very short answers to personal questions. Students should normally write 1-5 words. The goal is clear communication, not complex grammar. Longer answers do not receive extra credit and often create unnecessary errors.",
+    "Aptis Writing Part 1 requires five very short answers to personal questions. Students should normally write 1-5 words. The goal is clear communication, not complex grammar. Longer answers do not receive extra credit, but a clear six- or seven-word answer is not a language mistake simply because it is slightly over the recommended range.",
     "",
     "Official guidance: for Part 1, focus on communicative competence. Do not over-penalise spelling, capitalisation or grammar if the meaning is clear. However, you may mention mistakes as learning feedback.",
     "",
-    "Your feedback should be short, encouraging, practical, suitable for A1-B1 learners, and focused on direct answers and short natural phrasing.",
+    "Your feedback should be short, encouraging, practical, suitable for A1-B1 learners, and focused on direct answers, clear meaning, and accurate phrasing.",
     "",
     "For each answer:",
     "1. Check whether it answers the question.",
     "2. Check whether the meaning is clear.",
     "3. Check whether it is 1-5 words.",
     "4. Highlight important mistakes, especially if they affect meaning.",
-    "5. Suggest the shortest natural answer.",
+    "5. Suggest an improved answer only if the original has a real language issue, is unclear/off task, or is clearly longer than Part 1 needs.",
     "",
     "Priorities:",
     "- Relevance and communication are the most important criteria.",
-    "- If an answer is longer than necessary, suggest a shorter natural version.",
+    "- If an answer is longer than necessary, you may suggest a shorter possible version, but frame this as an optional exam-management suggestion, not a mistake to fix.",
     "- Do not mention answers being too long in the overall summary unless at least one answer is more than 5 words.",
     "- If all answers are 1-5 words, say the length is good or short enough, even when the answers are irrelevant.",
     "- Keep relevance/communication problems separate from length problems.",
-    "- Do not encourage full-sentence answers unless they are the shortest natural option.",
+    "- Do not mark a grammatical full-sentence answer as wrong just because a shorter noun phrase is possible.",
     "- Highlight obvious grammar, spelling, vocabulary, or preposition mistakes as learning feedback, not official score loss.",
-    "- Prefer noun phrases, short verb phrases, or single-word answers.",
+    "- Prefer noun phrases, short verb phrases, or single-word answers as optional models, while accepting correct fuller answers when they communicate clearly.",
     "",
     `Length facts: ${tooLongCount} answer(s) are over 5 words. ${tooShortCount} answer(s) are blank or under 1 word.`,
     "",
-    "Avoid long explanations, advanced grammar terminology, official scores, complex full-sentence rewrites, and saying students get extra points for longer answers.",
+    "Avoid long explanations, advanced grammar terminology, official scores, complex full-sentence rewrites, and saying students get extra points for longer answers. Also avoid treating length advice as correction unless the answer is excessive, unclear, or error-prone.",
     "Return only valid JSON using the required schema.",
     "",
     "Student items:",
@@ -1866,24 +1994,29 @@ function buildAptisWritingPart23Prompt(payload) {
     "Do not describe an answer as too long simply because it is slightly over the recommended range.",
     "For acceptable_over_range, use a neutral tone: it is above the recommended range but still within a practical exam range.",
     "Do not include priority advice about reducing length for acceptable_over_range unless the answer is repetitive, unfocused, unclear, risky, or creates avoidable errors.",
-    "Only suggest shortening when it improves clarity, focus, naturalness, or accuracy. Do not suggest shortening just to fit the recommended range.",
+    "Only suggest shortening when it improves clarity, focus, naturalness, accuracy, or exam control. Do not suggest shortening just to fit the recommended range, and do not replace ambitious accurate wording with a simpler phrase merely because it is simpler.",
     "",
     "Feedback behaviour:",
     "- Check task fulfilment first. Missing content from the prompt must be front and centre in the summary and priority advice.",
     "- For Part 2, explicitly check whether the answer covers every part of the prompt. If the prompt asks why the student joined, and the answer does not say why, make that the main task-fulfilment point.",
     "- For Part 3, judge each reply separately against its own chat message.",
     "- Identify important grammar errors with short correction examples.",
+    "- Include a languageErrors array for each answer with the clearest mistakes to fix. For Part 2 include 2-5 items when clear errors are present. For each Part 3 answer include 1-4 items when clear errors are present.",
+    "- languageErrors should be genuinely useful corrections: grammar, vocabulary, word order, missing words, spelling, punctuation, or cohesion. Use exact student wording in original where possible.",
+    "- Do not put preference-only rewrites in languageErrors. A correction must fix a real problem, not merely make accurate ambitious writing shorter, simpler, safer, or more basic.",
+    "- If the student uses ambitious or advanced language accurately, praise it and preserve it. Only correct ambitious language when it is genuinely inaccurate, unclear, unnatural, or inappropriate for the task.",
+    "- If there are no clear mistakes in an answer, return an empty languageErrors array for that answer.",
     "- Praise strong natural vocabulary such as 'I'm particularly keen on', 'I'm really into', or other good B1/B2 phrases when used accurately.",
-    "- Do not discourage strong accurate vocabulary by suggesting simpler alternatives unless the original wording is unnatural, inaccurate, too formal for the task, or unclear.",
+    "- Reward ambitious, accurate language. Do not discourage strong accurate vocabulary or more complex phrasing by suggesting simpler alternatives unless the original wording is genuinely unnatural, inaccurate, too formal/informal for the task, unclear, or causing errors.",
     "- Mention punctuation/spelling errors only when useful.",
     "- Sentence-initial 'But' is acceptable in this informal short-answer style. Do not criticise it unless it genuinely makes the meaning unclear or repetitive.",
     "- Encourage simple cohesive devices where useful: because, also, but, so, for example. Do not force extra linkers into a clear answer.",
-    "- Provide an improved version that preserves the student's meaning and stays realistic for A2-B1.",
+    "- Provide an improved version that preserves the student's meaning, ambition, and strongest accurate language. Improve accuracy and clarity; do not simplify a good answer into a lower-level model.",
     "- Give 1-3 specific priority advice points.",
     "- Keep each feedback field concise. For Part 3, each improvedVersion should usually be one short natural reply, not a long rewrite.",
     "",
     "Tone: friendly, concise, encouraging, suitable for A2-B1 learners.",
-    "Avoid harsh wording, long grammar lectures, official scores, and rewarding unnecessary complexity.",
+    "Avoid harsh wording, long grammar lectures, official scores, and unnecessary complexity for its own sake. Ambitious language should be rewarded when it is accurate and task-appropriate, even in earlier parts.",
     "Return only valid JSON using the required schema.",
     "",
     "Submission:",
@@ -2009,11 +2142,11 @@ function buildAptisWritingPart4Prompt(payload) {
     "",
     "Improved versions:",
     "- Preserve the student's meaning where possible.",
-    "- Preserve the student's strongest accurate language. Do not downgrade sophisticated formal language to simpler B1 wording.",
+    "- Preserve the student's strongest accurate language. Do not downgrade sophisticated, ambitious, or formal language to simpler B1 wording when it works.",
     "- Correct register problems.",
     "- Make the informal email genuinely informal and the formal email genuinely formal.",
     "- Add task-specific content only if the original is too generic or misses a required point. If the student's content is already specific and complete, do not add new ideas just to make a model answer.",
-    "- Keep language realistic for the student's apparent level; do not create a perfect C2 template.",
+    "- Keep language realistic for the student's apparent level, but allow the improved version to preserve ambition and range. Do not create a perfect C2 template, and do not flatten a strong answer into basic English.",
     "- The improved formal email must respond to the specific source and formal prompt, not a generic template.",
     "- For strong answers, make minimal edits: correct errors, improve precision, and keep the student's style. Do not rewrite the whole email into a safer but less advanced version.",
     "",
@@ -2356,6 +2489,115 @@ function buildOteWritingFeedbackPrompt(payload) {
   ].join("\n");
 }
 
+function normalizeOteRegisterGapPayload(data) {
+  const gaps = Array.isArray(data?.gaps) ? data.gaps : [];
+  return {
+    exam: "ote",
+    taskId: cleanString(data?.taskId || "", 80),
+    title: cleanString(data?.title || "", 160),
+    direction: cleanString(data?.direction || "", 80),
+    targetRegister: cleanString(data?.targetRegister || "", 60),
+    sourceRegister: cleanString(data?.sourceRegister || "", 60),
+    instructions: cleanString(data?.instructions || "", 500),
+    gaps: gaps.slice(0, 8).map((gap) => ({
+      number: cleanString(gap?.number || "", 10),
+      studentAnswer: cleanString(gap?.studentAnswer || "", 120),
+      sentenceBefore: cleanString(gap?.sentenceBefore || "", 500),
+      sentenceAfter: cleanString(gap?.sentenceAfter || "", 500),
+      sourceMeaning: cleanString(gap?.sourceMeaning || "", 500),
+      idiomNote: cleanString(gap?.idiomNote || "", 500),
+      acceptedAnswers: Array.isArray(gap?.acceptedAnswers)
+        ? gap.acceptedAnswers.slice(0, 8).map((answer) => cleanString(answer, 80)).filter(Boolean)
+        : [],
+    })),
+  };
+}
+
+function buildOteRegisterGapFeedbackPrompt(payload) {
+  return [
+    "You are an expert English exam writing teacher for Oxford Test of English email tasks.",
+    "Assess short gap-fill answers in a register transformation activity.",
+    "The student is completing a parallel email so it keeps the same meaning in a different register.",
+    "",
+    "Judge each answer in four ways:",
+    "- Meaning: does it preserve the intended idea?",
+    "- Syntax: does it fit grammatically into the exact sentence frame?",
+    "- Lexis: is the word or phrase natural and precise?",
+    "- Register: is it appropriate for the target register? This is the most important criterion.",
+    "",
+    "Use the acceptedAnswers only as examples, not as the full list of possible correct answers.",
+    "Accept creative alternatives if they fit the sentence, meaning, and target register.",
+    "Follow any idiomNote exactly when judging naturalness. Do not recommend a phrase that the idiomNote says is unnatural.",
+    "If an answer is blank, mark verdict as blank and suggest a suitable answer.",
+    "If an answer is understandable but awkward, mark partly_appropriate and explain the smallest useful fix.",
+    "For verdict excellent, set betterAnswer to an empty string and do not suggest a replacement.",
+    "For verdict acceptable, set betterAnswer to an empty string unless there is a clearly better idiomatic option. Never repeat the student's answer in betterAnswer.",
+    "Keep every field concise, practical, and learner-friendly. Do not give official exam scores.",
+    "Return strict JSON only.",
+    "",
+    "Activity:",
+    JSON.stringify(payload, null, 2),
+  ].join("\n");
+}
+
+function normalizeOteRegisterRewritePayload(data) {
+  const items = Array.isArray(data?.items) ? data.items : [];
+  return {
+    exam: "ote",
+    taskId: cleanString(data?.taskId || "", 80),
+    title: cleanString(data?.title || "", 160),
+    instructions: cleanString(data?.instructions || "", 500),
+    items: items.slice(0, 12).map((item) => ({
+      id: cleanString(item?.id || "", 20),
+      functionLabel: cleanString(item?.functionLabel || "", 160),
+      sourceRegister: cleanString(item?.sourceRegister || "", 40),
+      targetRegister: cleanString(item?.targetRegister || "", 40),
+      prompt: cleanString(item?.prompt || "", 500),
+      studentAnswer: cleanString(item?.studentAnswer || "", 1000),
+      suggestedAnswers: Array.isArray(item?.suggestedAnswers)
+        ? item.suggestedAnswers.slice(0, 4).map((answer) => cleanString(answer, 400)).filter(Boolean)
+        : [],
+      keyFeatures: Array.isArray(item?.keyFeatures)
+        ? item.keyFeatures.slice(0, 8).map((feature) => cleanString(feature, 120)).filter(Boolean)
+        : [],
+    })),
+  };
+}
+
+function buildOteRegisterRewriteFeedbackPrompt(payload) {
+  return [
+    "You are an expert English exam writing teacher for Oxford Test of English email tasks.",
+    "Assess sentence-level register transformations. The student rewrites each prompt into the opposite register.",
+    "This is a formative practice activity, not formal marking. Be generous with natural alternatives from confident B2-C1 writers.",
+    "",
+    "For each answer judge:",
+    "- Meaning: does it preserve the main communicative function and idea?",
+    "- Syntax: is it a complete, grammatical sentence or phrase for the function?",
+    "- Lexis: are the vocabulary and collocations natural?",
+    "- Register: does it fit the requested target register? This is the most important criterion.",
+    "",
+    "Use suggestedAnswers and keyFeatures as examples, not as a fixed answer key.",
+    "Do not use suggestedAnswers as preferred targets. They are sample classroom answers only.",
+    "If the student's answer is natural and target-register appropriate, do not say another suggestedAnswer would be more typical, softer, more direct, or better.",
+    "Do not add a 'though...' caveat just because the student's answer differs from suggestedAnswers.",
+    "Accept natural alternatives that fit the target register, even if they do not match the examples.",
+    "Do not penalize small, reasonable wording changes if the communicative function and register are preserved.",
+    "Treat a response as excellent when it is natural, register-appropriate, and communicates the same broad function, even if it is not identical to the prompt.",
+    "Use acceptable for answers that work but have a real minor issue worth fixing. Do not use acceptable merely to mean 'not the same as the model'.",
+    "Use partly_appropriate only for a clear issue: noticeably changed meaning, unnatural collocation, incomplete syntax, or register mismatch.",
+    "When the writer uses an advanced but natural formal phrase, do not call it too strict, too elaborate, or a meaning shift unless it genuinely changes the message.",
+    "Specific calibration: 'Speak soon,' is an excellent informal sign-off. 'I would recommend visiting the park this weekend as an alternative' is an excellent formal suggestion. 'Much as I would be delighted to participate...' can be excellent as a formal decline if the rest of the sentence is grammatical and natural.",
+    "For verdict excellent, set suggestedRewrite to an empty string and do not suggest a replacement.",
+    "For verdict acceptable, set suggestedRewrite to an empty string unless there is one clear small upgrade. Never repeat the student's answer in suggestedRewrite.",
+    "If an answer is blank, mark verdict as blank and provide a suitable rewrite.",
+    "Keep feedback concise and learner-friendly. Do not give official exam scores.",
+    "Return strict JSON only.",
+    "",
+    "Activity:",
+    JSON.stringify(payload, null, 2),
+  ].join("\n");
+}
+
 exports.generateWritingFeedback = functions
   .region("europe-west1")
   .https.onCall(async (data, context) => {
@@ -2531,6 +2773,188 @@ exports.generateOteWritingFeedback = functions
     }
 
     feedback = postProcessOteWritingFeedback(payload, feedback);
+
+    return {
+      feedback,
+      meta: {
+        model,
+        responseId: responseJson?.id || null,
+        usage: responseJson?.usage || null,
+        generatedAt: new Date().toISOString(),
+        quota: creditReservation,
+      },
+    };
+  });
+
+exports.generateOteRegisterGapFeedback = functions
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Sign in before generating register feedback.");
+    }
+    if (!OPENAI_API_KEY) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Missing OPENAI_API_KEY in the Functions environment."
+      );
+    }
+
+    const payload = normalizeOteRegisterGapPayload(data);
+    if (!payload.taskId || !payload.gaps.length) {
+      throw new functions.https.HttpsError("invalid-argument", "Register gap feedback requires valid task data.");
+    }
+    if (!payload.gaps.some((gap) => gap.studentAnswer.trim())) {
+      throw new functions.https.HttpsError("invalid-argument", "Add at least one answer before requesting feedback.");
+    }
+
+    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const creditReservation = await consumeWritingFeedbackCredits(
+      context,
+      "ote_register_gap",
+      WRITING_FEEDBACK_CREDIT_COSTS.ote_register_gap
+    );
+    const requestBody = {
+      model,
+      input: buildOteRegisterGapFeedbackPrompt(payload),
+      reasoning: { effort: "low" },
+      max_output_tokens: 2200,
+      text: {
+        verbosity: "medium",
+        format: {
+          type: "json_schema",
+          name: "ote_register_gap_feedback",
+          strict: true,
+          schema: OTE_REGISTER_GAP_FEEDBACK_SCHEMA,
+        },
+      },
+    };
+
+    let apiResponse;
+    try {
+      apiResponse = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+    } catch (error) {
+      console.error("[generateOteRegisterGapFeedback] OpenAI request failed", error);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("unavailable", "Could not reach the feedback service.");
+    }
+
+    const responseJson = await apiResponse.json().catch(() => null);
+    if (!apiResponse.ok) {
+      console.error("[generateOteRegisterGapFeedback] OpenAI error", responseJson);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "internal",
+        responseJson?.error?.message || "The feedback service returned an error."
+      );
+    }
+
+    const outputText = extractOutputText(responseJson);
+    let feedback;
+    try {
+      feedback = JSON.parse(outputText);
+    } catch (error) {
+      console.error("[generateOteRegisterGapFeedback] JSON parse failed", { outputText, error });
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
+    }
+
+    return {
+      feedback,
+      meta: {
+        model,
+        responseId: responseJson?.id || null,
+        usage: responseJson?.usage || null,
+        generatedAt: new Date().toISOString(),
+        quota: creditReservation,
+      },
+    };
+  });
+
+exports.generateOteRegisterRewriteFeedback = functions
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Sign in before generating rewrite feedback.");
+    }
+    if (!OPENAI_API_KEY) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Missing OPENAI_API_KEY in the Functions environment."
+      );
+    }
+
+    const payload = normalizeOteRegisterRewritePayload(data);
+    if (!payload.taskId || !payload.items.length) {
+      throw new functions.https.HttpsError("invalid-argument", "Register rewrite feedback requires valid task data.");
+    }
+    if (!payload.items.some((item) => item.studentAnswer.trim())) {
+      throw new functions.https.HttpsError("invalid-argument", "Add at least one rewrite before requesting feedback.");
+    }
+
+    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const creditReservation = await consumeWritingFeedbackCredits(
+      context,
+      "ote_register_rewrite",
+      WRITING_FEEDBACK_CREDIT_COSTS.ote_register_rewrite
+    );
+    const requestBody = {
+      model,
+      input: buildOteRegisterRewriteFeedbackPrompt(payload),
+      reasoning: { effort: "low" },
+      max_output_tokens: 3000,
+      text: {
+        verbosity: "medium",
+        format: {
+          type: "json_schema",
+          name: "ote_register_rewrite_feedback",
+          strict: true,
+          schema: OTE_REGISTER_REWRITE_FEEDBACK_SCHEMA,
+        },
+      },
+    };
+
+    let apiResponse;
+    try {
+      apiResponse = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+    } catch (error) {
+      console.error("[generateOteRegisterRewriteFeedback] OpenAI request failed", error);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("unavailable", "Could not reach the feedback service.");
+    }
+
+    const responseJson = await apiResponse.json().catch(() => null);
+    if (!apiResponse.ok) {
+      console.error("[generateOteRegisterRewriteFeedback] OpenAI error", responseJson);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "internal",
+        responseJson?.error?.message || "The feedback service returned an error."
+      );
+    }
+
+    const outputText = extractOutputText(responseJson);
+    let feedback;
+    try {
+      feedback = JSON.parse(outputText);
+    } catch (error) {
+      console.error("[generateOteRegisterRewriteFeedback] JSON parse failed", { outputText, error });
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
+    }
 
     return {
       feedback,
@@ -2968,7 +3392,7 @@ exports.generateAptisWritingPart23Feedback = functions
       model,
       input: buildAptisWritingPart23Prompt(payload),
       reasoning: { effort: "low" },
-      max_output_tokens: payload.part === "part2" ? 1800 : 3800,
+      max_output_tokens: payload.part === "part2" ? 2300 : 4700,
       text: {
         verbosity: "medium",
         format: {
