@@ -35,7 +35,7 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
   }
 
   return (
-    <main className="menu-wrapper hub-menu-wrapper ote-menu-wrapper">
+    <main className="menu-wrapper hub-menu-wrapper ote-menu-wrapper ote-skill-menu-wrapper">
       <Seo
         title={`${isSpeaking ? "OTE Speaking" : "OTE Writing"} | Seif English`}
         description={`${isSpeaking ? "Speaking" : "Writing"} mock tests and training for Oxford Test of English students.`}

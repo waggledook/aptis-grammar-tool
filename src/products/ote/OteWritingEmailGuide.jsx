@@ -12,7 +12,7 @@ const quizQuestions = [
     options: ["Dear Sir or Madam,", "Dear Mr. Bell,", "Hi Bell, how's it going?"],
     answer: "Dear Mr. Bell,",
     explanation:
-      "If you know the sender's name, use a suitable named greeting. Dear Sir or Madam is for an unknown recipient, and Hi Bell is not appropriate.",
+      "If you know the sender's name, use it. Dear Sir or Madam is for a person whose name you do not know, and Hi Bell is not polite enough.",
   },
   {
     id: "word-count",
@@ -20,11 +20,11 @@ const quizQuestions = [
     options: [
       "Nothing, as long as all three notes are included.",
       "The system will not let you submit.",
-      "Your Task Fulfilment score is heavily capped.",
+      "Your score can be much lower because the answer is too short.",
     ],
-    answer: "Your Task Fulfilment score is heavily capped.",
+    answer: "Your score can be much lower because the answer is too short.",
     explanation:
-      "OTE Writing Part 1 has an 80-130 word target. Very short answers are penalized even when the language is accurate.",
+      "OTE Writing Part 1 asks for 80-130 words. If your answer is much too short, you can lose marks even if your English is correct.",
   },
   {
     id: "expanded-reason",
@@ -36,7 +36,7 @@ const quizQuestions = [
     ],
     answer: "I'd love to, but I can't make it because I have to help my family move that day.",
     explanation:
-      "It fits an informal email and gives a clear expanded reason. The brief answer covers the note but is underdeveloped.",
+      "It sounds friendly and gives a clear reason. The short answer is too simple.",
   },
   {
     id: "leftover-time",
@@ -56,7 +56,7 @@ const quizQuestions = [
     ],
     answer: "I would be delighted to assist with the preparation of the event.",
     explanation:
-      "It uses formal vocabulary and avoids casual phrasal verbs or idioms, so it fits a professional academic recipient.",
+      "It sounds polite and serious, so it fits an email to a college principal.",
   },
 ];
 
@@ -127,9 +127,9 @@ export default function OteWritingEmailGuide({ nativeRoutes = false }) {
         <p className="ote-kicker">Writing Part 1</p>
         <h1>The Email Task</h1>
         <p>
-          In the first section of the OTE Writing module, you read an input email and write a response
-          of 80-130 words. Success depends on checking who you are writing to, answering all three
-          handwritten notes, and managing the 20-minute timer.
+          In the first section of the OTE Writing module, you read an email and write a reply of
+          80-130 words. First check who you are writing to. Then answer all three handwritten notes
+          and keep an eye on the 20-minute timer.
         </p>
       </header>
 
@@ -142,7 +142,7 @@ export default function OteWritingEmailGuide({ nativeRoutes = false }) {
         <div>
           <FileText size={24} aria-hidden="true" />
           <strong>80-130 words</strong>
-          <span>Very short answers are capped, and overlong answers waste time.</span>
+          <span>Very short answers lose marks. Very long answers waste time.</span>
         </div>
         <div>
           <MessageSquareText size={24} aria-hidden="true" />
@@ -154,29 +154,29 @@ export default function OteWritingEmailGuide({ nativeRoutes = false }) {
       <section className="ote-training-section">
         <h2>How the Email Task Works</h2>
         <p>
-          The screen gives you an email from a specific sender and three handwritten notes showing
-          what your reply must do. These notes are not optional. They usually ask you to react,
-          explain, suggest, decline, choose, ask, or offer help.
+          The screen gives you an email from one person and three handwritten notes. The notes tell
+          you what to include in your reply. You must answer all of them.
         </p>
         <p>
-          Before you write, identify the relationship: friend, classmate, tutor, manager, coordinator,
-          or organization. That decision controls your greeting, grammar, vocabulary, and closing.
+          Before you write, ask: Who am I writing to? A friend needs friendly, informal language.
+          A teacher, manager, or coordinator needs more polite, formal language. This choice is
+          called register.
         </p>
       </section>
 
       <section className="ote-training-section">
-        <h2>Neutral/Formal vs. Informal Register</h2>
-        <div className="ote-training-compare" role="table" aria-label="Comparison of formal and informal OTE email register">
+        <h2>Register: Formal vs. Informal</h2>
+        <div className="ote-training-compare" role="table" aria-label="Comparison of formal and informal OTE email language">
           <div className="ote-training-compare-head" role="row">
             <span role="columnheader">Feature</span>
-            <span role="columnheader">Neutral / Formal Task</span>
-            <span role="columnheader">Informal Task</span>
+            <span role="columnheader">Formal / Polite Task</span>
+            <span role="columnheader">Informal / Friendly Task</span>
           </div>
           {[
-            ["Typical audience", "A principal, course tutor, manager, or coordinator.", "A classmate, close friend, or family member."],
+            ["Reader", "A principal, course tutor, manager, or coordinator.", "A classmate, close friend, or family member."],
             ["Opening", "Dear Mr. Davis, / Dear Ms. Smith,", "Hi Sam, / Hey Alex,"],
-            ["Grammar style", "Full verb forms: I am writing, I cannot.", "Contractions are natural: I'm writing, I can't."],
-            ["Functional language", "Indirect, polite requests: I would like to suggest...", "Direct, casual questions: What about...? / Any ideas?"],
+            ["Grammar", "Full forms: I am writing, I cannot.", "Short forms are natural: I'm writing, I can't."],
+            ["Useful phrases", "Polite phrases: I would like to suggest...", "Friendly phrases: What about...? / Any ideas?"],
             ["Closing", "Yours sincerely, / Kind regards,", "Write back soon, / Cheers, / Speak soon,"],
           ].map(([feature, formal, informal]) => (
             <div className="ote-training-compare-row" role="row" key={feature}>
@@ -196,7 +196,7 @@ export default function OteWritingEmailGuide({ nativeRoutes = false }) {
             <h3>Hunt down the notes</h3>
             <p>
               Every email has three handwritten notes. Answer each one and add a detail, reason, or
-              consequence so your reply feels complete.
+              result so your reply feels complete.
             </p>
           </article>
           <article>
@@ -204,7 +204,7 @@ export default function OteWritingEmailGuide({ nativeRoutes = false }) {
             <h3>Let the sender choose the tone</h3>
             <p>
               If the sender is a friend, sound warm and natural. If the sender is a tutor or coordinator,
-              use polite, neutral, and more complete phrasing.
+              use more formal register with polite and complete sentences.
             </p>
           </article>
           <article>
@@ -243,7 +243,7 @@ export default function OteWritingEmailGuide({ nativeRoutes = false }) {
             <strong>{correctCount === quizQuestions.length ? "Nice, full marks." : "Good review."}</strong>
             <span>
               You answered {correctCount} of {quizQuestions.length} correctly. Use the feedback above
-              to sharpen your email-task strategy.
+              to improve your email plan.
             </span>
             <button type="button" onClick={() => setAnswers({})}>
               <RotateCcw size={17} aria-hidden="true" />

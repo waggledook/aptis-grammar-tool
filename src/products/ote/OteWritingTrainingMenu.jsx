@@ -11,26 +11,26 @@ const TRAINING_SECTIONS = {
     kicker: "Writing Part 1",
     title: "Email Task Training",
     description:
-      "Build the skills for OTE email responses: read the input carefully, cover all three notes, choose the right tone, and write inside the word limit.",
+      "Build the skills for OTE email replies: read carefully, answer all three notes, choose the right register, and stay inside the word limit.",
     activities: [
       {
         label: "Activity 1",
         title: "How Email Tasks Work",
-        copy: "Understand the input email, notes, timing, and word-count expectations.",
+        copy: "Understand the email, the notes, the timer, and the word count.",
         icon: ClipboardList,
         route: "guide",
       },
       {
         label: "Activity 2",
         title: "Register Basics",
-        copy: "Decide whether sentences are formal or informal, then rewrite them in the opposite register.",
+        copy: "Decide if sentences are formal or informal, then rewrite them in the other style.",
         icon: Lightbulb,
         route: "register-basics",
       },
       {
         label: "Activity 3",
         title: "Register Gap Trainer",
-        copy: "Complete parallel formal and informal emails with equivalent meaning in different registers.",
+        copy: "Complete formal and informal emails with the same meaning.",
         icon: PenLine,
         route: "register-gaps",
       },
@@ -48,11 +48,37 @@ const TRAINING_SECTIONS = {
     kicker: "Writing Part 2",
     title: "Essay Task Training",
     description:
-      "Build structure and argument control for OTE essays: answer the title directly, organize paragraphs, and use linking naturally.",
+      "Build strong OTE essays: answer the title directly, organize paragraphs, and use linking words naturally.",
     activities: [
-      ["Activity 1", "How Essays Work", "Break down the task title and decide what position your essay will take.", ClipboardList],
-      ["Activity 2", "Paragraph Builder", "Practise introductions, balanced body paragraphs, examples, and conclusions.", PenLine],
-      ["Reference", "Essay Language Bank", "Review useful frames for opinions, contrast, reasons, and consequences.", FileText],
+      {
+        label: "Activity 1",
+        title: "How Essays Work",
+        copy: "Understand the title and decide your opinion before you write.",
+        icon: ClipboardList,
+        route: "guide",
+      },
+      {
+        label: "Activity 2",
+        title: "Introductions and Conclusions",
+        copy: "Practise opening the essay clearly and finishing with a strong final opinion.",
+        icon: PenLine,
+        route: "introductions-conclusions",
+      },
+      {
+        label: "Activity 3",
+        title: "Essay Planning",
+        copy: "Brainstorm ideas for and against the title, then choose a clear structure.",
+        icon: Lightbulb,
+        route: "planning",
+      },
+      {
+        label: "Activity 4",
+        title: "Body Paragraphs",
+        copy: "Choose strong topic sentences and match linking words to their purpose.",
+        icon: PenLine,
+        route: "body-paragraphs",
+      },
+      ["Reference", "Essay Language Bank", "Review useful phrases for opinions, contrast, reasons, and results.", FileText],
     ],
     practiceTitle: "Timed Essay Sets",
     practiceCopy: "Choose an individual essay title, then write one timed Part 2 essay in the native OTE layout.",
@@ -61,10 +87,16 @@ const TRAINING_SECTIONS = {
     kicker: "Writing Part 2",
     title: "Article / Review Training",
     description:
-      "Prepare for the article and review option: make the writing engaging, answer the advert fully, and keep the style clear but natural.",
+      "Prepare for articles and reviews: make the writing interesting, answer the task fully, and keep the style clear.",
     activities: [
-      ["Activity 1", "How Articles and Reviews Work", "Compare audience, purpose, headings, recommendation language, and review detail.", ClipboardList],
-      ["Activity 2", "Style Upgrade", "Practise openings, reader-friendly detail, opinions, and stronger closing lines.", Lightbulb],
+      {
+        label: "Activity 1",
+        title: "How Articles and Reviews Work",
+        copy: "Compare the reader, purpose, titles, recommendations, and useful details.",
+        icon: ClipboardList,
+        route: "guide",
+      },
+      ["Activity 2", "Style Upgrade", "Practise openings, reader-friendly details, opinions, and stronger endings.", Lightbulb],
       ["Activity 3", "Guided Article / Review", "Plan a complete answer from a prompt and check that every question is covered.", PenLine],
     ],
     practiceTitle: "Timed Article / Review Sets",
@@ -107,7 +139,7 @@ export default function OteWritingTrainingMenu({ nativeRoutes = false }) {
             ? { label: activity[0], title: activity[1], copy: activity[2], icon: activity[3] }
             : activity;
           const Icon = normalized.icon;
-          const route = nativeRoutes ? normalized.route : "";
+          const route = normalized.route || "";
           return (
             <button
               key={normalized.title}

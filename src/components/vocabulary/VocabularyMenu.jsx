@@ -8,7 +8,7 @@ export default function VocabularyMenu() {
   const navigate = useNavigate();
 
   return (
-    <div className="vocab-menu game-wrapper">
+    <div className="vocab-menu game-wrapper menu-style-hub">
       <Seo
         title="Aptis Vocabulary Practice | Seif Aptis Trainer"
         description="Build vocabulary for Aptis through topic-based practice, synonym training, and collocation practice."
@@ -97,22 +97,6 @@ export default function VocabularyMenu() {
         }
 
         /* ——— Active card ——— */
-        .card {
-          background: #13213b;
-          border: 1px solid #2c4b83;
-          border-radius: 12px;
-          color: #e6f0ff;
-          padding: 1rem;
-          text-align: left;
-          cursor: pointer;
-          transition: transform .08s ease, box-shadow .08s ease, border-color .08s;
-        }
-        .card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 18px rgba(0,0,0,.25);
-          border-color: #4a79d8;
-        }
-
         .card h3 {
           margin: 0;
           font-size: 1.05rem;

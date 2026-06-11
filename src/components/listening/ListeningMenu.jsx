@@ -7,7 +7,7 @@ export default function ListeningMenu() {
   const navigate = useNavigate();
 
   return (
-    <div className="listening-menu game-wrapper">
+    <div className="listening-menu game-wrapper menu-style-hub">
       <Seo
         title="Aptis Listening Practice | Seif Aptis Trainer"
         description="Practise all parts of the Aptis Listening test: multiple-choice extracts, speaker matching, opinion matching and longer monologues."
@@ -62,22 +62,6 @@ export default function ListeningMenu() {
 
   .cards { display:grid; gap:1rem; grid-template-columns:1fr; }
   @media (min-width:720px){ .cards{ grid-template-columns: repeat(2,1fr);} }
-
-  .card {
-    background:#13213b;
-    border:1px solid #2c4b83;
-    border-radius:12px;
-    color:#e6f0ff;
-    padding:1rem;
-    text-align:left;
-    cursor:pointer;
-    transition: transform .08s ease, box-shadow .08s ease, border-color .08s;
-  }
-  .card:hover {
-    transform: translateY(-2px);
-    box-shadow:0 6px 18px rgba(0,0,0,.25);
-    border-color:#4a79d8;
-  }
 
   .card-head{
     display:flex;

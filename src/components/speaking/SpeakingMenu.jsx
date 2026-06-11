@@ -45,7 +45,7 @@ export default function SpeakingMenu() {
   const navigate = useNavigate();
 
   return (
-    <div className="speaking-menu game-wrapper">
+    <div className="speaking-menu game-wrapper menu-style-hub">
       <Seo
         title="Aptis Speaking Practice | Seif Aptis Trainer"
         description="Practise all parts of the Aptis Speaking test: personal questions, photo description, compare & discuss, and a short presentation."
@@ -109,7 +109,7 @@ export default function SpeakingMenu() {
           href="https://aptis-gen.speaking1.beeskillsenglish.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className="mock-test-btn sleek"
+          className="mock-test-btn sleek menu-cta-btn"
         >
           🎤 Try a complete speaking test in exam conditions!
         </a>
@@ -161,22 +161,6 @@ export default function SpeakingMenu() {
           }
         }
 
-        .card {
-          background:#13213b;
-          border:1px solid #2c4b83;
-          border-radius:12px;
-          color: #e6f0ff;
-          padding:1rem;
-          text-align:left;
-          cursor:pointer;
-          transition: transform .08s ease, box-shadow .08s ease, border-color .08s, background .08s ease;
-        }
-
-        .card:hover {
-          transform: translateY(-2px);
-          box-shadow:0 6px 18px rgba(0,0,0,.25);
-        }
-
         .card h3 {
           margin:0 0 .35rem;
           display:flex;
@@ -190,57 +174,8 @@ export default function SpeakingMenu() {
           color:#cfd9f3;
         }
 
-        .guide-card {
-          background: linear-gradient(180deg, #13213b 0%, #122846 100%);
-          border-color: #3d5f99;
-        }
-
-        .guide-card:hover {
-          border-color: #5f83c0;
-        }
-
-        .practice-card {
-          background: linear-gradient(180deg, #172440 0%, #13213b 100%);
-          border-color: rgba(255, 207, 64, 0.48);
-        }
-
-        .practice-card:hover {
-          border-color: rgba(255, 207, 64, 0.82);
-        }
-
-        .section-kicker {
-          display: inline-flex;
-          align-items: center;
-          font-size: .76rem;
-          font-weight: 700;
-          letter-spacing: .06em;
-          text-transform: uppercase;
-          color: #ffcf40;
-          margin-bottom: .35rem;
-        }
-
-        /* ---- Mock test CTA (BeeSkills palette) ---- */
         .full-test-card {
           margin-top: 1.4rem;
-          display: grid;
-          gap: 1rem;
-          align-items: center;
-          background: linear-gradient(180deg, #13213b 0%, #10203a 100%);
-          border: 1px solid #2c4b83;
-          border-radius: 16px;
-          padding: 1rem;
-          box-shadow: 0 10px 24px rgba(0,0,0,.18);
-        }
-
-        .full-test-card h3 {
-          margin: 0 0 .35rem;
-          color: #e6f0ff;
-        }
-
-        .full-test-card p {
-          margin: 0;
-          color: #cfd9f3;
-          max-width: 62ch;
         }
 
         @media (min-width: 760px) {
@@ -255,16 +190,8 @@ export default function SpeakingMenu() {
 
         .mock-test-btn.sleek {
           position: relative;
-          display: inline-block;
-          padding: 1rem 1.6rem;
-          border-radius: 16px;
-          text-decoration: none;
-          font-weight: 700;
-          font-size: 1rem;
+          padding: 1rem 1.9rem;
           letter-spacing: .2px;
-          color: #ffcf40;
-          background: linear-gradient(180deg, #0e1a2f 0%, #1a2b4a 100%);
-          border: 1px solid rgba(255, 207, 64, 0.75);
           box-shadow:
             0 10px 24px rgba(0,0,0,.35),
             inset 0 1px 0 rgba(255,255,255,.06),
@@ -295,9 +222,6 @@ export default function SpeakingMenu() {
         @media (hover: hover) and (pointer: fine) {
           .mock-test-btn.sleek:hover {
             transform: translateY(-3px);
-            border-color: rgba(255, 207, 64, 0.95);
-            color: #ffe07a;
-            background: linear-gradient(180deg, #142444 0%, #21365f 100%);
             box-shadow:
               0 16px 28px rgba(0,0,0,.38),
               inset 0 1px 0 rgba(255,255,255,.08),

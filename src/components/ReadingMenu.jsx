@@ -32,7 +32,7 @@ const PRACTICE_CARDS = [
 export default function ReadingMenu() {
   const navigate = useNavigate();
   return (
-    <div className="reading-menu game-wrapper">
+    <div className="reading-menu game-wrapper menu-style-hub">
       <Seo
         title="Aptis Reading Practice | Seif Aptis Trainer"
         description="Practise Aptis Reading tasks, including sentence order (Part 2) and matching opinions (Part 3), plus a strategy guide for Part 2."
@@ -129,22 +129,6 @@ export default function ReadingMenu() {
           }
         }
 
-        .card {
-          background:#13213b;
-          border:1px solid #2c4b83;
-          border-radius:12px;
-          color:#e6f0ff;
-          padding:1rem;
-          text-align:left;
-          cursor:pointer;
-          transition: transform .08s ease, box-shadow .08s ease, border-color .08s, background .08s ease;
-        }
-
-        .card:hover {
-          transform: translateY(-2px);
-          box-shadow:0 6px 18px rgba(0,0,0,.25);
-        }
-
         .card h3 {
           margin:0 0 .35rem;
           display:flex;
@@ -158,23 +142,6 @@ export default function ReadingMenu() {
           color:#cfd9f3;
         }
 
-        .guide-card {
-          background: linear-gradient(180deg, #13213b 0%, #122846 100%);
-          border-color: #3d5f99;
-        }
-
-        .guide-card:hover {
-          border-color: #5f83c0;
-        }
-
-        .practice-card {
-          background: linear-gradient(180deg, #172440 0%, #13213b 100%);
-          border-color: rgba(255, 207, 64, 0.48);
-        }
-
-        .practice-card:hover {
-          border-color: rgba(255, 207, 64, 0.82);
-        }
       `}</style>
     </div>
   );

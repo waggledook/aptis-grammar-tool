@@ -1074,6 +1074,157 @@ h2,
   box-shadow: 0 12px 26px var(--color-shadow-soft);
 }
 
+/* === Seif Hub menu treatment for Aptis menus === */
+.menu-style-hub .cards,
+.menu-style-hub .menu-grid {
+  gap: 1rem;
+}
+
+.menu-style-hub .intro,
+.menu-style-hub .menu-sub,
+.menu-style-hub .section-header p {
+  color: rgba(238, 244, 255, 0.82);
+}
+
+.menu-style-hub .section-header h3,
+.menu-style-hub .title,
+.menu-style-hub .whats-new-copy h3 {
+  color: #eef4ff;
+}
+
+.menu-style-hub .whats-new-banner,
+.menu-style-hub .full-test-card {
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+  margin: 0 0 1rem;
+  padding: 1.2rem 1.3rem;
+  border-radius: 26px;
+  background: linear-gradient(180deg, rgba(38, 54, 90, 0.96) 0%, rgba(27, 40, 71, 0.98) 100%);
+  border: 1px solid rgba(240, 177, 79, 0.48);
+  box-shadow: 0 16px 34px rgba(4, 10, 24, 0.24);
+}
+
+.menu-style-hub .whats-new-copy,
+.menu-style-hub .full-test-card > div:first-child {
+  min-width: 0;
+}
+
+.menu-style-hub .whats-new-label,
+.menu-style-hub .section-kicker {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 0.45rem;
+  padding: 0.28rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid rgba(240, 177, 79, 0.35);
+  background: rgba(240, 177, 79, 0.12);
+  color: #ffcf70;
+  font-size: 0.88rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.menu-style-hub .whats-new-copy h3,
+.menu-style-hub .full-test-card h3 {
+  margin: 0 0 0.45rem;
+  font-size: clamp(1.2rem, 2vw, 1.85rem);
+  line-height: 1.15;
+}
+
+.menu-style-hub .whats-new-copy p,
+.menu-style-hub .full-test-card p {
+  margin: 0;
+  color: rgba(238, 244, 255, 0.88);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.menu-style-hub .whats-new-btn,
+.menu-style-hub .menu-cta-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 74px;
+  padding: 1rem 1.9rem;
+  border: none;
+  border-radius: 22px;
+  background: linear-gradient(180deg, #ffd064 0%, #ffb81f 100%);
+  color: #13213b;
+  font-size: 1rem;
+  font-weight: 900;
+  text-decoration: none;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+  transition: transform 0.16s ease, box-shadow 0.16s ease, filter 0.16s ease;
+}
+
+.menu-style-hub .whats-new-btn:hover,
+.menu-style-hub .menu-cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.24);
+  filter: brightness(1.02);
+}
+
+.menu-style-hub .whats-new-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+
+.menu-style-hub .menu-card,
+.menu-style-hub .card {
+  text-align: left;
+  background: #1a2847;
+  border: 2px solid #35508e;
+  border-radius: 22px;
+  padding: 1.45rem 1.5rem;
+  color: #eef4ff;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.16);
+  transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.menu-style-hub .menu-card:hover,
+.menu-style-hub .card:hover {
+  transform: translateY(-2px);
+  border-color: #4a6bc0;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+}
+
+.menu-style-hub .menu-card h3,
+.menu-style-hub .card h3 {
+  margin: 0 0 0.55rem;
+  color: #eef4ff;
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.menu-style-hub .menu-card p,
+.menu-style-hub .card p {
+  margin: 0;
+  color: rgba(238, 244, 255, 0.88);
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.menu-style-hub .guide-card,
+.menu-style-hub .practice-card {
+  background: #1a2847;
+}
+
+@media (min-width: 760px) {
+  .menu-style-hub .whats-new-banner,
+  .menu-style-hub .full-test-card {
+    grid-template-columns: minmax(0, 1.5fr) auto;
+  }
+}
+
+@media (max-width: 720px) {
+  .menu-style-hub .whats-new-btn,
+  .menu-style-hub .menu-cta-btn {
+    width: 100%;
+  }
+}
+
 .soon-pill,
 .live-pill {
   background: var(--color-surface-3);

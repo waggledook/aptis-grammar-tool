@@ -7,7 +7,7 @@ import {
   listAttemptsForCourseTestSession,
   saveCourseTestAttemptReview,
 } from "../../firebase";
-import { collection, getDocs, updateDoc, doc, query, orderBy, limit, startAfter, serverTimestamp } from "firebase/firestore";
+import { collection, getDoc, getDocs, updateDoc, doc, query, orderBy, limit, startAfter, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { getSeifHubAccessConfig, SEIF_HUB_ACCESS_KEY } from "../../siteConfig.js";
 import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
@@ -16,6 +16,13 @@ function getTodayLocalIsoDate() {
   const now = new Date();
   const tzOffset = now.getTimezoneOffset() * 60000;
   return new Date(now.getTime() - tzOffset).toISOString().slice(0, 10);
+}
+
+function getFeedbackWeekKey(date = new Date()) {
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const daysSinceMonday = (d.getUTCDay() + 6) % 7;
+  d.setUTCDate(d.getUTCDate() - daysSinceMonday);
+  return d.toISOString().slice(0, 10);
 }
 
 function formatDateTime(value) {
@@ -76,6 +83,24 @@ function stripHtmlToText(html = "") {
 function countWordsFromHtml(html = "") {
   const matches = stripHtmlToText(html).trim().match(/\S+/g);
   return matches ? matches.length : 0;
+}
+
+const WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS = {
+  student: 20,
+  teacher: 100,
+  admin: 1000,
+};
+
+function getWritingFeedbackWeeklyCredits(user = {}) {
+  const rawValue = user.writingFeedbackWeeklyCredits;
+  const hasCustomValue = rawValue !== undefined && rawValue !== null && rawValue !== "";
+  const customValue = Number(rawValue);
+
+  if (hasCustomValue && Number.isFinite(customValue)) {
+    return Math.max(0, Math.floor(customValue));
+  }
+
+  return WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS[user.role] || WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS.student;
 }
 
 function normalizeWritingGeneralSubmission(entry) {
@@ -345,6 +370,8 @@ export default function AdminDashboard({ user }) {
   const [studentRequests, setStudentRequests] = useState([]);
   const [loadingStudentRequests, setLoadingStudentRequests] = useState(true);
   const [resolvingRequestId, setResolvingRequestId] = useState("");
+  const [creditDrafts, setCreditDrafts] = useState({});
+  const [savingCredits, setSavingCredits] = useState({});
 
   const navigate = useNavigate();
 
@@ -370,7 +397,34 @@ export default function AdminDashboard({ user }) {
         ...d.data(),
       }));
 
-      setUsers(arr);
+      const weekKey = getFeedbackWeekKey();
+      const usageRows = await Promise.all(
+        arr
+          .filter((entry) => entry.role === "student")
+          .map(async (entry) => {
+            try {
+              const usageSnap = await getDoc(doc(db, "users", entry.id, "writingFeedbackUsage", weekKey));
+              return {
+                uid: entry.id,
+                creditsUsed: Number(usageSnap.data()?.creditsUsed || 0),
+              };
+            } catch (error) {
+              console.error("[AdminDashboard] load writing feedback credits failed", error);
+              return { uid: entry.id, creditsUsed: 0 };
+            }
+          })
+      );
+      const usageByUid = usageRows.reduce((acc, row) => {
+        acc[row.uid] = row.creditsUsed;
+        return acc;
+      }, {});
+
+      setUsers(
+        arr.map((entry) => ({
+          ...entry,
+          writingFeedbackCreditsUsedThisWeek: usageByUid[entry.id] || 0,
+        }))
+      );
       setLoading(false);
     }
 
@@ -443,6 +497,46 @@ export default function AdminDashboard({ user }) {
       );
     } finally {
       setAssigning(null);
+    }
+  }
+
+  function setCreditDraft(uid, value) {
+    setCreditDrafts((prev) => ({ ...prev, [uid]: value }));
+  }
+
+  async function addWritingFeedbackCredits(uid) {
+    const targetUser = users.find((entry) => entry.id === uid);
+    if (!targetUser) return;
+
+    const amount = Number.parseInt(creditDrafts[uid], 10);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      window.alert("Enter a positive number of credits to add.");
+      return;
+    }
+
+    const nextCredits = getWritingFeedbackWeeklyCredits(targetUser) + amount;
+    setSavingCredits((prev) => ({ ...prev, [uid]: true }));
+
+    try {
+      await updateDoc(doc(db, "users", uid), {
+        writingFeedbackWeeklyCredits: nextCredits,
+        writingFeedbackCreditsUpdatedAt: serverTimestamp(),
+        writingFeedbackCreditsUpdatedBy: user.uid,
+      });
+
+      setUsers((prev) =>
+        prev.map((entry) =>
+          entry.id === uid
+            ? {
+                ...entry,
+                writingFeedbackWeeklyCredits: nextCredits,
+              }
+            : entry
+        )
+      );
+      setCreditDrafts((prev) => ({ ...prev, [uid]: "" }));
+    } finally {
+      setSavingCredits((prev) => ({ ...prev, [uid]: false }));
     }
   }
 
@@ -942,6 +1036,74 @@ function renderHubAccessControl(u, compact = false) {
     }
 
     return <span className="tiny muted">—</span>;
+  };
+
+  const renderWritingFeedbackCreditControl = (u) => {
+    if (u.role !== "student") {
+      return <span className="tiny muted">Only student accounts use student AI feedback credits.</span>;
+    }
+
+    const weeklyCredits = getWritingFeedbackWeeklyCredits(u);
+    const usedCredits = Math.max(0, Number(u.writingFeedbackCreditsUsedThisWeek || 0));
+    const remainingCredits = Math.max(0, weeklyCredits - usedCredits);
+    const draftValue = creditDrafts[u.id] || "";
+    const isSaving = !!savingCredits[u.id];
+
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "0.65rem",
+            alignItems: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          <span style={{ color: "#dbe7ff", fontSize: "0.88rem" }}>
+            AI feedback credits left
+          </span>
+          <strong style={{ color: "#fef3c7", fontSize: "1.05rem" }}>
+            {remainingCredits}
+          </strong>
+        </div>
+        <div style={{ color: "#9fb4da", fontSize: "0.78rem" }}>
+          {usedCredits} used of {weeklyCredits} this week
+        </div>
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+          <input
+            type="number"
+            min="1"
+            step="1"
+            value={draftValue}
+            onChange={(event) => setCreditDraft(u.id, event.target.value)}
+            placeholder="Add"
+            disabled={isSaving}
+            style={{
+              width: "5.5rem",
+              fontSize: "0.82rem",
+              padding: "0.3rem 0.45rem",
+              borderRadius: "0.45rem",
+              border: "1px solid #374151",
+              backgroundColor: "#020617",
+              color: "#e5e7eb",
+            }}
+          />
+          <button
+            type="button"
+            className="review-btn"
+            onClick={() => addWritingFeedbackCredits(u.id)}
+            disabled={isSaving}
+            style={{
+              fontSize: "0.8rem",
+              padding: "0.3rem 0.65rem",
+            }}
+          >
+            {isSaving ? "Adding..." : "Add credits"}
+          </button>
+        </div>
+      </div>
+    );
   };
 
   const renderRoleButtons = (u) => (
@@ -1926,6 +2088,12 @@ function renderHubAccessControl(u, compact = false) {
                           Teacher
                         </div>
                         {renderTeacherControl(u)}
+                      </div>
+                      <div>
+                        <div style={{ fontSize: "0.8rem", color: "#cbd5e1", marginBottom: "0.35rem" }}>
+                          AI feedback
+                        </div>
+                        {renderWritingFeedbackCreditControl(u)}
                       </div>
                       <label
                         style={{

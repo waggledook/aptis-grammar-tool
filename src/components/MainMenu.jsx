@@ -6,7 +6,7 @@ import Seo from "./common/Seo.jsx"; // adjust path if your folder structure diff
 export default function MainMenu({ user }) {
   const navigate = useNavigate();
   return (
-    <div className="menu-wrapper">
+    <div className="menu-wrapper menu-style-hub">
       <Seo
         title="Seif Aptis Trainer | Free Aptis Practice"
         description="Practise Aptis grammar, reading, writing, speaking and vocabulary online. Exam-style tasks with tips, guides and progress tracking."
@@ -244,23 +244,6 @@ export default function MainMenu({ user }) {
   line-height: 1.4;
 }
 
-.whats-new-btn {
-  flex-shrink: 0;
-  background: var(--primary-gradient);
-  color: var(--primary-text);
-  border: none;
-  border-radius: 12px;
-  padding: .7rem 1rem;
-  font-weight: 800;
-  cursor: pointer;
-  transition: transform .08s ease, box-shadow .08s ease;
-}
-
-.whats-new-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px rgba(0,0,0,.22);
-}
-
 @media (max-width: 720px) {
   .whats-new-banner {
     flex-direction: column;
@@ -286,34 +269,6 @@ export default function MainMenu({ user }) {
         }
 
         /* ——— Cards ——— */
-        .menu-card {
-          background: var(--color-surface-2);
-          border: 1px solid var(--color-border);
-          color: var(--color-text);
-          border-radius: 14px;
-          padding: 1rem;
-          text-align: left;
-          cursor: pointer;
-          transition:
-            transform .08s ease,
-            box-shadow .08s ease,
-            border-color .08s;
-        }
-        .menu-card:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 18px var(--color-shadow-soft);
-          border-color: var(--color-border-strong);
-        }
-        .menu-card h3 {
-          margin: .1rem 0 .35rem;
-          color: var(--color-text);
-        }
-        .menu-card p {
-          margin: 0;
-          color: var(--color-text-soft);
-          opacity: .9;
-        }
-
         /* ——— "Coming soon" variants ——— */
         .soon-card {
           position: relative;
