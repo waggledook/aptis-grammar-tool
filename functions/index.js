@@ -3560,7 +3560,7 @@ exports.generateAptisWritingPart4Feedback = functions
       model,
       input: buildAptisWritingPart4Prompt(payload),
       reasoning: { effort: "low" },
-      max_output_tokens: 5200,
+      max_output_tokens: 8200,
       text: {
         verbosity: "medium",
         format: {

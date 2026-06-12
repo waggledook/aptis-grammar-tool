@@ -3156,6 +3156,7 @@ function ProfileEmailFeedback({ title, data }) {
         formatAndRegister: data.register,
         organization: data.cohesion,
         lexis: data.vocabulary,
+        mistakes: data.languageErrors,
       }}
     />
   );

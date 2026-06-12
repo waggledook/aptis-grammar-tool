@@ -626,7 +626,7 @@ function LanguageFixes({ items }) {
   if (!Array.isArray(items) || !items.length) return null;
   return (
     <div className="ai-p4-language-fixes">
-      <h5>Language to fix</h5>
+      <h5>Mistakes to fix</h5>
       <ul>
         {items.map((item, index) => (
           <li key={`${item.category}-${item.original}-${index}`}>
