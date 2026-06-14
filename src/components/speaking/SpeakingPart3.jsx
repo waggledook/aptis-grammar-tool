@@ -6,6 +6,7 @@ import { loadSpeakingDone, markSpeakingDone } from "../../utils/speakingProgress
 import { PART3_TASKS } from "./banks/part3";
 import SpeakingAssignButton from "./SpeakingAssignButton";
 import { getSitePath } from "../../siteConfig.js";
+import SpeakingDemoNotice from "./SpeakingDemoNotice.jsx";
 
 /**
  * Speaking – Part 3 (Compare two photos) — Exam-like
@@ -25,7 +26,10 @@ import { getSitePath } from "../../siteConfig.js";
 
 export default function SpeakingPart3({
   tasks = PART3_TASKS,
+  allowedTaskIds = [],
   user,
+  aptisAccess,
+  onSignIn,
   onRequireSignIn,
   partKey = "part3",
   activityId = "speaking-part-3",
@@ -44,8 +48,16 @@ export default function SpeakingPart3({
 }) {
   const [searchParams] = useSearchParams();
   const items = tasks;
+  const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
 
-  const [taskIndex, setTaskIndex] = useState(0);
+  const requestedTaskId = searchParams.get("task") || "";
+  const requestedTaskIndex = items.findIndex((task) => task.id === requestedTaskId);
+  const initialTaskIndex =
+    requestedTaskIndex >= 0 &&
+    (!allowedTaskIds.length || allowedTaskSet.has(items[requestedTaskIndex]?.id))
+      ? requestedTaskIndex
+      : 0;
+  const [taskIndex, setTaskIndex] = useState(initialTaskIndex);
   const current = items[taskIndex] || items[0];
 
   // completions
@@ -69,14 +81,25 @@ export default function SpeakingPart3({
 
     const nextIndex = items.findIndex((task) => task.id === requestedTaskId);
     if (nextIndex === -1) return;
-    if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) return;
+    if (isTaskLocked(items[nextIndex], nextIndex)) return;
     setTaskIndex(nextIndex);
-  }, [lockAfterIndex, searchParams, items, user]);
+  }, [allowedTaskIds.length, allowedTaskSet, lockAfterIndex, searchParams, items, user]);
+
+  useEffect(() => {
+    if (!items.length) return;
+    if (isTaskLocked(items[taskIndex], taskIndex)) setTaskIndex(0);
+  }, [allowedTaskIds.length, allowedTaskSet, items, lockAfterIndex, taskIndex, user]);
+
+  function isTaskLocked(task, index) {
+    return allowedTaskIds.length
+      ? !allowedTaskSet.has(task?.id)
+      : !user && lockAfterIndex != null && index >= lockAfterIndex;
+  }
 
   // decorate picker items (✓ for done, 🔒 for locked 3+ when signed-out)
   const decorated = useMemo(() =>
     items.map((t, i) => {
-      const locked = !user && lockAfterIndex != null && i >= lockAfterIndex;
+      const locked = isTaskLocked(t, i);
       const done = completed.has(t.id);
       return {
         ...t,
@@ -84,10 +107,11 @@ export default function SpeakingPart3({
         title: `${i + 1}. ${t.title}${done ? " ✓" : ""}${locked ? " 🔒" : ""}`,
       };
     }),
-  [items, completed, lockAfterIndex, user]);
+  [allowedTaskIds.length, allowedTaskSet, items, completed, lockAfterIndex, user]);
 
   function handleSelectTask(nextIndex) {
-    if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) {
+    if (isTaskLocked(items[nextIndex], nextIndex)) {
+      toast("That speaking task is included with full access.");
       onRequireSignIn?.(); // open your sign-in modal/sheet
       return;
     }
@@ -123,6 +147,10 @@ export default function SpeakingPart3({
           {headerActions}
         </div>
       </header>
+
+      <SpeakingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+        Demo mode includes one Part 3 comparison task. The other Part 3 tasks stay visible but require full access.
+      </SpeakingDemoNotice>
 
       <TaskFlow
         task={current}

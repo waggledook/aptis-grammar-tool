@@ -7,6 +7,7 @@ import { loadSpeakingDone, markSpeakingDone } from "../../utils/speakingProgress
 import { PART4_TASKS } from "./banks/part4";
 import SpeakingAssignButton from "./SpeakingAssignButton";
 import { getSitePath } from "../../siteConfig.js";
+import SpeakingDemoNotice from "./SpeakingDemoNotice.jsx";
 
 /**
  * Aptis Speaking – Part 4 (2-minute talk)
@@ -25,7 +26,10 @@ import { getSitePath } from "../../siteConfig.js";
 
 export default function SpeakingPart4({
   tasks = PART4_TASKS,
+  allowedTaskIds = [],
   user,
+  aptisAccess,
+  onSignIn,
   onRequireSignIn,
   prepareSeconds = 60,
   speakSeconds = 120,
@@ -45,7 +49,15 @@ export default function SpeakingPart4({
   ),
 }) {
   const [searchParams] = useSearchParams();
-  const [taskIndex, setTaskIndex] = useState(0);
+  const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
+  const requestedTaskId = searchParams.get("task") || "";
+  const requestedTaskIndex = tasks.findIndex((task) => task.id === requestedTaskId);
+  const initialTaskIndex =
+    requestedTaskIndex >= 0 &&
+    (!allowedTaskIds.length || allowedTaskSet.has(tasks[requestedTaskIndex]?.id))
+      ? requestedTaskIndex
+      : 0;
+  const [taskIndex, setTaskIndex] = useState(initialTaskIndex);
   const current = tasks[taskIndex] || tasks[0];
 
   // completed set (cross-device via Firebase; local fallback)
@@ -69,21 +81,36 @@ export default function SpeakingPart4({
 
     const nextIndex = tasks.findIndex((task) => task.id === requestedTaskId);
     if (nextIndex === -1) return;
-    if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) return;
+    if (isTaskLocked(tasks[nextIndex], nextIndex)) return;
     setTaskIndex(nextIndex);
-  }, [lockAfterIndex, searchParams, tasks, user]);
+  }, [allowedTaskIds.length, allowedTaskSet, lockAfterIndex, searchParams, tasks, user]);
+
+  useEffect(() => {
+    if (!tasks.length) return;
+    if (isTaskLocked(tasks[taskIndex], taskIndex)) setTaskIndex(0);
+  }, [allowedTaskIds.length, allowedTaskSet, lockAfterIndex, taskIndex, tasks, user]);
+
+  function isTaskLocked(task, index) {
+    return allowedTaskIds.length
+      ? !allowedTaskSet.has(task?.id)
+      : !user && lockAfterIndex != null && index >= lockAfterIndex;
+  }
 
   // decorate picker (✓ done, 🔒 locked 3+ if signed out)
   const decorated = useMemo(() =>
     tasks.map((t, i) => {
-      const locked = !user && lockAfterIndex != null && i >= lockAfterIndex;
+      const locked = isTaskLocked(t, i);
       const done = completed.has(t.id);
       return { ...t, locked, title: `${i+1}. ${t.title}${done?" ✓":""}${locked?" 🔒":""}` };
     }),
-  [tasks, completed, lockAfterIndex, user]);
+  [allowedTaskIds.length, allowedTaskSet, tasks, completed, lockAfterIndex, user]);
 
   function handleSelectTask(nextIndex) {
-    if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) { return; }
+    if (isTaskLocked(tasks[nextIndex], nextIndex)) {
+      toast("That speaking task is included with full access.");
+      onRequireSignIn?.();
+      return;
+    }
     setTaskIndex(nextIndex);
   }
 
@@ -111,6 +138,10 @@ export default function SpeakingPart4({
           {headerActions}
         </div>
       </header>
+
+      <SpeakingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+        Demo mode includes one Part 4 long-turn task. The other Part 4 topics stay visible but require full access.
+      </SpeakingDemoNotice>
 
       <Part4Flow
         task={current}

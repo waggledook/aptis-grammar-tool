@@ -6,12 +6,17 @@ import TopicFlashcards from "./TopicFlashcards";
 import VocabMistakeReview from "./VocabMistakeReview";
 import { toast } from "../../utils/toast";
 import { getSitePath } from "../../siteConfig.js";
+import AptisDemoBadge from "../access/AptisDemoBadge.jsx";
 
 export default function VocabularyTopics({
   onSelect,
   onBack,
   isAuthenticated = false,
   user = null,
+  aptisAccess,
+  demoTopicIds = [],
+  demoTopicSetIds = {},
+  onSignIn,
 }) {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,10 +24,23 @@ export default function VocabularyTopics({
   const setFromUrl = searchParams.get("set");
   const [selectedTopic, setSelectedTopic] = React.useState(topicFromUrl || null);
   const [topicView, setTopicView] = React.useState("practice");
+  const isDemoMode = !!aptisAccess?.isDemoMode;
+  const demoTopicSet = React.useMemo(() => new Set(demoTopicIds), [demoTopicIds]);
+  const [lockedTopic, setLockedTopic] = React.useState("");
 
   React.useEffect(() => {
     setSelectedTopic(topicFromUrl || null);
   }, [topicFromUrl]);
+
+  React.useEffect(() => {
+    if (!isDemoMode || !selectedTopic || demoTopicSet.has(selectedTopic)) return;
+    const next = new URLSearchParams(searchParams);
+    next.delete("topic");
+    next.delete("set");
+    setSearchParams(next);
+    setSelectedTopic(null);
+    setLockedTopic("That topic");
+  }, [demoTopicSet, isDemoMode, searchParams, selectedTopic, setSearchParams]);
 
   if (topicView === "mistakes") {
     return (
@@ -32,7 +50,7 @@ export default function VocabularyTopics({
     );
   }
 
-  if (selectedTopic) {
+  if (selectedTopic && (!isDemoMode || demoTopicSet.has(selectedTopic))) {
     if (topicView === "flashcards") {
       return (
         <TopicFlashcards
@@ -56,6 +74,8 @@ export default function VocabularyTopics({
           topic={selectedTopic}
           initialSetId={setFromUrl || ""}
           user={user}
+          aptisAccess={aptisAccess}
+          allowedSetIds={isDemoMode ? demoTopicSetIds[selectedTopic] || [] : []}
           onSetChange={(setId) => {
             const next = new URLSearchParams(searchParams);
             next.set("topic", selectedTopic);
@@ -164,6 +184,17 @@ export default function VocabularyTopics({
     },
   ];  
 
+  function renderTopicPill(topic) {
+    if (!isDemoMode) return null;
+    if (topic.active && demoTopicSet.has(topic.id)) {
+      return <span className="topic-access-pill demo">Demo available</span>;
+    }
+    if (topic.active) {
+      return <span className="topic-access-pill locked">Full access</span>;
+    }
+    return null;
+  }
+
   return (
     <div className="vocab-topics game-wrapper">
       <header className="header">
@@ -172,10 +203,24 @@ export default function VocabularyTopics({
           Choose a topic to explore key vocabulary and practise using it in context.
         </p>
       </header>
+
+      <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
+
+      {isDemoMode && lockedTopic ? (
+        <div className="topic-access-prompt" role="status">
+          <strong>{lockedTopic} is included with full access.</strong>
+          <p>The topic demo currently includes Transport and Education.</p>
+        </div>
+      ) : null}
+
 <div className="featured-cards">
   <button
-    className="card featured-card"
+    className={`card featured-card ${isDemoMode ? "locked-card" : ""}`}
     onClick={() => {
+      if (isDemoMode) {
+        setLockedTopic("Vocab Lab");
+        return;
+      }
       if (isAuthenticated) navigate("/vocabulary/lab");
       else toast("Please sign in to use Vocab Lab 🔒");
     }}
@@ -184,7 +229,7 @@ export default function VocabularyTopics({
       <h3 style={{ margin: 0 }}>
         🎯 Vocab Lab (Mixed practice)
       </h3>
-      <span className="soon-pill">New</span>
+      <span className="soon-pill">{isDemoMode ? "Full access" : "New"}</span>
     </div>
     <p style={{ margin: 0 }}>
       Generate a random session across topics — flashcards or test sentences.
@@ -192,8 +237,12 @@ export default function VocabularyTopics({
   </button>
 
   <button
-    className="card featured-card"
+    className={`card featured-card ${isDemoMode ? "locked-card" : ""}`}
     onClick={() => {
+      if (isDemoMode) {
+        setLockedTopic("Review mistakes");
+        return;
+      }
       if (isAuthenticated) setTopicView("mistakes");
       else toast("Please sign in to review saved mistakes 🔒");
     }}
@@ -214,22 +263,28 @@ export default function VocabularyTopics({
         {topics.map((t) => (
           <button
             key={t.id}
-            className={`card ${t.active ? "" : "soon-card"}`}
-            onClick={() =>
-              t.active
-                ? setSearchParams({ topic: t.id })
-                : toast(`${t.name} topic coming soon 👀`)
-            }
+            className={`card ${t.active ? "" : "soon-card"} ${isDemoMode && t.active && !demoTopicSet.has(t.id) ? "locked-card" : ""}`}
+            onClick={() => {
+              if (!t.active) {
+                toast(`${t.name} topic coming soon 👀`);
+                return;
+              }
+              if (isDemoMode && !demoTopicSet.has(t.id)) {
+                setLockedTopic(t.name);
+                return;
+              }
+              setSearchParams({ topic: t.id });
+            }}
           >
             <div className="card-head">
               <h3>
                 <span style={{ fontSize: "1.3rem" }}>{t.emoji}</span> {t.name}
               </h3>
-              {t.isNew ? (
+              {renderTopicPill(t) || (t.isNew ? (
                 <span className="new-pill">New</span>
               ) : !t.active ? (
                 <span className="soon-pill">Coming soon</span>
-              ) : null}
+              ) : null)}
             </div>
             <p>{t.desc}</p>
           </button>
@@ -248,6 +303,28 @@ export default function VocabularyTopics({
         .header { margin-bottom: 1rem; }
         .title { font-size: 1.6rem; margin-bottom: .3rem; }
         .intro { color: #a9b7d1; max-width: 640px; }
+
+        .topic-access-prompt {
+          margin: 0 0 1rem;
+          padding: .8rem .95rem;
+          border-radius: 12px;
+          border: 1px solid color-mix(in srgb, var(--color-accent) 42%, var(--color-border));
+          background:
+            linear-gradient(100deg, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-raised)), var(--color-surface-raised));
+        }
+
+        .topic-access-prompt strong {
+          display: block;
+          margin-bottom: .2rem;
+          color: var(--color-text);
+        }
+
+        .topic-access-prompt p {
+          margin: 0;
+          color: var(--color-text-soft);
+          line-height: 1.38;
+          font-size: .9rem;
+        }
 
         .cards {
           display: grid;
@@ -301,6 +378,10 @@ export default function VocabularyTopics({
           border-color: #3a5ba0;
         }
 
+        .locked-card {
+          opacity: .72;
+        }
+
         .card-head {
           display: flex;
           justify-content: space-between;
@@ -331,6 +412,28 @@ export default function VocabularyTopics({
           border-radius: 999px;
           font-weight: 700;
           white-space: nowrap;
+        }
+
+        .topic-access-pill {
+          border-radius: 999px;
+          border: 1px solid var(--color-border);
+          color: var(--color-text-soft);
+          font-size: .68rem;
+          line-height: 1.2;
+          padding: .18rem .48rem;
+          font-weight: 800;
+          white-space: nowrap;
+        }
+
+        .topic-access-pill.demo {
+          border-color: color-mix(in srgb, var(--color-accent) 48%, var(--color-border));
+          background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+          color: var(--color-accent);
+        }
+
+        .topic-access-pill.locked {
+          border-color: color-mix(in srgb, #94a3b8 42%, var(--color-border));
+          background: color-mix(in srgb, #94a3b8 10%, transparent);
         }
 
         .card h3 {

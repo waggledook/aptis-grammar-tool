@@ -19,6 +19,9 @@ const WRITING_FEEDBACK_WEEKLY_CREDITS = {
   admin: 1000,
 };
 
+const APTIS_TRAINER_ACCESS_KEY = "aptisTrainer";
+const APTIS_DEMO_FEEDBACK_LIFETIME_CREDITS = 8;
+
 const WRITING_FEEDBACK_CREDIT_COSTS = {
   generic: 4,
   aptis_part1: 1,
@@ -49,6 +52,57 @@ function getFeedbackWeekKey(date = new Date()) {
   return d.toISOString().slice(0, 10);
 }
 
+function todayIsoDate(date = new Date()) {
+  return date.toISOString().slice(0, 10);
+}
+
+function getSiteAccessConfig(userData, accessKey) {
+  const raw = userData?.siteAccess?.[accessKey];
+
+  if (raw === true) {
+    return {
+      active: true,
+      startDate: "",
+      endDate: "",
+      indefinite: true,
+    };
+  }
+
+  if (!raw || typeof raw !== "object") {
+    return {
+      active: false,
+      startDate: "",
+      endDate: "",
+      indefinite: false,
+    };
+  }
+
+  return {
+    active: !!raw.active,
+    startDate: raw.startDate || "",
+    endDate: raw.endDate || "",
+    indefinite: !!raw.indefinite,
+  };
+}
+
+function hasAptisTrainerAccess(userData) {
+  const role = userData?.role || "student";
+  if (role === "admin" || role === "teacher") return true;
+
+  const access = getSiteAccessConfig(userData, APTIS_TRAINER_ACCESS_KEY);
+  if (!access.active) return false;
+
+  const today = todayIsoDate();
+  if (access.startDate && today < access.startDate) return false;
+  if (!access.indefinite && access.endDate && today > access.endDate) return false;
+
+  return true;
+}
+
+function isAptisFeedbackTask(taskType) {
+  return String(taskType || "").startsWith("aptis_");
+}
+
 async function consumeWritingFeedbackCredits(context, taskType, creditCost) {
   if (!context.auth?.uid) {
     throw new functions.https.HttpsError("unauthenticated", "Sign in to get feedback.");
@@ -58,12 +112,62 @@ async function consumeWritingFeedbackCredits(context, taskType, creditCost) {
   const weekKey = getFeedbackWeekKey();
   const userRef = firestore.doc(`users/${uid}`);
   const usageRef = firestore.doc(`users/${uid}/writingFeedbackUsage/${weekKey}`);
+  const demoUsageRef = firestore.doc(`users/${uid}/aptisTrainerDemoFeedbackUsage/lifetime`);
 
   return firestore.runTransaction(async (tx) => {
-    const [userSnap, usageSnap] = await Promise.all([tx.get(userRef), tx.get(usageRef)]);
-    const role = userSnap.data()?.role || "student";
+    const userSnap = await tx.get(userRef);
+    const userData = userSnap.data() || {};
+
+    if (isAptisFeedbackTask(taskType) && !hasAptisTrainerAccess(userData)) {
+      const usageSnap = await tx.get(demoUsageRef);
+      const rawLifetimeLimit = userData.aptisDemoFeedbackLifetimeCredits;
+      const customLifetimeLimit =
+        rawLifetimeLimit === undefined || rawLifetimeLimit === null || rawLifetimeLimit === ""
+          ? NaN
+          : Number(rawLifetimeLimit);
+      const lifetimeLimit = Number.isFinite(customLifetimeLimit)
+        ? customLifetimeLimit
+        : APTIS_DEMO_FEEDBACK_LIFETIME_CREDITS;
+      const used = Number(usageSnap.data()?.creditsUsed || 0);
+      const nextUsed = used + creditCost;
+
+      if (nextUsed > lifetimeLimit) {
+        throw new functions.https.HttpsError(
+          "resource-exhausted",
+          "You have used your demo feedback credits. Full Aptis Trainer access includes more AI feedback."
+        );
+      }
+
+      tx.set(
+        demoUsageRef,
+        {
+          pool: "aptis_demo_lifetime",
+          creditsUsed: nextUsed,
+          lifetimeLimit,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          lastTaskType: taskType,
+          requests: admin.firestore.FieldValue.increment(1),
+          tasks: {
+            [taskType]: admin.firestore.FieldValue.increment(1),
+          },
+        },
+        { merge: true }
+      );
+
+      return {
+        taskType,
+        creditCost,
+        creditsUsed: nextUsed,
+        creditsRemaining: Math.max(0, lifetimeLimit - nextUsed),
+        lifetimeLimit,
+        pool: "aptis_demo_lifetime",
+      };
+    }
+
+    const usageSnap = await tx.get(usageRef);
+    const role = userData.role || "student";
     const weeklyLimit =
-      userSnap.data()?.writingFeedbackWeeklyCredits ??
+      userData.writingFeedbackWeeklyCredits ??
       WRITING_FEEDBACK_WEEKLY_CREDITS[role] ??
       WRITING_FEEDBACK_WEEKLY_CREDITS.student;
     const used = Number(usageSnap.data()?.creditsUsed || 0);
@@ -96,14 +200,36 @@ async function consumeWritingFeedbackCredits(context, taskType, creditCost) {
       taskType,
       creditCost,
       creditsUsed: nextUsed,
+      creditsRemaining: Math.max(0, weeklyLimit - nextUsed),
       weeklyLimit,
       weekKey,
+      pool: "weekly",
     };
   });
 }
 
 async function refundWritingFeedbackCredits(context, reservation) {
-  if (!context.auth?.uid || !reservation?.creditCost || !reservation?.weekKey) return;
+  if (!context.auth?.uid || !reservation?.creditCost) return;
+
+  if (reservation.pool === "aptis_demo_lifetime") {
+    const usageRef = firestore.doc(`users/${context.auth.uid}/aptisTrainerDemoFeedbackUsage/lifetime`);
+    await firestore.runTransaction(async (tx) => {
+      const snap = await tx.get(usageRef);
+      const used = Number(snap.data()?.creditsUsed || 0);
+      tx.set(
+        usageRef,
+        {
+          creditsUsed: Math.max(0, used - reservation.creditCost),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          refundedRequests: admin.firestore.FieldValue.increment(1),
+        },
+        { merge: true }
+      );
+    });
+    return;
+  }
+
+  if (!reservation.weekKey) return;
 
   const usageRef = firestore.doc(`users/${context.auth.uid}/writingFeedbackUsage/${reservation.weekKey}`);
   await firestore.runTransaction(async (tx) => {

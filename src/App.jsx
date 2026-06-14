@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import {
   auth,
@@ -82,6 +82,7 @@ import TeacherStudentProfile from "./components/TeacherStudentProfile";
 import CookieBanner from "./components/CookieBanner.jsx";
 import PrivacyPolicy from "./components/legal/PrivacyPolicy.jsx";
 import TeacherExtrasButton from "./components/common/TeacherExtrasButton.jsx";
+import AptisDemoBadge from "./components/access/AptisDemoBadge.jsx";
 import LiveGameJoin from "./components/live/LiveGameJoin";
 import LiveGameHost from "./components/live/LiveGameHost";
 import LiveGamePlayer from "./components/live/LiveGamePlayer";
@@ -95,6 +96,7 @@ import SpeakingPart3SimilaritiesExtras from "./components/teacher/SpeakingPart3S
 import CoursePackViewer from "./components/coursepack/CoursePackViewer";
 import PackKeyLanding from "./components/coursepack/PackKeyLanding";
 import CoreGrammarKey from "./components/coursepack/CoreGrammarKey";
+import { APTIS_DEMO_ACCESS, APTIS_DEMO_GRAMMAR_QUESTION_LIMIT } from "./demo/aptisDemoAccess.js";
 
 const TEACHER_NOTIFICATION_LIMIT = 100;
 const TEACHER_BADGE_REFRESH_MS = 10 * 60 * 1000;
@@ -168,7 +170,7 @@ import OteWritingEssayBodyParagraphs from "./products/ote/OteWritingEssayBodyPar
 import OteWritingArticleReviewGuide from "./products/ote/OteWritingArticleReviewGuide.jsx";
 import OteWritingRegisterBasics from "./products/ote/OteWritingRegisterBasics.jsx";
 import OteWritingRegisterGapTrainer from "./products/ote/OteWritingRegisterGapTrainer.jsx";
-import { canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
+import { canAccessAptisTrainer, canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 function BellIcon() {
   return (
@@ -202,6 +204,26 @@ function RequireSignedIn({ user, onSignIn, children }) {
         <button className="topbar-btn" type="button" onClick={onSignIn}>
           Sign in / Sign up
         </button>
+      </div>
+    </div>
+  );
+}
+
+function AptisFullAccessOnly({ user, aptisAccess, onSignIn, title = "Full access required", children }) {
+  if (!aptisAccess?.isDemoMode) return <>{children}</>;
+
+  return (
+    <div className="game-wrapper">
+      <div className="panel" style={{ marginTop: "1rem" }}>
+        <h2 className="title">{title}</h2>
+        <p className="intro">
+          This activity is included with full Aptis Trainer access. Demo access stays open for the selected sample activities.
+        </p>
+        {!user && onSignIn ? (
+          <button className="topbar-btn" type="button" onClick={onSignIn}>
+            Sign in / Sign up
+          </button>
+        ) : null}
       </div>
     </div>
   );
@@ -688,6 +710,12 @@ useEffect(() => {
 }, [location.pathname, user]);
 
 const hasSeifHubAccess = canAccessSeifHub(user);
+const hasAptisTrainerAccess = canAccessAptisTrainer(user);
+const isAptisDemoMode = !hasAptisTrainerAccess;
+const aptisAccess = {
+  hasFullAccess: hasAptisTrainerAccess,
+  isDemoMode: isAptisDemoMode,
+};
 const hasMemberSiteAccess = !requiresMemberAccess || hasSeifHubAccess;
 const isTeacherToolsRoute = location.pathname === "/teacher-tools";
 const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-it/join";
@@ -744,9 +772,10 @@ const [runKey,  setRunKey]  = useState(0);
       const batch = await fetchItems({
         levels,
         tags: tag ? [tag] : [],
-        count,
+        count: isAptisDemoMode ? Math.min(count, APTIS_DEMO_GRAMMAR_QUESTION_LIMIT) : count,
+        allowedIds: isAptisDemoMode ? APTIS_DEMO_ACCESS.grammar.itemIds : [],
         // Prefer new items for signed-in users
-        preferNew: !!user,
+        preferNew: !!user && !isAptisDemoMode,
         seenIds,
       });
   
@@ -782,6 +811,16 @@ const [runKey,  setRunKey]  = useState(0);
   // 👇 Add this INSIDE App, before the `return`
   function GrammarPage() {
     const [answeredCount, setAnsweredCount] = useState(0);
+    const grammarCountOptions = useMemo(
+      () => (isAptisDemoMode ? [5, 10, 15, 25] : [5, 10, 15]),
+      [isAptisDemoMode]
+    );
+
+    useEffect(() => {
+      if (!grammarCountOptions.includes(count)) {
+        setCount(grammarCountOptions[grammarCountOptions.length - 1]);
+      }
+    }, [grammarCountOptions, count]);
 
     const handleGenerate = () => {
       setAnsweredCount(0);
@@ -806,6 +845,18 @@ const [runKey,  setRunKey]  = useState(0);
       />
         <h1>Aptis Grammar Practice</h1>
 
+        <AptisDemoBadge
+          user={user}
+          aptisAccess={aptisAccess}
+          onSignIn={() => setShowAuth(true)}
+        />
+
+        {isAptisDemoMode && (
+          <div className="grammar-demo-note" role="note">
+            <strong>Grammar preview:</strong> demo mode uses a curated pool of 25 grammar items. Full access includes 400+ unique items across levels and grammar tags.
+          </div>
+        )}
+
         {tagsLoading && <p>Loading tags…</p>}
         {tagsError && <p className="error-text">Error loading tags.</p>}
 
@@ -824,7 +875,7 @@ const [runKey,  setRunKey]  = useState(0);
           role="group"
           aria-label="Number of questions"
         >
-          {[5, 10, 15].map((n) => (
+          {grammarCountOptions.map((n) => (
             <button
               key={n}
               type="button"
@@ -1055,9 +1106,9 @@ return (
   {/* ——— Grammar route ——— */}
   <Route
     path="/grammar"
-    element={isSeifHubSite ? <HubGrammarMenu /> : <GrammarPage />}
+    element={isSeifHubSite ? <HubGrammarMenu /> : <GrammarPage aptisAccess={aptisAccess} />}
   />
-  <Route path="/grammar/aptis" element={<GrammarPage />} />
+  <Route path="/grammar/aptis" element={<GrammarPage aptisAccess={aptisAccess} />} />
   <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu user={user} />} />
   <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer user={user} />} />
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests user={user} />} />
@@ -1202,7 +1253,16 @@ return (
   )}
 
 {/* Reading routes */}
-<Route path="/reading" element={<ReadingMenu />} />
+<Route
+  path="/reading"
+  element={
+    <ReadingMenu
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+    />
+  }
+/>
 
 <Route
   path="/reading/part1"
@@ -1235,7 +1295,10 @@ return (
     </button>
     <AptisPart2Reorder
       user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
       onRequireSignIn={() => setShowAuth(true)}
+      allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.reading.part2TaskIds : []}
       headerActions={
         <TeacherExtrasButton
           user={user}
@@ -1302,7 +1365,10 @@ return (
 
       <AptisPart4
         user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
         onRequireSignIn={() => setShowAuth(true)}
+        allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.reading.part4TaskIds : []}
       />
     </>
   }
@@ -1316,7 +1382,11 @@ return (
     isOteSite ? (
       <OteSkillMenu skill="speaking" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />
     ) : (
-      <SpeakingMenu />
+      <SpeakingMenu
+        user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+      />
     )
   }
 />
@@ -1332,7 +1402,13 @@ return (
       >
         ← Back
       </button>
-      <SpeakingPart1 user={user} speakSeconds={30} />
+      <SpeakingPart1
+        user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        allowedQuestionIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.speaking.part1QuestionIds : []}
+        speakSeconds={30}
+      />
     </>
   }
 />
@@ -1350,8 +1426,11 @@ return (
       </button>
       <SpeakingPart2
         user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.speaking.part2TaskIds : []}
         onBack={() => navigate("/speaking")}
-        onRequireSignIn={() => navigate("/")} // or setShowAuth(true) if you prefer
+        onRequireSignIn={() => setShowAuth(true)}
         headerActions={
           <TeacherExtrasButton
             user={user}
@@ -1395,6 +1474,9 @@ return (
       </button>
       <SpeakingPart3
         user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.speaking.part3TaskIds : []}
         headerActions={
           <TeacherExtrasButton
             user={user}
@@ -1438,6 +1520,9 @@ return (
       </button>
       <SpeakingPart4
         user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.speaking.part4TaskIds : []}
         headerActions={
           <TeacherExtrasButton
             user={user}
@@ -1509,7 +1594,16 @@ return (
 />
 
 {/* listening routes */}
-<Route path="/listening" element={isSeifHubSite ? <HubListeningMenu /> : <ListeningMenu />} />
+<Route
+  path="/listening"
+  element={
+    isSeifHubSite ? (
+      <HubListeningMenu />
+    ) : (
+      <ListeningMenu user={user} aptisAccess={aptisAccess} onSignIn={() => setShowAuth(true)} />
+    )
+  }
+/>
 
 <Route
   path="/listening/dictation"
@@ -1521,7 +1615,10 @@ return (
   element={
     <ListeningPart1
       user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
       onRequireSignIn={() => setShowAuthModal?.(true)}
+      allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.listening.part1TaskIds : []}
     />
   }
 />
@@ -1532,7 +1629,10 @@ return (
   element={
     <ListeningPart2
       user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
       onRequireSignIn={() => setShowAuthModal?.(true)}
+      allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.listening.part2TaskIds : []}
     />
   }
 />
@@ -1540,25 +1640,48 @@ return (
 <Route
   path="/listening/part3"
   element={
-    <ListeningPart3
+    <AptisFullAccessOnly
       user={user}
-      onRequireSignIn={() => setShowAuthModal(true)}
-    />
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+      title="Listening Part 3 is included with full access"
+    >
+      <ListeningPart3
+        user={user}
+        onRequireSignIn={() => setShowAuthModal(true)}
+      />
+    </AptisFullAccessOnly>
   }
 />
 
 <Route
   path="/listening/part4"
   element={
-    <ListeningPart4
+    <AptisFullAccessOnly
       user={user}
-      onRequireSignIn={() => setShowAuthModal?.(true)}
-    />
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+      title="Listening Part 4 is included with full access"
+    >
+      <ListeningPart4
+        user={user}
+        onRequireSignIn={() => setShowAuthModal?.(true)}
+      />
+    </AptisFullAccessOnly>
   }
 />
 
 {/* vocabulary routes */}
-<Route path="/vocabulary" element={isSeifHubSite ? <HubVocabularyMenu /> : <VocabularyMenu />} />
+<Route
+  path="/vocabulary"
+  element={
+    isSeifHubSite ? (
+      <HubVocabularyMenu />
+    ) : (
+      <VocabularyMenu user={user} aptisAccess={aptisAccess} onSignIn={() => setShowAuth(true)} />
+    )
+  }
+/>
 <Route path="/vocabulary/textbook" element={<HubVocabularyA1Menu />} />
 <Route
   path="/vocabulary/textbook/mistakes"
@@ -1573,48 +1696,105 @@ return (
 <Route path="/vocabulary/a1/:themeId/:activityId" element={<HubVocabularyActivityRunner />} />
   <Route
     path="/vocabulary/topics"
-    element={<VocabularyTopics isAuthenticated={!!user} user={user} />}
+    element={
+      <VocabularyTopics
+        isAuthenticated={!!user}
+        user={user}
+        aptisAccess={aptisAccess}
+        demoTopicIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.vocabulary.topicIds : []}
+        demoTopicSetIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.vocabulary.topicSetIds : {}}
+        onSignIn={() => setShowAuth(true)}
+      />
+    }
   />
 
 <Route
   path="/vocabulary/lab"
   element={
-    user ? (
-      <VocabLab user={user} />
-    ) : (
-      <div className="panel">
-        <h2 style={{ marginTop: 0 }}>Vocab Lab</h2>
-        <p className="muted">
-          Please sign in to use global training and track your progress.
-        </p>
-        <button className="topbar-btn" onClick={() => setShowAuth(true)}>
-          Sign in / Sign up
-        </button>
-      </div>
-    )
+    <AptisFullAccessOnly
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+      title="Vocab Lab is included with full access"
+    >
+      {user ? (
+        <VocabLab user={user} />
+      ) : (
+        <div className="panel">
+          <h2 style={{ marginTop: 0 }}>Vocab Lab</h2>
+          <p className="muted">
+            Please sign in to use global training and track your progress.
+          </p>
+          <button className="topbar-btn" onClick={() => setShowAuth(true)}>
+            Sign in / Sign up
+          </button>
+        </div>
+      )}
+    </AptisFullAccessOnly>
   }
 />
 
-<Route path="/vocabulary/synonyms" element={<SynonymTrainer />} />
+<Route
+  path="/vocabulary/synonyms"
+  element={
+    <SynonymTrainer
+      user={user}
+      aptisAccess={aptisAccess}
+      allowedItemIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.vocabulary.synonymItemIds : []}
+      onSignIn={() => setShowAuth(true)}
+    />
+  }
+/>
 
-<Route path="/vocabulary/collocations" element={<CollocationMenu />} />
+<Route
+  path="/vocabulary/collocations"
+  element={
+    <AptisFullAccessOnly
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+      title="Collocations are included with full access"
+    >
+      <CollocationMenu />
+    </AptisFullAccessOnly>
+  }
+/>
 
-<Route path="/vocabulary/collocations/trainer" element={<CollocationPrecisionTrainer />} />
+<Route
+  path="/vocabulary/collocations/trainer"
+  element={
+    <AptisFullAccessOnly
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+      title="Collocation Trainer is included with full access"
+    >
+      <CollocationPrecisionTrainer />
+    </AptisFullAccessOnly>
+  }
+/>
 
 <Route
   path="/vocabulary/collocations/dash"
   element={
-    <>
-      <button
-        onClick={() => navigate("/vocabulary")}
-        className="review-btn"
-        style={{ marginBottom: "1rem" }}
-      >
-        ← Back
-      </button>
+    <AptisFullAccessOnly
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+      title="Collocation Dash is included with full access"
+    >
+      <>
+        <button
+          onClick={() => navigate("/vocabulary")}
+          className="review-btn"
+          style={{ marginBottom: "1rem" }}
+        >
+          ← Back
+        </button>
 
-      <CollocationDash user={user} onRequireSignIn={() => setShowAuth(true)} />
-    </>
+        <CollocationDash user={user} onRequireSignIn={() => setShowAuth(true)} />
+      </>
+    </AptisFullAccessOnly>
   }
 />
 
@@ -1625,7 +1805,7 @@ return (
     isOteSite ? (
       <OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />
     ) : (
-      <WritingMenu />
+      <WritingMenu user={user} aptisAccess={aptisAccess} onSignIn={() => setShowAuth(true)} />
     )
   }
 />
@@ -1643,6 +1823,9 @@ return (
       </button>
       <WritingPart1
         user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        allowedQuestionIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.writing.part1QuestionIds : []}
         onBack={() => navigate("/writing")}
       />
     </>
@@ -1682,7 +1865,10 @@ return (
       </button>
       <WritingPart2
         user={user}
-        onRequireSignIn={() => navigate("/login")}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.writing.part2TaskIds : []}
+        onRequireSignIn={() => setShowAuth(true)}
       />
     </>
   }
@@ -1701,7 +1887,10 @@ return (
       </button>
       <WritingPart3
         user={user}
-        onRequireSignIn={() => navigate("/login")}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.writing.part3TaskIds : []}
+        onRequireSignIn={() => setShowAuth(true)}
       />
     </>
   }
@@ -1720,7 +1909,11 @@ return (
       </button>
       <WritingPart4Emails
         user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.writing.part4TaskIds : []}
         onBack={() => navigate("/writing")}
+        onRequireSignIn={() => setShowAuth(true)}
       />
     </>
   }
@@ -2047,12 +2240,14 @@ return (
               <MainMenu
                 onSelect={(next) => setView(next)}
                 user={user}
+                aptisAccess={aptisAccess}
+                onSignIn={() => setShowAuth(true)}
               />
             )
           )
         )}
 
-        {view === 'grammar' && <GrammarPage />}
+        {view === 'grammar' && <GrammarPage aptisAccess={aptisAccess} />}
 
         {view === 'mistakes' && (
           <>

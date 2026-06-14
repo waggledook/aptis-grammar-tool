@@ -4,6 +4,7 @@ import * as fb from "../../firebase"; // namespace import (works even if functio
 import { loadSpeakingDone, markSpeakingDone } from "../../utils/speakingProgress";
 import { PART1_QUESTIONS } from "./banks/part1";
 import { getTtsUrl } from '../../api/speak';
+import SpeakingDemoNotice from "./SpeakingDemoNotice.jsx";
 
 
 /**
@@ -18,6 +19,9 @@ import { getTtsUrl } from '../../api/speak';
 
 export default function SpeakingPart1({
   user,
+  aptisAccess,
+  onSignIn,
+  allowedQuestionIds = [],
   speakSeconds = 30,   // Aptis Part 1 typical speaking window
   autoBeepSeconds = 1.0
 }) {
@@ -52,7 +56,11 @@ export default function SpeakingPart1({
 
 
   // -------- Bank + progress tracking --------
-  const BANK = useMemo(() => PART1_QUESTIONS, []);
+  const BANK = useMemo(() => {
+    if (!allowedQuestionIds.length) return PART1_QUESTIONS;
+    const allowedSet = new Set(allowedQuestionIds);
+    return PART1_QUESTIONS.filter((question) => allowedSet.has(question.id));
+  }, [allowedQuestionIds]);
   const [completed, setCompleted] = useState(new Set()); // set of raw ids like "p1q001"
   useEffect(() => {
     let alive = true;
@@ -429,6 +437,10 @@ export default function SpeakingPart1({
   </button>
 </div>
       </header>
+
+      <SpeakingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+        Demo mode includes one Part 1 sample set with three selected personal questions. Full access unlocks the complete Part 1 question bank.
+      </SpeakingDemoNotice>
 
       <section className="panel">
       <audio ref={ttsAudioRef} preload="none" style={{ display: 'none' }} />

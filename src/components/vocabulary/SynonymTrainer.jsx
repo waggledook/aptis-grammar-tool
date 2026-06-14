@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Star } from "lucide-react";
 
 import Seo from "../common/Seo.jsx";
+import AptisDemoBadge from "../access/AptisDemoBadge.jsx";
 import synonymSeedItems from "./data/synonymSeedItems.js";
 import { toast } from "../../utils/toast";
 import {
@@ -125,17 +126,24 @@ function createExamSet(pool, preferredPartOfSpeech = "all", seenItemIds = new Se
   };
 }
 
-export default function SynonymTrainer() {
+export default function SynonymTrainer({ user, aptisAccess, allowedItemIds = [], onSignIn }) {
   const navigate = useNavigate();
   const completionLoggedRef = useRef(false);
-  const signedIn = !!auth.currentUser;
+  const signedIn = !!(user || auth.currentUser);
+  const isDemoMode = !!aptisAccess?.isDemoMode;
+  const allowedItemIdSet = useMemo(() => new Set(allowedItemIds), [allowedItemIds]);
+  const activeSeedItems = useMemo(() => {
+    if (!allowedItemIdSet.size) return synonymSeedItems;
+    const filtered = synonymSeedItems.filter((item) => allowedItemIdSet.has(item.itemId));
+    return filtered.length ? filtered : synonymSeedItems;
+  }, [allowedItemIdSet]);
 
   const [loading, setLoading] = useState(true);
   const [favouriteIds, setFavouriteIds] = useState(new Set());
   const [seenItemIds, setSeenItemIds] = useState(new Set());
   const availableLevels = useMemo(
-    () => Array.from(new Set(synonymSeedItems.map((item) => item.level))).sort(),
-    []
+    () => Array.from(new Set(activeSeedItems.map((item) => item.level))).sort(),
+    [activeSeedItems]
   );
   const [levels, setLevels] = useState(() => [...availableLevels]);
   const [partOfSpeech, setPartOfSpeech] = useState("all");
@@ -149,6 +157,20 @@ export default function SynonymTrainer() {
   const [learnResults, setLearnResults] = useState({});
   const [examAnswers, setExamAnswers] = useState({});
   const [examResults, setExamResults] = useState(null);
+
+  useEffect(() => {
+    setLevels((previous) => {
+      const next = previous.filter((level) => availableLevels.includes(level));
+      return next.length ? next : [...availableLevels];
+    });
+  }, [availableLevels]);
+
+  useEffect(() => {
+    if (sessionMode === "exam" && isDemoMode) {
+      setSessionMode("learn");
+      resetSession();
+    }
+  }, [isDemoMode, sessionMode]);
 
   useEffect(() => {
     let cancelled = false;
@@ -180,11 +202,11 @@ export default function SynonymTrainer() {
   }, [signedIn]);
 
   const topicOptions = useMemo(() => {
-    return Array.from(new Set(synonymSeedItems.map((item) => item.topic))).sort();
-  }, []);
+    return Array.from(new Set(activeSeedItems.map((item) => item.topic))).sort();
+  }, [activeSeedItems]);
 
   const filteredPool = useMemo(() => {
-    return synonymSeedItems.filter((item) => {
+    return activeSeedItems.filter((item) => {
       const levelMatch = levels.includes(item.level);
       const posMatch = partOfSpeech === "all" || item.partOfSpeech === partOfSpeech;
       const topicMatch = topic === "all" || item.topic === topic;
@@ -192,7 +214,7 @@ export default function SynonymTrainer() {
       const ambiguityMatch = isWithinAmbiguity(item, maxAmbiguity);
       return levelMatch && posMatch && topicMatch && statusMatch && ambiguityMatch;
     });
-  }, [levels, maxAmbiguity, partOfSpeech, topic]);
+  }, [activeSeedItems, levels, maxAmbiguity, partOfSpeech, topic]);
 
   const examPool = useMemo(
     () => filteredPool.filter((item) => isWithinAmbiguity(item, "low")),
@@ -258,6 +280,10 @@ export default function SynonymTrainer() {
   }
 
   async function startExamSession() {
+    if (isDemoMode) {
+      toast("Exam mode is included with full access.");
+      return;
+    }
     if (!canBuildExamSet) {
       toast("Exam mode needs at least 10 items from one word class.");
       return;
@@ -289,6 +315,10 @@ export default function SynonymTrainer() {
   }
 
   async function loadFavouriteSet() {
+    if (isDemoMode) {
+      toast("Favourite review is included with full access.");
+      return;
+    }
     try {
       const favourites = dedupeByItemId(await fetchSynonymTrainerFavourites());
       if (!favourites.length) {
@@ -310,6 +340,10 @@ export default function SynonymTrainer() {
   }
 
   async function loadMistakeSet() {
+    if (isDemoMode) {
+      toast("Mistake review is included with full access.");
+      return;
+    }
     try {
       const mistakes = dedupeByItemId(await fetchSynonymTrainerMistakes());
       if (!mistakes.length) {
@@ -501,6 +535,8 @@ export default function SynonymTrainer() {
           </p>
         </header>
 
+        <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
+
         <section className="synonym-setup">
           <div className="filter-panel synonym-filters">
             <fieldset className="levels-fieldset">
@@ -575,7 +611,13 @@ export default function SynonymTrainer() {
               <button
                 type="button"
                 className={`mode-pill ${sessionMode === "exam" ? "active" : ""}`}
-                onClick={() => setSessionMode("exam")}
+                onClick={() => {
+                  if (isDemoMode) {
+                    toast("Exam mode is included with full access.");
+                    return;
+                  }
+                  setSessionMode("exam");
+                }}
               >
                 Exam
               </button>
@@ -594,13 +636,19 @@ export default function SynonymTrainer() {
             >
               {loading ? "Loading..." : sessionMode === "exam" ? "Generate Exam Set" : "Generate Exercises"}
             </button>
-            <button className="review-btn mistakes" onClick={loadMistakeSet} disabled={loading || !signedIn}>
+            <button className="review-btn mistakes" onClick={loadMistakeSet} disabled={loading || !signedIn || isDemoMode}>
               Review Mistakes
             </button>
-            <button className="review-btn favourites" onClick={loadFavouriteSet} disabled={loading || !signedIn}>
+            <button className="review-btn favourites" onClick={loadFavouriteSet} disabled={loading || !signedIn || isDemoMode}>
               Review Favourites
             </button>
           </div>
+
+          {isDemoMode && (
+            <p className="muted-note">
+              The synonym demo uses a small curated sample. Exam mode, favourites, and mistake review are included with full access.
+            </p>
+          )}
 
           {!signedIn && (
             <p className="muted-note">

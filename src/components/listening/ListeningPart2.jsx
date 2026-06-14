@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Seo from "../common/Seo.jsx";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
+import ListeningDemoNotice from "./ListeningDemoNotice.jsx";
 
 const PART2_LISTENING_TASKS = [
     {
@@ -194,8 +195,10 @@ const PART2_LISTENING_TASKS = [
 
 const LETTERS = ["a", "b", "c", "d", "e", "f"];
 
-export default function ListeningPart2({ user, onRequireSignIn }) {
+export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireSignIn, allowedTaskIds = [] }) {
   const items = PART2_LISTENING_TASKS;
+  const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
+  const hasTaskAllowlist = allowedTaskSet.size > 0;
 
   const [taskIndex, setTaskIndex] = useState(0);
   const current = items[taskIndex] || items[0];
@@ -215,15 +218,21 @@ export default function ListeningPart2({ user, onRequireSignIn }) {
   const decoratedItems = useMemo(
     () =>
       items.map((t, i) => {
-        const locked = !user && i >= 1;
+        const locked = hasTaskAllowlist ? !allowedTaskSet.has(t.id) : !user && i >= 1;
         return {
           ...t,
           locked,
           title: `${i + 1}. ${t.title}${locked ? " 🔒" : ""}`,
         };
       }),
-    [items, user]
+    [allowedTaskSet, hasTaskAllowlist, items, user]
   );
+
+  useEffect(() => {
+    if (!hasTaskAllowlist || allowedTaskSet.has(current?.id)) return;
+    const nextIndex = items.findIndex((task) => allowedTaskSet.has(task.id));
+    setTaskIndex(nextIndex >= 0 ? nextIndex : 0);
+  }, [allowedTaskSet, current?.id, hasTaskAllowlist, items]);
 
   useEffect(() => {
     setAnswers({});
@@ -268,6 +277,13 @@ export default function ListeningPart2({ user, onRequireSignIn }) {
   }, [current?.id]);
 
   function handleSelectTask(nextIndex) {
+    const nextTask = items[nextIndex];
+    if (hasTaskAllowlist && !allowedTaskSet.has(nextTask?.id)) {
+      toast("That listening task is included with full access.");
+      onRequireSignIn?.();
+      return;
+    }
+
     if (!user && nextIndex >= 1) {
       onRequireSignIn?.();
       return;
@@ -421,13 +437,19 @@ export default function ListeningPart2({ user, onRequireSignIn }) {
             />
           </div>
 
-          {!user && (
-            <p className="lock-note">Sign in to unlock the remaining listening tasks.</p>
+          {!hasTaskAllowlist && !user && (
+            <p className="lock-note">
+              Sign in to unlock the remaining listening tasks.
+            </p>
           )}
 
           <p className="intro">{current?.intro}</p>
         </div>
       </header>
+
+      <ListeningDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+        Demo mode includes one Part 2 sample task. Full access unlocks the remaining Part 2 tasks.
+      </ListeningDemoNotice>
 
       <section className="panel">
         <div className="panelbar">

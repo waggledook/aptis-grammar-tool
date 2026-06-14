@@ -1,10 +1,56 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
-import { toast } from "../../utils/toast";
+import AptisDemoBadge from "../access/AptisDemoBadge.jsx";
 
-export default function ListeningMenu() {
+const LISTENING_CARDS = [
+  {
+    title: "Part 1: Information Recognition (Q1-13)",
+    description: "Multiple choice extracts.",
+    path: "/listening/part1",
+    demoAccess: "demo",
+  },
+  {
+    title: "Part 2: Information Matching (Q14)",
+    description: "Matching speakers.",
+    path: "/listening/part2",
+    demoAccess: "demo",
+  },
+  {
+    title: "Part 3: Inference - Discussion (Q15)",
+    description: "Opinion matching.",
+    path: "/listening/part3",
+    demoAccess: "locked",
+  },
+  {
+    title: "Part 4: Inference - Longer Monologues (Q16-17)",
+    description: "Multiple-choice extracts.",
+    path: "/listening/part4",
+    demoAccess: "locked",
+  },
+];
+
+export default function ListeningMenu({ user, aptisAccess, onSignIn }) {
   const navigate = useNavigate();
+  const [lockedItem, setLockedItem] = useState("");
+  const isDemoMode = !!aptisAccess?.isDemoMode;
+
+  function openCard(card) {
+    if (isDemoMode && card.demoAccess === "locked") {
+      setLockedItem(card.title);
+      return;
+    }
+    navigate(card.path);
+  }
+
+  function renderAccessPill(card) {
+    if (!isDemoMode || !card.demoAccess) return null;
+    return (
+      <span className={`listening-access-pill ${card.demoAccess === "demo" ? "demo" : "locked"}`}>
+        {card.demoAccess === "demo" ? "Demo available" : "Full access"}
+      </span>
+    );
+  }
 
   return (
     <div className="listening-menu game-wrapper menu-style-hub">
@@ -20,30 +66,22 @@ export default function ListeningMenu() {
         </p>
       </header>
 
+      <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
+
+      {isDemoMode && lockedItem ? (
+        <div className="listening-access-prompt" role="status">
+          <strong>{lockedItem} is included with full access.</strong>
+          <p>The listening demo includes three Part 1 questions and one Part 2 sample task.</p>
+        </div>
+      ) : null}
+
       <div className="cards">
-        {/* Part 1 (Coming soon) */}
-        <button className="card" onClick={() => navigate("/listening/part1")}>
-          <h3>Part 1: Information Recognition (Q1–13)</h3>
-  <p>Multiple choice extracts.</p>
-</button>
-
-
-        <button className="card" onClick={() => navigate("/listening/part2")}>
-            <h3>Part 2: Information Matching (Q14)</h3>
-          <p>Matching speakers.</p>
-        </button>
-
-        {/* Part 3 (Active) */}
-        <button className="card" onClick={() => navigate("/listening/part3")}>
-          <h3>Part 3: Inference – Discussion (Q15)</h3>
-          <p>Opinion matching.</p>
-        </button>
-
-        
-        <button className="card" onClick={() => navigate("/listening/part4")}>
-            <h3>Part 4: Inference – Longer Monologues (Q16–17)</h3>
-          <p>Multiple-choice extracts.</p>
-        </button>
+        {LISTENING_CARDS.map((card) => (
+          <button className="card" key={card.path} onClick={() => openCard(card)}>
+            <h3>{card.title}{renderAccessPill(card)}</h3>
+            <p>{card.description}</p>
+          </button>
+        ))}
       </div>
 
       {/* Back to main menu */}
@@ -60,6 +98,28 @@ export default function ListeningMenu() {
   .title { font-size: 1.6rem; margin-bottom: .3rem; }
   .intro { color: #a9b7d1; max-width: 600px; }
 
+  .listening-access-prompt {
+    margin: 0 0 1rem;
+    padding: .8rem .95rem;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--color-accent) 42%, var(--color-border));
+    background:
+      linear-gradient(100deg, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-raised)), var(--color-surface-raised));
+  }
+
+  .listening-access-prompt strong {
+    display: block;
+    margin-bottom: .2rem;
+    color: var(--color-text);
+  }
+
+  .listening-access-prompt p {
+    margin: 0;
+    color: var(--color-text-soft);
+    line-height: 1.38;
+    font-size: .9rem;
+  }
+
   .cards { display:grid; gap:1rem; grid-template-columns:1fr; }
   @media (min-width:720px){ .cards{ grid-template-columns: repeat(2,1fr);} }
 
@@ -72,8 +132,40 @@ export default function ListeningMenu() {
     margin-bottom:.35rem;
   }
 
-  .card h3 { margin:0; font-size:1.05rem; font-weight:600; }
+  .card h3 {
+    margin:0;
+    font-size:1.05rem;
+    font-weight:600;
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:.4rem;
+  }
   .card p { margin:0; color:#cfd9f3; font-size:.9rem; line-height:1.4; }
+
+  .listening-access-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: .18rem .48rem;
+    border-radius: 999px;
+    border: 1px solid var(--color-border);
+    color: var(--color-text-soft);
+    font-size: .68rem;
+    font-weight: 800;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .listening-access-pill.demo {
+    border-color: color-mix(in srgb, var(--color-accent) 48%, var(--color-border));
+    background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+    color: var(--color-accent);
+  }
+
+  .listening-access-pill.locked {
+    border-color: color-mix(in srgb, #94a3b8 42%, var(--color-border));
+    background: color-mix(in srgb, #94a3b8 10%, transparent);
+  }
 
   /* Coming soon: dim + dashed (CollocationMenu style) */
   .soon-card{

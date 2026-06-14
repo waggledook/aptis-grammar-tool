@@ -1,11 +1,31 @@
 // src/components/vocabulary/VocabularyMenu.jsx
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
+import AptisDemoBadge from "../access/AptisDemoBadge.jsx";
 
 
-export default function VocabularyMenu() {
+export default function VocabularyMenu({ user, aptisAccess, onSignIn }) {
   const navigate = useNavigate();
+  const [lockedItem, setLockedItem] = useState("");
+  const isDemoMode = !!aptisAccess?.isDemoMode;
+
+  function openCard(path, demoAccess, label) {
+    if (isDemoMode && demoAccess === "locked") {
+      setLockedItem(label);
+      return;
+    }
+    navigate(path);
+  }
+
+  function renderAccessPill(kind) {
+    if (!isDemoMode) return null;
+    return (
+      <span className={`vocab-access-pill ${kind === "demo" ? "demo" : "locked"}`}>
+        {kind === "demo" ? "Demo available" : "Full access"}
+      </span>
+    );
+  }
 
   return (
     <div className="vocab-menu game-wrapper menu-style-hub">
@@ -20,13 +40,22 @@ export default function VocabularyMenu() {
         </p>
       </header>
 
+      <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
+
+      {isDemoMode && lockedItem ? (
+        <div className="vocab-access-prompt" role="status">
+          <strong>{lockedItem} is included with full access.</strong>
+          <p>The vocabulary demo includes Transport and Education topic practice plus a small synonym sample.</p>
+        </div>
+      ) : null}
+
       <div className="cards">
         <button
           className="card menu-card"
-          onClick={() => navigate("/vocabulary/topics")}
+          onClick={() => openCard("/vocabulary/topics", "demo", "Topic Practice")}
         >
           <div className="menu-card-header">
-            <h3>Topic Practice</h3>
+            <h3>Topic Practice{renderAccessPill("demo")}</h3>
           </div>
           <p>Study words by theme (e.g. Travel, Education...).</p>
         </button>
@@ -34,10 +63,10 @@ export default function VocabularyMenu() {
         {/* 🔁 Synonym Trainer */}
         <button
           className="card menu-card"
-          onClick={() => navigate("/vocabulary/synonyms")}
+          onClick={() => openCard("/vocabulary/synonyms", "demo", "Synonym Trainer")}
         >
           <div className="menu-card-header">
-            <h3>Synonym Trainer</h3>
+            <h3>Synonym Trainer{renderAccessPill("demo")}</h3>
             <span className="soon-pill">New</span>
           </div>
           <p>
@@ -48,10 +77,10 @@ export default function VocabularyMenu() {
         {/* ⚙️ Collocation Trainer (LIVE) */}
 <button
   className="card menu-card"
-  onClick={() => navigate("/vocabulary/collocations")}
+  onClick={() => openCard("/vocabulary/collocations", "locked", "Collocation Trainer")}
 >
   <div className="menu-card-header">
-    <h3>Collocation Trainer</h3>
+    <h3>Collocation Trainer{renderAccessPill("locked")}</h3>
     <span className="uc-top-wrapper">
               <img
                 src="/images/ui/under-construction.png"
@@ -76,6 +105,28 @@ export default function VocabularyMenu() {
         .header { margin-bottom: 1rem; }
         .title { font-size: 1.6rem; margin-bottom: .3rem; }
         .intro { color: #a9b7d1; max-width: 640px; }
+
+        .vocab-access-prompt {
+          margin: 0 0 1rem;
+          padding: .8rem .95rem;
+          border-radius: 12px;
+          border: 1px solid color-mix(in srgb, var(--color-accent) 42%, var(--color-border));
+          background:
+            linear-gradient(100deg, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-raised)), var(--color-surface-raised));
+        }
+
+        .vocab-access-prompt strong {
+          display: block;
+          margin-bottom: .2rem;
+          color: var(--color-text);
+        }
+
+        .vocab-access-prompt p {
+          margin: 0;
+          color: var(--color-text-soft);
+          line-height: 1.38;
+          font-size: .9rem;
+        }
 
         .cards {
           display: grid;
@@ -102,6 +153,10 @@ export default function VocabularyMenu() {
           font-size: 1.05rem;
           color: #e6f0ff;
           font-weight: 600;
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: .4rem;
         }
 
         .card p {
@@ -155,6 +210,30 @@ export default function VocabularyMenu() {
           border-radius: 999px;
           font-weight: 600;
           white-space: nowrap;
+        }
+
+        .vocab-access-pill {
+          display: inline-flex;
+          align-items: center;
+          padding: .18rem .48rem;
+          border-radius: 999px;
+          border: 1px solid var(--color-border);
+          color: var(--color-text-soft);
+          font-size: .68rem;
+          font-weight: 800;
+          line-height: 1.2;
+          white-space: nowrap;
+        }
+
+        .vocab-access-pill.demo {
+          border-color: color-mix(in srgb, var(--color-accent) 48%, var(--color-border));
+          background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+          color: var(--color-accent);
+        }
+
+        .vocab-access-pill.locked {
+          border-color: color-mix(in srgb, #94a3b8 42%, var(--color-border));
+          background: color-mix(in srgb, #94a3b8 10%, transparent);
         }
       `}</style>
     </div>

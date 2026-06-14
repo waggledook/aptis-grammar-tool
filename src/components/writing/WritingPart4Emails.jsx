@@ -6,6 +6,7 @@ import { toast } from "../../utils/toast";
 import RichTextExamEditor from "../common/RichTextExamEditor";
 import WritingAssignButton from "./WritingAssignButton";
 import { getSitePath } from "../../siteConfig.js";
+import WritingDemoNotice from "./WritingDemoNotice.jsx";
 
 /**
  * Aptis Writing – Part 4 (two emails: informal ~50w, formal 120–150w)
@@ -131,9 +132,15 @@ const TASKS = [
   ];
   
 
-export default function WritingPart4Emails({ user, onRequireSignIn }) {
+export default function WritingPart4Emails({ user, aptisAccess, onSignIn, onRequireSignIn, allowedTaskIds = [] }) {
   const [searchParams] = useSearchParams();
-  // lock tasks 3+ if signed out
+  const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
+  const hasTaskAllowlist = allowedTaskSet.size > 0;
+  const firstAvailableTaskIndex = useMemo(() => {
+    if (!hasTaskAllowlist) return 0;
+    const nextIndex = TASKS.findIndex((task) => allowedTaskSet.has(task.id));
+    return nextIndex >= 0 ? nextIndex : 0;
+  }, [allowedTaskSet, hasTaskAllowlist]);
   const [taskIndex, setTaskIndex] = useState(0);
   const current = TASKS[taskIndex] || TASKS[0];
 
@@ -249,12 +256,22 @@ function handleDownload() {
 
     const nextIdx = TASKS.findIndex((task) => task.id === requestedTaskId);
     if (nextIdx === -1) return;
-    if (!user && nextIdx >= 2) return;
+    if (hasTaskAllowlist && !allowedTaskSet.has(TASKS[nextIdx].id)) {
+      setTaskIndex(firstAvailableTaskIndex);
+      return;
+    }
     setTaskIndex(nextIdx);
-  }, [searchParams, user]);
+  }, [allowedTaskSet, firstAvailableTaskIndex, hasTaskAllowlist, searchParams]);
+
+  useEffect(() => {
+    if (hasTaskAllowlist && !allowedTaskSet.has(current.id)) {
+      setTaskIndex(firstAvailableTaskIndex);
+    }
+  }, [allowedTaskSet, current.id, firstAvailableTaskIndex, hasTaskAllowlist]);
 
   function handleSelectTask(nextIdx) {
-    if (!user && nextIdx >= 2) {
+    if (hasTaskAllowlist && !allowedTaskSet.has(TASKS[nextIdx]?.id)) {
+      toast("That writing task is included with full access.");
       onRequireSignIn?.();
       return;
     }
@@ -372,12 +389,12 @@ async function handleGenerateFeedback() {
         <div>
           <h2 className="title">Writing – Part 4 (Two emails)</h2>
           <p className="intro">
-            Write an informal message (~50 words) and a formal email (120–150 words). Two tasks are open; sign in to unlock more.
+            Write an informal message (~50 words) and a formal email (120–150 words).
           </p>
         </div>
         <div className="picker">
           <ChipDropdown
-            items={decorateTasks(TASKS, user)}
+            items={decorateTasks(TASKS, { hasTaskAllowlist, allowedTaskSet })}
             value={taskIndex}
             onChange={handleSelectTask}
             label="Task"
@@ -392,6 +409,10 @@ async function handleGenerateFeedback() {
           />
         </div>
       </header>
+
+      <WritingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+        Demo mode includes one Part 4 two-email task. The other Part 4 tasks stay visible but require full access.
+      </WritingDemoNotice>
 
       <div className="grid">
   {showSummary ? (
@@ -664,13 +685,13 @@ function wordCount(s = "") {
 }
 function within(n, min, max) { return n >= min && n <= max; }
 
-function decorateTasks(tasks, user) {
+function decorateTasks(tasks, { hasTaskAllowlist, allowedTaskSet }) {
   return tasks.map((t, i) => {
-    const locked = !user && i >= 2;
+    const locked = hasTaskAllowlist && !allowedTaskSet.has(t.id);
     return {
       ...t,
       locked,
-      title: `${i + 1}. ${t.title}${locked ? " 🔒" : ""}`,
+      title: `${t.title}${locked ? " 🔒" : ""}`,
     };
   });
 }
@@ -707,9 +728,8 @@ function ChipDropdown({ items, value, onChange, label="Task" }) {
                   role="option"
                   aria-selected={active}
                   aria-disabled={locked}
-                  disabled={locked}
                   className={`chip-option ${active?"active":""} ${locked?"locked":""}`}
-                  onClick={() => { if (!locked) { onChange(i); setOpen(false); } }}
+                  onClick={() => { onChange(i); if (!locked) setOpen(false); }}
                   title={it.title}
                 >
                   <strong className="num">{i+1}.</strong>

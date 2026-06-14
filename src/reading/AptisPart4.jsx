@@ -5,6 +5,7 @@ import { fetchReadingCompletionsByPart, logReadingPart4Attempted, logReadingPart
 import { toast } from "../utils/toast";
 import { getSitePath } from "../siteConfig.js";
 import ReadingAssignButton from "./ReadingAssignButton.jsx";
+import ReadingDemoNotice from "./ReadingDemoNotice.jsx";
 
 /**
  * Aptis Reading – Part 4 (Heading matching)
@@ -287,9 +288,8 @@ function ChipDropdown({ items, value, onChange, label = "Task" }) {
                     isLocked ? "locked" : ""
                   }`}
                   onClick={() => {
-                    if (isLocked) return;
                     onChange(i);
-                    setOpen(false);
+                    if (!isLocked) setOpen(false);
                   }}
                   title={it.title}
                 >
@@ -341,11 +341,20 @@ function highlightEvidence(text, evidenceParts) {
 // ---------- Component ----------
 export default function AptisPart4({
   tasks = DEMO_TASKS,
+  allowedTaskIds = [],
   user,
+  aptisAccess,
+  onSignIn,
   onRequireSignIn,
 }) {
+  const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
   const initialTaskId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("task") : "";
-  const initialTaskIndex = Math.max(0, tasks.findIndex((task) => task.id === initialTaskId));
+  const initialTaskMatch = tasks.findIndex((task) => task.id === initialTaskId);
+  const initialTaskIndex =
+    initialTaskMatch >= 0 &&
+    (!allowedTaskIds.length || allowedTaskSet.has(tasks[initialTaskMatch]?.id))
+      ? initialTaskMatch
+      : 0;
   const [taskIndex, setTaskIndex] = useState(initialTaskIndex);
   const [answers, setAnswers] = useState({}); // { [paraId]: headingKey }
   const [feedback, setFeedback] = useState({}); // { [paraId]: true|false|null }
@@ -356,6 +365,14 @@ export default function AptisPart4({
   const paraRefs = useRef({});
 
   const current = tasks[taskIndex] || tasks[0];
+
+  useEffect(() => {
+    if (!tasks.length) return;
+    const currentTask = tasks[taskIndex];
+    if (allowedTaskIds.length && currentTask && !allowedTaskSet.has(currentTask.id)) {
+      setTaskIndex(0);
+    }
+  }, [allowedTaskIds.length, allowedTaskSet, taskIndex, tasks]);
 
   // Completed tasks (signed-in only)
   useEffect(() => {
@@ -380,18 +397,22 @@ export default function AptisPart4({
   const decoratedItems = useMemo(() => {
     return tasks.map((t) => {
       const done = completed.has(t.id);
-      const locked = false; // hook for gating later if you need it
+      const locked = allowedTaskIds.length ? !allowedTaskSet.has(t.id) : false;
       return {
         ...t,
         locked,
         title: `${t.title}${done ? " ✓" : ""}${locked ? " 🔒" : ""}`,
       };
     });
-  }, [tasks, completed]);
+  }, [allowedTaskIds.length, allowedTaskSet, tasks, completed]);
 
   function handleSelectTask(nextIndex) {
     if (!user && decoratedItems[nextIndex]?.locked) {
       onRequireSignIn?.();
+      return;
+    }
+    if (decoratedItems[nextIndex]?.locked) {
+      toast("That reading task is included with full access.");
       return;
     }
     setTaskIndex(nextIndex);
@@ -495,6 +516,10 @@ export default function AptisPart4({
           />
         </div>
       </header>
+
+      <ReadingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+        Demo mode includes one Part 4 reading task. The other Part 4 tasks stay visible but require full access.
+      </ReadingDemoNotice>
 
       <section className="panel p4-panel">
         <div className="p4-panelbar">

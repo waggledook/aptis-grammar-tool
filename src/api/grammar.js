@@ -96,6 +96,7 @@ export async function fetchItems({
   count     = 5,
   preferNew = false,
   seenIds   = [],
+  allowedIds = [],
 }) {
   // Normalise tags into an array on each item
   let items = itemsData.map(item => ({
@@ -106,6 +107,11 @@ export async function fetchItems({
         ? [item.tag]
         : [],
   }));
+
+  if (allowedIds.length) {
+    const allowedSet = new Set(allowedIds);
+    items = items.filter(item => allowedSet.has(item.id));
+  }
 
   if (levels.length) {
     items = items.filter(item => levels.includes(item.level));

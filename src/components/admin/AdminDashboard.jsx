@@ -9,7 +9,12 @@ import {
 } from "../../firebase";
 import { collection, getDoc, getDocs, updateDoc, doc, query, orderBy, limit, startAfter, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
-import { getSeifHubAccessConfig, SEIF_HUB_ACCESS_KEY } from "../../siteConfig.js";
+import {
+  APTIS_TRAINER_ACCESS_KEY,
+  getAptisTrainerAccessConfig,
+  getSeifHubAccessConfig,
+  SEIF_HUB_ACCESS_KEY,
+} from "../../siteConfig.js";
 import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
 
 function getTodayLocalIsoDate() {
@@ -91,6 +96,8 @@ const WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS = {
   admin: 1000,
 };
 
+const APTIS_DEMO_FEEDBACK_LIFETIME_CREDITS = 8;
+
 function getWritingFeedbackWeeklyCredits(user = {}) {
   const rawValue = user.writingFeedbackWeeklyCredits;
   const hasCustomValue = rawValue !== undefined && rawValue !== null && rawValue !== "";
@@ -101,6 +108,31 @@ function getWritingFeedbackWeeklyCredits(user = {}) {
   }
 
   return WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS[user.role] || WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS.student;
+}
+
+function getAptisDemoFeedbackLifetimeCredits(user = {}) {
+  const rawValue = user.aptisDemoFeedbackLifetimeCredits;
+  const hasCustomValue = rawValue !== undefined && rawValue !== null && rawValue !== "";
+  const customValue = Number(rawValue);
+
+  if (hasCustomValue && Number.isFinite(customValue)) {
+    return Math.max(0, Math.floor(customValue));
+  }
+
+  return APTIS_DEMO_FEEDBACK_LIFETIME_CREDITS;
+}
+
+function hasActiveAptisTrainerAccess(user = {}) {
+  if (user.role === "admin" || user.role === "teacher") return true;
+
+  const access = getAptisTrainerAccessConfig(user);
+  if (!access.active) return false;
+
+  const today = getTodayLocalIsoDate();
+  if (access.startDate && today < access.startDate) return false;
+  if (!access.indefinite && access.endDate && today > access.endDate) return false;
+
+  return true;
 }
 
 function normalizeWritingGeneralSubmission(entry) {
@@ -350,6 +382,8 @@ export default function AdminDashboard({ user }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [hubDrafts, setHubDrafts] = useState({});
   const [savingHub, setSavingHub] = useState({});
+  const [aptisDrafts, setAptisDrafts] = useState({});
+  const [savingAptis, setSavingAptis] = useState({});
   const [courseTestSessions, setCourseTestSessions] = useState([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
   const [deletingSessionId, setDeletingSessionId] = useState("");
@@ -403,14 +437,18 @@ export default function AdminDashboard({ user }) {
           .filter((entry) => entry.role === "student")
           .map(async (entry) => {
             try {
-              const usageSnap = await getDoc(doc(db, "users", entry.id, "writingFeedbackUsage", weekKey));
+              const [usageSnap, demoUsageSnap] = await Promise.all([
+                getDoc(doc(db, "users", entry.id, "writingFeedbackUsage", weekKey)),
+                getDoc(doc(db, "users", entry.id, "aptisTrainerDemoFeedbackUsage", "lifetime")),
+              ]);
               return {
                 uid: entry.id,
                 creditsUsed: Number(usageSnap.data()?.creditsUsed || 0),
+                aptisDemoCreditsUsed: Number(demoUsageSnap.data()?.creditsUsed || 0),
               };
             } catch (error) {
               console.error("[AdminDashboard] load writing feedback credits failed", error);
-              return { uid: entry.id, creditsUsed: 0 };
+              return { uid: entry.id, creditsUsed: 0, aptisDemoCreditsUsed: 0 };
             }
           })
       );
@@ -418,11 +456,16 @@ export default function AdminDashboard({ user }) {
         acc[row.uid] = row.creditsUsed;
         return acc;
       }, {});
+      const aptisDemoUsageByUid = usageRows.reduce((acc, row) => {
+        acc[row.uid] = row.aptisDemoCreditsUsed;
+        return acc;
+      }, {});
 
       setUsers(
         arr.map((entry) => ({
           ...entry,
           writingFeedbackCreditsUsedThisWeek: usageByUid[entry.id] || 0,
+          aptisDemoFeedbackCreditsUsed: aptisDemoUsageByUid[entry.id] || 0,
         }))
       );
       setLoading(false);
@@ -514,22 +557,36 @@ export default function AdminDashboard({ user }) {
       return;
     }
 
-    const nextCredits = getWritingFeedbackWeeklyCredits(targetUser) + amount;
+    const isAptisDemoOnly = targetUser.role === "student" && !hasActiveAptisTrainerAccess(targetUser);
+    const currentCredits = isAptisDemoOnly
+      ? getAptisDemoFeedbackLifetimeCredits(targetUser)
+      : getWritingFeedbackWeeklyCredits(targetUser);
+    const nextCredits = currentCredits + amount;
     setSavingCredits((prev) => ({ ...prev, [uid]: true }));
 
     try {
-      await updateDoc(doc(db, "users", uid), {
-        writingFeedbackWeeklyCredits: nextCredits,
-        writingFeedbackCreditsUpdatedAt: serverTimestamp(),
-        writingFeedbackCreditsUpdatedBy: user.uid,
-      });
+      const payload = isAptisDemoOnly
+        ? {
+            aptisDemoFeedbackLifetimeCredits: nextCredits,
+            aptisDemoFeedbackCreditsUpdatedAt: serverTimestamp(),
+            aptisDemoFeedbackCreditsUpdatedBy: user.uid,
+          }
+        : {
+            writingFeedbackWeeklyCredits: nextCredits,
+            writingFeedbackCreditsUpdatedAt: serverTimestamp(),
+            writingFeedbackCreditsUpdatedBy: user.uid,
+          };
+
+      await updateDoc(doc(db, "users", uid), payload);
 
       setUsers((prev) =>
         prev.map((entry) =>
           entry.id === uid
             ? {
                 ...entry,
-                writingFeedbackWeeklyCredits: nextCredits,
+                ...(isAptisDemoOnly
+                  ? { aptisDemoFeedbackLifetimeCredits: nextCredits }
+                  : { writingFeedbackWeeklyCredits: nextCredits }),
               }
             : entry
         )
@@ -785,10 +842,8 @@ async function setPackAccess(uid, allowed) {
 
 const hasPack = (u) => !!(u.courseAccess && u.courseAccess[PACK_ID]);
 
-function getHubDraft(u) {
-  if (hubDrafts[u.id]) return hubDrafts[u.id];
-
-  const access = getSeifHubAccessConfig(u);
+function getDefaultAccessDraft(u, getAccessConfig) {
+  const access = getAccessConfig(u);
   if (!access.active && !access.startDate) {
     return {
       ...access,
@@ -797,6 +852,16 @@ function getHubDraft(u) {
   }
 
   return access;
+}
+
+function getHubDraft(u) {
+  if (hubDrafts[u.id]) return hubDrafts[u.id];
+  return getDefaultAccessDraft(u, getSeifHubAccessConfig);
+}
+
+function getAptisDraft(u) {
+  if (aptisDrafts[u.id]) return aptisDrafts[u.id];
+  return getDefaultAccessDraft(u, getAptisTrainerAccessConfig);
 }
 
 function setHubDraft(uid, patch) {
@@ -810,21 +875,32 @@ function setHubDraft(uid, patch) {
   });
 }
 
-async function saveSeifHubAccess(uid) {
-  const sourceUser = users.find((u) => u.id === uid) || {};
-  const draft = hubDrafts[uid] || getSeifHubAccessConfig(sourceUser);
-  const payload = {
+function setAptisDraft(uid, patch) {
+  setAptisDrafts((prev) => {
+    const sourceUser = users.find((u) => u.id === uid) || {};
+    const base = prev[uid] || getAptisDraft(sourceUser);
+    return {
+      ...prev,
+      [uid]: { ...base, ...patch },
+    };
+  });
+}
+
+function buildAccessPayload(draft) {
+  return {
     active: !!draft.active,
     startDate: draft.startDate || "",
     endDate: draft.indefinite ? "" : (draft.endDate || ""),
     indefinite: !!draft.indefinite,
   };
+}
 
-  setSavingHub((prev) => ({ ...prev, [uid]: true }));
+async function saveSiteAccess(uid, accessKey, payload, setSaving) {
+  setSaving((prev) => ({ ...prev, [uid]: true }));
 
   try {
     await updateDoc(doc(db, "users", uid), {
-      [`siteAccess.${SEIF_HUB_ACCESS_KEY}`]: payload,
+      [`siteAccess.${accessKey}`]: payload,
     });
 
     setUsers((prev) =>
@@ -832,19 +908,34 @@ async function saveSeifHubAccess(uid) {
         if (u.id !== uid) return u;
         return {
           ...u,
-          siteAccess: { ...(u.siteAccess || {}), [SEIF_HUB_ACCESS_KEY]: payload },
+          siteAccess: { ...(u.siteAccess || {}), [accessKey]: payload },
         };
       })
     );
   } finally {
-    setSavingHub((prev) => ({ ...prev, [uid]: false }));
+    setSaving((prev) => ({ ...prev, [uid]: false }));
   }
 }
 
-function getHubStatus(u) {
-  const access = getSeifHubAccessConfig(u);
+async function saveSeifHubAccess(uid) {
+  const sourceUser = users.find((u) => u.id === uid) || {};
+  const draft = hubDrafts[uid] || getSeifHubAccessConfig(sourceUser);
+  const payload = buildAccessPayload(draft);
+
+  await saveSiteAccess(uid, SEIF_HUB_ACCESS_KEY, payload, setSavingHub);
+}
+
+async function saveAptisTrainerAccess(uid) {
+  const sourceUser = users.find((u) => u.id === uid) || {};
+  const draft = aptisDrafts[uid] || getAptisTrainerAccessConfig(sourceUser);
+  const payload = buildAccessPayload(draft);
+
+  await saveSiteAccess(uid, APTIS_TRAINER_ACCESS_KEY, payload, setSavingAptis);
+}
+
+function getAccessStatus(access, offLabel) {
   if (!access.active) {
-    return { label: "Hub off", tone: "muted" };
+    return { label: offLabel, tone: "muted" };
   }
 
   const today = new Date().toISOString().slice(0, 10);
@@ -867,8 +958,24 @@ function getHubStatus(u) {
   return { label: "Active", tone: "success" };
 }
 
-function renderHubAccessControl(u, compact = false) {
-  const draft = getHubDraft(u);
+function getHubStatus(u) {
+  return getAccessStatus(getSeifHubAccessConfig(u), "Hub off");
+}
+
+function getAptisStatus(u) {
+  return getAccessStatus(getAptisTrainerAccessConfig(u), "Aptis demo only");
+}
+
+function renderSiteAccessControl({
+  u,
+  compact = false,
+  draft,
+  setDraft,
+  savingMap,
+  onSave,
+  activeLabel,
+  saveLabel,
+}) {
   const fontSize = compact ? "0.78rem" : "0.82rem";
   const inputStyle = {
     fontSize,
@@ -905,9 +1012,9 @@ function renderHubAccessControl(u, compact = false) {
         <input
           type="checkbox"
           checked={draft.active}
-          onChange={(e) => setHubDraft(u.id, { active: e.target.checked })}
+          onChange={(e) => setDraft(u.id, { active: e.target.checked })}
         />
-        Seif Hub active
+        {activeLabel}
       </label>
 
       <div
@@ -923,7 +1030,7 @@ function renderHubAccessControl(u, compact = false) {
           <input
             type="date"
             value={draft.startDate}
-            onChange={(e) => setHubDraft(u.id, { startDate: e.target.value })}
+            onChange={(e) => setDraft(u.id, { startDate: e.target.value })}
             onFocus={openDatePicker}
             onClick={openDatePicker}
             style={inputStyle}
@@ -935,7 +1042,7 @@ function renderHubAccessControl(u, compact = false) {
           <input
             type="date"
             value={draft.endDate}
-            onChange={(e) => setHubDraft(u.id, { endDate: e.target.value })}
+            onChange={(e) => setDraft(u.id, { endDate: e.target.value })}
             onFocus={openDatePicker}
             onClick={openDatePicker}
             disabled={draft.indefinite}
@@ -957,7 +1064,7 @@ function renderHubAccessControl(u, compact = false) {
           type="checkbox"
           checked={draft.indefinite}
           onChange={(e) =>
-            setHubDraft(u.id, {
+            setDraft(u.id, {
               indefinite: e.target.checked,
               endDate: e.target.checked ? "" : draft.endDate,
             })
@@ -969,8 +1076,8 @@ function renderHubAccessControl(u, compact = false) {
       <button
         type="button"
         className="ghost-btn"
-        onClick={() => saveSeifHubAccess(u.id)}
-        disabled={!!savingHub[u.id]}
+        onClick={() => onSave(u.id)}
+        disabled={!!savingMap[u.id]}
         style={{
           marginLeft: 0,
           alignSelf: "flex-start",
@@ -978,10 +1085,36 @@ function renderHubAccessControl(u, compact = false) {
           padding: "0.25rem 0.6rem",
         }}
       >
-        {savingHub[u.id] ? "Saving..." : "Save hub access"}
+        {savingMap[u.id] ? "Saving..." : saveLabel}
       </button>
     </div>
   );
+}
+
+function renderHubAccessControl(u, compact = false) {
+  return renderSiteAccessControl({
+    u,
+    compact,
+    draft: getHubDraft(u),
+    setDraft: setHubDraft,
+    savingMap: savingHub,
+    onSave: saveSeifHubAccess,
+    activeLabel: "Seif Hub active",
+    saveLabel: "Save hub access",
+  });
+}
+
+function renderAptisAccessControl(u, compact = false) {
+  return renderSiteAccessControl({
+    u,
+    compact,
+    draft: getAptisDraft(u),
+    setDraft: setAptisDraft,
+    savingMap: savingAptis,
+    onSave: saveAptisTrainerAccess,
+    activeLabel: "Aptis Trainer active",
+    saveLabel: "Save Aptis access",
+  });
 }
 
 
@@ -1043,9 +1176,15 @@ function renderHubAccessControl(u, compact = false) {
       return <span className="tiny muted">Only student accounts use student AI feedback credits.</span>;
     }
 
-    const weeklyCredits = getWritingFeedbackWeeklyCredits(u);
-    const usedCredits = Math.max(0, Number(u.writingFeedbackCreditsUsedThisWeek || 0));
-    const remainingCredits = Math.max(0, weeklyCredits - usedCredits);
+    const isAptisDemoOnly = !hasActiveAptisTrainerAccess(u);
+    const creditLimit = isAptisDemoOnly
+      ? getAptisDemoFeedbackLifetimeCredits(u)
+      : getWritingFeedbackWeeklyCredits(u);
+    const usedCredits = Math.max(
+      0,
+      Number(isAptisDemoOnly ? u.aptisDemoFeedbackCreditsUsed : u.writingFeedbackCreditsUsedThisWeek || 0)
+    );
+    const remainingCredits = Math.max(0, creditLimit - usedCredits);
     const draftValue = creditDrafts[u.id] || "";
     const isSaving = !!savingCredits[u.id];
 
@@ -1061,14 +1200,14 @@ function renderHubAccessControl(u, compact = false) {
           }}
         >
           <span style={{ color: "#dbe7ff", fontSize: "0.88rem" }}>
-            AI feedback credits left
+            {isAptisDemoOnly ? "Demo feedback credits left" : "AI feedback credits left"}
           </span>
           <strong style={{ color: "#fef3c7", fontSize: "1.05rem" }}>
             {remainingCredits}
           </strong>
         </div>
         <div style={{ color: "#9fb4da", fontSize: "0.78rem" }}>
-          {usedCredits} used of {weeklyCredits} this week
+          {usedCredits} used of {creditLimit} {isAptisDemoOnly ? "total" : "this week"}
         </div>
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           <input
@@ -1247,6 +1386,7 @@ function renderHubAccessControl(u, compact = false) {
   };
 
   const activeHubCount = users.filter((u) => getHubStatus(u).tone === "success").length;
+  const activeAptisCount = users.filter((u) => getAptisStatus(u).tone === "success").length;
   const teacherCount = users.filter((u) => u.role === "teacher" || u.role === "admin").length;
   const studentCount = users.filter((u) => u.role === "student").length;
   const pendingStudentRequests = studentRequests.filter((request) => request.status === "pending");
@@ -1332,7 +1472,7 @@ function renderHubAccessControl(u, compact = false) {
             style={{
               marginTop: "0.9rem",
               display: "grid",
-              gridTemplateColumns: isNarrow ? "1fr" : "repeat(4, minmax(0, 1fr))",
+              gridTemplateColumns: isNarrow ? "1fr" : "repeat(5, minmax(0, 1fr))",
               gap: "0.75rem",
             }}
           >
@@ -1340,6 +1480,7 @@ function renderHubAccessControl(u, compact = false) {
               { label: "Users", value: users.length },
               { label: "Students", value: studentCount },
               { label: "Teachers/Admins", value: teacherCount },
+              { label: "Active Aptis", value: activeAptisCount },
               { label: "Active Seif Hub", value: activeHubCount },
             ].map((item) => (
               <div
@@ -1954,6 +2095,7 @@ function renderHubAccessControl(u, compact = false) {
           >
             {displayedUsers.map((u) => {
               const hubStatus = getHubStatus(u);
+              const aptisStatus = getAptisStatus(u);
               const emailKey = (u.email || "").trim().toLowerCase();
               const duplicateCount = duplicateEmailMap[emailKey] || 0;
 
@@ -2051,6 +2193,17 @@ function renderHubAccessControl(u, compact = false) {
                           borderRadius: "999px",
                           fontSize: "0.76rem",
                           fontWeight: 700,
+                          ...statusStyles[aptisStatus.tone],
+                        }}
+                      >
+                        Aptis: {aptisStatus.label}
+                      </span>
+                      <span
+                        style={{
+                          padding: "0.34rem 0.7rem",
+                          borderRadius: "999px",
+                          fontSize: "0.76rem",
+                          fontWeight: 700,
                           ...statusStyles[hubStatus.tone],
                         }}
                       >
@@ -2065,7 +2218,7 @@ function renderHubAccessControl(u, compact = false) {
                       display: "grid",
                       gridTemplateColumns: isNarrow
                         ? "1fr"
-                        : "minmax(220px, 1.05fr) minmax(320px, 1.25fr) minmax(220px, 0.9fr)",
+                        : "minmax(220px, 1.05fr) minmax(280px, 1.15fr) minmax(280px, 1.15fr) minmax(220px, 0.9fr)",
                       gap: "1rem",
                     }}
                   >
@@ -2111,6 +2264,23 @@ function renderHubAccessControl(u, compact = false) {
                         />
                         Course pack access
                       </label>
+                    </div>
+
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "0.7rem",
+                        padding: "0.85rem",
+                        borderRadius: "0.9rem",
+                        background: "rgba(2, 6, 23, 0.22)",
+                        border: "1px solid rgba(51, 65, 85, 0.7)",
+                      }}
+                    >
+                      <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                        Aptis Trainer Access
+                      </div>
+                      {renderAptisAccessControl(u)}
                     </div>
 
                     <div

@@ -1,16 +1,17 @@
 export const SEIF_HUB_ACCESS_KEY = "seifhub";
+export const APTIS_TRAINER_ACCESS_KEY = "aptisTrainer";
 
 function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
-export function getSeifHubAccessConfig(userOrSiteAccess) {
+function getSiteAccessConfig(userOrSiteAccess, accessKey) {
   const siteAccess =
     userOrSiteAccess && userOrSiteAccess.siteAccess
       ? userOrSiteAccess.siteAccess
       : userOrSiteAccess || {};
 
-  const raw = siteAccess?.[SEIF_HUB_ACCESS_KEY];
+  const raw = siteAccess?.[accessKey];
 
   if (raw === true) {
     return {
@@ -36,6 +37,14 @@ export function getSeifHubAccessConfig(userOrSiteAccess) {
     endDate: raw.endDate || "",
     indefinite: !!raw.indefinite,
   };
+}
+
+export function getSeifHubAccessConfig(userOrSiteAccess) {
+  return getSiteAccessConfig(userOrSiteAccess, SEIF_HUB_ACCESS_KEY);
+}
+
+export function getAptisTrainerAccessConfig(userOrSiteAccess) {
+  return getSiteAccessConfig(userOrSiteAccess, APTIS_TRAINER_ACCESS_KEY);
 }
 
 function getWindowLocation() {
@@ -85,6 +94,20 @@ export function canAccessSeifHub(user) {
   if (user.role === "admin" || user.role === "teacher") return true;
 
   const access = getSeifHubAccessConfig(user);
+  if (!access.active) return false;
+
+  const today = todayIsoDate();
+  if (access.startDate && today < access.startDate) return false;
+  if (!access.indefinite && access.endDate && today > access.endDate) return false;
+
+  return true;
+}
+
+export function canAccessAptisTrainer(user) {
+  if (!user) return false;
+  if (user.role === "admin" || user.role === "teacher") return true;
+
+  const access = getAptisTrainerAccessConfig(user);
   if (!access.active) return false;
 
   const today = todayIsoDate();

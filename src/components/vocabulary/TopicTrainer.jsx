@@ -14,9 +14,21 @@ import VocabReviewPlayer from "./VocabReviewPlayer";
 import VocabAssignButton from "./VocabAssignButton";
 
 
-export default function TopicTrainer({ topic, onBack, onShowFlashcards, initialSetId = "", onSetChange, user: userProp = null }) {
+export default function TopicTrainer({
+  topic,
+  onBack,
+  onShowFlashcards,
+  initialSetId = "",
+  onSetChange,
+  user: userProp = null,
+  aptisAccess,
+  allowedSetIds = [],
+}) {
   const user = userProp || auth.currentUser;
   const isSignedIn = !!user;
+  const isDemoMode = !!aptisAccess?.isDemoMode;
+  const allowedSetIdSet = useMemo(() => new Set(allowedSetIds), [allowedSetIds]);
+  const hasSetAllowlist = allowedSetIdSet.size > 0;
   const topicInfo = TOPIC_DATA[topic] || null;
 
   const [setIndex, setSetIndex] = useState(null);
@@ -40,15 +52,25 @@ export default function TopicTrainer({ topic, onBack, onShowFlashcards, initialS
     if (!topicInfo || !initialSetId) return;
     const nextIdx = topicInfo.sets.findIndex((set, idx) => (set.id || String(idx)) === initialSetId);
     if (nextIdx === -1) return;
-    if (!isSignedIn && nextIdx >= 2) return;
+    const nextSetId = topicInfo.sets[nextIdx]?.id || String(nextIdx);
+    if (hasSetAllowlist && !allowedSetIdSet.has(nextSetId)) return;
     setSetIndex(nextIdx);
     setHasChosenSet(true);
-  }, [initialSetId, topicInfo, isSignedIn]);
+  }, [allowedSetIdSet, hasSetAllowlist, initialSetId, topicInfo]);
 
   // Reset match logging flag when we move to a different set
   useEffect(() => {
     hasLoggedMatchForSet.current = false;
   }, [activeSetId]);
+
+  useEffect(() => {
+    if (!hasSetAllowlist || !topicInfo) return;
+    if (!hasChosenSet || !activeSetId || allowedSetIdSet.has(activeSetId)) return;
+    const nextIdx = topicInfo.sets.findIndex((set, idx) => allowedSetIdSet.has(set.id || String(idx)));
+    setSetIndex(nextIdx >= 0 ? nextIdx : null);
+    setHasChosenSet(nextIdx >= 0);
+    if (nextIdx >= 0) onSetChange?.(topicInfo.sets[nextIdx]?.id || String(nextIdx));
+  }, [activeSetId, allowedSetIdSet, hasChosenSet, hasSetAllowlist, onSetChange, topicInfo]);
 
   useEffect(() => {
     setMatchedTerms([]);
@@ -237,24 +259,28 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
       Choose a topic set to begin practising this theme.
     </p>
     <div className="set-pill-row">
-      {topicInfo.sets.map((set, idx) => (
+      {topicInfo.sets.map((set, idx) => {
+        const setId = set.id || String(idx);
+        const locked = hasSetAllowlist && !allowedSetIdSet.has(setId);
+        return (
         <button
-          key={set.id}
-          className={`control-pill set-choice-pill${!isSignedIn && idx >= 2 ? " locked" : ""}`}
+          key={setId}
+          className={`control-pill set-choice-pill${locked ? " locked" : ""}`}
           onClick={() => {
-            if (!isSignedIn && idx >= 2) {
-              toast("Sign in to unlock this set 🔒");
+            if (locked) {
+              toast("That vocabulary set is included with full access.");
               return;
             }
             setSetIndex(idx);
             setHasChosenSet(true);
-            onSetChange?.(set.id || String(idx));
+            onSetChange?.(setId);
           }}
           
         >
           {set.title}
         </button>
-      ))}
+        );
+      })}
     </div>
   </div>
 )}
@@ -268,6 +294,7 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
                 const setId = set.id || String(idx);
                 const prog = vocabProgress[setId] || {};
                 const done = !!prog.completedReview;
+                const locked = hasSetAllowlist && !allowedSetIdSet.has(setId);
 
                 return (
                   <button
@@ -275,11 +302,11 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
                     className={
                       "set-pill " +
                       (idx === setIndex ? "active" : "") +
-                      (!isSignedIn && idx >= 2 ? " locked" : "")
+                      (locked ? " locked" : "")
                     }
                     onClick={() => {
-                      if (!isSignedIn && idx >= 2) {
-                        toast("Sign in to unlock this set 🔒");
+                      if (locked) {
+                        toast("That vocabulary set is included with full access.");
                         return;
                       }
                       setSetIndex(idx);
@@ -298,8 +325,14 @@ const allMatched = activeSet && matchedTerms.length === activeSet.pairs.length;
           <div className="toolbar-row toolbar-row-bottom">
             {onShowFlashcards && (
               <button
-                className="control-pill flashcards-btn"
-                onClick={onShowFlashcards}
+                className={`control-pill flashcards-btn ${isDemoMode ? "locked" : ""}`}
+                onClick={() => {
+                  if (isDemoMode) {
+                    toast("Topic flashcards are included with full access.");
+                    return;
+                  }
+                  onShowFlashcards();
+                }}
               >
                 🃏 Topic flashcards
               </button>

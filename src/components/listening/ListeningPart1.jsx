@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Seo from "../common/Seo.jsx";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
+import ListeningDemoNotice from "./ListeningDemoNotice.jsx";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Task bank
@@ -640,8 +641,6 @@ const PART1_LISTENING_TASKS = [
 ];
 
 const GUEST_TASK_LIMIT = 3;
-const MAX_SESSION_SIZE = 13;
-
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
@@ -728,11 +727,11 @@ function getDefaultSessionCount(taskCount) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Component
 // ─────────────────────────────────────────────────────────────────────────────
-export default function ListeningPart1({ user, onRequireSignIn }) {
+export default function ListeningPart1({ user, aptisAccess, onSignIn, onRequireSignIn, allowedTaskIds = [] }) {
   const [statsById, setStatsById] = useState({});
   const [loadingStats, setLoadingStats] = useState(false);
 
-  const [setSize, setSetSize] = useState(1);
+  const [setSize, setSetSize] = useState(5);
   const [mode, setMode] = useState("all"); // "all" | "wrongOnly"
 
   const [sessionTasks, setSessionTasks] = useState([]);
@@ -750,13 +749,20 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const [selectedTag, setSelectedTag] = useState("all");
+  const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
+  const hasTaskAllowlist = allowedTaskSet.size > 0;
 
   const availableTasks = useMemo(
-    () =>
-      user
-        ? PART1_LISTENING_TASKS
-        : PART1_LISTENING_TASKS.slice(0, GUEST_TASK_LIMIT),
-    [user]
+    () => {
+      if (hasTaskAllowlist) {
+        const filtered = PART1_LISTENING_TASKS.filter((task) => allowedTaskSet.has(task.id));
+        return filtered.length ? filtered : PART1_LISTENING_TASKS;
+      }
+      return user
+          ? PART1_LISTENING_TASKS
+          : PART1_LISTENING_TASKS.slice(0, GUEST_TASK_LIMIT);
+    },
+    [allowedTaskSet, hasTaskAllowlist, user]
   );
 
   const availableTags = useMemo(() => {
@@ -810,11 +816,6 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
   }, [user]);
 
   useEffect(() => {
-    generateNewSet(mode);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, loadingStats]);
-
-  useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
 
@@ -846,8 +847,6 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
   const listensLeft = Math.max(0, 2 - playsUsed);
   const playDisabled = !current?.audioSrc || (playsUsed >= 2 && !isPlaying);
 
-  const maxSelectable = Math.min(MAX_SESSION_SIZE, filteredTasks.length || 1);
-
   const sessionSummary = useMemo(() => {
     if (!sessionTasks.length) return { checked: 0, correct: 0 };
 
@@ -874,6 +873,11 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
   }, [currentWhyOpen, current]);
 
   function generateNewSet(nextMode = mode) {
+    if (hasTaskAllowlist && nextMode === "wrongOnly") {
+      toast("Mistake review is included with full access.");
+      return;
+    }
+
     if (nextMode === "wrongOnly" && !user) {
       onRequireSignIn?.();
       return;
@@ -1059,57 +1063,46 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
         <header className="top">
           <h2 className="title">Listening – Part 1 (Short Extracts)</h2>
           <p className="intro">
-            Build a random practice set from the listening task bank.
+            Choose a task type, then start a short practice set. You will see one question at a time.
           </p>
         </header>
 
-        <section className="panel">
-        <div className="setupRow">
-  <label className="field">
-    <span className="fieldLabel">Number of tasks</span>
-    <select
-      className="select"
-      value={setSize}
-      onChange={(e) => setSetSize(Number(e.target.value))}
-    >
-      {Array.from({ length: maxSelectable }, (_, i) => i + 1).map((n) => (
-        <option key={n} value={n}>
-          {n}
-        </option>
-      ))}
-    </select>
-  </label>
-
-  <label className="field">
-    <span className="fieldLabel">Task type</span>
-    <select
-      className="select"
-      value={selectedTag}
-      onChange={(e) => setSelectedTag(e.target.value)}
-    >
-      {availableTags.map((tag) => (
-  <option key={tag} value={tag}>
-    {formatTagLabel(tag)}
-  </option>
-))}
-    </select>
-  </label>
+        <section className="panel setup-panel">
+          <div className="setupRow">
+            <label className="field">
+              <span className="fieldLabel">Task type</span>
+              <select
+                className="select"
+                value={selectedTag}
+                onChange={(e) => setSelectedTag(e.target.value)}
+              >
+                {availableTags.map((tag) => (
+                  <option key={tag} value={tag}>
+                    {formatTagLabel(tag)}
+                  </option>
+                ))}
+              </select>
+            </label>
 
             <div className="setupBtns">
-              <button className="btn primary" onClick={() => generateNewSet("all")}>
-                Generate practice set
+              <button className="btn primary start-btn" onClick={() => generateNewSet("all")}>
+                Start practice
               </button>
               <button
                 className="btn ghost"
                 onClick={() => generateNewSet("wrongOnly")}
-                disabled={!user}
+                disabled={!user || hasTaskAllowlist}
               >
                 Review mistakes
               </button>
             </div>
           </div>
 
-          {!user && (
+          <p className="setup-note">
+            {filteredTasks.length} matching tasks available. A practice set will include up to {Math.min(setSize, filteredTasks.length)} questions.
+          </p>
+
+          {!hasTaskAllowlist && !user && (
             <p className="lock-note">
               Guest users can practise the starter bank only. Sign in to unlock all Part 1 tasks, review mistakes and avoid completed tasks.
             </p>
@@ -1141,107 +1134,82 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
 
           <div className="setupRow compact">
             <label className="field">
-              <span className="fieldLabel">Number of tasks</span>
+              <span className="fieldLabel">Task type</span>
               <select
                 className="select"
-                value={setSize}
-                onChange={(e) => setSetSize(Number(e.target.value))}
+                value={selectedTag}
+                onChange={(e) => setSelectedTag(e.target.value)}
               >
-                {Array.from({ length: maxSelectable }, (_, i) => i + 1).map((n) => (
-                  <option key={n} value={n}>
-                    {n}
+                {availableTags.map((tag) => (
+                  <option key={tag} value={tag}>
+                    {formatTagLabel(tag)}
                   </option>
                 ))}
               </select>
             </label>
-            <label className="field">
-  <span className="fieldLabel">Task type</span>
-  <select
-    className="select"
-    value={selectedTag}
-    onChange={(e) => setSelectedTag(e.target.value)}
-  >
-    {availableTags.map((tag) => (
-  <option key={tag} value={tag}>
-    {formatTagLabel(tag)}
-  </option>
-))}
-  </select>
-</label>
 
             <div className="setupBtns">
               <button className={`modeBtn ${mode === "all" ? "active" : ""}`} onClick={() => generateNewSet("all")}>
-                New mixed set
+                New practice set
               </button>
               <button
                 className={`modeBtn ${mode === "wrongOnly" ? "active" : ""}`}
                 onClick={() => generateNewSet("wrongOnly")}
-                disabled={!user}
+                disabled={!user || hasTaskAllowlist}
               >
                 Review mistakes
               </button>
             </div>
           </div>
 
-          {!user && (
+          {(hasTaskAllowlist || !user) && (
             <p className="lock-note">
-              You’re using the free starter bank. Sign in to unlock the full task bank and save your wrong-task history.
+              {hasTaskAllowlist
+                ? "Demo sample set"
+                : "You’re using the free starter bank. Sign in to unlock the full task bank and save your wrong-task history."}
             </p>
           )}
 
-<div className="sessionMeta">
-<span className="pill">
-  Available tasks <strong>{filteredTasks.length}</strong>
-  {selectedTag !== "all" ? ` (${formatTagLabel(selectedTag)})` : ""}
-  {!user ? ` / ${PART1_LISTENING_TASKS.length}` : ""}
-</span>
+          <div className="sessionMeta">
             <span className="pill">
-              Task <strong>{sessionIndex + 1}</strong> / {sessionTasks.length}
+              Question <strong>{sessionIndex + 1}</strong> / {sessionTasks.length}
             </span>
             <span className="pill">
-              Checked <strong>{sessionSummary.checked}</strong> / {sessionTasks.length}
-            </span>
-            <span className="pill">
-              Correct <strong>{sessionSummary.correct}</strong> / {sessionTasks.length}
+              Score <strong>{sessionSummary.correct}</strong> / {sessionTasks.length}
             </span>
             {mode === "wrongOnly" && <span className="pill warn">Wrong-task review</span>}
           </div>
-          <p className="intro">{current?.intro}</p>
+          <p className="intro">Listen to the recording and answer the question. You can listen twice.</p>
         </div>
       </header>
+
+      <ListeningDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+        Demo mode includes three selected Part 1 questions. Full access unlocks the complete Part 1 bank and mistake review.
+      </ListeningDemoNotice>
 
       <section className="panel">
         <div className="panelbar">
           <div className="audioBox">
             <button
               type="button"
-              className={`btn ${isPlaying ? "danger" : "primary"}`}
+              className={`btn audio-btn ${isPlaying ? "danger" : "primary"}`}
               onClick={handlePlayStop}
               disabled={playDisabled}
               title={!current?.audioSrc ? "Audio coming soon" : playsUsed >= 2 ? "No listens remaining" : "Play audio"}
             >
-              {isPlaying ? "Stop" : "Play"}
+              {isPlaying ? "Stop audio" : playsUsed > 0 ? "Play again" : "Play audio"}
             </button>
 
             <div className="listenMeta">
-              <span className={`pill ${playsUsed >= 2 ? "pill-dim" : ""}`}>
-                Listens left: <strong>{listensLeft}</strong>/2
+              <span className={`smallnote ${playsUsed >= 2 ? "pill-dim" : ""}`}>
+                {listensLeft} of 2 listens left
               </span>
-              {playsUsed > 0 && (
-                <span className="smallnote">(You’ve used {playsUsed} of 2)</span>
-              )}
             </div>
           </div>
 
           <div className="controls">
-            <button className="btn" onClick={handleResetTask}>
-              Reset task
-            </button>
-            <button className="btn primary" onClick={handleCheck}>
-              Check
-            </button>
-            <button className="btn ghost" onClick={handleShowAnswer}>
-              Show answer
+            <button className="btn primary" onClick={handleCheck} disabled={!currentAnswer}>
+              Check answer
             </button>
           </div>
         </div>
@@ -1251,20 +1219,21 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
           <div className="questionTop">
             <div className="questionText">{current.question}</div>
 
-            <button
-              type="button"
-              className="why-btn"
-              disabled={!currentChecked}
-              onClick={() =>
-                setWhyOpenByTask((prev) => ({
-                  ...prev,
-                  [current.id]: !prev[current.id],
-                }))
-              }
-              title={currentChecked ? "Show explanation" : "Check first to unlock"}
-            >
-              Why?
-            </button>
+            {currentChecked && (
+              <button
+                type="button"
+                className="why-btn"
+                onClick={() =>
+                  setWhyOpenByTask((prev) => ({
+                    ...prev,
+                    [current.id]: !prev[current.id],
+                  }))
+                }
+                title="Show explanation"
+              >
+                Why?
+              </button>
+            )}
           </div>
 
           <div className="stem">{current.stem}</div>
@@ -1315,7 +1284,7 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
           </div>
         )}
 
-        <div className="scriptWrap">
+        <div className="secondaryActions">
           <button
             type="button"
             className="linkbtn"
@@ -1330,6 +1299,16 @@ export default function ListeningPart1({ user, onRequireSignIn }) {
             {currentShowScript ? "Hide script" : "Show script"}
           </button>
 
+          <button type="button" className="linkbtn" onClick={handleShowAnswer}>
+            Show answer
+          </button>
+
+          <button type="button" className="linkbtn" onClick={handleResetTask}>
+            Reset question
+          </button>
+        </div>
+
+        <div className="scriptWrap">
           {currentShowScript && currentChecked && !!current.script?.length && (
             <div className="scriptPanel">
               <h4 className="scriptTitle">Script</h4>
@@ -1428,6 +1407,11 @@ function StyleScope() {
         padding: 1rem;
       }
 
+      .setup-panel {
+        max-width: 820px;
+        margin: 0 auto;
+      }
+
       .setupRow {
         display: flex;
         gap: 1rem;
@@ -1468,6 +1452,10 @@ function StyleScope() {
         flex-wrap: wrap;
       }
 
+      .start-btn {
+        min-width: 160px;
+      }
+
       .modeBtn {
         background:#13213b;
         border:1px solid #2c4b83;
@@ -1488,7 +1476,12 @@ function StyleScope() {
         cursor: not-allowed;
       }
 
-      .lock-note { margin: 0; color: #9fc2ff; font-size: .92rem; }
+      .setup-note,
+      .lock-note {
+        margin: .6rem 0 0;
+        color: #9fc2ff;
+        font-size: .92rem;
+      }
 
       .sessionMeta {
         display: flex;
@@ -1509,6 +1502,7 @@ function StyleScope() {
       .audioBox { display:flex; align-items:center; gap:.75rem; flex-wrap: wrap; }
       .listenMeta { display:flex; align-items:baseline; gap:.5rem; flex-wrap: wrap; }
       .smallnote { color: #a9b7d1; font-size: .9rem; }
+      .audio-btn { min-width: 118px; }
 
       .questionCard {
         background: rgba(255,255,255,.03);
@@ -1634,31 +1628,64 @@ function StyleScope() {
       .controls { display:flex; gap:.6rem; flex-wrap: wrap; }
 
       .btn {
-        background:#13213b;
-        border:1px solid #2c4b83;
-        color:#e6f0ff;
+        background:#13213b !important;
+        border:1px solid #2c4b83 !important;
+        color:#e6f0ff !important;
         border-radius: 10px;
         padding: .55rem .8rem;
         cursor:pointer;
         font-weight: 700;
       }
 
-      .btn:hover { border-color:#4a79d8; }
-      .btn:disabled { opacity:.55; cursor:not-allowed; }
+      .btn:hover:not(:disabled) {
+        border-color:#6ea8ff !important;
+        color:#ffffff !important;
+      }
+
+      .btn:disabled {
+        background: rgba(148, 163, 184, .12) !important;
+        border-color: rgba(148, 163, 184, .32) !important;
+        color: rgba(207, 217, 243, .48) !important;
+        box-shadow: none !important;
+        cursor:not-allowed;
+        opacity: 1;
+      }
 
       .btn.primary {
-        background: linear-gradient(180deg, rgba(88,150,255,.35), rgba(88,150,255,.15));
-        border-color: rgba(88,150,255,.85);
+        background: linear-gradient(180deg, #3262b7 0%, #1d4486 100%) !important;
+        border-color: #78aaff !important;
+        color: #ffffff !important;
+        box-shadow: 0 8px 18px rgba(28, 80, 170, .25), inset 0 1px 0 rgba(255,255,255,.16) !important;
+      }
+
+      .btn.primary:hover:not(:disabled) {
+        background: linear-gradient(180deg, #3d73d3 0%, #25539f 100%) !important;
+      }
+
+      .btn.primary:disabled {
+        background: rgba(88,150,255,.14) !important;
+        border-color: rgba(88,150,255,.34) !important;
+        color: rgba(199, 213, 239, .5) !important;
       }
 
       .btn.danger {
-        background: linear-gradient(180deg, rgba(235,80,80,.25), rgba(235,80,80,.12));
-        border-color: rgba(235,80,80,.8);
+        background: linear-gradient(180deg, rgba(235,80,80,.25), rgba(235,80,80,.12)) !important;
+        border-color: rgba(235,80,80,.8) !important;
+        color: #ffd7d7 !important;
       }
 
       .btn.ghost {
-        background: transparent;
-        border-color: rgba(210, 225, 255, .35);
+        background: transparent !important;
+        border-color: rgba(210, 225, 255, .38) !important;
+        color: #dbe7ff !important;
+      }
+
+      .secondaryActions {
+        display: flex;
+        gap: .9rem;
+        flex-wrap: wrap;
+        align-items: center;
+        margin-top: 1rem;
       }
 
       .linkbtn {
@@ -1690,7 +1717,7 @@ function StyleScope() {
         background: rgba(255,214,102,.09);
       }
 
-      .scriptWrap { margin-top: 1rem; }
+      .scriptWrap { margin-top: .75rem; }
       .scriptPanel {
         margin-top: .75rem;
         background: rgba(255,255,255,.04);

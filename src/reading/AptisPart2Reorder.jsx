@@ -5,6 +5,7 @@ import { toast } from "../utils/toast"; // your ToastHost helper
 import { getSitePath } from "../siteConfig.js";
 import ReadingAssignButton from "./ReadingAssignButton.jsx";
 import { READING_PART2_TASKS } from "./part2Tasks.js";
+import ReadingDemoNotice from "./ReadingDemoNotice.jsx";
 
 /**
  * Aptis Part 2 – Sentence Reordering (drag sentences into slots)
@@ -294,9 +295,8 @@ function ChipDropdown({ items, value, onChange, label = "Task" }) {
         aria-disabled={isLocked}
         className={`chip-option ${isActive ? 'active' : ''} ${isLocked ? 'locked' : ''}`}
         onClick={() => {
-          if (isLocked) return;      // block selection if locked
           onChange(i);
-          setOpen(false);
+          if (!isLocked) setOpen(false);
         }}
         title={it.title}
       >
@@ -315,7 +315,10 @@ function ChipDropdown({ items, value, onChange, label = "Task" }) {
 // ---------- Main container showing two texts side‑by‑side ----------
 export default function AptisPart2Reorder({
   tasks = READING_PART2_TASKS,
+  allowedTaskIds = [],
   user,
+  aptisAccess,
+  onSignIn,
   onRequireSignIn,
   routeBasePath = getSitePath("/reading/part2"),
   activityId = "reading-part-2",
@@ -328,6 +331,8 @@ export default function AptisPart2Reorder({
   intro = "Put the sentences in the correct order to build a coherent text.",
 }) {
   const [searchParams] = useSearchParams();
+  const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
+
   // Flatten: each text becomes its own selectable task
   const flattened = useMemo(() => {
     const out = [];
@@ -335,6 +340,7 @@ export default function AptisPart2Reorder({
       t.texts.forEach((tx) => {
         out.push({
           id: `${t.id}__${tx.id}`,
+          sourceTaskId: t.id,
           // Compose a friendly title: Task title — Text title
           title: tx.title || t.title,
           subtitle: t.title !== tx.title ? t.title : "",
@@ -347,12 +353,23 @@ export default function AptisPart2Reorder({
   }, [tasks]);
 
   const initialTaskId = searchParams.get("task") || "";
-  const initialTaskIndex = Math.max(0, flattened.findIndex((task) => task.id === initialTaskId));
+  const initialTaskMatch = flattened.findIndex((task) => task.id === initialTaskId);
+  const initialTaskIndex =
+    initialTaskMatch >= 0 &&
+    (!allowedTaskIds.length || allowedTaskSet.has(flattened[initialTaskMatch]?.sourceTaskId))
+      ? initialTaskMatch
+      : 0;
   const [taskIndex, setTaskIndex] = useState(initialTaskIndex);
   const current = flattened[taskIndex] || flattened[0];
 
   // ✅ NEW: track which tasks are completed for this user
   const [completed, setCompleted] = useState(new Set());
+
+  function isTaskLocked(task, index) {
+    return allowedTaskIds.length
+      ? !allowedTaskSet.has(task.sourceTaskId)
+      : !user && lockAfterIndex != null && index >= lockAfterIndex;
+  }
 
   useEffect(() => {
     if (!trackProgress) {
@@ -374,13 +391,21 @@ export default function AptisPart2Reorder({
 
     const nextIndex = flattened.findIndex((task) => task.id === requestedTaskId);
     if (nextIndex === -1) return;
-    if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) return;
+    if (isTaskLocked(flattened[nextIndex], nextIndex)) return;
     setTaskIndex(nextIndex);
-  }, [flattened, lockAfterIndex, searchParams, user]);
+  }, [allowedTaskIds.length, allowedTaskSet, flattened, lockAfterIndex, searchParams, user]);
+
+  useEffect(() => {
+    if (!flattened.length) return;
+    if (isTaskLocked(flattened[taskIndex], taskIndex)) {
+      setTaskIndex(0);
+    }
+  }, [allowedTaskIds.length, allowedTaskSet, flattened, lockAfterIndex, taskIndex, user]);
 
  // ✅ guard selection – tasks 3+ require sign-in (index >= 2)
 function handleSelectTask(nextIndex) {
-  if (!user && lockAfterIndex != null && nextIndex >= lockAfterIndex) {
+  if (isTaskLocked(flattened[nextIndex], nextIndex)) {
+    toast("That reading task is included with full access.");
     onRequireSignIn?.(); // open your sign-in modal
     return;
   }
@@ -391,7 +416,7 @@ function handleSelectTask(nextIndex) {
 const decoratedItems = useMemo(
   () =>
     flattened.map((f, i) => {
-      const locked = !user && lockAfterIndex != null && i >= lockAfterIndex;
+      const locked = isTaskLocked(f, i);
       return {
         ...f,
         locked,
@@ -401,7 +426,7 @@ const decoratedItems = useMemo(
           (locked ? " 🔒" : "")
       };
     }),
-  [flattened, completed, lockAfterIndex, user]
+  [allowedTaskIds.length, allowedTaskSet, flattened, completed, lockAfterIndex, user]
 );
 
 return (
@@ -439,6 +464,10 @@ return (
         {headerActions}
       </div>
     </header>
+
+    <ReadingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+      Demo mode includes two Part 2 reading tasks. The other Part 2 tasks stay visible but require full access.
+    </ReadingDemoNotice>
 
     {/* Single task view (just one text) */}
     <div className="single">

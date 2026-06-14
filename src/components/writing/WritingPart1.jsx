@@ -2,6 +2,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as fb from "../../firebase";
 import { toast } from "../../utils/toast";
+import WritingDemoNotice from "./WritingDemoNotice.jsx";
 
 /* =========================================================================
    CONFIG
@@ -126,9 +127,15 @@ function pickRandomQuestions(bank, historySet, count = QUESTIONS_PER_RUN) {
 /* =========================================================================
    COMPONENT
    ========================================================================= */
-export default function WritingPart1({ user }) {
+export default function WritingPart1({ user, aptisAccess, onSignIn, allowedQuestionIds = [] }) {
+  const allowedQuestionSet = useMemo(() => new Set(allowedQuestionIds), [allowedQuestionIds]);
+  const activeQuestionBank = useMemo(() => {
+    if (!allowedQuestionSet.size) return WRITING_P1_BANK;
+    const filtered = WRITING_P1_BANK.filter((question) => allowedQuestionSet.has(strId(question)));
+    return filtered.length ? filtered : WRITING_P1_BANK;
+  }, [allowedQuestionSet]);
   const [history, setHistory] = useState(() => loadHistory());
-  const [sessionQs, setSessionQs] = useState(() => pickRandomQuestions(WRITING_P1_BANK, history));
+  const [sessionQs, setSessionQs] = useState(() => pickRandomQuestions(activeQuestionBank, history));
   const [answers, setAnswers] = useState(() => Array(sessionQs.length).fill(""));
   const [phase, setPhase] = useState("ready"); // ready | typing | summary
   const submittingRef = useRef(false);
@@ -158,6 +165,16 @@ function getSuggestionsFor(qId) {
     });
     inputRefs.current = [];
   }, [sessionQs.length]);
+
+  useEffect(() => {
+    const nextHistory = loadHistory();
+    setHistory(nextHistory);
+    setSessionQs(pickRandomQuestions(activeQuestionBank, nextHistory));
+    setAnswers(Array(Math.min(QUESTIONS_PER_RUN, activeQuestionBank.length)).fill(""));
+    setSubmissionId("");
+    resetFeedback();
+    setPhase("ready");
+  }, [activeQuestionBank]);
 
   function start() {
     setShowSuggestions(false);            // ← reset
@@ -302,7 +319,7 @@ function getSuggestionsFor(qId) {
     setShowSuggestions(false);            // ← reset
     resetFeedback();
     const h = loadHistory();
-    const qs = pickRandomQuestions(WRITING_P1_BANK, h);
+    const qs = pickRandomQuestions(activeQuestionBank, h);
     setSessionQs(qs);
     setAnswers(Array(qs.length).fill(""));
     setSubmissionId("");
@@ -326,6 +343,10 @@ function getSuggestionsFor(qId) {
           <button className="btn" onClick={newSet}>New random set</button>
         </div>
       </header>
+
+      <WritingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+        Demo mode includes five selected Part 1 questions. Full access unlocks the complete Part 1 question bank.
+      </WritingDemoNotice>
 
       <div className="grid">
         <section className="panel">

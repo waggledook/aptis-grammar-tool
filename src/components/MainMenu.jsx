@@ -1,10 +1,43 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Seo from "./common/Seo.jsx"; // adjust path if your folder structure differs
+import AptisDemoBadge from "./access/AptisDemoBadge.jsx";
 
 
-export default function MainMenu({ user }) {
+export default function MainMenu({ user, aptisAccess, onSignIn }) {
   const navigate = useNavigate();
+  const [lockedSection, setLockedSection] = useState("");
+  const isDemoMode = !!aptisAccess?.isDemoMode;
+
+  const fullAccessSections = new Set([]);
+
+  function openSection(sectionId, path) {
+    if (isDemoMode && fullAccessSections.has(sectionId)) {
+      setLockedSection(sectionId);
+      return;
+    }
+
+    navigate(path);
+  }
+
+  function renderAccessPill(kind) {
+    if (!isDemoMode) return null;
+
+    return (
+      <span className={`menu-access-pill ${kind === "demo" ? "demo" : "locked"}`}>
+        {kind === "demo" ? "Demo available" : "Full access"}
+      </span>
+    );
+  }
+
+  const lockedLabels = {
+    reading: "Reading Practice",
+    speaking: "Speaking Practice",
+    writing: "Writing Practice",
+    vocabulary: "Vocabulary Practice",
+    listening: "Listening Practice",
+  };
+
   return (
     <div className="menu-wrapper menu-style-hub">
       <Seo
@@ -25,6 +58,8 @@ export default function MainMenu({ user }) {
 
       <p className="menu-sub">Choose a practice area to begin.</p>
 
+      <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
+
       <div className="whats-new-banner">
   <div className="whats-new-copy">
     <span className="whats-new-label">What’s new</span>
@@ -35,43 +70,74 @@ export default function MainMenu({ user }) {
 
   <button
     className="whats-new-btn"
-    onClick={() => navigate("/writing")}
+    onClick={() => openSection("writing", "/writing")}
   >
     Open writing practice
   </button>
 </div>
 
+      {isDemoMode && lockedSection && (
+        <div className="menu-access-prompt" role="status">
+          <div>
+            <strong>{lockedLabels[lockedSection]} is included with full access.</strong>
+            <p>
+              The demo currently includes grammar, selected reading, writing, speaking, vocabulary and listening samples.
+            </p>
+          </div>
+          {!user && onSignIn ? (
+            <button type="button" className="menu-access-prompt-btn" onClick={onSignIn}>
+              Sign in
+            </button>
+          ) : null}
+        </div>
+      )}
+
       <div className="menu-grid">
         {/* Grammar */}
 <button className="menu-card" onClick={() => navigate("/grammar")}>
-  <h3>Grammar Practice</h3>
+  <div className="menu-card-title-row">
+    <h3>Grammar Practice</h3>
+    {renderAccessPill("demo")}
+  </div>
   <p>Gap-fills by level & tag (A2–C1). Track mistakes & favourites.</p>
 </button>
 
         {/* Reading */}
-        <button className="menu-card" onClick={() => navigate("/reading")}>
-        <h3>Reading Practice</h3>
+        <button className="menu-card" onClick={() => openSection("reading", "/reading")}>
+        <div className="menu-card-title-row">
+          <h3>Reading Practice</h3>
+          {renderAccessPill("demo")}
+        </div>
         <p>Practice tasks for all reading sections.</p>
       </button>
 
         {/* Speaking */}
-<button className="menu-card" onClick={() => navigate("/speaking")}>
-  <h3>Speaking Practice</h3>
+<button className="menu-card" onClick={() => openSection("speaking", "/speaking")}>
+  <div className="menu-card-title-row">
+    <h3>Speaking Practice</h3>
+    {renderAccessPill("demo")}
+  </div>
   <p>Practice tasks for all parts of the speaking exam.</p>
 </button>
 
         {/* Writing */}
-<button className="menu-card" onClick={() => navigate("/writing")}>
-  <h3>Writing Practice</h3>
+<button className="menu-card" onClick={() => openSection("writing", "/writing")}>
+  <div className="menu-card-title-row">
+    <h3>Writing Practice</h3>
+    {renderAccessPill("demo")}
+  </div>
   <p>
     Practise all parts of the Aptis Writing test, from short answers to
     full emails.
   </p>
 </button>
 
-        <button className="menu-card" onClick={() => navigate("/vocabulary")}>
+        <button className="menu-card" onClick={() => openSection("vocabulary", "/vocabulary")}>
   <div className="menu-card-header">
-    <h3>Vocabulary Practice</h3>
+    <div className="menu-card-title-row">
+      <h3>Vocabulary Practice</h3>
+      {renderAccessPill("demo")}
+    </div>
     <span className="uc-top-wrapper">
       <img
         src="/images/ui/under-construction.png"
@@ -84,9 +150,12 @@ export default function MainMenu({ user }) {
 </button>
 
 
-<button className="menu-card" onClick={() => navigate("/listening")}>
+<button className="menu-card" onClick={() => openSection("listening", "/listening")}>
   <div className="menu-card-header">
-    <h3>Listening Practice</h3>
+    <div className="menu-card-title-row">
+      <h3>Listening Practice</h3>
+      {renderAccessPill("demo")}
+    </div>
     <span className="uc-top-wrapper">
       <img
         src="/images/ui/under-construction.png"
@@ -99,8 +168,11 @@ export default function MainMenu({ user }) {
 </button>
 
         {/* Profile */}
-<button className="menu-card" onClick={() => navigate("/profile")}>
-  <h3>My Profile</h3>
+<button className="menu-card" onClick={() => (user ? navigate("/profile") : onSignIn?.())}>
+  <div className="menu-card-title-row">
+    <h3>My Profile</h3>
+    {isDemoMode && !user ? <span className="menu-access-pill neutral">Sign-in feature</span> : null}
+  </div>
   <p>See your progress and review saved work.</p>
 </button>
 
@@ -255,6 +327,50 @@ export default function MainMenu({ user }) {
   }
 }
 
+.menu-access-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .85rem;
+  margin: 0 0 1rem;
+  padding: .78rem .95rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 42%, var(--color-border));
+  background:
+    linear-gradient(100deg, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-raised)), var(--color-surface-raised));
+}
+
+.menu-access-prompt strong {
+  display: block;
+  margin-bottom: .18rem;
+  color: var(--color-text);
+}
+
+.menu-access-prompt p {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.38;
+  font-size: .9rem;
+}
+
+.menu-access-prompt-btn {
+  flex: 0 0 auto;
+  padding: .45rem .75rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--color-accent) 45%, var(--color-border));
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+  color: var(--color-accent);
+  font-size: .85rem;
+  font-weight: 800;
+}
+
+@media (max-width: 720px) {
+  .menu-access-prompt {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}
+
         /* ——— Grid ——— */
         .menu-grid {
           margin-top: 0;
@@ -266,6 +382,48 @@ export default function MainMenu({ user }) {
           .menu-grid {
             grid-template-columns: repeat(2, 1fr);
           }
+        }
+
+        .menu-card-title-row {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: .65rem;
+          margin-bottom: .35rem;
+        }
+
+        .menu-card-title-row h3 {
+          margin: 0;
+        }
+
+        .menu-access-pill {
+          flex: 0 0 auto;
+          padding: .2rem .48rem;
+          border-radius: 999px;
+          border: 1px solid var(--color-border);
+          background: color-mix(in srgb, var(--color-surface-raised) 82%, transparent);
+          color: var(--color-text-soft);
+          font-size: .68rem;
+          font-weight: 800;
+          line-height: 1.2;
+          white-space: nowrap;
+        }
+
+        .menu-access-pill.demo {
+          border-color: color-mix(in srgb, var(--color-accent) 48%, var(--color-border));
+          background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+          color: var(--color-accent);
+        }
+
+        .menu-access-pill.locked {
+          border-color: color-mix(in srgb, #94a3b8 42%, var(--color-border));
+          background: color-mix(in srgb, #94a3b8 10%, transparent);
+        }
+
+        .menu-access-pill.neutral {
+          border-color: color-mix(in srgb, var(--color-link) 42%, var(--color-border));
+          background: color-mix(in srgb, var(--color-link) 10%, transparent);
+          color: var(--color-link);
         }
 
         /* ——— Cards ——— */
