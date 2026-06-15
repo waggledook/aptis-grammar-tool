@@ -902,7 +902,7 @@ const [runKey,  setRunKey]  = useState(0);
 
         <div className="btn-row">
           <button
-  className="generate-btn"
+  className="generate-btn grammar-start-btn"
   onClick={handleGenerate}
   disabled={loading || tagsLoading}
 >

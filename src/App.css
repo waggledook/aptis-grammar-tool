@@ -233,6 +233,65 @@ button {
   cursor: default;
 }
 
+.generate-btn.grammar-start-btn {
+  min-width: 10.5rem;
+  min-height: 3.05rem;
+  padding: 0.78rem 1.65rem;
+  border: 1px solid rgba(255, 233, 155, 0.72);
+  border-radius: 12px;
+  background: linear-gradient(180deg, #ffe27a 0%, #f7b32b 100%);
+  box-shadow:
+    0 12px 24px rgba(253, 191, 45, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  color: #14203a;
+  font-size: 1.08rem;
+  font-weight: 900;
+  letter-spacing: 0;
+}
+
+.generate-btn.grammar-start-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ffec9a 0%, #ffc13f 100%);
+  box-shadow:
+    0 14px 28px rgba(253, 191, 45, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.56);
+  transform: translateY(-1px);
+}
+
+.generate-btn.grammar-start-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.generate-btn.grammar-start-btn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 4px rgba(253, 191, 45, 0.26),
+    0 12px 24px rgba(253, 191, 45, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 520px) {
+  .generate-btn.grammar-start-btn {
+    width: 100%;
+  }
+}
+
+.App .btn-row .generate-btn.grammar-start-btn {
+  background: linear-gradient(180deg, #ffe27a 0%, #f7b32b 100%) !important;
+  border-color: rgba(255, 233, 155, 0.72) !important;
+  box-shadow:
+    0 12px 24px rgba(253, 191, 45, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5) !important;
+  color: #14203a !important;
+}
+
+.App .btn-row .generate-btn.grammar-start-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #ffec9a 0%, #ffc13f 100%) !important;
+  border-color: rgba(255, 233, 155, 0.86) !important;
+  box-shadow:
+    0 14px 28px rgba(253, 191, 45, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.56) !important;
+}
+
 /* Option buttons */
 .option-btn {
   background: #fdbf2d;
@@ -3352,6 +3411,22 @@ h2,
   background: var(--primary-gradient) !important;
   border-color: transparent !important;
   color: var(--primary-text) !important;
+}
+
+:root[data-theme="light"] .generate-btn.grammar-start-btn {
+  background: linear-gradient(180deg, #ffe27a 0%, #f7b32b 100%) !important;
+  border-color: rgba(156, 113, 16, 0.34) !important;
+  box-shadow:
+    0 12px 24px rgba(156, 113, 16, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.62) !important;
+  color: #14203a !important;
+}
+
+:root[data-theme="light"] .generate-btn.grammar-start-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #fff0a8 0%, #ffc744 100%) !important;
+  box-shadow:
+    0 14px 28px rgba(156, 113, 16, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.66) !important;
 }
 
 :root[data-theme="light"] :is(
