@@ -774,7 +774,7 @@ const [runKey,  setRunKey]  = useState(0);
   
       const batch = await fetchItems({
         levels,
-        tags: tag ? [tag] : [],
+        tags: !isAptisDemoMode && tag ? [tag] : [],
         count: isAptisDemoMode ? Math.min(count, APTIS_DEMO_GRAMMAR_QUESTION_LIMIT) : count,
         allowedIds: isAptisDemoMode ? APTIS_DEMO_ACCESS.grammar.itemIds : [],
         // Prefer new items for signed-in users
@@ -825,6 +825,12 @@ const [runKey,  setRunKey]  = useState(0);
       }
     }, [grammarCountOptions, count]);
 
+    useEffect(() => {
+      if (isAptisDemoMode && tag) {
+        setTag("");
+      }
+    }, [isAptisDemoMode, tag]);
+
     const handleGenerate = () => {
       setAnsweredCount(0);
       generate();
@@ -870,6 +876,8 @@ const [runKey,  setRunKey]  = useState(0);
             tag={tag}
             onTagChange={setTag}
             allTags={allTags}
+            tagsLocked={isAptisDemoMode}
+            lockedTagsMessage="Full tag filtering is available with full access."
           />
         )}
 
@@ -898,7 +906,7 @@ const [runKey,  setRunKey]  = useState(0);
   onClick={handleGenerate}
   disabled={loading || tagsLoading}
 >
-  {loading ? "Loading…" : "Generate Exercises"}
+  {loading ? "Loading…" : "Start"}
 </button>
 
           {user && (

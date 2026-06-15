@@ -10,6 +10,9 @@ import { PART4_TASKS } from "../speaking/banks/part4";
 import { auth } from "../../firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { getTotalVocabSets, TOPIC_DATA } from "../vocabulary/data/vocabTopics";
+import { vocabExerciseTasks } from "../vocabulary/data/vocabExerciseBank.js";
+import synonymSeedItems from "../vocabulary/data/synonymSeedItems.js";
+import collocationPrecisionItems from "../vocabulary/collocations/data/collocationPrecisionItems.js";
 import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
 import { getOteWritingMock } from "../../products/ote/mockTests/data/oteWritingMockData.js";
 import {
@@ -23,6 +26,14 @@ import {
 } from "firebase/auth";
 
 const HUB_GRAMMAR_LEVELS = ["a2", "b1", "b2", "c1", "c2"];
+const EMPTY_VOCAB_PRACTICE_SUMMARY = {
+  exercise: { attempted: 0, perfect: 0, attempts: 0, favourites: 0, favouriteItems: 0, mistakeQuestions: 0 },
+  synonyms: { attempted: 0, correct: 0, attempts: 0, favourites: 0, mistakes: 0 },
+  collocations: { attempted: 0, correct: 0, attempts: 0, favourites: 0, mistakes: 0 },
+};
+const TOTAL_VOCAB_EXERCISE_TASKS = vocabExerciseTasks.length;
+const TOTAL_SYNONYM_ITEMS = synonymSeedItems.length;
+const TOTAL_COLLOCATION_ITEMS = collocationPrecisionItems.length;
 const HUB_GRAMMAR_LEVEL_COLORS = {
   a2: "#7ef0c2",
   b1: "#8fb6ff",
@@ -156,6 +167,7 @@ export default function Profile({
 
   const [vocabTopicCounts, setVocabTopicCounts] = useState(null); // 👈 NEW
   const [vocabMistakes, setVocabMistakes] = useState([]); // 👈 NEW
+  const [vocabPracticeSummary, setVocabPracticeSummary] = useState(EMPTY_VOCAB_PRACTICE_SUMMARY);
 
   // Progress sections at the top
   const [showReadingPanel, setShowReadingPanel] = useState(false);
@@ -331,6 +343,7 @@ const handleChangePassword = async (e) => {
           speakingFeedbackItems,
           vocabCounts,
           vocabMistakesArr,
+          vocabPractice,
           hubGrammarSubs,
           keywordDash,
           wordFormationDash,
@@ -353,6 +366,7 @@ const handleChangePassword = async (e) => {
           fb.fetchSpeakingAiFeedback?.(20, uid) ?? Promise.resolve([]),
           fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
           fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]),
+          fb.fetchVocabPracticeSummary?.(uid) ?? Promise.resolve(EMPTY_VOCAB_PRACTICE_SUMMARY),
           fb.fetchHubGrammarSubmissions?.(200, uid) ?? Promise.resolve([]),
           fb.fetchHubKeywordDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
           fb.fetchHubWordFormationDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
@@ -377,6 +391,7 @@ const handleChangePassword = async (e) => {
         setSpeakingFeedback(speakingFeedbackItems || []);
         setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
         setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
+        setVocabPracticeSummary(vocabPractice || EMPTY_VOCAB_PRACTICE_SUMMARY);
         setHubGrammarSubmissions(hubGrammarSubs || []);
         setHubGrammarDash(buildHubGrammarDashboard(hubGrammarSubs || []));
         setHubKeywordDash(keywordDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
@@ -413,6 +428,21 @@ const totalCompletedVocab = vocabTopicCounts
     0
   )
 : 0;
+
+const vocabExerciseAttempted = vocabPracticeSummary?.exercise?.attempted || 0;
+const vocabExercisePerfect = vocabPracticeSummary?.exercise?.perfect || 0;
+const vocabExerciseFavourites =
+  (vocabPracticeSummary?.exercise?.favourites || 0) +
+  (vocabPracticeSummary?.exercise?.favouriteItems || 0);
+const vocabExerciseMistakeQuestions = vocabPracticeSummary?.exercise?.mistakeQuestions || 0;
+const vocabSynonymAttempted = vocabPracticeSummary?.synonyms?.attempted || 0;
+const vocabSynonymCorrect = vocabPracticeSummary?.synonyms?.correct || 0;
+const vocabSynonymFavourites = vocabPracticeSummary?.synonyms?.favourites || 0;
+const vocabSynonymMistakes = vocabPracticeSummary?.synonyms?.mistakes || 0;
+const vocabCollocationAttempted = vocabPracticeSummary?.collocations?.attempted || 0;
+const vocabCollocationCorrect = vocabPracticeSummary?.collocations?.correct || 0;
+const vocabCollocationFavourites = vocabPracticeSummary?.collocations?.favourites || 0;
+const vocabCollocationMistakes = vocabPracticeSummary?.collocations?.mistakes || 0;
 
 const totalReadingCompleted =
   (readingCounts.part1 || 0) +
@@ -652,7 +682,7 @@ const totalListeningTasks =
     </h3>
 
     <span className="muted small" style={{ flexShrink: 0 }}>
-      {totalCompletedVocab}/{TOTAL_VOCAB_SETS || 0} sets completed
+      {totalCompletedVocab} topic sets · {vocabExerciseAttempted} exercise tasks
     </span>
 
     <span className={`chev ${showVocabPanel ? "open" : ""}`} aria-hidden>
@@ -666,70 +696,238 @@ const totalListeningTasks =
         <ProgressBar
           value={totalCompletedVocab}
           max={TOTAL_VOCAB_SETS || 1}
-          label="Overall"
+          label="Topic sets"
           right={`${totalCompletedVocab}/${TOTAL_VOCAB_SETS || 0}`}
         />
       </div>
 
-      {!vocabTopicCounts || Object.keys(vocabTopicCounts).length === 0 ? (
-        <p className="muted small" style={{ marginTop: ".6rem" }}>
-          No vocab sets completed yet.
-        </p>
-      ) : (
-        <ul className="vocab-list" style={{ marginTop: ".6rem" }}>
-          {Object.entries(vocabTopicCounts).map(([topicKey, stats]) => (
-            <li key={topicKey} className="vocab-row">
-              <span className="vocab-topic-label">
-                {TOPIC_DATA?.[topicKey]?.topicTitle || topicKey.charAt(0).toUpperCase() + topicKey.slice(1)}
-              </span>
-              <span className="vocab-topic-count">
-                {stats.completed} set{stats.completed === 1 ? "" : "s"} completed
-                {typeof stats.total === "number" && stats.total > 0 && (
-                  <span className="vocab-topic-sub">
-                    {" "}
-                    (out of {stats.total} total)
-                  </span>
-                )}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div style={{ marginTop: "0.75rem" }}>
-        <h4
-          style={{
-            margin: "0 0 .4rem 0",
-            fontSize: "0.95rem",
-            color: "#cfe1ff",
-          }}
-        >
-          Mistakes
-        </h4>
-
-        {(!vocabMistakes || vocabMistakes.length === 0) ? (
-          <p className="muted small">
-            No active vocab mistakes – great job!
-          </p>
-        ) : (
-          <>
-            <p className="muted small">
-              You have <strong>{vocabMistakes.length}</strong> vocab item
-              {vocabMistakes.length === 1 ? "" : "s"} to review.
-            </p>
-
-            {onGoVocabMistakes && (
+      <div className="vocab-tool-list">
+        <details className="vocab-tool-item" open>
+          <summary>
+            <span className="vocab-tool-summary-title">Topic Practice</span>
+            <span className="vocab-tool-summary-meta">{totalCompletedVocab}/{TOTAL_VOCAB_SETS || 0} sets</span>
+          </summary>
+          <div className="vocab-tool-body">
+            <p className="muted small">Completed themed vocabulary review sets.</p>
+            <div className="vocab-tool-progress">
+              <ProgressBar
+                value={totalCompletedVocab}
+                max={TOTAL_VOCAB_SETS || 1}
+                label="Seen"
+                right={`${totalCompletedVocab}/${TOTAL_VOCAB_SETS || 0}`}
+              />
+              <ProgressBar
+                value={totalCompletedVocab}
+                max={TOTAL_VOCAB_SETS || 1}
+                label="Completed"
+                right={`${totalCompletedVocab}/${TOTAL_VOCAB_SETS || 0}`}
+              />
+            </div>
+            {(!vocabMistakes || vocabMistakes.length === 0) ? (
+              <p className="vocab-tool-good">No active topic mistakes.</p>
+            ) : (
+              <p className="vocab-tool-alert">
+                {vocabMistakes.length} topic mistake{vocabMistakes.length === 1 ? "" : "s"} to review.
+              </p>
+            )}
+            <div className="vocab-tool-actions">
+              <button type="button" className="btn vocab-tool-btn" onClick={() => navigate("/vocabulary/topics")}>
+                Open tool
+              </button>
               <button
                 type="button"
-                className="btn"
-                style={{ marginTop: ".4rem" }}
+                className="btn vocab-tool-btn"
                 onClick={onGoVocabMistakes}
+                disabled={!onGoVocabMistakes || !vocabMistakes?.length}
               >
-                Review vocab mistakes
+                Review mistakes
               </button>
+              <button type="button" className="btn vocab-tool-btn" disabled>
+                Review favourites
+              </button>
+            </div>
+            {!vocabTopicCounts || Object.keys(vocabTopicCounts).length === 0 ? (
+              <p className="muted small" style={{ marginTop: ".35rem" }}>
+                No topic sets completed yet.
+              </p>
+            ) : (
+              <ul className="vocab-list vocab-topic-breakdown">
+                {Object.entries(vocabTopicCounts).map(([topicKey, stats]) => (
+                  <li key={topicKey} className="vocab-row">
+                    <span className="vocab-topic-label">
+                      {TOPIC_DATA?.[topicKey]?.topicTitle || topicKey.charAt(0).toUpperCase() + topicKey.slice(1)}
+                    </span>
+                    <span className="vocab-topic-count">
+                      {stats.completed} set{stats.completed === 1 ? "" : "s"} completed
+                      {typeof stats.total === "number" && stats.total > 0 && (
+                        <span className="vocab-topic-sub">
+                          {" "}
+                          (out of {stats.total} total)
+                        </span>
+                      )}
+                    </span>
+                  </li>
+                ))}
+              </ul>
             )}
-          </>
-        )}
+          </div>
+        </details>
+
+        <details className="vocab-tool-item featured" open>
+          <summary>
+            <span className="vocab-tool-summary-title">Vocabulary Exercise Trainer</span>
+            <span className="vocab-tool-summary-meta">{vocabExerciseAttempted} tried</span>
+          </summary>
+          <div className="vocab-tool-body">
+            <p className="muted small">
+              Aptis-style synonym, definition, collocation and gap-fill tasks.
+            </p>
+            <div className="vocab-tool-progress">
+              <ProgressBar
+                value={vocabExerciseAttempted}
+                max={TOTAL_VOCAB_EXERCISE_TASKS || 1}
+                label="Seen"
+                right={`${vocabExerciseAttempted}/${TOTAL_VOCAB_EXERCISE_TASKS || 0}`}
+              />
+              <ProgressBar
+                value={vocabExercisePerfect}
+                max={TOTAL_VOCAB_EXERCISE_TASKS || 1}
+                label="Perfect"
+                right={`${vocabExercisePerfect}/${TOTAL_VOCAB_EXERCISE_TASKS || 0}`}
+              />
+            </div>
+            <div className="vocab-tool-stats">
+              <span>{vocabExercisePerfect} perfect</span>
+              <span>{vocabExerciseFavourites} saved</span>
+              <span>{vocabExerciseMistakeQuestions} mistakes</span>
+            </div>
+            <div className="vocab-tool-actions">
+              <button
+                type="button"
+                className="btn vocab-tool-btn"
+                onClick={() => navigate("/vocabulary/exercises")}
+              >
+                Open tool
+              </button>
+              <button
+                type="button"
+                className="btn vocab-tool-btn"
+                onClick={() => navigate("/vocabulary/exercises")}
+                disabled={!vocabExerciseMistakeQuestions}
+              >
+                Review mistakes
+              </button>
+              <button
+                type="button"
+                className="btn vocab-tool-btn"
+                onClick={() => navigate("/vocabulary/exercises")}
+                disabled={!vocabExerciseFavourites}
+              >
+                Review favourites
+              </button>
+            </div>
+          </div>
+        </details>
+
+        <details className="vocab-tool-item">
+          <summary>
+            <span className="vocab-tool-summary-title">Synonym Trainer</span>
+            <span className="vocab-tool-summary-meta">{vocabSynonymAttempted} tried</span>
+          </summary>
+          <div className="vocab-tool-body">
+            <p className="muted small">Closest-meaning practice and exam-style synonym review.</p>
+            <div className="vocab-tool-progress">
+              <ProgressBar
+                value={vocabSynonymAttempted}
+                max={TOTAL_SYNONYM_ITEMS || 1}
+                label="Seen"
+                right={`${vocabSynonymAttempted}/${TOTAL_SYNONYM_ITEMS || 0}`}
+              />
+              <ProgressBar
+                value={vocabSynonymCorrect}
+                max={TOTAL_SYNONYM_ITEMS || 1}
+                label="Correct"
+                right={`${vocabSynonymCorrect}/${TOTAL_SYNONYM_ITEMS || 0}`}
+              />
+            </div>
+            <div className="vocab-tool-stats">
+              <span>{vocabSynonymCorrect} correct</span>
+              <span>{vocabSynonymFavourites} saved</span>
+              <span>{vocabSynonymMistakes} mistakes</span>
+            </div>
+            <div className="vocab-tool-actions">
+              <button type="button" className="btn vocab-tool-btn" onClick={() => navigate("/vocabulary/synonyms")}>
+                Open tool
+              </button>
+              <button
+                type="button"
+                className="btn vocab-tool-btn"
+                onClick={() => navigate("/vocabulary/synonyms")}
+                disabled={!vocabSynonymMistakes}
+              >
+                Review mistakes
+              </button>
+              <button
+                type="button"
+                className="btn vocab-tool-btn"
+                onClick={() => navigate("/vocabulary/synonyms")}
+                disabled={!vocabSynonymFavourites}
+              >
+                Review favourites
+              </button>
+            </div>
+          </div>
+        </details>
+
+        <details className="vocab-tool-item">
+          <summary>
+            <span className="vocab-tool-summary-title">Collocation Trainer</span>
+            <span className="vocab-tool-summary-meta">{vocabCollocationAttempted} tried</span>
+          </summary>
+          <div className="vocab-tool-body">
+            <p className="muted small">Natural word combinations and precision collocation sets.</p>
+            <div className="vocab-tool-progress">
+              <ProgressBar
+                value={vocabCollocationAttempted}
+                max={TOTAL_COLLOCATION_ITEMS || 1}
+                label="Seen"
+                right={`${vocabCollocationAttempted}/${TOTAL_COLLOCATION_ITEMS || 0}`}
+              />
+              <ProgressBar
+                value={vocabCollocationCorrect}
+                max={TOTAL_COLLOCATION_ITEMS || 1}
+                label="Correct"
+                right={`${vocabCollocationCorrect}/${TOTAL_COLLOCATION_ITEMS || 0}`}
+              />
+            </div>
+            <div className="vocab-tool-stats">
+              <span>{vocabCollocationCorrect} correct</span>
+              <span>{vocabCollocationFavourites} saved</span>
+              <span>{vocabCollocationMistakes} mistakes</span>
+            </div>
+            <div className="vocab-tool-actions">
+              <button type="button" className="btn vocab-tool-btn" onClick={() => navigate("/vocabulary/collocations")}>
+                Open tool
+              </button>
+              <button
+                type="button"
+                className="btn vocab-tool-btn"
+                onClick={() => navigate("/vocabulary/collocations/trainer")}
+                disabled={!vocabCollocationMistakes}
+              >
+                Review mistakes
+              </button>
+              <button
+                type="button"
+                className="btn vocab-tool-btn"
+                onClick={() => navigate("/vocabulary/collocations/trainer")}
+                disabled={!vocabCollocationFavourites}
+              >
+                Review favourites
+              </button>
+            </div>
+          </div>
+        </details>
       </div>
     </div>
   )}
@@ -785,6 +983,106 @@ const totalListeningTasks =
           label="Part 4"
           right={`${speakingCounts.part4 || 0}/${SPEAKING_TOTALS.part4 || 0}`}
         />
+      </div>
+
+      <div className="subpanel collapsible-inner" style={{ marginTop: "0.9rem" }}>
+        <button
+          type="button"
+          className="collapse-head inner"
+          aria-expanded={showSpeakingFeedback}
+          onClick={() => setShowSpeakingFeedback((s) => !s)}
+        >
+          <div className="inner-head-left">
+            <h4 className="inner-title">Speaking Feedback</h4>
+            <span className="muted small">
+              {speakingFeedback.length} saved item
+              {speakingFeedback.length === 1 ? "" : "s"}
+            </span>
+          </div>
+          <span className={`chev ${showSpeakingFeedback ? "open" : ""}`} aria-hidden>
+            ▾
+          </span>
+        </button>
+
+        {showSpeakingFeedback && (
+          <>
+            {!speakingFeedback.length ? (
+              <p className="muted" style={{ marginTop: ".5rem" }}>
+                No saved speaking feedback yet.
+              </p>
+            ) : (
+              <ul className="wlist" style={{ marginTop: ".5rem" }}>
+                {speakingFeedback.map((item, idx) => {
+                  const when = item.createdAt?.toDate?.()
+                    ? item.createdAt.toDate().toLocaleString()
+                    : item.createdAt || "—";
+                  const partLabel =
+                    item.part === "part1"
+                      ? "Speaking Part 1"
+                      : item.part === "part2"
+                      ? "Speaking Part 2"
+                      : item.part || "Speaking";
+                  const title = item.taskTitle || partLabel;
+                  const transcripts = item.transcripts || [];
+
+                  return (
+                    <li key={item.id || idx} className="wcard">
+                      <div className="whead">
+                        <div>
+                          <strong>{title}</strong>
+                          <div className="muted small">{when}</div>
+                          <div className="muted small">
+                            {partLabel} · transcript-based feedback · audio not stored
+                          </div>
+                        </div>
+                        <div className="actions">
+                          <button
+                            className="btn"
+                            type="button"
+                            onClick={() => {
+                              const text = [
+                                `${title} (${when})`,
+                                "",
+                                ...(transcripts || []).map((entry, index) =>
+                                  [
+                                    `Q${index + 1}: ${entry.question || item.questions?.[index]?.question || ""}`,
+                                    entry.transcript || "(no clear transcript)",
+                                  ].join("\n")
+                                ),
+                              ].join("\n\n");
+                              navigator.clipboard.writeText(text).then(() => toast("Copied speaking feedback ✓"));
+                            }}
+                          >
+                            Copy transcripts
+                          </button>
+                        </div>
+                      </div>
+
+                      {transcripts.length ? (
+                        <details className="profile-ai-feedback-full">
+                          <summary>View transcripts</summary>
+                          <div className="profile-ai-feedback-body">
+                            {transcripts.map((entry, index) => (
+                              <article className="profile-ai-feedback-card" key={entry.questionId || index}>
+                                <strong>Q{index + 1}: {entry.question || item.questions?.[index]?.question || "Question"}</strong>
+                                <p>{entry.transcript || "No clear transcript."}</p>
+                              </article>
+                            ))}
+                          </div>
+                        </details>
+                      ) : null}
+
+                      <ProfileAiFeedback
+                        feedback={item.feedback}
+                        descriptor="Generated automatically from transcripts. Audio is not stored."
+                      />
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
+        )}
       </div>
     </div>
   )}
@@ -1967,112 +2265,6 @@ const totalListeningTasks =
 
 {!isSeifHubProfile && (
 <>
-{/* --- SPEAKING FEEDBACK --- */}
-      <section className="panel collapsible" style={{ marginTop: "1rem" }}>
-  <button
-    type="button"
-    className="collapse-head"
-    aria-expanded={showSpeakingFeedback}
-    onClick={() => setShowSpeakingFeedback((s) => !s)}
-  >
-    <h3 className="sec-title" style={{ margin: 0 }}>
-      Speaking Feedback
-    </h3>
-
-    <span className="muted small" style={{ flexShrink: 0 }}>
-      {speakingFeedback.length} saved item
-      {speakingFeedback.length === 1 ? "" : "s"}
-    </span>
-
-    <span
-      className={`chev ${showSpeakingFeedback ? "open" : ""}`}
-      aria-hidden
-    >
-      ▾
-    </span>
-  </button>
-
-  {showSpeakingFeedback && (
-    <>
-      {!speakingFeedback.length ? (
-        <p className="muted" style={{ marginTop: ".5rem" }}>
-          No saved speaking feedback yet.
-        </p>
-      ) : (
-        <ul className="wlist" style={{ marginTop: ".5rem" }}>
-          {speakingFeedback.map((item, idx) => {
-            const when = item.createdAt?.toDate?.()
-              ? item.createdAt.toDate().toLocaleString()
-              : item.createdAt || "—";
-            const partLabel =
-              item.part === "part1"
-                ? "Speaking Part 1"
-                : item.part === "part2"
-                ? "Speaking Part 2"
-                : item.part || "Speaking";
-            const title = item.taskTitle || partLabel;
-            const transcripts = item.transcripts || [];
-
-            return (
-              <li key={item.id || idx} className="wcard">
-                <div className="whead">
-                  <div>
-                    <strong>{title}</strong>
-                    <div className="muted small">{when}</div>
-                    <div className="muted small">
-                      {partLabel} · transcript-based feedback · audio not stored
-                    </div>
-                  </div>
-                  <div className="actions">
-                    <button
-                      className="btn"
-                      type="button"
-                      onClick={() => {
-                        const text = [
-                          `${title} (${when})`,
-                          "",
-                          ...(transcripts || []).map((entry, index) =>
-                            [
-                              `Q${index + 1}: ${entry.question || item.questions?.[index]?.question || ""}`,
-                              entry.transcript || "(no clear transcript)",
-                            ].join("\n")
-                          ),
-                        ].join("\n\n");
-                        navigator.clipboard.writeText(text).then(() => toast("Copied speaking feedback ✓"));
-                      }}
-                    >
-                      Copy transcripts
-                    </button>
-                  </div>
-                </div>
-
-                {transcripts.length ? (
-                  <details className="profile-ai-feedback-full">
-                    <summary>View transcripts</summary>
-                    <div className="profile-ai-feedback-body">
-                      {transcripts.map((entry, index) => (
-                        <article className="profile-ai-feedback-card" key={entry.questionId || index}>
-                          <strong>Q{index + 1}: {entry.question || item.questions?.[index]?.question || "Question"}</strong>
-                          <p>{entry.transcript || "No clear transcript."}</p>
-                        </article>
-                      ))}
-                    </div>
-                  </details>
-                ) : null}
-
-                <ProfileAiFeedback
-                  feedback={item.feedback}
-                  descriptor="Generated automatically from transcripts. Audio is not stored."
-                />
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </>
-  )}
-</section>
-
 {/* --- SPEAKING NOTES --- */}
       <section className="panel collapsible" style={{ marginTop: "1rem" }}>
   <button
@@ -2545,6 +2737,157 @@ function StyleScope() {
       .vocab-topic-sub {
         font-size: 0.8rem;
         color: #9fb0e0;
+      }
+      .vocab-tool-list {
+        display: grid;
+        gap: .75rem;
+        margin-top: .85rem;
+      }
+
+      .vocab-tool-item {
+        border-radius: 12px;
+        border: 1px solid var(--color-border);
+        background: color-mix(in srgb, var(--color-surface-raised) 78%, transparent);
+        overflow: hidden;
+      }
+
+      .vocab-tool-item.featured {
+        border-color: color-mix(in srgb, var(--color-accent) 42%, var(--color-border));
+        background:
+          linear-gradient(135deg, color-mix(in srgb, var(--color-accent) 12%, var(--color-surface-raised)), var(--color-surface-raised));
+      }
+
+      .vocab-tool-item summary {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: .75rem;
+        padding: .78rem .9rem;
+        cursor: pointer;
+        list-style: none;
+      }
+
+      .vocab-tool-item summary::-webkit-details-marker {
+        display: none;
+      }
+
+      .vocab-tool-item summary::after {
+        content: "▾";
+        color: var(--color-text-soft);
+        font-weight: 900;
+        transition: transform .15s ease;
+      }
+
+      .vocab-tool-item[open] summary::after {
+        transform: rotate(180deg);
+      }
+
+      .vocab-tool-summary-title {
+        margin: 0;
+        color: #cfe1ff;
+        font-size: .98rem;
+        font-weight: 900;
+        line-height: 1.2;
+      }
+
+      .vocab-tool-summary-meta {
+        flex: 0 0 auto;
+        padding: .18rem .48rem;
+        border-radius: 999px;
+        background: color-mix(in srgb, var(--color-accent) 14%, transparent);
+        border: 1px solid color-mix(in srgb, var(--color-accent) 34%, var(--color-border));
+        color: var(--color-accent);
+        font-size: .75rem;
+        font-weight: 900;
+        white-space: nowrap;
+      }
+
+      .vocab-tool-body {
+        display: grid;
+        gap: .65rem;
+        padding: 0 .9rem .85rem;
+      }
+
+      .vocab-tool-progress {
+        display: grid;
+        gap: .5rem;
+        max-width: 640px;
+      }
+
+      .vocab-tool-stats {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .35rem;
+      }
+
+      .vocab-tool-stats span,
+      .vocab-tool-good,
+      .vocab-tool-alert {
+        width: fit-content;
+        margin: 0;
+        padding: .18rem .48rem;
+        border-radius: 999px;
+        font-size: .76rem;
+        font-weight: 800;
+      }
+
+      .vocab-tool-stats span {
+        background: color-mix(in srgb, var(--color-link) 12%, transparent);
+        color: var(--color-text-soft);
+        border: 1px solid color-mix(in srgb, var(--color-link) 22%, var(--color-border));
+      }
+
+      .vocab-tool-good {
+        background: color-mix(in srgb, #22c55e 12%, transparent);
+        border: 1px solid color-mix(in srgb, #22c55e 30%, var(--color-border));
+        color: #9ef0bb;
+      }
+
+      .vocab-tool-alert {
+        background: color-mix(in srgb, #ef4444 12%, transparent);
+        border: 1px solid color-mix(in srgb, #ef4444 34%, var(--color-border));
+        color: #ffb4b4;
+      }
+
+      .vocab-tool-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .45rem;
+        margin-top: .1rem;
+      }
+
+      .vocab-tool-btn {
+        min-height: 2.25rem;
+        padding: .45rem .78rem;
+        font-size: .9rem;
+        line-height: 1.1;
+      }
+
+      .vocab-tool-btn:disabled {
+        cursor: not-allowed;
+        opacity: .48;
+        filter: grayscale(.25);
+      }
+
+      .vocab-topic-breakdown {
+        margin-top: .85rem;
+      }
+
+      @media (max-width: 540px) {
+        .vocab-row {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .vocab-tool-item summary {
+          align-items: flex-start;
+          flex-wrap: wrap;
+        }
+
+        .vocab-topic-count {
+          text-align: left;
+          white-space: normal;
+        }
       }
       .panel-body {
   margin-top: 0.75rem;

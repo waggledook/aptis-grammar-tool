@@ -2524,6 +2524,75 @@ export async function fetchVocabExerciseMistakes(n = 20, uid) {
   }));
 }
 
+export async function fetchVocabPracticeSummary(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) {
+    return {
+      exercise: { attempted: 0, perfect: 0, attempts: 0, favourites: 0, favouriteItems: 0, mistakeQuestions: 0 },
+      synonyms: { attempted: 0, correct: 0, attempts: 0, favourites: 0, mistakes: 0 },
+      collocations: { attempted: 0, correct: 0, attempts: 0, favourites: 0, mistakes: 0 },
+    };
+  }
+
+  const [
+    exerciseProgressSnap,
+    exerciseFavouritesSnap,
+    exerciseItemFavouritesSnap,
+    exerciseMistakesSnap,
+    synonymProgressSnap,
+    synonymFavouritesSnap,
+    synonymMistakesSnap,
+    collocationProgressSnap,
+    collocationFavouritesSnap,
+    collocationMistakesSnap,
+  ] = await Promise.all([
+    getDocs(collection(db, "users", realUid, "vocabExerciseProgress")),
+    getDocs(collection(db, "users", realUid, "vocabExerciseFavourites")),
+    getDocs(collection(db, "users", realUid, "vocabExerciseItemFavourites")),
+    getDocs(collection(db, "users", realUid, "vocabExerciseMistakes")),
+    getDocs(collection(db, "users", realUid, "synonymTrainerProgress")),
+    getDocs(collection(db, "users", realUid, "synonymTrainerFavourites")),
+    getDocs(collection(db, "users", realUid, "synonymTrainerMistakes")),
+    getDocs(collection(db, "users", realUid, "collocationPrecisionProgress")),
+    getDocs(collection(db, "users", realUid, "collocationPrecisionFavourites")),
+    getDocs(collection(db, "users", realUid, "collocationPrecisionMistakes")),
+  ]);
+
+  const exerciseProgress = exerciseProgressSnap.docs.map((entry) => entry.data() || {});
+  const synonymProgress = synonymProgressSnap.docs.map((entry) => entry.data() || {});
+  const collocationProgress = collocationProgressSnap.docs.map((entry) => entry.data() || {});
+  const exerciseMistakeQuestions = exerciseMistakesSnap.docs.reduce((total, entry) => {
+    const data = entry.data() || {};
+    return total + (Array.isArray(data.wrongQuestions) ? data.wrongQuestions.length : 1);
+  }, 0);
+  const hasEverCorrect = (entry) => entry.everCorrect === true || entry.lastCorrect === true;
+
+  return {
+    exercise: {
+      attempted: exerciseProgressSnap.size,
+      perfect: exerciseProgress.filter((entry) => entry.everPerfect).length,
+      attempts: exerciseProgress.reduce((total, entry) => total + Number(entry.attempts || 0), 0),
+      favourites: exerciseFavouritesSnap.size,
+      favouriteItems: exerciseItemFavouritesSnap.size,
+      mistakeQuestions: exerciseMistakeQuestions,
+    },
+    synonyms: {
+      attempted: synonymProgressSnap.size,
+      correct: synonymProgress.filter(hasEverCorrect).length,
+      attempts: synonymProgress.reduce((total, entry) => total + Number(entry.attempts || 0), 0),
+      favourites: synonymFavouritesSnap.size,
+      mistakes: synonymMistakesSnap.size,
+    },
+    collocations: {
+      attempted: collocationProgressSnap.size,
+      correct: collocationProgress.filter(hasEverCorrect).length,
+      attempts: collocationProgress.reduce((total, entry) => total + Number(entry.attempts || 0), 0),
+      favourites: collocationFavouritesSnap.size,
+      mistakes: collocationMistakesSnap.size,
+    },
+  };
+}
+
 export async function saveCollocationPrecisionResult(itemId, tags, isCorrect) {
   const uid = auth.currentUser?.uid;
   if (!uid || !itemId) return;

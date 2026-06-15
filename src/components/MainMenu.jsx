@@ -61,20 +61,21 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
       <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
 
       <div className="whats-new-banner">
-  <div className="whats-new-copy">
-    <span className="whats-new-label">What’s new</span>
-    <p>
-      <strong>Automatic writing feedback</strong> Get instant Aptis-style feedback on your Writing Part 1, 2, 3 and 4 practice tasks.
-    </p>
-  </div>
+        <div className="whats-new-copy">
+          <span className="whats-new-label">What’s new</span>
+          <h3>New Aptis Vocabulary Exercise Trainer</h3>
+          <p>
+            Practise exam-style vocabulary tasks with instant feedback, favourites and mistake review.
+          </p>
+        </div>
 
-  <button
-    className="whats-new-btn"
-    onClick={() => openSection("writing", "/writing")}
-  >
-    Open writing practice
-  </button>
-</div>
+        <button
+          className="whats-new-btn"
+          onClick={() => openSection("vocabulary", "/vocabulary/exercises")}
+        >
+          Try vocabulary exercises
+        </button>
+      </div>
 
       {isDemoMode && lockedSection && (
         <div className="menu-access-prompt" role="status">
@@ -138,15 +139,9 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
       <h3>Vocabulary Practice</h3>
       {renderAccessPill("demo")}
     </div>
-    <span className="uc-top-wrapper">
-      <img
-        src="/images/ui/under-construction.png"
-        alt="Under construction"
-        className="uc-top-icon"
-      />
-    </span>
+    <span className="soon-pill">New trainer</span>
   </div>
-  <p>Topics, synonyms, and collocations.</p>
+  <p>Topic practice plus Aptis-style vocabulary exercises with feedback, favourites and mistake review.</p>
 </button>
 
 

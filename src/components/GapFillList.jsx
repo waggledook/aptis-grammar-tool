@@ -13,7 +13,7 @@ export default function GapFillList({
 
   if (!items) return null;
   if (items.length === 0) {
-    return <p>No items to display. Click “Generate” above.</p>;
+    return <p>No items to display. Click “Start” above.</p>;
   }
 
   const handleAnswer = (answerPayload) => {

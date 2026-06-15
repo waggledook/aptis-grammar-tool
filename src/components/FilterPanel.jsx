@@ -6,7 +6,9 @@ export default function FilterPanel({
   onLevelsChange,    // setter for levels
   tag,               // string: currently selected tag
   onTagChange,       // setter for tag
-  allTags            // array of strings
+  allTags,           // array of strings
+  tagsLocked = false,
+  lockedTagsMessage = "Full tag filtering is available with full access."
 }) {
   const allLevels = ['A2','B1','B2','C1'];
 
@@ -46,22 +48,24 @@ export default function FilterPanel({
 </fieldset>
 
       {/* Tags as a dropdown */}
-      <label style={{ display: 'block', marginTop: 8 }}>
-  Tag:
-  {' '}
-  <span className="select-wrap">
-    <select
-      className="select"
-      value={tag}
-      onChange={e => onTagChange(e.target.value)}
-    >
-      <option value="">All tags</option>
-      {allTags.map(t => (
-        <option key={t} value={t}>{t}</option>
-      ))}
-    </select>
-  </span>
-</label>
+      <label className="tag-filter-field">
+        <span>Tag:</span>
+        <span className="select-wrap">
+          <select
+            className="select"
+            value={tagsLocked ? "" : tag}
+            onChange={e => onTagChange(tagsLocked ? "" : e.target.value)}
+          >
+            <option value="">All tags</option>
+            {allTags.map(t => (
+              <option key={t} value={t} disabled={tagsLocked}>{t}</option>
+            ))}
+          </select>
+        </span>
+        {tagsLocked && (
+          <span className="tag-access-note">{lockedTagsMessage}</span>
+        )}
+      </label>
     </div>
   );
 }

@@ -12,7 +12,7 @@ export default function AptisDemoBadge({ user, aptisAccess, onSignIn }) {
       <div className="aptis-demo-badge-copy">
         <span className="aptis-demo-pill">
           <span aria-hidden="true">✦</span>
-          Demo mode
+          Demo access
         </span>
         <div>
           <p>
