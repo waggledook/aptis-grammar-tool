@@ -60,6 +60,19 @@ export default function VocabularyMenu({ user, aptisAccess, onSignIn }) {
           <p>Study words by theme (e.g. Travel, Education...).</p>
         </button>
 
+        <button
+          className="card menu-card"
+          onClick={() => openCard("/vocabulary/exercises", "demo", "Vocabulary Exercise Trainer")}
+        >
+          <div className="menu-card-header">
+            <h3>Vocabulary Exercise Trainer{renderAccessPill("demo")}</h3>
+            <span className="soon-pill">New</span>
+          </div>
+          <p>
+            Generate mixed Aptis-style synonym, collocation, and gap-fill exercises with feedback.
+          </p>
+        </button>
+
         {/* 🔁 Synonym Trainer */}
         <button
           className="card menu-card"

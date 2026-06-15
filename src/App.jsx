@@ -66,6 +66,7 @@ import CollocationDash from "./components/vocabulary/collocations/CollocationDas
 import CollocationPrecisionTrainer from "./components/vocabulary/collocations/CollocationPrecisionTrainer";
 import VocabLab from "./components/vocabulary/VocabLab";
 import SynonymTrainer from "./components/vocabulary/SynonymTrainer";
+import VocabExerciseTrainer from "./components/vocabulary/VocabExerciseTrainer.jsx";
 import TopicTrainer from "./components/vocabulary/TopicTrainer";
 import Seo from "./components/common/Seo.jsx";
 import './App.css'
@@ -143,6 +144,7 @@ import HubNegatrisGame from "./components/hub/HubNegatrisGame.jsx";
 import HubSyntaxSentinelGame from "./components/hub/HubSyntaxSentinelGame.jsx";
 import HubYourClass from "./components/hub/HubYourClass.jsx";
 import HubCourseTestRunner from "./components/hub/HubCourseTestRunner.jsx";
+import HubAptisGrammarVocabularyMock from "./components/hub/HubAptisGrammarVocabularyMock.jsx";
 import OteDashboard from "./products/ote/OteDashboard.jsx";
 import OteSkillMenu from "./products/ote/OteSkillMenu.jsx";
 import OteSpeakingPart2Menu from "./products/ote/OteSpeakingPart2Menu.jsx";
@@ -312,6 +314,7 @@ const location = useLocation();
 const isCoursePack = location.pathname.startsWith("/course-pack");
 const isAdminRoute = location.pathname.startsWith("/admin");
 const isFlashcardsPlayerRoute = /^\/grammar\/flashcards\/[^/]+$/.test(location.pathname);
+const isAptisGrammarVocabularyMockRoute = location.pathname === "/grammar/aptis-mock";
 const currentSite = getSiteVariant();
 const isSeifHubSite = currentSite.id === "seifhub";
 const isOteSite = currentSite.id === "ote";
@@ -334,7 +337,7 @@ const isOteRoute =
       location.pathname.startsWith("/results")));
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
-const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute;
+const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
@@ -978,12 +981,12 @@ const [runKey,  setRunKey]  = useState(0);
   // — RENDER MAIN APP —
 return (
   // in src/App.jsx (inside your App component’s return)
-  <div className={`App ${isWideLayout ? "App--full" : ""} ${isOteExamRoute ? "App--exam" : ""}`} data-theme={theme}>
+  <div className={`App ${isWideLayout ? "App--full" : ""} ${(isOteExamRoute || isAptisGrammarVocabularyMockRoute) ? "App--exam" : ""}`} data-theme={theme}>
     <ToastHost />
-    {!isOteExamRoute && <CookieBanner />}
-    <div className={`content-container ${isWideLayout ? "content-container--full" : ""} ${isOteExamRoute ? "content-container--exam" : ""}`}>
+    {!isOteExamRoute && !isAptisGrammarVocabularyMockRoute && <CookieBanner />}
+    <div className={`content-container ${isWideLayout ? "content-container--full" : ""} ${(isOteExamRoute || isAptisGrammarVocabularyMockRoute) ? "content-container--exam" : ""}`}>
       {/* Auth bar */}
-    {!isOteExamRoute && <div
+    {!isOteExamRoute && !isAptisGrammarVocabularyMockRoute && <div
   style={{
     textAlign: "right",
     marginBottom: "1rem",
@@ -1112,6 +1115,7 @@ return (
   <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu user={user} />} />
   <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer user={user} />} />
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests user={user} />} />
+  <Route path="/grammar/aptis-mock" element={<HubAptisGrammarVocabularyMock />} />
   <Route
     path="/grammar/translation"
     element={
@@ -1278,7 +1282,10 @@ return (
 
       <AptisPart1
         user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
         onRequireSignIn={() => setShowAuth(true)}
+        allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.reading.part1TaskIds : []}
       />
     </>
   }
@@ -1731,6 +1738,17 @@ return (
         </div>
       )}
     </AptisFullAccessOnly>
+  }
+/>
+
+<Route
+  path="/vocabulary/exercises"
+  element={
+    <VocabExerciseTrainer
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+    />
   }
 />
 
@@ -2467,7 +2485,7 @@ return (
 </Routes>
 
 {/* Footer stays visible on normal app routes */}
-{!isOteExamRoute && <Footer />}
+{!isOteExamRoute && !isAptisGrammarVocabularyMockRoute && <Footer />}
 
 
   </div>

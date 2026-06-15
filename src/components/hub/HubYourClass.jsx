@@ -128,6 +128,7 @@ function getSpeakingPartKey(type) {
 }
 
 function getReadingPartKey(type) {
+  if (type === "reading-part-1") return "part1";
   if (type === "reading-part-2") return "part2";
   if (type === "reading-part-3") return "part3";
   if (type === "reading-part-4") return "part4";

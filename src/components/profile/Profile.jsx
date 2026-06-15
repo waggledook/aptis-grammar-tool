@@ -98,6 +98,7 @@ export default function Profile({
   const [loading, setLoading] = useState(true);
 
   const [readingCounts, setReadingCounts] = useState({
+    part1: 0,
     part2: 0,
     part3: 0,
     part4: 0,
@@ -282,6 +283,7 @@ const handleChangePassword = async (e) => {
   };
 
   const READING_TOTALS = {
+    part1: 6,
     part2: 6, // update if you have more reorder tasks live
     part3: 1, // you said there is currently one example
     part4: 2, // update if you have more live
@@ -334,7 +336,7 @@ const handleChangePassword = async (e) => {
           wordFormationDash,
           openClozeDash,
         ] = await Promise.all([
-          fb.fetchReadingCounts?.(uid) ?? Promise.resolve({ part2: 0, part3: 0, part4: 0 }),
+          fb.fetchReadingCounts?.(uid) ?? Promise.resolve({ part1: 0, part2: 0, part3: 0, part4: 0 }),
           fb.fetchSpeakingCounts(uid),
           fb.fetchListeningCounts?.(uid) ?? Promise.resolve({ part1: 0, part2: 0, part3: 0, part4: 0 }),
           fb.fetchRecentMistakes(8, uid),
@@ -358,7 +360,7 @@ const handleChangePassword = async (e) => {
         ]);  
   
         if (!alive) return;
-        setReadingCounts(rCounts || { part2: 0, part3: 0, part4: 0 });
+        setReadingCounts(rCounts || { part1: 0, part2: 0, part3: 0, part4: 0 });
         setSpeakingCounts(sCounts);
         setListeningCounts(lCounts || { part1: 0, part2: 0, part3: 0, part4: 0 });
         setMistakes(m);
@@ -413,11 +415,13 @@ const totalCompletedVocab = vocabTopicCounts
 : 0;
 
 const totalReadingCompleted =
+  (readingCounts.part1 || 0) +
   (readingCounts.part2 || 0) +
   (readingCounts.part3 || 0) +
   (readingCounts.part4 || 0);
 
 const totalReadingTasks =
+  (READING_TOTALS.part1 || 0) +
   (READING_TOTALS.part2 || 0) +
   (READING_TOTALS.part3 || 0) +
   (READING_TOTALS.part4 || 0);
@@ -550,6 +554,12 @@ const totalListeningTasks =
   {showReadingPanel && (
     <div className="panel-body">
       <div className="pbar-group">
+        <ProgressBar
+          value={readingCounts.part1 || 0}
+          max={READING_TOTALS.part1 || 1}
+          label="Part 1"
+          right={`${readingCounts.part1 || 0}/${READING_TOTALS.part1 || 0}`}
+        />
         <ProgressBar
           value={readingCounts.part2 || 0}
           max={READING_TOTALS.part2 || 1}

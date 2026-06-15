@@ -34,6 +34,7 @@ export const APTIS_DEMO_ACCESS = {
     itemIds: APTIS_DEMO_GRAMMAR_ITEM_IDS,
   },
   reading: {
+    part1TaskIds: ["cinema-plan", "class-homework"],
     part2TaskIds: ["cycling-lanes", "ebooks"],
     part4TaskIds: ["yawning"],
   },

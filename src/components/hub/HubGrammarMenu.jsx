@@ -59,6 +59,12 @@ export default function HubGrammarMenu() {
             Take short focused tests and get instant feedback to help you notice and fix mistakes.
           </p>
         </button>
+        <button className="menu-card" onClick={() => navigate(getSitePath("/grammar/aptis-mock"))}>
+          <h3>Aptis Grammar and Vocabulary Mock</h3>
+          <p>
+            Practise in a full exam-style runner with 25 grammar screens, 5 vocabulary tasks, and a 25-minute timer.
+          </p>
+        </button>
         <button className="menu-card" onClick={() => navigate(getSitePath("/grammar/translation"))}>
           <h3>Translation Trainer</h3>
           <p>

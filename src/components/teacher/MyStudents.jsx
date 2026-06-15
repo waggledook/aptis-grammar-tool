@@ -21,6 +21,7 @@ import { toast } from "../../utils/toast";
 const TEACHER_NOTIFICATION_LIMIT = 100;
 
 function getReadingPartLabel(part) {
+  if (part === "part1") return "Reading Part 1";
   if (part === "part2") return "Reading Part 2";
   if (part === "part3") return "Reading Part 3";
   if (part === "part4") return "Reading Part 4";

@@ -59,6 +59,7 @@ const SPEAKING_TASK_OPTIONS = {
 };
 
 const READING_OPTIONS = [
+  { id: "reading-part-1", label: "Aptis Reading Part 1", routePath: getSitePath("/reading/part1") },
   { id: "reading-part-2", label: "Aptis Reading Part 2", routePath: getSitePath("/reading/part2") },
   { id: "reading-part-3", label: "Aptis Reading Part 3", routePath: getSitePath("/reading/part3") },
   { id: "reading-part-4", label: "Aptis Reading Part 4", routePath: getSitePath("/reading/part4") },
@@ -189,6 +190,7 @@ function getSpeakingPartKey(type) {
 }
 
 function getReadingPartKey(type) {
+  if (type === "reading-part-1") return "part1";
   if (type === "reading-part-2") return "part2";
   if (type === "reading-part-3") return "part3";
   if (type === "reading-part-4") return "part4";

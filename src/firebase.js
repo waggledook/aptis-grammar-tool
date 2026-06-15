@@ -963,6 +963,27 @@ export async function logSynonymTrainerCompleted(details = {}) {
   });
 }
 
+export async function logVocabExerciseStarted(details = {}) {
+  return logActivity("vocab_exercise_started", {
+    app: "aptis-trainer",
+    ...details,
+  });
+}
+
+export async function logVocabExerciseReviewLoaded(details = {}) {
+  return logActivity("vocab_exercise_review_loaded", {
+    app: "aptis-trainer",
+    ...details,
+  });
+}
+
+export async function logVocabExerciseCompleted(details = {}) {
+  return logActivity("vocab_exercise_completed", {
+    app: "aptis-trainer",
+    ...details,
+  });
+}
+
 export async function logHubFlashcardsStarted(details = {}) {
   return logActivity("hub_flashcards_started", {
     app: "seifhub",
@@ -1270,6 +1291,23 @@ export async function logReadingPart4Attempted({ taskId, score, total, source = 
 export async function logReadingPart4Completed({ taskId, source = "AptisPart4" }) {
   await saveReadingProgress(taskId, "part4");
   return logActivity("reading_part4_completed", {
+    taskId: taskId || null,
+    source,
+  });
+}
+
+export async function logReadingPart1Attempted({ taskId, score, total, source = "AptisPart1" }) {
+  return logActivity("reading_part1_attempted", {
+    taskId: taskId || null,
+    score: typeof score === "number" ? score : null,
+    total: typeof total === "number" ? total : null,
+    source,
+  });
+}
+
+export async function logReadingPart1Completed({ taskId, source = "AptisPart1" }) {
+  await saveReadingProgress(taskId, "part1");
+  return logActivity("reading_part1_completed", {
     taskId: taskId || null,
     source,
   });
@@ -2340,6 +2378,152 @@ export async function fetchSynonymTrainerMistakes(n = 20, uid) {
   }));
 }
 
+export async function saveVocabExerciseTaskResult({ taskId, tags, score, total, isPerfect }) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !taskId) return;
+
+  const ref = doc(db, "users", uid, "vocabExerciseProgress", taskId);
+  const snap = await getDoc(ref);
+  const previousBest = snap.exists() ? Number(snap.data()?.bestScore || 0) : 0;
+  const nextScore = Number(score ?? 0);
+  await setDoc(
+    ref,
+    {
+      taskId,
+      tags: tags || "",
+      attempts: increment(1),
+      bestScore: Math.max(previousBest, nextScore),
+      lastScore: nextScore,
+      total: total ?? 0,
+      everPerfect: isPerfect || !!snap.data()?.everPerfect,
+      lastPerfect: !!isPerfect,
+      lastAnsweredAt: serverTimestamp(),
+      app: "aptis-trainer",
+    },
+    { merge: true }
+  );
+}
+
+export async function fetchSeenVocabExerciseTaskIds(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "vocabExerciseProgress"));
+  return snap.docs.map((d) => d.id);
+}
+
+export async function fetchVocabExerciseFavourites(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "vocabExerciseFavourites"));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveVocabExerciseFavourite(task) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !task?.taskId) return;
+
+  const ref = doc(db, "users", uid, "vocabExerciseFavourites", task.taskId);
+  await setDoc(
+    ref,
+    {
+      ...task,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      app: "aptis-trainer",
+    },
+    { merge: true }
+  );
+}
+
+export async function removeVocabExerciseFavourite(taskId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !taskId) return;
+
+  await deleteDoc(doc(db, "users", uid, "vocabExerciseFavourites", taskId));
+}
+
+export async function fetchVocabExerciseItemFavourites(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(collection(db, "users", realUid, "vocabExerciseItemFavourites"));
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
+export async function saveVocabExerciseItemFavourite(item) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !item?.itemId) return;
+
+  const ref = doc(db, "users", uid, "vocabExerciseItemFavourites", item.itemId);
+  await setDoc(
+    ref,
+    {
+      ...item,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+      app: "aptis-trainer",
+    },
+    { merge: true }
+  );
+}
+
+export async function removeVocabExerciseItemFavourite(itemId) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  await deleteDoc(doc(db, "users", uid, "vocabExerciseItemFavourites", itemId));
+}
+
+export async function recordVocabExerciseMistake(task) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !task?.taskId) return;
+
+  await addDoc(collection(db, "users", uid, "vocabExerciseMistakes"), {
+    ...task,
+    app: "aptis-trainer",
+    createdAt: serverTimestamp(),
+  });
+}
+
+export async function clearVocabExerciseMistakes(taskId, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !taskId) return;
+
+  const snap = await getDocs(
+    query(
+      collection(db, "users", realUid, "vocabExerciseMistakes"),
+      where("taskId", "==", taskId)
+    )
+  );
+
+  await Promise.all(snap.docs.map((entry) => deleteDoc(entry.ref)));
+}
+
+export async function fetchVocabExerciseMistakes(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const qy = query(
+    collection(db, "users", realUid, "vocabExerciseMistakes"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+
+  const snap = await getDocs(qy);
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...d.data(),
+  }));
+}
+
 export async function saveCollocationPrecisionResult(itemId, tags, isCorrect) {
   const uid = auth.currentUser?.uid;
   if (!uid || !itemId) return;
@@ -2796,9 +2980,9 @@ export async function fetchReadingProgressMap(uid) {
 /** Reading progress counts per part */
 export async function fetchReadingCounts(uid) {
   const realUid = _uidOrCurrent(uid);
-  if (!realUid) return { part2: 0, part3: 0, part4: 0 };
+  if (!realUid) return { part1: 0, part2: 0, part3: 0, part4: 0 };
 
-  const counts = { part2: 0, part3: 0, part4: 0 };
+  const counts = { part1: 0, part2: 0, part3: 0, part4: 0 };
 
   const snap = await getDocs(collection(db, "users", realUid, "readingProgress"));
   const docs = snap.docs.map((d) => ({ id: d.id, data: d.data() || {} }));
@@ -2853,6 +3037,7 @@ export async function fetchReadingCounts(uid) {
     if (seen.has(key)) return;
     seen.add(key);
 
+    if (normalizedPart === "part1") counts.part1 += 1;
     if (normalizedPart === "part2") counts.part2 += 1;
     if (normalizedPart === "part3") counts.part3 += 1;
     if (normalizedPart === "part4") counts.part4 += 1;

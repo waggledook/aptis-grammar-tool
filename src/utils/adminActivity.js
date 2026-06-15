@@ -19,6 +19,8 @@ export const ACTIVITY_TYPE_LABELS = {
   reading_guide_show_answers: "Reading Guide Answers Shown",
   reading_guide_reorder_completed: "Reading Guide Completed",
   reading_reorder_completed: "Reading Reorder Completed",
+  reading_part1_attempted: "Reading Part 1 Attempt",
+  reading_part1_completed: "Reading Part 1 Completed",
   reading_part4_attempted: "Reading Part 4 Attempt",
   reading_part4_completed: "Reading Part 4 Completed",
   reading_part3_attempted: "Reading Part 3 Attempt",
@@ -64,6 +66,9 @@ export const ACTIVITY_TYPE_LABELS = {
   synonym_trainer_started: "Synonym Trainer Started",
   synonym_trainer_review_loaded: "Synonym Trainer Review Loaded",
   synonym_trainer_completed: "Synonym Trainer Completed",
+  vocab_exercise_started: "Vocab Exercise Started",
+  vocab_exercise_review_loaded: "Vocab Exercise Review Loaded",
+  vocab_exercise_completed: "Vocab Exercise Completed",
   writing_p1_guide_activity_started: "Writing Part 1 Guide Activity Started",
   writing_p4_register_guide_activity_started: "Writing Part 4 Register Guide Activity Started",
   writing_guide_viewed: "Writing Guide Viewed",
@@ -271,9 +276,11 @@ export function formatActivityDetails(log) {
     case "reading_guide_reorder_completed":
     case "reading_reorder_completed":
       return joinParts([d.taskId || "Task", "Completed"]);
+    case "reading_part1_attempted":
     case "reading_part4_attempted":
     case "reading_part3_attempted":
       return joinParts([d.taskId || "Task", `Score ${formatScore(d.score, d.total)}`]);
+    case "reading_part1_completed":
     case "reading_part4_completed":
     case "reading_part3_completed":
       return joinParts([d.taskId || "Task", "Completed"]);
@@ -371,6 +378,16 @@ export function formatActivityDetails(log) {
         d.topic || "",
         d.maxAmbiguity ? `Ambiguity ${d.maxAmbiguity}` : "",
         `Correct ${formatScore(d.correct, d.total)}`,
+      ]);
+    case "vocab_exercise_started":
+      return joinParts([d.mode || "normal", formatCount(d.totalTasks, "task")]);
+    case "vocab_exercise_review_loaded":
+      return joinParts([d.mode || "review", formatCount(d.totalTasks, "task")]);
+    case "vocab_exercise_completed":
+      return joinParts([
+        d.mode || "",
+        `Correct ${formatScore(d.correct, d.totalQuestions)}`,
+        formatCount(d.totalTasks, "task"),
       ]);
     case "writing_submitted": {
       const partLabels = {

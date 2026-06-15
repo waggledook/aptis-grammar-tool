@@ -15,6 +15,12 @@ const GUIDE_CARDS = [
 
 const PRACTICE_CARDS = [
   {
+    title: "Part 1: Word Choices",
+    description: "Choose the best word for each gap in short informal emails.",
+    path: "/reading/part1",
+    demoAccess: "demo",
+  },
+  {
     title: "Part 2: Sentence Order",
     description: "Reorder sentences to form a logical paragraph.",
     path: "/reading/part2",
@@ -75,7 +81,7 @@ export default function ReadingMenu({ user, aptisAccess, onSignIn }) {
       {isDemoMode && lockedPart ? (
         <div className="reading-access-prompt" role="status">
           <strong>{lockedPart} is included with full access.</strong>
-          <p>The reading demo currently includes two Part 2 tasks and one Part 4 task.</p>
+          <p>The reading demo currently includes two Part 1 tasks, two Part 2 tasks and one Part 4 task.</p>
         </div>
       ) : null}
 
