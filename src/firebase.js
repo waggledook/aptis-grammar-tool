@@ -1625,6 +1625,7 @@ export async function logWritingSubmitted(details) {
 // re-create the old reports collection helper
 const reportsCollection = collection(db, "reports");
 const hubAccessRequestsCollection = collection(db, "hubAccessRequests");
+const supportMessagesCollection = collection(db, "supportMessages");
 
 /**
  * Send a report document, now including the full question text.
@@ -1673,6 +1674,40 @@ export async function sendHubAccessRequest({ note = "", site = "seifhub" } = {})
     userId: user?.uid ?? null,
     userEmail: user?.email ?? null,
     userName: user?.displayName ?? "",
+    createdAt: serverTimestamp(),
+    status: "new",
+  });
+}
+
+export async function sendSupportMessage({
+  language = "en",
+  category = "other",
+  categoryLabel = "",
+  message = "",
+  includePage = true,
+  route = "",
+  url = "",
+  site = "aptis",
+  userAgent = "",
+} = {}) {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error("You must be signed in to send a message.");
+  }
+
+  return addDoc(supportMessagesCollection, {
+    language: language === "es" ? "es" : "en",
+    category: String(category || "other"),
+    categoryLabel: String(categoryLabel || category || "Other").trim(),
+    message: String(message || "").trim(),
+    includePage: !!includePage,
+    route: includePage ? String(route || "") : "",
+    url: includePage ? String(url || "") : "",
+    site: String(site || "aptis"),
+    userAgent: String(userAgent || ""),
+    userId: user.uid,
+    userEmail: user.email || null,
+    userName: user.displayName || "",
     createdAt: serverTimestamp(),
     status: "new",
   });

@@ -85,6 +85,7 @@ import PrivacyPolicy from "./components/legal/PrivacyPolicy.jsx";
 import TeacherExtrasButton from "./components/common/TeacherExtrasButton.jsx";
 import AptisDemoBadge from "./components/access/AptisDemoBadge.jsx";
 import AptisAccessPage from "./components/access/AptisAccessPage.jsx";
+import SupportMessageWidget from "./components/support/SupportMessageWidget.jsx";
 import LiveGameJoin from "./components/live/LiveGameJoin";
 import LiveGameHost from "./components/live/LiveGameHost";
 import LiveGamePlayer from "./components/live/LiveGamePlayer";
@@ -1011,6 +1012,11 @@ return (
   <div className={`App ${isWideLayout ? "App--full" : ""} ${(isOteExamRoute || isAptisGrammarVocabularyMockRoute) ? "App--exam" : ""}`} data-theme={theme}>
     <ToastHost />
     {!isOteExamRoute && !isAptisGrammarVocabularyMockRoute && <CookieBanner />}
+    <SupportMessageWidget
+      user={user}
+      site={currentSite.id}
+      hidden={showAuth || isOteExamRoute || isAptisGrammarVocabularyMockRoute}
+    />
     <div className={`content-container ${isWideLayout ? "content-container--full" : ""} ${(isOteExamRoute || isAptisGrammarVocabularyMockRoute) ? "content-container--exam" : ""}`}>
       {/* Auth bar */}
     {!isOteExamRoute && !isAptisGrammarVocabularyMockRoute && <div

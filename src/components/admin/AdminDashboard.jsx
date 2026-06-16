@@ -418,6 +418,9 @@ export default function AdminDashboard({ user }) {
   const [hubAccessRequests, setHubAccessRequests] = useState([]);
   const [loadingHubAccessRequests, setLoadingHubAccessRequests] = useState(true);
   const [resolvingHubAccessRequestId, setResolvingHubAccessRequestId] = useState("");
+  const [supportMessages, setSupportMessages] = useState([]);
+  const [loadingSupportMessages, setLoadingSupportMessages] = useState(true);
+  const [resolvingSupportMessageId, setResolvingSupportMessageId] = useState("");
   const [adminNotificationsOpen, setAdminNotificationsOpen] = useState(false);
   const [readAdminNotificationKeys, setReadAdminNotificationKeys] = useState({});
   const [selectedAdminUserId, setSelectedAdminUserId] = useState("");
@@ -520,6 +523,21 @@ export default function AdminDashboard({ user }) {
     }
 
     loadHubAccessRequests();
+  }, []);
+
+  useEffect(() => {
+    async function loadSupportMessages() {
+      try {
+        const snap = await getDocs(query(collection(db, "supportMessages"), orderBy("createdAt", "desc"), limit(50)));
+        setSupportMessages(snap.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+      } catch (error) {
+        console.error("[AdminDashboard] load support messages failed", error);
+      } finally {
+        setLoadingSupportMessages(false);
+      }
+    }
+
+    loadSupportMessages();
   }, []);
 
   useEffect(() => {
@@ -719,6 +737,30 @@ export default function AdminDashboard({ user }) {
       }
     } finally {
       setResolvingHubAccessRequestId("");
+    }
+  }
+
+  async function markSupportMessageHandled(message) {
+    if (!message?.id) return;
+    setResolvingSupportMessageId(message.id);
+    try {
+      const patch = {
+        status: "handled",
+        updatedAt: serverTimestamp(),
+        resolvedAt: serverTimestamp(),
+        resolvedByUid: user.uid,
+        resolvedByEmail: user.email || null,
+      };
+      await updateDoc(doc(db, "supportMessages", message.id), patch);
+      setSupportMessages((prev) =>
+        prev.map((entry) => (entry.id === message.id ? { ...entry, ...patch } : entry))
+      );
+      if (selectedAdminNotification?.message?.id === message.id) {
+        setSelectedAdminNotification(null);
+        setSelectedAdminUserId("");
+      }
+    } finally {
+      setResolvingSupportMessageId("");
     }
   }
 
@@ -1462,6 +1504,7 @@ function renderAptisAccessControl(u, compact = false) {
   const studentCount = users.filter((u) => u.role === "student").length;
   const pendingStudentRequests = studentRequests.filter((request) => request.status === "pending");
   const newAccessRequests = hubAccessRequests.filter((request) => (request.status || "new") === "new");
+  const newSupportMessages = supportMessages.filter((message) => (message.status || "new") === "new");
   const recentSignupCutoff = Date.now() - 7 * 86400000;
   const recentSignupNotifications = users
     .filter((entry) => timestampToMs(entry.createdAt) >= recentSignupCutoff)
@@ -1490,7 +1533,21 @@ function renderAptisAccessControl(u, compact = false) {
     detail: request.userEmail || request.userName || request.userId || "Unknown user",
     };
   });
-  const adminNotifications = [...accessRequestNotifications, ...recentSignupNotifications]
+  const supportMessageNotifications = newSupportMessages.map((message) => {
+    const preview = String(message.message || "").replace(/\s+/g, " ").trim();
+    return {
+      id: `support-message:${message.id}`,
+      type: "support-message",
+      message,
+      userId: message.userId || "",
+      userEmail: message.userEmail || "",
+      userName: message.userName || message.userEmail || "User",
+      createdAt: message.createdAt,
+      title: `Support message · ${message.categoryLabel || message.category || "Other"}`,
+      detail: preview || message.userEmail || message.userName || "No message text",
+    };
+  });
+  const adminNotifications = [...supportMessageNotifications, ...accessRequestNotifications, ...recentSignupNotifications]
     .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
     .slice(0, 30);
   const unreadAdminNotificationCount = adminNotifications.filter(
@@ -1670,7 +1727,9 @@ function renderAptisAccessControl(u, compact = false) {
                 <div>
                   <strong>Admin notifications</strong>
                   <span style={{ display: "block", color: "#9fb4da", fontSize: "0.82rem", marginTop: "0.1rem" }}>
-                    {loadingHubAccessRequests ? "Loading..." : `${unreadAdminNotificationCount} unread · ${adminNotifications.length} shown`}
+                    {loadingHubAccessRequests || loadingSupportMessages
+                      ? "Loading..."
+                      : `${unreadAdminNotificationCount} unread · ${adminNotifications.length} shown`}
                   </span>
                 </div>
                 {unreadAdminNotificationCount > 0 ? (
@@ -2695,6 +2754,16 @@ function renderAptisAccessControl(u, compact = false) {
                     {resolvingHubAccessRequestId === selectedAdminNotification.request.id ? "Saving..." : "Mark handled"}
                   </button>
                 ) : null}
+                {selectedAdminNotification.message ? (
+                  <button
+                    type="button"
+                    className="review-btn"
+                    onClick={() => markSupportMessageHandled(selectedAdminNotification.message)}
+                    disabled={resolvingSupportMessageId === selectedAdminNotification.message.id}
+                  >
+                    {resolvingSupportMessageId === selectedAdminNotification.message.id ? "Saving..." : "Mark handled"}
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   className="ghost-btn"
@@ -2720,6 +2789,37 @@ function renderAptisAccessControl(u, compact = false) {
                 </button>
               </div>
             </div>
+
+            {selectedAdminNotification.message ? (
+              <div style={{ padding: "1rem 1.1rem 0" }}>
+                <div
+                  style={{
+                    display: "grid",
+                    gap: "0.75rem",
+                    padding: "0.95rem",
+                    borderRadius: "0.9rem",
+                    background: "rgba(2, 6, 23, 0.25)",
+                    border: "1px solid rgba(51, 65, 85, 0.75)",
+                  }}
+                >
+                  <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", color: "#cbd5e1", fontSize: "0.84rem" }}>
+                    <span>Language: <strong>{selectedAdminNotification.message.language === "es" ? "Español" : "English"}</strong></span>
+                    <span>Category: <strong>{selectedAdminNotification.message.categoryLabel || selectedAdminNotification.message.category || "Other"}</strong></span>
+                    {selectedAdminNotification.message.site ? (
+                      <span>Site: <strong>{selectedAdminNotification.message.site}</strong></span>
+                    ) : null}
+                  </div>
+                  <div style={{ whiteSpace: "pre-wrap", color: "#eef4ff", lineHeight: 1.55 }}>
+                    {selectedAdminNotification.message.message || "No message text."}
+                  </div>
+                  {selectedAdminNotification.message.route || selectedAdminNotification.message.url ? (
+                    <div style={{ color: "#9fb4da", fontSize: "0.84rem", overflowWrap: "anywhere" }}>
+                      Page: {selectedAdminNotification.message.url || selectedAdminNotification.message.route}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
 
             {!selectedAdminUser ? (
               <div style={{ padding: "1.1rem", color: "#fbbf24" }}>

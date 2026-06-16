@@ -1437,6 +1437,210 @@ h2,
   min-width: 68px;
 }
 
+.support-widget {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 70;
+}
+
+.support-launcher,
+.support-submit,
+.support-icon-btn,
+.support-language-toggle button {
+  border: 1px solid var(--color-border);
+  font: inherit;
+}
+
+.support-launcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.48rem;
+  min-height: 2.65rem;
+  padding: 0.58rem 0.82rem;
+  border-radius: 999px;
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  box-shadow: 0 14px 32px var(--color-shadow);
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.support-launcher:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-2);
+}
+
+.support-launcher-help {
+  color: var(--color-link);
+}
+
+.support-panel {
+  width: min(390px, calc(100vw - 2rem));
+  max-height: min(680px, calc(100vh - 2rem));
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  box-shadow: 0 20px 44px var(--color-shadow);
+  padding: 0.95rem;
+}
+
+.support-panel-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  align-items: flex-start;
+}
+
+.support-panel-head h2 {
+  margin: 0;
+  color: var(--color-text);
+  text-align: left;
+  font-size: 1.05rem;
+}
+
+.support-panel-head p {
+  margin: 0.3rem 0 0;
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+  line-height: 1.42;
+}
+
+.support-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--color-surface-3);
+  color: var(--color-text-soft);
+}
+
+.support-language-toggle {
+  display: inline-flex;
+  gap: 0.25rem;
+  margin-top: 0.85rem;
+  padding: 0.18rem;
+  border-radius: 999px;
+  background: var(--color-surface-3);
+}
+
+.support-language-toggle button {
+  min-width: 2.5rem;
+  padding: 0.28rem 0.5rem;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text-soft);
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.support-language-toggle button.is-selected {
+  background: var(--primary-gradient);
+  color: var(--primary-text);
+}
+
+.support-form {
+  display: grid;
+  gap: 0.72rem;
+  margin-top: 0.85rem;
+}
+
+.support-form label {
+  display: grid;
+  gap: 0.34rem;
+  color: var(--color-text-soft);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.support-form select,
+.support-form textarea {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-3);
+  color: var(--color-text);
+  font: inherit;
+  padding: 0.58rem 0.68rem;
+}
+
+.support-form textarea {
+  resize: vertical;
+  min-height: 8rem;
+  max-height: 16rem;
+  line-height: 1.4;
+}
+
+.support-form select:focus,
+.support-form textarea:focus {
+  outline: none;
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.support-checkbox {
+  display: flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  gap: 0.45rem !important;
+  font-weight: 650 !important;
+}
+
+.support-checkbox input {
+  width: 1rem;
+  height: 1rem;
+}
+
+.support-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.46rem;
+  min-height: 2.65rem;
+  padding: 0.62rem 0.9rem;
+  border-radius: 10px;
+  background: var(--primary-gradient);
+  color: var(--primary-text);
+  font-weight: 900;
+}
+
+.support-submit:disabled {
+  cursor: default;
+  opacity: 0.66;
+}
+
+@media (max-width: 640px) {
+  .support-widget {
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: max(0.75rem, env(safe-area-inset-bottom));
+  }
+
+  .support-launcher {
+    width: 2.85rem;
+    min-width: 2.85rem;
+    height: 2.85rem;
+    justify-content: center;
+    padding: 0;
+  }
+
+  .support-launcher span,
+  .support-launcher-help {
+    display: none;
+  }
+
+  .support-panel {
+    width: calc(100vw - 1.5rem);
+    max-height: min(640px, calc(100vh - 1.5rem));
+    border-radius: 13px;
+  }
+}
+
 :root[data-theme="light"] .content-container {
   border: 1px solid var(--color-border);
 }

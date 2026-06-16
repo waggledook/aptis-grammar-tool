@@ -4483,6 +4483,76 @@ exports.emailHubAccessRequest = functions.region("europe-west1")
     return null;
   });
 
+exports.emailSupportMessage = functions.region("europe-west1")
+  .firestore.document("supportMessages/{messageId}")
+  .onCreate(async (snap) => {
+    const m = snap.data() || {};
+    const when = new Date().toLocaleString("en-GB", { timeZone: "Europe/Madrid" });
+    const userEmail = m.userEmail || null;
+    const language = m.language === "es" ? "Español" : "English";
+
+    const lines = [
+      "New app support message",
+      "",
+      `Language: ${language}`,
+      `Category: ${m.categoryLabel || m.category || "Other"}`,
+      `Site: ${m.site || "-"}`,
+      `User: ${m.userName || "-"}`,
+      `Email: ${userEmail || "-"}`,
+      `UID: ${m.userId || "-"}`,
+      `Route: ${m.route || "-"}`,
+      `URL: ${m.url || "-"}`,
+      `At: ${when}`,
+      "",
+      "Message:",
+      m.message || "",
+    ];
+
+    const esc = (s) => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    const toHtml = (arr) => arr.map((l) => `<p>${esc(l)}</p>`).join("");
+
+    const adminMsg = {
+      from: FROM_ADDRESS,
+      to: TEACHER_EMAIL || FROM_ADDRESS,
+      subject: `App support message — ${m.categoryLabel || m.category || "Other"} — ${userEmail || m.userName || "unknown user"}`,
+      text: lines.join("\n"),
+      html: toHtml(lines),
+      replyTo: userEmail && userEmail.includes("@") ? userEmail : undefined,
+    };
+
+    const userMsg = userEmail && userEmail.includes("@")
+      ? {
+          from: FROM_ADDRESS,
+          to: userEmail,
+          subject: m.language === "es" ? "Hemos recibido tu mensaje" : "We’ve received your message",
+          text: [
+            m.language === "es"
+              ? "Gracias por tu mensaje. Lo hemos recibido y te responderemos lo antes posible."
+              : "Thanks for your message. We’ve received it and will reply as soon as possible.",
+            "",
+            ...lines,
+          ].join("\n"),
+          html:
+            `<p>${m.language === "es"
+              ? "Gracias por tu mensaje. Lo hemos recibido y te responderemos lo antes posible."
+              : "Thanks for your message. We’ve received it and will reply as soon as possible."}</p>` +
+            "<hr/>" +
+            toHtml(lines),
+          replyTo: TEACHER_EMAIL || FROM_ADDRESS,
+        }
+      : null;
+
+    try {
+      await transporter.sendMail(adminMsg);
+      if (userMsg) await transporter.sendMail(userMsg);
+      console.log("MAIL_OK support message", { id: snap.id, to: adminMsg.to, copy: !!userMsg });
+    } catch (err) {
+      console.error("MAIL_FAIL support message", err?.message || String(err));
+    }
+
+    return null;
+  });
+
 // =============== NEW: notify when a user becomes a TEACHER ===============
 exports.onUserRoleChange = functions
   .region("europe-west1")

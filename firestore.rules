@@ -458,7 +458,45 @@ service cloud.firestore {
       allow delete: if false;
     }
 
-    // ── 12b) Teacher requests to link existing students ─────────────────
+    // ── 12b) App support/contact messages ──────────────────────────────
+    match /supportMessages/{messageId} {
+      allow create: if isSignedIn()
+        && request.resource.data.keys().hasOnly([
+          "language",
+          "category",
+          "categoryLabel",
+          "message",
+          "includePage",
+          "route",
+          "url",
+          "site",
+          "userAgent",
+          "userId",
+          "userEmail",
+          "userName",
+          "createdAt",
+          "status"
+        ])
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.userEmail == request.auth.token.email
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 1200
+        && request.resource.data.status == "new";
+
+      allow get, list: if isAdmin();
+      allow update: if isAdmin()
+        && changedKeys().hasOnly([
+          "status",
+          "updatedAt",
+          "resolvedAt",
+          "resolvedByUid",
+          "resolvedByEmail"
+        ]);
+      allow delete: if false;
+    }
+
+    // ── 12c) Teacher requests to link existing students ─────────────────
     match /teacherStudentRequests/{requestId} {
       allow create: if isTeacherOrAdmin()
         && request.resource.data.teacherUid == request.auth.uid
