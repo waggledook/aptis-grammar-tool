@@ -1,6 +1,6 @@
 import React from "react";
-
-const APTIS_FULL_ACCESS_URL = "https://idiomasseif.com/preparacion-examen-aptis/";
+import { Link } from "react-router-dom";
+import { APTIS_ACCESS_PATH } from "./aptisAccessLinks.js";
 
 export default function AptisDemoBadge({ user, aptisAccess, onSignIn }) {
   if (!aptisAccess?.isDemoMode) return null;
@@ -32,15 +32,13 @@ export default function AptisDemoBadge({ user, aptisAccess, onSignIn }) {
             <span>Sign in</span>
           </button>
         ) : null}
-        <a
+        <Link
           className="aptis-demo-action"
-          href={APTIS_FULL_ACCESS_URL}
-          target="_blank"
-          rel="noopener noreferrer"
+          to={APTIS_ACCESS_PATH}
         >
           <span>Get full access</span>
           <span aria-hidden="true">→</span>
-        </a>
+        </Link>
       </div>
     </aside>
   );

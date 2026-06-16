@@ -17,8 +17,10 @@ import {
   listGrammarSetAttemptsForStudent,
   listStudentCourseTestAttempts,
   listStudentCourseTestSessions,
+  fetchUserPublicProfile,
 } from "../../firebase";
 import { getTopicSetIds } from "../vocabulary/data/vocabTopics.js";
+import UserAvatar from "../common/UserAvatar.jsx";
 
 function timestampToDate(value) {
   if (!value) return null;
@@ -231,6 +233,7 @@ export default function HubYourClass({ user }) {
   const [sessions, setSessions] = useState([]);
   const [assignments, setAssignments] = useState([]);
   const [attemptsBySessionId, setAttemptsBySessionId] = useState({});
+  const [teacherProfile, setTeacherProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -239,6 +242,7 @@ export default function HubYourClass({ user }) {
     async function load() {
       if (!user) {
         setSessions([]);
+        setTeacherProfile(null);
         setLoading(false);
         return;
       }
@@ -262,8 +266,16 @@ export default function HubYourClass({ user }) {
           fetchWritingP3Submissions(100, user.uid),
           fetchWritingP4Submissions(100, user.uid),
         ]);
+        const teacherId =
+          user.teacherId ||
+          (assignedRows || []).find((assignment) => assignment?.teacherUid)?.teacherUid ||
+          (rows || []).find((session) => session?.teacherUid)?.teacherUid ||
+          "";
+        const loadedTeacher = teacherId ? await fetchUserPublicProfile(teacherId).catch(() => null) : null;
+
         if (!alive) return;
         setSessions(rows || []);
+        setTeacherProfile(loadedTeacher);
         const completionSources = {
           vocabulary: vocabProgress || {},
           speaking: speakingProgress || {},
@@ -385,6 +397,15 @@ export default function HubYourClass({ user }) {
             once you finish them.
           </p>
         </header>
+
+        <section className="hub-class-teacher-card">
+          <UserAvatar user={teacherProfile || { displayName: "Teacher" }} size="xl" />
+          <div>
+            <span className="hub-class-kicker">Your teacher</span>
+            <h2>{teacherProfile?.displayName || teacherProfile?.name || teacherProfile?.email || "Teacher"}</h2>
+            <p>{teacherProfile?.email || "Your assigned teacher will appear here when your account is linked."}</p>
+          </div>
+        </section>
 
         <section className="hub-class-panel">
           <div className="hub-class-panel-head">
@@ -682,6 +703,7 @@ function HubYourClassStyles() {
       }
 
       .hub-class-hero,
+      .hub-class-teacher-card,
       .hub-class-panel {
         border-radius: 20px;
         border: 1px solid rgba(70, 102, 170, 0.42);
@@ -696,6 +718,23 @@ function HubYourClassStyles() {
 
       .hub-class-panel {
         padding: 1.2rem;
+      }
+
+      .hub-class-teacher-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem 1.1rem;
+      }
+
+      .hub-class-teacher-card h2 {
+        margin: 0.45rem 0 0.15rem;
+        color: #eef4ff;
+      }
+
+      .hub-class-teacher-card p {
+        margin: 0;
+        color: #a9b7d1;
       }
 
       .hub-class-kicker {
@@ -856,7 +895,7 @@ function HubYourClassStyles() {
         color: var(--color-text);
       }
 
-      :root[data-theme="light"] .hub-class-wrapper :is(.hub-class-hero, .hub-class-panel) {
+      :root[data-theme="light"] .hub-class-wrapper :is(.hub-class-hero, .hub-class-teacher-card, .hub-class-panel) {
         background: var(--color-surface-2);
         border-color: var(--color-border);
         color: var(--color-text);
@@ -865,6 +904,7 @@ function HubYourClassStyles() {
 
       :root[data-theme="light"] .hub-class-wrapper :is(
         .hub-class-title,
+        .hub-class-teacher-card h2,
         .hub-class-panel-head h2,
         .hub-class-group-head h3,
         .hub-class-session-head h4,
@@ -876,6 +916,7 @@ function HubYourClassStyles() {
 
       :root[data-theme="light"] .hub-class-wrapper :is(
         .hub-class-copy,
+        .hub-class-teacher-card p,
         .hub-class-panel-head p,
         .hub-class-session-head p,
         .hub-class-empty

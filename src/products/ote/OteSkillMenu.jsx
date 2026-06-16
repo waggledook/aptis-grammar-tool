@@ -9,6 +9,7 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
   const isSpeaking = skill === "speaking";
   const homePath = getSitePath(nativeRoutes ? "/" : "/ote");
   const speakingMockPath = getSitePath(nativeRoutes ? "/mock-tests/speaking-1" : "/ote/mock-tests/speaking-1");
+  const interviewTrainingPath = getSitePath(nativeRoutes ? "/speaking/part-1-interview" : "/ote/speaking/part-1-interview");
   const voicemailTrainingPath = getSitePath(nativeRoutes ? "/speaking/part-2-voicemails" : "/ote/speaking/part-2-voicemails");
   const talkTrainingPath = getSitePath(nativeRoutes ? "/speaking/parts-3-4" : "/ote/speaking/parts-3-4");
   const writingMockPath = getSitePath(nativeRoutes ? "/writing/mock-tests" : "/ote/writing/mock-tests");
@@ -75,9 +76,9 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
               <h3>Speaking Mock 1</h3>
               <p>Run the full speaking module in a locked exam-style environment.</p>
             </button>
-            <button className="menu-card" type="button" disabled>
+            <button className="menu-card" type="button" onClick={() => navigate(interviewTrainingPath)}>
               <h3>Part 1 Interview Training</h3>
-              <p>Short-answer fluency drills for personal and everyday questions.</p>
+              <p>Learn the interview format, timing, scoring rules, and check your understanding.</p>
             </button>
             <button className="menu-card" type="button" onClick={() => navigate(voicemailTrainingPath)}>
               <h3>Part 2 Voicemail Training</h3>

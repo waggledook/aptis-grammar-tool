@@ -84,6 +84,7 @@ import CookieBanner from "./components/CookieBanner.jsx";
 import PrivacyPolicy from "./components/legal/PrivacyPolicy.jsx";
 import TeacherExtrasButton from "./components/common/TeacherExtrasButton.jsx";
 import AptisDemoBadge from "./components/access/AptisDemoBadge.jsx";
+import AptisAccessPage from "./components/access/AptisAccessPage.jsx";
 import LiveGameJoin from "./components/live/LiveGameJoin";
 import LiveGameHost from "./components/live/LiveGameHost";
 import LiveGamePlayer from "./components/live/LiveGamePlayer";
@@ -147,6 +148,7 @@ import HubCourseTestRunner from "./components/hub/HubCourseTestRunner.jsx";
 import HubAptisGrammarVocabularyMock from "./components/hub/HubAptisGrammarVocabularyMock.jsx";
 import OteDashboard from "./products/ote/OteDashboard.jsx";
 import OteSkillMenu from "./products/ote/OteSkillMenu.jsx";
+import OteSpeakingPart1Guide from "./products/ote/OteSpeakingPart1Guide.jsx";
 import OteSpeakingPart2Menu from "./products/ote/OteSpeakingPart2Menu.jsx";
 import OteSpeakingPart2Voicemails from "./products/ote/OteSpeakingPart2Voicemails.jsx";
 import OteSpeakingPart2GuidedMessage1 from "./products/ote/OteSpeakingPart2GuidedMessage1.jsx";
@@ -401,6 +403,10 @@ function syncTeacherUnreadCount(nextCount) {
   setTeacherUnreadCount(Math.max(0, Number(nextCount || 0)));
 }
 
+function syncProfilePhoto(url) {
+  setUser((prev) => (prev ? { ...prev, photoURL: url || "" } : prev));
+}
+
 useEffect(() => {
   const unsub = onAuthStateChanged(auth, async (u) => {
     if (!u) {
@@ -419,12 +425,25 @@ useEffect(() => {
       setUser({
         ...u,
         role: data.role || "student",
+        name: data.name || u.displayName || "",
+        username: data.username || "",
+        teacherId: data.teacherId || null,
         courseAccess: data.courseAccess || {},
         siteAccess: data.siteAccess || {},
+        photoURL: data.photoURL || u.photoURL || "",
       });
     } catch (err) {
       console.error("Failed to read user role:", err);
-      setUser({ ...u, role: "student", courseAccess: {}, siteAccess: {} });
+      setUser({
+        ...u,
+        role: "student",
+        name: u.displayName || "",
+        username: "",
+        teacherId: null,
+        courseAccess: {},
+        siteAccess: {},
+        photoURL: u.photoURL || "",
+      });
     }
   });
 
@@ -1073,7 +1092,11 @@ return (
           title={user.email || "My Profile"}
         >
           <span className="avatar">
-            {((user.displayName || user.email || "U")[0] || "U").toUpperCase()}
+            {user.photoURL ? (
+              <img src={user.photoURL} alt="" />
+            ) : (
+              ((user.displayName || user.email || "U")[0] || "U").toUpperCase()
+            )}
           </span>
         </button>
       )}
@@ -1090,6 +1113,7 @@ return (
   {showMemberAccessGate ? (
     <>
       <Route path="/privacy" element={<PrivacyPolicy />} />
+      <Route path="/aptis-access" element={<AptisAccessPage user={user} aptisAccess={aptisAccess} onSignIn={() => setShowAuth(true)} />} />
       <Route path="/admin" element={<AdminDashboard user={user} />} />
       <Route path="/admin/activity" element={<AdminActivityLog user={user} />} />
       <Route path="/admin/activity-charts" element={<AdminActivityCharts user={user} />} />
@@ -1113,6 +1137,8 @@ return (
     </>
   ) : (
     <>
+
+  <Route path="/aptis-access" element={<AptisAccessPage user={user} aptisAccess={aptisAccess} onSignIn={() => setShowAuth(true)} />} />
 
   {/* ——— Grammar route ——— */}
   <Route
@@ -1169,6 +1195,7 @@ return (
 
   <Route path="/ote" element={<OteDashboard user={user} nativeRoutes={false} />} />
   <Route path="/ote/speaking" element={<OteSkillMenu skill="speaking" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-1-interview" element={<OteSpeakingPart1Guide nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-2-voicemails" element={<OteSpeakingPart2Menu nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-2-voicemails/overview" element={<OteSpeakingPart2Voicemails nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-2-voicemails/guided-message-1" element={<OteSpeakingPart2GuidedMessage1 nativeRoutes={false} />} />
@@ -1218,6 +1245,7 @@ return (
     element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
   />
   <Route path="/ote/mock-tests/:mockId/results/:attemptId" element={<OteSpeakingResults user={user} homePath="/ote" />} />
+  <Route path="/speaking/part-1-interview" element={<OteSpeakingPart1Guide nativeRoutes={isOteSite} />} />
   <Route path="/speaking/part-2-voicemails" element={<OteSpeakingPart2Menu nativeRoutes={isOteSite} />} />
   <Route path="/speaking/part-2-voicemails/overview" element={<OteSpeakingPart2Voicemails nativeRoutes={isOteSite} />} />
   <Route path="/speaking/part-2-voicemails/guided-message-1" element={<OteSpeakingPart2GuidedMessage1 nativeRoutes={isOteSite} />} />
@@ -1999,6 +2027,7 @@ return (
       onGoMistakes={() => navigate("/profile/mistakes")}
       onGoFavourites={() => navigate("/profile/favourites")}
       onGoVocabMistakes={() => navigate("/profile/vocab-mistakes")}   // 👈 ADD THIS
+      onProfilePhotoChange={syncProfilePhoto}
     />
   }
 />
@@ -2483,6 +2512,7 @@ return (
             onBack={() => setView('menu')}
             onGoMistakes={() => setView('mistakes')}
             onGoFavourites={() => setView('favourites')}
+            onProfilePhotoChange={syncProfilePhoto}
           />
         )}
       </>

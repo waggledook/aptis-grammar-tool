@@ -4428,11 +4428,13 @@ exports.emailHubAccessRequest = functions.region("europe-west1")
     const r = snap.data() || {};
     const when = new Date().toLocaleString("en-GB", { timeZone: "Europe/Madrid" });
     const userEmail = r.userEmail || null;
+    const site = r.site === "aptis-trainer" ? "aptis-trainer" : "seifhub";
+    const productName = site === "aptis-trainer" ? "Aptis Trainer" : "Seif Hub";
 
     const lines = [
-      "New Seif Hub access request",
+      `New ${productName} access request`,
       "",
-      `Site: ${r.site || "seifhub"}`,
+      `Site: ${site}`,
       `User: ${r.userName || "-"}`,
       `Email: ${userEmail || "-"}`,
       `UID: ${r.userId || "-"}`,
@@ -4446,24 +4448,24 @@ exports.emailHubAccessRequest = functions.region("europe-west1")
     const adminMsg = {
       from: FROM_ADDRESS,
       to: TEACHER_EMAIL || FROM_ADDRESS,
-      subject: `Seif Hub access request — ${userEmail || r.userName || "unknown user"}`,
+      subject: `${productName} access request — ${userEmail || r.userName || "unknown user"}`,
       text: lines.join("\n"),
       html: toHtml(lines),
       replyTo: userEmail && userEmail.includes("@") ? userEmail : undefined,
     };
 
     const userMsg = userEmail && userEmail.includes("@")
-      ? {
+        ? {
           from: FROM_ADDRESS,
           to: userEmail,
-          subject: "We’ve received your Seif Hub access request",
+          subject: `We’ve received your ${productName} access request`,
           text: [
-            "Thanks for your request. We’ve received it and will review your Seif Hub access shortly.",
+            `Thanks for your request. We’ve received it and will review your ${productName} access shortly.`,
             "",
             ...lines,
           ].join("\n"),
           html:
-            "<p>Thanks for your request. We’ve received it and will review your Seif Hub access shortly.</p>" +
+            `<p>Thanks for your request. We’ve received it and will review your ${esc(productName)} access shortly.</p>` +
             "<hr/>" +
             toHtml(lines),
           replyTo: TEACHER_EMAIL || FROM_ADDRESS,

@@ -12,6 +12,7 @@ import {
   HUB_DEPENDENT_PREPOSITION_BANKS,
   HUB_DEPENDENT_PREPOSITION_LEVEL_ORDER,
 } from "../../data/hubDependentPrepositionItems.js";
+import UserAvatar from "../common/UserAvatar.jsx";
 
 const SPANGLISH_GAME_ID = "hub_spanglish_fixit";
 const NEGATRIS_GAME_ID = "hub_negatris";
@@ -32,6 +33,10 @@ function BoardSection({
   onDeleteGlobalScore,
 }) {
   const canModerate = user?.role === "admin";
+  const avatarForScore = (entry) => ({
+    ...entry,
+    photoURL: entry.photoURL || (entry.uid && entry.uid === user?.uid ? user.photoURL || "" : ""),
+  });
 
   return (
     <section className="hub-game-board">
@@ -51,6 +56,7 @@ function BoardSection({
                 {personalScores.map((entry, index) => (
                   <div key={entry.id} className="hub-game-board-row">
                     <span>#{index + 1}</span>
+                    <UserAvatar user={user} size="xs" />
                     <strong>{entry.score}</strong>
                   </div>
                 ))}
@@ -70,6 +76,7 @@ function BoardSection({
               {globalScores.map((entry, index) => (
                 <div key={entry.id} className="hub-game-board-row is-global">
                   <span>#{index + 1}</span>
+                  <UserAvatar user={avatarForScore(entry)} size="xs" />
                   <em>{entry.displayName}</em>
                   <strong>{entry.score}</strong>
                   {canModerate ? (
@@ -257,6 +264,13 @@ export default function HubGameLeaderboards({ user }) {
     return deletingScoreKey.slice(gameId.length + 1);
   }
 
+  function avatarForScore(entry) {
+    return {
+      ...entry,
+      photoURL: entry.photoURL || (entry.uid && entry.uid === user?.uid ? user.photoURL || "" : ""),
+    };
+  }
+
   return (
     <div className="menu-wrapper hub-game-leaderboards-wrapper">
       <Seo
@@ -357,6 +371,7 @@ export default function HubGameLeaderboards({ user }) {
                   {dependentPersonal.map((entry, index) => (
                     <div key={entry.id} className="hub-game-board-row">
                       <span>#{index + 1}</span>
+                      <UserAvatar user={user} size="xs" />
                       <strong>{entry.score}</strong>
                     </div>
                   ))}
@@ -377,6 +392,7 @@ export default function HubGameLeaderboards({ user }) {
                 {dependentGlobal.map((entry, index) => (
                   <div key={entry.id} className="hub-game-board-row is-global">
                     <span>#{index + 1}</span>
+                    <UserAvatar user={avatarForScore(entry)} size="xs" />
                     <em>{entry.displayName}</em>
                     <strong>{entry.score}</strong>
                     {user?.role === "admin" ? (
@@ -517,14 +533,14 @@ export default function HubGameLeaderboards({ user }) {
 
         .hub-game-board-row {
           display: grid;
-          grid-template-columns: auto 1fr auto;
+          grid-template-columns: auto auto 1fr;
           gap: .75rem;
           align-items: center;
           color: rgba(230, 240, 255, 0.9);
         }
 
         .hub-game-board-row.is-global {
-          grid-template-columns: auto minmax(0, 1fr) auto auto;
+          grid-template-columns: auto auto minmax(0, 1fr) auto auto;
         }
 
         .hub-game-board-row em {

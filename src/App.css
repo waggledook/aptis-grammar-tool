@@ -706,6 +706,7 @@ button {
   width: 1.8rem;
   height: 1.8rem;
   border-radius: 50%;
+  overflow: hidden;
   background: #294b84;          /* your brand blue */
   border: 1px solid #3a6ebd;    /* subtle outline */
   color: #e6f0ff;
@@ -717,9 +718,47 @@ button {
   transition: transform 0.15s ease, filter 0.15s ease;
 }
 
+.profile-badge-btn .avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .profile-badge-btn:hover .avatar {
   filter: brightness(1.1);
   transform: scale(1.05);
+}
+
+.user-avatar {
+  --avatar-size: 2.35rem;
+  width: var(--avatar-size);
+  height: var(--avatar-size);
+  border-radius: 50%;
+  overflow: hidden;
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-2, #294b84);
+  border: 1px solid var(--color-border-strong, #3a6ebd);
+  color: var(--color-text, #e6f0ff);
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.user-avatar--xs { --avatar-size: 1.8rem; font-size: 0.78rem; }
+.user-avatar--sm { --avatar-size: 2.1rem; font-size: 0.86rem; }
+.user-avatar--md { --avatar-size: 2.55rem; font-size: 1rem; }
+.user-avatar--lg { --avatar-size: 3.35rem; font-size: 1.25rem; }
+.user-avatar--xl { --avatar-size: 4.4rem; font-size: 1.7rem; }
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .topbar-notify-btn {
@@ -978,6 +1017,117 @@ button {
   color: #ffffff;
 }
 
+.aptis-access-page {
+  max-width: 980px;
+  margin: 0 auto;
+}
+
+.aptis-access-hero {
+  margin: 0 0 1.2rem;
+  padding: 1.35rem 0 0.35rem;
+  text-align: center;
+}
+
+.aptis-access-panel-label {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  color: var(--color-text-soft);
+  font-size: 0.82rem;
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1.2;
+  padding: 0;
+}
+
+.aptis-access-hero h1 {
+  margin: 0.72rem 0 0.5rem;
+}
+
+.aptis-access-hero p {
+  max-width: 43rem;
+  margin: 0 auto;
+  color: var(--color-text-soft);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.aptis-access-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  align-items: stretch;
+}
+
+.aptis-access-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.78rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-raised);
+  box-shadow: 0 10px 24px var(--color-shadow-soft);
+}
+
+.aptis-access-panel h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.2rem;
+  line-height: 1.25;
+  text-align: left;
+}
+
+.aptis-access-panel p {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.48;
+}
+
+.aptis-access-primary,
+.aptis-access-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  width: fit-content;
+  min-height: 2.8rem;
+  margin-top: auto;
+  padding: 0.68rem 1rem;
+  border-radius: 10px;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.aptis-access-primary {
+  border: 1px solid rgba(255, 233, 155, 0.72);
+  background: linear-gradient(180deg, #ffe27a 0%, #f7b32b 100%);
+  color: #14203a;
+  box-shadow:
+    0 10px 22px rgba(253, 191, 45, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.aptis-access-primary:hover:not(:disabled),
+.aptis-access-secondary:hover {
+  transform: translateY(-1px);
+}
+
+.aptis-access-primary:disabled {
+  cursor: default;
+  opacity: 0.66;
+}
+
+.aptis-access-secondary {
+  border: 1px solid color-mix(in srgb, var(--color-link) 42%, var(--color-border));
+  background: var(--color-surface-3);
+  color: var(--color-link);
+}
+
+.aptis-access-small {
+  font-size: 0.88rem;
+}
+
 @media (max-width: 640px) {
   .aptis-demo-badge {
     align-items: flex-start;
@@ -992,6 +1142,15 @@ button {
 
   .aptis-demo-actions {
     justify-content: flex-start;
+    width: 100%;
+  }
+
+  .aptis-access-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aptis-access-primary,
+  .aptis-access-secondary {
     width: 100%;
   }
 }

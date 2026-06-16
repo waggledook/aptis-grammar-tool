@@ -83,11 +83,11 @@ export default function HubLanding({ user, hasAccess, onSignIn, siteVariant = nu
     setSendingRequest(true);
 
     try {
-      await sendHubAccessRequest();
+      await sendHubAccessRequest({ site: "seifhub" });
       toast(
         user?.email
           ? `Request sent. We’ve emailed a copy to ${user.email}.`
-          : "Request sent. We’ll review your Seif Hub access shortly."
+          : `Request sent. We’ll review your ${productName} access shortly.`
       );
     } catch (err) {
       console.error("Hub access request failed:", err);

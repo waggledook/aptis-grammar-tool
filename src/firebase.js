@@ -126,6 +126,7 @@ export const doSignUp = async ({ email, pw, name, username }) => {
       email: user.email || null,
       name: name || "",
       username: uname,
+      photoURL: user.photoURL || null,
       role: "student",
       createdAt: serverTimestamp(),
     },
@@ -147,6 +148,45 @@ export const doSignUp = async ({ email, pw, name, username }) => {
 
 export const onAuthChange = (cb)       => onAuthStateChanged(auth, cb);
 export const doSignOut    = ()         => signOut(auth);
+
+function normalizePublicUserProfile(id, data = {}) {
+  return {
+    id,
+    uid: id,
+    email: data.email || null,
+    name: data.name || data.displayName || "",
+    displayName: data.displayName || data.name || "",
+    username: data.username || "",
+    photoURL: data.photoURL || "",
+    role: data.role || "student",
+  };
+}
+
+export async function fetchUserPublicProfile(uid) {
+  if (!uid) return null;
+  const snap = await getDoc(doc(db, "users", uid));
+  if (!snap.exists()) return null;
+  return normalizePublicUserProfile(snap.id, snap.data() || {});
+}
+
+export async function fetchUserPublicProfiles(uids = []) {
+  const uniqueUids = [...new Set((Array.isArray(uids) ? uids : []).filter(Boolean))];
+  if (!uniqueUids.length) return {};
+
+  const rows = await Promise.all(
+    uniqueUids.map((uid) =>
+      fetchUserPublicProfile(uid).catch((error) => {
+        console.warn("[profiles] Could not load user profile", uid, error);
+        return null;
+      })
+    )
+  );
+
+  return rows.reduce((acc, row) => {
+    if (row?.uid) acc[row.uid] = row;
+    return acc;
+  }, {});
+}
 
 async function logAiFeedbackGenerated(kind, details = {}, resultData = {}) {
   const meta = resultData?.meta || {};
@@ -395,6 +435,7 @@ export async function ensureUserProfile(user) {
         email: user.email || null,
         name: user.displayName || "",
         username: "",           // we don't know yet – stays empty
+        photoURL: user.photoURL || null,
         role: "student",
         createdAt: serverTimestamp(),
       },
@@ -417,6 +458,9 @@ export async function ensureUserProfile(user) {
     if (data.username === undefined) {
       // ensure the field exists, even if empty
       patch.username = "";
+    }
+    if (!data.photoURL && user.photoURL) {
+      patch.photoURL = user.photoURL;
     }
 
     if (Object.keys(patch).length) {
@@ -784,6 +828,7 @@ export async function saveHubGameScore(gameId, score, details = {}) {
     score: numericScore,
     createdAt: serverTimestamp(),
     displayName,
+    photoURL: user.photoURL || details.photoURL || null,
     userEmail: user.email || null,
     app: "seifhub",
     gameId,
@@ -812,6 +857,7 @@ export async function fetchMyTopHubGameScores(gameId, n = 3, uid) {
       score: data.score ?? 0,
       createdAt: data.createdAt || null,
       displayName: data.displayName || null,
+      photoURL: data.photoURL || null,
       details: data.details || null,
     };
   });
@@ -833,6 +879,7 @@ export async function fetchTopHubGameScores(gameId, n = 10) {
       score: data.score ?? 0,
       createdAt: data.createdAt || null,
       displayName: data.displayName || data.userEmail || "User",
+      photoURL: data.photoURL || null,
     };
   });
 }
@@ -1616,11 +1663,12 @@ export async function sendReport({
   });
 }
 
-export async function sendHubAccessRequest({ note = "" } = {}) {
+export async function sendHubAccessRequest({ note = "", site = "seifhub" } = {}) {
   const user = auth.currentUser;
+  const normalizedSite = site === "aptis-trainer" || site === "ote" ? "aptis-trainer" : "seifhub";
 
   return addDoc(hubAccessRequestsCollection, {
-    site: "seifhub",
+    site: normalizedSite,
     note: note.trim(),
     userId: user?.uid ?? null,
     userEmail: user?.email ?? null,
@@ -4230,19 +4278,77 @@ export async function fetchGrammarDashboard(uid) {
   return { answered, correct, total };
 }
 
+const AVATAR_MAX_SOURCE_BYTES = 5 * 1024 * 1024;
+const AVATAR_OUTPUT_SIZE = 512;
+const AVATAR_ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+function getAvatarExtension(contentType) {
+  if (contentType === "image/webp") return "webp";
+  if (contentType === "image/jpeg") return "jpg";
+  return "png";
+}
+
+async function prepareAvatarImage(file) {
+  if (!file) throw new Error("Choose an image first.");
+  if (!AVATAR_ALLOWED_TYPES.has(file.type)) {
+    throw new Error("Please upload a JPG, PNG, or WebP image.");
+  }
+  if (file.size > AVATAR_MAX_SOURCE_BYTES) {
+    throw new Error("Please choose an image under 5 MB.");
+  }
+  if (typeof document === "undefined") return { blob: file, contentType: file.type };
+
+  const image = await new Promise((resolve, reject) => {
+    const img = new Image();
+    const objectUrl = URL.createObjectURL(file);
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl);
+      resolve(img);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl);
+      reject(new Error("Couldn’t read that image."));
+    };
+    img.src = objectUrl;
+  });
+
+  const canvas = document.createElement("canvas");
+  canvas.width = AVATAR_OUTPUT_SIZE;
+  canvas.height = AVATAR_OUTPUT_SIZE;
+
+  const ctx = canvas.getContext("2d");
+  const side = Math.min(image.naturalWidth || image.width, image.naturalHeight || image.height);
+  const sx = ((image.naturalWidth || image.width) - side) / 2;
+  const sy = ((image.naturalHeight || image.height) - side) / 2;
+
+  ctx.drawImage(image, sx, sy, side, side, 0, 0, AVATAR_OUTPUT_SIZE, AVATAR_OUTPUT_SIZE);
+
+  const preferredType = "image/webp";
+  const blob = await new Promise((resolve) => {
+    canvas.toBlob((result) => resolve(result), preferredType, 0.88);
+  });
+
+  if (blob) return { blob, contentType: preferredType };
+
+  const fallbackBlob = await new Promise((resolve) => {
+    canvas.toBlob((result) => resolve(result), "image/png");
+  });
+  if (!fallbackBlob) throw new Error("Couldn’t prepare that image.");
+  return { blob: fallbackBlob, contentType: "image/png" };
+}
+
 /**
- * Upload a PNG/JPG avatar to Storage and mirror its URL to Auth + Firestore.
- * Path: userAvatars/{uid}/badge.png
+ * Upload a JPG/PNG/WebP avatar to Storage and mirror its URL to Auth + Firestore.
+ * Path: userAvatars/{uid}/avatar-{timestamp}.{ext}
  */
-// Upload a PNG/JPG avatar to Storage, then mirror URL to Auth + Firestore.
 export async function uploadAvatarAndSave(file) {
   const user = auth.currentUser;
   if (!user) throw new Error("Must be signed in");
 
-  const avatarRef = ref(storage, `userAvatars/${user.uid}/badge.png`);
-  const task = uploadBytesResumable(avatarRef, file, {
-    contentType: file?.type || "image/png", // important for rules
-  });
+  const { blob, contentType } = await prepareAvatarImage(file);
+  const ext = getAvatarExtension(contentType);
+  const avatarRef = ref(storage, `userAvatars/${user.uid}/avatar-${Date.now()}.${ext}`);
+  const task = uploadBytesResumable(avatarRef, blob, { contentType });
 
   await new Promise((resolve, reject) => {
     task.on("state_changed", null, (err) => {
@@ -4257,6 +4363,16 @@ export async function uploadAvatarAndSave(file) {
   await setDoc(doc(db, "users", user.uid), { photoURL: url }, { merge: true });
 
   return url;
+}
+
+export async function clearAvatarAndSave() {
+  const user = auth.currentUser;
+  if (!user) throw new Error("Must be signed in");
+
+  await updateProfile(user, { photoURL: null });
+  await setDoc(doc(db, "users", user.uid), { photoURL: null }, { merge: true });
+
+  return null;
 }
 
 function normalizeTargetStudentIds(targetStudentIds = []) {

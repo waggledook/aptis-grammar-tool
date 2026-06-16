@@ -17,6 +17,7 @@ import {
 import { TOPIC_DATA } from "../vocabulary/data/vocabTopics";
 import { fetchItemsByIds } from "../../api/grammar";
 import { toast } from "../../utils/toast";
+import UserAvatar from "../common/UserAvatar.jsx";
 
 const TEACHER_NOTIFICATION_LIMIT = 100;
 
@@ -820,6 +821,10 @@ export default function MyStudents({
           studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id;
         return acc;
       }, {});
+      const studentPhotoById = studentRows.reduce((acc, studentRow) => {
+        acc[studentRow.id] = studentRow.photoURL || "";
+        return acc;
+      }, {});
       const nextGrammarNotifications = [];
       const nextCourseTestNotifications = [];
 
@@ -855,6 +860,7 @@ export default function MyStudents({
             data.studentEmail ||
             studentLabelById[studentUid] ||
             studentUid,
+          studentPhotoURL: studentPhotoById[studentUid] || "",
           createdAt: candidateLatest,
           title: data.setTitle || data.title || "Grammar set",
           setId: data.setId || null,
@@ -885,6 +891,7 @@ export default function MyStudents({
             studentLabelById[data.studentUid] ||
             data.studentUid ||
             "Student",
+          studentPhotoURL: studentPhotoById[data.studentUid] || "",
           createdAt: data.submittedAt || data.updatedAt || data.startedAt || null,
           title: data.templateTitle || template?.title || "Course test",
           attempt: { id: entry.id, ...data },
@@ -1197,6 +1204,7 @@ export default function MyStudents({
         studentId: studentRow.id,
         studentLabel:
           studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        studentPhotoURL: studentRow.photoURL || "",
         createdAt: entry.createdAt,
         partLabel: entry.partLabel,
         submission: entry,
@@ -1212,6 +1220,7 @@ export default function MyStudents({
         studentId: studentRow.id,
         studentLabel:
           studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        studentPhotoURL: studentRow.photoURL || "",
         createdAt: entry.createdAt,
         title: entry.activityTitle || "Mini grammar test",
         submission: entry,
@@ -1227,6 +1236,7 @@ export default function MyStudents({
         studentId: studentRow.id,
         studentLabel:
           studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        studentPhotoURL: studentRow.photoURL || "",
         createdAt: entry.updatedAt,
         topicTitle: entry.topicTitle || entry.topic || "Vocabulary",
         setTitle: entry.setTitle || entry.setId || "Set",
@@ -1243,6 +1253,7 @@ export default function MyStudents({
         studentId: studentRow.id,
         studentLabel:
           studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        studentPhotoURL: studentRow.photoURL || "",
         createdAt: entry.createdAt,
         title: entry.assignmentLabel || entry.setLabel || "Dictation",
         submission: entry,
@@ -1258,6 +1269,7 @@ export default function MyStudents({
         studentId: studentRow.id,
         studentLabel:
           studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        studentPhotoURL: studentRow.photoURL || "",
         createdAt: entry.createdAt,
         title: entry.assignmentLabel || entry.deckTitle || "Grammar flashcards",
         submission: entry,
@@ -1273,6 +1285,7 @@ export default function MyStudents({
         studentId: studentRow.id,
         studentLabel:
           studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        studentPhotoURL: studentRow.photoURL || "",
         createdAt: entry.updatedAt,
         partLabel: getReadingPartLabel(entry.part),
         taskId: entry.taskId,
@@ -1487,29 +1500,36 @@ async function copySelectedSubmission() {
                       className={`teacher-notify-item ${readSubmissionKeys[entry.id] ? "" : "is-unread"}`}
                       onClick={() => openNotification(entry)}
                     >
-                      <div>
-                        <strong>{entry.studentLabel}</strong>
-                        <span>
-                          {entry.kind === "writing"
-                            ? `${entry.partLabel} submission`
-                            : entry.kind === "course-test"
-                              ? `${entry.attempt?.reviewStatus === "reviewed" ? "Course test reviewed" : "Course test submitted"} · ${entry.title}`
-                            : entry.kind === "mini-test"
-                              ? `Mini test completed · ${entry.title}`
-                            : entry.kind === "dictation"
-                              ? `Dictation completed · ${entry.title}`
-                            : entry.kind === "flashcards"
-                              ? `Flashcards completed · ${entry.title}`
-                            : entry.kind === "reading"
-                              ? `${entry.partLabel} completed`
-                            : entry.kind === "vocabulary"
-                              ? `Vocabulary set completed · ${entry.topicTitle} · ${entry.setTitle}`
-                            : `${
-                                entry.setType === "use_of_english_custom"
-                                  ? "Use of English quiz completed"
-                                  : "Grammar set completed"
-                              } · ${entry.title}`}
-                        </span>
+                      <div className="teacher-notify-person">
+                        <UserAvatar
+                          label={entry.studentLabel}
+                          photoURL={entry.studentPhotoURL}
+                          size="sm"
+                        />
+                        <div>
+                          <strong>{entry.studentLabel}</strong>
+                          <span>
+                            {entry.kind === "writing"
+                              ? `${entry.partLabel} submission`
+                              : entry.kind === "course-test"
+                                ? `${entry.attempt?.reviewStatus === "reviewed" ? "Course test reviewed" : "Course test submitted"} · ${entry.title}`
+                              : entry.kind === "mini-test"
+                                ? `Mini test completed · ${entry.title}`
+                              : entry.kind === "dictation"
+                                ? `Dictation completed · ${entry.title}`
+                              : entry.kind === "flashcards"
+                                ? `Flashcards completed · ${entry.title}`
+                              : entry.kind === "reading"
+                                ? `${entry.partLabel} completed`
+                              : entry.kind === "vocabulary"
+                                ? `Vocabulary set completed · ${entry.topicTitle} · ${entry.setTitle}`
+                              : `${
+                                  entry.setType === "use_of_english_custom"
+                                    ? "Use of English quiz completed"
+                                    : "Grammar set completed"
+                                } · ${entry.title}`}
+                          </span>
+                        </div>
                       </div>
                       <em>{formatRelative(entry.createdAt)}</em>
                     </button>
@@ -1627,9 +1647,12 @@ async function copySelectedSubmission() {
               <article key={studentRow.id} className="student-card">
                 <div className="student-card-head">
                   <div className="student-identity">
-                    <h3>{label}</h3>
-                    <p>{studentRow.email || "No email on file"}</p>
-                    {studentRow.username ? <span className="student-handle">@{studentRow.username}</span> : null}
+                    <UserAvatar user={studentRow} label={label} size="lg" />
+                    <div>
+                      <h3>{label}</h3>
+                      <p>{studentRow.email || "No email on file"}</p>
+                      {studentRow.username ? <span className="student-handle">@{studentRow.username}</span> : null}
+                    </div>
                   </div>
 
                   <div className="student-chip-row">
@@ -1709,35 +1732,42 @@ async function copySelectedSubmission() {
         <div className="teacher-review-overlay" onClick={() => setSelectedNotification(null)}>
           <div className="teacher-review-modal" onClick={(event) => event.stopPropagation()}>
             <div className="teacher-review-head">
-              <div>
-                <h3>{selectedNotification.studentLabel}</h3>
-                <p>
-                  {selectedNotification.partLabel ||
-                    (selectedNotification.kind === "dictation"
-                      ? "Dictation"
-                      : selectedNotification.kind === "mini-test"
-                        ? "Mini test"
-                        : selectedNotification.kind === "flashcards"
-                          ? "Flashcards"
-                        : selectedNotification.kind === "vocabulary"
-                          ? "Vocabulary"
-                          : selectedNotification.kind === "reading"
-                            ? selectedNotification.partLabel || "Reading"
-                          : selectedNotification.kind === "grammar-set"
-                            ? "Grammar set"
-                            : selectedNotification.kind === "course-test"
-                              ? "Course test"
-                              : "Student")} submission · {formatDate(selectedNotification.createdAt)}
-                </p>
-                {selectedNotification.kind === "course-test" ? (
-                  <div
-                    className={`teacher-review-status-chip ${
-                      selectedNotification.attempt?.reviewStatus === "reviewed" ? "is-reviewed" : "is-pending"
-                    }`}
-                  >
-                    {selectedNotification.attempt?.reviewStatus === "reviewed" ? "Reviewed" : "Requires review"}
-                  </div>
-                ) : null}
+              <div className="teacher-review-person">
+                <UserAvatar
+                  label={selectedNotification.studentLabel}
+                  photoURL={selectedNotification.studentPhotoURL}
+                  size="lg"
+                />
+                <div>
+                  <h3>{selectedNotification.studentLabel}</h3>
+                  <p>
+                    {selectedNotification.partLabel ||
+                      (selectedNotification.kind === "dictation"
+                        ? "Dictation"
+                        : selectedNotification.kind === "mini-test"
+                          ? "Mini test"
+                          : selectedNotification.kind === "flashcards"
+                            ? "Flashcards"
+                          : selectedNotification.kind === "vocabulary"
+                            ? "Vocabulary"
+                            : selectedNotification.kind === "reading"
+                              ? selectedNotification.partLabel || "Reading"
+                            : selectedNotification.kind === "grammar-set"
+                              ? "Grammar set"
+                              : selectedNotification.kind === "course-test"
+                                ? "Course test"
+                                : "Student")} submission · {formatDate(selectedNotification.createdAt)}
+                  </p>
+                  {selectedNotification.kind === "course-test" ? (
+                    <div
+                      className={`teacher-review-status-chip ${
+                        selectedNotification.attempt?.reviewStatus === "reviewed" ? "is-reviewed" : "is-pending"
+                      }`}
+                    >
+                      {selectedNotification.attempt?.reviewStatus === "reviewed" ? "Reviewed" : "Requires review"}
+                    </div>
+                  ) : null}
+                </div>
               </div>
               <div className="teacher-review-top-actions">
                 <button
@@ -2380,6 +2410,19 @@ async function copySelectedSubmission() {
           white-space: nowrap;
         }
 
+        .teacher-notify-person,
+        .teacher-review-person {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          min-width: 0;
+        }
+
+        .teacher-notify-person > div,
+        .teacher-review-person > div {
+          min-width: 0;
+        }
+
         .teacher-review-overlay {
           position: fixed;
           inset: 0;
@@ -2781,6 +2824,13 @@ async function copySelectedSubmission() {
         }
 
         .student-identity {
+          display: flex;
+          align-items: center;
+          gap: 0.8rem;
+          min-width: 0;
+        }
+
+        .student-identity > div {
           min-width: 0;
         }
 
@@ -2922,6 +2972,11 @@ async function copySelectedSubmission() {
           .student-class-editor {
             flex-direction: column;
             align-items: stretch;
+          }
+
+          .student-identity,
+          .teacher-review-person {
+            align-items: flex-start;
           }
 
           .student-chip-row {

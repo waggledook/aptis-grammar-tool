@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as fb from "../../firebase";
 import { toast } from "../../utils/toast";
@@ -103,6 +103,7 @@ export default function Profile({
   viewerLabelOverride,    // optional: override "Signed in as …"
   siteMode = "aptis",
   allowAccountSecurity = true,
+  onProfilePhotoChange = null,
 }) {
   const navigate = useNavigate();
   const isSeifHubProfile = siteMode === "seifhub";
@@ -205,9 +206,12 @@ export default function Profile({
 
   const TOTAL_VOCAB_SETS = getTotalVocabSets();
 
-  // we'll still keep photoURL logic in case you want to bring badges back later,
-  // but we just won't render the avatar / studio for now.
-  const [photoURL, setPhotoURL] = useState(auth.currentUser?.photoURL || "");
+  const [photoURL, setPhotoURL] = useState(() =>
+    user?.photoURL || (!targetUid ? auth.currentUser?.photoURL || "" : "")
+  );
+  const [avatarBusy, setAvatarBusy] = useState(false);
+  const [avatarError, setAvatarError] = useState("");
+  const avatarInputRef = useRef(null);
 
 
 const [currentPw, setCurrentPw] = useState("");
@@ -215,6 +219,51 @@ const [newPw, setNewPw] = useState("");
 const [confirmPw, setConfirmPw] = useState("");
 const [pwBusy, setPwBusy] = useState(false);
 const [pwError, setPwError] = useState("");
+
+const canEditAvatar = allowAccountSecurity && !targetUid && !!auth.currentUser;
+
+const profileInitial = ((user?.displayName || user?.name || user?.username || user?.email || "U")[0] || "U").toUpperCase();
+
+const handleAvatarSaved = (url) => {
+  setPhotoURL(url || "");
+  onProfilePhotoChange?.(url || null);
+};
+
+const handleAvatarUpload = async (event) => {
+  const file = event.target.files?.[0];
+  event.target.value = "";
+  if (!file) return;
+
+  setAvatarBusy(true);
+  setAvatarError("");
+  try {
+    const url = await fb.uploadAvatarAndSave(file);
+    handleAvatarSaved(url);
+    toast("Profile picture updated ✓");
+  } catch (err) {
+    const msg = err?.message || "Couldn’t update profile picture.";
+    setAvatarError(msg);
+    toast(msg);
+  } finally {
+    setAvatarBusy(false);
+  }
+};
+
+const handleAvatarClear = async () => {
+  setAvatarBusy(true);
+  setAvatarError("");
+  try {
+    await fb.clearAvatarAndSave();
+    handleAvatarSaved(null);
+    toast("Profile picture removed.");
+  } catch (err) {
+    const msg = err?.message || "Couldn’t remove profile picture.";
+    setAvatarError(msg);
+    toast(msg);
+  } finally {
+    setAvatarBusy(false);
+  }
+};
 
 const handleChangePassword = async (e) => {
   e.preventDefault();
@@ -303,13 +352,18 @@ const handleChangePassword = async (e) => {
 
 
 
-  // keep photoURL synced if user changes badge in future
   useEffect(() => {
+    if (targetUid) {
+      setPhotoURL(user?.photoURL || "");
+      return undefined;
+    }
+
+    setPhotoURL(user?.photoURL || auth.currentUser?.photoURL || "");
     const unsub = onAuthStateChanged(auth, (u) => {
-      setPhotoURL(u?.photoURL || "");
+      setPhotoURL(user?.photoURL || u?.photoURL || "");
     });
     return unsub;
-  }, []);
+  }, [targetUid, user?.photoURL]);
 
   // load all profile data
   useEffect(() => {
@@ -487,7 +541,56 @@ const totalListeningTasks =
   </div>
 </header>
 
-      {/* NOTE: avatar / Create/Change badge UI + ProfileBadgeStudio REMOVED */}
+      <section className="profile-avatar-strip">
+        <div className="profile-avatar-preview" aria-hidden="true">
+          {photoURL ? (
+            <img src={photoURL} alt="" />
+          ) : (
+            <span>{profileInitial}</span>
+          )}
+        </div>
+        <div className="profile-avatar-copy">
+          <div className="profile-avatar-title">Profile picture</div>
+          <div className="profile-avatar-sub">
+            {canEditAvatar
+              ? "Upload a square profile photo."
+              : photoURL
+              ? "Custom profile picture"
+              : "No custom profile picture yet"}
+          </div>
+          {avatarError && <div className="account-strip-error">{avatarError}</div>}
+        </div>
+
+        {canEditAvatar && (
+          <div className="profile-avatar-actions">
+            <input
+              ref={avatarInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              onChange={handleAvatarUpload}
+              className="profile-avatar-input"
+            />
+            <button
+              type="button"
+              className="btn"
+              onClick={() => avatarInputRef.current?.click()}
+              disabled={avatarBusy}
+            >
+              {photoURL ? "Change photo" : "Upload photo"}
+            </button>
+            {photoURL && (
+              <button
+                type="button"
+                className="btn danger"
+                onClick={handleAvatarClear}
+                disabled={avatarBusy}
+              >
+                Remove
+              </button>
+            )}
+          </div>
+        )}
+      </section>
 
       {loading ? (
   <p className="muted">Loading…</p>
@@ -702,7 +805,7 @@ const totalListeningTasks =
       </div>
 
       <div className="vocab-tool-list">
-        <details className="vocab-tool-item" open>
+        <details className="vocab-tool-item">
           <summary>
             <span className="vocab-tool-summary-title">Topic Practice</span>
             <span className="vocab-tool-summary-meta">{totalCompletedVocab}/{TOTAL_VOCAB_SETS || 0} sets</span>
@@ -773,7 +876,7 @@ const totalListeningTasks =
           </div>
         </details>
 
-        <details className="vocab-tool-item featured" open>
+        <details className="vocab-tool-item featured">
           <summary>
             <span className="vocab-tool-summary-title">Vocabulary Exercise Trainer</span>
             <span className="vocab-tool-summary-meta">{vocabExerciseAttempted} tried</span>
@@ -2968,6 +3071,72 @@ function StyleScope() {
   color: #ffb4b4;
 }
 
+.profile-avatar-strip{
+  display:grid;
+  grid-template-columns:auto minmax(0, 1fr);
+  align-items:center;
+  gap: 14px;
+  margin: 0 0 14px;
+  padding: 14px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  border-radius: 14px;
+}
+
+.profile-avatar-preview{
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  overflow:hidden;
+  border: 1px solid rgba(255,255,255,0.18);
+  background:#0a1528;
+  color:#e6f0ff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight: 900;
+  font-size: 1.55rem;
+}
+
+.profile-avatar-preview img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.profile-avatar-title{
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.profile-avatar-sub{
+  margin-top: 2px;
+  font-size: .85rem;
+  opacity: .75;
+}
+
+.profile-avatar-actions{
+  grid-column: 1 / -1;
+  display:flex;
+  flex-wrap:wrap;
+  gap: 8px;
+}
+
+.profile-avatar-input{
+  display:none;
+}
+
+@media(min-width:760px){
+  .profile-avatar-strip{
+    grid-template-columns:auto minmax(0, 1fr) auto;
+  }
+  .profile-avatar-actions{
+    grid-column:auto;
+    justify-content:flex-end;
+  }
+}
+
 :root[data-theme="light"] .profile-page {
   --panel: var(--color-surface-2);
   --ink: var(--color-text);
@@ -2979,16 +3148,22 @@ function StyleScope() {
   color: var(--color-text) !important;
 }
 
-:root[data-theme="light"] .profile-page :is(.intro, .muted, .small, .account-strip-sub, .account-strip-hint, .vocab-topic-sub) {
+:root[data-theme="light"] .profile-page :is(.intro, .muted, .small, .account-strip-sub, .account-strip-hint, .profile-avatar-sub, .vocab-topic-sub) {
   color: var(--color-text-soft) !important;
   opacity: 1;
 }
 
-:root[data-theme="light"] .profile-page :is(.card, .panel, .account-strip) {
+:root[data-theme="light"] .profile-page :is(.card, .panel, .account-strip, .profile-avatar-strip) {
   background: var(--color-surface-2) !important;
   border-color: var(--color-border) !important;
   color: var(--color-text) !important;
   box-shadow: 0 8px 22px var(--color-shadow-soft);
+}
+
+:root[data-theme="light"] .profile-page .profile-avatar-preview {
+  background: var(--color-surface-3) !important;
+  border-color: var(--color-border-strong) !important;
+  color: var(--color-text) !important;
 }
 
 :root[data-theme="light"] .profile-page :is(.wcard, .subpanel, .hub-grammar-profile-card) {

@@ -7,7 +7,7 @@ import {
   listAttemptsForCourseTestSession,
   saveCourseTestAttemptReview,
 } from "../../firebase";
-import { collection, getDoc, getDocs, updateDoc, doc, query, orderBy, limit, startAfter, serverTimestamp } from "firebase/firestore";
+import { collection, getDoc, getDocs, updateDoc, setDoc, doc, query, orderBy, limit, startAfter, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import {
   APTIS_TRAINER_ACCESS_KEY,
@@ -16,6 +16,7 @@ import {
   SEIF_HUB_ACCESS_KEY,
 } from "../../siteConfig.js";
 import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
+import UserAvatar from "../common/UserAvatar.jsx";
 
 function getTodayLocalIsoDate() {
   const now = new Date();
@@ -48,6 +49,16 @@ function formatDateTime(value) {
     hour: "2-digit",
     minute: "2-digit",
   }).format(date);
+}
+
+function timestampToMs(value) {
+  if (!value) return 0;
+  if (typeof value?.toMillis === "function") return value.toMillis();
+  if (typeof value?.toDate === "function") return value.toDate().getTime();
+  if (value instanceof Date) return value.getTime();
+  if (value.seconds) return value.seconds * 1000;
+  const parsed = new Date(value).getTime();
+  return Number.isFinite(parsed) ? parsed : 0;
 }
 
 function normalizeStudentLookup(value = "") {
@@ -404,6 +415,13 @@ export default function AdminDashboard({ user }) {
   const [studentRequests, setStudentRequests] = useState([]);
   const [loadingStudentRequests, setLoadingStudentRequests] = useState(true);
   const [resolvingRequestId, setResolvingRequestId] = useState("");
+  const [hubAccessRequests, setHubAccessRequests] = useState([]);
+  const [loadingHubAccessRequests, setLoadingHubAccessRequests] = useState(true);
+  const [resolvingHubAccessRequestId, setResolvingHubAccessRequestId] = useState("");
+  const [adminNotificationsOpen, setAdminNotificationsOpen] = useState(false);
+  const [readAdminNotificationKeys, setReadAdminNotificationKeys] = useState({});
+  const [selectedAdminUserId, setSelectedAdminUserId] = useState("");
+  const [selectedAdminNotification, setSelectedAdminNotification] = useState(null);
   const [creditDrafts, setCreditDrafts] = useState({});
   const [savingCredits, setSavingCredits] = useState({});
 
@@ -488,6 +506,35 @@ export default function AdminDashboard({ user }) {
 
     loadStudentRequests();
   }, []);
+
+  useEffect(() => {
+    async function loadHubAccessRequests() {
+      try {
+        const snap = await getDocs(query(collection(db, "hubAccessRequests"), orderBy("createdAt", "desc"), limit(50)));
+        setHubAccessRequests(snap.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+      } catch (error) {
+        console.error("[AdminDashboard] load Seif Hub access requests failed", error);
+      } finally {
+        setLoadingHubAccessRequests(false);
+      }
+    }
+
+    loadHubAccessRequests();
+  }, []);
+
+  useEffect(() => {
+    async function loadAdminNotificationState() {
+      if (!user?.uid || user.role !== "admin") return;
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid, "adminDashboards", "notifications"));
+        setReadAdminNotificationKeys(snap.exists() ? snap.data()?.readNotificationKeys || {} : {});
+      } catch (error) {
+        console.error("[AdminDashboard] load notification state failed", error);
+      }
+    }
+
+    loadAdminNotificationState();
+  }, [user?.uid, user?.role]);
 
   useEffect(() => {
     let alive = true;
@@ -648,6 +695,30 @@ export default function AdminDashboard({ user }) {
       );
     } finally {
       setResolvingRequestId("");
+    }
+  }
+
+  async function markHubAccessRequestHandled(request) {
+    if (!request?.id) return;
+    setResolvingHubAccessRequestId(request.id);
+    try {
+      const patch = {
+        status: "handled",
+        updatedAt: serverTimestamp(),
+        resolvedAt: serverTimestamp(),
+        resolvedByUid: user.uid,
+        resolvedByEmail: user.email || null,
+      };
+      await updateDoc(doc(db, "hubAccessRequests", request.id), patch);
+      setHubAccessRequests((prev) =>
+        prev.map((entry) => (entry.id === request.id ? { ...entry, ...patch } : entry))
+      );
+      if (selectedAdminNotification?.request?.id === request.id) {
+        setSelectedAdminNotification(null);
+        setSelectedAdminUserId("");
+      }
+    } finally {
+      setResolvingHubAccessRequestId("");
     }
   }
 
@@ -1390,6 +1461,44 @@ function renderAptisAccessControl(u, compact = false) {
   const teacherCount = users.filter((u) => u.role === "teacher" || u.role === "admin").length;
   const studentCount = users.filter((u) => u.role === "student").length;
   const pendingStudentRequests = studentRequests.filter((request) => request.status === "pending");
+  const newAccessRequests = hubAccessRequests.filter((request) => (request.status || "new") === "new");
+  const recentSignupCutoff = Date.now() - 7 * 86400000;
+  const recentSignupNotifications = users
+    .filter((entry) => timestampToMs(entry.createdAt) >= recentSignupCutoff)
+    .map((entry) => ({
+      id: `signup:${entry.id}`,
+      type: "signup",
+      userId: entry.id,
+      userEmail: entry.email || "",
+      userName: labelForUser(entry),
+      createdAt: entry.createdAt,
+      title: "New user signed up",
+      detail: entry.email || labelForUser(entry),
+    }));
+  const accessRequestNotifications = newAccessRequests.map((request) => {
+    const isAptisRequest = request.site === "aptis-trainer" || request.site === "ote";
+    return {
+    id: `access-request:${request.id}`,
+    type: "access-request",
+    request,
+    userId: request.userId || "",
+    userEmail: request.userEmail || "",
+    userName: request.userName || request.userEmail || "User",
+    createdAt: request.createdAt,
+    title: `${isAptisRequest ? "Aptis Trainer" : "Seif Hub"} access requested`,
+    siteLabel: isAptisRequest ? "Aptis Trainer" : "Seif Hub",
+    detail: request.userEmail || request.userName || request.userId || "Unknown user",
+    };
+  });
+  const adminNotifications = [...accessRequestNotifications, ...recentSignupNotifications]
+    .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
+    .slice(0, 30);
+  const unreadAdminNotificationCount = adminNotifications.filter(
+    (notification) => !readAdminNotificationKeys[notification.id]
+  ).length;
+  const selectedAdminUser = selectedAdminUserId
+    ? users.find((entry) => entry.id === selectedAdminUserId) || null
+    : null;
   const emailGroups = users.reduce((acc, u) => {
     const email = (u.email || "").trim().toLowerCase();
     if (!email) return acc;
@@ -1438,6 +1547,59 @@ function renderAptisAccessControl(u, compact = false) {
     minWidth: "12rem",
   };
 
+  function findUserForAdminNotification(notification) {
+    if (!notification) return null;
+    if (notification.userId) {
+      const byId = users.find((entry) => entry.id === notification.userId);
+      if (byId) return byId;
+    }
+
+    const email = normalizeStudentLookup(notification.userEmail);
+    if (email) {
+      const byEmail = users.find((entry) => normalizeStudentLookup(entry.email) === email);
+      if (byEmail) return byEmail;
+    }
+
+    return null;
+  }
+
+  async function persistAdminReadMap(nextReadMap) {
+    setReadAdminNotificationKeys(nextReadMap);
+    if (!user?.uid) return;
+    try {
+      await setDoc(
+        doc(db, "users", user.uid, "adminDashboards", "notifications"),
+        {
+          readNotificationKeys: nextReadMap,
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    } catch (error) {
+      console.error("[AdminDashboard] persist notification state failed", error);
+    }
+  }
+
+  function markAdminNotificationRead(notificationId) {
+    if (!notificationId || readAdminNotificationKeys[notificationId]) return;
+    void persistAdminReadMap({ ...readAdminNotificationKeys, [notificationId]: true });
+  }
+
+  function markAdminNotificationUnread(notificationId) {
+    if (!notificationId || !readAdminNotificationKeys[notificationId]) return;
+    const next = { ...readAdminNotificationKeys };
+    delete next[notificationId];
+    void persistAdminReadMap(next);
+  }
+
+  function openAdminNotification(notification) {
+    const target = findUserForAdminNotification(notification);
+    setSelectedAdminNotification(notification);
+    setSelectedAdminUserId(target?.id || "");
+    setAdminNotificationsOpen(false);
+    markAdminNotificationRead(notification.id);
+  }
+
   return (
     <div style={{ maxWidth: 1160, margin: "auto" }}>
       <div
@@ -1451,14 +1613,140 @@ function renderAptisAccessControl(u, compact = false) {
         <button className="review-btn" onClick={() => navigate("/")}>
           ← Back
         </button>
-  
-        <button
-          className="ghost-btn"
-          style={{ fontSize: "0.85rem", padding: "0.25rem 0.6rem" }}
-          onClick={() => navigate("/admin/activity")}
-        >
-          View activity log
-        </button>
+
+        <div style={{ display: "flex", gap: "0.55rem", alignItems: "center", flexWrap: "wrap", position: "relative" }}>
+          <button
+            type="button"
+            className="ghost-btn"
+            style={{ fontSize: "0.85rem", padding: "0.25rem 0.6rem", marginLeft: 0, position: "relative" }}
+            onClick={() => setAdminNotificationsOpen((prev) => !prev)}
+          >
+            Admin notifications
+            {unreadAdminNotificationCount > 0 ? (
+              <span
+                style={{
+                  marginLeft: "0.45rem",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  minWidth: "1.4rem",
+                  height: "1.4rem",
+                  borderRadius: "999px",
+                  background: "#f6bd60",
+                  color: "#16233f",
+                  fontSize: "0.74rem",
+                  fontWeight: 900,
+                }}
+              >
+                {unreadAdminNotificationCount}
+              </span>
+            ) : null}
+          </button>
+
+          <button
+            className="ghost-btn"
+            style={{ fontSize: "0.85rem", padding: "0.25rem 0.6rem", marginLeft: 0 }}
+            onClick={() => navigate("/admin/activity")}
+          >
+            View activity log
+          </button>
+
+          {adminNotificationsOpen ? (
+            <div
+              style={{
+                position: "absolute",
+                top: "calc(100% + 0.6rem)",
+                right: 0,
+                zIndex: 20,
+                width: "min(430px, calc(100vw - 2rem))",
+                borderRadius: "1rem",
+                border: "1px solid rgba(77, 110, 184, 0.42)",
+                background: "rgba(20, 33, 59, 0.98)",
+                boxShadow: "0 16px 30px rgba(0,0,0,0.26)",
+                padding: "0.85rem",
+              }}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", marginBottom: "0.65rem", color: "#dbe7ff", alignItems: "center" }}>
+                <div>
+                  <strong>Admin notifications</strong>
+                  <span style={{ display: "block", color: "#9fb4da", fontSize: "0.82rem", marginTop: "0.1rem" }}>
+                    {loadingHubAccessRequests ? "Loading..." : `${unreadAdminNotificationCount} unread · ${adminNotifications.length} shown`}
+                  </span>
+                </div>
+                {unreadAdminNotificationCount > 0 ? (
+                  <button
+                    type="button"
+                    className="ghost-btn"
+                    style={{ marginLeft: 0, fontSize: "0.76rem", padding: "0.25rem 0.55rem" }}
+                    onClick={() =>
+                      void persistAdminReadMap({
+                        ...readAdminNotificationKeys,
+                        ...adminNotifications.reduce((acc, notification) => {
+                          acc[notification.id] = true;
+                          return acc;
+                        }, {}),
+                      })
+                    }
+                  >
+                    Mark all read
+                  </button>
+                ) : null}
+              </div>
+
+              {!adminNotifications.length ? (
+                <p style={{ margin: 0, color: "#94a3b8" }}>No recent account notifications.</p>
+              ) : (
+                <div style={{ display: "grid", gap: "0.55rem", maxHeight: "430px", overflow: "auto" }}>
+                  {adminNotifications.map((notification) => {
+                    const matchedUser = findUserForAdminNotification(notification);
+                    const isUnread = !readAdminNotificationKeys[notification.id];
+                    return (
+                      <button
+                        key={notification.id}
+                        type="button"
+                        onClick={() => openAdminNotification(notification)}
+                        style={{
+                          width: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          gap: "0.75rem",
+                          textAlign: "left",
+                          borderRadius: "0.85rem",
+                          border: isUnread
+                            ? "1px solid rgba(245, 193, 90, 0.38)"
+                            : "1px solid rgba(108, 136, 199, 0.18)",
+                          background: isUnread
+                            ? "rgba(37, 31, 16, 0.34)"
+                            : "rgba(11, 18, 37, 0.68)",
+                          color: "#eef4ff",
+                          padding: "0.72rem 0.8rem",
+                          cursor: "pointer",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: "0.65rem", minWidth: 0 }}>
+                          <UserAvatar
+                            user={matchedUser || { email: notification.userEmail, displayName: notification.userName }}
+                            size="sm"
+                          />
+                          <div style={{ minWidth: 0 }}>
+                            <strong style={{ display: "block" }}>{notification.title}</strong>
+                            <span style={{ display: "block", color: "#b7c6e6", fontSize: "0.84rem", marginTop: "0.2rem", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              {notification.detail}
+                            </span>
+                          </div>
+                        </div>
+                        <em style={{ color: "#9cc1ff", fontSize: "0.78rem", fontStyle: "normal", whiteSpace: "nowrap" }}>
+                          {formatDateTime(notification.createdAt)}
+                        </em>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ) : null}
+        </div>
       </div>
   
       <h1 style={{ marginTop: "0.75rem" }}>Admin Dashboard</h1>
@@ -2335,6 +2623,230 @@ function renderAptisAccessControl(u, compact = false) {
           </div>
         </>
       )}
+
+      {selectedAdminNotification ? (
+        <div
+          onClick={() => {
+            setSelectedAdminNotification(null);
+            setSelectedAdminUserId("");
+          }}
+          style={{
+            position: "fixed",
+            inset: 0,
+            background: "rgba(2, 6, 23, 0.78)",
+            zIndex: 72,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1.2rem",
+          }}
+        >
+          <div
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "min(1120px, 100%)",
+              maxHeight: "88vh",
+              overflow: "auto",
+              borderRadius: "1.1rem",
+              border: "1px solid #27406f",
+              background: "linear-gradient(180deg, rgba(24, 41, 79, 0.98), rgba(20, 36, 71, 0.98))",
+              boxShadow: "0 24px 60px rgba(0,0,0,0.35)",
+            }}
+          >
+            <div
+              style={{
+                padding: "1rem 1.1rem",
+                borderBottom: "1px solid rgba(39, 64, 111, 0.8)",
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "0.9rem",
+                flexWrap: "wrap",
+                alignItems: "center",
+              }}
+            >
+              <div style={{ display: "flex", gap: "0.8rem", alignItems: "center", minWidth: 0 }}>
+                <UserAvatar
+                  user={selectedAdminUser || { email: selectedAdminNotification.userEmail, displayName: selectedAdminNotification.userName }}
+                  size="lg"
+                />
+                <div style={{ minWidth: 0 }}>
+                  <div style={{ color: "#f8fafc", fontSize: "1.05rem", fontWeight: 800 }}>
+                    {selectedAdminUser?.email || selectedAdminNotification.userEmail || selectedAdminNotification.userName || "Unknown user"}
+                  </div>
+                  <div style={{ marginTop: "0.2rem", color: "#9fb4da", fontSize: "0.88rem" }}>
+                    {selectedAdminNotification.title} · {formatDateTime(selectedAdminNotification.createdAt)}
+                  </div>
+                  {selectedAdminNotification.request?.note ? (
+                    <div style={{ marginTop: "0.35rem", color: "#dbeafe", fontSize: "0.86rem" }}>
+                      Note: {selectedAdminNotification.request.note}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+
+              <div style={{ display: "flex", gap: "0.55rem", flexWrap: "wrap", justifyContent: "flex-end" }}>
+                {selectedAdminNotification.request ? (
+                  <button
+                    type="button"
+                    className="review-btn"
+                    onClick={() => markHubAccessRequestHandled(selectedAdminNotification.request)}
+                    disabled={resolvingHubAccessRequestId === selectedAdminNotification.request.id}
+                  >
+                    {resolvingHubAccessRequestId === selectedAdminNotification.request.id ? "Saving..." : "Mark handled"}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  className="ghost-btn"
+                  style={{ marginLeft: 0 }}
+                  onClick={() =>
+                    readAdminNotificationKeys[selectedAdminNotification.id]
+                      ? markAdminNotificationUnread(selectedAdminNotification.id)
+                      : markAdminNotificationRead(selectedAdminNotification.id)
+                  }
+                >
+                  {readAdminNotificationKeys[selectedAdminNotification.id] ? "Mark unread" : "Mark read"}
+                </button>
+                <button
+                  type="button"
+                  className="ghost-btn"
+                  style={{ marginLeft: 0 }}
+                  onClick={() => {
+                    setSelectedAdminNotification(null);
+                    setSelectedAdminUserId("");
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+
+            {!selectedAdminUser ? (
+              <div style={{ padding: "1.1rem", color: "#fbbf24" }}>
+                Could not match this notification to a user account yet.
+              </div>
+            ) : (
+              <>
+                <div
+                  style={{
+                    padding: "0.9rem 1.1rem 0",
+                    display: "flex",
+                    gap: "0.5rem",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                  }}
+                >
+                  {(() => {
+                    const aptisStatus = getAptisStatus(selectedAdminUser);
+                    const hubStatus = getHubStatus(selectedAdminUser);
+                    return (
+                      <>
+                        <span
+                          style={{
+                            padding: "0.34rem 0.7rem",
+                            borderRadius: "999px",
+                            background: "rgba(253, 191, 45, 0.14)",
+                            border: "1px solid rgba(253, 191, 45, 0.28)",
+                            color: "#ffd56e",
+                            fontSize: "0.78rem",
+                            fontWeight: 700,
+                            textTransform: "capitalize",
+                          }}
+                        >
+                          {selectedAdminUser.role}
+                        </span>
+                        <span
+                          style={{
+                            padding: "0.34rem 0.7rem",
+                            borderRadius: "999px",
+                            fontSize: "0.76rem",
+                            fontWeight: 700,
+                            ...statusStyles[aptisStatus.tone],
+                          }}
+                        >
+                          Aptis: {aptisStatus.label}
+                        </span>
+                        <span
+                          style={{
+                            padding: "0.34rem 0.7rem",
+                            borderRadius: "999px",
+                            fontSize: "0.76rem",
+                            fontWeight: 700,
+                            ...statusStyles[hubStatus.tone],
+                          }}
+                        >
+                          {hubStatus.label}
+                        </span>
+                      </>
+                    );
+                  })()}
+                </div>
+
+                <div
+                  style={{
+                    padding: "1rem 1.1rem 1.1rem",
+                    display: "grid",
+                    gridTemplateColumns: isNarrow
+                      ? "1fr"
+                      : "minmax(220px, 1.05fr) minmax(280px, 1.15fr) minmax(280px, 1.15fr) minmax(220px, 0.9fr)",
+                    gap: "1rem",
+                  }}
+                >
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem", padding: "0.85rem", borderRadius: "0.9rem", background: "rgba(2, 6, 23, 0.22)", border: "1px solid rgba(51, 65, 85, 0.7)" }}>
+                    <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                      Assignment
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "0.8rem", color: "#cbd5e1", marginBottom: "0.35rem" }}>Teacher</div>
+                      {renderTeacherControl(selectedAdminUser)}
+                    </div>
+                    <div>
+                      <div style={{ fontSize: "0.8rem", color: "#cbd5e1", marginBottom: "0.35rem" }}>AI feedback</div>
+                      {renderWritingFeedbackCreditControl(selectedAdminUser)}
+                    </div>
+                    <label style={{ display: "inline-flex", gap: "0.55rem", alignItems: "center", fontSize: "0.88rem", color: "#dbe7ff" }}>
+                      <input
+                        type="checkbox"
+                        checked={hasPack(selectedAdminUser)}
+                        onChange={(event) => setPackAccess(selectedAdminUser.id, event.target.checked)}
+                      />
+                      Course pack access
+                    </label>
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem", padding: "0.85rem", borderRadius: "0.9rem", background: "rgba(2, 6, 23, 0.22)", border: "1px solid rgba(51, 65, 85, 0.7)" }}>
+                    <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                      Aptis Trainer Access
+                    </div>
+                    {renderAptisAccessControl(selectedAdminUser)}
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem", padding: "0.85rem", borderRadius: "0.9rem", background: "rgba(2, 6, 23, 0.22)", border: "1px solid rgba(51, 65, 85, 0.7)" }}>
+                    <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                      Seif Hub Access
+                    </div>
+                    {renderHubAccessControl(selectedAdminUser)}
+                  </div>
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", padding: "0.85rem", borderRadius: "0.9rem", background: "rgba(2, 6, 23, 0.22)", border: "1px solid rgba(51, 65, 85, 0.7)" }}>
+                    <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                      Actions
+                    </div>
+                    <button
+                      className="ghost-btn"
+                      style={{ fontSize: "0.85rem", padding: "0.45rem 0.75rem", marginLeft: 0, alignSelf: "flex-start" }}
+                      onClick={() => goToProfile(selectedAdminUser.id)}
+                    >
+                      View profile
+                    </button>
+                    {renderRoleButtons(selectedAdminUser)}
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      ) : null}
 
       {selectedWritingGeneralSubmission ? (
         <div
