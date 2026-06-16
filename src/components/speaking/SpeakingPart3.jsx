@@ -7,6 +7,7 @@ import { PART3_TASKS } from "./banks/part3";
 import SpeakingAssignButton from "./SpeakingAssignButton";
 import { getSitePath } from "../../siteConfig.js";
 import SpeakingDemoNotice from "./SpeakingDemoNotice.jsx";
+import SpeakingFeedbackPanel from "./SpeakingFeedbackPanel.jsx";
 
 /**
  * Speaking – Part 3 (Compare two photos) — Exam-like
@@ -154,6 +155,7 @@ export default function SpeakingPart3({
 
       <TaskFlow
         task={current}
+        user={user}
         onFinished={async () => {
           if (!trackProgress) return;
           try {
@@ -182,7 +184,7 @@ export default function SpeakingPart3({
 /* ──────────────────────────────────────────────────────────────────────────
    Flow controller (3 sequential segments)
    ────────────────────────────────────────────────────────────────────────── */
-function TaskFlow({ task, onFinished }) {
+function TaskFlow({ task, user, onFinished }) {
   const SPEAK_SECONDS = 45;
 
   const questions = useMemo(() => [
@@ -200,6 +202,9 @@ function TaskFlow({ task, onFinished }) {
   const [recordings, setRecordings] = useState([]);
   const [recording, setRecording] = useState(false);
   const [micError, setMicError] = useState("");
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackError, setFeedbackError] = useState("");
+  const [feedbackResult, setFeedbackResult] = useState(null);
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const ttsAudioRef = useRef(null);
@@ -227,6 +232,9 @@ async function ensureAudioContext() {
     setLeft(SPEAK_SECONDS);
     setRecordings([]);
     setMicError("");
+    setFeedbackLoading(false);
+    setFeedbackError("");
+    setFeedbackResult(null);
     stopRecording(true);
     cancelTTS();
   }, [task?.id]);
@@ -262,10 +270,69 @@ async function ensureAudioContext() {
 
   async function startTask() {
     await ensureAudioContext();               // 👈 iOS needs this
+    setFeedbackError("");
+    setFeedbackResult(null);
+    setRecordings([]);
     setOverall("running");
     setSeg(0);
     setSub("announce");
     setLeft(SPEAK_SECONDS);
+  }
+
+  async function requestPart3Feedback() {
+    if (!user) {
+      setFeedbackError("Sign in to get AI feedback.");
+      return;
+    }
+    const completeRecordings = recordings.filter((item) => item?.blob);
+    if (completeRecordings.length !== 3) {
+      setFeedbackError("Record all three answers before requesting feedback.");
+      return;
+    }
+
+    setFeedbackLoading(true);
+    setFeedbackError("");
+    try {
+      const payloadRecordings = await Promise.all(recordings.map(async (item, index) => ({
+        name: item?.name || `speaking-part3-q${index + 1}.webm`,
+        mime: item?.mime || item?.blob?.type || "audio/webm",
+        base64: await blobToBase64(item.blob),
+      })));
+      const result = await fb.requestAptisSpeakingPart3Feedback({
+        task: {
+          id: task?.id || "",
+          title: task?.title || "",
+          photoA: { alt: task?.photoA?.alt || "" },
+          photoB: { alt: task?.photoB?.alt || "" },
+        },
+        questions: questions.map((text, index) => ({
+          id: `q${index + 1}`,
+          question: text,
+        })),
+        recordings: payloadRecordings,
+      });
+      setFeedbackResult(result);
+      if (result?.feedback && fb.saveSpeakingAiFeedback) {
+        try {
+          await fb.saveSpeakingAiFeedback({
+            part: "part3",
+            taskId: task?.id || "",
+            taskTitle: task?.title || "Speaking Part 3",
+            questions: questions.map((text, index) => ({ id: `q${index + 1}`, question: text })),
+            transcripts: result?.transcripts || [],
+            feedback: result.feedback,
+            meta: result?.meta || null,
+          });
+        } catch (saveError) {
+          console.warn("[Speaking Part 3 feedback] save failed", saveError);
+        }
+      }
+    } catch (error) {
+      console.error("[p3] feedback error", error);
+      setFeedbackError(error?.message || "Could not generate feedback right now.");
+    } finally {
+      setFeedbackLoading(false);
+    }
   }
   async function startSegment() {
     setLeft(SPEAK_SECONDS);
@@ -455,6 +522,7 @@ async function ensureAudioContext() {
   const qText = questions[seg];
 
   return (
+    <>
     <div className="panes panes-vertical">
       {/* Top: controls */}
       <section className="panel controls-panel">
@@ -515,7 +583,12 @@ async function ensureAudioContext() {
           <Summary
             recordings={recordings}
             taskId={task?.id || "task"}
+            user={user}
+            feedbackLoading={feedbackLoading}
+            feedbackError={feedbackError}
+            onRequestFeedback={requestPart3Feedback}
             onDownloadAll={createZipAndDownload}
+            onRestart={startTask}
           />
         )}
   
@@ -566,13 +639,26 @@ async function ensureAudioContext() {
         )}
       </section>
     </div>
+    {overall === "summary" && feedbackResult?.feedback && (
+      <SpeakingFeedbackPanel feedbackResult={feedbackResult} questions={questions} />
+    )}
+    </>
   );  
 }
 
 function formatTime(total){ const m = Math.floor(total/60); const s = total % 60; return `${m}:${String(s).padStart(2,"0")}`; }
 
 /* ────────────────────────────────────────────────────────────────────────── */
-function Summary({ recordings, taskId, onDownloadAll }) {
+function Summary({
+  recordings,
+  taskId,
+  user,
+  feedbackLoading,
+  feedbackError,
+  onRequestFeedback,
+  onDownloadAll,
+  onRestart,
+}) {
   return (
     <div className="summary">
       <h3 style={{ marginTop: 0 }}>Recordings</h3>
@@ -589,9 +675,40 @@ function Summary({ recordings, taskId, onDownloadAll }) {
         <button className="btn primary" onClick={() => onDownloadAll(recordings, `aptis-part3-${taskId}.zip`)}>
           Download all (.zip)
         </button>
+        <button
+          className="btn primary"
+          onClick={onRequestFeedback}
+          disabled={!user || feedbackLoading || recordings.filter((item) => item?.blob).length !== 3}
+          title={!user ? "Sign in to get AI feedback" : "Generate transcript-based written feedback"}
+        >
+          {feedbackLoading ? "Getting feedback..." : "Get AI feedback"}
+        </button>
+        <button className="btn" onClick={onRestart}>Start another set</button>
       </div>
+      {!user && (
+        <p className="muted" style={{ marginTop: ".5rem" }}>
+          Sign in to test transcript-based AI feedback.
+        </p>
+      )}
+      {feedbackError && (
+        <p className="muted" role="alert" style={{ marginTop: ".5rem" }}>
+          {feedbackError}
+        </p>
+      )}
     </div>
   );
+}
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const value = String(reader.result || "");
+      resolve(value.includes(",") ? value.split(",").pop() : value);
+    };
+    reader.onerror = () => reject(reader.error || new Error("Could not read recording."));
+    reader.readAsDataURL(blob);
+  });
 }
 
 /* ──────────────────────────────────────────────────────────────────────────

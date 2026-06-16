@@ -319,6 +319,46 @@ export async function requestAptisSpeakingPart2Feedback(payload) {
   return result.data;
 }
 
+export async function requestAptisSpeakingPart3Feedback(payload) {
+  const generateAptisSpeakingPart3Feedback = httpsCallable(
+    functionsRegion,
+    "generateAptisSpeakingPart3Feedback"
+  );
+  const result = await generateAptisSpeakingPart3Feedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  await logAiFeedbackGenerated("aptis_speaking_part3", {
+    product: "aptis",
+    section: "speaking",
+    part: "part3",
+    taskId: payload?.task?.id || "",
+    taskTitle: payload?.task?.title || "",
+    answerCount: Array.isArray(payload?.recordings) ? payload.recordings.length : null,
+  }, result.data);
+  return result.data;
+}
+
+export async function requestAptisSpeakingPart4Feedback(payload) {
+  const generateAptisSpeakingPart4Feedback = httpsCallable(
+    functionsRegion,
+    "generateAptisSpeakingPart4Feedback"
+  );
+  const result = await generateAptisSpeakingPart4Feedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  await logAiFeedbackGenerated("aptis_speaking_part4", {
+    product: "aptis",
+    section: "speaking",
+    part: "part4",
+    taskId: payload?.task?.id || "",
+    taskTitle: payload?.task?.title || "",
+    answerCount: Array.isArray(payload?.recordings) ? payload.recordings.length : null,
+  }, result.data);
+  return result.data;
+}
+
 export async function doPasswordReset(email, redirectUrl = "") {
   const safeRedirect = String(redirectUrl || "").trim();
   if (!safeRedirect) {

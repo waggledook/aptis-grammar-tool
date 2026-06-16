@@ -30,6 +30,8 @@ const WRITING_FEEDBACK_CREDIT_COSTS = {
   aptis_part4: 5,
   aptis_speaking_part1: 2,
   aptis_speaking_part2: 3,
+  aptis_speaking_part3: 4,
+  aptis_speaking_part4: 5,
   ote_full_mock: 8,
   ote_single_task: 4,
   ote_register_gap: 1,
@@ -780,6 +782,93 @@ const APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA = {
           improvedAnswer: { type: "string" },
           teacherNote: { type: "string" },
         },
+      },
+    },
+  },
+};
+
+const APTIS_SPEAKING_PART3_FEEDBACK_SCHEMA = JSON.parse(JSON.stringify(APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA));
+APTIS_SPEAKING_PART3_FEEDBACK_SCHEMA.properties.taskType.enum = ["aptis_speaking_part3"];
+APTIS_SPEAKING_PART3_FEEDBACK_SCHEMA.properties.answers.items.properties.questionType.enum = [
+  "photo_comparison",
+  "comparative_reasoning",
+  "extended_opinion",
+];
+
+const APTIS_SPEAKING_PART4_FEEDBACK_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["taskType", "estimatedLevel", "overall", "answer"],
+  properties: {
+    taskType: { type: "string", enum: ["aptis_speaking_part4"] },
+    estimatedLevel: APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA.properties.estimatedLevel,
+    overall: {
+      type: "object",
+      additionalProperties: false,
+      required: [
+        "summary",
+        "mainStrengths",
+        "mainPriorities",
+        "questionCoverage",
+        "developmentAdvice",
+        "transcriptCaveat",
+      ],
+      properties: {
+        summary: { type: "string" },
+        mainStrengths: { type: "array", items: { type: "string" } },
+        mainPriorities: { type: "array", items: { type: "string" } },
+        questionCoverage: { type: "array", items: { type: "string" } },
+        developmentAdvice: { type: "string" },
+        transcriptCaveat: { type: "string" },
+      },
+    },
+    answer: {
+      type: "object",
+      additionalProperties: false,
+      required: [
+        "questionId",
+        "question",
+        "transcript",
+        "durationSeconds",
+        "taskFulfilment",
+        "answerDevelopment",
+        "content",
+        "grammar",
+        "vocabulary",
+        "cohesion",
+        "languageErrors",
+        "fluency",
+        "improvedAnswer",
+        "teacherNote",
+      ],
+      properties: {
+        questionId: { type: "string" },
+        question: { type: "string" },
+        transcript: { type: "string" },
+        durationSeconds: { type: "number" },
+        taskFulfilment: APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA.properties.answers.items.properties.taskFulfilment,
+        answerDevelopment: APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA.properties.answers.items.properties.answerDevelopment,
+        content: APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA.properties.answers.items.properties.content,
+        grammar: APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA.properties.answers.items.properties.grammar,
+        vocabulary: APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA.properties.answers.items.properties.vocabulary,
+        cohesion: APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA.properties.answers.items.properties.cohesion,
+        languageErrors: {
+          type: "array",
+          items: {
+            type: "object",
+            additionalProperties: false,
+            required: ["category", "original", "correction", "explanation"],
+            properties: {
+              category: { type: "string", enum: ["grammar", "vocabulary", "word_order", "missing_word", "transcript_unclear"] },
+              original: { type: "string" },
+              correction: { type: "string" },
+              explanation: { type: "string" },
+            },
+          },
+        },
+        fluency: APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA.properties.answers.items.properties.fluency,
+        improvedAnswer: { type: "string" },
+        teacherNote: { type: "string" },
       },
     },
   },
@@ -1617,6 +1706,47 @@ function normalizeSpeakingPart2Task(data = {}) {
   };
 }
 
+function normalizeSpeakingPart3Task(data = {}) {
+  const task = data?.task || {};
+  const rawQuestions = Array.isArray(data?.questions) ? data.questions : [];
+  const questions = rawQuestions.slice(0, 3).map((item, index) => ({
+    id: cleanString(item?.id || `q${index + 1}`, 120),
+    questionNumber: index + 1,
+    questionType:
+      index === 0 ? "photo_comparison" : index === 1 ? "comparative_reasoning" : "extended_opinion",
+    question: cleanString(item?.question || item?.text || "", 500),
+  }));
+
+  return {
+    taskId: cleanString(task?.id || data?.taskId || "", 120),
+    title: cleanString(task?.title || "", 200),
+    photoA: {
+      alt: cleanString(task?.photoA?.alt || "", 1200),
+    },
+    photoB: {
+      alt: cleanString(task?.photoB?.alt || "", 1200),
+    },
+    questions,
+  };
+}
+
+function normalizeSpeakingPart4Task(data = {}) {
+  const task = data?.task || {};
+  const rawQuestions = Array.isArray(data?.questions) ? data.questions : [];
+  const questions = rawQuestions.slice(0, 3).map((item, index) => ({
+    id: cleanString(item?.id || `q${index + 1}`, 120),
+    questionNumber: index + 1,
+    question: cleanString(item?.question || item?.text || "", 500),
+  }));
+
+  return {
+    taskId: cleanString(task?.id || data?.taskId || "", 120),
+    title: cleanString(task?.title || "", 200),
+    imageAltText: cleanString(task?.alt || task?.imageAltText || "", 1200),
+    questions,
+  };
+}
+
 function normalizeSpeakingAudioItems(recordings) {
   if (!Array.isArray(recordings)) return [];
   return recordings.slice(0, 3).map((item, index) => {
@@ -1843,6 +1973,149 @@ function buildAptisSpeakingPart2Prompt(task, items) {
   ].join("\n");
 }
 
+function buildAptisSpeakingPart3Prompt(task, items) {
+  return [
+    "You are an English exam speaking feedback assistant for Aptis Speaking Part 3.",
+    "",
+    "The student answered three 45-second questions based on two photographs. Q1 usually asks them to describe what they can see in both photographs. Q2 asks them to compare some aspect of the situations, people, places, activities, advantages, disadvantages, feelings, difficulty, importance, preference, or suitability. Q3 is usually a broader opinion, explanation, comparison, or speculation question related to the topic. This is AI-estimated Aptis-style feedback, not official marking.",
+    "",
+    "Important limitation: you are assessing transcripts. Do not give pronunciation feedback or include pronunciation as a category. Only mention transcript clarity if a transcript is incomplete, unclear, or impossible to interpret. Do not invent accent, intonation, word-stress, phoneme, or sound-level problems.",
+    "",
+    "Part 3 priorities:",
+    "- Q1 photo description/comparison: reward clear description of both photographs. The student should identify visible people, places, actions, objects, and the general situations in both images. Strong answers should also make at least one clear comparison or contrast between the photos.",
+    "- In Q1, do not require every possible visible detail. Two to four relevant observations about each image can be enough if the answer is clear, balanced, and connected.",
+    "- Q1 can include both description and speculation. Reward grounded phrases such as it looks like, it seems as if, they might be, they are probably, perhaps, I imagine, and it appears to be, especially when used to compare the two images.",
+    "- Do not criticise speculation simply because it goes beyond literal description. Only flag it if it contradicts the image data, becomes implausible, or replaces almost all visible description with unsupported storytelling.",
+    "- Q2 should answer the exact comparative question. Reward answers that compare both sides and give reasons. Do not treat Q2 as just more photo description.",
+    "- Q3 should usually give a broader opinion, explanation, prediction, or speculation related to the topic. Reward developed reasoning: reasons, examples, consequences, personal experience, comparison, advantages/disadvantages, and cautious speculation.",
+    "- Across the three answers, reward clear comparison language: both, whereas, while, on the other hand, compared with, in contrast, unlike, similarly, the main difference is, and one similarity is.",
+    "- Task fulfilment and topic relevance matter more than showing advanced language for its own sake.",
+    "- Grammar priorities: present continuous for visible actions, there is/there are, present simple, past simple where relevant, comparatives and superlatives, contrast clauses, modals for speculation, basic conditionals, connectors, word order, articles, prepositions, and subject-verb agreement.",
+    "- Vocabulary priorities: concrete topic vocabulary, natural collocations, accurate adjectives for comparison, and specific details.",
+    "- Cohesion: reward connected sentences and clear sequencing. A list of isolated observations is weaker than a short organised comparison.",
+    "- Fluency: infer cautiously from transcript only. You may mention very short answers, repeated restarts, many transcribed fillers, unfinished sentences, or fragmented language, but do not overstate fluency from text.",
+    "- Language errors: include up to three clear, useful fixes per answer. Use exact student words when possible. If there are no clear learner-language errors, return an empty languageErrors array for that answer.",
+    "- Do not put preference-only rewrites in languageErrors. If a phrase is correct but could be shorter, simpler, more focused, more comparative, or more exam-like, mention it in teacherNote, task/content feedback, or priorities instead.",
+    "- Do not create a languageError where original and correction are the same or nearly the same.",
+    "- Do not label repetition, self-correction, filler, or over-explaining as word_order or grammar unless there is a concrete grammar/word-order error.",
+    "- Do not correct correct grammar simply because an alternative tense, linker, or simpler phrasing is also possible.",
+    "- Treat ordinary spoken informality and odd duplicated words cautiously; they may be normal speech or transcription artefacts.",
+    "- If the task data includes descriptions of the two photos, use those descriptions to judge relevance. Do not invent extra image details that are not in the task data.",
+    "",
+    "Question-specific guidance:",
+    "- Q1: Check whether the student describes both photographs and makes at least some comparison.",
+    "- Q2: Check whether the student compares the aspect asked about, chooses a side or explains both sides, and gives reasons.",
+    "- Q3: Check whether the student gives a clear opinion/speculation/explanation beyond the photos.",
+    "",
+    "Calibration:",
+    "- Do not hard-cap the estimated level because this is a single Part 3 task. Limited evidence should lower confidence, not force B1/B2.",
+    "- Use B1 range only for genuinely B1-like performance: mostly clear but limited range, repetitive structures, noticeable learner errors, thin development, weak comparison, partial task fulfilment, or answers that rely heavily on simple description.",
+    "- Use B2 range for clear, relevant, reasonably developed answers with natural connected speech, good everyday vocabulary, mostly controlled grammar, and some successful comparison.",
+    "- Use C1 range for highly natural, flexible, idiomatic answers with strong control, specific detail, clear comparison, good reasoning, and only occasional slips or transcript artefacts.",
+    "- Use C1+ range as the minimum when all three answers are clear and relevant, reasonably developed, and show advanced spoken control.",
+    "- Be generous when the response is clearly communicative and natural: when choosing between adjacent levels, choose the higher label with lower confidence unless there is concrete evidence for the lower label.",
+    "- However, weak or missing comparison is a meaningful Part 3 task issue.",
+    "",
+    "Improved answer rules:",
+    "- Keep the student's original idea where possible.",
+    "- For Q1, model a natural description of both photos grounded in the image data supplied. Include at least one similarity or contrast if appropriate.",
+    "- For Q2, answer the exact comparative question directly and give reasons.",
+    "- For Q3, answer the exact broader opinion/speculation question directly and develop the point with reasons, examples, or consequences.",
+    "- Use natural spoken English suitable for the student's observed level. Do not simplify strong answers into lower-level model answers.",
+    "- Aim for a concise spoken answer, usually around 35-85 words for each 45-second question.",
+    "- If the student's answer is already excellent, keep improvements minimal and say so.",
+    "",
+    "Feedback style: short, encouraging, practical, and specific to the question. Avoid long grammar lectures, harsh wording, official score claims, and pronunciation feedback.",
+    "Use grammar.examples and vocabulary.examples only when they add something not already covered in languageErrors; otherwise return empty arrays.",
+    "Set overall.transcriptCaveat to a short note that feedback is transcript-based and audio-level features are not assessed.",
+    "Return only valid JSON using the required schema.",
+    "",
+    "Photo/task data:",
+    JSON.stringify(task, null, 2),
+    "",
+    "Transcribed answers:",
+    JSON.stringify(items, null, 2),
+  ].join("\n");
+}
+
+function buildAptisSpeakingPart4Prompt(task, item) {
+  return [
+    "You are an English exam speaking feedback assistant for Aptis Speaking Part 4.",
+    "",
+    "The student gave one longer response of up to two minutes, covering three questions on a more abstract topic. The task includes a picture, but the student should not mainly describe the picture. The picture is a prompt for the topic, not the main focus of the answer. This is AI-estimated Aptis-style feedback, not official marking.",
+    "",
+    "Important limitation: you are assessing a transcript. Do not give pronunciation feedback or include pronunciation as a category. Only mention transcript clarity if the transcript is incomplete, unclear, or impossible to interpret. Do not invent accent, intonation, word-stress, phoneme, sound-level, pacing, or pronunciation problems.",
+    "",
+    "Part 4 task format:",
+    "- The student sees a picture and three questions on an abstract topic.",
+    "- The student has one minute to prepare and gives one continuous response of up to two minutes.",
+    "- The response should answer all three questions, not treat them as three completely separate mini-answers.",
+    "- The first one or two questions are often more personal or experiential. The final question is usually broader, more abstract, or opinion-based.",
+    "",
+    "Part 4 priorities:",
+    "- The most important task issue is whether the student answers all three questions clearly and relevantly.",
+    "- Reward answers that are well structured, easy to follow, and sustained across the full response.",
+    "- Strong answers usually move from personal experience to broader opinion or reflection.",
+    "- The student should not spend much time describing the photo. A very brief reference to the picture is acceptable if it introduces the topic, but extended photo description should be flagged as a task-focus problem.",
+    "- Do not punish the student for not describing visible details in the picture.",
+    "- Reward clear signposting between questions or ideas, such as first of all, speaking personally, as for the second question, when it comes to, more generally, overall, and to sum up.",
+    "- Reward development: reasons, examples, consequences, contrasts, personal experience, generalisation, cautious qualification, and abstraction beyond the immediate personal example.",
+    "- Flag answers that are very short, stop after only one or two questions, go off-topic, repeat the same idea without development, or sound like a memorised script.",
+    "- If the student invents a realistic example, do not criticise this. Invented but plausible examples are acceptable if they help answer the question.",
+    "",
+    "Question coverage:",
+    "- Check whether question 1, question 2, and question 3 are each answered clearly.",
+    "- If one question is missing or only touched on very briefly, mention this as a key task issue.",
+    "- If all three questions are answered but the response is unbalanced, explain which part needed more development.",
+    "- If the response answers the topic generally but does not clearly cover the three specific questions, treat this as partial task fulfilment.",
+    "- If the student only describes the picture and does not answer the questions, treat this as a serious task fulfilment problem.",
+    "",
+    "Language priorities:",
+    "- Grammar priorities: present simple for general opinions, past simple and present perfect for experience, comparatives, modals, conditionals, relative clauses, linking clauses, noun phrases, articles, prepositions, word order, subject-verb agreement, and accurate tense control when moving between personal experience and general opinion.",
+    "- Vocabulary priorities: topic-specific vocabulary, natural collocations, precise adjectives, abstract nouns, opinion phrases, and language for cause, consequence, contrast, and generalisation.",
+    "- Cohesion priorities: clear linking between ideas, reference words, sequencing, contrast, addition, cause/reason, result, and summary language.",
+    "- Fluency: infer cautiously from transcript only. You may mention very short answers, repeated restarts, many transcribed fillers, unfinished sentences, circular repetition, or fragmented language, but do not overstate fluency from text.",
+    "- Normal spoken fillers, discourse markers, self-repairs, and informal phrases are acceptable.",
+    "",
+    "Language errors:",
+    "- Include up to five clear, useful language fixes for the whole response.",
+    "- Use exact student words where possible.",
+    "- Prioritise errors that affect clarity, accuracy, naturalness, or repeated patterns.",
+    "- If there are no clear learner-language errors, return an empty languageErrors array.",
+    "- Do not put preference-only rewrites in languageErrors, create a languageError where original and correction are nearly the same, or correct correct grammar simply because another wording is possible.",
+    "",
+    "Calibration:",
+    "- Part 4 targets a higher level than Parts 2 and 3, so weak development, missing questions, or poor organisation matter more here.",
+    "- Do not hard-cap the estimated level because this is a single Part 4 task. Limited evidence should lower confidence, not force a low level.",
+    "- Use B1 range when the answer is mostly understandable but simple, thin, repetitive, only partly developed, heavily dependent on basic structures, or answers only one or two questions clearly.",
+    "- Use B2 range for a clear, relevant response that answers at least two questions well, uses some organisation, gives reasons/examples, and shows reasonably controlled grammar and vocabulary.",
+    "- Use high B2 / B2.2 when all three questions are addressed, the response is organised and sustained, and the language is clear and mostly controlled, but lacks the flexibility, precision, or complexity of C1.",
+    "- Use C1 range when the response addresses all three questions, is well structured, develops ideas naturally, uses some complex grammar accurately, has sufficient vocabulary for abstract discussion, and uses cohesive devices effectively.",
+    "- Use C1+ range when the response is clearly sustained, flexible, well organised, specific, nuanced, and natural, with only minor local slips or transcript artefacts.",
+    "- Do not give C1/C1+ if the student misses one of the three questions, mostly describes the picture, gives only general unsupported points, or cannot sustain the response.",
+    "",
+    "Improved answer rules:",
+    "- Produce one improved two-minute-style answer, not three separate answers.",
+    "- Keep the student's original ideas where possible.",
+    "- Answer all three questions clearly and do not mainly describe the photo.",
+    "- Use natural spoken English suitable for the student's observed level.",
+    "- Aim for a concise but developed spoken response, usually around 140-220 words for the full two-minute answer.",
+    "- If the student's answer is already excellent, keep improvements minimal and say so.",
+    "",
+    "Feedback style: short, encouraging, practical, and specific to the task. Avoid long grammar lectures, harsh wording, official score claims, and pronunciation feedback.",
+    "Make the main priorities easy for a student to act on in their next attempt.",
+    "Use grammar.examples and vocabulary.examples only when they add something not already covered in languageErrors; otherwise return empty arrays.",
+    "Set overall.transcriptCaveat to a short note that feedback is transcript-based and audio-level features are not assessed.",
+    "Return only valid JSON using the required schema.",
+    "",
+    "Photo/task data:",
+    JSON.stringify(task, null, 2),
+    "",
+    "Transcribed Part 4 response:",
+    JSON.stringify(item, null, 2),
+  ].join("\n");
+}
+
 function normalizeFeedbackText(value = "") {
   return String(value || "")
     .toLowerCase()
@@ -1999,7 +2272,7 @@ function preventAdvancedAnswerFlattening(feedback, items = []) {
   return feedback;
 }
 
-function postProcessAptisSpeakingPart2Feedback(feedback, items = []) {
+function postProcessAptisSpeakingPart2Feedback(feedback, items = [], partLabel = "Part 2") {
   if (!feedback || !Array.isArray(feedback.answers)) return feedback;
   if (feedback.overall) {
     if (Array.isArray(feedback.overall.mainPriorities)) {
@@ -2055,11 +2328,11 @@ function postProcessAptisSpeakingPart2Feedback(feedback, items = []) {
       label: "C1+ range",
       confidence: feedback.estimatedLevel?.confidence === "high" ? "high" : "medium",
       note:
-        "AI-estimated Aptis-style feedback, not an official score. The transcript shows advanced spoken control across all three Part 2 answers, so the observed range is at least C1+ for this task.",
+        `AI-estimated Aptis-style feedback, not an official score. The transcript shows advanced spoken control across all three ${partLabel} answers, so the observed range is at least C1+ for this task.`,
     };
     if (feedback.overall) {
       feedback.overall.summary =
-        "A strong advanced Part 2 performance with natural speculation, specific examples, mature reasoning, and only minor local phrasing issues.";
+        `A strong advanced ${partLabel} performance with natural speculation, specific examples, mature reasoning, and only minor local phrasing issues.`;
     }
   }
   return preventAdvancedAnswerFlattening(feedback, items);
@@ -3510,6 +3783,293 @@ exports.generateAptisSpeakingPart2Feedback = functions
 
     return {
       transcripts: items,
+      feedback,
+      meta: {
+        model,
+        transcriptionModel: "gpt-4o-mini-transcribe",
+        responseId: responseJson?.id || null,
+        usage: responseJson?.usage || null,
+        generatedAt: new Date().toISOString(),
+        quota: creditReservation,
+        audioStored: false,
+      },
+    };
+  });
+
+exports.generateAptisSpeakingPart3Feedback = functions
+  .region("europe-west1")
+  .runWith({ timeoutSeconds: 120, memory: "512MB" })
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Sign in before generating speaking feedback.");
+    }
+    if (!OPENAI_API_KEY) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Missing OPENAI_API_KEY in the Functions environment."
+      );
+    }
+
+    const task = normalizeSpeakingPart3Task(data);
+    const recordings = normalizeSpeakingAudioItems(data?.recordings);
+    if (
+      task.questions.length !== 3 ||
+      recordings.length !== 3 ||
+      task.questions.some((item) => !item.question) ||
+      recordings.some((item) => !item.base64)
+    ) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Aptis Speaking Part 3 feedback requires three questions and three recordings."
+      );
+    }
+
+    const totalBase64Bytes = recordings.reduce((sum, item) => sum + item.base64.length, 0);
+    if (totalBase64Bytes > 9_000_000) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "These recordings are too large for the trial feedback request."
+      );
+    }
+
+    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const creditReservation = await consumeWritingFeedbackCredits(
+      context,
+      "aptis_speaking_part3",
+      WRITING_FEEDBACK_CREDIT_COSTS.aptis_speaking_part3
+    );
+
+    let transcripts;
+    try {
+      transcripts = await Promise.all(recordings.map((item, index) => transcribeAudioItem(item, index)));
+    } catch (error) {
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw error;
+    }
+
+    const items = task.questions.map((question, index) => {
+      const transcript = cleanString(transcripts[index] || "", 2400);
+      return {
+        questionId: question.id,
+        questionNumber: question.questionNumber,
+        questionType: question.questionType,
+        question: question.question,
+        transcript,
+        durationSeconds: 45,
+        audioAvailable: true,
+        audioAnalysisAvailable: false,
+        transcriptionConfidence: "medium",
+        wordCount: countWords(transcript),
+      };
+    });
+
+    if (items.every((item) => item.wordCount < 2)) {
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "The recordings could not be transcribed clearly enough to assess."
+      );
+    }
+
+    const requestBody = {
+      model,
+      input: buildAptisSpeakingPart3Prompt(task, items),
+      reasoning: { effort: "low" },
+      max_output_tokens: 5000,
+      text: {
+        verbosity: "low",
+        format: {
+          type: "json_schema",
+          name: "aptis_speaking_part3_feedback",
+          strict: true,
+          schema: APTIS_SPEAKING_PART3_FEEDBACK_SCHEMA,
+        },
+      },
+    };
+
+    let apiResponse;
+    try {
+      apiResponse = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+    } catch (error) {
+      console.error("[generateAptisSpeakingPart3Feedback] OpenAI request failed", error);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("unavailable", "Could not reach the feedback service.");
+    }
+
+    const responseJson = await apiResponse.json().catch(() => null);
+    if (!apiResponse.ok) {
+      console.error("[generateAptisSpeakingPart3Feedback] OpenAI error", responseJson);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "internal",
+        responseJson?.error?.message || "The feedback service returned an error."
+      );
+    }
+
+    const outputText = extractOutputText(responseJson);
+    let feedback;
+    try {
+      feedback = JSON.parse(outputText);
+    } catch (error) {
+      console.error("[generateAptisSpeakingPart3Feedback] JSON parse failed", { outputText, error });
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
+    }
+
+    feedback = postProcessAptisSpeakingPart2Feedback(feedback, items, "Part 3");
+
+    return {
+      transcripts: items,
+      feedback,
+      meta: {
+        model,
+        transcriptionModel: "gpt-4o-mini-transcribe",
+        responseId: responseJson?.id || null,
+        usage: responseJson?.usage || null,
+        generatedAt: new Date().toISOString(),
+        quota: creditReservation,
+        audioStored: false,
+      },
+    };
+  });
+
+exports.generateAptisSpeakingPart4Feedback = functions
+  .region("europe-west1")
+  .runWith({ timeoutSeconds: 120, memory: "512MB" })
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Sign in before generating speaking feedback.");
+    }
+    if (!OPENAI_API_KEY) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Missing OPENAI_API_KEY in the Functions environment."
+      );
+    }
+
+    const task = normalizeSpeakingPart4Task(data);
+    const recordings = normalizeSpeakingAudioItems(data?.recordings).slice(0, 1);
+    if (
+      task.questions.length !== 3 ||
+      recordings.length !== 1 ||
+      task.questions.some((item) => !item.question) ||
+      recordings.some((item) => !item.base64)
+    ) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Aptis Speaking Part 4 feedback requires three questions and one recording."
+      );
+    }
+
+    const totalBase64Bytes = recordings.reduce((sum, item) => sum + item.base64.length, 0);
+    if (totalBase64Bytes > 9_000_000) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "This recording is too large for the trial feedback request."
+      );
+    }
+
+    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const creditReservation = await consumeWritingFeedbackCredits(
+      context,
+      "aptis_speaking_part4",
+      WRITING_FEEDBACK_CREDIT_COSTS.aptis_speaking_part4
+    );
+
+    let transcripts;
+    try {
+      transcripts = await Promise.all(recordings.map((item, index) => transcribeAudioItem(item, index)));
+    } catch (error) {
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw error;
+    }
+
+    const transcript = cleanString(transcripts[0] || "", 4200);
+    const item = {
+      questionId: "part4-talk",
+      question: task.questions.map((question) => question.question).join(" / "),
+      transcript,
+      durationSeconds: 120,
+      audioAvailable: true,
+      audioAnalysisAvailable: false,
+      transcriptionConfidence: "medium",
+      wordCount: countWords(transcript),
+    };
+
+    if (item.wordCount < 2) {
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "The recording could not be transcribed clearly enough to assess."
+      );
+    }
+
+    const requestBody = {
+      model,
+      input: buildAptisSpeakingPart4Prompt(task, item),
+      reasoning: { effort: "low" },
+      max_output_tokens: 5000,
+      text: {
+        verbosity: "low",
+        format: {
+          type: "json_schema",
+          name: "aptis_speaking_part4_feedback",
+          strict: true,
+          schema: APTIS_SPEAKING_PART4_FEEDBACK_SCHEMA,
+        },
+      },
+    };
+
+    let apiResponse;
+    try {
+      apiResponse = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+    } catch (error) {
+      console.error("[generateAptisSpeakingPart4Feedback] OpenAI request failed", error);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("unavailable", "Could not reach the feedback service.");
+    }
+
+    const responseJson = await apiResponse.json().catch(() => null);
+    if (!apiResponse.ok) {
+      console.error("[generateAptisSpeakingPart4Feedback] OpenAI error", responseJson);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "internal",
+        responseJson?.error?.message || "The feedback service returned an error."
+      );
+    }
+
+    const outputText = extractOutputText(responseJson);
+    let feedback;
+    try {
+      feedback = JSON.parse(outputText);
+    } catch (error) {
+      console.error("[generateAptisSpeakingPart4Feedback] JSON parse failed", { outputText, error });
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
+    }
+
+    if (feedback?.answer) {
+      const processed = postProcessAptisSpeakingPart2Feedback({ answers: [feedback.answer] }, [item]);
+      feedback.answer = processed.answers?.[0] || feedback.answer;
+    }
+
+    return {
+      transcripts: [item],
       feedback,
       meta: {
         model,

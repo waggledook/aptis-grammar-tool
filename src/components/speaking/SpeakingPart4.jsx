@@ -8,6 +8,7 @@ import { PART4_TASKS } from "./banks/part4";
 import SpeakingAssignButton from "./SpeakingAssignButton";
 import { getSitePath } from "../../siteConfig.js";
 import SpeakingDemoNotice from "./SpeakingDemoNotice.jsx";
+import SpeakingFeedbackPanel from "./SpeakingFeedbackPanel.jsx";
 
 /**
  * Aptis Speaking – Part 4 (2-minute talk)
@@ -145,6 +146,7 @@ export default function SpeakingPart4({
 
       <Part4Flow
         task={current}
+        user={user}
         prepareSeconds={prepareSeconds}
         speakSeconds={speakSeconds}
         onFinished={async () => {
@@ -174,12 +176,15 @@ export default function SpeakingPart4({
 
 /* ─────────────────────────────────────────────────────────────────────── */
 
-function Part4Flow({ task, prepareSeconds, speakSeconds, onFinished }) {
+function Part4Flow({ task, user, prepareSeconds, speakSeconds, onFinished }) {
     // phases: ready → announce → prep → beep → speak → summary
     const [phase, setPhase] = useState("ready");
     const [left, setLeft] = useState(prepareSeconds);
     const [recording, setRecording] = useState(false);
     const [micError, setMicError] = useState("");
+    const [feedbackLoading, setFeedbackLoading] = useState(false);
+    const [feedbackError, setFeedbackError] = useState("");
+    const [feedbackResult, setFeedbackResult] = useState(null);
   
     const recRef = useRef(null);
     const chunksRef = useRef([]);
@@ -209,6 +214,9 @@ async function ensureAudioContext() {
       setRecording(false);
       setFile(null);
       setMicError("");
+      setFeedbackLoading(false);
+      setFeedbackError("");
+      setFeedbackResult(null);
       stopRecording(true);
       cancelTTS();
     }, [task?.id, prepareSeconds]);
@@ -274,7 +282,63 @@ async function ensureAudioContext() {
   
     async function startPrep() {
       await ensureAudioContext();     // 👈 iOS needs a user-gesture resume
+      setFeedbackError("");
+      setFeedbackResult(null);
+      setFile(null);
       setPhase("announce");
+    }
+
+    async function requestPart4Feedback() {
+      if (!user) {
+        setFeedbackError("Sign in to get AI feedback.");
+        return;
+      }
+      if (!file?.blob) {
+        setFeedbackError("Record your Part 4 answer before requesting feedback.");
+        return;
+      }
+
+      setFeedbackLoading(true);
+      setFeedbackError("");
+      try {
+        const result = await fb.requestAptisSpeakingPart4Feedback({
+          task: {
+            id: task?.id || "",
+            title: task?.title || "",
+            alt: task?.alt || "",
+          },
+          questions: questions.map((text, index) => ({
+            id: `q${index + 1}`,
+            question: text,
+          })),
+          recordings: [{
+            name: file.name || "speaking-part4-talk.webm",
+            mime: file.mime || file.blob.type || "audio/webm",
+            base64: await blobToBase64(file.blob),
+          }],
+        });
+        setFeedbackResult(result);
+        if (result?.feedback && fb.saveSpeakingAiFeedback) {
+          try {
+            await fb.saveSpeakingAiFeedback({
+              part: "part4",
+              taskId: task?.id || "",
+              taskTitle: task?.title || "Speaking Part 4",
+              questions: questions.map((text, index) => ({ id: `q${index + 1}`, question: text })),
+              transcripts: result?.transcripts || [],
+              feedback: result.feedback,
+              meta: result?.meta || null,
+            });
+          } catch (saveError) {
+            console.warn("[Speaking Part 4 feedback] save failed", saveError);
+          }
+        }
+      } catch (error) {
+        console.error("[p4] feedback error", error);
+        setFeedbackError(error?.message || "Could not generate feedback right now.");
+      } finally {
+        setFeedbackLoading(false);
+      }
     }
   
     async function startSpeak() {
@@ -434,6 +498,7 @@ function playBeep(freq = 600, seconds = 1.0){
   
     // UI
     return (
+      <>
       <div className="panes panes-vertical">
         {/* Top: controls + timers */}
         <section className="panel controls-panel">
@@ -498,11 +563,30 @@ function playBeep(freq = 600, seconds = 1.0){
   <>
     <audio controls playsInline preload="metadata" src={file.url} />
     <a className="btn primary" href={file.url} download={file.name}>Download talk</a>
+    <button
+      className="btn primary"
+      onClick={requestPart4Feedback}
+      disabled={!user || feedbackLoading || !file?.blob}
+      title={!user ? "Sign in to get AI feedback" : "Generate transcript-based written feedback"}
+    >
+      {feedbackLoading ? "Getting feedback..." : "Get AI feedback"}
+    </button>
+    <button className="btn" onClick={startPrep}>Start another set</button>
   </>
 )}
             </div>
           )}
   
+          {!user && phase === "summary" && (
+            <p className="muted" style={{ marginTop: ".5rem" }}>
+              Sign in to test transcript-based AI feedback.
+            </p>
+          )}
+          {feedbackError && (
+            <p className="muted" role="alert" style={{ marginTop: ".5rem" }}>
+              {feedbackError}
+            </p>
+          )}
           {micError && <p className="muted" role="alert" style={{ marginTop: ".5rem" }}>{micError}</p>}
         </section>
   
@@ -534,11 +618,27 @@ function playBeep(freq = 600, seconds = 1.0){
           )}
         </section>
       </div>
+      {phase === "summary" && feedbackResult?.feedback && (
+        <SpeakingFeedbackPanel feedbackResult={feedbackResult} questions={questions} />
+      )}
+      </>
     );
   }
   
 
 function formatTime(t){ const m=Math.floor(t/60), s=t%60; return `${m}:${String(s).padStart(2,"0")}`; }
+
+function blobToBase64(blob) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const value = String(reader.result || "");
+      resolve(value.includes(",") ? value.split(",").pop() : value);
+    };
+    reader.onerror = () => reject(reader.error || new Error("Could not read recording."));
+    reader.readAsDataURL(blob);
+  });
+}
 
 /* ─────────────────────────────────────────────────────────────────────── */
 
