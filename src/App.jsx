@@ -150,6 +150,8 @@ import HubAptisGrammarVocabularyMock from "./components/hub/HubAptisGrammarVocab
 import OteDashboard from "./products/ote/OteDashboard.jsx";
 import OteSkillMenu from "./products/ote/OteSkillMenu.jsx";
 import OteSpeakingPart1Guide from "./products/ote/OteSpeakingPart1Guide.jsx";
+import OteSpeakingPart1Menu from "./products/ote/OteSpeakingPart1Menu.jsx";
+import OteSpeakingPart1Practice from "./products/ote/OteSpeakingPart1Practice.jsx";
 import OteSpeakingPart2Menu from "./products/ote/OteSpeakingPart2Menu.jsx";
 import OteSpeakingPart2Voicemails from "./products/ote/OteSpeakingPart2Voicemails.jsx";
 import OteSpeakingPart2GuidedMessage1 from "./products/ote/OteSpeakingPart2GuidedMessage1.jsx";
@@ -318,6 +320,7 @@ const isCoursePack = location.pathname.startsWith("/course-pack");
 const isAdminRoute = location.pathname.startsWith("/admin");
 const isFlashcardsPlayerRoute = /^\/grammar\/flashcards\/[^/]+$/.test(location.pathname);
 const isAptisGrammarVocabularyMockRoute = location.pathname === "/grammar/aptis-mock";
+const isHubCourseTestRunnerRoute = /^\/your-class\/tests\/[^/]+$/.test(location.pathname);
 const currentSite = getSiteVariant();
 const isSeifHubSite = currentSite.id === "seifhub";
 const isOteSite = currentSite.id === "ote";
@@ -1015,7 +1018,7 @@ return (
     <SupportMessageWidget
       user={user}
       site={currentSite.id}
-      hidden={showAuth || isOteExamRoute || isAptisGrammarVocabularyMockRoute}
+      hidden={showAuth || isOteExamRoute || isAptisGrammarVocabularyMockRoute || isHubCourseTestRunnerRoute}
     />
     <div className={`content-container ${isWideLayout ? "content-container--full" : ""} ${(isOteExamRoute || isAptisGrammarVocabularyMockRoute) ? "content-container--exam" : ""}`}>
       {/* Auth bar */}
@@ -1201,7 +1204,10 @@ return (
 
   <Route path="/ote" element={<OteDashboard user={user} nativeRoutes={false} />} />
   <Route path="/ote/speaking" element={<OteSkillMenu skill="speaking" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
-  <Route path="/ote/speaking/part-1-interview" element={<OteSpeakingPart1Guide nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-1-interview" element={<OteSpeakingPart1Menu nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-1-interview/overview" element={<OteSpeakingPart1Guide nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-1-interview/practice" element={<OteSpeakingPart1Practice nativeRoutes={false} />} />
+  <Route path="/ote/speaking/part-1-interview/practice/:setId" element={<OteSpeakingPart1Practice nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-2-voicemails" element={<OteSpeakingPart2Menu nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-2-voicemails/overview" element={<OteSpeakingPart2Voicemails nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-2-voicemails/guided-message-1" element={<OteSpeakingPart2GuidedMessage1 nativeRoutes={false} />} />
@@ -1251,7 +1257,10 @@ return (
     element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
   />
   <Route path="/ote/mock-tests/:mockId/results/:attemptId" element={<OteSpeakingResults user={user} homePath="/ote" />} />
-  <Route path="/speaking/part-1-interview" element={<OteSpeakingPart1Guide nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/part-1-interview" element={<OteSpeakingPart1Menu nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/part-1-interview/overview" element={<OteSpeakingPart1Guide nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/part-1-interview/practice" element={<OteSpeakingPart1Practice nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/part-1-interview/practice/:setId" element={<OteSpeakingPart1Practice nativeRoutes={isOteSite} />} />
   <Route path="/speaking/part-2-voicemails" element={<OteSpeakingPart2Menu nativeRoutes={isOteSite} />} />
   <Route path="/speaking/part-2-voicemails/overview" element={<OteSpeakingPart2Voicemails nativeRoutes={isOteSite} />} />
   <Route path="/speaking/part-2-voicemails/guided-message-1" element={<OteSpeakingPart2GuidedMessage1 nativeRoutes={isOteSite} />} />

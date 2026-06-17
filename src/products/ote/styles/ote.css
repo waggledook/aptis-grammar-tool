@@ -1833,8 +1833,46 @@
 
 .ote-practice-progress {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  gap: 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 0.85rem 1rem;
+}
+
+.ote-practice-progress > div:first-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.ote-practice-progress span {
+  color: var(--ote-dashboard-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-practice-progress strong {
+  color: var(--color-text);
+  font-size: 1.02rem;
+}
+
+.ote-practice-progress-bar {
+  overflow: hidden;
+  height: 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-border) 55%, transparent);
+}
+
+.ote-practice-progress-bar span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--ote-dashboard-accent), var(--ote-dashboard-primary));
+  transition: width 0.2s ease;
 }
 
 .ote-practice-step,
@@ -1951,6 +1989,22 @@
   margin: 0 0 0.9rem;
   color: var(--color-text-soft);
   line-height: 1.5;
+}
+
+.ote-practice-complete-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 1rem 0 1.4rem;
+}
+
+.ote-practice-complete-actions .ote-reference-download,
+.ote-practice-complete-actions .ote-training-primary-link {
+  min-height: 52px;
+  min-width: 180px;
+  padding: 0.8rem 1rem;
+  line-height: 1.1;
 }
 
 .ote-part34-image-grid {

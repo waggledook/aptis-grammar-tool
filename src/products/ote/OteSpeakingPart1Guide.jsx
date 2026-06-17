@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { ArrowLeft, CheckCircle2, Clock3, ListChecks, MessageCircleQuestion, RotateCcw, XCircle, Zap } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clock3, ListChecks, RotateCcw, XCircle, Zap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
@@ -100,7 +100,7 @@ function QuizQuestion({ question, selectedAnswer, onSelect }) {
 export default function OteSpeakingPart1Guide({ nativeRoutes = false }) {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
-  const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
+  const menuPath = getSitePath(nativeRoutes ? "/speaking/part-1-interview" : "/ote/speaking/part-1-interview");
   const answeredCount = Object.keys(answers).length;
   const correctCount = useMemo(
     () => quizQuestions.filter((question) => answers[question.id] === question.answer).length,
@@ -118,9 +118,9 @@ export default function OteSpeakingPart1Guide({ nativeRoutes = false }) {
         description="Learn how to answer the first questions in the OTE Speaking test and practice with our quick review quiz."
       />
 
-      <button className="ote-training-back" type="button" onClick={() => navigate(speakingPath)}>
+      <button className="ote-training-back" type="button" onClick={() => navigate(menuPath)}>
         <ArrowLeft size={18} aria-hidden="true" />
-        Back to speaking
+        Back to interview training
       </button>
 
       <header className="ote-training-hero">
@@ -246,13 +246,6 @@ export default function OteSpeakingPart1Guide({ nativeRoutes = false }) {
             </button>
           </div>
         )}
-      </section>
-
-      <section className="ote-training-section">
-        <button className="ote-training-primary-link" type="button" onClick={() => navigate(speakingPath)}>
-          Back to Speaking Training
-          <MessageCircleQuestion size={17} aria-hidden="true" />
-        </button>
       </section>
     </main>
   );
