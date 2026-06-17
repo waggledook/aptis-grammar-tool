@@ -1,0 +1,325 @@
+[
+  {
+    "id": "b1_tense_01",
+    "level": "B1",
+    "tag": "Narrative Tenses",
+    "sentence": "I ___ to the cinema when I saw her.",
+    "options": [
+      "go",
+      "was going",
+      "have gone"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'go' is present and doesn’t match the past context.",
+      "Correct: 'was going' sets up a past continuous action interrupted by another event.",
+      "Incorrect: 'have gone' is present perfect, which doesn't fit this timeline."
+    ]
+  },
+  {
+    "id": "b1_past_01",
+    "level": "B1",
+    "tag": "Narrative Tenses",
+    "sentence": "We ___ to Italy last summer.",
+    "options": [
+      "go",
+      "went",
+      "gone"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'go' is present tense and doesn’t fit the past time marker.",
+      "Correct: 'went' is the past form of 'go' and fits the sentence.",
+      "Incorrect: 'gone' is a past participle, not used without an auxiliary."
+    ]
+  },
+  {
+    "id": "b1_narr_01",
+    "level": "B1",
+    "tag": "Narrative Tenses",
+    "sentence": "I ___ in the shower when I heard a loud crash.",
+    "options": [
+      "sang",
+      "had sung",
+      "was singing"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'sang' suggests a finished action, not one in progress.",
+      "Incorrect: 'had sung' places the action before another past point, not at the same time.",
+      "Correct: Past continuous describes an action in progress interrupted by another."
+    ]
+  },
+  {
+    "id": "b2_narr_02",
+    "level": "B1",
+    "tag": "Narrative Tenses",
+    "sentence": "By the time we arrived, the guests ___.",
+    "options": [
+      "already leave",
+      "had already left",
+      "left already"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'already leave' is present and this is a past situation",
+      "Correct: 'had already left':Past perfect shows the action was completed before our arrival.",
+      "Incorrect: 'left already' Past simple doesn’t clearly mark the earlier action here."
+    ]
+  },
+  {
+    "id": "b2_narr_03",
+    "level": "B2",
+    "tag": "Narrative Tenses",
+    "sentence": "She ___ for over an hour when he finally called.",
+    "options": [
+      "was waiting",
+      "had been waiting",
+      "waited"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'was waiting': Past continuous indicates a continuous action, but the duration 'for over an hour' requires the perfect form ",
+      "Correct: Past perfect continuous shows ongoing duration before another past event afer 'for over an hour'.",
+      "Incorrect: Past simple doesn’t express continuity or duration."
+    ]
+  },
+  {
+    "id": "c1_narr_04",
+    "level": "C1",
+    "tag": "Narrative Tenses",
+    "sentence": "Every summer, we ___ a cottage by the lake.",
+    "options": [
+      "were renting",
+      "would rent",
+      "use to rent"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: Past continuous suggests a temporary ongoing action, not a repeated habit.",
+      "Correct: 'would' + base verb expresses a past habit with time framing.",
+      "Incorrect: 'use to rent' is wrong here because we need past simple 'used to'."
+    ]
+  },
+  {
+    "id": "b1_narr_05",
+    "level": "B1",
+    "tag": "Narrative Tenses",
+    "sentence": "When I got to the station, the train ___.",
+    "options": [
+      "already went",
+      "had already gone",
+      "were going"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'already went': Past simple doesn’t show that it happened before my arrival and is not normally used with 'already'.",
+      "Correct: 'had already gone': Past perfect shows the train had left before the later past action.",
+      "Incorrect: 'were going' Past continuous is incorrect here because the train is singular and goes with 'was'."
+    ]
+  },
+  {
+    "id": "b1_narr_06",
+    "level": "B1",
+    "tag": "Narrative Tenses",
+    "sentence": "He ___ dinner when the lights went out.",
+    "options": [
+      "was having",
+      "had",
+      "has"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'was having': Past continuous is used for an action in progress interrupted by another.",
+      "Incorrect: 'had': Past simple means he had dinner after the lights went out, which doesn't make sense here.",
+      "Incorrect: 'has': Present tense is incorrect as this is a past situation: 'went out': past simple."
+    ]
+  },
+  {
+    "id": "b1_narr_08",
+    "level": "B1",
+    "tag": "Narrative Tenses",
+    "sentence": "She ___ the documents and put them in the drawer.",
+    "options": [
+      "has signed",
+      "was signing",
+      "signed"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect:'has signed': Present perfect is incorrect as it is a past situation: 'she put' is past simple..",
+      "Incorrect: 'was signing': Past continuous suggests an action in progress, not completed.",
+      "Correct: Past simple is used for a sequence of completed past events. first she 'signed' then she 'put'"
+    ]
+  },
+  {
+    "id": "c1_narr_09",
+    "level": "C1",
+    "tag": "Narrative Tenses",
+    "sentence": "Back then, we ___ the same pub every Friday after work.",
+    "options": [
+      "were visiting",
+      "had visited",
+      "would visit"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'were visiting': Past continuous doesn’t express regularity or habit.",
+      "Incorrect: 'had visited': past perfect does not describe a past habit, 'back then'.",
+      "Correct: 'Would' is used for repeated past habits, especially with time markers like 'every Friday'."
+    ]
+  },
+  {
+    "id": "b2_narr_10",
+    "level": "B2",
+    "tag": "Narrative Tenses",
+    "sentence": "By the time the police arrived, the burglars ___.",
+    "options": [
+      "had escaped",
+      "escaped",
+      "have escaped"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: Past perfect shows the burglars left before the police arrived.",
+      "Incorrect: Past simple might imply both actions happened in sequence, not clearly separated in time.",
+      "Incorrect: Present perfect doesn't go with this past situation, relative to a past action: 'escaped'."
+    ]
+  },
+  {
+    "id": "b1_narr_fix_01",
+    "level": "B1",
+    "tag": "Narrative Tenses",
+    "sentence": "While I ___ the door, the phone rang.",
+    "options": [
+      "open",
+      "was opening",
+      "had opened"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'open': present simple is wrong because this is a past situation: 'rang'.",
+      "Correct: Past continuous expresses the action in progress when another action happened.",
+      "Incorrect: Past perfect suggests the action was completed before the phone rang, but doesn't fit with 'while'."
+    ]
+  },
+  {
+    "id": "b2_narr_12",
+    "level": "B2",
+    "tag": "Narrative Tenses",
+    "sentence": "They ___ for hours when they finally reached the campsite.",
+    "options": [
+      "were walking",
+      "walked",
+      "had been walking"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: Past continuous shows an ongoing action but doesn’t show past duration which we need with 'for hours'.",
+      "Incorrect: 'walked': is incorrect because we need the perfect with the duration 'for hours'",
+      "Correct: 'had been walking: Past perfect continuous is used for actions continuing up to a point in the past, especially with a duration: 'for hours'."
+    ]
+  },
+  {
+    "id": "c1_narr_14",
+    "level": "C1",
+    "tag": "Narrative Tenses",
+    "sentence": "When we were children, we ___ by candlelight during power cuts.",
+    "options": [
+      "had read",
+      "were reading",
+      "would read"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'had read': Past perfect doesn’t describe a habitual action",
+      "Incorrect: 'were reading': Past continuous is not used for repeated past habits.",
+      "Correct: 'Would' is appropriate to describe past repeated actions or habits."
+    ]
+  },
+  {
+    "id": "b1_narr_16",
+    "level": "B1",
+    "tag": "Narrative Tenses",
+    "sentence": "We ___ in the garden when it suddenly started to rain.",
+    "options": [
+      "sat",
+      "were sitting",
+      "had sat"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Sat' doesn't express an ongoing action at the moment of interruption.",
+      "Correct: 'were sitting: Past continuous is used for actions in progress.",
+      "Incorrect: 'had sat': Past perfect isn't correct because it doesn't express a continuous action as the rain started."
+    ]
+  },
+  {
+    "id": "b2_narr_17",
+    "level": "B2",
+    "tag": "Narrative Tenses",
+    "sentence": "By the time I got to the party, everyone ___.",
+    "options": [
+      "left",
+      "had been left",
+      "was leaving"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: Past simple doesn’t clearly show which event happened first.",
+      "Incorrect: 'had been left' Past perfect is incorrect because it is in the PASSIVE VOICE. 'had left' would be correct",
+      "Correct: 'was leaving: Past continuous suggests that people had started leaving, but not everyone had left yet."
+    ]
+  },
+  {
+    "id": "c1_narr_18",
+    "level": "C1",
+    "tag": "Narrative Tenses",
+    "sentence": "He ___ the piano every day when he was young.",
+    "options": [
+      "would play",
+      "was playing",
+      "had played"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Would' describes a habitual action in the past.",
+      "Incorrect: 'was playing': Past continuous does not express repeated past habit.",
+      "Incorrect: 'had played': Past perfect refers to a specific earlier event, not a habit."
+    ]
+  },
+  {
+    "id": "b1_narr_19",
+    "level": "B1",
+    "tag": "Narrative Tenses",
+    "sentence": "They ___ dinner when the guests arrived.",
+    "options": [
+      "were having",
+      "had",
+      "have had"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'were having': Past continuous expresses the action in progress.",
+      "Incorrect: 'had': Past simple doesn’t convey that the action was ongoing. 'had had', past perfect would be correct",
+      "Incorrect: 'Have had' is a present perfect form, not appropriate for this past situation."
+    ]
+  },
+  {
+    "id": "b2_narr_fix_01",
+    "level": "B2",
+    "tag": "Narrative Tenses",
+    "sentence": "She had a headache because she ___ all morning without a break.",
+    "options": [
+      "worked",
+      "was working",
+      "had been working"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: Past simple doesn’t convey the idea of continuous effort over time.",
+      "Incorrect: 'was working': Past continuous would be correct without the duration 'all morning'.",
+      "Correct: 'had been working': Past perfect continuous is correct here because we have the duration 'all morning' which requires the perfect form."
+    ]
+  }
+]

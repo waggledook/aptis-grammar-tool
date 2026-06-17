@@ -1,0 +1,427 @@
+[
+  {
+    "id": "b2_verbpat_01",
+    "level": "B1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "She enjoys ___ in the mountains.",
+    "options": [
+      "to hike",
+      "hiking",
+      "hike"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'to hike' doesn't follow the correct verb pattern after 'enjoys'.",
+      "Correct: 'hiking' is a gerund, which is used after verbs like 'enjoy'.",
+      "Incorrect: 'hike' is a bare infinitive, which is not used here."
+    ]
+  },
+  {
+    "id": "b2_gerinf_01",
+    "level": "B2",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "He promised ___ me as soon as he arrived.",
+    "options": [
+      "call",
+      "to call",
+      "calling"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'call' is a bare infinitive, not used after 'promised'.",
+      "Correct: 'to call' is the proper infinitive form after 'promised'.",
+      "Incorrect: 'calling' is a gerund, which doesn’t follow 'promised'."
+    ]
+  },
+  {
+    "id": "b2_infclauses_01",
+    "level": "B2",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "She was the first person ___ the new software.",
+    "options": [
+      "trying",
+      "to try",
+      "tried"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'trying' doesn’t fit after 'the first person'.",
+      "Correct: 'to try' is the correct infinitive structure after ordinal expressions.",
+      "Incorrect: 'tried' is past simple, which is not grammatically correct here."
+    ]
+  },
+  {
+    "id": "b1_ginf_01",
+    "level": "B1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "She promised ___ him with the project over the weekend.",
+    "options": [
+      "help",
+      "helping",
+      "to help"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: promise + to inf'.",
+      "Incorrect: 'Helping' is a gerund, but 'promise' takes the infinitive.",
+      "Correct: We use 'to + inf' after 'promise'."
+    ]
+  },
+  {
+    "id": "b2_ginf_02",
+    "level": "B2",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "He avoided ___ about the argument during dinner.",
+    "options": [
+      "to speak",
+      "speaking",
+      "speak"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Avoid' is followed by a gerund, not an infinitive.",
+      "Correct: 'Avoid' is one of many verbs followed by a gerund.",
+      "Incorrect: 'Avoid' is followed by a gerund, not the infinitive without to."
+    ]
+  },
+  {
+    "id": "b1_ginf_03",
+    "level": "B1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "I can’t afford ___ a new phone right now.",
+    "options": [
+      "buying",
+      "to buy",
+      "buy"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Afford' is followed by the infinitive, not the gerund.",
+      "Correct: 'Can’t afford to +inf' is the correct structure.",
+      "Incorrect: 'can’t afford' takes the to inf."
+    ]
+  },
+  {
+    "id": "b2_ginf_04",
+    "level": "C1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "I regret ___ you that your application was unsuccessful.",
+    "options": [
+      "informing",
+      "inform",
+      "to inform"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'Informing' would refer to a past action you already did. In this case, we regret something we are doing in the moment of speaking",
+      "Incorrect: Regret takes the to infinitive or the gerund.",
+      "Correct: 'Regret to do something' = sorry to say/tell someone bad news."
+    ]
+  },
+  {
+    "id": "b2_ginf_05",
+    "level": "B2",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "They stopped ___ when the teacher entered the room.",
+    "options": [
+      "to talk",
+      "talking",
+      "talk"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Stopped to talk' would mean they stopped another action in order to talk.",
+      "Correct: 'Stopped talking': the gerund is the activity which is stopped",
+      "Incorrect: Stopped never goes with the infinitive without to."
+    ]
+  },
+  {
+    "id": "b2_ginf_06",
+    "level": "B2",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "He admitted ___ the mistake during the meeting.",
+    "options": [
+      "to make",
+      "making",
+      "make"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: Admit always takes a gerund.",
+      "Correct: 'Admit' is followed by a gerund.",
+      "Incorrect: Admit always takes a gerund."
+    ]
+  },
+  {
+    "id": "b2_ginf_07",
+    "level": "B2",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "We decided ___ the meeting until next week.",
+    "options": [
+      "to postpone",
+      "postponing",
+      "postpone"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Decide' is followed by 'to + infinitive'.",
+      "Incorrect: Gerund is not used after 'decide'.",
+      "Incorrect: 'Decide' is followed by 'to + infinitive'."
+    ]
+  },
+  {
+    "id": "b2_ginf_08",
+    "level": "B2",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "He admitted to ___ the documents without permission.",
+    "options": [
+      "access",
+      "accessing",
+      "accesses"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect:'to here is a preposition, and so is followed by verb-ing.",
+      "Correct: 'Admitted to' is followed by a gerund.",
+      "Incorrect: We can't use a verb in the present simple after a preposition."
+    ]
+  },
+  {
+    "id": "b2_ginf_09",
+    "level": "B2",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "He forgot ___ the door before leaving.",
+    "options": [
+      "lock",
+      "locking",
+      "to lock"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'forget' takes either the gerund or infinitive'.",
+      "Incorrect: 'forget' can take the gerund, when referring to a memory we have. e.g 'I won't forget meeting you'",
+      "Correct: 'Forgot to lock' = he didn’t do it."
+    ]
+  },
+  {
+    "id": "b2_ginf_10",
+    "level": "B2",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "It was really boring. He went on ___ about his trip for hours.",
+    "options": [
+      "to talk",
+      "talking",
+      "talk"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Go on to infinitive' means you stop one activity and start another.",
+      "Correct: 'Go on + verb-ing' = he continued the same activity.",
+      "Incorrect: Go on never goes with the infinitive without 'to'."
+    ]
+  },
+  {
+    "id": "c1_ginf_12b",
+    "level": "C1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "They were forbidden ___ their phones during the exam.",
+    "options": [
+      "using",
+      "to using",
+      "to use"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: forbid + to infinitive.",
+      "Incorrect: forbid does not take the gerund.",
+      "Correct: 'forbid' takes the infinitive with 'to'."
+    ]
+  },
+  {
+    "id": "c1_ginf_13b",
+    "level": "B1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "He promised ___ the documents by Friday.",
+    "options": [
+      "sending",
+      "send",
+      "to send"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'Promised sending' is not standard.",
+      "Incorrect: The bare infinitive isn't used after 'promised'.",
+      "Correct: 'Promise' is followed by 'to + base verb'."
+    ]
+  },
+  {
+    "id": "c1_ginf_14b",
+    "level": "B2",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "The manager agreed ___ us more time to finish.",
+    "options": [
+      "giving",
+      "give",
+      "to give"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'agree' + to infinitive.",
+      "Incorrect: 'agree' doesn't take the infinitive without 'to'.",
+      "Correct: 'Agree' is followed by the infinitive with 'to'."
+    ]
+  },
+  {
+    "id": "c1_ginf_11",
+    "level": "B2",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "I don’t mind you ___ late as long as you call.",
+    "options": [
+      "arriving",
+      "to arrive",
+      "arrive"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Mind' is followed by a gerund.",
+      "Incorrect: 'To arrive' is not used with 'mind'.",
+      "Incorrect: 'mind' to verb-ing always'"
+    ]
+  },
+  {
+    "id": "c1_ginf_12",
+    "level": "C1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "You had better ___ your boss before making changes.",
+    "options": [
+      "consult",
+      "consulting",
+      "to consult"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Had better' works like a modal verb (similar meaning to 'should') and takes the infinitive without 'to'.",
+      "Incorrect: had better + infinitive without 'to'.",
+      "Incorrect: had better + infinitive without 'to'."
+    ]
+  },
+  {
+    "id": "c1_ginf_13",
+    "level": "C1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "I suggest ___ the train to avoid traffic.",
+    "options": [
+      "take",
+      "taking",
+      "to take"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'suggest' + verb-ing.",
+      "Correct: 'Suggest' is typically followed by a gerund.",
+      "Incorrect: suggest + to infinitive is not standard."
+    ]
+  },
+  {
+    "id": "c1_ginf_14",
+    "level": "C1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "He denied ___ the email, even though we had proof.",
+    "options": [
+      "to send",
+      "sending",
+      "send"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Deny' takes a gerund, not an infinitive.",
+      "Correct: 'Denied sending' is the standard form.",
+      "Incorrect: deny + verb-ing always."
+    ]
+  },
+  {
+    "id": "c1_ginf_15",
+    "level": "C1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "Is it really worth ___ a complaint? They won’t do anything.",
+    "options": [
+      "to make",
+      "make",
+      "making"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'Worth' is not followed by an infinitive.",
+      "Incorrect: 'Worth' + verb-ing.",
+      "Correct: 'Worth is followed by a gerund or a noun."
+    ]
+  },
+  {
+    "id": "c1_ginf_16",
+    "level": "C1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "She was forbidden ___ the lab without supervision.",
+    "options": [
+      "entering",
+      "to enter",
+      "to entering"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Forbid' takes to + infinitive.",
+      "Correct: forbid (somebody9 + to infinitive.",
+      "Incorrect: forbid never takes the gerund."
+    ]
+  },
+  {
+    "id": "c1_ginf_17",
+    "level": "C1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "We managed to avoid ___ by the traffic cameras.",
+    "options": [
+      "being caught",
+      "to be caught",
+      "caught"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Avoid' is followed by a gerund. Passive form = 'being caught'.",
+      "Incorrect: avoid 'verb-ing'.",
+      "Incorrect: 'being' is necessary as this is a passive voice."
+    ]
+  },
+  {
+    "id": "c1_ginf_18",
+    "level": "C1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "They let us ___ the venue earlier than usual.",
+    "options": [
+      "to enter",
+      "entering",
+      "enter"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'Let' is followed by the infinitive without to.",
+      "Incorrect: 'Let' does not take a gerund'.",
+      "Correct: 'Let someone do something', let takes infinitive without to."
+    ]
+  },
+  {
+    "id": "c1_ginf_19",
+    "level": "C1",
+    "tag": "Gerunds and Infinitives",
+    "sentence": "The therapist recommended ___ a journal every night.",
+    "options": [
+      "to keep",
+      "keep",
+      "keeping"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: recommend + to infinitive is not standard.",
+      "Incorrect: recommend + verb-ing.",
+      "Correct: 'Recommend' is followed by a gerund."
+    ]
+  }
+]

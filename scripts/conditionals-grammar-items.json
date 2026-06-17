@@ -1,0 +1,308 @@
+[
+  {
+    "id": "b1_cond_01",
+    "level": "B1",
+    "tag": "Conditionals",
+    "sentence": "If she ___ earlier, she wouldn't have missed the bus.",
+    "options": [
+      "left",
+      "had left",
+      "leaves"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'left' is simple past, but the third conditional requires past perfect.",
+      "Correct: 'had left' fits the third conditional structure for past regrets.",
+      "Incorrect: 'leaves' is present tense and not appropriate in this past hypothetical."
+    ]
+  },
+  {
+    "id": "b1_cond0_01",
+    "level": "B1",
+    "tag": "Conditionals",
+    "sentence": "If she’s not too tired in the evenings, she ___ to the gym.",
+    "options": [
+      "will go",
+      "is going",
+      "goes"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'will go', for a first conditinal, suggests a specific future instance, not a routine.",
+      "Incorrect: 'is going' is present continuous, which doesn’t fit habitual meaning here.",
+      "Correct: Zero conditionals use present simple in both clauses to describe habits or routines."
+    ]
+  },
+  {
+    "id": "b1_cond1_01",
+    "level": "B1",
+    "tag": "Conditionals",
+    "sentence": "If she doesn’t set an alarm, she ___ late for work tomorrow.",
+    "options": [
+      "is",
+      "will be",
+      "was"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'is' would suggest a general fact, not a specific future situation.",
+      "Correct: First conditional uses 'will' in the remain clause to talk about future possibilities.",
+      "Incorrect: 'was' is past tense and doesn't fit a future conditional."
+    ]
+  },
+  {
+    "id": "b2_cond2_01",
+    "level": "B2",
+    "tag": "Conditionals",
+    "sentence": "If I ___ more confident, I would speak up in meetings.",
+    "options": [
+      "had been",
+      "were",
+      "am"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'had been' is past perfect, used in third conditionals.",
+      "Correct: In the second conditional, we use past simple in the 'if' clause, often 'were' for all subjects.",
+      "Incorrect: 'am' is present simple and doesn’t match this hypothetical structure."
+    ]
+  },
+  {
+    "id": "c1_condinv_01",
+    "level": "C1",
+    "tag": "Conditionals",
+    "sentence": "Had they known the truth, they ___ things differently.",
+    "options": [
+      "did",
+      "will do",
+      "would have done"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'did' is simple past, which doesn’t show the hypothetical.",
+      "Incorrect: 'will do' expresses future and doesn't suit a past hypothetical.",
+      "Correct: This is an inverted third conditional. 'Had they known' = 'If they had known'."
+    ]
+  },
+  {
+    "id": "c1_mixedcond_01",
+    "level": "C1",
+    "tag": "Conditionals",
+    "sentence": "If I had taken that job, I ___ in New York now.",
+    "options": [
+      "would have lived",
+      "would be living",
+      "live"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'would have lived' expresses a completed past result, but 'now' refers to the present.",
+      "Correct: This is a mixed conditional: past condition with a present result.",
+      "Incorrect: 'live' is present simple which isn't used in an unreal conditional."
+    ]
+  },
+  {
+    "id": "b1_cond0_02",
+    "level": "B1",
+    "tag": "Conditionals",
+    "sentence": "If people don't drink enough water, they ___ dehydrated.",
+    "options": [
+      "got",
+      "get",
+      "will get"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'got' is past tense and does not describe a situation that's always true.",
+      "Correct: This is a zero conditional describing a general consequence.",
+      "Incorrect: 'will get' is used in first conditionals, suggests a specific future outcome, not a general truth."
+    ]
+  },
+  {
+    "id": "b1_cond1_02",
+    "level": "B1",
+    "tag": "Conditionals",
+    "sentence": "If it rains tomorrow, we ___ the picnic.",
+    "options": [
+      "won’t have",
+      "don’t have",
+      "didn’t have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: In first conditionals, we use present simple in the 'if' clause and 'will/won’t' in the result.",
+      "Incorrect: 'don’t have' is present simple, which would be used in a habitual or zero conditional.",
+      "Incorrect: 'didn’t have' is past simple, which doesn't express a future possibility."
+    ]
+  },
+  {
+    "id": "b2_cond2_02",
+    "level": "B1",
+    "tag": "Conditionals",
+    "sentence": "If I won the lottery, I ___ a house by the sea.",
+    "options": [
+      "bought",
+      "would buy",
+      "will buy"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'bought' is past simple and we need would (or could) in the main clause.",
+      "Correct: Second conditional expresses an unreal or unlikely present/future situation.",
+      "Incorrect: 'will buy' fits a first conditional, not a hypothetical one."
+    ]
+  },
+  {
+    "id": "c1_cond3_01",
+    "level": "B2",
+    "tag": "Conditionals",
+    "sentence": "If they had left earlier, they ___ the train.",
+    "options": [
+      "would catch",
+      "caught",
+      "would have caught"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'would catch' fits a second conditional (unreal present/future).",
+      "Incorrect: 'caught' is simple past, and we need 'would have' in the main clauses of 3rd conditional.",
+      "Correct: Third conditional = past perfect + would have + past participle."
+    ]
+  },
+  {
+    "id": "c1_cond_mixed_02",
+    "level": "B2",
+    "tag": "Conditionals",
+    "sentence": "If I hadn’t skipped breakfast, I ___ so hungry now.",
+    "options": [
+      "wouldn’t have been",
+      "won't be",
+      "wouldn't be"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'wouldn’t have been' is a third conditional with a past result, but the clause refers to NOW.",
+      "Incorrect: 'won’t be' refers to a future outcome, not present.",
+      "Correct: This is a mixed conditional — past action with a present result."
+    ]
+  },
+  {
+    "id": "c1_cond_alt_01",
+    "level": "B1",
+    "tag": "Conditionals",
+    "sentence": "Unless we leave now, we ___ the beginning of the film.",
+    "options": [
+      "missed",
+      "will miss",
+      "would miss"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'missed' is past simple and doesn’t refer to the future.",
+      "Correct: 'Unless' functions like 'if not' in a first conditional structure.",
+      "Incorrect: 'would miss' fits a second conditional (unreal), not this real future scenario."
+    ]
+  },
+  {
+    "id": "b2_ifclause_01",
+    "level": "B1",
+    "tag": "Conditionals",
+    "sentence": "We would go hiking more often if the weather ___ better.",
+    "options": [
+      "were",
+      "had been",
+      "is"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'were' is past simple, which is used in 2nd conditionals for present or future hypothetical situations",
+      "Incorrect: 'had been' would be a 3rd conditional, a hypothetical past situaation. We 'would have gone hiking' would be needed in the other clause",
+      "InCorrect: 'Is' would be correct in a first or zero conditional, using 'will go' or 'go' in the main clause."
+    ]
+  },
+  {
+    "id": "c1_invif_01",
+    "level": "C1",
+    "tag": "Conditionals",
+    "sentence": "Were she to accept the job, she ___ to relocate immediately.",
+    "options": [
+      "had",
+      "would have",
+      "will have"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'had' is not correct: we need 'would' in the main clause.",
+      "Correct: This is a formal inverted second conditional: 'Were she to...' = 'if she were to accept' or 'If she accepted...'.",
+      "Incorrect: 'will have' fits a first conditional, not a hypothetical one."
+    ]
+  },
+  {
+    "id": "c1_cond_adv_01",
+    "level": "B1",
+    "tag": "Conditionals",
+    "sentence": "Take a coat ___ it gets cold later.",
+    "options": [
+      "in case",
+      "unless",
+      "even if"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'in case' is used to express precaution — you take the coat to be prepared.",
+      "Incorrect: 'unless' means 'if not' and 'if it doesn't get cold later' doesn't make sense.",
+      "Incorrect: 'even if' implies doing something *despite* a possible condition, which doesn't fit here."
+    ]
+  },
+  {
+    "id": "b2_ifneg_01",
+    "level": "B2",
+    "tag": "Conditionals",
+    "sentence": "If he hadn’t ignored the instructions, he ___ so many mistakes.",
+    "options": [
+      "wouldn't have made",
+      "wouldn’t make",
+      "won’t make"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: This is a third conditional with a past regret using 'would have + past participle'.",
+      "Incorrect: 'wouldn’t make' is second conditional (unreal present), not appropriate here.",
+      "Incorrect: 'won’t make' refers to future, not past events."
+    ]
+  },
+  {
+    "id": "c1_cond_provided_01",
+    "level": "B2",
+    "tag": "Conditionals",
+    "sentence": "You can borrow the car ___ you drive carefully.",
+    "options": [
+      "unless",
+      "even though",
+      "provided that"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'unless' would imply the opposite condition.",
+      "Incorrect: 'even though' introduces contrast, not condition.",
+      "Correct: 'provided that' introduces a condition and is a formal alternative to 'if'."
+    ]
+  },
+  {
+    "id": "c1_cond_unlesspast_01",
+    "level": "C1",
+    "tag": "Conditionals",
+    "sentence": "He wouldn’t have succeeded unless someone ___ him a second chance.",
+    "options": [
+      "gives",
+      "had given",
+      "would have given"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'gives' is present simple, which doesn’t fit a past hypothetical.",
+      "Correct: Third conditionals use past perfect in the conditional clause — here introduced with 'unless'.",
+      "Incorrect: 'would have given' is inccorect as we don't use would in the conditional clause."
+    ]
+  }
+]

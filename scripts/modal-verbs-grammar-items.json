@@ -1,0 +1,444 @@
+[
+  {
+    "id": "c1_modals_01",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "He ___ told her the truth. She was furious when she found out he was lying.",
+    "options": [
+      "must have",
+      "can't have",
+      "should have"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'must have' suggests certainty, but we’re talking about a mistake.",
+      "Incorrect: 'can't have' implies disbelief, which doesn’t match the context.",
+      "Correct: 'should have' means it was a good idea, be he didn't do it."
+    ]
+  },
+  {
+    "id": "b2_negmodals_01",
+    "level": "B2",
+    "tag": "Modal verbs",
+    "sentence": "You ___ smoke here — it's a non-smoking area.",
+    "options": [
+      "mustn't",
+      "don't have to",
+      "mustn't to"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'mustn't' expresses prohibition — it's not allowed.",
+      "Incorrect: 'don't have to' means it's not necessary, but still permitted.",
+      "Incorrect: 'mustn't to' is incorrect because we use infinitive without to after a modal verb."
+    ]
+  },
+  {
+    "id": "A2_modal_01",
+    "level": "A2",
+    "tag": "Modal verbs",
+    "sentence": "You ___ leave early today if you finish your work.",
+    "options": [
+      "must",
+      "can",
+      "should"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "'must' = obligation, not permission. Not logical in this context.",
+      "Correct: 'can' expresses permission.",
+      "'ought' = recommendation, but is incorrect here without 'to'."
+    ]
+  },
+  {
+    "id": "B1_modal_02",
+    "level": "B1",
+    "tag": "Modal verbs",
+    "sentence": "I ___ speak French quite well, but I'm still learning.",
+    "options": [
+      "be able to",
+      "can",
+      "could"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Needs 'am/is/are able to' for present, and in most cases is more formal.",
+      "Correct: present ability = 'can'.",
+      "'could' = past/general ability, but this sentence is about the present."
+    ]
+  },
+  {
+    "id": "B1_modal_04",
+    "level": "B1",
+    "tag": "Modal verbs",
+    "sentence": "You ___ bring any food; there's plenty here.",
+    "options": [
+      "don't have to",
+      "can't",
+      "mustn't"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'don't have to' suggests it isn't necessary.",
+      "'can't' = impossibility/prohibition, which is too strong here.",
+      "'mustn't' = suggests prohibition, which is too strong here: the sentence is saying it's unnecessary, not forbidden."
+    ]
+  },
+  {
+    "id": "B2_modal_05",
+    "level": "B2",
+    "tag": "Modal verbs",
+    "sentence": "The lights are off; they ___ be at home.",
+    "options": [
+      "could",
+      "can't",
+      "must"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "A possibility: but this doesn't make sense with the lights being off.",
+      "Correct: strong negative deduction: they are definitely not at home.",
+      "Strong positive deduction: they are definitely at home, but then the lights would be on."
+    ]
+  },
+  {
+    "id": "C1_modal_06",
+    "level": "B2",
+    "tag": "Modal verbs",
+    "sentence": "He drove for six hours without stopping — he ___ been exhausted.",
+    "options": [
+      "must have",
+      "should have",
+      "could have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: strong deduction about the past. It's very likely he was exhausted.",
+      "Expectation/criticism, not deduction. It was a good idea for him to be exhausted doesn't make sense.",
+      "Possibility only, not strong enough for this context."
+    ]
+  },
+  {
+    "id": "C1_modal_07",
+    "level": "B2",
+    "tag": "Modal verbs",
+    "sentence": "You ___ told me earlier; now it's too late.",
+    "options": [
+      "must have",
+      "should have",
+      "could"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "past Deduction: You definitey told me earlier, which doesn't make sense in this context.",
+      "Correct: past advice/criticism. You didn't tell me, and that was a mistake.",
+      "Past possibility, but is missing the 'have' to be correct."
+    ]
+  },
+  {
+    "id": "B2_modal_09",
+    "level": "B1",
+    "tag": "Modal verbs",
+    "sentence": "I ___ go to London next week, but I'm not sure yet.",
+    "options": [
+      "might",
+      "ought",
+      "must"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: uncertain future possibility.",
+      "ought to expresses advice/ something is a good idea, but we are missing 'to'.",
+      "Obligation/necessity, grammatically correct, but doesn't make sense with 'I'm not sure yet'."
+    ]
+  },
+  {
+    "id": "C1_modal_10",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "You're late — your presentation ___ start at nine.",
+    "options": [
+      "should have",
+      "was supposed to",
+      "must have"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Could be correct, but we would need 'started' after have, not the infinitive 'start'.",
+      "Correct: expresses a past obligation that was not satisfied.",
+      "Deduction about the past: Your presentation definitely started at nine, but it doesn't fit the context of being late."
+    ]
+  },
+  {
+    "id": "C1_modal_21",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "We left at 5 a.m., but there was no traffic — we ___ left so early.",
+    "options": [
+      "needn't have",
+      "didn't need to",
+      "mustn't have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'needn't have + past participle' = the action happened but was unnecessary.",
+      "'didn't need to' = unnecessary, but it requires the infinitive 'leave', not the past participle.",
+      "'mustn't have' = past deduction; wrong meaning here, as we are talking about a past action that was unnecessary, not a deduction."
+    ]
+  },
+  {
+    "id": "B2_modal_22",
+    "level": "B2",
+    "tag": "Modal verbs",
+    "sentence": "We had free tickets, so we ___ pay for entry.",
+    "options": [
+      "didn't need to",
+      "needn't have",
+      "mustn't"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: lack of necessity (and we probably didn’t pay).",
+      "'needn't have paid' would imply we paid, but it wasn’t necessary. But here we have 'pay' not the past participle 'paid'.",
+      "'mustn't' = present prohibition or strong advice, but the sentence is about the past."
+    ]
+  },
+  {
+    "id": "C1_modal_23",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "After three attempts, she finally ___ reset the server.",
+    "options": [
+      "was able to",
+      "could",
+      "could have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct for an ability on a single successful occasion.",
+      "'could' is not natural for an ability on a specific occasion.",
+      "'could have' suggests a possibility that didn’t necessarily happen, which doesn't fit here."
+    ]
+  },
+  {
+    "id": "C1_modal_24",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "Doorbell again — that ___ the post woman.",
+    "options": [
+      "will be",
+      "would be",
+      "should have been"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'will' for present assumption: A deduction about the present (That’ll be the post woman).",
+      "'would be' is not used for a present assumption here.",
+      "'should have been' is past expectation; wrong time: we are talking about the present, not the past."
+    ]
+  },
+  {
+    "id": "C1_modal_25",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "How ___  speak to her like that?",
+    "options": [
+      "dare you",
+      "dare you to",
+      "do dare"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: dare is often used as a modal verb in questions forms and negatives",
+      "'to' is not used in modal constructions.",
+      "'do dare you' is the wrong order for a question form. We could say 'do you dare to speak to her like that?' or 'do you dare speak to her like that'."
+    ]
+  },
+  {
+    "id": "C1_modal_26",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "You ___ be late again.",
+    "options": [
+      "had better not",
+      "shouldn't have",
+      "hadn't better"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: strong recommendation for present/future. Similar to 'should', but stronger, often used as a threat/warning.",
+      "'shouldn't have' = past criticism- doesn't work because we have 'be' and not 'been'.",
+      "'had better' is never separated by not, the negative form is 'had better not'."
+    ]
+  },
+  {
+    "id": "C1_modal_27",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "He did it again — I ___ cancel at the last minute.",
+    "options": [
+      "might have known he would",
+      "might have known he will",
+      "might know he would"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct idiom: 'I might have known (that) he would…' (ironic, typical behaviour).",
+      "Tense clash: 'might have known' pairs with 'would', not 'will', for this idiom.",
+      "Wrong tense: 'might know' is present, we need a past meaning here."
+    ]
+  },
+  {
+    "id": "C1_modal_28",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "They brought coats, but the hall was heated — they ___ brought them.",
+    "options": [
+      "needn't have",
+      "didn't need to",
+      "mustn't have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: they DID bring them, but it wasn’t necessary. Need can be a modal verb in the negative.",
+      "Didn't need to is always possible, but here we have `brought' not the infinitive 'bring'.",
+      "'mustn't have' is a past deduction; not a past necessity."
+    ]
+  },
+  {
+    "id": "B2_modal_29",
+    "level": "B2",
+    "tag": "Modal verbs",
+    "sentence": "With fast-track security, we ___ wait in the long queue.",
+    "options": [
+      "didn't need to",
+      "needn't have",
+      "couldn't have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: lack of necessity in the past (and we probably didn’t wait).",
+      "'needn't have waited' implies we did wait, which wasn't necessary- but it requires the past participle 'WAITED'.",
+      "'couldn't have' = impossibility; wrong meaning."
+    ]
+  },
+  {
+    "id": "C1_modal_30",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "The door was jammed, but after a few tries we ___ open it.",
+    "options": [
+      "were able to",
+      "could",
+      "could have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct for a past ability on a single occasion.",
+      "Not possible for an ability on a specific occasion in the past.",
+      "Suggests a possibility in the past, not something that we actually did."
+    ]
+  },
+  {
+    "id": "A2_modal_31",
+    "level": "A2",
+    "tag": "Modal verbs",
+    "sentence": "You ___ use my laptop if you need it.",
+    "options": [
+      "can",
+      "mustn't",
+      "should to"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'can' = permission/ability.",
+      "'must' = prohibition, doesn't make sense with 'if you need it'.",
+      "'should' = advice, less natural here, and cannot be used with 'to'."
+    ]
+  },
+  {
+    "id": "A2_modal_32",
+    "level": "A2",
+    "tag": "Modal verbs",
+    "sentence": "You ___ swim here; the currents are too dangerous.",
+    "options": [
+      "mustn't",
+      "don't have to",
+      "could"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'mustn't' = prohibition.",
+      "'don't have to' means you can swim here, but it isn't necessary, which doesn't make sense here.",
+      "'could' = theoretical possibility, which contradicts the fact that it is too dangerous."
+    ]
+  },
+  {
+    "id": "B1_modal_33",
+    "level": "B1",
+    "tag": "Modal verbs",
+    "sentence": "You ___ see a dentist as soon as you can.",
+    "options": [
+      "should",
+      "must to",
+      "ought"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'should' = advice/recommendation.",
+      "'must' = strong obligation but we can't use 'to' after a modal verb.",
+      "'ought' = advice recommendation, but ought goes with 'to'."
+    ]
+  },
+  {
+    "id": "B2_modal_36",
+    "level": "B2",
+    "tag": "Modal verbs",
+    "sentence": "He was in Madrid all day; he ___ attended the meeting in London.",
+    "options": [
+      "can't have",
+      "mustn't have",
+      "shouldn't have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'can't have' = strong negative deduction about the past. It was impossible for him to attend.",
+      "'must have' means it was almost certain he attended, which is not possible if he was in Madrid.",
+      "'shouldn't have' = past criticism, wrong meaning."
+    ]
+  },
+  {
+    "id": "C1_modal_37",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "We ended up paying for a taxi, but the hotel offered a free shuttle — we ___ paid for the ride.",
+    "options": [
+      "needn't have",
+      "didn't need to",
+      "ought not to"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: we DID pay, but it wasn’t necessary, in the negative need can be a modal verb.",
+      "Means it wasn’t necessary but it would require the infinitive 'pay'.",
+      "a bad idea in the past, but we are missing 'have' to be correct. 'ought not to have paid' would be correct."
+    ]
+  },
+  {
+    "id": "C1_modal_38",
+    "level": "C1",
+    "tag": "Modal verbs",
+    "sentence": "Despite the outage, the team ___ restore service by noon.",
+    "options": [
+      "was able to",
+      "could",
+      "could have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct for an ability on one specific occasion.",
+      "Unnatural for one specific success in the positive, we use could for general ability in the past.",
+      "Past possibility, not a completed success."
+    ]
+  }
+]

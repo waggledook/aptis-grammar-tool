@@ -1,0 +1,189 @@
+[
+  {
+    "id": "b1_comp_01",
+    "level": "B1",
+    "tag": "Comparatives and Superlatives",
+    "sentence": "My phone is ___ than yours.",
+    "options": [
+      "expensiver",
+      "more expensive",
+      "most expensive"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'expensiver' is not a valid comparative form.",
+      "Correct: 'more expensive' is the correct comparative for long adjectives.",
+      "Incorrect: 'most expensive' is a superlative, not a comparative."
+    ]
+  },
+  {
+    "id": "b1_comp_02",
+    "level": "B1",
+    "tag": "Comparatives and Superlatives",
+    "sentence": "This test is ___ than the one we did last week.",
+    "options": [
+      "difficult",
+      "more difficult",
+      "most difficult"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'difficult' needs a comparative marker here.",
+      "Correct: 'more difficult' is the correct comparative for long adjectives.",
+      "Incorrect: 'most difficult' is a superlative, not a comparative."
+    ]
+  },
+  {
+    "id": "b1_notas_01",
+    "level": "B1",
+    "tag": "Comparatives and Superlatives",
+    "sentence": "The train wasn’t ___ I expected.",
+    "options": [
+      "as fast as",
+      "so fast than",
+      "too fast as"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'as fast as' is the standard structure for comparisons of equality.",
+      "Incorrect: 'so fast than' is incorrect. 'so fast as' is possible in negative sentences",
+      "Incorrect: 'too fast as' is grammatically incorrect."
+    ]
+  },
+  {
+    "id": "b2_modcomp_01",
+    "level": "B1",
+    "tag": "Comparatives and Superlatives",
+    "sentence": "This phone is slightly ___ than mine.",
+    "options": [
+      "cheaper",
+      "more cheap",
+      "cheapest"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'cheaper' is the comparative of cheap. one syllable adjectives: add +er",
+      "Incorrect: 'more cheap' is not correct for one-syllable adjectives",
+      "Incorrect: 'cheapest' is a superlative. This sentence requires a comparative structure"
+    ]
+  },
+  {
+    "id": "b2_supl_01",
+    "level": "B2",
+    "tag": "Comparatives and Superlatives",
+    "sentence": "Of all the runners, she was by  ___",
+    "options": [
+      "far the faster",
+      "much the faster",
+      "far the fastest"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'faster' is a comparative, used for comparing two things.",
+      "Incorrect: 'much' is incorrect: by + far is used to emphasise a superlative.",
+      "Correct: 'fastest' is the superlative form needed here."
+    ]
+  },
+  {
+    "id": "b2_notso_01",
+    "level": "B2",
+    "tag": "Comparatives and Superlatives",
+    "sentence": "The new version isn’t  ___ as the original.",
+    "options": [
+      "quite as good",
+      "quite as better",
+      "near as good"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'quite as good' is correct: we add quite to not as... as to indicate a small difference.",
+      "Incorrect: 'quite as better' is wrong because we don't use the comparative after as.",
+      "Incorrect: 'near as good' would be correct if we used 'nearly'. Not nearly as.... indicates a big difference."
+    ]
+  },
+  {
+    "id": "c1_doublecomp_01",
+    "level": "B2",
+    "tag": "Comparatives and Superlatives",
+    "sentence": "The more you practise,  ___ you become.",
+    "options": [
+      "better",
+      "the best",
+      "the better"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'better' is comparative but we need 'the + comparative' in this structure.",
+      "Incorrect: 'the best' is using the superlative not comparative.",
+      "Correct: 'the better' :here we use the + comparative correctly."
+    ]
+  },
+  {
+    "id": "b2_eqcomp_01",
+    "level": "B2",
+    "tag": "Comparatives and Superlatives",
+    "sentence": "He’s  ___ tall as his older brother.",
+    "options": [
+      "just so",
+      "just as",
+      "equal as"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'just so' is not correct: we can use not so... as in negative sentences.",
+      "Correct: 'just as' is correct to show that two things are the same.",
+      "Incorrect: 'equal as' does not exist in English"
+    ]
+  },
+  {
+    "id": "c1_exaggcomp_01",
+    "level": "B1",
+    "tag": "Comparatives and Superlatives",
+    "sentence": "It’s by far the ___ experience I’ve ever had.",
+    "options": [
+      "more terrifying",
+      "most terrifying",
+      "terrifying"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'more terrifying' is a comparative, not used with 'ever had'.",
+      "Correct: 'most terrifying' is a superlative, matching 'ever had'.",
+      "Incorrect: 'terrifying' is a base adjective and incomplete here."
+    ]
+  },
+  {
+    "id": "b2_nowherenear_01",
+    "level": "B2",
+    "tag": "Comparatives and Superlatives",
+    "sentence": "The new software is ___  user-friendly as the old version.",
+    "options": [
+      "anywhere near as",
+      "nowhere nearly as",
+      "nowhere near as"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'anywhere near as' is incorrect because anywhere is not negative.",
+      "Incorrect: 'nowhere nearly as' is incorrect because we use 'near', not 'nearly'.",
+      "Correct: 'nowhere near as' is used to emphasise a significant difference when using not as... as."
+    ]
+  },
+  {
+    "id": "c1_farless_01",
+    "level": "B2",
+    "tag": "Comparatives and Superlatives",
+    "sentence": "His latest book is  ___ interesting than his earlier works.",
+    "options": [
+      "far little",
+      "much least",
+      "far less"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'far little' is wrong because we need a comparative adjective.",
+      "Incorrect: 'much least' is incorrect because least is a superlative. 'much less' is correct.",
+      "Correct: 'far less' is a common structure used to emphasise a comparative."
+    ]
+  }
+]

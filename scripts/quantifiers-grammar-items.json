@@ -1,0 +1,478 @@
+[
+  {
+    "id": "b1_quants_01",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "There aren't ___ apples left in the basket.",
+    "options": [
+      "some",
+      "any",
+      "much"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'some' is typically used in affirmative statements.",
+      "Correct: 'any' is used in negative contexts like this one.",
+      "Incorrect: 'much' is used with uncountable nouns, not 'apples'."
+    ]
+  },
+  {
+    "id": "b1_quant_01",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "There were only ___ people at the meeting, so it ended early.",
+    "options": [
+      "few",
+      "a few",
+      "a little"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Few' without 'a' doesn't go with 'only'.",
+      "Correct: 'A few' is appropriate for countable nouns like 'people'.",
+      "Incorrect: 'A little' is used with uncountable nouns."
+    ]
+  },
+  {
+    "id": "b1_quant_02",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "We have ___ milk left — not enough for everyone.",
+    "options": [
+      "few",
+      "many",
+      "little"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'few' is used with countables, not 'milk'.",
+      "Incorrect: 'Many' is used with countables, and here the meaning is negative.",
+      "Correct: 'Little' fits with uncountables and expresses insufficiency."
+    ]
+  },
+  {
+    "id": "b2_quant_03",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "He hasn’t done ___ to help prepare for the trip.",
+    "options": [
+      "much",
+      "many",
+      "a lot of"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Much' is correct for an indefinite quantity here. There is no noun used..",
+      "Incorrect: 'Many' is for countable nouns.",
+      "Incorrect: 'a lot of' is wrong because 'of' needs a noun. eg. 'a lot of work'. Here 'a lot' is correct"
+    ]
+  },
+  {
+    "id": "b1_quant_04",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "___ of the information in the report is outdated.",
+    "options": [
+      "Many",
+      "Some",
+      "A few"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Many' is wrong because information is uncountable.",
+      "Correct: 'Some' is appropriate with uncountable nouns (also possible with countables).",
+      "Incorrect: 'A few' is only used with plural countables."
+    ]
+  },
+  {
+    "id": "b1_quant_05",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "I brought ___ sandwiches in case anyone gets hungry.",
+    "options": [
+      "a little",
+      "few",
+      "a few"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'A little' is for uncountable nouns, not 'sandwiches'.",
+      "Incorrect: 'few' without 'a' is too negative, as it means 'not many'.",
+      "Correct: 'A few' fits with plural countable nouns like 'sandwiches'."
+    ]
+  },
+  {
+    "id": "b2_quant_06",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "She spends ___ of her time reading science fiction novels.",
+    "options": [
+      "many",
+      "few",
+      "most"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'Many' doesn’t go with 'time', which is uncountable.",
+      "Incorrect: 'Few' is also inappropriate for uncountables. We could say 'little of her time'.",
+      "Correct: 'Most of her time' is a common and correct phrase."
+    ]
+  },
+  {
+    "id": "b1_quant_07",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "Five of us spoke a little Chinese, but ___ of us had ever been to Asia before the trip.",
+    "options": [
+      "neither",
+      "none",
+      "nothing"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Neither' is used when referring to two people.",
+      "Correct: 'None of us' fits for more than two and refers to people.",
+      "Incorrect: 'Nothing' refers to things, not people."
+    ]
+  },
+  {
+    "id": "quant_21",
+    "level": "A2",
+    "tag": "Quantifiers",
+    "sentence": "There weren’t ___ chairs for everyone to sit down.",
+    "options": [
+      "too many",
+      "enough",
+      "a lot of"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'too many' would suggest an excess. Here we need more chairs.",
+      "Correct: 'enough' is used to express sufficient quantity.",
+      "Incorrect: 'a lot of' is positive and doesn’t express insufficiency."
+    ]
+  },
+  {
+    "id": "quant_22",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "She has ___ interest in politics.",
+    "options": [
+      "a few",
+      "little",
+      "few"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'a few' is for plural countable nouns, not uncountable ones.",
+      "Correct: 'little' is used with uncountable nouns like 'interest'.",
+      "Incorrect: 'few' is used with countable nouns."
+    ]
+  },
+  {
+    "id": "quant_23",
+    "level": "B2",
+    "tag": "Quantifiers",
+    "sentence": "We saw ___ tourists in the winter months.",
+    "options": [
+      "hardly any",
+      "plenty",
+      "a great deal of"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'hardly any' means almost none, which fits the idea of low numbers.",
+      "Incorrect: 'plenty' means 'more than enough' and needs the preposition 'of'.",
+      "Incorrect: 'a great deal of' is for uncountable nouns."
+    ]
+  },
+  {
+    "id": "quant_24",
+    "level": "B2",
+    "tag": "Quantifiers",
+    "sentence": "___ of the 10 participants had read the article beforehand, so it was impossible to discuss it",
+    "options": [
+      "Each",
+      "None",
+      "Neither"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Each' implies all had read it, which would make it possible to discuss the article",
+      "Correct: 'None' is used for zero quantity out of more than two.",
+      "Incorrect: 'Neither' is only used when referring to two people or things."
+    ]
+  },
+  {
+    "id": "quant_25",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "There’s ___ milk left in the fridge — not much.",
+    "options": [
+      "few",
+      "a few",
+      "a little"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'few' has a more negative tone and doesn't fit well here.",
+      "Incorrect: 'a few' is for plural countable nouns.",
+      "Correct: 'a little' is used for small amounts of uncountable nouns."
+    ]
+  },
+  {
+    "id": "quant_26",
+    "level": "A2",
+    "tag": "Quantifiers",
+    "sentence": "They have ___ cats at home.",
+    "options": [
+      "much",
+      "little",
+      "a lot of"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'much' is used with uncountables, usually negative.",
+      "Incorrect: 'little' is for uncountables and doesn’t make sense with 'cats'.",
+      "Correct: 'a lot of' is fine with countable nouns like 'cats'."
+    ]
+  },
+  {
+    "id": "quant_27",
+    "level": "C1",
+    "tag": "Quantifiers",
+    "sentence": "She had made ___ progress than expected, given the circumstances.",
+    "options": [
+      "too many",
+      "few",
+      "far less"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'too many' is not appropriate with uncountables.",
+      "Incorrect: 'few' is used for countable nouns.",
+      "Correct: 'far less' is comparative and fits with uncountable nouns like 'progress'. Far is used for emphasis."
+    ]
+  },
+  {
+    "id": "quant_28",
+    "level": "B2",
+    "tag": "Quantifiers",
+    "sentence": "We didn’t see ___ people at the concert.",
+    "options": [
+      "much",
+      "many",
+      "a little"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'much' is used with uncountables.",
+      "Correct: 'many' is used for plural countable nouns like 'people'.",
+      "Incorrect: 'a little' is used with uncountables."
+    ]
+  },
+  {
+    "id": "quant_29",
+    "level": "B2",
+    "tag": "Quantifiers",
+    "sentence": "I invited them both, but ___ of them came.",
+    "options": [
+      "neither",
+      "none",
+      "either"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'neither' means not one or the other of two.",
+      "Incorrect: 'none' is used for more than two.",
+      "Incorrect: 'either' suggests one or the other, not both."
+    ]
+  },
+  {
+    "id": "quant_30",
+    "level": "B2",
+    "tag": "Quantifiers",
+    "sentence": "He didn’t show ___ interest in the topic.",
+    "options": [
+      "a few",
+      "much",
+      "many"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'a few' doesn’t work with uncountables.",
+      "Correct: 'much' is used with uncountables like 'interest'.",
+      "Incorrect: 'many' is for plural countable nouns."
+    ]
+  },
+  {
+    "id": "a2_quant_11",
+    "level": "A2",
+    "tag": "Quantifiers",
+    "sentence": "There isn’t ___ milk left in the fridge.",
+    "options": [
+      "many",
+      "some",
+      "much"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'Many' is used with plural countable nouns, not uncountables like 'milk'.",
+      "Incorrect: 'Some' is possible in affirmative statements, but here we would use 'any' in the negative.",
+      "Correct: 'Much' is used in negative sentences with uncountable nouns."
+    ]
+  },
+  {
+    "id": "b1_quant_12",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "I only had ___ time to finish the report before the deadline.",
+    "options": [
+      "a little",
+      "a few",
+      "many"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'A little' is used with uncountable nouns like 'time'.",
+      "Incorrect: 'A few' is used with countable nouns, and doesn't fit here.",
+      "Incorrect: 'Many' is incorrect with uncountable nouns."
+    ]
+  },
+  {
+    "id": "b2_quant_13",
+    "level": "B2",
+    "tag": "Quantifiers",
+    "sentence": "They invited all their friends, but only ___ showed up.",
+    "options": [
+      "few",
+      "a few",
+      "much"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Few' cannot be used without 'a' after 'only'.",
+      "Correct: 'A few' suggests some came, but not many.",
+      "Incorrect: 'Much' is uncountable and cannot be used with 'friends'."
+    ]
+  },
+  {
+    "id": "b1_quant_14",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "There were too ___ mistakes in the essay to ignore.",
+    "options": [
+      "much",
+      "many",
+      "a lot"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Much' is for uncountable nouns.",
+      "Correct: 'Many' is used with plural countable nouns like 'mistakes'.",
+      "Incorrect: 'A lot' needs 'of' to go with mistakes, and can't be used after 'too'."
+    ]
+  },
+  {
+    "id": "b2_quant_15",
+    "level": "B2",
+    "tag": "Quantifiers",
+    "sentence": "He spoke so quickly that ___ of us could follow what he was saying.",
+    "options": [
+      "nobody",
+      "few",
+      "much"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'nobody' cannot be used with 'of us'. 'Nobody could follow' would be correct",
+      "Correct: 'Few' suggests that not many could follow, and fits with 'of us'.",
+      "Incorrect: 'Much' is not correct because 'us' refers to people which is countable."
+    ]
+  },
+  {
+    "id": "c1_quant_17",
+    "level": "C1",
+    "tag": "Quantifiers",
+    "sentence": "Hardly ___ of the proposals were accepted by the committee.",
+    "options": [
+      "any",
+      "some",
+      "much"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Hardly any' is a fixed expression to indicate very few or almost none.",
+      "Incorrect: 'Some' does not go with the negative meaning of 'hardly'.",
+      "Incorrect: 'Much' is for uncountable nouns and cannot be used with hardly"
+    ]
+  },
+  {
+    "id": "b2_quant_18",
+    "level": "B2",
+    "tag": "Quantifiers",
+    "sentence": "Only ___ of the team members were able to attend the meeting.",
+    "options": [
+      "either",
+      "some",
+      "a little"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Either' refers to two people/things, and is not used with 'only'.",
+      "Correct: 'Some' refers to a portion of a larger group.",
+      "Incorrect: 'A little' is used with uncountables."
+    ]
+  },
+  {
+    "id": "c1_quant_19",
+    "level": "C1",
+    "tag": "Quantifiers",
+    "sentence": "___ of the two applicants had the qualifications we were looking for.",
+    "options": [
+      "None",
+      "Neither",
+      "Any"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'None' would be correct with more than two applicants.",
+      "Correct: 'Neither' is correct because we specify two applicants.",
+      "Incorrect: 'Any' would not work without a negative or interrogative context."
+    ]
+  },
+  {
+    "id": "b1_quant_20",
+    "level": "B1",
+    "tag": "Quantifiers",
+    "sentence": "I don't have ___ money to buy concert tickets this month.",
+    "options": [
+      "enough",
+      "a few",
+      "plenty"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Enough' is used to express sufficient quantity.",
+      "Incorrect: 'A few' is used with countable nouns.",
+      "Incorrect: 'Plenty' would be used in an affirmative sentence, and needs 'of'."
+    ]
+  },
+  {
+    "id": "quant_34",
+    "level": "C1",
+    "tag": "Quantifiers",
+    "sentence": "There was ___ media coverage following the scandal.",
+    "options": [
+      "a great deal of",
+      "many",
+      "a few"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'a great deal of' is appropriate for uncountable nouns like 'coverage'. 'a great/good deal of' are more formal ways of saying 'a lot of'.",
+      "Incorrect: 'a large number of' is used with countables.",
+      "Incorrect: 'a few' is used with countable nouns."
+    ]
+  }
+]

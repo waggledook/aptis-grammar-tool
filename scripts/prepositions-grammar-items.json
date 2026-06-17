@@ -1,0 +1,461 @@
+[
+  {
+    "id": "b2_prep_01",
+    "level": "B2",
+    "tag": "Prepositions",
+    "sentence": "She’s very good ___ dealing with pressure.",
+    "options": [
+      "at",
+      "on",
+      "with"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'good at' is the correct collocation.",
+      "Incorrect: 'good on' is not a standard expression here.",
+      "Incorrect: 'good with' is sometimes possible, but not with 'dealing with pressure'."
+    ]
+  },
+  {
+    "id": "b1_prep2_01",
+    "level": "B1",
+    "tag": "Prepositions",
+    "sentence": "He was afraid ___ flying.",
+    "options": [
+      "of",
+      "for",
+      "about"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'afraid of' is the correct fixed prepositional phrase.",
+      "Incorrect: 'afraid for' suggests concern about someone else, not fear of something.",
+      "Incorrect: 'afraid about' is not a standard collocation."
+    ]
+  },
+  {
+    "id": "b2_expressions_01",
+    "level": "B2",
+    "tag": "Prepositions",
+    "sentence": "They arrived at the airport just ___ time to catch the flight.",
+    "options": [
+      "in",
+      "on",
+      "at"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'in time' means early enough for something.",
+      "Incorrect: 'on time' means exactly at the scheduled time, but doesn't work with 'to catch'.",
+      "Incorrect: 'at time' is not a standard expression."
+    ]
+  },
+  {
+    "id": "a2_prep_01",
+    "level": "B1",
+    "tag": "Prepositions",
+    "sentence": "She’s very good ___ dancing.",
+    "options": [
+      "on",
+      "in",
+      "at"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'on' does not go with good.",
+      "Incorrect: 'in' does not go with good.",
+      "Correct: We say 'good at' something. The same with 'great/ok/bad/terrible at' etc"
+    ]
+  },
+  {
+    "id": "a2_prep_02",
+    "level": "A2",
+    "tag": "Prepositions",
+    "sentence": "He’s afraid ___ spiders.",
+    "options": [
+      "with",
+      "for",
+      "of"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'with' does not go with afraid.",
+      "Incorrect: 'for' does not go with afraid.",
+      "Correct: 'afraid of' is the correct collocation."
+    ]
+  },
+  {
+    "id": "a2_prep_03",
+    "level": "A2",
+    "tag": "Prepositions",
+    "sentence": "They arrived ___ the airport very early.",
+    "options": [
+      "at",
+      "to",
+      "in"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: We say 'arrive at' with most public places.",
+      "Incorrect: 'to' does not go with arrive.",
+      "Incorrect: 'in': we use arrive in for bigger less specific places, like neighbourhoods, towns, countries etc."
+    ]
+  },
+  {
+    "id": "b1_prep_01",
+    "level": "B1",
+    "tag": "Prepositions",
+    "sentence": "I’m looking forward ___ the holidays.",
+    "options": [
+      "to",
+      "for",
+      "at"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'look forward to' is a set phrase.",
+      "Incorrect: 'for' does not go with look forward.",
+      "Incorrect: 'at' does not go with look forward."
+    ]
+  },
+  {
+    "id": "b1_prep_02",
+    "level": "A2",
+    "tag": "Prepositions",
+    "sentence": "She apologized ___ being late.",
+    "options": [
+      "of",
+      "about",
+      "for"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'of' does not go with 'apologize'.",
+      "Incorrect: 'about' idoes not go with 'apologize'.",
+      "Correct: 'apologize for' is the right structure."
+    ]
+  },
+  {
+    "id": "b1_prep_03",
+    "level": "B1",
+    "tag": "Prepositions",
+    "sentence": "He depends ___ his parents for money.",
+    "options": [
+      "on",
+      "in",
+      "of"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'depend on' is the correct form.",
+      "Incorrect: 'in' does not go with 'depend'.",
+      "Incorrect: 'of' does not go with 'depend'."
+    ]
+  },
+  {
+    "id": "b2_prep_020",
+    "level": "C1",
+    "tag": "Prepositions",
+    "sentence": "There has been a sharp increase ___ prices.",
+    "options": [
+      "of",
+      "in",
+      "to"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'of prices' is incorrect here.",
+      "Correct: 'increase in prices' is the right phrase. The same with similar constructions: 'a rise/fall/decrease etc IN'",
+      "Incorrect: 'to prices' is not used in this case."
+    ]
+  },
+  {
+    "id": "b2_prep_02",
+    "level": "B2",
+    "tag": "Prepositions",
+    "sentence": "This area is famous ___ its natural beauty.",
+    "options": [
+      "for",
+      "with",
+      "by"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'famous for' is the correct collocation.",
+      "Incorrect: 'with' does not go with 'famous'.",
+      "Incorrect: 'by' does not go with 'famous'."
+    ]
+  },
+  {
+    "id": "b2_prep_03",
+    "level": "B2",
+    "tag": "Prepositions",
+    "sentence": "He’s been accused ___ stealing company money.",
+    "options": [
+      "about",
+      "of",
+      "for"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'about' does not go with 'accuse'.",
+      "Correct: 'accused of' is the standard form. To accuse somebody of something",
+      "Incorrect: 'for' does not go with 'accuse'."
+    ]
+  },
+  {
+    "id": "b2_prep_04",
+    "level": "B2",
+    "tag": "Prepositions",
+    "sentence": "She’s responsible ___ managing the team.",
+    "options": [
+      "of",
+      "for",
+      "with"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'responsible of' is a common mistake.",
+      "Correct: 'responsible for' is the standard structure.",
+      "Incorrect: 'with' does not go with 'responsible'."
+    ]
+  },
+  {
+    "id": "b1_prep_04",
+    "level": "B2",
+    "tag": "Prepositions",
+    "sentence": "I'm not very keen ___ horror films.",
+    "options": [
+      "about",
+      "on",
+      "in"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'about' does not go with 'keen'.",
+      "Correct: 'on' is the right preposition after this adjective.",
+      "Incorrect: 'in' does not go with 'keen'."
+    ]
+  },
+  {
+    "id": "b1_prep_06",
+    "level": "B1",
+    "tag": "Prepositions",
+    "sentence": "He's married ___ a doctor.",
+    "options": [
+      "to",
+      "with",
+      "in"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'be married to' is the correct form.",
+      "Incorrect: 'with' does not go with 'married'.",
+      "Incorrect: 'in' does not go with 'married'."
+    ]
+  },
+  {
+    "id": "b2_prep_05",
+    "level": "C1",
+    "tag": "Prepositions",
+    "sentence": "They succeeded ___ improving the system.",
+    "options": [
+      "on",
+      "in",
+      "at"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'on' does not go with 'succeed'.",
+      "Correct: 'succeed in' is the correct verb + preposition pattern.",
+      "Incorrect: 'at' does not go with 'succeed'."
+    ]
+  },
+  {
+    "id": "b2_prep_06",
+    "level": "B2",
+    "tag": "Prepositions",
+    "sentence": "She insisted ___ paying for dinner.",
+    "options": [
+      "in",
+      "on",
+      "with"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'in' does not go with 'insist'.",
+      "Correct: 'insist on' is the right collocation.",
+      "Incorrect: 'with' does not go with 'insist'."
+    ]
+  },
+  {
+    "id": "b2_prep_09",
+    "level": "B2",
+    "tag": "Prepositions",
+    "sentence": "This rule applies ___ all employees, regardless of position.",
+    "options": [
+      "to",
+      "for",
+      "at"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'applies to' is the correct verb-preposition pairing.",
+      "Incorrect: 'applies for' changes the meaning.",
+      "Incorrect: 'at' does not go with 'apply'."
+    ]
+  },
+  {
+    "id": "a2_prep_time_01",
+    "level": "A2",
+    "tag": "Prepositions",
+    "sentence": "The train leaves ___ 8 o’clock sharp.",
+    "options": [
+      "in",
+      "at",
+      "on"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'in' is used for longer time periods like months or years.",
+      "Correct: 'at' is used for specific clock times.",
+      "Incorrect: 'on' is used for days and dates, not times."
+    ]
+  },
+  {
+    "id": "b1_prep_place_012",
+    "level": "B1",
+    "tag": "Prepositions",
+    "sentence": "They met each other ___ the corner of the street.",
+    "options": [
+      "at",
+      "along",
+      "in"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'at the corner' is the standard phrase for location.",
+      "Incorrect: 'along the corner': along is not used to indicate location.",
+      "Incorrect: 'in the corner' is typically used for indoor spaces."
+    ]
+  },
+  {
+    "id": "b1_prep_movement_01",
+    "level": "B1",
+    "tag": "Prepositions",
+    "sentence": "She walked ___ the room without saying a word.",
+    "options": [
+      "into",
+      "over",
+      "at"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'into' expresses movement inside a space.",
+      "Incorrect: 'over' means across the top, not appropriate here.",
+      "Incorrect: 'at' refers to a location, not movement into."
+    ]
+  },
+  {
+    "id": "b2_prep_time_01",
+    "level": "B1",
+    "tag": "Prepositions",
+    "sentence": "We haven’t seen him ___ the beginning of the year.",
+    "options": [
+      "for",
+      "since",
+      "from"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'for' would be followed by a duration (e.g. for six months).",
+      "Correct: 'since' is used with a specific point in time.",
+      "Incorrect: 'from' doesn't go with this present perfect structure."
+    ]
+  },
+  {
+    "id": "a2_prep_place_01",
+    "level": "A2",
+    "tag": "Prepositions",
+    "sentence": "The keys are ___ the table. Can you see them?",
+    "options": [
+      "on",
+      "in",
+      "over"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'on the table' describes surface location.",
+      "Incorrect: 'in the table' suggests the keys are 'inside' the table.",
+      "Incorrect: 'over the table' means suspended above, not resting on."
+    ]
+  },
+  {
+    "id": "a2_prep_time_02",
+    "level": "A2",
+    "tag": "Prepositions",
+    "sentence": "We always have lunch ___ noon.",
+    "options": [
+      "on",
+      "at",
+      "in"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'on' is used for days and dates.",
+      "Correct: 'at' is used for specific times, including 'at noon'.",
+      "Incorrect: 'in' is used for longer periods like months or seasons."
+    ]
+  },
+  {
+    "id": "b1_prep_place_02",
+    "level": "B1",
+    "tag": "Prepositions",
+    "sentence": "There was a beautiful painting ___ the wall.",
+    "options": [
+      "in",
+      "at",
+      "on"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'in the wall' suggests something inside.",
+      "Incorrect: 'at the wall' would imply being next to it, not on it.",
+      "Correct: 'on the wall' is the usual phrase for something mounted."
+    ]
+  },
+  {
+    "id": "b2_prep_movement_02",
+    "level": "B2",
+    "tag": "Prepositions",
+    "sentence": "He ran quickly ___ the hill and disappeared.",
+    "options": [
+      "above",
+      "over",
+      "along"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'above' implies a vertical distance, not movement.",
+      "Correct: 'over' suggests crossing to the other side.",
+      "Incorrect: 'along' means following a path, not crossing it."
+    ]
+  },
+  {
+    "id": "b1_prep_time_03",
+    "level": "B1",
+    "tag": "Prepositions",
+    "sentence": "She arrived ___ time to catch the train.",
+    "options": [
+      "at",
+      "on",
+      "in"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'at time' is not a correct phrase.",
+      "Incorrect: 'on time' means punctual, but the expression here requires 'in time' (with sufficient time).",
+      "Correct: 'in time' means before the deadline or moment."
+    ]
+  }
+]

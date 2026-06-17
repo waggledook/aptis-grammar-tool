@@ -2,15 +2,19 @@
 import React, { useState, useEffect } from 'react'
 import { auth, sendReport, recordMistake,
          addFavourite, removeFavourite, fetchFavourites, saveGrammarResult } from '../firebase'
-import { AlertCircle, Star } from 'lucide-react'
+import { AlertCircle, BookOpen, Star } from 'lucide-react'
 import { toast } from '../utils/toast'
+import GrammarTheoryModal from './grammar/GrammarTheoryModal'
+import { getGrammarTheoryForItem } from '../data/grammarTheoryNotes'
 import '../index.css'     // your global styles
 
 export default function GapFillItem({ item, onAnswer, testMode = false }) {
   const { id, sentence, options, answerIndex, explanations, level } = item
+  const theory = getGrammarTheoryForItem(item)
 
   const [sel, setSel]             = useState(null)
   const [showReport, setShowReport]       = useState(false)
+  const [showTheory, setShowTheory]       = useState(false)
   const [reportReason, setReportReason]   = useState('')
   const [otherText, setOtherText]         = useState('')
   const [isFav, setIsFav]                 = useState(false)
@@ -129,23 +133,36 @@ const toggleFav = async () => {
         <span className={`cefr-badge cefr-${level}`}>
           {level || '–'}
         </span>
-        {auth.currentUser && (
-          <button
-          className={`fav-btn ${isFav ? 'active' : ''}`}
-          onClick={toggleFav}
-          aria-pressed={isFav}
-          aria-label={isFav ? 'Remove from favourites' : 'Add to favourites'}
-          title={isFav ? 'Remove from favourites' : 'Add to favourites'}
-        >
-          {isFav ? (
-            // Filled star (gold)
-            <Star size={18} fill="#ffd36a" stroke="#ffd36a" />
-          ) : (
-            // Outline star
-            <Star size={18} />
+        <div className="gapfill-card-actions">
+          {auth.currentUser && (
+            <button
+            className={`fav-btn ${isFav ? 'active' : ''}`}
+            onClick={toggleFav}
+            aria-pressed={isFav}
+            aria-label={isFav ? 'Remove from favourites' : 'Add to favourites'}
+            title={isFav ? 'Remove from favourites' : 'Add to favourites'}
+          >
+            {isFav ? (
+              // Filled star (gold)
+              <Star size={18} fill="#ffd36a" stroke="#ffd36a" />
+            ) : (
+              // Outline star
+              <Star size={18} />
+            )}
+          </button>
           )}
-        </button>
-        )}
+          {theory && (
+            <button
+              type="button"
+              className="theory-btn"
+              onClick={() => setShowTheory(true)}
+              aria-label={`Show ${theory.title} grammar notes`}
+              title={`Show ${theory.title} grammar notes`}
+            >
+              <BookOpen size={18} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* The sentence with a blank */}
@@ -277,6 +294,9 @@ const toggleFav = async () => {
     </div>
   </div>
 )}
+      {showTheory && (
+        <GrammarTheoryModal theory={theory} onClose={() => setShowTheory(false)} />
+      )}
     </div>
   )
 }

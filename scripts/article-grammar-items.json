@@ -1,0 +1,393 @@
+[
+  {
+    "id": "b1_art_01",
+    "level": "B1",
+    "tag": "Articles",
+    "sentence": "I saw ___ elephant at the zoo.",
+    "options": [
+      "a",
+      "the",
+      "an"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'a' is wrong because 'elephant' starts with a vowel sound.",
+      "Incorrect: 'the' is too specific for a first mention.",
+      "Correct: 'an' is used before words starting with a vowel sound."
+    ]
+  },
+  {
+    "id": "a1_art_01",
+    "level": "A2",
+    "tag": "Articles",
+    "sentence": "He’s eating ___ apple.",
+    "options": [
+      "a",
+      "the",
+      "an"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'a' is used before consonant sounds, not vowels.",
+      "Incorrect: 'the' is for known or previously mentioned items.",
+      "Correct: 'an' is used before vowel sounds like 'apple'."
+    ]
+  },
+  {
+    "id": "a2_art_01",
+    "level": "A2",
+    "tag": "Articles",
+    "sentence": "When we went to Paris, we stayed at ___ hotel near the city centre.",
+    "options": [
+      "—",
+      "a",
+      "the"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: No article is not allowed with singular countable nouns.",
+      "Correct: 'a' is used for first mention of a singular countable noun.",
+      "Incorrect: 'the' would only be correct if the listener already knows which hotel, or there is only one, which is not the case."
+    ]
+  },
+  {
+    "id": "b1_art_012",
+    "level": "A2",
+    "tag": "Articles",
+    "sentence": "He gave me ___ book you recommended.",
+    "options": [
+      "a",
+      "the",
+      "—"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'a' is for non-specific first mentions.",
+      "Correct: 'the' refers to a specific book already known to both speaker and listener.",
+      "Incorrect: Zero article is not used before singular countable nouns."
+    ]
+  },
+  {
+    "id": "a2_art_02",
+    "level": "A2",
+    "tag": "Articles",
+    "sentence": "Do you want ___ cup of tea?",
+    "options": [
+      "a",
+      "—",
+      "the"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'a' is used for offers or first mentions.",
+      "Incorrect: Zero article is not used with countable singular nouns.",
+      "Incorrect: 'the' implies a known specific cup."
+    ]
+  },
+  {
+    "id": "b2_art_01",
+    "level": "B2",
+    "tag": "Articles",
+    "sentence": "She was at ___ university when we met.",
+    "options": [
+      "a",
+      "the",
+      "—"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'a' suggests any university, but this refers to the time when she was a student.",
+      "Incorrect: 'the' would suggest a specific university, focussing on the physical place, not the fact of being a student.",
+      "Correct: No article is used when referring to the institution in a general sense, and being a student."
+    ]
+  },
+  {
+    "id": "b1_art_02",
+    "level": "B1",
+    "tag": "Articles",
+    "sentence": "After dinner, we went for ___ walk along the river.",
+    "options": [
+      "a",
+      "the",
+      "—"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'a walk' is a typical collocation for leisure activity.",
+      "Incorrect: 'the' suggests a specific walk already known or mentioned.",
+      "Incorrect: Zero article is not allowed with singular countable nouns."
+    ]
+  },
+  {
+    "id": "b2_art_02",
+    "level": "A2",
+    "tag": "Articles",
+    "sentence": "___ moon looked especially bright last night.",
+    "options": [
+      "A",
+      "—",
+      "The"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'A moon' would be wrong unless referring to one of many moons.",
+      "Incorrect: No article isn’t used with unique objects. With proper nouns like 'Mars' or 'Jupiter, no aritcle is correct",
+      "Correct: 'The moon' is a unique object, so we always use 'the'."
+    ]
+  },
+  {
+    "id": "a2_art_03",
+    "level": "A2",
+    "tag": "Articles",
+    "sentence": "He works as ___ engineer for an international company.",
+    "options": [
+      "an",
+      "—",
+      "the"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'an' is used before vowel sounds like 'engineer'.",
+      "Incorrect: - is inccorect, as we always use a/an before jobs.",
+      "Incorrect: 'the' is too specific for this context."
+    ]
+  },
+  {
+    "id": "b2_art_03",
+    "level": "B2",
+    "tag": "Articles",
+    "sentence": "___ Netherlands is known for its canals and windmills.",
+    "options": [
+      "—",
+      "The",
+      "A"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: No article is used with most countries, but this is an exception.",
+      "Correct: We use 'the' with country names that are plural or contain political terms (e.g. 'the Netherlands').",
+      "Incorrect: 'A Netherlands' is never correct."
+    ]
+  },
+  {
+    "id": "b2_art_04",
+    "level": "B2",
+    "tag": "Articles",
+    "sentence": "Many tourists visit ___ Alps for skiing in winter.",
+    "options": [
+      "a",
+      "the",
+      "—"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'A Alps' is grammatically incorrect — 'Alps' is plural and unique.",
+      "Correct: We use 'the' with mountain ranges like 'the Alps'.",
+      "Incorrect: No article is used with most countries, but mountain ranges always take 'the'."
+    ]
+  },
+  {
+    "id": "c1_art_01",
+    "level": "C1",
+    "tag": "Articles",
+    "sentence": "___ rich often invest their money in real estate.",
+    "options": [
+      "A",
+      "—",
+      "The"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'A rich' is incorrect without a noun.",
+      "Incorrect: No article doesn't work when referring to a defined group like this.",
+      "Correct: 'The rich' means rich people in general. We use 'the + adjective' to refer to a group."
+    ]
+  },
+  {
+    "id": "b2_art_05",
+    "level": "B2",
+    "tag": "Articles",
+    "sentence": "___ Amazon is the second longest river in the world.",
+    "options": [
+      "A",
+      "The",
+      "—"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'A Amazon' is grammatically incorrect — it’s a specific name.",
+      "Correct: Rivers always take 'the', e.g. the Amazon, the Nile.",
+      "Incorrect: Zero article is not used with named rivers."
+    ]
+  },
+  {
+    "id": "c1_art_02",
+    "level": "C1",
+    "tag": "Articles",
+    "sentence": "She donated a large sum to help ___ elderly in her community.",
+    "options": [
+      "the",
+      "a",
+      "—"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'The elderly' refers to elderly people in general — we use 'the + adjective' for groups.",
+      "Incorrect: 'A elderly' is grammatically incorrect (and singular/plural mismatch).",
+      "Incorrect: No article sounds incomplete when referring to a whole group in this way."
+    ]
+  },
+  {
+    "id": "b2_art_06",
+    "level": "B2",
+    "tag": "Articles",
+    "sentence": "Lake Como is in ___ north of Italy.",
+    "options": [
+      "the",
+      "—",
+      "a"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: When referring to regions of countries, we use 'the north/south/etc.'",
+      "Incorrect: Zero article sounds incomplete in this context.",
+      "Incorrect: 'a north' is not a valid expression."
+    ]
+  },
+  {
+    "id": "c1_art_03",
+    "level": "B2",
+    "tag": "Articles",
+    "sentence": "___ Spanish have a strong tradition of family gatherings.",
+    "options": [
+      "The",
+      "A",
+      "—"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'The Spanish' refers to the Spanish people as a nationality group.",
+      "Incorrect: 'A Spanish' would require a noun (e.g. 'a Spanish person').",
+      "Incorrect: Zero article isn't used for nationalities used as plural collective nouns."
+    ]
+  },
+  {
+    "id": "b1_art_03",
+    "level": "B1",
+    "tag": "Articles",
+    "sentence": "She visited ___ Mount Fuji during her trip to Japan.",
+    "options": [
+      "—",
+      "a",
+      "the"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'the is not correct, as we do not use 'the' with mountains: e.g. We climbed Everest.",
+      "Incorrect: 'A Mount Fuji' is not correct as there is only one.",
+      "Incorrect: 'The' is not used before mountain names."
+    ]
+  },
+  {
+    "id": "c1_art_04",
+    "level": "A2",
+    "tag": "Articles",
+    "sentence": "They’re launching ___ campaign to raise awareness about climate change.",
+    "options": [
+      "—",
+      "a",
+      "the"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: Zero article is not allowed with singular countable nouns.",
+      "Correct: 'a campaign' is used for first mention of a singular countable noun.",
+      "Incorrect: 'the campaign' would imply the listener already knows about it."
+    ]
+  },
+  {
+    "id": "b2_art_07",
+    "level": "B1",
+    "tag": "Articles",
+    "sentence": "They travelled across ___ Sahara on camelback.",
+    "options": [
+      "—",
+      "a",
+      "the"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: No article is not correct with named deserts.",
+      "Incorrect: 'A Sahara' is not possible as there is only one Sahara Desert.",
+      "Correct: Deserts (like rivers and oceans) take 'the' — 'the Sahara', 'the Gobi'."
+    ]
+  },
+  {
+    "id": "c1_art_05",
+    "level": "B2",
+    "tag": "Articles",
+    "sentence": "___ Spanish people are generally very sociable.",
+    "options": [
+      "A",
+      "—",
+      "The"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'A Spanish people' is grammatically incorrect — we don't use 'a' with plural 'people'.",
+      "Correct: No article is correct when we are referring to Spanish people in general. Compare 'The Spanish people I know' (specific group).",
+      "Incorrect: 'The Spanish people' is wrong because we are referring to Spanish people in general."
+    ]
+  },
+  {
+    "id": "c1_art_11",
+    "level": "B2",
+    "tag": "Articles",
+    "sentence": "___ are known for their efficiency and punctuality.",
+    "options": [
+      "The Germans",
+      "A Germans",
+      "Germans"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'The Germans' would imply a specific group, not a nationality in general.",
+      "Incorrect: 'A Germans' is grammatically wrong — singular article with a plural noun.",
+      "Correct: 'Germans': Nationalities ending in -an are used as nouns, eg. 'An Italian'. We use the plural form with no article to make generalisations"
+    ]
+  },
+  {
+    "id": "c1_art_09",
+    "level": "B2",
+    "tag": "Articles",
+    "sentence": "___ tend to value personal freedom and individualism.",
+    "options": [
+      "The Americans",
+      "Americans",
+      "The American"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'The Americans' refers to a specific group, not the nationality in general.",
+      "Correct: 'Americans': Nationalities ending in -an are used as nouns, eg. 'An Italian'. We use the plural form with no article to make generalisations",
+      "Incorrect: 'The American' is singular and doesn’t work with a plural verb like 'tend'."
+    ]
+  },
+  {
+    "id": "b2_art_06b",
+    "level": "B2",
+    "tag": "Articles",
+    "sentence": "We spent a week hiking in ___ Spain.",
+    "options": [
+      "Northern",
+      "the Northern",
+      "a Northern"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: We don’t use an article before compound place names like 'Northern Spain'.",
+      "Incorrect: 'The Northern Spain' is not correct. Compare 'the north of Spain'.",
+      "Incorrect: 'A Northern Spain' is not a valid phrase — we don’t use 'a' before region names like this."
+    ]
+  }
+]

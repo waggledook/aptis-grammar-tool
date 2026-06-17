@@ -1,0 +1,274 @@
+[
+  {
+    "id": "b2_futureforms_01",
+    "level": "B1",
+    "tag": "Future Forms",
+    "sentence": "We ___ to visit them next weekend.",
+    "options": [
+      "are going",
+      "go",
+      "will going"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'are going' is the correct 'be going to' future structure.",
+      "Incorrect: 'go' is present simple, not suitable for planned future.",
+      "Incorrect: 'will going' is ungrammatical; 'will' is followed by base verb."
+    ]
+  },
+  {
+    "id": "b1_future_01",
+    "level": "B1",
+    "tag": "Future Forms",
+    "sentence": "Look at those clouds! It ___ any second now.",
+    "options": [
+      "will rain",
+      "is raining",
+      "is going to rain"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'Will rain' less natural when the prediction is based on (visible) evidence in the present moment.",
+      "Incorrect: Present continuous is used for arrangements (plans), not predictions.",
+      "Correct: 'Going to' is used for predictions based on present evidence."
+    ]
+  },
+  {
+    "id": "b2_future_02",
+    "level": "B2",
+    "tag": "Future Forms",
+    "sentence": "They ___ for Paris at 6am tomorrow.",
+    "options": [
+      "are leaving",
+      "will leave",
+      "leaves"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: Present continuous for fixed plans with a time reference.",
+      "Incorrect: 'Will leave' is less natural for scheduled events.",
+      "Incorrect: Present simple is more common in timetables, not personal plans. Here it is incorrect because of the 's' as well (they=plural)."
+    ]
+  },
+  {
+    "id": "b2_future_03",
+    "level": "B2",
+    "tag": "Future Forms",
+    "sentence": "By the time you get home, I ___ dinner, so you can eat as soon as you arrive.",
+    "options": [
+      "will be cooking",
+      "am going to cook",
+      "will have cooked"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: This would describe an ongoing action, not a completed one. We know the food will be ready before you arrive.",
+      "Incorrect: 'Going to' doesn't work with 'by the time' in this case.",
+      "Correct: 'Will have cooked' shows completion before a point in the future, and is typically used with 'by the time'."
+    ]
+  },
+  {
+    "id": "a2_future_04",
+    "level": "A2",
+    "tag": "Future Forms",
+    "sentence": "I think it ___ cold tomorrow.",
+    "options": [
+      "will be",
+      "is being",
+      "going to be"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Will' is used for predictions based on opinion or belief.",
+      "Incorrect: future continuous is not used for future predictions.",
+      "Incorrect: 'Going to be' is more common with present evidence. Here it is incorrect because we're missing the verb 'to be': 'is going to be'."
+    ]
+  },
+  {
+    "id": "b1_future_05",
+    "level": "B1",
+    "tag": "Future Forms",
+    "sentence": "This time next week, we ___ on the beach!",
+    "options": [
+      "are lying",
+      "will be lying",
+      "will have lain"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: Present continuous is use for future arrangements. Here we are describing an action in progress at a future time.",
+      "Correct: 'Will be lying' (future continuous) describes an ongoing future action.",
+      "Incorrect: 'Will have lain' focuses on completion, not an action in progress."
+    ]
+  },
+  {
+    "id": "b2_future_06",
+    "level": "B2",
+    "tag": "Future Forms",
+    "sentence": "She says she ___ her final decision by Friday.",
+    "options": [
+      "will be making",
+      "will have made",
+      "makes"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: Progressive doesn't work with 'by Friday. It could work with 'on Friday' or 'this Friday', but not with 'by'.",
+      "Correct: 'Will have made' expresses completed future action before another point. future perfect especially common with 'by'.",
+      "Incorrect: Present simple doesn't work for a future plan."
+    ]
+  },
+  {
+    "id": "a2_future_07",
+    "level": "B1",
+    "tag": "Future Forms",
+    "sentence": "We ___ a barbecue on Saturday. Want to come?",
+    "options": [
+      "are having",
+      "will have",
+      "have had"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: Present continuous is used for planned future events/arrangements.",
+      "Incorrect: 'Will have' is strange here as we are referring to a plan we already have.",
+      "Incorrect: 'Have had', present perfect, refers to the past."
+    ]
+  },
+  {
+    "id": "c1_future_08",
+    "level": "C1",
+    "tag": "Future Forms",
+    "sentence": "If she keeps going at this pace, she ___ the summit before sunset.",
+    "options": [
+      "will reaches",
+      "will have reached",
+      "are reaching"
+    ],
+    "answerIndex": 1,
+    "explanations": [
+      "Incorrect: 'Will reach' is possible but not 'will reaches'. will (modal verb) + infintive without to.",
+      "Correct: 'Will have reached' is used for completion before a point in time.",
+      "Incorrect: Present continuous is used for future arrangements, and doesn't fit here (conditional/prediction)."
+    ]
+  },
+  {
+    "id": "b2_future_09",
+    "level": "B2",
+    "tag": "Future Forms",
+    "sentence": "Don't call her at 8. She ___ her presentation then. It starts at 7:30",
+    "options": [
+      "will be giving",
+      "gives",
+      "will give"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Will be giving' shows an action in progress at a future time.",
+      "Incorrect: Present simple doesn't indicate an action already in progress. It could be used for a fixed timetabled event, but less natural here.",
+      "Incorrect: 'Will give' suggests her presentation starts at 8, but we know it starts earlier (7:30)."
+    ]
+  },
+  {
+    "id": "b1_future_10",
+    "level": "B1",
+    "tag": "Future Forms",
+    "sentence": "I ___ the results as soon as I get them.",
+    "options": [
+      "will tell you",
+      "am telling you",
+      "go to tell you"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Will' is used in conditional sentences and future time clauses (as soon as).",
+      "Incorrect: 'Am telling you' suggests a fixed arrangement, which doesn't fit here.",
+      "Incorrect: 'Go to tell you' needs to be in the continuous (going to future), 'am going to tell you'. But is less natural in these structures."
+    ]
+  },
+  {
+    "id": "c1_future_11",
+    "level": "C1",
+    "tag": "Future Forms",
+    "sentence": "The President ___ a formal apology later this afternoon.",
+    "options": [
+      "going to issue",
+      "issues",
+      "is to issue"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: missing the the verb to be: 'is going to issue'.",
+      "Incorrect: Present simple is rare for future outside timetables or schedules.",
+      "Correct: 'Be to + infinitive' is formal and appropriate in announcements."
+    ]
+  },
+  {
+    "id": "c1_future_12",
+    "level": "C1",
+    "tag": "Future Forms",
+    "sentence": "The flight ___ at 8:15, so we need to leave now.",
+    "options": [
+      "is about to leave",
+      "is set to leaving",
+      "is due to leave"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'About to' implies very soon but doesn’t give a fixed time.",
+      "Incorrect: 'Is set to leaving' is incorrect because 'set to' needs the infinitive.",
+      "Correct: 'Due to' works well with scheduled arrangements."
+    ]
+  },
+  {
+    "id": "c1_future_13",
+    "level": "B2",
+    "tag": "Future Forms",
+    "sentence": "He looked like he ___ something important.",
+    "options": [
+      "is going to say",
+      "will have said",
+      "was about to say"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: Present/future mix doesn't fit with past context. 'was going to say' would be correct.",
+      "Incorrect: future perfect doesn't fit with 'looked' in the past.",
+      "Correct: 'Was about to' implies immediate past intention. Future in the past (was instead of is)."
+    ]
+  },
+  {
+    "id": "c1_future_15",
+    "level": "C1",
+    "tag": "Future Forms",
+    "sentence": "He is ___ launching a new brand when the scandal broke.",
+    "options": [
+      "just about to",
+      "due to",
+      "on the point of"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: would be correct with the infinitive: just about to LAUNCH.",
+      "Incorrect: 'Due to' also takes the infinitive: 'due to launch'. due= scheduled or expected.",
+      "Correct: 'On the point of' has a similar meaning to 'be about to' but goes with verb-ing."
+    ]
+  },
+  {
+    "id": "c1_future_17",
+    "level": "C1",
+    "tag": "Future Forms",
+    "sentence": "The meeting ___ at 2pm sharp, so please be punctual.",
+    "options": [
+      "is to beginning",
+      "will have begun",
+      "is due to begin"
+    ],
+    "answerIndex": 2,
+    "explanations": [
+      "Incorrect: 'is to begin' (infinitive) would be correct. to be + to inf is a formal future form, especially for timetabled events.",
+      "Incorrect: 'future perfect would mean it begins before 2pm- not possible with 2pm SHARP.",
+      "Correct: 'Is due to' is ideal for fixed, scheduled events like meetings. 'due' similar to 'scheduled' or 'expected'."
+    ]
+  }
+]
