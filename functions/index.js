@@ -20,6 +20,7 @@ const WRITING_FEEDBACK_WEEKLY_CREDITS = {
 };
 
 const APTIS_TRAINER_ACCESS_KEY = "aptisTrainer";
+const SEIF_HUB_ACCESS_KEY = "seifhub";
 const APTIS_DEMO_FEEDBACK_LIFETIME_CREDITS = 8;
 
 const WRITING_FEEDBACK_CREDIT_COSTS = {
@@ -99,6 +100,92 @@ function hasAptisTrainerAccess(userData) {
   if (!access.indefinite && access.endDate && today > access.endDate) return false;
 
   return true;
+}
+
+function escapeHtml(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function siteAccessLabel(accessKey = "") {
+  const labels = {
+    [APTIS_TRAINER_ACCESS_KEY]: "Aptis Trainer",
+    [SEIF_HUB_ACCESS_KEY]: "Seif Hub",
+    ote: "OTE Seif",
+  };
+
+  if (labels[accessKey]) return labels[accessKey];
+
+  return String(accessKey || "your course platform")
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase()) || "your course platform";
+}
+
+function siteAccessUrl(accessKey = "") {
+  const urls = {
+    [APTIS_TRAINER_ACCESS_KEY]: "https://aptis.beeskillsenglish.com/",
+    [SEIF_HUB_ACCESS_KEY]: "https://seifhub.beeskillsenglish.com/",
+    ote: "https://ote-seif.beeskillsenglish.com/",
+  };
+
+  return urls[accessKey] || "https://aptis.beeskillsenglish.com/";
+}
+
+function normalizeSiteAccessEntry(raw) {
+  if (raw === true) {
+    return {
+      active: true,
+      startDate: "",
+      endDate: "",
+      indefinite: true,
+    };
+  }
+
+  if (!raw || typeof raw !== "object") {
+    return {
+      active: false,
+      startDate: "",
+      endDate: "",
+      indefinite: false,
+    };
+  }
+
+  return {
+    active: !!raw.active,
+    startDate: raw.startDate || "",
+    endDate: raw.endDate || "",
+    indefinite: !!raw.indefinite,
+  };
+}
+
+function hasMeaningfulAccessNotificationChange(beforeAccess, afterAccess) {
+  if (!afterAccess.active) return false;
+  if (!beforeAccess.active) return true;
+
+  return (
+    beforeAccess.startDate !== afterAccess.startDate ||
+    beforeAccess.endDate !== afterAccess.endDate ||
+    beforeAccess.indefinite !== afterAccess.indefinite
+  );
+}
+
+function formatAccessDate(dateString = "") {
+  if (!dateString) return "";
+
+  const parsed = new Date(`${dateString}T00:00:00`);
+  if (Number.isNaN(parsed.getTime())) return dateString;
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(parsed);
 }
 
 function isAptisFeedbackTask(taskType) {
@@ -4548,6 +4635,136 @@ exports.emailSupportMessage = functions.region("europe-west1")
       console.log("MAIL_OK support message", { id: snap.id, to: adminMsg.to, copy: !!userMsg });
     } catch (err) {
       console.error("MAIL_FAIL support message", err?.message || String(err));
+    }
+
+    return null;
+  });
+
+exports.emailSiteAccessGranted = functions.region("europe-west1")
+  .firestore.document("users/{userId}")
+  .onWrite(async (change, context) => {
+    const before = change.before.exists ? change.before.data() || {} : {};
+    const after = change.after.exists ? change.after.data() || {} : null;
+
+    if (!after) return null;
+
+    const userEmail = after.email || null;
+    if (!userEmail || !userEmail.includes("@")) return null;
+
+    const beforeSiteAccess = before.siteAccess || {};
+    const afterSiteAccess = after.siteAccess || {};
+    const accessKeys = Array.from(
+      new Set([
+        ...Object.keys(beforeSiteAccess || {}),
+        ...Object.keys(afterSiteAccess || {}),
+      ])
+    );
+
+    const changedAccesses = accessKeys
+      .map((accessKey) => {
+        const previous = normalizeSiteAccessEntry(beforeSiteAccess?.[accessKey]);
+        const current = normalizeSiteAccessEntry(afterSiteAccess?.[accessKey]);
+        if (!hasMeaningfulAccessNotificationChange(previous, current)) return null;
+
+        return {
+          accessKey,
+          label: siteAccessLabel(accessKey),
+          url: siteAccessUrl(accessKey),
+          access: current,
+          isNewGrant: !previous.active,
+        };
+      })
+      .filter(Boolean);
+
+    if (!changedAccesses.length) return null;
+
+    const displayName =
+      after.displayName || after.name || after.username || userEmail.split("@")[0] || "there";
+    const firstAccess = changedAccesses[0];
+    const isSingleAccess = changedAccesses.length === 1;
+    const accessListText = changedAccesses
+      .map(({ label, url, access }) => {
+        const startLine = access.startDate
+          ? `Start date: ${formatAccessDate(access.startDate)}`
+          : "Start date: active now";
+        const endLine = access.indefinite
+          ? "End date: no end date set"
+          : access.endDate
+            ? `End date: ${formatAccessDate(access.endDate)}`
+            : "End date: not set";
+
+        return [`${label}: ${url}`, startLine, endLine].join("\n");
+      })
+      .join("\n\n");
+    const accessListHtml = changedAccesses
+      .map(({ label, url, access }) => {
+        const startLine = access.startDate
+          ? `Start date: ${formatAccessDate(access.startDate)}`
+          : "Start date: active now";
+        const endLine = access.indefinite
+          ? "End date: no end date set"
+          : access.endDate
+            ? `End date: ${formatAccessDate(access.endDate)}`
+            : "End date: not set";
+
+        return [
+          `<li>`,
+          `<strong>${escapeHtml(label)}</strong><br/>`,
+          `<a href="${escapeHtml(url)}">${escapeHtml(url)}</a><br/>`,
+          `${escapeHtml(startLine)}<br/>`,
+          `${escapeHtml(endLine)}`,
+          `</li>`,
+        ].join("");
+      })
+      .join("");
+    const hasNewGrant = changedAccesses.some((entry) => entry.isNewGrant);
+    const subject = isSingleAccess
+      ? `Your ${firstAccess.label} access is ready`
+      : "Your Seif English platform access is ready";
+    const intro = hasNewGrant
+      ? "Good news: your access has been activated."
+      : "Good news: your access details have been updated.";
+
+    const text = [
+      `Hi ${displayName},`,
+      "",
+      intro,
+      "",
+      accessListText,
+      "",
+      "You can sign in with the same email address you used for your Seif English account.",
+      "If anything looks wrong, just reply to this email and we will help.",
+      "",
+      "Best,",
+      "Seif English Academy",
+    ].join("\n");
+
+    const html =
+      `<p>Hi ${escapeHtml(displayName)},</p>` +
+      `<p>${escapeHtml(intro)}</p>` +
+      `<ul>${accessListHtml}</ul>` +
+      `<p>You can sign in with the same email address you used for your Seif English account.</p>` +
+      `<p>If anything looks wrong, just reply to this email and we will help.</p>` +
+      `<p>Best,<br/>Seif English Academy</p>`;
+
+    const userMsg = {
+      from: FROM_ADDRESS,
+      to: userEmail,
+      subject,
+      text,
+      html,
+      replyTo: TEACHER_EMAIL || FROM_ADDRESS,
+    };
+
+    try {
+      await transporter.sendMail(userMsg);
+      console.log("MAIL_OK site access granted", {
+        uid: context.params.userId,
+        userEmail,
+        accessKeys: changedAccesses.map((entry) => entry.accessKey),
+      });
+    } catch (err) {
+      console.error("MAIL_FAIL site access granted", err?.message || String(err));
     }
 
     return null;
