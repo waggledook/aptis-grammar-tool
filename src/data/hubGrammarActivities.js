@@ -2161,8 +2161,8 @@ export const HUB_GRAMMAR_ACTIVITIES = [
         "Choose the best future form.",
         "Barcelona are playing really well. I think they ____ the match.",
         ["'ll win", "'re winning", "'re going to win"],
-        0,
-        "Use 'will' for a prediction based on opinion."
+        2,
+        "Use 'be going to' for a prediction based on present evidence: they are playing really well now."
       ),
       multipleChoiceItem(
         "ff-mc-8",

@@ -139,6 +139,239 @@ function buildInitialAnswers(activity) {
   return state;
 }
 
+function evaluateGrammarItem(item, answers) {
+  if (item.type === "multiple-choice") {
+    const rawAnswer = answers[item.id];
+    const selectedIndex =
+      rawAnswer === "" || rawAnswer == null ? null : Number(rawAnswer);
+    const hasAnswer = selectedIndex != null && selectedIndex >= 0;
+    const isCorrect = selectedIndex === item.answerIndex;
+
+    return {
+      id: item.id,
+      type: "multiple-choice",
+      prompt: item.prompt,
+      question: item.question,
+      options: item.options,
+      answer: selectedIndex,
+      hasAnswer,
+      selectedOption:
+        selectedIndex != null && selectedIndex >= 0 ? item.options[selectedIndex] : "",
+      correctOption: item.options[item.answerIndex],
+      isCorrect,
+      explanation: item.explanation,
+    };
+  }
+
+  if (item.type === "error-correction") {
+    const rawAnswer = answers[item.id];
+    const selectedValue = String(rawAnswer || "");
+    const correctionText = answers[`${item.id}:correction`] || "";
+    const normalizedCorrection = normalizeAnswer(correctionText);
+    const acceptedCorrections = Array.isArray(item.correction)
+      ? item.correction
+      : String(item.correction || "")
+          .split("/")
+          .map((entry) => entry.trim())
+          .filter(Boolean);
+    const normalizedExpectedCorrections = acceptedCorrections.map((entry) =>
+      normalizeAnswer(entry)
+    );
+    const selectedIsCorrect = selectedValue === "correct";
+    const selectedIsWrong = selectedValue === "wrong";
+    const hasAnswer = selectedIsCorrect || selectedIsWrong;
+    const correctionMatches =
+      !item.isCorrect && normalizedExpectedCorrections.length
+        ? normalizedExpectedCorrections.includes(normalizedCorrection)
+        : true;
+    const isCorrect = hasAnswer
+      ? item.isCorrect
+        ? selectedIsCorrect
+        : selectedIsWrong && correctionMatches
+      : false;
+
+    return {
+      id: item.id,
+      type: "error-correction",
+      prompt: item.prompt,
+      sentence: item.sentence,
+      highlighted: item.highlighted,
+      answer: selectedValue,
+      hasAnswer,
+      correctionAnswer: correctionText,
+      selectedLabel:
+        selectedValue === "correct"
+          ? "Correct"
+          : selectedValue === "wrong"
+            ? "Wrong"
+            : "",
+      expectedLabel: item.isCorrect ? "Correct" : "Wrong",
+      isCorrect,
+      correction: acceptedCorrections,
+      explanation: item.explanation,
+    };
+  }
+
+  if (item.type === "comma-placement") {
+    const selectedPositions = Array.isArray(answers[item.id]) ? answers[item.id] : [];
+    const expectedPositions = Array.isArray(item.commaPositions) ? item.commaPositions : [];
+    const words = Array.isArray(item.words)
+      ? item.words
+      : String(item.sentence || "")
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
+    const isCorrect = sameCommaPositions(selectedPositions, expectedPositions);
+
+    return {
+      id: item.id,
+      type: "comma-placement",
+      prompt: item.prompt,
+      sentence: item.sentence,
+      words,
+      selectedCommaPositions: selectedPositions,
+      expectedCommaPositions: expectedPositions,
+      selectedSentence: buildCommaSentence(words, selectedPositions),
+      corrected: item.corrected,
+      needsCommas: item.needsCommas,
+      isCorrect,
+      explanation: item.explanation,
+    };
+  }
+
+  if (item.type === "adverb-placement") {
+    const placements = answers[item.id] || {};
+    const correctPlacements = item.correctPlacements || {};
+    const isCorrect =
+      item.adverbs.length > 0 &&
+      item.adverbs.every(
+        (adverb) => Number(placements[adverb]) === Number(correctPlacements[adverb])
+      );
+
+    return {
+      id: item.id,
+      type: "adverb-placement",
+      prompt: item.prompt,
+      baseSentence: item.baseSentence,
+      tokens: item.tokens,
+      adverbs: item.adverbs,
+      placements,
+      selectedSentence: buildAdverbPlacementSentence(
+        item.tokens,
+        placements,
+        item.finalPunctuation
+      ),
+      correctSentence: item.correctSentence,
+      isCorrect,
+      explanation: item.explanation,
+    };
+  }
+
+  if (item.type === "word-order") {
+    const selectedOrder = Array.isArray(answers[item.id]) ? answers[item.id] : [];
+    const selectedSentence = buildWordOrderSentence(
+      item.tokens || [],
+      selectedOrder,
+      item.finalPunctuation || ""
+    );
+    const acceptedAnswers = Array.isArray(item.acceptedAnswers)
+      ? item.acceptedAnswers
+      : [item.answer].filter(Boolean);
+    const isCorrect = acceptedAnswers.some(
+      (accepted) => normalizeAnswer(accepted) === normalizeAnswer(selectedSentence)
+    );
+
+    return {
+      id: item.id,
+      type: "word-order",
+      prompt: item.prompt,
+      tokens: item.tokens,
+      selectedOrder,
+      selectedSentence,
+      answer: item.answer,
+      acceptedAnswers,
+      isCorrect,
+      explanation: item.explanation,
+    };
+  }
+
+  if (item.type === "audio-response") {
+    const rawAnswer = answers[item.id] || "";
+    const acceptedAnswers = Array.isArray(item.acceptedAnswers)
+      ? item.acceptedAnswers
+      : [item.answer].filter(Boolean);
+    const isCorrect = acceptedAnswers.some(
+      (accepted) => normalizeAnswer(accepted) === normalizeAnswer(rawAnswer)
+    );
+
+    return {
+      id: item.id,
+      type: "audio-response",
+      prompt: item.prompt,
+      audioSrc: item.audioSrc,
+      answer: rawAnswer,
+      acceptedAnswers,
+      correctAnswer: item.answer || acceptedAnswers[0] || "",
+      isCorrect,
+      explanation: item.explanation,
+    };
+  }
+
+  const evaluatedGaps = item.gaps.map((gap) => {
+    const answerKey = `${item.id}:${gap.id}`;
+    const rawAnswer = answers[answerKey] || "";
+    const normalized = normalizeAnswer(rawAnswer);
+    const matched = gap.acceptedAnswers.some(
+      (accepted) => normalizeAnswer(accepted) === normalized
+    );
+
+    return {
+      gapId: gap.id,
+      answer: rawAnswer,
+      acceptedAnswers: gap.acceptedAnswers,
+      isCorrect: matched,
+      feedback: gap.feedback,
+    };
+  });
+
+  return {
+    id: item.id,
+    type: "gap-fill",
+    prompt: item.prompt,
+    parts: item.parts,
+    gaps: evaluatedGaps,
+  };
+}
+
+function scoreEvaluatedItems(evaluatedItems = [], totalGaps = 0) {
+  const correct = evaluatedItems.reduce(
+    (sum, item) => {
+      if (
+        item.type === "multiple-choice" ||
+        item.type === "error-correction" ||
+        item.type === "comma-placement" ||
+        item.type === "adverb-placement" ||
+        item.type === "word-order" ||
+        item.type === "audio-response"
+      ) {
+        return sum + (item.isCorrect ? 1 : 0);
+      }
+      return sum + item.gaps.filter((gap) => gap.isCorrect).length;
+    },
+    0
+  );
+
+  return {
+    correct,
+    score: totalGaps ? Math.round((correct / totalGaps) * 100) : 0,
+  };
+}
+
+function getDraftStorageKey(activityId, user) {
+  const userKey = user?.uid || user?.email || "guest";
+  return `hub-grammar-draft:${activityId}:${userKey}`;
+}
+
 function highlightSentence(sentence, highlighted) {
   const full = String(sentence || "");
   const target = String(highlighted || "");
@@ -236,11 +469,18 @@ export default function HubGrammarActivityRunner({ user }) {
   const [answers, setAnswers] = useState(() => (activity ? buildInitialAnswers(activity) : {}));
   const [confirmedCorrections, setConfirmedCorrections] = useState({});
   const [selectedAdverb, setSelectedAdverb] = useState(null);
+  const [, setSelectedWordToken] = useState(null);
+  const [checkedItemResults, setCheckedItemResults] = useState({});
+  const [draftStatus, setDraftStatus] = useState("idle");
   const [submitted, setSubmitted] = useState(false);
   const [saving, setSaving] = useState(false);
   const [result, setResult] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const isTeacher = user?.role === "teacher" || user?.role === "admin";
+  const draftStorageKey = useMemo(
+    () => (activity ? getDraftStorageKey(activity.id, user) : ""),
+    [activity, user?.uid, user?.email]
+  );
 
   const orderedInputKeys = useMemo(() => {
     if (!activity) return [];
@@ -337,13 +577,63 @@ export default function HubGrammarActivityRunner({ user }) {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
     inputRefs.current = {};
     itemRefs.current = {};
-    setAnswers(activity ? buildInitialAnswers(activity) : {});
+    const initialAnswers = activity ? buildInitialAnswers(activity) : {};
+    let restoredDraft = null;
+
+    if (activity && typeof window !== "undefined") {
+      try {
+        const rawDraft = window.localStorage.getItem(getDraftStorageKey(activity.id, user));
+        restoredDraft = rawDraft ? JSON.parse(rawDraft) : null;
+      } catch (error) {
+        console.warn("[HubGrammarActivityRunner] draft restore failed", error);
+      }
+    }
+
+    if (restoredDraft && !restoredDraft.submitted) {
+      setAnswers({ ...initialAnswers, ...(restoredDraft.answers || {}) });
+      setCheckedItemResults(restoredDraft.checkedItemResults || {});
+      setDraftStatus("restored");
+    } else {
+      setAnswers(initialAnswers);
+      setCheckedItemResults({});
+      setDraftStatus("idle");
+    }
+
     setConfirmedCorrections({});
     setSelectedAdverb(null);
+    setSelectedWordToken(null);
     setSubmitted(false);
     setSaving(false);
     setResult(null);
-  }, [activityId, activity]);
+  }, [activityId, activity, user?.uid, user?.email]);
+
+  useEffect(() => {
+    if (!activity || !draftStorageKey || submitted) return;
+    if (typeof window === "undefined") return;
+
+    setDraftStatus((current) => (current === "restored" ? "restored" : "saving"));
+
+    const timeoutId = window.setTimeout(() => {
+      try {
+        window.localStorage.setItem(
+          draftStorageKey,
+          JSON.stringify({
+            activityId: activity.id,
+            answers,
+            checkedItemResults,
+            submitted: false,
+            updatedAt: new Date().toISOString(),
+          })
+        );
+        setDraftStatus("saved");
+      } catch (error) {
+        console.warn("[HubGrammarActivityRunner] draft save failed", error);
+        setDraftStatus("error");
+      }
+    }, 500);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [activity, answers, checkedItemResults, draftStorageKey, submitted]);
 
   useEffect(() => {
     if (!submitted) {
@@ -421,17 +711,23 @@ export default function HubGrammarActivityRunner({ user }) {
     }
   };
 
-  const focusNextInput = (key) => {
+  const handleSentenceAdvance = (item, key) => {
     const currentIndex = orderedInputKeys.indexOf(key);
     const nextKey = currentIndex >= 0 ? orderedInputKeys[currentIndex + 1] : null;
+    const nextKeyItemId = String(nextKey || "").split(":")[0];
 
-    if (nextKey && inputRefs.current[nextKey]) {
+    if (nextKey && nextKeyItemId === item.id && inputRefs.current[nextKey]) {
       focusControl(nextKey);
+      return;
     }
+
+    handleCheckItem(item);
   };
 
-  const handleJudgeSelection = (itemId, value) => {
-    handleChange(itemId, value);
+  const handleJudgeSelection = (item, value) => {
+    const itemId = item.id;
+    const nextAnswers = { ...answers, [itemId]: value };
+    setAnswers(nextAnswers);
 
     if (value === "wrong") {
       setConfirmedCorrections((prev) => ({ ...prev, [itemId]: false }));
@@ -442,9 +738,11 @@ export default function HubGrammarActivityRunner({ user }) {
     }
 
     setConfirmedCorrections((prev) => ({ ...prev, [itemId]: false }));
+    handleCheckItem(item, nextAnswers);
   };
 
-  const confirmCorrection = (itemId) => {
+  const confirmCorrection = (item) => {
+    const itemId = item.id;
     const correctionKey = `${itemId}:correction`;
     const value = String(answers[correctionKey] || "").trim();
     if (!value) {
@@ -453,9 +751,7 @@ export default function HubGrammarActivityRunner({ user }) {
     }
 
     setConfirmedCorrections((prev) => ({ ...prev, [itemId]: true }));
-    requestAnimationFrame(() => {
-      focusNextQuestion(itemId);
-    });
+    handleCheckItem(item);
   };
 
   const handleGapChoiceSelect = (item, gap, choice) => {
@@ -490,6 +786,12 @@ export default function HubGrammarActivityRunner({ user }) {
 
   const clearCommas = (itemId) => {
     handleChange(itemId, []);
+  };
+
+  const handleNoCommasNeeded = (item) => {
+    const nextAnswers = { ...answers, [item.id]: [] };
+    setAnswers(nextAnswers);
+    handleCheckItem(item, nextAnswers);
   };
 
   const placeAdverb = (itemId, adverb, slotIndex) => {
@@ -555,8 +857,15 @@ export default function HubGrammarActivityRunner({ user }) {
     setAnswers(buildInitialAnswers(activity));
     setConfirmedCorrections({});
     setSelectedAdverb(null);
+    setSelectedWordToken(null);
+    setCheckedItemResults({});
+    setDraftStatus("idle");
     setSubmitted(false);
     setResult(null);
+
+    if (typeof window !== "undefined" && draftStorageKey) {
+      window.localStorage.removeItem(draftStorageKey);
+    }
   };
 
   const shareUrl =
@@ -572,6 +881,27 @@ export default function HubGrammarActivityRunner({ user }) {
       console.error("[HubGrammarActivityRunner] copy share link failed", error);
       toast("Could not copy that link.");
     }
+  };
+
+  const handleCheckItem = (item, answerOverride = null) => {
+    if (!item || submitted || checkedItemResults[item.id]) return;
+
+    const sourceAnswers = answerOverride || answers;
+    const evaluatedItem = evaluateGrammarItem(item, sourceAnswers);
+    setCheckedItemResults((prev) => ({
+      ...prev,
+      [item.id]: evaluatedItem,
+    }));
+    setConfirmedCorrections((prev) => ({ ...prev, [item.id]: true }));
+    setSelectedAdverb((current) => (current?.itemId === item.id ? null : current));
+    setSelectedWordToken((current) => (current?.itemId === item.id ? null : current));
+  };
+
+  const handleMultipleChoiceSelect = (item, optionIndex) => {
+    const value = String(optionIndex);
+    const nextAnswers = { ...answers, [item.id]: value };
+    setAnswers(nextAnswers);
+    handleCheckItem(item, nextAnswers);
   };
 
   const handleSubmit = async () => {
@@ -779,23 +1109,7 @@ export default function HubGrammarActivityRunner({ user }) {
       };
     });
 
-    const correct = evaluatedItems.reduce(
-      (sum, item) => {
-        if (
-          item.type === "multiple-choice" ||
-          item.type === "error-correction" ||
-          item.type === "comma-placement" ||
-          item.type === "adverb-placement" ||
-          item.type === "word-order" ||
-          item.type === "audio-response"
-        ) {
-          return sum + (item.isCorrect ? 1 : 0);
-        }
-        return sum + item.gaps.filter((gap) => gap.isCorrect).length;
-      },
-      0
-    );
-    const score = totalGaps ? Math.round((correct / totalGaps) * 100) : 0;
+    const { correct, score } = scoreEvaluatedItems(evaluatedItems, totalGaps);
     const payload = {
       activityId: activity.id,
       activityTitle: activity.title,
@@ -811,6 +1125,10 @@ export default function HubGrammarActivityRunner({ user }) {
 
     try {
       await saveHubGrammarSubmission(payload);
+      if (typeof window !== "undefined" && draftStorageKey) {
+        window.localStorage.removeItem(draftStorageKey);
+      }
+      setDraftStatus("idle");
       toast("Grammar activity submitted and saved.");
     } catch (error) {
       console.error("[HubGrammarActivityRunner] save failed", error);
@@ -837,6 +1155,17 @@ export default function HubGrammarActivityRunner({ user }) {
         <header className="hub-grammar-header">
           <div className="hub-grammar-kicker-row">
             <span className="hub-grammar-kicker">Seif Hub Grammar Activity</span>
+            {!submitted && draftStatus !== "idle" ? (
+              <span className={`hub-grammar-draft-pill is-${draftStatus}`}>
+                {draftStatus === "restored"
+                  ? "Draft restored"
+                  : draftStatus === "saving"
+                    ? "Saving draft..."
+                    : draftStatus === "error"
+                      ? "Draft not saved"
+                      : "Draft saved"}
+              </span>
+            ) : null}
             {isTeacher ? (
               <button
                 type="button"
@@ -919,7 +1248,8 @@ export default function HubGrammarActivityRunner({ user }) {
 
         <div className="hub-grammar-list">
           {activity.items.map((item, index) => {
-            const evaluatedItem = result?.items.find((entry) => entry.id === item.id);
+            const evaluatedItem = result?.items.find((entry) => entry.id === item.id) || checkedItemResults[item.id];
+            const itemLocked = submitted || Boolean(checkedItemResults[item.id]);
 
             return (
               <article
@@ -956,9 +1286,9 @@ export default function HubGrammarActivityRunner({ user }) {
                     <div className="hub-grammar-options">
                       {item.options.map((option, optionIndex) => {
                         const selected = answers[item.id] === String(optionIndex);
-                        const isRightAnswer = submitted && optionIndex === item.answerIndex;
+                        const isRightAnswer = itemLocked && optionIndex === item.answerIndex;
                         const isWrongSelection =
-                          submitted && selected && optionIndex !== item.answerIndex;
+                          itemLocked && selected && optionIndex !== item.answerIndex;
 
                         return (
                           <button
@@ -972,8 +1302,8 @@ export default function HubGrammarActivityRunner({ user }) {
                             ]
                               .filter(Boolean)
                               .join(" ")}
-                            onClick={() => handleChange(item.id, String(optionIndex))}
-                            disabled={submitted}
+                            onClick={() => handleMultipleChoiceSelect(item, optionIndex)}
+                            disabled={itemLocked}
                           >
                             {option}
                           </button>
@@ -993,11 +1323,11 @@ export default function HubGrammarActivityRunner({ user }) {
                       ].map((option) => {
                         const selected = answers[item.id] === option.value;
                         const shouldBeSelected =
-                          submitted &&
+                          itemLocked &&
                           ((item.isCorrect && option.value === "correct") ||
                             (!item.isCorrect && option.value === "wrong"));
                         const wrongSelection =
-                          submitted && selected && !shouldBeSelected;
+                          itemLocked && selected && !shouldBeSelected;
 
                         return (
                           <button
@@ -1011,9 +1341,9 @@ export default function HubGrammarActivityRunner({ user }) {
                             ]
                               .filter(Boolean)
                               .join(" ")}
-                            onClick={() => handleJudgeSelection(item.id, option.value)}
+                            onClick={() => handleJudgeSelection(item, option.value)}
                             ref={registerInput(`${item.id}:judge:${option.value}`)}
-                            disabled={submitted}
+                            disabled={itemLocked}
                           >
                             {option.label}
                           </button>
@@ -1036,18 +1366,18 @@ export default function HubGrammarActivityRunner({ user }) {
                             onKeyDown={(event) => {
                               if (event.key === "Enter") {
                                 event.preventDefault();
-                                confirmCorrection(item.id);
+                                confirmCorrection(item);
                               }
                             }}
                             ref={registerInput(`${item.id}:correction`)}
-                            disabled={submitted || Boolean(confirmedCorrections[item.id])}
+                            disabled={itemLocked || Boolean(confirmedCorrections[item.id])}
                             placeholder="Type the corrected form..."
                           />
                           <button
                             type="button"
                             className="hub-grammar-inline-btn"
-                            onClick={() => confirmCorrection(item.id)}
-                            disabled={submitted}
+                            onClick={() => confirmCorrection(item)}
+                            disabled={itemLocked}
                           >
                             OK
                           </button>
@@ -1076,13 +1406,13 @@ export default function HubGrammarActivityRunner({ user }) {
                             ]
                               .filter(Boolean)
                               .join(" ")}
-                            draggable={!submitted && !isPlaced}
+                            draggable={!itemLocked && !isPlaced}
                             onDragStart={(event) => {
                               event.dataTransfer.setData("text/plain", adverb);
                               event.dataTransfer.effectAllowed = "move";
                             }}
                             onClick={() => {
-                              if (submitted) return;
+                              if (itemLocked) return;
                               if (isPlaced) {
                                 removePlacedAdverb(item.id, adverb);
                                 return;
@@ -1090,7 +1420,7 @@ export default function HubGrammarActivityRunner({ user }) {
                               setSelectedAdverb(isSelected ? null : { itemId: item.id, adverb });
                             }}
                             ref={adverbIndex === 0 ? registerInput(`${item.id}:adverb:0`) : undefined}
-                            disabled={submitted}
+                            disabled={itemLocked}
                           >
                             {adverb}
                           </button>
@@ -1103,7 +1433,7 @@ export default function HubGrammarActivityRunner({ user }) {
                         const slotAdverbs = item.adverbs.filter(
                           (adverb) => Number(placements[adverb]) === slotIndex
                         );
-                        const correctAdverbsForSlot = submitted
+                        const correctAdverbsForSlot = itemLocked
                           ? item.adverbs.filter(
                               (adverb) =>
                                 Number(item.correctPlacements?.[adverb]) === slotIndex &&
@@ -1125,16 +1455,16 @@ export default function HubGrammarActivityRunner({ user }) {
                                 .filter(Boolean)
                                 .join(" ")}
                               onDragOver={(event) => {
-                                if (!submitted) event.preventDefault();
+                                if (!itemLocked) event.preventDefault();
                               }}
                               onDrop={(event) => handleAdverbDrop(event, item, slotIndex)}
                               onClick={() => {
-                                if (submitted) return;
+                                if (itemLocked) return;
                                 if (selectedAdverb?.itemId === item.id) {
                                   placeAdverb(item.id, selectedAdverb.adverb, slotIndex);
                                 }
                               }}
-                              disabled={submitted}
+                              disabled={itemLocked}
                               aria-label={`Place adverb in position ${slotIndex + 1}`}
                             >
                               {slotAdverbs.length ? (
@@ -1143,7 +1473,7 @@ export default function HubGrammarActivityRunner({ user }) {
                                     key={`${item.id}:placed:${adverb}`}
                                     className={[
                                       "hub-grammar-adverb-placed",
-                                      submitted
+                                      itemLocked
                                         ? Number(item.correctPlacements?.[adverb]) === slotIndex
                                           ? "is-correct"
                                           : "is-wrong"
@@ -1198,7 +1528,7 @@ export default function HubGrammarActivityRunner({ user }) {
                                   .filter(Boolean)
                                   .join(" ")}
                                 onClick={() => handleCommaToggle(item, wordIndex)}
-                                disabled={submitted}
+                                disabled={itemLocked}
                                 ref={wordIndex === 0 ? registerInput(`${item.id}:comma:none`) : undefined}
                               >
                                 ,
@@ -1219,8 +1549,8 @@ export default function HubGrammarActivityRunner({ user }) {
                       ]
                         .filter(Boolean)
                         .join(" ")}
-                      onClick={() => clearCommas(item.id)}
-                      disabled={submitted}
+                      onClick={() => handleNoCommasNeeded(item)}
+                      disabled={itemLocked}
                     >
                       No commas needed
                     </button>
@@ -1250,10 +1580,10 @@ export default function HubGrammarActivityRunner({ user }) {
                             type="button"
                             className="hub-grammar-word-pill is-placed"
                             onClick={() => {
-                              if (submitted) return;
+                              if (itemLocked) return;
                               removeWordToken(item.id, tokenIndex);
                             }}
-                            disabled={submitted}
+                            disabled={itemLocked}
                           >
                             {token}
                           </button>
@@ -1282,12 +1612,12 @@ export default function HubGrammarActivityRunner({ user }) {
                               .filter(Boolean)
                               .join(" ")}
                             onClick={() => {
-                              if (submitted) return;
+                              if (itemLocked) return;
                               if (isPlaced) return;
                               placeWordToken(item.id, tokenIndex);
                             }}
                             ref={tokenIndex === 0 ? registerInput(`${item.id}:word-bank:0`) : undefined}
-                            disabled={submitted}
+                            disabled={itemLocked}
                           >
                             {token}
                           </button>
@@ -1300,7 +1630,7 @@ export default function HubGrammarActivityRunner({ user }) {
                         type="button"
                         className="hub-grammar-inline-btn hub-grammar-word-clear"
                         onClick={() => clearWordOrder(item.id)}
-                        disabled={submitted || !Array.isArray(answers[item.id]) || answers[item.id].length === 0}
+                        disabled={itemLocked || !Array.isArray(answers[item.id]) || answers[item.id].length === 0}
                       >
                         Clear order
                       </button>
@@ -1327,11 +1657,11 @@ export default function HubGrammarActivityRunner({ user }) {
                         onKeyDown={(event) => {
                           if (event.key === "Enter") {
                             event.preventDefault();
-                            focusNextQuestion(item.id);
+                            handleCheckItem(item);
                           }
                         }}
                         ref={registerInput(item.id)}
-                        disabled={submitted}
+                        disabled={itemLocked}
                         placeholder="So do I / Neither do I..."
                       />
                     </label>
@@ -1354,8 +1684,8 @@ export default function HubGrammarActivityRunner({ user }) {
 	                        item,
 	                        answers,
 	                        handleChange,
-	                        focusNextInput,
-	                        submitted,
+	                        (key) => handleSentenceAdvance(item, key),
+	                        itemLocked,
 	                        registerInput,
 	                        handleGapChoiceSelect
 	                      )}
@@ -1363,7 +1693,21 @@ export default function HubGrammarActivityRunner({ user }) {
 	                  </>
 	                )}
 
-                {submitted && evaluatedItem && (
+                <div className="hub-grammar-card-check">
+                  {itemLocked ? (
+                    <span className="hub-grammar-checked-pill">Answer checked</span>
+                  ) : item.type === "multiple-choice" ? null : (
+                    <button
+                      type="button"
+                      className="review-btn"
+                      onClick={() => handleCheckItem(item)}
+                    >
+                      Check answer
+                    </button>
+                  )}
+                </div>
+
+                {itemLocked && evaluatedItem && (
                   <div className="hub-grammar-feedback-list">
                     {evaluatedItem.type === "multiple-choice" ? (
                       <div
@@ -1478,7 +1822,7 @@ export default function HubGrammarActivityRunner({ user }) {
             onClick={handleSubmit}
             disabled={submitted || saving}
           >
-            {submitted ? "Submitted" : "Submit answers"}
+            {submitted ? "Submitted" : "Submit final result"}
           </button>
           <button className="ghost-btn" onClick={handleReset}>
             Reset activity
@@ -1551,6 +1895,47 @@ export default function HubGrammarActivityRunner({ user }) {
           transform: translateY(-1px);
           background: rgba(253, 191, 45, 0.14);
           border-color: rgba(253, 191, 45, 0.36);
+        }
+
+        .hub-grammar-draft-pill,
+        .hub-grammar-checked-pill {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 1.8rem;
+          padding: 0.22rem 0.65rem;
+          border-radius: 999px;
+          border: 1px solid rgba(148, 163, 184, 0.26);
+          background: rgba(15, 23, 42, 0.34);
+          color: #cbd5e1;
+          font-size: 0.78rem;
+          font-weight: 800;
+          letter-spacing: 0.03em;
+          text-transform: uppercase;
+        }
+
+        .hub-grammar-draft-pill.is-restored {
+          border-color: rgba(96, 165, 250, 0.34);
+          background: rgba(96, 165, 250, 0.12);
+          color: #bfdbfe;
+        }
+
+        .hub-grammar-draft-pill.is-saving {
+          border-color: rgba(253, 191, 45, 0.3);
+          background: rgba(253, 191, 45, 0.1);
+          color: #fde68a;
+        }
+
+        .hub-grammar-draft-pill.is-saved {
+          border-color: rgba(52, 211, 153, 0.3);
+          background: rgba(52, 211, 153, 0.1);
+          color: #a7f3d0;
+        }
+
+        .hub-grammar-draft-pill.is-error {
+          border-color: rgba(248, 113, 113, 0.34);
+          background: rgba(248, 113, 113, 0.12);
+          color: #fecaca;
         }
 
         .hub-grammar-share-overlay {
@@ -2208,6 +2593,20 @@ export default function HubGrammarActivityRunner({ user }) {
           display: flex;
           flex-direction: column;
           gap: 0.55rem;
+        }
+
+        .hub-grammar-card-check {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 0.55rem;
+          margin-top: 0.85rem;
+        }
+
+        .hub-grammar-checked-pill {
+          border-color: rgba(52, 211, 153, 0.28);
+          background: rgba(52, 211, 153, 0.1);
+          color: #a7f3d0;
         }
 
         .hub-grammar-feedback {
