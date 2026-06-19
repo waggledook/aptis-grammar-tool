@@ -399,6 +399,28 @@ export async function requestAptisSpeakingPart4Feedback(payload) {
   return result.data;
 }
 
+export async function requestOteSpeakingFeedback(payload) {
+  const generateOteSpeakingFeedback = httpsCallable(
+    functionsRegion,
+    "generateOteSpeakingFeedback",
+    { timeout: 300000 }
+  );
+  const result = await generateOteSpeakingFeedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  await logAiFeedbackGenerated("ote_speaking", {
+    product: "ote",
+    section: "speaking",
+    part: payload?.partId || payload?.part || "",
+    taskId: payload?.task?.id || payload?.taskId || payload?.mockId || "",
+    taskTitle: payload?.task?.title || payload?.mockTitle || "",
+    answerCount: Array.isArray(payload?.recordings) ? payload.recordings.length : null,
+    mockId: payload?.mockId || "",
+  }, result.data);
+  return result.data;
+}
+
 export async function doPasswordReset(email, redirectUrl = "") {
   const safeRedirect = String(redirectUrl || "").trim();
   if (!safeRedirect) {
@@ -929,6 +951,118 @@ export async function logActivity(type, details = {}) {
     // logging should never break the app
     console.error("[activityLog] Failed to log activity:", err);
   }
+}
+
+function logOteActivity(type, details = {}) {
+  return logActivity(type, {
+    app: "ote",
+    product: "ote",
+    ...details,
+  });
+}
+
+function getOteTrainingProgressId(details = {}) {
+  if (details.progressId) return String(details.progressId);
+
+  const section = String(details.section || "").toLowerCase();
+  const part = String(details.part || "").toLowerCase();
+  const mode = String(details.mode || details.activity || "").toLowerCase();
+  const taskId = String(details.taskId || details.setId || "").toLowerCase();
+
+  if (section === "speaking") {
+    if (part === "part-1" || part === "part1") {
+      if (mode.includes("practice") || taskId) return "speaking.part1.practice";
+    }
+    if (part === "part-2" || part === "part2") {
+      if (taskId === "guided-message-1") return "speaking.part2.guided-message-1";
+      if (taskId === "guided-message-2") return "speaking.part2.guided-message-2";
+      if (mode.includes("voicemail_practice") || taskId.startsWith("set-")) return "speaking.part2.practice";
+    }
+    if (part === "parts-3-4" || part === "part-3" || part === "part3" || part === "part-4" || part === "part4") {
+      if (mode.includes("guided")) return "speaking.parts34.guided-talk";
+      if (mode.includes("practice") || taskId) return "speaking.parts34.practice";
+    }
+  }
+
+  if (section === "writing") {
+    if (part === "part-1" || part === "part1") {
+      if (mode.includes("register_rewrite") || taskId === "register-rewrite") return "writing.email.register-basics";
+      if (mode.includes("register_gap") || taskId === "register-gaps") return "writing.email.register-gaps";
+      if (mode.includes("practice") || taskId) return "writing.email.practice";
+    }
+    if (part === "part-2" || part === "part2") {
+      const practiceSection = String(details.practiceSection || details.sectionId || "").toLowerCase();
+      if (practiceSection === "essay") return "writing.essay.practice";
+      if (practiceSection === "article-review") return "writing.article-review.practice";
+      if (mode.includes("intro") || taskId === "introductions-conclusions") return "writing.essay.introductions-conclusions";
+      if (mode.includes("planning") || taskId === "planning") return "writing.essay.planning";
+      if (mode.includes("body") || taskId === "body-paragraphs") return "writing.essay.body-paragraphs";
+      if (mode.includes("article") || taskId === "article-review-guide") return "writing.article-review.guide";
+    }
+  }
+
+  return "";
+}
+
+export async function markOteTrainingProgress(details = {}) {
+  const user = auth.currentUser;
+  const progressId = getOteTrainingProgressId(details);
+  if (!user || !progressId) return null;
+
+  await setDoc(
+    doc(db, "users", user.uid, "oteTrainingProgress", progressId),
+    {
+      progressId,
+      product: "ote",
+      section: details.section || "",
+      part: details.part || "",
+      mode: details.mode || details.activity || "",
+      taskId: details.taskId || details.setId || "",
+      taskTitle: details.taskTitle || details.setTitle || "",
+      completed: true,
+      completedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+  return progressId;
+}
+
+export async function fetchOteTrainingProgress(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return new Set();
+
+  const snap = await getDocs(collection(db, "users", realUid, "oteTrainingProgress"));
+  return new Set(
+    snap.docs
+      .map((entry) => {
+        const data = entry.data() || {};
+        if (data.completed === false) return "";
+        return data.progressId || entry.id;
+      })
+      .filter(Boolean)
+  );
+}
+
+export async function logOteTrainingStarted(details = {}) {
+  return logOteActivity("ote_training_started", details);
+}
+
+export async function logOteTrainingCompleted(details = {}) {
+  await markOteTrainingProgress(details);
+  return logOteActivity("ote_training_completed", details);
+}
+
+export async function logOteMockStarted(details = {}) {
+  return logOteActivity("ote_mock_started", details);
+}
+
+export async function logOteMockCompleted(details = {}) {
+  return logOteActivity("ote_mock_completed", details);
+}
+
+export async function logOteRegisterChecked(details = {}) {
+  return logOteActivity("ote_register_checked", details);
 }
 
 export async function logHubKeywordStarted(details = {}) {
@@ -3415,6 +3549,7 @@ export async function fetchSpeakingCounts(uid) {
 }
 
 export async function saveSpeakingAiFeedback({
+  product = "aptis",
   part,
   taskId = "",
   taskTitle = "",
@@ -3427,7 +3562,7 @@ export async function saveSpeakingAiFeedback({
   if (!uid || !part || !feedback) return null;
 
   const ref = await addDoc(collection(db, "users", uid, "speakingFeedback"), {
-    product: "aptis",
+    product,
     part,
     taskId,
     taskTitle,
@@ -4823,6 +4958,9 @@ export async function saveOteMockAttempt(payload = {}) {
     elapsedSeconds: Number(payload.elapsedSeconds || 0),
     startedAtClient: payload.startedAtClient || null,
     recordings: Array.isArray(payload.recordings) ? payload.recordings : [],
+    aiFeedback: payload.aiFeedback || null,
+    aiFeedbackMeta: payload.aiFeedbackMeta || null,
+    aiFeedbackTranscripts: Array.isArray(payload.aiFeedbackTranscripts) ? payload.aiFeedbackTranscripts : [],
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
     submittedAt: serverTimestamp(),
@@ -4850,6 +4988,19 @@ export async function fetchOteMockAttempt(attemptId, uid) {
   const data = topLevelSnap.data() || {};
   if (data.studentUid !== realUid) return null;
   return { id: topLevelSnap.id, ...data };
+}
+
+export async function fetchOteMockAttempts(n = 20, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const q = query(
+    collection(db, "users", realUid, "oteMockAttempts"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
 }
 
 /** Optional: use a preset image that already lives in your app bundle or CDN */

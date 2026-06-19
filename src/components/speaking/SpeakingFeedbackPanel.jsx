@@ -37,7 +37,8 @@ export default function SpeakingFeedbackPanel({ feedbackResult, questions = [], 
       <FeedbackBullets title="Strengths" items={feedback.overall?.mainStrengths} />
       <FeedbackBullets title="Priorities" items={feedback.overall?.mainPriorities} />
       <FeedbackBullets title="Question coverage" items={feedback.overall?.questionCoverage} />
-      {feedback.overall?.photoDescriptionAdvice ? (
+      {feedback.overall?.photoDescriptionAdvice &&
+      !["n/a", "not applicable", "none"].includes(String(feedback.overall.photoDescriptionAdvice).trim().toLowerCase()) ? (
         <p><strong>Photo focus:</strong> {feedback.overall.photoDescriptionAdvice}</p>
       ) : null}
       {feedback.overall?.developmentAdvice ? (

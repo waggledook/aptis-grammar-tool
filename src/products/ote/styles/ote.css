@@ -682,6 +682,7 @@
 }
 
 .ote-training-activity-card {
+  position: relative;
   display: flex;
   min-height: 235px;
   flex-direction: column;
@@ -695,6 +696,46 @@
   text-align: left;
   box-shadow: var(--ote-dashboard-shadow);
   transition: transform 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.ote-practice-set-card.is-complete,
+.ote-training-activity-card.is-complete {
+  border-color: color-mix(in srgb, #22c55e 64%, var(--ote-dashboard-panel-border));
+  box-shadow: 0 0 0 1px color-mix(in srgb, #22c55e 22%, transparent), var(--ote-dashboard-shadow);
+}
+
+.ote-training-complete-icon {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  color: #7ef0c2 !important;
+}
+
+.ote-training-progress-strip {
+  width: min(620px, 100%);
+  display: grid;
+  gap: 0.45rem;
+  margin-top: 1rem;
+}
+
+.ote-training-progress-strip span {
+  color: var(--ote-dashboard-text);
+  font-size: 0.85rem;
+  font-weight: 900;
+}
+
+.ote-training-progress-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ote-dashboard-panel-border) 46%, transparent);
+}
+
+.ote-training-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #7ef0c2, var(--ote-dashboard-accent));
 }
 
 .ote-training-activity-card:hover {
@@ -1778,6 +1819,7 @@
 }
 
 .ote-practice-set-card {
+  position: relative;
   display: flex;
   min-height: 210px;
   flex-direction: column;

@@ -2,6 +2,14 @@ import React, { useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Download, HelpCircle, Mic, MinusCircle, Play, PlusCircle, Settings, Volume2 } from "lucide-react";
 import { getOteSpeakingMock } from "./mockTests/data/oteSpeakingMockData.js";
+import SpeakingFeedbackPanel from "../../components/speaking/SpeakingFeedbackPanel.jsx";
+import {
+  logOteMockCompleted,
+  logOteMockStarted,
+  requestOteSpeakingFeedback,
+  saveOteMockAttempt,
+} from "../../firebase.js";
+import { recordingsToFeedbackAudio } from "./utils/speakingFeedback.js";
 import "./styles/ote.css";
 
 const MIME_CANDIDATES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
@@ -16,6 +24,24 @@ function formatTime(seconds) {
 function getSupportedMimeType() {
   if (typeof MediaRecorder === "undefined") return "";
   return MIME_CANDIDATES.find((type) => MediaRecorder.isTypeSupported(type)) || "";
+}
+
+function buildRecordingPrompt(step) {
+  if (step.prompt) return step.prompt;
+  if (!step.task) return "";
+  const bullets = Array.isArray(step.task.bullets) && step.task.bullets.length
+    ? ` In your message, you should: ${step.task.bullets.join("; ")}.`
+    : "";
+  return `${step.task.lead || step.task.prompt || ""}${bullets}`.trim();
+}
+
+function stripRecordingForStorage(recording) {
+  if (!recording) return null;
+  const { blob, url, ...rest } = recording;
+  return {
+    ...rest,
+    audioStored: false,
+  };
 }
 
 function buildSteps(mock) {
@@ -363,7 +389,7 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
             partId: step.part?.id || "",
             partNumber: step.part?.number || null,
             label: step.label || step.task?.title || step.prompt || step.id,
-            prompt: step.prompt || step.task?.lead || step.task?.prompt || "",
+            prompt: buildRecordingPrompt(step),
             selectedImageIds: [],
             durationSeconds: seconds,
             mimeType: finalType,
@@ -388,7 +414,7 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
         partId: step.part?.id || "",
         partNumber: step.part?.number || null,
         label: step.label || step.id,
-        prompt: step.prompt || step.task?.lead || "",
+        prompt: buildRecordingPrompt(step),
         selectedImageIds: [],
         durationSeconds: seconds,
         mimeType: "",
@@ -482,6 +508,11 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
     skipResolverRef.current = null;
     runningRef.current = true;
     startedAtRef.current = new Date();
+    logOteMockStarted({
+      module: "speaking",
+      mockId: mock.id,
+      mockTitle: mock.title,
+    });
     elapsedTimerRef.current = window.setInterval(() => {
       if (!startedAtRef.current) return;
       setElapsedSeconds(Math.floor((Date.now() - startedAtRef.current.getTime()) / 1000));
@@ -507,6 +538,14 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
     setActiveStep(null);
     setSecondsLeft(0);
     setStatus("complete");
+    logOteMockCompleted({
+      module: "speaking",
+      mockId: mock.id,
+      mockTitle: mock.title,
+      recordingCount: totalRecordingSteps,
+      elapsedSeconds: Math.floor((Date.now() - startedAtRef.current.getTime()) / 1000),
+      reason: "completed",
+    });
   }
 
   function handleSkip() {
@@ -536,8 +575,15 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
         />
       ) : status === "complete" ? (
         <CompleteScreen
+          user={user}
+          mock={mock}
           recordings={recordings}
+          elapsedSeconds={elapsedSeconds}
+          onRequireSignIn={onRequireSignIn}
           onDashboard={() => navigate("/ote")}
+          onResult={(attemptId) =>
+            navigate(nativeRoutes ? `/mock-tests/${mock.id}/results/${attemptId}` : `/ote/mock-tests/${mock.id}/results/${attemptId}`)
+          }
         />
       ) : (
         <ExamBody
@@ -978,8 +1024,54 @@ async function createZipAndDownload(files, zipName = "recordings.zip") {
   URL.revokeObjectURL(url);
 }
 
-function CompleteScreen({ recordings, onDashboard }) {
+function CompleteScreen({ user, mock, recordings, elapsedSeconds = 0, onDashboard, onResult, onRequireSignIn }) {
   const downloadableRecordings = recordings.filter((recording) => recording.url && recording.blob);
+  const [feedbackResult, setFeedbackResult] = useState(null);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackError, setFeedbackError] = useState("");
+  const [savedAttemptId, setSavedAttemptId] = useState("");
+
+  async function handleGenerateFeedback() {
+    if (!user) {
+      onRequireSignIn?.();
+      setFeedbackError("Sign in to generate and save mock feedback.");
+      return;
+    }
+    setFeedbackLoading(true);
+    setFeedbackError("");
+    try {
+      const feedbackAudio = await recordingsToFeedbackAudio(downloadableRecordings, `ote-${mock.id}`);
+      const result = await requestOteSpeakingFeedback({
+        partId: "mock",
+        mockId: mock.id,
+        mockTitle: mock.title,
+        task: {
+          id: mock.id,
+          title: mock.title,
+          topic: mock.part3Theme || "",
+          parts: mock.parts,
+        },
+        recordings: feedbackAudio,
+      });
+      setFeedbackResult(result);
+      const attemptId = await saveOteMockAttempt({
+        mockId: mock.id,
+        mockTitle: mock.title,
+        module: "speaking",
+        elapsedSeconds,
+        recordings: downloadableRecordings.map(stripRecordingForStorage).filter(Boolean),
+        aiFeedback: result?.feedback || null,
+        aiFeedbackMeta: result?.meta || null,
+        aiFeedbackTranscripts: result?.transcripts || [],
+      });
+      setSavedAttemptId(attemptId);
+    } catch (error) {
+      console.error("[OTE speaking mock feedback] failed", error);
+      setFeedbackError(error?.message || "Could not generate mock feedback right now.");
+    } finally {
+      setFeedbackLoading(false);
+    }
+  }
 
   return (
     <section className="ote-complete-screen">
@@ -999,6 +1091,25 @@ function CompleteScreen({ recordings, onDashboard }) {
           <Download size={22} />
           Download full test as ZIP
         </button>
+        <button
+          className="ote-download-zip-btn"
+          type="button"
+          onClick={handleGenerateFeedback}
+          disabled={!downloadableRecordings.length || feedbackLoading}
+        >
+          {feedbackLoading ? "Generating feedback..." : "Get speaking feedback"}
+        </button>
+        {savedAttemptId ? (
+          <button className="ote-secondary-btn" type="button" onClick={() => onResult?.(savedAttemptId)}>
+            Open saved result
+          </button>
+        ) : null}
+        {feedbackError ? <p className="ote-warning">{feedbackError}</p> : null}
+        <SpeakingFeedbackPanel
+          feedbackResult={feedbackResult}
+          questions={downloadableRecordings.map((recording) => recording.prompt || recording.label)}
+          title="OTE speaking mock feedback"
+        />
         <div className="ote-recording-list">
           {downloadableRecordings.map((recording, index) => (
             <article key={recording.id} className="ote-recording-card">

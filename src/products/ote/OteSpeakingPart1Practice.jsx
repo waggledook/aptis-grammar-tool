@@ -2,8 +2,16 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, CheckCircle2, Download, Mic, Timer } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
+import SpeakingFeedbackPanel from "../../components/speaking/SpeakingFeedbackPanel.jsx";
+import {
+  logOteTrainingCompleted,
+  logOteTrainingStarted,
+  requestOteSpeakingFeedback,
+  saveSpeakingAiFeedback,
+} from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
 import { OTE_SPEAKING_AUDIO } from "./mockTests/data/oteSpeakingMockData.js";
+import { recordingsToFeedbackAudio } from "./utils/speakingFeedback.js";
 import "./styles/ote.css";
 
 const MIME_CANDIDATES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
@@ -414,7 +422,7 @@ async function createZipAndDownload(files, zipName = "ote-part-1-practice.zip") 
   URL.revokeObjectURL(url);
 }
 
-export default function OteSpeakingPart1Practice({ nativeRoutes = false }) {
+export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = null, onRequireSignIn }) {
   const { setId } = useParams();
   const navigate = useNavigate();
   const { playAudioFile, speak, stop } = useSpeech();
@@ -428,12 +436,17 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false }) {
   const [secondsLeft, setSecondsLeft] = useState(10);
   const [recordings, setRecordings] = useState([]);
   const [micError, setMicError] = useState("");
+  const [feedbackResult, setFeedbackResult] = useState(null);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
+  const [feedbackError, setFeedbackError] = useState("");
 
   const streamRef = useRef(null);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
   const objectUrlsRef = useRef([]);
+  const activityStartedRef = useRef(false);
+  const activityCompletedRef = useRef(false);
 
   const activeQuestion = questions[questionIndex];
   const complete = selectedSet && recordings.length >= questions.length;
@@ -453,8 +466,12 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false }) {
     setSecondsLeft(10);
     setRecordings([]);
     setMicError("");
+    setFeedbackResult(null);
+    setFeedbackError("");
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     objectUrlsRef.current = [];
+    activityStartedRef.current = false;
+    activityCompletedRef.current = false;
     stop();
   }, [setId]);
 
@@ -535,6 +552,17 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false }) {
     if (!activeQuestion || phase === "listening" || phase === "recording") return;
     const stream = await ensureStream();
     if (!stream) return;
+    if (!activityStartedRef.current) {
+      activityStartedRef.current = true;
+      logOteTrainingStarted({
+        section: "speaking",
+        part: "part-1",
+        mode: "timed_practice",
+        setId: selectedSet.id,
+        setTitle: selectedSet.title,
+        questionCount: questions.length,
+      });
+    }
     await runQuestion(activeQuestion, questionIndex, stream);
   }
 
@@ -555,6 +583,8 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false }) {
         ...current.filter((recording) => recording.questionId !== question.id),
         {
           questionId: question.id,
+          id: question.id,
+          partId: "part-1",
           label: question.label,
           title: question.title,
           prompt: question.prompt,
@@ -592,6 +622,18 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false }) {
       return;
     }
     setPhase("complete");
+    if (!activityCompletedRef.current) {
+      activityCompletedRef.current = true;
+      logOteTrainingCompleted({
+        section: "speaking",
+        part: "part-1",
+        mode: "timed_practice",
+        setId: selectedSet.id,
+        setTitle: selectedSet.title,
+        recordingCount: recordings.length,
+        scoredRecordingCount: recordings.filter((recording) => !recording.label?.toLowerCase().includes("practice")).length,
+      });
+    }
   }
 
   function resetSet() {
@@ -599,12 +641,58 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false }) {
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     objectUrlsRef.current = [];
+    activityStartedRef.current = false;
+    activityCompletedRef.current = false;
     setRecordings([]);
     setQuestionIndex(0);
     setPhase("ready");
     setSecondsLeft(10);
     setMicError("");
+    setFeedbackResult(null);
+    setFeedbackError("");
     stop();
+  }
+
+  async function handleGenerateFeedback() {
+    if (!user) {
+      onRequireSignIn?.();
+      setFeedbackError("Sign in to generate OTE speaking feedback.");
+      return;
+    }
+    setFeedbackLoading(true);
+    setFeedbackError("");
+    try {
+      const feedbackQuestions = questions.filter((question) => !question.isPractice);
+      const orderedRecordings = feedbackQuestions
+        .map((question) => recordings.find((recording) => recording.questionId === question.id))
+        .filter(Boolean);
+      const feedbackAudio = await recordingsToFeedbackAudio(orderedRecordings, `ote-part-1-${selectedSet.id}`);
+      const result = await requestOteSpeakingFeedback({
+        partId: "part-1",
+        task: {
+          id: selectedSet.id,
+          title: selectedSet.title,
+          instructions: PART1_INSTRUCTIONS,
+        },
+        recordings: feedbackAudio,
+      });
+      setFeedbackResult(result);
+      await saveSpeakingAiFeedback({
+        product: "ote",
+        part: "part-1",
+        taskId: selectedSet.id,
+        taskTitle: selectedSet.title,
+        questions: feedbackQuestions.map((question) => question.prompt),
+        transcripts: result?.transcripts || [],
+        feedback: result?.feedback,
+        meta: result?.meta || null,
+      });
+    } catch (error) {
+      console.error("[OTE part 1 feedback] failed", error);
+      setFeedbackError(error?.message || "Could not generate feedback right now.");
+    } finally {
+      setFeedbackLoading(false);
+    }
   }
 
   if (!selectedSet) {
@@ -742,7 +830,21 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false }) {
               <button className="ote-training-primary-link" type="button" onClick={resetSet}>
                 Try this set again
               </button>
+              <button
+                className="ote-training-primary-link"
+                type="button"
+                onClick={handleGenerateFeedback}
+                disabled={!recordings.length || feedbackLoading}
+              >
+                {feedbackLoading ? "Generating feedback..." : "Get AI feedback"}
+              </button>
             </div>
+            {feedbackError ? <p className="ote-mic-error">{feedbackError}</p> : null}
+            <SpeakingFeedbackPanel
+              feedbackResult={feedbackResult}
+              questions={questions.filter((question) => !question.isPractice).map((question) => question.prompt)}
+              title="OTE Part 1 feedback"
+            />
             <div className="ote-recording-list">
               {recordings.map((recording) => (
                 <article key={recording.questionId} className="ote-recording-card">

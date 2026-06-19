@@ -1,8 +1,8 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, Eye, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
-import { requestOteRegisterRewriteFeedback } from "../../firebase.js";
+import { logOteRegisterChecked, logOteTrainingCompleted, requestOteRegisterRewriteFeedback } from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
 import "./styles/ote.css";
 
@@ -231,6 +231,8 @@ export default function OteWritingRegisterBasics({ user, onRequireSignIn, native
   const [rewriteAiStatus, setRewriteAiStatus] = useState("idle");
   const [rewriteAiError, setRewriteAiError] = useState("");
   const [rewriteAiFeedback, setRewriteAiFeedback] = useState(null);
+  const identificationLoggedRef = useRef(false);
+  const rewriteLoggedRef = useRef(false);
   const trainingPath = getSitePath(nativeRoutes ? "/writing/training/email" : "/ote/writing/training/email");
   const identificationScore = useMemo(
     () => identificationItems.filter((item) => identificationAnswers[item.id] === item.register).length,
@@ -240,6 +242,34 @@ export default function OteWritingRegisterBasics({ user, onRequireSignIn, native
     () => rewriteItems.filter((item) => rewriteAnswers[item.id]?.trim()).length,
     [rewriteAnswers, rewriteItems]
   );
+
+  useEffect(() => {
+    const answeredCount = Object.keys(identificationAnswers).length;
+    if (identificationLoggedRef.current || answeredCount < identificationItems.length) return;
+    identificationLoggedRef.current = true;
+    logOteRegisterChecked({
+      section: "writing",
+      part: "part-1",
+      activity: "register_identification",
+      taskTitle: "Register basics",
+      score: identificationScore,
+      total: identificationItems.length,
+    });
+  }, [identificationAnswers, identificationItems.length, identificationScore]);
+
+  useEffect(() => {
+    if (rewriteLoggedRef.current || rewriteCompleted < rewriteItems.length) return;
+    rewriteLoggedRef.current = true;
+    logOteTrainingCompleted({
+      section: "writing",
+      part: "part-1",
+      mode: "register_rewrite",
+      taskId: "register-rewrite",
+      taskTitle: "Register reformulation practice",
+      completedItems: rewriteCompleted,
+      total: rewriteItems.length,
+    });
+  }, [rewriteCompleted, rewriteItems.length]);
 
   function chooseIdentification(itemId, value) {
     setIdentificationAnswers((prev) => ({ ...prev, [itemId]: value }));

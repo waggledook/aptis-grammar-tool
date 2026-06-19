@@ -8,7 +8,7 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
   const navigate = useNavigate();
   const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
   const writingPath = getSitePath(nativeRoutes ? "/writing" : "/ote/writing");
-  const resultsPath = getSitePath(nativeRoutes ? "/results" : "/ote/results");
+  const profilePath = getSitePath("/profile");
 
   return (
     <main className="menu-wrapper hub-menu-wrapper ote-menu-wrapper">
@@ -52,9 +52,9 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
           <p>Timed writing mocks and task practice for email, essay, and article responses.</p>
         </button>
 
-        <button className="menu-card" type="button" onClick={() => navigate(resultsPath)}>
-          <h3>Results</h3>
-          <p>Review saved mock-test attempts and teacher feedback once review tools are connected.</p>
+        <button className="menu-card" type="button" onClick={() => navigate(profilePath)}>
+          <h3>My Profile</h3>
+          <p>Review saved OTE speaking feedback, writing submissions, and progress.</p>
         </button>
 
         <button className="menu-card" type="button" disabled>

@@ -1,8 +1,9 @@
-import React from "react";
-import { ArrowLeft, ClipboardList, PlayCircle } from "lucide-react";
+import React, { useMemo } from "react";
+import { ArrowLeft, CheckCircle2, ClipboardList, PlayCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
+import { useOteTrainingProgress, useOteTrainingSummary } from "./utils/trainingProgress.js";
 import "./styles/ote.css";
 
 export default function OteSpeakingPart1Menu({ nativeRoutes = false }) {
@@ -14,6 +15,22 @@ export default function OteSpeakingPart1Menu({ nativeRoutes = false }) {
   const practicePath = getSitePath(
     nativeRoutes ? "/speaking/part-1-interview/practice" : "/ote/speaking/part-1-interview/practice"
   );
+  const completedProgress = useOteTrainingProgress();
+  const activities = useMemo(
+    () => [
+      {
+        label: "Activity 1",
+        title: "How Part 1 Works",
+        copy: "Learn the format, timing, question order, and scoring rules, then check your understanding.",
+        icon: ClipboardList,
+        path: overviewPath,
+        progressId: "speaking.part1.overview",
+      },
+    ],
+    [overviewPath]
+  );
+  const summary = useOteTrainingSummary(activities, completedProgress);
+  const practiceComplete = completedProgress.has("speaking.part1.practice");
 
   return (
     <main className="ote-training-page">
@@ -34,23 +51,54 @@ export default function OteSpeakingPart1Menu({ nativeRoutes = false }) {
           Build confidence for the opening interview: understand the question order, practise the
           fast timing, and record short answers across everyday topics.
         </p>
+        <div className="ote-training-progress-strip" aria-label="Training progress">
+          <span>{summary.completed} of {summary.total} training lessons complete</span>
+          <div className="ote-training-progress-track" aria-hidden="true">
+            <span style={{ width: `${summary.total ? Math.round((summary.completed / summary.total) * 100) : 0}%` }} />
+          </div>
+        </div>
       </header>
 
       <div className="ote-training-activity-grid" aria-label="Part 1 interview activities">
-        <button className="ote-training-activity-card" type="button" onClick={() => navigate(overviewPath)}>
-          <ClipboardList size={28} aria-hidden="true" />
-          <span>Activity 1</span>
-          <h2>How Part 1 Works</h2>
-          <p>Learn the format, timing, question order, and scoring rules, then check your understanding.</p>
-        </button>
+        {activities.map((activity) => {
+          const Icon = activity.icon;
+          const isComplete = completedProgress.has(activity.progressId);
+          return (
+            <button
+              key={activity.progressId}
+              className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
+              type="button"
+              onClick={() => navigate(activity.path)}
+            >
+              {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+              <Icon size={28} aria-hidden="true" />
+              <span>{activity.label}</span>
+              <h2>{activity.title}</h2>
+              <p>{activity.copy}</p>
+            </button>
+          );
+        })}
+      </div>
 
-        <button className="ote-training-activity-card" type="button" onClick={() => navigate(practicePath)}>
+      <section className="ote-training-section">
+        <h2>Final Practice</h2>
+        <p className="ote-section-lead">
+          {summary.allComplete
+            ? "Training complete. Now practise timed interview sets."
+            : "Review the Part 1 format, then move into timed interview practice."}
+        </p>
+        <button
+          className={`ote-practice-set-card ote-writing-practice-entry-card ${practiceComplete ? "is-complete" : ""}`}
+          type="button"
+          onClick={() => navigate(practicePath)}
+        >
+          {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
           <PlayCircle size={28} aria-hidden="true" />
           <span>Practice</span>
           <h2>Timed Interview Sets</h2>
           <p>Practise two fixed warm-up questions and six topic questions with recordings.</p>
         </button>
-      </div>
+      </section>
     </main>
   );
 }

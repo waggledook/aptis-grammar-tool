@@ -1,8 +1,9 @@
-import React from "react";
-import { ArrowLeft, ClipboardList, Mic, PlayCircle } from "lucide-react";
+import React, { useMemo } from "react";
+import { ArrowLeft, CheckCircle2, ClipboardList, Mic, PlayCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
+import { useOteTrainingProgress, useOteTrainingSummary } from "./utils/trainingProgress.js";
 import "./styles/ote.css";
 
 export default function OteSpeakingPart34Menu({ nativeRoutes = false }) {
@@ -17,6 +18,30 @@ export default function OteSpeakingPart34Menu({ nativeRoutes = false }) {
   const guidedPath = getSitePath(
     nativeRoutes ? "/speaking/parts-3-4/guided-talk" : "/ote/speaking/parts-3-4/guided-talk"
   );
+  const completedProgress = useOteTrainingProgress();
+  const activities = useMemo(
+    () => [
+      {
+        label: "Activity 1",
+        title: "How Parts 3 & 4 Work",
+        copy: "Learn the format, compare the long talk with the follow-up questions, then check your understanding.",
+        icon: ClipboardList,
+        path: overviewPath,
+        progressId: "speaking.parts34.overview",
+      },
+      {
+        label: "Activity 2",
+        title: "Guided Talk Builder",
+        copy: "Plan two photo choices, build transitions, and compare your answer with a model response.",
+        icon: Mic,
+        path: guidedPath,
+        progressId: "speaking.parts34.guided-talk",
+      },
+    ],
+    [guidedPath, overviewPath]
+  );
+  const summary = useOteTrainingSummary(activities, completedProgress);
+  const practiceComplete = completedProgress.has("speaking.parts34.practice");
 
   return (
     <main className="ote-training-page">
@@ -38,30 +63,54 @@ export default function OteSpeakingPart34Menu({ nativeRoutes = false }) {
           one-minute talk, answer follow-up questions without preparation time, and practise under
           exam-style timing.
         </p>
+        <div className="ote-training-progress-strip" aria-label="Training progress">
+          <span>{summary.completed} of {summary.total} training lessons complete</span>
+          <div className="ote-training-progress-track" aria-hidden="true">
+            <span style={{ width: `${summary.total ? Math.round((summary.completed / summary.total) * 100) : 0}%` }} />
+          </div>
+        </div>
       </header>
 
       <div className="ote-training-activity-grid" aria-label="Parts 3 and 4 activities">
-        <button className="ote-training-activity-card" type="button" onClick={() => navigate(overviewPath)}>
-          <ClipboardList size={28} aria-hidden="true" />
-          <span>Activity 1</span>
-          <h2>How Parts 3 & 4 Work</h2>
-          <p>Learn the format, compare the long talk with the follow-up questions, then check your understanding.</p>
-        </button>
+        {activities.map((activity) => {
+          const Icon = activity.icon;
+          const isComplete = completedProgress.has(activity.progressId);
+          return (
+            <button
+              key={activity.progressId}
+              className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
+              type="button"
+              onClick={() => navigate(activity.path)}
+            >
+              {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+              <Icon size={28} aria-hidden="true" />
+              <span>{activity.label}</span>
+              <h2>{activity.title}</h2>
+              <p>{activity.copy}</p>
+            </button>
+          );
+        })}
+      </div>
 
-        <button className="ote-training-activity-card" type="button" onClick={() => navigate(guidedPath)}>
-          <Mic size={28} aria-hidden="true" />
-          <span>Activity 2</span>
-          <h2>Guided Talk Builder</h2>
-          <p>Plan two photo choices, build transitions, and compare your answer with a model response.</p>
-        </button>
-
-        <button className="ote-training-activity-card" type="button" onClick={() => navigate(practicePath)}>
+      <section className="ote-training-section">
+        <h2>Final Practice</h2>
+        <p className="ote-section-lead">
+          {summary.allComplete
+            ? "Training complete. Now practise timed talks and follow-up questions."
+            : "Work through the training activities above, then practise full timed Parts 3 and 4 sets."}
+        </p>
+        <button
+          className={`ote-practice-set-card ote-writing-practice-entry-card ${practiceComplete ? "is-complete" : ""}`}
+          type="button"
+          onClick={() => navigate(practicePath)}
+        >
+          {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
           <PlayCircle size={28} aria-hidden="true" />
           <span>Practice</span>
           <h2>Timed Talk Sets</h2>
           <p>Practise a picture-based talk, then answer six related follow-up questions with recordings.</p>
         </button>
-      </div>
+      </section>
     </main>
   );
 }

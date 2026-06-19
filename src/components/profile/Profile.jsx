@@ -14,7 +14,9 @@ import { vocabExerciseTasks } from "../vocabulary/data/vocabExerciseBank.js";
 import synonymSeedItems from "../vocabulary/data/synonymSeedItems.js";
 import collocationPrecisionItems from "../vocabulary/collocations/data/collocationPrecisionItems.js";
 import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
-import { getOteWritingMock } from "../../products/ote/mockTests/data/oteWritingMockData.js";
+import { OTE_SPEAKING_MOCKS } from "../../products/ote/mockTests/data/oteSpeakingMockData.js";
+import { getOteWritingMock, getOteWritingMocks } from "../../products/ote/mockTests/data/oteWritingMockData.js";
+import { getOteWritingPracticeGroups } from "../../products/ote/mockTests/data/oteWritingPracticeData.js";
 import {
   downloadOteWritingSubmissionDocx,
   downloadOteWritingSubmissionText,
@@ -40,6 +42,11 @@ const HUB_GRAMMAR_LEVEL_COLORS = {
   b2: "#f6d26b",
   c1: "#f2b0b7",
   c2: "#c7a4ff",
+};
+const OTE_SPEAKING_TOTALS = {
+  part1: 6,
+  part2: 5,
+  parts34: 5,
 };
 
 function buildHubGrammarDashboard(submissions = []) {
@@ -107,6 +114,8 @@ export default function Profile({
 }) {
   const navigate = useNavigate();
   const isSeifHubProfile = siteMode === "seifhub";
+  const isOteProfile = siteMode === "ote";
+  const isAptisProfile = !isSeifHubProfile && !isOteProfile;
   const [loading, setLoading] = useState(true);
 
   const [readingCounts, setReadingCounts] = useState({
@@ -165,6 +174,9 @@ export default function Profile({
   const [showSpeakingNotes, setShowSpeakingNotes] = useState(false);
   const [speakingFeedback, setSpeakingFeedback] = useState([]);
   const [showSpeakingFeedback, setShowSpeakingFeedback] = useState(false);
+  const [oteMockAttempts, setOteMockAttempts] = useState([]);
+  const [showOteSpeakingPanel, setShowOteSpeakingPanel] = useState(true);
+  const [showOteWritingPanel, setShowOteWritingPanel] = useState(true);
 
   const [vocabTopicCounts, setVocabTopicCounts] = useState(null); // 👈 NEW
   const [vocabMistakes, setVocabMistakes] = useState([]); // 👈 NEW
@@ -395,6 +407,7 @@ const handleChangePassword = async (e) => {
           oteWritingSubs,
           specNotes,
           speakingFeedbackItems,
+          oteMockRows,
           vocabCounts,
           vocabMistakesArr,
           vocabPractice,
@@ -415,9 +428,10 @@ const handleChangePassword = async (e) => {
           fb.fetchWritingP3Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP4Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP4RegisterAttempts?.(100, uid) ?? Promise.resolve([]),
-          fb.fetchOteWritingSubmissions?.(20, uid) ?? Promise.resolve([]),
+          fb.fetchOteWritingSubmissions?.(100, uid) ?? Promise.resolve([]),
           fb.fetchSpeakingSpeculationNotes?.(50, uid) ?? Promise.resolve([]),
           fb.fetchSpeakingAiFeedback?.(20, uid) ?? Promise.resolve([]),
+          fb.fetchOteMockAttempts?.(20, uid) ?? Promise.resolve([]),
           fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
           fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]),
           fb.fetchVocabPracticeSummary?.(uid) ?? Promise.resolve(EMPTY_VOCAB_PRACTICE_SUMMARY),
@@ -443,6 +457,7 @@ const handleChangePassword = async (e) => {
         setOteWriting(oteWritingSubs || []);
         setSpeakingNotes(specNotes);
         setSpeakingFeedback(speakingFeedbackItems || []);
+        setOteMockAttempts(oteMockRows || []);
         setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
         setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
         setVocabPracticeSummary(vocabPractice || EMPTY_VOCAB_PRACTICE_SUMMARY);
@@ -522,15 +537,96 @@ const totalListeningTasks =
   (LISTENING_TOTALS.part3 || 0) +
   (LISTENING_TOTALS.part4 || 0);
 
+const aptisWritingItems =
+  writingP1.length +
+  guideEdits.length +
+  writingP2.length +
+  writingP3.length +
+  writingP4.length +
+  p4Register.length;
+
+const oteSpeakingFeedback = speakingFeedback.filter((item) => item.product === "ote");
+const aptisSpeakingFeedback = speakingFeedback.filter((item) => (item.product || "aptis") !== "ote");
+const oteWritingMockCount = oteWriting.filter((entry) => entry.type !== "ote-writing-practice").length;
+const oteWritingPracticeCount = oteWriting.length - oteWritingMockCount;
+const oteSpeakingMockTotal = Object.keys(OTE_SPEAKING_MOCKS || {}).length;
+const oteWritingMocksTotal = getOteWritingMocks().length;
+const oteWritingPracticeGroups = getOteWritingPracticeGroups();
+const oteWritingPracticeTotals = Object.fromEntries(
+  oteWritingPracticeGroups.map((group) => [group.id, group.sets.length])
+);
+const normalizeOteSpeakingPart = (part) => {
+  const value = String(part || "").toLowerCase();
+  if (value === "part1" || value === "part-1") return "part1";
+  if (value === "part2" || value === "part-2") return "part2";
+  if (value === "part3" || value === "part-3" || value === "part4" || value === "part-4") return "parts34";
+  if (value === "parts-3-4" || value === "part34" || value === "part-3-4") return "parts34";
+  return value;
+};
+const uniqueOteSpeakingTasks = (partKey) =>
+  new Set(
+    oteSpeakingFeedback
+      .filter((item) => normalizeOteSpeakingPart(item.part) === partKey)
+      .map((item) => item.taskId || item.taskTitle || item.id)
+      .filter(Boolean)
+  ).size;
+const oteSpeakingProgress = {
+  part1: uniqueOteSpeakingTasks("part1"),
+  part2: uniqueOteSpeakingTasks("part2"),
+  parts34: uniqueOteSpeakingTasks("parts34"),
+  mock: new Set(
+    oteMockAttempts
+      .filter((attempt) => (attempt.module || "speaking") === "speaking")
+      .map((attempt) => attempt.mockId || attempt.id)
+      .filter(Boolean)
+  ).size,
+};
+const oteWritingProgress = {
+  mock: new Set(
+    oteWriting
+      .filter((entry) => entry.type !== "ote-writing-practice")
+      .map((entry) => entry.mockId || entry.id)
+      .filter(Boolean)
+  ).size,
+  practiceBySection: Object.fromEntries(
+    oteWritingPracticeGroups.map((group) => [
+      group.id,
+      new Set(
+        oteWriting
+          .filter((entry) => entry.type === "ote-writing-practice" && entry.practiceSection === group.id)
+          .map((entry) => entry.practiceTaskId || entry.id)
+          .filter(Boolean)
+      ).size,
+    ])
+  ),
+};
+const profileTitle =
+  titleOverride ||
+  (isOteProfile ? "OTE Profile" : isSeifHubProfile ? "Seif Hub Profile" : "My Profile");
+const profileIntro = isOteProfile
+  ? "Your OTE speaking and writing work in one place."
+  : isSeifHubProfile
+  ? "Your Seif Hub activity and account details."
+  : "Your Aptis Trainer progress and account details.";
+const formatOteSpeakingPart = (part) => {
+  const value = String(part || "").toLowerCase();
+  if (value === "part1" || value === "part-1") return "Part 1";
+  if (value === "part2" || value === "part-2") return "Part 2";
+  if (value === "part3" || value === "part-3") return "Part 3";
+  if (value === "part4" || value === "part-4") return "Part 4";
+  if (value === "parts-3-4" || value === "part34" || value === "part-3-4") return "Parts 3 and 4";
+  return part || "Speaking";
+};
+
   return (
     <div className="profile-page game-wrapper">
       <StyleScope />
       <header className="header">
-  <h2 className="title">{titleOverride || "My Profile"}</h2>
+  <h2 className="title">{profileTitle}</h2>
   <p className="intro">
     {viewerLabelOverride ?? (
       <>
-        Signed in as <strong>{user?.email || "Guest"}</strong>
+        {profileIntro} Signed in as <strong>{user?.email || "Guest"}</strong>
       </>
     )}
   </p>
@@ -661,7 +757,324 @@ const totalListeningTasks =
 </section>
       )}
 
-          {!isSeifHubProfile && (
+      {isOteProfile && (
+        <>
+          <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+            <button
+              type="button"
+              className="collapse-head"
+              aria-expanded={showOteSpeakingPanel}
+              onClick={() => setShowOteSpeakingPanel((s) => !s)}
+            >
+              <h3 className="sec-title" style={{ margin: 0 }}>
+                OTE Speaking
+              </h3>
+
+              <span className="muted small" style={{ flexShrink: 0 }}>
+                {oteSpeakingFeedback.length} feedback item{oteSpeakingFeedback.length === 1 ? "" : "s"}
+              </span>
+
+              <span className={`chev ${showOteSpeakingPanel ? "open" : ""}`} aria-hidden>
+                ▾
+              </span>
+            </button>
+
+            {showOteSpeakingPanel && (
+              <div className="panel-body">
+                <div className="pbar-group">
+                  <ProgressBar
+                    value={oteSpeakingProgress.part1}
+                    max={OTE_SPEAKING_TOTALS.part1}
+                    label="Part 1 interview sets"
+                    right={`${oteSpeakingProgress.part1}/${OTE_SPEAKING_TOTALS.part1}`}
+                  />
+                  <ProgressBar
+                    value={oteSpeakingProgress.part2}
+                    max={OTE_SPEAKING_TOTALS.part2}
+                    label="Part 2 voicemail sets"
+                    right={`${oteSpeakingProgress.part2}/${OTE_SPEAKING_TOTALS.part2}`}
+                  />
+                  <ProgressBar
+                    value={oteSpeakingProgress.parts34}
+                    max={OTE_SPEAKING_TOTALS.parts34}
+                    label="Parts 3 and 4 sets"
+                    right={`${oteSpeakingProgress.parts34}/${OTE_SPEAKING_TOTALS.parts34}`}
+                  />
+                  <ProgressBar
+                    value={oteSpeakingProgress.mock}
+                    max={oteSpeakingMockTotal || 1}
+                    label="Speaking mock attempts"
+                    right={`${oteSpeakingProgress.mock}/${oteSpeakingMockTotal || 0}`}
+                  />
+                </div>
+
+                {!oteSpeakingFeedback.length ? (
+                  <p className="muted" style={{ marginTop: ".5rem" }}>
+                    No OTE speaking feedback saved yet.
+                  </p>
+                ) : (
+                  <ul className="wlist" style={{ marginTop: ".5rem" }}>
+                    {oteSpeakingFeedback.map((item, idx) => {
+                      const when = item.createdAt?.toDate?.()
+                        ? item.createdAt.toDate().toLocaleString()
+                        : item.createdAt || "—";
+                      const partLabel = formatOteSpeakingPart(item.part);
+                      const title = item.taskTitle || `OTE Speaking ${partLabel}`;
+                      const transcripts = item.transcripts || [];
+
+                      return (
+                        <li key={item.id || idx} className="wcard">
+                          <div className="whead">
+                            <div>
+                              <strong>{title}</strong>
+                              <div className="muted small">{when}</div>
+                              <div className="muted small">
+                                OTE {partLabel} · transcript-based feedback · audio not stored
+                              </div>
+                            </div>
+                            <div className="actions">
+                              <button
+                                className="btn"
+                                type="button"
+                                onClick={() => {
+                                  const text = [
+                                    `${title} (${when})`,
+                                    "",
+                                    ...(transcripts || []).map((entry, index) =>
+                                      [
+                                        `Q${index + 1}: ${entry.question || item.questions?.[index]?.question || ""}`,
+                                        entry.transcript || "(no clear transcript)",
+                                      ].join("\n")
+                                    ),
+                                  ].join("\n\n");
+                                  navigator.clipboard.writeText(text).then(() => toast("Copied OTE speaking transcripts ✓"));
+                                }}
+                              >
+                                Copy transcripts
+                              </button>
+                            </div>
+                          </div>
+
+                          {transcripts.length ? (
+                            <details className="profile-ai-feedback-full">
+                              <summary>View transcripts</summary>
+                              <div className="profile-ai-feedback-body">
+                                {transcripts.map((entry, index) => (
+                                  <article className="profile-ai-feedback-card" key={entry.questionId || index}>
+                                    <strong>Q{index + 1}: {entry.question || item.questions?.[index]?.question || "Question"}</strong>
+                                    <p>{entry.transcript || "No clear transcript."}</p>
+                                  </article>
+                                ))}
+                              </div>
+                            </details>
+                          ) : null}
+
+                          <ProfileAiFeedback
+                            feedback={item.feedback}
+                            descriptor="Generated automatically from OTE transcripts. Audio is not stored."
+                          />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+
+                {oteMockAttempts.length ? (
+                  <>
+                    <h4 className="inner-title" style={{ marginTop: "1rem" }}>
+                      Full speaking mock results
+                    </h4>
+                    <ul className="wlist" style={{ marginTop: ".5rem" }}>
+                      {oteMockAttempts.map((attempt) => {
+                        const when = attempt.createdAt?.toDate?.()
+                          ? attempt.createdAt.toDate().toLocaleString()
+                          : attempt.createdAt || "—";
+                        const resultPath = getSitePath(`/mock-tests/${attempt.mockId || "speaking-1"}/results/${attempt.id}`);
+
+                        return (
+                          <li key={attempt.id} className="wcard">
+                            <div className="whead">
+                              <div>
+                                <strong>{attempt.mockTitle || "OTE Speaking Mock"}</strong>
+                                <div className="muted small">{when}</div>
+                                <div className="muted small">
+                                  Full speaking mock · {attempt.recordings?.length || 0} recordings
+                                </div>
+                              </div>
+                              <div className="actions">
+                                <button className="btn" type="button" onClick={() => navigate(resultPath)}>
+                                  View results
+                                </button>
+                              </div>
+                            </div>
+
+                            <ProfileAiFeedback
+                              feedback={attempt.aiFeedback}
+                              descriptor="Saved from the full OTE speaking mock flow."
+                            />
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </>
+                ) : null}
+              </div>
+            )}
+          </section>
+
+          <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+            <button
+              type="button"
+              className="collapse-head"
+              aria-expanded={showOteWritingPanel}
+              onClick={() => setShowOteWritingPanel((s) => !s)}
+            >
+              <h3 className="sec-title" style={{ margin: 0 }}>
+                OTE Writing
+              </h3>
+
+              <span className="muted small" style={{ flexShrink: 0 }}>
+                {oteWritingMockCount} mock · {oteWritingPracticeCount} practice
+              </span>
+
+              <span className={`chev ${showOteWritingPanel ? "open" : ""}`} aria-hidden>
+                ▾
+              </span>
+            </button>
+
+            {showOteWritingPanel && (
+              <div className="panel-body">
+                <div className="pbar-group">
+                  <ProgressBar
+                    value={oteWritingProgress.mock}
+                    max={oteWritingMocksTotal || 1}
+                    label="Writing mock submissions"
+                    right={`${oteWritingProgress.mock}/${oteWritingMocksTotal || 0}`}
+                  />
+                  {oteWritingPracticeGroups.map((group) => (
+                    <ProgressBar
+                      key={group.id}
+                      value={oteWritingProgress.practiceBySection[group.id] || 0}
+                      max={oteWritingPracticeTotals[group.id] || 1}
+                      label={`${group.label} practice`}
+                      right={`${oteWritingProgress.practiceBySection[group.id] || 0}/${oteWritingPracticeTotals[group.id] || 0}`}
+                    />
+                  ))}
+                </div>
+
+                {!oteWriting.length ? (
+                  <p className="muted" style={{ marginTop: ".5rem" }}>
+                    No OTE writing submissions saved yet.
+                  </p>
+                ) : (
+                  <ul className="wlist" style={{ marginTop: ".5rem" }}>
+                    {oteWriting.map((s, idx) => {
+                      const when = s.createdAt?.toDate?.()
+                        ? s.createdAt.toDate().toLocaleString()
+                        : s.createdAt || "—";
+                      const isPractice = s.type === "ote-writing-practice";
+                      const mock = isPractice ? null : getOteWritingMock(s.mockId || "writing-1");
+                      const task2 = mock?.task2?.options?.[s.task2Choice || "essay"];
+                      const title = s.mockTitle || mock?.title || (isPractice ? "OTE Writing Practice" : "OTE Writing Mock");
+                      const practiceTitle = s.tasks?.practice?.title || title;
+                      const practiceAnswer = s.answers?.task || "";
+                      const practiceWords = s.counts?.task ?? 0;
+
+                      return (
+                        <li key={s.id || idx} className="wcard">
+                          <div className="whead">
+                            <div>
+                              <strong>{title}</strong>
+                              <div className="muted small">{when}</div>
+                              {isPractice ? (
+                                <div className="muted small">
+                                  Timed practice: {s.practiceTaskLabel || s.practiceTaskType || "Writing"} · {practiceWords} words
+                                </div>
+                              ) : (
+                                <div className="muted small">
+                                  Task 1: {s.counts?.task1 ?? 0} words · Task 2: {task2?.title || "Part 2"}, {s.counts?.[s.task2Choice || "essay"] ?? 0} words
+                                </div>
+                              )}
+                            </div>
+                            <div className="actions">
+                              <button
+                                className="btn"
+                                type="button"
+                                onClick={() => {
+                                  const text = isPractice
+                                    ? [
+                                        title,
+                                        `${practiceTitle} (${practiceWords} words)`,
+                                        practiceAnswer || "(no answer)",
+                                      ].join("\n")
+                                    : [
+                                        title,
+                                        `Task 1 (${s.counts?.task1 ?? 0} words)`,
+                                        s.answers?.task1 || "(no answer)",
+                                        "",
+                                        `Task 2: ${task2?.title || "Part 2"} (${s.counts?.[s.task2Choice || "essay"] ?? 0} words)`,
+                                        s.answers?.[s.task2Choice || "essay"] || "(no answer)",
+                                      ].join("\n");
+                                  navigator.clipboard.writeText(text).then(() => toast("Copied OTE writing submission ✓"));
+                                }}
+                              >
+                                Copy
+                              </button>
+                              {!isPractice ? (
+                                <>
+                                  <button
+                                    className="btn"
+                                    type="button"
+                                    onClick={() => downloadOteWritingSubmissionText({ submissionId: s.id, submission: s, mock })}
+                                  >
+                                    TXT
+                                  </button>
+                                  <button
+                                    className="btn"
+                                    type="button"
+                                    onClick={() => downloadOteWritingSubmissionDocx({ submissionId: s.id, submission: s, mock })}
+                                  >
+                                    DOCX
+                                  </button>
+                                </>
+                              ) : null}
+                            </div>
+                          </div>
+
+                          {isPractice ? (
+                            <div className="submitted-p4">
+                              <div className="p4-col">
+                                <div className="p4-title">{practiceTitle}</div>
+                                <div className="submitted-html">{practiceAnswer || "(no answer)"}</div>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="submitted-p4">
+                              <div className="p4-col">
+                                <div className="p4-title">Task 1 email</div>
+                                <div className="submitted-html">{s.answers?.task1 || "(no answer)"}</div>
+                              </div>
+                              <div className="p4-col">
+                                <div className="p4-title">Task 2 {task2?.title || "Part 2"}</div>
+                                <div className="submitted-html">{s.answers?.[s.task2Choice || "essay"] || "(no answer)"}</div>
+                              </div>
+                            </div>
+                          )}
+
+                          <ProfileAiFeedback feedback={s.aiFeedback} />
+                        </li>
+                      );
+                    })}
+                  </ul>
+                )}
+              </div>
+            )}
+          </section>
+
+        </>
+      )}
+
+          {isAptisProfile && (
           <>
           {/* --- READING PROGRESS --- */}
 <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
@@ -772,6 +1185,8 @@ const totalListeningTasks =
           </>
           )}
 
+{isAptisProfile && (
+<>
 {/* --- VOCABULARY PROGRESS --- */}
 <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
   <button
@@ -1035,8 +1450,10 @@ const totalListeningTasks =
     </div>
   )}
 </section>
+</>
+)}
 
-{!isSeifHubProfile && (
+{isAptisProfile && (
 <>
 {/* --- SPEAKING PROGRESS --- */}
 <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
@@ -1098,8 +1515,8 @@ const totalListeningTasks =
           <div className="inner-head-left">
             <h4 className="inner-title">Speaking Feedback</h4>
             <span className="muted small">
-              {speakingFeedback.length} saved item
-              {speakingFeedback.length === 1 ? "" : "s"}
+              {aptisSpeakingFeedback.length} saved item
+              {aptisSpeakingFeedback.length === 1 ? "" : "s"}
             </span>
           </div>
           <span className={`chev ${showSpeakingFeedback ? "open" : ""}`} aria-hidden>
@@ -1109,13 +1526,13 @@ const totalListeningTasks =
 
         {showSpeakingFeedback && (
           <>
-            {!speakingFeedback.length ? (
+            {!aptisSpeakingFeedback.length ? (
               <p className="muted" style={{ marginTop: ".5rem" }}>
                 No saved speaking feedback yet.
               </p>
             ) : (
               <ul className="wlist" style={{ marginTop: ".5rem" }}>
-                {speakingFeedback.map((item, idx) => {
+                {aptisSpeakingFeedback.map((item, idx) => {
                   const when = item.createdAt?.toDate?.()
                     ? item.createdAt.toDate().toLocaleString()
                     : item.createdAt || "—";
@@ -1547,7 +1964,7 @@ const totalListeningTasks =
 </section>
 )}
 
-{!isSeifHubProfile && (
+{isAptisProfile && (
 <>
 {/* --- WRITING HISTORY / GUIDE GROUPED --- */}
 <section className="panel collapsible" style={{ marginTop: "1rem" }}>
@@ -1562,7 +1979,7 @@ const totalListeningTasks =
     </h3>
 
     <span className="muted small" style={{ flexShrink: 0 }}>
-  {totalWritingItems} saved item{totalWritingItems === 1 ? "" : "s"}
+  {aptisWritingItems} saved item{aptisWritingItems === 1 ? "" : "s"}
 </span>
 
     <span className={`chev ${showWritingAll ? "open" : ""}`} aria-hidden>
@@ -1572,7 +1989,7 @@ const totalListeningTasks =
 
   {showWritingAll && (
     <div className="writing-sections">
-      <div className="subpanel collapsible-inner">
+      {false && <div className="subpanel collapsible-inner">
         <button
           type="button"
           className="collapse-head inner"
@@ -1697,7 +2114,7 @@ const totalListeningTasks =
             )}
           </>
         )}
-      </div>
+      </div>}
 
       {/* ---------- Subsection: Part 1 practice sessions ---------- */}
       <div className="subpanel collapsible-inner">
@@ -2366,7 +2783,7 @@ const totalListeningTasks =
  </>
 )}
 
-{!isSeifHubProfile && (
+{isAptisProfile && (
 <>
 {/* --- SPEAKING NOTES --- */}
       <section className="panel collapsible" style={{ marginTop: "1rem" }}>

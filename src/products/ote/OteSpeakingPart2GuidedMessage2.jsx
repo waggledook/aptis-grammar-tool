@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
+import { logOteTrainingCompleted } from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
 import "./styles/ote.css";
 
@@ -270,6 +271,14 @@ export default function OteSpeakingPart2GuidedMessage2({ nativeRoutes = false })
       });
       setPracticeStatus("complete");
       setSecondsLeft(0);
+      logOteTrainingCompleted({
+        section: "speaking",
+        part: "part-2",
+        mode: "guided_voicemail",
+        taskId: "guided-message-2",
+        taskTitle: "Friendly voicemail reply",
+        recordingCount: 1,
+      });
     };
     recorder.start();
     startCountdown(40, "recording", () => {

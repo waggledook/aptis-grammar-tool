@@ -2,8 +2,16 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, CheckCircle2, Download, Mic, Timer } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
+import SpeakingFeedbackPanel from "../../components/speaking/SpeakingFeedbackPanel.jsx";
+import {
+  logOteTrainingCompleted,
+  logOteTrainingStarted,
+  requestOteSpeakingFeedback,
+  saveSpeakingAiFeedback,
+} from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
 import { OTE_SPEAKING_AUDIO } from "./mockTests/data/oteSpeakingMockData.js";
+import { recordingsToFeedbackAudio } from "./utils/speakingFeedback.js";
 import "./styles/ote.css";
 
 const MIME_CANDIDATES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
@@ -371,7 +379,7 @@ async function createZipAndDownload(files, zipName = "ote-talk-follow-up-practic
   URL.revokeObjectURL(url);
 }
 
-export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
+export default function OteSpeakingPart34Practice({ nativeRoutes = false, user = null, onRequireSignIn }) {
   const { setId } = useParams();
   const navigate = useNavigate();
   const { playAudioFile, speak, stop } = useSpeech();
@@ -385,12 +393,18 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
   const [recordings, setRecordings] = useState([]);
   const [micError, setMicError] = useState("");
   const [flowStep, setFlowStep] = useState(null);
+  const [part3FeedbackResult, setPart3FeedbackResult] = useState(null);
+  const [part4FeedbackResult, setPart4FeedbackResult] = useState(null);
+  const [feedbackLoading, setFeedbackLoading] = useState("");
+  const [feedbackError, setFeedbackError] = useState("");
 
   const streamRef = useRef(null);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
   const objectUrlsRef = useRef([]);
+  const activityStartedRef = useRef(false);
+  const activityCompletedRef = useRef(false);
 
   const steps = useMemo(() => {
     if (!selectedSet) return [];
@@ -441,8 +455,13 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
     setSecondsLeft(30);
     setRecordings([]);
     setMicError("");
+    setPart3FeedbackResult(null);
+    setPart4FeedbackResult(null);
+    setFeedbackError("");
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     objectUrlsRef.current = [];
+    activityStartedRef.current = false;
+    activityCompletedRef.current = false;
     stop();
   }, [setId]);
 
@@ -515,6 +534,17 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
     if (!activeStep || phase === "listening" || phase === "thinking" || phase === "recording") return;
     const stream = await ensureStream();
     if (!stream) return;
+    if (!activityStartedRef.current) {
+      activityStartedRef.current = true;
+      logOteTrainingStarted({
+        section: "speaking",
+        part: "parts-3-4",
+        mode: "talk_follow_up_practice",
+        setId: selectedSet.id,
+        setTitle: selectedSet.title,
+        taskCount: steps.length,
+      });
+    }
 
     if (activeStep.kind === "talk") {
       setFlowStep(activeStep);
@@ -552,6 +582,17 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
     setFlowStep(null);
     setPhase("complete");
     setSecondsLeft(0);
+    if (!activityCompletedRef.current) {
+      activityCompletedRef.current = true;
+      logOteTrainingCompleted({
+        section: "speaking",
+        part: "parts-3-4",
+        mode: recordings.some((recording) => recording.partId === "part-3") ? "talk_follow_up_practice" : "follow_up_practice",
+        setId: selectedSet.id,
+        setTitle: selectedSet.title,
+        recordingCount: recordings.length,
+      });
+    }
   }
 
   function startRecording(stream, step = activeStep) {
@@ -569,8 +610,11 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
         const url = URL.createObjectURL(blob);
         const recording = {
           stepId: step.id,
+          id: step.id,
+          partId: step.kind === "talk" ? "part-3" : "part-4",
           label: step.label,
           title: step.title,
+          prompt: step.prompt,
           durationSeconds: step.responseSeconds,
           blob,
           url,
@@ -597,6 +641,25 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
   }
 
+  function skipToPart4() {
+    stop();
+    setFlowStep(null);
+    setStepIndex(1);
+    setPhase("ready");
+    setSecondsLeft(30);
+    if (!activityStartedRef.current) {
+      activityStartedRef.current = true;
+      logOteTrainingStarted({
+        section: "speaking",
+        part: "part-4",
+        mode: "follow_up_practice",
+        setId: selectedSet.id,
+        setTitle: selectedSet.title,
+        taskCount: steps.filter((step) => step.kind === "question").length,
+      });
+    }
+  }
+
   function goNext() {
     stop();
     if (stepIndex < steps.length - 1) {
@@ -607,6 +670,73 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
       return;
     }
     setPhase("complete");
+    if (!activityCompletedRef.current) {
+      activityCompletedRef.current = true;
+      logOteTrainingCompleted({
+        section: "speaking",
+        part: "parts-3-4",
+        mode: "talk_follow_up_practice",
+        setId: selectedSet.id,
+        setTitle: selectedSet.title,
+        recordingCount: recordings.length,
+      });
+    }
+  }
+
+  async function handleGenerateFeedback(partId) {
+    if (!user) {
+      onRequireSignIn?.();
+      setFeedbackError("Sign in to generate OTE speaking feedback.");
+      return;
+    }
+    setFeedbackLoading(partId);
+    setFeedbackError("");
+    try {
+      const partSteps = partId === "part-3"
+        ? steps.filter((step) => step.kind === "talk")
+        : steps.filter((step) => step.kind === "question");
+      const orderedRecordings = partSteps
+        .map((step) => recordings.find((recording) => recording.stepId === step.id))
+        .filter(Boolean);
+      const feedbackAudio = await recordingsToFeedbackAudio(orderedRecordings, `ote-${partId}-${selectedSet.id}`);
+      const task = partId === "part-3"
+        ? {
+            id: selectedSet.id,
+            title: selectedSet.title,
+            topic: selectedSet.title,
+            instructions: PART3_INSTRUCTIONS,
+            lead: selectedSet.talkPrompt,
+            images: selectedSet.images,
+          }
+        : {
+            id: `${selectedSet.id}-follow-ups`,
+            title: `${selectedSet.title} follow-ups`,
+            topic: selectedSet.title,
+            instructions: PART4_INSTRUCTIONS,
+          };
+      const result = await requestOteSpeakingFeedback({
+        partId,
+        task,
+        recordings: feedbackAudio,
+      });
+      if (partId === "part-3") setPart3FeedbackResult(result);
+      else setPart4FeedbackResult(result);
+      await saveSpeakingAiFeedback({
+        product: "ote",
+        part: partId,
+        taskId: task.id,
+        taskTitle: task.title,
+        questions: partSteps.map((step) => step.prompt),
+        transcripts: result?.transcripts || [],
+        feedback: result?.feedback,
+        meta: result?.meta || null,
+      });
+    } catch (error) {
+      console.error(`[OTE ${partId} feedback] failed`, error);
+      setFeedbackError(error?.message || "Could not generate feedback right now.");
+    } finally {
+      setFeedbackLoading("");
+    }
   }
 
   if (!selectedSet) {
@@ -636,6 +766,8 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
   }
 
   const activeRecording = recordings.find((recording) => recording.stepId === visibleStep?.id);
+  const hasPart3Recording = recordings.some((recording) => recording.partId === "part-3");
+  const hasPart4Recording = recordings.some((recording) => recording.partId === "part-4");
 
   return (
     <main className="ote-training-page">
@@ -707,6 +839,11 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
                 <Mic size={18} aria-hidden="true" />
                 {phase === "listening" ? "Task running" : visibleStep.kind === "talk" ? "Start task" : "Start follow-up questions"}
               </button>
+              {visibleStep.kind === "talk" && !activeRecording && phase === "ready" ? (
+                <button type="button" onClick={skipToPart4}>
+                  Skip to Part 4
+                </button>
+              ) : null}
               {phase === "recording" && (
                 <button type="button" onClick={stopRecordingNow}>
                   Stop recording
@@ -727,10 +864,29 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
                 </a>
                 <button type="button" onClick={goNext}>
                   <CheckCircle2 size={18} aria-hidden="true" />
-                  {stepIndex < steps.length - 1 ? "Next question" : "Finish set"}
+                  {visibleStep.kind === "talk" ? "Start Part 4" : stepIndex < steps.length - 1 ? "Next question" : "Finish set"}
                 </button>
+                {visibleStep.kind === "talk" ? (
+                  <button
+                    type="button"
+                    onClick={() => handleGenerateFeedback("part-3")}
+                    disabled={feedbackLoading === "part-3"}
+                  >
+                    {feedbackLoading === "part-3" ? "Generating feedback..." : "Get Part 3 feedback"}
+                  </button>
+                ) : null}
               </div>
             )}
+            {visibleStep.kind === "talk" ? (
+              <>
+                {feedbackError ? <p className="ote-mic-error">{feedbackError}</p> : null}
+                <SpeakingFeedbackPanel
+                  feedbackResult={part3FeedbackResult}
+                  questions={[selectedSet.talkPrompt]}
+                  title="OTE Part 3 talk feedback"
+                />
+              </>
+            ) : null}
           </article>
         )}
 
@@ -748,6 +904,35 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false }) {
               <Download size={18} aria-hidden="true" />
               Download ZIP
             </button>
+            <div className="ote-practice-complete-actions">
+              <button
+                className="ote-training-primary-link"
+                type="button"
+                onClick={() => handleGenerateFeedback("part-3")}
+                disabled={!hasPart3Recording || Boolean(feedbackLoading)}
+              >
+                {feedbackLoading === "part-3" ? "Generating Part 3..." : "Get Part 3 feedback"}
+              </button>
+              <button
+                className="ote-training-primary-link"
+                type="button"
+                onClick={() => handleGenerateFeedback("part-4")}
+                disabled={!hasPart4Recording || Boolean(feedbackLoading)}
+              >
+                {feedbackLoading === "part-4" ? "Generating Part 4..." : "Get Part 4 feedback"}
+              </button>
+            </div>
+            {feedbackError ? <p className="ote-mic-error">{feedbackError}</p> : null}
+            <SpeakingFeedbackPanel
+              feedbackResult={part3FeedbackResult}
+              questions={[selectedSet.talkPrompt]}
+              title="OTE Part 3 talk feedback"
+            />
+            <SpeakingFeedbackPanel
+              feedbackResult={part4FeedbackResult}
+              questions={steps.filter((step) => step.kind === "question").map((step) => step.prompt)}
+              title="OTE Part 4 follow-up feedback"
+            />
             <div className="ote-recording-list">
               {recordings.map((recording) => (
                 <article key={recording.stepId} className="ote-recording-card">

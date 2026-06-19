@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Download, FileText, HelpCircle, Printer, Settings } from "lucide-react";
 import {
+  logOteMockCompleted,
+  logOteMockStarted,
   requestOteWritingFeedback,
   saveOteWritingSubmission,
   saveWritingAiFeedback,
@@ -149,6 +151,11 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
     setAiFeedback(null);
     setFeedbackMeta(null);
     saveStartedRef.current = false;
+    logOteMockStarted({
+      module: "writing",
+      mockId: mock.id,
+      mockTitle: mock.title,
+    });
     setCountdownLeft(mock.countdownSeconds);
     setPartTitleLeft(WRITING_PART_TITLE_SECONDS);
     setStatus("countdown");
@@ -179,6 +186,14 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
     setFinishReason(reason);
     setFinishNotice(reason === "time" ? "Time is up. Your writing is locked for review." : "");
     setStatus("complete");
+    logOteMockCompleted({
+      module: "writing",
+      mockId: mock.id,
+      mockTitle: mock.title,
+      task2Choice,
+      wordCount: wordCounts.task1 + (wordCounts[task2Choice] || 0),
+      reason,
+    });
   }
 
   function advanceFromTimer() {

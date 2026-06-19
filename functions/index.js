@@ -33,6 +33,8 @@ const WRITING_FEEDBACK_CREDIT_COSTS = {
   aptis_speaking_part2: 3,
   aptis_speaking_part3: 4,
   aptis_speaking_part4: 5,
+  ote_speaking_part: 4,
+  ote_speaking_mock: 8,
   ote_full_mock: 8,
   ote_single_task: 4,
   ote_register_gap: 1,
@@ -961,6 +963,26 @@ const APTIS_SPEAKING_PART4_FEEDBACK_SCHEMA = {
   },
 };
 
+const OTE_SPEAKING_FEEDBACK_SCHEMA = JSON.parse(JSON.stringify(APTIS_SPEAKING_PART2_FEEDBACK_SCHEMA));
+OTE_SPEAKING_FEEDBACK_SCHEMA.properties.taskType.enum = ["ote_speaking"];
+OTE_SPEAKING_FEEDBACK_SCHEMA.properties.estimatedLevel.properties.label.enum = [
+  "Below A2 / unclear",
+  "A2 range",
+  "B1 range",
+  "B2 range",
+  "C1 range",
+  "C1+ range",
+  "C2-like / above OTE task range",
+];
+OTE_SPEAKING_FEEDBACK_SCHEMA.properties.answers.items.properties.questionNumber = { type: "integer" };
+OTE_SPEAKING_FEEDBACK_SCHEMA.properties.answers.items.properties.questionType.enum = [
+  "interview",
+  "formal_voicemail",
+  "informal_voicemail",
+  "talk",
+  "follow_up",
+];
+
 const APTIS_WRITING_PART23_FEEDBACK_SCHEMA = {
   type: "object",
   additionalProperties: false,
@@ -1844,6 +1866,67 @@ function normalizeSpeakingAudioItems(recordings) {
   });
 }
 
+function normalizeOteSpeakingPayload(data = {}) {
+  const rawRecordings = Array.isArray(data?.recordings) ? data.recordings : [];
+  const partId = cleanString(data?.partId || data?.part || "mock", 40);
+  const mockId = cleanString(data?.mockId || "", 120);
+  const task = data?.task && typeof data.task === "object" ? data.task : {};
+  const recordings = rawRecordings.slice(0, 18).map((item, index) => ({
+    id: cleanString(item?.id || item?.questionId || item?.taskId || item?.stepId || `r${index + 1}`, 120),
+    partId: cleanString(item?.partId || partId, 40),
+    label: cleanString(item?.label || item?.title || `Response ${index + 1}`, 160),
+    prompt: cleanString(item?.prompt || "", 1800),
+    durationSeconds: Number(item?.durationSeconds || 0),
+    base64: cleanString(item?.base64 || "", 12_000_000),
+    mime: cleanString(item?.mime || "audio/webm", 80) || "audio/webm",
+    name: cleanString(item?.name || `ote-speaking-${index + 1}.webm`, 160),
+  }));
+
+  return {
+    partId,
+    mockId,
+    mockTitle: cleanString(data?.mockTitle || "", 180),
+    task: {
+      id: cleanString(task?.id || data?.taskId || mockId || partId, 120),
+      title: cleanString(task?.title || data?.taskTitle || data?.mockTitle || "", 220),
+      topic: cleanString(task?.topic || data?.topic || "", 160),
+      instructions: Array.isArray(task?.instructions)
+        ? task.instructions.slice(0, 8).map((item) => cleanString(item, 500)).filter(Boolean)
+        : [],
+      bullets: Array.isArray(task?.bullets)
+        ? task.bullets.slice(0, 8).map((item) => cleanString(item, 500)).filter(Boolean)
+        : [],
+      lead: cleanString(task?.lead || task?.prompt || "", 2200),
+      audience: cleanString(task?.audience || "", 160),
+      mode: cleanString(task?.mode || task?.type || "", 80),
+      friendMessage: cleanString(task?.friendMessage || task?.incomingAudioScript || "", 2000),
+      images: Array.isArray(task?.images)
+        ? task.images.slice(0, 8).map((image) => ({
+            id: cleanString(image?.id || "", 80),
+            label: cleanString(image?.label || "", 180),
+            description: cleanString(image?.description || image?.alt || "", 500),
+          })).filter((image) => image.label || image.description)
+        : [],
+      parts: Array.isArray(task?.parts) ? task.parts : [],
+    },
+    recordings,
+  };
+}
+
+function getOteQuestionType(recording = {}, index = 0) {
+  const partId = recording.partId || "";
+  const text = normalizeFeedbackText(`${recording.id} ${recording.label}`);
+  if (partId === "part-1" || text.includes("part 1")) return "interview";
+  if (partId === "part-3" || text.includes("talk")) return "talk";
+  if (partId === "part-4" || text.includes("follow")) return "follow_up";
+  if (partId === "part-2" || text.includes("message")) {
+    return text.includes("message 1") || text.includes("formal") || text.includes("leave") || index === 0
+      ? "formal_voicemail"
+      : "informal_voicemail";
+  }
+  return "interview";
+}
+
 async function transcribeAudioItem(audioItem, index) {
   const buffer = Buffer.from(audioItem.base64, "base64");
   if (!buffer.byteLength) {
@@ -2203,6 +2286,60 @@ function buildAptisSpeakingPart4Prompt(task, item) {
   ].join("\n");
 }
 
+function buildOteSpeakingPrompt(payload, items) {
+  const isMock = payload.partId === "mock" || Boolean(payload.mockId);
+  return [
+    "You are an Oxford Test of English speaking feedback assistant.",
+    "",
+    "Use the Oxford Test of English speaking task specifications as the exam frame. The module has Part 1 interview questions, Part 2 two voicemails, Part 3 a one-minute talk from visual/written prompts, and Part 4 six follow-up questions linked to the Part 3 theme. Speaking is marked analytically for Task fulfilment, Pronunciation and Fluency, Grammar, and Lexis on a 0-7 scale from below A2 to C1, but the public OTE result is reported only up to B2. You must not claim to give an official score.",
+    "",
+    "Important limitation: you are assessing transcripts. Do not give detailed pronunciation, accent, intonation, word-stress, or phoneme feedback. For the OTE criterion Pronunciation and Fluency, comment mainly on fluency evidence visible in the transcript, and add that audio-level pronunciation is not assessed reliably here. Only mention transcript clarity if the transcript is incomplete or impossible to interpret.",
+    "",
+    "Calibration learned from Aptis feedback:",
+    "- Do not grade harshly just because spoken transcripts are messy. Normal fillers, restarts, self-corrections, informal discourse markers, and transcript artefacts are compatible with strong spoken English.",
+    "- Limited evidence should lower confidence, not automatically lower the level.",
+    "- When evidence sits between adjacent levels, choose the higher level with lower confidence unless there is concrete evidence for the lower level.",
+    "- Use B1 only when the performance is genuinely limited: thin development, frequent clear learner errors, repeated simple structures, partial task fulfilment, or poor relevance.",
+    "- Use B2 for clear, relevant, reasonably developed learner responses with good control, natural everyday vocabulary, and only local errors.",
+    "- Use C1 when the transcript shows flexible, idiomatic, nuanced, well controlled spoken English, even if the task itself is simple.",
+    "- Use C1+ range when responses are consistently natural, spontaneous, developed, idiomatic, and controlled, with only minor local slips or likely transcript artefacts.",
+    "- Use C2-like / above OTE task range when the answers sound essentially native-like or professionally fluent for this limited task type. Keep the caveat that Part 1 cannot prove the speaker's full ceiling.",
+    "- If all OTE Part 1 scored answers are relevant, developed for the 20-second window, natural, and mostly error-free, the observed range should normally be at least C1. Do not assign B2 just because official OTE certificates report only up to B2.",
+    "",
+    "Part-specific task guidance:",
+    "- Part 1 interview: answer each short spoken question directly. Short answers can be acceptable, but stronger practice answers add a reason, example, contrast, or personal detail. The first two questions may be simple identity questions; do not over-penalise them for being short.",
+    "- Part 2 voicemail 1: the student leaves a voicemail to a neutral or formal audience such as a manager, shop, school, company, or service. Reward polite openings, clear identity/context, coverage of all bullet points, and neutral/formal style. Do not demand a written-email level of formality.",
+    "- Part 2 voicemail 2: the student replies to a friend's voicemail. Reward friendly, natural, informal spoken style, direct response to the incoming message, and coverage of all bullet points. Do not criticise contractions or conversational phrases when they fit a friend.",
+    "- Part 3 talk: the student chooses two visuals or options and gives a one-minute talk for a class/workplace audience. Reward clear selection of two items, relevance to the scenario, simple organisation, explanation of benefits/reasons, and enough development for one minute. Do not require all visuals to be discussed.",
+    "- Part 4 follow-up questions: the six questions are linked to the Part 3 topic. Reward direct answers, reasons/examples, opinions, comparisons, and gradually broader thinking. Each answer is separate and short; do not expect a two-minute monologue.",
+    "",
+    "Feedback requirements:",
+    "- Keep feedback practical, encouraging, and student-facing.",
+    "- For each response, identify task fulfilment, development/content, grammar, vocabulary/lexis, cohesion where relevant, and transcript-based fluency.",
+    "- Include useful languageErrors only for clear learner-language issues supported by the transcript. Do not invent errors. Up to three per short response, up to five only for a longer talk.",
+    "- Do not put register preferences in languageErrors unless the style is genuinely inappropriate for the audience.",
+    "- Do not correct acceptable spoken phrasing just because a shorter or tidier written alternative exists. Examples of acceptable spoken phrasing include hedges like kind of, discourse markers like well/you know/I guess, relative that for people in informal speech, and ordinary repetition used for planning.",
+    "- Do not put optional style polish in languageErrors. If the phrase is understandable and acceptable in spontaneous speech, do not list it as a fix. Mention it lightly in teacherNote only if useful.",
+    "- Avoid corrections whose only justification is slightly smoother, more natural, more direct, too strong, or better collocation. These are coaching notes, not language errors.",
+    "- Be very cautious with possible mistranscriptions. If a phrase is plausible as a transcription artefact, mention transcript uncertainty in teacherNote rather than presenting it as a definite language error.",
+    "- Improved answers should preserve the student's idea, specificity, tone, and level. Never simplify a strong advanced answer into a generic B1/B2 model.",
+    "- For strong C1/C1+/C2-like responses, improvedAnswer must not be shorter or simpler than the original unless the original is genuinely unclear. Either give a very light same-level polish with similar length and content density, or write: This is already a strong answer; keep the original content and only make minor local edits.",
+    "- Preserve advanced vocabulary, hedging, nuance, examples, and personality in suggested answers. Do not replace specific content with generic exam-safe content.",
+    "- Match the expected time limit: brief for Part 1, about 35-60 words for voicemails, about 100-150 words for the Part 3 talk, and about 35-70 words for Part 4 follow-ups.",
+    "",
+    `Feedback scope: ${isMock ? "full OTE speaking mock" : payload.partId}.`,
+    "Set overall.transcriptCaveat to: Feedback is based on transcripts, so audio-level pronunciation is not assessed reliably.",
+    "Set estimatedLevel.note to mention this is AI-estimated OTE-style feedback, not an official score.",
+    "Return only valid JSON using the required schema.",
+    "",
+    "Task data:",
+    JSON.stringify(payload.task, null, 2),
+    "",
+    "Transcribed responses:",
+    JSON.stringify(items, null, 2),
+  ].join("\n");
+}
+
 function normalizeFeedbackText(value = "") {
   return String(value || "")
     .toLowerCase()
@@ -2423,6 +2560,75 @@ function postProcessAptisSpeakingPart2Feedback(feedback, items = [], partLabel =
     }
   }
   return preventAdvancedAnswerFlattening(feedback, items);
+}
+
+function isOteStylePolishOnly(item = {}) {
+  const explanation = normalizeFeedbackText(item.explanation || item.feedback || item.comment);
+  const category = normalizeFeedbackText(item.category || "");
+  if (!explanation) return false;
+  const polishSignals = [
+    "slightly smoother",
+    "slightly more natural",
+    "more natural phrasing",
+    "more natural here",
+    "not the most natural",
+    "not fully natural",
+    "understandable but",
+    "acceptable spoken phrasing",
+    "a simpler phrasing",
+    "slightly awkward",
+    "too strong for the meaning",
+  ];
+  const hardErrorSignals = [
+    "subject-verb agreement",
+    "plural agreement",
+    "countable noun",
+    "missing",
+    "incorrect",
+    "wrong",
+    "unclear",
+    "changes the meaning",
+  ];
+  return (
+    ["vocabulary", "word_order"].includes(category) &&
+    polishSignals.some((signal) => explanation.includes(signal)) &&
+    !hardErrorSignals.some((signal) => explanation.includes(signal))
+  );
+}
+
+function postProcessOteSpeakingFeedback(feedback, items = []) {
+  feedback = postProcessAptisSpeakingPart2Feedback(feedback, items, "OTE Speaking");
+  if (feedback?.estimatedLevel?.note) {
+    feedback.estimatedLevel.note = feedback.estimatedLevel.note.replace(/Aptis-style/gi, "OTE-style");
+  }
+  if (!feedback || !Array.isArray(feedback.answers)) return feedback;
+
+  const advanced = ["C1 range", "C1+ range", "C2-like / above OTE task range"].includes(
+    feedback.estimatedLevel?.label || ""
+  );
+
+  feedback.answers = feedback.answers.map((answer, index) => {
+    const next = { ...answer };
+    if (Array.isArray(next.languageErrors)) {
+      next.languageErrors = next.languageErrors.filter((item) => !isOteStylePolishOnly(item));
+    }
+    if (advanced) {
+      const transcript = cleanString(items[index]?.transcript || next.transcript || "", 3600);
+      const improved = cleanString(next.improvedAnswer || "", 3600);
+      const transcriptWords = countWords(transcript);
+      const improvedWords = countWords(improved);
+      if (transcriptWords >= 35 && improvedWords > 0 && improvedWords < transcriptWords * 0.85) {
+        next.improvedAnswer = transcript;
+        next.teacherNote = [
+          next.teacherNote,
+          "This is already a strong advanced answer; keep the original content and only make minor local edits.",
+        ].filter(Boolean).join(" ");
+      }
+    }
+    return next;
+  });
+
+  return feedback;
 }
 
 function getPart23WordCountStatus(part, wordCount) {
@@ -4166,6 +4372,152 @@ exports.generateAptisSpeakingPart4Feedback = functions
         generatedAt: new Date().toISOString(),
         quota: creditReservation,
         audioStored: false,
+      },
+    };
+  });
+
+exports.generateOteSpeakingFeedback = functions
+  .region("europe-west1")
+  .runWith({ timeoutSeconds: 300, memory: "1GB" })
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Sign in before generating speaking feedback.");
+    }
+    if (!OPENAI_API_KEY) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Missing OPENAI_API_KEY in the Functions environment."
+      );
+    }
+
+    const payload = normalizeOteSpeakingPayload(data);
+    const recordings = payload.recordings;
+    if (!recordings.length || recordings.some((item) => !item.base64)) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "OTE speaking feedback requires at least one recording."
+      );
+    }
+
+    const isMock = payload.partId === "mock" || Boolean(payload.mockId) || recordings.length > 7;
+    const totalBase64Bytes = recordings.reduce((sum, item) => sum + item.base64.length, 0);
+    if (totalBase64Bytes > (isMock ? 32_000_000 : 12_000_000)) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "These recordings are too large for the feedback request."
+      );
+    }
+
+    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const creditTaskType = isMock ? "ote_speaking_mock" : "ote_speaking_part";
+    const creditReservation = await consumeWritingFeedbackCredits(
+      context,
+      creditTaskType,
+      WRITING_FEEDBACK_CREDIT_COSTS[creditTaskType]
+    );
+
+    let transcripts;
+    try {
+      transcripts = await Promise.all(recordings.map((item, index) => transcribeAudioItem(item, index)));
+    } catch (error) {
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw error;
+    }
+
+    const items = recordings.map((recording, index) => {
+      const transcript = cleanString(transcripts[index] || "", 3200);
+      return {
+        questionId: recording.id,
+        questionNumber: index + 1,
+        questionType: getOteQuestionType(recording, index),
+        question: recording.prompt || recording.label,
+        partId: recording.partId || payload.partId,
+        label: recording.label,
+        transcript,
+        durationSeconds: recording.durationSeconds || 0,
+        audioAvailable: true,
+        audioAnalysisAvailable: false,
+        transcriptionConfidence: "medium",
+        wordCount: countWords(transcript),
+      };
+    });
+
+    if (items.every((item) => item.wordCount < 2)) {
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "The recordings could not be transcribed clearly enough to assess."
+      );
+    }
+
+    const requestBody = {
+      model,
+      input: buildOteSpeakingPrompt(payload, items),
+      reasoning: { effort: "low" },
+      max_output_tokens: isMock ? 9000 : 5200,
+      text: {
+        verbosity: "low",
+        format: {
+          type: "json_schema",
+          name: "ote_speaking_feedback",
+          strict: true,
+          schema: OTE_SPEAKING_FEEDBACK_SCHEMA,
+        },
+      },
+    };
+
+    let apiResponse;
+    try {
+      apiResponse = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+    } catch (error) {
+      console.error("[generateOteSpeakingFeedback] OpenAI request failed", error);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("unavailable", "Could not reach the feedback service.");
+    }
+
+    const responseJson = await apiResponse.json().catch(() => null);
+    if (!apiResponse.ok) {
+      console.error("[generateOteSpeakingFeedback] OpenAI error", responseJson);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "internal",
+        responseJson?.error?.message || "The feedback service returned an error."
+      );
+    }
+
+    const outputText = extractOutputText(responseJson);
+    let feedback;
+    try {
+      feedback = JSON.parse(outputText);
+    } catch (error) {
+      console.error("[generateOteSpeakingFeedback] JSON parse failed", { outputText, error });
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
+    }
+
+    feedback = postProcessOteSpeakingFeedback(feedback, items);
+
+    return {
+      transcripts: items,
+      feedback,
+      meta: {
+        model,
+        transcriptionModel: "gpt-4o-mini-transcribe",
+        responseId: responseJson?.id || null,
+        usage: responseJson?.usage || null,
+        generatedAt: new Date().toISOString(),
+        quota: creditReservation,
+        audioStored: false,
+        product: "ote",
+        partId: payload.partId,
+        mockId: payload.mockId,
       },
     };
   });

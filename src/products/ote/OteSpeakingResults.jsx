@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import SpeakingFeedbackPanel from "../../components/speaking/SpeakingFeedbackPanel.jsx";
 import { fetchOteMockAttempt } from "../../firebase.js";
 import "./styles/ote.css";
 
@@ -72,6 +73,14 @@ export default function OteSpeakingResults({ user, homePath = "/ote" }) {
               Audio playback is available immediately after a mock in this first slice. Persistent
               cloud audio storage can be added when we wire the final review workflow.
             </p>
+            <SpeakingFeedbackPanel
+              feedbackResult={{
+                feedback: attempt.aiFeedback,
+                transcripts: attempt.aiFeedbackTranscripts || [],
+              }}
+              questions={(attempt.aiFeedbackTranscripts || []).map((entry) => entry.question || entry.label)}
+              title="OTE speaking mock feedback"
+            />
           </>
         ) : !loading ? (
           <p className="ote-muted">This attempt could not be loaded for the current account.</p>

@@ -3,6 +3,8 @@ import { ArrowLeft, CheckCircle2, FileText, RotateCcw, Timer } from "lucide-reac
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import {
+  logOteTrainingCompleted,
+  logOteTrainingStarted,
   requestOteWritingFeedback,
   saveOteWritingSubmission,
   saveWritingAiFeedback,
@@ -134,6 +136,15 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
     setFinishedAt(null);
     setFinishReason("");
     saveStartedRef.current = false;
+    logOteTrainingStarted({
+      section: "writing",
+      part: task.type === "email" ? "part-1" : "part-2",
+      mode: "timed_practice",
+      taskId: task.id,
+      taskTitle: task.title,
+      taskType: task.type,
+      sectionId: group.id,
+    });
   }
 
   function resetPractice() {
@@ -155,6 +166,17 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
     setFinishedAt(new Date().toISOString());
     setFinishReason(reason);
     setPhase("complete");
+    logOteTrainingCompleted({
+      section: "writing",
+      part: task.type === "email" ? "part-1" : "part-2",
+      mode: "timed_practice",
+      taskId: task.id,
+      taskTitle: task.title,
+      taskType: task.type,
+      sectionId: group.id,
+      wordCount: words,
+      reason,
+    });
   }
 
   function buildSubmissionPayload() {

@@ -152,7 +152,11 @@ export default function TeacherStudentProfile({ user }) {
           ? `Seif Hub starts ${hubAccess.startDate}`
           : "Seif Hub active";
   const profileTitle =
-    profileMode === "seifhub" ? "Student Profile · Seif Hub" : "Student Profile · Aptis Trainer";
+    profileMode === "seifhub"
+      ? "Student Profile · Seif Hub"
+      : profileMode === "ote"
+        ? "Student Profile · OTE"
+        : "Student Profile · Aptis Trainer";
   const teacherLabel = assignedTeacher
     ? labelForPerson(assignedTeacher)
     : student?.teacherId
@@ -219,6 +223,13 @@ export default function TeacherStudentProfile({ user }) {
             onClick={() => setProfileMode("seifhub")}
           >
             Seif Hub
+          </button>
+          <button
+            type="button"
+            className={profileMode === "ote" ? "review-btn" : "ghost-btn"}
+            onClick={() => setProfileMode("ote")}
+          >
+            OTE
           </button>
         </div>
       </section>

@@ -2,7 +2,7 @@ import React, { useMemo, useState } from "react";
 import { ArrowLeft, CheckCircle2, Eye, FileText, RotateCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
-import { requestOteRegisterGapFeedback } from "../../firebase.js";
+import { logOteRegisterChecked, requestOteRegisterGapFeedback } from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
 import "./styles/ote.css";
 
@@ -407,6 +407,20 @@ export default function OteWritingRegisterGapTrainer({ user, onRequireSignIn, na
     setAiFeedback(null);
   }
 
+  function checkAnswers() {
+    setChecked(true);
+    logOteRegisterChecked({
+      section: "writing",
+      part: "part-1",
+      activity: "register_gap",
+      taskId: activeTask.id,
+      taskTitle: activeTask.title,
+      direction: activeTask.label,
+      score: score.correct,
+      total: score.total,
+    });
+  }
+
   function buildAiPayload() {
     const targetRegister = activeTask.id === "formal-to-informal" ? "informal email to a friend" : "formal email to a principal";
     const sourceRegister = activeTask.id === "formal-to-informal" ? "formal email from an organisation" : "informal email to a classmate";
@@ -520,7 +534,7 @@ export default function OteWritingRegisterGapTrainer({ user, onRequireSignIn, na
         )}
 
         <div className="ote-recorder-actions ote-register-actions">
-          <button type="button" onClick={() => setChecked(true)}>
+          <button type="button" onClick={checkAnswers}>
             <CheckCircle2 size={18} aria-hidden="true" />
             Check answers
           </button>

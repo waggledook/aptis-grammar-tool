@@ -73,6 +73,11 @@ export const ACTIVITY_TYPE_LABELS = {
   writing_p4_register_guide_activity_started: "Writing Part 4 Register Guide Activity Started",
   writing_guide_viewed: "Writing Guide Viewed",
   ai_feedback_generated: "AI Feedback Generated",
+  ote_training_started: "OTE Training Started",
+  ote_training_completed: "OTE Training Completed",
+  ote_mock_started: "OTE Mock Started",
+  ote_mock_completed: "OTE Mock Completed",
+  ote_register_checked: "OTE Register Checked",
   [WRITING_GENERAL_SUBMISSION_TYPE]: "Writing General Mock Submitted",
 };
 
@@ -107,6 +112,14 @@ function getWordCountFromHtml(html = "") {
 function getNonEmptyCount(items) {
   if (!Array.isArray(items)) return 0;
   return items.filter((item) => stripHtmlToText(item).trim()).length;
+}
+
+function formatOtePart(value = "") {
+  const part = String(value || "");
+  if (part === "parts-3-4") return "Parts 3-4";
+  if (part.startsWith("part-")) return `Part ${part.replace("part-", "")}`;
+  if (part.startsWith("part")) return `Part ${part.replace("part", "")}`;
+  return part;
 }
 
 function getWritingGeneralUserLabel(data = {}) {
@@ -444,6 +457,40 @@ export function formatActivityDetails(log) {
           ? `${d.creditCost} credit${d.creditCost === 1 ? "" : "s"}`
           : "";
       return joinParts([productLabel, sectionLabel, partLabel, d.mode || "", taskLabel, size, cost]);
+    }
+    case "ote_training_started":
+    case "ote_training_completed": {
+      const sectionLabel = d.section ? titleCaseFromSnakeCase(d.section) : "Training";
+      const partLabel = d.part ? formatOtePart(d.part) : "";
+      const taskLabel = d.taskTitle || d.setTitle || d.taskId || d.setId || "";
+      const size =
+        typeof d.wordCount === "number"
+          ? `${d.wordCount} words`
+          : typeof d.recordingCount === "number"
+          ? formatCount(d.recordingCount, "recording")
+          : "";
+      const score =
+        typeof d.score === "number" && typeof d.total === "number"
+          ? `${d.score}/${d.total}`
+          : "";
+      return joinParts(["OTE", sectionLabel, partLabel, d.mode || "", taskLabel, size, score]);
+    }
+    case "ote_mock_started":
+    case "ote_mock_completed": {
+      const size =
+        typeof d.wordCount === "number"
+          ? `${d.wordCount} words`
+          : typeof d.recordingCount === "number"
+          ? formatCount(d.recordingCount, "recording")
+          : "";
+      return joinParts(["OTE", d.module || "Mock", d.mockTitle || d.mockId || "Mock", d.reason || "", size]);
+    }
+    case "ote_register_checked": {
+      const score =
+        typeof d.score === "number" && typeof d.total === "number"
+          ? `${d.score}/${d.total}`
+          : "";
+      return joinParts(["OTE", "Register", d.activity || "", d.taskTitle || d.taskId || "", score]);
     }
     case WRITING_GENERAL_SUBMISSION_TYPE: {
       const part3Total = Array.isArray(d.part3WordCounts) ? d.part3WordCounts.reduce((sum, count) => sum + count, 0) : 0;

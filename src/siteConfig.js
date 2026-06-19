@@ -54,13 +54,16 @@ function getWindowLocation() {
 
 export function getSiteVariant(locationLike = getWindowLocation()) {
   const hostname = locationLike?.hostname || "";
+  const pathname = locationLike?.pathname || "";
   const search = locationLike?.search || "";
   const params = new URLSearchParams(search);
   const forcedSite = String(params.get("site") || "").split("?")[0];
+  const isOteCompatibilityPath = pathname === "/ote" || pathname.startsWith("/ote/");
 
   const isOte =
     forcedSite === "ote" ||
-    hostname === "ote-seif.beeskillsenglish.com";
+    hostname === "ote-seif.beeskillsenglish.com" ||
+    isOteCompatibilityPath;
 
   if (isOte) {
     return {

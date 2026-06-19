@@ -1,8 +1,9 @@
-import React from "react";
-import { ArrowLeft, ClipboardList, FileText, MessageSquareText, Mic, PlayCircle } from "lucide-react";
+import React, { useMemo } from "react";
+import { ArrowLeft, CheckCircle2, ClipboardList, FileText, MessageSquareText, Mic, PlayCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
+import { useOteTrainingProgress, useOteTrainingSummary } from "./utils/trainingProgress.js";
 import "./styles/ote.css";
 
 export default function OteSpeakingPart2Menu({ nativeRoutes = false }) {
@@ -23,6 +24,46 @@ export default function OteSpeakingPart2Menu({ nativeRoutes = false }) {
   const practicePath = getSitePath(
     nativeRoutes ? "/speaking/part-2-voicemails/practice" : "/ote/speaking/part-2-voicemails/practice"
   );
+  const completedProgress = useOteTrainingProgress();
+  const activities = useMemo(
+    () => [
+      {
+        label: "Activity 1",
+        title: "How Voicemails Work",
+        copy: "Learn the format, compare Message 1 and Message 2, then check your understanding.",
+        icon: ClipboardList,
+        path: introPath,
+        progressId: "speaking.part2.overview",
+      },
+      {
+        label: "Activity 2",
+        title: "Guided Task: Message 1",
+        copy: "Review student answers, record your own polite voicemail, and compare with a model.",
+        icon: Mic,
+        path: guidedPath,
+        progressId: "speaking.part2.guided-message-1",
+      },
+      {
+        label: "Activity 3",
+        title: "Guided Task: Message 2",
+        copy: "Reply to a friend's voice message with the right informal tone and clear structure.",
+        icon: MessageSquareText,
+        path: guidedMessage2Path,
+        progressId: "speaking.part2.guided-message-2",
+      },
+      {
+        label: "Reference",
+        title: "Part 2 Cheat Sheet",
+        copy: "Review useful frameworks and download a branded PDF reference for practice.",
+        icon: FileText,
+        path: cheatSheetPath,
+        progressId: "speaking.part2.cheat-sheet",
+      },
+    ],
+    [cheatSheetPath, guidedMessage2Path, guidedPath, introPath]
+  );
+  const summary = useOteTrainingSummary(activities, completedProgress);
+  const practiceComplete = completedProgress.has("speaking.part2.practice");
 
   return (
     <main className="ote-training-page">
@@ -43,44 +84,54 @@ export default function OteSpeakingPart2Menu({ nativeRoutes = false }) {
           Build the skills for formal and friendly OTE voice messages: understand the format,
           spot common mistakes, practise under timed conditions, and compare your answer with a model.
         </p>
+        <div className="ote-training-progress-strip" aria-label="Training progress">
+          <span>{summary.completed} of {summary.total} training lessons complete</span>
+          <div className="ote-training-progress-track" aria-hidden="true">
+            <span style={{ width: `${summary.total ? Math.round((summary.completed / summary.total) * 100) : 0}%` }} />
+          </div>
+        </div>
       </header>
 
       <div className="ote-training-activity-grid" aria-label="Part 2 voicemail activities">
-        <button className="ote-training-activity-card" type="button" onClick={() => navigate(introPath)}>
-          <ClipboardList size={28} aria-hidden="true" />
-          <span>Activity 1</span>
-          <h2>How Voicemails Work</h2>
-          <p>Learn the format, compare Message 1 and Message 2, then check your understanding.</p>
-        </button>
+        {activities.map((activity) => {
+          const Icon = activity.icon;
+          const isComplete = completedProgress.has(activity.progressId);
+          return (
+            <button
+              key={activity.progressId}
+              className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
+              type="button"
+              onClick={() => navigate(activity.path)}
+            >
+              {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+              <Icon size={28} aria-hidden="true" />
+              <span>{activity.label}</span>
+              <h2>{activity.title}</h2>
+              <p>{activity.copy}</p>
+            </button>
+          );
+        })}
+      </div>
 
-        <button className="ote-training-activity-card" type="button" onClick={() => navigate(guidedPath)}>
-          <Mic size={28} aria-hidden="true" />
-          <span>Activity 2</span>
-          <h2>Guided Task: Message 1</h2>
-          <p>Review student answers, record your own polite voicemail, and compare with a model.</p>
-        </button>
-
-        <button className="ote-training-activity-card" type="button" onClick={() => navigate(guidedMessage2Path)}>
-          <MessageSquareText size={28} aria-hidden="true" />
-          <span>Activity 3</span>
-          <h2>Guided Task: Message 2</h2>
-          <p>Reply to a friend's voice message with the right informal tone and clear structure.</p>
-        </button>
-
-        <button className="ote-training-activity-card" type="button" onClick={() => navigate(cheatSheetPath)}>
-          <FileText size={28} aria-hidden="true" />
-          <span>Reference</span>
-          <h2>Part 2 Cheat Sheet</h2>
-          <p>Review useful frameworks and download a branded PDF reference for practice.</p>
-        </button>
-
-        <button className="ote-training-activity-card" type="button" onClick={() => navigate(practicePath)}>
+      <section className="ote-training-section">
+        <h2>Final Practice</h2>
+        <p className="ote-section-lead">
+          {summary.allComplete
+            ? "Training complete. Now practise complete voicemail sets with exam-style timing."
+            : "Work through the training cards above, then practise full timed voicemail sets."}
+        </p>
+        <button
+          className={`ote-practice-set-card ote-writing-practice-entry-card ${practiceComplete ? "is-complete" : ""}`}
+          type="button"
+          onClick={() => navigate(practicePath)}
+        >
+          {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
           <PlayCircle size={28} aria-hidden="true" />
           <span>Practice</span>
           <h2>Timed Voicemail Sets</h2>
           <p>Practise both voicemail types with exam-style timing and downloadable recordings.</p>
         </button>
-      </div>
+      </section>
     </main>
   );
 }

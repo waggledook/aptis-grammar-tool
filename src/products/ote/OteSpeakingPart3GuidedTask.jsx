@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
+import { logOteTrainingCompleted } from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
 import "./styles/ote.css";
 
@@ -271,6 +272,14 @@ export default function OteSpeakingPart3GuidedTask({ nativeRoutes = false }) {
       });
       setPracticeStatus("complete");
       setSecondsLeft(0);
+      logOteTrainingCompleted({
+        section: "speaking",
+        part: "parts-3-4",
+        mode: "guided_talk",
+        taskId: "guided-talk",
+        taskTitle: "Guided Talk Builder",
+        recordingCount: 1,
+      });
     };
     recorder.start();
     startCountdown(60, "recording", () => {

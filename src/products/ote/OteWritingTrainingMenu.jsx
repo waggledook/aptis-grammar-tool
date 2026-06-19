@@ -1,9 +1,10 @@
-import React from "react";
-import { ArrowLeft, ClipboardList, FileText, Lightbulb, PenLine, PlayCircle } from "lucide-react";
+import React, { useMemo } from "react";
+import { ArrowLeft, CheckCircle2, ClipboardList, FileText, Lightbulb, PenLine, PlayCircle } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { getOteWritingPracticeGroup } from "./mockTests/data/oteWritingPracticeData.js";
+import { useOteTrainingProgress, useOteTrainingSummary } from "./utils/trainingProgress.js";
 import "./styles/ote.css";
 
 const TRAINING_SECTIONS = {
@@ -19,6 +20,7 @@ const TRAINING_SECTIONS = {
         copy: "Understand the email, the notes, the timer, and the word count.",
         icon: ClipboardList,
         route: "guide",
+        progressId: "writing.email.guide",
       },
       {
         label: "Activity 2",
@@ -26,6 +28,7 @@ const TRAINING_SECTIONS = {
         copy: "Decide if sentences are formal or informal, then rewrite them in the other style.",
         icon: Lightbulb,
         route: "register-basics",
+        progressId: "writing.email.register-basics",
       },
       {
         label: "Activity 3",
@@ -33,12 +36,14 @@ const TRAINING_SECTIONS = {
         copy: "Complete formal and informal emails with the same meaning.",
         icon: PenLine,
         route: "register-gaps",
+        progressId: "writing.email.register-gaps",
       },
       {
         label: "Activity 4",
         title: "Guided Email Builder",
         copy: "Plan the three content points and turn them into a clear exam-ready reply.",
         icon: PenLine,
+        progressId: "writing.email.guided-builder",
       },
     ],
     practiceTitle: "Timed Email Sets",
@@ -56,6 +61,7 @@ const TRAINING_SECTIONS = {
         copy: "Understand the title and decide your opinion before you write.",
         icon: ClipboardList,
         route: "guide",
+        progressId: "writing.essay.guide",
       },
       {
         label: "Activity 2",
@@ -63,6 +69,7 @@ const TRAINING_SECTIONS = {
         copy: "Practise opening the essay clearly and finishing with a strong final opinion.",
         icon: PenLine,
         route: "introductions-conclusions",
+        progressId: "writing.essay.introductions-conclusions",
       },
       {
         label: "Activity 3",
@@ -70,6 +77,7 @@ const TRAINING_SECTIONS = {
         copy: "Brainstorm ideas for and against the title, then choose a clear structure.",
         icon: Lightbulb,
         route: "planning",
+        progressId: "writing.essay.planning",
       },
       {
         label: "Activity 4",
@@ -77,8 +85,9 @@ const TRAINING_SECTIONS = {
         copy: "Choose strong topic sentences and match linking words to their purpose.",
         icon: PenLine,
         route: "body-paragraphs",
+        progressId: "writing.essay.body-paragraphs",
       },
-      ["Reference", "Essay Language Bank", "Review useful phrases for opinions, contrast, reasons, and results.", FileText],
+      ["Reference", "Essay Language Bank", "Review useful phrases for opinions, contrast, reasons, and results.", FileText, "", "writing.essay.language-bank"],
     ],
     practiceTitle: "Timed Essay Sets",
     practiceCopy: "Choose an individual essay title, then write one timed Part 2 essay in the native OTE layout.",
@@ -95,9 +104,10 @@ const TRAINING_SECTIONS = {
         copy: "Compare the reader, purpose, titles, recommendations, and useful details.",
         icon: ClipboardList,
         route: "guide",
+        progressId: "writing.article-review.guide",
       },
-      ["Activity 2", "Style Upgrade", "Practise openings, reader-friendly details, opinions, and stronger endings.", Lightbulb],
-      ["Activity 3", "Guided Article / Review", "Plan a complete answer from a prompt and check that every question is covered.", PenLine],
+      ["Activity 2", "Style Upgrade", "Practise openings, reader-friendly details, opinions, and stronger endings.", Lightbulb, "", "writing.article-review.style-upgrade"],
+      ["Activity 3", "Guided Article / Review", "Plan a complete answer from a prompt and check that every question is covered.", PenLine, "", "writing.article-review.guided"],
     ],
     practiceTitle: "Timed Article / Review Sets",
     practiceCopy: "Choose an individual article or review prompt, then write one timed Part 2 response in the native OTE layout.",
@@ -114,6 +124,19 @@ export default function OteWritingTrainingMenu({ nativeRoutes = false }) {
     nativeRoutes ? `/writing/training/${practiceGroup.id}/practice` : `/ote/writing/training/${practiceGroup.id}/practice`
   );
   const trainingBasePath = nativeRoutes ? `/writing/training/${practiceGroup.id}` : `/ote/writing/training/${practiceGroup.id}`;
+  const completedProgress = useOteTrainingProgress();
+  const normalizedActivities = useMemo(
+    () =>
+      config.activities.map((activity) =>
+        Array.isArray(activity)
+          ? { label: activity[0], title: activity[1], copy: activity[2], icon: activity[3], route: activity[4] || "", progressId: activity[5] || "" }
+          : activity
+      ),
+    [config.activities]
+  );
+  const summary = useOteTrainingSummary(normalizedActivities, completedProgress);
+  const practiceProgressId = `writing.${practiceGroup.id}.practice`;
+  const practiceComplete = completedProgress.has(practiceProgressId);
 
   return (
     <main className="ote-training-page">
@@ -131,25 +154,30 @@ export default function OteWritingTrainingMenu({ nativeRoutes = false }) {
         <p className="ote-kicker">{config.kicker}</p>
         <h1>{config.title}</h1>
         <p>{config.description}</p>
+        <div className="ote-training-progress-strip" aria-label="Training progress">
+          <span>{summary.completed} of {summary.total} training lessons complete</span>
+          <div className="ote-training-progress-track" aria-hidden="true">
+            <span style={{ width: `${summary.total ? Math.round((summary.completed / summary.total) * 100) : 0}%` }} />
+          </div>
+        </div>
       </header>
 
       <div className="ote-training-activity-grid" aria-label={`${config.title} activities`}>
-        {config.activities.map((activity) => {
-          const normalized = Array.isArray(activity)
-            ? { label: activity[0], title: activity[1], copy: activity[2], icon: activity[3] }
-            : activity;
+        {normalizedActivities.map((normalized, index) => {
           const Icon = normalized.icon;
           const route = normalized.route || "";
+          const isComplete = normalized.progressId && completedProgress.has(normalized.progressId);
           return (
             <button
               key={normalized.title}
-              className="ote-training-activity-card"
+              className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
               type="button"
               disabled={!route}
               onClick={route ? () => navigate(getSitePath(`${trainingBasePath}/${route}`)) : undefined}
             >
+              {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
               <Icon size={28} aria-hidden="true" />
-              <span>{normalized.label}</span>
+              <span>{normalized.label || `Activity ${index + 1}`}</span>
               <h2>{normalized.title}</h2>
               <p>{normalized.copy}</p>
             </button>
@@ -160,9 +188,16 @@ export default function OteWritingTrainingMenu({ nativeRoutes = false }) {
       <section className="ote-training-section">
         <h2>Final Practice</h2>
         <p className="ote-section-lead">
-          Timed placeholder tasks are ready now, so new materials can drop into this task-type menu later.
+          {summary.allComplete
+            ? "Training complete. Now choose a timed task and practise under exam conditions."
+            : "Complete the training lessons above, then move into timed exam-style practice."}
         </p>
-        <button className="ote-practice-set-card ote-writing-practice-entry-card" type="button" onClick={() => navigate(practiceMenuPath)}>
+        <button
+          className={`ote-practice-set-card ote-writing-practice-entry-card ${practiceComplete ? "is-complete" : ""}`}
+          type="button"
+          onClick={() => navigate(practiceMenuPath)}
+        >
+          {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
           <PlayCircle size={28} aria-hidden="true" />
           <span>Practice</span>
           <h2>{config.practiceTitle}</h2>
