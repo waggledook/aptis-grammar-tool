@@ -14,7 +14,7 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const firestore = admin.firestore();
 
 const WRITING_FEEDBACK_WEEKLY_CREDITS = {
-  student: 20,
+  student: 40,
   teacher: 100,
   admin: 1000,
 };

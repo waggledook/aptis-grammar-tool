@@ -177,6 +177,9 @@ export default function Profile({
   const [oteMockAttempts, setOteMockAttempts] = useState([]);
   const [showOteSpeakingPanel, setShowOteSpeakingPanel] = useState(true);
   const [showOteWritingPanel, setShowOteWritingPanel] = useState(true);
+  const [profileFeedbackBusy, setProfileFeedbackBusy] = useState("");
+  const [feedbackCreditStatus, setFeedbackCreditStatus] = useState(null);
+  const [creditRequestBusy, setCreditRequestBusy] = useState(false);
 
   const [vocabTopicCounts, setVocabTopicCounts] = useState(null); // 👈 NEW
   const [vocabMistakes, setVocabMistakes] = useState([]); // 👈 NEW
@@ -340,6 +343,301 @@ const handleChangePassword = async (e) => {
   }
 };
 
+function countWords(value) {
+  const text = String(value || "").trim();
+  if (!text) return 0;
+  return text.split(/\s+/).filter(Boolean).length;
+}
+
+function getOtePracticeTaskType(task = {}) {
+  const typeText = `${task.type || ""} ${task.typeLabel || ""} ${task.title || ""}`.toLowerCase();
+  if (typeText.includes("review")) return "ote_part2_review";
+  if (typeText.includes("article")) return "ote_part2_article";
+  if (typeText.includes("essay")) return "ote_part2_essay";
+  return "ote_part1_email";
+}
+
+function getOtePracticeRegister(task = {}) {
+  if (task.type === "email") return task.register || "neutral";
+  if (task.type === "review") return "review-style";
+  if (task.type === "article") return "article-style";
+  return "essay-style";
+}
+
+function getProfileFeedbackCreditCost(kind, submission = {}) {
+  if (kind === "part1") return 1;
+  if (kind === "part2") return 2;
+  if (kind === "part3") return 3;
+  if (kind === "part4") return 5;
+  if (kind === "ote") return submission.type === "ote-writing-practice" ? 4 : 8;
+  return 4;
+}
+
+function getProfileFeedbackPool(kind, status) {
+  if (kind !== "ote" && status && !status.hasAptisTrainerAccess) {
+    return "aptisDemo";
+  }
+  return "weekly";
+}
+
+async function refreshFeedbackCreditStatus() {
+  const uid = targetUid || user?.uid || auth.currentUser?.uid;
+  if (!uid || !fb.fetchFeedbackCreditStatus) return null;
+  const nextStatus = await fb.fetchFeedbackCreditStatus(uid);
+  setFeedbackCreditStatus(nextStatus);
+  return nextStatus;
+}
+
+async function requestMoreFeedbackCredits({ pool = "weekly", neededCredits = null, remainingCredits = null } = {}) {
+  if (targetUid || creditRequestBusy) return false;
+  setCreditRequestBusy(true);
+  try {
+    await fb.sendFeedbackCreditRequest?.({
+      pool,
+      site: siteMode,
+      neededCredits,
+      remainingCredits,
+      note:
+        pool === "aptisDemo"
+          ? "Student requested more Aptis demo feedback credits from their profile."
+          : "Student requested more weekly AI feedback credits from their profile.",
+    });
+    toast("Credit request sent.");
+    return true;
+  } catch (error) {
+    console.warn("[Profile] credit request failed", error);
+    toast(error?.message || "Could not send the credit request.");
+    return false;
+  } finally {
+    setCreditRequestBusy(false);
+  }
+}
+
+async function confirmProfileFeedbackCredits(kind, submission) {
+  if (targetUid) return true;
+  const cost = getProfileFeedbackCreditCost(kind, submission);
+  let status = feedbackCreditStatus;
+  if (!status) {
+    status = await refreshFeedbackCreditStatus();
+  }
+  if (!status) return true;
+
+  const poolKey = getProfileFeedbackPool(kind, status);
+  const pool = poolKey === "aptisDemo" ? status.aptisDemo : status.weekly;
+  const poolName = poolKey === "aptisDemo" ? "Aptis demo feedback" : "weekly AI feedback";
+  const remaining = Number(pool?.remaining || 0);
+
+  if (remaining < cost) {
+    const shouldRequest = window.confirm(
+      `You need ${cost} feedback credit${cost === 1 ? "" : "s"} for this request, but you have ${remaining} ${poolName} credit${remaining === 1 ? "" : "s"} remaining. Request more credits?`
+    );
+    if (shouldRequest) {
+      await requestMoreFeedbackCredits({ pool: poolKey, neededCredits: cost, remainingCredits: remaining });
+    }
+    return false;
+  }
+
+  return window.confirm(
+    `This feedback request will use ${cost} credit${cost === 1 ? "" : "s"}. You have ${remaining} ${poolName} credit${remaining === 1 ? "" : "s"} remaining. Continue?`
+  );
+}
+
+async function handleProfileWritingFeedback(kind, submission) {
+  if (!submission?.id) return;
+  const canSpendCredits = await confirmProfileFeedbackCredits(kind, submission);
+  if (!canSpendCredits) return;
+
+  const busyKey = `${kind}:${submission.id}`;
+  setProfileFeedbackBusy(busyKey);
+
+  try {
+    let result = null;
+
+    if (kind === "part1") {
+      result = await fb.requestAptisWritingPart1Feedback(submission.items || []);
+    } else if (kind === "part2") {
+      result = await fb.requestAptisWritingPart23Feedback({
+        part: "part2",
+        taskId: submission.taskId || "",
+        title: submission.taskId || "Saved Part 2 submission",
+        context: "",
+        prompt: "",
+        answers: [
+          {
+            text: submission.answerText || "",
+            wordCount: submission.counts?.answer || countWords(submission.answerText),
+          },
+        ],
+      });
+    } else if (kind === "part3") {
+      result = await fb.requestAptisWritingPart23Feedback({
+        part: "part3",
+        taskId: submission.taskId || "",
+        title: submission.taskId || "Saved Part 3 submission",
+        context: "",
+        chats: (submission.answersText || ["", "", ""]).map((_, index) => ({
+          name: `Message ${index + 1}`,
+          question: "",
+        })),
+        answers: (submission.answersText || []).map((text, index) => ({
+          text,
+          wordCount: submission.counts?.[index] || countWords(text),
+        })),
+      });
+    } else if (kind === "part4") {
+      result = await fb.requestAptisWritingPart4Feedback({
+        part: "part4",
+        taskId: submission.taskId || "",
+        title: submission.taskId || "Saved Part 4 submission",
+        sourceTitle: "",
+        source: "",
+        friendPrompt: "",
+        formalPrompt: "",
+        friendEmail: {
+          text: submission.friendText || "",
+          wordCount: submission.counts?.friend || countWords(submission.friendText),
+        },
+        formalEmail: {
+          text: submission.formalText || "",
+          wordCount: submission.counts?.formal || countWords(submission.formalText),
+        },
+      });
+    } else if (kind === "ote") {
+      const isPractice = submission.type === "ote-writing-practice";
+      const tasks = [];
+      if (isPractice) {
+        const task = submission.tasks?.practice || {};
+        const answerText = submission.answers?.task || "";
+        tasks.push({
+          taskId: `training:${submission.practiceTaskId || submission.id}`,
+          taskType: getOtePracticeTaskType(task),
+          title: task.title || submission.practiceTaskLabel || "OTE Writing Practice",
+          inputText: [task.setup, task.context, task.promptLabel].filter(Boolean).join("\n"),
+          prompt: [task.prompt, task.instruction].filter(Boolean).join("\n") || task.title || "",
+          requiredPoints: Array.isArray(task.email?.prompts)
+            ? task.email.prompts.map((prompt) => `${prompt.question || ""} Note: ${prompt.note || ""}`.trim())
+            : [],
+          targetAudience: task.replyTo || task.email?.from || "English teacher",
+          expectedRegister: getOtePracticeRegister(task),
+          answer: {
+            text: answerText,
+            wordCount: submission.counts?.task || countWords(answerText),
+          },
+        });
+      } else {
+        const task1 = submission.tasks?.task1 || {};
+        const task1Email = task1.email || {};
+        const selectedTask = submission.tasks?.task2?.selectedOption || {};
+        const task2Choice = submission.task2Choice || "essay";
+        const task2Answer = submission.answers?.[task2Choice] || "";
+        tasks.push(
+          {
+            taskId: `${submission.mockId || "mock"}:task1`,
+            taskType: "ote_part1_email",
+            title: task1.title || "Email",
+            inputText: [
+              task1.setup,
+              task1Email.from ? `From: ${task1Email.from}` : "",
+              task1Email.subject ? `Subject: ${task1Email.subject}` : "",
+              task1Email.greeting,
+              ...(task1Email.paragraphs || []),
+              ...(task1Email.prompts || []).map((prompt) => `${prompt.question} [Note: ${prompt.note}]`),
+            ].filter(Boolean).join("\n"),
+            prompt: task1.setup || "Write an email responding to the input email.",
+            requiredPoints: (task1Email.prompts || []).map((prompt) => `${prompt.question} Note: ${prompt.note}`.trim()),
+            targetAudience: task1.replyTo || task1Email.from || "recipient",
+            expectedRegister: "neutral",
+            answer: {
+              text: submission.answers?.task1 || "",
+              wordCount: submission.counts?.task1 || countWords(submission.answers?.task1),
+            },
+          },
+          {
+            taskId: `${submission.mockId || "mock"}:task2:${selectedTask.id || task2Choice}`,
+            taskType: getOtePracticeTaskType(selectedTask),
+            title: selectedTask.title || "Part 2",
+            inputText: selectedTask.context || "",
+            prompt: [selectedTask.promptLabel, selectedTask.prompt, selectedTask.instruction].filter(Boolean).join("\n"),
+            requiredPoints: [],
+            targetAudience: "English teacher",
+            expectedRegister: getOtePracticeRegister(selectedTask),
+            answer: {
+              text: task2Answer,
+              wordCount: submission.counts?.[task2Choice] || countWords(task2Answer),
+            },
+          }
+        );
+      }
+      result = await fb.requestOteWritingFeedback({
+        exam: "OTE",
+        mode: isPractice ? "single_task" : "full_mock",
+        tasks,
+      });
+    }
+
+    if (!result?.feedback) throw new Error("No feedback was returned.");
+    await fb.saveWritingAiFeedback({
+      kind,
+      submissionId: submission.id,
+      feedback: result.feedback,
+      meta: result?.meta || null,
+    });
+
+    const patch = {
+      aiFeedback: result.feedback,
+      aiFeedbackMeta: result?.meta || null,
+      aiFeedbackUpdatedAt: new Date().toISOString(),
+    };
+    const updateList = (setter) =>
+      setter((current) => current.map((item) => (item.id === submission.id ? { ...item, ...patch } : item)));
+
+    if (kind === "part1") updateList(setWritingP1);
+    if (kind === "part2") updateList(setWritingP2);
+    if (kind === "part3") updateList(setWritingP3);
+    if (kind === "part4") updateList(setWritingP4);
+    if (kind === "ote") updateList(setOteWriting);
+
+    await refreshFeedbackCreditStatus();
+    toast("Feedback saved to profile.");
+  } catch (error) {
+    console.warn("[Profile] writing feedback failed", error);
+    const message = error?.message || "Could not generate feedback.";
+    if (/credit|allowance|resource-exhausted/i.test(`${error?.code || ""} ${message}`)) {
+      const status = await refreshFeedbackCreditStatus().catch(() => feedbackCreditStatus);
+      const poolKey = getProfileFeedbackPool(kind, status);
+      const remaining = poolKey === "aptisDemo" ? status?.aptisDemo?.remaining : status?.weekly?.remaining;
+      const shouldRequest = window.confirm(`${message}\n\nRequest more feedback credits?`);
+      if (shouldRequest) {
+        await requestMoreFeedbackCredits({
+          pool: poolKey,
+          neededCredits: getProfileFeedbackCreditCost(kind, submission),
+          remainingCredits: Number.isFinite(Number(remaining)) ? Number(remaining) : null,
+        });
+      }
+    } else {
+      toast(message);
+    }
+  } finally {
+    setProfileFeedbackBusy("");
+  }
+}
+
+function renderFeedbackButton(kind, submission) {
+  if (targetUid) return null;
+  const busyKey = `${kind}:${submission?.id || ""}`;
+  const busy = profileFeedbackBusy === busyKey;
+  return (
+    <button
+      className="btn"
+      type="button"
+      onClick={() => handleProfileWritingFeedback(kind, submission)}
+      disabled={!!profileFeedbackBusy || !submission?.id}
+    >
+      {busy ? "Generating..." : submission?.aiFeedback ? "Refresh feedback" : "Get AI feedback"}
+    </button>
+  );
+}
+
 
   const SPEAKING_TOTALS = {
     part1: PART1_QUESTIONS.length,
@@ -415,6 +713,7 @@ const handleChangePassword = async (e) => {
           keywordDash,
           wordFormationDash,
           openClozeDash,
+          feedbackCredits,
         ] = await Promise.all([
           fb.fetchReadingCounts?.(uid) ?? Promise.resolve({ part1: 0, part2: 0, part3: 0, part4: 0 }),
           fb.fetchSpeakingCounts(uid),
@@ -439,6 +738,7 @@ const handleChangePassword = async (e) => {
           fb.fetchHubKeywordDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
           fb.fetchHubWordFormationDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
           fb.fetchHubOpenClozeDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
+          fb.fetchFeedbackCreditStatus?.(uid) ?? Promise.resolve(null),
         ]);  
   
         if (!alive) return;
@@ -466,6 +766,7 @@ const handleChangePassword = async (e) => {
         setHubKeywordDash(keywordDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
         setHubWordFormationDash(wordFormationDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
         setHubOpenClozeDash(openClozeDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
+        setFeedbackCreditStatus(feedbackCredits || null);
       } catch (e) {
         console.error("[Profile] load failed", e);
         toast("Couldn’t load some profile data.");
@@ -608,6 +909,50 @@ const profileIntro = isOteProfile
   : isSeifHubProfile
   ? "Your Seif Hub activity and account details."
   : "Your Aptis Trainer progress and account details.";
+const shouldShowAptisDemoCredits =
+  isAptisProfile && feedbackCreditStatus && !feedbackCreditStatus.hasAptisTrainerAccess;
+const renderFeedbackCreditCard = () => {
+  if (!feedbackCreditStatus) return null;
+  const weekly = feedbackCreditStatus.weekly || { remaining: 0, used: 0, limit: 0 };
+  const aptisDemo = feedbackCreditStatus.aptisDemo || { remaining: 0, used: 0, limit: 0 };
+
+  return (
+    <section className="feedback-credit-card">
+      <div>
+        <div className="feedback-credit-eyebrow">Feedback credits</div>
+        <div className="feedback-credit-grid">
+          <div>
+            <strong>{weekly.remaining}</strong>
+            <span>weekly AI credits left</span>
+            <em>{weekly.used} used of {weekly.limit} this week</em>
+          </div>
+          {shouldShowAptisDemoCredits && (
+            <div>
+              <strong>{aptisDemo.remaining}</strong>
+              <span>Aptis demo credits left</span>
+              <em>{aptisDemo.used} used of {aptisDemo.limit} total</em>
+            </div>
+          )}
+        </div>
+      </div>
+      {!targetUid && (
+        <button
+          type="button"
+          className="btn"
+          onClick={() =>
+            requestMoreFeedbackCredits({
+              pool: shouldShowAptisDemoCredits ? "aptisDemo" : "weekly",
+              remainingCredits: shouldShowAptisDemoCredits ? aptisDemo.remaining : weekly.remaining,
+            })
+          }
+          disabled={creditRequestBusy}
+        >
+          {creditRequestBusy ? "Sending..." : "Request more"}
+        </button>
+      )}
+    </section>
+  );
+};
 const formatOteSpeakingPart = (part) => {
   const value = String(part || "").toLowerCase();
   if (value === "part1" || value === "part-1") return "Part 1";
@@ -756,6 +1101,8 @@ const formatOteSpeakingPart = (part) => {
   )}
 </section>
       )}
+
+      {renderFeedbackCreditCard()}
 
       {isOteProfile && (
         <>
@@ -1038,6 +1385,7 @@ const formatOteSpeakingPart = (part) => {
                                   </button>
                                 </>
                               ) : null}
+                              {renderFeedbackButton("ote", s)}
                             </div>
                           </div>
 
@@ -2204,6 +2552,7 @@ const formatOteSpeakingPart = (part) => {
                           >
                             Copy
                           </button>
+                          {renderFeedbackButton("part1", s)}
                         </div>
                       </div>
 
@@ -2420,6 +2769,9 @@ const formatOteSpeakingPart = (part) => {
                             {s.counts?.answer ?? 0} words
                           </div>
                         </div>
+                        <div className="actions">
+                          {renderFeedbackButton("part2", s)}
+                        </div>
                       </div>
 
                       <div
@@ -2490,6 +2842,9 @@ const formatOteSpeakingPart = (part) => {
                               Task: {s.taskId}
                             </div>
                           )}
+                        </div>
+                        <div className="actions">
+                          {renderFeedbackButton("part3", s)}
                         </div>
                       </div>
 
@@ -2732,6 +3087,7 @@ const formatOteSpeakingPart = (part) => {
                           >
                             Copy
                           </button>
+                          {renderFeedbackButton("part4", s)}
                         </div>
                       </div>
 
@@ -3488,6 +3844,56 @@ function StyleScope() {
   color: #ffb4b4;
 }
 
+.feedback-credit-card{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 14px;
+  margin: 0 0 14px;
+  padding: 14px;
+  border: 1px solid rgba(126, 240, 194, 0.24);
+  background: rgba(10, 21, 40, 0.62);
+  border-radius: 14px;
+}
+
+.feedback-credit-eyebrow{
+  color:#9fb4da;
+  font-size:.74rem;
+  font-weight:800;
+  letter-spacing:.04em;
+  text-transform:uppercase;
+  margin-bottom:8px;
+}
+
+.feedback-credit-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap: 14px;
+}
+
+.feedback-credit-grid > div{
+  min-width: 160px;
+  display:grid;
+  gap:3px;
+}
+
+.feedback-credit-grid strong{
+  color:#fef3c7;
+  font-size:1.45rem;
+  line-height:1;
+}
+
+.feedback-credit-grid span{
+  color:#eef4ff;
+  font-weight:800;
+}
+
+.feedback-credit-grid em{
+  color:#9fb4da;
+  font-size:.8rem;
+  font-style:normal;
+}
+
 .profile-avatar-strip{
   display:grid;
   grid-template-columns:auto minmax(0, 1fr);
@@ -3554,6 +3960,13 @@ function StyleScope() {
   }
 }
 
+@media(max-width:640px){
+  .feedback-credit-card{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+}
+
 :root[data-theme="light"] .profile-page {
   --panel: var(--color-surface-2);
   --ink: var(--color-text);
@@ -3565,12 +3978,12 @@ function StyleScope() {
   color: var(--color-text) !important;
 }
 
-:root[data-theme="light"] .profile-page :is(.intro, .muted, .small, .account-strip-sub, .account-strip-hint, .profile-avatar-sub, .vocab-topic-sub) {
+:root[data-theme="light"] .profile-page :is(.intro, .muted, .small, .account-strip-sub, .account-strip-hint, .profile-avatar-sub, .vocab-topic-sub, .feedback-credit-eyebrow, .feedback-credit-grid em) {
   color: var(--color-text-soft) !important;
   opacity: 1;
 }
 
-:root[data-theme="light"] .profile-page :is(.card, .panel, .account-strip, .profile-avatar-strip) {
+:root[data-theme="light"] .profile-page :is(.card, .panel, .account-strip, .profile-avatar-strip, .feedback-credit-card) {
   background: var(--color-surface-2) !important;
   border-color: var(--color-border) !important;
   color: var(--color-text) !important;

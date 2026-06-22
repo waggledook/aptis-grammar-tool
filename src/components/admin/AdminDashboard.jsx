@@ -102,7 +102,7 @@ function countWordsFromHtml(html = "") {
 }
 
 const WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS = {
-  student: 20,
+  student: 40,
   teacher: 100,
   admin: 1000,
 };
@@ -612,7 +612,7 @@ export default function AdminDashboard({ user }) {
     setCreditDrafts((prev) => ({ ...prev, [uid]: value }));
   }
 
-  async function addWritingFeedbackCredits(uid) {
+  async function addWritingFeedbackCredits(uid, creditPool = "weekly") {
     const targetUser = users.find((entry) => entry.id === uid);
     if (!targetUser) return;
 
@@ -622,15 +622,15 @@ export default function AdminDashboard({ user }) {
       return;
     }
 
-    const isAptisDemoOnly = targetUser.role === "student" && !hasActiveAptisTrainerAccess(targetUser);
-    const currentCredits = isAptisDemoOnly
+    const targetPool = creditPool === "aptisDemo" ? "aptisDemo" : "weekly";
+    const currentCredits = targetPool === "aptisDemo"
       ? getAptisDemoFeedbackLifetimeCredits(targetUser)
       : getWritingFeedbackWeeklyCredits(targetUser);
     const nextCredits = currentCredits + amount;
     setSavingCredits((prev) => ({ ...prev, [uid]: true }));
 
     try {
-      const payload = isAptisDemoOnly
+      const payload = targetPool === "aptisDemo"
         ? {
             aptisDemoFeedbackLifetimeCredits: nextCredits,
             aptisDemoFeedbackCreditsUpdatedAt: serverTimestamp(),
@@ -649,7 +649,7 @@ export default function AdminDashboard({ user }) {
           entry.id === uid
             ? {
                 ...entry,
-                ...(isAptisDemoOnly
+                ...(targetPool === "aptisDemo"
                   ? { aptisDemoFeedbackLifetimeCredits: nextCredits }
                   : { writingFeedbackWeeklyCredits: nextCredits }),
               }
@@ -1290,19 +1290,16 @@ function renderAptisAccessControl(u, compact = false) {
     }
 
     const isAptisDemoOnly = !hasActiveAptisTrainerAccess(u);
-    const creditLimit = isAptisDemoOnly
-      ? getAptisDemoFeedbackLifetimeCredits(u)
-      : getWritingFeedbackWeeklyCredits(u);
-    const usedCredits = Math.max(
-      0,
-      Number(isAptisDemoOnly ? u.aptisDemoFeedbackCreditsUsed : u.writingFeedbackCreditsUsedThisWeek || 0)
-    );
-    const remainingCredits = Math.max(0, creditLimit - usedCredits);
+    const weeklyCreditLimit = getWritingFeedbackWeeklyCredits(u);
+    const weeklyUsedCredits = Math.max(0, Number(u.writingFeedbackCreditsUsedThisWeek || 0));
+    const weeklyRemainingCredits = Math.max(0, weeklyCreditLimit - weeklyUsedCredits);
+    const aptisDemoCreditLimit = getAptisDemoFeedbackLifetimeCredits(u);
+    const aptisDemoUsedCredits = Math.max(0, Number(u.aptisDemoFeedbackCreditsUsed || 0));
+    const aptisDemoRemainingCredits = Math.max(0, aptisDemoCreditLimit - aptisDemoUsedCredits);
     const draftValue = creditDrafts[u.id] || "";
     const isSaving = !!savingCredits[u.id];
-
-    return (
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
+    const renderCreditRow = ({ label, remaining, used, limit, period }) => (
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
         <div
           style={{
             display: "flex",
@@ -1313,15 +1310,41 @@ function renderAptisAccessControl(u, compact = false) {
           }}
         >
           <span style={{ color: "#dbe7ff", fontSize: "0.88rem" }}>
-            {isAptisDemoOnly ? "Demo feedback credits left" : "AI feedback credits left"}
+            {label}
           </span>
           <strong style={{ color: "#fef3c7", fontSize: "1.05rem" }}>
-            {remainingCredits}
+            {remaining}
           </strong>
         </div>
         <div style={{ color: "#9fb4da", fontSize: "0.78rem" }}>
-          {usedCredits} used of {creditLimit} {isAptisDemoOnly ? "total" : "this week"}
+          {used} used of {limit} {period}
         </div>
+      </div>
+    );
+
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
+        {renderCreditRow({
+          label: "Weekly AI feedback credits left",
+          remaining: weeklyRemainingCredits,
+          used: weeklyUsedCredits,
+          limit: weeklyCreditLimit,
+          period: "this week",
+        })}
+        {isAptisDemoOnly && (
+          <>
+            {renderCreditRow({
+              label: "Aptis demo credits left",
+              remaining: aptisDemoRemainingCredits,
+              used: aptisDemoUsedCredits,
+              limit: aptisDemoCreditLimit,
+              period: "total",
+            })}
+            <div style={{ color: "#9fb4da", fontSize: "0.74rem", lineHeight: 1.35 }}>
+              OTE feedback uses weekly AI credits. Aptis demo credits only cover Aptis feedback without Aptis access.
+            </div>
+          </>
+        )}
         <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
           <input
             type="number"
@@ -1344,15 +1367,29 @@ function renderAptisAccessControl(u, compact = false) {
           <button
             type="button"
             className="review-btn"
-            onClick={() => addWritingFeedbackCredits(u.id)}
+            onClick={() => addWritingFeedbackCredits(u.id, "weekly")}
             disabled={isSaving}
             style={{
               fontSize: "0.8rem",
               padding: "0.3rem 0.65rem",
             }}
           >
-            {isSaving ? "Adding..." : "Add credits"}
+            {isSaving ? "Adding..." : "Add weekly credits"}
           </button>
+          {isAptisDemoOnly && (
+            <button
+              type="button"
+              className="review-btn"
+              onClick={() => addWritingFeedbackCredits(u.id, "aptisDemo")}
+              disabled={isSaving}
+              style={{
+                fontSize: "0.8rem",
+                padding: "0.3rem 0.65rem",
+              }}
+            >
+              {isSaving ? "Adding..." : "Add Aptis demo credits"}
+            </button>
+          )}
         </div>
       </div>
     );
@@ -1519,7 +1556,9 @@ function renderAptisAccessControl(u, compact = false) {
       detail: entry.email || labelForUser(entry),
     }));
   const accessRequestNotifications = newAccessRequests.map((request) => {
+    const isFeedbackCreditRequest = request.requestType === "feedback_credits";
     const isAptisRequest = request.site === "aptis-trainer" || request.site === "ote";
+    const poolLabel = request.pool === "aptisDemo" ? "Aptis demo" : "weekly AI";
     return {
     id: `access-request:${request.id}`,
     type: "access-request",
@@ -1528,9 +1567,13 @@ function renderAptisAccessControl(u, compact = false) {
     userEmail: request.userEmail || "",
     userName: request.userName || request.userEmail || "User",
     createdAt: request.createdAt,
-    title: `${isAptisRequest ? "Aptis Trainer" : "Seif Hub"} access requested`,
-    siteLabel: isAptisRequest ? "Aptis Trainer" : "Seif Hub",
-    detail: request.userEmail || request.userName || request.userId || "Unknown user",
+    title: isFeedbackCreditRequest
+      ? "Feedback credits requested"
+      : `${isAptisRequest ? "Aptis Trainer" : "Seif Hub"} access requested`,
+    siteLabel: isFeedbackCreditRequest ? "Feedback credits" : isAptisRequest ? "Aptis Trainer" : "Seif Hub",
+    detail: isFeedbackCreditRequest
+      ? `${poolLabel} credits · ${request.userEmail || request.userName || request.userId || "Unknown user"}`
+      : request.userEmail || request.userName || request.userId || "Unknown user",
     };
   });
   const supportMessageNotifications = newSupportMessages.map((message) => {
@@ -2738,6 +2781,17 @@ function renderAptisAccessControl(u, compact = false) {
                   {selectedAdminNotification.request?.note ? (
                     <div style={{ marginTop: "0.35rem", color: "#dbeafe", fontSize: "0.86rem" }}>
                       Note: {selectedAdminNotification.request.note}
+                    </div>
+                  ) : null}
+                  {selectedAdminNotification.request?.requestType === "feedback_credits" ? (
+                    <div style={{ marginTop: "0.35rem", color: "#dbeafe", fontSize: "0.86rem" }}>
+                      Requested pool: {selectedAdminNotification.request.pool === "aptisDemo" ? "Aptis demo" : "weekly AI"}
+                      {typeof selectedAdminNotification.request.remainingCredits === "number"
+                        ? ` · Remaining: ${selectedAdminNotification.request.remainingCredits}`
+                        : ""}
+                      {typeof selectedAdminNotification.request.neededCredits === "number"
+                        ? ` · Needed: ${selectedAdminNotification.request.neededCredits}`
+                        : ""}
                     </div>
                   ) : null}
                 </div>

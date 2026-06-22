@@ -444,7 +444,12 @@ export function formatActivityDetails(log) {
     case "ai_feedback_generated": {
       const productLabel = d.product === "ote" ? "OTE" : d.product === "seifhub" ? "Hub" : "Aptis";
       const sectionLabel = d.section ? titleCaseFromSnakeCase(d.section) : "";
-      const partLabel = d.part ? `Part ${String(d.part).replace("part", "")}` : "";
+      const partLabel =
+        d.product === "ote"
+          ? formatOtePart(d.part)
+          : d.part
+          ? `Part ${String(d.part).replace("part", "")}`
+          : "";
       const taskLabel = d.taskTitle || d.taskId || "";
       const size =
         typeof d.wordCount === "number" && d.wordCount > 0

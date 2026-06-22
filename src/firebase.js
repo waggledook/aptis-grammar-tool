@@ -47,6 +47,14 @@ import {
 import { TOPIC_DATA } from "./components/vocabulary/data/vocabTopics";
 import { getAllHubVocabThemes } from "./data/hubVocabularyActivities";
 
+const WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS = {
+  student: 40,
+  teacher: 100,
+  admin: 1000,
+};
+const APTIS_DEMO_FEEDBACK_LIFETIME_CREDITS = 8;
+const APTIS_TRAINER_ACCESS_KEY = "aptisTrainer";
+
 const firebaseConfig = {
   apiKey: "AIzaSyCvpE87D16safq68oFB4fJKPyCURsc-mrU",
   authDomain: "examplay-auth.firebaseapp.com",
@@ -202,7 +210,7 @@ async function logAiFeedbackGenerated(kind, details = {}, resultData = {}) {
     wordCount: details.wordCount ?? null,
     model: meta.model || details.model || "",
     feedbackTaskType: meta.feedbackTaskType || meta.taskType || "",
-    creditCost: meta.quota?.cost ?? meta.creditCost ?? null,
+    creditCost: meta.quota?.creditCost ?? meta.quota?.cost ?? meta.creditCost ?? null,
   });
 }
 
@@ -1760,6 +1768,122 @@ export async function logWritingSubmitted(details) {
 const reportsCollection = collection(db, "reports");
 const hubAccessRequestsCollection = collection(db, "hubAccessRequests");
 const supportMessagesCollection = collection(db, "supportMessages");
+
+function getFeedbackWeekKey(date = new Date()) {
+  const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+  const daysSinceMonday = (d.getUTCDay() + 6) % 7;
+  d.setUTCDate(d.getUTCDate() - daysSinceMonday);
+  return d.toISOString().slice(0, 10);
+}
+
+function todayIsoDate(date = new Date()) {
+  return date.toISOString().slice(0, 10);
+}
+
+function getSiteAccessConfig(userData = {}, accessKey) {
+  const raw = userData?.siteAccess?.[accessKey];
+  if (raw === true) return { active: true, startDate: "", endDate: "", indefinite: true };
+  if (!raw || typeof raw !== "object") return { active: false, startDate: "", endDate: "", indefinite: false };
+  return {
+    active: !!raw.active,
+    startDate: raw.startDate || "",
+    endDate: raw.endDate || "",
+    indefinite: !!raw.indefinite,
+  };
+}
+
+function hasAptisTrainerAccess(userData = {}) {
+  const role = userData?.role || "student";
+  if (role === "admin" || role === "teacher") return true;
+  const access = getSiteAccessConfig(userData, APTIS_TRAINER_ACCESS_KEY);
+  if (!access.active) return false;
+  const today = todayIsoDate();
+  if (access.startDate && today < access.startDate) return false;
+  if (!access.indefinite && access.endDate && today > access.endDate) return false;
+  return true;
+}
+
+function getWritingFeedbackWeeklyLimit(userData = {}) {
+  const rawValue = userData.writingFeedbackWeeklyCredits;
+  const hasCustomValue = rawValue !== undefined && rawValue !== null && rawValue !== "";
+  const customValue = Number(rawValue);
+  if (hasCustomValue && Number.isFinite(customValue)) {
+    return Math.max(0, Math.floor(customValue));
+  }
+  const role = userData.role || "student";
+  return WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS[role] || WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS.student;
+}
+
+function getAptisDemoFeedbackLifetimeLimit(userData = {}) {
+  const rawValue = userData.aptisDemoFeedbackLifetimeCredits;
+  const hasCustomValue = rawValue !== undefined && rawValue !== null && rawValue !== "";
+  const customValue = Number(rawValue);
+  if (hasCustomValue && Number.isFinite(customValue)) {
+    return Math.max(0, Math.floor(customValue));
+  }
+  return APTIS_DEMO_FEEDBACK_LIFETIME_CREDITS;
+}
+
+export async function fetchFeedbackCreditStatus(uid = auth.currentUser?.uid) {
+  if (!uid) return null;
+  const weekKey = getFeedbackWeekKey();
+  const [userSnap, weeklyUsageSnap, demoUsageSnap] = await Promise.all([
+    getDoc(doc(db, "users", uid)),
+    getDoc(doc(db, "users", uid, "writingFeedbackUsage", weekKey)),
+    getDoc(doc(db, "users", uid, "aptisTrainerDemoFeedbackUsage", "lifetime")),
+  ]);
+  const userData = userSnap.data() || {};
+  const weeklyLimit = getWritingFeedbackWeeklyLimit(userData);
+  const weeklyUsed = Number(weeklyUsageSnap.data()?.creditsUsed || 0);
+  const aptisDemoLimit = getAptisDemoFeedbackLifetimeLimit(userData);
+  const aptisDemoUsed = Number(demoUsageSnap.data()?.creditsUsed || 0);
+
+  return {
+    uid,
+    role: userData.role || "student",
+    weekKey,
+    hasAptisTrainerAccess: hasAptisTrainerAccess(userData),
+    weekly: {
+      pool: "weekly",
+      limit: weeklyLimit,
+      used: weeklyUsed,
+      remaining: Math.max(0, weeklyLimit - weeklyUsed),
+    },
+    aptisDemo: {
+      pool: "aptis_demo_lifetime",
+      limit: aptisDemoLimit,
+      used: aptisDemoUsed,
+      remaining: Math.max(0, aptisDemoLimit - aptisDemoUsed),
+    },
+  };
+}
+
+export async function sendFeedbackCreditRequest({
+  pool = "weekly",
+  site = "aptis",
+  neededCredits = null,
+  remainingCredits = null,
+  note = "",
+} = {}) {
+  const user = auth.currentUser;
+  if (!user) {
+    throw new Error("You must be signed in to request more credits.");
+  }
+
+  return addDoc(hubAccessRequestsCollection, {
+    requestType: "feedback_credits",
+    site,
+    pool,
+    neededCredits,
+    remainingCredits,
+    note: String(note || "").trim(),
+    userId: user.uid,
+    userEmail: user.email ?? null,
+    userName: user.displayName ?? "",
+    createdAt: serverTimestamp(),
+    status: "new",
+  });
+}
 
 /**
  * Send a report document, now including the full question text.
