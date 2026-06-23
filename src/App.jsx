@@ -70,7 +70,7 @@ import VocabExerciseTrainer from "./components/vocabulary/VocabExerciseTrainer.j
 import TopicTrainer from "./components/vocabulary/TopicTrainer";
 import Seo from "./components/common/Seo.jsx";
 import './App.css'
-import { collection, doc, getDoc, getDocs, onSnapshot, query, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, where } from "firebase/firestore";
 import GrammarSetRunner from "./components/grammar/GrammarSetRunner";
 import UseOfEnglishCustomQuizRunner from "./components/grammar/UseOfEnglishCustomQuizRunner.jsx";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
@@ -177,7 +177,7 @@ import OteWritingEssayBodyParagraphs from "./products/ote/OteWritingEssayBodyPar
 import OteWritingArticleReviewGuide from "./products/ote/OteWritingArticleReviewGuide.jsx";
 import OteWritingRegisterBasics from "./products/ote/OteWritingRegisterBasics.jsx";
 import OteWritingRegisterGapTrainer from "./products/ote/OteWritingRegisterGapTrainer.jsx";
-import { canAccessAptisTrainer, canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
+import { canAccessAptisTrainer, canAccessOte, canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 function BellIcon() {
   return (
@@ -347,6 +347,7 @@ const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || 
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
+const [savingOteVersion, setSavingOteVersion] = useState(false);
 
 useEffect(() => {
   document.documentElement.dataset.theme = theme;
@@ -434,6 +435,7 @@ useEffect(() => {
         teacherId: data.teacherId || null,
         courseAccess: data.courseAccess || {},
         siteAccess: data.siteAccess || {},
+        oteVersion: data.oteVersion || "general",
         photoURL: data.photoURL || u.photoURL || "",
       });
     } catch (err) {
@@ -446,6 +448,7 @@ useEffect(() => {
         teacherId: null,
         courseAccess: {},
         siteAccess: {},
+        oteVersion: "general",
         photoURL: u.photoURL || "",
       });
     }
@@ -737,12 +740,13 @@ useEffect(() => {
 
 const hasSeifHubAccess = canAccessSeifHub(user);
 const hasAptisTrainerAccess = canAccessAptisTrainer(user);
+const hasOteAccess = canAccessOte(user);
 const isAptisDemoMode = !hasAptisTrainerAccess;
 const aptisAccess = {
   hasFullAccess: hasAptisTrainerAccess,
   isDemoMode: isAptisDemoMode,
 };
-const hasMemberSiteAccess = !requiresMemberAccess || hasSeifHubAccess;
+const hasMemberSiteAccess = !requiresMemberAccess || (isOteSite ? hasOteAccess : hasSeifHubAccess);
 const isTeacherToolsRoute = location.pathname === "/teacher-tools";
 const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-it/join";
 const isPublicSpanglishPlayRoute = /^\/games\/spanglish-fix-it\/play\/[^/]+$/.test(location.pathname);
@@ -757,6 +761,22 @@ const showMemberAccessGate =
 
 const toggleTheme = () => {
   setTheme((current) => (current === "light" ? "dark" : "light"));
+};
+
+const setOteVersionPreference = async (version) => {
+  const normalizedVersion = version === "advanced" ? "advanced" : "general";
+  setUser((prev) => (prev ? { ...prev, oteVersion: normalizedVersion } : prev));
+
+  if (!user?.uid) return;
+
+  setSavingOteVersion(true);
+  try {
+    await setDoc(doc(db, "users", user.uid), { oteVersion: normalizedVersion }, { merge: true });
+  } catch (error) {
+    console.error("[OTE] Failed to save version preference", error);
+  } finally {
+    setSavingOteVersion(false);
+  }
 };
 
 
@@ -1024,13 +1044,38 @@ return (
       {/* Auth bar */}
     {!isOteExamRoute && !isAptisGrammarVocabularyMockRoute && <div
   style={{
-    textAlign: "right",
     marginBottom: "1rem",
     display: "flex",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
     gap: "8px",
+    alignItems: "center",
+    flexWrap: "wrap",
   }}
 >
+  <div className="topbar-left">
+    {isOteRoute ? (
+      <div className="ote-topbar-version-toggle" role="group" aria-label="Choose OTE version">
+        <button
+          type="button"
+          className={user?.oteVersion === "advanced" ? "" : "is-active"}
+          onClick={() => setOteVersionPreference("general")}
+          disabled={savingOteVersion}
+        >
+          General
+        </button>
+        <button
+          type="button"
+          className={user?.oteVersion === "advanced" ? "is-active" : ""}
+          onClick={() => setOteVersionPreference("advanced")}
+          disabled={savingOteVersion}
+        >
+          Advanced
+        </button>
+      </div>
+    ) : null}
+  </div>
+
+  <div className="topbar-actions">
   <button
     className="topbar-btn"
     onClick={() => {
@@ -1115,6 +1160,7 @@ return (
       Sign In / Sign Up
     </button>
   )}
+  </div>
 </div>}
 
    {/* ————— Show the right “page” ————— */}
@@ -1202,7 +1248,15 @@ return (
   <Route path="/games/spanglish-fix-it/join" element={<HubSpanglishLiveJoin />} />
   <Route path="/games/spanglish-fix-it/play/:gameId" element={<HubSpanglishLivePlayer />} />
 
-  <Route path="/ote" element={<OteDashboard user={user} nativeRoutes={false} />} />
+  <Route
+    path="/ote"
+    element={
+      <OteDashboard
+        user={user}
+        nativeRoutes={false}
+      />
+    }
+  />
   <Route path="/ote/speaking" element={<OteSkillMenu skill="speaking" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-1-interview" element={<OteSpeakingPart1Menu nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-1-interview/overview" element={<OteSpeakingPart1Guide nativeRoutes={false} />} />
@@ -2305,7 +2359,10 @@ return (
             />
           ) : (
             isOteSite ? (
-              <OteDashboard user={user} nativeRoutes={isOteSite} />
+              <OteDashboard
+                user={user}
+                nativeRoutes={isOteSite}
+              />
             ) : (
               <MainMenu
                 onSelect={(next) => setView(next)}

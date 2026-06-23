@@ -1924,7 +1924,8 @@ export async function sendReport({
 
 export async function sendHubAccessRequest({ note = "", site = "seifhub" } = {}) {
   const user = auth.currentUser;
-  const normalizedSite = site === "aptis-trainer" || site === "ote" ? "aptis-trainer" : "seifhub";
+  const normalizedSite =
+    site === "ote" ? "ote" : site === "aptis-trainer" ? "aptis-trainer" : "seifhub";
 
   return addDoc(hubAccessRequestsCollection, {
     site: normalizedSite,

@@ -9,6 +9,7 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
   const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
   const writingPath = getSitePath(nativeRoutes ? "/writing" : "/ote/writing");
   const profilePath = getSitePath("/profile");
+  const isAdvanced = user?.oteVersion === "advanced";
 
   return (
     <main className="menu-wrapper hub-menu-wrapper ote-menu-wrapper">
@@ -30,38 +31,66 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
 
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
-          <span className="whats-new-label">Mock-test environment</span>
-          <h3>Speaking and writing mocks are ready</h3>
+          <span className="whats-new-label">{isAdvanced ? "Advanced workspace" : "Mock-test environment"}</span>
+          <h3>{isAdvanced ? "Advanced OTE is ready for content" : "Speaking and writing mocks are ready"}</h3>
           <p>
-            Start with OTE-style mock environments for speaking recordings and timed writing practice.
+            {isAdvanced
+              ? "Use these placeholder areas as starting points while the advanced training content takes shape."
+              : "Start with OTE-style mock environments for speaking recordings and timed writing practice."}
           </p>
         </div>
-        <button className="whats-new-btn" type="button" onClick={() => navigate(speakingPath)}>
-          Open speaking
-        </button>
+        {!isAdvanced ? (
+          <button className="whats-new-btn" type="button" onClick={() => navigate(speakingPath)}>
+            Open speaking
+          </button>
+        ) : null}
       </div>
 
-      <div className="menu-grid" aria-label="OTE sections">
-        <button className="menu-card" type="button" onClick={() => navigate(speakingPath)}>
-          <h3>Speaking</h3>
-          <p>Mock tests and speaking training for the four-part OTE speaking module.</p>
-        </button>
+      {isAdvanced ? (
+        <div className="menu-grid" aria-label="Advanced OTE sections">
+          <button className="menu-card" type="button" disabled>
+            <h3>Advanced Speaking</h3>
+            <p>Placeholder for higher-level OTE speaking strategy, feedback loops, and exam drills.</p>
+          </button>
 
-        <button className="menu-card" type="button" onClick={() => navigate(writingPath)}>
-          <h3>Writing</h3>
-          <p>Timed writing mocks and task practice for email, essay, and article responses.</p>
-        </button>
+          <button className="menu-card" type="button" disabled>
+            <h3>Advanced Writing</h3>
+            <p>Placeholder for C1-focused writing training, register control, and timed response work.</p>
+          </button>
 
-        <button className="menu-card" type="button" onClick={() => navigate(profilePath)}>
-          <h3>My Profile</h3>
-          <p>Review saved OTE speaking feedback, writing submissions, and progress.</p>
-        </button>
+          <button className="menu-card" type="button" disabled>
+            <h3>Advanced Language Lab</h3>
+            <p>Placeholder for complex grammar, lexical range, discourse markers, and precision practice.</p>
+          </button>
 
-        <button className="menu-card" type="button" disabled>
-          <h3>Training Library</h3>
-          <p>Future lessons, phrase banks, and focused drills for OTE skills.</p>
-        </button>
-      </div>
+          <button className="menu-card" type="button" onClick={() => navigate(profilePath)}>
+            <h3>My Profile</h3>
+            <p>Review saved OTE speaking feedback, writing submissions, and progress.</p>
+          </button>
+        </div>
+      ) : (
+        <div className="menu-grid" aria-label="OTE sections">
+          <button className="menu-card" type="button" onClick={() => navigate(speakingPath)}>
+            <h3>Speaking</h3>
+            <p>Mock tests and speaking training for the four-part OTE speaking module.</p>
+          </button>
+
+          <button className="menu-card" type="button" onClick={() => navigate(writingPath)}>
+            <h3>Writing</h3>
+            <p>Timed writing mocks and task practice for email, essay, and article responses.</p>
+          </button>
+
+          <button className="menu-card" type="button" onClick={() => navigate(profilePath)}>
+            <h3>My Profile</h3>
+            <p>Review saved OTE speaking feedback, writing submissions, and progress.</p>
+          </button>
+
+          <button className="menu-card" type="button" disabled>
+            <h3>Training Library</h3>
+            <p>Future lessons, phrase banks, and focused drills for OTE skills.</p>
+          </button>
+        </div>
+      )}
     </main>
   );
 }

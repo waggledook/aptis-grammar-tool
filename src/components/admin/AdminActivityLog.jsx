@@ -478,23 +478,50 @@ export default function AdminActivityLog({ user }) {
   };
 
   const typeOptions = getActivityTypeOptions();
+  const renderLogUser = (log) =>
+    log.userId && log.userId !== WRITING_GENERAL_GUEST_USER_ID ? (
+      <button
+        type="button"
+        onClick={() => goToProfile(log.userId)}
+        className="activity-log-user-btn"
+      >
+        {log.userLabel || log.userEmail || log.userId}
+      </button>
+    ) : (
+      <span className="activity-log-user-text">
+        {log.userLabel || log.userEmail || "Guest"}
+      </span>
+    );
+
+  const renderLogDetails = (log) => {
+    const text = formatActivityDetails(log) || "";
+    const isMultiline = typeof text === "string" && text.includes("\n");
+
+    return isMultiline ? (
+      <pre className="activity-log-details-pre">{text}</pre>
+    ) : (
+      <span className="activity-log-details-text">{text}</span>
+    );
+  };
 
   return (
-    <div style={{ maxWidth: 900, margin: "auto" }}>
-      <button className="review-btn" onClick={() => navigate("/admin")}>
-        ← Back to Admin
-      </button>
+    <div className="admin-activity-log">
+      <div className="activity-log-top-actions">
+        <button className="review-btn" onClick={() => navigate("/admin")}>
+          ← Back to Admin
+        </button>
 
-      <button className="review-btn" onClick={() => navigate("/admin/activity-charts")}>
-  📊 Charts
-</button>
+        <button className="review-btn" onClick={() => navigate("/admin/activity-charts")}>
+          Charts
+        </button>
+      </div>
 
       <h1 style={{ marginTop: "0.75rem" }}>Activity log</h1>
       <p className="muted small">
         Showing {logs.length} events (loaded in batches of {PAGE_SIZE}).
         {usingCache ? " Using cached results." : ""}
       </p>
-      <div style={{ display: "flex", gap: "0.75rem", alignItems: "center", marginBottom: "0.75rem" }}>
+      <div className="activity-log-refresh-row">
         <button className="ghost-btn" type="button" onClick={refreshNow} disabled={refreshing || loading}>
           {refreshing ? "Refreshing..." : "Refresh now"}
         </button>
@@ -505,6 +532,7 @@ export default function AdminActivityLog({ user }) {
 
       {/* Simple filters */}
       <div
+        className="activity-log-filters"
         style={{
           marginTop: "0.75rem",
           padding: "0.5rem 0.75rem",
@@ -564,13 +592,13 @@ export default function AdminActivityLog({ user }) {
 
       {!loading && (
   <>
-    <div style={{ marginTop: "1rem", overflowX: "auto" }}>
+    <div className="activity-log-table-wrap">
       <table
+        className="activity-log-table"
         style={{
           width: "100%",
           borderCollapse: "collapse",
           fontSize: "0.9rem",
-          minWidth: 650,
         }}
       >
             <thead>
@@ -602,28 +630,7 @@ export default function AdminActivityLog({ user }) {
                     {log.createdAt instanceof Date ? log.createdAt.toLocaleString() : "—"}
                   </td>
                   <td style={{ padding: "0.35rem 0.25rem" }}>
-                    {log.userId && log.userId !== WRITING_GENERAL_GUEST_USER_ID ? (
-                      <button
-                        type="button"
-                        onClick={() => goToProfile(log.userId)}
-                        style={{
-                          background: "none",
-                          border: "none",
-                          padding: 0,
-                          margin: 0,
-                          color: "inherit",
-                          textAlign: "left",
-                          cursor: "pointer",
-                          fontSize: "0.85rem",
-                        }}
-                      >
-                        {log.userLabel || log.userEmail || log.userId}
-                      </button>
-                    ) : (
-                      <span style={{ fontSize: "0.85rem" }}>
-                        {log.userLabel || log.userEmail || "Guest"}
-                      </span>
-                    )}
+                    {renderLogUser(log)}
                   </td>
                   {/* Type */}
 <td style={{ padding: "0.35rem 0.25rem" }}>
@@ -633,36 +640,27 @@ export default function AdminActivityLog({ user }) {
 </td>
 
 <td style={{ padding: "0.35rem 0.25rem" }}>
-  {(() => {
-    const text = formatActivityDetails(log) || "";
-    const isMultiline = typeof text === "string" && text.includes("\n");
-
-    return isMultiline ? (
-      <pre
-        style={{
-          margin: 0,
-          fontSize: "0.75rem",
-          whiteSpace: "pre-wrap",
-          wordBreak: "break-word",
-          opacity: 0.85,
-        }}
-      >
-        {text}
-      </pre>
-    ) : (
-      <span className="tiny" style={{ fontSize: "0.8rem", opacity: 0.9 }}>
-        {text}
-      </span>
-    );
-  })()}
+  {renderLogDetails(log)}
 </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
+        <div className="activity-log-card-list">
+          {filteredLogs.map((log) => (
+            <article className="activity-log-card" key={log.id}>
+              <div className="activity-log-card-head">
+                <span className="badge subtle small">{getActivityTypeLabel(log.type)}</span>
+                <time>{log.createdAt instanceof Date ? log.createdAt.toLocaleString() : "—"}</time>
+              </div>
+              <div className="activity-log-card-user">{renderLogUser(log)}</div>
+              <div className="activity-log-card-details">{renderLogDetails(log)}</div>
+            </article>
+          ))}
+        </div>
 {/* ✅ PASTE THE LOAD MORE BLOCK HERE */}
-<div style={{ marginTop: "1rem", display: "flex", gap: "0.75rem", alignItems: "center" }}>
+<div className="activity-log-load-more">
 <button
   className="review-btn"
   onClick={loadMore}

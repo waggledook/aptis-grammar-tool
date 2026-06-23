@@ -1,5 +1,6 @@
 export const SEIF_HUB_ACCESS_KEY = "seifhub";
 export const APTIS_TRAINER_ACCESS_KEY = "aptisTrainer";
+export const OTE_ACCESS_KEY = "ote";
 
 function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);
@@ -47,6 +48,10 @@ export function getAptisTrainerAccessConfig(userOrSiteAccess) {
   return getSiteAccessConfig(userOrSiteAccess, APTIS_TRAINER_ACCESS_KEY);
 }
 
+export function getOteAccessConfig(userOrSiteAccess) {
+  return getSiteAccessConfig(userOrSiteAccess, OTE_ACCESS_KEY);
+}
+
 function getWindowLocation() {
   if (typeof window === "undefined") return null;
   return window.location;
@@ -67,7 +72,7 @@ export function getSiteVariant(locationLike = getWindowLocation()) {
 
   if (isOte) {
     return {
-      id: "ote",
+      id: OTE_ACCESS_KEY,
       label: "OTE Seif",
       requiresMemberAccess: true,
     };
@@ -111,6 +116,20 @@ export function canAccessAptisTrainer(user) {
   if (user.role === "admin" || user.role === "teacher") return true;
 
   const access = getAptisTrainerAccessConfig(user);
+  if (!access.active) return false;
+
+  const today = todayIsoDate();
+  if (access.startDate && today < access.startDate) return false;
+  if (!access.indefinite && access.endDate && today > access.endDate) return false;
+
+  return true;
+}
+
+export function canAccessOte(user) {
+  if (!user) return false;
+  if (user.role === "admin" || user.role === "teacher") return true;
+
+  const access = getOteAccessConfig(user);
   if (!access.active) return false;
 
   const today = todayIsoDate();

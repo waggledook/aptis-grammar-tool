@@ -12,7 +12,9 @@ import { useNavigate } from "react-router-dom";
 import {
   APTIS_TRAINER_ACCESS_KEY,
   getAptisTrainerAccessConfig,
+  getOteAccessConfig,
   getSeifHubAccessConfig,
+  OTE_ACCESS_KEY,
   SEIF_HUB_ACCESS_KEY,
 } from "../../siteConfig.js";
 import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
@@ -108,6 +110,10 @@ const WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS = {
 };
 
 const APTIS_DEMO_FEEDBACK_LIFETIME_CREDITS = 8;
+const OTE_VERSION_OPTIONS = [
+  { value: "general", label: "General" },
+  { value: "advanced", label: "Advanced" },
+];
 
 function getWritingFeedbackWeeklyCredits(user = {}) {
   const rawValue = user.writingFeedbackWeeklyCredits;
@@ -387,7 +393,7 @@ export default function AdminDashboard({ user }) {
   const [isNarrow, setIsNarrow] = useState(false); // mobile breakpoint
 
   // NEW: sorting + filtering
-  const [sortBy, setSortBy] = useState("email"); // "email" | "role" | "teacher"
+  const [sortBy, setSortBy] = useState("email"); // "email" | "role" | "teacher" | "joined"
   const [sortDir, setSortDir] = useState("asc"); // "asc" | "desc"
   const [teacherFilter, setTeacherFilter] = useState("all"); // "all" | "no-teacher" | "has-teacher" | teacherId
   const [searchTerm, setSearchTerm] = useState("");
@@ -395,6 +401,9 @@ export default function AdminDashboard({ user }) {
   const [savingHub, setSavingHub] = useState({});
   const [aptisDrafts, setAptisDrafts] = useState({});
   const [savingAptis, setSavingAptis] = useState({});
+  const [oteDrafts, setOteDrafts] = useState({});
+  const [savingOte, setSavingOte] = useState({});
+  const [savingOteVersion, setSavingOteVersion] = useState({});
   const [courseTestSessions, setCourseTestSessions] = useState([]);
   const [loadingSessions, setLoadingSessions] = useState(true);
   const [deletingSessionId, setDeletingSessionId] = useState("");
@@ -424,6 +433,7 @@ export default function AdminDashboard({ user }) {
   const [adminNotificationsOpen, setAdminNotificationsOpen] = useState(false);
   const [readAdminNotificationKeys, setReadAdminNotificationKeys] = useState({});
   const [selectedAdminUserId, setSelectedAdminUserId] = useState("");
+  const [activeAdminEdit, setActiveAdminEdit] = useState(null);
   const [selectedAdminNotification, setSelectedAdminNotification] = useState(null);
   const [creditDrafts, setCreditDrafts] = useState({});
   const [savingCredits, setSavingCredits] = useState({});
@@ -977,6 +987,11 @@ function getAptisDraft(u) {
   return getDefaultAccessDraft(u, getAptisTrainerAccessConfig);
 }
 
+function getOteDraft(u) {
+  if (oteDrafts[u.id]) return oteDrafts[u.id];
+  return getDefaultAccessDraft(u, getOteAccessConfig);
+}
+
 function setHubDraft(uid, patch) {
   setHubDrafts((prev) => {
     const sourceUser = users.find((u) => u.id === uid) || {};
@@ -992,6 +1007,17 @@ function setAptisDraft(uid, patch) {
   setAptisDrafts((prev) => {
     const sourceUser = users.find((u) => u.id === uid) || {};
     const base = prev[uid] || getAptisDraft(sourceUser);
+    return {
+      ...prev,
+      [uid]: { ...base, ...patch },
+    };
+  });
+}
+
+function setOteDraft(uid, patch) {
+  setOteDrafts((prev) => {
+    const sourceUser = users.find((u) => u.id === uid) || {};
+    const base = prev[uid] || getOteDraft(sourceUser);
     return {
       ...prev,
       [uid]: { ...base, ...patch },
@@ -1046,6 +1072,31 @@ async function saveAptisTrainerAccess(uid) {
   await saveSiteAccess(uid, APTIS_TRAINER_ACCESS_KEY, payload, setSavingAptis);
 }
 
+async function saveOteAccess(uid) {
+  const sourceUser = users.find((u) => u.id === uid) || {};
+  const draft = oteDrafts[uid] || getOteAccessConfig(sourceUser);
+  const payload = buildAccessPayload(draft);
+
+  await saveSiteAccess(uid, OTE_ACCESS_KEY, payload, setSavingOte);
+}
+
+async function setOteVersion(uid, version) {
+  const normalizedVersion = version === "advanced" ? "advanced" : "general";
+  setSavingOteVersion((prev) => ({ ...prev, [uid]: true }));
+
+  try {
+    await updateDoc(doc(db, "users", uid), {
+      oteVersion: normalizedVersion,
+    });
+
+    setUsers((prev) =>
+      prev.map((u) => (u.id === uid ? { ...u, oteVersion: normalizedVersion } : u))
+    );
+  } finally {
+    setSavingOteVersion((prev) => ({ ...prev, [uid]: false }));
+  }
+}
+
 function getAccessStatus(access, offLabel) {
   if (!access.active) {
     return { label: offLabel, tone: "muted" };
@@ -1053,19 +1104,19 @@ function getAccessStatus(access, offLabel) {
 
   const today = new Date().toISOString().slice(0, 10);
   if (access.startDate && today < access.startDate) {
-    return { label: `Starts ${access.startDate}`, tone: "info" };
+    return { label: "Scheduled", tone: "info" };
   }
 
   if (!access.indefinite && access.endDate && today > access.endDate) {
-    return { label: `Expired ${access.endDate}`, tone: "danger" };
+    return { label: "Expired", tone: "danger" };
   }
 
   if (access.indefinite) {
-    return { label: "Active indefinitely", tone: "success" };
+    return { label: "Indefinite", tone: "success" };
   }
 
   if (access.endDate) {
-    return { label: `Active until ${access.endDate}`, tone: "success" };
+    return { label: "Active", tone: "success" };
   }
 
   return { label: "Active", tone: "success" };
@@ -1077,6 +1128,10 @@ function getHubStatus(u) {
 
 function getAptisStatus(u) {
   return getAccessStatus(getAptisTrainerAccessConfig(u), "Aptis demo only");
+}
+
+function getOteStatus(u) {
+  return getAccessStatus(getOteAccessConfig(u), "OTE off");
 }
 
 function renderSiteAccessControl({
@@ -1228,6 +1283,253 @@ function renderAptisAccessControl(u, compact = false) {
     activeLabel: "Aptis Trainer active",
     saveLabel: "Save Aptis access",
   });
+}
+
+function renderOteAccessControl(u, compact = false) {
+  const fontSize = compact ? "0.78rem" : "0.82rem";
+  const inputStyle = {
+    fontSize,
+    padding: "0.25rem 0.45rem",
+    borderRadius: "0.375rem",
+    border: "1px solid #374151",
+    backgroundColor: "#020617",
+    color: "#e5e7eb",
+  };
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.55rem" }}>
+      {renderSiteAccessControl({
+        u,
+        compact,
+        draft: getOteDraft(u),
+        setDraft: setOteDraft,
+        savingMap: savingOte,
+        onSave: saveOteAccess,
+        activeLabel: "OTE active",
+        saveLabel: "Save OTE access",
+      })}
+
+      <label style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize, opacity: 0.9 }}>
+        <span>Default version</span>
+        <select
+          value={u.oteVersion === "advanced" ? "advanced" : "general"}
+          onChange={(event) => setOteVersion(u.id, event.target.value)}
+          disabled={!!savingOteVersion[u.id]}
+          style={inputStyle}
+        >
+          {OTE_VERSION_OPTIONS.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
+    </div>
+  );
+}
+
+function openAccessEditor(section, u) {
+  if (section === "aptis") {
+    setAptisDrafts((prev) => ({
+      ...prev,
+      [u.id]: prev[u.id] || getDefaultAccessDraft(u, getAptisTrainerAccessConfig),
+    }));
+  }
+
+  if (section === "ote") {
+    setOteDrafts((prev) => ({
+      ...prev,
+      [u.id]: prev[u.id] || getDefaultAccessDraft(u, getOteAccessConfig),
+    }));
+  }
+
+  if (section === "hub") {
+    setHubDrafts((prev) => ({
+      ...prev,
+      [u.id]: prev[u.id] || getDefaultAccessDraft(u, getSeifHubAccessConfig),
+    }));
+  }
+
+  setActiveAdminEdit({ section, userId: u.id });
+}
+
+function getOteVersionLabel(u = {}) {
+  return u.oteVersion === "advanced" ? "Advanced" : "General";
+}
+
+function formatAccessDate(value) {
+  return value || "—";
+}
+
+function getAccessSectionMeta(section, u) {
+  if (section === "aptis") {
+    return {
+      editTitle: "Edit Aptis Trainer access",
+      access: getAptisTrainerAccessConfig(u),
+      status: getAptisStatus(u),
+      control: renderAptisAccessControl(u),
+    };
+  }
+
+  if (section === "hub") {
+    return {
+      editTitle: "Edit Seif Hub access",
+      access: getSeifHubAccessConfig(u),
+      status: getHubStatus(u),
+      control: renderHubAccessControl(u),
+    };
+  }
+
+  return {
+    editTitle: "Edit OTE access",
+    access: getOteAccessConfig(u),
+    status: getOteStatus(u),
+    control: renderOteAccessControl(u),
+    extraRows: [{ label: "Version", value: getOteVersionLabel(u) }],
+  };
+}
+
+function renderAccessSummary(u, section, { showEdit = true } = {}) {
+  const meta = getAccessSectionMeta(section, u);
+  const access = meta.access;
+  const status = meta.status;
+  const rows = [
+    { label: "Start", value: formatAccessDate(access.startDate) },
+    { label: "End", value: access.indefinite ? "Indefinite" : formatAccessDate(access.endDate) },
+    ...(meta.extraRows || []),
+    { label: "Access", value: access.active ? "On" : "Off" },
+  ];
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", minHeight: "100%" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", alignItems: "center" }}>
+        <span
+          style={{
+            padding: "0.24rem 0.58rem",
+            borderRadius: "999px",
+            fontSize: "0.76rem",
+            fontWeight: 800,
+            lineHeight: 1.15,
+            ...statusStyles[status.tone],
+          }}
+        >
+          {status.label}
+        </span>
+        {showEdit ? (
+          <button
+            type="button"
+            className="ghost-btn"
+            onClick={() => openAccessEditor(section, u)}
+            style={{ marginLeft: 0, fontSize: "0.78rem", padding: "0.25rem 0.6rem" }}
+          >
+            Edit
+          </button>
+        ) : null}
+      </div>
+
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gap: "0.65rem",
+          color: "#dbe7ff",
+          fontSize: "0.86rem",
+        }}
+      >
+        {rows.map((row) => (
+          <div key={row.label}>
+            <div style={{ color: "#94a3b8", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+              {row.label}
+            </div>
+            <strong>{row.value}</strong>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function renderOteAccessSummary(u, options) {
+  return renderAccessSummary(u, "ote", options);
+}
+
+const adminUserCardStyle = {
+  display: "flex",
+  flexDirection: "column",
+  gap: "0.62rem",
+  padding: "0.72rem",
+  borderRadius: "0.82rem",
+  background: "rgba(2, 6, 23, 0.22)",
+  border: "1px solid rgba(51, 65, 85, 0.7)",
+  minWidth: 0,
+};
+
+const adminUserGridColumns =
+  "minmax(230px, 1.08fr) repeat(3, minmax(190px, 0.9fr)) minmax(235px, 0.95fr)";
+
+function AdminEditModal({ title, user: modalUser, children, onClose }) {
+  if (!modalUser) return null;
+
+  return (
+    <div
+      className="admin-dashboard-modal-backdrop"
+      onClick={onClose}
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 90,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "1.2rem",
+        background: "rgba(2, 6, 23, 0.78)",
+      }}
+    >
+      <div
+        className="admin-dashboard-modal"
+        onClick={(event) => event.stopPropagation()}
+        style={{
+          width: "min(620px, 100%)",
+          maxHeight: "88vh",
+          overflow: "auto",
+          borderRadius: "1rem",
+          border: "1px solid rgba(59, 130, 246, 0.38)",
+          background: "linear-gradient(180deg, #14244a, #0f1f42)",
+          boxShadow: "0 24px 70px rgba(0, 0, 0, 0.42)",
+        }}
+      >
+        <div
+          style={{
+            padding: "1rem 1.1rem",
+            borderBottom: "1px solid rgba(51, 65, 85, 0.75)",
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "1rem",
+            alignItems: "flex-start",
+          }}
+        >
+          <div style={{ minWidth: 0 }}>
+            <div style={{ color: "#94a3b8", fontSize: "0.76rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+              {labelForUser(modalUser)}
+            </div>
+            <h3 style={{ margin: "0.25rem 0 0", color: "#f8fafc" }}>{title}</h3>
+          </div>
+          <button
+            type="button"
+            className="ghost-btn"
+            onClick={onClose}
+            style={{ marginLeft: 0, flex: "0 0 auto", padding: "0.35rem 0.7rem" }}
+          >
+            Close
+          </button>
+        </div>
+
+        <div style={{ padding: "1.1rem" }}>
+          {children}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 
@@ -1395,57 +1697,175 @@ function renderAptisAccessControl(u, compact = false) {
     );
   };
 
-  const renderRoleButtons = (u) => (
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "flex-start",
-        gap: "0.35rem",
-        flexWrap: "wrap",
-      }}
-    >
-      {u.role !== "teacher" && (
-        <button
-          className="review-btn"
-          onClick={() => updateRole(u.id, "teacher")}
-          style={{
-            fontSize: "0.8rem",
-            padding: "0.25rem 0.6rem",
-          }}
-        >
-          Make Teacher
-        </button>
-      )}
+  const getTeacherSummaryLabel = (u) => {
+    if (u.role !== "student") return "Staff account";
+    const teacher = teachers.find((t) => t.id === u.teacherId);
+    return teacher ? labelForTeacher(teacher) : "No teacher";
+  };
 
-      {u.role !== "student" && (
-        <button
-          className="ghost-btn"
-          onClick={() => updateRole(u.id, "student")}
-          style={{
-            marginLeft: 0,
-            fontSize: "0.8rem",
-            padding: "0.25rem 0.6rem",
-          }}
-        >
-          Make Student
-        </button>
-      )}
+  const getCreditSummary = (u) => {
+    if (u.role !== "student") {
+      return { weekly: "—", demo: "—" };
+    }
 
-      {u.role !== "admin" && (
-        <button
-          className="generate-btn"
-          onClick={() => updateRole(u.id, "admin")}
+    const weeklyLimit = getWritingFeedbackWeeklyCredits(u);
+    const weeklyUsed = Math.max(0, Number(u.writingFeedbackCreditsUsedThisWeek || 0));
+    const demoLimit = getAptisDemoFeedbackLifetimeCredits(u);
+    const demoUsed = Math.max(0, Number(u.aptisDemoFeedbackCreditsUsed || 0));
+
+    return {
+      weekly: `${Math.max(0, weeklyLimit - weeklyUsed)} / ${weeklyLimit}`,
+      demo: `${Math.max(0, demoLimit - demoUsed)} / ${demoLimit}`,
+    };
+  };
+
+  const renderAssignmentSummary = (u, { showEdit = true } = {}) => {
+    const creditSummary = getCreditSummary(u);
+    const rows = [
+      { label: "Teacher", value: getTeacherSummaryLabel(u) },
+      { label: "Weekly AI", value: creditSummary.weekly },
+      { label: "Demo AI", value: creditSummary.demo },
+      { label: "Course pack", value: hasPack(u) ? "On" : "Off" },
+    ];
+
+    return (
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", minHeight: "100%" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "0.75rem", alignItems: "center" }}>
+          <span
+            style={{
+              padding: "0.28rem 0.65rem",
+              borderRadius: "999px",
+              fontSize: "0.76rem",
+              fontWeight: 800,
+              background: "rgba(59, 130, 246, 0.16)",
+              border: "1px solid rgba(96, 165, 250, 0.28)",
+              color: "#bfdbfe",
+            }}
+          >
+            Assignment
+          </span>
+          {showEdit ? (
+            <button
+              type="button"
+              className="ghost-btn"
+              onClick={() => setActiveAdminEdit({ section: "assignment", userId: u.id })}
+              style={{ marginLeft: 0, fontSize: "0.78rem", padding: "0.25rem 0.6rem" }}
+            >
+              Edit
+            </button>
+          ) : null}
+        </div>
+
+        <div
           style={{
-            marginLeft: 0,
-            fontSize: "0.8rem",
-            padding: "0.25rem 0.6rem",
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: "0.65rem",
+            color: "#dbe7ff",
+            fontSize: "0.86rem",
           }}
         >
-          Make Admin
-        </button>
-      )}
+          {rows.map((row) => (
+            <div key={row.label}>
+              <div style={{ color: "#94a3b8", fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                {row.label}
+              </div>
+              <strong>{row.value}</strong>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderAssignmentControl = (u) => (
+    <div style={{ display: "flex", flexDirection: "column", gap: "0.95rem" }}>
+      <div>
+        <div style={{ fontSize: "0.8rem", color: "#cbd5e1", marginBottom: "0.35rem" }}>
+          Teacher
+        </div>
+        {renderTeacherControl(u)}
+      </div>
+      <div>
+        <div style={{ fontSize: "0.8rem", color: "#cbd5e1", marginBottom: "0.35rem" }}>
+          AI feedback
+        </div>
+        {renderWritingFeedbackCreditControl(u)}
+      </div>
+      <label
+        style={{
+          display: "inline-flex",
+          gap: "0.55rem",
+          alignItems: "center",
+          fontSize: "0.88rem",
+          color: "#dbe7ff",
+        }}
+      >
+        <input
+          type="checkbox"
+          checked={hasPack(u)}
+          onChange={(event) => setPackAccess(u.id, event.target.checked)}
+        />
+        Course pack access
+      </label>
     </div>
   );
+
+  const renderRoleButtons = (u) => {
+    const roleButtonStyle = {
+      marginLeft: 0,
+      width: "100%",
+      minHeight: "2rem",
+      fontSize: "0.76rem",
+      lineHeight: 1,
+      padding: "0.32rem 0.45rem",
+      whiteSpace: "nowrap",
+      display: "inline-flex",
+      alignItems: "center",
+      justifyContent: "center",
+    };
+
+    return (
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+          gap: "0.35rem",
+          width: "100%",
+        }}
+      >
+        {u.role !== "teacher" && (
+          <button
+            className="ghost-btn"
+            onClick={() => updateRole(u.id, "teacher")}
+            style={roleButtonStyle}
+          >
+            Teacher
+          </button>
+        )}
+
+        {u.role !== "student" && (
+          <button
+            className="ghost-btn"
+            onClick={() => updateRole(u.id, "student")}
+            style={roleButtonStyle}
+          >
+            Student
+          </button>
+        )}
+
+        {u.role !== "admin" && (
+          <button
+            className="ghost-btn"
+            onClick={() => updateRole(u.id, "admin")}
+            style={roleButtonStyle}
+          >
+            Admin
+          </button>
+        )}
+      </div>
+    );
+  };
 
   // NEW: helper for sorting
   const primaryLabel = (u) =>
@@ -1511,6 +1931,13 @@ function renderAptisAccessControl(u, compact = false) {
 
   // NEW: sort the filtered list
   const displayedUsers = [...filtered].sort((a, b) => {
+    if (sortBy === "joined") {
+      const aTime = timestampToMs(a.createdAt);
+      const bTime = timestampToMs(b.createdAt);
+      if (aTime !== bTime) return sortDir === "asc" ? aTime - bTime : bTime - aTime;
+      return primaryLabel(a).localeCompare(primaryLabel(b));
+    }
+
     let aKey = "";
     let bKey = "";
 
@@ -1557,7 +1984,12 @@ function renderAptisAccessControl(u, compact = false) {
     }));
   const accessRequestNotifications = newAccessRequests.map((request) => {
     const isFeedbackCreditRequest = request.requestType === "feedback_credits";
-    const isAptisRequest = request.site === "aptis-trainer" || request.site === "ote";
+    const siteLabel =
+      request.site === "ote"
+        ? "OTE"
+        : request.site === "aptis-trainer"
+          ? "Aptis Trainer"
+          : "Seif Hub";
     const poolLabel = request.pool === "aptisDemo" ? "Aptis demo" : "weekly AI";
     return {
     id: `access-request:${request.id}`,
@@ -1569,8 +2001,8 @@ function renderAptisAccessControl(u, compact = false) {
     createdAt: request.createdAt,
     title: isFeedbackCreditRequest
       ? "Feedback credits requested"
-      : `${isAptisRequest ? "Aptis Trainer" : "Seif Hub"} access requested`,
-    siteLabel: isFeedbackCreditRequest ? "Feedback credits" : isAptisRequest ? "Aptis Trainer" : "Seif Hub",
+      : `${siteLabel} access requested`,
+    siteLabel: isFeedbackCreditRequest ? "Feedback credits" : siteLabel,
     detail: isFeedbackCreditRequest
       ? `${poolLabel} credits · ${request.userEmail || request.userName || request.userId || "Unknown user"}`
       : request.userEmail || request.userName || request.userId || "Unknown user",
@@ -1599,6 +2031,14 @@ function renderAptisAccessControl(u, compact = false) {
   const selectedAdminUser = selectedAdminUserId
     ? users.find((entry) => entry.id === selectedAdminUserId) || null
     : null;
+  const activeAdminEditUser = activeAdminEdit?.userId
+    ? users.find((entry) => entry.id === activeAdminEdit.userId) || null
+    : null;
+  const isActiveAccessEdit = ["aptis", "ote", "hub"].includes(activeAdminEdit?.section);
+  const activeAdminEditMeta =
+    activeAdminEditUser && isActiveAccessEdit
+      ? getAccessSectionMeta(activeAdminEdit.section, activeAdminEditUser)
+      : null;
   const emailGroups = users.reduce((acc, u) => {
     const email = (u.email || "").trim().toLowerCase();
     if (!email) return acc;
@@ -1701,7 +2141,7 @@ function renderAptisAccessControl(u, compact = false) {
   }
 
   return (
-    <div style={{ maxWidth: 1160, margin: "auto" }}>
+    <div className="admin-dashboard" style={{ maxWidth: 1160, margin: "auto" }}>
       <div
         style={{
           display: "flex",
@@ -1874,6 +2314,7 @@ function renderAptisAccessControl(u, compact = false) {
               { label: "Active Seif Hub", value: activeHubCount },
             ].map((item) => (
               <div
+                className="admin-stat-card"
                 key={item.label}
                 style={{
                   padding: "0.9rem 1rem",
@@ -1940,6 +2381,7 @@ function renderAptisAccessControl(u, compact = false) {
           )}
 
           <div
+            className="admin-panel"
             style={{
               marginTop: "0.9rem",
               padding: "0.95rem 1rem",
@@ -1996,6 +2438,7 @@ function renderAptisAccessControl(u, compact = false) {
 
                   return (
                     <section
+                      className="admin-subpanel"
                       key={request.id}
                       style={{
                         borderRadius: "0.85rem",
@@ -2073,6 +2516,7 @@ function renderAptisAccessControl(u, compact = false) {
           </div>
 
           <div
+            className="admin-filter-panel"
             style={{
               marginTop: "0.9rem",
               padding: "0.9rem 1rem",
@@ -2090,10 +2534,15 @@ function renderAptisAccessControl(u, compact = false) {
                 <span className="tiny muted">Sort by</span>
                 <select
                   value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value)}
+                  onChange={(e) => {
+                    const nextSortBy = e.target.value;
+                    setSortBy(nextSortBy);
+                    if (nextSortBy === "joined") setSortDir("desc");
+                  }}
                   style={baseInputStyle}
                 >
                   <option value="email">Email / Username</option>
+                  <option value="joined">Date joined</option>
                   <option value="role">Role</option>
                   <option value="teacher">Teacher</option>
                 </select>
@@ -2107,7 +2556,13 @@ function renderAptisAccessControl(u, compact = false) {
                   setSortDir((prev) => (prev === "asc" ? "desc" : "asc"))
                 }
               >
-                {sortDir === "asc" ? "↑ Ascending" : "↓ Descending"}
+                {sortBy === "joined"
+                  ? sortDir === "asc"
+                    ? "↑ Oldest first"
+                    : "↓ Newest first"
+                  : sortDir === "asc"
+                    ? "↑ Ascending"
+                    : "↓ Descending"}
               </button>
             </div>
 
@@ -2142,6 +2597,7 @@ function renderAptisAccessControl(u, compact = false) {
           </div>
 
           <div
+            className="admin-panel admin-panel-accent"
             style={{
               marginTop: "0.9rem",
               padding: "0.95rem 1rem",
@@ -2206,6 +2662,7 @@ function renderAptisAccessControl(u, compact = false) {
               <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
                 {courseTestSessions.map((session) => (
                   <section
+                    className="admin-subpanel"
                     key={session.id}
                     style={{
                       borderRadius: "0.95rem",
@@ -2316,6 +2773,7 @@ function renderAptisAccessControl(u, compact = false) {
           </div>
 
           <div
+            className="admin-panel"
             style={{
               marginTop: "0.95rem",
               padding: "0.95rem 1rem",
@@ -2378,6 +2836,7 @@ function renderAptisAccessControl(u, compact = false) {
                   const summary = getWritingGeneralSummary(submission);
                   return (
                     <section
+                      className="admin-subpanel"
                       key={submission.id}
                       style={{
                         borderRadius: "0.95rem",
@@ -2486,11 +2945,13 @@ function renderAptisAccessControl(u, compact = false) {
             {displayedUsers.map((u) => {
               const hubStatus = getHubStatus(u);
               const aptisStatus = getAptisStatus(u);
+              const oteStatus = getOteStatus(u);
               const emailKey = (u.email || "").trim().toLowerCase();
               const duplicateCount = duplicateEmailMap[emailKey] || 0;
 
               return (
                 <section
+                  className="admin-user-row"
                   key={u.id}
                   style={{
                     borderRadius: "1rem",
@@ -2501,6 +2962,7 @@ function renderAptisAccessControl(u, compact = false) {
                   }}
                 >
                   <div
+                    className="admin-user-row-header"
                     style={{
                       padding: "1rem 1.1rem",
                       borderBottom: "1px solid rgba(39, 64, 111, 0.8)",
@@ -2534,6 +2996,9 @@ function renderAptisAccessControl(u, compact = false) {
                           @{u.username}
                         </div>
                       )}
+                      <div style={{ marginTop: "0.25rem", fontSize: "0.78rem", color: "#7f95bf" }}>
+                        Joined {formatDateTime(u.createdAt)}
+                      </div>
                       {duplicateCount > 1 && (
                         <div
                           style={{
@@ -2594,6 +3059,17 @@ function renderAptisAccessControl(u, compact = false) {
                           borderRadius: "999px",
                           fontSize: "0.76rem",
                           fontWeight: 700,
+                          ...statusStyles[oteStatus.tone],
+                        }}
+                      >
+                        OTE: {oteStatus.label}
+                      </span>
+                      <span
+                        style={{
+                          padding: "0.34rem 0.7rem",
+                          borderRadius: "999px",
+                          fontSize: "0.76rem",
+                          fontWeight: 700,
                           ...statusStyles[hubStatus.tone],
                         }}
                       >
@@ -2606,115 +3082,53 @@ function renderAptisAccessControl(u, compact = false) {
                     style={{
                       padding: "1rem 1.1rem 1.1rem",
                       display: "grid",
-                      gridTemplateColumns: isNarrow
-                        ? "1fr"
-                        : "minmax(220px, 1.05fr) minmax(280px, 1.15fr) minmax(280px, 1.15fr) minmax(220px, 0.9fr)",
-                      gap: "1rem",
+                      gridTemplateColumns: isNarrow ? "1fr" : adminUserGridColumns,
+                      gap: "0.8rem",
                     }}
                   >
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.7rem",
-                        padding: "0.85rem",
-                        borderRadius: "0.9rem",
-                        background: "rgba(2, 6, 23, 0.22)",
-                        border: "1px solid rgba(51, 65, 85, 0.7)",
-                      }}
-                    >
+                    <div className="admin-user-summary-card" style={adminUserCardStyle}>
                       <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                         Assignment
                       </div>
-                      <div>
-                        <div style={{ fontSize: "0.8rem", color: "#cbd5e1", marginBottom: "0.35rem" }}>
-                          Teacher
-                        </div>
-                        {renderTeacherControl(u)}
-                      </div>
-                      <div>
-                        <div style={{ fontSize: "0.8rem", color: "#cbd5e1", marginBottom: "0.35rem" }}>
-                          AI feedback
-                        </div>
-                        {renderWritingFeedbackCreditControl(u)}
-                      </div>
-                      <label
-                        style={{
-                          display: "inline-flex",
-                          gap: "0.55rem",
-                          alignItems: "center",
-                          fontSize: "0.88rem",
-                          color: "#dbe7ff",
-                        }}
-                      >
-                        <input
-                          type="checkbox"
-                          checked={hasPack(u)}
-                          onChange={(e) => setPackAccess(u.id, e.target.checked)}
-                        />
-                        Course pack access
-                      </label>
+                      {renderAssignmentSummary(u)}
                     </div>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.7rem",
-                        padding: "0.85rem",
-                        borderRadius: "0.9rem",
-                        background: "rgba(2, 6, 23, 0.22)",
-                        border: "1px solid rgba(51, 65, 85, 0.7)",
-                      }}
-                    >
+                    <div className="admin-user-summary-card" style={adminUserCardStyle}>
                       <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                         Aptis Trainer Access
                       </div>
-                      {renderAptisAccessControl(u)}
+                      {renderAccessSummary(u, "aptis")}
                     </div>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.7rem",
-                        padding: "0.85rem",
-                        borderRadius: "0.9rem",
-                        background: "rgba(2, 6, 23, 0.22)",
-                        border: "1px solid rgba(51, 65, 85, 0.7)",
-                      }}
-                    >
+                    <div className="admin-user-summary-card" style={adminUserCardStyle}>
+                      <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                        OTE Access
+                      </div>
+                      {renderOteAccessSummary(u)}
+                    </div>
+
+                    <div className="admin-user-summary-card" style={adminUserCardStyle}>
                       <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                         Seif Hub Access
                       </div>
-                      {renderHubAccessControl(u)}
+                      {renderAccessSummary(u, "hub")}
                     </div>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "0.75rem",
-                        padding: "0.85rem",
-                        borderRadius: "0.9rem",
-                        background: "rgba(2, 6, 23, 0.22)",
-                        border: "1px solid rgba(51, 65, 85, 0.7)",
-                      }}
-                    >
+                    <div className="admin-user-summary-card" style={{ ...adminUserCardStyle, gap: "0.7rem" }}>
                       <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                         Actions
                       </div>
                       <button
                         className="ghost-btn"
                         style={{
-                          fontSize: "0.85rem",
-                          padding: "0.45rem 0.75rem",
+                          width: "100%",
+                          fontSize: "0.82rem",
+                          padding: "0.38rem 0.65rem",
                           marginLeft: 0,
-                          alignSelf: "flex-start",
                         }}
                         onClick={() => goToProfile(u.id)}
                       >
-                        View profile
+                        Profile
                       </button>
                       {renderRoleButtons(u)}
                     </div>
@@ -2893,6 +3307,7 @@ function renderAptisAccessControl(u, compact = false) {
                   {(() => {
                     const aptisStatus = getAptisStatus(selectedAdminUser);
                     const hubStatus = getHubStatus(selectedAdminUser);
+                    const oteStatus = getOteStatus(selectedAdminUser);
                     return (
                       <>
                         <span
@@ -2926,6 +3341,17 @@ function renderAptisAccessControl(u, compact = false) {
                             borderRadius: "999px",
                             fontSize: "0.76rem",
                             fontWeight: 700,
+                            ...statusStyles[oteStatus.tone],
+                          }}
+                        >
+                          OTE: {oteStatus.label}
+                        </span>
+                        <span
+                          style={{
+                            padding: "0.34rem 0.7rem",
+                            borderRadius: "999px",
+                            fontSize: "0.76rem",
+                            fontWeight: 700,
                             ...statusStyles[hubStatus.tone],
                           }}
                         >
@@ -2940,58 +3366,48 @@ function renderAptisAccessControl(u, compact = false) {
                   style={{
                     padding: "1rem 1.1rem 1.1rem",
                     display: "grid",
-                    gridTemplateColumns: isNarrow
-                      ? "1fr"
-                      : "minmax(220px, 1.05fr) minmax(280px, 1.15fr) minmax(280px, 1.15fr) minmax(220px, 0.9fr)",
-                    gap: "1rem",
+                    gridTemplateColumns: isNarrow ? "1fr" : adminUserGridColumns,
+                    gap: "0.8rem",
                   }}
                 >
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem", padding: "0.85rem", borderRadius: "0.9rem", background: "rgba(2, 6, 23, 0.22)", border: "1px solid rgba(51, 65, 85, 0.7)" }}>
+                  <div style={adminUserCardStyle}>
                     <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                       Assignment
                     </div>
-                    <div>
-                      <div style={{ fontSize: "0.8rem", color: "#cbd5e1", marginBottom: "0.35rem" }}>Teacher</div>
-                      {renderTeacherControl(selectedAdminUser)}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: "0.8rem", color: "#cbd5e1", marginBottom: "0.35rem" }}>AI feedback</div>
-                      {renderWritingFeedbackCreditControl(selectedAdminUser)}
-                    </div>
-                    <label style={{ display: "inline-flex", gap: "0.55rem", alignItems: "center", fontSize: "0.88rem", color: "#dbe7ff" }}>
-                      <input
-                        type="checkbox"
-                        checked={hasPack(selectedAdminUser)}
-                        onChange={(event) => setPackAccess(selectedAdminUser.id, event.target.checked)}
-                      />
-                      Course pack access
-                    </label>
+                    {renderAssignmentSummary(selectedAdminUser)}
                   </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem", padding: "0.85rem", borderRadius: "0.9rem", background: "rgba(2, 6, 23, 0.22)", border: "1px solid rgba(51, 65, 85, 0.7)" }}>
+                  <div style={adminUserCardStyle}>
                     <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                       Aptis Trainer Access
                     </div>
-                    {renderAptisAccessControl(selectedAdminUser)}
+                    {renderAccessSummary(selectedAdminUser, "aptis")}
                   </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem", padding: "0.85rem", borderRadius: "0.9rem", background: "rgba(2, 6, 23, 0.22)", border: "1px solid rgba(51, 65, 85, 0.7)" }}>
+                  <div style={adminUserCardStyle}>
+                    <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                      OTE Access
+                    </div>
+                    {renderOteAccessSummary(selectedAdminUser)}
+                  </div>
+
+                  <div style={adminUserCardStyle}>
                     <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                       Seif Hub Access
                     </div>
-                    {renderHubAccessControl(selectedAdminUser)}
+                    {renderAccessSummary(selectedAdminUser, "hub")}
                   </div>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem", padding: "0.85rem", borderRadius: "0.9rem", background: "rgba(2, 6, 23, 0.22)", border: "1px solid rgba(51, 65, 85, 0.7)" }}>
+                  <div style={{ ...adminUserCardStyle, gap: "0.7rem" }}>
                     <div style={{ fontSize: "0.74rem", color: "#94a3b8", textTransform: "uppercase", letterSpacing: "0.04em" }}>
                       Actions
                     </div>
                     <button
                       className="ghost-btn"
-                      style={{ fontSize: "0.85rem", padding: "0.45rem 0.75rem", marginLeft: 0, alignSelf: "flex-start" }}
+                      style={{ width: "100%", fontSize: "0.82rem", padding: "0.38rem 0.65rem", marginLeft: 0 }}
                       onClick={() => goToProfile(selectedAdminUser.id)}
                     >
-                      View profile
+                      Profile
                     </button>
                     {renderRoleButtons(selectedAdminUser)}
                   </div>
@@ -3000,6 +3416,56 @@ function renderAptisAccessControl(u, compact = false) {
             )}
           </div>
         </div>
+      ) : null}
+
+      {activeAdminEditMeta ? (
+        <AdminEditModal
+          title={activeAdminEditMeta.editTitle}
+          user={activeAdminEditUser}
+          onClose={() => setActiveAdminEdit(null)}
+        >
+          {activeAdminEditUser ? (
+            <>
+              <div
+                style={{
+                  marginBottom: "1rem",
+                  padding: "0.85rem",
+                  borderRadius: "0.85rem",
+                  border: "1px solid rgba(51, 65, 85, 0.7)",
+                  background: "rgba(2, 6, 23, 0.22)",
+                }}
+              >
+                {renderAccessSummary(activeAdminEditUser, activeAdminEdit.section, { showEdit: false })}
+              </div>
+              {activeAdminEditMeta.control}
+            </>
+          ) : null}
+        </AdminEditModal>
+      ) : null}
+
+      {activeAdminEdit?.section === "assignment" ? (
+        <AdminEditModal
+          title="Edit assignment and credits"
+          user={activeAdminEditUser}
+          onClose={() => setActiveAdminEdit(null)}
+        >
+          {activeAdminEditUser ? (
+            <>
+              <div
+                style={{
+                  marginBottom: "1rem",
+                  padding: "0.85rem",
+                  borderRadius: "0.85rem",
+                  border: "1px solid rgba(51, 65, 85, 0.7)",
+                  background: "rgba(2, 6, 23, 0.22)",
+                }}
+              >
+                {renderAssignmentSummary(activeAdminEditUser, { showEdit: false })}
+              </div>
+              {renderAssignmentControl(activeAdminEditUser)}
+            </>
+          ) : null}
+        </AdminEditModal>
       ) : null}
 
       {selectedWritingGeneralSubmission ? (
