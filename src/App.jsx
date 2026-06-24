@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useState, useEffect, useMemo } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useMemo } from 'react'
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import {
   auth,
@@ -100,10 +100,43 @@ import CoursePackViewer from "./components/coursepack/CoursePackViewer";
 import PackKeyLanding from "./components/coursepack/PackKeyLanding";
 import CoreGrammarKey from "./components/coursepack/CoreGrammarKey";
 import { APTIS_DEMO_ACCESS, APTIS_DEMO_GRAMMAR_QUESTION_LIMIT } from "./demo/aptisDemoAccess.js";
+import { getAptisRouteSeo } from "./seo/aptisRouteSeo.js";
 
 const TEACHER_NOTIFICATION_LIMIT = 100;
 const TEACHER_BADGE_REFRESH_MS = 10 * 60 * 1000;
 const THEME_STORAGE_KEY = "aptis-theme";
+
+function AptisRouteSeoSync({ enabled }) {
+  const location = useLocation();
+
+  useLayoutEffect(() => {
+    if (!enabled) return;
+    const { title, description } = getAptisRouteSeo(location.pathname);
+    const url = `${window.location.origin}${location.pathname}`;
+    document.title = title;
+
+    let descriptionMeta = document.querySelector('meta[name="description"]');
+    if (!descriptionMeta) {
+      descriptionMeta = document.createElement("meta");
+      descriptionMeta.setAttribute("name", "description");
+      document.head.appendChild(descriptionMeta);
+    }
+    descriptionMeta.setAttribute("content", description);
+
+    let canonical = document.querySelector('link[rel="canonical"]');
+    if (!canonical) {
+      canonical = document.createElement("link");
+      canonical.setAttribute("rel", "canonical");
+      document.head.appendChild(canonical);
+    }
+    canonical.setAttribute("href", url);
+
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if (ogUrl) ogUrl.setAttribute("content", url);
+  }, [enabled, location.pathname]);
+
+  return null;
+}
 
 import CoreVocabularyKey from "./components/coursepack/CoreVocabularyKey";
 import ReadingPart1Key from "./components/coursepack/ReadingPart1Key";
@@ -1033,6 +1066,7 @@ const [runKey,  setRunKey]  = useState(0);
 return (
   // in src/App.jsx (inside your App component’s return)
   <div className={`App ${isWideLayout ? "App--full" : ""} ${(isOteExamRoute || isAptisGrammarVocabularyMockRoute) ? "App--exam" : ""}`} data-theme={theme}>
+    <AptisRouteSeoSync enabled={currentSite.id === "aptis-trainer"} />
     <ToastHost />
     {!isOteExamRoute && !isAptisGrammarVocabularyMockRoute && <CookieBanner />}
     <SupportMessageWidget

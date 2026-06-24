@@ -1,5 +1,11 @@
 // src/components/common/Seo.jsx
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
+
+function getCanonicalUrl(canonical) {
+  if (canonical) return canonical;
+  if (typeof window === "undefined") return "";
+  return `${window.location.origin}${window.location.pathname}`;
+}
 
 function upsertMeta(selector, attrs) {
   let el = document.querySelector(selector);
@@ -22,8 +28,8 @@ function upsertLink(rel, href) {
 }
 
 export default function Seo({ title, description, canonical }) {
-  useEffect(() => {
-    const url = canonical || window.location.href;
+  useLayoutEffect(() => {
+    const url = getCanonicalUrl(canonical);
 
     if (title) document.title = title;
 
