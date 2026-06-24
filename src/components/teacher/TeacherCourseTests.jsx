@@ -51,6 +51,10 @@ function toDateOrNull(value) {
   return Number.isNaN(date.getTime()) ? null : date;
 }
 
+function normalizeStudentIds(ids = []) {
+  return [...new Set((ids || []).map((entry) => String(entry || "").trim()).filter(Boolean))];
+}
+
 function normalizeReviewAnswer(value = "") {
   return String(value || "")
     .toLowerCase()
@@ -505,6 +509,9 @@ export default function TeacherCourseTests({ user }) {
   const [monitorAttempts, setMonitorAttempts] = useState([]);
   const [monitorLoading, setMonitorLoading] = useState(false);
   const [monitorNowMs, setMonitorNowMs] = useState(Date.now());
+  const [studentEditSession, setStudentEditSession] = useState(null);
+  const [studentEditIds, setStudentEditIds] = useState([]);
+  const [savingStudentEdit, setSavingStudentEdit] = useState(false);
 
   const selectedOwnerTeacher =
     teacherOptions.find((teacher) => teacher.id === ownerTeacherUid) ||
@@ -688,6 +695,12 @@ export default function TeacherCourseTests({ user }) {
     });
   };
 
+  const toggleStudentEditId = (studentId) => {
+    setStudentEditIds((prev) =>
+      prev.includes(studentId) ? prev.filter((entry) => entry !== studentId) : [...prev, studentId]
+    );
+  };
+
   const handleOwnerTeacherChange = (teacherUid) => {
     setOwnerTeacherUid(teacherUid);
     setSelectedStudentIds([]);
@@ -695,6 +708,17 @@ export default function TeacherCourseTests({ user }) {
     if (isAdmin && teacherUid !== user.uid) {
       setStudentScope("all");
     }
+  };
+
+  const openStudentEditSession = (session) => {
+    setStudentEditSession(session);
+    setStudentEditIds(Array.isArray(session.targetStudentIds) ? session.targetStudentIds : []);
+  };
+
+  const closeStudentEditSession = () => {
+    setStudentEditSession(null);
+    setStudentEditIds([]);
+    setSavingStudentEdit(false);
   };
 
   const resetForm = () => {
@@ -718,6 +742,31 @@ export default function TeacherCourseTests({ user }) {
   const listAttemptsForVisibleSession = async (sessionId) => {
     if (isAdmin) return listAttemptsForCourseTestSession(sessionId);
     return listAttemptsForMyCourseTestSession(sessionId);
+  };
+
+  const saveStudentEditSession = async () => {
+    if (!studentEditSession?.id) return;
+    if (!studentEditIds.length) {
+      toast("Choose at least one student for this session.");
+      return;
+    }
+
+    setSavingStudentEdit(true);
+    try {
+      const targetStudentIds = normalizeStudentIds(studentEditIds);
+      await updateCourseTestSession(studentEditSession.id, { targetStudentIds });
+      const refreshed = await refreshVisibleSessions();
+      setSessions(refreshed || []);
+      const refreshedSession = (refreshed || []).find((entry) => entry.id === studentEditSession.id);
+      setStudentEditSession(refreshedSession || { ...studentEditSession, targetStudentIds });
+      setStudentEditIds(targetStudentIds);
+      toast("Session students updated.");
+    } catch (error) {
+      console.error("[TeacherCourseTests] student edit failed", error);
+      toast("Could not update session students.");
+    } finally {
+      setSavingStudentEdit(false);
+    }
   };
 
   const handleSessionStageUpdate = async (sessionId, patch, message) => {
@@ -937,6 +986,30 @@ export default function TeacherCourseTests({ user }) {
       return totals;
     }, { notStarted: 0, mainPaper: 0, listening: 0, waiting: 0, finished: 0 });
   }, [monitorEntries]);
+  const studentEditRows = useMemo(() => {
+    const assignedIds = Array.isArray(studentEditSession?.targetStudentIds)
+      ? studentEditSession.targetStudentIds
+      : [];
+    const byId = new Map(students.map((student) => [student.id, student]));
+    assignedIds.forEach((studentId) => {
+      if (!byId.has(studentId)) {
+        byId.set(studentId, {
+          id: studentId,
+          displayName: studentId,
+          email: "",
+          className: "",
+          teacherLabel: "Previously assigned",
+        });
+      }
+    });
+
+    return Array.from(byId.values()).sort((a, b) => {
+      const aAssigned = studentEditIds.includes(a.id) ? 0 : 1;
+      const bAssigned = studentEditIds.includes(b.id) ? 0 : 1;
+      if (aAssigned !== bAssigned) return aAssigned - bAssigned;
+      return String(a.displayName || a.email || a.id).localeCompare(String(b.displayName || b.email || b.id));
+    });
+  }, [studentEditIds, studentEditSession, students]);
 
   useEffect(() => {
     if (!monitorSession) return undefined;
@@ -1308,6 +1381,9 @@ export default function TeacherCourseTests({ user }) {
                     <button type="button" className="ghost-btn" onClick={() => void openMonitorSession(session)}>
                       Live timings
                     </button>
+                    <button type="button" className="ghost-btn" onClick={() => openStudentEditSession(session)}>
+                      Edit students
+                    </button>
                     <button type="button" className="ghost-btn" onClick={() => openReviewSession(session)}>
                       Review submissions
                     </button>
@@ -1556,6 +1632,85 @@ export default function TeacherCourseTests({ user }) {
         </div>
       ) : null}
 
+      {studentEditSession ? (
+        <div className="teacher-course-review-overlay" onClick={closeStudentEditSession}>
+          <div className="teacher-course-student-edit-modal" onClick={(event) => event.stopPropagation()}>
+            <div className="teacher-course-review-head">
+              <div>
+                <h3>Edit assigned students</h3>
+                <p>
+                  {studentEditSession.templateTitle || "Course test session"} · {studentEditIds.length} selected
+                </p>
+              </div>
+              <button type="button" className="ghost-btn" onClick={closeStudentEditSession}>
+                Close
+              </button>
+            </div>
+
+            <div className="teacher-course-students">
+              <div className="teacher-course-students-head">
+                <div>
+                  <span className="panel-label">Students with access</span>
+                  <div className="muted small">
+                    Add or remove students from this existing session.
+                  </div>
+                </div>
+                <div className="teacher-course-actions">
+                  <button
+                    type="button"
+                    className="ghost-btn"
+                    onClick={() => setStudentEditIds(studentEditRows.map((student) => student.id))}
+                    disabled={!studentEditRows.length || savingStudentEdit}
+                  >
+                    Select all
+                  </button>
+                  <button
+                    type="button"
+                    className="ghost-btn"
+                    onClick={() => setStudentEditIds([])}
+                    disabled={savingStudentEdit}
+                  >
+                    Clear all
+                  </button>
+                </div>
+              </div>
+
+              <div className="teacher-course-student-list is-tall">
+                {studentEditRows.map((student) => (
+                  <label key={student.id} className="teacher-course-student-row">
+                    <input
+                      type="checkbox"
+                      checked={studentEditIds.includes(student.id)}
+                      onChange={() => toggleStudentEditId(student.id)}
+                    />
+                    <span>
+                      <strong>{student.displayName}</strong>
+                      <span className="muted small" style={{ display: "block" }}>
+                        {student.email || student.id}
+                        {student.className ? ` · ${student.className}` : ""}
+                        {isAdmin && student.teacherLabel ? ` · ${student.teacherLabel}` : ""}
+                      </span>
+                    </span>
+                  </label>
+                ))}
+                {!studentEditRows.length ? (
+                  <p className="muted small">No students are available to assign.</p>
+                ) : null}
+              </div>
+            </div>
+
+            <div className="teacher-course-actions">
+              <button type="button" className="btn" onClick={saveStudentEditSession} disabled={savingStudentEdit}>
+                {savingStudentEdit ? "Saving..." : "Save students"}
+              </button>
+              <button type="button" className="ghost-btn" onClick={closeStudentEditSession} disabled={savingStudentEdit}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       {previewTemplate ? (
         <div className="teacher-course-review-overlay" onClick={closePreviewTemplate}>
           <div className="teacher-course-preview-modal" onClick={(event) => event.stopPropagation()}>
@@ -1710,6 +1865,10 @@ export default function TeacherCourseTests({ user }) {
           gap: 0.45rem;
         }
 
+        .teacher-course-student-list.is-tall {
+          max-height: min(48vh, 520px);
+        }
+
         .teacher-course-student-row {
           display: flex;
           align-items: flex-start;
@@ -1798,6 +1957,18 @@ export default function TeacherCourseTests({ user }) {
 
         .teacher-course-preview-modal {
           width: min(1100px, 100%);
+          max-height: 88vh;
+          overflow: auto;
+          border-radius: 16px;
+          border: 1px solid rgba(60, 89, 150, 0.75);
+          background: rgba(11, 19, 42, 0.98);
+          padding: 1rem;
+          display: grid;
+          gap: 1rem;
+        }
+
+        .teacher-course-student-edit-modal {
+          width: min(760px, 100%);
           max-height: 88vh;
           overflow: auto;
           border-radius: 16px;

@@ -1122,6 +1122,29 @@ function getAccessStatus(access, offLabel) {
   return { label: "Active", tone: "success" };
 }
 
+function AccessDateInput({ value, disabled = false, onCommit, style }) {
+  const commitValue = (input) => {
+    onCommit(input.value);
+  };
+
+  return (
+    <input
+      key={value || "empty"}
+      type="date"
+      defaultValue={value || ""}
+      disabled={disabled}
+      onBlur={(event) => commitValue(event.currentTarget)}
+      onKeyDown={(event) => {
+        if (event.key === "Enter") {
+          commitValue(event.currentTarget);
+          event.currentTarget.blur();
+        }
+      }}
+      style={style}
+    />
+  );
+}
+
 function getHubStatus(u) {
   return getAccessStatus(getSeifHubAccessConfig(u), "Hub off");
 }
@@ -1152,10 +1175,6 @@ function renderSiteAccessControl({
     border: "1px solid #374151",
     backgroundColor: "#020617",
     color: "#e5e7eb",
-  };
-
-  const openDatePicker = (event) => {
-    event.target.showPicker?.();
   };
 
   return (
@@ -1195,25 +1214,19 @@ function renderSiteAccessControl({
       >
         <label style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize, opacity: 0.9 }}>
           <span>Start</span>
-          <input
-            type="date"
+          <AccessDateInput
             value={draft.startDate}
-            onChange={(e) => setDraft(u.id, { startDate: e.target.value })}
-            onFocus={openDatePicker}
-            onClick={openDatePicker}
+            onCommit={(value) => setDraft(u.id, { startDate: value })}
             style={inputStyle}
           />
         </label>
 
         <label style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize, opacity: draft.indefinite ? 0.5 : 0.9 }}>
           <span>End</span>
-          <input
-            type="date"
+          <AccessDateInput
             value={draft.endDate}
-            onChange={(e) => setDraft(u.id, { endDate: e.target.value })}
-            onFocus={openDatePicker}
-            onClick={openDatePicker}
             disabled={draft.indefinite}
+            onCommit={(value) => setDraft(u.id, { endDate: value })}
             style={inputStyle}
           />
         </label>
