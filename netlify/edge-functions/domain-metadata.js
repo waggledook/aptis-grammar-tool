@@ -2,7 +2,7 @@ const SITE_METADATA = {
   "aptis-trainer.beeskillsenglish.com": {
     title: "Seif Aptis Trainer | BeeSkills English",
     description:
-      "Interactive Aptis Trainer for Aptis General practice: grammar, speaking, writing, reading, listening, and vocabulary.",
+      "Interactive Aptis Trainer for Seif English Academy students preparing Aptis General: grammar, speaking, writing, reading, listening, and vocabulary.",
     canonical: "https://aptis-trainer.beeskillsenglish.com/",
     image: "https://aptis-trainer.beeskillsenglish.com/og-image.jpg",
     appName: "Seif Aptis Trainer | Seif English Academy",
@@ -10,7 +10,7 @@ const SITE_METADATA = {
   "seifhub.beeskillsenglish.com": {
     title: "Seif Hub | BeeSkills English",
     description:
-      "Private SeifHub course practice for BeeSkills English students: class activities, progress tests, vocabulary, grammar, listening, and course resources.",
+      "Private SeifHub course practice for Seif English Academy students: class activities, progress tests, vocabulary, grammar, listening, and course resources.",
     canonical: "https://seifhub.beeskillsenglish.com/",
     image: "https://seifhub.beeskillsenglish.com/og-image.jpg",
     appName: "Seif Hub | BeeSkills English",
@@ -18,7 +18,7 @@ const SITE_METADATA = {
   "ote-seif.beeskillsenglish.com": {
     title: "OTE Seif | BeeSkills English",
     description:
-      "OTE preparation app for BeeSkills English students with speaking, writing, register, and exam-style practice.",
+      "OTE preparation app for Seif English Academy students with speaking, writing, register, and exam-style practice.",
     canonical: "https://ote-seif.beeskillsenglish.com/",
     image: "https://ote-seif.beeskillsenglish.com/og-image.jpg",
     appName: "OTE Seif | BeeSkills English",
