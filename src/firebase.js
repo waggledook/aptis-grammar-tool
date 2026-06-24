@@ -4683,6 +4683,9 @@ export async function createCourseTestSession({
   templateTitle,
   level,
   testKind,
+  teacherUid = "",
+  teacherEmail = null,
+  teacherName = null,
   className = "",
   notes = "",
   targetStudentIds = [],
@@ -4714,9 +4717,12 @@ export async function createCourseTestSession({
     templateTitle,
     level: level || null,
     testKind: testKind || null,
-    teacherUid: user.uid,
-    teacherEmail: user.email || null,
-    teacherName: user.displayName || null,
+    teacherUid: teacherUid || user.uid,
+    teacherEmail: teacherEmail || user.email || null,
+    teacherName: teacherName || user.displayName || null,
+    createdByUid: user.uid,
+    createdByEmail: user.email || null,
+    createdByName: user.displayName || null,
     className: String(className || "").trim(),
     notes: String(notes || "").trim(),
     targetStudentIds: normalizedStudents,
@@ -4738,6 +4744,13 @@ export async function createCourseTestSession({
 
 export async function listMyCourseTestSessions() {
   const uid = auth.currentUser?.uid;
+  if (!uid) return [];
+
+  return listCourseTestSessionsForTeacher(uid);
+}
+
+export async function listCourseTestSessionsForTeacher(teacherUid) {
+  const uid = teacherUid || auth.currentUser?.uid;
   if (!uid) return [];
 
   const q = query(collection(db, "courseTestSessions"), where("teacherUid", "==", uid));

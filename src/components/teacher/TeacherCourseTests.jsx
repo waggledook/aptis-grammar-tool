@@ -5,7 +5,9 @@ import {
   db,
   createCourseTestSession,
   deleteCourseTestSession,
+  listAttemptsForCourseTestSession,
   listAttemptsForMyCourseTestSession,
+  listCourseTestSessionsForTeacher,
   listMyCourseTestSessions,
   saveCourseTestAttemptReview,
   updateCourseTestSession,
@@ -480,6 +482,8 @@ export default function TeacherCourseTests({ user }) {
   const [saving, setSaving] = useState(false);
   const [deletingSessionId, setDeletingSessionId] = useState("");
   const [studentScope, setStudentScope] = useState("my");
+  const [teacherOptions, setTeacherOptions] = useState([]);
+  const [ownerTeacherUid, setOwnerTeacherUid] = useState(user?.uid || "");
 
   const [templateId, setTemplateId] = useState(templates[0]?.id || "");
   const [sessionTitle, setSessionTitle] = useState("");
@@ -502,6 +506,10 @@ export default function TeacherCourseTests({ user }) {
   const [monitorLoading, setMonitorLoading] = useState(false);
   const [monitorNowMs, setMonitorNowMs] = useState(Date.now());
 
+  const selectedOwnerTeacher =
+    teacherOptions.find((teacher) => teacher.id === ownerTeacherUid) ||
+    { id: user.uid, email: user.email || "", displayName: user.displayName || user.name || user.email || user.uid };
+
   useEffect(() => {
     let alive = true;
 
@@ -510,17 +518,30 @@ export default function TeacherCourseTests({ user }) {
       try {
         let studentRows = [];
         let sessionRows = [];
+        let teacherRows = [];
+        let allUsers = [];
+
+        if (isAdmin) {
+          const allUsersSnap = await getDocs(collection(db, "users"));
+          if (!alive) return;
+
+          allUsers = allUsersSnap.docs.map((entry) => ({ id: entry.id, ...(entry.data() || {}) }));
+          teacherRows = allUsers
+            .filter((entry) => entry.role === "teacher" || entry.role === "admin")
+            .map((entry) => ({
+              id: entry.id,
+              email: entry.email || "",
+              displayName: entry.displayName || entry.name || entry.username || entry.email || entry.id,
+              role: entry.role || "",
+            }))
+            .sort((a, b) => a.displayName.localeCompare(b.displayName));
+        }
 
         if (isAdmin && studentScope === "all") {
-          const [allUsersSnap, sessionResults] = await Promise.all([
-            getDocs(collection(db, "users")),
-            listMyCourseTestSessions(),
-          ]);
+          const sessionResults = await listCourseTestSessionsForTeacher(ownerTeacherUid || user.uid);
 
           if (!alive) return;
 
-          const allUsers = allUsersSnap.docs.map((entry) => ({ id: entry.id, ...(entry.data() || {}) }));
-          const teacherRows = allUsers.filter((entry) => entry.role === "teacher" || entry.role === "admin");
           const rosterSnaps = await Promise.all(
             teacherRows.map((teacher) => getDocs(collection(db, "users", teacher.id, "studentRoster")))
           );
@@ -536,7 +557,7 @@ export default function TeacherCourseTests({ user }) {
                 rosterMeta[entry.id] = {
                   ...meta,
                   rosterTeacherUid: teacher.id,
-                  rosterTeacherName: teacher.displayName || teacher.name || teacher.email || teacher.id,
+                  rosterTeacherName: teacher.displayName || teacher.email || teacher.id,
                 };
               }
             });
@@ -562,7 +583,9 @@ export default function TeacherCourseTests({ user }) {
           const [studentSnap, rosterSnap, sessionResults] = await Promise.all([
             getDocs(studentQuery),
             getDocs(collection(db, "users", user.uid, "studentRoster")),
-            listMyCourseTestSessions(),
+            isAdmin && ownerTeacherUid && ownerTeacherUid !== user.uid
+              ? listCourseTestSessionsForTeacher(ownerTeacherUid)
+              : listMyCourseTestSessions(),
           ]);
 
           if (!alive) return;
@@ -589,6 +612,29 @@ export default function TeacherCourseTests({ user }) {
           sessionRows = sessionResults || [];
         }
 
+        if (isAdmin) {
+          const fallbackAdminOption = {
+            id: user.uid,
+            email: user.email || "",
+            displayName: user.displayName || user.name || user.email || user.uid,
+            role: user.role || "admin",
+          };
+          const nextTeacherOptions = teacherRows.length ? teacherRows : [fallbackAdminOption];
+          setTeacherOptions(nextTeacherOptions);
+          if (!nextTeacherOptions.some((teacher) => teacher.id === ownerTeacherUid)) {
+            setOwnerTeacherUid(user.uid);
+          }
+        } else {
+          setTeacherOptions([
+            {
+              id: user.uid,
+              email: user.email || "",
+              displayName: user.displayName || user.name || user.email || user.uid,
+              role: user.role || "teacher",
+            },
+          ]);
+          setOwnerTeacherUid(user.uid);
+        }
         setStudents(studentRows);
         setSessions(sessionRows || []);
       } catch (error) {
@@ -603,7 +649,7 @@ export default function TeacherCourseTests({ user }) {
     return () => {
       alive = false;
     };
-  }, [isAdmin, studentScope, user.displayName, user.email, user.uid]);
+  }, [isAdmin, ownerTeacherUid, studentScope, user.displayName, user.email, user.name, user.role, user.uid]);
 
   const classOptions = useMemo(() => {
     return [...new Set(students.map((student) => student.className).filter(Boolean))].sort((a, b) =>
@@ -642,6 +688,15 @@ export default function TeacherCourseTests({ user }) {
     });
   };
 
+  const handleOwnerTeacherChange = (teacherUid) => {
+    setOwnerTeacherUid(teacherUid);
+    setSelectedStudentIds([]);
+    setClassFilter("all");
+    if (isAdmin && teacherUid !== user.uid) {
+      setStudentScope("all");
+    }
+  };
+
   const resetForm = () => {
     setSessionTitle("");
     setClassFilter("all");
@@ -653,10 +708,22 @@ export default function TeacherCourseTests({ user }) {
     setControlMode("teacher-controlled");
   };
 
+  const refreshVisibleSessions = async () => {
+    if (isAdmin && ownerTeacherUid && ownerTeacherUid !== user.uid) {
+      return listCourseTestSessionsForTeacher(ownerTeacherUid);
+    }
+    return listMyCourseTestSessions();
+  };
+
+  const listAttemptsForVisibleSession = async (sessionId) => {
+    if (isAdmin) return listAttemptsForCourseTestSession(sessionId);
+    return listAttemptsForMyCourseTestSession(sessionId);
+  };
+
   const handleSessionStageUpdate = async (sessionId, patch, message) => {
     try {
       await updateCourseTestSession(sessionId, patch);
-      const refreshed = await listMyCourseTestSessions();
+      const refreshed = await refreshVisibleSessions();
       setSessions(refreshed || []);
       toast(message);
     } catch (error) {
@@ -671,7 +738,7 @@ export default function TeacherCourseTests({ user }) {
     setReviewScores({});
     setReviewAttemptsLoading(true);
     try {
-      const rows = await listAttemptsForMyCourseTestSession(session.id);
+      const rows = await listAttemptsForVisibleSession(session.id);
       setReviewAttempts(rows || []);
     } catch (error) {
       console.error("[TeacherCourseTests] review load failed", error);
@@ -716,6 +783,9 @@ export default function TeacherCourseTests({ user }) {
         templateTitle: sessionTitle.trim() || selectedTemplate.title,
         level: selectedTemplate.level,
         testKind: selectedTemplate.testKind,
+        teacherUid: selectedOwnerTeacher.id,
+        teacherEmail: selectedOwnerTeacher.email || null,
+        teacherName: selectedOwnerTeacher.displayName || selectedOwnerTeacher.email || null,
         className: classFilter !== "all" && classFilter !== "__unlabelled__" ? classFilter : "",
         notes,
         targetStudentIds: selectedStudentIds,
@@ -727,7 +797,7 @@ export default function TeacherCourseTests({ user }) {
         controlMode,
       });
 
-      const refreshed = await listMyCourseTestSessions();
+      const refreshed = await refreshVisibleSessions();
       setSessions(refreshed || []);
       resetForm();
 
@@ -755,7 +825,7 @@ export default function TeacherCourseTests({ user }) {
     setDeletingSessionId(session.id);
     try {
       await deleteCourseTestSession(session.id);
-      const refreshed = await listMyCourseTestSessions();
+      const refreshed = await refreshVisibleSessions();
       setSessions(refreshed || []);
       if (reviewSession?.id === session.id) {
         closeReviewSession();
@@ -773,7 +843,7 @@ export default function TeacherCourseTests({ user }) {
     if (!session?.id) return;
     setMonitorLoading(true);
     try {
-      const rows = await listAttemptsForMyCourseTestSession(session.id);
+      const rows = await listAttemptsForVisibleSession(session.id);
       setMonitorAttempts(rows || []);
     } catch (error) {
       console.error("[TeacherCourseTests] monitor load failed", error);
@@ -897,7 +967,7 @@ export default function TeacherCourseTests({ user }) {
         reviewedByName: user.displayName || user.email || "Teacher",
       });
 
-      const refreshed = await listAttemptsForMyCourseTestSession(reviewSession.id);
+      const refreshed = await listAttemptsForVisibleSession(reviewSession.id);
       setReviewAttempts(refreshed || []);
       const updatedAttempt = (refreshed || []).find((entry) => entry.id === selectedAttempt.id) || null;
       setSelectedAttempt(updatedAttempt);
@@ -941,6 +1011,27 @@ export default function TeacherCourseTests({ user }) {
                 placeholder={selectedTemplate?.title || "Session title"}
               />
             </label>
+
+            {isAdmin ? (
+              <label>
+                <span className="panel-label">Owner teacher</span>
+                <select
+                  className="input"
+                  value={ownerTeacherUid || user.uid}
+                  onChange={(e) => handleOwnerTeacherChange(e.target.value)}
+                >
+                  {teacherOptions.map((teacher) => (
+                    <option key={teacher.id} value={teacher.id}>
+                      {teacher.displayName || teacher.email || teacher.id}
+                      {teacher.role === "admin" ? " (admin)" : ""}
+                    </option>
+                  ))}
+                </select>
+                <div className="muted small" style={{ marginTop: "0.35rem" }}>
+                  Sessions created here appear under this teacher’s account and use their name for students.
+                </div>
+              </label>
+            ) : null}
 
             <div className="teacher-course-row">
               {isAdmin ? (
@@ -1073,7 +1164,11 @@ export default function TeacherCourseTests({ user }) {
         </div>
 
         <div className="teacher-course-panel">
-          <h3 className="sec-title" style={{ marginTop: 0 }}>My course test sessions</h3>
+          <h3 className="sec-title" style={{ marginTop: 0 }}>
+            {isAdmin && selectedOwnerTeacher.id !== user.uid
+              ? `${selectedOwnerTeacher.displayName || selectedOwnerTeacher.email || "Teacher"}'s course test sessions`
+              : "My course test sessions"}
+          </h3>
           <p className="muted small" style={{ marginTop: 0 }}>
             Fixed Oxford-based test sessions you’ve already set up for students.
           </p>
@@ -1112,6 +1207,23 @@ export default function TeacherCourseTests({ user }) {
                       <p>{session.accessPin || "—"}</p>
                     </div>
                   </div>
+
+                  {isAdmin ? (
+                    <div className="teacher-course-session-meta">
+                      <div>
+                        <span className="panel-label">Owner teacher</span>
+                        <p>{session.teacherName || session.teacherEmail || session.teacherUid || "—"}</p>
+                      </div>
+                      <div>
+                        <span className="panel-label">Created by</span>
+                        <p>{session.createdByName || session.createdByEmail || session.createdByUid || "—"}</p>
+                      </div>
+                      <div>
+                        <span className="panel-label">Teacher ID</span>
+                        <p>{session.teacherUid || "—"}</p>
+                      </div>
+                    </div>
+                  ) : null}
 
                   <div className="teacher-course-session-meta">
                     <div>
