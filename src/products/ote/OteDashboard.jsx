@@ -48,9 +48,9 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
 
       {isAdvanced ? (
         <div className="menu-grid" aria-label="Advanced OTE sections">
-          <button className="menu-card" type="button" disabled>
+          <button className="menu-card" type="button" onClick={() => navigate(speakingPath)}>
             <h3>Advanced Speaking</h3>
-            <p>Placeholder for higher-level OTE speaking strategy, feedback loops, and exam drills.</p>
+            <p>Open the advanced speaking workspace, including the five-part placeholder mock.</p>
           </button>
 
           <button className="menu-card" type="button" disabled>

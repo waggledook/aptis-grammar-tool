@@ -7,8 +7,10 @@ import "./styles/ote.css";
 export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn, nativeRoutes = false }) {
   const navigate = useNavigate();
   const isSpeaking = skill === "speaking";
+  const isAdvanced = user?.oteVersion === "advanced";
   const homePath = getSitePath(nativeRoutes ? "/" : "/ote");
-  const speakingMockPath = getSitePath(nativeRoutes ? "/mock-tests/speaking-1" : "/ote/mock-tests/speaking-1");
+  const speakingMockId = isAdvanced ? "speaking-advanced-1" : "speaking-1";
+  const speakingMockPath = getSitePath(nativeRoutes ? `/mock-tests/${speakingMockId}` : `/ote/mock-tests/${speakingMockId}`);
   const interviewTrainingPath = getSitePath(nativeRoutes ? "/speaking/part-1-interview" : "/ote/speaking/part-1-interview");
   const voicemailTrainingPath = getSitePath(nativeRoutes ? "/speaking/part-2-voicemails" : "/ote/speaking/part-2-voicemails");
   const talkTrainingPath = getSitePath(nativeRoutes ? "/speaking/parts-3-4" : "/ote/speaking/parts-3-4");
@@ -57,10 +59,12 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
           <span className="whats-new-label">Available now</span>
-          <h3>{isSpeaking ? "Speaking Mock 1" : "Writing mocks"}</h3>
+          <h3>{isSpeaking ? (isAdvanced ? "Advanced Speaking Mock 1" : "Speaking Mock 1") : "Writing mocks"}</h3>
           <p>
             {isSpeaking
-              ? "A full four-part OTE-style speaking mock with automatic timing and recordings."
+              ? isAdvanced
+                ? "A five-part OTE Advanced speaking mock shell with interview, diplomatic voicemail, summary, debate, and follow-up sections."
+                : "A full four-part OTE-style speaking mock with automatic timing and recordings."
               : "Choose from the available two-part OTE-style writing mocks with separate task timers, a choice screen, and live word counts."}
           </p>
         </div>
@@ -73,20 +77,32 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
         {isSpeaking ? (
           <>
             <button className="menu-card" type="button" onClick={openSpeakingMock}>
-              <h3>Speaking Mock 1</h3>
-              <p>Run the full speaking module in a locked exam-style environment.</p>
+              <h3>{isAdvanced ? "Advanced Speaking Mock 1" : "Speaking Mock 1"}</h3>
+              <p>
+                {isAdvanced
+                  ? "Run the five-part advanced speaking module with placeholder tasks and timed recordings."
+                  : "Run the full speaking module in a locked exam-style environment."}
+              </p>
             </button>
             <button className="menu-card" type="button" onClick={() => navigate(interviewTrainingPath)}>
               <h3>Part 1 Interview Training</h3>
               <p>Learn the interview format, timing, scoring rules, and check your understanding.</p>
             </button>
             <button className="menu-card" type="button" onClick={() => navigate(voicemailTrainingPath)}>
-              <h3>Part 2 Voicemail Training</h3>
-              <p>Learn the format, compare formal and friendly messages, then check your understanding.</p>
+              <h3>{isAdvanced ? "Part 2 Diplomatic Voicemail" : "Part 2 Voicemail Training"}</h3>
+              <p>
+                {isAdvanced
+                  ? "Placeholder area for diplomatic transaction and disagreement practice."
+                  : "Learn the format, compare formal and friendly messages, then check your understanding."}
+              </p>
             </button>
             <button className="menu-card" type="button" onClick={() => navigate(talkTrainingPath)}>
-              <h3>Parts 3 and 4 Talk Training</h3>
-              <p>Open the long-talk training menu, then choose a guide, guided activity, or timed practice.</p>
+              <h3>{isAdvanced ? "Summary and Debate Training" : "Parts 3 and 4 Talk Training"}</h3>
+              <p>
+                {isAdvanced
+                  ? "Placeholder area for integrated summaries, debate planning, and follow-up question strategy."
+                  : "Open the long-talk training menu, then choose a guide, guided activity, or timed practice."}
+              </p>
             </button>
           </>
         ) : (

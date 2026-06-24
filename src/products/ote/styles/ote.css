@@ -2613,6 +2613,81 @@
   margin: 0.65rem 0;
 }
 
+.ote-notes-panel {
+  position: fixed;
+  left: clamp(16px, 3vw, 32px);
+  top: clamp(128px, 22vh, 260px);
+  z-index: 35;
+  width: min(420px, calc(100vw - 32px));
+  height: min(520px, calc(100vh - 180px));
+  min-height: 320px;
+  border: 2px solid #111;
+  border-radius: 8px;
+  background: #f7f7f7;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+}
+
+.ote-notes-header {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  align-items: center;
+  position: relative;
+  height: 42px;
+  padding: 0.45rem 2.6rem;
+  border-bottom: 1px solid #d5d5d5;
+  background: #fff;
+  color: #333;
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.ote-notes-header button {
+  position: absolute;
+  right: 0.6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  min-width: auto;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #4778b0;
+  font-size: 2rem;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.ote-notes-paper {
+  height: calc(100% - 42px);
+  padding: 1rem;
+  background: #f4f4f4;
+}
+
+.ote-notes-panel textarea {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 1px solid #d6d6d6;
+  border-radius: 5px;
+  resize: vertical;
+  background:
+    linear-gradient(#d9d9d9 0 2px, transparent 2px) top 18px left 14px / calc(100% - 28px) 2px no-repeat,
+    #fff;
+  color: #333;
+  font: inherit;
+  line-height: 1.45;
+  padding: 3rem 1.6rem 1.2rem;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.02);
+}
+
+.ote-notes-panel textarea::placeholder {
+  color: #777;
+}
+
 .ote-incoming-script {
   margin: 1rem 0;
   padding: 0.9rem 1rem;
@@ -2774,6 +2849,128 @@
   font-size: 1.02rem;
 }
 
+.ote-debate-map {
+  grid-column: 1 / -1;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(190px, 0.96fr) minmax(230px, 1.08fr) minmax(190px, 0.96fr);
+  grid-template-areas:
+    "instructions instructions instructions"
+    ". idea2 ."
+    "idea1 center idea3"
+    "idea4 center idea5";
+  gap: 1.15rem 2.4rem;
+  align-items: center;
+  margin-top: 0.25rem;
+  padding: 2rem;
+  border: 1px solid var(--ote-exam-line);
+  background: var(--ote-exam-panel);
+  overflow: hidden;
+}
+
+.ote-debate-map-instructions {
+  grid-area: instructions;
+  color: #333;
+  font-size: 1.05rem;
+  line-height: 1.35;
+  z-index: 1;
+}
+
+.ote-debate-map-instructions p {
+  margin: 0 0 0.45rem;
+}
+
+.ote-debate-map-instructions ul {
+  margin: 0 0 0.75rem;
+  padding-left: 1.35rem;
+}
+
+.ote-debate-map-instructions li {
+  margin: 0.15rem 0;
+}
+
+.ote-debate-center,
+.ote-debate-idea {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 78px;
+  padding: 0.8rem 1rem;
+  border: 2px solid #45c6bd;
+  border-radius: 5px;
+  color: #333;
+  text-align: center;
+  font-size: 1.08rem;
+  font-weight: 800;
+  line-height: 1.25;
+  z-index: 1;
+}
+
+.ote-debate-center {
+  grid-area: center;
+  min-height: 116px;
+  background: #9bded8;
+}
+
+.ote-debate-idea {
+  background: #fff;
+}
+
+.ote-debate-idea::before,
+.ote-debate-idea::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  background: #45c6bd;
+  pointer-events: none;
+}
+
+.ote-debate-idea.idea-1 { grid-area: idea1; }
+.ote-debate-idea.idea-2 { grid-area: idea2; }
+.ote-debate-idea.idea-3 { grid-area: idea3; }
+.ote-debate-idea.idea-4 { grid-area: idea4; }
+.ote-debate-idea.idea-5 { grid-area: idea5; }
+
+.ote-debate-idea.idea-1::before,
+.ote-debate-idea.idea-3::before {
+  top: 50%;
+  width: 2.7rem;
+  height: 2px;
+}
+
+.ote-debate-idea.idea-1::before {
+  right: -2.7rem;
+  transform-origin: right center;
+  transform: rotate(45deg);
+}
+
+.ote-debate-idea.idea-3::before {
+  left: -2.7rem;
+  transform-origin: left center;
+  transform: rotate(-45deg);
+}
+
+.ote-debate-idea.idea-2::before {
+  left: 50%;
+  bottom: -1.45rem;
+  width: 2px;
+  height: 1.45rem;
+}
+
+.ote-debate-idea.idea-4::before {
+  top: 50%;
+  right: -2.4rem;
+  width: 2.4rem;
+  height: 2px;
+}
+
+.ote-debate-idea.idea-5::before {
+  top: 50%;
+  left: -2.4rem;
+  width: 2.4rem;
+  height: 2px;
+}
+
 .ote-recording-progress {
   grid-column: 1 / -1;
   color: #667085;
@@ -2812,6 +3009,10 @@
 .ote-exam-footer button:disabled {
   opacity: 0.52;
   cursor: not-allowed;
+}
+
+.ote-exam-footer .ote-notes-btn {
+  min-width: 96px;
 }
 
 .ote-exam-footer .ote-footer-next {
@@ -5068,8 +5269,40 @@
     padding: 1.5rem 1rem 6rem;
   }
 
+  .ote-notes-panel {
+    left: 1rem;
+    right: 1rem;
+    top: 96px;
+    width: auto;
+    height: min(440px, calc(100vh - 170px));
+  }
+
   .ote-image-grid {
     padding: 1rem 0 0;
+  }
+
+  .ote-debate-map {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "instructions"
+      "center"
+      "idea1"
+      "idea2"
+      "idea3"
+      "idea4"
+      "idea5";
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+
+  .ote-debate-center,
+  .ote-debate-idea {
+    min-height: 64px;
+  }
+
+  .ote-debate-idea::before,
+  .ote-debate-idea::after {
+    display: none;
   }
 
   .ote-recording-card {

@@ -96,7 +96,7 @@ export default function ListeningMenu({ user, aptisAccess, onSignIn }) {
       <style>{`
   .header { margin-bottom: 1rem; }
   .title { font-size: 1.6rem; margin-bottom: .3rem; }
-  .intro { color: #a9b7d1; max-width: 600px; }
+  .intro { color: var(--color-text-soft); max-width: 600px; }
 
   .listening-access-prompt {
     margin: 0 0 1rem;
@@ -141,7 +141,7 @@ export default function ListeningMenu({ user, aptisAccess, onSignIn }) {
     flex-wrap:wrap;
     gap:.4rem;
   }
-  .card p { margin:0; color:#cfd9f3; font-size:.9rem; line-height:1.4; }
+  .card p { margin:0; color: var(--color-text-soft); font-size:.9rem; line-height:1.4; }
 
   .listening-access-pill {
     display: inline-flex;

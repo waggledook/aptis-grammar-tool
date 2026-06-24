@@ -49,71 +49,144 @@ function buildSteps(mock) {
   const part2 = mock.parts.find((part) => part.id === "part-2");
   const part3 = mock.parts.find((part) => part.id === "part-3");
   const part4 = mock.parts.find((part) => part.id === "part-4");
+  const part5 = mock.parts.find((part) => part.id === "part-5");
 
-  return [
+  const steps = [
     { kind: "module-countdown", id: "module-start", seconds: 10 },
-    { kind: "part-card", id: "part-1-card", part: part1, seconds: 2 },
-    ...(part1.instructionAudioSrc
-      ? [{ kind: "part-instructions", id: "part-1-instructions", part: part1, audioSrc: part1.instructionAudioSrc }]
-      : []),
-    ...part1.questions.map((question, index) => ({
-      kind: "listen-record",
-      id: question.id,
-      part: part1,
-      progressIndex: index + 1,
-      progressTotal: part1.questions.length,
-      prompt: question.prompt,
-      audioSrc: question.audioSrc,
-      label: `Question ${index + 1} of ${part1.questions.length}`,
-      responseSeconds: question.responseSeconds,
-    })),
-    { kind: "part-card", id: "part-2-card", part: part2, seconds: 2 },
-    ...(part2.instructionAudioSrc
-      ? [{ kind: "part-instructions", id: "part-2-instructions", part: part2, audioSrc: part2.instructionAudioSrc }]
-      : []),
-    ...part2.tasks.map((task, index) => ({
-      kind: "prep-record",
-      id: task.id,
-      part: part2,
-      progressIndex: index + 1,
-      progressTotal: part2.tasks.length,
-      task,
-      label: `Voice message ${index + 1} of ${part2.tasks.length}`,
-      prepSeconds: task.prepSeconds,
-      responseSeconds: task.responseSeconds,
-    })),
-    { kind: "part-card", id: "part-3-card", part: part3, seconds: 2 },
-    ...(part3.instructionAudioSrc
-      ? [{ kind: "part-instructions", id: "part-3-instructions", part: part3, audioSrc: part3.instructionAudioSrc }]
-      : []),
-    {
-      kind: "talk-grid",
-      id: part3.task.id,
-      part: part3,
-      progressIndex: 1,
-      progressTotal: 1,
-      task: part3.task,
-      label: "Talk",
-      prepSeconds: part3.task.prepSeconds,
-      responseSeconds: part3.task.responseSeconds,
-    },
-    { kind: "part-card", id: "part-4-card", part: part4, seconds: 2 },
-    ...(part4.instructionAudioSrc
-      ? [{ kind: "part-instructions", id: "part-4-instructions", part: part4, audioSrc: part4.instructionAudioSrc }]
-      : []),
-    ...part4.questions.map((question, index) => ({
-      kind: "listen-record",
-      id: question.id,
-      part: part4,
-      progressIndex: index + 1,
-      progressTotal: part4.questions.length,
-      topic: part4.topic,
-      prompt: question.prompt,
-      audioSrc: question.audioSrc,
-      label: `Question ${index + 1} of ${part4.questions.length}`,
-      responseSeconds: question.responseSeconds,
-    })),
   ];
+
+  if (part1) {
+    steps.push(
+      { kind: "part-card", id: "part-1-card", part: part1, seconds: 2 },
+      ...(part1.instructionAudioSrc
+        ? [{ kind: "part-instructions", id: "part-1-instructions", part: part1, audioSrc: part1.instructionAudioSrc }]
+        : []),
+      ...part1.questions.map((question, index) => ({
+        kind: "listen-record",
+        id: question.id,
+        part: part1,
+        progressIndex: index + 1,
+        progressTotal: part1.questions.length,
+        prompt: question.prompt,
+        audioSrc: question.audioSrc,
+        label: `Question ${index + 1} of ${part1.questions.length}`,
+        responseSeconds: question.responseSeconds,
+      }))
+    );
+  }
+
+  if (part2) {
+    steps.push(
+      { kind: "part-card", id: "part-2-card", part: part2, seconds: 2 },
+      ...(part2.instructionAudioSrc
+        ? [{
+            kind: "part-instructions",
+            id: "part-2-instructions",
+            part: part2,
+            audioSrc: part2.instructionAudioSrc,
+            task: part2.showTaskDuringInstructions ? part2.tasks[0] : null,
+          }]
+        : []),
+      ...part2.tasks.map((task, index) => ({
+        kind: "prep-record",
+        id: task.id,
+        part: part2,
+        progressIndex: index + 1,
+        progressTotal: part2.tasks.length,
+        task,
+        label: task.title || `Voice message ${index + 1} of ${part2.tasks.length}`,
+        prepSeconds: task.prepSeconds,
+        responseSeconds: task.responseSeconds,
+      }))
+    );
+  }
+
+  if (part3?.task) {
+    steps.push(
+      { kind: "part-card", id: "part-3-card", part: part3, seconds: 2 },
+      ...(part3.instructionAudioSrc
+        ? [{
+            kind: "part-instructions",
+            id: "part-3-instructions",
+            part: part3,
+            audioSrc: part3.instructionAudioSrc,
+            task: part3.task.visualType === "summary" ? part3.task : null,
+          }]
+        : []),
+      {
+        kind: part3.task.visualType === "summary" ? "summary-task" : "talk-grid",
+        id: part3.task.id,
+        part: part3,
+        progressIndex: 1,
+        progressTotal: 1,
+        task: part3.task,
+        label: part3.task.title || "Task",
+        prepSeconds: part3.task.prepSeconds,
+        responseSeconds: part3.task.responseSeconds,
+      }
+    );
+  }
+
+  if (part4?.task) {
+    steps.push(
+      { kind: "part-card", id: "part-4-card", part: part4, seconds: 2 },
+      ...(part4.instructionAudioSrc
+        ? [{ kind: "part-instructions", id: "part-4-instructions", part: part4, audioSrc: part4.instructionAudioSrc }]
+        : []),
+      {
+        kind: part4.task.visualType === "debate" ? "debate-task" : "prep-record",
+        id: part4.task.id,
+        part: part4,
+        progressIndex: 1,
+        progressTotal: 1,
+        task: part4.task,
+        label: part4.task.title || "Task",
+        prepSeconds: part4.task.prepSeconds,
+        responseSeconds: part4.task.responseSeconds,
+      }
+    );
+  } else if (part4?.questions?.length) {
+    steps.push(
+      { kind: "part-card", id: "part-4-card", part: part4, seconds: 2 },
+      ...(part4.instructionAudioSrc
+        ? [{ kind: "part-instructions", id: "part-4-instructions", part: part4, audioSrc: part4.instructionAudioSrc }]
+        : []),
+      ...part4.questions.map((question, index) => ({
+        kind: "listen-record",
+        id: question.id,
+        part: part4,
+        progressIndex: index + 1,
+        progressTotal: part4.questions.length,
+        topic: part4.topic,
+        prompt: question.prompt,
+        audioSrc: question.audioSrc,
+        label: `Question ${index + 1} of ${part4.questions.length}`,
+        responseSeconds: question.responseSeconds,
+      }))
+    );
+  }
+
+  if (part5?.questions?.length) {
+    steps.push(
+      { kind: "part-card", id: "part-5-card", part: part5, seconds: 2 },
+      ...(part5.instructionAudioSrc
+        ? [{ kind: "part-instructions", id: "part-5-instructions", part: part5, audioSrc: part5.instructionAudioSrc }]
+        : []),
+      ...part5.questions.map((question, index) => ({
+        kind: "listen-record",
+        id: question.id,
+        part: part5,
+        progressIndex: index + 1,
+        progressTotal: part5.questions.length,
+        prompt: question.prompt,
+        audioSrc: question.audioSrc,
+        label: `Question ${index + 1} of ${part5.questions.length}`,
+        responseSeconds: question.responseSeconds,
+      }))
+    );
+  }
+
+  return steps;
 }
 
 export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRoutes = false }) {
@@ -122,7 +195,7 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
   const mock = getOteSpeakingMock(mockId);
   const steps = useMemo(() => buildSteps(mock), [mock]);
   const totalRecordingSteps = useMemo(
-    () => steps.filter((step) => ["listen-record", "prep-record", "talk-grid"].includes(step.kind)).length,
+    () => steps.filter((step) => ["listen-record", "prep-record", "talk-grid", "summary-task", "debate-task"].includes(step.kind)).length,
     [steps]
   );
 
@@ -142,6 +215,8 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
     fontSize: "medium",
     theme: "default",
   });
+  const [notesOpen, setNotesOpen] = useState(false);
+  const [notesDraft, setNotesDraft] = useState("");
 
   const runningRef = useRef(false);
   const streamRef = useRef(null);
@@ -456,7 +531,7 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
       return;
     }
 
-    if (step.kind === "prep-record" || step.kind === "talk-grid") {
+    if (["prep-record", "talk-grid", "summary-task", "debate-task"].includes(step.kind)) {
       if (step.task?.instructionAudioSrc) {
         await playAudioFile(step.task.instructionAudioSrc);
         consumeSkipRequest();
@@ -471,6 +546,25 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
       }
       if (step.task?.incomingAudioSrc) {
         await playAudioFile(step.task.incomingAudioSrc);
+        consumeSkipRequest();
+      }
+      if (Array.isArray(step.task?.expertAudioSources) || Array.isArray(step.task?.expertIntroAudioSources)) {
+        const expertAudioSources = step.task.expertAudioSources || [];
+        const expertIntroAudioSources = step.task.expertIntroAudioSources || [];
+        const expertAudioCount = Math.max(expertAudioSources.length, expertIntroAudioSources.length);
+        for (let index = 0; index < expertAudioCount; index += 1) {
+          if (expertIntroAudioSources[index]) {
+            await playAudioFile(expertIntroAudioSources[index]);
+            consumeSkipRequest();
+          }
+          if (expertAudioSources[index]) {
+            await playAudioFile(expertAudioSources[index]);
+            consumeSkipRequest();
+          }
+        }
+      }
+      if (step.task?.prepInstructionAudioSrc) {
+        await playAudioFile(step.task.prepInstructionAudioSrc);
         consumeSkipRequest();
       }
       if (step.task?.thinkingAudioSrc) {
@@ -595,12 +689,19 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
           totalRecordingSteps={totalRecordingSteps}
           volume={volume}
           onVolumeChange={updateVolume}
+          notesOpen={notesOpen}
+          notesDraft={notesDraft}
+          onToggleNotes={() => setNotesOpen((prev) => !prev)}
+          onNotesChange={setNotesDraft}
         />
       )}
 
       <ExamFooter
         onOpenSettings={() => setSettingsOpen(true)}
         onSkip={status === "running" ? handleSkip : undefined}
+        notesEnabled={status === "running" && activeStep?.task?.allowNotes}
+        notesOpen={notesOpen}
+        onToggleNotes={() => setNotesOpen((prev) => !prev)}
         nextLabel={status === "sound-check" ? "Next" : ""}
         onNext={status === "sound-check" ? handleBeginExam : undefined}
         nextDisabled={status === "sound-check" && soundCheckState === "recording"}
@@ -775,6 +876,10 @@ function ExamBody({
   totalRecordingSteps,
   volume,
   onVolumeChange,
+  notesOpen,
+  notesDraft,
+  onToggleNotes,
+  onNotesChange,
 }) {
   if (!activeStep) return null;
 
@@ -798,8 +903,10 @@ function ExamBody({
     );
   }
 
+  const hasVisualPanel = ["talk-grid", "debate-task"].includes(activeStep.kind);
+
   return (
-    <section className={`ote-task-screen ${activeStep.kind === "talk-grid" ? "has-image-grid" : ""}`}>
+    <section className={`ote-task-screen ${hasVisualPanel ? "has-image-grid" : ""}`}>
       <div className="ote-task-copy">
         <h2>{activeStep.part.title}</h2>
         {activeStep.kind === "prep-record" ? <VoicemailModeLine mode={activeStep.task.mode} /> : null}
@@ -807,21 +914,48 @@ function ExamBody({
         {activeStep.kind === "listen-record" ? (
           <>
             {activeStep.topic ? <p className="ote-topic">Topic: {activeStep.topic}</p> : null}
-            <p className="ote-question-text">{phase === "record" ? "Speak now." : "Listen to the question."}</p>
+            <p className="ote-question-text">
+              {activeStep.displayQuestionLabelOnly
+                ? activeStep.label
+                : phase === "record"
+                  ? "Speak now."
+                  : "Listen to the question."}
+            </p>
           </>
         ) : null}
-        {activeStep.kind === "prep-record" ? <VoicemailPrompt task={activeStep.task} /> : null}
+        {activeStep.task && (activeStep.kind === "prep-record" ||
+          (activeStep.kind === "part-instructions" && activeStep.part?.id === "part-2")) ? (
+          <VoicemailPrompt task={activeStep.task} />
+        ) : null}
         {activeStep.kind === "talk-grid" ? <TalkPrompt task={activeStep.task} /> : null}
+        {((activeStep.kind === "part-instructions" && activeStep.task?.visualType === "summary") ||
+          activeStep.kind === "summary-task") ? (
+          <SummaryPrompt task={activeStep.task} />
+        ) : null}
+        {activeStep.kind === "debate-task" ? <DebatePrompt task={activeStep.task} /> : null}
+        {activeStep.task?.allowNotes && notesOpen ? (
+          <NotesPanel value={notesDraft} onChange={onNotesChange} onClose={onToggleNotes} />
+        ) : null}
         {micError ? <p className="ote-warning">{micError}</p> : null}
         <button className="ote-help-btn" type="button" aria-label="Help" disabled>
           <HelpCircle size={24} />
         </button>
       </div>
 
-      <StatusPanel phase={phase} secondsLeft={secondsLeft} volume={volume} onVolumeChange={onVolumeChange} />
+      <StatusPanel
+        phase={phase}
+        secondsLeft={secondsLeft}
+        prepSeconds={activeStep.prepSeconds}
+        showThink={Boolean(activeStep.prepSeconds)}
+        volume={volume}
+        onVolumeChange={onVolumeChange}
+      />
 
       {activeStep.kind === "talk-grid" ? (
         <ImageGrid task={activeStep.task} />
+      ) : null}
+      {activeStep.kind === "debate-task" ? (
+        <DebateMindMap task={activeStep.task} />
       ) : null}
 
       <div className="ote-recording-progress">
@@ -832,6 +966,8 @@ function ExamBody({
 }
 
 function VoicemailModeLine({ mode }) {
+  if (mode === "diplomatic") return null;
+
   return (
     <p className="ote-mode-line">
       {mode === "reply"
@@ -878,23 +1014,81 @@ function TalkPrompt({ task }) {
   );
 }
 
-function StatusPanel({ phase, secondsLeft, volume, onVolumeChange }) {
+function SummaryPrompt({ task }) {
+  return (
+    <div className="ote-prompt-block">
+      <p>{task.prompt}</p>
+      {Array.isArray(task.requirements) && task.requirements.length ? (
+        <ul>
+          {task.requirements.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ) : null}
+      {Array.isArray(task.listenItems) && task.listenItems.length ? (
+        <>
+          <strong>{task.listenPrompt || "Now listen to the two speakers."}</strong>
+          <ul>
+            {task.listenItems.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+      <strong>You now have some time to think about what you want to say.</strong>
+    </div>
+  );
+}
+
+function DebatePrompt({ task }) {
+  return (
+    <div className="ote-prompt-block">
+      <p>{task.prompt}</p>
+      <p>
+        <strong>&lsquo;{task.statement}&rsquo;</strong>
+      </p>
+    </div>
+  );
+}
+
+function NotesPanel({ value, onChange, onClose }) {
+  return (
+    <aside className="ote-notes-panel" role="dialog" aria-label="Notes">
+      <div className="ote-notes-header">
+        <strong>Notes</strong>
+        <button type="button" onClick={onClose} aria-label="Close notes">×</button>
+      </div>
+      <div className="ote-notes-paper">
+        <textarea
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          placeholder="Write your notes here ..."
+        />
+      </div>
+    </aside>
+  );
+}
+
+function StatusPanel({ phase, secondsLeft, prepSeconds = 0, showThink = false, volume, onVolumeChange }) {
   const isPrep = phase === "prep";
   const isRecord = phase === "record";
   const isListen = phase === "listen";
   const activeBars = Math.max(1, Math.round(volume * 6));
+  const thinkProgress = isPrep && prepSeconds
+    ? Math.max(8, Math.min(100, (secondsLeft / prepSeconds) * 100))
+    : 0;
 
   return (
     <aside className="ote-status-panel">
       <div className="ote-status-top">
         <StatusIcon label="Listen" active={isListen} icon={<Volume2 size={72} />} />
-        {isPrep ? (
+        {showThink ? (
           <div className="ote-think-meter">
             <strong>Think</strong>
             <span className="ote-vertical-meter">
-              <i style={{ height: `${Math.max(8, Math.min(100, secondsLeft * 5))}%` }} />
+              <i style={{ height: `${thinkProgress}%` }} />
             </span>
-            <b>{formatTime(secondsLeft)}</b>
+            <b>{isPrep ? formatTime(secondsLeft) : "00:00"}</b>
           </div>
         ) : null}
         <StatusIcon label="Speak" active={isRecord} icon={<Mic size={72} />} time={isRecord ? formatTime(secondsLeft) : "00:00"} />
@@ -944,6 +1138,30 @@ function ImageGrid({ task }) {
           <img src={image.src} alt="" />
           <figcaption>{image.label}</figcaption>
         </figure>
+      ))}
+    </div>
+  );
+}
+
+function DebateMindMap({ task }) {
+  const ideas = task.mindMapIdeas || [];
+
+  return (
+    <div className="ote-debate-map" aria-label="Debate ideas">
+      <div className="ote-debate-map-instructions">
+        <p>Prepare your case for the debate. You should:</p>
+        <ul>
+          {(task.requirements || []).map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+        <p>You now have {task.prepSeconds || 45} seconds to prepare. You can make notes if you wish.</p>
+      </div>
+      <div className="ote-debate-center">{task.statement}</div>
+      {ideas.map((idea, index) => (
+        <div key={idea} className={`ote-debate-idea idea-${index + 1}`}>
+          {idea}
+        </div>
       ))}
     </div>
   );
@@ -1135,7 +1353,16 @@ function CompleteScreen({ user, mock, recordings, elapsedSeconds = 0, onDashboar
   );
 }
 
-function ExamFooter({ onOpenSettings, onSkip, nextLabel, onNext, nextDisabled = false }) {
+function ExamFooter({
+  onOpenSettings,
+  onSkip,
+  notesEnabled = false,
+  notesOpen = false,
+  onToggleNotes,
+  nextLabel,
+  onNext,
+  nextDisabled = false,
+}) {
   return (
     <footer className="ote-exam-footer">
       <button type="button" className="ote-settings-btn" onClick={onOpenSettings} aria-label="Visual display options">
@@ -1144,6 +1371,11 @@ function ExamFooter({ onOpenSettings, onSkip, nextLabel, onNext, nextDisabled = 
       <button type="button" className="ote-skip-btn" onClick={onSkip} disabled={!onSkip}>
         Skip
       </button>
+      {notesEnabled ? (
+        <button type="button" className="ote-notes-btn" onClick={onToggleNotes}>
+          Notes
+        </button>
+      ) : null}
       <span>© Seif English OTE mock environment</span>
       {nextLabel ? (
         <button type="button" className="ote-footer-next" onClick={onNext} disabled={nextDisabled}>

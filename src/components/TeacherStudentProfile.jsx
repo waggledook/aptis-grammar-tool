@@ -181,9 +181,9 @@ export default function TeacherStudentProfile({ user }) {
   ];
 
   return (
-    <div className="profile-page game-wrapper">
+    <div className="profile-page teacher-student-profile game-wrapper">
       <section
-        className="panel"
+        className="panel teacher-student-profile-panel"
         style={{
           marginBottom: "0.9rem",
           padding: "0.85rem 1rem",
@@ -195,7 +195,7 @@ export default function TeacherStudentProfile({ user }) {
         }}
       >
         <div>
-          <div style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em", color: "#94a3b8" }}>
+          <div className="teacher-student-profile-eyebrow" style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em", color: "#94a3b8" }}>
             Profile view
           </div>
           <div className="muted small" style={{ marginTop: "0.2rem" }}>
@@ -235,13 +235,13 @@ export default function TeacherStudentProfile({ user }) {
       </section>
 
       <section
-        className="panel"
+        className="panel teacher-student-profile-panel"
         style={{
           marginBottom: "0.9rem",
           padding: "0.9rem 1rem",
         }}
       >
-        <div style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em", color: "#94a3b8", marginBottom: "0.65rem" }}>
+        <div className="teacher-student-profile-eyebrow" style={{ fontSize: "0.78rem", textTransform: "uppercase", letterSpacing: "0.06em", color: "#94a3b8", marginBottom: "0.65rem" }}>
           Student details
         </div>
         <div
@@ -253,6 +253,7 @@ export default function TeacherStudentProfile({ user }) {
         >
           {details.map((item) => (
             <div
+              className="teacher-student-detail-card"
               key={item.label}
               style={{
                 border: "1px solid rgba(148, 163, 184, 0.25)",
@@ -262,10 +263,10 @@ export default function TeacherStudentProfile({ user }) {
                 minWidth: 0,
               }}
             >
-              <div style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8", marginBottom: "0.2rem" }}>
+              <div className="teacher-student-detail-label" style={{ fontSize: "0.72rem", textTransform: "uppercase", letterSpacing: "0.05em", color: "#94a3b8", marginBottom: "0.2rem" }}>
                 {item.label}
               </div>
-              <div style={{ color: "#e2e8f0", fontWeight: 700, overflowWrap: "anywhere" }}>
+              <div className="teacher-student-detail-value" style={{ color: "#e2e8f0", fontWeight: 700, overflowWrap: "anywhere" }}>
                 {item.value}
               </div>
             </div>

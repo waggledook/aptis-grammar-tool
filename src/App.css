@@ -2035,6 +2035,56 @@ h2,
               radial-gradient(80% 140% at 50% 100%, rgba(30, 41, 59, .12), rgba(30, 41, 59, 0));
 }
 
+:root[data-theme="light"] .menu-style-hub .full-test-card {
+  grid-template-columns: minmax(0, 1fr) minmax(220px, max-content) !important;
+  align-items: center !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f7faff 100%) !important;
+  border-color: #c7d6ec !important;
+  box-shadow: 0 12px 28px rgba(32, 52, 84, 0.08) !important;
+}
+
+:root[data-theme="light"] .menu-style-hub .full-test-card h3 {
+  color: #172033 !important;
+}
+
+:root[data-theme="light"] .menu-style-hub .full-test-card p {
+  max-width: 46rem;
+  color: #52627f !important;
+  opacity: 1 !important;
+}
+
+:root[data-theme="light"] .menu-style-hub .section-kicker {
+  background: #fff7e6 !important;
+  border-color: #f7c76d !important;
+  color: #b77900 !important;
+}
+
+:root[data-theme="light"] .menu-style-hub .menu-cta-btn,
+:root[data-theme="light"] .menu-style-hub .mock-test-btn.sleek {
+  min-height: 58px !important;
+  border: 1px solid #c7d6ec !important;
+  border-radius: 16px !important;
+  background: #eef4ff !important;
+  color: #9a6400 !important;
+  box-shadow: 0 8px 18px rgba(32, 52, 84, 0.08) !important;
+  text-align: center;
+}
+
+:root[data-theme="light"] .menu-style-hub .mock-test-btn.sleek::after {
+  right: 16px !important;
+  left: 16px !important;
+  bottom: -5px !important;
+  height: 7px !important;
+  background: rgba(32, 52, 84, 0.08) !important;
+  filter: blur(4px) !important;
+}
+
+@media (max-width: 760px) {
+  :root[data-theme="light"] .menu-style-hub .full-test-card {
+    grid-template-columns: 1fr !important;
+  }
+}
+
 /* Component-level menu styles are injected after App.css, so light mode needs explicit priority here. */
 :root[data-theme="light"] .menu-wrapper button[class*="card"],
 :root[data-theme="light"] .menu-wrapper .menu-card,
@@ -2084,6 +2134,15 @@ h2,
   background: var(--color-surface-3) !important;
   border-color: var(--color-border) !important;
   color: var(--color-link) !important;
+}
+
+:root[data-theme="light"] :is(.reading-menu, .speaking-menu, .writing-menu, .vocab-menu, .listening-menu) :is(.title, .section-header h3) {
+  color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] :is(.reading-menu, .speaking-menu, .writing-menu, .vocab-menu, .listening-menu) :is(.intro, .section-header p, .card p) {
+  color: var(--color-text-soft) !important;
+  opacity: 1 !important;
 }
 
 /* === Aptis Trainer activity light-mode pass === */
@@ -4049,6 +4108,40 @@ h2,
 
 :root[data-theme="light"] .admin-dashboard-modal-backdrop {
   background: rgba(15, 23, 42, 0.34) !important;
+}
+
+/* === Teacher student profile light theme === */
+:root[data-theme="light"] .teacher-student-profile .teacher-student-profile-panel {
+  background: #f8fbff !important;
+  border-color: #c9d8ee !important;
+  box-shadow: 0 10px 24px rgba(32, 52, 84, 0.07) !important;
+}
+
+:root[data-theme="light"] .teacher-student-profile .teacher-student-profile-eyebrow,
+:root[data-theme="light"] .teacher-student-profile .teacher-student-detail-label {
+  color: #64748b !important;
+}
+
+:root[data-theme="light"] .teacher-student-profile .teacher-student-detail-card {
+  background: #ffffff !important;
+  border-color: #d4deee !important;
+  box-shadow: 0 6px 16px rgba(32, 52, 84, 0.06);
+}
+
+:root[data-theme="light"] .teacher-student-profile .teacher-student-detail-value {
+  color: #172033 !important;
+}
+
+:root[data-theme="light"] .teacher-student-profile .review-btn {
+  background: #eaf2ff !important;
+  border-color: #b9c9e4 !important;
+  color: #1f5fbf !important;
+}
+
+:root[data-theme="light"] .teacher-student-profile .ghost-btn {
+  background: #f8fbff !important;
+  border-color: #cbd8eb !important;
+  color: #172033 !important;
 }
 
 .admin-activity-log {

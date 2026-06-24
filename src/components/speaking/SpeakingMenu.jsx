@@ -163,7 +163,7 @@ export default function SpeakingMenu({ user, aptisAccess, onSignIn }) {
       <style>{`
         .header { margin-bottom: 1rem; }
         .title { font-size: 1.6rem; margin-bottom: .3rem; }
-        .intro { color: #a9b7d1; max-width: 600px; }
+        .intro { color: var(--color-text-soft); max-width: 600px; }
 
         .speaking-access-prompt {
           margin: 0 0 1rem;
@@ -197,12 +197,12 @@ export default function SpeakingMenu({ user, aptisAccess, onSignIn }) {
 
         .section-header h3 {
           margin: 0 0 .25rem;
-          color: #e6f0ff;
+          color: var(--color-text);
         }
 
         .section-header p {
           margin: 0;
-          color: #a9b7d1;
+          color: var(--color-text-soft);
           max-width: 680px;
         }
 
@@ -252,7 +252,7 @@ export default function SpeakingMenu({ user, aptisAccess, onSignIn }) {
 
         .card p {
           margin:0;
-          color:#cfd9f3;
+          color: var(--color-text-soft);
         }
 
         .full-test-card {

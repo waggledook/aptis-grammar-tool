@@ -2945,6 +2945,203 @@ async function copySelectedSubmission() {
           flex-shrink: 0;
         }
 
+        :root[data-theme="light"] .my-students-page {
+          color: var(--color-text);
+        }
+
+        :root[data-theme="light"] .my-students-hero h1,
+        :root[data-theme="light"] .my-students-stat strong,
+        :root[data-theme="light"] .student-card-head h3,
+        :root[data-theme="light"] .student-meta strong,
+        :root[data-theme="light"] .student-request-row,
+        :root[data-theme="light"] .teacher-notify-item strong,
+        :root[data-theme="light"] .teacher-review-head h3,
+        :root[data-theme="light"] .teacher-review-answer strong,
+        :root[data-theme="light"] .teacher-review-attempt-label,
+        :root[data-theme="light"] .teacher-review-attempt-body p,
+        :root[data-theme="light"] .teacher-review-plain,
+        :root[data-theme="light"] .teacher-review-skill-card p {
+          color: #172033;
+        }
+
+        :root[data-theme="light"] .my-students-hero p,
+        :root[data-theme="light"] .my-students-stat span,
+        :root[data-theme="light"] .field span,
+        :root[data-theme="light"] .panel-label,
+        :root[data-theme="light"] .student-card-head p,
+        :root[data-theme="light"] .student-meta em,
+        :root[data-theme="light"] .student-request-row span,
+        :root[data-theme="light"] .teacher-notify-head,
+        :root[data-theme="light"] .teacher-notify-item span,
+        :root[data-theme="light"] .teacher-review-head p,
+        :root[data-theme="light"] .teacher-review-attempt-note,
+        :root[data-theme="light"] .teacher-dictation-attempt-label {
+          color: #64748b;
+        }
+
+        :root[data-theme="light"] .teacher-notify-btn,
+        :root[data-theme="light"] .my-students-page .review-btn,
+        :root[data-theme="light"] .my-students-page .ghost-btn {
+          background: #eef4ff;
+          border-color: #bfd0e8;
+          color: #1f5fbf;
+          box-shadow: 0 10px 22px rgba(32, 52, 84, 0.08);
+        }
+
+        :root[data-theme="light"] .teacher-notify-btn:hover,
+        :root[data-theme="light"] .my-students-page .review-btn:hover:not(:disabled),
+        :root[data-theme="light"] .my-students-page .ghost-btn:hover:not(:disabled) {
+          background: #e3edff;
+          border-color: #9fb6d8;
+          color: #174ea6;
+        }
+
+        :root[data-theme="light"] .teacher-notify-panel,
+        :root[data-theme="light"] .teacher-review-modal,
+        :root[data-theme="light"] .my-students-stat,
+        :root[data-theme="light"] .my-students-controls,
+        :root[data-theme="light"] .student-request-list,
+        :root[data-theme="light"] .student-card {
+          background: linear-gradient(180deg, #ffffff, #f7faff);
+          border-color: #c7d6ec;
+          color: #172033;
+          box-shadow: 0 14px 30px rgba(32, 52, 84, 0.1);
+        }
+
+        :root[data-theme="light"] .teacher-notify-panel {
+          box-shadow: 0 22px 42px rgba(32, 52, 84, 0.18);
+        }
+
+        :root[data-theme="light"] .teacher-notify-item,
+        :root[data-theme="light"] .teacher-review-block,
+        :root[data-theme="light"] .teacher-review-skill-card,
+        :root[data-theme="light"] .teacher-review-attempt,
+        :root[data-theme="light"] .student-meta {
+          background: #ffffff;
+          border-color: #d5e1f0;
+          color: #172033;
+        }
+
+        :root[data-theme="light"] .teacher-notify-item:hover {
+          border-color: #9fb6d8;
+          background: #f4f8ff;
+        }
+
+        :root[data-theme="light"] .teacher-notify-item.is-unread {
+          background: #fff7e6;
+          border-color: #f1c46b;
+        }
+
+        :root[data-theme="light"] .teacher-notify-item em,
+        :root[data-theme="light"] .student-handle {
+          color: #1f5fbf;
+        }
+
+        :root[data-theme="light"] .field input,
+        :root[data-theme="light"] .field select {
+          background: #ffffff;
+          border-color: #b8c7dc;
+          color: #172033;
+        }
+
+        :root[data-theme="light"] .field input::placeholder {
+          color: #7b8799;
+        }
+
+        :root[data-theme="light"] .student-card-head,
+        :root[data-theme="light"] .student-row-main,
+        :root[data-theme="light"] .teacher-review-head,
+        :root[data-theme="light"] .teacher-review-actions,
+        :root[data-theme="light"] .teacher-review-answer + .teacher-review-answer {
+          border-color: #d7e2f1;
+        }
+
+        :root[data-theme="light"] .student-chip {
+          background: #eef4ff;
+          border-color: #b9c9e4;
+          color: #1f5fbf;
+        }
+
+        :root[data-theme="light"] .student-chip.is-class {
+          background: #fff7e6;
+          border-color: #f1c46b;
+          color: #9a6400;
+        }
+
+        :root[data-theme="light"] .student-chip.is-active {
+          background: #e8f8ef;
+          border-color: #87d8a7;
+          color: #17633b;
+        }
+
+        :root[data-theme="light"] .teacher-review-overlay {
+          background: rgba(15, 23, 42, 0.34);
+        }
+
+        :root[data-theme="light"] .teacher-review-status-chip.is-reviewed,
+        :root[data-theme="light"] .teacher-review-attempt-chip.is-correct {
+          background: #e8f8ef;
+          border-color: #87d8a7;
+          color: #17633b;
+        }
+
+        :root[data-theme="light"] .teacher-review-status-chip.is-pending,
+        :root[data-theme="light"] .teacher-review-attempt-chip.is-partial {
+          background: #fff7e6;
+          border-color: #f1c46b;
+          color: #9a6400;
+        }
+
+        :root[data-theme="light"] .teacher-review-attempt-chip.is-wrong {
+          background: #fff1e8;
+          color: #a64212;
+        }
+
+        :root[data-theme="light"] .teacher-review-attempt.is-correct {
+          border-color: #87d8a7;
+          background: #f1fbf5;
+        }
+
+        :root[data-theme="light"] .teacher-review-attempt.is-partial {
+          border-color: #f1c46b;
+          background: #fffaf0;
+        }
+
+        :root[data-theme="light"] .teacher-review-attempt.is-wrong {
+          border-color: #f5b491;
+          background: #fff7f2;
+        }
+
+        :root[data-theme="light"] .dictation-token {
+          background: #f8fbff;
+          border-color: #d4deee;
+          color: #172033;
+        }
+
+        :root[data-theme="light"] .dictation-token.is-correct {
+          color: #17633b;
+          background: #e8f8ef;
+          border-color: #87d8a7;
+        }
+
+        :root[data-theme="light"] .dictation-token.is-wrong {
+          color: #9f1d1d;
+          background: #fff0f0;
+          border-color: #f1a4a4;
+        }
+
+        :root[data-theme="light"] .dictation-token.is-clue-letter {
+          color: #9a6400;
+          background: #fff7e6;
+          border-color: #f1c46b;
+        }
+
+        :root[data-theme="light"] .dictation-token.is-clue-word {
+          color: #1f5fbf;
+          background: #eef4ff;
+          border-color: #b9c9e4;
+        }
+
         @media (max-width: 900px) {
           .my-students-summary,
           .my-students-controls,
