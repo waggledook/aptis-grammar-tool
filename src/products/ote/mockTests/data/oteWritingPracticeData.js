@@ -455,6 +455,155 @@ export const OTE_WRITING_PRACTICE_SETS = {
       instruction: "Write your review.",
     },
   ],
+  advancedEssay: [
+    {
+      id: "advanced-essay-lecture-recordings",
+      title: "Advanced Essay Practice 1",
+      type: "advancedEssay",
+      typeLabel: "Essay",
+      noun: "essay",
+      theme: "Higher education",
+      timeSeconds: 30 * 60,
+      minWords: 220,
+      maxWords: 280,
+      intro: "You have 30 minutes to write an essay. Write 220-280 words.",
+      setup:
+        "You have been discussing the topic of higher education in your class. Your tutor has asked you to write an essay on the following:",
+      prompt: "Many universities now record lectures so that students can watch them at a later time.",
+      question: "Do you think that this is a positive or a negative development?",
+      ideasIntro: "Your essay must include at least two of the following ideas:",
+      ideas: [
+        "impact on student attendance",
+        "impact on the quality of learning",
+        "impact on access to education",
+      ],
+      organizationInstruction:
+        "Organize your essay clearly, introducing the topic, providing support for the points you make, and giving a conclusion.",
+      instruction: "Write your essay.",
+    },
+    {
+      id: "advanced-essay-city-cars",
+      title: "Advanced Essay Practice 2",
+      type: "advancedEssay",
+      typeLabel: "Essay",
+      noun: "essay",
+      theme: "Urban transport",
+      timeSeconds: 30 * 60,
+      minWords: 220,
+      maxWords: 280,
+      intro: "You have 30 minutes to write an essay. Write 220-280 words.",
+      setup:
+        "You have been discussing the topic of transport in cities in your class. Your tutor has asked you to write an essay on the following:",
+      prompt:
+        "Some people say that private cars should be banned from city centres. However, others argue that drivers should remain free to use city roads.",
+      question: "Which opinion do you agree with?",
+      ideasIntro: "Your essay must include at least two of the following ideas:",
+      ideas: [
+        "impact on local businesses",
+        "impact on air quality",
+        "impact on public transport",
+      ],
+      organizationInstruction:
+        "Organize your essay clearly, introducing the topic, providing support for the points you make, and giving a conclusion.",
+      instruction: "Write your essay.",
+    },
+  ],
+  advancedSummary: [
+    {
+      id: "advanced-summary-network-effects",
+      title: "Advanced Summary Practice 1",
+      type: "advancedSummary",
+      typeLabel: "Summary",
+      noun: "summary",
+      theme: "Economics",
+      timeSeconds: 20 * 60,
+      minWords: 80,
+      maxWords: 100,
+      intro: "You have 20 minutes to write a summary. Write 80-100 words.",
+      setup:
+        "You have been learning about an aspect of economics for a college course. You have read a textbook extract and attended a lecture and now your tutor has asked you to write a summary of the main ideas for your classmates to read.",
+      instructions: [
+        "Write one paragraph, combining information from the textbook extract and the lecture transcript to summarize the main ideas. Your summary should provide the reader with enough information to understand the main ideas from both texts.",
+        "Write full sentences, using your own words where possible.",
+        "Do NOT write more than 100 words.",
+      ],
+      instruction: "Write your summary.",
+      sources: [
+        {
+          title: "Textbook extract",
+          text:
+            "Some products become more useful as the number of users increases. This is known as a network effect. A telephone, for example, has little value if only one person owns one, but its usefulness grows as more people join the same system. Digital platforms can expand especially quickly because each new user may attract others, creating a cycle of growth. This pattern is common in social media, payment systems and online marketplaces. Large networks can benefit consumers by making it easier to find information, buyers, sellers or services in one place. However, they may also make it difficult for new competitors to enter the market, even when those competitors offer better technology. Users may hesitate to move because their contacts, records or reputation are already connected to the established platform. As a result, network effects can contribute to a small number of companies becoming extremely powerful.",
+        },
+        {
+          title: "Lecture transcript",
+          text:
+            "'It is tempting to assume that the biggest platform will always win, but, well, the picture is more complicated. People may use several services at the same time, particularly when switching is cheap. A restaurant can advertise on two delivery apps, for instance, and customers can compare both. Trust and quality matter as well: a large network may lose users rapidly if it handles personal data badly or allows unreliable sellers to dominate. Governments and industry groups can also require systems to work together. This interoperability means that people can communicate or transfer information across competing services, reducing the advantage of the largest network. So size creates momentum, but it does not remove the need to provide a useful and dependable service. Network effects are strongest when users feel locked into one system and alternatives cannot connect with it.'",
+        },
+      ],
+      glossary: [
+        { term: "reputation", definition: "the opinion that people generally have of someone or something" },
+        { term: "established", definition: "having existed successfully for a long time" },
+        { term: "interoperability", definition: "the ability of different systems to work together" },
+        { term: "momentum", definition: "the force that keeps a process developing after it has begun" },
+      ],
+      markingGuide: {
+        overarchingIdea:
+          "Digital platforms can grow rapidly because their value increases with user numbers, although size alone does not guarantee permanent success.",
+        mainIdeas: [
+          "Network effects create cycles of growth and can make platforms more convenient for users.",
+          "Established networks may become powerful because moving to a competitor can mean losing contacts, information or reputation.",
+          "Competition remains possible when users can use several services, systems can connect, or a large platform loses trust or quality.",
+        ],
+      },
+    },
+    {
+      id: "advanced-summary-pollination",
+      title: "Advanced Summary Practice 2",
+      type: "advancedSummary",
+      typeLabel: "Summary",
+      noun: "summary",
+      theme: "Biology",
+      timeSeconds: 20 * 60,
+      minWords: 80,
+      maxWords: 100,
+      intro: "You have 20 minutes to write a summary. Write 80-100 words.",
+      setup:
+        "You have been learning about an aspect of biology for a college course. You have read a textbook extract and attended a lecture and now your tutor has asked you to write a summary of the main ideas for your classmates to read.",
+      instructions: [
+        "Write one paragraph, combining information from the textbook extract and the lecture transcript to summarize the main ideas. Your summary should provide the reader with enough information to understand the main ideas from both texts.",
+        "Write full sentences, using your own words where possible.",
+        "Do NOT write more than 100 words.",
+      ],
+      instruction: "Write your summary.",
+      sources: [
+        {
+          title: "Textbook extract",
+          text:
+            "Pollination occurs when pollen is transferred between parts of a flower, allowing seeds and fruit to develop. Wind performs this task for some plants, but many depend on animals, especially insects. Bees are the best-known pollinators, although flies, butterflies, beetles and some birds also play important roles. A diverse pollinator community can make plant reproduction more reliable because different species are active in different weather conditions and visit different kinds of flowers. This matters for natural ecosystems and for agriculture: many crops produce larger or better-quality harvests when insects visit them. Pollination also supports wild plants that provide food and shelter for other animals. Managed honeybee colonies are often brought to farms during flowering, but they cannot fully replace wild pollinators. Relying heavily on one species creates a risk if disease, poor weather or food shortages reduce its numbers.",
+        },
+        {
+          title: "Lecture transcript",
+          text:
+            "'We have seen major declines in some pollinator populations, and there is no single cause. The loss of flowering habitats leaves insects with less food and fewer nesting places. Certain pesticides can kill them directly or, er, affect their ability to navigate and reproduce. Disease and climate change add further pressure. Farmers can help by leaving strips of wild flowers beside fields, reducing pesticide use and providing nesting areas. These measures do more than protect wildlife. In one study, farms with suitable habitat attracted a wider range of insects and achieved more stable fruit production, even when honeybee activity was low. This is especially important as growing seasons shift. The key point is diversity: protecting several pollinator species makes the whole system less dependent on any one of them. Conservation therefore supports both ecosystems and the long-term security of food production.'",
+        },
+      ],
+      glossary: [
+        { term: "colony", definition: "a group of insects of the same type living together" },
+        { term: "nesting", definition: "connected with making or using a place to lay eggs" },
+        { term: "navigate", definition: "find the correct direction while travelling" },
+        { term: "stable", definition: "unlikely to change suddenly or fail" },
+      ],
+      markingGuide: {
+        overarchingIdea:
+          "A diverse population of pollinators is essential to natural ecosystems and dependable food production.",
+        mainIdeas: [
+          "Animal pollination enables many wild plants and crops to reproduce and produce good-quality fruit or seeds.",
+          "Different pollinator species work under different conditions, so managed honeybees cannot fully replace wild populations.",
+          "Habitat loss, pesticides, disease and climate change threaten pollinators, while flower strips, nesting areas and reduced pesticide use can protect them and stabilize harvests.",
+        ],
+      },
+    },
+  ],
 };
 
 export function getOteWritingPracticeGroups() {
@@ -462,6 +611,8 @@ export function getOteWritingPracticeGroups() {
     { id: "email", label: "Email", sets: OTE_WRITING_PRACTICE_SETS.email },
     { id: "essay", label: "Essay", sets: OTE_WRITING_PRACTICE_SETS.essay },
     { id: "article-review", label: "Article / Review", sets: OTE_WRITING_PRACTICE_SETS.articleReview },
+    { id: "advanced-essay", label: "Advanced Essay", sets: OTE_WRITING_PRACTICE_SETS.advancedEssay },
+    { id: "advanced-summary", label: "Advanced Summary", sets: OTE_WRITING_PRACTICE_SETS.advancedSummary },
   ];
 }
 

@@ -204,6 +204,8 @@ import OteWritingPracticeMenu from "./products/ote/OteWritingPracticeMenu.jsx";
 import OteWritingPracticeRunner from "./products/ote/OteWritingPracticeRunner.jsx";
 import OteWritingEmailGuide from "./products/ote/OteWritingEmailGuide.jsx";
 import OteWritingEssayGuide from "./products/ote/OteWritingEssayGuide.jsx";
+import OteWritingAdvancedEssayGuide from "./products/ote/OteWritingAdvancedEssayGuide.jsx";
+import OteWritingAdvancedSummaryGuide from "./products/ote/OteWritingAdvancedSummaryGuide.jsx";
 import OteWritingEssayIntroConclusion from "./products/ote/OteWritingEssayIntroConclusion.jsx";
 import OteWritingEssayPlanning from "./products/ote/OteWritingEssayPlanning.jsx";
 import OteWritingEssayBodyParagraphs from "./products/ote/OteWritingEssayBodyParagraphs.jsx";
@@ -1144,7 +1146,7 @@ return (
     <>
       {(user.role === "teacher" || user.role === "admin") && (
         <button
-          onClick={() => navigate("/my-students")}
+          onClick={() => navigate(getSitePath("/my-students"))}
           className="topbar-btn topbar-notify-btn"
           aria-label="Open student notifications"
           title={
@@ -1320,7 +1322,7 @@ return (
   <Route path="/ote/speaking/parts-3-4-practice" element={<OteSpeakingPart34Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/parts-3-4-practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/writing" element={<OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
-  <Route path="/ote/writing/training/:section" element={<OteWritingTrainingMenu nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/:section" element={<OteWritingTrainingMenu user={user} nativeRoutes={false} />} />
   <Route path="/ote/writing/training/email/guide" element={<OteWritingEmailGuide nativeRoutes={false} />} />
   <Route
     path="/ote/writing/training/email/register-basics"
@@ -1334,8 +1336,10 @@ return (
   <Route path="/ote/writing/training/essay/introductions-conclusions" element={<OteWritingEssayIntroConclusion nativeRoutes={false} />} />
   <Route path="/ote/writing/training/essay/planning" element={<OteWritingEssayPlanning nativeRoutes={false} />} />
   <Route path="/ote/writing/training/essay/body-paragraphs" element={<OteWritingEssayBodyParagraphs nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/advanced-essay/guide" element={<OteWritingAdvancedEssayGuide nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/advanced-summary/guide" element={<OteWritingAdvancedSummaryGuide nativeRoutes={false} />} />
   <Route path="/ote/writing/training/article-review/guide" element={<OteWritingArticleReviewGuide nativeRoutes={false} />} />
-  <Route path="/ote/writing/training/:section/practice" element={<OteWritingPracticeMenu nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/:section/practice" element={<OteWritingPracticeMenu user={user} nativeRoutes={false} />} />
   <Route
     path="/ote/writing/training/:section/practice/:setId"
     element={<OteWritingPracticeRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
@@ -1376,12 +1380,14 @@ return (
   {isOteSite && (
     <>
       <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
-      <Route path="/writing/training/:section" element={<OteWritingTrainingMenu nativeRoutes />} />
+      <Route path="/writing/training/:section" element={<OteWritingTrainingMenu user={user} nativeRoutes />} />
       <Route path="/writing/training/email/guide" element={<OteWritingEmailGuide nativeRoutes />} />
       <Route path="/writing/training/essay/guide" element={<OteWritingEssayGuide nativeRoutes />} />
       <Route path="/writing/training/essay/introductions-conclusions" element={<OteWritingEssayIntroConclusion nativeRoutes />} />
       <Route path="/writing/training/essay/planning" element={<OteWritingEssayPlanning nativeRoutes />} />
       <Route path="/writing/training/essay/body-paragraphs" element={<OteWritingEssayBodyParagraphs nativeRoutes />} />
+      <Route path="/writing/training/advanced-essay/guide" element={<OteWritingAdvancedEssayGuide nativeRoutes />} />
+      <Route path="/writing/training/advanced-summary/guide" element={<OteWritingAdvancedSummaryGuide nativeRoutes />} />
       <Route path="/writing/training/article-review/guide" element={<OteWritingArticleReviewGuide nativeRoutes />} />
       <Route
         path="/writing/training/email/register-basics"
@@ -1391,7 +1397,7 @@ return (
         path="/writing/training/email/register-gaps"
         element={<OteWritingRegisterGapTrainer user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />}
       />
-      <Route path="/writing/training/:section/practice" element={<OteWritingPracticeMenu nativeRoutes />} />
+      <Route path="/writing/training/:section/practice" element={<OteWritingPracticeMenu user={user} nativeRoutes />} />
       <Route
         path="/writing/training/:section/practice/:setId"
         element={<OteWritingPracticeRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />}

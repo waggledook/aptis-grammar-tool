@@ -479,6 +479,11 @@
   grid-template-columns: 0.85fr 1.2fr 1.2fr;
 }
 
+.ote-training-compare-head.is-two-column,
+.ote-training-compare-row.is-two-column {
+  grid-template-columns: minmax(160px, 0.55fr) minmax(0, 1.45fr);
+}
+
 .ote-training-compare-head {
   background: rgba(255, 191, 73, 0.16);
   color: var(--color-text);
@@ -502,6 +507,19 @@
 .ote-training-compare-row span:first-child {
   color: var(--color-text);
   font-weight: 800;
+}
+
+.ote-training-checklist {
+  display: grid;
+  gap: 0.65rem;
+  margin: 0;
+  padding-left: 1.35rem;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+}
+
+.ote-training-checklist li {
+  padding-left: 0.2rem;
 }
 
 .ote-training-rule-grid {
@@ -3346,6 +3364,124 @@
   color: var(--color-text);
 }
 
+.ote-writing-practice-locked {
+  display: flex;
+  gap: 0.9rem;
+  align-items: flex-start;
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  padding: 1rem;
+}
+
+.ote-writing-practice-locked svg {
+  flex: 0 0 auto;
+  color: var(--ote-dashboard-accent);
+}
+
+.ote-writing-practice-locked h3 {
+  margin: 0 0 0.35rem;
+}
+
+.ote-writing-practice-locked p {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+}
+
+.ote-writing-practice-summary-layout {
+  display: grid;
+  gap: 0.95rem;
+}
+
+.ote-writing-practice-summary-top {
+  display: grid;
+  grid-template-columns: minmax(300px, 0.92fr) minmax(360px, 1.08fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.ote-writing-practice-summary-top .ote-writing-practice-prompt {
+  padding: 0.85rem 0.95rem;
+  line-height: 1.34;
+}
+
+.ote-writing-practice-summary-top .ote-writing-practice-prompt p {
+  margin-bottom: 0.58rem;
+}
+
+.ote-writing-practice-summary-top .ote-writing-lead {
+  font-size: 1rem;
+}
+
+.ote-writing-practice-summary-top .ote-writing-practice-answer {
+  min-height: 0;
+  grid-template-rows: minmax(220px, 260px) auto;
+}
+
+.ote-writing-practice-summary-top .ote-writing-practice-answer textarea {
+  min-height: 220px;
+}
+
+.ote-writing-practice-source-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ote-writing-practice-source-grid .ote-writing-source-card {
+  padding: 0;
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  overflow: hidden;
+}
+
+.ote-writing-practice-source-grid .ote-writing-source-card h2 {
+  margin: 0;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--color-border);
+  font-size: 1rem;
+}
+
+.ote-writing-practice-source-grid .ote-writing-source-card p {
+  margin: 0;
+  padding: 0.9rem;
+  color: var(--color-text);
+}
+
+.ote-writing-practice-glossary {
+  margin-top: 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 0.75rem 0.9rem;
+}
+
+.ote-writing-practice-glossary summary {
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.ote-writing-practice-glossary dl {
+  margin: 0.75rem 0 0;
+}
+
+.ote-writing-practice-glossary div {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.45rem;
+}
+
+.ote-writing-practice-glossary dt {
+  font-weight: 800;
+}
+
+.ote-writing-practice-glossary dd {
+  margin: 0;
+  color: var(--color-text-soft);
+}
+
 .ote-writing-practice-answer {
   display: grid;
   grid-template-rows: auto minmax(300px, 1fr) auto;
@@ -5415,6 +5551,8 @@
   .ote-writing-choice-grid,
   .ote-writing-mock-list,
   .ote-writing-practice-layout,
+  .ote-writing-practice-summary-top,
+  .ote-writing-practice-source-grid,
   .ote-writing-practice-review,
   .ote-writing-register-grid,
   .ote-register-identification-grid,

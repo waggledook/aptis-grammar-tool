@@ -112,13 +112,52 @@ const TRAINING_SECTIONS = {
     practiceTitle: "Timed Article / Review Sets",
     practiceCopy: "Choose an individual article or review prompt, then write one timed Part 2 response in the native OTE layout.",
   },
+  "advanced-essay": {
+    kicker: "Writing Part 1",
+    title: "Advanced Essay Training",
+    description:
+      "Prepare for the OTE Advanced essay: answer the exact question, develop at least two prompts, and keep a clear academic argument.",
+    activities: [
+      {
+        label: "Guide",
+        title: "The Advanced Essay Task",
+        copy: "Review timing, word count, marking areas, structure, and complete the final quiz.",
+        icon: ClipboardList,
+        route: "guide",
+        progressId: "writing.advanced-essay.guide",
+      },
+    ],
+    practiceTitle: "Timed Advanced Essay Sets",
+    practiceCopy: "Choose an individual advanced essay prompt, then write one timed 220-280 word response.",
+  },
+  "advanced-summary": {
+    kicker: "Writing Part 2",
+    title: "Advanced Summary Training",
+    description:
+      "Prepare for the OTE Advanced summary: combine a textbook extract and lecture transcript into one concise academic paragraph.",
+    activities: [
+      {
+        label: "Guide",
+        title: "The Advanced Summary Task",
+        copy: "Review synthesis, source selection, word-limit rules, and complete the final quiz.",
+        icon: ClipboardList,
+        route: "guide",
+        progressId: "writing.advanced-summary.guide",
+      },
+    ],
+    practiceTitle: "Timed Advanced Summary Sets",
+    practiceCopy: "Choose an integrated summary task, then write one timed 80-100 word response.",
+  },
 };
 
-export default function OteWritingTrainingMenu({ nativeRoutes = false }) {
+export default function OteWritingTrainingMenu({ user, nativeRoutes = false }) {
   const navigate = useNavigate();
   const { section = "email" } = useParams();
   const config = TRAINING_SECTIONS[section] || TRAINING_SECTIONS.email;
   const practiceGroup = getOteWritingPracticeGroup(section);
+  const groupIsAdvanced = practiceGroup.id.startsWith("advanced-");
+  const userIsAdvanced = user?.oteVersion === "advanced";
+  const groupMatchesVariant = !user || groupIsAdvanced === userIsAdvanced;
   const writingPath = getSitePath(nativeRoutes ? "/writing" : "/ote/writing");
   const practiceMenuPath = getSitePath(
     nativeRoutes ? `/writing/training/${practiceGroup.id}/practice` : `/ote/writing/training/${practiceGroup.id}/practice`
@@ -137,6 +176,29 @@ export default function OteWritingTrainingMenu({ nativeRoutes = false }) {
   const summary = useOteTrainingSummary(normalizedActivities, completedProgress);
   const practiceProgressId = `writing.${practiceGroup.id}.practice`;
   const practiceComplete = completedProgress.has(practiceProgressId);
+
+  if (!groupMatchesVariant) {
+    return (
+      <main className="ote-training-page">
+        <Seo title="Writing training unavailable | Seif English" description="This writing training section is not available in the selected OTE variant." />
+
+        <button className="ote-training-back" type="button" onClick={() => navigate(writingPath)}>
+          <ArrowLeft size={18} aria-hidden="true" />
+          Back to writing
+        </button>
+
+        <header className="ote-training-hero">
+          <p className="ote-kicker">Writing training</p>
+          <h1>Training not available</h1>
+          <p>
+            {groupIsAdvanced
+              ? "This advanced writing training is only available in the Advanced OTE workspace."
+              : "This general writing training is only available in the General OTE workspace."}
+          </p>
+        </header>
+      </main>
+    );
+  }
 
   return (
     <main className="ote-training-page">

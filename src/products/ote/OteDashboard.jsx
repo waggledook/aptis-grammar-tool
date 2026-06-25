@@ -9,7 +9,46 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
   const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
   const writingPath = getSitePath(nativeRoutes ? "/writing" : "/ote/writing");
   const profilePath = getSitePath("/profile");
+  const teacherToolsPath = getSitePath("/teacher-tools");
+  const myStudentsPath = getSitePath("/my-students");
+  const myClassPath = getSitePath("/your-class");
+  const adminPath = getSitePath("/admin");
   const isAdvanced = user?.oteVersion === "advanced";
+  const isTeacherOrAdmin = user?.role === "teacher" || user?.role === "admin";
+  const isAdmin = user?.role === "admin";
+  const isStudent = user && !isTeacherOrAdmin;
+
+  const accountCards = (
+    <>
+      {isTeacherOrAdmin ? (
+        <button className="menu-card" type="button" onClick={() => navigate(teacherToolsPath)}>
+          <h3>Teacher Tools</h3>
+          <p>Create class activities, manage assigned work, and review student performance from the teacher workspace.</p>
+        </button>
+      ) : null}
+
+      {isTeacherOrAdmin ? (
+        <button className="menu-card" type="button" onClick={() => navigate(myStudentsPath)}>
+          <h3>My Students</h3>
+          <p>Open your class list, review recent student work, and follow learner progress from one place.</p>
+        </button>
+      ) : null}
+
+      {isAdmin ? (
+        <button className="menu-card" type="button" onClick={() => navigate(adminPath)}>
+          <h3>Admin Tools</h3>
+          <p>Manage OTE access, account roles, student links, and platform activity data.</p>
+        </button>
+      ) : null}
+
+      {isStudent ? (
+        <button className="menu-card" type="button" onClick={() => navigate(myClassPath)}>
+          <h3>My Class</h3>
+          <p>See activities assigned by your teacher and continue class work from your student workspace.</p>
+        </button>
+      ) : null}
+    </>
+  );
 
   return (
     <main className="menu-wrapper hub-menu-wrapper ote-menu-wrapper">
@@ -67,6 +106,8 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
             <h3>My Profile</h3>
             <p>Review saved OTE speaking feedback, writing submissions, and progress.</p>
           </button>
+
+          {accountCards}
         </div>
       ) : (
         <div className="menu-grid" aria-label="OTE sections">
@@ -89,6 +130,8 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
             <h3>Training Library</h3>
             <p>Future lessons, phrase banks, and focused drills for OTE skills.</p>
           </button>
+
+          {accountCards}
         </div>
       )}
     </main>

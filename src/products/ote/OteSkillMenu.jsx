@@ -17,6 +17,12 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
   const talkTrainingPath = getSitePath(nativeRoutes ? "/speaking/parts-3-4" : "/ote/speaking/parts-3-4");
   const emailTrainingPath = getSitePath(nativeRoutes ? "/writing/training/email" : "/ote/writing/training/email");
   const essayTrainingPath = getSitePath(nativeRoutes ? "/writing/training/essay" : "/ote/writing/training/essay");
+  const advancedEssayTrainingPath = getSitePath(
+    nativeRoutes ? "/writing/training/advanced-essay" : "/ote/writing/training/advanced-essay"
+  );
+  const advancedSummaryTrainingPath = getSitePath(
+    nativeRoutes ? "/writing/training/advanced-summary" : "/ote/writing/training/advanced-summary"
+  );
   const articleReviewTrainingPath = getSitePath(
     nativeRoutes ? "/writing/training/article-review" : "/ote/writing/training/article-review"
   );
@@ -124,13 +130,13 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
               <h3>Advanced Writing Mock Tests</h3>
               <p>Choose a timed advanced essay and summary mock in the exam environment.</p>
             </button>
-            <button className="menu-card" type="button" disabled>
+            <button className="menu-card" type="button" onClick={() => navigate(advancedEssayTrainingPath)}>
               <h3>Part 1 Essay</h3>
-              <p>Coming soon: advanced essay structure, argument, and support practice.</p>
+              <p>Review the advanced essay guide and open timed 220-280 word practice sets.</p>
             </button>
-            <button className="menu-card" type="button" disabled>
+            <button className="menu-card" type="button" onClick={() => navigate(advancedSummaryTrainingPath)}>
               <h3>Part 2 Summary</h3>
-              <p>Coming soon: integrated reading-to-writing summary practice.</p>
+              <p>Review the integrated summary guide and open timed textbook-and-lecture practice sets.</p>
             </button>
           </>
         ) : (

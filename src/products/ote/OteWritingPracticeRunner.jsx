@@ -32,6 +32,8 @@ function countWords(value) {
 }
 
 function getPracticeTaskType(task = {}) {
+  if (task.type === "advancedEssay") return "ote_advanced_part1_essay";
+  if (task.type === "advancedSummary") return "ote_advanced_part2_summary";
   if (task.type === "email") return "ote_part1_email";
   if (task.type === "review") return "ote_part2_review";
   if (task.type === "article") return "ote_part2_article";
@@ -39,6 +41,8 @@ function getPracticeTaskType(task = {}) {
 }
 
 function getExpectedRegister(task = {}) {
+  if (task.type === "advancedEssay") return "academic essay";
+  if (task.type === "advancedSummary") return "concise academic summary";
   if (task.type === "email") {
     return task.register === "informal" ? "informal" : "neutral";
   }
@@ -48,6 +52,25 @@ function getExpectedRegister(task = {}) {
 }
 
 function buildPracticeInputText(task = {}) {
+  if (task.type === "advancedEssay") {
+    return [
+      task.setup,
+      task.prompt,
+      task.question,
+      ...(task.ideas || []).map((idea) => `Idea: ${idea}`),
+      task.organizationInstruction,
+    ].filter(Boolean).join("\n");
+  }
+  if (task.type === "advancedSummary") {
+    return [
+      task.setup,
+      ...(task.sources || []).map((source) => `${source.title}\n${source.text}`),
+      task.markingGuide?.overarchingIdea
+        ? `Teacher marking guide - overarching idea: ${task.markingGuide.overarchingIdea}`
+        : "",
+      ...(task.markingGuide?.mainIdeas || []).map((idea) => `Teacher marking guide - main idea: ${idea}`),
+    ].filter(Boolean).join("\n\n");
+  }
   if (task.type !== "email") return task.context || "";
   const email = task.email || {};
   return [
@@ -66,14 +89,37 @@ function buildPracticePrompt(task = {}) {
   if (task.type === "email") {
     return task.setup || "Write an email responding to the input email.";
   }
+  if (task.type === "advancedEssay") {
+    return [task.prompt, task.question, task.instruction].filter(Boolean).join("\n");
+  }
+  if (task.type === "advancedSummary") {
+    return [
+      ...(task.instructions || []),
+      task.instruction,
+    ].filter(Boolean).join("\n");
+  }
   return [task.promptLabel, task.prompt, task.instruction].filter(Boolean).join("\n");
 }
 
 function buildRequiredPoints(task = {}) {
+  if (task.type === "advancedEssay") return task.ideas || [];
+  if (task.type === "advancedSummary") return task.markingGuide?.mainIdeas || [];
   if (task.type !== "email") return [];
   return (task.email?.prompts || []).map((prompt) =>
     `${prompt.question} Note: ${prompt.note}`.trim()
   );
+}
+
+function getPracticePart(task = {}) {
+  if (task.type === "email" || task.type === "advancedEssay") return "part-1";
+  return "part-2";
+}
+
+function getPracticeTargetAudience(task = {}) {
+  if (task.type === "email") return task.replyTo || task.email?.from || "recipient";
+  if (task.type === "advancedEssay") return "academic tutor";
+  if (task.type === "advancedSummary") return "classmates";
+  return "English teacher";
 }
 
 export default function OteWritingPracticeRunner({ user, onRequireSignIn, nativeRoutes = false }) {
@@ -81,6 +127,9 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
   const navigate = useNavigate();
   const task = getOteWritingPracticeSet(setId);
   const group = section ? getOteWritingPracticeGroup(section) : getOteWritingPracticeGroupForSet(task.id);
+  const groupIsAdvanced = group.id.startsWith("advanced-");
+  const userIsAdvanced = user?.oteVersion === "advanced";
+  const groupMatchesVariant = !user || groupIsAdvanced === userIsAdvanced;
   const [phase, setPhase] = useState("ready");
   const [secondsLeft, setSecondsLeft] = useState(task.timeSeconds);
   const [answer, setAnswer] = useState("");
@@ -97,6 +146,7 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
   const practiceMenuPath = getSitePath(
     nativeRoutes ? `/writing/training/${group.id}/practice` : `/ote/writing/training/${group.id}/practice`
   );
+  const writingPath = getSitePath(nativeRoutes ? "/writing" : "/ote/writing");
 
   useEffect(() => {
     setPhase("ready");
@@ -138,7 +188,7 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
     saveStartedRef.current = false;
     logOteTrainingStarted({
       section: "writing",
-      part: task.type === "email" ? "part-1" : "part-2",
+      part: getPracticePart(task),
       mode: "timed_practice",
       taskId: task.id,
       taskTitle: task.title,
@@ -168,7 +218,7 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
     setPhase("complete");
     logOteTrainingCompleted({
       section: "writing",
-      part: task.type === "email" ? "part-1" : "part-2",
+      part: getPracticePart(task),
       mode: "timed_practice",
       taskId: task.id,
       taskTitle: task.title,
@@ -217,7 +267,15 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
           context: task.context || "",
           promptLabel: task.promptLabel || "",
           prompt: task.prompt || "",
+          question: task.question || "",
+          ideas: task.ideas || [],
+          ideasIntro: task.ideasIntro || "",
+          organizationInstruction: task.organizationInstruction || "",
           instruction: task.instruction || "",
+          instructions: task.instructions || [],
+          sources: task.sources || [],
+          glossary: task.glossary || [],
+          markingGuide: task.markingGuide || null,
           theme: task.theme || "",
           register: task.register || "",
           registerLabel: task.registerLabel || "",
@@ -270,7 +328,7 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
             inputText: buildPracticeInputText(task),
             prompt: buildPracticePrompt(task),
             requiredPoints: buildRequiredPoints(task),
-            targetAudience: task.type === "email" ? task.replyTo || task.email?.from || "recipient" : "English teacher",
+            targetAudience: getPracticeTargetAudience(task),
             expectedRegister: getExpectedRegister(task),
             answer: {
               text: answerText,
@@ -328,6 +386,27 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
       });
   }, [phase, user]);
 
+  if (!groupMatchesVariant) {
+    return (
+      <main className="ote-training-page">
+        <Seo title="Writing practice unavailable | Seif English" description="This writing practice set is not available in the selected OTE variant." />
+        <button className="ote-training-back" type="button" onClick={() => navigate(writingPath)}>
+          <ArrowLeft size={18} aria-hidden="true" />
+          Back to writing
+        </button>
+        <header className="ote-training-hero">
+          <p className="ote-kicker">Timed practice</p>
+          <h1>Practice not available</h1>
+          <p>
+            {groupIsAdvanced
+              ? "This advanced writing practice is only available in the Advanced OTE workspace."
+              : "This general writing practice is only available in the General OTE workspace."}
+          </p>
+        </header>
+      </main>
+    );
+  }
+
   return (
     <main className="ote-training-page">
       <Seo title={`${task.title} | Seif English`} description="Timed OTE writing practice task." />
@@ -375,35 +454,39 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
               </ul>
             </div>
 
-            <div className="ote-writing-practice-layout">
-              <div className="ote-writing-practice-prompt">
-                {task.type === "email" ? <EmailPrompt task={task} /> : <ExtendedPrompt task={task} />}
-              </div>
-
-              <div className="ote-writing-practice-answer">
-                {task.type === "email" ? (
-                  <div className="ote-reply-fields">
-                    <p><strong>To:</strong> <span>{task.replyTo}</span></p>
-                    <p><strong>Subject:</strong> <span>{task.replySubject}</span></p>
-                  </div>
-                ) : null}
-                <textarea
-                  value={answer}
-                  disabled={phase !== "writing"}
-                  spellCheck={false}
-                  autoCorrect="off"
-                  autoCapitalize="off"
-                  autoComplete="off"
-                  data-gramm="false"
-                  data-gramm_editor="false"
-                  placeholder={phase === "writing" ? "Write your answer here ..." : "Start the timer when you are ready ..."}
-                  onChange={(event) => setAnswer(event.target.value)}
+            {task.type === "advancedSummary" ? (
+              phase === "ready" ? (
+                <AdvancedSummaryLockedPreview task={task} />
+              ) : (
+                <AdvancedSummaryWritingLayout
+                  task={task}
+                  answer={answer}
+                  phase={phase}
+                  words={words}
+                  onChange={setAnswer}
                 />
-                <div className={`ote-word-count ${words < task.minWords ? "is-low" : words > task.maxWords ? "is-high" : "is-good"}`}>
-                  {words} words / {task.minWords}-{task.maxWords}
+              )
+            ) : (
+              <div className="ote-writing-practice-layout">
+                <div className="ote-writing-practice-prompt">
+                  {task.type === "email" ? (
+                    <EmailPrompt task={task} />
+                  ) : task.type === "advancedEssay" ? (
+                    <AdvancedEssayPrompt task={task} />
+                  ) : (
+                    <ExtendedPrompt task={task} />
+                  )}
                 </div>
+
+                <WritingPracticeAnswerBox
+                  task={task}
+                  answer={answer}
+                  phase={phase}
+                  words={words}
+                  onChange={setAnswer}
+                />
               </div>
-            </div>
+            )}
 
             <div className="ote-recorder-actions">
               {phase === "ready" ? (
@@ -437,7 +520,7 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
             <div className="ote-writing-practice-review">
               <article>
                 <h3>{task.typeLabel} task</h3>
-                <p>{task.type === "email" ? task.setup : task.prompt}</p>
+                <p>{task.type === "email" ? task.setup : task.prompt || task.setup}</p>
               </article>
               <article>
                 <h3>Your answer</h3>
@@ -466,6 +549,97 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
         )}
       </section>
     </main>
+  );
+}
+
+function WritingPracticeAnswerBox({ task, answer, phase, words, onChange }) {
+  return (
+    <div className="ote-writing-practice-answer">
+      {task.type === "email" ? (
+        <div className="ote-reply-fields">
+          <p><strong>To:</strong> <span>{task.replyTo}</span></p>
+          <p><strong>Subject:</strong> <span>{task.replySubject}</span></p>
+        </div>
+      ) : null}
+      <textarea
+        value={answer}
+        disabled={phase !== "writing"}
+        spellCheck={false}
+        autoCorrect="off"
+        autoCapitalize="off"
+        autoComplete="off"
+        data-gramm="false"
+        data-gramm_editor="false"
+        placeholder={phase === "writing" ? "Write your answer here ..." : "Start the timer when you are ready ..."}
+        onChange={(event) => onChange(event.target.value)}
+      />
+      <div className={`ote-word-count ${words < task.minWords ? "is-low" : words > task.maxWords ? "is-high" : "is-good"}`}>
+        {words} words / {task.minWords}-{task.maxWords}
+      </div>
+    </div>
+  );
+}
+
+function AdvancedSummaryLockedPreview({ task }) {
+  return (
+    <div className="ote-writing-practice-locked">
+      <Timer size={24} aria-hidden="true" />
+      <div>
+        <h3>{task.typeLabel} materials hidden</h3>
+        <p>
+          Start the timed practice to reveal the summary instructions, textbook extract, lecture transcript, and answer box.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function AdvancedSummaryWritingLayout({ task, answer, phase, words, onChange }) {
+  return (
+    <div className="ote-writing-practice-summary-layout">
+      <div className="ote-writing-practice-summary-top">
+        <div className="ote-writing-practice-prompt">
+          <AdvancedSummaryPrompt task={task} />
+        </div>
+        <WritingPracticeAnswerBox
+          task={task}
+          answer={answer}
+          phase={phase}
+          words={words}
+          onChange={onChange}
+        />
+      </div>
+      <AdvancedSummarySources task={task} />
+    </div>
+  );
+}
+
+function AdvancedSummarySources({ task }) {
+  return (
+    <>
+      <div className="ote-writing-practice-source-grid">
+        {(task.sources || []).map((source) => (
+          <article className="ote-writing-source-card" key={source.title}>
+            <h2>{source.title}</h2>
+            <p>{source.text}</p>
+          </article>
+        ))}
+      </div>
+
+      {task.glossary?.length ? (
+        <details className="ote-writing-practice-glossary">
+          <summary>Glossary</summary>
+          <dl>
+            {task.glossary.map((item) => (
+              <div key={item.term}>
+                <dt>{item.term}</dt>
+                <dd>{item.definition}</dd>
+              </div>
+            ))}
+          </dl>
+        </details>
+      ) : null}
+    </>
   );
 }
 
@@ -508,6 +682,38 @@ function HighlightedPrompt({ text, highlight }) {
       {source.slice(0, start)}
       <mark>{target}</mark>
       {source.slice(start + target.length)}
+    </>
+  );
+}
+
+function AdvancedEssayPrompt({ task }) {
+  return (
+    <>
+      <p className="ote-writing-lead">{task.intro}</p>
+      <p>{task.setup}</p>
+      <article className="ote-writing-option-card">
+        <p><em>{task.prompt}</em></p>
+        <p><em>{task.question}</em></p>
+      </article>
+      <p>{task.ideasIntro}</p>
+      <ul className="ote-writing-bullet-list">
+        {(task.ideas || []).map((idea) => <li key={idea}>{idea}</li>)}
+      </ul>
+      <p>{task.organizationInstruction}</p>
+      <p>{task.instruction}</p>
+    </>
+  );
+}
+
+function AdvancedSummaryPrompt({ task }) {
+  return (
+    <>
+      <p className="ote-writing-lead">{task.intro}</p>
+      <p>{task.setup}</p>
+      {(task.instructions || []).map((instruction) => (
+        <p key={instruction}>{instruction}</p>
+      ))}
+      <p>{task.instruction}</p>
     </>
   );
 }

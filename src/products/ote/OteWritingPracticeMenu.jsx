@@ -6,13 +6,41 @@ import { getSitePath } from "../../siteConfig.js";
 import { getOteWritingPracticeGroup } from "./mockTests/data/oteWritingPracticeData.js";
 import "./styles/ote.css";
 
-export default function OteWritingPracticeMenu({ nativeRoutes = false }) {
+export default function OteWritingPracticeMenu({ user, nativeRoutes = false }) {
   const navigate = useNavigate();
   const { section = "email" } = useParams();
   const group = getOteWritingPracticeGroup(section);
+  const groupIsAdvanced = group.id.startsWith("advanced-");
+  const userIsAdvanced = user?.oteVersion === "advanced";
+  const groupMatchesVariant = !user || groupIsAdvanced === userIsAdvanced;
   const menuGroups = getMenuGroups(group.sets);
-  const trainingPath = getSitePath(nativeRoutes ? `/writing/training/${group.id}` : `/ote/writing/training/${group.id}`);
+  const trainingPath = getSitePath(
+    group.hasTrainingMenu === false
+      ? nativeRoutes ? "/writing" : "/ote/writing"
+      : nativeRoutes ? `/writing/training/${group.id}` : `/ote/writing/training/${group.id}`
+  );
   const basePath = nativeRoutes ? `/writing/training/${group.id}/practice` : `/ote/writing/training/${group.id}/practice`;
+
+  if (!groupMatchesVariant) {
+    return (
+      <main className="ote-training-page">
+        <Seo title="Writing practice unavailable | Seif English" description="This writing practice set is not available in the selected OTE variant." />
+        <button className="ote-training-back" type="button" onClick={() => navigate(getSitePath(nativeRoutes ? "/writing" : "/ote/writing"))}>
+          <ArrowLeft size={18} aria-hidden="true" />
+          Back to writing
+        </button>
+        <header className="ote-training-hero">
+          <p className="ote-kicker">Practice sets</p>
+          <h1>Practice not available</h1>
+          <p>
+            {groupIsAdvanced
+              ? "This advanced writing practice is only available in the Advanced OTE workspace."
+              : "This general writing practice is only available in the General OTE workspace."}
+          </p>
+        </header>
+      </main>
+    );
+  }
 
   return (
     <main className="ote-training-page">
@@ -23,7 +51,7 @@ export default function OteWritingPracticeMenu({ nativeRoutes = false }) {
 
       <button className="ote-training-back" type="button" onClick={() => navigate(trainingPath)}>
         <ArrowLeft size={18} aria-hidden="true" />
-        Back to {group.label.toLowerCase()} training
+        {group.hasTrainingMenu === false ? "Back to writing" : `Back to ${group.label.toLowerCase()} training`}
       </button>
 
       <header className="ote-training-hero">
