@@ -59,7 +59,7 @@ function deriveAnswerMap(sections = [], rawAnswers = {}) {
 function normalizeAnswer(value = "") {
   return String(value || "")
     .toLowerCase()
-    .replace(/[’']/g, "")
+    .replace(/[’‘'`´~]/g, "")
     .replace(/[-.,!?;:()[\]{}"“”]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -1382,6 +1382,15 @@ export default function HubCourseTestRunner({ user }) {
   const timeUp = mainPaperEndsAtMs ? timeRemainingMs <= 0 : false;
   const mainPaperSubmitted = Boolean(attempt?.runnerState?.mainPaperSubmittedAt || attempt?.submittedAt);
   const activeListeningSection = listeningSections[listeningSectionIndex] || null;
+  const activeListeningPreReadSeconds = Number(activeListeningSection?.timing?.preReadSeconds || 45);
+  const listeningCountdownMessage =
+    listeningPhase === "preread"
+      ? `Recording 1 starts in ${listeningCountdown}s`
+      : listeningPhase === "pause"
+        ? `Play 2 starts in ${listeningCountdown}s`
+        : listeningPhase === "between-sections"
+          ? `Next exercise starts in ${listeningCountdown}s`
+          : "";
   const listeningReadyForNext =
     listeningPhase === "ready-next" || listeningPhase === "ready-finish";
   const listeningComplete = Boolean(attempt?.completed || attempt?.submittedAt);
@@ -1742,7 +1751,6 @@ export default function HubCourseTestRunner({ user }) {
       listeningSectionIndex: nextSectionIndex,
       listeningPhase: "idle",
     });
-    await runListeningSection(nextSectionIndex);
   }
 
   useEffect(() => {
@@ -2012,7 +2020,6 @@ export default function HubCourseTestRunner({ user }) {
       listeningSectionIndex: nextSectionIndex,
       listeningPhase: "idle",
     });
-    await runListeningSection(nextSectionIndex);
   }
 
   async function handleStatusChange(sectionId, status) {
@@ -2142,26 +2149,6 @@ export default function HubCourseTestRunner({ user }) {
     if (canOpenDetailedFeedback) return;
     setDetailedFeedbackOpen(false);
   }, [canOpenDetailedFeedback]);
-
-  useEffect(() => {
-    if (!attempt?.id || !hydrationDoneRef.current) return;
-    if (!mainPaperSubmitted || listeningComplete) return;
-    if (!activeListeningSection) return;
-    if (!listeningAvailable) return;
-    if (startingListening) return;
-    if (listeningPhase !== "idle") return;
-
-    runListeningSection(listeningSectionIndex);
-  }, [
-    attempt?.id,
-    mainPaperSubmitted,
-    listeningComplete,
-    activeListeningSection,
-    listeningAvailable,
-    listeningPhase,
-    listeningSectionIndex,
-    startingListening,
-  ]);
 
   if (!user) {
     return (
@@ -2359,6 +2346,31 @@ export default function HubCourseTestRunner({ user }) {
                   </p>
                 </div>
               </div>
+            ) : activeListeningSection && listeningPhase === "idle" ? (
+              <div className="hub-course-test-listening-start">
+                <span className="hub-course-test-listening-kicker">
+                  Listening exercise {listeningSectionIndex + 1} of {listeningSections.length}
+                </span>
+                <h2>Listening</h2>
+                <p>
+                  When you start, you will have {activeListeningPreReadSeconds} seconds to read the questions before
+                  the listening begins. The recording will then play twice automatically.
+                </p>
+                <div className="hub-course-test-listening-start-meta">
+                  <strong>{activeListeningSection.title}</strong>
+                  <span>{activeListeningSection.itemCount} questions · {activeListeningSection.timing?.playCount || 2} plays</span>
+                </div>
+                <div className="hub-course-test-listening-actions">
+                  <button
+                    className="btn"
+                    type="button"
+                    onClick={() => runListeningSection(listeningSectionIndex)}
+                    disabled={startingListening}
+                  >
+                    {startingListening ? "Starting..." : "Start listening"}
+                  </button>
+                </div>
+              </div>
             ) : activeListeningSection ? (
               <>
                 <div className="hub-course-test-listening-hero">
@@ -2375,29 +2387,30 @@ export default function HubCourseTestRunner({ user }) {
                       {activeListeningSection.sharedPrompt.title}
                     </p>
                   ) : null}
-                  <p className="hub-course-test-listening-status">
-                    {listeningPhase === "idle"
-                      ? "Get ready. Reading time will begin automatically."
-                      : listeningPhase === "preread"
-                        ? `Read the task. Recording 1 starts in ${listeningCountdown}s.`
-                        : listeningPhase === "pause"
-                          ? `Play 2 starts in ${listeningCountdown}s.`
-                          : listeningPhase === "between-sections"
-                            ? `Next exercise starts in ${listeningCountdown}s.`
-                            : listeningPhase === "playing-first"
-                              ? "Play 1"
-                              : listeningPhase === "playing-second"
-                                ? "Play 2"
-                                : listeningPhase === "awaiting-first-play"
-                                  ? "Press to play recording 1."
-                                  : listeningPhase === "awaiting-second-play"
-                                    ? "Press to play recording 2."
-                                    : listeningPhase === "resume-blocked"
-                                      ? "This listening exercise was already started before the page refreshed. Ask your teacher before continuing."
-                                    : listeningPhase === "ready-finish"
-                                      ? "Listening complete. Submit when you're ready."
-                                      : "Listening in progress."}
-                  </p>
+                  {listeningCountdownMessage ? (
+                    <div className="hub-course-test-listening-countdown" role="timer" aria-live="polite">
+                      <span>{listeningPhase === "preread" ? "Read the questions" : "Get ready"}</span>
+                      <strong>{listeningCountdown}s</strong>
+                      <em>{listeningCountdownMessage}</em>
+                    </div>
+                  ) : null}
+                  {!listeningCountdownMessage ? (
+                    <p className="hub-course-test-listening-status">
+                      {listeningPhase === "playing-first"
+                        ? "Play 1"
+                        : listeningPhase === "playing-second"
+                          ? "Play 2"
+                          : listeningPhase === "awaiting-first-play"
+                            ? "Press to play recording 1."
+                            : listeningPhase === "awaiting-second-play"
+                              ? "Press to play recording 2."
+                              : listeningPhase === "resume-blocked"
+                                ? "This listening exercise was already started before the page refreshed. Ask your teacher before continuing."
+                              : listeningPhase === "ready-finish"
+                                ? "Listening complete. Submit when you're ready."
+                                : "Listening in progress."}
+                    </p>
+                  ) : null}
                 </div>
 
                 {Array.isArray(activeListeningSection.sharedPrompt?.exampleLines) &&
@@ -4327,6 +4340,17 @@ function HubCourseTestRunnerStyles() {
         margin-bottom: 1rem;
       }
 
+      .hub-course-test-listening-start {
+        display: grid;
+        gap: 0.85rem;
+        padding: 1.15rem;
+        border-radius: 18px;
+        border: 1px solid rgba(125, 211, 255, 0.3);
+        background:
+          radial-gradient(circle at top right, rgba(125, 211, 255, 0.16), transparent 44%),
+          rgba(8, 16, 38, 0.48);
+      }
+
       .hub-course-test-listening-kicker {
         color: #8ea5c8;
         font-size: 0.82rem;
@@ -4340,10 +4364,78 @@ function HubCourseTestRunnerStyles() {
         color: #eef4ff;
       }
 
+      .hub-course-test-listening-start h2 {
+        margin: 0;
+        color: #eef4ff;
+        font-size: clamp(1.9rem, 4vw, 2.7rem);
+      }
+
+      .hub-course-test-listening-start p {
+        margin: 0;
+        max-width: 62ch;
+        color: #cfe0fb;
+        font-size: 1.04rem;
+        line-height: 1.6;
+      }
+
+      .hub-course-test-listening-start-meta {
+        display: grid;
+        gap: 0.2rem;
+        padding: 0.85rem 0.95rem;
+        border-radius: 14px;
+        border: 1px solid rgba(120, 182, 255, 0.2);
+        background: rgba(120, 182, 255, 0.07);
+      }
+
+      .hub-course-test-listening-start-meta strong {
+        color: #eef4ff;
+      }
+
+      .hub-course-test-listening-start-meta span {
+        color: #9cb2d3;
+      }
+
       .hub-course-test-listening-subtitle {
         margin: 0;
         color: #b8c8e6;
         line-height: 1.5;
+      }
+
+      .hub-course-test-listening-countdown {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 0.2rem 1rem;
+        align-items: center;
+        padding: 1rem 1.05rem;
+        border-radius: 18px;
+        border: 1px solid rgba(147, 232, 183, 0.38);
+        background:
+          radial-gradient(circle at top right, rgba(147, 232, 183, 0.22), transparent 42%),
+          rgba(9, 27, 47, 0.82);
+        box-shadow: 0 18px 36px rgba(2, 8, 24, 0.24);
+      }
+
+      .hub-course-test-listening-countdown span {
+        color: #aee7d2;
+        font-size: 0.82rem;
+        font-weight: 800;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .hub-course-test-listening-countdown strong {
+        grid-row: span 2;
+        color: #f7fffb;
+        font-size: clamp(2.5rem, 9vw, 4.8rem);
+        line-height: 0.9;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .hub-course-test-listening-countdown em {
+        color: #e3fff1;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 1.35;
       }
 
       .hub-course-test-listening-instruction,
@@ -4415,7 +4507,9 @@ function HubCourseTestRunnerStyles() {
         .hub-course-test-listening-card strong,
         .hub-course-test-summary-card strong,
         .hub-course-test-detail-card strong,
-        .hub-course-test-listening-hero h2
+        .hub-course-test-listening-hero h2,
+        .hub-course-test-listening-start h2,
+        .hub-course-test-listening-start-meta strong
       ) {
         color: var(--color-text);
       }
@@ -4446,7 +4540,10 @@ function HubCourseTestRunnerStyles() {
         .hub-course-test-detail-card span,
         .hub-course-test-confirm-copy,
         .hub-course-test-listening-subtitle,
-        .hub-course-test-listening-instruction
+        .hub-course-test-listening-instruction,
+        .hub-course-test-listening-start p,
+        .hub-course-test-listening-start-meta span,
+        .hub-course-test-listening-countdown em
       ) {
         color: var(--color-text-soft);
       }
@@ -4467,7 +4564,8 @@ function HubCourseTestRunnerStyles() {
         .hub-course-test-status-label,
         .hub-course-test-summary-card span,
         .hub-course-test-detail-card span,
-        .hub-course-test-note-block span
+        .hub-course-test-note-block span,
+        .hub-course-test-listening-countdown span
       ) {
         background: var(--color-surface-3);
         border-color: var(--color-border);
@@ -4492,6 +4590,9 @@ function HubCourseTestRunnerStyles() {
         .hub-course-test-feedback-attempt,
         .hub-course-test-nav-btn,
         .hub-course-test-listening-card,
+        .hub-course-test-listening-start,
+        .hub-course-test-listening-start-meta,
+        .hub-course-test-listening-countdown,
         .hub-course-test-summary-card,
         .hub-course-test-detail-card,
         .hub-course-test-note-block
@@ -4599,6 +4700,10 @@ function HubCourseTestRunnerStyles() {
       :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-timer.is-over {
         background: rgba(180, 35, 24, 0.08);
         border-color: rgba(180, 35, 24, 0.35);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listening-countdown strong {
+        color: var(--color-text);
       }
 
       :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-report-track {
