@@ -779,6 +779,12 @@ const aptisAccess = {
   hasFullAccess: hasAptisTrainerAccess,
   isDemoMode: isAptisDemoMode,
 };
+const hasLinkedAptisAccess = hasAptisTrainerAccess || hasSeifHubAccess;
+const isLinkedAptisDemoMode = !hasLinkedAptisAccess;
+const linkedAptisAccess = {
+  hasFullAccess: hasLinkedAptisAccess,
+  isDemoMode: isLinkedAptisDemoMode,
+};
 const hasMemberSiteAccess = !requiresMemberAccess || (isOteSite ? hasOteAccess : hasSeifHubAccess);
 const isTeacherToolsRoute = location.pathname === "/teacher-tools";
 const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-it/join";
@@ -852,11 +858,11 @@ const [runKey,  setRunKey]  = useState(0);
   
       const batch = await fetchItems({
         levels,
-        tags: !isAptisDemoMode && tag ? [tag] : [],
-        count: isAptisDemoMode ? Math.min(count, APTIS_DEMO_GRAMMAR_QUESTION_LIMIT) : count,
-        allowedIds: isAptisDemoMode ? APTIS_DEMO_ACCESS.grammar.itemIds : [],
+        tags: !isLinkedAptisDemoMode && tag ? [tag] : [],
+        count: isLinkedAptisDemoMode ? Math.min(count, APTIS_DEMO_GRAMMAR_QUESTION_LIMIT) : count,
+        allowedIds: isLinkedAptisDemoMode ? APTIS_DEMO_ACCESS.grammar.itemIds : [],
         // Prefer new items for signed-in users
-        preferNew: !!user && !isAptisDemoMode,
+        preferNew: !!user && !isLinkedAptisDemoMode,
         seenIds,
       });
   
@@ -893,8 +899,8 @@ const [runKey,  setRunKey]  = useState(0);
   function GrammarPage() {
     const [answeredCount, setAnsweredCount] = useState(0);
     const grammarCountOptions = useMemo(
-      () => (isAptisDemoMode ? [5, 10, 15, 25] : [5, 10, 15]),
-      [isAptisDemoMode]
+      () => (isLinkedAptisDemoMode ? [5, 10, 15, 25] : [5, 10, 15]),
+      [isLinkedAptisDemoMode]
     );
 
     useEffect(() => {
@@ -904,10 +910,10 @@ const [runKey,  setRunKey]  = useState(0);
     }, [grammarCountOptions, count]);
 
     useEffect(() => {
-      if (isAptisDemoMode && tag) {
+      if (isLinkedAptisDemoMode && tag) {
         setTag("");
       }
-    }, [isAptisDemoMode, tag]);
+    }, [isLinkedAptisDemoMode, tag]);
 
     const handleGenerate = () => {
       setAnsweredCount(0);
@@ -934,11 +940,11 @@ const [runKey,  setRunKey]  = useState(0);
 
         <AptisDemoBadge
           user={user}
-          aptisAccess={aptisAccess}
+          aptisAccess={linkedAptisAccess}
           onSignIn={() => setShowAuth(true)}
         />
 
-        {isAptisDemoMode && (
+        {isLinkedAptisDemoMode && (
           <div className="grammar-demo-note" role="note">
             <strong>Grammar preview:</strong> demo mode uses a curated pool of 25 grammar items. Full access includes 400+ unique items across levels and grammar tags.
           </div>
@@ -954,7 +960,7 @@ const [runKey,  setRunKey]  = useState(0);
             tag={tag}
             onTagChange={setTag}
             allTags={allTags}
-            tagsLocked={isAptisDemoMode}
+            tagsLocked={isLinkedAptisDemoMode}
             lockedTagsMessage="Full tag filtering is available with full access."
           />
         )}
@@ -1234,9 +1240,9 @@ return (
   {/* ——— Grammar route ——— */}
   <Route
     path="/grammar"
-    element={isSeifHubSite ? <HubGrammarMenu /> : <GrammarPage aptisAccess={aptisAccess} />}
+    element={isSeifHubSite ? <HubGrammarMenu /> : <GrammarPage aptisAccess={linkedAptisAccess} />}
   />
-  <Route path="/grammar/aptis" element={<GrammarPage aptisAccess={aptisAccess} />} />
+  <Route path="/grammar/aptis" element={<GrammarPage aptisAccess={linkedAptisAccess} />} />
   <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu user={user} />} />
   <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer user={user} />} />
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests user={user} />} />
@@ -1848,9 +1854,9 @@ return (
       <VocabularyTopics
         isAuthenticated={!!user}
         user={user}
-        aptisAccess={aptisAccess}
-        demoTopicIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.vocabulary.topicIds : []}
-        demoTopicSetIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.vocabulary.topicSetIds : {}}
+        aptisAccess={linkedAptisAccess}
+        demoTopicIds={isLinkedAptisDemoMode ? APTIS_DEMO_ACCESS.vocabulary.topicIds : []}
+        demoTopicSetIds={isLinkedAptisDemoMode ? APTIS_DEMO_ACCESS.vocabulary.topicSetIds : {}}
         onSignIn={() => setShowAuth(true)}
       />
     }
@@ -1861,7 +1867,7 @@ return (
   element={
     <AptisFullAccessOnly
       user={user}
-      aptisAccess={aptisAccess}
+      aptisAccess={linkedAptisAccess}
       onSignIn={() => setShowAuth(true)}
       title="Vocab Lab is included with full access"
     >
@@ -2410,7 +2416,7 @@ return (
           )
         )}
 
-        {view === 'grammar' && <GrammarPage aptisAccess={aptisAccess} />}
+        {view === 'grammar' && <GrammarPage aptisAccess={linkedAptisAccess} />}
 
         {view === 'mistakes' && (
           <>
@@ -2610,6 +2616,10 @@ return (
             onBack={() => setView("vocabularyMenu")}
             isAuthenticated={!!user}
             user={user}
+            aptisAccess={linkedAptisAccess}
+            demoTopicIds={isLinkedAptisDemoMode ? APTIS_DEMO_ACCESS.vocabulary.topicIds : []}
+            demoTopicSetIds={isLinkedAptisDemoMode ? APTIS_DEMO_ACCESS.vocabulary.topicSetIds : {}}
+            onSignIn={() => setShowAuth(true)}
           />
         )}
 
