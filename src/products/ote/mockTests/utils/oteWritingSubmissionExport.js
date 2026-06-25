@@ -15,6 +15,16 @@ function safeText(value) {
   return String(value || "").trim();
 }
 
+function normalizeComparableText(value) {
+  return safeText(value).replace(/\s+/g, " ");
+}
+
+function needsImprovedVersion(task = {}) {
+  const improved = normalizeComparableText(task.improvedVersion);
+  if (!improved) return false;
+  return improved !== normalizeComparableText(task.studentAnswer);
+}
+
 function bodyParagraph(text, options = {}) {
   return new Paragraph({
     text: safeText(text) || "(no answer)",
@@ -87,8 +97,10 @@ function getFeedbackLines(feedback) {
       });
     }
 
-    if (task.improvedVersion) {
+    if (needsImprovedVersion(task)) {
       lines.push("", "Improved version", task.improvedVersion);
+    } else if (task.improvedVersion) {
+      lines.push("", "Improved version", "No rewrite needed; the original version is already strong.");
     }
 
     if (task.teacherNote) lines.push("", `Teacher note: ${task.teacherNote}`);
@@ -138,9 +150,12 @@ function feedbackDocxBlocks(feedback) {
       });
     }
 
-    if (task.improvedVersion) {
+    if (needsImprovedVersion(task)) {
       children.push(headingParagraph("Improved Version"));
       children.push(answerBlock(task.improvedVersion));
+    } else if (task.improvedVersion) {
+      children.push(headingParagraph("Improved Version"));
+      children.push(bodyParagraph("No rewrite needed; the original version is already strong."));
     }
 
     if (task.teacherNote) {
@@ -154,12 +169,13 @@ function feedbackDocxBlocks(feedback) {
 export function buildOteWritingSubmissionText({ submissionId, submission, mock }) {
   const task2Choice = submission.task2Choice || "essay";
   const task2 = mock.task2.options[task2Choice];
+  const task1Label = mock.task1.kind === "essay" ? "Essay" : "Email";
   return [
     `${mock.title}`,
     `Submission ID: ${submissionId || "local"}`,
-    `Part 2 option: ${task2.title}`,
+    mock.task2.noChoice ? `Part 2: ${task2.title}` : `Part 2 option: ${task2.title}`,
     "",
-    `Task 1: Email (${submission.counts?.task1 ?? 0} words)`,
+    `Task 1: ${task1Label} (${submission.counts?.task1 ?? 0} words)`,
     submission.answers?.task1 || "(no answer)",
     "",
     `Task 2: ${task2.title} (${submission.counts?.[task2Choice] ?? 0} words)`,
@@ -171,6 +187,37 @@ export function buildOteWritingSubmissionText({ submissionId, submission, mock }
 export async function downloadOteWritingSubmissionDocx({ submissionId, submission, mock }) {
   const task2Choice = submission.task2Choice || "essay";
   const task2 = mock.task2.options[task2Choice];
+  const task1Label = mock.task1.kind === "essay" ? "Essay" : "Email";
+  const task1PromptBlocks = mock.task1.kind === "essay"
+    ? [
+        bodyParagraph(mock.task1.setup),
+        bodyParagraph(mock.task1.prompt),
+        bodyParagraph(mock.task1.question),
+        ...(mock.task1.ideas || []).map((idea) => bodyParagraph(`- ${idea}`)),
+        bodyParagraph(mock.task1.organizationInstruction),
+      ]
+    : [
+        bodyParagraph(mock.task1.setup),
+        ...(mock.task1.email?.prompts || []).flatMap((prompt, index) => [
+          new Paragraph({
+            children: [new TextRun({ text: `${index + 1}. ${prompt.question}`, bold: true })],
+            spacing: { after: 80 },
+          }),
+          bodyParagraph(prompt.note),
+        ]),
+      ];
+  const task2PromptBlocks = task2.kind === "summary"
+    ? [
+        bodyParagraph(task2.setup),
+        ...(task2.sources || []).flatMap((source) => [
+          headingParagraph(source.title),
+          bodyParagraph(source.text),
+        ]),
+      ]
+    : [
+        bodyParagraph(task2.context),
+        bodyParagraph(task2.prompt),
+      ];
 
   const doc = new Document({
     styles: {
@@ -201,21 +248,13 @@ export async function downloadOteWritingSubmissionDocx({ submissionId, submissio
             style: "TitleStyle",
           }),
           bodyParagraph(`Submission ID: ${submissionId || "local"}`),
-          bodyParagraph(`Part 2 option: ${task2.title}`),
-          headingParagraph("Part 1: Email"),
-          bodyParagraph(mock.task1.setup),
-          ...mock.task1.email.prompts.flatMap((prompt, index) => [
-            new Paragraph({
-              children: [new TextRun({ text: `${index + 1}. ${prompt.question}`, bold: true })],
-              spacing: { after: 80 },
-            }),
-            bodyParagraph(prompt.note),
-          ]),
+          bodyParagraph(mock.task2.noChoice ? `Part 2: ${task2.title}` : `Part 2 option: ${task2.title}`),
+          headingParagraph(`Part 1: ${task1Label}`),
+          ...task1PromptBlocks,
           bodyParagraph(`Word count: ${submission.counts?.task1 ?? 0}`),
           answerBlock(submission.answers?.task1),
           headingParagraph(`Part 2: ${task2.title}`, { pageBreakBefore: true }),
-          bodyParagraph(task2.context),
-          bodyParagraph(task2.prompt),
+          ...task2PromptBlocks,
           bodyParagraph(`Word count: ${submission.counts?.[task2Choice] ?? 0}`),
           answerBlock(submission.answers?.[task2Choice]),
           ...feedbackDocxBlocks(submission.aiFeedback),

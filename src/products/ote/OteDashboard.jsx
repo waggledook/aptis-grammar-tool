@@ -31,11 +31,11 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
 
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
-          <span className="whats-new-label">{isAdvanced ? "Advanced workspace" : "Mock-test environment"}</span>
-          <h3>{isAdvanced ? "Advanced OTE is ready for content" : "Speaking and writing mocks are ready"}</h3>
+          <span className="whats-new-label">{isAdvanced ? "Advanced practice" : "Mock-test environment"}</span>
+          <h3>{isAdvanced ? "Prepare for OTE Advanced" : "Speaking and writing mocks are ready"}</h3>
           <p>
             {isAdvanced
-              ? "Use these placeholder areas as starting points while the advanced training content takes shape."
+              ? "Practise the higher-level speaking and writing tasks with timed mock-test activities."
               : "Start with OTE-style mock environments for speaking recordings and timed writing practice."}
           </p>
         </div>
@@ -50,17 +50,17 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
         <div className="menu-grid" aria-label="Advanced OTE sections">
           <button className="menu-card" type="button" onClick={() => navigate(speakingPath)}>
             <h3>Advanced Speaking</h3>
-            <p>Open the advanced speaking workspace, including the five-part placeholder mock.</p>
+            <p>Practise the five-part speaking module: questions, voicemail, summary, debate, and follow-up questions.</p>
           </button>
 
-          <button className="menu-card" type="button" disabled>
+          <button className="menu-card" type="button" onClick={() => navigate(writingPath)}>
             <h3>Advanced Writing</h3>
-            <p>Placeholder for C1-focused writing training, register control, and timed response work.</p>
+            <p>Practise the advanced essay and integrated summary tasks in a timed writing environment.</p>
           </button>
 
           <button className="menu-card" type="button" disabled>
             <h3>Advanced Language Lab</h3>
-            <p>Placeholder for complex grammar, lexical range, discourse markers, and precision practice.</p>
+            <p>Coming soon: complex grammar, lexical range, discourse markers, and precision practice.</p>
           </button>
 
           <button className="menu-card" type="button" onClick={() => navigate(profilePath)}>

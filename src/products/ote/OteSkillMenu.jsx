@@ -11,10 +11,10 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
   const homePath = getSitePath(nativeRoutes ? "/" : "/ote");
   const speakingMockId = isAdvanced ? "speaking-advanced-1" : "speaking-1";
   const speakingMockPath = getSitePath(nativeRoutes ? `/mock-tests/${speakingMockId}` : `/ote/mock-tests/${speakingMockId}`);
+  const writingMockPath = getSitePath(nativeRoutes ? "/writing/mock-tests" : "/ote/writing/mock-tests");
   const interviewTrainingPath = getSitePath(nativeRoutes ? "/speaking/part-1-interview" : "/ote/speaking/part-1-interview");
   const voicemailTrainingPath = getSitePath(nativeRoutes ? "/speaking/part-2-voicemails" : "/ote/speaking/part-2-voicemails");
   const talkTrainingPath = getSitePath(nativeRoutes ? "/speaking/parts-3-4" : "/ote/speaking/parts-3-4");
-  const writingMockPath = getSitePath(nativeRoutes ? "/writing/mock-tests" : "/ote/writing/mock-tests");
   const emailTrainingPath = getSitePath(nativeRoutes ? "/writing/training/email" : "/ote/writing/training/email");
   const essayTrainingPath = getSitePath(nativeRoutes ? "/writing/training/essay" : "/ote/writing/training/essay");
   const articleReviewTrainingPath = getSitePath(
@@ -59,13 +59,15 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
           <span className="whats-new-label">Available now</span>
-          <h3>{isSpeaking ? (isAdvanced ? "Advanced Speaking Mock 1" : "Speaking Mock 1") : "Writing mocks"}</h3>
+          <h3>{isSpeaking ? (isAdvanced ? "Advanced Speaking Mock 1" : "Speaking Mock 1") : isAdvanced ? "Advanced writing mocks" : "Writing mocks"}</h3>
           <p>
             {isSpeaking
               ? isAdvanced
                 ? "A five-part OTE Advanced speaking mock shell with interview, diplomatic voicemail, summary, debate, and follow-up sections."
                 : "A full four-part OTE-style speaking mock with automatic timing and recordings."
-              : "Choose from the available two-part OTE-style writing mocks with separate task timers, a choice screen, and live word counts."}
+              : isAdvanced
+                ? "Choose an advanced essay and summary writing mock with separate task timers and live word counts."
+                : "Choose from the available two-part OTE-style writing mocks with separate task timers, a choice screen, and live word counts."}
           </p>
         </div>
         <button className="whats-new-btn" type="button" onClick={isSpeaking ? openSpeakingMock : openWritingMock}>
@@ -74,35 +76,61 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
       </div>
 
       <div className="menu-grid">
-        {isSpeaking ? (
+        {isSpeaking && isAdvanced ? (
           <>
             <button className="menu-card" type="button" onClick={openSpeakingMock}>
-              <h3>{isAdvanced ? "Advanced Speaking Mock 1" : "Speaking Mock 1"}</h3>
-              <p>
-                {isAdvanced
-                  ? "Run the five-part advanced speaking module with placeholder tasks and timed recordings."
-                  : "Run the full speaking module in a locked exam-style environment."}
-              </p>
+              <h3>Advanced Speaking Mock 1</h3>
+              <p>Run the five-part advanced speaking module with timed recordings.</p>
+            </button>
+            <button className="menu-card" type="button" disabled>
+              <h3>Part 1 Questions</h3>
+              <p>Coming soon: focused practice for advanced interview questions.</p>
+            </button>
+            <button className="menu-card" type="button" disabled>
+              <h3>Part 2 Diplomatic Voicemail</h3>
+              <p>Coming soon: tactful voicemail responses for sensitive situations.</p>
+            </button>
+            <button className="menu-card" type="button" disabled>
+              <h3>Part 3 Summary</h3>
+              <p>Coming soon: integrated listening-to-speaking summary practice.</p>
+            </button>
+            <button className="menu-card" type="button" disabled>
+              <h3>Parts 4 and 5 Debate</h3>
+              <p>Coming soon: debate preparation and follow-up question practice.</p>
+            </button>
+          </>
+        ) : isSpeaking ? (
+          <>
+            <button className="menu-card" type="button" onClick={openSpeakingMock}>
+              <h3>Speaking Mock 1</h3>
+              <p>Run the full speaking module in a locked exam-style environment.</p>
             </button>
             <button className="menu-card" type="button" onClick={() => navigate(interviewTrainingPath)}>
               <h3>Part 1 Interview Training</h3>
               <p>Learn the interview format, timing, scoring rules, and check your understanding.</p>
             </button>
             <button className="menu-card" type="button" onClick={() => navigate(voicemailTrainingPath)}>
-              <h3>{isAdvanced ? "Part 2 Diplomatic Voicemail" : "Part 2 Voicemail Training"}</h3>
-              <p>
-                {isAdvanced
-                  ? "Placeholder area for diplomatic transaction and disagreement practice."
-                  : "Learn the format, compare formal and friendly messages, then check your understanding."}
-              </p>
+              <h3>Part 2 Voicemail Training</h3>
+              <p>Learn the format, compare formal and friendly messages, then check your understanding.</p>
             </button>
             <button className="menu-card" type="button" onClick={() => navigate(talkTrainingPath)}>
-              <h3>{isAdvanced ? "Summary and Debate Training" : "Parts 3 and 4 Talk Training"}</h3>
-              <p>
-                {isAdvanced
-                  ? "Placeholder area for integrated summaries, debate planning, and follow-up question strategy."
-                  : "Open the long-talk training menu, then choose a guide, guided activity, or timed practice."}
-              </p>
+              <h3>Parts 3 and 4 Talk Training</h3>
+              <p>Open the long-talk training menu, then choose a guide, guided activity, or timed practice.</p>
+            </button>
+          </>
+        ) : isAdvanced ? (
+          <>
+            <button className="menu-card" type="button" onClick={openWritingMock}>
+              <h3>Advanced Writing Mock Tests</h3>
+              <p>Choose a timed advanced essay and summary mock in the exam environment.</p>
+            </button>
+            <button className="menu-card" type="button" disabled>
+              <h3>Part 1 Essay</h3>
+              <p>Coming soon: advanced essay structure, argument, and support practice.</p>
+            </button>
+            <button className="menu-card" type="button" disabled>
+              <h3>Part 2 Summary</h3>
+              <p>Coming soon: integrated reading-to-writing summary practice.</p>
             </button>
           </>
         ) : (

@@ -8,6 +8,7 @@ import {
   saveOteWritingSubmission,
   saveWritingAiFeedback,
 } from "../../firebase.js";
+import { getSitePath } from "../../siteConfig.js";
 import { getOteWritingMock } from "./mockTests/data/oteWritingMockData.js";
 import {
   downloadOteWritingSubmissionDocx,
@@ -31,10 +32,70 @@ function countWords(value) {
 }
 
 function getOteTask2Type(option = {}) {
+  if (option.kind === "summary") return "ote_advanced_part2_summary";
   const typeText = `${option.id || ""} ${option.noun || ""} ${option.title || ""}`.toLowerCase();
   if (typeText.includes("review")) return "ote_part2_review";
   if (typeText.includes("article")) return "ote_part2_article";
   return "ote_part2_essay";
+}
+
+function getOteTask1Type(task = {}) {
+  if (task.kind === "essay") return "ote_advanced_part1_essay";
+  return "ote_part1_email";
+}
+
+function getDefaultTask2Choice(mock = {}) {
+  return mock.task2?.defaultChoice || Object.keys(mock.task2?.options || {})[0] || "essay";
+}
+
+function hasTask2ChoiceScreen(mock = {}) {
+  return !mock.task2?.noChoice && Object.keys(mock.task2?.options || {}).length > 1;
+}
+
+function getInitialWritingAnswers(mock = {}) {
+  return {
+    task1: "",
+    essay: "",
+    article: "",
+    summary: "",
+    [getDefaultTask2Choice(mock)]: "",
+  };
+}
+
+function flattenRichText(value) {
+  if (Array.isArray(value)) {
+    return value.map((part) => (typeof part === "string" ? part : part?.text || "")).join("");
+  }
+  return String(value || "");
+}
+
+function normalizeComparableText(value) {
+  return String(value || "").trim().replace(/\s+/g, " ");
+}
+
+function needsImprovedVersion(task = {}) {
+  const improved = normalizeComparableText(task.improvedVersion);
+  if (!improved) return false;
+  return improved !== normalizeComparableText(task.studentAnswer);
+}
+
+function removeUndefinedFields(value, insideArray = false) {
+  if (Array.isArray(value)) {
+    if (insideArray) return flattenRichText(value);
+    return value.map((item) => removeUndefinedFields(item, true));
+  }
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value)
+        .filter(([, item]) => item !== undefined)
+        .map(([key, item]) => [key, removeUndefinedFields(item)])
+    );
+  }
+  return value;
+}
+
+function isAdvancedWritingMock(mock = {}) {
+  return mock.levelLabel === "Advanced";
 }
 
 function isNeutralOteEmailTask(email = {}) {
@@ -47,13 +108,17 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
   const { mockId = "writing-1" } = useParams();
   const navigate = useNavigate();
   const mock = getOteWritingMock(mockId);
+  const isAdvancedUser = user?.oteVersion === "advanced";
+  const mockIsAdvanced = isAdvancedWritingMock(mock);
+  const mockMatchesVariant = mockIsAdvanced === isAdvancedUser;
+  const showTask2Choice = hasTask2ChoiceScreen(mock);
 
   const [status, setStatus] = useState("ready");
   const [countdownLeft, setCountdownLeft] = useState(mock.countdownSeconds);
   const [partTitleLeft, setPartTitleLeft] = useState(WRITING_PART_TITLE_SECONDS);
   const [timerLeft, setTimerLeft] = useState(0);
-  const [task2Choice, setTask2Choice] = useState("essay");
-  const [answers, setAnswers] = useState({ task1: "", essay: "", article: "" });
+  const [task2Choice, setTask2Choice] = useState(getDefaultTask2Choice(mock));
+  const [answers, setAnswers] = useState(() => getInitialWritingAnswers(mock));
   const [finishedAt, setFinishedAt] = useState(null);
   const [finishNotice, setFinishNotice] = useState("");
   const [finishReason, setFinishReason] = useState("");
@@ -65,6 +130,7 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
   const [aiFeedback, setAiFeedback] = useState(null);
   const [feedbackMeta, setFeedbackMeta] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [glossaryOpen, setGlossaryOpen] = useState(false);
   const [visualSettings, setVisualSettings] = useState({
     fontSize: "medium",
     theme: "default",
@@ -76,6 +142,7 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
       task1: countWords(answers.task1),
       essay: countWords(answers.essay),
       article: countWords(answers.article),
+      summary: countWords(answers.summary),
     }),
     [answers]
   );
@@ -98,13 +165,18 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
         setTimerLeft(mock.task1.timeSeconds);
         return undefined;
       }
-      setStatus("choice");
-      setTimerLeft(mock.task2.choiceSeconds);
+      if (showTask2Choice) {
+        setStatus("choice");
+        setTimerLeft(mock.task2.choiceSeconds);
+        return undefined;
+      }
+      setStatus("task2");
+      setTimerLeft(mock.task2.timeSeconds);
       return undefined;
     }
     const timer = window.setTimeout(() => setPartTitleLeft((prev) => prev - 1), 1000);
     return () => window.clearTimeout(timer);
-  }, [mock.task1.timeSeconds, mock.task2.choiceSeconds, partTitleLeft, status]);
+  }, [mock.task1.timeSeconds, mock.task2.choiceSeconds, mock.task2.timeSeconds, partTitleLeft, showTask2Choice, status]);
 
   useEffect(() => {
     if (!["task1", "choice", "task2"].includes(status)) return undefined;
@@ -138,8 +210,8 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
       onRequireSignIn?.();
       return;
     }
-    setAnswers({ task1: "", essay: "", article: "" });
-    setTask2Choice("essay");
+    setAnswers(getInitialWritingAnswers(mock));
+    setTask2Choice(getDefaultTask2Choice(mock));
     setFinishedAt(null);
     setFinishNotice("");
     setFinishReason("");
@@ -211,7 +283,7 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
   }
 
   function buildSubmissionPayload() {
-    return {
+    return removeUndefinedFields({
       mockId: mock.id,
       mockTitle: mock.title,
       moduleLabel: mock.moduleLabel,
@@ -220,20 +292,28 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
         task1: answers.task1,
         essay: answers.essay,
         article: answers.article,
+        summary: answers.summary,
       },
       counts: wordCounts,
       tasks: {
         task1: {
           title: mock.task1.title,
+          kind: mock.task1.kind || "email",
           minWords: mock.task1.minWords,
           maxWords: mock.task1.maxWords,
           setup: mock.task1.setup,
+          prompt: mock.task1.prompt,
+          question: mock.task1.question,
+          ideas: mock.task1.ideas,
+          organizationInstruction: mock.task1.organizationInstruction,
+          instruction: mock.task1.instruction,
           replyTo: mock.task1.replyTo,
           replySubject: mock.task1.replySubject,
           email: mock.task1.email,
         },
         task2: {
           title: mock.task2.title,
+          kind: mock.task2.kind || "extended",
           minWords: mock.task2.minWords,
           maxWords: mock.task2.maxWords,
           selectedOption: mock.task2.options[task2Choice],
@@ -246,7 +326,7 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
       },
       finishedAt: finishedAt || new Date().toISOString(),
       reason: finishReason,
-    };
+    });
   }
 
   async function handleGenerateFeedback(submission) {
@@ -269,18 +349,37 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
       const selectedAnswer = (submission.answers?.[submission.task2Choice] || "").trim();
       const task1 = submission.tasks?.task1 || {};
       const task1Email = task1.email || {};
-      const task1InputText = [
-        task1.setup,
-        "",
-        `From: ${task1Email.from || ""}`,
-        `Subject: ${task1Email.subject || ""}`,
-        task1Email.greeting || "",
-        ...(task1Email.paragraphs || []),
-        ...(task1Email.prompts || []).map((prompt) => `${prompt.question} [Note: ${prompt.note}]`),
-        ...(task1Email.closing || []),
-      ].filter(Boolean).join("\n");
+      const task1Type = getOteTask1Type(task1);
+      const task1InputText = task1Type === "ote_advanced_part1_essay"
+        ? [
+            task1.setup,
+            task1.prompt,
+            task1.question,
+            ...(task1.ideas || []).map((idea) => `Idea: ${idea}`),
+            task1.organizationInstruction,
+          ].filter(Boolean).join("\n")
+        : [
+            task1.setup,
+            "",
+            `From: ${task1Email.from || ""}`,
+            `Subject: ${task1Email.subject || ""}`,
+            task1Email.greeting || "",
+            ...(task1Email.paragraphs || []),
+            ...(task1Email.prompts || []).map((prompt) => `${prompt.question} [Note: ${prompt.note}]`),
+            ...(task1Email.closing || []),
+          ].filter(Boolean).join("\n");
 
       const task2Type = getOteTask2Type(selectedTask);
+      const task2InputText = task2Type === "ote_advanced_part2_summary"
+        ? [
+            selectedTask.setup,
+            ...(selectedTask.sources || []).map((source) => `${source.title}\n${source.text}`),
+            selectedTask.markingGuide?.overarchingIdea
+              ? `Teacher marking guide - overarching idea: ${selectedTask.markingGuide.overarchingIdea}`
+              : "",
+            ...(selectedTask.markingGuide?.mainIdeas || []).map((idea) => `Teacher marking guide - main idea: ${idea}`),
+          ].filter(Boolean).join("\n\n")
+        : selectedTask.context || "";
 
       const result = await requestOteWritingFeedback({
         exam: "OTE",
@@ -288,15 +387,19 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
         tasks: [
           {
             taskId: `${submission.mockId || "mock"}:task1`,
-            taskType: "ote_part1_email",
-            title: task1.title || "Email",
+            taskType: task1Type,
+            title: task1.title || (task1Type === "ote_advanced_part1_essay" ? "Essay" : "Email"),
             inputText: task1InputText,
-            prompt: task1.setup || "Write an email responding to the input email.",
-            requiredPoints: (task1Email.prompts || []).map((prompt) =>
-              `${prompt.question} Note: ${prompt.note}`.trim()
-            ),
-            targetAudience: task1.replyTo || task1Email.from || "recipient",
-            expectedRegister: isNeutralOteEmailTask(task1Email) ? "neutral" : "informal",
+            prompt: task1Type === "ote_advanced_part1_essay"
+              ? [task1.prompt, task1.question, task1.instruction].filter(Boolean).join("\n")
+              : task1.setup || "Write an email responding to the input email.",
+            requiredPoints: task1Type === "ote_advanced_part1_essay"
+              ? task1.ideas || []
+              : (task1Email.prompts || []).map((prompt) =>
+                  `${prompt.question} Note: ${prompt.note}`.trim()
+                ),
+            targetAudience: task1Type === "ote_advanced_part1_essay" ? "academic tutor" : task1.replyTo || task1Email.from || "recipient",
+            expectedRegister: task1Type === "ote_advanced_part1_essay" ? "academic essay" : isNeutralOteEmailTask(task1Email) ? "neutral" : "informal",
             answer: {
               text: (submission.answers?.task1 || "").trim(),
               wordCount: submission.counts?.task1 || countWords(submission.answers?.task1),
@@ -306,18 +409,25 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
             taskId: `${submission.mockId || "mock"}:task2:${selectedTask.id || submission.task2Choice}`,
             taskType: task2Type,
             title: selectedTask.title || "Part 2",
-            inputText: selectedTask.context || "",
-            prompt: [selectedTask.promptLabel, selectedTask.prompt, selectedTask.instruction]
+            inputText: task2InputText,
+            prompt: [
+              selectedTask.promptLabel,
+              selectedTask.prompt,
+              ...(selectedTask.instructions || []).map(flattenRichText),
+              flattenRichText(selectedTask.instruction),
+            ]
               .filter(Boolean)
               .join("\n"),
-            requiredPoints: [],
-            targetAudience: "English teacher",
+            requiredPoints: selectedTask.markingGuide?.mainIdeas || [],
+            targetAudience: task2Type === "ote_advanced_part2_summary" ? "classmates" : "English teacher",
             expectedRegister:
-              task2Type === "ote_part2_essay"
-                ? "essay-style"
-                : task2Type === "ote_part2_review"
-                  ? "review-style"
-                  : "article-style",
+              task2Type === "ote_advanced_part2_summary"
+                ? "concise academic summary"
+                : task2Type === "ote_part2_essay"
+                  ? "essay-style"
+                  : task2Type === "ote_part2_review"
+                    ? "review-style"
+                    : "article-style",
             answer: {
               text: selectedAnswer,
               wordCount: submission.counts?.[submission.task2Choice] || countWords(selectedAnswer),
@@ -351,7 +461,7 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
         submissionId,
         mode: "full_mock",
         taskTypes: [
-          "ote_part1_email",
+          getOteTask1Type(submission.tasks?.task1 || {}),
           getOteTask2Type(submission.tasks?.task2?.selectedOption || {}),
         ],
         wordCounts: {
@@ -366,6 +476,17 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
 
   const homePath = nativeRoutes ? "/" : "/ote";
   const headerState = getHeaderState(status, mock, timerLeft);
+  const activeTask2Option = mock.task2.options[task2Choice];
+  const hasGlossary = status === "task2" && activeTask2Option?.kind === "summary" && activeTask2Option.glossary?.length;
+
+  if (user && !mockMatchesVariant) {
+    return (
+      <WritingUnavailable
+        isAdvancedMock={mockIsAdvanced}
+        onBack={() => navigate(getSitePath(nativeRoutes ? "/writing/mock-tests" : "/ote/writing/mock-tests"))}
+      />
+    );
+  }
 
   return (
     <main className={`ote-exam ote-writing-exam ote-font-${visualSettings.fontSize} ote-theme-${visualSettings.theme}`}>
@@ -431,9 +552,15 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
         <WritingFooter
           status={status}
           onOpenSettings={() => setSettingsOpen(true)}
+          onGlossary={hasGlossary ? () => setGlossaryOpen(true) : null}
           onNext={status === "task1" ? goToChoice : status === "choice" ? beginTask2 : () => finishMock("manual")}
         />
       ) : null}
+      <SummaryGlossaryModal
+        open={glossaryOpen && Boolean(hasGlossary)}
+        glossary={activeTask2Option?.glossary || []}
+        onClose={() => setGlossaryOpen(false)}
+      />
       <VisualOptionsDrawer
         open={settingsOpen}
         settings={visualSettings}
@@ -486,6 +613,27 @@ function WritingHeader({ title, progress, timeLeft }) {
   );
 }
 
+function WritingUnavailable({ isAdvancedMock, onBack }) {
+  return (
+    <main className="ote-exam ote-writing-exam">
+      <WritingHeader title="Writing Mock" progress={0} timeLeft={null} />
+      <section className="ote-start-screen ote-writing-start">
+        <div className="ote-writing-intro">
+          <h1>Mock not available</h1>
+          <p>
+            {isAdvancedMock
+              ? "This advanced writing mock is only available in the Advanced OTE workspace."
+              : "This general writing mock is only available in the General OTE workspace."}
+          </p>
+          <button className="ote-primary-btn" type="button" onClick={onBack}>
+            Back to writing mocks
+          </button>
+        </div>
+      </section>
+    </main>
+  );
+}
+
 function WritingStartScreen({ user, onStart }) {
   return (
     <section className="ote-start-screen ote-writing-start">
@@ -530,6 +678,33 @@ function WritingPartTitle({ partNumber }) {
 
 function TaskOne({ mock, value, words, onChange }) {
   const task = mock.task1;
+  if (task.kind === "essay") {
+    return (
+      <section className="ote-writing-workspace">
+        <div className="ote-writing-task-layout">
+          <div className="ote-writing-prompt-pane">
+            <p className="ote-writing-lead">{task.intro}</p>
+            <p>{task.setup}</p>
+            <article className="ote-writing-option-card">
+              <p><em>{task.prompt}</em></p>
+              <p><em>{task.question}</em></p>
+            </article>
+            <p>{task.ideasIntro}</p>
+            <ul className="ote-writing-bullet-list">
+              {task.ideas.map((idea) => <li key={idea}>{idea}</li>)}
+            </ul>
+            <p>{task.organizationInstruction}</p>
+            <p>{task.instruction}</p>
+          </div>
+          <div className="ote-writing-answer-pane">
+            <WritingTextarea value={value} onChange={onChange} />
+            <WordCounter words={words} min={task.minWords} max={task.maxWords} />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="ote-writing-workspace">
       <div className="ote-writing-task-layout">
@@ -603,6 +778,46 @@ function TaskTwoChoice({ mock, choice, onChoiceChange }) {
 function TaskTwoWriting({ mock, choice, value, words, onChange }) {
   const task = mock.task2;
   const option = task.options[choice];
+  if (option.kind === "summary") {
+    return (
+      <section className="ote-writing-workspace">
+        <div className="ote-writing-summary-layout">
+          <div className="ote-writing-summary-top">
+            <div className="ote-writing-prompt-pane">
+              <p className="ote-writing-lead">
+                {(option.introLines || [option.intro]).filter(Boolean).map((line) => (
+                  <React.Fragment key={line}>
+                    {line}
+                    <br />
+                  </React.Fragment>
+                ))}
+              </p>
+              <p>{option.setup}</p>
+              {option.instructions.map((instruction) => (
+                <RichInstructionLine key={flattenRichText(instruction)} line={instruction} />
+              ))}
+              <RichInstructionLine line={option.instruction} />
+            </div>
+            <div className="ote-writing-answer-pane ote-writing-summary-answer-pane">
+              <WritingTextarea value={value} onChange={onChange} />
+              <WordCounter words={words} min={task.minWords} max={task.maxWords} showRange={false} />
+            </div>
+          </div>
+          <div className="ote-writing-source-panel">
+            <div className="ote-writing-source-grid">
+              {option.sources.map((source) => (
+                <article className="ote-writing-source-card" key={source.title}>
+                  <h2>{source.title}</h2>
+                  <p>{source.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="ote-writing-workspace">
       <div className="ote-writing-task-layout">
@@ -628,6 +843,22 @@ function TaskTwoWriting({ mock, choice, value, words, onChange }) {
 }
 
 function PreviewOption({ option, minWords = 100, maxWords = 160, compact = false }) {
+  if (option.kind === "summary") {
+    return (
+      <>
+        <p className="ote-writing-preview-lead">
+          You have 20 minutes to write a summary. Write {minWords}-{maxWords} words.
+        </p>
+        {!compact ? <p>{option.setup}</p> : null}
+        <div className="ote-writing-title-box">
+          <strong>{option.title}</strong>
+          <p>{flattenRichText(option.instructions?.[0])}</p>
+        </div>
+        <p>{flattenRichText(option.instruction)}</p>
+      </>
+    );
+  }
+
   if (option.id === "essay") {
     return (
       <>
@@ -658,6 +889,18 @@ function PreviewOption({ option, minWords = 100, maxWords = 160, compact = false
   );
 }
 
+function RichInstructionLine({ line }) {
+  if (!Array.isArray(line)) return <p>{line}</p>;
+  return (
+    <p>
+      {line.map((part, index) => {
+        if (typeof part === "string") return <React.Fragment key={`${part}-${index}`}>{part}</React.Fragment>;
+        return <strong key={`${part.text}-${index}`}>{part.text}</strong>;
+      })}
+    </p>
+  );
+}
+
 function WritingTextarea({ value, onChange }) {
   return (
     <textarea
@@ -674,16 +917,16 @@ function WritingTextarea({ value, onChange }) {
   );
 }
 
-function WordCounter({ words, min, max }) {
+function WordCounter({ words, min, max, showRange = true }) {
   const status = words < min ? "is-low" : words > max ? "is-high" : "is-good";
   return (
     <div className={`ote-word-count ${status}`}>
-      {words} words / {min}-{max}
+      {words} words{showRange ? ` / ${min}-${max}` : ""}
     </div>
   );
 }
 
-function WritingFooter({ status, onOpenSettings, onNext }) {
+function WritingFooter({ status, onOpenSettings, onGlossary, onNext }) {
   const nextLabel = status === "task1" ? "Next" : status === "choice" ? "Next" : "Finish mock";
   return (
     <footer className="ote-exam-footer">
@@ -693,11 +936,42 @@ function WritingFooter({ status, onOpenSettings, onNext }) {
       <button type="button" disabled>
         Jump to
       </button>
+      {onGlossary ? (
+        <button type="button" onClick={onGlossary}>
+          Glossary
+        </button>
+      ) : null}
       <span>{status === "choice" ? "Choose one question before continuing." : "You cannot return after choosing Next."}</span>
       <button className="ote-footer-next" type="button" onClick={onNext}>
         {nextLabel}
       </button>
     </footer>
+  );
+}
+
+function SummaryGlossaryModal({ open, glossary = [], onClose }) {
+  if (!open) return null;
+
+  return (
+    <aside className="ote-summary-glossary-popover" aria-label="Glossary">
+      <div className="ote-summary-glossary-title">
+        <span>Glossary</span>
+        <button type="button" onClick={onClose} aria-label="Close glossary">
+          ×
+        </button>
+      </div>
+      <div className="ote-summary-glossary-body">
+        <h2>Glossary</h2>
+        <dl>
+          {glossary.map((item) => (
+            <div key={item.term}>
+              <dt>{item.term}</dt>
+              <dd>{item.definition}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </aside>
   );
 }
 
@@ -799,6 +1073,7 @@ function WritingComplete({
   onBack,
 }) {
   const task2 = mock.task2.options[task2Choice];
+  const task1Label = mock.task1.kind === "essay" ? "Essay" : "Email";
   return (
     <section className="ote-complete-screen">
       <div className="ote-results-panel ote-writing-results-panel">
@@ -835,7 +1110,7 @@ function WritingComplete({
         </div>
         <div className="ote-writing-review-grid">
           <article>
-            <h2>Task 1</h2>
+            <h2>Task 1: {task1Label}</h2>
             <p>{wordCounts.task1} words</p>
             <pre>{answers.task1 || "No answer written."}</pre>
           </article>
@@ -953,10 +1228,17 @@ export function WritingAiFeedback({ feedback, status, error }) {
             <OteExampleList examples={task.grammar?.examples} type="correction" />
             <p><strong>Lexis:</strong> {task.lexis?.feedback}</p>
             <OteExampleList examples={task.lexis?.examples} type="suggestion" />
-            <div className="ote-ai-feedback-improved">
-              <strong>Improved version</strong>
-              <pre>{task.improvedVersion}</pre>
-            </div>
+            {needsImprovedVersion(task) ? (
+              <div className="ote-ai-feedback-improved">
+                <strong>Improved version</strong>
+                <pre>{task.improvedVersion}</pre>
+              </div>
+            ) : task.improvedVersion ? (
+              <div className="ote-ai-feedback-improved">
+                <strong>Improved version</strong>
+                <p>No rewrite needed; the original version is already strong.</p>
+              </div>
+            ) : null}
             <blockquote>{task.teacherNote}</blockquote>
           </article>
         ))}
@@ -969,6 +1251,8 @@ export function WritingAiFeedback({ feedback, status, error }) {
 
 function getOteTaskLabel(taskType, index = 1) {
   if (taskType === "ote_part1_email") return "Part 1 Email";
+  if (taskType === "ote_advanced_part1_essay") return "Part 1 Essay";
+  if (taskType === "ote_advanced_part2_summary") return "Part 2 Summary";
   if (taskType === "ote_part2_article") return "Part 2 Article";
   if (taskType === "ote_part2_review") return "Part 2 Review";
   if (taskType === "ote_part2_essay") return "Part 2 Essay";

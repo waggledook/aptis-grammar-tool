@@ -799,6 +799,8 @@ const toggleTheme = () => {
 const setOteVersionPreference = async (version) => {
   const normalizedVersion = version === "advanced" ? "advanced" : "general";
   setUser((prev) => (prev ? { ...prev, oteVersion: normalizedVersion } : prev));
+  const oteHomePath = location.pathname.startsWith("/ote") ? getSitePath("/ote") : getSitePath("/");
+  navigate(oteHomePath);
 
   if (!user?.uid) return;
 

@@ -349,7 +349,16 @@ function countWords(value) {
   return text.split(/\s+/).filter(Boolean).length;
 }
 
+function flattenOteRichText(value) {
+  if (Array.isArray(value)) {
+    return value.map((part) => (typeof part === "string" ? part : part?.text || "")).join("");
+  }
+  return String(value || "");
+}
+
 function getOtePracticeTaskType(task = {}) {
+  if (task.kind === "summary") return "ote_advanced_part2_summary";
+  if (task.kind === "essay" && task.minWords >= 220) return "ote_advanced_part1_essay";
   const typeText = `${task.type || ""} ${task.typeLabel || ""} ${task.title || ""}`.toLowerCase();
   if (typeText.includes("review")) return "ote_part2_review";
   if (typeText.includes("article")) return "ote_part2_article";
@@ -358,6 +367,8 @@ function getOtePracticeTaskType(task = {}) {
 }
 
 function getOtePracticeRegister(task = {}) {
+  if (task.kind === "summary") return "concise academic summary";
+  if (task.kind === "essay" && task.minWords >= 220) return "academic essay";
   if (task.type === "email") return task.register || "neutral";
   if (task.type === "review") return "review-style";
   if (task.type === "article") return "article-style";
@@ -530,23 +541,48 @@ async function handleProfileWritingFeedback(kind, submission) {
         const selectedTask = submission.tasks?.task2?.selectedOption || {};
         const task2Choice = submission.task2Choice || "essay";
         const task2Answer = submission.answers?.[task2Choice] || "";
-        tasks.push(
-          {
-            taskId: `${submission.mockId || "mock"}:task1`,
-            taskType: "ote_part1_email",
-            title: task1.title || "Email",
-            inputText: [
+        const task1Type = getOtePracticeTaskType(task1);
+        const task1InputText = task1Type === "ote_advanced_part1_essay"
+          ? [
+              task1.setup,
+              task1.prompt,
+              task1.question,
+              ...(task1.ideas || []).map((idea) => `Idea: ${idea}`),
+              task1.organizationInstruction,
+            ].filter(Boolean).join("\n")
+          : [
               task1.setup,
               task1Email.from ? `From: ${task1Email.from}` : "",
               task1Email.subject ? `Subject: ${task1Email.subject}` : "",
               task1Email.greeting,
               ...(task1Email.paragraphs || []),
               ...(task1Email.prompts || []).map((prompt) => `${prompt.question} [Note: ${prompt.note}]`),
-            ].filter(Boolean).join("\n"),
-            prompt: task1.setup || "Write an email responding to the input email.",
-            requiredPoints: (task1Email.prompts || []).map((prompt) => `${prompt.question} Note: ${prompt.note}`.trim()),
-            targetAudience: task1.replyTo || task1Email.from || "recipient",
-            expectedRegister: "neutral",
+            ].filter(Boolean).join("\n");
+        const task2Type = getOtePracticeTaskType(selectedTask);
+        const task2InputText = task2Type === "ote_advanced_part2_summary"
+          ? [
+              selectedTask.setup,
+              ...(selectedTask.sources || []).map((source) => `${source.title}\n${source.text}`),
+              selectedTask.markingGuide?.overarchingIdea
+                ? `Teacher marking guide - overarching idea: ${selectedTask.markingGuide.overarchingIdea}`
+                : "",
+              ...(selectedTask.markingGuide?.mainIdeas || []).map((idea) => `Teacher marking guide - main idea: ${idea}`),
+            ].filter(Boolean).join("\n\n")
+          : selectedTask.context || "";
+        tasks.push(
+          {
+            taskId: `${submission.mockId || "mock"}:task1`,
+            taskType: task1Type,
+            title: task1.title || (task1Type === "ote_advanced_part1_essay" ? "Essay" : "Email"),
+            inputText: task1InputText,
+            prompt: task1Type === "ote_advanced_part1_essay"
+              ? [task1.prompt, task1.question, task1.instruction].filter(Boolean).join("\n")
+              : task1.setup || "Write an email responding to the input email.",
+            requiredPoints: task1Type === "ote_advanced_part1_essay"
+              ? task1.ideas || []
+              : (task1Email.prompts || []).map((prompt) => `${prompt.question} Note: ${prompt.note}`.trim()),
+            targetAudience: task1Type === "ote_advanced_part1_essay" ? "academic tutor" : task1.replyTo || task1Email.from || "recipient",
+            expectedRegister: getOtePracticeRegister(task1),
             answer: {
               text: submission.answers?.task1 || "",
               wordCount: submission.counts?.task1 || countWords(submission.answers?.task1),
@@ -554,12 +590,17 @@ async function handleProfileWritingFeedback(kind, submission) {
           },
           {
             taskId: `${submission.mockId || "mock"}:task2:${selectedTask.id || task2Choice}`,
-            taskType: getOtePracticeTaskType(selectedTask),
+            taskType: task2Type,
             title: selectedTask.title || "Part 2",
-            inputText: selectedTask.context || "",
-            prompt: [selectedTask.promptLabel, selectedTask.prompt, selectedTask.instruction].filter(Boolean).join("\n"),
-            requiredPoints: [],
-            targetAudience: "English teacher",
+            inputText: task2InputText,
+            prompt: [
+              selectedTask.promptLabel,
+              selectedTask.prompt,
+              ...(selectedTask.instructions || []).map(flattenOteRichText),
+              flattenOteRichText(selectedTask.instruction),
+            ].filter(Boolean).join("\n"),
+            requiredPoints: selectedTask.markingGuide?.mainIdeas || [],
+            targetAudience: task2Type === "ote_advanced_part2_summary" ? "classmates" : "English teacher",
             expectedRegister: getOtePracticeRegister(selectedTask),
             answer: {
               text: task2Answer,
@@ -4521,6 +4562,10 @@ function ProfileEmailFeedback({ title, data }) {
 }
 
 function ProfileTaskFeedback({ title, task }) {
+  const improvedText = String(task.improvedVersion || "").trim();
+  const studentText = String(task.studentAnswer || "").trim();
+  const showImprovedVersion = improvedText && improvedText.replace(/\s+/g, " ") !== studentText.replace(/\s+/g, " ");
+
   return (
     <article className="profile-ai-feedback-card">
       <strong>{title}</strong>
@@ -4536,11 +4581,13 @@ function ProfileTaskFeedback({ title, task }) {
       {task.lexis?.feedback ? <p><em>Vocabulary:</em> {task.lexis.feedback}</p> : null}
       <ProfileExamples title="Vocabulary examples" examples={task.lexis?.examples} />
       <ProfileMistakes mistakes={task.mistakes} />
-      {task.improvedVersion ? (
+      {showImprovedVersion ? (
         <>
           <p><em>Improved version:</em></p>
           <pre>{task.improvedVersion}</pre>
         </>
+      ) : improvedText ? (
+        <p><em>Improved version:</em> No rewrite needed; the original version is already strong.</p>
       ) : null}
       {task.teacherNote ? <p><em>Teacher note:</em> {task.teacherNote}</p> : null}
     </article>

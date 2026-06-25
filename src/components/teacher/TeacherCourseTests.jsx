@@ -15,6 +15,7 @@ import {
 import { getHubCourseTestTemplate, listHubCourseTestTemplates } from "../../data/hubCourseTestTemplates.js";
 import { getSitePath } from "../../siteConfig.js";
 import { toast } from "../../utils/toast";
+import { getDuplicateDisplayNameGroups, getUserIdentityLabel } from "../../utils/userLabels.js";
 
 function formatDateTime(value) {
   if (!value) return "—";
@@ -516,6 +517,7 @@ export default function TeacherCourseTests({ user }) {
   const selectedOwnerTeacher =
     teacherOptions.find((teacher) => teacher.id === ownerTeacherUid) ||
     { id: user.uid, email: user.email || "", displayName: user.displayName || user.name || user.email || user.uid };
+  const duplicateTeacherNameGroups = getDuplicateDisplayNameGroups(teacherOptions);
 
   useEffect(() => {
     let alive = true;
@@ -1095,11 +1097,15 @@ export default function TeacherCourseTests({ user }) {
                 >
                   {teacherOptions.map((teacher) => (
                     <option key={teacher.id} value={teacher.id}>
-                      {teacher.displayName || teacher.email || teacher.id}
-                      {teacher.role === "admin" ? " (admin)" : ""}
+                      {getUserIdentityLabel(teacher, { includeRole: true })}
                     </option>
                   ))}
                 </select>
+                {duplicateTeacherNameGroups.length > 0 ? (
+                  <div className="muted small" style={{ marginTop: "0.35rem" }}>
+                    Duplicate teacher names detected. Use the email and UID shown above to choose the correct account.
+                  </div>
+                ) : null}
                 <div className="muted small" style={{ marginTop: "0.35rem" }}>
                   Sessions created here appear under this teacher’s account and use their name for students.
                 </div>

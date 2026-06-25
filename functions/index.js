@@ -1415,9 +1415,10 @@ const OTE_WRITING_FEEDBACK_SCHEMA = {
             "A2 range",
             "B1 range",
             "B1+/B2 range",
+            "B2 range",
             "Strong B2 range",
             "C1 range",
-            "C2-like / above OTE range",
+            "At least C1 / above OTE range",
           ],
         },
         confidence: { type: "string", enum: ["low", "medium", "high"] },
@@ -1459,7 +1460,14 @@ const OTE_WRITING_FEEDBACK_SCHEMA = {
           taskId: { type: "string" },
           taskType: {
             type: "string",
-            enum: ["ote_part1_email", "ote_part2_essay", "ote_part2_article", "ote_part2_review"],
+            enum: [
+              "ote_part1_email",
+              "ote_part2_essay",
+              "ote_part2_article",
+              "ote_part2_review",
+              "ote_advanced_part1_essay",
+              "ote_advanced_part2_summary",
+            ],
           },
           studentAnswer: { type: "string" },
           wordCount: { type: "integer" },
@@ -2984,6 +2992,20 @@ function getOteWordCountStatus(taskType, wordCount) {
     if (wordCount <= 150) return "acceptable_over_range";
     return "excessive";
   }
+  if (taskType === "ote_advanced_part1_essay") {
+    if (wordCount < 180) return "too_short";
+    if (wordCount < 220) return "slightly_short_but_acceptable";
+    if (wordCount <= 280) return "target_range";
+    if (wordCount <= 300) return "acceptable_over_range";
+    return "excessive";
+  }
+  if (taskType === "ote_advanced_part2_summary") {
+    if (wordCount < 60) return "too_short";
+    if (wordCount < 80) return "slightly_short_but_acceptable";
+    if (wordCount <= 100) return "target_range";
+    if (wordCount <= 105) return "acceptable_over_range";
+    return "excessive";
+  }
   if (wordCount < 80) return "too_short";
   if (wordCount < 100) return "slightly_short_but_acceptable";
   if (wordCount <= 160) return "target_range";
@@ -2992,8 +3014,32 @@ function getOteWordCountStatus(taskType, wordCount) {
 }
 
 function describeOteWordCount(taskType, status, wordCount) {
-  const label = taskType === "ote_part1_email" ? "Part 1 email" : "Part 2 task";
+  const label =
+    taskType === "ote_part1_email"
+      ? "Part 1 email"
+      : taskType === "ote_advanced_part1_essay"
+        ? "Part 1 essay"
+        : taskType === "ote_advanced_part2_summary"
+          ? "Part 2 summary"
+          : "Part 2 task";
   const words = `${wordCount} word${wordCount === 1 ? "" : "s"}`;
+  if (taskType === "ote_advanced_part1_essay") {
+    if (wordCount >= 220 && wordCount <= 280) return `Part 1 essay: ${words}. In the target range.`;
+    if (wordCount >= 161 && wordCount <= 219) return `Part 1 essay: ${words}. Under length; official criteria cap all criteria at B2.2.`;
+    if (wordCount >= 91 && wordCount <= 160) return `Part 1 essay: ${words}. Clearly under length; official criteria cap all criteria at B2.1.`;
+    if (wordCount >= 71 && wordCount <= 90) return `Part 1 essay: ${words}. Severely under length; official criteria cap all criteria at B1.2.`;
+    if (wordCount <= 70) return `Part 1 essay: ${words}. Too short for the task; official criteria cap all criteria at B1.1.`;
+    return `Part 1 essay: ${words}. Over the target range; mention this if it causes repetition, loss of focus, or exam-management risk.`;
+  }
+
+  if (taskType === "ote_advanced_part2_summary") {
+    if (wordCount >= 80 && wordCount <= 100) return `Part 2 summary: ${words}. In the target range.`;
+    if (wordCount >= 101 && wordCount <= 105) return `Part 2 summary: ${words}. Slightly over 100 words, but official criteria allow any mark up to 105 words.`;
+    if (wordCount >= 106 && wordCount <= 120) return `Part 2 summary: ${words}. Over the limit; official criteria cap all criteria at B2.2.`;
+    if (wordCount >= 121) return `Part 2 summary: ${words}. Far over the limit; official criteria cap all criteria at B1.2.`;
+    return `${label}: ${words}. Under length; important main ideas are likely missing.`;
+  }
+
   switch (status) {
     case "too_short":
       return `${label}: ${words}. This is under length and should be flagged clearly, especially if content is missing.`;
@@ -3056,7 +3102,7 @@ function isLengthPriority(text = "") {
 }
 
 function isVaguePolishPriority(text = "") {
-  return /\b(make .*phrases? more natural|phrases? more natural|smoother wording|wording more natural)\b/i.test(text);
+  return /\b(make .*phrases? more natural|phrases? more natural|smoother wording|wording more natural|supporting details? tightly focused|maximum precision|maintain .*precision)\b/i.test(text);
 }
 
 function dedupeOtePriorities(priorities = []) {
@@ -3064,6 +3110,21 @@ function dedupeOtePriorities(priorities = []) {
     const normalized = String(item || "").trim().toLowerCase();
     return normalized && list.findIndex((other) => String(other || "").trim().toLowerCase() === normalized) === index;
   });
+}
+
+function countOteMeaningfulMistakes(taskFeedback = {}) {
+  return Array.isArray(taskFeedback.mistakes) ? taskFeedback.mistakes.length : 0;
+}
+
+function hasPartialOteTaskCoverage(taskFeedback = {}) {
+  const taskStatus = taskFeedback.taskFulfilment?.status;
+  const contentStatus = taskFeedback.taskFulfilment?.contentSpecificity?.status;
+  const requiredPoints = taskFeedback.taskFulfilment?.requiredPoints || [];
+  return (
+    ["partial", "weak", "off_task"].includes(taskStatus) ||
+    ["partly_generic", "too_generic", "off_task"].includes(contentStatus) ||
+    requiredPoints.some((point) => ["partly_covered", "missing"].includes(point?.status))
+  );
 }
 
 function postProcessOteWritingFeedback(payload, feedback) {
@@ -3119,6 +3180,8 @@ function postProcessOteWritingFeedback(payload, feedback) {
   const hasHighControlTask = processedTasks.some(isHighControlOteTask);
   const hasOnlyHighControlTasks = processedTasks.length > 0 && processedTasks.every(isHighControlOteTask);
   const hasMeaningfulMistakes = processedTasks.some((task) => (task.mistakes || []).length > 0);
+  const meaningfulMistakeCount = processedTasks.reduce((sum, task) => sum + countOteMeaningfulMistakes(task), 0);
+  const hasPartialCoverage = processedTasks.some(hasPartialOteTaskCoverage);
 
   const adjusted = {
     ...feedback,
@@ -3139,14 +3202,27 @@ function postProcessOteWritingFeedback(payload, feedback) {
 
   if (
     hasHighControlTask &&
-    ["B1+/B2 range", "Strong B2 range"].includes(adjusted.estimatedWritingLevel?.label)
+    ["B1+/B2 range", "B2 range", "Strong B2 range"].includes(adjusted.estimatedWritingLevel?.label)
   ) {
     adjusted.estimatedWritingLevel = {
       ...(adjusted.estimatedWritingLevel || {}),
-      label: hasMeaningfulMistakes ? "C1 range" : "C2-like / above OTE range",
+      label: hasMeaningfulMistakes ? "C1 range" : "At least C1 / above OTE range",
       confidence: adjusted.estimatedWritingLevel?.confidence || "medium",
       note:
-        "This is AI-estimated training feedback. OTE reports results only up to B2, but the observed writing quality is above that reporting range.",
+        "This is AI-estimated training feedback. OTE Advanced reports up to C1, and the observed writing quality comfortably meets that level for this task.",
+    };
+  }
+
+  if (
+    adjusted.estimatedWritingLevel?.label === "Strong B2 range" &&
+    (meaningfulMistakeCount >= 8 || hasPartialCoverage)
+  ) {
+    adjusted.estimatedWritingLevel = {
+      ...(adjusted.estimatedWritingLevel || {}),
+      label: "B2 range",
+      note:
+        adjusted.estimatedWritingLevel?.note ||
+        "This is AI-estimated training feedback. The script is clearly communicative, but recurring errors or incomplete task coverage make Strong B2 too generous.",
     };
   }
 
@@ -3171,6 +3247,8 @@ function normalizeOteWritingPayload(data) {
     "ote_part2_essay",
     "ote_part2_article",
     "ote_part2_review",
+    "ote_advanced_part1_essay",
+    "ote_advanced_part2_summary",
   ]);
   const tasks = Array.isArray(data?.tasks) ? data.tasks : [];
 
@@ -3215,10 +3293,14 @@ function buildOteWritingFeedbackPrompt(payload) {
     "- ote_part2_essay",
     "- ote_part2_article",
     "- ote_part2_review",
+    "- ote_advanced_part1_essay",
+    "- ote_advanced_part2_summary",
     "",
     "Official task context:",
     "- Part 1 email: 80-130 words, responds to an input email, includes three required points, informal or neutral tone, functions such as giving information, responding to opinions/feelings, inviting, requesting, suggesting.",
     "- Part 2 essay/article/review: 100-160 words. Essay develops an argument on a classroom-discussion topic. Article/review tasks describe, narrate, express feelings/opinions, and may recommend. The target reader is usually an English teacher.",
+    "- Advanced Part 1 essay: 220-280 words, academic tutor audience. The answer must develop a clear argument, include at least two listed ideas, support points, and reach a conclusion.",
+    "- Advanced Part 2 summary: 80-100 words, one paragraph for classmates. The answer must combine the main ideas from a textbook extract and lecture transcript, use full sentences, avoid copying where possible, and stay concise. Use any task-specific marking guide in the input as the expected content coverage.",
     "- OTE Writing criteria are Task fulfilment, Organization, Grammar, and Lexis. Task fulfilment includes task requirements, format, register, and length.",
     "",
     "Feedback categories for every task:",
@@ -3232,26 +3314,62 @@ function buildOteWritingFeedbackPrompt(payload) {
     "8. Priority advice",
     "",
     "Estimated writing level:",
-    "- Use only: Below A2 / unclear, A2 range, B1 range, B1+/B2 range, Strong B2 range, C1 range, C2-like / above OTE range.",
-    "- OTE reports results only up to B2, but this training tool may still describe observed writing quality above the OTE reporting range.",
-    "- If the response shows highly natural idiomatic phrasing, flexible syntax, precise register control, strong cohesion, and almost no errors, use C1 range or C2-like / above OTE range even if the official exam would report at most B2.",
+    "- Use only: Below A2 / unclear, A2 range, B1 range, B1+/B2 range, B2 range, Strong B2 range, C1 range, At least C1 / above OTE range.",
+    "- This training tool may describe observed writing quality above the core range targeted by a specific OTE writing task.",
+    "- OTE Advanced reports up to C1. For exceptionally polished, native-like, or professionally fluent writing, use At least C1 / above OTE range rather than suggesting an official C2 result.",
+    "- If the response shows highly natural idiomatic phrasing, flexible syntax, precise register control, strong cohesion, and almost no errors, use C1 range or At least C1 / above OTE range.",
     "- Do not lower an otherwise advanced answer to B1+/B2 because of a small word-count excess, one slightly indirect point, or a minor punctuation choice. Mention those as local issues while keeping the observed language level high.",
     "- Reserve Strong B2 range for strong but still visibly upper-intermediate writing: generally effective, but with limited idiomatic range, some awkwardness, noticeable simplification, or several correctable issues.",
-    "- If the writing is polished, idiomatic, naturally organized, register-appropriate, and virtually error-free, it should normally be C1 range or C2-like / above OTE range, not Strong B2.",
+    "- Use B2 range, not Strong B2 range, when the answer is organized and communicative but contains recurring basic/intermediate errors, many silent corrections would be needed, or task coverage is only partial.",
+    "- If the writing is polished, idiomatic, naturally organized, register-appropriate, and virtually error-free, it should normally be C1 range or At least C1 / above OTE range, not Strong B2.",
     "- Do not give a precise official score.",
     "",
     "Task fulfilment and content specificity are high priority. Internally identify the specific task requirements before giving feedback.",
     "- For Part 1, identify the three required points and check whether each is covered, partly covered, or missing.",
     "- For Part 1, check that the answer responds to the input email, not just the general topic.",
     "- For essays, check for a clear opinion, developed argument, reasons/examples, logical organization, and specificity to the question.",
+    "- Separate the writer's position from task fulfilment. Agreeing, disagreeing, partially agreeing, or proposing alternatives can all be valid if the question allows it. Do not mark a position wrong just because it is harder to develop.",
     "- For articles, check that it reads like a magazine article, has an engaging suitable tone, and answers the article prompt precisely.",
     "- For reviews, check that the reviewed item is clear, details/opinions/reasons are given, and recommendation is included where required.",
     "- Flag generic content: memorised openings, vague statements, opinions without reasons, unrelated examples, or article/review answers that sound like general essays.",
     "",
+    "Oxford Test of English Advanced Writing criteria:",
+    "- Advanced writing is marked separately for Part 1 Essay and Part 2 Summary. Both scripts use Task fulfilment, Organization, Grammar, and Lexis, but the task expectations are different.",
+    "- Use the 0-7 marking scale conceptually only: B1.1/B1.2, B2.1/B2.2, C1.1/C1.2, C2.1. Do not output numeric marks unless the user-facing schema explicitly asks for them, and never claim official marking.",
+    "- In feedback, describe the observed performance in plain language: B2-level, C1-level, or above-task-range quality where appropriate.",
+    "",
+    "Advanced Part 1 Essay criteria:",
+    "- Task fulfilment: judge whether the essay develops a clear argument, expands and supports points, includes at least two of the three listed prompts, uses an appropriate tutor-facing academic register, and creates a positive effect on the reader.",
+    "- C1-like essay task fulfilment: well-developed argument, points expanded and supported at length, register nearly always appropriate, consistently positive reader impact.",
+    "- B2-like essay task fulfilment: generally well developed, argument and points reasonably expanded, register generally appropriate, reader understands with minimal effort.",
+    "- B1-like essay task fulfilment: underdeveloped, short/minimally expanded points, inconsistent register, reader needs effort.",
+    "- If the essay includes ideas from fewer than two listed prompts, say this clearly: official criteria cap Task fulfilment at B2.2.",
+    "- If the essay clearly covers at least two listed prompts, do not treat the unused third prompt as missing content. You may mention it only as an optional development route, not a weakness.",
+    "- If the essay covers fewer than two listed prompts but gives a legitimate opinion, keep the opinion. Tell the student to develop the missing listed prompt(s) in a way that supports their own stance.",
+    "- Organization: look for an effective introduction, logical paragraphing, clear progression of argument, suitable conclusion, and cohesive features that guide the reader naturally.",
+    "- Grammar: reward range plus control. C1 requires a high level of control of simple and complex structures with rare, hard-to-spot errors; B2 has good control but complex structures may be awkward or errors may occasionally impede.",
+    "- Lexis: reward precise, task-appropriate range. C1 uses a wide range with rare non-impeding errors; B2 is generally appropriate but may include unnatural or inaccurate choices.",
+    "- Advanced essay length caps: 161-219 words caps all criteria at B2.2; 91-160 at B2.1; 71-90 at B1.2; 0-70 at B1.1. Over 280 is not the same as the summary over-limit cap, but should be mentioned if it affects focus or exam management.",
+    "",
+    "Advanced Part 2 Summary criteria:",
+    "- Task fulfilment: judge whether the response synthesizes the main ideas from both input texts with appropriate supporting details, avoids unnecessary detail, is clearly communicated, uses an appropriate academic register, and stays within the 80-100 word task.",
+    "- Use the task-specific marking guide from inputText as the expected content. Treat requiredPoints as the main ideas from that guide. Mark each main idea as covered, partly covered, or missing.",
+    "- Check source use explicitly and precisely. Distinguish using only one source from using both sources but omitting essential ideas, adding unsupported ideas, or selecting details poorly.",
+    "- If only one input text is used, official criteria cap Task fulfilment and Organization at B1.2. Do not say 'leans too much on one source' when the answer actually uses both; say which essential ideas are missing instead.",
+    "- C1-like summary task fulfilment: main ideas and suitable supporting details from both texts are synthesized, clearly communicated with little redundancy, register nearly always appropriate.",
+    "- B2-like summary task fulfilment: at least two main ideas plus some supporting detail from both texts, generally clear, some awareness of purpose.",
+    "- B1-like summary task fulfilment: at least one main idea from one text, not always clearly communicated, limited awareness of task purpose.",
+    "- Organization: reward reconstructing/reorganizing ideas into one coherent paragraph. Do not reward simply copying each text in sequence as two mini-summaries.",
+    "- Grammar and Lexis: for summary, focus on paraphrasing and adaptation. Reward concise control and successful grammatical/lexical transformation; penalize reliance on original wording, copying, or awkward paraphrase that reduces clarity.",
+    "- Summary concision matters. The response should be one paragraph, full sentences, enough information for classmates, and no more than 100 words.",
+    "- Advanced summary length caps: up to 105 words may receive any mark; 106-120 words caps all criteria at B2.2; 121+ words caps all criteria at B1.2.",
+    "- Redundancy is a real criterion: flag irrelevant examples, repeated points, or minor details that crowd out main ideas.",
+    "",
     "Task-specific register:",
     "- Part 1 email to a friend: informal language, contractions, direct questions, friendly closings are appropriate.",
     "- Part 1 neutral recipient: polite but not excessively formal. Do not push students into very formal Aptis-style committee emails unless required.",
-    "- Essay: neutral/formal classroom-discussion style; avoid very chatty phrases.",
+    "- Essay: neutral/formal classroom-discussion style for a teacher or tutor; avoid very chatty phrases.",
+    "- Advanced summary: concise academic summary for classmates; no personal opinion, no bullet points, no informal commentary, no direct address.",
     "- Article: can be lively and reader-focused; do not mark it down simply because it is less formal than an essay.",
     "- Review: can be semi-formal or lively; should be useful for the target reader and not sound like a private message.",
     "",
@@ -3259,40 +3377,48 @@ function buildOteWritingFeedbackPrompt(payload) {
     "- Use the supplied wordCountStatus and do not contradict it.",
     "- Under-length responses should be flagged clearly because OTE specifications penalize under-length writing.",
     "- Acceptable_over_range means the answer is no more than 20 words over the target. Do not list this as a weakness, priority, or correction if the answer is focused, relevant, and accurate.",
+    "- Exception: for ote_advanced_part2_summary, acceptable_over_range means 101-105 words only. Above 105 words is capped in the official criteria and must be flagged.",
     "- Only make length a meaningful issue when the response is excessive, or when extra length causes repetition, loss of focus, unclear task coverage, or avoidable language errors.",
     "",
     "Mistakes section:",
     "- Include a dedicated mistakes array for each task.",
     "- Each mistake should show the exact student text or a short phrase, a corrected version, and a short explanation.",
+    "- For error-heavy B1/B2 answers, include enough corrections to explain the main recurring patterns and the main changes in the improved version. Usually include 6-10 useful mistakes for a task with many errors, not just 3-5.",
     "- Only include genuine, defensible problems. If nothing is wrong, return an empty mistakes array.",
     "- Do not invent corrections just because feedback was requested. Do not rewrite natural idiomatic language into blander exam language.",
+    "- Do catch precise idiom or collocation errors that change meaning, especially in otherwise strong writing, such as 'cannot be understated' when the intended meaning is 'cannot be overstated'.",
     "- Do not correct style choices that are appropriate for the task register, such as contractions, informal phrasing, direct questions, or friendly closings in an email to a friend.",
     "- Treat natural idiomatic phrases as acceptable even if a simpler alternative exists. For example, do not correct phrases like 'landing you with the mess', 'so long as we book', 'he's gonna love it', or 'lend us a hand' in an informal email when they fit the context.",
     "- A correction must fix a real problem, not merely replace an advanced or idiomatic phrase with a simpler one.",
     "- Prioritize mistakes that clearly affect task fulfilment, register, grammar accuracy, lexis accuracy, spelling, punctuation, or clarity.",
-    "- For excellent responses, it is normal to include 0 mistakes and no grammar/lexis examples. For weaker responses, include only the most useful mistakes, usually 1-5.",
+    "- For excellent responses, it is normal to include 0 mistakes and no grammar/lexis examples. For weaker responses, include the most useful representative mistakes; use a longer list when errors are frequent enough that a short list would make the rewrite look unexplained.",
+    "- Do not say there are no significant corrections beyond the listed errors when the improved version silently fixes additional grammar, vocabulary, or collocation problems.",
     "- If a whole idea is missing, use category 'task', original as 'Missing idea: ...', and correction as a short suggested addition.",
     "- If a point is handled indirectly but still makes sense in context, describe it as a possible task-development improvement, not as a language error.",
     "",
     "Improved versions:",
     "- Preserve the student's meaning, choices, opinions, examples, and key ideas.",
     "- Do not change task decisions. For example, if the student chose the steep/fast route, keep that route; if the student chose the cafe, keep the cafe; if the student supported shorter holidays, keep that opinion.",
+    "- Never reverse or soften the student's opinion to improve task fulfilment. For example, do not change 'instead of limiting visitors' to 'in addition to limiting visitors', or 'capping is not the right answer' to 'capping is not the only answer'.",
     "- The improved version should be a corrected and upgraded version of the student's answer, not a shorter alternative answer and not a generic model answer.",
     "- If the student's answer is already excellent and there are no meaningful corrections, keep improvedVersion identical or nearly identical to the original. Do not force changes.",
     "- Keep the version close to the original structure when the structure works.",
     "- Make the writing genuinely better: improve accuracy, naturalness, cohesion, and task clarity while preserving content.",
-    "- Keep the version realistic for the student's observed level; do not simplify a C1/C2-like answer into a lower-level model answer.",
+    "- Keep the version realistic for the student's observed level; do not simplify an advanced answer into a lower-level model answer.",
     "- Do not remove specific details unless they are irrelevant, repetitive, or incorrect.",
-    "- Add new ideas only when a required task point is missing or too vague.",
+    "- Add new ideas only when a required task point is missing or too vague, and make them support the student's original stance.",
+    "- Every substantial change in the improved version should correspond to an explained mistake or task-development note. Avoid silently correcting many errors that are not mentioned anywhere in feedback.",
     "- Keep Part 1 improved emails 80-130 words where possible.",
     "- Keep Part 2 improved versions 100-160 words where possible.",
+    "- Keep Advanced Part 1 essay improved versions 220-280 words where possible.",
+    "- Keep Advanced Part 2 summary improved versions 80-100 words, one paragraph, and no more than 100 words where possible.",
     "",
     "Overall feedback and priorities:",
     "- mainPriorities may be an empty array when there are no meaningful priorities. Do not fill it with artificial advice.",
     "- If the only issue is a tiny task-development point or a small overage within acceptable_over_range, say so proportionately and do not make it sound like a serious weakness.",
     "- For excellent answers, the teacherNote should explicitly say that no significant language corrections are needed.",
     "",
-    "Feedback style: clear, practical, encouraging, suitable for A2-C2 learners, specific to the answer. Avoid long grammar lectures, vague advice, official score claims, harsh wording, generic repeated advice, and unnecessary correction.",
+    "Feedback style: clear, practical, encouraging, suitable for A2-C1+ learners, specific to the answer. Avoid long grammar lectures, vague advice, official score claims, harsh wording, generic repeated advice, and unnecessary correction.",
     "Keep all feedback fields concise. Use one short sentence for most feedback strings, and keep mistake explanations brief so the JSON response can complete cleanly.",
     "Return only valid JSON using the required schema.",
     "",

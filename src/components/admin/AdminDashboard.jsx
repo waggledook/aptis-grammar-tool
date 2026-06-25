@@ -19,6 +19,7 @@ import {
 } from "../../siteConfig.js";
 import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
 import UserAvatar from "../common/UserAvatar.jsx";
+import { getDuplicateDisplayNameGroups, getUserDisplayLabel, getUserIdentityLabel } from "../../utils/userLabels.js";
 
 function getTodayLocalIsoDate() {
   const now = new Date();
@@ -1550,9 +1551,18 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
   const teachers = users.filter(
     (u) => u.role === "teacher" || u.role === "admin" // admins can also be teachers
   );
+  const duplicateTeacherNameGroups = getDuplicateDisplayNameGroups(teachers);
+  const duplicateTeacherIds = new Set(
+    duplicateTeacherNameGroups.flatMap((group) => group.map((teacher) => teacher.id))
+  );
 
-  const labelForTeacher = (t) =>
-    t.displayName || t.name || t.username || t.email || t.id;
+  const detailedLabelForTeacher = (t) =>
+    getUserIdentityLabel(t, { includeRole: true });
+
+  const labelForTeacher = (t) => {
+    const label = getUserDisplayLabel(t);
+    return duplicateTeacherIds.has(t.id) ? `${label} (duplicate name)` : label;
+  };
 
   const renderTeacherControl = (u) => {
     const isStudent = u.role === "student";
@@ -1581,7 +1591,7 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
           </option>
           {teachers.map((t) => (
             <option key={t.id} value={t.id}>
-              {labelForTeacher(t)}
+              {detailedLabelForTeacher(t)}
             </option>
           ))}
         </select>
@@ -2388,6 +2398,53 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
                     <strong>{groupedUsers.length}x</strong>
                     <span>{email}</span>
                   </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {duplicateTeacherNameGroups.length > 0 && (
+            <div
+              style={{
+                marginTop: "0.9rem",
+                padding: "0.95rem 1rem",
+                borderRadius: "1rem",
+                background: "rgba(88, 28, 135, 0.18)",
+                border: "1px solid rgba(196, 181, 253, 0.28)",
+              }}
+            >
+              <div style={{ fontSize: "0.82rem", fontWeight: 800, color: "#ddd6fe", textTransform: "uppercase", letterSpacing: "0.04em" }}>
+                Duplicate teacher display names
+              </div>
+              <p style={{ marginTop: "0.45rem", color: "#e9d5ff", lineHeight: 1.5 }}>
+                These teachers/admins share the same visible name. Teacher dropdowns now include email and a short UID so you can choose the correct account.
+              </p>
+              <div
+                style={{
+                  marginTop: "0.7rem",
+                  display: "grid",
+                  gap: "0.55rem",
+                }}
+              >
+                {duplicateTeacherNameGroups.map((group) => (
+                  <div
+                    key={group.map((teacher) => teacher.id).join("-")}
+                    style={{
+                      padding: "0.6rem 0.75rem",
+                      borderRadius: "0.8rem",
+                      background: "rgba(15, 23, 42, 0.72)",
+                      border: "1px solid rgba(196, 181, 253, 0.2)",
+                      color: "#f8fafc",
+                      fontSize: "0.82rem",
+                    }}
+                  >
+                    <strong>{group[0]?.displayName || group[0]?.name || group[0]?.username || "Same name"}</strong>
+                    <div style={{ marginTop: "0.35rem", display: "grid", gap: "0.25rem", color: "#d8b4fe" }}>
+                      {group.map((teacher) => (
+                        <span key={teacher.id}>{detailedLabelForTeacher(teacher)}</span>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
             </div>

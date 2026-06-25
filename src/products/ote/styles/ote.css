@@ -4112,6 +4112,12 @@
   color: #555;
 }
 
+.ote-writing-bullet-list {
+  margin: 0 0 1.2rem 1.4rem;
+  padding: 0;
+  line-height: 1.55;
+}
+
 .ote-reply-fields {
   padding: 1rem 1.2rem;
   border: 1px solid #d2d2d2;
@@ -4173,6 +4179,174 @@
   font-family: "Comic Sans MS", "Bradley Hand", cursive;
   font-size: 1.35rem;
   font-style: normal;
+}
+
+.ote-writing-summary-layout {
+  width: min(1320px, calc(100vw - 3rem));
+  margin: 0 auto;
+  padding: 0.85rem 0 6rem;
+}
+
+.ote-writing-summary-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(420px, 0.95fr);
+  gap: 1.15rem;
+  align-items: stretch;
+}
+
+.ote-writing-summary-top .ote-writing-prompt-pane {
+  padding: 1.35rem 1.9rem 0.9rem;
+}
+
+.ote-writing-summary-top .ote-writing-prompt-pane p {
+  margin-bottom: 0.8rem;
+}
+
+.ote-writing-summary-answer-pane {
+  grid-template-rows: minmax(260px, 315px) auto;
+  padding: 1rem 1.55rem 0.9rem;
+}
+
+.ote-writing-summary-answer-pane textarea {
+  min-height: 260px;
+  height: 315px;
+  padding: 1rem 1.15rem;
+}
+
+.ote-writing-source-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  border: 1px solid #d3d6dc;
+  border-radius: 5px;
+  background: #f2f2f2;
+}
+
+.ote-writing-source-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.2rem;
+}
+
+.ote-writing-source-card,
+.ote-writing-glossary-card {
+  border: 1px solid #d3d6dc;
+  border-radius: 5px;
+  background: #fff;
+  color: #333;
+}
+
+.ote-writing-source-card h2,
+.ote-writing-glossary-card h2 {
+  margin: 0;
+  padding: 0.85rem 1.1rem;
+  border-bottom: 1px solid #d3d6dc;
+  font-size: 1.2rem;
+}
+
+.ote-writing-source-card p {
+  margin: 0;
+  padding: 1rem 1.1rem;
+  line-height: 1.42;
+}
+
+.ote-writing-source-card small {
+  display: block;
+  padding: 0 1.2rem 1.1rem;
+  color: #666;
+}
+
+.ote-writing-glossary-card {
+  margin-top: 1.2rem;
+  padding-bottom: 0.9rem;
+}
+
+.ote-writing-glossary-card dl {
+  margin: 0;
+  padding: 1rem 1.2rem 0;
+}
+
+.ote-writing-glossary-card div {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.45rem;
+}
+
+.ote-writing-glossary-card dt {
+  font-weight: 800;
+}
+
+.ote-writing-glossary-card dd {
+  margin: 0;
+}
+
+.ote-summary-glossary-popover {
+  position: fixed;
+  left: 4.2rem;
+  bottom: 4.9rem;
+  z-index: 80;
+  width: min(560px, calc(100vw - 2rem));
+  min-height: 430px;
+  border: 2px solid #1f1f1f;
+  border-radius: 7px;
+  background: #f5f5f5;
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.25);
+  color: #333;
+}
+
+.ote-summary-glossary-title {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 44px;
+  border-bottom: 1px solid #d6d6d6;
+  font-size: 1.2rem;
+}
+
+.ote-summary-glossary-title button {
+  position: absolute;
+  right: 0.75rem;
+  top: 0.25rem;
+  border: 0;
+  background: transparent;
+  color: #5579ae;
+  font-size: 2.2rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.ote-summary-glossary-body {
+  margin: 1rem;
+  min-height: 350px;
+  padding: 1.6rem 1.25rem;
+  border: 1px solid #d3d6dc;
+  border-radius: 4px;
+  background: #fff;
+}
+
+.ote-summary-glossary-body h2 {
+  margin: 0 0 1.2rem;
+  font-size: 1.25rem;
+}
+
+.ote-summary-glossary-body dl {
+  margin: 0;
+}
+
+.ote-summary-glossary-body div {
+  display: flex;
+  gap: 0.35rem;
+  margin-bottom: 0.25rem;
+  font-size: 1.12rem;
+  line-height: 1.25;
+}
+
+.ote-summary-glossary-body dt {
+  font-weight: 800;
+}
+
+.ote-summary-glossary-body dd {
+  margin: 0;
 }
 
 .ote-writing-choice-tabs {
@@ -5233,6 +5407,7 @@
   .ote-practice-progress,
   .ote-task-screen,
   .ote-writing-task-layout,
+  .ote-writing-summary-top,
   .ote-writing-review-grid,
   .ote-ai-feedback-criteria,
   .ote-ai-feedback-versions,
@@ -5248,6 +5423,26 @@
   .ote-register-ai-head,
   .ote-register-ai-gap-list {
     grid-template-columns: 1fr;
+  }
+
+  .ote-writing-summary-layout {
+    width: min(100%, calc(100vw - 2rem));
+  }
+
+  .ote-writing-source-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-summary-glossary-popover {
+    left: 1rem;
+    right: 1rem;
+    bottom: 4.8rem;
+    width: auto;
+    min-height: 360px;
+  }
+
+  .ote-summary-glossary-body {
+    min-height: 280px;
   }
 
   .ote-exam-header {

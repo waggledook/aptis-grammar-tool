@@ -8,7 +8,10 @@ import "./styles/ote.css";
 
 export default function OteWritingMockMenu({ user, onRequireSignIn, nativeRoutes = false }) {
   const navigate = useNavigate();
-  const mocks = getOteWritingMocks();
+  const isAdvanced = user?.oteVersion === "advanced";
+  const mocks = getOteWritingMocks().filter((mock) =>
+    isAdvanced ? mock.levelLabel === "Advanced" : mock.levelLabel !== "Advanced"
+  );
   const basePath = nativeRoutes ? "/writing/mock-tests" : "/ote/writing/mock-tests";
   const backPath = getSitePath(nativeRoutes ? "/writing" : "/ote/writing");
 
@@ -42,7 +45,9 @@ export default function OteWritingMockMenu({ user, onRequireSignIn, nativeRoutes
         <div className="ote-writing-mock-menu-inner">
           <p className="ote-writing-lead">Choose a mock writing test.</p>
           <p>
-            Each mock has a 20-minute email task, a two-minute Part 2 choice screen, and a 25-minute extended writing task.
+            {isAdvanced
+              ? "Advanced writing mocks use the essay and summary format."
+              : "Each mock has a 20-minute email task, a two-minute Part 2 choice screen, and a 25-minute extended writing task."}
           </p>
           {!user ? <p className="ote-warning">Sign in to save your completed writing mock to your profile.</p> : null}
           <div className="ote-writing-mock-list">
@@ -51,7 +56,11 @@ export default function OteWritingMockMenu({ user, onRequireSignIn, nativeRoutes
                 <span>Mock {index + 1}</span>
                 <strong>{mock.title}</strong>
                 <em>
-                  Email: {mock.task1.maxWords} words max. Part 2: choose {Object.values(mock.task2.options).map((option) => option.noun).join(" or ")}.
+                  {mock.levelLabel ? `${mock.levelLabel}. ` : ""}
+                  Part 1: {mock.task1.title.toLowerCase()}, {mock.task1.recommendedTime}. Part 2:{" "}
+                  {mock.task2.noChoice
+                    ? `${mock.task2.title.toLowerCase()}, ${mock.task2.recommendedTime}.`
+                    : `choose ${Object.values(mock.task2.options).map((option) => option.noun).join(" or ")}.`}
                 </em>
                 <ChevronRight size={28} />
               </button>
