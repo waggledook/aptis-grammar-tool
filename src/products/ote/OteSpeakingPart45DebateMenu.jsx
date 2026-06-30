@@ -6,47 +6,37 @@ import { getSitePath } from "../../siteConfig.js";
 import { useOteTrainingProgress, useOteTrainingSummary } from "./utils/trainingProgress.js";
 import "./styles/ote.css";
 
-export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
+export default function OteSpeakingPart45DebateMenu({ nativeRoutes = false }) {
   const navigate = useNavigate();
-  const isAdvanced = user?.oteVersion === "advanced";
   const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
   const overviewPath = getSitePath(
-    nativeRoutes ? "/speaking/part-1-interview/overview" : "/ote/speaking/part-1-interview/overview"
+    nativeRoutes ? "/speaking/parts-4-5-debate/overview" : "/ote/speaking/parts-4-5-debate/overview"
   );
   const practicePath = getSitePath(
-    nativeRoutes ? "/speaking/part-1-interview/practice" : "/ote/speaking/part-1-interview/practice"
+    nativeRoutes ? "/speaking/parts-4-5-debate/practice" : "/ote/speaking/parts-4-5-debate/practice"
   );
   const completedProgress = useOteTrainingProgress();
   const activities = useMemo(
-    () => isAdvanced ? [
+    () => [
       {
         label: "Activity 1",
-        title: "Advanced Interview Strategy",
-        copy: "Learn the six-question format, 30-second answer timing, and a practical structure for stronger responses.",
+        title: "Advanced Debate Strategy",
+        copy: "Learn how to choose a position, use the debate prompts, build a two-minute argument, and handle Part 5 follow-ups.",
         icon: ClipboardList,
         path: overviewPath,
-        progressId: "speaking.part1.advanced-overview",
-      },
-    ] : [
-      {
-        label: "Activity 1",
-        title: "How Part 1 Works",
-        copy: "Learn the format, timing, question order, and scoring rules, then check your understanding.",
-        icon: ClipboardList,
-        path: overviewPath,
-        progressId: "speaking.part1.overview",
+        progressId: "speaking.parts45.advanced-debate-overview",
       },
     ],
-    [isAdvanced, overviewPath]
+    [overviewPath]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
-  const practiceComplete = completedProgress.has("speaking.part1.practice");
+  const practiceComplete = completedProgress.has("speaking.parts45.practice");
 
   return (
     <main className="ote-training-page">
       <Seo
-        title="OTE Speaking Part 1 Interview Training | Seif English"
-        description="Training activities for OTE Speaking Part 1 short interview questions."
+        title="OTE Advanced Speaking Parts 4 and 5 Training | Seif English"
+        description="Training activities for OTE Advanced debate and follow-up question practice."
       />
 
       <button className="ote-training-back" type="button" onClick={() => navigate(speakingPath)}>
@@ -55,12 +45,12 @@ export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
       </button>
 
       <header className="ote-training-hero">
-        <p className="ote-kicker">Speaking Part 1</p>
-        <h1>Interview Training</h1>
+        <p className="ote-kicker">Speaking Parts 4 & 5</p>
+        <h1>Debate Training</h1>
         <p>
-          {isAdvanced
-            ? "Build confidence for the Advanced opening interview: recycle the two warm-up questions, then practise four longer timed responses."
-            : "Build confidence for the opening interview: understand the question order, practise the fast timing, and record short answers across everyday topics."}
+          Build the skills for Advanced debate and follow-up tasks: choose a clear side, develop two
+          or three prompts, use the mind map effectively, and answer wider topic questions without
+          preparation time.
         </p>
         <div className="ote-training-progress-strip" aria-label="Training progress">
           <span>{summary.completed} of {summary.total} training lessons complete</span>
@@ -70,7 +60,7 @@ export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
         </div>
       </header>
 
-      <div className="ote-training-activity-grid" aria-label="Part 1 interview activities">
+      <div className="ote-training-activity-grid" aria-label="Parts 4 and 5 debate activities">
         {activities.map((activity) => {
           const Icon = activity.icon;
           const isComplete = completedProgress.has(activity.progressId);
@@ -94,13 +84,9 @@ export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
       <section className="ote-training-section">
         <h2>Final Practice</h2>
         <p className="ote-section-lead">
-          {isAdvanced
-            ? summary.allComplete
-              ? "Guide complete. Now choose a timed Advanced interview set and practise the four longer Part 1 responses."
-              : "Review the Advanced interview strategy, then move into timed 30-second response practice."
-            : summary.allComplete
-            ? "Training complete. Now practise timed interview sets."
-            : "Review the Part 1 format, then move into timed interview practice."}
+          {summary.allComplete
+            ? "Guide complete. Now practise full debate and follow-up sets, or jump straight to Part 5 questions."
+            : "Work through the debate strategy guide, then practise timed Parts 4 and 5 sets."}
         </p>
         <button
           className={`ote-practice-set-card ote-writing-practice-entry-card ${practiceComplete ? "is-complete" : ""}`}
@@ -110,12 +96,8 @@ export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
           {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
           <PlayCircle size={28} aria-hidden="true" />
           <span>Practice</span>
-          <h2>Timed Interview Sets</h2>
-          <p>
-            {isAdvanced
-              ? "Practise two fixed warm-up questions and four Advanced interview questions with recordings."
-              : "Practise two fixed warm-up questions and six topic questions with recordings."}
-          </p>
+          <h2>Timed Debate Sets</h2>
+          <p>Practise a two-minute debate, then answer four related follow-up questions with recordings.</p>
         </button>
       </section>
     </main>

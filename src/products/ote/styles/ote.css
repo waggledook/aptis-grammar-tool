@@ -2470,6 +2470,41 @@
   box-shadow: var(--ote-dashboard-shadow-hover);
 }
 
+.ote-debate-set-card {
+  cursor: default;
+}
+
+.ote-debate-set-card:hover {
+  transform: none;
+}
+
+.ote-debate-set-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: auto;
+}
+
+.ote-debate-set-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ote-dashboard-primary);
+  color: var(--ote-dashboard-primary-text);
+  padding: 0.65rem 0.85rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.ote-debate-set-actions button:nth-child(2) {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
 .ote-practice-set-card span,
 .ote-practice-step span {
   color: var(--ote-dashboard-accent);
@@ -2602,6 +2637,28 @@
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
+.ote-practice-hidden-task {
+  display: grid;
+  gap: 0.45rem;
+  margin: 1rem 0;
+  border: 1px dashed var(--color-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-surface) 74%, transparent);
+  color: var(--color-text-soft);
+  padding: 1rem;
+}
+
+.ote-practice-hidden-task p {
+  margin: 0;
+  max-width: 720px;
+  color: var(--color-text-soft);
+  line-height: 1.55;
+}
+
+.ote-practice-hidden-task .ote-kicker {
+  color: var(--ote-dashboard-accent);
+}
+
 .ote-practice-task-tools button:hover,
 .ote-training-recording-review button:hover {
   transform: translateY(-1px);
@@ -2648,6 +2705,185 @@
   color: var(--color-text);
   padding: 0.9rem 0.9rem 0.9rem 1.55rem;
   line-height: 1.45;
+}
+
+.ote-summary-practice-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(280px, 1.1fr);
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.ote-summary-script-panel,
+.ote-summary-notes-box {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 1rem;
+}
+
+.ote-summary-script-panel {
+  margin: 1rem 0;
+}
+
+.ote-summary-script-panel strong,
+.ote-summary-notes-box strong {
+  color: var(--color-text);
+}
+
+.ote-summary-script-panel small {
+  display: block;
+  margin-top: 0.85rem;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-summary-source-list {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+}
+
+.ote-summary-source-list article {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 0.75rem;
+}
+
+.ote-summary-source-list span {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: uppercase;
+  color: var(--ote-dashboard-primary);
+}
+
+.ote-summary-source-list p {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-soft);
+}
+
+.ote-summary-notes-box > div {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.7rem;
+}
+
+.ote-summary-notes-box textarea {
+  width: 100%;
+  min-height: 220px;
+  resize: vertical;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  padding: 0.9rem;
+  font: inherit;
+  line-height: 1.5;
+}
+
+.ote-summary-notes-box textarea:focus {
+  outline: 2px solid rgba(47, 99, 235, 0.22);
+  border-color: var(--ote-dashboard-primary);
+}
+
+.ote-speaking-status {
+  margin: 0.7rem 0 0;
+  color: var(--color-text-soft);
+  font-weight: 800;
+}
+
+.ote-native-debate-map {
+  margin: 1rem 0;
+  border-color: var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.ote-debate-practice-page .ote-training-hero {
+  padding: 0.85rem 0 0.9rem;
+}
+
+.ote-debate-practice-page .ote-training-hero h1 {
+  max-width: 900px;
+  font-size: clamp(2rem, 4.3vw, 4rem);
+}
+
+.ote-debate-practice-page .ote-training-hero p {
+  max-width: 860px;
+}
+
+.ote-debate-practice-page .ote-practice-runner {
+  gap: 0.8rem;
+}
+
+.ote-debate-practice-page .ote-practice-progress {
+  padding: 0.75rem 0.9rem;
+}
+
+.ote-debate-practice-page .ote-practice-task-card {
+  padding: 1.15rem;
+}
+
+.ote-debate-practice-page .ote-recorder-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(128px, auto);
+  align-items: start;
+  gap: 1rem;
+}
+
+.ote-debate-practice-page .ote-recorder-top h2 {
+  max-width: 900px;
+  font-size: clamp(1.35rem, 2.55vw, 2.45rem);
+  line-height: 1.18;
+}
+
+.ote-debate-practice-page .ote-recorder-timer {
+  min-width: 128px;
+  min-height: 88px;
+}
+
+.ote-debate-practice-page .ote-native-debate-map {
+  grid-template-columns: minmax(170px, 0.9fr) minmax(220px, 1.05fr) minmax(170px, 0.9fr);
+  gap: 0.95rem 2rem;
+  margin: 0.85rem 0 0;
+  padding: 1.15rem;
+  background: color-mix(in srgb, var(--color-surface) 86%, var(--ote-dashboard-accent) 14%);
+}
+
+.ote-debate-practice-page .ote-native-debate-map .ote-debate-map-instructions {
+  max-width: none;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--color-surface-2) 92%, transparent);
+  color: var(--color-text);
+  padding: 0.8rem 0.9rem;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.ote-debate-practice-page .ote-native-debate-map .ote-debate-map-instructions p,
+.ote-debate-practice-page .ote-native-debate-map .ote-debate-map-instructions li {
+  color: var(--color-text);
+}
+
+.ote-debate-practice-page .ote-native-debate-map .ote-debate-map-instructions ul {
+  margin-bottom: 0.55rem;
+}
+
+.ote-debate-practice-page .ote-native-debate-map .ote-debate-center,
+.ote-debate-practice-page .ote-native-debate-map .ote-debate-idea {
+  min-height: 70px;
+  padding: 0.75rem 0.9rem;
+  font-size: 1rem;
+}
+
+.ote-debate-practice-page .ote-native-debate-map .ote-debate-center {
+  min-height: 104px;
 }
 
 .ote-practice-complete h2 {
@@ -6164,6 +6400,7 @@
   .ote-writing-practice-layout,
   .ote-writing-practice-summary-top,
   .ote-writing-practice-source-grid,
+  .ote-summary-practice-layout,
   .ote-writing-practice-review,
   .ote-writing-register-grid,
   .ote-register-identification-grid,
@@ -6338,6 +6575,33 @@
 }
 
 @media (max-width: 720px) {
+  .ote-debate-practice-page .ote-recorder-top {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-debate-practice-page .ote-recorder-timer {
+    justify-self: stretch;
+  }
+
+  .ote-debate-practice-page .ote-native-debate-map {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "instructions"
+      "center"
+      "idea1"
+      "idea2"
+      "idea3"
+      "idea4"
+      "idea5";
+    gap: 0.75rem;
+    padding: 0.9rem;
+  }
+
+  .ote-debate-practice-page .ote-native-debate-map .ote-debate-idea::before,
+  .ote-debate-practice-page .ote-native-debate-map .ote-debate-idea::after {
+    display: none;
+  }
+
   .ote-menu-wrapper .whats-new-banner {
     flex-direction: column;
     align-items: flex-start;

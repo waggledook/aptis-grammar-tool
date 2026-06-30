@@ -1016,6 +1016,9 @@ function getOteTrainingProgressId(details = {}) {
       if (mode.includes("guided")) return "speaking.parts34.guided-talk";
       if (mode.includes("practice") || taskId) return "speaking.parts34.practice";
     }
+    if (part === "parts-4-5" || part === "part-5" || part === "part5") {
+      if (mode.includes("practice") || taskId) return "speaking.parts45.practice";
+    }
   }
 
   if (section === "writing") {

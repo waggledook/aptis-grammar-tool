@@ -512,7 +512,9 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
   const navigate = useNavigate();
   const { speakingId, playAudioFile, playCueThenSpeak, speak, stop } = useSpeech();
   const menuPath = getSitePath(nativeRoutes ? "/speaking/part-2-voicemails" : "/ote/speaking/part-2-voicemails");
-  const basePath = getSitePath(nativeRoutes ? "/speaking/part-2-voicemails/practice" : "/ote/speaking/part-2-voicemails/practice");
+  const rawBasePath = nativeRoutes ? "/speaking/part-2-voicemails/practice" : "/ote/speaking/part-2-voicemails/practice";
+  const basePath = getSitePath(rawBasePath);
+  const getSetPath = (id) => getSitePath(`${rawBasePath}/${id}`);
   const isAdvanced = user?.oteVersion === "advanced";
   const activeSets = isAdvanced ? ADVANCED_PRACTICE_SETS : PRACTICE_SETS;
   const activeInstructions = isAdvanced ? ADVANCED_VOICEMAIL_INSTRUCTIONS : VOICEMAIL_INSTRUCTIONS;
@@ -800,7 +802,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
         </header>
         <div className="ote-practice-set-grid">
           {activeSets.map((set, index) => (
-            <button className="ote-practice-set-card" key={set.id} type="button" onClick={() => navigate(`${basePath}/${set.id}`)}>
+            <button className="ote-practice-set-card" key={set.id} type="button" onClick={() => navigate(getSetPath(set.id))}>
               <span>Set {index + 1}</span>
               <h2>{set.title}</h2>
               <p>{set.description}</p>

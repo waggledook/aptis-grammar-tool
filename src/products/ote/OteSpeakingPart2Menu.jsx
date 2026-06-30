@@ -27,40 +27,52 @@ export default function OteSpeakingPart2Menu({ user, nativeRoutes = false }) {
   );
   const completedProgress = useOteTrainingProgress();
   const activities = useMemo(
-    () => isAdvanced ? [] : [
-      {
-        label: "Activity 1",
-        title: "How Voicemails Work",
-        copy: "Learn the format, compare Message 1 and Message 2, then check your understanding.",
-        icon: ClipboardList,
-        path: introPath,
-        progressId: "speaking.part2.overview",
-      },
-      {
-        label: "Activity 2",
-        title: "Guided Task: Message 1",
-        copy: "Review student answers, record your own polite voicemail, and compare with a model.",
-        icon: Mic,
-        path: guidedPath,
-        progressId: "speaking.part2.guided-message-1",
-      },
-      {
-        label: "Activity 3",
-        title: "Guided Task: Message 2",
-        copy: "Reply to a friend's voice message with the right informal tone and clear structure.",
-        icon: MessageSquareText,
-        path: guidedMessage2Path,
-        progressId: "speaking.part2.guided-message-2",
-      },
-      {
-        label: "Reference",
-        title: "Part 2 Cheat Sheet",
-        copy: "Review useful frameworks and download a branded PDF reference for practice.",
-        icon: FileText,
-        path: cheatSheetPath,
-        progressId: "speaking.part2.cheat-sheet",
-      },
-    ],
+    () =>
+      isAdvanced
+        ? [
+            {
+              label: "Activity 1",
+              title: "Advanced Voice Message Strategy",
+              copy: "Learn the one-message format, 10-second planning window, diplomatic language, and a simple response plan.",
+              icon: ClipboardList,
+              path: introPath,
+              progressId: "speaking.part2.advanced-overview",
+            },
+          ]
+        : [
+            {
+              label: "Activity 1",
+              title: "How Voicemails Work",
+              copy: "Learn the format, compare Message 1 and Message 2, then check your understanding.",
+              icon: ClipboardList,
+              path: introPath,
+              progressId: "speaking.part2.overview",
+            },
+            {
+              label: "Activity 2",
+              title: "Guided Task: Message 1",
+              copy: "Review student answers, record your own polite voicemail, and compare with a model.",
+              icon: Mic,
+              path: guidedPath,
+              progressId: "speaking.part2.guided-message-1",
+            },
+            {
+              label: "Activity 3",
+              title: "Guided Task: Message 2",
+              copy: "Reply to a friend's voice message with the right informal tone and clear structure.",
+              icon: MessageSquareText,
+              path: guidedMessage2Path,
+              progressId: "speaking.part2.guided-message-2",
+            },
+            {
+              label: "Reference",
+              title: "Part 2 Cheat Sheet",
+              copy: "Review useful frameworks and download a branded PDF reference for practice.",
+              icon: FileText,
+              path: cheatSheetPath,
+              progressId: "speaking.part2.cheat-sheet",
+            },
+          ],
     [cheatSheetPath, guidedMessage2Path, guidedPath, introPath, isAdvanced]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
@@ -86,44 +98,42 @@ export default function OteSpeakingPart2Menu({ user, nativeRoutes = false }) {
             ? "Practise Advanced diplomatic voice messages: read and listen to the task, think briefly, then record a tactful 40-second response."
             : "Build the skills for formal and friendly OTE voice messages: understand the format, spot common mistakes, practise under timed conditions, and compare your answer with a model."}
         </p>
-        {!isAdvanced ? (
-          <div className="ote-training-progress-strip" aria-label="Training progress">
-            <span>{summary.completed} of {summary.total} training lessons complete</span>
-            <div className="ote-training-progress-track" aria-hidden="true">
-              <span style={{ width: `${summary.total ? Math.round((summary.completed / summary.total) * 100) : 0}%` }} />
-            </div>
+        <div className="ote-training-progress-strip" aria-label="Training progress">
+          <span>{summary.completed} of {summary.total} training lessons complete</span>
+          <div className="ote-training-progress-track" aria-hidden="true">
+            <span style={{ width: `${summary.total ? Math.round((summary.completed / summary.total) * 100) : 0}%` }} />
           </div>
-        ) : null}
+        </div>
       </header>
 
-      {!isAdvanced ? (
-        <div className="ote-training-activity-grid" aria-label="Part 2 voicemail activities">
-          {activities.map((activity) => {
-            const Icon = activity.icon;
-            const isComplete = completedProgress.has(activity.progressId);
-            return (
-              <button
-                key={activity.progressId}
-                className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
-                type="button"
-                onClick={() => navigate(activity.path)}
-              >
-                {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
-                <Icon size={28} aria-hidden="true" />
-                <span>{activity.label}</span>
-                <h2>{activity.title}</h2>
-                <p>{activity.copy}</p>
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
+      <div className="ote-training-activity-grid" aria-label="Part 2 voicemail activities">
+        {activities.map((activity) => {
+          const Icon = activity.icon;
+          const isComplete = completedProgress.has(activity.progressId);
+          return (
+            <button
+              key={activity.progressId}
+              className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
+              type="button"
+              onClick={() => navigate(activity.path)}
+            >
+              {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+              <Icon size={28} aria-hidden="true" />
+              <span>{activity.label}</span>
+              <h2>{activity.title}</h2>
+              <p>{activity.copy}</p>
+            </button>
+          );
+        })}
+      </div>
 
       <section className="ote-training-section">
         <h2>Final Practice</h2>
         <p className="ote-section-lead">
           {isAdvanced
-            ? "Choose a timed diplomatic voicemail task and practise under Advanced exam conditions."
+            ? summary.allComplete
+              ? "Guide complete. Now choose a timed diplomatic voicemail task and practise under Advanced exam conditions."
+              : "Review the Advanced voice-message strategy, then move into timed diplomatic practice."
             : summary.allComplete
             ? "Training complete. Now practise complete voicemail sets with exam-style timing."
             : "Work through the training cards above, then practise full timed voicemail sets."}

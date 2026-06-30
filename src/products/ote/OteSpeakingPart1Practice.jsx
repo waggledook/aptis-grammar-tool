@@ -226,6 +226,12 @@ const ADVANCED_PRACTICE_SETS = [
       "How has the way you use technology changed in recent years?",
       "Finally, if you could learn one practical skill immediately, what would you choose, and why?",
     ],
+    audio: [
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-1-q3.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-1-q4.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-1-q5.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-1-q6.mp3",
+    ],
   },
   {
     id: "advanced-set-2",
@@ -236,6 +242,12 @@ const ADVANCED_PRACTICE_SETS = [
       "What qualities make someone a good neighbour?",
       "How did an important decision you made affect your life?",
       "Finally, if you had much more free time, how do you think your priorities would change?",
+    ],
+    audio: [
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-2-q3.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-2-q4.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-2-q5.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-2-q6.mp3",
     ],
   },
   {
@@ -248,6 +260,12 @@ const ADVANCED_PRACTICE_SETS = [
       "In what ways have shopping habits changed during your lifetime?",
       "Finally, when do you think it is worth taking a risk?",
     ],
+    audio: [
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-3-q3.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-3-q4.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-3-q5.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-3-q6.mp3",
+    ],
   },
   {
     id: "advanced-set-4",
@@ -259,6 +277,12 @@ const ADVANCED_PRACTICE_SETS = [
       "Tell me about a time when you had to adapt to an unexpected situation.",
       "Finally, if you could change one aspect of modern life, what would it be?",
     ],
+    audio: [
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-4-q3.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-4-q4.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-4-q5.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-4-q6.mp3",
+    ],
   },
   {
     id: "advanced-set-5",
@@ -269,6 +293,12 @@ const ADVANCED_PRACTICE_SETS = [
       "Can you describe a place where you can concentrate well?",
       "How has your idea of success changed over time?",
       "Finally, what is the most valuable lesson you have learned from a difficult experience?",
+    ],
+    audio: [
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-5-q3.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-5-q4.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-5-q5.mp3",
+      "/audio/ote/speaking/advanced/part1-practice/advanced-set-5-q6.mp3",
     ],
   },
 ];
@@ -504,7 +534,9 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
   const navigate = useNavigate();
   const { playAudioFile, speak, stop } = useSpeech();
   const menuPath = getSitePath(nativeRoutes ? "/speaking/part-1-interview" : "/ote/speaking/part-1-interview");
-  const basePath = getSitePath(nativeRoutes ? "/speaking/part-1-interview/practice" : "/ote/speaking/part-1-interview/practice");
+  const rawBasePath = nativeRoutes ? "/speaking/part-1-interview/practice" : "/ote/speaking/part-1-interview/practice";
+  const basePath = getSitePath(rawBasePath);
+  const getSetPath = (id) => getSitePath(`${rawBasePath}/${id}`);
   const isAdvanced = user?.oteVersion === "advanced";
   const activeSets = isAdvanced ? ADVANCED_PRACTICE_SETS : PRACTICE_SETS;
   const selectedSet = useMemo(() => activeSets.find((item) => item.id === setId), [activeSets, setId]);
@@ -794,7 +826,7 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
         </header>
         <div className="ote-practice-set-grid">
           {activeSets.map((set, index) => (
-            <button className="ote-practice-set-card" key={set.id} type="button" onClick={() => navigate(`${basePath}/${set.id}`)}>
+            <button className="ote-practice-set-card" key={set.id} type="button" onClick={() => navigate(getSetPath(set.id))}>
               <span>Set {index + 1}</span>
               <h2>{set.title}</h2>
               <p>{set.description}</p>

@@ -14,6 +14,7 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
   const writingMockPath = getSitePath(nativeRoutes ? "/writing/mock-tests" : "/ote/writing/mock-tests");
   const interviewTrainingPath = getSitePath(nativeRoutes ? "/speaking/part-1-interview" : "/ote/speaking/part-1-interview");
   const voicemailTrainingPath = getSitePath(nativeRoutes ? "/speaking/part-2-voicemails" : "/ote/speaking/part-2-voicemails");
+  const debateTrainingPath = getSitePath(nativeRoutes ? "/speaking/parts-4-5-debate" : "/ote/speaking/parts-4-5-debate");
   const talkTrainingPath = getSitePath(nativeRoutes ? "/speaking/parts-3-4" : "/ote/speaking/parts-3-4");
   const emailTrainingPath = getSitePath(nativeRoutes ? "/writing/training/email" : "/ote/writing/training/email");
   const essayTrainingPath = getSitePath(nativeRoutes ? "/writing/training/essay" : "/ote/writing/training/essay");
@@ -96,13 +97,13 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
               <h3>Part 2 Diplomatic Voicemail</h3>
               <p>Practise tactful 40-second voice messages after some time to think before recording.</p>
             </button>
-            <button className="menu-card" type="button" disabled>
+            <button className="menu-card" type="button" onClick={() => navigate(talkTrainingPath)}>
               <h3>Part 3 Summary</h3>
-              <p>Coming soon: integrated listening-to-speaking summary practice.</p>
+              <p>Review the integrated summary guide, then practise with notes, preparation time, and recording.</p>
             </button>
-            <button className="menu-card" type="button" disabled>
+            <button className="menu-card" type="button" onClick={() => navigate(debateTrainingPath)}>
               <h3>Parts 4 and 5 Debate</h3>
-              <p>Coming soon: debate preparation and follow-up question practice.</p>
+              <p>Review the debate guide, then practise mind maps, floating notes, and follow-up questions.</p>
             </button>
           </>
         ) : isSpeaking ? (

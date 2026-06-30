@@ -384,7 +384,9 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
   const navigate = useNavigate();
   const { playAudioFile, speak, stop } = useSpeech();
   const menuPath = getSitePath(nativeRoutes ? "/speaking/parts-3-4" : "/ote/speaking/parts-3-4");
-  const basePath = getSitePath(nativeRoutes ? "/speaking/parts-3-4/practice" : "/ote/speaking/parts-3-4/practice");
+  const rawBasePath = nativeRoutes ? "/speaking/parts-3-4/practice" : "/ote/speaking/parts-3-4/practice";
+  const basePath = getSitePath(rawBasePath);
+  const getSetPath = (id) => getSitePath(`${rawBasePath}/${id}`);
   const selectedSet = useMemo(() => PRACTICE_SETS.find((item) => item.id === setId), [setId]);
 
   const [stepIndex, setStepIndex] = useState(0);
@@ -754,7 +756,7 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
         </header>
         <div className="ote-practice-set-grid">
           {PRACTICE_SETS.map((set, index) => (
-            <button className="ote-practice-set-card" key={set.id} type="button" onClick={() => navigate(`${basePath}/${set.id}`)}>
+            <button className="ote-practice-set-card" key={set.id} type="button" onClick={() => navigate(getSetPath(set.id))}>
               <span>Set {index + 1}</span>
               <h2>{set.title}</h2>
               <p>{set.description}</p>
@@ -766,6 +768,7 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
   }
 
   const activeRecording = recordings.find((recording) => recording.stepId === visibleStep?.id);
+  const shouldRevealVisibleStep = phase !== "ready" || Boolean(activeRecording);
   const hasPart3Recording = recordings.some((recording) => recording.partId === "part-3");
   const hasPart4Recording = recordings.some((recording) => recording.partId === "part-4");
 
@@ -789,7 +792,7 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
             <div className="ote-recorder-top">
               <div>
                 <p className="ote-kicker">{visibleStep.label}</p>
-                <h2>{visibleStep.kind === "talk" ? "Choose two pictures and give your talk" : visibleStep.title}</h2>
+                <h2>{visibleStep.kind === "talk" ? "Part 3 Talk" : visibleStep.title}</h2>
               </div>
               <div className={`ote-recorder-timer is-${phase}`} aria-live="polite">
                 <Timer size={22} aria-hidden="true" />
@@ -798,37 +801,50 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
               </div>
             </div>
 
-            <div className="ote-practice-instructions">
-              <p className="ote-kicker">Instructions</p>
-              <ul>
-                {(visibleStep.kind === "talk" ? PART3_INSTRUCTIONS : PART4_INSTRUCTIONS).map((line) => (
-                  <li key={line}>{line}</li>
-                ))}
-              </ul>
-            </div>
+            {shouldRevealVisibleStep ? (
+              <>
+                <div className="ote-practice-instructions">
+                  <p className="ote-kicker">Instructions</p>
+                  <ul>
+                    {(visibleStep.kind === "talk" ? PART3_INSTRUCTIONS : PART4_INSTRUCTIONS).map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                </div>
 
-            {visibleStep.kind === "talk" && (
-              <div className="ote-practice-specific-prompt">
-                <p>{visibleStep.prompt}</p>
-              </div>
-            )}
+                {visibleStep.kind === "talk" && (
+                  <div className="ote-practice-specific-prompt">
+                    <p>{visibleStep.prompt}</p>
+                  </div>
+                )}
 
-            {visibleStep.kind === "talk" && (
-              <div className="ote-part34-image-grid">
-                {selectedSet.images.map((image) => (
-                  <figure key={image.id}>
-                    {image.src ? (
-                      <img src={image.src} alt="" />
-                    ) : (
-                      <div className="ote-part34-image-placeholder" aria-hidden="true">
-                        <span>{image.label}</span>
-                      </div>
-                    )}
-                    <figcaption>
-                      <strong>{image.label}</strong>
-                    </figcaption>
-                  </figure>
-                ))}
+                {visibleStep.kind === "talk" && (
+                  <div className="ote-part34-image-grid">
+                    {selectedSet.images.map((image) => (
+                      <figure key={image.id}>
+                        {image.src ? (
+                          <img src={image.src} alt="" />
+                        ) : (
+                          <div className="ote-part34-image-placeholder" aria-hidden="true">
+                            <span>{image.label}</span>
+                          </div>
+                        )}
+                        <figcaption>
+                          <strong>{image.label}</strong>
+                        </figcaption>
+                      </figure>
+                    ))}
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="ote-practice-hidden-task">
+                <p className="ote-kicker">Task hidden</p>
+                <p>
+                  {visibleStep.kind === "talk"
+                    ? "Press Start task when you are ready. The instructions and task materials will be shown and read before the preparation countdown begins."
+                    : "Press Start follow-up questions when you are ready. The question will be shown and read before recording begins."}
+                </p>
               </div>
             )}
 
