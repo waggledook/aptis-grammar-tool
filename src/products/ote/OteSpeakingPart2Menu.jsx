@@ -6,8 +6,9 @@ import { getSitePath } from "../../siteConfig.js";
 import { useOteTrainingProgress, useOteTrainingSummary } from "./utils/trainingProgress.js";
 import "./styles/ote.css";
 
-export default function OteSpeakingPart2Menu({ nativeRoutes = false }) {
+export default function OteSpeakingPart2Menu({ user, nativeRoutes = false }) {
   const navigate = useNavigate();
+  const isAdvanced = user?.oteVersion === "advanced";
   const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
   const introPath = getSitePath(
     nativeRoutes ? "/speaking/part-2-voicemails/overview" : "/ote/speaking/part-2-voicemails/overview"
@@ -26,7 +27,7 @@ export default function OteSpeakingPart2Menu({ nativeRoutes = false }) {
   );
   const completedProgress = useOteTrainingProgress();
   const activities = useMemo(
-    () => [
+    () => isAdvanced ? [] : [
       {
         label: "Activity 1",
         title: "How Voicemails Work",
@@ -60,7 +61,7 @@ export default function OteSpeakingPart2Menu({ nativeRoutes = false }) {
         progressId: "speaking.part2.cheat-sheet",
       },
     ],
-    [cheatSheetPath, guidedMessage2Path, guidedPath, introPath]
+    [cheatSheetPath, guidedMessage2Path, guidedPath, introPath, isAdvanced]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
   const practiceComplete = completedProgress.has("speaking.part2.practice");
@@ -81,42 +82,49 @@ export default function OteSpeakingPart2Menu({ nativeRoutes = false }) {
         <p className="ote-kicker">Speaking Part 2</p>
         <h1>Voicemail Training</h1>
         <p>
-          Build the skills for formal and friendly OTE voice messages: understand the format,
-          spot common mistakes, practise under timed conditions, and compare your answer with a model.
+          {isAdvanced
+            ? "Practise Advanced diplomatic voice messages: read and listen to the task, think briefly, then record a tactful 40-second response."
+            : "Build the skills for formal and friendly OTE voice messages: understand the format, spot common mistakes, practise under timed conditions, and compare your answer with a model."}
         </p>
-        <div className="ote-training-progress-strip" aria-label="Training progress">
-          <span>{summary.completed} of {summary.total} training lessons complete</span>
-          <div className="ote-training-progress-track" aria-hidden="true">
-            <span style={{ width: `${summary.total ? Math.round((summary.completed / summary.total) * 100) : 0}%` }} />
+        {!isAdvanced ? (
+          <div className="ote-training-progress-strip" aria-label="Training progress">
+            <span>{summary.completed} of {summary.total} training lessons complete</span>
+            <div className="ote-training-progress-track" aria-hidden="true">
+              <span style={{ width: `${summary.total ? Math.round((summary.completed / summary.total) * 100) : 0}%` }} />
+            </div>
           </div>
-        </div>
+        ) : null}
       </header>
 
-      <div className="ote-training-activity-grid" aria-label="Part 2 voicemail activities">
-        {activities.map((activity) => {
-          const Icon = activity.icon;
-          const isComplete = completedProgress.has(activity.progressId);
-          return (
-            <button
-              key={activity.progressId}
-              className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
-              type="button"
-              onClick={() => navigate(activity.path)}
-            >
-              {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
-              <Icon size={28} aria-hidden="true" />
-              <span>{activity.label}</span>
-              <h2>{activity.title}</h2>
-              <p>{activity.copy}</p>
-            </button>
-          );
-        })}
-      </div>
+      {!isAdvanced ? (
+        <div className="ote-training-activity-grid" aria-label="Part 2 voicemail activities">
+          {activities.map((activity) => {
+            const Icon = activity.icon;
+            const isComplete = completedProgress.has(activity.progressId);
+            return (
+              <button
+                key={activity.progressId}
+                className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
+                type="button"
+                onClick={() => navigate(activity.path)}
+              >
+                {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+                <Icon size={28} aria-hidden="true" />
+                <span>{activity.label}</span>
+                <h2>{activity.title}</h2>
+                <p>{activity.copy}</p>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
 
       <section className="ote-training-section">
         <h2>Final Practice</h2>
         <p className="ote-section-lead">
-          {summary.allComplete
+          {isAdvanced
+            ? "Choose a timed diplomatic voicemail task and practise under Advanced exam conditions."
+            : summary.allComplete
             ? "Training complete. Now practise complete voicemail sets with exam-style timing."
             : "Work through the training cards above, then practise full timed voicemail sets."}
         </p>
@@ -128,8 +136,12 @@ export default function OteSpeakingPart2Menu({ nativeRoutes = false }) {
           {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
           <PlayCircle size={28} aria-hidden="true" />
           <span>Practice</span>
-          <h2>Timed Voicemail Sets</h2>
-          <p>Practise both voicemail types with exam-style timing and downloadable recordings.</p>
+          <h2>{isAdvanced ? "Timed Diplomatic Voicemail Sets" : "Timed Voicemail Sets"}</h2>
+          <p>
+            {isAdvanced
+              ? "Practise one diplomatic voice message at a time with some time to think and 40 seconds to speak."
+              : "Practise both voicemail types with exam-style timing and downloadable recordings."}
+          </p>
         </button>
       </section>
     </main>

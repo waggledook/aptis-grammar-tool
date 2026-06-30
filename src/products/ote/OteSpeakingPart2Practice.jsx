@@ -20,6 +20,13 @@ const VOICEMAIL_INSTRUCTIONS = [
   "The clock shows how much time you have to speak.",
   "Start speaking when you hear the tone.",
 ];
+const ADVANCED_VOICEMAIL_INSTRUCTIONS = [
+  "You are going to leave a voice message.",
+  "First read and listen to the task, then decide what you want to say.",
+  "You need to be diplomatic in your response.",
+  "You have 40 seconds to leave your voice message.",
+  "Start speaking when you hear the tone.",
+];
 
 const PRACTICE_SETS = [
   {
@@ -224,6 +231,124 @@ const PRACTICE_SETS = [
   },
 ];
 
+const ADVANCED_PRACTICE_SETS = [
+  {
+    id: "advanced-set-1",
+    title: "Tutor Assignment Request",
+    description: "Diplomatically respond to a tutor who wants to share your assignment.",
+    tasks: [
+      {
+        id: "advanced-set-1-message",
+        type: "advanced-diplomatic",
+        label: "Voice message",
+        title: "Assignment Example",
+        audience: "Tutor",
+        lead:
+          "You study at college. Your tutor, Dr Evans, has asked for permission to show your recent assignment to other students as an example. Your tutor would like to use it in next week's class. The assignment contains some personal information, so you do not want the current version to be shared. Leave a voice message for your tutor and:",
+        bullets: [
+          "thank her for choosing your work",
+          "explain your concern",
+          "suggest a possible solution",
+        ],
+        prepSeconds: 10,
+        responseSeconds: 40,
+      },
+    ],
+  },
+  {
+    id: "advanced-set-2",
+    title: "Study Room Meeting",
+    description: "Ask another student to move a meeting without creating conflict.",
+    tasks: [
+      {
+        id: "advanced-set-2-message",
+        type: "advanced-diplomatic",
+        label: "Voice message",
+        title: "Silent Study Room",
+        audience: "Student society organiser",
+        lead:
+          "You study at college. A student you know, Maya, has arranged a society meeting in a study room tomorrow. You have discovered that the room is reserved for silent study, and the meeting may disturb other students. The college has recently received complaints about noise in this area. Leave a voice message for Maya and:",
+        bullets: [
+          "explain why you are calling",
+          "ask her to change the location",
+          "suggest a suitable alternative",
+        ],
+        prepSeconds: 10,
+        responseSeconds: 40,
+      },
+    ],
+  },
+  {
+    id: "advanced-set-3",
+    title: "Short-notice Saturday Shift",
+    description: "Respond tactfully to a manager about a difficult schedule change.",
+    tasks: [
+      {
+        id: "advanced-set-3-message",
+        type: "advanced-diplomatic",
+        label: "Voice message",
+        title: "Saturday Work Request",
+        audience: "Manager",
+        lead:
+          "You work for a company. Your manager, Karen Willis, has changed your work schedule at short notice and asked you to work on Saturday. The change was made because several employees are ill during a particularly busy week. You have an important personal commitment that day. Leave a voice message for your manager and:",
+        bullets: [
+          "acknowledge why the company needs extra staff",
+          "explain why Saturday is difficult for you",
+          "suggest a compromise",
+        ],
+        prepSeconds: 10,
+        responseSeconds: 40,
+      },
+    ],
+  },
+  {
+    id: "advanced-set-4",
+    title: "Client Report Figures",
+    description: "Ask a colleague to delay a report because figures may be inaccurate.",
+    tasks: [
+      {
+        id: "advanced-set-4-message",
+        type: "advanced-diplomatic",
+        label: "Voice message",
+        title: "Report Accuracy Concern",
+        audience: "Colleague",
+        lead:
+          "You work for a company. Your colleague, Marcus, plans to send a report to a client this afternoon. You have noticed that some of the cost figures may be inaccurate, but Marcus believes the report should be sent immediately. The information could influence the client's decision. Leave a voice message for Marcus and:",
+        bullets: [
+          "explain why you are concerned",
+          "ask him to delay sending the report",
+          "suggest how you can check it quickly",
+        ],
+        prepSeconds: 10,
+        responseSeconds: 40,
+      },
+    ],
+  },
+  {
+    id: "advanced-set-5",
+    title: "Training a New Employee",
+    description: "Suggest a practical arrangement when two work responsibilities conflict.",
+    tasks: [
+      {
+        id: "advanced-set-5-message",
+        type: "advanced-diplomatic",
+        label: "Voice message",
+        title: "Training Schedule",
+        audience: "Manager",
+        lead:
+          "You work for a company. Your manager, Ms Patel, has asked you to train a new employee throughout next week. You are willing to help, but you also have an urgent project to finish by Friday. No other experienced employee is available for the whole week. Leave a voice message for your manager and:",
+        bullets: [
+          "show that you understand the importance of the training",
+          "explain your difficulty",
+          "suggest a different arrangement",
+        ],
+        prepSeconds: 10,
+        responseSeconds: 40,
+      },
+    ],
+  },
+];
+
 function formatTime(seconds) {
   const safe = Math.max(0, Math.ceil(seconds || 0));
   return `00:${String(safe).padStart(2, "0")}`;
@@ -388,7 +513,10 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
   const { speakingId, playAudioFile, playCueThenSpeak, speak, stop } = useSpeech();
   const menuPath = getSitePath(nativeRoutes ? "/speaking/part-2-voicemails" : "/ote/speaking/part-2-voicemails");
   const basePath = getSitePath(nativeRoutes ? "/speaking/part-2-voicemails/practice" : "/ote/speaking/part-2-voicemails/practice");
-  const selectedSet = useMemo(() => PRACTICE_SETS.find((item) => item.id === setId), [setId]);
+  const isAdvanced = user?.oteVersion === "advanced";
+  const activeSets = isAdvanced ? ADVANCED_PRACTICE_SETS : PRACTICE_SETS;
+  const activeInstructions = isAdvanced ? ADVANCED_VOICEMAIL_INSTRUCTIONS : VOICEMAIL_INSTRUCTIONS;
+  const selectedSet = useMemo(() => activeSets.find((item) => item.id === setId), [activeSets, setId]);
 
   const [activeIndex, setActiveIndex] = useState(0);
   const [phase, setPhase] = useState("ready");
@@ -510,7 +638,9 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     setSecondsLeft(0);
     await playAudioFile(
       `instructions-${activeTask.id}`,
-      activeTask.type === "message-2" ? OTE_SPEAKING_AUDIO.voicemailInstructions2 : OTE_SPEAKING_AUDIO.voicemailInstructions1
+      isAdvanced
+        ? OTE_SPEAKING_AUDIO.voicemailAdvancedInstructions
+        : activeTask.type === "message-2" ? OTE_SPEAKING_AUDIO.voicemailInstructions2 : OTE_SPEAKING_AUDIO.voicemailInstructions1
     );
     if (activeTask.taskAudioSrc) {
       await playAudioFile(`task-${activeTask.id}`, activeTask.taskAudioSrc);
@@ -524,7 +654,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
       await playCueThenSpeak(`friend-${activeTask.id}`, OTE_SPEAKING_AUDIO.nowListenToMessage, activeTask.friendMessage);
     }
     await playAudioFile(`think-auto-${activeTask.id}`, OTE_SPEAKING_AUDIO.timeToThink);
-    startCountdown(20, "thinking", () => startRecording(stream));
+    startCountdown(activeTask.prepSeconds || (isAdvanced ? 10 : 20), "thinking", () => startRecording(stream));
   }
 
   function startRecording(stream) {
@@ -549,7 +679,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
           label: activeTask.label,
           title: activeTask.title,
           prompt: buildTaskSpeech(activeTask),
-          durationSeconds: 40,
+          durationSeconds: activeTask.responseSeconds || 40,
           blob,
           url,
           name: `ote-part-2-${selectedSet.id}-${activeTask.type}.webm`,
@@ -559,7 +689,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
       setSecondsLeft(0);
     };
     recorder.start();
-    startCountdown(40, "recording", () => {
+    startCountdown(activeTask.responseSeconds || 40, "recording", () => {
       if (recorder.state === "recording") recorder.stop();
     });
   }
@@ -627,7 +757,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
         task: {
           id: selectedSet.id,
           title: selectedSet.title,
-          instructions: VOICEMAIL_INSTRUCTIONS,
+          instructions: activeInstructions,
           tasks: selectedSet.tasks,
         },
         recordings: feedbackAudio,
@@ -662,10 +792,14 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
         <header className="ote-training-hero">
           <p className="ote-kicker">Practice</p>
           <h1>Voicemail Practice Sets</h1>
-          <p>Choose a set. Each one includes a polite Message 1 task and a friendly Message 2 reply.</p>
+          <p>
+            {isAdvanced
+              ? "Choose a set. Each one gives you a diplomatic voice message task with some time to think and 40 seconds to speak."
+              : "Choose a set. Each one includes a polite Message 1 task and a friendly Message 2 reply."}
+          </p>
         </header>
         <div className="ote-practice-set-grid">
-          {PRACTICE_SETS.map((set, index) => (
+          {activeSets.map((set, index) => (
             <button className="ote-practice-set-card" key={set.id} type="button" onClick={() => navigate(`${basePath}/${set.id}`)}>
               <span>Set {index + 1}</span>
               <h2>{set.title}</h2>
@@ -691,7 +825,11 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
       <header className="ote-training-hero">
         <p className="ote-kicker">Practice set</p>
         <h1>{selectedSet.title}</h1>
-        <p>Run both voicemail types with exam-style timing, then listen back and download your recordings.</p>
+        <p>
+          {isAdvanced
+            ? "Read and listen to the task, then use the time to think before leaving one diplomatic 40-second voice message."
+            : "Run both voicemail types with exam-style timing, then listen back and download your recordings."}
+        </p>
       </header>
 
       <section className="ote-practice-runner">
@@ -712,7 +850,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
             <div className="ote-practice-instructions">
               <p className="ote-kicker">Instructions</p>
               <ul>
-                {VOICEMAIL_INSTRUCTIONS.map((line) => (
+                {activeInstructions.map((line) => (
                   <li key={line}>{line}</li>
                 ))}
               </ul>
@@ -765,8 +903,12 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
         {(complete || phase === "complete") && (
           <section className="ote-practice-complete">
             <p className="ote-kicker">Practice complete</p>
-            <h2>Review Your Two Voicemails</h2>
-            <p>Play them back, download individual files, or download the full set as a ZIP.</p>
+            <h2>{isAdvanced ? "Review Your Voice Message" : "Review Your Two Voicemails"}</h2>
+            <p>
+              {isAdvanced
+                ? "Play your voice message back, download the file, or generate feedback."
+                : "Play them back, download individual files, or download the full set as a ZIP."}
+            </p>
             <button
               className="ote-reference-download"
               type="button"

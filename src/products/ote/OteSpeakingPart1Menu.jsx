@@ -6,8 +6,9 @@ import { getSitePath } from "../../siteConfig.js";
 import { useOteTrainingProgress, useOteTrainingSummary } from "./utils/trainingProgress.js";
 import "./styles/ote.css";
 
-export default function OteSpeakingPart1Menu({ nativeRoutes = false }) {
+export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
   const navigate = useNavigate();
+  const isAdvanced = user?.oteVersion === "advanced";
   const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
   const overviewPath = getSitePath(
     nativeRoutes ? "/speaking/part-1-interview/overview" : "/ote/speaking/part-1-interview/overview"
@@ -17,7 +18,7 @@ export default function OteSpeakingPart1Menu({ nativeRoutes = false }) {
   );
   const completedProgress = useOteTrainingProgress();
   const activities = useMemo(
-    () => [
+    () => isAdvanced ? [] : [
       {
         label: "Activity 1",
         title: "How Part 1 Works",
@@ -27,7 +28,7 @@ export default function OteSpeakingPart1Menu({ nativeRoutes = false }) {
         progressId: "speaking.part1.overview",
       },
     ],
-    [overviewPath]
+    [isAdvanced, overviewPath]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
   const practiceComplete = completedProgress.has("speaking.part1.practice");
@@ -48,42 +49,49 @@ export default function OteSpeakingPart1Menu({ nativeRoutes = false }) {
         <p className="ote-kicker">Speaking Part 1</p>
         <h1>Interview Training</h1>
         <p>
-          Build confidence for the opening interview: understand the question order, practise the
-          fast timing, and record short answers across everyday topics.
+          {isAdvanced
+            ? "Build confidence for the Advanced opening interview: recycle the two warm-up questions, then practise four longer timed responses."
+            : "Build confidence for the opening interview: understand the question order, practise the fast timing, and record short answers across everyday topics."}
         </p>
-        <div className="ote-training-progress-strip" aria-label="Training progress">
-          <span>{summary.completed} of {summary.total} training lessons complete</span>
-          <div className="ote-training-progress-track" aria-hidden="true">
-            <span style={{ width: `${summary.total ? Math.round((summary.completed / summary.total) * 100) : 0}%` }} />
+        {!isAdvanced ? (
+          <div className="ote-training-progress-strip" aria-label="Training progress">
+            <span>{summary.completed} of {summary.total} training lessons complete</span>
+            <div className="ote-training-progress-track" aria-hidden="true">
+              <span style={{ width: `${summary.total ? Math.round((summary.completed / summary.total) * 100) : 0}%` }} />
+            </div>
           </div>
-        </div>
+        ) : null}
       </header>
 
-      <div className="ote-training-activity-grid" aria-label="Part 1 interview activities">
-        {activities.map((activity) => {
-          const Icon = activity.icon;
-          const isComplete = completedProgress.has(activity.progressId);
-          return (
-            <button
-              key={activity.progressId}
-              className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
-              type="button"
-              onClick={() => navigate(activity.path)}
-            >
-              {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
-              <Icon size={28} aria-hidden="true" />
-              <span>{activity.label}</span>
-              <h2>{activity.title}</h2>
-              <p>{activity.copy}</p>
-            </button>
-          );
-        })}
-      </div>
+      {!isAdvanced ? (
+        <div className="ote-training-activity-grid" aria-label="Part 1 interview activities">
+          {activities.map((activity) => {
+            const Icon = activity.icon;
+            const isComplete = completedProgress.has(activity.progressId);
+            return (
+              <button
+                key={activity.progressId}
+                className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
+                type="button"
+                onClick={() => navigate(activity.path)}
+              >
+                {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+                <Icon size={28} aria-hidden="true" />
+                <span>{activity.label}</span>
+                <h2>{activity.title}</h2>
+                <p>{activity.copy}</p>
+              </button>
+            );
+          })}
+        </div>
+      ) : null}
 
       <section className="ote-training-section">
         <h2>Final Practice</h2>
         <p className="ote-section-lead">
-          {summary.allComplete
+          {isAdvanced
+            ? "Choose a timed Advanced interview set and practise the four longer Part 1 responses."
+            : summary.allComplete
             ? "Training complete. Now practise timed interview sets."
             : "Review the Part 1 format, then move into timed interview practice."}
         </p>
@@ -96,7 +104,11 @@ export default function OteSpeakingPart1Menu({ nativeRoutes = false }) {
           <PlayCircle size={28} aria-hidden="true" />
           <span>Practice</span>
           <h2>Timed Interview Sets</h2>
-          <p>Practise two fixed warm-up questions and six topic questions with recordings.</p>
+          <p>
+            {isAdvanced
+              ? "Practise two fixed warm-up questions and four Advanced interview questions with recordings."
+              : "Practise two fixed warm-up questions and six topic questions with recordings."}
+          </p>
         </button>
       </section>
     </main>

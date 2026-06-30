@@ -429,6 +429,32 @@ export async function requestOteSpeakingFeedback(payload) {
   return result.data;
 }
 
+export async function requestOteLevelProductionFeedback(payload) {
+  const generateOteLevelProductionFeedback = httpsCallable(
+    functionsRegion,
+    "generateOteLevelProductionFeedback",
+    { timeout: 300000 }
+  );
+  const result = await generateOteLevelProductionFeedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  try {
+    await logAiFeedbackGenerated("ote_level_production", {
+      product: "ote",
+      section: "level-test",
+      mode: payload?.mode || "general_production_check",
+      profileId: payload?.phase1?.profile?.id || "",
+      score: payload?.phase1?.totalScore ?? null,
+      answerCount: Array.isArray(payload?.speaking?.recordings) ? payload.speaking.recordings.length : null,
+      wordCount: payload?.writing?.answer?.wordCount ?? null,
+    }, result.data);
+  } catch (error) {
+    console.warn("[OTE level production] activity log failed", error);
+  }
+  return result.data;
+}
+
 export async function doPasswordReset(email, redirectUrl = "") {
   const safeRedirect = String(redirectUrl || "").trim();
   if (!safeRedirect) {

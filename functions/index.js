@@ -10,6 +10,7 @@ try { admin.app(); } catch { admin.initializeApp(); }
 const GMAIL_USER   = process.env.GMAIL_USER;
 const GMAIL_PASS   = process.env.GMAIL_APP_PASSWORD;
 const TEACHER_EMAIL = process.env.TEACHER_EMAIL || GMAIL_USER;
+const OTE_LEVEL_REPORT_COPY_EMAIL = "nicholas@beeskillsenglish.com";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const firestore = admin.firestore();
 
@@ -1604,6 +1605,92 @@ const OTE_WRITING_FEEDBACK_SCHEMA = {
         },
       },
     },
+  },
+};
+
+const OTE_LEVEL_PRODUCTION_FEEDBACK_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "taskType",
+    "speaking",
+    "writing",
+    "productionEstimate",
+    "confidence",
+    "courseRecommendation",
+    "advancedRecommended",
+    "strength",
+    "priority",
+    "candidateMessage",
+  ],
+  properties: {
+    taskType: { type: "string", enum: ["ote_level_production_feedback"] },
+    speaking: {
+      type: "object",
+      additionalProperties: false,
+      required: ["estimatedLevel", "confidence", "criteria", "note"],
+      properties: {
+        estimatedLevel: {
+          type: "string",
+          enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"],
+        },
+        confidence: { type: "string", enum: ["low", "moderate", "high"] },
+        criteria: {
+          type: "object",
+          additionalProperties: false,
+          required: ["taskFulfilment", "organization", "grammar", "lexis"],
+          properties: {
+            taskFulfilment: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
+            organization: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
+            grammar: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
+            lexis: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
+          },
+        },
+        note: { type: "string" },
+      },
+    },
+    writing: {
+      type: "object",
+      additionalProperties: false,
+      required: ["estimatedLevel", "confidence", "criteria", "note"],
+      properties: {
+        estimatedLevel: {
+          type: "string",
+          enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"],
+        },
+        confidence: { type: "string", enum: ["low", "moderate", "high"] },
+        criteria: {
+          type: "object",
+          additionalProperties: false,
+          required: ["taskFulfilment", "organization", "grammar", "lexis"],
+          properties: {
+            taskFulfilment: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
+            organization: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
+            grammar: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
+            lexis: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
+          },
+        },
+        note: { type: "string" },
+      },
+    },
+    productionEstimate: {
+      type: "string",
+      enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"],
+    },
+    confidence: { type: "string", enum: ["low", "moderate", "high"] },
+    courseRecommendation: {
+      type: "string",
+      enum: [
+        "A2 / Elementary Foundation Course",
+        "B1 Level Preparation Course",
+        "B2 Exam Masterclass Course",
+        "OTE Advanced diagnostic recommended",
+      ],
+    },
+    advancedRecommended: { type: "boolean" },
+    strength: { type: "string" },
+    priority: { type: "string" },
+    candidateMessage: { type: "string" },
   },
 };
 
@@ -3427,6 +3514,305 @@ function buildOteWritingFeedbackPrompt(payload) {
   ].join("\n");
 }
 
+function normalizeOteLevelProductionPayload(data = {}) {
+  const lead = data?.lead && typeof data.lead === "object" ? data.lead : {};
+  const phase1 = data?.phase1 && typeof data.phase1 === "object" ? data.phase1 : {};
+  const profile = phase1?.profile && typeof phase1.profile === "object" ? phase1.profile : {};
+  const quizReport = data?.quizReport && typeof data.quizReport === "object" ? data.quizReport : {};
+  const quizResult = quizReport?.result && typeof quizReport.result === "object" ? quizReport.result : {};
+  const quizScores = quizReport?.scores && typeof quizReport.scores === "object" ? quizReport.scores : {};
+  const speaking = data?.speaking && typeof data.speaking === "object" ? data.speaking : {};
+  const writing = data?.writing && typeof data.writing === "object" ? data.writing : {};
+  const writingTask = writing?.task && typeof writing.task === "object" ? writing.task : {};
+  const writingAnswerText = cleanString(writing?.answer?.text || "", 5000);
+  const recordings = Array.isArray(speaking?.recordings)
+    ? speaking.recordings.slice(0, 3).map((item, index) => ({
+        id: cleanString(item?.id || item?.taskId || `speaking-${index + 1}`, 120),
+        label: cleanString(item?.label || item?.title || `Speaking ${index + 1}`, 160),
+        prompt: cleanString(item?.prompt || "", 1800),
+        durationSeconds: Number(item?.durationSeconds || 0),
+        base64: cleanString(item?.base64 || "", 8_000_000),
+        mime: cleanString(item?.mime || "audio/webm", 80) || "audio/webm",
+        name: cleanString(item?.name || `ote-level-production-${index + 1}.webm`, 160),
+      }))
+    : [];
+
+  return {
+    mode: cleanString(data?.mode || "general_production_check", 80),
+    lead: {
+      email: cleanString(lead?.email || "", 180).toLowerCase(),
+      name: cleanString(lead?.name || "", 120),
+    },
+    phase1: {
+      routeKey: cleanString(phase1?.routeKey || "", 40),
+      batch1Score: Number(phase1?.batch1Score || 0),
+      totalScore: Number(phase1?.totalScore || 0),
+      profile: {
+        id: cleanString(profile?.id || "", 10),
+        cefr: cleanString(profile?.cefr || "", 20),
+        title: cleanString(profile?.title || "", 120),
+        redirectLabel: cleanString(profile?.redirectLabel || "", 180),
+      },
+    },
+    quizReport: {
+      result: {
+        cefr: cleanString(quizResult?.cefr || profile?.cefr || "", 20),
+        title: cleanString(quizResult?.title || profile?.title || "", 120),
+        profileId: cleanString(quizResult?.profileId || profile?.id || "", 10),
+        summary: cleanString(quizResult?.summary || "", 600),
+        redirectLabel: cleanString(quizResult?.redirectLabel || profile?.redirectLabel || "", 180),
+        coursePath: cleanString(quizResult?.coursePath || "", 180),
+        commercialCue: cleanString(quizResult?.commercialCue || "", 300),
+      },
+      routeKey: cleanString(quizReport?.routeKey || phase1?.routeKey || "", 40),
+      scores: {
+        batch1: Number(quizScores?.batch1 || phase1?.batch1Score || 0),
+        batch2: Number(quizScores?.batch2 || 0),
+        total: Number(quizScores?.total || phase1?.totalScore || 0),
+        max: Number(quizScores?.max || 20),
+      },
+      items: Array.isArray(quizReport?.items)
+        ? quizReport.items.slice(0, 20).map((item, index) => ({
+            number: Number(item?.number || index + 1),
+            id: cleanString(item?.id || "", 80),
+            level: cleanString(item?.level || "", 20),
+            focus: cleanString(item?.focus || "", 120),
+            prompt: cleanString(item?.prompt || "", 600),
+            selectedAnswer: cleanString(item?.selectedAnswer || "", 160),
+            correctAnswer: cleanString(item?.correctAnswer || "", 160),
+            isCorrect: Boolean(item?.isCorrect),
+            feedback: cleanString(item?.feedback || "", 500),
+          }))
+        : [],
+      text: cleanString(quizReport?.text || "", 14000),
+    },
+    speaking: {
+      recordings,
+    },
+    writing: {
+      task: {
+        id: cleanString(writingTask?.id || "ote-diagnostic-writing-email-1", 120),
+        title: cleanString(writingTask?.title || "Registration email", 160),
+        inputText: cleanString(writingTask?.inputText || "", 2500),
+        prompt: cleanString(writingTask?.prompt || "", 1400),
+        requiredPoints: Array.isArray(writingTask?.requiredPoints)
+          ? writingTask.requiredPoints.slice(0, 5).map((point) => cleanString(point, 400)).filter(Boolean)
+          : [],
+        targetWordsMin: Number(writingTask?.targetWordsMin || 60),
+        targetWordsMax: Number(writingTask?.targetWordsMax || 100),
+      },
+      answer: {
+        text: writingAnswerText,
+        wordCount: Number.isFinite(writing?.answer?.wordCount) ? writing.answer.wordCount : countWords(writingAnswerText),
+      },
+    },
+  };
+}
+
+function buildOteLevelProductionPrompt(payload, speakingItems) {
+  return [
+    "You are an English level diagnostic assistant for Oxford Test of English preparation.",
+    "",
+    "This is a short public funnel diagnostic, not an official OTE score or full mock test.",
+    "Assess the learner's production using only these bands: Insufficient evidence, Below A2, A2, B1, B2, Strong B2 / Advanced-ready.",
+    "Do not output C1. If the learner is clearly beyond B2 for this short General check, use Strong B2 / Advanced-ready and recommend an OTE Advanced diagnostic.",
+    "Write candidate-facing comments in Spanish by default. Keep official level labels and course names unchanged when the schema requires them.",
+    "",
+    "Transcript-only limitation:",
+    "- Speaking recordings have been transcribed. Do not claim reliable pronunciation assessment.",
+    "- You may consider whether the transcript suggests connected speech, task fulfilment, organization, grammar range, vocabulary range, and approximate response length.",
+    "- Keep speaking confidence no higher than moderate unless the evidence is unusually complete and clear.",
+    "- If speaking transcripts are empty, too short, or marked with transcriptionConfidence insufficient, set speaking.estimatedLevel and speaking criteria to Insufficient evidence.",
+    "- Do not block the report because of weak speaking evidence. Use the Use of English result and writing sample for the overall recommendation, and explain in Spanish that speaking could not be assessed reliably.",
+    "",
+    "Speaking task weights:",
+    "- Personal question: 15%",
+    "- Voicemail: 35%",
+    "- Picture-based talk: 50%",
+    "",
+    "Writing task:",
+    "- Short polite registration/admissions email.",
+    "- Recommended length: 60-100 words.",
+    "- The learner should say which course or level they are interested in, explain why they want to improve their English, and say when they would like to start.",
+    "- Assess whether the register is suitable for a course admissions context: polite, clear, and not too casual.",
+    "",
+    "Minimum evidence rules:",
+    "- Speaking is insufficient if the voicemail or talk is missing/unusable or there are only isolated words across the main tasks.",
+    "- Writing is insufficient if there is no relevant response or fewer than about 35-40 relevant words.",
+    "- A short but relevant response can still provide level evidence.",
+    "",
+    "Course recommendation rules:",
+    "- Below A2 or A2: A2 / Elementary Foundation Course.",
+    "- B1: B1 Level Preparation Course.",
+    "- B2: B2 Exam Masterclass Course.",
+    "- Strong B2 / Advanced-ready: OTE Advanced diagnostic recommended.",
+    "- If Phase 1 profile is D/C1, advancedRecommended should normally be true unless production evidence is clearly much weaker.",
+    "",
+    "Return strict JSON only. Keep candidateMessage, strength, and priority concise, warm, practical, and in Spanish.",
+    "",
+    "Phase 1 Use of English result:",
+    JSON.stringify(payload.phase1, null, 2),
+    "",
+    "Speaking transcripts:",
+    JSON.stringify(speakingItems, null, 2),
+    "",
+    "Writing task and answer:",
+    JSON.stringify(payload.writing, null, 2),
+  ].join("\n");
+}
+
+function buildOteLevelReportEmail({ payload, speakingItems, feedback, submissionId }) {
+  const candidateEmail = payload.lead.email;
+  const profile = payload.quizReport?.result || payload.phase1?.profile || {};
+  const scores = payload.quizReport?.scores || {};
+  const quizItems = Array.isArray(payload.quizReport?.items) ? payload.quizReport.items : [];
+  const lines = [
+    "Informe del test de nivel Oxford Test of English",
+    "",
+    `Email del estudiante: ${candidateEmail}`,
+    submissionId ? `ID del informe: ${submissionId}` : "",
+    "",
+    "Resultado de Use of English",
+    `Resultado orientativo: ${profile.cefr || payload.phase1?.profile?.cefr || "-"} | ${profile.title || payload.phase1?.profile?.title || "-"}`,
+    `Puntuación: ${scores.total ?? payload.phase1?.totalScore ?? "-"}/${scores.max || 20}`,
+    `Primera parte: ${scores.batch1 ?? payload.phase1?.batch1Score ?? "-"}/10`,
+    `Segunda parte: ${scores.batch2 ?? "-"}/10`,
+    `Ruta: ${payload.quizReport?.routeKey || payload.phase1?.routeKey || "-"}`,
+    `Recomendación: ${profile.redirectLabel || payload.phase1?.profile?.redirectLabel || "-"}`,
+    "",
+    "Revisión de preguntas",
+  ].filter(Boolean);
+
+  quizItems.forEach((item) => {
+    lines.push(
+      "",
+      `${item.number}. ${item.level} | ${item.focus}`,
+      item.prompt,
+      `Respuesta del estudiante: ${item.selectedAnswer || "Sin respuesta"}`,
+      `Respuesta correcta: ${item.correctAnswer}`,
+      `Resultado: ${item.isCorrect ? "Correcto" : "Para revisar"}`,
+      `Comentario: ${item.feedback}`
+    );
+  });
+
+  lines.push(
+    "",
+    "Estimación de speaking y writing",
+    `Nivel estimado: ${feedback?.productionEstimate || "-"}`,
+    `Confianza: ${feedback?.confidence || "-"}`,
+    `Ruta recomendada: ${feedback?.courseRecommendation || "-"}`,
+    `Evaluación avanzada recomendada: ${feedback?.advancedRecommended ? "Sí" : "No"}`,
+    `Punto fuerte: ${feedback?.strength || "-"}`,
+    `Prioridad: ${feedback?.priority || "-"}`,
+    `Mensaje para el estudiante: ${feedback?.candidateMessage || "-"}`,
+    "",
+    "Muestra de writing",
+    `Tarea: ${payload.writing.task.title}`,
+    `Palabras: ${payload.writing.answer.wordCount}`,
+    payload.writing.answer.text || "-",
+    "",
+    "Transcripciones de speaking"
+  );
+
+  speakingItems.forEach((item, index) => {
+    lines.push(
+      "",
+      `${index + 1}. ${item.title}`,
+      item.prompt,
+      `Palabras: ${item.wordCount}`,
+      item.transcript || "-"
+    );
+  });
+
+  lines.push(
+    "",
+    "Nota: este es un test de nivel breve para orientación, no una puntuación oficial del Oxford Test of English."
+  );
+
+  const text = lines.join("\n");
+  const html = [
+    "<h2>Informe del test de nivel Oxford Test of English</h2>",
+    `<p><strong>Email del estudiante:</strong> ${escapeHtml(candidateEmail)}</p>`,
+    submissionId ? `<p><strong>ID del informe:</strong> ${escapeHtml(submissionId)}</p>` : "",
+    "<h3>Resultado de Use of English</h3>",
+    `<p><strong>Resultado orientativo:</strong> ${escapeHtml(profile.cefr || payload.phase1?.profile?.cefr || "-")} | ${escapeHtml(profile.title || payload.phase1?.profile?.title || "-")}</p>`,
+    `<p><strong>Puntuación:</strong> ${escapeHtml(scores.total ?? payload.phase1?.totalScore ?? "-")}/${escapeHtml(scores.max || 20)}</p>`,
+    `<p><strong>Ruta:</strong> ${escapeHtml(payload.quizReport?.routeKey || payload.phase1?.routeKey || "-")}</p>`,
+    `<p><strong>Recomendación:</strong> ${escapeHtml(profile.redirectLabel || payload.phase1?.profile?.redirectLabel || "-")}</p>`,
+    "<h3>Revisión de preguntas</h3>",
+    ...quizItems.map((item) => [
+      "<div style=\"border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:8px\">",
+      `<p><strong>${escapeHtml(item.number)}. ${escapeHtml(item.level)} | ${escapeHtml(item.focus)}</strong></p>`,
+      `<p>${escapeHtml(item.prompt)}</p>`,
+      `<p><strong>Respuesta del estudiante:</strong> ${escapeHtml(item.selectedAnswer || "Sin respuesta")}</p>`,
+      `<p><strong>Respuesta correcta:</strong> ${escapeHtml(item.correctAnswer)}</p>`,
+      `<p><strong>Resultado:</strong> ${item.isCorrect ? "Correcto" : "Para revisar"}</p>`,
+      `<p>${escapeHtml(item.feedback)}</p>`,
+      "</div>",
+    ].join("")),
+    "<h3>Estimación de speaking y writing</h3>",
+    `<p><strong>Nivel estimado:</strong> ${escapeHtml(feedback?.productionEstimate || "-")}</p>`,
+    `<p><strong>Confianza:</strong> ${escapeHtml(feedback?.confidence || "-")}</p>`,
+    `<p><strong>Ruta recomendada:</strong> ${escapeHtml(feedback?.courseRecommendation || "-")}</p>`,
+    `<p><strong>Punto fuerte:</strong> ${escapeHtml(feedback?.strength || "-")}</p>`,
+    `<p><strong>Prioridad:</strong> ${escapeHtml(feedback?.priority || "-")}</p>`,
+    `<p>${escapeHtml(feedback?.candidateMessage || "")}</p>`,
+    "<h3>Muestra de writing</h3>",
+    `<p><strong>Tarea:</strong> ${escapeHtml(payload.writing.task.title)}</p>`,
+    `<p><strong>Palabras:</strong> ${escapeHtml(payload.writing.answer.wordCount)}</p>`,
+    `<pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(payload.writing.answer.text || "-")}</pre>`,
+    "<h3>Transcripciones de speaking</h3>",
+    ...speakingItems.map((item, index) => [
+      `<h4>${escapeHtml(index + 1)}. ${escapeHtml(item.title)}</h4>`,
+      `<p>${escapeHtml(item.prompt)}</p>`,
+      `<p><strong>Palabras:</strong> ${escapeHtml(item.wordCount)}</p>`,
+      `<pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(item.transcript || "-")}</pre>`,
+    ].join("")),
+    "<p><em>Este es un test de nivel breve para orientación, no una puntuación oficial del Oxford Test of English.</em></p>",
+  ].filter(Boolean).join("\n");
+
+  return { text, html };
+}
+
+async function sendOteLevelReportEmail({ payload, speakingItems, feedback, submissionId }) {
+  if (!FROM_ADDRESS || !GMAIL_PASS) {
+    console.warn("[generateOteLevelProductionFeedback] Email skipped: missing Gmail credentials.");
+    return false;
+  }
+  const report = buildOteLevelReportEmail({ payload, speakingItems, feedback, submissionId });
+  const subject = `Informe de nivel Oxford Test of English: ${payload.quizReport?.result?.cefr || payload.phase1?.profile?.cefr || "resultado"}`;
+  const candidateMsg = {
+    from: FROM_ADDRESS,
+    to: payload.lead.email,
+    subject,
+    text: [
+      "Gracias por completar el test de nivel de Oxford Test of English.",
+      "",
+      "Tu informe está abajo. Nuestro equipo académico también ha recibido una copia para poder recomendarte el siguiente paso.",
+      "",
+      report.text,
+    ].join("\n"),
+    html: [
+      "<p>Gracias por completar el test de nivel de Oxford Test of English.</p>",
+      "<p>Tu informe está abajo. Nuestro equipo académico también ha recibido una copia para poder recomendarte el siguiente paso.</p>",
+      report.html,
+    ].join("\n"),
+    replyTo: OTE_LEVEL_REPORT_COPY_EMAIL,
+  };
+  const adminMsg = {
+    from: FROM_ADDRESS,
+    to: OTE_LEVEL_REPORT_COPY_EMAIL,
+    subject: `Nuevo test de nivel Oxford Test of English: ${payload.lead.email}`,
+    text: report.text,
+    html: report.html,
+    replyTo: payload.lead.email,
+  };
+
+  await transporter.sendMail(candidateMsg);
+  await transporter.sendMail(adminMsg);
+  return true;
+}
+
 function normalizeOteRegisterGapPayload(data) {
   const gaps = Array.isArray(data?.gaps) ? data.gaps : [];
   return {
@@ -4732,6 +5118,170 @@ exports.generateOteSpeakingFeedback = functions
         product: "ote",
         partId: payload.partId,
         mockId: payload.mockId,
+      },
+    };
+  });
+
+exports.generateOteLevelProductionFeedback = functions
+  .region("europe-west1")
+  .runWith({ timeoutSeconds: 300, memory: "1GB" })
+  .https.onCall(async (data, context) => {
+    if (!OPENAI_API_KEY) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Missing OPENAI_API_KEY in the Functions environment."
+      );
+    }
+
+    const payload = normalizeOteLevelProductionPayload(data);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.lead.email)) {
+      throw new functions.https.HttpsError("invalid-argument", "A valid email address is required.");
+    }
+    const recordingsWithAudio = payload.speaking.recordings.filter((item) => item.base64);
+    const totalBase64Bytes = recordingsWithAudio.reduce((sum, item) => sum + item.base64.length, 0);
+    if (totalBase64Bytes > 24_000_000) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "These recordings are too large for the level-test diagnostic."
+      );
+    }
+    if (payload.writing.answer.wordCount < 35) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "The writing response is too short to estimate reliably."
+      );
+    }
+
+    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const transcripts = await Promise.all(payload.speaking.recordings.map(async (item, index) => {
+      if (!item.base64) return "";
+      try {
+        return await transcribeAudioItem(item, index);
+      } catch (error) {
+        console.error("[generateOteLevelProductionFeedback] Transcription failed for item", {
+          index,
+          id: item.id,
+          message: error?.message || String(error),
+        });
+        return "";
+      }
+    }));
+
+    const speakingItems = payload.speaking.recordings.map((recording, index) => {
+      const transcript = cleanString(transcripts[index] || "", 2600);
+      const wordCount = countWords(transcript);
+      return {
+        taskId: recording.id,
+        title: recording.label,
+        prompt: recording.prompt,
+        durationSeconds: recording.durationSeconds || 0,
+        transcript,
+        wordCount,
+        audioAvailable: Boolean(recording.base64),
+        audioAnalysisAvailable: false,
+        transcriptionConfidence: wordCount >= 2 ? "medium" : "insufficient",
+      };
+    });
+
+    const requestBody = {
+      model,
+      input: buildOteLevelProductionPrompt(payload, speakingItems),
+      reasoning: { effort: "low" },
+      max_output_tokens: 2600,
+      text: {
+        verbosity: "low",
+        format: {
+          type: "json_schema",
+          name: "ote_level_production_feedback",
+          strict: true,
+          schema: OTE_LEVEL_PRODUCTION_FEEDBACK_SCHEMA,
+        },
+      },
+    };
+
+    let apiResponse;
+    try {
+      apiResponse = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+    } catch (error) {
+      console.error("[generateOteLevelProductionFeedback] OpenAI request failed", error);
+      throw new functions.https.HttpsError("unavailable", "Could not reach the feedback service.");
+    }
+
+    const responseJson = await apiResponse.json().catch(() => null);
+    if (!apiResponse.ok) {
+      console.error("[generateOteLevelProductionFeedback] OpenAI error", responseJson);
+      throw new functions.https.HttpsError(
+        "internal",
+        responseJson?.error?.message || "The feedback service returned an error."
+      );
+    }
+
+    const outputText = extractOutputText(responseJson);
+    let feedback;
+    try {
+      feedback = JSON.parse(outputText);
+    } catch (error) {
+      console.error("[generateOteLevelProductionFeedback] JSON parse failed", { outputText, error });
+      throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
+    }
+
+    let submissionId = null;
+    try {
+      const docRef = await firestore.collection("oteLevelProductionLeads").add({
+        email: payload.lead.email,
+        name: payload.lead.name || "",
+        uid: context.auth?.uid || null,
+        mode: payload.mode,
+        phase1: payload.phase1,
+        quizReport: payload.quizReport,
+        speakingTranscripts: speakingItems,
+        writing: {
+          task: payload.writing.task,
+          answer: payload.writing.answer,
+        },
+        feedback,
+        meta: {
+          model,
+          transcriptionModel: "gpt-4o-mini-transcribe",
+          responseId: responseJson?.id || null,
+          usage: responseJson?.usage || null,
+          generatedAt: new Date().toISOString(),
+          audioStored: false,
+          publicFunnel: true,
+        },
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      submissionId = docRef.id;
+    } catch (error) {
+      console.error("[generateOteLevelProductionFeedback] Firestore save failed", error);
+    }
+
+    let reportEmailed = false;
+    try {
+      reportEmailed = await sendOteLevelReportEmail({ payload, speakingItems, feedback, submissionId });
+    } catch (error) {
+      console.error("[generateOteLevelProductionFeedback] Report email failed", error);
+    }
+
+    return {
+      submissionId,
+      transcripts: speakingItems,
+      feedback,
+      reportEmailed,
+      meta: {
+        model,
+        transcriptionModel: "gpt-4o-mini-transcribe",
+        responseId: responseJson?.id || null,
+        usage: responseJson?.usage || null,
+        generatedAt: new Date().toISOString(),
+        audioStored: false,
       },
     };
   });

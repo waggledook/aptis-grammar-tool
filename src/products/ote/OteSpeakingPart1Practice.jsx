@@ -21,6 +21,13 @@ const PART1_INSTRUCTIONS = [
   "The clock shows how much time you have to speak.",
   "Start speaking when you hear the tone.",
 ];
+const ADVANCED_PART1_INSTRUCTIONS = [
+  "You are going to answer six questions.",
+  "The first two questions are practice questions.",
+  "The clock shows how much time you have to speak.",
+  "Start speaking when you hear the tone.",
+  "Try to speak for the full amount of time.",
+];
 
 const TOPICS = [
   {
@@ -208,6 +215,64 @@ const PRACTICE_SETS = TOPICS.reduce((sets, topic, index) => {
   return sets;
 }, []);
 
+const ADVANCED_PRACTICE_SETS = [
+  {
+    id: "advanced-set-1",
+    title: "Food, Home and Technology",
+    description: "Answer the two fixed practice questions, then respond to four Advanced interview questions.",
+    questions: [
+      "Thinking about food, tell me about a meal you particularly enjoyed recently.",
+      "What makes a good place to live?",
+      "How has the way you use technology changed in recent years?",
+      "Finally, if you could learn one practical skill immediately, what would you choose, and why?",
+    ],
+  },
+  {
+    id: "advanced-set-2",
+    title: "Music, Neighbours and Priorities",
+    description: "Answer the two fixed practice questions, then respond to four Advanced interview questions.",
+    questions: [
+      "Thinking about music, tell me about something you enjoy listening to.",
+      "What qualities make someone a good neighbour?",
+      "How did an important decision you made affect your life?",
+      "Finally, if you had much more free time, how do you think your priorities would change?",
+    ],
+  },
+  {
+    id: "advanced-set-3",
+    title: "Home, People and Risk",
+    description: "Answer the two fixed practice questions, then respond to four Advanced interview questions.",
+    questions: [
+      "Thinking about your home, which room do you spend the most time in, and why?",
+      "Can you tell me about a person whose company you enjoy?",
+      "In what ways have shopping habits changed during your lifetime?",
+      "Finally, when do you think it is worth taking a risk?",
+    ],
+  },
+  {
+    id: "advanced-set-4",
+    title: "Health, Traditions and Change",
+    description: "Answer the two fixed practice questions, then respond to four Advanced interview questions.",
+    questions: [
+      "Thinking about health, what do you do to stay physically or mentally well?",
+      "What is one tradition from your country that you value?",
+      "Tell me about a time when you had to adapt to an unexpected situation.",
+      "Finally, if you could change one aspect of modern life, what would it be?",
+    ],
+  },
+  {
+    id: "advanced-set-5",
+    title: "Work, Concentration and Lessons",
+    description: "Answer the two fixed practice questions, then respond to four Advanced interview questions.",
+    questions: [
+      "Thinking about work or study, which tasks do you find most satisfying?",
+      "Can you describe a place where you can concentrate well?",
+      "How has your idea of success changed over time?",
+      "Finally, what is the most valuable lesson you have learned from a difficult experience?",
+    ],
+  },
+];
+
 function formatTime(seconds) {
   const safe = Math.max(0, Math.ceil(seconds || 0));
   return `00:${String(safe).padStart(2, "0")}`;
@@ -220,6 +285,31 @@ function getSupportedMimeType() {
 
 function buildQuestions(set) {
   if (!set) return [];
+  const scoredQuestions = Array.isArray(set.questions)
+    ? set.questions.map((prompt, questionIndex) => ({
+        id: `${set.id}-q${questionIndex + 3}`,
+        label: `Advanced question ${questionIndex + 1}`,
+        title: `Question ${questionIndex + 3}`,
+        prompt,
+        audioSrc: set.audio?.[questionIndex] || "",
+        responseSeconds: 30,
+        isPractice: false,
+      }))
+    : set.topics.flatMap((topic, topicIndex) =>
+        topic.questions.map((prompt, questionIndex) => {
+          const questionNumber = 3 + topicIndex * 3 + questionIndex;
+          return {
+            id: `${set.id}-${topic.id}-q${questionIndex + 1}`,
+            label: `${topic.title} question ${questionIndex + 1}`,
+            title: `Question ${questionNumber}`,
+            prompt,
+            audioSrc: TOPIC_AUDIO[topic.id]?.[questionIndex] || "",
+            responseSeconds: 20,
+            isPractice: false,
+          };
+        })
+      );
+
   return [
     {
       id: `${set.id}-q1`,
@@ -239,20 +329,7 @@ function buildQuestions(set) {
       responseSeconds: 10,
       isPractice: true,
     },
-    ...set.topics.flatMap((topic, topicIndex) =>
-      topic.questions.map((prompt, questionIndex) => {
-        const questionNumber = 3 + topicIndex * 3 + questionIndex;
-        return {
-          id: `${set.id}-${topic.id}-q${questionIndex + 1}`,
-          label: `${topic.title} question ${questionIndex + 1}`,
-          title: `Question ${questionNumber}`,
-          prompt,
-          audioSrc: TOPIC_AUDIO[topic.id]?.[questionIndex] || "",
-          responseSeconds: 20,
-          isPractice: false,
-        };
-      })
-    ),
+    ...scoredQuestions,
   ];
 }
 
@@ -428,8 +505,11 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
   const { playAudioFile, speak, stop } = useSpeech();
   const menuPath = getSitePath(nativeRoutes ? "/speaking/part-1-interview" : "/ote/speaking/part-1-interview");
   const basePath = getSitePath(nativeRoutes ? "/speaking/part-1-interview/practice" : "/ote/speaking/part-1-interview/practice");
-  const selectedSet = useMemo(() => PRACTICE_SETS.find((item) => item.id === setId), [setId]);
+  const isAdvanced = user?.oteVersion === "advanced";
+  const activeSets = isAdvanced ? ADVANCED_PRACTICE_SETS : PRACTICE_SETS;
+  const selectedSet = useMemo(() => activeSets.find((item) => item.id === setId), [activeSets, setId]);
   const questions = useMemo(() => buildQuestions(selectedSet), [selectedSet]);
+  const instructions = isAdvanced ? ADVANCED_PART1_INSTRUCTIONS : PART1_INSTRUCTIONS;
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [phase, setPhase] = useState("ready");
@@ -536,7 +616,7 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
     setPhase("listening");
     setSecondsLeft(0);
     if (index === 0) {
-      await playAudioFile(OTE_SPEAKING_AUDIO.part1Instructions);
+      await playAudioFile(isAdvanced ? OTE_SPEAKING_AUDIO.part1AdvancedInstructions : OTE_SPEAKING_AUDIO.part1Instructions);
     }
     if (question.audioSrc) {
       const played = await playAudioFile(question.audioSrc);
@@ -707,12 +787,13 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
           <p className="ote-kicker">Speaking Part 1</p>
           <h1>Timed Interview Sets</h1>
           <p>
-            Choose a set. Every set starts with the same two practice questions, then combines two
-            everyday topics for questions 3 to 8.
+            {isAdvanced
+              ? "Choose a set. Every set starts with the same two practice questions, then gives you four Advanced interview questions."
+              : "Choose a set. Every set starts with the same two practice questions, then combines two everyday topics for questions 3 to 8."}
           </p>
         </header>
         <div className="ote-practice-set-grid">
-          {PRACTICE_SETS.map((set, index) => (
+          {activeSets.map((set, index) => (
             <button className="ote-practice-set-card" key={set.id} type="button" onClick={() => navigate(`${basePath}/${set.id}`)}>
               <span>Set {index + 1}</span>
               <h2>{set.title}</h2>
@@ -737,7 +818,11 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
       <header className="ote-training-hero">
         <p className="ote-kicker">Part 1 timed set</p>
         <h1>{selectedSet.title}</h1>
-        <p>Answer eight short interview questions with the real Part 1 timing: 10 seconds for practice, then 20 seconds for each scored answer.</p>
+        <p>
+          {isAdvanced
+            ? "Answer six short interview questions with the real Advanced Part 1 timing: 10 seconds for practice, then 30 seconds for each scored answer."
+            : "Answer eight short interview questions with the real Part 1 timing: 10 seconds for practice, then 20 seconds for each scored answer."}
+        </p>
       </header>
 
       <section className="ote-practice-runner">
@@ -770,7 +855,7 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
             <div className="ote-practice-instructions">
               <p className="ote-kicker">Instructions</p>
               <ul>
-                {PART1_INSTRUCTIONS.map((line) => (
+                {instructions.map((line) => (
                   <li key={line}>{line}</li>
                 ))}
               </ul>

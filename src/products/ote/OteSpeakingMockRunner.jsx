@@ -1327,6 +1327,7 @@ function CompleteScreen({ user, mock, recordings, elapsedSeconds = 0, onDashboar
           feedbackResult={feedbackResult}
           questions={downloadableRecordings.map((recording) => recording.prompt || recording.label)}
           title="OTE speaking mock feedback"
+          appearance="light"
         />
         <div className="ote-recording-list">
           {downloadableRecordings.map((recording, index) => (

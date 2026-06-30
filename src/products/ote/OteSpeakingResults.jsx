@@ -80,6 +80,7 @@ export default function OteSpeakingResults({ user, homePath = "/ote" }) {
               }}
               questions={(attempt.aiFeedbackTranscripts || []).map((entry) => entry.question || entry.label)}
               title="OTE speaking mock feedback"
+              appearance="light"
             />
           </>
         ) : !loading ? (

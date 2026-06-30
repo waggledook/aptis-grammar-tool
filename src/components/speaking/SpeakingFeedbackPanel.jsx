@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function SpeakingFeedbackPanel({ feedbackResult, questions = [], title = "AI feedback" }) {
+export default function SpeakingFeedbackPanel({ feedbackResult, questions = [], title = "AI feedback", appearance = "auto" }) {
   const feedback = feedbackResult?.feedback;
   const transcripts = feedbackResult?.transcripts || [];
   if (!feedback) return null;
@@ -12,7 +12,7 @@ export default function SpeakingFeedbackPanel({ feedbackResult, questions = [], 
       : [];
 
   return (
-    <section className="speaking-feedback-panel" aria-label={title}>
+    <section className={`speaking-feedback-panel ${appearance === "light" ? "is-light" : ""}`} aria-label={title}>
       <StyleScope />
       <div className="speaking-feedback-head">
         <h4>{title}</h4>
@@ -184,6 +184,34 @@ function StyleScope() {
       .speaking-language-fixes span { color:#fca5a5; }
       .speaking-language-fixes strong { color:#86efac; }
       .speaking-language-fixes em { display:block; color:#a9b7d1; }
+      .speaking-feedback-panel.is-light {
+        background:#f8fbff !important;
+        border-color:#c8d8ef !important;
+        color:#172033 !important;
+        box-shadow:0 8px 22px rgba(15,23,42,.08) !important;
+      }
+      .speaking-feedback-panel.is-light :is(h4, strong) { color:#172033 !important; }
+      .speaking-feedback-panel.is-light :is(p, li) { color:#334155 !important; }
+      .speaking-feedback-panel.is-light .speaking-level-badge {
+        border-color:#2563eb !important;
+        color:#1d4ed8 !important;
+        background:#eff6ff !important;
+      }
+      .speaking-feedback-panel.is-light .speaking-feedback-muted,
+      .speaking-feedback-panel.is-light .speaking-transcript { color:#64748b !important; }
+      .speaking-feedback-panel.is-light .speaking-answer-feedback { border-top-color:#d5e2f3 !important; }
+      .speaking-feedback-panel.is-light .speaking-criterion,
+      .speaking-feedback-panel.is-light .speaking-language-fixes li { background:#ffffff !important; border-color:#d5e2f3 !important; }
+      .speaking-feedback-panel.is-light .speaking-status { color:#2563eb !important; }
+      .speaking-feedback-panel.is-light .speaking-improved-answer { background:#eaf2ff !important; border-left-color:#2563eb !important; }
+      .speaking-feedback-panel.is-light .speaking-language-fixes {
+        background:#fff7ed !important;
+        border-color:#fed7aa !important;
+        border-left-color:#f59e0b !important;
+      }
+      .speaking-feedback-panel.is-light .speaking-language-fixes span { color:#b91c1c !important; }
+      .speaking-feedback-panel.is-light .speaking-language-fixes strong { color:#166534 !important; }
+      .speaking-feedback-panel.is-light .speaking-language-fixes em { color:#64748b !important; }
       :root[data-theme="light"] .speaking-feedback-panel {
         background:#f8fbff !important;
         border-color:#c8d8ef !important;

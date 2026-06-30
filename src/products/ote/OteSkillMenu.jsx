@@ -88,13 +88,13 @@ export default function OteSkillMenu({ skill = "speaking", user, onRequireSignIn
               <h3>Advanced Speaking Mock 1</h3>
               <p>Run the five-part advanced speaking module with timed recordings.</p>
             </button>
-            <button className="menu-card" type="button" disabled>
+            <button className="menu-card" type="button" onClick={() => navigate(interviewTrainingPath)}>
               <h3>Part 1 Questions</h3>
-              <p>Coming soon: focused practice for advanced interview questions.</p>
+              <p>Practise Advanced interview sets with two fixed warm-up questions and four timed responses.</p>
             </button>
-            <button className="menu-card" type="button" disabled>
+            <button className="menu-card" type="button" onClick={() => navigate(voicemailTrainingPath)}>
               <h3>Part 2 Diplomatic Voicemail</h3>
-              <p>Coming soon: tactful voicemail responses for sensitive situations.</p>
+              <p>Practise tactful 40-second voice messages after some time to think before recording.</p>
             </button>
             <button className="menu-card" type="button" disabled>
               <h3>Part 3 Summary</h3>
