@@ -40,6 +40,18 @@ function createLevelTestSessionId() {
   return `ote-level-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
+function scrollElementIntoViewAfterRender(elementRef, fallbackTop = 0) {
+  window.requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
+      if (elementRef.current) {
+        elementRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      window.scrollTo({ top: fallbackTop, behavior: "smooth" });
+    });
+  });
+}
+
 function getBatchScore(items, answers) {
   return items.reduce((score, item) => (answers[item.id] === item.answer ? score + 1 : score), 0);
 }
@@ -146,6 +158,9 @@ function ProductionCheck({
   const [recordingPhase, setRecordingPhase] = useState("idle");
   const [secondsLeft, setSecondsLeft] = useState(0);
   const [recordings, setRecordings] = useState({});
+  const [micCheckPhase, setMicCheckPhase] = useState("idle");
+  const [micCheckSecondsLeft, setMicCheckSecondsLeft] = useState(0);
+  const [micCheckRecording, setMicCheckRecording] = useState(null);
   const [micError, setMicError] = useState("");
   const [writingAnswer, setWritingAnswer] = useState("");
   const [writingStarted, setWritingStarted] = useState(false);
@@ -157,6 +172,10 @@ function ProductionCheck({
   const streamRef = useRef(null);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
+  const micCheckRecorderRef = useRef(null);
+  const micCheckChunksRef = useRef([]);
+  const micCheckTimerRef = useRef(null);
+  const micCheckRecordingRef = useRef(null);
   const timerRef = useRef(null);
   const writingTimerRef = useRef(null);
   const recordingsRef = useRef({});
@@ -171,11 +190,19 @@ function ProductionCheck({
   }, [recordings]);
 
   useEffect(() => {
+    micCheckRecordingRef.current = micCheckRecording;
+  }, [micCheckRecording]);
+
+  useEffect(() => {
     return () => {
       window.clearInterval(timerRef.current);
+      window.clearInterval(micCheckTimerRef.current);
       window.clearInterval(writingTimerRef.current);
+      window.speechSynthesis?.cancel?.();
       if (recorderRef.current?.state === "recording") recorderRef.current.stop();
+      if (micCheckRecorderRef.current?.state === "recording") micCheckRecorderRef.current.stop();
       streamRef.current?.getTracks?.().forEach((track) => track.stop());
+      if (micCheckRecordingRef.current?.url) URL.revokeObjectURL(micCheckRecordingRef.current.url);
       Object.values(recordingsRef.current).forEach((recording) => {
         if (recording?.url) URL.revokeObjectURL(recording.url);
       });
@@ -185,6 +212,11 @@ function ProductionCheck({
   function clearTimer() {
     window.clearInterval(timerRef.current);
     timerRef.current = null;
+  }
+
+  function clearMicCheckTimer() {
+    window.clearInterval(micCheckTimerRef.current);
+    micCheckTimerRef.current = null;
   }
 
   async function ensureStream() {
@@ -205,23 +237,84 @@ function ProductionCheck({
     }
   }
 
-  function playTone() {
-    try {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return;
-      const audioContext = new AudioContextClass();
-      const oscillator = audioContext.createOscillator();
-      const gain = audioContext.createGain();
-      oscillator.frequency.value = 880;
-      gain.gain.setValueAtTime(0.001, audioContext.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.18, audioContext.currentTime + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.24);
-      oscillator.connect(gain);
-      gain.connect(audioContext.destination);
-      oscillator.start();
-      oscillator.stop(audioContext.currentTime + 0.26);
-    } catch {
-      // The tone is a convenience only; recording still works without it.
+  function playTone(durationSeconds = 0.8) {
+    return new Promise((resolve) => {
+      try {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) {
+          resolve();
+          return;
+        }
+        const audioContext = new AudioContextClass();
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        const startTime = audioContext.currentTime;
+        const endTime = startTime + durationSeconds;
+        oscillator.frequency.value = 880;
+        gain.gain.setValueAtTime(0.001, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.18, startTime + 0.04);
+        gain.gain.setValueAtTime(0.18, Math.max(startTime + 0.05, endTime - 0.12));
+        gain.gain.exponentialRampToValueAtTime(0.001, endTime);
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.onended = () => {
+          audioContext.close?.();
+          resolve();
+        };
+        oscillator.start(startTime);
+        oscillator.stop(endTime);
+      } catch {
+        // The tone is a convenience only; recording still works without it.
+        resolve();
+      }
+    });
+  }
+
+  async function startMicCheck() {
+    const stream = await ensureStream();
+    if (!stream || micCheckPhase === "recording") return;
+    if (micCheckRecordingRef.current?.url) URL.revokeObjectURL(micCheckRecordingRef.current.url);
+    setMicCheckRecording(null);
+    setMicError("");
+    setMicCheckPhase("recording");
+    setMicCheckSecondsLeft(5);
+    micCheckChunksRef.current = [];
+
+    const mimeType = getSupportedMimeType();
+    const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+    micCheckRecorderRef.current = recorder;
+    recorder.ondataavailable = (event) => {
+      if (event.data?.size) micCheckChunksRef.current.push(event.data);
+    };
+    recorder.onstop = () => {
+      clearMicCheckTimer();
+      const blob = new Blob(micCheckChunksRef.current, { type: mimeType || "audio/webm" });
+      const url = URL.createObjectURL(blob);
+      const recording = { blob, url };
+      micCheckRecordingRef.current = recording;
+      setMicCheckRecording(recording);
+      setMicCheckPhase("ready");
+      setMicCheckSecondsLeft(0);
+    };
+
+    await playTone();
+    recorder.start();
+    let remaining = 5;
+    clearMicCheckTimer();
+    micCheckTimerRef.current = window.setInterval(() => {
+      remaining -= 1;
+      setMicCheckSecondsLeft(Math.max(0, remaining));
+      if (remaining <= 0) {
+        clearMicCheckTimer();
+        if (recorder.state === "recording") recorder.stop();
+      }
+    }, 1000);
+  }
+
+  function stopMicCheck() {
+    clearMicCheckTimer();
+    if (micCheckRecorderRef.current?.state === "recording") {
+      micCheckRecorderRef.current.stop();
     }
   }
 
@@ -244,20 +337,104 @@ function ProductionCheck({
     }, 1000);
   }
 
+  function getSpeakingTaskText(task) {
+    if (!task) return "";
+    return [
+      task.prompt,
+      ...(task.bulletPoints || []),
+      ...(task.imageOptions || []).map((image) => image.label),
+      ...(task.imageIdeas || []),
+      ...(task.ideaPrompts || []),
+    ].filter(Boolean).join(". ");
+  }
+
+  function playAudioSource(src) {
+    return new Promise((resolve) => {
+      if (!src) {
+        resolve();
+        return;
+      }
+      const audio = new Audio(src);
+      audio.onended = resolve;
+      audio.onerror = resolve;
+      audio.play().catch(resolve);
+    });
+  }
+
+  function getPrepInstructionText(task) {
+    if (!task?.preparationSeconds) return "";
+    return task.prepInstructionText || `You now have ${task.preparationSeconds} seconds to think about your answer.`;
+  }
+
+  function readSpeakingTask(task) {
+    return new Promise((resolve) => {
+      if (!task) {
+        resolve();
+        return;
+      }
+
+      if (task.audioSrc) {
+        playAudioSource(task.audioSrc).then(resolve);
+        return;
+      }
+
+      const text = getSpeakingTaskText(task);
+      if (!text || !window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") {
+        window.setTimeout(resolve, 800);
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-GB";
+      utterance.rate = 0.95;
+      utterance.onend = resolve;
+      utterance.onerror = resolve;
+      window.speechSynthesis.speak(utterance);
+    });
+  }
+
+  function readPrepInstruction(task) {
+    return new Promise((resolve) => {
+      const text = getPrepInstructionText(task);
+      if (task?.prepAudioSrc) {
+        playAudioSource(task.prepAudioSrc).then(resolve);
+        return;
+      }
+      if (!text || !window.speechSynthesis || typeof SpeechSynthesisUtterance === "undefined") {
+        window.setTimeout(resolve, 500);
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = "en-GB";
+      utterance.rate = 0.95;
+      utterance.onend = resolve;
+      utterance.onerror = resolve;
+      window.speechSynthesis.speak(utterance);
+    });
+  }
+
   async function startSpeakingTask() {
-    if (!activeTask || recordings[activeTask.id]) return;
+    if (!activeTask || recordings[activeTask.id] || recordingPhase !== "idle") return;
     const stream = await ensureStream();
     if (!stream) return;
+    setRecordingPhase("reading");
+    setSecondsLeft(0);
+    await readSpeakingTask(activeTask);
     if (activeTask.preparationSeconds > 0) {
+      setRecordingPhase("preparing");
+      setSecondsLeft(activeTask.preparationSeconds);
+      await readPrepInstruction(activeTask);
       runCountdown(activeTask.preparationSeconds, "preparing", () => startRecording(stream));
     } else {
       startRecording(stream);
     }
   }
 
-  function startRecording(stream) {
+  async function startRecording(stream) {
     if (!activeTask) return;
-    playTone();
+    await playTone();
     chunksRef.current = [];
     const mimeType = getSupportedMimeType();
     const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
@@ -294,6 +471,7 @@ function ProductionCheck({
       setActiveSpeakingIndex((current) => current + 1);
       setRecordingPhase("idle");
       setSecondsLeft(0);
+      window.speechSynthesis?.cancel?.();
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -419,17 +597,57 @@ function ProductionCheck({
       <section className="ote-production-shell">
         <div className="ote-production-task">
           <span>Comprobación del micrófono</span>
-          <h2>Permite el acceso al micrófono</h2>
-          <p>Esta comprobación no se evalúa. Solo confirma que tu navegador puede grabar las tareas de speaking.</p>
+          <h2>Prueba tu micrófono antes de empezar</h2>
+          <p>Graba una frase corta y escúchala. Esta prueba no se evalúa ni se envía: solo confirma que el audio se guarda correctamente en tu navegador.</p>
           {micError ? <p className="ote-production-warning">{micError}</p> : null}
+          <div className={`ote-mic-check-card ote-mic-check-${micCheckPhase}`}>
+            <div>
+              <strong>
+                {micCheckPhase === "recording"
+                  ? "Grabando prueba"
+                  : micCheckPhase === "ready"
+                    ? "Escucha tu prueba"
+                    : "Grabación de prueba"}
+              </strong>
+              <p>
+                {micCheckPhase === "recording"
+                  ? "Di algo como: This is my microphone test."
+                  : micCheckPhase === "ready"
+                    ? "Si puedes escucharte con claridad, ya puedes continuar."
+                    : "Pulsa grabar y habla durante unos segundos."}
+              </p>
+            </div>
+            {micCheckPhase === "recording" ? (
+              <div className="ote-mic-check-status" aria-live="polite">
+                <Mic size={20} aria-hidden="true" />
+                <span>{micCheckSecondsLeft}s</span>
+              </div>
+            ) : null}
+            {micCheckRecording?.url ? (
+              <audio className="ote-mic-check-audio" controls src={micCheckRecording.url} />
+            ) : null}
+          </div>
           <div className="ote-level-cta-row">
-            <button className="ote-level-primary" type="button" onClick={async () => {
-              const stream = await ensureStream();
-              if (stream) setStep("speaking");
-            }}>
-              Comprobar micrófono
-              <Mic size={18} aria-hidden="true" />
-            </button>
+            {micCheckPhase === "recording" ? (
+              <button className="ote-level-secondary" type="button" onClick={stopMicCheck}>
+                Detener prueba
+                <Square size={18} aria-hidden="true" />
+              </button>
+            ) : (
+              <button className={micCheckPhase === "ready" ? "ote-level-secondary" : "ote-level-primary"} type="button" onClick={startMicCheck}>
+                {micCheckPhase === "ready" ? "Grabar otra vez" : "Grabar prueba de 5 segundos"}
+                {micCheckPhase === "ready" ? <RotateCcw size={18} aria-hidden="true" /> : <Mic size={18} aria-hidden="true" />}
+              </button>
+            )}
+            {micCheckPhase === "ready" ? (
+              <button className="ote-level-primary" type="button" onClick={() => {
+                setStep("speaking");
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              }}>
+                Continuar a speaking
+                <ArrowRight size={18} aria-hidden="true" />
+              </button>
+            ) : null}
             <button className="ote-level-secondary" type="button" onClick={onBackToResult}>Volver al resultado</button>
           </div>
         </div>
@@ -439,33 +657,91 @@ function ProductionCheck({
 
   if (step === "speaking") {
     const activeRecording = recordings[activeTask.id];
+    const taskHasStarted = recordingPhase !== "idle" || !!activeRecording;
+    const prepInstructionText = getPrepInstructionText(activeTask);
+    const stageLabel = recordingPhase === "reading"
+      ? "Escucha la pregunta"
+      : recordingPhase === "preparing"
+        ? "Preparación"
+        : recordingPhase === "recording"
+          ? "Ahora habla"
+          : recordingPhase === "done"
+            ? "Grabación guardada"
+            : "Listo para empezar";
+    const stageHelp = recordingPhase === "reading"
+      ? "La pregunta aparecerá y se leerá antes de iniciar el tiempo."
+      : recordingPhase === "preparing"
+        ? "No hables todavía. Usa este tiempo para preparar tu respuesta."
+        : recordingPhase === "recording"
+          ? "Habla ahora. La grabación está en marcha."
+          : recordingPhase === "done"
+            ? "Puedes escuchar tu grabación antes de continuar."
+            : "Pulsa empezar para ver y escuchar la pregunta.";
+    const timerLabel = recordingPhase === "preparing"
+      ? "preparación"
+      : recordingPhase === "recording"
+        ? "grabando"
+        : recordingPhase === "reading"
+          ? "escuchando"
+          : "tiempo de respuesta";
     return (
       <section className="ote-production-shell">
         <div className="ote-level-status">
           <div>
             <Mic size={20} aria-hidden="true" />
             <strong>Speaking {activeSpeakingIndex + 1} de {productionTasks.speaking.length}: {activeTask.title}</strong>
-            <span>{activeTask.instructions}</span>
+            <span>{stageHelp}</span>
           </div>
           <div>
-            <strong>{recordingPhase === "idle" ? formatClock(activeTask.responseSeconds) : formatClock(secondsLeft)}</strong>
-            <span>{recordingPhase === "preparing" ? "preparación" : recordingPhase === "recording" ? "grabando" : "tiempo de respuesta"}</span>
+            <strong>{recordingPhase === "reading" ? "..." : recordingPhase === "idle" ? formatClock(activeTask.responseSeconds) : formatClock(secondsLeft)}</strong>
+            <span>{timerLabel}</span>
           </div>
         </div>
-        <article className="ote-production-task">
-          <span>{activeTask.topic || activeTask.title}</span>
-          <h2>{activeTask.prompt}</h2>
-          {activeTask.bulletPoints?.length ? <ul>{activeTask.bulletPoints.map((point) => <li key={point}>{point}</li>)}</ul> : null}
-          {activeTask.imageIdeas?.length ? (
-            <div className="ote-production-ideas">
-              {activeTask.imageIdeas.map((idea) => <strong key={idea}>{idea}</strong>)}
+        <article className={`ote-production-task ote-speaking-stage-${recordingPhase}`}>
+          <span>{stageLabel}</span>
+          {taskHasStarted ? (
+            <>
+              <h2>{activeTask.prompt}</h2>
+              {recordingPhase === "preparing" && prepInstructionText ? (
+                <p className="ote-speaking-prep-instruction">{prepInstructionText}</p>
+              ) : null}
+              {activeTask.bulletPoints?.length ? <ul>{activeTask.bulletPoints.map((point) => <li key={point}>{point}</li>)}</ul> : null}
+              {activeTask.imageOptions?.length ? (
+                <div className="ote-part34-image-grid ote-production-image-grid">
+                  {activeTask.imageOptions.map((image) => (
+                    <figure key={image.id}>
+                      {image.src ? (
+                        <img src={image.src} alt={image.description || ""} />
+                      ) : (
+                        <div className="ote-part34-image-placeholder" aria-hidden="true">
+                          <span>{image.label}</span>
+                        </div>
+                      )}
+                      <figcaption>
+                        <strong>{image.label}</strong>
+                      </figcaption>
+                    </figure>
+                  ))}
+                </div>
+              ) : null}
+              {activeTask.imageIdeas?.length ? (
+                <div className="ote-production-ideas">
+                  {activeTask.imageIdeas.map((idea) => <strong key={idea}>{idea}</strong>)}
+                </div>
+              ) : null}
+              {activeTask.ideaPrompts?.length ? (
+                <div className="ote-production-ideas">
+                  {activeTask.ideaPrompts.map((idea) => <strong key={idea}>{idea}</strong>)}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div className="ote-speaking-ready-card">
+              <strong>{activeTask.topic || activeTask.title}</strong>
+              <p>{activeTask.instructions}</p>
+              <p>La pregunta no se muestra hasta que empieces la tarea.</p>
             </div>
-          ) : null}
-          {activeTask.ideaPrompts?.length ? (
-            <div className="ote-production-ideas">
-              {activeTask.ideaPrompts.map((idea) => <strong key={idea}>{idea}</strong>)}
-            </div>
-          ) : null}
+          )}
           {activeRecording ? (
             <div className="ote-production-recording">
               <audio controls playsInline preload="metadata" src={activeRecording.url} />
@@ -473,8 +749,8 @@ function ProductionCheck({
             </div>
           ) : (
             <div className="ote-level-cta-row">
-              <button className="ote-level-primary" type="button" disabled={recordingPhase === "preparing" || recordingPhase === "recording"} onClick={startSpeakingTask}>
-                {recordingPhase === "preparing" ? "Preparando..." : recordingPhase === "recording" ? "Grabando..." : "Empezar tarea"}
+              <button className="ote-level-primary" type="button" disabled={recordingPhase !== "idle"} onClick={startSpeakingTask}>
+                {recordingPhase === "reading" ? "Leyendo pregunta..." : recordingPhase === "preparing" ? "Preparando..." : recordingPhase === "recording" ? "Grabando..." : "Empezar tarea"}
                 {recordingPhase === "recording" ? <Square size={18} aria-hidden="true" /> : <Play size={18} aria-hidden="true" />}
               </button>
             </div>
@@ -646,6 +922,7 @@ export default function OteLevelTest({
   const checkpointLoggedRef = useRef(false);
   const completedLoggedRef = useRef(false);
   const productionStartedLoggedRef = useRef(false);
+  const quizTopRef = useRef(null);
   const [phase, setPhase] = useState("batch1");
   const [routeKey, setRouteKey] = useState("");
   const [answers, setAnswers] = useState({});
@@ -740,7 +1017,7 @@ export default function OteLevelTest({
     }
     setRouteKey(nextRouteKey);
     setPhase("batch2");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    scrollElementIntoViewAfterRender(quizTopRef);
   }
 
   function finishTest() {
@@ -833,7 +1110,7 @@ export default function OteLevelTest({
         />
       ) : phase !== "results" ? (
         <>
-          <div className="ote-level-status">
+          <div className="ote-level-status" ref={quizTopRef}>
             <div>
               <Timer size={20} aria-hidden="true" />
               <strong>{phase === "batch1" ? testCopy.firstPartTitle : "Segunda parte"}</strong>

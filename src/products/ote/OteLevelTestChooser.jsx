@@ -37,11 +37,15 @@ export default function OteLevelTestChooser({ nativeRoutes = false }) {
           to={generalPath}
           onClick={() => logOteLevelTestSelected({ edition: "general", targetPath: generalPath })}
         >
-          <div className="ote-level-choice-icon">
-            <Gauge size={28} aria-hidden="true" />
+          <div className="ote-level-choice-head">
+            <span className="ote-level-choice-icon">
+              <Gauge size={24} aria-hidden="true" />
+            </span>
+            <span className="ote-level-choice-kicker">
+              Ruta general
+              <span className="ote-level-choice-pill">Si tienes dudas</span>
+            </span>
           </div>
-          <span className="ote-level-choice-kicker">Ruta general</span>
-          <span className="ote-level-choice-pill">Recomendado si tienes dudas</span>
           <h2>No sé exactamente mi nivel</h2>
           <p>Para estudiantes que quieren orientación inicial o están entre A2 y B2.</p>
           <ul>
@@ -59,10 +63,12 @@ export default function OteLevelTestChooser({ nativeRoutes = false }) {
           to={advancedPath}
           onClick={() => logOteLevelTestSelected({ edition: "advanced", targetPath: advancedPath })}
         >
-          <div className="ote-level-choice-icon">
-            <GraduationCap size={28} aria-hidden="true" />
+          <div className="ote-level-choice-head">
+            <span className="ote-level-choice-icon">
+              <GraduationCap size={24} aria-hidden="true" />
+            </span>
+            <span className="ote-level-choice-kicker">Ruta avanzada</span>
           </div>
-          <span className="ote-level-choice-kicker">Ruta avanzada</span>
           <h2>Necesito C1 o ya tengo un nivel alto</h2>
           <p>Para estudiantes que preparan OTE Advanced o ya se sienten cómodos con B2.</p>
           <ul>

@@ -6,6 +6,7 @@ export const OTE_LEVEL_PRODUCTION_TASKS = {
       preparationSeconds: 0,
       responseSeconds: 20,
       weight: 15,
+      audioSrc: "/audio/ote/level-test/general-speaking-personal.mp3",
       prompt: "Tell us about an activity you enjoy doing in your free time. How often do you do it, and why do you enjoy it?",
       instructions: "Empieza a hablar cuando escuches el tono. Tienes 20 segundos.",
       expectedContent: ["identify an activity", "say how often you do it", "explain why you enjoy it"],
@@ -16,6 +17,9 @@ export const OTE_LEVEL_PRODUCTION_TASKS = {
       preparationSeconds: 20,
       responseSeconds: 40,
       weight: 35,
+      audioSrc: "/audio/ote/level-test/general-speaking-voicemail.mp3",
+      prepAudioSrc: "/audio/ote/level-test/prep-20-seconds.mp3",
+      prepInstructionText: "You now have 20 seconds to think about your answer.",
       prompt:
         "You are taking a weekend photography course at a community centre. The next class has been moved to Friday evening, but you cannot attend. Leave a voicemail for the course manager.",
       bulletPoints: [
@@ -32,10 +36,38 @@ export const OTE_LEVEL_PRODUCTION_TASKS = {
       preparationSeconds: 30,
       responseSeconds: 60,
       weight: 50,
+      audioSrc: "/audio/ote/level-test/general-speaking-presentation.mp3",
+      prepAudioSrc: "/audio/ote/level-test/prep-30-seconds.mp3",
+      prepInstructionText: "You now have 30 seconds to think about your answer.",
       topic: "Improving life in a town",
       prompt:
         "Your town wants to make life healthier and easier for local people. Choose two ideas. Compare them and explain how they could improve people's lives. Say which of the two would be more useful, and why.",
-      imageIdeas: ["A public park", "A protected cycle route", "A bus or public transport service", "A local sports centre"],
+      imageOptions: [
+        {
+          id: "public-park",
+          label: "A public park",
+          description: "People relaxing in a green city park",
+          src: "/images/ote/level-test/public-park.png",
+        },
+        {
+          id: "protected-cycle-route",
+          label: "A protected cycle route",
+          description: "A cyclist using a protected cycle lane",
+          src: "/images/ote/level-test/protected-cycle-route.png",
+        },
+        {
+          id: "bus-service",
+          label: "A bus or public transport service",
+          description: "A city bus stopping for passengers",
+          src: "/images/ote/level-test/bus-service.png",
+        },
+        {
+          id: "sports-centre",
+          label: "A local sports centre",
+          description: "People playing sport inside a sports centre",
+          src: "/images/ote/level-test/sports-centre.png",
+        },
+      ],
       instructions: "Tienes 30 segundos para preparar y 60 segundos para responder.",
       expectedContent: ["choose two ideas", "compare benefits", "select one idea as more useful", "justify your choice"],
     },
@@ -75,6 +107,7 @@ export const OTE_ADVANCED_LEVEL_PRODUCTION_TASKS = {
       preparationSeconds: 0,
       responseSeconds: 30,
       weight: 15,
+      audioSrc: "/audio/ote/level-test/advanced-speaking-personal.mp3",
       prompt: "Tell us about a skill you would like to improve. Why would it be useful to you, and what could you do to improve it?",
       instructions: "Empieza a hablar cuando escuches el tono. Tienes 30 segundos.",
       expectedContent: [
@@ -97,6 +130,9 @@ export const OTE_ADVANCED_LEVEL_PRODUCTION_TASKS = {
       preparationSeconds: 10,
       responseSeconds: 40,
       weight: 35,
+      audioSrc: "/audio/ote/level-test/advanced-speaking-voicemessage.mp3",
+      prepAudioSrc: "/audio/ote/level-test/prep-10-seconds.mp3",
+      prepInstructionText: "You now have 10 seconds to think about your answer.",
       audience: "manager",
       register: "professional and diplomatic",
       prompt:
@@ -129,6 +165,9 @@ export const OTE_ADVANCED_LEVEL_PRODUCTION_TASKS = {
       preparationSeconds: 30,
       responseSeconds: 60,
       weight: 50,
+      audioSrc: "/audio/ote/level-test/advanced-speaking-debate.mp3",
+      prepAudioSrc: "/audio/ote/level-test/prep-30-seconds.mp3",
+      prepInstructionText: "You now have 30 seconds to think about your answer.",
       topic: "Recorded university lectures",
       statement: "All university lectures should be recorded and made available online.",
       ideaPrompts: [
