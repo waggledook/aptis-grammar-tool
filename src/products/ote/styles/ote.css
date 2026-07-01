@@ -771,6 +771,173 @@
   gap: 0.85rem;
 }
 
+.ote-level-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.ote-level-choice-card {
+  position: relative;
+  display: grid;
+  gap: 0.72rem;
+  align-content: start;
+  min-height: 310px;
+  padding: 1.18rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(74, 107, 192, 0.12), rgba(13, 33, 71, 0.22));
+  color: inherit;
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color 0.16s ease, background-color 0.16s ease, box-shadow 0.16s ease, transform 0.16s ease;
+}
+
+.ote-level-choice-card:hover,
+.ote-level-choice-card:focus-visible {
+  border-color: rgba(246, 189, 96, 0.55);
+  background: linear-gradient(180deg, rgba(74, 107, 192, 0.2), rgba(13, 33, 71, 0.28));
+  box-shadow: 0 12px 34px rgba(0, 0, 0, 0.18);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.ote-level-choice-icon {
+  display: inline-grid;
+  width: 3.1rem;
+  height: 3.1rem;
+  place-items: center;
+  border: 1px solid rgba(136, 183, 255, 0.38);
+  border-radius: 999px;
+  color: var(--color-accent);
+  background: rgba(42, 100, 184, 0.16);
+}
+
+.ote-level-choice-kicker {
+  color: var(--color-text-soft);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.ote-level-choice-pill {
+  justify-self: start;
+  width: fit-content;
+  padding: 0.28rem 0.55rem;
+  border: 1px solid rgba(246, 189, 96, 0.36);
+  border-radius: 999px;
+  background: rgba(246, 189, 96, 0.08);
+  color: var(--color-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.ote-level-choice-card h2 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1.45rem, 3vw, 1.9rem);
+  line-height: 1.12;
+  text-align: left;
+}
+
+.ote-level-choice-card p,
+.ote-level-choice-card li,
+.ote-level-choice-note span {
+  color: var(--color-text-soft);
+  line-height: 1.55;
+}
+
+.ote-level-choice-card p {
+  margin: 0;
+}
+
+.ote-level-choice-card ul {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.1rem 0 0;
+  padding-left: 1.1rem;
+}
+
+.ote-level-choice-card li::marker {
+  color: var(--color-accent);
+}
+
+.ote-level-choice-cta {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-self: start;
+  margin-top: auto;
+  padding-top: 0.25rem;
+  color: var(--color-accent);
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.ote-level-choice-cta svg {
+  color: var(--color-accent);
+}
+
+.ote-level-choice-note {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  margin-top: 0.55rem;
+}
+
+.ote-level-choice-note svg {
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+  color: var(--color-accent);
+}
+
+.ote-level-choice-recommendation {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 1rem;
+  align-items: center;
+  border-color: rgba(246, 189, 96, 0.34);
+  background: linear-gradient(90deg, rgba(246, 189, 96, 0.1), rgba(74, 107, 192, 0.09));
+}
+
+.ote-level-recommendation-icon {
+  display: grid;
+  width: 3.7rem;
+  height: 3.7rem;
+  place-items: center;
+  border: 1px solid rgba(246, 189, 96, 0.36);
+  border-radius: 999px;
+  color: var(--color-accent);
+  background: rgba(246, 189, 96, 0.08);
+}
+
+.ote-level-choice-recommendation strong {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: clamp(1.15rem, 2.4vw, 1.45rem);
+  line-height: 1.2;
+}
+
+.ote-level-choice-mini-cta {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(246, 189, 96, 0.42);
+  border-radius: 8px;
+  color: var(--color-text);
+  font-weight: 900;
+  text-decoration: none;
+  white-space: nowrap;
+  background: rgba(246, 189, 96, 0.08);
+}
+
+.ote-level-choice-mini-cta svg {
+  color: var(--color-accent);
+}
+
 .ote-level-upsell article {
   padding: 1rem;
   border: 1px solid var(--color-border);
@@ -6550,6 +6717,7 @@
   }
 
   .ote-level-hero,
+  .ote-level-choice-grid,
   .ote-level-upsell,
   .ote-production-summary,
   .ote-production-writing {
@@ -6567,6 +6735,20 @@
 
   .ote-level-options {
     grid-template-columns: 1fr;
+  }
+
+  .ote-level-choice-card {
+    min-height: 0;
+  }
+
+  .ote-level-choice-recommendation {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+
+  .ote-level-choice-mini-cta {
+    justify-self: start;
+    white-space: normal;
   }
 
   .ote-production-ideas {

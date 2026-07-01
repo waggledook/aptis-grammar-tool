@@ -46,6 +46,16 @@ const OTE_COURSE_LANDINGS = {
       "Quieres una evaluación más completa antes de elegir un plan de estudio.",
     ],
   },
+  "c2-mastery": {
+    cefr: "C2",
+    title: "Ruta de maestría / diagnóstico premium",
+    promise: "Afina naturalidad, precisión idiomática y control de matiz para candidatos que ya están por encima del objetivo C1.",
+    bestFor: [
+      "Tu control de gramática y vocabulario avanzado ya es muy alto.",
+      "Necesitas una recomendación más personalizada que una ruta B2/C1 estándar.",
+      "Quieres pulir producción escrita y oral con objetivos de excelencia.",
+    ],
+  },
 };
 
 export default function OteCourseLanding({ nativeRoutes = false }) {

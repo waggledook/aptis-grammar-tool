@@ -1622,6 +1622,7 @@ const OTE_LEVEL_PRODUCTION_FEEDBACK_SCHEMA = {
     "strength",
     "priority",
     "candidateMessage",
+    "writingCorrections",
   ],
   properties: {
     taskType: { type: "string", enum: ["ote_level_production_feedback"] },
@@ -1632,7 +1633,7 @@ const OTE_LEVEL_PRODUCTION_FEEDBACK_SCHEMA = {
       properties: {
         estimatedLevel: {
           type: "string",
-          enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"],
+          enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready", "C1"],
         },
         confidence: { type: "string", enum: ["low", "moderate", "high"] },
         criteria: {
@@ -1640,10 +1641,10 @@ const OTE_LEVEL_PRODUCTION_FEEDBACK_SCHEMA = {
           additionalProperties: false,
           required: ["taskFulfilment", "organization", "grammar", "lexis"],
           properties: {
-            taskFulfilment: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
-            organization: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
-            grammar: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
-            lexis: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
+            taskFulfilment: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready", "C1"] },
+            organization: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready", "C1"] },
+            grammar: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready", "C1"] },
+            lexis: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready", "C1"] },
           },
         },
         note: { type: "string" },
@@ -1656,7 +1657,7 @@ const OTE_LEVEL_PRODUCTION_FEEDBACK_SCHEMA = {
       properties: {
         estimatedLevel: {
           type: "string",
-          enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"],
+          enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready", "C1"],
         },
         confidence: { type: "string", enum: ["low", "moderate", "high"] },
         criteria: {
@@ -1664,10 +1665,10 @@ const OTE_LEVEL_PRODUCTION_FEEDBACK_SCHEMA = {
           additionalProperties: false,
           required: ["taskFulfilment", "organization", "grammar", "lexis"],
           properties: {
-            taskFulfilment: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
-            organization: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
-            grammar: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
-            lexis: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"] },
+            taskFulfilment: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready", "C1"] },
+            organization: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready", "C1"] },
+            grammar: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready", "C1"] },
+            lexis: { type: "string", enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready", "C1"] },
           },
         },
         note: { type: "string" },
@@ -1675,7 +1676,7 @@ const OTE_LEVEL_PRODUCTION_FEEDBACK_SCHEMA = {
     },
     productionEstimate: {
       type: "string",
-      enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready"],
+      enum: ["Insufficient evidence", "Below A2", "A2", "B1", "B2", "Strong B2 / Advanced-ready", "C1"],
     },
     confidence: { type: "string", enum: ["low", "moderate", "high"] },
     courseRecommendation: {
@@ -1684,13 +1685,28 @@ const OTE_LEVEL_PRODUCTION_FEEDBACK_SCHEMA = {
         "A2 / Elementary Foundation Course",
         "B1 Level Preparation Course",
         "B2 Exam Masterclass Course",
+        "B2-to-C1 bridge / C1 preparation route",
         "OTE Advanced diagnostic recommended",
+        "C1 Academic Track / Premium Diagnostic",
       ],
     },
     advancedRecommended: { type: "boolean" },
     strength: { type: "string" },
     priority: { type: "string" },
     candidateMessage: { type: "string" },
+    writingCorrections: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["original", "correction", "explanation"],
+        properties: {
+          original: { type: "string" },
+          correction: { type: "string" },
+          explanation: { type: "string" },
+        },
+      },
+    },
   },
 };
 
@@ -3594,9 +3610,16 @@ function normalizeOteLevelProductionPayload(data = {}) {
         id: cleanString(writingTask?.id || "ote-diagnostic-writing-email-1", 120),
         title: cleanString(writingTask?.title || "Registration email", 160),
         inputText: cleanString(writingTask?.inputText || "", 2500),
+        question: cleanString(writingTask?.question || "", 1200),
         prompt: cleanString(writingTask?.prompt || "", 1400),
         requiredPoints: Array.isArray(writingTask?.requiredPoints)
           ? writingTask.requiredPoints.slice(0, 5).map((point) => cleanString(point, 400)).filter(Boolean)
+          : [],
+        expectedContent: Array.isArray(writingTask?.expectedContent)
+          ? writingTask.expectedContent.slice(0, 8).map((point) => cleanString(point, 400)).filter(Boolean)
+          : [],
+        assessmentFocus: Array.isArray(writingTask?.assessmentFocus)
+          ? writingTask.assessmentFocus.slice(0, 8).map((point) => cleanString(point, 300)).filter(Boolean)
           : [],
         targetWordsMin: Number(writingTask?.targetWordsMin || 60),
         targetWordsMax: Number(writingTask?.targetWordsMax || 100),
@@ -3610,31 +3633,76 @@ function normalizeOteLevelProductionPayload(data = {}) {
 }
 
 function buildOteLevelProductionPrompt(payload, speakingItems) {
+  const isAdvancedCheck = payload.mode === "advanced_level_check";
+  const levelInstructions = isAdvancedCheck
+    ? [
+        "Assess the learner's production using only these bands: Insufficient evidence, Below A2, A2, B1, B2, Strong B2 / Advanced-ready, C1.",
+        "This is the Advanced diagnostic path. The tasks are designed to distinguish secure B2, approaching C1, and clear C1 evidence.",
+        "Do not output C2. For exceptional, highly polished production, use C1 and explain that the evidence is comfortably advanced.",
+        "Treat C1 as a normal, reachable outcome for this advanced check when the response is fluent, coherent, precise, and well controlled.",
+      ]
+    : [
+        "Assess the learner's production using only these bands: Insufficient evidence, Below A2, A2, B1, B2, Strong B2 / Advanced-ready, C1.",
+        "Do not output C2. If the learner is clearly beyond B2 for this short General check, use C1 and recommend a C1/Advanced diagnostic route.",
+      ];
+  const speakingTaskInstructions = isAdvancedCheck
+    ? [
+        "Speaking task weights:",
+        "- Personal question: 15%",
+        "- Diplomatic voicemail: 35%",
+        "- Mini debate: 50%",
+      ]
+    : [
+        "Speaking task weights:",
+        "- Personal question: 15%",
+        "- Voicemail: 35%",
+        "- Picture-based talk: 50%",
+      ];
+  const writingTaskInstructions = isAdvancedCheck
+    ? [
+        "Writing task:",
+        "- Short academic opinion response for a tutor.",
+        `- Recommended length: ${payload.writing.task.targetWordsMin}-${payload.writing.task.targetWordsMax} words.`,
+        "- The learner should discuss benefits, consider possible costs/disadvantages, give their own opinion, support ideas with reasons, and include a brief conclusion.",
+        "- Assess whether the register is suitable for an academic tutor: neutral to formal, clear, organized, and appropriately concise.",
+        "- Do not heavily penalize a response slightly over the target range if it is relevant, controlled, and well organized.",
+      ]
+    : [
+        "Writing task:",
+        "- Short polite registration/admissions email.",
+        `- Recommended length: ${payload.writing.task.targetWordsMin}-${payload.writing.task.targetWordsMax} words.`,
+        "- The learner should say which course or level they are interested in, explain why they want to improve their English, and say when they would like to start.",
+        "- Assess whether the register is suitable for a course admissions context: polite, clear, and not too casual.",
+        "- Do not heavily penalize a response slightly over 100 words if it is relevant, controlled, and well organized.",
+      ];
   return [
     "You are an English level diagnostic assistant for Oxford Test of English preparation.",
     "",
     "This is a short public funnel diagnostic, not an official OTE score or full mock test.",
-    "Assess the learner's production using only these bands: Insufficient evidence, Below A2, A2, B1, B2, Strong B2 / Advanced-ready.",
-    "Do not output C1. If the learner is clearly beyond B2 for this short General check, use Strong B2 / Advanced-ready and recommend an OTE Advanced diagnostic.",
+    ...levelInstructions,
     "Write candidate-facing comments in Spanish by default. Keep official level labels and course names unchanged when the schema requires them.",
     "",
     "Transcript-only limitation:",
     "- Speaking recordings have been transcribed. Do not claim reliable pronunciation assessment.",
     "- You may consider whether the transcript suggests connected speech, task fulfilment, organization, grammar range, vocabulary range, and approximate response length.",
-    "- Keep speaking confidence no higher than moderate unless the evidence is unusually complete and clear.",
+    "- Do not lower the level estimate merely because pronunciation cannot be assessed. Mention pronunciation as a limitation, not as a weakness.",
+    "- Keep speaking confidence no higher than moderate unless the evidence is unusually complete and clear, but confidence and level are separate: moderate confidence can still support Strong B2 / Advanced-ready.",
     "- If speaking transcripts are empty, too short, or marked with transcriptionConfidence insufficient, set speaking.estimatedLevel and speaking criteria to Insufficient evidence.",
     "- Do not block the report because of weak speaking evidence. Use the Use of English result and writing sample for the overall recommendation, and explain in Spanish that speaking could not be assessed reliably.",
     "",
-    "Speaking task weights:",
-    "- Personal question: 15%",
-    "- Voicemail: 35%",
-    "- Picture-based talk: 50%",
+    "Level calibration:",
+    "- Use B2 for competent production with clear organization but noticeable limits in development, range, or control.",
+    "- Use Strong B2 / Advanced-ready when the learner gives extended, well-organized answers, handles all task points, uses varied lexis and complex grammar, and only makes occasional slips that do not impede communication.",
+    "- A response can be Strong B2 / Advanced-ready even with minor grammar slips, fillers, transcription artifacts, or slightly unnatural phrasing.",
+    "- Use C1 when the learner's production is fluent, extended, coherent, naturally organized, idiomatic or near-idiomatic, and shows only isolated minor slips or typos.",
+    "- Do not mention B2 in candidateMessage when productionEstimate is C1. Be clear and confident: the production sample is C1-level evidence, while still noting that this is not an official score.",
+    "- If the learner explicitly mentions aiming for C1/C2, do not treat that as evidence of current level. Judge only the language produced.",
     "",
-    "Writing task:",
-    "- Short polite registration/admissions email.",
-    "- Recommended length: 60-100 words.",
-    "- The learner should say which course or level they are interested in, explain why they want to improve their English, and say when they would like to start.",
-    "- Assess whether the register is suitable for a course admissions context: polite, clear, and not too casual.",
+    ...speakingTaskInstructions,
+    "",
+    ...writingTaskInstructions,
+    "- Populate writingCorrections only with real, specific language issues from the writing sample. Do not invent corrections. If there are no clear errors, return an empty array.",
+    "- Do not say the learner needs to improve grammar or polish written grammar unless writingCorrections contains actual grammatical corrections.",
     "",
     "Minimum evidence rules:",
     "- Speaking is insufficient if the voicemail or talk is missing/unusable or there are only isolated words across the main tasks.",
@@ -3642,11 +3710,22 @@ function buildOteLevelProductionPrompt(payload, speakingItems) {
     "- A short but relevant response can still provide level evidence.",
     "",
     "Course recommendation rules:",
-    "- Below A2 or A2: A2 / Elementary Foundation Course.",
-    "- B1: B1 Level Preparation Course.",
-    "- B2: B2 Exam Masterclass Course.",
-    "- Strong B2 / Advanced-ready: OTE Advanced diagnostic recommended.",
-    "- If Phase 1 profile is D/C1, advancedRecommended should normally be true unless production evidence is clearly much weaker.",
+    ...(isAdvancedCheck
+      ? [
+        "- Below A2, A2, or B1: B1 Level Preparation Course or B2 bridge support, depending on the Use of English result.",
+        "- B2: B2 Exam Masterclass Course.",
+        "- Strong B2 / Advanced-ready: B2-to-C1 bridge / C1 preparation route.",
+        "- C1: C1 Academic Track / Premium Diagnostic.",
+        "- In advanced mode, advancedRecommended should normally be false because this is already the advanced diagnostic path.",
+      ]
+      : [
+        "- Below A2 or A2: A2 / Elementary Foundation Course.",
+        "- B1: B1 Level Preparation Course.",
+        "- B2: B2 Exam Masterclass Course.",
+        "- Strong B2 / Advanced-ready: OTE Advanced diagnostic recommended.",
+        "- C1: C1 Academic Track / Premium Diagnostic.",
+        "- If Phase 1 profile is D/C1, advancedRecommended should normally be true unless production evidence is clearly much weaker.",
+      ]),
     "",
     "Return strict JSON only. Keep candidateMessage, strength, and priority concise, warm, practical, and in Spanish.",
     "",
@@ -3661,16 +3740,85 @@ function buildOteLevelProductionPrompt(payload, speakingItems) {
   ].join("\n");
 }
 
+function buildOteFinalRecommendation(feedback, payload, speakingItems) {
+  const isAdvancedCheck = payload.mode === "advanced_level_check";
+  const profile = payload.quizReport?.result || payload.phase1?.profile || {};
+  const scores = payload.quizReport?.scores || {};
+  const productionEstimate = feedback?.productionEstimate || "Insufficient evidence";
+  const routeFromProduction = feedback?.courseRecommendation || "";
+  const quizRoute = profile.redirectLabel || payload.phase1?.profile?.redirectLabel || "";
+  const quizCefr = profile.cefr || payload.phase1?.profile?.cefr || "-";
+  const totalScore = scores.total ?? payload.phase1?.totalScore ?? "-";
+  const speakingWordTotal = (speakingItems || []).reduce((sum, item) => sum + Number(item.wordCount || 0), 0);
+  const hasSpeakingEvidence = speakingWordTotal >= 80;
+  const hasWritingEvidence = Number(payload?.writing?.answer?.wordCount || 0) >= 35;
+  const hasCorrections = Array.isArray(feedback?.writingCorrections) && feedback.writingCorrections.length > 0;
+
+  if (productionEstimate === "C1") {
+    return {
+      title: "Ruta C1 / evaluación avanzada",
+      route: "C1 Academic Track / Premium Diagnostic",
+      summary:
+        `Tu producción de speaking y writing muestra evidencia clara de nivel C1. El resultado de Use of English (${quizCefr}, ${totalScore}/20) sirve como comprobación adicional de precisión, pero la recomendación final debe dar más peso a la muestra productiva completa.`,
+      nextStep: hasCorrections
+        ? "Recomendamos una evaluación avanzada C1 y revisar los detalles concretos señalados en writing."
+        : "Recomendamos una evaluación avanzada C1 o una ruta de preparación de alto nivel.",
+    };
+  }
+
+  if (productionEstimate === "Strong B2 / Advanced-ready") {
+    return {
+      title: isAdvancedCheck ? "B2 alto con puente hacia C1" : "B2 alto con evaluación avanzada recomendada",
+      route: isAdvancedCheck ? "B2-to-C1 bridge / C1 preparation route" : (routeFromProduction || "OTE Advanced diagnostic recommended"),
+      summary:
+        isAdvancedCheck
+          ? `La combinación del Use of English avanzado (${quizCefr}, ${totalScore}/20) y la producción oral/escrita indica un perfil B2 alto, cerca de una ruta C1 pero todavía con margen para consolidar precisión y desarrollo.`
+          : `La combinación del Use of English (${quizCefr}, ${totalScore}/20) y la producción oral/escrita indica un perfil B2 alto. La muestra productiva es suficientemente fuerte como para recomendar una comprobación avanzada.`,
+      nextStep: isAdvancedCheck
+        ? "Recomendamos una ruta puente B2-C1 o preparación C1 si el objetivo es certificar un nivel avanzado."
+        : "Recomendamos hacer una evaluación avanzada antes de elegir la ruta final.",
+    };
+  }
+
+  if (["B2", "B1", "A2", "Below A2"].includes(productionEstimate)) {
+    return {
+      title: `Ruta recomendada: ${routeFromProduction || quizRoute || productionEstimate}`,
+      route: routeFromProduction || quizRoute || productionEstimate,
+      summary:
+        hasSpeakingEvidence || hasWritingEvidence
+          ? `La recomendación combina el resultado de Use of English (${quizCefr}, ${totalScore}/20) con la muestra de speaking/writing. En conjunto, el perfil encaja mejor con ${productionEstimate}.`
+          : `La recomendación se basa principalmente en el resultado de Use of English (${quizCefr}, ${totalScore}/20), porque la muestra productiva fue limitada.`,
+      nextStep: routeFromProduction || quizRoute || "Revisar la ruta recomendada con el equipo académico.",
+    };
+  }
+
+  return {
+    title: `Ruta orientativa: ${quizRoute || quizCefr}`,
+    route: quizRoute || quizCefr,
+    summary:
+      `No hubo suficiente evidencia productiva para ajustar con seguridad el resultado. La recomendación final se basa principalmente en el Use of English (${quizCefr}, ${totalScore}/20).`,
+    nextStep: "Completar speaking y writing de nuevo en un entorno tranquilo ayudaría a confirmar la ruta.",
+  };
+}
+
 function buildOteLevelReportEmail({ payload, speakingItems, feedback, submissionId }) {
   const candidateEmail = payload.lead.email;
   const profile = payload.quizReport?.result || payload.phase1?.profile || {};
   const scores = payload.quizReport?.scores || {};
   const quizItems = Array.isArray(payload.quizReport?.items) ? payload.quizReport.items : [];
+  const writingCorrections = Array.isArray(feedback?.writingCorrections) ? feedback.writingCorrections : [];
+  const finalRecommendation = feedback?.finalRecommendation || buildOteFinalRecommendation(feedback, payload, speakingItems);
   const lines = [
     "Informe del test de nivel Oxford Test of English",
     "",
     `Email del estudiante: ${candidateEmail}`,
     submissionId ? `ID del informe: ${submissionId}` : "",
+    "",
+    "Recomendación final",
+    finalRecommendation.title,
+    `Ruta: ${finalRecommendation.route}`,
+    finalRecommendation.summary,
+    `Siguiente paso: ${finalRecommendation.nextStep}`,
     "",
     "Resultado de Use of English",
     `Resultado orientativo: ${profile.cefr || payload.phase1?.profile?.cefr || "-"} | ${profile.title || payload.phase1?.profile?.title || "-"}`,
@@ -3710,7 +3858,22 @@ function buildOteLevelReportEmail({ payload, speakingItems, feedback, submission
     `Tarea: ${payload.writing.task.title}`,
     `Palabras: ${payload.writing.answer.wordCount}`,
     payload.writing.answer.text || "-",
-    "",
+    ""
+  );
+
+  if (writingCorrections.length) {
+    lines.push("Correcciones específicas de writing");
+    writingCorrections.forEach((item, index) => {
+      lines.push(
+        `${index + 1}. ${item.original}`,
+        `Corrección: ${item.correction}`,
+        `Comentario: ${item.explanation}`,
+        ""
+      );
+    });
+  }
+
+  lines.push(
     "Transcripciones de speaking"
   );
 
@@ -3734,22 +3897,37 @@ function buildOteLevelReportEmail({ payload, speakingItems, feedback, submission
     "<h2>Informe del test de nivel Oxford Test of English</h2>",
     `<p><strong>Email del estudiante:</strong> ${escapeHtml(candidateEmail)}</p>`,
     submissionId ? `<p><strong>ID del informe:</strong> ${escapeHtml(submissionId)}</p>` : "",
+    "<h3>Recomendación final</h3>",
+    "<div style=\"border:1px solid #bfdbfe;border-left:5px solid #2563eb;background:#eff6ff;padding:14px;margin:12px 0;border-radius:8px\">",
+    `<p><strong>${escapeHtml(finalRecommendation.title)}</strong></p>`,
+    `<p><strong>Ruta:</strong> ${escapeHtml(finalRecommendation.route)}</p>`,
+    `<p>${escapeHtml(finalRecommendation.summary)}</p>`,
+    `<p><strong>Siguiente paso:</strong> ${escapeHtml(finalRecommendation.nextStep)}</p>`,
+    "</div>",
     "<h3>Resultado de Use of English</h3>",
     `<p><strong>Resultado orientativo:</strong> ${escapeHtml(profile.cefr || payload.phase1?.profile?.cefr || "-")} | ${escapeHtml(profile.title || payload.phase1?.profile?.title || "-")}</p>`,
     `<p><strong>Puntuación:</strong> ${escapeHtml(scores.total ?? payload.phase1?.totalScore ?? "-")}/${escapeHtml(scores.max || 20)}</p>`,
     `<p><strong>Ruta:</strong> ${escapeHtml(payload.quizReport?.routeKey || payload.phase1?.routeKey || "-")}</p>`,
     `<p><strong>Recomendación:</strong> ${escapeHtml(profile.redirectLabel || payload.phase1?.profile?.redirectLabel || "-")}</p>`,
     "<h3>Revisión de preguntas</h3>",
-    ...quizItems.map((item) => [
-      "<div style=\"border:1px solid #ddd;padding:12px;margin:10px 0;border-radius:8px\">",
+    ...quizItems.map((item) => {
+      const cardStyle = item.isCorrect
+        ? "border:1px solid #bbf7d0;border-left:5px solid #16a34a;background:#f0fdf4;padding:12px;margin:10px 0;border-radius:8px"
+        : "border:1px solid #fecaca;border-left:5px solid #dc2626;background:#fff7ed;padding:12px;margin:10px 0;border-radius:8px";
+      const badgeStyle = item.isCorrect
+        ? "display:inline-block;padding:3px 8px;border-radius:999px;background:#dcfce7;color:#166534;font-weight:700"
+        : "display:inline-block;padding:3px 8px;border-radius:999px;background:#fee2e2;color:#991b1b;font-weight:700";
+      return [
+      `<div style="${cardStyle}">`,
       `<p><strong>${escapeHtml(item.number)}. ${escapeHtml(item.level)} | ${escapeHtml(item.focus)}</strong></p>`,
       `<p>${escapeHtml(item.prompt)}</p>`,
       `<p><strong>Respuesta del estudiante:</strong> ${escapeHtml(item.selectedAnswer || "Sin respuesta")}</p>`,
       `<p><strong>Respuesta correcta:</strong> ${escapeHtml(item.correctAnswer)}</p>`,
-      `<p><strong>Resultado:</strong> ${item.isCorrect ? "Correcto" : "Para revisar"}</p>`,
+      `<p><strong>Resultado:</strong> <span style="${badgeStyle}">${item.isCorrect ? "Correcto" : "Para revisar"}</span></p>`,
       `<p>${escapeHtml(item.feedback)}</p>`,
       "</div>",
-    ].join("")),
+    ].join("");
+    }),
     "<h3>Estimación de speaking y writing</h3>",
     `<p><strong>Nivel estimado:</strong> ${escapeHtml(feedback?.productionEstimate || "-")}</p>`,
     `<p><strong>Confianza:</strong> ${escapeHtml(feedback?.confidence || "-")}</p>`,
@@ -3761,6 +3939,14 @@ function buildOteLevelReportEmail({ payload, speakingItems, feedback, submission
     `<p><strong>Tarea:</strong> ${escapeHtml(payload.writing.task.title)}</p>`,
     `<p><strong>Palabras:</strong> ${escapeHtml(payload.writing.answer.wordCount)}</p>`,
     `<pre style="white-space:pre-wrap;font-family:Arial,sans-serif">${escapeHtml(payload.writing.answer.text || "-")}</pre>`,
+    writingCorrections.length ? "<h3>Correcciones específicas de writing</h3>" : "",
+    ...writingCorrections.map((item) => [
+      "<div style=\"border:1px solid #fed7aa;border-left:5px solid #f59e0b;background:#fff7ed;padding:12px;margin:10px 0;border-radius:8px\">",
+      `<p><strong>Original:</strong> ${escapeHtml(item.original || "")}</p>`,
+      `<p><strong>Corrección:</strong> ${escapeHtml(item.correction || "")}</p>`,
+      `<p>${escapeHtml(item.explanation || "")}</p>`,
+      "</div>",
+    ].join("")),
     "<h3>Transcripciones de speaking</h3>",
     ...speakingItems.map((item, index) => [
       `<h4>${escapeHtml(index + 1)}. ${escapeHtml(item.title)}</h4>`,
@@ -3811,6 +3997,76 @@ async function sendOteLevelReportEmail({ payload, speakingItems, feedback, submi
   await transporter.sendMail(candidateMsg);
   await transporter.sendMail(adminMsg);
   return true;
+}
+
+function postProcessOteLevelProductionFeedback(feedback, payload, speakingItems) {
+  if (!feedback) return feedback;
+  const isAdvancedCheck = payload.mode === "advanced_level_check";
+
+  const normalize = (value) =>
+    String(value || "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLowerCase();
+  const writingCorrections = Array.isArray(feedback.writingCorrections)
+    ? feedback.writingCorrections.filter((item) => item?.original && item?.correction)
+    : [];
+  const allFeedbackText = normalize([
+    feedback.strength,
+    feedback.priority,
+    feedback.candidateMessage,
+    feedback.speaking?.note,
+    feedback.writing?.note,
+  ].filter(Boolean).join(" "));
+  const speakingWordTotal = (speakingItems || []).reduce((sum, item) => sum + Number(item.wordCount || 0), 0);
+  const substantialSpeakingTasks = (speakingItems || []).filter((item) => Number(item.wordCount || 0) >= 50).length;
+  const writingWords = Number(payload?.writing?.answer?.wordCount || 0);
+  const phase1Score = Number(payload?.phase1?.totalScore || payload?.quizReport?.scores?.total || 0);
+  const profileId = String(payload?.phase1?.profile?.id || payload?.quizReport?.result?.profileId || "");
+  const strongUseOfEnglish = phase1Score >= 18 || ["D", "ADV_C1", "ADV_C2"].includes(profileId);
+  const enoughProductionEvidence = writingWords >= 70 && speakingWordTotal >= 180 && substantialSpeakingTasks >= 2;
+  const hasStrongSignals =
+    /(muy buen|buen control|respuestas? amplia|bien organizada|lexico.*(rico|variado)|vocabulario.*(rico|variado)|solido|clara|claridad)/.test(allFeedbackText);
+  const hasSevereLimit =
+    /(insuficient|limitad|incomplet|muchos errores|dificultad|impide|pobre|confus|no puede evaluarse el speaking)/.test(allFeedbackText);
+
+  const shouldUpgradeToC1 =
+    ["B2", "Strong B2 / Advanced-ready"].includes(feedback.productionEstimate) &&
+    (strongUseOfEnglish || hasStrongSignals) &&
+    enoughProductionEvidence &&
+    !hasSevereLimit &&
+    writingCorrections.length <= 1;
+
+  if (feedback.productionEstimate === "C1" || shouldUpgradeToC1) {
+    const adjusted = {
+      ...feedback,
+      writingCorrections,
+      productionEstimate: "C1",
+      courseRecommendation: "C1 Academic Track / Premium Diagnostic",
+      advancedRecommended: !isAdvancedCheck,
+      priority: writingCorrections.length
+        ? "Revisar detalles aislados de precisión escrita y mantener este nivel de naturalidad en tareas formales."
+        : "Mantener este nivel de naturalidad y precisión en tareas formales más exigentes.",
+      candidateMessage:
+        isAdvancedCheck
+          ? "Tu producción se sitúa claramente en C1: las respuestas son amplias, naturales, bien organizadas y con muy buen control del registro. Este test no es una certificación oficial, pero la muestra justifica una ruta C1 de alto nivel."
+          : "Tu producción se sitúa claramente en C1: las respuestas son amplias, naturales, bien organizadas y con muy buen control del registro. Este test no es una certificación oficial, pero la muestra justifica una ruta avanzada o una evaluación C1 más específica.",
+    };
+    return {
+      ...adjusted,
+      finalRecommendation: buildOteFinalRecommendation(adjusted, payload, speakingItems),
+    };
+  }
+
+  const adjusted = {
+    ...feedback,
+    writingCorrections,
+    advancedRecommended: isAdvancedCheck ? false : feedback.advancedRecommended,
+  };
+  return {
+    ...adjusted,
+    finalRecommendation: buildOteFinalRecommendation(adjusted, payload, speakingItems),
+  };
 }
 
 function normalizeOteRegisterGapPayload(data) {
@@ -5231,6 +5487,7 @@ exports.generateOteLevelProductionFeedback = functions
       console.error("[generateOteLevelProductionFeedback] JSON parse failed", { outputText, error });
       throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
     }
+    feedback = postProcessOteLevelProductionFeedback(feedback, payload, speakingItems);
 
     let submissionId = null;
     try {

@@ -1,7 +1,14 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowDownToLine, ArrowRight, CheckCircle2, Mail, Mic, PenLine, Play, RotateCcw, Square, Timer, Volume2 } from "lucide-react";
 import Seo from "../../components/common/Seo.jsx";
-import { requestOteLevelProductionFeedback } from "../../firebase.js";
+import {
+  logOteLevelProductionStarted,
+  logOteLevelProductionSubmitted,
+  logOteLevelTestCheckpoint,
+  logOteLevelTestCompleted,
+  logOteLevelTestStarted,
+  requestOteLevelProductionFeedback,
+} from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
 import { OTE_LEVEL_TEST_BATCHES, getOteLevelTestProfile } from "./data/oteLevelTestItems.js";
 import { OTE_LEVEL_PRODUCTION_TASKS, shouldRecommendAdvancedDiagnostic } from "./data/oteLevelProductionTasks.js";
@@ -24,6 +31,13 @@ function formatClock(seconds) {
 
 function countWords(text) {
   return String(text || "").trim().split(/\s+/).filter(Boolean).length;
+}
+
+function createLevelTestSessionId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `ote-level-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
 function getBatchScore(items, answers) {
@@ -55,9 +69,9 @@ function getQuestionReportItems(coreItems, routeBatch, answers) {
   });
 }
 
-function buildQuizReportText({ profile, routeKey, batch1Score, batch2Score, totalScore, reportItems }) {
+function buildQuizReportText({ profile, routeKey, batch1Score, batch2Score, totalScore, reportItems, reportTitle = "Informe del test de nivel Oxford Test of English" }) {
   const lines = [
-    "Informe del test de nivel Oxford Test of English",
+    reportTitle,
     "",
     `Resultado orientativo: ${profile.cefr} | ${profile.title}`,
     `Puntuación: ${totalScore}/20`,
@@ -114,8 +128,20 @@ function OptionButton({ item, option, selected, onSelect }) {
   );
 }
 
-function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, onBackToResult }) {
-  const [step, setStep] = useState("intro");
+function ProductionCheck({
+  profile,
+  phase1,
+  quizReport,
+  coursePath,
+  homePath,
+  onBackToResult,
+  productionTasks = OTE_LEVEL_PRODUCTION_TASKS,
+  feedbackMode = "general_production_check",
+  showAdvancedDiagnosticCard = false,
+  testEdition = "general",
+  sessionId = "",
+}) {
+  const [step, setStep] = useState("mic");
   const [activeSpeakingIndex, setActiveSpeakingIndex] = useState(0);
   const [recordingPhase, setRecordingPhase] = useState("idle");
   const [secondsLeft, setSecondsLeft] = useState(0);
@@ -123,7 +149,7 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
   const [micError, setMicError] = useState("");
   const [writingAnswer, setWritingAnswer] = useState("");
   const [writingStarted, setWritingStarted] = useState(false);
-  const [writingSecondsLeft, setWritingSecondsLeft] = useState(OTE_LEVEL_PRODUCTION_TASKS.writing.recommendedSeconds);
+  const [writingSecondsLeft, setWritingSecondsLeft] = useState(productionTasks.writing.recommendedSeconds);
   const [leadEmail, setLeadEmail] = useState("");
   const [leadStatus, setLeadStatus] = useState("idle");
   const [feedbackResult, setFeedbackResult] = useState(null);
@@ -134,11 +160,11 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
   const timerRef = useRef(null);
   const writingTimerRef = useRef(null);
   const recordingsRef = useRef({});
-  const activeTask = OTE_LEVEL_PRODUCTION_TASKS.speaking[activeSpeakingIndex];
-  const speakingComplete = OTE_LEVEL_PRODUCTION_TASKS.speaking.every((task) => recordings[task.id]);
+  const activeTask = productionTasks.speaking[activeSpeakingIndex];
+  const speakingComplete = productionTasks.speaking.every((task) => recordings[task.id]);
   const writingWordCount = countWords(writingAnswer);
-  const writingTask = OTE_LEVEL_PRODUCTION_TASKS.writing;
-  const advancedRecommended = shouldRecommendAdvancedDiagnostic(profile);
+  const writingTask = productionTasks.writing;
+  const advancedRecommended = showAdvancedDiagnosticCard && shouldRecommendAdvancedDiagnostic(profile);
 
   useEffect(() => {
     recordingsRef.current = recordings;
@@ -264,7 +290,7 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
 
   function moveToNextSpeaking() {
     clearTimer();
-    if (activeSpeakingIndex < OTE_LEVEL_PRODUCTION_TASKS.speaking.length - 1) {
+    if (activeSpeakingIndex < productionTasks.speaking.length - 1) {
       setActiveSpeakingIndex((current) => current + 1);
       setRecordingPhase("idle");
       setSecondsLeft(0);
@@ -298,17 +324,24 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
     setLeadStatus("loading");
     setFeedbackError("");
     try {
-      const orderedRecordings = OTE_LEVEL_PRODUCTION_TASKS.speaking
+      const orderedRecordings = productionTasks.speaking
         .map((task) => recordings[task.id])
         .filter(Boolean);
       const feedbackAudio = await recordingsToFeedbackAudio(orderedRecordings, "ote-level-production");
-      const inputText = [
-        `From: ${writingTask.inputEmail.from}`,
-        `Subject: ${writingTask.inputEmail.subject}`,
-        ...writingTask.inputEmail.body,
-      ].join("\n");
+      const inputText = writingTask.inputEmail
+        ? [
+          `From: ${writingTask.inputEmail.from}`,
+          `Subject: ${writingTask.inputEmail.subject}`,
+          ...writingTask.inputEmail.body,
+        ].join("\n")
+        : [
+          writingTask.question ? `Question: ${writingTask.question}` : "",
+          writingTask.topicPrompts?.length ? `Topic prompts: ${writingTask.topicPrompts.join("; ")}` : "",
+          writingTask.audience ? `Audience: ${writingTask.audience}` : "",
+          writingTask.register ? `Register: ${writingTask.register}` : "",
+        ].filter(Boolean).join("\n");
       const result = await requestOteLevelProductionFeedback({
-        mode: "general_production_check",
+        mode: feedbackMode,
         lead: { email: trimmedEmail },
         phase1,
         quizReport,
@@ -318,8 +351,11 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
             id: writingTask.id,
             title: writingTask.title,
             inputText,
+            question: writingTask.question,
             prompt: writingTask.prompt,
             requiredPoints: writingTask.bulletPoints,
+            expectedContent: writingTask.expectedContent,
+            assessmentFocus: writingTask.assessmentFocus,
             targetWordsMin: writingTask.targetWordsMin,
             targetWordsMax: writingTask.targetWordsMax,
           },
@@ -328,6 +364,20 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
             wordCount: writingWordCount,
           },
         },
+      });
+      logOteLevelProductionSubmitted({
+        sessionId,
+        edition: testEdition,
+        mode: feedbackMode,
+        routeKey: phase1?.routeKey || "",
+        profileId: phase1?.profile?.id || "",
+        cefr: phase1?.profile?.cefr || "",
+        totalScore: phase1?.totalScore ?? null,
+        speakingRecordings: feedbackAudio.length,
+        writingWordCount,
+        productionEstimate: result?.feedback?.productionEstimate || "",
+        courseRecommendation: result?.feedback?.courseRecommendation || "",
+        reportEmailed: !!result?.reportEmailed,
       });
       setFeedbackResult(result);
       setLeadStatus("ready");
@@ -394,7 +444,7 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
         <div className="ote-level-status">
           <div>
             <Mic size={20} aria-hidden="true" />
-            <strong>Speaking {activeSpeakingIndex + 1} de {OTE_LEVEL_PRODUCTION_TASKS.speaking.length}: {activeTask.title}</strong>
+            <strong>Speaking {activeSpeakingIndex + 1} de {productionTasks.speaking.length}: {activeTask.title}</strong>
             <span>{activeTask.instructions}</span>
           </div>
           <div>
@@ -409,6 +459,11 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
           {activeTask.imageIdeas?.length ? (
             <div className="ote-production-ideas">
               {activeTask.imageIdeas.map((idea) => <strong key={idea}>{idea}</strong>)}
+            </div>
+          ) : null}
+          {activeTask.ideaPrompts?.length ? (
+            <div className="ote-production-ideas">
+              {activeTask.ideaPrompts.map((idea) => <strong key={idea}>{idea}</strong>)}
             </div>
           ) : null}
           {activeRecording ? (
@@ -429,7 +484,7 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
         <div className="ote-level-actions">
           <button className="ote-level-secondary" type="button" onClick={onBackToResult}>Volver al resultado</button>
           <button className="ote-level-primary" type="button" disabled={!activeRecording} onClick={moveToNextSpeaking}>
-            {activeSpeakingIndex < OTE_LEVEL_PRODUCTION_TASKS.speaking.length - 1 ? "Siguiente tarea de speaking" : "Continuar a writing"}
+            {activeSpeakingIndex < productionTasks.speaking.length - 1 ? "Siguiente tarea de speaking" : "Continuar a writing"}
             <ArrowRight size={18} aria-hidden="true" />
           </button>
         </div>
@@ -445,7 +500,7 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
           <div>
             <PenLine size={20} aria-hidden="true" />
             <strong>{writingTask.title}</strong>
-            <span>Escribe 60-100 palabras. El temporizador es orientativo; no se cortará tu respuesta.</span>
+            <span>Escribe {writingTask.targetWordsMin}-{writingTask.targetWordsMax} palabras. El temporizador es orientativo; no se cortará tu respuesta.</span>
           </div>
           <div>
             <strong>{formatClock(writingSecondsLeft)}</strong>
@@ -453,11 +508,20 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
           </div>
         </div>
         <div className="ote-production-writing">
-          <article className="ote-production-email">
-            <p><strong>De:</strong> {writingTask.inputEmail.from}</p>
-            <p><strong>Asunto:</strong> {writingTask.inputEmail.subject}</p>
-            {writingTask.inputEmail.body.map((line) => <p key={line}>{line}</p>)}
-          </article>
+          {writingTask.inputEmail ? (
+            <article className="ote-production-email">
+              <p><strong>De:</strong> {writingTask.inputEmail.from}</p>
+              <p><strong>Asunto:</strong> {writingTask.inputEmail.subject}</p>
+              {writingTask.inputEmail.body.map((line) => <p key={line}>{line}</p>)}
+            </article>
+          ) : (
+            <article className="ote-production-email">
+              <p><strong>Pregunta:</strong> {writingTask.question}</p>
+              {writingTask.topicPrompts?.length ? (
+                <ul>{writingTask.topicPrompts.map((point) => <li key={point}>{point}</li>)}</ul>
+              ) : null}
+            </article>
+          )}
           <article className="ote-production-task">
             <span>{writingTask.prompt}</span>
             <ul>{writingTask.bulletPoints.map((point) => <li key={point}>{point}</li>)}</ul>
@@ -465,13 +529,13 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
               value={writingAnswer}
               onChange={(event) => setWritingAnswer(event.target.value)}
               onFocus={startWritingTimer}
-              placeholder="Escribe tu email aquí..."
+              placeholder={writingTask.inputEmail ? "Escribe tu email aquí..." : "Escribe tu respuesta aquí..."}
             />
             {writingWordCount > 0 && writingWordCount < writingTask.targetWordsMin ? (
-              <p className="ote-production-warning">Tu respuesta tiene menos de 60 palabras, así que habrá menos información para evaluar tu writing.</p>
+              <p className="ote-production-warning">Tu respuesta tiene menos de {writingTask.targetWordsMin} palabras, así que habrá menos información para evaluar tu writing.</p>
             ) : null}
             {writingWordCount > writingTask.targetWordsMax ? (
-              <p className="ote-production-warning">Has escrito más de 100 palabras. No pasa nada, pero la tarea está pensada para ser breve.</p>
+              <p className="ote-production-warning">Has escrito más de {writingTask.targetWordsMax} palabras. No pasa nada, pero la tarea está pensada para ser breve.</p>
             ) : null}
           </article>
         </div>
@@ -552,31 +616,74 @@ function ProductionCheck({ profile, phase1, quizReport, coursePath, homePath, on
   return null;
 }
 
-export default function OteLevelTest({ nativeRoutes = false }) {
+const DEFAULT_LEVEL_TEST_COPY = {
+  testEdition: "general",
+  seoTitle: "Test de nivel Oxford Test of English | OTE Seif",
+  seoDescription: "Haz un test de nivel rápido para Oxford Test of English y recibe una orientación CEFR en menos de 10 minutos.",
+  kicker: "Test de nivel Oxford Test of English",
+  heading: "Comprueba tu nivel para Oxford Test of English",
+  intro: "Responde 20 preguntas breves de Use of English. Al terminar, verás tu nivel orientativo y una ruta de preparación recomendada.",
+  firstPartTitle: "Primera parte",
+  firstPartSubtitle: "10 preguntas iniciales",
+  lowerPartSubtitle: "10 preguntas para consolidar base",
+  upperPartSubtitle: "10 preguntas de nivel más alto",
+  reportTitle: "Informe del test de nivel Oxford Test of English",
+  downloadFilename: "informe-nivel-oxford-test-of-english.txt",
+  feedbackMode: "general_production_check",
+  showAdvancedDiagnosticSuggestion: true,
+};
+
+export default function OteLevelTest({
+  nativeRoutes = false,
+  batches = OTE_LEVEL_TEST_BATCHES,
+  getProfile = getOteLevelTestProfile,
+  productionTasks = OTE_LEVEL_PRODUCTION_TASKS,
+  copy = {},
+}) {
+  const testCopy = { ...DEFAULT_LEVEL_TEST_COPY, ...copy };
+  const sessionIdRef = useRef(createLevelTestSessionId());
+  const startedLoggedRef = useRef(false);
+  const checkpointLoggedRef = useRef(false);
+  const completedLoggedRef = useRef(false);
+  const productionStartedLoggedRef = useRef(false);
   const [phase, setPhase] = useState("batch1");
   const [routeKey, setRouteKey] = useState("");
   const [answers, setAnswers] = useState({});
-  const coreItems = OTE_LEVEL_TEST_BATCHES.core.items;
-  const routeBatch = routeKey ? OTE_LEVEL_TEST_BATCHES[routeKey] : null;
+  const coreItems = batches.core.items;
+  const routeBatch = routeKey ? batches[routeKey] : null;
   const activeItems = phase === "batch1" ? coreItems : routeBatch?.items || [];
   const batch1Score = useMemo(() => getBatchScore(coreItems, answers), [answers, coreItems]);
   const batch2Score = useMemo(() => (routeBatch ? getBatchScore(routeBatch.items, answers) : 0), [answers, routeBatch]);
   const totalScore = batch1Score + batch2Score;
   const answeredCount = getAnsweredCount(activeItems, answers);
   const totalAnswered = getAnsweredCount(coreItems, answers) + (routeBatch ? getAnsweredCount(routeBatch.items, answers) : 0);
+  const speakingMinutes = Math.max(1, Math.ceil(productionTasks.speaking.reduce(
+    (total, task) => total + Number(task.preparationSeconds || 0) + Number(task.responseSeconds || 0),
+    0
+  ) / 60));
+  const writingMinutes = Math.max(1, Math.round(Number(productionTasks.writing.recommendedSeconds || 0) / 60));
   const isBatchComplete = answeredCount === activeItems.length;
-  const profile = routeKey ? getOteLevelTestProfile(routeKey, totalScore) : null;
+  const profile = routeKey ? getProfile(routeKey, totalScore) : null;
   const coursePath = profile ? getSitePath(nativeRoutes ? profile.coursePath.replace("/ote", "") : profile.coursePath) : "";
   const homePath = getSitePath(nativeRoutes ? "/" : "/ote");
+  const advancedTestPath = getSitePath(nativeRoutes ? "/level-test/advanced" : "/ote/level-test/advanced");
   const reportItems = useMemo(
     () => (routeBatch ? getQuestionReportItems(coreItems, routeBatch, answers) : []),
     [answers, coreItems, routeBatch]
   );
   const quizReportText = useMemo(
     () => (profile && routeBatch
-      ? buildQuizReportText({ profile, routeKey, batch1Score, batch2Score, totalScore, reportItems })
+      ? buildQuizReportText({
+        profile,
+        routeKey,
+        batch1Score,
+        batch2Score,
+        totalScore,
+        reportItems,
+        reportTitle: testCopy.reportTitle,
+      })
       : ""),
-    [batch1Score, batch2Score, profile, reportItems, routeBatch, routeKey, totalScore]
+    [batch1Score, batch2Score, profile, reportItems, routeBatch, routeKey, testCopy.reportTitle, totalScore]
   );
   const quizReport = useMemo(
     () => (profile && routeBatch ? {
@@ -602,22 +709,75 @@ export default function OteLevelTest({ nativeRoutes = false }) {
     [batch1Score, batch2Score, profile, quizReportText, reportItems, routeBatch, routeKey, totalScore]
   );
 
+  useEffect(() => {
+    if (startedLoggedRef.current) return;
+    startedLoggedRef.current = true;
+    logOteLevelTestStarted({
+      sessionId: sessionIdRef.current,
+      edition: testCopy.testEdition,
+      batchId: batches.core?.id || "",
+      totalQuestions: 20,
+    });
+  }, [batches.core?.id, testCopy.testEdition]);
+
   function chooseAnswer(itemId, option) {
     setAnswers((current) => ({ ...current, [itemId]: option }));
   }
 
   function continueFromBatch1() {
-    setRouteKey(batch1Score <= 5 ? "lower" : "upper");
+    const nextRouteKey = batch1Score <= 5 ? "lower" : "upper";
+    if (!checkpointLoggedRef.current) {
+      checkpointLoggedRef.current = true;
+      logOteLevelTestCheckpoint({
+        sessionId: sessionIdRef.current,
+        edition: testCopy.testEdition,
+        checkpoint: "batch1",
+        batchId: batches.core?.id || "",
+        batch1Score,
+        routeKey: nextRouteKey,
+        nextBatchId: batches[nextRouteKey]?.id || "",
+      });
+    }
+    setRouteKey(nextRouteKey);
     setPhase("batch2");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function finishTest() {
+    if (!completedLoggedRef.current) {
+      completedLoggedRef.current = true;
+      const nextProfile = getProfile(routeKey, totalScore);
+      logOteLevelTestCompleted({
+        sessionId: sessionIdRef.current,
+        edition: testCopy.testEdition,
+        routeKey,
+        batch1Score,
+        batch2Score,
+        totalScore,
+        maxScore: 20,
+        profileId: nextProfile?.id || "",
+        cefr: nextProfile?.cefr || "",
+        redirectLabel: nextProfile?.redirectLabel || "",
+      });
+    }
     setPhase("results");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   function resetTest() {
+    const nextSessionId = createLevelTestSessionId();
+    sessionIdRef.current = nextSessionId;
+    startedLoggedRef.current = true;
+    checkpointLoggedRef.current = false;
+    completedLoggedRef.current = false;
+    productionStartedLoggedRef.current = false;
+    logOteLevelTestStarted({
+      sessionId: nextSessionId,
+      edition: testCopy.testEdition,
+      batchId: batches.core?.id || "",
+      totalQuestions: 20,
+      restarted: true,
+    });
     setAnswers({});
     setRouteKey("");
     setPhase("batch1");
@@ -627,17 +787,15 @@ export default function OteLevelTest({ nativeRoutes = false }) {
   return (
     <main className="ote-level-test">
       <Seo
-        title="Test de nivel Oxford Test of English | OTE Seif"
-        description="Haz un test de nivel rápido para Oxford Test of English y recibe una orientación CEFR en menos de 10 minutos."
+        title={testCopy.seoTitle}
+        description={testCopy.seoDescription}
       />
 
       <section className="ote-level-hero">
         <div>
-          <span className="ote-kicker">Test de nivel Oxford Test of English</span>
-          <h1>Comprueba tu nivel para Oxford Test of English</h1>
-          <p>
-            Responde 20 preguntas breves de Use of English. Al terminar, verás tu nivel orientativo y una ruta de preparación recomendada.
-          </p>
+          <span className="ote-kicker">{testCopy.kicker}</span>
+          <h1>{testCopy.heading}</h1>
+          <p>{testCopy.intro}</p>
         </div>
         <div className="ote-level-meter" aria-label={`${totalAnswered} de 20 preguntas respondidas`}>
           <strong>{totalAnswered}/20</strong>
@@ -658,10 +816,16 @@ export default function OteLevelTest({ nativeRoutes = false }) {
               title: profile.title,
               redirectLabel: profile.redirectLabel,
             },
+            testEdition: testCopy.testEdition,
           }}
           quizReport={quizReport}
           coursePath={coursePath}
           homePath={homePath}
+          productionTasks={productionTasks}
+          feedbackMode={testCopy.feedbackMode}
+          showAdvancedDiagnosticCard={testCopy.showAdvancedDiagnosticSuggestion}
+          testEdition={testCopy.testEdition}
+          sessionId={sessionIdRef.current}
           onBackToResult={() => {
             setPhase("results");
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -672,8 +836,8 @@ export default function OteLevelTest({ nativeRoutes = false }) {
           <div className="ote-level-status">
             <div>
               <Timer size={20} aria-hidden="true" />
-              <strong>{phase === "batch1" ? "Primera parte" : "Segunda parte"}</strong>
-              <span>{phase === "batch1" ? "10 preguntas iniciales" : routeKey === "lower" ? "10 preguntas para consolidar base" : "10 preguntas de nivel más alto"}</span>
+              <strong>{phase === "batch1" ? testCopy.firstPartTitle : "Segunda parte"}</strong>
+              <span>{phase === "batch1" ? testCopy.firstPartSubtitle : routeKey === "lower" ? testCopy.lowerPartSubtitle : testCopy.upperPartSubtitle}</span>
             </div>
             <div>
               <strong>{answeredCount}/{activeItems.length}</strong>
@@ -734,14 +898,14 @@ export default function OteLevelTest({ nativeRoutes = false }) {
 
           <div className="ote-level-upsell">
             <article>
-              <PenLine size={24} aria-hidden="true" />
-              <h3>1. Writing</h3>
-              <p>Escribe un email breve para comprobar precisión, registro y claridad.</p>
+              <Mic size={24} aria-hidden="true" />
+              <h3>1. Speaking</h3>
+              <p>Graba tres respuestas cortas en unos {speakingMinutes} minutos para completar una recomendación más fiable.</p>
             </article>
             <article>
-              <Mic size={24} aria-hidden="true" />
-              <h3>2. Speaking</h3>
-              <p>Graba tres respuestas cortas para completar una recomendación más fiable.</p>
+              <PenLine size={24} aria-hidden="true" />
+              <h3>2. Writing</h3>
+              <p>Escribe una respuesta breve de {writingMinutes} minutos para comprobar precisión, registro y claridad.</p>
             </article>
             <article>
               <Volume2 size={24} aria-hidden="true" />
@@ -755,6 +919,18 @@ export default function OteLevelTest({ nativeRoutes = false }) {
               className="ote-level-primary"
               type="button"
               onClick={() => {
+                if (!productionStartedLoggedRef.current) {
+                  productionStartedLoggedRef.current = true;
+                  logOteLevelProductionStarted({
+                    sessionId: sessionIdRef.current,
+                    edition: testCopy.testEdition,
+                    mode: testCopy.feedbackMode,
+                    routeKey,
+                    profileId: profile?.id || "",
+                    cefr: profile?.cefr || "",
+                    totalScore,
+                  });
+                }
                 setPhase("production");
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
@@ -774,7 +950,7 @@ export default function OteLevelTest({ nativeRoutes = false }) {
             <button
               className="ote-level-secondary"
               type="button"
-              onClick={() => downloadTextFile("informe-nivel-oxford-test-of-english.txt", quizReportText)}
+              onClick={() => downloadTextFile(testCopy.downloadFilename, quizReportText)}
             >
               <ArrowDownToLine size={18} aria-hidden="true" />
               Descargar informe
@@ -802,11 +978,15 @@ export default function OteLevelTest({ nativeRoutes = false }) {
             <p>{profile.commercialCue}</p>
           </div>
 
-          {shouldRecommendAdvancedDiagnostic(profile) ? (
+          {testCopy.showAdvancedDiagnosticSuggestion && shouldRecommendAdvancedDiagnostic(profile) ? (
             <div className="ote-level-route-card">
               <span>Ruta avanzada</span>
               <strong>Recomendamos una evaluación avanzada de Oxford Test of English</strong>
-              <p>Este test general indica un resultado alto. Cuando el test avanzado esté disponible, esta será la siguiente ruta recomendada.</p>
+              <p>Este test general indica un resultado alto. El siguiente paso recomendado es hacer el test avanzado para comprobar si tu perfil encaja con una ruta C1.</p>
+              <a className="ote-level-secondary" href={advancedTestPath}>
+                Ir al test avanzado
+                <ArrowRight size={18} aria-hidden="true" />
+              </a>
             </div>
           ) : null}
 

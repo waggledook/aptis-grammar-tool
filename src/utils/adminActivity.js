@@ -78,6 +78,12 @@ export const ACTIVITY_TYPE_LABELS = {
   ote_mock_started: "OTE Mock Started",
   ote_mock_completed: "OTE Mock Completed",
   ote_register_checked: "OTE Register Checked",
+  ote_level_test_selected: "OTE Level Test Selected",
+  ote_level_test_started: "OTE Level Test Started",
+  ote_level_test_checkpoint: "OTE Level Test Checkpoint",
+  ote_level_test_completed: "OTE Level Test Completed",
+  ote_level_production_started: "OTE Level Production Started",
+  ote_level_production_submitted: "OTE Level Production Submitted",
   [WRITING_GENERAL_SUBMISSION_TYPE]: "Writing General Mock Submitted",
 };
 
@@ -496,6 +502,52 @@ export function formatActivityDetails(log) {
           ? `${d.score}/${d.total}`
           : "";
       return joinParts(["OTE", "Register", d.activity || "", d.taskTitle || d.taskId || "", score]);
+    }
+    case "ote_level_test_selected":
+      return joinParts(["OTE", "Level test", d.edition || "", d.targetPath || ""]);
+    case "ote_level_test_started":
+      return joinParts(["OTE", "Level test", d.edition || "", d.restarted ? "Restarted" : "Started", d.sessionId || ""]);
+    case "ote_level_test_checkpoint":
+      return joinParts([
+        "OTE",
+        "Level test",
+        d.edition || "",
+        `Batch 1 ${formatScore(d.batch1Score, 10)}`,
+        d.routeKey ? `Route ${d.routeKey}` : "",
+      ]);
+    case "ote_level_test_completed":
+      return joinParts([
+        "OTE",
+        "Level test",
+        d.edition || "",
+        `Score ${formatScore(d.totalScore, d.maxScore || 20)}`,
+        d.cefr || "",
+        d.profileId || "",
+        d.redirectLabel || "",
+      ]);
+    case "ote_level_production_started":
+      return joinParts([
+        "OTE",
+        "Level production",
+        d.edition || "",
+        d.mode || "",
+        `Use of English ${d.totalScore ?? "?"}/20`,
+        d.cefr || "",
+      ]);
+    case "ote_level_production_submitted": {
+      const speaking =
+        typeof d.speakingRecordings === "number" ? formatCount(d.speakingRecordings, "recording") : "";
+      const writing =
+        typeof d.writingWordCount === "number" ? `${d.writingWordCount} words` : "";
+      return joinParts([
+        "OTE",
+        "Level production",
+        d.edition || "",
+        d.productionEstimate || "",
+        speaking,
+        writing,
+        d.reportEmailed ? "Email sent" : "Email not confirmed",
+      ]);
     }
     case WRITING_GENERAL_SUBMISSION_TYPE: {
       const part3Total = Array.isArray(d.part3WordCounts) ? d.part3WordCounts.reduce((sum, count) => sum + count, 0) : 0;

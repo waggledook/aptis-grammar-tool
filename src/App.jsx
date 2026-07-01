@@ -219,7 +219,9 @@ import OteWritingEssayBodyParagraphs from "./products/ote/OteWritingEssayBodyPar
 import OteWritingArticleReviewGuide from "./products/ote/OteWritingArticleReviewGuide.jsx";
 import OteWritingRegisterBasics from "./products/ote/OteWritingRegisterBasics.jsx";
 import OteWritingRegisterGapTrainer from "./products/ote/OteWritingRegisterGapTrainer.jsx";
+import OteLevelTestChooser from "./products/ote/OteLevelTestChooser.jsx";
 import OteLevelTest from "./products/ote/OteLevelTest.jsx";
+import OteAdvancedLevelTest from "./products/ote/OteAdvancedLevelTest.jsx";
 import OteCourseLanding from "./products/ote/OteCourseLanding.jsx";
 import { canAccessAptisTrainer, canAccessOte, canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
@@ -382,6 +384,7 @@ const isOteRoute =
   (isOteSite &&
     (location.pathname === "/" ||
       location.pathname.startsWith("/level-test") ||
+      location.pathname.startsWith("/advanced-level-test") ||
       location.pathname.startsWith("/courses") ||
       location.pathname.startsWith("/speaking") ||
       location.pathname.startsWith("/writing") ||
@@ -803,9 +806,14 @@ const isTeacherToolsRoute = location.pathname === "/teacher-tools";
 const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-it/join";
 const isPublicSpanglishPlayRoute = /^\/games\/spanglish-fix-it\/play\/[^/]+$/.test(location.pathname);
 const isPublicOteLevelTestRoute =
-  location.pathname === "/ote/level-test" ||
+  location.pathname.startsWith("/ote/level-test") ||
+  location.pathname === "/ote/advanced-level-test" ||
   location.pathname.startsWith("/ote/courses/") ||
-  (isOteSite && (location.pathname === "/level-test" || location.pathname.startsWith("/courses/")));
+  (isOteSite && (
+    location.pathname.startsWith("/level-test") ||
+    location.pathname === "/advanced-level-test" ||
+    location.pathname.startsWith("/courses/")
+  ));
 const showMemberAccessGate =
   requiresMemberAccess &&
   !hasMemberSiteAccess &&
@@ -1317,7 +1325,10 @@ return (
       />
     }
   />
-  <Route path="/ote/level-test" element={<OteLevelTest nativeRoutes={false} />} />
+  <Route path="/ote/level-test" element={<OteLevelTestChooser nativeRoutes={false} />} />
+  <Route path="/ote/level-test/general" element={<OteLevelTest nativeRoutes={false} />} />
+  <Route path="/ote/level-test/advanced" element={<OteAdvancedLevelTest nativeRoutes={false} />} />
+  <Route path="/ote/advanced-level-test" element={<Navigate to={getSitePath("/ote/level-test/advanced")} replace />} />
   <Route path="/ote/courses/:courseId" element={<OteCourseLanding nativeRoutes={false} />} />
   <Route path="/ote/speaking" element={<OteSkillMenu skill="speaking" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
   <Route path="/ote/speaking/part-1-interview" element={<OteSpeakingPart1Menu user={user} nativeRoutes={false} />} />
@@ -1434,8 +1445,32 @@ return (
     path="/level-test"
     element={
       isOteSite
-        ? <OteLevelTest nativeRoutes />
+        ? <OteLevelTestChooser nativeRoutes />
         : <Navigate to={getSitePath("/ote/level-test")} replace />
+    }
+  />
+  <Route
+    path="/level-test/general"
+    element={
+      isOteSite
+        ? <OteLevelTest nativeRoutes />
+        : <Navigate to={getSitePath("/ote/level-test/general")} replace />
+    }
+  />
+  <Route
+    path="/level-test/advanced"
+    element={
+      isOteSite
+        ? <OteAdvancedLevelTest nativeRoutes />
+        : <Navigate to={getSitePath("/ote/level-test/advanced")} replace />
+    }
+  />
+  <Route
+    path="/advanced-level-test"
+    element={
+      isOteSite
+        ? <Navigate to={getSitePath("/level-test/advanced")} replace />
+        : <Navigate to={getSitePath("/ote/level-test/advanced")} replace />
     }
   />
   <Route

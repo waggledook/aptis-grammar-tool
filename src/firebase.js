@@ -1102,6 +1102,56 @@ export async function logOteRegisterChecked(details = {}) {
   return logOteActivity("ote_register_checked", details);
 }
 
+export async function logOteLevelTestSelected(details = {}) {
+  return logOteActivity("ote_level_test_selected", {
+    section: "level-test",
+    ...details,
+  });
+}
+
+export async function logOteLevelTestStarted(details = {}) {
+  return logOteActivity("ote_level_test_started", {
+    section: "level-test",
+    ...details,
+  });
+}
+
+export async function logOteLevelTestCheckpoint(details = {}) {
+  return logOteActivity("ote_level_test_checkpoint", {
+    section: "level-test",
+    ...details,
+  });
+}
+
+export async function logOteLevelTestCompleted(details = {}) {
+  return logOteActivity("ote_level_test_completed", {
+    section: "level-test",
+    ...details,
+  });
+}
+
+export async function logOteLevelProductionStarted(details = {}) {
+  return logOteActivity("ote_level_production_started", {
+    section: "level-test",
+    ...details,
+  });
+}
+
+export async function logOteLevelProductionSubmitted(details = {}) {
+  return logOteActivity("ote_level_production_submitted", {
+    section: "level-test",
+    ...details,
+  });
+}
+
+export async function updateOwnOteVersion(version = "general") {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in.");
+  const normalizedVersion = version === "advanced" ? "advanced" : "general";
+  await setDoc(doc(db, "users", user.uid), { oteVersion: normalizedVersion }, { merge: true });
+  return normalizedVersion;
+}
+
 export async function logHubKeywordStarted(details = {}) {
   return logActivity("hub_keyword_started", {
     app: "seifhub",

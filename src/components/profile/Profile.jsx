@@ -44,10 +44,78 @@ const HUB_GRAMMAR_LEVEL_COLORS = {
   c2: "#c7a4ff",
 };
 const OTE_SPEAKING_TOTALS = {
-  part1: 6,
-  part2: 5,
-  parts34: 5,
+  general: {
+    part1: 6,
+    part2: 5,
+    parts34: 5,
+    mock: 0,
+  },
+  advanced: {
+    part1: 5,
+    part2: 5,
+    part3Summary: 2,
+    parts45: 3,
+    mock: 0,
+  },
 };
+
+const OTE_ADVANCED_SPEAKING_TASK_IDS = new Set([
+  "urban-green-spaces",
+  "short-breaks",
+  "travel-environment-debate",
+  "travel-environment-follow-ups",
+  "shopping-consumerism-debate",
+  "shopping-consumerism-follow-ups",
+  "science-natural-world-debate",
+  "science-natural-world-follow-ups",
+]);
+
+function normalizeOteProfileVariant(version) {
+  return version === "advanced" ? "advanced" : "general";
+}
+
+function isAdvancedOteSpeakingFeedback(item = {}) {
+  const part = String(item.part || "").toLowerCase();
+  const taskId = String(item.taskId || "").toLowerCase();
+  const taskTitle = String(item.taskTitle || "").toLowerCase();
+  if (taskId.startsWith("advanced-set-")) return true;
+  if (OTE_ADVANCED_SPEAKING_TASK_IDS.has(taskId)) return true;
+  if (part === "part-5" || part === "part5" || part === "parts-4-5") return true;
+  if (taskId.includes("-debate") || taskId.includes("-follow-ups")) return true;
+  if (taskTitle.includes("advanced") || taskTitle.includes("summary")) return true;
+  return false;
+}
+
+function isAdvancedOteMockAttempt(attempt = {}) {
+  const mockId = String(attempt.mockId || "").toLowerCase();
+  const mockTitle = String(attempt.mockTitle || "").toLowerCase();
+  return mockId.includes("advanced") || mockTitle.includes("advanced");
+}
+
+function isAdvancedOteWritingSubmission(entry = {}) {
+  const mockId = String(entry.mockId || "").toLowerCase();
+  const mockTitle = String(entry.mockTitle || entry.title || "").toLowerCase();
+  const levelLabel = String(entry.levelLabel || "").toLowerCase();
+  const practiceSection = String(entry.practiceSection || "").toLowerCase();
+  const practiceTaskType = String(entry.practiceTaskType || "").toLowerCase();
+  const practiceTaskLabel = String(entry.practiceTaskLabel || "").toLowerCase();
+  const practiceTask = entry.tasks?.practice || {};
+  const task1 = entry.tasks?.task1 || {};
+  const selectedTask = entry.tasks?.task2?.selectedOption || {};
+  return (
+    mockId.includes("advanced") ||
+    mockTitle.includes("advanced") ||
+    levelLabel.includes("advanced") ||
+    practiceSection.startsWith("advanced-") ||
+    practiceTaskType.includes("advanced") ||
+    practiceTaskLabel.includes("advanced") ||
+    practiceTask.kind === "summary" ||
+    Number(practiceTask.minWords || 0) >= 220 ||
+    task1.kind === "essay" ||
+    Number(task1.minWords || 0) >= 220 ||
+    selectedTask.kind === "summary"
+  );
+}
 
 function buildHubGrammarDashboard(submissions = []) {
   const byLevel = Object.fromEntries(
@@ -177,6 +245,8 @@ export default function Profile({
   const [oteMockAttempts, setOteMockAttempts] = useState([]);
   const [showOteSpeakingPanel, setShowOteSpeakingPanel] = useState(true);
   const [showOteWritingPanel, setShowOteWritingPanel] = useState(true);
+  const [oteProfileVariant, setOteProfileVariant] = useState(() => normalizeOteProfileVariant(user?.oteVersion));
+  const [oteProfileVariantBusy, setOteProfileVariantBusy] = useState(false);
   const [profileFeedbackBusy, setProfileFeedbackBusy] = useState("");
   const [feedbackCreditStatus, setFeedbackCreditStatus] = useState(null);
   const [creditRequestBusy, setCreditRequestBusy] = useState(false);
@@ -716,6 +786,27 @@ function renderFeedbackButton(kind, submission) {
     return unsub;
   }, [targetUid, user?.photoURL]);
 
+  useEffect(() => {
+    setOteProfileVariant(normalizeOteProfileVariant(user?.oteVersion));
+  }, [user?.oteVersion, targetUid]);
+
+  async function handleOteProfileVariantChange(nextVariant) {
+    const normalized = normalizeOteProfileVariant(nextVariant);
+    setOteProfileVariant(normalized);
+    if (targetUid) return;
+    setOteProfileVariantBusy(true);
+    try {
+      await fb.updateOwnOteVersion?.(normalized);
+      toast(`OTE profile set to ${normalized === "advanced" ? "Advanced" : "General"}.`);
+    } catch (error) {
+      console.warn("[Profile] OTE version update failed", error);
+      setOteProfileVariant(normalizeOteProfileVariant(user?.oteVersion));
+      toast(error?.message || "Could not update your OTE mode.");
+    } finally {
+      setOteProfileVariantBusy(false);
+    }
+  }
+
   // load all profile data
   useEffect(() => {
     let alive = true;
@@ -887,13 +978,29 @@ const aptisWritingItems =
   writingP4.length +
   p4Register.length;
 
-const oteSpeakingFeedback = speakingFeedback.filter((item) => item.product === "ote");
+const activeOteVariantLabel = oteProfileVariant === "advanced" ? "Advanced" : "General";
+const allOteSpeakingFeedback = speakingFeedback.filter((item) => item.product === "ote");
+const oteSpeakingFeedback = allOteSpeakingFeedback.filter(
+  (item) => isAdvancedOteSpeakingFeedback(item) === (oteProfileVariant === "advanced")
+);
 const aptisSpeakingFeedback = speakingFeedback.filter((item) => (item.product || "aptis") !== "ote");
-const oteWritingMockCount = oteWriting.filter((entry) => entry.type !== "ote-writing-practice").length;
-const oteWritingPracticeCount = oteWriting.length - oteWritingMockCount;
-const oteSpeakingMockTotal = Object.keys(OTE_SPEAKING_MOCKS || {}).length;
-const oteWritingMocksTotal = getOteWritingMocks().length;
-const oteWritingPracticeGroups = getOteWritingPracticeGroups();
+const filteredOteWriting = oteWriting.filter(
+  (entry) => isAdvancedOteWritingSubmission(entry) === (oteProfileVariant === "advanced")
+);
+const filteredOteMockAttempts = oteMockAttempts.filter(
+  (attempt) => isAdvancedOteMockAttempt(attempt) === (oteProfileVariant === "advanced")
+);
+const oteWritingMockCount = filteredOteWriting.filter((entry) => entry.type !== "ote-writing-practice").length;
+const oteWritingPracticeCount = filteredOteWriting.length - oteWritingMockCount;
+const oteSpeakingMockTotal = Object.values(OTE_SPEAKING_MOCKS || {}).filter(
+  (mock) => isAdvancedOteMockAttempt(mock) === (oteProfileVariant === "advanced")
+).length;
+const oteWritingMocksTotal = getOteWritingMocks().filter(
+  (mock) => isAdvancedOteWritingSubmission(mock) === (oteProfileVariant === "advanced")
+).length;
+const oteWritingPracticeGroups = getOteWritingPracticeGroups().filter(
+  (group) => group.id.startsWith("advanced-") === (oteProfileVariant === "advanced")
+);
 const oteWritingPracticeTotals = Object.fromEntries(
   oteWritingPracticeGroups.map((group) => [group.id, group.sets.length])
 );
@@ -901,6 +1008,8 @@ const normalizeOteSpeakingPart = (part) => {
   const value = String(part || "").toLowerCase();
   if (value === "part1" || value === "part-1") return "part1";
   if (value === "part2" || value === "part-2") return "part2";
+  if (oteProfileVariant === "advanced" && (value === "part3" || value === "part-3")) return "part3Summary";
+  if (oteProfileVariant === "advanced" && (value === "part4" || value === "part-4" || value === "part5" || value === "part-5" || value === "parts-4-5")) return "parts45";
   if (value === "part3" || value === "part-3" || value === "part4" || value === "part-4") return "parts34";
   if (value === "parts-3-4" || value === "part34" || value === "part-3-4") return "parts34";
   return value;
@@ -916,8 +1025,10 @@ const oteSpeakingProgress = {
   part1: uniqueOteSpeakingTasks("part1"),
   part2: uniqueOteSpeakingTasks("part2"),
   parts34: uniqueOteSpeakingTasks("parts34"),
+  part3Summary: uniqueOteSpeakingTasks("part3Summary"),
+  parts45: uniqueOteSpeakingTasks("parts45"),
   mock: new Set(
-    oteMockAttempts
+    filteredOteMockAttempts
       .filter((attempt) => (attempt.module || "speaking") === "speaking")
       .map((attempt) => attempt.mockId || attempt.id)
       .filter(Boolean)
@@ -925,7 +1036,7 @@ const oteSpeakingProgress = {
 };
 const oteWritingProgress = {
   mock: new Set(
-    oteWriting
+    filteredOteWriting
       .filter((entry) => entry.type !== "ote-writing-practice")
       .map((entry) => entry.mockId || entry.id)
       .filter(Boolean)
@@ -934,7 +1045,7 @@ const oteWritingProgress = {
     oteWritingPracticeGroups.map((group) => [
       group.id,
       new Set(
-        oteWriting
+        filteredOteWriting
           .filter((entry) => entry.type === "ote-writing-practice" && entry.practiceSection === group.id)
           .map((entry) => entry.practiceTaskId || entry.id)
           .filter(Boolean)
@@ -1000,7 +1111,9 @@ const formatOteSpeakingPart = (part) => {
   if (value === "part2" || value === "part-2") return "Part 2";
   if (value === "part3" || value === "part-3") return "Part 3";
   if (value === "part4" || value === "part-4") return "Part 4";
+  if (value === "part5" || value === "part-5") return "Part 5";
   if (value === "parts-3-4" || value === "part34" || value === "part-3-4") return "Parts 3 and 4";
+  if (value === "parts-4-5" || value === "part45" || value === "part-4-5") return "Parts 4 and 5";
   return part || "Speaking";
 };
 
@@ -1147,6 +1260,29 @@ const formatOteSpeakingPart = (part) => {
 
       {isOteProfile && (
         <>
+          <section className="ote-profile-mode-card">
+            <div>
+              <div className="feedback-credit-eyebrow">OTE workspace</div>
+              <strong>{activeOteVariantLabel}</strong>
+              <p className="muted small">
+                Your profile is currently showing {activeOteVariantLabel.toLowerCase()} OTE speaking and writing work.
+              </p>
+            </div>
+            <div className="ote-profile-mode-actions" role="group" aria-label="Choose OTE profile mode">
+              {["general", "advanced"].map((variant) => (
+                <button
+                  key={variant}
+                  type="button"
+                  className={`btn ${oteProfileVariant === variant ? "is-active" : ""}`}
+                  onClick={() => handleOteProfileVariantChange(variant)}
+                  disabled={oteProfileVariantBusy}
+                >
+                  {variant === "advanced" ? "Advanced" : "General"}
+                </button>
+              ))}
+            </div>
+          </section>
+
           <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
             <button
               type="button"
@@ -1155,7 +1291,7 @@ const formatOteSpeakingPart = (part) => {
               onClick={() => setShowOteSpeakingPanel((s) => !s)}
             >
               <h3 className="sec-title" style={{ margin: 0 }}>
-                OTE Speaking
+                OTE {activeOteVariantLabel} Speaking
               </h3>
 
               <span className="muted small" style={{ flexShrink: 0 }}>
@@ -1172,22 +1308,39 @@ const formatOteSpeakingPart = (part) => {
                 <div className="pbar-group">
                   <ProgressBar
                     value={oteSpeakingProgress.part1}
-                    max={OTE_SPEAKING_TOTALS.part1}
-                    label="Part 1 interview sets"
-                    right={`${oteSpeakingProgress.part1}/${OTE_SPEAKING_TOTALS.part1}`}
+                    max={OTE_SPEAKING_TOTALS[oteProfileVariant].part1}
+                    label={oteProfileVariant === "advanced" ? "Part 1 advanced interview sets" : "Part 1 interview sets"}
+                    right={`${oteSpeakingProgress.part1}/${OTE_SPEAKING_TOTALS[oteProfileVariant].part1}`}
                   />
                   <ProgressBar
                     value={oteSpeakingProgress.part2}
-                    max={OTE_SPEAKING_TOTALS.part2}
-                    label="Part 2 voicemail sets"
-                    right={`${oteSpeakingProgress.part2}/${OTE_SPEAKING_TOTALS.part2}`}
+                    max={OTE_SPEAKING_TOTALS[oteProfileVariant].part2}
+                    label={oteProfileVariant === "advanced" ? "Part 2 diplomatic voicemail sets" : "Part 2 voicemail sets"}
+                    right={`${oteSpeakingProgress.part2}/${OTE_SPEAKING_TOTALS[oteProfileVariant].part2}`}
                   />
-                  <ProgressBar
-                    value={oteSpeakingProgress.parts34}
-                    max={OTE_SPEAKING_TOTALS.parts34}
-                    label="Parts 3 and 4 sets"
-                    right={`${oteSpeakingProgress.parts34}/${OTE_SPEAKING_TOTALS.parts34}`}
-                  />
+                  {oteProfileVariant === "advanced" ? (
+                    <>
+                      <ProgressBar
+                        value={oteSpeakingProgress.part3Summary}
+                        max={OTE_SPEAKING_TOTALS.advanced.part3Summary}
+                        label="Part 3 summary sets"
+                        right={`${oteSpeakingProgress.part3Summary}/${OTE_SPEAKING_TOTALS.advanced.part3Summary}`}
+                      />
+                      <ProgressBar
+                        value={oteSpeakingProgress.parts45}
+                        max={OTE_SPEAKING_TOTALS.advanced.parts45}
+                        label="Parts 4 and 5 debate sets"
+                        right={`${oteSpeakingProgress.parts45}/${OTE_SPEAKING_TOTALS.advanced.parts45}`}
+                      />
+                    </>
+                  ) : (
+                    <ProgressBar
+                      value={oteSpeakingProgress.parts34}
+                      max={OTE_SPEAKING_TOTALS.general.parts34}
+                      label="Parts 3 and 4 sets"
+                      right={`${oteSpeakingProgress.parts34}/${OTE_SPEAKING_TOTALS.general.parts34}`}
+                    />
+                  )}
                   <ProgressBar
                     value={oteSpeakingProgress.mock}
                     max={oteSpeakingMockTotal || 1}
@@ -1267,13 +1420,13 @@ const formatOteSpeakingPart = (part) => {
                   </ul>
                 )}
 
-                {oteMockAttempts.length ? (
+                {filteredOteMockAttempts.length ? (
                   <>
                     <h4 className="inner-title" style={{ marginTop: "1rem" }}>
                       Full speaking mock results
                     </h4>
                     <ul className="wlist" style={{ marginTop: ".5rem" }}>
-                      {oteMockAttempts.map((attempt) => {
+                      {filteredOteMockAttempts.map((attempt) => {
                         const when = attempt.createdAt?.toDate?.()
                           ? attempt.createdAt.toDate().toLocaleString()
                           : attempt.createdAt || "—";
@@ -1318,7 +1471,7 @@ const formatOteSpeakingPart = (part) => {
               onClick={() => setShowOteWritingPanel((s) => !s)}
             >
               <h3 className="sec-title" style={{ margin: 0 }}>
-                OTE Writing
+                OTE {activeOteVariantLabel} Writing
               </h3>
 
               <span className="muted small" style={{ flexShrink: 0 }}>
@@ -1350,13 +1503,13 @@ const formatOteSpeakingPart = (part) => {
                   ))}
                 </div>
 
-                {!oteWriting.length ? (
+                {!filteredOteWriting.length ? (
                   <p className="muted" style={{ marginTop: ".5rem" }}>
                     No OTE writing submissions saved yet.
                   </p>
                 ) : (
                   <ul className="wlist" style={{ marginTop: ".5rem" }}>
-                    {oteWriting.map((s, idx) => {
+                    {filteredOteWriting.map((s, idx) => {
                       const when = s.createdAt?.toDate?.()
                         ? s.createdAt.toDate().toLocaleString()
                         : s.createdAt || "—";
@@ -3392,6 +3545,11 @@ function StyleScope() {
         border-radius:10px;
         cursor:pointer
       }
+      .btn.is-active{
+        background:#fdbf2d;
+        border-color:#fdbf2d;
+        color:#101828;
+      }
 
       .pbar-group{ display:grid; gap:.6rem; }
       .hub-grammar-profile-card{
@@ -3897,6 +4055,36 @@ function StyleScope() {
   border-radius: 14px;
 }
 
+.ote-profile-mode-card{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:14px;
+  margin:0 0 14px;
+  padding:14px;
+  border:1px solid rgba(253,191,45,.28);
+  background:rgba(10,21,40,.62);
+  border-radius:14px;
+}
+
+.ote-profile-mode-card strong{
+  display:block;
+  color:#e6f0ff;
+  font-size:1.15rem;
+  margin-bottom:4px;
+}
+
+.ote-profile-mode-card p{
+  margin:0;
+}
+
+.ote-profile-mode-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:flex-end;
+}
+
 .feedback-credit-eyebrow{
   color:#9fb4da;
   font-size:.74rem;
@@ -4002,9 +4190,15 @@ function StyleScope() {
 }
 
 @media(max-width:640px){
-  .feedback-credit-card{
+  .feedback-credit-card,
+  .ote-profile-mode-card{
     align-items:flex-start;
     flex-direction:column;
+  }
+
+  .ote-profile-mode-actions{
+    width:100%;
+    justify-content:flex-start;
   }
 }
 
@@ -4024,7 +4218,7 @@ function StyleScope() {
   opacity: 1;
 }
 
-:root[data-theme="light"] .profile-page :is(.card, .panel, .account-strip, .profile-avatar-strip, .feedback-credit-card) {
+:root[data-theme="light"] .profile-page :is(.card, .panel, .account-strip, .profile-avatar-strip, .feedback-credit-card, .ote-profile-mode-card) {
   background: var(--color-surface-2) !important;
   border-color: var(--color-border) !important;
   color: var(--color-text) !important;
@@ -4092,6 +4286,12 @@ function StyleScope() {
   background: var(--color-surface-2) !important;
   border-color: var(--color-border-strong) !important;
   color: var(--color-text) !important;
+}
+
+:root[data-theme="light"] .profile-page .btn.is-active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #101828;
 }
 
 :root[data-theme="light"] .profile-page .account-strip-error {
