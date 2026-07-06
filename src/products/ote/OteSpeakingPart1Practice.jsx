@@ -12,6 +12,7 @@ import {
 import { getSitePath } from "../../siteConfig.js";
 import { OTE_SPEAKING_AUDIO } from "./mockTests/data/oteSpeakingMockData.js";
 import { recordingsToFeedbackAudio } from "./utils/speakingFeedback.js";
+import OteAssignableCard from "./OteAssignableCard.jsx";
 import "./styles/ote.css";
 
 const MIME_CANDIDATES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
@@ -563,6 +564,19 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
   const activeQuestion = questions[questionIndex];
   const complete = selectedSet && recordings.length >= questions.length;
   const progressPercent = questions.length ? ((questionIndex + 1) / questions.length) * 100 : 0;
+  const assignmentVariant = isAdvanced ? "advanced" : "general";
+
+  function buildAssignmentItem(set) {
+    return {
+      id: `ote.${assignmentVariant}.speaking.part1.practice.${set.id}`,
+      variant: assignmentVariant,
+      category: "Speaking",
+      label: `Part 1: ${set.title}`,
+      routePath: getSetPath(set.id),
+      progressId: `speaking.part1.practice.${set.id}`,
+      parentProgressId: "speaking.part1.practice",
+    };
+  }
 
   useEffect(() => {
     return () => {
@@ -826,11 +840,17 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
         </header>
         <div className="ote-practice-set-grid">
           {activeSets.map((set, index) => (
-            <button className="ote-practice-set-card" key={set.id} type="button" onClick={() => navigate(getSetPath(set.id))}>
+            <OteAssignableCard
+              key={set.id}
+              user={user}
+              item={buildAssignmentItem(set)}
+              className="ote-practice-set-card"
+              onClick={() => navigate(getSetPath(set.id))}
+            >
               <span>Set {index + 1}</span>
               <h2>{set.title}</h2>
               <p>{set.description}</p>
-            </button>
+            </OteAssignableCard>
           ))}
         </div>
       </main>

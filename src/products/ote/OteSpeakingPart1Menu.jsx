@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { useOteTrainingProgress, useOteTrainingSummary } from "./utils/trainingProgress.js";
+import OteAssignableCard from "./OteAssignableCard.jsx";
+import { getOteAssignmentItem } from "./data/oteAssignmentCatalog.js";
 import "./styles/ote.css";
 
 export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
@@ -41,6 +43,15 @@ export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
   const practiceComplete = completedProgress.has("speaking.part1.practice");
+  const assignmentVariant = isAdvanced ? "advanced" : "general";
+  const overviewAssignment = getOteAssignmentItem(
+    isAdvanced ? "ote.advanced.speaking.part1.overview" : "ote.general.speaking.part1.overview",
+    { variant: assignmentVariant, nativeRoutes }
+  );
+  const practiceAssignment = getOteAssignmentItem(
+    isAdvanced ? "ote.advanced.speaking.part1.practice" : "ote.general.speaking.part1.practice",
+    { variant: assignmentVariant, nativeRoutes }
+  );
 
   return (
     <main className="ote-training-page">
@@ -75,10 +86,11 @@ export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
           const Icon = activity.icon;
           const isComplete = completedProgress.has(activity.progressId);
           return (
-            <button
+            <OteAssignableCard
               key={activity.progressId}
+              user={user}
+              item={overviewAssignment}
               className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
-              type="button"
               onClick={() => navigate(activity.path)}
             >
               {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
@@ -86,7 +98,7 @@ export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
               <span>{activity.label}</span>
               <h2>{activity.title}</h2>
               <p>{activity.copy}</p>
-            </button>
+            </OteAssignableCard>
           );
         })}
       </div>
@@ -102,9 +114,10 @@ export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
             ? "Training complete. Now practise timed interview sets."
             : "Review the Part 1 format, then move into timed interview practice."}
         </p>
-        <button
+        <OteAssignableCard
+          user={user}
+          item={practiceAssignment}
           className={`ote-practice-set-card ote-writing-practice-entry-card ${practiceComplete ? "is-complete" : ""}`}
-          type="button"
           onClick={() => navigate(practicePath)}
         >
           {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
@@ -116,7 +129,7 @@ export default function OteSpeakingPart1Menu({ user, nativeRoutes = false }) {
               ? "Practise two fixed warm-up questions and four Advanced interview questions with recordings."
               : "Practise two fixed warm-up questions and six topic questions with recordings."}
           </p>
-        </button>
+        </OteAssignableCard>
       </section>
     </main>
   );

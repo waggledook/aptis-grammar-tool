@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { getOteWritingPracticeGroup } from "./mockTests/data/oteWritingPracticeData.js";
+import OteAssignableCard from "./OteAssignableCard.jsx";
 import "./styles/ote.css";
 
 export default function OteWritingPracticeMenu({ user, nativeRoutes = false }) {
@@ -20,6 +21,21 @@ export default function OteWritingPracticeMenu({ user, nativeRoutes = false }) {
       : nativeRoutes ? `/writing/training/${group.id}` : `/ote/writing/training/${group.id}`
   );
   const basePath = nativeRoutes ? `/writing/training/${group.id}/practice` : `/ote/writing/training/${group.id}/practice`;
+  const variant = groupIsAdvanced ? "advanced" : "general";
+
+  function buildAssignmentItem(set) {
+    const routePath = getSitePath(`${basePath}/${set.id}`);
+    const parentProgressId = `writing.${group.id}.practice`;
+    return {
+      id: `ote.${variant}.writing.${group.id}.practice.${set.id}`,
+      variant,
+      category: "Writing",
+      label: `${group.label}: ${set.title}`,
+      routePath,
+      progressId: `${parentProgressId}.${set.id}`,
+      parentProgressId,
+    };
+  }
 
   if (!groupMatchesVariant) {
     return (
@@ -70,7 +86,14 @@ export default function OteWritingPracticeMenu({ user, nativeRoutes = false }) {
               </div>
               <div className="ote-practice-set-grid">
                 {sets.map((set, index) => (
-                  <PracticeSetCard key={set.id} set={set} index={index} onClick={() => navigate(getSitePath(`${basePath}/${set.id}`))} />
+                  <PracticeSetCard
+                    key={set.id}
+                    user={user}
+                    item={buildAssignmentItem(set)}
+                    set={set}
+                    index={index}
+                    onClick={() => navigate(getSitePath(`${basePath}/${set.id}`))}
+                  />
                 ))}
               </div>
             </section>
@@ -79,7 +102,14 @@ export default function OteWritingPracticeMenu({ user, nativeRoutes = false }) {
       ) : (
         <div className="ote-practice-set-grid">
           {group.sets.map((set, index) => (
-            <PracticeSetCard key={set.id} set={set} index={index} onClick={() => navigate(getSitePath(`${basePath}/${set.id}`))} />
+            <PracticeSetCard
+              key={set.id}
+              user={user}
+              item={buildAssignmentItem(set)}
+              set={set}
+              index={index}
+              onClick={() => navigate(getSitePath(`${basePath}/${set.id}`))}
+            />
           ))}
         </div>
       )}
@@ -120,15 +150,15 @@ function getMenuGroups(sets = []) {
     .filter(Boolean);
 }
 
-function PracticeSetCard({ set, index, onClick }) {
+function PracticeSetCard({ user, item, set, index, onClick }) {
   return (
-    <button className="ote-practice-set-card" type="button" onClick={onClick}>
+    <OteAssignableCard user={user} item={item} className="ote-practice-set-card" onClick={onClick}>
       <span>{set.registerLabel ? `${set.registerLabel} ${index + 1}` : `${set.typeLabel || "Set"} ${index + 1}`}</span>
       <h2>{set.title}</h2>
       {set.theme ? <strong className="ote-practice-set-theme">{set.theme}</strong> : null}
       <p>
         {Math.round(set.timeSeconds / 60)} minutes. Write {set.minWords}-{set.maxWords} words.
       </p>
-    </button>
+    </OteAssignableCard>
   );
 }

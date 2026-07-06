@@ -5,6 +5,8 @@ import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { getOteWritingPracticeGroup } from "./mockTests/data/oteWritingPracticeData.js";
 import { useOteTrainingProgress, useOteTrainingSummary } from "./utils/trainingProgress.js";
+import OteAssignableCard from "./OteAssignableCard.jsx";
+import { getOteAssignmentItems } from "./data/oteAssignmentCatalog.js";
 import "./styles/ote.css";
 
 const TRAINING_SECTIONS = {
@@ -176,6 +178,11 @@ export default function OteWritingTrainingMenu({ user, nativeRoutes = false }) {
   const summary = useOteTrainingSummary(normalizedActivities, completedProgress);
   const practiceProgressId = `writing.${practiceGroup.id}.practice`;
   const practiceComplete = completedProgress.has(practiceProgressId);
+  const assignmentItems = getOteAssignmentItems({
+    variant: groupIsAdvanced ? "advanced" : "general",
+    nativeRoutes,
+  });
+  const assignmentByProgressId = Object.fromEntries(assignmentItems.map((item) => [item.progressId, item]));
 
   if (!groupMatchesVariant) {
     return (
@@ -230,10 +237,11 @@ export default function OteWritingTrainingMenu({ user, nativeRoutes = false }) {
           const route = normalized.route || "";
           const isComplete = normalized.progressId && completedProgress.has(normalized.progressId);
           return (
-            <button
+            <OteAssignableCard
               key={normalized.title}
+              user={user}
+              item={assignmentByProgressId[normalized.progressId]}
               className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
-              type="button"
               disabled={!route}
               onClick={route ? () => navigate(getSitePath(`${trainingBasePath}/${route}`)) : undefined}
             >
@@ -242,7 +250,7 @@ export default function OteWritingTrainingMenu({ user, nativeRoutes = false }) {
               <span>{normalized.label || `Activity ${index + 1}`}</span>
               <h2>{normalized.title}</h2>
               <p>{normalized.copy}</p>
-            </button>
+            </OteAssignableCard>
           );
         })}
       </div>
@@ -254,9 +262,10 @@ export default function OteWritingTrainingMenu({ user, nativeRoutes = false }) {
             ? "Training complete. Now choose a timed task and practise under exam conditions."
             : "Complete the training lessons above, then move into timed exam-style practice."}
         </p>
-        <button
+        <OteAssignableCard
+          user={user}
+          item={assignmentByProgressId[practiceProgressId]}
           className={`ote-practice-set-card ote-writing-practice-entry-card ${practiceComplete ? "is-complete" : ""}`}
-          type="button"
           onClick={() => navigate(practiceMenuPath)}
         >
           {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
@@ -264,7 +273,7 @@ export default function OteWritingTrainingMenu({ user, nativeRoutes = false }) {
           <span>Practice</span>
           <h2>{config.practiceTitle}</h2>
           <p>{config.practiceCopy}</p>
-        </button>
+        </OteAssignableCard>
       </section>
     </main>
   );

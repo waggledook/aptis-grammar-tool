@@ -17,6 +17,7 @@ import {
   fetchVocabProgressMap,
   fetchSpeakingProgressMap,
   fetchReadingProgressMap,
+  fetchOteTrainingProgressMap,
   fetchRecentVocabProgress,
   listAssignedActivitiesForStudent,
   listGrammarSetAttemptsForStudent,
@@ -651,11 +652,12 @@ useEffect(() => {
     }
 
     try {
-      const [assignments, vocabProgress, speakingProgress, readingProgress, dictationSessions, translationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+      const [assignments, vocabProgress, speakingProgress, readingProgress, oteTrainingProgress, dictationSessions, translationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
         listAssignedActivitiesForStudent(user.uid),
         fetchVocabProgressMap(user.uid),
         fetchSpeakingProgressMap(user.uid),
         fetchReadingProgressMap(user.uid),
+        fetchOteTrainingProgressMap(user.uid),
         fetchHubDictationSessions(200, user.uid),
         fetchHubTranslationSessions(200, user.uid),
         fetchHubGrammarSubmissions(200, user.uid),
@@ -672,6 +674,7 @@ useEffect(() => {
         vocabulary: vocabProgress || {},
         speaking: speakingProgress || {},
         reading: readingProgress || {},
+        oteTraining: oteTrainingProgress || {},
         dictation: buildLatestMap(dictationSessions || [], "assignmentId"),
         translation: buildLatestMap(translationSessions || [], "assignmentId"),
         miniTests: buildLatestMap(miniTests || [], "activityId"),
@@ -756,6 +759,10 @@ useEffect(() => {
         }
         if (assignment.activityType === "translation") {
           return (completionSources.translation?.[assignment.id] || 0) < assignedAt;
+        }
+        if (assignment.activityType === "ote-training") {
+          const progressId = assignment.progressId || assignment.taskId || assignment.activityId;
+          return timestampToMs(completionSources.oteTraining?.[progressId]) < assignedAt;
         }
         return true;
       }).length;
@@ -1379,7 +1386,7 @@ return (
   <Route path="/ote/speaking/part-2-voicemails/practice/:setId" element={<OteSpeakingPart2Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/part-3-summary/practice" element={<OteSpeakingPart3SummaryPractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/part-3-summary/practice/:setId" element={<OteSpeakingPart3SummaryPractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
-  <Route path="/ote/speaking/parts-4-5-debate" element={<OteSpeakingPart45DebateMenu nativeRoutes={false} />} />
+  <Route path="/ote/speaking/parts-4-5-debate" element={<OteSpeakingPart45DebateMenu user={user} nativeRoutes={false} />} />
   <Route path="/ote/speaking/parts-4-5-debate/overview" element={<OteSpeakingPart45DebateGuide nativeRoutes={false} />} />
   <Route path="/ote/speaking/parts-4-5-debate/practice" element={<OteSpeakingPart45DebatePractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/parts-4-5-debate/practice/:setId" element={<OteSpeakingPart45DebatePractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
@@ -1529,7 +1536,7 @@ return (
   <Route path="/speaking/part-2-voicemails/practice/:setId" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/speaking/part-3-summary/practice" element={<OteSpeakingPart3SummaryPractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/speaking/part-3-summary/practice/:setId" element={<OteSpeakingPart3SummaryPractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
-  <Route path="/speaking/parts-4-5-debate" element={<OteSpeakingPart45DebateMenu nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/parts-4-5-debate" element={<OteSpeakingPart45DebateMenu user={user} nativeRoutes={isOteSite} />} />
   <Route path="/speaking/parts-4-5-debate/overview" element={<OteSpeakingPart45DebateGuide nativeRoutes={isOteSite} />} />
   <Route path="/speaking/parts-4-5-debate/practice" element={<OteSpeakingPart45DebatePractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/speaking/parts-4-5-debate/practice/:setId" element={<OteSpeakingPart45DebatePractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />

@@ -8,6 +8,7 @@ import {
   fetchHubTranslationSessions,
   fetchHubFlashcardSessions,
   fetchHubGrammarSubmissions,
+  fetchOteTrainingProgressMap,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
   fetchWritingP3Submissions,
@@ -81,6 +82,8 @@ function getAssignmentTypeLabel(type) {
       return "Dictation task";
     case "translation":
       return "Translation task";
+    case "ote-training":
+      return "OTE activity";
     case "vocabulary-topic":
       return "Vocabulary set";
     default:
@@ -225,6 +228,12 @@ function resolveAssignedCompletion(assignment, sources) {
     return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
   }
 
+  if (assignment?.activityType === "ote-training") {
+    const progressId = assignment.progressId || assignment.taskId || assignment.activityId;
+    const completedAt = timestampToMs(sources.oteTraining?.[progressId]);
+    return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
+  }
+
   return { completed: false, completedAt: 0 };
 }
 
@@ -249,13 +258,14 @@ export default function HubYourClass({ user }) {
 
       setLoading(true);
       try {
-        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, readingProgress, dictationSessions, translationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, readingProgress, oteTrainingProgress, dictationSessions, translationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
           listStudentCourseTestSessions(user.uid),
           listStudentCourseTestAttempts(user.uid),
           listAssignedActivitiesForStudent(user.uid),
           fetchVocabProgressMap(user.uid),
           fetchSpeakingProgressMap(user.uid),
           fetchReadingProgressMap(user.uid),
+          fetchOteTrainingProgressMap(user.uid),
           fetchHubDictationSessions(200, user.uid),
           fetchHubTranslationSessions(200, user.uid),
           fetchHubFlashcardSessions(200, user.uid),
@@ -280,6 +290,7 @@ export default function HubYourClass({ user }) {
           vocabulary: vocabProgress || {},
           speaking: speakingProgress || {},
           reading: readingProgress || {},
+          oteTraining: oteTrainingProgress || {},
           dictation: buildLatestTimeMap(dictationSessions || [], "assignmentId"),
           translation: buildLatestTimeMap(translationSessions || [], "assignmentId"),
           flashcards: {

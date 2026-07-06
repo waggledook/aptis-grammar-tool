@@ -1022,13 +1022,15 @@ function getOteTrainingProgressId(details = {}) {
   }
 
   if (section === "writing") {
+    const practiceSection = String(details.practiceSection || details.sectionId || "").toLowerCase();
+    if (practiceSection === "advanced-essay") return "writing.advanced-essay.practice";
+    if (practiceSection === "advanced-summary") return "writing.advanced-summary.practice";
     if (part === "part-1" || part === "part1") {
       if (mode.includes("register_rewrite") || taskId === "register-rewrite") return "writing.email.register-basics";
       if (mode.includes("register_gap") || taskId === "register-gaps") return "writing.email.register-gaps";
       if (mode.includes("practice") || taskId) return "writing.email.practice";
     }
     if (part === "part-2" || part === "part2") {
-      const practiceSection = String(details.practiceSection || details.sectionId || "").toLowerCase();
       if (practiceSection === "essay") return "writing.essay.practice";
       if (practiceSection === "article-review") return "writing.article-review.practice";
       if (mode.includes("intro") || taskId === "introductions-conclusions") return "writing.essay.introductions-conclusions";
@@ -1045,23 +1047,36 @@ export async function markOteTrainingProgress(details = {}) {
   const user = auth.currentUser;
   const progressId = getOteTrainingProgressId(details);
   if (!user || !progressId) return null;
+  const taskKey = String(details.taskId || details.setId || "").trim();
+  const specificProgressId =
+    taskKey && progressId.endsWith(".practice") ? `${progressId}.${taskKey}` : "";
 
-  await setDoc(
-    doc(db, "users", user.uid, "oteTrainingProgress", progressId),
-    {
-      progressId,
-      product: "ote",
-      section: details.section || "",
-      part: details.part || "",
-      mode: details.mode || details.activity || "",
-      taskId: details.taskId || details.setId || "",
-      taskTitle: details.taskTitle || details.setTitle || "",
-      completed: true,
-      completedAt: serverTimestamp(),
-      updatedAt: serverTimestamp(),
-    },
-    { merge: true }
-  );
+  const baseData = {
+    progressId,
+    product: "ote",
+    section: details.section || "",
+    part: details.part || "",
+    mode: details.mode || details.activity || "",
+    taskId: details.taskId || details.setId || "",
+    taskTitle: details.taskTitle || details.setTitle || "",
+    completed: true,
+    completedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+
+  await setDoc(doc(db, "users", user.uid, "oteTrainingProgress", progressId), baseData, { merge: true });
+
+  if (specificProgressId && specificProgressId !== progressId) {
+    await setDoc(
+      doc(db, "users", user.uid, "oteTrainingProgress", specificProgressId),
+      {
+        ...baseData,
+        progressId: specificProgressId,
+        parentProgressId: progressId,
+      },
+      { merge: true }
+    );
+  }
   return progressId;
 }
 
@@ -1081,6 +1096,21 @@ export async function fetchOteTrainingProgress(uid) {
   );
 }
 
+export async function fetchOteTrainingProgressMap(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return {};
+
+  const snap = await getDocs(collection(db, "users", realUid, "oteTrainingProgress"));
+  return snap.docs.reduce((acc, entry) => {
+    const data = entry.data() || {};
+    if (data.completed === false) return acc;
+    const progressId = data.progressId || entry.id;
+    if (!progressId) return acc;
+    acc[progressId] = data.completedAt || data.updatedAt || data.createdAt || null;
+    return acc;
+  }, {});
+}
+
 export async function logOteTrainingStarted(details = {}) {
   return logOteActivity("ote_training_started", details);
 }
@@ -1095,6 +1125,26 @@ export async function logOteMockStarted(details = {}) {
 }
 
 export async function logOteMockCompleted(details = {}) {
+  const module = String(details.module || "").toLowerCase();
+  const mockId = String(details.mockId || "").toLowerCase();
+  const progressId =
+    module === "speaking" && mockId
+      ? `ote.mock.${mockId}`
+      : module === "writing"
+        ? mockId.includes("advanced")
+          ? "ote.mock.writing-advanced"
+          : "ote.mock.writing-general"
+        : "";
+  if (progressId) {
+    await markOteTrainingProgress({
+      ...details,
+      progressId,
+      section: module,
+      mode: "mock_test",
+      taskId: mockId,
+      taskTitle: details.mockTitle || "",
+    });
+  }
   return logOteActivity("ote_mock_completed", details);
 }
 

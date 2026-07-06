@@ -12,6 +12,7 @@ import {
 import { getSitePath } from "../../siteConfig.js";
 import { OTE_SPEAKING_AUDIO } from "./mockTests/data/oteSpeakingMockData.js";
 import { recordingsToFeedbackAudio } from "./utils/speakingFeedback.js";
+import OteAssignableCard from "./OteAssignableCard.jsx";
 import "./styles/ote.css";
 
 const MIME_CANDIDATES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
@@ -310,6 +311,18 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
   const recording = recordings[0] || null;
   const complete = Boolean(recording);
 
+  function buildAssignmentItem(set) {
+    return {
+      id: `ote.advanced.speaking.part3.practice.${set.id}`,
+      variant: "advanced",
+      category: "Speaking",
+      label: `Part 3 Summary: ${set.title}`,
+      routePath: getSetPath(set.id),
+      progressId: `speaking.parts34.practice.${set.id}`,
+      parentProgressId: "speaking.parts34.practice",
+    };
+  }
+
   useEffect(() => {
     return () => {
       window.clearInterval(timerRef.current);
@@ -567,11 +580,17 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
         </header>
         <div className="ote-practice-set-grid">
           {SUMMARY_PRACTICE_SETS.map((set, index) => (
-            <button className="ote-practice-set-card" key={set.id} type="button" onClick={() => navigate(getSetPath(set.id))}>
+            <OteAssignableCard
+              key={set.id}
+              user={user}
+              item={buildAssignmentItem(set)}
+              className="ote-practice-set-card"
+              onClick={() => navigate(getSetPath(set.id))}
+            >
               <span>Set {index + 1}</span>
               <h2>{set.title}</h2>
               <p>{set.description}</p>
-            </button>
+            </OteAssignableCard>
           ))}
         </div>
       </main>

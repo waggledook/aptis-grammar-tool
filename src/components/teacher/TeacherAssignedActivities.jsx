@@ -8,6 +8,7 @@ import {
   fetchHubFlashcardSessions,
   fetchHubGrammarSubmissions,
   fetchHubTranslationSessions,
+  fetchOteTrainingProgressMap,
   fetchWritingP1Sessions,
   fetchWritingP2Submissions,
   fetchWritingP3Submissions,
@@ -22,6 +23,7 @@ import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
 import { HUB_GRAMMAR_FLASHCARD_DECKS } from "../../data/hubGrammarFlashcards.js";
 import { HUB_DICTATION_SETS } from "../../data/hubDictationSets.js";
 import { HUB_TRANSLATION_ALL_SET_ID, HUB_TRANSLATION_SETS } from "../../data/hubTranslationSets.js";
+import { getOteAssignmentItems } from "../../products/ote/data/oteAssignmentCatalog.js";
 import { PART2_TASKS } from "../speaking/banks/part2";
 import { PART3_TASKS } from "../speaking/banks/part3";
 import { PART4_TASKS } from "../speaking/banks/part4";
@@ -64,6 +66,8 @@ const READING_OPTIONS = [
   { id: "reading-part-3", label: "Aptis Reading Part 3", routePath: getSitePath("/reading/part3") },
   { id: "reading-part-4", label: "Aptis Reading Part 4", routePath: getSitePath("/reading/part4") },
 ];
+
+const OTE_ASSIGNMENT_OPTIONS = getOteAssignmentItems({ nativeRoutes: false });
 
 const ALL_DICTATION_SENTENCES = HUB_DICTATION_SETS.flatMap((set) =>
   (set.sentences || []).map((sentence, index) => ({
@@ -147,6 +151,8 @@ function getAssignmentTypeLabel(type) {
       return "Dictation task";
     case "translation":
       return "Translation task";
+    case "ote-training":
+      return "OTE activity";
     case "vocabulary-topic":
       return "Vocabulary set";
     default:
@@ -283,6 +289,12 @@ function resolveAssignmentCompletion(assignment, sources) {
     return { completed: completedAt >= assignedAt, completedAt };
   }
 
+  if (assignment?.activityType === "ote-training") {
+    const progressId = assignment.progressId || assignment.taskId || assignment.activityId;
+    const completedAt = timestampToMs(sources.oteTraining?.[progressId]);
+    return { completed: completedAt >= assignedAt, completedAt };
+  }
+
   return { completed: false, completedAt: 0 };
 }
 
@@ -363,10 +375,11 @@ export default function TeacherAssignedActivities({ user }) {
         const completionByStudentId = Object.fromEntries(
           await Promise.all(
             (studentRows || []).map(async (student) => {
-              const [vocabProgress, speakingProgress, readingProgress, dictationSessions, translationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+              const [vocabProgress, speakingProgress, readingProgress, oteTrainingProgress, dictationSessions, translationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
                 fetchVocabProgressMap(student.id),
                 fetchSpeakingProgressMap(student.id),
                 fetchReadingProgressMap(student.id),
+                fetchOteTrainingProgressMap(student.id),
                 fetchHubDictationSessions(200, student.id),
                 fetchHubTranslationSessions(200, student.id),
                 fetchHubFlashcardSessions(200, student.id),
@@ -384,6 +397,7 @@ export default function TeacherAssignedActivities({ user }) {
                   vocabulary: vocabProgress || {},
                   speaking: speakingProgress || {},
                   reading: readingProgress || {},
+                  oteTraining: oteTrainingProgress || {},
                   dictation: buildLatestTimeMap(dictationSessions || [], "assignmentId"),
                   translation: buildLatestTimeMap(translationSessions || [], "assignmentId"),
                   flashcards: {
@@ -420,7 +434,7 @@ export default function TeacherAssignedActivities({ user }) {
               const student = studentMap[studentId];
               const completion = resolveAssignmentCompletion(
                 assignment,
-                completionByStudentId[studentId] || { miniTests: {}, flashcards: {}, grammarSets: {}, writing: {}, speaking: {}, reading: {}, vocabulary: {}, dictation: {}, translation: {} }
+                completionByStudentId[studentId] || { miniTests: {}, flashcards: {}, grammarSets: {}, writing: {}, speaking: {}, reading: {}, vocabulary: {}, dictation: {}, translation: {}, oteTraining: {} }
               );
 
               return {
@@ -549,6 +563,7 @@ export default function TeacherAssignedActivities({ user }) {
     if (activityType === "writing") return WRITING_OPTIONS;
     if (activityType === "speaking") return SPEAKING_OPTIONS;
     if (activityType === "reading") return READING_OPTIONS;
+    if (activityType === "ote-training") return OTE_ASSIGNMENT_OPTIONS;
     return miniTestOptions;
   }, [activityType, dictationPresetOptions, flashcardDeckOptions, miniTestOptions, publishedGrammarSetOptions, useOfEnglishOptions]);
 
@@ -805,6 +820,9 @@ export default function TeacherAssignedActivities({ user }) {
         routePath,
         taskId: chosenWritingTask?.id || chosenSpeakingTask?.id || "",
         taskTitle: chosenWritingTask?.label || chosenSpeakingTask?.label || "",
+        progressId: activityType === "ote-training" ? chosenOption.progressId || chosenOption.id : "",
+        oteVariant: activityType === "ote-training" ? chosenOption.variant || "general" : "",
+        oteCategory: activityType === "ote-training" ? chosenOption.category || "" : "",
         targetMode,
         className: targetMode === "class" ? className : "",
         targetStudentIds,
@@ -920,7 +938,7 @@ export default function TeacherAssignedActivities({ user }) {
         <div className="teacher-assign-head">
           <div>
             <h3>Create an assigned activity</h3>
-            <p>Send mini tests, flashcards, grammar sets, Use of English sets, reading, writing, speaking, or dictation tasks to your class.</p>
+            <p>Send mini tests, flashcards, grammar sets, Use of English sets, OTE work, reading, writing, speaking, or dictation tasks to your class.</p>
           </div>
         </div>
 
@@ -936,6 +954,7 @@ export default function TeacherAssignedActivities({ user }) {
                   <option value="flashcards">Grammar flashcards</option>
                   <option value="grammar-set">Aptis grammar set</option>
                   <option value="use-of-english">Use of English set</option>
+                  <option value="ote-training">OTE activity</option>
                   <option value="writing">Writing task</option>
                   <option value="reading">Reading task</option>
                   <option value="speaking">Speaking task</option>

@@ -14,6 +14,170 @@
   --ote-dashboard-shadow-hover: 0 14px 28px rgba(0, 0, 0, 0.2);
 }
 
+.ote-assign-field span,
+.ote-assign-label {
+  color: rgba(232, 238, 247, 0.72);
+  font-size: 0.82rem;
+}
+
+.ote-assignable-card {
+  position: relative;
+  display: grid;
+  min-width: 0;
+}
+
+.ote-assignable-card > .ote-training-activity-card,
+.ote-assignable-card > .ote-practice-set-card {
+  width: 100%;
+  height: 100%;
+}
+
+.ote-assign-btn {
+  border: 1px solid rgba(124, 196, 255, 0.5);
+  border-radius: 999px;
+  background: rgba(124, 196, 255, 0.12);
+  color: #eaf5ff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  padding: 0.45rem 0.75rem;
+  white-space: nowrap;
+}
+
+.ote-assign-card-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 2;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+}
+
+.ote-assignable-card .ote-training-complete-icon {
+  right: 4.9rem;
+}
+
+.ote-assign-card-btn + .ote-assign-overlay,
+.ote-assignable-card .ote-assign-overlay {
+  position: fixed;
+}
+
+.ote-assign-btn:hover {
+  background: rgba(124, 196, 255, 0.2);
+}
+
+.ote-assign-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(7, 13, 27, 0.72);
+}
+
+.ote-assign-modal {
+  width: min(720px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+  padding: 1rem;
+  border: 1px solid rgba(125, 179, 255, 0.24);
+  border-radius: 8px;
+  background: #12213b;
+  color: #eaf1ff;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.35);
+}
+
+.ote-assign-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.ote-assign-head h3,
+.ote-assign-head p {
+  margin: 0;
+}
+
+.ote-assign-head p {
+  margin-top: 0.2rem;
+  color: #a9b7d1;
+}
+
+.ote-assign-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.9rem;
+}
+
+.ote-assign-field,
+.ote-assign-students {
+  display: grid;
+  gap: 0.45rem;
+  margin-bottom: 0.9rem;
+}
+
+.ote-assign-field select,
+.ote-assign-field textarea {
+  width: 100%;
+  border: 1px solid rgba(125, 179, 255, 0.26);
+  border-radius: 8px;
+  background: #0d1830;
+  color: #eaf1ff;
+  font: inherit;
+  padding: 0.7rem 0.8rem;
+}
+
+.ote-assign-student-list {
+  display: grid;
+  gap: 0.55rem;
+  max-height: 240px;
+  overflow: auto;
+  padding-right: 0.25rem;
+}
+
+.ote-assign-student-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgba(125, 179, 255, 0.14);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.ote-assign-student-item em {
+  margin-left: auto;
+  color: #8fb6ff;
+  font-size: 0.84rem;
+  font-style: normal;
+}
+
+.ote-assign-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 680px) {
+  .ote-assign-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ote-assign-actions .btn {
+    width: 100%;
+  }
+
+  .ote-assign-card-btn {
+    top: 0.6rem;
+    right: 0.6rem;
+  }
+}
+
 .ote-menu-wrapper,
 .ote-training-page,
 .ote-reference-page {
@@ -1031,7 +1195,7 @@
 }
 
 .ote-course-landing {
-  width: min(100%, 980px);
+  width: min(100%, 1120px);
   margin: 0 auto;
   padding: 1.25rem 0 3rem;
   color: var(--color-text);
@@ -1056,11 +1220,438 @@
   line-height: 1.6;
 }
 
+.ote-course-recommendation {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+  max-width: 820px;
+  margin-top: 1rem;
+  border: 1px solid rgba(246, 189, 96, 0.36);
+  border-radius: 8px;
+  background: rgba(246, 189, 96, 0.08);
+  padding: 0.9rem;
+}
+
+.ote-course-recommendation svg {
+  color: var(--color-accent);
+}
+
+.ote-course-recommendation strong,
+.ote-course-section-head h2,
+.ote-purchase-card h3,
+.ote-skill-purchase-grid h3,
+.ote-exam-price-grid h3 {
+  color: var(--color-text);
+}
+
+.ote-course-recommendation span {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
 .ote-course-actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   margin-top: 1.1rem;
+}
+
+.ote-course-section {
+  display: grid;
+  gap: 1rem;
+  padding: 1.2rem 0;
+  border-top: 1px solid var(--color-border);
+}
+
+.ote-course-section-head {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.ote-course-section-head span {
+  color: var(--color-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ote-course-section-head h2 {
+  margin: 0;
+  font-size: clamp(1.45rem, 3vw, 2rem);
+  text-align: left;
+}
+
+.ote-adventure-panel {
+  gap: 1.1rem;
+}
+
+.ote-adventure-step,
+.ote-adventure-summary {
+  display: grid;
+  gap: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-adventure-step-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.ote-adventure-step-head > span {
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid rgba(246, 189, 96, 0.42);
+  border-radius: 999px;
+  color: var(--color-accent);
+  font-weight: 900;
+}
+
+.ote-adventure-step-head h3,
+.ote-adventure-summary h3 {
+  margin: 0;
+  color: var(--color-text);
+  font-size: 1.18rem;
+  text-align: left;
+}
+
+.ote-adventure-step-head p,
+.ote-adventure-summary p {
+  margin: 0.25rem 0 0;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-adventure-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ote-adventure-step:first-of-type .ote-adventure-choice-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ote-adventure-choice,
+.ote-adventure-skill,
+.ote-trainer-toggle {
+  display: grid;
+  gap: 0.35rem;
+  align-content: start;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: rgba(74, 107, 192, 0.08);
+  color: var(--color-text);
+  padding: 0.85rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ote-adventure-choice:hover,
+.ote-adventure-choice:focus-visible,
+.ote-adventure-skill:hover,
+.ote-adventure-skill:focus-visible,
+.ote-trainer-toggle:hover,
+.ote-trainer-toggle:focus-visible {
+  border-color: rgba(246, 189, 96, 0.5);
+  outline: none;
+}
+
+.ote-adventure-choice.is-selected,
+.ote-adventure-skill.is-selected,
+.ote-trainer-toggle.is-selected {
+  border-color: rgba(246, 189, 96, 0.78);
+  background: linear-gradient(135deg, rgba(246, 189, 96, 0.14), rgba(74, 107, 192, 0.1));
+  box-shadow: 0 0 0 1px rgba(246, 189, 96, 0.16);
+}
+
+.ote-adventure-choice span {
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(246, 189, 96, 0.1);
+  color: var(--color-accent);
+  padding: 0.2rem 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-adventure-choice strong,
+.ote-adventure-skill strong,
+.ote-trainer-toggle strong {
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.ote-adventure-choice b,
+.ote-trainer-toggle b {
+  color: var(--color-accent);
+  font-size: 1.05rem;
+}
+
+.ote-adventure-choice small,
+.ote-adventure-skill small {
+  color: var(--color-text-soft);
+  line-height: 1.4;
+}
+
+.ote-adventure-choice em {
+  color: var(--color-accent);
+  font-style: normal;
+  font-weight: 900;
+}
+
+.ote-adventure-skill-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.ote-adventure-skill svg {
+  color: var(--color-accent);
+}
+
+.ote-trainer-toggle {
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+}
+
+.ote-trainer-toggle span {
+  width: fit-content;
+  border-radius: 999px;
+  background: rgba(246, 189, 96, 0.1);
+  color: var(--color-accent);
+  padding: 0.22rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.ote-trainer-included-note {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  border: 1px solid rgba(246, 189, 96, 0.36);
+  border-radius: 8px;
+  background: rgba(246, 189, 96, 0.08);
+  padding: 0.75rem;
+}
+
+.ote-trainer-included-note svg {
+  color: var(--color-accent);
+}
+
+.ote-trainer-included-note strong {
+  display: block;
+  color: var(--color-text);
+}
+
+.ote-trainer-included-note span {
+  display: block;
+  margin-top: 0.15rem;
+  color: var(--color-text-soft);
+  line-height: 1.4;
+}
+
+.ote-adventure-summary {
+  grid-template-columns: minmax(0, 1.35fr) minmax(220px, 0.8fr) auto auto;
+  align-items: center;
+  border-color: rgba(246, 189, 96, 0.45);
+  background: linear-gradient(90deg, rgba(246, 189, 96, 0.1), rgba(74, 107, 192, 0.08));
+}
+
+.ote-adventure-summary > div > span {
+  color: var(--color-accent);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ote-adventure-summary dl {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0;
+}
+
+.ote-adventure-summary dl div {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.ote-adventure-summary dt {
+  color: var(--color-text-soft);
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.ote-adventure-summary dd {
+  margin: 0;
+  color: var(--color-text);
+  font-weight: 800;
+}
+
+.ote-adventure-price {
+  color: var(--color-accent);
+  font-size: 1.35rem;
+  white-space: nowrap;
+}
+
+.ote-level-primary.is-disabled,
+.ote-level-primary[aria-disabled="true"] {
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.ote-course-package-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.ote-purchase-card,
+.ote-skill-purchase-grid article,
+.ote-exam-price-grid article {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+}
+
+.ote-purchase-card {
+  display: grid;
+  gap: 0.75rem;
+  align-content: start;
+  padding: 1rem;
+}
+
+.ote-purchase-card.is-recommended {
+  border-color: rgba(246, 189, 96, 0.7);
+  box-shadow: 0 0 0 1px rgba(246, 189, 96, 0.18);
+}
+
+.ote-purchase-badge {
+  justify-self: start;
+  border: 1px solid rgba(246, 189, 96, 0.34);
+  border-radius: 999px;
+  background: rgba(246, 189, 96, 0.1);
+  color: var(--color-accent);
+  padding: 0.25rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 900;
+}
+
+.ote-purchase-card h3,
+.ote-skill-purchase-grid h3,
+.ote-exam-price-grid h3 {
+  margin: 0;
+  text-align: left;
+  line-height: 1.18;
+}
+
+.ote-purchase-card p,
+.ote-skill-purchase-grid p,
+.ote-exam-price-grid p {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+}
+
+.ote-purchase-price {
+  color: var(--color-accent);
+  font-size: 1.2rem;
+}
+
+.ote-purchase-card ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--color-text-soft);
+}
+
+.ote-purchase-action,
+.ote-skill-purchase-grid a,
+.ote-exam-price-grid a {
+  display: inline-flex;
+  gap: 0.45rem;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-height: 42px;
+  border-radius: 8px;
+  background: var(--color-accent);
+  color: #13213b;
+  padding: 0.62rem 0.82rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.ote-skill-purchase-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.ote-skill-purchase-grid article {
+  display: grid;
+  gap: 0.55rem;
+  align-content: start;
+  padding: 0.95rem;
+}
+
+.ote-skill-purchase-grid svg {
+  color: var(--color-accent);
+}
+
+.ote-exam-price-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.ote-exam-price-grid article {
+  display: grid;
+  gap: 0.65rem;
+  align-content: start;
+  border-top: 5px solid var(--color-accent);
+  padding: 1rem;
+  text-align: center;
+}
+
+.ote-exam-price-grid h3 {
+  min-height: 3.4em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.ote-exam-price-grid span {
+  color: var(--color-text);
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+.ote-exam-price-grid strong {
+  color: var(--color-accent);
+  font-size: 2.15rem;
+  line-height: 1;
+}
+
+.ote-exam-price-grid a {
+  justify-self: center;
+  width: 100%;
+  background: #082a55;
+  color: #ffffff;
 }
 
 .ote-course-fit {
@@ -6697,8 +7288,18 @@
   .ote-register-email-grid,
   .ote-register-feedback,
   .ote-register-ai-head,
-  .ote-register-ai-gap-list {
+  .ote-register-ai-gap-list,
+  .ote-course-package-grid,
+  .ote-skill-purchase-grid,
+  .ote-adventure-choice-grid,
+  .ote-adventure-step:first-of-type .ote-adventure-choice-grid,
+  .ote-adventure-skill-grid,
+  .ote-adventure-summary {
     grid-template-columns: 1fr;
+  }
+
+  .ote-exam-price-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .ote-writing-summary-layout {
@@ -6880,6 +7481,20 @@
 }
 
 @media (max-width: 720px) {
+  .ote-exam-price-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-exam-price-grid h3 {
+    min-height: auto;
+  }
+
+  .ote-purchase-action,
+  .ote-skill-purchase-grid a,
+  .ote-exam-price-grid a {
+    width: 100%;
+  }
+
   .ote-debate-practice-page .ote-recorder-top {
     grid-template-columns: 1fr;
   }

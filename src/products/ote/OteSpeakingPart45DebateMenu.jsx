@@ -4,9 +4,11 @@ import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { useOteTrainingProgress, useOteTrainingSummary } from "./utils/trainingProgress.js";
+import OteAssignableCard from "./OteAssignableCard.jsx";
+import { getOteAssignmentItems } from "./data/oteAssignmentCatalog.js";
 import "./styles/ote.css";
 
-export default function OteSpeakingPart45DebateMenu({ nativeRoutes = false }) {
+export default function OteSpeakingPart45DebateMenu({ user, nativeRoutes = false }) {
   const navigate = useNavigate();
   const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
   const overviewPath = getSitePath(
@@ -31,6 +33,8 @@ export default function OteSpeakingPart45DebateMenu({ nativeRoutes = false }) {
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
   const practiceComplete = completedProgress.has("speaking.parts45.practice");
+  const assignmentItems = getOteAssignmentItems({ variant: "advanced", nativeRoutes });
+  const assignmentByProgressId = Object.fromEntries(assignmentItems.map((item) => [item.progressId, item]));
 
   return (
     <main className="ote-training-page">
@@ -65,10 +69,11 @@ export default function OteSpeakingPart45DebateMenu({ nativeRoutes = false }) {
           const Icon = activity.icon;
           const isComplete = completedProgress.has(activity.progressId);
           return (
-            <button
+            <OteAssignableCard
               key={activity.progressId}
+              user={user}
+              item={assignmentByProgressId[activity.progressId]}
               className={`ote-training-activity-card ${isComplete ? "is-complete" : ""}`}
-              type="button"
               onClick={() => navigate(activity.path)}
             >
               {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
@@ -76,7 +81,7 @@ export default function OteSpeakingPart45DebateMenu({ nativeRoutes = false }) {
               <span>{activity.label}</span>
               <h2>{activity.title}</h2>
               <p>{activity.copy}</p>
-            </button>
+            </OteAssignableCard>
           );
         })}
       </div>
@@ -88,9 +93,10 @@ export default function OteSpeakingPart45DebateMenu({ nativeRoutes = false }) {
             ? "Guide complete. Now practise full debate and follow-up sets, or jump straight to Part 5 questions."
             : "Work through the debate strategy guide, then practise timed Parts 4 and 5 sets."}
         </p>
-        <button
+        <OteAssignableCard
+          user={user}
+          item={assignmentByProgressId["speaking.parts45.practice"]}
           className={`ote-practice-set-card ote-writing-practice-entry-card ${practiceComplete ? "is-complete" : ""}`}
-          type="button"
           onClick={() => navigate(practicePath)}
         >
           {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
@@ -98,7 +104,7 @@ export default function OteSpeakingPart45DebateMenu({ nativeRoutes = false }) {
           <span>Practice</span>
           <h2>Timed Debate Sets</h2>
           <p>Practise a two-minute debate, then answer four related follow-up questions with recordings.</p>
-        </button>
+        </OteAssignableCard>
       </section>
     </main>
   );
