@@ -40,6 +40,14 @@ export default function OteSpeakingPart2Menu({ user, nativeRoutes = false }) {
               path: introPath,
               progressId: "speaking.part2.advanced-overview",
             },
+            {
+              label: "Reference",
+              title: "Diplomatic Voice Message Cheat Sheet",
+              copy: "Review Advanced diplomatic phrases, planning questions, model answers, and final reminders.",
+              icon: FileText,
+              path: cheatSheetPath,
+              progressId: "speaking.part2.advanced-cheat-sheet",
+            },
           ]
         : [
             {

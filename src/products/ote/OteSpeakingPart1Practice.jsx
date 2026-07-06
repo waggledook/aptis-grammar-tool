@@ -13,6 +13,7 @@ import { getSitePath } from "../../siteConfig.js";
 import { OTE_SPEAKING_AUDIO } from "./mockTests/data/oteSpeakingMockData.js";
 import { recordingsToFeedbackAudio } from "./utils/speakingFeedback.js";
 import OteAssignableCard from "./OteAssignableCard.jsx";
+import { useOteTrainingProgress } from "./utils/trainingProgress.js";
 import "./styles/ote.css";
 
 const MIME_CANDIDATES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
@@ -543,6 +544,7 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
   const selectedSet = useMemo(() => activeSets.find((item) => item.id === setId), [activeSets, setId]);
   const questions = useMemo(() => buildQuestions(selectedSet), [selectedSet]);
   const instructions = isAdvanced ? ADVANCED_PART1_INSTRUCTIONS : PART1_INSTRUCTIONS;
+  const completedProgress = useOteTrainingProgress();
 
   const [questionIndex, setQuestionIndex] = useState(0);
   const [phase, setPhase] = useState("ready");
@@ -844,9 +846,12 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
               key={set.id}
               user={user}
               item={buildAssignmentItem(set)}
-              className="ote-practice-set-card"
+              className={`ote-practice-set-card ${completedProgress.has(`speaking.part1.practice.${set.id}`) ? "is-complete" : ""}`}
               onClick={() => navigate(getSetPath(set.id))}
             >
+              {completedProgress.has(`speaking.part1.practice.${set.id}`) ? (
+                <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" />
+              ) : null}
               <span>Set {index + 1}</span>
               <h2>{set.title}</h2>
               <p>{set.description}</p>

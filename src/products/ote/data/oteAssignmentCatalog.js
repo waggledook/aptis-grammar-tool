@@ -50,6 +50,14 @@ const OTE_ASSIGNMENT_ITEMS = [
     progressId: "speaking.part2.guided-message-2",
   },
   {
+    id: "ote.general.speaking.part2.cheat-sheet",
+    variant: "general",
+    category: "Speaking",
+    label: "Part 2 Cheat Sheet",
+    routePath: "/ote/speaking/part-2-voicemails/cheat-sheet",
+    progressId: "speaking.part2.cheat-sheet",
+  },
+  {
     id: "ote.general.speaking.part2.practice",
     variant: "general",
     category: "Speaking",
@@ -208,6 +216,14 @@ const OTE_ASSIGNMENT_ITEMS = [
     label: "Advanced Part 2 Voice Message Guide",
     routePath: "/ote/speaking/part-2-voicemails/overview",
     progressId: "speaking.part2.advanced-overview",
+  },
+  {
+    id: "ote.advanced.speaking.part2.cheat-sheet",
+    variant: "advanced",
+    category: "Speaking",
+    label: "Advanced Part 2 Diplomatic Cheat Sheet",
+    routePath: "/ote/speaking/part-2-voicemails/cheat-sheet",
+    progressId: "speaking.part2.advanced-cheat-sheet",
   },
   {
     id: "ote.advanced.speaking.part2.practice",

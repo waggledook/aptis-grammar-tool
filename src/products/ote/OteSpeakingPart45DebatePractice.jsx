@@ -13,6 +13,7 @@ import { getSitePath } from "../../siteConfig.js";
 import { OTE_SPEAKING_AUDIO } from "./mockTests/data/oteSpeakingMockData.js";
 import { recordingsToFeedbackAudio } from "./utils/speakingFeedback.js";
 import OteAssignButton from "./OteAssignButton.jsx";
+import { useOteTrainingProgress } from "./utils/trainingProgress.js";
 import "./styles/ote.css";
 
 const MIME_CANDIDATES = ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
@@ -343,6 +344,7 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
   const getSetPath = (id, query = "") => getSitePath(`${rawBasePath}/${id}${query}`);
   const selectedSet = useMemo(() => DEBATE_PRACTICE_SETS.find((item) => item.id === setId), [setId]);
   const steps = useMemo(() => buildSteps(selectedSet, initialMode), [selectedSet, initialMode]);
+  const completedProgress = useOteTrainingProgress();
 
   const [stepIndex, setStepIndex] = useState(0);
   const [phase, setPhase] = useState("ready");
@@ -661,8 +663,14 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
         </header>
         <div className="ote-practice-set-grid">
           {DEBATE_PRACTICE_SETS.map((set, index) => (
-            <article className="ote-practice-set-card ote-debate-set-card" key={set.id}>
+            <article
+              className={`ote-practice-set-card ote-debate-set-card ${completedProgress.has(`speaking.parts45.practice.${set.id}`) ? "is-complete" : ""}`}
+              key={set.id}
+            >
               <OteAssignButton user={user} item={buildAssignmentItem(set)} className="ote-assign-btn ote-assign-card-btn" />
+              {completedProgress.has(`speaking.parts45.practice.${set.id}`) ? (
+                <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" />
+              ) : null}
               <span>Set {index + 1}</span>
               <h2>{set.title}</h2>
               <p>{set.description}</p>

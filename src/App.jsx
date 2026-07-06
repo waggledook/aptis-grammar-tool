@@ -1376,11 +1376,7 @@ return (
   />
   <Route
     path="/ote/speaking/part-2-voicemails/cheat-sheet"
-    element={
-      user?.oteVersion === "advanced"
-        ? <Navigate to={getSitePath("/ote/speaking/part-2-voicemails")} replace />
-        : <OteSpeakingPart2CheatSheet nativeRoutes={false} />
-    }
+    element={<OteSpeakingPart2CheatSheet nativeRoutes={false} user={user} />}
   />
   <Route path="/ote/speaking/part-2-voicemails/practice" element={<OteSpeakingPart2Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/part-2-voicemails/practice/:setId" element={<OteSpeakingPart2Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
@@ -1526,11 +1522,7 @@ return (
   />
   <Route
     path="/speaking/part-2-voicemails/cheat-sheet"
-    element={
-      user?.oteVersion === "advanced"
-        ? <Navigate to={getSitePath("/speaking/part-2-voicemails")} replace />
-        : <OteSpeakingPart2CheatSheet nativeRoutes={isOteSite} />
-    }
+    element={<OteSpeakingPart2CheatSheet nativeRoutes={isOteSite} user={user} />}
   />
   <Route path="/speaking/part-2-voicemails/practice" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/speaking/part-2-voicemails/practice/:setId" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />

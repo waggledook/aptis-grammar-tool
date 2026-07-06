@@ -1,10 +1,11 @@
 import React from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { getOteWritingPracticeGroup } from "./mockTests/data/oteWritingPracticeData.js";
 import OteAssignableCard from "./OteAssignableCard.jsx";
+import { useOteTrainingProgress } from "./utils/trainingProgress.js";
 import "./styles/ote.css";
 
 export default function OteWritingPracticeMenu({ user, nativeRoutes = false }) {
@@ -22,6 +23,7 @@ export default function OteWritingPracticeMenu({ user, nativeRoutes = false }) {
   );
   const basePath = nativeRoutes ? `/writing/training/${group.id}/practice` : `/ote/writing/training/${group.id}/practice`;
   const variant = groupIsAdvanced ? "advanced" : "general";
+  const completedProgress = useOteTrainingProgress();
 
   function buildAssignmentItem(set) {
     const routePath = getSitePath(`${basePath}/${set.id}`);
@@ -90,6 +92,7 @@ export default function OteWritingPracticeMenu({ user, nativeRoutes = false }) {
                     key={set.id}
                     user={user}
                     item={buildAssignmentItem(set)}
+                    isComplete={completedProgress.has(`writing.${group.id}.practice.${set.id}`)}
                     set={set}
                     index={index}
                     onClick={() => navigate(getSitePath(`${basePath}/${set.id}`))}
@@ -106,6 +109,7 @@ export default function OteWritingPracticeMenu({ user, nativeRoutes = false }) {
               key={set.id}
               user={user}
               item={buildAssignmentItem(set)}
+              isComplete={completedProgress.has(`writing.${group.id}.practice.${set.id}`)}
               set={set}
               index={index}
               onClick={() => navigate(getSitePath(`${basePath}/${set.id}`))}
@@ -150,9 +154,15 @@ function getMenuGroups(sets = []) {
     .filter(Boolean);
 }
 
-function PracticeSetCard({ user, item, set, index, onClick }) {
+function PracticeSetCard({ user, item, isComplete, set, index, onClick }) {
   return (
-    <OteAssignableCard user={user} item={item} className="ote-practice-set-card" onClick={onClick}>
+    <OteAssignableCard
+      user={user}
+      item={item}
+      className={`ote-practice-set-card ${isComplete ? "is-complete" : ""}`}
+      onClick={onClick}
+    >
+      {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
       <span>{set.registerLabel ? `${set.registerLabel} ${index + 1}` : `${set.typeLabel || "Set"} ${index + 1}`}</span>
       <h2>{set.title}</h2>
       {set.theme ? <strong className="ote-practice-set-theme">{set.theme}</strong> : null}

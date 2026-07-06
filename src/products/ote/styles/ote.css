@@ -3221,6 +3221,12 @@
   line-height: 1.55;
 }
 
+.ote-reference-hero .ote-reference-timing {
+  margin-top: 0.55rem;
+  color: var(--color-accent);
+  font-weight: 800;
+}
+
 .ote-reference-section {
   padding: 1.1rem;
 }
@@ -3293,6 +3299,24 @@
   padding-left: 1.05rem;
   color: var(--color-text-soft);
   line-height: 1.42;
+}
+
+.ote-reference-frame p,
+.ote-reference-reminders {
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-reference-frame p {
+  margin: 0;
+}
+
+.ote-reference-reminders {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+  margin: 0;
+  padding-left: 1.1rem;
 }
 
 .ote-reference-example p {
