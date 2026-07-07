@@ -245,9 +245,11 @@ function getSupportedMimeType() {
 function useSpeech() {
   const [speakingId, setSpeakingId] = useState("");
   const audioRef = useRef(null);
+  const finishRef = useRef(null);
 
   useEffect(() => {
     return () => {
+      finishRef.current?.(false);
       window.speechSynthesis?.cancel();
       audioRef.current?.pause();
     };
@@ -265,9 +267,11 @@ function useSpeech() {
         settled = true;
         audio.pause();
         audioRef.current = null;
+        finishRef.current = null;
         setSpeakingId("");
         resolve(played);
       };
+      finishRef.current = finish;
       audioRef.current = audio;
       audio.onended = () => finish(true);
       audio.onerror = () => finish(false);
@@ -283,11 +287,16 @@ function useSpeech() {
     audioRef.current?.pause();
     window.speechSynthesis.cancel();
     return new Promise((resolve) => {
+      let settled = false;
       const utterance = new SpeechSynthesisUtterance(text);
       const finish = () => {
+        if (settled) return;
+        settled = true;
+        finishRef.current = null;
         setSpeakingId("");
         resolve(true);
       };
+      finishRef.current = finish;
       utterance.lang = "en-GB";
       utterance.rate = 0.94;
       utterance.onend = finish;
@@ -298,6 +307,8 @@ function useSpeech() {
   }
 
   function stop() {
+    finishRef.current?.(false);
+    finishRef.current = null;
     audioRef.current?.pause();
     audioRef.current = null;
     window.speechSynthesis?.cancel();
@@ -404,6 +415,9 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
   const [feedbackError, setFeedbackError] = useState("");
 
   const streamRef = useRef(null);
+  const activeRunStreamRef = useRef(null);
+  const skipListeningRef = useRef(false);
+  const skipThinkingRef = useRef(false);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -475,6 +489,9 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
     setPart3FeedbackResult(null);
     setPart4FeedbackResult(null);
     setFeedbackError("");
+    activeRunStreamRef.current = null;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     objectUrlsRef.current = [];
     activityStartedRef.current = false;
@@ -540,10 +557,26 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
   }
 
   async function runPrep(seconds, stream, step) {
+    if (!seconds) return startRecording(stream, step);
+    skipThinkingRef.current = false;
+    setPhase("thinking");
+    setSecondsLeft(seconds);
     await playAudioFile(`think-auto-${step.id}`, OTE_SPEAKING_AUDIO.timeToThink);
+    if (skipListeningRef.current || skipThinkingRef.current) return null;
     return new Promise((resolve) => {
       startCountdown(seconds, "thinking", () => resolve(startRecording(stream, step)));
     });
+  }
+
+  function listeningWasSkipped(stream, step) {
+    if (!skipListeningRef.current) return false;
+    skipListeningRef.current = false;
+    if (step.kind === "talk") {
+      runPrep(step.prepSeconds, stream, step);
+    } else {
+      startRecording(stream, step);
+    }
+    return true;
   }
 
   async function startStep() {
@@ -551,6 +584,9 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
     if (!activeStep || phase === "listening" || phase === "thinking" || phase === "recording") return;
     const stream = await ensureStream();
     if (!stream) return;
+    activeRunStreamRef.current = stream;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
     if (!activityStartedRef.current) {
       activityStartedRef.current = true;
       logOteTrainingStarted({
@@ -568,11 +604,13 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
       setPhase("listening");
       setSecondsLeft(0);
       await playAudioFile(`instructions-${activeStep.id}`, OTE_SPEAKING_AUDIO.part3Instructions);
+      if (listeningWasSkipped(stream, activeStep)) return;
       if (activeStep.audioSrc) {
         await playAudioFile(activeStep.id, activeStep.audioSrc);
       } else {
         await speak(activeStep.id, activeStep.prompt);
       }
+      if (listeningWasSkipped(stream, activeStep)) return;
       await runPrep(activeStep.prepSeconds, stream, activeStep);
       setFlowStep(null);
       return;
@@ -580,36 +618,18 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
 
     setPhase("listening");
     setSecondsLeft(0);
-    await playAudioFile("part-4-instructions", OTE_SPEAKING_AUDIO.part4Instructions);
-    for (let index = stepIndex; index < steps.length; index += 1) {
-      const step = steps[index];
-      if (step.kind !== "question") continue;
-      setStepIndex(index);
-      setFlowStep(step);
-      setPhase("listening");
-      setSecondsLeft(0);
-      if (step.audioSrc) {
-        await playAudioFile(step.id, step.audioSrc);
-      } else {
-        await speak(step.id, step.prompt);
-      }
-      await startRecording(stream, step);
-      await new Promise((resolve) => window.setTimeout(resolve, 450));
+    if (stepIndex === 1) {
+      await playAudioFile("part-4-instructions", OTE_SPEAKING_AUDIO.part4Instructions);
+      if (listeningWasSkipped(stream, activeStep)) return;
     }
-    setFlowStep(null);
-    setPhase("complete");
-    setSecondsLeft(0);
-    if (!activityCompletedRef.current) {
-      activityCompletedRef.current = true;
-      logOteTrainingCompleted({
-        section: "speaking",
-        part: "parts-3-4",
-        mode: recordings.some((recording) => recording.partId === "part-3") ? "talk_follow_up_practice" : "follow_up_practice",
-        setId: selectedSet.id,
-        setTitle: selectedSet.title,
-        recordingCount: recordings.length,
-      });
+    setFlowStep(activeStep);
+    if (activeStep.audioSrc) {
+      await playAudioFile(activeStep.id, activeStep.audioSrc);
+    } else {
+      await speak(activeStep.id, activeStep.prompt);
     }
+    if (listeningWasSkipped(stream, activeStep)) return;
+    await startRecording(stream, activeStep);
   }
 
   function startRecording(stream, step = activeStep) {
@@ -656,6 +676,40 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
   function stopRecordingNow() {
     clearTimer();
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
+  }
+
+  function skipToNextPhase() {
+    if (phase === "listening") {
+      skipListeningRef.current = true;
+      stop();
+      return;
+    }
+    if (phase === "thinking") {
+      clearTimer();
+      skipThinkingRef.current = true;
+      startRecording(activeRunStreamRef.current || streamRef.current, visibleStep);
+      return;
+    }
+    if (phase === "recording") stopRecordingNow();
+  }
+
+  function repeatVisibleStep() {
+    if (!visibleStep) return;
+    clearTimer();
+    stop();
+    const recording = recordings.find((item) => item.stepId === visibleStep.id);
+    if (recording?.url) URL.revokeObjectURL(recording.url);
+    objectUrlsRef.current = objectUrlsRef.current.filter((url) => url !== recording?.url);
+    setRecordings((current) => current.filter((item) => item.stepId !== visibleStep.id));
+    setFlowStep(null);
+    setPhase("ready");
+    setSecondsLeft(visibleStep.prepSeconds || visibleStep.responseSeconds || 30);
+    activeRunStreamRef.current = null;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
+    setPart3FeedbackResult(null);
+    setPart4FeedbackResult(null);
+    setFeedbackError("");
   }
 
   function skipToPart4() {
@@ -811,7 +865,7 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
       </header>
 
       <section className="ote-practice-runner">
-        {!complete && visibleStep && (
+        {!complete && phase !== "complete" && visibleStep && (
           <article className="ote-practice-task-card">
             <div className="ote-recorder-top">
               <div>
@@ -877,7 +931,7 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
             <div className="ote-recorder-actions">
               <button type="button" onClick={startStep} disabled={phase === "listening" || phase === "thinking" || phase === "recording"}>
                 <Mic size={18} aria-hidden="true" />
-                {phase === "listening" ? "Task running" : visibleStep.kind === "talk" ? "Start task" : "Start follow-up questions"}
+                {phase === "listening" ? "Task running" : visibleStep.kind === "talk" ? "Start task" : "Start question"}
               </button>
               {visibleStep.kind === "talk" && !activeRecording && phase === "ready" ? (
                 <button type="button" onClick={skipToPart4}>
@@ -889,6 +943,16 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
                   Stop recording
                 </button>
               )}
+              {phase === "listening" ? (
+                <button type="button" onClick={skipToNextPhase}>
+                  {visibleStep.kind === "talk" ? "Skip to thinking" : "Skip to recording"}
+                </button>
+              ) : null}
+              {phase === "thinking" ? (
+                <button type="button" onClick={skipToNextPhase}>
+                  Skip to recording
+                </button>
+              ) : null}
             </div>
 
             {activeRecording && (
@@ -905,6 +969,9 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
                 <button type="button" onClick={goNext}>
                   <CheckCircle2 size={18} aria-hidden="true" />
                   {visibleStep.kind === "talk" ? "Start Part 4" : stepIndex < steps.length - 1 ? "Next question" : "Finish set"}
+                </button>
+                <button type="button" onClick={repeatVisibleStep}>
+                  Record again
                 </button>
                 {visibleStep.kind === "talk" ? (
                   <button
@@ -945,6 +1012,13 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
               Download ZIP
             </button>
             <div className="ote-practice-complete-actions">
+              <button
+                className="ote-training-primary-link"
+                type="button"
+                onClick={repeatVisibleStep}
+              >
+                Record current task again
+              </button>
               <button
                 className="ote-training-primary-link"
                 type="button"

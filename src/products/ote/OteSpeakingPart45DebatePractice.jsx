@@ -156,9 +156,11 @@ function buildSteps(set, mode) {
 function useSpeech() {
   const [speakingId, setSpeakingId] = useState("");
   const audioRef = useRef(null);
+  const finishRef = useRef(null);
 
   useEffect(() => {
     return () => {
+      finishRef.current?.(false);
       window.speechSynthesis?.cancel();
       audioRef.current?.pause();
     };
@@ -176,9 +178,11 @@ function useSpeech() {
         settled = true;
         audio.pause();
         audioRef.current = null;
+        finishRef.current = null;
         setSpeakingId("");
         resolve(played);
       };
+      finishRef.current = finish;
       audioRef.current = audio;
       audio.onended = () => finish(true);
       audio.onerror = () => finish(false);
@@ -194,11 +198,16 @@ function useSpeech() {
     audioRef.current?.pause();
     window.speechSynthesis.cancel();
     return new Promise((resolve) => {
+      let settled = false;
       const utterance = new SpeechSynthesisUtterance(text);
       const finish = () => {
+        if (settled) return;
+        settled = true;
+        finishRef.current = null;
         setSpeakingId("");
         resolve(true);
       };
+      finishRef.current = finish;
       utterance.lang = "en-GB";
       utterance.rate = rate;
       utterance.onend = finish;
@@ -209,6 +218,8 @@ function useSpeech() {
   }
 
   function stop() {
+    finishRef.current?.(false);
+    finishRef.current = null;
     audioRef.current?.pause();
     audioRef.current = null;
     window.speechSynthesis?.cancel();
@@ -359,6 +370,9 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
   const [feedbackError, setFeedbackError] = useState("");
 
   const streamRef = useRef(null);
+  const activeRunStreamRef = useRef(null);
+  const skipListeningRef = useRef(false);
+  const skipThinkingRef = useRef(false);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -409,6 +423,9 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
     setPart4FeedbackResult(null);
     setPart5FeedbackResult(null);
     setFeedbackError("");
+    activeRunStreamRef.current = null;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
     activityStartedRef.current = false;
     activityCompletedRef.current = false;
     stop();
@@ -476,6 +493,9 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
     if (!selectedSet || !activeStep || ["listening", "thinking", "recording"].includes(phase)) return;
     const stream = await ensureStream();
     if (!stream) return;
+    activeRunStreamRef.current = stream;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
     if (!activityStartedRef.current) {
       activityStartedRef.current = true;
       logOteTrainingStarted({
@@ -491,17 +511,38 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
     setSecondsLeft(0);
     if (activeStep.kind === "debate") {
       await playAudioFile("debate-instructions", OTE_SPEAKING_AUDIO.debateAdvancedInstructions);
+      if (skipListeningRef.current) return beginThinkingPhase(stream, activeStep, { playCue: false });
       await speak("debate-task", buildDebateTaskSpeech(selectedSet), 0.92);
-      await playAudioFile("debate-prepare", OTE_SPEAKING_AUDIO.debatePrepareInstructions);
-      startCountdown(activeStep.prepSeconds, "thinking", () => startRecording(stream, activeStep));
+      if (skipListeningRef.current) return beginThinkingPhase(stream, activeStep, { playCue: false });
+      beginThinkingPhase(stream, activeStep);
     } else {
       if (stepIndex === (hasDebate ? 1 : 0)) {
         await playAudioFile("follow-up-instructions", OTE_SPEAKING_AUDIO.followUpAdvancedInstructions);
         await speak("follow-up-topic", selectedSet.followUpLead, 0.94);
+        if (skipListeningRef.current) {
+          skipListeningRef.current = false;
+          startRecording(stream, activeStep);
+          return;
+        }
       }
       await speak(activeStep.id, activeStep.prompt, 0.94);
+      if (skipListeningRef.current) {
+        skipListeningRef.current = false;
+        startRecording(stream, activeStep);
+        return;
+      }
       startRecording(stream, activeStep);
     }
+  }
+
+  async function beginThinkingPhase(stream, step, { playCue = true } = {}) {
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
+    setPhase("thinking");
+    setSecondsLeft(step.prepSeconds);
+    if (playCue) await playAudioFile("debate-prepare", OTE_SPEAKING_AUDIO.debatePrepareInstructions);
+    if (skipThinkingRef.current) return;
+    startCountdown(step.prepSeconds, "thinking", () => startRecording(stream, step));
   }
 
   function startRecording(stream, step) {
@@ -547,6 +588,39 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
   }
 
+  function skipToNextPhase() {
+    if (phase === "listening") {
+      skipListeningRef.current = true;
+      stop();
+      return;
+    }
+    if (phase === "thinking") {
+      clearTimer();
+      skipThinkingRef.current = true;
+      startRecording(activeRunStreamRef.current || streamRef.current, activeStep);
+      return;
+    }
+    if (phase === "recording") stopRecordingNow();
+  }
+
+  function repeatActiveStep() {
+    if (!activeStep) return;
+    clearTimer();
+    stop();
+    const recording = recordings.find((item) => item.stepId === activeStep.id);
+    if (recording?.url) URL.revokeObjectURL(recording.url);
+    objectUrlsRef.current = objectUrlsRef.current.filter((url) => url !== recording?.url);
+    setRecordings((current) => current.filter((item) => item.stepId !== activeStep.id));
+    setPhase("ready");
+    setSecondsLeft(activeStep.prepSeconds || activeStep.responseSeconds || 40);
+    activeRunStreamRef.current = null;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
+    setPart4FeedbackResult(null);
+    setPart5FeedbackResult(null);
+    setFeedbackError("");
+  }
+
   function goNext() {
     stop();
     if (stepIndex < steps.length - 1) {
@@ -587,6 +661,9 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
     setPart4FeedbackResult(null);
     setPart5FeedbackResult(null);
     setFeedbackError("");
+    activeRunStreamRef.current = null;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
     stop();
   }
 
@@ -782,6 +859,16 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
                   Stop recording
                 </button>
               ) : null}
+              {phase === "listening" ? (
+                <button type="button" onClick={skipToNextPhase}>
+                  {activeStep.kind === "debate" ? "Skip to thinking" : "Skip to recording"}
+                </button>
+              ) : null}
+              {phase === "thinking" ? (
+                <button type="button" onClick={skipToNextPhase}>
+                  Skip to recording
+                </button>
+              ) : null}
             </div>
 
             {notesOpen ? (
@@ -802,6 +889,9 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
                 <button type="button" onClick={goNext}>
                   <CheckCircle2 size={18} aria-hidden="true" />
                   {stepIndex < steps.length - 1 ? "Next task" : "Finish set"}
+                </button>
+                <button type="button" onClick={repeatActiveStep}>
+                  Record again
                 </button>
               </div>
             ) : null}
@@ -825,6 +915,9 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
               </button>
               <button className="ote-training-primary-link" type="button" onClick={resetSet}>
                 Try this set again
+              </button>
+              <button className="ote-training-primary-link" type="button" onClick={repeatActiveStep}>
+                Record current task again
               </button>
               {hasDebate ? (
                 <button

@@ -218,6 +218,14 @@ const OTE_ASSIGNMENT_ITEMS = [
     progressId: "speaking.part2.advanced-overview",
   },
   {
+    id: "ote.advanced.speaking.part2.guided-message",
+    variant: "advanced",
+    category: "Speaking",
+    label: "Advanced Part 2 Guided Diplomatic Message",
+    routePath: "/ote/speaking/part-2-voicemails/advanced-guided-message",
+    progressId: "speaking.part2.advanced-guided-message",
+  },
+  {
     id: "ote.advanced.speaking.part2.cheat-sheet",
     variant: "advanced",
     category: "Speaking",

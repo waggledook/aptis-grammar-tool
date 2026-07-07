@@ -245,6 +245,7 @@ const ADVANCED_PRACTICE_SETS = [
         label: "Voice message",
         title: "Assignment Example",
         audience: "Tutor",
+        taskAudioSrc: "/audio/ote/speaking/advanced/part2-prompts/advanced-set-1-message.mp3",
         lead:
           "You study at college. Your tutor, Dr Evans, has asked for permission to show your recent assignment to other students as an example. Your tutor would like to use it in next week's class. The assignment contains some personal information, so you do not want the current version to be shared. Leave a voice message for your tutor and:",
         bullets: [
@@ -268,6 +269,7 @@ const ADVANCED_PRACTICE_SETS = [
         label: "Voice message",
         title: "Silent Study Room",
         audience: "Student society organiser",
+        taskAudioSrc: "/audio/ote/speaking/advanced/part2-prompts/advanced-set-2-message.mp3",
         lead:
           "You study at college. A student you know, Maya, has arranged a society meeting in a study room tomorrow. You have discovered that the room is reserved for silent study, and the meeting may disturb other students. The college has recently received complaints about noise in this area. Leave a voice message for Maya and:",
         bullets: [
@@ -291,6 +293,7 @@ const ADVANCED_PRACTICE_SETS = [
         label: "Voice message",
         title: "Saturday Work Request",
         audience: "Manager",
+        taskAudioSrc: "/audio/ote/speaking/advanced/part2-prompts/advanced-set-3-message.mp3",
         lead:
           "You work for a company. Your manager, Karen Willis, has changed your work schedule at short notice and asked you to work on Saturday. The change was made because several employees are ill during a particularly busy week. You have an important personal commitment that day. Leave a voice message for your manager and:",
         bullets: [
@@ -314,6 +317,7 @@ const ADVANCED_PRACTICE_SETS = [
         label: "Voice message",
         title: "Report Accuracy Concern",
         audience: "Colleague",
+        taskAudioSrc: "/audio/ote/speaking/advanced/part2-prompts/advanced-set-4-message.mp3",
         lead:
           "You work for a company. Your colleague, Marcus, plans to send a report to a client this afternoon. You have noticed that some of the cost figures may be inaccurate, but Marcus believes the report should be sent immediately. The information could influence the client's decision. Leave a voice message for Marcus and:",
         bullets: [
@@ -337,6 +341,7 @@ const ADVANCED_PRACTICE_SETS = [
         label: "Voice message",
         title: "Training Schedule",
         audience: "Manager",
+        taskAudioSrc: "/audio/ote/speaking/advanced/part2-prompts/advanced-set-5-message.mp3",
         lead:
           "You work for a company. Your manager, Ms Patel, has asked you to train a new employee throughout next week. You are willing to help, but you also have an urgent project to finish by Friday. No other experienced employee is available for the whole week. Leave a voice message for your manager and:",
         bullets: [
@@ -368,9 +373,11 @@ function buildTaskSpeech(task) {
 function useSpeech() {
   const [speakingId, setSpeakingId] = useState("");
   const audioRef = useRef(null);
+  const finishRef = useRef(null);
 
   useEffect(() => {
     return () => {
+      finishRef.current?.(false);
       window.speechSynthesis?.cancel();
       audioRef.current?.pause();
     };
@@ -388,9 +395,11 @@ function useSpeech() {
         settled = true;
         audio.pause();
         audioRef.current = null;
+        finishRef.current = null;
         setSpeakingId("");
         resolve(played);
       };
+      finishRef.current = finish;
       audioRef.current = audio;
       audio.onended = () => finish(true);
       audio.onerror = () => finish(false);
@@ -406,10 +415,18 @@ function useSpeech() {
     audioRef.current?.pause();
     window.speechSynthesis.cancel();
     return new Promise((resolve) => {
+      let settled = false;
       const utterance = new SpeechSynthesisUtterance(text);
       const finish = () => {
+        if (settled) return;
+        settled = true;
+        finishRef.current = null;
         setSpeakingId("");
         resolve(true);
+      };
+      finishRef.current = () => {
+        finish();
+        return false;
       };
       utterance.lang = "en-GB";
       utterance.rate = 0.94;
@@ -426,6 +443,8 @@ function useSpeech() {
   }
 
   function stop() {
+    finishRef.current?.(false);
+    finishRef.current = null;
     audioRef.current?.pause();
     audioRef.current = null;
     window.speechSynthesis?.cancel();
@@ -533,6 +552,9 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
   const [feedbackError, setFeedbackError] = useState("");
 
   const streamRef = useRef(null);
+  const activeRunStreamRef = useRef(null);
+  const skipListeningRef = useRef(false);
+  const skipThinkingRef = useRef(false);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -572,6 +594,9 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     setMicError("");
     setFeedbackResult(null);
     setFeedbackError("");
+    activeRunStreamRef.current = null;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     objectUrlsRef.current = [];
     activityStartedRef.current = false;
@@ -636,11 +661,31 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     }, 1000);
   }
 
+  async function beginThinkingPhase(stream, { playCue = true } = {}) {
+    if (!stream) return;
+    skipThinkingRef.current = false;
+    setPhase("thinking");
+    setSecondsLeft(activeTask.prepSeconds || (isAdvanced ? 10 : 20));
+    if (playCue) await playAudioFile(`think-auto-${activeTask.id}`, OTE_SPEAKING_AUDIO.timeToThink);
+    if (skipListeningRef.current || skipThinkingRef.current) return;
+    startCountdown(activeTask.prepSeconds || (isAdvanced ? 10 : 20), "thinking", () => startRecording(stream));
+  }
+
+  function listeningWasSkipped(stream) {
+    if (!skipListeningRef.current) return false;
+    skipListeningRef.current = false;
+    beginThinkingPhase(stream, { playCue: false });
+    return true;
+  }
+
   async function startTask() {
     stop();
     if (!activeTask || phase === "listening" || phase === "thinking" || phase === "recording") return;
     const stream = await ensureStream();
     if (!stream) return;
+    activeRunStreamRef.current = stream;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
     if (!activityStartedRef.current) {
       activityStartedRef.current = true;
       logOteTrainingStarted({
@@ -660,19 +705,22 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
         ? OTE_SPEAKING_AUDIO.voicemailAdvancedInstructions
         : activeTask.type === "message-2" ? OTE_SPEAKING_AUDIO.voicemailInstructions2 : OTE_SPEAKING_AUDIO.voicemailInstructions1
     );
+    if (listeningWasSkipped(stream)) return;
     if (activeTask.taskAudioSrc) {
       await playAudioFile(`task-${activeTask.id}`, activeTask.taskAudioSrc);
     } else {
       await speak(`task-${activeTask.id}`, taskSpeech);
     }
+    if (listeningWasSkipped(stream)) return;
     if (activeTask.incomingAudioSrc) {
       await playAudioFile(`friend-cue-${activeTask.id}`, OTE_SPEAKING_AUDIO.nowListenToMessage);
+      if (listeningWasSkipped(stream)) return;
       await playAudioFile(`friend-${activeTask.id}`, activeTask.incomingAudioSrc);
     } else if (activeTask.friendMessage) {
       await playCueThenSpeak(`friend-${activeTask.id}`, OTE_SPEAKING_AUDIO.nowListenToMessage, activeTask.friendMessage);
     }
-    await playAudioFile(`think-auto-${activeTask.id}`, OTE_SPEAKING_AUDIO.timeToThink);
-    startCountdown(activeTask.prepSeconds || (isAdvanced ? 10 : 20), "thinking", () => startRecording(stream));
+    if (listeningWasSkipped(stream)) return;
+    await beginThinkingPhase(stream);
   }
 
   function startRecording(stream) {
@@ -715,6 +763,42 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
   function stopRecordingNow() {
     clearTimer();
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
+  }
+
+  function skipToNextPhase() {
+    if (phase === "listening") {
+      skipListeningRef.current = true;
+      setPhase("thinking");
+      setSecondsLeft(activeTask?.prepSeconds || (isAdvanced ? 10 : 20));
+      stop();
+      return;
+    }
+    if (phase === "thinking") {
+      clearTimer();
+      skipThinkingRef.current = true;
+      startRecording(activeRunStreamRef.current || streamRef.current);
+      return;
+    }
+    if (phase === "recording") {
+      stopRecordingNow();
+    }
+  }
+
+  function repeatActiveTask() {
+    if (!activeTask) return;
+    clearTimer();
+    stop();
+    const recording = recordings.find((item) => item.taskId === activeTask.id);
+    if (recording?.url) URL.revokeObjectURL(recording.url);
+    objectUrlsRef.current = objectUrlsRef.current.filter((url) => url !== recording?.url);
+    setRecordings((current) => current.filter((item) => item.taskId !== activeTask.id));
+    setPhase("ready");
+    setSecondsLeft(activeTask.prepSeconds || (isAdvanced ? 10 : 20));
+    activeRunStreamRef.current = null;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
+    setFeedbackResult(null);
+    setFeedbackError("");
   }
 
   function goNext() {
@@ -905,6 +989,16 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
                   Stop recording
                 </button>
               )}
+              {phase === "listening" ? (
+                <button type="button" onClick={skipToNextPhase}>
+                  Skip to thinking
+                </button>
+              ) : null}
+              {phase === "thinking" ? (
+                <button type="button" onClick={skipToNextPhase}>
+                  Skip to recording
+                </button>
+              ) : null}
             </div>
 
             {activeRecording && (
@@ -921,6 +1015,9 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
                 <button type="button" onClick={goNext}>
                   <CheckCircle2 size={18} aria-hidden="true" />
                   {activeIndex < selectedSet.tasks.length - 1 ? "Next voicemail" : "Finish set"}
+                </button>
+                <button type="button" onClick={repeatActiveTask}>
+                  Record again
                 </button>
               </div>
             )}
@@ -952,6 +1049,9 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
               disabled={!recordings.length || feedbackLoading}
             >
               {feedbackLoading ? "Generating feedback..." : "Get AI feedback"}
+            </button>
+            <button className="ote-training-primary-link" type="button" onClick={repeatActiveTask}>
+              Record current task again
             </button>
             {feedbackError ? <p className="ote-mic-error">{feedbackError}</p> : null}
             <SpeakingFeedbackPanel

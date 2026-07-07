@@ -21,6 +21,11 @@ export default function OteSpeakingPart2Menu({ user, nativeRoutes = false }) {
   const guidedMessage2Path = getSitePath(
     nativeRoutes ? "/speaking/part-2-voicemails/guided-message-2" : "/ote/speaking/part-2-voicemails/guided-message-2"
   );
+  const advancedGuidedPath = getSitePath(
+    nativeRoutes
+      ? "/speaking/part-2-voicemails/advanced-guided-message"
+      : "/ote/speaking/part-2-voicemails/advanced-guided-message"
+  );
   const cheatSheetPath = getSitePath(
     nativeRoutes ? "/speaking/part-2-voicemails/cheat-sheet" : "/ote/speaking/part-2-voicemails/cheat-sheet"
   );
@@ -39,6 +44,14 @@ export default function OteSpeakingPart2Menu({ user, nativeRoutes = false }) {
               icon: ClipboardList,
               path: introPath,
               progressId: "speaking.part2.advanced-overview",
+            },
+            {
+              label: "Activity 2",
+              title: "Guided Task: Diplomatic Voice Message",
+              copy: "Study three sample answers, fix diplomatic problems, then record your own 40-second message.",
+              icon: Mic,
+              path: advancedGuidedPath,
+              progressId: "speaking.part2.advanced-guided-message",
             },
             {
               label: "Reference",
@@ -83,7 +96,7 @@ export default function OteSpeakingPart2Menu({ user, nativeRoutes = false }) {
               progressId: "speaking.part2.cheat-sheet",
             },
           ],
-    [cheatSheetPath, guidedMessage2Path, guidedPath, introPath, isAdvanced]
+    [advancedGuidedPath, cheatSheetPath, guidedMessage2Path, guidedPath, introPath, isAdvanced]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
   const practiceComplete = completedProgress.has("speaking.part2.practice");

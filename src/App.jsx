@@ -192,6 +192,7 @@ import OteSpeakingPart2AdvancedGuide from "./products/ote/OteSpeakingPart2Advanc
 import OteSpeakingPart2Voicemails from "./products/ote/OteSpeakingPart2Voicemails.jsx";
 import OteSpeakingPart2GuidedMessage1 from "./products/ote/OteSpeakingPart2GuidedMessage1.jsx";
 import OteSpeakingPart2GuidedMessage2 from "./products/ote/OteSpeakingPart2GuidedMessage2.jsx";
+import OteSpeakingPart2AdvancedGuidedTask from "./products/ote/OteSpeakingPart2AdvancedGuidedTask.jsx";
 import OteSpeakingPart2CheatSheet from "./products/ote/OteSpeakingPart2CheatSheet.jsx";
 import OteSpeakingPart2Practice from "./products/ote/OteSpeakingPart2Practice.jsx";
 import OteSpeakingPart34Menu from "./products/ote/OteSpeakingPart34Menu.jsx";
@@ -1375,6 +1376,14 @@ return (
     }
   />
   <Route
+    path="/ote/speaking/part-2-voicemails/advanced-guided-message"
+    element={
+      user?.oteVersion === "advanced"
+        ? <OteSpeakingPart2AdvancedGuidedTask nativeRoutes={false} />
+        : <Navigate to={getSitePath("/ote/speaking/part-2-voicemails")} replace />
+    }
+  />
+  <Route
     path="/ote/speaking/part-2-voicemails/cheat-sheet"
     element={<OteSpeakingPart2CheatSheet nativeRoutes={false} user={user} />}
   />
@@ -1518,6 +1527,14 @@ return (
       user?.oteVersion === "advanced"
         ? <Navigate to={getSitePath("/speaking/part-2-voicemails")} replace />
         : <OteSpeakingPart2GuidedMessage2 nativeRoutes={isOteSite} />
+    }
+  />
+  <Route
+    path="/speaking/part-2-voicemails/advanced-guided-message"
+    element={
+      user?.oteVersion === "advanced"
+        ? <OteSpeakingPart2AdvancedGuidedTask nativeRoutes={isOteSite} />
+        : <Navigate to={getSitePath("/speaking/part-2-voicemails")} replace />
     }
   />
   <Route

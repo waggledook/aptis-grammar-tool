@@ -127,9 +127,11 @@ function buildTaskText(task) {
 function useSpeech() {
   const [speakingId, setSpeakingId] = useState("");
   const audioRef = useRef(null);
+  const finishRef = useRef(null);
 
   useEffect(() => {
     return () => {
+      finishRef.current?.(false);
       window.speechSynthesis?.cancel();
       audioRef.current?.pause();
     };
@@ -147,9 +149,11 @@ function useSpeech() {
         settled = true;
         audio.pause();
         audioRef.current = null;
+        finishRef.current = null;
         setSpeakingId("");
         resolve(played);
       };
+      finishRef.current = finish;
       audioRef.current = audio;
       audio.onended = () => finish(true);
       audio.onerror = () => finish(false);
@@ -165,11 +169,16 @@ function useSpeech() {
     audioRef.current?.pause();
     window.speechSynthesis.cancel();
     return new Promise((resolve) => {
+      let settled = false;
       const utterance = new SpeechSynthesisUtterance(text);
       const finish = () => {
+        if (settled) return;
+        settled = true;
+        finishRef.current = null;
         setSpeakingId("");
         resolve(true);
       };
+      finishRef.current = finish;
       utterance.lang = "en-GB";
       utterance.rate = rate;
       utterance.onend = finish;
@@ -180,6 +189,8 @@ function useSpeech() {
   }
 
   function stop() {
+    finishRef.current?.(false);
+    finishRef.current = null;
     audioRef.current?.pause();
     audioRef.current = null;
     window.speechSynthesis?.cancel();
@@ -303,6 +314,9 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
   const [feedbackError, setFeedbackError] = useState("");
 
   const streamRef = useRef(null);
+  const activeRunStreamRef = useRef(null);
+  const skipListeningRef = useRef(false);
+  const skipThinkingRef = useRef(false);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -346,6 +360,9 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
     setNotesDraft("");
     setFeedbackResult(null);
     setFeedbackError("");
+    activeRunStreamRef.current = null;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
     activityStartedRef.current = false;
     activityCompletedRef.current = false;
     stop();
@@ -413,6 +430,9 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
     if (!selectedSet || ["listening", "thinking", "recording"].includes(phase)) return;
     const stream = await ensureStream();
     if (!stream) return;
+    activeRunStreamRef.current = stream;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
     if (!activityStartedRef.current) {
       activityStartedRef.current = true;
       logOteTrainingStarted({
@@ -426,25 +446,39 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
     setPhase("listening");
     setSecondsLeft(0);
     await playAudioFile("summary-instructions", OTE_SPEAKING_AUDIO.summaryAdvancedInstructions);
+    if (skipListeningRef.current) return beginThinkingPhase(stream, { playCue: false });
     if (selectedSet.taskAudioSrc) {
       const played = await playAudioFile("summary-task", selectedSet.taskAudioSrc);
       if (!played) await speak("summary-task", `${selectedSet.prompt} ${selectedSet.requirements.join(" ")}`, 0.92);
     } else {
       await speak("summary-task", `${selectedSet.prompt} ${selectedSet.requirements.join(" ")}`, 0.92);
     }
+    if (skipListeningRef.current) return beginThinkingPhase(stream, { playCue: false });
     await speak("summary-listen-cue", "Now listen to the two experts.", 0.94);
+    if (skipListeningRef.current) return beginThinkingPhase(stream, { playCue: false });
     for (let index = 0; index < selectedSet.experts.length; index += 1) {
       const expert = selectedSet.experts[index];
       const introSrc = index === 0 ? OTE_SPEAKING_AUDIO.summaryExpert1Intro : OTE_SPEAKING_AUDIO.summaryExpert2Intro;
       await playAudioFile(`expert-${index + 1}-intro`, introSrc);
+      if (skipListeningRef.current) return beginThinkingPhase(stream, { playCue: false });
       if (expert.audioSrc) {
         const played = await playAudioFile(`expert-${index + 1}`, expert.audioSrc);
         if (!played) await speak(`expert-${index + 1}`, expert.script, 0.9);
       } else {
         await speak(`expert-${index + 1}`, expert.script, 0.9);
       }
+      if (skipListeningRef.current) return beginThinkingPhase(stream, { playCue: false });
     }
-    await playAudioFile("summary-time-to-think", OTE_SPEAKING_AUDIO.timeToThink);
+    await beginThinkingPhase(stream);
+  }
+
+  async function beginThinkingPhase(stream, { playCue = true } = {}) {
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
+    setPhase("thinking");
+    setSecondsLeft(40);
+    if (playCue) await playAudioFile("summary-time-to-think", OTE_SPEAKING_AUDIO.timeToThink);
+    if (skipThinkingRef.current) return;
     startCountdown(40, "thinking", () => startRecording(stream));
   }
 
@@ -501,6 +535,38 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
   }
 
+  function skipToNextPhase() {
+    if (phase === "listening") {
+      skipListeningRef.current = true;
+      stop();
+      return;
+    }
+    if (phase === "thinking") {
+      clearTimer();
+      skipThinkingRef.current = true;
+      startRecording(activeRunStreamRef.current || streamRef.current);
+      return;
+    }
+    if (phase === "recording") stopRecordingNow();
+  }
+
+  function repeatTask() {
+    clearTimer();
+    stop();
+    const currentRecording = recordings[0];
+    if (currentRecording?.url) URL.revokeObjectURL(currentRecording.url);
+    objectUrlsRef.current = objectUrlsRef.current.filter((url) => url !== currentRecording?.url);
+    setRecordings([]);
+    setPhase("ready");
+    setSecondsLeft(40);
+    activeRunStreamRef.current = null;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
+    setFeedbackResult(null);
+    setFeedbackError("");
+    activityCompletedRef.current = false;
+  }
+
   function resetSet() {
     clearTimer();
     if (recorderRef.current?.state === "recording") recorderRef.current.stop();
@@ -516,6 +582,9 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
     setNotesDraft("");
     setFeedbackResult(null);
     setFeedbackError("");
+    activeRunStreamRef.current = null;
+    skipListeningRef.current = false;
+    skipThinkingRef.current = false;
     stop();
   }
 
@@ -684,6 +753,16 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
                   Stop recording
                 </button>
               )}
+              {phase === "listening" ? (
+                <button type="button" onClick={skipToNextPhase}>
+                  Skip to thinking
+                </button>
+              ) : null}
+              {phase === "thinking" ? (
+                <button type="button" onClick={skipToNextPhase}>
+                  Skip to recording
+                </button>
+              ) : null}
             </div>
             {notesOpen ? (
               <NotesPanel
@@ -712,6 +791,9 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
               </button>
               <button className="ote-training-primary-link" type="button" onClick={resetSet}>
                 Try this set again
+              </button>
+              <button className="ote-training-primary-link" type="button" onClick={repeatTask}>
+                Record again
               </button>
               <button
                 className="ote-training-primary-link"
