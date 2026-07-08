@@ -1,10 +1,9 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { fetchOteTrainingProgress } from "../../../firebase.js";
 
 export function useOteTrainingProgress() {
   const [completed, setCompleted] = useState(() => new Set());
-
-  useEffect(() => {
+  const refreshProgress = useCallback(() => {
     let alive = true;
     fetchOteTrainingProgress()
       .then((progress) => {
@@ -18,6 +17,37 @@ export function useOteTrainingProgress() {
       alive = false;
     };
   }, []);
+
+  useEffect(() => {
+    return refreshProgress();
+  }, [refreshProgress]);
+
+  useEffect(() => {
+    function handleProgressUpdated(event) {
+      const progressIds = Array.isArray(event.detail?.progressIds) ? event.detail.progressIds : [];
+      if (!progressIds.length) return;
+      setCompleted((current) => {
+        const next = new Set(current);
+        progressIds.forEach((id) => {
+          if (id) next.add(id);
+        });
+        return next;
+      });
+    }
+
+    function handleFocus() {
+      refreshProgress();
+    }
+
+    window.addEventListener("ote-training-progress-updated", handleProgressUpdated);
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+    return () => {
+      window.removeEventListener("ote-training-progress-updated", handleProgressUpdated);
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+    };
+  }, [refreshProgress]);
 
   return completed;
 }

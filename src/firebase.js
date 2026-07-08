@@ -1077,6 +1077,13 @@ export async function markOteTrainingProgress(details = {}) {
       { merge: true }
     );
   }
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("ote-training-progress-updated", {
+      detail: {
+        progressIds: [progressId, specificProgressId].filter(Boolean),
+      },
+    }));
+  }
   return progressId;
 }
 

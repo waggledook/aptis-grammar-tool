@@ -58,6 +58,10 @@
   right: 4.9rem;
 }
 
+.ote-assignable-card .ote-training-count-badge {
+  right: 5.2rem;
+}
+
 .ote-assign-card-btn + .ote-assign-overlay,
 .ote-assignable-card .ote-assign-overlay {
   position: fixed;
@@ -2221,6 +2225,30 @@
   color: #7ef0c2 !important;
 }
 
+.ote-training-count-badge {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 3.7rem;
+  min-height: 2rem;
+  border: 1px solid var(--ote-dashboard-panel-border-hover);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ote-dashboard-panel) 78%, #000 8%);
+  color: var(--ote-dashboard-text) !important;
+  font-size: 0.82rem !important;
+  font-weight: 900;
+  line-height: 1;
+  text-transform: none !important;
+}
+
+.ote-training-count-badge.is-complete {
+  border-color: color-mix(in srgb, #22c55e 72%, var(--ote-dashboard-panel-border));
+  color: #7ef0c2 !important;
+}
+
 .ote-training-progress-strip {
   width: min(620px, 100%);
   display: grid;
@@ -3604,6 +3632,150 @@
 .ote-training-recording-review .ote-review-secondary-action:hover,
 .ote-training-recording-review .ote-review-utility-action:hover {
   border-color: var(--ote-dashboard-panel-border-hover);
+}
+
+.ote-followup-type-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.ote-followup-type-card {
+  display: grid;
+  gap: 0.75rem;
+  min-height: 0;
+  border: 1px solid var(--ote-dashboard-panel-border);
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--ote-dashboard-secondary) 88%, transparent), transparent 58%),
+    var(--ote-dashboard-card-bg);
+  padding: 0.95rem;
+}
+
+.ote-followup-type-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.ote-followup-type-top span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid color-mix(in srgb, var(--ote-dashboard-accent) 65%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ote-dashboard-accent) 18%, transparent);
+  color: var(--ote-dashboard-accent);
+  font-size: 0.86rem;
+  font-weight: 900;
+}
+
+.ote-followup-type-top strong {
+  flex: 1;
+  color: var(--ote-dashboard-text);
+  font-size: 1.02rem;
+  line-height: 1.2;
+  text-align: right;
+}
+
+.ote-followup-type-card > p {
+  margin: 0;
+  color: var(--ote-dashboard-text);
+  font-size: 1rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.ote-followup-type-aim {
+  display: grid;
+  gap: 0.2rem;
+  border-top: 1px solid var(--ote-dashboard-panel-border);
+  padding-top: 0.65rem;
+}
+
+.ote-followup-type-aim span {
+  color: var(--ote-dashboard-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.ote-followup-type-aim p {
+  margin: 0;
+  color: var(--ote-dashboard-text-soft);
+  line-height: 1.35;
+}
+
+.ote-guided-sprint-panel {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.ote-guided-sprint-panel > .ote-complete-utility-action {
+  justify-self: start;
+}
+
+.ote-guided-sprint-review {
+  display: grid;
+  grid-template-columns: minmax(320px, 1fr) minmax(300px, 460px);
+  align-items: center;
+  gap: 1.4rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 1rem;
+}
+
+.ote-guided-sprint-review audio {
+  width: min(420px, 100%);
+}
+
+.ote-guided-sprint-review .ote-review-primary-action {
+  width: min(460px, 100%);
+  min-height: 4.25rem;
+  padding: 0.95rem 1.2rem;
+  border: 2px solid color-mix(in srgb, var(--ote-dashboard-primary) 82%, white);
+  background: var(--ote-dashboard-primary);
+  color: var(--ote-dashboard-primary-text);
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 900;
+}
+
+.ote-guided-sprint-review .ote-review-secondary-action,
+.ote-guided-sprint-review .ote-review-utility-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-height: 2.75rem;
+  padding: 0.62rem 0.82rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.ote-guided-sprint-review .ote-review-secondary-action {
+  border: 2px solid var(--ote-dashboard-panel-border);
+  background: var(--ote-dashboard-secondary);
+  color: var(--ote-dashboard-text);
+}
+
+.ote-guided-sprint-review .ote-review-utility-action {
+  border: 1px solid var(--ote-dashboard-panel-border);
+  background: transparent;
+  color: var(--ote-dashboard-text-soft);
+}
+
+.ote-guided-sprint-review .ote-review-primary-action:hover,
+.ote-guided-sprint-review .ote-review-secondary-action:hover,
+.ote-guided-sprint-review .ote-review-utility-action:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--ote-dashboard-shadow);
 }
 
 .ote-practice-hidden-task {
@@ -7992,6 +8164,15 @@
   }
 
   .ote-training-recording-review {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+
+  .ote-followup-type-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-guided-sprint-review {
     grid-template-columns: 1fr;
     align-items: stretch;
   }

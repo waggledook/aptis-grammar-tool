@@ -99,7 +99,15 @@ export default function OteSpeakingPart2Menu({ user, nativeRoutes = false }) {
     [advancedGuidedPath, cheatSheetPath, guidedMessage2Path, guidedPath, introPath, isAdvanced]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
-  const practiceComplete = completedProgress.has("speaking.part2.practice");
+  const practiceTotal = 5;
+  const practiceChildCount = Array.from(completedProgress).filter((progressId) =>
+    /^speaking\.part2\.practice\.[\w-]+$/.test(progressId)
+  ).length;
+  const practiceCompleted = Math.min(practiceTotal, Math.max(
+    practiceChildCount,
+    completedProgress.has("speaking.part2.practice") ? 1 : 0
+  ));
+  const practiceComplete = practiceCompleted >= practiceTotal;
   const assignmentItems = getOteAssignmentItems({
     variant: isAdvanced ? "advanced" : "general",
     nativeRoutes,
@@ -174,7 +182,9 @@ export default function OteSpeakingPart2Menu({ user, nativeRoutes = false }) {
           className={`ote-practice-set-card ote-writing-practice-entry-card ${practiceComplete ? "is-complete" : ""}`}
           onClick={() => navigate(practicePath)}
         >
-          {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+          <span className={`ote-training-count-badge ${practiceComplete ? "is-complete" : ""}`}>
+            {practiceCompleted}/{practiceTotal}
+          </span>
           <PlayCircle size={28} aria-hidden="true" />
           <span>Practice</span>
           <h2>{isAdvanced ? "Timed Diplomatic Voicemail Sets" : "Timed Voicemail Sets"}</h2>

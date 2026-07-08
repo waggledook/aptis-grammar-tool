@@ -54,7 +54,15 @@ export default function OteSpeakingPart45DebateMenu({ user, nativeRoutes = false
     [followUpGuidedTaskPath, guidedTaskPath, overviewPath]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
-  const practiceComplete = completedProgress.has("speaking.parts45.practice");
+  const practiceTotal = 3;
+  const practiceChildCount = Array.from(completedProgress).filter((progressId) =>
+    /^speaking\.parts45\.practice\.[\w-]+$/.test(progressId)
+  ).length;
+  const practiceCompleted = Math.min(practiceTotal, Math.max(
+    practiceChildCount,
+    completedProgress.has("speaking.parts45.practice") ? 1 : 0
+  ));
+  const practiceComplete = practiceCompleted >= practiceTotal;
   const assignmentItems = getOteAssignmentItems({ variant: "advanced", nativeRoutes });
   const assignmentByProgressId = Object.fromEntries(assignmentItems.map((item) => [item.progressId, item]));
 
@@ -121,7 +129,9 @@ export default function OteSpeakingPart45DebateMenu({ user, nativeRoutes = false
           className={`ote-practice-set-card ote-writing-practice-entry-card ${practiceComplete ? "is-complete" : ""}`}
           onClick={() => navigate(practicePath)}
         >
-          {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+          <span className={`ote-training-count-badge ${practiceComplete ? "is-complete" : ""}`}>
+            {practiceCompleted}/{practiceTotal}
+          </span>
           <PlayCircle size={28} aria-hidden="true" />
           <span>Practice</span>
           <h2>Timed Debate Sets</h2>

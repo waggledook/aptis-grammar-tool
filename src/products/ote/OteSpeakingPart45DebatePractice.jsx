@@ -470,6 +470,19 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
   const hasDebate = steps.some((step) => step.kind === "debate");
   const modeLabel = initialMode === "followups" ? "Follow-ups only" : "Debate + follow-ups";
 
+  useEffect(() => {
+    if (!complete || !selectedSet || activityCompletedRef.current) return;
+    activityCompletedRef.current = true;
+    logOteTrainingCompleted({
+      section: "speaking",
+      part: initialMode === "followups" ? "part-5" : "parts-4-5",
+      mode: initialMode === "followups" ? "follow_up_practice" : "debate_follow_up_practice",
+      setId: selectedSet.id,
+      setTitle: selectedSet.title,
+      recordingCount: recordings.length,
+    });
+  }, [complete, initialMode, recordings.length, selectedSet]);
+
   function buildAssignmentItem(set) {
     return {
       id: `ote.advanced.speaking.parts45.practice.${set.id}`,

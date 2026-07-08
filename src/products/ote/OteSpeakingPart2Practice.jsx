@@ -567,6 +567,19 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
   const assignmentVariant = isAdvanced ? "advanced" : "general";
   const getPrepSeconds = (task) => task?.prepSeconds || (isAdvanced ? 10 : 20);
 
+  useEffect(() => {
+    if (!complete || !selectedSet || activityCompletedRef.current) return;
+    activityCompletedRef.current = true;
+    logOteTrainingCompleted({
+      section: "speaking",
+      part: "part-2",
+      mode: "voicemail_practice",
+      setId: selectedSet.id,
+      setTitle: selectedSet.title,
+      recordingCount: recordings.length,
+    });
+  }, [complete, recordings.length, selectedSet]);
+
   function buildAssignmentItem(set) {
     return {
       id: `ote.${assignmentVariant}.speaking.part2.practice.${set.id}`,

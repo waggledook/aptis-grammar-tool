@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
   ArrowLeft,
-  ChevronDown,
   CheckCircle2,
+  ChevronDown,
   Download,
   Lightbulb,
   Play,
@@ -39,53 +39,69 @@ function getSupportedMimeType() {
 const followUpQuestions = [
   {
     id: "q1",
-    label: "Question 1",
-    type: "Opinion + qualification",
-    prompt: "Your debate was about attendance at lectures. Do you think students learn better when they have more freedom?",
-    audioSrc: "/audio/ote/speaking/advanced/guided-followups/lecture-attendance-q1.mp3",
-    skill: "Give a clear view, but avoid being too absolute.",
+    type: "Preference",
+    opening: "Personally, I prefer...",
+    prompt: "Where do you prefer to study, and why?",
+    audioSrc: "/audio/ote/speaking/general/guided-followups/study-environments-q1.mp3",
+    skill: "Describe a personal preference and give a reason.",
   },
   {
     id: "q2",
-    label: "Question 2",
-    type: "Evaluation",
-    prompt: "Some people say online lectures make university more accessible. What do you think?",
-    audioSrc: "/audio/ote/speaking/advanced/guided-followups/lecture-attendance-q2.mp3",
-    skill: "Discuss benefits and possible limits.",
+    type: "Comparison",
+    opening: "I think it depends, but...",
+    prompt: "Do you think it is better to study alone or with other people?",
+    audioSrc: "/audio/ote/speaking/general/guided-followups/study-environments-q2.mp3",
+    skill: "Compare two options and give an opinion.",
   },
   {
     id: "q3",
-    label: "Question 3",
-    type: "Abstract explanation",
-    prompt: "In what ways can universities help students become more independent?",
-    audioSrc: "/audio/ote/speaking/advanced/guided-followups/lecture-attendance-q3.mp3",
-    skill: "Give two general ideas with examples.",
+    type: "Advantages",
+    opening: "One big advantage is...",
+    prompt: "How can online learning help students?",
+    audioSrc: "/audio/ote/speaking/general/guided-followups/study-environments-q3.mp3",
+    skill: "Explain one or two advantages.",
   },
   {
     id: "q4",
-    label: "Question 4",
-    type: "Hypothetical",
-    prompt: "Imagine you were responsible for improving student motivation at a university. What changes would you make?",
-    audioSrc: "/audio/ote/speaking/advanced/guided-followups/lecture-attendance-q4.mp3",
-    skill: "Use conditional language and propose actions.",
+    type: "Problems",
+    opening: "One common problem is...",
+    prompt: "What problems can students have when they study at home?",
+    audioSrc: "/audio/ote/speaking/general/guided-followups/study-environments-q4.mp3",
+    skill: "Describe problems and add examples.",
+  },
+  {
+    id: "q5",
+    type: "Suggestions",
+    opening: "They could...",
+    prompt: "What could schools or academies do to help students study better?",
+    audioSrc: "/audio/ote/speaking/general/guided-followups/study-environments-q5.mp3",
+    skill: "Make practical suggestions.",
+  },
+  {
+    id: "q6",
+    type: "Future prediction",
+    opening: "I think they probably will...",
+    prompt: "Do you think people will study more online in the future?",
+    audioSrc: "/audio/ote/speaking/general/guided-followups/study-environments-q6.mp3",
+    skill: "Speculate about the future.",
   },
 ];
 
 const answerShape = [
   {
-    title: "1. Direct answer",
-    body: "Answer the question immediately.",
-    phrases: ["Yes, to some extent.", "I think it depends on the student.", "If I were responsible for this, I would..."],
+    title: "1. Answer",
+    body: "Give the direct answer immediately.",
+    phrases: ["Personally, I prefer...", "I think it depends...", "Yes, probably..."],
   },
   {
     title: "2. Reason",
     body: "Explain why.",
-    phrases: ["The main reason is that...", "This matters because...", "One problem is that..."],
+    phrases: ["because...", "The main reason is...", "This is useful because..."],
   },
   {
-    title: "3. Development",
-    body: "Add one extra layer.",
-    phrases: ["For example...", "On the other hand...", "The risk is that..."],
+    title: "3. Detail",
+    body: "Add one example, contrast, or extra detail.",
+    phrases: ["For example...", "However...", "This is especially helpful when..."],
   },
 ];
 
@@ -94,60 +110,68 @@ const weakAnswers = [
     id: "too-short",
     label: "Weak answer 1",
     title: "Too short",
-    question: "Do you think students learn better when they have more freedom?",
-    answer: "Yes, I think so. Freedom is important because students are adults. So yes, they learn better.",
-    problem: "It answers the question, but it stops after one simple reason.",
+    question: "Where do you prefer to study, and why?",
+    answer: "I prefer to study at home because it is good.",
+    problem: "The answer is clear, but it is too short and underdeveloped.",
     better:
-      "Yes, to some extent, because university students need to become responsible for their own learning. If they are given some freedom, they can decide which lectures are essential and which materials they can study independently. However, too much freedom can be risky for students who lack discipline, so I think freedom works best when there is still some structure.",
+      "Personally, I prefer to study at home because I feel more relaxed there. I can organize my desk, choose the music I want and take short breaks when I need to. However, I need to put my phone away, or I get distracted very easily.",
   },
   {
-    id: "repeats-debate",
+    id: "no-comparison",
     label: "Weak answer 2",
-    title: "Repeats Part 4",
-    question: "Some people say online lectures make university more accessible. What do you think?",
-    answer: "As I said in my debate, attendance should not be optional because students may miss important explanations and get worse results.",
-    problem: "This goes back to the debate instead of answering the new question.",
+    title: "No real comparison",
+    question: "Do you think it is better to study alone or with other people?",
+    answer: "Studying alone is good and studying with people is good too. Both are good.",
+    problem: "The student mentions both options but does not compare them properly.",
     better:
-      "I agree that online lectures can make university more accessible, especially for students who live far away, have health problems or need to work part-time. They can follow the course without always being physically present. However, accessibility is not just about uploading videos. Universities also need to make sure students can ask questions and feel connected to the course.",
+      "I think it depends on the activity. If I need to memorize vocabulary or read something difficult, studying alone is better because I can concentrate. But if I am preparing a presentation or practising speaking, studying with other people is much more useful.",
   },
   {
-    id: "vague",
+    id: "repeats-idea",
     label: "Weak answer 3",
-    title: "Vague and repetitive",
-    question: "In what ways can universities help students become more independent?",
-    answer: "Universities can help students be independent by teaching independence. They should give them independence because independence is important for university students.",
-    problem: "The answer repeats the key word but does not explain anything specific.",
+    title: "Repeats one idea",
+    question: "How can online learning help students?",
+    answer: "Online learning helps students because it is online. Students can study online and learn online.",
+    problem: "The student repeats the same word without adding meaning.",
     better:
-      "Universities can help by gradually giving students more responsibility. For example, instead of telling them exactly what to read for every class, tutors could ask them to choose sources and justify their choices. Another useful approach would be to teach study skills explicitly, such as planning research, managing deadlines and evaluating information critically.",
+      "Online learning can help students because it gives them more flexibility. For example, they can watch a video lesson again if they do not understand something the first time. It is also useful for people who live far away or cannot come to class every day.",
   },
   {
-    id: "not-hypothetical",
+    id: "wrong-question",
     label: "Weak answer 4",
-    title: "No hypothetical language",
-    question: "Imagine you were responsible for improving student motivation at a university. What changes would you make?",
-    answer: "I improve classes and students are more motivated. Also teachers explain better and students go to lectures.",
-    problem: "The answer has ideas, but the language does not match the hypothetical situation.",
+    title: "Does not answer the question",
+    question: "What problems can students have when they study at home?",
+    answer: "I like studying at home because it is comfortable and I can drink coffee.",
+    problem: "This answers a different question. The question asks about problems, not preferences.",
     better:
-      "If I were responsible for improving motivation, I would make courses feel more connected to students' future goals. For instance, I would include more practical projects, guest speakers and real-world case studies. I would also give students more regular feedback, because motivation often drops when people do not know whether they are making progress.",
+      "One common problem is distraction. At home, students may have their phone, family, television or other things around them, so it can be hard to concentrate. Another problem is that home can feel too comfortable, so students may not work as seriously as they would in a library or classroom.",
   },
 ];
 
 const languageGroups = [
   {
-    title: "Balanced Opinion",
-    phrases: ["I agree up to a point.", "It depends on the student.", "I can see both sides, but...", "In general, I would say that..."],
+    title: "Preference",
+    phrases: ["Personally, I prefer...", "I usually find it easier to...", "For me, the best place is...", "I feel more comfortable when..."],
   },
   {
-    title: "Evaluation",
-    phrases: ["One clear advantage is...", "The main drawback is...", "This can be useful in cases where...", "The problem is that this may not work for everyone."],
+    title: "Comparison",
+    phrases: ["It depends on the situation.", "Both options have advantages.", "Studying alone is better for...", "Studying with other people is useful when..."],
   },
   {
-    title: "Speculation",
-    phrases: ["This could lead to...", "It might encourage students to...", "There is a risk that...", "In the long term, this may..."],
+    title: "Advantages",
+    phrases: ["One big advantage is...", "This can help students because...", "It makes it easier to...", "It gives students the chance to..."],
   },
   {
-    title: "Hypotheticals",
-    phrases: ["If I were responsible for this, I would...", "I would probably start by...", "One change I would make is...", "The first thing I would do is..."],
+    title: "Problems",
+    phrases: ["One common problem is...", "The main difficulty is...", "Students may find it hard to...", "There is a risk that..."],
+  },
+  {
+    title: "Suggestions",
+    phrases: ["Schools could...", "It would be useful to...", "They should provide...", "One simple change would be to..."],
+  },
+  {
+    title: "Future",
+    phrases: ["I think people will probably...", "In the future, we may see more...", "Online learning will become more common, but...", "I do not think it will completely replace..."],
   },
 ];
 
@@ -155,32 +179,42 @@ const modelAnswers = [
   {
     label: "Question 1",
     answer:
-      "I think students often learn better when they have some freedom, because they become more responsible for their own progress. For example, they can decide which lectures are essential and which topics they can review independently. However, freedom only works if students understand the consequences of their choices. If there is no structure at all, some students may fall behind quite quickly.",
+      "Personally, I prefer to study in a quiet library because there are fewer distractions. When I am at home, I often check my phone or start doing other things. In a library, the atmosphere is more serious, so I find it easier to concentrate for a longer time.",
   },
   {
     label: "Question 2",
     answer:
-      "I agree, especially for students who cannot always attend in person because of work, illness or distance. Online lectures can make it easier for them to continue studying without missing important content. Having said that, accessibility is not only about recording lectures. Students also need opportunities to ask questions, interact with classmates and receive support from tutors.",
+      "I think it depends on the activity. If I need to read, revise grammar or memorize vocabulary, I prefer to study alone. But if I want to practise speaking or prepare ideas for a project, studying with other people can be much more useful.",
   },
   {
     label: "Question 3",
     answer:
-      "Universities can help by giving students more responsibility gradually. For example, tutors could ask students to choose some of their own reading or design small research projects. At the same time, students need guidance on how to manage that freedom. Teaching practical study skills, such as planning, note-taking and evaluating sources, would make independence much more realistic.",
+      "Online learning can help students because it is flexible. They can study at home, repeat a video lesson or do extra practice when they have time. It is especially useful for students who are busy or who cannot travel to the academy every day.",
   },
   {
     label: "Question 4",
     answer:
-      "If I were responsible for this, I would try to make courses feel more connected to students' real goals. I would include more practical projects, case studies and links to future careers. I would also improve feedback, because students often lose motivation when they do not know how they are doing. Regular, specific feedback could help them feel that their effort is leading somewhere.",
+      "The biggest problem is distraction. At home, students may have their phone, family or television nearby, so it is easy to lose concentration. Also, some students find it difficult to separate study time from free time when they are in the same place.",
+  },
+  {
+    label: "Question 5",
+    answer:
+      "They could create different study spaces for different needs. For example, they could have quiet rooms for individual work and group rooms for speaking practice or projects. They could also give students advice about how to organize their study time outside class.",
+  },
+  {
+    label: "Question 6",
+    answer:
+      "Yes, I think online learning will probably become more common because it is convenient and flexible. However, I do not think it will completely replace face-to-face classes. Many students still need personal contact with teachers and classmates to stay motivated.",
   },
 ];
 
-export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = false, user = null, onRequireSignIn }) {
+export default function OteSpeakingPart34FollowUpGuidedTask({ nativeRoutes = false, user = null, onRequireSignIn }) {
   const navigate = useNavigate();
   const [expandedAnswer, setExpandedAnswer] = useState("");
   const [showModel, setShowModel] = useState(false);
   const [practiceIndex, setPracticeIndex] = useState(0);
   const [practicePhase, setPracticePhase] = useState("ready");
-  const [secondsLeft, setSecondsLeft] = useState(40);
+  const [secondsLeft, setSecondsLeft] = useState(30);
   const [recordings, setRecordings] = useState([]);
   const [micError, setMicError] = useState("");
   const [feedbackLoading, setFeedbackLoading] = useState(false);
@@ -193,7 +227,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
   const timerRef = useRef(null);
   const objectUrlsRef = useRef([]);
   const audioRef = useRef(null);
-  const menuPath = getSitePath(nativeRoutes ? "/speaking/parts-4-5-debate" : "/ote/speaking/parts-4-5-debate");
+  const menuPath = getSitePath(nativeRoutes ? "/speaking/parts-3-4" : "/ote/speaking/parts-3-4");
   const activeQuestion = followUpQuestions[practiceIndex] || followUpQuestions[0];
   const activeRecording = recordings.find((recording) => recording.questionId === activeQuestion.id);
   const practiceComplete = practicePhase === "complete";
@@ -327,13 +361,13 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
         {
           id: question.id,
           questionId: question.id,
-          label: question.label,
+          label: `Question ${followUpQuestions.findIndex((item) => item.id === question.id) + 1}`,
           blob,
           url,
-          name: `ote-advanced-followup-guided-${question.id}.webm`,
-          partId: "part-5",
+          name: `ote-general-followup-guided-${question.id}.webm`,
+          partId: "part-4",
           prompt: question.prompt,
-          durationSeconds: 40,
+          durationSeconds: 30,
         },
       ]);
       setPracticePhase("review");
@@ -341,7 +375,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
     };
     setPracticePhase("recording");
     recorder.start();
-    startCountdown(40, () => {
+    startCountdown(30, () => {
       if (recorder.state === "recording") recorder.stop();
     });
   }
@@ -358,7 +392,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
     objectUrlsRef.current = objectUrlsRef.current.filter((url) => url !== recording?.url);
     setRecordings((current) => current.filter((item) => item.questionId !== activeQuestion.id));
     setPracticePhase("ready");
-    setSecondsLeft(40);
+    setSecondsLeft(30);
   }
 
   function goNextQuestion() {
@@ -370,7 +404,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
     const nextIndex = practiceIndex + 1;
     setPracticeIndex(nextIndex);
     setPracticePhase("ready");
-    setSecondsLeft(40);
+    setSecondsLeft(30);
     window.setTimeout(() => startQuestion(nextIndex), 0);
   }
 
@@ -382,7 +416,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
     setRecordings([]);
     setPracticeIndex(0);
     setPracticePhase("ready");
-    setSecondsLeft(40);
+    setSecondsLeft(30);
     setMicError("");
     setFeedbackError("");
     setFeedbackResult(null);
@@ -403,32 +437,32 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
       .map((question) => recordings.find((recording) => recording.questionId === question.id))
       .filter(Boolean);
     if (orderedRecordings.length < followUpQuestions.length) {
-      setFeedbackError("Record all four follow-up answers before generating feedback.");
+      setFeedbackError("Record all six follow-up answers before generating feedback.");
       return;
     }
     setFeedbackLoading(true);
     setFeedbackError("");
     try {
-      const feedbackAudio = await recordingsToFeedbackAudio(orderedRecordings, "ote-guided-followup-lecture-attendance");
+      const feedbackAudio = await recordingsToFeedbackAudio(orderedRecordings, "ote-general-guided-followup-study");
       const task = {
-        id: "guided-followup-lecture-attendance",
-        title: "Guided follow-up sprint: lecture attendance",
+        id: "guided-followup-study-environments",
+        title: "Guided follow-up sprint: study environments",
         instructions: [
-          "You are going to answer four questions on the topic of your debate.",
-          "You have 40 seconds to answer each question.",
+          "You are going to answer six questions on the topic of your presentation.",
+          "You have 30 seconds to answer each question.",
           "Start speaking when you hear the tone.",
         ],
-        topic: "Universities should make attendance at lectures optional.",
+        topic: "Different environments where people can study.",
       };
       const result = await requestOteSpeakingFeedback({
-        partId: "part-5",
+        partId: "part-4",
         task,
         recordings: feedbackAudio,
       });
       setFeedbackResult(result);
       await saveSpeakingAiFeedback({
         product: "ote",
-        part: "part-5",
+        part: "part-4",
         taskId: task.id,
         taskTitle: task.title,
         questions: followUpQuestions.map((question) => question.prompt),
@@ -437,7 +471,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
         meta: result?.meta || null,
       });
     } catch (error) {
-      console.error("[OTE guided follow-up feedback] failed", error);
+      console.error("[OTE guided Part 4 feedback] failed", error);
       setFeedbackError(error?.message || "Could not generate feedback right now.");
     } finally {
       setFeedbackLoading(false);
@@ -448,10 +482,10 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
     if (completedLoggedRef.current || !showModel) return;
     completedLoggedRef.current = true;
     logOteTrainingCompleted({
-      progressId: "speaking.parts45.advanced-followup-guided-task",
+      progressId: "speaking.parts34.followup-guided",
       section: "speaking",
-      part: "part-5",
-      mode: "advanced_followup_guided_task",
+      part: "part-4",
+      mode: "general_followup_guided_task",
       taskTitle: "Guided Task: Follow-up Question Sprint",
       completed: true,
     });
@@ -471,21 +505,21 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
   return (
     <main className="ote-training-page">
       <Seo
-        title="OTE Advanced Speaking Part 5 Guided Follow-up Task | Seif English"
-        description="Train OTE Advanced Part 5 follow-up answers by classifying question types, improving weak responses, and comparing with model answers."
+        title="OTE Speaking Part 4 Guided Follow-up Task | Seif English"
+        description="Train OTE General Speaking Part 4 follow-up answers by recognizing question types, recording six short answers, and comparing with models."
       />
 
       <button className="ote-training-back" type="button" onClick={() => navigate(menuPath)}>
         <ArrowLeft size={18} aria-hidden="true" />
-        Back to debate training
+        Back to long talk training
       </button>
 
       <header className="ote-training-hero">
         <p className="ote-kicker">Activity 3</p>
         <h1>Guided Task: Follow-up Question Sprint</h1>
         <p>
-          You have already given your debate answer. Now train the four audio-only follow-up
-          questions: identify the question type, answer directly, and develop one clear idea.
+          You have just given your one-minute presentation. Now train six audio-only follow-up
+          questions: answer clearly, give a reason, and add one extra detail.
         </p>
       </header>
 
@@ -493,25 +527,29 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
         <div className="ote-guided-task-heading">
           <div>
             <p className="ote-kicker">Topic link</p>
-            <h2>Universities should make attendance at lectures optional.</h2>
+            <h2>Different environments where people can study</h2>
           </div>
           <div className="ote-guided-timing-note" aria-label="Task timing">
-            <span>4 follow-up questions</span>
-            <span>40 seconds each</span>
+            <span>6 follow-up questions</span>
+            <span>30 seconds each</span>
           </div>
         </div>
         <p>
+          This follows the guided Part 3 presentation task: your academy is upgrading its facilities
+          for students, and you are talking about different places where people can study.
+        </p>
+        <p>
           In the real test, you only hear each question. You do not see the full question on screen.
-          The first question stays close to your debate, then the later questions move outwards.
+          Your aim is a short, clear answer, not a second long talk.
         </p>
       </section>
 
       <section className="ote-training-section">
-        <h2>Classify the Questions</h2>
+        <h2>Recognize the Question Type</h2>
         <p className="ote-section-lead">
-          Part 5 is not just opinion practice. The question type tells you what kind of language to show.
+          Part 4 questions are quick. The faster you recognize the job of the question, the easier it is to answer well.
         </p>
-        <div className="ote-followup-type-grid" aria-label="Follow-up question types">
+        <div className="ote-followup-type-grid" aria-label="General follow-up question types">
           {followUpQuestions.map((question, index) => (
             <article className="ote-followup-type-card" key={question.id}>
               <div className="ote-followup-type-top">
@@ -519,6 +557,10 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
                 <strong>{question.type}</strong>
               </div>
               <p>{question.prompt}</p>
+              <div className="ote-followup-type-aim">
+                <span>Useful opening</span>
+                <p>{question.opening}</p>
+              </div>
               <div className="ote-followup-type-aim">
                 <span>Aim</span>
                 <p>{question.skill}</p>
@@ -529,9 +571,9 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
       </section>
 
       <section className="ote-training-section">
-        <h2>The 40-Second Shape</h2>
+        <h2>The 30-Second Shape</h2>
         <p className="ote-section-lead">
-          A strong answer does not need an introduction or conclusion. It needs to answer, explain, and develop.
+          Most answers only need three moves: answer, reason, example or extra detail.
         </p>
         <div className="ote-training-rule-grid">
           {answerShape.map((step) => (
@@ -549,7 +591,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
       <section className="ote-training-section">
         <h2>Analyze Weak Answers</h2>
         <p className="ote-section-lead">
-          These better versions are teaching fixes. Record your own full sprint before opening the complete model answers.
+          Open each card after you have decided what the problem is. The headings are hidden so they do not give away the answer.
         </p>
         <div className="ote-student-answer-list">
           {weakAnswers.map((item) => (
@@ -585,7 +627,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
       </section>
 
       <section className="ote-training-section">
-        <h2>Useful Follow-up Language</h2>
+        <h2>Useful Part 4 Language</h2>
         <div className="ote-training-rule-grid">
           {languageGroups.map((group) => (
             <article key={group.title}>
@@ -603,25 +645,25 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
           <div className="ote-recorder-top">
             <div>
               <p className="ote-kicker">Your turn</p>
-              <h2>Record a Follow-up Sprint</h2>
+              <h2>Record a Part 4 Follow-up Sprint</h2>
               <p>
-                In timed practice, each question plays immediately and the recorder starts after the tone.
-                Listen, answer, review, then move to the next question.
+                Each question plays immediately and the recorder starts after the tone. Listen,
+                answer, review, then move to the next question.
               </p>
             </div>
             <div className={`ote-recorder-timer ${practicePhase === "recording" ? "is-recording" : "is-ready"}`} aria-label="Answer timing">
               {practicePhase === "listening" ? <Volume2 size={22} aria-hidden="true" /> : <Timer size={22} aria-hidden="true" />}
-              <strong>{practicePhase === "recording" ? `0:${String(secondsLeft).padStart(2, "0")}` : "0:40"}</strong>
+              <strong>{practicePhase === "recording" ? `0:${String(secondsLeft).padStart(2, "0")}` : "0:30"}</strong>
               <span>{practicePhase === "listening" ? "Listening" : practicePhase === "review" ? "Review" : "Each answer"}</span>
             </div>
           </div>
 
           <div className="ote-guided-sprint-panel" aria-live="polite">
             <div>
-              <p className="ote-kicker">{practiceComplete ? "Sprint complete" : activeQuestion.label}</p>
+              <p className="ote-kicker">{practiceComplete ? "Sprint complete" : `Question ${practiceIndex + 1}`}</p>
               <h3>
                 {practiceComplete
-                  ? "All four answers recorded"
+                  ? "All six answers recorded"
                   : practicePhase === "listening"
                     ? "Listen to the question"
                     : practicePhase === "recording"
@@ -636,8 +678,8 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
                   : practicePhase === "review"
                     ? "Listen back before moving on. The next question will play immediately when you continue."
                     : practicePhase === "recording"
-                      ? "Answer directly, give a reason, then develop one idea."
-                      : "You will hear the question, then the tone will start your 40-second answer."}
+                      ? "Answer directly, give a reason, then add one extra detail."
+                      : "You will hear the question, then the tone will start your 30-second answer."}
               </p>
             </div>
 
@@ -646,7 +688,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
             {practicePhase === "ready" ? (
               <button className="ote-training-primary-link" type="button" onClick={() => startQuestion(practiceIndex)}>
                 <Play size={17} aria-hidden="true" />
-                {recordings.length ? `Start ${activeQuestion.label}` : "Start follow-up sprint"}
+                {recordings.length ? `Start Question ${practiceIndex + 1}` : "Start follow-up sprint"}
               </button>
             ) : null}
 
@@ -709,7 +751,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
                 <SpeakingFeedbackPanel
                   feedbackResult={feedbackResult}
                   questions={followUpQuestions.map((question) => question.prompt)}
-                  title="OTE Part 5 guided follow-up feedback"
+                  title="OTE Part 4 guided follow-up feedback"
                 />
                 <div className="ote-recording-list">
                   {recordings.map((recording) => (
@@ -735,7 +777,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
                 <ul className="ote-practice-bullets">
                   <li>Listen for the question type.</li>
                   <li>Answer the exact question first.</li>
-                  <li>Choose one idea you can develop.</li>
+                  <li>Add one reason and one extra detail.</li>
                 </ul>
               </article>
               <article>
@@ -743,7 +785,7 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
                 <ul className="ote-practice-bullets">
                   <li>Did you answer directly?</li>
                   <li>Did you give a reason?</li>
-                  <li>Did you develop the idea?</li>
+                  <li>Did you add detail?</li>
                 </ul>
               </article>
             </div>
@@ -764,8 +806,8 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
             <p className="ote-kicker">Model answers</p>
             <h2>Compare After Recording</h2>
             <p>
-              Try the sprint first, then reveal the models. Notice how each answer uses the same
-              simple shape but changes language for the question type.
+              Try the sprint first, then reveal the models. Notice how each answer stays short but
+              still includes an answer, a reason, and one extra detail.
             </p>
           </div>
           <button type="button" onClick={() => setShowModel(true)} disabled={showModel}>
@@ -789,13 +831,13 @@ export default function OteSpeakingPart45FollowUpGuidedTask({ nativeRoutes = fal
       <section className="ote-training-section">
         <h2>Final Reflection</h2>
         <p className="ote-section-lead">
-          Which answer was hardest: opinion, evaluation, abstract explanation, or hypothetical?
+          Which question type was hardest: preference, comparison, advantages, problems, suggestions, or future prediction?
         </p>
         <ul className="ote-practice-bullets">
-          <li>Can I avoid repeating my Part 4 debate?</li>
-          <li>Can I answer an abstract question with specific ideas?</li>
-          <li>Can I use conditional language for hypothetical questions?</li>
-          <li>Can I develop one point instead of rushing through several undeveloped ideas?</li>
+          <li>Can I recognize the question type quickly?</li>
+          <li>Can I answer directly in the first sentence?</li>
+          <li>Can I add a reason without speaking for too long?</li>
+          <li>Can I add one useful detail before the time runs out?</li>
         </ul>
         <button className="ote-training-primary-link" type="button" onClick={restartSprint}>
           <Sparkles size={17} aria-hidden="true" />

@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { ArrowLeft, CheckCircle2, ClipboardList, Mic, PlayCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ClipboardList, MessageCircleQuestion, Mic, PlayCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
@@ -24,6 +24,9 @@ export default function OteSpeakingPart34Menu({ user, nativeRoutes = false }) {
   const practicePath = isAdvanced ? summaryPracticePath : talkPracticePath;
   const guidedPath = getSitePath(
     nativeRoutes ? "/speaking/parts-3-4/guided-talk" : "/ote/speaking/parts-3-4/guided-talk"
+  );
+  const followUpGuidedPath = getSitePath(
+    nativeRoutes ? "/speaking/parts-3-4/follow-up-guided-task" : "/ote/speaking/parts-3-4/follow-up-guided-task"
   );
   const completedProgress = useOteTrainingProgress();
   const activities = useMemo(
@@ -56,11 +59,27 @@ export default function OteSpeakingPart34Menu({ user, nativeRoutes = false }) {
               path: guidedPath,
               progressId: "speaking.parts34.guided-talk",
             },
+            {
+              label: "Activity 3",
+              title: "Guided Task: Follow-up Question Sprint",
+              copy: "Recognize Part 4 question types, improve weak answers, and record six short follow-up responses.",
+              icon: MessageCircleQuestion,
+              path: followUpGuidedPath,
+              progressId: "speaking.parts34.followup-guided",
+            },
           ],
-    [guidedPath, isAdvanced, overviewPath]
+    [followUpGuidedPath, guidedPath, isAdvanced, overviewPath]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
-  const practiceComplete = completedProgress.has("speaking.parts34.practice");
+  const practiceTotal = isAdvanced ? 2 : 5;
+  const practiceChildCount = Array.from(completedProgress).filter((progressId) =>
+    /^speaking\.parts34\.practice\.[\w-]+$/.test(progressId)
+  ).length;
+  const practiceCompleted = Math.min(practiceTotal, Math.max(
+    practiceChildCount,
+    completedProgress.has("speaking.parts34.practice") ? 1 : 0
+  ));
+  const practiceComplete = practiceCompleted >= practiceTotal;
   const assignmentItems = getOteAssignmentItems({
     variant: isAdvanced ? "advanced" : "general",
     nativeRoutes,
@@ -139,7 +158,9 @@ export default function OteSpeakingPart34Menu({ user, nativeRoutes = false }) {
           className={`ote-practice-set-card ote-writing-practice-entry-card ${practiceComplete ? "is-complete" : ""}`}
           onClick={() => navigate(practicePath)}
         >
-          {practiceComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+          <span className={`ote-training-count-badge ${practiceComplete ? "is-complete" : ""}`}>
+            {practiceCompleted}/{practiceTotal}
+          </span>
           <PlayCircle size={28} aria-hidden="true" />
           <span>Practice</span>
           <h2>{isAdvanced ? "Timed Summary Sets" : "Timed Talk Sets"}</h2>

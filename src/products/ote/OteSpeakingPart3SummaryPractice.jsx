@@ -327,6 +327,19 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
   const recording = recordings[0] || null;
   const complete = Boolean(recording);
 
+  useEffect(() => {
+    if (!complete || !selectedSet || activityCompletedRef.current) return;
+    activityCompletedRef.current = true;
+    logOteTrainingCompleted({
+      section: "speaking",
+      part: "part-3",
+      mode: "summary_practice",
+      setId: selectedSet.id,
+      setTitle: selectedSet.title,
+      recordingCount: recordings.length,
+    });
+  }, [complete, recordings.length, selectedSet]);
+
   function buildAssignmentItem(set) {
     return {
       id: `ote.advanced.speaking.part3.practice.${set.id}`,

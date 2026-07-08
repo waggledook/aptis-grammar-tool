@@ -82,6 +82,14 @@ const OTE_ASSIGNMENT_ITEMS = [
     progressId: "speaking.parts34.guided-talk",
   },
   {
+    id: "ote.general.speaking.parts34.followup-guided",
+    variant: "general",
+    category: "Speaking",
+    label: "Part 4 Follow-up Question Guided Task",
+    routePath: "/ote/speaking/parts-3-4/follow-up-guided-task",
+    progressId: "speaking.parts34.followup-guided",
+  },
+  {
     id: "ote.general.speaking.parts34.practice",
     variant: "general",
     category: "Speaking",

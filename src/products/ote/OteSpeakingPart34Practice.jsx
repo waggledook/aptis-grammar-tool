@@ -460,6 +460,19 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
   const visibleStep = flowStep || activeStep;
   const complete = selectedSet && recordings.length >= steps.length;
 
+  useEffect(() => {
+    if (!complete || !selectedSet || activityCompletedRef.current) return;
+    activityCompletedRef.current = true;
+    logOteTrainingCompleted({
+      section: "speaking",
+      part: "parts-3-4",
+      mode: "talk_follow_up_practice",
+      setId: selectedSet.id,
+      setTitle: selectedSet.title,
+      recordingCount: recordings.length,
+    });
+  }, [complete, recordings.length, selectedSet]);
+
   function buildAssignmentItem(set) {
     return {
       id: `ote.general.speaking.parts34.practice.${set.id}`,
