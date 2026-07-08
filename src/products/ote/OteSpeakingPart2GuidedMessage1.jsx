@@ -563,15 +563,19 @@ export default function OteSpeakingPart2GuidedMessage1({ nativeRoutes = false })
 
           {recording && (
             <div className="ote-training-recording-review">
-              <div>
-                <strong>Your recording</strong>
-                <span>Listen back before you compare with the model.</span>
+              <div className="ote-training-review-playback">
+                <div>
+                  <strong>Your recording</strong>
+                  <span>Listen back before you compare with the model.</span>
+                </div>
+                <audio controls playsInline preload="metadata" src={recording.url} />
               </div>
-              <audio controls playsInline preload="metadata" src={recording.url} />
-              <a href={recording.url} download={recording.name}>
-                <Download size={17} aria-hidden="true" />
-                Download audio
-              </a>
+              <div className="ote-training-review-actions">
+                <a className="ote-review-utility-action" href={recording.url} download={recording.name}>
+                  <Download size={17} aria-hidden="true" />
+                  Download audio
+                </a>
+              </div>
             </div>
           )}
         </div>

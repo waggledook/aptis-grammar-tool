@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, CheckCircle2, Download, Mic, Timer } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Download, Mic, RotateCcw, Timer } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import SpeakingFeedbackPanel from "../../components/speaking/SpeakingFeedbackPanel.jsx";
@@ -418,6 +418,7 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
   const activeRunStreamRef = useRef(null);
   const skipListeningRef = useRef(false);
   const skipThinkingRef = useRef(false);
+  const autoStartNextStepRef = useRef(false);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -492,12 +493,27 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
     activeRunStreamRef.current = null;
     skipListeningRef.current = false;
     skipThinkingRef.current = false;
+    autoStartNextStepRef.current = false;
     objectUrlsRef.current.forEach((url) => URL.revokeObjectURL(url));
     objectUrlsRef.current = [];
     activityStartedRef.current = false;
     activityCompletedRef.current = false;
     stop();
   }, [setId]);
+
+  useEffect(() => {
+    if (
+      !autoStartNextStepRef.current ||
+      phase !== "ready" ||
+      !activeStep ||
+      activeStep.kind !== "question" ||
+      recordings.some((recording) => recording.stepId === activeStep.id)
+    ) {
+      return;
+    }
+    autoStartNextStepRef.current = false;
+    startStep();
+  }, [stepIndex, phase, activeStep, recordings]);
 
   async function ensureStream() {
     if (streamRef.current) return streamRef.current;
@@ -707,6 +723,7 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
     activeRunStreamRef.current = null;
     skipListeningRef.current = false;
     skipThinkingRef.current = false;
+    autoStartNextStepRef.current = false;
     setPart3FeedbackResult(null);
     setPart4FeedbackResult(null);
     setFeedbackError("");
@@ -734,10 +751,12 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
   function goNext() {
     stop();
     if (stepIndex < steps.length - 1) {
+      const nextStep = steps[stepIndex + 1];
+      autoStartNextStepRef.current = nextStep?.kind === "question";
       setFlowStep(null);
       setStepIndex((index) => index + 1);
       setPhase("ready");
-      setSecondsLeft(steps[stepIndex + 1]?.prepSeconds || steps[stepIndex + 1]?.responseSeconds || 30);
+      setSecondsLeft(nextStep?.prepSeconds || nextStep?.responseSeconds || 30);
       return;
     }
     setPhase("complete");
@@ -921,7 +940,7 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
                 <p>
                   {visibleStep.kind === "talk"
                     ? "Press Start task when you are ready. The instructions and task materials will be shown and read before the preparation countdown begins."
-                    : "Press Start follow-up questions when you are ready. The question will be shown and read before recording begins."}
+                    : "Press Start follow-up questions when you are ready. The question audio will play before recording begins."}
                 </p>
               </div>
             )}
@@ -957,31 +976,39 @@ export default function OteSpeakingPart34Practice({ nativeRoutes = false, user =
 
             {activeRecording && (
               <div className="ote-training-recording-review">
-                <div>
-                  <strong>{visibleStep.label} recording</strong>
-                  <span>Listen back before moving on.</span>
+                <div className="ote-training-review-playback">
+                  <div>
+                    <strong>{visibleStep.label} recording</strong>
+                    <span>Listen back before moving on.</span>
+                  </div>
+                  <audio controls playsInline preload="metadata" src={activeRecording.url} />
                 </div>
-                <audio controls playsInline preload="metadata" src={activeRecording.url} />
-                <a href={activeRecording.url} download={activeRecording.name}>
-                  <Download size={17} aria-hidden="true" />
-                  Download audio
-                </a>
-                <button type="button" onClick={goNext}>
-                  <CheckCircle2 size={18} aria-hidden="true" />
-                  {visibleStep.kind === "talk" ? "Start Part 4" : stepIndex < steps.length - 1 ? "Next question" : "Finish set"}
-                </button>
-                <button type="button" onClick={repeatVisibleStep}>
-                  Record again
-                </button>
-                {visibleStep.kind === "talk" ? (
-                  <button
-                    type="button"
-                    onClick={() => handleGenerateFeedback("part-3")}
-                    disabled={feedbackLoading === "part-3"}
-                  >
-                    {feedbackLoading === "part-3" ? "Generating feedback..." : "Get Part 3 feedback"}
+                <div className="ote-training-review-actions">
+                  <button className="ote-review-primary-action" type="button" onClick={goNext}>
+                    <CheckCircle2 size={20} aria-hidden="true" />
+                    {visibleStep.kind === "talk" ? "Start Part 4" : stepIndex < steps.length - 1 ? "Next question" : "Finish set"}
                   </button>
-                ) : null}
+                  <div className="ote-training-review-secondary-actions">
+                    <button className="ote-review-secondary-action" type="button" onClick={repeatVisibleStep}>
+                      <RotateCcw size={17} aria-hidden="true" />
+                      Record again
+                    </button>
+                    <a className="ote-review-utility-action" href={activeRecording.url} download={activeRecording.name}>
+                      <Download size={17} aria-hidden="true" />
+                      Download audio
+                    </a>
+                    {visibleStep.kind === "talk" ? (
+                      <button
+                        className="ote-review-utility-action"
+                        type="button"
+                        onClick={() => handleGenerateFeedback("part-3")}
+                        disabled={feedbackLoading === "part-3"}
+                      >
+                        {feedbackLoading === "part-3" ? "Generating feedback..." : "Get Part 3 feedback"}
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
               </div>
             )}
             {visibleStep.kind === "talk" ? (

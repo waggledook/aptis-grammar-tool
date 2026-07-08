@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, CheckCircle2, Download, Mic, Timer } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Download, Mic, RotateCcw, Timer } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import SpeakingFeedbackPanel from "../../components/speaking/SpeakingFeedbackPanel.jsx";
@@ -1014,22 +1014,29 @@ export default function OteSpeakingPart1Practice({ nativeRoutes = false, user = 
 
             {activeRecording && (
               <div className="ote-training-recording-review">
-                <div>
-                  <strong>{activeQuestion.title} recording</strong>
-                  <span>Listen back before moving on.</span>
+                <div className="ote-training-review-playback">
+                  <div>
+                    <strong>{activeQuestion.title} recording</strong>
+                    <span>Listen back before moving on.</span>
+                  </div>
+                  <audio controls playsInline preload="metadata" src={activeRecording.url} />
                 </div>
-                <audio controls playsInline preload="metadata" src={activeRecording.url} />
-                <a href={activeRecording.url} download={activeRecording.name}>
-                  <Download size={17} aria-hidden="true" />
-                  Download audio
-                </a>
-                <button type="button" onClick={goNext}>
-                  <CheckCircle2 size={18} aria-hidden="true" />
-                  {questionIndex < questions.length - 1 ? "Play next question" : "Finish set"}
-                </button>
-                <button type="button" onClick={repeatActiveQuestion}>
-                  Record again
-                </button>
+                <div className="ote-training-review-actions">
+                  <button className="ote-review-primary-action" type="button" onClick={goNext}>
+                    <CheckCircle2 size={20} aria-hidden="true" />
+                    {questionIndex < questions.length - 1 ? "Play next question" : "Finish set"}
+                  </button>
+                  <div className="ote-training-review-secondary-actions">
+                    <button className="ote-review-secondary-action" type="button" onClick={repeatActiveQuestion}>
+                      <RotateCcw size={17} aria-hidden="true" />
+                      Record again
+                    </button>
+                    <a className="ote-review-utility-action" href={activeRecording.url} download={activeRecording.name}>
+                      <Download size={17} aria-hidden="true" />
+                      Download audio
+                    </a>
+                  </div>
+                </div>
               </div>
             )}
           </article>

@@ -202,6 +202,8 @@ import OteSpeakingPart3AdvancedGuide from "./products/ote/OteSpeakingPart3Advanc
 import OteSpeakingPart3SummaryPractice from "./products/ote/OteSpeakingPart3SummaryPractice.jsx";
 import OteSpeakingPart45DebateMenu from "./products/ote/OteSpeakingPart45DebateMenu.jsx";
 import OteSpeakingPart45DebateGuide from "./products/ote/OteSpeakingPart45DebateGuide.jsx";
+import OteSpeakingPart45DebateGuidedTask from "./products/ote/OteSpeakingPart45DebateGuidedTask.jsx";
+import OteSpeakingPart45FollowUpGuidedTask from "./products/ote/OteSpeakingPart45FollowUpGuidedTask.jsx";
 import OteSpeakingPart45DebatePractice from "./products/ote/OteSpeakingPart45DebatePractice.jsx";
 import OteSpeakingPart34Practice from "./products/ote/OteSpeakingPart34Practice.jsx";
 import OteSpeakingMockRunner from "./products/ote/OteSpeakingMockRunner.jsx";
@@ -1393,6 +1395,8 @@ return (
   <Route path="/ote/speaking/part-3-summary/practice/:setId" element={<OteSpeakingPart3SummaryPractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/parts-4-5-debate" element={<OteSpeakingPart45DebateMenu user={user} nativeRoutes={false} />} />
   <Route path="/ote/speaking/parts-4-5-debate/overview" element={<OteSpeakingPart45DebateGuide nativeRoutes={false} />} />
+  <Route path="/ote/speaking/parts-4-5-debate/guided-task" element={<OteSpeakingPart45DebateGuidedTask nativeRoutes={false} />} />
+  <Route path="/ote/speaking/parts-4-5-debate/follow-up-guided-task" element={<OteSpeakingPart45FollowUpGuidedTask nativeRoutes={false} />} />
   <Route path="/ote/speaking/parts-4-5-debate/practice" element={<OteSpeakingPart45DebatePractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/parts-4-5-debate/practice/:setId" element={<OteSpeakingPart45DebatePractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/parts-3-4" element={<OteSpeakingPart34Menu user={user} nativeRoutes={false} />} />
@@ -1547,6 +1551,8 @@ return (
   <Route path="/speaking/part-3-summary/practice/:setId" element={<OteSpeakingPart3SummaryPractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/speaking/parts-4-5-debate" element={<OteSpeakingPart45DebateMenu user={user} nativeRoutes={isOteSite} />} />
   <Route path="/speaking/parts-4-5-debate/overview" element={<OteSpeakingPart45DebateGuide nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/parts-4-5-debate/guided-task" element={<OteSpeakingPart45DebateGuidedTask nativeRoutes={isOteSite} />} />
+  <Route path="/speaking/parts-4-5-debate/follow-up-guided-task" element={<OteSpeakingPart45FollowUpGuidedTask nativeRoutes={isOteSite} />} />
   <Route path="/speaking/parts-4-5-debate/practice" element={<OteSpeakingPart45DebatePractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/speaking/parts-4-5-debate/practice/:setId" element={<OteSpeakingPart45DebatePractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/speaking/parts-3-4" element={<OteSpeakingPart34Menu user={user} nativeRoutes={isOteSite} />} />

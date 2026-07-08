@@ -266,6 +266,22 @@ const OTE_ASSIGNMENT_ITEMS = [
     progressId: "speaking.parts45.advanced-debate-overview",
   },
   {
+    id: "ote.advanced.speaking.parts45.guided-task",
+    variant: "advanced",
+    category: "Speaking",
+    label: "Advanced Debate Guided Task",
+    routePath: "/ote/speaking/parts-4-5-debate/guided-task",
+    progressId: "speaking.parts45.advanced-debate-guided-task",
+  },
+  {
+    id: "ote.advanced.speaking.parts45.followup-guided-task",
+    variant: "advanced",
+    category: "Speaking",
+    label: "Advanced Follow-up Question Guided Task",
+    routePath: "/ote/speaking/parts-4-5-debate/follow-up-guided-task",
+    progressId: "speaking.parts45.advanced-followup-guided-task",
+  },
+  {
     id: "ote.advanced.speaking.parts45.practice",
     variant: "advanced",
     category: "Speaking",

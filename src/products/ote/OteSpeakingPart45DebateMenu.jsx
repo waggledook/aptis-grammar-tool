@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { ArrowLeft, CheckCircle2, ClipboardList, PlayCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ClipboardList, MessageCircleQuestion, Mic2, PlayCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
@@ -17,6 +17,12 @@ export default function OteSpeakingPart45DebateMenu({ user, nativeRoutes = false
   const practicePath = getSitePath(
     nativeRoutes ? "/speaking/parts-4-5-debate/practice" : "/ote/speaking/parts-4-5-debate/practice"
   );
+  const guidedTaskPath = getSitePath(
+    nativeRoutes ? "/speaking/parts-4-5-debate/guided-task" : "/ote/speaking/parts-4-5-debate/guided-task"
+  );
+  const followUpGuidedTaskPath = getSitePath(
+    nativeRoutes ? "/speaking/parts-4-5-debate/follow-up-guided-task" : "/ote/speaking/parts-4-5-debate/follow-up-guided-task"
+  );
   const completedProgress = useOteTrainingProgress();
   const activities = useMemo(
     () => [
@@ -28,8 +34,24 @@ export default function OteSpeakingPart45DebateMenu({ user, nativeRoutes = false
         path: overviewPath,
         progressId: "speaking.parts45.advanced-debate-overview",
       },
+      {
+        label: "Activity 2",
+        title: "Guided Task: The Debate Builder",
+        copy: "Analyze three student answers, plan a two-minute debate, and compare your response with a high-scoring model.",
+        icon: Mic2,
+        path: guidedTaskPath,
+        progressId: "speaking.parts45.advanced-debate-guided-task",
+      },
+      {
+        label: "Activity 3",
+        title: "Guided Task: Follow-up Question Sprint",
+        copy: "Classify Part 5 question types, improve weak answers, and compare your responses with four model follow-ups.",
+        icon: MessageCircleQuestion,
+        path: followUpGuidedTaskPath,
+        progressId: "speaking.parts45.advanced-followup-guided-task",
+      },
     ],
-    [overviewPath]
+    [followUpGuidedTaskPath, guidedTaskPath, overviewPath]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
   const practiceComplete = completedProgress.has("speaking.parts45.practice");

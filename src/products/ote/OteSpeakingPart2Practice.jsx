@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, CheckCircle2, Download, Mic, Timer } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Download, Mic, RotateCcw, Timer } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import SpeakingFeedbackPanel from "../../components/speaking/SpeakingFeedbackPanel.jsx";
@@ -565,6 +565,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
   const activeTask = selectedSet?.tasks?.[activeIndex];
   const complete = selectedSet && recordings.length >= selectedSet.tasks.length;
   const assignmentVariant = isAdvanced ? "advanced" : "general";
+  const getPrepSeconds = (task) => task?.prepSeconds || (isAdvanced ? 10 : 20);
 
   function buildAssignmentItem(set) {
     return {
@@ -589,7 +590,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
   useEffect(() => {
     setActiveIndex(0);
     setPhase("ready");
-    setSecondsLeft(20);
+    setSecondsLeft(getPrepSeconds(activeSets.find((set) => set.id === setId)?.tasks?.[0]));
     setRecordings([]);
     setMicError("");
     setFeedbackResult(null);
@@ -602,7 +603,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     activityStartedRef.current = false;
     activityCompletedRef.current = false;
     stop();
-  }, [setId]);
+  }, [setId, isAdvanced]);
 
   async function ensureStream() {
     if (streamRef.current) return streamRef.current;
@@ -665,10 +666,10 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     if (!stream) return;
     skipThinkingRef.current = false;
     setPhase("thinking");
-    setSecondsLeft(activeTask.prepSeconds || (isAdvanced ? 10 : 20));
+    setSecondsLeft(getPrepSeconds(activeTask));
     if (playCue) await playAudioFile(`think-auto-${activeTask.id}`, OTE_SPEAKING_AUDIO.timeToThink);
     if (skipListeningRef.current || skipThinkingRef.current) return;
-    startCountdown(activeTask.prepSeconds || (isAdvanced ? 10 : 20), "thinking", () => startRecording(stream));
+    startCountdown(getPrepSeconds(activeTask), "thinking", () => startRecording(stream));
   }
 
   function listeningWasSkipped(stream) {
@@ -769,7 +770,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     if (phase === "listening") {
       skipListeningRef.current = true;
       setPhase("thinking");
-      setSecondsLeft(activeTask?.prepSeconds || (isAdvanced ? 10 : 20));
+      setSecondsLeft(getPrepSeconds(activeTask));
       stop();
       return;
     }
@@ -793,7 +794,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     objectUrlsRef.current = objectUrlsRef.current.filter((url) => url !== recording?.url);
     setRecordings((current) => current.filter((item) => item.taskId !== activeTask.id));
     setPhase("ready");
-    setSecondsLeft(activeTask.prepSeconds || (isAdvanced ? 10 : 20));
+    setSecondsLeft(getPrepSeconds(activeTask));
     activeRunStreamRef.current = null;
     skipListeningRef.current = false;
     skipThinkingRef.current = false;
@@ -805,9 +806,10 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     stop();
     if (!selectedSet) return;
     if (activeIndex < selectedSet.tasks.length - 1) {
+      const nextTask = selectedSet.tasks[activeIndex + 1];
       setActiveIndex((index) => index + 1);
       setPhase("ready");
-      setSecondsLeft(20);
+      setSecondsLeft(getPrepSeconds(nextTask));
       return;
     }
     setPhase("complete");
@@ -834,7 +836,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     setRecordings([]);
     setActiveIndex(0);
     setPhase("ready");
-    setSecondsLeft(20);
+    setSecondsLeft(getPrepSeconds(selectedSet?.tasks?.[0]));
     setMicError("");
     setFeedbackResult(null);
     setFeedbackError("");
@@ -923,6 +925,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
   }
 
   const activeRecording = recordings.find((recording) => recording.taskId === activeTask?.id);
+  const shouldRevealActiveTask = phase !== "ready" || Boolean(activeRecording);
   const taskSpeech = activeTask ? buildTaskSpeech(activeTask) : "";
 
   return (
@@ -958,24 +961,37 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
               </div>
             </div>
 
-            <div className="ote-practice-instructions">
-              <p className="ote-kicker">Instructions</p>
-              <ul>
-                {activeInstructions.map((line) => (
-                  <li key={line}>{line}</li>
-                ))}
-              </ul>
-            </div>
+            {shouldRevealActiveTask ? (
+              <>
+                <div className="ote-practice-instructions">
+                  <p className="ote-kicker">Instructions</p>
+                  <ul>
+                    {activeInstructions.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
+                </div>
 
-            <div className="ote-practice-specific-prompt">
-              <p>{activeTask.lead}</p>
-            </div>
+                <div className="ote-practice-specific-prompt">
+                  <p>{activeTask.lead}</p>
+                </div>
 
-            <ul className="ote-practice-bullets">
-              {activeTask.bullets.map((bullet) => (
-                <li key={bullet}>{bullet}</li>
-              ))}
-            </ul>
+                <ul className="ote-practice-bullets">
+                  {activeTask.bullets.map((bullet) => (
+                    <li key={bullet}>{bullet}</li>
+                  ))}
+                </ul>
+              </>
+            ) : (
+              <div className="ote-practice-hidden-task">
+                <p className="ote-kicker">Task hidden</p>
+                <p>
+                  {isAdvanced
+                    ? "Press Start task to reveal the voice message task and begin the timed sequence."
+                    : "Press Start task to reveal the voicemail instructions and begin the timed sequence."}
+                </p>
+              </div>
+            )}
 
             {micError && <p className="ote-mic-error">{micError}</p>}
 
@@ -1003,22 +1019,29 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
 
             {activeRecording && (
               <div className="ote-training-recording-review">
-                <div>
-                  <strong>Your {activeTask.label} recording</strong>
-                  <span>Listen back before moving on.</span>
+                <div className="ote-training-review-playback">
+                  <div>
+                    <strong>Your {activeTask.label} recording</strong>
+                    <span>Listen back before moving on.</span>
+                  </div>
+                  <audio controls playsInline preload="metadata" src={activeRecording.url} />
                 </div>
-                <audio controls playsInline preload="metadata" src={activeRecording.url} />
-                <a href={activeRecording.url} download={activeRecording.name}>
-                  <Download size={17} aria-hidden="true" />
-                  Download audio
-                </a>
-                <button type="button" onClick={goNext}>
-                  <CheckCircle2 size={18} aria-hidden="true" />
-                  {activeIndex < selectedSet.tasks.length - 1 ? "Next voicemail" : "Finish set"}
-                </button>
-                <button type="button" onClick={repeatActiveTask}>
-                  Record again
-                </button>
+                <div className="ote-training-review-actions">
+                  <button className="ote-review-primary-action" type="button" onClick={goNext}>
+                    <CheckCircle2 size={20} aria-hidden="true" />
+                    {activeIndex < selectedSet.tasks.length - 1 ? "Next voicemail" : "Finish set"}
+                  </button>
+                  <div className="ote-training-review-secondary-actions">
+                    <button className="ote-review-secondary-action" type="button" onClick={repeatActiveTask}>
+                      <RotateCcw size={17} aria-hidden="true" />
+                      Record again
+                    </button>
+                    <a className="ote-review-utility-action" href={activeRecording.url} download={activeRecording.name}>
+                      <Download size={17} aria-hidden="true" />
+                      Download audio
+                    </a>
+                  </div>
+                </div>
               </div>
             )}
           </article>
@@ -1033,26 +1056,32 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
                 ? "Play your voice message back, download the file, or generate feedback."
                 : "Play them back, download individual files, or download the full set as a ZIP."}
             </p>
-            <button
-              className="ote-reference-download"
-              type="button"
-              onClick={() => createZipAndDownload(recordings, `ote-part-2-${selectedSet.id}.zip`)}
-              disabled={!recordings.length}
-            >
-              <Download size={18} aria-hidden="true" />
-              Download ZIP
-            </button>
-            <button
-              className="ote-training-primary-link"
-              type="button"
-              onClick={handleGenerateFeedback}
-              disabled={!recordings.length || feedbackLoading}
-            >
-              {feedbackLoading ? "Generating feedback..." : "Get AI feedback"}
-            </button>
-            <button className="ote-training-primary-link" type="button" onClick={repeatActiveTask}>
-              Record current task again
-            </button>
+            <div className="ote-complete-action-panel">
+              <button
+                className="ote-complete-primary-action"
+                type="button"
+                onClick={handleGenerateFeedback}
+                disabled={!recordings.length || feedbackLoading}
+              >
+                <CheckCircle2 size={20} aria-hidden="true" />
+                {feedbackLoading ? "Generating feedback..." : "Get AI feedback"}
+              </button>
+              <div className="ote-complete-secondary-actions">
+                <button className="ote-complete-secondary-action" type="button" onClick={repeatActiveTask}>
+                  <RotateCcw size={17} aria-hidden="true" />
+                  Record again
+                </button>
+                <button
+                  className="ote-complete-utility-action"
+                  type="button"
+                  onClick={() => createZipAndDownload(recordings, `ote-part-2-${selectedSet.id}.zip`)}
+                  disabled={!recordings.length}
+                >
+                  <Download size={17} aria-hidden="true" />
+                  Download ZIP
+                </button>
+              </div>
+            </div>
             {feedbackError ? <p className="ote-mic-error">{feedbackError}</p> : null}
             <SpeakingFeedbackPanel
               feedbackResult={feedbackResult}
@@ -1068,7 +1097,10 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
                     <small>{recording.durationSeconds}s response window</small>
                   </div>
                   <audio controls playsInline preload="metadata" src={recording.url} />
-                  <a href={recording.url} download={recording.name}>Download audio</a>
+                  <a className="ote-recording-download-link" href={recording.url} download={recording.name}>
+                    <Download size={17} aria-hidden="true" />
+                    Download audio
+                  </a>
                 </article>
               ))}
             </div>

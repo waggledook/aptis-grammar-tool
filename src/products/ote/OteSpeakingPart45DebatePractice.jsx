@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, CheckCircle2, Download, Mic, NotebookTabs, Timer } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Download, Mic, NotebookTabs, RotateCcw, Timer } from "lucide-react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import SpeakingFeedbackPanel from "../../components/speaking/SpeakingFeedbackPanel.jsx";
@@ -37,6 +37,8 @@ const DEBATE_REQUIREMENTS = [
   "give a conclusion",
 ];
 
+const DEBATE_STATEMENT_LEAD_AUDIO = "/audio/ote/speaking/advanced/debate-prompts/your-tutor-statement.mp3";
+
 const DEBATE_PRACTICE_SETS = [
   {
     id: "travel-environment",
@@ -45,6 +47,13 @@ const DEBATE_PRACTICE_SETS = [
     statement: "International tourism does more harm than good.",
     topic: "the impact of global tourism",
     followUpLead: "The topic of your debate was the impact of global tourism.",
+    taskAudioSrc: "/audio/ote/speaking/advanced/debate-prompts/travel-environment-topic.mp3",
+    followUpAudioSources: [
+      "/audio/ote/speaking/advanced/debate-followups/travel-environment-q1.mp3",
+      "/audio/ote/speaking/advanced/debate-followups/travel-environment-q2.mp3",
+      "/audio/ote/speaking/advanced/debate-followups/travel-environment-q3.mp3",
+      "/audio/ote/speaking/advanced/debate-followups/travel-environment-q4.mp3",
+    ],
     mindMapIdeas: [
       "cultural preservation",
       "local businesses",
@@ -53,7 +62,7 @@ const DEBATE_PRACTICE_SETS = [
       "global understanding",
     ],
     questions: [
-      "Your talk was about international travel. How likely is it that people will change their travel habits to protect the environment?",
+      "The topic of your debate was the impact of global tourism. How likely is it that people will change their travel habits to protect the environment?",
       "Many historic cities are crowded with visitors. Should local governments restrict access to popular cultural landmarks?",
       "Do you agree that learning a foreign language is essential to truly understand another country's culture?",
       "Some people believe that global trade leads to a loss of national identity. What do you think?",
@@ -66,6 +75,13 @@ const DEBATE_PRACTICE_SETS = [
     statement: "Physical cash should be completely phased out of society.",
     topic: "a cashless society",
     followUpLead: "The topic of your debate was a cashless society.",
+    taskAudioSrc: "/audio/ote/speaking/advanced/debate-prompts/shopping-consumerism-topic.mp3",
+    followUpAudioSources: [
+      "/audio/ote/speaking/advanced/debate-followups/shopping-consumerism-q1.mp3",
+      "/audio/ote/speaking/advanced/debate-followups/shopping-consumerism-q2.mp3",
+      "/audio/ote/speaking/advanced/debate-followups/shopping-consumerism-q3.mp3",
+      "/audio/ote/speaking/advanced/debate-followups/shopping-consumerism-q4.mp3",
+    ],
     mindMapIdeas: [
       "financial fraud",
       "transaction speed",
@@ -74,7 +90,7 @@ const DEBATE_PRACTICE_SETS = [
       "bank fees",
     ],
     questions: [
-      "Your talk was about digital currency. Do you think a totally digital economy makes people spend more money than they should?",
+      "The topic of your debate was a cashless society. Do you think a totally digital economy makes people spend more money than they should?",
       "Many people prefer to shop online rather than visit local markets. What are the consequences of this trend for small towns?",
       "How important is it for schools to teach children practical financial management and budgeting skills?",
       "Some people say that money cannot buy long-term happiness. What is your view?",
@@ -87,6 +103,13 @@ const DEBATE_PRACTICE_SETS = [
     statement: "Governments should fund environmental protection over space exploration.",
     topic: "funding priorities for science and the environment",
     followUpLead: "The topic of your debate was funding priorities for science and the environment.",
+    taskAudioSrc: "/audio/ote/speaking/advanced/debate-prompts/science-natural-world-topic.mp3",
+    followUpAudioSources: [
+      "/audio/ote/speaking/advanced/debate-followups/science-natural-world-q1.mp3",
+      "/audio/ote/speaking/advanced/debate-followups/science-natural-world-q2.mp3",
+      "/audio/ote/speaking/advanced/debate-followups/science-natural-world-q3.mp3",
+      "/audio/ote/speaking/advanced/debate-followups/science-natural-world-q4.mp3",
+    ],
     mindMapIdeas: [
       "climate change",
       "technological breakthroughs",
@@ -95,7 +118,7 @@ const DEBATE_PRACTICE_SETS = [
       "scientific discovery",
     ],
     questions: [
-      "Your talk was about space exploration and Earth. If private companies fund space missions, should they own what they discover?",
+      "The topic of your debate was funding priorities for science and the environment. If private companies fund space missions, should they own what they discover?",
       "Many people feel powerless to combat global warming on an individual level. What actions should local communities take?",
       "Do you agree that international cooperation is vital for major scientific advancements?",
       "Some people say that we should remain entirely optimistic about the future of human civilization. What do you think?",
@@ -105,7 +128,9 @@ const DEBATE_PRACTICE_SETS = [
 
 function formatTime(seconds) {
   const safe = Math.max(0, Math.ceil(seconds || 0));
-  return `00:${String(safe).padStart(2, "0")}`;
+  const minutes = Math.floor(safe / 60);
+  const remainingSeconds = safe % 60;
+  return `${minutes}:${String(remainingSeconds).padStart(2, "0")}`;
 }
 
 function getSupportedMimeType() {
@@ -123,6 +148,10 @@ function buildDebateTaskSpeech(set) {
   ].join(" ");
 }
 
+function buildDebateTopicSpeech(set) {
+  return set.statement;
+}
+
 function buildSteps(set, mode) {
   if (!set) return [];
   const steps = [];
@@ -134,6 +163,7 @@ function buildSteps(set, mode) {
       label: "Part 4 Debate",
       title: "Debate",
       prompt: buildDebateTaskSpeech(set),
+      taskAudioSrc: set.taskAudioSrc,
       prepSeconds: 45,
       responseSeconds: 120,
     });
@@ -146,6 +176,7 @@ function buildSteps(set, mode) {
       label: `Follow-up ${index + 1}`,
       title: `Question ${index + 1}`,
       prompt,
+      audioSrc: set.followUpAudioSources?.[index],
       prepSeconds: 0,
       responseSeconds: 40,
     });
@@ -304,11 +335,61 @@ async function createZipAndDownload(files, zipName = "ote-debate-practice.zip") 
 }
 
 function NotesPanel({ value, onChange, onClose }) {
+  const panelRef = useRef(null);
+  const dragRef = useRef(null);
+  const [position, setPosition] = useState(null);
+
+  function clampPosition(left, top, width, height) {
+    const margin = 12;
+    const maxLeft = Math.max(margin, window.innerWidth - width - margin);
+    const maxTop = Math.max(margin, window.innerHeight - height - margin);
+    return {
+      left: Math.min(Math.max(margin, left), maxLeft),
+      top: Math.min(Math.max(margin, top), maxTop),
+    };
+  }
+
+  function startDrag(event) {
+    if (event.button !== 0 || !panelRef.current) return;
+    const rect = panelRef.current.getBoundingClientRect();
+    dragRef.current = {
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top,
+      width: rect.width,
+      height: rect.height,
+    };
+    setPosition(clampPosition(rect.left, rect.top, rect.width, rect.height));
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+  }
+
+  function moveDrag(event) {
+    if (!dragRef.current) return;
+    const { offsetX, offsetY, width, height } = dragRef.current;
+    setPosition(clampPosition(event.clientX - offsetX, event.clientY - offsetY, width, height));
+  }
+
+  function stopDrag(event) {
+    dragRef.current = null;
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+  }
+
   return (
-    <aside className="ote-notes-panel" role="dialog" aria-label="Notes">
-      <div className="ote-notes-header">
+    <aside
+      ref={panelRef}
+      className="ote-notes-panel"
+      role="dialog"
+      aria-label="Notes"
+      style={position ? { left: `${position.left}px`, top: `${position.top}px`, right: "auto" } : undefined}
+    >
+      <div
+        className="ote-notes-header"
+        onPointerDown={startDrag}
+        onPointerMove={moveDrag}
+        onPointerUp={stopDrag}
+        onPointerCancel={stopDrag}
+      >
         <strong>Notes</strong>
-        <button type="button" onClick={onClose} aria-label="Close notes">x</button>
+        <button type="button" onPointerDown={(event) => event.stopPropagation()} onClick={onClose} aria-label="Close notes">x</button>
       </div>
       <div className="ote-notes-paper">
         <textarea
@@ -373,6 +454,7 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
   const activeRunStreamRef = useRef(null);
   const skipListeningRef = useRef(false);
   const skipThinkingRef = useRef(false);
+  const autoStartNextStepRef = useRef(false);
   const recorderRef = useRef(null);
   const chunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -426,10 +508,17 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
     activeRunStreamRef.current = null;
     skipListeningRef.current = false;
     skipThinkingRef.current = false;
+    autoStartNextStepRef.current = false;
     activityStartedRef.current = false;
     activityCompletedRef.current = false;
     stop();
   }, [setId, initialMode]);
+
+  useEffect(() => {
+    if (!autoStartNextStepRef.current || phase !== "ready" || activeRecording || !activeStep) return;
+    autoStartNextStepRef.current = false;
+    startStep();
+  }, [stepIndex, phase, activeStep, activeRecording]);
 
   async function ensureStream() {
     if (streamRef.current) return streamRef.current;
@@ -512,20 +601,30 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
     if (activeStep.kind === "debate") {
       await playAudioFile("debate-instructions", OTE_SPEAKING_AUDIO.debateAdvancedInstructions);
       if (skipListeningRef.current) return beginThinkingPhase(stream, activeStep, { playCue: false });
-      await speak("debate-task", buildDebateTaskSpeech(selectedSet), 0.92);
+      const playedLeadAudio = await playAudioFile("debate-statement-lead", DEBATE_STATEMENT_LEAD_AUDIO);
+      if (!playedLeadAudio) {
+        await speak(
+          "debate-statement-lead",
+          "Your tutor has asked you to take part in a class debate. You are going to put a case for or against the following statement:",
+          0.92
+        );
+      }
+      if (skipListeningRef.current) return beginThinkingPhase(stream, activeStep, { playCue: false });
+      const playedTopicAudio = await playAudioFile("debate-topic", activeStep.taskAudioSrc);
+      if (!playedTopicAudio) await speak("debate-topic", buildDebateTopicSpeech(selectedSet), 0.92);
       if (skipListeningRef.current) return beginThinkingPhase(stream, activeStep, { playCue: false });
       beginThinkingPhase(stream, activeStep);
     } else {
       if (stepIndex === (hasDebate ? 1 : 0)) {
         await playAudioFile("follow-up-instructions", OTE_SPEAKING_AUDIO.followUpAdvancedInstructions);
-        await speak("follow-up-topic", selectedSet.followUpLead, 0.94);
         if (skipListeningRef.current) {
           skipListeningRef.current = false;
           startRecording(stream, activeStep);
           return;
         }
       }
-      await speak(activeStep.id, activeStep.prompt, 0.94);
+      const playedQuestionAudio = await playAudioFile(activeStep.id, activeStep.audioSrc);
+      if (!playedQuestionAudio) await speak(activeStep.id, activeStep.prompt, 0.94);
       if (skipListeningRef.current) {
         skipListeningRef.current = false;
         startRecording(stream, activeStep);
@@ -625,6 +724,7 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
     stop();
     if (stepIndex < steps.length - 1) {
       const nextStep = steps[stepIndex + 1];
+      autoStartNextStepRef.current = nextStep.kind === "question";
       setStepIndex((index) => index + 1);
       setPhase("ready");
       setSecondsLeft(nextStep.prepSeconds || nextStep.responseSeconds || 40);
@@ -664,6 +764,7 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
     activeRunStreamRef.current = null;
     skipListeningRef.current = false;
     skipThinkingRef.current = false;
+    autoStartNextStepRef.current = false;
     stop();
   }
 
@@ -824,10 +925,6 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
                       ))}
                     </ul>
                   </div>
-                  <div className="ote-practice-specific-prompt">
-                    <p>{selectedSet.followUpLead}</p>
-                    <p>{activeStep.prompt}</p>
-                  </div>
                 </>
               )
             ) : (
@@ -877,22 +974,31 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
 
             {activeRecording ? (
               <div className="ote-training-recording-review">
-                <div>
-                  <strong>{activeStep.label} recording</strong>
-                  <span>Listen back before moving on.</span>
+                <div className="ote-training-review-playback">
+                  <div>
+                    <strong>{activeStep.label} recording</strong>
+                    <span>Listen back before moving on.</span>
+                  </div>
+                  <audio controls playsInline preload="metadata" src={activeRecording.url} />
                 </div>
-                <audio controls playsInline preload="metadata" src={activeRecording.url} />
-                <a href={activeRecording.url} download={activeRecording.name}>
-                  <Download size={17} aria-hidden="true" />
-                  Download audio
-                </a>
-                <button type="button" onClick={goNext}>
-                  <CheckCircle2 size={18} aria-hidden="true" />
-                  {stepIndex < steps.length - 1 ? "Next task" : "Finish set"}
-                </button>
-                <button type="button" onClick={repeatActiveStep}>
-                  Record again
-                </button>
+                <div className="ote-training-review-actions">
+                  <button className="ote-review-primary-action" type="button" onClick={goNext}>
+                    <CheckCircle2 size={20} aria-hidden="true" />
+                    {stepIndex < steps.length - 1
+                      ? steps[stepIndex + 1]?.kind === "question" ? "Next question" : "Next task"
+                      : "Finish set"}
+                  </button>
+                  <div className="ote-training-review-secondary-actions">
+                    <button className="ote-review-secondary-action" type="button" onClick={repeatActiveStep}>
+                      <RotateCcw size={17} aria-hidden="true" />
+                      Record again
+                    </button>
+                    <a className="ote-review-utility-action" href={activeRecording.url} download={activeRecording.name}>
+                      <Download size={17} aria-hidden="true" />
+                      Download audio
+                    </a>
+                  </div>
+                </div>
               </div>
             ) : null}
           </article>
@@ -901,7 +1007,7 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
         {(complete || phase === "complete") ? (
           <section className="ote-practice-complete">
             <p className="ote-kicker">Practice complete</p>
-            <h2>Review Your Debate Practice</h2>
+            <h2>{initialMode === "followups" ? "Review Your Follow-up Practice" : "Review Your Debate Practice"}</h2>
             <p>Play back your recordings, download the set, or generate focused feedback.</p>
             <div className="ote-practice-complete-actions">
               <button

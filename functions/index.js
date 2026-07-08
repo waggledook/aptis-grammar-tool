@@ -2447,6 +2447,8 @@ function buildOteAdvancedSpeakingPrompt(payload, items) {
     "- C1 evidence: task requirements mostly fulfilled, listener fully informed, register appropriate with rare lapses, smooth flow, organized discourse, high grammatical control of simple and complex structures, broad relevant lexis, and Part 3 synthesizes the two main points with appropriate supporting detail.",
     "- C2-like evidence: task requirements completely fulfilled, effortless and well-developed communication, effortlessly appropriate register, highly organized discourse, rare errors only in complex/infrequent language, sophisticated lexis, and Part 3 concisely synthesizes both main points with effective organization of any supporting details.",
     "- C1.2 / plus-level feedback should be reserved for performances that meet C1 comfortably, not merely minimally.",
+    "- For Part 5-only feedback, use C1+ range or C2-like / above OTE task range when the answers are consistently native-like/professionally fluent for this limited task: direct, well developed, idiomatic, flexible, nuanced, and controlled across the four questions.",
+    "- Do not hold a native-like Part 5 performance at plain C1 just because the evidence is limited to Part 5; reflect the limited scope in confidence/note instead.",
     "- Limited evidence should lower confidence, not automatically force a low level.",
     "- Do not lower a strong advanced performance because spontaneous speech contains ordinary fillers or local slips.",
     "",
@@ -2464,9 +2466,10 @@ function buildOteAdvancedSpeakingPrompt(payload, items) {
     "- Include useful languageErrors only for clear learner-language issues supported by the transcript. Do not invent errors. Up to three per short response, up to five only for longer Part 3/Part 4 responses.",
     "- Do not put register preferences in languageErrors unless the style is genuinely inappropriate for the task audience.",
     "- Do not correct acceptable spoken phrasing just because a tidier written alternative exists.",
+    "- Do not treat hesitation fragments, filler-adjacent wording, false starts, or likely transcription artifacts as grammar errors. For example, if a transcript appears to show an odd article before a plural noun but the surrounding speech is native-like, mention transcript uncertainty only if useful; do not present it as a definite correction.",
     "- Be very cautious with possible mistranscriptions. If a phrase is plausible as a transcription artefact, mention uncertainty in teacherNote rather than presenting it as a definite language error.",
     "- Improved answers should preserve the student's idea, specificity, tone, and level. Never simplify a strong advanced answer into a generic B1/B2 model.",
-    "- For strong C1/C1+/C2-like responses, improvedAnswer must be a light same-level polish or say the original content is already strong and only needs minor local edits.",
+    "- For strong C1/C1+/C2-like responses, improvedAnswer must be a light same-level polish or say the original content is already strong and only needs minor local edits. If languageErrors are included, the improvedAnswer must apply those exact corrections and must not repeat the flagged wording.",
     "- Match the expected time limit: brief for Part 1, around 70-100 words for Part 2/3, around 220-300 words for Part 4, and around 50-85 words for each Part 5 answer when giving model/improved answers.",
     "",
     `Feedback scope: ${isMock ? "full OTE Advanced speaking mock" : payload.partId}.`,
@@ -2795,12 +2798,94 @@ function isOteStylePolishOnly(item = {}) {
   );
 }
 
+function isLikelySpokenTranscriptArtifact(item = {}) {
+  const category = normalizeFeedbackText(item.category || "");
+  const original = normalizeFeedbackText(item.original || "");
+  const correction = normalizeFeedbackText(item.correction || "");
+  const explanation = normalizeFeedbackText(item.explanation || item.feedback || item.comment || "");
+  if (!original || !correction) return false;
+  if (category === "transcript_unclear") return true;
+  if (/\b(transcript|transcription|misheard|hesitation|false start|self-correction|slip|spoken)\b/.test(explanation)) {
+    return true;
+  }
+
+  const withoutArticles = original.replace(/\b(a|an|the)\s+/g, "").trim();
+  if (withoutArticles === correction && /\b(a|an|the)\b/.test(original)) return true;
+  return false;
+}
+
+function getPart5Strength(feedback, items = []) {
+  if (!feedback || !Array.isArray(feedback.answers) || feedback.answers.length !== 4) return "none";
+  if (!items.every((item) => item?.questionType === "follow_up" || item?.partId === "part-5")) return "none";
+
+  const totalWords = items.reduce((sum, item) => sum + Number(item.wordCount || 0), 0);
+  const allSubstantial = items.every((item) => Number(item.wordCount || 0) >= 30);
+  const answers = feedback.answers;
+  const allTaskGood = answers.every((answer) => getCriterionStatus(answer.taskFulfilment) === "good");
+  const developedCount = answers.filter((answer) => getCriterionStatus(answer.answerDevelopment) === "well_developed").length;
+  const allGrammarControlled = answers.every((answer) =>
+    ["good", "minor_issues"].includes(getCriterionStatus(answer.grammar))
+  );
+  const strongVocabCount = answers.filter((answer) => getCriterionStatus(answer.vocabulary) === "good").length;
+  const fluentCount = answers.filter((answer) => getCriterionStatus(answer.fluency) === "good").length;
+  const meaningfulErrors = answers.reduce((sum, answer) => {
+    const errors = Array.isArray(answer.languageErrors) ? answer.languageErrors : [];
+    return sum + errors.filter((error) => !isLikelySpokenTranscriptArtifact(error)).length;
+  }, 0);
+
+  if (
+    totalWords >= 170 &&
+    allSubstantial &&
+    allTaskGood &&
+    developedCount >= 3 &&
+    allGrammarControlled &&
+    strongVocabCount >= 3 &&
+    fluentCount >= 3 &&
+    meaningfulErrors <= 1
+  ) {
+    return "native_like";
+  }
+
+  if (
+    totalWords >= 140 &&
+    allSubstantial &&
+    allTaskGood &&
+    developedCount >= 2 &&
+    allGrammarControlled &&
+    strongVocabCount >= 2 &&
+    fluentCount >= 2 &&
+    meaningfulErrors <= 2
+  ) {
+    return "strong_c1_plus";
+  }
+
+  return "none";
+}
+
 function postProcessOteSpeakingFeedback(feedback, items = []) {
   feedback = postProcessAptisSpeakingPart2Feedback(feedback, items, "OTE Speaking");
   if (feedback?.estimatedLevel?.note) {
     feedback.estimatedLevel.note = feedback.estimatedLevel.note.replace(/Aptis-style/gi, "OTE-style");
   }
   if (!feedback || !Array.isArray(feedback.answers)) return feedback;
+
+  const part5Strength = getPart5Strength(feedback, items);
+  const nativeLikePart5 = part5Strength === "native_like";
+  if (["native_like", "strong_c1_plus"].includes(part5Strength) && feedback.estimatedLevel?.label === "C1 range") {
+    feedback.estimatedLevel = {
+      ...feedback.estimatedLevel,
+      label: nativeLikePart5 ? "C2-like / above OTE task range" : "C1+ range",
+      confidence: feedback.estimatedLevel?.confidence === "low" ? "medium" : feedback.estimatedLevel?.confidence || "medium",
+      note: nativeLikePart5
+        ? "AI-estimated OTE Advanced-style feedback, not an official score. These Part 5 answers show native-like/professionally fluent control for this limited follow-up task; OTE public reporting is capped at C1, so treat this as above-range task evidence rather than an official C2 result."
+        : "AI-estimated OTE Advanced-style feedback, not an official score. These Part 5 answers show comfortable C1 control for this limited follow-up task; OTE public reporting is capped at C1, so C1+ means strong task evidence rather than an official higher result.",
+    };
+    if (feedback.overall) {
+      feedback.overall.summary = nativeLikePart5
+        ? "The follow-up answers are consistently fluent, flexible, well developed, and idiomatic, with strong control of complex spoken language across the four questions."
+        : "The follow-up answers are fluent, flexible, developed, and controlled across the set, showing comfortable C1-level performance for this task type.";
+    }
+  }
 
   const advanced = ["C1 range", "C1+ range", "C2-like / above OTE task range"].includes(
     feedback.estimatedLevel?.label || ""
@@ -2809,7 +2894,17 @@ function postProcessOteSpeakingFeedback(feedback, items = []) {
   feedback.answers = feedback.answers.map((answer, index) => {
     const next = { ...answer };
     if (Array.isArray(next.languageErrors)) {
-      next.languageErrors = next.languageErrors.filter((item) => !isOteStylePolishOnly(item));
+      next.languageErrors = next.languageErrors.filter((item) =>
+        !isOteStylePolishOnly(item) && !(nativeLikePart5 && isLikelySpokenTranscriptArtifact(item))
+      );
+    }
+    if (nativeLikePart5 && next.grammar && next.languageErrors?.length === 0) {
+      next.grammar = {
+        ...next.grammar,
+        status: "good",
+        feedback: "Grammar is controlled and natural in spontaneous spoken English; no clear learner-language correction is needed here.",
+        examples: [],
+      };
     }
     if (advanced) {
       const transcript = cleanString(items[index]?.transcript || next.transcript || "", 3600);
