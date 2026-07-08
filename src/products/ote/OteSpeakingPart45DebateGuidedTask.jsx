@@ -44,25 +44,25 @@ const weakAnswers = [
     example: "Student Example 2",
     label: "The Fence-Sitter",
     answer:
-      "Well, I suppose both sides are true. Some students need lectures, but some students do not. Attendance can be useful, but optional attendance can also be useful. I don't really know. It depends on the student and the subject.",
-    problem: "Marcos never really chooses a side.",
+      "Well, I suppose there are good arguments on both sides. On the one hand, university students are adults, so maybe they should be free to decide whether a lecture is useful for them or not. Some people learn better alone, and some students have jobs or family responsibilities, so compulsory attendance might be unfair in some cases. But on the other hand, lectures are also important because students can ask questions and follow the course more easily. If attendance is optional, some students might miss too many classes and then have problems with their academic results. So I think attendance can be useful, but optional attendance can also be useful. It really depends on the student, the subject and the teacher.",
+    problem: "Marcos gives several relevant ideas, but he never really puts a case forward.",
     feedback:
-      "A balanced answer is fine, but this is a debate. The listener needs to know what case you are putting forward. You can acknowledge the other side briefly, but your position should be clear.",
+      "A balanced answer is fine, but this is a debate. The listener needs to know which side you are arguing for. You can acknowledge the other side briefly, but your own position should control the answer.",
     better:
-      "Although compulsory attendance can help some students stay organized, I would still argue that attendance should be optional. At university level, students should be treated as adults and given the responsibility to decide how they learn best.",
+      "Although compulsory attendance can help some students stay organized, I would still argue that attendance should be optional. At university level, students should be treated as adults and given responsibility for their own learning. This does not mean that lectures are unimportant; it means that students should be trusted to decide when attending in person is genuinely necessary.",
   },
   {
     id: "underdeveloped",
     name: "Sara",
     example: "Student Example 3",
-    label: "The Underdeveloped Answer",
+    label: "The One-Point Answer",
     answer:
-      "I disagree with the statement. Attendance should not be optional because students may stop going to class. Also, some students may get worse marks. For example, if students miss lectures, they might not understand the subject. So I disagree.",
-    problem: "Sara has a clear opinion, but the argument is too short for a two-minute response.",
+      "I disagree with the statement because attendance is very important for academic results. If students stop going to lectures, they may miss explanations from the teacher, and then they might not understand the subject properly. This is especially true in difficult courses, where one topic is connected to the next. For example, if a student misses several lectures at the beginning of term, they may feel lost later and get worse marks in the exam. So, in my opinion, attendance should not be optional because students need to go to class if they want to do well.",
+    problem: "Sara has a clear position and one relevant argument, but the answer depends too heavily on a single point.",
     feedback:
-      "This is a good starting point, but it needs expansion: explain consequences, give a concrete example, add a second developed point, and finish with a stronger conclusion.",
+      "This is a good start, but a two-minute debate needs more range. Sara should add a second developed idea, use clearer transitions, and possibly acknowledge the strongest argument on the other side before returning to her position.",
     better:
-      "I would argue against the statement because making lectures optional could seriously affect academic results. Many students believe they can study independently, but in practice they may miss explanations, examples and opportunities to ask questions. This could be especially damaging in more complex subjects, where understanding develops gradually over several sessions.",
+      "I would argue against the statement because making lectures optional could seriously affect academic results. Many students believe they can study independently, but in practice they may miss explanations, examples and opportunities to ask questions. A further concern is motivation: if attendance is completely optional, some students may gradually stop going, not because they have a better learning strategy, but because they lack structure.",
   },
 ];
 
