@@ -58,6 +58,17 @@ const OTE_SPEAKING_TOTALS = {
     mock: 0,
   },
 };
+const OTE_READING_PRACTICE_SETS = {
+  general: [
+    { id: "general-reading-part-1-a2-pilot-1", label: "Part 1 A2 sets" },
+    { id: "general-reading-part-1-b1-pilot-1", label: "Part 1 B1 sets" },
+    { id: "general-reading-part-1-pilot-1", label: "Part 1 B2 sets" },
+  ],
+  advanced: [
+    { id: "advanced-reading-part-1-pilot-1", label: "Part 1 Pilot Set 1" },
+    { id: "advanced-reading-part-1-pilot-2", label: "Part 1 Pilot Set 2" },
+  ],
+};
 
 const OTE_ADVANCED_SPEAKING_TASK_IDS = new Set([
   "urban-green-spaces",
@@ -243,8 +254,10 @@ export default function Profile({
   const [speakingFeedback, setSpeakingFeedback] = useState([]);
   const [showSpeakingFeedback, setShowSpeakingFeedback] = useState(false);
   const [oteMockAttempts, setOteMockAttempts] = useState([]);
-  const [showOteSpeakingPanel, setShowOteSpeakingPanel] = useState(true);
-  const [showOteWritingPanel, setShowOteWritingPanel] = useState(true);
+  const [oteTrainingProgress, setOteTrainingProgress] = useState({});
+  const [showOteSpeakingPanel, setShowOteSpeakingPanel] = useState(false);
+  const [showOteWritingPanel, setShowOteWritingPanel] = useState(false);
+  const [showOteReadingPanel, setShowOteReadingPanel] = useState(false);
   const [oteProfileVariant, setOteProfileVariant] = useState(() => normalizeOteProfileVariant(user?.oteVersion));
   const [oteProfileVariantBusy, setOteProfileVariantBusy] = useState(false);
   const [profileFeedbackBusy, setProfileFeedbackBusy] = useState("");
@@ -845,6 +858,7 @@ function renderFeedbackButton(kind, submission) {
           keywordDash,
           wordFormationDash,
           openClozeDash,
+          trainingProgress,
           feedbackCredits,
         ] = await Promise.all([
           fb.fetchReadingCounts?.(uid) ?? Promise.resolve({ part1: 0, part2: 0, part3: 0, part4: 0 }),
@@ -870,6 +884,7 @@ function renderFeedbackButton(kind, submission) {
           fb.fetchHubKeywordDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
           fb.fetchHubWordFormationDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
           fb.fetchHubOpenClozeDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
+          fb.fetchOteTrainingProgressMap?.(uid) ?? Promise.resolve({}),
           fb.fetchFeedbackCreditStatus?.(uid) ?? Promise.resolve(null),
         ]);  
   
@@ -898,6 +913,7 @@ function renderFeedbackButton(kind, submission) {
         setHubKeywordDash(keywordDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
         setHubWordFormationDash(wordFormationDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
         setHubOpenClozeDash(openClozeDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
+        setOteTrainingProgress(trainingProgress || {});
         setFeedbackCreditStatus(feedbackCredits || null);
       } catch (e) {
         console.error("[Profile] load failed", e);
@@ -1053,11 +1069,20 @@ const oteWritingProgress = {
     ])
   ),
 };
+const oteReadingPracticeSets = OTE_READING_PRACTICE_SETS[oteProfileVariant] || [];
+const completedOteReadingSetIds = new Set(
+  Object.keys(oteTrainingProgress || {})
+    .filter((progressId) => progressId.startsWith("reading.part1.practice."))
+    .map((progressId) => progressId.replace("reading.part1.practice.", ""))
+);
+const oteReadingProgress = {
+  part1: oteReadingPracticeSets.filter((set) => completedOteReadingSetIds.has(set.id)).length,
+};
 const profileTitle =
   titleOverride ||
   (isOteProfile ? "OTE Profile" : isSeifHubProfile ? "Seif Hub Profile" : "My Profile");
 const profileIntro = isOteProfile
-  ? "Your OTE speaking and writing work in one place."
+  ? "Your OTE reading, speaking, and writing work in one place."
   : isSeifHubProfile
   ? "Your Seif Hub activity and account details."
   : "Your Aptis Trainer progress and account details.";
@@ -1265,7 +1290,7 @@ const formatOteSpeakingPart = (part) => {
               <div className="feedback-credit-eyebrow">OTE workspace</div>
               <strong>{activeOteVariantLabel}</strong>
               <p className="muted small">
-                Your profile is currently showing {activeOteVariantLabel.toLowerCase()} OTE speaking and writing work.
+                Your profile is currently showing {activeOteVariantLabel.toLowerCase()} OTE reading, speaking, and writing work.
               </p>
             </div>
             <div className="ote-profile-mode-actions" role="group" aria-label="Choose OTE profile mode">
@@ -1281,6 +1306,55 @@ const formatOteSpeakingPart = (part) => {
                 </button>
               ))}
             </div>
+          </section>
+
+          <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+            <button
+              type="button"
+              className="collapse-head"
+              aria-expanded={showOteReadingPanel}
+              onClick={() => setShowOteReadingPanel((s) => !s)}
+            >
+              <h3 className="sec-title" style={{ margin: 0 }}>
+                OTE {activeOteVariantLabel} Reading
+              </h3>
+
+              <span className="muted small" style={{ flexShrink: 0 }}>
+                {oteReadingProgress.part1}/{oteReadingPracticeSets.length} sets complete
+              </span>
+
+              <span className={`chev ${showOteReadingPanel ? "open" : ""}`} aria-hidden>
+                ▾
+              </span>
+            </button>
+
+            {showOteReadingPanel && (
+              <div className="panel-body">
+                <div className="pbar-group">
+                  <ProgressBar
+                    value={oteReadingProgress.part1}
+                    max={oteReadingPracticeSets.length || 1}
+                    label="Part 1 short-text practice"
+                    right={`${oteReadingProgress.part1}/${oteReadingPracticeSets.length}`}
+                  />
+                </div>
+                <ul className="wlist" style={{ marginTop: ".75rem" }}>
+                  {oteReadingPracticeSets.map((set) => {
+                    const isComplete = completedOteReadingSetIds.has(set.id);
+                    return (
+                      <li key={set.id} className="wcard">
+                        <div className="whead">
+                          <strong>{set.label}</strong>
+                          <span className={`muted small ${isComplete ? "ote-profile-activity-complete" : ""}`}>
+                            {isComplete ? "Complete" : "Not started"}
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            )}
           </section>
 
           <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
@@ -4083,6 +4157,11 @@ function StyleScope() {
   flex-wrap:wrap;
   gap:8px;
   justify-content:flex-end;
+}
+
+.ote-profile-activity-complete{
+  color:#238052 !important;
+  font-weight:800;
 }
 
 .feedback-credit-eyebrow{

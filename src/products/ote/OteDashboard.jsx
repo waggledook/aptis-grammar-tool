@@ -8,6 +8,7 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
   const navigate = useNavigate();
   const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
   const writingPath = getSitePath(nativeRoutes ? "/writing" : "/ote/writing");
+  const readingPath = getSitePath(nativeRoutes ? "/reading" : "/ote/reading");
   const profilePath = getSitePath("/profile");
   const teacherToolsPath = getSitePath("/teacher-tools");
   const myStudentsPath = getSitePath("/my-students");
@@ -97,6 +98,13 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
             <p>Practise the advanced essay and integrated summary tasks in a timed writing environment.</p>
           </button>
 
+          {isTeacherOrAdmin ? (
+            <button className="menu-card" type="button" onClick={() => navigate(readingPath)}>
+              <h3>Advanced Reading</h3>
+              <p>Open the four Advanced reading sections: short texts, matching, gapped text, and long text.</p>
+            </button>
+          ) : null}
+
           <button className="menu-card" type="button" disabled>
             <h3>Advanced Language Lab</h3>
             <p>Coming soon: complex grammar, lexical range, discourse markers, and precision practice.</p>
@@ -120,6 +128,13 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
             <h3>Writing</h3>
             <p>Timed writing mocks and task practice for email, essay, and article responses.</p>
           </button>
+
+          {isTeacherOrAdmin ? (
+            <button className="menu-card" type="button" onClick={() => navigate(readingPath)}>
+              <h3>Reading</h3>
+              <p>Open the reading part menu for short texts, matching, gapped text, and long text.</p>
+            </button>
+          ) : null}
 
           <button className="menu-card" type="button" onClick={() => navigate(profilePath)}>
             <h3>My Profile</h3>

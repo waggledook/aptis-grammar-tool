@@ -1040,6 +1040,12 @@ function getOteTrainingProgressId(details = {}) {
     }
   }
 
+  if (section === "reading") {
+    if (part === "part-1" || part === "part1") {
+      if (mode.includes("practice") || taskId) return "reading.part1.practice";
+    }
+  }
+
   return "";
 }
 

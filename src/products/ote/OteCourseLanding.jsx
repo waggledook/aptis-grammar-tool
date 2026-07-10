@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { ArrowRight, BookOpen, CheckCircle2, Headphones, Mail, PenLine, Sparkles, Volume2 } from "lucide-react";
+import { ArrowRight, CheckCircle2, Mail, Sparkles } from "lucide-react";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import "./styles/ote.css";
@@ -89,20 +89,11 @@ const LEVEL_ROUTES = [
   },
 ];
 
-const TRAINER_ADD_ON_PRICE = 10;
-const COURSE_MODULE_PRICE = 50;
-const EXAM_MODULE_PRICE = 55;
-
 const PURCHASE_PATHS = [
   {
     id: "course-exam",
     title: "Curso + examen",
     summary: "Preparación guiada y compra del examen cuando estés listo/a.",
-  },
-  {
-    id: "course",
-    title: "Solo curso",
-    summary: "Preparación sin comprar todavía una fecha de examen.",
   },
   {
     id: "exam",
@@ -111,29 +102,71 @@ const PURCHASE_PATHS = [
   },
 ];
 
-const COURSE_SCOPES = [
-  {
-    id: "four-skills",
-    title: "Curso completo",
-    summary: "Preparación integrada de las cuatro skills principales.",
-    priceLabel: "Consultar precio",
-    includes: ["Speaking", "Writing", "Reading", "Listening"],
-  },
-  {
-    id: "individual",
-    title: "Skills individuales",
-    summary: "Elige solo las áreas que quieres preparar.",
-    priceLabel: "Consultar precio",
-    includes: ["Speaking", "Writing", "Reading", "Listening"],
-  },
-];
+const PRODUCT_OPTIONS = {
+  "course-exam": [
+    {
+      id: "full",
+      title: "Curso completo + examen completo",
+      summary: "Preparación de speaking, writing, reading y listening con las tasas del examen completo.",
+      quantityLabel: "4 skills",
+      priceType: "courseExamPrice",
+      slug: "course-exam/full",
+    },
+    {
+      id: "1-skill",
+      title: "1 skill + 1 módulo de examen",
+      summary: "Compra una skill de preparación y el módulo de examen correspondiente. La skill se elige en la página de producto.",
+      quantityLabel: "1 skill",
+      price: 105,
+      slug: "course-exam/1-skill",
+    },
+    {
+      id: "2-skills",
+      title: "2 skills + 2 módulos de examen",
+      summary: "Compra dos skills de preparación y sus módulos de examen. Las skills se eligen en la página de producto.",
+      quantityLabel: "2 skills",
+      price: 210,
+      slug: "course-exam/2-skills",
+    },
+  ],
+  exam: [
+    {
+      id: "full",
+      title: "Examen completo",
+      summary: "Compra el Oxford Test of English completo para la ruta seleccionada.",
+      quantityLabel: "4 módulos",
+      priceType: "examPrice",
+      slug: "exam-only/full",
+    },
+    {
+      id: "1-module",
+      title: "1 módulo de examen",
+      summary: "Compra un módulo del examen. El módulo exacto se elige en la página de producto.",
+      quantityLabel: "1 módulo",
+      price: 55,
+      slug: "exam-only/1-module",
+    },
+    {
+      id: "2-modules",
+      title: "2 módulos de examen",
+      summary: "Compra dos módulos del examen. Los módulos exactos se eligen en la página de producto.",
+      quantityLabel: "2 módulos",
+      price: 110,
+      slug: "exam-only/2-modules",
+    },
+  ],
+};
 
-const SKILL_PACKAGES = [
-  { id: "speaking", title: "Speaking", icon: Volume2, summary: "Práctica oral, fluidez, estructura de respuestas y feedback." },
-  { id: "writing", title: "Writing", icon: PenLine, summary: "Emails, essays, register, organización y corrección personalizada." },
-  { id: "reading", title: "Reading", icon: BookOpen, summary: "Estrategias de lectura, timing, comprensión global y preguntas de detalle." },
-  { id: "listening", title: "Listening", icon: Headphones, summary: "Comprensión oral, toma de notas, distractores y gestión del tiempo." },
-];
+function getProductPrice(option, route) {
+  if (!option) return 0;
+  if (option.priceType === "courseExamPrice") return route.courseExamPrice;
+  if (option.priceType === "examPrice") return route.examPrice;
+  return option.price;
+}
+
+function getProductSlug(routeId, option) {
+  return option ? `${routeId}/${option.slug}` : "";
+}
 
 export default function OteCourseLanding({ nativeRoutes = false }) {
   const navigate = useNavigate();
@@ -141,54 +174,33 @@ export default function OteCourseLanding({ nativeRoutes = false }) {
   const [searchParams] = useSearchParams();
   const course = COURSE_RECOMMENDATIONS[courseId] || COURSE_RECOMMENDATIONS["b1-preparation"];
   const recommendedLevelRoute = ["c1-academic-track", "c2-mastery"].includes(courseId) ? "advanced" : "general";
+  const requestedPurchasePath = searchParams.get("buy") || "";
+  const initialPurchasePath = PURCHASE_PATHS.some((item) => item.id === requestedPurchasePath) ? requestedPurchasePath : "";
+  const requestedProduct = searchParams.get("product") || "";
+  const initialProductOption = PRODUCT_OPTIONS[initialPurchasePath]?.some((item) => item.id === requestedProduct) ? requestedProduct : "";
   const [levelRoute, setLevelRoute] = useState(searchParams.get("route") || recommendedLevelRoute);
-  const [purchasePath, setPurchasePath] = useState(searchParams.get("buy") || "");
-  const [courseScope, setCourseScope] = useState(course.recommendedPackage === "foundation" ? "individual" : "four-skills");
-  const [selectedSkills, setSelectedSkills] = useState([]);
-  const [trainerAccess, setTrainerAccess] = useState(false);
+  const [purchasePath, setPurchasePath] = useState(initialPurchasePath);
+  const [productOption, setProductOption] = useState(initialProductOption);
   const levelTestPath = getSitePath(nativeRoutes ? "/level-test" : "/ote/level-test");
   const homePath = getSitePath(nativeRoutes ? "/" : "/ote");
   const selectedRoute = LEVEL_ROUTES.find((item) => item.id === levelRoute) || LEVEL_ROUTES[0];
-  const includesExam = purchasePath === "course-exam" || purchasePath === "exam";
-  const includesCourse = purchasePath === "course-exam" || purchasePath === "course";
-  const needsScopeChoice = includesCourse || includesExam;
-  const trainerIncludedWithCourse = includesCourse;
-  const trainerAddOnSelected = includesExam && !trainerIncludedWithCourse && trainerAccess;
-  const trainerPrice = trainerAddOnSelected ? TRAINER_ADD_ON_PRICE : 0;
-  const courseOnlyPrice = selectedRoute.courseExamPrice - selectedRoute.examPrice;
-  const courseBasePrice = courseScope === "individual" ? selectedSkills.length * COURSE_MODULE_PRICE : courseOnlyPrice;
-  const examBasePrice = courseScope === "individual" ? selectedSkills.length * EXAM_MODULE_PRICE : selectedRoute.examPrice;
-  const totalPrice = courseScope === "four-skills" && purchasePath === "course-exam"
-    ? selectedRoute.courseExamPrice
-    : (includesCourse ? courseBasePrice : 0) + (includesExam ? examBasePrice : 0) + trainerPrice;
-  const needsSkillSelection = needsScopeChoice && courseScope === "individual";
-  const canContinue = !!purchasePath && (!needsSkillSelection || selectedSkills.length > 0);
-  const selectedSkillLabels = useMemo(
-    () => SKILL_PACKAGES.filter((skill) => selectedSkills.includes(skill.id)).map((skill) => skill.title),
-    [selectedSkills],
-  );
-  const scopeLabel = courseScope === "four-skills"
-    ? includesExam && !includesCourse ? "Examen completo" : "Curso completo"
-    : includesExam && !includesCourse ? "Módulos individuales" : "Skills individuales";
+  const includesCourse = purchasePath === "course-exam";
+  const currentProductOptions = PRODUCT_OPTIONS[purchasePath] || [];
+  const selectedProduct = currentProductOptions.find((item) => item.id === productOption) || null;
+  const totalPrice = getProductPrice(selectedProduct, selectedRoute);
+  const productSlug = getProductSlug(levelRoute, selectedProduct);
+  const canContinue = !!selectedProduct;
   const contactSubject = [
     `OTE ${selectedRoute.label}`,
     purchasePath ? PURCHASE_PATHS.find((item) => item.id === purchasePath)?.title : "orientación",
-    needsScopeChoice ? scopeLabel : "",
+    selectedProduct?.title || "",
+    productSlug,
   ].filter(Boolean).join(" - ");
   const contactHref = `mailto:nicholas@beeskillsenglish.com?subject=${encodeURIComponent(contactSubject)}`;
 
-  function toggleSkill(skillId) {
-    setSelectedSkills((current) => {
-      if (current.includes(skillId)) {
-        return current.filter((id) => id !== skillId);
-      }
-      return [...current, skillId];
-    });
-  }
-
   function choosePurchasePath(nextPath) {
     setPurchasePath(nextPath);
-    setTrainerAccess(false);
+    setProductOption("");
   }
 
   return (
@@ -203,7 +215,7 @@ export default function OteCourseLanding({ nativeRoutes = false }) {
           <Sparkles size={20} aria-hidden="true" />
           <div>
             <strong>Recomendación del test: {course.title}</strong>
-            <span>Te guiamos paso a paso para elegir curso, examen o una combinación de ambos.</span>
+            <span>Te guiamos paso a paso para elegir curso con examen o solo examen.</span>
           </div>
         </div>
         <div className="ote-course-actions">
@@ -252,8 +264,8 @@ export default function OteCourseLanding({ nativeRoutes = false }) {
           <div className="ote-adventure-step-head">
             <span>2</span>
             <div>
-              <h3>¿Quieres curso, examen o las dos cosas?</h3>
-              <p>El curso completo incluye acceso al trainer de Speaking & Writing. Si compras solo el examen, puedes añadirlo por {TRAINER_ADD_ON_PRICE}€.</p>
+              <h3>¿Quieres curso y examen, o solo examen?</h3>
+              <p>Actualmente ofrecemos la preparación junto con el examen, o la compra del examen si ya tienes claro que quieres presentarte.</p>
             </div>
           </div>
           <div className="ote-adventure-choice-grid">
@@ -271,110 +283,43 @@ export default function OteCourseLanding({ nativeRoutes = false }) {
           </div>
         </div>
 
-        {needsScopeChoice ? (
+        {purchasePath ? (
           <div className="ote-adventure-step">
             <div className="ote-adventure-step-head">
               <span>3</span>
               <div>
-                <h3>{includesCourse ? "¿Curso completo o skills concretas?" : "¿Examen completo o módulos concretos?"}</h3>
+                <h3>{includesCourse ? "Elige el tamaño del producto" : "Elige cuántos módulos necesitas"}</h3>
                 <p>
                   {includesCourse
-                    ? "Puedes preparar todas las skills o centrarte en lo que más necesitas."
-                    : "Puedes comprar el examen completo o solo los módulos que necesitas repetir."}
+                    ? "Aquí solo eliges la cantidad. En la página de producto podrás elegir speaking, writing, reading o listening."
+                    : "Aquí solo eliges la cantidad. En la página de producto podrás indicar qué módulo o módulos necesitas."}
                 </p>
               </div>
             </div>
             <div className="ote-adventure-choice-grid">
-              {COURSE_SCOPES.map((item) => (
+              {currentProductOptions.map((item) => (
                 <button
-                  className={`ote-adventure-choice ${courseScope === item.id ? "is-selected" : ""}`}
+                  className={`ote-adventure-choice ${productOption === item.id ? "is-selected" : ""}`}
                   key={item.id}
                   type="button"
-                  onClick={() => setCourseScope(item.id)}
+                  onClick={() => setProductOption(item.id)}
                 >
-                  <strong>
-                    {item.id === "four-skills"
-                      ? includesCourse ? "Curso completo" : "Examen completo"
-                      : includesCourse ? "Skills individuales" : "Módulos individuales"}
-                  </strong>
-                  <small>
-                    {item.id === "four-skills"
-                      ? includesCourse
-                        ? "Preparación integrada de speaking, writing, reading y listening. 16 horas de clase en 4 semanas."
-                        : `${selectedRoute.label}: ${selectedRoute.levels}.`
-                      : includesCourse
-                        ? "Elige solo las skills que quieres preparar."
-                        : "Elige los módulos de examen que quieres comprar."}
-                  </small>
-                  <em>
-                    {item.id === "four-skills" && purchasePath === "course-exam"
-                      ? `${selectedRoute.courseExamPrice}€ curso + tasas`
-                      : item.id === "four-skills" && includesExam
-                        ? `${selectedRoute.examPrice}€ tasas examen`
-                        : item.id === "four-skills" && includesCourse
-                          ? `${courseOnlyPrice}€ curso`
-                          : item.id === "individual" && includesExam && includesCourse
-                            ? `${COURSE_MODULE_PRICE + EXAM_MODULE_PRICE}€ por skill + módulo`
-                            : item.id === "individual" && includesExam
-                              ? `${EXAM_MODULE_PRICE}€ por módulo`
-                              : item.id === "individual" && includesCourse
-                                ? `${COURSE_MODULE_PRICE}€ por skill`
-                                : item.priceLabel}
-                  </em>
+                  <span>{item.quantityLabel}</span>
+                  <strong>{item.title}</strong>
+                  <small>{item.summary}</small>
+                  <em>{getProductPrice(item, selectedRoute)}€</em>
                 </button>
               ))}
             </div>
-            {courseScope === "individual" ? (
-              <div className="ote-adventure-skill-grid" aria-label="Elige skills individuales">
-                {SKILL_PACKAGES.map((item) => {
-                  const Icon = item.icon;
-                  const isSelected = selectedSkills.includes(item.id);
-                  return (
-                    <button
-                      className={`ote-adventure-skill ${isSelected ? "is-selected" : ""}`}
-                      key={item.id}
-                      type="button"
-                      onClick={() => toggleSkill(item.id)}
-                    >
-                      <Icon size={20} aria-hidden="true" />
-                      <strong>{item.title}</strong>
-                      <small>{item.summary}</small>
-                    </button>
-                  );
-                })}
-              </div>
-            ) : null}
             {includesCourse ? (
               <div className="ote-trainer-included-note">
                 <Sparkles size={18} aria-hidden="true" />
                 <div>
                   <strong>Speaking & Writing Trainer incluido</strong>
-                  <span>Todos los cursos incluyen automáticamente el acceso digital de práctica para speaking y writing.</span>
+                  <span>Los productos con curso incluyen automáticamente el acceso digital de práctica para speaking y writing.</span>
                 </div>
               </div>
             ) : null}
-          </div>
-        ) : null}
-
-        {includesExam && !trainerIncludedWithCourse ? (
-          <div className="ote-adventure-step">
-            <div className="ote-adventure-step-head">
-              <span>4</span>
-              <div>
-                <h3>Añadir Speaking & Writing Trainer</h3>
-                <p>Opcional para compras de examen o cursos por skills individuales. Por ahora se centra en speaking y writing.</p>
-              </div>
-            </div>
-            <button
-              className={`ote-trainer-toggle ${trainerAccess ? "is-selected" : ""}`}
-              type="button"
-              aria-pressed={trainerAccess}
-              onClick={() => setTrainerAccess((current) => !current)}
-            >
-              <span>{trainerAccess ? "Incluido" : "No incluido"}</span>
-              <strong>Speaking & Writing Trainer</strong>
-              <b>+{TRAINER_ADD_ON_PRICE}€</b>
-            </button>
           </div>
         ) : null}
 
@@ -389,38 +334,21 @@ export default function OteCourseLanding({ nativeRoutes = false }) {
               <dt>Compra</dt>
               <dd>{purchasePath ? PURCHASE_PATHS.find((item) => item.id === purchasePath)?.title : "Elige una opción"}</dd>
             </div>
-            {includesCourse ? (
-            <div>
-              <dt>Curso</dt>
-                  <dd>
-                    {courseScope === "four-skills"
-                  ? includesExam
-                    ? `Todas las skills + Speaking & Writing Trainer (${selectedRoute.courseExamPrice}€, tasas incluidas)`
-                    : `Todas las skills + Speaking & Writing Trainer (${courseBasePrice}€, sin tasas de examen)`
-                  : selectedSkillLabels.length
-                    ? `${selectedSkillLabels.join(", ")} + Speaking & Writing Trainer (${courseBasePrice}€)`
-                    : "Elige al menos una skill"}
-                  </dd>
-            </div>
-            ) : null}
-            {includesExam ? (
+            {selectedProduct ? (
               <div>
-                <dt>Examen</dt>
-                <dd>
-                  {courseScope === "four-skills" && includesCourse
-                    ? `Tasas incluidas (${selectedRoute.examPrice}€)`
-                    : courseScope === "four-skills"
-                      ? `${selectedRoute.examPrice}€ tasas examen`
-                      : selectedSkills.length
-                        ? `${examBasePrice}€ (${selectedSkills.length} módulos)`
-                        : "Elige al menos un módulo"}
-                  {trainerAddOnSelected ? ` + ${TRAINER_ADD_ON_PRICE}€ trainer` : ""}
-                </dd>
+                <dt>Producto</dt>
+                <dd>{selectedProduct.title}</dd>
+              </div>
+            ) : null}
+            {selectedProduct ? (
+              <div>
+                <dt>Producto web</dt>
+                <dd>{productSlug}</dd>
               </div>
             ) : null}
           </dl>
           <strong className="ote-adventure-price">
-            {purchasePath ? needsSkillSelection && selectedSkills.length === 0 ? "Elige skills" : `${totalPrice}€` : "Elige una opción"}
+            {selectedProduct ? `${totalPrice}€` : purchasePath ? "Elige producto" : "Elige una opción"}
           </strong>
           <a className={`ote-level-primary ${canContinue ? "" : "is-disabled"}`} href={canContinue ? contactHref : undefined} aria-disabled={!canContinue}>
             Continuar

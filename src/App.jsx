@@ -214,6 +214,8 @@ import OteWritingMockRunner from "./products/ote/OteWritingMockRunner.jsx";
 import OteWritingTrainingMenu from "./products/ote/OteWritingTrainingMenu.jsx";
 import OteWritingPracticeMenu from "./products/ote/OteWritingPracticeMenu.jsx";
 import OteWritingPracticeRunner from "./products/ote/OteWritingPracticeRunner.jsx";
+import OteAdvancedReadingPart1Practice from "./products/ote/OteAdvancedReadingPart1Practice.jsx";
+import OteGeneralReadingPart1Practice from "./products/ote/OteGeneralReadingPart1Practice.jsx";
 import OteWritingEmailGuide from "./products/ote/OteWritingEmailGuide.jsx";
 import OteWritingEssayGuide from "./products/ote/OteWritingEssayGuide.jsx";
 import OteWritingAdvancedEssayGuide from "./products/ote/OteWritingAdvancedEssayGuide.jsx";
@@ -228,6 +230,7 @@ import OteLevelTestChooser from "./products/ote/OteLevelTestChooser.jsx";
 import OteLevelTest from "./products/ote/OteLevelTest.jsx";
 import OteAdvancedLevelTest from "./products/ote/OteAdvancedLevelTest.jsx";
 import OteCourseLanding from "./products/ote/OteCourseLanding.jsx";
+import OteReadingMenu, { OteReadingPartShell } from "./products/ote/OteReadingMenu.jsx";
 import { canAccessAptisTrainer, canAccessOte, canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 function BellIcon() {
@@ -384,6 +387,10 @@ const isOteExamRoute =
 const isOteWritingPracticeTaskRoute =
   /^\/ote\/writing\/training\/[^/]+\/practice\/[^/]+$/.test(location.pathname) ||
   (isOteSite && /^\/writing\/training\/[^/]+\/practice\/[^/]+$/.test(location.pathname));
+const isOteReadingPracticeTaskRoute =
+  /^\/ote\/reading\/advanced\/part-1-short-texts\/practice\/[^/]+$/.test(location.pathname) ||
+  /^\/ote\/reading\/general\/part-1-short-texts\/practice\/[^/]+$/.test(location.pathname) ||
+  (isOteSite && /^\/reading\/(advanced|general)\/part-1-short-texts\/practice\/[^/]+$/.test(location.pathname));
 const isOteRoute =
   location.pathname.startsWith("/ote") ||
   (isOteSite &&
@@ -392,12 +399,13 @@ const isOteRoute =
       location.pathname.startsWith("/advanced-level-test") ||
       location.pathname.startsWith("/courses") ||
       location.pathname.startsWith("/speaking") ||
+      location.pathname.startsWith("/reading") ||
       location.pathname.startsWith("/writing") ||
       location.pathname.startsWith("/mock-tests") ||
       location.pathname.startsWith("/results")));
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
-const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute;
+const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
@@ -1423,6 +1431,10 @@ return (
   />
   <Route path="/ote/speaking/parts-3-4-practice" element={<OteSpeakingPart34Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/parts-3-4-practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
+  <Route path="/ote/reading" element={<RequireTeacher user={user}><OteReadingMenu user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/advanced/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/general/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart1Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/:variant/:partId" element={<RequireTeacher user={user}><OteReadingPartShell user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/writing" element={<OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
   <Route path="/ote/writing/training/:section" element={<OteWritingTrainingMenu user={user} nativeRoutes={false} />} />
   <Route path="/ote/writing/training/email/guide" element={<OteWritingEmailGuide nativeRoutes={false} />} />
@@ -1584,6 +1596,9 @@ return (
   {isOteSite && (
     <>
       <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
+      <Route path="/reading/advanced/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Practice user={user} nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/general/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart1Practice user={user} nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/:variant/:partId" element={<RequireTeacher user={user}><OteReadingPartShell user={user} nativeRoutes /></RequireTeacher>} />
       <Route path="/writing/training/:section" element={<OteWritingTrainingMenu user={user} nativeRoutes />} />
       <Route path="/writing/training/email/guide" element={<OteWritingEmailGuide nativeRoutes />} />
       <Route path="/writing/training/essay/guide" element={<OteWritingEssayGuide nativeRoutes />} />
@@ -1617,11 +1632,15 @@ return (
 <Route
   path="/reading"
   element={
-    <ReadingMenu
-      user={user}
-      aptisAccess={aptisAccess}
-      onSignIn={() => setShowAuth(true)}
-    />
+    isOteSite
+      ? <RequireTeacher user={user}><OteReadingMenu user={user} nativeRoutes /></RequireTeacher>
+      : (
+        <ReadingMenu
+          user={user}
+          aptisAccess={aptisAccess}
+          onSignIn={() => setShowAuth(true)}
+        />
+      )
   }
 />
 

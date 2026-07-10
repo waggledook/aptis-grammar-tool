@@ -588,6 +588,474 @@
   line-height: 1.65;
 }
 
+.ote-reading-practice-page {
+  max-width: 1180px;
+}
+
+.ote-reading-ready-card,
+.ote-reading-native-task {
+  display: grid;
+  gap: 1.15rem;
+}
+
+.ote-reading-native-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+  gap: 1.15rem;
+  align-items: start;
+}
+
+.ote-reading-native-layout .ote-instructions {
+  margin: 0 0 0.9rem;
+  color: var(--color-text-soft);
+}
+
+.ote-reading-native-layout .ote-training-option {
+  grid-template-columns: 1fr;
+  min-height: 68px;
+}
+
+.ote-reading-native-layout .ote-training-option strong {
+  color: var(--ote-dashboard-accent);
+}
+
+.ote-reading-source-card {
+  min-height: 100%;
+  overflow: hidden;
+  border: 1px solid #d8dce3;
+  border-radius: 6px;
+  background: #fbfcfe;
+  color: #27313d;
+  box-shadow: 0 10px 26px rgba(2, 15, 40, 0.18);
+}
+
+.ote-reading-source-masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 48px;
+  border-bottom: 1px solid #d8dce3;
+  background: #f1f4f8;
+  color: #536070;
+  padding: 0.75rem 1rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ote-reading-source-publication {
+  color: #173c70;
+  font-size: 1rem;
+  font-weight: 900;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.ote-reading-source-body {
+  padding: clamp(1rem, 2.4vw, 1.65rem);
+}
+
+.ote-reading-source-meta {
+  margin: 0;
+  color: #6c7784;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.ote-reading-source-card h3 {
+  margin: 0.45rem 0 0.35rem;
+  color: #16283f;
+  font-size: 1.35rem;
+  line-height: 1.2;
+}
+
+.ote-reading-source-byline {
+  margin: 0 0 1.05rem;
+  color: #657181;
+  font-size: 0.88rem;
+  font-style: italic;
+}
+
+.ote-reading-source-body > p:last-child {
+  margin: 0;
+  color: #303944;
+  font-size: 1.04rem;
+  line-height: 1.62;
+}
+
+.ote-reading-source-card.is-blog .ote-reading-source-masthead {
+  background: #173c70;
+  color: #d8e4f6;
+}
+
+.ote-reading-source-card.is-blog .ote-reading-source-publication {
+  color: #fff;
+}
+
+.ote-reading-source-card.is-review .ote-reading-source-masthead {
+  border-bottom: 3px solid #eb5f4e;
+  background: #fff;
+  color: #68717d;
+}
+
+.ote-reading-source-card.is-review .ote-reading-source-publication {
+  color: #cf4c3d;
+}
+
+.ote-reading-source-card.is-app .ote-reading-source-masthead {
+  position: relative;
+  justify-content: flex-end;
+  min-height: 54px;
+  border-bottom: 1px solid #d4d9e0;
+  background: #eef1f5;
+}
+
+.ote-reading-source-card.is-app .ote-reading-source-publication {
+  position: absolute;
+  left: 1rem;
+  color: #274b79;
+}
+
+.ote-reading-source-card.is-app .ote-reading-source-publication::before {
+  content: "";
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  margin-right: 0.55rem;
+  border-radius: 50%;
+  background: #ef6255;
+  box-shadow: 14px 0 #edc547, 28px 0 #43bda8;
+}
+
+.ote-reading-source-card.is-journal .ote-reading-source-masthead {
+  border-bottom: 0;
+  background: #0b5662;
+  color: #d8f1ed;
+}
+
+.ote-reading-source-card.is-journal .ote-reading-source-publication {
+  color: #fff;
+}
+
+.ote-reading-source-card.is-fiction {
+  border-color: #3b4453;
+  background: #f5f1e9;
+}
+
+.ote-reading-source-card.is-fiction .ote-reading-source-masthead {
+  border-bottom-color: #c7bdad;
+  background: #252f3c;
+  color: #e6ded2;
+}
+
+.ote-reading-source-card.is-fiction .ote-reading-source-publication,
+.ote-reading-source-card.is-fiction h3 {
+  color: #fff;
+}
+
+.ote-reading-source-card.is-fiction h3 {
+  color: #283440;
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.ote-reading-source-card.is-fiction .ote-reading-source-body > p:last-child {
+  color: #313333;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.08rem;
+  line-height: 1.7;
+}
+
+.ote-reading-source-card.is-letter {
+  background: #fffdf8;
+}
+
+.ote-reading-source-card.is-letter .ote-reading-source-masthead {
+  border-bottom: 2px solid #243a57;
+  background: #fffdf8;
+  color: #5d6670;
+}
+
+.ote-reading-source-card.is-letter .ote-reading-source-publication {
+  color: #1d3452;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.18rem;
+}
+
+.ote-reading-source-card.is-letter h3,
+.ote-reading-source-card.is-letter .ote-reading-source-body > p:last-child {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.ote-general-artifact {
+  min-height: 100%;
+  overflow: hidden;
+  border: 1px solid #d8dce3;
+  border-radius: 6px;
+  background: #fff;
+  color: #303944;
+  box-shadow: 0 10px 26px rgba(2, 15, 40, 0.16);
+}
+
+.ote-general-artifact > p,
+.ote-general-artifact > div:last-child > p {
+  margin: 0;
+  white-space: pre-line;
+  font-size: 1.06rem;
+  line-height: 1.6;
+}
+
+.ote-general-artifact.is-email {
+  display: grid;
+  align-content: start;
+}
+
+.ote-general-artifact.is-email > div {
+  display: grid;
+  grid-template-columns: 112px 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  min-height: 50px;
+  border-bottom: 1px solid #dde1e6;
+  padding: 0.75rem 1rem;
+}
+
+.ote-general-artifact.is-email > div strong {
+  color: #16283f;
+}
+
+.ote-general-artifact.is-email > div span {
+  color: #394654;
+}
+
+.ote-general-artifact.is-email > p {
+  padding: 1.4rem 1rem;
+}
+
+.ote-general-artifact.is-advert,
+.ote-general-artifact.is-notice {
+  align-self: center;
+  min-height: 340px;
+  border: 0;
+  background: #ffeb83;
+  padding: clamp(1.5rem, 5vw, 3rem);
+  text-align: center;
+}
+
+.ote-general-artifact.is-notice {
+  background: #f7e36e;
+}
+
+.ote-general-artifact.is-advert h3,
+.ote-general-artifact.is-notice h3 {
+  margin: 0 0 1rem;
+  color: #2c3540;
+  font-size: clamp(1.45rem, 2.4vw, 2rem);
+  line-height: 1.15;
+}
+
+.ote-general-artifact.is-advert p,
+.ote-general-artifact.is-notice p {
+  font-size: clamp(1.04rem, 1.7vw, 1.28rem);
+  line-height: 1.45;
+}
+
+.ote-general-artifact.is-message {
+  align-self: center;
+  max-width: 470px;
+  min-height: 260px;
+  margin: 1rem auto;
+  border-radius: 28px 28px 12px 28px;
+  background: #e4f6ec;
+  padding: 1.4rem;
+}
+
+.ote-general-artifact.is-message.is-group {
+  max-width: 560px;
+  border-radius: 14px;
+  background: #edf1ff;
+}
+
+.ote-general-artifact.is-message.is-group .ote-message-head {
+  color: #3f5394;
+}
+
+.ote-general-artifact.is-note {
+  position: relative;
+  align-self: center;
+  min-height: 300px;
+  max-width: 520px;
+  margin: 1rem auto;
+  border: 1px solid #e5c93e;
+  border-radius: 2px;
+  background: #ffec7f;
+  padding: clamp(1.5rem, 4vw, 2.4rem);
+  transform: rotate(-1deg);
+}
+
+.ote-general-artifact.is-note::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  width: 104px;
+  height: 22px;
+  background: rgba(217, 187, 90, 0.38);
+  transform: translateX(-50%) rotate(1deg);
+}
+
+.ote-general-artifact.is-note h3 {
+  margin: 0 0 1rem;
+  color: #3d3a26;
+  font-size: 1.3rem;
+}
+
+.ote-general-artifact.is-note p {
+  color: #363325;
+}
+
+.ote-message-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  color: #246544;
+}
+
+.ote-message-head span {
+  color: #688174;
+  font-size: 0.82rem;
+}
+
+.ote-general-artifact.is-web header {
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  min-height: 52px;
+  border-bottom: 1px solid #d8dce3;
+  background: #f0f2f5;
+  padding: 0 1rem;
+}
+
+.ote-general-artifact.is-web header i {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ef6255;
+}
+
+.ote-general-artifact.is-web header i:nth-child(2) { background: #edc547; }
+.ote-general-artifact.is-web header i:nth-child(3) { background: #43bda8; }
+
+.ote-general-artifact.is-web header span {
+  margin-left: 0.6rem;
+  color: #4c5b6b;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.ote-general-artifact.is-web > div {
+  padding: clamp(1rem, 2.4vw, 1.65rem);
+}
+
+.ote-general-artifact-label {
+  margin: 0;
+  color: #687685;
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-general-artifact.is-web h3 {
+  margin: 0.4rem 0 0.8rem;
+  color: #16283f;
+  font-size: 1.38rem;
+}
+
+.ote-general-artifact.is-review header {
+  border-bottom: 3px solid #d25545;
+  background: #fff;
+}
+
+.ote-general-artifact.is-review header span {
+  color: #bd4031;
+}
+
+.ote-reading-native-complete {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+}
+
+.ote-reading-native-complete > svg {
+  color: var(--ote-dashboard-accent);
+}
+
+.ote-reading-native-complete h2 {
+  margin: 0.2rem 0 0.5rem;
+  color: var(--color-text);
+  font-size: 1.8rem;
+}
+
+.ote-reading-native-complete > div {
+  min-width: 0;
+}
+
+.ote-reading-native-complete .ote-reading-review-list {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.ote-reading-native-complete .ote-reading-review-list article {
+  border-left-color: rgba(215, 91, 91, 0.85);
+  background: color-mix(in srgb, #9a2d2d 14%, var(--color-surface-2));
+  color: var(--color-text);
+}
+
+.ote-reading-native-complete .ote-reading-review-list article.is-correct {
+  border-left-color: rgba(47, 153, 96, 0.9);
+  background: color-mix(in srgb, #187f4e 14%, var(--color-surface-2));
+}
+
+.ote-reading-native-complete .ote-reading-review-list article > div,
+.ote-reading-native-complete .ote-reading-review-list article p {
+  color: var(--color-text);
+}
+
+.ote-reading-native-complete .ote-complete-actions {
+  justify-content: flex-start;
+}
+
+.ote-reading-native-complete .ote-complete-actions button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ote-dashboard-primary);
+  color: var(--ote-dashboard-primary-text);
+  padding: 0.7rem 0.9rem;
+  font-weight: 900;
+}
+
+.ote-reading-native-complete .ote-complete-actions button:first-child {
+  border: 1px solid var(--ote-dashboard-panel-border);
+  background: var(--ote-dashboard-secondary);
+  color: var(--ote-dashboard-text);
+}
+
+@media (max-width: 780px) {
+  .ote-reading-native-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-reading-native-complete {
+    grid-template-columns: 1fr;
+  }
+}
+
 .ote-training-summary {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2124,6 +2592,118 @@
   background: rgba(24, 138, 81, 0.09);
 }
 
+.ote-training-option.is-incorrect {
+  border-color: rgba(188, 65, 65, 0.72);
+  background: rgba(188, 65, 65, 0.1);
+}
+
+.ote-training-option[aria-disabled="true"] {
+  cursor: default;
+}
+
+.ote-reading-item-feedback {
+  margin-top: 0.85rem;
+  border-left: 4px solid rgba(188, 65, 65, 0.8);
+  background: color-mix(in srgb, #9a2d2d 13%, var(--color-surface-2));
+  color: var(--color-text);
+  padding: 0.8rem 0.9rem;
+}
+
+.ote-reading-item-feedback.is-correct {
+  border-left-color: rgba(47, 153, 96, 0.9);
+  background: color-mix(in srgb, #187f4e 13%, var(--color-surface-2));
+}
+
+.ote-reading-item-feedback strong {
+  color: var(--color-text);
+}
+
+.ote-reading-item-feedback p {
+  margin: 0.35rem 0 0;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-training-option {
+  border-color: #3f70b8;
+  background: #ffffff;
+  color: #173b72;
+  box-shadow: none;
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-training-option strong {
+  color: #b27000;
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-training-option:hover {
+  border-color: #1f579f;
+  background: #f1f6ff;
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-training-option.is-selected {
+  border-color: #24569c;
+  background: #e8f1ff;
+  box-shadow: 0 0 0 2px rgba(50, 108, 187, 0.12);
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-training-option.is-answer {
+  border-color: #238052;
+  background: #e9f8ef;
+  color: #164b32;
+  box-shadow: 0 0 0 2px rgba(35, 128, 82, 0.12);
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-training-option.is-answer strong {
+  color: #197247;
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-training-option.is-incorrect {
+  border-color: #be4a4a;
+  background: #fff0f0;
+  color: #7e2424;
+  box-shadow: 0 0 0 2px rgba(190, 74, 74, 0.1);
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-training-option.is-incorrect strong {
+  color: #a43737;
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-reading-item-feedback {
+  border-left-color: #be4a4a;
+  background: #fff2f2;
+  color: #6d2424;
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-reading-item-feedback.is-correct {
+  border-left-color: #238052;
+  background: #e7f6ed;
+  color: #164b32;
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-reading-item-feedback strong,
+:root[data-theme="light"] .ote-reading-practice-page .ote-reading-item-feedback p {
+  color: inherit;
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-recorder-actions button {
+  border: 1px solid #d78b12;
+  background: #f6b642;
+  color: #172d52;
+  box-shadow: none;
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-recorder-actions button:hover:not(:disabled) {
+  border-color: #b77000;
+  background: #eca62d;
+  box-shadow: 0 6px 14px rgba(174, 109, 0, 0.16);
+}
+
+:root[data-theme="light"] .ote-reading-practice-page .ote-recorder-actions button:disabled {
+  border-color: #c8d0dc;
+  background: #edf0f4;
+  color: #7a8491;
+}
+
 .ote-training-option svg {
   color: var(--color-accent);
 }
@@ -3487,6 +4067,17 @@
   line-height: 1.5;
 }
 
+.ote-reading-menu-progress {
+  display: block;
+  margin-top: auto;
+  color: var(--ote-dashboard-accent);
+  font-size: 0.84rem;
+}
+
+:root[data-theme="light"] .ote-reading-menu-progress {
+  color: #a76600;
+}
+
 .ote-practice-runner {
   display: grid;
   gap: 1rem;
@@ -3532,8 +4123,12 @@
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--ote-dashboard-accent), var(--ote-dashboard-primary));
+  background: linear-gradient(90deg, #f6bd60, #e9a93f);
   transition: width 0.2s ease;
+}
+
+:root[data-theme="light"] .ote-practice-progress-bar span {
+  background: linear-gradient(90deg, #4d83ca, #245da8);
 }
 
 .ote-practice-step,
@@ -5251,6 +5846,225 @@
 .ote-exam-footer .ote-footer-next:disabled {
   opacity: 0.55;
   cursor: not-allowed;
+}
+
+.ote-reading-practice-exam {
+  padding-bottom: 72px;
+}
+
+.ote-reading-timer {
+  min-width: 142px;
+  padding: 0.42rem 1rem;
+  background: #0a2b57;
+  color: #fff;
+  font-size: 2.2rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-align: center;
+}
+
+.ote-reading-start-panel {
+  display: grid;
+  justify-items: center;
+  gap: 0.8rem;
+}
+
+.ote-reading-start-panel .ote-kicker,
+.ote-reading-results-panel .ote-kicker {
+  margin: 0;
+  color: #5579ae;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ote-reading-start-details {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: #102f61;
+  font-weight: 700;
+}
+
+.ote-reading-task-screen {
+  display: grid;
+  grid-template-columns: minmax(310px, 0.96fr) minmax(420px, 1.04fr);
+  min-height: calc(100vh - 154px);
+}
+
+.ote-reading-question-pane {
+  padding: clamp(1.5rem, 3vw, 3.4rem);
+}
+
+.ote-reading-question-number {
+  margin: 0 0 1.6rem;
+  color: #5579ae;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
+
+.ote-reading-question-pane h2 {
+  max-width: 760px;
+  margin: 1.9rem 0;
+  color: #333;
+  font-size: clamp(1.35rem, 2vw, 1.72rem);
+  font-weight: 500;
+  line-height: 1.25;
+}
+
+.ote-reading-options {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 760px;
+}
+
+.ote-reading-options button {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  width: 100%;
+  min-height: 64px;
+  padding: 0.95rem 1rem;
+  border: 2px solid #5a9dea;
+  border-radius: 5px;
+  background: #fff;
+  color: #1754ad;
+  font-size: 1.08rem;
+  line-height: 1.3;
+  text-align: left;
+}
+
+.ote-reading-options button:hover,
+.ote-reading-options button.is-selected {
+  border-color: #102f61;
+  background: #edf5ff;
+}
+
+.ote-reading-options button strong {
+  display: grid;
+  flex: 0 0 1.7rem;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  font-size: 0.86rem;
+}
+
+.ote-reading-text-pane {
+  align-self: stretch;
+  padding: clamp(1.25rem, 2.5vw, 2.7rem);
+  background: #f4f4f5;
+}
+
+.ote-reading-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  height: 62px;
+  padding: 0 1.25rem;
+  border: 1px solid #d6d8db;
+  border-bottom: 0;
+  border-radius: 6px 6px 0 0;
+  background: #fff;
+}
+
+.ote-reading-browser-bar i {
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: #f14b58;
+}
+
+.ote-reading-browser-bar i:nth-child(2) { background: #f1c537; }
+.ote-reading-browser-bar i:nth-child(3) { background: #3cc4b3; }
+
+.ote-reading-browser-bar span {
+  margin-left: 0.8rem;
+  color: #54575d;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.ote-reading-text-inner {
+  min-height: min(64vh, 760px);
+  padding: clamp(1.35rem, 3vw, 2.5rem);
+  border: 1px solid #d6d8db;
+  border-radius: 0 0 6px 6px;
+  background: #fff;
+}
+
+.ote-reading-text-inner h3 {
+  margin: 0 0 1.2rem;
+  color: #102f61;
+  font-size: 1.28rem;
+}
+
+.ote-reading-text-inner p {
+  margin: 0;
+  color: #343434;
+  font-size: clamp(1.08rem, 1.5vw, 1.28rem);
+  line-height: 1.4;
+}
+
+.ote-reading-results-screen {
+  display: grid;
+  place-items: start center;
+  min-height: calc(100vh - 82px);
+  padding: 2rem;
+}
+
+.ote-reading-results-panel {
+  display: grid;
+  justify-items: center;
+  max-width: 900px;
+  text-align: center;
+}
+
+.ote-reading-results-panel > svg { color: #2d8b57; }
+
+.ote-reading-review-list {
+  display: grid;
+  gap: 0.75rem;
+  width: 100%;
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.ote-reading-review-list article {
+  padding: 1rem;
+  border-left: 4px solid #c3424d;
+  background: #fff5f5;
+}
+
+.ote-reading-review-list article.is-correct {
+  border-left-color: #2d8b57;
+  background: #f2fbf5;
+}
+
+.ote-reading-review-list article > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: #102f61;
+}
+
+.ote-reading-review-list article > div span { font-weight: 800; }
+.ote-reading-review-list article p { margin: 0.55rem 0 0; }
+
+@media (max-width: 780px) {
+  .ote-reading-timer { min-width: 92px; font-size: 1.45rem; }
+  .ote-reading-task-screen { grid-template-columns: 1fr; }
+  .ote-reading-text-pane { order: -1; }
+  .ote-reading-text-inner { min-height: auto; }
+  .ote-reading-practice-exam .ote-exam-header { grid-template-columns: auto 1fr auto; gap: 0.7rem; padding: 0.6rem 1rem; }
+  .ote-reading-practice-exam .ote-exam-title { font-size: 1.45rem; white-space: normal; }
+  .ote-reading-practice-exam .ote-progress-rail { display: none; }
+  .ote-reading-practice-exam .ote-exam-mark { width: 42px; height: 42px; }
+  .ote-reading-practice-exam .ote-exam-footer { gap: 0.6rem; height: auto; min-height: 66px; padding: 0.55rem 1rem; }
+  .ote-reading-practice-exam .ote-exam-footer span { display: none; }
 }
 
 .ote-theme-contrast .ote-exam-footer button {
