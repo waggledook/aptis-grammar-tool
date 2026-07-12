@@ -4328,3 +4328,26 @@ h2,
     color: var(--color-text-soft);
   }
 }
+.profile-reading-mock-parts {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.profile-reading-mock-parts span {
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  background: var(--color-surface-2);
+  color: var(--color-text-soft);
+  padding: 0.55rem 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-align: center;
+}
+
+@media (max-width: 680px) {
+  .profile-reading-mock-parts {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

@@ -158,9 +158,55 @@ const pilotSet2Questions = [
   },
 ];
 
+const fullMockSet1Questions = [
+  {
+    id: "shop-sale", source: "Extract from a novel", title: "The shop",
+    text: "Mara had expected the shop to seem smaller after fifteen years, but the opposite was true. Without customers, the long counter and dark shelves stretched away from her like parts of a stage after the audience had gone. Her brother had already cleared the office and left the sale papers beside the till. All she had to do was sign. Instead, she began straightening jars whose labels faced slightly sideways, a task their father had once performed each evening. She knew the buyers would replace the shelves and probably the name above the door. What surprised her was not that this hurt, but that she had mistaken postponing the signature for making a decision.",
+    prompt: "What does Mara realise about her behaviour?",
+    options: ["She cares more about the shop’s contents than its future.", "She has been using a familiar routine to avoid taking action.", "She expects her brother to reconsider the sale if she delays it."], answer: 1,
+    feedback: "Straightening the jars repeats her father’s old routine but does not address the decision she must make. Mara realises that this activity is a form of postponement; there is no suggestion that her brother will reverse the sale.",
+  },
+  {
+    id: "after-the-flood", source: "Documentary review", title: "After the Flood",
+    text: "In her documentary After the Flood, Laila Mensah follows three families returning to a coastal town damaged by storms. The film avoids dramatic narration, allowing conversations about insurance forms, ruined photographs and temporary housing to carry the story. This restraint is usually effective, though the repeated shots of empty streets occasionally seem to insist on an emotion the residents have already expressed more powerfully themselves. Mensah is especially good at showing disagreement within families without turning anyone into a villain. The result is not a simple account of heroic recovery, but a thoughtful study of how people can share a loss while imagining entirely different futures.",
+    prompt: "What reservation does the reviewer express about the film?",
+    options: ["The lack of narration leaves some important events unexplained.", "Family disagreements receive more attention than the storm’s effects.", "Some visual sequences reinforce emotions more heavily than necessary."], answer: 2,
+    feedback: "The reviewer considers the documentary’s restraint effective overall but feels that repeated images of empty streets sometimes emphasise an emotion the residents have already communicated. The lack of dramatic narration and handling of disagreement are praised.",
+  },
+  {
+    id: "visitor-survey", source: "Work email", title: "Visitor survey",
+    text: "Thank you for submitting the revised visitor survey. The shorter version is clearer, but I am concerned about distributing it only through the museum’s membership newsletter. Members are likely to know our exhibitions well and may be more supportive of the proposed changes than occasional visitors. Could we also invite responses at the ticket desk for two weeks, using the same questions? This would take more staff time, so I suggest testing the approach on weekdays before extending it to weekends. We do not need a perfectly representative study, but the present plan may produce reassuring results without telling us much about the people we most need to understand.",
+    prompt: "Why does the writer suggest collecting responses at the ticket desk?",
+    options: ["To include people who are less closely connected with the museum", "To find out whether staff can explain the questions more clearly", "To compare the opinions of weekday and weekend visitors"], answer: 0,
+    feedback: "Newsletter respondents are likely to be committed museum members. Collecting answers at the ticket desk would include occasional visitors whose reactions may be less predictable. The weekday proposal is only a practical trial of the method.",
+  },
+  {
+    id: "background-music", source: "Research report", title: "Background music and concentration",
+    text: "Studies of background music and concentration often compare performance in silence with performance while music is playing. Such designs may overlook a crucial variable: whether listeners chose the music themselves. In a recent experiment, participants completed editing tasks under three conditions—silence, researcher-selected music and music selected from their own playlists. Self-selected music was associated with better mood, but not consistently with greater accuracy. Participants who strongly believed music helped them were also more likely to report satisfaction, regardless of their scores. The findings suggest that preference influences the experience of working more reliably than it influences the quality of the work produced.",
+    prompt: "What do the findings indicate?",
+    options: ["Familiar music improves performance mainly among people who believe in its benefits.", "Choosing music may make work more enjoyable without improving its quality.", "Music selected by researchers reduces accuracy because listeners lack control."], answer: 1,
+    feedback: "Self-selected music improved participants’ mood, but not reliably their accuracy. Their experience of working improved more consistently than their performance; belief increased reported satisfaction rather than results.",
+  },
+  {
+    id: "library-hours", source: "Letter to a newspaper", title: "Library opening hours",
+    text: "The council’s proposal to keep the central library open until midnight has been welcomed as an obvious improvement. More access is desirable, but longer hours are not the same as broader access. The plan adds late-night study space while reducing the morning service used by parents, older residents and jobseekers who rely on staff assistance. It also assumes that demand at midnight will justify transport and security costs that have not yet been published. A limited trial would be sensible. Presenting the change as a choice between progress and nostalgia is not. Public services should adapt, but they should do so on evidence rather than on the attractiveness of a headline.",
+    prompt: "What is the writer’s position on the proposal?",
+    options: ["It should be rejected unless the existing morning service is protected.", "Its financial risks are more serious than its effects on library users.", "It could be tested, but its advantages should not be treated as certain."], answer: 2,
+    feedback: "The writer accepts that a limited trial could provide useful evidence but objects to presenting the plan as an automatically progressive improvement. They neither reject it outright nor rank financial costs above access concerns.",
+  },
+  {
+    id: "remote-induction", source: "Workplace advice article", title: "Remote induction",
+    text: "New employees working remotely are often given more information than they can reasonably absorb. Companies respond to the absence of informal office contact by scheduling presentations, sending manuals and creating long lists of introductory meetings. The intention is supportive, yet the result can be a week full of explanations with little opportunity to use any of them. Effective remote induction is usually slower and more selective. A new employee might receive essential guidance first, attempt a genuine task and then meet the colleague whose expertise has become relevant. This approach does not provide less support; it times support so that information arrives when the employee has a reason to understand and remember it.",
+    prompt: "What approach to remote induction does the writer recommend?",
+    options: ["Providing guidance when employees can connect it to real work", "Reducing introductory contact so employees learn more independently", "Giving employees complete information but more time to process it"], answer: 0,
+    feedback: "The writer recommends giving information progressively, when a genuine task makes it relevant and memorable. This is selective, well-timed support rather than reduced support or the same information-heavy approach spread over longer.",
+  },
+];
+
 const practiceSets = {
-  "pilot-1": { id: "pilot-1", title: "Pilot Set 1", questions: pilotSet1Questions },
-  "pilot-2": { id: "pilot-2", title: "Pilot Set 2", questions: pilotSet2Questions },
+  "c1-full-mock-1": { id: "c1-full-mock-1", title: "C1 Full Mock Set", questions: fullMockSet1Questions },
+  "pilot-1": { id: "pilot-1", title: "Choices and Consequences", questions: pilotSet1Questions },
+  "pilot-2": { id: "pilot-2", title: "Evidence and Decisions", questions: pilotSet2Questions },
 };
 
 function formatTime(seconds) {
@@ -369,6 +415,8 @@ export default function OteAdvancedReadingPart1Practice({ user, nativeRoutes = f
     </main>
   );
 }
+
+export { practiceSets as advancedReadingPart1PracticeSets };
 
 function ItemFeedback({ question, answer }) {
   const isCorrect = answer === question.answer;

@@ -60,13 +60,38 @@ const OTE_SPEAKING_TOTALS = {
 };
 const OTE_READING_PRACTICE_SETS = {
   general: [
-    { id: "general-reading-part-1-a2-pilot-1", label: "Part 1 A2 sets" },
-    { id: "general-reading-part-1-b1-pilot-1", label: "Part 1 B1 sets" },
-    { id: "general-reading-part-1-pilot-1", label: "Part 1 B2 sets" },
+    { id: "general-reading-part-1-a2-pilot-1", label: "Part 1 · Everyday Messages (A2)" },
+    { id: "general-reading-part-1-b1-pilot-1", label: "Part 1 · Plans and Everyday Life (B1)" },
+    { id: "general-reading-part-1-pilot-1", label: "Part 1 · Photography and Services (B2)" },
+    { id: "general-reading-part-2-a2-pilot-1", label: "Part 2 · Learning to Cook (A2)", part: "part2" },
+    { id: "general-reading-part-2-a2-pilot-2", label: "Part 2 · My Volunteer Work (A2)", part: "part2" },
+    { id: "general-reading-part-2-b2-pilot-1", label: "Part 2 · Podcasts to Download (B2)", part: "part2" },
+    { id: "general-reading-part-2-b2-pilot-2", label: "Part 2 · Online Course Providers (B2)", part: "part2" },
+    { id: "general-reading-part-3-a2-pilot-1", label: "Part 3 · My First Community Garden (A2)", part: "part3" },
+    { id: "general-reading-part-3-a2-pilot-2", label: "Part 3 · A Weekend Without My Phone (A2)", part: "part3" },
+    { id: "general-reading-part-3-b1-pilot-1", label: "Part 3 · My First Market Stall (B1)", part: "part3" },
+    { id: "general-reading-part-3-b1-pilot-2", label: "Part 3 · Why Study Breaks Matter (B1)", part: "part3" },
+    { id: "general-reading-part-3-b2-pilot-1", label: "Part 3 · Walking Meetings (B2)", part: "part3" },
+    { id: "general-reading-part-3-b2-pilot-2", label: "Part 3 · Repair Cafés (B2)", part: "part3" },
+    { id: "general-reading-part-4-b2-reading-together", label: "Part 4 · Reading Together in Silence (B2)", part: "part4" },
+    { id: "general-reading-part-4-b2-holiday-time", label: "Part 4 · Why Holidays Seem to Change Speed (B2)", part: "part4" },
+    { id: "general-reading-part-4-b1-second-life", label: "Part 4 · Giving Old Bicycles a Second Life (B1)", part: "part4" },
+    { id: "general-reading-part-4-b1-city-trees", label: "Part 4 · Why City Trees Matter (B1)", part: "part4" },
+    { id: "general-reading-part-4-a2-new-dog", label: "Part 4 · Our New Dog (A2)", part: "part4" },
+    { id: "general-reading-part-4-a2-useful-things", label: "Part 4 · A Library of Useful Things (A2)", part: "part4" },
   ],
   advanced: [
-    { id: "advanced-reading-part-1-pilot-1", label: "Part 1 Pilot Set 1" },
-    { id: "advanced-reading-part-1-pilot-2", label: "Part 1 Pilot Set 2" },
+    { id: "advanced-reading-part-1-pilot-1", label: "Part 1 · Choices and Consequences" },
+    { id: "advanced-reading-part-1-pilot-2", label: "Part 1 · Evidence and Decisions" },
+    { id: "advanced-reading-part-2-c1-pilot-1", label: "Part 2 · Handwriting or Digital Notes?", part: "part2" },
+    { id: "advanced-reading-part-2-c1-pilot-2", label: "Part 2 · Personality Tests at Work", part: "part2" },
+    { id: "advanced-reading-part-2-c1-pilot-3", label: "Part 2 · Making Cities Wilder", part: "part2" },
+    { id: "advanced-reading-part-3-c1-pilot-1", label: "Part 3 · The Case for Getting Slightly Lost", part: "part3" },
+    { id: "advanced-reading-part-3-c1-pilot-2", label: "Part 3 · Why We Keep Souvenirs", part: "part3" },
+    { id: "advanced-reading-part-3-c1-pilot-3", label: "Part 3 · The Value of Being Bored", part: "part3" },
+    { id: "advanced-reading-part-4-c1-pilot-1", label: "Part 4 · The Hidden Work of Small Talk", part: "part4" },
+    { id: "advanced-reading-part-4-c1-pilot-2", label: "Part 4 · The Danger of Perfect Efficiency", part: "part4" },
+    { id: "advanced-reading-part-4-c1-queues", label: "Part 4 · Why Queues Are Not Always a Failure", part: "part4" },
   ],
 };
 
@@ -1006,6 +1031,12 @@ const filteredOteWriting = oteWriting.filter(
 const filteredOteMockAttempts = oteMockAttempts.filter(
   (attempt) => isAdvancedOteMockAttempt(attempt) === (oteProfileVariant === "advanced")
 );
+const oteSpeakingMockAttempts = filteredOteMockAttempts.filter(
+  (attempt) => (attempt.module || "speaking") === "speaking"
+);
+const oteReadingMockAttempts = filteredOteMockAttempts.filter(
+  (attempt) => attempt.module === "reading"
+);
 const oteWritingMockCount = filteredOteWriting.filter((entry) => entry.type !== "ote-writing-practice").length;
 const oteWritingPracticeCount = filteredOteWriting.length - oteWritingMockCount;
 const oteSpeakingMockTotal = Object.values(OTE_SPEAKING_MOCKS || {}).filter(
@@ -1072,12 +1103,20 @@ const oteWritingProgress = {
 const oteReadingPracticeSets = OTE_READING_PRACTICE_SETS[oteProfileVariant] || [];
 const completedOteReadingSetIds = new Set(
   Object.keys(oteTrainingProgress || {})
-    .filter((progressId) => progressId.startsWith("reading.part1.practice."))
-    .map((progressId) => progressId.replace("reading.part1.practice.", ""))
+    .filter((progressId) => progressId.startsWith("reading.part1.practice.") || progressId.startsWith("reading.part2.practice.") || progressId.startsWith("reading.part3.practice.") || progressId.startsWith("reading.part4.practice."))
+    .map((progressId) => progressId.replace(/^reading\.part[1234]\.practice\./, ""))
 );
 const oteReadingProgress = {
-  part1: oteReadingPracticeSets.filter((set) => completedOteReadingSetIds.has(set.id)).length,
+  part1: oteReadingPracticeSets.filter((set) => !set.part && completedOteReadingSetIds.has(set.id)).length,
+  part2: oteReadingPracticeSets.filter((set) => set.part === "part2" && completedOteReadingSetIds.has(set.id)).length,
+  part3: oteReadingPracticeSets.filter((set) => set.part === "part3" && completedOteReadingSetIds.has(set.id)).length,
+  part4: oteReadingPracticeSets.filter((set) => set.part === "part4" && completedOteReadingSetIds.has(set.id)).length,
+  mock: new Set(oteReadingMockAttempts.map((attempt) => attempt.mockId || attempt.id).filter(Boolean)).size,
 };
+const oteReadingPart1Total = oteReadingPracticeSets.filter((set) => !set.part).length;
+const oteReadingPart2Total = oteReadingPracticeSets.filter((set) => set.part === "part2").length;
+const oteReadingPart3Total = oteReadingPracticeSets.filter((set) => set.part === "part3").length;
+const oteReadingPart4Total = oteReadingPracticeSets.filter((set) => set.part === "part4").length;
 const profileTitle =
   titleOverride ||
   (isOteProfile ? "OTE Profile" : isSeifHubProfile ? "Seif Hub Profile" : "My Profile");
@@ -1320,7 +1359,7 @@ const formatOteSpeakingPart = (part) => {
               </h3>
 
               <span className="muted small" style={{ flexShrink: 0 }}>
-                {oteReadingProgress.part1}/{oteReadingPracticeSets.length} sets complete
+                {oteReadingProgress.part1 + oteReadingProgress.part2 + oteReadingProgress.part3 + oteReadingProgress.part4}/{oteReadingPracticeSets.length} sets complete
               </span>
 
               <span className={`chev ${showOteReadingPanel ? "open" : ""}`} aria-hidden>
@@ -1333,10 +1372,14 @@ const formatOteSpeakingPart = (part) => {
                 <div className="pbar-group">
                   <ProgressBar
                     value={oteReadingProgress.part1}
-                    max={oteReadingPracticeSets.length || 1}
+                    max={oteReadingPart1Total || 1}
                     label="Part 1 short-text practice"
-                    right={`${oteReadingProgress.part1}/${oteReadingPracticeSets.length}`}
+                    right={`${oteReadingProgress.part1}/${oteReadingPart1Total}`}
                   />
+                  {oteReadingPart2Total ? <ProgressBar value={oteReadingProgress.part2} max={oteReadingPart2Total} label="Part 2 matching practice" right={`${oteReadingProgress.part2}/${oteReadingPart2Total}`} /> : null}
+                  {oteReadingPart3Total ? <ProgressBar value={oteReadingProgress.part3} max={oteReadingPart3Total} label="Part 3 gapped-text practice" right={`${oteReadingProgress.part3}/${oteReadingPart3Total}`} /> : null}
+                  {oteReadingPart4Total ? <ProgressBar value={oteReadingProgress.part4} max={oteReadingPart4Total} label="Part 4 long-text practice" right={`${oteReadingProgress.part4}/${oteReadingPart4Total}`} /> : null}
+                  {oteProfileVariant === "advanced" ? <ProgressBar value={oteReadingProgress.mock} max={1} label="Full reading mock" right={`${oteReadingProgress.mock}/1`} /> : null}
                 </div>
                 <ul className="wlist" style={{ marginTop: ".75rem" }}>
                   {oteReadingPracticeSets.map((set) => {
@@ -1353,6 +1396,40 @@ const formatOteSpeakingPart = (part) => {
                     );
                   })}
                 </ul>
+                {oteReadingMockAttempts.length ? (
+                  <>
+                    <h4 className="inner-title" style={{ marginTop: "1rem" }}>Full reading mock attempts</h4>
+                    <ul className="wlist" style={{ marginTop: ".5rem" }}>
+                      {oteReadingMockAttempts.map((attempt) => {
+                        const when = attempt.createdAt?.toDate?.()
+                          ? attempt.createdAt.toDate().toLocaleString()
+                          : attempt.createdAt || "—";
+                        const partScores = attempt.partScores || {};
+                        return (
+                          <li key={attempt.id} className="wcard">
+                            <div className="whead">
+                              <div>
+                                <strong>{attempt.mockTitle || "OTE Advanced Reading Mock 1"}</strong>
+                                <div className="muted small">{when}</div>
+                                <div className="muted small">
+                                  Score: {attempt.score ?? 0}/{attempt.total ?? 24}
+                                  {attempt.elapsedSeconds ? ` · ${Math.floor(attempt.elapsedSeconds / 60)}m ${attempt.elapsedSeconds % 60}s` : ""}
+                                </div>
+                              </div>
+                              <span className="ote-profile-activity-complete">Complete</span>
+                            </div>
+                            <div className="profile-reading-mock-parts">
+                              <span>Part 1: {partScores.part1 ?? "—"}/6</span>
+                              <span>Part 2: {partScores.part2 ?? "—"}/7</span>
+                              <span>Part 3: {partScores.part3 ?? "—"}/6</span>
+                              <span>Part 4: {partScores.part4 ?? "—"}/5</span>
+                            </div>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </>
+                ) : null}
               </div>
             )}
           </section>
@@ -1487,6 +1564,7 @@ const formatOteSpeakingPart = (part) => {
                           <ProfileAiFeedback
                             feedback={item.feedback}
                             descriptor="Generated automatically from OTE transcripts. Audio is not stored."
+                            sourceItem={item}
                           />
                         </li>
                       );
@@ -1494,13 +1572,13 @@ const formatOteSpeakingPart = (part) => {
                   </ul>
                 )}
 
-                {filteredOteMockAttempts.length ? (
+                {oteSpeakingMockAttempts.length ? (
                   <>
                     <h4 className="inner-title" style={{ marginTop: "1rem" }}>
                       Full speaking mock results
                     </h4>
                     <ul className="wlist" style={{ marginTop: ".5rem" }}>
-                      {filteredOteMockAttempts.map((attempt) => {
+                      {oteSpeakingMockAttempts.map((attempt) => {
                         const when = attempt.createdAt?.toDate?.()
                           ? attempt.createdAt.toDate().toLocaleString()
                           : attempt.createdAt || "—";
@@ -2211,6 +2289,7 @@ const formatOteSpeakingPart = (part) => {
                       <ProfileAiFeedback
                         feedback={item.feedback}
                         descriptor="Generated automatically from transcripts. Audio is not stored."
+                        sourceItem={item}
                       />
                     </li>
                   );
@@ -4686,7 +4765,7 @@ function normalizeEmailHtmlForClipboard(html = "") {
   return s;
 }
 
-function ProfileAiFeedback({ feedback, descriptor = "Generated automatically to help you improve your writing." }) {
+function ProfileAiFeedback({ feedback, descriptor = "Generated automatically to help you improve your writing.", sourceItem = null }) {
   if (!feedback) return null;
 
   const level = feedback.estimatedWritingLevel?.label || feedback.estimatedLevel?.label || "";
@@ -4714,13 +4793,17 @@ function ProfileAiFeedback({ feedback, descriptor = "Generated automatically to 
       {!summary && teacherComment ? <p>{teacherComment}</p> : null}
       <details className="profile-ai-feedback-full">
         <summary>View full feedback</summary>
-        <ProfileAiFeedbackFull feedback={feedback} />
+        <ProfileAiFeedbackFull feedback={feedback} sourceItem={sourceItem} />
       </details>
     </div>
   );
 }
 
-function ProfileAiFeedbackFull({ feedback }) {
+function ProfileAiFeedbackFull({ feedback, sourceItem = null }) {
+  if (sourceItem?.part && (sourceItem.product || "aptis") && (feedback.answer || Array.isArray(feedback.answers) || feedback.overall)) {
+    return <ProfileSpeakingFeedback feedback={feedback} sourceItem={sourceItem} />;
+  }
+
   if (feedback.taskType === "aptis_writing_part4") {
     return (
       <div className="profile-ai-feedback-body">
@@ -4766,6 +4849,53 @@ function ProfileAiFeedbackFull({ feedback }) {
   );
 }
 
+function ProfileSpeakingFeedback({ feedback, sourceItem = null }) {
+  const answers = Array.isArray(feedback.answers)
+    ? feedback.answers
+    : feedback.answer
+      ? [feedback.answer]
+      : [];
+  const transcripts = Array.isArray(sourceItem?.transcripts) ? sourceItem.transcripts : [];
+  const questions = Array.isArray(sourceItem?.questions) ? sourceItem.questions : [];
+
+  return (
+    <div className="profile-ai-feedback-body">
+      {feedback.estimatedLevel?.label ? (
+        <p>
+          <strong>Observed range:</strong> {feedback.estimatedLevel.label}
+          {feedback.estimatedLevel.confidence ? ` (${feedback.estimatedLevel.confidence} confidence)` : ""}
+        </p>
+      ) : null}
+      {feedback.overall?.summary ? <p>{feedback.overall.summary}</p> : null}
+      {feedback.estimatedLevel?.note || feedback.overall?.transcriptCaveat ? (
+        <p className="muted small">{feedback.estimatedLevel?.note || feedback.overall?.transcriptCaveat}</p>
+      ) : null}
+      <ProfileAiFeedbackList title="Strengths" items={feedback.overall?.mainStrengths} />
+      <ProfileAiFeedbackList title="Priorities" items={feedback.overall?.mainPriorities} />
+      <ProfileAiFeedbackList title="Question coverage" items={feedback.overall?.questionCoverage} />
+      {feedback.overall?.photoDescriptionAdvice &&
+      !/^(n\/a|none|not applicable\b)/i.test(String(feedback.overall.photoDescriptionAdvice).trim()) ? (
+        <p><strong>Photo focus:</strong> {feedback.overall.photoDescriptionAdvice}</p>
+      ) : null}
+      {feedback.overall?.developmentAdvice ? (
+        <p><strong>Development:</strong> {feedback.overall.developmentAdvice}</p>
+      ) : null}
+      {answers.map((answer, index) => {
+        const question = questions[index]?.question || questions[index]?.text || answer.question || "";
+        const transcript = transcripts[index]?.transcript || answer.transcript || "";
+        return (
+          <ProfileSpeakingAnswerFeedback
+            key={answer.questionId || answer.id || index}
+            answer={{ ...answer, question, transcript }}
+            index={index}
+            single={answers.length === 1}
+          />
+        );
+      })}
+    </div>
+  );
+}
+
 function ProfileAiFeedbackList({ title, items = [] }) {
   if (!items.length) return null;
   return (
@@ -4775,6 +4905,36 @@ function ProfileAiFeedbackList({ title, items = [] }) {
         {items.map((item, index) => <li key={`${title}-${index}`}>{item}</li>)}
       </ul>
     </div>
+  );
+}
+
+function ProfileSpeakingAnswerFeedback({ answer, index, single = false }) {
+  const taskFulfilment = getFeedbackCriterionText(answer.taskFulfilment);
+  const development = getFeedbackCriterionText(answer.answerDevelopment);
+  const content = getFeedbackCriterionText(answer.content);
+  const grammar = getFeedbackCriterionText(answer.grammar);
+  const vocabulary = getFeedbackCriterionText(answer.vocabulary);
+  const cohesion = getFeedbackCriterionText(answer.cohesion);
+  const fluency = getFeedbackCriterionText(answer.fluency);
+
+  return (
+    <article className="profile-ai-feedback-card">
+      <strong>{single ? "Response" : `Q${index + 1}`}{answer.question ? `: ${answer.question}` : ""}</strong>
+      {answer.transcript ? <p><em>Transcript:</em> {answer.transcript}</p> : null}
+      {taskFulfilment ? <p><em>Task:</em> {taskFulfilment}</p> : null}
+      {development ? <p><em>Development:</em> {development}</p> : null}
+      {content ? <p><em>Content:</em> {content}</p> : null}
+      {grammar ? <p><em>Grammar:</em> {grammar}</p> : null}
+      {vocabulary ? <p><em>Vocabulary:</em> {vocabulary}</p> : null}
+      {cohesion ? <p><em>Cohesion:</em> {cohesion}</p> : null}
+      {fluency ? <p><em>Fluency:</em> {fluency}</p> : null}
+      <ProfileMistakes mistakes={answer.languageErrors} />
+      <ProfileExamples title="Grammar examples" examples={answer.grammar?.examples} />
+      <ProfileExamples title="Vocabulary examples" examples={answer.vocabulary?.examples} />
+      <ProfileAiFeedbackList title="Ideas to add" items={answer.content?.missingIdeas} />
+      {answer.improvedAnswer ? <p><em>Improved answer:</em> {answer.improvedAnswer}</p> : null}
+      {answer.teacherNote ? <p><em>Teacher note:</em> {answer.teacherNote}</p> : null}
+    </article>
   );
 }
 

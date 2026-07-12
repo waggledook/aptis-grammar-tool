@@ -110,19 +110,60 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
   const menuPath = getSitePath(basePath);
   const Icon = part.icon || ListChecks;
   const advancedPartOnePracticePath = (setId) => getSitePath(`${basePath}/advanced/part-1-short-texts/practice/${setId}`);
+  const advancedPartTwoPracticePath = (setId) => getSitePath(`${basePath}/advanced/part-2-matching/practice/${setId}`);
+  const advancedPartThreePracticePath = (setId) => getSitePath(`${basePath}/advanced/part-3-gapped-text/practice/${setId}`);
+  const advancedPartFourPracticePath = (setId) => getSitePath(`${basePath}/advanced/part-4-long-text/practice/${setId}`);
+  const generalPartFourPracticePath = (setId) => getSitePath(`${basePath}/general/part-4-long-text/practice/${setId}`);
+  const generalPartThreePracticePath = (setId) => getSitePath(`${basePath}/general/part-3-gapped-text/practice/${setId}`);
   const generalPartOnePracticePath = (setId) => getSitePath(`${basePath}/general/part-1-short-texts/practice/${setId}`);
+  const generalPartTwoPracticePath = (setId) => getSitePath(`${basePath}/general/part-2-matching/practice/${setId}`);
   const practiceSets = variant === "advanced" ? [
-    { title: "Pilot Set 1", id: "pilot-1", taskId: "advanced-reading-part-1-pilot-1" },
-    { title: "Pilot Set 2", id: "pilot-2", taskId: "advanced-reading-part-1-pilot-2" },
+    { title: "Choices and Consequences", id: "pilot-1", taskId: "advanced-reading-part-1-pilot-1" },
+    { title: "Evidence and Decisions", id: "pilot-2", taskId: "advanced-reading-part-1-pilot-2" },
   ] : [
-    { title: "A2 Pilot Set 1", level: "A2", id: "a2-pilot-1", taskId: "general-reading-part-1-a2-pilot-1" },
-    { title: "B1 Pilot Set 1", level: "B1", id: "b1-pilot-1", taskId: "general-reading-part-1-b1-pilot-1" },
-    { title: "B2 Pilot Set 1", level: "B2", id: "pilot-1", taskId: "general-reading-part-1-pilot-1" },
+    { title: "Everyday Messages", level: "A2", id: "a2-pilot-1", taskId: "general-reading-part-1-a2-pilot-1" },
+    { title: "Plans and Everyday Life", level: "B1", id: "b1-pilot-1", taskId: "general-reading-part-1-b1-pilot-1" },
+    { title: "Photography and Services", level: "B2", id: "pilot-1", taskId: "general-reading-part-1-pilot-1" },
   ];
   const partOnePracticeSets = partId === "part-1-short-texts" ? practiceSets : [];
+  const partTwoPracticeSets = partId === "part-2-matching" ? (variant === "advanced" ? [
+    { title: "Handwriting or Digital Notes?", level: "C1", id: "c1-pilot-1", taskId: "advanced-reading-part-2-c1-pilot-1" },
+    { title: "Personality Tests at Work", level: "C1", id: "c1-pilot-2", taskId: "advanced-reading-part-2-c1-pilot-2" },
+    { title: "Making Cities Wilder", level: "C1", id: "c1-pilot-3", taskId: "advanced-reading-part-2-c1-pilot-3" },
+  ] : [
+    { title: "Learning to Cook", level: "A2", id: "a2-pilot-1", taskId: "general-reading-part-2-a2-pilot-1" },
+    { title: "My Volunteer Work", level: "A2", id: "a2-pilot-2", taskId: "general-reading-part-2-a2-pilot-2" },
+    { title: "Podcasts to Download", level: "B2", id: "b2-pilot-1", taskId: "general-reading-part-2-b2-pilot-1" },
+    { title: "Online Course Providers", level: "B2", id: "b2-pilot-2", taskId: "general-reading-part-2-b2-pilot-2" },
+  ]) : [];
+  const partThreePracticeSets = partId === "part-3-gapped-text" ? (variant === "advanced" ? [
+    { title: "The Case for Getting Slightly Lost", level: "C1", id: "c1-pilot-1", taskId: "advanced-reading-part-3-c1-pilot-1" },
+    { title: "Why We Keep Souvenirs", level: "C1", id: "c1-pilot-2", taskId: "advanced-reading-part-3-c1-pilot-2" },
+    { title: "The Value of Being Bored", level: "C1", id: "c1-pilot-3", taskId: "advanced-reading-part-3-c1-pilot-3" },
+  ] : [
+    { title: "My First Community Garden", level: "A2", id: "a2-pilot-1", taskId: "general-reading-part-3-a2-pilot-1" },
+    { title: "A Weekend Without My Phone", level: "A2", id: "a2-pilot-2", taskId: "general-reading-part-3-a2-pilot-2" },
+    { title: "My First Market Stall", level: "B1", id: "b1-pilot-1", taskId: "general-reading-part-3-b1-pilot-1" },
+    { title: "Why Study Breaks Matter", level: "B1", id: "b1-pilot-2", taskId: "general-reading-part-3-b1-pilot-2" },
+    { title: "Walking Meetings", level: "B2", id: "b2-pilot-1", taskId: "general-reading-part-3-b2-pilot-1" },
+    { title: "Repair Cafés", level: "B2", id: "b2-pilot-2", taskId: "general-reading-part-3-b2-pilot-2" },
+  ]) : [];
+  const partFourPracticeSets = partId === "part-4-long-text" ? (variant === "advanced" ? [
+    { title: "The Hidden Work of Small Talk", level: "C1", id: "c1-pilot-1", taskId: "advanced-reading-part-4-c1-pilot-1" },
+    { title: "The Danger of Perfect Efficiency", level: "C1", id: "c1-pilot-2", taskId: "advanced-reading-part-4-c1-pilot-2" },
+    { title: "Why Queues Are Not Always a Failure", level: "C1", id: "c1-queues", taskId: "advanced-reading-part-4-c1-queues" },
+  ] : [
+    { title: "Our New Dog", level: "A2", id: "a2-new-dog", taskId: "general-reading-part-4-a2-new-dog" },
+    { title: "A Library of Useful Things", level: "A2", id: "a2-useful-things", taskId: "general-reading-part-4-a2-useful-things" },
+    { title: "Giving Old Bicycles a Second Life", level: "B1", id: "b1-second-life", taskId: "general-reading-part-4-b1-second-life" },
+    { title: "Why City Trees Matter", level: "B1", id: "b1-city-trees", taskId: "general-reading-part-4-b1-city-trees" },
+    { title: "Reading Together in Silence", level: "B2", id: "b2-reading-together", taskId: "general-reading-part-4-b2-reading-together" },
+    { title: "Why Holidays Seem to Change Speed", level: "B2", id: "b2-holiday-time", taskId: "general-reading-part-4-b2-holiday-time" },
+  ]) : [];
+  const currentPracticeSets = partOnePracticeSets.length ? partOnePracticeSets : partTwoPracticeSets.length ? partTwoPracticeSets : partThreePracticeSets.length ? partThreePracticeSets : partFourPracticeSets;
   const completedSetCount = partOnePracticeSets.filter((set) =>
     completedProgress.has(`reading.part1.practice.${set.taskId}`)
-  ).length;
+  ).length + partTwoPracticeSets.filter((set) => completedProgress.has(`reading.part2.practice.${set.taskId}`)).length + partThreePracticeSets.filter((set) => completedProgress.has(`reading.part3.practice.${set.taskId}`)).length + partFourPracticeSets.filter((set) => completedProgress.has(`reading.part4.practice.${set.taskId}`)).length;
 
   return (
     <main className="ote-training-page">
@@ -140,11 +181,11 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
         <p className="ote-kicker">{config.label} Reading {part.label}</p>
         <h1>{part.title}</h1>
         <p>{part.copy}</p>
-        {partOnePracticeSets.length ? (
+        {currentPracticeSets.length ? (
           <div className="ote-training-progress-strip" aria-label="Reading practice progress">
-            <span>{completedSetCount} of {partOnePracticeSets.length} practice sets complete</span>
+            <span>{completedSetCount} of {currentPracticeSets.length} practice sets complete</span>
             <div className="ote-training-progress-track" aria-hidden="true">
-              <span style={{ width: `${Math.round((completedSetCount / partOnePracticeSets.length) * 100)}%` }} />
+              <span style={{ width: `${Math.round((completedSetCount / currentPracticeSets.length) * 100)}%` }} />
             </div>
           </div>
         ) : null}
@@ -184,6 +225,28 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
             })}
           </div>
         </section>
+      ) : partTwoPracticeSets.length ? (
+        <section className="ote-training-section">
+          <div className="ote-practice-set-grid">
+            {partTwoPracticeSets.map((set) => {
+              const isComplete = completedProgress.has(`reading.part2.practice.${set.taskId}`);
+              return <button className={`ote-practice-set-card ${isComplete ? "is-complete" : ""}`} key={set.id} type="button" onClick={() => navigate(variant === "advanced" ? advancedPartTwoPracticePath(set.id) : generalPartTwoPracticePath(set.id))}>
+                {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+                <Clock3 size={28} aria-hidden="true" />
+                <span>{set.level} · Timed practice</span>
+                <h2>{set.title}</h2>
+                <p>{variant === "advanced" ? "Seven matching questions. Three specialist responses." : set.level === "A2" ? "Six questions. Three short personal texts." : "Six profiles. Four source options."} 8 minutes for the full task.</p>
+              </button>;
+            })}
+          </div>
+        </section>
+      ) : partThreePracticeSets.length ? (
+        <section className="ote-training-section"><div className="ote-practice-set-grid">{partThreePracticeSets.map((set) => {
+          const isComplete = completedProgress.has(`reading.part3.practice.${set.taskId}`);
+          return <button className={`ote-practice-set-card ${isComplete ? "is-complete" : ""}`} key={set.id} type="button" onClick={() => navigate(variant === "advanced" ? advancedPartThreePracticePath(set.id) : generalPartThreePracticePath(set.id))}>{isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}<Clock3 size={28} aria-hidden="true" /><span>{set.level} · Timed practice</span><h2>{set.title}</h2><p>Six missing sentences, one extra option, and 11 minutes for the full task.</p></button>;
+        })}</div></section>
+      ) : partFourPracticeSets.length ? (
+        <section className="ote-training-section"><div className="ote-practice-set-grid">{partFourPracticeSets.map((set) => { const isComplete = completedProgress.has(`reading.part4.practice.${set.taskId}`); return <button className={`ote-practice-set-card ${isComplete ? "is-complete" : ""}`} key={set.id} type="button" onClick={() => navigate(variant === "advanced" ? advancedPartFourPracticePath(set.id) : generalPartFourPracticePath(set.id))}>{isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}<Clock3 size={28} aria-hidden="true" /><span>{set.level} · Timed practice</span><h2>{set.title}</h2><p>One long text, {variant === "advanced" ? "five" : "four"} questions, and 8 minutes for the full task.</p></button>; })}</div></section>
       ) : (
       <section className="ote-training-section">
         <div className="ote-practice-set-card ote-writing-practice-entry-card">
@@ -205,6 +268,7 @@ export default function OteReadingMenu({ user, nativeRoutes = false }) {
   const navigate = useNavigate();
   const homePath = getSitePath(nativeRoutes ? "/" : "/ote");
   const basePath = getReadingBasePath(nativeRoutes);
+  const readingMockPath = getSitePath(nativeRoutes ? "/reading/mock-tests/advanced-reading-1" : "/ote/reading/mock-tests/advanced-reading-1");
   const activeVariant = getUserReadingVariant(user);
   const config = READING_VARIANTS[activeVariant];
   const completedProgress = useOteTrainingProgress();
@@ -219,6 +283,14 @@ export default function OteReadingMenu({ user, nativeRoutes = false }) {
   const completedPartOneSets = readingPartOneSets.filter((taskId) =>
     completedProgress.has(`reading.part1.practice.${taskId}`)
   ).length;
+  const readingPartTwoSets = activeVariant === "advanced" ? ["advanced-reading-part-2-c1-pilot-1", "advanced-reading-part-2-c1-pilot-2", "advanced-reading-part-2-c1-pilot-3"] : ["general-reading-part-2-a2-pilot-1", "general-reading-part-2-a2-pilot-2", "general-reading-part-2-b2-pilot-1", "general-reading-part-2-b2-pilot-2"];
+  const readingPartThreeSets = activeVariant === "advanced" ? ["advanced-reading-part-3-c1-pilot-1", "advanced-reading-part-3-c1-pilot-2", "advanced-reading-part-3-c1-pilot-3"] : ["general-reading-part-3-a2-pilot-1", "general-reading-part-3-a2-pilot-2", "general-reading-part-3-b1-pilot-1", "general-reading-part-3-b1-pilot-2", "general-reading-part-3-b2-pilot-1", "general-reading-part-3-b2-pilot-2"];
+  const readingPartFourSets = activeVariant === "advanced" ? ["advanced-reading-part-4-c1-pilot-1", "advanced-reading-part-4-c1-pilot-2", "advanced-reading-part-4-c1-queues"] : ["general-reading-part-4-a2-new-dog", "general-reading-part-4-a2-useful-things", "general-reading-part-4-b1-second-life", "general-reading-part-4-b1-city-trees", "general-reading-part-4-b2-reading-together", "general-reading-part-4-b2-holiday-time"];
+  const completedPartTwoSets = readingPartTwoSets.filter((taskId) =>
+    completedProgress.has(`reading.part2.practice.${taskId}`)
+  ).length;
+  const completedPartThreeSets = readingPartThreeSets.filter((taskId) => completedProgress.has(`reading.part3.practice.${taskId}`)).length;
+  const completedPartFourSets = readingPartFourSets.filter((taskId) => completedProgress.has(`reading.part4.practice.${taskId}`)).length;
 
   return (
     <main className="menu-wrapper hub-menu-wrapper ote-menu-wrapper ote-skill-menu-wrapper">
@@ -234,6 +306,8 @@ export default function OteReadingMenu({ user, nativeRoutes = false }) {
       </header>
 
       <p className="menu-sub">{config.subtitle}</p>
+
+      {activeVariant === "advanced" ? <section className="ote-training-section"><div className="ote-practice-set-grid"><button className="ote-practice-set-card" type="button" onClick={() => navigate(readingMockPath)}><Clock3 size={28} aria-hidden="true" /><span>Full mock test</span><h2>Advanced Reading Mock 1</h2><p>All four reading parts in sequence, followed by a read-only answer review.</p></button></div></section> : null}
 
       <section className="ote-training-section">
         <h2>{config.label} Reading Parts</h2>
@@ -252,6 +326,14 @@ export default function OteReadingMenu({ user, nativeRoutes = false }) {
                   <strong className="ote-reading-menu-progress">
                     {completedPartOneSets}/{readingPartOneSets.length} timed sets complete
                   </strong>
+                ) : part.id === "part-2-matching" && readingPartTwoSets.length ? (
+                  <strong className="ote-reading-menu-progress">
+                    {completedPartTwoSets}/{readingPartTwoSets.length} timed sets complete
+                  </strong>
+                ) : part.id === "part-3-gapped-text" && readingPartThreeSets.length ? (
+                  <strong className="ote-reading-menu-progress">{completedPartThreeSets}/{readingPartThreeSets.length} timed sets complete</strong>
+                ) : part.id === "part-4-long-text" && readingPartFourSets.length ? (
+                  <strong className="ote-reading-menu-progress">{completedPartFourSets}/{readingPartFourSets.length} timed sets complete</strong>
                 ) : null}
               </button>
             );

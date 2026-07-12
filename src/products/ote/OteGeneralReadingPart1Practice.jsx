@@ -72,9 +72,9 @@ const a2PilotSet1 = [
 ];
 
 const practiceSets = {
-  "a2-pilot-1": { title: "A2 Pilot Set 1", level: "A2", questions: a2PilotSet1 },
-  "pilot-1": { title: "B2 Pilot Set 1", level: "B2", questions: pilotSet1 },
-  "b1-pilot-1": { title: "B1 Pilot Set 1", level: "B1", questions: b1PilotSet1 },
+  "a2-pilot-1": { title: "Everyday Messages", level: "A2", questions: a2PilotSet1 },
+  "pilot-1": { title: "Photography and Services", level: "B2", questions: pilotSet1 },
+  "b1-pilot-1": { title: "Plans and Everyday Life", level: "B1", questions: b1PilotSet1 },
 };
 
 function formatTime(seconds) {

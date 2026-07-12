@@ -215,7 +215,14 @@ import OteWritingTrainingMenu from "./products/ote/OteWritingTrainingMenu.jsx";
 import OteWritingPracticeMenu from "./products/ote/OteWritingPracticeMenu.jsx";
 import OteWritingPracticeRunner from "./products/ote/OteWritingPracticeRunner.jsx";
 import OteAdvancedReadingPart1Practice from "./products/ote/OteAdvancedReadingPart1Practice.jsx";
+import OteAdvancedReadingPart2Practice from "./products/ote/OteAdvancedReadingPart2Practice.jsx";
+import OteAdvancedReadingPart3Practice from "./products/ote/OteAdvancedReadingPart3Practice.jsx";
+import OteGeneralReadingPart3Practice from "./products/ote/OteGeneralReadingPart3Practice.jsx";
+import OteAdvancedReadingPart4Practice from "./products/ote/OteAdvancedReadingPart4Practice.jsx";
+import OteGeneralReadingPart4Practice from "./products/ote/OteGeneralReadingPart4Practice.jsx";
+import OteAdvancedReadingMockRunner from "./products/ote/OteAdvancedReadingMockRunner.jsx";
 import OteGeneralReadingPart1Practice from "./products/ote/OteGeneralReadingPart1Practice.jsx";
+import OteGeneralReadingPart2Practice from "./products/ote/OteGeneralReadingPart2Practice.jsx";
 import OteWritingEmailGuide from "./products/ote/OteWritingEmailGuide.jsx";
 import OteWritingEssayGuide from "./products/ote/OteWritingEssayGuide.jsx";
 import OteWritingAdvancedEssayGuide from "./products/ote/OteWritingAdvancedEssayGuide.jsx";
@@ -381,16 +388,29 @@ const isOteSite = currentSite.id === "ote";
 const requiresMemberAccess = !!currentSite.requiresMemberAccess;
 const isOteExamRoute =
   /^\/ote\/mock-tests\/[^/]+/.test(location.pathname) ||
+  /^\/ote\/reading\/mock-tests\/[^/]+/.test(location.pathname) ||
   /^\/ote\/writing\/mock-tests(?:\/[^/]+)?$/.test(location.pathname) ||
   (isOteSite && /^\/mock-tests\/[^/]+/.test(location.pathname)) ||
+  (isOteSite && /^\/reading\/mock-tests\/[^/]+/.test(location.pathname)) ||
   (isOteSite && /^\/writing\/mock-tests(?:\/[^/]+)?$/.test(location.pathname));
 const isOteWritingPracticeTaskRoute =
   /^\/ote\/writing\/training\/[^/]+\/practice\/[^/]+$/.test(location.pathname) ||
   (isOteSite && /^\/writing\/training\/[^/]+\/practice\/[^/]+$/.test(location.pathname));
 const isOteReadingPracticeTaskRoute =
   /^\/ote\/reading\/advanced\/part-1-short-texts\/practice\/[^/]+$/.test(location.pathname) ||
+  /^\/ote\/reading\/advanced\/part-2-matching\/practice\/[^/]+$/.test(location.pathname) ||
+  /^\/ote\/reading\/advanced\/part-3-gapped-text\/practice\/[^/]+$/.test(location.pathname) ||
+  /^\/ote\/reading\/general\/part-3-gapped-text\/practice\/[^/]+$/.test(location.pathname) ||
+  /^\/ote\/reading\/advanced\/part-4-long-text\/practice\/[^/]+$/.test(location.pathname) ||
+  /^\/ote\/reading\/general\/part-4-long-text\/practice\/[^/]+$/.test(location.pathname) ||
   /^\/ote\/reading\/general\/part-1-short-texts\/practice\/[^/]+$/.test(location.pathname) ||
-  (isOteSite && /^\/reading\/(advanced|general)\/part-1-short-texts\/practice\/[^/]+$/.test(location.pathname));
+  /^\/ote\/reading\/general\/part-2-matching\/practice\/[^/]+$/.test(location.pathname) ||
+  (isOteSite && (
+    /^\/reading\/(advanced|general)\/part-1-short-texts\/practice\/[^/]+$/.test(location.pathname) ||
+    /^\/reading\/(advanced|general)\/part-2-matching\/practice\/[^/]+$/.test(location.pathname)
+    || /^\/reading\/(advanced|general)\/part-3-gapped-text\/practice\/[^/]+$/.test(location.pathname)
+    || /^\/reading\/(advanced|general)\/part-4-long-text\/practice\/[^/]+$/.test(location.pathname)
+  ));
 const isOteRoute =
   location.pathname.startsWith("/ote") ||
   (isOteSite &&
@@ -1432,8 +1452,15 @@ return (
   <Route path="/ote/speaking/parts-3-4-practice" element={<OteSpeakingPart34Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/parts-3-4-practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/reading" element={<RequireTeacher user={user}><OteReadingMenu user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/mock-tests/advanced-reading-1" element={<RequireTeacher user={user}><OteAdvancedReadingMockRunner user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/reading/advanced/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/advanced/part-2-matching/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart2Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/advanced/part-3-gapped-text/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart3Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/general/part-3-gapped-text/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart3Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/advanced/part-4-long-text/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart4Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/general/part-4-long-text/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart4Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/reading/general/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart1Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/general/part-2-matching/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart2Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/reading/:variant/:partId" element={<RequireTeacher user={user}><OteReadingPartShell user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/writing" element={<OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
   <Route path="/ote/writing/training/:section" element={<OteWritingTrainingMenu user={user} nativeRoutes={false} />} />
@@ -1596,8 +1623,15 @@ return (
   {isOteSite && (
     <>
       <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
+      <Route path="/reading/mock-tests/advanced-reading-1" element={<RequireTeacher user={user}><OteAdvancedReadingMockRunner user={user} nativeRoutes /></RequireTeacher>} />
       <Route path="/reading/advanced/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Practice user={user} nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/advanced/part-2-matching/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart2Practice user={user} nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/advanced/part-3-gapped-text/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart3Practice user={user} nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/general/part-3-gapped-text/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart3Practice user={user} nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/advanced/part-4-long-text/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart4Practice user={user} nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/general/part-4-long-text/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart4Practice user={user} nativeRoutes /></RequireTeacher>} />
       <Route path="/reading/general/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart1Practice user={user} nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/general/part-2-matching/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart2Practice user={user} nativeRoutes /></RequireTeacher>} />
       <Route path="/reading/:variant/:partId" element={<RequireTeacher user={user}><OteReadingPartShell user={user} nativeRoutes /></RequireTeacher>} />
       <Route path="/writing/training/:section" element={<OteWritingTrainingMenu user={user} nativeRoutes />} />
       <Route path="/writing/training/email/guide" element={<OteWritingEmailGuide nativeRoutes />} />

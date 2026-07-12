@@ -1044,6 +1044,15 @@ function getOteTrainingProgressId(details = {}) {
     if (part === "part-1" || part === "part1") {
       if (mode.includes("practice") || taskId) return "reading.part1.practice";
     }
+    if (part === "part-2" || part === "part2") {
+      if (mode.includes("practice") || taskId) return "reading.part2.practice";
+    }
+    if (part === "part-3" || part === "part3") {
+      if (mode.includes("practice") || taskId) return "reading.part3.practice";
+    }
+    if (part === "part-4" || part === "part4") {
+      if (mode.includes("practice") || taskId) return "reading.part4.practice";
+    }
   }
 
   return "";
@@ -1147,6 +1156,10 @@ export async function logOteMockCompleted(details = {}) {
         ? mockId.includes("advanced")
           ? "ote.mock.writing-advanced"
           : "ote.mock.writing-general"
+        : module === "reading"
+          ? mockId.includes("advanced")
+            ? "ote.mock.reading-advanced"
+            : "ote.mock.reading-general"
         : "";
   if (progressId) {
     await markOteTrainingProgress({
@@ -5237,6 +5250,11 @@ export async function saveOteMockAttempt(payload = {}) {
     studentName: user.displayName || null,
     elapsedSeconds: Number(payload.elapsedSeconds || 0),
     startedAtClient: payload.startedAtClient || null,
+    score: Number.isFinite(Number(payload.score)) ? Number(payload.score) : null,
+    total: Number.isFinite(Number(payload.total)) ? Number(payload.total) : null,
+    partScores: payload.partScores && typeof payload.partScores === "object" ? payload.partScores : null,
+    answers: payload.answers && typeof payload.answers === "object" ? payload.answers : null,
+    reason: payload.reason || "completed",
     recordings: Array.isArray(payload.recordings) ? payload.recordings : [],
     aiFeedback: payload.aiFeedback || null,
     aiFeedbackMeta: payload.aiFeedbackMeta || null,
