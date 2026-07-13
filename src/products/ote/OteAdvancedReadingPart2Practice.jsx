@@ -234,6 +234,7 @@ export default function OteAdvancedReadingPart2Practice({ user, nativeRoutes = f
           <article className="ote-practice-task-card ote-reading-matching-task">
             <div className="ote-recorder-top"><div><p className="ote-kicker">Matching task</p><h2>Which specialist matches each statement?</h2></div><div className="ote-recorder-timer is-recording" aria-hidden="true"><Clock3 size={22} /><strong>{formatTime(secondsLeft)}</strong><span>Remaining</span></div></div>
             <div className="ote-reading-matching-layout">
+              <div className="ote-reading-question-column">
               <div className="ote-reading-match-list">
                 {questions.map((item, index) => {
                   const expanded = expandedId === item.id;
@@ -246,9 +247,10 @@ export default function OteAdvancedReadingPart2Practice({ user, nativeRoutes = f
                   </article>;
                 })}
               </div>
+              <div className="ote-recorder-actions">{phase === "review" ? <button type="button" onClick={() => finishPractice("manual")}>View final report</button> : <button type="button" disabled={answeredCount !== questions.length} onClick={checkAnswers}>Check answers</button>}</div>
+              </div>
               <ReviewArticle practiceSet={practiceSet} evidence={phase === "review" ? evidenceBySet[practiceSet.id]?.[expandedId] : ""} />
             </div>
-            <div className="ote-recorder-actions">{phase === "review" ? <button type="button" onClick={() => finishPractice("manual")}>View final report</button> : <button type="button" disabled={answeredCount !== questions.length} onClick={checkAnswers}>Check answers</button>}</div>
           </article>
         ) : <CompleteCard score={score} answers={answers} questions={questions} reviewers={reviewers} setTitle={practiceSet.title} onRetry={startPractice} onBack={() => navigate(menuPath)} />}
       </section>

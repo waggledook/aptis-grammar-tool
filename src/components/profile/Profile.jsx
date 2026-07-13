@@ -77,8 +77,8 @@ const OTE_READING_PRACTICE_SETS = {
     { id: "general-reading-part-4-b2-holiday-time", label: "Part 4 · Why Holidays Seem to Change Speed (B2)", part: "part4" },
     { id: "general-reading-part-4-b1-second-life", label: "Part 4 · Giving Old Bicycles a Second Life (B1)", part: "part4" },
     { id: "general-reading-part-4-b1-city-trees", label: "Part 4 · Why City Trees Matter (B1)", part: "part4" },
-    { id: "general-reading-part-4-a2-new-dog", label: "Part 4 · Our New Dog (A2)", part: "part4" },
-    { id: "general-reading-part-4-a2-useful-things", label: "Part 4 · A Library of Useful Things (A2)", part: "part4" },
+    { id: "general-reading-part-4-a2-new-dog", label: "Part 4 · The Right Dog for Us (A2)", part: "part4" },
+    { id: "general-reading-part-4-a2-useful-things", label: "Part 4 · Borrow, Don’t Buy (A2)", part: "part4" },
   ],
   advanced: [
     { id: "advanced-reading-part-1-pilot-1", label: "Part 1 · Choices and Consequences" },

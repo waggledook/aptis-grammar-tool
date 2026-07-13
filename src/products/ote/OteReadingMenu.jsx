@@ -153,8 +153,8 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
     { title: "The Danger of Perfect Efficiency", level: "C1", id: "c1-pilot-2", taskId: "advanced-reading-part-4-c1-pilot-2" },
     { title: "Why Queues Are Not Always a Failure", level: "C1", id: "c1-queues", taskId: "advanced-reading-part-4-c1-queues" },
   ] : [
-    { title: "Our New Dog", level: "A2", id: "a2-new-dog", taskId: "general-reading-part-4-a2-new-dog" },
-    { title: "A Library of Useful Things", level: "A2", id: "a2-useful-things", taskId: "general-reading-part-4-a2-useful-things" },
+    { title: "The Right Dog for Us", level: "A2", id: "a2-new-dog", taskId: "general-reading-part-4-a2-new-dog" },
+    { title: "Borrow, Don’t Buy", level: "A2", id: "a2-useful-things", taskId: "general-reading-part-4-a2-useful-things" },
     { title: "Giving Old Bicycles a Second Life", level: "B1", id: "b1-second-life", taskId: "general-reading-part-4-b1-second-life" },
     { title: "Why City Trees Matter", level: "B1", id: "b1-city-trees", taskId: "general-reading-part-4-b1-city-trees" },
     { title: "Reading Together in Silence", level: "B2", id: "b2-reading-together", taskId: "general-reading-part-4-b2-reading-together" },
