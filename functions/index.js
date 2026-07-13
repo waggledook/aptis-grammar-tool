@@ -38,6 +38,8 @@ const WRITING_FEEDBACK_CREDIT_COSTS = {
   ote_speaking_mock: 8,
   ote_full_mock: 8,
   ote_single_task: 4,
+  ote_advanced_intro_conclusion: 2,
+  ote_advanced_academic_style: 1,
   ote_register_gap: 1,
   ote_register_rewrite: 1,
 };
@@ -1815,6 +1817,123 @@ const OTE_REGISTER_REWRITE_FEEDBACK_SCHEMA = {
       },
     },
     teacherComment: { type: "string" },
+  },
+};
+
+const OTE_ADVANCED_ACADEMIC_STYLE_FEEDBACK_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: ["taskType", "overall", "items", "teacherComment"],
+  properties: {
+    taskType: { type: "string", enum: ["ote_advanced_academic_style_rewrite"] },
+    overall: {
+      type: "object",
+      additionalProperties: false,
+      required: ["summary", "styleControl", "mainAdvice"],
+      properties: {
+        summary: { type: "string" },
+        styleControl: {
+          type: "string",
+          enum: ["strong", "mostly_good", "mixed", "needs_work", "too_incomplete"],
+        },
+        mainAdvice: { type: "string" },
+      },
+    },
+    items: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: [
+          "id",
+          "studentAnswer",
+          "verdict",
+          "meaning",
+          "academicStyle",
+          "language",
+          "suggestedRewrite",
+          "explanation",
+        ],
+        properties: {
+          id: { type: "string" },
+          studentAnswer: { type: "string" },
+          verdict: {
+            type: "string",
+            enum: ["excellent", "acceptable", "partly_appropriate", "not_appropriate", "blank"],
+          },
+          meaning: { type: "string" },
+          academicStyle: { type: "string" },
+          language: { type: "string" },
+          suggestedRewrite: { type: "string" },
+          explanation: { type: "string" },
+        },
+      },
+    },
+    teacherComment: { type: "string" },
+  },
+};
+
+const OTE_ADVANCED_INTRO_CONCLUSION_FEEDBACK_SCHEMA = {
+  type: "object",
+  additionalProperties: false,
+  required: [
+    "overall",
+    "issueFraming",
+    "argumentControl",
+    "finalJudgement",
+    "consistency",
+    "register",
+    "languageCorrections",
+    "teacherComment",
+  ],
+  properties: {
+    overall: {
+      type: "object",
+      additionalProperties: false,
+      required: ["summary", "verdict", "mainStrength", "mainPriority"],
+      properties: {
+        summary: { type: "string" },
+        verdict: {
+          type: "string",
+          enum: ["strong", "mostly_effective", "developing", "incomplete"],
+        },
+        mainStrength: { type: "string" },
+        mainPriority: { type: "string" },
+      },
+    },
+    issueFraming: { $ref: "#/$defs/criterion" },
+    argumentControl: { $ref: "#/$defs/criterion" },
+    finalJudgement: { $ref: "#/$defs/criterion" },
+    consistency: { $ref: "#/$defs/criterion" },
+    register: { $ref: "#/$defs/criterion" },
+    languageCorrections: {
+      type: "array",
+      items: {
+        type: "object",
+        additionalProperties: false,
+        required: ["original", "correction", "explanation"],
+        properties: {
+          original: { type: "string" },
+          correction: { type: "string" },
+          explanation: { type: "string" },
+        },
+      },
+    },
+    teacherComment: { type: "string" },
+  },
+  $defs: {
+    criterion: {
+      type: "object",
+      additionalProperties: false,
+      required: ["status", "feedback"],
+      properties: {
+        status: {
+          type: "string",
+          enum: ["strong", "mostly_effective", "needs_work", "missing"],
+        },
+        feedback: { type: "string" },
+      },
+    },
   },
 };
 
@@ -4164,6 +4283,66 @@ function postProcessOteLevelProductionFeedback(feedback, payload, speakingItems)
   };
 }
 
+function normalizeOteAdvancedIntroConclusionPayload(data = {}) {
+  const introductionText = cleanString(data?.introduction?.text || "", 1400);
+  const conclusionText = cleanString(data?.conclusion?.text || "", 1400);
+  return {
+    exam: "ote_advanced",
+    taskId: cleanString(data?.taskId || "", 120),
+    title: cleanString(data?.title || "", 180),
+    taskPrompt: cleanString(data?.taskPrompt || "", 1800),
+    availableIdeas: Array.isArray(data?.availableIdeas)
+      ? data.availableIdeas.slice(0, 3).map((item) => cleanString(item, 180)).filter(Boolean)
+      : [],
+    selectedPosition: cleanString(data?.selectedPosition || "", 500),
+    selectedIdeas: Array.isArray(data?.selectedIdeas)
+      ? data.selectedIdeas.slice(0, 3).map((item) => cleanString(item, 180)).filter(Boolean)
+      : [],
+    introduction: {
+      text: introductionText,
+      wordCount: countWords(introductionText),
+    },
+    conclusion: {
+      text: conclusionText,
+      wordCount: countWords(conclusionText),
+    },
+  };
+}
+
+function buildOteAdvancedIntroConclusionFeedbackPrompt(payload) {
+  return [
+    "You are an expert English writing teacher giving focused formative feedback for an Oxford Test of English Advanced essay lesson.",
+    "The student has planned a full essay but written only its introduction and conclusion. Do not assess the response as a complete 220-280-word essay.",
+    "Do not claim to provide official Oxford Test of English marking or a certified level.",
+    "Return strict JSON only using the supplied schema.",
+    "",
+    "Lesson principles:",
+    "- The introduction should establish the precise issue, restate the two positions in the student's own words, and create a clear starting point.",
+    "- An explicit position in the introduction is optional. Never criticise the introduction merely because it does not announce a thesis or preview the selected prompts.",
+    "- The introduction should avoid developing supporting arguments, detailed examples, or an essay plan.",
+    "- The conclusion must bring the imagined discussion together, answer the question clearly, remain consistent with the selected position and introduction, and avoid a new argument or policy.",
+    "- Both paragraphs should normally be approximately 35-50 words. Treat this as formative guidance, not a rigid penalty.",
+    "",
+    "Assess exactly these areas:",
+    "1. issueFraming: Does the introduction identify the precise advertising debate and fairly restate both positions?",
+    "2. argumentControl: Does the introduction save development for the body, and does the conclusion avoid undeveloped new arguments or policies?",
+    "3. finalJudgement: Does the conclusion give a definite answer to the question?",
+    "4. consistency: Do both paragraphs align with the selected overall position and sound as though they belong to the same essay? Use the selected ideas only as intended body-paragraph context; do not require them to be listed in the introduction.",
+    "5. register: Is the style appropriately formal, natural, clear, and suitable for an academic tutor?",
+    "",
+    "Feedback rules:",
+    "- Give concise, learner-friendly comments grounded in exact wording from the student's paragraphs.",
+    "- Do not invent missing body paragraphs or judge how well unseen arguments were developed.",
+    "- Do not provide a model introduction, model conclusion, or full rewritten pair.",
+    "- Add no language correction unless there is a real grammar, vocabulary, cohesion, or register problem.",
+    "- Return at most four high-value languageCorrections. For strong accurate writing, return an empty array.",
+    "- Do not replace advanced but natural British academic phrasing with simpler language merely as a preference.",
+    "",
+    "Student plan and paragraphs:",
+    JSON.stringify(payload, null, 2),
+  ].join("\n");
+}
+
 function normalizeOteRegisterGapPayload(data) {
   const gaps = Array.isArray(data?.gaps) ? data.gaps : [];
   return {
@@ -4267,6 +4446,58 @@ function buildOteRegisterRewriteFeedbackPrompt(payload) {
     "If an answer is blank, mark verdict as blank and provide a suitable rewrite.",
     "Keep feedback concise and learner-friendly. Do not give official exam scores.",
     "Return strict JSON only.",
+    "",
+    "Activity:",
+    JSON.stringify(payload, null, 2),
+  ].join("\n");
+}
+
+function normalizeOteAdvancedAcademicStylePayload(data) {
+  const items = Array.isArray(data?.items) ? data.items : [];
+  return {
+    exam: "ote_advanced",
+    taskId: cleanString(data?.taskId || "", 100),
+    title: cleanString(data?.title || "", 180),
+    instructions: cleanString(data?.instructions || "", 600),
+    items: items.slice(0, 10).map((item) => ({
+      id: cleanString(item?.id || "", 30),
+      source: cleanString(item?.source || "", 600),
+      studentAnswer: cleanString(item?.studentAnswer || "", 1000),
+      suggestedAnswer: cleanString(item?.suggestedAnswer || "", 600),
+      keyFeatures: Array.isArray(item?.keyFeatures)
+        ? item.keyFeatures.slice(0, 8).map((feature) => cleanString(feature, 180)).filter(Boolean)
+        : [],
+    })),
+  };
+}
+
+function buildOteAdvancedAcademicStyleFeedbackPrompt(payload) {
+  return [
+    "You are an expert writing teacher assessing a formative Oxford Test of English Advanced essay exercise.",
+    "The student has rewritten sentence-level examples to make them suitable for a clear, precise and controlled academic essay.",
+    "This is not an official exam score.",
+    "",
+    "For each submitted rewrite, assess:",
+    "- Meaning: does it preserve the central meaning rather than replacing it with a different claim?",
+    "- Academic style: is it neutral, precise, measured and appropriately qualified?",
+    "- Language: is the grammar accurate and the vocabulary and collocations natural?",
+    "",
+    "Accept a wide range of effective rewrites. The suggestedAnswer and keyFeatures are teaching references, not a fixed answer key.",
+    "Do not penalise a natural answer merely because it differs from the suggested version.",
+    "Do not demand unnecessarily elaborate vocabulary, passive structures, nominalisation or an impersonal thesis style.",
+    "Flag conversational wording, vague reference, unsupported generalisation, emotional exaggeration, direct address and inflated language only when genuinely present.",
+    "Judge the rewrite as a whole and distinguish academic style from surface accuracy.",
+    "An isolated grammar, spelling or typing slip must not make an otherwise appropriate rewrite not_appropriate. This includes a missing auxiliary such as 'be', a missing article, a small agreement error or a clear typo.",
+    "When the style and meaning work but there is one small language slip, use acceptable, explicitly recognise what works, and give the correction gently and briefly.",
+    "Use partly_appropriate only when a noticeable language problem affects clarity, the meaning has shifted, or the style remains inconsistent.",
+    "Reserve not_appropriate for a rewrite that substantially changes the meaning, remains clearly conversational or vague, or is too inaccurate to communicate the intended idea.",
+    "Phrase explanations supportively: lead with the successful feature, then identify the smallest useful correction. Avoid blunt statements that the whole answer is inappropriate when only one word is missing or mistyped.",
+    "When suggesting a correction for a small slip, preserve the student's wording and change only what is necessary.",
+    "If the answer is accurate, natural and academically appropriate, use excellent and leave suggestedRewrite empty.",
+    "For acceptable, leave suggestedRewrite empty unless one small, concrete revision is genuinely useful.",
+    "Use partly_appropriate or not_appropriate only when there is a clear issue with meaning, language or academic suitability.",
+    "Keep comments concise, specific and learner-friendly. Refer to the student's exact wording where useful.",
+    "Set taskType exactly to ote_advanced_academic_style_rewrite. Return strict JSON only.",
     "",
     "Activity:",
     JSON.stringify(payload, null, 2),
@@ -4461,6 +4692,110 @@ exports.generateOteWritingFeedback = functions
     };
   });
 
+exports.generateOteAdvancedIntroConclusionFeedback = functions
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Sign in before generating paragraph feedback.");
+    }
+    if (!OPENAI_API_KEY) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Missing OPENAI_API_KEY in the Functions environment."
+      );
+    }
+
+    const payload = normalizeOteAdvancedIntroConclusionPayload(data);
+    if (
+      !payload.taskId ||
+      !payload.taskPrompt ||
+      !payload.selectedPosition ||
+      payload.selectedIdeas.length < 2 ||
+      !payload.introduction.text ||
+      !payload.conclusion.text
+    ) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Advanced introduction and conclusion feedback requires a complete plan and both paragraphs."
+      );
+    }
+    if (payload.introduction.wordCount < 8 || payload.conclusion.wordCount < 8) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Both paragraphs need enough writing to assess."
+      );
+    }
+
+    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const creditReservation = await consumeWritingFeedbackCredits(
+      context,
+      "ote_advanced_intro_conclusion",
+      WRITING_FEEDBACK_CREDIT_COSTS.ote_advanced_intro_conclusion
+    );
+    const requestBody = {
+      model,
+      input: buildOteAdvancedIntroConclusionFeedbackPrompt(payload),
+      reasoning: { effort: "low" },
+      max_output_tokens: 2400,
+      text: {
+        verbosity: "medium",
+        format: {
+          type: "json_schema",
+          name: "ote_advanced_intro_conclusion_feedback",
+          strict: true,
+          schema: OTE_ADVANCED_INTRO_CONCLUSION_FEEDBACK_SCHEMA,
+        },
+      },
+    };
+
+    let apiResponse;
+    try {
+      apiResponse = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+    } catch (error) {
+      console.error("[generateOteAdvancedIntroConclusionFeedback] OpenAI request failed", error);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("unavailable", "Could not reach the feedback service.");
+    }
+
+    const responseJson = await apiResponse.json().catch(() => null);
+    if (!apiResponse.ok) {
+      console.error("[generateOteAdvancedIntroConclusionFeedback] OpenAI error", responseJson);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "internal",
+        responseJson?.error?.message || "The feedback service returned an error."
+      );
+    }
+
+    const outputText = extractOutputText(responseJson);
+    let feedback;
+    try {
+      feedback = JSON.parse(outputText);
+    } catch (error) {
+      console.error("[generateOteAdvancedIntroConclusionFeedback] JSON parse failed", { outputText, error });
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
+    }
+
+    return {
+      feedback,
+      meta: {
+        model,
+        responseId: responseJson?.id || null,
+        usage: responseJson?.usage || null,
+        generatedAt: new Date().toISOString(),
+        quota: creditReservation,
+      },
+    };
+  });
+
 exports.generateOteRegisterGapFeedback = functions
   .region("europe-west1")
   .https.onCall(async (data, context) => {
@@ -4627,6 +4962,97 @@ exports.generateOteRegisterRewriteFeedback = functions
       feedback = JSON.parse(outputText);
     } catch (error) {
       console.error("[generateOteRegisterRewriteFeedback] JSON parse failed", { outputText, error });
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
+    }
+
+    return {
+      feedback,
+      meta: {
+        model,
+        responseId: responseJson?.id || null,
+        usage: responseJson?.usage || null,
+        generatedAt: new Date().toISOString(),
+        quota: creditReservation,
+      },
+    };
+  });
+
+exports.generateOteAdvancedAcademicStyleFeedback = functions
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth) {
+      throw new functions.https.HttpsError("unauthenticated", "Sign in before generating academic style feedback.");
+    }
+    if (!OPENAI_API_KEY) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Missing OPENAI_API_KEY in the Functions environment."
+      );
+    }
+
+    const payload = normalizeOteAdvancedAcademicStylePayload(data);
+    if (!payload.taskId || !payload.items.length) {
+      throw new functions.https.HttpsError("invalid-argument", "Academic style feedback requires valid rewrite data.");
+    }
+    if (!payload.items.some((item) => item.studentAnswer.trim())) {
+      throw new functions.https.HttpsError("invalid-argument", "Submit at least one rewrite before requesting feedback.");
+    }
+
+    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const creditReservation = await consumeWritingFeedbackCredits(
+      context,
+      "ote_advanced_academic_style",
+      WRITING_FEEDBACK_CREDIT_COSTS.ote_advanced_academic_style
+    );
+    const requestBody = {
+      model,
+      input: buildOteAdvancedAcademicStyleFeedbackPrompt(payload),
+      reasoning: { effort: "low" },
+      max_output_tokens: 3000,
+      text: {
+        verbosity: "medium",
+        format: {
+          type: "json_schema",
+          name: "ote_advanced_academic_style_feedback",
+          strict: true,
+          schema: OTE_ADVANCED_ACADEMIC_STYLE_FEEDBACK_SCHEMA,
+        },
+      },
+    };
+
+    let apiResponse;
+    try {
+      apiResponse = await fetch("https://api.openai.com/v1/responses", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${OPENAI_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+    } catch (error) {
+      console.error("[generateOteAdvancedAcademicStyleFeedback] OpenAI request failed", error);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError("unavailable", "Could not reach the feedback service.");
+    }
+
+    const responseJson = await apiResponse.json().catch(() => null);
+    if (!apiResponse.ok) {
+      console.error("[generateOteAdvancedAcademicStyleFeedback] OpenAI error", responseJson);
+      await refundWritingFeedbackCredits(context, creditReservation);
+      throw new functions.https.HttpsError(
+        "internal",
+        responseJson?.error?.message || "The feedback service returned an error."
+      );
+    }
+
+    const outputText = extractOutputText(responseJson);
+    let feedback;
+    try {
+      feedback = JSON.parse(outputText);
+    } catch (error) {
+      console.error("[generateOteAdvancedAcademicStyleFeedback] JSON parse failed", { outputText, error });
       await refundWritingFeedbackCredits(context, creditReservation);
       throw new functions.https.HttpsError("internal", "The feedback service returned invalid JSON.");
     }

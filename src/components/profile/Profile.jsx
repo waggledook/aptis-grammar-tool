@@ -1666,6 +1666,7 @@ const formatOteSpeakingPart = (part) => {
                         ? s.createdAt.toDate().toLocaleString()
                         : s.createdAt || "—";
                       const isPractice = s.type === "ote-writing-practice";
+                      const isAcademicStyleRewrite = s.practiceTaskType === "advanced-academic-style-rewrites";
                       const mock = isPractice ? null : getOteWritingMock(s.mockId || "writing-1");
                       const task2 = mock?.task2?.options?.[s.task2Choice || "essay"];
                       const title = s.mockTitle || mock?.title || (isPractice ? "OTE Writing Practice" : "OTE Writing Mock");
@@ -1681,7 +1682,9 @@ const formatOteSpeakingPart = (part) => {
                               <div className="muted small">{when}</div>
                               {isPractice ? (
                                 <div className="muted small">
-                                  Timed practice: {s.practiceTaskLabel || s.practiceTaskType || "Writing"} · {practiceWords} words
+                                  {isAcademicStyleRewrite
+                                    ? `Sentence rewrites · ${s.counts?.rewrites || s.tasks?.practice?.items?.length || 0} saved`
+                                    : `Timed practice: ${s.practiceTaskLabel || s.practiceTaskType || "Writing"} · ${practiceWords} words`}
                                 </div>
                               ) : (
                                 <div className="muted small">
@@ -1731,17 +1734,31 @@ const formatOteSpeakingPart = (part) => {
                                   </button>
                                 </>
                               ) : null}
-                              {renderFeedbackButton("ote", s)}
+                              {s.practiceTaskType !== "advanced-academic-style-rewrites"
+                                ? renderFeedbackButton("ote", s)
+                                : null}
                             </div>
                           </div>
 
                           {isPractice ? (
-                            <div className="submitted-p4">
-                              <div className="p4-col">
-                                <div className="p4-title">{practiceTitle}</div>
-                                <div className="submitted-html">{practiceAnswer || "(no answer)"}</div>
+                            isAcademicStyleRewrite ? (
+                              <div className="submitted-p4">
+                                {(s.tasks?.practice?.items || []).map((item, rewriteIndex) => (
+                                  <div className="p4-col" key={item.id || rewriteIndex}>
+                                    <div className="p4-title">Rewrite {rewriteIndex + 1}</div>
+                                    <div className="muted small">Original: {item.source}</div>
+                                    <div className="submitted-html">{item.studentAnswer || "(no answer)"}</div>
+                                  </div>
+                                ))}
                               </div>
-                            </div>
+                            ) : (
+                              <div className="submitted-p4">
+                                <div className="p4-col">
+                                  <div className="p4-title">{practiceTitle}</div>
+                                  <div className="submitted-html">{practiceAnswer || "(no answer)"}</div>
+                                </div>
+                              </div>
+                            )
                           ) : (
                             <div className="submitted-p4">
                               <div className="p4-col">
@@ -4827,6 +4844,10 @@ function ProfileAiFeedbackFull({ feedback, sourceItem = null }) {
     );
   }
 
+  if (feedback.taskType === "ote_advanced_academic_style_rewrite") {
+    return <ProfileAcademicStyleRewriteFeedback feedback={feedback} />;
+  }
+
   if (Array.isArray(feedback.answers)) {
     return (
       <div className="profile-ai-feedback-body">
@@ -4847,6 +4868,49 @@ function ProfileAiFeedbackFull({ feedback, sourceItem = null }) {
       {JSON.stringify(feedback, null, 2)}
     </pre>
   );
+}
+
+function ProfileAcademicStyleRewriteFeedback({ feedback }) {
+  return (
+    <div className="profile-ai-feedback-body">
+      {feedback.overall?.styleControl ? (
+        <p><strong>Style control:</strong> {profileAcademicStyleControlLabel(feedback.overall.styleControl)}</p>
+      ) : null}
+      {feedback.overall?.mainAdvice ? <p><strong>Main advice:</strong> {feedback.overall.mainAdvice}</p> : null}
+      {(feedback.items || []).map((item, index) => (
+        <div key={item.id || index} className="profile-ai-feedback-section">
+          <strong>Rewrite {index + 1}: {profileAcademicStyleVerdictLabel(item.verdict)}</strong>
+          {item.studentAnswer ? <p><b>Your answer:</b> {item.studentAnswer}</p> : null}
+          {item.meaning ? <p><b>Meaning:</b> {item.meaning}</p> : null}
+          {item.academicStyle ? <p><b>Academic style:</b> {item.academicStyle}</p> : null}
+          {item.language ? <p><b>Language:</b> {item.language}</p> : null}
+          {item.suggestedRewrite ? <p><b>Suggested revision:</b> {item.suggestedRewrite}</p> : null}
+          {item.explanation ? <p>{item.explanation}</p> : null}
+        </div>
+      ))}
+      {feedback.teacherComment ? <p><strong>Teacher comment:</strong> {feedback.teacherComment}</p> : null}
+    </div>
+  );
+}
+
+function profileAcademicStyleVerdictLabel(verdict) {
+  return {
+    excellent: "Strong rewrite",
+    acceptable: "Effective · small fix",
+    partly_appropriate: "Developing",
+    not_appropriate: "Needs revision",
+    blank: "Not submitted",
+  }[verdict] || "Reviewed";
+}
+
+function profileAcademicStyleControlLabel(value) {
+  return {
+    strong: "Strong academic style",
+    mostly_good: "Mostly effective",
+    mixed: "Developing consistency",
+    needs_work: "More practice needed",
+    too_incomplete: "More writing needed",
+  }[value] || "Rewrite review";
 }
 
 function ProfileSpeakingFeedback({ feedback, sourceItem = null }) {

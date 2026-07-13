@@ -226,6 +226,10 @@ import OteGeneralReadingPart2Practice from "./products/ote/OteGeneralReadingPart
 import OteWritingEmailGuide from "./products/ote/OteWritingEmailGuide.jsx";
 import OteWritingEssayGuide from "./products/ote/OteWritingEssayGuide.jsx";
 import OteWritingAdvancedEssayGuide from "./products/ote/OteWritingAdvancedEssayGuide.jsx";
+import OteWritingAdvancedEssayIntroConclusion from "./products/ote/OteWritingAdvancedEssayIntroConclusion.jsx";
+import OteWritingAdvancedEssayAcademicStyle from "./products/ote/OteWritingAdvancedEssayAcademicStyle.jsx";
+import OteWritingAdvancedEssayPlanning from "./products/ote/OteWritingAdvancedEssayPlanning.jsx";
+import OteWritingAdvancedEssayLanguageToolkit from "./products/ote/OteWritingAdvancedEssayLanguageToolkit.jsx";
 import OteWritingAdvancedSummaryGuide from "./products/ote/OteWritingAdvancedSummaryGuide.jsx";
 import OteWritingEssayIntroConclusion from "./products/ote/OteWritingEssayIntroConclusion.jsx";
 import OteWritingEssayPlanning from "./products/ote/OteWritingEssayPlanning.jsx";
@@ -1478,6 +1482,16 @@ return (
   <Route path="/ote/writing/training/essay/planning" element={<OteWritingEssayPlanning nativeRoutes={false} />} />
   <Route path="/ote/writing/training/essay/body-paragraphs" element={<OteWritingEssayBodyParagraphs nativeRoutes={false} />} />
   <Route path="/ote/writing/training/advanced-essay/guide" element={<OteWritingAdvancedEssayGuide nativeRoutes={false} />} />
+  <Route
+    path="/ote/writing/training/advanced-essay/introductions-conclusions"
+    element={<OteWritingAdvancedEssayIntroConclusion user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/writing/training/advanced-essay/academic-style"
+    element={<OteWritingAdvancedEssayAcademicStyle user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
+  />
+  <Route path="/ote/writing/training/advanced-essay/planning" element={<OteWritingAdvancedEssayPlanning nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/advanced-essay/language-toolkit" element={<OteWritingAdvancedEssayLanguageToolkit nativeRoutes={false} />} />
   <Route path="/ote/writing/training/advanced-summary/guide" element={<OteWritingAdvancedSummaryGuide nativeRoutes={false} />} />
   <Route path="/ote/writing/training/article-review/guide" element={<OteWritingArticleReviewGuide nativeRoutes={false} />} />
   <Route path="/ote/writing/training/:section/practice" element={<OteWritingPracticeMenu user={user} nativeRoutes={false} />} />
@@ -1640,6 +1654,16 @@ return (
       <Route path="/writing/training/essay/planning" element={<OteWritingEssayPlanning nativeRoutes />} />
       <Route path="/writing/training/essay/body-paragraphs" element={<OteWritingEssayBodyParagraphs nativeRoutes />} />
       <Route path="/writing/training/advanced-essay/guide" element={<OteWritingAdvancedEssayGuide nativeRoutes />} />
+      <Route
+        path="/writing/training/advanced-essay/introductions-conclusions"
+        element={<OteWritingAdvancedEssayIntroConclusion user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />}
+      />
+      <Route
+        path="/writing/training/advanced-essay/academic-style"
+        element={<OteWritingAdvancedEssayAcademicStyle user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />}
+      />
+      <Route path="/writing/training/advanced-essay/planning" element={<OteWritingAdvancedEssayPlanning nativeRoutes />} />
+      <Route path="/writing/training/advanced-essay/language-toolkit" element={<OteWritingAdvancedEssayLanguageToolkit nativeRoutes />} />
       <Route path="/writing/training/advanced-summary/guide" element={<OteWritingAdvancedSummaryGuide nativeRoutes />} />
       <Route path="/writing/training/article-review/guide" element={<OteWritingArticleReviewGuide nativeRoutes />} />
       <Route

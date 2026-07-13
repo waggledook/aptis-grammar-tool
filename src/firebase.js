@@ -246,6 +246,26 @@ export async function requestOteWritingFeedback(payload) {
   return result.data;
 }
 
+export async function requestOteAdvancedIntroConclusionFeedback(payload) {
+  const generateFeedback = httpsCallable(functionsRegion, "generateOteAdvancedIntroConclusionFeedback");
+  const result = await generateFeedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  await logAiFeedbackGenerated("ote_advanced_intro_conclusion", {
+    product: "ote",
+    section: "writing",
+    part: "part-1",
+    mode: "advanced_intro_conclusion",
+    taskId: payload?.taskId || "",
+    taskTitle: payload?.title || "",
+    answerCount: 2,
+    wordCount:
+      Number(payload?.introduction?.wordCount || 0) + Number(payload?.conclusion?.wordCount || 0),
+  }, result.data);
+  return result.data;
+}
+
 export async function requestOteRegisterGapFeedback(payload) {
   const generateOteRegisterGapFeedback = httpsCallable(functionsRegion, "generateOteRegisterGapFeedback");
   const result = await generateOteRegisterGapFeedback({
@@ -279,6 +299,29 @@ export async function requestOteRegisterRewriteFeedback(payload) {
     product: "ote",
     section: "writing",
     mode: "register_rewrite",
+    taskId: payload?.taskId || "",
+    taskTitle: payload?.title || "",
+    answerCount: items.length,
+    wordCount: items.reduce(
+      (sum, item) => sum + String(item?.studentAnswer || "").trim().split(/\s+/).filter(Boolean).length,
+      0
+    ),
+  }, result.data);
+  return result.data;
+}
+
+export async function requestOteAdvancedAcademicStyleFeedback(payload) {
+  const generateFeedback = httpsCallable(functionsRegion, "generateOteAdvancedAcademicStyleFeedback");
+  const result = await generateFeedback({
+    ...payload,
+    model: "gpt-5.4-mini",
+  });
+  const items = Array.isArray(payload?.items) ? payload.items : [];
+  await logAiFeedbackGenerated("ote_advanced_academic_style", {
+    product: "ote",
+    section: "writing",
+    part: "part-1",
+    mode: "advanced_academic_style_rewrite",
     taskId: payload?.taskId || "",
     taskTitle: payload?.title || "",
     answerCount: items.length,
@@ -4106,6 +4149,36 @@ export async function saveOteWritingSubmission(payload) {
     createdAt: serverTimestamp(),
   });
   return ref.id;
+}
+
+export async function saveOteAdvancedAcademicStyleRewrites(payload) {
+  const uid = auth.currentUser?.uid;
+  if (!uid) return null;
+
+  const submissionId = "advanced-academic-style-rewrites";
+  await setDoc(
+    doc(db, "users", uid, "oteWritingSubmissions", submissionId),
+    {
+      product: "ote",
+      type: "ote-writing-practice",
+      mockId: "advanced-academic-style-rewrites",
+      mockTitle: "Advanced Essay: Academic Style Rewrites",
+      moduleLabel: "Writing",
+      practiceTaskId: "advanced-academic-style-rewrites",
+      practiceSection: "advanced-essay",
+      practiceSectionLabel: "Advanced essay",
+      practiceTaskType: "advanced-academic-style-rewrites",
+      practiceTaskLabel: "Academic style rewrites",
+      ...payload,
+      aiFeedback: null,
+      aiFeedbackMeta: null,
+      aiFeedbackUpdatedAt: null,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+  return submissionId;
 }
 
 export async function fetchOteWritingSubmissions(n = 20, uid) {

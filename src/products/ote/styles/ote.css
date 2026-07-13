@@ -3584,6 +3584,1141 @@
   font-weight: 800;
 }
 
+.ote-writing-draft-box small.is-in-range {
+  color: #188a51;
+}
+
+.ote-advanced-writing-quote {
+  margin: 0.55rem 0 0.9rem;
+  border-left: 3px solid var(--ote-dashboard-accent);
+  padding-left: 0.85rem;
+  color: var(--color-text);
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+.ote-advanced-writing-do-dont {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.ote-advanced-writing-do-dont article {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-advanced-writing-do-dont h3 {
+  margin: 0 0 0.8rem;
+  color: var(--color-text);
+}
+
+.ote-advanced-writing-do-dont strong {
+  display: block;
+  margin-top: 0.85rem;
+  color: var(--ote-dashboard-accent);
+}
+
+.ote-advanced-writing-do-dont .ote-advanced-writing-optional-position {
+  margin: 0.9rem 0 0;
+  border-left: 3px solid var(--ote-dashboard-accent);
+  padding-left: 0.75rem;
+  color: var(--color-text);
+  line-height: 1.45;
+}
+
+.ote-advanced-writing-do-dont ul {
+  display: grid;
+  gap: 0.45rem;
+  margin: 0.45rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-advanced-writing-breakdown {
+  margin-top: 1rem;
+}
+
+.ote-advanced-writing-structure {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.8rem;
+}
+
+.ote-advanced-writing-structure p {
+  display: grid;
+  grid-template-columns: minmax(110px, 0.25fr) 1fr;
+  gap: 0.75rem;
+  margin: 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  padding: 0.75rem;
+}
+
+.ote-advanced-writing-structure span {
+  color: var(--ote-dashboard-accent);
+  font-weight: 900;
+}
+
+.ote-advanced-writing-note {
+  margin: 0.85rem 0 0;
+  color: var(--color-text-soft);
+  font-style: italic;
+}
+
+.ote-advanced-writing-draft {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(260px, 0.7fr);
+  gap: 1rem;
+  align-items: start;
+  margin: 1.25rem 0 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-advanced-writing-transfer-task h3 {
+  margin: 0.25rem 0 0;
+  color: var(--color-text);
+  font-size: 1.25rem;
+}
+
+.ote-advanced-writing-plan {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+  gap: 1rem;
+  margin: 1rem 0 1.5rem;
+}
+
+.ote-advanced-writing-plan > div {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-advanced-writing-plan h3,
+.ote-advanced-writing-draft-intro h3 {
+  margin: 0;
+  color: var(--color-text);
+}
+
+.ote-advanced-writing-plan p,
+.ote-advanced-writing-draft-intro p {
+  margin: 0.35rem 0 0.8rem;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+}
+
+.ote-advanced-writing-draft-intro {
+  margin-top: 1.5rem;
+}
+
+.ote-advanced-writing-pair-check {
+  margin: 1rem 0;
+}
+
+.ote-advanced-writing-ai-card {
+  margin-top: 1rem;
+}
+
+.ote-advanced-writing-feedback-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 1rem;
+}
+
+.ote-advanced-writing-feedback-grid > article {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 0.9rem;
+}
+
+.ote-advanced-writing-feedback-grid p {
+  margin: 0.5rem 0 0;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+}
+
+.ote-advanced-writing-feedback-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ote-advanced-writing-feedback-head h3 {
+  margin: 0;
+  color: var(--color-text);
+}
+
+.ote-advanced-writing-feedback-head span {
+  border-radius: 999px;
+  background: rgba(246, 189, 96, 0.16);
+  color: var(--ote-dashboard-accent);
+  padding: 0.3rem 0.55rem;
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-advanced-writing-teacher-comment {
+  margin: 1rem 0 0;
+  border-left: 3px solid var(--ote-dashboard-accent);
+  padding-left: 0.8rem;
+}
+
+.ote-academic-style-shifts {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+}
+
+.ote-academic-style-shifts > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ote-academic-style-shifts > div + div {
+  border-top: 1px solid var(--color-border);
+}
+
+.ote-academic-style-shifts span,
+.ote-academic-style-shifts strong {
+  padding: 0.7rem 0.85rem;
+  color: var(--color-text);
+}
+
+.ote-academic-style-shifts span + span,
+.ote-academic-style-shifts strong + strong {
+  border-left: 1px solid var(--color-border);
+}
+
+.ote-academic-style-shifts > div:first-child {
+  background: var(--ote-dashboard-primary);
+}
+
+.ote-academic-style-shifts > div:first-child strong {
+  color: var(--ote-dashboard-primary-text);
+}
+
+.ote-academic-style-myths {
+  margin-top: 1rem;
+}
+
+.ote-academic-style-myths ul,
+.ote-academic-style-problem-list ul,
+.ote-academic-style-paragraph-task ul {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0.6rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-academic-style-notice-card mark {
+  border-radius: 0.28em;
+  background: linear-gradient(135deg, #ffda8a 0%, #f6bd60 100%);
+  box-shadow: 0 2px 0 rgba(10, 27, 57, 0.32);
+  color: #17325f;
+  margin: -0.04em -0.12em;
+  padding: 0.04em 0.12em;
+  font-weight: inherit;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  animation: ote-academic-highlight-reveal 0.35s ease-out both;
+}
+
+@keyframes ote-academic-highlight-reveal {
+  from {
+    opacity: 0.35;
+    filter: saturate(0.6);
+  }
+  to {
+    opacity: 1;
+    filter: saturate(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ote-academic-style-notice-card mark {
+    animation: none;
+  }
+}
+
+.ote-academic-style-reveal-notes {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--ote-dashboard-panel-border);
+  border-radius: 8px;
+  background: var(--ote-dashboard-secondary);
+  color: var(--ote-dashboard-text);
+  padding: 0.6rem 0.75rem;
+  font-weight: 900;
+}
+
+.ote-academic-style-reveal-notes:disabled {
+  cursor: default;
+  opacity: 0.58;
+}
+
+.ote-academic-style-notice-notes {
+  margin-top: 0.85rem;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.85rem;
+}
+
+.ote-academic-style-issue-labels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.ote-academic-style-issue-labels span {
+  display: grid;
+  gap: 0.2rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.7rem;
+}
+
+.ote-academic-style-issue-labels strong {
+  color: var(--ote-dashboard-accent);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+
+.ote-academic-style-notice-notes > p {
+  margin: 0.75rem 0 0;
+  color: var(--color-text-soft);
+  line-height: 1.5;
+}
+
+.ote-academic-style-upgrade {
+  display: grid;
+  gap: 0.25rem;
+  border-left: 3px solid rgba(24, 138, 81, 0.72);
+  padding-left: 0.75rem;
+  color: var(--color-text) !important;
+}
+
+.ote-academic-style-upgrade strong {
+  color: #188a51;
+}
+
+.ote-training-feedback > p {
+  margin: 0.35rem 0 0;
+}
+
+.ote-academic-style-rewrite-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.ote-academic-style-rewrite-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-academic-style-rewrite-card.is-submitted {
+  border-color: rgba(24, 138, 81, 0.5);
+  box-shadow: inset 0 3px 0 rgba(24, 138, 81, 0.7);
+}
+
+.ote-academic-style-rewrite-card blockquote {
+  margin: 0;
+  border-left: 3px solid var(--ote-dashboard-accent);
+  padding-left: 0.75rem;
+  color: var(--color-text);
+  line-height: 1.5;
+}
+
+.ote-academic-style-rewrite-card label {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.ote-academic-style-rewrite-card label > span {
+  color: var(--color-text);
+  font-weight: 900;
+}
+
+.ote-academic-style-rewrite-card textarea {
+  width: 100%;
+  min-height: 96px;
+  resize: vertical;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.75rem;
+  font: inherit;
+  line-height: 1.45;
+}
+
+.ote-academic-style-rewrite-card textarea:disabled {
+  opacity: 0.82;
+  cursor: default;
+}
+
+.ote-academic-style-rewrite-card > button {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.4rem;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ote-dashboard-primary);
+  color: var(--ote-dashboard-primary-text);
+  padding: 0.6rem 0.75rem;
+  font-weight: 900;
+}
+
+.ote-academic-style-rewrite-card > button:disabled {
+  opacity: 0.55;
+}
+
+.ote-academic-style-save-error {
+  margin: 0;
+  color: #d75a5a;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.ote-academic-style-suggestion {
+  margin-top: auto;
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.7rem;
+}
+
+.ote-academic-style-suggestion p {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.45;
+}
+
+.ote-academic-style-suggestion ul {
+  display: grid;
+  gap: 0.3rem;
+  margin: 0.55rem 0 0;
+  padding-left: 1.2rem;
+  color: var(--color-text-soft);
+}
+
+.ote-academic-style-source-paragraph {
+  margin: 1rem 0;
+  border-left: 4px solid var(--ote-dashboard-accent);
+  background: var(--color-surface-2);
+  padding: 1rem;
+  color: var(--color-text);
+  line-height: 1.65;
+}
+
+.ote-academic-style-source-paragraph.has-annotations {
+  border-left-color: #f6bd60;
+}
+
+.ote-paragraph-issue-highlight,
+.ote-academic-style-issue-group {
+  --issue-highlight: #f6bd60;
+  --issue-ink: #17325f;
+  --issue-panel: rgba(246, 189, 96, 0.12);
+}
+
+.ote-paragraph-issue-highlight.is-vague,
+.ote-academic-style-issue-group.is-vague {
+  --issue-highlight: #8bd7c7;
+  --issue-panel: rgba(139, 215, 199, 0.12);
+}
+
+.ote-paragraph-issue-highlight.is-unsupported,
+.ote-academic-style-issue-group.is-unsupported {
+  --issue-highlight: #f39a8d;
+  --issue-panel: rgba(243, 154, 141, 0.12);
+}
+
+.ote-paragraph-issue-highlight.is-overstated,
+.ote-academic-style-issue-group.is-overstated {
+  --issue-highlight: #e9a4c6;
+  --issue-panel: rgba(233, 164, 198, 0.12);
+}
+
+.ote-paragraph-issue-highlight.is-control,
+.ote-academic-style-issue-group.is-control {
+  --issue-highlight: #b8a8ed;
+  --issue-panel: rgba(184, 168, 237, 0.12);
+}
+
+.ote-paragraph-issue-highlight {
+  border-radius: 0.25em;
+  background: var(--issue-highlight);
+  box-shadow: 0 2px 0 rgba(10, 27, 57, 0.28);
+  color: var(--issue-ink);
+  margin: -0.03em -0.1em;
+  padding: 0.03em 0.1em;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  animation: ote-academic-highlight-reveal 0.35s ease-out both;
+}
+
+.ote-academic-style-issue-groups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin: 1rem 0 1.2rem;
+}
+
+.ote-academic-style-issue-group {
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--issue-highlight) 42%, var(--color-border));
+  border-radius: 10px;
+  background: linear-gradient(145deg, var(--issue-panel), var(--color-surface-2) 48%);
+}
+
+.ote-academic-style-issue-group header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  align-items: start;
+  border-bottom: 1px solid color-mix(in srgb, var(--issue-highlight) 28%, var(--color-border));
+  padding: 0.85rem;
+}
+
+.ote-academic-style-issue-group header > span {
+  width: 12px;
+  height: 12px;
+  margin-top: 0.26rem;
+  border-radius: 999px;
+  background: var(--issue-highlight);
+  box-shadow: 0 0 0 4px var(--issue-panel);
+}
+
+.ote-academic-style-issue-group h3,
+.ote-academic-style-issue-group header p {
+  margin: 0;
+}
+
+.ote-academic-style-issue-group h3 {
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.ote-academic-style-issue-group header p {
+  margin-top: 0.2rem;
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.ote-academic-style-issue-group ul {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ote-academic-style-issue-group li {
+  display: grid;
+  grid-template-columns: minmax(120px, 0.36fr) 1fr;
+  gap: 0.7rem;
+  align-items: start;
+  padding: 0.72rem 0.85rem;
+}
+
+.ote-academic-style-issue-group li + li {
+  border-top: 1px solid var(--color-border);
+}
+
+.ote-academic-style-issue-group li strong {
+  border-radius: 6px;
+  background: var(--issue-highlight);
+  color: var(--issue-ink);
+  padding: 0.28rem 0.42rem;
+  font-size: 0.84rem;
+  line-height: 1.3;
+}
+
+.ote-academic-style-issue-group li > span {
+  color: var(--color-text-soft);
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.ote-academic-style-problem-list {
+  margin: 1rem 0;
+}
+
+.ote-academic-style-problem-list ul {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ote-academic-style-paragraph-task {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.65fr) minmax(0, 1.35fr);
+  gap: 1rem;
+  align-items: start;
+  margin: 1rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-academic-style-paragraph-task .ote-writing-draft-box {
+  margin: 0;
+}
+
+.ote-academic-style-final-check {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-advanced-planning-reminder {
+  margin-top: 1rem;
+  border-left: 4px solid var(--ote-dashboard-accent);
+  border-radius: 0 8px 8px 0;
+  background: rgba(246, 189, 96, 0.1);
+  padding: 0.8rem 0.9rem;
+  color: var(--color-text);
+  font-weight: 800;
+  line-height: 1.45;
+}
+
+.ote-writing-brainstorm-head button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.ote-advanced-planning-structure-note {
+  border-left: 3px solid var(--ote-dashboard-accent);
+  padding-left: 0.7rem;
+  color: var(--color-text-soft);
+  font-size: 0.92rem;
+}
+
+.ote-advanced-planning-prompt-selector {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.ote-advanced-planning-prompt-selector > strong {
+  color: var(--color-text);
+}
+
+.ote-advanced-planning-prompt-selector > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.ote-advanced-planning-prompt-selector button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--ote-dashboard-panel-border);
+  border-radius: 999px;
+  background: var(--ote-dashboard-secondary);
+  color: var(--ote-dashboard-text);
+  padding: 0.55rem 0.7rem;
+  font-weight: 800;
+}
+
+.ote-advanced-planning-prompt-selector button.is-selected {
+  border-color: var(--ote-dashboard-accent);
+  background: rgba(246, 189, 96, 0.12);
+  box-shadow: 0 0 0 2px rgba(246, 189, 96, 0.14);
+}
+
+.ote-advanced-planning-plan-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.ote-advanced-planning-box {
+  display: grid;
+  gap: 0.7rem;
+  align-content: start;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-advanced-planning-box h3,
+.ote-advanced-planning-box p {
+  margin: 0;
+}
+
+.ote-advanced-planning-box h3 {
+  color: var(--color-text);
+}
+
+.ote-advanced-planning-box p {
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-advanced-planning-box textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.75rem;
+  font: inherit;
+  line-height: 1.45;
+}
+
+.ote-advanced-planning-coverage {
+  margin: 0.9rem 0 0;
+  border-left: 3px solid rgba(188, 65, 65, 0.72);
+  padding-left: 0.7rem;
+  color: var(--color-text-soft);
+  font-weight: 800;
+}
+
+.ote-advanced-planning-coverage.is-complete {
+  border-left-color: rgba(24, 138, 81, 0.72);
+  color: #188a51;
+}
+
+.ote-advanced-planning-completion {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+}
+
+.ote-advanced-planning-completion.is-complete {
+  border-color: rgba(24, 138, 81, 0.55);
+}
+
+.ote-advanced-planning-completion h2 {
+  margin: 0;
+}
+
+.ote-advanced-planning-completion ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin: 1rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ote-advanced-planning-completion li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: var(--color-text-soft);
+}
+
+.ote-advanced-planning-completion li.is-complete {
+  color: #188a51;
+}
+
+.ote-language-toolkit-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ote-language-toolkit-print {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--ote-dashboard-panel-border);
+  border-radius: 8px;
+  background: var(--ote-dashboard-secondary);
+  color: var(--ote-dashboard-text);
+  padding: 0.65rem 0.8rem;
+  font-weight: 900;
+}
+
+.ote-language-toolkit-hero {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ote-language-toolkit-hero-icon {
+  display: grid;
+  place-items: center;
+  width: 68px;
+  height: 68px;
+  border-radius: 16px;
+  background: rgba(246, 189, 96, 0.14);
+  color: var(--ote-dashboard-accent);
+}
+
+.ote-language-toolkit-contents {
+  margin: 1.2rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-language-toolkit-contents > strong {
+  color: var(--color-text);
+}
+
+.ote-language-toolkit-contents > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-top: 0.7rem;
+}
+
+.ote-language-toolkit-contents a {
+  display: flex;
+  gap: 0.55rem;
+  align-items: center;
+  border-radius: 8px;
+  color: var(--color-text-soft);
+  padding: 0.5rem 0.6rem;
+  text-decoration: none;
+}
+
+.ote-language-toolkit-contents a:hover {
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.ote-language-toolkit-contents a span {
+  color: var(--ote-dashboard-accent);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.ote-language-toolkit-section {
+  scroll-margin-top: 1rem;
+  margin: 1rem 0;
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-2);
+}
+
+.ote-language-toolkit-section > header {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.85rem;
+  align-items: start;
+  border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(135deg, rgba(246, 189, 96, 0.13), transparent);
+  padding: 1rem;
+}
+
+.ote-language-toolkit-section > header > span {
+  color: var(--ote-dashboard-accent);
+  font-size: 1.3rem;
+  font-weight: 950;
+}
+
+.ote-language-toolkit-section h2,
+.ote-language-toolkit-section header p {
+  margin: 0;
+}
+
+.ote-language-toolkit-section h2 {
+  color: var(--color-text);
+  font-size: 1.3rem;
+}
+
+.ote-language-toolkit-section header p {
+  margin-top: 0.3rem;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-language-toolkit-body {
+  display: grid;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.ote-language-toolkit-group h3,
+.ote-language-toolkit-group p {
+  margin: 0;
+}
+
+.ote-language-toolkit-group h3 {
+  color: var(--color-text);
+  font-size: 1rem;
+}
+
+.ote-language-toolkit-group p {
+  margin-top: 0.3rem;
+  color: var(--color-text-soft);
+}
+
+.ote-language-toolkit-phrases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.65rem;
+}
+
+.ote-language-toolkit-phrases span {
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.48rem 0.65rem;
+  line-height: 1.35;
+}
+
+.ote-language-toolkit-pattern {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+  border-radius: 8px;
+  background: var(--ote-dashboard-primary);
+  color: var(--ote-dashboard-primary-text);
+  padding: 0.8rem;
+}
+
+.ote-language-toolkit-pattern span {
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+.ote-language-toolkit-body blockquote {
+  margin: 0;
+  border-left: 4px solid var(--ote-dashboard-accent);
+  background: var(--color-surface);
+  padding: 0.85rem;
+  color: var(--color-text);
+  line-height: 1.6;
+}
+
+.ote-language-toolkit-comparison {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.ote-language-toolkit-comparison > div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem;
+  align-items: start;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 0.75rem;
+  line-height: 1.45;
+}
+
+.ote-language-toolkit-comparison .is-avoid {
+  color: #b84141;
+}
+
+.ote-language-toolkit-comparison .is-use {
+  color: #188a51;
+}
+
+.ote-language-toolkit-comparison span {
+  color: var(--color-text);
+}
+
+.ote-language-toolkit-avoid {
+  display: flex;
+  gap: 0.65rem;
+  border-left: 4px solid #b84141;
+  border-radius: 0 8px 8px 0;
+  background: rgba(188, 65, 65, 0.08);
+  padding: 0.75rem;
+  color: var(--color-text);
+}
+
+.ote-language-toolkit-avoid strong {
+  color: #b84141;
+}
+
+.ote-language-toolkit-tip {
+  display: flex;
+  gap: 0.5rem;
+  align-items: start;
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.45;
+}
+
+.ote-language-toolkit-tip svg {
+  flex: 0 0 auto;
+  color: var(--ote-dashboard-accent);
+}
+
+.ote-language-toolkit-sentence-patterns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.ote-language-toolkit-sentence-patterns article {
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+  padding: 0.75rem;
+}
+
+.ote-language-toolkit-sentence-patterns strong {
+  color: var(--ote-dashboard-accent);
+}
+
+.ote-language-toolkit-sentence-patterns p {
+  margin: 0.35rem 0 0;
+  color: var(--color-text);
+  line-height: 1.45;
+}
+
+.ote-language-toolkit-table {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+}
+
+.ote-language-toolkit-table > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ote-language-toolkit-table > div + div {
+  border-top: 1px solid var(--color-border);
+}
+
+.ote-language-toolkit-table span,
+.ote-language-toolkit-table strong {
+  padding: 0.68rem 0.75rem;
+  color: var(--color-text);
+}
+
+.ote-language-toolkit-table span + span,
+.ote-language-toolkit-table strong + strong {
+  border-left: 1px solid var(--color-border);
+}
+
+.ote-language-toolkit-table > div:first-child {
+  background: var(--ote-dashboard-primary);
+}
+
+.ote-language-toolkit-table > div:first-child strong {
+  color: var(--ote-dashboard-primary-text);
+}
+
+.ote-language-toolkit-final {
+  margin: 1.2rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: linear-gradient(145deg, var(--color-surface-2), rgba(246, 189, 96, 0.1));
+  padding: 1.2rem;
+}
+
+.ote-language-toolkit-final h2 {
+  margin: 0;
+  color: var(--color-text);
+}
+
+.ote-language-toolkit-final > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+}
+
+.ote-language-toolkit-final > div span {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  color: var(--color-text);
+}
+
+.ote-language-toolkit-final > div svg {
+  flex: 0 0 auto;
+  color: #188a51;
+}
+
+.ote-language-toolkit-final blockquote {
+  margin: 1rem 0 0;
+  border-left: 4px solid var(--ote-dashboard-accent);
+  padding-left: 0.85rem;
+  color: var(--color-text);
+  font-size: 1.05rem;
+  font-weight: 800;
+  line-height: 1.55;
+}
+
+.ote-advanced-writing-draft .ote-writing-draft-box {
+  margin: 0;
+}
+
+.ote-advanced-writing-draft > div > strong {
+  color: var(--color-text);
+}
+
+.ote-advanced-writing-checklist {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.7rem;
+}
+
+.ote-advanced-writing-checklist label {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem;
+  align-items: start;
+  color: var(--color-text-soft);
+  line-height: 1.35;
+  cursor: pointer;
+}
+
+.ote-advanced-writing-checklist input {
+  width: 18px;
+  height: 18px;
+  margin: 0.05rem 0 0;
+  accent-color: var(--ote-dashboard-accent);
+}
+
+.ote-advanced-writing-finish {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ote-advanced-writing-finish h2,
+.ote-advanced-writing-finish p {
+  margin: 0;
+}
+
 .ote-essay-planning-grid,
 .ote-essay-structure-grid {
   display: grid;
@@ -8781,6 +9916,122 @@
   }
 }
 
+@media print {
+  body.ote-language-toolkit-print-mode,
+  body.ote-language-toolkit-print-mode .App,
+  body.ote-language-toolkit-print-mode .content-container,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-page {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #111827 !important;
+    box-shadow: none !important;
+  }
+
+  body.ote-language-toolkit-print-mode .content-container > div:first-child,
+  body.ote-language-toolkit-print-mode footer,
+  body.ote-language-toolkit-print-mode .no-print {
+    display: none !important;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-hero,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-section,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-final,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-group,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-sentence-patterns article {
+    border-color: #cbd5e1 !important;
+    background: #fff !important;
+    color: #111827 !important;
+    box-shadow: none !important;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-hero {
+    grid-template-columns: 58px 1fr !important;
+    margin: 0 0 0.15in !important;
+    padding: 0.14in !important;
+    border: 1px solid #cbd5e1 !important;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-hero h1 {
+    color: #0f172a !important;
+    font-size: 23pt !important;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-hero p,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-section p,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-group p,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-tip {
+    color: #334155 !important;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-section {
+    margin: 0 0 0.13in !important;
+    border-radius: 4px !important;
+    break-inside: auto;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-section > header {
+    padding: 0.1in !important;
+    background: #f8fafc !important;
+    break-after: avoid;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-section h2 {
+    color: #0f172a !important;
+    font-size: 14pt !important;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-body {
+    gap: 0.08in !important;
+    padding: 0.1in !important;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-group,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-comparison,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-pattern,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-body blockquote,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-avoid,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-sentence-patterns article {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-phrases {
+    gap: 0.05in !important;
+    margin-top: 0.05in !important;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-phrases span {
+    border-color: #cbd5e1 !important;
+    background: #f8fafc !important;
+    color: #111827 !important;
+    padding: 0.04in 0.06in !important;
+    font-size: 9pt !important;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-pattern {
+    background: #e2e8f0 !important;
+    color: #111827 !important;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-table span,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-table strong,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-comparison span,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-sentence-patterns p,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-body blockquote,
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-avoid {
+    color: #111827 !important;
+  }
+
+  body.ote-language-toolkit-print-mode .ote-language-toolkit-final {
+    margin: 0.15in 0 0 !important;
+    padding: 0.12in !important;
+    break-inside: avoid;
+  }
+}
+
 .ote-writing-exam.ote-theme-contrast .ote-writing-workspace,
 .ote-writing-exam.ote-theme-contrast .ote-writing-choice-screen,
 .ote-writing-exam.ote-theme-contrast .ote-writing-mock-menu-screen,
@@ -9556,6 +10807,53 @@
 }
 
 @media (max-width: 900px) {
+  .ote-advanced-writing-do-dont,
+  .ote-advanced-writing-draft,
+  .ote-advanced-writing-plan,
+  .ote-advanced-writing-feedback-grid,
+  .ote-academic-style-rewrite-grid,
+  .ote-academic-style-paragraph-task,
+  .ote-academic-style-final-check,
+  .ote-advanced-planning-plan-grid,
+  .ote-advanced-planning-completion ul,
+  .ote-language-toolkit-contents > div,
+  .ote-language-toolkit-comparison,
+  .ote-language-toolkit-sentence-patterns,
+  .ote-language-toolkit-final > div {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-language-toolkit-hero {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-academic-style-issue-groups {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-academic-style-issue-group li {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+  }
+
+  .ote-academic-style-problem-list ul {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-academic-style-issue-labels {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-advanced-writing-structure p {
+    grid-template-columns: 1fr;
+    gap: 0.25rem;
+  }
+
+  .ote-advanced-writing-finish {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .ote-dashboard-grid,
   .ote-dashboard-hero,
   .ote-training-activity-grid,
