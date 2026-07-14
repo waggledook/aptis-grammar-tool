@@ -60,7 +60,7 @@ function normalizeAnswer(value = "") {
   return String(value || "")
     .toLowerCase()
     .replace(/[’‘'`´~]/g, "")
-    .replace(/[-.,!?;:()[\]{}"“”]/g, " ")
+    .replace(/[-—–.,!?;:()[\]{}"“”]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -197,6 +197,7 @@ function getAutoItemScore(item, answer) {
     }
 
     const accepted = Array.isArray(item.acceptedAnswers) ? item.acceptedAnswers : [];
+    if (!String(answer ?? "").trim()) return 0;
     const normalized = normalizeAnswer(answer);
     if (accepted.some((entry) => normalizeAnswer(entry) === normalized)) return 1;
 
@@ -519,12 +520,13 @@ function renderInlineTextInput(item, answer, setGapAnswer, timeUp) {
   if (!prompt.includes("________")) return null;
 
   const [before, ...afterParts] = prompt.split(/_{4,}/);
+  const widthClass = item.inputWidth ? `is-${item.inputWidth}` : "";
   return (
     <>
       {before}
       <input
         type="text"
-        className="input hub-course-test-inline-gap"
+        className={["input", "hub-course-test-inline-gap", widthClass].filter(Boolean).join(" ")}
         value={typeof answer === "string" ? answer : ""}
         onChange={(e) => setGapAnswer("g1", e.target.value)}
         onKeyDown={handleExamTextInputKeyDown}

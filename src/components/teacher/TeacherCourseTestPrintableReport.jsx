@@ -34,7 +34,7 @@ function normalizeReviewAnswer(value = "") {
   return String(value || "")
     .toLowerCase()
     .replace(/[’']/g, "")
-    .replace(/[-.,!?;:()[\]{}"“”]/g, " ")
+    .replace(/[-—–.,!?;:()[\]{}"“”]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -167,6 +167,7 @@ function getAutoItemScore(item, answer) {
     }
 
     const accepted = Array.isArray(item.acceptedAnswers) ? item.acceptedAnswers : [];
+    if (!String(answer ?? "").trim()) return 0;
     const normalized = normalizeReviewAnswer(answer);
     if (accepted.some((entry) => normalizeReviewAnswer(entry) === normalized)) return 1;
 

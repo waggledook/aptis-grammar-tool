@@ -4327,6 +4327,218 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     ],
   },
   {
+    id: "oxford-insight-upper-intermediate-progress-1-5",
+    provider: "Oxford",
+    course: "Insight Upper-Intermediate",
+    title: "Insight Upper-Intermediate Progress Test 1-5",
+    level: "upper-intermediate",
+    testKind: "progress",
+    version: "A",
+    sourcePdfLabel: "Insight Upper-Int progress test editable.pdf",
+    supportedSkills: ["grammar", "vocabulary", "reading", "listening"],
+    deliveryPlan: {
+      mainPaper: {
+        id: "main-paper",
+        label: "Grammar, Vocabulary and Reading",
+        skills: ["grammar", "vocabulary", "reading"],
+        timingMode: "shared-section-timer",
+        durationMinutes: 70,
+        navigationMode: "free-navigation",
+        revisitAllowed: true,
+      },
+      listeningPaper: {
+        id: "listening-paper",
+        label: "Listening",
+        skills: ["listening"],
+        timingMode: "controlled-listening",
+        navigationMode: "teacher-paced",
+        revisitAllowed: false,
+        defaultPlayback: {
+          playCount: 2,
+          preReadSeconds: 45,
+          gapBetweenPlaysSeconds: 10,
+          answerWindowSeconds: 0,
+        },
+      },
+    },
+    sections: [
+      buildSection("grammar-part-1", "Grammar A: Multiple choice", "grammar", "multiple-choice-inline", "multiple-choice-single", 10, true, "Read the sentence and choose the correct answer.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Read the sentence and choose the correct answer.",
+        },
+        items: [
+          choiceItem("g1-1", "Woman: What are your plans for the holidays?\nMan: I’m not sure. I ________ some friends in Vietnam, but I haven’t booked any tickets yet. They are quite expensive.", ["may visit", "am visiting", "visit"], 0),
+          choiceItem("g1-2", "By the time I take my exams next month, I ________ all of my assignments. Then I’m free for summer.\nGirl: Lucky you!", ["will have been handing in", "will have handed in", "will be handing in"], 1),
+          choiceItem("g1-3", "Cathy ________ something when Henry came through the door.", ["was to say", "would say", "was about to say"], 2),
+          choiceItem("g1-4", "Anna spent ________ money on her exercise bike. It was really expensive.", ["hardly any", "far too much", "no"], 1),
+          choiceItem("g1-5", "Once Elizabeth ________ her parents to let her travel, she immediately started packing.", ["was able to convince", "couldn’t convince", "can convince"], 0),
+          choiceItem("g1-6", "My neighbour ________ the drums. It’s incredibly annoying.", ["is forever playing", "forever plays", "would forever play"], 0),
+          choiceItem("g1-7", "The inventor didn’t predict how their invention ________ people 100 years later.", ["were about to affect", "would affect", "were to affect"], 1),
+          choiceItem("g1-8", "I wanted to see this band and ________ tickets before they sold out.", ["shouldn’t have booked", "ought to have booked", "didn’t have to book"], 1),
+          choiceItem("g1-9", "Jam ________ be kept in the fridge. It can be kept in the cupboard.", ["doesn’t need to", "ought not to", "had better not"], 0),
+          choiceItem("g1-10", "Tell the children they ________ be so loud. They’re not supposed to make noise after 9 p.m.", ["don’t have to", "mustn’t", "needn’t"], 1),
+        ],
+      }),
+      buildSection("grammar-part-2", "Grammar B: Sentence completion", "grammar", "gap-fill-word-or-phrase", "gap-fill-word-or-phrase", 12, true, "Complete each sentence with the correct form of the words in brackets.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Complete each sentence with the correct form of the words in brackets.",
+          exampleLines: ["For article questions, enter a, per, or a dash (-) for no article."],
+        },
+        items: [
+          textInputItem("g2-1", "Ajay was covered in grease because he ________ (had / fix) the car since early that morning.", ["had been fixing"]),
+          textInputItem("g2-2", "When Max finally got to the beach, Anjali ________ (had / already leave) and was no longer there.", ["had already left"]),
+          textInputItem("g2-3", "This weekend, like every weekend, Jakub ________ (visit) his grandparents to have dinner with them.", ["is going to visit", "will visit", "is visiting"]),
+          textInputItem("g2-4", "I ________ (have / run) around all morning. I can’t wait to sit down when I’m done.", ["have been running"]),
+          textInputItem("g2-5", "Anh Long asked Louise why she ________ (had not / clean) the car while he was out.", ["had not cleaned", "hadn’t cleaned"]),
+          textInputItem("g2-6", "Priya ________ (be / try) to build the shelf when her dad arrived and offered to help her.", ["was trying"]),
+          textInputItem("g2-7", "‘I’m going to make you ________ (sweat),’ shouted the fitness instructor.", ["sweat"]),
+          textInputItem("g2-8", "We’ve got maths four times ________ (article or -) week.", ["a", "per"]),
+          textInputItem("g2-9", "I ________ (not / used to / have) my tea without sugar. I prefer it sweet.", ["am not used to having", "’m not used to having", "'m not used to having"]),
+          textInputItem("g2-10", "Ajay, when you were younger, ________ (used to / visit) your grandparents often?", ["did you use to visit"]),
+          textInputItem("g2-11", "Anjali tried ________ (beat) her opponent, but in the end couldn’t achieve it.", ["to beat"]),
+          textInputItem("g2-12", "Some people enjoy writing ________ (article or -) journals.", ["-", "–", "—", "no article", "zero article"]),
+        ],
+      }),
+      buildSection("grammar-part-3", "Grammar C: Key word transformations", "grammar", "sentence-transformation", "sentence-transformation", 8, true, "Complete the second sentence so that it has a similar meaning to the first sentence. Use the word given without changing it, and use between two and five words.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Complete the second sentence so that it has a similar meaning to the first sentence.",
+          exampleLines: ["Use the word given without changing it.", "Use between two and five words."],
+        },
+        items: [
+          textInputItem("g3-1", "The last time I spoke to Elena was in March.\nSINCE\nI __________________________________ March.", ["haven’t spoken to Elena since", "haven't spoken to Elena since"], "", { inputWidth: "xlong" }),
+          textInputItem("g3-2", "At nine o’clock tomorrow, we’ll be in the middle of our journey to Paris.\nTRAVELLING\nAt nine o’clock tomorrow, we __________________________________ to Paris.", ["will be travelling", "’ll be travelling", "'ll be travelling"], "", { inputWidth: "xlong" }),
+          textInputItem("g3-3", "Marta started working at the hospital in 2020 and will still be there next year.\nBEEN\nBy next year, Marta __________________________________ at the hospital for seven years.", ["will have been working", "’ll have been working", "'ll have been working"], "", { inputWidth: "xlong" }),
+          textInputItem("g3-4", "Very few people showed any interest in the proposal.\nLITTLE\nThere __________________________________ in the proposal.", ["was little interest"], "", { inputWidth: "xlong" }),
+          textInputItem("g3-5", "Working at night felt strange at first, but it gradually became normal for me.\nUSED\nI gradually __________________________________ at night.", ["got used to working"], "", { inputWidth: "xlong" }),
+          textInputItem("g3-6", "When we were children, our aunt regularly took us swimming after school.\nWOULD\nWhen we were children, our aunt __________________________________ after school.", ["would take us swimming"], "", { inputWidth: "xlong" }),
+          textInputItem("g3-7", "We bought food for the journey, but it wasn’t necessary.\nNEEDN’T\nWe __________________________________ food for the journey.", ["needn’t have bought", "needn't have bought"], "", { inputWidth: "xlong" }),
+          textInputItem("g3-8", "It would be sensible not to drive in this weather.\nBETTER\nYou __________________________________ in this weather.", ["had better not drive", "’d better not drive", "'d better not drive"], "", { inputWidth: "xlong" }),
+        ],
+      }),
+      buildSection("vocabulary-part-1", "Vocabulary C: Word formation", "vocabulary", "word-formation", "word-formation", 6, true, "Complete each sentence with the correct form of the word in brackets.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Complete each sentence with the correct form of the word in brackets.",
+        },
+        items: [
+          textInputItem("v1-1", "Piotr made a ________ (commit) to help his friend with his studies.", ["commitment"]),
+          textInputItem("v1-2", "Cathy showed ________ (determine) to finish her tennis match even though she was tired.", ["determination"]),
+          textInputItem("v1-3", "It was a ________ (disappoint) to Tom to not get tickets for the rugby match.", ["disappointment"]),
+          textInputItem("v1-4", "The invention of the fridge was an ________ (innovate) way to store food.", ["innovative"]),
+          textInputItem("v1-5", "Anna showed ________ (control) when she said goodbye to her family at the airport.", ["self-control", "self control"]),
+          textInputItem("v1-6", "Rainfall increased by ________ (increment) amounts, rising by one centimetre each day.", ["incremental"]),
+        ],
+      }),
+      buildSection("vocabulary-part-2", "Vocabulary D: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 12, true, "Read the sentence and choose the correct answer.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Read the sentence and choose the correct answer.",
+        },
+        items: [
+          choiceItem("v2-1", "Anjali asked her daughter to ________ the dress she wanted to wear for the party.", ["help out", "pick out", "clear out"], 1),
+          choiceItem("v2-2", "We have a ________ necklace that my grandmother gave to us.", ["beautiful old silver", "old silver beautiful", "silver beautiful old"], 0),
+          choiceItem("v2-3", "Max baked some amazing ________ cakes for his little brother’s birthday party.", ["handmade", "wide-ranging", "broad-minded"], 0),
+          choiceItem("v2-4", "Tom sat in a ________ room to see the doctor.", ["waiting square grey", "grey waiting square", "square grey waiting"], 2),
+          choiceItem("v2-5", "My parents are going to ________ these old magazines, as they’ve read them.", ["opt out", "throw out", "wear out"], 1),
+          choiceItem("v2-6", "My sister reads a lot, so I have a ________ supply of books I can borrow!", ["well-earned", "highly respected", "never-ending"], 2),
+          choiceItem("v2-7", "Esra stood with others to ________ her friends who were running in the race.", ["slip on", "cheer on", "move on"], 1),
+          choiceItem("v2-8", "Anh Long’s mother wanted to ________ him to learn the guitar, so she bought him one.", ["encourage", "enlarge", "ensure"], 0),
+          choiceItem("v2-9", "The train has left, so ________ hurrying to the station.", ["at some point", "from my point of view", "there’s no point in"], 2),
+          choiceItem("v2-10", "I haven’t played this game in years, so I’ll need to ________ the rules.", ["add on", "brush up on", "keeps on"], 1),
+          choiceItem("v2-11", "The player was ________ winning the tennis match when she fell.", ["at some point", "up to a point", "on the point of"], 2),
+          choiceItem("v2-12", "Tom ________ two photographs with his passport application so it would be accepted.", ["enabled", "enclosed", "enraged"], 1),
+        ],
+      }),
+      buildSection("vocabulary-part-3", "Vocabulary E: Missing words and phrases", "vocabulary", "gap-fill-word-or-phrase", "gap-fill-word-or-phrase", 10, true, "Complete each sentence with the missing word or phrase. Some letters are given.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Complete each sentence with the missing word or phrase.",
+          exampleLines: ["Some letters are given."],
+        },
+        items: [
+          textInputItem("v3-1", "Critics accused the company of acting out of s__________-i__________ rather than genuine concern for local residents.", [], "", {
+            inlineParts: ["Critics accused the company of acting out of s", { gapId: "g1", width: "medium" }, "-i", { gapId: "g2", width: "medium" }, " rather than genuine concern for local residents."],
+            inlineAcceptedAnswers: { g1: ["elf", "self"], g2: ["nterest", "interest"] },
+          }),
+          textInputItem("v3-2", "When their equipment broke, the climbers had to be r__________ and repair it using the materials available.", [], "", {
+            inlineParts: ["When their equipment broke, the climbers had to be r", { gapId: "g1", width: "medium" }, " and repair it using the materials available."],
+            inlineAcceptedAnswers: { g1: ["esourceful", "resourceful"] },
+          }),
+          textInputItem("v3-3", "The council plans to renovate several r__________-d__________ buildings near the station.", [], "", {
+            inlineParts: ["The council plans to renovate several r", { gapId: "g1", width: "short" }, "-d", { gapId: "g2", width: "short" }, " buildings near the station."],
+            inlineAcceptedAnswers: { g1: ["un", "run"], g2: ["own", "down"] },
+          }),
+          textInputItem("v3-4", "The museum is fully ac__________ to wheelchair users.", [], "", {
+            inlineParts: ["The museum is fully ac", { gapId: "g1", width: "medium" }, " to wheelchair users."],
+            inlineAcceptedAnswers: { g1: ["cessible", "accessible"] },
+          }),
+          textInputItem("v3-5", "The writing was so faint that I could hardly m__________ o__________ the address.", [], "", {
+            inlineParts: ["The writing was so faint that I could hardly m", { gapId: "g1", width: "short" }, " o", { gapId: "g2", width: "short" }, " the address."],
+            inlineAcceptedAnswers: { g1: ["ake", "make"], g2: ["ut", "out"] },
+          }),
+          textInputItem("v3-6", "Could you k__________ an e__________ o__________ my bag while I buy a ticket?", [], "", {
+            inlineParts: ["Could you k", { gapId: "g1", width: "short" }, " an e", { gapId: "g2", width: "short" }, " o", { gapId: "g3", width: "short" }, " my bag while I buy a ticket?"],
+            inlineAcceptedAnswers: { g1: ["eep", "keep"], g2: ["ye", "eye"], g3: ["n", "on"] },
+          }),
+          textInputItem("v3-7", "The scheme aims to em__________ local residents by allowing them to make decisions about the project.", [], "", {
+            inlineParts: ["The scheme aims to em", { gapId: "g1", width: "medium" }, " local residents by allowing them to make decisions about the project."],
+            inlineAcceptedAnswers: { g1: ["power", "empower"] },
+          }),
+          textInputItem("v3-8", "The new cycle lanes should b__________ both commuters and local businesses.", [], "", {
+            inlineParts: ["The new cycle lanes should b", { gapId: "g1", width: "medium" }, " both commuters and local businesses."],
+            inlineAcceptedAnswers: { g1: ["enefit", "benefit"] },
+          }),
+          textInputItem("v3-9", "Use the i__________ at the back of the book to find every reference to climate change.", [], "", {
+            inlineParts: ["Use the i", { gapId: "g1", width: "medium" }, " at the back of the book to find every reference to climate change."],
+            inlineAcceptedAnswers: { g1: ["ndex", "index"] },
+          }),
+          textInputItem("v3-10", "The journey was exhausting, but the view from the top made it w__________.", [], "", {
+            inlineParts: ["The journey was exhausting, but the view from the top made it w", { gapId: "g1", width: "medium" }, "."],
+            inlineAcceptedAnswers: { g1: ["orthwhile", "worthwhile"] },
+          }),
+        ],
+      }),
+      buildSection("reading-part-1", "Reading: Method acting", "reading", "reading-multiple-choice", "multiple-choice-single", 6, true, "Read the article about method acting and choose the correct answer for each question.", {
+        sharedPrompt: {
+          type: "reading-passage",
+          title: "Method acting",
+          passages: [{
+            heading: "Method acting",
+            text: "You may have heard this term before, or you may not. For the latter, method acting is where actors try to get inside the minds and lives of the characters they’re playing on screen. Pre-filming, they recommend spending time considering how their character might behave in different situations, in order to ‘become’ them. They may even live like their character as they get ready for filming. Method isn’t the most popular technique because of the preparation required, but some believe the effort is worthwhile.\n\nMethod acting has been around for ages yet it hasn’t become the most adopted approach. Some say this is due to the demands it puts on an actor to master it (not that this puts some off it), and the effect it has in real life long after filming has stopped must be considerable. I think this is outweighed by the fact that, in general, working with method actors is more challenging, which limits opportunities. A number of directors have complained about losing control when working with method actors.\n\nWhat do actors say about method acting? A handful of famous faces are well known for following the approach and have at times had fun made of themselves because of it. But others say they aren’t method actors, they’ve found it exhausting when they’ve attempted it, and they prefer to fall back on more general acting techniques that don’t require ‘taking the character home’ and making them part of their lives. Their methods are no less effective, they say.\n\nSome actors appear to take method acting too far. One such actor got rid of almost everything he owned to better perform the role of a poverty-struck musician. This, he said, enabled him to feel what his character might have felt, and helped him give the performance of a lifetime. Clearly, this actor felt it necessary to take things to extremes, but is going to such lengths for acting really worth it? Can audiences tell the difference? Probably not.\n\nWe rarely even notice good acting, but we might notice when things don’t go so well. This could be the plot, the dialogue, the acting itself. It’s not that we don’t appreciate a good piece of acting, but we wouldn’t necessarily know the difference between an actor who’s looked inside himself to find the necessary skills, and one who’s lived unwashed in a caravan for weeks as his character has. The only time we may notice method acting is when an actor is playing a historical figure, or celebrity. Then, we can appreciate the similarity and understand the efforts the actor must have gone to, to speak and move like the person they’re playing.\n\nA few actors have started to speak out against method acting. ‘If you’re playing a killer, you can’t go round preparing for that,’ says one. ‘It’s ridiculous,’ says another, ‘Just act!’ Some report that not only is method acting potentially dangerous (on occasion, actors have even made themselves ill by following strange diets or extreme sports during preparations), it can also disrupt the filming process on set. ‘If an actor refuses to step out of the role during breaks, you may have to deal with a bit of an idiot ...’ says one actor.",
+          }],
+        },
+        items: [
+          choiceItem("r1-1", "What is the main purpose of the introduction?", ["To explain why a well-known technique is used in filming", "To recommend a well-known technique", "To provide a definition of a well-known technique"], 2),
+          choiceItem("r1-2", "What is the main reason that the writer feels that method acting isn’t more common?", ["There are fewer acting roles for those who like method acting.", "It is very difficult to maintain the role after filming has stopped.", "Method acting takes much longer to become really good at."], 0),
+          choiceItem("r1-3", "What does the writer suggest in the third paragraph?", ["Some well-known actors say they really enjoy method acting.", "Method acting can have a negative impact on actors’ personal lives.", "Other acting techniques are not as successful as method acting."], 1),
+          choiceItem("r1-4", "What does the writer say about one famous method actor?", ["He believed his preparations would enable him to do well in a role.", "His preparations for the role were fairly typical of method acting.", "He needn’t have prepared for this particular role so thoroughly."], 2),
+          choiceItem("r1-5", "What does the writer say about audiences?", ["They particularly enjoy seeing movies where actors play well-known people.", "They have difficulty distinguishing between method and ordinary acting.", "They tend to focus too much on the poorer aspects of a performance."], 1),
+          choiceItem("r1-6", "Why does the writer include quotes from actors in the final paragraph?", ["To highlight the kinds of things that often go wrong in preparations", "To support the argument that method acting is unnecessary", "To explain why the majority of actors now refuse to do method acting"], 1),
+        ],
+      }),
+      buildSection("listening-part-1", "Listening: Exercise that doesn’t feel like exercise", "listening", "listening-multiple-choice", "multiple-choice-single", 6, true, "Listen to a radio programme about exercise. Choose the correct answer for each question.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Listen to a radio programme about exercise.",
+          exampleLines: ["Choose the correct answer for each question."],
+        },
+        items: [
+          choiceItem("l1-1", "What is the problem with daily exercise for many of us?", ["It is too difficult to fit it into our lives.", "It feels too much like doing work.", "It quickly becomes too repetitive."], 1),
+          choiceItem("l1-2", "What does Mariam say about her early experiences of exercise?", ["She preferred exercising alone than with other people.", "She did not think she was very good at sport.", "She only did activities that she was forced to do."], 2),
+          choiceItem("l1-3", "What does Mariam say about drummercise?", ["She found out about it through someone else.", "She thought she could use existing skills for it.", "She discovered it wasn’t the best form of exercise."], 0),
+          choiceItem("l1-4", "What does Max particularly enjoy about adult gymnastics?", ["It does not feel like exercising to him.", "It brings back memories of his childhood.", "It is based on another sports activity he does."], 1),
+          choiceItem("l1-5", "What was Dana’s former attitude to jogging?", ["She compared it to eating certain beneficial foods.", "She wished she had been better at it.", "She thought that if she pretended to like it, she would."], 0),
+          choiceItem("l1-6", "How did Dana feel when she came across aerial yoga?", ["Concerned about the safety of the activity", "Excited about taking on a new challenge", "Surprised at how easy the people said it was"], 1),
+        ],
+        audioSrc: "/audio/listening/insight-upper-int-progress-1-5.mp3",
+        timing: { preReadSeconds: 45, playCount: 2, gapBetweenPlaysSeconds: 10, answerWindowSeconds: 0 },
+      }),
+    ],
+  },
+  {
     id: "oxford-insight-upper-intermediate-end-of-year-a",
     provider: "Oxford",
     course: "Insight Upper-Intermediate",
@@ -5781,6 +5993,9 @@ export function listHubCourseTestTemplates({ level, testKind } = {}) {
     const levelDiff = (aLevelIndex === -1 ? Number.MAX_SAFE_INTEGER : aLevelIndex)
       - (bLevelIndex === -1 ? Number.MAX_SAFE_INTEGER : bLevelIndex);
     if (levelDiff !== 0) return levelDiff;
+
+    const courseDiff = String(a.course || "").localeCompare(String(b.course || ""), "en", { numeric: true });
+    if (courseDiff !== 0) return courseDiff;
 
     const testKindDiff = testKindOrder.indexOf(a.testKind) - testKindOrder.indexOf(b.testKind);
     if (testKindDiff !== 0) return testKindDiff;
