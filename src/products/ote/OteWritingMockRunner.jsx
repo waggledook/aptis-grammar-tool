@@ -14,6 +14,10 @@ import {
   downloadOteWritingSubmissionDocx,
   downloadOteWritingSubmissionText,
 } from "./mockTests/utils/oteWritingSubmissionExport.js";
+import {
+  formatSummaryMarkingGuide,
+  getSummaryMainIdeas,
+} from "./mockTests/utils/oteSummaryMarkingGuide.js";
 import "./styles/ote.css";
 
 const WRITING_PART_TITLE_SECONDS = 5;
@@ -29,6 +33,10 @@ function countWords(value) {
   const text = String(value || "").trim();
   if (!text) return 0;
   return text.split(/\s+/).filter(Boolean).length;
+}
+
+function formatFeedbackStatus(value = "") {
+  return String(value).replace(/_/g, " ");
 }
 
 function getOteTask2Type(option = {}) {
@@ -355,6 +363,7 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
             task1.setup,
             task1.prompt,
             task1.question,
+            task1.ideasIntro,
             ...(task1.ideas || []).map((idea) => `Idea: ${idea}`),
             task1.organizationInstruction,
           ].filter(Boolean).join("\n")
@@ -374,10 +383,7 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
         ? [
             selectedTask.setup,
             ...(selectedTask.sources || []).map((source) => `${source.title}\n${source.text}`),
-            selectedTask.markingGuide?.overarchingIdea
-              ? `Teacher marking guide - overarching idea: ${selectedTask.markingGuide.overarchingIdea}`
-              : "",
-            ...(selectedTask.markingGuide?.mainIdeas || []).map((idea) => `Teacher marking guide - main idea: ${idea}`),
+            formatSummaryMarkingGuide(selectedTask.markingGuide),
           ].filter(Boolean).join("\n\n")
         : selectedTask.context || "";
 
@@ -418,7 +424,8 @@ export default function OteWritingMockRunner({ user, onRequireSignIn, nativeRout
             ]
               .filter(Boolean)
               .join("\n"),
-            requiredPoints: selectedTask.markingGuide?.mainIdeas || [],
+            requiredPoints: getSummaryMainIdeas(selectedTask.markingGuide),
+            markingGuide: task2Type === "ote_advanced_part2_summary" ? selectedTask.markingGuide : null,
             targetAudience: task2Type === "ote_advanced_part2_summary" ? "classmates" : "English teacher",
             expectedRegister:
               task2Type === "ote_advanced_part2_summary"
@@ -1205,6 +1212,38 @@ export function WritingAiFeedback({ feedback, status, error }) {
                   </li>
                 ))}
               </ul>
+            ) : null}
+            {task.summaryEvaluation?.applicable ? (
+              <div className="ote-ai-feedback-summary-evaluation">
+                <h4>Summary information map</h4>
+                <p>
+                  <strong>Overarching idea ({formatFeedbackStatus(task.summaryEvaluation.overarchingIdea?.status)}):</strong>{" "}
+                  {task.summaryEvaluation.overarchingIdea?.feedback}
+                </p>
+                {(task.summaryEvaluation.mainIdeas || []).map((idea) => (
+                  <div key={idea.id || idea.idea}>
+                    <p>
+                      <strong>Main idea ({formatFeedbackStatus(idea.status)}):</strong> {idea.idea}
+                      {idea.feedback ? <em>{idea.feedback}</em> : null}
+                    </p>
+                    <p>
+                      <strong>Supporting detail ({formatFeedbackStatus(idea.supportingDetail?.status)}):</strong>{" "}
+                      {idea.supportingDetail?.feedback}
+                    </p>
+                  </div>
+                ))}
+                {[
+                  ["Use of sources", task.summaryEvaluation.useOfSources],
+                  ["Synthesis", task.summaryEvaluation.synthesis],
+                  ["Redundancy", task.summaryEvaluation.redundancy],
+                  ["Idea-based organization", task.summaryEvaluation.organization],
+                  ["Paraphrasing", task.summaryEvaluation.paraphrasing],
+                ].map(([label, result]) => (
+                  <p key={label}>
+                    <strong>{label} ({formatFeedbackStatus(result?.status)}):</strong> {result?.feedback}
+                  </p>
+                ))}
+              </div>
             ) : null}
             <p><strong>Content:</strong> {task.taskFulfilment?.contentSpecificity?.feedback}</p>
             {task.mistakes?.length ? (

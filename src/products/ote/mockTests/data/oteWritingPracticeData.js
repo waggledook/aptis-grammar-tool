@@ -532,27 +532,73 @@ export const OTE_WRITING_PRACTICE_SETS = {
         {
           title: "Textbook extract",
           text:
-            "Some products become more useful as the number of users increases. This is known as a network effect. A telephone, for example, has little value if only one person owns one, but its usefulness grows as more people join the same system. Digital platforms can expand especially quickly because each new user may attract others, creating a cycle of growth. This pattern is common in social media, payment systems and online marketplaces. Large networks can benefit consumers by making it easier to find information, buyers, sellers or services in one place. However, they may also make it difficult for new competitors to enter the market, even when those competitors offer better technology. Users may hesitate to move because their contacts, records or reputation are already connected to the established platform. As a result, network effects can contribute to a small number of companies becoming extremely powerful.",
+            "Some products become more useful as the number of users increases, a pattern known as a network effect. A telephone, for example, has little value if only one person owns one, but becomes more useful as others join the same system. Digital platforms can therefore grow rapidly because each new user may attract more participants. This is common in social media, payment systems and online marketplaces. Large networks can make it easier to find information, buyers, sellers or services in one place. However, their size can also discourage competition. People may be unwilling to leave an established platform if their contacts, records or reputation are stored there, even when another service offers better technology. This creates switching costs and may allow a small number of companies to gain considerable market power. The advantage is strongest when users depend on a single network and competing systems cannot exchange information with it.",
         },
         {
           title: "Lecture transcript",
           text:
-            "'It is tempting to assume that the biggest platform will always win, but, well, the picture is more complicated. People may use several services at the same time, particularly when switching is cheap. A restaurant can advertise on two delivery apps, for instance, and customers can compare both. Trust and quality matter as well: a large network may lose users rapidly if it handles personal data badly or allows unreliable sellers to dominate. Governments and industry groups can also require systems to work together. This interoperability means that people can communicate or transfer information across competing services, reducing the advantage of the largest network. So size creates momentum, but it does not remove the need to provide a useful and dependable service. Network effects are strongest when users feel locked into one system and alternatives cannot connect with it.'",
+            "'Now, a large network does not automatically remain successful. Its advantage depends partly on how difficult it is for users to choose alternatives. When switching is cheap, people may use several services at once; restaurants, for instance, often advertise through more than one delivery app. Systems can also be required to work together, allowing users to communicate or transfer information across competing platforms. This interoperability weakens the barrier created by network size. Trust and quality matter as well. A dominant platform may, er, lose users if it handles personal data badly or allows unreliable sellers to become common. So network effects create momentum, but they do not remove the need to provide a useful and dependable service. Size gives a platform its greatest protection when users are locked in and alternatives cannot connect with it.'",
         },
       ],
       glossary: [
         { term: "reputation", definition: "the opinion that people generally have of someone or something" },
-        { term: "established", definition: "having existed successfully for a long time" },
+        { term: "switching costs", definition: "the disadvantages or losses involved in changing to another product or service" },
         { term: "interoperability", definition: "the ability of different systems to work together" },
         { term: "momentum", definition: "the force that keeps a process developing after it has begun" },
       ],
       markingGuide: {
         overarchingIdea:
-          "Digital platforms can grow rapidly because their value increases with user numbers, although size alone does not guarantee permanent success.",
+          "Network effects can help digital platforms grow and become powerful, but their advantage depends on users being locked in and on competitors being unable to connect.",
         mainIdeas: [
-          "Network effects create cycles of growth and can make platforms more convenient for users.",
-          "Established networks may become powerful because moving to a competitor can mean losing contacts, information or reputation.",
-          "Competition remains possible when users can use several services, systems can connect, or a large platform loses trust or quality.",
+          {
+            id: "idea-1",
+            idea: "A product or platform becomes more useful and can grow more rapidly as its number of users increases.",
+            supportingDetails: [
+              { source: "textbook", detail: "Each new platform user may attract further participants." },
+              { source: "textbook", detail: "Large networks make it easier to find information, buyers, sellers or services." },
+              { source: "lecture", detail: "Network size creates momentum." },
+            ],
+          },
+          {
+            id: "idea-2",
+            idea: "Established platforms can gain market power because users may find it difficult or costly to leave.",
+            supportingDetails: [
+              { source: "textbook", detail: "Users may lose contacts, records or reputation by changing platforms." },
+              { source: "textbook", detail: "This can discourage new competitors even when they have better technology." },
+              { source: "lecture", detail: "Network effects are strongest when users are locked into one service." },
+              { source: "lecture", detail: "Using several platforms is easier when switching is cheap." },
+            ],
+          },
+          {
+            id: "idea-3",
+            idea: "Large networks do not automatically remain dominant because competition, connectivity, trust and quality still matter.",
+            supportingDetails: [
+              { source: "lecture", detail: "Users may use several competing services." },
+              { source: "lecture", detail: "Interoperability allows different systems to communicate or exchange information." },
+              { source: "lecture", detail: "Poor data handling or unreliable sellers can cause users to leave." },
+              { source: "textbook", detail: "Competitors may offer better technology, although switching barriers can prevent users moving." },
+            ],
+          },
+        ],
+        crossTextLinks: [
+          { mainIdeaId: "idea-1", explanation: "The lecture's reference to momentum supports the textbook's explanation of the cycle of growth." },
+          { mainIdeaId: "idea-2", explanation: "The textbook explains the causes of lock-in, while the lecture explains when that lock-in is strong or weak." },
+          { mainIdeaId: "idea-3", explanation: "The textbook establishes the market barrier, while the lecture explains how that barrier can be reduced." },
+        ],
+        lowPriorityDetails: [
+          { source: "textbook", detail: "The telephone example." },
+          { source: "textbook", detail: "The complete list of social media, payment systems and online marketplaces." },
+          { source: "lecture", detail: "The restaurant and delivery-app example." },
+          { source: "lecture", detail: "Both the personal-data and unreliable-seller examples; one would be enough." },
+        ],
+        modelSummary:
+          "Network effects make products more valuable as participation grows, allowing digital platforms to expand rapidly and offer users convenient access to information and services. Established networks may also gain market power because people risk losing contacts, records or reputation when switching. However, size does not guarantee permanent dominance. Users can choose several platforms when switching is cheap, while interoperability allows competing systems to connect. Poor quality or loss of trust may also drive users away, so network effects are strongest when customers are locked into one dependable system.",
+        commonWeaknesses: [
+          "Describing the benefits of large networks but omitting lock-in.",
+          "Listing the lecture's exceptions without explaining what a network effect is.",
+          "Treating size as a guarantee of success.",
+          "Spending too many words on the telephone or delivery-app examples.",
+          "Summarizing the textbook first and the lecture second without linking them.",
         ],
       },
     },
@@ -579,12 +625,12 @@ export const OTE_WRITING_PRACTICE_SETS = {
         {
           title: "Textbook extract",
           text:
-            "Pollination occurs when pollen is transferred between parts of a flower, allowing seeds and fruit to develop. Wind performs this task for some plants, but many depend on animals, especially insects. Bees are the best-known pollinators, although flies, butterflies, beetles and some birds also play important roles. A diverse pollinator community can make plant reproduction more reliable because different species are active in different weather conditions and visit different kinds of flowers. This matters for natural ecosystems and for agriculture: many crops produce larger or better-quality harvests when insects visit them. Pollination also supports wild plants that provide food and shelter for other animals. Managed honeybee colonies are often brought to farms during flowering, but they cannot fully replace wild pollinators. Relying heavily on one species creates a risk if disease, poor weather or food shortages reduce its numbers.",
+            "Pollination transfers pollen between parts of a flower, allowing seeds and fruit to develop. Wind performs this task for some plants, but many depend on animals, especially insects. Animal pollination supports wild plants that provide food and shelter for other species, and many crops produce larger or better-quality harvests when insects visit them. A diverse pollinator community makes reproduction more reliable because different species are active in different weather conditions and visit different flowers. Managed honeybee colonies are often taken to farms during flowering, but they cannot fully replace wild pollinators. Heavy dependence on one species creates a risk if disease, poor weather or food shortages reduce its numbers. Pollinators are also threatened by the loss of flowering habitats, pesticides and climate change. Protecting a range of species is therefore important for both natural ecosystems and dependable food production.",
         },
         {
           title: "Lecture transcript",
           text:
-            "'We have seen major declines in some pollinator populations, and there is no single cause. The loss of flowering habitats leaves insects with less food and fewer nesting places. Certain pesticides can kill them directly or, er, affect their ability to navigate and reproduce. Disease and climate change add further pressure. Farmers can help by leaving strips of wild flowers beside fields, reducing pesticide use and providing nesting areas. These measures do more than protect wildlife. In one study, farms with suitable habitat attracted a wider range of insects and achieved more stable fruit production, even when honeybee activity was low. This is especially important as growing seasons shift. The key point is diversity: protecting several pollinator species makes the whole system less dependent on any one of them. Conservation therefore supports both ecosystems and the long-term security of food production.'",
+            "'So, what can farms actually do to protect pollinators? Leaving strips of wild flowers beside fields provides food and nesting places, while reducing pesticide use lowers the risk of insects being killed or, er, losing their ability to navigate and reproduce. These measures can also benefit farmers. In one study, fields surrounded by suitable habitat attracted a wider range of insects and produced more stable fruit harvests, even when honeybee activity was low. This matters because different pollinators work under different conditions, particularly as weather patterns and growing seasons change. Providing nesting areas can help species that do not live in managed hives, although the most effective action will vary between farms. The key point is that conservation should support several species rather than relying only on honeybees. A more diverse pollinator population makes the whole agricultural system less vulnerable when one species declines.'",
         },
       ],
       glossary: [
@@ -595,11 +641,58 @@ export const OTE_WRITING_PRACTICE_SETS = {
       ],
       markingGuide: {
         overarchingIdea:
-          "A diverse population of pollinators is essential to natural ecosystems and dependable food production.",
+          "Protecting a diverse population of pollinators supports natural ecosystems and makes food production more reliable.",
         mainIdeas: [
-          "Animal pollination enables many wild plants and crops to reproduce and produce good-quality fruit or seeds.",
-          "Different pollinator species work under different conditions, so managed honeybees cannot fully replace wild populations.",
-          "Habitat loss, pesticides, disease and climate change threaten pollinators, while flower strips, nesting areas and reduced pesticide use can protect them and stabilize harvests.",
+          {
+            id: "idea-1",
+            idea: "Animal pollination enables wild plants and many crops to reproduce.",
+            supportingDetails: [
+              { source: "textbook", detail: "Pollination allows seeds and fruit to develop." },
+              { source: "textbook", detail: "Wild plants support other species by providing food and shelter." },
+              { source: "textbook", detail: "Insect visits can improve the size or quality of crop harvests." },
+              { source: "lecture", detail: "Farms with suitable pollinator habitat achieved more stable fruit production." },
+            ],
+          },
+          {
+            id: "idea-2",
+            idea: "A diverse group of pollinators is more dependable than relying mainly on managed honeybees.",
+            supportingDetails: [
+              { source: "textbook", detail: "Different species work in different weather and visit different flowers." },
+              { source: "textbook", detail: "Managed honeybees cannot fully replace wild pollinators." },
+              { source: "lecture", detail: "Diverse insects stabilized harvests when honeybee activity was low." },
+              { source: "lecture", detail: "A system with several species is less vulnerable when one declines." },
+            ],
+          },
+          {
+            id: "idea-3",
+            idea: "Pollinators face several threats, but farms can protect them through changes in land and pesticide management.",
+            supportingDetails: [
+              { source: "textbook", detail: "Habitat loss, pesticides, disease, food shortages and climate change create risks." },
+              { source: "lecture", detail: "Wild-flower strips provide food and nesting places." },
+              { source: "lecture", detail: "Reducing pesticide use protects navigation and reproduction." },
+              { source: "lecture", detail: "Nesting areas can support species that do not use managed hives." },
+            ],
+          },
+        ],
+        crossTextLinks: [
+          { mainIdeaId: "idea-1", explanation: "The textbook explains why pollination matters generally, while the lecture provides agricultural evidence of its benefits." },
+          { mainIdeaId: "idea-2", explanation: "The lecture's farm study illustrates the textbook's broader claim that diversity increases reliability." },
+          { mainIdeaId: "idea-3", explanation: "The textbook identifies the threats, while the lecture develops practical responses." },
+        ],
+        lowPriorityDetails: [
+          { source: "textbook", detail: "The fact that wind pollinates some plants." },
+          { source: "textbook", detail: "Detailed distinctions between flowers visited by individual species." },
+          { source: "lecture", detail: "The precise circumstances of the farm study." },
+          { source: "lecture", detail: "The qualification that different measures work on different farms." },
+          { source: "both", detail: "Listing every threat and every conservation method." },
+        ],
+        modelSummary:
+          "Animal pollination enables many wild plants and crops to reproduce, supporting ecosystems and food production. A diverse group of pollinators is more reliable because species visit different flowers and remain active under different conditions, meaning managed honeybees cannot replace wild insects completely. Habitat loss, pesticides, disease and climate change threaten these populations. Farms can help through flower strips, nesting areas and reduced pesticide use. Such measures attract more species and can stabilize harvests when honeybee activity falls, making agriculture less dependent on any single pollinator.",
+        commonWeaknesses: [
+          "Writing mainly about threats and failing to explain why pollination matters.",
+          "Referring only to honeybees and ignoring species diversity.",
+          "Listing conservation measures without linking them to stable harvests.",
+          "Including every threat and solution instead of selecting representative details.",
         ],
       },
     },

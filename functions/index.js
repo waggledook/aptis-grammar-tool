@@ -1451,6 +1451,7 @@ const OTE_WRITING_FEEDBACK_SCHEMA = {
           "wordCountStatus",
           "wordCountFeedback",
           "taskFulfilment",
+          "summaryEvaluation",
           "formatAndRegister",
           "organization",
           "grammar",
@@ -1494,7 +1495,7 @@ const OTE_WRITING_FEEDBACK_SCHEMA = {
                   required: ["point", "status", "feedback"],
                   properties: {
                     point: { type: "string" },
-                    status: { type: "string", enum: ["covered", "partly_covered", "missing"] },
+                    status: { type: "string", enum: ["covered", "partly_covered", "missing", "optional_not_used"] },
                     feedback: { type: "string" },
                   },
                 },
@@ -1505,6 +1506,100 @@ const OTE_WRITING_FEEDBACK_SCHEMA = {
                 required: ["status", "feedback"],
                 properties: {
                   status: { type: "string", enum: ["specific", "partly_generic", "too_generic", "off_task"] },
+                  feedback: { type: "string" },
+                },
+              },
+            },
+          },
+          summaryEvaluation: {
+            type: "object",
+            additionalProperties: false,
+            required: [
+              "applicable",
+              "overarchingIdea",
+              "mainIdeas",
+              "useOfSources",
+              "synthesis",
+              "redundancy",
+              "organization",
+              "paraphrasing",
+            ],
+            properties: {
+              applicable: { type: "boolean" },
+              overarchingIdea: {
+                type: "object",
+                additionalProperties: false,
+                required: ["status", "feedback"],
+                properties: {
+                  status: { type: "string", enum: ["present", "partly_present", "missing", "not_applicable"] },
+                  feedback: { type: "string" },
+                },
+              },
+              mainIdeas: {
+                type: "array",
+                items: {
+                  type: "object",
+                  additionalProperties: false,
+                  required: ["id", "idea", "status", "feedback", "supportingDetail"],
+                  properties: {
+                    id: { type: "string" },
+                    idea: { type: "string" },
+                    status: { type: "string", enum: ["present", "partly_present", "missing"] },
+                    feedback: { type: "string" },
+                    supportingDetail: {
+                      type: "object",
+                      additionalProperties: false,
+                      required: ["status", "feedback"],
+                      properties: {
+                        status: { type: "string", enum: ["appropriate", "limited", "missing"] },
+                        feedback: { type: "string" },
+                      },
+                    },
+                  },
+                },
+              },
+              useOfSources: {
+                type: "object",
+                additionalProperties: false,
+                required: ["status", "feedback"],
+                properties: {
+                  status: { type: "string", enum: ["both_clearly_used", "both_used_but_weakly_integrated", "only_one_used", "not_applicable"] },
+                  feedback: { type: "string" },
+                },
+              },
+              synthesis: {
+                type: "object",
+                additionalProperties: false,
+                required: ["status", "feedback"],
+                properties: {
+                  status: { type: "string", enum: ["strongly_connected", "some_cross_text_integration", "source_by_source_summary", "not_applicable"] },
+                  feedback: { type: "string" },
+                },
+              },
+              redundancy: {
+                type: "object",
+                additionalProperties: false,
+                required: ["status", "feedback"],
+                properties: {
+                  status: { type: "string", enum: ["minimal", "some_unnecessary_detail", "excessive_detail_crowding_out_main_ideas", "not_applicable"] },
+                  feedback: { type: "string" },
+                },
+              },
+              organization: {
+                type: "object",
+                additionalProperties: false,
+                required: ["status", "feedback"],
+                properties: {
+                  status: { type: "string", enum: ["logical_idea_based_order", "partly_integrated", "mainly_follows_original_source_order", "not_applicable"] },
+                  feedback: { type: "string" },
+                },
+              },
+              paraphrasing: {
+                type: "object",
+                additionalProperties: false,
+                required: ["status", "feedback"],
+                properties: {
+                  status: { type: "string", enum: ["structures_and_vocabulary_adapted", "partly_adapted", "heavily_dependent_on_source_wording", "not_applicable"] },
                   feedback: { type: "string" },
                 },
               },
@@ -3376,7 +3471,121 @@ function describeOteWordCount(taskType, status, wordCount) {
 function hasOnlyCoveredOtePoints(taskFeedback = {}) {
   const points = taskFeedback.taskFulfilment?.requiredPoints;
   if (!Array.isArray(points) || !points.length) return true;
-  return points.every((point) => point?.status === "covered");
+  return points.every((point) => ["covered", "optional_not_used"].includes(point?.status));
+}
+
+function getOteEssayPointSearchTerms(point = "") {
+  const normalized = String(point || "").trim().toLowerCase();
+  if (!normalized) return [];
+  const core = normalized.replace(/^(?:the\s+)?(?:impact|effect)\s+on\s+/, "").trim();
+  return [...new Set([normalized, core].filter((term) => term.length >= 4))];
+}
+
+function textMentionsOteEssayPoint(text = "", point = "") {
+  const haystack = String(text || "").toLowerCase();
+  return getOteEssayPointSearchTerms(point).some((term) => haystack.includes(term));
+}
+
+function stripOptionalOteEssayPointCriticism(text = "", optionalPoints = []) {
+  let cleaned = String(text || "");
+  optionalPoints.forEach((point) => {
+    getOteEssayPointSearchTerms(point).forEach((term) => {
+      const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      cleaned = cleaned
+        .replace(
+          new RegExp(`(?:,?\\s*(?:and|but)\\s+)?(?:the\\s+)?${escaped}(?:\\s+(?:point|idea))?\\s+(?:is|was)\\s+(?:missing|omitted|not\\s+(?:covered|included|developed))`, "gi"),
+          ""
+        )
+        .replace(
+          new RegExp(`(?:,?\\s*(?:and|but)\\s+)?(?:you\\s+)?(?:should|need\\s+to|must)?\\s*(?:include|cover|develop|add)\\s+(?:the\\s+)?${escaped}`, "gi"),
+          ""
+        );
+    });
+  });
+
+  return cleaned
+    .replace(/,\s*so\s+the\s+task\s+is\s+(?:only\s+)?partly\s+fulfilled/gi, "")
+    .replace(/\s+,/g, ",")
+    .replace(/,\s*,+/g, ",")
+    .replace(/\.\s*,/g, ".")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function normalizeAdvancedEssayOptionalPoints(originalTask = {}, taskFeedback = {}) {
+  if (originalTask.taskType !== "ote_advanced_part1_essay") return taskFeedback;
+  const points = taskFeedback.taskFulfilment?.requiredPoints;
+  if (!Array.isArray(points) || !points.length) return taskFeedback;
+
+  const usedPoints = points.filter((point) => ["covered", "partly_covered"].includes(point?.status));
+  if (usedPoints.length < 2) return taskFeedback;
+
+  const optionalPoints = points
+    .filter((point) => ["missing", "optional_not_used"].includes(point?.status))
+    .map((point) => point?.point)
+    .filter(Boolean);
+  if (!optionalPoints.length) return taskFeedback;
+
+  const coveredCount = usedPoints.filter((point) => point?.status === "covered").length;
+  const taskFulfilment = taskFeedback.taskFulfilment || {};
+  const cleanedFeedback = stripOptionalOteEssayPointCriticism(taskFulfilment.feedback, optionalPoints);
+  const removedFalseCoverageCriticism = cleanedFeedback !== String(taskFulfilment.feedback || "").trim();
+  const cleanedTeacherNote = stripOptionalOteEssayPointCriticism(taskFeedback.teacherNote, optionalPoints);
+  const coverageMessage = "The response satisfies the content-choice requirement by using at least two of the listed ideas.";
+
+  return {
+    ...taskFeedback,
+    taskFulfilment: {
+      ...taskFulfilment,
+      status:
+        taskFulfilment.status === "partial" && coveredCount >= 2 && removedFalseCoverageCriticism
+          ? "good"
+          : taskFulfilment.status,
+      feedback: cleanedFeedback
+        ? `${coverageMessage} ${cleanedFeedback}`
+        : coverageMessage,
+      requiredPoints: points.map((point) =>
+        ["missing", "optional_not_used"].includes(point?.status)
+          ? {
+              ...point,
+              status: "optional_not_used",
+              feedback: "Optional third idea; the task requires the student to use at least two listed ideas.",
+            }
+          : point
+      ),
+      contentSpecificity: taskFulfilment.contentSpecificity
+        ? {
+            ...taskFulfilment.contentSpecificity,
+            feedback: stripOptionalOteEssayPointCriticism(
+              taskFulfilment.contentSpecificity.feedback,
+              optionalPoints
+            ),
+          }
+        : taskFulfilment.contentSpecificity,
+    },
+    organization: taskFeedback.organization
+      ? {
+          ...taskFeedback.organization,
+          feedback: stripOptionalOteEssayPointCriticism(taskFeedback.organization.feedback, optionalPoints),
+        }
+      : taskFeedback.organization,
+    mistakes: (taskFeedback.mistakes || []).filter(
+      (mistake) =>
+        !(
+          mistake?.category === "task" &&
+          optionalPoints.some((point) =>
+            textMentionsOteEssayPoint(
+              [mistake.original, mistake.correction, mistake.explanation].join(" "),
+              point
+            )
+          )
+        )
+    ),
+    teacherNote:
+      cleanedTeacherNote && !/^(?:next time|in (?:the )?future)\.?$/i.test(cleanedTeacherNote)
+        ? cleanedTeacherNote
+        : coverageMessage,
+  };
 }
 
 function isHighControlOteTask(taskFeedback = {}) {
@@ -3449,14 +3658,15 @@ function postProcessOteWritingFeedback(payload, feedback) {
 
   const processedTasks = feedback.tasks.map((taskFeedback, index) => {
     const originalTask = payload.tasks[index] || {};
+    const normalizedTaskFeedback = normalizeAdvancedEssayOptionalPoints(originalTask, taskFeedback);
     const withOriginalCounts = {
-      ...taskFeedback,
-      wordCount: originalTask.answer?.wordCount ?? taskFeedback.wordCount,
-      wordCountStatus: originalTask.answer?.wordCountStatus || taskFeedback.wordCountStatus,
+      ...normalizedTaskFeedback,
+      wordCount: originalTask.answer?.wordCount ?? normalizedTaskFeedback.wordCount,
+      wordCountStatus: originalTask.answer?.wordCountStatus || normalizedTaskFeedback.wordCountStatus,
       wordCountFeedback: describeOteWordCount(
-        originalTask.taskType || taskFeedback.taskType,
-        originalTask.answer?.wordCountStatus || taskFeedback.wordCountStatus,
-        originalTask.answer?.wordCount ?? taskFeedback.wordCount
+        originalTask.taskType || normalizedTaskFeedback.taskType,
+        originalTask.answer?.wordCountStatus || normalizedTaskFeedback.wordCountStatus,
+        originalTask.answer?.wordCount ?? normalizedTaskFeedback.wordCount
       ),
     };
 
@@ -3499,13 +3709,23 @@ function postProcessOteWritingFeedback(payload, feedback) {
   const hasMeaningfulMistakes = processedTasks.some((task) => (task.mistakes || []).length > 0);
   const meaningfulMistakeCount = processedTasks.reduce((sum, task) => sum + countOteMeaningfulMistakes(task), 0);
   const hasPartialCoverage = processedTasks.some(hasPartialOteTaskCoverage);
+  const optionalEssayPoints = processedTasks.flatMap((task) =>
+    (task.taskFulfilment?.requiredPoints || [])
+      .filter((point) => point?.status === "optional_not_used")
+      .map((point) => point?.point)
+      .filter(Boolean)
+  );
 
   const adjusted = {
     ...feedback,
     tasks: processedTasks,
     overall: {
       ...(feedback.overall || {}),
+      summary: stripOptionalOteEssayPointCriticism(feedback.overall?.summary, optionalEssayPoints),
       mainPriorities: dedupeOtePriorities(feedback.overall?.mainPriorities || []).filter((priority) => {
+        if (optionalEssayPoints.some((point) => textMentionsOteEssayPoint(priority, point))) {
+          return false;
+        }
         if (processedTasks.some((task) => task.wordCountStatus === "acceptable_over_range") && isLengthPriority(priority)) {
           return false;
         }
@@ -3557,6 +3777,46 @@ function postProcessOteWritingFeedback(payload, feedback) {
   return adjusted;
 }
 
+function normalizeOteSummaryMarkingGuide(markingGuide) {
+  if (!markingGuide || typeof markingGuide !== "object") return null;
+  const mainIdeas = Array.isArray(markingGuide.mainIdeas)
+    ? markingGuide.mainIdeas.slice(0, 4).map((item, index) => {
+        const ideaObject = typeof item === "string" ? { idea: item } : item || {};
+        return {
+          id: cleanString(ideaObject.id || `idea-${index + 1}`, 80),
+          idea: cleanString(ideaObject.idea || "", 500),
+          supportingDetails: Array.isArray(ideaObject.supportingDetails)
+            ? ideaObject.supportingDetails.slice(0, 6).map((detail) => ({
+                source: cleanString(detail?.source || "", 40),
+                detail: cleanString(detail?.detail || "", 500),
+              })).filter((detail) => detail.detail)
+            : [],
+        };
+      }).filter((item) => item.idea)
+    : [];
+
+  return {
+    overarchingIdea: cleanString(markingGuide.overarchingIdea || "", 700),
+    mainIdeas,
+    crossTextLinks: Array.isArray(markingGuide.crossTextLinks)
+      ? markingGuide.crossTextLinks.slice(0, 6).map((link) => ({
+          mainIdeaId: cleanString(link?.mainIdeaId || "", 80),
+          explanation: cleanString(link?.explanation || "", 600),
+        })).filter((link) => link.explanation)
+      : [],
+    lowPriorityDetails: Array.isArray(markingGuide.lowPriorityDetails)
+      ? markingGuide.lowPriorityDetails.slice(0, 8).map((detail) => ({
+          source: cleanString(detail?.source || "", 40),
+          detail: cleanString(detail?.detail || "", 500),
+        })).filter((detail) => detail.detail)
+      : [],
+    modelSummary: cleanString(markingGuide.modelSummary || "", 1400),
+    commonWeaknesses: Array.isArray(markingGuide.commonWeaknesses)
+      ? markingGuide.commonWeaknesses.slice(0, 8).map((item) => cleanString(item, 500)).filter(Boolean)
+      : [],
+  };
+}
+
 function normalizeOteWritingPayload(data) {
   const mode = data?.mode === "single_task" ? "single_task" : "full_mock";
   const validTaskTypes = new Set([
@@ -3582,11 +3842,14 @@ function normalizeOteWritingPayload(data) {
         taskId: cleanString(task?.taskId || "", 120),
         taskType,
         title: cleanString(task?.title || "", 180),
-        inputText: cleanString(task?.inputText || "", 3500),
+        inputText: cleanString(task?.inputText || "", 9000),
         prompt: cleanString(task?.prompt || "", 1800),
         requiredPoints: Array.isArray(task?.requiredPoints)
           ? task.requiredPoints.slice(0, 5).map((point) => cleanString(point, 500)).filter(Boolean)
           : [],
+        markingGuide: taskType === "ote_advanced_part2_summary"
+          ? normalizeOteSummaryMarkingGuide(task?.markingGuide)
+          : null,
         targetAudience: cleanString(task?.targetAudience || "", 160),
         expectedRegister: cleanString(task?.expectedRegister || "", 60),
         answer: {
@@ -3661,7 +3924,9 @@ function buildOteWritingFeedbackPrompt(payload) {
     "- B2-like essay task fulfilment: generally well developed, argument and points reasonably expanded, register generally appropriate, reader understands with minimal effort.",
     "- B1-like essay task fulfilment: underdeveloped, short/minimally expanded points, inconsistent register, reader needs effort.",
     "- If the essay includes ideas from fewer than two listed prompts, say this clearly: official criteria cap Task fulfilment at B2.2.",
-    "- If the essay clearly covers at least two listed prompts, do not treat the unused third prompt as missing content. You may mention it only as an optional development route, not a weakness.",
+    "- Populate requiredPoints for all listed essay ideas. If the essay clearly uses at least two listed ideas, set any unused third idea to optional_not_used, never missing.",
+    "- If the essay clearly covers at least two listed prompts, do not treat the unused third prompt as missing content. Do not mention it in the overall summary, main priorities, mistakes, task-fulfilment criticism, or improved version. It may be described only as an optional development route.",
+    "- An optional_not_used point satisfies the task choice rule and must not lower Task fulfilment, Organization, the estimated level, or any other judgment.",
     "- If the essay covers fewer than two listed prompts but gives a legitimate opinion, keep the opinion. Tell the student to develop the missing listed prompt(s) in a way that supports their own stance.",
     "- Organization: look for an effective introduction, logical paragraphing, clear progression of argument, suitable conclusion, and cohesive features that guide the reader naturally.",
     "- Grammar: reward range plus control. C1 requires a high level of control of simple and complex structures with rare, hard-to-spot errors; B2 has good control but complex structures may be awkward or errors may occasionally impede.",
@@ -3670,7 +3935,16 @@ function buildOteWritingFeedbackPrompt(payload) {
     "",
     "Advanced Part 2 Summary criteria:",
     "- Task fulfilment: judge whether the response synthesizes the main ideas from both input texts with appropriate supporting details, avoids unnecessary detail, is clearly communicated, uses an appropriate academic register, and stays within the 80-100 word task.",
-    "- Use the task-specific marking guide from inputText as the expected content. Treat requiredPoints as the main ideas from that guide. Mark each main idea as covered, partly covered, or missing.",
+    "- Use the task-specific markingGuide information map as the expected meaning, not as a keyword checklist. requiredPoints contains short labels for the same main ideas.",
+    "- Evaluate semantic idea coverage: accept any accurate paraphrase that expresses the same meaning. Never require exact phrases, keywords, or wording from the guide or model summary.",
+    "- Populate summaryEvaluation for every advanced summary. Assess the overarching idea as present, partly_present, or missing. Assess every task-specific main idea separately as present, partly_present, or missing.",
+    "- For each main idea, assess supportingDetail as appropriate, limited, or missing. Supporting details are acceptable evidence, not a compulsory checklist: selected details are normally sufficient and no candidate needs every listed detail.",
+    "- Assess useOfSources, synthesis, redundancy, idea-based organization, and paraphrasing separately using the schema categories.",
+    "- Do not give full credit merely because an idea and an unrelated detail both appear; check that their relationship is clear.",
+    "- Do not require equal space for the two sources. Both must contribute meaningfully, but one may provide the framework while the other develops it.",
+    "- Use crossTextLinks as examples of meaningful synthesis. Equivalent relationships expressed in a different way also receive credit.",
+    "- Use lowPriorityDetails and commonWeaknesses to diagnose selection. Do not automatically penalize an example; it is redundant when it occupies space needed for more important content.",
+    "- The overarching idea may appear anywhere in the paragraph; do not require it in the first sentence.",
     "- Check source use explicitly and precisely. Distinguish using only one source from using both sources but omitting essential ideas, adding unsupported ideas, or selecting details poorly.",
     "- If only one input text is used, official criteria cap Task fulfilment and Organization at B1.2. Do not say 'leans too much on one source' when the answer actually uses both; say which essential ideas are missing instead.",
     "- C1-like summary task fulfilment: main ideas and suitable supporting details from both texts are synthesized, clearly communicated with little redundancy, register nearly always appropriate.",
@@ -3681,6 +3955,11 @@ function buildOteWritingFeedbackPrompt(payload) {
     "- Summary concision matters. The response should be one paragraph, full sentences, enough information for classmates, and no more than 100 words.",
     "- Advanced summary length caps: up to 105 words may receive any mark; 106-120 words caps all criteria at B2.2; 121+ words caps all criteria at B1.2.",
     "- Redundancy is a real criterion: flag irrelevant examples, repeated points, or minor details that crowd out main ideas.",
+    "- C1-like task fulfilment requires synthesized main ideas with appropriate selected support from both texts, clear communication, and little redundancy.",
+    "- B2-like task fulfilment requires at least two main ideas with some supporting detail from both texts and generally clear communication.",
+    "- B1-like task fulfilment includes at least one main idea from one text but limited synthesis or supporting information.",
+    "- If only one source is used, cap Task fulfilment and Organization at B1.2. For 106-120 words cap all criteria at B2.2; for 121+ words cap all criteria at B1.2. Apply these caps even if other qualities are stronger.",
+    "- For every non-summary task, set summaryEvaluation.applicable to false, return an empty mainIdeas array, set every summaryEvaluation status to not_applicable, and use empty feedback strings.",
     "",
     "Task-specific register:",
     "- Part 1 email to a friend: informal language, contractions, direct questions, friendly closings are appropriate.",

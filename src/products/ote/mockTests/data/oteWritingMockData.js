@@ -277,11 +277,57 @@ export const OTE_WRITING_MOCKS = {
           ],
           markingGuide: {
             overarchingIdea:
-              "Sleep supports the formation and preservation of memories but must complement effective learning.",
+              "Sleep supports the formation, consolidation and preservation of memory, but it must complement effective study.",
             mainIdeas: [
-              "Sleep helps consolidate memories by strengthening and reorganizing recently learned information.",
-              "Different sleep stages may support different kinds of memory, and sleep both before and soon after learning is beneficial.",
-              "Sleep deprivation damages recall and the ability to absorb new information, but sleep cannot compensate for ineffective study.",
+              {
+                id: "idea-1",
+                idea: "Sleep consolidates recently learned information by stabilizing and reorganizing memories.",
+                supportingDetails: [
+                  { source: "textbook", detail: "New memories are initially fragile." },
+                  { source: "textbook", detail: "The sleeping brain reactivates patterns linked to recent learning." },
+                  { source: "lecture", detail: "The rested group remembered more word pairs than the sleep-deprived group." },
+                  { source: "lecture", detail: "Sleep strengthens useful connections and may weaken less useful ones." },
+                ],
+              },
+              {
+                id: "idea-2",
+                idea: "The timing and type of sleep influence learning and different kinds of memory.",
+                supportingDetails: [
+                  { source: "textbook", detail: "Deep sleep is linked to facts and events." },
+                  { source: "textbook", detail: "Rapid eye movement sleep may support emotional and practical skills." },
+                  { source: "textbook", detail: "Sleep before learning improves attention and memory formation." },
+                  { source: "lecture", detail: "Sleeping soon after studying protects memories from later interference." },
+                  { source: "lecture", detail: "Similar effects occur when learning movements and routes." },
+                ],
+              },
+              {
+                id: "idea-3",
+                idea: "Sleep deprivation harms both recall and the ability to learn, but sleep cannot compensate for ineffective study.",
+                supportingDetails: [
+                  { source: "lecture", detail: "Students who lose sleep may struggle to recall previous work and absorb new information." },
+                  { source: "textbook", detail: "Sleep cannot preserve material that was not properly understood." },
+                  { source: "textbook", detail: "Learning still requires focused study, meaningful connections and retrieval." },
+                  { source: "lecture", detail: "Regular sleep should accompany active study rather than replace revision." },
+                ],
+              },
+            ],
+            crossTextLinks: [
+              { mainIdeaId: "idea-1", explanation: "The lecture experiment illustrates the textbook's explanation of memory consolidation." },
+              { mainIdeaId: "idea-2", explanation: "The textbook describes the stages and timing of sleep, while the lecture provides practical and experimental examples." },
+            ],
+            lowPriorityDetails: [
+              { source: "lecture", detail: "The precise design of the word-pair experiment." },
+              { source: "textbook", detail: "The daytime-nap example." },
+              { source: "both", detail: "Listing every kind of memory." },
+              { source: "lecture", detail: "The final reference to last-minute rest." },
+            ],
+            modelSummary:
+              "Sleep helps memories become stable by reactivating and reorganizing recent learning, and rested learners generally recall more than those deprived of sleep. Different sleep stages may support factual, emotional and practical memories, while sleeping soon after study can protect new information from interference. Adequate sleep before learning is also important because tired people struggle to concentrate and absorb material. However, sleep does not preserve information that was poorly understood, so regular rest should support active study, meaningful connections and retrieval practice rather than replace them.",
+            commonWeaknesses: [
+              "Reporting the experiment without explaining consolidation.",
+              "Claiming that sleep simply stores an exact copy of information.",
+              "Suggesting that sleep can replace studying.",
+              "Discussing sleep stages but omitting sleep before and after learning.",
             ],
           },
         },
@@ -385,11 +431,58 @@ export const OTE_WRITING_MOCKS = {
           ],
           markingGuide: {
             overarchingIdea:
-              "The design of urban areas causes them to retain heat, creating unequal health risks that require city-wide solutions.",
+              "Urban design causes cities to retain heat, producing unequal health risks that require combined, city-wide environmental solutions.",
             mainIdeas: [
-              "Buildings and hard, dark surfaces store heat, while limited vegetation and air movement reduce natural cooling.",
-              "The greatest danger occurs in hotter, less-green districts and during the night, particularly for vulnerable residents.",
-              "Cities can reduce temperatures through trees, green or reflective roofs and carefully targeted projects; air-conditioning alone is insufficient.",
+              {
+                id: "idea-1",
+                idea: "Buildings, roads and limited vegetation cause urban areas to absorb and retain heat.",
+                supportingDetails: [
+                  { source: "textbook", detail: "Roads, roofs and walls absorb energy and release it slowly." },
+                  { source: "textbook", detail: "Dark surfaces store more heat than vegetation." },
+                  { source: "textbook", detail: "Tall buildings restrict air movement." },
+                  { source: "textbook", detail: "Fewer plants means less cooling through evaporation." },
+                  { source: "lecture", detail: "Trees, green roofs and reflective roofs directly address these causes." },
+                ],
+              },
+              {
+                id: "idea-2",
+                idea: "The heat island effect is uneven and creates particular risks for vulnerable residents.",
+                supportingDetails: [
+                  { source: "textbook", detail: "Districts with little shade and extensive concrete remain hotter." },
+                  { source: "textbook", detail: "High night-time temperatures prevent the body recovering." },
+                  { source: "textbook", detail: "Older people, children and those with health problems face greater risks." },
+                  { source: "lecture", detail: "Cooling projects should target the hottest, highest-risk districts." },
+                ],
+              },
+              {
+                id: "idea-3",
+                idea: "Cities need a combination of environmental measures rather than relying only on air-conditioning.",
+                supportingDetails: [
+                  { source: "lecture", detail: "Trees provide shade and release water." },
+                  { source: "lecture", detail: "Green and reflective roofs reduce stored heat." },
+                  { source: "lecture", detail: "Combinations of measures are more effective." },
+                  { source: "lecture", detail: "Air-conditioning increases energy use and releases heat outside." },
+                  { source: "textbook", detail: "The variety of physical causes explains why no single measure is sufficient." },
+                ],
+              },
+            ],
+            crossTextLinks: [
+              { mainIdeaId: "idea-1", explanation: "The textbook explains the physical causes, while the lecture proposes measures that reduce each effect." },
+              { mainIdeaId: "idea-2", explanation: "The lecture's recommendation to target projects follows from the textbook's explanation of unequal exposure and vulnerability." },
+            ],
+            lowPriorityDetails: [
+              { source: "textbook", detail: "The exact comparison with nearby rural areas." },
+              { source: "lecture", detail: "The practical maintenance requirements of trees." },
+              { source: "lecture", detail: "The reference to wealthy central districts." },
+              { source: "lecture", detail: "Explaining both disadvantages of air-conditioning in detail." },
+            ],
+            modelSummary:
+              "Cities remain warmer than surrounding areas because dark buildings and roads store heat, tall structures restrict airflow and limited vegetation reduces natural cooling. The effect is greatest in concrete neighbourhoods and during the night, creating particular risks for older people, children and those with health problems. Cities can respond through trees, green roofs and reflective surfaces, with projects concentrated in the hottest and most vulnerable districts. Combining environmental measures is more effective than relying on air-conditioning, which increases electricity use and releases additional heat outdoors.",
+            commonWeaknesses: [
+              "Listing solutions without explaining why cities become hot.",
+              "Describing the physical causes but omitting health risks.",
+              "Treating air-conditioning as the main city-wide solution.",
+              "Failing to mention that heat and risk vary between neighbourhoods.",
             ],
           },
         },

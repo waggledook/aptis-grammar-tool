@@ -15,6 +15,10 @@ import {
   getOteWritingPracticeGroupForSet,
   getOteWritingPracticeSet,
 } from "./mockTests/data/oteWritingPracticeData.js";
+import {
+  formatSummaryMarkingGuide,
+  getSummaryMainIdeas,
+} from "./mockTests/utils/oteSummaryMarkingGuide.js";
 import { WritingAiFeedback } from "./OteWritingMockRunner.jsx";
 import "./styles/ote.css";
 
@@ -57,6 +61,7 @@ function buildPracticeInputText(task = {}) {
       task.setup,
       task.prompt,
       task.question,
+      task.ideasIntro,
       ...(task.ideas || []).map((idea) => `Idea: ${idea}`),
       task.organizationInstruction,
     ].filter(Boolean).join("\n");
@@ -65,10 +70,7 @@ function buildPracticeInputText(task = {}) {
     return [
       task.setup,
       ...(task.sources || []).map((source) => `${source.title}\n${source.text}`),
-      task.markingGuide?.overarchingIdea
-        ? `Teacher marking guide - overarching idea: ${task.markingGuide.overarchingIdea}`
-        : "",
-      ...(task.markingGuide?.mainIdeas || []).map((idea) => `Teacher marking guide - main idea: ${idea}`),
+      formatSummaryMarkingGuide(task.markingGuide),
     ].filter(Boolean).join("\n\n");
   }
   if (task.type !== "email") return task.context || "";
@@ -103,7 +105,7 @@ function buildPracticePrompt(task = {}) {
 
 function buildRequiredPoints(task = {}) {
   if (task.type === "advancedEssay") return task.ideas || [];
-  if (task.type === "advancedSummary") return task.markingGuide?.mainIdeas || [];
+  if (task.type === "advancedSummary") return getSummaryMainIdeas(task.markingGuide);
   if (task.type !== "email") return [];
   return (task.email?.prompts || []).map((prompt) =>
     `${prompt.question} Note: ${prompt.note}`.trim()
@@ -328,6 +330,7 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
             inputText: buildPracticeInputText(task),
             prompt: buildPracticePrompt(task),
             requiredPoints: buildRequiredPoints(task),
+            markingGuide: task.type === "advancedSummary" ? task.markingGuide : null,
             targetAudience: getPracticeTargetAudience(task),
             expectedRegister: getExpectedRegister(task),
             answer: {

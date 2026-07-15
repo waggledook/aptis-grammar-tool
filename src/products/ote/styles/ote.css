@@ -2833,6 +2833,39 @@
   line-height: 1.45;
 }
 
+:root[data-theme="light"] .ote-training-page .ote-training-option {
+  border-color: #3f70b8;
+  background: #ffffff;
+  color: #173b72;
+  box-shadow: none;
+}
+
+:root[data-theme="light"] .ote-training-page .ote-training-option:hover {
+  border-color: #1f579f;
+  background: #f1f6ff;
+}
+
+:root[data-theme="light"] .ote-training-page .ote-training-option.is-selected {
+  border-color: #24569c;
+  background: #e8f1ff;
+  color: #173b72;
+  box-shadow: 0 0 0 2px rgba(50, 108, 187, 0.12);
+}
+
+:root[data-theme="light"] .ote-training-page .ote-training-option.is-answer {
+  border-color: #238052;
+  background: #e9f8ef;
+  color: #164b32;
+  box-shadow: 0 0 0 2px rgba(35, 128, 82, 0.12);
+}
+
+:root[data-theme="light"] .ote-training-page .ote-training-option.is-incorrect {
+  border-color: #be4a4a;
+  background: #fff0f0;
+  color: #7e2424;
+  box-shadow: 0 0 0 2px rgba(190, 74, 74, 0.1);
+}
+
 :root[data-theme="light"] .ote-reading-practice-page .ote-training-option {
   border-color: #3f70b8;
   background: #ffffff;
@@ -2917,6 +2950,14 @@
   color: var(--color-accent);
 }
 
+:root[data-theme="light"] .ote-training-page .ote-training-option.is-answer svg {
+  color: #197247;
+}
+
+:root[data-theme="light"] .ote-training-page .ote-training-option.is-incorrect svg {
+  color: #a43737;
+}
+
 .ote-training-feedback {
   margin: 0.85rem 0 0;
 }
@@ -2976,6 +3017,483 @@
 .ote-training-primary-link:hover {
   transform: translateY(-1px);
   box-shadow: var(--ote-dashboard-shadow);
+}
+
+.ote-summary-lesson-heading,
+.ote-summary-comparison-grid article header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ote-summary-lesson-heading h2,
+.ote-summary-lesson-heading p,
+.ote-summary-comparison-grid h3 {
+  margin: 0;
+}
+
+.ote-summary-lesson-heading > span,
+.ote-summary-comparison-grid header span {
+  border-radius: 999px;
+  background: rgba(246, 189, 96, 0.14);
+  color: var(--color-text);
+  padding: 0.4rem 0.7rem;
+  font-size: 0.86rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.ote-summary-lesson-source-grid,
+.ote-summary-comparison-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.ote-summary-lesson-source-grid article,
+.ote-summary-comparison-grid article,
+.ote-summary-glossary-list {
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-summary-lesson-source-grid h3,
+.ote-summary-glossary-list h3 {
+  margin: 0 0 0.7rem;
+  color: var(--color-text);
+}
+
+.ote-summary-lesson-source-grid p,
+.ote-summary-comparison-grid p {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.72;
+}
+
+.ote-summary-highlight {
+  border-radius: 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 0.07em 0.02em;
+  transition: background 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+}
+
+.ote-summary-highlight.is-idea-1,
+.ote-summary-highlight-legend .is-idea-1 {
+  background: rgba(66, 153, 225, 0.27);
+  box-shadow: inset 0 -2px 0 #4299e1;
+}
+
+.ote-summary-highlight.is-idea-2,
+.ote-summary-highlight-legend .is-idea-2 {
+  background: rgba(159, 122, 234, 0.26);
+  box-shadow: inset 0 -2px 0 #9f7aea;
+}
+
+.ote-summary-highlight.is-idea-3,
+.ote-summary-highlight-legend .is-idea-3 {
+  background: rgba(237, 137, 54, 0.28);
+  box-shadow: inset 0 -2px 0 #ed8936;
+}
+
+.ote-summary-highlight.is-detail-1 {
+  background: rgba(66, 153, 225, 0.13);
+  box-shadow: inset 0 -1px 0 rgba(66, 153, 225, 0.7);
+}
+
+.ote-summary-highlight.is-detail-2 {
+  background: rgba(159, 122, 234, 0.13);
+  box-shadow: inset 0 -1px 0 rgba(159, 122, 234, 0.7);
+}
+
+.ote-summary-highlight.is-detail-3 {
+  background: rgba(237, 137, 54, 0.14);
+  box-shadow: inset 0 -1px 0 rgba(237, 137, 54, 0.7);
+}
+
+.ote-summary-highlight.is-lower,
+.ote-summary-highlight-legend .is-lower {
+  background: rgba(128, 128, 128, 0.12);
+  color: var(--color-text-soft);
+  opacity: 0.58;
+  text-decoration: underline dotted rgba(128, 128, 128, 0.8);
+}
+
+.ote-summary-highlight-legend .is-detail {
+  background: rgba(109, 152, 205, 0.12);
+  border-bottom: 1px solid rgba(109, 152, 205, 0.8);
+}
+
+.ote-summary-glossary-list {
+  margin-top: 1rem;
+}
+
+.ote-summary-glossary-list dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem 1rem;
+  margin: 0;
+}
+
+.ote-summary-glossary-list dl div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.ote-summary-glossary-list dt {
+  color: var(--color-text);
+  font-weight: 850;
+}
+
+.ote-summary-glossary-list dd {
+  margin: 0;
+  color: var(--color-text-soft);
+  line-height: 1.4;
+}
+
+.ote-summary-pause-note,
+.ote-summary-key-message,
+.ote-summary-final-feedback,
+.ote-summary-takeaway {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  border-left: 4px solid var(--ote-dashboard-accent);
+  border-radius: 6px;
+  background: rgba(246, 189, 96, 0.1);
+  color: var(--color-text);
+  padding: 0.9rem 1rem;
+}
+
+.ote-summary-pause-note span {
+  color: var(--color-text-soft);
+}
+
+.ote-summary-key-message p,
+.ote-summary-final-feedback p,
+.ote-summary-takeaway p {
+  margin: 0.25rem 0 0;
+}
+
+.ote-summary-reveal-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 0.9rem 0;
+}
+
+.ote-summary-reveal-controls button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+  font-weight: 800;
+}
+
+.ote-summary-reveal-controls button.is-active {
+  border-color: var(--ote-dashboard-accent);
+  background: rgba(246, 189, 96, 0.15);
+}
+
+.ote-summary-reveal-controls button:disabled,
+.ote-summary-check-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.46;
+  transform: none;
+}
+
+.ote-summary-control-hint {
+  margin-top: 0;
+  font-size: 0.9rem;
+}
+
+.ote-summary-highlight-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0 0 1rem;
+}
+
+.ote-summary-highlight-legend span {
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 0.38rem 0.55rem;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.ote-summary-comparison-grid article {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+}
+
+.ote-summary-comparison-grid article:first-child {
+  border-color: rgba(47, 153, 96, 0.48);
+}
+
+.ote-summary-check-button {
+  margin-top: 0.85rem;
+}
+
+.ote-summary-final-feedback {
+  border-left-color: #2f9960;
+  background: rgba(47, 153, 96, 0.1);
+}
+
+.ote-summary-takeaway {
+  border: 2px solid var(--ote-dashboard-accent);
+  background: rgba(246, 189, 96, 0.12);
+}
+
+.ote-summary-question-explanation {
+  margin-top: 0.85rem;
+  border-left: 3px solid var(--ote-dashboard-accent);
+  background: rgba(246, 189, 96, 0.08);
+  padding: 0.7rem 0.85rem;
+}
+
+.ote-paraphrase-student-summary {
+  margin: 0.8rem 0;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+}
+
+.ote-paraphrase-student-summary.is-revised {
+  border-color: rgba(47, 153, 96, 0.5);
+}
+
+.ote-paraphrase-student-summary header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.65rem;
+}
+
+.ote-paraphrase-student-summary h2,
+.ote-paraphrase-student-summary p {
+  margin: 0;
+}
+
+.ote-paraphrase-student-summary header span {
+  border-radius: 999px;
+  background: rgba(246, 189, 96, 0.14);
+  color: var(--color-text);
+  padding: 0.35rem 0.65rem;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.ote-paraphrase-student-summary p {
+  color: var(--color-text);
+  line-height: 1.7;
+}
+
+.ote-paraphrase-language-hunt {
+  margin-top: 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-2);
+  padding: 1rem;
+  color: var(--color-text);
+  font-size: 1rem;
+  line-height: 2.25;
+}
+
+.ote-paraphrase-language-hunt button {
+  display: inline;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  padding: 0.12rem 0.08rem;
+  font: inherit;
+  line-height: inherit;
+  text-align: left;
+  transition: background 0.12s ease, box-shadow 0.12s ease;
+}
+
+.ote-paraphrase-language-hunt:not(.is-checked) button:hover {
+  background: rgba(246, 189, 96, 0.1);
+  box-shadow: inset 0 -2px 0 rgba(246, 189, 96, 0.65);
+}
+
+.ote-paraphrase-language-hunt button.is-selected {
+  background: rgba(246, 189, 96, 0.18);
+  box-shadow: inset 0 -2px 0 var(--ote-dashboard-accent);
+}
+
+.ote-paraphrase-language-hunt button.is-keep,
+.ote-paraphrase-language-legend .is-keep {
+  background: rgba(66, 153, 225, 0.2);
+  box-shadow: inset 0 -2px 0 #4299e1;
+}
+
+.ote-paraphrase-language-hunt button.is-change,
+.ote-paraphrase-language-legend .is-change {
+  background: rgba(159, 122, 234, 0.21);
+  box-shadow: inset 0 -2px 0 #9f7aea;
+}
+
+.ote-paraphrase-language-hunt button.is-wrong,
+.ote-paraphrase-language-legend .is-wrong {
+  background: rgba(188, 65, 65, 0.12);
+  box-shadow: inset 0 -2px 0 rgba(188, 65, 65, 0.8);
+}
+
+.ote-paraphrase-language-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.8rem;
+}
+
+.ote-paraphrase-language-legend span {
+  border-radius: 6px;
+  color: var(--color-text);
+  padding: 0.38rem 0.55rem;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.ote-paraphrase-rewrite-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  margin-top: 0.9rem;
+}
+
+.ote-paraphrase-rewrite-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.ote-paraphrase-rewrite-heading h2,
+.ote-paraphrase-rewrite-heading p {
+  margin: 0;
+}
+
+.ote-paraphrase-rewrite-heading p {
+  margin-top: 0.35rem;
+}
+
+.ote-paraphrase-rewrite-heading > span {
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: rgba(246, 189, 96, 0.14);
+  color: var(--color-text);
+  padding: 0.42rem 0.7rem;
+  font-size: 0.84rem;
+  font-weight: 850;
+}
+
+.ote-paraphrase-rewrite-grid article {
+  display: grid;
+  gap: 0.6rem;
+  align-content: start;
+  border: 1px solid var(--color-border);
+  border-radius: 9px;
+  background: var(--color-surface-2);
+  padding: 0.9rem;
+}
+
+.ote-paraphrase-rewrite-grid article.is-submitted {
+  border-color: rgba(24, 138, 81, 0.52);
+  box-shadow: inset 0 3px 0 rgba(24, 138, 81, 0.72);
+}
+
+.ote-paraphrase-rewrite-grid label {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--color-text);
+  font-weight: 850;
+}
+
+.ote-paraphrase-rewrite-grid label span {
+  display: inline-grid;
+  place-items: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 50%;
+  background: var(--ote-dashboard-primary);
+  color: var(--ote-dashboard-primary-text);
+  font-size: 0.82rem;
+}
+
+.ote-paraphrase-rewrite-grid input {
+  width: 100%;
+  min-height: 44px;
+  border: 1px solid var(--color-border);
+  border-radius: 7px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: 0.68rem 0.75rem;
+  font: inherit;
+}
+
+.ote-paraphrase-rewrite-grid input:focus {
+  border-color: var(--ote-dashboard-accent);
+  outline: 2px solid rgba(246, 189, 96, 0.16);
+}
+
+.ote-paraphrase-rewrite-grid input:disabled {
+  cursor: default;
+  opacity: 0.82;
+}
+
+.ote-paraphrase-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  justify-self: start;
+  border: 0;
+  border-radius: 8px;
+  background: var(--ote-dashboard-primary);
+  color: var(--ote-dashboard-primary-text);
+  padding: 0.6rem 0.75rem;
+  font: inherit;
+  font-weight: 900;
+}
+
+.ote-paraphrase-submit:disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.ote-paraphrase-rewrite-grid article > div {
+  border-top: 1px solid var(--color-border);
+  padding-top: 0.55rem;
+}
+
+.ote-paraphrase-suggestions strong {
+  color: var(--color-text);
+}
+
+.ote-paraphrase-rewrite-grid ul {
+  margin: 0.35rem 0 0;
+  padding-left: 1.15rem;
+  color: var(--color-text-soft);
+}
+
+.ote-paraphrase-rewrite-grid li + li {
+  margin-top: 0.2rem;
 }
 
 .ote-training-activity-grid {
@@ -3079,6 +3597,45 @@
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #7ef0c2, var(--ote-dashboard-accent));
+}
+
+/* Shared menu controls inherit dark OTE tokens, so give them explicit light-mode contrast. */
+:root[data-theme="light"] .ote-training-progress-strip > span {
+  color: #293b5b;
+}
+
+:root[data-theme="light"] .ote-training-progress-track {
+  background: #dce5f2;
+}
+
+:root[data-theme="light"] .ote-assign-btn {
+  border-color: #5b9dde;
+  background: #eaf4ff;
+  color: #174a7c;
+  box-shadow: 0 2px 7px rgba(23, 74, 124, 0.12);
+}
+
+:root[data-theme="light"] .ote-assign-btn:hover {
+  border-color: #286fad;
+  background: #d9ecff;
+  color: #103b67;
+}
+
+:root[data-theme="light"] .ote-assign-btn:focus-visible {
+  outline: 3px solid rgba(37, 99, 235, 0.28);
+  outline-offset: 2px;
+}
+
+:root[data-theme="light"] .ote-training-count-badge {
+  border-color: #7594bd;
+  background: #eef4fb;
+  color: #233b60 !important;
+}
+
+:root[data-theme="light"] .ote-training-count-badge.is-complete {
+  border-color: #159766;
+  background: #e8f7f0;
+  color: #08734d !important;
 }
 
 .ote-training-activity-card:hover {
@@ -10859,6 +11416,10 @@
   .ote-training-activity-grid,
   .ote-training-summary,
   .ote-training-rule-grid,
+  .ote-summary-lesson-source-grid,
+  .ote-summary-comparison-grid,
+  .ote-summary-glossary-list dl,
+  .ote-paraphrase-rewrite-grid,
   .ote-student-answer-grid,
   .ote-takeaway-grid,
   .ote-phrase-grid,
@@ -11164,6 +11725,9 @@
 
   .ote-training-quiz-header,
   .ote-training-complete,
+  .ote-summary-lesson-heading,
+  .ote-paraphrase-student-summary header,
+  .ote-paraphrase-rewrite-heading,
   .ote-register-lesson-head,
   .ote-register-gap-head,
   .ote-level-status,

@@ -22,6 +22,10 @@ import {
   downloadOteWritingSubmissionText,
 } from "../../products/ote/mockTests/utils/oteWritingSubmissionExport.js";
 import {
+  formatSummaryMarkingGuide,
+  getSummaryMainIdeas,
+} from "../../products/ote/mockTests/utils/oteSummaryMarkingGuide.js";
+import {
   EmailAuthProvider,
   reauthenticateWithCredential,
   updatePassword,
@@ -627,16 +631,44 @@ async function handleProfileWritingFeedback(kind, submission) {
       if (isPractice) {
         const task = submission.tasks?.practice || {};
         const answerText = submission.answers?.task || "";
+        const taskType = getOtePracticeTaskType(task);
+        const isAdvancedSummary = taskType === "ote_advanced_part2_summary";
+        const isAdvancedEssay = taskType === "ote_advanced_part1_essay";
+        const practiceInputText = isAdvancedSummary
+          ? [
+              task.setup,
+              ...(task.sources || []).map((source) => `${source.title}\n${source.text}`),
+              formatSummaryMarkingGuide(task.markingGuide),
+            ].filter(Boolean).join("\n\n")
+          : isAdvancedEssay
+            ? [
+                task.setup,
+                task.prompt,
+                task.question,
+                task.ideasIntro,
+                ...(task.ideas || []).map((idea) => `Idea: ${idea}`),
+                task.organizationInstruction,
+              ].filter(Boolean).join("\n")
+            : [task.setup, task.context, task.promptLabel].filter(Boolean).join("\n");
         tasks.push({
           taskId: `training:${submission.practiceTaskId || submission.id}`,
-          taskType: getOtePracticeTaskType(task),
+          taskType,
           title: task.title || submission.practiceTaskLabel || "OTE Writing Practice",
-          inputText: [task.setup, task.context, task.promptLabel].filter(Boolean).join("\n"),
-          prompt: [task.prompt, task.instruction].filter(Boolean).join("\n") || task.title || "",
-          requiredPoints: Array.isArray(task.email?.prompts)
-            ? task.email.prompts.map((prompt) => `${prompt.question || ""} Note: ${prompt.note || ""}`.trim())
-            : [],
-          targetAudience: task.replyTo || task.email?.from || "English teacher",
+          inputText: practiceInputText,
+          prompt: isAdvancedSummary
+            ? [...(task.instructions || []), task.instruction].filter(Boolean).join("\n")
+            : isAdvancedEssay
+              ? [task.prompt, task.question, task.instruction].filter(Boolean).join("\n")
+              : [task.prompt, task.instruction].filter(Boolean).join("\n") || task.title || "",
+          requiredPoints: isAdvancedSummary
+            ? getSummaryMainIdeas(task.markingGuide)
+            : isAdvancedEssay
+              ? task.ideas || []
+              : Array.isArray(task.email?.prompts)
+                ? task.email.prompts.map((prompt) => `${prompt.question || ""} Note: ${prompt.note || ""}`.trim())
+                : [],
+          markingGuide: isAdvancedSummary ? task.markingGuide : null,
+          targetAudience: isAdvancedSummary ? "classmates" : isAdvancedEssay ? "academic tutor" : task.replyTo || task.email?.from || "English teacher",
           expectedRegister: getOtePracticeRegister(task),
           answer: {
             text: answerText,
@@ -655,6 +687,7 @@ async function handleProfileWritingFeedback(kind, submission) {
               task1.setup,
               task1.prompt,
               task1.question,
+              task1.ideasIntro,
               ...(task1.ideas || []).map((idea) => `Idea: ${idea}`),
               task1.organizationInstruction,
             ].filter(Boolean).join("\n")
@@ -671,10 +704,7 @@ async function handleProfileWritingFeedback(kind, submission) {
           ? [
               selectedTask.setup,
               ...(selectedTask.sources || []).map((source) => `${source.title}\n${source.text}`),
-              selectedTask.markingGuide?.overarchingIdea
-                ? `Teacher marking guide - overarching idea: ${selectedTask.markingGuide.overarchingIdea}`
-                : "",
-              ...(selectedTask.markingGuide?.mainIdeas || []).map((idea) => `Teacher marking guide - main idea: ${idea}`),
+              formatSummaryMarkingGuide(selectedTask.markingGuide),
             ].filter(Boolean).join("\n\n")
           : selectedTask.context || "";
         tasks.push(
@@ -707,7 +737,8 @@ async function handleProfileWritingFeedback(kind, submission) {
               ...(selectedTask.instructions || []).map(flattenOteRichText),
               flattenOteRichText(selectedTask.instruction),
             ].filter(Boolean).join("\n"),
-            requiredPoints: selectedTask.markingGuide?.mainIdeas || [],
+            requiredPoints: getSummaryMainIdeas(selectedTask.markingGuide),
+            markingGuide: task2Type === "ote_advanced_part2_summary" ? selectedTask.markingGuide : null,
             targetAudience: task2Type === "ote_advanced_part2_summary" ? "classmates" : "English teacher",
             expectedRegister: getOtePracticeRegister(selectedTask),
             answer: {

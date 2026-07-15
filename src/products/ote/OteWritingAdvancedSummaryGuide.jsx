@@ -16,32 +16,33 @@ import "./styles/ote.css";
 
 const criteriaRows = [
   {
-    criterion: "Completing the task",
-    examinersLookFor: "Use information from both texts, include the main ideas, add enough supporting detail, and keep an academic style.",
+    criterion: "Task fulfilment",
+    examinersLookFor: "Synthesize the main ideas with appropriate supporting details from both texts. Communicate the topic clearly, avoid unnecessary information and maintain an appropriate academic register.",
   },
   {
-    criterion: "Organizing ideas",
-    examinersLookFor: "Write one paragraph, combine related points, use a logical order, and avoid repetition.",
+    criterion: "Organization",
+    examinersLookFor: "Reorganize information in a logical way rather than following the sources mechanically. Create a coherent progression and use cohesive features to show relationships between ideas.",
   },
   {
     criterion: "Grammar",
-    examinersLookFor: "Change source sentence structures, show relationships clearly, and avoid long or confusing sentences.",
+    examinersLookFor: "Adapt source structures rather than copying them. Maintain grammatical control while expressing the information clearly and concisely.",
   },
   {
-    criterion: "Vocabulary",
-    examinersLookFor: "Use your own wording where possible, keep technical terms accurate, and avoid unnatural synonyms.",
+    criterion: "Lexis",
+    examinersLookFor: "Adapt source vocabulary where possible while keeping necessary technical terms accurate. Use precise, concise language and avoid forced synonyms.",
   },
 ];
 
 const methodSteps = [
-  "Identify the central topic shared by both texts.",
-  "Find the most important causes, effects, problems, processes or solutions.",
-  "Choose only the supporting details needed to explain the main ideas.",
-  "Match related information from the textbook and lecture.",
-  "Remove repeated information, long examples and minor details.",
-  "Choose a logical order; you do not need to follow either source exactly.",
+  "Identify the overarching idea shared by both texts.",
+  "Find the two or three main ideas that explain or develop it.",
+  "Match supporting details to each main idea, including details found in the other source.",
+  "Mark long examples, repetition and low-priority information that can be omitted.",
+  "Select enough supporting detail to make each main idea understandable.",
+  "Organize the paragraph around ideas, not around the textbook and lecture separately.",
   "Paraphrase vocabulary and sentence structures without changing the meaning.",
-  "Check the word count and remove unnecessary introductions or repetition.",
+  "Check that both sources are represented and remove unnecessary wording.",
+  "Check the word count.",
 ];
 
 const quizQuestions = [
@@ -99,6 +100,28 @@ const quizQuestions = [
     ],
     answer: "The highest score in each marking area is B2.2",
     explanation: "A summary of 106-120 words cannot receive more than B2.2 in any marking area.",
+  },
+  {
+    id: "cross-text-detail",
+    prompt: "A main idea appears in the lecture, while a useful explanation of it appears in the textbook. What should you do?",
+    options: [
+      "Summarize each source in a different sentence.",
+      "Connect the main idea and explanation in the same part of your summary.",
+      "Use only the idea from the lecture.",
+    ],
+    answer: "Connect the main idea and explanation in the same part of your summary.",
+    explanation: "This is cross-text synthesis. Organize the response around the relationship between the pieces of information, not their original sources.",
+  },
+  {
+    id: "information-hierarchy",
+    prompt: "Which plan is most suitable for an 80–100-word summary?",
+    options: [
+      "Include every example so that no information is lost.",
+      "State the overarching idea, cover the main ideas and select only useful supporting details.",
+      "Give equal numbers of words to the textbook and lecture.",
+    ],
+    answer: "State the overarching idea, cover the main ideas and select only useful supporting details.",
+    explanation: "The two sources do not need equal space. The priority is a clear and accurate information hierarchy.",
   },
 ];
 
@@ -210,7 +233,7 @@ export default function OteWritingAdvancedSummaryGuide({ nativeRoutes = false })
       <section className="ote-training-section">
         <h2>The Four Marking Areas</h2>
         <div className="ote-training-compare" role="table" aria-label="Advanced summary marking areas">
-          <div className="ote-training-compare-head" role="row">
+          <div className="ote-training-compare-head is-two-column" role="row">
             <span role="columnheader">Area</span>
             <span role="columnheader">A strong answer...</span>
           </div>
@@ -245,6 +268,27 @@ export default function OteWritingAdvancedSummaryGuide({ nativeRoutes = false })
       </section>
 
       <section className="ote-training-section">
+        <h2>Build an Information Map</h2>
+        <p>
+          Both texts share one overarching idea. Beneath it, there are usually two or three main ideas,
+          each supported by explanations, examples, evidence or processes. A supporting detail may
+          appear in a different source from the main idea it develops.
+        </p>
+        <p>
+          Do not assume that the textbook or lecture is always more important. In some tasks, one
+          source provides the main framework and the other develops it. In others, the main ideas are
+          distributed more evenly.
+        </p>
+        <p>Before writing, identify:</p>
+        <ul className="ote-training-checklist">
+          <li><strong>The overarching idea:</strong> the central message that unites both texts.</li>
+          <li><strong>The main ideas:</strong> the major points needed to understand that message.</li>
+          <li><strong>The supporting details:</strong> selected explanations or examples that clarify the main ideas.</li>
+          <li><strong>The redundant information:</strong> accurate material that is not necessary within 100 words.</li>
+        </ul>
+      </section>
+
+      <section className="ote-training-section">
         <h2>A Reliable Summary Method</h2>
         <ol className="ote-training-checklist">
           {methodSteps.map((step) => (
@@ -256,7 +300,7 @@ export default function OteWritingAdvancedSummaryGuide({ nativeRoutes = false })
       <section className="ote-training-section">
         <h2>Be Careful with the Word Limit</h2>
         <div className="ote-training-compare" role="table" aria-label="Advanced summary word limit">
-          <div className="ote-training-compare-head" role="row">
+          <div className="ote-training-compare-head is-two-column" role="row">
             <span role="columnheader">Length</span>
             <span role="columnheader">What it means</span>
           </div>

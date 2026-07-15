@@ -231,6 +231,8 @@ import OteWritingAdvancedEssayAcademicStyle from "./products/ote/OteWritingAdvan
 import OteWritingAdvancedEssayPlanning from "./products/ote/OteWritingAdvancedEssayPlanning.jsx";
 import OteWritingAdvancedEssayLanguageToolkit from "./products/ote/OteWritingAdvancedEssayLanguageToolkit.jsx";
 import OteWritingAdvancedSummaryGuide from "./products/ote/OteWritingAdvancedSummaryGuide.jsx";
+import OteWritingAdvancedSummaryMainIdeas from "./products/ote/OteWritingAdvancedSummaryMainIdeas.jsx";
+import OteWritingAdvancedSummaryParaphrasing from "./products/ote/OteWritingAdvancedSummaryParaphrasing.jsx";
 import OteWritingEssayIntroConclusion from "./products/ote/OteWritingEssayIntroConclusion.jsx";
 import OteWritingEssayPlanning from "./products/ote/OteWritingEssayPlanning.jsx";
 import OteWritingEssayBodyParagraphs from "./products/ote/OteWritingEssayBodyParagraphs.jsx";
@@ -1493,6 +1495,8 @@ return (
   <Route path="/ote/writing/training/advanced-essay/planning" element={<OteWritingAdvancedEssayPlanning nativeRoutes={false} />} />
   <Route path="/ote/writing/training/advanced-essay/language-toolkit" element={<OteWritingAdvancedEssayLanguageToolkit nativeRoutes={false} />} />
   <Route path="/ote/writing/training/advanced-summary/guide" element={<OteWritingAdvancedSummaryGuide nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/advanced-summary/main-ideas" element={<OteWritingAdvancedSummaryMainIdeas nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/advanced-summary/paraphrasing" element={<OteWritingAdvancedSummaryParaphrasing nativeRoutes={false} />} />
   <Route path="/ote/writing/training/article-review/guide" element={<OteWritingArticleReviewGuide nativeRoutes={false} />} />
   <Route path="/ote/writing/training/:section/practice" element={<OteWritingPracticeMenu user={user} nativeRoutes={false} />} />
   <Route
@@ -1665,6 +1669,8 @@ return (
       <Route path="/writing/training/advanced-essay/planning" element={<OteWritingAdvancedEssayPlanning nativeRoutes />} />
       <Route path="/writing/training/advanced-essay/language-toolkit" element={<OteWritingAdvancedEssayLanguageToolkit nativeRoutes />} />
       <Route path="/writing/training/advanced-summary/guide" element={<OteWritingAdvancedSummaryGuide nativeRoutes />} />
+      <Route path="/writing/training/advanced-summary/main-ideas" element={<OteWritingAdvancedSummaryMainIdeas nativeRoutes />} />
+      <Route path="/writing/training/advanced-summary/paraphrasing" element={<OteWritingAdvancedSummaryParaphrasing nativeRoutes />} />
       <Route path="/writing/training/article-review/guide" element={<OteWritingArticleReviewGuide nativeRoutes />} />
       <Route
         path="/writing/training/email/register-basics"

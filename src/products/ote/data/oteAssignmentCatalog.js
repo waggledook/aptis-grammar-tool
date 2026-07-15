@@ -362,6 +362,22 @@ const OTE_ASSIGNMENT_ITEMS = [
     progressId: "writing.advanced-summary.guide",
   },
   {
+    id: "ote.advanced.writing.summary.main-ideas",
+    variant: "advanced",
+    category: "Writing",
+    label: "Advanced Summary: Finding the Main Ideas",
+    routePath: "/ote/writing/training/advanced-summary/main-ideas",
+    progressId: "writing.advanced-summary.main-ideas",
+  },
+  {
+    id: "ote.advanced.writing.summary.paraphrasing",
+    variant: "advanced",
+    category: "Writing",
+    label: "Advanced Summary: Effective Paraphrasing",
+    routePath: "/ote/writing/training/advanced-summary/paraphrasing",
+    progressId: "writing.advanced-summary.paraphrasing",
+  },
+  {
     id: "ote.advanced.writing.summary.practice",
     variant: "advanced",
     category: "Writing",
