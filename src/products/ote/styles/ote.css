@@ -14,6 +14,207 @@
   --ote-dashboard-shadow-hover: 0 14px 28px rgba(0, 0, 0, 0.2);
 }
 
+/* Review vocabulary by topic */
+.ote-review-vocab-page {
+  --review-ink: #183153;
+  --review-teal: #0f8b83;
+  --review-teal-soft: color-mix(in srgb, var(--review-teal) 10%, var(--color-surface, #fff));
+  max-width: 1180px;
+}
+
+.ote-review-vocab-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 2rem;
+}
+
+.ote-review-vocab-hero > div:first-child { max-width: 760px; }
+.ote-review-vocab-hero em { color: var(--review-teal); font-style: normal; font-weight: 800; }
+
+.ote-review-overall-progress {
+  min-width: 132px;
+  padding: 1rem 1.2rem;
+  border: 1px solid color-mix(in srgb, var(--review-teal) 28%, var(--color-border));
+  border-radius: 18px;
+  background: var(--review-teal-soft);
+  text-align: center;
+}
+
+.ote-review-overall-progress strong { display: block; color: var(--review-teal); font-size: 2.1rem; line-height: 1; }
+.ote-review-overall-progress strong span { color: var(--color-text-soft); font-size: 1rem; }
+.ote-review-overall-progress small { display: block; margin-top: .45rem; color: var(--color-text-soft); font-weight: 700; }
+
+.ote-review-topic-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(175px, 1fr));
+  gap: .65rem;
+  margin: 1.25rem 0;
+}
+
+.ote-review-topic-picker > button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: .65rem;
+  min-width: 0;
+  padding: .8rem;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface-raised, #fff);
+  color: var(--color-text);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .16s ease, transform .16s ease, background .16s ease;
+}
+
+.ote-review-topic-picker > button:hover { transform: translateY(-2px); border-color: color-mix(in srgb, var(--review-teal) 55%, var(--color-border)); }
+.ote-review-topic-picker > button.is-active { border-color: var(--review-teal); background: var(--review-teal-soft); box-shadow: 0 0 0 2px color-mix(in srgb, var(--review-teal) 12%, transparent); }
+.ote-review-topic-picker > button.is-complete > svg { color: #16945d; }
+.ote-review-topic-picker button > span:nth-child(2) { min-width: 0; }
+.ote-review-topic-picker strong, .ote-review-topic-picker small { display: block; }
+.ote-review-topic-picker strong { font-size: .8rem; line-height: 1.25; }
+.ote-review-topic-picker small { margin-top: .2rem; color: var(--color-text-soft); font-size: .67rem; }
+.ote-review-topic-icon { display: grid; width: 35px; height: 35px; place-items: center; border-radius: 10px; background: color-mix(in srgb, var(--review-teal) 12%, transparent); color: var(--review-teal); }
+
+.ote-review-workspace {
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+  border-radius: 22px;
+  background: var(--color-surface-raised, #fff);
+  box-shadow: 0 18px 55px rgba(20, 45, 70, .08);
+}
+
+.ote-review-topic-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.35rem 1.5rem 1rem; }
+.ote-review-topic-head h2 { margin: .15rem 0 0; font-size: 1.55rem; }
+.ote-review-topic-score { display: flex; flex-direction: column; align-items: flex-end; }
+.ote-review-topic-score strong { color: var(--review-teal); font-size: 1.35rem; }
+.ote-review-topic-score span { color: var(--color-text-soft); font-size: .75rem; }
+
+.ote-review-activity-tabs { display: grid; grid-template-columns: repeat(3, 1fr); padding: 0 1.5rem; border-bottom: 1px solid var(--color-border); }
+.ote-review-activity-tabs button { display: flex; align-items: center; justify-content: center; gap: .55rem; padding: .85rem .65rem; border: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--color-text-soft); font-weight: 800; cursor: pointer; }
+.ote-review-activity-tabs button > span { display: grid; width: 24px; height: 24px; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--color-text-soft) 10%, transparent); font-size: .73rem; }
+.ote-review-activity-tabs button.is-active { border-bottom-color: var(--review-teal); color: var(--review-teal); }
+.ote-review-activity-tabs button.is-active > span { background: var(--review-teal); color: white; }
+
+.ote-review-activity-panel { padding: 1.5rem; }
+.ote-review-activity-intro { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.1rem; }
+.ote-review-activity-intro h3 { margin: .2rem 0 .25rem; font-size: 1.2rem; }
+.ote-review-activity-intro p:last-child { margin: 0; color: var(--color-text-soft); }
+.ote-review-activity-intro > strong { display: grid; min-width: 58px; height: 58px; place-items: center; border-radius: 50%; background: var(--review-teal-soft); color: var(--review-teal); font-size: 1rem; }
+.ote-review-activity-intro > svg { color: var(--review-teal); }
+
+.ote-review-match-grid { display: grid; grid-template-columns: .75fr 1.25fr; gap: 1rem; }
+.ote-review-match-grid > div { display: grid; align-content: start; gap: .55rem; }
+.ote-review-match-grid h4 { margin: 0 0 .15rem; color: var(--color-text-soft); font-size: .73rem; letter-spacing: .09em; text-transform: uppercase; }
+.ote-review-match-grid button { display: flex; align-items: center; gap: .45rem; min-height: 48px; padding: .7rem .85rem; border: 1px solid var(--color-border); border-radius: 11px; background: var(--color-surface, #fff); color: var(--color-text); line-height: 1.28; text-align: left; cursor: pointer; }
+.ote-review-match-grid button:hover:not(:disabled), .ote-review-match-grid button.is-selected { border-color: var(--review-teal); background: var(--review-teal-soft); }
+.ote-review-match-grid button.is-selected { box-shadow: inset 3px 0 var(--review-teal); }
+.ote-review-match-grid button.is-matched { border-color: color-mix(in srgb, #16945d 48%, var(--color-border)); background: color-mix(in srgb, #16945d 9%, var(--color-surface, #fff)); color: color-mix(in srgb, #16945d 78%, var(--color-text)); opacity: .72; }
+.ote-review-match-grid button.is-wrong-pair { border-color: #d46a5e; background: color-mix(in srgb, #d46a5e 10%, var(--color-surface, #fff)); animation: ote-review-pair-shake .38s ease; }
+@keyframes ote-review-pair-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+.ote-review-check-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1rem; }
+.ote-review-check-row > button, .ote-review-final-actions button, .ote-review-rewrite-box button { display: inline-flex; align-items: center; justify-content: center; gap: .45rem; padding: .72rem 1rem; border: 1px solid var(--review-teal); border-radius: 10px; background: var(--review-teal); color: white; font-weight: 800; cursor: pointer; }
+.ote-review-check-row > button:disabled, .ote-review-rewrite-box button:disabled { cursor: not-allowed; opacity: .45; }
+.ote-review-inline-feedback { display: flex; align-items: center; gap: .45rem; min-height: 26px; color: var(--color-text-soft); font-size: .88rem; }
+.ote-review-inline-feedback.is-correct { color: #157347; }
+.ote-review-inline-feedback.is-wrong { color: #b44339; }
+.ote-review-tip { display: flex; gap: .6rem; margin-top: 1rem; padding: .8rem; border-radius: 12px; background: var(--review-teal-soft); color: var(--review-teal); }
+.ote-review-tip p { margin: 0; color: var(--color-text); }
+
+.ote-review-gap-navigator { margin-bottom: 1rem; padding: .65rem; border: 1px solid var(--color-border); border-radius: 13px; background: color-mix(in srgb, var(--review-ink) 3%, var(--color-surface, #fff)); }
+.ote-review-gap-progress-label { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 .15rem .5rem; color: var(--color-text-soft); font-size: .72rem; }
+.ote-review-gap-progress-label span { font-weight: 800; letter-spacing: .05em; text-transform: uppercase; }
+.ote-review-gap-progress-label strong { color: var(--review-teal); }
+.ote-review-gap-progress { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: .35rem; }
+.ote-review-gap-progress button { display: grid; width: auto; min-width: 0; height: 32px; padding: 0; place-items: center; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface, #fff); color: var(--color-text-soft); font-size: .78rem; font-weight: 800; line-height: 1; cursor: pointer; transition: border-color .15s ease, background .15s ease, color .15s ease, transform .15s ease; }
+.ote-review-gap-progress button:hover { border-color: color-mix(in srgb, var(--review-teal) 55%, var(--color-border)); transform: translateY(-1px); }
+.ote-review-gap-progress button.is-active { border-color: var(--review-teal); background: var(--review-teal); color: white; box-shadow: 0 3px 9px color-mix(in srgb, var(--review-teal) 24%, transparent); }
+.ote-review-gap-progress button.is-complete { border-color: #16945d; background: color-mix(in srgb, #16945d 11%, var(--color-surface, #fff)); color: #16945d; }
+.ote-review-gap-progress button.is-complete.is-active { background: #16945d; color: white; }
+.ote-review-gap-card { padding: 1.25rem; border: 1px solid var(--color-border); border-radius: 16px; background: color-mix(in srgb, var(--review-ink) 3%, var(--color-surface, #fff)); }
+.ote-review-gap-card.is-correct { border-color: #16945d; }
+.ote-review-gap-card.is-wrong { border-color: #d46a5e; }
+.ote-review-gap-sentence { margin: 0; font-size: 1.15rem; font-weight: 650; line-height: 1.7; }
+.ote-review-gap-sentence span { display: inline-block; min-width: 140px; margin: 0 .3rem; padding: .05rem .5rem; border-bottom: 2px solid var(--review-teal); color: var(--review-teal); text-align: center; }
+.ote-review-meaning { display: flex; align-items: center; gap: .35rem; margin: .75rem 0 0; color: var(--color-text-soft); font-size: .85rem; }
+.ote-review-meaning svg { color: #d59b10; }
+.ote-review-word-bank { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
+.ote-review-word-bank button { padding: .5rem .75rem; border: 1px solid var(--color-border); border-radius: 999px; background: var(--color-surface, #fff); color: var(--color-text); font-weight: 700; cursor: pointer; }
+.ote-review-word-bank button.is-selected { border-color: var(--review-teal); background: var(--review-teal); color: white; }
+.ote-review-word-bank button:disabled { opacity: .35; cursor: not-allowed; }
+
+.ote-review-upgrade-layout { display: grid; grid-template-columns: .7fr 1.3fr; gap: 1rem; align-items: stretch; }
+.ote-review-original { display: flex; flex-direction: column; justify-content: center; padding: 1.25rem; border-radius: 15px; background: color-mix(in srgb, #e39b32 10%, var(--color-surface, #fff)); }
+.ote-review-original span, .ote-review-models span { color: var(--color-text-soft); font-size: .72rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.ote-review-original p { margin: .5rem 0 0; font-size: 1.1rem; line-height: 1.55; }
+.ote-review-rewrite-box label { display: block; margin-bottom: .45rem; font-weight: 800; }
+.ote-review-rewrite-box textarea { width: 100%; min-height: 126px; padding: .85rem; border: 1px solid var(--color-border); border-radius: 12px; resize: vertical; background: var(--color-surface, #fff); color: var(--color-text); font: inherit; line-height: 1.5; }
+.ote-review-rewrite-box textarea:focus { border-color: var(--review-teal); outline: 3px solid var(--review-teal-soft); }
+.ote-review-rewrite-box > div { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: .5rem; }
+.ote-review-rewrite-box > div > span { color: var(--color-text-soft); font-size: .78rem; }
+.ote-review-models { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-top: 1rem; }
+.ote-review-models article { padding: 1rem; border: 1px solid color-mix(in srgb, var(--review-teal) 24%, var(--color-border)); border-radius: 13px; background: var(--review-teal-soft); }
+.ote-review-models p { margin: .4rem 0 0; line-height: 1.55; }
+.ote-review-done-icon { color: #16945d !important; }
+
+.ote-review-workspace-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .8rem 1.5rem; border-top: 1px solid var(--color-border); background: color-mix(in srgb, var(--color-text) 2.5%, var(--color-surface, #fff)); color: var(--color-text-soft); font-size: .8rem; }
+.ote-review-workspace-footer button { display: inline-flex; align-items: center; gap: .35rem; border: 0; background: transparent; color: var(--color-text-soft); font-weight: 700; cursor: pointer; }
+
+.ote-review-complete { max-width: 960px; margin: 1rem auto; padding: 2rem; border: 1px solid var(--color-border); border-radius: 24px; background: var(--color-surface-raised, #fff); text-align: center; box-shadow: 0 18px 55px rgba(20, 45, 70, .08); }
+.ote-review-complete-mark { display: grid; width: 72px; height: 72px; margin: 0 auto 1rem; place-items: center; border-radius: 50%; background: color-mix(in srgb, #16945d 12%, transparent); color: #16945d; }
+.ote-review-complete h1 { margin: .25rem 0; }
+.ote-review-complete > p:not(.ote-kicker) { color: var(--color-text-soft); }
+.ote-review-score-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: .65rem; margin: 1.5rem 0; }
+.ote-review-score-grid article { display: grid; gap: .35rem; justify-items: center; padding: 1rem .5rem; border: 1px solid var(--color-border); border-radius: 14px; }
+.ote-review-score-grid svg { color: var(--review-teal); }
+.ote-review-score-grid span { color: var(--color-text-soft); font-size: .75rem; }
+.ote-review-score-grid strong { color: var(--review-teal); font-size: 1.05rem; }
+.ote-review-reminder { display: flex; align-items: flex-start; gap: .75rem; padding: 1rem; border-radius: 14px; background: var(--review-teal-soft); text-align: left; }
+.ote-review-reminder svg { flex: 0 0 auto; color: var(--review-teal); }
+.ote-review-reminder p { margin: .3rem 0 0; color: var(--color-text-soft); line-height: 1.5; }
+.ote-review-final-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .65rem; margin-top: 1.25rem; }
+.ote-review-final-actions button.is-secondary { border-color: var(--color-border); background: var(--color-surface, #fff); color: var(--color-text); }
+
+@media (max-width: 920px) {
+  .ote-review-topic-picker { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .ote-review-score-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 620px) {
+  body:has(.ote-review-vocab-page),
+  body:has(.ote-review-structure-page) { display: block; }
+  body:has(.ote-review-vocab-page) #root,
+  body:has(.ote-review-structure-page) #root,
+  body:has(.ote-review-vocab-page) .App,
+  body:has(.ote-review-structure-page) .App,
+  body:has(.ote-review-vocab-page) .content-container,
+  body:has(.ote-review-structure-page) .content-container { width: 100%; min-width: 0; }
+  body:has(.ote-review-vocab-page) .App,
+  body:has(.ote-review-structure-page) .App { margin: 0; padding: .6rem; }
+  body:has(.ote-review-vocab-page) .content-container,
+  body:has(.ote-review-structure-page) .content-container { padding: .8rem; }
+  .ote-review-vocab-hero { grid-template-columns: 1fr; gap: 1rem; }
+  .ote-review-overall-progress { width: 100%; }
+  .ote-review-topic-picker { display: flex; overflow-x: auto; padding-bottom: .35rem; scroll-snap-type: x mandatory; }
+  .ote-review-topic-picker > button { min-width: 210px; scroll-snap-align: start; }
+  .ote-review-topic-head { align-items: flex-start; }
+  .ote-review-activity-tabs { padding: 0 .65rem; }
+  .ote-review-activity-tabs button { align-items: center; flex-direction: column; font-size: .7rem; }
+  .ote-review-activity-panel { padding: 1rem; }
+  .ote-review-match-grid, .ote-review-upgrade-layout, .ote-review-models { grid-template-columns: 1fr; }
+  .ote-review-check-row { align-items: stretch; flex-direction: column; }
+  .ote-review-check-row > button { width: 100%; }
+  .ote-review-gap-progress { gap: .25rem; }
+  .ote-review-gap-progress button { height: 30px; font-size: .72rem; }
+  .ote-review-workspace-footer { align-items: flex-start; flex-direction: column; }
+  .ote-review-score-grid { grid-template-columns: 1fr; }
+  .ote-review-complete { padding: 1.25rem; }
+  .ote-review-final-actions { flex-direction: column; }
+  .ote-review-final-actions button { width: 100%; }
+}
+
 .ote-assign-field span,
 .ote-assign-label {
   color: rgba(232, 238, 247, 0.72);
@@ -11853,4 +12054,287 @@
   .ote-part34-image-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+/* Review planning and structure */
+.ote-review-structure-page { max-width: 1060px; }
+.ote-review-flexible-note { display: flex; gap: .8rem; margin: 1.1rem 0; padding: 1rem 1.1rem; border: 1px solid color-mix(in srgb, #0f8b83 35%, var(--color-border)); border-radius: 15px; background: color-mix(in srgb, #0f8b83 9%, var(--color-surface, #fff)); }
+.ote-review-flexible-note > svg { flex: 0 0 auto; color: #0f8b83; }
+.ote-review-flexible-note strong { display: block; margin-bottom: .2rem; color: var(--color-text); }
+.ote-review-flexible-note p { margin: 0; color: var(--color-text-soft); line-height: 1.5; }
+.ote-review-structure-intro { display: flex; align-items: center; justify-content: center; gap: .7rem; margin: 1.2rem 0; }
+.ote-review-structure-intro > div { display: flex; align-items: center; gap: .55rem; }
+.ote-review-structure-intro span { display: grid; width: 30px; height: 30px; place-items: center; border-radius: 50%; background: #0f8b83; color: white; font-size: .78rem; font-weight: 900; }
+.ote-review-structure-intro p { margin: 0; color: var(--color-text-soft); font-size: .85rem; }
+.ote-review-structure-intro p strong { color: var(--color-text); }
+.ote-review-structure-intro > svg { color: var(--color-text-soft); }
+.ote-review-planner { overflow: hidden; margin-top: 1rem; border: 1px solid var(--color-border); border-radius: 20px; background: var(--color-surface-raised, #fff); box-shadow: 0 16px 45px rgba(17, 38, 67, .08); }
+.ote-review-selector { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--color-border); }
+.ote-review-selector button { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .7rem; padding: 1rem 1.2rem; border: 0; border-bottom: 3px solid transparent; background: transparent; color: var(--color-text); text-align: left; cursor: pointer; }
+.ote-review-selector button:first-child { border-right: 1px solid var(--color-border); }
+.ote-review-selector button.is-active { border-bottom-color: #0f8b83; background: color-mix(in srgb, #0f8b83 8%, transparent); }
+.ote-review-selector button > svg:first-child { color: #0f8b83; }
+.ote-review-selector button > svg:last-child { color: var(--color-text-soft); }
+.ote-review-selector button.is-complete > svg:last-child { color: #16803c; }
+.ote-review-selector small, .ote-review-selector strong { display: block; }
+.ote-review-selector small { color: var(--color-text-soft); font-size: .7rem; }
+.ote-review-selector strong { margin-top: .1rem; }
+.ote-review-task-card { margin: 1.25rem; padding: 1.2rem; border-left: 5px solid #0f8b83; border-radius: 12px; background: color-mix(in srgb, #0f8b83 7%, var(--color-surface, #fff)); }
+.ote-review-task-card h2 { margin: .8rem 0 .55rem; text-align: left; }
+.ote-review-task-card p { margin: .35rem 0; line-height: 1.5; }
+.ote-review-task-label { display: flex; align-items: center; gap: .4rem; color: #0f8b83; font-size: .75rem; font-weight: 850; letter-spacing: .05em; text-transform: uppercase; }
+.ote-review-task-label strong { margin-left: auto; padding: .25rem .5rem; border-radius: 999px; background: var(--color-surface, #fff); color: var(--color-text-soft); letter-spacing: 0; text-transform: none; }
+.ote-review-publication { color: var(--color-text-soft); font-style: italic; }
+.ote-review-paragraph-stepper { display: grid; grid-template-columns: repeat(4, 1fr); margin: 0 1.25rem 1rem; }
+.ote-review-paragraph-stepper button { position: relative; display: grid; justify-items: center; gap: .18rem; padding: .55rem .35rem; border: 0; background: transparent; color: var(--color-text-soft); text-align: center; cursor: pointer; }
+.ote-review-paragraph-stepper button::before { position: absolute; z-index: 0; top: 20px; right: 50%; left: -50%; height: 2px; background: var(--color-border); content: ""; }
+.ote-review-paragraph-stepper button:first-child::before { display: none; }
+.ote-review-paragraph-stepper button > span { z-index: 1; display: grid; width: 34px; height: 34px; place-items: center; border: 2px solid var(--color-border); border-radius: 50%; background: var(--color-surface, #fff); font-size: .78rem; font-weight: 900; }
+.ote-review-paragraph-stepper button.is-active > span { border-color: #0f8b83; background: #0f8b83; color: white; }
+.ote-review-paragraph-stepper small { margin-top: .2rem; font-size: .66rem; }
+.ote-review-paragraph-stepper strong { font-size: .75rem; line-height: 1.25; }
+.ote-review-paragraph-stepper button.is-active strong { color: #0f8b83; }
+.ote-review-plan-workspace { margin: 0 1.25rem 1.25rem; padding: 1.25rem; border: 1px solid var(--color-border); border-radius: 15px; }
+.ote-review-plan-workspace > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.ote-review-plan-workspace h2 { margin: .2rem 0 0; text-align: left; }
+.ote-review-purpose-pill { padding: .35rem .65rem; border-radius: 999px; background: color-mix(in srgb, #0f8b83 10%, transparent); color: #0f8b83; font-size: .72rem; font-weight: 800; }
+.ote-review-plan-columns { display: grid; grid-template-columns: .8fr 1.2fr; gap: 1rem; }
+.ote-review-plan-columns h3 { margin: 0 0 .65rem; font-size: .9rem; }
+.ote-review-guiding-questions { padding: 1rem; border-radius: 12px; background: color-mix(in srgb, var(--color-text) 3.5%, transparent); }
+.ote-review-guiding-questions ul { display: grid; gap: .5rem; margin: 0; padding-left: 1.2rem; color: var(--color-text-soft); font-size: .86rem; }
+.ote-review-note-fields { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; align-content: start; }
+.ote-review-note-fields h3 { grid-column: 1 / -1; }
+.ote-review-note-fields label { color: var(--color-text-soft); font-size: .72rem; font-weight: 800; }
+.ote-review-note-fields input { display: block; width: 100%; margin-top: .22rem; padding: .62rem .7rem; border: 1px solid var(--color-border); border-radius: 9px; background: var(--color-surface, #fff); color: var(--color-text); font: inherit; font-size: .84rem; }
+.ote-review-note-fields input:focus { border-color: #0f8b83; outline: 3px solid color-mix(in srgb, #0f8b83 11%, transparent); }
+.ote-review-reveal-button { display: inline-flex; align-items: center; gap: .4rem; margin-top: 1rem; padding: .6rem .8rem; border: 1px solid #0f8b83; border-radius: 9px; background: transparent; color: #0f8b83; font-weight: 800; cursor: pointer; }
+.ote-review-suggested-notes { margin-top: .75rem; padding: .85rem; border-radius: 11px; background: color-mix(in srgb, #0f8b83 8%, transparent); }
+.ote-review-suggested-notes > span { color: #0f8b83; font-size: .7rem; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
+.ote-review-suggested-notes > div { display: flex; flex-wrap: wrap; gap: .4rem; margin-top: .5rem; }
+.ote-review-suggested-notes > div span { padding: .35rem .55rem; border: 1px solid color-mix(in srgb, #0f8b83 22%, var(--color-border)); border-radius: 999px; background: var(--color-surface, #fff); font-size: .77rem; }
+.ote-review-planning-tip { display: flex; gap: .65rem; margin-top: .85rem; padding: .85rem; border-radius: 11px; background: color-mix(in srgb, #d59b10 9%, transparent); }
+.ote-review-planning-tip > svg { flex: 0 0 auto; color: #b57900; }
+.ote-review-planning-tip p { margin: .2rem 0 0; color: var(--color-text-soft); font-size: .84rem; line-height: 1.45; }
+.ote-review-plan-comparison { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: .55rem; margin-top: .65rem; }
+.ote-review-plan-comparison span { padding: .55rem; border-radius: 8px; background: var(--color-surface, #fff); font-size: .78rem; }
+.ote-review-plan-comparison span:last-child { color: #0f8b83; font-weight: 750; }
+.ote-review-plan-workspace > footer { display: flex; justify-content: space-between; gap: .7rem; margin-top: 1rem; }
+.ote-review-plan-workspace > footer button { display: inline-flex; align-items: center; gap: .4rem; padding: .65rem .8rem; border: 1px solid var(--color-border); border-radius: 9px; background: var(--color-surface, #fff); color: var(--color-text); font-weight: 800; cursor: pointer; }
+.ote-review-plan-workspace > footer button:last-child { border-color: #0f8b83; background: #0f8b83; color: white; }
+.ote-review-plan-workspace > footer button:disabled { opacity: .35; cursor: not-allowed; }
+.ote-review-structure-model { margin: 1.25rem; padding: 1.25rem; border: 1px solid color-mix(in srgb, #0f8b83 32%, var(--color-border)); border-radius: 15px; }
+.ote-review-structure-model > header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: .8rem; }
+.ote-review-structure-model h2 { margin: .15rem 0 0; text-align: left; }
+.ote-review-structure-model header button { display: inline-flex; align-items: center; gap: .4rem; padding: .55rem .7rem; border: 1px solid var(--color-border); border-radius: 9px; background: transparent; color: var(--color-text); font-weight: 750; cursor: pointer; }
+.ote-review-structure-model header button.is-active { border-color: #0f8b83; color: #0f8b83; }
+.ote-review-structure-model article { display: block; border-radius: 9px; transition: background .15s ease; }
+.ote-review-structure-model article.has-label { display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: .85rem; padding: .7rem; background: color-mix(in srgb, #0f8b83 7%, transparent); }
+.ote-review-structure-model article + article { margin-top: .3rem; }
+.ote-review-structure-model article > span { color: #0f8b83; font-size: .68rem; font-weight: 850; text-transform: uppercase; }
+.ote-review-structure-model article > span strong { display: block; margin-top: .22rem; color: var(--color-text); font-size: .72rem; line-height: 1.25; text-transform: none; }
+.ote-review-structure-model article p { margin: 0; line-height: 1.62; }
+.ote-review-model-count { display: block; margin-top: .8rem; color: var(--color-text-soft); font-size: .76rem; text-align: right; }
+.ote-review-structure-quiz { margin-top: 1.4rem; }
+.ote-review-quiz-card { margin-top: .85rem; padding: 1rem; border: 1px solid var(--color-border); border-radius: 13px; }
+.ote-review-quiz-card.is-correct { border-color: color-mix(in srgb, #16803c 50%, var(--color-border)); }
+.ote-review-quiz-card.is-wrong { border-color: color-mix(in srgb, #b42318 50%, var(--color-border)); }
+.ote-review-quiz-card h3 { margin: 0 0 .7rem; font-size: .98rem; }
+.ote-review-quiz-card > div { display: grid; gap: .45rem; }
+.ote-review-quiz-card > div button { display: flex; align-items: center; gap: .6rem; padding: .65rem .75rem; border: 1px solid var(--color-border); border-radius: 9px; background: var(--color-surface, #fff); color: var(--color-text); text-align: left; cursor: pointer; }
+.ote-review-quiz-card > div button > span { display: grid; flex: 0 0 auto; width: 23px; height: 23px; place-items: center; border: 1px solid var(--color-border); border-radius: 50%; font-size: .7rem; font-weight: 900; }
+.ote-review-quiz-card > div button.is-selected { border-color: #0f8b83; background: color-mix(in srgb, #0f8b83 8%, transparent); }
+.ote-review-quiz-card > div button.is-answer { border-color: #16803c; background: color-mix(in srgb, #16803c 8%, transparent); }
+.ote-review-check-multiple { margin-top: .65rem; padding: .55rem .75rem; border: 0; border-radius: 8px; background: #0f8b83; color: white; font-weight: 800; cursor: pointer; }
+.ote-review-check-multiple:disabled { opacity: .4; }
+.ote-review-quiz-feedback { display: flex; gap: .45rem; margin: .7rem 0 0; color: var(--color-text-soft); font-size: .84rem; }
+.ote-review-quiz-feedback svg { flex: 0 0 auto; color: #16803c; }
+.ote-review-quiz-card.is-wrong .ote-review-quiz-feedback svg { color: #b42318; }
+.ote-review-cheat-heading { display: flex; align-items: center; justify-content: space-between; }
+.ote-review-cheat-heading svg { color: #0f8b83; }
+.ote-review-cheat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: .65rem; margin-top: 1rem; }
+.ote-review-cheat-grid article { position: relative; padding: 1rem; border: 1px solid var(--color-border); border-radius: 12px; }
+.ote-review-cheat-grid article > span { display: grid; width: 28px; height: 28px; place-items: center; border-radius: 50%; background: #0f8b83; color: white; font-size: .72rem; font-weight: 900; }
+.ote-review-cheat-grid h3 { margin: .55rem 0 .3rem; font-size: .91rem; }
+.ote-review-cheat-grid p { margin: 0; color: var(--color-text-soft); font-size: .78rem; line-height: 1.4; }
+.ote-review-cheat-grid small { display: block; margin-top: .55rem; color: #0f8b83; font-weight: 750; line-height: 1.35; }
+.ote-review-three-paragraph { margin-top: .9rem; padding: 1rem; border-radius: 12px; background: color-mix(in srgb, #0f8b83 8%, transparent); }
+.ote-review-three-paragraph p { margin: .3rem 0 .7rem; color: var(--color-text-soft); line-height: 1.5; }
+.ote-review-three-paragraph blockquote { margin: 0; padding: .7rem; border-left: 3px solid #0f8b83; background: var(--color-surface, #fff); font-style: italic; }
+.ote-review-final-reminder { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .45rem; margin-top: 1rem; color: #0f8b83; font-weight: 850; }
+.ote-review-structure-next { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.2rem; padding: 1.15rem; border-radius: 15px; background: color-mix(in srgb, #0f8b83 9%, var(--color-surface, #fff)); }
+.ote-review-structure-next h2 { margin: .2rem 0; text-align: left; }
+.ote-review-structure-next p:last-child { margin: 0; color: var(--color-text-soft); }
+.ote-review-structure-next button { display: inline-flex; flex: 0 0 auto; align-items: center; gap: .45rem; padding: .75rem 1rem; border: 0; border-radius: 10px; background: #0f8b83; color: white; font-weight: 850; cursor: pointer; }
+
+@media (max-width: 720px) {
+  .ote-review-structure-intro { align-items: stretch; flex-direction: column; }
+  .ote-review-structure-intro > svg { display: none; }
+  .ote-review-selector { grid-template-columns: 1fr; }
+  .ote-review-selector button:first-child { border-right: 0; border-bottom: 1px solid var(--color-border); }
+  .ote-review-paragraph-stepper { grid-template-columns: repeat(4, minmax(90px, 1fr)); overflow-x: auto; padding-bottom: .3rem; }
+  .ote-review-plan-columns, .ote-review-note-fields { grid-template-columns: 1fr; }
+  .ote-review-plan-workspace > header, .ote-review-structure-model > header, .ote-review-structure-next { align-items: stretch; flex-direction: column; }
+  .ote-review-purpose-pill { align-self: flex-start; }
+  .ote-review-plan-comparison { grid-template-columns: 1fr; }
+  .ote-review-plan-comparison > svg { transform: rotate(90deg); justify-self: center; }
+  .ote-review-plan-workspace > footer { flex-direction: column; }
+  .ote-review-plan-workspace > footer button { justify-content: center; width: 100%; }
+  .ote-review-structure-model article.has-label { grid-template-columns: 1fr; }
+  .ote-review-cheat-grid { grid-template-columns: 1fr 1fr; }
+  .ote-review-structure-next button { justify-content: center; width: 100%; }
+}
+
+@media (max-width: 480px) {
+  .ote-review-task-card, .ote-review-plan-workspace, .ote-review-structure-model { margin-right: .7rem; margin-left: .7rem; }
+  .ote-review-paragraph-stepper { margin-right: .7rem; margin-left: .7rem; }
+  .ote-review-cheat-grid { grid-template-columns: 1fr; }
+  .ote-review-structure-model header button { justify-content: center; }
+}
+
+/* Article planning additions */
+.ote-article-preplan-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin: 0 1.25rem 1.2rem; }
+.ote-article-preplan-grid > article { padding: 1rem; border: 1px solid var(--color-border); border-radius: 13px; }
+.ote-article-preplan-grid article > header > span { color: #0f8b83; font-size: .7rem; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
+.ote-article-preplan-grid article > header h2 { margin: .2rem 0; font-size: 1.05rem; text-align: left; }
+.ote-article-preplan-grid article > header p { margin: 0 0 .7rem; color: var(--color-text-soft); font-size: .8rem; }
+.ote-article-content-check > div { display: grid; gap: .4rem; }
+.ote-article-content-check > div button { display: flex; align-items: center; gap: .55rem; padding: .55rem .65rem; border: 1px solid var(--color-border); border-radius: 8px; background: var(--color-surface, #fff); color: var(--color-text); font-size: .78rem; text-align: left; cursor: pointer; }
+.ote-article-content-check > div button > span { display: grid; flex: 0 0 auto; width: 21px; height: 21px; place-items: center; border: 1px solid var(--color-border); border-radius: 6px; }
+.ote-article-content-check > div button.is-selected { border-color: #0f8b83; background: color-mix(in srgb, #0f8b83 8%, transparent); }
+.ote-article-content-check > div button.is-selected > span { border-color: #0f8b83; background: #0f8b83; color: white; }
+.ote-article-content-check > div button.is-answer { border-color: #16803c; background: color-mix(in srgb, #16803c 8%, transparent); }
+.ote-article-check-button, .ote-article-model-reveal { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; margin-top: .7rem; padding: .6rem .75rem; border: 0; border-radius: 8px; background: #0f8b83; color: white; font-weight: 800; cursor: pointer; }
+.ote-article-check-button:disabled, .ote-article-model-reveal:disabled { opacity: .4; cursor: not-allowed; }
+.ote-article-plan-choice > div { display: grid; gap: .45rem; }
+.ote-article-plan-choice > div > button { padding: .65rem; border: 1px solid var(--color-border); border-radius: 9px; background: var(--color-surface, #fff); color: var(--color-text); text-align: left; cursor: pointer; }
+.ote-article-plan-choice > div > button strong { display: block; margin-bottom: .3rem; font-size: .8rem; }
+.ote-article-plan-choice > div > button ul { display: grid; gap: .15rem; margin: 0; padding-left: 1rem; color: var(--color-text-soft); font-size: .71rem; }
+.ote-article-plan-choice > div > button.is-selected { border-color: #0f8b83; }
+.ote-article-plan-choice > div > button.is-answer { border-color: #16803c; background: color-mix(in srgb, #16803c 8%, transparent); }
+.ote-article-preplan-feedback { display: flex; gap: .45rem; margin: .7rem 0 0; color: var(--color-text-soft); font-size: .78rem; line-height: 1.4; }
+.ote-article-preplan-feedback > svg { flex: 0 0 auto; color: #16803c; }
+.ote-article-preplan-feedback.is-wrong > svg, .ote-article-content-check.is-wrong .ote-article-preplan-feedback > svg { color: #b42318; }
+.ote-article-opening-ending { margin: 0 1.25rem 1.25rem; padding: 1.2rem; border: 1px solid var(--color-border); border-radius: 15px; }
+.ote-article-opening-ending > div:first-child h2 { margin: .2rem 0 1rem; text-align: left; }
+.ote-article-opening-ending > article + article { margin-top: 1rem; }
+.ote-article-opening-ending article h3 { margin: 0 0 .55rem; font-size: .92rem; }
+.ote-article-opening-ending article > div { display: grid; gap: .4rem; }
+.ote-article-opening-ending article > div button { display: flex; align-items: center; gap: .6rem; padding: .6rem .7rem; border: 1px solid var(--color-border); border-radius: 9px; background: var(--color-surface, #fff); color: var(--color-text); font-size: .78rem; text-align: left; cursor: pointer; }
+.ote-article-opening-ending article > div button > span { display: grid; flex: 0 0 auto; width: 23px; height: 23px; place-items: center; border: 1px solid var(--color-border); border-radius: 50%; font-size: .7rem; font-weight: 900; }
+.ote-article-opening-ending article > div button.is-selected { border-color: #0f8b83; }
+.ote-article-opening-ending article > div button.is-answer { border-color: #16803c; background: color-mix(in srgb, #16803c 8%, transparent); }
+.ote-article-opening-ending article > p { display: flex; gap: .45rem; margin: .55rem 0 0; color: var(--color-text-soft); font-size: .78rem; }
+.ote-article-opening-ending article > p > svg { flex: 0 0 auto; color: #16803c; }
+.ote-article-opening-ending article > p.is-wrong > svg { color: #b42318; }
+.ote-article-model-reveal { margin-top: 1rem; }
+.ote-article-model-meta { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: .8rem; color: var(--color-text-soft); font-size: .75rem; }
+.ote-article-model-meta span { color: #0f8b83; font-weight: 800; }
+.ote-article-cheat-types { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-top: 1rem; }
+.ote-article-cheat-types article { padding: 1rem; border: 1px solid var(--color-border); border-radius: 13px; }
+.ote-article-cheat-types article > span { color: #0f8b83; font-size: .7rem; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
+.ote-article-cheat-types h3 { margin: .25rem 0 .65rem; }
+.ote-article-cheat-types ol { display: grid; gap: .5rem; margin: 0; padding-left: 1.15rem; color: var(--color-text-soft); font-size: .8rem; }
+.ote-article-cheat-types li strong { color: var(--color-text); }
+.ote-article-cheat-types article > p { margin: .8rem 0 0; padding: .55rem; border-radius: 8px; background: color-mix(in srgb, #0f8b83 8%, transparent); color: #0f8b83; font-size: .78rem; font-weight: 850; text-align: center; }
+
+@media (max-width: 720px) {
+  .ote-article-preplan-grid, .ote-article-cheat-types { grid-template-columns: 1fr; }
+  .ote-article-model-meta { align-items: flex-start; flex-direction: column; }
+}
+
+@media (max-width: 620px) {
+  body:has(.ote-article-structure-page) { display: block; }
+  body:has(.ote-article-structure-page) #root,
+  body:has(.ote-article-structure-page) .App,
+  body:has(.ote-article-structure-page) .content-container { width: 100%; min-width: 0; }
+  body:has(.ote-article-structure-page) .App { margin: 0; padding: .6rem; }
+  body:has(.ote-article-structure-page) .content-container { padding: .8rem; }
+}
+
+/* Lighter visual hierarchy for planning lessons in dark mode */
+:root:not([data-theme="light"]) .ote-review-structure-page {
+  --ote-plan-line: rgba(127, 177, 218, .2);
+  --ote-plan-control: rgba(27, 54, 94, .62);
+  --ote-plan-control-hover: rgba(34, 68, 115, .72);
+  --ote-plan-wash: rgba(43, 91, 128, .075);
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-planner {
+  border-color: var(--ote-plan-line);
+  background: linear-gradient(180deg, rgba(18, 42, 77, .3), rgba(12, 31, 59, .14));
+  box-shadow: none;
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-selector {
+  border-color: var(--ote-plan-line);
+  background: rgba(31, 63, 105, .12);
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-selector button:first-child {
+  border-color: var(--ote-plan-line);
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-selector button.is-active,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-task-card,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-three-paragraph,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-structure-next {
+  background: rgba(15, 139, 131, .075);
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-plan-workspace,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-article-opening-ending,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-structure-model {
+  border-width: 1px 0 0;
+  border-color: var(--ote-plan-line);
+  border-radius: 0;
+  background: transparent;
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-article-preplan-grid > article {
+  border-color: var(--ote-plan-line);
+  background: var(--ote-plan-wash);
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-guiding-questions,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-suggested-notes,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-planning-tip,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-structure-model article.has-label {
+  background: var(--ote-plan-wash);
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-note-fields input,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-plan-workspace > footer button,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-suggested-notes > div span,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-plan-comparison span,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-quiz-card > div button,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-article-content-check > div button,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-article-plan-choice > div > button,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-article-opening-ending article > div button,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-three-paragraph blockquote {
+  border-color: var(--ote-plan-line);
+  background: var(--ote-plan-control);
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-quiz-card > div button:hover:not(:disabled),
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-article-content-check > div button:hover:not(:disabled),
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-article-plan-choice > div > button:hover:not(:disabled),
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-article-opening-ending article > div button:hover:not(:disabled) {
+  background: var(--ote-plan-control-hover);
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-quiz-card {
+  padding-right: 0;
+  padding-left: 0;
+  border-width: 1px 0 0;
+  border-radius: 0;
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-review-cheat-grid article,
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-article-cheat-types article {
+  border-color: var(--ote-plan-line);
+  background: rgba(31, 63, 105, .09);
+}
+
+:root:not([data-theme="light"]) .ote-review-structure-page .ote-article-cheat-types article > p {
+  background: rgba(15, 139, 131, .08);
 }

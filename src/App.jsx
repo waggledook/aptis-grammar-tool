@@ -237,6 +237,9 @@ import OteWritingEssayIntroConclusion from "./products/ote/OteWritingEssayIntroC
 import OteWritingEssayPlanning from "./products/ote/OteWritingEssayPlanning.jsx";
 import OteWritingEssayBodyParagraphs from "./products/ote/OteWritingEssayBodyParagraphs.jsx";
 import OteWritingArticleReviewGuide from "./products/ote/OteWritingArticleReviewGuide.jsx";
+import OteWritingArticleStructure from "./products/ote/OteWritingArticleStructure.jsx";
+import OteWritingReviewStructure from "./products/ote/OteWritingReviewStructure.jsx";
+import OteWritingReviewVocabulary from "./products/ote/OteWritingReviewVocabulary.jsx";
 import OteWritingRegisterBasics from "./products/ote/OteWritingRegisterBasics.jsx";
 import OteWritingRegisterGapTrainer from "./products/ote/OteWritingRegisterGapTrainer.jsx";
 import OteLevelTestChooser from "./products/ote/OteLevelTestChooser.jsx";
@@ -1498,6 +1501,9 @@ return (
   <Route path="/ote/writing/training/advanced-summary/main-ideas" element={<OteWritingAdvancedSummaryMainIdeas nativeRoutes={false} />} />
   <Route path="/ote/writing/training/advanced-summary/paraphrasing" element={<OteWritingAdvancedSummaryParaphrasing nativeRoutes={false} />} />
   <Route path="/ote/writing/training/article-review/guide" element={<OteWritingArticleReviewGuide nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/article-review/article-structure" element={<OteWritingArticleStructure nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/article-review/structure" element={<OteWritingReviewStructure nativeRoutes={false} />} />
+  <Route path="/ote/writing/training/article-review/vocabulary" element={<OteWritingReviewVocabulary nativeRoutes={false} />} />
   <Route path="/ote/writing/training/:section/practice" element={<OteWritingPracticeMenu user={user} nativeRoutes={false} />} />
   <Route
     path="/ote/writing/training/:section/practice/:setId"
@@ -1672,6 +1678,9 @@ return (
       <Route path="/writing/training/advanced-summary/main-ideas" element={<OteWritingAdvancedSummaryMainIdeas nativeRoutes />} />
       <Route path="/writing/training/advanced-summary/paraphrasing" element={<OteWritingAdvancedSummaryParaphrasing nativeRoutes />} />
       <Route path="/writing/training/article-review/guide" element={<OteWritingArticleReviewGuide nativeRoutes />} />
+      <Route path="/writing/training/article-review/article-structure" element={<OteWritingArticleStructure nativeRoutes />} />
+      <Route path="/writing/training/article-review/structure" element={<OteWritingReviewStructure nativeRoutes />} />
+      <Route path="/writing/training/article-review/vocabulary" element={<OteWritingReviewVocabulary nativeRoutes />} />
       <Route
         path="/writing/training/email/register-basics"
         element={<OteWritingRegisterBasics user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />}
@@ -2257,6 +2266,7 @@ return (
 />
 
 {/* ——— Writing routes ——— */}
+{import.meta.env.DEV ? <Route path="/dev/article-structure" element={<OteWritingArticleStructure nativeRoutes={false} />} /> : null}
 <Route
   path="/writing"
   element={

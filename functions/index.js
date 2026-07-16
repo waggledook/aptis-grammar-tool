@@ -3617,18 +3617,89 @@ function isPreferenceOnlyOteCorrection(mistake = {}) {
     mistake.explanation,
   ].join(" ").toLowerCase();
 
+  const explicitlyOptionalEdit =
+    /\b(opening|meaning|structure|phrase|expression|wording|term)\b[^.]{0,80}\b(?:is|are)\s+(?:clear|correct|good|accurate|acceptable|natural)\b/.test(text) &&
+    /\b(?:a little long|more direct|shorter|more focused|overpacked|tighten(?:ed)?|simpler|more natural(?:ly)?|streamline|concise|concision)\b/.test(text);
+
   return (
-    /\b(more natural|clearer|smoother|slightly awkward|more idiomatic|sounds better|prefer)\b/.test(text) &&
-    !/\b(error|incorrect|wrong|missing|unclear|confusing|changes the meaning|impede|grammar mistake)\b/.test(text)
+    explicitlyOptionalEdit ||
+    (
+      /\b(more natural|clearer|smoother|slightly awkward|more idiomatic|sounds better|prefer|could be more direct|can be tightened|slightly simpler)\b/.test(text) &&
+      !/\b(error|incorrect|wrong|missing|unclear|confusing|changes the meaning|impede|grammar mistake)\b/.test(text)
+    )
   );
 }
 
 function isLengthPriority(text = "") {
-  return /\b(word count|word limit|length|too long|shorten|closer to the limit|closer to the word limit)\b/i.test(text);
+  return /\b(word count|word limit|length|too long|shorten|cut the essay|trim the introduction|target range|closer to the limit|closer to the word limit)\b/i.test(text);
+}
+
+function containsFalseOteTargetRangeLengthClaim(text = "") {
+  return /\b(?:word count|word limit|word-limit|advanced essay cap|task limit|target length|too long|cut the essay|shorten the essay|trim the introduction|above the advanced|over the (?:task|word)|beyond the (?:advanced|word)|goes beyond)\b/i.test(String(text || ""));
+}
+
+function stripFalseOteTargetRangeLengthClaim(text = "") {
+  const source = String(text || "").trim();
+  if (!source) return "";
+
+  const withoutTrailingClaim = source.replace(
+    /,\s*(?:but|although)\s+(?:the\s+)?(?:essay(?:'s)?\s+)?(?:length|word count)\s+(?:is|was)[^.]*\.?$/i,
+    "."
+  );
+
+  return withoutTrailingClaim
+    .split(/(?<=[.!?])\s+/)
+    .filter((sentence) => !containsFalseOteTargetRangeLengthClaim(sentence))
+    .join(" ")
+    .replace(/\s{2,}/g, " ")
+    .trim();
+}
+
+function isOteLengthMistake(mistake = {}) {
+  return containsFalseOteTargetRangeLengthClaim(
+    [mistake.category, mistake.original, mistake.correction, mistake.explanation].join(" ")
+  );
+}
+
+function normalizeOteTargetRangeFeedback(originalTask = {}, taskFeedback = {}) {
+  const wordCountStatus = originalTask.answer?.wordCountStatus || taskFeedback.wordCountStatus;
+  if (!["target_range", "acceptable_over_range"].includes(wordCountStatus)) return taskFeedback;
+
+  const taskFulfilment = taskFeedback.taskFulfilment || {};
+  const originalTaskFeedback = String(taskFulfilment.feedback || "").trim();
+  const cleanedTaskFeedback = stripFalseOteTargetRangeLengthClaim(originalTaskFeedback);
+  const removedFalseLengthPenalty = cleanedTaskFeedback !== originalTaskFeedback;
+  const contentStatus = taskFulfilment.contentSpecificity?.status;
+  const coverageOtherwiseComplete =
+    hasOnlyCoveredOtePoints(taskFeedback) &&
+    !["too_generic", "off_task"].includes(contentStatus);
+  const cleanedTeacherNote = stripFalseOteTargetRangeLengthClaim(taskFeedback.teacherNote);
+
+  return {
+    ...taskFeedback,
+    taskFulfilment: {
+      ...taskFulfilment,
+      status:
+        taskFulfilment.status === "partial" && removedFalseLengthPenalty && coverageOtherwiseComplete
+          ? "good"
+          : taskFulfilment.status,
+      feedback:
+        cleanedTaskFeedback ||
+        (wordCountStatus === "target_range"
+          ? "The response is within the target word range and fulfils the task without a length penalty."
+          : "The response is slightly above the target range, which does not create an automatic grading penalty."),
+    },
+    mistakes: (taskFeedback.mistakes || []).filter((mistake) => !isOteLengthMistake(mistake)),
+    teacherNote:
+      cleanedTeacherNote ||
+      (wordCountStatus === "target_range"
+        ? "The response is within the target word range; no length reduction is required."
+        : "The small overage does not create an automatic grading penalty; revise only if it affects focus."),
+  };
 }
 
 function isVaguePolishPriority(text = "") {
-  return /\b(make .*phrases? more natural|phrases? more natural|smoother wording|wording more natural|supporting details? tightly focused|maximum precision|maintain .*precision)\b/i.test(text);
+  return /\b(make .*phrases? more natural|phrases? more natural|smoother wording|wording more natural|supporting details? tightly focused|maximum precision|maintain .*precision|tighten .*long sentences?|make the argument more direct)\b/i.test(text);
 }
 
 function dedupeOtePriorities(priorities = []) {
@@ -3659,8 +3730,9 @@ function postProcessOteWritingFeedback(payload, feedback) {
   const processedTasks = feedback.tasks.map((taskFeedback, index) => {
     const originalTask = payload.tasks[index] || {};
     const normalizedTaskFeedback = normalizeAdvancedEssayOptionalPoints(originalTask, taskFeedback);
+    const normalizedLengthFeedback = normalizeOteTargetRangeFeedback(originalTask, normalizedTaskFeedback);
     const withOriginalCounts = {
-      ...normalizedTaskFeedback,
+      ...normalizedLengthFeedback,
       wordCount: originalTask.answer?.wordCount ?? normalizedTaskFeedback.wordCount,
       wordCountStatus: originalTask.answer?.wordCountStatus || normalizedTaskFeedback.wordCountStatus,
       wordCountFeedback: describeOteWordCount(
@@ -3670,37 +3742,55 @@ function postProcessOteWritingFeedback(payload, feedback) {
       ),
     };
 
-    if (!isHighControlOteTask(withOriginalCounts)) return withOriginalCounts;
+    const shouldPreFilterPreferenceEdits =
+      originalTask.taskType === "ote_advanced_part1_essay" &&
+      ["target_range", "acceptable_over_range"].includes(withOriginalCounts.wordCountStatus);
+    const withoutPreferenceEdits = {
+      ...withOriginalCounts,
+      mistakes: shouldPreFilterPreferenceEdits
+        ? (withOriginalCounts.mistakes || []).filter(
+            (mistake) => !isPreferenceOnlyOteCorrection(mistake)
+          )
+        : (withOriginalCounts.mistakes || []),
+    };
 
-    const filteredMistakes = (withOriginalCounts.mistakes || []).filter(
+    if (!isHighControlOteTask(withoutPreferenceEdits)) return withoutPreferenceEdits;
+
+    const filteredMistakes = (withoutPreferenceEdits.mistakes || []).filter(
       (mistake) => !isPreferenceOnlyOteCorrection(mistake)
     );
     const hasNoMeaningfulMistakes = filteredMistakes.length === 0;
-    const studentAnswer = originalTask.answer?.text || withOriginalCounts.studentAnswer || "";
+    const studentAnswer = originalTask.answer?.text || withoutPreferenceEdits.studentAnswer || "";
 
     return {
-      ...withOriginalCounts,
+      ...withoutPreferenceEdits,
       mistakes: filteredMistakes,
       grammar: hasNoMeaningfulMistakes
         ? {
-            ...withOriginalCounts.grammar,
-            status: withOriginalCounts.grammar?.status === "minor_issues" ? "strong" : withOriginalCounts.grammar?.status,
+            ...withoutPreferenceEdits.grammar,
+            status: withoutPreferenceEdits.grammar?.status === "minor_issues" ? "strong" : withoutPreferenceEdits.grammar?.status,
             feedback: "Grammar is accurate and controlled; no significant corrections are needed.",
             examples: [],
           }
-        : withOriginalCounts.grammar,
+        : withoutPreferenceEdits.grammar,
       lexis: hasNoMeaningfulMistakes
         ? {
-            ...withOriginalCounts.lexis,
-            status: withOriginalCounts.lexis?.status || "strong",
+            ...withoutPreferenceEdits.lexis,
+            status: withoutPreferenceEdits.lexis?.status || "strong",
             feedback: "Vocabulary is natural, precise, and appropriate for the task.",
             examples: [],
           }
-        : withOriginalCounts.lexis,
-      improvedVersion: hasNoMeaningfulMistakes && studentAnswer ? studentAnswer : withOriginalCounts.improvedVersion,
+        : withoutPreferenceEdits.lexis,
+      formatAndRegister: hasNoMeaningfulMistakes
+        ? {
+            ...withoutPreferenceEdits.formatAndRegister,
+            feedback: "The academic register is appropriate and consistently controlled for a tutor-facing essay.",
+          }
+        : withoutPreferenceEdits.formatAndRegister,
+      improvedVersion: hasNoMeaningfulMistakes && studentAnswer ? studentAnswer : withoutPreferenceEdits.improvedVersion,
       teacherNote: hasNoMeaningfulMistakes
         ? "This is a polished response with no significant language corrections needed."
-        : withOriginalCounts.teacherNote,
+        : withoutPreferenceEdits.teacherNote,
     };
   });
 
@@ -3709,6 +3799,9 @@ function postProcessOteWritingFeedback(payload, feedback) {
   const hasMeaningfulMistakes = processedTasks.some((task) => (task.mistakes || []).length > 0);
   const meaningfulMistakeCount = processedTasks.reduce((sum, task) => sum + countOteMeaningfulMistakes(task), 0);
   const hasPartialCoverage = processedTasks.some(hasPartialOteTaskCoverage);
+  const allTasksWithinAcceptedRange = processedTasks.every((task) =>
+    ["target_range", "acceptable_over_range"].includes(task.wordCountStatus)
+  );
   const optionalEssayPoints = processedTasks.flatMap((task) =>
     (task.taskFulfilment?.requiredPoints || [])
       .filter((point) => point?.status === "optional_not_used")
@@ -3721,12 +3814,22 @@ function postProcessOteWritingFeedback(payload, feedback) {
     tasks: processedTasks,
     overall: {
       ...(feedback.overall || {}),
-      summary: stripOptionalOteEssayPointCriticism(feedback.overall?.summary, optionalEssayPoints),
+      summary: allTasksWithinAcceptedRange
+        ? stripFalseOteTargetRangeLengthClaim(
+            stripOptionalOteEssayPointCriticism(feedback.overall?.summary, optionalEssayPoints)
+          )
+        : stripOptionalOteEssayPointCriticism(feedback.overall?.summary, optionalEssayPoints),
+      mainStrengths: (feedback.overall?.mainStrengths || []).map((strength) =>
+        String(strength || "").replace(
+          /all three required ideas/gi,
+          (match) => (/^[A-Z]/.test(match) ? "All three listed ideas" : "all three listed ideas")
+        )
+      ),
       mainPriorities: dedupeOtePriorities(feedback.overall?.mainPriorities || []).filter((priority) => {
         if (optionalEssayPoints.some((point) => textMentionsOteEssayPoint(priority, point))) {
           return false;
         }
-        if (processedTasks.some((task) => task.wordCountStatus === "acceptable_over_range") && isLengthPriority(priority)) {
+        if (allTasksWithinAcceptedRange && isLengthPriority(priority)) {
           return false;
         }
         if (hasOnlyHighControlTasks && isVaguePolishPriority(priority)) {

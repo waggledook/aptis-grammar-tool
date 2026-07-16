@@ -131,8 +131,8 @@ export default function OteWritingArticleReviewGuide({ nativeRoutes = false }) {
   const navigate = useNavigate();
   const [answers, setAnswers] = useState({});
   const menuPath = getSitePath(nativeRoutes ? "/writing/training/article-review" : "/ote/writing/training/article-review");
-  const practicePath = getSitePath(
-    nativeRoutes ? "/writing/training/article-review/practice" : "/ote/writing/training/article-review/practice"
+  const articleStructurePath = getSitePath(
+    nativeRoutes ? "/writing/training/article-review/article-structure" : "/ote/writing/training/article-review/article-structure"
   );
   const answeredCount = Object.keys(answers).length;
   const correctCount = useMemo(
@@ -284,8 +284,8 @@ export default function OteWritingArticleReviewGuide({ nativeRoutes = false }) {
       </section>
 
       <section className="ote-training-section">
-        <button className="ote-training-primary-link" type="button" onClick={() => navigate(practicePath)}>
-          Open timed article / review practice
+        <button className="ote-training-primary-link" type="button" onClick={() => navigate(articleStructurePath)}>
+          Continue to article planning and structure
         </button>
       </section>
     </main>
