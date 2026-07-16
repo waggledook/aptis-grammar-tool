@@ -2,6 +2,7 @@
 const functions = require("firebase-functions");
 const admin     = require("firebase-admin");
 const nodemailer = require("nodemailer");
+const {aggregateAnalyticsEvent} = require("./activityAnalytics");
 
 // ---------- init Admin (safe if called twice) ----------
 try { admin.app(); } catch { admin.initializeApp(); }
@@ -13,6 +14,36 @@ const TEACHER_EMAIL = process.env.TEACHER_EMAIL || GMAIL_USER;
 const OTE_LEVEL_REPORT_COPY_EMAIL = "nicholas@beeskillsenglish.com";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const firestore = admin.firestore();
+
+exports.aggregateActivityLog = functions
+  .runWith({maxInstances: 5})
+  .region("europe-west1")
+  .firestore.document("activityLog/{logId}")
+  .onCreate((snap, context) => aggregateAnalyticsEvent({
+    firestore,
+    admin,
+    source: "activityLog",
+    sourceId: context.params.logId,
+    data: snap.data() || {},
+    createdAt: snap.createTime || context.timestamp,
+  }));
+
+exports.aggregateWritingSubmission = functions
+  .runWith({maxInstances: 5})
+  .region("europe-west1")
+  .firestore.document("submissions/{submissionId}")
+  .onCreate((snap, context) => aggregateAnalyticsEvent({
+    firestore,
+    admin,
+    source: "submissions",
+    sourceId: context.params.submissionId,
+    data: {
+      ...snap.data(),
+      type: "writing_general_submission",
+      app: "aptis-writing-general",
+    },
+    createdAt: snap.createTime || context.timestamp,
+  }));
 
 const WRITING_FEEDBACK_WEEKLY_CREDITS = {
   student: 40,
@@ -7148,6 +7179,375 @@ exports.onUserRoleChange = functions
 const cors  = require("cors")({ origin: true });
 const crypto = require("crypto");
 const textToSpeech = require("@google-cloud/text-to-speech");
+
+const SEIF_ADMIN_SYNC_SECRET = "SEIF_ADMIN_SYNC_SECRET";
+const SEIF_ADMIN_DEFAULT_PASSWORD = "12345678";
+const SEIF_ADMIN_ACCESS_EXTENSION_DAYS = 14;
+const SEIF_ADMIN_DATED_ACCESS_STATUSES = new Set(["active", "completed"]);
+const SEIF_ADMIN_IMMEDIATE_DEACTIVATION_STATUSES = new Set(["cancelled"]);
+
+class SeifAdminApiError extends Error {
+  constructor(status, code, message) {
+    super(message);
+    this.status = status;
+    this.code = code;
+  }
+}
+
+function normalizeSeifAdminEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function normalizeSeifAdminId(value) {
+  return String(value || "").trim();
+}
+
+function parseSeifAdminIsoDate(value, fieldName, required) {
+  const raw = String(value || "").trim();
+  if (!raw && !required) return "";
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    throw new SeifAdminApiError(
+      400,
+      "invalid_request",
+      `${fieldName} must use YYYY-MM-DD format.`
+    );
+  }
+
+  const [year, month, day] = raw.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  if (
+    date.getUTCFullYear() !== year ||
+    date.getUTCMonth() !== month - 1 ||
+    date.getUTCDate() !== day
+  ) {
+    throw new SeifAdminApiError(400, "invalid_request", `${fieldName} is not a valid date.`);
+  }
+
+  return raw;
+}
+
+function addSeifAdminDays(isoDate, days) {
+  const [year, month, day] = isoDate.split("-").map(Number);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  date.setUTCDate(date.getUTCDate() + days);
+  return date.toISOString().slice(0, 10);
+}
+
+function validateSeifAdminToken(req) {
+  const expected = String(process.env[SEIF_ADMIN_SYNC_SECRET] || "");
+  const header = String(req.get("authorization") || "");
+  const match = header.match(/^Bearer\s+(.+)$/i);
+  const received = match ? match[1].trim() : "";
+
+  if (!expected || !received) return false;
+
+  const expectedBuffer = Buffer.from(expected);
+  const receivedBuffer = Buffer.from(received);
+  return expectedBuffer.length === receivedBuffer.length &&
+    crypto.timingSafeEqual(expectedBuffer, receivedBuffer);
+}
+
+function parseSeifAdminSyncRequest(body = {}) {
+  const studentId = normalizeSeifAdminId(body.studentId);
+  const email = normalizeSeifAdminEmail(body.email);
+  const status = String(body.status || "").trim().toLowerCase();
+
+  if (!studentId) {
+    throw new SeifAdminApiError(400, "invalid_request", "studentId is required.");
+  }
+  if (!email || !email.includes("@")) {
+    throw new SeifAdminApiError(400, "invalid_request", "A valid email is required.");
+  }
+  if (
+    !SEIF_ADMIN_DATED_ACCESS_STATUSES.has(status) &&
+    !SEIF_ADMIN_IMMEDIATE_DEACTIVATION_STATUSES.has(status)
+  ) {
+    throw new SeifAdminApiError(
+      400,
+      "invalid_request",
+      "status must be active, completed, or cancelled."
+    );
+  }
+
+  const active = SEIF_ADMIN_DATED_ACCESS_STATUSES.has(status);
+  const courseStartDate = parseSeifAdminIsoDate(
+    body.courseStartDate,
+    "courseStartDate",
+    false
+  );
+  const courseEndDate = parseSeifAdminIsoDate(body.courseEndDate, "courseEndDate", active);
+  const requestedAccess = body.access;
+
+  if (
+    active &&
+    (!requestedAccess ||
+      typeof requestedAccess !== "object" ||
+      typeof requestedAccess.aptisTrainer !== "boolean" ||
+      typeof requestedAccess.ote !== "boolean")
+  ) {
+    throw new SeifAdminApiError(
+      400,
+      "invalid_request",
+      "access.aptisTrainer and access.ote must both be true or false."
+    );
+  }
+
+  const firstName = String(body.firstName || "").trim();
+  const lastName = String(body.lastName || "").trim();
+  const displayName = [firstName, lastName].filter(Boolean).join(" ");
+  const accessEndDate = active
+    ? addSeifAdminDays(courseEndDate, SEIF_ADMIN_ACCESS_EXTENSION_DAYS)
+    : "";
+  const makeAccess = (enabled) => enabled && active
+    ? {
+        active: true,
+        startDate: courseStartDate || todayIsoDate(),
+        endDate: accessEndDate,
+        indefinite: false,
+      }
+    : {
+        active: false,
+        startDate: "",
+        endDate: "",
+        indefinite: false,
+      };
+
+  return {
+    studentId,
+    contractId: normalizeSeifAdminId(body.contractId),
+    email,
+    status,
+    active,
+    firstName,
+    lastName,
+    displayName,
+    courseStartDate,
+    courseEndDate,
+    accessEndDate,
+    siteAccess: {
+      [SEIF_HUB_ACCESS_KEY]: makeAccess(true),
+      [APTIS_TRAINER_ACCESS_KEY]: makeAccess(active && requestedAccess.aptisTrainer),
+      ote: makeAccess(active && requestedAccess.ote),
+    },
+  };
+}
+
+async function findSeifAdminUserByStudentId(studentId) {
+  const snapshot = await firestore
+    .collection("users")
+    .where("externalSystems.seifAdmin.studentId", "==", studentId)
+    .limit(2)
+    .get();
+
+  if (snapshot.size > 1) {
+    throw new SeifAdminApiError(
+      409,
+      "student_id_conflict",
+      "More than one account is linked to this studentId."
+    );
+  }
+
+  return snapshot.empty ? null : snapshot.docs[0];
+}
+
+async function getSeifAdminAuthUserByEmail(email) {
+  try {
+    return await admin.auth().getUserByEmail(email);
+  } catch (err) {
+    if (err.code === "auth/user-not-found") return null;
+    throw err;
+  }
+}
+
+async function createSeifAdminAuthUser(email, displayName) {
+  try {
+    const authUser = await admin.auth().createUser({
+      email,
+      password: SEIF_ADMIN_DEFAULT_PASSWORD,
+      displayName: displayName || undefined,
+      emailVerified: false,
+    });
+    return {authUser, createdAuthUser: true};
+  } catch (err) {
+    // A retried or simultaneous first request may have created the Auth user.
+    if (err.code === "auth/email-already-exists") {
+      const existing = await getSeifAdminAuthUserByEmail(email);
+      if (existing) return {authUser: existing, createdAuthUser: false};
+    }
+    throw err;
+  }
+}
+
+async function resolveSeifAdminAuthUser(payload) {
+  const studentDoc = await findSeifAdminUserByStudentId(payload.studentId);
+  const emailUser = await getSeifAdminAuthUserByEmail(payload.email);
+
+  // A cancellation may be retried after an account has already been removed manually.
+  // Treat that as a successful no-op instead of creating a disabled account.
+  if (!payload.active && !studentDoc && !emailUser) {
+    return {authUser: null, existingDoc: null, createdAuthUser: false, skipped: true};
+  }
+
+  if (studentDoc) {
+    if (emailUser && emailUser.uid !== studentDoc.id) {
+      throw new SeifAdminApiError(
+        409,
+        "email_conflict",
+        "This email belongs to a different account."
+      );
+    }
+
+    const authUser = await admin.auth().getUser(studentDoc.id);
+    const authUpdates = {};
+    if (normalizeSeifAdminEmail(authUser.email) !== payload.email) {
+      authUpdates.email = payload.email;
+    }
+    if (payload.displayName && authUser.displayName !== payload.displayName) {
+      authUpdates.displayName = payload.displayName;
+    }
+
+    return {
+      authUser: Object.keys(authUpdates).length
+        ? await admin.auth().updateUser(authUser.uid, authUpdates)
+        : authUser,
+      existingDoc: studentDoc,
+      createdAuthUser: false,
+    };
+  }
+
+  let authUser = emailUser;
+  let createdAuthUser = false;
+  if (!authUser) {
+    const created = await createSeifAdminAuthUser(payload.email, payload.displayName);
+    authUser = created.authUser;
+    createdAuthUser = created.createdAuthUser;
+  } else if (payload.displayName && authUser.displayName !== payload.displayName) {
+    authUser = await admin.auth().updateUser(authUser.uid, {
+      displayName: payload.displayName,
+    });
+  }
+
+  const existingDoc = await firestore.doc(`users/${authUser.uid}`).get();
+  const linkedStudentId = normalizeSeifAdminId(
+    existingDoc.data()?.externalSystems?.seifAdmin?.studentId
+  );
+  if (linkedStudentId && linkedStudentId !== payload.studentId) {
+    throw new SeifAdminApiError(
+      409,
+      "account_link_conflict",
+      "This account is already linked to a different studentId."
+    );
+  }
+
+  return {authUser, existingDoc, createdAuthUser};
+}
+
+exports.syncSeifAdminStudent = functions
+  .runWith({secrets: [SEIF_ADMIN_SYNC_SECRET]})
+  .region("europe-west1")
+  .https.onRequest(async (req, res) => {
+    res.set("Cache-Control", "no-store");
+
+    if (req.method !== "POST") {
+      return res.status(405).json({
+        ok: false,
+        error: {code: "method_not_allowed", message: "Use POST."},
+      });
+    }
+    if (!validateSeifAdminToken(req)) {
+      return res.status(401).json({
+        ok: false,
+        error: {code: "unauthorized", message: "Invalid credentials."},
+      });
+    }
+
+    try {
+      const payload = parseSeifAdminSyncRequest(req.body || {});
+      const {authUser, existingDoc, createdAuthUser, skipped} =
+        await resolveSeifAdminAuthUser(payload);
+
+      if (skipped) {
+        return res.status(200).json({
+          ok: true,
+          uid: null,
+          studentId: payload.studentId,
+          email: payload.email,
+          createdAuthUser: false,
+          status: payload.status,
+          accessEndDate: "",
+          access: {seifhub: false, aptisTrainer: false, ote: false},
+        });
+      }
+
+      const existingData = existingDoc.exists ? existingDoc.data() || {} : {};
+      const existingSeifAdmin = existingData.externalSystems?.seifAdmin || {};
+      if (payload.active && !payload.courseStartDate) {
+        Object.entries(payload.siteAccess).forEach(([accessKey, access]) => {
+          if (access.active) {
+            access.startDate = existingData.siteAccess?.[accessKey]?.startDate || access.startDate;
+          }
+        });
+      }
+      const now = admin.firestore.FieldValue.serverTimestamp();
+      const userPayload = {
+        email: payload.email,
+        name: payload.displayName || existingData.name || authUser.displayName || "",
+        username: existingData.username || "",
+        role: existingData.role || "student",
+        siteAccess: payload.siteAccess,
+        externalSystems: {
+          seifAdmin: {
+            studentId: payload.studentId,
+            contractId: payload.contractId || existingSeifAdmin.contractId || "",
+            status: payload.status,
+            courseStartDate: payload.courseStartDate || existingSeifAdmin.courseStartDate || "",
+            courseEndDate: payload.courseEndDate,
+            accessEndDate: payload.accessEndDate,
+            lastSyncedAt: now,
+          },
+        },
+        updatedAt: now,
+      };
+
+      if (!existingDoc.exists) userPayload.createdAt = now;
+      await firestore.doc(`users/${authUser.uid}`).set(userPayload, {merge: true});
+
+      console.log("SEIF_ADMIN_SYNC_OK", {
+        uid: authUser.uid,
+        studentId: payload.studentId,
+        status: payload.status,
+        createdAuthUser,
+      });
+
+      return res.status(createdAuthUser ? 201 : 200).json({
+        ok: true,
+        uid: authUser.uid,
+        studentId: payload.studentId,
+        email: payload.email,
+        createdAuthUser,
+        status: payload.status,
+        accessEndDate: payload.accessEndDate,
+        access: {
+          seifhub: payload.siteAccess.seifhub.active,
+          aptisTrainer: payload.siteAccess.aptisTrainer.active,
+          ote: payload.siteAccess.ote.active,
+        },
+      });
+    } catch (err) {
+      const status = err instanceof SeifAdminApiError ? err.status : 500;
+      const code = err instanceof SeifAdminApiError ? err.code : "sync_failed";
+      const message = err instanceof SeifAdminApiError
+        ? err.message
+        : "The student could not be synchronized.";
+
+      console.error("SEIF_ADMIN_SYNC_FAIL", {
+        status,
+        code,
+        message: err?.message || String(err),
+      });
+      return res.status(status).json({ok: false, error: {code, message}});
+    }
+  });
 
 
 const ttsClient = new textToSpeech.TextToSpeechClient();

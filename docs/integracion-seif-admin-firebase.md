@@ -1,323 +1,254 @@
-# Integración de SEIF Admin con Firebase para SeifHub
+# API de integración de SEIF Admin con las plataformas de SEIF
 
-Esta nota es para el desarrollador que mantiene la aplicación de administración de SEIF. El objetivo es que esa aplicación pueda crear y renovar automáticamente el acceso de los alumnos a SeifHub cuando se registre un alumno nuevo o cuando cambie su contrato.
+Documento técnico para la aplicación de administración de SEIF.
 
-## Proyecto Actual de Firebase
+## Objetivo
 
-- ID del proyecto Firebase: `examplay-auth`
-- Dominio de Auth: `examplay-auth.firebaseapp.com`
-- Región de Cloud Functions utilizada por esta app: `europe-west1`
-- URL de SeifHub: `https://seifhub.beeskillsenglish.com`
-- Ruta alternativa local: `/?site=seifhub`
+Cuando se cree o modifique un alumno en SEIF Admin, esa aplicación enviará el estado
+actual del alumno a una API de SEIF. La API creará o actualizará la cuenta de Firebase
+y sincronizará su acceso a las plataformas.
 
-La configuración pública web de Firebase está en `src/firebase.js`, pero el alta automática de alumnos no debería hacerse desde código del navegador en la app externa de administración. Lo recomendable es hacerlo servidor-a-servidor, mediante una Cloud Function HTTPS específica en este proyecto de Firebase o mediante un servicio backend con credenciales controladas de Firebase Admin.
+La aplicación de administración no necesita acceso directo a Firebase, Firestore ni a
+ninguna base de datos de las plataformas.
 
-## Modelo de Usuario que Necesita SeifHub
-
-El acceso a SeifHub se controla con el usuario de Firebase Auth y el documento correspondiente en Firestore:
+## Endpoint
 
 ```text
-Usuario de Firebase Auth
-  uid
-  email
-  password
-  displayName
-
-Documento de Firestore
-  /users/{uid}
+POST https://europe-west1-examplay-auth.cloudfunctions.net/syncSeifAdminStudent
+Content-Type: application/json
+Authorization: Bearer <TOKEN_COMPARTIDO>
 ```
 
-Documento mínimo en Firestore:
+El token es secreto y solo puede guardarse en el servidor de SEIF Admin. No debe
+incluirse en JavaScript ejecutado en un navegador, repositorios públicos ni registros.
 
-```json
-{
-  "email": "student@example.com",
-  "name": "Student Name",
-  "username": "",
-  "role": "student",
-  "createdAt": "<server timestamp>",
-  "updatedAt": "<server timestamp>",
-  "siteAccess": {
-    "seifhub": {
-      "active": true,
-      "startDate": "2026-06-09",
-      "endDate": "2026-09-07",
-      "indefinite": false
-    }
-  },
-  "externalSystems": {
-    "seifAdmin": {
-      "studentId": "12345",
-      "contractId": "abc-123",
-      "contractEndDate": "2026-08-31",
-      "lastSyncedAt": "<server timestamp>"
-    }
-  }
-}
-```
+## Cuerpo de la petición
 
-`siteAccess.seifhub` es el campo clave:
-
-- `active: true` activa el acceso a SeifHub.
-- `startDate` y `endDate` son fechas ISO: `YYYY-MM-DD`.
-- La app permite el acceso mientras la fecha actual esté entre `startDate` y `endDate`, ambas incluidas.
-- `indefinite: false` significa que `endDate` se aplica.
-- Para la regla propuesta, `endDate` debe ser `contractEndDate + 7 days`.
-
-La lógica de acceso está en `src/siteConfig.js`.
-
-## Flujo de Alta
-
-Cuando se registre un alumno nuevo en la app de administración de SEIF:
-
-1. Normalizar el email de registro: minúsculas y sin espacios al principio o al final.
-2. Calcular `seifhubEndDate = contractEndDate + 7 days`.
-3. Crear o actualizar un usuario de Firebase Auth con:
-   - `email`: el email usado en el registro
-   - `password`: `12345678`
-   - `displayName`: nombre + apellidos
-4. Crear o combinar `/users/{uid}` con:
-   - `role: "student"`
-   - `email`
-   - `name`
-   - `siteAccess.seifhub.active: true`
-   - `siteAccess.seifhub.startDate`
-   - `siteAccess.seifhub.endDate`
-   - `siteAccess.seifhub.indefinite: false`
-   - identificadores externos de la app de administración, si están disponibles
-
-Importante: Firebase Auth exige que los emails sean únicos. Si el email ya existe, la integración debería actualizar el acceso del usuario existente en Firestore, no crear una cuenta duplicada.
-
-## Flujo de Renovación
-
-Cuando un alumno renueve:
-
-1. Encontrar el usuario de Firebase Auth por email o por el valor guardado en `externalSystems.seifAdmin.studentId`.
-2. Calcular el nuevo `seifhubEndDate = newContractEndDate + 7 days`.
-3. Actualizar solo los campos de acceso en Firestore y los metadatos externos del contrato.
-
-Actualización recomendada para una renovación:
-
-```json
-{
-  "siteAccess.seifhub": {
-    "active": true,
-    "startDate": "2026-06-09",
-    "endDate": "2026-12-22",
-    "indefinite": false
-  },
-  "externalSystems.seifAdmin.contractEndDate": "2026-12-15",
-  "externalSystems.seifAdmin.lastSyncedAt": "<server timestamp>",
-  "updatedAt": "<server timestamp>"
-}
-```
-
-## Flujo de Cancelación o No Renovación
-
-Si la app de administración cancela el acceso explícitamente:
-
-```json
-{
-  "siteAccess.seifhub": {
-    "active": false,
-    "startDate": "",
-    "endDate": "",
-    "indefinite": false
-  },
-  "updatedAt": "<server timestamp>"
-}
-```
-
-Si el alumno simplemente no renueva, no hace falta desactivarlo manualmente siempre que `endDate` esté rellenado. SeifHub dejará de permitir el acceso después de esa fecha.
-
-## Límite Recomendado de la API
-
-La mejor opción sería añadir una Cloud Function HTTPS a este proyecto Firebase, por ejemplo:
-
-```text
-POST https://europe-west1-examplay-auth.cloudfunctions.net/syncSeifHubStudent
-```
-
-Cuerpo de petición sugerido:
+Cada petición representa el estado completo y actual del alumno:
 
 ```json
 {
   "studentId": "12345",
-  "contractId": "abc-123",
+  "contractId": "contrato-2026-12345",
   "firstName": "Ana",
-  "lastName": "Garcia",
+  "lastName": "García",
   "email": "ana@example.com",
-  "contractStartDate": "2026-06-09",
-  "contractEndDate": "2026-08-31",
-  "status": "active"
+  "courseStartDate": "2026-09-01",
+  "courseEndDate": "2027-06-30",
+  "status": "active",
+  "access": {
+    "aptisTrainer": true,
+    "ote": false
+  }
 }
 ```
 
-Respuesta sugerida:
+### Campos
+
+| Campo | Tipo | Obligatorio | Descripción |
+|---|---|---:|---|
+| `studentId` | string | Sí | Identificador permanente y único del alumno en SEIF Admin. |
+| `contractId` | string | No | Identificador del contrato actual. |
+| `firstName` | string | Recomendado | Nombre del alumno. |
+| `lastName` | string | Recomendado | Apellidos del alumno. |
+| `email` | string | Sí | Email actual. Se normaliza a minúsculas. |
+| `courseStartDate` | `YYYY-MM-DD` | No | Fecha de inicio. Si se omite en un alta activa, se usa la fecha actual. |
+| `courseEndDate` | `YYYY-MM-DD` | Sí con `active` o `completed` | Fecha final del curso o contrato. |
+| `status` | string | Sí | `active`, `completed` o `cancelled`. |
+| `access.aptisTrainer` | boolean | Sí con `active` o `completed` | Acceso solicitado a Aptis Trainer. |
+| `access.ote` | boolean | Sí con `active` o `completed` | Acceso solicitado a OTE. |
+
+No se envía un campo para SeifHub: todo alumno con `status: "active"` o
+`status: "completed"` conserva acceso a SeifHub hasta la fecha calculada.
+
+## Reglas de acceso
+
+- `seifhub` se activa automáticamente con `active` y se conserva con `completed`.
+- `aptisTrainer` se controla mediante `access.aptisTrainer`.
+- `ote` se controla mediante `access.ote`.
+- La fecha de caducidad es `courseEndDate + 14 días`.
+- `completed` conserva los accesos seleccionados hasta esa misma fecha de caducidad.
+- `cancelled` desactiva las tres plataformas inmediatamente.
+- Con `active` o `completed` deben enviarse siempre los dos booleanos de `access`.
+- Cambiar un booleano de `true` a `false` retira ese acceso.
+- Repetir exactamente la misma petición es seguro: actualiza la misma cuenta y no
+  crea duplicados.
+
+## Altas, alumnos existentes y renovaciones
+
+La misma llamada sirve para todas las operaciones:
+
+### Alumno nuevo
+
+Si no existe una cuenta asociada al `studentId` ni al email, la API:
+
+1. crea el usuario en Firebase Auth;
+2. asigna la contraseña inicial `12345678`;
+3. crea el perfil de Firestore;
+4. aplica los accesos solicitados;
+5. guarda el `studentId` para futuras sincronizaciones.
+
+La contraseña inicial solo se asigna al crear la cuenta. Una sincronización posterior
+nunca cambia la contraseña de un usuario existente.
+
+### Alumno existente que empieza un curso de examen
+
+Se envía el mismo `studentId`, las fechas actuales y, por ejemplo:
+
+```json
+"access": {
+  "aptisTrainer": true,
+  "ote": false
+}
+```
+
+La API actualiza la cuenta existente y añade Aptis Trainer, conservando SeifHub.
+
+### Renovación
+
+Se vuelve a enviar el estado completo con el nuevo `courseEndDate`. La API localiza al
+alumno mediante `studentId`, actualiza el contrato y calcula una nueva caducidad de 14
+días después de la fecha recibida.
+
+Ejemplo: `courseEndDate: "2027-09-30"` produce
+`accessEndDate: "2027-10-14"`.
+
+### Cambio de email
+
+El `studentId` es la identidad principal. Si el email cambia, se envía el mismo
+`studentId` con el email nuevo. La API actualiza Firebase Auth y Firestore. Si el email
+nuevo ya pertenece a otra cuenta, devuelve un conflicto y no combina las cuentas.
+
+### Finalización normal del curso
+
+Cuando un alumno termine y sea desactivado de forma ordinaria en SEIF Admin, se envía
+`status: "completed"` junto con las fechas y los accesos que tenía:
+
+```json
+{
+  "studentId": "12345",
+  "email": "ana@example.com",
+  "courseStartDate": "2026-09-01",
+  "courseEndDate": "2027-06-30",
+  "status": "completed",
+  "access": {
+    "aptisTrainer": true,
+    "ote": false
+  }
+}
+```
+
+Aunque el estado administrativo sea `completed`, los accesos seleccionados siguen
+activos hasta `courseEndDate + 14 días`. Después, las plataformas rechazan el acceso
+automáticamente por fecha.
+
+### Cancelación inmediata
+
+```json
+{
+  "studentId": "12345",
+  "email": "ana@example.com",
+  "status": "cancelled"
+}
+```
+
+`cancelled` se reserva para bajas que deben cortar el acceso inmediatamente, por
+ejemplo una cancelación anticipada, impago, error o incidencia. Desactiva SeifHub,
+Aptis Trainer y OTE, pero no elimina la cuenta ni cambia su contraseña.
+
+## Respuesta correcta
+
+Un alta nueva devuelve HTTP `201`; una actualización devuelve HTTP `200`:
 
 ```json
 {
   "ok": true,
   "uid": "firebase-auth-uid",
+  "studentId": "12345",
   "email": "ana@example.com",
-  "seifhubEndDate": "2026-09-07",
-  "createdAuthUser": true
+  "createdAuthUser": false,
+  "status": "active",
+  "accessEndDate": "2027-07-14",
+  "access": {
+    "seifhub": true,
+    "aptisTrainer": true,
+    "ote": false
+  }
 }
 ```
 
-La autenticación de este endpoint debería hacerse con una cabecera secreta compartida solo entre servidores o mediante una petición servicio-a-servicio firmada por Google. El secreto no debe exponerse nunca en JavaScript del navegador.
+## Errores
 
-Ejemplo de cabecera:
+Los errores usan esta estructura:
 
-```text
-Authorization: Bearer <server-only secret>
+```json
+{
+  "ok": false,
+  "error": {
+    "code": "invalid_request",
+    "message": "courseEndDate must use YYYY-MM-DD format."
+  }
+}
 ```
 
-## Ejemplo de Cloud Function
+| HTTP | Significado |
+|---:|---|
+| `400` | Faltan datos o algún valor/formato no es válido. |
+| `401` | Token ausente o incorrecto. |
+| `405` | Debe utilizarse `POST`. |
+| `409` | El `studentId` o email entra en conflicto con otra cuenta. Requiere revisión. |
+| `500` | Error interno temporal. Se puede reintentar más tarde. |
 
-Esto es un borrador para `functions/index.js`. Usa Firebase Admin, así que puede saltarse de forma segura las reglas de Firestore del cliente porque se ejecuta en un servidor de confianza.
+SEIF Admin debe registrar el código HTTP y el `error.code`, y mostrar o poner en cola
+los fallos para que una sincronización no se pierda silenciosamente. Puede reintentar
+errores `500`; no debe reintentar automáticamente errores `400`, `401` o `409` sin
+corregir primero la causa.
 
-```js
-const cors = require("cors")({ origin: true });
+## Ejemplo con curl
 
-function addDaysIso(isoDate, days) {
-  const [year, month, day] = String(isoDate || "").split("-").map(Number);
-  if (!year || !month || !day) return "";
-  const date = new Date(Date.UTC(year, month - 1, day));
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
-}
-
-function normalizeEmail(email) {
-  return String(email || "").trim().toLowerCase();
-}
-
-exports.syncSeifHubStudent = functions
-  .region("europe-west1")
-  .https.onRequest((req, res) => {
-    cors(req, res, async () => {
-      try {
-        if (req.method !== "POST") {
-          res.status(405).json({ ok: false, error: "Use POST." });
-          return;
-        }
-
-        const expectedSecret = process.env.SEIF_ADMIN_SYNC_SECRET;
-        const authHeader = req.get("authorization") || "";
-        const token = authHeader.replace(/^Bearer\s+/i, "");
-        if (!expectedSecret || token !== expectedSecret) {
-          res.status(401).json({ ok: false, error: "Unauthorised." });
-          return;
-        }
-
-        const body = req.body || {};
-        const email = normalizeEmail(body.email);
-        const contractEndDate = String(body.contractEndDate || "").slice(0, 10);
-        const contractStartDate = String(body.contractStartDate || "").slice(0, 10);
-
-        if (!email || !email.includes("@")) {
-          res.status(400).json({ ok: false, error: "A valid email is required." });
-          return;
-        }
-
-        if (!contractEndDate) {
-          res.status(400).json({ ok: false, error: "contractEndDate is required." });
-          return;
-        }
-
-        const seifhubEndDate = addDaysIso(contractEndDate, 7);
-        const displayName = [body.firstName, body.lastName].filter(Boolean).join(" ").trim();
-
-        let authUser;
-        let createdAuthUser = false;
-
-        try {
-          authUser = await admin.auth().getUserByEmail(email);
-        } catch (err) {
-          if (err.code !== "auth/user-not-found") throw err;
-          authUser = await admin.auth().createUser({
-            email,
-            password: "12345678",
-            displayName: displayName || undefined,
-            emailVerified: false,
-          });
-          createdAuthUser = true;
-        }
-
-        if (displayName && authUser.displayName !== displayName) {
-          await admin.auth().updateUser(authUser.uid, { displayName });
-        }
-
-        const active = body.status !== "cancelled" && body.status !== "inactive";
-        const access = active
-          ? {
-              active: true,
-              startDate: contractStartDate || new Date().toISOString().slice(0, 10),
-              endDate: seifhubEndDate,
-              indefinite: false,
-            }
-          : {
-              active: false,
-              startDate: "",
-              endDate: "",
-              indefinite: false,
-            };
-
-        const userRef = admin.firestore().doc(`users/${authUser.uid}`);
-        const existingSnap = await userRef.get();
-        const existingData = existingSnap.exists ? existingSnap.data() || {} : {};
-        const firestorePayload = {
-          email,
-          name: displayName || existingData.name || "",
-          username: existingData.username || "",
-          role: existingData.role || "student",
-          siteAccess: { seifhub: access },
-          externalSystems: {
-            seifAdmin: {
-              studentId: body.studentId || existingData.externalSystems?.seifAdmin?.studentId || "",
-              contractId: body.contractId || "",
-              contractEndDate,
-              lastSyncedAt: admin.firestore.FieldValue.serverTimestamp(),
-            },
-          },
-          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
-        };
-
-        if (!existingSnap.exists) {
-          firestorePayload.createdAt = admin.firestore.FieldValue.serverTimestamp();
-        }
-
-        await userRef.set(firestorePayload, { merge: true });
-
-        res.json({
-          ok: true,
-          uid: authUser.uid,
-          email,
-          seifhubEndDate: access.endDate,
-          createdAuthUser,
-        });
-      } catch (err) {
-        console.error("syncSeifHubStudent failed", err);
-        res.status(500).json({ ok: false, error: "Sync failed." });
-      }
-    });
-  });
+```bash
+curl --request POST \
+  'https://europe-west1-examplay-auth.cloudfunctions.net/syncSeifAdminStudent' \
+  --header 'Authorization: Bearer <TOKEN_COMPARTIDO>' \
+  --header 'Content-Type: application/json' \
+  --data '{
+    "studentId": "12345",
+    "contractId": "contrato-2026-12345",
+    "firstName": "Ana",
+    "lastName": "García",
+    "email": "ana@example.com",
+    "courseStartDate": "2026-09-01",
+    "courseEndDate": "2027-06-30",
+    "status": "active",
+    "access": {
+      "aptisTrainer": true,
+      "ote": false
+    }
+  }'
 ```
 
-Antes de desplegar, hay que añadir el secreto como variable de entorno de Cloud Functions o como configuración de Firebase Functions. El comando exacto dependerá de cómo esté configurado el despliegue actual.
+## Configuración y despliegue por parte de SEIF
 
-## Notas y Riesgos
+Antes del primer despliegue se debe crear el secreto de Firebase:
 
-- La contraseña por defecto `12345678` coincide con el funcionamiento actual de SEIF. Más adelante se podría pedir o forzar al alumno a cambiarla en el primer inicio de sesión.
-- No conviene dar a la parte frontend de la app de administración acceso directo de escritura a Firestore. Las reglas actuales de Firestore restringen a propósito las actualizaciones de `siteAccess`.
-- La sincronización debe ser idempotente: llamadas repetidas con el mismo email deben actualizar el usuario existente y las fechas de contrato, no crear duplicados.
-- Conviene guardar `studentId` y `contractId` del sistema externo; esto hace que las renovaciones futuras sean más seguras que depender solo del email.
-- Actualmente la app da acceso automático a SeifHub a usuarios con rol `teacher` o `admin`, pero los alumnos normales necesitan `siteAccess.seifhub.active`.
+```bash
+firebase functions:secrets:set SEIF_ADMIN_SYNC_SECRET
+```
 
-## Referencias de Código Relevantes
+Después se despliega únicamente esta función:
 
-- Configuración de Firebase y helpers de Auth: `src/firebase.js`
-- Control de acceso a SeifHub: `src/siteConfig.js`
-- Panel de administración que edita el acceso a SeifHub: `src/components/admin/AdminDashboard.jsx`
-- Reglas de Firestore que restringen `siteAccess`: `firestore.rules`
-- Punto de entrada actual de Cloud Functions: `functions/index.js`
+```bash
+firebase deploy --only functions:syncSeifAdminStudent
+```
+
+El valor del secreto se entregará al responsable de SEIF Admin por un canal seguro,
+separado de este documento.
+
+## Implementación en este repositorio
+
+- Endpoint: `functions/index.js`, export `syncSeifAdminStudent`.
+- Proyecto Firebase: `examplay-auth`.
+- Región: `europe-west1`.
+- Control de acceso del frontend: `src/siteConfig.js`.
+- Notificación por cambios de acceso: función `emailSiteAccessGranted`.
+- Reglas de protección de perfiles: `firestore.rules`.

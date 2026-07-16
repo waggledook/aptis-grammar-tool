@@ -34,9 +34,11 @@ export const ACTIVITY_TYPE_LABELS = {
   listening_part4_attempted: "Listening Part 4 Attempt",
   listening_part4_completed: "Listening Part 4 Completed",
   hub_grammar_submitted: "Hub Grammar Submitted",
+  hub_vocab_activity_completed: "Hub Vocabulary Activity Completed",
   hub_dictation_completed: "Hub Dictation Completed",
   hub_translation_completed: "Hub Translation Completed",
   hub_flashcards_started: "Hub Flashcards Started",
+  hub_flashcards_completed: "Hub Flashcards Completed",
   hub_spanglish_started: "Hub Spanglish Started",
   hub_spanglish_review_started: "Hub Spanglish Review Started",
   hub_spanglish_completed: "Hub Spanglish Completed",
@@ -49,6 +51,8 @@ export const ACTIVITY_TYPE_LABELS = {
   hub_dependent_preps_completed: "Hub Dependent Prepositions Completed",
   hub_negatris_started: "Hub Negatris Started",
   hub_negatris_completed: "Hub Negatris Completed",
+  hub_syntax_sentinel_started: "Hub Syntax Sentinel Started",
+  hub_syntax_sentinel_completed: "Hub Syntax Sentinel Completed",
   hub_keyword_started: "Hub Keyword Started",
   hub_keyword_review_loaded: "Hub Keyword Review Loaded",
   hub_keyword_completed: "Hub Keyword Completed",
@@ -171,6 +175,7 @@ export function buildWritingGeneralSubmissionActivity(docSnap) {
     userEmail: data.userEmail || userLabel,
     userLabel,
     type: WRITING_GENERAL_SUBMISSION_TYPE,
+    source: "submissions",
     details: {
       submissionId: docSnap.id,
       mockId: data.mockId || answers.__mockId || "",
@@ -315,11 +320,27 @@ export function formatActivityDetails(log) {
       return joinParts([d.taskId || "Task", "Completed", typeof d.playsUsed === "number" ? `Listens ${d.playsUsed}/2` : ""]);
     case "hub_grammar_submitted":
       return joinParts([d.activityTitle || d.activityId || "Grammar activity", `${d.score ?? "?"}%`, `Correct ${formatScore(d.correct, d.total)}`]);
+    case "hub_vocab_activity_completed":
+      return joinParts([
+        d.themeTitle || d.themeId || "Vocabulary",
+        d.activityTitle || d.activityId || "Activity",
+        d.level || "",
+        d.mode || "",
+        `First try ${d.correctFirstTry ?? "?"}/${d.totalItems ?? "?"}`,
+        `Mistakes ${d.mistakesCount ?? "?"}`,
+      ]);
     case "hub_dictation_completed":
     case "hub_translation_completed":
       return joinParts([d.mode || "game", d.setLabel || d.setId || "All sentences", `Score ${d.score ?? "?"}`, `Completed ${formatScore(d.completed, d.totalPlayed)}`]);
     case "hub_flashcards_started":
       return joinParts([d.mode || "deck", d.deckTitle || d.deckId || "Flashcards", formatCount(d.total, "card")]);
+    case "hub_flashcards_completed":
+      return joinParts([
+        d.mode || "deck",
+        d.deckTitle || d.deckId || "Flashcards",
+        `Reviewed ${formatScore(d.reviewedCards, d.total)}`,
+        d.assignmentLabel || d.assignmentId || "",
+      ]);
     case "hub_spanglish_started":
       return joinParts([d.mode || "normal", formatCount(d.totalItems, "item")]);
     case "hub_spanglish_review_started":
@@ -344,6 +365,15 @@ export function formatActivityDetails(log) {
       return joinParts([`Lives ${d.startingLives ?? "?"}`, `Extra life every ${d.extraLifeStreak ?? "?"}`]);
     case "hub_negatris_completed":
       return joinParts([`Score ${d.score ?? "?"}`, `Mistakes ${d.mistakes ?? "?"}`, `Streak ${d.streak ?? "?"}`, `Lives left ${d.livesRemaining ?? "?"}`]);
+    case "hub_syntax_sentinel_started":
+      return joinParts([d.mode || "normal", d.level || d.levelId || "", formatCount(d.totalItems ?? d.total, "item")]);
+    case "hub_syntax_sentinel_completed":
+      return joinParts([
+        d.mode || "normal",
+        d.level || d.levelId || "",
+        `Score ${d.score ?? "?"}`,
+        `Correct ${formatScore(d.correct, d.total ?? d.attempted)}`,
+      ]);
     case "hub_keyword_started":
     case "hub_open_cloze_started":
     case "hub_word_formation_started":

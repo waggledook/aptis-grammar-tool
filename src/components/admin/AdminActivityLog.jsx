@@ -1,6 +1,16 @@
 // src/components/admin/AdminActivityLog.jsx
-import React, { useEffect, useState } from "react";
-import { collection, getDocs, orderBy, limit, query, startAfter, where } from "firebase/firestore";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  startAfter,
+  where,
+} from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
 import {
@@ -14,8 +24,78 @@ import {
 } from "../../utils/adminActivity";
 
 const PAGE_SIZE = 200;
-const CACHE_KEY = "admin-activity-log-cache-v2";
+const CACHE_KEY_PREFIX = "admin-activity-log-cache-v3";
 const CACHE_TTL_MS = 2 * 60 * 1000;
+const DEFAULT_FILTERS = Object.freeze({ type: "all", user: "" });
+
+function normalizeFilters(filters = DEFAULT_FILTERS) {
+  const user = String(filters.user || "").trim();
+  return {
+    type: filters.type || "all",
+    user: user.includes("@") ? user.toLowerCase() : user,
+  };
+}
+
+function getCacheKey(filters) {
+  const normalized = normalizeFilters(filters);
+  return `${CACHE_KEY_PREFIX}:${encodeURIComponent(normalized.type)}:${encodeURIComponent(normalized.user)}`;
+}
+
+function getUserFilter(filters) {
+  const user = normalizeFilters(filters).user;
+  if (!user) return null;
+  return user.includes("@")
+    ? { field: "userEmail", value: user }
+    : { field: "userId", value: user };
+}
+
+function shouldQueryActivity(filters) {
+  return normalizeFilters(filters).type !== WRITING_GENERAL_SUBMISSION_TYPE;
+}
+
+function shouldQuerySubmissions(filters) {
+  const type = normalizeFilters(filters).type;
+  return type === "all" || type === WRITING_GENERAL_SUBMISSION_TYPE;
+}
+
+function buildSourceQuery(source, filters, { cursorDoc = null, newerThan = null } = {}) {
+  const normalized = normalizeFilters(filters);
+  const constraints = [];
+  const userFilter = getUserFilter(normalized);
+
+  if (source === "activityLog" && normalized.type !== "all") {
+    constraints.push(where("type", "==", normalized.type));
+  }
+  if (userFilter) constraints.push(where(userFilter.field, "==", userFilter.value));
+  if (newerThan) constraints.push(where("createdAt", ">", new Date(newerThan)));
+  constraints.push(orderBy("createdAt", "desc"));
+  if (cursorDoc) constraints.push(startAfter(cursorDoc));
+  constraints.push(limit(PAGE_SIZE));
+
+  return query(collection(db, source), ...constraints);
+}
+
+function mapActivityDocs(snapshot) {
+  if (!snapshot) return [];
+  return snapshot.docs
+    .map((entry) => {
+      const data = entry.data();
+      const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
+      if (!createdAt) return null;
+      return { id: entry.id, ...data, source: "activityLog", createdAt };
+    })
+    .filter(Boolean);
+}
+
+function mapSubmissionDocs(snapshot) {
+  if (!snapshot) return [];
+  return snapshot.docs.map(buildWritingGeneralSubmissionActivity).filter(Boolean);
+}
+
+function snapshotTimestamp(snapshot, position) {
+  const entry = position === "first" ? snapshot?.docs?.[0] : snapshot?.docs?.[snapshot.docs.length - 1];
+  return entry?.data()?.createdAt?.toMillis?.() || entry?.data()?.createdAt?.seconds * 1000 || null;
+}
 
 function serializeLog(log) {
   return {
@@ -34,11 +114,11 @@ function hydrateLog(log) {
   };
 }
 
-function readCache() {
+function readCache(filters) {
   if (typeof window === "undefined") return null;
 
   try {
-    const raw = window.sessionStorage.getItem(CACHE_KEY);
+    const raw = window.sessionStorage.getItem(getCacheKey(filters));
     if (!raw) return null;
 
     const parsed = JSON.parse(raw);
@@ -47,8 +127,8 @@ function readCache() {
 
     return {
       logs: parsed.logs.map(hydrateLog).filter((entry) => entry.createdAt instanceof Date && !Number.isNaN(entry.createdAt.getTime())),
-      activityCursorValue: parsed.activityCursorValue || null,
-      submissionCursorValue: parsed.submissionCursorValue || null,
+      activityCursorId: parsed.activityCursorId || null,
+      submissionCursorId: parsed.submissionCursorId || null,
       newestActivityValue: parsed.newestActivityValue || null,
       newestSubmissionValue: parsed.newestSubmissionValue || null,
       hasMoreActivity: !!parsed.hasMoreActivity,
@@ -61,9 +141,10 @@ function readCache() {
 }
 
 function writeCache({
+  filters,
   logs,
-  activityCursorValue,
-  submissionCursorValue,
+  activityCursorId,
+  submissionCursorId,
   newestActivityValue,
   newestSubmissionValue,
   hasMoreActivity,
@@ -73,12 +154,12 @@ function writeCache({
 
   try {
     window.sessionStorage.setItem(
-      CACHE_KEY,
+      getCacheKey(filters),
       JSON.stringify({
         savedAt: Date.now(),
         logs: (logs || []).map(serializeLog),
-        activityCursorValue: activityCursorValue || null,
-        submissionCursorValue: submissionCursorValue || null,
+        activityCursorId: activityCursorId || null,
+        submissionCursorId: submissionCursorId || null,
         newestActivityValue: newestActivityValue || null,
         newestSubmissionValue: newestSubmissionValue || null,
         hasMoreActivity: !!hasMoreActivity,
@@ -90,11 +171,11 @@ function writeCache({
   }
 }
 
-function clearCache() {
+function clearCache(filters) {
   if (typeof window === "undefined") return;
 
   try {
-    window.sessionStorage.removeItem(CACHE_KEY);
+    window.sessionStorage.removeItem(getCacheKey(filters));
   } catch (error) {
     console.warn("[AdminActivityLog] Could not clear cache", error);
   }
@@ -107,337 +188,190 @@ export default function AdminActivityLog({ user }) {
   const [loading, setLoading] = useState(true);
   const [filterType, setFilterType] = useState("all");
   const [filterEmail, setFilterEmail] = useState("");
+  const [appliedFilters, setAppliedFilters] = useState(DEFAULT_FILTERS);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [activityCursorDoc, setActivityCursorDoc] = useState(null);
   const [submissionCursorDoc, setSubmissionCursorDoc] = useState(null);
-  const [activityCursorValue, setActivityCursorValue] = useState(null);
-  const [submissionCursorValue, setSubmissionCursorValue] = useState(null);
+  const [activityCursorId, setActivityCursorId] = useState(null);
+  const [submissionCursorId, setSubmissionCursorId] = useState(null);
   const [newestActivityValue, setNewestActivityValue] = useState(null);
   const [newestSubmissionValue, setNewestSubmissionValue] = useState(null);
   const [hasMoreActivity, setHasMoreActivity] = useState(true);
   const [hasMoreSubmissions, setHasMoreSubmissions] = useState(true);
   const [usingCache, setUsingCache] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState("");
   const navigate = useNavigate();
+
+  const loadFilters = useCallback(async (nextFilters, { forceRefresh = false } = {}) => {
+    const filters = normalizeFilters(nextFilters);
+    setError("");
+
+    const cached = forceRefresh ? null : readCache(filters);
+    if (cached) {
+      setLogs(cached.logs);
+      setAppliedFilters(filters);
+      setLoading(false);
+      setUsingCache(true);
+      setActivityCursorDoc(null);
+      setSubmissionCursorDoc(null);
+      setActivityCursorId(cached.activityCursorId);
+      setSubmissionCursorId(cached.submissionCursorId);
+      setNewestActivityValue(cached.newestActivityValue);
+      setNewestSubmissionValue(cached.newestSubmissionValue);
+      setHasMoreActivity(cached.hasMoreActivity);
+      setHasMoreSubmissions(cached.hasMoreSubmissions);
+      setHasMore(cached.hasMoreActivity || cached.hasMoreSubmissions);
+      return;
+    }
+
+    setLoading(true);
+    setUsingCache(false);
+    setActivityCursorDoc(null);
+    setSubmissionCursorDoc(null);
+    setActivityCursorId(null);
+    setSubmissionCursorId(null);
+
+    try {
+      const [activitySnap, submissionSnap] = await Promise.all([
+        shouldQueryActivity(filters)
+          ? getDocs(buildSourceQuery("activityLog", filters))
+          : Promise.resolve(null),
+        shouldQuerySubmissions(filters)
+          ? getDocs(buildSourceQuery("submissions", filters))
+          : Promise.resolve(null),
+      ]);
+      const nextLogs = [...mapActivityDocs(activitySnap), ...mapSubmissionDocs(submissionSnap)].sort(sortActivitiesByDateDesc);
+      const nextActivityCursor = activitySnap?.docs?.[activitySnap.docs.length - 1] || null;
+      const nextSubmissionCursor = submissionSnap?.docs?.[submissionSnap.docs.length - 1] || null;
+      const moreActivity = !!activitySnap && activitySnap.docs.length === PAGE_SIZE;
+      const moreSubmissions = !!submissionSnap && submissionSnap.docs.length === PAGE_SIZE;
+      const newestActivity = snapshotTimestamp(activitySnap, "first");
+      const newestSubmission = snapshotTimestamp(submissionSnap, "first");
+
+      setLogs(nextLogs);
+      setAppliedFilters(filters);
+      setActivityCursorDoc(nextActivityCursor);
+      setSubmissionCursorDoc(nextSubmissionCursor);
+      setActivityCursorId(nextActivityCursor?.id || null);
+      setSubmissionCursorId(nextSubmissionCursor?.id || null);
+      setNewestActivityValue(newestActivity);
+      setNewestSubmissionValue(newestSubmission);
+      setHasMoreActivity(moreActivity);
+      setHasMoreSubmissions(moreSubmissions);
+      setHasMore(moreActivity || moreSubmissions);
+      writeCache({
+        filters,
+        logs: nextLogs,
+        activityCursorId: nextActivityCursor?.id || null,
+        submissionCursorId: nextSubmissionCursor?.id || null,
+        newestActivityValue: newestActivity,
+        newestSubmissionValue: newestSubmission,
+        hasMoreActivity: moreActivity,
+        hasMoreSubmissions: moreSubmissions,
+      });
+    } catch (loadError) {
+      console.error("[AdminActivityLog] Could not load activity", loadError);
+      setError("Activity could not be loaded. Check the filters or Firestore indexes and try again.");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (!user || user.role !== "admin") return;
-
-    async function load(forceRefresh = false) {
-      const cached = !forceRefresh ? readCache() : null;
-      if (cached) {
-        setLogs(cached.logs);
-        setLoading(false);
-        setUsingCache(true);
-        setActivityCursorValue(cached.activityCursorValue);
-        setSubmissionCursorValue(cached.submissionCursorValue);
-        setNewestActivityValue(cached.newestActivityValue);
-        setNewestSubmissionValue(cached.newestSubmissionValue);
-        setHasMoreActivity(cached.hasMoreActivity);
-        setHasMoreSubmissions(cached.hasMoreSubmissions);
-        setHasMore(cached.hasMoreActivity || cached.hasMoreSubmissions);
-        return;
-      }
-
-      setLoading(true);
-      setUsingCache(false);
-      setHasMore(true);
-      setActivityCursorDoc(null);
-      setSubmissionCursorDoc(null);
-      setActivityCursorValue(null);
-      setSubmissionCursorValue(null);
-      setNewestActivityValue(null);
-      setNewestSubmissionValue(null);
-
-      const activityQuery = query(
-        collection(db, "activityLog"),
-        orderBy("createdAt", "desc"),
-        limit(PAGE_SIZE)
-      );
-
-      const submissionQuery = query(
-        collection(db, "submissions"),
-        orderBy("createdAt", "desc"),
-        limit(PAGE_SIZE)
-      );
-
-      const [activitySnap, submissionSnap] = await Promise.all([
-        getDocs(activityQuery),
-        getDocs(submissionQuery),
-      ]);
-
-      const activityLogs = activitySnap.docs
-        .map((d) => {
-          const data = d.data();
-          const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
-          if (!createdAt) return null;
-
-          return {
-            id: d.id,
-            ...data,
-            createdAt,
-          };
-        })
-        .filter(Boolean);
-
-      const submissionLogs = submissionSnap.docs
-        .map((docSnap) => buildWritingGeneralSubmissionActivity(docSnap))
-        .filter(Boolean);
-
-      setLogs([...activityLogs, ...submissionLogs].sort(sortActivitiesByDateDesc));
-
-      const lastActivity = activitySnap.docs[activitySnap.docs.length - 1] || null;
-      const lastSubmission = submissionSnap.docs[submissionSnap.docs.length - 1] || null;
-      const firstActivity = activitySnap.docs[0] || null;
-      const firstSubmission = submissionSnap.docs[0] || null;
-      setActivityCursorDoc(lastActivity);
-      setSubmissionCursorDoc(lastSubmission);
-      setActivityCursorValue(
-        lastActivity?.data()?.createdAt?.toMillis?.() || lastActivity?.data()?.createdAt?.seconds * 1000 || null
-      );
-      setSubmissionCursorValue(
-        lastSubmission?.data()?.createdAt?.toMillis?.() || lastSubmission?.data()?.createdAt?.seconds * 1000 || null
-      );
-      setNewestActivityValue(
-        firstActivity?.data()?.createdAt?.toMillis?.() || firstActivity?.data()?.createdAt?.seconds * 1000 || null
-      );
-      setNewestSubmissionValue(
-        firstSubmission?.data()?.createdAt?.toMillis?.() || firstSubmission?.data()?.createdAt?.seconds * 1000 || null
-      );
-      setHasMoreActivity(activitySnap.docs.length === PAGE_SIZE);
-      setHasMoreSubmissions(submissionSnap.docs.length === PAGE_SIZE);
-      setHasMore(activitySnap.docs.length === PAGE_SIZE || submissionSnap.docs.length === PAGE_SIZE);
-      writeCache({
-        logs: [...activityLogs, ...submissionLogs].sort(sortActivitiesByDateDesc),
-        activityCursorValue:
-          lastActivity?.data()?.createdAt?.toMillis?.() || lastActivity?.data()?.createdAt?.seconds * 1000 || null,
-        submissionCursorValue:
-          lastSubmission?.data()?.createdAt?.toMillis?.() || lastSubmission?.data()?.createdAt?.seconds * 1000 || null,
-        newestActivityValue:
-          firstActivity?.data()?.createdAt?.toMillis?.() || firstActivity?.data()?.createdAt?.seconds * 1000 || null,
-        newestSubmissionValue:
-          firstSubmission?.data()?.createdAt?.toMillis?.() || firstSubmission?.data()?.createdAt?.seconds * 1000 || null,
-        hasMoreActivity: activitySnap.docs.length === PAGE_SIZE,
-        hasMoreSubmissions: submissionSnap.docs.length === PAGE_SIZE,
-      });
-
-      setLoading(false);
-    }
-
-    load();
-  }, [user]);
+    void loadFilters(DEFAULT_FILTERS);
+  }, [loadFilters, user]);
 
   async function loadMore() {
     if (loadingMore || !hasMore) return;
-  
     setLoadingMore(true);
+    setError("");
 
-    const requests = [];
+    try {
+      let resolvedActivityCursor = activityCursorDoc;
+      let resolvedSubmissionCursor = submissionCursorDoc;
+      if (hasMoreActivity && !resolvedActivityCursor && activityCursorId) {
+        const cursorSnap = await getDoc(doc(db, "activityLog", activityCursorId));
+        resolvedActivityCursor = cursorSnap.exists() ? cursorSnap : null;
+      }
+      if (hasMoreSubmissions && !resolvedSubmissionCursor && submissionCursorId) {
+        const cursorSnap = await getDoc(doc(db, "submissions", submissionCursorId));
+        resolvedSubmissionCursor = cursorSnap.exists() ? cursorSnap : null;
+      }
 
-    if (hasMoreActivity && activityCursorDoc) {
-      requests.push(
-        getDocs(
-          query(
-            collection(db, "activityLog"),
-            orderBy("createdAt", "desc"),
-            startAfter(activityCursorDoc),
-            limit(PAGE_SIZE)
-          )
-        )
-      );
-    } else if (hasMoreActivity && activityCursorValue) {
-      requests.push(
-        getDocs(
-          query(
-            collection(db, "activityLog"),
-            orderBy("createdAt", "desc"),
-            startAfter(new Date(activityCursorValue)),
-            limit(PAGE_SIZE)
-          )
-        )
-      );
-    } else {
-      requests.push(Promise.resolve(null));
-    }
+      const [activitySnap, submissionSnap] = await Promise.all([
+        hasMoreActivity && resolvedActivityCursor
+          ? getDocs(buildSourceQuery("activityLog", appliedFilters, { cursorDoc: resolvedActivityCursor }))
+          : Promise.resolve(null),
+        hasMoreSubmissions && resolvedSubmissionCursor
+          ? getDocs(buildSourceQuery("submissions", appliedFilters, { cursorDoc: resolvedSubmissionCursor }))
+          : Promise.resolve(null),
+      ]);
+      const nextActivityCursor = activitySnap?.docs?.[activitySnap.docs.length - 1] || resolvedActivityCursor;
+      const nextSubmissionCursor = submissionSnap?.docs?.[submissionSnap.docs.length - 1] || resolvedSubmissionCursor;
+      const moreActivity = activitySnap ? activitySnap.docs.length === PAGE_SIZE : false;
+      const moreSubmissions = submissionSnap ? submissionSnap.docs.length === PAGE_SIZE : false;
 
-    if (hasMoreSubmissions && submissionCursorDoc) {
-      requests.push(
-        getDocs(
-          query(
-            collection(db, "submissions"),
-            orderBy("createdAt", "desc"),
-            startAfter(submissionCursorDoc),
-            limit(PAGE_SIZE)
-          )
-        )
-      );
-    } else if (hasMoreSubmissions && submissionCursorValue) {
-      requests.push(
-        getDocs(
-          query(
-            collection(db, "submissions"),
-            orderBy("createdAt", "desc"),
-            startAfter(new Date(submissionCursorValue)),
-            limit(PAGE_SIZE)
-          )
-        )
-      );
-    } else {
-      requests.push(Promise.resolve(null));
-    }
-
-    const [activitySnap, submissionSnap] = await Promise.all(requests);
-
-    const nextActivityLogs = activitySnap
-      ? activitySnap.docs
-          .map((d) => {
-            const data = d.data();
-            const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
-            if (!createdAt) return null;
-
-            return {
-              id: d.id,
-              ...data,
-              createdAt,
-            };
-          })
-          .filter(Boolean)
-      : [];
-
-    const nextSubmissionLogs = submissionSnap
-      ? submissionSnap.docs
-          .map((docSnap) => buildWritingGeneralSubmissionActivity(docSnap))
-          .filter(Boolean)
-      : [];
-
-    setLogs((prev) =>
-      {
-        const nextLogs = [...prev, ...nextActivityLogs, ...nextSubmissionLogs].sort(sortActivitiesByDateDesc);
+      setLogs((previous) => {
+        const nextLogs = [...previous, ...mapActivityDocs(activitySnap), ...mapSubmissionDocs(submissionSnap)].sort(sortActivitiesByDateDesc);
         writeCache({
+          filters: appliedFilters,
           logs: nextLogs,
-          activityCursorValue:
-            (activitySnap && activitySnap.docs.length
-              ? activitySnap.docs[activitySnap.docs.length - 1]?.data()?.createdAt?.toMillis?.() ||
-                activitySnap.docs[activitySnap.docs.length - 1]?.data()?.createdAt?.seconds * 1000
-              : activityCursorValue) || null,
-          submissionCursorValue:
-            (submissionSnap && submissionSnap.docs.length
-              ? submissionSnap.docs[submissionSnap.docs.length - 1]?.data()?.createdAt?.toMillis?.() ||
-                submissionSnap.docs[submissionSnap.docs.length - 1]?.data()?.createdAt?.seconds * 1000
-              : submissionCursorValue) || null,
+          activityCursorId: nextActivityCursor?.id || activityCursorId,
+          submissionCursorId: nextSubmissionCursor?.id || submissionCursorId,
           newestActivityValue,
           newestSubmissionValue,
-          hasMoreActivity: activitySnap ? activitySnap.docs.length === PAGE_SIZE : hasMoreActivity,
-          hasMoreSubmissions: submissionSnap ? submissionSnap.docs.length === PAGE_SIZE : hasMoreSubmissions,
+          hasMoreActivity: moreActivity,
+          hasMoreSubmissions: moreSubmissions,
         });
         return nextLogs;
-      }
-    );
-
-    const lastActivity =
-      activitySnap && activitySnap.docs.length
-        ? activitySnap.docs[activitySnap.docs.length - 1]
-        : activityCursorDoc;
-    const lastSubmission =
-      submissionSnap && submissionSnap.docs.length
-        ? submissionSnap.docs[submissionSnap.docs.length - 1]
-        : submissionCursorDoc;
-    const moreActivity = activitySnap ? activitySnap.docs.length === PAGE_SIZE : hasMoreActivity;
-    const moreSubmissions = submissionSnap
-      ? submissionSnap.docs.length === PAGE_SIZE
-      : hasMoreSubmissions;
-
-    setActivityCursorDoc(lastActivity);
-    setSubmissionCursorDoc(lastSubmission);
-    setActivityCursorValue(
-      lastActivity?.data?.()?.createdAt?.toMillis?.() || lastActivity?.data?.()?.createdAt?.seconds * 1000 || activityCursorValue
-    );
-    setSubmissionCursorValue(
-      lastSubmission?.data?.()?.createdAt?.toMillis?.() || lastSubmission?.data?.()?.createdAt?.seconds * 1000 || submissionCursorValue
-    );
-    setHasMoreActivity(moreActivity);
-    setHasMoreSubmissions(moreSubmissions);
-    setHasMore(moreActivity || moreSubmissions);
-    setLoadingMore(false);
+      });
+      setActivityCursorDoc(nextActivityCursor);
+      setSubmissionCursorDoc(nextSubmissionCursor);
+      setActivityCursorId(nextActivityCursor?.id || null);
+      setSubmissionCursorId(nextSubmissionCursor?.id || null);
+      setHasMoreActivity(moreActivity);
+      setHasMoreSubmissions(moreSubmissions);
+      setHasMore(moreActivity || moreSubmissions);
+    } catch (loadMoreError) {
+      console.error("[AdminActivityLog] Could not load more activity", loadMoreError);
+      setError("More activity could not be loaded. Please try again.");
+    } finally {
+      setLoadingMore(false);
+    }
   }
 
   async function refreshNow() {
     if (refreshing) return;
     setRefreshing(true);
-    clearCache();
-    setActivityCursorDoc(null);
-    setSubmissionCursorDoc(null);
+    setError("");
+    clearCache(appliedFilters);
 
     try {
-      const activityQuery = newestActivityValue
-        ? query(
-            collection(db, "activityLog"),
-            where("createdAt", ">", new Date(newestActivityValue)),
-            orderBy("createdAt", "desc"),
-            limit(PAGE_SIZE)
-          )
-        : query(
-            collection(db, "activityLog"),
-            orderBy("createdAt", "desc"),
-            limit(PAGE_SIZE)
-          );
-
-      const submissionQuery = newestSubmissionValue
-        ? query(
-            collection(db, "submissions"),
-            where("createdAt", ">", new Date(newestSubmissionValue)),
-            orderBy("createdAt", "desc"),
-            limit(PAGE_SIZE)
-          )
-        : query(
-            collection(db, "submissions"),
-            orderBy("createdAt", "desc"),
-            limit(PAGE_SIZE)
-          );
-
       const [activitySnap, submissionSnap] = await Promise.all([
-        getDocs(activityQuery),
-        getDocs(submissionQuery),
+        shouldQueryActivity(appliedFilters)
+          ? getDocs(buildSourceQuery("activityLog", appliedFilters, { newerThan: newestActivityValue }))
+          : Promise.resolve(null),
+        shouldQuerySubmissions(appliedFilters)
+          ? getDocs(buildSourceQuery("submissions", appliedFilters, { newerThan: newestSubmissionValue }))
+          : Promise.resolve(null),
       ]);
-
-      const activityLogs = activitySnap.docs
-        .map((d) => {
-          const data = d.data();
-          const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
-          if (!createdAt) return null;
-
-          return {
-            id: d.id,
-            ...data,
-            createdAt,
-          };
-        })
-        .filter(Boolean);
-
-      const submissionLogs = submissionSnap.docs
-        .map((docSnap) => buildWritingGeneralSubmissionActivity(docSnap))
-        .filter(Boolean);
-
-      const nextNewestActivityValue =
-        activitySnap.docs[0]?.data()?.createdAt?.toMillis?.() ||
-        activitySnap.docs[0]?.data()?.createdAt?.seconds * 1000 ||
-        newestActivityValue ||
-        null;
-      const nextNewestSubmissionValue =
-        submissionSnap.docs[0]?.data()?.createdAt?.toMillis?.() ||
-        submissionSnap.docs[0]?.data()?.createdAt?.seconds * 1000 ||
-        newestSubmissionValue ||
-        null;
+      const activityLogs = mapActivityDocs(activitySnap);
+      const submissionLogs = mapSubmissionDocs(submissionSnap);
+      const nextNewestActivityValue = snapshotTimestamp(activitySnap, "first") || newestActivityValue;
+      const nextNewestSubmissionValue = snapshotTimestamp(submissionSnap, "first") || newestSubmissionValue;
 
       setLogs((prev) => {
-        const seen = new Set(prev.map((entry) => `${entry.type}:${entry.id}`));
-        const incoming = [...activityLogs, ...submissionLogs].filter((entry) => !seen.has(`${entry.type}:${entry.id}`));
+        const seen = new Set(prev.map((entry) => `${entry.source}:${entry.id}`));
+        const incoming = [...activityLogs, ...submissionLogs].filter((entry) => !seen.has(`${entry.source}:${entry.id}`));
         const nextLogs = [...incoming, ...prev].sort(sortActivitiesByDateDesc);
         writeCache({
+          filters: appliedFilters,
           logs: nextLogs,
-          activityCursorValue,
-          submissionCursorValue,
+          activityCursorId,
+          submissionCursorId,
           newestActivityValue: nextNewestActivityValue,
           newestSubmissionValue: nextNewestSubmissionValue,
           hasMoreActivity,
@@ -448,30 +382,24 @@ export default function AdminActivityLog({ user }) {
       setUsingCache(false);
       setNewestActivityValue(nextNewestActivityValue);
       setNewestSubmissionValue(nextNewestSubmissionValue);
+    } catch (refreshError) {
+      console.error("[AdminActivityLog] Could not refresh activity", refreshError);
+      setError("Activity could not be refreshed. Please try again.");
     } finally {
       setRefreshing(false);
     }
   }
 
+  const filtersDirty = filterType !== appliedFilters.type || normalizeFilters({ type: filterType, user: filterEmail }).user !== appliedFilters.user;
+  const sourceCounts = useMemo(() => logs.reduce((counts, log) => {
+    if (log.source === "submissions") counts.submissions += 1;
+    else counts.activityLog += 1;
+    return counts;
+  }, { activityLog: 0, submissions: 0 }), [logs]);
+
   if (!user || user.role !== "admin") {
     return <p>⛔ You do not have permission to view this page.</p>;
   }
-
-  const filteredLogs = logs.filter((log) => {
-    if (filterType !== "all" && log.type !== filterType) return false;
-    const userSearchText = [
-      log.userLabel,
-      log.userEmail,
-      log.userId,
-    ].filter(Boolean).join(" ").toLowerCase();
-    if (
-      filterEmail &&
-      !userSearchText.includes(filterEmail.toLowerCase())
-    ) {
-      return false;
-    }
-    return true;
-  });
 
   const goToProfile = (uid) => {
     navigate(`/teacher/student/${uid}`);
@@ -512,13 +440,17 @@ export default function AdminActivityLog({ user }) {
         </button>
 
         <button className="review-btn" onClick={() => navigate("/admin/activity-charts")}>
-          Charts
+          Raw event explorer
+        </button>
+
+        <button className="review-btn" onClick={() => navigate("/admin/activity-insights")}>
+          Insights
         </button>
       </div>
 
       <h1 style={{ marginTop: "0.75rem" }}>Activity log</h1>
       <p className="muted small">
-        Showing {logs.length} events (loaded in batches of {PAGE_SIZE}).
+        Loaded {logs.length} matching events: {sourceCounts.activityLog} activity events and {sourceCounts.submissions} Writing General submissions.
         {usingCache ? " Using cached results." : ""}
       </p>
       <div className="activity-log-refresh-row">
@@ -569,12 +501,12 @@ export default function AdminActivityLog({ user }) {
         </div>
 
         <div style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
-          <span className="tiny muted">User email</span>
+          <span className="tiny muted">Exact email or UID</span>
           <input
             type="text"
             value={filterEmail}
             onChange={(e) => setFilterEmail(e.target.value)}
-            placeholder="filter by user"
+            placeholder="name@example.com or UID"
             style={{
               fontSize: "0.8rem",
               padding: "0.2rem 0.4rem",
@@ -586,8 +518,24 @@ export default function AdminActivityLog({ user }) {
             }}
           />
         </div>
+
+        <button
+          className="review-btn"
+          type="button"
+          onClick={() => void loadFilters({ type: filterType, user: filterEmail })}
+          disabled={!filtersDirty || loading}
+        >
+          {loading ? "Applying…" : "Apply filters"}
+        </button>
+
+        {filtersDirty ? (
+          <span className="muted small">Filters changed — apply them to query Firestore.</span>
+        ) : (
+          <span className="muted small">Filters applied. Results remain capped and paginated.</span>
+        )}
       </div>
 
+      {error ? <p role="alert" style={{ color: "#fca5a5" }}>{error}</p> : null}
       {loading && <p>Loading activity…</p>}
 
       {!loading && (
@@ -610,6 +558,9 @@ export default function AdminActivityLog({ user }) {
                   User
                 </th>
                 <th align="left" style={{ padding: "0.4rem 0.25rem" }}>
+                  Source
+                </th>
+                <th align="left" style={{ padding: "0.4rem 0.25rem" }}>
                   Type
                 </th>
                 <th align="left" style={{ padding: "0.4rem 0.25rem" }}>
@@ -618,9 +569,9 @@ export default function AdminActivityLog({ user }) {
               </tr>
             </thead>
             <tbody>
-              {filteredLogs.map((log) => (
+              {logs.map((log) => (
                 <tr
-                  key={log.id}
+                  key={`${log.source}:${log.id}`}
                   style={{
                     borderTop: "1px solid #1f2937",
                     verticalAlign: "top",
@@ -632,7 +583,12 @@ export default function AdminActivityLog({ user }) {
                   <td style={{ padding: "0.35rem 0.25rem" }}>
                     {renderLogUser(log)}
                   </td>
-                  {/* Type */}
+<td style={{ padding: "0.35rem 0.25rem" }}>
+  <span className="badge subtle small">
+    {log.source === "submissions" ? "Writing submission" : "Activity log"}
+  </span>
+</td>
+
 <td style={{ padding: "0.35rem 0.25rem" }}>
   <span className="badge subtle small">
     {getActivityTypeLabel(log.type)}
@@ -648,11 +604,16 @@ export default function AdminActivityLog({ user }) {
           </table>
         </div>
         <div className="activity-log-card-list">
-          {filteredLogs.map((log) => (
-            <article className="activity-log-card" key={log.id}>
+          {logs.map((log) => (
+            <article className="activity-log-card" key={`${log.source}:${log.id}`}>
               <div className="activity-log-card-head">
-                <span className="badge subtle small">{getActivityTypeLabel(log.type)}</span>
+                <span className="badge subtle small">
+                  {log.source === "submissions" ? "Writing submission" : "Activity log"}
+                </span>
                 <time>{log.createdAt instanceof Date ? log.createdAt.toLocaleString() : "—"}</time>
+              </div>
+              <div style={{ marginTop: "0.45rem" }}>
+                <span className="badge subtle small">{getActivityTypeLabel(log.type)}</span>
               </div>
               <div className="activity-log-card-user">{renderLogUser(log)}</div>
               <div className="activity-log-card-details">{renderLogDetails(log)}</div>

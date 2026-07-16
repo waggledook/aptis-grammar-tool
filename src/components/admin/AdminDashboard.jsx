@@ -2214,6 +2214,14 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
             View activity log
           </button>
 
+          <button
+            className="ghost-btn"
+            style={{ fontSize: "0.85rem", padding: "0.25rem 0.6rem", marginLeft: 0 }}
+            onClick={() => navigate("/admin/activity-insights")}
+          >
+            View activity insights
+          </button>
+
           {adminNotificationsOpen ? (
             <div
               style={{

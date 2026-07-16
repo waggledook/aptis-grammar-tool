@@ -1,5 +1,5 @@
 // src/components/admin/AdminActivityCharts.jsx
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   collection,
   getDocs,
@@ -7,7 +7,7 @@ import {
   where,
   orderBy,
   Timestamp,
-  limit, // ✅ add
+  limit,
 } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useNavigate } from "react-router-dom";
@@ -27,6 +27,54 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+
+const MAX_CHART_DAYS = 90;
+const MAX_DOCS_PER_SOURCE = 5000;
+const CHART_CACHE_TTL_MS = 5 * 60 * 1000;
+const CHART_CACHE_PREFIX = "admin-activity-chart-cache-v1";
+
+function chartCacheKey({ from, to, type }) {
+  return `${CHART_CACHE_PREFIX}:${from}:${to}:${encodeURIComponent(type)}`;
+}
+
+function serializeChartLog(log) {
+  return {
+    ...log,
+    createdAt: log.createdAt instanceof Date ? log.createdAt.toISOString() : log.createdAt,
+  };
+}
+
+function readChartCache(config) {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.sessionStorage.getItem(chartCacheKey(config));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed.logs) || Date.now() - Number(parsed.savedAt || 0) > CHART_CACHE_TTL_MS) return null;
+    return {
+      logs: parsed.logs
+        .map((log) => ({ ...log, createdAt: new Date(log.createdAt) }))
+        .filter((log) => !Number.isNaN(log.createdAt.getTime())),
+      truncated: !!parsed.truncated,
+    };
+  } catch (error) {
+    console.warn("[AdminActivityCharts] Could not read cache", error);
+    return null;
+  }
+}
+
+function writeChartCache(config, logs, truncated) {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.setItem(chartCacheKey(config), JSON.stringify({
+      savedAt: Date.now(),
+      logs: logs.map(serializeChartLog),
+      truncated: !!truncated,
+    }));
+  } catch (error) {
+    console.warn("[AdminActivityCharts] Could not write cache", error);
+  }
+}
 
 function isoDate(d) {
   // Local YYYY-MM-DD (NOT UTC)
@@ -108,15 +156,11 @@ function computeRows({ logs, from, to, groupBy }) {
 
 export default function AdminActivityCharts({ user }) {
   const navigate = useNavigate();
-
-  if (!user || user.role !== "admin") {
-    return <p>⛔ You do not have permission to view this page.</p>;
-  }
-
+  const isAdmin = !!user && user.role === "admin";
   const today = useMemo(() => new Date(), []);
   const [from, setFrom] = useState(() => {
     const d = new Date();
-    d.setDate(d.getDate() - 30);
+    d.setDate(d.getDate() - 29);
     return isoDate(d);
   });
   const [to, setTo] = useState(() => isoDate(today));
@@ -128,6 +172,10 @@ export default function AdminActivityCharts({ user }) {
   // fetched logs for the current range/type
   const [rawLogs, setRawLogs] = useState([]); // [{ userId, userEmail, type, createdAt: Date, details }]
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [loadedConfig, setLoadedConfig] = useState(null);
+  const [usingCache, setUsingCache] = useState(false);
+  const [truncated, setTruncated] = useState(false);
 
   // user drill-down
   const [selectedUserId, setSelectedUserId] = useState("");
@@ -136,14 +184,18 @@ export default function AdminActivityCharts({ user }) {
   const [userResults, setUserResults] = useState([]);
   const [userSearching, setUserSearching] = useState(false);
 
+  const chartFrom = loadedConfig?.from || from;
+  const chartTo = loadedConfig?.to || to;
+  const filtersDirty = !loadedConfig || from !== loadedConfig.from || to !== loadedConfig.to || typeFilter !== loadedConfig.type;
+
   // Chart rows derived from raw logs + selected user + groupBy
   const rows = useMemo(() => {
     const subset = selectedUserId
       ? rawLogs.filter((l) => l.userId === selectedUserId)
       : rawLogs;
 
-    return computeRows({ logs: subset, from, to, groupBy });
-  }, [rawLogs, selectedUserId, from, to, groupBy]);
+    return computeRows({ logs: subset, from: chartFrom, to: chartTo, groupBy });
+  }, [rawLogs, selectedUserId, chartFrom, chartTo, groupBy]);
 
   // Top users (leaderboard) derived from rawLogs
   const topUsers = useMemo(() => {
@@ -186,6 +238,48 @@ export default function AdminActivityCharts({ user }) {
       .slice(0, 8);
   }, [rawLogs, selectedUserId]);
 
+  const sourceCounts = useMemo(() => rawLogs.reduce((counts, log) => {
+    if (log.source === "submissions") counts.submissions += 1;
+    else counts.activityLog += 1;
+    return counts;
+  }, { activityLog: 0, submissions: 0 }), [rawLogs]);
+
+  useEffect(() => {
+    const term = userQuery.trim().toLowerCase();
+    if (!isAdmin || term.length < 3) {
+      setUserResults([]);
+      setUserSearching(false);
+      return undefined;
+    }
+
+    let cancelled = false;
+    setUserSearching(true);
+    const timer = window.setTimeout(async () => {
+      try {
+        const snap = await getDocs(query(
+          collection(db, "users"),
+          orderBy("email"),
+          where("email", ">=", term),
+          where("email", "<=", `${term}\uf8ff`),
+          limit(10)
+        ));
+        if (!cancelled) {
+          setUserResults(snap.docs.map((entry) => ({ id: entry.id, ...entry.data() })));
+        }
+      } catch (searchError) {
+        console.error("[AdminActivityCharts] User search failed", searchError);
+        if (!cancelled) setError("User search could not be completed.");
+      } finally {
+        if (!cancelled) setUserSearching(false);
+      }
+    }, 500);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
+  }, [isAdmin, userQuery]);
+
   function clearUser() {
     setSelectedUserId("");
     setSelectedUserEmail("");
@@ -214,43 +308,33 @@ export default function AdminActivityCharts({ user }) {
     setTo(isoDate(b));
   }
 
-  async function searchUsers(input) {
-    const term = input.trim().toLowerCase();
-    setUserQuery(input);
-  
-    if (term.length < 2) {
-      setUserResults([]);
-      return;
-    }
-  
-    setUserSearching(true);
-  
-    // Prefix search on users.email (works well if emails are stored lowercase)
-    const qRef = query(
-      collection(db, "users"),
-      orderBy("email"),
-      where("email", ">=", term),
-      where("email", "<=", term + "\uf8ff"),
-      limit(10)
-    );
-  
-    const snap = await getDocs(qRef);
-  
-    setUserResults(
-      snap.docs.map((d) => ({
-        id: d.id,
-        ...d.data(),
-      }))
-    );
-  
-    setUserSearching(false);
-  }
-
   async function loadChart() {
-    setLoading(true);
-
     const fromD = startOfDay(parseYMD(from));
     const toD = endOfDay(parseYMD(to));
+    const rangeDays = Math.floor((toD.getTime() - fromD.getTime()) / 86400000) + 1;
+
+    setError("");
+    if (fromD > toD) {
+      setError("The From date must be before the To date.");
+      return;
+    }
+    if (rangeDays > MAX_CHART_DAYS) {
+      setError(`Choose a range of ${MAX_CHART_DAYS} days or fewer to control Firestore reads.`);
+      return;
+    }
+
+    const config = { from, to, type: typeFilter };
+    const cached = readChartCache(config);
+    if (cached) {
+      setRawLogs(cached.logs);
+      setLoadedConfig(config);
+      setUsingCache(true);
+      setTruncated(cached.truncated);
+      return;
+    }
+
+    setLoading(true);
+    setUsingCache(false);
 
     const fromTs = Timestamp.fromDate(fromD);
     const toTs = Timestamp.fromDate(toD);
@@ -258,43 +342,45 @@ export default function AdminActivityCharts({ user }) {
     const shouldLoadActivityLog = typeFilter === "all" || typeFilter !== WRITING_GENERAL_SUBMISSION_TYPE;
     const shouldLoadSubmissions = typeFilter === "all" || typeFilter === WRITING_GENERAL_SUBMISSION_TYPE;
 
-    const activityPromise = shouldLoadActivityLog
-      ? getDocs(
-          typeFilter === "all"
-            ? query(
-                collection(db, "activityLog"),
-                where("createdAt", ">=", fromTs),
-                where("createdAt", "<=", toTs),
-                orderBy("createdAt", "asc")
-              )
-            : query(
-                collection(db, "activityLog"),
-                where("type", "==", typeFilter),
-                where("createdAt", ">=", fromTs),
-                where("createdAt", "<=", toTs),
-                orderBy("createdAt", "asc")
-              )
-        )
-      : Promise.resolve(null);
-
-    const submissionsPromise = shouldLoadSubmissions
-      ? getDocs(
-          query(
-            collection(db, "submissions"),
-            where("createdAt", ">=", fromTs),
-            where("createdAt", "<=", toTs),
-            orderBy("createdAt", "asc")
+    try {
+      const activityPromise = shouldLoadActivityLog
+        ? getDocs(
+            typeFilter === "all"
+              ? query(
+                  collection(db, "activityLog"),
+                  where("createdAt", ">=", fromTs),
+                  where("createdAt", "<=", toTs),
+                  orderBy("createdAt", "asc"),
+                  limit(MAX_DOCS_PER_SOURCE + 1)
+                )
+              : query(
+                  collection(db, "activityLog"),
+                  where("type", "==", typeFilter),
+                  where("createdAt", ">=", fromTs),
+                  where("createdAt", "<=", toTs),
+                  orderBy("createdAt", "asc"),
+                  limit(MAX_DOCS_PER_SOURCE + 1)
+                )
           )
-        )
-      : Promise.resolve(null);
+        : Promise.resolve(null);
 
-    const [activitySnap, submissionsSnap] = await Promise.all([
-      activityPromise,
-      submissionsPromise,
-    ]);
+      const submissionsPromise = shouldLoadSubmissions
+        ? getDocs(
+            query(
+              collection(db, "submissions"),
+              where("createdAt", ">=", fromTs),
+              where("createdAt", "<=", toTs),
+              orderBy("createdAt", "asc"),
+              limit(MAX_DOCS_PER_SOURCE + 1)
+            )
+          )
+        : Promise.resolve(null);
 
-    const activityRows = activitySnap
-      ? activitySnap.docs
+      const [activitySnap, submissionsSnap] = await Promise.all([activityPromise, submissionsPromise]);
+      const wasTruncated = (activitySnap?.docs.length || 0) > MAX_DOCS_PER_SOURCE ||
+        (submissionsSnap?.docs.length || 0) > MAX_DOCS_PER_SOURCE;
+      const activityRows = activitySnap
+        ? activitySnap.docs.slice(0, MAX_DOCS_PER_SOURCE)
           .map((doc) => {
             const data = doc.data();
             const dt = data.createdAt?.toDate ? data.createdAt.toDate() : null;
@@ -307,20 +393,35 @@ export default function AdminActivityCharts({ user }) {
               userLabel: data.userLabel || data.userEmail || "",
               type: data.type || "",
               details: data.details || {},
+              app: data.app || "",
+              source: "activityLog",
               createdAt: dt,
             };
           })
           .filter(Boolean)
-      : [];
+        : [];
 
-    const submissionRows = submissionsSnap
-      ? submissionsSnap.docs
+      const submissionRows = submissionsSnap
+        ? submissionsSnap.docs.slice(0, MAX_DOCS_PER_SOURCE)
           .map((docSnap) => buildWritingGeneralSubmissionActivity(docSnap))
           .filter(Boolean)
-      : [];
+        : [];
+      const nextLogs = [...activityRows, ...submissionRows];
 
-    setRawLogs([...activityRows, ...submissionRows]);
-    setLoading(false);
+      setRawLogs(nextLogs);
+      setLoadedConfig(config);
+      setTruncated(wasTruncated);
+      writeChartCache(config, nextLogs, wasTruncated);
+    } catch (chartError) {
+      console.error("[AdminActivityCharts] Could not load chart", chartError);
+      setError("Chart data could not be loaded. Check the date range or Firestore indexes and try again.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  if (!isAdmin) {
+    return <p>⛔ You do not have permission to view this page.</p>;
   }
 
   return (
@@ -337,6 +438,10 @@ export default function AdminActivityCharts({ user }) {
   ← Back to Activity Log
 </button>
 
+        <button className="review-btn" onClick={() => navigate("/admin/activity-insights")}>
+          Aggregate insights
+        </button>
+
         {selectedUserId ? (
           <button className="review-btn" onClick={clearUser}>
             Clear user
@@ -346,8 +451,7 @@ export default function AdminActivityCharts({ user }) {
 
       <h1 style={{ marginTop: "0.75rem" }}>Activity charts</h1>
       <p className="muted small">
-        Counts are aggregated client-side from activityLog for the selected date
-        range.
+        Queries run only when you select Update chart, cover at most {MAX_CHART_DAYS} days, and are cached for five minutes per tab.
       </p>
 
       {/* Controls */}
@@ -433,7 +537,23 @@ export default function AdminActivityCharts({ user }) {
         <button className="review-btn" onClick={loadChart} disabled={loading}>
           {loading ? "Loading…" : "Update chart"}
         </button>
+
+        <span className="muted small">
+          {filtersDirty
+            ? "Filters changed — update the chart to query Firestore."
+            : usingCache
+              ? "Showing cached results."
+              : "Filters are up to date."}
+        </span>
       </div>
+
+      {error ? <p role="alert" style={{ color: "#fca5a5" }}>{error}</p> : null}
+      {loadedConfig ? (
+        <p className="muted small">
+          Loaded {rawLogs.length} matching records: {sourceCounts.activityLog} activity events and {sourceCounts.submissions} Writing General submissions.
+          {truncated ? ` Results were capped at ${MAX_DOCS_PER_SOURCE} documents per source to control reads.` : ""}
+        </p>
+      ) : null}
 
       {/* User panel */}
       <div
@@ -473,8 +593,8 @@ export default function AdminActivityCharts({ user }) {
   <input
     type="text"
     value={userQuery}
-    onChange={(e) => searchUsers(e.target.value)}
-    placeholder="Type email…"
+    onChange={(e) => setUserQuery(e.target.value)}
+    placeholder="Type at least 3 characters…"
     style={{
       fontSize: "0.85rem",
       padding: "0.25rem 0.5rem",
@@ -499,7 +619,7 @@ export default function AdminActivityCharts({ user }) {
           setSelectedUserId(u.id);
           setSelectedUserEmail(u.email || "");
           setUserResults([]);
-          setUserQuery(u.email || "");
+          setUserQuery("");
         }}
         style={{ justifyContent: "space-between", display: "flex", gap: "0.75rem" }}
         title="Select user"
@@ -527,8 +647,10 @@ export default function AdminActivityCharts({ user }) {
               Top users in current results
             </div>
 
-            {rawLogs.length === 0 ? (
+            {!loadedConfig ? (
               <div className="muted small">Run “Update chart” first.</div>
+            ) : rawLogs.length === 0 ? (
+              <div className="muted small">No activity found in this range.</div>
             ) : topUsers.length === 0 ? (
               <div className="muted small">No user data found.</div>
             ) : (
@@ -621,7 +743,7 @@ export default function AdminActivityCharts({ user }) {
         <div className="muted small" style={{ marginBottom: "0.5rem" }}>
           Showing <strong>{rows.length}</strong>{" "}
           {groupBy === "week" ? "weeks" : "days"}
-          {typeFilter === "all" ? "" : ` · ${getActivityTypeLabel(typeFilter)}`}
+          {!loadedConfig || loadedConfig.type === "all" ? "" : ` · ${getActivityTypeLabel(loadedConfig.type)}`}
           {selectedUserId ? ` · ${selectedUserEmail || selectedUserId}` : ""}
         </div>
 

@@ -56,6 +56,9 @@ const READING_VARIANTS = {
         label: "Part 1",
         title: "Short Texts",
         copy: "Six short texts, each with one multiple-choice question focused on local and global meaning.",
+        guideTitle: "Short Texts Strategy Guide",
+        guideCopy: "Learn the timing, question types, distractor patterns, and an 80-second method, then check your understanding.",
+        guideProgressId: "reading.part1.advanced-guide",
         icon: FileText,
       },
       {
@@ -63,6 +66,9 @@ const READING_VARIANTS = {
         label: "Part 2",
         title: "Matching",
         copy: "Match six or seven items with texts, using fast search reading for detail, opinion, and implication.",
+        guideTitle: "Multiple Matching Strategy Guide",
+        guideCopy: "Compare the two possible layouts, practise a fast matching method, and learn how to reject partial matches.",
+        guideProgressId: "reading.part2.advanced-guide",
         icon: Search,
       },
       {
@@ -70,6 +76,9 @@ const READING_VARIANTS = {
         label: "Part 3",
         title: "Gapped Text",
         copy: "Place six extracted sentences into a text, with one extra distractor sentence.",
+        guideTitle: "Gapped Text Strategy Guide",
+        guideCopy: "Use reference words, linking language, grammar, and paragraph function to connect each sentence on both sides.",
+        guideProgressId: "reading.part3.advanced-guide",
         icon: TextCursorInput,
       },
       {
@@ -77,6 +86,9 @@ const READING_VARIANTS = {
         label: "Part 4",
         title: "Long Text",
         copy: "Answer four or five multiple-choice questions on a longer text.",
+        guideTitle: "Long Text Strategy Guide",
+        guideCopy: "Work through local and global questions efficiently, identify rhetorical purpose, and avoid realistic distractors.",
+        guideProgressId: "reading.part4.advanced-guide",
         icon: BookOpen,
       },
     ],
@@ -109,6 +121,8 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
   const part = config.parts.find((item) => item.id === partId) || config.parts[0];
   const menuPath = getSitePath(basePath);
   const Icon = part.icon || ListChecks;
+  const guidePath = getSitePath(`${basePath}/advanced/${partId}/guide`);
+  const guideComplete = completedProgress.has(part.guideProgressId);
   const advancedPartOnePracticePath = (setId) => getSitePath(`${basePath}/advanced/part-1-short-texts/practice/${setId}`);
   const advancedPartTwoPracticePath = (setId) => getSitePath(`${basePath}/advanced/part-2-matching/practice/${setId}`);
   const advancedPartThreePracticePath = (setId) => getSitePath(`${basePath}/advanced/part-3-gapped-text/practice/${setId}`);
@@ -190,6 +204,22 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
           </div>
         ) : null}
       </header>
+
+      {variant === "advanced" ? (
+        <div className="ote-training-activity-grid" aria-label={`${part.label} training guide`}>
+          <button
+            className={`ote-training-activity-card ${guideComplete ? "is-complete" : ""}`}
+            type="button"
+            onClick={() => navigate(guidePath)}
+          >
+            {guideComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+            <Icon size={28} aria-hidden="true" />
+            <span>Guide</span>
+            <h2>{part.guideTitle}</h2>
+            <p>{part.guideCopy}</p>
+          </button>
+        </div>
+      ) : null}
 
       {variant === "advanced" && partId === "part-1-short-texts" ? (
         <section className="ote-training-section">

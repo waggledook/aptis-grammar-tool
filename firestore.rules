@@ -43,6 +43,40 @@ service cloud.firestore {
         || isTeacherOf(userId);
     }
 
+    function isValidActivityLogCreate() {
+      return isSignedIn()
+        && request.resource.data.keys().hasOnly([
+          "userId",
+          "userEmail",
+          "type",
+          "details",
+          "createdAt",
+          "app"
+        ])
+        && request.resource.data.keys().hasAll([
+          "userId",
+          "userEmail",
+          "type",
+          "details",
+          "createdAt",
+          "app"
+        ])
+        && request.resource.data.userId == request.auth.uid
+        && (
+          (!("email" in request.auth.token) && request.resource.data.userEmail == null)
+          || ("email" in request.auth.token && request.resource.data.userEmail == request.auth.token.email)
+        )
+        && request.resource.data.type is string
+        && request.resource.data.type.size() > 0
+        && request.resource.data.type.size() <= 100
+        && request.resource.data.details is map
+        && request.resource.data.details.keys().size() <= 50
+        && request.resource.data.app is string
+        && request.resource.data.app.size() > 0
+        && request.resource.data.app.size() <= 100
+        && request.resource.data.createdAt == request.time;
+    }
+
     function changedKeys() {
       return resource == null
         ? request.resource.data.keys()
@@ -416,9 +450,29 @@ service cloud.firestore {
 
     // ── 10) Activity log (site usage events) ────────────────────────────
     match /activityLog/{logId} {
-      allow create: if isSignedIn();
+      allow create: if isValidActivityLogCreate();
       allow get, list: if isAdmin();
       allow update, delete: if false;
+    }
+
+    // ── 10b) Server-maintained admin analytics ─────────────────────────
+    match /adminAnalyticsDaily/{dateId} {
+      allow get, list: if isAdmin();
+      allow create, update, delete: if false;
+
+      match /dailyUsers/{userId} {
+        allow get, list: if isAdmin();
+        allow create, update, delete: if false;
+      }
+    }
+
+    match /adminAnalyticsUsers/{userId} {
+      allow get, list: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    match /adminAnalyticsProcessed/{eventId} {
+      allow read, write: if false;
     }
 
     // ── 11) Public Aptis Writing General submissions ───────────────────

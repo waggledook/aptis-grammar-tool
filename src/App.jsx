@@ -77,6 +77,7 @@ import UseOfEnglishCustomQuizRunner from "./components/grammar/UseOfEnglishCusto
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 import AdminActivityLog from "./components/admin/AdminActivityLog.jsx";
 import AdminActivityCharts from "./components/admin/AdminActivityCharts";
+import AdminActivityInsights from "./components/admin/AdminActivityInsights.jsx";
 import TeacherTools from "./components/teacher/TeacherTools"; // ← Add this
 import MyStudents from "./components/teacher/MyStudents";
 import TeacherCourseTestPrintableReport from "./components/teacher/TeacherCourseTestPrintableReport.jsx";
@@ -217,6 +218,10 @@ import OteWritingPracticeRunner from "./products/ote/OteWritingPracticeRunner.js
 import OteAdvancedReadingPart1Practice from "./products/ote/OteAdvancedReadingPart1Practice.jsx";
 import OteAdvancedReadingPart2Practice from "./products/ote/OteAdvancedReadingPart2Practice.jsx";
 import OteAdvancedReadingPart3Practice from "./products/ote/OteAdvancedReadingPart3Practice.jsx";
+import OteAdvancedReadingPart1Guide from "./products/ote/OteAdvancedReadingPart1Guide.jsx";
+import OteAdvancedReadingPart2Guide from "./products/ote/OteAdvancedReadingPart2Guide.jsx";
+import OteAdvancedReadingPart3Guide from "./products/ote/OteAdvancedReadingPart3Guide.jsx";
+import OteAdvancedReadingPart4Guide from "./products/ote/OteAdvancedReadingPart4Guide.jsx";
 import OteGeneralReadingPart3Practice from "./products/ote/OteGeneralReadingPart3Practice.jsx";
 import OteAdvancedReadingPart4Practice from "./products/ote/OteAdvancedReadingPart4Practice.jsx";
 import OteGeneralReadingPart4Practice from "./products/ote/OteGeneralReadingPart4Practice.jsx";
@@ -1288,6 +1293,7 @@ return (
       <Route path="/admin" element={<AdminDashboard user={user} />} />
       <Route path="/admin/activity" element={<AdminActivityLog user={user} />} />
       <Route path="/admin/activity-charts" element={<AdminActivityCharts user={user} />} />
+      <Route path="/admin/activity-insights" element={<AdminActivityInsights user={user} />} />
       <Route
         path="/teacher-tools"
         element={
@@ -1462,6 +1468,10 @@ return (
   <Route path="/ote/speaking/parts-3-4-practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/reading" element={<RequireTeacher user={user}><OteReadingMenu user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/reading/mock-tests/advanced-reading-1" element={<RequireTeacher user={user}><OteAdvancedReadingMockRunner user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/advanced/part-1-short-texts/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Guide nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/advanced/part-2-matching/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart2Guide nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/advanced/part-3-gapped-text/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart3Guide nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading/advanced/part-4-long-text/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart4Guide nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/reading/advanced/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/reading/advanced/part-2-matching/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart2Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/reading/advanced/part-3-gapped-text/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart3Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
@@ -1648,6 +1658,10 @@ return (
     <>
       <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
       <Route path="/reading/mock-tests/advanced-reading-1" element={<RequireTeacher user={user}><OteAdvancedReadingMockRunner user={user} nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/advanced/part-1-short-texts/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Guide nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/advanced/part-2-matching/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart2Guide nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/advanced/part-3-gapped-text/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart3Guide nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/advanced/part-4-long-text/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart4Guide nativeRoutes /></RequireTeacher>} />
       <Route path="/reading/advanced/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Practice user={user} nativeRoutes /></RequireTeacher>} />
       <Route path="/reading/advanced/part-2-matching/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart2Practice user={user} nativeRoutes /></RequireTeacher>} />
       <Route path="/reading/advanced/part-3-gapped-text/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart3Practice user={user} nativeRoutes /></RequireTeacher>} />
@@ -2266,7 +2280,6 @@ return (
 />
 
 {/* ——— Writing routes ——— */}
-{import.meta.env.DEV ? <Route path="/dev/article-structure" element={<OteWritingArticleStructure nativeRoutes={false} />} /> : null}
 <Route
   path="/writing"
   element={
@@ -2514,6 +2527,7 @@ return (
 />
 
 <Route path="/admin/activity-charts" element={<AdminActivityCharts user={user} />} />
+<Route path="/admin/activity-insights" element={<AdminActivityInsights user={user} />} />
 
 <Route
   path="/my-students"
