@@ -13,6 +13,7 @@ import {
   fetchWritingP3Submissions,
   fetchWritingP4Submissions,
   fetchReadingProgressMap,
+  fetchRecentOteTrainingProgress,
 } from "../../firebase";
 import { TOPIC_DATA } from "../vocabulary/data/vocabTopics";
 import { fetchItemsByIds } from "../../api/grammar";
@@ -27,6 +28,48 @@ function getReadingPartLabel(part) {
   if (part === "part3") return "Reading Part 3";
   if (part === "part4") return "Reading Part 4";
   return "Reading";
+}
+
+function formatOteToken(value = "") {
+  return String(value || "")
+    .replace(/[_-]+/g, " ")
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function getOtePartLabel(part = "") {
+  const normalized = String(part || "").toLowerCase().replace(/[^a-z0-9]/g, "");
+  if (normalized === "part1") return "Part 1";
+  if (normalized === "part2") return "Part 2";
+  if (normalized === "part3") return "Part 3";
+  if (normalized === "part4") return "Part 4";
+  if (normalized === "part5") return "Part 5";
+  if (normalized === "parts34") return "Parts 3–4";
+  if (normalized === "parts45") return "Parts 4–5";
+  return part ? formatOteToken(part) : "";
+}
+
+function getOteActivityLabel(entry = {}) {
+  const variant = ["general", "advanced"].includes(String(entry.variant || "").toLowerCase())
+    ? formatOteToken(entry.variant)
+    : "";
+  const section = entry.section ? formatOteToken(entry.section) : "";
+  const part = getOtePartLabel(entry.part);
+  return ["OTE", variant, section, part].filter(Boolean).join(" ");
+}
+
+function getOteActivityTitle(entry = {}) {
+  if (entry.taskTitle) return entry.taskTitle;
+  if (entry.mode === "mock_test") return "Mock test";
+  if (String(entry.progressId || "").includes("guide")) return "Strategy guide";
+  return entry.mode ? formatOteToken(entry.mode) : "Training activity";
+}
+
+function getOteScoreLabel(entry = {}) {
+  if (entry.score !== null && entry.score !== undefined && entry.total !== null && entry.total !== undefined) {
+    return `${entry.score}/${entry.total}`;
+  }
+  if (entry.percent !== null && entry.percent !== undefined) return `${entry.percent}%`;
+  return "";
 }
 
 function timestampToMs(value) {
@@ -372,6 +415,9 @@ function buildActivitySummary(studentId, attemptStats, submissionBundle) {
   const latestReading = (submissionBundle?.readingProgress || [])
     .slice()
     .sort((a, b) => timestampToMs(b.updatedAt) - timestampToMs(a.updatedAt))[0] || null;
+  const latestOte = (submissionBundle?.oteTrainingProgress || [])
+    .slice()
+    .sort((a, b) => timestampToMs(b.updatedAt) - timestampToMs(a.updatedAt))[0] || null;
   const latestAttemptAt = attemptMeta?.latestSubmittedAt || null;
 
   const candidates = [
@@ -413,6 +459,13 @@ function buildActivitySummary(studentId, attemptStats, submissionBundle) {
           detail: "Completed",
         }
       : null,
+    latestOte
+      ? {
+          kind: getOteActivityLabel(latestOte),
+          createdAt: latestOte.updatedAt,
+          detail: getOteActivityTitle(latestOte),
+        }
+      : null,
     latestAttemptAt
       ? {
           kind: "Teacher quiz",
@@ -432,6 +485,7 @@ function buildActivitySummary(studentId, attemptStats, submissionBundle) {
     latestGrammar,
     latestVocab,
     latestReading,
+    latestOte,
     latestActivity,
   };
 }
@@ -925,7 +979,7 @@ export default function MyStudents({
 
       const statsEntries = await Promise.all(
         studentRows.map(async (studentRow) => {
-          const [part1, part2, part3, part4, grammar, dictation, flashcards, vocab, reading] = await Promise.all([
+          const [part1, part2, part3, part4, grammar, dictation, flashcards, vocab, reading, oteTraining] = await Promise.all([
             fetchWritingP1Sessions(3, studentRow.id),
             fetchWritingP2Submissions(3, studentRow.id),
             fetchWritingP3Submissions(3, studentRow.id),
@@ -935,6 +989,7 @@ export default function MyStudents({
             fetchHubFlashcardSessions(3, studentRow.id),
             fetchRecentVocabProgress(3, studentRow.id),
             fetchReadingProgressMap(studentRow.id),
+            fetchRecentOteTrainingProgress(5, studentRow.id),
           ]);
 
           const recentWriting = [
@@ -954,6 +1009,7 @@ export default function MyStudents({
               readingProgress: Object.values(reading || {})
                 .sort((a, b) => timestampToMs(b.updatedAt) - timestampToMs(a.updatedAt))
                 .slice(0, 5),
+              oteTrainingProgress: oteTraining || [],
               recentVocab: (vocab || []).map((entry) => {
                 const meta = resolveVocabMeta(entry.topic, entry.setId);
                 return {
@@ -1295,11 +1351,29 @@ export default function MyStudents({
     );
   }, [hydratedStudents, submissionStats]);
 
+  const oteTrainingNotifications = useMemo(() => {
+    return hydratedStudents.flatMap((studentRow) =>
+      (submissionStats[studentRow.id]?.oteTrainingProgress || []).map((entry) => ({
+        id: `ote-training:${studentRow.id}:${entry.progressId}:${timestampToMs(entry.updatedAt)}`,
+        kind: "ote-training",
+        studentId: studentRow.id,
+        studentLabel:
+          studentRow.displayName || studentRow.name || studentRow.username || studentRow.email || studentRow.id,
+        studentPhotoURL: studentRow.photoURL || "",
+        createdAt: entry.updatedAt,
+        title: getOteActivityTitle(entry),
+        oteLabel: getOteActivityLabel(entry),
+        scoreLabel: getOteScoreLabel(entry),
+        progress: entry,
+      }))
+    );
+  }, [hydratedStudents, submissionStats]);
+
   const teacherNotifications = useMemo(() => {
-    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...dictationNotifications, ...flashcardNotifications, ...readingNotifications, ...vocabNotifications, ...courseTestNotifications]
+    return [...writingNotifications, ...grammarCompletionNotifications, ...miniTestNotifications, ...dictationNotifications, ...flashcardNotifications, ...readingNotifications, ...oteTrainingNotifications, ...vocabNotifications, ...courseTestNotifications]
       .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
       .slice(0, TEACHER_NOTIFICATION_LIMIT);
-  }, [courseTestNotifications, dictationNotifications, flashcardNotifications, grammarCompletionNotifications, miniTestNotifications, readingNotifications, vocabNotifications, writingNotifications]);
+  }, [courseTestNotifications, dictationNotifications, flashcardNotifications, grammarCompletionNotifications, miniTestNotifications, oteTrainingNotifications, readingNotifications, vocabNotifications, writingNotifications]);
 
   const unreadNotificationCount = useMemo(() => {
     return teacherNotifications.filter((entry) => !readSubmissionKeys[entry.id]).length;
@@ -1522,6 +1596,8 @@ async function copySelectedSubmission() {
                                 ? `Flashcards completed · ${entry.title}`
                               : entry.kind === "reading"
                                 ? `${entry.partLabel} completed`
+                              : entry.kind === "ote-training"
+                                ? `${entry.oteLabel} completed · ${entry.title}${entry.scoreLabel ? ` · ${entry.scoreLabel}` : ""}`
                               : entry.kind === "vocabulary"
                                 ? `Vocabulary set completed · ${entry.topicTitle} · ${entry.setTitle}`
                               : `${
@@ -1753,11 +1829,13 @@ async function copySelectedSubmission() {
                             ? "Vocabulary"
                             : selectedNotification.kind === "reading"
                               ? selectedNotification.partLabel || "Reading"
+                            : selectedNotification.kind === "ote-training"
+                              ? selectedNotification.oteLabel || "OTE"
                             : selectedNotification.kind === "grammar-set"
                               ? "Grammar set"
                               : selectedNotification.kind === "course-test"
                                 ? "Course test"
-                                : "Student")} submission · {formatDate(selectedNotification.createdAt)}
+                                : "Student")} {selectedNotification.kind === "writing" || selectedNotification.kind === "course-test" ? "submission" : "completion"} · {formatDate(selectedNotification.createdAt)}
                   </p>
                   {selectedNotification.kind === "course-test" ? (
                     <div
@@ -2027,6 +2105,26 @@ async function copySelectedSubmission() {
                     <div className="teacher-review-plain">
                       Completed {formatRelative(selectedNotification.createdAt)}.
                       {selectedNotification.taskId ? ` Task: ${selectedNotification.taskId}.` : ""}
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
+              {selectedNotification.kind === "ote-training" ? (
+                <div className="teacher-review-block">
+                  <span className="panel-label">OTE activity completion</span>
+                  <div className="teacher-review-answer">
+                    <strong>{selectedNotification.title}</strong>
+                    <div className="teacher-review-plain">
+                      Completed {formatRelative(selectedNotification.createdAt)}.
+                      {selectedNotification.oteLabel ? ` Activity: ${selectedNotification.oteLabel}.` : ""}
+                      {selectedNotification.scoreLabel ? ` Score: ${selectedNotification.scoreLabel}.` : ""}
+                      {selectedNotification.progress?.wordCount != null
+                        ? ` Word count: ${selectedNotification.progress.wordCount}.`
+                        : ""}
+                      {selectedNotification.progress?.recordingCount != null
+                        ? ` Recordings completed: ${selectedNotification.progress.recordingCount}.`
+                        : ""}
                     </div>
                   </div>
                 </div>

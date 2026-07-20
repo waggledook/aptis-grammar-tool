@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, BookOpen, CheckCircle2, Clock3, FileText, ListChecks, Search, TextCursorInput } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckCircle2, Clock3, FileText, FlaskConical, ListChecks, Search, Target, TextCursorInput, Users } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
@@ -19,6 +19,15 @@ const READING_VARIANTS = {
         label: "Part 1",
         title: "Short Texts",
         copy: "Six short texts with one three-option multiple-choice question each.",
+        guides: [
+          {
+            title: "Short Texts Strategy Guide",
+            copy: "Learn the timing, question types, common traps, and a simple 80-second method.",
+            progressId: "reading.part1.general-guide",
+            route: "guide",
+            icon: FileText,
+          },
+        ],
         icon: FileText,
       },
       {
@@ -26,6 +35,22 @@ const READING_VARIANTS = {
         label: "Part 2",
         title: "Multiple Matching",
         copy: "Match profiles, requirements, or factual texts by scanning for detail, opinion, and attitude.",
+        guides: [
+          {
+            title: "Six Questions → Three Texts",
+            copy: "Build a quick map of three personal texts, then search efficiently for information, opinion, and attitude.",
+            progressId: "reading.part2.general-three-texts-guide",
+            route: "guide/three-texts",
+            icon: FileText,
+          },
+          {
+            title: "Six People → Four Choices",
+            copy: "Identify each person's essential requirements, reject partial matches, and choose the best overall fit.",
+            progressId: "reading.part2.general-people-choices-guide",
+            route: "guide/people-and-choices",
+            icon: Users,
+          },
+        ],
         icon: Search,
       },
       {
@@ -33,6 +58,31 @@ const READING_VARIANTS = {
         label: "Part 3",
         title: "Gapped Text",
         copy: "Insert six missing sentences into a longer newspaper or magazine-style text.",
+        guides: [
+          {
+            title: "Gapped Text Strategy Guide",
+            copy: "Use references, linking language, grammar, and paragraph logic to connect every gap on both sides.",
+            progressId: "reading.part3.general-guide",
+            route: "guide",
+            icon: TextCursorInput,
+          },
+          {
+            title: "Cohesion Detective",
+            copy: "Work through two rounds of missing-sentence cases, moving from clear references and results to paragraph-level reasoning.",
+            progressId: "reading.part3.general-cohesion-detective",
+            route: "cohesion-detective",
+            icon: Search,
+            eyebrow: "Skill trainer",
+          },
+          {
+            title: "Distractor Laboratory",
+            copy: "Solve two mini gapped texts, then use short explanations to see why the tempting sentences do not fit.",
+            progressId: "reading.part3.general-distractor-laboratory",
+            route: "distractor-laboratory",
+            icon: FlaskConical,
+            eyebrow: "Skill trainer",
+          },
+        ],
         icon: TextCursorInput,
       },
       {
@@ -40,6 +90,15 @@ const READING_VARIANTS = {
         label: "Part 4",
         title: "Long Text",
         copy: "Answer four multiple-choice questions on a longer text.",
+        guides: [
+          {
+            title: "Long Text Strategy Guide",
+            copy: "Work through local and global questions, read words in context, and avoid realistic distractors.",
+            progressId: "reading.part4.general-guide",
+            route: "guide",
+            icon: BookOpen,
+          },
+        ],
         icon: BookOpen,
       },
     ],
@@ -56,9 +115,31 @@ const READING_VARIANTS = {
         label: "Part 1",
         title: "Short Texts",
         copy: "Six short texts, each with one multiple-choice question focused on local and global meaning.",
-        guideTitle: "Short Texts Strategy Guide",
-        guideCopy: "Learn the timing, question types, distractor patterns, and an 80-second method, then check your understanding.",
-        guideProgressId: "reading.part1.advanced-guide",
+        guides: [
+          {
+            title: "Short Texts Strategy Guide",
+            copy: "Learn the timing, question types, distractor patterns, and an 80-second method, then check your understanding.",
+            progressId: "reading.part1.advanced-guide",
+            route: "guide",
+            icon: FileText,
+          },
+          {
+            title: "Set Your Reading Target",
+            copy: "Identify what each question asks, form your own answer, then test it against three realistic options.",
+            progressId: "reading.part1.advanced-reading-target",
+            route: "reading-target",
+            icon: Target,
+            eyebrow: "Skill trainer",
+          },
+          {
+            title: "Distractor Forensics",
+            copy: "Choose the best answers, then diagnose exactly how twelve realistic distractors change or overstate the text.",
+            progressId: "reading.part1.advanced-distractor-forensics",
+            route: "distractor-forensics",
+            icon: FlaskConical,
+            eyebrow: "Skill trainer",
+          },
+        ],
         icon: FileText,
       },
       {
@@ -76,9 +157,31 @@ const READING_VARIANTS = {
         label: "Part 3",
         title: "Gapped Text",
         copy: "Place six extracted sentences into a text, with one extra distractor sentence.",
-        guideTitle: "Gapped Text Strategy Guide",
-        guideCopy: "Use reference words, linking language, grammar, and paragraph function to connect each sentence on both sides.",
-        guideProgressId: "reading.part3.advanced-guide",
+        guides: [
+          {
+            title: "Gapped Text Strategy Guide",
+            copy: "Use reference words, linking language, grammar, and paragraph function to connect each sentence on both sides.",
+            progressId: "reading.part3.advanced-guide",
+            route: "guide",
+            icon: TextCursorInput,
+          },
+          {
+            title: "Cohesion Detective",
+            copy: "Solve eight missing-sentence cases by marking the backward, forward, and bridge clues that connect the paragraph.",
+            progressId: "reading.part3.advanced-cohesion-detective",
+            route: "cohesion-detective",
+            icon: Search,
+            eyebrow: "Skill trainer",
+          },
+          {
+            title: "Distractor Laboratory",
+            copy: "Solve a mini gapped text, then diagnose why four plausible alternatives fail to perform the paragraph’s required job.",
+            progressId: "reading.part3.advanced-distractor-laboratory",
+            route: "distractor-laboratory",
+            icon: FlaskConical,
+            eyebrow: "Skill trainer",
+          },
+        ],
         icon: TextCursorInput,
       },
       {
@@ -121,8 +224,16 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
   const part = config.parts.find((item) => item.id === partId) || config.parts[0];
   const menuPath = getSitePath(basePath);
   const Icon = part.icon || ListChecks;
-  const guidePath = getSitePath(`${basePath}/advanced/${partId}/guide`);
-  const guideComplete = completedProgress.has(part.guideProgressId);
+  const guideCards = part.guides?.map((guide) => ({
+    ...guide,
+    path: getSitePath(`${basePath}/${variant}/${partId}/${guide.route}`),
+  })) || (part.guideTitle ? [{
+    title: part.guideTitle,
+    copy: part.guideCopy,
+    progressId: part.guideProgressId,
+    path: getSitePath(`${basePath}/${variant}/${partId}/guide`),
+    icon: Icon,
+  }] : []);
   const advancedPartOnePracticePath = (setId) => getSitePath(`${basePath}/advanced/part-1-short-texts/practice/${setId}`);
   const advancedPartTwoPracticePath = (setId) => getSitePath(`${basePath}/advanced/part-2-matching/practice/${setId}`);
   const advancedPartThreePracticePath = (setId) => getSitePath(`${basePath}/advanced/part-3-gapped-text/practice/${setId}`);
@@ -145,10 +256,10 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
     { title: "Personality Tests at Work", level: "C1", id: "c1-pilot-2", taskId: "advanced-reading-part-2-c1-pilot-2" },
     { title: "Making Cities Wilder", level: "C1", id: "c1-pilot-3", taskId: "advanced-reading-part-2-c1-pilot-3" },
   ] : [
-    { title: "Learning to Cook", level: "A2", id: "a2-pilot-1", taskId: "general-reading-part-2-a2-pilot-1" },
-    { title: "My Volunteer Work", level: "A2", id: "a2-pilot-2", taskId: "general-reading-part-2-a2-pilot-2" },
-    { title: "Podcasts to Download", level: "B2", id: "b2-pilot-1", taskId: "general-reading-part-2-b2-pilot-1" },
-    { title: "Online Course Providers", level: "B2", id: "b2-pilot-2", taskId: "general-reading-part-2-b2-pilot-2" },
+    { title: "Learning to Cook", level: "A2", formatLabel: "Three texts", id: "a2-pilot-1", taskId: "general-reading-part-2-a2-pilot-1" },
+    { title: "My Volunteer Work", level: "A2", formatLabel: "Three texts", id: "a2-pilot-2", taskId: "general-reading-part-2-a2-pilot-2" },
+    { title: "Podcasts to Download", level: "B2", formatLabel: "People and choices", id: "b2-pilot-1", taskId: "general-reading-part-2-b2-pilot-1" },
+    { title: "Online Course Providers", level: "B2", formatLabel: "People and choices", id: "b2-pilot-2", taskId: "general-reading-part-2-b2-pilot-2" },
   ]) : [];
   const partThreePracticeSets = partId === "part-3-gapped-text" ? (variant === "advanced" ? [
     { title: "The Case for Getting Slightly Lost", level: "C1", id: "c1-pilot-1", taskId: "advanced-reading-part-3-c1-pilot-1" },
@@ -205,19 +316,26 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
         ) : null}
       </header>
 
-      {variant === "advanced" ? (
-        <div className="ote-training-activity-grid" aria-label={`${part.label} training guide`}>
-          <button
-            className={`ote-training-activity-card ${guideComplete ? "is-complete" : ""}`}
-            type="button"
-            onClick={() => navigate(guidePath)}
-          >
-            {guideComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
-            <Icon size={28} aria-hidden="true" />
-            <span>Guide</span>
-            <h2>{part.guideTitle}</h2>
-            <p>{part.guideCopy}</p>
-          </button>
+      {guideCards.length ? (
+        <div className={`ote-training-activity-grid ${guideCards.length === 2 ? "is-two-column" : ""}`} aria-label={`${part.label} training ${guideCards.length === 1 ? "guide" : "guides"}`}>
+          {guideCards.map((guide) => {
+            const GuideIcon = guide.icon || Icon;
+            const guideComplete = completedProgress.has(guide.progressId);
+            return (
+              <button
+                className={`ote-training-activity-card ${guideComplete ? "is-complete" : ""}`}
+                key={guide.progressId}
+                type="button"
+                onClick={() => navigate(guide.path)}
+              >
+                {guideComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+                <GuideIcon size={28} aria-hidden="true" />
+                <span>{guide.eyebrow || "Guide"}</span>
+                <h2>{guide.title}</h2>
+                <p>{guide.copy}</p>
+              </button>
+            );
+          })}
         </div>
       ) : null}
 
@@ -263,7 +381,7 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
               return <button className={`ote-practice-set-card ${isComplete ? "is-complete" : ""}`} key={set.id} type="button" onClick={() => navigate(variant === "advanced" ? advancedPartTwoPracticePath(set.id) : generalPartTwoPracticePath(set.id))}>
                 {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
                 <Clock3 size={28} aria-hidden="true" />
-                <span>{set.level} · Timed practice</span>
+                <span>{set.level} · {set.formatLabel || "Timed practice"}</span>
                 <h2>{set.title}</h2>
                 <p>{variant === "advanced" ? "Seven matching questions. Three specialist responses." : set.level === "A2" ? "Six questions. Three short personal texts." : "Six profiles. Four source options."} 8 minutes for the full task.</p>
               </button>;

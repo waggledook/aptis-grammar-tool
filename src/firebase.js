@@ -1122,6 +1122,21 @@ export async function markOteTrainingProgress(details = {}) {
     updatedAt: serverTimestamp(),
   };
 
+  [
+    ["variant", details.variant],
+    ["score", details.score],
+    ["total", details.total],
+    ["percent", details.percent],
+    ["reason", details.reason],
+    ["wordCount", details.wordCount],
+    ["recordingCount", details.recordingCount],
+    ["scoredRecordingCount", details.scoredRecordingCount],
+    ["taskType", details.taskType],
+    ["sectionId", details.sectionId],
+  ].forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") baseData[key] = value;
+  });
+
   await setDoc(doc(db, "users", user.uid, "oteTrainingProgress", progressId), baseData, { merge: true });
 
   if (specificProgressId && specificProgressId !== progressId) {
@@ -1174,6 +1189,61 @@ export async function fetchOteTrainingProgressMap(uid) {
     acc[progressId] = data.completedAt || data.updatedAt || data.createdAt || null;
     return acc;
   }, {});
+}
+
+export async function fetchRecentOteTrainingProgress(n = 10, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const requestedCount = Math.max(1, Number(n) || 10);
+  const qy = query(
+    collection(db, "users", realUid, "oteTrainingProgress"),
+    orderBy("updatedAt", "desc"),
+    // Timed practice writes both a parent progress document and a task-specific
+    // document. Read extra rows so the deduplicated result still reaches n.
+    limit(requestedCount * 3)
+  );
+  const snap = await getDocs(qy);
+  const seenCompletions = new Set();
+
+  return snap.docs
+    .map((entry) => {
+      const data = entry.data() || {};
+      return {
+        id: entry.id,
+        progressId: data.progressId || entry.id,
+        parentProgressId: data.parentProgressId || "",
+        product: data.product || "ote",
+        section: data.section || "",
+        part: data.part || "",
+        mode: data.mode || "",
+        taskId: data.taskId || "",
+        taskTitle: data.taskTitle || "",
+        variant: data.variant || "",
+        score: data.score ?? null,
+        total: data.total ?? null,
+        percent: data.percent ?? null,
+        reason: data.reason || "",
+        wordCount: data.wordCount ?? null,
+        recordingCount: data.recordingCount ?? null,
+        scoredRecordingCount: data.scoredRecordingCount ?? null,
+        taskType: data.taskType || "",
+        sectionId: data.sectionId || "",
+        completed: data.completed !== false,
+        completedAt: data.completedAt || null,
+        updatedAt: data.updatedAt || data.completedAt || data.createdAt || null,
+      };
+    })
+    .filter((entry) => {
+      if (!entry.completed) return false;
+      const completionKey = entry.taskId
+        ? [entry.section, entry.part, entry.mode, entry.taskId].join(":")
+        : entry.progressId;
+      if (seenCompletions.has(completionKey)) return false;
+      seenCompletions.add(completionKey);
+      return true;
+    })
+    .slice(0, requestedCount);
 }
 
 export async function logOteTrainingStarted(details = {}) {

@@ -18,6 +18,7 @@ import {
   fetchSpeakingProgressMap,
   fetchReadingProgressMap,
   fetchOteTrainingProgressMap,
+  fetchRecentOteTrainingProgress,
   fetchRecentVocabProgress,
   listAssignedActivitiesForStudent,
   listGrammarSetAttemptsForStudent,
@@ -219,9 +220,20 @@ import OteAdvancedReadingPart1Practice from "./products/ote/OteAdvancedReadingPa
 import OteAdvancedReadingPart2Practice from "./products/ote/OteAdvancedReadingPart2Practice.jsx";
 import OteAdvancedReadingPart3Practice from "./products/ote/OteAdvancedReadingPart3Practice.jsx";
 import OteAdvancedReadingPart1Guide from "./products/ote/OteAdvancedReadingPart1Guide.jsx";
+import OteAdvancedReadingPart1TargetTrainer from "./products/ote/OteAdvancedReadingPart1TargetTrainer.jsx";
+import OteAdvancedReadingDistractorForensics from "./products/ote/OteAdvancedReadingDistractorForensics.jsx";
 import OteAdvancedReadingPart2Guide from "./products/ote/OteAdvancedReadingPart2Guide.jsx";
 import OteAdvancedReadingPart3Guide from "./products/ote/OteAdvancedReadingPart3Guide.jsx";
 import OteAdvancedReadingPart4Guide from "./products/ote/OteAdvancedReadingPart4Guide.jsx";
+import OteAdvancedReadingCohesionDetective from "./products/ote/OteAdvancedReadingCohesionDetective.jsx";
+import OteAdvancedReadingDistractorLaboratory from "./products/ote/OteAdvancedReadingDistractorLaboratory.jsx";
+import OteGeneralReadingCohesionDetective from "./products/ote/OteGeneralReadingCohesionDetective.jsx";
+import OteGeneralReadingDistractorLaboratory from "./products/ote/OteGeneralReadingDistractorLaboratory.jsx";
+import OteReadingPart1Guide from "./products/ote/OteReadingPart1Guide.jsx";
+import OteReadingPart2PeopleAndChoicesGuide from "./products/ote/OteReadingPart2PeopleAndChoicesGuide.jsx";
+import OteReadingPart2ThreeProfilesGuide from "./products/ote/OteReadingPart2ThreeProfilesGuide.jsx";
+import OteReadingPart3Guide from "./products/ote/OteReadingPart3Guide.jsx";
+import OteReadingPart4Guide from "./products/ote/OteReadingPart4Guide.jsx";
 import OteGeneralReadingPart3Practice from "./products/ote/OteGeneralReadingPart3Practice.jsx";
 import OteAdvancedReadingPart4Practice from "./products/ote/OteAdvancedReadingPart4Practice.jsx";
 import OteGeneralReadingPart4Practice from "./products/ote/OteGeneralReadingPart4Practice.jsx";
@@ -599,7 +611,7 @@ useEffect(() => {
       const notificationIds = (
         await Promise.all(
           studentIds.map(async (studentId) => {
-            const [part1, part2, part3, part4, miniTests, dictationSessions, vocabSets, readingProgress] =
+            const [part1, part2, part3, part4, miniTests, dictationSessions, vocabSets, readingProgress, oteTrainingProgress] =
               await Promise.all([
                 fetchWritingP1Sessions(3, studentId),
                 fetchWritingP2Submissions(3, studentId),
@@ -609,6 +621,7 @@ useEffect(() => {
                 fetchHubDictationSessions(3, studentId),
                 fetchRecentVocabProgress(3, studentId),
                 fetchReadingProgressMap(studentId),
+                fetchRecentOteTrainingProgress(5, studentId),
               ]);
 
             return [
@@ -626,6 +639,10 @@ useEffect(() => {
                   id: `reading:${studentId}:${entry.part}:${entry.taskId}`,
                   createdAt: entry.updatedAt,
                 })),
+              ...(oteTrainingProgress || []).map((entry) => ({
+                id: `ote-training:${studentId}:${entry.progressId}:${timestampToMs(entry.updatedAt)}`,
+                createdAt: entry.updatedAt,
+              })),
             ];
           })
         )
@@ -1466,21 +1483,32 @@ return (
   />
   <Route path="/ote/speaking/parts-3-4-practice" element={<OteSpeakingPart34Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/parts-3-4-practice/:setId" element={<OteSpeakingPart34Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
-  <Route path="/ote/reading" element={<RequireTeacher user={user}><OteReadingMenu user={user} nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/mock-tests/advanced-reading-1" element={<RequireTeacher user={user}><OteAdvancedReadingMockRunner user={user} nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/advanced/part-1-short-texts/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Guide nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/advanced/part-2-matching/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart2Guide nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/advanced/part-3-gapped-text/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart3Guide nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/advanced/part-4-long-text/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart4Guide nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/advanced/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/advanced/part-2-matching/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart2Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/advanced/part-3-gapped-text/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart3Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/general/part-3-gapped-text/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart3Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/advanced/part-4-long-text/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart4Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/general/part-4-long-text/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart4Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/general/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart1Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/general/part-2-matching/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart2Practice user={user} nativeRoutes={false} /></RequireTeacher>} />
-  <Route path="/ote/reading/:variant/:partId" element={<RequireTeacher user={user}><OteReadingPartShell user={user} nativeRoutes={false} /></RequireTeacher>} />
+  <Route path="/ote/reading" element={<OteReadingMenu user={user} nativeRoutes={false} />} />
+  <Route path="/ote/reading/mock-tests/advanced-reading-1" element={<OteAdvancedReadingMockRunner user={user} nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-1-short-texts/guide" element={<OteAdvancedReadingPart1Guide nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-1-short-texts/reading-target" element={<OteAdvancedReadingPart1TargetTrainer nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-1-short-texts/distractor-forensics" element={<OteAdvancedReadingDistractorForensics nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-2-matching/guide" element={<OteAdvancedReadingPart2Guide nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-3-gapped-text/guide" element={<OteAdvancedReadingPart3Guide nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-4-long-text/guide" element={<OteAdvancedReadingPart4Guide nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-3-gapped-text/distractor-laboratory" element={<OteAdvancedReadingDistractorLaboratory nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-1-short-texts/guide" element={<OteReadingPart1Guide nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-2-matching/guide/three-texts" element={<OteReadingPart2ThreeProfilesGuide nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-2-matching/guide/people-and-choices" element={<OteReadingPart2PeopleAndChoicesGuide nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-3-gapped-text/guide" element={<OteReadingPart3Guide nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-3-gapped-text/cohesion-detective" element={<OteGeneralReadingCohesionDetective nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-3-gapped-text/distractor-laboratory" element={<OteGeneralReadingDistractorLaboratory nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-4-long-text/guide" element={<OteReadingPart4Guide nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-1-short-texts/practice/:setId" element={<OteAdvancedReadingPart1Practice user={user} nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-2-matching/practice/:setId" element={<OteAdvancedReadingPart2Practice user={user} nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-3-gapped-text/practice/:setId" element={<OteAdvancedReadingPart3Practice user={user} nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-3-gapped-text/practice/:setId" element={<OteGeneralReadingPart3Practice user={user} nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-4-long-text/practice/:setId" element={<OteAdvancedReadingPart4Practice user={user} nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-4-long-text/practice/:setId" element={<OteGeneralReadingPart4Practice user={user} nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-1-short-texts/practice/:setId" element={<OteGeneralReadingPart1Practice user={user} nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-2-matching/practice/:setId" element={<OteGeneralReadingPart2Practice user={user} nativeRoutes={false} />} />
+  <Route path="/ote/reading/:variant/:partId" element={<OteReadingPartShell user={user} nativeRoutes={false} />} />
   <Route path="/ote/writing" element={<OteSkillMenu skill="writing" user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />} />
   <Route path="/ote/writing/training/:section" element={<OteWritingTrainingMenu user={user} nativeRoutes={false} />} />
   <Route path="/ote/writing/training/email/guide" element={<OteWritingEmailGuide nativeRoutes={false} />} />
@@ -1657,20 +1685,31 @@ return (
   {isOteSite && (
     <>
       <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
-      <Route path="/reading/mock-tests/advanced-reading-1" element={<RequireTeacher user={user}><OteAdvancedReadingMockRunner user={user} nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/advanced/part-1-short-texts/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Guide nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/advanced/part-2-matching/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart2Guide nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/advanced/part-3-gapped-text/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart3Guide nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/advanced/part-4-long-text/guide" element={<RequireTeacher user={user}><OteAdvancedReadingPart4Guide nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/advanced/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart1Practice user={user} nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/advanced/part-2-matching/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart2Practice user={user} nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/advanced/part-3-gapped-text/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart3Practice user={user} nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/general/part-3-gapped-text/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart3Practice user={user} nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/advanced/part-4-long-text/practice/:setId" element={<RequireTeacher user={user}><OteAdvancedReadingPart4Practice user={user} nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/general/part-4-long-text/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart4Practice user={user} nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/general/part-1-short-texts/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart1Practice user={user} nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/general/part-2-matching/practice/:setId" element={<RequireTeacher user={user}><OteGeneralReadingPart2Practice user={user} nativeRoutes /></RequireTeacher>} />
-      <Route path="/reading/:variant/:partId" element={<RequireTeacher user={user}><OteReadingPartShell user={user} nativeRoutes /></RequireTeacher>} />
+      <Route path="/reading/mock-tests/advanced-reading-1" element={<OteAdvancedReadingMockRunner user={user} nativeRoutes />} />
+      <Route path="/reading/advanced/part-1-short-texts/guide" element={<OteAdvancedReadingPart1Guide nativeRoutes />} />
+      <Route path="/reading/advanced/part-1-short-texts/reading-target" element={<OteAdvancedReadingPart1TargetTrainer nativeRoutes />} />
+      <Route path="/reading/advanced/part-1-short-texts/distractor-forensics" element={<OteAdvancedReadingDistractorForensics nativeRoutes />} />
+      <Route path="/reading/advanced/part-2-matching/guide" element={<OteAdvancedReadingPart2Guide nativeRoutes />} />
+      <Route path="/reading/advanced/part-3-gapped-text/guide" element={<OteAdvancedReadingPart3Guide nativeRoutes />} />
+      <Route path="/reading/advanced/part-4-long-text/guide" element={<OteAdvancedReadingPart4Guide nativeRoutes />} />
+      <Route path="/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes />} />
+      <Route path="/reading/advanced/part-3-gapped-text/distractor-laboratory" element={<OteAdvancedReadingDistractorLaboratory nativeRoutes />} />
+      <Route path="/reading/general/part-1-short-texts/guide" element={<OteReadingPart1Guide nativeRoutes />} />
+      <Route path="/reading/general/part-2-matching/guide/three-texts" element={<OteReadingPart2ThreeProfilesGuide nativeRoutes />} />
+      <Route path="/reading/general/part-2-matching/guide/people-and-choices" element={<OteReadingPart2PeopleAndChoicesGuide nativeRoutes />} />
+      <Route path="/reading/general/part-3-gapped-text/guide" element={<OteReadingPart3Guide nativeRoutes />} />
+      <Route path="/reading/general/part-3-gapped-text/cohesion-detective" element={<OteGeneralReadingCohesionDetective nativeRoutes />} />
+      <Route path="/reading/general/part-3-gapped-text/distractor-laboratory" element={<OteGeneralReadingDistractorLaboratory nativeRoutes />} />
+      <Route path="/reading/general/part-4-long-text/guide" element={<OteReadingPart4Guide nativeRoutes />} />
+      <Route path="/reading/advanced/part-1-short-texts/practice/:setId" element={<OteAdvancedReadingPart1Practice user={user} nativeRoutes />} />
+      <Route path="/reading/advanced/part-2-matching/practice/:setId" element={<OteAdvancedReadingPart2Practice user={user} nativeRoutes />} />
+      <Route path="/reading/advanced/part-3-gapped-text/practice/:setId" element={<OteAdvancedReadingPart3Practice user={user} nativeRoutes />} />
+      <Route path="/reading/general/part-3-gapped-text/practice/:setId" element={<OteGeneralReadingPart3Practice user={user} nativeRoutes />} />
+      <Route path="/reading/advanced/part-4-long-text/practice/:setId" element={<OteAdvancedReadingPart4Practice user={user} nativeRoutes />} />
+      <Route path="/reading/general/part-4-long-text/practice/:setId" element={<OteGeneralReadingPart4Practice user={user} nativeRoutes />} />
+      <Route path="/reading/general/part-1-short-texts/practice/:setId" element={<OteGeneralReadingPart1Practice user={user} nativeRoutes />} />
+      <Route path="/reading/general/part-2-matching/practice/:setId" element={<OteGeneralReadingPart2Practice user={user} nativeRoutes />} />
+      <Route path="/reading/:variant/:partId" element={<OteReadingPartShell user={user} nativeRoutes />} />
       <Route path="/writing/training/:section" element={<OteWritingTrainingMenu user={user} nativeRoutes />} />
       <Route path="/writing/training/email/guide" element={<OteWritingEmailGuide nativeRoutes />} />
       <Route path="/writing/training/essay/guide" element={<OteWritingEssayGuide nativeRoutes />} />
@@ -1720,7 +1759,7 @@ return (
   path="/reading"
   element={
     isOteSite
-      ? <RequireTeacher user={user}><OteReadingMenu user={user} nativeRoutes /></RequireTeacher>
+      ? <OteReadingMenu user={user} nativeRoutes />
       : (
         <ReadingMenu
           user={user}
