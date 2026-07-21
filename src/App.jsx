@@ -1494,7 +1494,14 @@ return (
   <Route path="/ote/reading/advanced/part-1-short-texts/distractor-forensics" element={<OteAdvancedReadingDistractorForensics nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-1-short-texts/distractor-detective" element={<OteGeneralReadingDistractorDetective nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-2-matching/guide" element={<OteAdvancedReadingPart2Guide nativeRoutes={false} />} />
-  <Route path="/ote/reading/advanced/part-2-matching/decode-before-search" element={<OteAdvancedReadingDecodeBeforeSearch nativeRoutes={false} />} />
+  <Route
+    path="/ote/reading/advanced/part-2-matching/decode-before-search"
+    element={
+      <RequireTeacher user={user}>
+        <OteAdvancedReadingDecodeBeforeSearch nativeRoutes={false} />
+      </RequireTeacher>
+    }
+  />
   <Route path="/ote/reading/advanced/part-3-gapped-text/guide" element={<OteAdvancedReadingPart3Guide nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-4-long-text/guide" element={<OteAdvancedReadingPart4Guide nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes={false} />} />
@@ -1698,7 +1705,14 @@ return (
       <Route path="/reading/advanced/part-1-short-texts/distractor-forensics" element={<OteAdvancedReadingDistractorForensics nativeRoutes />} />
       <Route path="/reading/general/part-1-short-texts/distractor-detective" element={<OteGeneralReadingDistractorDetective nativeRoutes />} />
       <Route path="/reading/advanced/part-2-matching/guide" element={<OteAdvancedReadingPart2Guide nativeRoutes />} />
-      <Route path="/reading/advanced/part-2-matching/decode-before-search" element={<OteAdvancedReadingDecodeBeforeSearch nativeRoutes />} />
+      <Route
+        path="/reading/advanced/part-2-matching/decode-before-search"
+        element={
+          <RequireTeacher user={user}>
+            <OteAdvancedReadingDecodeBeforeSearch nativeRoutes />
+          </RequireTeacher>
+        }
+      />
       <Route path="/reading/advanced/part-3-gapped-text/guide" element={<OteAdvancedReadingPart3Guide nativeRoutes />} />
       <Route path="/reading/advanced/part-4-long-text/guide" element={<OteAdvancedReadingPart4Guide nativeRoutes />} />
       <Route path="/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes />} />

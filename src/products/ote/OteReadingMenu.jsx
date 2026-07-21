@@ -178,6 +178,7 @@ const READING_VARIANTS = {
             route: "decode-before-search",
             icon: Target,
             eyebrow: "Skill trainer · Seven questions → three texts",
+            previewOnly: true,
           },
         ],
         icon: Search,
@@ -244,6 +245,7 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
   const basePath = getReadingBasePath(nativeRoutes);
   const requestedPartIsValid = activeConfig.parts.some((item) => item.id === partId);
   const completedProgress = useOteTrainingProgress();
+  const isTeacherOrAdmin = user?.role === "teacher" || user?.role === "admin";
 
   if (variant !== activeVariant || !requestedPartIsValid) {
     const fallbackPartId = requestedPartIsValid ? partId : activeConfig.parts[0].id;
@@ -351,16 +353,18 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
           {guideCards.map((guide) => {
             const GuideIcon = guide.icon || Icon;
             const guideComplete = completedProgress.has(guide.progressId);
+            const guideLocked = guide.previewOnly && !isTeacherOrAdmin;
             return (
               <button
-                className={`ote-training-activity-card ${guideComplete ? "is-complete" : ""}`}
+                className={`ote-training-activity-card ${guideComplete && !guideLocked ? "is-complete" : ""}`}
                 key={guide.progressId}
                 type="button"
+                disabled={guideLocked}
                 onClick={() => navigate(guide.path)}
               >
-                {guideComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+                {guideComplete && !guideLocked ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
                 <GuideIcon size={28} aria-hidden="true" />
-                <span>{guide.eyebrow || "Guide"}</span>
+                <span>{guideLocked ? "Coming soon" : guide.eyebrow || "Guide"}</span>
                 <h2>{guide.title}</h2>
                 <p>{guide.copy}</p>
               </button>
