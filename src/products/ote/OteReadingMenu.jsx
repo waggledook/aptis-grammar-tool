@@ -163,9 +163,23 @@ const READING_VARIANTS = {
         label: "Part 2",
         title: "Matching",
         copy: "Match six or seven items with texts, using fast search reading for detail, opinion, and implication.",
-        guideTitle: "Multiple Matching Strategy Guide",
-        guideCopy: "Compare the two possible layouts, practise a fast matching method, and learn how to reject partial matches.",
-        guideProgressId: "reading.part2.advanced-guide",
+        guides: [
+          {
+            title: "Multiple Matching Strategy Guide",
+            copy: "Compare the two possible layouts, practise a fast matching method, and learn how to reject partial matches.",
+            progressId: "reading.part2.advanced-guide",
+            route: "guide",
+            icon: Search,
+          },
+          {
+            title: "Decode Before You Search",
+            copy: "Decode seven questions, compare three accounts, and prove each match with complete supporting evidence.",
+            progressId: "reading.part2.advanced-decode-before-search",
+            route: "decode-before-search",
+            icon: Target,
+            eyebrow: "Skill trainer · Seven questions → three texts",
+          },
+        ],
         icon: Search,
       },
       {

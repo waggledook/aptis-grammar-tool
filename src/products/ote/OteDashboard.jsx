@@ -55,7 +55,7 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
     <main className="menu-wrapper hub-menu-wrapper ote-menu-wrapper">
       <Seo
         title="OTE Training | Seif English"
-        description="Oxford Test of English mock-test training for speaking and writing."
+        description="Oxford Test of English training for speaking, writing, and reading."
       />
 
       <header className="main-header ote-main-header">
@@ -72,11 +72,11 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
           <span className="whats-new-label">{isAdvanced ? "Advanced practice" : "Mock-test environment"}</span>
-          <h3>{isAdvanced ? "Prepare for OTE Advanced" : "Speaking and writing mocks are ready"}</h3>
+          <h3>{isAdvanced ? "Prepare for OTE Advanced" : "Speaking, writing, and reading practice is ready"}</h3>
           <p>
             {isAdvanced
-              ? "Practise the higher-level speaking and writing tasks with timed mock-test activities."
-              : "Start with OTE-style mock environments for speaking recordings and timed writing practice."}
+              ? "Practise higher-level speaking, writing, and reading tasks with guides, focused training, and timed activities."
+              : "Build each OTE skill with mock environments, clear guides, and focused practice activities."}
           </p>
         </div>
         {!isAdvanced ? (
@@ -98,12 +98,10 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
             <p>Practise the advanced essay and integrated summary tasks in a timed writing environment.</p>
           </button>
 
-          {isTeacherOrAdmin ? (
-            <button className="menu-card" type="button" onClick={() => navigate(readingPath)}>
-              <h3>Advanced Reading</h3>
-              <p>Open the four Advanced reading sections: short texts, matching, gapped text, and long text.</p>
-            </button>
-          ) : null}
+          <button className="menu-card" type="button" onClick={() => navigate(readingPath)}>
+            <h3>Advanced Reading</h3>
+            <p>Open the four Advanced reading sections: short texts, matching, gapped text, and long text.</p>
+          </button>
 
           <button className="menu-card" type="button" disabled>
             <h3>Advanced Language Lab</h3>
@@ -129,12 +127,10 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
             <p>Timed writing mocks and task practice for email, essay, and article responses.</p>
           </button>
 
-          {isTeacherOrAdmin ? (
-            <button className="menu-card" type="button" onClick={() => navigate(readingPath)}>
-              <h3>Reading</h3>
-              <p>Open the reading part menu for short texts, matching, gapped text, and long text.</p>
-            </button>
-          ) : null}
+          <button className="menu-card" type="button" onClick={() => navigate(readingPath)}>
+            <h3>Reading</h3>
+            <p>Open the reading part menu for short texts, matching, gapped text, and long text.</p>
+          </button>
 
           <button className="menu-card" type="button" onClick={() => navigate(profilePath)}>
             <h3>My Profile</h3>
