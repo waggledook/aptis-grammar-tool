@@ -221,7 +221,9 @@ import OteAdvancedReadingPart2Practice from "./products/ote/OteAdvancedReadingPa
 import OteAdvancedReadingPart3Practice from "./products/ote/OteAdvancedReadingPart3Practice.jsx";
 import OteAdvancedReadingPart1Guide from "./products/ote/OteAdvancedReadingPart1Guide.jsx";
 import OteAdvancedReadingPart1TargetTrainer from "./products/ote/OteAdvancedReadingPart1TargetTrainer.jsx";
+import OteGeneralReadingPart1TargetTrainer from "./products/ote/OteGeneralReadingPart1TargetTrainer.jsx";
 import OteAdvancedReadingDistractorForensics from "./products/ote/OteAdvancedReadingDistractorForensics.jsx";
+import OteGeneralReadingDistractorDetective from "./products/ote/OteGeneralReadingDistractorDetective.jsx";
 import OteAdvancedReadingPart2Guide from "./products/ote/OteAdvancedReadingPart2Guide.jsx";
 import OteAdvancedReadingPart3Guide from "./products/ote/OteAdvancedReadingPart3Guide.jsx";
 import OteAdvancedReadingPart4Guide from "./products/ote/OteAdvancedReadingPart4Guide.jsx";
@@ -1487,7 +1489,9 @@ return (
   <Route path="/ote/reading/mock-tests/advanced-reading-1" element={<OteAdvancedReadingMockRunner user={user} nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-1-short-texts/guide" element={<OteAdvancedReadingPart1Guide nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-1-short-texts/reading-target" element={<OteAdvancedReadingPart1TargetTrainer nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-1-short-texts/reading-target" element={<OteGeneralReadingPart1TargetTrainer nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-1-short-texts/distractor-forensics" element={<OteAdvancedReadingDistractorForensics nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-1-short-texts/distractor-detective" element={<OteGeneralReadingDistractorDetective nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-2-matching/guide" element={<OteAdvancedReadingPart2Guide nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-3-gapped-text/guide" element={<OteAdvancedReadingPart3Guide nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-4-long-text/guide" element={<OteAdvancedReadingPart4Guide nativeRoutes={false} />} />
@@ -1688,7 +1692,9 @@ return (
       <Route path="/reading/mock-tests/advanced-reading-1" element={<OteAdvancedReadingMockRunner user={user} nativeRoutes />} />
       <Route path="/reading/advanced/part-1-short-texts/guide" element={<OteAdvancedReadingPart1Guide nativeRoutes />} />
       <Route path="/reading/advanced/part-1-short-texts/reading-target" element={<OteAdvancedReadingPart1TargetTrainer nativeRoutes />} />
+      <Route path="/reading/general/part-1-short-texts/reading-target" element={<OteGeneralReadingPart1TargetTrainer nativeRoutes />} />
       <Route path="/reading/advanced/part-1-short-texts/distractor-forensics" element={<OteAdvancedReadingDistractorForensics nativeRoutes />} />
+      <Route path="/reading/general/part-1-short-texts/distractor-detective" element={<OteGeneralReadingDistractorDetective nativeRoutes />} />
       <Route path="/reading/advanced/part-2-matching/guide" element={<OteAdvancedReadingPart2Guide nativeRoutes />} />
       <Route path="/reading/advanced/part-3-gapped-text/guide" element={<OteAdvancedReadingPart3Guide nativeRoutes />} />
       <Route path="/reading/advanced/part-4-long-text/guide" element={<OteAdvancedReadingPart4Guide nativeRoutes />} />

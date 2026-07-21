@@ -26,12 +26,13 @@ const LABS = [
     description: "Start with clear references, actions and results.",
     articleTitle: "The shared umbrellas",
     sentences: {
-      A: "Each umbrella had the pool’s name printed clearly on its handle.",
-      B: "Staff posted a message asking borrowers to return any umbrellas that day.",
-      C: "Because the scheme worked well, the pool decided to continue it permanently.",
-      D: "Several visitors suggested moving the stand closer to the changing rooms.",
+      A: "Staff posted a message asking borrowers to return any umbrellas that day.",
+      B: "Several visitors suggested moving the stand closer to the changing rooms.",
+      C: "Each umbrella had the pool’s name printed clearly on its handle.",
+      D: "Because the scheme worked well, the pool decided to continue it permanently.",
     },
-    answers: { 1: "A", 2: "B", 3: "C" },
+    sentenceOrder: ["A", "D", "B", "C"],
+    answers: { 1: "C", 2: "A", 3: "D" },
     article: [
       "Visitors to a community swimming pool often arrived in good weather but left during heavy rain. Last autumn, the manager placed a stand of bright yellow umbrellas beside the main exit. Anyone could borrow one and return it on their next visit.",
       {
@@ -53,8 +54,8 @@ const LABS = [
     investigations: [
       {
         gap: 1,
-        tempting: "D",
-        question: "Why is D weaker here?",
+        tempting: "B",
+        question: "Why is B weaker here?",
         choices: [
           "It describes a suggestion, not an action that could have produced the result described by ‘This’.",
           "Visitors have not been mentioned in the text.",
@@ -62,7 +63,7 @@ const LABS = [
         ],
         answer: 0,
         diagnosis: "A suggestion cannot explain a completed result",
-        explanation: "D tells us what visitors suggested. It does not say the stand was moved. A explains ‘This’: the printed name helped people know where the umbrellas belonged.",
+        explanation: "B tells us what visitors suggested. It does not say the stand was moved. C explains ‘This’: the printed name helped people know where the umbrellas belonged.",
         highlights: {
           before: [],
           answer: ["pool’s name printed clearly on its handle"],
@@ -71,8 +72,8 @@ const LABS = [
       },
       {
         gap: 2,
-        tempting: "D",
-        question: "What is the main problem with D here?",
+        tempting: "B",
+        question: "What is the main problem with B here?",
         choices: [
           "The suggestion happens too early in the story.",
           "It does not explain why seven umbrellas were returned that evening.",
@@ -80,7 +81,7 @@ const LABS = [
         ],
         answer: 1,
         diagnosis: "It does not explain the result",
-        explanation: "Moving the stand might help in the future, but it cannot bring the umbrellas back that day. B gives the action that caused the result: staff asked people to return them.",
+        explanation: "Moving the stand might help in the future, but it cannot bring the umbrellas back that day. A gives the action that caused the result: staff asked people to return them.",
         highlights: {
           before: ["the stand was completely empty"],
           answer: ["asking borrowers to return any umbrellas that day"],
@@ -89,8 +90,8 @@ const LABS = [
       },
       {
         gap: 3,
-        tempting: "D",
-        question: "Why is C stronger?",
+        tempting: "B",
+        question: "Why is D stronger?",
         choices: [
           "It explains how the umbrellas were bought.",
           "It connects the successful month to a decision about the future.",
@@ -98,7 +99,7 @@ const LABS = [
         ],
         answer: 1,
         diagnosis: "Right topic, wrong direction",
-        explanation: "The text is moving from a successful trial to the pool’s future plans. D stays on the topic, but nothing later discusses the position of the stand.",
+        explanation: "The text is moving from a successful trial to the pool’s future plans. B stays on the topic, but nothing later discusses the position of the stand.",
         highlights: {
           before: ["only two umbrellas were still missing", "expected to lose far more"],
           answer: ["scheme worked well", "continue it permanently"],
@@ -120,6 +121,7 @@ const LABS = [
       D: "Successful schemes adjust each street separately instead of applying one setting everywhere.",
       E: "Concern remained highest at junctions, where traffic came from several directions.",
     },
+    sentenceOrder: ["B", "D", "A", "E", "C"],
     answers: { 1: "C", 2: "E", 3: "A", 4: "D" },
     article: [
       "Street lights help people travel safely after dark, but keeping them at full brightness all night uses energy and can disturb nocturnal animals. Some towns have therefore begun testing adaptive lights, which become brighter only when needed.",
@@ -240,23 +242,27 @@ function HighlightedText({ text, fragments = [], active = false }) {
 }
 
 function SentenceBank({ lab, placements, selected, onSelect }) {
-  const available = Object.keys(lab.sentences).filter((id) => !Object.values(placements).includes(id));
   return (
     <aside className="ote-distractor-bank" aria-label="Missing sentences">
       <div><p className="ote-kicker">Missing sentences</p><h2>Choose or drag</h2></div>
-      {available.map((id) => (
-        <button
-          className={selected === id ? "is-selected" : ""}
-          draggable
-          key={id}
-          type="button"
-          aria-pressed={selected === id}
-          onClick={() => onSelect(selected === id ? "" : id)}
-          onDragStart={(event) => event.dataTransfer.setData("text/plain", id)}
-        >
-          <GripVertical size={18} aria-hidden="true" /><strong>{id}</strong><span>{lab.sentences[id]}</span>
-        </button>
-      ))}
+      {lab.sentenceOrder.map((id) => {
+        const placedGap = Object.entries(placements).find(([, sentenceId]) => sentenceId === id)?.[0];
+        return (
+          <button
+            className={`${selected === id ? "is-selected" : ""} ${placedGap ? "is-placed" : ""}`}
+            draggable
+            key={id}
+            type="button"
+            aria-pressed={selected === id}
+            aria-label={`${id}. ${lab.sentences[id]}${placedGap ? ` Placed in gap ${placedGap}.` : ""}`}
+            onClick={() => onSelect(selected === id ? "" : id)}
+            onDragStart={(event) => event.dataTransfer.setData("text/plain", id)}
+          >
+            <GripVertical size={18} aria-hidden="true" /><strong>{id}</strong><span>{lab.sentences[id]}</span>
+            {placedGap ? <small>In gap {placedGap}</small> : null}
+          </button>
+        );
+      })}
       <p>One sentence will remain unused.</p>
     </aside>
   );
@@ -300,7 +306,12 @@ function LaboratoryArticle(props) {
         return (
           <p className={active ? "is-investigating" : ""} key={paragraph.gap}>
             <HighlightedText text={paragraph.before} fragments={investigation?.highlights.before} active={active && evidenceRevealed} />
-            <ArticleGap lab={lab} id={paragraph.gap} {...props} />
+            <ArticleGap
+              lab={lab}
+              id={paragraph.gap}
+              {...props}
+              placement={props.placements?.[paragraph.gap]}
+            />
             <HighlightedText text={paragraph.after} fragments={investigation?.highlights.after} active={active && evidenceRevealed} />
           </p>
         );

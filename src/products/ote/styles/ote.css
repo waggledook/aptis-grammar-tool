@@ -12798,6 +12798,10 @@
   border-color: var(--distractor-accent);
   background: color-mix(in srgb, var(--distractor-accent) 7%, var(--color-surface, #fff));
 }
+.ote-distractor-bank > button.is-placed:not(.is-selected) {
+  border-color: color-mix(in srgb, #16803c 45%, var(--color-border));
+  background: color-mix(in srgb, #16803c 6%, var(--color-surface, #fff));
+}
 .ote-distractor-bank > button > svg { margin-top: .13rem; color: var(--color-text-soft); }
 .ote-distractor-bank > button > strong {
   display: grid;
@@ -12810,6 +12814,17 @@
   font-size: .72rem;
 }
 .ote-distractor-bank > button > span { font-size: .82rem; line-height: 1.45; }
+.ote-distractor-bank > button > small {
+  grid-column: 3;
+  justify-self: start;
+  margin-top: -.15rem;
+  padding: .16rem .42rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, #16803c 12%, transparent);
+  color: #16803c;
+  font-size: .65rem;
+  font-weight: 900;
+}
 .ote-distractor-bank > p { margin: .1rem 0 0; color: var(--color-text-soft); font-size: .74rem; text-align: center; }
 
 .ote-distractor-article { padding: 1.05rem 1.15rem; }
@@ -13140,6 +13155,10 @@
 .ote-forensics-panel .ote-cohesion-actions { margin-top: .8rem; }
 
 .ote-forensics-diagnostic-report { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; max-width: 760px; margin: .9rem auto 0; text-align: left; }
+.ote-forensics-round-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .55rem; max-width: 760px; margin: .7rem auto 0; text-align: left; }
+.ote-forensics-round-summary article { display: flex; align-items: center; justify-content: space-between; gap: .75rem; padding: .65rem .8rem; border: 1px solid var(--color-border); border-radius: 9px; background: color-mix(in srgb, var(--forensics-accent) 4%, var(--color-surface, #fff)); }
+.ote-forensics-round-summary span { color: var(--color-text-soft); font-size: .76rem; font-weight: 800; }
+.ote-forensics-round-summary strong { color: var(--forensics-accent); font-size: 1rem; white-space: nowrap; }
 .ote-forensics-diagnostic-report article { display: flex; gap: .55rem; align-items: flex-start; padding: .8rem; border: 1px solid color-mix(in srgb, var(--forensics-warm) 35%, var(--color-border)); border-radius: 10px; background: color-mix(in srgb, var(--forensics-warm) 6%, transparent); }
 .ote-forensics-diagnostic-report article.is-success { grid-column: 1 / -1; border-color: color-mix(in srgb, #16803c 35%, var(--color-border)); background: color-mix(in srgb, #16803c 6%, transparent); }
 .ote-forensics-diagnostic-report article > svg { flex: 0 0 auto; color: var(--forensics-warm); }
@@ -13164,6 +13183,7 @@
 
 @media (max-width: 620px) {
   .ote-forensics-reference > div,
+  .ote-forensics-round-summary,
   .ote-forensics-diagnostic-report { grid-template-columns: 1fr; }
   .ote-forensics-diagnostic-report article.is-success { grid-column: auto; }
   .ote-forensics-check { width: 100%; }

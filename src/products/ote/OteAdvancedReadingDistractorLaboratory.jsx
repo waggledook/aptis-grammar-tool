@@ -19,14 +19,16 @@ import { getSitePath } from "../../siteConfig.js";
 import "./styles/ote.css";
 
 const SENTENCES = {
-  A: "A crack that appears serious may stop widening once the object has adjusted to its new environment.",
-  B: "Over several months, tiny sensors recorded how the wood moved as the surrounding air became wetter or drier.",
-  C: "The value of delaying treatment depends on whether deterioration is continuing or has already stabilised.",
-  D: "These records help conservators distinguish a temporary adjustment from an ongoing problem.",
-  E: "Visible repairs can also reassure visitors that a collection is being actively cared for.",
+  A: "Over several months, tiny sensors recorded how the wood moved as the surrounding air became wetter or drier.",
+  B: "These records help conservators distinguish a temporary adjustment from an ongoing problem.",
+  C: "Visible repairs can also reassure visitors that a collection is being actively cared for.",
+  D: "A crack that appears serious may stop widening once the object has adjusted to its new environment.",
+  E: "The value of delaying treatment depends on whether deterioration is continuing or has already stabilised.",
 };
 
-const ANSWERS = { 1: "A", 2: "B", 3: "C", 4: "D" };
+const SENTENCE_ORDER = ["A", "C", "E", "B", "D"];
+
+const ANSWERS = { 1: "D", 2: "A", 3: "E", 4: "B" };
 
 const ARTICLE = [
   "When an old object becomes cracked or damaged, repairing it immediately may seem like the obvious response. Conservators, however, know that every treatment changes some of the original material. In certain situations, careful observation is safer than immediate action.",
@@ -55,8 +57,8 @@ const ARTICLE = [
 const INVESTIGATIONS = [
   {
     gap: 1,
-    tempting: "E",
-    question: "Why is E weaker here?",
+    tempting: "C",
+    question: "Why is C weaker here?",
     choices: [
       "It repeats information that has already been explained.",
       "It introduces a relevant side issue but does not explain why immediate treatment may be harmful.",
@@ -64,7 +66,7 @@ const INVESTIGATIONS = [
     ],
     answer: 1,
     diagnosis: "Right topic, wrong line of argument",
-    explanation: "E is relevant to conservation and offers a believable reason for visible repairs. This paragraph, however, explains the physical behaviour of wood and why apparent damage may not require immediate intervention. Visitors’ reactions do not lead to the danger of treating the wood too soon.",
+    explanation: "C is relevant to conservation and offers a believable reason for visible repairs. This paragraph, however, explains the physical behaviour of wood and why apparent damage may not require immediate intervention. Visitors’ reactions do not lead to the danger of treating the wood too soon.",
     highlights: {
       before: ["A newly visible crack may therefore appear more alarming than it really is"],
       answer: ["may stop widening", "adjusted to its new environment"],
@@ -73,8 +75,8 @@ const INVESTIGATIONS = [
   },
   {
     gap: 2,
-    tempting: "D",
-    question: "What is the main problem with D here?",
+    tempting: "B",
+    question: "What is the main problem with B here?",
     choices: [
       "‘These records’ has no established reference because the records have not yet been introduced.",
       "It describes the findings before the project has begun.",
@@ -82,7 +84,7 @@ const INVESTIGATIONS = [
     ],
     answer: 0,
     diagnosis: "Reference introduced too early",
-    explanation: "D belongs to the article and makes sense as a general point about monitoring. At this gap, however, ‘These records’ has no established antecedent. B introduces both the sensors and the measurements that the following sentence calls ‘the readings’.",
+    explanation: "B belongs to the article and makes sense as a general point about monitoring. At this gap, however, ‘These records’ has no established antecedent. A introduces both the sensors and the measurements that the following sentence calls ‘the readings’.",
     highlights: {
       before: ["conservators compared painted wooden panels"],
       answer: ["tiny sensors recorded how the wood moved"],
@@ -91,8 +93,8 @@ const INVESTIGATIONS = [
   },
   {
     gap: 3,
-    tempting: "A",
-    question: "Why is C stronger than A here?",
+    tempting: "D",
+    question: "Why is E stronger than D here?",
     choices: [
       "It introduces a general principle which the following example then helps to define.",
       "It gives more scientific detail about the previous experiment.",
@@ -100,7 +102,7 @@ const INVESTIGATIONS = [
     ],
     answer: 0,
     diagnosis: "An example where the paragraph needs a rule",
-    explanation: "A supports the idea that waiting can sometimes be sensible, but the paragraph has moved beyond one kind of crack. It now needs a broad rule distinguishing safe delay from dangerous inaction. The next sentence illustrates the dangerous category.",
+    explanation: "D supports the idea that waiting can sometimes be sensible, but the paragraph has moved beyond one kind of crack. It now needs a broad rule distinguishing safe delay from dangerous inaction. The next sentence illustrates the dangerous category.",
     highlights: {
       before: ["damaged objects should simply be ignored"],
       answer: ["depends on whether deterioration is continuing or has already stabilised"],
@@ -109,8 +111,8 @@ const INVESTIGATIONS = [
   },
   {
     gap: 4,
-    tempting: "C",
-    question: "Why is C unsuitable here?",
+    tempting: "E",
+    question: "Why is E unsuitable here?",
     choices: [
       "It is too general at a point where the text needs to explain the value of the new technology.",
       "It disagrees with the paragraph’s conclusion about treatment.",
@@ -118,7 +120,7 @@ const INVESTIGATIONS = [
     ],
     answer: 0,
     diagnosis: "Right idea, wrong position",
-    explanation: "C states an important principle, but that principle belongs in the previous paragraph. This paragraph has a new function: explaining how technology supports the decision. D develops the records mentioned immediately beforehand and leads directly to evidence-based action.",
+    explanation: "E states an important principle, but that principle belongs in the previous paragraph. This paragraph has a new function: explaining how technology supports the decision. B develops the records mentioned immediately beforehand and leads directly to evidence-based action.",
     highlights: {
       before: ["detailed records of change"],
       answer: ["These records", "temporary adjustment", "ongoing problem"],
@@ -145,28 +147,33 @@ function HighlightedText({ text, fragments = [], active = false }) {
   return output;
 }
 
-function SentenceBank({ available, selected, onSelect }) {
+function SentenceBank({ placements, selected, onSelect }) {
   return (
     <aside className="ote-distractor-bank" aria-label="Missing sentences">
       <div>
         <p className="ote-kicker">Missing sentences</p>
         <h2>Choose or drag</h2>
       </div>
-      {available.map((id) => (
-        <button
-          className={selected === id ? "is-selected" : ""}
-          draggable
-          key={id}
-          type="button"
-          aria-pressed={selected === id}
-          onClick={() => onSelect(selected === id ? "" : id)}
-          onDragStart={(event) => event.dataTransfer.setData("text/plain", id)}
-        >
-          <GripVertical size={18} aria-hidden="true" />
-          <strong>{id}</strong>
-          <span>{SENTENCES[id]}</span>
-        </button>
-      ))}
+      {SENTENCE_ORDER.map((id) => {
+        const placedGap = Object.entries(placements).find(([, sentenceId]) => sentenceId === id)?.[0];
+        return (
+          <button
+            className={`${selected === id ? "is-selected" : ""} ${placedGap ? "is-placed" : ""}`}
+            draggable
+            key={id}
+            type="button"
+            aria-pressed={selected === id}
+            aria-label={`${id}. ${SENTENCES[id]}${placedGap ? ` Placed in gap ${placedGap}.` : ""}`}
+            onClick={() => onSelect(selected === id ? "" : id)}
+            onDragStart={(event) => event.dataTransfer.setData("text/plain", id)}
+          >
+            <GripVertical size={18} aria-hidden="true" />
+            <strong>{id}</strong>
+            <span>{SENTENCES[id]}</span>
+            {placedGap ? <small>In gap {placedGap}</small> : null}
+          </button>
+        );
+      })}
       <p>One sentence will remain unused.</p>
     </aside>
   );
@@ -241,7 +248,11 @@ function LaboratoryArticle(props) {
               fragments={activeInvestigation?.highlights.before}
               active={isActive && evidenceRevealed}
             />
-            <ArticleGap id={paragraph.gap} {...props} />
+            <ArticleGap
+              id={paragraph.gap}
+              {...props}
+              placement={props.placements?.[paragraph.gap]}
+            />
             <HighlightedText
               text={paragraph.after}
               fragments={activeInvestigation?.highlights.after}
@@ -347,7 +358,6 @@ export default function OteAdvancedReadingDistractorLaboratory({ nativeRoutes = 
     : "/ote/reading/advanced/part-3-gapped-text";
   const menuPath = getSitePath(basePath);
   const practicePath = getSitePath(`${basePath}/practice/c1-pilot-1`);
-  const available = Object.keys(SENTENCES).filter((id) => !Object.values(placements).includes(id));
   const placedCount = Object.keys(placements).length;
   const placementScore = useMemo(
     () => Object.entries(ANSWERS).filter(([gap, answer]) => placements[gap] === answer).length,
@@ -491,7 +501,7 @@ export default function OteAdvancedReadingDistractorLaboratory({ nativeRoutes = 
               </div>
               <p className="ote-distractor-stage-copy">Choose a sentence, then tap a gap—or drag sentences directly into the article. Check both sides before you place it.</p>
               <div className="ote-distractor-solve-layout">
-                <SentenceBank available={available} selected={selectedSentence} onSelect={setSelectedSentence} />
+                <SentenceBank placements={placements} selected={selectedSentence} onSelect={setSelectedSentence} />
                 <LaboratoryArticle
                   phase={phase}
                   placements={placements}

@@ -1,23 +1,5 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-  ArrowLeft,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Fingerprint,
-  FlaskConical,
-  ListChecks,
-  RotateCcw,
-  Search,
-  ShieldQuestion,
-  XCircle,
-} from "lucide-react";
-import { useNavigate } from "react-router-dom";
-import Seo from "../../components/common/Seo.jsx";
-import { logOteTrainingCompleted } from "../../firebase.js";
-import { getSitePath } from "../../siteConfig.js";
-import ReadingCaseNavigator from "./ReadingCaseNavigator.jsx";
-import "./styles/ote.css";
+import React from "react";
+import OteReadingDistractorTrainer from "./OteReadingDistractorTrainer.jsx";
 
 const DIAGNOSES = [
   { id: "different-question", label: "Answers a different question", description: "The option contains a true detail, but not the information requested." },
@@ -247,232 +229,27 @@ const DIAGNOSTIC_FEEDBACK = {
   "wrong-link": "Track who holds each view and distinguish the cause of an event from the event itself.",
 };
 
-function HighlightedText({ text, fragments = [], active = false }) {
-  if (!active || !fragments.length) return text;
-  const ranges = fragments
-    .map((fragment) => ({ fragment, start: text.indexOf(fragment) }))
-    .filter(({ start }) => start >= 0)
-    .sort((a, b) => a.start - b.start);
-  const output = [];
-  let cursor = 0;
-  ranges.forEach(({ fragment, start }) => {
-    if (start < cursor) return;
-    if (start > cursor) output.push(text.slice(cursor, start));
-    output.push(<mark key={`${fragment}:${start}`}>{fragment}</mark>);
-    cursor = start + fragment.length;
-  });
-  if (cursor < text.length) output.push(text.slice(cursor));
-  return output;
-}
-
-function ForensicText({ item, activeDistractor, evidenceRevealed }) {
-  return (
-    <article className="ote-forensics-text">
-      <header><span>{item.source}</span><h2>{item.title}</h2></header>
-      {item.paragraphs.map((paragraph, index) => (
-        <p key={`${item.id}:${index}`}><HighlightedText text={paragraph} fragments={activeDistractor?.evidence} active={evidenceRevealed} /></p>
-      ))}
-    </article>
-  );
-}
-
-function getDiagnosisLabel(id) {
-  return DIAGNOSES.find((entry) => entry.id === id)?.label || id;
-}
+const CONFIG = {
+  cases: CASES,
+  diagnoses: DIAGNOSES,
+  diagnosticFeedback: DIAGNOSTIC_FEEDBACK,
+  variant: "advanced",
+  progressId: "reading.part1.advanced-distractor-forensics",
+  mode: "distractor_forensics",
+  taskId: "advanced-reading-part-1-distractor-forensics",
+  taskTitle: "Distractor Forensics",
+  title: "Distractor Forensics",
+  seoTitle: "Distractor Forensics | OTE Advanced Reading Part 1 | Seif English",
+  seoDescription: "Learn to identify exactly how realistic distractors change, overstate or misrepresent an Advanced Reading Part 1 text.",
+  kicker: "Advanced Reading Part 1 · Skill trainer",
+  intro: "Choose the best answer, then examine both wrong options and identify exactly where their meaning breaks down.",
+  wording: {
+    answerSummary: "Answer each Part 1 question before beginning the forensic examination.",
+    evidenceSummary: "The relevant wording appears inside the original text, not in a duplicate.",
+    successCopy: "You identified all twelve distractor patterns accurately.",
+  },
+};
 
 export default function OteAdvancedReadingDistractorForensics({ nativeRoutes = false }) {
-  const navigate = useNavigate();
-  const [caseIndex, setCaseIndex] = useState(0);
-  const [forensicIndex, setForensicIndex] = useState(0);
-  const [work, setWork] = useState({});
-  const [complete, setComplete] = useState(false);
-  const completionLoggedRef = useRef(false);
-  const item = CASES[caseIndex];
-  const itemWork = work[item.id] || {};
-  const activeDistractor = item.distractors[forensicIndex];
-  const selectedDiagnosis = itemWork.diagnoses?.[activeDistractor.option];
-  const diagnosisChecked = Boolean(itemWork.checkedDiagnoses?.[activeDistractor.option]);
-  const diagnosisCorrect = selectedDiagnosis === activeDistractor.diagnosis;
-  const answerCorrect = itemWork.answer === item.answer;
-  const completedCases = CASES.filter((entry) => entry.distractors.every((distractor) => work[entry.id]?.checkedDiagnoses?.[distractor.option])).length;
-  const basePath = nativeRoutes ? "/reading/advanced/part-1-short-texts" : "/ote/reading/advanced/part-1-short-texts";
-  const menuPath = getSitePath(basePath);
-  const practicePath = getSitePath(`${basePath}/practice/pilot-1`);
-  const answerScore = useMemo(() => CASES.filter((entry) => work[entry.id]?.answer === entry.answer).length, [work]);
-  const diagnosisScore = useMemo(() => CASES.reduce((score, entry) => score + entry.distractors.filter((distractor) => work[entry.id]?.diagnoses?.[distractor.option] === distractor.diagnosis).length, 0), [work]);
-  const missedDiagnosisCounts = useMemo(() => {
-    const counts = {};
-    CASES.forEach((entry) => entry.distractors.forEach((distractor) => {
-      const entryWork = work[entry.id] || {};
-      if (entryWork.checkedDiagnoses?.[distractor.option] && entryWork.diagnoses?.[distractor.option] !== distractor.diagnosis) {
-        counts[distractor.diagnosis] = (counts[distractor.diagnosis] || 0) + 1;
-      }
-    }));
-    return counts;
-  }, [work]);
-  const priorityFeedback = Object.entries(missedDiagnosisCounts).sort((a, b) => b[1] - a[1]).slice(0, 2);
-
-  useEffect(() => {
-    if (!complete || completionLoggedRef.current) return;
-    completionLoggedRef.current = true;
-    logOteTrainingCompleted({
-      progressId: "reading.part1.advanced-distractor-forensics",
-      section: "reading",
-      part: "part-1",
-      mode: "distractor_forensics",
-      taskId: "advanced-reading-part-1-distractor-forensics",
-      taskTitle: "Distractor Forensics",
-      variant: "advanced",
-      score: answerScore + diagnosisScore,
-      total: 18,
-      answerScore,
-      diagnosisScore,
-    });
-  }, [answerScore, complete, diagnosisScore]);
-
-  function updateItem(changes) {
-    setWork((current) => ({ ...current, [item.id]: { ...(current[item.id] || {}), ...changes } }));
-  }
-
-  function selectDiagnosis(diagnosis) {
-    if (diagnosisChecked) return;
-    setWork((current) => ({
-      ...current,
-      [item.id]: {
-        ...(current[item.id] || {}),
-        diagnoses: { ...(current[item.id]?.diagnoses || {}), [activeDistractor.option]: diagnosis },
-      },
-    }));
-  }
-
-  function checkDiagnosis() {
-    if (!selectedDiagnosis) return;
-    setWork((current) => ({
-      ...current,
-      [item.id]: {
-        ...(current[item.id] || {}),
-        checkedDiagnoses: { ...(current[item.id]?.checkedDiagnoses || {}), [activeDistractor.option]: true },
-      },
-    }));
-  }
-
-  function advance() {
-    if (!diagnosisChecked) return;
-    if (forensicIndex === 0) {
-      setForensicIndex(1);
-      return;
-    }
-    if (caseIndex === CASES.length - 1) {
-      setComplete(true);
-      return;
-    }
-    setCaseIndex((current) => current + 1);
-    setForensicIndex(0);
-  }
-
-  function resetActivity() {
-    setCaseIndex(0);
-    setForensicIndex(0);
-    setWork({});
-    setComplete(false);
-    completionLoggedRef.current = false;
-  }
-
-  return (
-    <main className="ote-training-page ote-forensics-page">
-      <Seo title="Distractor Forensics | OTE Advanced Reading Part 1 | Seif English" description="Learn to identify exactly how realistic distractors change, overstate or misrepresent an Advanced Reading Part 1 text." />
-      <button className="ote-training-back" type="button" onClick={() => navigate(menuPath)}><ArrowLeft size={18} aria-hidden="true" /> Back to Part 1 training</button>
-      <header className="ote-training-hero">
-        <p className="ote-kicker">Advanced Reading Part 1 · Skill trainer</p>
-        <h1>Distractor Forensics</h1>
-        <p>Choose the best answer, then examine both wrong options and identify exactly where their meaning breaks down.</p>
-      </header>
-      <section className="ote-training-summary" aria-label="Distractor Forensics overview">
-        <div><ListChecks size={24} aria-hidden="true" /><strong>6 best answers</strong><span>Answer each Part 1 question before beginning the forensic examination.</span></div>
-        <div><Fingerprint size={24} aria-hidden="true" /><strong>12 diagnoses</strong><span>Classify both wrong answers, even when your first choice was correct.</span></div>
-        <div><Search size={24} aria-hidden="true" /><strong>Evidence in context</strong><span>The relevant wording appears inside the original text, not in a duplicate.</span></div>
-      </section>
-      <details className="ote-forensics-reference">
-        <summary>The six diagnoses</summary>
-        <div>{DIAGNOSES.map((diagnosis) => <article key={diagnosis.id}><strong>{diagnosis.label}</strong><span>{diagnosis.description}</span></article>)}</div>
-      </details>
-
-      {complete ? (
-        <section className="ote-training-section ote-cohesion-complete">
-          <div className="ote-cohesion-complete-icon"><Fingerprint size={34} aria-hidden="true" /></div>
-          <p className="ote-kicker">Forensic report complete</p>
-          <h2>Two skills, separately measured</h2>
-          <div className="ote-cohesion-score-grid">
-            <article><span>Best answers</span><strong>{answerScore} / 6</strong><p>Your interpretation of each complete text.</p></article>
-            <article><span>Distractor diagnoses</span><strong>{diagnosisScore} / 12</strong><p>Your analysis of exactly why each wrong answer fails.</p></article>
-          </div>
-          <div className="ote-forensics-diagnostic-report">
-            {priorityFeedback.length ? priorityFeedback.map(([diagnosis]) => <article key={diagnosis}><ShieldQuestion size={20} aria-hidden="true" /><div><strong>{getDiagnosisLabel(diagnosis)}</strong><p>{DIAGNOSTIC_FEEDBACK[diagnosis]}</p></div></article>) : <article className="is-success"><CheckCircle2 size={20} aria-hidden="true" /><div><strong>Excellent diagnostic control</strong><p>You identified all twelve distractor patterns accurately.</p></div></article>}
-          </div>
-          <div className="ote-forensics-results">
-            {CASES.map((entry, index) => {
-              const answerRight = work[entry.id]?.answer === entry.answer;
-              const diagnosesRight = entry.distractors.filter((distractor) => work[entry.id]?.diagnoses?.[distractor.option] === distractor.diagnosis).length;
-              return <button key={entry.id} type="button" onClick={() => { setCaseIndex(index); setForensicIndex(0); setComplete(false); }}>{answerRight && diagnosesRight === 2 ? <CheckCircle2 size={19} aria-hidden="true" /> : <XCircle size={19} aria-hidden="true" />}<span>Case {index + 1}: {entry.title}</span><small>Answer {answerRight ? "✓" : "✗"} · Diagnoses {diagnosesRight}/2</small></button>;
-            })}
-          </div>
-          <div className="ote-cohesion-actions is-complete">
-            <button className="is-secondary" type="button" onClick={resetActivity}><RotateCcw size={17} aria-hidden="true" /> Try all cases again</button>
-            <button type="button" onClick={() => navigate(practicePath)}>Open timed practice <ChevronRight size={17} aria-hidden="true" /></button>
-          </div>
-        </section>
-      ) : (
-        <section className="ote-training-section ote-forensics-runner">
-          <div className="ote-cohesion-progress-head"><div><span>Case {caseIndex + 1} of {CASES.length} · {item.source}</span><strong>{completedCases} / 6 complete</strong></div><div className="ote-practice-progress-bar" aria-hidden="true"><span style={{ width: `${(completedCases / CASES.length) * 100}%` }} /></div></div>
-          <ReadingCaseNavigator
-            items={CASES}
-            currentIndex={caseIndex}
-            isComplete={(entry) => entry.distractors.every((distractor) => work[entry.id]?.checkedDiagnoses?.[distractor.option])}
-            onSelect={(index) => { setCaseIndex(index); setForensicIndex(0); }}
-          />
-          <article className="ote-forensics-case">
-            <header><p className="ote-kicker">Case {caseIndex + 1} · {item.title}</p><h2>{item.question}</h2></header>
-            {!itemWork.answerChecked ? (
-              <>
-                <ForensicText item={item} />
-                <div className="ote-cohesion-options" role="radiogroup" aria-label={`Answer options for case ${caseIndex + 1}`}>
-                  {item.options.map((option) => <button className={itemWork.answer === option.id ? "is-selected" : ""} key={option.id} type="button" role="radio" aria-checked={itemWork.answer === option.id} onClick={() => updateItem({ answer: option.id })}><strong>{option.id}</strong><span>{option.text}</span></button>)}
-                </div>
-                <button className="ote-forensics-check" type="button" disabled={!itemWork.answer} onClick={() => updateItem({ answerChecked: true })}>Check best answer</button>
-              </>
-            ) : (
-              <>
-                <div className={`ote-forensics-answer-banner ${answerCorrect ? "is-correct" : "is-wrong"}`}>{answerCorrect ? <CheckCircle2 size={21} aria-hidden="true" /> : <XCircle size={21} aria-hidden="true" />}<p><strong>{answerCorrect ? "Correct." : `The best answer is ${item.answer}.`}</strong> {item.why}</p></div>
-                <div className="ote-forensics-investigation-layout">
-                  <ForensicText item={item} activeDistractor={activeDistractor} evidenceRevealed={diagnosisChecked} />
-                  <aside className="ote-forensics-panel">
-                    <div className="ote-distractor-lab-progress"><span>Wrong option {forensicIndex + 1} of 2</span><strong>Case {caseIndex + 1}</strong></div>
-                    <div className="ote-distractor-lab-progress-bar" aria-hidden="true"><span style={{ width: `${((forensicIndex + (diagnosisChecked ? 1 : 0)) / 2) * 100}%` }} /></div>
-                    <p className="ote-kicker">Forensic examination: {activeDistractor.option}</p>
-                    <h3>{item.options.find((option) => option.id === activeDistractor.option)?.text}</h3>
-                    <label htmlFor={`diagnosis-${item.id}-${activeDistractor.option}`}>Where does the meaning break down?</label>
-                    <select id={`diagnosis-${item.id}-${activeDistractor.option}`} value={selectedDiagnosis || ""} disabled={diagnosisChecked} onChange={(event) => selectDiagnosis(event.target.value)}>
-                      <option value="">Select a diagnosis…</option>
-                      {DIAGNOSES.map((diagnosis) => <option value={diagnosis.id} key={diagnosis.id}>{diagnosis.label}</option>)}
-                    </select>
-                    {!diagnosisChecked ? <button className="ote-forensics-check" type="button" disabled={!selectedDiagnosis} onClick={checkDiagnosis}>Check diagnosis</button> : (
-                      <div className={`ote-forensics-autopsy ${diagnosisCorrect ? "is-correct" : "is-wrong"}`} aria-live="polite">
-                        <div>{diagnosisCorrect ? <CheckCircle2 size={20} aria-hidden="true" /> : <XCircle size={20} aria-hidden="true" />}<p><strong>{diagnosisCorrect ? "Diagnosis confirmed." : `Best diagnosis: ${getDiagnosisLabel(activeDistractor.diagnosis)}.`}</strong></p></div>
-                        <span>{activeDistractor.note}</span><p>{activeDistractor.explanation}</p>
-                      </div>
-                    )}
-                    <div className="ote-cohesion-actions">
-                      <button className="is-secondary" type="button" disabled={forensicIndex === 0} onClick={() => setForensicIndex(0)}><ChevronLeft size={17} aria-hidden="true" /> Previous option</button>
-                      <button type="button" disabled={!diagnosisChecked} onClick={advance}>{forensicIndex === 0 ? "Examine second option" : caseIndex === CASES.length - 1 ? "View final report" : "Next case"}<ChevronRight size={17} aria-hidden="true" /></button>
-                    </div>
-                  </aside>
-                </div>
-              </>
-            )}
-            {!itemWork.answerChecked ? <div className="ote-cohesion-actions"><button className="is-secondary" type="button" disabled={caseIndex === 0} onClick={() => { setCaseIndex((current) => Math.max(0, current - 1)); setForensicIndex(0); }}><ChevronLeft size={17} aria-hidden="true" /> Previous case</button></div> : null}
-          </article>
-        </section>
-      )}
-    </main>
-  );
+  return <OteReadingDistractorTrainer nativeRoutes={nativeRoutes} config={CONFIG} />;
 }
