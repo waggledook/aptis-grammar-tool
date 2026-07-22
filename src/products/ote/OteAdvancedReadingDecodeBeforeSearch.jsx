@@ -74,11 +74,11 @@ const QUESTIONS = [
     type: "specific",
     typeFeedback: "You need one reason why somebody enrolled.",
     rephrases: [
-      { id: "A", text: "Who went to support a friend who wanted company?" },
-      { id: "B", text: "Who persuaded a friend to take the course?" },
-      { id: "C", text: "Who hoped to meet new people during the course?" },
+      { id: "A", text: "Who hoped to meet new people during the course?" },
+      { id: "B", text: "Who went to support a friend who wanted company?" },
+      { id: "C", text: "Who persuaded a friend to take the course?" },
     ],
-    rephraseAnswer: "A",
+    rephraseAnswer: "B",
     targetIdeas: ["Another person did not want to attend alone", "The writer agreed to go with them"],
     answer: "A",
     evidenceOptions: [
@@ -98,11 +98,11 @@ const QUESTIONS = [
     type: "attitude",
     typeFeedback: "The question asks how somebody eventually felt about a teaching decision.",
     rephrases: [
-      { id: "A", text: "Who later valued having to work out a technical difficulty alone?" },
-      { id: "B", text: "Who believed that the tutor lacked the knowledge to help?" },
-      { id: "C", text: "Who preferred learning the technical skills before beginning the project?" },
+      { id: "A", text: "Who believed that the tutor lacked the knowledge to help?" },
+      { id: "B", text: "Who preferred learning the technical skills before beginning the project?" },
+      { id: "C", text: "Who later valued having to work out a technical difficulty alone?" },
     ],
-    rephraseAnswer: "A",
+    rephraseAnswer: "C",
     targetIdeas: ["The tutor did not solve the problem", "The learner eventually saw this as useful"],
     answer: "B",
     evidenceOptions: [
@@ -170,11 +170,11 @@ const QUESTIONS = [
     type: "attitude",
     typeFeedback: "The writer’s new view is expressed indirectly. Look for an earlier reaction and a later change.",
     rephrases: [
-      { id: "A", text: "Who learned that a recording error can still reveal useful information?" },
-      { id: "B", text: "Who became skilled enough to avoid making recording errors?" },
-      { id: "C", text: "Who believes that unwanted sounds should normally remain in the final piece?" },
+      { id: "A", text: "Who became skilled enough to avoid making recording errors?" },
+      { id: "B", text: "Who believes that unwanted sounds should normally remain in the final piece?" },
+      { id: "C", text: "Who learned that a recording error can still reveal useful information?" },
     ],
-    rephraseAnswer: "A",
+    rephraseAnswer: "C",
     targetIdeas: ["Something went wrong in a recording", "The writer came to see that it still had some value"],
     answer: "C",
     evidenceOptions: [
@@ -194,11 +194,11 @@ const QUESTIONS = [
     type: "specific",
     typeFeedback: "Look for a future plan and compare its format with the course projects.",
     rephrases: [
-      { id: "A", text: "Who plans to use the techniques for something other than a documentary?" },
-      { id: "B", text: "Who intends to make another documentary about a different subject?" },
-      { id: "C", text: "Who hopes to teach the techniques to other people?" },
+      { id: "A", text: "Who hopes to teach the techniques to other people?" },
+      { id: "B", text: "Who plans to use the techniques for something other than a documentary?" },
+      { id: "C", text: "Who intends to make another documentary about a different subject?" },
     ],
-    rephraseAnswer: "A",
+    rephraseAnswer: "B",
     targetIdeas: ["A clear future project", "The project is not another documentary"],
     answer: "B",
     evidenceOptions: [
