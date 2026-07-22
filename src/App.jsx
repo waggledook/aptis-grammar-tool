@@ -225,10 +225,12 @@ import OteAdvancedReadingPart1TargetTrainer from "./products/ote/OteAdvancedRead
 import OteGeneralReadingPart1TargetTrainer from "./products/ote/OteGeneralReadingPart1TargetTrainer.jsx";
 import OteAdvancedReadingDistractorForensics from "./products/ote/OteAdvancedReadingDistractorForensics.jsx";
 import OteGeneralReadingDistractorDetective from "./products/ote/OteGeneralReadingDistractorDetective.jsx";
+import OteGeneralReadingComparePeople from "./products/ote/OteGeneralReadingComparePeople.jsx";
 import OteAdvancedReadingPart2Guide from "./products/ote/OteAdvancedReadingPart2Guide.jsx";
 import OteAdvancedReadingDecodeBeforeSearch from "./products/ote/OteAdvancedReadingDecodeBeforeSearch.jsx";
 import OteAdvancedReadingPart3Guide from "./products/ote/OteAdvancedReadingPart3Guide.jsx";
 import OteAdvancedReadingPart4Guide from "./products/ote/OteAdvancedReadingPart4Guide.jsx";
+import OteAdvancedReadingInsideParagraph from "./products/ote/OteAdvancedReadingInsideParagraph.jsx";
 import OteAdvancedReadingOptionJuryLaunch from "./products/ote/OteAdvancedReadingOptionJuryLaunch.jsx";
 import OteOptionJuryHost from "./products/ote/OteOptionJuryHost.jsx";
 import OteOptionJuryPlayer from "./products/ote/OteOptionJuryPlayer.jsx";
@@ -1500,28 +1502,22 @@ return (
   <Route path="/ote/reading/advanced/part-2-matching/guide" element={<OteAdvancedReadingPart2Guide nativeRoutes={false} />} />
   <Route
     path="/ote/reading/advanced/part-2-matching/decode-before-search"
-    element={
-      <RequireTeacher user={user}>
-        <OteAdvancedReadingDecodeBeforeSearch nativeRoutes={false} />
-      </RequireTeacher>
-    }
+    element={<OteAdvancedReadingDecodeBeforeSearch nativeRoutes={false} />}
   />
   <Route
     path="/ote/reading/advanced/part-2-matching/compare-candidates"
-    element={
-      <RequireTeacher user={user}>
-        <OteAdvancedReadingCompareCandidates nativeRoutes={false} />
-      </RequireTeacher>
-    }
+    element={<OteAdvancedReadingCompareCandidates nativeRoutes={false} />}
   />
   <Route path="/ote/reading/advanced/part-3-gapped-text/guide" element={<OteAdvancedReadingPart3Guide nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-4-long-text/guide" element={<OteAdvancedReadingPart4Guide nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-4-long-text/inside-the-paragraph" element={<OteAdvancedReadingInsideParagraph nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-4-long-text/live/option-jury" element={<RequireTeacher user={user}><OteAdvancedReadingOptionJuryLaunch user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-3-gapped-text/distractor-laboratory" element={<OteAdvancedReadingDistractorLaboratory nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-1-short-texts/guide" element={<OteReadingPart1Guide nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-2-matching/guide/three-texts" element={<OteReadingPart2ThreeProfilesGuide nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-2-matching/guide/people-and-choices" element={<OteReadingPart2PeopleAndChoicesGuide nativeRoutes={false} />} />
+  <Route path="/ote/reading/general/part-2-matching/compare-people" element={<OteGeneralReadingComparePeople nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-3-gapped-text/guide" element={<OteReadingPart3Guide nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-3-gapped-text/cohesion-detective" element={<OteGeneralReadingCohesionDetective nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-3-gapped-text/distractor-laboratory" element={<OteGeneralReadingDistractorLaboratory nativeRoutes={false} />} />
@@ -1720,28 +1716,22 @@ return (
       <Route path="/reading/advanced/part-2-matching/guide" element={<OteAdvancedReadingPart2Guide nativeRoutes />} />
       <Route
         path="/reading/advanced/part-2-matching/decode-before-search"
-        element={
-          <RequireTeacher user={user}>
-            <OteAdvancedReadingDecodeBeforeSearch nativeRoutes />
-          </RequireTeacher>
-        }
+        element={<OteAdvancedReadingDecodeBeforeSearch nativeRoutes />}
       />
       <Route
         path="/reading/advanced/part-2-matching/compare-candidates"
-        element={
-          <RequireTeacher user={user}>
-            <OteAdvancedReadingCompareCandidates nativeRoutes />
-          </RequireTeacher>
-        }
+        element={<OteAdvancedReadingCompareCandidates nativeRoutes />}
       />
       <Route path="/reading/advanced/part-3-gapped-text/guide" element={<OteAdvancedReadingPart3Guide nativeRoutes />} />
       <Route path="/reading/advanced/part-4-long-text/guide" element={<OteAdvancedReadingPart4Guide nativeRoutes />} />
+      <Route path="/reading/advanced/part-4-long-text/inside-the-paragraph" element={<OteAdvancedReadingInsideParagraph nativeRoutes />} />
       <Route path="/reading/advanced/part-4-long-text/live/option-jury" element={<RequireTeacher user={user}><OteAdvancedReadingOptionJuryLaunch user={user} nativeRoutes /></RequireTeacher>} />
       <Route path="/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes />} />
       <Route path="/reading/advanced/part-3-gapped-text/distractor-laboratory" element={<OteAdvancedReadingDistractorLaboratory nativeRoutes />} />
       <Route path="/reading/general/part-1-short-texts/guide" element={<OteReadingPart1Guide nativeRoutes />} />
       <Route path="/reading/general/part-2-matching/guide/three-texts" element={<OteReadingPart2ThreeProfilesGuide nativeRoutes />} />
       <Route path="/reading/general/part-2-matching/guide/people-and-choices" element={<OteReadingPart2PeopleAndChoicesGuide nativeRoutes />} />
+      <Route path="/reading/general/part-2-matching/compare-people" element={<OteGeneralReadingComparePeople nativeRoutes />} />
       <Route path="/reading/general/part-3-gapped-text/guide" element={<OteReadingPart3Guide nativeRoutes />} />
       <Route path="/reading/general/part-3-gapped-text/cohesion-detective" element={<OteGeneralReadingCohesionDetective nativeRoutes />} />
       <Route path="/reading/general/part-3-gapped-text/distractor-laboratory" element={<OteGeneralReadingDistractorLaboratory nativeRoutes />} />

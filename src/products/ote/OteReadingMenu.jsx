@@ -66,6 +66,14 @@ const READING_VARIANTS = {
             route: "guide/people-and-choices",
             icon: Users,
           },
+          {
+            title: "Compare the People",
+            copy: "Practise both Part 2 formats: compare exact meanings across three profiles, then check every requirement across four choices.",
+            progressId: "reading.part2.general-compare-people",
+            route: "compare-people",
+            icon: Users,
+            eyebrow: "Two-mode skill trainer",
+          },
         ],
         icon: Search,
       },
@@ -178,7 +186,6 @@ const READING_VARIANTS = {
             route: "compare-candidates",
             icon: Users,
             eyebrow: "Skill trainer · Exact meaning vs topic overlap",
-            previewOnly: true,
           },
           {
             title: "Decode Before You Search",
@@ -187,7 +194,6 @@ const READING_VARIANTS = {
             route: "decode-before-search",
             icon: Target,
             eyebrow: "Skill trainer · Seven questions → three texts",
-            previewOnly: true,
           },
         ],
         icon: Search,
@@ -238,13 +244,22 @@ const READING_VARIANTS = {
             icon: BookOpen,
           },
           {
-            title: "Option Jury",
+            title: "Inside the Paragraph",
+            copy: "Study one developing paragraph at a time: choose the best interpretation, then select the sentences that prove it.",
+            progressId: "reading.part4.advanced-inside-paragraph",
+            route: "inside-the-paragraph",
+            icon: Search,
+            eyebrow: "Skill trainer",
+          },
+          {
+            title: "Host Option Jury",
             copy: "Assign students A, B or C, compare their evidence, then let the whole class vote on the best answer.",
             progressId: "reading.part4.advanced-option-jury",
             route: "live/option-jury",
             icon: Gavel,
             eyebrow: "Teacher-led multiplayer activity",
             previewOnly: true,
+            teacherOnly: true,
           },
         ],
         icon: BookOpen,
@@ -280,7 +295,7 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
   const part = config.parts.find((item) => item.id === partId) || config.parts[0];
   const menuPath = getSitePath(basePath);
   const Icon = part.icon || ListChecks;
-  const guideCards = part.guides?.map((guide) => ({
+  const guideCards = (part.guides?.map((guide) => ({
     ...guide,
     path: getSitePath(`${basePath}/${variant}/${partId}/${guide.route}`),
   })) || (part.guideTitle ? [{
@@ -289,7 +304,7 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
     progressId: part.guideProgressId,
     path: getSitePath(`${basePath}/${variant}/${partId}/guide`),
     icon: Icon,
-  }] : []);
+  }] : [])).filter((guide) => !guide.teacherOnly || isTeacherOrAdmin);
   const advancedPartOnePracticePath = (setId) => getSitePath(`${basePath}/advanced/part-1-short-texts/practice/${setId}`);
   const advancedPartTwoPracticePath = (setId) => getSitePath(`${basePath}/advanced/part-2-matching/practice/${setId}`);
   const advancedPartThreePracticePath = (setId) => getSitePath(`${basePath}/advanced/part-3-gapped-text/practice/${setId}`);
