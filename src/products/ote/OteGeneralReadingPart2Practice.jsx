@@ -113,6 +113,7 @@ export default function OteGeneralReadingPart2Practice({ user, nativeRoutes = fa
   const [expandedId, setExpandedId] = useState(questions[0].id);
   const [secondsLeft, setSecondsLeft] = useState(TIME_SECONDS);
   const completionLogged = useRef(false);
+  const completionPromise = useRef(null);
   const answeredCount = Object.keys(answers).length;
   const score = useMemo(() => questions.reduce((total, item) => total + (answers[item.id] === item.answer ? 1 : 0), 0), [answers, questions]);
 
@@ -128,6 +129,7 @@ export default function OteGeneralReadingPart2Practice({ user, nativeRoutes = fa
 
   function startPractice() {
     completionLogged.current = false;
+    completionPromise.current = null;
     setAnswers({});
     setExpandedId(questions[0].id);
     setSecondsLeft(TIME_SECONDS);
@@ -141,9 +143,13 @@ export default function OteGeneralReadingPart2Practice({ user, nativeRoutes = fa
   }
 
   function recordCompletion(reason) {
-    if (completionLogged.current) return;
-    completionLogged.current = true;
-    logOteTrainingCompleted({ section: "reading", part: "part-2", mode: "timed_practice", taskId: `general-reading-part-2-${practiceSet.id}`, taskTitle: `General Reading Part 2 ${practiceSet.title}`, variant: "general", score, total: questions.length, reason });
+    if (completionLogged.current) return Promise.resolve(true);
+    if (completionPromise.current) return completionPromise.current;
+    completionPromise.current = logOteTrainingCompleted({ section: "reading", part: "part-2", mode: "timed_practice", taskId: `general-reading-part-2-${practiceSet.id}`, taskTitle: `General Reading Part 2 ${practiceSet.title}`, variant: "general", score, total: questions.length, reason: typeof reason === "string" ? reason : "checked" })
+      .then(() => { completionLogged.current = true; return true; })
+      .catch((error) => { console.warn("[OTE Reading Part 2] completion save failed", error); return false; })
+      .finally(() => { completionPromise.current = null; });
+    return completionPromise.current;
   }
 
   function checkAnswers(reason = "checked") {
@@ -151,9 +157,10 @@ export default function OteGeneralReadingPart2Practice({ user, nativeRoutes = fa
     recordCompletion(reason);
   }
 
-  function finishPractice(reason = "manual") {
+  async function finishPractice(reason = "manual") {
     setPhase("complete");
-    recordCompletion(reason);
+    const saved = await recordCompletion(reason);
+    if (!saved) void recordCompletion(reason);
   }
 
   if (user?.oteVersion === "advanced") return <Unavailable onBack={() => navigate(getSitePath(nativeRoutes ? "/reading" : "/ote/reading"))} />;
@@ -176,7 +183,7 @@ export default function OteGeneralReadingPart2Practice({ user, nativeRoutes = fa
             <button type="button" className="ote-reading-match-toggle" onClick={() => setExpandedId(expanded ? "" : item.id)} aria-expanded={expanded}><span>{index + 1}. {isTextMatching ? item.prompt : item.name}</span><ChevronDown size={22} aria-hidden="true" /></button>
             {expanded ? <div className="ote-reading-match-options">{!isTextMatching ? <p className="ote-reading-match-profile">{item.prompt}</p> : null}{Object.entries(options).map(([choice, option]) => <button key={choice} type="button" className={`${answer === choice ? "is-selected" : ""} ${reviewed && choice === item.answer ? "is-answer" : ""} ${reviewed && answer === choice && !isCorrect ? "is-incorrect" : ""}`} disabled={reviewed} onClick={() => chooseAnswer(item.id, choice)}>{choice}. {option.title}</button>)}{reviewed ? <div className={`ote-reading-item-feedback ${isCorrect ? "is-correct" : "is-wrong"}`}><strong>{isCorrect ? "Correct." : "Not quite."}</strong><p>{item.feedback}</p></div> : null}</div> : null}
           </article>;
-        })}</div><div className="ote-recorder-actions">{phase === "review" ? <button type="button" onClick={() => finishPractice("manual")}>View final report</button> : <button type="button" disabled={answeredCount !== questions.length} onClick={checkAnswers}>Check answers</button>}</div></div><OptionsArticle practiceSet={practiceSet} evidence={phase === "review" ? (isTextMatching ? questions.find((item) => item.id === expandedId)?.evidence : evidenceBySet[practiceSet.id]?.[expandedId]) : ""} /></div>
+        })}</div><div className="ote-recorder-actions">{phase === "review" ? <button type="button" onClick={() => finishPractice("manual")}>View final report</button> : <button type="button" disabled={answeredCount !== questions.length} onClick={() => checkAnswers("checked")}>Check answers</button>}</div></div><OptionsArticle practiceSet={practiceSet} evidence={phase === "review" ? (isTextMatching ? questions.find((item) => item.id === expandedId)?.evidence : evidenceBySet[practiceSet.id]?.[expandedId]) : ""} /></div>
       </article> : <CompleteCard score={score} answers={answers} questions={questions} options={options} setTitle={practiceSet.title} onRetry={startPractice} onBack={() => navigate(menuPath)} />}
     </section>
   </main>;

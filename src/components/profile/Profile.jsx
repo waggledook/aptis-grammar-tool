@@ -940,7 +940,7 @@ function renderFeedbackButton(kind, submission) {
           fb.fetchHubKeywordDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
           fb.fetchHubWordFormationDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
           fb.fetchHubOpenClozeDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
-          fb.fetchOteTrainingProgressMap?.(uid) ?? Promise.resolve({}),
+          fb.fetchOteTrainingProgressDetails?.(uid) ?? Promise.resolve({}),
           fb.fetchFeedbackCreditStatus?.(uid) ?? Promise.resolve(null),
         ]);  
   
@@ -1414,13 +1414,17 @@ const formatOteSpeakingPart = (part) => {
                 </div>
                 <ul className="wlist" style={{ marginTop: ".75rem" }}>
                   {oteReadingPracticeSets.map((set) => {
-                    const isComplete = completedOteReadingSetIds.has(set.id);
+                    const partNumber = set.part ? set.part.replace("part", "") : "1";
+                    const progressId = `reading.part${partNumber}.practice.${set.id}`;
+                    const result = oteTrainingProgress?.[progressId];
+                    const isComplete = Boolean(result) || completedOteReadingSetIds.has(set.id);
+                    const hasScore = Number.isFinite(result?.score) && Number.isFinite(result?.total);
                     return (
                       <li key={set.id} className="wcard">
                         <div className="whead">
                           <strong>{set.label}</strong>
                           <span className={`muted small ${isComplete ? "ote-profile-activity-complete" : ""}`}>
-                            {isComplete ? "Complete" : "Not started"}
+                            {isComplete ? (hasScore ? `${result.score}/${result.total}` : "Complete") : "Not started"}
                           </span>
                         </div>
                       </li>

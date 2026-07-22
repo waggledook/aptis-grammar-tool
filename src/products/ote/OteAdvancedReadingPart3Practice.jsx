@@ -140,8 +140,9 @@ export default function OteAdvancedReadingPart3Practice({ user, nativeRoutes = f
   }
 
   function checkAnswers(reason = "checked") {
+    const completionReason = typeof reason === "string" ? reason : "checked";
     setPhase("review");
-    recordCompletion(reason);
+    recordCompletion(completionReason);
   }
 
   async function finishPractice(reason = "manual") {
@@ -162,7 +163,7 @@ export default function OteAdvancedReadingPart3Practice({ user, nativeRoutes = f
       {phase === "ready" ? <ReadyCard user={user} onStart={startPractice} /> : phase === "complete" ? <CompleteCard score={score} placements={placements} answersMap={activeAnswers} sentencesMap={activeSentences} rationalesMap={activeRationales} title={taskTitle} onRetry={startPractice} onBack={() => navigate(menuPath)} /> : <article className="ote-practice-task-card ote-reading-gapped-task">
         <div className="ote-recorder-top"><div><p className="ote-kicker">Gapped text</p><h2>Drag a sentence into each gap</h2></div><div className="ote-recorder-timer is-recording" aria-hidden="true"><Clock3 size={22} /><strong>{formatTime(secondsLeft)}</strong><span>{phase === "review" ? "Checked" : "Remaining"}</span></div></div>
         <div className="ote-reading-gapped-layout"><SentenceBank available={available} selected={selectedSentence} onSelect={setSelectedSentence} sentencesMap={activeSentences} />{additionalTask ? <GenericTextArticle task={additionalTask} placements={placements} selectedSentence={selectedSentence} onPlace={placeSentence} onClear={clearGap} reviewed={phase === "review"} /> : <TextArticle placements={placements} selectedSentence={selectedSentence} onPlace={placeSentence} onClear={clearGap} reviewed={phase === "review"} />}</div>
-        <div className="ote-recorder-actions">{phase === "review" ? <button type="button" onClick={() => finishPractice("manual")}>View final report</button> : <button type="button" disabled={placedCount !== 6} onClick={checkAnswers}>Check answers</button>}</div>
+        <div className="ote-recorder-actions">{phase === "review" ? <button type="button" onClick={() => finishPractice("manual")}>View final report</button> : <button type="button" disabled={placedCount !== 6} onClick={() => checkAnswers("checked")}>Check answers</button>}</div>
       </article>}
     </section>
   </main>;

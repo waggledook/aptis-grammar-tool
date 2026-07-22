@@ -1203,6 +1203,46 @@ export async function fetchOteTrainingProgressMap(uid) {
   }, {});
 }
 
+export async function fetchOteTrainingProgressDetails(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return {};
+
+  const snap = await getDocs(collection(db, "users", realUid, "oteTrainingProgress"));
+  return snap.docs.reduce((acc, entry) => {
+    const data = entry.data() || {};
+    if (data.completed === false) return acc;
+    const progressId = String(data.progressId || entry.id || "");
+    if (!progressId) return acc;
+    const detail = {
+      progressId,
+      parentProgressId: data.parentProgressId || "",
+      section: data.section || "",
+      part: data.part || "",
+      mode: data.mode || "",
+      taskId: data.taskId || "",
+      taskTitle: data.taskTitle || "",
+      variant: data.variant || "",
+      score: typeof data.score === "number" ? data.score : null,
+      total: typeof data.total === "number" ? data.total : null,
+      percent: typeof data.percent === "number" ? data.percent : null,
+      completedAt: data.completedAt || data.updatedAt || data.createdAt || null,
+    };
+    acc[progressId] = detail;
+
+    const taskId = String(data.taskId || "").trim();
+    const recoveredTaskProgressId =
+      taskId && progressId.endsWith(".practice") ? `${progressId}.${taskId}` : "";
+    if (recoveredTaskProgressId && !acc[recoveredTaskProgressId]) {
+      acc[recoveredTaskProgressId] = {
+        ...detail,
+        progressId: recoveredTaskProgressId,
+        parentProgressId: progressId,
+      };
+    }
+    return acc;
+  }, {});
+}
+
 export async function fetchRecentOteTrainingProgress(n = 10, uid) {
   const realUid = _uidOrCurrent(uid);
   if (!realUid) return [];

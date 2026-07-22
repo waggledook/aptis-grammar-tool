@@ -175,6 +175,7 @@ export default function OteAdvancedReadingPart2Practice({ user, nativeRoutes = f
   const [expandedId, setExpandedId] = useState(questions[0].id);
   const [secondsLeft, setSecondsLeft] = useState(TIME_SECONDS);
   const completionLogged = useRef(false);
+  const completionPromise = useRef(null);
   const answeredCount = Object.keys(answers).length;
   const score = useMemo(() => questions.reduce((total, item) => total + (answers[item.id] === item.answer ? 1 : 0), 0), [answers]);
 
@@ -191,6 +192,7 @@ export default function OteAdvancedReadingPart2Practice({ user, nativeRoutes = f
 
   function startPractice() {
     completionLogged.current = false;
+    completionPromise.current = null;
     setAnswers({});
     setExpandedId(questions[0].id);
     setSecondsLeft(TIME_SECONDS);
@@ -204,9 +206,13 @@ export default function OteAdvancedReadingPart2Practice({ user, nativeRoutes = f
   }
 
   function recordCompletion(reason) {
-    if (completionLogged.current) return;
-    completionLogged.current = true;
-    logOteTrainingCompleted({ section: "reading", part: "part-2", mode: "timed_practice", taskId: `advanced-reading-part-2-${practiceSet.id}`, taskTitle: `Advanced Reading Part 2 ${practiceSet.title}`, variant: "advanced", score, total: questions.length, reason });
+    if (completionLogged.current) return Promise.resolve(true);
+    if (completionPromise.current) return completionPromise.current;
+    completionPromise.current = logOteTrainingCompleted({ section: "reading", part: "part-2", mode: "timed_practice", taskId: `advanced-reading-part-2-${practiceSet.id}`, taskTitle: `Advanced Reading Part 2 ${practiceSet.title}`, variant: "advanced", score, total: questions.length, reason: typeof reason === "string" ? reason : "checked" })
+      .then(() => { completionLogged.current = true; return true; })
+      .catch((error) => { console.warn("[OTE Reading Part 2] completion save failed", error); return false; })
+      .finally(() => { completionPromise.current = null; });
+    return completionPromise.current;
   }
 
   function checkAnswers(reason = "checked") {
@@ -214,9 +220,10 @@ export default function OteAdvancedReadingPart2Practice({ user, nativeRoutes = f
     recordCompletion(reason);
   }
 
-  function finishPractice(reason = "manual") {
+  async function finishPractice(reason = "manual") {
     setPhase("complete");
-    recordCompletion(reason);
+    const saved = await recordCompletion(reason);
+    if (!saved) void recordCompletion(reason);
   }
 
   if (user?.oteVersion && user.oteVersion !== "advanced") return <Unavailable onBack={() => navigate(getSitePath(nativeRoutes ? "/reading" : "/ote/reading"))} />;
@@ -247,7 +254,7 @@ export default function OteAdvancedReadingPart2Practice({ user, nativeRoutes = f
                   </article>;
                 })}
               </div>
-              <div className="ote-recorder-actions">{phase === "review" ? <button type="button" onClick={() => finishPractice("manual")}>View final report</button> : <button type="button" disabled={answeredCount !== questions.length} onClick={checkAnswers}>Check answers</button>}</div>
+              <div className="ote-recorder-actions">{phase === "review" ? <button type="button" onClick={() => finishPractice("manual")}>View final report</button> : <button type="button" disabled={answeredCount !== questions.length} onClick={() => checkAnswers("checked")}>Check answers</button>}</div>
               </div>
               <ReviewArticle practiceSet={practiceSet} evidence={phase === "review" ? evidenceBySet[practiceSet.id]?.[expandedId] : ""} />
             </div>
