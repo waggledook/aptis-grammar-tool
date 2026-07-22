@@ -218,6 +218,7 @@ import OteWritingPracticeMenu from "./products/ote/OteWritingPracticeMenu.jsx";
 import OteWritingPracticeRunner from "./products/ote/OteWritingPracticeRunner.jsx";
 import OteAdvancedReadingPart1Practice from "./products/ote/OteAdvancedReadingPart1Practice.jsx";
 import OteAdvancedReadingPart2Practice from "./products/ote/OteAdvancedReadingPart2Practice.jsx";
+import OteAdvancedReadingCompareCandidates from "./products/ote/OteAdvancedReadingCompareCandidates.jsx";
 import OteAdvancedReadingPart3Practice from "./products/ote/OteAdvancedReadingPart3Practice.jsx";
 import OteAdvancedReadingPart1Guide from "./products/ote/OteAdvancedReadingPart1Guide.jsx";
 import OteAdvancedReadingPart1TargetTrainer from "./products/ote/OteAdvancedReadingPart1TargetTrainer.jsx";
@@ -228,6 +229,9 @@ import OteAdvancedReadingPart2Guide from "./products/ote/OteAdvancedReadingPart2
 import OteAdvancedReadingDecodeBeforeSearch from "./products/ote/OteAdvancedReadingDecodeBeforeSearch.jsx";
 import OteAdvancedReadingPart3Guide from "./products/ote/OteAdvancedReadingPart3Guide.jsx";
 import OteAdvancedReadingPart4Guide from "./products/ote/OteAdvancedReadingPart4Guide.jsx";
+import OteAdvancedReadingOptionJuryLaunch from "./products/ote/OteAdvancedReadingOptionJuryLaunch.jsx";
+import OteOptionJuryHost from "./products/ote/OteOptionJuryHost.jsx";
+import OteOptionJuryPlayer from "./products/ote/OteOptionJuryPlayer.jsx";
 import OteAdvancedReadingCohesionDetective from "./products/ote/OteAdvancedReadingCohesionDetective.jsx";
 import OteAdvancedReadingDistractorLaboratory from "./products/ote/OteAdvancedReadingDistractorLaboratory.jsx";
 import OteGeneralReadingCohesionDetective from "./products/ote/OteGeneralReadingCohesionDetective.jsx";
@@ -1502,8 +1506,17 @@ return (
       </RequireTeacher>
     }
   />
+  <Route
+    path="/ote/reading/advanced/part-2-matching/compare-candidates"
+    element={
+      <RequireTeacher user={user}>
+        <OteAdvancedReadingCompareCandidates nativeRoutes={false} />
+      </RequireTeacher>
+    }
+  />
   <Route path="/ote/reading/advanced/part-3-gapped-text/guide" element={<OteAdvancedReadingPart3Guide nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-4-long-text/guide" element={<OteAdvancedReadingPart4Guide nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-4-long-text/live/option-jury" element={<RequireTeacher user={user}><OteAdvancedReadingOptionJuryLaunch user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-3-gapped-text/distractor-laboratory" element={<OteAdvancedReadingDistractorLaboratory nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-1-short-texts/guide" element={<OteReadingPart1Guide nativeRoutes={false} />} />
@@ -1713,8 +1726,17 @@ return (
           </RequireTeacher>
         }
       />
+      <Route
+        path="/reading/advanced/part-2-matching/compare-candidates"
+        element={
+          <RequireTeacher user={user}>
+            <OteAdvancedReadingCompareCandidates nativeRoutes />
+          </RequireTeacher>
+        }
+      />
       <Route path="/reading/advanced/part-3-gapped-text/guide" element={<OteAdvancedReadingPart3Guide nativeRoutes />} />
       <Route path="/reading/advanced/part-4-long-text/guide" element={<OteAdvancedReadingPart4Guide nativeRoutes />} />
+      <Route path="/reading/advanced/part-4-long-text/live/option-jury" element={<RequireTeacher user={user}><OteAdvancedReadingOptionJuryLaunch user={user} nativeRoutes /></RequireTeacher>} />
       <Route path="/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes />} />
       <Route path="/reading/advanced/part-3-gapped-text/distractor-laboratory" element={<OteAdvancedReadingDistractorLaboratory nativeRoutes />} />
       <Route path="/reading/general/part-1-short-texts/guide" element={<OteReadingPart1Guide nativeRoutes />} />
@@ -2611,6 +2633,8 @@ return (
 <Route path="/live/join" element={<LiveGameJoin />} />
 <Route path="/live/host/:gameId" element={<LiveGameHost />} />
 <Route path="/live/play/:gameId" element={<LiveGamePlayer />} />
+<Route path="/live/option-jury/host/:gameId" element={<OteOptionJuryHost user={user} />} />
+<Route path="/live/option-jury/play/:gameId" element={<OteOptionJuryPlayer />} />
 
 <Route
   path="/grammar-sets/:setId"

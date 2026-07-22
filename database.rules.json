@@ -51,6 +51,9 @@
         "setId": {
           ".write": "auth != null && !data.exists()"
         },
+        "taskId": {
+          ".write": "auth != null && !data.exists()"
+        },
         "type": {
           ".write": "auth != null && !data.exists()"
         },
@@ -74,7 +77,27 @@
         "players": {
           "$playerId": {
             ".read": "auth != null || (root.child('liveGames').child($gameId).child('type').val() === 'spanglish_fixit' && root.child('liveGames').child($gameId).child('publicJoinEnabled').val() === true)",
-            ".write": "(auth != null && auth.uid === $playerId) || (!data.exists() && newData.hasChildren(['name', 'isGuest', 'score', 'joinedAt', 'lastActiveAt', 'playerToken']) && newData.child('isGuest').val() === true && newData.child('score').val() === 0) || (data.exists() && data.child('playerToken').val() === newData.child('playerToken').val()) || (auth != null && root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid)"
+            ".write": "(auth != null && root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid) || (auth != null && auth.uid === $playerId && root.child('liveGames').child($gameId).child('type').val() !== 'ote-advanced-reading-part4-option-jury') || (auth != null && auth.uid === $playerId && root.child('liveGames').child($gameId).child('type').val() === 'ote-advanced-reading-part4-option-jury' && root.child('liveGames').child($gameId).child('status').val() === 'lobby' && !data.exists() && !newData.child('optionAssignment').exists()) || (root.child('liveGames').child($gameId).child('type').val() === 'spanglish_fixit' && !data.exists() && newData.hasChildren(['name', 'isGuest', 'score', 'joinedAt', 'lastActiveAt', 'playerToken']) && newData.child('isGuest').val() === true && newData.child('score').val() === 0) || (root.child('liveGames').child($gameId).child('type').val() === 'spanglish_fixit' && data.exists() && data.child('playerToken').val() === newData.child('playerToken').val())"
+          }
+        },
+
+        "investigations": {
+          "$playerId": {
+            ".read": "auth != null",
+            "$questionId": {
+              ".write": "auth != null && ((auth.uid === $playerId && root.child('liveGames').child($gameId).child('type').val() === 'ote-advanced-reading-part4-option-jury' && root.child('liveGames').child($gameId).child('state').child('phase').val() === 'investigation' && (($questionId === 'q1' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 0) || ($questionId === 'q2' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 1) || ($questionId === 'q3' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 2) || ($questionId === 'q4' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 3) || ($questionId === 'q5' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 4)) && (!data.exists() || data.child('submitted').val() !== true)) || root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid)",
+              ".validate": "newData.hasChildren(['assignedOption', 'verdict', 'submitted']) && (newData.child('verdict').val() === '' || newData.child('verdict').val() === 'strong' || newData.child('verdict').val() === 'flawed' || newData.child('verdict').val() === 'no_match') && (newData.child('submitted').val() === true || newData.child('submitted').val() === false) && newData.child('assignedOption').val() === ($questionId === 'q1' ? root.child('liveGames').child($gameId).child('players').child($playerId).child('optionAssignment').val() : $questionId === 'q2' ? (root.child('liveGames').child($gameId).child('players').child($playerId).child('optionAssignment').val() === 'A' ? 'B' : root.child('liveGames').child($gameId).child('players').child($playerId).child('optionAssignment').val() === 'B' ? 'C' : 'A') : $questionId === 'q3' ? (root.child('liveGames').child($gameId).child('players').child($playerId).child('optionAssignment').val() === 'A' ? 'C' : root.child('liveGames').child($gameId).child('players').child($playerId).child('optionAssignment').val() === 'B' ? 'A' : 'B') : $questionId === 'q4' ? root.child('liveGames').child($gameId).child('players').child($playerId).child('optionAssignment').val() : $questionId === 'q5' ? (root.child('liveGames').child($gameId).child('players').child($playerId).child('optionAssignment').val() === 'A' ? 'B' : root.child('liveGames').child($gameId).child('players').child($playerId).child('optionAssignment').val() === 'B' ? 'C' : 'A') : null)"
+            }
+          }
+        },
+
+        "finalVotes": {
+          "$questionId": {
+            "$playerId": {
+              ".read": "auth != null",
+              ".write": "auth != null && ((auth.uid === $playerId && root.child('liveGames').child($gameId).child('type').val() === 'ote-advanced-reading-part4-option-jury' && root.child('liveGames').child($gameId).child('state').child('phase').val() === 'final_vote' && (($questionId === 'q1' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 0) || ($questionId === 'q2' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 1) || ($questionId === 'q3' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 2) || ($questionId === 'q4' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 3) || ($questionId === 'q5' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 4)) && !data.exists()) || root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid)",
+              ".validate": "newData.hasChildren(['option', 'submittedAt']) && (newData.child('option').val() === 'A' || newData.child('option').val() === 'B' || newData.child('option').val() === 'C')"
+            }
           }
         },
 

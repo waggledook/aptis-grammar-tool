@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowLeft, BookOpen, CheckCircle2, Clock3, FileText, FlaskConical, ListChecks, Search, Target, TextCursorInput, Users } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckCircle2, Clock3, FileText, FlaskConical, Gavel, ListChecks, Search, Target, TextCursorInput, Users } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
@@ -172,6 +172,15 @@ const READING_VARIANTS = {
             icon: Search,
           },
           {
+            title: "Compare the Candidates",
+            copy: "Work through two highlighted-evidence rounds, identify each exact match, and diagnose the closest alternatives.",
+            progressId: "reading.part2.advanced-compare-candidates",
+            route: "compare-candidates",
+            icon: Users,
+            eyebrow: "Skill trainer · Exact meaning vs topic overlap",
+            previewOnly: true,
+          },
+          {
             title: "Decode Before You Search",
             copy: "Decode seven questions, compare three accounts, and prove each match with complete supporting evidence.",
             progressId: "reading.part2.advanced-decode-before-search",
@@ -220,9 +229,24 @@ const READING_VARIANTS = {
         label: "Part 4",
         title: "Long Text",
         copy: "Answer four or five multiple-choice questions on a longer text.",
-        guideTitle: "Long Text Strategy Guide",
-        guideCopy: "Work through local and global questions efficiently, identify rhetorical purpose, and avoid realistic distractors.",
-        guideProgressId: "reading.part4.advanced-guide",
+        guides: [
+          {
+            title: "Long Text Strategy Guide",
+            copy: "Work through local and global questions efficiently, identify rhetorical purpose, and avoid realistic distractors.",
+            progressId: "reading.part4.advanced-guide",
+            route: "guide",
+            icon: BookOpen,
+          },
+          {
+            title: "Option Jury",
+            copy: "Assign students A, B or C, compare their evidence, then let the whole class vote on the best answer.",
+            progressId: "reading.part4.advanced-option-jury",
+            route: "live/option-jury",
+            icon: Gavel,
+            eyebrow: "Teacher-led multiplayer activity",
+            previewOnly: true,
+          },
+        ],
         icon: BookOpen,
       },
     ],

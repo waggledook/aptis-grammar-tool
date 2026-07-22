@@ -13201,6 +13201,69 @@
   .ote-decode-score-breakdown { grid-template-columns: 1fr; }
 }
 
+/* Advanced Reading Part 2: Compare the Candidates */
+.ote-candidates-page { --decode-accent: #0f766e; --decode-warm: #c65d09; }
+.ote-candidates-intro { display: grid; gap: 1rem; }
+.ote-candidates-round-selector { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; }
+.ote-candidates-round-selector button { display: grid; gap: .25rem; padding: .8rem .85rem; border: 1px solid var(--color-border); border-radius: 10px; background: var(--color-surface, #fff); color: var(--color-text); text-align: left; cursor: pointer; }
+.ote-candidates-round-selector button.is-active { border-color: var(--decode-accent); background: color-mix(in srgb, var(--decode-accent) 7%, var(--color-surface, #fff)); box-shadow: inset 0 0 0 1px var(--decode-accent); }
+.ote-candidates-round-selector span { color: var(--decode-accent); font-size: .66rem; font-weight: 900; letter-spacing: .055em; text-transform: uppercase; }
+.ote-candidates-round-selector strong { font-size: .84rem; line-height: 1.35; }
+.ote-candidates-round-selector small { color: var(--color-text-soft); font-size: .7rem; line-height: 1.35; }
+.ote-candidates-intro-prompt { display: flex; gap: .85rem; align-items: flex-start; padding: 1rem; border: 1px solid color-mix(in srgb, var(--decode-accent) 45%, var(--color-border)); border-radius: 11px; background: color-mix(in srgb, var(--decode-accent) 7%, var(--color-surface, #fff)); }
+.ote-candidates-intro-prompt > svg { flex: 0 0 auto; color: var(--decode-accent); }
+.ote-candidates-intro-prompt h2 { margin: .12rem 0 .35rem; color: var(--color-text); font-size: 1.2rem; }
+.ote-candidates-intro-prompt p:last-child { margin: 0; color: var(--color-text-soft); font-size: .82rem; line-height: 1.55; }
+.ote-candidates-intro-action { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem 1rem; border-radius: 10px; background: color-mix(in srgb, var(--decode-accent) 8%, var(--color-surface, #fff)); }
+.ote-candidates-intro-action p { margin: 0; color: var(--color-text); font-size: .82rem; font-weight: 850; }
+.ote-candidates-intro-action button { display: inline-flex; align-items: center; justify-content: center; gap: .4rem; padding: .72rem .9rem; border: 1px solid var(--decode-accent); border-radius: 8px; background: var(--decode-accent); color: #fff; font-weight: 900; cursor: pointer; }
+.ote-candidates-reference > div { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+.ote-candidates-task-panel { min-width: 0; }
+.ote-candidate-diagnosis-stack { display: grid; gap: .65rem; }
+.ote-candidate-diagnosis { overflow: hidden; border: 1px solid var(--color-border); border-radius: 10px; background: color-mix(in srgb, var(--color-surface-2, var(--color-surface)) 86%, transparent); }
+.ote-candidate-diagnosis > header { display: flex; align-items: center; justify-content: space-between; gap: .5rem; padding: .62rem .7rem; border-bottom: 1px solid var(--color-border); }
+.ote-candidate-diagnosis > header strong { color: var(--color-text); font-size: .78rem; }
+.ote-candidate-diagnosis > header span { color: var(--decode-accent); font-size: .63rem; font-weight: 900; text-align: right; text-transform: uppercase; }
+.ote-candidate-diagnosis.is-correct { border-color: color-mix(in srgb, #16803c 58%, var(--color-border)); }
+.ote-candidate-diagnosis.is-wrong { border-color: color-mix(in srgb, #b54235 62%, var(--color-border)); }
+.ote-candidate-quotes { display: grid; gap: .35rem; padding: .65rem .7rem; }
+.ote-candidate-quotes blockquote { margin: 0; color: var(--color-text-soft); font-size: .73rem; line-height: 1.48; }
+.ote-candidate-label-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .35rem; padding: 0 .7rem .7rem; }
+.ote-candidate-diagnosis > header + .ote-candidate-label-row { padding-top: .7rem; }
+.ote-candidate-label-row button { min-height: 42px; padding: .45rem .35rem; border: 1px solid var(--color-border); border-radius: 7px; background: var(--color-surface, #fff); color: var(--color-text-soft); font-size: .65rem; font-weight: 850; line-height: 1.25; cursor: pointer; }
+.ote-candidate-label-row button.is-selected { border-color: var(--decode-accent); background: color-mix(in srgb, var(--decode-accent) 8%, var(--color-surface, #fff)); color: var(--decode-accent); box-shadow: inset 0 0 0 1px var(--decode-accent); }
+.ote-candidate-label-row button:disabled { cursor: default; opacity: 1; }
+.ote-candidate-inline-feedback { display: flex; gap: .45rem; align-items: flex-start; padding: .65rem .7rem; border-top: 1px solid var(--color-border); background: color-mix(in srgb, #16803c 6%, transparent); }
+.ote-candidate-diagnosis.is-wrong .ote-candidate-inline-feedback { background: color-mix(in srgb, #b54235 6%, transparent); }
+.ote-candidate-inline-feedback > svg { flex: 0 0 auto; margin-top: .1rem; color: #16803c; }
+.ote-candidate-diagnosis.is-wrong .ote-candidate-inline-feedback > svg { color: #b54235; }
+.ote-candidate-inline-feedback p { margin: 0; color: var(--color-text-soft); font-size: .72rem; line-height: 1.48; }
+.ote-candidate-inline-feedback strong { color: var(--color-text); }
+.ote-candidates-distinction { margin-top: .65rem; padding: .7rem .75rem; border-left: 4px solid var(--decode-warm); border-radius: 8px; background: color-mix(in srgb, var(--decode-warm) 7%, transparent); }
+.ote-candidates-distinction strong { color: var(--decode-warm); font-size: .66rem; letter-spacing: .055em; text-transform: uppercase; }
+.ote-candidates-distinction p { margin: .25rem 0 0; color: var(--color-text-soft); font-size: .76rem; line-height: 1.45; }
+.ote-candidates-lesson-report { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; max-width: 820px; margin: 1rem auto 0; text-align: left; }
+.ote-candidates-lesson-report article { display: flex; min-width: 0; flex-direction: column; align-items: flex-start; gap: .45rem; padding: .9rem; border: 1px solid var(--color-border); border-radius: 10px; background: var(--color-surface, #fff); }
+.ote-candidates-lesson-report span { color: var(--decode-accent); font-size: .66rem; font-weight: 900; letter-spacing: .055em; text-transform: uppercase; }
+.ote-candidates-lesson-report h3 { margin: 0; color: var(--color-text); font-size: .92rem; line-height: 1.35; }
+.ote-candidates-lesson-report strong { color: var(--color-text-soft); font-size: .76rem; }
+.ote-candidates-lesson-report p { margin: 0; color: var(--color-text-soft); font-size: .76rem; }
+.ote-candidates-lesson-report button { margin-top: auto; padding: .55rem .7rem; border: 1px solid var(--decode-accent); border-radius: 7px; background: color-mix(in srgb, var(--decode-accent) 7%, var(--color-surface, #fff)); color: var(--decode-accent); font-size: .72rem; font-weight: 900; cursor: pointer; }
+
+@media (min-width: 981px) {
+  .ote-candidates-task-panel { max-height: calc(100dvh - 6rem); overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+  .ote-candidates-task-panel .ote-cohesion-actions { position: sticky; z-index: 2; bottom: 0; padding-top: .7rem; background: linear-gradient(180deg, transparent, var(--color-surface, #fff) 28%); }
+}
+
+@media (max-width: 620px) {
+  .ote-candidates-reference > div { grid-template-columns: 1fr !important; }
+  .ote-candidates-round-selector,
+  .ote-candidates-lesson-report { grid-template-columns: 1fr; }
+  .ote-candidate-label-row { grid-template-columns: 1fr; }
+  .ote-candidates-intro-action { align-items: stretch; flex-direction: column; }
+  .ote-candidates-intro-action button { width: 100%; }
+}
+
 /* Advanced Reading Part 1: Distractor Forensics */
 .ote-forensics-page { --forensics-accent: #7c3aed; --forensics-warm: #c65d09; }
 .ote-forensics-reference { margin: 1rem 0; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface, #fff); }

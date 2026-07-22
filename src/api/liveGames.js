@@ -27,6 +27,7 @@ import {
   update,
   runTransaction,
 } from "firebase/database";
+import { OPTION_JURY_GAME_TYPE } from "../products/ote/data/oteAdvancedReadingPart4OptionJury.js";
 
 const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
 const SPANGLISH_GUEST_TOKEN_STORAGE_KEY = "spanglish_fixit_guest_token";
@@ -129,16 +130,105 @@ export async function joinLiveGameByPin(pin) {
   const displayName =
     user.displayName || user.email || "Player";
 
-  await set(playerRef, {
-    name: displayName,
-    score: 0,
-    joinedAt: Date.now(),
-    answeredThisQuestion: false,
-    lastAnswerIndex: null,
-    lastAnswerCorrect: null,
-  });
+  const existingPlayer = (await get(playerRef)).val();
+  if (game.type === OPTION_JURY_GAME_TYPE) {
+    if (!existingPlayer) await set(playerRef, {
+      name: displayName,
+      joinedAt: Date.now(),
+    });
+  } else {
+    await set(playerRef, {
+      name: displayName,
+      score: 0,
+      joinedAt: Date.now(),
+      answeredThisQuestion: false,
+      lastAnswerIndex: null,
+      lastAnswerCorrect: null,
+    });
+  }
 
-  return { gameId: game.gameId };
+  return { gameId: game.gameId, type: game.type || "grammar" };
+}
+
+export async function createOptionJuryLiveGame({ taskId, title }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host an Option Jury session.");
+  if (!taskId) throw new Error("createOptionJuryLiveGame: taskId is required.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: title || "Option Jury",
+    type: OPTION_JURY_GAME_TYPE,
+    taskId,
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby", questionIndex: 0 },
+  });
+  return { gameId, pin };
+}
+
+export async function assignOptionJuryPlayer({ gameId, playerId, optionAssignment }) {
+  if (!auth.currentUser) throw new Error("You must be signed in to assign options.");
+  if (!gameId || !playerId || !["A", "B", "C"].includes(optionAssignment)) {
+    throw new Error("Invalid Option Jury assignment.");
+  }
+  await set(ref(rtdb, `liveGames/${gameId}/players/${playerId}/optionAssignment`), optionAssignment);
+}
+
+export async function autoBalanceOptionJuryPlayers({ gameId, playerIds }) {
+  if (!auth.currentUser) throw new Error("You must be signed in to assign options.");
+  const updates = {};
+  (playerIds || []).forEach((playerId, index) => {
+    updates[`liveGames/${gameId}/players/${playerId}/optionAssignment`] = ["A", "B", "C"][index % 3];
+  });
+  if (Object.keys(updates).length) await update(ref(rtdb), updates);
+}
+
+export async function saveOptionJuryEvaluation({ gameId, questionId, assignedOption, verdict, reason = "" }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to evaluate an option.");
+  if (!gameId || !questionId || !["A", "B", "C"].includes(assignedOption)) {
+    throw new Error("Invalid Option Jury evaluation.");
+  }
+  await set(ref(rtdb, `liveGames/${gameId}/investigations/${user.uid}/${questionId}`), {
+    assignedOption,
+    verdict: verdict || "",
+    reason: String(reason || "").slice(0, 220),
+    submitted: false,
+    updatedAt: Date.now(),
+  });
+}
+
+export async function submitOptionJuryInvestigation({ gameId, questionId, assignedOption, verdict, reason = "" }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to submit evaluations.");
+  if (!gameId || !questionId || !["A", "B", "C"].includes(assignedOption) || !verdict) {
+    throw new Error("Complete the current option evaluation before submitting.");
+  }
+  await set(ref(rtdb, `liveGames/${gameId}/investigations/${user.uid}/${questionId}`), {
+    assignedOption,
+    verdict,
+    reason: String(reason || "").slice(0, 220),
+    submitted: true,
+    submittedAt: Date.now(),
+  });
+}
+
+export async function submitOptionJuryFinalVote({ gameId, questionId, option, changedMind = null }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to vote.");
+  if (!gameId || !questionId || !["A", "B", "C"].includes(option)) {
+    throw new Error("Invalid Option Jury vote.");
+  }
+  await set(ref(rtdb, `liveGames/${gameId}/finalVotes/${questionId}/${user.uid}`), {
+    option,
+    changedMind: typeof changedMind === "boolean" ? changedMind : null,
+    submittedAt: Date.now(),
+  });
 }
 
 /**
@@ -189,6 +279,15 @@ export async function setLiveGameState(gameId, partialState) {
     }
     if ("questionDeadline" in partialState) {
       updates.questionDeadline = partialState.questionDeadline;
+    }
+    if ("phaseStartedAt" in partialState) {
+      updates.phaseStartedAt = partialState.phaseStartedAt;
+    }
+    if ("phaseDeadline" in partialState) {
+      updates.phaseDeadline = partialState.phaseDeadline;
+    }
+    if ("phaseDuration" in partialState) {
+      updates.phaseDuration = partialState.phaseDuration;
     }
   
     if (Object.keys(updates).length === 0) return;
