@@ -615,16 +615,49 @@
 
 .option-jury-player-report { max-width: 760px; margin: 2rem auto; color: var(--jury-ink); text-align: center; }
 .option-jury-player-report > svg { color: var(--jury-gold); }
-.option-jury-player-report > div { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.3rem 0; }
-.option-jury-player-report article { padding: 1.3rem; border: 1px solid var(--jury-border); border-radius: 16px; background: var(--jury-surface); }
-.option-jury-player-report article small { display: block; color: var(--jury-teal); font-weight: 850; text-transform: uppercase; }
-.option-jury-player-report article strong { display: block; margin: 0.4rem; color: var(--jury-ink); font-size: 2.8rem; }
-.option-jury-player-report article p { color: var(--jury-soft); }
+.option-jury-score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.3rem 0; }
+.option-jury-score-grid article { padding: 1.3rem; border: 1px solid var(--jury-border); border-radius: 16px; background: var(--jury-surface); }
+.option-jury-score-grid article small { display: block; color: var(--jury-teal); font-weight: 850; text-transform: uppercase; }
+.option-jury-score-grid article > strong { display: block; margin: 0.4rem; color: var(--jury-ink); font-size: 2.8rem; }
+.option-jury-score-grid article p { color: var(--jury-soft); }
+
+.option-jury-correct-answer {
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.8rem 0;
+  padding: 0.7rem;
+  border: 1px solid var(--jury-success);
+  border-radius: 11px;
+  background: var(--jury-success-soft);
+  text-align: left;
+}
+
+.option-jury-correct-answer > span { color: var(--jury-success); font-size: 0.75rem; font-weight: 900; letter-spacing: 0.04em; text-transform: uppercase; }
+.option-jury-correct-answer > strong { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--jury-success); color: #fff; }
+.option-jury-correct-answer > p { margin: 0; color: var(--jury-ink); font-weight: 750; line-height: 1.4; }
+
+.option-jury-player-results { display: grid; gap: 0.8rem; margin-top: 2rem; text-align: left; }
+.option-jury-player-results > h2 { margin: 0; color: var(--jury-ink); }
+.option-jury-player-question-result { padding: 1rem; border: 1px solid var(--jury-border); border-radius: 15px; background: var(--jury-surface); }
+.option-jury-player-question-result > header { display: flex; align-items: center; justify-content: space-between; gap: 0.8rem; }
+.option-jury-player-question-result > header > span { color: var(--jury-teal); font-size: 0.76rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
+.option-jury-player-question-result > header > b { padding: 0.3rem 0.55rem; border-radius: 999px; font-size: 0.76rem; }
+.option-jury-player-question-result > header > b.is-correct { background: var(--jury-success-soft); color: var(--jury-success); }
+.option-jury-player-question-result > header > b.is-incorrect { background: var(--jury-danger-soft); color: var(--jury-danger); }
+.option-jury-player-question-result > header > b.is-missing { background: var(--jury-surface-3); color: var(--jury-muted); }
+.option-jury-player-question-result h3 { margin: 0.45rem 0; color: var(--jury-ink); }
+.option-jury-player-result-meta { display: grid; gap: 0.35rem; }
+.option-jury-player-result-meta p { margin: 0; color: var(--jury-soft); line-height: 1.45; }
+.option-jury-player-result-meta strong { color: var(--jury-ink); }
 
 .option-jury-report-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 0.8rem; }
 .option-jury-report-grid > article { padding: 1rem; border: 1px solid var(--jury-border); border-radius: 14px; background: var(--jury-surface-2); }
 .option-jury-report-grid h3 { min-height: 2.8em; margin: 0.35rem 0; color: var(--jury-ink); }
 .option-jury-report-grid > article > strong { color: var(--jury-teal); }
+.option-jury-report-grid .option-jury-correct-answer { grid-template-columns: auto 1fr; }
+.option-jury-report-grid .option-jury-correct-answer > span { grid-column: 1 / -1; }
 .option-jury-mini-distribution { display: grid; gap: 0.4rem; margin-top: 0.8rem; }
 .option-jury-mini-distribution > div { display: grid; grid-template-columns: 25px repeat(3, 1fr); gap: 0.3rem; padding: 0.4rem; border-radius: 8px; background: var(--jury-surface-3); font-size: 0.7rem; }
 .option-jury-mini-distribution b { color: var(--jury-teal); }
@@ -654,7 +687,9 @@
   .option-jury-investigation-card fieldset { grid-template-columns: 1fr; }
   .option-jury-progress { align-items: flex-start; flex-direction: column; }
   .option-jury-final-vote fieldset { grid-template-columns: 1fr 1fr; }
-  .option-jury-player-report > div { grid-template-columns: 1fr; }
+  .option-jury-score-grid { grid-template-columns: 1fr; }
+  .option-jury-correct-answer { grid-template-columns: auto 1fr; }
+  .option-jury-correct-answer > span { grid-column: 1 / -1; }
   .option-jury-vote-bars > div { grid-template-columns: 30px 1fr 74px; }
   .option-jury-mini-distribution > div { grid-template-columns: 22px 1fr; }
   .option-jury-mini-distribution span { grid-column: 2; }

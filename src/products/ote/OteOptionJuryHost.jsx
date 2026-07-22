@@ -20,6 +20,7 @@ import {
 import {
   AssignmentSummary,
   ComparisonOptions,
+  CorrectAnswer,
   EvidencePanel,
   PassagePanel,
   PhasePill,
@@ -169,7 +170,7 @@ function HostReport({ game, task, players }) {
     const correct = votes.filter((vote) => vote.option === correctLetter).length;
     const changed = votes.filter((vote) => vote.changedMind === true).length;
     const mindChangeResponses = votes.filter((vote) => typeof vote.changedMind === "boolean");
-    return <article key={question.id}><span>Question {index + 1}</span><h3>{question.prompt}</h3><strong>{votes.length ? Math.round((correct / votes.length) * 100) : 0}% final answers correct</strong><p>{mindChangeResponses.length ? `${Math.round((changed / mindChangeResponses.length) * 100)}% of respondents` : "No responses"} said another student’s reasoning changed their mind</p><InitialDistribution game={game} question={question} players={players} /></article>;
+    return <article key={question.id}><span>Question {index + 1}</span><h3>{question.prompt}</h3><CorrectAnswer question={question} /><strong>{votes.length ? Math.round((correct / votes.length) * 100) : 0}% final answers correct</strong><p>{mindChangeResponses.length ? `${Math.round((changed / mindChangeResponses.length) * 100)}% of respondents` : "No responses"} said another student’s reasoning changed their mind</p><InitialDistribution game={game} question={question} players={players} /></article>;
   })}</div></section>;
 }
 

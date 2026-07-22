@@ -28,8 +28,8 @@ const rationales = {
 const additionalTasks = {
   "c1-pilot-2": {
     title: "Why We Keep Souvenirs", heading: "Why we keep souvenirs",
-    sentences: { A: "Objects help by supplying sensory and contextual clues from which a wider scene can be rebuilt.", B: "Museums perform a similar function by preserving objects that communities consider historically important.", C: "The act of selecting a future reminder can therefore alter how a person attends to the present moment.", D: "An object may evoke an entire relationship for one person because of circumstances that are invisible to everyone else.", E: "It is possible to recognise this loss as symbolic without believing that the memory itself will actually vanish.", F: "Nevertheless, commercial origin does not prevent an object from acquiring intensely personal significance.", G: "When almost every moment leaves a record, finding the few traces that still carry meaning becomes increasingly difficult." },
-    answers: { 1: "A", 2: "D", 3: "C", 4: "F", 5: "E", 6: "G" },
+    sentences: { A: "The act of selecting a future reminder can therefore alter how a person attends to the present moment.", B: "It is possible to recognise this loss as symbolic without believing that the memory itself will actually vanish.", C: "Objects help by supplying sensory and contextual clues from which a wider scene can be rebuilt.", D: "Museums perform a similar function by preserving objects that communities consider historically important.", E: "Nevertheless, commercial origin does not prevent an object from acquiring intensely personal significance.", F: "An object may evoke an entire relationship for one person because of circumstances that are invisible to everyone else.", G: "When almost every moment leaves a record, finding the few traces that still carry meaning becomes increasingly difficult." },
+    answers: { 1: "C", 2: "F", 3: "A", 4: "E", 5: "B", 6: "G" },
     rationales: { 1: "This explains how objects prompt reconstructed memories before the text gives examples involving smell, texture and sight.", 2: "This develops the owner's private relationship with an object before the contrast with somebody else follows.", 3: "This states how choosing a future reminder can change attention in the present, leading into the future self who will look back.", 4: "This concedes that commercial production does not prevent personal meaning before the magnet example makes that point concrete.", 5: "This separates the symbolic feeling of loss from the literal disappearance of memory.", 6: "This identifies the problem created by abundant digital records before the physical-versus-digital contrast follows." },
     paragraphs: [
       "A souvenir is an object kept because it is connected with a place, person or event. It may be expensive, but often it is not: a train ticket, a shell or a receipt can matter more than something deliberately bought as a keepsake. Indeed, the accidental keepsake and the object sold specifically to tourists may eventually perform much the same psychological function. Such objects appear trivial until we try to throw them away. Their value lies less in what they are than in what they allow us to recover.",
@@ -44,8 +44,8 @@ const additionalTasks = {
   },
   "c1-pilot-3": {
     title: "The Value of Being Bored", heading: "The value of being bored",
-    sentences: { A: "Boredom may therefore be less an absence of attention than a demand for a more satisfying object of attention.", B: "The unoccupied intervals in which attention once wandered are increasingly filled before discomfort can fully develop.", C: "The repetitive activity may simply create a mental gap in which thoughts that were previously unrelated have room to combine.", D: "It is important, however, to distinguish temporary boredom from the chronic powerlessness of having no meaningful choices.", E: "If every loss of interest is immediately answered with stimulation, people may get little practice in directing attention for themselves.", F: "The aim is not to seek boredom as an achievement, but to become less frightened of moments offering no instant reward.", G: "Some workplaces have introduced creativity rooms filled with games, coloured furniture and walls on which employees can write." },
-    answers: { 1: "A", 2: "B", 3: "C", 4: "D", 5: "E", 6: "F" },
+    sentences: { A: "It is important, however, to distinguish temporary boredom from the chronic powerlessness of having no meaningful choices.", B: "The unoccupied intervals in which attention once wandered are increasingly filled before discomfort can fully develop.", C: "The aim is not to seek boredom as an achievement, but to become less frightened of moments offering no instant reward.", D: "Some workplaces have introduced creativity rooms filled with games, coloured furniture and walls on which employees can write.", E: "Boredom may therefore be less an absence of attention than a demand for a more satisfying object of attention.", F: "If every loss of interest is immediately answered with stimulation, people may get little practice in directing attention for themselves.", G: "The repetitive activity may simply create a mental gap in which thoughts that were previously unrelated have room to combine." },
+    answers: { 1: "E", 2: "B", 3: "G", 4: "A", 5: "F", 6: "C" },
     rationales: { 1: "This reformulates boredom as a demand for a more satisfying focus before the broader interpretation begins.", 2: "This explains how smartphones fill previously empty intervals before the text considers what unfilled moments allow the mind to do.", 3: "This cautiously explains why a repetitive task might help unrelated ideas combine; the next sentence refers back to that mental gap.", 4: "This sets up the contrast between limited, temporary boredom and long-term lack of control illustrated by the traveller and worker.", 5: "This explains how constant novelty can reduce practice in directing attention before the text qualifies that enduring dullness is not the solution.", 6: "This clarifies that leaving moments unfilled is not about celebrating boredom, but tolerating a lack of instant reward." },
     paragraphs: [
       "Boredom has a poor reputation. It is associated with wasted time, dull company and tasks that ought to have been designed better. Modern life offers countless ways to escape it: a phone can fill a queue, a journey or the few minutes before a meeting. This seems like straightforward progress. Yet boredom is not merely an unpleasant space from which nothing useful can emerge. It is also a signal about attention, motivation and the relationship between what we are doing and what we believe we could be doing instead.",
@@ -80,6 +80,7 @@ export default function OteAdvancedReadingPart3Practice({ user, nativeRoutes = f
   const [selectedSentence, setSelectedSentence] = useState("");
   const [secondsLeft, setSecondsLeft] = useState(TIME_SECONDS);
   const completionLogged = useRef(false);
+  const completionPromise = useRef(null);
   const placedCount = Object.keys(placements).length;
   const score = useMemo(() => Object.entries(activeAnswers).reduce((total, [gap, answer]) => total + (placements[gap] === answer ? 1 : 0), 0), [activeAnswers, placements]);
   const available = Object.keys(activeSentences).filter((id) => !Object.values(placements).includes(id));
@@ -97,6 +98,7 @@ export default function OteAdvancedReadingPart3Practice({ user, nativeRoutes = f
 
   function startPractice() {
     completionLogged.current = false;
+    completionPromise.current = null;
     setPlacements({});
     setSelectedSentence("");
     setSecondsLeft(TIME_SECONDS);
@@ -120,9 +122,21 @@ export default function OteAdvancedReadingPart3Practice({ user, nativeRoutes = f
   }
 
   function recordCompletion(reason) {
-    if (completionLogged.current) return;
-    completionLogged.current = true;
-    logOteTrainingCompleted({ section: "reading", part: "part-3", mode: "timed_practice", taskId: `advanced-reading-part-3-${setId}`, taskTitle: `Advanced Reading Part 3 ${taskTitle}`, variant: "advanced", score, total: 6, reason });
+    if (completionLogged.current) return Promise.resolve(true);
+    if (completionPromise.current) return completionPromise.current;
+    completionPromise.current = logOteTrainingCompleted({ section: "reading", part: "part-3", mode: "timed_practice", taskId: `advanced-reading-part-3-${setId}`, taskTitle: `Advanced Reading Part 3 ${taskTitle}`, variant: "advanced", score, total: 6, reason })
+      .then(() => {
+        completionLogged.current = true;
+        return true;
+      })
+      .catch((error) => {
+        console.warn("[OTE Reading Part 3] completion save failed", error);
+        return false;
+      })
+      .finally(() => {
+        completionPromise.current = null;
+      });
+    return completionPromise.current;
   }
 
   function checkAnswers(reason = "checked") {
@@ -130,9 +144,10 @@ export default function OteAdvancedReadingPart3Practice({ user, nativeRoutes = f
     recordCompletion(reason);
   }
 
-  function finishPractice(reason = "manual") {
+  async function finishPractice(reason = "manual") {
     setPhase("complete");
-    recordCompletion(reason);
+    const saved = await recordCompletion(reason);
+    if (!saved) void recordCompletion(reason);
   }
 
   if (user?.oteVersion && user.oteVersion !== "advanced") return <Unavailable onBack={() => navigate(getSitePath(nativeRoutes ? "/reading" : "/ote/reading"))} />;

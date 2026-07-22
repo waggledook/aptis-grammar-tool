@@ -1,6 +1,6 @@
 import React from "react";
 import { BookOpen, ChevronDown } from "lucide-react";
-import { OPTION_LETTERS, VERDICT_OPTIONS, getAssignedOptionForQuestion, getOptionIndex } from "./data/oteAdvancedReadingPart4OptionJury.js";
+import { OPTION_LETTERS, VERDICT_OPTIONS, getAssignedOptionForQuestion, getOptionIndex, getOptionLetter } from "./data/oteAdvancedReadingPart4OptionJury.js";
 import "./styles/option-jury.css";
 
 export function PassagePanel({ task, defaultOpen = false }) {
@@ -32,6 +32,11 @@ export function TimerDisplay({ remainingSeconds, label }) {
   const minutes = Math.floor(safeSeconds / 60);
   const seconds = String(safeSeconds % 60).padStart(2, "0");
   return <div className={`option-jury-timer ${safeSeconds === 0 ? "is-finished" : safeSeconds <= 15 ? "is-low" : ""}`}><span>{label}</span><strong>{minutes}:{seconds}</strong></div>;
+}
+
+export function CorrectAnswer({ question, label = "Correct answer" }) {
+  const letter = getOptionLetter(question.answer);
+  return <div className="option-jury-correct-answer"><span>{label}</span><strong>{letter}</strong><p>{question.options[question.answer]}</p></div>;
 }
 
 export function PhasePill({ phase, questionIndex, totalQuestions = 5 }) {

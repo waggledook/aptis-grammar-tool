@@ -17,6 +17,7 @@ import {
 } from "./data/oteAdvancedReadingPart4OptionJury.js";
 import {
   ComparisonOptions,
+  CorrectAnswer,
   EvidencePanel,
   PassagePanel,
   PhasePill,
@@ -303,5 +304,15 @@ function PlayerReport({ game, task, player, uid }) {
     return game?.investigations?.[uid]?.[question.id]?.verdict === question.optionVerdicts[optionIndex];
   }).length;
   const finalScore = task.questions.filter((question) => game?.finalVotes?.[question.id]?.[uid]?.option === getOptionLetter(question.answer)).length;
-  return <section className="option-jury-player-report"><Gavel size={42} /><span>Session complete</span><h2>Your Option Jury report</h2><div><article><small>Option judgements</small><strong>{initialScore}/5</strong><p>How accurately you evaluated your team’s rotating option.</p></article><article><small>Final answers</small><strong>{finalScore}/5</strong><p>Your score after comparing all three options.</p></article></div><p>Your first score rewards accurate diagnosis, including recognising when a distractor is flawed.</p></section>;
+  return <section className="option-jury-player-report"><Gavel size={42} /><span>Session complete</span><h2>Your Option Jury report</h2><div className="option-jury-score-grid"><article><small>Option judgements</small><strong>{initialScore}/5</strong><p>How accurately you evaluated your team’s rotating option.</p></article><article><small>Final answers</small><strong>{finalScore}/5</strong><p>Your score after comparing all three options.</p></article></div><p>Your first score rewards accurate diagnosis, including recognising when a distractor is flawed.</p><div className="option-jury-player-results"><h2>Question review</h2>{task.questions.map((question, index) => {
+    const correctLetter = getOptionLetter(question.answer);
+    const assignedOption = getAssignedOptionForQuestion(player.optionAssignment, index);
+    const investigation = game?.investigations?.[uid]?.[question.id];
+    const verdictLabel = VERDICT_OPTIONS.find((item) => item.id === investigation?.verdict)?.label;
+    const finalVote = game?.finalVotes?.[question.id]?.[uid]?.option;
+    const finalVoteText = finalVote ? question.options[getOptionIndex(finalVote)] : "No answer submitted";
+    const voteStatus = !finalVote ? "No final answer" : finalVote === correctLetter ? "Correct" : "Incorrect";
+    const voteStatusClass = !finalVote ? "is-missing" : finalVote === correctLetter ? "is-correct" : "is-incorrect";
+    return <article className="option-jury-player-question-result" key={question.id}><header><span>Question {index + 1}</span><b className={voteStatusClass}>{voteStatus}</b></header><h3>{question.prompt}</h3><CorrectAnswer question={question} /><div className="option-jury-player-result-meta"><p><strong>Your final answer:</strong> {finalVote ? `${finalVote} — ${finalVoteText}` : finalVoteText}</p><p><strong>Your investigation:</strong> Option {assignedOption} · {verdictLabel || "No judgement submitted"}</p></div></article>;
+  })}</div></section>;
 }

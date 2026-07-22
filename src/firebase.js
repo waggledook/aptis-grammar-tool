@@ -19,6 +19,7 @@ import {
   orderBy,
   limit,
   serverTimestamp,
+  writeBatch,
   getCountFromServer,           // ← NEW
   increment,                     // ← NEW
   updateDoc                     // ← ADD THIS
@@ -1137,10 +1138,11 @@ export async function markOteTrainingProgress(details = {}) {
     if (value !== undefined && value !== null && value !== "") baseData[key] = value;
   });
 
-  await setDoc(doc(db, "users", user.uid, "oteTrainingProgress", progressId), baseData, { merge: true });
+  const batch = writeBatch(db);
+  batch.set(doc(db, "users", user.uid, "oteTrainingProgress", progressId), baseData, { merge: true });
 
   if (specificProgressId && specificProgressId !== progressId) {
-    await setDoc(
+    batch.set(
       doc(db, "users", user.uid, "oteTrainingProgress", specificProgressId),
       {
         ...baseData,
@@ -1150,6 +1152,7 @@ export async function markOteTrainingProgress(details = {}) {
       { merge: true }
     );
   }
+  await batch.commit();
   if (typeof window !== "undefined") {
     window.dispatchEvent(new CustomEvent("ote-training-progress-updated", {
       detail: {
@@ -1167,10 +1170,14 @@ export async function fetchOteTrainingProgress(uid) {
   const snap = await getDocs(collection(db, "users", realUid, "oteTrainingProgress"));
   return new Set(
     snap.docs
-      .map((entry) => {
+      .flatMap((entry) => {
         const data = entry.data() || {};
-        if (data.completed === false) return "";
-        return data.progressId || entry.id;
+        if (data.completed === false) return [];
+        const progressId = String(data.progressId || entry.id || "");
+        const taskId = String(data.taskId || "").trim();
+        const recoveredTaskProgressId =
+          taskId && progressId.endsWith(".practice") ? `${progressId}.${taskId}` : "";
+        return [progressId, recoveredTaskProgressId].filter(Boolean);
       })
       .filter(Boolean)
   );
@@ -1184,9 +1191,14 @@ export async function fetchOteTrainingProgressMap(uid) {
   return snap.docs.reduce((acc, entry) => {
     const data = entry.data() || {};
     if (data.completed === false) return acc;
-    const progressId = data.progressId || entry.id;
+    const progressId = String(data.progressId || entry.id || "");
     if (!progressId) return acc;
-    acc[progressId] = data.completedAt || data.updatedAt || data.createdAt || null;
+    const completedAt = data.completedAt || data.updatedAt || data.createdAt || null;
+    const taskId = String(data.taskId || "").trim();
+    const recoveredTaskProgressId =
+      taskId && progressId.endsWith(".practice") ? `${progressId}.${taskId}` : "";
+    acc[progressId] = completedAt;
+    if (recoveredTaskProgressId) acc[recoveredTaskProgressId] = completedAt;
     return acc;
   }, {});
 }
