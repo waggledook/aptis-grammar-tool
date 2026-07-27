@@ -161,6 +161,8 @@ export function AdvancedPartTwoTask({ set, answers, onChange, disabled = false }
               const index = set.gaps.findIndex((entry) => entry.id === gap.id);
               const before = notes.filter((note) => note.beforeGap === gap.id);
               const after = notes.filter((note) => note.afterGap === gap.id);
+              const leadingPunctuation = gap.after.match(/^[.,;:]/)?.[0] || "";
+              const remainingText = leadingPunctuation ? gap.after.slice(1) : gap.after;
               return (
                 <React.Fragment key={gap.id}>
                   {before.map((note) => <p key={note.text}>{note.text}</p>)}
@@ -177,8 +179,13 @@ export function AdvancedPartTwoTask({ set, answers, onChange, disabled = false }
                         type="text"
                         value={answers[gap.id] || ""}
                       />
+                      {leadingPunctuation ? (
+                        <span className="ote-listening-gap-punctuation" aria-hidden="true">
+                          {leadingPunctuation}
+                        </span>
+                      ) : null}
                     </label>
-                    <span>{gap.after}</span>
+                    <span>{remainingText}</span>
                   </p>
                   {after.map((note) => <p key={note.text}>{note.text}</p>)}
                 </React.Fragment>
@@ -213,6 +220,70 @@ export function ListeningTask({
     return <GeneralPartTwoTask set={activity.set} answers={answers} onChange={onChange} disabled={disabled} />;
   }
   return <AdvancedPartTwoTask set={activity.set} answers={answers} onChange={onChange} disabled={disabled} />;
+}
+
+function CompletedReviewSentence({ before, answer, after }) {
+  return (
+    <p className="ote-listening-live-review-sentence">
+      <span>{before} </span>
+      <mark>{answer}</mark>
+      <span>{after}</span>
+    </p>
+  );
+}
+
+function PartOneReviewContext({ item, selectedValue, showSelection }) {
+  return (
+    <div className="ote-listening-live-review-context is-part-one">
+      <div className="ote-listening-live-review-question">
+        <p>{item.context}</p>
+        <h4>{item.prompt}</h4>
+      </div>
+      <div
+        className={`ote-listening-live-review-options ${item.kind === "pictures" ? "is-pictures" : "is-text"}`}
+        aria-label="Answer options"
+      >
+        {item.options.map((option, index) => {
+          const isCorrect = index === item.answer;
+          const isSelected = showSelection && index === selectedValue;
+          return (
+            <div
+              className={`${isCorrect ? "is-correct" : ""} ${isSelected ? "is-selected" : ""}`}
+              key={`${item.id}-review-${index}`}
+            >
+              {item.kind === "pictures" ? <img src={option.image} alt="" /> : <span>{option.text}</span>}
+              <strong aria-label={`Option ${optionLetter(index)}`}>{optionLetter(index)}</strong>
+              <small>
+                {isCorrect ? "Correct answer" : isSelected ? "Your answer" : ""}
+              </small>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ListeningReviewContext({ activity, item, selectedValue, showSelection }) {
+  if (activity.format === "part1") {
+    return (
+      <PartOneReviewContext
+        item={item}
+        selectedValue={selectedValue}
+        showSelection={showSelection}
+      />
+    );
+  }
+
+  const answer = activity.format === "general-part2"
+    ? item.options[item.answer]
+    : item.answer;
+  return (
+    <div className="ote-listening-live-review-context">
+      {item.section ? <p className="ote-listening-live-review-section">{item.section}</p> : null}
+      <CompletedReviewSentence before={item.before} answer={answer} after={item.after} />
+    </div>
+  );
 }
 
 export function ListeningFeedback({ activity, item, selectedValue, showAudio = false }) {
@@ -254,6 +325,12 @@ export function ListeningFeedback({ activity, item, selectedValue, showAudio = f
           <strong>{selectedText}</strong>
         </div>
       ) : null}
+      <ListeningReviewContext
+        activity={activity}
+        item={item}
+        selectedValue={selectedValue}
+        showSelection={!showAudio && hasResponse}
+      />
       <p className="ote-listening-feedback-explanation">
         {isPartOne ? item.explanation : item.review?.explanation}
       </p>

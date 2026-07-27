@@ -1,4 +1,8 @@
 .ote-listening-live-page {
+  --ote-dashboard-panel-border: #35508e;
+  --ote-dashboard-accent: #f6bd60;
+  --ote-dashboard-primary: linear-gradient(180deg, #f6bd60, #e9a93f);
+  --ote-dashboard-primary-text: #13213b;
   --ote-live-page-bg: #081a38;
   --ote-live-page-glow: rgba(94, 168, 227, 0.18);
   --ote-live-surface: var(--color-surface);
@@ -115,9 +119,12 @@
 .ote-listening-live-pin > strong {
   margin: 0.2rem 0 0.75rem;
   color: var(--ote-live-text);
-  font-size: clamp(2.7rem, 7vw, 4.5rem);
-  letter-spacing: 0.13em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: clamp(2.5rem, 5vw, 3.15rem);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.045em;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .ote-listening-live-pin button,
@@ -444,6 +451,139 @@
   font-size: 0.95rem;
 }
 
+.ote-listening-live-review-context {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface);
+}
+
+.ote-listening-live-review-section {
+  margin: 0;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-size: 0.82rem;
+  font-weight: 850;
+}
+
+.ote-listening-live-review-sentence {
+  margin: 0;
+  color: var(--color-text);
+  font-size: clamp(1rem, 2vw, 1.12rem);
+  line-height: 1.65;
+}
+
+.ote-listening-live-review-sentence mark {
+  padding: 0.12rem 0.3rem;
+  border-radius: 4px;
+  background: color-mix(in srgb, #49c982 28%, var(--color-surface));
+  color: var(--color-text);
+  font-weight: 850;
+  box-shadow: inset 0 -2px 0 #2d9b63;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+.ote-listening-live-review-question p,
+.ote-listening-live-review-question h4 {
+  margin: 0;
+}
+
+.ote-listening-live-review-question p {
+  color: var(--color-text-soft);
+  font-size: 0.82rem;
+}
+
+.ote-listening-live-review-question h4 {
+  margin-top: 0.2rem;
+  color: var(--color-text);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.ote-listening-live-review-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.ote-listening-live-review-options > div {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  overflow: hidden;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.ote-listening-live-review-options > div.is-correct {
+  border-color: #2d9b63;
+  background: color-mix(in srgb, #2d9b63 9%, var(--color-surface));
+  box-shadow: 0 0 0 2px color-mix(in srgb, #2d9b63 13%, transparent);
+}
+
+.ote-listening-live-review-options > div.is-selected:not(.is-correct) {
+  border-color: #c35a63;
+  background: color-mix(in srgb, #c35a63 8%, var(--color-surface));
+}
+
+.ote-listening-live-review-options strong {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16);
+}
+
+.ote-listening-live-review-options small {
+  min-height: 1.7rem;
+  padding: 0.35rem 0.55rem;
+  color: var(--color-text-soft);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.ote-listening-live-review-options.is-pictures img {
+  width: 100%;
+  aspect-ratio: 1.3;
+  object-fit: cover;
+}
+
+.ote-listening-live-review-options.is-text > div {
+  grid-template-columns: 2rem 1fr;
+  gap: 0.55rem;
+  align-content: start;
+  padding: 0.8rem;
+}
+
+.ote-listening-live-review-options.is-text strong {
+  position: static;
+  grid-row: 1 / span 2;
+  box-shadow: none;
+}
+
+.ote-listening-live-review-options.is-text span {
+  min-width: 0;
+  padding-top: 0.25rem;
+  line-height: 1.4;
+}
+
+.ote-listening-live-review-options.is-text small {
+  min-height: 1rem;
+  padding: 0;
+}
+
 @media (max-width: 760px) {
   .ote-listening-live-lobby,
   .ote-listening-live-options.is-pictures {
@@ -464,5 +604,9 @@
   .ote-listening-teacher-mode > div:last-child {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .ote-listening-live-review-options.is-text {
+    grid-template-columns: 1fr;
   }
 }

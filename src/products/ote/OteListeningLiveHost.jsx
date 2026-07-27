@@ -239,6 +239,7 @@ export default function OteListeningLiveHost({ user }) {
   }
 
   const playCount = game.state?.playCount || 0;
+  const displayedPin = String(game.pin || "").replace(/^(\d{3})(\d{3})$/, "$1 $2");
   return (
     <main className="ote-listening-live-page ote-listening-live-host">
       <Seo title={`Host Live Listening: ${activity.title}`} description="Teacher-controlled OTE listening session." />
@@ -256,7 +257,9 @@ export default function OteListeningLiveHost({ user }) {
         <section className="ote-listening-live-lobby">
           <div className="ote-listening-live-pin">
             <p>Students join with PIN</p>
-            <strong>{game.pin}</strong>
+            <strong aria-label={`PIN ${String(game.pin || "").split("").join(" ")}`}>
+              {displayedPin}
+            </strong>
             <QRCodeSVG value={joinUrl} size={184} includeMargin />
             <button type="button" onClick={copyJoinLink}><Clipboard size={17} /> {copyState || "Copy join link"}</button>
           </div>
