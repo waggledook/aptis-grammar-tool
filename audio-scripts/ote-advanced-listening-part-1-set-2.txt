@@ -1,0 +1,107 @@
+OTE Advanced Listening Part 1 — Set 2
+Audio generation scripts
+
+Do not add “Now listen again” or announce the answers.
+The application inserts the repeat cue and replays each listening item automatically.
+
+
+QUESTION TEXT RECORDINGS
+
+QUESTION 1
+Output filename: question-1.mp3
+
+Two editors are discussing an article.
+
+What criticism does the woman make?
+
+
+QUESTION 2
+Output filename: question-2.mp3
+
+A couple are discussing a home office.
+
+Which room will become the home office?
+
+
+QUESTION 3
+Output filename: question-3.mp3
+
+An economist is discussing a four-day-week trial.
+
+Why does he mention small companies?
+
+
+QUESTION 4
+Output filename: question-4.mp3
+
+A student is discussing an oral-history project with her professor.
+
+What does the professor suggest she focus on?
+
+
+QUESTION 5
+Output filename: question-5.mp3
+
+Two colleagues are discussing a presentation venue.
+
+Where will the presentation take place?
+
+
+LISTENING ITEM RECORDINGS
+
+ITEM 1
+Output filename: item-1.mp3
+
+Man: I’ve read your comments on the article. You thought the tone was too informal?
+
+Woman: Actually, no. For an online magazine aimed at non-specialists, the style is lively without being patronising. And the research is recent enough; most of the figures come from studies published this year.
+
+Man: So what’s the problem?
+
+Woman: The case studies. Individually they’re fascinating, especially the interview with the architect, but there are so many that the main claim almost disappears. A reader may remember three unusual buildings and still be unclear about what the article is arguing. I’d keep one example and use the space to develop the analysis.
+
+
+ITEM 2
+Output filename: item-2.mp3
+
+Man: Have you decided where you’re going to set up your home office?
+
+Woman: Well, we’ve gone ahead and insulated the garage and added a proper window. It still needs painting and the desk hasn’t arrived, but that’s where I’ll be based. It’s far quieter than the rest of the house, too. I’d initially considered the dining room because of the lovely natural light, but clearing away my work every time we host dinner is a non-starter. And while the spare bedroom was the obvious fallback, my parents stay there too frequently for that to be practical.
+
+
+ITEM 3
+Output filename: item-3.mp3
+
+Man: The four-day-week trial produced some impressive figures, particularly on staff retention and reported wellbeing, with several participating organisations reporting higher productivity. However, we need to exercise caution before assuming these outcomes can be extrapolated across the board. The vast majority of employers involved were larger firms capable of reallocating duties seamlessly during absences. For an enterprise with a single payroll specialist or technician, there’s far less operational slack. It doesn’t render shorter weeks unworkable for smaller outfits, but their specific constraints simply weren’t accounted for in this dataset.
+
+
+ITEM 4
+Output filename: item-4.mp3
+
+Woman: The interviews for my oral-history project don’t always match the official records. People remember the factory closing in different years, and some insist there were protests that the local newspaper never mentioned. I’m wondering whether I need a larger sample.
+
+Man: More interviews might be useful, but they won’t necessarily make those differences disappear.
+
+Woman: Then should I concentrate on checking which account is accurate?
+
+Man: Not entirely. The disagreement may be the most interesting part. Ask why one version has survived within a family or neighbourhood and another hasn’t. Memory reflects identity and later experience as well as the original event. That tension could become the focus of the project.
+
+
+ITEM 5
+Output filename: item-5.mp3
+
+Man: Is everything arranged for tomorrow’s presentation?
+
+Woman: The lecture theatre would have been ideal, but another department had already booked it.
+
+Man: What about the outdoor courtyard?
+
+Woman: I considered it, but with heavy rain forecast, taking that gamble didn’t seem worthwhile.
+
+Man: Will the alternative be big enough?
+
+Woman: The technicians rearranged the rows of desktop computers and cleared the extra tables this morning. Capacity is tighter than in the theatre, but everyone will still get a seat, and the display screen is excellent.
+
+Man: Good. Have you told everyone about the change?
+
+Woman: Yes, I updated the invitation this afternoon.

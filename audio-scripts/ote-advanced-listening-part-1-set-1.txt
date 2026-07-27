@@ -1,0 +1,53 @@
+OTE Advanced Listening Part 1 — Set 1
+Main extract recording scripts
+
+Important: Record only the dialogue or monologue shown for each item.
+Do not add the question instructions, “Now listen again”, or the answer.
+
+
+ITEM 1
+Output filename: item-1.mp3
+
+Man: Have you sorted out the refreshments for Friday’s training day?
+
+Woman: More or less. The café couldn’t get the sandwich platters there until midday, by which time the first session will be over. The venue already includes pastries with the tea and coffee, so adding more of those wouldn’t solve much, especially with the dietary requirements people sent in. The café can deliver the fruit trays first thing and keep the different types separate. I’ve asked them to provide enough for about thirty people.
+
+
+ITEM 2
+Output filename: item-2.mp3
+
+Woman: The old audio guide was remarkably comprehensive, and visitors often praised the amount of information it contained. When we observed people using it, though, many spent more time looking at the screen than at the objects in front of them. The replacement still provides basic directions and practical information, but much of the commentary has been replaced by prompts followed by a few seconds of silence. Some colleagues wondered whether this might reduce the need for gallery staff. Early trials suggest the opposite: visitors tend to ask more questions once they have formed impressions of their own.
+
+
+ITEM 3
+Output filename: item-3.mp3
+
+Woman: I’ve drafted the questionnaire for my project on why commuters oppose the city-centre congestion charge.
+
+Man: And who are you planning to survey?
+
+Woman: Drivers, cyclists and bus passengers from several districts. I’ve also varied the question order so earlier answers don’t influence later ones.
+
+Man: The range sounds broad enough, although you’ll need to make sure one group doesn’t dominate. Varying the order is sensible too, though I’d pilot the questionnaire first.
+
+Woman: So what concerns you?
+
+Man: The project’s starting point. Calling it a study of why commuters oppose the charge assumes you already know their position. You may find that opposition is far from universal.
+
+
+ITEM 4
+Output filename: item-4.mp3
+
+Woman: Aren’t you supposed to be at that job interview across town this afternoon?
+
+Man: Yes. I’d planned to take the train, but the strike has made the replacement buses hopelessly unreliable.
+
+Woman: You could cycle. You’d probably get there faster.
+
+Man: Twelve kilometres in this suit? I don’t think arriving red-faced and exhausted would create the right impression. I checked the fare, and it’s more than I wanted to pay, but the driver’s collecting me at two. At least that removes the uncertainty.
+
+
+ITEM 5
+Output filename: item-5.mp3
+
+Woman: Wearable technology is becoming more accurate, and the latest devices can collect an extraordinary amount of information. Athletes often enjoy having daily targets too, although that initial burst of motivation tends to fade. The figures don’t interpret themselves, of course. A device may recommend rest while an experienced coach sees an athlete who appears ready to compete. What follows is not simply a technical discussion about accuracy; it becomes a negotiation over whose judgement carries more weight. In some teams, decisions that once belonged almost entirely to the coach are now shared with analysts and medical staff.

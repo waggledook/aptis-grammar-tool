@@ -185,6 +185,14 @@ import HubCourseTestRunner from "./components/hub/HubCourseTestRunner.jsx";
 import HubAptisGrammarVocabularyMock from "./components/hub/HubAptisGrammarVocabularyMock.jsx";
 import OteDashboard from "./products/ote/OteDashboard.jsx";
 import OteSkillMenu from "./products/ote/OteSkillMenu.jsx";
+import OteListeningMenu, { OteListeningPartShell } from "./products/ote/OteListeningMenu.jsx";
+import OteAdvancedListeningPart1Guide from "./products/ote/OteAdvancedListeningPart1Guide.jsx";
+import OteAdvancedListeningPart1Practice from "./products/ote/OteAdvancedListeningPart1Practice.jsx";
+import OteAdvancedListeningPart2Guide from "./products/ote/OteAdvancedListeningPart2Guide.jsx";
+import OteAdvancedListeningPart2Practice from "./products/ote/OteAdvancedListeningPart2Practice.jsx";
+import OteGeneralListeningPart1Practice from "./products/ote/OteGeneralListeningPart1Practice.jsx";
+import OteGeneralListeningPart2Guide from "./products/ote/OteGeneralListeningPart2Guide.jsx";
+import OteGeneralListeningPart2Practice from "./products/ote/OteGeneralListeningPart2Practice.jsx";
 import OteSpeakingPart1Guide from "./products/ote/OteSpeakingPart1Guide.jsx";
 import OteSpeakingPart1AdvancedGuide from "./products/ote/OteSpeakingPart1AdvancedGuide.jsx";
 import OteSpeakingPart1Menu from "./products/ote/OteSpeakingPart1Menu.jsx";
@@ -455,6 +463,7 @@ const isOteRoute =
       location.pathname.startsWith("/courses") ||
       location.pathname.startsWith("/speaking") ||
       location.pathname.startsWith("/reading") ||
+      location.pathname.startsWith("/listening") ||
       location.pathname.startsWith("/writing") ||
       location.pathname.startsWith("/mock-tests") ||
       location.pathname.startsWith("/results")));
@@ -1405,6 +1414,39 @@ return (
       />
     }
   />
+  <Route path="/ote/listening" element={<OteListeningMenu user={user} nativeRoutes={false} />} />
+  <Route
+    path="/ote/listening/advanced/part-1-short-extracts/guide"
+    element={<OteAdvancedListeningPart1Guide nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/listening/advanced/part-1-short-extracts/practice/:setId"
+    element={<OteAdvancedListeningPart1Practice user={user} nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/listening/advanced/part-2-note-completion/guide"
+    element={<OteAdvancedListeningPart2Guide nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/listening/advanced/part-2-note-completion/practice/:setId"
+    element={<OteAdvancedListeningPart2Practice user={user} nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/listening/general/part-1-picture-options/practice/:setId"
+    element={<OteGeneralListeningPart1Practice user={user} nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/listening/general/part-2-note-completion/guide"
+    element={<OteGeneralListeningPart2Guide nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/listening/general/part-2-note-completion/practice/:setId"
+    element={<OteGeneralListeningPart2Practice user={user} nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/listening/:variant/:partId"
+    element={<OteListeningPartShell user={user} nativeRoutes={false} />}
+  />
   <Route path="/ote/level-test" element={<OteLevelTestChooser nativeRoutes={false} />} />
   <Route path="/ote/level-test/general" element={<OteLevelTest nativeRoutes={false} />} />
   <Route path="/ote/level-test/advanced" element={<OteAdvancedLevelTest nativeRoutes={false} />} />
@@ -1707,6 +1749,38 @@ return (
   {isOteSite && (
     <>
       <Route path="/mock-tests/:mockId" element={<OteSpeakingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
+      <Route
+        path="/listening/advanced/part-1-short-extracts/guide"
+        element={<OteAdvancedListeningPart1Guide nativeRoutes />}
+      />
+      <Route
+        path="/listening/advanced/part-1-short-extracts/practice/:setId"
+        element={<OteAdvancedListeningPart1Practice user={user} nativeRoutes />}
+      />
+      <Route
+        path="/listening/advanced/part-2-note-completion/guide"
+        element={<OteAdvancedListeningPart2Guide nativeRoutes />}
+      />
+      <Route
+        path="/listening/advanced/part-2-note-completion/practice/:setId"
+        element={<OteAdvancedListeningPart2Practice user={user} nativeRoutes />}
+      />
+      <Route
+        path="/listening/general/part-1-picture-options/practice/:setId"
+        element={<OteGeneralListeningPart1Practice user={user} nativeRoutes />}
+      />
+      <Route
+        path="/listening/general/part-2-note-completion/guide"
+        element={<OteGeneralListeningPart2Guide nativeRoutes />}
+      />
+      <Route
+        path="/listening/general/part-2-note-completion/practice/:setId"
+        element={<OteGeneralListeningPart2Practice user={user} nativeRoutes />}
+      />
+      <Route
+        path="/listening/:variant/:partId"
+        element={<OteListeningPartShell user={user} nativeRoutes />}
+      />
       <Route path="/reading/mock-tests/advanced-reading-1" element={<OteAdvancedReadingMockRunner user={user} nativeRoutes />} />
       <Route path="/reading/advanced/part-1-short-texts/guide" element={<OteAdvancedReadingPart1Guide nativeRoutes />} />
       <Route path="/reading/advanced/part-1-short-texts/reading-target" element={<OteAdvancedReadingPart1TargetTrainer nativeRoutes />} />
@@ -2141,7 +2215,9 @@ return (
 <Route
   path="/listening"
   element={
-    isSeifHubSite ? (
+    isOteSite ? (
+      <OteListeningMenu user={user} nativeRoutes />
+    ) : isSeifHubSite ? (
       <HubListeningMenu />
     ) : (
       <ListeningMenu user={user} aptisAccess={aptisAccess} onSignIn={() => setShowAuth(true)} />

@@ -9,6 +9,7 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
   const speakingPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
   const writingPath = getSitePath(nativeRoutes ? "/writing" : "/ote/writing");
   const readingPath = getSitePath(nativeRoutes ? "/reading" : "/ote/reading");
+  const listeningPath = getSitePath(nativeRoutes ? "/listening" : "/ote/listening");
   const profilePath = getSitePath("/profile");
   const teacherToolsPath = getSitePath("/teacher-tools");
   const myStudentsPath = getSitePath("/my-students");
@@ -55,7 +56,7 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
     <main className="menu-wrapper hub-menu-wrapper ote-menu-wrapper">
       <Seo
         title="OTE Training | Seif English"
-        description="Oxford Test of English training for speaking, writing, and reading."
+        description="Oxford Test of English training for speaking, writing, reading, and listening."
       />
 
       <header className="main-header ote-main-header">
@@ -72,10 +73,10 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
       <div className="whats-new-banner hub-status-banner">
         <div className="whats-new-copy">
           <span className="whats-new-label">{isAdvanced ? "Advanced practice" : "Mock-test environment"}</span>
-          <h3>{isAdvanced ? "Prepare for OTE Advanced" : "Speaking, writing, and reading practice is ready"}</h3>
+          <h3>{isAdvanced ? "Prepare for OTE Advanced" : "Speaking, writing, reading, and listening practice"}</h3>
           <p>
             {isAdvanced
-              ? "Practise higher-level speaking, writing, and reading tasks with guides, focused training, and timed activities."
+              ? "Practise higher-level speaking, writing, reading, and listening tasks with guides, focused training, and timed activities."
               : "Build each OTE skill with mock environments, clear guides, and focused practice activities."}
           </p>
         </div>
@@ -102,6 +103,13 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
             <h3>Advanced Reading</h3>
             <p>Open the four Advanced reading sections: short texts, matching, gapped text, and long text.</p>
           </button>
+
+          {isTeacherOrAdmin ? (
+            <button className="menu-card" type="button" onClick={() => navigate(listeningPath)}>
+              <h3>Advanced Listening</h3>
+              <p>Open all four Advanced Listening parts: mixed options, note completion, opinion matching, and multiple choice.</p>
+            </button>
+          ) : null}
 
           <button className="menu-card" type="button" disabled>
             <h3>Advanced Language Lab</h3>
@@ -131,6 +139,13 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
             <h3>Reading</h3>
             <p>Open the reading part menu for short texts, matching, gapped text, and long text.</p>
           </button>
+
+          {isTeacherOrAdmin ? (
+            <button className="menu-card" type="button" onClick={() => navigate(listeningPath)}>
+              <h3>Listening</h3>
+              <p>Open all four General Listening parts: picture options, note completion, opinion matching, and multiple choice.</p>
+            </button>
+          ) : null}
 
           <button className="menu-card" type="button" onClick={() => navigate(profilePath)}>
             <h3>My Profile</h3>

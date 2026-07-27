@@ -1959,6 +1959,21 @@ export default function HubCourseTestRunner({ user }) {
         runnerState: nextRunnerState,
         autoScore,
         autoTotal,
+      }, {
+        sessionId: session?.id || attempt.sessionId || "",
+        templateId: template?.id || attempt.templateId || "",
+        templateTitle: session?.templateTitle || template?.title || attempt.templateTitle || "",
+        level: template?.level || attempt.level || "",
+        testKind: template?.testKind || attempt.testKind || "",
+        teacherUid: session?.teacherUid || attempt.teacherUid || "",
+        studentUid: user?.uid || attempt.studentUid || "",
+        studentEmail: user?.email || "",
+        studentName: user?.displayName || user?.name || user?.email || attempt.studentName || "",
+        durationSeconds: (() => {
+          const startedAt = timestampToDate(attempt.startedAt);
+          return startedAt ? (Date.now() - startedAt.getTime()) / 1000 : null;
+        })(),
+        sectionCount: allSections.length,
       });
       const savedRunnerState = saveResult?.runnerState || nextRunnerState;
       const savedAutoScore = Number(saveResult?.autoScore ?? autoScore);

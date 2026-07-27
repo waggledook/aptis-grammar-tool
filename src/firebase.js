@@ -1099,6 +1099,21 @@ function getOteTrainingProgressId(details = {}) {
     }
   }
 
+  if (section === "listening") {
+    if (part === "part-1" || part === "part1") {
+      if (mode.includes("practice") || taskId) return "listening.part1.practice";
+    }
+    if (part === "part-2" || part === "part2") {
+      if (mode.includes("practice") || taskId) return "listening.part2.practice";
+    }
+    if (part === "part-3" || part === "part3") {
+      if (mode.includes("practice") || taskId) return "listening.part3.practice";
+    }
+    if (part === "part-4" || part === "part4") {
+      if (mode.includes("practice") || taskId) return "listening.part4.practice";
+    }
+  }
+
   return "";
 }
 
@@ -5040,6 +5055,15 @@ function buildCourseTestPin() {
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 
+function logHubCourseTestActivity(type, details = {}) {
+  return logActivity(type, {
+    app: "seifhub",
+    product: "seifhub",
+    section: "course-tests",
+    ...details,
+  });
+}
+
 export async function createCourseTestSession({
   templateId,
   templateTitle,
@@ -5099,6 +5123,23 @@ export async function createCourseTestSession({
     endsAt: resolvedEndsAt,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
+  });
+
+  await logHubCourseTestActivity("hub_course_test_session_created", {
+    sessionId: ref.id,
+    templateId: templateId || "",
+    templateTitle: templateTitle || "",
+    level: level || "",
+    testKind: testKind || "",
+    teacherUid: teacherUid || user.uid,
+    teacherEmail: teacherEmail || user.email || "",
+    teacherName: teacherName || user.displayName || "",
+    className: String(className || "").trim(),
+    targetStudentCount: normalizedStudents.length,
+    accessMode: accessMode || "assigned",
+    controlMode: normalizedControlMode,
+    requirePin: Boolean(requirePin),
+    status: status || "scheduled",
   });
 
   return { id: ref.id, accessPin: pin };
@@ -5200,6 +5241,7 @@ export async function startCourseTestAttempt({
   testKind,
   teacherUid,
   studentUid,
+  studentEmail,
   studentName,
 }) {
   const user = auth.currentUser;
@@ -5225,6 +5267,19 @@ export async function startCourseTestAttempt({
     updatedAt: serverTimestamp(),
   });
 
+  await logHubCourseTestActivity("hub_course_test_started", {
+    attemptId: ref.id,
+    sessionId: sessionId || "",
+    templateId: templateId || "",
+    templateTitle: templateTitle || "",
+    level: level || "",
+    testKind: testKind || "",
+    teacherUid: teacherUid || "",
+    studentUid: studentUid || user.uid,
+    studentEmail: studentEmail || user.email || "",
+    studentName: studentName || user.displayName || "",
+  });
+
   return ref.id;
 }
 
@@ -5247,16 +5302,17 @@ export async function saveCourseTestAttemptDraft(attemptId, data = {}) {
   };
 }
 
-export async function submitCourseTestAttempt(attemptId, data = {}) {
+export async function submitCourseTestAttempt(attemptId, data = {}, activityDetails = {}) {
   if (!attemptId) throw new Error("Attempt ID is required.");
 
   const protectedData = await protectCourseTestRunnerState(attemptId, data);
   const autoScore = Number(protectedData.autoScore || 0);
   const autoTotal = Number(protectedData.autoTotal || 0);
+  const percent = autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0;
 
   await updateDoc(doc(db, "courseTestAttempts", attemptId), {
     ...protectedData,
-    percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+    percent,
     completed: true,
     reviewRequired: true,
     reviewStatus: "pending",
@@ -5268,9 +5324,31 @@ export async function submitCourseTestAttempt(attemptId, data = {}) {
     { ...protectedData, completed: true, reviewStatus: "pending" },
     "submit"
   );
+  await logHubCourseTestActivity("hub_course_test_completed", {
+    attemptId,
+    sessionId: activityDetails.sessionId || "",
+    templateId: activityDetails.templateId || "",
+    templateTitle: activityDetails.templateTitle || "",
+    level: activityDetails.level || "",
+    testKind: activityDetails.testKind || "",
+    teacherUid: activityDetails.teacherUid || "",
+    studentUid: activityDetails.studentUid || auth.currentUser?.uid || "",
+    studentEmail: activityDetails.studentEmail || auth.currentUser?.email || "",
+    studentName: activityDetails.studentName || auth.currentUser?.displayName || "",
+    autoScore,
+    autoTotal,
+    percent,
+    durationSeconds: Number.isFinite(activityDetails.durationSeconds)
+      ? Math.max(0, Math.round(activityDetails.durationSeconds))
+      : null,
+    sectionCount: Number.isFinite(activityDetails.sectionCount)
+      ? activityDetails.sectionCount
+      : null,
+    reviewStatus: "pending",
+  });
   return {
     ...protectedData,
-    percent: autoTotal > 0 ? Math.round((autoScore / autoTotal) * 100) : 0,
+    percent,
     completed: true,
     reviewRequired: true,
     reviewStatus: "pending",

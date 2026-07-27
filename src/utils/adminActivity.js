@@ -62,6 +62,9 @@ export const ACTIVITY_TYPE_LABELS = {
   hub_word_formation_started: "Hub Word Formation Started",
   hub_word_formation_review_loaded: "Hub Word Formation Review Loaded",
   hub_word_formation_completed: "Hub Word Formation Completed",
+  hub_course_test_session_created: "Hub Course Test Session Created",
+  hub_course_test_started: "Hub Course Test Started",
+  hub_course_test_completed: "Hub Course Test Completed",
   collocation_dash_started: "Collocation Dash Started",
   collocation_dash_completed: "Collocation Dash Completed",
   collocation_precision_started: "Collocation Trainer Started",
@@ -213,6 +216,20 @@ function joinParts(parts) {
 
 function formatScore(score, total) {
   return `${score ?? "?"}/${total ?? "?"}`;
+}
+
+function formatCourseTestKind(value = "") {
+  if (value === "progress") return "Progress test";
+  if (value === "end-of-course") return "End-of-course test";
+  return titleCaseFromSnakeCase(value) || "Course test";
+}
+
+function formatDurationSeconds(value) {
+  if (typeof value !== "number" || !Number.isFinite(value)) return "";
+  const totalSeconds = Math.max(0, Math.round(value));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  return minutes ? `${minutes}m ${seconds}s` : `${seconds}s`;
 }
 
 function formatUnknownDetails(details) {
@@ -386,6 +403,32 @@ export function formatActivityDetails(log) {
     case "hub_open_cloze_completed":
     case "hub_word_formation_completed":
       return joinParts([d.mode || "normal", `Correct ${formatScore(d.correct, d.total)}`]);
+    case "hub_course_test_session_created":
+      return joinParts([
+        formatCourseTestKind(d.testKind),
+        d.level || "",
+        d.templateTitle || d.templateId || "Course test",
+        d.className || "",
+        formatCount(d.targetStudentCount, "student"),
+        d.controlMode || "",
+      ]);
+    case "hub_course_test_started":
+      return joinParts([
+        formatCourseTestKind(d.testKind),
+        d.level || "",
+        d.templateTitle || d.templateId || "Course test",
+        d.studentName || d.studentEmail || d.studentUid || "Student",
+      ]);
+    case "hub_course_test_completed":
+      return joinParts([
+        formatCourseTestKind(d.testKind),
+        d.level || "",
+        d.templateTitle || d.templateId || "Course test",
+        d.studentName || d.studentEmail || d.studentUid || "Student",
+        `Score ${formatScore(d.autoScore, d.autoTotal)}`,
+        typeof d.percent === "number" ? `${d.percent}%` : "",
+        formatDurationSeconds(d.durationSeconds),
+      ]);
     case "collocation_dash_started":
       return joinParts([formatCount(d.roundsPlanned, "round"), `${d.roundSeconds ?? "?"}s`]);
     case "collocation_dash_completed":
