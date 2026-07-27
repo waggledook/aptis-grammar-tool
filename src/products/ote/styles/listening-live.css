@@ -1,0 +1,468 @@
+.ote-listening-live-page {
+  --ote-live-page-bg: #081a38;
+  --ote-live-page-glow: rgba(94, 168, 227, 0.18);
+  --ote-live-surface: var(--color-surface);
+  --ote-live-surface-soft: var(--color-surface-2);
+  --ote-live-surface-tint: color-mix(in srgb, #2d78b5 12%, var(--color-surface));
+  --ote-live-text: var(--color-text);
+  --ote-live-text-soft: var(--color-text-soft);
+  --ote-live-muted: var(--color-muted);
+  --ote-live-border: var(--color-border);
+  --ote-live-border-strong: #5ea8e3;
+  --ote-live-accent: #74bdf3;
+  --ote-live-primary: #2d82bd;
+  --ote-live-primary-hover: #3b94cf;
+  --ote-live-primary-text: #ffffff;
+  --ote-live-danger: #ff9999;
+  --ote-live-success: #65d58e;
+  --ote-live-shadow: 0 16px 45px rgba(0, 0, 0, 0.24);
+  min-height: 100vh;
+  padding: clamp(1rem, 2.5vw, 2.5rem);
+  color: var(--ote-live-text);
+  background:
+    radial-gradient(circle at top right, var(--ote-live-page-glow), transparent 32rem),
+    var(--ote-live-page-bg);
+}
+
+:root[data-theme="light"] .ote-listening-live-page {
+  --ote-live-page-bg: #f5f8fb;
+  --ote-live-page-glow: rgba(45, 120, 181, 0.13);
+  --ote-live-surface-tint: #e9f3fa;
+  --ote-live-border-strong: #2d78b5;
+  --ote-live-accent: #155886;
+  --ote-live-primary: #17679e;
+  --ote-live-primary-hover: #0f5789;
+  --ote-live-danger: #9c2929;
+  --ote-live-success: #2d7347;
+  --ote-live-shadow: 0 16px 45px rgba(19, 55, 82, 0.08);
+}
+
+.ote-listening-live-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  width: min(1180px, 100%);
+  margin: 0 auto 1.25rem;
+}
+
+.ote-listening-live-header p {
+  margin: 0 0 0.25rem;
+  color: var(--ote-live-accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ote-listening-live-header h1 {
+  margin: 0;
+  color: var(--ote-live-text);
+  font-size: clamp(1.65rem, 3vw, 2.55rem);
+}
+
+.ote-listening-live-phase {
+  flex: 0 0 auto;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--ote-live-border);
+  border-radius: 999px;
+  background: var(--ote-live-surface);
+  color: var(--ote-live-accent);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.ote-listening-live-lobby,
+.ote-listening-live-stage {
+  width: min(1180px, 100%);
+  margin: 0 auto;
+}
+
+.ote-listening-live-lobby {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.75fr) minmax(320px, 1.4fr);
+  gap: 1.25rem;
+}
+
+.ote-listening-live-pin,
+.ote-listening-live-roster,
+.ote-listening-live-stage,
+.ote-listening-live-wait {
+  border: 1px solid var(--ote-live-border);
+  border-radius: 1.2rem;
+  background: var(--ote-live-surface);
+  box-shadow: var(--ote-live-shadow);
+}
+
+.ote-listening-live-pin,
+.ote-listening-live-roster {
+  padding: 1.4rem;
+}
+
+.ote-listening-live-pin {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.ote-listening-live-pin p {
+  margin: 0;
+  color: var(--ote-live-text-soft);
+  font-weight: 700;
+}
+
+.ote-listening-live-pin > strong {
+  margin: 0.2rem 0 0.75rem;
+  color: var(--ote-live-text);
+  font-size: clamp(2.7rem, 7vw, 4.5rem);
+  letter-spacing: 0.13em;
+  line-height: 1;
+}
+
+.ote-listening-live-pin button,
+.ote-listening-live-controls button,
+.ote-listening-live-primary,
+.ote-listening-teacher-mode button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 1px solid var(--ote-live-border-strong);
+  border-radius: 0.7rem;
+  background: var(--ote-live-surface);
+  color: var(--ote-live-accent);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.ote-listening-live-pin button:hover:not(:disabled),
+.ote-listening-live-controls button:hover:not(:disabled),
+.ote-listening-teacher-mode button:hover:not(:disabled) {
+  border-color: var(--ote-live-accent);
+  background: var(--ote-live-surface-tint);
+}
+
+.ote-listening-live-pin button:focus-visible,
+.ote-listening-live-controls button:focus-visible,
+.ote-listening-live-primary:focus-visible,
+.ote-listening-teacher-mode button:focus-visible,
+.ote-listening-live-options button:focus-visible,
+.ote-general-listening-choice-options button:focus-visible,
+.ote-listening-note-line input:focus-visible {
+  outline: 3px solid color-mix(in srgb, var(--ote-live-border-strong) 36%, transparent);
+  outline-offset: 2px;
+}
+
+.ote-listening-live-pin button {
+  margin-top: 0.7rem;
+  padding: 0.65rem 0.85rem;
+}
+
+.ote-listening-live-roster > div {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ote-listening-live-roster h2 {
+  margin: 0;
+}
+
+.ote-listening-live-roster ul {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.55rem;
+  margin: 1rem 0 1.4rem;
+  padding: 0;
+  list-style: none;
+}
+
+.ote-listening-live-roster li {
+  padding: 0.65rem 0.8rem;
+  border-radius: 0.65rem;
+  background: var(--ote-live-surface-soft);
+  color: var(--ote-live-text-soft);
+  font-weight: 700;
+}
+
+.ote-listening-live-primary {
+  padding: 0.8rem 1rem;
+  border-color: var(--ote-live-primary);
+  background: var(--ote-live-primary);
+  color: var(--ote-live-primary-text);
+}
+
+.ote-listening-live-primary:hover:not(:disabled) {
+  border-color: var(--ote-live-primary-hover);
+  background: var(--ote-live-primary-hover);
+}
+
+.ote-listening-live-primary:disabled,
+.ote-listening-live-controls button:disabled,
+.ote-listening-teacher-mode button:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.ote-listening-live-stage {
+  padding: clamp(1rem, 2vw, 1.5rem);
+}
+
+.ote-listening-live-status {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--ote-live-border-strong) 35%, var(--ote-live-border));
+  background: var(--ote-live-surface-tint);
+  color: var(--ote-live-text);
+  font-weight: 750;
+}
+
+.ote-listening-live-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.ote-listening-live-controls button {
+  padding: 0.7rem 0.85rem;
+}
+
+.ote-listening-live-controls .is-stop {
+  border-color: color-mix(in srgb, var(--ote-live-danger) 70%, var(--ote-live-border));
+  color: var(--ote-live-danger);
+}
+
+.ote-listening-live-response-bar {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  color: var(--ote-live-text-soft);
+  font-size: 0.9rem;
+  font-weight: 750;
+}
+
+.ote-listening-live-response-bar span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ote-listening-live-question {
+  margin-bottom: 1.15rem;
+}
+
+.ote-listening-live-question > header p {
+  margin: 0 0 0.3rem;
+  color: var(--ote-live-text-soft);
+  font-weight: 650;
+}
+
+.ote-listening-live-question > header h2 {
+  margin: 0 0 1rem;
+  color: var(--ote-live-text);
+}
+
+.ote-listening-live-options {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.ote-listening-live-options.is-pictures {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.ote-listening-live-options button {
+  overflow: hidden;
+  border: 2px solid var(--ote-live-border);
+  border-radius: 0.85rem;
+  background: var(--ote-live-surface);
+  color: var(--ote-live-text);
+  cursor: pointer;
+}
+
+.ote-listening-live-options button.is-selected {
+  border-color: var(--ote-live-border-strong);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--ote-live-border-strong) 22%, transparent);
+  background: var(--ote-live-surface-tint);
+}
+
+.ote-listening-live-options.is-pictures button {
+  aspect-ratio: 1.2;
+  padding: 0;
+}
+
+.ote-listening-live-options img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ote-listening-live-options.is-text button {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.7rem;
+  padding: 0.9rem 1rem;
+  text-align: left;
+}
+
+.ote-listening-live-options.is-text strong {
+  color: var(--ote-live-accent);
+}
+
+.ote-listening-live-saved {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 1rem;
+  color: var(--ote-live-success);
+  font-size: 0.88rem;
+  font-weight: 700;
+}
+
+.ote-listening-live-wait {
+  width: min(720px, 100%);
+  margin: 4rem auto;
+  padding: 2.2rem;
+  text-align: center;
+}
+
+.ote-listening-live-wait h2 {
+  margin: 0.65rem 0 0.3rem;
+}
+
+.ote-listening-live-wait p {
+  margin: 0;
+  color: var(--ote-live-text-soft);
+}
+
+.ote-listening-live-wait.is-compact {
+  margin: 1rem auto 0;
+  padding: 0.9rem;
+}
+
+.ote-listening-live-complete {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ote-listening-live-complete p,
+.ote-listening-live-complete h2 {
+  margin: 0;
+}
+
+.ote-listening-live-report {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.ote-listening-live-report > div {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.65rem;
+  background: var(--ote-live-surface-soft);
+  color: var(--ote-live-text);
+}
+
+.ote-listening-teacher-mode {
+  --ote-live-surface: var(--color-surface);
+  --ote-live-surface-soft: var(--color-surface-2);
+  --ote-live-surface-tint: color-mix(in srgb, var(--ote-dashboard-accent) 9%, var(--color-surface));
+  --ote-live-text: var(--color-text);
+  --ote-live-text-soft: var(--color-text-soft);
+  --ote-live-border: var(--color-border);
+  --ote-live-border-strong: var(--ote-dashboard-accent);
+  --ote-live-accent: var(--ote-dashboard-accent);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1.2rem;
+  padding: 1rem;
+  border: 1px solid color-mix(in srgb, var(--ote-dashboard-accent) 44%, var(--ote-live-border));
+  border-radius: 0.9rem;
+  background: var(--ote-live-surface-tint);
+  color: var(--ote-live-text);
+  box-shadow: var(--ote-dashboard-shadow);
+}
+
+.ote-listening-teacher-mode > div {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.ote-listening-teacher-mode span {
+  display: grid;
+}
+
+.ote-listening-teacher-mode small {
+  color: var(--ote-live-text-soft);
+}
+
+.ote-listening-teacher-mode button {
+  padding: 0.65rem 0.8rem;
+  border-color: color-mix(in srgb, var(--ote-dashboard-accent) 55%, var(--ote-live-border));
+  background: var(--ote-live-surface);
+  color: var(--ote-live-text);
+}
+
+.ote-listening-live-student-response {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid color-mix(in srgb, #c35a63 52%, var(--color-border));
+  border-radius: 8px;
+  background: color-mix(in srgb, #c35a63 9%, var(--color-surface));
+}
+
+.ote-listening-live-student-response.is-correct {
+  border-color: color-mix(in srgb, #2d9b63 58%, var(--color-border));
+  background: color-mix(in srgb, #2d9b63 10%, var(--color-surface));
+}
+
+.ote-listening-live-student-response span {
+  color: var(--color-text-soft);
+  font-size: 0.7rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ote-listening-live-student-response strong {
+  color: var(--color-text);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 760px) {
+  .ote-listening-live-lobby,
+  .ote-listening-live-options.is-pictures {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-listening-live-options.is-pictures button {
+    aspect-ratio: 1.35;
+  }
+
+  .ote-listening-live-header,
+  .ote-listening-live-response-bar,
+  .ote-listening-teacher-mode {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .ote-listening-teacher-mode > div:last-child {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

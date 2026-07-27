@@ -28,6 +28,7 @@ import {
   runTransaction,
 } from "firebase/database";
 import { OPTION_JURY_GAME_TYPE } from "../products/ote/data/oteAdvancedReadingPart4OptionJury.js";
+import { OTE_LISTENING_LIVE_GAME_TYPE } from "../products/ote/data/oteListeningLive.js";
 
 const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
 const SPANGLISH_GUEST_TOKEN_STORAGE_KEY = "spanglish_fixit_guest_token";
@@ -131,7 +132,7 @@ export async function joinLiveGameByPin(pin) {
     user.displayName || user.email || "Player";
 
   const existingPlayer = (await get(playerRef)).val();
-  if (game.type === OPTION_JURY_GAME_TYPE) {
+  if (game.type === OPTION_JURY_GAME_TYPE || game.type === OTE_LISTENING_LIVE_GAME_TYPE) {
     if (!existingPlayer) await set(playerRef, {
       name: displayName,
       joinedAt: Date.now(),
@@ -169,6 +170,43 @@ export async function createOptionJuryLiveGame({ taskId, title }) {
     state: { phase: "lobby", questionIndex: 0 },
   });
   return { gameId, pin };
+}
+
+export async function createOteListeningLiveGame({ activityId, title }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a listening session.");
+  if (!activityId) throw new Error("createOteListeningLiveGame: activityId is required.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: title || "OTE Listening",
+    type: OTE_LISTENING_LIVE_GAME_TYPE,
+    activityId,
+    status: "lobby",
+    createdAt: Date.now(),
+    state: {
+      phase: "lobby",
+      questionIndex: 0,
+      reviewIndex: 0,
+      playCount: 0,
+    },
+  });
+  return { gameId, pin };
+}
+
+export async function submitOteListeningLiveAnswer({ gameId, itemId, value }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to answer.");
+  if (!gameId || !itemId) throw new Error("Missing listening answer details.");
+
+  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/listeningAnswers/${itemId}`), {
+    value,
+    submittedAt: Date.now(),
+  });
 }
 
 export async function assignOptionJuryPlayer({ gameId, playerId, optionAssignment }) {
@@ -267,6 +305,15 @@ export async function setLiveGameState(gameId, partialState) {
     }
     if (typeof partialState.roundIndex === "number") {
       updates.roundIndex = partialState.roundIndex;
+    }
+    if (typeof partialState.reviewIndex === "number") {
+      updates.reviewIndex = partialState.reviewIndex;
+    }
+    if (typeof partialState.playCount === "number") {
+      updates.playCount = partialState.playCount;
+    }
+    if (typeof partialState.audioStage === "string") {
+      updates.audioStage = partialState.audioStage;
     }
     if (typeof partialState.clickDuration === "number") {
       updates.clickDuration = partialState.clickDuration;

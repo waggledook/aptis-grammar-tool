@@ -242,6 +242,8 @@ import OteAdvancedReadingInsideParagraph from "./products/ote/OteAdvancedReading
 import OteAdvancedReadingOptionJuryLaunch from "./products/ote/OteAdvancedReadingOptionJuryLaunch.jsx";
 import OteOptionJuryHost from "./products/ote/OteOptionJuryHost.jsx";
 import OteOptionJuryPlayer from "./products/ote/OteOptionJuryPlayer.jsx";
+import OteListeningLiveHost from "./products/ote/OteListeningLiveHost.jsx";
+import OteListeningLivePlayer from "./products/ote/OteListeningLivePlayer.jsx";
 import OteAdvancedReadingCohesionDetective from "./products/ote/OteAdvancedReadingCohesionDetective.jsx";
 import OteAdvancedReadingDistractorLaboratory from "./products/ote/OteAdvancedReadingDistractorLaboratory.jsx";
 import OteGeneralReadingCohesionDetective from "./products/ote/OteGeneralReadingCohesionDetective.jsx";
@@ -2701,6 +2703,8 @@ return (
 <Route path="/live/play/:gameId" element={<LiveGamePlayer />} />
 <Route path="/live/option-jury/host/:gameId" element={<OteOptionJuryHost user={user} />} />
 <Route path="/live/option-jury/play/:gameId" element={<OteOptionJuryPlayer />} />
+<Route path="/live/ote-listening/host/:gameId" element={<RequireTeacher user={user}><OteListeningLiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/ote-listening/play/:gameId" element={<OteListeningLivePlayer />} />
 
 <Route
   path="/grammar-sets/:setId"

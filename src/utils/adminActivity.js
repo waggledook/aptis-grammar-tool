@@ -547,17 +547,23 @@ export function formatActivityDetails(log) {
       const sectionLabel = d.section ? titleCaseFromSnakeCase(d.section) : "Training";
       const partLabel = d.part ? formatOtePart(d.part) : "";
       const taskLabel = d.taskTitle || d.setTitle || d.taskId || d.setId || "";
+      const modeLabel =
+        d.mode === "teacher_led_live"
+          ? "Teacher-led live"
+          : d.mode || "";
       const size =
         typeof d.wordCount === "number"
           ? `${d.wordCount} words`
           : typeof d.recordingCount === "number"
           ? formatCount(d.recordingCount, "recording")
+          : typeof d.answeredCount === "number"
+          ? `${d.answeredCount} answered`
           : "";
       const score =
         typeof d.score === "number" && typeof d.total === "number"
           ? `${d.score}/${d.total}`
           : "";
-      return joinParts(["OTE", sectionLabel, partLabel, d.mode || "", taskLabel, size, score]);
+      return joinParts(["OTE", sectionLabel, partLabel, modeLabel, taskLabel, size, score]);
     }
     case "ote_mock_started":
     case "ote_mock_completed": {

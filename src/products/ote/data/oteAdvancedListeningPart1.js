@@ -64,6 +64,7 @@ export const advancedListeningPart1Sets = [
         kind: "text",
         answer: 1,
         instructionAudioSrc: `${audioRoot}/question-2.mp3`,
+        optionsAudioSrc: `${audioRoot}/options-2.mp3`,
         audioSrc: `${audioRoot}/item-2.mp3`,
         options: [
           { text: "to stop visitors becoming disorientated" },
@@ -109,6 +110,7 @@ export const advancedListeningPart1Sets = [
         kind: "text",
         answer: 0,
         instructionAudioSrc: `${audioRoot}/question-3.mp3`,
+        optionsAudioSrc: `${audioRoot}/options-3.mp3`,
         audioSrc: `${audioRoot}/item-3.mp3`,
         options: [
           { text: "whether the study starts from a neutral position" },
@@ -219,6 +221,7 @@ export const advancedListeningPart1Sets = [
         kind: "text",
         answer: 1,
         instructionAudioSrc: `${audioRoot}/question-5.mp3`,
+        optionsAudioSrc: `${audioRoot}/options-5.mp3`,
         audioSrc: `${audioRoot}/item-5.mp3`,
         options: [
           { text: "the reliability of the measurements collected" },
@@ -273,6 +276,7 @@ export const advancedListeningPart1Sets = [
         kind: "text",
         answer: 0,
         instructionAudioSrc: `${setTwoAudioRoot}/question-1.mp3`,
+        optionsAudioSrc: `${setTwoAudioRoot}/options-1.mp3`,
         audioSrc: `${setTwoAudioRoot}/item-1.mp3`,
         options: [
           { text: "Its examples obscure the central argument." },
@@ -370,6 +374,7 @@ export const advancedListeningPart1Sets = [
         kind: "text",
         answer: 1,
         instructionAudioSrc: `${setTwoAudioRoot}/question-3.mp3`,
+        optionsAudioSrc: `${setTwoAudioRoot}/options-3.mp3`,
         audioSrc: `${setTwoAudioRoot}/item-3.mp3`,
         options: [
           { text: "to explain why productivity gains may be exaggerated" },
@@ -415,6 +420,7 @@ export const advancedListeningPart1Sets = [
         kind: "text",
         answer: 1,
         instructionAudioSrc: `${setTwoAudioRoot}/question-4.mp3`,
+        optionsAudioSrc: `${setTwoAudioRoot}/options-4.mp3`,
         audioSrc: `${setTwoAudioRoot}/item-4.mp3`,
         options: [
           { text: "how accurately people remember dates" },

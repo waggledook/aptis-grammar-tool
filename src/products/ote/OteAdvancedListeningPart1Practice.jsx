@@ -363,8 +363,14 @@ export default function OteAdvancedListeningPart1Practice({
       });
     };
 
-    if (item.instructionAudioSrc) playPrompt(item.instructionAudioSrc, token, playFirstExtract);
-    else playFirstExtract();
+    const playOptions = () => {
+      if (token !== ttsTokenRef.current) return;
+      if (item.optionsAudioSrc) playPrompt(item.optionsAudioSrc, token, playFirstExtract);
+      else playFirstExtract();
+    };
+
+    if (item.instructionAudioSrc) playPrompt(item.instructionAudioSrc, token, playOptions);
+    else playOptions();
   }
 
   function startPractice() {
@@ -580,8 +586,8 @@ export default function OteAdvancedListeningPart1Practice({
               <p className="ote-kicker">
                 {question.kind === "pictures" ? "Choose the correct picture" : "Choose the correct answer"}
               </p>
-              <h2>{question.prompt}</h2>
               <p>{question.context}</p>
+              <h2>{question.prompt}</h2>
             </div>
             <div className={`ote-recorder-timer ${questionStage === "answering" ? "is-answering" : isPlaying ? "is-listening" : "is-ready"}`} aria-live="polite">
               <Headphones size={22} aria-hidden="true" />

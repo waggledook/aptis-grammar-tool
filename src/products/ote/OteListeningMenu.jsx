@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   ArrowLeft,
   BookOpen,
@@ -9,6 +9,7 @@ import {
   ListChecks,
   MessageSquareText,
   NotebookTabs,
+  Radio,
   Users,
 } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
@@ -19,6 +20,9 @@ import { advancedListeningPart2Sets } from "./data/oteAdvancedListeningPart2.js"
 import { generalListeningPart1Sets } from "./data/oteGeneralListeningPart1.js";
 import { generalListeningPart2Sets } from "./data/oteGeneralListeningPart2.js";
 import { useOteTrainingProgress } from "./utils/trainingProgress.js";
+import { createOteListeningLiveGame } from "../../api/liveGames.js";
+import { getOteListeningLiveActivityId } from "./data/oteListeningLive.js";
+import { toast } from "../../utils/toast.js";
 import "./styles/ote.css";
 
 const LISTENING_VARIANTS = {
@@ -164,6 +168,8 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
   const basePath = getListeningBasePath(nativeRoutes);
   const requestedPartIsValid = config.parts.some((item) => item.id === partId);
   const completedProgress = useOteTrainingProgress();
+  const [creatingLiveSetId, setCreatingLiveSetId] = useState("");
+  const canHostLive = user?.role === "teacher" || user?.role === "admin";
 
   if (variant !== activeVariant || !requestedPartIsValid) {
     const fallbackPartId = requestedPartIsValid ? partId : config.parts[0].id;
@@ -179,6 +185,23 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
     ...guide,
     path: getSitePath(`${basePath}/${variant}/${partId}/${guide.route}`),
   }));
+
+  async function launchLiveSet(set) {
+    const partNumber = partId === "part-2-note-completion" ? 2 : 1;
+    setCreatingLiveSetId(set.id);
+    try {
+      const { gameId } = await createOteListeningLiveGame({
+        activityId: getOteListeningLiveActivityId(variant, partNumber, set.id),
+        title: set.title,
+      });
+      navigate(getSitePath(`/live/ote-listening/host/${gameId}`));
+    } catch (error) {
+      console.error("[OteListeningPartShell] live session creation failed", error);
+      toast(error.message || "Could not create the listening room.");
+    } finally {
+      setCreatingLiveSetId("");
+    }
+  }
 
   return (
     <main className="ote-training-page ote-listening-part-page">
@@ -276,6 +299,34 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
             </article>
           )}
         </div>
+        {canHostLive && hasListeningSets ? (
+          <aside className="ote-listening-teacher-mode">
+            <div>
+              <Radio size={25} aria-hidden="true" />
+              <span>
+                <strong>Teacher mode</strong>
+                <small>Host the audio and control the task, repeat and detailed feedback for a live class.</small>
+              </span>
+            </div>
+            <div>
+              {listeningSets
+                .filter((set) => set.assetsReady !== false && set.audioReady !== false && set.instructionAudioReady !== false)
+                .map((set) => (
+                  <button
+                    disabled={!!creatingLiveSetId}
+                    key={set.id}
+                    onClick={() => launchLiveSet(set)}
+                    type="button"
+                  >
+                    <Radio size={16} />
+                    {creatingLiveSetId === set.id
+                      ? "Creating room…"
+                      : `Run ${set.level ? `${set.level} · ${set.title}` : set.title} live`}
+                  </button>
+                ))}
+            </div>
+          </aside>
+        ) : null}
       </section>
     </main>
   );

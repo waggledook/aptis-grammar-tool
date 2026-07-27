@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { joinLiveGameByPin } from "../../api/liveGames";
 import { toast } from "../../utils/toast";
 import { OPTION_JURY_GAME_TYPE } from "../../products/ote/data/oteAdvancedReadingPart4OptionJury.js";
+import { OTE_LISTENING_LIVE_GAME_TYPE } from "../../products/ote/data/oteListeningLive.js";
 import { getSitePath } from "../../siteConfig.js";
 
 export default function LiveGameJoin() {
@@ -31,7 +32,13 @@ export default function LiveGameJoin() {
         try {
           const { gameId, type } = await joinLiveGameByPin(trimmed);
           toast("Joined game successfully!");
-          navigate(getSitePath(type === OPTION_JURY_GAME_TYPE ? `/live/option-jury/play/${gameId}` : `/live/play/${gameId}`));
+          const destination =
+            type === OPTION_JURY_GAME_TYPE
+              ? `/live/option-jury/play/${gameId}`
+              : type === OTE_LISTENING_LIVE_GAME_TYPE
+                ? `/live/ote-listening/play/${gameId}`
+                : `/live/play/${gameId}`;
+          navigate(getSitePath(destination));
         } catch (err) {
           console.error("[LiveGameJoin] join failed", err);
           toast(err.message || "Could not join game.");
