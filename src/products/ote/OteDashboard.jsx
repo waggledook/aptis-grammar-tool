@@ -104,12 +104,10 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
             <p>Open the four Advanced reading sections: short texts, matching, gapped text, and long text.</p>
           </button>
 
-          {isTeacherOrAdmin ? (
-            <button className="menu-card" type="button" onClick={() => navigate(listeningPath)}>
-              <h3>Advanced Listening</h3>
-              <p>Open all four Advanced Listening parts: mixed options, note completion, opinion matching, and multiple choice.</p>
-            </button>
-          ) : null}
+          <button className="menu-card" type="button" onClick={() => navigate(listeningPath)}>
+            <h3>Advanced Listening</h3>
+            <p>Open all four Advanced Listening parts: mixed options, note completion, opinion matching, and multiple choice.</p>
+          </button>
 
           <button className="menu-card" type="button" disabled>
             <h3>Advanced Language Lab</h3>
@@ -140,12 +138,10 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
             <p>Open the reading part menu for short texts, matching, gapped text, and long text.</p>
           </button>
 
-          {isTeacherOrAdmin ? (
-            <button className="menu-card" type="button" onClick={() => navigate(listeningPath)}>
-              <h3>Listening</h3>
-              <p>Open all four General Listening parts: picture options, note completion, opinion matching, and multiple choice.</p>
-            </button>
-          ) : null}
+          <button className="menu-card" type="button" onClick={() => navigate(listeningPath)}>
+            <h3>Listening</h3>
+            <p>Open all four General Listening parts: picture options, note completion, opinion matching, and multiple choice.</p>
+          </button>
 
           <button className="menu-card" type="button" onClick={() => navigate(profilePath)}>
             <h3>My Profile</h3>

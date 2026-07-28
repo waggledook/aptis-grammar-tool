@@ -22,7 +22,7 @@ export const generalListeningPart1Sets = [
     title: "A2 Picture Set 1",
     description: "Five short picture-option questions about everyday decisions and arrangements.",
     assetsReady: true,
-    audioReady: false,
+    audioReady: true,
     instructionAudioReady: true,
     questions: [
       {
@@ -208,13 +208,13 @@ export const generalListeningPart1Sets = [
           },
           {
             option: 2,
-            quote: "Let’s meet at the bus stop at quarter to nine.",
+            quote: "Let’s meet at the bus stop at quarter to.",
             note: "The bus stop is the agreed meeting place.",
           },
         ],
         script: [
           { speaker: "Woman", text: "Shall we meet outside the café at half past eight?" },
-          { speaker: "Man", text: "It doesn’t open until nine. Let’s meet at the bus stop at quarter to nine." },
+          { speaker: "Man", text: "It doesn’t open until nine. Let’s meet at the bus stop at quarter to." },
           { speaker: "Woman", text: "Fine. We can walk to the station together from there and catch the nine o’clock train." },
         ],
         profile: {
@@ -450,7 +450,7 @@ export const generalListeningPart1Sets = [
     title: "B2 Picture Set 1",
     description: "Five picture-option questions testing revised plans, shared reactions, and combined details.",
     assetsReady: true,
-    audioReady: false,
+    audioReady: true,
     instructionAudioReady: true,
     questions: [
       {
