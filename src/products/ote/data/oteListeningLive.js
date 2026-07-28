@@ -1,5 +1,6 @@
 import { advancedListeningPart1Sets } from "./oteAdvancedListeningPart1.js";
 import { advancedListeningPart2Sets } from "./oteAdvancedListeningPart2.js";
+import { advancedListeningPart3Sets } from "./oteAdvancedListeningPart3.js";
 import { generalListeningPart1Sets } from "./oteGeneralListeningPart1.js";
 import { generalListeningPart2Sets } from "./oteGeneralListeningPart2.js";
 
@@ -16,6 +17,8 @@ function buildActivity(variant, part, set) {
     format:
       part === 1
         ? "part1"
+        : part === 3
+          ? "part3"
         : variant === "general"
           ? "general-part2"
           : "advanced-part2",
@@ -28,6 +31,7 @@ const activities = [
   ...advancedListeningPart1Sets.map((set) => buildActivity("advanced", 1, set)),
   ...generalListeningPart2Sets.map((set) => buildActivity("general", 2, set)),
   ...advancedListeningPart2Sets.map((set) => buildActivity("advanced", 2, set)),
+  ...advancedListeningPart3Sets.map((set) => buildActivity("advanced", 3, set)),
 ];
 
 export const oteListeningLiveActivities = Object.fromEntries(
@@ -46,5 +50,6 @@ export function getOteListeningItems(activity) {
   if (!activity) return [];
   if (activity.format === "part1") return activity.set.questions || [];
   if (activity.format === "general-part2") return activity.set.items || [];
+  if (activity.format === "part3") return activity.set.opinions || [];
   return activity.set.gaps || [];
 }

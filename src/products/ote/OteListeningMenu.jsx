@@ -17,6 +17,7 @@ import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { advancedListeningPart1Sets } from "./data/oteAdvancedListeningPart1.js";
 import { advancedListeningPart2Sets } from "./data/oteAdvancedListeningPart2.js";
+import { advancedListeningPart3Sets } from "./data/oteAdvancedListeningPart3.js";
 import { generalListeningPart1Sets } from "./data/oteGeneralListeningPart1.js";
 import { generalListeningPart2Sets } from "./data/oteGeneralListeningPart2.js";
 import { useOteTrainingProgress } from "./utils/trainingProgress.js";
@@ -119,6 +120,7 @@ const LISTENING_VARIANTS = {
         title: "Opinion matching",
         copy: "A longer dialogue with five or six questions matching stated and implied opinions to speakers.",
         icon: Users,
+        availableSets: 2,
       },
       {
         id: "part-4-text-options",
@@ -152,11 +154,19 @@ function getListeningSets(variant, partId) {
   if (variant === "advanced" && partId === "part-2-note-completion") {
     return advancedListeningPart2Sets;
   }
+  if (variant === "advanced" && partId === "part-3-opinion-matching") {
+    return advancedListeningPart3Sets;
+  }
   return [];
 }
 
 function getListeningTaskId(variant, partId, setId) {
-  const partNumber = partId === "part-2-note-completion" ? 2 : 1;
+  const partNumber =
+    partId === "part-3-opinion-matching"
+      ? 3
+      : partId === "part-2-note-completion"
+        ? 2
+        : 1;
   return `listening.part${partNumber}.practice.${variant}-listening-part-${partNumber}-${setId}`;
 }
 
@@ -187,7 +197,12 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
   }));
 
   async function launchLiveSet(set) {
-    const partNumber = partId === "part-2-note-completion" ? 2 : 1;
+    const partNumber =
+      partId === "part-3-opinion-matching"
+        ? 3
+        : partId === "part-2-note-completion"
+          ? 2
+          : 1;
     setCreatingLiveSetId(set.id);
     try {
       const { gameId } = await createOteListeningLiveGame({
@@ -261,7 +276,8 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
                 getListeningTaskId(variant, partId, set.id)
               );
               const isReady = set.assetsReady !== false;
-              const finalAudioReady = set.audioReady !== false && set.instructionAudioReady !== false;
+              const mainAudioReady = set.audioReady !== false;
+              const instructionAudioReady = set.instructionAudioReady !== false;
               const levelLabel = set.level || (variant === "advanced" ? "B2-C1" : "A2-B2");
               return (
                 <button
@@ -276,7 +292,7 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
                   <span>
                     {!isReady
                       ? `${levelLabel} · Assets in production`
-                      : finalAudioReady
+                      : mainAudioReady
                         ? `${levelLabel} · Timed practice`
                         : `${levelLabel} · Content preview`}
                   </span>
@@ -284,8 +300,10 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
                   <p>{set.description}</p>
                   {!isReady ? (
                     <strong className="ote-reading-menu-progress">Content integrated · Images and audio pending</strong>
-                  ) : !finalAudioReady ? (
+                  ) : !mainAudioReady ? (
                     <strong className="ote-reading-menu-progress">Browser-voice preview · Final audio pending</strong>
+                  ) : !instructionAudioReady ? (
+                    <strong className="ote-reading-menu-progress">Recorded discussion · Browser-voiced instructions</strong>
                   ) : null}
                 </button>
               );
@@ -310,7 +328,7 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
             </div>
             <div>
               {listeningSets
-                .filter((set) => set.assetsReady !== false && set.audioReady !== false && set.instructionAudioReady !== false)
+                .filter((set) => set.assetsReady !== false && set.audioReady !== false)
                 .map((set) => (
                   <button
                     disabled={!!creatingLiveSetId}

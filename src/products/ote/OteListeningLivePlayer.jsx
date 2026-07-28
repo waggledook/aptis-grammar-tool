@@ -115,6 +115,9 @@ export default function OteListeningLivePlayer() {
       if (activity.format === "advanced-part2") {
         return normaliseListeningAnswer(answers[item.id]) === normaliseListeningAnswer(item.answer);
       }
+      if (activity.format === "part3") {
+        return answers[item.id] === item.answer;
+      }
       return Number(answers[item.id]) === item.answer;
     }).length;
     const answeredCount = items.filter((item) => {
@@ -229,6 +232,9 @@ function StudentResult({ activity, answers, items }) {
   const score = items.filter((item) => {
     if (activity.format === "advanced-part2") {
       return normaliseListeningAnswer(answers[item.id]) === normaliseListeningAnswer(item.answer);
+    }
+    if (activity.format === "part3") {
+      return answers[item.id] === item.answer;
     }
     return Number(answers[item.id]) === item.answer;
   }).length;

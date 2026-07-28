@@ -1,6 +1,7 @@
 import React from "react";
 import { BookOpenCheck, CheckCircle2, Headphones, Radio } from "lucide-react";
 import { normaliseListeningAnswer, optionLetter } from "./utils/listeningLive.js";
+import { OpinionMatchingTask } from "./OteAdvancedListeningPart3Practice.jsx";
 
 function evidenceFor(activity, item) {
   if (activity.format === "part1") {
@@ -8,6 +9,9 @@ function evidenceFor(activity, item) {
       ...entry,
       type: entry.option === item.answer ? "correct" : "distractor",
     }));
+  }
+  if (activity.format === "part3") {
+    return item.review.evidence.map((entry) => ({ ...entry }));
   }
   return [
     { quote: item.review?.correctQuote || "", type: "correct" },
@@ -219,6 +223,16 @@ export function ListeningTask({
   if (activity.format === "general-part2") {
     return <GeneralPartTwoTask set={activity.set} answers={answers} onChange={onChange} disabled={disabled} />;
   }
+  if (activity.format === "part3") {
+    return (
+      <OpinionMatchingTask
+        answers={answers}
+        disabled={disabled}
+        onChange={onChange}
+        set={activity.set}
+      />
+    );
+  }
   return <AdvancedPartTwoTask set={activity.set} answers={answers} onChange={onChange} disabled={disabled} />;
 }
 
@@ -275,6 +289,17 @@ function ListeningReviewContext({ activity, item, selectedValue, showSelection }
     );
   }
 
+  if (activity.format === "part3") {
+    const answerLabel = activity.set.speakers.find((speaker) => speaker.id === item.answer)?.label;
+    return (
+      <div className="ote-listening-live-review-context">
+        <p className="ote-listening-live-review-section">Opinion</p>
+        <p className="ote-listening-live-review-sentence">{item.text}</p>
+        <p><strong>Expressed by: {answerLabel}</strong></p>
+      </div>
+    );
+  }
+
   const answer = activity.format === "general-part2"
     ? item.options[item.answer]
     : item.answer;
@@ -289,12 +314,15 @@ function ListeningReviewContext({ activity, item, selectedValue, showSelection }
 export function ListeningFeedback({ activity, item, selectedValue, showAudio = false }) {
   const evidence = evidenceFor(activity, item);
   const isPartOne = activity.format === "part1";
+  const isPartThree = activity.format === "part3";
   const hasResponse =
     selectedValue !== undefined &&
     selectedValue !== null &&
     String(selectedValue).trim() !== "";
   const correctText = isPartOne
     ? `${optionLetter(item.answer)}. ${item.options[item.answer].text}`
+    : isPartThree
+      ? activity.set.speakers.find((speaker) => speaker.id === item.answer)?.label
     : activity.format === "general-part2"
       ? `${optionLetter(item.answer)}. ${item.options[item.answer]}`
       : item.answer;
@@ -302,12 +330,16 @@ export function ListeningFeedback({ activity, item, selectedValue, showAudio = f
     ? "No answer submitted"
     : isPartOne
       ? `${optionLetter(selectedValue)}. ${item.options[selectedValue].text}`
+      : isPartThree
+        ? activity.set.speakers.find((speaker) => speaker.id === selectedValue)?.label || String(selectedValue)
       : activity.format === "general-part2"
         ? `${optionLetter(selectedValue)}. ${item.options[selectedValue]}`
         : String(selectedValue).trim();
   const correct =
     isPartOne || activity.format === "general-part2"
       ? selectedValue === item.answer
+      : isPartThree
+        ? selectedValue === item.answer
       : normaliseListeningAnswer(selectedValue) === normaliseListeningAnswer(item.answer);
 
   return (
@@ -369,6 +401,14 @@ export function ListeningFeedback({ activity, item, selectedValue, showAudio = f
                 <p>{entry.note}</p>
               </article>
             ))
+          : isPartThree
+            ? evidence.map((entry, index) => (
+                <article className={entry.type === "correct" ? "is-correct" : "is-distractor"} key={`${entry.quote}-${index}`}>
+                  <span>{entry.type === "correct" ? `${entry.speaker} · Opinion evidence` : `${entry.speaker} · Contrast`}</span>
+                  <strong>{entry.quote}</strong>
+                  <p>{entry.note}</p>
+                </article>
+              ))
           : (item.review?.distractors || []).map((entry) => (
               <article className="is-distractor" key={entry.quote}>
                 <span>Distractor</span>

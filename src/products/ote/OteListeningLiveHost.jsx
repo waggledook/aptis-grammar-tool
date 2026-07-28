@@ -285,9 +285,11 @@ export default function OteListeningLiveHost({ user }) {
           </ListeningLiveStatus>
 
           <div className="ote-listening-live-controls">
-            <button type="button" disabled={!!playing} onClick={() => playSequence("question", questionAudioSources())}>
-              <Headphones size={18} /> Play question
-            </button>
+            {activity.format === "part1" || activity.set.instructionAudioReady !== false ? (
+              <button type="button" disabled={!!playing} onClick={() => playSequence("question", questionAudioSources())}>
+                <Headphones size={18} /> Play question
+              </button>
+            ) : null}
             <button type="button" disabled={!!playing} onClick={() => playSequence("first", [activity.format === "part1" ? currentItem.audioSrc : activity.set.audioSrc], Math.max(1, playCount))}>
               <Play size={18} /> Play first listen
             </button>
@@ -341,6 +343,9 @@ function ListeningLiveReport({ activity, items, players }) {
   function isCorrect(item, value) {
     if (activity.format === "advanced-part2") {
       return normaliseListeningAnswer(value) === normaliseListeningAnswer(item.answer);
+    }
+    if (activity.format === "part3") {
+      return value === item.answer;
     }
     return Number(value) === item.answer;
   }
