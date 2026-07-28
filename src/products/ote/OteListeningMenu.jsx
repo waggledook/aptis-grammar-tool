@@ -357,6 +357,10 @@ export default function OteListeningMenu({ user, nativeRoutes = false }) {
   const activeVariant = getUserListeningVariant(user);
   const config = LISTENING_VARIANTS[activeVariant];
   const completedProgress = useOteTrainingProgress();
+  const canSeePart3 = user?.role === "teacher" || user?.role === "admin";
+  const visibleParts = config.parts.filter(
+    (part) => part.id !== "part-3-opinion-matching" || canSeePart3
+  );
 
   return (
     <main className="menu-wrapper hub-menu-wrapper ote-menu-wrapper ote-listening-menu">
@@ -378,7 +382,7 @@ export default function OteListeningMenu({ user, nativeRoutes = false }) {
         <h2>{config.label} Listening Parts</h2>
         <p className="ote-section-lead">Open the section for each part of the module.</p>
         <div className="menu-grid" aria-label={`${config.label} listening parts`}>
-          {config.parts.map((part) => {
+          {visibleParts.map((part) => {
             const Icon = part.icon || ListChecks;
             const partPath = getSitePath(`${basePath}/${activeVariant}/${part.id}`);
             const partSets = getListeningSets(activeVariant, part.id);
