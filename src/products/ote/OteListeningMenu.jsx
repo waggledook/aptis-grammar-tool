@@ -20,6 +20,7 @@ import { advancedListeningPart2Sets } from "./data/oteAdvancedListeningPart2.js"
 import { advancedListeningPart3Sets } from "./data/oteAdvancedListeningPart3.js";
 import { generalListeningPart1Sets } from "./data/oteGeneralListeningPart1.js";
 import { generalListeningPart2Sets } from "./data/oteGeneralListeningPart2.js";
+import { generalListeningPart3Sets } from "./data/oteGeneralListeningPart3.js";
 import { useOteTrainingProgress } from "./utils/trainingProgress.js";
 import { createOteListeningLiveGame } from "../../api/liveGames.js";
 import { getOteListeningLiveActivityId } from "./data/oteListeningLive.js";
@@ -64,6 +65,7 @@ const LISTENING_VARIANTS = {
         title: "Opinion matching",
         copy: "A longer dialogue with five questions matching opinions to the people who express them.",
         icon: Users,
+        availableSets: 3,
       },
       {
         id: "part-4-text-options",
@@ -77,20 +79,22 @@ const LISTENING_VARIANTS = {
   advanced: {
     label: "Advanced",
     title: "OTE Advanced Listening",
-    subtitle: "B2-C1 practice for all four parts of the Oxford Test of English Advanced Listening module.",
+    subtitle: "B2-C1 practice for the three task formats used across the four parts of the Oxford Test of English Advanced Listening module.",
     seoDescription: "Oxford Test of English Advanced listening sections and part menus.",
+    sectionTitle: "Advanced Listening task formats",
+    sectionLead: "Parts 1 and 4 use the same short-extract format, so they share one training area.",
     parts: [
       {
         id: "part-1-short-extracts",
-        label: "Part 1",
-        title: "Picture or text options",
-        copy: "Five short monologues or dialogues with picture or text multiple-choice questions.",
+        label: "Parts 1 & 4",
+        title: "Short extracts",
+        copy: "Five short monologues or dialogues with three-option questions: Part 1 may use pictures or text, while Part 4 uses text only.",
         icon: Image,
-        availableSets: 2,
+        availableSets: 3,
         guides: [
           {
-            title: "Short Dialogues and Monologues Guide",
-            copy: "Learn the question types, two-listening method, and distractor patterns, then check your understanding.",
+            title: "Parts 1 & 4 Short Extracts Guide",
+            copy: "Compare the two parts, then learn their shared question types, two-listening method, and distractor patterns.",
             progressId: "listening.part1.advanced-guide",
             route: "guide",
             icon: BookOpen,
@@ -122,13 +126,6 @@ const LISTENING_VARIANTS = {
         icon: Users,
         availableSets: 2,
       },
-      {
-        id: "part-4-text-options",
-        label: "Part 4",
-        title: "Multiple-choice extracts",
-        copy: "Five short monologues or dialogues with one three-option text question each.",
-        icon: MessageSquareText,
-      },
     ],
   },
 };
@@ -147,6 +144,9 @@ function getListeningSets(variant, partId) {
   }
   if (variant === "general" && partId === "part-2-note-completion") {
     return generalListeningPart2Sets;
+  }
+  if (variant === "general" && partId === "part-3-opinion-matching") {
+    return generalListeningPart3Sets;
   }
   if (variant === "advanced" && partId === "part-1-short-extracts") {
     return advancedListeningPart1Sets;
@@ -191,6 +191,10 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
   const menuPath = getSitePath(basePath);
   const listeningSets = getListeningSets(variant, partId);
   const hasListeningSets = listeningSets.length > 0;
+  const visiblePracticeSets = canHostLive
+    ? listeningSets
+    : listeningSets.filter((set) => set.hiddenFromStudentMenu !== true);
+  const hasVisiblePracticeSets = visiblePracticeSets.length > 0;
   const guideCards = (part.guides || []).map((guide) => ({
     ...guide,
     path: getSitePath(`${basePath}/${variant}/${partId}/${guide.route}`),
@@ -264,13 +268,13 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
       <section className="ote-training-section">
         <h2>Practice sets</h2>
         <p className="ote-section-lead">
-          {hasListeningSets
+          {hasVisiblePracticeSets
             ? "Open a ready set to practise this part in the native listening interface."
             : "This section is in place and ready for its first listening set."}
         </p>
         <div className="ote-practice-set-grid">
-          {hasListeningSets ? (
-            listeningSets.map((set) => {
+          {hasVisiblePracticeSets ? (
+            visiblePracticeSets.map((set) => {
               const setPath = getSitePath(`${basePath}/${variant}/${partId}/practice/${set.id}`);
               const isComplete = completedProgress.has(
                 getListeningTaskId(variant, partId, set.id)
@@ -357,9 +361,12 @@ export default function OteListeningMenu({ user, nativeRoutes = false }) {
   const activeVariant = getUserListeningVariant(user);
   const config = LISTENING_VARIANTS[activeVariant];
   const completedProgress = useOteTrainingProgress();
-  const canSeePart3 = user?.role === "teacher" || user?.role === "admin";
+  const canSeeGeneralPart3 = user?.role === "teacher" || user?.role === "admin";
   const visibleParts = config.parts.filter(
-    (part) => part.id !== "part-3-opinion-matching" || canSeePart3
+    (part) =>
+      part.id !== "part-3-opinion-matching" ||
+      activeVariant === "advanced" ||
+      canSeeGeneralPart3
   );
 
   return (
@@ -379,8 +386,10 @@ export default function OteListeningMenu({ user, nativeRoutes = false }) {
       <p className="menu-sub">{config.subtitle}</p>
 
       <section className="ote-training-section">
-        <h2>{config.label} Listening Parts</h2>
-        <p className="ote-section-lead">Open the section for each part of the module.</p>
+        <h2>{config.sectionTitle || `${config.label} Listening Parts`}</h2>
+        <p className="ote-section-lead">
+          {config.sectionLead || "Open the section for each part of the module."}
+        </p>
         <div className="menu-grid" aria-label={`${config.label} listening parts`}>
           {visibleParts.map((part) => {
             const Icon = part.icon || ListChecks;

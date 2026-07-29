@@ -9,7 +9,10 @@ import {
   logOteTrainingStarted,
   rtdb,
 } from "../../firebase.js";
-import { submitOteListeningLiveAnswer } from "../../api/liveGames.js";
+import {
+  confirmOteListeningLiveScriptCheck,
+  submitOteListeningLiveAnswer,
+} from "../../api/liveGames.js";
 import { toast } from "../../utils/toast.js";
 import {
   OTE_LISTENING_LIVE_GAME_TYPE,
@@ -19,6 +22,7 @@ import {
 import {
   ListeningFeedback,
   ListeningLiveStatus,
+  ListeningScriptCheck,
   ListeningTask,
 } from "./OteListeningLiveShared.jsx";
 import { normaliseListeningAnswer } from "./utils/listeningLive.js";
@@ -30,7 +34,9 @@ export default function OteListeningLivePlayer() {
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
   const [localAnswers, setLocalAnswers] = useState({});
+  const [confirmingItemId, setConfirmingItemId] = useState("");
   const activityLogPendingRef = useRef(new Set());
+  const answerSaveQueuesRef = useRef(new Map());
 
   useEffect(() => {
     const unsubscribe = onValue(ref(rtdb, `liveGames/${gameId}`), (snapshot) => {
@@ -124,6 +130,21 @@ export default function OteListeningLivePlayer() {
       const value = answers[item.id];
       return value !== undefined && value !== null && String(value).trim() !== "";
     }).length;
+    const initialScore = items.filter((item) => {
+      const record = player.listeningAnswers?.[item.id];
+      const value =
+        record?.initialAnswered === false
+          ? undefined
+          : record?.initialValue ?? record?.value;
+      if (activity.format === "advanced-part2") {
+        return normaliseListeningAnswer(value) === normaliseListeningAnswer(item.answer);
+      }
+      if (activity.format === "part3") return value === item.answer;
+      return Number(value) === item.answer;
+    }).length;
+    const answerChanges = items.filter(
+      (item) => player.listeningAnswers?.[item.id]?.changedAfterScript
+    ).length;
 
     activityLogPendingRef.current.add(completedStorageKey);
     window.localStorage.setItem(completedStorageKey, "1");
@@ -132,6 +153,8 @@ export default function OteListeningLivePlayer() {
       score,
       total: items.length,
       answeredCount,
+      initialScore,
+      answerChanges,
       completionReason: "host_finished",
     })
       .catch((error) => {
@@ -141,13 +164,36 @@ export default function OteListeningLivePlayer() {
       .finally(() => activityLogPendingRef.current.delete(completedStorageKey));
   }, [activity, answers, gameId, items, phase, player, uid]);
 
-  async function saveAnswer(itemId, value) {
+  async function saveAnswer(itemId, value, stage = "initial") {
     setLocalAnswers((current) => ({ ...current, [itemId]: value }));
+    const previousSave =
+      answerSaveQueuesRef.current.get(itemId) || Promise.resolve();
+    const saveRequest = previousSave
+      .catch(() => {})
+      .then(() => submitOteListeningLiveAnswer({ gameId, itemId, value, stage }));
+    answerSaveQueuesRef.current.set(itemId, saveRequest);
     try {
-      await submitOteListeningLiveAnswer({ gameId, itemId, value });
+      await saveRequest;
     } catch (error) {
       console.error("[OteListeningLivePlayer] answer save failed", error);
       toast("Your answer could not be saved. Please try again.");
+    } finally {
+      if (answerSaveQueuesRef.current.get(itemId) === saveRequest) {
+        answerSaveQueuesRef.current.delete(itemId);
+      }
+    }
+  }
+
+  async function confirmScriptCheck(itemId, value) {
+    setConfirmingItemId(itemId);
+    try {
+      await answerSaveQueuesRef.current.get(itemId)?.catch(() => {});
+      await confirmOteListeningLiveScriptCheck({ gameId, itemId, value });
+    } catch (error) {
+      console.error("[OteListeningLivePlayer] script check confirmation failed", error);
+      toast("Your final choice could not be confirmed. Please try again.");
+    } finally {
+      setConfirmingItemId("");
     }
   }
 
@@ -168,6 +214,17 @@ export default function OteListeningLivePlayer() {
         : audioStage === "repeat"
           ? "The repeat is playing from the teacher’s screen"
           : "Listen to the audio shared by your teacher";
+  const reviewAnswerRecord = reviewItem
+    ? player.listeningAnswers?.[reviewItem.id]
+    : null;
+  const originalAnswerWasSubmitted =
+    Boolean(reviewAnswerRecord) &&
+    reviewAnswerRecord.initialAnswered !== false &&
+    (reviewAnswerRecord.initialValue !== undefined ||
+      reviewAnswerRecord.value !== undefined);
+  const originalAnswerValue = originalAnswerWasSubmitted
+    ? reviewAnswerRecord.initialValue ?? reviewAnswerRecord.value
+    : undefined;
 
   return (
     <main className="ote-listening-live-page ote-listening-live-player">
@@ -178,7 +235,17 @@ export default function OteListeningLivePlayer() {
           <h1>{activity.title}</h1>
         </div>
         <span className="ote-listening-live-phase">
-          {phase === "lobby" ? "Waiting" : phase === "review" ? `Review ${reviewIndex + 1}/${items.length}` : phase === "finished" ? "Complete" : activity.format === "part1" ? `Question ${questionIndex + 1}/${items.length}` : "Live task"}
+          {phase === "lobby"
+            ? "Waiting"
+            : phase === "script_check"
+              ? `Script check ${questionIndex + 1}/${items.length}`
+              : phase === "review"
+                ? `Feedback ${reviewIndex + 1}/${items.length}`
+                : phase === "finished"
+                  ? "Complete"
+                  : activity.format === "part1"
+                    ? `Question ${questionIndex + 1}/${items.length}`
+                    : "Live task"}
         </span>
       </header>
 
@@ -196,12 +263,36 @@ export default function OteListeningLivePlayer() {
           <ListeningTask
             activity={activity}
             answers={answers}
-            onChange={saveAnswer}
+            onChange={(itemId, value) => saveAnswer(itemId, value, "initial")}
             questionIndex={questionIndex}
           />
           <div className="ote-listening-live-saved">
             <CheckCircle2 size={18} />
-            Answers are saved automatically. You can change them until feedback is revealed.
+            Answers are saved automatically. You can change them until the script is revealed.
+          </div>
+        </section>
+      ) : null}
+
+      {phase === "script_check" && reviewItem ? (
+        <section className="ote-listening-live-stage">
+          <ListeningLiveStatus>
+            Read the script and check your evidence. The correct answer is still hidden.
+          </ListeningLiveStatus>
+          <ListeningScriptCheck
+            confirmed={Boolean(
+              player.listeningAnswers?.[reviewItem.id]?.scriptCheckedAt
+            )}
+            disabled={confirmingItemId === reviewItem.id}
+            item={reviewItem}
+            onChange={(value) => saveAnswer(reviewItem.id, value, "script_check")}
+            onConfirm={() => confirmScriptCheck(reviewItem.id, answers[reviewItem.id])}
+            originalSubmitted={originalAnswerWasSubmitted}
+            originalValue={originalAnswerValue}
+            value={answers[reviewItem.id]}
+          />
+          <div className="ote-listening-live-wait is-compact">
+            <Radio size={25} />
+            <p>Your teacher controls when the correct answer is revealed.</p>
           </div>
         </section>
       ) : null}
@@ -211,6 +302,8 @@ export default function OteListeningLivePlayer() {
           <ListeningLiveStatus>Follow the explanation on your screen while the teacher reviews it</ListeningLiveStatus>
           <ListeningFeedback
             activity={activity}
+            initialSubmitted={originalAnswerWasSubmitted}
+            initialValue={originalAnswerValue}
             item={reviewItem}
             selectedValue={answers[reviewItem.id]}
           />
@@ -222,28 +315,48 @@ export default function OteListeningLivePlayer() {
       ) : null}
 
       {phase === "finished" ? (
-        <StudentResult activity={activity} answers={answers} items={items} />
+        <StudentResult
+          activity={activity}
+          answerRecords={player.listeningAnswers || {}}
+          answers={answers}
+          items={items}
+        />
       ) : null}
     </main>
   );
 }
 
-function StudentResult({ activity, answers, items }) {
-  const score = items.filter((item) => {
+function StudentResult({ activity, answerRecords, answers, items }) {
+  function answerIsCorrect(item, value) {
     if (activity.format === "advanced-part2") {
-      return normaliseListeningAnswer(answers[item.id]) === normaliseListeningAnswer(item.answer);
+      return normaliseListeningAnswer(value) === normaliseListeningAnswer(item.answer);
     }
-    if (activity.format === "part3") {
-      return answers[item.id] === item.answer;
-    }
-    return Number(answers[item.id]) === item.answer;
-  }).length;
+    if (activity.format === "part3") return value === item.answer;
+    return Number(value) === item.answer;
+  }
+
+  const score = items.filter((item) => answerIsCorrect(item, answers[item.id])).length;
+  const initialScore = items.filter((item) =>
+    answerIsCorrect(
+      item,
+      answerRecords[item.id]?.initialAnswered === false
+        ? undefined
+        : answerRecords[item.id]?.initialValue ?? answerRecords[item.id]?.value
+    )
+  ).length;
+  const changes = items.filter((item) => answerRecords[item.id]?.changedAfterScript).length;
   return (
     <section className="ote-listening-live-stage">
       <div className="ote-listening-live-wait">
         <CheckCircle2 size={42} />
         <h2>Session complete</h2>
         <p>You answered {score} of {items.length} questions correctly.</p>
+        {activity.format === "part1" ? (
+          <p>
+            Before checking the scripts: {initialScore}/{items.length}. You changed {changes}{" "}
+            {changes === 1 ? "answer" : "answers"} after reading the evidence.
+          </p>
+        ) : null}
       </div>
     </section>
   );

@@ -2,6 +2,7 @@ const assetRoot = "/images/ote/listening/advanced/part-1/set-1";
 const audioRoot = "/audio/ote/listening/advanced/part-1/set-1";
 const setTwoAssetRoot = "/images/ote/listening/advanced/part-1/set-2";
 const setTwoAudioRoot = "/audio/ote/listening/advanced/part-1/set-2";
+const setThreeAudioRoot = "/audio/ote/listening/advanced/part-1/set-3";
 
 export const advancedListeningPart1Sets = [
   {
@@ -525,6 +526,296 @@ export const advancedListeningPart1Sets = [
         },
         explanation:
           "The lecture theatre is booked and the courtyard is too risky in the forecast rain. Rows of desktop computers identify the remaining venue as the computer room.",
+      },
+    ],
+  },
+  {
+    id: "set-3",
+    title: "Set 3 · C1 Challenge",
+    level: "C1",
+    description: "Five upper-range C1 extracts testing subtle purpose, attitude, emphasis, and implied meaning. Deliberately harder than many test-day items.",
+    hiddenFromStudentMenu: true,
+    assetsReady: true,
+    audioReady: true,
+    instructionAudioReady: true,
+    questions: [
+      {
+        id: "dissertation-case-studies",
+        context: "A student is discussing a dissertation chapter with her supervisor.",
+        prompt: "What does the supervisor particularly want her to improve?",
+        kind: "text",
+        answer: 1,
+        instructionAudioSrc: `${setThreeAudioRoot}/question-1.mp3`,
+        optionsAudioSrc: `${setThreeAudioRoot}/options-1.mp3`,
+        audioSrc: `${setThreeAudioRoot}/item-1.mp3`,
+        options: [
+          { text: "the selection of case studies included" },
+          { text: "the way the case studies contribute to a developing argument" },
+          { text: "the treatment of inconsistencies in the interview evidence" },
+        ],
+        reviewEvidence: [
+          {
+            option: 0,
+            quote: "One may eventually have to go, but I'd decide that only once the line of argument is visible.",
+            note: "Removing a case study is presented as a possible later decision, not the present priority.",
+          },
+          {
+            option: 1,
+            quote: "Each one is interesting in isolation, yet I'm not always clear what the second makes us reconsider about the first, or how the third changes the picture again.",
+            note: "The supervisor wants the examples to build and reshape one developing line of argument.",
+          },
+          {
+            option: 2,
+            quote: "the interviews are useful precisely because they don't always agree.",
+            note: "The inconsistencies are treated as useful evidence rather than a weakness to correct.",
+          },
+        ],
+        script: [
+          {
+            speaker: "Woman",
+            text: "I've read the new chapter. The historical background is substantial, but it earns its place, and the interviews are useful precisely because they don't always agree. What I'm less certain about is the movement between the case studies. Each one is interesting in isolation, yet I'm not always clear what the second makes us reconsider about the first, or how the third changes the picture again.",
+          },
+          {
+            speaker: "Man",
+            text: "So the problem is the number of examples?",
+          },
+          {
+            speaker: "Woman",
+            text: "Not necessarily. One may eventually have to go, but I'd decide that only once the line of argument is visible. Cutting material now could simply leave you with fewer disconnected sections.",
+          },
+        ],
+        profile: {
+          level: "C1",
+          words: 105,
+          focus: "Distinguishing the main revision priority from secondary possibilities",
+          distractors: "Conflicting evidence is approved, while reducing the number of examples remains a plausible later step.",
+        },
+        explanation:
+          "The supervisor approves the conflicting interview evidence and does not yet recommend cutting examples. She wants the case studies to function as a cumulative argument rather than isolated sections.",
+      },
+      {
+        id: "waterfront-proposal",
+        context: "An architect is commenting on a waterfront development proposal.",
+        prompt: "How does she feel about the revised proposal?",
+        kind: "text",
+        answer: 2,
+        instructionAudioSrc: `${setThreeAudioRoot}/question-2.mp3`,
+        optionsAudioSrc: `${setThreeAudioRoot}/options-2.mp3`,
+        audioSrc: `${setThreeAudioRoot}/item-2.mp3`,
+        options: [
+          { text: "relieved that the consultation process has been extended" },
+          { text: "encouraged by the developers' willingness to alter their plans" },
+          { text: "unconvinced that environmental gains compensate for what will be lost" },
+        ],
+        reviewEvidence: [
+          {
+            option: 0,
+            quote: "the new consultation period is welcome.",
+            note: "She welcomes the extension, but it is one positive detail rather than her overall judgement.",
+          },
+          {
+            option: 1,
+            quote: "Moving the access road away from the school is sensible",
+            note: "She approves one alteration without expressing general confidence in the revised scheme.",
+          },
+          {
+            option: 2,
+            quote: "Perhaps the new planting will work well in twenty years; that doesn't solve the immediate loss.",
+            note: "Her cumulative position is that the promised future planting does not compensate for removing mature trees now.",
+          },
+        ],
+        script: [
+          {
+            speaker: "Man",
+            text: "The developers have revised the waterfront proposal again. Does this version address your concerns?",
+          },
+          {
+            speaker: "Woman",
+            text: "Some of them. Moving the access road away from the school is sensible, and the new consultation period is welcome. I'm less persuaded by the environmental claims. The drawings make the roof gardens look generous, but they're being offered as compensation for removing mature trees that already cool the site and absorb rainwater. Perhaps the new planting will work well in twenty years; that doesn't solve the immediate loss.",
+          },
+          {
+            speaker: "Man",
+            text: "At least the public can respond before a final decision.",
+          },
+          {
+            speaker: "Woman",
+            text: "Yes, and given the scale of the scheme, taking another month is hardly excessive.",
+          },
+        ],
+        profile: {
+          level: "C1",
+          words: 107,
+          focus: "Recovering an overall attitude from mixed positive and negative evaluation",
+          distractors: "The final exchange returns to a genuine positive feature after the central environmental reservation.",
+        },
+        explanation:
+          "She welcomes individual revisions, including the longer consultation, but remains unconvinced that roof gardens and future planting offset the immediate loss of mature trees.",
+      },
+      {
+        id: "volunteer-theatres",
+        context: "Two researchers are discussing a report on online ticketing.",
+        prompt: "Why does the man mention volunteer-run theatres?",
+        kind: "text",
+        answer: 0,
+        instructionAudioSrc: `${setThreeAudioRoot}/question-3.mp3`,
+        optionsAudioSrc: `${setThreeAudioRoot}/options-3.mp3`,
+        audioSrc: `${setThreeAudioRoot}/item-3.mp3`,
+        options: [
+          { text: "to question whether a reported saving represents genuine efficiency" },
+          { text: "to show why different staffing models complicate organisational comparisons" },
+          { text: "to show why official employment figures exclude unpaid work" },
+        ],
+        reviewEvidence: [
+          {
+            option: 0,
+            quote: "Some of the work has changed hands rather than disappeared.",
+            note: "The example challenges whether the reduction in paid staff time represents work genuinely being eliminated.",
+          },
+          {
+            option: 1,
+            quote: "That also makes comparisons between organisations rather awkward, since the amount of unpaid support varies enormously.",
+            note: "This is a true consequence of the example, but it is not the immediate reason the man introduces it.",
+          },
+          {
+            option: 2,
+            quote: "Official employment figures won't show any of it, of course",
+            note: "This later consequence is memorable but secondary to the man's challenge to the report's efficiency claim.",
+          },
+        ],
+        script: [
+          {
+            speaker: "Woman",
+            text: "This report says online ticketing reduced administrative work by nearly a third.",
+          },
+          {
+            speaker: "Man",
+            text: "In the organisations studied, yes. But look at the volunteer-run theatres. Paid staff spent fewer hours processing bookings because volunteers began answering customer emails and resolving payment problems from home.",
+          },
+          {
+            speaker: "Woman",
+            text: "So the system was still more efficient?",
+          },
+          {
+            speaker: "Man",
+            text: "Possibly, but the saving isn't quite where the headline suggests. Some of the work has changed hands rather than disappeared. That also makes comparisons between organisations rather awkward, since the amount of unpaid support varies enormously. Official employment figures won't show any of it, of course, which is another reason to treat the result cautiously.",
+          },
+        ],
+        profile: {
+          level: "C1",
+          words: 104,
+          focus: "Distinguishing an example's rhetorical purpose from its valid consequences",
+          distractors: "All three options reflect true implications, but the later consequences are not the example's immediate argumentative function.",
+        },
+        explanation:
+          "The theatres show that a reduction in paid staff time may reflect work being transferred to volunteers rather than genuine efficiency. Comparability and employment statistics are later consequences of that same example.",
+      },
+      {
+        id: "coastal-field-project",
+        context: "A university supervisor is talking about a coastal field project.",
+        prompt: "What is the supervisor mainly doing?",
+        kind: "text",
+        answer: 0,
+        instructionAudioSrc: `${setThreeAudioRoot}/question-4.mp3`,
+        optionsAudioSrc: `${setThreeAudioRoot}/options-4.mp3`,
+        audioSrc: `${setThreeAudioRoot}/item-4.mp3`,
+        options: [
+          { text: "warning that participants will need to work with limited guidance" },
+          { text: "encouraging less experienced students to apply" },
+          { text: "explaining why competition for places will be high" },
+        ],
+        reviewEvidence: [
+          {
+            option: 0,
+            quote: "You'll have a timetable, but not someone checking each stage of your work.",
+            note: "Her practical message is that students must be comfortable working independently.",
+          },
+          {
+            option: 1,
+            quote: "Some of last year's strongest applications came from first years.",
+            note: "Less experienced students are not excluded, but encouraging them is not the supervisor's main purpose.",
+          },
+          {
+            option: 2,
+            quote: "Places are limited, but that isn't why I'm spelling this out.",
+            note: "Competition is mentioned and then explicitly rejected as the reason for the warning.",
+          },
+        ],
+        script: [
+          {
+            speaker: "Woman",
+            text: "Before you apply for the coastal field project, be clear about what the week involves. The research station is small, weather can cancel boat trips at short notice, and there may be long periods when the senior staff are working elsewhere. You'll have a timetable, but not someone checking each stage of your work.",
+          },
+          {
+            speaker: "Man",
+            text: "Are you saying first-year students shouldn't apply?",
+          },
+          {
+            speaker: "Woman",
+            text: "No. Some of last year's strongest applications came from first years. I'm saying that anyone expecting a tightly supervised course may find the experience unsettling. Places are limited, but that isn't why I'm spelling this out. If the uncertainty sounds appealing rather than alarming, the forms are online.",
+          },
+        ],
+        profile: {
+          level: "C1",
+          words: 109,
+          focus: "Interpreting a pragmatic warning beneath a literal invitation",
+          distractors: "The ending permits applications and mentions both first-year success and limited places.",
+        },
+        explanation:
+          "The supervisor does not discourage first-year applicants, but she is managing expectations about independence and the limited guidance available during the project.",
+      },
+      {
+        id: "documentary-podcast",
+        context: "A reviewer is discussing a documentary podcast series.",
+        prompt: "What criticism does he make?",
+        kind: "text",
+        answer: 2,
+        instructionAudioSrc: `${setThreeAudioRoot}/question-5.mp3`,
+        optionsAudioSrc: `${setThreeAudioRoot}/options-5.mp3`,
+        audioSrc: `${setThreeAudioRoot}/item-5.mp3`,
+        options: [
+          { text: "It gives opposing positions unequal attention." },
+          { text: "It allows one contributor to exercise too much influence." },
+          { text: "It generalises too readily from individual experiences." },
+        ],
+        reviewEvidence: [
+          {
+            option: 0,
+            quote: "the presenter gives both sides of the debate more time than I expected.",
+            note: "The reviewer explicitly praises the balance between opposing sides.",
+          },
+          {
+            option: 1,
+            quote: "Nor is it a problem that Professor Hale appears in three episodes; her claims are challenged rather than simply accepted.",
+            note: "The recurring contributor is prominent, but the reviewer does not believe she has excessive influence.",
+          },
+          {
+            option: 2,
+            quote: "the programme moves from them to claims about whole communities with very little in between.",
+            note: "His criticism is that vivid personal stories are treated as though they were representative evidence.",
+          },
+        ],
+        script: [
+          {
+            speaker: "Man",
+            text: "The series is beautifully produced, and the presenter gives both sides of the debate more time than I expected. Nor is it a problem that Professor Hale appears in three episodes; her claims are challenged rather than simply accepted. My reservation is about the personal accounts. They're vivid, and several are genuinely moving, but the programme moves from them to claims about whole communities with very little in between. A story can reveal what a policy feels like without showing how typical that experience is.",
+          },
+          {
+            speaker: "Woman",
+            text: "Would you still recommend it?",
+          },
+          {
+            speaker: "Man",
+            text: "Certainly. Hale is an engaging speaker, and the final episode raises questions most programmes would avoid.",
+          },
+        ],
+        profile: {
+          level: "C1",
+          words: 106,
+          focus: "Identifying a precise criticism followed by a positive concession",
+          distractors: "The first two options are explicitly activated and rejected, while the closing recommendation returns attention to Professor Hale.",
+        },
+        explanation:
+          "The reviewer approves the balance and does not object to Professor Hale's prominence. He criticises the leap from individual stories to claims about whole communities.",
       },
     ],
   },

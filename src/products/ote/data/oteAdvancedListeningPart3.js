@@ -11,7 +11,7 @@ export const advancedListeningPart3Sets = [
     assetsReady: true,
     audioReady: true,
     audioSrc: `${setOneAudioRoot}/ai-generated-feedback-on-student-writing.mp3`,
-    instructionAudioReady: false,
+    instructionAudioReady: true,
     instructionAudioSrc: `${setOneAudioRoot}/question.mp3`,
     instructions:
       "Listen to an education journalist and a university researcher discussing AI-generated feedback on student writing. Match the people—the woman, the man, or both—to the opinions below.",
@@ -305,7 +305,7 @@ export const advancedListeningPart3Sets = [
     assetsReady: true,
     audioReady: true,
     audioSrc: `${setTwoAudioRoot}/citizen-science.mp3`,
-    instructionAudioReady: false,
+    instructionAudioReady: true,
     instructionAudioSrc: `${setTwoAudioRoot}/question.mp3`,
     instructions:
       "Listen to a science journalist and a conservation ecologist discussing citizen science. Match the people—the woman, the man, or both—to the opinions below.",

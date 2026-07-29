@@ -166,6 +166,7 @@ export default function OteAdvancedListeningPart1Practice({
   const navigate = useNavigate();
   const isGeneral = variant === "general";
   const listeningLabel = isGeneral ? "General" : "Advanced";
+  const partLabel = isGeneral ? "Part 1" : "Parts 1 & 4";
   const setId = routeSetId || (isGeneral ? "a2-set-1" : "set-1");
   const practiceSet = useMemo(
     () => (
@@ -182,6 +183,13 @@ export default function OteAdvancedListeningPart1Practice({
       : `/ote/listening/${variant}/${isGeneral ? "part-1-picture-options" : "part-1-short-extracts"}`
   );
   const questions = practiceSet.questions;
+  const pictureQuestionCount = questions.filter((item) => item.kind === "pictures").length;
+  const textQuestionCount = questions.length - pictureQuestionCount;
+  const formatSummary = isGeneral
+    ? `${questions.length} picture-option rounds.`
+    : pictureQuestionCount === 0
+      ? `${textQuestionCount} text-option rounds, matching Part 4's answer format.`
+      : `${pictureQuestionCount} picture-option rounds and ${textQuestionCount} text-option rounds.`;
 
   const [phase, setPhase] = useState("ready");
   const [questionIndex, setQuestionIndex] = useState(0);
@@ -389,7 +397,7 @@ export default function OteAdvancedListeningPart1Practice({
       part: "part-1",
       mode: "exam_style_practice",
       taskId: `${variant}-listening-part-1-${practiceSet.id}`,
-      taskTitle: `${listeningLabel} Listening Part 1 ${practiceSet.title}`,
+      taskTitle: `${listeningLabel} Listening ${partLabel} ${practiceSet.title}`,
       variant,
     });
   }
@@ -431,7 +439,7 @@ export default function OteAdvancedListeningPart1Practice({
       part: "part-1",
       mode: "exam_style_practice",
       taskId: `${variant}-listening-part-1-${practiceSet.id}`,
-      taskTitle: `${listeningLabel} Listening Part 1 ${practiceSet.title}`,
+      taskTitle: `${listeningLabel} Listening ${partLabel} ${practiceSet.title}`,
       variant,
       score,
       total: questions.length,
@@ -458,7 +466,7 @@ export default function OteAdvancedListeningPart1Practice({
     return (
       <main className="ote-training-page">
         <header className="ote-training-hero">
-          <p className="ote-kicker">{listeningLabel} Listening Part 1</p>
+          <p className="ote-kicker">{listeningLabel} Listening {partLabel}</p>
           <h1>Practice not available</h1>
           <p>Switch your OTE workspace to {listeningLabel} to open this set.</p>
         </header>
@@ -471,15 +479,15 @@ export default function OteAdvancedListeningPart1Practice({
     return (
       <main className="ote-training-page ote-listening-ready-page">
         <Seo
-          title={`${practiceSet.title} | OTE ${listeningLabel} Listening Part 1`}
-          description={`${listeningLabel} Listening Part 1 set in production.`}
+          title={`${practiceSet.title} | OTE ${listeningLabel} Listening ${partLabel}`}
+          description={`${listeningLabel} Listening ${partLabel} set in production.`}
         />
         <button className="ote-training-back" type="button" onClick={() => navigate(partPath)}>
           <ArrowLeft size={18} aria-hidden="true" />
-          Back to Part 1
+          Back to {partLabel}
         </button>
         <header className="ote-training-hero">
-          <p className="ote-kicker">{listeningLabel} Listening Part 1</p>
+          <p className="ote-kicker">{listeningLabel} Listening {partLabel}</p>
           <h1>{practiceSet.title}</h1>
           <p>The questions and scoring are integrated. This set will open when its picture and audio assets have been added.</p>
         </header>
@@ -491,15 +499,15 @@ export default function OteAdvancedListeningPart1Practice({
     return (
       <main className="ote-training-page ote-listening-ready-page">
         <Seo
-          title={`OTE ${listeningLabel} Listening Part 1 | Seif English`}
-          description={`Exam-style ${listeningLabel} Listening Part 1 practice.`}
+          title={`OTE ${listeningLabel} Listening ${partLabel} | Seif English`}
+          description={`Exam-style ${listeningLabel} Listening ${partLabel} practice.`}
         />
         <button className="ote-training-back" type="button" onClick={() => navigate(partPath)}>
           <ArrowLeft size={18} aria-hidden="true" />
-          Back to Part 1
+          Back to {partLabel}
         </button>
         <header className="ote-training-hero">
-          <p className="ote-kicker">{listeningLabel} Listening Part 1</p>
+          <p className="ote-kicker">{listeningLabel} Listening {partLabel}</p>
           <h1>{practiceSet.title}</h1>
           <p>{practiceSet.description}</p>
         </header>
@@ -519,7 +527,7 @@ export default function OteAdvancedListeningPart1Practice({
             <div className="ote-training-rule-grid">
               <article>
                 <h3>Five questions</h3>
-                <p>{isGeneral ? "Five picture-option rounds." : "Two picture rounds and three text-option rounds."}</p>
+                <p>{formatSummary}</p>
               </article>
               <article><h3>Optional review</h3><p>Review each answer immediately, or continue and use the detailed feedback at the end.</p></article>
             </div>
@@ -546,6 +554,7 @@ export default function OteAdvancedListeningPart1Practice({
         score={score}
         setTitle={practiceSet.title}
         listeningLabel={listeningLabel}
+        partLabel={partLabel}
         onBack={() => navigate(partPath)}
         onRetry={startPractice}
       />
@@ -555,16 +564,16 @@ export default function OteAdvancedListeningPart1Practice({
   return (
     <main className="ote-training-page ote-listening-practice-page">
       <Seo
-        title={`OTE ${listeningLabel} Listening Part 1 ${practiceSet.title} | Seif English`}
-        description={`Exam-style ${listeningLabel} Listening Part 1 practice.`}
+        title={`OTE ${listeningLabel} Listening ${partLabel} ${practiceSet.title} | Seif English`}
+        description={`Exam-style ${listeningLabel} Listening ${partLabel} practice.`}
       />
       <button className="ote-training-back" type="button" onClick={() => navigate(partPath)}>
         <ArrowLeft size={18} aria-hidden="true" />
-        Back to Part 1
+        Back to {partLabel}
       </button>
 
       <header className="ote-training-hero">
-        <p className="ote-kicker">{listeningLabel} Listening Part 1</p>
+        <p className="ote-kicker">{listeningLabel} Listening {partLabel}</p>
         <h1>{practiceSet.title}</h1>
         <p>Listen to each short extract twice and choose the best answer.</p>
       </header>
@@ -705,6 +714,7 @@ function ListeningComplete({
   answers,
   audioReady,
   listeningLabel,
+  partLabel,
   questions,
   score,
   setTitle,
@@ -714,8 +724,8 @@ function ListeningComplete({
   return (
     <main className="ote-training-page ote-listening-results-page">
       <Seo
-        title={`OTE ${listeningLabel} Listening Part 1 Results | Seif English`}
-        description={`Review your ${listeningLabel} Listening Part 1 practice.`}
+        title={`OTE ${listeningLabel} Listening ${partLabel} Results | Seif English`}
+        description={`Review your ${listeningLabel} Listening ${partLabel} practice.`}
       />
       <section className="ote-practice-complete ote-listening-native-complete">
         <CheckCircle2 size={42} aria-hidden="true" />

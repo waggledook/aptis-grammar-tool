@@ -12,6 +12,7 @@ import Seo from "../../components/common/Seo.jsx";
 import { logOteTrainingCompleted, logOteTrainingStarted } from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
 import { getAdvancedListeningPart3Set } from "./data/oteAdvancedListeningPart3.js";
+import { getGeneralListeningPart3Set } from "./data/oteGeneralListeningPart3.js";
 import "./styles/ote.css";
 
 const LISTEN_AGAIN_PROMPT_SRC = "/audio/ote/listening/instructions/now-listen-again.mp3";
@@ -100,32 +101,46 @@ export function OpinionMatchingTask({
   disabled = false,
   revealAnswers = false,
 }) {
+  const rows = [
+    ...(set.example ? [{ opinion: set.example, example: true, number: 0 }] : []),
+    ...set.opinions.map((opinion, index) => ({
+      opinion,
+      example: false,
+      number: index + 1,
+    })),
+  ];
+
   return (
     <div className="ote-listening-opinion-sheet">
       <div className="ote-listening-opinion-heading" aria-hidden="true">
         <span>Opinion</span>
         {set.speakers.map((speaker) => <strong key={speaker.id}>{speaker.label}</strong>)}
       </div>
-      {set.opinions.map((opinion, index) => (
-        <section className="ote-listening-opinion-row" key={opinion.id}>
+      {rows.map(({ opinion, example, number }) => (
+        <section
+          className={`ote-listening-opinion-row ${example ? "is-example" : ""}`}
+          key={opinion.id}
+        >
           <div className="ote-listening-opinion-copy">
-            <strong>{index + 1}</strong>
+            <strong>{number}</strong>
             <p>{opinion.text}</p>
           </div>
           <div
             className="ote-listening-opinion-options"
             role="radiogroup"
-            aria-label={`Opinion ${index + 1}: ${opinion.text}`}
+            aria-label={`Opinion ${number}: ${opinion.text}`}
           >
             {set.speakers.map((speaker) => {
-              const selected = answers[opinion.id] === speaker.id;
-              const isAnswer = revealAnswers && opinion.answer === speaker.id;
+              const selected = example
+                ? opinion.answer === speaker.id
+                : answers[opinion.id] === speaker.id;
+              const isAnswer = (example || revealAnswers) && opinion.answer === speaker.id;
               const isWrong = revealAnswers && selected && !isAnswer;
               return (
                 <button
                   aria-checked={selected}
                   className={`${selected ? "is-selected" : ""} ${isAnswer ? "is-answer" : ""} ${isWrong ? "is-wrong" : ""}`}
-                  disabled={disabled}
+                  disabled={disabled || example}
                   key={speaker.id}
                   onClick={() => onChange?.(opinion.id, speaker.id)}
                   role="radio"
@@ -168,15 +183,27 @@ function OpinionContextReview({ opinion }) {
   );
 }
 
-export default function OteAdvancedListeningPart3Practice({ user, nativeRoutes = false }) {
-  const { setId = "set-1" } = useParams();
+export function OteListeningPart3Practice({
+  user,
+  nativeRoutes = false,
+  variant = "advanced",
+}) {
+  const isAdvanced = variant === "advanced";
+  const variantLabel = isAdvanced ? "Advanced" : "General";
+  const { setId = isAdvanced ? "set-1" : "a2-sports-centre" } = useParams();
   const navigate = useNavigate();
-  const practiceSet = useMemo(() => getAdvancedListeningPart3Set(setId), [setId]);
+  const practiceSet = useMemo(
+    () =>
+      isAdvanced
+        ? getAdvancedListeningPart3Set(setId)
+        : getGeneralListeningPart3Set(setId),
+    [isAdvanced, setId]
+  );
   const menuPath = getSitePath(nativeRoutes ? "/listening" : "/ote/listening");
   const partPath = getSitePath(
     nativeRoutes
-      ? "/listening/advanced/part-3-opinion-matching"
-      : "/ote/listening/advanced/part-3-opinion-matching"
+      ? `/listening/${variant}/part-3-opinion-matching`
+      : `/ote/listening/${variant}/part-3-opinion-matching`
   );
   const [phase, setPhase] = useState("ready");
   const [stage, setStage] = useState("idle");
@@ -376,9 +403,9 @@ export default function OteAdvancedListeningPart3Practice({ user, nativeRoutes =
       section: "listening",
       part: "part-3",
       mode: "exam_style_opinion_matching",
-      taskId: `advanced-listening-part-3-${practiceSet.id}`,
-      taskTitle: `Advanced Listening Part 3 ${practiceSet.title}`,
-      variant: "advanced",
+      taskId: `${variant}-listening-part-3-${practiceSet.id}`,
+      taskTitle: `${variantLabel} Listening Part 3 ${practiceSet.title}`,
+      variant,
       level: practiceSet.level,
     });
   }
@@ -394,22 +421,23 @@ export default function OteAdvancedListeningPart3Practice({ user, nativeRoutes =
       section: "listening",
       part: "part-3",
       mode: "exam_style_opinion_matching",
-      taskId: `advanced-listening-part-3-${practiceSet.id}`,
-      taskTitle: `Advanced Listening Part 3 ${practiceSet.title}`,
-      variant: "advanced",
+      taskId: `${variant}-listening-part-3-${practiceSet.id}`,
+      taskTitle: `${variantLabel} Listening Part 3 ${practiceSet.title}`,
+      variant,
       level: practiceSet.level,
       score,
       total: practiceSet.opinions.length,
     });
   }
 
-  if (user && user.oteVersion !== "advanced") {
+  const userVariant = user?.oteVersion === "advanced" ? "advanced" : "general";
+  if (user && userVariant !== variant) {
     return (
       <main className="ote-training-page">
         <header className="ote-training-hero">
-          <p className="ote-kicker">Advanced Listening Part 3</p>
+          <p className="ote-kicker">{variantLabel} Listening Part 3</p>
           <h1>Practice not available</h1>
-          <p>Switch your OTE workspace to Advanced to open this set.</p>
+          <p>Switch your OTE workspace to {variantLabel} to open this set.</p>
         </header>
         <button className="topbar-btn" type="button" onClick={() => navigate(menuPath)}>Back to listening</button>
       </main>
@@ -419,13 +447,13 @@ export default function OteAdvancedListeningPart3Practice({ user, nativeRoutes =
   if (phase === "ready") {
     return (
       <main className="ote-training-page ote-listening-ready-page">
-        <Seo title="OTE Advanced Listening Part 3 | Seif English" description="Exam-style opinion-matching listening practice." />
+        <Seo title={`OTE ${variantLabel} Listening Part 3 | Seif English`} description="Exam-style opinion-matching listening practice." />
         <button className="ote-training-back" type="button" onClick={() => navigate(partPath)}>
           <ArrowLeft size={18} aria-hidden="true" />
           Back to Part 3
         </button>
         <header className="ote-training-hero">
-          <p className="ote-kicker">Advanced Listening Part 3 · {practiceSet.level}</p>
+          <p className="ote-kicker">{variantLabel} Listening Part 3 · {practiceSet.level}</p>
           <h1>{practiceSet.title}</h1>
           <p>{practiceSet.description}</p>
         </header>
@@ -443,7 +471,10 @@ export default function OteAdvancedListeningPart3Practice({ user, nativeRoutes =
               </div>
             </div>
             <p className="ote-listening-part2-ready-copy">
-              The instructions play first. You then have 30 seconds to read all six opinions before the complete discussion plays twice automatically.
+              The instructions play first. The clock then shows how much time you have to read
+              {practiceSet.example
+                ? " the worked example and five opinions"
+                : ` all ${practiceSet.opinions.length} opinions`} before the complete discussion plays twice automatically.
             </p>
             {!practiceSet.audioReady ? (
               <p className="ote-listening-audio-note">
@@ -471,19 +502,20 @@ export default function OteAdvancedListeningPart3Practice({ user, nativeRoutes =
         onRetry={startPractice}
         score={score}
         set={practiceSet}
+        variantLabel={variantLabel}
       />
     );
   }
 
   return (
     <main className="ote-training-page ote-listening-practice-page ote-listening-part3-page">
-      <Seo title={`${practiceSet.title} | OTE Advanced Listening Part 3`} description="Advanced opinion-matching listening practice." />
+      <Seo title={`${practiceSet.title} | OTE ${variantLabel} Listening Part 3`} description={`${variantLabel} opinion-matching listening practice.`} />
       <button className="ote-training-back" type="button" onClick={() => navigate(partPath)}>
         <ArrowLeft size={18} aria-hidden="true" />
         Back to Part 3
       </button>
       <header className="ote-training-hero">
-        <p className="ote-kicker">Advanced Listening Part 3</p>
+        <p className="ote-kicker">{variantLabel} Listening Part 3</p>
         <h1>Opinion matching</h1>
       </header>
       <section className="ote-practice-runner">
@@ -541,10 +573,10 @@ export default function OteAdvancedListeningPart3Practice({ user, nativeRoutes =
   );
 }
 
-function PartThreeComplete({ set, answers, score, onBack, onRetry }) {
+function PartThreeComplete({ set, answers, score, onBack, onRetry, variantLabel }) {
   return (
     <main className="ote-training-page ote-listening-results-page">
-      <Seo title="OTE Advanced Listening Part 3 Results | Seif English" description="Review your opinion-matching answers." />
+      <Seo title={`OTE ${variantLabel} Listening Part 3 Results | Seif English`} description="Review your opinion-matching answers." />
       <section className="ote-practice-complete ote-listening-native-complete">
         <CheckCircle2 size={42} aria-hidden="true" />
         <div>
@@ -617,4 +649,8 @@ function PartThreeComplete({ set, answers, score, onBack, onRetry }) {
       </section>
     </main>
   );
+}
+
+export default function OteAdvancedListeningPart3Practice(props) {
+  return <OteListeningPart3Practice {...props} variant="advanced" />;
 }

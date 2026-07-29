@@ -3,6 +3,7 @@ import { advancedListeningPart2Sets } from "./oteAdvancedListeningPart2.js";
 import { advancedListeningPart3Sets } from "./oteAdvancedListeningPart3.js";
 import { generalListeningPart1Sets } from "./oteGeneralListeningPart1.js";
 import { generalListeningPart2Sets } from "./oteGeneralListeningPart2.js";
+import { generalListeningPart3Sets } from "./oteGeneralListeningPart3.js";
 
 export const OTE_LISTENING_LIVE_GAME_TYPE = "ote_listening_teacher";
 
@@ -31,6 +32,7 @@ const activities = [
   ...advancedListeningPart1Sets.map((set) => buildActivity("advanced", 1, set)),
   ...generalListeningPart2Sets.map((set) => buildActivity("general", 2, set)),
   ...advancedListeningPart2Sets.map((set) => buildActivity("advanced", 2, set)),
+  ...generalListeningPart3Sets.map((set) => buildActivity("general", 3, set)),
   ...advancedListeningPart3Sets.map((set) => buildActivity("advanced", 3, set)),
 ];
 

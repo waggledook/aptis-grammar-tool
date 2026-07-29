@@ -9,7 +9,7 @@
 //   [gameId]: {
 //     ownerUid, pin, setId, type,
 //     status: "lobby" | "in-progress" | "finished",
-//     state: { phase: "lobby" | "question" | "reveal" | "finished", questionIndex },
+//     state: { phase: "lobby" | "task" | "script_check" | "review" | "finished", questionIndex },
 //     players: { [uid]: { name, score, ... } },
 //     answers: { [questionIndex]: { [uid]: { selectedIndex, correct, answeredAt } } }
 //   }
@@ -198,14 +198,87 @@ export async function createOteListeningLiveGame({ activityId, title }) {
   return { gameId, pin };
 }
 
-export async function submitOteListeningLiveAnswer({ gameId, itemId, value }) {
+export async function submitOteListeningLiveAnswer({
+  gameId,
+  itemId,
+  value,
+  stage = "initial",
+}) {
   const user = auth.currentUser;
   if (!user) throw new Error("You must be signed in to answer.");
   if (!gameId || !itemId) throw new Error("Missing listening answer details.");
 
-  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/listeningAnswers/${itemId}`), {
-    value,
-    submittedAt: Date.now(),
+  const answerRef = ref(
+    rtdb,
+    `liveGames/${gameId}/players/${user.uid}/listeningAnswers/${itemId}`
+  );
+  await runTransaction(answerRef, (current) => {
+    const now = Date.now();
+    const existing = current || {};
+    const hadInitialAnswer =
+      stage === "script_check"
+        ? existing.initialAnswered ?? existing.value !== undefined
+        : true;
+    const initialValue =
+      stage === "script_check"
+        ? existing.initialValue ?? (hadInitialAnswer ? existing.value : undefined)
+        : value;
+    return {
+      ...existing,
+      value,
+      submittedAt: now,
+      initialValue: hadInitialAnswer ? initialValue : null,
+      initialAnswered: hadInitialAnswer,
+      initialSubmittedAt:
+        stage === "script_check"
+          ? existing.initialSubmittedAt || existing.submittedAt || now
+          : now,
+      ...(stage === "script_check"
+        ? {
+            scriptCheckValue: value,
+            scriptCheckUpdatedAt: now,
+            changedAfterScript: !hadInitialAnswer || value !== initialValue,
+          }
+        : {
+            scriptCheckValue: null,
+            scriptCheckUpdatedAt: null,
+            scriptCheckedAt: null,
+            changedAfterScript: false,
+          }),
+    };
+  });
+}
+
+export async function confirmOteListeningLiveScriptCheck({ gameId, itemId, value }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to confirm an answer.");
+  if (!gameId || !itemId) throw new Error("Missing listening answer details.");
+
+  const answerRef = ref(
+    rtdb,
+    `liveGames/${gameId}/players/${user.uid}/listeningAnswers/${itemId}`
+  );
+  await runTransaction(answerRef, (current) => {
+    const finalValue = value ?? current?.value;
+    if (finalValue === undefined || finalValue === null) return current;
+    const now = Date.now();
+    const existing = current || {};
+    const initialAnswered =
+      existing.initialAnswered ?? existing.value !== undefined;
+    const initialValue =
+      existing.initialValue ?? (initialAnswered ? existing.value : undefined);
+    return {
+      ...existing,
+      value: finalValue,
+      submittedAt: now,
+      initialValue: initialAnswered ? initialValue : null,
+      initialAnswered,
+      initialSubmittedAt: existing.initialSubmittedAt || existing.submittedAt || now,
+      scriptCheckValue: finalValue,
+      scriptCheckUpdatedAt: now,
+      scriptCheckedAt: now,
+      changedAfterScript: !initialAnswered || finalValue !== initialValue,
+    };
   });
 }
 

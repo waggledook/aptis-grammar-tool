@@ -95,6 +95,96 @@ export function PartOneQuestion({ item, value, onChange, disabled = false }) {
   );
 }
 
+function partOneAnswerText(item, value, emptyLabel = "No answer submitted") {
+  if (value === undefined || value === null || !item.options[value]) return emptyLabel;
+  return `${optionLetter(value)}. ${item.options[value].text}`;
+}
+
+export function ListeningScriptCheck({
+  item,
+  originalValue,
+  originalSubmitted,
+  value,
+  onChange,
+  onConfirm,
+  confirmed = false,
+  disabled = false,
+}) {
+  const hasAnswer = value !== undefined && value !== null;
+  const hasOriginalRecord =
+    originalSubmitted !== undefined ||
+    (originalValue !== undefined && originalValue !== null);
+  const originalWasSubmitted =
+    originalSubmitted ??
+    (originalValue !== undefined && originalValue !== null);
+  const changed =
+    hasAnswer &&
+    (!originalWasSubmitted || value !== originalValue);
+
+  return (
+    <section className="ote-listening-script-check">
+      <div className="ote-listening-script-check-intro">
+        <p className="ote-kicker">Script check</p>
+        <h2>Check the evidence before the answer is revealed</h2>
+        <p>
+          Read the unmarked script, compare it with all three options, and decide whether to keep
+          or revise the answer chosen while listening.
+        </p>
+      </div>
+
+      {hasOriginalRecord ? (
+        <div className="ote-listening-original-answer">
+          <span>Answer before seeing the script</span>
+          <strong>
+            {originalWasSubmitted
+              ? partOneAnswerText(item, originalValue)
+              : "No answer submitted"}
+          </strong>
+        </div>
+      ) : null}
+
+      <PartOneQuestion
+        disabled={disabled || confirmed}
+        item={item}
+        onChange={onChange}
+        value={value}
+      />
+
+      <div className="ote-listening-script-check-transcript" aria-label="Unmarked listening script">
+        {item.script.map((line, index) => (
+          <p key={`${line.speaker}-${index}`}>
+            <strong>{line.speaker}:</strong> {line.text}
+          </p>
+        ))}
+      </div>
+
+      {onConfirm ? (
+        <div className="ote-listening-script-check-actions">
+          <button
+            className="ote-listening-live-primary"
+            disabled={!hasAnswer || confirmed || disabled}
+            onClick={onConfirm}
+            type="button"
+          >
+            {confirmed
+              ? "Final choice confirmed"
+              : !originalWasSubmitted
+                ? "Confirm answer chosen from the script"
+              : changed
+                ? "Confirm revised answer"
+                : "Keep and confirm original answer"}
+          </button>
+          <p>
+            {confirmed
+              ? "Your final choice is locked. The teacher will reveal the correct answer next."
+              : "The correct answer and highlighted evidence are still hidden."}
+          </p>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 function GeneralChoiceRow({ item, number, value, onChange, example = false, disabled = false }) {
   return (
     <div className={`ote-general-listening-choice-row ${example ? "is-example" : ""}`}>
@@ -311,7 +401,14 @@ function ListeningReviewContext({ activity, item, selectedValue, showSelection }
   );
 }
 
-export function ListeningFeedback({ activity, item, selectedValue, showAudio = false }) {
+export function ListeningFeedback({
+  activity,
+  item,
+  selectedValue,
+  initialSubmitted,
+  initialValue,
+  showAudio = false,
+}) {
   const evidence = evidenceFor(activity, item);
   const isPartOne = activity.format === "part1";
   const isPartThree = activity.format === "part3";
@@ -335,6 +432,20 @@ export function ListeningFeedback({ activity, item, selectedValue, showAudio = f
       : activity.format === "general-part2"
         ? `${optionLetter(selectedValue)}. ${item.options[selectedValue]}`
         : String(selectedValue).trim();
+  const hasInitialResponse =
+    initialSubmitted === false
+      ? false
+      : initialValue !== undefined &&
+        initialValue !== null &&
+        String(initialValue).trim() !== "";
+  const hasInitialRecord = initialSubmitted !== undefined || hasInitialResponse;
+  const initialText = isPartOne
+    ? partOneAnswerText(item, initialValue, "No answer submitted")
+    : "";
+  const changedAfterScript =
+    isPartOne &&
+    hasResponse &&
+    (!hasInitialResponse || initialValue !== selectedValue);
   const correct =
     isPartOne || activity.format === "general-part2"
       ? selectedValue === item.answer
@@ -351,7 +462,24 @@ export function ListeningFeedback({ activity, item, selectedValue, showAudio = f
           <h3>{correctText}</h3>
         </div>
       </header>
-      {!showAudio ? (
+      {!showAudio && isPartOne && hasInitialRecord ? (
+        <div className="ote-listening-answer-journey">
+          <div>
+            <span>Before the script</span>
+            <strong>{initialText}</strong>
+          </div>
+          <div className={changedAfterScript ? "is-changed" : ""}>
+            <span>
+              {!hasInitialResponse
+                ? "Answered after the script"
+                : changedAfterScript
+                  ? "Revised after the script"
+                  : "Confirmed after the script"}
+            </span>
+            <strong>{selectedText}</strong>
+          </div>
+        </div>
+      ) : !showAudio ? (
         <div className={`ote-listening-live-student-response ${correct ? "is-correct" : "is-wrong"}`}>
           <span>Your response</span>
           <strong>{selectedText}</strong>

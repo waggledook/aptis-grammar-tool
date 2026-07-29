@@ -15336,6 +15336,18 @@
   align-items: stretch;
 }
 
+.ote-listening-opinion-row.is-example {
+  background: color-mix(in srgb, #2d9b63 7%, var(--color-surface));
+}
+
+.ote-listening-opinion-row.is-example .ote-listening-opinion-copy > strong {
+  background: #2d9b63;
+}
+
+.ote-listening-opinion-row.is-example .ote-listening-opinion-options button {
+  cursor: default;
+}
+
 .ote-listening-opinion-row + .ote-listening-opinion-row {
   border-top: 1px solid var(--color-border);
 }

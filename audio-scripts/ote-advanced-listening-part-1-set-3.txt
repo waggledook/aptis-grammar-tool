@@ -1,0 +1,155 @@
+OTE Advanced Listening Parts 1 & 4 — Set 3 · C1 Challenge
+Audio generation scripts
+
+Do not add “Now listen again” or announce the answers.
+The application inserts the repeat cue and replays each listening item automatically.
+
+
+QUESTION TEXT RECORDINGS
+
+QUESTION 1
+Output filename: question-1.mp3
+
+A student is discussing a dissertation chapter with her supervisor.
+
+What does the supervisor particularly want her to improve?
+
+
+QUESTION 2
+Output filename: question-2.mp3
+
+An architect is commenting on a waterfront development proposal.
+
+How does she feel about the revised proposal?
+
+
+QUESTION 3
+Output filename: question-3.mp3
+
+Two researchers are discussing a report on online ticketing.
+
+Why does the man mention volunteer-run theatres?
+
+
+QUESTION 4
+Output filename: question-4.mp3
+
+A university supervisor is talking about a coastal field project.
+
+What is the supervisor mainly doing?
+
+
+QUESTION 5
+Output filename: question-5.mp3
+
+A reviewer is discussing a documentary podcast series.
+
+What criticism does he make?
+
+
+OPTION TEXT RECORDINGS
+
+OPTIONS 1
+Output filename: options-1.mp3
+
+The selection of case studies included.
+
+The way the case studies contribute to a developing argument.
+
+The treatment of inconsistencies in the interview evidence.
+
+
+OPTIONS 2
+Output filename: options-2.mp3
+
+Relieved that the consultation process has been extended.
+
+Encouraged by the developers’ willingness to alter their plans.
+
+Unconvinced that environmental gains compensate for what will be lost.
+
+
+OPTIONS 3
+Output filename: options-3.mp3
+
+To question whether a reported saving represents genuine efficiency.
+
+To show why different staffing models complicate organisational comparisons.
+
+To show why official employment figures exclude unpaid work.
+
+
+OPTIONS 4
+Output filename: options-4.mp3
+
+Warning that participants will need to work with limited guidance.
+
+Encouraging less experienced students to apply.
+
+Explaining why competition for places will be high.
+
+
+OPTIONS 5
+Output filename: options-5.mp3
+
+It gives opposing positions unequal attention.
+
+It allows one contributor to exercise too much influence.
+
+It generalises too readily from individual experiences.
+
+
+LISTENING ITEM RECORDINGS
+
+ITEM 1
+Output filename: item-1.mp3
+
+Woman: I’ve read the new chapter. The historical background is substantial, but it earns its place, and the interviews are useful precisely because they don’t always agree. What I’m less certain about is the movement between the case studies. Each one is interesting in isolation, yet I’m not always clear what the second makes us reconsider about the first, or how the third changes the picture again.
+
+Man: So the problem is the number of examples?
+
+Woman: Not necessarily. One may eventually have to go, but I’d decide that only once the line of argument is visible. Cutting material now could simply leave you with fewer disconnected sections.
+
+
+ITEM 2
+Output filename: item-2.mp3
+
+Man: The developers have revised the waterfront proposal again. Does this version address your concerns?
+
+Woman: Some of them. Moving the access road away from the school is sensible, and the new consultation period is welcome. I’m less persuaded by the environmental claims. The drawings make the roof gardens look generous, but they’re being offered as compensation for removing mature trees that already cool the site and absorb rainwater. Perhaps the new planting will work well in twenty years; that doesn’t solve the immediate loss.
+
+Man: At least the public can respond before a final decision.
+
+Woman: Yes, and given the scale of the scheme, taking another month is hardly excessive.
+
+
+ITEM 3
+Output filename: item-3.mp3
+
+Woman: This report says online ticketing reduced administrative work by nearly a third.
+
+Man: In the organisations studied, yes. But look at the volunteer-run theatres. Paid staff spent fewer hours processing bookings because volunteers began answering customer emails and resolving payment problems from home.
+
+Woman: So the system was still more efficient?
+
+Man: Possibly, but the saving isn’t quite where the headline suggests. Some of the work has changed hands rather than disappeared. That also makes comparisons between organisations rather awkward, since the amount of unpaid support varies enormously. Official employment figures won’t show any of it, of course, which is another reason to treat the result cautiously.
+
+
+ITEM 4
+Output filename: item-4.mp3
+
+Woman: Before you apply for the coastal field project, be clear about what the week involves. The research station is small, weather can cancel boat trips at short notice, and there may be long periods when the senior staff are working elsewhere. You’ll have a timetable, but not someone checking each stage of your work.
+
+Man: Are you saying first-year students shouldn’t apply?
+
+Woman: No. Some of last year’s strongest applications came from first years. I’m saying that anyone expecting a tightly supervised course may find the experience unsettling. Places are limited, but that isn’t why I’m spelling this out. If the uncertainty sounds appealing rather than alarming, the forms are online.
+
+
+ITEM 5
+Output filename: item-5.mp3
+
+Man: The series is beautifully produced, and the presenter gives both sides of the debate more time than I expected. Nor is it a problem that Professor Hale appears in three episodes; her claims are challenged rather than simply accepted. My reservation is about the personal accounts. They’re vivid, and several are genuinely moving, but the programme moves from them to claims about whole communities with very little in between. A story can reveal what a policy feels like without showing how typical that experience is.
+
+Woman: Would you still recommend it?
+
+Man: Certainly. Hale is an engaging speaker, and the final episode raises questions most programmes would avoid.

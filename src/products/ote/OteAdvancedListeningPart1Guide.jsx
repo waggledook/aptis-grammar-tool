@@ -64,21 +64,21 @@ const questionTypeRows = [
 const quizQuestions = [
   {
     id: "recordings",
-    prompt: "How many separate recordings are there in Advanced Listening Part 1?",
+    prompt: "How many separate recordings are there in each of Advanced Listening Parts 1 and 4?",
     options: ["Four", "Five", "Six"],
     answer: "Five",
-    explanation: "Part 1 contains five independent short dialogues or monologues.",
+    explanation: "Each part contains five independent short dialogues or monologues.",
   },
   {
     id: "options",
-    prompt: "Which answer formats can appear in Part 1?",
+    prompt: "What is the main format difference between Parts 1 and 4?",
     options: [
-      "Text options only",
-      "Text options and, at B2, picture options",
-      "Typed gap answers only",
+      "Part 1 may use pictures or text; Part 4 uses text only",
+      "Part 1 uses text only; Part 4 may use pictures",
+      "Part 1 is multiple choice; Part 4 requires typed answers",
     ],
-    answer: "Text options and, at B2, picture options",
-    explanation: "Every item has three options. Picture options can appear in B2 Part 1; the other items use text.",
+    answer: "Part 1 may use pictures or text; Part 4 uses text only",
+    explanation: "Every item has three options. Part 1 can include picture questions, whereas Part 4 presents text options.",
   },
   {
     id: "plays",
@@ -103,7 +103,7 @@ const quizQuestions = [
     prompt: "A speaker mentions one plan and later changes it. Which detail usually matters?",
     options: ["The first plan", "The final decision", "Whichever detail sounds more practical"],
     answer: "The final decision",
-    explanation: "Part 1 often tests whether you can track a change of mind and distinguish the final answer from an earlier idea.",
+    explanation: "These short-extract tasks often test whether you can track a change of mind and distinguish the final answer from an earlier idea.",
   },
   {
     id: "second-listen",
@@ -181,7 +181,7 @@ export default function OteAdvancedListeningPart1Guide({ nativeRoutes = false })
       section: "listening",
       part: "part-1",
       mode: "advanced_guide",
-      taskTitle: "Advanced Listening Part 1 guide",
+      taskTitle: "Advanced Listening Parts 1 and 4 guide",
       score: correctCount,
       total: quizQuestions.length,
     });
@@ -190,68 +190,78 @@ export default function OteAdvancedListeningPart1Guide({ nativeRoutes = false })
   return (
     <main className="ote-training-page">
       <Seo
-        title="OTE Advanced Listening Part 1 Guide | Seif English"
-        description="Prepare for OTE Advanced Listening Part 1 with its format, question types, two-listening strategy, distractor traps, and a review quiz."
+        title="OTE Advanced Listening Parts 1 & 4 Guide | Seif English"
+        description="Prepare for OTE Advanced Listening Parts 1 and 4 with their shared short-extract format, answer-option difference, two-listening strategy, distractor traps, and review quiz."
       />
 
       <button className="ote-training-back" type="button" onClick={() => navigate(menuPath)}>
         <ArrowLeft size={18} aria-hidden="true" />
-        Back to Part 1 training
+        Back to Parts 1 & 4 training
       </button>
 
       <header className="ote-training-hero">
-        <p className="ote-kicker">Advanced Listening Part 1</p>
+        <p className="ote-kicker">Advanced Listening Parts 1 & 4</p>
         <h1>Short Dialogues and Monologues</h1>
         <p>
-          Listen to five separate short recordings and answer one three-option question on each.
-          The task tests whether you can identify a speaker's purpose, attitude, implication, or
-          final decision while rejecting convincing distractors.
+          Parts 1 and 4 use essentially the same task: listen to five separate short recordings
+          and answer one three-option question on each. Part 1 may include picture options,
+          whereas Part 4 uses text options only.
         </p>
       </header>
 
-      <section className="ote-training-summary" aria-label="Advanced Listening Part 1 essentials">
+      <section className="ote-training-summary" aria-label="Advanced Listening Parts 1 and 4 essentials">
         <div>
           <Headphones size={24} aria-hidden="true" />
-          <strong>5 short recordings</strong>
-          <span>Each dialogue or monologue is independent and has one question.</span>
+          <strong>5 recordings per part</strong>
+          <span>Each short dialogue or monologue is independent and has one question.</span>
         </div>
         <div>
           <ListChecks size={24} aria-hidden="true" />
-          <strong>3 options each</strong>
-          <span>The options may be text or, in B2 items, pictures.</span>
+          <strong>One format difference</strong>
+          <span>Part 1 may use pictures or text; Part 4 uses text only.</span>
         </div>
         <div>
           <Ear size={24} aria-hidden="true" />
-          <strong>Up to 2 listens</strong>
-          <span>Use the first for the whole situation and the second to confirm the evidence.</span>
+          <strong>The same core method</strong>
+          <span>Use the first listen for the situation and the second to confirm the evidence.</span>
         </div>
       </section>
 
       <section className="ote-training-section">
-        <h2>How the Task Works</h2>
+        <h2>How Both Parts Work</h2>
         <p>
           Before each recording, you hear the situation and question and can inspect the three
           options. The recording then plays automatically. After the first play, you can listen
           again before making your final choice.
         </p>
         <p>
-          At advanced level, more than one option may reuse genuine details from the recording.
-          The correct answer is the option that matches the speaker's complete meaning. At C1,
-          the speech may also contain natural hesitation, reformulation, idiomatic language, or a
-          conclusion that is implied rather than stated directly.
+          The answer-option presentation changes, but the listening skill does not. More than one
+          option may reuse genuine details from the recording, and the correct answer is the one
+          that matches the speaker's complete meaning. At C1, the speech may also contain natural
+          hesitation, reformulation, idiomatic language, or a conclusion that is implied rather
+          than stated directly.
         </p>
         <div className="ote-practice-specific-prompt">
           <p>
-            <strong>Adaptive link to Part 2:</strong> after your fifth Part 1 response, the test
-            updates its estimate of your level. That estimate determines whether you see the B2 or
-            C1 version of Part 2.
+            <strong>Where Part 1 fits:</strong> after your fifth Part 1 response, the test updates
+            its estimate of your level. That estimate determines whether you see the B2 or C1
+            version of Part 2. Part 4 returns to the same short-extract skills later in the module,
+            without picture questions.
+          </p>
+        </div>
+        <div className="ote-practice-specific-prompt">
+          <p>
+            <strong>Is Part 4 harder?</strong> Not automatically. Both parts cover the same B2-C1
+            range and the difficulty varies from item to item. Later questions may concentrate the
+            more interpretive end of the format, especially a speaker's purpose, priority, or
+            attitude, but the technique remains the same.
           </p>
         </div>
       </section>
 
       <section className="ote-training-section">
         <h2>What Can the Question Test?</h2>
-        <div className="ote-training-compare" role="table" aria-label="Advanced Listening Part 1 question types">
+        <div className="ote-training-compare" role="table" aria-label="Advanced Listening Parts 1 and 4 question types">
           <div className="ote-training-compare-head" role="row">
             <span role="columnheader">Question type</span>
             <span role="columnheader">What it asks</span>
@@ -334,7 +344,7 @@ export default function OteAdvancedListeningPart1Guide({ nativeRoutes = false })
       <section className="ote-training-section ote-training-quiz">
         <div className="ote-training-quiz-header">
           <div>
-            <h2>Part 1 Review Quiz</h2>
+            <h2>Parts 1 & 4 Review Quiz</h2>
             <p>Choose an answer to get immediate feedback.</p>
           </div>
           <div className="ote-training-score" aria-live="polite">
@@ -368,7 +378,7 @@ export default function OteAdvancedListeningPart1Guide({ nativeRoutes = false })
 
       <section className="ote-training-section">
         <button className="ote-training-primary-link" type="button" onClick={() => navigate(practicePath)}>
-          Open timed Advanced Part 1 practice
+          Open timed Advanced Parts 1 & 4 practice
         </button>
       </section>
     </main>
