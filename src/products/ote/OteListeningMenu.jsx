@@ -361,12 +361,12 @@ export default function OteListeningMenu({ user, nativeRoutes = false }) {
   const activeVariant = getUserListeningVariant(user);
   const config = LISTENING_VARIANTS[activeVariant];
   const completedProgress = useOteTrainingProgress();
-  const canSeeGeneralPart3 = user?.role === "teacher" || user?.role === "admin";
+  const canSeeHiddenSets = user?.role === "teacher" || user?.role === "admin";
   const visibleParts = config.parts.filter(
     (part) =>
       part.id !== "part-3-opinion-matching" ||
       activeVariant === "advanced" ||
-      canSeeGeneralPart3
+      canSeeHiddenSets
   );
 
   return (
@@ -395,7 +395,10 @@ export default function OteListeningMenu({ user, nativeRoutes = false }) {
             const Icon = part.icon || ListChecks;
             const partPath = getSitePath(`${basePath}/${activeVariant}/${part.id}`);
             const partSets = getListeningSets(activeVariant, part.id);
-            const readyPartSets = partSets.filter((set) => set.assetsReady !== false);
+            const listedPartSets = canSeeHiddenSets
+              ? partSets
+              : partSets.filter((set) => set.hiddenFromStudentMenu !== true);
+            const readyPartSets = listedPartSets.filter((set) => set.assetsReady !== false);
             const completedPartSets = readyPartSets.filter((set) =>
               completedProgress.has(getListeningTaskId(activeVariant, part.id, set.id))
             );
@@ -408,8 +411,8 @@ export default function OteListeningMenu({ user, nativeRoutes = false }) {
                 {part.availableSets ? (
                   <strong className="ote-reading-menu-progress">
                     {completedPartSets.length}/{readyPartSets.length} available sets complete
-                    {partSets.length > readyPartSets.length
-                      ? ` · ${partSets.length - readyPartSets.length} in production`
+                    {listedPartSets.length > readyPartSets.length
+                      ? ` · ${listedPartSets.length - readyPartSets.length} in production`
                       : ""}
                   </strong>
                 ) : (

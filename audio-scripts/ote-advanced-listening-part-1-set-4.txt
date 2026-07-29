@@ -1,0 +1,90 @@
+OTE Advanced Listening Parts 1 & 4 — Set 4 · C1 Challenge (revised)
+Audio generation scripts
+
+The question and option recordings are shared with Set 3.
+Only the five listening extracts below require new recordings.
+
+Do not add “Now listen again” or announce the answers.
+The application inserts the repeat cue and replays each listening item automatically.
+
+
+LISTENING ITEM RECORDINGS
+
+ITEM 1
+Output filename: item-1.mp3
+
+Woman: I’ve reworked the chapter and added more from the interviews. I’m still not sure what to do where people remember the same event differently.
+
+Man: Those disagreements give the chapter energy. A little more context might help the reader judge whether they come from memory, position or simply the questions you asked.
+
+Woman: I wondered whether the harbour interview was the weakest.
+
+Man: It is less vivid, though it gives you the only view from seasonal workers. I also noticed how often the discussion seemed to begin again. The cooperative raises the question of who gets heard, but the market section opens with fresh background rather than making use of it. The conclusion eventually supplies the links, though rather late.
+
+Woman: So the harbour section may have to go?
+
+Man: If the word limit forces a cut, that would be the obvious candidate.
+
+
+ITEM 2
+Output filename: item-2.mp3
+
+Man: The developers have submitted another version of the waterfront scheme. Has it changed your view?
+
+Woman: It’s a much more serious response than the first one. The access road has moved away from the school, residents have another month to comment, and the roof gardens are deeper than before. They’ve enlarged the flood-storage area as well.
+
+Man: You sound almost won over.
+
+Woman: Not quite. The figures place mature trees beside planted roof space as though the same number of square metres meant the same thing. One provides shade and holds rainwater from day one; the other depends on years of growth and careful maintenance. The revised drainage helps, but only after soil that already absorbs water has been removed.
+
+Man: Still, they’ve shifted a long way.
+
+Woman: They have. The willingness to listen is better than I expected.
+
+
+ITEM 3
+Output filename: item-3.mp3
+
+Woman: The report says online ticketing cut administrative work by almost a third.
+
+Man: Take the volunteer-run theatres. Their paid staff spent fewer hours processing bookings, but volunteers began answering evening emails, sorting out failed payments and helping customers who could not use the system.
+
+Woman: The theatres still saved money.
+
+Man: On payroll, certainly. Yet the same kinds of enquiries were still being dealt with; they had simply moved outside paid hours. It also makes those theatres awkward to compare with venues where every hour of support is salaried, because the two organisations are counting rather different things.
+
+Woman: National employment figures would miss the volunteers too.
+
+Man: Completely. Officially, those hours are almost invisible.
+
+
+ITEM 4
+Output filename: item-4.mp3
+
+Woman: I’m thinking of applying for the coastal field project, but I’m only in my first year. Are places usually taken by older students?
+
+Man: There are about five applicants for each place, although the panel does not favour people simply because they are further through a degree. What catches people out is the way the week runs. Boat trips move when the weather changes, senior researchers may be away from the station for most of a day, and the timetable does not tell you what to do with every spare hour.
+
+Woman: I’ve only done fieldwork once.
+
+Man: Experience helps, but last year some first-year students adapted faster than people who had done several projects. They asked sensible questions before the boats left, then found useful work when the original plan collapsed.
+
+Woman: Would applying be unrealistic?
+
+Man: Your laboratory results are strong, and the proposal you’ve outlined would be competitive.
+
+
+ITEM 5
+Output filename: item-5.mp3
+
+Woman: You listened to the documentary podcast series on housing policy. Did it seem balanced?
+
+Man: More than the publicity suggested. Tenants, landlords and council officers receive roughly comparable time, although the tenants’ accounts are edited more memorably. Professor Hale appears in every episode, and later contributors are often asked questions using terms she introduced.
+
+Woman: So she controls the argument?
+
+Man: I wouldn’t say that. Her claims are challenged, and the editors do not simply adopt her conclusions. The three tenant stories all come from one city and were found through the same campaign group, yet by the final episode the narration has shifted to statements about renters nationally.
+
+Woman: Would you recommend it?
+
+Man: Yes. Hale remains the clearest contributor, which may be why her voice stays with you afterwards.
