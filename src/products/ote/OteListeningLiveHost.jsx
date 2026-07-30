@@ -76,6 +76,8 @@ export default function OteListeningLiveHost({ user }) {
   const phase = game?.state?.phase || "lobby";
   const questionIndex = game?.state?.questionIndex || 0;
   const reviewIndex = game?.state?.reviewIndex || 0;
+  const scriptCheckIndex =
+    activity?.format === "part1" ? questionIndex : reviewIndex;
   const currentItem =
     activity?.format === "part1"
       ? items[questionIndex]
@@ -186,19 +188,36 @@ export default function OteListeningLiveHost({ user }) {
       await setLiveGameState(gameId, { phase: "script_check", reviewIndex: questionIndex });
       return;
     }
-    await setLiveGameState(gameId, { phase: "review", reviewIndex: 0 });
+    const totalAnswers = players.reduce(
+      (total, player) =>
+        total +
+        items.filter((item) => hasSubmittedAnswer(player.listeningAnswers?.[item.id])).length,
+      0
+    );
+    const expectedAnswers = players.length * items.length;
+    if (
+      totalAnswers < expectedAnswers &&
+      !window.confirm(
+        `${expectedAnswers - totalAnswers} answer(s) have not been submitted. Begin the script checks anyway?`
+      )
+    ) return;
+    await setLiveGameState(gameId, { phase: "script_check", reviewIndex: 0 });
   }
 
-  async function revealFinalFeedback() {
+  async function advanceFromScriptCheck() {
     stopAudio();
     const checked = scriptCheckCount(currentItem.id);
     if (
       checked < players.length &&
       !window.confirm(
-        `${players.length - checked} student(s) have not confirmed their script-check answer. Reveal the correct answer anyway?`
+        `${players.length - checked} student(s) have not confirmed their script-check answer. Move on anyway?`
       )
     ) return;
-    await setLiveGameState(gameId, { phase: "review", reviewIndex: questionIndex });
+    if (activity.format === "part1") {
+      await setLiveGameState(gameId, { phase: "review", reviewIndex: questionIndex });
+      return;
+    }
+    await setLiveGameState(gameId, { phase: "review", reviewIndex });
   }
 
   async function nextFromReview() {
@@ -218,7 +237,10 @@ export default function OteListeningLiveHost({ user }) {
       return;
     }
     if (reviewIndex < items.length - 1) {
-      await setLiveGameState(gameId, { reviewIndex: reviewIndex + 1 });
+      await setLiveGameState(gameId, {
+        phase: "script_check",
+        reviewIndex: reviewIndex + 1,
+      });
     } else {
       await finishSession();
     }
@@ -231,6 +253,14 @@ export default function OteListeningLiveHost({ user }) {
 
   function answerCount(itemId) {
     return players.filter((player) => player.listeningAnswers?.[itemId]).length;
+  }
+
+  function hasSubmittedAnswer(record) {
+    return (
+      record?.value !== undefined &&
+      record?.value !== null &&
+      String(record.value).trim() !== ""
+    );
   }
 
   function scriptCheckCount(itemId) {
@@ -271,7 +301,7 @@ export default function OteListeningLiveHost({ user }) {
           {phase === "lobby"
             ? "Lobby"
             : phase === "script_check"
-              ? `Script check ${questionIndex + 1}/${items.length}`
+              ? `Script check ${scriptCheckIndex + 1}/${items.length}`
               : phase === "review"
                 ? `Feedback ${reviewIndex + 1}/${items.length}`
                 : phase === "finished"
@@ -331,12 +361,12 @@ export default function OteListeningLiveHost({ user }) {
           </div>
 
           <div className="ote-listening-live-response-bar">
-            <span><Users size={17} /> {activity.format === "part1" ? `${answerCount(currentItem.id)} of ${players.length} answered` : `${players.reduce((total, player) => total + items.filter((item) => player.listeningAnswers?.[item.id]).length, 0)} of ${players.length * items.length} answers received`}</span>
+            <span><Users size={17} /> {activity.format === "part1" ? `${answerCount(currentItem.id)} of ${players.length} answered` : `${players.reduce((total, player) => total + items.filter((item) => hasSubmittedAnswer(player.listeningAnswers?.[item.id])).length, 0)} of ${players.length * items.length} answers received`}</span>
             <span>{playCount}/2 main plays started</span>
           </div>
           <ListeningTask activity={activity} answers={{}} disabled questionIndex={questionIndex} />
           <button className="ote-listening-live-primary" type="button" onClick={advanceFromTask}>
-            <Eye size={18} /> {activity.format === "part1" ? "Reveal script check" : "Reveal detailed feedback"}
+            <Eye size={18} /> {activity.format === "part1" ? "Reveal script check" : "Begin script checks"}
           </button>
         </section>
       ) : null}
@@ -352,13 +382,21 @@ export default function OteListeningLiveHost({ user }) {
             </span>
             <span>The correct answer is still hidden</span>
           </div>
-          <ListeningScriptCheck item={currentItem} value={undefined} disabled />
+          <ListeningScriptCheck
+            activity={activity}
+            item={currentItem}
+            value={undefined}
+            disabled
+          />
           <button
             className="ote-listening-live-primary"
             type="button"
-            onClick={revealFinalFeedback}
+            onClick={advanceFromScriptCheck}
           >
-            <Eye size={18} /> Reveal correct answer and evidence
+            <Eye size={18} />{" "}
+            {activity.format === "part1"
+              ? "Reveal correct answer and evidence"
+              : "Reveal correct answer and evidence"}
           </button>
         </section>
       ) : null}
@@ -378,7 +416,7 @@ export default function OteListeningLiveHost({ user }) {
             <ChevronRight size={18} />
             {activity.format === "part1"
               ? questionIndex === items.length - 1 ? "Finish session" : `Open Question ${questionIndex + 2}`
-              : reviewIndex === items.length - 1 ? "Finish session" : `Review answer ${reviewIndex + 2}`}
+              : reviewIndex === items.length - 1 ? "Finish session" : `Open script check ${reviewIndex + 2}`}
           </button>
         </section>
       ) : null}
@@ -428,9 +466,8 @@ function ListeningLiveReport({ activity, items, players }) {
             <div key={player.id}>
               <strong>{player.name}</strong>
               <span>
-                {activity.format === "part1"
-                  ? `Final ${score}/${items.length} · Before script ${initialScore}/${items.length} · ${changes} changed`
-                  : `${score}/${items.length}`}
+                Final {score}/{items.length} · Before script {initialScore}/{items.length} · {changes}{" "}
+                {changes === 1 ? "answer" : "answers"} changed
               </span>
             </div>
           );

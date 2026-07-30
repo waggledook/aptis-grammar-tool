@@ -191,9 +191,7 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
   const menuPath = getSitePath(basePath);
   const listeningSets = getListeningSets(variant, partId);
   const hasListeningSets = listeningSets.length > 0;
-  const visiblePracticeSets = canHostLive
-    ? listeningSets
-    : listeningSets.filter((set) => set.hiddenFromStudentMenu !== true);
+  const visiblePracticeSets = listeningSets;
   const hasVisiblePracticeSets = visiblePracticeSets.length > 0;
   const guideCards = (part.guides || []).map((guide) => ({
     ...guide,
@@ -279,7 +277,8 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
               const isComplete = completedProgress.has(
                 getListeningTaskId(variant, partId, set.id)
               );
-              const isReady = set.assetsReady !== false;
+              const isReady =
+                set.assetsReady !== false && set.practiceReady !== false;
               const mainAudioReady = set.audioReady !== false;
               const instructionAudioReady = set.instructionAudioReady !== false;
               const levelLabel = set.level || (variant === "advanced" ? "B2-C1" : "A2-B2");
@@ -295,7 +294,9 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
                   <Headphones size={28} aria-hidden="true" />
                   <span>
                     {!isReady
-                      ? `${levelLabel} · Assets in production`
+                      ? set.practiceReady === false
+                        ? `${levelLabel} · Audio pending`
+                        : `${levelLabel} · Assets in production`
                       : mainAudioReady
                         ? `${levelLabel} · Timed practice`
                         : `${levelLabel} · Content preview`}
@@ -303,7 +304,11 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
                   <h2>{set.title}</h2>
                   <p>{set.description}</p>
                   {!isReady ? (
-                    <strong className="ote-reading-menu-progress">Content integrated · Images and audio pending</strong>
+                    <strong className="ote-reading-menu-progress">
+                      {set.practiceReady === false
+                        ? "Content integrated · Final discussion audio pending"
+                        : "Content integrated · Images and audio pending"}
+                    </strong>
                   ) : !mainAudioReady ? (
                     <strong className="ote-reading-menu-progress">Browser-voice preview · Final audio pending</strong>
                   ) : !instructionAudioReady ? (
@@ -361,13 +366,7 @@ export default function OteListeningMenu({ user, nativeRoutes = false }) {
   const activeVariant = getUserListeningVariant(user);
   const config = LISTENING_VARIANTS[activeVariant];
   const completedProgress = useOteTrainingProgress();
-  const canSeeHiddenSets = user?.role === "teacher" || user?.role === "admin";
-  const visibleParts = config.parts.filter(
-    (part) =>
-      part.id !== "part-3-opinion-matching" ||
-      activeVariant === "advanced" ||
-      canSeeHiddenSets
-  );
+  const visibleParts = config.parts;
 
   return (
     <main className="menu-wrapper hub-menu-wrapper ote-menu-wrapper ote-listening-menu">
@@ -395,10 +394,11 @@ export default function OteListeningMenu({ user, nativeRoutes = false }) {
             const Icon = part.icon || ListChecks;
             const partPath = getSitePath(`${basePath}/${activeVariant}/${part.id}`);
             const partSets = getListeningSets(activeVariant, part.id);
-            const listedPartSets = canSeeHiddenSets
-              ? partSets
-              : partSets.filter((set) => set.hiddenFromStudentMenu !== true);
-            const readyPartSets = listedPartSets.filter((set) => set.assetsReady !== false);
+            const listedPartSets = partSets;
+            const readyPartSets = listedPartSets.filter(
+              (set) =>
+                set.assetsReady !== false && set.practiceReady !== false
+            );
             const completedPartSets = readyPartSets.filter((set) =>
               completedProgress.has(getListeningTaskId(activeVariant, part.id, set.id))
             );

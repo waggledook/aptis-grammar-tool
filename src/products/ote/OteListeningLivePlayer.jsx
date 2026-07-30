@@ -53,6 +53,8 @@ export default function OteListeningLivePlayer() {
   const phase = game?.state?.phase || "lobby";
   const questionIndex = game?.state?.questionIndex || 0;
   const reviewIndex = game?.state?.reviewIndex || 0;
+  const scriptCheckIndex =
+    activity?.format === "part1" ? questionIndex : reviewIndex;
   const reviewItem = items[activity?.format === "part1" ? questionIndex : reviewIndex];
   const remoteAnswers = useMemo(() => {
     if (!uid) return {};
@@ -238,7 +240,7 @@ export default function OteListeningLivePlayer() {
           {phase === "lobby"
             ? "Waiting"
             : phase === "script_check"
-              ? `Script check ${questionIndex + 1}/${items.length}`
+              ? `Script check ${scriptCheckIndex + 1}/${items.length}`
               : phase === "review"
                 ? `Feedback ${reviewIndex + 1}/${items.length}`
                 : phase === "finished"
@@ -279,6 +281,7 @@ export default function OteListeningLivePlayer() {
             Read the script and check your evidence. The correct answer is still hidden.
           </ListeningLiveStatus>
           <ListeningScriptCheck
+            activity={activity}
             confirmed={Boolean(
               player.listeningAnswers?.[reviewItem.id]?.scriptCheckedAt
             )}
@@ -292,7 +295,7 @@ export default function OteListeningLivePlayer() {
           />
           <div className="ote-listening-live-wait is-compact">
             <Radio size={25} />
-            <p>Your teacher controls when the correct answer is revealed.</p>
+            <p>Your teacher controls when the class moves on.</p>
           </div>
         </section>
       ) : null}
@@ -351,12 +354,10 @@ function StudentResult({ activity, answerRecords, answers, items }) {
         <CheckCircle2 size={42} />
         <h2>Session complete</h2>
         <p>You answered {score} of {items.length} questions correctly.</p>
-        {activity.format === "part1" ? (
-          <p>
-            Before checking the scripts: {initialScore}/{items.length}. You changed {changes}{" "}
-            {changes === 1 ? "answer" : "answers"} after reading the evidence.
-          </p>
-        ) : null}
+        <p>
+          Before checking the scripts: {initialScore}/{items.length}. You changed {changes}{" "}
+          {changes === 1 ? "answer" : "answers"} after reading the evidence.
+        </p>
       </div>
     </section>
   );

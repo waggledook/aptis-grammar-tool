@@ -100,7 +100,155 @@ function partOneAnswerText(item, value, emptyLabel = "No answer submitted") {
   return `${optionLetter(value)}. ${item.options[value].text}`;
 }
 
+function hasListeningAnswer(value) {
+  return value !== undefined && value !== null && String(value).trim() !== "";
+}
+
+function answersMatch(activity, first, second) {
+  if (activity.format === "advanced-part2") {
+    return normaliseListeningAnswer(first) === normaliseListeningAnswer(second);
+  }
+  return first === second;
+}
+
+function listeningAnswerText(activity, item, value, emptyLabel = "No answer submitted") {
+  if (!hasListeningAnswer(value)) return emptyLabel;
+  if (activity.format === "part1") return partOneAnswerText(item, value, emptyLabel);
+  if (activity.format === "general-part2") {
+    return item.options[value]
+      ? `${optionLetter(value)}. ${item.options[value]}`
+      : emptyLabel;
+  }
+  if (activity.format === "part3") {
+    return activity.set.speakers.find((speaker) => speaker.id === value)?.label || String(value);
+  }
+  return String(value).trim();
+}
+
+function getListeningScriptExcerpt(activity, item) {
+  if (activity.format === "part1") return item.script || [];
+
+  const script = activity.set.script || [];
+  const evidence = evidenceFor(activity, item);
+  const matchingLineIndexes = evidence.flatMap((entry) => {
+    const index = script.findIndex((line) => line.text.includes(entry.quote));
+    return index >= 0 ? [index] : [];
+  });
+
+  if (!matchingLineIndexes.length) return script;
+  const firstIndex = Math.min(...matchingLineIndexes);
+  const lastIndex = Math.max(...matchingLineIndexes);
+  return script.slice(firstIndex, lastIndex + 1);
+}
+
+function ScriptCheckAnswer({ activity, item, value, onChange, disabled }) {
+  if (activity.format === "part1") {
+    return (
+      <PartOneQuestion
+        disabled={disabled}
+        item={item}
+        onChange={onChange}
+        value={value}
+      />
+    );
+  }
+
+  if (activity.format === "general-part2") {
+    const itemNumber = activity.set.items.findIndex((entry) => entry.id === item.id) + 1;
+    return (
+      <div className="ote-general-listening-notes-sheet">
+        <section>
+          <h3>{item.section}</h3>
+          <GeneralChoiceRow
+            disabled={disabled}
+            item={item}
+            number={itemNumber}
+            onChange={onChange}
+            value={value}
+          />
+        </section>
+      </div>
+    );
+  }
+
+  if (activity.format === "part3") {
+    const itemNumber = activity.set.opinions.findIndex((entry) => entry.id === item.id) + 1;
+    return (
+      <div className="ote-listening-opinion-sheet">
+        <div className="ote-listening-opinion-heading" aria-hidden="true">
+          <span>Opinion</span>
+          {activity.set.speakers.map((speaker) => (
+            <strong key={speaker.id}>{speaker.label}</strong>
+          ))}
+        </div>
+        <section className="ote-listening-opinion-row">
+          <div className="ote-listening-opinion-copy">
+            <strong>{itemNumber}</strong>
+            <p>{item.text}</p>
+          </div>
+          <div
+            className="ote-listening-opinion-options"
+            role="radiogroup"
+            aria-label={`Opinion ${itemNumber}: ${item.text}`}
+          >
+            {activity.set.speakers.map((speaker) => {
+              const selected = value === speaker.id;
+              return (
+                <button
+                  aria-checked={selected}
+                  className={selected ? "is-selected" : ""}
+                  disabled={disabled}
+                  key={speaker.id}
+                  onClick={() => onChange?.(speaker.id)}
+                  role="radio"
+                  type="button"
+                >
+                  <span aria-hidden="true" />
+                  <strong>{speaker.label}</strong>
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  const itemNumber = activity.set.gaps.findIndex((entry) => entry.id === item.id) + 1;
+  const leadingPunctuation = item.after.match(/^[.,;:]/)?.[0] || "";
+  const remainingText = leadingPunctuation ? item.after.slice(1) : item.after;
+  return (
+    <div className="ote-listening-notes-sheet">
+      <section>
+        <h3>{item.section}</h3>
+        <p className="ote-listening-note-line">
+          <span>{item.before} </span>
+          <label>
+            <span className="sr-only">Gap {itemNumber}</span>
+            <span className="ote-listening-gap-number" aria-hidden="true">{itemNumber}</span>
+            <input
+              aria-label={`Gap ${itemNumber}`}
+              autoComplete="off"
+              disabled={disabled}
+              onChange={(event) => onChange?.(event.target.value)}
+              type="text"
+              value={value || ""}
+            />
+            {leadingPunctuation ? (
+              <span className="ote-listening-gap-punctuation" aria-hidden="true">
+                {leadingPunctuation}
+              </span>
+            ) : null}
+          </label>
+          <span>{remainingText}</span>
+        </p>
+      </section>
+    </div>
+  );
+}
+
 export function ListeningScriptCheck({
+  activity,
   item,
   originalValue,
   originalSubmitted,
@@ -110,16 +258,17 @@ export function ListeningScriptCheck({
   confirmed = false,
   disabled = false,
 }) {
-  const hasAnswer = value !== undefined && value !== null;
+  const hasAnswer = hasListeningAnswer(value);
   const hasOriginalRecord =
     originalSubmitted !== undefined ||
-    (originalValue !== undefined && originalValue !== null);
+    hasListeningAnswer(originalValue);
   const originalWasSubmitted =
     originalSubmitted ??
-    (originalValue !== undefined && originalValue !== null);
+    hasListeningAnswer(originalValue);
   const changed =
     hasAnswer &&
-    (!originalWasSubmitted || value !== originalValue);
+    (!originalWasSubmitted || !answersMatch(activity, value, originalValue));
+  const scriptExcerpt = getListeningScriptExcerpt(activity, item);
 
   return (
     <section className="ote-listening-script-check">
@@ -127,7 +276,7 @@ export function ListeningScriptCheck({
         <p className="ote-kicker">Script check</p>
         <h2>Check the evidence before the answer is revealed</h2>
         <p>
-          Read the unmarked script, compare it with all three options, and decide whether to keep
+          Read the relevant unmarked section, compare it with the task, and decide whether to keep
           or revise the answer chosen while listening.
         </p>
       </div>
@@ -137,21 +286,22 @@ export function ListeningScriptCheck({
           <span>Answer before seeing the script</span>
           <strong>
             {originalWasSubmitted
-              ? partOneAnswerText(item, originalValue)
+              ? listeningAnswerText(activity, item, originalValue)
               : "No answer submitted"}
           </strong>
         </div>
       ) : null}
 
-      <PartOneQuestion
-        disabled={disabled || confirmed}
+      <ScriptCheckAnswer
+        activity={activity}
         item={item}
+        disabled={disabled || confirmed}
         onChange={onChange}
         value={value}
       />
 
       <div className="ote-listening-script-check-transcript" aria-label="Unmarked listening script">
-        {item.script.map((line, index) => (
+        {scriptExcerpt.map((line, index) => (
           <p key={`${line.speaker}-${index}`}>
             <strong>{line.speaker}:</strong> {line.text}
           </p>
@@ -176,7 +326,7 @@ export function ListeningScriptCheck({
           </button>
           <p>
             {confirmed
-              ? "Your final choice is locked. The teacher will reveal the correct answer next."
+              ? "Your final choice is locked. The teacher will move the class on."
               : "The correct answer and highlighted evidence are still hidden."}
           </p>
         </div>
@@ -425,13 +575,7 @@ export function ListeningFeedback({
       : item.answer;
   const selectedText = !hasResponse
     ? "No answer submitted"
-    : isPartOne
-      ? `${optionLetter(selectedValue)}. ${item.options[selectedValue].text}`
-      : isPartThree
-        ? activity.set.speakers.find((speaker) => speaker.id === selectedValue)?.label || String(selectedValue)
-      : activity.format === "general-part2"
-        ? `${optionLetter(selectedValue)}. ${item.options[selectedValue]}`
-        : String(selectedValue).trim();
+    : listeningAnswerText(activity, item, selectedValue);
   const hasInitialResponse =
     initialSubmitted === false
       ? false
@@ -439,13 +583,15 @@ export function ListeningFeedback({
         initialValue !== null &&
         String(initialValue).trim() !== "";
   const hasInitialRecord = initialSubmitted !== undefined || hasInitialResponse;
-  const initialText = isPartOne
-    ? partOneAnswerText(item, initialValue, "No answer submitted")
-    : "";
+  const initialText = listeningAnswerText(
+    activity,
+    item,
+    initialValue,
+    "No answer submitted"
+  );
   const changedAfterScript =
-    isPartOne &&
     hasResponse &&
-    (!hasInitialResponse || initialValue !== selectedValue);
+    (!hasInitialResponse || !answersMatch(activity, initialValue, selectedValue));
   const correct =
     isPartOne || activity.format === "general-part2"
       ? selectedValue === item.answer
@@ -462,7 +608,7 @@ export function ListeningFeedback({
           <h3>{correctText}</h3>
         </div>
       </header>
-      {!showAudio && isPartOne && hasInitialRecord ? (
+      {!showAudio && hasInitialRecord ? (
         <div className="ote-listening-answer-journey">
           <div>
             <span>Before the script</span>
@@ -512,7 +658,7 @@ export function ListeningFeedback({
         <span className="is-distractor">Distractor evidence</span>
       </div>
       <div className="ote-listening-feedback-script">
-        {(isPartOne ? item.script : activity.set.script).map((line, index) => (
+        {getListeningScriptExcerpt(activity, item).map((line, index) => (
           <p key={`${line.speaker}-${index}`}>
             <strong>{line.speaker}:</strong>{" "}
             {renderHighlightedText(line.text, evidence)}

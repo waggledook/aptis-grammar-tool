@@ -14,6 +14,7 @@ export const generalListeningPart3Sets = [
     description:
       "Match five opinions about a visit to a new sports centre to the woman, the man, or both speakers.",
     assetsReady: true,
+    practiceReady: false,
     audioReady: false,
     audioSrc: "/audio/ote/listening/general/part-3/a2-sports-centre/discussion.mp3",
     instructionAudioReady: false,
@@ -201,9 +202,9 @@ export const generalListeningPart3Sets = [
     description:
       "Match five opinions about a community arts centre to the woman, the man, or both speakers.",
     assetsReady: true,
-    audioReady: false,
+    audioReady: true,
     audioSrc: "/audio/ote/listening/general/part-3/b1-community-arts-centre/discussion.mp3",
-    instructionAudioReady: false,
+    instructionAudioReady: true,
     instructionAudioSrc: "/audio/ote/listening/general/part-3/b1-community-arts-centre/question.mp3",
     instructions:
       "Listen to a man and a woman talking about a new community arts centre. Match the people—the woman, the man or both—to the opinions below. The first one has been done for you.",
@@ -399,9 +400,9 @@ export const generalListeningPart3Sets = [
     description:
       "Match five opinions about plans for a town market to the woman, the man, or both speakers.",
     assetsReady: true,
-    audioReady: false,
+    audioReady: true,
     audioSrc: "/audio/ote/listening/general/part-3/b2-town-market/discussion.mp3",
-    instructionAudioReady: false,
+    instructionAudioReady: true,
     instructionAudioSrc: "/audio/ote/listening/general/part-3/b2-town-market/question.mp3",
     instructions:
       "Listen to a man and a woman discussing plans for a town market. Match the people—the woman, the man or both—to the opinions below. The first one has been done for you.",
