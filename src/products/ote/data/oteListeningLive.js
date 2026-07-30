@@ -4,6 +4,7 @@ import { advancedListeningPart3Sets } from "./oteAdvancedListeningPart3.js";
 import { generalListeningPart1Sets } from "./oteGeneralListeningPart1.js";
 import { generalListeningPart2Sets } from "./oteGeneralListeningPart2.js";
 import { generalListeningPart3Sets } from "./oteGeneralListeningPart3.js";
+import { generalListeningPart4Sets } from "./oteGeneralListeningPart4.js";
 
 export const OTE_LISTENING_LIVE_GAME_TYPE = "ote_listening_teacher";
 
@@ -16,7 +17,7 @@ function buildActivity(variant, part, set) {
     level: set.level || (variant === "advanced" ? "B2-C1" : "A2-B2"),
     title: set.title,
     format:
-      part === 1
+      part === 1 || part === 4
         ? "part1"
         : part === 3
           ? "part3"
@@ -34,6 +35,7 @@ const activities = [
   ...advancedListeningPart2Sets.map((set) => buildActivity("advanced", 2, set)),
   ...generalListeningPart3Sets.map((set) => buildActivity("general", 3, set)),
   ...advancedListeningPart3Sets.map((set) => buildActivity("advanced", 3, set)),
+  ...generalListeningPart4Sets.map((set) => buildActivity("general", 4, set)),
 ];
 
 export const oteListeningLiveActivities = Object.fromEntries(

@@ -21,6 +21,7 @@ import { advancedListeningPart3Sets } from "./data/oteAdvancedListeningPart3.js"
 import { generalListeningPart1Sets } from "./data/oteGeneralListeningPart1.js";
 import { generalListeningPart2Sets } from "./data/oteGeneralListeningPart2.js";
 import { generalListeningPart3Sets } from "./data/oteGeneralListeningPart3.js";
+import { generalListeningPart4Sets } from "./data/oteGeneralListeningPart4.js";
 import { useOteTrainingProgress } from "./utils/trainingProgress.js";
 import { createOteListeningLiveGame } from "../../api/liveGames.js";
 import { getOteListeningLiveActivityId } from "./data/oteListeningLive.js";
@@ -41,6 +42,15 @@ const LISTENING_VARIANTS = {
         copy: "Five short monologues or dialogues with one three-picture multiple-choice question each.",
         icon: Image,
         availableSets: 3,
+        guides: [
+          {
+            title: "Picture Multiple Choice Strategy Guide",
+            copy: "Compare picture options, track changes of plan, and use the second listening to prove the exact detail.",
+            progressId: "listening.part1.general-guide",
+            route: "guide",
+            icon: BookOpen,
+          },
+        ],
       },
       {
         id: "part-2-note-completion",
@@ -66,6 +76,15 @@ const LISTENING_VARIANTS = {
         copy: "A longer dialogue with five questions matching opinions to the people who express them.",
         icon: Users,
         availableSets: 3,
+        guides: [
+          {
+            title: "Matching Opinions Strategy Guide",
+            copy: "Track each speaker's position, distinguish acknowledgement from agreement, and prove every “both” answer.",
+            progressId: "listening.part3.general-guide",
+            route: "guide",
+            icon: BookOpen,
+          },
+        ],
       },
       {
         id: "part-4-text-options",
@@ -73,6 +92,16 @@ const LISTENING_VARIANTS = {
         title: "Multiple-choice extracts",
         copy: "Five short monologues or dialogues with one three-option text question each.",
         icon: MessageSquareText,
+        availableSets: 2,
+        guides: [
+          {
+            title: "Text Multiple Choice Strategy Guide",
+            copy: "Identify each question's focus, compare the written options, and separate the speaker's main meaning from true but secondary details.",
+            progressId: "listening.part4.general-guide",
+            route: "guide",
+            icon: BookOpen,
+          },
+        ],
       },
     ],
   },
@@ -125,6 +154,15 @@ const LISTENING_VARIANTS = {
         copy: "A longer dialogue with five or six questions matching stated and implied opinions to speakers.",
         icon: Users,
         availableSets: 2,
+        guides: [
+          {
+            title: "Matching Opinions Strategy Guide",
+            copy: "Compare the adaptive B2 and C1 versions, then track ownership, scope, qualification, and implied positions.",
+            progressId: "listening.part3.advanced-guide",
+            route: "guide",
+            icon: BookOpen,
+          },
+        ],
       },
     ],
   },
@@ -148,6 +186,9 @@ function getListeningSets(variant, partId) {
   if (variant === "general" && partId === "part-3-opinion-matching") {
     return generalListeningPart3Sets;
   }
+  if (variant === "general" && partId === "part-4-text-options") {
+    return generalListeningPart4Sets;
+  }
   if (variant === "advanced" && partId === "part-1-short-extracts") {
     return advancedListeningPart1Sets;
   }
@@ -162,7 +203,9 @@ function getListeningSets(variant, partId) {
 
 function getListeningTaskId(variant, partId, setId) {
   const partNumber =
-    partId === "part-3-opinion-matching"
+    partId === "part-4-text-options"
+      ? 4
+      : partId === "part-3-opinion-matching"
       ? 3
       : partId === "part-2-note-completion"
         ? 2
@@ -200,7 +243,9 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
 
   async function launchLiveSet(set) {
     const partNumber =
-      partId === "part-3-opinion-matching"
+      partId === "part-4-text-options"
+        ? 4
+        : partId === "part-3-opinion-matching"
         ? 3
         : partId === "part-2-note-completion"
           ? 2

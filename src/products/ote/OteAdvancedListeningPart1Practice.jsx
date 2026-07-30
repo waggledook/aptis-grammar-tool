@@ -13,6 +13,7 @@ import { logOteTrainingCompleted, logOteTrainingStarted } from "../../firebase.j
 import { getSitePath } from "../../siteConfig.js";
 import { getAdvancedListeningPart1Set } from "./data/oteAdvancedListeningPart1.js";
 import { getGeneralListeningPart1Set } from "./data/oteGeneralListeningPart1.js";
+import { getGeneralListeningPart4Set } from "./data/oteGeneralListeningPart4.js";
 import "./styles/ote.css";
 
 const LISTEN_AGAIN_PROMPT_SRC = "/audio/ote/listening/instructions/now-listen-again.mp3";
@@ -161,31 +162,38 @@ export default function OteAdvancedListeningPart1Practice({
   user,
   nativeRoutes = false,
   variant = "advanced",
+  generalPart = 1,
 }) {
   const { setId: routeSetId } = useParams();
   const navigate = useNavigate();
   const isGeneral = variant === "general";
+  const isGeneralPart4 = isGeneral && generalPart === 4;
+  const partNumber = isGeneralPart4 ? 4 : 1;
   const listeningLabel = isGeneral ? "General" : "Advanced";
-  const partLabel = isGeneral ? "Part 1" : "Parts 1 & 4";
-  const setId = routeSetId || (isGeneral ? "a2-set-1" : "set-1");
+  const partLabel = isGeneralPart4 ? "Part 4" : isGeneral ? "Part 1" : "Parts 1 & 4";
+  const setId = routeSetId || (isGeneralPart4 ? "b1-set-1" : isGeneral ? "a2-set-1" : "set-1");
   const practiceSet = useMemo(
     () => (
-      isGeneral
+      isGeneralPart4
+        ? getGeneralListeningPart4Set(setId)
+        : isGeneral
         ? getGeneralListeningPart1Set(setId)
         : getAdvancedListeningPart1Set(setId)
     ),
-    [isGeneral, setId]
+    [isGeneral, isGeneralPart4, setId]
   );
   const menuPath = getSitePath(nativeRoutes ? "/listening" : "/ote/listening");
   const partPath = getSitePath(
     nativeRoutes
-      ? `/listening/${variant}/${isGeneral ? "part-1-picture-options" : "part-1-short-extracts"}`
-      : `/ote/listening/${variant}/${isGeneral ? "part-1-picture-options" : "part-1-short-extracts"}`
+      ? `/listening/${variant}/${isGeneralPart4 ? "part-4-text-options" : isGeneral ? "part-1-picture-options" : "part-1-short-extracts"}`
+      : `/ote/listening/${variant}/${isGeneralPart4 ? "part-4-text-options" : isGeneral ? "part-1-picture-options" : "part-1-short-extracts"}`
   );
   const questions = practiceSet.questions;
   const pictureQuestionCount = questions.filter((item) => item.kind === "pictures").length;
   const textQuestionCount = questions.length - pictureQuestionCount;
-  const formatSummary = isGeneral
+  const formatSummary = isGeneralPart4
+    ? `${textQuestionCount} text-option rounds.`
+    : isGeneral
     ? `${questions.length} picture-option rounds.`
     : pictureQuestionCount === 0
       ? `${textQuestionCount} text-option rounds, matching Part 4's answer format.`
@@ -373,12 +381,39 @@ export default function OteAdvancedListeningPart1Practice({
 
     const playOptions = () => {
       if (token !== ttsTokenRef.current) return;
-      if (item.optionsAudioSrc) playPrompt(item.optionsAudioSrc, token, playFirstExtract);
-      else playFirstExtract();
+      if (
+        practiceSet.instructionAudioReady !== false &&
+        item.optionsAudioSrc
+      ) {
+        playPrompt(item.optionsAudioSrc, token, playFirstExtract);
+        return;
+      }
+      if (item.kind === "text") {
+        speakPreview(
+          item.options.map((option) => ({
+            speaker: "Woman",
+            text: option.text,
+          })),
+          token,
+          playFirstExtract
+        );
+        return;
+      }
+      playFirstExtract();
     };
 
-    if (item.instructionAudioSrc) playPrompt(item.instructionAudioSrc, token, playOptions);
-    else playOptions();
+    if (
+      practiceSet.instructionAudioReady !== false &&
+      item.instructionAudioSrc
+    ) {
+      playPrompt(item.instructionAudioSrc, token, playOptions);
+      return;
+    }
+    speakPreview(
+      [{ speaker: "Woman", text: `${item.context} ${item.prompt}` }],
+      token,
+      playOptions
+    );
   }
 
   function startPractice() {
@@ -394,9 +429,9 @@ export default function OteAdvancedListeningPart1Practice({
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: "auto" }));
     logOteTrainingStarted({
       section: "listening",
-      part: "part-1",
+      part: `part-${partNumber}`,
       mode: "exam_style_practice",
-      taskId: `${variant}-listening-part-1-${practiceSet.id}`,
+      taskId: `${variant}-listening-part-${partNumber}-${practiceSet.id}`,
       taskTitle: `${listeningLabel} Listening ${partLabel} ${practiceSet.title}`,
       variant,
     });
@@ -436,9 +471,9 @@ export default function OteAdvancedListeningPart1Practice({
     completionLoggedRef.current = true;
     logOteTrainingCompleted({
       section: "listening",
-      part: "part-1",
+      part: `part-${partNumber}`,
       mode: "exam_style_practice",
-      taskId: `${variant}-listening-part-1-${practiceSet.id}`,
+      taskId: `${variant}-listening-part-${partNumber}-${practiceSet.id}`,
       taskTitle: `${listeningLabel} Listening ${partLabel} ${practiceSet.title}`,
       variant,
       score,

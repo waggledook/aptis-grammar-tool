@@ -190,11 +190,16 @@ import OteAdvancedListeningPart1Guide from "./products/ote/OteAdvancedListeningP
 import OteAdvancedListeningPart1Practice from "./products/ote/OteAdvancedListeningPart1Practice.jsx";
 import OteAdvancedListeningPart2Guide from "./products/ote/OteAdvancedListeningPart2Guide.jsx";
 import OteAdvancedListeningPart2Practice from "./products/ote/OteAdvancedListeningPart2Practice.jsx";
+import OteAdvancedListeningPart3Guide from "./products/ote/OteAdvancedListeningPart3Guide.jsx";
 import OteAdvancedListeningPart3Practice from "./products/ote/OteAdvancedListeningPart3Practice.jsx";
+import OteGeneralListeningPart1Guide from "./products/ote/OteGeneralListeningPart1Guide.jsx";
 import OteGeneralListeningPart1Practice from "./products/ote/OteGeneralListeningPart1Practice.jsx";
 import OteGeneralListeningPart2Guide from "./products/ote/OteGeneralListeningPart2Guide.jsx";
 import OteGeneralListeningPart2Practice from "./products/ote/OteGeneralListeningPart2Practice.jsx";
+import OteGeneralListeningPart3Guide from "./products/ote/OteGeneralListeningPart3Guide.jsx";
 import OteGeneralListeningPart3Practice from "./products/ote/OteGeneralListeningPart3Practice.jsx";
+import OteGeneralListeningPart4Guide from "./products/ote/OteGeneralListeningPart4Guide.jsx";
+import OteGeneralListeningPart4Practice from "./products/ote/OteGeneralListeningPart4Practice.jsx";
 import OteSpeakingPart1Guide from "./products/ote/OteSpeakingPart1Guide.jsx";
 import OteSpeakingPart1AdvancedGuide from "./products/ote/OteSpeakingPart1AdvancedGuide.jsx";
 import OteSpeakingPart1Menu from "./products/ote/OteSpeakingPart1Menu.jsx";
@@ -1436,8 +1441,16 @@ return (
     element={<OteAdvancedListeningPart2Practice user={user} nativeRoutes={false} />}
   />
   <Route
+    path="/ote/listening/advanced/part-3-opinion-matching/guide"
+    element={<OteAdvancedListeningPart3Guide nativeRoutes={false} />}
+  />
+  <Route
     path="/ote/listening/advanced/part-3-opinion-matching/practice/:setId"
     element={<OteAdvancedListeningPart3Practice user={user} nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/listening/general/part-1-picture-options/guide"
+    element={<OteGeneralListeningPart1Guide nativeRoutes={false} />}
   />
   <Route
     path="/ote/listening/general/part-1-picture-options/practice/:setId"
@@ -1452,8 +1465,20 @@ return (
     element={<OteGeneralListeningPart2Practice user={user} nativeRoutes={false} />}
   />
   <Route
+    path="/ote/listening/general/part-3-opinion-matching/guide"
+    element={<OteGeneralListeningPart3Guide nativeRoutes={false} />}
+  />
+  <Route
     path="/ote/listening/general/part-3-opinion-matching/practice/:setId"
     element={<OteGeneralListeningPart3Practice user={user} nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/listening/general/part-4-text-options/guide"
+    element={<OteGeneralListeningPart4Guide nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/listening/general/part-4-text-options/practice/:setId"
+    element={<OteGeneralListeningPart4Practice user={user} nativeRoutes={false} />}
   />
   <Route
     path="/ote/listening/:variant/:partId"
@@ -1778,8 +1803,16 @@ return (
         element={<OteAdvancedListeningPart2Practice user={user} nativeRoutes />}
       />
       <Route
+        path="/listening/advanced/part-3-opinion-matching/guide"
+        element={<OteAdvancedListeningPart3Guide nativeRoutes />}
+      />
+      <Route
         path="/listening/advanced/part-3-opinion-matching/practice/:setId"
         element={<OteAdvancedListeningPart3Practice user={user} nativeRoutes />}
+      />
+      <Route
+        path="/listening/general/part-1-picture-options/guide"
+        element={<OteGeneralListeningPart1Guide nativeRoutes />}
       />
       <Route
         path="/listening/general/part-1-picture-options/practice/:setId"
@@ -1794,8 +1827,20 @@ return (
         element={<OteGeneralListeningPart2Practice user={user} nativeRoutes />}
       />
       <Route
+        path="/listening/general/part-3-opinion-matching/guide"
+        element={<OteGeneralListeningPart3Guide nativeRoutes />}
+      />
+      <Route
         path="/listening/general/part-3-opinion-matching/practice/:setId"
         element={<OteGeneralListeningPart3Practice user={user} nativeRoutes />}
+      />
+      <Route
+        path="/listening/general/part-4-text-options/guide"
+        element={<OteGeneralListeningPart4Guide nativeRoutes />}
+      />
+      <Route
+        path="/listening/general/part-4-text-options/practice/:setId"
+        element={<OteGeneralListeningPart4Practice user={user} nativeRoutes />}
       />
       <Route
         path="/listening/:variant/:partId"
