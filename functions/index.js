@@ -13,6 +13,7 @@ const GMAIL_PASS   = process.env.GMAIL_APP_PASSWORD;
 const TEACHER_EMAIL = process.env.TEACHER_EMAIL || GMAIL_USER;
 const OTE_LEVEL_REPORT_COPY_EMAIL = "nicholas@beeskillsenglish.com";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const DEFAULT_ASSESSMENT_FEEDBACK_MODEL = "gpt-5.6-luna";
 const firestore = admin.firestore();
 
 exports.aggregateActivityLog = functions
@@ -1101,6 +1102,30 @@ const APTIS_WRITING_PART23_FEEDBACK_SCHEMA = {
       items: { type: "string" },
     },
     teacherComment: { type: "string" },
+  },
+};
+
+const APTIS_WRITING_PART3_FEEDBACK_SCHEMA = {
+  ...APTIS_WRITING_PART23_FEEDBACK_SCHEMA,
+  required: [
+    ...APTIS_WRITING_PART23_FEEDBACK_SCHEMA.required,
+    "estimatedResponseLevel",
+  ],
+  properties: {
+    ...APTIS_WRITING_PART23_FEEDBACK_SCHEMA.properties,
+    estimatedResponseLevel: {
+      type: "object",
+      additionalProperties: false,
+      required: ["label", "confidence", "rationale"],
+      properties: {
+        label: {
+          type: "string",
+          enum: ["Below A2 / unclear", "A2-like", "B1-like", "B2-like", "C1-like"],
+        },
+        confidence: { type: "string", enum: ["low", "medium", "high"] },
+        rationale: { type: "string" },
+      },
+    },
   },
 };
 
@@ -3237,6 +3262,25 @@ function buildAptisWritingPart23Prompt(payload) {
   const ranges = payload.part === "part2"
     ? "Part 2 ranges: recommendedMin 20, recommendedMax 30, practicalMax 45."
     : "Part 3 ranges: recommendedMin 30, recommendedMax 40, practicalMax 60.";
+  const part3LevelCalibration = payload.part === "part3"
+    ? [
+        "",
+        "Part 3 response-level estimate:",
+        "- Estimate the calibre shown by this set of three short responses, not the learner's overall CEFR level and not an official Aptis score.",
+        "- Below A2 / unclear: responses are largely incomplete, isolated, off-task, or frequently too unclear to recover the intended meaning.",
+        "- A2-like: the writer gives basic relevant information in simple sentences; frequent errors or limited range remain, but the main meaning is usually recoverable.",
+        "- B1-like: the writer answers relevantly with connected sentences, reasons or details and adequate everyday language; errors are noticeable but communication is generally clear.",
+        "- B2-like: the three replies communicate clearly and are generally developed, but the language may remain safe or routine, show some uneven precision or awkwardness, or contain noticeable errors or inconsistency. Do not default a virtually error-free, natural and varied set to B2-like merely because the task is short or the vocabulary is everyday.",
+        "- C1-like: all three replies consistently fulfil their prompts and make very effective use of the short format. The writing is natural, precise, flexible and confidently controlled, with task-specific detail, concise cohesion, effective grammatical variation and no substantive errors. Complex grammar need not appear in every sentence.",
+        "- Do not award C1-like because of one sophisticated phrase, one inversion or one unusual word. Look for consistent control across all three replies.",
+        "- Do not require showy grammar or rare vocabulary for C1-like. Natural precision, flexibility and effortless control matter more than forced complexity; familiar vocabulary used idiomatically and exactly for the task is positive evidence.",
+        "- A set can be C1-like when all three replies are fully task-specific, naturally phrased, well developed within 30-40 words and consistently accurate, while showing effective variation through description, contrast, preferences, reasons or conditional meaning. This is advanced control of the Part 3 task even without essay-style syntax.",
+        "- Calibration decision rule: when all three replies fully answer their prompts, are naturally and precisely phrased, are well developed within the recommended range, show effective variation across the set and contain no substantive language errors, label the set C1-like. Do not label that evidence B2-like merely because the vocabulary is familiar or the structures are not conspicuously complex.",
+        "- The task is designed to produce three short replies. Never withhold C1-like solely because the total sample is short when all three replies are complete and within the recommended range. Limited evidence may reduce confidence, but it must not impose a B2 ceiling.",
+        "- Treat the label and confidence as separate judgements. Use confidence for the consistency of the evidence across the three replies; use low when they are underdeveloped, uneven or partly off-task. Do not lower the label for minor keyboard typography such as an acute accent in place of an apostrophe when language control is otherwise advanced.",
+        "- In estimatedResponseLevel.rationale, name two or three concrete features that justify the label. Explicitly recognise advanced-quality writing when the evidence supports B2-like or C1-like.",
+      ]
+    : [];
 
   return [
     "You are an English exam writing feedback assistant for Aptis General Writing.",
@@ -3267,6 +3311,8 @@ function buildAptisWritingPart23Prompt(payload) {
     "- Include a languageErrors array for each answer with the clearest mistakes to fix. For Part 2 include 2-5 items when clear errors are present. For each Part 3 answer include 1-4 items when clear errors are present.",
     "- languageErrors should be genuinely useful corrections: grammar, vocabulary, word order, missing words, spelling, punctuation, or cohesion. Use exact student wording in original where possible.",
     "- Do not put preference-only rewrites in languageErrors. A correction must fix a real problem, not merely make accurate ambitious writing shorter, simpler, safer, or more basic.",
+    "- Treat accurate complex grammar as evidence of range. Correctly formed inversion after restrictive or negative adverbials, such as 'Rarely do I have the chance...', is grammatical and can be a strong exam feature; do not replace it with standard word order merely because that is simpler.",
+    "- More generally, preserve accurate conditionals, relative clauses, participle clauses, cleft structures, passive forms and other ambitious syntax when they fit the meaning and register. Only correct them when their formation or use is genuinely wrong or makes the answer unclear.",
     "- If the student uses ambitious or advanced language accurately, praise it and preserve it. Only correct ambitious language when it is genuinely inaccurate, unclear, unnatural, or inappropriate for the task.",
     "- If there are no clear mistakes in an answer, return an empty languageErrors array for that answer.",
     "- Praise strong natural vocabulary such as 'I'm particularly keen on', 'I'm really into', or other good B1/B2 phrases when used accurately.",
@@ -3277,8 +3323,9 @@ function buildAptisWritingPart23Prompt(payload) {
     "- Provide an improved version that preserves the student's meaning, ambition, and strongest accurate language. Improve accuracy and clarity; do not simplify a good answer into a lower-level model.",
     "- Give 1-3 specific priority advice points.",
     "- Keep each feedback field concise. For Part 3, each improvedVersion should usually be one short natural reply, not a long rewrite.",
+    ...part3LevelCalibration,
     "",
-    "Tone: friendly, concise, encouraging, suitable for A2-B1 learners.",
+    "Tone: friendly, concise, encouraging, and clear for a language learner. Match the praise to the actual quality of the response, including explicit recognition of advanced performance when supported.",
     "Avoid harsh wording, long grammar lectures, official scores, and unnecessary complexity for its own sake. Ambitious language should be rewarded when it is accurate and task-appropriate, even in earlier parts.",
     "Return only valid JSON using the required schema.",
     "",
@@ -3379,6 +3426,11 @@ function buildAptisWritingPart4Prompt(payload) {
     "- If the improvedVersion changes a student phrase because it is inaccurate, unnatural, unclear, or register-inappropriate, include that phrase in languageErrors unless it is only a tiny punctuation or formatting cleanup.",
     "- Keep each languageErrors explanation to one short sentence.",
     "- Do not invent mistakes. If an email has no clear language errors, return an empty languageErrors array.",
+    "- A languageErrors item must identify a genuine error. The original and correction must differ meaningfully; never return a no-op correction or use languageErrors for an optional stylistic preference.",
+    "- Treat accurate complex grammar as evidence of range. Correctly formed inversion after restrictive or negative adverbials, such as 'Rarely do I have the chance...', is grammatical and can strengthen an exam response. Do not replace it with standard word order merely because the simpler form is more common.",
+    "- Preserve accurate conditionals, relative clauses, participle clauses, cleft structures, passive forms and other ambitious syntax when they suit the meaning and register. Only correct them when their formation or use is genuinely wrong, unclear or inappropriate.",
+    "- Accept natural alternatives instead of enforcing one preferred phrase. For example, 'What should I do?', 'catch the attention of the audience', and 'I look forward to hearing your opinion' can all be correct in context.",
+    "- Do not assume a pronoun or factual detail is wrong when the source leaves it open. For example, 'our trip' may be correct if the writer and friend travelled together.",
     "- Use grammar.examples and vocabulary.examples only when they add something not already covered in languageErrors; otherwise return empty arrays for those fields.",
     "- Register feedback must be specific. If register.feedback mentions tone, formality, politeness, directness, naturalness, or the difference between the two emails, register.examples must include 1-3 concrete examples with exact student wording and a more suitable alternative.",
     "- For register.examples, include positive examples only when register is strong; otherwise prioritise phrases that need a clearer formal or informal version.",
@@ -3426,6 +3478,444 @@ function buildAptisWritingPart4Prompt(payload) {
     JSON.stringify(payload, null, 2),
   ].join("\n");
 }
+
+const APTIS_WRITING_MODEL_LAB_MODELS = ["gpt-5.4-mini", "gpt-5.6-luna"];
+const APTIS_WRITING_MODEL_LAB_PRICING = {
+  "gpt-5.4-mini": { input: 0.75, cachedInput: 0.075, output: 4.5 },
+  "gpt-5.6-luna": { input: 0.2, cachedInput: 0.02, cacheWriteInput: 0.25, output: 1.2 },
+};
+
+async function requireAdminForModelLab(context) {
+  if (!context.auth?.uid) {
+    throw new functions.https.HttpsError("unauthenticated", "Sign in before opening the model lab.");
+  }
+
+  const userSnap = await firestore.doc(`users/${context.auth.uid}`).get();
+  if (userSnap.data()?.role !== "admin") {
+    throw new functions.https.HttpsError("permission-denied", "Only administrators can use the model lab.");
+  }
+}
+
+function buildAptisWritingModelLabRequest(data) {
+  const kind = cleanString(data?.kind || "", 20);
+
+  if (kind === "part1") {
+    const items = normalizePart1Items(data?.payload?.items);
+    if (items.length !== 5 || items.some((item) => !item.question || !item.answer)) {
+      throw new functions.https.HttpsError("invalid-argument", "Part 1 needs five answered items.");
+    }
+    return {
+      kind,
+      payload: { items },
+      prompt: buildAptisWritingPart1Prompt(items),
+      schemaName: "aptis_writing_part1_feedback",
+      schema: APTIS_WRITING_PART1_FEEDBACK_SCHEMA,
+      verbosity: "low",
+      maxOutputTokens: 1400,
+      postprocess(feedback) {
+        if (feedback?.overall && items.every((item) => item.wordCount >= 1 && item.wordCount <= 5)) {
+          feedback.overall.lengthControl = "good";
+        }
+        return feedback;
+      },
+    };
+  }
+
+  if (kind === "part2" || kind === "part3") {
+    const payload = normalizePart23Payload({ ...data?.payload, part: kind });
+    const expectedAnswers = kind === "part2" ? 1 : 3;
+    if (
+      payload.answers.length !== expectedAnswers ||
+      payload.answers.some((answer) => !answer.text) ||
+      (kind === "part2" && !payload.prompt) ||
+      (kind === "part3" && payload.chats.length !== 3)
+    ) {
+      throw new functions.https.HttpsError("invalid-argument", `The ${kind} comparison payload is incomplete.`);
+    }
+    return {
+      kind,
+      payload,
+      prompt: buildAptisWritingPart23Prompt(payload),
+      schemaName: kind === "part3" ? "aptis_writing_part3_feedback" : "aptis_writing_part23_feedback",
+      schema: kind === "part3" ? APTIS_WRITING_PART3_FEEDBACK_SCHEMA : APTIS_WRITING_PART23_FEEDBACK_SCHEMA,
+      verbosity: "medium",
+      maxOutputTokens: kind === "part2" ? 2300 : 4700,
+      postprocess(feedback) {
+        if (Array.isArray(feedback?.answers)) {
+          feedback.answers = feedback.answers.map((answer, index) => ({
+            ...answer,
+            wordCount: payload.answers[index]?.wordCount ?? answer.wordCount,
+            wordCountStatus: payload.answers[index]?.wordCountStatus || answer.wordCountStatus,
+          }));
+        }
+        if (feedback?.overall) {
+          feedback.overall.wordCountComment = payload.answers
+            .map((answer) => describePart23WordCount(answer.wordCountStatus, answer.wordCount))
+            .join(" ");
+        }
+        return feedback;
+      },
+    };
+  }
+
+  if (kind === "part4") {
+    const payload = normalizePart4Payload(data?.payload);
+    if (
+      !payload.source ||
+      !payload.friendPrompt ||
+      !payload.formalPrompt ||
+      !payload.friendEmail.text ||
+      !payload.formalEmail.text
+    ) {
+      throw new functions.https.HttpsError("invalid-argument", "The part4 comparison payload is incomplete.");
+    }
+    return {
+      kind,
+      payload,
+      prompt: buildAptisWritingPart4Prompt(payload),
+      schemaName: "aptis_writing_part4_feedback",
+      schema: APTIS_WRITING_PART4_FEEDBACK_SCHEMA,
+      verbosity: "medium",
+      maxOutputTokens: 8200,
+      postprocess(feedback) {
+        if (feedback?.informalEmail) {
+          feedback.informalEmail.wordCount = payload.friendEmail.wordCount;
+          feedback.informalEmail.wordCountStatus = payload.friendEmail.wordCountStatus;
+          feedback.informalEmail.wordCountFeedback = describePart4WordCount(
+            "informal",
+            payload.friendEmail.wordCountStatus,
+            payload.friendEmail.wordCount
+          );
+        }
+        if (feedback?.formalEmail) {
+          feedback.formalEmail.wordCount = payload.formalEmail.wordCount;
+          feedback.formalEmail.wordCountStatus = payload.formalEmail.wordCountStatus;
+          feedback.formalEmail.wordCountFeedback = describePart4WordCount(
+            "formal",
+            payload.formalEmail.wordCountStatus,
+            payload.formalEmail.wordCount
+          );
+        }
+        return feedback;
+      },
+    };
+  }
+
+  throw new functions.https.HttpsError("invalid-argument", "Choose Aptis Writing part1, part2, part3, or part4.");
+}
+
+function estimateModelLabCost(model, usage = {}) {
+  const price = APTIS_WRITING_MODEL_LAB_PRICING[model];
+  if (!price) return null;
+
+  const inputTokens = Number(usage.input_tokens || 0);
+  const outputTokens = Number(usage.output_tokens || 0);
+  const details = usage.input_tokens_details || {};
+  const cachedTokens = Math.min(inputTokens, Number(details.cached_tokens || 0));
+  const cacheWriteTokens = Math.min(
+    Math.max(0, inputTokens - cachedTokens),
+    Number(details.cache_write_tokens || details.cache_creation_tokens || 0)
+  );
+  const regularTokens = Math.max(0, inputTokens - cachedTokens - cacheWriteTokens);
+  const usd = (
+    regularTokens * price.input +
+    cachedTokens * price.cachedInput +
+    cacheWriteTokens * (price.cacheWriteInput || price.input) +
+    outputTokens * price.output
+  ) / 1_000_000;
+
+  return Number(usd.toFixed(8));
+}
+
+async function runAptisWritingModelLabModel(model, config) {
+  const startedAt = Date.now();
+  try {
+    const apiResponse = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model,
+        input: config.prompt,
+        reasoning: { effort: "low" },
+        max_output_tokens: config.maxOutputTokens,
+        text: {
+          verbosity: config.verbosity,
+          format: {
+            type: "json_schema",
+            name: config.schemaName,
+            strict: true,
+            schema: config.schema,
+          },
+        },
+      }),
+    });
+    const responseJson = await apiResponse.json().catch(() => null);
+    if (!apiResponse.ok) {
+      return {
+        ok: false,
+        model,
+        latencyMs: Date.now() - startedAt,
+        error: cleanString(responseJson?.error?.message || "The model request failed.", 500),
+      };
+    }
+
+    const outputText = extractOutputText(responseJson);
+    let feedback;
+    try {
+      feedback = config.postprocess(JSON.parse(outputText));
+    } catch {
+      return {
+        ok: false,
+        model,
+        latencyMs: Date.now() - startedAt,
+        responseId: responseJson?.id || null,
+        usage: responseJson?.usage || null,
+        error: "The model returned invalid structured JSON.",
+      };
+    }
+
+    return {
+      ok: true,
+      model,
+      feedback,
+      latencyMs: Date.now() - startedAt,
+      responseId: responseJson?.id || null,
+      usage: responseJson?.usage || null,
+      estimatedCostUsd: estimateModelLabCost(model, responseJson?.usage || {}),
+    };
+  } catch (error) {
+    console.error("[runAptisWritingModelLabModel] request failed", { model, error });
+    return {
+      ok: false,
+      model,
+      latencyMs: Date.now() - startedAt,
+      error: "Could not reach the feedback service.",
+    };
+  }
+}
+
+function modelLabCandidateFromSnapshot(kind, snap) {
+  const data = snap.data() || {};
+  const createdAt = data.createdAt?.toDate?.().toISOString?.() || null;
+  const base = {
+    id: `${kind}:${snap.id}`,
+    kind,
+    taskId: cleanString(data.taskId || "", 120),
+    createdAt,
+  };
+
+  if (kind === "part1") {
+    const items = normalizePart1Items(data.items);
+    if (items.length !== 5 || items.some((item) => !item.question || !item.answer)) return null;
+    return { ...base, payload: { items }, wordCount: items.reduce((sum, item) => sum + item.wordCount, 0) };
+  }
+  if (kind === "part2") {
+    const text = cleanString(data.answerText || "", 5000);
+    if (!base.taskId || !text) return null;
+    const wordCount = Number(data.counts?.answer || countWords(text));
+    return { ...base, payload: { answerText: text, wordCount }, wordCount };
+  }
+  if (kind === "part3") {
+    const answers = Array.isArray(data.answersText) ? data.answersText.slice(0, 3).map((value) => cleanString(value, 5000)) : [];
+    if (!base.taskId || answers.length !== 3 || answers.some((answer) => !answer)) return null;
+    const wordCounts = answers.map((answer, index) => Number(data.counts?.[index] || countWords(answer)));
+    return { ...base, payload: { answers, wordCounts }, wordCount: wordCounts.reduce((sum, value) => sum + value, 0) };
+  }
+  if (kind === "part4") {
+    const friendText = cleanString(data.friendText || "", 9000);
+    const formalText = cleanString(data.formalText || "", 14000);
+    if (!base.taskId || !friendText || !formalText) return null;
+    const friendWordCount = Number(data.counts?.friend || countWords(friendText));
+    const formalWordCount = Number(data.counts?.formal || countWords(formalText));
+    return {
+      ...base,
+      payload: { friendText, formalText, friendWordCount, formalWordCount },
+      wordCount: friendWordCount + formalWordCount,
+    };
+  }
+  return null;
+}
+
+async function getAptisWritingModelLabSummary() {
+  const snap = await firestore.collection("aiModelEvaluations").limit(500).get();
+  const reviewed = snap.docs.map((docSnap) => docSnap.data() || {}).filter((entry) => entry.status === "reviewed");
+  const summary = {
+    reviewed: reviewed.length,
+    wins: Object.fromEntries(APTIS_WRITING_MODEL_LAB_MODELS.map((model) => [model, 0])),
+    ties: 0,
+    neither: 0,
+    totalEstimatedCostUsd: Object.fromEntries(APTIS_WRITING_MODEL_LAB_MODELS.map((model) => [model, 0])),
+    averageRating: Object.fromEntries(APTIS_WRITING_MODEL_LAB_MODELS.map((model) => [model, null])),
+  };
+  const ratingTotals = Object.fromEntries(APTIS_WRITING_MODEL_LAB_MODELS.map((model) => [model, { sum: 0, count: 0 }]));
+
+  reviewed.forEach((entry) => {
+    const preference = entry.review?.preference;
+    if (preference === "tie") summary.ties += 1;
+    else if (preference === "neither") summary.neither += 1;
+    else {
+      const winningModel = entry.outputs?.[preference]?.model;
+      if (winningModel && summary.wins[winningModel] !== undefined) summary.wins[winningModel] += 1;
+    }
+
+    Object.values(entry.outputs || {}).forEach((output) => {
+      if (output?.model && output.ok) {
+        summary.totalEstimatedCostUsd[output.model] += Number(output.estimatedCostUsd || 0);
+      }
+    });
+    ["A", "B"].forEach((label) => {
+      const model = entry.outputs?.[label]?.model;
+      const ratings = entry.review?.ratings?.[label] || {};
+      Object.values(ratings).forEach((value) => {
+        if (model && ratingTotals[model] && Number.isFinite(Number(value))) {
+          ratingTotals[model].sum += Number(value);
+          ratingTotals[model].count += 1;
+        }
+      });
+    });
+  });
+
+  APTIS_WRITING_MODEL_LAB_MODELS.forEach((model) => {
+    summary.totalEstimatedCostUsd[model] = Number(summary.totalEstimatedCostUsd[model].toFixed(6));
+    const ratings = ratingTotals[model];
+    summary.averageRating[model] = ratings.count ? Number((ratings.sum / ratings.count).toFixed(2)) : null;
+  });
+  return summary;
+}
+
+exports.listAptisWritingModelLabCandidates = functions
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    await requireAdminForModelLab(context);
+    const requestedKind = ["part1", "part2", "part3", "part4"].includes(data?.kind) ? data.kind : "all";
+    const perKindLimit = Math.min(50, Math.max(5, Number(data?.limit || 20)));
+    const collections = {
+      part1: "writingP1Sessions",
+      part2: "writingP2Submissions",
+      part3: "writingP3Submissions",
+      part4: "writingP4Submissions",
+    };
+    const kinds = requestedKind === "all" ? Object.keys(collections) : [requestedKind];
+    const rows = await Promise.all(kinds.map(async (kind) => {
+      let snap;
+      try {
+        snap = await firestore.collectionGroup(collections[kind])
+          .orderBy("createdAt", "desc")
+          .limit(perKindLimit)
+          .get();
+      } catch (error) {
+        console.warn("[listAptisWritingModelLabCandidates] falling back to unordered sample", { kind, error });
+        snap = await firestore.collectionGroup(collections[kind]).limit(perKindLimit).get();
+      }
+      return snap.docs.map((docSnap) => modelLabCandidateFromSnapshot(kind, docSnap)).filter(Boolean);
+    }));
+    const candidates = rows.flat().sort((a, b) => String(b.createdAt || "").localeCompare(String(a.createdAt || "")));
+    return { candidates, summary: await getAptisWritingModelLabSummary() };
+  });
+
+exports.runAptisWritingModelLabComparison = functions
+  .runWith({ timeoutSeconds: 300, memory: "1GB" })
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    await requireAdminForModelLab(context);
+    if (!OPENAI_API_KEY) {
+      throw new functions.https.HttpsError("failed-precondition", "Missing OPENAI_API_KEY in the Functions environment.");
+    }
+
+    const config = buildAptisWritingModelLabRequest(data);
+    const results = await Promise.all(
+      APTIS_WRITING_MODEL_LAB_MODELS.map((model) => runAptisWritingModelLabModel(model, config))
+    );
+    const ordered = Math.random() < 0.5 ? results : [results[1], results[0]];
+    const outputs = { A: ordered[0], B: ordered[1] };
+    const evaluationRef = firestore.collection("aiModelEvaluations").doc();
+    await evaluationRef.set({
+      kind: config.kind,
+      sourceCandidateId: cleanString(data?.sourceCandidateId || "", 160),
+      taskId: cleanString(config.payload?.taskId || data?.taskId || "", 120),
+      input: config.payload,
+      outputs,
+      status: "pending_review",
+      createdByUid: context.auth.uid,
+      createdByEmail: context.auth.token?.email || null,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    const blindOutput = (output) => ({
+      ok: output.ok,
+      feedback: output.feedback || null,
+      error: output.ok ? null : "This model request failed. The model identity will remain hidden until the review is saved.",
+    });
+    return {
+      evaluationId: evaluationRef.id,
+      kind: config.kind,
+      options: { A: blindOutput(outputs.A), B: blindOutput(outputs.B) },
+    };
+  });
+
+exports.submitAptisWritingModelLabReview = functions
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    await requireAdminForModelLab(context);
+    const evaluationId = cleanString(data?.evaluationId || "", 160);
+    const preference = ["A", "B", "tie", "neither"].includes(data?.preference) ? data.preference : "";
+    const criteria = ["accuracy", "taskUnderstanding", "usefulSpecificity", "tone"];
+    const hasDetailedRatings = !!data?.ratings && typeof data.ratings === "object";
+    const ratings = hasDetailedRatings ? {} : null;
+    if (hasDetailedRatings) {
+      ["A", "B"].forEach((label) => {
+        ratings[label] = {};
+        criteria.forEach((criterion) => {
+          const value = Number(data?.ratings?.[label]?.[criterion]);
+          if (!Number.isInteger(value) || value < 1 || value > 5) {
+            throw new functions.https.HttpsError(
+              "invalid-argument",
+              "Complete every 1-5 criterion for both responses, or submit only the overall verdict."
+            );
+          }
+          ratings[label][criterion] = value;
+        });
+      });
+    }
+    if (!evaluationId || !preference) {
+      throw new functions.https.HttpsError("invalid-argument", "Choose a preference before saving the review.");
+    }
+
+    const ref = firestore.doc(`aiModelEvaluations/${evaluationId}`);
+    const snap = await ref.get();
+    if (!snap.exists) throw new functions.https.HttpsError("not-found", "That comparison no longer exists.");
+    await ref.update({
+      status: "reviewed",
+      review: {
+        preference,
+        ratings,
+        falseCorrections: {
+          A: !!data?.falseCorrections?.A,
+          B: !!data?.falseCorrections?.B,
+        },
+        notes: cleanString(data?.notes || "", 4000),
+        reviewedByUid: context.auth.uid,
+        reviewedAt: admin.firestore.FieldValue.serverTimestamp(),
+      },
+    });
+
+    const evaluation = snap.data() || {};
+    const reveal = {};
+    ["A", "B"].forEach((label) => {
+      const output = evaluation.outputs?.[label] || {};
+      reveal[label] = {
+        model: output.model || "unknown",
+        ok: !!output.ok,
+        latencyMs: output.latencyMs || null,
+        usage: output.usage || null,
+        estimatedCostUsd: output.estimatedCostUsd ?? null,
+      };
+    });
+    return { reveal, summary: await getAptisWritingModelLabSummary() };
+  });
 
 function getOteWordCountStatus(taskType, wordCount) {
   if (taskType === "ote_part1_email") {
@@ -4935,7 +5425,7 @@ exports.generateWritingFeedback = functions
       throw new functions.https.HttpsError("invalid-argument", "The writing answer is too short to assess.");
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const prompt = buildWritingFeedbackPrompt({ ...data, answer });
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
@@ -5032,7 +5522,7 @@ exports.generateOteWritingFeedback = functions
       throw new functions.https.HttpsError("invalid-argument", "OTE Part 1 email feedback requires three points.");
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditTaskType = payload.mode === "single_task" ? "ote_single_task" : "ote_full_mock";
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
@@ -5139,7 +5629,7 @@ exports.generateOteAdvancedIntroConclusionFeedback = functions
       );
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
       "ote_advanced_intro_conclusion",
@@ -5230,7 +5720,7 @@ exports.generateOteRegisterGapFeedback = functions
       throw new functions.https.HttpsError("invalid-argument", "Add at least one answer before requesting feedback.");
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
       "ote_register_gap",
@@ -5321,7 +5811,7 @@ exports.generateOteRegisterRewriteFeedback = functions
       throw new functions.https.HttpsError("invalid-argument", "Add at least one rewrite before requesting feedback.");
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
       "ote_register_rewrite",
@@ -5412,7 +5902,7 @@ exports.generateOteAdvancedAcademicStyleFeedback = functions
       throw new functions.https.HttpsError("invalid-argument", "Submit at least one rewrite before requesting feedback.");
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
       "ote_advanced_academic_style",
@@ -5503,7 +5993,7 @@ exports.generateAptisWritingPart1Feedback = functions
       );
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
       "aptis_part1",
@@ -5631,7 +6121,7 @@ exports.generateAptisSpeakingPart1Feedback = functions
       );
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
       "aptis_speaking_part1",
@@ -5771,7 +6261,7 @@ exports.generateAptisSpeakingPart2Feedback = functions
       );
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
       "aptis_speaking_part2",
@@ -5915,7 +6405,7 @@ exports.generateAptisSpeakingPart3Feedback = functions
       );
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
       "aptis_speaking_part3",
@@ -6059,7 +6549,7 @@ exports.generateAptisSpeakingPart4Feedback = functions
       );
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
       "aptis_speaking_part4",
@@ -6198,7 +6688,7 @@ exports.generateOteSpeakingFeedback = functions
       );
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditTaskType = isMock ? "ote_speaking_mock" : "ote_speaking_part";
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
@@ -6342,7 +6832,7 @@ exports.generateOteLevelProductionFeedback = functions
       );
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const transcripts = await Promise.all(payload.speaking.recordings.map(async (item, index) => {
       if (!item.base64) return "";
       try {
@@ -6508,7 +6998,7 @@ exports.generateAptisWritingPart23Feedback = functions
       throw new functions.https.HttpsError("invalid-argument", "Part 3 feedback requires three chat messages.");
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const feedbackTaskType = payload.part === "part2" ? "aptis_part2" : "aptis_part3";
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
@@ -6524,9 +7014,11 @@ exports.generateAptisWritingPart23Feedback = functions
         verbosity: "medium",
         format: {
           type: "json_schema",
-          name: "aptis_writing_part23_feedback",
+          name: payload.part === "part3" ? "aptis_writing_part3_feedback" : "aptis_writing_part23_feedback",
           strict: true,
-          schema: APTIS_WRITING_PART23_FEEDBACK_SCHEMA,
+          schema: payload.part === "part3"
+            ? APTIS_WRITING_PART3_FEEDBACK_SCHEMA
+            : APTIS_WRITING_PART23_FEEDBACK_SCHEMA,
         },
       },
     };
@@ -6630,7 +7122,7 @@ exports.generateAptisWritingPart4Feedback = functions
       throw new functions.https.HttpsError("invalid-argument", "Both Part 4 emails must contain text.");
     }
 
-    const model = cleanString(data?.model || "gpt-5.4-mini", 80);
+    const model = DEFAULT_ASSESSMENT_FEEDBACK_MODEL;
     const creditReservation = await consumeWritingFeedbackCredits(
       context,
       "aptis_part4",

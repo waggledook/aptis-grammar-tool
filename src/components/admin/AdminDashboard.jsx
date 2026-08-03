@@ -2222,6 +2222,14 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
             View activity insights
           </button>
 
+          <button
+            className="ghost-btn"
+            style={{ fontSize: "0.85rem", padding: "0.25rem 0.6rem", marginLeft: 0 }}
+            onClick={() => navigate("/admin/model-lab")}
+          >
+            Open AI Model Lab
+          </button>
+
           {adminNotificationsOpen ? (
             <div
               style={{

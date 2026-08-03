@@ -14,7 +14,8 @@ import WritingDemoNotice from "./WritingDemoNotice.jsx";
  * - Word counters live; submit stores to Firestore when signed in.
  */
 
-const TASKS = [
+// eslint-disable-next-line react-refresh/only-export-components
+export const WRITING_PART4_TASKS = [
     {
       id: "sports-fee",
       title: "Sports Club: Introduction of a Membership Fee",
@@ -130,6 +131,8 @@ const TASKS = [
       formalPrompt: "Write an email to the president. Give your opinion about the temporary online plan and suggest ways to keep the meetings enjoyable and interactive. (120–150 words)",
     },
   ];
+
+const TASKS = WRITING_PART4_TASKS;
   
 
 export default function WritingPart4Emails({ user, aptisAccess, onSignIn, onRequireSignIn, allowedTaskIds = [] }) {

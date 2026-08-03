@@ -17,7 +17,8 @@ import WritingDemoNotice from "./WritingDemoNotice.jsx";
  * - Polished layout + game-wrapper structure
  */
 
-const TASKS = [
+// eslint-disable-next-line react-refresh/only-export-components
+export const WRITING_PART3_TASKS = [
     {
       id: "sports-fee",
       title: "Sports Club",
@@ -179,7 +180,9 @@ const TASKS = [
         },
       ],
     },
-  ];
+];
+
+const TASKS = WRITING_PART3_TASKS;
 
 export default function WritingPart3({ user, aptisAccess, onSignIn, onRequireSignIn, allowedTaskIds = [] }) {
   const [searchParams] = useSearchParams();
@@ -636,6 +639,26 @@ function AptisWritingPart23Feedback({ feedback, status, error }) {
       </div>
       {feedback.overall?.wordCountComment ? <p>{feedback.overall.wordCountComment}</p> : null}
 
+      {feedback.estimatedResponseLevel?.label ? (
+        <div className="ai-p3-level">
+          <div className="ai-p3-level-head">
+            <div>
+              <small>Estimated response calibre</small>
+              <strong>{feedback.estimatedResponseLevel.label}</strong>
+            </div>
+            {feedback.estimatedResponseLevel.confidence ? (
+              <span>{feedback.estimatedResponseLevel.confidence} confidence</span>
+            ) : null}
+          </div>
+          {feedback.estimatedResponseLevel.rationale ? (
+            <p>{feedback.estimatedResponseLevel.rationale}</p>
+          ) : null}
+          <small className="ai-p3-level-note">
+            This estimates the calibre of these three short responses only. It is not an official Aptis score or an overall CEFR judgement.
+          </small>
+        </div>
+      ) : null}
+
       <div className="ai-p23-list">
         {(feedback.answers || []).map((item, index) => (
           <article key={item.index ?? index}>
@@ -979,6 +1002,55 @@ function StyleScope() {
   margin:.1rem 0 .35rem;
   color:#a9b7d1;
   font-size:.9rem;
+}
+
+.aptis-writing-p3 .ai-p3-level {
+  margin:.7rem 0;
+  padding:.8rem;
+  border:1px solid #4269a8;
+  border-radius:10px;
+  background:linear-gradient(135deg, rgba(48,94,163,.24), rgba(19,33,59,.95));
+}
+
+.aptis-writing-p3 .ai-p3-level-head {
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:.75rem;
+}
+
+.aptis-writing-p3 .ai-p3-level-head > div {
+  display:grid;
+  gap:.15rem;
+}
+
+.aptis-writing-p3 .ai-p3-level-head small,
+.aptis-writing-p3 .ai-p3-level-note {
+  color:#a9b7d1;
+}
+
+.aptis-writing-p3 .ai-p3-level-head strong {
+  color:#eef5ff;
+  font-size:1.12rem;
+}
+
+.aptis-writing-p3 .ai-p3-level-head span {
+  flex:0 0 auto;
+  border:1px solid #5e86c7;
+  border-radius:999px;
+  padding:.2rem .5rem;
+  color:#cfe1ff;
+  font-size:.8rem;
+  text-transform:capitalize;
+}
+
+.aptis-writing-p3 .ai-p3-level p {
+  margin:.65rem 0 .45rem;
+}
+
+.aptis-writing-p3 .ai-p3-level-note {
+  display:block;
+  line-height:1.45;
 }
 
 .aptis-writing-p3 .ai-p23-list {

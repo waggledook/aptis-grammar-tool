@@ -475,6 +475,11 @@ service cloud.firestore {
       allow read, write: if false;
     }
 
+    // Admin-only, server-written blind AI model evaluations.
+    match /aiModelEvaluations/{evaluationId} {
+      allow read, write: if false;
+    }
+
     // ── 11) Public Aptis Writing General submissions ───────────────────
     match /submissions/{submissionId} {
       allow create: if request.resource.data.keys().hasOnly([

@@ -14,7 +14,8 @@ import WritingDemoNotice from "./WritingDemoNotice.jsx";
  * - Tasks 1–2 open to everyone; 3+ require sign-in.
  */
 
-const TASKS = [
+// eslint-disable-next-line react-refresh/only-export-components
+export const WRITING_PART2_TASKS = [
   {
     id: "sports-fee",
     title: "Sports Club",
@@ -72,6 +73,8 @@ const TASKS = [
       "Please write about your favourite kinds of films and how often you go to the cinema or watch films at home.",
   },
 ];
+
+const TASKS = WRITING_PART2_TASKS;
 
 export default function WritingPart2({ user, aptisAccess, onSignIn, onRequireSignIn, allowedTaskIds = [] }) {
   const [searchParams] = useSearchParams();

@@ -4820,7 +4820,8 @@ function normalizeEmailHtmlForClipboard(html = "") {
 function ProfileAiFeedback({ feedback, descriptor = "Generated automatically to help you improve your writing.", sourceItem = null }) {
   if (!feedback) return null;
 
-  const level = feedback.estimatedWritingLevel?.label || feedback.estimatedLevel?.label || "";
+  const responseLevel = feedback.estimatedResponseLevel?.label || "";
+  const level = responseLevel || feedback.estimatedWritingLevel?.label || feedback.estimatedLevel?.label || "";
   const summary = feedback.overall?.summary || "";
   const strengths = feedback.overall?.mainStrengths || [];
   const priorities = feedback.overall?.mainPriorities || feedback.priorityAdvice || [];
@@ -4830,7 +4831,11 @@ function ProfileAiFeedback({ feedback, descriptor = "Generated automatically to 
     <div className="submitted-html profile-ai-feedback">
       <div className="p4-title">Feedback</div>
       <div className="muted small">{descriptor}</div>
-      {level ? <div className="muted small">Estimated level: {level}</div> : null}
+      {level ? (
+        <div className="muted small">
+          {responseLevel ? "Estimated response calibre" : "Estimated level"}: {level}
+        </div>
+      ) : null}
       {summary ? <p>{summary}</p> : null}
       {strengths.length ? (
         <p>
@@ -4886,6 +4891,20 @@ function ProfileAiFeedbackFull({ feedback, sourceItem = null }) {
   if (Array.isArray(feedback.answers)) {
     return (
       <div className="profile-ai-feedback-body">
+        {feedback.estimatedResponseLevel?.label ? (
+          <div className="profile-ai-feedback-section">
+            <strong>Estimated response calibre: {feedback.estimatedResponseLevel.label}</strong>
+            {feedback.estimatedResponseLevel.confidence ? (
+              <p className="muted small">{feedback.estimatedResponseLevel.confidence} confidence</p>
+            ) : null}
+            {feedback.estimatedResponseLevel.rationale ? (
+              <p>{feedback.estimatedResponseLevel.rationale}</p>
+            ) : null}
+            <p className="muted small">
+              This estimates the calibre of these three short responses only. It is not an official Aptis score or an overall CEFR judgement.
+            </p>
+          </div>
+        ) : null}
         {feedback.overall?.wordCountComment ? (
           <p><strong>Word count:</strong> {feedback.overall.wordCountComment}</p>
         ) : null}

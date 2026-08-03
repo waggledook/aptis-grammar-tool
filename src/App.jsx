@@ -79,6 +79,7 @@ import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 import AdminActivityLog from "./components/admin/AdminActivityLog.jsx";
 import AdminActivityCharts from "./components/admin/AdminActivityCharts";
 import AdminActivityInsights from "./components/admin/AdminActivityInsights.jsx";
+import AdminAiModelLab from "./components/admin/AdminAiModelLab.jsx";
 import TeacherTools from "./components/teacher/TeacherTools"; // ← Add this
 import MyStudents from "./components/teacher/MyStudents";
 import TeacherCourseTestPrintableReport from "./components/teacher/TeacherCourseTestPrintableReport.jsx";
@@ -1338,6 +1339,7 @@ return (
       <Route path="/admin/activity" element={<AdminActivityLog user={user} />} />
       <Route path="/admin/activity-charts" element={<AdminActivityCharts user={user} />} />
       <Route path="/admin/activity-insights" element={<AdminActivityInsights user={user} />} />
+      <Route path="/admin/model-lab" element={<AdminAiModelLab user={user} />} />
       <Route
         path="/teacher-tools"
         element={
@@ -2743,6 +2745,7 @@ return (
 
 <Route path="/admin/activity-charts" element={<AdminActivityCharts user={user} />} />
 <Route path="/admin/activity-insights" element={<AdminActivityInsights user={user} />} />
+<Route path="/admin/model-lab" element={<AdminAiModelLab user={user} />} />
 
 <Route
   path="/my-students"

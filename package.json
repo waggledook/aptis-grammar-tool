@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:functions": "VITE_USE_FUNCTIONS_EMULATOR=true vite",
+    "emulators:functions": "npm --prefix functions run serve",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",

@@ -15,16 +15,16 @@ If you are developing a production application, we recommend using TypeScript wi
 
 The OTE writing mock completion screen includes a manual **Generate AI feedback** button for local testing.
 
-1. Start the Functions emulator with your OpenAI key:
+1. Start the Functions emulator. It loads `functions/.env.examplay-auth` automatically:
 
 ```bash
-OPENAI_API_KEY=sk-... npm --prefix functions run serve
+npm run emulators:functions
 ```
 
 2. Start Vite with the Functions emulator enabled:
 
 ```bash
-VITE_USE_FUNCTIONS_EMULATOR=true npm run dev
+npm run dev:functions
 ```
 
 3. Sign in, then test either feedback flow:
@@ -32,8 +32,11 @@ VITE_USE_FUNCTIONS_EMULATOR=true npm run dev
    - Complete Aptis Writing Part 1, then click **Generate AI feedback** on the summary screen.
    - Complete Aptis Writing Part 2 or Part 3, then click **Generate AI feedback** on the summary screen.
    - Complete Aptis Writing Part 4, then click **Generate AI feedback** on the summary screen.
+   - As an admin, open `/admin/model-lab` to run blind GPT-5.4 mini versus GPT-5.6 Luna comparisons on historical Aptis Writing submissions.
 
-The original generic callable function is `generateWritingFeedback` in `functions/index.js`. It defaults to `gpt-5.4-mini`, uses structured JSON output, and keeps the API key on the server side.
+Plain `npm run dev` deliberately uses deployed Cloud Functions. Until a new callable has been deployed, calling it from that Vite session can look like a CORS error because the production URL does not exist. Use the two emulator commands above when testing new functions locally.
+
+The original generic callable function is `generateWritingFeedback` in `functions/index.js`. It defaults to `gpt-5.6-luna`, uses structured JSON output, and keeps the API key on the server side. The Aptis and OTE writing and speaking feedback routes use the same production model default, including OTE mock feedback.
 
 OTE writing mocks use `generateOteWritingFeedback`. It supports OTE Part 1 email and Part 2 essay/article/review task profiles, checks task fulfilment, organization, grammar, lexis, word count, and returns broad OTE-style level labels up to Strong B2 range.
 

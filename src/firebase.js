@@ -55,6 +55,7 @@ const WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS = {
 };
 const APTIS_DEMO_FEEDBACK_LIFETIME_CREDITS = 8;
 const APTIS_TRAINER_ACCESS_KEY = "aptisTrainer";
+const ASSESSMENT_FEEDBACK_MODEL = "gpt-5.6-luna";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCvpE87D16safq68oFB4fJKPyCURsc-mrU",
@@ -217,7 +218,10 @@ async function logAiFeedbackGenerated(kind, details = {}, resultData = {}) {
 
 export async function requestWritingFeedback(payload) {
   const generateWritingFeedback = httpsCallable(functionsRegion, "generateWritingFeedback");
-  const result = await generateWritingFeedback(payload);
+  const result = await generateWritingFeedback({
+    ...payload,
+    model: ASSESSMENT_FEEDBACK_MODEL,
+  });
   await logAiFeedbackGenerated("writing_generic", {
     product: payload?.exam || "aptis",
     section: payload?.part || payload?.taskTitle || "writing",
@@ -232,7 +236,7 @@ export async function requestOteWritingFeedback(payload) {
   const generateOteWritingFeedback = httpsCallable(functionsRegion, "generateOteWritingFeedback");
   const result = await generateOteWritingFeedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   const tasks = Array.isArray(payload?.tasks) ? payload.tasks : [];
   await logAiFeedbackGenerated("ote_writing", {
@@ -251,7 +255,7 @@ export async function requestOteAdvancedIntroConclusionFeedback(payload) {
   const generateFeedback = httpsCallable(functionsRegion, "generateOteAdvancedIntroConclusionFeedback");
   const result = await generateFeedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   await logAiFeedbackGenerated("ote_advanced_intro_conclusion", {
     product: "ote",
@@ -271,7 +275,7 @@ export async function requestOteRegisterGapFeedback(payload) {
   const generateOteRegisterGapFeedback = httpsCallable(functionsRegion, "generateOteRegisterGapFeedback");
   const result = await generateOteRegisterGapFeedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   const gaps = Array.isArray(payload?.gaps) ? payload.gaps : [];
   await logAiFeedbackGenerated("ote_register_gap", {
@@ -293,7 +297,7 @@ export async function requestOteRegisterRewriteFeedback(payload) {
   const generateOteRegisterRewriteFeedback = httpsCallable(functionsRegion, "generateOteRegisterRewriteFeedback");
   const result = await generateOteRegisterRewriteFeedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   const items = Array.isArray(payload?.items) ? payload.items : [];
   await logAiFeedbackGenerated("ote_register_rewrite", {
@@ -315,7 +319,7 @@ export async function requestOteAdvancedAcademicStyleFeedback(payload) {
   const generateFeedback = httpsCallable(functionsRegion, "generateOteAdvancedAcademicStyleFeedback");
   const result = await generateFeedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   const items = Array.isArray(payload?.items) ? payload.items : [];
   await logAiFeedbackGenerated("ote_advanced_academic_style", {
@@ -341,7 +345,7 @@ export async function requestAptisWritingPart1Feedback(items) {
   );
   const result = await generateAptisWritingPart1Feedback({
     items,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   // Aptis writing feedback is logged by the callable after successful generation.
   return result.data;
@@ -354,7 +358,7 @@ export async function requestAptisWritingPart23Feedback(payload) {
   );
   const result = await generateAptisWritingPart23Feedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   // Aptis writing feedback is logged by the callable after successful generation.
   return result.data;
@@ -367,9 +371,29 @@ export async function requestAptisWritingPart4Feedback(payload) {
   );
   const result = await generateAptisWritingPart4Feedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   // Aptis writing feedback is logged by the callable after successful generation.
+  return result.data;
+}
+
+export async function listAptisWritingModelLabCandidates({ kind = "all", limit: rowLimit = 20 } = {}) {
+  const callable = httpsCallable(functionsRegion, "listAptisWritingModelLabCandidates");
+  const result = await callable({ kind, limit: rowLimit });
+  return result.data;
+}
+
+export async function runAptisWritingModelLabComparison(payload) {
+  const callable = httpsCallable(functionsRegion, "runAptisWritingModelLabComparison", {
+    timeout: 300000,
+  });
+  const result = await callable(payload);
+  return result.data;
+}
+
+export async function submitAptisWritingModelLabReview(payload) {
+  const callable = httpsCallable(functionsRegion, "submitAptisWritingModelLabReview");
+  const result = await callable(payload);
   return result.data;
 }
 
@@ -380,7 +404,7 @@ export async function requestAptisSpeakingPart1Feedback(payload) {
   );
   const result = await generateAptisSpeakingPart1Feedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   await logAiFeedbackGenerated("aptis_speaking_part1", {
     product: "aptis",
@@ -398,7 +422,7 @@ export async function requestAptisSpeakingPart2Feedback(payload) {
   );
   const result = await generateAptisSpeakingPart2Feedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   await logAiFeedbackGenerated("aptis_speaking_part2", {
     product: "aptis",
@@ -418,7 +442,7 @@ export async function requestAptisSpeakingPart3Feedback(payload) {
   );
   const result = await generateAptisSpeakingPart3Feedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   await logAiFeedbackGenerated("aptis_speaking_part3", {
     product: "aptis",
@@ -438,7 +462,7 @@ export async function requestAptisSpeakingPart4Feedback(payload) {
   );
   const result = await generateAptisSpeakingPart4Feedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   await logAiFeedbackGenerated("aptis_speaking_part4", {
     product: "aptis",
@@ -459,7 +483,7 @@ export async function requestOteSpeakingFeedback(payload) {
   );
   const result = await generateOteSpeakingFeedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   await logAiFeedbackGenerated("ote_speaking", {
     product: "ote",
@@ -481,7 +505,7 @@ export async function requestOteLevelProductionFeedback(payload) {
   );
   const result = await generateOteLevelProductionFeedback({
     ...payload,
-    model: "gpt-5.4-mini",
+    model: ASSESSMENT_FEEDBACK_MODEL,
   });
   try {
     await logAiFeedbackGenerated("ote_level_production", {
