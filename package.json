@@ -16,6 +16,8 @@
     "content:sync:keyword": "node scripts/sync-keyword-content.mjs",
     "content:sync:opencloze": "node scripts/sync-open-cloze-content.mjs",
     "content:sync:wordformation": "node scripts/sync-word-formation-content.mjs",
+    "credits:students:preview": "node scripts/set-student-feedback-credit-floor.mjs",
+    "credits:students:apply": "node scripts/set-student-feedback-credit-floor.mjs --apply",
     "coursepack:split": "python3 scripts/split_course_pack_sections.py",
     "coursepack:upload": "node scripts/upload-course-pack-sections.mjs"
   },

@@ -49,7 +49,7 @@ import { TOPIC_DATA } from "./components/vocabulary/data/vocabTopics";
 import { getAllHubVocabThemes } from "./data/hubVocabularyActivities";
 
 const WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS = {
-  student: 40,
+  student: 120,
   teacher: 100,
   admin: 1000,
 };

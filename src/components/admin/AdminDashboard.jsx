@@ -105,7 +105,7 @@ function countWordsFromHtml(html = "") {
 }
 
 const WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS = {
-  student: 40,
+  student: 120,
   teacher: 100,
   admin: 1000,
 };
