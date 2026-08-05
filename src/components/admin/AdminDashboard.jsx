@@ -2,7 +2,9 @@
 import React, { useEffect, useMemo, useState } from "react";
 import {
   db,
+  deleteOrphanedFirestoreUserProfile,
   deleteCourseTestSession,
+  inspectDuplicateFirestoreUsers,
   listAllCourseTestSessions,
   listAttemptsForCourseTestSession,
   saveCourseTestAttemptReview,
@@ -438,6 +440,11 @@ export default function AdminDashboard({ user }) {
   const [selectedAdminNotification, setSelectedAdminNotification] = useState(null);
   const [creditDrafts, setCreditDrafts] = useState({});
   const [savingCredits, setSavingCredits] = useState({});
+  const [duplicateReview, setDuplicateReview] = useState(null);
+  const [duplicateReviewLoading, setDuplicateReviewLoading] = useState(false);
+  const [duplicateReviewError, setDuplicateReviewError] = useState("");
+  const [duplicateReviewNotice, setDuplicateReviewNotice] = useState("");
+  const [deletingOrphanUid, setDeletingOrphanUid] = useState("");
 
   const navigate = useNavigate();
 
@@ -792,6 +799,57 @@ export default function AdminDashboard({ user }) {
       console.error("[AdminDashboard] delete course test session failed", error);
     } finally {
       setDeletingSessionId("");
+    }
+  }
+
+  async function openDuplicateReview(email, groupedUsers) {
+    const uids = groupedUsers.map((entry) => entry.id);
+    setDuplicateReview({email, uids, records: []});
+    setDuplicateReviewLoading(true);
+    setDuplicateReviewError("");
+    setDuplicateReviewNotice("");
+    try {
+      const result = await inspectDuplicateFirestoreUsers({email, uids});
+      setDuplicateReview({email: result.email, uids, records: result.records || []});
+    } catch (error) {
+      console.error("[AdminDashboard] inspect duplicate users failed", error);
+      setDuplicateReviewError(error?.message || "The duplicate records could not be checked.");
+    } finally {
+      setDuplicateReviewLoading(false);
+    }
+  }
+
+  async function removeOrphanedProfile(record) {
+    if (!duplicateReview || record?.authExists || !record?.uid) return;
+    const nestedMessage = record.nestedDocumentCount
+      ? ` It also removes ${record.nestedDocumentCount} nested progress record(s).`
+      : "";
+    const confirmed = window.confirm(
+      `Remove the stale Firestore profile ${record.uid} for ${duplicateReview.email}?` +
+      `${nestedMessage}\n\nThe live Firebase Authentication account will not be changed. A profile audit backup will be retained.`
+    );
+    if (!confirmed) return;
+
+    setDeletingOrphanUid(record.uid);
+    setDuplicateReviewError("");
+    setDuplicateReviewNotice("");
+    try {
+      await deleteOrphanedFirestoreUserProfile({
+        email: duplicateReview.email,
+        uid: record.uid,
+        uids: duplicateReview.uids,
+      });
+      setUsers((prev) => prev.filter((entry) => entry.id !== record.uid));
+      setDuplicateReview((prev) => ({
+        ...prev,
+        records: prev.records.filter((entry) => entry.uid !== record.uid),
+      }));
+      setDuplicateReviewNotice(`Removed stale profile ${record.uid}. The live account was not changed.`);
+    } catch (error) {
+      console.error("[AdminDashboard] delete orphaned profile failed", error);
+      setDuplicateReviewError(error?.message || "The stale profile could not be removed.");
+    } finally {
+      setDeletingOrphanUid("");
     }
   }
 
@@ -2397,8 +2455,10 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
                 }}
               >
                 {duplicateEmailEntries.map(([email, groupedUsers]) => (
-                  <span
+                  <button
                     key={email}
+                    type="button"
+                    onClick={() => openDuplicateReview(email, groupedUsers)}
                     style={{
                       display: "inline-flex",
                       alignItems: "center",
@@ -2409,11 +2469,13 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
                       border: "1px solid rgba(251, 191, 36, 0.24)",
                       color: "#f8fafc",
                       fontSize: "0.8rem",
+                      cursor: "pointer",
                     }}
                   >
                     <strong>{groupedUsers.length}x</strong>
                     <span>{email}</span>
-                  </span>
+                    <span style={{ color: "#fcd34d", fontWeight: 800 }}>Review →</span>
+                  </button>
                 ))}
               </div>
             </div>
@@ -3225,6 +3287,134 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
           </div>
         </>
       )}
+
+      {duplicateReview ? (
+        <div
+          className="admin-dashboard-modal-backdrop"
+          onClick={() => !deletingOrphanUid && setDuplicateReview(null)}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 95,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1.2rem",
+            background: "rgba(2, 6, 23, 0.82)",
+          }}
+        >
+          <div
+            className="admin-dashboard-modal"
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "min(760px, 100%)",
+              maxHeight: "88vh",
+              overflow: "auto",
+              borderRadius: "1rem",
+              border: "1px solid rgba(251, 191, 36, 0.4)",
+              background: "linear-gradient(180deg, #182443, #101a32)",
+              boxShadow: "0 24px 70px rgba(0, 0, 0, 0.46)",
+              padding: "1.1rem",
+            }}
+          >
+            <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem", alignItems: "flex-start" }}>
+              <div>
+                <div style={{ color: "#fcd34d", fontSize: "0.78rem", fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                  Review duplicate user
+                </div>
+                <h3 style={{ margin: "0.3rem 0 0", color: "#f8fafc" }}>{duplicateReview.email}</h3>
+                <p style={{ margin: "0.4rem 0 0", color: "#b7c6e6", lineHeight: 1.5 }}>
+                  Authentication status is checked securely on the server. Only a Firestore profile with no matching Auth account can be removed.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="ghost-btn"
+                disabled={!!deletingOrphanUid}
+                onClick={() => setDuplicateReview(null)}
+                style={{ marginLeft: 0, flex: "0 0 auto" }}
+              >
+                Close
+              </button>
+            </div>
+
+            {duplicateReviewLoading ? <p style={{ color: "#cbd5e1" }}>Checking Firebase Authentication…</p> : null}
+            {duplicateReviewError ? (
+              <p role="alert" style={{ color: "#fecaca", background: "rgba(127, 29, 29, 0.24)", border: "1px solid rgba(248, 113, 113, 0.3)", borderRadius: "0.75rem", padding: "0.75rem" }}>
+                {duplicateReviewError}
+              </p>
+            ) : null}
+            {duplicateReviewNotice ? (
+              <p role="status" style={{ color: "#bbf7d0", background: "rgba(20, 83, 45, 0.24)", border: "1px solid rgba(74, 222, 128, 0.3)", borderRadius: "0.75rem", padding: "0.75rem" }}>
+                {duplicateReviewNotice}
+              </p>
+            ) : null}
+
+            {!duplicateReviewLoading && duplicateReview.records.length ? (
+              <div style={{ display: "grid", gap: "0.8rem", marginTop: "1rem" }}>
+                {duplicateReview.records.map((record) => (
+                  <section
+                    key={record.uid}
+                    style={{
+                      borderRadius: "0.9rem",
+                      border: record.authExists
+                        ? "1px solid rgba(74, 222, 128, 0.38)"
+                        : "1px solid rgba(248, 113, 113, 0.38)",
+                      background: record.authExists
+                        ? "rgba(20, 83, 45, 0.14)"
+                        : "rgba(127, 29, 29, 0.14)",
+                      padding: "0.9rem",
+                    }}
+                  >
+                    <div style={{ display: "flex", justifyContent: "space-between", gap: "0.8rem", flexWrap: "wrap", alignItems: "flex-start" }}>
+                      <div style={{ minWidth: 0 }}>
+                        <strong style={{ color: "#f8fafc" }}>
+                          {record.displayName || record.username || record.email || "Unnamed user"}
+                        </strong>
+                        <div style={{ marginTop: "0.25rem", color: "#9fb4da", fontSize: "0.82rem", overflowWrap: "anywhere" }}>
+                          UID: {record.uid}
+                        </div>
+                      </div>
+                      <span
+                        style={{
+                          borderRadius: "999px",
+                          padding: "0.3rem 0.65rem",
+                          background: record.authExists ? "rgba(34, 197, 94, 0.18)" : "rgba(239, 68, 68, 0.18)",
+                          color: record.authExists ? "#bbf7d0" : "#fecaca",
+                          fontWeight: 800,
+                          fontSize: "0.76rem",
+                        }}
+                      >
+                        {record.authExists ? "Live Auth account" : "Orphaned Firestore profile"}
+                      </span>
+                    </div>
+                    <div style={{ marginTop: "0.75rem", color: "#cbd5e1", fontSize: "0.84rem", lineHeight: 1.55 }}>
+                      <div>Role: {record.role || "—"} · Joined: {formatDateTime(record.profileCreatedAt)}</div>
+                      {record.authExists ? <div>Last sign-in: {formatDateTime(record.lastSignInAt)}</div> : null}
+                      <div>Nested profile records: {record.nestedDocumentCount || 0}</div>
+                    </div>
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: "0.8rem" }}>
+                      {record.authExists ? (
+                        <span style={{ color: "#86efac", fontSize: "0.82rem", fontWeight: 700 }}>Protected — no delete action</span>
+                      ) : (
+                        <button
+                          type="button"
+                          className="ghost-btn"
+                          disabled={!!deletingOrphanUid}
+                          onClick={() => removeOrphanedProfile(record)}
+                          style={{ marginLeft: 0, color: "#fecaca", borderColor: "rgba(248, 113, 113, 0.45)" }}
+                        >
+                          {deletingOrphanUid === record.uid ? "Removing…" : "Remove stale profile"}
+                        </button>
+                      )}
+                    </div>
+                  </section>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        </div>
+      ) : null}
 
       {selectedAdminNotification ? (
         <div

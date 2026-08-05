@@ -397,6 +397,18 @@ export async function submitAptisWritingModelLabReview(payload) {
   return result.data;
 }
 
+export async function inspectDuplicateFirestoreUsers({ email, uids }) {
+  const callable = httpsCallable(functionsRegion, "inspectDuplicateFirestoreUsers");
+  const result = await callable({ email, uids });
+  return result.data;
+}
+
+export async function deleteOrphanedFirestoreUserProfile({ email, uid, uids }) {
+  const callable = httpsCallable(functionsRegion, "deleteOrphanedFirestoreUserProfile");
+  const result = await callable({ email, uid, uids });
+  return result.data;
+}
+
 export async function requestAptisSpeakingPart1Feedback(payload) {
   const generateAptisSpeakingPart1Feedback = httpsCallable(
     functionsRegion,

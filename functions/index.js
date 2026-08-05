@@ -46,6 +46,209 @@ exports.aggregateWritingSubmission = functions
     createdAt: snap.createTime || context.timestamp,
   }));
 
+function normalizeUserEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function userCleanupDate(value) {
+  if (!value) return null;
+  const date = typeof value.toDate === "function" ? value.toDate() : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date.toISOString();
+}
+
+async function requireAdminForUserCleanup(context) {
+  if (!context.auth?.uid) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "Sign in before reviewing duplicate users."
+    );
+  }
+
+  const adminProfile = await firestore.doc(`users/${context.auth.uid}`).get();
+  if (adminProfile.data()?.role !== "admin") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Only administrators can review or remove duplicate users."
+    );
+  }
+}
+
+function duplicateUserRequest(data) {
+  const email = normalizeUserEmail(data?.email);
+  const uids = Array.from(new Set(
+    (Array.isArray(data?.uids) ? data.uids : [])
+      .map((uid) => String(uid || "").trim())
+      .filter((uid) => /^[a-zA-Z0-9_-]{1,128}$/.test(uid))
+  ));
+
+  if (!email || email.length > 320 || uids.length < 2 || uids.length > 10) {
+    throw new functions.https.HttpsError(
+      "invalid-argument",
+      "Choose a duplicate email group containing between two and ten user records."
+    );
+  }
+
+  return {email, uids};
+}
+
+async function authUserOrNull(uid) {
+  try {
+    return await admin.auth().getUser(uid);
+  } catch (error) {
+    if (error?.code === "auth/user-not-found") return null;
+    throw error;
+  }
+}
+
+async function directUserSubcollectionSummary(userRef) {
+  const subcollections = await userRef.listCollections();
+  const summaries = await Promise.all(subcollections.map(async (entry) => {
+    const countSnap = await entry.count().get();
+    return {name: entry.id, documentCount: Number(countSnap.data().count || 0)};
+  }));
+  return summaries.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+exports.inspectDuplicateFirestoreUsers = functions
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    await requireAdminForUserCleanup(context);
+    const request = duplicateUserRequest(data);
+
+    const records = await Promise.all(request.uids.map(async (uid) => {
+      const userRef = firestore.doc(`users/${uid}`);
+      const [profileSnap, authUser, subcollections] = await Promise.all([
+        userRef.get(),
+        authUserOrNull(uid),
+        directUserSubcollectionSummary(userRef),
+      ]);
+      const profile = profileSnap.data() || {};
+      if (!profileSnap.exists || normalizeUserEmail(profile.email) !== request.email) {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          "The duplicate group changed. Refresh the dashboard and try again."
+        );
+      }
+
+      return {
+        uid,
+        email: profile.email || "",
+        displayName: profile.displayName || profile.name || "",
+        username: profile.username || "",
+        role: profile.role || "",
+        teacherId: profile.teacherId || "",
+        profileCreatedAt: userCleanupDate(profile.createdAt),
+        authExists: !!authUser,
+        authEmail: authUser?.email || "",
+        authCreatedAt: authUser?.metadata?.creationTime || null,
+        lastSignInAt: authUser?.metadata?.lastSignInTime || null,
+        subcollections,
+        nestedDocumentCount: subcollections.reduce(
+          (total, entry) => total + entry.documentCount,
+          0
+        ),
+      };
+    }));
+
+    return {email: request.email, records};
+  });
+
+exports.deleteOrphanedFirestoreUserProfile = functions
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    await requireAdminForUserCleanup(context);
+    const request = duplicateUserRequest(data);
+    const uid = String(data?.uid || "").trim();
+    if (!request.uids.includes(uid) || uid === context.auth.uid) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Choose a valid orphaned user record."
+      );
+    }
+
+    const profileRef = firestore.doc(`users/${uid}`);
+    const siblingRefs = request.uids
+      .filter((candidateUid) => candidateUid !== uid)
+      .map((candidateUid) => firestore.doc(`users/${candidateUid}`));
+    const [profileSnap, siblingSnaps, authUser, subcollections] = await Promise.all([
+      profileRef.get(),
+      firestore.getAll(...siblingRefs),
+      authUserOrNull(uid),
+      directUserSubcollectionSummary(profileRef),
+    ]);
+    const profile = profileSnap.data() || {};
+
+    if (!profileSnap.exists || normalizeUserEmail(profile.email) !== request.email) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "This Firestore profile changed or no longer exists. Refresh and try again."
+      );
+    }
+    const matchingSiblingExists = siblingSnaps.some(
+      (snap) => snap.exists && normalizeUserEmail(snap.data()?.email) === request.email
+    );
+    if (!matchingSiblingExists) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "This email is no longer duplicated. Nothing was deleted."
+      );
+    }
+    if (authUser) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "This UID still has a Firebase Authentication account and cannot be removed here."
+      );
+    }
+
+    const nestedDocumentCount = subcollections.reduce(
+      (total, entry) => total + entry.documentCount,
+      0
+    );
+    const auditRef = firestore.collection("adminUserCleanupAudit").doc();
+    await auditRef.set({
+      action: "delete_orphaned_firestore_user_profile",
+      status: "started",
+      targetUid: uid,
+      targetEmail: request.email,
+      profileBackup: profile,
+      subcollections,
+      nestedDocumentCount,
+      requestedByUid: context.auth.uid,
+      requestedByEmail: context.auth.token?.email || null,
+      startedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    try {
+      await firestore.recursiveDelete(profileRef);
+      await auditRef.update({
+        status: "completed",
+        completedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    } catch (error) {
+      await auditRef.update({
+        status: "failed",
+        error: String(error?.message || error).slice(0, 1000),
+        failedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      console.error("[deleteOrphanedFirestoreUserProfile] cleanup failed", {
+        uid,
+        auditId: auditRef.id,
+        error,
+      });
+      throw new functions.https.HttpsError(
+        "internal",
+        "The orphaned profile could not be removed. Nothing else was changed."
+      );
+    }
+
+    return {
+      deletedUid: uid,
+      email: request.email,
+      nestedDocumentCount,
+      auditId: auditRef.id,
+    };
+  });
+
 const WRITING_FEEDBACK_WEEKLY_CREDITS = {
   student: 120,
   teacher: 100,
