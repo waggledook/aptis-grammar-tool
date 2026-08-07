@@ -715,8 +715,18 @@ function VocabularyTaskCard({
   const [reportOpen, setReportOpen] = useState(false);
   const [localReportReason, setLocalReportReason] = useState("");
   const [localReportComment, setLocalReportComment] = useState("");
+  const [showMissingAnswers, setShowMissingAnswers] = useState(false);
+  const questionSelectRefs = useRef(new Map());
+  const unansweredQuestions = task.questions
+    .map((question, questionIndex) => ({ question, questionIndex }))
+    .filter(({ question }) => !answers[question.id]);
   const allAnswered = task.questions.every((question) => answers[question.id]);
   const taskScore = task.questions.filter((question) => answers[question.id] === question.answerLetter).length;
+  const missingQuestionNumbers = unansweredQuestions.map(({ questionIndex }) => questionIndex + 1);
+  const missingQuestionLabel = missingQuestionNumbers.length === 1
+    ? `question ${missingQuestionNumbers[0]}`
+    : `questions ${missingQuestionNumbers.join(", ")}`;
+  const missingMessageId = `${task.id}-missing-answers`;
 
   function toggleReportForm() {
     setReportOpen((open) => !open);
@@ -733,6 +743,26 @@ function VocabularyTaskCard({
   async function sendLocalReport() {
     const sent = await onSendReport(localReportReason, localReportComment);
     if (sent) closeLocalReportForm();
+  }
+
+  function handleCheck() {
+    if (unansweredQuestions.length) {
+      setShowMissingAnswers(true);
+      toast(`Please answer ${missingQuestionLabel} before checking.`);
+
+      const firstUnansweredId = unansweredQuestions[0].question.id;
+      window.requestAnimationFrame(() => {
+        const firstUnansweredSelect = questionSelectRefs.current.get(firstUnansweredId);
+        firstUnansweredSelect?.focus({ preventScroll: true });
+        firstUnansweredSelect
+          ?.closest(".vocab-task-row")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+      return;
+    }
+
+    setShowMissingAnswers(false);
+    onCheck();
   }
 
   return (
@@ -817,20 +847,27 @@ function VocabularyTaskCard({
             const isCorrect = selectedLetter === question.answerLetter;
             const itemFavouriteId = buildItemFavouriteId(task, question);
             const isQuestionFavourite = favouriteItemIds.has(itemFavouriteId);
+            const isMissing = showMissingAnswers && !selectedLetter;
             return (
               <div
                 key={question.id}
-                className={`vocab-task-row ${checked ? (isCorrect ? "is-correct" : "is-wrong") : ""}`}
+                className={`vocab-task-row ${checked ? (isCorrect ? "is-correct" : "is-wrong") : isMissing ? "is-missing" : ""}`}
               >
                 <span className="vocab-task-number">{questionIndex + 1}</span>
                 <p>{getQuestionText(task, question)}</p>
                 <div className="vocab-task-answer-controls">
                   <span className="select-wrap vocab-task-select-wrap">
                     <select
+                      ref={(node) => {
+                        if (node) questionSelectRefs.current.set(question.id, node);
+                        else questionSelectRefs.current.delete(question.id);
+                      }}
                       className="select"
                       value={selectedLetter}
                       onChange={(event) => onChoose(question.id, event.target.value)}
                       disabled={checked}
+                      aria-invalid={isMissing || undefined}
+                      aria-describedby={isMissing ? missingMessageId : undefined}
                     >
                       <option value="">Choose</option>
                       {task.options.map((option) => (
@@ -857,11 +894,13 @@ function VocabularyTaskCard({
       </div>
 
       <div className="vocab-task-actions">
-        <button className="review-btn" type="button" onClick={onCheck} disabled={!allAnswered || checked}>
+        <button className="review-btn" type="button" onClick={handleCheck} disabled={checked}>
           {checked ? `Checked: ${taskScore}/${task.questions.length}` : "Check task"}
         </button>
-        {!allAnswered && !checked ? (
-          <p>Answer all five questions before checking.</p>
+        {showMissingAnswers && !allAnswered && !checked ? (
+          <p id={missingMessageId} className="vocab-task-missing-message" role="alert">
+            Please answer {missingQuestionLabel} before checking.
+          </p>
         ) : null}
       </div>
 
@@ -1277,6 +1316,26 @@ function VocabExerciseStyles() {
       .vocab-task-row.is-wrong {
         border-color: color-mix(in srgb, #ef4444 55%, var(--color-border));
         background: color-mix(in srgb, #ef4444 10%, var(--color-surface-raised));
+      }
+
+      .vocab-task-row.is-missing {
+        border-color: color-mix(in srgb, var(--color-danger) 68%, var(--color-border));
+        background: color-mix(in srgb, var(--color-danger) 9%, var(--color-surface-raised));
+        box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-danger) 18%, transparent);
+      }
+
+      .vocab-task-row.is-missing .select {
+        border-color: var(--color-danger);
+        box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-danger) 18%, transparent);
+      }
+
+      .vocab-task-actions .vocab-task-missing-message {
+        padding: .55rem .7rem;
+        border: 1px solid color-mix(in srgb, var(--color-danger) 42%, var(--color-border));
+        border-radius: 10px;
+        background: color-mix(in srgb, var(--color-danger) 10%, var(--color-surface-raised));
+        color: var(--color-danger);
+        font-weight: 800;
       }
 
       .vocab-task-number {
