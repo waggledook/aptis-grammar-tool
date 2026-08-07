@@ -1873,9 +1873,25 @@ export async function logReadingReorderCompleted({ taskId, source = "AptisPart2R
   });
 }
 
+const READING_GUIDE_VIEW_DEDUPE_MS = 2000;
+const recentReadingGuideViews = new Map();
+
 // Reading guide page opened
 export async function logReadingGuideViewed({ guideId = "reading_guide_reorder" } = {}) {
-  return logActivity("reading_guide_viewed", { guideId });
+  const userId = auth.currentUser?.uid;
+  if (!userId) return;
+
+  const safeGuideId = String(guideId || "reading_guide_reorder");
+  const dedupeKey = `${userId}:${safeGuideId}`;
+  const now = Date.now();
+  const previousView = recentReadingGuideViews.get(dedupeKey);
+
+  // React StrictMode intentionally reruns mount effects in development. Ignore
+  // only the immediate duplicate while continuing to record later visits.
+  if (previousView && now - previousView < READING_GUIDE_VIEW_DEDUPE_MS) return;
+
+  recentReadingGuideViews.set(dedupeKey, now);
+  return logActivity("reading_guide_viewed", { guideId: safeGuideId });
 }
 
 // “Show clues” clicked (guide)
