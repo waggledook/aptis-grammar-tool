@@ -33,6 +33,7 @@ import { fetchItems }              from './api/grammar'
 import ReviewMistakes   from './components/ReviewMistakes'
 import ReviewFavourites from './components/ReviewFavourites'
 import ReadingGuide from './reading/ReadingGuide';
+import ReadingPart3StrategyTrainer from './reading/ReadingPart3StrategyTrainer.jsx';
 import MainMenu from './components/MainMenu';
 import Profile from "./components/profile/Profile";
 import WritingMenu from './components/writing/WritingMenu';
@@ -44,6 +45,7 @@ import WritingPart4Guide from "./components/writing/WritingPart4Guide";
 import WritingPart4Emails from "./components/writing/WritingPart4Emails";
 import WritingPart4RegisterGuide from "./components/writing/WritingPart4RegisterGuide";
 import ReadingMenu from './components/ReadingMenu';
+import ReadingPartMenu from './reading/ReadingPartMenu.jsx';
 import SpeakingMenu from './components/speaking/SpeakingMenu';
 import SpeakingPart1 from "./components/speaking/SpeakingPart1";
 import SpeakingPart2 from './components/speaking/SpeakingPart2';
@@ -1947,11 +1949,22 @@ return (
 />
 
 <Route
+  path="/reading/parts/:partNumber"
+  element={
+    <ReadingPartMenu
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+    />
+  }
+/>
+
+<Route
   path="/reading/part1"
   element={
     <>
       <button
-        onClick={() => navigate("/reading")}
+        onClick={() => navigate("/reading/parts/1")}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
@@ -1972,7 +1985,7 @@ return (
 <Route path="/reading/part2" element={
   <>
     <button
-      onClick={() => navigate("/reading")}
+      onClick={() => navigate("/reading/parts/2")}
       className="review-btn"
       style={{ marginBottom: "1rem" }}
     >
@@ -2000,7 +2013,7 @@ return (
     <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
       <>
         <button
-          onClick={() => navigate("/reading")}
+          onClick={() => navigate("/reading/parts/2")}
           className="review-btn"
           style={{ marginBottom: "1rem" }}
         >
@@ -2014,7 +2027,7 @@ return (
 <Route path="/reading/part2-guide" element={
   <>
     <button
-      onClick={() => navigate("/reading")}
+      onClick={() => navigate("/reading/parts/2")}
       className="review-btn"
       style={{ marginBottom: "1rem" }}
     >
@@ -2023,10 +2036,22 @@ return (
     <ReadingGuide />
   </>
 } />
+<Route path="/reading/part3-strategy" element={
+  <>
+    <button
+      onClick={() => navigate("/reading/parts/3")}
+      className="review-btn"
+      style={{ marginBottom: "1rem" }}
+    >
+      ← Back
+    </button>
+    <ReadingPart3StrategyTrainer />
+  </>
+} />
 <Route path="/reading/part3" element={
   <>
     <button
-      onClick={() => navigate("/reading")}
+      onClick={() => navigate("/reading/parts/3")}
       className="review-btn"
       style={{ marginBottom: "1rem" }}
     >
@@ -2041,7 +2066,7 @@ return (
   element={
     <>
       <button
-        onClick={() => navigate("/reading")}
+        onClick={() => navigate("/reading/parts/4")}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >

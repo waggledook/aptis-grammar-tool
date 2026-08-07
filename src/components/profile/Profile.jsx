@@ -836,7 +836,7 @@ function renderFeedbackButton(kind, submission) {
   const READING_TOTALS = {
     part1: 6,
     part2: 6, // update if you have more reorder tasks live
-    part3: 1, // you said there is currently one example
+    part3: 5,
     part4: 2, // update if you have more live
   };
 

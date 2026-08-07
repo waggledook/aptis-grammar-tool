@@ -318,9 +318,15 @@ export function formatActivityDetails(log) {
     case "reading_reorder_completed":
       return joinParts([d.taskId || "Task", "Completed"]);
     case "reading_part1_attempted":
+    case "reading_part2_attempted":
     case "reading_part4_attempted":
     case "reading_part3_attempted":
-      return joinParts([d.taskId || "Task", `Score ${formatScore(d.score, d.total)}`]);
+      return joinParts([
+        d.taskId || "Task",
+        `Score ${formatScore(d.score, d.total)}`,
+        typeof d.durationSeconds === "number" ? `Time ${formatDurationSeconds(d.durationSeconds)}` : "",
+        d.completionAction === "answers_revealed" ? "Answers revealed" : "",
+      ]);
     case "reading_part1_completed":
     case "reading_part4_completed":
     case "reading_part3_completed":

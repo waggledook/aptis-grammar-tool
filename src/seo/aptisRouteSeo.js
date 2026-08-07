@@ -26,6 +26,26 @@ export const APTIS_ROUTE_SEO = {
     description:
       "Practise Aptis Reading tasks, including sentence order, matching opinions, heading matching and reading strategy guides.",
   },
+  "/reading/parts/1": {
+    title: "Aptis Reading Part 1: Word Choices | Seif Aptis Trainer",
+    description:
+      "Learn the Aptis Reading Part 1 word-choice format and open exam-style practice with feedback and suggested timing.",
+  },
+  "/reading/parts/2": {
+    title: "Aptis Reading Part 2: Sentence Order | Seif Aptis Trainer",
+    description:
+      "Learn the Aptis Reading Part 2 sentence-order strategy and practise rebuilding cohesive exam-style texts.",
+  },
+  "/reading/parts/3": {
+    title: "Aptis Reading Part 3: Matching Opinions | Seif Aptis Trainer",
+    description:
+      "Learn to match complete ideas in Aptis Reading Part 3, then practise exam-style opinion-matching tasks.",
+  },
+  "/reading/parts/4": {
+    title: "Aptis Reading Part 4: Heading Matching | Seif Aptis Trainer",
+    description:
+      "Learn the Aptis Reading Part 4 heading-matching format and practise identifying the main purpose of each paragraph.",
+  },
   "/reading/part1": {
     title: "Aptis Reading Part 1 Practice | Seif Aptis Trainer",
     description:
@@ -45,6 +65,11 @@ export const APTIS_ROUTE_SEO = {
     title: "Aptis Reading Part 3 Practice | Seif Aptis Trainer",
     description:
       "Practise Aptis Reading Part 3 matching-opinion tasks with short comments and exam-style questions.",
+  },
+  "/reading/part3-strategy": {
+    title: "Aptis Reading Part 3 Strategy Trainer | Seif Aptis Trainer",
+    description:
+      "Learn to paraphrase questions, reject partial matches and prove answers with evidence in Aptis Reading Part 3.",
   },
   "/reading/part4": {
     title: "Aptis Reading Part 4 Practice | Seif Aptis Trainer",

@@ -9,6 +9,11 @@ import { getSitePath } from "../siteConfig.js";
 import { toast } from "../utils/toast";
 import ReadingAssignButton from "./ReadingAssignButton.jsx";
 import ReadingDemoNotice from "./ReadingDemoNotice.jsx";
+import {
+  ReadingTaskStart,
+  ReadingTaskTimer,
+} from "./ReadingTaskTimer.jsx";
+import { getReadingTimingDetails, READING_SUGGESTED_SECONDS, useSuggestedTaskTimer } from "./readingTaskTiming.js";
 
 const READING_PART1_TASKS = [
   {
@@ -261,6 +266,7 @@ export default function AptisPart1({
   const [feedback, setFeedback] = useState({});
   const [completed, setCompleted] = useState(new Set());
   const [whyOpen, setWhyOpen] = useState(null);
+  const taskTimer = useSuggestedTaskTimer(READING_SUGGESTED_SECONDS.part1);
   const current = tasks[taskIndex] || tasks[0];
 
   useEffect(() => {
@@ -303,6 +309,7 @@ export default function AptisPart1({
     setAnswers({});
     setFeedback({});
     setWhyOpen(null);
+    taskTimer.reset();
   }
 
   function handleSelectTask(nextIndex) {
@@ -333,6 +340,7 @@ export default function AptisPart1({
   }
 
   async function handleCheck() {
+    const timingDetails = getReadingTimingDetails(taskTimer, "checked");
     const nextFeedback = {};
     current.gaps
       .filter((gap) => !gap.fixed)
@@ -355,6 +363,7 @@ export default function AptisPart1({
         score,
         total,
         source: "AptisPart1",
+        ...timingDetails,
       });
     }
 
@@ -364,6 +373,12 @@ export default function AptisPart1({
   }
 
   async function handleShowAnswers() {
+    const timingDetails = getReadingTimingDetails(taskTimer, "answers_revealed");
+    const answerable = current.gaps.filter((gap) => !gap.fixed);
+    const score = answerable.reduce(
+      (total, gap) => total + (answers[gap.id] === gap.answer ? 1 : 0),
+      0
+    );
     const nextAnswers = {};
     const nextFeedback = {};
     current.gaps.forEach((gap) => {
@@ -373,6 +388,15 @@ export default function AptisPart1({
     });
     setAnswers(nextAnswers);
     setFeedback(nextFeedback);
+    if (user) {
+      await logReadingPart1Attempted({
+        taskId: current.id,
+        score,
+        total: answerable.length,
+        source: "AptisPart1",
+        ...timingDetails,
+      });
+    }
     await markCurrentTaskCompleted();
   }
 
@@ -380,6 +404,7 @@ export default function AptisPart1({
     setAnswers({});
     setFeedback({});
     setWhyOpen(null);
+    taskTimer.reset();
   }
 
   function renderGap(gapId) {
@@ -443,7 +468,18 @@ export default function AptisPart1({
         Demo mode includes two Part 1 reading tasks. The other Part 1 tasks stay visible but require full access.
       </ReadingDemoNotice>
 
-      <section className="p1-panel">
+      {taskTimer.phase === "ready" ? (
+        <ReadingTaskStart
+          partLabel="Aptis Reading Part 1"
+          taskTitle={current.title}
+          itemCountLabel="5 word choices"
+          recommendedSeconds={taskTimer.recommendedSeconds}
+          onStart={taskTimer.start}
+        />
+      ) : (
+        <>
+          <ReadingTaskTimer timer={taskTimer} />
+          <section className="p1-panel">
         <div className="p1-panelbar">
           <div>
             <p className="eyebrow">Question 1 of 5</p>
@@ -521,7 +557,9 @@ export default function AptisPart1({
             </ol>
           </div>
         ) : null}
-      </section>
+          </section>
+        </>
+      )}
     </div>
   );
 }

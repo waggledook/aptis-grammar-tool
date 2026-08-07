@@ -1849,6 +1849,22 @@ export async function logSpeakingNoteSubmitted(details) {
 
 // ─── READING ACTIVITY HELPERS ───────────────────────────────────────────────
 
+function normaliseReadingTimingDetails(details = {}) {
+  const output = {};
+  ["durationSeconds", "recommendedSeconds", "overtimeSeconds"].forEach((key) => {
+    if (Number.isFinite(details[key])) output[key] = Math.max(0, Math.round(details[key]));
+  });
+  if (typeof details.withinSuggestedTime === "boolean") {
+    output.withinSuggestedTime = details.withinSuggestedTime;
+  }
+  if (typeof details.firstTimedCheck === "boolean") {
+    output.firstTimedCheck = details.firstTimedCheck;
+  }
+  if (details.completionAction) output.completionAction = String(details.completionAction);
+  if (details.timingMode) output.timingMode = String(details.timingMode);
+  return output;
+}
+
 // Part 2 reorder (the main reorder activity)
 export async function logReadingReorderCompleted({ taskId, source = "AptisPart2Reorder" }) {
   return logActivity("reading_reorder_completed", {
@@ -1891,12 +1907,19 @@ export async function logReadingGuideReorderCompleted({ taskId }) {
   });
 }
 
-export async function logReadingPart4Attempted({ taskId, score, total, source = "AptisPart4" }) {
+export async function logReadingPart4Attempted({
+  taskId,
+  score,
+  total,
+  source = "AptisPart4",
+  ...timingDetails
+}) {
   return logActivity("reading_part4_attempted", {
     taskId: taskId || null,
     score: typeof score === "number" ? score : null,
     total: typeof total === "number" ? total : null,
     source,
+    ...normaliseReadingTimingDetails(timingDetails),
   });
 }
 
@@ -1908,12 +1931,19 @@ export async function logReadingPart4Completed({ taskId, source = "AptisPart4" }
   });
 }
 
-export async function logReadingPart1Attempted({ taskId, score, total, source = "AptisPart1" }) {
+export async function logReadingPart1Attempted({
+  taskId,
+  score,
+  total,
+  source = "AptisPart1",
+  ...timingDetails
+}) {
   return logActivity("reading_part1_attempted", {
     taskId: taskId || null,
     score: typeof score === "number" ? score : null,
     total: typeof total === "number" ? total : null,
     source,
+    ...normaliseReadingTimingDetails(timingDetails),
   });
 }
 
@@ -1925,17 +1955,35 @@ export async function logReadingPart1Completed({ taskId, source = "AptisPart1" }
   });
 }
 
+export async function logReadingPart2Attempted({
+  taskId,
+  score,
+  total,
+  source = "AptisPart2Reorder",
+  ...timingDetails
+}) {
+  return logActivity("reading_part2_attempted", {
+    taskId: taskId || null,
+    score: typeof score === "number" ? score : null,
+    total: typeof total === "number" ? total : null,
+    source,
+    ...normaliseReadingTimingDetails(timingDetails),
+  });
+}
+
 export async function logReadingPart3Attempted({
   taskId,
   score,
   total,
   source = "AptisPart3",
+  ...timingDetails
 }) {
   return logActivity("reading_part3_attempted", {
     taskId: taskId || null,
     score: typeof score === "number" ? score : null,
     total: typeof total === "number" ? total : null,
     source,
+    ...normaliseReadingTimingDetails(timingDetails),
   });
 }
 

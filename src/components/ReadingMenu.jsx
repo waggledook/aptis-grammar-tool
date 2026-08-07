@@ -1,235 +1,117 @@
-// src/components/ReadingMenu.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Seo from "./common/Seo.jsx";
+import { fetchReadingCompletions } from "../firebase.js";
+import { APTIS_READING_PARTS } from "../reading/readingMenuData.js";
 import AptisDemoBadge from "./access/AptisDemoBadge.jsx";
-
-const GUIDE_CARDS = [
-  {
-    title: "Part 2 Guide: Sentence Order",
-    description: "Learn how to spot cohesive clues and link ideas when reordering sentences.",
-    path: "/reading/part2-guide",
-    demoAccess: "demo",
-  },
-];
-
-const PRACTICE_CARDS = [
-  {
-    title: "Part 1: Word Choices",
-    description: "Choose the best word for each gap in short informal emails.",
-    path: "/reading/part1",
-    demoAccess: "demo",
-  },
-  {
-    title: "Part 2: Sentence Order",
-    description: "Reorder sentences to form a logical paragraph.",
-    path: "/reading/part2",
-    demoAccess: "demo",
-  },
-  {
-    title: "Part 3: Matching Opinions",
-    description: "Read four short comments and decide who says what.",
-    path: "/reading/part3",
-    demoAccess: "locked",
-  },
-  {
-    title: "Part 4: Heading Matching",
-    description: "Match headings to paragraphs. One heading is extra.",
-    path: "/reading/part4",
-    demoAccess: "demo",
-  },
-];
+import Seo from "./common/Seo.jsx";
 
 export default function ReadingMenu({ user, aptisAccess, onSignIn }) {
   const navigate = useNavigate();
-  const [lockedPart, setLockedPart] = useState("");
+  const [completed, setCompleted] = useState(() => new Set());
   const isDemoMode = !!aptisAccess?.isDemoMode;
 
-  function openCard(card) {
-    if (isDemoMode && card.demoAccess === "locked") {
-      setLockedPart(card.title);
-      return;
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    if (!user) {
+      setCompleted(new Set());
+      return undefined;
     }
-
-    navigate(card.path);
-  }
-
-  function renderAccessPill(card) {
-    if (!isDemoMode || !card.demoAccess) return null;
-    return (
-      <span className={`reading-access-pill ${card.demoAccess === "demo" ? "demo" : "locked"}`}>
-        {card.demoAccess === "demo" ? "Demo available" : "Full access"}
-      </span>
-    );
-  }
+    fetchReadingCompletions().then((done) => {
+      if (alive) setCompleted(done);
+    });
+    return () => { alive = false; };
+  }, [user]);
 
   return (
-    <div className="reading-menu game-wrapper menu-style-hub">
+    <main className="reading-menu game-wrapper hub-menu-wrapper menu-style-hub">
       <Seo
         title="Aptis Reading Practice | Seif Aptis Trainer"
-        description="Practise Aptis Reading tasks, including sentence order (Part 2) and matching opinions (Part 3), plus a strategy guide for Part 2."
+        description="Choose an Aptis Reading part, learn its strategy and practise complete exam-style tasks with feedback."
       />
-      <header className="header">
-        <h2 className="title">Reading Practice</h2>
-        <p className="intro">
-          Practise individual parts of the Aptis Reading test, or use the guide when you want support with sentence order.
-        </p>
+
+      <header className="reading-menu-header">
+        <h1>Aptis Reading Parts</h1>
+        <p>Open a part to choose between strategy training and exam-style practice.</p>
       </header>
 
       <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
 
-      {isDemoMode && lockedPart ? (
-        <div className="reading-access-prompt" role="status">
-          <strong>{lockedPart} is included with full access.</strong>
-          <p>The reading demo currently includes two Part 1 tasks, two Part 2 tasks and one Part 4 task.</p>
-        </div>
-      ) : null}
+      <section className="reading-menu-section">
+        <div className="reading-parts-grid" aria-label="Aptis Reading parts">
+          {APTIS_READING_PARTS.map((part) => {
+            const Icon = part.icon;
+            const completedCount = part.taskIds.filter((taskId) => completed.has(taskId)).length;
+            const allComplete = part.taskIds.length > 0 && completedCount === part.taskIds.length;
+            const onlyLockedActivities = part.training
+              .concat(part.practice)
+              .filter((activity) => activity.status !== "coming-soon")
+              .every((activity) => activity.demoAccess === "locked");
 
-      <section className="menu-section guides">
-        <div className="section-header">
-          <h3>Guide</h3>
-          <p>Get support with the main strategy guide currently available in reading.</p>
-        </div>
-        <div className="cards guide-cards">
-          {GUIDE_CARDS.map((card) => (
-            <button className="card guide-card" key={card.path} onClick={() => openCard(card)}>
-              <h3>{card.title}{renderAccessPill(card)}</h3>
-              <p>{card.description}</p>
-            </button>
-          ))}
+            return (
+              <button
+                className={`menu-card reading-part-card ${allComplete ? "is-complete" : ""}`}
+                key={part.number}
+                type="button"
+                onClick={() => navigate(`/reading/parts/${part.number}`)}
+              >
+                {allComplete ? <CheckCircle2 className="reading-complete-icon" size={24} aria-label="Part complete" /> : null}
+                <div className="reading-part-card-label"><Icon size={28} aria-hidden="true" /><span>{part.label}</span></div>
+                <h3>{part.title}</h3>
+                <p>{part.copy}</p>
+                {user ? (
+                  <strong className="reading-menu-progress">
+                    {completedCount}/{part.taskIds.length} practice tasks complete
+                  </strong>
+                ) : (
+                  <strong className="reading-menu-progress">{part.menuSummary}</strong>
+                )}
+                {isDemoMode ? (
+                  <small className={`reading-menu-access ${onlyLockedActivities ? "locked" : "demo"}`}>
+                    {onlyLockedActivities ? "Full access" : "Demo available"}
+                  </small>
+                ) : null}
+              </button>
+            );
+          })}
         </div>
       </section>
 
-      <section className="menu-section practice">
-        <div className="section-header">
-          <h3>Exam Practice</h3>
-          <p>Practise the reading parts directly in exam-style tasks.</p>
-        </div>
-        <div className="cards">
-          {PRACTICE_CARDS.map((card) => (
-            <button className="card practice-card" key={card.path} onClick={() => openCard(card)}>
-              <h3>{card.title}{renderAccessPill(card)}</h3>
-              <p>{card.description}</p>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Back to main menu */}
-      <button
-        className="topbar-btn"
-        onClick={() => navigate("/")}
-        style={{ marginTop: "1rem" }}
-      >
+      <button className="topbar-btn reading-menu-back" type="button" onClick={() => navigate("/")}>
         ← Back to main menu
       </button>
 
       <style>{`
-        .header { margin-bottom: 1rem; }
-        .title { font-size: 1.6rem; margin-bottom: .3rem; }
-        .intro { color: var(--color-text-soft); max-width: 640px; }
-
-        .reading-access-prompt {
-          margin: 0 0 1rem;
-          padding: .8rem .95rem;
-          border-radius: 12px;
-          border: 1px solid color-mix(in srgb, var(--color-accent) 42%, var(--color-border));
-          background:
-            linear-gradient(100deg, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-raised)), var(--color-surface-raised));
-        }
-
-        .reading-access-prompt strong {
-          display: block;
-          margin-bottom: .2rem;
-          color: var(--color-text);
-        }
-
-        .reading-access-prompt p {
-          margin: 0;
-          color: var(--color-text-soft);
-          line-height: 1.38;
-          font-size: .9rem;
-        }
-
-        .menu-section {
-          margin-top: 1.2rem;
-        }
-
-        .section-header {
-          margin-bottom: .85rem;
-        }
-
-        .section-header h3 {
-          margin: 0 0 .25rem;
-          color: var(--color-text);
-        }
-
-        .section-header p {
-          margin: 0;
-          color: var(--color-text-soft);
-          max-width: 680px;
-        }
-
-        .cards {
-          display:grid;
-          gap:1rem;
-          grid-template-columns:1fr;
-        }
-
-        @media (min-width:720px){
-          .cards {
-            grid-template-columns: repeat(2,1fr);
-          }
-        }
-
-        .guide-cards {
-          grid-template-columns: 1fr;
-        }
-
-        @media (min-width:720px){
-          .guide-cards {
-            grid-template-columns: minmax(280px, 420px);
-          }
-        }
-
-        .card h3 {
-          margin:0 0 .35rem;
-          display:flex;
-          align-items:center;
-          flex-wrap:wrap;
-          gap:.35rem;
-        }
-
-        .reading-access-pill {
-          display: inline-flex;
-          align-items: center;
-          padding: .2rem .48rem;
-          border-radius: 999px;
-          border: 1px solid var(--color-border);
-          color: var(--color-text-soft);
-          font-size: .68rem;
-          font-weight: 800;
-          line-height: 1.2;
-          white-space: nowrap;
-        }
-
-        .reading-access-pill.demo {
-          border-color: color-mix(in srgb, var(--color-accent) 48%, var(--color-border));
-          background: color-mix(in srgb, var(--color-accent) 16%, transparent);
-          color: var(--color-accent);
-        }
-
-        .reading-access-pill.locked {
-          border-color: color-mix(in srgb, #94a3b8 42%, var(--color-border));
-          background: color-mix(in srgb, #94a3b8 10%, transparent);
-        }
-
-        .card p {
-          margin:0;
-          color: var(--color-text-soft);
-        }
-
+        .reading-menu-header { margin-bottom:1.2rem; }
+        .reading-menu-header h1 { margin:0 0 .55rem; color:#eef4ff; font-size:clamp(1.7rem, 4vw, 2.35rem); text-align:left; }
+        .reading-menu-header p { margin:0; color:rgba(238,244,255,.82); font-size:1.05rem; line-height:1.5; }
+        .reading-menu-section { margin-top:1.3rem; }
+        .reading-parts-grid { display:grid; grid-template-columns:1fr; gap:1rem; }
+        .reading-menu .reading-part-card { position:relative; display:flex; flex-direction:column; align-items:flex-start; min-height:220px; }
+        .reading-part-card-label { display:flex; align-items:center; gap:.35rem; margin-bottom:.25rem; color:#eef4ff; font-size:1rem; }
+        .reading-part-card-label svg { color:#eef4ff; }
+        .reading-menu .reading-part-card h3 { font-size:1.28rem; text-align:left; }
+        .reading-menu .reading-part-card p { text-align:left; }
+        .reading-menu-progress { display:block; margin-top:auto; padding-top:.9rem; color:#ffbd38; font-size:.86rem; }
+        .reading-menu-access { display:inline-flex; margin-top:.45rem; padding:.2rem .45rem; border:1px solid rgba(238,244,255,.28); border-radius:999px; color:rgba(238,244,255,.72); font-size:.66rem; font-weight:850; }
+        .reading-menu-access.demo { border-color:rgba(255,189,56,.44); color:#ffcf70; }
+        .reading-menu .reading-part-card.is-complete { border-color:color-mix(in srgb, #22c55e 64%, #35508e); box-shadow:0 0 0 1px color-mix(in srgb, #22c55e 22%, transparent), 0 10px 24px rgba(0,0,0,.16); }
+        .reading-complete-icon { position:absolute; top:1rem; right:1rem; color:#7ef0c2 !important; }
+        .reading-menu-back { margin-top:1.2rem; }
+        :root[data-theme="light"] .reading-menu-header h1 { color:var(--color-text); }
+        :root[data-theme="light"] .reading-menu-header p { color:var(--color-text-soft); }
+        :root[data-theme="light"] .reading-part-card-label, :root[data-theme="light"] .reading-part-card-label svg { color:var(--color-text); }
+        :root[data-theme="light"] .reading-menu-progress { color:#a76600; }
+        :root[data-theme="light"] .reading-menu-access { color:var(--color-text-soft); }
+        :root[data-theme="light"] .reading-menu-access.demo { border-color:#b47a15; color:#8a5900; }
+        :root[data-theme="light"] .reading-menu .reading-part-card.is-complete { border-color:#159766; box-shadow:0 0 0 1px rgba(21,151,102,.28), 0 12px 26px rgba(21,94,73,.1); }
+        :root[data-theme="light"] .reading-complete-icon { color:#0d9b67 !important; }
+        @media (min-width:720px) { .reading-parts-grid { grid-template-columns:repeat(2, minmax(0, 1fr)); } }
       `}</style>
-    </div>
+    </main>
   );
 }

@@ -8,116 +8,83 @@ import {
 import { toast } from "../utils/toast";
 import { getSitePath } from "../siteConfig.js";
 import ReadingAssignButton from "./ReadingAssignButton.jsx";
+import { READING_PART3_TASKS } from "./part3Tasks.js";
+import {
+  ReadingTaskStart,
+  ReadingTaskTimer,
+} from "./ReadingTaskTimer.jsx";
+import { getReadingTimingDetails, READING_SUGGESTED_SECONDS, useSuggestedTaskTimer } from "./readingTaskTiming.js";
 
-// ---------- Demo dataset ----------
-const DEMO_TASKS = [
-    {
-      id: "remote-work",
-      title: "Remote Work and Office Life",
-      comments: [
-        {
-          name: "Emma",
-          text:
-            "When I first started working remotely, I thought it would be easy. But while in an office, you have natural routines and a sense of accountability to others, at home, it’s easy to faff about. On the positive side, I can organise my day around my children, and that flexibility is priceless. Still, I think younger workers miss out on learning from more experienced colleagues when they’re isolated at home. There’s so much you absorb just by being around people in a professional environment.",
-        },
-        {
-          name: "Ryan",
-          text:
-            "Remote work is here to stay, and that’s a good thing. For years, employers assumed people couldn’t be trusted to carry out their duties without supervision, but that’s nonsense. Most people are more focused when they’re comfortable. Personally, I’ve gained back hours every week by cutting out the commute. Companies benefit too; less need for expensive office space. As long as the targets are met, who cares where the work is done? The world is moving forward, and managers need to stop thinking like it’s still 1995.",
-        },
-        {
-          name: "Leo",
-          text:
-            "I can’t stand working from home. I never feel like I can log off properly and when I leave the office, I want to forget about it all. Something I can’t do when my computer is in the next room. I also miss the energy of being surrounded by people. Online meetings feel awkward and artificial, and they rarely spark creativity. I understand why some people enjoy the flexibility, and while most of us can be relied on to work well on our own, without supervision, surely many will abuse the freedom to do their own thing, won’t they?",
-        },
-        {
-          name: "Sofia",
-          text:
-            "I’ve been homeworking for a couple of years now, and though not travelling to work on the busy trains is awesome, I like having a few days in the office to collaborate face to face as well: It's definitely less isolating when you can just pop over to the next desk to check up on a colleague. What worries me is that remote workers are often overlooked for promotions- out of sight, out of mind. Employers need to make sure opportunities are equal for everyone. Still, in terms of productivity, it really depends on you, you know?  Some are lazier at home, but others find it easier to focus.",
-        },
-      ],
-      questions: [
-        {
-            id: 1,
-            text: "Who says working remotely makes it difficult to disconnect from work?",
-            answer: "Leo",
-            evidenceParts: [
-              "I never feel like I can log off properly",
-              "when my computer is in the next room"
-            ],
-            explanation:
-              "Log off=disconnect from a website/app. I this case Leo is using it to mean disconnect from work.",
-          },
-        {
-          id: 2,
-          text: "Who thinks some workers have an unfair advantage due to visibility?",
-          answer: "Sofia",
-          evidence:
-            "remote workers are often overlooked for promotions- out of sight, out of mind.",
-          explanation:
-            "out of sight: not seen. So remote workers are not considered for better positions (overlooked=not considered).",
-        },
-        {
-          id: 3,
-          text: "Who believes that employees can be counted on to work independently?",
-          answer: "Ryan",
-          evidence:
-            "employers assumed people couldn’t be trusted to carry out their duties without supervision, but that’s nonsense.",
-          explanation:
-            "counted on= relied on. So similar to 'trusted'. 'Without supervision' means independently. Ryan says that's it's nonsense to think employees can't work independently.",
-        },
-        {
-          id: 4,
-          text: "Who says remote work can make people less productive?",
-          answer: "Emma",
-          evidence:
-            "at home, it’s easy to faff about.",
-          explanation:
-            "Emma says that without the structure of the office, we 'faff about': British informal phrasal verb for waste time or be unproductive. Sofia also mentions productivity, but she says it depends on the person.",
-        },
-        {
-          id: 5,
-          text: "Who appreciates the time saved by not travelling to work?",
-          answer: "Ryan",
-          evidence:
-            "I’ve gained back hours every week by cutting out the commute.",
-          explanation:
-            "'commute' means travel to/from work. Ryan cuts this out: he removes it from his routine and saves time. Sofia mentions 'not travelling to work' but doesn't specifically say she saves time.",
-        },
-        {
-          id: 6,
-          text: "Who worries that home workers lose opportunities for informal learning?",
-          answer: "Emma",
-          evidence:
-            "younger workers miss out on learning from more experienced colleagues when they’re isolated at home.",
-          explanation:
-            "'miss out on' = lose opportunities to experience something. Learning from experienced colleagues=informal learning.",
-        },
-        {
-          id: 7,
-          text: "Who says the best option is combining office and home work?",
-          answer: "Sofia",
-          evidence:
-            "I like having a few days in the office to collaborate face to face as well",
-          explanation:
-            "Sofia likes working from home but at the office 'as well'. She describes several benefits.",
-        },
-      ],
-    },
-  ];
-  
+function ChipDropdown({ items, value, onChange, label = "Task" }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  useEffect(() => {
+    function handleDocumentClick(event) {
+      if (ref.current && !ref.current.contains(event.target)) setOpen(false);
+    }
+
+    document.addEventListener("mousedown", handleDocumentClick);
+    return () => document.removeEventListener("mousedown", handleDocumentClick);
+  }, []);
+
+  const active = items[value];
+
+  return (
+    <div className="chip-select" ref={ref}>
+      <button
+        type="button"
+        className={`count-chip ${open ? "selected" : ""}`}
+        onClick={() => setOpen((currentOpen) => !currentOpen)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className="lbl">{label}</span>
+        <span className="val">{active?.title ?? "—"}</span>
+        <span className="chev" aria-hidden="true">
+          ▾
+        </span>
+      </button>
+
+      {open ? (
+        <ul className="chip-menu" role="listbox">
+          {items.map((item, index) => (
+            <li key={item.id}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={index === value}
+                className={`chip-option ${index === value ? "active" : ""}`}
+                onClick={() => {
+                  onChange(index);
+                  setOpen(false);
+                }}
+                title={item.title}
+              >
+                <strong className="num">{index + 1}.</strong>
+                <span className="ttl">{item.title}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
+}
 
 // ---------- Component ----------
-export default function AptisPart3Matching({ tasks = DEMO_TASKS, user, onRequireSignIn }) {
+export default function AptisPart3Matching({ tasks = READING_PART3_TASKS, user }) {
   const initialTaskId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("task") : "";
   const initialTaskIndex = Math.max(0, tasks.findIndex((task) => task.id === initialTaskId));
   const [taskIndex, setTaskIndex] = useState(initialTaskIndex);
   const [answers, setAnswers] = useState({});
   const [feedback, setFeedback] = useState({});
+  const [resultMode, setResultMode] = useState(null);
   const [completed, setCompleted] = useState(new Set());
   const [whyOpen, setWhyOpen] = useState(null);
+  const taskTimer = useSuggestedTaskTimer(READING_SUGGESTED_SECONDS.part3);
   const commentRefs = useRef({});
-  const current = tasks[taskIndex];
+  const current = tasks[taskIndex] || tasks[0];
 
   
 
@@ -153,9 +120,29 @@ useEffect(() => {
 
   const names = useMemo(() => current.comments.map((c) => c.name), [current]);
 
+  const decoratedItems = useMemo(
+    () =>
+      tasks.map((task) => ({
+        ...task,
+        title: `${task.title}${completed.has(task.id) ? " ✓" : ""}`,
+      })),
+    [completed, tasks]
+  );
+
+  function handleSelectTask(nextIndex) {
+    setTaskIndex(nextIndex);
+    setAnswers({});
+    setFeedback({});
+    setResultMode(null);
+    setWhyOpen(null);
+    commentRefs.current = {};
+    taskTimer.reset();
+  }
+
   function handleChange(qid, val) {
     setAnswers((p) => ({ ...p, [qid]: val }));
     setFeedback((p) => ({ ...p, [qid]: null }));
+    setResultMode((currentMode) => currentMode === "revealed" ? "checked" : currentMode);
     // if they change an answer, hide any open explanation for that question
     if (whyOpen === qid) setWhyOpen(null);
   }
@@ -174,12 +161,14 @@ useEffect(() => {
   }
 
   async function handleCheck() {
+    const timingDetails = getReadingTimingDetails(taskTimer, "checked");
     const fb = {};
     current.questions.forEach((q) => {
       const given = answers[q.id];
       fb[q.id] = given ? given === q.answer : null;
     });
     setFeedback(fb);
+    setResultMode("checked");
   
     const total = current.questions.length;
     const score = current.questions.reduce(
@@ -195,6 +184,7 @@ useEffect(() => {
         score,
         total,
         source: "AptisPart3",
+        ...timingDetails,
       });
     }
   
@@ -205,6 +195,11 @@ useEffect(() => {
   }
 
   async function handleShowAnswers() {
+    const timingDetails = getReadingTimingDetails(taskTimer, "answers_revealed");
+    const score = current.questions.reduce(
+      (total, question) => total + (answers[question.id] === question.answer ? 1 : 0),
+      0
+    );
     const fb = {};
     const ans = {};
     current.questions.forEach((q) => {
@@ -213,7 +208,18 @@ useEffect(() => {
     });
     setAnswers(ans);
     setFeedback(fb);
+    setResultMode("revealed");
     setWhyOpen(null); // close explanations so they can open them one by one
+
+    if (user) {
+      await logReadingPart3Attempted({
+        taskId: current.id,
+        score,
+        total: current.questions.length,
+        source: "AptisPart3",
+        ...timingDetails,
+      });
+    }
 
     await markCurrentTaskCompleted();
   }
@@ -221,7 +227,9 @@ useEffect(() => {
   function handleReset() {
     setAnswers({});
     setFeedback({});
+    setResultMode(null);
     setWhyOpen(null);
+    taskTimer.reset();
   }
 
  // helper: get highlighted version of a comment's text if it's the open explanation
@@ -286,18 +294,37 @@ useEffect(() => {
           <h2 className="title">Reading – Part 3 (Matching Opinions)</h2>
           <p className="intro"><em>{current.title}</em></p>
         </div>
-        <ReadingAssignButton
-          user={user}
-          activityId="reading-part-3"
-          activityLabel={`Aptis Reading Part 3 — ${current?.title || "Matching opinions"}`}
-          routePath={getSitePath(`/reading/part3?task=${encodeURIComponent(current?.id || "")}`)}
-          taskId={current?.id || ""}
-          taskTitle={current?.title || ""}
-        />
+        <div className="header-tools">
+          <ReadingAssignButton
+            user={user}
+            activityId="reading-part-3"
+            activityLabel={`Aptis Reading Part 3 — ${current?.title || "Matching opinions"}`}
+            routePath={getSitePath(`/reading/part3?task=${encodeURIComponent(current?.id || "")}`)}
+            taskId={current?.id || ""}
+            taskTitle={current?.title || ""}
+          />
+          <ChipDropdown
+            items={decoratedItems}
+            value={taskIndex}
+            onChange={handleSelectTask}
+            label="Task"
+          />
+        </div>
       </header>
 
-      {/* ---------- Comments section ---------- */}
-      <section className="comments">
+      {taskTimer.phase === "ready" ? (
+        <ReadingTaskStart
+          partLabel="Aptis Reading Part 3"
+          taskTitle={current.title}
+          itemCountLabel="7 opinion matches"
+          recommendedSeconds={taskTimer.recommendedSeconds}
+          onStart={taskTimer.start}
+        />
+      ) : (
+        <>
+          <ReadingTaskTimer timer={taskTimer} />
+          {/* ---------- Comments section ---------- */}
+          <section className="comments">
   <h3>Comments</h3>
 
   {current.comments.map((c, i) => {
@@ -324,20 +351,68 @@ useEffect(() => {
       </div>
     );
   })}
-</section>
+          </section>
 
 
       {/* ---------- Questions section ---------- */}
-      <section className="questions-section">
+          <section className="questions-section">
         <h3>Questions</h3>
+
+        {resultMode ? (() => {
+          const correctCount = current.questions.filter((q) => feedback[q.id] === true).length;
+          const incorrectCount = current.questions.filter((q) => feedback[q.id] === false).length;
+          const unansweredCount = current.questions.filter((q) => !answers[q.id]).length;
+          const recheckCount = current.questions.filter(
+            (q) => answers[q.id] && feedback[q.id] == null
+          ).length;
+
+          return (
+            <div className={`results-summary ${resultMode === "revealed" ? "is-revealed" : ""}`} role="status" aria-live="polite">
+              <strong>
+                {resultMode === "revealed"
+                  ? "Answers shown"
+                  : `Score: ${correctCount} / ${current.questions.length}`}
+              </strong>
+              <div className="results-counts">
+                <span className="correct-count">✓ {correctCount} correct</span>
+                {resultMode === "checked" ? (
+                  <>
+                    <span className="incorrect-count">✕ {incorrectCount} incorrect</span>
+                    <span className="unanswered-count">! {unansweredCount} unanswered</span>
+                    {recheckCount ? <span className="recheck-count">↻ {recheckCount} to recheck</span> : null}
+                  </>
+                ) : null}
+              </div>
+            </div>
+          );
+        })() : null}
 
         <ol className="questions">
           {current.questions.map((q) => {
             const fb = feedback[q.id];
-            const cls = fb === true ? "ok" : fb === false ? "bad" : "";
+            const isUnanswered = !!resultMode && !answers[q.id];
+            const needsRecheck = !!resultMode && !!answers[q.id] && fb == null;
+            const cls = fb === true
+              ? "ok"
+              : fb === false
+                ? "bad"
+                : isUnanswered
+                  ? "unanswered"
+                  : needsRecheck
+                    ? "needs-recheck"
+                    : "";
 
             const canExplain = fb !== null && fb !== undefined; // means they've hit Check (or Show answers)
             const isOpen = whyOpen === q.id;
+            const status = fb === true
+              ? { icon: "✓", label: resultMode === "revealed" ? "Correct answer" : "Correct" }
+              : fb === false
+                ? { icon: "✕", label: "Incorrect" }
+                : isUnanswered
+                  ? { icon: "!", label: "Not answered" }
+                  : needsRecheck
+                    ? { icon: "↻", label: "Check again" }
+                    : null;
 
             return (
               <li key={q.id} className={cls}>
@@ -345,6 +420,7 @@ useEffect(() => {
                   <span className="qtext">{q.text}</span>
 
                   <select
+                    aria-label={`Answer question ${q.id}: ${q.text}`}
                     value={answers[q.id] || ""}
                     onChange={(e) => handleChange(q.id, e.target.value)}
                   >
@@ -367,6 +443,13 @@ useEffect(() => {
                   >
                     Why?
                   </button>
+
+                  {status ? (
+                    <span className="answer-status" role="status">
+                      <span className="status-icon" aria-hidden="true">{status.icon}</span>
+                      {status.label}
+                    </span>
+                  ) : null}
                 </div>
 
                 {isOpen && (
@@ -404,7 +487,9 @@ useEffect(() => {
             Show answers
           </button>
         </div>
-      </section>
+          </section>
+        </>
+      )}
     </div>
   );
 }
@@ -420,15 +505,93 @@ function StyleScope() {
           --muted:#a9b7d1;
           --ok:#2fb67c;
           --bad:#e46c6c;
+          --warning:#f1b84b;
           --accent:#6ea8ff;
           --evidence-bg:rgba(255,214,102,.2);
           --evidence-border:rgba(255,214,102,.6);
           color:var(--ink);
         }
   
-        .aptis-matching .header { margin-bottom:1rem; }
+        .aptis-matching .header {
+          margin-bottom:1rem;
+          display:flex;
+          justify-content:space-between;
+          align-items:flex-start;
+          gap:1rem;
+        }
         .aptis-matching .title { margin:0; font-size:1.4rem; }
         .aptis-matching .intro { color:var(--muted); margin-top:.2rem; }
+        .aptis-matching .header-tools {
+          display:flex;
+          align-items:center;
+          justify-content:flex-end;
+          gap:.6rem;
+          flex-wrap:wrap;
+        }
+
+        /* TASK PICKER */
+        .aptis-matching .chip-select { position:relative; display:inline-block; }
+        .aptis-matching .count-chip {
+          min-width:13rem;
+          max-width:min(24rem, 78vw);
+          display:inline-flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:.5rem;
+          background:#24365d;
+          border:1px solid #335086;
+          color:var(--ink);
+          padding:.45rem .7rem;
+          border-radius:10px;
+          cursor:pointer;
+        }
+        .aptis-matching .count-chip .lbl { color:#cfe1ff; font-weight:800; }
+        .aptis-matching .count-chip .val {
+          overflow:hidden;
+          text-overflow:ellipsis;
+          white-space:nowrap;
+        }
+        .aptis-matching .chip-menu {
+          position:absolute;
+          right:0;
+          margin-top:.4rem;
+          background:#132647;
+          border:1px solid #2c4b83;
+          border-radius:12px;
+          padding:.35rem;
+          list-style:none;
+          min-width:17rem;
+          max-height:50vh;
+          overflow:auto;
+          box-shadow:0 10px 24px rgba(0,0,0,.35);
+          z-index:50;
+        }
+        .aptis-matching .chip-option {
+          width:100%;
+          text-align:left;
+          background:transparent;
+          border:0;
+          color:var(--ink);
+          padding:.45rem .6rem;
+          border-radius:10px;
+          display:flex;
+          gap:.5rem;
+          align-items:baseline;
+          cursor:pointer;
+        }
+        .aptis-matching .chip-option:hover { background:#0f1b31; }
+        .aptis-matching .chip-option.active { background:#294b84; }
+        .aptis-matching .chip-option .num {
+          color:#cfe1ff;
+          width:2.2rem;
+          display:inline-block;
+        }
+        .aptis-matching .chip-option .ttl {
+          color:var(--ink);
+          white-space:nowrap;
+          overflow:hidden;
+          text-overflow:ellipsis;
+        }
   
         /* COMMENTS */
         .aptis-matching .comment {
@@ -479,6 +642,70 @@ function StyleScope() {
           color:var(--accent);
           font-size:1.1rem;
         }
+
+        .aptis-matching .results-summary {
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:.8rem;
+          margin:.25rem 0 1rem;
+          padding:.75rem .85rem;
+          border:1px solid #37598e;
+          border-radius:12px;
+          background:#0f1b31;
+          color:var(--ink);
+        }
+        .aptis-matching .results-summary > strong {
+          font-size:1rem;
+          color:var(--ink);
+        }
+        .aptis-matching .results-counts {
+          display:flex;
+          gap:.45rem;
+          flex-wrap:wrap;
+          justify-content:flex-end;
+        }
+        .aptis-matching .results-counts span,
+        .aptis-matching .answer-status {
+          display:inline-flex;
+          align-items:center;
+          gap:.32rem;
+          border:1px solid;
+          border-radius:999px;
+          padding:.28rem .55rem;
+          font-size:.78rem;
+          font-weight:800;
+          line-height:1.2;
+          white-space:nowrap;
+        }
+        .aptis-matching .correct-count,
+        .aptis-matching li.ok .answer-status {
+          color:#b8f5d7;
+          background:rgba(47,182,124,.14);
+          border-color:rgba(47,182,124,.7);
+        }
+        .aptis-matching .incorrect-count,
+        .aptis-matching li.bad .answer-status {
+          color:#ffd0d0;
+          background:rgba(228,108,108,.14);
+          border-color:rgba(228,108,108,.72);
+        }
+        .aptis-matching .unanswered-count,
+        .aptis-matching .recheck-count,
+        .aptis-matching li.unanswered .answer-status,
+        .aptis-matching li.needs-recheck .answer-status {
+          color:#ffe1a3;
+          background:rgba(241,184,75,.14);
+          border-color:rgba(241,184,75,.75);
+        }
+        .aptis-matching .status-icon {
+          display:inline-grid;
+          place-items:center;
+          width:1rem;
+          height:1rem;
+          font-size:.82rem;
+          font-weight:900;
+        }
   
         .aptis-matching .questions {
           list-style:decimal;
@@ -486,6 +713,31 @@ function StyleScope() {
           display:flex;
           flex-direction:column;
           gap:.9rem;
+        }
+
+        .aptis-matching .questions > li {
+          padding:.7rem .75rem;
+          border:2px solid transparent;
+          border-radius:12px;
+          color:var(--ink);
+          transition:border-color .18s ease, background .18s ease;
+        }
+
+        .aptis-matching .questions > li.ok {
+          background:rgba(47,182,124,.09) !important;
+          border-color:rgba(47,182,124,.82) !important;
+          color:var(--ink) !important;
+        }
+        .aptis-matching .questions > li.bad {
+          background:rgba(228,108,108,.09) !important;
+          border-color:rgba(228,108,108,.86) !important;
+          color:var(--ink) !important;
+        }
+        .aptis-matching .questions > li.unanswered,
+        .aptis-matching .questions > li.needs-recheck {
+          background:rgba(241,184,75,.08) !important;
+          border-color:rgba(241,184,75,.82) !important;
+          color:var(--ink) !important;
         }
   
         .aptis-matching .q-row {
@@ -522,8 +774,19 @@ function StyleScope() {
           cursor:not-allowed;
         }
   
-        .aptis-matching li.ok { color:var(--ok); }
-        .aptis-matching li.bad { color:var(--bad); }
+        .aptis-matching li.ok select {
+          border:2px solid var(--ok);
+          box-shadow:0 0 0 2px rgba(47,182,124,.16);
+        }
+        .aptis-matching li.bad select {
+          border:2px solid var(--bad);
+          box-shadow:0 0 0 2px rgba(228,108,108,.16);
+        }
+        .aptis-matching li.unanswered select,
+        .aptis-matching li.needs-recheck select {
+          border:2px solid var(--warning);
+          box-shadow:0 0 0 2px rgba(241,184,75,.14);
+        }
   
         .aptis-matching .why-box {
           background:#0f1b31;
@@ -577,6 +840,86 @@ function StyleScope() {
         .aptis-matching .btn.ghost {
           background:transparent;
           border-color:#37598e;
+        }
+
+        @media (max-width:720px) {
+          .aptis-matching .header { flex-direction:column; }
+          .aptis-matching .header-tools {
+            width:100%;
+            justify-content:flex-start;
+          }
+          .aptis-matching .count-chip,
+          .aptis-matching .chip-select { width:100%; }
+          .aptis-matching .chip-menu {
+            left:0;
+            right:auto;
+            width:100%;
+            min-width:0;
+          }
+          .aptis-matching .results-summary {
+            align-items:flex-start;
+            flex-direction:column;
+          }
+          .aptis-matching .results-counts { justify-content:flex-start; }
+        }
+
+        :root[data-theme="light"] .aptis-matching .results-summary {
+          background:#ffffff !important;
+          border-color:#b7c7dd !important;
+          color:#172033 !important;
+          box-shadow:0 5px 14px rgba(38,65,105,.08) !important;
+        }
+        :root[data-theme="light"] .aptis-matching .results-summary > strong {
+          color:#172033 !important;
+        }
+        :root[data-theme="light"] .aptis-matching .correct-count,
+        :root[data-theme="light"] .aptis-matching li.ok .answer-status {
+          color:#075a3e !important;
+          background:#d9f8ea !important;
+          border-color:#16825d !important;
+        }
+        :root[data-theme="light"] .aptis-matching .incorrect-count,
+        :root[data-theme="light"] .aptis-matching li.bad .answer-status {
+          color:#8f2028 !important;
+          background:#fee7e9 !important;
+          border-color:#c44751 !important;
+        }
+        :root[data-theme="light"] .aptis-matching .unanswered-count,
+        :root[data-theme="light"] .aptis-matching .recheck-count,
+        :root[data-theme="light"] .aptis-matching li.unanswered .answer-status,
+        :root[data-theme="light"] .aptis-matching li.needs-recheck .answer-status {
+          color:#704600 !important;
+          background:#fff2cc !important;
+          border-color:#b87a00 !important;
+        }
+        :root[data-theme="light"] .aptis-matching .questions > li.ok {
+          background:#effcf6 !important;
+          border-color:#16825d !important;
+          color:#172033 !important;
+        }
+        :root[data-theme="light"] .aptis-matching .questions > li.bad {
+          background:#fff3f4 !important;
+          border-color:#c44751 !important;
+          color:#172033 !important;
+        }
+        :root[data-theme="light"] .aptis-matching .questions > li.unanswered,
+        :root[data-theme="light"] .aptis-matching .questions > li.needs-recheck {
+          background:#fff9e8 !important;
+          border-color:#b87a00 !important;
+          color:#172033 !important;
+        }
+        :root[data-theme="light"] .aptis-matching li.ok select {
+          border-color:#16825d !important;
+          box-shadow:0 0 0 2px rgba(22,130,93,.13) !important;
+        }
+        :root[data-theme="light"] .aptis-matching li.bad select {
+          border-color:#c44751 !important;
+          box-shadow:0 0 0 2px rgba(196,71,81,.13) !important;
+        }
+        :root[data-theme="light"] .aptis-matching li.unanswered select,
+        :root[data-theme="light"] .aptis-matching li.needs-recheck select {
+          border-color:#b87a00 !important;
+          box-shadow:0 0 0 2px rgba(184,122,0,.12) !important;
         }
       `}</style>
     );

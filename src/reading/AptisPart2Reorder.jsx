@@ -1,11 +1,16 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
-import { saveReadingCompletion, saveReadingProgress, fetchReadingCompletions, logReadingReorderCompleted } from '../firebase';
+import { saveReadingCompletion, saveReadingProgress, fetchReadingCompletions, logReadingPart2Attempted, logReadingReorderCompleted } from '../firebase';
 import { toast } from "../utils/toast"; // your ToastHost helper
 import { getSitePath } from "../siteConfig.js";
 import ReadingAssignButton from "./ReadingAssignButton.jsx";
 import { READING_PART2_TASKS } from "./part2Tasks.js";
 import ReadingDemoNotice from "./ReadingDemoNotice.jsx";
+import {
+  ReadingTaskStart,
+  ReadingTaskTimer,
+} from "./ReadingTaskTimer.jsx";
+import { getReadingTimingDetails, READING_SUGGESTED_SECONDS, useSuggestedTaskTimer } from "./readingTaskTiming.js";
 
 /**
  * Aptis Part 2 – Sentence Reordering (drag sentences into slots)
@@ -60,7 +65,7 @@ function buildBoard(sentences) {
 function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
 
 // ---------- Reorder list with slots + pool (per text) ----------
-function TextReorder({ spec, onChangeCheck }) {
+function TextReorder({ spec, onChangeCheck, onReveal, onReset }) {
   const [state, setState] = useState(() => buildBoard(spec.sentences));
   const [feedback, setFeedback] = useState(null); // array<boolean | null>
 
@@ -70,7 +75,7 @@ function TextReorder({ spec, onChangeCheck }) {
   );
 
   function reset(shuffle = true) {
-    setState(prev => {
+    setState(() => {
       const rebuilt = buildBoard(spec.sentences);
       return { ...rebuilt, pool: shuffle ? rebuilt.pool : rebuilt.pool };
     });
@@ -98,18 +103,6 @@ function TextReorder({ spec, onChangeCheck }) {
     setFeedback(null);
   }
 
-  function onRemoveFromSlot(slotIndex) {
-    setState(prev => {
-      const next = deepClone(prev);
-      const s = next.boardSlots[slotIndex];
-      if (!s || s.fixed) return prev;
-      next.pool.push(s);
-      next.boardSlots[slotIndex] = null;
-      return next;
-    });
-    setFeedback(null);
-  }
-
   function handleCheck() {
     const fb = state.boardSlots.map((s, i) => {
       if (!s) return null; // empty slot
@@ -121,9 +114,14 @@ function TextReorder({ spec, onChangeCheck }) {
   }
 
   function handleShowAnswer() {
+    const previousFeedback = state.boardSlots.map((sentence, index) => {
+      if (!sentence) return null;
+      return sentence.id === correctOrder[index];
+    });
     const perfect = spec.sentences.slice().sort((a,b) => a.order - b.order);
     setState({ boardSlots: perfect, pool: [] });
     setFeedback(perfect.map(() => true));
+    onReveal?.(previousFeedback);
   }
 
   // Drag handlers
@@ -151,10 +149,12 @@ function TextReorder({ spec, onChangeCheck }) {
         });
         setFeedback(null);
       }
-    } catch {}
+    } catch {
+      return;
+    }
   }
 
-  function onDropToPool(fromSlotIndex, item) {
+  function onDropToPool(fromSlotIndex) {
     setState(prev => {
       const next = deepClone(prev);
       if (fromSlotIndex == null) return prev;
@@ -168,26 +168,13 @@ function TextReorder({ spec, onChangeCheck }) {
     setFeedback(null);
   }
 
-  // Keyboard swap (for accessibility)
-  function swapSlots(i, j) {
-    setState(prev => {
-      const next = deepClone(prev);
-      const a = next.boardSlots[i];
-      const b = next.boardSlots[j];
-      if (a?.fixed || b?.fixed) return prev;
-      next.boardSlots[i] = b; next.boardSlots[j] = a;
-      return next;
-    });
-    setFeedback(null);
-  }
-
   return (
     <div className="text-card">
       <div className="text-head">
         <h3>{spec.title}</h3>
         <div className="controls">
           <button className="btn" onClick={() => reset(true)}>Shuffle</button>
-          <button className="btn" onClick={() => reset(false)}>Reset</button>
+          <button className="btn" onClick={() => { reset(false); onReset?.(); }}>Reset</button>
           <button className="btn primary" onClick={handleCheck}>Check</button>
           <button className="btn ghost" onClick={handleShowAnswer}>Show answer</button>
         </div>
@@ -230,9 +217,11 @@ function TextReorder({ spec, onChangeCheck }) {
       const payload = JSON.parse(e.dataTransfer.getData("text/plain"));
       // only accept items dragged from slots
       if (payload?.type === "slot-item") {
-        onDropToPool(payload.slotIndex, state.boardSlots[payload.slotIndex]);
+        onDropToPool(payload.slotIndex);
       }
-    } catch {}
+    } catch {
+      return;
+    }
   }}
 >
   {state.pool.map((item) => (
@@ -364,12 +353,14 @@ export default function AptisPart2Reorder({
 
   // ✅ NEW: track which tasks are completed for this user
   const [completed, setCompleted] = useState(new Set());
+  const taskTimer = useSuggestedTaskTimer(READING_SUGGESTED_SECONDS.part2);
+  const resetTaskTimer = taskTimer.reset;
 
-  function isTaskLocked(task, index) {
+  const isTaskLocked = useCallback((task, index) => {
     return allowedTaskIds.length
       ? !allowedTaskSet.has(task.sourceTaskId)
       : !user && lockAfterIndex != null && index >= lockAfterIndex;
-  }
+  }, [allowedTaskIds.length, allowedTaskSet, lockAfterIndex, user]);
 
   useEffect(() => {
     if (!trackProgress) {
@@ -393,14 +384,16 @@ export default function AptisPart2Reorder({
     if (nextIndex === -1) return;
     if (isTaskLocked(flattened[nextIndex], nextIndex)) return;
     setTaskIndex(nextIndex);
-  }, [allowedTaskIds.length, allowedTaskSet, flattened, lockAfterIndex, searchParams, user]);
+    resetTaskTimer();
+  }, [flattened, isTaskLocked, resetTaskTimer, searchParams]);
 
   useEffect(() => {
     if (!flattened.length) return;
     if (isTaskLocked(flattened[taskIndex], taskIndex)) {
       setTaskIndex(0);
+      resetTaskTimer();
     }
-  }, [allowedTaskIds.length, allowedTaskSet, flattened, lockAfterIndex, taskIndex, user]);
+  }, [flattened, isTaskLocked, resetTaskTimer, taskIndex]);
 
  // ✅ guard selection – tasks 3+ require sign-in (index >= 2)
 function handleSelectTask(nextIndex) {
@@ -410,6 +403,7 @@ function handleSelectTask(nextIndex) {
     return;
   }
   setTaskIndex(nextIndex);
+  resetTaskTimer();
 }
 
 // (optional) decorate picker labels with ✓ / 🔒
@@ -426,7 +420,7 @@ const decoratedItems = useMemo(
           (locked ? " 🔒" : "")
       };
     }),
-  [allowedTaskIds.length, allowedTaskSet, flattened, completed, lockAfterIndex, user]
+  [completed, flattened, isTaskLocked]
 );
 
 return (
@@ -469,33 +463,83 @@ return (
       Demo mode includes two Part 2 reading tasks. The other Part 2 tasks stay visible but require full access.
     </ReadingDemoNotice>
 
-    {/* Single task view (just one text) */}
-    <div className="single">
-    <TextReorder
-  key={current?.id}
-  spec={current.text}
-  onChangeCheck={async (fb) => {
-    if (!user) return;
-    if (!fb.length || !fb.every(v => v === true)) return;
-    if (!trackProgress) return;
-  
-    // avoid re-logging if user revisits a completed task
-    const alreadyDone = completed.has(current.id);
-    if (alreadyDone) return;
-  
-    if (progressPart) {
-      await saveReadingProgress(current.id, progressPart);
-    } else {
-      await saveReadingCompletion(current.id);
-    }
-    setCompleted(prev => new Set(prev).add(current.id));
-    toast("Task marked as completed ✓");
-  
-    // ✅ activity log
-    await logReadingReorderCompleted({ taskId: current.id, source: "AptisPart2Reorder" });
-  }}  
-/>
-    </div>
+    {taskTimer.phase === "ready" ? (
+      <ReadingTaskStart
+        partLabel="Aptis Reading Part 2"
+        taskTitle={current.title}
+        itemCountLabel="5 sentences to place"
+        recommendedSeconds={taskTimer.recommendedSeconds}
+        onStart={taskTimer.start}
+      />
+    ) : (
+      <>
+        <ReadingTaskTimer timer={taskTimer} />
+        {/* Single task view (one of the two texts in the exam part) */}
+        <div className="single">
+          <TextReorder
+            key={current?.id}
+            spec={current.text}
+            onReset={resetTaskTimer}
+            onReveal={async (fb) => {
+              const timingDetails = getReadingTimingDetails(taskTimer, "answers_revealed");
+              const answerableOrders = new Set(
+                current.text.sentences.filter((sentence) => !sentence.fixed).map((sentence) => sentence.order)
+              );
+              const score = [...answerableOrders].reduce(
+                (total, order) => total + (fb[order] === true ? 1 : 0),
+                0
+              );
+              if (user) {
+                await logReadingPart2Attempted({
+                  taskId: current.id,
+                  score,
+                  total: answerableOrders.size,
+                  source: "AptisPart2Reorder",
+                  ...timingDetails,
+                });
+              }
+            }}
+            onChangeCheck={async (fb) => {
+              const timingDetails = getReadingTimingDetails(taskTimer, "checked");
+              const answerableOrders = new Set(
+                current.text.sentences.filter((sentence) => !sentence.fixed).map((sentence) => sentence.order)
+              );
+              const score = [...answerableOrders].reduce(
+                (total, order) => total + (fb[order] === true ? 1 : 0),
+                0
+              );
+
+              if (user) {
+                await logReadingPart2Attempted({
+                  taskId: current.id,
+                  score,
+                  total: answerableOrders.size,
+                  source: "AptisPart2Reorder",
+                  ...timingDetails,
+                });
+              }
+
+              if (!user) return;
+              if (!fb.length || !fb.every((value) => value === true)) return;
+              if (!trackProgress) return;
+
+              const alreadyDone = completed.has(current.id);
+              if (alreadyDone) return;
+
+              if (progressPart) {
+                await saveReadingProgress(current.id, progressPart);
+              } else {
+                await saveReadingCompletion(current.id);
+              }
+              setCompleted((previous) => new Set(previous).add(current.id));
+              toast("Task marked as completed ✓");
+
+              await logReadingReorderCompleted({ taskId: current.id, source: "AptisPart2Reorder" });
+            }}
+          />
+        </div>
+      </>
+    )}
   </div>
 );
 }

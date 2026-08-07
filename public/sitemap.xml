@@ -21,6 +21,22 @@
     <priority>0.9</priority>
   </url>
   <url>
+    <loc>https://aptis-trainer.beeskillsenglish.com/reading/parts/1</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aptis-trainer.beeskillsenglish.com/reading/parts/2</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aptis-trainer.beeskillsenglish.com/reading/parts/3</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aptis-trainer.beeskillsenglish.com/reading/parts/4</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://aptis-trainer.beeskillsenglish.com/reading/part1</loc>
     <priority>0.8</priority>
   </url>
@@ -34,6 +50,10 @@
   </url>
   <url>
     <loc>https://aptis-trainer.beeskillsenglish.com/reading/part3</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aptis-trainer.beeskillsenglish.com/reading/part3-strategy</loc>
     <priority>0.8</priority>
   </url>
   <url>

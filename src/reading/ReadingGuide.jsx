@@ -5,6 +5,7 @@ import {
   logReadingGuideReorderCheck,
   logReadingGuideShowAnswers,
   logReadingGuideReorderCompleted,
+  saveReadingProgress,
 } from "../firebase";
 /**
  * ReadingGuide – Guided flow (clue reveal ➜ then reorder)
@@ -203,7 +204,7 @@ function ClueReveal({ sentence, revealed, onReveal }) {
 }
 
 
-function ApplyReorder({ intro, sentences, taskId }){
+function ApplyReorder({ intro, sentences, taskId, onComplete }){
   // intro becomes fixed slot 0; sentences are 1..N
   const introItem = { id:"__intro__", text:intro, order:0, fixed:true };
   const canonical = [introItem, ...sentences].sort((a,b)=>a.order-b.order);
@@ -231,7 +232,9 @@ function ApplyReorder({ intro, sentences, taskId }){
       if (payload.type !== "slot") return;
       setState(prev=>{ const next=deepClone(prev); const s=next.slots[payload.i]; if(!s || canonical[payload.i]?.fixed) return prev; next.slots[payload.i]=null; next.pool.push(s); return next; });
       setFb(null);
-    }catch{}
+    } catch {
+      return;
+    }
   }
   async function check() {
     const nextFb = state.slots.map((s, i) => !!s && s.id === canonical[i]?.id);
@@ -242,6 +245,7 @@ function ApplyReorder({ intro, sentences, taskId }){
   
     if (allCorrect) {
       await logReadingGuideReorderCompleted({ taskId });
+      onComplete?.(taskId);
     }
   }
   
@@ -286,7 +290,7 @@ function ApplyReorder({ intro, sentences, taskId }){
   );
 }
 
-function GuidedTaskSection({ task }) {
+function GuidedTaskSection({ task, onComplete }) {
   // per-task state
   const [revealed, setRevealed] = useState(() => new Set());
   const [clueLogged, setClueLogged] = useState(false);
@@ -322,12 +326,14 @@ function GuidedTaskSection({ task }) {
 
       {/* Part B – Reorder */}
       <h4 className="subt" style={{ marginTop: '1rem' }}>Apply: Put the sentences in order</h4>
-      <ApplyReorder intro={task.intro} sentences={task.sentences} taskId={task.id} />
+      <ApplyReorder intro={task.intro} sentences={task.sentences} taskId={task.id} onComplete={onComplete} />
     </section>
   );
 }
 
 export default function ReadingGuide(){
+  const [completedTasks, setCompletedTasks] = useState(() => new Set());
+
   // Always start this page at the top
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -335,6 +341,17 @@ export default function ReadingGuide(){
     }
     logReadingGuideViewed({ guideId: "reading_guide_reorder" });
   }, []);
+
+  useEffect(() => {
+    if (completedTasks.size === TASKS.length) {
+      saveReadingProgress("part2-guide", "guide");
+    }
+  }, [completedTasks]);
+
+  function completeTask(taskId) {
+    setCompletedTasks((current) => new Set(current).add(taskId));
+  }
+
   return (
     <div className="reading-guide game-wrapper">
       <GuideStyle />
@@ -362,7 +379,7 @@ export default function ReadingGuide(){
 
         {/* 📝 Render ALL guided tasks */}
         {TASKS.map(task => (
-          <GuidedTaskSection key={task.id} task={task} />
+          <GuidedTaskSection key={task.id} task={task} onComplete={completeTask} />
         ))}
       </div>
     </div>

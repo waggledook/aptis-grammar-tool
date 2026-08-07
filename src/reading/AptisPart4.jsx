@@ -6,6 +6,11 @@ import { toast } from "../utils/toast";
 import { getSitePath } from "../siteConfig.js";
 import ReadingAssignButton from "./ReadingAssignButton.jsx";
 import ReadingDemoNotice from "./ReadingDemoNotice.jsx";
+import {
+  ReadingTaskStart,
+  ReadingTaskTimer,
+} from "./ReadingTaskTimer.jsx";
+import { getReadingTimingDetails, READING_SUGGESTED_SECONDS, useSuggestedTaskTimer } from "./readingTaskTiming.js";
 
 /**
  * Aptis Reading – Part 4 (Heading matching)
@@ -361,6 +366,7 @@ export default function AptisPart4({
   const [completed, setCompleted] = useState(new Set());
   const [whyOpen, setWhyOpen] = useState(null); // paragraph id
   const [showHeadings, setShowHeadings] = useState(false);
+  const taskTimer = useSuggestedTaskTimer(READING_SUGGESTED_SECONDS.part4);
 
   const paraRefs = useRef({});
 
@@ -420,6 +426,7 @@ export default function AptisPart4({
     setFeedback({});
     setWhyOpen(null);
     setShowHeadings(false);
+    taskTimer.reset();
   }
 
   function handleChange(paraId, headingKey) {
@@ -442,6 +449,7 @@ export default function AptisPart4({
   }
 
   async function handleCheck() {
+    const timingDetails = getReadingTimingDetails(taskTimer, "checked");
     const fb = {};
     current.paragraphs.forEach((p) => {
       const given = answers[p.id];
@@ -460,6 +468,7 @@ export default function AptisPart4({
         score,
         total,
         source: "AptisPart4",
+        ...timingDetails,
       });
     }
   
@@ -469,7 +478,12 @@ export default function AptisPart4({
     }
   }
 
-  function handleShowAnswers() {
+  async function handleShowAnswers() {
+    const timingDetails = getReadingTimingDetails(taskTimer, "answers_revealed");
+    const score = current.paragraphs.reduce(
+      (total, paragraph) => total + (answers[paragraph.id] === paragraph.answer ? 1 : 0),
+      0
+    );
     const fb = {};
     const ans = {};
     current.paragraphs.forEach((p) => {
@@ -479,12 +493,22 @@ export default function AptisPart4({
     setAnswers(ans);
     setFeedback(fb);
     setWhyOpen(null);
+    if (user) {
+      await logReadingPart4Attempted({
+        taskId: current.id,
+        score,
+        total: current.paragraphs.length,
+        source: "AptisPart4",
+        ...timingDetails,
+      });
+    }
   }
 
   function handleReset() {
     setAnswers({});
     setFeedback({});
     setWhyOpen(null);
+    taskTimer.reset();
   }
 
   const headingOptions = current.headings;
@@ -521,7 +545,18 @@ export default function AptisPart4({
         Demo mode includes one Part 4 reading task. The other Part 4 tasks stay visible but require full access.
       </ReadingDemoNotice>
 
-      <section className="panel p4-panel">
+      {taskTimer.phase === "ready" ? (
+        <ReadingTaskStart
+          partLabel="Aptis Reading Part 4"
+          taskTitle={current.title}
+          itemCountLabel="7 heading matches"
+          recommendedSeconds={taskTimer.recommendedSeconds}
+          onStart={taskTimer.start}
+        />
+      ) : (
+        <>
+          <ReadingTaskTimer timer={taskTimer} />
+          <section className="panel p4-panel">
         <div className="p4-panelbar">
           <button
             type="button"
@@ -645,7 +680,9 @@ export default function AptisPart4({
             );
           })}
         </div>
-      </section>
+          </section>
+        </>
+      )}
     </div>
   );
 }
