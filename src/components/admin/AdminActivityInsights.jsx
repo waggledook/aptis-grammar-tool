@@ -21,10 +21,16 @@ import {
 } from "recharts";
 import { db } from "../../firebase";
 import { getActivityTypeLabel } from "../../utils/adminActivity";
+import { buildInsightChartRows } from "../../utils/adminInsightChart";
 
 const MAX_INSIGHT_DAYS = 366;
 const INSIGHT_CACHE_TTL_MS = 5 * 60 * 1000;
 const INSIGHT_CACHE_PREFIX = "admin-activity-insights-v1";
+const CHART_GRANULARITIES = [
+  {id: "daily", label: "Daily"},
+  {id: "weekly", label: "Weekly"},
+  {id: "monthly", label: "Monthly"},
+];
 
 function isoDate(date) {
   const year = date.getFullYear();
@@ -177,6 +183,22 @@ function InsightCard({label, value, comparison, detail}) {
   );
 }
 
+function ActivityChartTooltip({active, payload, grouped}) {
+  const row = payload?.[0]?.payload;
+  if (!active || !row) return null;
+  return (
+    <div className="admin-insights-chart-tooltip">
+      <strong>{row.rangeLabel}</strong>
+      <span>Events: {formatNumber(row.events)}</span>
+      <span>
+        {grouped ? "Average daily users" : "Individual users"}: {formatNumber(row.users, grouped ? 1 : 0)}
+      </span>
+      {grouped ? <span>Active user-days: {formatNumber(row.userDays)}</span> : null}
+      {grouped ? <small>{row.dayCount} day{row.dayCount === 1 ? "" : "s"} in this bucket</small> : null}
+    </div>
+  );
+}
+
 async function fetchDailySummaries(from, to) {
   const snapshot = await getDocs(query(
     collection(db, "adminAnalyticsDaily"),
@@ -202,6 +224,7 @@ export default function AdminActivityInsights({user}) {
   const [loading, setLoading] = useState(false);
   const [usingCache, setUsingCache] = useState(false);
   const [error, setError] = useState("");
+  const [chartGranularity, setChartGranularity] = useState("daily");
 
   const filtersDirty = !loadedConfig || from !== loadedConfig.from || to !== loadedConfig.to;
   const currentRows = useMemo(() => loadedConfig
@@ -212,6 +235,12 @@ export default function AdminActivityInsights({user}) {
     : [], [previousSummaries, loadedConfig]);
   const totals = useMemo(() => summarizeRows(currentRows), [currentRows]);
   const previousTotals = useMemo(() => summarizeRows(previousRows), [previousRows]);
+  const chartRows = useMemo(
+    () => buildInsightChartRows(currentRows, chartGranularity),
+    [currentRows, chartGranularity]
+  );
+  const chartIsGrouped = chartGranularity !== "daily";
+  const chartPeriodLabel = chartGranularity === "monthly" ? "Monthly" : chartGranularity === "weekly" ? "Weekly" : "Daily";
 
   const featureRows = useMemo(() => {
     const eventTotals = mergeMetricMap(currentSummaries, "eventsByType");
@@ -330,7 +359,7 @@ export default function AdminActivityInsights({user}) {
         Exact daily user counts from compact server-maintained summaries. Known admin accounts are excluded from the primary user metric.
       </p>
       <p className="admin-insights-notice">
-        Collection starts with the Phase 2 deployment. Historical activity has not been automatically backfilled, protecting against a large one-off read bill.
+        Historical coverage includes bounded manual backfills. Dates without a daily summary are shown as zero.
       </p>
 
       <section className="admin-insights-controls" aria-label="Analytics date controls">
@@ -374,19 +403,40 @@ export default function AdminActivityInsights({user}) {
           </section>
 
           <section className="admin-insights-panel">
-            <h2>Daily users and activity</h2>
-            <p>Users are distinct non-admin Firebase UIDs. Events use the separate left axis.</p>
+            <div className="admin-insights-panel-heading">
+              <div>
+                <h2>{chartPeriodLabel} users and activity</h2>
+                <p>
+                  {chartIsGrouped
+                    ? "Events are totalled; the user line shows average daily users. Active user-days appear in the tooltip."
+                    : "Users are distinct non-admin Firebase UIDs each day. Events use the separate left axis."}
+                </p>
+              </div>
+              <div className="admin-insights-granularity" role="group" aria-label="Chart time grouping">
+                {CHART_GRANULARITIES.map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    className={chartGranularity === option.id ? "is-active" : ""}
+                    aria-pressed={chartGranularity === option.id}
+                    onClick={() => setChartGranularity(option.id)}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <div className="admin-insights-chart">
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={currentRows} margin={{top: 10, right: 15, left: 0, bottom: 25}}>
+                <ComposedChart data={chartRows} margin={{top: 10, right: 15, left: 0, bottom: 25}}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.18)" />
                   <XAxis dataKey="label" angle={-35} textAnchor="end" height={48} tick={{fontSize: 11}} />
                   <YAxis yAxisId="events" allowDecimals={false} tick={{fontSize: 11}} />
-                  <YAxis yAxisId="users" orientation="right" allowDecimals={false} tick={{fontSize: 11}} />
-                  <Tooltip contentStyle={{background: "#0b1220", border: "1px solid #334155", borderRadius: 10}} />
+                  <YAxis yAxisId="users" orientation="right" allowDecimals={chartIsGrouped} tick={{fontSize: 11}} />
+                  <Tooltip content={<ActivityChartTooltip grouped={chartIsGrouped} />} />
                   <Legend />
                   <Bar yAxisId="events" dataKey="events" name="Events" fill="#60a5fa" radius={[4, 4, 0, 0]} />
-                  <Line yAxisId="users" type="monotone" dataKey="users" name="Individual users" stroke="#34d399" strokeWidth={3} dot={{r: 2}} />
+                  <Line yAxisId="users" type="monotone" dataKey="users" name={chartIsGrouped ? "Average daily users" : "Individual users"} stroke="#34d399" strokeWidth={3} dot={{r: 2}} />
                 </ComposedChart>
               </ResponsiveContainer>
             </div>
