@@ -243,6 +243,10 @@ export const READING_PART2_TASKS = [
   },
 ];
 
+export const READING_PART2_STANDARD_TASK_IDS = READING_PART2_TASKS.flatMap((task) =>
+  task.texts.map((text) => `${task.id}__${text.id}`)
+);
+
 export const READING_PART2_TEACHER_TASKS = [
   {
     id: "plastic-free-school",

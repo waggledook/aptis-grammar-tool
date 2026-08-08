@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, CheckCircle2, ChevronRight, Clock3, GraduationCap } from "lucide-react";
+import { ArrowLeft, ArrowRight, CheckCircle2, ChevronRight, Clock3, GraduationCap } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import AptisDemoBadge from "../components/access/AptisDemoBadge.jsx";
 import Seo from "../components/common/Seo.jsx";
@@ -104,9 +104,16 @@ export default function ReadingPartMenu({ user, aptisAccess, onSignIn }) {
         <div className="reading-part-title-line"><PartIcon size={30} aria-hidden="true" /><span>{part.label}</span></div>
         <h1>{part.title}</h1>
         <p>{part.copy}</p>
-        <div className="reading-part-facts" aria-label={`${part.label} format and suggested timing`}>
-          <span><strong>{part.format}</strong> task format</span>
-          <span><strong>{part.timing}</strong> suggested pace</span>
+        <div className="reading-part-header-actions">
+          <button
+            className={`reading-practice-link ${practiceComplete ? "is-complete" : ""}`}
+            type="button"
+            onClick={() => openActivity(part.practice)}
+          >
+            <Clock3 size={16} aria-hidden="true" />
+            Start exam practice
+            <ArrowRight size={16} aria-hidden="true" />
+          </button>
         </div>
       </header>
 
@@ -121,7 +128,9 @@ export default function ReadingPartMenu({ user, aptisAccess, onSignIn }) {
 
       <section className="reading-part-section">
         <div className="reading-part-section-heading"><h2>Learn &amp; train</h2><p>Build the method before attempting a complete exam-style task.</p></div>
-        <div className="reading-part-activity-grid">{part.training.map(renderActivity)}</div>
+        <div className={`reading-part-activity-grid ${part.training.length > 1 ? "has-multiple" : ""}`}>
+          {part.training.map(renderActivity)}
+        </div>
       </section>
 
       <section className="reading-part-section">
@@ -154,27 +163,28 @@ export default function ReadingPartMenu({ user, aptisAccess, onSignIn }) {
         .reading-part-title-line svg { color:#eef4ff; }
         .reading-part-header h1 { margin:.18rem 0 .45rem; color:#eef4ff; font-size:clamp(1.75rem, 4vw, 2.4rem); text-align:left; }
         .reading-part-header > p { margin:0; max-width:46rem; color:rgba(238,244,255,.84); font-size:1.04rem; line-height:1.5; }
-        .reading-part-facts { display:flex; flex-wrap:wrap; gap:.55rem; margin-top:.85rem; }
-        .reading-part-facts span { padding:.38rem .62rem; border:1px solid #35508e; border-radius:999px; background:#1a2847; color:rgba(238,244,255,.76); font-size:.76rem; }
-        .reading-part-facts strong { color:#eef4ff; }
+        .reading-part-header-actions { display:flex; margin-top:.65rem; }
+        .reading-practice-link { display:inline-flex; align-items:center; gap:.28rem; padding:.38rem .58rem; border:1px solid rgba(255,189,56,.52); border-radius:999px; background:transparent; color:#ffcf70; font:inherit; font-size:.76rem; font-weight:850; cursor:pointer; }
+        .reading-practice-link:hover { background:rgba(255,189,56,.1); }
+        .reading-practice-link.is-complete { border-color:rgba(34,197,94,.58); color:#7ef0c2; }
         .reading-part-access-prompt { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin:1rem 0 0; padding:.85rem 1rem; border:1px solid rgba(240,177,79,.48); border-radius:14px; background:#1a2847; color:#eef4ff; }
         .reading-part-access-prompt p { margin:.18rem 0 0; color:rgba(238,244,255,.78); }
         .reading-part-access-prompt button { padding:.55rem .78rem; border:0; border-radius:9px; background:#ffbd38; color:#13213b; font:inherit; font-weight:900; cursor:pointer; }
-        .reading-part-section { margin-top:1.45rem; }
-        .reading-part-section-heading { margin-bottom:.8rem; }
+        .reading-part-section { margin-top:1.15rem; }
+        .reading-part-section-heading { margin-bottom:.6rem; }
         .reading-part-section-heading h2 { margin:0 0 .2rem; color:#eef4ff; font-size:1.3rem; text-align:left; }
         .reading-part-section-heading p { margin:0; color:rgba(238,244,255,.78); }
-        .reading-part-activity-grid { display:grid; grid-template-columns:minmax(0, 1fr); gap:1rem; }
-        .reading-part-hub .reading-part-activity { position:relative; display:flex; flex-direction:column; align-items:flex-start; width:100%; max-width:48rem; min-height:220px; text-align:left; }
+        .reading-part-activity-grid { display:grid; grid-template-columns:minmax(0, 1fr); gap:.75rem; }
+        .reading-part-hub .reading-part-activity { position:relative; display:flex; flex-direction:column; align-items:flex-start; width:100%; max-width:48rem; min-height:160px; padding:.95rem 1.05rem; border-radius:16px; text-align:left; }
         .reading-part-hub .reading-part-activity.is-coming-soon { cursor:not-allowed; opacity:.58; }
-        .reading-part-activity-label { display:flex; align-items:center; gap:.4rem; margin-bottom:.45rem; color:#eef4ff; font-size:.82rem; font-weight:850; text-transform:uppercase; }
-        .reading-part-activity-label svg { color:#eef4ff; }
-        .reading-part-hub .reading-part-activity h3 { font-size:1.22rem; text-align:left; }
-        .reading-part-hub .reading-part-activity p { text-align:left; }
-        .reading-activity-progress { display:block; margin-top:auto; padding-top:.8rem; color:#ffbd38; font-size:.84rem; }
+        .reading-part-activity-label { display:flex; align-items:center; gap:.35rem; margin-bottom:.35rem; color:#eef4ff; font-size:.75rem; font-weight:850; text-transform:uppercase; }
+        .reading-part-activity-label svg { width:22px; height:22px; color:#eef4ff; }
+        .reading-part-hub .reading-part-activity h3 { margin-bottom:.38rem; font-size:1.08rem; text-align:left; }
+        .reading-part-hub .reading-part-activity p { font-size:.92rem; line-height:1.38; text-align:left; }
+        .reading-activity-progress { display:block; margin-top:auto; padding-top:.55rem; color:#ffbd38; font-size:.78rem; }
         .reading-activity-progress.is-complete { color:#7ef0c2; }
-        .reading-part-activity-footer { display:flex; align-items:center; justify-content:space-between; gap:.7rem; width:100%; margin-top:.65rem; }
-        .reading-part-activity-footer > strong { display:inline-flex; align-items:center; gap:.18rem; margin-left:auto; color:#ffbd38; font-size:.84rem; }
+        .reading-part-activity-footer { display:flex; align-items:center; justify-content:space-between; gap:.55rem; width:100%; margin-top:.5rem; }
+        .reading-part-activity-footer > strong { display:inline-flex; align-items:center; gap:.18rem; margin-left:auto; color:#ffbd38; font-size:.78rem; }
         .reading-part-pill { display:inline-flex; padding:.2rem .46rem; border:1px solid rgba(238,244,255,.28); border-radius:999px; color:rgba(238,244,255,.72); font-size:.66rem; font-weight:850; }
         .reading-part-pill.demo { border-color:rgba(255,189,56,.44); color:#ffcf70; }
         .reading-part-hub .reading-part-activity.is-complete { border-color:color-mix(in srgb, #22c55e 64%, #35508e); box-shadow:0 0 0 1px color-mix(in srgb, #22c55e 22%, transparent), 0 10px 24px rgba(0,0,0,.16); }
@@ -182,13 +192,14 @@ export default function ReadingPartMenu({ user, aptisAccess, onSignIn }) {
         :root[data-theme="light"] .reading-part-back { border-color:rgba(53,80,142,.35); background:var(--color-surface-2); color:var(--color-text); }
         :root[data-theme="light"] .reading-part-title-line, :root[data-theme="light"] .reading-part-title-line svg, :root[data-theme="light"] .reading-part-header h1, :root[data-theme="light"] .reading-part-section-heading h2 { color:var(--color-text); }
         :root[data-theme="light"] .reading-part-header > p, :root[data-theme="light"] .reading-part-section-heading p { color:var(--color-text-soft); }
-        :root[data-theme="light"] .reading-part-facts span { border-color:rgba(53,80,142,.28); background:var(--color-surface-2); color:var(--color-text-soft); }
-        :root[data-theme="light"] .reading-part-facts strong { color:var(--color-text); }
+        :root[data-theme="light"] .reading-practice-link { border-color:#b47a15; color:#8a5900; }
+        :root[data-theme="light"] .reading-practice-link:hover { background:rgba(180,122,21,.08); }
         :root[data-theme="light"] .reading-part-activity-label, :root[data-theme="light"] .reading-part-activity-label svg { color:var(--color-text); }
         :root[data-theme="light"] .reading-activity-progress, :root[data-theme="light"] .reading-part-activity-footer > strong { color:#a76600; }
         :root[data-theme="light"] .reading-activity-progress.is-complete { color:#08734d; }
         :root[data-theme="light"] .reading-part-hub .reading-part-activity.is-complete { border-color:#159766; box-shadow:0 0 0 1px rgba(21,151,102,.28), 0 12px 26px rgba(21,94,73,.1); }
         :root[data-theme="light"] .reading-part-hub .reading-complete-icon { color:#0d9b67 !important; }
+        @media (min-width:720px) { .reading-part-activity-grid.has-multiple { grid-template-columns:repeat(2, minmax(0, 1fr)); } .reading-part-activity-grid.has-multiple .reading-part-activity { max-width:none; } }
         @media (max-width:560px) { .reading-part-access-prompt { align-items:flex-start; flex-direction:column; } .reading-part-activity-footer { align-items:flex-start; flex-direction:column; } .reading-part-activity-footer > strong { margin-left:0; } }
       `}</style>
     </main>

@@ -37,6 +37,8 @@ import ReadingPart3StrategyTrainer from './reading/ReadingPart3StrategyTrainer.j
 import MainMenu from './components/MainMenu';
 import Profile from "./components/profile/Profile";
 import WritingMenu from './components/writing/WritingMenu';
+import WritingPartMenu from './components/writing/WritingPartMenu.jsx';
+import AptisWritingStrategyGuide from './components/writing/AptisWritingStrategyGuide.jsx';
 import WritingPart1 from './components/writing/WritingPart1';
 import WritingPart1Guide from "./components/writing/WritingPart1Guide.jsx";
 import WritingPart2 from "./components/writing/WritingPart2.jsx";
@@ -46,7 +48,10 @@ import WritingPart4Emails from "./components/writing/WritingPart4Emails";
 import WritingPart4RegisterGuide from "./components/writing/WritingPart4RegisterGuide";
 import ReadingMenu from './components/ReadingMenu';
 import ReadingPartMenu from './reading/ReadingPartMenu.jsx';
+import AptisReadingStrategyGuide from './reading/AptisReadingStrategyGuide.jsx';
 import SpeakingMenu from './components/speaking/SpeakingMenu';
+import SpeakingPartMenu from './components/speaking/SpeakingPartMenu.jsx';
+import AptisSpeakingStrategyGuide from './components/speaking/AptisSpeakingStrategyGuide.jsx';
 import SpeakingPart1 from "./components/speaking/SpeakingPart1";
 import SpeakingPart2 from './components/speaking/SpeakingPart2';
 import SpeakingPart2Secret from './components/speaking/SpeakingPart2Secret';
@@ -153,6 +158,8 @@ import SpeakingPart1Key from "./components/coursepack/SpeakingPart1Key";
 import SpeakingPart2Key from "./components/coursepack/SpeakingPart2Key";
 import SpeakingPart3Key from "./components/coursepack/SpeakingPart3Key";
 import ListeningMenu from "./components/listening/ListeningMenu.jsx";
+import ListeningPartMenu from "./components/listening/ListeningPartMenu.jsx";
+import AptisListeningStrategyGuide from "./components/listening/AptisListeningStrategyGuide.jsx";
 import ListeningPart1 from "./components/listening/ListeningPart1.jsx";
 import ListeningPart2 from "./components/listening/ListeningPart2.jsx";
 import ListeningPart3 from "./components/listening/ListeningPart3.jsx";
@@ -1960,6 +1967,11 @@ return (
 />
 
 <Route
+  path="/reading/parts/:partNumber/strategy-guide"
+  element={<AptisReadingStrategyGuide />}
+/>
+
+<Route
   path="/reading/part1"
   element={
     <>
@@ -2102,11 +2114,60 @@ return (
 />
 
 <Route
+  path="/speaking/parts/:partNumber"
+  element={
+    <SpeakingPartMenu
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+    />
+  }
+/>
+
+<Route
+  path="/speaking/parts/1/strategy-guide"
+  element={<AptisSpeakingStrategyGuide partNumber="1" />}
+/>
+
+<Route
+  path="/speaking/parts/2/strategy-guide"
+  element={<AptisSpeakingStrategyGuide partNumber="2" />}
+/>
+
+<Route
+  path="/speaking/parts/3/strategy-guide"
+  element={
+    <AptisFullAccessOnly
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+      title="Speaking Part 3 strategy is included with full access"
+    >
+      <AptisSpeakingStrategyGuide partNumber="3" />
+    </AptisFullAccessOnly>
+  }
+/>
+
+<Route
+  path="/speaking/parts/4/strategy-guide"
+  element={
+    <AptisFullAccessOnly
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+      title="Speaking Part 4 strategy is included with full access"
+    >
+      <AptisSpeakingStrategyGuide partNumber="4" />
+    </AptisFullAccessOnly>
+  }
+/>
+
+<Route
   path="/speaking/part1"
   element={
     <>
       <button
-        onClick={() => navigate("/speaking")}
+        onClick={() => navigate("/speaking/parts/1")}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
@@ -2128,7 +2189,7 @@ return (
   element={
     <>
       <button
-        onClick={() => navigate("/speaking")}
+        onClick={() => navigate("/speaking/parts/2")}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
@@ -2139,7 +2200,7 @@ return (
         aptisAccess={aptisAccess}
         onSignIn={() => setShowAuth(true)}
         allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.speaking.part2TaskIds : []}
-        onBack={() => navigate("/speaking")}
+        onBack={() => navigate("/speaking/parts/2")}
         onRequireSignIn={() => setShowAuth(true)}
         headerActions={
           <TeacherExtrasButton
@@ -2159,7 +2220,7 @@ return (
     <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
       <>
         <button
-          onClick={() => navigate("/speaking")}
+          onClick={() => navigate("/speaking/parts/2")}
           className="review-btn"
           style={{ marginBottom: "1rem" }}
         >
@@ -2176,7 +2237,7 @@ return (
   element={
     <>
       <button
-        onClick={() => navigate("/speaking")}
+        onClick={() => navigate("/speaking/parts/3")}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
@@ -2205,7 +2266,7 @@ return (
     <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
       <>
         <button
-          onClick={() => navigate("/speaking")}
+          onClick={() => navigate("/speaking/parts/3")}
           className="review-btn"
           style={{ marginBottom: "1rem" }}
         >
@@ -2222,7 +2283,7 @@ return (
   element={
     <>
       <button
-        onClick={() => navigate("/speaking")}
+        onClick={() => navigate("/speaking/parts/4")}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
@@ -2251,7 +2312,7 @@ return (
     <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
       <>
         <button
-          onClick={() => navigate("/speaking")}
+          onClick={() => navigate("/speaking/parts/4")}
           className="review-btn"
           style={{ marginBottom: "1rem" }}
         >
@@ -2267,9 +2328,8 @@ return (
   path="/speaking/photo-guide"
   element={
     <SpeakingPart2and3_PhotoGuide
-      onBack={() => navigate("/speaking")}
-      onStartPart2={() => navigate("/speaking/part2")}
-      onStartPart3={() => navigate("/speaking/part3")}
+      onBack={() => navigate("/speaking/parts/2")}
+      onStartPractice={() => navigate("/speaking/part2")}
     />
   }
 />
@@ -2320,6 +2380,55 @@ return (
 <Route
   path="/listening/dictation"
   element={isSeifHubSite ? <HubDictationTrainer /> : <ListeningMenu />}
+/>
+
+<Route
+  path="/listening/parts/:partNumber"
+  element={
+    <ListeningPartMenu
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+    />
+  }
+/>
+
+<Route
+  path="/listening/parts/1/strategy-guide"
+  element={<AptisListeningStrategyGuide partNumber="1" />}
+/>
+
+<Route
+  path="/listening/parts/2/strategy-guide"
+  element={<AptisListeningStrategyGuide partNumber="2" />}
+/>
+
+<Route
+  path="/listening/parts/3/strategy-guide"
+  element={
+    <AptisFullAccessOnly
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+      title="Listening Part 3 strategy is included with full access"
+    >
+      <AptisListeningStrategyGuide partNumber="3" />
+    </AptisFullAccessOnly>
+  }
+/>
+
+<Route
+  path="/listening/parts/4/strategy-guide"
+  element={
+    <AptisFullAccessOnly
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+      title="Listening Part 4 strategy is included with full access"
+    >
+      <AptisListeningStrategyGuide partNumber="4" />
+    </AptisFullAccessOnly>
+  }
 />
 
 <Route
@@ -2534,11 +2643,27 @@ return (
 />
 
 <Route
+  path="/writing/parts/:partNumber"
+  element={
+    <WritingPartMenu
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={() => setShowAuth(true)}
+    />
+  }
+/>
+
+<Route
+  path="/writing/parts/:partNumber/strategy-guide"
+  element={<AptisWritingStrategyGuide />}
+/>
+
+<Route
   path="/writing/part1"
   element={
     <>
       <button
-        onClick={() => navigate("/writing")}
+        onClick={() => navigate("/writing/parts/1")}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
@@ -2549,7 +2674,7 @@ return (
         aptisAccess={aptisAccess}
         onSignIn={() => setShowAuth(true)}
         allowedQuestionIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.writing.part1QuestionIds : []}
-        onBack={() => navigate("/writing")}
+        onBack={() => navigate("/writing/parts/1")}
       />
     </>
   }
@@ -2558,20 +2683,11 @@ return (
 <Route
   path="/writing/part1-guide"
   element={
-    <>
-      <button
-        onClick={() => navigate("/writing")}
-        className="review-btn"
-        style={{ marginBottom: "1rem" }}
-      >
-        ← Back
-      </button>
-      <WritingPart1Guide
-        user={user}
-        onBack={() => navigate("/writing")}
-        onStartPractice={() => navigate("/writing/part1")}
-      />
-    </>
+    <WritingPart1Guide
+      user={user}
+      onBack={() => navigate("/writing/parts/1")}
+      onStartPractice={() => navigate("/writing/part1")}
+    />
   }
 />
 
@@ -2580,7 +2696,7 @@ return (
   element={
     <>
       <button
-        onClick={() => navigate("/writing")}
+        onClick={() => navigate("/writing/parts/2")}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
@@ -2602,7 +2718,7 @@ return (
   element={
     <>
       <button
-        onClick={() => navigate("/writing")}
+        onClick={() => navigate("/writing/parts/3")}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
@@ -2624,7 +2740,7 @@ return (
   element={
     <>
       <button
-        onClick={() => navigate("/writing")}
+        onClick={() => navigate("/writing/parts/4")}
         className="review-btn"
         style={{ marginBottom: "1rem" }}
       >
@@ -2635,7 +2751,7 @@ return (
         aptisAccess={aptisAccess}
         onSignIn={() => setShowAuth(true)}
         allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.writing.part4TaskIds : []}
-        onBack={() => navigate("/writing")}
+        onBack={() => navigate("/writing/parts/4")}
         onRequireSignIn={() => setShowAuth(true)}
       />
     </>
@@ -2645,43 +2761,25 @@ return (
 <Route
   path="/writing/part4-guide"
   element={
-    <>
-      <button
-        onClick={() => navigate("/writing")}
-        className="review-btn"
-        style={{ marginBottom: "1rem" }}
-      >
-        ← Back
-      </button>
-      <WritingPart4Guide
-        onBack={() => navigate("/writing")}
-        onOpen={(slug) => {
-          if (slug === "register") return navigate("/writing/part4-register");
-          if (slug === "practice") return navigate("/writing/part4");
-          // fallback for any future slugs
-          navigate(`/writing/p4-${slug}`);
-        }}
-      />
-    </>
+    <WritingPart4Guide
+      onBack={() => navigate("/writing/parts/4")}
+      onOpen={(slug) => {
+        if (slug === "register") return navigate("/writing/part4-register");
+        if (slug === "practice") return navigate("/writing/part4");
+        // fallback for any future slugs
+        navigate(`/writing/p4-${slug}`);
+      }}
+    />
   }
 />
 
 <Route
   path="/writing/part4-register"
   element={
-    <>
-      <button
-        onClick={() => navigate("/writing/part4-guide")}
-        className="review-btn"
-        style={{ marginBottom: "1rem" }}
-      >
-        ← Back
-      </button>
-      <WritingPart4RegisterGuide
-        onBack={() => navigate("/writing/part4-guide")}
-        onStartPractice={() => navigate("/writing/part4")}
-      />
-    </>
+    <WritingPart4RegisterGuide
+      onBack={() => navigate("/writing/parts/4")}
+      onStartPractice={() => navigate("/writing/part4")}
+    />
   }
 />
 

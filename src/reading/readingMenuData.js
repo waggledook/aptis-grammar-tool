@@ -1,4 +1,5 @@
 import { BookOpen, FileText, ListOrdered, Users } from "lucide-react";
+import { READING_PART2_STANDARD_TASK_IDS } from "./part2Tasks.js";
 
 export const APTIS_READING_PARTS = [
   {
@@ -9,15 +10,17 @@ export const APTIS_READING_PARTS = [
     format: "5 word choices",
     timing: "3 minutes",
     icon: FileText,
-    menuSummary: "Exam practice available",
+    menuSummary: "Strategy guide + exam practice",
     taskIds: ["cinema-plan", "class-homework", "cafe-meeting", "doctor-appointment", "weekend-trip", "birthday-present"],
     training: [
       {
-        id: "part1-strategy",
+        id: "part1-strategy-guide",
         eyebrow: "Strategy guide",
-        title: "Part 1 Strategy Guide",
-        copy: "Learn how to use grammar, collocation and the meaning of the whole message to choose each word.",
-        status: "coming-soon",
+        title: "Sentence Comprehension Strategy",
+        copy: "Understand each sentence, compare all three options and check that your answer makes sense.",
+        path: "/reading/parts/1/strategy-guide",
+        demoAccess: "demo",
+        progressId: "part1-strategy-guide",
       },
     ],
     practice: {
@@ -37,26 +40,23 @@ export const APTIS_READING_PARTS = [
     format: "2 texts in the exam",
     timing: "3:30 per text",
     icon: ListOrdered,
-    menuSummary: "Guide + exam practice",
-    taskIds: [
-      "cycling-lanes__t1",
-      "ebooks__t1",
-      "helen-graves__t1",
-      "film-festival__t1",
-      "remote-work__t1",
-      "plastic-reduction__t1",
-      "plastic-free-school__t1",
-      "olive-oil-production__t1",
-      "sports-centre-opening__t1",
-      "traditional-kimchi-making__t1",
-      "city-infrastructure__t1",
-    ],
+    menuSummary: "Strategy guide + guided training + exam practice",
+    taskIds: READING_PART2_STANDARD_TASK_IDS,
     training: [
       {
-        id: "part2-guide",
+        id: "part2-strategy-guide",
         eyebrow: "Strategy guide",
-        title: "Sentence Order Guide",
-        copy: "Spot references, linking language and other cohesive clues before rebuilding the text.",
+        title: "Text Cohesion Strategy",
+        copy: "Follow references, linking words and connected ideas to build the text in small chains.",
+        path: "/reading/parts/2/strategy-guide",
+        demoAccess: "demo",
+        progressId: "part2-strategy-guide",
+      },
+      {
+        id: "part2-guide",
+        eyebrow: "Guided practice",
+        title: "Explore Cohesive Clues",
+        copy: "Reveal the links inside two short texts, then drag the sentences into the correct order.",
         path: "/reading/part2-guide",
         demoAccess: "demo",
         progressId: "part2-guide",
@@ -79,9 +79,18 @@ export const APTIS_READING_PARTS = [
     format: "7 opinion matches",
     timing: "10 minutes",
     icon: Users,
-    menuSummary: "Guided training + exam practice",
+    menuSummary: "Strategy guide + guided training + exam practice",
     taskIds: ["fitness-trackers", "food-delivery-apps", "learning-online", "exercising-with-others", "remote-work"],
     training: [
+      {
+        id: "part3-strategy-guide",
+        eyebrow: "Strategy guide",
+        title: "Opinion Matching Strategy",
+        copy: "Analyse the seven statements first, then read one person at a time and prove every match.",
+        path: "/reading/parts/3/strategy-guide",
+        demoAccess: "locked",
+        progressId: "part3-strategy-guide",
+      },
       {
         id: "part3-strategy",
         eyebrow: "Guided training",
@@ -109,15 +118,17 @@ export const APTIS_READING_PARTS = [
     format: "7 paragraph matches",
     timing: "15 minutes",
     icon: BookOpen,
-    menuSummary: "Exam practice available",
+    menuSummary: "Strategy guide + exam practice",
     taskIds: ["yawning", "music-consumer-behaviour"],
     training: [
       {
-        id: "part4-strategy",
+        id: "part4-strategy-guide",
         eyebrow: "Strategy guide",
-        title: "Part 4 Strategy Guide",
-        copy: "Learn to identify paragraph purpose, separate main ideas from details and reject broad distractors.",
-        status: "coming-soon",
+        title: "Long Text Comprehension Strategy",
+        copy: "Summarise each paragraph’s main idea, compare the headings and use elimination carefully.",
+        path: "/reading/parts/4/strategy-guide",
+        demoAccess: "demo",
+        progressId: "part4-strategy-guide",
       },
     ],
     practice: {

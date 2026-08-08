@@ -33,8 +33,8 @@ export default function SpeakingPart3ComparingMenu() {
           </p>
         </div>
         <div className="actions">
-          <button className="btn" onClick={() => navigate("/speaking")}>
-            ← Back to speaking menu
+          <button className="btn" onClick={() => navigate("/speaking/parts/3")}>
+            ← Back to Part 3
           </button>
         </div>
       </header>

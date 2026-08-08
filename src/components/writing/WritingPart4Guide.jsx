@@ -15,7 +15,7 @@ export default function WritingPart4Guide({ onBack, onOpen }) {
         <div>
           <h2 className="title">Writing – Part 4 Guide</h2>
           <p className="intro">
-            In this final part of the Aptis Advanced Writing test, you respond to a short message by writing
+            In this final part of the Aptis Writing test, you respond to a short message by writing
             <br />• an <strong>informal email</strong> (≈ 50 words) to a <strong>friend</strong>, and
             <br />• a <strong>formal email</strong> (≈ 120–150 words) to a <strong>club, committee or organisation</strong>.
           </p>

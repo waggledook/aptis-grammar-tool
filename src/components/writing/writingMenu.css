@@ -1,0 +1,409 @@
+.writing-menu-header {
+  margin-bottom: 1.2rem;
+}
+
+.writing-menu-header h1,
+.writing-part-header h1,
+.writing-part-section-heading h2 {
+  color: #eef4ff;
+  text-align: left;
+}
+
+.writing-menu-header h1 {
+  margin: 0 0 .55rem;
+  font-size: clamp(1.7rem, 4vw, 2.35rem);
+}
+
+.writing-menu-header p,
+.writing-part-header > p,
+.writing-part-section-heading p {
+  color: rgba(238, 244, 255, .82);
+}
+
+.writing-menu-header p {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.writing-menu-section {
+  margin-top: 1.3rem;
+}
+
+.writing-parts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+.writing-menu .writing-part-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 220px;
+}
+
+.writing-part-card-label,
+.writing-part-title-line,
+.writing-part-activity-label {
+  display: flex;
+  align-items: center;
+  color: #eef4ff;
+}
+
+.writing-part-card-label {
+  gap: .35rem;
+  margin-bottom: .25rem;
+  font-size: 1rem;
+}
+
+.writing-menu .writing-part-card h3 {
+  font-size: 1.28rem;
+  text-align: left;
+}
+
+.writing-menu .writing-part-card p {
+  text-align: left;
+}
+
+.writing-menu-summary {
+  display: block;
+  margin-top: auto;
+  padding-top: .9rem;
+  color: #ffbd38;
+  font-size: .86rem;
+}
+
+.writing-menu-access,
+.writing-part-pill {
+  display: inline-flex;
+  padding: .2rem .46rem;
+  border: 1px solid rgba(238, 244, 255, .28);
+  border-radius: 999px;
+  color: rgba(238, 244, 255, .72);
+  font-size: .66rem;
+  font-weight: 850;
+}
+
+.writing-menu-access {
+  margin-top: .45rem;
+}
+
+.writing-menu-access.demo,
+.writing-part-pill.demo {
+  border-color: rgba(255, 189, 56, .44);
+  color: #ffcf70;
+}
+
+.writing-full-test-card {
+  display: grid;
+  gap: 1rem;
+  align-items: center;
+  margin-top: 1.35rem;
+  padding: 1.15rem;
+  border: 1px solid #35508e;
+  border-radius: 14px;
+  background: #1a2847;
+  color: #eef4ff;
+}
+
+.writing-full-test-kicker {
+  color: #ffbd38;
+  font-size: .75rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.writing-full-test-card h2 {
+  margin: .2rem 0 .3rem;
+  color: #eef4ff;
+  font-size: 1.25rem;
+  text-align: left;
+}
+
+.writing-full-test-card p {
+  margin: 0;
+  color: rgba(238, 244, 255, .78);
+}
+
+.writing-full-test-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: .78rem 1rem;
+  border-radius: 10px;
+  background: #ffbd38;
+  color: #13213b;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.writing-menu-back {
+  margin-top: 1.2rem;
+}
+
+.writing-part-back {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  margin: 0 0 1.2rem;
+  padding: .55rem .75rem;
+  border: 2px solid #35508e;
+  border-radius: 10px;
+  background: #1a2847;
+  color: #eef4ff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.writing-part-header {
+  margin-bottom: 1.2rem;
+}
+
+.writing-part-title-line {
+  gap: .4rem;
+  font-size: 1rem;
+}
+
+.writing-part-header h1 {
+  margin: .18rem 0 .45rem;
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+}
+
+.writing-part-header > p {
+  max-width: 46rem;
+  margin: 0;
+  font-size: 1.04rem;
+  line-height: 1.5;
+}
+
+.writing-part-header-actions {
+  display: flex;
+  margin-top: .65rem;
+}
+
+.writing-practice-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .28rem;
+  padding: .38rem .58rem;
+  border: 1px solid rgba(255, 189, 56, .52);
+  border-radius: 999px;
+  background: transparent;
+  color: #ffcf70;
+  font: inherit;
+  font-size: .76rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.writing-practice-link:hover {
+  background: rgba(255, 189, 56, .1);
+}
+
+.writing-part-access-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 1rem 0 0;
+  padding: .85rem 1rem;
+  border: 1px solid rgba(240, 177, 79, .48);
+  border-radius: 14px;
+  background: #1a2847;
+  color: #eef4ff;
+}
+
+.writing-part-access-prompt p {
+  margin: .18rem 0 0;
+  color: rgba(238, 244, 255, .78);
+}
+
+.writing-part-access-prompt button {
+  padding: .55rem .78rem;
+  border: 0;
+  border-radius: 9px;
+  background: #ffbd38;
+  color: #13213b;
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.writing-part-section {
+  margin-top: 1.15rem;
+}
+
+.writing-part-section-heading {
+  margin-bottom: .6rem;
+}
+
+.writing-part-section-heading h2 {
+  margin: 0 0 .2rem;
+  font-size: 1.3rem;
+}
+
+.writing-part-section-heading p {
+  margin: 0;
+}
+
+.writing-part-activity-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: .75rem;
+}
+
+.writing-part-hub .writing-part-activity {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 48rem;
+  min-height: 160px;
+  padding: .95rem 1.05rem;
+  border-radius: 16px;
+  text-align: left;
+}
+
+.writing-part-hub .writing-part-activity.is-coming-soon {
+  cursor: not-allowed;
+  opacity: .58;
+}
+
+.writing-part-activity-label {
+  gap: .35rem;
+  margin-bottom: .35rem;
+  font-size: .75rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.writing-part-activity-label svg {
+  width: 22px;
+  height: 22px;
+}
+
+.writing-part-hub .writing-part-activity h3 {
+  margin-bottom: .38rem;
+  font-size: 1.08rem;
+  text-align: left;
+}
+
+.writing-part-hub .writing-part-activity p {
+  font-size: .92rem;
+  line-height: 1.38;
+  text-align: left;
+}
+
+.writing-part-activity-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .7rem;
+  width: 100%;
+  margin-top: auto;
+  padding-top: .5rem;
+}
+
+.writing-part-activity-footer > strong {
+  display: inline-flex;
+  align-items: center;
+  gap: .18rem;
+  margin-left: auto;
+  color: #ffbd38;
+  font-size: .78rem;
+  white-space: nowrap;
+}
+
+:root[data-theme="light"] .writing-menu-header h1,
+:root[data-theme="light"] .writing-part-header h1,
+:root[data-theme="light"] .writing-part-section-heading h2,
+:root[data-theme="light"] .writing-part-card-label,
+:root[data-theme="light"] .writing-part-title-line,
+:root[data-theme="light"] .writing-part-activity-label {
+  color: var(--color-text);
+}
+
+:root[data-theme="light"] .writing-menu-header p,
+:root[data-theme="light"] .writing-part-header > p,
+:root[data-theme="light"] .writing-part-section-heading p {
+  color: var(--color-text-soft);
+}
+
+:root[data-theme="light"] .writing-menu-summary,
+:root[data-theme="light"] .writing-part-activity-footer > strong {
+  color: #a76600;
+}
+
+:root[data-theme="light"] .writing-menu-access,
+:root[data-theme="light"] .writing-part-pill {
+  color: var(--color-text-soft);
+}
+
+:root[data-theme="light"] .writing-menu-access.demo,
+:root[data-theme="light"] .writing-part-pill.demo {
+  border-color: #b47a15;
+  color: #8a5900;
+}
+
+:root[data-theme="light"] .writing-full-test-card,
+:root[data-theme="light"] .writing-part-back {
+  border-color: rgba(53, 80, 142, .35);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+:root[data-theme="light"] .writing-full-test-card h2 {
+  color: var(--color-text);
+}
+
+:root[data-theme="light"] .writing-practice-link {
+  border-color: #b47a15;
+  color: #8a5900;
+}
+
+:root[data-theme="light"] .writing-practice-link:hover {
+  background: rgba(180, 122, 21, .08);
+}
+
+:root[data-theme="light"] .writing-full-test-card p {
+  color: var(--color-text-soft);
+}
+
+@media (min-width: 720px) {
+  .writing-parts-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .writing-part-activity-grid.has-multiple {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .writing-part-activity-grid.has-multiple .writing-part-activity {
+    max-width: none;
+  }
+}
+
+@media (min-width: 760px) {
+  .writing-full-test-card {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
+@media (max-width: 560px) {
+  .writing-part-access-prompt,
+  .writing-part-activity-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .writing-part-activity-footer > strong {
+    margin-left: 0;
+  }
+
+  .writing-full-test-link {
+    width: 100%;
+  }
+}
