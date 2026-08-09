@@ -37,6 +37,39 @@ const EMPTY_VOCAB_PRACTICE_SUMMARY = {
   synonyms: { attempted: 0, correct: 0, attempts: 0, favourites: 0, mistakes: 0 },
   collocations: { attempted: 0, correct: 0, attempts: 0, favourites: 0, mistakes: 0 },
 };
+const EMPTY_GRAMMAR_REVIEW_STATUS = {
+  due: 0,
+  maintenance: 0,
+  scheduled: 0,
+  legacy: 0,
+};
+
+function buildGrammarReviewStatus(reviewQueue = [], legacyIds = []) {
+  const activeReviewIds = new Set(reviewQueue.map((entry) => entry.itemId));
+  const uniqueLegacyIds = Array.from(new Set(legacyIds || []));
+
+  return {
+    due: reviewQueue.filter((entry) => entry.due && !entry.maintenance).length,
+    maintenance: reviewQueue.filter((entry) => entry.due && entry.maintenance).length,
+    scheduled: reviewQueue.filter((entry) => !entry.due).length,
+    legacy: uniqueLegacyIds.filter((itemId) => !activeReviewIds.has(itemId)).length,
+  };
+}
+
+function formatGrammarReviewStatus({ due, maintenance, scheduled, legacy }) {
+  const parts = [];
+  if (due > 0) parts.push(`${due} due today`);
+  if (maintenance > 0) {
+    parts.push(`${maintenance} maintenance check${maintenance === 1 ? "" : "s"} ready`);
+  }
+  if (legacy > 0) {
+    parts.push(`${legacy} legacy mistake${legacy === 1 ? "" : "s"} ready`);
+  }
+  if (!parts.length && scheduled > 0) {
+    return `Nothing due today · ${scheduled} scheduled for later`;
+  }
+  return parts.length ? parts.join(" · ") : "Nothing due today";
+}
 const TOTAL_VOCAB_EXERCISE_TASKS = vocabExerciseTasks.length;
 const TOTAL_SYNONYM_ITEMS = synonymSeedItems.length;
 const TOTAL_COLLOCATION_ITEMS = collocationPrecisionItems.length;
@@ -210,6 +243,7 @@ export default function Profile({
   user,
   onBack,
   onGoMistakes,
+  onGoGrammarReview,
   onGoFavourites,
   onGoVocabMistakes,   // 👈 NEW
   // NEW:
@@ -255,6 +289,9 @@ export default function Profile({
     correct: 0,
     total: 0,
   });
+  const [grammarReviewStatus, setGrammarReviewStatus] = useState(
+    EMPTY_GRAMMAR_REVIEW_STATUS
+  );
 
   // Writing data (kept)
   const [writingP1, setWritingP1] = useState([]);
@@ -898,6 +935,8 @@ function renderFeedbackButton(kind, submission) {
           f,
           w,
           gDash,
+          gReviewQueue,
+          gReviewLegacyIds,
           gEdits,
           wP2,
           wP3,
@@ -924,6 +963,8 @@ function renderFeedbackButton(kind, submission) {
           fb.fetchRecentFavourites(8, uid),
           fb.fetchWritingP1Sessions(10, uid),
           fb.fetchGrammarDashboard(uid),
+          fb.fetchGrammarReviewQueue?.(uid) ?? Promise.resolve([]),
+          fb.fetchRecentMistakes(15, uid),
           fb.fetchWritingP1GuideEdits(100, uid),
           fb.fetchWritingP2Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP3Submissions?.(20, uid) ?? Promise.resolve([]),
@@ -952,6 +993,9 @@ function renderFeedbackButton(kind, submission) {
         setFavourites(f);
         setWritingP1(w);
         setGrammarDash(gDash);
+        setGrammarReviewStatus(
+          buildGrammarReviewStatus(gReviewQueue || [], gReviewLegacyIds || [])
+        );
         setGuideEdits(gEdits);
         setWritingP2(wP2);
         setWritingP3(wP3);
@@ -2386,13 +2430,13 @@ const formatOteSpeakingPart = (part) => {
       />
       <div style={{ height: 8 }} />
       <ProgressBar
-        label="Correct"
+        label="Answered correctly at least once"
         value={grammarDash.correct}
         max={grammarDash.total || 1}
         right={`${grammarDash.correct}/${grammarDash.total || 0}`}
       />
 
-      {(onGoMistakes || onGoFavourites) && (
+      {(onGoMistakes || onGoGrammarReview || onGoFavourites) && (
         <div
           style={{
             display: "flex",
@@ -2401,6 +2445,26 @@ const formatOteSpeakingPart = (part) => {
             marginTop: "0.75rem",
           }}
         >
+          {onGoGrammarReview && (
+            <div className="profile-grammar-review-shortcut">
+              <button
+                className="btn grammar-review-featured"
+                type="button"
+                onClick={() => onGoGrammarReview()}
+                aria-describedby="profile-grammar-review-status"
+              >
+                <span>Today’s Review</span>
+                <span className="grammar-review-new-badge">New</span>
+              </button>
+              <span
+                id="profile-grammar-review-status"
+                className="profile-grammar-review-status"
+              >
+                {formatGrammarReviewStatus(grammarReviewStatus)}
+              </span>
+            </div>
+          )}
+
           {onGoMistakes && (
             <button
               className="btn"

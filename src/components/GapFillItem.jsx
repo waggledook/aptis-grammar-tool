@@ -1,16 +1,23 @@
 // src/components/GapFillItem.jsx
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { auth, sendReport, recordMistake,
-         addFavourite, removeFavourite, fetchFavourites, saveGrammarResult } from '../firebase'
+         addFavourite, removeFavourite, fetchFavourites, saveGrammarResult,
+         saveGrammarLearningAttempt, logActivity } from '../firebase'
 import { AlertCircle, BookOpen, Star } from 'lucide-react'
 import { toast } from '../utils/toast'
 import GrammarTheoryModal from './grammar/GrammarTheoryModal'
 import { getGrammarTheoryForItem } from '../data/grammarTheoryNotes'
 import '../index.css'     // your global styles
 
-export default function GapFillItem({ item, onAnswer, testMode = false }) {
+export default function GapFillItem({
+  item,
+  onAnswer,
+  testMode = false,
+  trackingContext = null,
+}) {
   const { id, sentence, options, answerIndex, explanations, level } = item
   const theory = getGrammarTheoryForItem(item)
+  const isReview = trackingContext?.mode === 'review'
 
   const [sel, setSel]             = useState(null)
   const [showReport, setShowReport]       = useState(false)
@@ -19,6 +26,7 @@ export default function GapFillItem({ item, onAnswer, testMode = false }) {
   const [otherText, setOtherText]         = useState('')
   const [isFav, setIsFav]                 = useState(false)
   const [sendingReport, setSendingReport] = useState(false)
+  const answerLockedRef = useRef(false)
 
   // Pre-split for rendering
   const [before, after] = sentence.split('___')
@@ -37,12 +45,45 @@ export default function GapFillItem({ item, onAnswer, testMode = false }) {
   // 2) Handle answer clicks (and record mistakes)
   //
   const handleClick = (idx) => {
-    if (sel !== null) return; // already answered
+    if (sel !== null || answerLockedRef.current) return; // already answered
+    answerLockedRef.current = true;
   
     setSel(idx);
   
     const isCorrect = idx === answerIndex;
-  
+    const user = auth.currentUser;
+    let trackingPromise = null;
+
+    if (user) {
+      if (!isCorrect) {
+        recordMistake(id).catch((err) =>
+          console.error("[GapFillItem] recordMistake error:", err)
+        );
+      }
+
+      saveGrammarResult(id, isCorrect).catch((err) =>
+        console.error("[GapFillItem] saveGrammarResult error:", err)
+      );
+
+      if (trackingContext) {
+        trackingPromise = saveGrammarLearningAttempt({
+          sessionId: trackingContext.sessionId,
+          mode: trackingContext.mode || (testMode ? "test" : "practice"),
+          itemId: id,
+          level,
+          tags: Array.isArray(item.tags) ? item.tags : item.tag ? [item.tag] : [],
+          isCorrect,
+          selectedIndex: idx,
+          correctIndex: answerIndex,
+          selectedOption: options?.[idx] ?? null,
+          correctOption: options?.[answerIndex] ?? null,
+        }).catch((err) => {
+          console.error("[GapFillItem] saveGrammarLearningAttempt error:", err);
+          throw err;
+        });
+      }
+    }
+
     // Tell parent (GrammarSetRunner / main trainer) what happened
     if (typeof onAnswer === "function") {
       try {
@@ -53,25 +94,12 @@ export default function GapFillItem({ item, onAnswer, testMode = false }) {
           correctIndex: answerIndex,
           selectedOption: options?.[idx] ?? null,
           correctOption: options?.[answerIndex] ?? null,
+          trackingPromise,
         });
       } catch (err) {
         console.error("[GapFillItem] onAnswer handler failed:", err);
       }
     }
-  
-    // Only write to Firestore if signed in
-    const user = auth.currentUser;
-    if (!user) return;
-  
-    if (!isCorrect) {
-      recordMistake(id).catch((err) =>
-        console.error("[GapFillItem] recordMistake error:", err)
-      );
-    }
-  
-    saveGrammarResult(id, isCorrect).catch((err) =>
-      console.error("[GapFillItem] saveGrammarResult error:", err)
-    );
   };  
 
   // 3) Toggle favourite on/off
@@ -91,6 +119,20 @@ const toggleFav = async () => {
     console.error('Favourite error', e)
   }
 }
+
+  const openTheory = () => {
+    setShowTheory(true)
+    logActivity('grammar_reference_opened', {
+      itemId: id,
+      level: level || '',
+      tag: item.tag || item.tags?.[0] || '',
+      referenceTitle: theory?.title || '',
+      mode: trackingContext?.mode || (testMode ? 'test' : 'practice'),
+      source: 'grammar-question',
+    }).catch((err) =>
+      console.error('[GapFillItem] grammar reference activity error:', err)
+    )
+  }
   //
   // 4) Send a report
   //
@@ -155,7 +197,7 @@ const toggleFav = async () => {
             <button
               type="button"
               className="theory-btn"
-              onClick={() => setShowTheory(true)}
+              onClick={openTheory}
               aria-label={`Show ${theory.title} grammar notes`}
               title={`Show ${theory.title} grammar notes`}
             >
@@ -227,7 +269,13 @@ const toggleFav = async () => {
 
   return (
     <div className="explanation">
-      <p className="explanation-title">Feedback:</p>
+      <p className="explanation-title">
+        {isReview
+          ? sel === answerIndex
+            ? 'Nice work — let’s check why.'
+            : 'Not quite — let’s learn from it.'
+          : 'Feedback:'}
+      </p>
       <ul className="explanation-list">
         {ordered.map(f => (
           <li

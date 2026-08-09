@@ -9,6 +9,7 @@
     "emulators:functions": "npm --prefix functions run serve",
     "build": "vite build",
     "lint": "eslint .",
+    "test:grammar-review": "node scripts/test-grammar-review.mjs",
     "preview": "vite preview",
     "content:export:keyword": "node scripts/export-keyword-content.mjs",
     "content:export:opencloze": "node scripts/export-open-cloze-content.mjs",

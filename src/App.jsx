@@ -22,12 +22,13 @@ import {
   fetchRecentVocabProgress,
   listAssignedActivitiesForStudent,
   listGrammarSetAttemptsForStudent,
+  startGrammarLearningSession,
+  completeGrammarLearningSession,
 } from "./firebase";
 import { onAuthStateChanged }      from 'firebase/auth'
 import AuthForm                    from './components/AuthForm'
 import FilterPanel                 from './components/FilterPanel'
 import GapFillList                 from './components/GapFillList'
-import ProgressTracker             from './components/ProgressTracker'
 import useTags                     from './hooks/useTags'
 import { fetchItems }              from './api/grammar'
 import ReviewMistakes   from './components/ReviewMistakes'
@@ -82,6 +83,7 @@ import './App.css'
 import { collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, where } from "firebase/firestore";
 import GrammarSetRunner from "./components/grammar/GrammarSetRunner";
 import UseOfEnglishCustomQuizRunner from "./components/grammar/UseOfEnglishCustomQuizRunner.jsx";
+import GrammarReviewBeta from "./components/grammar/GrammarReviewBeta.jsx";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 import AdminActivityLog from "./components/admin/AdminActivityLog.jsx";
 import AdminActivityCharts from "./components/admin/AdminActivityCharts";
@@ -116,6 +118,13 @@ import { getAptisRouteSeo } from "./seo/aptisRouteSeo.js";
 const TEACHER_NOTIFICATION_LIMIT = 100;
 const TEACHER_BADGE_REFRESH_MS = 10 * 60 * 1000;
 const THEME_STORAGE_KEY = "aptis-theme";
+
+function createGrammarSessionId() {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return crypto.randomUUID();
+  }
+  return `grammar-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+}
 
 function AptisRouteSeoSync({ enabled }) {
   const location = useLocation();
@@ -963,6 +972,7 @@ const [loading, setLoading] = useState(false)
 const [error,   setError]   = useState(null)
 const [count,   setCount]   = useState(10); // how many questions to generate
 const [runKey,  setRunKey]  = useState(0);
+const [grammarTrackingContext, setGrammarTrackingContext] = useState(null);
 
   const [readingMode, setReadingMode] = useState('menu'); // 'menu' | 'guide' | 'practice'
 
@@ -998,9 +1008,27 @@ const [runKey,  setRunKey]  = useState(0);
         preferNew: !!user && !isLinkedAptisDemoMode,
         seenIds,
       });
-  
+
+      const trackingContext = batch.length
+        ? {
+            sessionId: createGrammarSessionId(),
+            mode: "practice",
+            levels: [...levels],
+            tags: !isLinkedAptisDemoMode && tag ? [tag] : [],
+            itemIds: batch.map((item) => item.id),
+            totalItems: batch.length,
+          }
+        : null;
+
+      setGrammarTrackingContext(trackingContext);
       setItems(batch);
       setRunKey(k => k + 1); // force fresh run for child components
+
+      if (trackingContext) {
+        startGrammarLearningSession(trackingContext).catch((sessionError) =>
+          console.error("startGrammarLearningSession failed:", sessionError)
+        );
+      }
     } catch (err) {
       console.error("generate() failed", err);
       setError('Failed to load items.');
@@ -1018,6 +1046,7 @@ const [runKey,  setRunKey]  = useState(0);
   
   const clearExercises = () => {
     setItems([]);
+    setGrammarTrackingContext(null);
     setError(null);
     setRunKey(k => k + 1); // ensures any child state is reset
   };
@@ -1030,7 +1059,6 @@ const [runKey,  setRunKey]  = useState(0);
 
   // 👇 Add this INSIDE App, before the `return`
   function GrammarPage() {
-    const [answeredCount, setAnsweredCount] = useState(0);
     const grammarCountOptions = useMemo(
       () => (isLinkedAptisDemoMode ? [5, 10, 15, 25] : [5, 10, 15]),
       [isLinkedAptisDemoMode]
@@ -1049,18 +1077,25 @@ const [runKey,  setRunKey]  = useState(0);
     }, [isLinkedAptisDemoMode, tag]);
 
     const handleGenerate = () => {
-      setAnsweredCount(0);
       generate();
     };
   
     const handleReplay = () => {
-      setAnsweredCount(0);
       newSetSameSettings();
     };
   
     const handleClear = () => {
-      setAnsweredCount(0);
       clearExercises();
+    };
+
+    const handleSessionComplete = (summary) => {
+      if (!grammarTrackingContext?.sessionId) return;
+      return completeGrammarLearningSession({
+        sessionId: grammarTrackingContext.sessionId,
+        answeredCount: summary.answered,
+        correctCount: summary.correct,
+        totalItems: summary.total,
+      });
     };
 
     return (
@@ -1117,17 +1152,33 @@ const [runKey,  setRunKey]  = useState(0);
           <span className="count-label">questions</span>
         </div>
 
-        <div className="btn-row">
-          <button
-  className="generate-btn grammar-start-btn"
-  onClick={handleGenerate}
-  disabled={loading || tagsLoading}
->
-  {loading ? "Loading…" : "Start"}
-</button>
+        <div
+          className="btn-row grammar-actions"
+          role="group"
+          aria-label="Grammar practice actions"
+        >
+          <div className="grammar-actions-primary">
+            <button
+              className="generate-btn grammar-start-btn"
+              onClick={handleGenerate}
+              disabled={loading || tagsLoading}
+            >
+              {loading ? "Loading…" : "Start"}
+            </button>
+
+            {user && (
+              <button
+                className="review-btn grammar-review-featured"
+                onClick={() => navigate("/profile/grammar-review-beta")}
+              >
+                <span>Today’s Review</span>
+                <span className="grammar-review-new-badge">New</span>
+              </button>
+            )}
+          </div>
 
           {user && (
-            <>
+            <div className="grammar-actions-secondary">
               <button
                 className="review-btn mistakes"
                 onClick={() => navigate("/profile/mistakes")}
@@ -1140,7 +1191,7 @@ const [runKey,  setRunKey]  = useState(0);
               >
                 Review Favourites
               </button>
-            </>
+            </div>
           )}
         </div>
 
@@ -1170,12 +1221,10 @@ const [runKey,  setRunKey]  = useState(0);
   key={runKey}
   runKey={runKey}                           // optional but recommended
   items={items}
-  onAnswer={() => setAnsweredCount(c => c + 1)}
+  trackingContext={grammarTrackingContext}
+  showProgress
+  onComplete={handleSessionComplete}
 />
-            <ProgressTracker
-              answered={answeredCount}
-              total={items.length}
-            />
 
             {items.length > 0 && (
               <div className="exercise-footer">
@@ -2792,6 +2841,7 @@ return (
       siteMode={currentSite.id}
       onBack={() => navigate("/")}
       onGoMistakes={() => navigate("/profile/mistakes")}
+      onGoGrammarReview={() => navigate("/profile/grammar-review-beta")}
       onGoFavourites={() => navigate("/profile/favourites")}
       onGoVocabMistakes={() => navigate("/profile/vocab-mistakes")}   // 👈 ADD THIS
       onProfilePhotoChange={syncProfilePhoto}
@@ -2813,6 +2863,11 @@ return (
       <ReviewMistakes />
     </>
   }
+/>
+
+<Route
+  path="/profile/grammar-review-beta"
+  element={<GrammarReviewBeta user={user} />}
 />
 
 <Route

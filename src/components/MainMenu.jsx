@@ -63,17 +63,18 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
       <div className="whats-new-banner">
         <div className="whats-new-copy">
           <span className="whats-new-label">What’s new</span>
-          <h3>New Aptis Vocabulary Exercise Trainer</h3>
+          <h3>Expanded Aptis Grammar Practice</h3>
           <p>
-            Practise exam-style vocabulary tasks with instant feedback, favourites and mistake review.
+            Now 500+ questions, with new sets on present tenses, determiners,
+            noun agreement, used to and causatives — plus personalised review.
           </p>
         </div>
 
         <button
           className="whats-new-btn"
-          onClick={() => openSection("vocabulary", "/vocabulary/exercises")}
+          onClick={() => navigate("/grammar")}
         >
-          Try vocabulary exercises
+          Start grammar practice
         </button>
       </div>
 

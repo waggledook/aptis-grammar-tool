@@ -335,6 +335,192 @@ button {
   font-size: 1.1rem;
   color: #ccc;
 }
+
+.grammar-session-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(260px, 0.75fr);
+  gap: 1rem;
+  margin-top: 0.9rem;
+  padding: 1.1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 14px;
+  background: var(--color-surface-2);
+  box-shadow: 0 10px 24px var(--color-shadow-soft);
+}
+
+.grammar-session-summary h2 {
+  margin: 0.2rem 0 0.35rem;
+  color: var(--color-text);
+  text-align: left;
+}
+
+.grammar-session-summary p {
+  margin: 0;
+  color: var(--color-text-soft);
+  font-size: 0.95rem;
+}
+
+.grammar-session-summary-label {
+  color: #fdbf2d;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.grammar-session-summary-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.grammar-session-summary-stats > div {
+  display: grid;
+  align-content: center;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-3);
+  text-align: center;
+}
+
+.grammar-session-summary-stats span {
+  color: var(--color-text-soft);
+  font-size: 0.72rem;
+}
+
+.grammar-session-summary-stats strong {
+  color: var(--color-text);
+  font-size: 1.35rem;
+}
+
+@media (max-width: 680px) {
+  .grammar-session-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grammar-review-beta {
+  display: grid;
+  gap: 1rem;
+}
+
+.grammar-review-beta > .review-btn {
+  width: fit-content;
+}
+
+.grammar-review-beta-hero {
+  padding: 1.3rem;
+  border: 1px solid rgba(253, 191, 45, 0.34);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, rgba(253, 191, 45, 0.11), transparent 55%),
+    var(--color-surface-2);
+}
+
+.grammar-review-beta-hero > span {
+  color: #fdbf2d;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.grammar-review-beta-hero h1 {
+  margin: 0.25rem 0 0.4rem;
+  text-align: left;
+}
+
+.grammar-review-beta-hero p,
+.grammar-review-beta-ready p {
+  margin: 0;
+  color: var(--color-text-soft);
+}
+
+.grammar-review-beta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.grammar-review-beta-grid article {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface-2);
+}
+
+.grammar-review-beta-grid span,
+.grammar-review-beta-reasons li span {
+  color: var(--color-text-soft);
+  font-size: 0.78rem;
+}
+
+.grammar-review-beta-grid strong {
+  color: var(--color-text);
+  font-size: 1.6rem;
+}
+
+.grammar-review-beta-ready,
+.grammar-review-beta-reasons {
+  padding: 1rem;
+}
+
+.grammar-review-beta-ready h2,
+.grammar-review-beta-reasons h2 {
+  margin-top: 0;
+  text-align: left;
+}
+
+.grammar-review-beta-ready .generate-btn {
+  margin-top: 0.9rem;
+}
+
+.grammar-review-beta-reasons ul {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grammar-review-beta-reasons li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.grammar-review-beta-reasons > p {
+  margin: -0.2rem 0 0.9rem;
+  color: var(--color-text-soft);
+  line-height: 1.55;
+}
+
+.grammar-review-beta-reasons li strong {
+  color: var(--color-text);
+}
+
+.grammar-review-beta-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+@media (max-width: 760px) {
+  .grammar-review-beta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .grammar-review-beta-reasons li {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
 /* === Feedback container === */
 .explanation {
   margin-top: 24px;
@@ -4640,5 +4826,110 @@ h2,
   .admin-insights-chart {
     height: 300px;
     min-height: 300px;
+  }
+}
+
+/* Featured entry point for the personalised grammar review. */
+button.grammar-review-featured {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  min-height: 2.75rem;
+  border: 1px solid rgba(196, 181, 253, 0.78);
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  box-shadow:
+    0 10px 22px rgba(79, 70, 229, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: #fff;
+}
+
+button.grammar-review-featured:hover:not(:disabled) {
+  border-color: rgba(221, 214, 254, 0.95);
+  background: linear-gradient(135deg, #5b54ee 0%, #8b4bf0 100%);
+  box-shadow:
+    0 12px 26px rgba(79, 70, 229, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  color: #fff;
+  filter: none;
+  transform: translateY(-1px);
+}
+
+button.grammar-review-featured:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 4px rgba(139, 92, 246, 0.28),
+    0 10px 22px rgba(79, 70, 229, 0.25);
+}
+
+.grammar-review-new-badge {
+  padding: 0.18rem 0.42rem;
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 999px;
+  background: #fef3c7;
+  color: #78350f;
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.btn-row.grammar-actions {
+  display: grid;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.grammar-actions-primary,
+.grammar-actions-secondary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+
+.grammar-actions .generate-btn {
+  margin: 0;
+}
+
+.grammar-actions-primary > button {
+  min-height: 3.05rem;
+}
+
+.profile-grammar-review-shortcut {
+  display: flex;
+  flex: 0 0 100%;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.profile-grammar-review-status {
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+@media (max-width: 520px) {
+  .grammar-actions-primary,
+  .grammar-actions-secondary {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .grammar-actions-primary > button,
+  .grammar-actions-secondary > button {
+    width: 100%;
+  }
+
+  .profile-grammar-review-shortcut > button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button.grammar-review-featured:hover:not(:disabled) {
+    transform: none;
   }
 }

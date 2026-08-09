@@ -255,6 +255,23 @@
     ]
   },
   {
+    "id": "c1_unreal_16",
+    "level": "C1",
+    "tag": "unreal forms",
+    "sentence": "I'd rather you ___ me earlier that the meeting was cancelled.",
+    "options": [
+      "had told",
+      "told",
+      "would tell"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: After 'I'd rather you' referring to a past preference, we use the past perfect ('had told').",
+      "Incorrect: 'told' describes a real past action, but the speaker is talking about an unreal/desired past action.",
+      "Incorrect: 'would tell' refers to future habits/annoyances, not a specific past regret."
+    ]
+  },
+  {
     "id": "c1_unreal_17",
     "level": "C1",
     "tag": "unreal forms",
@@ -286,6 +303,23 @@
       "Correct: A past perfect is needed because the speaker wanted an explanation *earlier*, but it didn’t happen. This is similar to a third conditional structure.",
       "Incorrect: 'explained' is not possible because we're referring to an unreal PAST situation in this sentence.",
       "Incorrect: 'would explain' looks to the future, not a past preference."
+    ]
+  },
+  {
+    "id": "c1_unreal_19",
+    "level": "C1",
+    "tag": "unreal forms",
+    "sentence": "He’d rather we ___ the problem when it first appeared.",
+    "options": [
+      "had dealt with",
+      "dealt with",
+      "would deal with"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: This expresses regret about a past missed action, so past perfect ('had dealt with') is required.",
+      "Incorrect: 'dealt with' is real past; it doesn't match an unreal regret/my preference structure.",
+      "Incorrect: 'would deal with' refers to the future or hypothetical willingness, not a past action."
     ]
   }
 ]

@@ -3707,6 +3707,2080 @@ export const grammarTheoryNotes = {
       "Is the comparison after as if/as though real or unreal?",
     ],
   },
+  "Determiners and Pronouns": {
+    "title": "Determiners and Pronouns",
+    "subtitle": "Referring to people and things clearly",
+    "intro": "Determiners and pronouns help us show which person or thing we mean, whether something belongs to someone, and how one item relates to another.",
+    "examples": [
+      "That jacket is mine.",
+      "Could I try another size?",
+      "Some people left early; others stayed.",
+      "The two teams congratulated each other."
+    ],
+    "focus": "This guide focuses on possessives, reflexive and reciprocal pronouns, another/other, one/ones, each/every, and formal substitution with that/those.",
+    "sections": [
+      {
+        "title": "1. Possessive forms",
+        "body": [
+          "Use a possessive determiner before a noun:",
+          "Use a possessive pronoun when the noun is not repeated:",
+          "A common structure is:",
+          "a friend/colleague/neighbour of + possessive pronoun",
+          "Not: a friend of me"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "This seat is mine."
+          },
+          {
+            "label": "Example",
+            "text": "Is that bag yours?"
+          },
+          {
+            "label": "Example",
+            "text": "Their flat is larger than ours."
+          },
+          {
+            "label": "Example",
+            "text": "A friend of mine works there."
+          },
+          {
+            "label": "Example",
+            "text": "We stayed with some relatives of hers."
+          }
+        ],
+        "chips": [
+          "my phone",
+          "her coat",
+          "their house"
+        ]
+      },
+      {
+        "title": "2. Reflexive pronouns",
+        "body": [
+          "Use myself, yourself, himself, herself, itself, ourselves, yourselves, themselves when the subject and object refer to the same person or thing.",
+          "They can also add emphasis:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "He accidentally cut himself."
+          },
+          {
+            "label": "Example",
+            "text": "She taught herself Italian."
+          },
+          {
+            "label": "Example",
+            "text": "We introduced ourselves."
+          },
+          {
+            "label": "Example",
+            "text": "The director herself answered the complaint."
+          },
+          {
+            "label": "Example",
+            "text": "I built the shelves myself."
+          }
+        ]
+      },
+      {
+        "title": "By + reflexive pronoun",
+        "body": [
+          "By myself / yourself / themselves often means alone or without help."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "She travelled by herself."
+          },
+          {
+            "label": "Example",
+            "text": "We fixed it by ourselves."
+          }
+        ]
+      },
+      {
+        "title": "3. Each other",
+        "body": [
+          "Use each other when two or more people perform the same action towards one another.",
+          "Compare:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "The neighbours often help each other."
+          },
+          {
+            "label": "Example",
+            "text": "The two players blamed each other."
+          },
+          {
+            "label": "Example",
+            "text": "They looked at themselves in the mirror."
+          },
+          {
+            "label": "Example",
+            "text": "They looked at each other across the table."
+          }
+        ]
+      },
+      {
+        "title": "4. Another, other and others",
+        "body": [
+          "These forms are easy to confuse."
+        ]
+      },
+      {
+        "title": "Another",
+        "body": [
+          "Use another + singular countable noun for one more or a different one.",
+          "Another can also come before a number:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Could I have another cup?"
+          },
+          {
+            "label": "Example",
+            "text": "Let's try another route."
+          },
+          {
+            "label": "Example",
+            "text": "We'll need another two days."
+          },
+          {
+            "label": "Example",
+            "text": "They ordered another three copies."
+          }
+        ]
+      },
+      {
+        "title": "Other",
+        "body": [
+          "Use other + plural noun or other + uncountable noun."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Are there any other options?"
+          },
+          {
+            "label": "Example",
+            "text": "We need other information before deciding."
+          }
+        ]
+      },
+      {
+        "title": "Others",
+        "body": [
+          "Use others when the noun is not repeated."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Some people agreed; others disagreed."
+          }
+        ]
+      },
+      {
+        "title": "5. The other / the others",
+        "body": [
+          "Use the other for the remaining one of a known pair.",
+          "Use the other + plural noun for the remaining members of a known group.",
+          "Use the others when the noun is omitted.",
+          "The key difference is:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "There are two keys. One is mine; the other is yours."
+          },
+          {
+            "label": "Example",
+            "text": "Two candidates withdrew; the other four continued."
+          },
+          {
+            "label": "Example",
+            "text": "Three people stayed; the others left."
+          },
+          {
+            "label": "Example",
+            "text": "the others = the remaining people/things in a known group"
+          }
+        ],
+        "chips": [
+          "another = one more / a different one",
+          "the other = the remaining one",
+          "others = other people/things generally"
+        ]
+      },
+      {
+        "title": "6. One and ones",
+        "body": [
+          "Use one / ones to avoid repeating a countable noun.",
+          "Use one for singular nouns and ones for plural nouns.",
+          "Do not normally use one/ones to refer back to an uncountable noun."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "This chair is broken. Use the other one."
+          },
+          {
+            "label": "Example",
+            "text": "I prefer the darker ones."
+          },
+          {
+            "label": "Example",
+            "text": "Have you got a cheaper one?"
+          }
+        ]
+      },
+      {
+        "title": "7. Each and every",
+        "body": [
+          "Both each and every refer to all members of a group, but the viewpoint is slightly different."
+        ]
+      },
+      {
+        "title": "Each",
+        "body": [
+          "Focuses more on members individually."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Each student received a certificate."
+          },
+          {
+            "label": "Example",
+            "text": "The tickets cost €20 each."
+          }
+        ]
+      },
+      {
+        "title": "Every",
+        "body": [
+          "Treats all members as part of a complete group.",
+          "Remember:",
+          "every + singular noun",
+          "Not: every students"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Every room has a balcony."
+          },
+          {
+            "label": "Example",
+            "text": "I go there every summer."
+          }
+        ]
+      },
+      {
+        "title": "8. Both, all and each",
+        "body": [
+          "These words can appear in different positions.",
+          "Each often emphasises individual distribution:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Both students passed."
+          },
+          {
+            "label": "Example",
+            "text": "The students both passed."
+          },
+          {
+            "label": "Example",
+            "text": "All the applicants were interviewed."
+          },
+          {
+            "label": "Example",
+            "text": "The applicants were all interviewed."
+          },
+          {
+            "label": "Example",
+            "text": "The players were each given a medal."
+          },
+          {
+            "label": "Example",
+            "text": "They were each given a separate task."
+          }
+        ]
+      },
+      {
+        "title": "9. One thing compared with another",
+        "body": [
+          "In more formal English, that and those can replace a previously mentioned noun, especially in comparisons.",
+          "Use that for singular or uncountable reference:",
+          "Use those for plural reference:",
+          "This avoids unnecessary repetition."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "The climate on the coast is milder than that inland."
+          },
+          {
+            "label": "Example",
+            "text": "The working conditions here are better than those at my previous company."
+          }
+        ]
+      },
+      {
+        "title": "10. Those + description",
+        "body": [
+          "Those can also mean the people who...",
+          "This structure is particularly common in formal and written English."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Those interested should contact reception."
+          },
+          {
+            "label": "Example",
+            "text": "Support is available for those affected by the changes."
+          }
+        ]
+      },
+      {
+        "title": "11. Former and latter",
+        "body": [
+          "When exactly two people or things have been mentioned:",
+          "Example:",
+          "These forms are more common in formal writing than in conversation."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "The company considered reducing prices or cutting staff. The latter option was rejected."
+          }
+        ],
+        "chips": [
+          "the former = the first",
+          "the latter = the second"
+        ]
+      },
+      {
+        "title": "12. Such",
+        "body": [
+          "Such can refer back to a type, situation or description already mentioned.",
+          "Useful patterns:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "The role is temporary and should be treated as such."
+          },
+          {
+            "label": "Example",
+            "text": "There is no such thing as a completely risk-free investment."
+          }
+        ],
+        "chips": [
+          "as such",
+          "such a/an + noun",
+          "no such + noun",
+          "no such thing as"
+        ]
+      },
+      {
+        "title": "Quick comparison",
+        "body": [],
+        "table": {
+          "headers": [
+            "Form",
+            "Main use"
+          ],
+          "rows": [
+            [
+              "my / your / her",
+              "before a noun"
+            ],
+            [
+              "mine / yours / hers",
+              "replaces the noun"
+            ],
+            [
+              "myself / themselves",
+              "same person does and receives the action"
+            ],
+            [
+              "each other",
+              "reciprocal action"
+            ],
+            [
+              "another",
+              "one more / a different one"
+            ],
+            [
+              "other + noun",
+              "additional or different things"
+            ],
+            [
+              "others",
+              "other people/things without repeating the noun"
+            ],
+            [
+              "the other(s)",
+              "remaining member(s) of a known group"
+            ],
+            [
+              "one / ones",
+              "replaces countable nouns"
+            ],
+            [
+              "that / those",
+              "formal noun substitution"
+            ],
+            [
+              "each",
+              "members individually"
+            ],
+            [
+              "every",
+              "all members of a group"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "Common mistakes",
+        "body": [],
+        "examples": [
+          {
+            "label": "Remember",
+            "text": "another question, but other questions"
+          },
+          {
+            "label": "Remember",
+            "text": "some people ... others, not some people ... other"
+          },
+          {
+            "label": "Remember",
+            "text": "one ... the other when there are two"
+          },
+          {
+            "label": "Remember",
+            "text": "a friend of mine, not a friend of me"
+          },
+          {
+            "label": "Remember",
+            "text": "every student, not every students"
+          },
+          {
+            "label": "Remember",
+            "text": "Use themselves for reflexive meaning and each other for reciprocal meaning."
+          },
+          {
+            "label": "Remember",
+            "text": "Use that/those, not ordinary object pronouns, for formal substitution in comparisons."
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Is the noun being repeated, or can I replace it?",
+      "Am I talking about one more item or the remaining item?",
+      "Is the action reflexive or reciprocal?",
+      "Do I need a possessive determiner or a possessive pronoun?",
+      "Am I referring to members individually with each?",
+      "Is one/ones replacing a countable noun?",
+      "Would that/those make a formal comparison clearer?"
+    ]
+  },
+  "Nouns and Agreement": {
+    "title": "Nouns and Agreement",
+    "subtitle": "Countability, singular and plural forms, and choosing the correct verb",
+    "intro": "English nouns do not always behave as their form suggests. Some nouns are uncountable, some look plural but take a singular verb, and in longer noun phrases the noun nearest the verb is not always the one that controls agreement.",
+    "examples": [
+      "The equipment has arrived.",
+      "Those trousers are too long.",
+      "A series of problems has delayed the project.",
+      "Three quarters of the students have finished."
+    ],
+    "focus": "This guide focuses on countability, unusual noun forms and subject–verb agreement.",
+    "sections": [
+      {
+        "title": "1. Countable and uncountable nouns",
+        "body": [
+          "Countable nouns can normally have singular and plural forms:",
+          "Uncountable nouns normally do not use a/an or a regular plural form.",
+          "Common examples include:",
+          "Use an expression such as:",
+          "Not: an advice / informations / furnitures"
+        ],
+        "chips": [
+          "a chair / two chairs",
+          "an idea / several ideas",
+          "advice",
+          "information",
+          "furniture",
+          "equipment",
+          "work",
+          "traffic",
+          "a piece of advice",
+          "an item of information",
+          "a piece of equipment"
+        ]
+      },
+      {
+        "title": "2. Countability can change with meaning",
+        "body": [
+          "Some nouns can be countable or uncountable depending on what they mean."
+        ]
+      },
+      {
+        "title": "Experience",
+        "body": [
+          "→ knowledge gained over time",
+          "→ one particular event"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "She has a lot of experience in marketing."
+          },
+          {
+            "label": "Example",
+            "text": "Travelling alone was an interesting experience."
+          }
+        ]
+      },
+      {
+        "title": "Paper",
+        "body": [
+          "→ material",
+          "→ academic articles",
+          "Other nouns that can change include room, time, glass, hair, chicken, business and work.",
+          "Always consider the meaning, not just the noun itself."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "We need more paper for the printer."
+          },
+          {
+            "label": "Example",
+            "text": "She published three papers last year."
+          }
+        ]
+      },
+      {
+        "title": "3. Nouns that look plural but are singular",
+        "body": [
+          "Some nouns ending in -s take singular agreement.",
+          "Here, statistics means the academic subject.",
+          "But:",
+          "Here, statistics means numerical data and is plural."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "The news is encouraging."
+          },
+          {
+            "label": "Example",
+            "text": "Economics is difficult."
+          },
+          {
+            "label": "Example",
+            "text": "Statistics is useful for this degree."
+          },
+          {
+            "label": "Example",
+            "text": "The latest statistics show a decline."
+          }
+        ]
+      },
+      {
+        "title": "4. Plural-only nouns",
+        "body": [
+          "Some nouns normally take a plural verb even though they may refer to one object or group.",
+          "With a pair of, agreement is singular:",
+          "The verb agrees with pair, not trousers."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "These scissors are blunt."
+          },
+          {
+            "label": "Example",
+            "text": "My trousers are too long."
+          },
+          {
+            "label": "Example",
+            "text": "The police are investigating the incident."
+          },
+          {
+            "label": "Example",
+            "text": "This pair of trousers is too small."
+          }
+        ]
+      },
+      {
+        "title": "5. Find the head noun",
+        "body": [
+          "In a long noun phrase, the verb normally agrees with the main noun, not the noun closest to it.",
+          "A useful strategy is to remove the of-phrase:",
+          "This often makes the correct agreement clearer."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "The effect of the new rules is already noticeable."
+          },
+          {
+            "label": "Example",
+            "text": "A series of delays has caused problems."
+          },
+          {
+            "label": "Example",
+            "text": "The contents of the box were damaged."
+          },
+          {
+            "label": "Example",
+            "text": "A series ~~of delays~~ has..."
+          },
+          {
+            "label": "Example",
+            "text": "The effects ~~of the change~~ are..."
+          }
+        ]
+      },
+      {
+        "title": "6. The number of / a number of",
+        "body": [
+          "These two expressions behave differently."
+        ]
+      },
+      {
+        "title": "The number of + plural noun → singular",
+        "body": [
+          "The subject is the number."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "The number of applications has increased."
+          }
+        ]
+      },
+      {
+        "title": "A number of + plural noun → plural",
+        "body": [
+          "Here, a number of means approximately several."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "A number of applications have arrived late."
+          }
+        ]
+      },
+      {
+        "title": "7. Fractions, percentages and proportions",
+        "body": [
+          "With fractions and proportions, agreement normally depends on the noun after of."
+        ]
+      },
+      {
+        "title": "Singular or uncountable noun",
+        "body": [],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Half of the building is empty."
+          },
+          {
+            "label": "Example",
+            "text": "Two thirds of the water has disappeared."
+          }
+        ]
+      },
+      {
+        "title": "Plural noun",
+        "body": [
+          "Ask: What does the fraction refer to?"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Half of the rooms are empty."
+          },
+          {
+            "label": "Example",
+            "text": "Two thirds of the participants have finished."
+          }
+        ]
+      },
+      {
+        "title": "8. Amounts as one unit",
+        "body": [
+          "Distances, periods of time and sums of money can take singular agreement when we think of them as one total amount.",
+          "The noun looks plural, but the speaker is treating the whole amount as one unit."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Ten kilometres is a long way to walk."
+          },
+          {
+            "label": "Example",
+            "text": "Four weeks is enough time."
+          },
+          {
+            "label": "Example",
+            "text": "€2,000 is more than I expected."
+          }
+        ]
+      },
+      {
+        "title": "9. Words with the same singular and plural form",
+        "body": [
+          "Some nouns do not change form."
+        ]
+      },
+      {
+        "title": "Species",
+        "body": [],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "This species is endangered."
+          },
+          {
+            "label": "Example",
+            "text": "Several species are endangered."
+          }
+        ]
+      },
+      {
+        "title": "Means",
+        "body": [
+          "Look at the determiner and meaning to decide whether the noun is singular or plural."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "This is the simplest means of communication."
+          },
+          {
+            "label": "Example",
+            "text": "Several means have been considered."
+          }
+        ]
+      },
+      {
+        "title": "10. More than one",
+        "body": [
+          "Despite its plural meaning:",
+          "more than one + singular noun + singular verb",
+          "This is a formal agreement pattern worth remembering."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "More than one employee has complained."
+          },
+          {
+            "label": "Example",
+            "text": "More than one solution is possible."
+          }
+        ]
+      },
+      {
+        "title": "11. Many a",
+        "body": [
+          "The formal expression:",
+          "many a + singular noun",
+          "also takes singular agreement.",
+          "It means something similar to many, but the grammar remains singular."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Many a traveller has made the same mistake."
+          },
+          {
+            "label": "Example",
+            "text": "Many a promising idea has failed at this stage."
+          }
+        ]
+      },
+      {
+        "title": "12. One of those who...",
+        "body": [
+          "Agreement can become tricky when a relative clause follows one of + plural noun.",
+          "Who refers to students, so the verb is plural.",
+          "But compare:",
+          "Now the only one is the person who completed it, so singular agreement is used."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "She is one of the students who have completed the course."
+          },
+          {
+            "label": "Example",
+            "text": "She is the only one of the students who has completed the course."
+          }
+        ]
+      },
+      {
+        "title": "13. Every with joined nouns",
+        "body": [
+          "When every applies to two singular nouns joined by and, the verb is normally singular.",
+          "The people or things are being considered individually, one by one."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Every manager and supervisor has received the instructions."
+          },
+          {
+            "label": "Example",
+            "text": "Every window and door was checked."
+          }
+        ]
+      },
+      {
+        "title": "Quick comparison",
+        "body": [],
+        "table": {
+          "headers": [
+            "Structure",
+            "Agreement"
+          ],
+          "rows": [
+            [
+              "the news",
+              "singular"
+            ],
+            [
+              "the police",
+              "plural"
+            ],
+            [
+              "a pair of trousers",
+              "singular"
+            ],
+            [
+              "trousers",
+              "plural"
+            ],
+            [
+              "the number of people",
+              "singular"
+            ],
+            [
+              "a number of people",
+              "plural"
+            ],
+            [
+              "a series of problems",
+              "singular"
+            ],
+            [
+              "half of the money",
+              "singular"
+            ],
+            [
+              "half of the students",
+              "plural"
+            ],
+            [
+              "more than one person",
+              "singular"
+            ],
+            [
+              "many a person",
+              "singular"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "Common mistakes",
+        "body": [],
+        "examples": [
+          {
+            "label": "Remember",
+            "text": "Do not make normally uncountable nouns plural: advices, equipments, furnitures."
+          },
+          {
+            "label": "Remember",
+            "text": "Do not automatically agree with the noun closest to the verb."
+          },
+          {
+            "label": "Remember",
+            "text": "Remember the difference between the number of and a number of."
+          },
+          {
+            "label": "Remember",
+            "text": "With fractions, check the noun after of."
+          },
+          {
+            "label": "Remember",
+            "text": "Treat a distance, period or sum as singular when it represents one total amount."
+          },
+          {
+            "label": "Remember",
+            "text": "Remember that species and means can be singular or plural without changing form."
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Is the noun countable or uncountable in this meaning?",
+      "Does the noun have an unusual singular or plural form?",
+      "What is the real head noun of the subject?",
+      "Is an of-phrase distracting me from the head noun?",
+      "Does a fraction refer to a singular, uncountable or plural noun?",
+      "Is a measurement being treated as one amount?",
+      "Am I dealing with a special structure such as the number of, more than one or many a?"
+    ]
+  },
+  "Present Tenses and Perfect Forms": {
+    "title": "Present Tenses and Perfect Forms",
+    "subtitle": "Habits, temporary situations and connections with the present",
+    "intro": "English present forms help us distinguish between regular situations, actions happening around now, past events connected to the present, and activities continuing up to now.",
+    "examples": [
+      "I usually cycle to work.",
+      "I'm working from home this week.",
+      "We've visited that restaurant several times.",
+      "She's been studying all morning."
+    ],
+    "focus": "This guide focuses on choosing between the present simple, present continuous, present perfect simple and present perfect continuous.",
+    "sections": [
+      {
+        "title": "Present simple",
+        "body": [
+          "Use the present simple for:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "He normally starts work at eight."
+          },
+          {
+            "label": "Example",
+            "text": "They live near the coast."
+          },
+          {
+            "label": "Example",
+            "text": "I believe you're right."
+          }
+        ],
+        "chips": [
+          "habits and routines",
+          "permanent or regular situations",
+          "facts and general truths",
+          "states"
+        ]
+      },
+      {
+        "title": "Present continuous",
+        "body": [
+          "Use:",
+          "am/is/are + verb-ing",
+          "for:",
+          "A temporary situation can continue for days or months. It does not have to be happening at the exact moment of speaking."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "She's talking to a client at the moment."
+          },
+          {
+            "label": "Example",
+            "text": "I'm staying with friends this month."
+          },
+          {
+            "label": "Example",
+            "text": "Prices are rising rapidly."
+          }
+        ],
+        "chips": [
+          "actions happening now",
+          "temporary situations",
+          "changing situations"
+        ]
+      },
+      {
+        "title": "2. Stative verbs",
+        "body": [
+          "Some verbs usually describe states rather than actions, so they are not normally used in continuous forms.",
+          "Common examples include:",
+          "know, believe, understand, want, need, own, belong, remember",
+          "Some verbs can be stative or active depending on meaning:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I understand the problem."
+          },
+          {
+            "label": "Example",
+            "text": "She owns two flats."
+          },
+          {
+            "label": "Example",
+            "text": "We need more information."
+          },
+          {
+            "label": "Example",
+            "text": "I'm thinking about changing jobs. → considering"
+          },
+          {
+            "label": "Example",
+            "text": "The soup tastes strange. → has a particular flavour"
+          },
+          {
+            "label": "Example",
+            "text": "The chef is tasting the soup. → deliberately trying it"
+          }
+        ],
+        "chips": [
+          "I think he's right. → opinion"
+        ]
+      },
+      {
+        "title": "3. Present perfect simple",
+        "body": [
+          "Use:",
+          "have/has + past participle",
+          "for past events or situations that are connected with the present.",
+          "Common uses include:"
+        ]
+      },
+      {
+        "title": "Experience",
+        "body": [],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I've never travelled to Canada."
+          },
+          {
+            "label": "Example",
+            "text": "Have you seen this film before?"
+          }
+        ]
+      },
+      {
+        "title": "Completed actions in an unfinished period",
+        "body": [],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "She's answered five emails today."
+          },
+          {
+            "label": "Example",
+            "text": "We've had several problems this week."
+          }
+        ]
+      },
+      {
+        "title": "Situations continuing until now",
+        "body": [],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I've known him for years."
+          },
+          {
+            "label": "Example",
+            "text": "They've lived here since 2018."
+          }
+        ]
+      },
+      {
+        "title": "4. Finished past or present perfect?",
+        "body": [
+          "The present perfect connects a past event with now.",
+          "Do not normally use it with a clearly finished past time.",
+          "Use the present perfect when the period continues up to now or no finished past time is given.",
+          "Useful expressions include:",
+          "so far, yet, already, ever, never, since, for, recently"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I saw her yesterday."
+          },
+          {
+            "label": "Example",
+            "text": "We moved here in 2022."
+          },
+          {
+            "label": "Example",
+            "text": "I've seen her twice this week."
+          },
+          {
+            "label": "Example",
+            "text": "We've moved house several times."
+          }
+        ]
+      },
+      {
+        "title": "5. Since and for",
+        "body": [
+          "Use:",
+          "since + starting point",
+          "Use:",
+          "for + period of time"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I've worked here for six years."
+          },
+          {
+            "label": "Example",
+            "text": "I've worked here since 2020."
+          }
+        ],
+        "chips": [
+          "since Monday",
+          "since 2020",
+          "since I started this job",
+          "for three hours",
+          "for several years",
+          "for a long time"
+        ]
+      },
+      {
+        "title": "6. Present perfect simple or continuous?",
+        "body": [
+          "Both forms can connect the past with the present, but the focus is different."
+        ]
+      },
+      {
+        "title": "Present perfect simple",
+        "body": [
+          "Often focuses on result, completion or number."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I've written four pages."
+          },
+          {
+            "label": "Example",
+            "text": "She's called him three times."
+          }
+        ]
+      },
+      {
+        "title": "Present perfect continuous",
+        "body": [
+          "Use:",
+          "have/has been + verb-ing",
+          "to focus on activity or duration.",
+          "Compare:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I've been writing all morning."
+          },
+          {
+            "label": "Example",
+            "text": "She's been trying to contact him for hours."
+          },
+          {
+            "label": "Example",
+            "text": "I've been painting all day. → activity and duration"
+          }
+        ],
+        "chips": [
+          "I've painted three rooms. → completed result"
+        ]
+      },
+      {
+        "title": "7. Completed number or continuing activity?",
+        "body": [
+          "Words showing a completed number of actions normally favour the simple form:",
+          "Expressions of duration often favour the continuous when the activity is still happening:",
+          "The meaning matters more than simply spotting a particular time expression."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "We've interviewed eight candidates so far."
+          },
+          {
+            "label": "Example",
+            "text": "We've been interviewing candidates all morning."
+          }
+        ],
+        "chips": [
+          "twice",
+          "three times",
+          "six reports",
+          "several applications",
+          "all morning",
+          "for two hours",
+          "since breakfast"
+        ]
+      },
+      {
+        "title": "8. Structures with time and experience",
+        "body": [
+          "Some common structures strongly favour the present perfect."
+        ]
+      },
+      {
+        "title": "This is the first/second/third time...",
+        "body": [],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "This is the second time I've forgotten my password."
+          }
+        ]
+      },
+      {
+        "title": "Superlative + experience up to now",
+        "body": [
+          "These structures compare the present situation with everything experienced up to now."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "It's the best meal I've had in months."
+          }
+        ]
+      },
+      {
+        "title": "9. Been or gone?",
+        "body": [
+          "Use gone to when someone went somewhere and is still there or on the way.",
+          "→ She isn't here now.",
+          "Use been to for a completed visit.",
+          "→ She visited and returned."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Marta has gone to the bank."
+          },
+          {
+            "label": "Example",
+            "text": "Marta has been to Rome several times."
+          }
+        ]
+      },
+      {
+        "title": "10. More advanced perfect structures",
+        "body": [
+          "Some expressions use the present perfect to describe a situation that has developed or remained true over time."
+        ]
+      },
+      {
+        "title": "Have yet to",
+        "body": [
+          "have yet to + infinitive means have still not done something."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Several issues have yet to be resolved."
+          }
+        ]
+      },
+      {
+        "title": "Come to",
+        "body": [
+          "have come to + infinitive can describe gradual change."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "The policy has come to be seen as unnecessary."
+          }
+        ]
+      },
+      {
+        "title": "So far / long since",
+        "body": [
+          "Perfect forms also combine with adverbials showing the relationship between past and present.",
+          "These forms are especially common in formal written English."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "No solution has so far been found."
+          },
+          {
+            "label": "Example",
+            "text": "That approach has long since been abandoned."
+          }
+        ]
+      },
+      {
+        "title": "Quick comparison",
+        "body": [],
+        "table": {
+          "headers": [
+            "Form",
+            "Main focus"
+          ],
+          "rows": [
+            [
+              "present simple",
+              "routine, fact, state"
+            ],
+            [
+              "present continuous",
+              "now, temporary or changing situation"
+            ],
+            [
+              "present perfect simple",
+              "result, experience, completed number"
+            ],
+            [
+              "present perfect continuous",
+              "activity, duration, ongoing process"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "Common mistakes",
+        "body": [],
+        "examples": [
+          {
+            "label": "Remember",
+            "text": "Do not use continuous forms automatically with stative verbs."
+          },
+          {
+            "label": "Remember",
+            "text": "Use the past simple with clearly finished past times such as yesterday or last year."
+          },
+          {
+            "label": "Remember",
+            "text": "Use since for a starting point and for for a duration."
+          },
+          {
+            "label": "Remember",
+            "text": "A completed number often favours the present perfect simple."
+          },
+          {
+            "label": "Remember",
+            "text": "An activity continuing over time often favours the present perfect continuous."
+          },
+          {
+            "label": "Remember",
+            "text": "Do not choose a tense only because of one keyword: consider the meaning of the whole sentence."
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Is this a regular situation or a temporary one?",
+      "Is the verb describing a state or an activity?",
+      "Is the past time finished or connected to now?",
+      "Am I focusing on a completed result or an ongoing activity?",
+      "Is there a completed number of actions?",
+      "Do I need since or for?",
+      "Does the situation continue up to the present?"
+    ]
+  },
+  "Used to and Be/Get Used to": {
+    "title": "Used to and Be/Get Used to",
+    "subtitle": "Past habits, familiarity and adapting to change",
+    "intro": "Used to, be used to and get used to look similar, but they have very different meanings and structures.",
+    "examples": [
+      "I used to work weekends.",
+      "I'm used to working under pressure.",
+      "It took me a while to get used to the new system."
+    ],
+    "focus": "This guide focuses on past habits and states, familiarity, adaptation, and the different verb forms that follow these structures.",
+    "sections": [
+      {
+        "title": "1. Used to + infinitive",
+        "body": [
+          "Use:",
+          "used to + base verb",
+          "for a past habit or state that is no longer true.",
+          "It can describe both:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "We used to visit them every summer."
+          },
+          {
+            "label": "Example",
+            "text": "She used to have very long hair."
+          },
+          {
+            "label": "Example",
+            "text": "There used to be a bakery on this corner."
+          },
+          {
+            "label": "Example",
+            "text": "repeated actions → We used to go camping every spring."
+          },
+          {
+            "label": "Example",
+            "text": "states → I used to believe that story."
+          }
+        ]
+      },
+      {
+        "title": "2. Questions and negatives",
+        "body": [
+          "With did, use use to in standard written English.",
+          "Not:",
+          "The did already carries the past tense."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Did you use to live here?"
+          },
+          {
+            "label": "Example",
+            "text": "I didn't use to enjoy cooking."
+          },
+          {
+            "label": "Example",
+            "text": "Did you used to...?"
+          },
+          {
+            "label": "Example",
+            "text": "I didn't used to..."
+          }
+        ]
+      },
+      {
+        "title": "3. Used to or would?",
+        "body": [
+          "Both can describe repeated past actions.",
+          "But would is not normally used for past states.",
+          "Not normally:",
+          "So used to has a wider range than habitual would."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "When we were children, we used to spend hours outdoors."
+          },
+          {
+            "label": "Example",
+            "text": "When we were children, we would spend hours outdoors."
+          },
+          {
+            "label": "Example",
+            "text": "I used to own a motorbike."
+          },
+          {
+            "label": "Example",
+            "text": "She used to know everyone in the village."
+          },
+          {
+            "label": "Example",
+            "text": "I would own a motorbike."
+          },
+          {
+            "label": "Example",
+            "text": "She would know everyone."
+          }
+        ]
+      },
+      {
+        "title": "4. Be used to",
+        "body": [
+          "Use:",
+          "be used to + noun / pronoun / verb-ing",
+          "to mean be accustomed to something or find it normal.",
+          "Here, to is a preposition, not part of an infinitive.",
+          "That is why we say:",
+          "used to working",
+          "not:",
+          "used to work",
+          "when the meaning is accustomed to."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "She's used to the cold."
+          },
+          {
+            "label": "Example",
+            "text": "We're used to it."
+          },
+          {
+            "label": "Example",
+            "text": "I'm used to travelling alone."
+          }
+        ]
+      },
+      {
+        "title": "5. Get used to",
+        "body": [
+          "Use:",
+          "get used to + noun / pronoun / verb-ing",
+          "for the process of becoming accustomed to something.",
+          "Compare:",
+          "→ adaptation is happening.",
+          "→ it is already normal for me."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "He quickly got used to the new timetable."
+          },
+          {
+            "label": "Example",
+            "text": "I'm getting used to wearing glasses."
+          },
+          {
+            "label": "Example",
+            "text": "You'll get used to it eventually."
+          },
+          {
+            "label": "Example",
+            "text": "I'm getting used to the noise."
+          },
+          {
+            "label": "Example",
+            "text": "I'm used to the noise."
+          }
+        ]
+      },
+      {
+        "title": "6. Be used to or get used to?",
+        "body": [
+          "The main difference is state versus change.",
+          "Compare:",
+          "The tense of be or get can change:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "At first the hours felt strange, but I got used to them."
+          },
+          {
+            "label": "Example",
+            "text": "Now I'm used to them."
+          },
+          {
+            "label": "Example",
+            "text": "I wasn't used to it."
+          },
+          {
+            "label": "Example",
+            "text": "I've got used to it."
+          },
+          {
+            "label": "Example",
+            "text": "You'll soon get used to it."
+          },
+          {
+            "label": "Example",
+            "text": "I had got used to it by then."
+          }
+        ],
+        "table": {
+          "headers": [
+            "Structure",
+            "Meaning"
+          ],
+          "rows": [
+            [
+              "be used to",
+              "something is already familiar"
+            ],
+            [
+              "get used to",
+              "become familiar with something"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "7. Don't forget the complement",
+        "body": [
+          "Because to is a preposition in be/get used to, it normally needs something after it.",
+          "Normally not:",
+          "However, the complement can sometimes already be supplied elsewhere in the sentence:",
+          "So do not simply learn “a sentence can never end in used to”. Check whether the missing complement is understood from the structure."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I'm used to it."
+          },
+          {
+            "label": "Example",
+            "text": "She's used to the traffic."
+          },
+          {
+            "label": "Example",
+            "text": "We're used to getting up early."
+          },
+          {
+            "label": "Example",
+            "text": "I'm used to."
+          },
+          {
+            "label": "Example",
+            "text": "The workload is heavier than I'm used to."
+          },
+          {
+            "label": "Example",
+            "text": "It's much colder than we're used to."
+          }
+        ]
+      },
+      {
+        "title": "8. Another meaning of “is used to”",
+        "body": [
+          "Be careful: be used to + infinitive can have a completely different meaning.",
+          "Here:",
+          "be used + to-infinitive = be employed for a purpose",
+          "Compare:",
+          "→ repairing it is familiar to the technician.",
+          "→ repairing it is the tool's purpose.",
+          "The difference between to + infinitive and to + -ing is crucial."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "This button is used to reset the machine."
+          },
+          {
+            "label": "Example",
+            "text": "The software is used to create digital models."
+          },
+          {
+            "label": "Example",
+            "text": "The technician is used to repairing this equipment."
+          },
+          {
+            "label": "Example",
+            "text": "This tool is used to repair the equipment."
+          }
+        ]
+      },
+      {
+        "title": "Quick comparison",
+        "body": [],
+        "table": {
+          "headers": [
+            "Structure",
+            "Meaning",
+            "Form after it"
+          ],
+          "rows": [
+            [
+              "used to",
+              "past habit/state",
+              "base verb"
+            ],
+            [
+              "be used to",
+              "be accustomed to",
+              "noun / pronoun / -ing"
+            ],
+            [
+              "get used to",
+              "become accustomed to",
+              "noun / pronoun / -ing"
+            ],
+            [
+              "be used to do",
+              "be employed for a purpose",
+              "infinitive"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "Common mistakes",
+        "body": [],
+        "examples": [
+          {
+            "label": "Remember",
+            "text": "used to live, not used to living, for a former situation."
+          },
+          {
+            "label": "Remember",
+            "text": "be used to living, not be used to live, for familiarity."
+          },
+          {
+            "label": "Remember",
+            "text": "get used to working, not get used to work."
+          },
+          {
+            "label": "Remember",
+            "text": "After did/didn't, use use to."
+          },
+          {
+            "label": "Remember",
+            "text": "Do not use habitual would freely with past states such as know, own or believe."
+          },
+          {
+            "label": "Remember",
+            "text": "Remember that is used to do and is used to doing are different structures."
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Am I describing a former habit or state?",
+      "Is something already familiar, or is someone still adapting to it?",
+      "Is to followed by an infinitive or acting as a preposition?",
+      "Do I need a noun, pronoun or -ing form after be/get used to?",
+      "Could would describe this past action, or is it a state?",
+      "Does be used to + infinitive express purpose rather than familiarity?"
+    ]
+  },
+  "Causatives": {
+    "title": "Causatives",
+    "subtitle": "Having, getting, making and letting other people do things",
+    "intro": "Causative structures describe situations where one person arranges, causes, persuades or allows another person to do something. They can also describe services that somebody else performs for us.",
+    "examples": [
+      "We had some new shelves fitted.",
+      "She got her neighbour to look after the dog.",
+      "The coach made the players stay behind.",
+      "His story had everyone laughing."
+    ],
+    "focus": "This guide focuses on the main causative patterns with have, get, make and let, including some more advanced uses.",
+    "sections": [
+      {
+        "title": "1. Have / get something done",
+        "body": [
+          "Use:",
+          "have/get + object + past participle",
+          "when someone else performs the action for you.",
+          "The subject normally arranges the action but does not perform it personally.",
+          "Compare:",
+          "Have is generally neutral. Get is especially common in everyday English."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I had my passport renewed last month."
+          },
+          {
+            "label": "Example",
+            "text": "We're getting the roof repaired next week."
+          },
+          {
+            "label": "Example",
+            "text": "You should have that cut checked by a doctor."
+          },
+          {
+            "label": "Example",
+            "text": "I repaired the computer. → I did it."
+          },
+          {
+            "label": "Example",
+            "text": "I had the computer repaired. → Someone else did it for me."
+          }
+        ]
+      },
+      {
+        "title": "2. Changing the tense",
+        "body": [
+          "The tense goes on have or get. The past participle stays the same.",
+          "More complex tenses are possible too:",
+          "Think of have/get something done as one structure that can move through different tenses."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "She has her flat cleaned once a week."
+          },
+          {
+            "label": "Example",
+            "text": "She had it cleaned yesterday."
+          },
+          {
+            "label": "Example",
+            "text": "She is having it cleaned now."
+          },
+          {
+            "label": "Example",
+            "text": "She will have it cleaned before the guests arrive."
+          },
+          {
+            "label": "Example",
+            "text": "She has had it cleaned already."
+          },
+          {
+            "label": "Example",
+            "text": "By Friday, we'll have had the locks changed."
+          }
+        ]
+      },
+      {
+        "title": "3. Have someone do / get someone to do",
+        "body": [
+          "When you mention the person who performs the action, the patterns change."
+        ]
+      },
+      {
+        "title": "Have + person + bare infinitive",
+        "body": [
+          "have + person + do"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I'll have the receptionist call you back."
+          },
+          {
+            "label": "Example",
+            "text": "The director had one of the technicians check the system."
+          }
+        ]
+      },
+      {
+        "title": "Get + person + to-infinitive",
+        "body": [
+          "get + person + to do",
+          "Get someone to do can suggest persuasion or successfully convincing someone.",
+          "Remember:",
+          "Not: have someone to do"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I'll get the receptionist to call you back."
+          },
+          {
+            "label": "Example",
+            "text": "We eventually got him to apologise."
+          }
+        ],
+        "chips": [
+          "have someone do",
+          "get someone to do"
+        ]
+      },
+      {
+        "title": "Make = cause or force",
+        "body": [
+          "make + person + bare infinitive"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "The teacher made everyone rewrite the introduction."
+          },
+          {
+            "label": "Example",
+            "text": "That song always makes me smile."
+          }
+        ]
+      },
+      {
+        "title": "Let = allow",
+        "body": [
+          "let + person + bare infinitive",
+          "Neither structure takes to in the active form."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "They let us use the meeting room."
+          },
+          {
+            "label": "Example",
+            "text": "Her parents wouldn't let her go alone."
+          }
+        ]
+      },
+      {
+        "title": "5. Passive forms",
+        "body": [
+          "There is an important change with make:",
+          "In the passive, make takes to + infinitive.",
+          "For permission, we normally use be allowed to rather than a passive form of let:"
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "They made us wait."
+          },
+          {
+            "label": "Example",
+            "text": "We were made to wait."
+          },
+          {
+            "label": "Example",
+            "text": "They let us leave early."
+          },
+          {
+            "label": "Example",
+            "text": "We were allowed to leave early."
+          }
+        ]
+      },
+      {
+        "title": "6. Have + person + -ing",
+        "body": [
+          "At a more advanced level, have + object + verb-ing can mean causing someone or something to enter or continue an activity or state.",
+          "Compare:",
+          "→ She instructed them to do it.",
+          "→ She caused or kept the activity in progress.",
+          "The distinction is often about the action as a task versus the activity in progress."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "Within minutes, the instructor had everyone working together."
+          },
+          {
+            "label": "Example",
+            "text": "Her impression had the whole table laughing."
+          },
+          {
+            "label": "Example",
+            "text": "For a while, he had me believing every word."
+          },
+          {
+            "label": "Example",
+            "text": "She had them practise the dialogue."
+          },
+          {
+            "label": "Example",
+            "text": "She had them practising for most of the afternoon."
+          }
+        ]
+      },
+      {
+        "title": "7. Won't have someone doing something",
+        "body": [
+          "Won't have + person + -ing can mean that you refuse to tolerate particular behaviour.",
+          "Here, have does not mean arrange a service. It means roughly allow or tolerate."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "I won't have people smoking inside the building."
+          },
+          {
+            "label": "Example",
+            "text": "She won't have anyone speaking to her children like that."
+          }
+        ]
+      },
+      {
+        "title": "8. When something happens to you",
+        "body": [
+          "Have something done does not always mean that you arranged the action. It can also describe something that happened to you, especially an unpleasant experience.",
+          "Obviously, the person did not arrange for these things to happen. The context tells us whether the action was arranged or experienced."
+        ],
+        "examples": [
+          {
+            "label": "Example",
+            "text": "He had his wallet stolen at the festival."
+          },
+          {
+            "label": "Example",
+            "text": "They had several windows broken during the storm."
+          }
+        ]
+      },
+      {
+        "title": "Quick comparison",
+        "body": [],
+        "table": {
+          "headers": [
+            "Structure",
+            "Meaning"
+          ],
+          "rows": [
+            [
+              "have something done",
+              "arrange for someone to do it"
+            ],
+            [
+              "get something done",
+              "arrange/manage to get it done"
+            ],
+            [
+              "have someone do",
+              "arrange/instruct someone to do it"
+            ],
+            [
+              "get someone to do",
+              "persuade/arrange for someone to do it"
+            ],
+            [
+              "make someone do",
+              "cause/force someone to do it"
+            ],
+            [
+              "let someone do",
+              "allow someone to do it"
+            ],
+            [
+              "be made to do",
+              "be forced/caused to do it"
+            ],
+            [
+              "have someone doing",
+              "cause/keep an activity in progress"
+            ]
+          ]
+        }
+      },
+      {
+        "title": "Common mistakes",
+        "body": [],
+        "examples": [
+          {
+            "label": "Remember",
+            "text": "have someone do, not have someone to do"
+          },
+          {
+            "label": "Remember",
+            "text": "get someone to do, not get someone do"
+          },
+          {
+            "label": "Remember",
+            "text": "make someone do, but be made to do"
+          },
+          {
+            "label": "Remember",
+            "text": "let someone do, not let someone to do"
+          },
+          {
+            "label": "Remember",
+            "text": "have something done uses a past participle"
+          },
+          {
+            "label": "Remember",
+            "text": "Check whether the person after have/get is doing the action or receiving it."
+          }
+        ]
+      }
+    ],
+    "checklist": [
+      "Am I doing the action myself, or is somebody else doing it?",
+      "Am I mentioning the person who performs the action?",
+      "Do I mean arrange, persuade, force or allow?",
+      "Does the object perform the action or receive it?",
+      "Do I need a bare infinitive, a to-infinitive, a past participle or an -ing form?",
+      "Is have something done describing an arranged service or something that happened to someone?"
+    ]
+  }
 };
 
 export function getGrammarTheoryForItem(item) {

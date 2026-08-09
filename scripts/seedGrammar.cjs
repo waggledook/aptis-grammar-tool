@@ -11,32 +11,39 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
-const batch = db.batch();
+const BATCH_SIZE = 400;
 
-// Seed each item into the 'grammarItems' collection,
-// using the item.id for the document ID.
-items.forEach(item => {
-  const docRef = db.collection('grammarItems').doc(item.id);
+async function seedGrammarItems() {
+  let committed = 0;
 
-  // Normalize tags: if you still have `tag`, convert it to `tags: [tag]`
-  const data = {
-    ...item,
-    tags: Array.isArray(item.tags)
-      ? item.tags
-      : item.tag
-        ? [item.tag]
-        : []
-  };
-  delete data.tag; // remove old single-tag field if present
+  for (let start = 0; start < items.length; start += BATCH_SIZE) {
+    const batch = db.batch();
+    const chunk = items.slice(start, start + BATCH_SIZE);
 
-  batch.set(docRef, data);
-});
+    chunk.forEach(item => {
+      const docRef = db.collection('grammarItems').doc(item.id);
+      const data = {
+        ...item,
+        tags: Array.isArray(item.tags)
+          ? item.tags
+          : item.tag
+            ? [item.tag]
+            : []
+      };
+      delete data.tag;
+      batch.set(docRef, data);
+    });
 
-batch.commit()
-  .then(() => {
-    console.log('✅ Seed completed successfully!');
-    process.exit(0);
-  })
+    await batch.commit();
+    committed += chunk.length;
+    console.log(`Committed ${committed}/${items.length} grammar items.`);
+  }
+
+  console.log('✅ Seed completed successfully!');
+}
+
+seedGrammarItems()
+  .then(() => process.exit(0))
   .catch(err => {
     console.error('❌ Error seeding data:', err);
     process.exit(1);

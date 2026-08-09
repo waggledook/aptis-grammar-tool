@@ -4,6 +4,10 @@ export const WRITING_GENERAL_GUEST_LABEL = "Guest (Aptis Writing General)";
 
 export const ACTIVITY_TYPE_LABELS = {
   grammar_session: "Grammar Session",
+  grammar_session_completed: "Grammar Session Completed",
+  grammar_reference_opened: "Grammar Reference Opened",
+  grammar_review_started: "Grammar Mistake Review Started",
+  grammar_review_completed: "Grammar Mistake Review Completed",
   vocab_set_completed: "Vocabulary Set Completed",
   grammar_set_completed: "Grammar Set Completed",
   live_game_played: "Live Game Played",
@@ -262,6 +266,48 @@ export function formatActivityDetails(log) {
       const modeLabel = d.mode === "test" ? "Test mode" : "Practice";
       return joinParts([modeLabel, formatCount(d.totalItems, "item")]);
     }
+    case "grammar_session_completed":
+      return joinParts([
+        `${formatScore(d.correctCount, d.totalItems)} correct`,
+        typeof d.accuracy === "number" ? `${d.accuracy}% accuracy` : "",
+      ]);
+    case "grammar_reference_opened": {
+      const modeLabel =
+        d.mode === "review"
+          ? "Today’s review"
+          : d.mode === "test"
+            ? "Test mode"
+            : "Practice";
+      return joinParts([
+        d.referenceTitle || d.tag || "Grammar reference",
+        d.level ? `${d.level} question` : "",
+        modeLabel,
+        d.itemId || "",
+      ]);
+    }
+    case "grammar_review_started":
+      return joinParts([
+        formatCount(d.totalItems, "question"),
+        typeof d.dueItemCount === "number"
+          ? formatCount(d.dueItemCount, "due review")
+          : "",
+        d.legacyItemCount > 0
+          ? formatCount(d.legacyItemCount, "legacy mistake")
+          : "",
+        d.maintenanceItemCount > 0
+          ? formatCount(d.maintenanceItemCount, "maintenance check")
+          : "",
+      ]);
+    case "grammar_review_completed":
+      return joinParts([
+        `${formatScore(d.correctCount, d.totalItems)} correct`,
+        typeof d.accuracy === "number" ? `${d.accuracy}% accuracy` : "",
+        typeof d.incorrectCount === "number"
+          ? d.incorrectCount === 0
+            ? "No immediate retries"
+            : `${d.incorrectCount} immediate ${d.incorrectCount === 1 ? "retry" : "retries"}`
+          : "",
+      ]);
     case "vocab_set_completed": {
       const stats =
         typeof d.correctFirstTry === "number" || typeof d.mistakesCount === "number"

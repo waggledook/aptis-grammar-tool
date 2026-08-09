@@ -2,6 +2,11 @@
 import { useState, useEffect } from 'react';
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
+import grammarItems from '../../scripts/grammar-items.json';
+
+const localTags = grammarItems.flatMap(item =>
+  Array.isArray(item.tags) ? item.tags : item.tag ? [item.tag] : []
+);
 
 /**
  * Fetches all distinct tags from the grammarItems collection.
@@ -22,9 +27,12 @@ export default function useTags() {
         if (cancelled) return;
 
         // Extract & flatten all tags
-        const allTags = snapshot.docs
-          .map(doc => doc.data().tags || [])
-          .flat();
+        const allTags = [
+          ...snapshot.docs
+            .map(doc => doc.data().tags || [])
+            .flat(),
+          ...localTags,
+        ];
 
         // De‑duplicate while preserving insertion order
         const unique = Array.from(new Set(allTags)).sort((a, b) =>

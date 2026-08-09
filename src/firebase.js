@@ -20,6 +20,8 @@ import {
   limit,
   serverTimestamp,
   writeBatch,
+  runTransaction,
+  Timestamp,
   getCountFromServer,           // ← NEW
   increment,                     // ← NEW
   updateDoc                     // ← ADD THIS
@@ -47,6 +49,13 @@ import {
 } from "firebase/functions";
 import { TOPIC_DATA } from "./components/vocabulary/data/vocabTopics";
 import { getAllHubVocabThemes } from "./data/hubVocabularyActivities";
+import {
+  getGrammarReviewTransition,
+  grammarReviewDateToMs,
+  isGrammarMaintenancePending,
+  isGrammarReviewDue,
+  isGrammarReviewPending,
+} from "./utils/grammarReview";
 
 const WRITING_FEEDBACK_DEFAULT_WEEKLY_CREDITS = {
   student: 120,
@@ -4986,19 +4995,346 @@ export async function lookupEmailByUsername(username) {
  */
 export async function saveGrammarResult(itemId, isCorrect) {
   const uid = auth.currentUser?.uid;
-  if (!uid) return; // guests handled by localStorage mirror in UI
+  if (!uid) return;
 
   const ref = doc(db, "users", uid, "grammarProgress", itemId);
+  await runTransaction(db, async (transaction) => {
+    const snap = await transaction.get(ref);
+    const current = snap.exists() ? snap.data() || {} : {};
+
+    transaction.set(
+      ref,
+      {
+        attempts: Math.max(0, Number(current.attempts) || 0) + 1,
+        // Preserve a real historical `true`; older numeric values are treated
+        // conservatively instead of being rewritten as evidence of mastery.
+        everCorrect: current.everCorrect === true || !!isCorrect,
+        lastCorrect: !!isCorrect,
+        lastAnsweredAt: serverTimestamp(),
+      },
+      { merge: true }
+    );
+  });
+}
+
+// ─── GRAMMAR LEARNING TRACKING V2 ───────────────────────────────────────────
+// This is intentionally additive. The legacy grammarProgress and mistakes
+// collections remain active while the richer attempt history is validated.
+
+function normalizeGrammarTrackingTags(tags) {
+  const values = Array.isArray(tags) ? tags : tags ? [tags] : [];
+  return Array.from(
+    new Set(values.map((value) => String(value || "").trim()).filter(Boolean))
+  );
+}
+
+export async function startGrammarLearningSession({
+  sessionId,
+  mode = "practice",
+  levels = [],
+  tags = [],
+  itemIds = [],
+  totalItems = itemIds.length,
+  dueItemCount = 0,
+  legacyItemCount = 0,
+  maintenanceItemCount = 0,
+}) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !sessionId) return;
+
+  const safeMode = String(mode || "practice");
+  const safeTotal = Math.max(0, Number(totalItems) || 0);
+  const safeDueCount = Math.max(0, Number(dueItemCount) || 0);
+  const safeLegacyCount = Math.max(0, Number(legacyItemCount) || 0);
+  const safeMaintenanceCount = Math.max(0, Number(maintenanceItemCount) || 0);
+  const ref = doc(db, "users", uid, "grammarSessions", sessionId);
+  await setDoc(ref, {
+    schemaVersion: 2,
+    app: "aptis-trainer",
+    mode: safeMode,
+    levels: normalizeGrammarTrackingTags(levels),
+    tags: normalizeGrammarTrackingTags(tags),
+    itemIds: (itemIds || []).map((value) => String(value)).filter(Boolean),
+    totalItems: safeTotal,
+    answeredCount: 0,
+    correctCount: 0,
+    incorrectCount: 0,
+    status: "active",
+    startedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    ...(safeMode === "review"
+      ? {
+          dueItemCount: safeDueCount,
+          legacyItemCount: safeLegacyCount,
+          maintenanceItemCount: safeMaintenanceCount,
+        }
+      : {}),
+  });
+
+  if (safeMode === "review") {
+    await logActivity("grammar_review_started", {
+      sessionId: String(sessionId),
+      totalItems: safeTotal,
+      dueItemCount: safeDueCount,
+      legacyItemCount: safeLegacyCount,
+      maintenanceItemCount: safeMaintenanceCount,
+      schemaVersion: 2,
+    });
+  }
+}
+
+export async function saveGrammarLearningAttempt({
+  sessionId,
+  mode = "practice",
+  itemId,
+  level = "",
+  tags = [],
+  isCorrect,
+  selectedIndex = null,
+  correctIndex = null,
+  selectedOption = null,
+  correctOption = null,
+}) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !itemId) return;
+
+  const attemptRef = doc(collection(db, "users", uid, "grammarAttempts"));
+  const progressRef = doc(db, "users", uid, "grammarLearningProgress", String(itemId));
+  const sessionRef = sessionId
+    ? doc(db, "users", uid, "grammarSessions", String(sessionId))
+    : null;
+  const normalizedTags = normalizeGrammarTrackingTags(tags);
+  const correct = !!isCorrect;
+
+  await runTransaction(db, async (transaction) => {
+    const progressSnap = await transaction.get(progressRef);
+    const current = progressSnap.exists() ? progressSnap.data() || {} : {};
+    const previousAttempts = Math.max(0, Number(current.attemptCount) || 0);
+    const previousCorrect = Math.max(0, Number(current.correctCount) || 0);
+    const previousIncorrect = Math.max(0, Number(current.incorrectCount) || 0);
+    const reviewTransition = getGrammarReviewTransition(current, {
+      isCorrect: correct,
+      mode: String(mode || "practice"),
+      now: Timestamp.now().toDate(),
+    });
+
+    transaction.set(attemptRef, {
+      schemaVersion: 2,
+      attemptId: attemptRef.id,
+      sessionId: sessionId ? String(sessionId) : "",
+      app: "aptis-trainer",
+      mode: String(mode || "practice"),
+      itemId: String(itemId),
+      level: String(level || ""),
+      tags: normalizedTags,
+      correct,
+      selectedIndex: Number.isInteger(selectedIndex) ? selectedIndex : null,
+      correctIndex: Number.isInteger(correctIndex) ? correctIndex : null,
+      selectedOption: selectedOption == null ? null : String(selectedOption),
+      correctOption: correctOption == null ? null : String(correctOption),
+      reviewStageBefore: Math.max(0, Number(current.reviewStage) || 0),
+      maintenanceBefore: isGrammarMaintenancePending(current),
+      reviewNeededBefore:
+        current.needsReview === true ||
+        (current.needsReview == null && current.lastCorrect === false),
+      answeredAt: serverTimestamp(),
+    });
+
+    transaction.set(
+      progressRef,
+      {
+        schemaVersion: 2,
+        itemId: String(itemId),
+        level: String(level || current.level || ""),
+        tags: normalizedTags.length ? normalizedTags : current.tags || [],
+        attemptCount: previousAttempts + 1,
+        correctCount: previousCorrect + (correct ? 1 : 0),
+        incorrectCount: previousIncorrect + (correct ? 0 : 1),
+        firstAttemptCorrect:
+          previousAttempts === 0 ? correct : current.firstAttemptCorrect ?? null,
+        everCorrect: current.everCorrect === true || correct,
+        lastCorrect: correct,
+        lastSelectedIndex: Number.isInteger(selectedIndex) ? selectedIndex : null,
+        lastAnsweredAt: serverTimestamp(),
+        needsReview: reviewTransition.needsReview,
+        reviewStage: reviewTransition.reviewStage,
+        nextReviewAt: reviewTransition.nextReviewAt
+          ? Timestamp.fromDate(reviewTransition.nextReviewAt)
+          : null,
+        lapseCount: reviewTransition.lapseCount,
+        consecutiveCorrect: reviewTransition.consecutiveCorrect,
+        masteryStatus: reviewTransition.masteryStatus,
+        maintenancePending: reviewTransition.maintenancePending,
+        maintenanceCompleted: reviewTransition.maintenanceCompleted,
+        ...(correct ? {} : { lastIncorrectAt: serverTimestamp() }),
+      },
+      { merge: true }
+    );
+
+    if (sessionRef) {
+      transaction.set(
+        sessionRef,
+        {
+          lastAnsweredAt: serverTimestamp(),
+          updatedAt: serverTimestamp(),
+        },
+        { merge: true }
+      );
+    }
+  });
+}
+
+export async function completeGrammarLearningSession({
+  sessionId,
+  mode = "practice",
+  answeredCount,
+  correctCount,
+  totalItems,
+}) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || !sessionId) return;
+
+  const safeAnswered = Math.max(0, Number(answeredCount) || 0);
+  const safeCorrect = Math.max(0, Number(correctCount) || 0);
+  const safeTotal = Math.max(0, Number(totalItems) || 0);
+  const safeMode = String(mode || "practice");
+  const incorrectCount = Math.max(0, safeAnswered - safeCorrect);
+  const accuracy = safeAnswered ? Math.round((safeCorrect / safeAnswered) * 100) : 0;
+
   await setDoc(
-    ref,
+    doc(db, "users", uid, "grammarSessions", String(sessionId)),
     {
-      attempts: increment(1),
-      everCorrect: isCorrect ? true : increment(0), // stays true once correct
-      lastCorrect: !!isCorrect,
-      lastAnsweredAt: serverTimestamp(),
+      answeredCount: safeAnswered,
+      correctCount: safeCorrect,
+      incorrectCount,
+      totalItems: safeTotal,
+      accuracy,
+      status: safeAnswered >= safeTotal && safeTotal > 0 ? "completed" : "incomplete",
+      completedAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
     },
     { merge: true }
   );
+
+  await logActivity(
+    safeMode === "review"
+      ? "grammar_review_completed"
+      : "grammar_session_completed",
+    {
+      sessionId: String(sessionId),
+      totalItems: safeTotal,
+      answeredCount: safeAnswered,
+      correctCount: safeCorrect,
+      incorrectCount,
+      accuracy,
+      schemaVersion: 2,
+    }
+  );
+}
+
+export async function fetchGrammarReviewQueue(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const snap = await getDocs(
+    collection(db, "users", realUid, "grammarLearningProgress")
+  );
+  const now = new Date();
+
+  return snap.docs
+    .map((entry) => {
+      const data = entry.data() || {};
+      const maintenance = isGrammarMaintenancePending(data);
+      const needsReview = isGrammarReviewPending(data);
+      const nextReviewAt =
+        data.nextReviewAt || data.lastIncorrectAt || data.lastAnsweredAt || null;
+
+      return {
+        id: entry.id,
+        ...data,
+        itemId: data.itemId || entry.id,
+        needsReview,
+        maintenance,
+        nextReviewAt,
+        due: isGrammarReviewDue({ ...data, needsReview, nextReviewAt }, now),
+      };
+    })
+    .filter((entry) => entry.needsReview)
+    .sort((a, b) => {
+      if (a.due !== b.due) return a.due ? -1 : 1;
+      if (a.maintenance !== b.maintenance) return a.maintenance ? 1 : -1;
+      const dueDelta =
+        grammarReviewDateToMs(a.nextReviewAt) -
+        grammarReviewDateToMs(b.nextReviewAt);
+      if (dueDelta) return dueDelta;
+      return (Number(b.lapseCount) || 0) - (Number(a.lapseCount) || 0);
+    });
+}
+
+export async function fetchGrammarTrackingReconciliation(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) {
+    return {
+      sessions: 0,
+      completedSessions: 0,
+      attempts: 0,
+      progressItems: 0,
+      aggregateAttempts: 0,
+      aggregateDelta: 0,
+      orphanAttempts: 0,
+      sessionMismatches: [],
+    };
+  }
+
+  const [sessionSnap, attemptSnap, progressSnap] = await Promise.all([
+    getDocs(collection(db, "users", realUid, "grammarSessions")),
+    getDocs(collection(db, "users", realUid, "grammarAttempts")),
+    getDocs(collection(db, "users", realUid, "grammarLearningProgress")),
+  ]);
+
+  const sessions = new Map(
+    sessionSnap.docs.map((entry) => [entry.id, { id: entry.id, ...entry.data() }])
+  );
+  const attemptsBySession = new Map();
+  let orphanAttempts = 0;
+
+  attemptSnap.docs.forEach((entry) => {
+    const data = entry.data() || {};
+    const sessionId = String(data.sessionId || "");
+    if (!sessionId || !sessions.has(sessionId)) {
+      orphanAttempts += 1;
+      return;
+    }
+    attemptsBySession.set(sessionId, (attemptsBySession.get(sessionId) || 0) + 1);
+  });
+
+  const sessionMismatches = Array.from(sessions.values())
+    .filter((session) => session.status === "completed")
+    .map((session) => ({
+      sessionId: session.id,
+      expected: Math.max(0, Number(session.answeredCount) || 0),
+      recorded: attemptsBySession.get(session.id) || 0,
+    }))
+    .filter((entry) => entry.expected !== entry.recorded)
+    .slice(0, 20);
+
+  const aggregateAttempts = progressSnap.docs.reduce(
+    (sum, entry) => sum + Math.max(0, Number(entry.data()?.attemptCount) || 0),
+    0
+  );
+
+  return {
+    sessions: sessionSnap.size,
+    completedSessions: Array.from(sessions.values()).filter(
+      (session) => session.status === "completed"
+    ).length,
+    attempts: attemptSnap.size,
+    progressItems: progressSnap.size,
+    aggregateAttempts,
+    aggregateDelta: aggregateAttempts - attemptSnap.size,
+    orphanAttempts,
+    sessionMismatches,
+  };
 }
 
 /**

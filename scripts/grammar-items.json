@@ -1238,7 +1238,7 @@
           ]
         },
         {
-          "id": "b1_prep_place_012",
+          "id": "b1_prep_place_01",
           "level": "B1",
           "tag": "Prepositions",
           "sentence": "They met each other ___ the corner of the street.",
@@ -4330,6 +4330,19 @@
           ]
       },
         {
+          "id": "c1_unreal_16",
+          "level": "C1",
+          "tag": "unreal forms",
+          "sentence": "I'd rather you ___ me earlier that the meeting was cancelled.",
+          "options": ["had told", "told", "would tell"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: After 'I'd rather you' referring to a past preference, we use the past perfect ('had told').",
+            "Incorrect: 'told' describes a real past action, but the speaker is talking about an unreal/desired past action.",
+            "Incorrect: 'would tell' refers to future habits/annoyances, not a specific past regret."
+          ]
+        },
+        {
           "id": "c1_unreal_17",
           "level": "C1",
           "tag": "unreal forms",
@@ -4353,6 +4366,19 @@
             "Correct: A past perfect is needed because the speaker wanted an explanation *earlier*, but it didn’t happen. This is similar to a third conditional structure.",
             "Incorrect: 'explained' is not possible because we're referring to an unreal PAST situation in this sentence.",
             "Incorrect: 'would explain' looks to the future, not a past preference."
+          ]
+        },
+        {
+          "id": "c1_unreal_19",
+          "level": "C1",
+          "tag": "unreal forms",
+          "sentence": "He’d rather we ___ the problem when it first appeared.",
+          "options": ["had dealt with", "dealt with", "would deal with"],
+          "answerIndex": 0,
+          "explanations": [
+            "Correct: This expresses regret about a past missed action, so past perfect ('had dealt with') is required.",
+            "Incorrect: 'dealt with' is real past; it doesn't match an unreal regret/my preference structure.",
+            "Incorrect: 'would deal with' refers to the future or hypothetical willingness, not a past action."
           ]
         },
           {
@@ -5318,6 +5344,2096 @@
                   "Incorrect: 'Hardly' means 'almost not', so it changes the meaning completely.",
                   "Incorrect: 'Hardly ever' means 'almost never', which does not fit the context."
                 ]
-              }
-            
+              },
+  {
+    "id": "pres_a2_01",
+    "level": "A2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "She usually ___ the bus to work, but today she's walking.",
+    "options": [
+      "takes",
+      "is taking",
+      "has taken"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: We use the present simple for regular habits and routines.",
+      "Incorrect: The present continuous describes something happening now or a temporary situation, but 'usually' refers to her normal routine.",
+      "Incorrect: The present perfect does not describe a regular habit here."
+    ]
+  },
+  {
+    "id": "pres_a2_02",
+    "level": "A2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "Please be quiet — the baby ___.",
+    "options": [
+      "is sleeping",
+      "sleeps",
+      "has slept"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The present continuous describes something happening at the moment.",
+      "Incorrect: The present simple normally describes a habit or general situation.",
+      "Incorrect: The present perfect looks back at an action before now rather than describing what is happening now."
+    ]
+  },
+  {
+    "id": "pres_a2_03",
+    "level": "A2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "I ___ this film before, so I know how it ends.",
+    "options": [
+      "have seen",
+      "saw",
+      "am seeing"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The present perfect is used for past experiences when no finished past time is given.",
+      "Incorrect: The past simple would normally be used with a finished time reference such as 'last week'.",
+      "Incorrect: The present continuous does not express a previous experience."
+    ]
+  },
+  {
+    "id": "pres_a2_04",
+    "level": "A2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "We ___ dinner yet.",
+    "options": [
+      "haven't had",
+      "didn't have",
+      "don't have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: We commonly use the present perfect with 'yet' for something expected to happen before now.",
+      "Incorrect: The past simple normally refers to a finished past time.",
+      "Incorrect: The present simple does not express the idea of something not happening up to now."
+    ]
+  },
+  {
+    "id": "pres_b1_01",
+    "level": "B1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "I normally work from home, but this month I ___ from the office while my flat is being renovated.",
+    "options": [
+      "am working",
+      "work",
+      "have worked"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The present continuous describes a temporary situation that is different from the speaker's normal routine.",
+      "Incorrect: The present simple would describe the speaker's usual working arrangement, which is already given as working from home.",
+      "Incorrect: The present perfect focuses on what has happened before now, not the temporary arrangement continuing this month."
+    ]
+  },
+  {
+    "id": "pres_b1_02",
+    "level": "B1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "She ___ with her brother until she finds a flat of her own.",
+    "options": [
+      "is staying",
+      "stays",
+      "has stayed"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The present continuous is commonly used for temporary situations around the present.",
+      "Incorrect: The present simple would suggest that staying with her brother is her regular or permanent situation.",
+      "Incorrect: The present perfect does not describe the temporary situation that is continuing now."
+    ]
+  },
+  {
+    "id": "pres_b1_03",
+    "level": "B1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "This sauce ___ a little strange. Did you use a different kind of cheese?",
+    "options": [
+      "tastes",
+      "is tasting",
+      "has tasted"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Taste' describes the flavour of the sauce here, so it functions as a linking verb and is normally used in the simple form.",
+      "Incorrect: 'Is tasting' describes the action of deliberately trying food, as in 'The chef is tasting the sauce'.",
+      "Incorrect: The present perfect does not fit a description of the sauce's flavour now."
+    ]
+  },
+  {
+    "id": "pres_b1_04",
+    "level": "B1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "I'm sorry, she can't come to the phone. She ___ lunch with a client.",
+    "options": [
+      "is having",
+      "has",
+      "has had"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have' can be used in the continuous when it means taking part in an activity such as having lunch.",
+      "Incorrect: 'Has lunch' normally describes a habitual or regular event rather than what she is doing now.",
+      "Incorrect: 'Has had lunch' means that the meal is already finished."
+    ]
+  },
+  {
+    "id": "pres_b1_05",
+    "level": "B1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "I ___ you're right, but I'd still like to check the figures before we decide.",
+    "options": [
+      "think",
+      "am thinking",
+      "have thought"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Think' meaning 'believe' or 'have an opinion' is normally used in the present simple.",
+      "Incorrect: 'I'm thinking' is generally used when 'think' means considering something, as in 'I'm thinking about changing jobs'.",
+      "Incorrect: The present perfect refers to thinking before now rather than simply stating the speaker's current opinion."
+    ]
+  },
+  {
+    "id": "pres_b1_06",
+    "level": "B1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "David isn't here. He's ___ to the chemist's.",
+    "options": [
+      "gone",
+      "been",
+      "went"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Has gone to' means that David went there and has not returned yet.",
+      "Incorrect: 'Has been to' normally means that someone visited a place and returned.",
+      "Incorrect: After 'he's' meaning 'he has', we need the past participle 'gone', not the past simple 'went'."
+    ]
+  },
+  {
+    "id": "pres_b1_07",
+    "level": "B1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "I've known her ___ we were at school.",
+    "options": [
+      "since",
+      "for",
+      "from"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Since' introduces the point or event when a situation began.",
+      "Incorrect: 'For' is followed by a period of time, such as 'for ten years'.",
+      "Incorrect: 'From' is not used in this present-perfect structure to show duration up to now."
+    ]
+  },
+  {
+    "id": "pres_b1_08",
+    "level": "B1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "She ___ six emails so far today.",
+    "options": [
+      "has answered",
+      "answered",
+      "is answering"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'So far today' refers to an unfinished period continuing up to now, so the present perfect is appropriate.",
+      "Incorrect: The past simple normally places an action within a finished past period.",
+      "Incorrect: The present continuous would describe an email being answered now, not the completed total of six."
+    ]
+  },
+  {
+    "id": "pres_b2_01",
+    "level": "B2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "I ___ three different versions of the introduction so far, but none of them sounds quite right.",
+    "options": [
+      "have written",
+      "have been writing",
+      "wrote"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The present perfect simple focuses on the completed result: three different versions.",
+      "Incorrect: The present perfect continuous focuses more on the activity itself and does not fit naturally with the completed total of three versions.",
+      "Incorrect: 'So far' connects these completed actions with the present, so the past simple does not fit."
+    ]
+  },
+  {
+    "id": "pres_b2_02",
+    "level": "B2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "I ___ this chapter for nearly two hours, and I'm still only halfway through it.",
+    "options": [
+      "have been reading",
+      "read",
+      "am reading"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The present perfect continuous emphasises the duration of an activity that began in the past and is still continuing.",
+      "Incorrect: The past simple would place the reading in a finished past period.",
+      "Incorrect: The present continuous can describe an activity happening now, but it cannot by itself express the duration from the past up to now."
+    ]
+  },
+  {
+    "id": "pres_b2_03",
+    "level": "B2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "This is the third time the system ___ today.",
+    "options": [
+      "has crashed",
+      "crashed",
+      "is crashing"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: After 'This is the third time...', we normally use the present perfect to count experiences or events up to now.",
+      "Incorrect: The past simple does not fit the 'This is the third time...' structure referring to experience up to the present.",
+      "Incorrect: The present continuous describes an event in progress and cannot express the completed total of three crashes."
+    ]
+  },
+  {
+    "id": "pres_b2_04",
+    "level": "B2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "This is by far the most convincing explanation anyone ___ so far.",
+    "options": [
+      "has offered",
+      "offered",
+      "is offering"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: A superlative referring to everything up to the present commonly takes the present perfect, reinforced here by 'so far'.",
+      "Incorrect: The past simple would place the offer in a finished past context rather than compare it with everything up to now.",
+      "Incorrect: The present continuous would describe an offer being made now, not all the explanations given up to this point."
+    ]
+  },
+  {
+    "id": "pres_b2_05",
+    "level": "B2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "I ___ to ask you about that for weeks, but there never seems to be a good moment.",
+    "options": [
+      "have been meaning",
+      "mean",
+      "meant"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have been meaning to' describes an intention that has existed for some time but has not yet been carried out.",
+      "Incorrect: The present simple does not naturally express an unfulfilled intention continuing over the period 'for weeks'.",
+      "Incorrect: The past simple would place the intention entirely in the past, but it still exists now."
+    ]
+  },
+  {
+    "id": "pres_b2_06",
+    "level": "B2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "Since taking over as director, she ___ four major changes, all of which are now in place.",
+    "options": [
+      "has introduced",
+      "has been introducing",
+      "introduced"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The present perfect simple focuses on the four completed changes introduced during a period continuing up to now.",
+      "Incorrect: The continuous form focuses on an ongoing process, whereas 'all of which are now in place' makes the completed results important.",
+      "Incorrect: 'Since taking over' establishes a period extending from the past to the present, so the past simple does not fit."
+    ]
+  },
+  {
+    "id": "pres_b2_07",
+    "level": "B2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "Sales ___ by almost 18% since the company changed its pricing strategy.",
+    "options": [
+      "have fallen",
+      "are falling",
+      "fell"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The present perfect describes the measurable change between the past starting point and now.",
+      "Incorrect: The present continuous can describe a trend in progress, but it does not connect naturally with 'since' and the completed change of 18%.",
+      "Incorrect: The past simple would treat the fall as belonging to a finished past period rather than a change measured up to the present."
+    ]
+  },
+  {
+    "id": "pres_b2_08",
+    "level": "B2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "I ___ through the data all afternoon, but I'm still only halfway through it.",
+    "options": [
+      "have been working",
+      "worked",
+      "am working"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The present perfect continuous describes an activity continuing over a period from the past up to now, with the focus on the ongoing process.",
+      "Incorrect: The past simple suggests a finished past activity, which conflicts with 'I'm still only halfway through it'.",
+      "Incorrect: The present continuous describes what is happening now but does not express the duration extending through the afternoon up to now."
+    ]
+  },
+  {
+    "id": "pres_b2_09",
+    "level": "B2",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "I've ___ the report twice, and I still can't find the figure you're referring to.",
+    "options": [
+      "read",
+      "been reading",
+      "reading"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The present perfect simple is used because 'twice' gives a completed number of repetitions.",
+      "Incorrect: The present perfect continuous focuses on an activity over time and is not used naturally with the completed count 'twice' here.",
+      "Incorrect: After 'I've' meaning 'I have', we need a past participle. An -ing form would require 'been'."
+    ]
+  },
+  {
+    "id": "pres_c1_01",
+    "level": "C1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "Several key questions ___ satisfactorily answered, despite decades of research.",
+    "options": [
+      "have yet to be",
+      "have yet been",
+      "are yet being"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have yet to be + past participle' means that something expected has still not happened.",
+      "Incorrect: We cannot say 'have yet been answered' in this structure; 'yet' is followed by 'to + infinitive'.",
+      "Incorrect: 'Are yet being answered' does not express the meaning that the questions remain unresolved."
+    ]
+  },
+  {
+    "id": "pres_c1_02",
+    "level": "C1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "Over time, the distinction ___ as increasingly artificial.",
+    "options": [
+      "has come to be regarded",
+      "has come to regard",
+      "has been come to be regarded"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Has come to be regarded as' describes a gradual change in how something is perceived up to the present.",
+      "Incorrect: 'Has come to regard' is active and would mean that the distinction itself developed an opinion about something.",
+      "Incorrect: 'Has been come' is not a possible perfect construction."
+    ]
+  },
+  {
+    "id": "pres_c1_03",
+    "level": "C1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "The view that intelligence is essentially fixed ___ abandoned by most researchers.",
+    "options": [
+      "has long since been",
+      "has long since",
+      "is long since being"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Has long since been abandoned' uses the present perfect passive to show that the change happened some time ago and remains true now.",
+      "Incorrect: 'Has long since abandoned' is active and would mean that the view itself abandoned something.",
+      "Incorrect: 'Is long since being abandoned' is not a grammatical way to express an established change of this kind."
+    ]
+  },
+  {
+    "id": "pres_c1_04",
+    "level": "C1",
+    "tag": "Present Tenses and Perfect Forms",
+    "sentence": "No satisfactory explanation ___ for the discrepancy.",
+    "options": [
+      "has so far been put forward",
+      "has so far put forward",
+      "is so far being put forward"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The present perfect passive with 'so far' shows that no satisfactory explanation has been proposed up to the present.",
+      "Incorrect: The active form would mean that 'no satisfactory explanation' itself proposed something, which is not possible here.",
+      "Incorrect: The present continuous passive suggests an explanation is currently being proposed, contradicting the statement that none has been put forward so far."
+    ]
+  },
+  {
+    "id": "det_a2_01",
+    "level": "A2",
+    "tag": "Determiners and Pronouns",
+    "sentence": "Lucy invited Sam and ___ to dinner.",
+    "options": [
+      "me",
+      "I",
+      "my"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: After the verb 'invited', we need the object pronoun 'me'.",
+      "Incorrect: 'I' is a subject pronoun, not an object pronoun.",
+      "Incorrect: 'My' is a possessive determiner and must normally be followed by a noun."
+    ]
+  },
+  {
+    "id": "det_a2_02",
+    "level": "A2",
+    "tag": "Determiners and Pronouns",
+    "sentence": "Your coat is on the chair. ___ is still in the car.",
+    "options": [
+      "Mine",
+      "My",
+      "Me"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Mine' is a possessive pronoun and replaces 'my coat'.",
+      "Incorrect: 'My' is a possessive determiner and needs a noun after it: 'my coat'.",
+      "Incorrect: 'Me' is an object pronoun and cannot express possession here."
+    ]
+  },
+  {
+    "id": "det_a2_03",
+    "level": "A2",
+    "tag": "Determiners and Pronouns",
+    "sentence": "Emma made the dress ___.",
+    "options": [
+      "herself",
+      "her",
+      "hers"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Herself' emphasises that Emma made the dress without someone else doing it for her.",
+      "Incorrect: 'Her' is an object pronoun or possessive determiner and does not work in this position.",
+      "Incorrect: 'Hers' is a possessive pronoun, but it cannot be used to emphasise the subject in this structure."
+    ]
+  },
+  {
+    "id": "det_a2_04",
+    "level": "A2",
+    "tag": "Determiners and Pronouns",
+    "sentence": "Who are ___ people over there by the entrance?",
+    "options": [
+      "those",
+      "that",
+      "this"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Those' refers to plural people or things that are relatively far from the speaker.",
+      "Incorrect: 'That' is singular.",
+      "Incorrect: 'This' is singular and normally refers to something close to the speaker."
+    ]
+  },
+  {
+    "id": "det_b1_01",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "There are plenty of clean mugs in the cupboard. This one is cracked, so I'll take ___.",
+    "options": [
+      "another",
+      "the other",
+      "other"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Another' means one more or a different one from an unspecified larger group.",
+      "Incorrect: 'The other' normally refers to the remaining one of two, but there are plenty of mugs available.",
+      "Incorrect: 'Other' cannot normally be used alone before an omitted singular countable noun here."
+    ]
+  },
+  {
+    "id": "det_b1_02",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "Are there any ___ questions before we finish?",
+    "options": [
+      "other",
+      "another",
+      "others"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Other' is used before a plural noun to mean additional or different ones.",
+      "Incorrect: 'Another' is normally followed by a singular countable noun: 'another question'.",
+      "Incorrect: 'Others' is a pronoun and is not followed directly by a noun."
+    ]
+  },
+  {
+    "id": "det_b1_03",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "There are two entrances. One is at the front and ___ is round the back.",
+    "options": [
+      "the other",
+      "another",
+      "other"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: With a set of two, 'one ... the other' refers to the first and the remaining one.",
+      "Incorrect: 'Another' means an additional or different one and does not identify the remaining member of a pair.",
+      "Incorrect: 'Other' cannot stand alone as a singular pronoun in this structure."
+    ]
+  },
+  {
+    "id": "det_b1_04",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "Three of the eight applicants had previous management experience; ___ five did not.",
+    "options": [
+      "the other",
+      "other",
+      "another"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'The other five' refers to the specific five remaining members of the group.",
+      "Incorrect: 'Other five' would normally need another determiner, such as 'the' or 'these'.",
+      "Incorrect: 'Another five' means an additional five rather than the five remaining from the original group."
+    ]
+  },
+  {
+    "id": "det_b1_05",
+    "level": "A2",
+    "tag": "Determiners and Pronouns",
+    "sentence": "These shoes are too tight. Have you got any larger ___?",
+    "options": [
+      "ones",
+      "one",
+      "them"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Ones' replaces a plural countable noun already mentioned: 'larger shoes'.",
+      "Incorrect: 'One' is singular, but 'shoes' is plural.",
+      "Incorrect: 'Them' refers back to the same shoes rather than different larger shoes."
+    ]
+  },
+  {
+    "id": "det_b1_06",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "I've never owned a dishwasher, but I'm thinking of buying ___.",
+    "options": [
+      "one",
+      "it",
+      "the one"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'One' replaces a singular countable noun when we mean a new, non-specific example of that thing.",
+      "Incorrect: 'It' would normally refer to a particular dishwasher already identified.",
+      "Incorrect: 'The one' refers to a specific dishwasher that the listener can identify."
+    ]
+  },
+  {
+    "id": "det_b1_07",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "The two old friends hadn't met for years, so they were delighted to see ___ again.",
+    "options": [
+      "each other",
+      "themselves",
+      "them"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Each other' expresses a reciprocal action: each friend saw the other.",
+      "Incorrect: 'Themselves' would mean that each person saw himself or herself.",
+      "Incorrect: 'Them' would refer to some other people, not to the two friends reciprocally."
+    ]
+  },
+  {
+    "id": "det_b1_08",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "The children made all the decorations ___.",
+    "options": [
+      "themselves",
+      "each other",
+      "them"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Themselves' emphasises that the children did the work personally.",
+      "Incorrect: 'Each other' expresses a reciprocal relationship between people and does not fit this meaning.",
+      "Incorrect: 'Them' is an object pronoun and cannot provide this emphatic meaning."
+    ]
+  },
+  {
+    "id": "det_b1_09",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "A colleague of ___ recommended this restaurant to me.",
+    "options": [
+      "mine",
+      "me",
+      "my"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: After 'a colleague of', we use the possessive pronoun 'mine': 'a colleague of mine'.",
+      "Incorrect: 'Me' is an object pronoun and does not express possession here.",
+      "Incorrect: 'My' normally comes directly before a noun: 'my colleague'."
+    ]
+  },
+  {
+    "id": "det_b1_10",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "The tickets cost €15 ___.",
+    "options": [
+      "each",
+      "every",
+      "all"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Each' can come after a plural subject or amount to mean that the price applies individually to every item.",
+      "Incorrect: 'Every' must normally come before a singular countable noun: 'every ticket'.",
+      "Incorrect: 'All' refers to the whole group collectively and cannot be used after the price in this way."
+    ]
+  },
+  {
+    "id": "det_b1_11",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "I didn't need any help. I managed to put the shelves up by ___.",
+    "options": [
+      "myself",
+      "my own",
+      "me"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'By myself' means alone or without help from another person.",
+      "Incorrect: We can say 'on my own', but not 'by my own' with this meaning.",
+      "Incorrect: 'By me' would normally identify the person who performed an action in a passive construction."
+    ]
+  },
+  {
+    "id": "det_b1_12",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "She didn't borrow her sister's laptop; she used ___.",
+    "options": [
+      "her own",
+      "own hers",
+      "hers own"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Her own' means the laptop that belonged to her personally.",
+      "Incorrect: 'Own hers' has the words in the wrong order.",
+      "Incorrect: We do not use a possessive pronoun before 'own' in this structure."
+    ]
+  },
+  {
+    "id": "det_b1_13",
+    "level": "B1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "Some people work best early in the morning; ___ are much more productive at night.",
+    "options": [
+      "others",
+      "other",
+      "another"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Others' is a plural pronoun meaning other people.",
+      "Incorrect: 'Other' is normally used as a determiner before a noun, for example 'other people'.",
+      "Incorrect: 'Another' is singular and means one additional or different person or thing."
+    ]
+  },
+  {
+    "id": "det_b2_01",
+    "level": "B2",
+    "tag": "Determiners and Pronouns",
+    "sentence": "The repairs are more extensive than we expected, so we'll need ___ to finish them.",
+    "options": [
+      "another three weeks",
+      "three other week",
+      "other three weeks"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Another + number + plural noun' means an additional amount: 'another three weeks'.",
+      "Incorrect: After 'three', the noun must be plural, and this word order does not express the intended additional period.",
+      "Incorrect: We normally say 'another three weeks' or 'three more weeks', not 'other three weeks'."
+    ]
+  },
+  {
+    "id": "det_b2_02",
+    "level": "B2",
+    "tag": "Determiners and Pronouns",
+    "sentence": "The cost of living in the capital is considerably higher than ___ in smaller towns.",
+    "options": [
+      "that",
+      "it",
+      "one"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'That' can substitute for a previously mentioned singular noun phrase in a comparison: 'the cost of living'.",
+      "Incorrect: 'It' normally refers to the same specific thing rather than substituting for a parallel noun phrase in this type of comparison.",
+      "Incorrect: 'One' substitutes for a singular countable noun, but 'cost of living' is not being used as a countable item here."
+    ]
+  },
+  {
+    "id": "det_b2_03",
+    "level": "B2",
+    "tag": "Determiners and Pronouns",
+    "sentence": "The responsibilities of local councils are quite different from ___ of central government.",
+    "options": [
+      "those",
+      "them",
+      "ones"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Those' substitutes for the plural noun 'responsibilities' in a formal comparison.",
+      "Incorrect: 'Them' is an object pronoun and does not work as this kind of noun-phrase substitute.",
+      "Incorrect: We do not normally use 'ones of central government' in this structure; 'those of' is the standard form."
+    ]
+  },
+  {
+    "id": "det_b2_04",
+    "level": "B2",
+    "tag": "Determiners and Pronouns",
+    "sentence": "Additional financial support will be available to ___ affected by the closure.",
+    "options": [
+      "those",
+      "them",
+      "they"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Those + participle/adjective' can mean 'the people who are affected', a common structure in more formal English.",
+      "Incorrect: The ordinary object pronoun 'them' cannot normally be directly modified by 'affected by the closure' in this structure.",
+      "Incorrect: 'They' is a subject pronoun and cannot follow the preposition 'to'."
+    ]
+  },
+  {
+    "id": "det_b2_05",
+    "level": "B2",
+    "tag": "Determiners and Pronouns",
+    "sentence": "The report identifies two main problems: rising costs and falling demand. It argues that the ___ is largely beyond the company's control.",
+    "options": [
+      "latter",
+      "later",
+      "last"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'The latter' refers to the second of two things just mentioned, in this case falling demand.",
+      "Incorrect: 'Later' refers to time and is not used to identify the second of two previously mentioned items.",
+      "Incorrect: 'The last' can refer to the final member of a sequence, but it is not the standard paired reference form used with two previously mentioned alternatives."
+    ]
+  },
+  {
+    "id": "det_b2_06",
+    "level": "B2",
+    "tag": "Determiners and Pronouns",
+    "sentence": "There is ___ a completely risk-free investment.",
+    "options": [
+      "no such thing as",
+      "no such a thing as",
+      "not such thing as"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'There is no such thing as...' is the standard structure for saying that something does not exist.",
+      "Incorrect: We do not insert 'a' between 'such' and 'thing' in the fixed expression 'no such thing as'.",
+      "Incorrect: 'Not such thing as' is not a grammatical determiner structure."
+    ]
+  },
+  {
+    "id": "det_c1_01",
+    "level": "C1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "The panel is purely advisory and has no decision-making powers; it should therefore be treated as ___.",
+    "options": [
+      "such",
+      "so",
+      "it"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'As such' refers back to a previously stated role, status or category: the panel should be treated in its capacity as an advisory body.",
+      "Incorrect: 'As so' is not used to refer back to a previously established status or category.",
+      "Incorrect: 'As it' cannot replace 'as such' in this reference structure."
+    ]
+  },
+  {
+    "id": "det_c1_02",
+    "level": "C1",
+    "tag": "Determiners and Pronouns",
+    "sentence": "The supposedly independent investigations were in fact commissioned by ___ organisation.",
+    "options": [
+      "one and the same",
+      "one same",
+      "the one and same"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'One and the same' is an emphatic determiner expression meaning exactly the same person or thing.",
+      "Incorrect: 'One same organisation' is not the standard English structure.",
+      "Incorrect: The fixed expression is 'one and the same', not 'the one and same'."
+    ]
+  },
+  {
+    "id": "noun_a2_01",
+    "level": "A2",
+    "tag": "Nouns and Agreement",
+    "sentence": "The news ___ good today.",
+    "options": [
+      "is",
+      "are",
+      "be"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'News' ends in -s but is an uncountable singular noun, so it takes a singular verb.",
+      "Incorrect: 'News' is grammatically singular, despite its plural-looking ending.",
+      "Incorrect: We need a finite verb here, not the infinitive 'be'."
+    ]
+  },
+  {
+    "id": "noun_a2_02",
+    "level": "A2",
+    "tag": "Nouns and Agreement",
+    "sentence": "These scissors ___ blunt. Have you got another pair?",
+    "options": [
+      "are",
+      "is",
+      "has"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Scissors' is a plural-only noun, so we use a plural verb.",
+      "Incorrect: We cannot normally say 'these scissors is' because 'scissors' takes plural agreement.",
+      "Incorrect: 'Has blunt' is not a grammatical structure."
+    ]
+  },
+  {
+    "id": "noun_a2_03",
+    "level": "A2",
+    "tag": "Nouns and Agreement",
+    "sentence": "Can you give me a piece of ___?",
+    "options": [
+      "advice",
+      "advices",
+      "an advice"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Advice' is uncountable, so we can say 'a piece of advice'.",
+      "Incorrect: 'Advice' does not normally have a plural form 'advices'.",
+      "Incorrect: We do not use 'an advice'; 'advice' is uncountable."
+    ]
+  },
+  {
+    "id": "noun_b1_01",
+    "level": "A2",
+    "tag": "Nouns and Agreement",
+    "sentence": "The furniture we ordered ___ finally arrived.",
+    "options": [
+      "has",
+      "have",
+      "is"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Furniture' is an uncountable singular noun, so we use 'has arrived'.",
+      "Incorrect: 'Furniture' does not take plural agreement.",
+      "Incorrect: The present perfect is formed with 'has arrived', not 'is arrived'."
+    ]
+  },
+  {
+    "id": "noun_b1_02",
+    "level": "B1",
+    "tag": "Nouns and Agreement",
+    "sentence": "All the equipment ___ checked before the experiment began.",
+    "options": [
+      "was",
+      "were",
+      "have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Equipment' is uncountable and takes singular agreement, so the passive form is 'was checked'.",
+      "Incorrect: Although there may be several individual items, 'equipment' itself is grammatically singular.",
+      "Incorrect: 'Have checked' would be active and would also require a plural subject."
+    ]
+  },
+  {
+    "id": "noun_b1_03",
+    "level": "B1",
+    "tag": "Nouns and Agreement",
+    "sentence": "The job requires at least two years' ___ working with young children.",
+    "options": [
+      "experience",
+      "experiences",
+      "an experience"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Experience' is uncountable when it means knowledge or skill gained through doing something.",
+      "Incorrect: 'Experiences' refers to separate events or things that happen to someone, not a period of professional experience.",
+      "Incorrect: We cannot use 'an experience' after 'two years'' with this meaning."
+    ]
+  },
+  {
+    "id": "noun_b1_04",
+    "level": "A2",
+    "tag": "Nouns and Agreement",
+    "sentence": "The printer has run out of ___.",
+    "options": [
+      "paper",
+      "a paper",
+      "papers"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Paper' is uncountable when it refers to the material used for printing.",
+      "Incorrect: 'A paper' normally means a document, article or newspaper rather than the material itself.",
+      "Incorrect: 'Papers' refers to separate documents or newspapers, not printing material in general."
+    ]
+  },
+  {
+    "id": "noun_b1_05",
+    "level": "B1",
+    "tag": "Nouns and Agreement",
+    "sentence": "The police ___ questioning two people about the robbery.",
+    "options": [
+      "are",
+      "is",
+      "has"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Police' is treated as a plural noun when it refers to police officers generally.",
+      "Incorrect: We do not normally use singular agreement with 'the police'.",
+      "Incorrect: 'Has questioning' is not a grammatical verb form."
+    ]
+  },
+  {
+    "id": "noun_b1_06",
+    "level": "B1",
+    "tag": "Nouns and Agreement",
+    "sentence": "This pair of trousers ___ too small for me.",
+    "options": [
+      "is",
+      "are",
+      "be"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The grammatical head of the subject is the singular noun 'pair', so we use 'is'.",
+      "Incorrect: 'Trousers' is plural, but here it is part of the phrase 'a pair of trousers'; agreement is with 'pair'.",
+      "Incorrect: We need a finite verb, not the base form 'be'."
+    ]
+  },
+  {
+    "id": "noun_b1_07",
+    "level": "B1",
+    "tag": "Nouns and Agreement",
+    "sentence": "The contents of the box ___ damaged in transit.",
+    "options": [
+      "were",
+      "was",
+      "has"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Contents' is plural, so we use the plural verb 'were'.",
+      "Incorrect: The nearby singular noun 'box' does not control the agreement; the subject is 'the contents'.",
+      "Incorrect: 'Has damaged' would be active and does not agree with the plural subject."
+    ]
+  },
+  {
+    "id": "noun_b1_08",
+    "level": "B1",
+    "tag": "Nouns and Agreement",
+    "sentence": "I found two grey ___ on my jacket.",
+    "options": [
+      "hairs",
+      "hair",
+      "a hair"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: Individual strands can be counted, so 'two hairs' is correct.",
+      "Incorrect: 'Hair' is normally uncountable when we refer to someone's hair generally, but individual strands can be countable.",
+      "Incorrect: 'A hair' is singular and cannot follow 'two'."
+    ]
+  },
+  {
+    "id": "noun_b2_01",
+    "level": "B2",
+    "tag": "Nouns and Agreement",
+    "sentence": "The number of complaints received this month ___ higher than expected.",
+    "options": [
+      "is",
+      "are",
+      "have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: In 'the number of + plural noun', the grammatical head is the singular noun 'number', so the verb is singular.",
+      "Incorrect: 'Complaints' is plural but does not control the verb in this structure.",
+      "Incorrect: 'Have' would require a plural subject and does not fit before 'higher'."
+    ]
+  },
+  {
+    "id": "noun_b2_02",
+    "level": "B2",
+    "tag": "Nouns and Agreement",
+    "sentence": "A number of complaints ___ already been resolved.",
+    "options": [
+      "have",
+      "has",
+      "is"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'A number of + plural noun' means 'several' and takes plural agreement.",
+      "Incorrect: This differs from 'the number of', which takes a singular verb.",
+      "Incorrect: The present perfect passive requires 'have been resolved' with this plural subject."
+    ]
+  },
+  {
+    "id": "noun_b2_03",
+    "level": "B2",
+    "tag": "Nouns and Agreement",
+    "sentence": "A series of unexpected delays ___ forced us to revise the schedule.",
+    "options": [
+      "has",
+      "have",
+      "are"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The head noun is singular 'series', so we use 'has forced'.",
+      "Incorrect: The plural noun 'delays' is part of the 'of' phrase and does not control agreement.",
+      "Incorrect: 'Are forced' would create a passive structure and change the meaning."
+    ]
+  },
+  {
+    "id": "noun_b2_04",
+    "level": "B2",
+    "tag": "Nouns and Agreement",
+    "sentence": "Nearly two thirds of the land ___ owned by the state.",
+    "options": [
+      "is",
+      "are",
+      "have"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: With fractions and proportions, agreement depends on the noun after 'of'. 'Land' is uncountable singular, so we use 'is'.",
+      "Incorrect: The fraction itself does not automatically require plural agreement.",
+      "Incorrect: 'Have owned' would be active and would not express the intended passive meaning."
+    ]
+  },
+  {
+    "id": "noun_b2_05",
+    "level": "B2",
+    "tag": "Nouns and Agreement",
+    "sentence": "Nearly two thirds of the houses ___ more than fifty years old.",
+    "options": [
+      "are",
+      "is",
+      "has"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: Here the fraction refers to the plural noun 'houses', so we use plural agreement.",
+      "Incorrect: Unlike 'two thirds of the land', the noun after 'of' is plural in this sentence.",
+      "Incorrect: 'Has' cannot be used with the plural subject 'houses' in this structure."
+    ]
+  },
+  {
+    "id": "noun_b2_06",
+    "level": "B2",
+    "tag": "Nouns and Agreement",
+    "sentence": "Twenty kilometres ___ a long way to walk in this heat.",
+    "options": [
+      "is",
+      "are",
+      "have been"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: An amount of distance can be treated as a single unit, so singular agreement is used here.",
+      "Incorrect: Although 'kilometres' is morphologically plural, the whole distance is being considered as one amount.",
+      "Incorrect: 'Have been a long way' does not fit this general statement and treats the distance as plural."
+    ]
+  },
+  {
+    "id": "noun_b2_07",
+    "level": "B2",
+    "tag": "Nouns and Agreement",
+    "sentence": "Statistics ___ my weakest subject at university.",
+    "options": [
+      "was",
+      "were",
+      "have been"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: When 'statistics' means the academic subject, it is treated as singular.",
+      "Incorrect: The plural form is used when 'statistics' means numerical data, but here it names a field of study.",
+      "Incorrect: The sentence refers to the speaker's time at university, so present perfect is not appropriate."
+    ]
+  },
+  {
+    "id": "noun_b2_08",
+    "level": "B2",
+    "tag": "Nouns and Agreement",
+    "sentence": "The latest statistics ___ a sharp fall in unemployment.",
+    "options": [
+      "show",
+      "shows",
+      "is showing"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: Here 'statistics' means numerical data and is plural, so we use 'show'.",
+      "Incorrect: Singular 'shows' would be appropriate if 'statistics' meant the academic subject, but not when referring to several figures or data.",
+      "Incorrect: 'Is showing' uses singular agreement and therefore does not agree with plural 'statistics' in this meaning."
+    ]
+  },
+  {
+    "id": "noun_b2_09",
+    "level": "B2",
+    "tag": "Nouns and Agreement",
+    "sentence": "Several means of reducing energy use ___ been proposed.",
+    "options": [
+      "have",
+      "has",
+      "is"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Means' has the same form in the singular and plural. 'Several' makes it clear that it is plural here, so we use 'have'.",
+      "Incorrect: Singular 'has' would be used with 'one means', not 'several means'.",
+      "Incorrect: The present perfect passive requires 'have been proposed' with this plural subject."
+    ]
+  },
+  {
+    "id": "noun_c1_01",
+    "level": "C1",
+    "tag": "Nouns and Agreement",
+    "sentence": "More than one candidate ___ concerns about the way the interviews were conducted.",
+    "options": [
+      "has raised",
+      "have raised",
+      "are raising"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: Despite its plural meaning, 'more than one + singular noun' normally takes singular agreement: 'more than one candidate has'.",
+      "Incorrect: The meaning involves several candidates, but the grammatical structure conventionally takes a singular verb.",
+      "Incorrect: The issue is not an action currently in progress, and the agreement after 'more than one candidate' is singular."
+    ]
+  },
+  {
+    "id": "noun_c1_02",
+    "level": "C1",
+    "tag": "Nouns and Agreement",
+    "sentence": "Many a promising career ___ damaged by a single poor decision.",
+    "options": [
+      "has been",
+      "have been",
+      "are"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The formal structure 'many a + singular noun' has plural meaning but takes singular grammatical agreement.",
+      "Incorrect: Although 'many a promising career' refers to numerous careers, the verb after this construction is singular.",
+      "Incorrect: 'Are damaged' uses plural agreement and also loses the perfect meaning expressed by 'has been damaged'."
+    ]
+  },
+  {
+    "id": "noun_c1_03",
+    "level": "C1",
+    "tag": "Nouns and Agreement",
+    "sentence": "She is one of the researchers who ___ consistently argued against the proposal.",
+    "options": [
+      "have",
+      "has",
+      "is"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: In 'one of the researchers who...', the relative pronoun 'who' refers to the plural noun 'researchers', so the relative clause takes plural agreement: 'researchers who have argued'.",
+      "Incorrect: 'Has' would make the relative clause agree with 'one', but the antecedent of 'who' in this structure is 'researchers'.",
+      "Incorrect: 'Is argued' would create an incorrect passive structure and does not agree with the intended meaning."
+    ]
+  },
+  {
+    "id": "noun_c1_04",
+    "level": "C1",
+    "tag": "Nouns and Agreement",
+    "sentence": "She is the only one of the researchers who ___ consistently argued against the proposal.",
+    "options": [
+      "has",
+      "have",
+      "are"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'The only one ... who' identifies a single person, so the relative clause takes singular agreement: she is the only one who has argued.",
+      "Incorrect: Without 'only', 'one of the researchers who have...' normally takes plural agreement, but 'the only one' changes the reference here.",
+      "Incorrect: 'Are argued' is both plural and passive and does not fit the meaning."
+    ]
+  },
+  {
+    "id": "noun_c1_05",
+    "level": "C1",
+    "tag": "Nouns and Agreement",
+    "sentence": "Every manager and employee ___ been asked to complete the questionnaire.",
+    "options": [
+      "has",
+      "have",
+      "are"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: When 'every' applies distributively to coordinated singular nouns, the phrase normally takes singular agreement: each manager and each employee has been asked.",
+      "Incorrect: Although the phrase refers to many people, 'every' makes the reference distributive and singular in grammatical agreement.",
+      "Incorrect: The present perfect passive requires 'has been asked', not 'are been asked'."
+    ]
+  },
+  {
+    "id": "used_a2_01",
+    "level": "A2",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "I ___ to school every day, but now I take the bus.",
+    "options": [
+      "used to walk",
+      "use to walk",
+      "was used to walk"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Used to + infinitive' describes a regular past habit that is no longer true.",
+      "Incorrect: In an affirmative sentence, the form is 'used to', not 'use to'.",
+      "Incorrect: 'Was used to' means 'was accustomed to' and must be followed by a noun or -ing form."
+    ]
+  },
+  {
+    "id": "used_a2_02",
+    "level": "A2",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "There ___ a small shop here, but now it's a café.",
+    "options": [
+      "used to be",
+      "use to be",
+      "was used to be"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'There used to be' describes something that existed in the past but no longer exists.",
+      "Incorrect: In an affirmative sentence, we use 'used to', not 'use to'.",
+      "Incorrect: 'Was used to be' is not a grammatical way to describe a past state."
+    ]
+  },
+  {
+    "id": "used_b1_01",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "We ___ near the station, but we moved to the suburbs last year.",
+    "options": [
+      "used to live",
+      "were used to living",
+      "got used to living"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Used to + infinitive' describes a past situation that is no longer true.",
+      "Incorrect: 'Were used to living' means that living near the station was familiar or normal to us.",
+      "Incorrect: 'Got used to living' describes the process of becoming accustomed to living somewhere."
+    ]
+  },
+  {
+    "id": "used_b1_02",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "___ football when you were at school?",
+    "options": [
+      "Did you use to play",
+      "Were you used to play",
+      "Did you used to play"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: In standard written English, questions use 'did + subject + use to + infinitive'.",
+      "Incorrect: 'Be used to' means 'be accustomed to' and is followed by a noun or -ing form, not an infinitive.",
+      "Incorrect: After 'did', the standard written form is 'use to', not 'used to'."
+    ]
+  },
+  {
+    "id": "used_b1_03",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "I ___ coffee, but now I drink several cups a day.",
+    "options": [
+      "didn't use to like",
+      "wasn't used to like",
+      "didn't used to like"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Didn't use to + infinitive' describes a past state or habit that was not true but is true now.",
+      "Incorrect: 'Wasn't used to' means 'wasn't accustomed to' and would need a noun or -ing form after 'to'.",
+      "Incorrect: After 'didn't', the standard written form is 'use to', not 'used to'."
+    ]
+  },
+  {
+    "id": "used_b1_04",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "My grandparents ___ a small farm, but they sold it before I was born.",
+    "options": [
+      "used to own",
+      "would own",
+      "were used to owning"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Used to' can describe past states, such as possession, that are no longer true.",
+      "Incorrect: Habitual 'would' is normally used for repeated actions, not past states such as owning something.",
+      "Incorrect: 'Were used to owning' means that owning a farm was familiar to them, which is a different meaning."
+    ]
+  },
+  {
+    "id": "used_b1_05",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "Getting up at six doesn't bother me. I'm ___ early.",
+    "options": [
+      "used to getting up",
+      "used to get up",
+      "getting used to get up"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Be used to + -ing' means that an activity is familiar or normal to someone.",
+      "Incorrect: In 'be used to', 'to' is a preposition, so it is followed here by 'getting', not the infinitive 'get'.",
+      "Incorrect: 'Get used to' is also followed by a noun or -ing form, so 'get up' is incorrect here."
+    ]
+  },
+  {
+    "id": "used_b1_06",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "At first I found the traffic stressful, but after a few weeks I ___ it.",
+    "options": [
+      "got used to",
+      "used to",
+      "was used to"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Got used to' describes the process of becoming accustomed to something.",
+      "Incorrect: 'Used to' describes a past habit or state and must be followed by an infinitive.",
+      "Incorrect: 'Was used to' describes already being accustomed to something rather than the process of adapting to it."
+    ]
+  },
+  {
+    "id": "used_b1_07",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "Don't worry about the noise. You'll soon ___ it.",
+    "options": [
+      "get used to",
+      "be used to hear",
+      "used to"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Get used to' means gradually become accustomed to something.",
+      "Incorrect: 'Be used to' is followed by a noun or -ing form, so 'be used to hear' is incorrect.",
+      "Incorrect: 'Used to' describes a past habit or state and cannot be followed by the pronoun 'it' in this way."
+    ]
+  },
+  {
+    "id": "used_b1_08",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "Are you ___ in front of large groups?",
+    "options": [
+      "used to speaking",
+      "used to speak",
+      "use to speaking"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Be used to + -ing' asks whether an activity is familiar or normal to someone.",
+      "Incorrect: In this expression, 'to' is a preposition and is followed by the -ing form.",
+      "Incorrect: The expression meaning 'be accustomed to' requires 'be + used to': 'Are you used to...?'"
+    ]
+  },
+  {
+    "id": "used_b1_09",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "Over the first few months, I gradually ___ working from home.",
+    "options": [
+      "got used to",
+      "was used to",
+      "used to"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Got used to' describes the gradual process of becoming accustomed to working from home.",
+      "Incorrect: 'Was used to' describes a state of already being accustomed to something, rather than the gradual process indicated by 'gradually'.",
+      "Incorrect: 'Used to' describes a former habit or state and would need an infinitive, not 'working'."
+    ]
+  },
+  {
+    "id": "used_b1_10",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "She's worked in customer service for years, so she's ___ people complaining.",
+    "options": [
+      "used to hearing",
+      "used to hear",
+      "getting used to hear"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Be used to + -ing' means that hearing complaints is familiar and no longer surprising.",
+      "Incorrect: In 'be used to', 'to' is a preposition, so it must be followed here by 'hearing'.",
+      "Incorrect: 'Get used to' also takes a noun or -ing form, so 'hear' is incorrect."
+    ]
+  },
+  {
+    "id": "used_b1_11",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "After years of teaching online, I'm quite ___ having my lessons observed remotely.",
+    "options": [
+      "used to",
+      "use to",
+      "used for"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Be used to + -ing' means that an experience is familiar or normal.",
+      "Incorrect: 'Use to' is not the form used after 'be' to express familiarity.",
+      "Incorrect: 'Used for' expresses purpose, not familiarity or adaptation."
+    ]
+  },
+  {
+    "id": "used_b1_12",
+    "level": "B1",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "The early starts were difficult at first, but they don't bother me now. Now ___.",
+    "options": [
+      "I'm used to them",
+      "I'm used to",
+      "I used to them"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'I'm used to them' means that the early starts are now familiar and no longer difficult.",
+      "Incorrect: 'I'm used to' is incomplete here. The preposition 'to' needs a complement, such as 'them' or 'getting up early'.",
+      "Incorrect: 'I used to them' is not grammatical. 'Used to + infinitive' describes a past habit, while 'be used to + noun/-ing' describes familiarity."
+    ]
+  },
+  {
+    "id": "used_b2_01",
+    "level": "B2",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "When I first moved abroad, I wasn't ___ dinner so late.",
+    "options": [
+      "used to eating",
+      "used to eat",
+      "using to eat"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Wasn't used to + -ing' means that eating dinner so late was unfamiliar at that time.",
+      "Incorrect: 'Used to eat' describes a former habit, but after 'wasn't' we need 'be used to + -ing'.",
+      "Incorrect: 'Using to' is not part of either 'used to' or 'be used to'."
+    ]
+  },
+  {
+    "id": "used_b2_02",
+    "level": "B2",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "I've finally ___ working with two screens instead of one.",
+    "options": [
+      "got used to",
+      "been used to",
+      "used to"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'I've finally got used to working...' describes a process of adaptation that has now been completed.",
+      "Incorrect: 'I've been used to working...' describes a continuing state of familiarity rather than the completion of an adaptation process suggested by 'finally'.",
+      "Incorrect: 'I've used to working' is not grammatical. The past-habit construction is 'used to + infinitive' and cannot follow 'have' in this way."
+    ]
+  },
+  {
+    "id": "used_b2_03",
+    "level": "B2",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "Even after a year, I never really ___ people calling me 'Professor'.",
+    "options": [
+      "got used to",
+      "used to",
+      "was used to"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Never really got used to' means that the speaker never became fully accustomed to this behaviour.",
+      "Incorrect: 'Used to' would need an infinitive and would describe something that regularly happened in the past.",
+      "Incorrect: 'Was used to' would mean that the speaker was accustomed to it, which contradicts 'never really'."
+    ]
+  },
+  {
+    "id": "used_b2_04",
+    "level": "B2",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "The scanner ___ tiny cracks that are invisible to the human eye.",
+    "options": [
+      "is used to identify",
+      "is used to identifying",
+      "is used to identify with"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Is used to + infinitive' is passive here and means that the scanner is employed for the purpose of identifying tiny cracks.",
+      "Incorrect: 'Is used to identifying' has the structure 'be used to + -ing', meaning 'be accustomed to identifying', which is not the intended meaning.",
+      "Incorrect: 'Identify with' means feel a connection or similarity with someone or something; it does not mean detect cracks."
+    ]
+  },
+  {
+    "id": "used_b2_05",
+    "level": "B2",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "The new job involves far more travelling than I ___.",
+    "options": [
+      "am used to",
+      "used to",
+      "get used to"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'More travelling than I am used to' means more travelling than is normal or familiar to me. The complement of 'to' is understood from 'travelling'.",
+      "Incorrect: 'Used to' would normally need an infinitive, such as 'used to travel', and would refer to a past habit.",
+      "Incorrect: 'Get used to' describes a process of adaptation and does not fit this comparison with what is currently familiar to the speaker."
+    ]
+  },
+  {
+    "id": "used_b2_06",
+    "level": "B2",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "I can't ___ not having everything within walking distance.",
+    "options": [
+      "get used to",
+      "be used to",
+      "used to"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Can't get used to + -ing' means that the speaker is unable to become accustomed to the situation.",
+      "Incorrect: 'Can't be used to' questions whether the speaker is already accustomed to something; it does not express difficulty adapting in the intended way.",
+      "Incorrect: 'Used to' describes a past habit or state and cannot follow 'can't' in this structure."
+    ]
+  },
+  {
+    "id": "used_b2_07",
+    "level": "B2",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "By the end of my first year in the city, I ___ the long commute.",
+    "options": [
+      "had got used to",
+      "used to",
+      "was getting used to"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: The past perfect 'had got used to' shows that the process of adaptation was complete by a particular point in the past.",
+      "Incorrect: 'Used to' describes a former habit or state and does not mean 'had become accustomed to'.",
+      "Incorrect: 'Was getting used to' describes an adaptation still in progress, whereas 'by the end of my first year' presents the adaptation as complete."
+    ]
+  },
+  {
+    "id": "used_b2_08",
+    "level": "B2",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "We ___ everyone in the neighbourhood, but most of the old families have moved away now.",
+    "options": [
+      "used to know",
+      "would know",
+      "were used to knowing"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Used to' can describe a past state, such as knowing people, that is no longer true.",
+      "Incorrect: Habitual 'would' is normally used for repeated actions rather than states such as 'know'.",
+      "Incorrect: 'Were used to knowing' means that knowing everyone was familiar to us, which is a different meaning."
+    ]
+  },
+  {
+    "id": "used_b2_09",
+    "level": "B2",
+    "tag": "Used to and Be/Get Used to",
+    "sentence": "For the first few weeks, the night shifts were exhausting. Eventually, though, I ___.",
+    "options": [
+      "got used to them",
+      "was used to",
+      "used to them"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Got used to them' describes successfully becoming accustomed to the night shifts.",
+      "Incorrect: 'Was used to' is incomplete here because the preposition 'to' needs a complement.",
+      "Incorrect: 'Used to them' is missing the verb 'be' or 'get'. We can say 'I was used to them' or 'I got used to them'."
+    ]
+  },
+  {
+    "id": "caus_a2_01",
+    "level": "A2",
+    "tag": "Causatives",
+    "sentence": "My parents don't ___ me stay out late on school nights.",
+    "options": [
+      "let",
+      "let to",
+      "allow"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Let + object + infinitive without to' means allow someone to do something.",
+      "Incorrect: 'Let' is not followed by 'to' before the verb.",
+      "Incorrect: 'Allow' would need 'to': 'allow me to stay out late'."
+    ]
+  },
+  {
+    "id": "caus_a2_02",
+    "level": "A2",
+    "tag": "Causatives",
+    "sentence": "That film always ___ me cry.",
+    "options": [
+      "makes",
+      "makes to",
+      "lets"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Make + object + infinitive without to' means cause someone to do something.",
+      "Incorrect: In the active causative structure, 'make' is followed by the infinitive without 'to'.",
+      "Incorrect: 'Let' means allow rather than cause, so it does not express the intended meaning."
+    ]
+  },
+  {
+    "id": "caus_b1_01",
+    "level": "B1",
+    "tag": "Causatives",
+    "sentence": "I ___ every six weeks because it grows so quickly.",
+    "options": [
+      "have my hair cut",
+      "cut my hair",
+      "have cut my hair"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have something done' is used when we arrange for another person to perform a service for us.",
+      "Incorrect: 'Cut my hair' means that the speaker personally cuts it.",
+      "Incorrect: 'Have cut my hair' is present perfect active and means that the speaker has personally cut their hair."
+    ]
+  },
+  {
+    "id": "caus_b1_02",
+    "level": "B1",
+    "tag": "Causatives",
+    "sentence": "We ___ last month. The decorator did a great job.",
+    "options": [
+      "had the living room painted",
+      "painted the living room",
+      "had painted the living room"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Had the living room painted' means that we arranged for someone else to paint it.",
+      "Incorrect: 'Painted the living room' means that we did the painting ourselves, which contradicts the reference to the decorator.",
+      "Incorrect: 'Had painted' is past perfect active and would mean that we ourselves had completed the painting."
+    ]
+  },
+  {
+    "id": "caus_b1_03",
+    "level": "B1",
+    "tag": "Causatives",
+    "sentence": "I'm going to ___ before our long drive next week.",
+    "options": [
+      "get the car serviced",
+      "get the car to service",
+      "get serviced the car"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Get something done' can mean arrange for another person to perform a service.",
+      "Incorrect: In this causative structure, the object is followed by a past participle: 'get the car serviced'.",
+      "Incorrect: The normal word order is 'get + object + past participle'."
+    ]
+  },
+  {
+    "id": "caus_b1_04",
+    "level": "B1",
+    "tag": "Causatives",
+    "sentence": "You should ___ if you've been having headaches.",
+    "options": [
+      "have your eyes tested",
+      "test your eyes",
+      "have tested your eyes"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have your eyes tested' means arrange for an optician or other professional to test them.",
+      "Incorrect: 'Test your eyes' suggests that you perform the test yourself.",
+      "Incorrect: 'Have tested your eyes' is not the causative structure required here."
+    ]
+  },
+  {
+    "id": "caus_b1_05",
+    "level": "B1",
+    "tag": "Causatives",
+    "sentence": "The manager had her assistant ___ the figures before the meeting.",
+    "options": [
+      "check",
+      "to check",
+      "checked"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have + person + infinitive without to' means arrange for or instruct someone to do something.",
+      "Incorrect: After causative 'have + person', we do not use 'to' before the verb.",
+      "Incorrect: The past participle is used in 'have something done', but here the object is a person who performs the action."
+    ]
+  },
+  {
+    "id": "caus_b1_06",
+    "level": "B1",
+    "tag": "Causatives",
+    "sentence": "I eventually got the technician ___ the problem.",
+    "options": [
+      "to fix",
+      "fix",
+      "fixed"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Get + person + to-infinitive' means persuade or arrange for someone to do something.",
+      "Incorrect: Unlike causative 'have' and 'make', causative 'get' requires 'to' before the verb.",
+      "Incorrect: 'Got the technician fixed' would make the technician the person or thing being repaired."
+    ]
+  },
+  {
+    "id": "caus_b1_07",
+    "level": "B1",
+    "tag": "Causatives",
+    "sentence": "The teacher made us ___ the exercise again.",
+    "options": [
+      "do",
+      "to do",
+      "doing"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: Active 'make + object' is followed by the infinitive without 'to'.",
+      "Incorrect: We do not use 'to' after active causative 'make'.",
+      "Incorrect: 'Make someone' is not followed by an -ing form in this structure."
+    ]
+  },
+  {
+    "id": "caus_b1_08",
+    "level": "B1",
+    "tag": "Causatives",
+    "sentence": "We need to ___ before winter. Several of them no longer close properly.",
+    "options": [
+      "get the windows replaced",
+      "get the windows to replace",
+      "have replace the windows"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Get + object + past participle' means arrange for someone to replace the windows.",
+      "Incorrect: 'Get + person + to-infinitive' is possible, but here 'the windows' receive the action rather than perform it.",
+      "Incorrect: The causative form with 'have' would be 'have the windows replaced'."
+    ]
+  },
+  {
+    "id": "caus_b1_09",
+    "level": "B1",
+    "tag": "Causatives",
+    "sentence": "How often do you ___?",
+    "options": [
+      "have your teeth checked",
+      "check your teeth",
+      "have checked your teeth"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have your teeth checked' means arrange for a dentist to examine them.",
+      "Incorrect: 'Check your teeth' means you personally examine them.",
+      "Incorrect: After 'do you', we need the base form 'have', followed by the causative structure 'your teeth checked'."
+    ]
+  },
+  {
+    "id": "caus_b1_10",
+    "level": "B1",
+    "tag": "Causatives",
+    "sentence": "I'll ___ you the updated timetable this afternoon.",
+    "options": [
+      "have my assistant send",
+      "have my assistant to send",
+      "have sent my assistant"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have + person + infinitive without to' means arrange for that person to perform the action.",
+      "Incorrect: Causative 'have + person' takes the infinitive without 'to'.",
+      "Incorrect: This word order changes the structure and does not mean that the assistant will send the timetable."
+    ]
+  },
+  {
+    "id": "caus_b2_01",
+    "level": "B2",
+    "tag": "Causatives",
+    "sentence": "We were made ___ outside for nearly an hour.",
+    "options": [
+      "to wait",
+      "wait",
+      "waiting"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: In the passive, 'make' changes from 'make someone do' to 'be made to do'.",
+      "Incorrect: The bare infinitive is used after active 'make', but the passive requires 'to'.",
+      "Incorrect: 'Be made' is not followed by an -ing form in this causative structure."
+    ]
+  },
+  {
+    "id": "caus_b2_02",
+    "level": "B2",
+    "tag": "Causatives",
+    "sentence": "They wouldn't ___ early, even though we'd finished all the work.",
+    "options": [
+      "let us leave",
+      "let us to leave",
+      "allow us leave"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Let + object + infinitive without to' means allow someone to do something.",
+      "Incorrect: 'Let' is followed by the infinitive without 'to'.",
+      "Incorrect: 'Allow' requires 'to': 'allow us to leave'."
+    ]
+  },
+  {
+    "id": "caus_b2_03",
+    "level": "B2",
+    "tag": "Causatives",
+    "sentence": "Although we asked several times, we weren't ___ early.",
+    "options": [
+      "allowed to leave",
+      "let to leave",
+      "let leave"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: In ordinary passive English, 'be allowed to' is used to express the passive equivalent of 'let someone do something'.",
+      "Incorrect: We do not normally form the passive of causative 'let' as 'be let to do'.",
+      "Incorrect: 'Were let leave' is not the standard passive structure for permission."
+    ]
+  },
+  {
+    "id": "caus_b2_04",
+    "level": "B2",
+    "tag": "Causatives",
+    "sentence": "You really should ___ before you set off. They were making a strange noise yesterday.",
+    "options": [
+      "have had the brakes checked",
+      "have the brakes checked",
+      "have checked the brakes"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Should have had the brakes checked' expresses that arranging the check would have been advisable before a past event.",
+      "Incorrect: 'Should have the brakes checked' gives present or future advice, but 'before you set off' refers here to a journey that has already begun.",
+      "Incorrect: 'Should have checked the brakes' means that you personally should have checked them rather than arranged for someone else to do so."
+    ]
+  },
+  {
+    "id": "caus_b2_05",
+    "level": "B2",
+    "tag": "Causatives",
+    "sentence": "By the time we move in, we'll ___ throughout the house.",
+    "options": [
+      "have had the wiring replaced",
+      "have the wiring replaced",
+      "have replaced the wiring"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Will have had something done' combines the future perfect with the causative and means the work will have been arranged and completed before we move in.",
+      "Incorrect: 'Will have the wiring replaced' can refer to arranging the work in the future, but it does not express completion before the future point introduced by 'by the time'.",
+      "Incorrect: 'Will have replaced the wiring' means that we ourselves will have done the electrical work."
+    ]
+  },
+  {
+    "id": "caus_b2_06",
+    "level": "B2",
+    "tag": "Causatives",
+    "sentence": "She ___ on the train while she was asleep.",
+    "options": [
+      "had her phone stolen",
+      "had stolen her phone",
+      "got someone to steal her phone"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have something done' can also describe an experience, often an unpleasant one, without implying that the person arranged it.",
+      "Incorrect: 'Had stolen her phone' is past perfect active and suggests that she had stolen her own phone.",
+      "Incorrect: 'Got someone to steal her phone' would mean that she deliberately persuaded someone to steal it."
+    ]
+  },
+  {
+    "id": "caus_b2_07",
+    "level": "B2",
+    "tag": "Causatives",
+    "sentence": "During the storm, several residents ___ by falling branches.",
+    "options": [
+      "had their cars damaged",
+      "had damaged their cars",
+      "got their cars to damage"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: Here 'had their cars damaged' describes something unfortunate that happened to the residents' cars; they did not arrange the damage.",
+      "Incorrect: 'Had damaged their cars' is past perfect active and would mean the residents themselves damaged the cars.",
+      "Incorrect: 'Get + object + to-infinitive' requires the object to perform the action, but cars cannot meaningfully 'damage' in this structure."
+    ]
+  },
+  {
+    "id": "caus_b2_08",
+    "level": "B2",
+    "tag": "Causatives",
+    "sentence": "Rather than repair the old unit ourselves, we decided to ___ professionally.",
+    "options": [
+      "have it repaired",
+      "have repaired it",
+      "get it to repair"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have it repaired' means arrange for a professional to repair the unit.",
+      "Incorrect: 'Have repaired it' is a perfect active structure and means that we have personally repaired it.",
+      "Incorrect: 'Get it to repair' would require 'it' to perform the repair rather than receive it."
+    ]
+  },
+  {
+    "id": "caus_c1_01",
+    "level": "C1",
+    "tag": "Causatives",
+    "sentence": "Within a few minutes, the comedian ___ so loudly that some of them were in tears.",
+    "options": [
+      "had the whole audience laughing",
+      "had the whole audience to laugh",
+      "had the whole audience laughed"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have + object + -ing' can describe causing someone to enter or remain in an ongoing state or activity. Here the comedian caused the audience to be laughing.",
+      "Incorrect: Causative 'have' is not followed by 'object + to-infinitive'.",
+      "Incorrect: 'Had the audience laughed' would form part of a past perfect question or conditional structure, not a causative construction."
+    ]
+  },
+  {
+    "id": "caus_c1_02",
+    "level": "C1",
+    "tag": "Causatives",
+    "sentence": "The original sitting was declared invalid, so the examining board ___ the entire paper the following week.",
+    "options": [
+      "had us resit",
+      "had us to resit",
+      "had us resat"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have + person + bare infinitive' is used when someone arranges, instructs or requires another person to perform an action.",
+      "Incorrect: Causative 'have + person' takes the infinitive without 'to'.",
+      "Incorrect: A past participle is used after 'have + thing' when the thing receives the action, as in 'have the paper marked'. Here 'us' perform the action."
+    ]
+  },
+  {
+    "id": "caus_c1_03",
+    "level": "C1",
+    "tag": "Causatives",
+    "sentence": "By the end of the workshop, the trainer ___ confidently in front of the whole group.",
+    "options": [
+      "had even the quietest participants speaking",
+      "had even the quietest participants to speak",
+      "had even the quietest participants spoken"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Had + object + -ing' presents the participants as having reached an ongoing state or level of activity as a result of the trainer's work.",
+      "Incorrect: Causative 'have' does not take 'object + to-infinitive'.",
+      "Incorrect: 'Had the participants spoken' is a past perfect structure and does not express the intended causative meaning."
+    ]
+  },
+  {
+    "id": "caus_c1_04",
+    "level": "C1",
+    "tag": "Causatives",
+    "sentence": "For a moment, his confident explanation ___ that the figures had been independently verified.",
+    "options": [
+      "had me believing",
+      "had me to believe",
+      "had me believed"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Have + object + -ing' can mean cause someone to enter a temporary mental or emotional state. His explanation caused me, for a time, to believe the claim.",
+      "Incorrect: Causative 'have' does not normally take 'object + to-infinitive'.",
+      "Incorrect: 'Had me believed' is not a valid causative pattern."
+    ]
+  },
+  {
+    "id": "caus_c1_05",
+    "level": "C1",
+    "tag": "Causatives",
+    "sentence": "I'm not going to ___ junior members of staff as though they were incompetent.",
+    "options": [
+      "have you treating",
+      "have you to treat",
+      "have you treated"
+    ],
+    "answerIndex": 0,
+    "explanations": [
+      "Correct: 'Won't/not going to have + object + -ing' can mean refuse to tolerate someone's behaviour: the speaker will not accept this treatment of junior staff.",
+      "Incorrect: Causative 'have' is not followed by 'object + to-infinitive'.",
+      "Incorrect: 'Have you treated' would normally be interpreted as a perfect or causative-passive structure and does not express refusal to tolerate ongoing behaviour."
+    ]
+  }
   ]

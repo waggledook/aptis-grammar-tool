@@ -1,6 +1,14 @@
 // src/api/grammar.js
 import itemsData from '../../scripts/grammar-items.json';
 
+const ITEM_ID_ALIASES = {
+  b1_prep_place_012: 'b1_prep_place_01',
+};
+
+function canonicalItemId(id) {
+  return ITEM_ID_ALIASES[id] || id;
+}
+
 // Keep options ↔ explanations aligned when shuffling
 function shuffleOptionsSafely(item) {
   const { options, explanations = [], answerIndex } = item;
@@ -55,7 +63,7 @@ function chooseItemsWithSeen({
       .map(shuffleOptionsSafely);
   }
 
-  const seenSet = new Set(seenIds);
+  const seenSet = new Set(seenIds.map(canonicalItemId));
 
   const unseen = items.filter(it => !seenSet.has(it.id));
   const seen   = items.filter(it =>  seenSet.has(it.id));
@@ -109,7 +117,7 @@ export async function fetchItems({
   }));
 
   if (allowedIds.length) {
-    const allowedSet = new Set(allowedIds);
+    const allowedSet = new Set(allowedIds.map(canonicalItemId));
     items = items.filter(item => allowedSet.has(item.id));
   }
 
@@ -157,7 +165,7 @@ export async function fetchItemsByIds(ids) {
     return map;
   }, {});
 
-  const chosen = ids.map(id => lookup[id]).filter(Boolean);
+  const chosen = ids.map(id => lookup[canonicalItemId(id)]).filter(Boolean);
   // Shuffle options/explanations together so they always match
   return chosen.map(shuffleOptionsSafely);
 }
