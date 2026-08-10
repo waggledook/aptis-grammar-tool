@@ -1,6 +1,7 @@
 export const SEIF_HUB_ACCESS_KEY = "seifhub";
 export const APTIS_TRAINER_ACCESS_KEY = "aptisTrainer";
 export const OTE_ACCESS_KEY = "ote";
+export const APTIS_SITE_ID = "aptis";
 
 function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);
@@ -91,7 +92,7 @@ export function getSiteVariant(locationLike = getWindowLocation()) {
   }
 
   return {
-    id: "aptis",
+    id: APTIS_SITE_ID,
     label: "Seif Aptis Trainer",
     requiresMemberAccess: false,
   };

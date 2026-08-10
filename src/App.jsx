@@ -87,6 +87,7 @@ import { collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, where } fr
 import GrammarSetRunner from "./components/grammar/GrammarSetRunner";
 import UseOfEnglishCustomQuizRunner from "./components/grammar/UseOfEnglishCustomQuizRunner.jsx";
 import GrammarReviewBeta from "./components/grammar/GrammarReviewBeta.jsx";
+import GrammarReviewNudge from "./components/grammar/GrammarReviewNudge.jsx";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 import AdminActivityLog from "./components/admin/AdminActivityLog.jsx";
 import AdminActivityCharts from "./components/admin/AdminActivityCharts";
@@ -312,7 +313,7 @@ import OteLevelTest from "./products/ote/OteLevelTest.jsx";
 import OteAdvancedLevelTest from "./products/ote/OteAdvancedLevelTest.jsx";
 import OteCourseLanding from "./products/ote/OteCourseLanding.jsx";
 import OteReadingMenu, { OteReadingPartShell } from "./products/ote/OteReadingMenu.jsx";
-import { canAccessAptisTrainer, canAccessOte, canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
+import { APTIS_SITE_ID, canAccessAptisTrainer, canAccessOte, canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 function BellIcon() {
   return (
@@ -1399,6 +1400,10 @@ return (
   )}
   </div>
 </div>}
+
+  {currentSite.id === APTIS_SITE_ID && (
+    <GrammarReviewNudge user={user} />
+  )}
 
    {/* ————— Show the right “page” ————— */}
 <Routes>

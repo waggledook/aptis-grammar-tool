@@ -42,19 +42,8 @@ const EMPTY_GRAMMAR_REVIEW_STATUS = {
   maintenance: 0,
   scheduled: 0,
   legacy: 0,
+  ready: 0,
 };
-
-function buildGrammarReviewStatus(reviewQueue = [], legacyIds = []) {
-  const activeReviewIds = new Set(reviewQueue.map((entry) => entry.itemId));
-  const uniqueLegacyIds = Array.from(new Set(legacyIds || []));
-
-  return {
-    due: reviewQueue.filter((entry) => entry.due && !entry.maintenance).length,
-    maintenance: reviewQueue.filter((entry) => entry.due && entry.maintenance).length,
-    scheduled: reviewQueue.filter((entry) => !entry.due).length,
-    legacy: uniqueLegacyIds.filter((itemId) => !activeReviewIds.has(itemId)).length,
-  };
-}
 
 function formatGrammarReviewStatus({ due, maintenance, scheduled, legacy }) {
   const parts = [];
@@ -937,8 +926,7 @@ function renderFeedbackButton(kind, submission) {
           f,
           w,
           gDash,
-          gReviewQueue,
-          gReviewLegacyIds,
+          gReviewStatus,
           gEdits,
           wP2,
           wP3,
@@ -966,8 +954,7 @@ function renderFeedbackButton(kind, submission) {
           fb.fetchRecentFavourites(8, uid),
           fb.fetchWritingP1Sessions(10, uid),
           fb.fetchGrammarDashboard(uid),
-          fb.fetchGrammarReviewQueue?.(uid) ?? Promise.resolve([]),
-          fb.fetchRecentMistakes(15, uid),
+          fb.fetchGrammarReviewSummary?.(uid) ?? Promise.resolve(EMPTY_GRAMMAR_REVIEW_STATUS),
           fb.fetchWritingP1GuideEdits(100, uid),
           fb.fetchWritingP2Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP3Submissions?.(20, uid) ?? Promise.resolve([]),
@@ -997,9 +984,7 @@ function renderFeedbackButton(kind, submission) {
         setFavourites(f);
         setWritingP1(w);
         setGrammarDash(gDash);
-        setGrammarReviewStatus(
-          buildGrammarReviewStatus(gReviewQueue || [], gReviewLegacyIds || [])
-        );
+        setGrammarReviewStatus(gReviewStatus || EMPTY_GRAMMAR_REVIEW_STATUS);
         setGuideEdits(gEdits);
         setWritingP2(wP2);
         setWritingP3(wP3);

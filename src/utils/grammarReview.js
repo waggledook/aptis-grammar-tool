@@ -133,3 +133,26 @@ export function isGrammarReviewDue(progress = {}, now = new Date()) {
 export function grammarReviewDateToMs(value) {
   return asDate(value)?.getTime() || 0;
 }
+
+export function buildGrammarReviewSummary(reviewQueue = [], legacyIds = []) {
+  const activeReviewIds = new Set(reviewQueue.map((entry) => entry.itemId));
+  const uniqueLegacyIds = Array.from(new Set(legacyIds || []));
+  const due = reviewQueue.filter(
+    (entry) => entry.due && !entry.maintenance
+  ).length;
+  const maintenance = reviewQueue.filter(
+    (entry) => entry.due && entry.maintenance
+  ).length;
+  const scheduled = reviewQueue.filter((entry) => !entry.due).length;
+  const legacy = uniqueLegacyIds.filter(
+    (itemId) => !activeReviewIds.has(itemId)
+  ).length;
+
+  return {
+    due,
+    maintenance,
+    scheduled,
+    legacy,
+    ready: due + maintenance + legacy,
+  };
+}

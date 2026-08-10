@@ -4922,6 +4922,60 @@ button.grammar-review-featured:focus-visible {
   line-height: 1.4;
 }
 
+.grammar-review-nudge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid color-mix(in srgb, #7c3aed 42%, var(--color-border));
+  border-radius: 14px;
+  background:
+    linear-gradient(110deg, rgba(124, 58, 237, 0.13), transparent 58%),
+    var(--color-surface-2);
+  box-shadow: 0 10px 24px var(--color-shadow-soft);
+}
+
+.grammar-review-nudge-copy {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+}
+
+.grammar-review-nudge-copy > span {
+  color: #a78bfa;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.grammar-review-nudge-copy strong {
+  color: var(--color-text);
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.grammar-review-nudge-copy p {
+  margin: 0;
+  color: var(--color-text-soft);
+  font-size: 0.88rem;
+  line-height: 1.4;
+}
+
+.grammar-review-nudge-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.grammar-review-nudge-actions > button {
+  min-height: 2.7rem;
+  white-space: nowrap;
+}
+
 @media (max-width: 520px) {
   .grammar-actions-primary,
   .grammar-actions-secondary {
@@ -4935,6 +4989,20 @@ button.grammar-review-featured:focus-visible {
   }
 
   .profile-grammar-review-shortcut > button {
+    width: 100%;
+  }
+
+  .grammar-review-nudge {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .grammar-review-nudge-actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .grammar-review-nudge-actions > button {
     width: 100%;
   }
 }

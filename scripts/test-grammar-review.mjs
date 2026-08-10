@@ -1,14 +1,22 @@
 import assert from "node:assert/strict";
+import { APTIS_SITE_ID, getSiteVariant } from "../src/siteConfig.js";
 import {
+  buildGrammarReviewSummary,
   getGrammarReviewTransition,
   isGrammarMaintenancePending,
   isGrammarReviewDue,
   isGrammarReviewPending,
 } from "../src/utils/grammarReview.js";
+
 import {
   formatActivityDetails,
   getActivityTypeLabel,
 } from "../src/utils/adminActivity.js";
+
+assert.equal(
+  getSiteVariant({ hostname: "localhost", pathname: "/", search: "" }).id,
+  APTIS_SITE_ID
+);
 
 const now = new Date("2026-08-09T10:00:00Z");
 const wrong = getGrammarReviewTransition(
@@ -93,6 +101,22 @@ const maintenanceReset = getGrammarReviewTransition(mastered, {
 assert.equal(maintenanceReset.reviewStage, 0);
 assert.equal(maintenanceReset.masteryStatus, "learning");
 assert.equal(maintenanceReset.maintenancePending, false);
+
+const reviewSummary = buildGrammarReviewSummary(
+  [
+    { itemId: "due-1", due: true, maintenance: false },
+    { itemId: "maintenance-1", due: true, maintenance: true },
+    { itemId: "later-1", due: false, maintenance: false },
+  ],
+  ["due-1", "legacy-1", "legacy-1", "legacy-2"]
+);
+assert.deepEqual(reviewSummary, {
+  due: 1,
+  maintenance: 1,
+  scheduled: 1,
+  legacy: 2,
+  ready: 4,
+});
 
 const practiceCorrect = getGrammarReviewTransition(wrong, {
   isCorrect: true,

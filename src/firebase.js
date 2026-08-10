@@ -50,6 +50,7 @@ import {
 import { TOPIC_DATA } from "./components/vocabulary/data/vocabTopics";
 import { getAllHubVocabThemes } from "./data/hubVocabularyActivities";
 import {
+  buildGrammarReviewSummary,
   getGrammarReviewTransition,
   grammarReviewDateToMs,
   isGrammarMaintenancePending,
@@ -5351,6 +5352,20 @@ export async function fetchGrammarReviewQueue(uid) {
       if (dueDelta) return dueDelta;
       return (Number(b.lapseCount) || 0) - (Number(a.lapseCount) || 0);
     });
+}
+
+export async function fetchGrammarReviewSummary(uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) {
+    return buildGrammarReviewSummary([], []);
+  }
+
+  const [reviewQueue, legacyIds] = await Promise.all([
+    fetchGrammarReviewQueue(realUid),
+    fetchRecentMistakes(15, realUid),
+  ]);
+
+  return buildGrammarReviewSummary(reviewQueue, legacyIds);
 }
 
 export async function fetchGrammarTrackingReconciliation(uid) {
