@@ -12,7 +12,11 @@ import {
 } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import Seo from "../components/common/Seo.jsx";
-import { logReadingGuideViewed, saveReadingProgress } from "../firebase.js";
+import {
+  logStrategyGuideCompleted,
+  logStrategyGuideViewed,
+  saveReadingProgress,
+} from "../firebase.js";
 import { getAptisReadingStrategyGuide } from "./aptisReadingStrategyGuideData.js";
 import "./aptisReadingStrategyGuide.css";
 
@@ -63,6 +67,7 @@ export default function AptisReadingStrategyGuide() {
   const guide = getAptisReadingStrategyGuide(partNumber);
   const [answers, setAnswers] = useState({});
   const completionSavedRef = useRef(false);
+  const completionLoggedRef = useRef(false);
 
   const answeredCount = Object.keys(answers).length;
   const correctCount = useMemo(
@@ -75,8 +80,27 @@ export default function AptisReadingStrategyGuide() {
     window.scrollTo({ top: 0, behavior: "auto" });
     setAnswers({});
     completionSavedRef.current = false;
-    logReadingGuideViewed({ guideId: `reading_part${guide.number}_strategy_guide` });
+    completionLoggedRef.current = false;
+    logStrategyGuideViewed({
+      skill: "reading",
+      part: guide.number,
+      guideId: `reading_part${guide.number}_strategy_guide`,
+      guideTitle: guide.title,
+    });
   }, [guide]);
+
+  useEffect(() => {
+    if (!guide || completionLoggedRef.current || answeredCount < guide.quiz.length) return;
+    completionLoggedRef.current = true;
+    logStrategyGuideCompleted({
+      skill: "reading",
+      part: guide.number,
+      guideId: `reading_part${guide.number}_strategy_guide`,
+      guideTitle: guide.title,
+      score: correctCount,
+      total: guide.quiz.length,
+    });
+  }, [answeredCount, correctCount, guide]);
 
   useEffect(() => {
     if (!guide || completionSavedRef.current || answeredCount < guide.quiz.length) return;

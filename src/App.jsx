@@ -36,6 +36,9 @@ import ReviewFavourites from './components/ReviewFavourites'
 import ReadingGuide from './reading/ReadingGuide';
 import ReadingPart3StrategyTrainer from './reading/ReadingPart3StrategyTrainer.jsx';
 import MainMenu from './components/MainMenu';
+import GrammarVocabularyMenu from './components/GrammarVocabularyMenu.jsx';
+import AptisGrammarMenu from './components/grammar/AptisGrammarMenu.jsx';
+import AptisGrammarStrategyGuide from './components/grammar/AptisGrammarStrategyGuide.jsx';
 import Profile from "./components/profile/Profile";
 import WritingMenu from './components/writing/WritingMenu';
 import WritingPartMenu from './components/writing/WritingPartMenu.jsx';
@@ -71,9 +74,9 @@ import ToastHost from './components/ToastHost';
 import Footer from "./components/common/Footer";
 import VocabularyTopics from "./components/vocabulary/VocabularyTopics";
 import { getTopicSetIds } from "./components/vocabulary/data/vocabTopics";
-import CollocationMenu from "./components/vocabulary/collocations/CollocationMenu";
 import CollocationDash from "./components/vocabulary/collocations/CollocationDash";
 import CollocationPrecisionTrainer from "./components/vocabulary/collocations/CollocationPrecisionTrainer";
+import AptisVocabularyStrategyGuide from "./components/vocabulary/AptisVocabularyStrategyGuide.jsx";
 import VocabLab from "./components/vocabulary/VocabLab";
 import SynonymTrainer from "./components/vocabulary/SynonymTrainer";
 import VocabExerciseTrainer from "./components/vocabulary/VocabExerciseTrainer.jsx";
@@ -348,19 +351,29 @@ function RequireSignedIn({ user, onSignIn, children }) {
   );
 }
 
-function AptisFullAccessOnly({ user, aptisAccess, onSignIn, title = "Full access required", children }) {
+function AptisFullAccessOnly({
+  user,
+  aptisAccess,
+  onSignIn,
+  onRequestAccess,
+  title = "Full access required",
+  description = "This activity is included with full Aptis Trainer access. Demo access stays open for the selected sample activities.",
+  children,
+}) {
   if (!aptisAccess?.isDemoMode) return <>{children}</>;
 
   return (
     <div className="game-wrapper">
       <div className="panel" style={{ marginTop: "1rem" }}>
         <h2 className="title">{title}</h2>
-        <p className="intro">
-          This activity is included with full Aptis Trainer access. Demo access stays open for the selected sample activities.
-        </p>
+        <p className="intro">{description}</p>
         {!user && onSignIn ? (
           <button className="topbar-btn" type="button" onClick={onSignIn}>
             Sign in / Sign up
+          </button>
+        ) : user && onRequestAccess ? (
+          <button className="topbar-btn" type="button" onClick={onRequestAccess}>
+            View access options
           </button>
         ) : null}
       </div>
@@ -1421,16 +1434,56 @@ return (
 
   <Route path="/aptis-access" element={<AptisAccessPage user={user} aptisAccess={aptisAccess} onSignIn={() => setShowAuth(true)} />} />
 
+  <Route
+    path="/grammar-vocabulary"
+    element={
+      <GrammarVocabularyMenu
+        user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+      />
+    }
+  />
+
   {/* ——— Grammar route ——— */}
   <Route
     path="/grammar"
-    element={isSeifHubSite ? <HubGrammarMenu /> : <GrammarPage aptisAccess={linkedAptisAccess} />}
+    element={
+      isSeifHubSite
+        ? <HubGrammarMenu />
+        : (
+          <AptisGrammarMenu
+            user={user}
+            aptisAccess={aptisAccess}
+            onSignIn={() => setShowAuth(true)}
+          />
+        )
+    }
   />
+  <Route path="/grammar/strategy-guide" element={<AptisGrammarStrategyGuide />} />
   <Route path="/grammar/aptis" element={<GrammarPage aptisAccess={linkedAptisAccess} />} />
   <Route path="/grammar/flashcards" element={<HubGrammarFlashcardsMenu user={user} />} />
   <Route path="/grammar/flashcards/:deckId" element={<HubFlashcardsDeckPlayer user={user} />} />
   <Route path="/grammar/mini-tests" element={<HubMiniGrammarTests user={user} />} />
-  <Route path="/grammar/aptis-mock" element={<HubAptisGrammarVocabularyMock />} />
+  <Route
+    path="/grammar/aptis-mock"
+    element={
+      <AptisFullAccessOnly
+        user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        onRequestAccess={() => navigate("/aptis-access")}
+        title="Aptis mock access required"
+        description="Sign in with an account that has active Aptis Trainer access to open these grammar and vocabulary mocks."
+      >
+        <HubAptisGrammarVocabularyMock
+          user={user}
+          onHome={() => navigate(siteHomePath)}
+          onProfile={() => navigate(siteProfilePath)}
+        />
+      </AptisFullAccessOnly>
+    }
+  />
   <Route
     path="/grammar/translation"
     element={
@@ -2552,6 +2605,7 @@ return (
     )
   }
 />
+<Route path="/vocabulary/strategy-guide" element={<AptisVocabularyStrategyGuide />} />
 <Route path="/vocabulary/textbook" element={<HubVocabularyA1Menu />} />
 <Route
   path="/vocabulary/textbook/mistakes"
@@ -2629,16 +2683,7 @@ return (
 
 <Route
   path="/vocabulary/collocations"
-  element={
-    <AptisFullAccessOnly
-      user={user}
-      aptisAccess={aptisAccess}
-      onSignIn={() => setShowAuth(true)}
-      title="Collocations are included with full access"
-    >
-      <CollocationMenu />
-    </AptisFullAccessOnly>
-  }
+  element={<Navigate to="/vocabulary" replace />}
 />
 
 <Route

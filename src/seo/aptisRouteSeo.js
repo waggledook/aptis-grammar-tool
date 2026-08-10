@@ -7,14 +7,24 @@ export const APTIS_ROUTE_SEO = {
       "Practise Aptis grammar, reading, writing, speaking and vocabulary online. Exam-style tasks with tips, guides and progress tracking.",
   },
   "/grammar": {
-    title: "Aptis Grammar Practice | Seif Aptis Trainer",
+    title: "Aptis Grammar Strategy and Practice | Seif Aptis Trainer",
     description:
-      "Generate Aptis-style grammar gap-fill exercises by level and topic. Practise A2-C1 grammar and review your mistakes and favourites.",
+      "Learn an effective Aptis Grammar strategy, practise gap-fill questions by level and topic, or take a complete Grammar and Vocabulary mock exam.",
+  },
+  "/grammar-vocabulary": {
+    title: "Aptis Grammar and Vocabulary | Seif Aptis Trainer",
+    description:
+      "Choose quick Aptis grammar and vocabulary training, browse practice activities, or take a complete timed mock exam.",
   },
   "/grammar/aptis": {
     title: "Aptis Grammar Gap-Fill Practice | Seif Aptis Trainer",
     description:
       "Practise Aptis-style grammar gap-fill questions with instant answers, levels, topics and review tools.",
+  },
+  "/grammar/strategy-guide": {
+    title: "Aptis Grammar Strategy Guide | Seif Aptis Trainer",
+    description:
+      "Learn how to identify grammar clues, compare answer options, check completed sentences and manage time in the Aptis Grammar section.",
   },
   "/grammar/aptis-mock": {
     title: "Aptis Grammar and Vocabulary Mock | Seif Aptis Trainer",
@@ -152,9 +162,14 @@ export const APTIS_ROUTE_SEO = {
       "Practise Aptis Listening Part 4 longer monologues with paired multiple-choice questions.",
   },
   "/vocabulary": {
-    title: "Aptis Vocabulary Practice | Seif Aptis Trainer",
+    title: "Aptis Vocabulary Strategy and Practice | Seif Aptis Trainer",
     description:
-      "Build vocabulary for Aptis through topic-based practice, synonym training, collocations and exam-style exercises.",
+      "Learn an effective Aptis Vocabulary strategy, build vocabulary by skill and complete exam-style vocabulary practice.",
+  },
+  "/vocabulary/strategy-guide": {
+    title: "Aptis Vocabulary Strategy Guide | Seif Aptis Trainer",
+    description:
+      "Learn how to approach synonyms, definitions, word-use questions and natural word combinations in the Aptis Vocabulary section.",
   },
   "/vocabulary/topics": {
     title: "Aptis Vocabulary Topics | Seif Aptis Trainer",

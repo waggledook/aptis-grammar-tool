@@ -42,8 +42,15 @@ body {
 }
 
 .App--exam {
+  width: 100vw;
+  max-width: none;
   margin: 0;
   padding: 0;
+}
+
+body:has(.App--exam) #root {
+  width: 100%;
+  max-width: none;
 }
 
 /* === CONTENT CARD === */
@@ -1482,6 +1489,10 @@ button {
 .content-container--full {
   padding-left: 16px;
   padding-right: 16px;
+}
+
+.content-container--full.content-container--exam {
+  padding: 0;
 }
 
 /* === Theme foundation overrides === */

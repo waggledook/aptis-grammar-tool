@@ -320,6 +320,8 @@ export default function Profile({
   const [speakingFeedback, setSpeakingFeedback] = useState([]);
   const [showSpeakingFeedback, setShowSpeakingFeedback] = useState(false);
   const [oteMockAttempts, setOteMockAttempts] = useState([]);
+  const [aptisMockAttempts, setAptisMockAttempts] = useState([]);
+  const [showAptisMockPanel, setShowAptisMockPanel] = useState(false);
   const [oteTrainingProgress, setOteTrainingProgress] = useState({});
   const [showOteSpeakingPanel, setShowOteSpeakingPanel] = useState(false);
   const [showOteWritingPanel, setShowOteWritingPanel] = useState(false);
@@ -946,6 +948,7 @@ function renderFeedbackButton(kind, submission) {
           specNotes,
           speakingFeedbackItems,
           oteMockRows,
+          aptisMockRows,
           vocabCounts,
           vocabMistakesArr,
           vocabPractice,
@@ -974,6 +977,7 @@ function renderFeedbackButton(kind, submission) {
           fb.fetchSpeakingSpeculationNotes?.(50, uid) ?? Promise.resolve([]),
           fb.fetchSpeakingAiFeedback?.(20, uid) ?? Promise.resolve([]),
           fb.fetchOteMockAttempts?.(20, uid) ?? Promise.resolve([]),
+          fb.fetchAptisGrammarVocabularyMockAttempts?.(50, uid) ?? Promise.resolve([]),
           fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
           fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]),
           fb.fetchVocabPracticeSummary?.(uid) ?? Promise.resolve(EMPTY_VOCAB_PRACTICE_SUMMARY),
@@ -1005,6 +1009,7 @@ function renderFeedbackButton(kind, submission) {
         setSpeakingNotes(specNotes);
         setSpeakingFeedback(speakingFeedbackItems || []);
         setOteMockAttempts(oteMockRows || []);
+        setAptisMockAttempts(aptisMockRows || []);
         setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
         setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
         setVocabPracticeSummary(vocabPractice || EMPTY_VOCAB_PRACTICE_SUMMARY);
@@ -2214,7 +2219,7 @@ const formatOteSpeakingPart = (part) => {
               <span>{vocabCollocationMistakes} mistakes</span>
             </div>
             <div className="vocab-tool-actions">
-              <button type="button" className="btn vocab-tool-btn" onClick={() => navigate("/vocabulary/collocations")}>
+              <button type="button" className="btn vocab-tool-btn" onClick={() => navigate("/vocabulary/collocations/trainer")}>
                 Open tool
               </button>
               <button
@@ -2768,6 +2773,58 @@ const formatOteSpeakingPart = (part) => {
               </li>
             );
           })}
+        </ul>
+      )}
+    </div>
+  )}
+</section>
+)}
+
+{(isSeifHubProfile || isAptisProfile) && (
+<section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
+    aria-expanded={showAptisMockPanel}
+    onClick={() => setShowAptisMockPanel((current) => !current)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      Aptis Grammar &amp; Vocabulary Mocks
+    </h3>
+
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      {new Set(aptisMockAttempts.map((attempt) => attempt.mockId).filter(Boolean)).size}/3 mocks completed
+      {aptisMockAttempts.length ? ` · ${aptisMockAttempts.length} attempt${aptisMockAttempts.length === 1 ? "" : "s"}` : ""}
+    </span>
+
+    <span className={`chev ${showAptisMockPanel ? "open" : ""}`} aria-hidden>
+      ▾
+    </span>
+  </button>
+
+  {showAptisMockPanel && (
+    <div className="panel-body">
+      {!targetUid && (
+        <div className="actions" style={{ marginBottom: ".8rem" }}>
+          <button
+            className="btn"
+            type="button"
+            onClick={() => navigate(getSitePath("/grammar/aptis-mock"))}
+          >
+            Open mock tests
+          </button>
+        </div>
+      )}
+
+      {!aptisMockAttempts.length ? (
+        <p className="muted small">No Aptis grammar and vocabulary mock attempts yet.</p>
+      ) : (
+        <ul className="wlist aptis-profile-mock-list">
+          {aptisMockAttempts.map((attempt, index) => (
+            <li key={attempt.id || `${attempt.mockId}-${index}`} className="wcard aptis-profile-mock-card">
+              <ProfileAptisMockAttemptReview attempt={attempt} />
+            </li>
+          ))}
         </ul>
       )}
     </div>
@@ -3748,6 +3805,107 @@ const formatOteSpeakingPart = (part) => {
 
 /* ---------------- styles, helpers, etc. (mostly unchanged) ---------------- */
 
+function formatAptisMockAttemptDate(value) {
+  if (value?.toDate) return value.toDate().toLocaleString();
+  if (!value) return "Date unavailable";
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+}
+
+function ProfileAptisMockReviewItem({ item, label }) {
+  return (
+    <article className={item.correct ? "is-correct" : "is-incorrect"}>
+      <div className="aptis-profile-answer-head">
+        <span>{label}</span>
+        <b>{item.correct ? "Correct" : "Review"}</b>
+      </div>
+      <strong>{item.prompt}</strong>
+      <p><b>Your answer:</b> {item.selected || "Not answered"}</p>
+      <p><b>Correct answer:</b> {item.correctValue || "—"}</p>
+      {item.explanation ? (
+        <details>
+          <summary>Why is this correct?</summary>
+          <p>{item.explanation}</p>
+        </details>
+      ) : null}
+    </article>
+  );
+}
+
+function ProfileAptisMockAttemptReview({ attempt }) {
+  const grammarItems = Array.isArray(attempt.review?.grammarItems)
+    ? attempt.review.grammarItems
+    : [];
+  const vocabularyTasks = Array.isArray(attempt.review?.vocabularyTasks)
+    ? attempt.review.vocabularyTasks
+    : [];
+  const vocabularyItems = vocabularyTasks.flatMap((task) =>
+    (task.items || []).map((item) => ({ ...item, taskType: task.type }))
+  );
+  const weaknesses = Array.isArray(attempt.grammarWeaknesses)
+    ? attempt.grammarWeaknesses.slice(0, 5)
+    : [];
+
+  return (
+    <details className="aptis-profile-mock-attempt">
+      <summary>
+        <span>
+          <strong>{attempt.mockTitle || "Aptis Grammar and Vocabulary Mock"}</strong>
+          <small>{formatAptisMockAttemptDate(attempt.submittedAt || attempt.createdAt)}</small>
+        </span>
+        <b>{attempt.score ?? 0}/{attempt.total || 50} · {attempt.percentage ?? 0}%</b>
+      </summary>
+
+      <div className="aptis-profile-mock-review">
+        <div className="aptis-profile-mock-stats">
+          <span>Grammar <b>{attempt.grammarScore ?? 0}/25</b></span>
+          <span>Vocabulary <b>{attempt.vocabularyScore ?? 0}/25</b></span>
+          <span>Answered <b>{attempt.answered ?? 0}/{attempt.total || 50}</b></span>
+        </div>
+
+        {weaknesses.length ? (
+          <p className="aptis-profile-focus">
+            <strong>Grammar areas missed:</strong>{" "}
+            {weaknesses.map((entry) => entry.target).join(" · ")}
+          </p>
+        ) : null}
+
+        {!grammarItems.length && !vocabularyItems.length ? (
+          <p className="muted small">A detailed answer snapshot is not available for this attempt.</p>
+        ) : (
+          <>
+            <details className="aptis-profile-review-section">
+              <summary>Grammar answers · {attempt.grammarScore ?? 0}/25 correct</summary>
+              <div className="aptis-profile-answer-list">
+                {grammarItems.map((item) => (
+                  <ProfileAptisMockReviewItem
+                    key={item.id || item.number}
+                    item={item}
+                    label={`Grammar ${item.number}${item.target ? ` · ${item.target}` : ""}`}
+                  />
+                ))}
+              </div>
+            </details>
+
+            <details className="aptis-profile-review-section">
+              <summary>Vocabulary answers · {attempt.vocabularyScore ?? 0}/25 correct</summary>
+              <div className="aptis-profile-answer-list">
+                {vocabularyItems.map((item) => (
+                  <ProfileAptisMockReviewItem
+                    key={`${item.taskType}-${item.number}`}
+                    item={item}
+                    label={`Vocabulary ${item.number}${item.taskType ? ` · ${item.taskType}` : ""}`}
+                  />
+                ))}
+              </div>
+            </details>
+          </>
+        )}
+      </div>
+    </details>
+  );
+}
+
 function StyleScope() {
   return (
     <style>{`
@@ -4476,6 +4634,143 @@ function StyleScope() {
   }
 }
 
+.aptis-profile-mock-list{
+  display:grid;
+  gap:10px;
+}
+
+.aptis-profile-mock-card{
+  padding:0 !important;
+  overflow:hidden;
+}
+
+.aptis-profile-mock-attempt > summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  padding:16px;
+  cursor:pointer;
+  list-style-position:inside;
+}
+
+.aptis-profile-mock-attempt > summary span{
+  display:inline-grid;
+  gap:4px;
+}
+
+.aptis-profile-mock-attempt > summary small{
+  color:var(--muted);
+}
+
+.aptis-profile-mock-attempt > summary > b{
+  flex-shrink:0;
+  padding:5px 9px;
+  border-radius:999px;
+  background:rgba(126,240,194,.12);
+  color:#9af2cf;
+}
+
+.aptis-profile-mock-review{
+  padding:0 16px 16px;
+}
+
+.aptis-profile-mock-stats{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.aptis-profile-mock-stats span{
+  padding:6px 9px;
+  border-radius:7px;
+  background:rgba(255,255,255,.05);
+}
+
+.aptis-profile-focus{
+  margin:10px 0;
+  color:var(--muted);
+  line-height:1.45;
+}
+
+.aptis-profile-review-section{
+  margin-top:10px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:9px;
+  overflow:hidden;
+}
+
+.aptis-profile-review-section > summary{
+  padding:12px 14px;
+  background:rgba(255,255,255,.04);
+  font-weight:800;
+  cursor:pointer;
+}
+
+.aptis-profile-answer-list{
+  display:grid;
+  gap:8px;
+  padding:10px;
+}
+
+.aptis-profile-answer-list > article{
+  padding:12px;
+  border:1px solid rgba(255,255,255,.1);
+  border-left:3px solid #c6a05d;
+  border-radius:7px;
+  background:rgba(255,255,255,.025);
+}
+
+.aptis-profile-answer-list > article.is-correct{
+  border-left-color:#79a887;
+}
+
+.aptis-profile-answer-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:7px;
+  color:var(--muted);
+  font-size:.86rem;
+}
+
+.aptis-profile-answer-head b{
+  padding:2px 7px;
+  border-radius:999px;
+  background:rgba(255,255,255,.07);
+  font-size:.78rem;
+}
+
+.aptis-profile-answer-list article > strong{
+  display:block;
+  margin-bottom:7px;
+  line-height:1.4;
+}
+
+.aptis-profile-answer-list article p{
+  margin:3px 0;
+  line-height:1.45;
+}
+
+.aptis-profile-answer-list article details{
+  margin-top:9px;
+  padding:8px 10px;
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:7px;
+}
+
+.aptis-profile-answer-list article details summary{
+  font-weight:800;
+  cursor:pointer;
+}
+
+.aptis-profile-answer-list article details p{
+  margin-top:8px;
+  color:var(--muted);
+}
+
 :root[data-theme="light"] .profile-page {
   --panel: var(--color-surface-2);
   --ink: var(--color-text);
@@ -4510,6 +4805,21 @@ function StyleScope() {
   border-color: var(--color-border) !important;
   color: var(--color-text) !important;
   box-shadow: 0 4px 14px var(--color-shadow-soft);
+}
+
+:root[data-theme="light"] .profile-page :is(.aptis-profile-mock-stats span, .aptis-profile-review-section > summary, .aptis-profile-answer-list > article) {
+  background:var(--color-surface-2) !important;
+  border-color:var(--color-border);
+  color:var(--color-text);
+}
+
+:root[data-theme="light"] .profile-page :is(.aptis-profile-review-section, .aptis-profile-answer-list article details) {
+  border-color:var(--color-border);
+}
+
+:root[data-theme="light"] .profile-page .aptis-profile-mock-attempt > summary > b{
+  background:#e9f4ec;
+  color:#326644 !important;
 }
 
 :root[data-theme="light"] .profile-page .subpanel:hover {

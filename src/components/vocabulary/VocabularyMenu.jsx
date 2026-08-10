@@ -1,254 +1,206 @@
-// src/components/vocabulary/VocabularyMenu.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import {
+  ArrowLeft,
+  BookOpenCheck,
+  CheckCircle2,
+  ChevronRight,
+  ClipboardCheck,
+  GraduationCap,
+  Languages,
+  Layers3,
+  Link2,
+  Zap,
+} from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import Seo from "../common/Seo.jsx";
+import { fetchAptisStrategyGuideProgress } from "../../firebase.js";
 import AptisDemoBadge from "../access/AptisDemoBadge.jsx";
+import Seo from "../common/Seo.jsx";
+import "./vocabularyMenu.css";
 
+const VOCABULARY_GUIDE_ID = "vocabulary_strategy_guide";
+
+const BUILD_ACTIVITIES = [
+  {
+    id: "topics",
+    eyebrow: "Topic practice",
+    title: "Topic Practice",
+    copy: "Study useful vocabulary by theme through flashcards, definitions, gap fills and review activities.",
+    path: "/vocabulary/topics",
+    demoAccess: "demo",
+    icon: Layers3,
+  },
+  {
+    id: "synonyms",
+    eyebrow: "Meaning practice",
+    title: "Synonym Trainer",
+    copy: "Practise closest-meaning matches with exam-style sets, favourites and mistake review.",
+    path: "/vocabulary/synonyms",
+    demoAccess: "demo",
+    icon: Languages,
+  },
+  {
+    id: "collocation-trainer",
+    eyebrow: "Precision practice",
+    title: "Collocation Trainer",
+    copy: "Choose all the natural word partnerships, review mistakes and save useful examples.",
+    path: "/vocabulary/collocations/trainer",
+    demoAccess: "locked",
+    icon: Link2,
+  },
+  {
+    id: "collocation-dash",
+    eyebrow: "Fast review game",
+    title: "Collocation Dash",
+    copy: "Build speed by matching verbs with the phrases they naturally combine with.",
+    path: "/vocabulary/collocations/dash",
+    demoAccess: "locked",
+    icon: Zap,
+  },
+];
+
+const EXAM_ACTIVITIES = [
+  {
+    id: "exercise-trainer",
+    eyebrow: "Exam-style sets",
+    title: "Vocabulary Exercise Trainer",
+    copy: "Generate mixed synonym, definition, word-use and word-combination exercises with feedback.",
+    path: "/vocabulary/exercises",
+    demoAccess: "demo",
+    icon: BookOpenCheck,
+  },
+  {
+    id: "full-mock",
+    eyebrow: "Complete mock",
+    title: "Grammar & Vocabulary Mock Exam",
+    copy: "Complete all 50 questions with the shared 25-minute time limit and exam-style navigation.",
+    path: "/grammar/aptis-mock",
+    demoAccess: "locked",
+    icon: ClipboardCheck,
+  },
+];
+
+function AccessPill({ kind, isDemoMode }) {
+  if (!isDemoMode) return null;
+  return (
+    <span className={`vocabulary-access-pill ${kind}`}>
+      {kind === "demo" ? "Demo available" : "Full access"}
+    </span>
+  );
+}
 
 export default function VocabularyMenu({ user, aptisAccess, onSignIn }) {
   const navigate = useNavigate();
   const [lockedItem, setLockedItem] = useState("");
-  const isDemoMode = !!aptisAccess?.isDemoMode;
+  const [guideComplete, setGuideComplete] = useState(false);
+  const isDemoMode = Boolean(aptisAccess?.isDemoMode);
 
-  function openCard(path, demoAccess, label) {
-    if (isDemoMode && demoAccess === "locked") {
-      setLockedItem(label);
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "auto" });
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    if (!user) {
+      setGuideComplete(false);
+      return undefined;
+    }
+
+    fetchAptisStrategyGuideProgress(VOCABULARY_GUIDE_ID)
+      .then((progress) => {
+        if (active) setGuideComplete(Boolean(progress?.completed));
+      })
+      .catch((error) => {
+        console.warn("[Aptis Vocabulary] strategy progress load failed", error);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [user]);
+
+  function openActivity(activity) {
+    if (isDemoMode && activity.demoAccess === "locked") {
+      setLockedItem(activity.title);
       return;
     }
-    navigate(path);
+    setLockedItem("");
+    navigate(activity.path);
   }
 
-  function renderAccessPill(kind) {
-    if (!isDemoMode) return null;
+  function renderActivity(activity) {
+    const ActivityIcon = activity.icon;
     return (
-      <span className={`vocab-access-pill ${kind === "demo" ? "demo" : "locked"}`}>
-        {kind === "demo" ? "Demo available" : "Full access"}
-      </span>
+      <button
+        className="menu-card vocabulary-activity-card"
+        key={activity.id}
+        type="button"
+        onClick={() => openActivity(activity)}
+      >
+        <div className="vocabulary-card-label">
+          <ActivityIcon size={25} aria-hidden="true" />
+          <span>{activity.eyebrow}</span>
+        </div>
+        <h3>{activity.title}</h3>
+        <p>{activity.copy}</p>
+        <div className="vocabulary-card-footer">
+          <AccessPill kind={activity.demoAccess} isDemoMode={isDemoMode} />
+          <strong>Open activity <ChevronRight size={17} aria-hidden="true" /></strong>
+        </div>
+      </button>
     );
   }
 
   return (
-    <div className="vocab-menu game-wrapper menu-style-hub">
+    <main className="vocabulary-hub game-wrapper hub-menu-wrapper menu-style-hub">
       <Seo
-        title="Aptis Vocabulary Practice | Seif Aptis Trainer"
-        description="Build vocabulary for Aptis through topic-based practice, synonym training, and collocation practice."
+        title="Aptis Vocabulary Strategy and Practice | Seif Aptis Trainer"
+        description="Learn an effective Aptis Vocabulary strategy, build vocabulary by skill and complete exam-style vocabulary practice."
       />
-      <header className="header">
-        <h2 className="title">Vocabulary Practice</h2>
-        <p className="intro">
-          Build your vocabulary through topics, synonym training, and collocation practice.
-        </p>
+
+      <button className="vocabulary-back" type="button" onClick={() => navigate("/grammar-vocabulary")}>
+        <ArrowLeft size={18} aria-hidden="true" /> Back to Grammar &amp; Vocabulary
+      </button>
+
+      <header className="vocabulary-header">
+        <div className="vocabulary-title-line"><Languages size={30} aria-hidden="true" /><span>Vocabulary</span></div>
+        <h1>Vocabulary strategy &amp; practice</h1>
+        <p>Learn a reliable method for the 25 vocabulary questions, then develop your range, precision and speed.</p>
       </header>
 
       <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
 
-      {isDemoMode && lockedItem ? (
-        <div className="vocab-access-prompt" role="status">
-          <strong>{lockedItem} is included with full access.</strong>
-          <p>The vocabulary demo includes Transport and Education topic practice plus a small synonym sample.</p>
+      {lockedItem ? (
+        <div className="vocabulary-access-prompt" role="status">
+          <div><strong>{lockedItem} is included with full access.</strong><p>Sign in with your academy account or use the access link above to continue.</p></div>
+          {!user && onSignIn ? <button type="button" onClick={onSignIn}>Sign in</button> : null}
         </div>
       ) : null}
 
-      <div className="cards">
+      <section className="vocabulary-section">
+        <div className="vocabulary-section-heading"><h2>Learn the method</h2><p>Understand the four question types and use the right strategy for each one.</p></div>
         <button
-          className="card menu-card"
-          onClick={() => openCard("/vocabulary/topics", "demo", "Topic Practice")}
+          className={`menu-card vocabulary-activity-card vocabulary-guide-card ${guideComplete ? "is-complete" : ""}`}
+          type="button"
+          onClick={() => navigate("/vocabulary/strategy-guide")}
         >
-          <div className="menu-card-header">
-            <h3>Topic Practice{renderAccessPill("demo")}</h3>
-          </div>
-          <p>Study words by theme (e.g. Travel, Education...).</p>
+          {guideComplete ? <CheckCircle2 className="vocabulary-complete-icon" size={23} aria-label="Completed" /> : null}
+          <div className="vocabulary-card-label"><GraduationCap size={25} aria-hidden="true" /><span>Strategy guide</span></div>
+          <h3>Vocabulary Strategy Guide</h3>
+          <p>Learn how to identify the task, use meaning and context, make confident matches and manage unknown words.</p>
+          {guideComplete ? <strong className="vocabulary-progress">Completed</strong> : null}
+          <div className="vocabulary-card-footer"><strong>Open guide <ChevronRight size={17} aria-hidden="true" /></strong></div>
         </button>
+      </section>
 
-        <button
-          className="card menu-card"
-          onClick={() => openCard("/vocabulary/exercises", "demo", "Vocabulary Exercise Trainer")}
-        >
-          <div className="menu-card-header">
-            <h3>Vocabulary Exercise Trainer{renderAccessPill("demo")}</h3>
-            <span className="soon-pill">New</span>
-          </div>
-          <p>
-            Generate mixed Aptis-style synonym, collocation, and gap-fill exercises with feedback.
-          </p>
-        </button>
+      <section className="vocabulary-section">
+        <div className="vocabulary-section-heading"><h2>Build your vocabulary</h2><p>Develop your knowledge through focused meaning, topic and word-combination practice.</p></div>
+        <div className="vocabulary-card-grid">{BUILD_ACTIVITIES.map(renderActivity)}</div>
+      </section>
 
-        {/* 🔁 Synonym Trainer */}
-        <button
-          className="card menu-card"
-          onClick={() => openCard("/vocabulary/synonyms", "demo", "Synonym Trainer")}
-        >
-          <div className="menu-card-header">
-            <h3>Synonym Trainer{renderAccessPill("demo")}</h3>
-            <span className="soon-pill">New</span>
-          </div>
-          <p>
-            Practise closest-meaning matching with exam-style sets, favourites, and mistake review.
-          </p>
-        </button>
-
-        {/* ⚙️ Collocation Trainer (LIVE) */}
-<button
-  className="card menu-card"
-  onClick={() => openCard("/vocabulary/collocations", "locked", "Collocation Trainer")}
->
-  <div className="menu-card-header">
-    <h3>Collocation Trainer{renderAccessPill("locked")}</h3>
-    <span className="uc-top-wrapper">
-              <img
-                src="/images/ui/under-construction.png"
-                alt="Under construction"
-                className="uc-top-icon"
-              />
-            </span>
-  </div>
-  <p>Practise natural word combinations and fixed expressions.</p>
-</button>
-      </div>
-
-      <button
-        className="topbar-btn"
-        onClick={() => navigate("/")}
-        style={{ marginTop: "1rem" }}
-      >
-        ← Back to main menu
-      </button>
-
-      <style>{`
-        .header { margin-bottom: 1rem; }
-        .title { font-size: 1.6rem; margin-bottom: .3rem; }
-        .intro { color: var(--color-text-soft); max-width: 640px; }
-
-        .vocab-access-prompt {
-          margin: 0 0 1rem;
-          padding: .8rem .95rem;
-          border-radius: 12px;
-          border: 1px solid color-mix(in srgb, var(--color-accent) 42%, var(--color-border));
-          background:
-            linear-gradient(100deg, color-mix(in srgb, var(--color-accent) 14%, var(--color-surface-raised)), var(--color-surface-raised));
-        }
-
-        .vocab-access-prompt strong {
-          display: block;
-          margin-bottom: .2rem;
-          color: var(--color-text);
-        }
-
-        .vocab-access-prompt p {
-          margin: 0;
-          color: var(--color-text-soft);
-          line-height: 1.38;
-          font-size: .9rem;
-        }
-
-        .cards {
-          display: grid;
-          gap: 1rem;
-          grid-template-columns: 1fr;
-        }
-        @media (min-width: 720px) {
-          .cards {
-            grid-template-columns: repeat(2, 1fr);
-          }
-        }
-
-        .card-head {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: .75rem;
-          margin-bottom: .35rem;
-        }
-
-        /* ——— Active card ——— */
-        .card h3 {
-          margin: 0;
-          font-size: 1.05rem;
-          color: var(--color-text);
-          font-weight: 600;
-          display: flex;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: .4rem;
-        }
-
-        .card p {
-          margin: 0;
-          color: var(--color-text-soft);
-          font-size: .9rem;
-          line-height: 1.4;
-        }
-
-        /* ——— Coming soon cards ——— */
-        .soon-card {
-          position: relative;
-          cursor: not-allowed;
-          opacity: 0.6;
-          background: #1a2747;
-          border: 1px dashed #3a5ba0;
-        }
-        .soon-card:hover {
-          transform: none;
-          box-shadow: none;
-          border-color: #3a5ba0;
-        }
-
-        .soon-card.tease {
-          cursor: pointer;
-          opacity: 0.85;
-          transition: transform 0.08s ease, box-shadow 0.08s ease, border-color 0.08s;
-        }
-        .soon-card.tease:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 18px rgba(0,0,0,.25);
-          border-color: #4a79d8;
-          background: #223463;
-        }
-
-        .soon-head {
-          display: flex;
-          flex-wrap: wrap;
-          align-items: baseline;
-          gap: .5rem .75rem;
-          margin-bottom: .35rem;
-        }
-
-        .soon-pill {
-          background: #24365d;
-          border: 1px solid #37598e;
-          color: #9eb7e5;
-          font-size: .75rem;
-          line-height: 1.2;
-          padding: .2rem .5rem;
-          border-radius: 999px;
-          font-weight: 600;
-          white-space: nowrap;
-        }
-
-        .vocab-access-pill {
-          display: inline-flex;
-          align-items: center;
-          padding: .18rem .48rem;
-          border-radius: 999px;
-          border: 1px solid var(--color-border);
-          color: var(--color-text-soft);
-          font-size: .68rem;
-          font-weight: 800;
-          line-height: 1.2;
-          white-space: nowrap;
-        }
-
-        .vocab-access-pill.demo {
-          border-color: color-mix(in srgb, var(--color-accent) 48%, var(--color-border));
-          background: color-mix(in srgb, var(--color-accent) 16%, transparent);
-          color: var(--color-accent);
-        }
-
-        .vocab-access-pill.locked {
-          border-color: color-mix(in srgb, #94a3b8 42%, var(--color-border));
-          background: color-mix(in srgb, #94a3b8 10%, transparent);
-        }
-      `}</style>
-    </div>
+      <section className="vocabulary-section">
+        <div className="vocabulary-section-heading"><h2>Exam-style practice</h2><p>Combine the vocabulary skills or complete the full Grammar and Vocabulary component.</p></div>
+        <div className="vocabulary-card-grid">{EXAM_ACTIVITIES.map(renderActivity)}</div>
+      </section>
+    </main>
   );
 }

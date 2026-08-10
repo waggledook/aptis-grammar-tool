@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
+import { logStrategyGuideCompleted, logStrategyGuideViewed } from "../../firebase.js";
 import { getAptisWritingStrategyGuide } from "./aptisWritingStrategyGuideData.js";
 import "../../reading/aptisReadingStrategyGuide.css";
 
@@ -63,6 +64,7 @@ export default function AptisWritingStrategyGuide() {
   const { partNumber = "" } = useParams();
   const guide = getAptisWritingStrategyGuide(partNumber);
   const [answers, setAnswers] = useState({});
+  const completionLoggedRef = useRef(false);
 
   const answeredCount = Object.keys(answers).length;
   const correctCount = useMemo(
@@ -74,7 +76,27 @@ export default function AptisWritingStrategyGuide() {
     if (!guide) return;
     window.scrollTo({ top: 0, behavior: "auto" });
     setAnswers({});
+    completionLoggedRef.current = false;
+    logStrategyGuideViewed({
+      skill: "writing",
+      part: guide.number,
+      guideId: `writing_part${guide.number}_strategy_guide`,
+      guideTitle: guide.title,
+    });
   }, [guide]);
+
+  useEffect(() => {
+    if (!guide || completionLoggedRef.current || answeredCount < guide.quiz.length) return;
+    completionLoggedRef.current = true;
+    logStrategyGuideCompleted({
+      skill: "writing",
+      part: guide.number,
+      guideId: `writing_part${guide.number}_strategy_guide`,
+      guideTitle: guide.title,
+      score: correctCount,
+      total: guide.quiz.length,
+    });
+  }, [answeredCount, correctCount, guide]);
 
   if (!guide) return <Navigate to="/writing" replace />;
 

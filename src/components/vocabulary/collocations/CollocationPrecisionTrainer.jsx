@@ -492,8 +492,8 @@ export default function CollocationPrecisionTrainer() {
       />
 
       <div className="cp-shell">
-        <button className="topbar-btn" onClick={() => navigate("/vocabulary/collocations")}>
-          ← Back to Collocations
+        <button className="topbar-btn" onClick={() => navigate("/vocabulary")}>
+          ← Back to Vocabulary
         </button>
 
         <header className="cp-header">

@@ -34,7 +34,6 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
     reading: "Reading Practice",
     speaking: "Speaking Practice",
     writing: "Writing Practice",
-    vocabulary: "Vocabulary Practice",
     listening: "Listening Practice",
   };
 
@@ -63,18 +62,18 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
       <div className="whats-new-banner">
         <div className="whats-new-copy">
           <span className="whats-new-label">What’s new</span>
-          <h3>Expanded Aptis Grammar Practice</h3>
+          <h3>Grammar &amp; Vocabulary Mock Exams</h3>
           <p>
-            Now 500+ questions, with new sets on present tenses, determiners,
-            noun agreement, used to and causatives — plus personalised review.
+            Take one of three complete timed mocks, then review every answer
+            with detailed explanations and a saved result.
           </p>
         </div>
 
         <button
           className="whats-new-btn"
-          onClick={() => navigate("/grammar")}
+          onClick={() => navigate("/grammar/aptis-mock")}
         >
-          Start grammar practice
+          Open mock exams
         </button>
       </div>
 
@@ -95,13 +94,13 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
       )}
 
       <div className="menu-grid">
-        {/* Grammar */}
-<button className="menu-card" onClick={() => navigate("/grammar")}>
+        {/* Grammar and Vocabulary */}
+<button className="menu-card" onClick={() => navigate("/grammar-vocabulary")}>
   <div className="menu-card-title-row">
-    <h3>Grammar Practice</h3>
+    <h3>Grammar &amp; Vocabulary</h3>
     {renderAccessPill("demo")}
   </div>
-  <p>Gap-fills by level & tag (A2–C1). Track mistakes & favourites.</p>
+  <p>Quick trainers, full practice areas and complete timed mock exams.</p>
 </button>
 
         {/* Reading */}
@@ -134,31 +133,10 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
   </p>
 </button>
 
-        <button className="menu-card" onClick={() => openSection("vocabulary", "/vocabulary")}>
-  <div className="menu-card-header">
-    <div className="menu-card-title-row">
-      <h3>Vocabulary Practice</h3>
-      {renderAccessPill("demo")}
-    </div>
-    <span className="soon-pill">New trainer</span>
-  </div>
-  <p>Topic practice plus Aptis-style vocabulary exercises with feedback, favourites and mistake review.</p>
-</button>
-
-
 <button className="menu-card" onClick={() => openSection("listening", "/listening")}>
-  <div className="menu-card-header">
-    <div className="menu-card-title-row">
-      <h3>Listening Practice</h3>
-      {renderAccessPill("demo")}
-    </div>
-    <span className="uc-top-wrapper">
-      <img
-        src="/images/ui/under-construction.png"
-        alt="Under construction"
-        className="uc-top-icon"
-      />
-    </span>
+  <div className="menu-card-title-row">
+    <h3>Listening Practice</h3>
+    {renderAccessPill("demo")}
   </div>
   <p>Exam-style listening tasks (Parts 1–4).</p>
 </button>

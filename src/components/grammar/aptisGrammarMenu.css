@@ -1,0 +1,219 @@
+.aptis-grammar-hub {
+  width: min(100%, 1050px);
+}
+
+.aptis-grammar-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 1.2rem;
+  padding: 0.55rem 0.75rem;
+  border: 2px solid #35508e;
+  border-radius: 10px;
+  background: #1a2847;
+  color: #eef4ff;
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.aptis-grammar-header {
+  margin-bottom: 1.2rem;
+}
+
+.aptis-grammar-title-line,
+.aptis-grammar-card-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #eef4ff;
+}
+
+.aptis-grammar-title-line {
+  font-size: 1rem;
+}
+
+.aptis-grammar-header h1 {
+  margin: 0.18rem 0 0.45rem;
+  color: #eef4ff;
+  font-size: clamp(1.75rem, 4vw, 2.4rem);
+  text-align: left;
+}
+
+.aptis-grammar-header > p {
+  max-width: 48rem;
+  margin: 0;
+  color: rgba(238, 244, 255, 0.84);
+  font-size: 1.04rem;
+  line-height: 1.5;
+}
+
+.aptis-grammar-section {
+  margin-top: 1.3rem;
+}
+
+.aptis-grammar-section-heading {
+  margin-bottom: 0.65rem;
+}
+
+.aptis-grammar-section-heading h2 {
+  margin: 0 0 0.2rem;
+  color: #eef4ff;
+  font-size: 1.3rem;
+  text-align: left;
+}
+
+.aptis-grammar-section-heading p {
+  margin: 0;
+  color: rgba(238, 244, 255, 0.76);
+}
+
+.aptis-grammar-card-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.aptis-grammar-hub .aptis-grammar-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 48rem;
+  min-height: 174px;
+  padding: 1rem 1.08rem;
+  border-radius: 16px;
+  text-align: left;
+}
+
+.aptis-grammar-card-grid .aptis-grammar-card {
+  max-width: none;
+}
+
+.aptis-grammar-card-label {
+  margin-bottom: 0.38rem;
+  font-size: 0.75rem;
+  font-weight: 850;
+  text-transform: uppercase;
+}
+
+.aptis-grammar-hub .aptis-grammar-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+  text-align: left;
+}
+
+.aptis-grammar-hub .aptis-grammar-card p {
+  font-size: 0.92rem;
+  line-height: 1.42;
+  text-align: left;
+}
+
+.aptis-grammar-card-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.18rem;
+  margin-top: auto;
+  padding-top: 0.65rem;
+  color: #ffbd38;
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.aptis-grammar-card-footer {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.6rem;
+  width: 100%;
+  margin-top: auto;
+}
+
+.aptis-grammar-card-footer .aptis-grammar-card-action {
+  margin-left: auto;
+}
+
+.aptis-grammar-access-pill {
+  display: inline-flex;
+  padding: 0.2rem 0.46rem;
+  border: 1px solid rgba(238, 244, 255, 0.3);
+  border-radius: 999px;
+  color: rgba(238, 244, 255, 0.74);
+  font-size: 0.66rem;
+  font-weight: 850;
+}
+
+.aptis-grammar-progress {
+  display: block;
+  margin-top: auto;
+  padding-top: 0.55rem;
+  color: #7ef0c2;
+  font-size: 0.78rem;
+}
+
+.aptis-grammar-hub .aptis-grammar-card.is-complete {
+  border-color: color-mix(in srgb, #22c55e 64%, #35508e);
+  box-shadow: 0 0 0 1px color-mix(in srgb, #22c55e 22%, transparent), 0 10px 24px rgba(0, 0, 0, 0.16);
+}
+
+.aptis-grammar-complete-icon {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  color: #7ef0c2 !important;
+}
+
+:root[data-theme="light"] .aptis-grammar-back {
+  border-color: rgba(53, 80, 142, 0.35);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+:root[data-theme="light"] .aptis-grammar-title-line,
+:root[data-theme="light"] .aptis-grammar-title-line svg,
+:root[data-theme="light"] .aptis-grammar-header h1,
+:root[data-theme="light"] .aptis-grammar-section-heading h2,
+:root[data-theme="light"] .aptis-grammar-card-label,
+:root[data-theme="light"] .aptis-grammar-card-label svg {
+  color: var(--color-text);
+}
+
+:root[data-theme="light"] .aptis-grammar-header > p,
+:root[data-theme="light"] .aptis-grammar-section-heading p {
+  color: var(--color-text-soft);
+}
+
+:root[data-theme="light"] .aptis-grammar-card-action {
+  color: #a76600;
+}
+
+:root[data-theme="light"] .aptis-grammar-progress,
+:root[data-theme="light"] .aptis-grammar-complete-icon {
+  color: #08734d !important;
+}
+
+:root[data-theme="light"] .aptis-grammar-hub .aptis-grammar-card.is-complete {
+  border-color: #159766;
+  box-shadow: 0 0 0 1px rgba(21, 151, 102, 0.28), 0 12px 26px rgba(21, 94, 73, 0.1);
+}
+
+:root[data-theme="light"] .aptis-grammar-access-pill {
+  border-color: rgba(53, 80, 142, 0.35);
+  color: var(--color-text-soft);
+}
+
+@media (max-width: 700px) {
+  .aptis-grammar-card-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .aptis-grammar-card-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .aptis-grammar-card-footer .aptis-grammar-card-action {
+    margin-left: 0;
+  }
+}

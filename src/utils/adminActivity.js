@@ -17,6 +17,8 @@ export const ACTIVITY_TYPE_LABELS = {
   speaking_task_completed: "Speaking Task Completed",
   vocab_flashcards_session: "Vocabulary Flashcards",
   vocab_match_session: "Vocabulary Match",
+  strategy_guide_viewed: "Strategy Guide Viewed",
+  strategy_guide_completed: "Strategy Guide Completed",
   reading_guide_viewed: "Reading Guide Viewed",
   reading_guide_clue_reveal: "Reading Guide Clue Reveal",
   reading_guide_reorder_check: "Reading Guide Check",
@@ -88,6 +90,8 @@ export const ACTIVITY_TYPE_LABELS = {
   ote_training_completed: "OTE Training Completed",
   ote_mock_started: "OTE Mock Started",
   ote_mock_completed: "OTE Mock Completed",
+  aptis_mock_started: "Aptis Grammar & Vocabulary Mock Started",
+  aptis_mock_completed: "Aptis Grammar & Vocabulary Mock Completed",
   ote_register_checked: "OTE Register Checked",
   ote_level_test_selected: "OTE Level Test Selected",
   ote_level_test_started: "OTE Level Test Started",
@@ -352,6 +356,19 @@ export function formatActivityDetails(log) {
       return joinParts([d.topic || "Unknown topic", "Flashcards", formatCount(d.totalCards, "card"), d.isAuthenticated ? "Signed in" : "Guest"]);
     case "vocab_match_session":
       return joinParts([d.topic || "Unknown topic", d.setId || "", "Match", formatCount(d.totalPairs, "pair")]);
+    case "strategy_guide_viewed":
+      return joinParts([
+        titleCaseFromSnakeCase(d.skill || "Aptis"),
+        d.part ? `Part ${d.part}` : "",
+        d.guideTitle || d.guideId || "Strategy guide",
+      ]);
+    case "strategy_guide_completed":
+      return joinParts([
+        titleCaseFromSnakeCase(d.skill || "Aptis"),
+        d.part ? `Part ${d.part}` : "",
+        d.guideTitle || d.guideId || "Strategy guide",
+        `Score ${formatScore(d.score, d.total)}`,
+      ]);
     case "reading_guide_viewed":
       return d.guideId || "Reading guide";
     case "reading_guide_clue_reveal":
@@ -627,6 +644,23 @@ export function formatActivityDetails(log) {
           : "";
       return joinParts(["OTE", d.module || "Mock", d.mockTitle || d.mockId || "Mock", d.reason || "", size]);
     }
+    case "aptis_mock_started":
+      return joinParts([
+        d.mockTitle || d.mockId || "Grammar & Vocabulary mock",
+        d.mockVersion ? `Version ${d.mockVersion}` : "",
+        typeof d.total === "number" ? formatCount(d.total, "item") : "",
+        typeof d.durationSeconds === "number" ? `Time allowed ${formatDurationSeconds(d.durationSeconds)}` : "",
+      ]);
+    case "aptis_mock_completed":
+      return joinParts([
+        d.mockTitle || d.mockId || "Grammar & Vocabulary mock",
+        `Score ${formatScore(d.score, d.total)}`,
+        typeof d.percentage === "number" ? `${d.percentage}%` : "",
+        typeof d.grammarScore === "number" ? `Grammar ${d.grammarScore}/25` : "",
+        typeof d.vocabularyScore === "number" ? `Vocabulary ${d.vocabularyScore}/25` : "",
+        typeof d.elapsedSeconds === "number" ? `Time ${formatDurationSeconds(d.elapsedSeconds)}` : "",
+        d.completionReason === "time_expired" ? "Time expired" : "Submitted",
+      ]);
     case "ote_register_checked": {
       const score =
         typeof d.score === "number" && typeof d.total === "number"

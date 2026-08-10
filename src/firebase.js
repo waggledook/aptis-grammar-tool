@@ -1076,6 +1076,88 @@ export async function logActivity(type, details = {}) {
   }
 }
 
+const STRATEGY_GUIDE_VIEW_DEDUPE_MS = 2000;
+const recentStrategyGuideViews = new Map();
+
+export async function logStrategyGuideViewed({ skill, part, guideId, guideTitle } = {}) {
+  const userId = auth.currentUser?.uid;
+  if (!userId) return;
+
+  const safeSkill = String(skill || "").toLowerCase();
+  const safePart = String(part || "");
+  const safeGuideId = String(guideId || `${safeSkill}_part${safePart}_strategy_guide`);
+  const dedupeKey = `${userId}:${safeGuideId}`;
+  const now = Date.now();
+  const previousView = recentStrategyGuideViews.get(dedupeKey);
+
+  // React StrictMode intentionally reruns mount effects in development.
+  if (previousView && now - previousView < STRATEGY_GUIDE_VIEW_DEDUPE_MS) return;
+
+  recentStrategyGuideViews.set(dedupeKey, now);
+  return logActivity("strategy_guide_viewed", {
+    skill: safeSkill,
+    part: safePart,
+    guideId: safeGuideId,
+    guideTitle: guideTitle ? String(guideTitle) : null,
+  });
+}
+
+export async function logStrategyGuideCompleted({
+  skill,
+  part,
+  guideId,
+  guideTitle,
+  score,
+  total,
+} = {}) {
+  const safeSkill = String(skill || "").toLowerCase();
+  const safePart = String(part || "");
+  return logActivity("strategy_guide_completed", {
+    skill: safeSkill,
+    part: safePart,
+    guideId: String(guideId || `${safeSkill}_part${safePart}_strategy_guide`),
+    guideTitle: guideTitle ? String(guideTitle) : null,
+    score: Number.isFinite(score) ? Math.max(0, Math.round(score)) : null,
+    total: Number.isFinite(total) ? Math.max(0, Math.round(total)) : null,
+  });
+}
+
+export async function saveAptisStrategyGuideProgress({
+  skill,
+  part,
+  guideId,
+  score,
+  total,
+} = {}) {
+  const userId = auth.currentUser?.uid;
+  if (!userId || !guideId) return;
+
+  const ref = doc(db, "users", userId, "aptisStrategyProgress", String(guideId));
+  return setDoc(
+    ref,
+    {
+      skill: String(skill || "").toLowerCase(),
+      part: String(part || ""),
+      guideId: String(guideId),
+      completed: true,
+      score: Number.isFinite(score) ? Math.max(0, Math.round(score)) : null,
+      total: Number.isFinite(total) ? Math.max(0, Math.round(total)) : null,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
+}
+
+export async function fetchAptisStrategyGuideProgress(guideId) {
+  const userId = auth.currentUser?.uid;
+  if (!userId || !guideId) return null;
+
+  const snap = await getDoc(
+    doc(db, "users", userId, "aptisStrategyProgress", String(guideId))
+  );
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
 function logOteActivity(type, details = {}) {
   return logActivity(type, {
     app: "ote",
@@ -6015,6 +6097,88 @@ export async function fetchOteMockAttempts(n = 20, uid) {
 
   const q = query(
     collection(db, "users", realUid, "oteMockAttempts"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+}
+
+export async function saveAptisGrammarVocabularyMockAttempt(payload = {}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to save this result.");
+
+  const profileSnap = await getDoc(doc(db, "users", user.uid));
+  const teacherUid = profileSnap.exists() ? profileSnap.data()?.teacherId || null : null;
+  const ref = doc(collection(db, "users", user.uid, "aptisGrammarVocabularyMockAttempts"));
+  const row = {
+    product: "aptis-general",
+    module: "grammar-vocabulary",
+    mockId: payload.mockId || "",
+    mockTitle: payload.mockTitle || "",
+    mockVersion: payload.mockVersion || "",
+    status: "submitted",
+    studentUid: user.uid,
+    studentEmail: user.email || null,
+    studentName: user.displayName || null,
+    teacherUid,
+    score: Number(payload.score || 0),
+    total: Number(payload.total || 0),
+    percentage: Number(payload.percentage || 0),
+    grammarScore: Number(payload.grammarScore || 0),
+    vocabularyScore: Number(payload.vocabularyScore || 0),
+    answered: Number(payload.answered || 0),
+    elapsedSeconds: Number(payload.elapsedSeconds || 0),
+    durationSeconds: Number(payload.durationSeconds || 0),
+    startedAtClient: payload.startedAtClient || null,
+    activitySessionId: payload.activitySessionId || null,
+    completionReason: payload.completionReason || "completed",
+    answers: payload.answers && typeof payload.answers === "object" ? payload.answers : {},
+    review: payload.review && typeof payload.review === "object" ? payload.review : {},
+    grammarWeaknesses: Array.isArray(payload.grammarWeaknesses) ? payload.grammarWeaknesses : [],
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    submittedAt: serverTimestamp(),
+  };
+
+  await setDoc(ref, row);
+  await logActivity("aptis_mock_completed", {
+    product: row.product,
+    module: row.module,
+    activitySessionId: row.activitySessionId,
+    attemptId: ref.id,
+    mockId: row.mockId,
+    mockTitle: row.mockTitle,
+    mockVersion: row.mockVersion,
+    score: row.score,
+    total: row.total,
+    percentage: row.percentage,
+    grammarScore: row.grammarScore,
+    vocabularyScore: row.vocabularyScore,
+    answered: row.answered,
+    elapsedSeconds: row.elapsedSeconds,
+    durationSeconds: row.durationSeconds,
+    completionReason: row.completionReason,
+  });
+  return ref.id;
+}
+
+export async function fetchAptisGrammarVocabularyMockAttempt(attemptId, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid || !attemptId) return null;
+
+  const snap = await getDoc(
+    doc(db, "users", realUid, "aptisGrammarVocabularyMockAttempts", attemptId)
+  );
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+}
+
+export async function fetchAptisGrammarVocabularyMockAttempts(n = 30, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const q = query(
+    collection(db, "users", realUid, "aptisGrammarVocabularyMockAttempts"),
     orderBy("createdAt", "desc"),
     limit(n)
   );
