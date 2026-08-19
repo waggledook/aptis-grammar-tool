@@ -274,6 +274,9 @@ import OteOptionJuryHost from "./products/ote/OteOptionJuryHost.jsx";
 import OteOptionJuryPlayer from "./products/ote/OteOptionJuryPlayer.jsx";
 import OteListeningLiveHost from "./products/ote/OteListeningLiveHost.jsx";
 import OteListeningLivePlayer from "./products/ote/OteListeningLivePlayer.jsx";
+import OteAdvancedReadingCohesionChallenge from "./products/ote/OteAdvancedReadingCohesionChallenge.jsx";
+import OteCohesionChallengeLiveHost from "./products/ote/OteCohesionChallengeLiveHost.jsx";
+import OteCohesionChallengeLivePlayer from "./products/ote/OteCohesionChallengeLivePlayer.jsx";
 import OteAdvancedReadingCohesionDetective from "./products/ote/OteAdvancedReadingCohesionDetective.jsx";
 import OteAdvancedReadingDistractorLaboratory from "./products/ote/OteAdvancedReadingDistractorLaboratory.jsx";
 import OteGeneralReadingCohesionDetective from "./products/ote/OteGeneralReadingCohesionDetective.jsx";
@@ -1128,7 +1131,7 @@ const [grammarTrackingContext, setGrammarTrackingContext] = useState(null);
 
         {isLinkedAptisDemoMode && (
           <div className="grammar-demo-note" role="note">
-            <strong>Grammar preview:</strong> demo mode uses a curated pool of 25 grammar items. Full access includes 400+ unique items across levels and grammar tags.
+            <strong>Grammar preview:</strong> demo mode uses a curated pool of 25 grammar items. Full access includes 500+ unique items across levels and grammar tags.
           </div>
         )}
 
@@ -1711,6 +1714,7 @@ return (
   <Route path="/ote/reading/advanced/part-4-long-text/live/option-jury" element={<RequireTeacher user={user}><OteAdvancedReadingOptionJuryLaunch user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-3-gapped-text/distractor-laboratory" element={<OteAdvancedReadingDistractorLaboratory nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-3-gapped-text/classroom-cohesion-challenge" element={<OteAdvancedReadingCohesionChallenge user={user} nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-1-short-texts/guide" element={<OteReadingPart1Guide nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-2-matching/guide/three-texts" element={<OteReadingPart2ThreeProfilesGuide nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-2-matching/guide/people-and-choices" element={<OteReadingPart2PeopleAndChoicesGuide nativeRoutes={false} />} />
@@ -1985,6 +1989,7 @@ return (
       <Route path="/reading/advanced/part-4-long-text/live/option-jury" element={<RequireTeacher user={user}><OteAdvancedReadingOptionJuryLaunch user={user} nativeRoutes /></RequireTeacher>} />
       <Route path="/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes />} />
       <Route path="/reading/advanced/part-3-gapped-text/distractor-laboratory" element={<OteAdvancedReadingDistractorLaboratory nativeRoutes />} />
+      <Route path="/reading/advanced/part-3-gapped-text/classroom-cohesion-challenge" element={<OteAdvancedReadingCohesionChallenge user={user} nativeRoutes />} />
       <Route path="/reading/general/part-1-short-texts/guide" element={<OteReadingPart1Guide nativeRoutes />} />
       <Route path="/reading/general/part-2-matching/guide/three-texts" element={<OteReadingPart2ThreeProfilesGuide nativeRoutes />} />
       <Route path="/reading/general/part-2-matching/guide/people-and-choices" element={<OteReadingPart2PeopleAndChoicesGuide nativeRoutes />} />
@@ -2999,6 +3004,8 @@ return (
 <Route path="/live/option-jury/play/:gameId" element={<OteOptionJuryPlayer />} />
 <Route path="/live/ote-listening/host/:gameId" element={<RequireTeacher user={user}><OteListeningLiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/ote-listening/play/:gameId" element={<OteListeningLivePlayer />} />
+<Route path="/live/cohesion-challenge/host/:gameId" element={<RequireTeacher user={user}><OteCohesionChallengeLiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/cohesion-challenge/play/:gameId" element={<OteCohesionChallengeLivePlayer />} />
 
 <Route
   path="/grammar-sets/:setId"

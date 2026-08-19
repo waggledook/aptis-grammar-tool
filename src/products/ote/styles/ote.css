@@ -1424,7 +1424,11 @@
 .ote-reading-gapped-text header { margin-bottom: 1rem; }.ote-reading-gapped-text h2 { margin: 0.35rem 0 0; color: #16283f; font-size: clamp(1.45rem, 2.5vw, 2rem); }.ote-reading-gapped-text > p { margin: 0 0 1rem; line-height: 1.65; }
 .ote-reading-gap { display: inline; }.ote-reading-gap > button { display: inline-block; min-width: 72px; border: 1px dashed #5e84b8; border-radius: 4px; background: #edf5ff; color: #1d518f; padding: 0.2rem 0.5rem; font: inherit; font-weight: 800; }.ote-reading-gap > button:disabled { opacity: 0.55; }
 .ote-reading-gap-answer { display: inline; border-bottom: 2px solid #6d93c4; background: #edf5ff; color: #203852; padding: 0.1rem 0.2rem; }.ote-reading-gap-answer strong { color: #174f91; }.ote-reading-gap-answer button { border: 0; background: transparent; color: inherit; vertical-align: middle; cursor: pointer; }.ote-reading-gap.is-correct .ote-reading-gap-answer { border-color: #43a86e; background: #e8f7ee; }.ote-reading-gap.is-wrong .ote-reading-gap-answer { border-color: #cd6666; background: #fff0f0; }
-.ote-reading-gap-feedback { display: block; margin: 0.55rem 0 0.75rem; border-left: 3px solid #537dac; background: #eef4fb; color: #263d5b; padding: 0.55rem 0.7rem; font-size: 0.9rem; line-height: 1.45; }.ote-reading-gap.is-correct .ote-reading-gap-feedback { border-color: #43a86e; }.ote-reading-gap.is-wrong .ote-reading-gap-feedback { border-color: #cd6666; }
+.ote-reading-gap-feedback { display: block; margin: 0.55rem 0 0.75rem; border-left: 3px solid #537dac; background: #eef4fb; color: #263d5b; padding: 0.65rem 0.75rem; font-size: 0.9rem; line-height: 1.45; }.ote-reading-gap.is-correct .ote-reading-gap-feedback { border-color: #43a86e; }.ote-reading-gap.is-wrong .ote-reading-gap-feedback { border-color: #cd6666; }
+.ote-reading-gap-feedback > strong { display: block; margin-bottom: 0.35rem; }
+.ote-reading-gap-correct-sentence { display: block; margin-bottom: 0.5rem; border: 1px solid #b9cce3; border-radius: 5px; background: #fff; color: #203852; padding: 0.55rem 0.65rem; font-size: 0.95rem; line-height: 1.5; }
+.ote-reading-gap-correct-sentence b { color: #174f91; }
+.ote-reading-gap-rationale { display: block; }
 @media (min-width: 861px) {
   .ote-reading-gapped-layout { height: min(68vh, 760px); align-items: stretch; }
   .ote-gapped-sentence-bank,
@@ -6212,6 +6216,79 @@
   margin: 0;
   color: var(--ote-dashboard-text-soft);
   line-height: 1.5;
+}
+
+.ote-teacher-practice-section {
+  border: 2px solid color-mix(in srgb, var(--ote-dashboard-accent) 58%, var(--ote-dashboard-panel-border));
+  background: color-mix(in srgb, var(--ote-dashboard-accent) 7%, var(--ote-dashboard-panel));
+}
+
+.ote-teacher-practice-heading {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.ote-teacher-practice-section .ote-practice-set-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.ote-teacher-practice-heading > svg {
+  flex: 0 0 auto;
+  margin-top: 0.15rem;
+  color: var(--ote-dashboard-accent);
+}
+
+.ote-teacher-practice-heading h2,
+.ote-teacher-practice-heading p {
+  margin: 0;
+}
+
+.ote-teacher-practice-heading .ote-kicker {
+  margin-bottom: 0.2rem;
+}
+
+.ote-teacher-practice-heading h2 {
+  color: var(--ote-dashboard-text);
+}
+
+.ote-teacher-practice-heading h2 + p {
+  margin-top: 0.35rem;
+  color: var(--ote-dashboard-text-soft);
+  line-height: 1.45;
+}
+
+.ote-practice-set-card.ote-teacher-practice-card {
+  overflow: hidden;
+  border-color: color-mix(in srgb, var(--ote-dashboard-accent) 70%, var(--ote-dashboard-panel-border));
+  background: linear-gradient(145deg, color-mix(in srgb, var(--ote-dashboard-accent) 12%, var(--ote-dashboard-panel)), var(--ote-dashboard-panel));
+}
+
+.ote-practice-set-card.ote-teacher-practice-card::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 5px;
+  background: var(--ote-dashboard-accent);
+  content: "";
+}
+
+.ote-practice-set-card.ote-teacher-practice-card > strong:not(.ote-training-complete-icon) {
+  display: inline-flex;
+  margin-top: auto;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ote-dashboard-accent) 15%, transparent);
+  color: var(--ote-dashboard-accent);
+  padding: 0.35rem 0.55rem;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.ote-practice-set-card.ote-teacher-practice-card:hover {
+  border-color: var(--ote-dashboard-accent);
 }
 
 .ote-reading-menu-progress {
@@ -11711,6 +11788,10 @@
   .ote-adventure-step:first-of-type .ote-adventure-choice-grid,
   .ote-adventure-skill-grid,
   .ote-adventure-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .ote-teacher-practice-section .ote-practice-set-grid {
     grid-template-columns: 1fr;
   }
 

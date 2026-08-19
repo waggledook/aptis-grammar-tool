@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { logOteTrainingCompleted, logOteTrainingStarted } from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
+import { advancedReadingPart3ClassroomTasks } from "./data/oteAdvancedReadingPart3ClassroomTasks.js";
 import "./styles/ote.css";
 
 const TIME_SECONDS = 11 * 60;
@@ -26,6 +27,7 @@ const rationales = {
   6: "This provides the balanced conclusion after rejecting both total dependence on apps and a return to paper maps.",
 };
 const additionalTasks = {
+  ...advancedReadingPart3ClassroomTasks,
   "c1-pilot-2": {
     title: "Why We Keep Souvenirs", heading: "Why we keep souvenirs",
     sentences: { A: "The act of selecting a future reminder can therefore alter how a person attends to the present moment.", B: "It is possible to recognise this loss as symbolic without believing that the memory itself will actually vanish.", C: "Objects help by supplying sensory and contextual clues from which a wider scene can be rebuilt.", D: "Museums perform a similar function by preserving objects that communities consider historically important.", E: "Nevertheless, commercial origin does not prevent an object from acquiring intensely personal significance.", F: "An object may evoke an entire relationship for one person because of circumstances that are invisible to everyone else.", G: "When almost every moment leaves a record, finding the few traces that still carry meaning becomes increasingly difficult." },
@@ -73,7 +75,6 @@ export default function OteAdvancedReadingPart3Practice({ user, nativeRoutes = f
   const activeAnswers = additionalTask?.answers || answers;
   const activeRationales = additionalTask?.rationales || rationales;
   const taskTitle = additionalTask?.title || "The Case for Getting Slightly Lost";
-  const taskHeading = additionalTask?.heading || "The case for getting slightly lost";
   const menuPath = getSitePath(nativeRoutes ? "/reading/advanced/part-3-gapped-text" : "/ote/reading/advanced/part-3-gapped-text");
   const [phase, setPhase] = useState("ready");
   const [placements, setPlacements] = useState({});
@@ -177,7 +178,7 @@ function Gap({ id, placement, selectedSentence, onPlace, onClear, reviewed }) {
   const correct = placement === answers[id];
   return <span className={`ote-reading-gap ${placement ? "is-filled" : ""} ${reviewed ? (correct ? "is-correct" : "is-wrong") : ""}`} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); onPlace(id, event.dataTransfer.getData("text/plain")); }}>
     {placement ? <span className="ote-reading-gap-answer"><strong>{placement}</strong> {sentences[placement]}{!reviewed ? <button type="button" onClick={() => onClear(id)} aria-label={`Remove sentence from gap ${id}`}><X size={15} /></button> : null}</span> : <button type="button" onClick={() => onPlace(id, selectedSentence)} disabled={!selectedSentence || reviewed}>Gap {id}</button>}
-    {reviewed ? <span className="ote-reading-gap-feedback"><strong>{correct ? "Correct." : `Answer: ${answers[id]}.`}</strong> {rationales[id]}</span> : null}
+    {reviewed ? <GapFeedback correct={correct} answer={answers[id]} sentence={sentences[answers[id]]} rationale={rationales[id]} /> : null}
   </span>;
 }
 
@@ -193,7 +194,15 @@ function TaskGap({ id, placement, selectedSentence, onPlace, onClear, reviewed, 
   const correct = placement === answersMap[id];
   return <span className={`ote-reading-gap ${placement ? "is-filled" : ""} ${reviewed ? (correct ? "is-correct" : "is-wrong") : ""}`} onDragOver={(event) => event.preventDefault()} onDrop={(event) => { event.preventDefault(); onPlace(id, event.dataTransfer.getData("text/plain")); }}>
     {placement ? <span className="ote-reading-gap-answer"><strong>{placement}</strong> {sentencesMap[placement]}{!reviewed ? <button type="button" onClick={() => onClear(id)} aria-label={`Remove sentence from gap ${id}`}><X size={15} /></button> : null}</span> : <button type="button" onClick={() => onPlace(id, selectedSentence)} disabled={!selectedSentence || reviewed}>Gap {id}</button>}
-    {reviewed ? <span className="ote-reading-gap-feedback"><strong>{correct ? "Correct." : `Answer: ${answersMap[id]}.`}</strong> {rationalesMap[id]}</span> : null}
+    {reviewed ? <GapFeedback correct={correct} answer={answersMap[id]} sentence={sentencesMap[answersMap[id]]} rationale={rationalesMap[id]} /> : null}
+  </span>;
+}
+
+function GapFeedback({ correct, answer, sentence, rationale }) {
+  return <span className="ote-reading-gap-feedback">
+    <strong>{correct ? "Correct." : `Correct sentence: ${answer}`}</strong>
+    {!correct ? <span className="ote-reading-gap-correct-sentence"><b>{answer}.</b> {sentence}</span> : null}
+    <span className="ote-reading-gap-rationale">{rationale}</span>
   </span>;
 }
 

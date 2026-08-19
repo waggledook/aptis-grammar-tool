@@ -14,12 +14,73 @@ function normalizeAnswer(value = "") {
     .trim()
     .toLowerCase()
     .replace(/^the\s+/, "")
+    .replace(/[-–—]/g, " ")
+    .replace(/[.,!?]/g, "")
     .replace(/\s+/g, " ")
     .replace(/[’']/g, "'");
 }
 
 function shuffle(items) {
   return [...items].sort(() => Math.random() - 0.5);
+}
+
+function shuffleDifferent(items) {
+  if (items.length < 2) return [...items];
+  const originalIds = items.map((item) => item.id);
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const shuffled = shuffle(items);
+    if (shuffled.some((item, index) => item.id !== originalIds[index])) return shuffled;
+  }
+  return [...items.slice(1), items[0]];
+}
+
+function moveItem(items, fromIndex, toIndex) {
+  if (!Number.isInteger(fromIndex) || !Number.isInteger(toIndex)) return items;
+  if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) return items;
+  if (fromIndex >= items.length || toIndex >= items.length) return items;
+  const next = [...items];
+  const [moved] = next.splice(fromIndex, 1);
+  next.splice(toIndex, 0, moved);
+  return next;
+}
+
+function getStructuredAnswer(entry) {
+  return entry?.answer || entry?.gapAnswers?.[0] || entry?.term || "";
+}
+
+function getStructuredAcceptedAnswers(entry) {
+  return [getStructuredAnswer(entry), ...(entry?.acceptedAnswers || [])]
+    .filter(Boolean)
+    .map(normalizeAnswer);
+}
+
+function getStructuredOptions(entry, items, optionLimit = 4) {
+  const correctAnswer = getStructuredAnswer(entry);
+  const configured = Array.isArray(entry?.options) ? entry.options : [];
+  const candidates = [
+    ...configured,
+    correctAnswer,
+    ...shuffle(items.filter((item) => item.id !== entry.id)).map(getStructuredAnswer),
+  ];
+  const seen = new Set();
+  const unique = candidates.filter((option) => {
+    const normalized = normalizeAnswer(option);
+    if (!normalized || seen.has(normalized)) return false;
+    seen.add(normalized);
+    return true;
+  });
+  const accepted = new Set(getStructuredAcceptedAnswers(entry));
+  if (configured.length) {
+    const configuredCorrect = unique.filter((option) => accepted.has(normalizeAnswer(option)));
+    const configuredDistractors = unique.filter((option) => !accepted.has(normalizeAnswer(option)));
+    return shuffle([
+      ...configuredCorrect,
+      ...configuredDistractors.slice(0, Math.max(0, optionLimit - configuredCorrect.length)),
+    ]);
+  }
+  const correctOption = unique.find((option) => accepted.has(normalizeAnswer(option))) || correctAnswer;
+  const distractors = unique.filter((option) => !accepted.has(normalizeAnswer(option)));
+  return shuffle([correctOption, ...distractors.slice(0, Math.max(1, optionLimit - 1))]);
 }
 
 function getActivityItems(theme, activity) {
@@ -35,7 +96,7 @@ function getActivityItems(theme, activity) {
 
 function getPrimaryLabel(entry, themeId) {
   if (themeId === "numbers") return entry.term;
-  return entry.term || entry.country || entry.phrase || "";
+  return entry.displayTerm || entry.term || entry.country || entry.phrase || "";
 }
 
 function getPromptLabel(entry, themeId) {
@@ -155,12 +216,17 @@ function getDisplayAnswer(entry, themeId, answerMode = "default") {
 }
 
 function getMistakePrompt(entry, theme, activity, answerMode = "default") {
+  if (entry.sentence) return entry.sentence;
+  if (answerMode === "clock") {
+    return `Clock showing ${String(entry.hour).padStart(2, "0")}:${String(entry.minute).padStart(2, "0")}`;
+  }
+  if (answerMode === "sequence") return entry.term || entry.phrase || activity?.title || theme.title;
   if (entry.gappedPhrase) return entry.gappedPhrase;
   if (entry.gapCueText) return entry.gapCueText;
   if (entry.cueText) return entry.cueText;
   if (entry.hotspotNumber) return `Number ${entry.hotspotNumber}`;
   if (answerMode === "nationality") return `Nationality for ${entry.country}`;
-  if (answerMode === "opposite") return `Opposite of ${entry.term}`;
+  if (answerMode === "opposite") return `Opposite of ${entry.cueText || entry.displayTerm || entry.term}`;
   if (answerMode === "plural") return `Plural of ${entry.singular || entry.term}`;
   return getPromptLabel(entry, theme.id) || activity?.title || theme.title;
 }
@@ -344,8 +410,8 @@ function FlashcardMode({ theme, items, flagMode = false, phraseMode = false, onC
               </>
             ) : (
               <>
-                <strong>{entry.term}</strong>
-                <span>{entry.pronunciation || entry.spokenLabel || entry.term}</span>
+                <strong>{entry.displayTerm || entry.term}</strong>
+                <span>{entry.pronunciation || entry.spokenLabel || entry.displayTerm || entry.term}</span>
               </>
             )}
           </div>
@@ -488,8 +554,14 @@ function MatchingMode({ theme, items, onComplete, onMistake }) {
   );
 }
 
-function ChoiceMode({ theme, items, mode = "word", onComplete, onMistake }) {
-  const [sessionItems, setSessionItems] = useState(() => shuffle(items));
+function ChoiceMode({ theme, activity, items, mode = "word", onComplete, onMistake }) {
+  const configuredLimit = Number(activity?.itemLimit);
+  const itemLimit = Number.isFinite(configuredLimit) && configuredLimit > 0 ? configuredLimit : items.length;
+  const makeSession = useCallback(
+    (source = items) => shuffle(source).slice(0, itemLimit),
+    [itemLimit, items]
+  );
+  const [sessionItems, setSessionItems] = useState(() => makeSession());
   const [reviewItems, setReviewItems] = useState(null);
   const [index, setIndex] = useState(0);
   const [choiceStatus, setChoiceStatus] = useState(null);
@@ -500,13 +572,13 @@ function ChoiceMode({ theme, items, mode = "word", onComplete, onMistake }) {
   const isGapChoiceMode = mode === "gap";
 
   useEffect(() => {
-    setSessionItems(shuffle(items));
+    setSessionItems(makeSession());
     setReviewItems(null);
     setIndex(0);
     setChoiceStatus(null);
     setMistakeItems([]);
     setIsComplete(false);
-  }, [items, mode, theme.id]);
+  }, [makeSession, mode, theme.id]);
 
   const options = useMemo(() => {
     if (isGapChoiceMode) {
@@ -544,6 +616,23 @@ function ChoiceMode({ theme, items, mode = "word", onComplete, onMistake }) {
               : entry.country
                 ? "country"
                 : "term";
+    if (Array.isArray(entry.options) && entry.options.length) {
+      const correctLabels = new Set(
+        [entry[key], ...(entry.acceptedAnswers || [])].filter(Boolean).map(normalizeAnswer)
+      );
+      const seen = new Set();
+      const configuredOptions = [entry[key], ...entry.options].filter((label) => {
+        const normalized = normalizeAnswer(label);
+        if (!normalized || seen.has(normalized)) return false;
+        seen.add(normalized);
+        return true;
+      });
+      return shuffle(configuredOptions).map((label) => ({
+        id: `${entry.id}-${normalizeAnswer(label)}`,
+        label,
+        correct: correctLabels.has(normalizeAnswer(label)),
+      }));
+    }
     const distractors = shuffle(entries.filter((item) => item.id !== entry.id)).slice(0, 3);
     return shuffle([entry, ...distractors]).map((item) => ({
       id: item.id,
@@ -582,7 +671,7 @@ function ChoiceMode({ theme, items, mode = "word", onComplete, onMistake }) {
   }
 
   function restart() {
-    setSessionItems(shuffle(items));
+    setSessionItems(makeSession());
     setReviewItems(null);
     setIndex(0);
     setChoiceStatus(null);
@@ -618,7 +707,7 @@ function ChoiceMode({ theme, items, mode = "word", onComplete, onMistake }) {
 
       <div className="hub-vocab-choice-prompt">
         {mode === "opposite" ? (
-          <strong className="hub-vocab-country-prompt">{entry.term}</strong>
+          <strong className="hub-vocab-country-prompt">{entry.cueText || entry.displayTerm || entry.term}</strong>
         ) : mode === "category" ? (
           renderVisualPrompt(entry)
         ) : mode === "plural" ? (
@@ -635,7 +724,7 @@ function ChoiceMode({ theme, items, mode = "word", onComplete, onMistake }) {
           {mode === "nationality"
             ? `What nationality is someone from ${entry.country}?`
             : mode === "opposite"
-              ? `What is the opposite of ${entry.term}?`
+              ? `What is the opposite of ${entry.cueText || entry.displayTerm || entry.term}?`
               : mode === "category"
                 ? `Is ${entry.term} food or drink?`
               : mode === "plural"
@@ -677,7 +766,7 @@ function ChoiceMode({ theme, items, mode = "word", onComplete, onMistake }) {
   );
 }
 
-function SpeakerChoiceMode({ theme, activity, items, onComplete, onMistake }) {
+function SpeakerChoiceMode({ theme, items, onComplete, onMistake }) {
   const [sessionItems, setSessionItems] = useState(() => shuffle(items));
   const [reviewItems, setReviewItems] = useState(null);
   const [index, setIndex] = useState(0);
@@ -799,7 +888,13 @@ function SpeakerChoiceMode({ theme, activity, items, onComplete, onMistake }) {
 }
 
 function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComplete, onMistake }) {
-  const [sessionItems, setSessionItems] = useState(() => shuffle(items));
+  const configuredLimit = Number(activity?.itemLimit);
+  const itemLimit = Number.isFinite(configuredLimit) && configuredLimit > 0 ? configuredLimit : items.length;
+  const makeSession = useCallback(
+    (source = items) => shuffle(source).slice(0, itemLimit),
+    [itemLimit, items]
+  );
+  const [sessionItems, setSessionItems] = useState(() => makeSession());
   const [reviewItems, setReviewItems] = useState(null);
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -819,7 +914,7 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComp
     : isOppositeMode
       ? "Opposite adjective"
     : isGapMode
-      ? "Missing words"
+      ? activity?.answerLabel || "Missing words"
     : activity?.answerLabel
       ? activity.answerLabel
     : theme.id === "numbers"
@@ -834,7 +929,7 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComp
     : isOppositeMode
       ? "Type the opposite"
     : isGapMode
-      ? "Type the missing words"
+      ? activity?.answerPlaceholder || "Type the missing words"
     : activity?.answerPlaceholder
       ? activity.answerPlaceholder
     : theme.id === "numbers"
@@ -842,14 +937,14 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComp
       : "Type the word";
 
   useEffect(() => {
-    setSessionItems(shuffle(items));
+    setSessionItems(makeSession());
     setReviewItems(null);
     setIndex(0);
     setAnswer("");
     setFeedback(null);
     setMistakeItems([]);
     setIsComplete(false);
-  }, [answerMode, items, theme.id]);
+  }, [answerMode, makeSession, theme.id]);
 
   function checkAnswer(event) {
     event.preventDefault();
@@ -883,7 +978,7 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComp
   }
 
   function restart() {
-    setSessionItems(shuffle(items));
+    setSessionItems(makeSession());
     setReviewItems(null);
     setIndex(0);
     setAnswer("");
@@ -930,7 +1025,7 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComp
             </>
           ) : isOppositeMode ? (
             <>
-              <strong className="hub-vocab-country-prompt">{entry.term}</strong>
+              <strong className="hub-vocab-country-prompt">{entry.cueText || entry.displayTerm || entry.term}</strong>
               <p>Type the opposite adjective.</p>
             </>
           ) : isGapMode ? (
@@ -989,7 +1084,7 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComp
   );
 }
 
-function PhraseGapFillMode({ theme, activity, items, onComplete, onMistake }) {
+function PhraseGapFillMode({ items, onComplete, onMistake }) {
   const gapItems = useMemo(() => items.filter((entry) => entry.gappedPhrase && entry.gapAnswers?.length), [items]);
   const [sessionItems, setSessionItems] = useState(() => shuffle(gapItems));
   const [reviewItems, setReviewItems] = useState(null);
@@ -1133,24 +1228,94 @@ function PhraseGapFillMode({ theme, activity, items, onComplete, onMistake }) {
   );
 }
 
-function HotelScene({ image, items, selectedId = null, matchedIds = [], activeId = null, onSelect = null }) {
+function getHotspotRounds(items, activity) {
+  const configuredRounds = Array.isArray(activity?.rounds) ? activity.rounds : [];
+  if (!configuredRounds.length) {
+    return [{ id: "all", title: "All words", description: "", items, viewBox: null }];
+  }
+
+  const rounds = configuredRounds.map((round, index) => {
+    const entryIds = new Set(round.entryIds || []);
+    const categories = new Set(round.categories || []);
+    const roundItems = items.filter((entry) => (
+      entryIds.has(entry.id) || categories.has(entry.category)
+    ));
+    return {
+      ...round,
+      id: round.id || `round-${index + 1}`,
+      items: roundItems,
+    };
+  }).filter((round) => round.items.length);
+
+  return rounds.length ? rounds : [{ id: "all", title: "All words", description: "", items, viewBox: null }];
+}
+
+function getRoundNumberMap(items) {
+  return Object.fromEntries(items.map((entry, index) => [entry.id, index + 1]));
+}
+
+function HotspotRoundHeader({ round, roundIndex, roundCount }) {
   return (
-    <div className="hub-vocab-hotel-scene">
-      <img src={image} alt="" draggable="false" />
+    <div className="hub-vocab-hotspot-round-header">
+      <span>Round {roundIndex + 1} of {roundCount}</span>
+      <div>
+        <strong>{round.title}</strong>
+        {round.description ? <p>{round.description}</p> : null}
+      </div>
+    </div>
+  );
+}
+
+function HotelScene({
+  image,
+  items,
+  selectedId = null,
+  matchedIds = [],
+  activeId = null,
+  onSelect = null,
+  viewBox = null,
+  numberById = null,
+}) {
+  const hasViewBox = viewBox
+    && Number(viewBox.width) > 0
+    && Number(viewBox.height) > 0;
+  const sceneStyle = hasViewBox
+    ? { aspectRatio: `${(1.5 * viewBox.width) / viewBox.height}` }
+    : undefined;
+  const imageStyle = hasViewBox
+    ? {
+      height: `${10000 / viewBox.height}%`,
+      left: `${(-viewBox.x * 100) / viewBox.width}%`,
+      position: "absolute",
+      top: `${(-viewBox.y * 100) / viewBox.height}%`,
+      width: `${10000 / viewBox.width}%`,
+    }
+    : undefined;
+
+  return (
+    <div className={`hub-vocab-hotel-scene ${hasViewBox ? "is-zoomed" : ""}`} style={sceneStyle}>
+      <img src={image} alt="" draggable="false" style={imageStyle} />
       {items.map((entry) => {
         const isMatched = matchedIds.includes(entry.id);
         const isSelected = selectedId === entry.id;
         const isActive = activeId === entry.id;
+        const left = hasViewBox
+          ? ((entry.hotspotX - viewBox.x) / viewBox.width) * 100
+          : entry.hotspotX;
+        const top = hasViewBox
+          ? ((entry.hotspotY - viewBox.y) / viewBox.height) * 100
+          : entry.hotspotY;
+        const displayNumber = numberById?.[entry.id] || entry.hotspotNumber;
         return (
           <button
             key={entry.id}
             type="button"
             className={`${isMatched ? "matched" : ""} ${isSelected ? "selected" : ""} ${isActive ? "active" : ""}`}
-            style={{ left: `${entry.hotspotX}%`, top: `${entry.hotspotY}%` }}
+            style={{ left: `${left}%`, top: `${top}%` }}
             onClick={onSelect ? () => onSelect(entry) : undefined}
-            aria-label={`Number ${entry.hotspotNumber}`}
+            aria-label={`Number ${displayNumber}`}
           >
-            {entry.hotspotNumber}
+            {displayNumber}
           </button>
         );
       })}
@@ -1159,22 +1324,32 @@ function HotelScene({ image, items, selectedId = null, matchedIds = [], activeId
 }
 
 function ImageHotspotMatchMode({ theme, items, activity, onComplete, onMistake }) {
-  const [sessionItems, setSessionItems] = useState(() => shuffle(items));
-  const [wordItems, setWordItems] = useState(() => shuffle(items));
+  const rounds = useMemo(() => getHotspotRounds(items, activity), [items, activity]);
+  const [roundIndex, setRoundIndex] = useState(0);
+  const activeRound = rounds[roundIndex] || rounds[0];
+  const [sessionItems, setSessionItems] = useState(() => shuffle(rounds[0]?.items || items));
+  const [wordItems, setWordItems] = useState(() => shuffle(rounds[0]?.items || items));
   const [selectedHotspot, setSelectedHotspot] = useState(null);
   const [matchedIds, setMatchedIds] = useState([]);
+  const [completedIds, setCompletedIds] = useState([]);
   const [mistakeItems, setMistakeItems] = useState([]);
   const [status, setStatus] = useState("");
-  const isComplete = matchedIds.length === sessionItems.length && sessionItems.length > 0;
+  const isRoundComplete = matchedIds.length === sessionItems.length && sessionItems.length > 0;
+  const isFinalRound = roundIndex === rounds.length - 1;
+  const isComplete = isRoundComplete && isFinalRound;
+  const numberById = useMemo(() => getRoundNumberMap(activeRound.items), [activeRound]);
 
   useEffect(() => {
-    setSessionItems(shuffle(items));
-    setWordItems(shuffle(items));
+    const firstRoundItems = rounds[0]?.items || items;
+    setRoundIndex(0);
+    setSessionItems(shuffle(firstRoundItems));
+    setWordItems(shuffle(firstRoundItems));
     setSelectedHotspot(null);
     setMatchedIds([]);
+    setCompletedIds([]);
     setMistakeItems([]);
     setStatus("");
-  }, [items, theme.id]);
+  }, [items, rounds, theme.id]);
 
   function chooseWord(entry) {
     if (!selectedHotspot || matchedIds.includes(entry.id)) return;
@@ -1193,19 +1368,42 @@ function ImageHotspotMatchMode({ theme, items, activity, onComplete, onMistake }
   }
 
   function restart() {
-    setSessionItems(shuffle(items));
-    setWordItems(shuffle(items));
+    const firstRoundItems = rounds[0]?.items || items;
+    setRoundIndex(0);
+    setSessionItems(shuffle(firstRoundItems));
+    setWordItems(shuffle(firstRoundItems));
     setSelectedHotspot(null);
     setMatchedIds([]);
+    setCompletedIds([]);
     setMistakeItems([]);
+    setStatus("");
+  }
+
+  function restartRound() {
+    setSessionItems(shuffle(activeRound.items));
+    setWordItems(shuffle(activeRound.items));
+    setSelectedHotspot(null);
+    setMatchedIds([]);
+    setStatus("");
+  }
+
+  function continueToNextRound() {
+    const nextRoundIndex = roundIndex + 1;
+    const nextRound = rounds[nextRoundIndex];
+    setCompletedIds((prev) => dedupeById([...prev, ...sessionItems]));
+    setRoundIndex(nextRoundIndex);
+    setSessionItems(shuffle(nextRound.items));
+    setWordItems(shuffle(nextRound.items));
+    setSelectedHotspot(null);
+    setMatchedIds([]);
     setStatus("");
   }
 
   if (isComplete) {
     return (
       <ActivityCompleteCard
-        title="Room matching complete"
-        total={sessionItems.length}
+        title="House matching complete"
+        total={items.length}
         mistakes={dedupeById(mistakeItems)}
         onRestart={restart}
         onReviewMistakes={null}
@@ -1214,21 +1412,38 @@ function ImageHotspotMatchMode({ theme, items, activity, onComplete, onMistake }
     );
   }
 
+  if (isRoundComplete) {
+    return (
+      <section className="hub-vocab-practice-card hub-vocab-hotspot-card">
+        <HotspotRoundHeader round={activeRound} roundIndex={roundIndex} roundCount={rounds.length} />
+        <div className="hub-vocab-round-complete">
+          <span aria-hidden="true">✓</span>
+          <strong>{activeRound.title} complete</strong>
+          <p>{completedIds.length + sessionItems.length} of {items.length} house words finished.</p>
+          <button type="button" onClick={continueToNextRound}>Continue to {rounds[roundIndex + 1].title}</button>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="hub-vocab-practice-card hub-vocab-hotspot-card">
+      <HotspotRoundHeader round={activeRound} roundIndex={roundIndex} roundCount={rounds.length} />
       <ProgressLine
         current={matchedIds.length}
         total={sessionItems.length}
         label="matched"
-        action={<button type="button" onClick={restart}>New round</button>}
+        action={<button type="button" onClick={restartRound}>Restart round</button>}
       />
 
-      <div className="hub-vocab-hotspot-layout">
+      <div className={`hub-vocab-hotspot-layout ${activeRound.viewBox ? "is-zoomed-layout" : ""}`}>
         <HotelScene
           image={activity?.sceneImage || theme.sceneImage}
           items={sessionItems}
           selectedId={selectedHotspot?.id}
           matchedIds={matchedIds}
+          viewBox={activeRound.viewBox}
+          numberById={numberById}
           onSelect={(entry) => {
             if (matchedIds.includes(entry.id)) return;
             setSelectedHotspot(entry);
@@ -1260,7 +1475,12 @@ function ImageHotspotMatchMode({ theme, items, activity, onComplete, onMistake }
 }
 
 function ImageHotspotTypeMode({ theme, items, activity, onComplete, onMistake }) {
-  const [sessionItems, setSessionItems] = useState(() => shuffle(items));
+  const rounds = useMemo(() => getHotspotRounds(items, activity), [items, activity]);
+  const makeSession = useCallback(
+    () => rounds.flatMap((round) => shuffle(round.items)),
+    [rounds]
+  );
+  const [sessionItems, setSessionItems] = useState(() => rounds.flatMap((round) => shuffle(round.items)));
   const [reviewItems, setReviewItems] = useState(null);
   const [index, setIndex] = useState(0);
   const [answer, setAnswer] = useState("");
@@ -1269,16 +1489,20 @@ function ImageHotspotTypeMode({ theme, items, activity, onComplete, onMistake })
   const [isComplete, setIsComplete] = useState(false);
   const activeItems = reviewItems || sessionItems;
   const entry = activeItems[index % activeItems.length];
+  const activeRoundIndex = Math.max(0, rounds.findIndex((round) => round.items.some((item) => item.id === entry?.id)));
+  const activeRound = rounds[activeRoundIndex] || rounds[0];
+  const numberById = useMemo(() => getRoundNumberMap(activeRound.items), [activeRound]);
+  const displayNumber = entry ? numberById[entry.id] : null;
 
   useEffect(() => {
-    setSessionItems(shuffle(items));
+    setSessionItems(makeSession());
     setReviewItems(null);
     setIndex(0);
     setAnswer("");
     setFeedback(null);
     setMistakeItems([]);
     setIsComplete(false);
-  }, [items, theme.id]);
+  }, [items, makeSession, theme.id]);
 
   useEffect(() => {
     if (feedback !== "correct") return undefined;
@@ -1311,7 +1535,7 @@ function ImageHotspotTypeMode({ theme, items, activity, onComplete, onMistake })
   }
 
   function restart() {
-    setSessionItems(shuffle(items));
+    setSessionItems(makeSession());
     setReviewItems(null);
     setIndex(0);
     setAnswer("");
@@ -1347,12 +1571,19 @@ function ImageHotspotTypeMode({ theme, items, activity, onComplete, onMistake })
 
   return (
     <section className="hub-vocab-practice-card hub-vocab-hotspot-card">
+      <HotspotRoundHeader round={activeRound} roundIndex={activeRoundIndex} roundCount={rounds.length} />
       <ProgressLine current={index + 1} total={activeItems.length} label="questions" />
 
       <form className="hub-vocab-type-form" onSubmit={checkAnswer}>
         <div className="hub-vocab-choice-prompt">
-          <HotelScene image={activity?.sceneImage || theme.sceneImage} items={items} activeId={entry.id} />
-          <p>Type the word for number <strong>{entry.hotspotNumber}</strong>.</p>
+          <HotelScene
+            image={activity?.sceneImage || theme.sceneImage}
+            items={activeRound.items}
+            activeId={entry.id}
+            viewBox={activeRound.viewBox}
+            numberById={numberById}
+          />
+          <p>Type the word for number <strong>{displayNumber}</strong>.</p>
         </div>
 
         <label>
@@ -1391,7 +1622,7 @@ function ImageHotspotTypeMode({ theme, items, activity, onComplete, onMistake })
   );
 }
 
-function ArticleChoiceMode({ theme, activity, items, onComplete, onMistake }) {
+function ArticleChoiceMode({ theme, items, onComplete, onMistake }) {
   const [sessionItems, setSessionItems] = useState(() => shuffle(items.filter((entry) => entry.article)));
   const [reviewItems, setReviewItems] = useState(null);
   const [index, setIndex] = useState(0);
@@ -1508,6 +1739,532 @@ function ArticleChoiceMode({ theme, activity, items, onComplete, onMistake }) {
   );
 }
 
+function EmptyActivityCard({ message = "This activity does not have any items yet." }) {
+  return (
+    <section className="hub-vocab-practice-card hub-vocab-empty-card">
+      <strong>Activity unavailable</strong>
+      <p>{message}</p>
+    </section>
+  );
+}
+
+function CategorySortMode({ theme, activity, items, onComplete, onMistake }) {
+  const categoryKey = activity.categoryKey || "category";
+  const categories = useMemo(() => {
+    if (Array.isArray(activity.categories) && activity.categories.length) {
+      return activity.categories.filter((category) => category?.id && category?.label);
+    }
+    return [...new Set(items.map((entry) => entry?.[categoryKey]).filter(Boolean))].map((value) => ({
+      id: value,
+      label: value,
+    }));
+  }, [activity.categories, categoryKey, items]);
+  const categoryIds = useMemo(() => new Set(categories.map((category) => category.id)), [categories]);
+  const eligibleItems = useMemo(
+    () => items.filter((entry) => entry?.id && categoryIds.has(entry?.[categoryKey])),
+    [categoryIds, categoryKey, items]
+  );
+  const itemLimit = Math.max(1, Number(activity.itemLimit) || 12);
+  const makeSession = useCallback(
+    (source = eligibleItems) => shuffle(source).slice(0, itemLimit),
+    [eligibleItems, itemLimit]
+  );
+  const [sessionItems, setSessionItems] = useState(() => makeSession());
+  const [reviewItems, setReviewItems] = useState(null);
+  const [index, setIndex] = useState(0);
+  const [feedback, setFeedback] = useState(null);
+  const [mistakeItems, setMistakeItems] = useState([]);
+  const [isComplete, setIsComplete] = useState(false);
+  const activeItems = reviewItems || sessionItems;
+  const entry = activeItems[index];
+  const next = useCallback(() => {
+    setFeedback(null);
+    if (index >= activeItems.length - 1) {
+      setIsComplete(true);
+      return;
+    }
+    setIndex((previous) => previous + 1);
+  }, [activeItems.length, index]);
+
+  useEffect(() => {
+    setSessionItems(makeSession());
+    setReviewItems(null);
+    setIndex(0);
+    setFeedback(null);
+    setMistakeItems([]);
+    setIsComplete(false);
+  }, [makeSession, theme.id]);
+
+  useEffect(() => {
+    if (feedback?.status !== "correct") return undefined;
+    const timer = window.setTimeout(next, 700);
+    return () => window.clearTimeout(timer);
+  }, [feedback, next]);
+
+  function choose(category) {
+    if (!entry || feedback) return;
+    const expectedId = entry[categoryKey];
+    const correctCategory = categories.find((item) => item.id === expectedId);
+    if (category.id === expectedId) {
+      setFeedback({ status: "correct", selectedId: category.id, correctId: expectedId });
+      return;
+    }
+    setMistakeItems((previous) => dedupeById([...previous, entry]));
+    onMistake?.(entry, {
+      userAnswer: category.label,
+      correctAnswer: correctCategory?.label || expectedId,
+      answerMode: "category",
+    });
+    setFeedback({ status: "wrong", selectedId: category.id, correctId: expectedId });
+  }
+
+  function restart() {
+    setSessionItems(makeSession());
+    setReviewItems(null);
+    setIndex(0);
+    setFeedback(null);
+    setMistakeItems([]);
+    setIsComplete(false);
+  }
+
+  function reviewMistakes() {
+    setReviewItems(dedupeById(mistakeItems));
+    setIndex(0);
+    setFeedback(null);
+    setMistakeItems([]);
+    setIsComplete(false);
+  }
+
+  if (!categories.length || !eligibleItems.length) {
+    return <EmptyActivityCard message={`Add categories and entries with a ${categoryKey} field to use this activity.`} />;
+  }
+
+  if (isComplete) {
+    return (
+      <ActivityCompleteCard
+        title={reviewItems ? "Mistake review complete" : "Sorting set complete"}
+        total={activeItems.length}
+        mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
+        onRestart={restart}
+        onReviewMistakes={reviewMistakes}
+        onComplete={reviewItems ? null : onComplete}
+      />
+    );
+  }
+
+  return (
+    <section className="hub-vocab-practice-card">
+      <ProgressLine current={index + 1} total={activeItems.length} label="items" />
+      <div className="hub-vocab-choice-prompt">
+        {activity.promptKey && entry[activity.promptKey] ? (
+          <strong className="hub-vocab-structured-prompt">{entry[activity.promptKey]}</strong>
+        ) : entry.image ? renderVisualPrompt(entry) : (
+          <strong className="hub-vocab-structured-prompt">{entry.term || entry.phrase}</strong>
+        )}
+        <p>{activity.prompt || "Choose the correct category."}</p>
+      </div>
+      <div className="hub-vocab-category-grid">
+        {categories.map((category) => (
+          <button
+            key={category.id}
+            type="button"
+            disabled={Boolean(feedback)}
+            className={
+              feedback?.correctId === category.id
+                ? "correct"
+                : feedback?.selectedId === category.id
+                  ? "wrong"
+                  : feedback
+                    ? "dimmed"
+                    : ""
+            }
+            onClick={() => choose(category)}
+          >
+            {category.label}
+          </button>
+        ))}
+      </div>
+      {feedback ? (
+        <div className={`hub-vocab-feedback ${feedback.status}`}>
+          <span>
+            {feedback.status === "correct"
+              ? "Correct. Next one coming..."
+              : <>Answer: <strong>{categories.find((category) => category.id === feedback.correctId)?.label}</strong></>}
+          </span>
+          {feedback.status === "wrong" ? <button type="button" onClick={next}>Next</button> : null}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function ClockFace({ hour, minute }) {
+  const safeHour = Number(hour) || 0;
+  const safeMinute = Number(minute) || 0;
+  const hourAngle = ((safeHour % 12) * 30 + safeMinute * 0.5) * (Math.PI / 180);
+  const minuteAngle = safeMinute * 6 * (Math.PI / 180);
+  const handEnd = (angle, length) => ({
+    x: 100 + Math.sin(angle) * length,
+    y: 100 - Math.cos(angle) * length,
+  });
+  const hourEnd = handEnd(hourAngle, 48);
+  const minuteEnd = handEnd(minuteAngle, 70);
+
+  return (
+    <div className="hub-vocab-clock" role="img" aria-label="Analogue clock">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <circle className="clock-face" cx="100" cy="100" r="92" />
+        {Array.from({ length: 60 }, (_, index) => {
+          const angle = index * 6 * (Math.PI / 180);
+          const isHour = index % 5 === 0;
+          const outer = handEnd(angle, 84);
+          const inner = handEnd(angle, isHour ? 72 : 79);
+          return (
+            <line
+              key={index}
+              className={isHour ? "clock-mark hour" : "clock-mark"}
+              x1={inner.x}
+              y1={inner.y}
+              x2={outer.x}
+              y2={outer.y}
+            />
+          );
+        })}
+        <line className="clock-hand hour" x1="100" y1="100" x2={hourEnd.x} y2={hourEnd.y} />
+        <line className="clock-hand minute" x1="100" y1="100" x2={minuteEnd.x} y2={minuteEnd.y} />
+        <circle className="clock-pin" cx="100" cy="100" r="5" />
+      </svg>
+    </div>
+  );
+}
+
+function StructuredQuestionMode({ theme, activity, items, promptType, inputMode, onComplete, onMistake }) {
+  const eligibleItems = useMemo(
+    () => items.filter((entry) => {
+      if (!entry?.id || !getStructuredAnswer(entry)) return false;
+      return promptType === "clock"
+        ? Number.isFinite(Number(entry.hour)) && Number.isFinite(Number(entry.minute))
+        : Boolean(entry.sentence);
+    }),
+    [items, promptType]
+  );
+  const configuredLimit = Number(activity?.itemLimit);
+  const itemLimit = Number.isFinite(configuredLimit) && configuredLimit > 0
+    ? configuredLimit
+    : eligibleItems.length;
+  const makeSession = useCallback(
+    (source = eligibleItems) => shuffle(source).slice(0, itemLimit),
+    [eligibleItems, itemLimit]
+  );
+  const [sessionItems, setSessionItems] = useState(() => makeSession());
+  const [reviewItems, setReviewItems] = useState(null);
+  const [index, setIndex] = useState(0);
+  const [answer, setAnswer] = useState("");
+  const [feedback, setFeedback] = useState(null);
+  const [mistakeItems, setMistakeItems] = useState([]);
+  const [isComplete, setIsComplete] = useState(false);
+  const activeItems = reviewItems || sessionItems;
+  const entry = activeItems[index];
+  const options = useMemo(
+    () => entry ? getStructuredOptions(entry, eligibleItems, Number(activity.optionCount) || 4) : [],
+    [activity.optionCount, eligibleItems, entry]
+  );
+  const next = useCallback(() => {
+    setAnswer("");
+    setFeedback(null);
+    if (index >= activeItems.length - 1) {
+      setIsComplete(true);
+      return;
+    }
+    setIndex((previous) => previous + 1);
+  }, [activeItems.length, index]);
+
+  useEffect(() => {
+    setSessionItems(makeSession());
+    setReviewItems(null);
+    setIndex(0);
+    setAnswer("");
+    setFeedback(null);
+    setMistakeItems([]);
+    setIsComplete(false);
+  }, [inputMode, makeSession, promptType, theme.id]);
+
+  useEffect(() => {
+    if (feedback?.status !== "correct") return undefined;
+    const timer = window.setTimeout(next, 700);
+    return () => window.clearTimeout(timer);
+  }, [feedback, next]);
+
+  function recordWrong(userAnswer) {
+    setMistakeItems((previous) => dedupeById([...previous, entry]));
+    onMistake?.(entry, {
+      userAnswer,
+      correctAnswer: getStructuredAnswer(entry),
+      answerMode: promptType === "clock" ? "clock" : "sentence-gap",
+    });
+  }
+
+  function choose(option) {
+    if (feedback) return;
+    const correct = getStructuredAcceptedAnswers(entry).includes(normalizeAnswer(option));
+    if (!correct) recordWrong(option);
+    setFeedback({ status: correct ? "correct" : "wrong", selected: option });
+  }
+
+  function checkAnswer(event) {
+    event.preventDefault();
+    if (feedback) return;
+    const correct = getStructuredAcceptedAnswers(entry).includes(normalizeAnswer(answer));
+    if (!correct) recordWrong(answer);
+    setFeedback({ status: correct ? "correct" : "wrong" });
+  }
+
+  function restart() {
+    setSessionItems(makeSession());
+    setReviewItems(null);
+    setIndex(0);
+    setAnswer("");
+    setFeedback(null);
+    setMistakeItems([]);
+    setIsComplete(false);
+  }
+
+  function reviewMistakes() {
+    setReviewItems(dedupeById(mistakeItems));
+    setIndex(0);
+    setAnswer("");
+    setFeedback(null);
+    setMistakeItems([]);
+    setIsComplete(false);
+  }
+
+  if (!eligibleItems.length) {
+    return (
+      <EmptyActivityCard
+        message={promptType === "clock"
+          ? "Add items with hour, minute, answer and acceptedAnswers fields to use this activity."
+          : "Add items with sentence, answer and acceptedAnswers fields to use this activity."}
+      />
+    );
+  }
+
+  if (isComplete) {
+    return (
+      <ActivityCompleteCard
+        title={reviewItems ? "Mistake review complete" : "Set complete"}
+        total={activeItems.length}
+        mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
+        onRestart={restart}
+        onReviewMistakes={reviewMistakes}
+        onComplete={reviewItems ? null : onComplete}
+      />
+    );
+  }
+
+  const prompt = (
+    <div className="hub-vocab-choice-prompt">
+      {promptType === "clock" ? (
+        <ClockFace hour={entry.hour} minute={entry.minute} />
+      ) : (
+        <>
+          {entry.image ? renderVisualPrompt(entry) : null}
+          <strong className="hub-vocab-structured-prompt">{entry.sentence}</strong>
+        </>
+      )}
+      <p>{activity.question || (promptType === "clock" ? "What time is it?" : "Complete the sentence.")}</p>
+    </div>
+  );
+
+  return (
+    <section className="hub-vocab-practice-card">
+      <ProgressLine current={index + 1} total={activeItems.length} label="questions" />
+      {inputMode === "choice" ? (
+        <>
+          {prompt}
+          <div className="hub-vocab-choice-grid">
+            {options.map((option) => {
+              const isCorrectOption = getStructuredAcceptedAnswers(entry).includes(normalizeAnswer(option));
+              return (
+                <button
+                  key={option}
+                  type="button"
+                  disabled={Boolean(feedback)}
+                  className={
+                    feedback && isCorrectOption
+                      ? "correct"
+                      : feedback?.selected === option
+                        ? "wrong"
+                        : feedback
+                          ? "dimmed"
+                          : ""
+                  }
+                  onClick={() => choose(option)}
+                >
+                  {option}
+                </button>
+              );
+            })}
+          </div>
+        </>
+      ) : (
+        <form className="hub-vocab-type-form" onSubmit={checkAnswer}>
+          {prompt}
+          <label>
+            <span>{activity.answerLabel || (promptType === "clock" ? "Time in words" : "Missing word or phrase")}</span>
+            <input
+              value={answer}
+              onChange={(event) => {
+                setAnswer(event.target.value);
+                if (feedback?.status === "wrong") setFeedback(null);
+              }}
+              placeholder={activity.answerPlaceholder || (promptType === "clock" ? "It's ..." : "Type the missing word or phrase")}
+              autoComplete="off"
+              autoFocus
+            />
+          </label>
+          <div className="hub-vocab-runner-actions">
+            <button type="submit">Check</button>
+            <button type="button" onClick={next}>Skip / next</button>
+          </div>
+        </form>
+      )}
+      {feedback ? (
+        <div className={`hub-vocab-feedback ${feedback.status}`}>
+          <span>
+            {feedback.status === "correct"
+              ? "Correct. Next one coming..."
+              : <>Answer: <strong>{getStructuredAnswer(entry)}</strong></>}
+          </span>
+          {feedback.status === "wrong" ? <button type="button" onClick={next}>Next</button> : null}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+function SequenceOrderMode({ theme, activity, items, onComplete, onMistake }) {
+  const correctItems = useMemo(() => {
+    if (Array.isArray(activity.sequence) && activity.sequence.length) {
+      const byId = new Map(items.map((entry) => [entry.id, entry]));
+      return activity.sequence.map((id) => byId.get(id)).filter(Boolean);
+    }
+    if (items.some((entry) => Number.isFinite(Number(entry.sequenceOrder)))) {
+      return [...items]
+        .filter((entry) => Number.isFinite(Number(entry.sequenceOrder)))
+        .sort((left, right) => Number(left.sequenceOrder) - Number(right.sequenceOrder));
+    }
+    return [...items];
+  }, [activity.sequence, items]);
+  const [orderedItems, setOrderedItems] = useState(() => shuffleDifferent(correctItems));
+  const [feedback, setFeedback] = useState(null);
+  const [mistakeItems, setMistakeItems] = useState([]);
+  const [reportedIds, setReportedIds] = useState(() => new Set());
+  const [isComplete, setIsComplete] = useState(false);
+
+  useEffect(() => {
+    setOrderedItems(shuffleDifferent(correctItems));
+    setFeedback(null);
+    setMistakeItems([]);
+    setReportedIds(new Set());
+    setIsComplete(false);
+  }, [correctItems, theme.id]);
+
+  function reorder(fromIndex, toIndex) {
+    setOrderedItems((previous) => moveItem(previous, fromIndex, toIndex));
+    setFeedback(null);
+  }
+
+  function checkOrder() {
+    const nextFeedback = orderedItems.map((entry, index) => entry.id === correctItems[index]?.id);
+    const misplaced = orderedItems.filter((entry, index) => !nextFeedback[index]);
+    setFeedback(nextFeedback);
+    if (!misplaced.length) {
+      setIsComplete(true);
+      return;
+    }
+    setMistakeItems((previous) => dedupeById([...previous, ...misplaced]));
+    const nextReported = new Set(reportedIds);
+    misplaced.forEach((entry) => {
+      if (nextReported.has(entry.id)) return;
+      const currentPosition = orderedItems.findIndex((item) => item.id === entry.id);
+      const expectedPosition = correctItems.findIndex((item) => item.id === entry.id);
+      onMistake?.(entry, {
+        userAnswer: `Position ${currentPosition + 1}`,
+        correctAnswer: `Position ${expectedPosition + 1}`,
+        answerMode: "sequence",
+      });
+      nextReported.add(entry.id);
+    });
+    setReportedIds(nextReported);
+  }
+
+  function restart() {
+    setOrderedItems(shuffleDifferent(correctItems));
+    setFeedback(null);
+    setMistakeItems([]);
+    setReportedIds(new Set());
+    setIsComplete(false);
+  }
+
+  if (correctItems.length < 2) {
+    return <EmptyActivityCard message="Add a sequence of at least two entry IDs, or sequenceOrder values, to use this activity." />;
+  }
+
+  if (isComplete) {
+    return (
+      <ActivityCompleteCard
+        title="Sequence complete"
+        total={correctItems.length}
+        mistakes={dedupeById(mistakeItems)}
+        onRestart={restart}
+        onReviewMistakes={null}
+        onComplete={onComplete}
+      />
+    );
+  }
+
+  return (
+    <section className="hub-vocab-practice-card">
+      <ProgressLine current={feedback?.filter(Boolean).length || 0} total={correctItems.length} label="in the right place" />
+      <p className="hub-vocab-sequence-instructions">
+        {activity.prompt || "Drag the items into order, or use the arrow buttons."}
+      </p>
+      <ol className="hub-vocab-sequence-list">
+        {orderedItems.map((entry, index) => (
+          <li
+            key={entry.id}
+            className={feedback ? (feedback[index] ? "correct" : "wrong") : ""}
+            draggable
+            onDragStart={(event) => event.dataTransfer.setData("text/plain", String(index))}
+            onDragOver={(event) => event.preventDefault()}
+            onDrop={(event) => {
+              event.preventDefault();
+              reorder(Number(event.dataTransfer.getData("text/plain")), index);
+            }}
+          >
+            <span className="hub-vocab-sequence-number">{index + 1}</span>
+            {entry.image ? renderVisualPrompt(entry, { compact: true }) : null}
+            <strong>{entry.term || entry.phrase || entry.label || entry.id}</strong>
+            <div className="hub-vocab-sequence-actions">
+              <button type="button" disabled={index === 0} aria-label={`Move ${entry.term || entry.id} up`} onClick={() => reorder(index, index - 1)}>↑</button>
+              <button type="button" disabled={index === orderedItems.length - 1} aria-label={`Move ${entry.term || entry.id} down`} onClick={() => reorder(index, index + 1)}>↓</button>
+            </div>
+          </li>
+        ))}
+      </ol>
+      <div className="hub-vocab-runner-actions">
+        <button type="button" onClick={checkOrder}>Check order</button>
+        <button type="button" onClick={restart}>Shuffle / reset</button>
+      </div>
+      {feedback && feedback.some((result) => !result) ? (
+        <div className="hub-vocab-feedback wrong">
+          <span>{feedback.filter(Boolean).length} of {feedback.length} are in the right place. Move the highlighted items and check again.</span>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 function renderActivity(theme, activity, handlers = {}) {
   const items = getActivityItems(theme, activity);
   const props = {
@@ -1520,11 +2277,11 @@ function renderActivity(theme, activity, handlers = {}) {
   if (activity.type === "matching" || activity.type === "flag-match") {
     return <MatchingMode theme={theme} items={items} {...props} />;
   }
-  if (activity.type === "quick-choice") return <ChoiceMode theme={theme} items={items} {...props} />;
-  if (activity.type === "gap-choice") return <ChoiceMode theme={theme} items={items} mode="gap" {...props} />;
-  if (activity.type === "nationality-choice") return <ChoiceMode theme={theme} items={items} mode="nationality" {...props} />;
-  if (activity.type === "opposites-choice") return <ChoiceMode theme={theme} items={items} mode="opposite" {...props} />;
-  if (activity.type === "category-choice") return <ChoiceMode theme={theme} items={items} mode="category" {...props} />;
+  if (activity.type === "quick-choice") return <ChoiceMode theme={theme} activity={activity} items={items} {...props} />;
+  if (activity.type === "gap-choice") return <ChoiceMode theme={theme} activity={activity} items={items} mode="gap" {...props} />;
+  if (activity.type === "nationality-choice") return <ChoiceMode theme={theme} activity={activity} items={items} mode="nationality" {...props} />;
+  if (activity.type === "opposites-choice") return <ChoiceMode theme={theme} activity={activity} items={items} mode="opposite" {...props} />;
+  if (activity.type === "category-choice") return <ChoiceMode theme={theme} activity={activity} items={items} mode="category" {...props} />;
   if (activity.type === "speaker-choice") return <SpeakerChoiceMode theme={theme} activity={activity} items={items} {...props} />;
   if (activity.type === "phrase-gap-fill") return <PhraseGapFillMode theme={theme} activity={activity} items={items} {...props} />;
   if (activity.type === "image-hotspot-match") return <ImageHotspotMatchMode theme={theme} items={items} activity={activity} {...props} />;
@@ -1545,6 +2302,20 @@ function renderActivity(theme, activity, handlers = {}) {
     return <TypeAnswerMode theme={theme} items={items} activity={activity} answerMode="gap" {...props} />;
   }
   if (activity.type === "article-choice") return <ArticleChoiceMode theme={theme} activity={activity} items={items} {...props} />;
+  if (activity.type === "category-sort") return <CategorySortMode theme={theme} activity={activity} items={items} {...props} />;
+  if (activity.type === "sequence-order") return <SequenceOrderMode theme={theme} activity={activity} items={items} {...props} />;
+  if (activity.type === "sentence-gap-choice") {
+    return <StructuredQuestionMode theme={theme} activity={activity} items={items} promptType="sentence" inputMode="choice" {...props} />;
+  }
+  if (activity.type === "sentence-gap-type-answer") {
+    return <StructuredQuestionMode theme={theme} activity={activity} items={items} promptType="sentence" inputMode="type" {...props} />;
+  }
+  if (activity.type === "clock-choice") {
+    return <StructuredQuestionMode theme={theme} activity={activity} items={items} promptType="clock" inputMode="choice" {...props} />;
+  }
+  if (activity.type === "clock-type-answer") {
+    return <StructuredQuestionMode theme={theme} activity={activity} items={items} promptType="clock" inputMode="type" {...props} />;
+  }
   return null;
 }
 
@@ -1636,7 +2407,7 @@ export default function HubVocabularyActivityRunner() {
     return (
       <div className="panel">
         <h2>Vocabulary activity not found</h2>
-        <p className="muted">That A1 activity does not exist yet.</p>
+        <p className="muted">That vocabulary activity does not exist yet.</p>
         <button className="review-btn" onClick={() => navigate(getSitePath("/vocabulary/textbook"))}>
           Back to vocabulary topics
         </button>
@@ -1662,7 +2433,7 @@ export default function HubVocabularyActivityRunner() {
 
       <header className="hub-vocab-runner-head" style={{ "--theme-accent": theme.accent }}>
         <div>
-          <span className="cefr-badge" style={{ "--badge-color": theme.accent }}>A1</span>
+          <span className="cefr-badge" style={{ "--badge-color": theme.accent }}>{theme.level.toUpperCase()}</span>
           <p className="hub-vocab-kicker">{theme.textbookRef}</p>
           <h1>{theme.title}</h1>
           <p>{activity.prompt || activity.shortDescription}</p>
@@ -2125,11 +2896,104 @@ export default function HubVocabularyActivityRunner() {
           overflow: hidden;
         }
 
+        .hub-vocab-hotspot-round-header {
+          align-items: center;
+          background: linear-gradient(135deg, rgba(246, 189, 96, 0.16), rgba(143, 182, 255, 0.12));
+          border: 1px solid rgba(246, 189, 96, 0.34);
+          border-radius: 16px;
+          display: flex;
+          gap: 0.85rem;
+          margin-bottom: 1rem;
+          padding: 0.78rem 0.9rem;
+        }
+
+        .hub-vocab-hotspot-round-header > span {
+          background: #f6bd60;
+          border-radius: 999px;
+          color: #13213b;
+          flex: 0 0 auto;
+          font-size: 0.76rem;
+          font-weight: 950;
+          letter-spacing: 0.04em;
+          padding: 0.38rem 0.62rem;
+          text-transform: uppercase;
+        }
+
+        .hub-vocab-hotspot-round-header strong {
+          color: #fff;
+          display: block;
+          font-size: 1.05rem;
+        }
+
+        .hub-vocab-hotspot-round-header p {
+          color: rgba(238, 244, 255, 0.76);
+          font-size: 0.88rem;
+          margin: 0.12rem 0 0;
+        }
+
+        .hub-vocab-round-complete {
+          align-items: center;
+          display: flex;
+          flex-direction: column;
+          gap: 0.65rem;
+          min-height: 18rem;
+          justify-content: center;
+          text-align: center;
+        }
+
+        .hub-vocab-round-complete > span {
+          align-items: center;
+          background: rgba(114, 223, 155, 0.2);
+          border: 1px solid rgba(114, 223, 155, 0.64);
+          border-radius: 999px;
+          color: #72df9b;
+          display: flex;
+          font-size: 1.7rem;
+          font-weight: 950;
+          height: 3.5rem;
+          justify-content: center;
+          width: 3.5rem;
+        }
+
+        .hub-vocab-round-complete strong {
+          color: #fff;
+          font-size: 1.35rem;
+        }
+
+        .hub-vocab-round-complete p {
+          color: rgba(238, 244, 255, 0.76);
+          margin: 0;
+        }
+
+        .hub-vocab-round-complete button {
+          background: #f6bd60;
+          border: 1px solid #ffd48d;
+          border-radius: 999px;
+          color: #13213b;
+          cursor: pointer;
+          font: inherit;
+          font-weight: 900;
+          margin-top: 0.35rem;
+          padding: 0.72rem 1rem;
+        }
+
         .hub-vocab-hotspot-layout {
           align-items: start;
           display: grid;
           gap: 1rem;
           grid-template-columns: minmax(0, 1.4fr) minmax(13rem, 0.6fr);
+        }
+
+        .hub-vocab-hotspot-layout.is-zoomed-layout {
+          grid-template-columns: 1fr;
+        }
+
+        .hub-vocab-hotspot-layout.is-zoomed-layout .hub-vocab-hotspot-words {
+          grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+        }
+
+        .hub-vocab-hotspot-layout.is-zoomed-layout .hub-vocab-hotspot-words button {
+          text-align: center;
         }
 
         .hub-vocab-hotel-scene {
@@ -2147,6 +3011,10 @@ export default function HubVocabularyActivityRunner() {
           display: block;
           height: auto;
           width: 100%;
+        }
+
+        .hub-vocab-hotel-scene.is-zoomed img {
+          max-width: none;
         }
 
         .hub-vocab-hotel-scene button {
@@ -2211,6 +3079,195 @@ export default function HubVocabularyActivityRunner() {
           border-color: rgba(114, 223, 155, 0.65);
           cursor: default;
           opacity: 0.74;
+        }
+
+        .hub-vocab-structured-prompt {
+          color: #fff;
+          font-size: clamp(1.55rem, 4vw, 2.65rem);
+          line-height: 1.25;
+          max-width: 52rem;
+          text-align: center;
+        }
+
+        .hub-vocab-category-grid {
+          display: grid;
+          gap: 0.7rem;
+          grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+        }
+
+        .hub-vocab-category-grid button {
+          border: 1px solid rgba(238, 244, 255, 0.14);
+          border-radius: 18px;
+          background: #1a2847;
+          color: #eef4ff;
+          cursor: pointer;
+          font: inherit;
+          font-weight: 850;
+          min-height: 3.5rem;
+          padding: 0.7rem 0.9rem;
+        }
+
+        .hub-vocab-category-grid button.correct,
+        .hub-vocab-choice-grid button.correct {
+          background: rgba(114, 223, 155, 0.18);
+          border-color: rgba(114, 223, 155, 0.65);
+        }
+
+        .hub-vocab-category-grid button.wrong,
+        .hub-vocab-choice-grid button.wrong {
+          background: rgba(255, 133, 133, 0.13);
+          border-color: rgba(255, 133, 133, 0.58);
+        }
+
+        .hub-vocab-category-grid button.dimmed {
+          opacity: 0.45;
+        }
+
+        .hub-vocab-clock {
+          aspect-ratio: 1;
+          background: #f8fbff;
+          border: 8px solid #2a3d67;
+          border-radius: 50%;
+          box-shadow: 0 18px 34px rgba(0, 0, 0, 0.28);
+          max-width: min(330px, 76vw);
+          padding: 0.4rem;
+          width: 100%;
+        }
+
+        .hub-vocab-clock svg {
+          display: block;
+          height: auto;
+          width: 100%;
+        }
+
+        .hub-vocab-clock .clock-face {
+          fill: #f8fbff;
+          stroke: #d9e2f2;
+          stroke-width: 2;
+        }
+
+        .hub-vocab-clock .clock-mark {
+          stroke: #8795ad;
+          stroke-linecap: round;
+          stroke-width: 1.5;
+        }
+
+        .hub-vocab-clock .clock-mark.hour {
+          stroke: #273754;
+          stroke-width: 4;
+        }
+
+        .hub-vocab-clock .clock-hand {
+          stroke-linecap: round;
+        }
+
+        .hub-vocab-clock .clock-hand.hour {
+          stroke: #13213b;
+          stroke-width: 8;
+        }
+
+        .hub-vocab-clock .clock-hand.minute {
+          stroke: #e59c32;
+          stroke-width: 5;
+        }
+
+        .hub-vocab-clock .clock-pin {
+          fill: #13213b;
+          stroke: #f6bd60;
+          stroke-width: 2;
+        }
+
+        .hub-vocab-sequence-instructions {
+          color: rgba(238, 244, 255, 0.78);
+          margin: 0;
+          text-align: center;
+        }
+
+        .hub-vocab-sequence-list {
+          display: grid;
+          gap: 0.55rem;
+          list-style: none;
+          margin: 0 auto;
+          max-width: 740px;
+          padding: 0;
+          width: 100%;
+        }
+
+        .hub-vocab-sequence-list li {
+          align-items: center;
+          background: #1a2847;
+          border: 1px solid rgba(238, 244, 255, 0.14);
+          border-radius: 16px;
+          cursor: grab;
+          display: grid;
+          gap: 0.7rem;
+          grid-template-columns: auto auto minmax(0, 1fr) auto;
+          min-height: 3.8rem;
+          padding: 0.55rem 0.65rem;
+        }
+
+        .hub-vocab-sequence-list li:active {
+          cursor: grabbing;
+        }
+
+        .hub-vocab-sequence-list li.correct {
+          background: rgba(114, 223, 155, 0.15);
+          border-color: rgba(114, 223, 155, 0.58);
+        }
+
+        .hub-vocab-sequence-list li.wrong {
+          background: rgba(255, 133, 133, 0.1);
+          border-color: rgba(255, 133, 133, 0.5);
+        }
+
+        .hub-vocab-sequence-number {
+          align-items: center;
+          background: rgba(255, 255, 255, 0.08);
+          border-radius: 999px;
+          display: inline-flex;
+          font-weight: 900;
+          height: 2rem;
+          justify-content: center;
+          width: 2rem;
+        }
+
+        .hub-vocab-sequence-actions {
+          display: flex;
+          gap: 0.35rem;
+        }
+
+        .hub-vocab-sequence-actions button {
+          align-items: center;
+          background: #24365d;
+          border: 1px solid rgba(238, 244, 255, 0.14);
+          border-radius: 9px;
+          color: #eef4ff;
+          cursor: pointer;
+          display: inline-flex;
+          font: inherit;
+          font-weight: 900;
+          height: 2.2rem;
+          justify-content: center;
+          width: 2.2rem;
+        }
+
+        .hub-vocab-sequence-actions button:disabled {
+          cursor: default;
+          opacity: 0.32;
+        }
+
+        .hub-vocab-empty-card {
+          justify-items: center;
+          text-align: center;
+        }
+
+        .hub-vocab-empty-card strong {
+          font-size: 1.35rem;
+        }
+
+        .hub-vocab-empty-card p {
+          color: rgba(238, 244, 255, 0.72);
+          margin: 0;
         }
 
         .hub-vocab-choice-grid {
@@ -2396,11 +3453,23 @@ export default function HubVocabularyActivityRunner() {
 
         :root[data-theme="light"] .hub-vocab-match-column button,
         :root[data-theme="light"] .hub-vocab-choice-grid button,
+        :root[data-theme="light"] .hub-vocab-category-grid button,
+        :root[data-theme="light"] .hub-vocab-sequence-list li,
         :root[data-theme="light"] .hub-vocab-hotspot-words button {
           background: #ffffff;
           border-color: rgba(44, 73, 128, 0.14);
           color: #18253f;
           box-shadow: 0 8px 18px rgba(43, 67, 112, 0.06);
+        }
+
+        :root[data-theme="light"] .hub-vocab-hotspot-round-header strong,
+        :root[data-theme="light"] .hub-vocab-round-complete strong {
+          color: #17223a;
+        }
+
+        :root[data-theme="light"] .hub-vocab-hotspot-round-header p,
+        :root[data-theme="light"] .hub-vocab-round-complete p {
+          color: rgba(23, 34, 58, 0.72);
         }
 
         :root[data-theme="light"] .hub-vocab-match-column button.selected {
@@ -2410,11 +3479,40 @@ export default function HubVocabularyActivityRunner() {
 
         :root[data-theme="light"] .hub-vocab-match-column button.matched,
         :root[data-theme="light"] .hub-vocab-choice-grid button.correct,
+        :root[data-theme="light"] .hub-vocab-category-grid button.correct,
+        :root[data-theme="light"] .hub-vocab-sequence-list li.correct,
         :root[data-theme="light"] .hub-vocab-hotspot-words button.matched,
         :root[data-theme="light"] .hub-vocab-hotspot-words button:disabled {
           background: rgba(114, 223, 155, 0.22);
           border-color: rgba(50, 142, 101, 0.4);
           color: #173826;
+        }
+
+        :root[data-theme="light"] .hub-vocab-choice-grid button.wrong,
+        :root[data-theme="light"] .hub-vocab-category-grid button.wrong,
+        :root[data-theme="light"] .hub-vocab-sequence-list li.wrong {
+          background: rgba(255, 133, 133, 0.14);
+          border-color: rgba(183, 72, 72, 0.34);
+          color: #5a2020;
+        }
+
+        :root[data-theme="light"] .hub-vocab-structured-prompt {
+          color: #16233d;
+        }
+
+        :root[data-theme="light"] .hub-vocab-sequence-instructions,
+        :root[data-theme="light"] .hub-vocab-empty-card p {
+          color: rgba(23, 37, 64, 0.76);
+        }
+
+        :root[data-theme="light"] .hub-vocab-sequence-number {
+          background: rgba(44, 73, 128, 0.09);
+        }
+
+        :root[data-theme="light"] .hub-vocab-sequence-actions button {
+          background: #eef3ff;
+          border-color: rgba(44, 73, 128, 0.16);
+          color: #18253f;
         }
 
         :root[data-theme="light"] .hub-vocab-choice-grid button.dimmed {
@@ -2457,6 +3555,21 @@ export default function HubVocabularyActivityRunner() {
 
           .hub-vocab-choice-grid.article-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .hub-vocab-category-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .hub-vocab-sequence-list li {
+            gap: 0.48rem;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+          }
+
+          .hub-vocab-sequence-list li > .hub-vocab-visual-tile,
+          .hub-vocab-sequence-list li > .hub-vocab-object-image,
+          .hub-vocab-sequence-list li > .hub-vocab-flag-large {
+            display: none;
           }
 
           .hub-vocab-hotspot-layout {

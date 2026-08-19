@@ -28,6 +28,10 @@ import {
   runTransaction,
 } from "firebase/database";
 import { OPTION_JURY_GAME_TYPE } from "../products/ote/data/oteAdvancedReadingPart4OptionJury.js";
+import {
+  COHESION_CHALLENGE_GAME_TYPE,
+  COHESION_CHALLENGE_TASK_ID,
+} from "../products/ote/data/oteAdvancedReadingCohesionChallenge.js";
 import { OTE_LISTENING_LIVE_GAME_TYPE } from "../products/ote/data/oteListeningLive.js";
 
 const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
@@ -132,7 +136,11 @@ export async function joinLiveGameByPin(pin) {
     user.displayName || user.email || "Player";
 
   const existingPlayer = (await get(playerRef)).val();
-  if (game.type === OPTION_JURY_GAME_TYPE || game.type === OTE_LISTENING_LIVE_GAME_TYPE) {
+  if (
+    game.type === OPTION_JURY_GAME_TYPE ||
+    game.type === OTE_LISTENING_LIVE_GAME_TYPE ||
+    game.type === COHESION_CHALLENGE_GAME_TYPE
+  ) {
     if (!existingPlayer) await set(playerRef, {
       name: displayName,
       joinedAt: Date.now(),
@@ -196,6 +204,51 @@ export async function createOteListeningLiveGame({ activityId, title }) {
     },
   });
   return { gameId, pin };
+}
+
+export async function createCohesionChallengeLiveGame({ title } = {}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a cohesion session.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: title || "Classroom Cohesion Challenge",
+    type: COHESION_CHALLENGE_GAME_TYPE,
+    taskId: COHESION_CHALLENGE_TASK_ID,
+    status: "lobby",
+    createdAt: Date.now(),
+    state: {
+      phase: "lobby",
+      questionIndex: 0,
+    },
+  });
+  return { gameId, pin };
+}
+
+export async function submitCohesionChallengeLiveAnswer({
+  gameId,
+  caseId,
+  option,
+  clueId,
+}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to answer.");
+  if (!gameId || !caseId || !["A", "B", "C"].includes(option) || !["1", "2", "3"].includes(clueId)) {
+    throw new Error("Choose a sentence and a decisive clue before submitting.");
+  }
+
+  await set(
+    ref(rtdb, `liveGames/${gameId}/players/${user.uid}/cohesionAnswers/${caseId}`),
+    {
+      option,
+      clueId,
+      submittedAt: Date.now(),
+    }
+  );
 }
 
 export async function submitOteListeningLiveAnswer({

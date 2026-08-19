@@ -227,6 +227,15 @@ const READING_VARIANTS = {
             icon: FlaskConical,
             eyebrow: "Skill trainer",
           },
+          {
+            title: "Classroom Cohesion Challenge",
+            copy: "Defend six missing-sentence decisions, reject two coherent distractors, or run the task as a live PIN session.",
+            progressId: "reading.part3.advanced-classroom-cohesion-challenge",
+            route: "classroom-cohesion-challenge",
+            icon: Users,
+            eyebrow: "Teacher resource · Independent or live",
+            teacherOnly: true,
+          },
         ],
         icon: TextCursorInput,
       },
@@ -336,6 +345,8 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
     { title: "The Case for Getting Slightly Lost", level: "C1", id: "c1-pilot-1", taskId: "advanced-reading-part-3-c1-pilot-1" },
     { title: "Why We Keep Souvenirs", level: "C1", id: "c1-pilot-2", taskId: "advanced-reading-part-3-c1-pilot-2" },
     { title: "The Value of Being Bored", level: "C1", id: "c1-pilot-3", taskId: "advanced-reading-part-3-c1-pilot-3" },
+    { title: "Why Free Things Are Complicated", level: "C1", id: "c1-free-things", taskId: "advanced-reading-part-3-c1-free-things", teacherOnly: true },
+    { title: "Why Experts Disagree", level: "C1", id: "c1-experts-disagree", taskId: "advanced-reading-part-3-c1-experts-disagree", teacherOnly: true },
   ] : [
     { title: "My First Community Garden", level: "A2", id: "a2-pilot-1", taskId: "general-reading-part-3-a2-pilot-1" },
     { title: "A Weekend Without My Phone", level: "A2", id: "a2-pilot-2", taskId: "general-reading-part-3-a2-pilot-2" },
@@ -344,6 +355,15 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
     { title: "Walking Meetings", level: "B2", id: "b2-pilot-1", taskId: "general-reading-part-3-b2-pilot-1" },
     { title: "Repair Cafés", level: "B2", id: "b2-pilot-2", taskId: "general-reading-part-3-b2-pilot-2" },
   ]) : [];
+  const visiblePartThreePracticeSets = partThreePracticeSets.filter(
+    (set) => !set.teacherOnly || isTeacherOrAdmin
+  );
+  const progressPartThreePracticeSets = partThreePracticeSets.filter(
+    (set) => !set.teacherOnly
+  );
+  const teacherPartThreePracticeSets = visiblePartThreePracticeSets.filter(
+    (set) => set.teacherOnly
+  );
   const partFourPracticeSets = partId === "part-4-long-text" ? (variant === "advanced" ? [
     { title: "The Hidden Work of Small Talk", level: "C1", id: "c1-pilot-1", taskId: "advanced-reading-part-4-c1-pilot-1" },
     { title: "The Danger of Perfect Efficiency", level: "C1", id: "c1-pilot-2", taskId: "advanced-reading-part-4-c1-pilot-2" },
@@ -356,10 +376,10 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
     { title: "Reading Together in Silence", level: "B2", id: "b2-reading-together", taskId: "general-reading-part-4-b2-reading-together" },
     { title: "Why Holidays Seem to Change Speed", level: "B2", id: "b2-holiday-time", taskId: "general-reading-part-4-b2-holiday-time" },
   ]) : [];
-  const currentPracticeSets = partOnePracticeSets.length ? partOnePracticeSets : partTwoPracticeSets.length ? partTwoPracticeSets : partThreePracticeSets.length ? partThreePracticeSets : partFourPracticeSets;
+  const currentPracticeSets = partOnePracticeSets.length ? partOnePracticeSets : partTwoPracticeSets.length ? partTwoPracticeSets : progressPartThreePracticeSets.length ? progressPartThreePracticeSets : partFourPracticeSets;
   const completedSetCount = partOnePracticeSets.filter((set) =>
     completedProgress.has(`reading.part1.practice.${set.taskId}`)
-  ).length + partTwoPracticeSets.filter((set) => completedProgress.has(`reading.part2.practice.${set.taskId}`)).length + partThreePracticeSets.filter((set) => completedProgress.has(`reading.part3.practice.${set.taskId}`)).length + partFourPracticeSets.filter((set) => completedProgress.has(`reading.part4.practice.${set.taskId}`)).length;
+  ).length + partTwoPracticeSets.filter((set) => completedProgress.has(`reading.part2.practice.${set.taskId}`)).length + progressPartThreePracticeSets.filter((set) => completedProgress.has(`reading.part3.practice.${set.taskId}`)).length + partFourPracticeSets.filter((set) => completedProgress.has(`reading.part4.practice.${set.taskId}`)).length;
 
   return (
     <main className="ote-training-page">
@@ -461,11 +481,25 @@ function OteReadingPartShell({ user, nativeRoutes = false }) {
             })}
           </div>
         </section>
-      ) : partThreePracticeSets.length ? (
-        <section className="ote-training-section"><div className="ote-practice-set-grid">{partThreePracticeSets.map((set) => {
-          const isComplete = completedProgress.has(`reading.part3.practice.${set.taskId}`);
-          return <button className={`ote-practice-set-card ${isComplete ? "is-complete" : ""}`} key={set.id} type="button" onClick={() => navigate(variant === "advanced" ? advancedPartThreePracticePath(set.id) : generalPartThreePracticePath(set.id))}>{isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}<Clock3 size={28} aria-hidden="true" /><span>{set.level} · Timed practice</span><h2>{set.title}</h2><p>Six missing sentences, one extra option, and 11 minutes for the full task.</p></button>;
-        })}</div></section>
+      ) : visiblePartThreePracticeSets.length ? (
+        <>
+          <section className="ote-training-section"><div className="ote-practice-set-grid">{progressPartThreePracticeSets.map((set) => {
+            const isComplete = completedProgress.has(`reading.part3.practice.${set.taskId}`);
+            return <button className={`ote-practice-set-card ${isComplete ? "is-complete" : ""}`} key={set.id} type="button" onClick={() => navigate(variant === "advanced" ? advancedPartThreePracticePath(set.id) : generalPartThreePracticePath(set.id))}>{isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}<Clock3 size={28} aria-hidden="true" /><span>{set.level} · Timed practice</span><h2>{set.title}</h2><p>Six missing sentences, one extra option, and 11 minutes for the full task.</p></button>;
+          })}</div></section>
+          {teacherPartThreePracticeSets.length ? (
+            <section className="ote-training-section ote-teacher-practice-section">
+              <div className="ote-teacher-practice-heading">
+                <Users size={26} aria-hidden="true" />
+                <div><p className="ote-kicker">Teacher resources</p><h2>Teacher classroom tasks</h2><p>Extra C1 sets for lessons or direct-link sharing. These do not count towards learner completion.</p></div>
+              </div>
+              <div className="ote-practice-set-grid">{teacherPartThreePracticeSets.map((set) => {
+                const isComplete = completedProgress.has(`reading.part3.practice.${set.taskId}`);
+                return <button className={`ote-practice-set-card ote-teacher-practice-card ${isComplete ? "is-complete" : ""}`} key={set.id} type="button" onClick={() => navigate(advancedPartThreePracticePath(set.id))}>{isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}<Users size={28} aria-hidden="true" /><span>Teacher task · {set.level}</span><h2>{set.title}</h2><p>Six missing sentences, one extra option, and 11 minutes. Share the direct link if students should open it independently.</p><strong>Not included in completion</strong></button>;
+              })}</div>
+            </section>
+          ) : null}
+        </>
       ) : partFourPracticeSets.length ? (
         <section className="ote-training-section"><div className="ote-practice-set-grid">{partFourPracticeSets.map((set) => { const isComplete = completedProgress.has(`reading.part4.practice.${set.taskId}`); return <button className={`ote-practice-set-card ${isComplete ? "is-complete" : ""}`} key={set.id} type="button" onClick={() => navigate(variant === "advanced" ? advancedPartFourPracticePath(set.id) : generalPartFourPracticePath(set.id))}>{isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}<Clock3 size={28} aria-hidden="true" /><span>{set.level} · Timed practice</span><h2>{set.title}</h2><p>One long text, {variant === "advanced" ? "five" : "four"} questions, and 8 minutes for the full task.</p></button>; })}</div></section>
       ) : (
@@ -505,7 +539,11 @@ export default function OteReadingMenu({ user, nativeRoutes = false }) {
     completedProgress.has(`reading.part1.practice.${taskId}`)
   ).length;
   const readingPartTwoSets = activeVariant === "advanced" ? ["advanced-reading-part-2-c1-pilot-1", "advanced-reading-part-2-c1-pilot-2", "advanced-reading-part-2-c1-pilot-3"] : ["general-reading-part-2-a2-pilot-1", "general-reading-part-2-a2-pilot-2", "general-reading-part-2-b2-pilot-1", "general-reading-part-2-b2-pilot-2"];
-  const readingPartThreeSets = activeVariant === "advanced" ? ["advanced-reading-part-3-c1-pilot-1", "advanced-reading-part-3-c1-pilot-2", "advanced-reading-part-3-c1-pilot-3"] : ["general-reading-part-3-a2-pilot-1", "general-reading-part-3-a2-pilot-2", "general-reading-part-3-b1-pilot-1", "general-reading-part-3-b1-pilot-2", "general-reading-part-3-b2-pilot-1", "general-reading-part-3-b2-pilot-2"];
+  const readingPartThreeSets = activeVariant === "advanced" ? [
+    "advanced-reading-part-3-c1-pilot-1",
+    "advanced-reading-part-3-c1-pilot-2",
+    "advanced-reading-part-3-c1-pilot-3",
+  ] : ["general-reading-part-3-a2-pilot-1", "general-reading-part-3-a2-pilot-2", "general-reading-part-3-b1-pilot-1", "general-reading-part-3-b1-pilot-2", "general-reading-part-3-b2-pilot-1", "general-reading-part-3-b2-pilot-2"];
   const readingPartFourSets = activeVariant === "advanced" ? ["advanced-reading-part-4-c1-pilot-1", "advanced-reading-part-4-c1-pilot-2", "advanced-reading-part-4-c1-queues"] : ["general-reading-part-4-a2-new-dog", "general-reading-part-4-a2-useful-things", "general-reading-part-4-b1-second-life", "general-reading-part-4-b1-city-trees", "general-reading-part-4-b2-reading-together", "general-reading-part-4-b2-holiday-time"];
   const completedPartTwoSets = readingPartTwoSets.filter((taskId) =>
     completedProgress.has(`reading.part2.practice.${taskId}`)

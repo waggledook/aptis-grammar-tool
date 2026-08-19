@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { joinLiveGameByPin } from "../../api/liveGames";
 import { toast } from "../../utils/toast";
 import { OPTION_JURY_GAME_TYPE } from "../../products/ote/data/oteAdvancedReadingPart4OptionJury.js";
+import { COHESION_CHALLENGE_GAME_TYPE } from "../../products/ote/data/oteAdvancedReadingCohesionChallenge.js";
 import { OTE_LISTENING_LIVE_GAME_TYPE } from "../../products/ote/data/oteListeningLive.js";
 import { getSitePath } from "../../siteConfig.js";
 
@@ -35,6 +36,8 @@ export default function LiveGameJoin() {
           const destination =
             type === OPTION_JURY_GAME_TYPE
               ? `/live/option-jury/play/${gameId}`
+              : type === COHESION_CHALLENGE_GAME_TYPE
+                ? `/live/cohesion-challenge/play/${gameId}`
               : type === OTE_LISTENING_LIVE_GAME_TYPE
                 ? `/live/ote-listening/play/${gameId}`
                 : `/live/play/${gameId}`;
