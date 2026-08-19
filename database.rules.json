@@ -101,6 +101,34 @@
           }
         },
 
+        "part4Answers": {
+          "$questionId": {
+            "$playerId": {
+              ".read": "auth != null",
+              ".write": "auth != null && ((auth.uid === $playerId && root.child('liveGames').child($gameId).child('type').val() === 'ote-advanced-reading-part4-evidence-live' && root.child('liveGames').child($gameId).child('state').child('phase').val() === 'question' && (($questionId === 'q1' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 0) || ($questionId === 'q2' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 1) || ($questionId === 'q3' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 2) || ($questionId === 'q4' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 3) || ($questionId === 'q5' && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() === 4)) && !data.exists()) || root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid)",
+              ".validate": "newData.hasChildren(['option', 'submittedAt']) && (newData.child('option').val() === 'A' || newData.child('option').val() === 'B' || newData.child('option').val() === 'C')"
+            }
+          }
+        },
+
+        "predictionReady": {
+          "$gap": {
+            "$playerId": {
+              ".read": "auth != null",
+              ".write": "auth != null && ((auth.uid === $playerId && root.child('liveGames').child($gameId).child('type').val() === 'ote-advanced-reading-part3-free-things-lesson' && root.child('liveGames').child($gameId).child('state').child('phase').val() === 'prediction' && (($gap === '1' && root.child('liveGames').child($gameId).child('state').child('gapIndex').val() === 0) || ($gap === '2' && root.child('liveGames').child($gameId).child('state').child('gapIndex').val() === 1) || ($gap === '3' && root.child('liveGames').child($gameId).child('state').child('gapIndex').val() === 2) || ($gap === '4' && root.child('liveGames').child($gameId).child('state').child('gapIndex').val() === 3) || ($gap === '5' && root.child('liveGames').child($gameId).child('state').child('gapIndex').val() === 4) || ($gap === '6' && root.child('liveGames').child($gameId).child('state').child('gapIndex').val() === 5)) && !data.exists()) || root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid)",
+              ".validate": "newData.hasChild('readyAt')"
+            }
+          }
+        },
+
+        "part3LessonPlacements": {
+          "$playerId": {
+            ".read": "auth != null",
+            ".write": "auth != null && ((auth.uid === $playerId && root.child('liveGames').child($gameId).child('type').val() === 'ote-advanced-reading-part3-free-things-lesson' && root.child('liveGames').child($gameId).child('state').child('phase').val() === 'placement' && !data.exists()) || root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid)",
+            ".validate": "newData.hasChildren(['answers', 'submittedAt']) && newData.child('answers').hasChildren(['1', '2', '3', '4', '5', '6']) && (newData.child('answers').child('1').val() === 'A' || newData.child('answers').child('1').val() === 'B' || newData.child('answers').child('1').val() === 'C' || newData.child('answers').child('1').val() === 'D' || newData.child('answers').child('1').val() === 'E' || newData.child('answers').child('1').val() === 'F' || newData.child('answers').child('1').val() === 'G') && (newData.child('answers').child('2').val() === 'A' || newData.child('answers').child('2').val() === 'B' || newData.child('answers').child('2').val() === 'C' || newData.child('answers').child('2').val() === 'D' || newData.child('answers').child('2').val() === 'E' || newData.child('answers').child('2').val() === 'F' || newData.child('answers').child('2').val() === 'G') && (newData.child('answers').child('3').val() === 'A' || newData.child('answers').child('3').val() === 'B' || newData.child('answers').child('3').val() === 'C' || newData.child('answers').child('3').val() === 'D' || newData.child('answers').child('3').val() === 'E' || newData.child('answers').child('3').val() === 'F' || newData.child('answers').child('3').val() === 'G') && (newData.child('answers').child('4').val() === 'A' || newData.child('answers').child('4').val() === 'B' || newData.child('answers').child('4').val() === 'C' || newData.child('answers').child('4').val() === 'D' || newData.child('answers').child('4').val() === 'E' || newData.child('answers').child('4').val() === 'F' || newData.child('answers').child('4').val() === 'G') && (newData.child('answers').child('5').val() === 'A' || newData.child('answers').child('5').val() === 'B' || newData.child('answers').child('5').val() === 'C' || newData.child('answers').child('5').val() === 'D' || newData.child('answers').child('5').val() === 'E' || newData.child('answers').child('5').val() === 'F' || newData.child('answers').child('5').val() === 'G') && (newData.child('answers').child('6').val() === 'A' || newData.child('answers').child('6').val() === 'B' || newData.child('answers').child('6').val() === 'C' || newData.child('answers').child('6').val() === 'D' || newData.child('answers').child('6').val() === 'E' || newData.child('answers').child('6').val() === 'F' || newData.child('answers').child('6').val() === 'G')"
+          }
+        },
+
         "rounds": {
           "$roundIndex": {
             "clickAnswers": {

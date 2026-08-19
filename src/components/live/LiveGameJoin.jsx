@@ -1,10 +1,11 @@
 // src/components/live/LiveGameJoin.jsx
-import React, { useState, useEffect } from "react";
+import React, { useCallback, useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { joinLiveGameByPin } from "../../api/liveGames";
 import { toast } from "../../utils/toast";
-import { OPTION_JURY_GAME_TYPE } from "../../products/ote/data/oteAdvancedReadingPart4OptionJury.js";
+import { OPTION_JURY_GAME_TYPE, PART4_EVIDENCE_LIVE_GAME_TYPE } from "../../products/ote/data/oteAdvancedReadingPart4OptionJury.js";
 import { COHESION_CHALLENGE_GAME_TYPE } from "../../products/ote/data/oteAdvancedReadingCohesionChallenge.js";
+import { FREE_THINGS_LESSON_GAME_TYPE } from "../../products/ote/data/oteAdvancedReadingPart3FreeThingsLesson.js";
 import { OTE_LISTENING_LIVE_GAME_TYPE } from "../../products/ote/data/oteListeningLive.js";
 import { getSitePath } from "../../siteConfig.js";
 
@@ -22,7 +23,7 @@ export default function LiveGameJoin() {
     // So we don't auto-join multiple times
     const [autoTried, setAutoTried] = useState(false);
   
-    async function joinWithPin(rawPin) {
+    const joinWithPin = useCallback(async (rawPin) => {
         const trimmed = (rawPin || "").trim();
         if (!trimmed) {
           toast("Please enter the game PIN.");
@@ -36,6 +37,10 @@ export default function LiveGameJoin() {
           const destination =
             type === OPTION_JURY_GAME_TYPE
               ? `/live/option-jury/play/${gameId}`
+              : type === PART4_EVIDENCE_LIVE_GAME_TYPE
+                ? `/live/part4-evidence/play/${gameId}`
+              : type === FREE_THINGS_LESSON_GAME_TYPE
+                ? `/live/free-things-lesson/play/${gameId}`
               : type === COHESION_CHALLENGE_GAME_TYPE
                 ? `/live/cohesion-challenge/play/${gameId}`
               : type === OTE_LISTENING_LIVE_GAME_TYPE
@@ -48,7 +53,7 @@ export default function LiveGameJoin() {
         } finally {
           setLoading(false);
         }
-      }
+      }, [navigate]);
     
       async function handleSubmit(e) {
         e.preventDefault();
@@ -67,7 +72,7 @@ export default function LiveGameJoin() {
     (async () => {
       await joinWithPin(pinFromQuery);
     })();
-  }, [pinFromQuery, autoTried, loading]);
+  }, [pinFromQuery, autoTried, loading, joinWithPin]);
 
 
   return (

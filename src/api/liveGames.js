@@ -27,12 +27,19 @@ import {
   update,
   runTransaction,
 } from "firebase/database";
-import { OPTION_JURY_GAME_TYPE } from "../products/ote/data/oteAdvancedReadingPart4OptionJury.js";
+import {
+  OPTION_JURY_GAME_TYPE,
+  PART4_EVIDENCE_LIVE_GAME_TYPE,
+} from "../products/ote/data/oteAdvancedReadingPart4OptionJury.js";
 import {
   COHESION_CHALLENGE_GAME_TYPE,
   COHESION_CHALLENGE_TASK_ID,
 } from "../products/ote/data/oteAdvancedReadingCohesionChallenge.js";
 import { OTE_LISTENING_LIVE_GAME_TYPE } from "../products/ote/data/oteListeningLive.js";
+import {
+  FREE_THINGS_LESSON_GAME_TYPE,
+  FREE_THINGS_LESSON_TASK_ID,
+} from "../products/ote/data/oteAdvancedReadingPart3FreeThingsLesson.js";
 
 const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
 const SPANGLISH_GUEST_TOKEN_STORAGE_KEY = "spanglish_fixit_guest_token";
@@ -138,8 +145,10 @@ export async function joinLiveGameByPin(pin) {
   const existingPlayer = (await get(playerRef)).val();
   if (
     game.type === OPTION_JURY_GAME_TYPE ||
+    game.type === PART4_EVIDENCE_LIVE_GAME_TYPE ||
     game.type === OTE_LISTENING_LIVE_GAME_TYPE ||
-    game.type === COHESION_CHALLENGE_GAME_TYPE
+    game.type === COHESION_CHALLENGE_GAME_TYPE ||
+    game.type === FREE_THINGS_LESSON_GAME_TYPE
   ) {
     if (!existingPlayer) await set(playerRef, {
       name: displayName,
@@ -172,6 +181,27 @@ export async function createOptionJuryLiveGame({ taskId, title }) {
     pin,
     title: title || "Option Jury",
     type: OPTION_JURY_GAME_TYPE,
+    taskId,
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby", questionIndex: 0 },
+  });
+  return { gameId, pin };
+}
+
+export async function createPart4EvidenceLiveGame({ taskId, title }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a Part 4 session.");
+  if (!taskId) throw new Error("createPart4EvidenceLiveGame: taskId is required.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: title || "Part 4 Evidence Reveal",
+    type: PART4_EVIDENCE_LIVE_GAME_TYPE,
     taskId,
     status: "lobby",
     createdAt: Date.now(),
@@ -227,6 +257,52 @@ export async function createCohesionChallengeLiveGame({ title } = {}) {
     },
   });
   return { gameId, pin };
+}
+
+export async function createFreeThingsLessonLiveGame({ title } = {}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host this lesson.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: title || "Why Free Things Are Complicated · Live lesson",
+    type: FREE_THINGS_LESSON_GAME_TYPE,
+    taskId: FREE_THINGS_LESSON_TASK_ID,
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby", gapIndex: 0, sentenceIndex: 0, reviewIndex: 0 },
+  });
+  return { gameId, pin };
+}
+
+export async function markFreeThingsLessonPredictionReady({ gameId, gap }) {
+  const user = auth.currentUser;
+  const safeGap = String(gap);
+  if (!user) throw new Error("You must be signed in to take part.");
+  if (!gameId || !["1", "2", "3", "4", "5", "6"].includes(safeGap)) {
+    throw new Error("Invalid lesson gap.");
+  }
+  await set(ref(rtdb, `liveGames/${gameId}/predictionReady/${safeGap}/${user.uid}`), {
+    readyAt: Date.now(),
+  });
+}
+
+export async function submitFreeThingsLessonPlacements({ gameId, answers }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to submit answers.");
+  const gaps = ["1", "2", "3", "4", "5", "6"];
+  const values = gaps.map((gap) => answers?.[gap]);
+  if (!gameId || values.some((value) => !["A", "B", "C", "D", "E", "F", "G"].includes(value)) || new Set(values).size !== 6) {
+    throw new Error("Place one different sentence in each of the six gaps.");
+  }
+  await set(ref(rtdb, `liveGames/${gameId}/part3LessonPlacements/${user.uid}`), {
+    answers: Object.fromEntries(gaps.map((gap) => [gap, answers[gap]])),
+    submittedAt: Date.now(),
+  });
 }
 
 export async function submitCohesionChallengeLiveAnswer({
@@ -395,6 +471,18 @@ export async function submitOptionJuryFinalVote({ gameId, questionId, option, ch
   });
 }
 
+export async function submitPart4EvidenceLiveAnswer({ gameId, questionId, option }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to answer.");
+  if (!gameId || !questionId || !["A", "B", "C"].includes(option)) {
+    throw new Error("Choose A, B or C before submitting.");
+  }
+  await set(ref(rtdb, `liveGames/${gameId}/part4Answers/${questionId}/${user.uid}`), {
+    option,
+    submittedAt: Date.now(),
+  });
+}
+
 /**
  * Host-only: update high-level game status.
  * e.g. setLiveGameStatus(gameId, "in-progress") or "finished".
@@ -425,6 +513,12 @@ export async function setLiveGameState(gameId, partialState) {
     }
     if (typeof partialState.questionIndex === "number") {
       updates.questionIndex = partialState.questionIndex;
+    }
+    if (typeof partialState.gapIndex === "number") {
+      updates.gapIndex = partialState.gapIndex;
+    }
+    if (typeof partialState.sentenceIndex === "number") {
+      updates.sentenceIndex = partialState.sentenceIndex;
     }
     if (typeof partialState.questionDuration === "number") {
       updates.questionDuration = partialState.questionDuration;

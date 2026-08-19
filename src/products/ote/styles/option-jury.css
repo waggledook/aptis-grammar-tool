@@ -143,6 +143,18 @@
   text-align: left;
 }
 
+.option-jury-launch-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  max-width: 1180px;
+  margin: 1.5rem auto;
+}
+.option-jury-launch-grid .option-jury-launch-card { height: 100%; margin: 0; box-sizing: border-box; }
+.option-jury-launch-card > h3 { margin: 0; color: var(--jury-ink); font-size: 1.25rem; }
+.option-jury-launch-card > p { margin: -0.65rem 0 0; }
+.option-jury-launch-card.is-evidence-format { border-color: var(--jury-border-strong); }
+
 .option-jury-launch-card > div > svg { color: var(--jury-gold); }
 
 .option-jury-launch-card span {
@@ -174,6 +186,10 @@
 
 .option-jury-launch-card li + li { margin-top: 0.7rem; }
 .option-jury-launch-button { justify-self: start; min-width: 230px; }
+
+@media (max-width: 840px) {
+  .option-jury-launch-grid { grid-template-columns: 1fr; }
+}
 
 .option-jury-lobby-layout {
   display: grid;

@@ -1,4 +1,5 @@
 export const OPTION_JURY_GAME_TYPE = "ote-advanced-reading-part4-option-jury";
+export const PART4_EVIDENCE_LIVE_GAME_TYPE = "ote-advanced-reading-part4-evidence-live";
 
 export const optionJuryTasks = {
   "forecasts-change-future": {
@@ -24,6 +25,10 @@ export const optionJuryTasks = {
           "Human behaviour is generally harder to predict than natural events.",
         ],
         answer: 1,
+        evidenceHighlights: [
+          "This seems straightforward, but only when the forecast has no influence on the event itself.",
+          "A prediction about human behaviour, by contrast, may become part of the situation it describes.",
+        ],
         optionVerdicts: ["flawed", "strong", "flawed"],
         optionLabels: ["Related, but changes the meaning", "Correct", "Too broad"],
         optionFeedback: [
@@ -43,6 +48,10 @@ export const optionJuryTasks = {
           "To show that forecasts may prevent the outcome they predict.",
         ],
         answer: 2,
+        evidenceHighlights: [
+          "Yet the road may be empty precisely because the warning was believed.",
+          "The forecast has not simply described a possible future; it has helped replace it with another one.",
+        ],
         optionVerdicts: ["flawed", "no_match", "strong"],
         optionLabels: ["True detail, but not the answer", "Unsupported", "Correct"],
         optionFeedback: [
@@ -62,6 +71,9 @@ export const optionJuryTasks = {
           "Public trust may decline even when a warning proves accurate.",
         ],
         answer: 0,
+        evidenceHighlights: [
+          "A successful warning can therefore resemble a failed forecast: the action it produces removes some of the evidence that the danger was real.",
+        ],
         optionVerdicts: ["strong", "no_match", "flawed"],
         optionLabels: ["Correct", "Reverses the writer’s point", "Related, but changes the meaning"],
         optionFeedback: [
@@ -81,6 +93,10 @@ export const optionJuryTasks = {
           "To explain why past behaviour is unsuitable for future forecasting.",
         ],
         answer: 1,
+        evidenceHighlights: [
+          "The objects being studied can hear the result, interpret it and change their conduct.",
+          "It means that the public use of a prediction becomes one of the forces the next model must attempt to understand.",
+        ],
         optionVerdicts: ["flawed", "strong", "no_match"],
         optionLabels: ["Related, but changes the meaning", "Correct", "Too absolute"],
         optionFeedback: [
@@ -101,6 +117,11 @@ export const optionJuryTasks = {
           "They should remain private whenever publication could affect the outcome.",
         ],
         answer: 0,
+        evidenceHighlights: [
+          "Forecasts should therefore be judged by more than whether the announced event occurred.",
+          "Accuracy remains essential: a forecast that is consistently careless is not rescued by good intentions.",
+          "But in social life, prediction and intervention are often inseparable.",
+        ],
         optionVerdicts: ["strong", "flawed", "no_match"],
         optionLabels: ["Correct", "Too absolute", "Unsupported"],
         optionFeedback: [

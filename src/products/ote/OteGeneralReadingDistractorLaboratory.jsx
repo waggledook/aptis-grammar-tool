@@ -268,6 +268,27 @@ function SentenceBank({ lab, placements, selected, onSelect }) {
   );
 }
 
+function PlacementReview({ lab, placements }) {
+  return (
+    <section className="ote-distractor-placement-review" aria-label="Your sentence placement results">
+      <header><div><p className="ote-kicker">Your original placements</p><h3>Compare before investigating</h3></div><span>Best sentences appear in the text below</span></header>
+      <div>
+        {Object.entries(lab.answers).map(([gap, correctId]) => {
+          const studentId = placements[gap];
+          const correct = studentId === correctId;
+          return (
+            <article className={correct ? "is-correct" : "is-wrong"} key={gap}>
+              <header>{correct ? <CheckCircle2 size={19} aria-hidden="true" /> : <XCircle size={19} aria-hidden="true" />}<strong>Gap {gap}</strong><span>{correct ? "Correct" : "Review"}</span></header>
+              <small>Your answer</small><p><strong>{studentId}</strong> {lab.sentences[studentId]}</p>
+              {!correct ? <><small>Correct answer</small><p className="is-correction"><strong>{correctId}</strong> {lab.sentences[correctId]}</p></> : null}
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function ArticleGap({ lab, id, phase, placement, selectedSentence, onPlace, onClear, investigation, evidenceRevealed }) {
   const isSolving = phase === "solve";
   const isActive = investigation?.gap === id;
@@ -521,7 +542,8 @@ export default function OteGeneralReadingDistractorLaboratory({ nativeRoutes = f
           ) : (
             <>
               <div className="ote-distractor-stage-head"><div><p className="ote-kicker">Laboratory {labIndex + 1} · Explanation stage</p><h2>Why does the other sentence fail?</h2></div><strong>Placement: {currentScore.placement} / {lab.investigations.length}</strong></div>
-              <p className="ote-distractor-stage-copy">The best sentences are now in the text. Answer one short question, then see the important words highlighted.</p>
+              <p className="ote-distractor-stage-copy">First compare your original placements below. The text then uses the best sentences so you can investigate the important links.</p>
+              <PlacementReview lab={lab} placements={labPlacements} />
               <div className="ote-distractor-investigation-layout">
                 <LaboratoryArticle lab={lab} phase={phase} placements={labPlacements} investigation={currentInvestigation} evidenceRevealed={currentRevealed} />
                 <InvestigationPanel

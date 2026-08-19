@@ -272,11 +272,16 @@ import OteAdvancedReadingInsideParagraph from "./products/ote/OteAdvancedReading
 import OteAdvancedReadingOptionJuryLaunch from "./products/ote/OteAdvancedReadingOptionJuryLaunch.jsx";
 import OteOptionJuryHost from "./products/ote/OteOptionJuryHost.jsx";
 import OteOptionJuryPlayer from "./products/ote/OteOptionJuryPlayer.jsx";
+import OteReadingPart4EvidenceLiveHost from "./products/ote/OteReadingPart4EvidenceLiveHost.jsx";
+import OteReadingPart4EvidenceLivePlayer from "./products/ote/OteReadingPart4EvidenceLivePlayer.jsx";
 import OteListeningLiveHost from "./products/ote/OteListeningLiveHost.jsx";
 import OteListeningLivePlayer from "./products/ote/OteListeningLivePlayer.jsx";
 import OteAdvancedReadingCohesionChallenge from "./products/ote/OteAdvancedReadingCohesionChallenge.jsx";
 import OteCohesionChallengeLiveHost from "./products/ote/OteCohesionChallengeLiveHost.jsx";
 import OteCohesionChallengeLivePlayer from "./products/ote/OteCohesionChallengeLivePlayer.jsx";
+import OteAdvancedReadingFreeThingsLessonLaunch from "./products/ote/OteAdvancedReadingFreeThingsLessonLaunch.jsx";
+import OteFreeThingsLessonLiveHost from "./products/ote/OteFreeThingsLessonLiveHost.jsx";
+import OteFreeThingsLessonLivePlayer from "./products/ote/OteFreeThingsLessonLivePlayer.jsx";
 import OteAdvancedReadingCohesionDetective from "./products/ote/OteAdvancedReadingCohesionDetective.jsx";
 import OteAdvancedReadingDistractorLaboratory from "./products/ote/OteAdvancedReadingDistractorLaboratory.jsx";
 import OteGeneralReadingCohesionDetective from "./products/ote/OteGeneralReadingCohesionDetective.jsx";
@@ -1715,6 +1720,7 @@ return (
   <Route path="/ote/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-3-gapped-text/distractor-laboratory" element={<OteAdvancedReadingDistractorLaboratory nativeRoutes={false} />} />
   <Route path="/ote/reading/advanced/part-3-gapped-text/classroom-cohesion-challenge" element={<OteAdvancedReadingCohesionChallenge user={user} nativeRoutes={false} />} />
+  <Route path="/ote/reading/advanced/part-3-gapped-text/live/free-things-lesson" element={<RequireTeacher user={user}><OteAdvancedReadingFreeThingsLessonLaunch user={user} nativeRoutes={false} /></RequireTeacher>} />
   <Route path="/ote/reading/general/part-1-short-texts/guide" element={<OteReadingPart1Guide nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-2-matching/guide/three-texts" element={<OteReadingPart2ThreeProfilesGuide nativeRoutes={false} />} />
   <Route path="/ote/reading/general/part-2-matching/guide/people-and-choices" element={<OteReadingPart2PeopleAndChoicesGuide nativeRoutes={false} />} />
@@ -1990,6 +1996,7 @@ return (
       <Route path="/reading/advanced/part-3-gapped-text/cohesion-detective" element={<OteAdvancedReadingCohesionDetective nativeRoutes />} />
       <Route path="/reading/advanced/part-3-gapped-text/distractor-laboratory" element={<OteAdvancedReadingDistractorLaboratory nativeRoutes />} />
       <Route path="/reading/advanced/part-3-gapped-text/classroom-cohesion-challenge" element={<OteAdvancedReadingCohesionChallenge user={user} nativeRoutes />} />
+      <Route path="/reading/advanced/part-3-gapped-text/live/free-things-lesson" element={<RequireTeacher user={user}><OteAdvancedReadingFreeThingsLessonLaunch user={user} nativeRoutes /></RequireTeacher>} />
       <Route path="/reading/general/part-1-short-texts/guide" element={<OteReadingPart1Guide nativeRoutes />} />
       <Route path="/reading/general/part-2-matching/guide/three-texts" element={<OteReadingPart2ThreeProfilesGuide nativeRoutes />} />
       <Route path="/reading/general/part-2-matching/guide/people-and-choices" element={<OteReadingPart2PeopleAndChoicesGuide nativeRoutes />} />
@@ -3002,10 +3009,14 @@ return (
 <Route path="/live/play/:gameId" element={<LiveGamePlayer />} />
 <Route path="/live/option-jury/host/:gameId" element={<OteOptionJuryHost user={user} />} />
 <Route path="/live/option-jury/play/:gameId" element={<OteOptionJuryPlayer />} />
+<Route path="/live/part4-evidence/host/:gameId" element={<RequireTeacher user={user}><OteReadingPart4EvidenceLiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/part4-evidence/play/:gameId" element={<OteReadingPart4EvidenceLivePlayer />} />
 <Route path="/live/ote-listening/host/:gameId" element={<RequireTeacher user={user}><OteListeningLiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/ote-listening/play/:gameId" element={<OteListeningLivePlayer />} />
 <Route path="/live/cohesion-challenge/host/:gameId" element={<RequireTeacher user={user}><OteCohesionChallengeLiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/cohesion-challenge/play/:gameId" element={<OteCohesionChallengeLivePlayer />} />
+<Route path="/live/free-things-lesson/host/:gameId" element={<RequireTeacher user={user}><OteFreeThingsLessonLiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/free-things-lesson/play/:gameId" element={<OteFreeThingsLessonLivePlayer />} />
 
 <Route
   path="/grammar-sets/:setId"

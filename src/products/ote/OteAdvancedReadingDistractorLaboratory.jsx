@@ -179,6 +179,31 @@ function SentenceBank({ placements, selected, onSelect }) {
   );
 }
 
+function PlacementReview({ placements }) {
+  return (
+    <section className="ote-distractor-placement-review" aria-label="Your sentence placement results">
+      <header><div><p className="ote-kicker">Your original placements</p><h3>Compare before investigating</h3></div><span>Correct sentences appear in the article below</span></header>
+      <div>
+        {Object.entries(ANSWERS).map(([gap, correctId]) => {
+          const studentId = placements[gap];
+          const correct = studentId === correctId;
+          return (
+            <article className={correct ? "is-correct" : "is-wrong"} key={gap}>
+              <header>
+                {correct ? <CheckCircle2 size={19} aria-hidden="true" /> : <XCircle size={19} aria-hidden="true" />}
+                <strong>Gap {gap}</strong><span>{correct ? "Correct" : "Review"}</span>
+              </header>
+              <small>Your answer</small>
+              <p><strong>{studentId}</strong> {SENTENCES[studentId]}</p>
+              {!correct ? <><small>Correct answer</small><p className="is-correction"><strong>{correctId}</strong> {SENTENCES[correctId]}</p></> : null}
+            </article>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
 function ArticleGap({
   id,
   phase,
@@ -521,7 +546,8 @@ export default function OteAdvancedReadingDistractorLaboratory({ nativeRoutes = 
                 <div><p className="ote-kicker">Stage 2 · Laboratory phase</p><h2>Inspect the text, not a duplicate</h2></div>
                 <strong>Placement: {placementScore} / 4</strong>
               </div>
-              <p className="ote-distractor-stage-copy">The correct sentences are now in place. Reveal each autopsy to see its evidence highlighted inside the article.</p>
+              <p className="ote-distractor-stage-copy">First compare your original placements below. The article then uses the correct sentences so you can investigate the evidence for each gap.</p>
+              <PlacementReview placements={placements} />
               <div className="ote-distractor-investigation-layout">
                 <LaboratoryArticle
                   phase={phase}
