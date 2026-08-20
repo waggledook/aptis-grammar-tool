@@ -4722,6 +4722,182 @@ export const HUB_COURSE_TEST_TEMPLATES = [
     ],
   },
   {
+    id: "oxford-insight-advanced-progress-1-5",
+    provider: "Oxford",
+    course: "Insight Advanced",
+    title: "Insight Advanced Progress Test Units 1-5",
+    level: "advanced",
+    testKind: "progress",
+    version: "A",
+    sourcePdfLabel: "Insight Adv progress test editable.pdf",
+    supportedSkills: ["grammar", "vocabulary", "reading", "listening"],
+    deliveryPlan: {
+      mainPaper: {
+        id: "main-paper",
+        label: "Grammar, Vocabulary and Reading",
+        skills: ["grammar", "vocabulary", "reading"],
+        timingMode: "shared-section-timer",
+        durationMinutes: 70,
+        navigationMode: "free-navigation",
+        revisitAllowed: true,
+      },
+      listeningPaper: {
+        id: "listening-paper",
+        label: "Listening",
+        skills: ["listening"],
+        timingMode: "controlled-listening",
+        navigationMode: "teacher-paced",
+        revisitAllowed: false,
+        defaultPlayback: {
+          playCount: 2,
+          preReadSeconds: 45,
+          gapBetweenPlaysSeconds: 10,
+          answerWindowSeconds: 0,
+        },
+      },
+    },
+    sections: [
+      buildSection("grammar-part-1", "Grammar A: Multiple choice", "grammar", "multiple-choice-inline", "multiple-choice-single", 6, true, "Read the sentence and choose the correct answer.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Read the sentence and choose the correct answer.",
+        },
+        items: [
+          choiceItem("g1-1", "Patient: Good morning, Dr Smith. I’m so glad I could get an appointment. The pain in my leg has been gradually getting worse for a few weeks now. Hopefully you can help me.\nDoctor: Let me have a look. Oh, that does look a bit sore. I wish you ________ me sooner. It’s best not to wait when a rash like this starts. But I’m sure we can help you get better soon.", ["have consulted", "had consulted", "will have consulted"], 1),
+          choiceItem("g1-2", "Student: Excuse me, Sir, when can we expect our essays back? I’m keen to find out which areas I need to improve in.\nTeacher: Yes, Tom, I haven’t forgotten. I ________ them by Monday, though I guess I won’t see you until Wednesday. That should still give you enough time to look at the feedback and use it for your revision.\nStudent: That’s great. Thanks, Sir!", ["will have marked", "have marked", "had marked"], 0),
+          choiceItem("g1-3", "We hope ________ the arrangements for the excursion by the end of the week.", ["having confirmed", "will have confirmed", "to have confirmed"], 2),
+          choiceItem("g1-4", "________ to change her degree course, Jenny started attending medical school in 2020.", ["To have decided", "Have decided", "Having decided"], 2),
+          choiceItem("g1-5", "Father: This is an excellent report card, Oscar.\nSon: Thanks, Dad!\nFather: Your grades are outstanding. I ________ more proud of you. I’ll take you out for ice cream as a reward for your hard work. We could go on Friday after swimming.\nSon: That sounds like a great idea.", ["had never been", "have never been", "will have never been"], 1),
+          choiceItem("g1-6", "Woman: Sorry. I don’t quite understand what you’re trying to say. Could you explain it again for me?\nMan: Of course. No problem. ________ I meant was that there are two sides to every story. We shouldn’t always believe the first thing we hear.\nWoman: I totally agree. It’s best to find out the facts first.", ["That", "What", "Which"], 1),
+        ],
+      }),
+      buildSection("grammar-part-2", "Grammar B: Sentence completion", "grammar", "gap-fill-word-or-phrase", "gap-fill-word-or-phrase", 8, true, "Complete each sentence with the correct form of the words in brackets.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Complete each sentence with the correct form of the words in brackets.",
+        },
+        items: [
+          textInputItem("g2-1", "Access to the sports centre ________ (restrict) since Monday due to essential building work.", ["has been restricted"]),
+          textInputItem("g2-2", "My mum’s a teacher, but I couldn’t imagine ________ (teach) by her at school.", ["being taught"]),
+          textInputItem("g2-3", "Following recent research, it ________ (believe) to be the oldest building in the whole country.", ["is believed"]),
+          textInputItem("g2-4", "I want to stop ________ (work) on Saturdays so I can spend more time with my family.", ["working"]),
+          textInputItem("g2-5", "If anyone can persuade her ________ (change) her mind, it’s Martin.", ["to change"]),
+          textInputItem("g2-6", "You can’t allow one person ________ (submit) the assignment after the deadline, when everyone else has done it on time.", ["to submit"]),
+          textInputItem("g2-7", "No sooner ________ (they / published) their plan than the criticism started.", ["had they published"]),
+          textInputItem("g2-8", "Such ________ (their self-confidence / be) that they hadn’t planned for any opposition.", ["was their self-confidence", "was their self confidence"]),
+        ],
+      }),
+      buildSection("grammar-part-3", "Grammar C: Multiple choice", "grammar", "multiple-choice-inline", "multiple-choice-single", 8, true, "Read the sentence and choose the correct answer.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Read the sentence and choose the correct answer.",
+        },
+        items: [
+          choiceItem("g3-1", "The museum announced that the new exhibition ________ the following summer.", ["is opening", "would open", "had opened"], 1),
+          choiceItem("g3-2", "After his farewell tour in 2005, the singer ________ live on stage.", ["will never perform", "would never perform", "never performs"], 1),
+          choiceItem("g3-3", "That night, we expected that Molly ________ an hour later, as she had missed the bus.", ["would be arriving", "arrived", "would have been arriving"], 0),
+          choiceItem("g3-4", "As they boarded the aeroplane, they didn’t realize they ________ the city again.", ["would have never seen", "were never to see", "never saw"], 1),
+          choiceItem("g3-5", "Learning to dance isn’t just about having fun - it’s also about building ________ in yourself.", ["confidence", "the confidence", "a confidence"], 0),
+          choiceItem("g3-6", "My bedroom hasn’t been painted for years so I’m ________ redecorated.", ["getting", "having", "having it"], 2),
+          choiceItem("g3-7", "Our store ________ redesigned at the moment, but all services are available through our website.", ["is being", "being", "is"], 0),
+          choiceItem("g3-8", "Sadly, ________ the cost of the equipment that stopped me taking up tennis.", ["what was", "that was", "it was"], 2),
+        ],
+      }),
+      buildSection("vocabulary-part-1", "Vocabulary D: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 6, true, "Read the sentence and choose the correct answer.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Read the sentence and choose the correct answer.",
+        },
+        items: [
+          choiceItem("v1-1", "My dad makes no ________ about it when he expresses himself. Everyone knows exactly how he feels!", ["skin", "bones", "feet"], 1),
+          choiceItem("v1-2", "Ed decided to ________ the wording of his presentation to make it easier to understand for the audience.", ["alter", "evolve", "substitute"], 0),
+          choiceItem("v1-3", "The rust on the car showed that it was ________ and would need to be fixed.", ["restoring", "decaying", "refining"], 1),
+          choiceItem("v1-4", "Jakub has a good ________ with his colleagues. Even though they have very different interests, they get on well.", ["rapport", "association", "marginalization"], 0),
+          choiceItem("v1-5", "Louise had feelings of ________ because her classmates hadn’t invited her to the party.", ["loyalty", "disaffection", "rejection"], 2),
+          choiceItem("v1-6", "________ means using words with similar sounds - either the same vowel sounds or the same consonants.", ["Imagery", "Assonance", "Repetition"], 1),
+        ],
+      }),
+      buildSection("vocabulary-part-2", "Vocabulary E: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 7, true, "Read the sentence and choose the correct answer.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Read the sentence and choose the correct answer.",
+        },
+        items: [
+          choiceItem("v2-1", "This is a ________ hat that women wear in my country. They wear it on special occasions.", ["responsible", "typical", "possible"], 1),
+          choiceItem("v2-2", "Emily was ________ that she would miss the beginning of the lesson, since her bus was now 30 minutes late.", ["proportionate", "concerned", "supportive"], 1),
+          choiceItem("v2-3", "Tom decided to ________ and study medicine to become a doctor. His parents wanted him to study law.", ["spur them into action", "toe the line", "go against the grain"], 2),
+          choiceItem("v2-4", "Richard decided he should be honest and ________ to his parents that he broke the window.", ["defend", "confess", "acquit"], 1),
+          choiceItem("v2-5", "Beth gave ________ on day two of the court case. She was the main witness for the defence.", ["conviction", "penalty", "testimony"], 2),
+          choiceItem("v2-6", "There were uncertain ________ of wind that made the smaller branches on the trees move slightly.", ["swaggers", "puffs", "drizzles"], 1),
+          choiceItem("v2-7", "The steam train began ________ up the hill towards the station platform.", ["chugging", "flashing", "strolling"], 0),
+        ],
+      }),
+      buildSection("vocabulary-part-3", "Vocabulary F: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 6, true, "Read the sentence and choose the correct answer.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Read the sentence and choose the correct answer.",
+        },
+        items: [
+          choiceItem("v3-1", "Mum is annoyed with me because I ________ my pocket money on things I don’t really need.", ["make ends meet", "fritter away", "splash out"], 1),
+          choiceItem("v3-2", "To try and boost ________, the company decided to give a discount on many of their products.", ["sales", "behaviour", "experience"], 0),
+          choiceItem("v3-3", "The exchange rate ________ slightly, but is expected to recover soon.", ["rocketed", "dipped", "plummeted"], 1),
+          choiceItem("v3-4", "The company’s television adverts ________ their new product being sold out in just a few weeks.", ["perpetuated", "were attributed to", "resulted in"], 2),
+          choiceItem("v3-5", "Peter was asked to conduct ________ to find out how many people buy a particular shampoo.", ["our minds", "market research", "public opinion"], 1),
+          choiceItem("v3-6", "Some countries suffer from ________ weather conditions, such as drought, floods and hurricanes.", ["volatile", "moderate", "steadily"], 0),
+        ],
+      }),
+      buildSection("vocabulary-part-4", "Vocabulary G: Multiple choice", "vocabulary", "multiple-choice-inline", "multiple-choice-single", 6, true, "Read the sentence and choose the correct answer.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Read the sentence and choose the correct answer.",
+        },
+        items: [
+          choiceItem("v4-1", "The reference website was the ________ of a group of university professors.", ["brainiac", "brainchild", "birdbrained"], 1),
+          choiceItem("v4-2", "Could Beth ________ this message to her sister?", ["team up", "find out", "pass on"], 2),
+          choiceItem("v4-3", "My dad has a ________ eye when he goes shopping - he always finds the best quality products.", ["receptive", "methodical", "discerning"], 2),
+          choiceItem("v4-4", "I found some old ________ between my mum and her pen pal - some of what they wrote was so funny!", ["interchange", "correspondence", "divergence"], 1),
+          choiceItem("v4-5", "I wanted to ________ exactly what had happened before I said anything about the situation.", ["ascertain", "occupy", "collaborate"], 0),
+          choiceItem("v4-6", "The two news stories were ________, so I wasn’t sure which one to believe.", ["interchangeable", "various", "contradictory"], 2),
+        ],
+      }),
+      buildSection("reading-part-1", "Reading H: Digital nomads", "reading", "reading-multiple-choice", "multiple-choice-single", 6, true, "Read the article about digital nomads and choose the correct answer for each question.", {
+        sharedPrompt: {
+          type: "reading-passage",
+          title: "Working from home or away?",
+          passages: [{
+            heading: "Working from home or away?",
+            text: "Andy White\n\nOnce dismissed as ‘citizens of nowhere’, one sector of the workforce is growing more important to countries who see it as a valuable source of revenue.\n\nMy stereotypical view of a digital nomad used to be of carefree university-educated western twenty-somethings working on laptops at far-flung beach resorts. However, the era of the digital nomad is entering a new phase. More countries are starting to issue special visas designed to attract long-term remote workers. Drawn by the offer of lower costs of living and broadband speeds equivalent to those back home, a growing number of individuals are choosing to work remotely while overseas. The key advantage to this working life is it offers greater flexibility in terms of both travel and employment. Many digital nomads will work from several different destinations per year, and often take on a variety of contracts to ensure a more diverse workload.\n\nBut it’s not just individuals who are shaping the trend. Many companies have established their own remote working policies to allow for greater flexibility and ensure they retain staff. For employees, a number of remote working days may now be part of their standard contract. This might lack the excitement of embracing the digital nomad life full-time, but it enables both employer and employee greater opportunity to make clear plans. It also provides more job security. Furthermore, businesses can play an integral role in providing clear and up-to-date immigration and tax advice. Both areas that individual digital nomads often find problematic.\n\nWhile the benefit of a guaranteed period of remote working are apparent for the employee, there are a number of advantages for employers. Studies have shown that international travel experience has a positive effect on personal and professional growth. Many people who have taken the opportunity to work abroad feel increased confidence and adaptability. Alongside that they develop skills like cultural sensitivity and communication. Assuming that a business has a simple and efficient remote-working process in place, allowing loyal employees to work abroad may result in them bringing a greater depth of experience and diversity to their role.\n\nHowever, not everyone is as keen on the transition to new working patterns. In many popular destinations, digital nomads are blamed for driving up the cost of rents and impacting on society. Digital nomads tend to earn proportionally more than locals. Therefore, they can afford higher rental costs. Many landlords, keen to take advantage of additional income, are offering properties to outsiders. This limits the availability of affordable housing for established residents. Communities often report an impact on their sense of identity as digital nomads arrive. As huge numbers of residents stay only short term, locals feel that there is a lack of stability and trust in their neighbourhoods. While there may be some economic benefit provided by rents, spending in local shops and supermarkets, many digital natives are given preferential tax arrangements. This means they put additional strain on infrastructure while paying less to maintain it.\n\nDespite these issues, the phenomenon of the digital nomad is unlikely to go anywhere soon. What is important is that a balance is found between the host communities and the nomads who arrive. While their ambition may be to get the most they can from their time in the sun, they need to give back to the community which has welcomed them.",
+          }],
+        },
+        items: [
+          choiceItem("r1-1", "According to the writer, what kind of people were the first generation of digital nomads?", ["Young people with no ties to a particular location", "People who worked in jobs related to technology", "Privileged European or North American graduates"], 2),
+          choiceItem("r1-2", "What does the writer see as the main benefit of current remote working?", ["Freedom to vary the scope and scale of work", "Visas to work abroad are easily accessible", "An opportunity to reduce living expenses"], 0),
+          choiceItem("r1-3", "What is the writer’s view of employers offering periods of remote working in contracts?", ["It ties people in to their current role.", "It is a relatively boring proposition.", "It provides a welcome sense of insurance."], 2),
+          choiceItem("r1-4", "What assumption does the writer make about employers’ views of remote-working opportunities?", ["They are eager to encourage participation to build loyalty.", "They are keen to promote and capitalize on any skills developed.", "They are happy to make reference to it to show diversity."], 1),
+          choiceItem("r1-5", "What example does the writer provide of the negative impacts of remote working on society?", ["Communities become less connected.", "Long-term rent prices increase rapidly.", "Resources are distributed unequally."], 0),
+          choiceItem("r1-6", "How would you summarize the writer’s opinion of the current situation?", ["There is a need to limit the impact of remote working.", "There is a need to address concerns on either side.", "There is a need to promote the benefits to locals."], 1),
+        ],
+      }),
+      buildSection("listening-part-1", "Listening I: Procrastination", "listening", "listening-multiple-choice", "multiple-choice-single", 6, true, "Listen to a podcast about a negative habit. Choose the correct answer for each question.", {
+        sharedPrompt: {
+          type: "text-block",
+          title: "Listen to a podcast about a negative habit.",
+          exampleLines: ["Choose the correct answer for each question."],
+        },
+        items: [
+          choiceItem("l1-1", "What does the speaker imply about procrastination?", ["It is a habit that most people unconsciously adopt.", "It is a habit that is common despite obvious drawbacks.", "It is a habit that tends to affect people only short term."], 1),
+          choiceItem("l1-2", "According to the speaker, what is our mindset when we submit to present bias?", ["We focus favourably on immediate events.", "We favour significant events only.", "We think carefully about consequence."], 0),
+          choiceItem("l1-3", "What reason does the speaker give for the tendency to create split selves?", ["Most people want to feel a greater sense of freedom.", "Most people find it satisfying to socialize more often.", "Most people choose immediate rather than delayed reward."], 2),
+          choiceItem("l1-4", "How does the speaker define a loss aversion bias?", ["An anxiety about losing that impacts decision-making", "An anxiety about making mistakes that creates fear", "An anxiety about choosing that causes regret"], 0),
+          choiceItem("l1-5", "What example does the speaker give of procrastination benefiting mental well-being?", ["It provides time to find solutions for complex issues.", "It provides the perspective to help with plans.", "It provides opportunities to improve mood."], 2),
+          choiceItem("l1-6", "How would you describe the tone of the text?", ["Academic and complex", "Informative and entertaining", "Formal and convincing"], 1),
+        ],
+        audioSrc: "/audio/listening/insight-advanced-progress-1-5-listening.mp3",
+        timing: { preReadSeconds: 45, playCount: 2, gapBetweenPlaysSeconds: 10, answerWindowSeconds: 0 },
+      }),
+    ],
+  },
+  {
     id: "oxford-insight-advanced-end-of-year-a",
     provider: "Oxford",
     course: "Insight Advanced",
