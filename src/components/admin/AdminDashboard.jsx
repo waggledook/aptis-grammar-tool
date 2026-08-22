@@ -201,8 +201,8 @@ function getWritingGeneralStudentLabel(entry) {
 function normalizeReviewAnswer(value = "") {
   return String(value || "")
     .toLowerCase()
-    .replace(/[’']/g, "")
-    .replace(/[-.,!?;:()[\]{}"“”]/g, " ")
+    .replace(/[’‘'`´~]/g, "")
+    .replace(/[-—–.,!?;:()[\]{}"“”]/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
