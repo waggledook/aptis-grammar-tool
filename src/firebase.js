@@ -793,34 +793,61 @@ export async function saveHubVocabActivityResult({
   totalItems,
   correctFirstTry,
   mistakesCount,
+  seenItemIds = [],
+  coverageTotal = null,
   mode = "practice",
 }) {
   const uid = auth.currentUser?.uid;
-  if (!uid || !themeId || !activityId) return;
+  if (!uid || !themeId || !activityId) return null;
 
   const docId = `${themeId}:${activityId}`;
   const ref = doc(db, "users", uid, "hubVocabProgress", docId);
-  const payload = {
-    themeId,
-    themeTitle: themeTitle || "",
-    level: level || "a1",
-    activityId,
-    activityTitle: activityTitle || "",
-    activityType: activityType || "",
-    completed: true,
-    attempts: increment(1),
-    totalItems: totalItems ?? 0,
-    mistakesTotal: increment(mistakesCount ?? 0),
-    lastRun: {
-      totalItems: totalItems ?? 0,
-      correctFirstTry: correctFirstTry ?? null,
-      mistakesCount: mistakesCount ?? 0,
-      mode,
-    },
-    updatedAt: serverTimestamp(),
-  };
+  const normalizedSeenIds = [...new Set(seenItemIds.filter(Boolean).map(String))];
+  const normalizedCoverageTotal = Number.isFinite(Number(coverageTotal)) && Number(coverageTotal) > 0
+    ? Number(coverageTotal)
+    : null;
+  const result = await runTransaction(db, async (transaction) => {
+    const snapshot = await transaction.get(ref);
+    const current = snapshot.exists() ? snapshot.data() || {} : {};
+    const mergedSeenIds = [...new Set([
+      ...(Array.isArray(current.seenItemIds) ? current.seenItemIds : []),
+      ...normalizedSeenIds,
+    ].filter(Boolean).map(String))];
+    const effectiveCoverageTotal = normalizedCoverageTotal || Number(current.coverageTotal) || null;
+    const completed = effectiveCoverageTotal
+      ? mergedSeenIds.length >= effectiveCoverageTotal
+      : true;
 
-  await setDoc(ref, payload, { merge: true });
+    transaction.set(ref, {
+      themeId,
+      themeTitle: themeTitle || "",
+      level: level || "a1",
+      activityId,
+      activityTitle: activityTitle || "",
+      activityType: activityType || "",
+      completed,
+      attempts: (Number(current.attempts) || 0) + 1,
+      totalItems: totalItems ?? 0,
+      mistakesTotal: (Number(current.mistakesTotal) || 0) + (mistakesCount ?? 0),
+      seenItemIds: mergedSeenIds,
+      coverageTotal: effectiveCoverageTotal,
+      lastRun: {
+        totalItems: totalItems ?? 0,
+        correctFirstTry: correctFirstTry ?? null,
+        mistakesCount: mistakesCount ?? 0,
+        seenItemIds: normalizedSeenIds,
+        mode,
+      },
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+
+    return {
+      completed,
+      seenItemIds: mergedSeenIds,
+      coverageTotal: effectiveCoverageTotal,
+      seenCount: mergedSeenIds.length,
+    };
+  });
 
   await logActivity("hub_vocab_activity_completed", {
     app: "seifhub",
@@ -833,8 +860,13 @@ export async function saveHubVocabActivityResult({
     totalItems: totalItems ?? null,
     correctFirstTry: correctFirstTry ?? null,
     mistakesCount: mistakesCount ?? null,
+    seenItemIds: normalizedSeenIds,
+    coverageTotal: normalizedCoverageTotal,
+    completed: result.completed,
     mode,
   });
+
+  return result;
 }
 
 export async function fetchHubVocabProgress(uid) {
@@ -844,18 +876,44 @@ export async function fetchHubVocabProgress(uid) {
   const snap = await getDocs(collection(db, "users", realUid, "hubVocabProgress"));
   const out = {};
 
+  const themes = getAllHubVocabThemes();
+  const activityByKey = new Map();
+  themes.forEach((theme) => {
+    (theme.activities || []).forEach((activity) => {
+      const dataset = activity.dataKey ? theme[activity.dataKey] : theme.entries;
+      const itemCount = Array.isArray(dataset) ? dataset.length : 0;
+      const itemIds = new Set((Array.isArray(dataset) ? dataset : []).map((item) => item?.id).filter(Boolean));
+      const configuredLimit = Number(activity.itemLimit);
+      activityByKey.set(`${theme.id}:${activity.id}`, {
+        itemCount,
+        itemIds,
+        tracksCoverage: Number.isFinite(configuredLimit) && configuredLimit > 0 && configuredLimit < itemCount,
+      });
+    });
+  });
+
   snap.forEach((d) => {
     const data = d.data() || {};
-    if (!data.completed) return;
     const themeId = data.themeId || d.id.split(":")[0] || "";
     const activityId = data.activityId || d.id.split(":")[1] || "";
+    const activityMeta = activityByKey.get(d.id);
+    const storedSeenItemIds = [...new Set((Array.isArray(data.seenItemIds) ? data.seenItemIds : []).filter(Boolean))];
+    const seenItemIds = activityMeta?.tracksCoverage
+      ? storedSeenItemIds.filter((itemId) => activityMeta.itemIds.has(itemId))
+      : storedSeenItemIds;
+    const coverageTotal = Number(data.coverageTotal) || activityMeta?.itemCount || null;
+    const completed = activityMeta?.tracksCoverage
+      ? Boolean(coverageTotal && seenItemIds.length >= coverageTotal)
+      : Boolean(data.completed);
     out[d.id] = {
       id: d.id,
       themeId,
       activityId,
-      completed: true,
+      completed,
       attempts: data.attempts ?? 0,
       mistakesTotal: data.mistakesTotal ?? 0,
+      seenItemIds,
+      coverageTotal,
       updatedAt: data.updatedAt || null,
       lastRun: data.lastRun || null,
     };
@@ -881,7 +939,7 @@ export async function fetchHubVocabThemeCounts(uid) {
 
   const progress = await fetchHubVocabProgress(realUid);
   Object.values(progress).forEach((entry) => {
-    if (!entry?.themeId) return;
+    if (!entry?.themeId || !entry.completed) return;
     if (!stats[entry.themeId]) stats[entry.themeId] = { completed: 0, total: 0 };
     stats[entry.themeId].completed += 1;
   });

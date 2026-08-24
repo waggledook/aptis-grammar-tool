@@ -104,18 +104,18 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Match the numbers to the words.",
       },
       {
-        id: "spelling",
-        type: "type-answer",
-        title: "Spell the number",
-        shortDescription: "Type the word for each number.",
-        prompt: "Type the number in words.",
-      },
-      {
         id: "quick-choice",
         type: "quick-choice",
         title: "Quick choice",
         shortDescription: "Choose the correct word before moving to the next card.",
         prompt: "Choose the word that matches the number.",
+      },
+      {
+        id: "spelling",
+        type: "type-answer",
+        title: "Spell the number",
+        shortDescription: "Type the word for each number.",
+        prompt: "Type the number in words.",
       },
     ],
   },
@@ -235,26 +235,11 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Match the classroom objects to the words.",
       },
       {
-        id: "spelling",
-        type: "type-answer",
-        title: "Spell the object",
-        shortDescription: "Type the classroom word from the visual prompt.",
-        prompt: "Look at the object and type the word.",
-      },
-      {
         id: "quick-choice",
         type: "quick-choice",
         title: "Quick choice",
         shortDescription: "Choose the correct classroom word.",
         prompt: "Choose the word that matches the classroom object.",
-      },
-      {
-        id: "language-gap-fill",
-        type: "phrase-gap-fill",
-        dataKey: "classroomLanguage",
-        title: "Classroom phrase gaps",
-        shortDescription: "Type the missing key word from each classroom phrase.",
-        prompt: "Complete the classroom phrase.",
       },
       {
         id: "speaker-choice",
@@ -263,6 +248,21 @@ export const HUB_VOCAB_THEMES = [
         title: "Teacher or student?",
         shortDescription: "Decide whether the teacher says it or the student says it.",
         prompt: "Choose who usually says the phrase.",
+      },
+      {
+        id: "spelling",
+        type: "type-answer",
+        title: "Spell the object",
+        shortDescription: "Type the classroom word from the visual prompt.",
+        prompt: "Look at the object and type the word.",
+      },
+      {
+        id: "language-gap-fill",
+        type: "phrase-gap-fill",
+        dataKey: "classroomLanguage",
+        title: "Classroom phrase gaps",
+        shortDescription: "Type the missing key word from each classroom phrase.",
+        prompt: "Complete the classroom phrase.",
       },
     ],
   },
@@ -308,13 +308,6 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Match the objects to the words.",
       },
       {
-        id: "spelling",
-        type: "type-answer",
-        title: "Spell the object",
-        shortDescription: "Type the small-object word from the visual prompt.",
-        prompt: "Look at the object and type the word.",
-      },
-      {
         id: "quick-choice",
         type: "quick-choice",
         title: "Quick choice",
@@ -327,6 +320,13 @@ export const HUB_VOCAB_THEMES = [
         title: "a / an",
         shortDescription: "Choose the correct article for each object.",
         prompt: "Choose the correct article before the noun.",
+      },
+      {
+        id: "spelling",
+        type: "type-answer",
+        title: "Spell the object",
+        shortDescription: "Type the small-object word from the visual prompt.",
+        prompt: "Look at the object and type the word.",
       },
     ],
   },
@@ -385,19 +385,19 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Match the colours to the words.",
       },
       {
-        id: "colour-spelling",
-        type: "type-answer",
-        title: "Spell the colour",
-        shortDescription: "Type the colour word from the visual prompt.",
-        prompt: "Look at the colour and type the word.",
-      },
-      {
         id: "opposites",
         type: "opposites-choice",
         dataKey: "adjectiveEntries",
         title: "Opposites",
         shortDescription: "Choose the opposite adjective.",
         prompt: "Choose the opposite of each adjective.",
+      },
+      {
+        id: "colour-spelling",
+        type: "type-answer",
+        title: "Spell the colour",
+        shortDescription: "Type the colour word from the visual prompt.",
+        prompt: "Look at the colour and type the word.",
       },
       {
         id: "write-the-opposite",
@@ -539,18 +539,18 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Match the food and drink items to the words.",
       },
       {
-        id: "spelling",
-        type: "type-answer",
-        title: "Spell the item",
-        shortDescription: "Type the food or drink word from the prompt.",
-        prompt: "Look at the prompt and type the word.",
-      },
-      {
         id: "quick-choice",
         type: "quick-choice",
         title: "Quick choice",
         shortDescription: "Choose the food or drink word that matches the prompt.",
         prompt: "Choose the correct food or drink word.",
+      },
+      {
+        id: "spelling",
+        type: "type-answer",
+        title: "Spell the item",
+        shortDescription: "Type the food or drink word from the prompt.",
+        prompt: "Look at the prompt and type the word.",
       },
     ],
   },
@@ -596,6 +596,13 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Match the cue prompts to the full phrases.",
       },
       {
+        id: "quick-choice",
+        type: "gap-choice",
+        title: "Quick choice",
+        shortDescription: "Choose the missing verb or verb phrase.",
+        prompt: "Choose the missing words.",
+      },
+      {
         id: "spelling",
         type: "cue-gap-type-answer",
         title: "Complete the phrase",
@@ -603,13 +610,6 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Look at the cue prompt and type the missing words.",
         answerLabel: "Missing words",
         answerPlaceholder: "Type the missing words",
-      },
-      {
-        id: "quick-choice",
-        type: "gap-choice",
-        title: "Quick choice",
-        shortDescription: "Choose the missing verb or verb phrase.",
-        prompt: "Choose the missing words.",
       },
     ],
   },
@@ -653,11 +653,27 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Look at the job prompt and say the job before you flip.",
       },
       {
+        id: "place-flashcards",
+        type: "flashcards",
+        dataKey: "workplaceEntries",
+        title: "Place flashcards",
+        shortDescription: "Read the place prompt, then reveal the phrase.",
+        prompt: "Look at the workplace prompt and say the phrase before you flip.",
+      },
+      {
         id: "job-matching",
         type: "matching",
         title: "Match jobs",
         shortDescription: "Match each job prompt to the correct word.",
         prompt: "Match the jobs to the words.",
+      },
+      {
+        id: "place-matching",
+        type: "matching",
+        dataKey: "workplaceEntries",
+        title: "Match places",
+        shortDescription: "Match each workplace prompt to the correct phrase.",
+        prompt: "Match the workplaces to the phrases.",
       },
       {
         id: "job-spelling",
@@ -667,22 +683,6 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Look at the prompt and type the job.",
         answerLabel: "Job",
         answerPlaceholder: "Type the job",
-      },
-      {
-        id: "place-flashcards",
-        type: "flashcards",
-        dataKey: "workplaceEntries",
-        title: "Place flashcards",
-        shortDescription: "Read the place prompt, then reveal the phrase.",
-        prompt: "Look at the workplace prompt and say the phrase before you flip.",
-      },
-      {
-        id: "place-matching",
-        type: "matching",
-        dataKey: "workplaceEntries",
-        title: "Match places",
-        shortDescription: "Match each workplace prompt to the correct phrase.",
-        prompt: "Match the workplaces to the phrases.",
       },
       {
         id: "place-spelling",
@@ -740,6 +740,13 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Match the daily routine prompts to the phrases.",
       },
       {
+        id: "routine-quick-choice",
+        type: "quick-choice",
+        title: "Quick choice",
+        shortDescription: "Choose the full routine phrase that matches the prompt.",
+        prompt: "Choose the correct routine phrase.",
+      },
+      {
         id: "routine-spelling",
         type: "cue-gap-type-answer",
         title: "Complete the routine",
@@ -747,13 +754,6 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Look at the cue prompt and type the missing word.",
         answerLabel: "Missing word",
         answerPlaceholder: "Type the missing word",
-      },
-      {
-        id: "routine-quick-choice",
-        type: "quick-choice",
-        title: "Quick choice",
-        shortDescription: "Choose the full routine phrase that matches the prompt.",
-        prompt: "Choose the correct routine phrase.",
       },
     ],
   },
@@ -809,6 +809,13 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Match the cue prompts to the full phrases.",
       },
       {
+        id: "quick-choice",
+        type: "gap-choice",
+        title: "Quick choice",
+        shortDescription: "Choose the missing verb or verb phrase.",
+        prompt: "Choose the missing words.",
+      },
+      {
         id: "spelling",
         type: "cue-gap-type-answer",
         title: "Complete the phrase",
@@ -816,13 +823,6 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Look at the cue prompt and type the missing words.",
         answerLabel: "Missing words",
         answerPlaceholder: "Type the missing words",
-      },
-      {
-        id: "quick-choice",
-        type: "gap-choice",
-        title: "Quick choice",
-        shortDescription: "Choose the missing verb or verb phrase.",
-        prompt: "Choose the missing words.",
       },
     ],
   },
@@ -891,11 +891,27 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Read the abbreviation and say the month before you flip.",
       },
       {
+        id: "ordinal-flashcards",
+        type: "flashcards",
+        dataKey: "ordinalEntries",
+        title: "Ordinal flashcards",
+        shortDescription: "Read the ordinal number, then reveal the word.",
+        prompt: "Read the ordinal number and say the word before you flip.",
+      },
+      {
         id: "month-matching",
         type: "matching",
         title: "Match months",
         shortDescription: "Match each abbreviation to the month.",
         prompt: "Match the month abbreviations to the words.",
+      },
+      {
+        id: "ordinal-matching",
+        type: "matching",
+        dataKey: "ordinalEntries",
+        title: "Match ordinals",
+        shortDescription: "Match each ordinal number to the word.",
+        prompt: "Match the ordinal numbers to the words.",
       },
       {
         id: "month-spelling",
@@ -905,22 +921,6 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Look at the abbreviation and type the month.",
         answerLabel: "Month",
         answerPlaceholder: "e.g. January",
-      },
-      {
-        id: "ordinal-flashcards",
-        type: "flashcards",
-        dataKey: "ordinalEntries",
-        title: "Ordinal flashcards",
-        shortDescription: "Read the ordinal number, then reveal the word.",
-        prompt: "Read the ordinal number and say the word before you flip.",
-      },
-      {
-        id: "ordinal-matching",
-        type: "matching",
-        dataKey: "ordinalEntries",
-        title: "Match ordinals",
-        shortDescription: "Match each ordinal number to the word.",
-        prompt: "Match the ordinal numbers to the words.",
       },
       {
         id: "ordinal-spelling",
@@ -979,6 +979,13 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Match the activity pictures to the words.",
       },
       {
+        id: "activity-quick-choice",
+        type: "quick-choice",
+        title: "Quick choice",
+        shortDescription: "Choose the activity that matches the cue.",
+        prompt: "Choose the correct activity.",
+      },
+      {
         id: "activity-spelling",
         type: "type-answer",
         title: "Spell the activity",
@@ -986,13 +993,6 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Look at the picture and type the activity.",
         answerLabel: "Activity",
         answerPlaceholder: "e.g. camping",
-      },
-      {
-        id: "activity-quick-choice",
-        type: "quick-choice",
-        title: "Quick choice",
-        shortDescription: "Choose the activity that matches the cue.",
-        prompt: "Choose the correct activity.",
       },
     ],
   },
@@ -1039,6 +1039,13 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Match the clothes pictures to the words.",
       },
       {
+        id: "clothes-quick-choice",
+        type: "quick-choice",
+        title: "Quick choice",
+        shortDescription: "Choose the clothes word that matches the picture.",
+        prompt: "Choose the correct clothes word.",
+      },
+      {
         id: "clothes-spelling",
         type: "type-answer",
         title: "Spell the clothes",
@@ -1046,13 +1053,6 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Look at the picture and type the clothes word.",
         answerLabel: "Clothes word",
         answerPlaceholder: "e.g. jacket",
-      },
-      {
-        id: "clothes-quick-choice",
-        type: "quick-choice",
-        title: "Quick choice",
-        shortDescription: "Choose the clothes word that matches the picture.",
-        prompt: "Choose the correct clothes word.",
       },
     ],
   },
@@ -1103,15 +1103,6 @@ export const HUB_VOCAB_THEMES = [
         prompt: "Click a numbered item, then choose the matching word.",
       },
       {
-        id: "room-spelling",
-        type: "image-hotspot-type-answer",
-        title: "Name the room item",
-        shortDescription: "Type the word for the highlighted room item.",
-        prompt: "Look at the highlighted number and type the word.",
-        answerLabel: "Room item",
-        answerPlaceholder: "e.g. a lamp",
-      },
-      {
         id: "hotel-labels",
         type: "image-hotspot-match",
         dataKey: "hotelEntries",
@@ -1119,6 +1110,15 @@ export const HUB_VOCAB_THEMES = [
         title: "Match the hotel",
         shortDescription: "Click a numbered hotel facility and match it to the word.",
         prompt: "Click a numbered place in the hotel, then choose the matching word.",
+      },
+      {
+        id: "room-spelling",
+        type: "image-hotspot-type-answer",
+        title: "Name the room item",
+        shortDescription: "Type the word for the highlighted room item.",
+        prompt: "Look at the highlighted number and type the word.",
+        answerLabel: "Room item",
+        answerPlaceholder: "e.g. a lamp",
       },
       {
         id: "hotel-spelling",
@@ -2237,6 +2237,294 @@ const a2HouseClueEntries = [
   { id: "a2-house-clue-cupboard", sentence: "You store food, plates, or other things inside this. It is ____.", answer: "a cupboard", acceptedAnswers: ["a cupboard", "cupboard"], options: ["a cupboard", "a shelf", "a fridge", "a wardrobe"] },
 ];
 
+const A2_PREPOSITIONS_IMAGE_BASE = "/images/vocab/a2-prepositions";
+
+function a2PrepositionEntry(id, term, example, imagePrompt) {
+  return objectEntry(`a2-prep-${id}`, term, term.toUpperCase(), term, [term], null, `${A2_PREPOSITIONS_IMAGE_BASE}/${id}.png`, {
+    example,
+    imagePrompt,
+  });
+}
+
+const a2PrepositionPositionEntries = [
+  a2PrepositionEntry("in", "in", "in the wardrobe", "A person or subtle translucent figure clearly inside an open wardrobe. The wardrobe surrounds the figure so the spatial relationship IN is unmistakable."),
+  a2PrepositionEntry("in-front-of", "in front of", "in front of the table", "A person clearly standing in front of a table, closer to the viewer than the table. Make depth and overlap very clear."),
+  a2PrepositionEntry("on", "on", "on the chair", "A small object or figure clearly resting on the seat of a chair, with direct contact between the two."),
+  a2PrepositionEntry("under", "under", "under the bed", "A person or object clearly underneath a bed, visible beneath the bed frame."),
+  a2PrepositionEntry("behind", "behind", "behind the sofa", "A person partly hidden behind the back of a sofa. The sofa should visibly block part of the figure."),
+  a2PrepositionEntry("between", "between", "between the windows", "A person or object positioned exactly between two clearly separated windows."),
+  a2PrepositionEntry("opposite", "opposite", "opposite the woman", "Two adults clearly facing one another from opposite sides of a room, with open space between them."),
+  a2PrepositionEntry("next-to", "next to", "next to the armchair", "A person or object immediately beside an armchair, clearly close but not touching or sitting on it."),
+  a2PrepositionEntry("over", "over", "over the mirror", "A small object or figure directly above a wall mirror, vertically aligned with it and not touching it."),
+];
+
+const a2PrepositionMovementEntries = [
+  a2PrepositionEntry("from", "from", "from the bedroom", "An adult clearly leaving a bedroom and moving away from it. Show the open bedroom doorway behind them and a clear directional movement away from the room."),
+  a2PrepositionEntry("to", "to", "to the bathroom", "An adult clearly walking toward a bathroom doorway. Make the bathroom destination visually recognisable and the direction of travel obvious."),
+  a2PrepositionEntry("into", "into", "into the wardrobe", "A figure moving from outside an open wardrobe into its interior. Show movement crossing the wardrobe threshold."),
+  a2PrepositionEntry("out-of", "out of", "out of the wardrobe", "A figure emerging from inside an open wardrobe to the outside. The direction must clearly be outward."),
+  a2PrepositionEntry("through", "through", "through the window", "A figure clearly passing through an open window from one side to the other. Show the figure crossing the window opening."),
+  a2PrepositionEntry("up", "up", "up the stairs", "An adult walking upward on a staircase, clearly moving from the lower steps to the higher steps."),
+  a2PrepositionEntry("down", "down", "down the stairs", "An adult walking downward on a staircase, clearly moving from the higher steps toward the lower floor."),
+];
+
+function withPrepositionOptions(entries, optionMap, prefix) {
+  return entries.map((entry) => ({
+    ...entry,
+    id: `${prefix}-${entry.id}`,
+    options: optionMap[entry.term],
+  }));
+}
+
+const a2PrepositionPositionChoiceEntries = withPrepositionOptions(a2PrepositionPositionEntries, {
+  in: ["in", "on", "under", "behind"],
+  "in front of": ["in front of", "behind", "next to", "opposite"],
+  on: ["on", "under", "in", "over"],
+  under: ["under", "on", "behind", "in"],
+  behind: ["behind", "in front of", "next to", "between"],
+  between: ["between", "next to", "opposite", "behind"],
+  opposite: ["opposite", "next to", "behind", "in front of"],
+  "next to": ["next to", "between", "opposite", "in front of"],
+  over: ["over", "under", "on", "behind"],
+}, "a2-prep-place-choice");
+
+const a2PrepositionMovementChoiceEntries = withPrepositionOptions(a2PrepositionMovementEntries, {
+  from: ["from", "to", "into", "out of"],
+  to: ["to", "from", "into", "through"],
+  into: ["into", "out of", "to", "through"],
+  "out of": ["out of", "into", "from", "through"],
+  through: ["through", "into", "out of", "to"],
+  up: ["up", "down", "to", "from"],
+  down: ["down", "up", "from", "to"],
+}, "a2-prep-move-choice");
+
+const a2PrepositionVisualEntries = [...a2PrepositionPositionEntries, ...a2PrepositionMovementEntries];
+
+const a2PrepositionContextEntries = [
+  { id: "a2-prep-context-01", sentence: "My coat is _____ the wardrobe.", answer: "in", options: ["in", "on", "under", "behind"] },
+  { id: "a2-prep-context-02", sentence: "There's a small table _____ the sofa.", answer: "in front of", options: ["in front of", "behind", "between", "under"] },
+  { id: "a2-prep-context-03", sentence: "Your phone is _____ the chair.", answer: "on", options: ["on", "in", "under", "over"] },
+  { id: "a2-prep-context-04", sentence: "I found my shoes _____ the bed.", answer: "under", options: ["under", "on", "in", "over"] },
+  { id: "a2-prep-context-05", sentence: "The cat is hiding _____ the sofa.", answer: "behind", options: ["behind", "in front of", "between", "opposite"] },
+  { id: "a2-prep-context-06", sentence: "There's a picture _____ the two windows.", answer: "between", options: ["between", "next to", "opposite", "behind"] },
+  { id: "a2-prep-context-07", sentence: "The bank is _____ the supermarket, on the other side of the road.", answer: "opposite", options: ["opposite", "next to", "behind", "between"] },
+  { id: "a2-prep-context-08", sentence: "The lamp is _____ the armchair.", answer: "next to", options: ["next to", "between", "opposite", "under"] },
+  { id: "a2-prep-context-09", sentence: "There's a light _____ the mirror.", answer: "over", options: ["over", "under", "in", "on"] },
+  { id: "a2-prep-context-10", sentence: "The plane is flying _____ the clouds.", answer: "above", options: ["above", "below", "under", "in"] },
+  { id: "a2-prep-context-11", sentence: "The garage is _____ our flat.", answer: "below", options: ["below", "above", "over", "on"] },
+  { id: "a2-prep-context-12", sentence: "She walked _____ the bedroom and went downstairs.", answer: "from", options: ["from", "to", "into", "through"] },
+  { id: "a2-prep-context-13", sentence: "We drove _____ the airport after breakfast.", answer: "to", options: ["to", "from", "out of", "through"] },
+  { id: "a2-prep-context-14", sentence: "He opened the door and walked _____ the room.", answer: "into", options: ["into", "out of", "from", "up"] },
+  { id: "a2-prep-context-15", sentence: "She took her coat _____ the wardrobe.", answer: "out of", options: ["out of", "into", "through", "to"] },
+  { id: "a2-prep-context-16", sentence: "The cat climbed _____ the open window.", answer: "through", options: ["through", "into", "to", "from"] },
+  { id: "a2-prep-context-17", sentence: "We walked _____ the stairs to the second floor.", answer: "up", options: ["up", "down", "through", "to"] },
+  { id: "a2-prep-context-18", sentence: "He ran _____ the stairs to answer the front door.", answer: "down", options: ["down", "up", "into", "from"] },
+  { id: "a2-prep-context-19", sentence: "I walked _____ the kitchen to get some water.", answer: "into", options: ["into", "in", "from", "out of"] },
+  { id: "a2-prep-context-20", sentence: "The children came _____ the classroom when the lesson finished.", answer: "out of", options: ["out of", "into", "to", "through"] },
+  { id: "a2-prep-context-21", sentence: "The café is _____ the cinema and the bank.", answer: "between", options: ["between", "opposite", "next to", "behind"] },
+  { id: "a2-prep-context-22", sentence: "The woman is sitting _____ me, so we're facing each other.", answer: "opposite", options: ["opposite", "next to", "behind", "under"] },
+  { id: "a2-prep-context-23", sentence: "He went _____ the stairs slowly because his leg hurt.", answer: "up", options: ["up", "into", "from", "through"] },
+  { id: "a2-prep-context-24", sentence: "I came _____ the bathroom and went back to my bedroom.", answer: "from", options: ["from", "to", "into", "up"] },
+];
+
+const A2_FOOD_IMAGE_BASE = "/images/vocab/a2-food";
+
+function a2FoodEntry(id, term, sourceGroup, image, acceptedAnswers = []) {
+  return objectEntry(`a2-food-${id}`, term, term.toUpperCase(), term, [term, ...acceptedAnswers], null, image, {
+    sourceGroup,
+  });
+}
+
+const a2FoodBreakfastEntries = [
+  a2FoodEntry("bread", "bread", "breakfast", `${FOOD_IMAGE_BASE}/bread.png`),
+  a2FoodEntry("butter", "butter", "breakfast", `${FOOD_IMAGE_BASE}/butter.png`),
+  a2FoodEntry("cereal", "cereal", "breakfast", `${FOOD_IMAGE_BASE}/cereal.png`),
+  a2FoodEntry("cheese", "cheese", "breakfast", `${FOOD_IMAGE_BASE}/cheese.png`),
+  a2FoodEntry("coffee", "coffee", "breakfast", `${FOOD_IMAGE_BASE}/coffee.png`),
+  a2FoodEntry("eggs", "eggs", "breakfast", `${FOOD_IMAGE_BASE}/egg.png`, ["egg"]),
+  a2FoodEntry("jam", "jam", "breakfast", `${A2_FOOD_IMAGE_BASE}/jam.png`),
+  a2FoodEntry("orange-juice", "orange juice", "breakfast", `${FOOD_IMAGE_BASE}/orange juice.png`, ["juice"]),
+  a2FoodEntry("milk", "milk", "breakfast", `${FOOD_IMAGE_BASE}/milk.png`),
+  a2FoodEntry("sugar", "sugar", "breakfast", `${FOOD_IMAGE_BASE}/sugar.png`),
+  a2FoodEntry("tea", "tea", "breakfast", `${FOOD_IMAGE_BASE}/tea.png`),
+  a2FoodEntry("toast", "toast", "breakfast", `${A2_FOOD_IMAGE_BASE}/toast.png`),
+];
+
+const a2FoodMealEntries = [
+  a2FoodEntry("fish", "fish", "lunch-dinner", `${FOOD_IMAGE_BASE}/fish.png`),
+  a2FoodEntry("herbs", "herbs", "lunch-dinner", `${A2_FOOD_IMAGE_BASE}/herbs.png`, ["herb"]),
+  a2FoodEntry("meat", "meat", "lunch-dinner", `${FOOD_IMAGE_BASE}/meat.png`),
+  a2FoodEntry("olive-oil", "olive oil", "lunch-dinner", `${A2_FOOD_IMAGE_BASE}/olive-oil.png`, ["oil"]),
+  a2FoodEntry("pasta", "pasta", "lunch-dinner", `${FOOD_IMAGE_BASE}/pasta.png`),
+  a2FoodEntry("rice", "rice", "lunch-dinner", `${FOOD_IMAGE_BASE}/rice.png`),
+  a2FoodEntry("salad", "salad", "lunch-dinner", `${FOOD_IMAGE_BASE}/salad.png`),
+  a2FoodEntry("seafood", "seafood", "lunch-dinner", `${A2_FOOD_IMAGE_BASE}/seafood.png`),
+  a2FoodEntry("spices", "spices", "lunch-dinner", `${A2_FOOD_IMAGE_BASE}/spices.png`, ["spice"]),
+];
+
+const a2FoodVegetableEntries = [
+  a2FoodEntry("carrots", "carrots", "vegetables", `${A2_FOOD_IMAGE_BASE}/carrots.png`, ["carrot"]),
+  a2FoodEntry("chips", "chips", "vegetables", `${A2_FOOD_IMAGE_BASE}/chips.png`, ["chip", "French fries", "French fry"]),
+  a2FoodEntry("lettuce", "lettuce", "vegetables", `${A2_FOOD_IMAGE_BASE}/lettuce.png`, ["a lettuce"]),
+  a2FoodEntry("mushrooms", "mushrooms", "vegetables", `${A2_FOOD_IMAGE_BASE}/mushrooms.png`, ["mushroom"]),
+  a2FoodEntry("onions", "onions", "vegetables", `${A2_FOOD_IMAGE_BASE}/onions.png`, ["onion"]),
+  a2FoodEntry("peas", "peas", "vegetables", `${A2_FOOD_IMAGE_BASE}/peas.png`, ["pea"]),
+  a2FoodEntry("peppers", "peppers", "vegetables", `${A2_FOOD_IMAGE_BASE}/peppers.png`, ["pepper"]),
+  a2FoodEntry("potatoes", "potatoes", "vegetables", `${FOOD_IMAGE_BASE}/potatoes.png`, ["potato"]),
+  a2FoodEntry("tomatoes", "tomatoes", "vegetables", `${A2_FOOD_IMAGE_BASE}/tomatoes.png`, ["tomato"]),
+];
+
+const a2FoodFruitEntries = [
+  a2FoodEntry("apples", "apples", "fruit", `${A2_FOOD_IMAGE_BASE}/apples.png`, ["apple"]),
+  a2FoodEntry("bananas", "bananas", "fruit", `${A2_FOOD_IMAGE_BASE}/bananas.png`, ["banana"]),
+  a2FoodEntry("oranges", "oranges", "fruit", `${A2_FOOD_IMAGE_BASE}/oranges.png`, ["orange"]),
+  a2FoodEntry("pineapple", "pineapple", "fruit", `${A2_FOOD_IMAGE_BASE}/pineapple.png`, ["a pineapple"]),
+  a2FoodEntry("strawberries", "strawberries", "fruit", `${A2_FOOD_IMAGE_BASE}/strawberries.png`, ["strawberry"]),
+];
+
+const a2FoodDessertEntries = [
+  a2FoodEntry("cake", "cake", "desserts", `${A2_FOOD_IMAGE_BASE}/cake.png`),
+  a2FoodEntry("fruit-salad", "fruit salad", "desserts", `${A2_FOOD_IMAGE_BASE}/fruit-salad.png`),
+  a2FoodEntry("ice-cream", "ice cream", "desserts", `${A2_FOOD_IMAGE_BASE}/ice-cream.png`),
+];
+
+const a2FoodSnackEntries = [
+  a2FoodEntry("biscuits", "biscuits", "snacks", `${A2_FOOD_IMAGE_BASE}/biscuits.png`, ["biscuit"]),
+  a2FoodEntry("chocolate", "chocolate", "snacks", `${FOOD_IMAGE_BASE}/chocolate.png`),
+  a2FoodEntry("crisps", "crisps", "snacks", `${A2_FOOD_IMAGE_BASE}/crisps.png`, ["crisp"]),
+  a2FoodEntry("nuts", "nuts", "snacks", `${A2_FOOD_IMAGE_BASE}/nuts.png`, ["nut"]),
+  a2FoodEntry("sandwich", "sandwich", "snacks", `${FOOD_IMAGE_BASE}/sandwich.png`, ["a sandwich"]),
+  a2FoodEntry("sweets", "sweets", "snacks", `${A2_FOOD_IMAGE_BASE}/sweets.png`, ["sweet"]),
+];
+
+const a2FoodEntries = [
+  ...a2FoodBreakfastEntries,
+  ...a2FoodMealEntries,
+  ...a2FoodVegetableEntries,
+  ...a2FoodFruitEntries,
+  ...a2FoodDessertEntries,
+  ...a2FoodSnackEntries,
+];
+
+const a2FoodClueEntries = [
+  { id: "a2-food-clue-01", sentence: "You often put this on bread or toast. It is made from fruit and sugar.", answer: "jam", options: ["jam", "butter", "cheese", "cereal"] },
+  { id: "a2-food-clue-02", sentence: "You make this by heating slices of bread until they are brown.", answer: "toast", options: ["toast", "cereal", "cake", "pasta"] },
+  { id: "a2-food-clue-03", sentence: "People often eat this from a bowl with milk for breakfast.", answer: "cereal", options: ["cereal", "rice", "salad", "peas"] },
+  { id: "a2-food-clue-04", sentence: "This is a hot drink made from coffee beans.", answer: "coffee", options: ["coffee", "tea", "milk", "orange juice"] },
+  { id: "a2-food-clue-05", sentence: "Salmon and tuna are examples of this.", answer: "fish", options: ["fish", "meat", "seafood", "herbs"] },
+  { id: "a2-food-clue-06", sentence: "Chicken, steak and ham are examples of this.", answer: "meat", options: ["meat", "fish", "seafood", "salad"] },
+  { id: "a2-food-clue-07", sentence: "You can add these leaves to food to give it more flavour.", answer: "herbs", options: ["herbs", "peas", "lettuce", "spices"] },
+  { id: "a2-food-clue-08", sentence: "You use this liquid for cooking or putting on salad.", answer: "olive oil", options: ["olive oil", "milk", "orange juice", "coffee"] },
+  { id: "a2-food-clue-09", sentence: "This food often includes lettuce, tomato and other vegetables mixed together.", answer: "salad", options: ["salad", "pasta", "rice", "seafood"] },
+  { id: "a2-food-clue-10", sentence: "These add strong flavours to food and often come as powders or seeds.", answer: "spices", options: ["spices", "herbs", "peas", "nuts"] },
+  { id: "a2-food-clue-11", sentence: "These are long orange vegetables that grow underground.", answer: "carrots", options: ["carrots", "peppers", "onions", "potatoes"] },
+  { id: "a2-food-clue-12", sentence: "In British English, these are pieces of potato that are fried and usually eaten hot.", answer: "chips", options: ["chips", "crisps", "potatoes", "nuts"] },
+  { id: "a2-food-clue-13", sentence: "This green vegetable is often used as the base of a salad.", answer: "lettuce", options: ["lettuce", "peas", "peppers", "carrots"] },
+  { id: "a2-food-clue-14", sentence: "These can be white or brown and have a round top and a short stem.", answer: "mushrooms", options: ["mushrooms", "onions", "tomatoes", "peas"] },
+  { id: "a2-food-clue-15", sentence: "These vegetables can make your eyes water when you cut them.", answer: "onions", options: ["onions", "carrots", "peppers", "mushrooms"] },
+  { id: "a2-food-clue-16", sentence: "These are small round green vegetables.", answer: "peas", options: ["peas", "onions", "carrots", "peppers"] },
+  { id: "a2-food-clue-17", sentence: "These vegetables can be red, green, yellow or orange and are often used in salads.", answer: "peppers", options: ["peppers", "tomatoes", "carrots", "onions"] },
+  { id: "a2-food-clue-18", sentence: "You can boil, roast, mash or fry these vegetables.", answer: "potatoes", options: ["potatoes", "tomatoes", "carrots", "mushrooms"] },
+  { id: "a2-food-clue-19", sentence: "These are usually red and are common in salads and pasta sauces.", answer: "tomatoes", options: ["tomatoes", "peppers", "onions", "strawberries"] },
+  { id: "a2-food-clue-20", sentence: "This long yellow fruit has a thick skin that you remove before eating it.", answer: "bananas", options: ["bananas", "oranges", "apples", "pineapple"] },
+  { id: "a2-food-clue-21", sentence: "These citrus fruits have orange skin.", answer: "oranges", options: ["oranges", "apples", "strawberries", "bananas"] },
+  { id: "a2-food-clue-22", sentence: "This large tropical fruit has a rough skin and green leaves on top.", answer: "pineapple", options: ["pineapple", "apples", "oranges", "bananas"] },
+  { id: "a2-food-clue-23", sentence: "These are small red fruits with tiny seeds on the outside.", answer: "strawberries", options: ["strawberries", "apples", "tomatoes", "oranges"] },
+  { id: "a2-food-clue-24", sentence: "This dessert is made by cutting different kinds of fruit into pieces and mixing them together.", answer: "fruit salad", options: ["fruit salad", "cake", "ice cream", "cereal"] },
+  { id: "a2-food-clue-25", sentence: "This cold sweet dessert is often sold in flavours such as vanilla or chocolate.", answer: "ice cream", options: ["ice cream", "cake", "fruit salad", "chocolate"] },
+  { id: "a2-food-clue-26", sentence: "In British English, these are small sweet baked snacks, often eaten with tea.", answer: "biscuits", options: ["biscuits", "crisps", "sweets", "nuts"] },
+  { id: "a2-food-clue-27", sentence: "In British English, these are thin crunchy slices of potato sold in packets.", answer: "crisps", options: ["crisps", "chips", "biscuits", "nuts"] },
+  { id: "a2-food-clue-28", sentence: "Almonds and walnuts are examples of these.", answer: "nuts", options: ["nuts", "peas", "crisps", "sweets"] },
+  { id: "a2-food-clue-29", sentence: "This snack usually has a filling between two pieces of bread.", answer: "sandwich", options: ["sandwich", "toast", "cake", "biscuits"] },
+  { id: "a2-food-clue-30", sentence: "In British English, this word means small pieces of sugary food such as boiled sweets or gummies.", answer: "sweets", options: ["sweets", "biscuits", "crisps", "chocolate"] },
+];
+
+const A2_PLACES_IMAGE_BASE = "/images/vocab/a2-places-buildings";
+
+function a2PlaceEntry(id, term, category, image = `${A2_PLACES_IMAGE_BASE}/${id}.png`, acceptedAnswers = []) {
+  const withoutArticle = term.replace(/^(?:a|an)\s+/i, "");
+  return objectEntry(`a2-place-${id}`, term, term.toUpperCase(), term, [term, withoutArticle, ...acceptedAnswers], null, image, {
+    category,
+  });
+}
+
+const a2EverydayPlaceEntries = [
+  a2PlaceEntry("chemist", "a chemist's", "everyday", `${A2_PLACES_IMAGE_BASE}/chemist.png`, ["chemist's", "a pharmacy", "pharmacy"]),
+  a2PlaceEntry("church", "a church", "everyday"),
+  a2PlaceEntry("department-store", "a department store", "everyday"),
+  a2PlaceEntry("hospital", "a hospital", "everyday"),
+  a2PlaceEntry("market", "a market", "everyday"),
+  a2PlaceEntry("park", "a park", "everyday"),
+  a2PlaceEntry("police-station", "a police station", "everyday"),
+  a2PlaceEntry("post-office", "a post office", "everyday"),
+  a2PlaceEntry("shopping-centre", "a shopping centre", "everyday", undefined, ["a shopping center", "shopping center"]),
+  a2PlaceEntry("supermarket", "a supermarket", "everyday"),
+  a2PlaceEntry("town-hall", "a town hall", "everyday", undefined, ["a city hall", "city hall"]),
+];
+
+const a2AttractionEntries = [
+  a2PlaceEntry("art-gallery", "an art gallery", "attractions"),
+  a2PlaceEntry("castle", "a castle", "attractions"),
+  a2PlaceEntry("museum", "a museum", "attractions"),
+  a2PlaceEntry("theatre", "a theatre", "attractions", undefined, ["a theater", "theater"]),
+  a2PlaceEntry("zoo", "a zoo", "attractions"),
+];
+
+const a2TownFeatureEntries = [
+  a2PlaceEntry("bridge", "a bridge", "town"),
+  a2PlaceEntry("river", "a river", "town"),
+  a2PlaceEntry("road", "a road", "town"),
+  a2PlaceEntry("square", "a square", "town"),
+  a2PlaceEntry("street", "a street", "town"),
+];
+
+const a2TransportPlaceEntries = [
+  a2PlaceEntry("bus-station", "a bus station", "transport"),
+  a2PlaceEntry("car-park", "a car park", "transport", undefined, ["a parking lot", "parking lot"]),
+  a2PlaceEntry("railway-station", "a railway station", "transport", `${A2_PLACES_IMAGE_BASE}/railway-station.png`, ["a train station", "train station"]),
+];
+
+const a2PlaceEntries = [
+  ...a2EverydayPlaceEntries,
+  ...a2AttractionEntries,
+  ...a2TownFeatureEntries,
+  ...a2TransportPlaceEntries,
+];
+
+const a2PlaceClueEntries = [
+  { id: "a2-place-clue-01", sentence: "You need to buy some medicine.", answer: "a chemist's", acceptedAnswers: ["chemist's", "a pharmacy", "pharmacy"], options: ["a chemist's", "a post office", "a supermarket", "a police station"] },
+  { id: "a2-place-clue-02", sentence: "You want to go to a Christian religious service.", answer: "a church", options: ["a church", "a museum", "a town hall", "a theatre"] },
+  { id: "a2-place-clue-03", sentence: "You want to buy clothes, cosmetics, and things for your home in one large shop.", answer: "a department store", options: ["a department store", "a supermarket", "a market", "a shopping centre"] },
+  { id: "a2-place-clue-04", sentence: "You are very ill and need medical treatment.", answer: "a hospital", options: ["a hospital", "a chemist's", "a police station", "a town hall"] },
+  { id: "a2-place-clue-05", sentence: "You want to buy food or other things from different outdoor stalls.", answer: "a market", options: ["a market", "a supermarket", "a department store", "a shopping centre"] },
+  { id: "a2-place-clue-06", sentence: "You want to walk, sit outside, or relax somewhere green.", answer: "a park", options: ["a park", "a square", "a street", "a zoo"] },
+  { id: "a2-place-clue-07", sentence: "You need to report a crime.", answer: "a police station", options: ["a police station", "a post office", "a town hall", "a hospital"] },
+  { id: "a2-place-clue-08", sentence: "You need to send a parcel.", answer: "a post office", options: ["a post office", "a chemist's", "a bus station", "a town hall"] },
+  { id: "a2-place-clue-09", sentence: "You want to visit several different shops in the same place.", answer: "a shopping centre", options: ["a shopping centre", "a department store", "a market", "a supermarket"] },
+  { id: "a2-place-clue-10", sentence: "You want to do your weekly food shopping.", answer: "a supermarket", options: ["a supermarket", "a market", "a department store", "a chemist's"] },
+  { id: "a2-place-clue-11", sentence: "You need to visit the local government offices.", answer: "a town hall", options: ["a town hall", "a police station", "a post office", "a railway station"] },
+  { id: "a2-place-clue-12", sentence: "You want to look at paintings and other works of art.", answer: "an art gallery", options: ["an art gallery", "a museum", "a theatre", "a castle"] },
+  { id: "a2-place-clue-13", sentence: "You want to visit an old fortified building where kings or queens may once have lived.", answer: "a castle", options: ["a castle", "a museum", "a town hall", "a church"] },
+  { id: "a2-place-clue-14", sentence: "You want to see historical or scientific objects and exhibitions.", answer: "a museum", options: ["a museum", "an art gallery", "a theatre", "a zoo"] },
+  { id: "a2-place-clue-15", sentence: "You want to watch actors perform a play.", answer: "a theatre", options: ["a theatre", "an art gallery", "a museum", "a church"] },
+  { id: "a2-place-clue-16", sentence: "You want to see animals from many different parts of the world.", answer: "a zoo", options: ["a zoo", "a park", "a museum", "a market"] },
+  { id: "a2-place-clue-17", sentence: "You need to cross a river without using a boat.", answer: "a bridge", options: ["a bridge", "a road", "a street", "a square"] },
+  { id: "a2-place-clue-18", sentence: "This is a natural body of water that flows towards the sea.", answer: "a river", options: ["a river", "a bridge", "a road", "a square"] },
+  { id: "a2-place-clue-19", sentence: "Cars and other vehicles travel along this between places.", answer: "a road", options: ["a road", "a street", "a bridge", "a square"] },
+  { id: "a2-place-clue-20", sentence: "This is an open public area in a town, often surrounded by buildings.", answer: "a square", options: ["a square", "a street", "a park", "a road"] },
+  { id: "a2-place-clue-21", sentence: "This is a road in a town or city, usually with buildings along it.", answer: "a street", options: ["a street", "a road", "a square", "a bridge"] },
+  { id: "a2-place-clue-22", sentence: "You want to catch a bus to another town.", answer: "a bus station", options: ["a bus station", "a railway station", "a car park", "a post office"] },
+  { id: "a2-place-clue-23", sentence: "You need somewhere to leave your car.", answer: "a car park", options: ["a car park", "a bus station", "a railway station", "a square"] },
+  { id: "a2-place-clue-24", sentence: "You want to catch a train.", answer: "a railway station", acceptedAnswers: ["a train station", "train station"], options: ["a railway station", "a bus station", "a car park", "a shopping centre"] },
+];
+
+const a2WorshipExtensionEntries = [
+  { id: "a2-worship-cathedral", term: "a cathedral", clue: "a large and important Christian church" },
+  { id: "a2-worship-mosque", term: "a mosque", clue: "a Muslim place of worship" },
+  { id: "a2-worship-synagogue", term: "a synagogue", clue: "a Jewish place of worship" },
+  { id: "a2-worship-temple", term: "a temple", clue: "a building used for worship in several religions" },
+];
+
 HUB_VOCAB_THEMES.push(
   {
     id: "days-numbers",
@@ -2275,11 +2563,10 @@ HUB_VOCAB_THEMES.push(
     continentSortEntries: a2ContinentSortEntries,
     activities: [
       { id: "continent-flashcards", type: "flashcards", dataKey: "continentEntries", title: "Continent flashcards", shortDescription: "Reveal the adjective for each continent.", prompt: "Say the continent adjective, then flip to check." },
-      { id: "continent-matching", type: "matching", dataKey: "continentEntries", title: "Continent → adjective", shortDescription: "Match each continent with its adjective.", prompt: "Match the continents and adjectives." },
       { id: "flag-flashcards", type: "flag-flashcards", title: "Flag flashcards", shortDescription: "Reveal the country and nationality from its flag.", prompt: "Say the country and nationality before you flip." },
+      { id: "continent-matching", type: "matching", dataKey: "continentEntries", title: "Continent → adjective", shortDescription: "Match each continent with its adjective.", prompt: "Match the continents and adjectives." },
       { id: "flag-match", type: "flag-match", title: "Match the flags", shortDescription: "Match each flag to the correct country.", prompt: "Which country does this flag show?" },
       { id: "nationalities", type: "nationality-choice", title: "Country → nationality", shortDescription: "Choose the correct nationality for each country.", prompt: "Choose the correct nationality." },
-      { id: "nationality-spelling", type: "nationality-type-answer", title: "Spell the nationality", shortDescription: "Type the nationality from the country name.", prompt: "Look at the country and type the nationality." },
       { id: "continent-sort", type: "category-sort", dataKey: "continentSortEntries", title: "Which continent?", shortDescription: "Sort countries into their continents.", prompt: "Choose the continent for each country.", promptKey: "country", categoryKey: "continentId", itemLimit: 12, categories: [
         { id: "africa", label: "Africa" },
         { id: "asia", label: "Asia" },
@@ -2288,6 +2575,7 @@ HUB_VOCAB_THEMES.push(
         { id: "north-america", label: "North America" },
         { id: "south-america", label: "South America" },
       ] },
+      { id: "nationality-spelling", type: "nationality-type-answer", title: "Spell the nationality", shortDescription: "Type the nationality from the country name.", prompt: "Look at the country and type the nationality." },
     ],
   },
   {
@@ -2307,9 +2595,9 @@ HUB_VOCAB_THEMES.push(
       { id: "phrase-flashcards", type: "flashcards", dataKey: "pictureEntries", title: "Classroom phrase flashcards", shortDescription: "Look at the classroom situation, then reveal the complete phrase.", prompt: "Say the full phrase before you flip." },
       { id: "phrase-matching", type: "matching", dataKey: "pictureEntries", title: "Match the phrase", shortDescription: "Match each classroom illustration to the complete phrase.", prompt: "Match the pictures and classroom phrases." },
       { id: "speaker-choice", type: "speaker-choice", title: "Teacher or student?", shortDescription: "Decide who usually says each classroom phrase.", prompt: "Choose whether the teacher or student says it." },
-      { id: "complete-phrase", type: "sentence-gap-type-answer", dataKey: "gapEntries", title: "Complete the classroom phrase", shortDescription: "Type the missing verb, preposition, or noun.", prompt: "Type the missing word." },
       { id: "choose-word", type: "sentence-gap-choice", dataKey: "gapEntries", title: "Choose the missing word", shortDescription: "Choose the word that completes each classroom phrase.", prompt: "Choose the missing word." },
       { id: "classroom-situations", type: "sentence-gap-choice", dataKey: "situationEntries", title: "Classroom situations", shortDescription: "Choose the phrase that fits each classroom situation.", prompt: "What would you say?", question: "What would you say?" },
+      { id: "complete-phrase", type: "sentence-gap-type-answer", dataKey: "gapEntries", title: "Complete the classroom phrase", shortDescription: "Type the missing verb, preposition, or noun.", prompt: "Type the missing word." },
     ],
   },
   {
@@ -2328,10 +2616,10 @@ HUB_VOCAB_THEMES.push(
     activities: [
       { id: "thing-flashcards", type: "flashcards", dataKey: "pictureEntries", title: "Things flashcards", shortDescription: "Look at each available object image, then reveal the word.", prompt: "Say the object before you flip." },
       { id: "thing-matching", type: "matching", dataKey: "pictureEntries", title: "Match the things", shortDescription: "Match each available object image to its name.", prompt: "Match the objects and words." },
-      { id: "thing-spelling", type: "type-answer", dataKey: "pictureEntries", title: "Spell the thing", shortDescription: "Type the object name from its image.", prompt: "Look at the object and type the word.", answerLabel: "Object", answerPlaceholder: "Type the object name" },
       { id: "thing-quick-choice", type: "quick-choice", dataKey: "pictureEntries", title: "Quick object choice", shortDescription: "Recognise each object quickly from its image.", prompt: "Choose the object shown.", itemLimit: 15 },
-      { id: "things-context", type: "sentence-gap-choice", dataKey: "contextEntries", title: "Things in context", shortDescription: "Choose the object that fits each everyday situation.", prompt: "Which object completes the sentence?", question: "Choose the most useful object.", itemLimit: 12 },
       { id: "articles", type: "sentence-gap-choice", dataKey: "articleEntries", title: "a / an / no article", shortDescription: "Choose a, an, or no article before each noun.", prompt: "Choose the correct article.", question: "Choose a, an, or no article.", itemLimit: 12 },
+      { id: "things-context", type: "sentence-gap-choice", dataKey: "contextEntries", title: "Things in context", shortDescription: "Choose the object that fits each everyday situation.", prompt: "Which object completes the sentence?", question: "Choose the most useful object.", itemLimit: 12 },
+      { id: "thing-spelling", type: "type-answer", dataKey: "pictureEntries", title: "Spell the thing", shortDescription: "Type the object name from its image.", prompt: "Look at the object and type the word.", answerLabel: "Object", answerPlaceholder: "Type the object name" },
     ],
   },
   {
@@ -2351,10 +2639,10 @@ HUB_VOCAB_THEMES.push(
     activities: [
       { id: "opposite-flashcards", type: "flashcards", dataKey: "flashcardEntries", title: "Opposite flashcards", shortDescription: "Recall the second adjective in each opposite pair.", prompt: "Say the opposite before you flip." },
       { id: "choose-opposite", type: "opposites-choice", title: "Choose the opposite", shortDescription: "Choose the opposite, with context for ambiguous words.", prompt: "Choose the opposite adjective.", itemLimit: 15 },
-      { id: "write-opposite", type: "opposite-type-answer", title: "Write the opposite", shortDescription: "Type the opposite, using labels such as old person and old thing.", prompt: "Write the opposite adjective.", itemLimit: 15 },
-      { id: "describing-context", type: "sentence-gap-choice", dataKey: "descriptiveContextEntries", title: "Which adjective fits?", shortDescription: "Choose an objective descriptive adjective from clear contextual clues.", prompt: "Choose the adjective that fits the description.", itemLimit: 12 },
       { id: "opinion-sort", type: "category-sort", dataKey: "opinionEntries", title: "Good or bad?", shortDescription: "Sort opinion adjectives as positive or negative.", prompt: "Is this opinion positive or negative?", promptKey: "term", categoryKey: "opinion", itemLimit: 7, categories: [{ id: "positive", label: "Positive" }, { id: "negative", label: "Negative" }] },
+      { id: "describing-context", type: "sentence-gap-choice", dataKey: "descriptiveContextEntries", title: "Which adjective fits?", shortDescription: "Choose an objective descriptive adjective from clear contextual clues.", prompt: "Choose the adjective that fits the description.", itemLimit: 12 },
       { id: "opinion-context", type: "sentence-gap-choice", dataKey: "opinionContextEntries", title: "Opinion adjectives in context", shortDescription: "Choose the adjective that best fits each situation.", prompt: "Choose the best opinion adjective." },
+      { id: "write-opposite", type: "opposite-type-answer", title: "Write the opposite", shortDescription: "Type the opposite, using labels such as old person and old thing.", prompt: "Write the opposite adjective.", itemLimit: 15 },
     ],
   },
   {
@@ -2372,10 +2660,10 @@ HUB_VOCAB_THEMES.push(
     activities: [
       { id: "verb-flashcards", type: "flashcards", title: "Verb phrase flashcards", shortDescription: "Use an illustration or cue to retrieve the complete phrase.", prompt: "Say the complete verb phrase before you flip." },
       { id: "verb-matching", type: "matching", title: "Match the phrases", shortDescription: "Match each visual or cue with its complete verb phrase.", prompt: "Match the cues and verb phrases." },
-      { id: "complete-verb", type: "cue-gap-type-answer", title: "Complete the phrase", shortDescription: "Type the verb that naturally completes each phrase.", prompt: "Type the missing verb.", answerLabel: "Verb", answerPlaceholder: "Type the verb" },
       { id: "quick-verb", type: "gap-choice", title: "Quick verb choice", shortDescription: "Choose from real verbs in the bank to complete each collocation.", prompt: "Choose the missing verb.", itemLimit: 15 },
       { id: "verb-builder", type: "category-sort", dataKey: "builderEntries", title: "Verb builder", shortDescription: "Connect complements with do, play, drink, eat, and cook.", prompt: "Which verb completes this phrase?", promptKey: "term", categoryKey: "verb", itemLimit: 8, categories: [{ id: "do", label: "DO" }, { id: "play", label: "PLAY" }, { id: "drink", label: "DRINK" }, { id: "eat", label: "EAT" }, { id: "cook", label: "COOK" }] },
       { id: "phrases-context", type: "sentence-gap-choice", dataKey: "contextEntries", title: "Phrases in context", shortDescription: "Choose the correctly inflected verb in an everyday sentence.", prompt: "Choose the verb that completes the sentence." },
+      { id: "complete-verb", type: "cue-gap-type-answer", title: "Complete the phrase", shortDescription: "Type the verb that naturally completes each phrase.", prompt: "Type the missing verb.", answerLabel: "Verb", answerPlaceholder: "Type the verb" },
     ],
   },
   {
@@ -2394,9 +2682,9 @@ HUB_VOCAB_THEMES.push(
     activities: [
       { id: "job-flashcards", type: "flashcards", dataKey: "pictureEntries", title: "Job flashcards", shortDescription: "Use the available job illustrations to recall the occupation.", prompt: "Say the job before you flip." },
       { id: "job-matching", type: "matching", dataKey: "pictureEntries", title: "Match jobs", shortDescription: "Match each available job illustration with its name.", prompt: "Match the jobs and occupation names." },
-      { id: "job-spelling", type: "type-answer", dataKey: "pictureEntries", title: "Spell the job", shortDescription: "Type the complete job name from its illustration.", prompt: "Look at the illustration and type the job.", answerLabel: "Job", answerPlaceholder: "e.g. an accountant" },
       { id: "what-job", type: "sentence-gap-choice", dataKey: "definitionEntries", title: "What job is it?", shortDescription: "Identify occupations from what people do.", prompt: "Read the description and choose the job.", question: "What job is it?", itemLimit: 12 },
       { id: "what-do-you-do", type: "sentence-gap-choice", dataKey: "workStatusEntries", title: "What do you do?", shortDescription: "Practise job, study, unemployment, and retirement expressions.", prompt: "Choose the expression that fits the person." },
+      { id: "job-spelling", type: "type-answer", dataKey: "pictureEntries", title: "Spell the job", shortDescription: "Type the complete job name from its illustration.", prompt: "Look at the illustration and type the job.", answerLabel: "Job", answerPlaceholder: "e.g. an accountant" },
     ],
   },
   {
@@ -2415,8 +2703,8 @@ HUB_VOCAB_THEMES.push(
     extendedEntries: a2ExtendedFamilyEntries,
     activities: [
       { id: "family-flashcards", type: "flashcards", title: "Core family flashcards", shortDescription: "Review familiar family members and learn the extended relationships.", prompt: "Say the family word before you flip." },
-      { id: "relationships", type: "sentence-gap-choice", dataKey: "relationshipEntries", title: "What's the relationship?", shortDescription: "Work out family vocabulary from a relationship sentence.", prompt: "Choose the correct relationship." },
       { id: "family-groups", type: "matching", dataKey: "groupEntries", title: "Family groups", shortDescription: "Match combinations of people with their family-group word.", prompt: "Match each description with the family group." },
+      { id: "relationships", type: "sentence-gap-choice", dataKey: "relationshipEntries", title: "What's the relationship?", shortDescription: "Work out family vocabulary from a relationship sentence.", prompt: "Choose the correct relationship." },
       { id: "family-tree", type: "sentence-gap-choice", dataKey: "treeEntries", title: "Family tree detective", shortDescription: "Follow a named family tree through short relationship clues.", prompt: "Read the family information and identify the relationship.", question: "What is the relationship?" },
       { id: "extended-family", type: "sentence-gap-type-answer", dataKey: "extendedEntries", title: "In-laws, stepfamily and partners", shortDescription: "Type the missing extended-family word.", prompt: "Type the missing family word.", answerLabel: "Family word", answerPlaceholder: "e.g. mother-in-law" },
     ],
@@ -2434,8 +2722,8 @@ HUB_VOCAB_THEMES.push(
     contextEntries: a2RoutineContextEntries,
     activities: [
       { id: "routine-flashcards", type: "flashcards", title: "Routine flashcards", shortDescription: "Look at the routine prompt, then reveal the phrase.", prompt: "Look at the prompt and say the routine phrase before you flip." },
-      { id: "routine-complete", type: "cue-gap-type-answer", title: "Complete the routine", shortDescription: "Type the missing verb from the routine phrase.", prompt: "Look at the cue prompt and type the missing word or words.", answerLabel: "Missing words", answerPlaceholder: "Type the missing words" },
       { id: "routine-in-context", type: "sentence-gap-choice", dataKey: "contextEntries", title: "Daily routine in context", shortDescription: "Choose the correct routine phrase in a short sentence.", prompt: "Read the sentence and choose the correct answer." },
+      { id: "routine-complete", type: "cue-gap-type-answer", title: "Complete the routine", shortDescription: "Type the missing verb from the routine phrase.", prompt: "Look at the cue prompt and type the missing word or words.", answerLabel: "Missing words", answerPlaceholder: "Type the missing words" },
     ],
   },
   {
@@ -2453,9 +2741,9 @@ HUB_VOCAB_THEMES.push(
     adverbEntries: a2FrequencyAdverbEntries,
     activities: [
       { id: "clock-choice", type: "clock-choice", dataKey: "clockEntries", title: "What time is it?", shortDescription: "Look at the clock and choose the correct time.", prompt: "Look at the clock and choose the correct phrase." },
-      { id: "clock-type-answer", type: "clock-type-answer", dataKey: "clockEntries", title: "Write the time", shortDescription: "Look at the clock and type the time.", prompt: "Look at the clock and type the time.", answerLabel: "Time", answerPlaceholder: "e.g. It's quarter past six" },
       { id: "frequency-expressions", type: "sentence-gap-choice", dataKey: "frequencyEntries", title: "Frequency expressions", shortDescription: "Choose the correct expression of frequency from an explicit schedule.", prompt: "Read the schedule and choose the correct expression." },
       { id: "adverbs-of-frequency", type: "sentence-gap-choice", dataKey: "adverbEntries", title: "Adverbs of frequency", shortDescription: "Choose the adverb that matches a clearly stated frequency.", prompt: "Read the frequency clue and choose the correct adverb." },
+      { id: "clock-type-answer", type: "clock-type-answer", dataKey: "clockEntries", title: "Write the time", shortDescription: "Look at the clock and type the time.", prompt: "Look at the clock and type the time.", answerLabel: "Time", answerPlaceholder: "e.g. It's quarter past six" },
     ],
   },
   {
@@ -2471,9 +2759,9 @@ HUB_VOCAB_THEMES.push(
     contextEntries: a2MoreVerbContextEntries,
     activities: [
       { id: "phrase-flashcards", type: "flashcards", title: "Verb phrase flashcards", shortDescription: "Look at the picture or cue and recall the full verb phrase.", prompt: "Say the complete phrase before you flip." },
-      { id: "complete-the-phrase", type: "cue-gap-type-answer", title: "Complete the phrase", shortDescription: "Type the missing verb or verb phrase.", prompt: "Complete each phrase with the correct verb.", answerLabel: "Missing words", answerPlaceholder: "Type the missing words" },
       { id: "choose-the-verb", type: "gap-choice", title: "Choose the verb", shortDescription: "Choose the verb or lexical unit that completes each phrase.", prompt: "Choose the correct verb or verb phrase.", itemLimit: 15 },
       { id: "verbs-in-context", type: "sentence-gap-choice", dataKey: "contextEntries", title: "Which verb fits?", shortDescription: "Choose the verb that makes sense in the situation.", prompt: "Read the situation and choose the correct answer." },
+      { id: "complete-the-phrase", type: "cue-gap-type-answer", title: "Complete the phrase", shortDescription: "Type the missing verb or verb phrase.", prompt: "Complete each phrase with the correct verb.", answerLabel: "Missing words", answerPlaceholder: "Type the missing words" },
     ],
   },
   {
@@ -2534,9 +2822,90 @@ HUB_VOCAB_THEMES.push(
     clueEntries: a2HouseClueEntries,
     activities: [
       { id: "house-hotspot-match", type: "image-hotspot-match", title: "Explore the house", shortDescription: "Work through five focused rounds for rooms, house parts, and household things.", prompt: "Complete one clearly labelled house round at a time.", sceneImage: A2_HOUSE_SCENE_IMAGE, rounds: A2_HOUSE_HOTSPOT_ROUNDS },
-      { id: "house-hotspot-type", type: "image-hotspot-type-answer", title: "Name it", shortDescription: "Name highlighted places and objects in five focused rounds.", prompt: "Use the round label and focused view to name the highlighted word.", sceneImage: A2_HOUSE_SCENE_IMAGE, rounds: A2_HOUSE_HOTSPOT_ROUNDS, answerLabel: "House word", answerPlaceholder: "Type the word" },
       { id: "where-do-you-find-it", type: "sentence-gap-choice", dataKey: "locationEntries", title: "Where do you find it?", shortDescription: "Choose the room where you normally find each thing.", prompt: "Where would you normally find this?" },
       { id: "house-clues", type: "sentence-gap-choice", dataKey: "clueEntries", title: "What am I?", shortDescription: "Read the clue and identify the room, house part, or object.", prompt: "Read the clue and choose the correct answer." },
+      { id: "house-hotspot-type", type: "image-hotspot-type-answer", title: "Name it", shortDescription: "Name highlighted places and objects in five focused rounds.", prompt: "Use the round label and focused view to name the highlighted word.", sceneImage: A2_HOUSE_SCENE_IMAGE, rounds: A2_HOUSE_HOTSPOT_ROUNDS, answerLabel: "House word", answerPlaceholder: "Type the word" },
+    ],
+  },
+  {
+    id: "a2-prepositions",
+    level: "a2",
+    order: 15,
+    title: "Prepositions",
+    shortDescription: "Practise common prepositions of place and movement.",
+    textbookRef: "Elementary Vocabulary Bank 15",
+    accent: "#7ef0c2",
+    itemCount: 16,
+    entries: a2PrepositionVisualEntries,
+    positionEntries: a2PrepositionPositionEntries,
+    movementEntries: a2PrepositionMovementEntries,
+    positionChoiceEntries: a2PrepositionPositionChoiceEntries,
+    movementChoiceEntries: a2PrepositionMovementChoiceEntries,
+    visualTypeEntries: a2PrepositionVisualEntries,
+    contextEntries: a2PrepositionContextEntries,
+    infoNotes: [
+      {
+        title: "above / over and below / under",
+        body: ["above is similar to over", "below is similar to under"],
+      },
+    ],
+    activities: [
+      { id: "preposition-matching", type: "matching", dataKey: "visualTypeEntries", title: "Match the prepositions", shortDescription: "Match each picture with the correct preposition.", prompt: "Match the pictures and prepositions.", itemLimit: 8 },
+      { id: "place-picture-choice", type: "quick-choice", dataKey: "positionChoiceEntries", title: "Where is it?", shortDescription: "Look at the picture and choose the correct preposition.", prompt: "Where is it?" },
+      { id: "movement-picture-choice", type: "quick-choice", dataKey: "movementChoiceEntries", title: "Where is it going?", shortDescription: "Look at the picture and choose the correct movement word.", prompt: "Look at the movement and choose the correct answer." },
+      { id: "prepositions-in-context", type: "sentence-gap-choice", dataKey: "contextEntries", title: "Prepositions in context", shortDescription: "Choose the preposition that completes each sentence.", prompt: "Read the sentence and choose the correct answer.", itemLimit: 10 },
+      { id: "preposition-picture-type", type: "type-answer", dataKey: "visualTypeEntries", title: "Write the preposition", shortDescription: "Look at the picture and type the correct preposition.", prompt: "Look at the picture and type the missing preposition.", answerLabel: "Preposition", answerPlaceholder: "Type the preposition" },
+    ],
+  },
+  {
+    id: "a2-food",
+    level: "a2",
+    order: 16,
+    title: "Food",
+    shortDescription: "Practise common foods for meals, fruit and vegetables, desserts, and snacks.",
+    textbookRef: "Elementary Vocabulary Bank 16",
+    accent: "#7ef0c2",
+    itemCount: 44,
+    entries: a2FoodEntries,
+    foodClueEntries: a2FoodClueEntries,
+    activities: [
+      { id: "food-flashcards", type: "flashcards", title: "Food flashcards", shortDescription: "Look at the food and recall the word.", prompt: "Look at the picture and say the word before you flip.", itemLimit: 12 },
+      { id: "food-matching", type: "matching", title: "Match the food", shortDescription: "Match each food picture with its name.", prompt: "Match the pictures and food words.", itemLimit: 8 },
+      { id: "food-groups", type: "category-sort", title: "Which group?", shortDescription: "Sort the foods into the sections from the vocabulary bank.", prompt: "Sort the words into the groups used in this vocabulary bank.", promptKey: "term", categoryKey: "sourceGroup", itemLimit: 16, categories: [
+        { id: "breakfast", label: "Breakfast" },
+        { id: "lunch-dinner", label: "Lunch or dinner" },
+        { id: "vegetables", label: "Vegetables" },
+        { id: "fruit", label: "Fruit" },
+        { id: "desserts", label: "Desserts" },
+        { id: "snacks", label: "Snacks" },
+      ] },
+      { id: "food-in-context", type: "sentence-gap-choice", dataKey: "foodClueEntries", title: "What food is it?", shortDescription: "Read the clue and choose the food.", prompt: "Read the clue and choose the correct answer.", question: "What food is it?", itemLimit: 10 },
+      { id: "food-spelling", type: "type-answer", title: "Name the food", shortDescription: "Look at the picture and type the food word.", prompt: "Look at the picture and type the word.", answerLabel: "Food", answerPlaceholder: "Type the food", itemLimit: 12 },
+    ],
+  },
+  {
+    id: "a2-places-buildings",
+    level: "a2",
+    order: 17,
+    title: "Places and buildings",
+    shortDescription: "Practise common buildings, public places, transport places, and features of a town.",
+    textbookRef: "Elementary Vocabulary Bank 17",
+    accent: "#7ef0c2",
+    itemCount: 24,
+    entries: a2PlaceEntries,
+    placeClueEntries: a2PlaceClueEntries,
+    extensionTitle: "More places of worship",
+    extensionEntries: a2WorshipExtensionEntries,
+    practicePrompt: {
+      title: "What is near you?",
+      prompt: "Choose some places from the bank and answer: Is there a ___ near where you live?",
+      followUp: "Yes, there is. · No, there isn't. · There's one near...",
+    },
+    activities: [
+      { id: "place-flashcards", type: "flashcards", title: "Place flashcards", shortDescription: "Look at the place and recall the word.", prompt: "Look at the picture and say the place before you flip.", itemLimit: 12 },
+      { id: "place-matching", type: "matching", title: "Match the places", shortDescription: "Match each place picture with its name.", prompt: "Match the pictures and place names.", itemLimit: 8 },
+      { id: "where-would-you-go", type: "sentence-gap-choice", dataKey: "placeClueEntries", title: "Where would you go?", shortDescription: "Choose the place that matches each situation.", prompt: "Where would you go?", question: "Choose the best place.", itemLimit: 10 },
+      { id: "place-spelling", type: "type-answer", title: "Name the place", shortDescription: "Look at the picture and type the place.", prompt: "Look at the picture and type the place.", answerLabel: "Place", answerPlaceholder: "Type the place", itemLimit: 12 },
     ],
   }
 );

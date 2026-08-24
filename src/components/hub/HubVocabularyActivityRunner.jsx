@@ -24,6 +24,13 @@ function shuffle(items) {
   return [...items].sort(() => Math.random() - 0.5);
 }
 
+function makePrioritizedSession(items, itemLimit, seenItemIds = []) {
+  const seen = new Set(seenItemIds);
+  const unseenItems = shuffle(items.filter((item) => item?.id && !seen.has(item.id)));
+  const previouslySeenItems = shuffle(items.filter((item) => item?.id && seen.has(item.id)));
+  return [...unseenItems, ...previouslySeenItems].slice(0, itemLimit);
+}
+
 function shuffleDifferent(items) {
   if (items.length < 2) return [...items];
   const originalIds = items.map((item) => item.id);
@@ -204,6 +211,26 @@ function ProgressLine({ current, total, label = "complete", action = null }) {
   );
 }
 
+function OverallCoverageTracker({ coverage }) {
+  if (!coverage?.tracked) return null;
+  const total = Math.max(Number(coverage.total) || 0, 0);
+  const seen = Math.min(new Set(coverage.seenItemIds || []).size, total);
+  const percentage = total ? Math.round((seen / total) * 100) : 0;
+
+  return (
+    <section className="hub-vocab-overall-progress" aria-label={`${seen} of ${total} activity items seen`}>
+      <div>
+        <strong>Overall activity progress</strong>
+        <span>{seen}/{total} items seen</span>
+      </div>
+      <div className="hub-vocab-overall-progress-track" aria-hidden="true">
+        <span style={{ width: `${percentage}%` }} />
+      </div>
+      <p>{seen >= total ? "You have seen every item." : "New items will be shown before repeated items."}</p>
+    </section>
+  );
+}
+
 function getDisplayAnswer(entry, themeId, answerMode = "default") {
   if (answerMode === "nationality") return entry.nationality || "";
   if (answerMode === "plural") return entry.plural || "";
@@ -228,6 +255,9 @@ function getMistakePrompt(entry, theme, activity, answerMode = "default") {
   if (answerMode === "nationality") return `Nationality for ${entry.country}`;
   if (answerMode === "opposite") return `Opposite of ${entry.cueText || entry.displayTerm || entry.term}`;
   if (answerMode === "plural") return `Plural of ${entry.singular || entry.term}`;
+  // A visual is the prompt in image-led activities. Falling through to the
+  // vocabulary label here would save the answer itself as the review prompt.
+  if (entry.image || entry.flag4x3 || entry.colorHex || entry.visualLabel) return "";
   return getPromptLabel(entry, theme.id) || activity?.title || theme.title;
 }
 
@@ -235,11 +265,20 @@ function ActivityCompleteCard({
   title = "Set complete",
   total = 0,
   mistakes = [],
+  completedItemIds = [],
+  coverage = null,
   onRestart,
   onReviewMistakes,
   onComplete,
 }) {
   const didCompleteRef = useRef(false);
+  const isCoverageRound = Boolean(coverage?.tracked && onComplete);
+  const coverageSeen = new Set([
+    ...(coverage?.seenItemIds || []),
+    ...completedItemIds,
+  ]).size;
+  const coverageTotal = Number(coverage?.total) || 0;
+  const overallComplete = isCoverageRound && coverageTotal > 0 && coverageSeen >= coverageTotal;
 
   useEffect(() => {
     if (didCompleteRef.current) return;
@@ -247,17 +286,28 @@ function ActivityCompleteCard({
     onComplete?.({
       total,
       mistakes: dedupeById(mistakes),
+      itemIds: completedItemIds,
     });
-  }, [onComplete, total]);
+  }, [completedItemIds, onComplete, total]);
 
   return (
     <section className="hub-vocab-practice-card hub-vocab-complete-card">
       <div className="hub-vocab-complete-copy">
-        <span className="hub-vocab-phrase-kicker">Set complete</span>
-        <h2>{title}</h2>
-        <p>
-          You finished <strong>{total}</strong> item{total === 1 ? "" : "s"}.
-        </p>
+        <span className="hub-vocab-phrase-kicker">
+          {isCoverageRound ? (overallComplete ? "Activity complete" : "Round complete") : "Set complete"}
+        </span>
+        <h2>{isCoverageRound && !overallComplete ? "Round complete" : title}</h2>
+        {isCoverageRound ? (
+          <p>
+            You have now covered <strong>{Math.min(coverageSeen, coverageTotal)}</strong> of{" "}
+            <strong>{coverageTotal}</strong> items.
+            {!overallComplete ? ` ${Math.max(coverageTotal - coverageSeen, 0)} still to see.` : " You have seen every item."}
+          </p>
+        ) : (
+          <p>
+            You finished <strong>{total}</strong> item{total === 1 ? "" : "s"}.
+          </p>
+        )}
         {mistakes.length ? (
           <p>
             You have <strong>{mistakes.length}</strong> mistake
@@ -269,7 +319,9 @@ function ActivityCompleteCard({
       </div>
 
       <div className="hub-vocab-runner-actions">
-        <button type="button" onClick={onRestart}>Restart set</button>
+        <button type="button" onClick={onRestart}>
+          {isCoverageRound && !overallComplete ? "Start next set" : "Restart set"}
+        </button>
         {mistakes.length && onReviewMistakes ? (
           <button type="button" onClick={onReviewMistakes}>Review mistakes</button>
         ) : null}
@@ -301,39 +353,40 @@ function ActivityTabs({ theme, activityId, progressMap = {} }) {
   );
 }
 
-function FlashcardMode({ theme, items, flagMode = false, phraseMode = false, onComplete }) {
-  const [cardEntries, setCardEntries] = useState(() => shuffle(items));
+function FlashcardMode({
+  items,
+  activity,
+  flagMode = false,
+  phraseMode = false,
+  coverage = null,
+  onItemSeen,
+  onComplete,
+}) {
+  const configuredLimit = Number(activity?.itemLimit);
+  const itemLimit = Number.isFinite(configuredLimit) && configuredLimit > 0 ? configuredLimit : items.length;
+  const seenItemIdsRef = useRef(coverage?.seenItemIds || []);
+  seenItemIdsRef.current = coverage?.seenItemIds || [];
+  const makeDeck = useCallback(
+    (source = items) => makePrioritizedSession(source, itemLimit, seenItemIdsRef.current),
+    [itemLimit, items]
+  );
+  const [cardEntries, setCardEntries] = useState(() => makeDeck());
   const [index, setIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [viewedIds, setViewedIds] = useState(() => new Set());
-  const didCompleteRef = useRef(false);
   const entry = cardEntries[index];
-
-  useEffect(() => {
-    const nextEntries = shuffle(items);
-    setCardEntries(nextEntries);
-    setIndex(0);
-    setIsFlipped(false);
-    setViewedIds(nextEntries[0]?.id ? new Set([nextEntries[0].id]) : new Set());
-    didCompleteRef.current = false;
-  }, [theme.id, items]);
+  const isRoundComplete = cardEntries.length > 0 && viewedIds.size >= cardEntries.length;
 
   useEffect(() => {
     if (!entry?.id) return;
+    onItemSeen?.(entry.id);
     setViewedIds((prev) => {
       if (prev.has(entry.id)) return prev;
       const next = new Set(prev);
       next.add(entry.id);
       return next;
     });
-  }, [entry?.id]);
-
-  useEffect(() => {
-    if (!cardEntries.length || didCompleteRef.current) return;
-    if (viewedIds.size < cardEntries.length) return;
-    didCompleteRef.current = true;
-    onComplete?.({ total: cardEntries.length, mistakes: [] });
-  }, [cardEntries.length, onComplete, viewedIds.size]);
+  }, [entry?.id, onItemSeen]);
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -368,12 +421,26 @@ function FlashcardMode({ theme, items, flagMode = false, phraseMode = false, onC
   }
 
   function reshuffle() {
-    const nextEntries = shuffle(items);
+    const nextEntries = makeDeck();
     setCardEntries(nextEntries);
     setIndex(0);
     setIsFlipped(false);
     setViewedIds(nextEntries[0]?.id ? new Set([nextEntries[0].id]) : new Set());
-    didCompleteRef.current = false;
+  }
+
+  if (isRoundComplete) {
+    return (
+      <ActivityCompleteCard
+        title="Flashcard activity complete"
+        total={cardEntries.length}
+        mistakes={[]}
+        completedItemIds={cardEntries.map((item) => item.id)}
+        coverage={coverage}
+        onRestart={reshuffle}
+        onReviewMistakes={null}
+        onComplete={onComplete}
+      />
+    );
   }
 
   return (
@@ -430,30 +497,42 @@ function FlashcardMode({ theme, items, flagMode = false, phraseMode = false, onC
   );
 }
 
-function MatchingMode({ theme, items, onComplete, onMistake }) {
-  const [sessionItems, setSessionItems] = useState(() => shuffle(items));
+function MatchingMode({
+  theme,
+  activity,
+  items,
+  coverage = null,
+  onItemSeen,
+  onComplete,
+  onMistake,
+}) {
+  const configuredLimit = Number(activity?.itemLimit);
+  const itemLimit = Number.isFinite(configuredLimit) && configuredLimit > 0
+    ? Math.min(configuredLimit, items.length)
+    : Math.min(8, items.length);
+  const seenItemIdsRef = useRef(coverage?.seenItemIds || []);
+  seenItemIdsRef.current = coverage?.seenItemIds || [];
+  const makeSession = useCallback(
+    (source = items) => makePrioritizedSession(source, itemLimit, seenItemIdsRef.current),
+    [itemLimit, items]
+  );
+  const [sessionItems, setSessionItems] = useState(() => makeSession());
   const [reviewItems, setReviewItems] = useState(null);
-  const [round, setRound] = useState(0);
   const [selectedLeft, setSelectedLeft] = useState(null);
   const [matchedIds, setMatchedIds] = useState([]);
   const [mistakeItems, setMistakeItems] = useState([]);
   const [status, setStatus] = useState("");
 
-  useEffect(() => {
-    setSessionItems(shuffle(items));
-    setReviewItems(null);
-    setRound(0);
-    setSelectedLeft(null);
-    setMatchedIds([]);
-    setMistakeItems([]);
-    setStatus("");
-  }, [items, theme.id]);
-
   const activeItems = reviewItems || sessionItems;
-  const roundItems = useMemo(() => shuffle(activeItems).slice(0, 8), [activeItems, round]);
+  const roundItems = useMemo(() => shuffle(activeItems), [activeItems]);
   const leftItems = useMemo(() => shuffle(roundItems), [roundItems]);
   const rightItems = useMemo(() => shuffle(roundItems), [roundItems]);
   const isComplete = roundItems.length > 0 && matchedIds.length === roundItems.length;
+
+  useEffect(() => {
+    if (reviewItems) return;
+    roundItems.forEach((entry) => onItemSeen?.(entry.id));
+  }, [onItemSeen, reviewItems, roundItems]);
 
   function chooseRight(entry) {
     if (!selectedLeft || matchedIds.includes(entry.id)) return;
@@ -472,13 +551,12 @@ function MatchingMode({ theme, items, onComplete, onMistake }) {
   }
 
   function startNewRound(nextItems = items) {
-    setSessionItems(shuffle(nextItems));
+    setSessionItems(makeSession(nextItems));
     setReviewItems(null);
     setSelectedLeft(null);
     setMatchedIds([]);
     setMistakeItems([]);
     setStatus("");
-    setRound((prev) => prev + 1);
   }
 
   function reviewMistakes() {
@@ -488,7 +566,6 @@ function MatchingMode({ theme, items, onComplete, onMistake }) {
     setMatchedIds([]);
     setMistakeItems([]);
     setStatus("");
-    setRound((prev) => prev + 1);
   }
 
   if (isComplete) {
@@ -497,6 +574,8 @@ function MatchingMode({ theme, items, onComplete, onMistake }) {
         title={reviewItems ? "Mistake review complete" : "Matching set complete"}
         total={roundItems.length}
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
+        completedItemIds={roundItems.map((item) => item.id)}
+        coverage={coverage}
         onRestart={() => startNewRound(items)}
         onReviewMistakes={reviewMistakes}
         onComplete={reviewItems ? null : onComplete}
@@ -554,11 +633,22 @@ function MatchingMode({ theme, items, onComplete, onMistake }) {
   );
 }
 
-function ChoiceMode({ theme, activity, items, mode = "word", onComplete, onMistake }) {
+function ChoiceMode({
+  theme,
+  activity,
+  items,
+  mode = "word",
+  coverage = null,
+  onItemSeen,
+  onComplete,
+  onMistake,
+}) {
   const configuredLimit = Number(activity?.itemLimit);
   const itemLimit = Number.isFinite(configuredLimit) && configuredLimit > 0 ? configuredLimit : items.length;
+  const seenItemIdsRef = useRef(coverage?.seenItemIds || []);
+  seenItemIdsRef.current = coverage?.seenItemIds || [];
   const makeSession = useCallback(
-    (source = items) => shuffle(source).slice(0, itemLimit),
+    (source = items) => makePrioritizedSession(source, itemLimit, seenItemIdsRef.current),
     [itemLimit, items]
   );
   const [sessionItems, setSessionItems] = useState(() => makeSession());
@@ -579,6 +669,10 @@ function ChoiceMode({ theme, activity, items, mode = "word", onComplete, onMista
     setMistakeItems([]);
     setIsComplete(false);
   }, [makeSession, mode, theme.id]);
+
+  useEffect(() => {
+    if (!reviewItems && entry?.id) onItemSeen?.(entry.id);
+  }, [entry?.id, onItemSeen, reviewItems]);
 
   const options = useMemo(() => {
     if (isGapChoiceMode) {
@@ -694,6 +788,8 @@ function ChoiceMode({ theme, activity, items, mode = "word", onComplete, onMista
         title={reviewItems ? "Mistake review complete" : "Set complete"}
         total={entries.length}
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
+        completedItemIds={reviewItems ? [] : sessionItems.map((item) => item.id)}
+        coverage={coverage}
         onRestart={restart}
         onReviewMistakes={reviewMistakes}
         onComplete={reviewItems ? null : onComplete}
@@ -887,11 +983,22 @@ function SpeakerChoiceMode({ theme, items, onComplete, onMistake }) {
   );
 }
 
-function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComplete, onMistake }) {
+function TypeAnswerMode({
+  theme,
+  items,
+  activity,
+  answerMode = "default",
+  coverage = null,
+  onItemSeen,
+  onComplete,
+  onMistake,
+}) {
   const configuredLimit = Number(activity?.itemLimit);
   const itemLimit = Number.isFinite(configuredLimit) && configuredLimit > 0 ? configuredLimit : items.length;
+  const seenItemIdsRef = useRef(coverage?.seenItemIds || []);
+  seenItemIdsRef.current = coverage?.seenItemIds || [];
   const makeSession = useCallback(
-    (source = items) => shuffle(source).slice(0, itemLimit),
+    (source = items) => makePrioritizedSession(source, itemLimit, seenItemIdsRef.current),
     [itemLimit, items]
   );
   const [sessionItems, setSessionItems] = useState(() => makeSession());
@@ -946,6 +1053,10 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComp
     setIsComplete(false);
   }, [answerMode, makeSession, theme.id]);
 
+  useEffect(() => {
+    if (!reviewItems && entry?.id) onItemSeen?.(entry.id);
+  }, [entry?.id, onItemSeen, reviewItems]);
+
   function checkAnswer(event) {
     event.preventDefault();
     const accepted = getAcceptedAnswers(entry, theme.id, answerMode);
@@ -955,6 +1066,7 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComp
       onMistake?.(entry, {
         userAnswer: answer,
         correctAnswer: getDisplayAnswer(entry, theme.id, answerMode),
+        acceptedAnswers: getAcceptedAnswers(entry, theme.id, answerMode),
         answerMode,
       });
     }
@@ -1003,6 +1115,8 @@ function TypeAnswerMode({ theme, items, activity, answerMode = "default", onComp
         title={reviewItems ? "Mistake review complete" : "Set complete"}
         total={activeItems.length}
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
+        completedItemIds={reviewItems ? [] : sessionItems.map((item) => item.id)}
+        coverage={coverage}
         onRestart={restart}
         onReviewMistakes={reviewMistakes}
         onComplete={reviewItems ? null : onComplete}
@@ -1363,6 +1477,10 @@ function ImageHotspotMatchMode({ theme, items, activity, onComplete, onMistake }
     onMistake?.(selectedHotspot, {
       userAnswer: entry.term,
       correctAnswer: selectedHotspot.term,
+      mistakePrompt: `Number ${numberById[selectedHotspot.id] || selectedHotspot.hotspotNumber}`,
+      hotspotNumber: numberById[selectedHotspot.id] || selectedHotspot.hotspotNumber,
+      hotspotViewBox: activeRound.viewBox || null,
+      sceneImage: activity?.sceneImage || theme.sceneImage || "",
     });
     setStatus("Not quite. Try another word.");
   }
@@ -1447,7 +1565,7 @@ function ImageHotspotMatchMode({ theme, items, activity, onComplete, onMistake }
           onSelect={(entry) => {
             if (matchedIds.includes(entry.id)) return;
             setSelectedHotspot(entry);
-            setStatus(`Number ${entry.hotspotNumber} selected.`);
+            setStatus(`Number ${numberById[entry.id] || entry.hotspotNumber} selected.`);
           }}
         />
 
@@ -1519,6 +1637,10 @@ function ImageHotspotTypeMode({ theme, items, activity, onComplete, onMistake })
       onMistake?.(entry, {
         userAnswer: answer,
         correctAnswer: entry.term,
+        mistakePrompt: `Number ${displayNumber || entry.hotspotNumber}`,
+        hotspotNumber: displayNumber || entry.hotspotNumber,
+        hotspotViewBox: activeRound.viewBox || null,
+        sceneImage: activity?.sceneImage || theme.sceneImage || "",
       });
     }
     setFeedback(isCorrect ? "correct" : "wrong");
@@ -1748,7 +1870,15 @@ function EmptyActivityCard({ message = "This activity does not have any items ye
   );
 }
 
-function CategorySortMode({ theme, activity, items, onComplete, onMistake }) {
+function CategorySortMode({
+  theme,
+  activity,
+  items,
+  coverage = null,
+  onItemSeen,
+  onComplete,
+  onMistake,
+}) {
   const categoryKey = activity.categoryKey || "category";
   const categories = useMemo(() => {
     if (Array.isArray(activity.categories) && activity.categories.length) {
@@ -1765,8 +1895,10 @@ function CategorySortMode({ theme, activity, items, onComplete, onMistake }) {
     [categoryIds, categoryKey, items]
   );
   const itemLimit = Math.max(1, Number(activity.itemLimit) || 12);
+  const seenItemIdsRef = useRef(coverage?.seenItemIds || []);
+  seenItemIdsRef.current = coverage?.seenItemIds || [];
   const makeSession = useCallback(
-    (source = eligibleItems) => shuffle(source).slice(0, itemLimit),
+    (source = eligibleItems) => makePrioritizedSession(source, itemLimit, seenItemIdsRef.current),
     [eligibleItems, itemLimit]
   );
   const [sessionItems, setSessionItems] = useState(() => makeSession());
@@ -1794,6 +1926,10 @@ function CategorySortMode({ theme, activity, items, onComplete, onMistake }) {
     setMistakeItems([]);
     setIsComplete(false);
   }, [makeSession, theme.id]);
+
+  useEffect(() => {
+    if (!reviewItems && entry?.id) onItemSeen?.(entry.id);
+  }, [entry?.id, onItemSeen, reviewItems]);
 
   useEffect(() => {
     if (feedback?.status !== "correct") return undefined;
@@ -1845,6 +1981,8 @@ function CategorySortMode({ theme, activity, items, onComplete, onMistake }) {
         title={reviewItems ? "Mistake review complete" : "Sorting set complete"}
         total={activeItems.length}
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
+        completedItemIds={reviewItems ? [] : sessionItems.map((item) => item.id)}
+        coverage={coverage}
         onRestart={restart}
         onReviewMistakes={reviewMistakes}
         onComplete={reviewItems ? null : onComplete}
@@ -1938,7 +2076,17 @@ function ClockFace({ hour, minute }) {
   );
 }
 
-function StructuredQuestionMode({ theme, activity, items, promptType, inputMode, onComplete, onMistake }) {
+function StructuredQuestionMode({
+  theme,
+  activity,
+  items,
+  promptType,
+  inputMode,
+  coverage = null,
+  onItemSeen,
+  onComplete,
+  onMistake,
+}) {
   const eligibleItems = useMemo(
     () => items.filter((entry) => {
       if (!entry?.id || !getStructuredAnswer(entry)) return false;
@@ -1952,8 +2100,10 @@ function StructuredQuestionMode({ theme, activity, items, promptType, inputMode,
   const itemLimit = Number.isFinite(configuredLimit) && configuredLimit > 0
     ? configuredLimit
     : eligibleItems.length;
+  const seenItemIdsRef = useRef(coverage?.seenItemIds || []);
+  seenItemIdsRef.current = coverage?.seenItemIds || [];
   const makeSession = useCallback(
-    (source = eligibleItems) => shuffle(source).slice(0, itemLimit),
+    (source = eligibleItems) => makePrioritizedSession(source, itemLimit, seenItemIdsRef.current),
     [eligibleItems, itemLimit]
   );
   const [sessionItems, setSessionItems] = useState(() => makeSession());
@@ -1988,6 +2138,10 @@ function StructuredQuestionMode({ theme, activity, items, promptType, inputMode,
     setMistakeItems([]);
     setIsComplete(false);
   }, [inputMode, makeSession, promptType, theme.id]);
+
+  useEffect(() => {
+    if (!reviewItems && entry?.id) onItemSeen?.(entry.id);
+  }, [entry?.id, onItemSeen, reviewItems]);
 
   useEffect(() => {
     if (feedback?.status !== "correct") return undefined;
@@ -2054,6 +2208,8 @@ function StructuredQuestionMode({ theme, activity, items, promptType, inputMode,
         title={reviewItems ? "Mistake review complete" : "Set complete"}
         total={activeItems.length}
         mistakes={reviewItems ? [] : dedupeById(mistakeItems)}
+        completedItemIds={reviewItems ? [] : sessionItems.map((item) => item.id)}
+        coverage={coverage}
         onRestart={restart}
         onReviewMistakes={reviewMistakes}
         onComplete={reviewItems ? null : onComplete}
@@ -2270,12 +2426,15 @@ function renderActivity(theme, activity, handlers = {}) {
   const props = {
     onComplete: handlers.onComplete,
     onMistake: handlers.onMistake,
+    onItemSeen: handlers.onItemSeen,
+    coverage: handlers.coverage,
   };
-  if (activity.type === "flashcards") return <FlashcardMode theme={theme} items={items} {...props} />;
-  if (activity.type === "flag-flashcards") return <FlashcardMode theme={theme} items={items} flagMode {...props} />;
-  if (activity.type === "phrase-flashcards") return <FlashcardMode theme={theme} items={items} phraseMode {...props} />;
+  const activityKey = `${theme.id}:${activity.id}:${items.length}`;
+  if (activity.type === "flashcards") return <FlashcardMode key={activityKey} activity={activity} items={items} {...props} />;
+  if (activity.type === "flag-flashcards") return <FlashcardMode key={activityKey} activity={activity} items={items} flagMode {...props} />;
+  if (activity.type === "phrase-flashcards") return <FlashcardMode key={activityKey} activity={activity} items={items} phraseMode {...props} />;
   if (activity.type === "matching" || activity.type === "flag-match") {
-    return <MatchingMode theme={theme} items={items} {...props} />;
+    return <MatchingMode key={activityKey} theme={theme} activity={activity} items={items} {...props} />;
   }
   if (activity.type === "quick-choice") return <ChoiceMode theme={theme} activity={activity} items={items} {...props} />;
   if (activity.type === "gap-choice") return <ChoiceMode theme={theme} activity={activity} items={items} mode="gap" {...props} />;
@@ -2319,14 +2478,78 @@ function renderActivity(theme, activity, handlers = {}) {
   return null;
 }
 
+function ThemeSupplementaryContent({ theme }) {
+  const notes = Array.isArray(theme.infoNotes) ? theme.infoNotes : [];
+  const extensionEntries = Array.isArray(theme.extensionEntries) ? theme.extensionEntries : [];
+  const practicePrompt = theme.practicePrompt;
+  if (!notes.length && !extensionEntries.length && !practicePrompt) return null;
+
+  return (
+    <aside className="hub-vocab-supplementary" aria-label="Extra vocabulary notes">
+      {notes.map((note) => (
+        <section key={note.title} className="hub-vocab-supplementary-card">
+          <h2>{note.title}</h2>
+          {(note.body || []).map((line) => <p key={line}>{line}</p>)}
+        </section>
+      ))}
+      {extensionEntries.length ? (
+        <section className="hub-vocab-supplementary-card">
+          <h2>{theme.extensionTitle || "More vocabulary"}</h2>
+          <dl className="hub-vocab-extension-list">
+            {extensionEntries.map((entry) => (
+              <div key={entry.id}>
+                <dt>{entry.term}</dt>
+                <dd>{entry.clue || entry.meaningNote}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      ) : null}
+      {practicePrompt ? (
+        <section className="hub-vocab-supplementary-card">
+          <h2>{practicePrompt.title}</h2>
+          <p>{practicePrompt.prompt}</p>
+          {practicePrompt.followUp ? <p className="muted">{practicePrompt.followUp}</p> : null}
+        </section>
+      ) : null}
+    </aside>
+  );
+}
+
 export default function HubVocabularyActivityRunner() {
   const navigate = useNavigate();
   const { themeId, activityId } = useParams();
   const result = getHubVocabActivity(themeId, activityId);
   const theme = result?.theme || getHubVocabTheme(themeId);
   const activity = result?.activity;
-  const activityItems = theme && activity ? getActivityItems(theme, activity) : [];
+  const activityItems = useMemo(
+    () => theme && activity ? getActivityItems(theme, activity) : [],
+    [activity, theme]
+  );
   const [progressMap, setProgressMap] = useState({});
+  const [progressLoaded, setProgressLoaded] = useState(false);
+  const [liveSeenIds, setLiveSeenIds] = useState(() => new Set());
+  const progressKey = theme && activity ? `${theme.id}:${activity.id}` : "";
+  const activityProgress = progressKey ? progressMap[progressKey] || {} : {};
+  const activityItemIds = useMemo(
+    () => new Set(activityItems.map((item) => item?.id).filter(Boolean)),
+    [activityItems]
+  );
+  const configuredItemLimit = Number(activity?.itemLimit);
+  const tracksCoverage = Boolean(
+    activityItems.length > 0 &&
+    Number.isFinite(configuredItemLimit) &&
+    configuredItemLimit > 0 &&
+    configuredItemLimit < activityItems.length
+  );
+  const coverage = useMemo(() => ({
+    tracked: tracksCoverage,
+    total: activityItems.length,
+    seenItemIds: [...new Set([
+      ...(activityProgress.seenItemIds || []),
+      ...liveSeenIds,
+    ])].filter((itemId) => activityItemIds.has(itemId)),
+  }), [activityItemIds, activityItems.length, activityProgress.seenItemIds, liveSeenIds, tracksCoverage]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -2336,22 +2559,47 @@ export default function HubVocabularyActivityRunner() {
 
   useEffect(() => {
     let alive = true;
+    setProgressLoaded(false);
+    setLiveSeenIds(new Set());
     fetchHubVocabProgress()
       .then((progress) => {
         if (alive) setProgressMap(progress || {});
       })
       .catch((error) => {
         console.error("[HubVocabularyActivityRunner] progress load failed", error);
+      })
+      .finally(() => {
+        if (alive) setProgressLoaded(true);
       });
     return () => {
       alive = false;
     };
   }, [themeId, activityId]);
 
+  const handleItemSeen = useCallback((itemId) => {
+    if (!itemId || !tracksCoverage) return;
+    setLiveSeenIds((previous) => {
+      if (previous.has(itemId)) return previous;
+      const next = new Set(previous);
+      next.add(itemId);
+      return next;
+    });
+  }, [tracksCoverage]);
+
   const handleComplete = useCallback(
-    ({ total, mistakes = [] } = {}) => {
+    ({ total, mistakes = [], itemIds = [] } = {}) => {
       if (!theme || !activity) return;
       const uniqueMistakes = dedupeById(mistakes);
+      const completedItemIds = tracksCoverage
+        ? [...new Set(itemIds.filter(Boolean))]
+        : [];
+      const mergedSeenItemIds = [...new Set([
+        ...(coverage.seenItemIds || []),
+        ...completedItemIds,
+      ])];
+      const locallyComplete = tracksCoverage
+        ? mergedSeenItemIds.length >= activityItems.length
+        : true;
       saveHubVocabActivityResult({
         themeId: theme.id,
         themeTitle: theme.title,
@@ -2362,15 +2610,21 @@ export default function HubVocabularyActivityRunner() {
         totalItems: total ?? activityItems.length,
         correctFirstTry: Math.max((total ?? activityItems.length) - uniqueMistakes.length, 0),
         mistakesCount: uniqueMistakes.length,
+        seenItemIds: completedItemIds,
+        coverageTotal: tracksCoverage ? activityItems.length : null,
       })
-        .then(() => {
+        .then((savedProgress) => {
+          const savedSeenItemIds = (savedProgress?.seenItemIds || mergedSeenItemIds)
+            .filter((itemId) => activityItemIds.has(itemId));
           setProgressMap((prev) => ({
             ...prev,
             [`${theme.id}:${activity.id}`]: {
               id: `${theme.id}:${activity.id}`,
               themeId: theme.id,
               activityId: activity.id,
-              completed: true,
+              completed: tracksCoverage ? locallyComplete : (savedProgress?.completed ?? true),
+              seenItemIds: savedSeenItemIds,
+              coverageTotal: savedProgress?.coverageTotal || (tracksCoverage ? activityItems.length : null),
             },
           }));
         })
@@ -2378,17 +2632,21 @@ export default function HubVocabularyActivityRunner() {
           console.error("[HubVocabularyActivityRunner] save progress failed", error);
         });
     },
-    [activity, activityItems.length, theme]
+    [activity, activityItemIds, activityItems.length, coverage.seenItemIds, theme, tracksCoverage]
   );
 
   const handleMistake = useCallback(
     (entry, details = {}) => {
       if (!theme || !activity || !entry) return;
+      const isHotspotActivity = activity.type === "image-hotspot-match"
+        || activity.type === "image-hotspot-type-answer";
       recordVocabMistake({
         topic: theme.id,
         setId: activity.id,
-        sentence: getMistakePrompt(entry, theme, activity, details.answerMode),
+        sentence: details.mistakePrompt
+          || getMistakePrompt(entry, theme, activity, details.answerMode),
         correctAnswer: details.correctAnswer || getDisplayAnswer(entry, theme.id, details.answerMode),
+        acceptedAnswers: details.acceptedAnswers || [],
         userAnswer: details.userAnswer || "",
         source: "hub-textbook",
         itemId: entry.id || "",
@@ -2396,6 +2654,13 @@ export default function HubVocabularyActivityRunner() {
         activityTitle: activity.title,
         activityType: activity.type,
         image: entry.image || entry.flag4x3 || "",
+        ...(isHotspotActivity ? {
+          sceneImage: details.sceneImage || activity.sceneImage || theme.sceneImage || "",
+          hotspotX: entry.hotspotX,
+          hotspotY: entry.hotspotY,
+          hotspotNumber: details.hotspotNumber || entry.hotspotNumber,
+          hotspotViewBox: details.hotspotViewBox || null,
+        } : {}),
       }).catch((error) => {
         console.error("[HubVocabularyActivityRunner] save mistake failed", error);
       });
@@ -2446,15 +2711,70 @@ export default function HubVocabularyActivityRunner() {
 
       <ActivityTabs theme={theme} activityId={activity.id} progressMap={progressMap} />
 
-      {renderActivity(theme, activity, {
-        onComplete: handleComplete,
-        onMistake: handleMistake,
-      })}
+      <OverallCoverageTracker coverage={coverage} />
+
+      {progressLoaded ? (
+        renderActivity(theme, activity, {
+          onComplete: handleComplete,
+          onMistake: handleMistake,
+          onItemSeen: handleItemSeen,
+          coverage,
+        })
+      ) : (
+        <section className="hub-vocab-practice-card hub-vocab-empty-card">
+          <strong>Loading activity progress…</strong>
+        </section>
+      )}
+
+      <ThemeSupplementaryContent theme={theme} />
 
       <style>{`
         .hub-vocab-runner {
           display: grid;
           gap: 1rem;
+        }
+
+        .hub-vocab-supplementary {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+          gap: 0.9rem;
+        }
+
+        .hub-vocab-supplementary-card {
+          border: 1px solid rgba(143, 182, 255, 0.22);
+          border-radius: 18px;
+          background: rgba(9, 20, 43, 0.54);
+          padding: 1rem 1.1rem;
+        }
+
+        .hub-vocab-supplementary-card h2 {
+          margin: 0 0 0.55rem;
+          font-size: 1rem;
+        }
+
+        .hub-vocab-supplementary-card p {
+          margin: 0.35rem 0 0;
+        }
+
+        .hub-vocab-extension-list {
+          display: grid;
+          gap: 0.55rem;
+          margin: 0;
+        }
+
+        .hub-vocab-extension-list div {
+          display: grid;
+          grid-template-columns: minmax(100px, 0.7fr) minmax(150px, 1.3fr);
+          gap: 0.75rem;
+        }
+
+        .hub-vocab-extension-list dt {
+          font-weight: 800;
+        }
+
+        .hub-vocab-extension-list dd {
+          margin: 0;
+          color: var(--muted-text, #b9c5dc);
         }
 
         .hub-vocab-top-actions {
@@ -2598,6 +2918,43 @@ export default function HubVocabularyActivityRunner() {
           color: rgba(238, 244, 255, 0.82);
           font-size: 1.02rem;
           margin: 0;
+        }
+
+        .hub-vocab-overall-progress {
+          background: rgba(9, 20, 43, 0.58);
+          border: 1px solid rgba(143, 182, 255, 0.22);
+          border-radius: 18px;
+          display: grid;
+          gap: 0.55rem;
+          padding: 0.9rem 1rem;
+        }
+
+        .hub-vocab-overall-progress > div:first-child {
+          align-items: center;
+          display: flex;
+          gap: 1rem;
+          justify-content: space-between;
+        }
+
+        .hub-vocab-overall-progress > div:first-child span,
+        .hub-vocab-overall-progress p {
+          color: rgba(238, 244, 255, 0.7);
+          margin: 0;
+        }
+
+        .hub-vocab-overall-progress-track {
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 999px;
+          height: 0.6rem;
+          overflow: hidden;
+        }
+
+        .hub-vocab-overall-progress-track span {
+          background: linear-gradient(90deg, #6da7ff, #72df9b);
+          border-radius: inherit;
+          display: block;
+          height: 100%;
+          transition: width 180ms ease;
         }
 
         .hub-vocab-card-count,
@@ -3381,6 +3738,20 @@ export default function HubVocabularyActivityRunner() {
           border-color: rgba(44, 73, 128, 0.14);
           color: #172540;
           box-shadow: 0 20px 42px rgba(43, 67, 112, 0.08);
+        }
+
+        :root[data-theme="light"] .hub-vocab-overall-progress {
+          background: #fff;
+          border-color: rgba(44, 73, 128, 0.14);
+        }
+
+        :root[data-theme="light"] .hub-vocab-overall-progress > div:first-child span,
+        :root[data-theme="light"] .hub-vocab-overall-progress p {
+          color: rgba(23, 37, 64, 0.72);
+        }
+
+        :root[data-theme="light"] .hub-vocab-overall-progress-track {
+          background: rgba(44, 73, 128, 0.12);
         }
 
         :root[data-theme="light"] .hub-vocab-complete-copy h2,

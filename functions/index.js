@@ -7726,6 +7726,23 @@ exports.emailSiteAccessGranted = functions.region("europe-west1")
     const intro = hasNewGrant
       ? "Good news: your access has been activated."
       : "Good news: your access details have been updated.";
+    const isNewSeifAdminAccount =
+      !change.before.exists &&
+      after.onboarding?.source === "seifAdmin" &&
+      after.onboarding?.temporaryPasswordIssued === true;
+    const temporaryPasswordText = isNewSeifAdminAccount
+      ? [
+          "",
+          `Temporary password: ${SEIF_ADMIN_DEFAULT_PASSWORD}`,
+          "For your security, please change this as soon as you sign in. Open your Profile, then use Account & Security → Change password.",
+        ]
+      : [];
+    const temporaryPasswordHtml = isNewSeifAdminAccount
+      ? [
+          `<p><strong>Temporary password:</strong> <code>${escapeHtml(SEIF_ADMIN_DEFAULT_PASSWORD)}</code></p>`,
+          "<p><strong>For your security, please change this as soon as you sign in.</strong> Open your Profile, then use Account &amp; Security &rarr; Change password.</p>",
+        ].join("")
+      : "";
 
     const text = [
       `Hi ${displayName},`,
@@ -7735,6 +7752,7 @@ exports.emailSiteAccessGranted = functions.region("europe-west1")
       accessListText,
       "",
       "You can sign in with the same email address you used for your Seif English account.",
+      ...temporaryPasswordText,
       "If anything looks wrong, just reply to this email and we will help.",
       "",
       "Best,",
@@ -7746,6 +7764,7 @@ exports.emailSiteAccessGranted = functions.region("europe-west1")
       `<p>${escapeHtml(intro)}</p>` +
       `<ul>${accessListHtml}</ul>` +
       `<p>You can sign in with the same email address you used for your Seif English account.</p>` +
+      temporaryPasswordHtml +
       `<p>If anything looks wrong, just reply to this email and we will help.</p>` +
       `<p>Best,<br/>Seif English Academy</p>`;
 
@@ -8205,6 +8224,13 @@ exports.syncSeifAdminStudent = functions
       };
 
       if (!existingDoc.exists) userPayload.createdAt = now;
+      if (createdAuthUser) {
+        userPayload.onboarding = {
+          source: "seifAdmin",
+          temporaryPasswordIssued: true,
+          temporaryPasswordIssuedAt: now,
+        };
+      }
       await firestore.doc(`users/${authUser.uid}`).set(userPayload, {merge: true});
 
       console.log("SEIF_ADMIN_SYNC_OK", {

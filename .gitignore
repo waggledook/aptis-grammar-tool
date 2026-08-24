@@ -5,6 +5,7 @@ dist/
 !functions/.env.example
 firebase-debug.log
 .firebase/
+.tmp.driveupload/
 functions/node_modules/
 serviceAccountKey.json
 coursepack-sections/
