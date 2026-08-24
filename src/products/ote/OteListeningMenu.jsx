@@ -108,22 +108,22 @@ const LISTENING_VARIANTS = {
   advanced: {
     label: "Advanced",
     title: "OTE Advanced Listening",
-    subtitle: "B2-C1 practice for the three task formats used across the four parts of the Oxford Test of English Advanced Listening module.",
+    subtitle: "Build the listening skills you need for the Oxford Test of English Advanced, from understanding short extracts to following detailed talks and opinions.",
     seoDescription: "Oxford Test of English Advanced listening sections and part menus.",
-    sectionTitle: "Advanced Listening task formats",
-    sectionLead: "Parts 1 and 4 use the same short-extract format, so they share one training area.",
+    sectionTitle: "What would you like to practise?",
+    sectionLead: "Choose a task below. Parts 1 and 4 have the same format, so you can practise them together.",
     parts: [
       {
         id: "part-1-short-extracts",
         label: "Parts 1 & 4",
-        title: "Short extracts",
-        copy: "Five short monologues or dialogues with three-option questions: Part 1 may use pictures or text, while Part 4 uses text only.",
+        title: "Choose the correct answer",
+        copy: "Listen to five short conversations or talks and choose the best answer. Part 1 may use pictures or words; Part 4 uses words only.",
         icon: Image,
         availableSets: 3,
         guides: [
           {
-            title: "Parts 1 & 4 Short Extracts Guide",
-            copy: "Compare the two parts, then learn their shared question types, two-listening method, and distractor patterns.",
+            title: "How to tackle Parts 1 & 4",
+            copy: "See how the two parts work, learn what to listen for and practise using your two listens effectively.",
             progressId: "listening.part1.advanced-guide",
             route: "guide",
             icon: BookOpen,
@@ -133,14 +133,14 @@ const LISTENING_VARIANTS = {
       {
         id: "part-2-note-completion",
         label: "Part 2",
-        title: "Note completion",
-        copy: "A longer monologue with five multiple-choice note questions or six gaps to complete.",
+        title: "Complete the notes",
+        copy: "Listen to one longer talk and complete the notes. You will either choose five answers or write the missing words in six gaps.",
         icon: NotebookTabs,
         availableSets: 2,
         guides: [
           {
-            title: "Note Completion Strategy Guide",
-            copy: "Compare the adaptive B2 and C1 formats, build a reliable note-following method, and review the answer rules.",
+            title: "How to complete the notes",
+            copy: "Learn how to preview the notes, keep your place while listening and write answers that follow the rules.",
             progressId: "listening.part2.advanced-guide",
             route: "guide",
             icon: BookOpen,
@@ -150,14 +150,14 @@ const LISTENING_VARIANTS = {
       {
         id: "part-3-opinion-matching",
         label: "Part 3",
-        title: "Opinion matching",
-        copy: "A longer dialogue with five or six questions matching stated and implied opinions to speakers.",
+        title: "Who has each opinion?",
+        copy: "Listen to a longer conversation and decide whether each opinion belongs to the woman, the man or both speakers.",
         icon: Users,
         availableSets: 2,
         guides: [
           {
-            title: "Matching Opinions Strategy Guide",
-            copy: "Compare the adaptive B2 and C1 versions, then track ownership, scope, qualification, and implied positions.",
+            title: "How to match the opinions",
+            copy: "Learn how to follow each speaker's ideas, notice agreement and disagreement, and recognise opinions that are only implied.",
             progressId: "listening.part3.advanced-guide",
             route: "guide",
             icon: BookOpen,

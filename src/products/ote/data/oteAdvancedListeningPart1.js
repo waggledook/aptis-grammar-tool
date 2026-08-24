@@ -5,7 +5,7 @@ const setTwoAudioRoot = "/audio/ote/listening/advanced/part-1/set-2";
 const setThreeAudioRoot = "/audio/ote/listening/advanced/part-1/set-3";
 const setFourAudioRoot = "/audio/ote/listening/advanced/part-1/set-4";
 
-export const advancedListeningPart1Sets = [
+const advancedListeningPart1SetCatalog = [
   {
     id: "set-1",
     title: "Set 1",
@@ -531,7 +531,7 @@ export const advancedListeningPart1Sets = [
     ],
   },
   {
-    id: "set-3",
+    id: "set-3-retired",
     title: "Set 3 · C1 Challenge",
     level: "C1",
     description: "Five upper-range C1 extracts testing subtle purpose, attitude, emphasis, and implied meaning. Deliberately harder than many test-day items.",
@@ -820,10 +820,10 @@ export const advancedListeningPart1Sets = [
     ],
   },
   {
-    id: "set-4",
-    title: "Set 4 · C1 Challenge (revised)",
+    id: "set-3",
+    title: "Set 3 · C1 Challenge",
     level: "C1",
-    description: "A revised upper-range C1 set with fully supported distractors and closer competition between plausible interpretations.",
+    description: "Try five challenging C1 extracts where you need to notice subtle differences in meaning and attitude.",
     assetsReady: true,
     audioReady: true,
     instructionAudioReady: true,
@@ -1162,6 +1162,11 @@ export const advancedListeningPart1Sets = [
   },
 ];
 
+export const advancedListeningPart1Sets = advancedListeningPart1SetCatalog.filter(
+  (set) => set.id !== "set-3-retired"
+);
+
 export function getAdvancedListeningPart1Set(setId = "set-1") {
-  return advancedListeningPart1Sets.find((set) => set.id === setId) || advancedListeningPart1Sets[0];
+  const currentSetId = setId === "set-4" ? "set-3" : setId;
+  return advancedListeningPart1Sets.find((set) => set.id === currentSetId) || advancedListeningPart1Sets[0];
 }
