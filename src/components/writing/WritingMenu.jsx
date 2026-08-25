@@ -56,16 +56,15 @@ export default function WritingMenu({ user, aptisAccess, onSignIn }) {
         <div>
           <div className="writing-full-test-kicker">Full test</div>
           <h2>Complete writing test</h2>
-          <p>Do the whole writing paper in exam conditions when you are ready for a complete challenge.</p>
+          <p>Choose from three complete Aptis General writing mocks and complete all four parts in a timed, exam-style interface.</p>
         </div>
-        <a
-          href="https://aptis-gen.writing1.beeskillsenglish.com/"
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
           className="writing-full-test-link"
+          onClick={() => navigate("/writing/mock-tests")}
         >
-          Open full writing test
-        </a>
+          Choose a writing mock
+        </button>
       </section>
 
       <button className="topbar-btn writing-menu-back" type="button" onClick={() => navigate("/")}>

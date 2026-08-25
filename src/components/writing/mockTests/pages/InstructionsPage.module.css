@@ -1,0 +1,33 @@
+/* src/pages/InstructionsPage.module.css */
+.container {
+    max-width: 600px;
+    margin: 2rem auto;
+    padding: 1rem;
+    line-height: 1.6;
+  }
+  
+  .heading {
+    font-size: 1.75rem;
+    margin-bottom: 1rem;
+  }
+  
+  .subheading {
+    margin-top: 1rem;
+    font-weight: bold;
+  }
+  
+  .list {
+    list-style: disc inside;
+    margin: 0.5rem 0 2rem 0;
+  }
+  
+  .footer {
+    text-align: right;
+  }
+  
+  .nextButton {
+    padding: 0.5rem 1.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+  

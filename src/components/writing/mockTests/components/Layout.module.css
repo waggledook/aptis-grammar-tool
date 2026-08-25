@@ -1,0 +1,381 @@
+.wrapper {
+    position: relative;
+    min-height: 100vh;
+    background: #fff;
+    color: #111;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+      'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  }
+
+.wrapper h1,
+.wrapper h2,
+.wrapper h3,
+.wrapper h4 {
+  color: inherit;
+}
+
+.wrapper :where(button) {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+  color: white;
+  font-size: 1.125rem;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.wrapper :where(button):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.wrapper :where(button):active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.1);
+}
+  
+  /* --- Header & Timer --- */
+  .header {
+    position: fixed;
+    top: 0;
+    right: 0;
+    padding: 0.5rem 1rem;
+    background: white;
+    z-index: 10;
+  
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  
+.timerDisplay {
+    text-align: right;
+  }
+.mockLabel {
+    color: #555;
+    font-size: 0.75rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .timerValue {
+    font-family: monospace;
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  .timerText {
+    font-size: 0.75rem;
+    color: #555;
+    margin-top: 2px;
+  }
+  
+  .timeBarContainer {
+    width: 120px;
+    height: 4px;
+    background: #e0e0e0;
+    border-radius: 2px;
+    margin-top: 4px;
+    overflow: hidden;
+  }
+  
+  .timeBar {
+    height: 100%;
+    background: #5a2d82;
+    transition: width 1s linear;
+  }
+  
+  /* --- Main & Footer --- */
+  .main {
+    padding: 2.5rem 1rem 4rem;
+  }
+  .bottomBar {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background: white;
+    border-top: 1px solid #ddd;
+    z-index: 10;
+  }
+  
+  /* ─── Game-style Base for Menu & Next ─── */
+.menuButton,
+.nextButton {
+    padding: 10px 20px;
+    font-size: 1.125rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+.menuButton:disabled,
+.nextButton:disabled,
+.reviewButton:disabled,
+.submitButton:disabled,
+.cancelButton:disabled,
+.submitConfirmButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+  transform: none;
+  box-shadow: none;
+}
+  
+  /* Menu = neutral gray */
+  .menuButton {
+    background: #eee;
+    color: #333;
+  }
+  .menuButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+  .menuButton:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 4px rgba(0,0,0,0.1);
+  }
+  
+  /* Next = purple gradient */
+  .nextButton {
+    /* base button look */
+    padding: 10px 20px;
+    font-size: 1.125rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+    /* vibrant blue gradient */
+    background: linear-gradient(135deg, #0066ff 0%, #00ccff 100%);
+    color: white;
+  }
+  
+  .nextButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+  
+  .nextButton:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 4px rgba(0,0,0,0.1);
+  }
+  
+  /* --- Drawer --- */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+  }
+  .drawer {
+    width: 200px;
+    background: white;
+    padding: 1rem;
+  }
+  .drawerList {
+    list-style: none;
+    margin: 0; padding: 0;
+  }
+  .drawerList li + li {
+    margin-top: 0.5rem;
+  }
+  /* keep layout overrides, but reset any global box-shadow, radius */
+  .drawerList button {
+    all: unset;           /* remove unwanted global button styles */
+    display: block;       /* occupy full width */
+    width: 100%;
+    box-sizing: border-box;  /* ← include padding in width calculation */
+    padding: 0.75rem 1rem;/* comfortable tap area */
+    color: #333;          /* dark text */
+    text-align: left;
+    cursor: pointer;
+  }
+  .drawerList button:hover {
+    background: #f5f5f5;  /* light hover highlight */
+  }
+  
+  /* --- Review Modal --- */
+  .modalOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal {
+    background: white;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 500px;
+    padding: 1.5rem;
+  }
+  .modalHeader {
+    margin: 0 0 0.5rem;
+  }
+  .modalSubheader {
+    margin: 0 0 1rem;
+    color: #555;
+  }
+  .partList {
+    list-style: none;
+    margin: 0; padding: 0;
+  }
+  .partItem {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
+  .modalFooter {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  /* Review-modal “Submit” = warning gradient */
+  .reviewButton {
+    /* base button look */
+    padding: 10px 20px;
+    font-size: 1.125rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+    /* bolder orange gradient */
+    background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);
+    color: white;
+    width: 100%;
+  }
+  
+  .reviewButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+  
+  .reviewButton:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 4px rgba(0,0,0,0.1);
+  }
+  
+  
+  /* Review-modal “Cancel” = neutral */
+  .submitButton {
+    /* base button look */
+    padding: 10px 20px;
+    font-size: 1.125rem;        /* 18px */
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+    /* complementary purple gradient */
+    background: linear-gradient(135deg, #5a2d82 0%, #703c9c 100%);
+    color: white;
+    width: 100%;
+  }
+  
+  .submitButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+  
+  .submitButton:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 4px rgba(0,0,0,0.1);
+  }  
+  
+  /* Make the entire part row clickable */
+  .partButton {
+    all: unset;
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  .partButton:hover {
+    background: #f5f5f5;
+  }
+  .partItem + .partItem {
+    margin-top: 0.5rem;
+  }
+  
+  /* Submit Confirmation Modal footer buttons */
+  .confirmFooter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  
+  /* Confirmation-modal “Cancel” */
+  .cancelButton {
+    padding: 10px 20px;
+    font-size: 1.125rem;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    background: #eee;
+    color: #333;
+    border: 1px solid #ccc;
+  }
+  .cancelButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+  .cancelButton:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 4px rgba(0,0,0,0.1);
+  }
+  
+  .submitConfirmButton {
+    /* base button look */
+    padding: 10px 20px;
+    font-size: 1.125rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  
+    /* fiery orange gradient */
+    background: linear-gradient(135deg, #f12711 0%, #f5af19 100%);
+    color: white;
+  
+    /* let the button size to its text */
+    display: inline-block;
+    width: auto;  /* remove the full-width */
+  }
+  
+  .submitConfirmButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+  }
+  
+  .submitConfirmButton:active {
+    transform: translateY(1px);
+    box-shadow: 0 3px 4px rgba(0,0,0,0.1);
+  }
+
+  .errorText {
+    margin: 0.75rem 0 0;
+    color: #b42318;
+    font-size: 0.95rem;
+  }
+  

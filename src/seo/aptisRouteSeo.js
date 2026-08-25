@@ -206,6 +206,11 @@ export const APTIS_ROUTE_SEO = {
     description:
       "Practise Aptis Writing Parts 1 to 4 with guides, model tasks and exam-style writing prompts.",
   },
+  "/writing/mock-tests": {
+    title: "Aptis General Writing Mock Tests | Seif Aptis Trainer",
+    description:
+      "Complete timed Aptis General Writing mock tests covering all four parts in an exam-style interface.",
+  },
   "/writing/part1": {
     title: "Aptis Writing Part 1 Practice | Seif Aptis Trainer",
     description:

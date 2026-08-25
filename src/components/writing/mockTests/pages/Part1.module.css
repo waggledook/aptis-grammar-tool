@@ -1,0 +1,89 @@
+.title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+
+  .heading {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.1rem;
+  }
+  
+  .subheading {
+    font-size: 1.25rem;
+    font-weight: normal;
+    margin-bottom: 1rem;
+  }
+
+/* rename .container → .partContainer (if you want consistency) */
+.partContainer {
+    padding: 1rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  /* reused from Part 3 */
+  .heading {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.2rem;
+  }
+  
+  .prompt {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+  }
+  
+  /* for each question block */
+  .questionBlock {
+    background: #fafafa;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* label for each question */
+  .label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.25rem;
+  }
+  
+  /* styling your inputs */
+  .answerInput {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background: #fff;
+    color: #111;
+    caret-color: #111;
+    color-scheme: light;
+    font: inherit;
+    box-sizing: border-box;
+  }
+
+  .answerInput::placeholder {
+    color: #777;
+    opacity: 1;
+  }
+
+  .answerInput:focus {
+    border-color: #5a2d82;
+    outline: 2px solid rgba(90, 45, 130, 0.2);
+    outline-offset: 1px;
+  }
+  
+  /* footer button */
+  .footer {
+    text-align: right;
+    margin-top: 1rem;
+  }
+  .nextButton {
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+  }
+  

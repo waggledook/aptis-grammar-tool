@@ -1,0 +1,66 @@
+.editorShell {
+  position: relative;
+}
+
+.toolbar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.toolbar button {
+  background: #eee;
+  border: 1px solid #ccc;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.toolbar button:hover {
+  background: #e4e4e4;
+}
+
+.active {
+  background: #ddd !important;
+  border-color: #888 !important;
+}
+
+.editable {
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow-y: auto;
+  direction: ltr !important;
+  unicode-bidi: embed !important;
+}
+
+.editable:empty:before {
+  content: attr(data-placeholder);
+  color: #999;
+}
+
+.wordCount {
+  text-align: right;
+  margin-top: 0.25rem;
+  font-size: 0.875rem;
+  color: #555;
+}
+
+.wordCountWarning {
+  color: red;
+  font-weight: bold;
+}
+
+.bookmarkButton {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.bookmarked {
+  color: gold;
+}

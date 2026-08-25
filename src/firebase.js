@@ -4355,6 +4355,99 @@ export async function fetchRecentFavourites(n = 10, uid) {
   return snap.docs.map((d) => d.data()?.itemId).filter(Boolean);
 }
 
+// — APTIS WRITING: complete timed mock papers ————————————————
+// Keep these records in the existing root `submissions` collection so
+// historic standalone-app attempts, admin reporting and the aggregation
+// trigger continue to work without a data migration.
+export async function saveAptisWritingMockSubmission(answers, options = {}) {
+  const currentUser = options.user?.uid ? options.user : auth.currentUser;
+  const mockId = options.mockId || "music-club";
+  const cleanAnswers = {
+    ...JSON.parse(JSON.stringify(answers || {})),
+    __mockId: mockId,
+  };
+  const basePayload = {
+    answers: cleanAnswers,
+    createdAt: serverTimestamp(),
+  };
+
+  if (!currentUser?.uid) {
+    const anonymousRef = await addDoc(collection(db, "submissions"), basePayload);
+    return anonymousRef.id;
+  }
+
+  let profile = {};
+  try {
+    const profileSnap = await getDoc(doc(db, "users", currentUser.uid));
+    profile = profileSnap.exists() ? profileSnap.data() || {} : {};
+  } catch (error) {
+    console.warn("[Aptis writing mock] Could not load submission profile metadata", error);
+  }
+
+  const signedInPayload = {
+    ...basePayload,
+    mockId,
+    userId: currentUser.uid,
+    userEmail: currentUser.email || null,
+    displayName: currentUser.displayName || profile.displayName || profile.name || "",
+    username: profile.username || "",
+  };
+
+  try {
+    const signedInRef = await addDoc(collection(db, "submissions"), signedInPayload);
+    return signedInRef.id;
+  } catch (error) {
+    if (error?.code !== "permission-denied") throw error;
+    console.warn("[Aptis writing mock] Profile metadata was rejected; saving the paper anonymously.");
+    const anonymousRef = await addDoc(collection(db, "submissions"), basePayload);
+    return anonymousRef.id;
+  }
+}
+
+export async function fetchAptisWritingMockSubmission(submissionId) {
+  if (!submissionId) throw new Error("A submission ID is required.");
+  const submissionSnap = await getDoc(doc(db, "submissions", submissionId));
+  if (!submissionSnap.exists()) {
+    throw new Error(`No such submission: ${submissionId}`);
+  }
+  return { id: submissionSnap.id, ...submissionSnap.data() };
+}
+
+/** Fetch complete timed Aptis Writing mocks belonging to one profile. */
+export async function fetchAptisWritingMockSubmissions(n = 50, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  try {
+    const snap = await getDocs(query(
+      collection(db, "submissions"),
+      where("userId", "==", realUid)
+    ));
+
+    const rows = snap.docs.map((submissionDoc) => ({
+      id: submissionDoc.id,
+      ...submissionDoc.data(),
+    }));
+
+    const createdAtMs = (value) => {
+      if (typeof value?.toMillis === "function") return value.toMillis();
+      if (value instanceof Date) return value.getTime();
+      const parsed = new Date(value || 0).getTime();
+      return Number.isFinite(parsed) ? parsed : 0;
+    };
+
+    rows.sort((a, b) => createdAtMs(b.createdAt) - createdAtMs(a.createdAt));
+    return rows.slice(0, Math.max(0, Number(n) || 0));
+  } catch (error) {
+    // Keep the rest of the profile usable while updated rules roll out.
+    if (error?.code === "permission-denied") {
+      console.warn("[Aptis writing mock] Profile history is not readable with the current Firestore rules.");
+      return [];
+    }
+    throw error;
+  }
+}
+
 /** Fetch Writing Part 1 sessions (latest first) */
 export async function fetchWritingP1Sessions(n = 20, uid) {
   const realUid = _uidOrCurrent(uid);

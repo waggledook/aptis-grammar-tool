@@ -1,0 +1,399 @@
+.page {
+  padding: 2rem;
+  max-width: 900px;
+  margin: auto;
+  background: #fff;
+  color: #111;
+}
+
+.page h1,
+.page h2,
+.page h3,
+.page h4 {
+  color: inherit;
+}
+
+.toolbar {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.toolbar button {
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.helperText {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.feedbackWorkspace {
+  background: #f6f8fb;
+  border: 1px solid #dce3ec;
+  border-radius: 6px;
+  color: #17202a;
+  margin: 1.5rem 0 2rem;
+  padding: 1rem;
+}
+
+.feedbackWorkspace h2 {
+  margin: 0 0 0.35rem;
+}
+
+.feedbackWorkspace p {
+  margin: 0.35rem 0;
+}
+
+.feedbackNotice {
+  color: #7a4a00;
+  font-weight: 600;
+}
+
+.feedbackCard {
+  background: #fff;
+  border: 1px solid #dce3ec;
+  border-radius: 6px;
+  margin-top: 1rem;
+  padding: 1rem;
+}
+
+.feedbackCardHeader {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.feedbackCardHeader h3 {
+  margin: 0;
+}
+
+.feedbackCardHeader button {
+  cursor: pointer;
+  padding: 0.55rem 0.8rem;
+}
+
+.feedbackCardHeader button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.feedbackEmpty {
+  color: #626f7d;
+}
+
+.feedbackError {
+  background: #fff4f4;
+  border-left: 4px solid #c83737;
+  color: #9f1f1f;
+  padding: 0.65rem 0.8rem;
+}
+
+.feedbackResult {
+  margin-top: 0.85rem;
+}
+
+.feedbackLevel {
+  color: #5a2d82;
+  font-weight: 700;
+}
+
+.feedbackSummary {
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+
+.feedbackNotes {
+  border-top: 1px solid #e6ecf2;
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+}
+
+.feedbackNotes p,
+.feedbackImproved p,
+.feedbackMistakes p {
+  line-height: 1.45;
+}
+
+.feedbackBullets {
+  margin-top: 0.9rem;
+}
+
+.feedbackBullets ul,
+.feedbackMistakes ul,
+.feedbackSuggestions ul {
+  margin: 0.45rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.feedbackBullets li {
+  margin-bottom: 0.25rem;
+}
+
+.feedbackSection {
+  border-top: 1px solid #dfe7ef;
+  margin-top: 1.1rem;
+  padding-top: 1rem;
+}
+
+.feedbackSection h4 {
+  color: #26394f;
+  font-size: 1.05rem;
+  margin: 0 0 0.35rem;
+}
+
+.feedbackQuestion {
+  color: #536171;
+  font-size: 0.93rem;
+}
+
+.feedbackStudentAnswer {
+  background: #fff;
+  border-left: 4px solid #b8c4d3;
+  margin: 0.65rem 0;
+  padding: 0.55rem 0.75rem;
+}
+
+.feedbackStudentAnswer p {
+  margin-bottom: 0;
+  white-space: pre-wrap;
+}
+
+.feedbackMistakes {
+  margin-top: 0.9rem;
+}
+
+.feedbackSuggestions {
+  margin-top: 0.9rem;
+}
+
+.feedbackMistakes li,
+.feedbackSuggestions li {
+  background: #f9fbfd;
+  border: 1px solid #edf1f5;
+  border-radius: 4px;
+  list-style: none;
+  margin: 0 0 0.45rem;
+  padding: 0.65rem 0.75rem;
+}
+
+.feedbackMistakes small,
+.feedbackSuggestions small {
+  color: #667586;
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-bottom: 0.2rem;
+  text-transform: uppercase;
+}
+
+.feedbackMistakes span:first-of-type {
+  color: #9f1f1f;
+}
+
+.feedbackMistakes strong {
+  color: #16703b;
+}
+
+.feedbackSuggestions span:first-of-type {
+  color: #445363;
+}
+
+.feedbackSuggestions strong {
+  color: #265c9c;
+}
+
+.feedbackMistakes em,
+.feedbackSuggestions em {
+  color: #536171;
+  display: block;
+  font-size: 0.92rem;
+}
+
+.feedbackImproved {
+  background: #f7fbf8;
+  border-left: 4px solid #39a467;
+  margin-top: 0.9rem;
+  padding: 0.7rem 0.85rem;
+}
+
+.feedbackImproved p {
+  white-space: pre-wrap;
+}
+
+.feedbackResult blockquote {
+  border-left: 4px solid #d6dfe8;
+  color: #445363;
+  margin: 0.9rem 0 0;
+  padding-left: 0.85rem;
+}
+
+.content {
+  background: white;
+  color: #111;
+}
+
+.documentHeader {
+  border-bottom: 2px solid #ddd;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+}
+
+.documentHeader h1 {
+  margin: 0 0 0.35rem;
+}
+
+.submissionMeta {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.section {
+  margin-bottom: 2rem;
+}
+
+.section h2,
+.section h3 {
+  margin-top: 0;
+}
+
+.promptText {
+  background: #f9f9f9;
+  padding: 0.75rem;
+  border-left: 4px solid #5a2d82;
+  margin-bottom: 1rem;
+}
+
+.qaBlock {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 1rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  break-inside: avoid-page;
+  page-break-inside: avoid;
+}
+
+.question {
+  margin-bottom: 0.5rem;
+}
+
+.answer {
+  padding-left: 1rem;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.answer p,
+.answer div {
+  margin-top: 0;
+  margin-bottom: 0.8rem;
+}
+
+.emailBlock {
+  margin: 0 0 1rem;
+  padding: 1rem 1rem 1rem 1.25rem;
+  background: #f8f8f8;
+  border-left: 4px solid #b9b9b9;
+}
+
+@media print {
+  .toolbar {
+    display: none !important;
+  }
+
+  .feedbackIntro,
+  .feedbackCardHeader button,
+  .feedbackEmpty,
+  .feedbackCardEmpty {
+    display: none !important;
+  }
+
+  .feedbackWorkspace {
+    background: white;
+    border: 0;
+    break-before: page;
+    margin: 2rem 0 0;
+    page-break-before: always;
+    padding: 0;
+  }
+
+  .feedbackWorkspace:not(.hasFeedback) {
+    display: none !important;
+  }
+
+  .feedbackWorkspace::before {
+    content: "Automated feedback";
+    display: block;
+    font-size: 16pt;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+  }
+
+  .feedbackCard {
+    border: 0;
+    break-inside: avoid-page;
+    margin-top: 1rem;
+    page-break-inside: avoid;
+    padding: 0;
+  }
+
+  .feedbackSection {
+    break-inside: avoid-page;
+    page-break-inside: avoid;
+  }
+
+  .feedbackMistakes li,
+  .feedbackSuggestions li,
+  .feedbackImproved {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .page {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    max-width: none;
+    margin: 0;
+    font-size: 11pt;
+    color: #000;
+  }
+
+  .content {
+    order: 1;
+    width: 100%;
+  }
+
+  .feedbackWorkspace {
+    order: 2;
+  }
+
+  .documentHeader {
+    margin-bottom: 1rem;
+  }
+
+  .section {
+    break-before: auto;
+    page-break-before: auto;
+  }
+}
+
+@page {
+  size: A4;
+  margin: 16mm 14mm;
+}
+  

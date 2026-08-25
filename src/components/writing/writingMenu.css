@@ -133,8 +133,11 @@
   justify-content: center;
   padding: .78rem 1rem;
   border-radius: 10px;
+  border: 0;
   background: #ffbd38;
   color: #13213b;
+  cursor: pointer;
+  font: inherit;
   font-weight: 900;
   text-decoration: none;
 }

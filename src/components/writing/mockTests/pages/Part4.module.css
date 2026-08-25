@@ -1,0 +1,39 @@
+/* src/pages/Part4.module.css */
+.partContainer {
+  padding: 1rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.heading {
+  margin: 0 0 0.25rem 0;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.progress {
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.prompt {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.emailBox {
+  background: #fafafa;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.questionBlock {
+  background: #fafafa;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+}

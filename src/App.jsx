@@ -50,6 +50,7 @@ import WritingPart3 from "./components/writing/WritingPart3.jsx";
 import WritingPart4Guide from "./components/writing/WritingPart4Guide";
 import WritingPart4Emails from "./components/writing/WritingPart4Emails";
 import WritingPart4RegisterGuide from "./components/writing/WritingPart4RegisterGuide";
+import AptisWritingMockRoutes from "./components/writing/mockTests/AptisWritingMockRoutes.jsx";
 import ReadingMenu from './components/ReadingMenu';
 import ReadingPartMenu from './reading/ReadingPartMenu.jsx';
 import AptisReadingStrategyGuide from './reading/AptisReadingStrategyGuide.jsx';
@@ -478,6 +479,7 @@ const isHubCourseTestRunnerRoute = /^\/your-class\/tests\/[^/]+$/.test(location.
 const currentSite = getSiteVariant();
 const isSeifHubSite = currentSite.id === "seifhub";
 const isOteSite = currentSite.id === "ote";
+const isAptisWritingMockRoute = !isOteSite && location.pathname.startsWith("/writing/mock-tests/");
 const requiresMemberAccess = !!currentSite.requiresMemberAccess;
 const isOteExamRoute =
   /^\/ote\/mock-tests\/[^/]+/.test(location.pathname) ||
@@ -519,7 +521,8 @@ const isOteRoute =
       location.pathname.startsWith("/results")));
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
-const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute;
+const isExamRoute = isOteExamRoute || isAptisGrammarVocabularyMockRoute || isAptisWritingMockRoute;
+const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute || isAptisWritingMockRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
@@ -1277,18 +1280,18 @@ const [grammarTrackingContext, setGrammarTrackingContext] = useState(null);
   // — RENDER MAIN APP —
 return (
   // in src/App.jsx (inside your App component’s return)
-  <div className={`App ${isWideLayout ? "App--full" : ""} ${(isOteExamRoute || isAptisGrammarVocabularyMockRoute) ? "App--exam" : ""}`} data-theme={theme}>
+  <div className={`App ${isWideLayout ? "App--full" : ""} ${isExamRoute ? "App--exam" : ""}`} data-theme={theme}>
     <AptisRouteSeoSync enabled={currentSite.id === "aptis-trainer"} />
     <ToastHost />
-    {!isOteExamRoute && !isAptisGrammarVocabularyMockRoute && <CookieBanner />}
+    {!isExamRoute && <CookieBanner />}
     <SupportMessageWidget
       user={user}
       site={currentSite.id}
-      hidden={showAuth || isOteExamRoute || isAptisGrammarVocabularyMockRoute || isHubCourseTestRunnerRoute}
+      hidden={showAuth || isExamRoute || isHubCourseTestRunnerRoute}
     />
-    <div className={`content-container ${isWideLayout ? "content-container--full" : ""} ${(isOteExamRoute || isAptisGrammarVocabularyMockRoute) ? "content-container--exam" : ""}`}>
+    <div className={`content-container ${isWideLayout ? "content-container--full" : ""} ${isExamRoute ? "content-container--exam" : ""}`}>
       {/* Auth bar */}
-    {!isOteExamRoute && !isAptisGrammarVocabularyMockRoute && <div
+    {!isExamRoute && <div
   style={{
     marginBottom: "1rem",
     display: "flex",
@@ -2753,6 +2756,13 @@ return (
   }
 />
 
+{!isOteSite && (
+  <Route
+    path="/writing/mock-tests/*"
+    element={<AptisWritingMockRoutes user={user} onRequireSignIn={() => setShowAuth(true)} />}
+  />
+)}
+
 <Route
   path="/writing/parts/:partNumber"
   element={
@@ -3426,7 +3436,7 @@ return (
 </Routes>
 
 {/* Footer stays visible on normal app routes */}
-{!isOteExamRoute && !isAptisGrammarVocabularyMockRoute && <Footer />}
+{!isExamRoute && <Footer />}
 
 
   </div>

@@ -501,7 +501,11 @@ service cloud.firestore {
           && request.resource.data.userEmail == request.auth.token.email
         );
       allow get: if true;
-      allow list: if isAdmin();
+      allow list: if isAdmin()
+        || (
+          isSignedIn()
+          && canAccessUser(resource.data.userId)
+        );
       allow update, delete: if false;
     }
 

@@ -17,6 +17,14 @@ import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
 import { OTE_SPEAKING_MOCKS } from "../../products/ote/mockTests/data/oteSpeakingMockData.js";
 import { getOteWritingMock, getOteWritingMocks } from "../../products/ote/mockTests/data/oteWritingMockData.js";
 import { getOteWritingPracticeGroups } from "../../products/ote/mockTests/data/oteWritingPracticeData.js";
+import { getWritingMock as getAptisWritingMock } from "../writing/mockTests/data/mocks.js";
+import { generalListeningPart1Sets } from "../../products/ote/data/oteGeneralListeningPart1.js";
+import { generalListeningPart2Sets } from "../../products/ote/data/oteGeneralListeningPart2.js";
+import { generalListeningPart3Sets } from "../../products/ote/data/oteGeneralListeningPart3.js";
+import { generalListeningPart4Sets } from "../../products/ote/data/oteGeneralListeningPart4.js";
+import { advancedListeningPart1Sets } from "../../products/ote/data/oteAdvancedListeningPart1.js";
+import { advancedListeningPart2Sets } from "../../products/ote/data/oteAdvancedListeningPart2.js";
+import { advancedListeningPart3Sets } from "../../products/ote/data/oteAdvancedListeningPart3.js";
 import {
   downloadOteWritingSubmissionDocx,
   downloadOteWritingSubmissionText,
@@ -119,6 +127,61 @@ const OTE_READING_PRACTICE_SETS = {
     { id: "advanced-reading-part-4-c1-pilot-2", label: "Part 4 · The Danger of Perfect Efficiency", part: "part4" },
     { id: "advanced-reading-part-4-c1-queues", label: "Part 4 · Why Queues Are Not Always a Failure", part: "part4" },
   ],
+};
+
+function buildOteListeningPracticeSets(variant, groups) {
+  return groups.flatMap(({ part, partLabel, sets }) =>
+    sets
+      .filter((set) => set.assetsReady !== false && set.practiceReady !== false)
+      .map((set) => ({
+        id: set.id,
+        label: `${partLabel} · ${set.title}`,
+        part,
+        progressId: `listening.part${part}.practice.${variant}-listening-part-${part}-${set.id}`,
+      }))
+  );
+}
+
+const OTE_LISTENING_PRACTICE_SETS = {
+  general: buildOteListeningPracticeSets("general", [
+    { part: 1, partLabel: "Part 1", sets: generalListeningPart1Sets },
+    { part: 2, partLabel: "Part 2", sets: generalListeningPart2Sets },
+    { part: 3, partLabel: "Part 3", sets: generalListeningPart3Sets },
+    { part: 4, partLabel: "Part 4", sets: generalListeningPart4Sets },
+  ]),
+  advanced: buildOteListeningPracticeSets("advanced", [
+    { part: 1, partLabel: "Parts 1 & 4", sets: advancedListeningPart1Sets },
+    { part: 2, partLabel: "Part 2", sets: advancedListeningPart2Sets },
+    { part: 3, partLabel: "Part 3", sets: advancedListeningPart3Sets },
+  ]),
+};
+
+const OTE_LISTENING_GUIDES = {
+  general: [
+    { label: "Part 1 · Picture Multiple Choice Strategy Guide", progressId: "listening.part1.general-guide" },
+    { label: "Part 2 · Note Completion Strategy Guide", progressId: "listening.part2.general-guide" },
+    { label: "Part 3 · Matching Opinions Strategy Guide", progressId: "listening.part3.general-guide" },
+    { label: "Part 4 · Text Multiple Choice Strategy Guide", progressId: "listening.part4.general-guide" },
+  ],
+  advanced: [
+    { label: "Parts 1 & 4 · Short Extracts Strategy Guide", progressId: "listening.part1.advanced-guide" },
+    { label: "Part 2 · Note Completion Strategy Guide", progressId: "listening.part2.advanced-guide" },
+    { label: "Part 3 · Opinion Matching Strategy Guide", progressId: "listening.part3.advanced-guide" },
+  ],
+};
+
+const OTE_LISTENING_PART_LABELS = {
+  general: {
+    1: "Part 1 picture-option practice",
+    2: "Part 2 note-completion practice",
+    3: "Part 3 opinion-matching practice",
+    4: "Part 4 text-option practice",
+  },
+  advanced: {
+    1: "Parts 1 and 4 short-extract practice",
+    2: "Part 2 note-completion practice",
+    3: "Part 3 opinion-matching practice",
+  },
 };
 
 const OTE_ADVANCED_SPEAKING_TASK_IDS = new Set([
@@ -298,6 +361,9 @@ export default function Profile({
   const [writingP3, setWritingP3] = useState([]);
   const [showWritingP3, setShowWritingP3] = useState(false);
 
+  const [aptisWritingMocks, setAptisWritingMocks] = useState([]);
+  const [showAptisWritingMocks, setShowAptisWritingMocks] = useState(false);
+
   const [p4Register, setP4Register] = useState([]);
   const [showP4Register, setShowP4Register] = useState(false);
   const [oteWriting, setOteWriting] = useState([]);
@@ -315,6 +381,7 @@ export default function Profile({
   const [showOteSpeakingPanel, setShowOteSpeakingPanel] = useState(false);
   const [showOteWritingPanel, setShowOteWritingPanel] = useState(false);
   const [showOteReadingPanel, setShowOteReadingPanel] = useState(false);
+  const [showOteListeningPanel, setShowOteListeningPanel] = useState(false);
   const [oteProfileVariant, setOteProfileVariant] = useState(() => normalizeOteProfileVariant(user?.oteVersion));
   const [oteProfileVariantBusy, setOteProfileVariantBusy] = useState(false);
   const [profileFeedbackBusy, setProfileFeedbackBusy] = useState("");
@@ -932,6 +999,7 @@ function renderFeedbackButton(kind, submission) {
           wP3,
           wP4,
           p4Reg,
+          aptisWritingMockSubs,
           oteWritingSubs,
           specNotes,
           speakingFeedbackItems,
@@ -960,6 +1028,7 @@ function renderFeedbackButton(kind, submission) {
           fb.fetchWritingP3Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP4Submissions?.(20, uid) ?? Promise.resolve([]),
           fb.fetchWritingP4RegisterAttempts?.(100, uid) ?? Promise.resolve([]),
+          fb.fetchAptisWritingMockSubmissions?.(50, uid) ?? Promise.resolve([]),
           fb.fetchOteWritingSubmissions?.(100, uid) ?? Promise.resolve([]),
           fb.fetchSpeakingSpeculationNotes?.(50, uid) ?? Promise.resolve([]),
           fb.fetchSpeakingAiFeedback?.(20, uid) ?? Promise.resolve([]),
@@ -990,6 +1059,7 @@ function renderFeedbackButton(kind, submission) {
         setWritingP3(wP3);
         setWritingP4(wP4);
         setP4Register(p4Reg);
+        setAptisWritingMocks(aptisWritingMockSubs || []);
         setOteWriting(oteWritingSubs || []);
         setSpeakingNotes(specNotes);
         setSpeakingFeedback(speakingFeedbackItems || []);
@@ -1077,6 +1147,7 @@ const totalListeningTasks =
   (LISTENING_TOTALS.part4 || 0);
 
 const aptisWritingItems =
+  aptisWritingMocks.length +
   writingP1.length +
   guideEdits.length +
   writingP2.length +
@@ -1182,11 +1253,30 @@ const oteReadingPart1Total = oteReadingPracticeSets.filter((set) => !set.part).l
 const oteReadingPart2Total = oteReadingPracticeSets.filter((set) => set.part === "part2").length;
 const oteReadingPart3Total = oteReadingPracticeSets.filter((set) => set.part === "part3").length;
 const oteReadingPart4Total = oteReadingPracticeSets.filter((set) => set.part === "part4").length;
+const oteListeningPracticeSets = OTE_LISTENING_PRACTICE_SETS[oteProfileVariant] || [];
+const oteListeningGuides = OTE_LISTENING_GUIDES[oteProfileVariant] || [];
+const completedOteListeningPracticeCount = oteListeningPracticeSets.filter(
+  (set) => Boolean(oteTrainingProgress?.[set.progressId])
+).length;
+const completedOteListeningGuideCount = oteListeningGuides.filter(
+  (guide) => Boolean(oteTrainingProgress?.[guide.progressId])
+).length;
+const oteListeningPartProgress = Object.entries(
+  OTE_LISTENING_PART_LABELS[oteProfileVariant] || {}
+).map(([part, label]) => {
+  const partSets = oteListeningPracticeSets.filter((set) => set.part === Number(part));
+  return {
+    part,
+    label,
+    completed: partSets.filter((set) => Boolean(oteTrainingProgress?.[set.progressId])).length,
+    total: partSets.length,
+  };
+});
 const profileTitle =
   titleOverride ||
   (isOteProfile ? "OTE Profile" : isSeifHubProfile ? "Seif Hub Profile" : "My Profile");
 const profileIntro = isOteProfile
-  ? "Your OTE reading, speaking, and writing work in one place."
+  ? "Your OTE reading, listening, speaking, and writing work in one place."
   : isSeifHubProfile
   ? "Your Seif Hub activity and account details."
   : "Your Aptis Trainer progress and account details.";
@@ -1394,7 +1484,7 @@ const formatOteSpeakingPart = (part) => {
               <div className="feedback-credit-eyebrow">OTE workspace</div>
               <strong>{activeOteVariantLabel}</strong>
               <p className="muted small">
-                Your profile is currently showing {activeOteVariantLabel.toLowerCase()} OTE reading, speaking, and writing work.
+                Your profile is currently showing {activeOteVariantLabel.toLowerCase()} OTE reading, listening, speaking, and writing work.
               </p>
             </div>
             <div className="ote-profile-mode-actions" role="group" aria-label="Choose OTE profile mode">
@@ -1499,6 +1589,86 @@ const formatOteSpeakingPart = (part) => {
                     </ul>
                   </>
                 ) : null}
+              </div>
+            )}
+          </section>
+
+          <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+            <button
+              type="button"
+              className="collapse-head"
+              aria-expanded={showOteListeningPanel}
+              onClick={() => setShowOteListeningPanel((s) => !s)}
+            >
+              <h3 className="sec-title" style={{ margin: 0 }}>
+                OTE {activeOteVariantLabel} Listening
+              </h3>
+
+              <span className="muted small" style={{ flexShrink: 0 }}>
+                {completedOteListeningPracticeCount}/{oteListeningPracticeSets.length} sets complete
+              </span>
+
+              <span className={`chev ${showOteListeningPanel ? "open" : ""}`} aria-hidden>
+                ▾
+              </span>
+            </button>
+
+            {showOteListeningPanel && (
+              <div className="panel-body">
+                <div className="pbar-group">
+                  {oteListeningPartProgress.map((part) => (
+                    <ProgressBar
+                      key={part.part}
+                      value={part.completed}
+                      max={part.total || 1}
+                      label={part.label}
+                      right={`${part.completed}/${part.total}`}
+                    />
+                  ))}
+                  <ProgressBar
+                    value={completedOteListeningGuideCount}
+                    max={oteListeningGuides.length || 1}
+                    label="Listening strategy guides"
+                    right={`${completedOteListeningGuideCount}/${oteListeningGuides.length}`}
+                  />
+                </div>
+
+                <h4 className="inner-title" style={{ marginTop: "1rem" }}>Practice sets</h4>
+                <ul className="wlist" style={{ marginTop: ".5rem" }}>
+                  {oteListeningPracticeSets.map((set) => {
+                    const result = oteTrainingProgress?.[set.progressId];
+                    const isComplete = Boolean(result);
+                    const hasScore = Number.isFinite(result?.score) && Number.isFinite(result?.total);
+                    return (
+                      <li key={set.progressId} className="wcard">
+                        <div className="whead">
+                          <strong>{set.label}</strong>
+                          <span className={`muted small ${isComplete ? "ote-profile-activity-complete" : ""}`}>
+                            {isComplete ? (hasScore ? `${result.score}/${result.total}` : "Complete") : "Not started"}
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                <h4 className="inner-title" style={{ marginTop: "1rem" }}>Strategy guides</h4>
+                <ul className="wlist" style={{ marginTop: ".5rem" }}>
+                  {oteListeningGuides.map((guide) => {
+                    const result = oteTrainingProgress?.[guide.progressId];
+                    const isComplete = Boolean(result);
+                    return (
+                      <li key={guide.progressId} className="wcard">
+                        <div className="whead">
+                          <strong>{guide.label}</strong>
+                          <span className={`muted small ${isComplete ? "ote-profile-activity-complete" : ""}`}>
+                            {isComplete ? "Complete" : "Not started"}
+                          </span>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
             )}
           </section>
@@ -2842,6 +3012,84 @@ const formatOteSpeakingPart = (part) => {
 
   {showWritingAll && (
     <div className="writing-sections">
+      <div className="subpanel collapsible-inner">
+        <button
+          type="button"
+          className="collapse-head inner"
+          aria-expanded={showAptisWritingMocks}
+          onClick={() => setShowAptisWritingMocks((s) => !s)}
+        >
+          <div className="inner-head-left">
+            <h4 className="inner-title">Complete Mock Tests</h4>
+            <span className="muted small">
+              {aptisWritingMocks.length}{" "}
+              {aptisWritingMocks.length === 1 ? "paper" : "papers"}
+            </span>
+          </div>
+          <span className={`chev ${showAptisWritingMocks ? "open" : ""}`} aria-hidden>
+            ▾
+          </span>
+        </button>
+
+        {showAptisWritingMocks && (
+          <>
+            {!aptisWritingMocks.length ? (
+              <p className="muted" style={{ marginTop: ".5rem" }}>
+                No completed writing mock tests yet.
+              </p>
+            ) : (
+              <ul className="wlist" style={{ marginTop: ".5rem" }}>
+                {aptisWritingMocks.map((submission, index) => {
+                  const answers = submission.answers || {};
+                  const mockId = submission.mockId || answers.__mockId || "music-club";
+                  const mock = getAptisWritingMock(mockId);
+                  const answerParts = [answers[1], answers[2], answers[3], answers[4]];
+                  const answerStrings = answerParts.flatMap((part) =>
+                    Array.isArray(part) ? part : [part]
+                  );
+                  const completedParts = answerParts.filter((part) => {
+                    const values = Array.isArray(part) ? part : [part];
+                    return values.some((value) => String(value || "").replace(/<[^>]*>/g, " ").trim());
+                  }).length;
+                  const totalWords = answerStrings.reduce((total, value) => {
+                    const plainText = String(value || "").replace(/<[^>]*>/g, " ").trim();
+                    return total + (plainText.match(/\S+/g)?.length || 0);
+                  }, 0);
+                  const when = submission.createdAt?.toDate?.()
+                    ? submission.createdAt.toDate().toLocaleString()
+                    : submission.createdAt instanceof Date
+                    ? submission.createdAt.toLocaleString()
+                    : submission.createdAt || "—";
+
+                  return (
+                    <li key={submission.id || `${mockId}-${index}`} className="wcard">
+                      <div className="whead">
+                        <div>
+                          <strong>{mock.menuTitle || mock.title}</strong>
+                          <div className="muted small">{when}</div>
+                          <div className="muted small">
+                            {completedParts}/4 parts answered · {totalWords} words
+                          </div>
+                        </div>
+                        <div className="actions">
+                          <button
+                            className="btn"
+                            type="button"
+                            onClick={() => navigate(`/writing/mock-tests/submitted/${submission.id}`)}
+                          >
+                            View full paper
+                          </button>
+                        </div>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </>
+        )}
+      </div>
+
       {false && <div className="subpanel collapsible-inner">
         <button
           type="button"
