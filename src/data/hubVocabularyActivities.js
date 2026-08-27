@@ -4751,7 +4751,7 @@ const preintAnimalEntries = Object.entries(preintAnimalGroups).flatMap(([categor
     id: `preint-animal-${term}`,
     term,
     category,
-    image: null,
+    image: `${PREINT_ANIMALS_IMAGE_BASE}/${term}.png`,
     imagePath: `${PREINT_ANIMALS_IMAGE_BASE}/${term}.png`,
     visualLabel: preintAnimalSymbols[term],
     acceptedAnswers: [term],
