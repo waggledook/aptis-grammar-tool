@@ -14,6 +14,10 @@ import { vocabExerciseTasks } from "../vocabulary/data/vocabExerciseBank.js";
 import synonymSeedItems from "../vocabulary/data/synonymSeedItems.js";
 import collocationPrecisionItems from "../vocabulary/collocations/data/collocationPrecisionItems.js";
 import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
+import {
+  getAllHubVocabThemes,
+  HUB_VOCAB_LEVELS,
+} from "../../data/hubVocabularyActivities.js";
 import { OTE_SPEAKING_MOCKS } from "../../products/ote/mockTests/data/oteSpeakingMockData.js";
 import { getOteWritingMock, getOteWritingMocks } from "../../products/ote/mockTests/data/oteWritingMockData.js";
 import { getOteWritingPracticeGroups } from "../../products/ote/mockTests/data/oteWritingPracticeData.js";
@@ -40,6 +44,17 @@ import {
 } from "firebase/auth";
 
 const HUB_GRAMMAR_LEVELS = ["a2", "b1", "b2", "c1", "c2"];
+const TEXTBOOK_VOCAB_THEMES = getAllHubVocabThemes();
+const TEXTBOOK_VOCAB_LEVEL_TOTALS = Object.fromEntries(
+  HUB_VOCAB_LEVELS.map((level) => [
+    level.id,
+    TEXTBOOK_VOCAB_THEMES
+      .filter((theme) => theme.level === level.id)
+      .reduce((sum, theme) => sum + (theme.activities?.length || 0), 0),
+  ])
+);
+const TEXTBOOK_VOCAB_TOTAL_ACTIVITIES = Object.values(TEXTBOOK_VOCAB_LEVEL_TOTALS)
+  .reduce((sum, total) => sum + total, 0);
 const EMPTY_VOCAB_PRACTICE_SUMMARY = {
   exercise: { attempted: 0, perfect: 0, attempts: 0, favourites: 0, favouriteItems: 0, mistakeQuestions: 0 },
   synonyms: { attempted: 0, correct: 0, attempts: 0, favourites: 0, mistakes: 0 },
@@ -391,6 +406,7 @@ export default function Profile({
   const [vocabTopicCounts, setVocabTopicCounts] = useState(null); // 👈 NEW
   const [vocabMistakes, setVocabMistakes] = useState([]); // 👈 NEW
   const [vocabPracticeSummary, setVocabPracticeSummary] = useState(EMPTY_VOCAB_PRACTICE_SUMMARY);
+  const [textbookVocabThemeCounts, setTextbookVocabThemeCounts] = useState({});
 
   // Progress sections at the top
   const [showReadingPanel, setShowReadingPanel] = useState(false);
@@ -1008,6 +1024,7 @@ function renderFeedbackButton(kind, submission) {
           vocabCounts,
           vocabMistakesArr,
           vocabPractice,
+          textbookVocabCounts,
           hubGrammarSubs,
           keywordDash,
           wordFormationDash,
@@ -1035,8 +1052,9 @@ function renderFeedbackButton(kind, submission) {
           fb.fetchOteMockAttempts?.(20, uid) ?? Promise.resolve([]),
           fb.fetchAptisGrammarVocabularyMockAttempts?.(50, uid) ?? Promise.resolve([]),
           fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
-          fb.fetchRecentVocabMistakes?.(8, uid) ?? Promise.resolve([]),
+          fb.fetchUnresolvedVocabMistakes?.(50, uid) ?? Promise.resolve([]),
           fb.fetchVocabPracticeSummary?.(uid) ?? Promise.resolve(EMPTY_VOCAB_PRACTICE_SUMMARY),
+          fb.fetchHubVocabThemeCounts?.(uid) ?? Promise.resolve({}),
           fb.fetchHubGrammarSubmissions?.(200, uid) ?? Promise.resolve([]),
           fb.fetchHubKeywordDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
           fb.fetchHubWordFormationDashboard?.(uid) ?? Promise.resolve({ answered: 0, correct: 0, total: 0, byLevel: {} }),
@@ -1068,6 +1086,7 @@ function renderFeedbackButton(kind, submission) {
         setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
         setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
         setVocabPracticeSummary(vocabPractice || EMPTY_VOCAB_PRACTICE_SUMMARY);
+        setTextbookVocabThemeCounts(textbookVocabCounts || {});
         setHubGrammarSubmissions(hubGrammarSubs || []);
         setHubGrammarDash(buildHubGrammarDashboard(hubGrammarSubs || []));
         setHubKeywordDash(keywordDash || { answered: 0, correct: 0, total: 0, byLevel: {} });
@@ -1106,6 +1125,33 @@ const totalCompletedVocab = vocabTopicCounts
     0
   )
 : 0;
+
+const textbookVocabLevelProgress = HUB_VOCAB_LEVELS.map((level) => {
+  const completed = TEXTBOOK_VOCAB_THEMES
+    .filter((theme) => theme.level === level.id)
+    .reduce(
+      (sum, theme) => sum + (textbookVocabThemeCounts?.[theme.id]?.completed || 0),
+      0
+    );
+
+  return {
+    id: level.id,
+    label: level.label,
+    title: level.title,
+    completed,
+    total: TEXTBOOK_VOCAB_LEVEL_TOTALS[level.id] || 0,
+  };
+});
+const textbookVocabCompleted = textbookVocabLevelProgress.reduce(
+  (sum, level) => sum + level.completed,
+  0
+);
+const textbookVocabMistakes = vocabMistakes.filter(
+  (item) => item?.source === "hub-textbook"
+);
+const aptisVocabMistakes = vocabMistakes.filter(
+  (item) => item?.source !== "hub-textbook"
+);
 
 const vocabExerciseAttempted = vocabPracticeSummary?.exercise?.attempted || 0;
 const vocabExercisePerfect = vocabPracticeSummary?.exercise?.perfect || 0;
@@ -2191,11 +2237,11 @@ const formatOteSpeakingPart = (part) => {
                 right={`${totalCompletedVocab}/${TOTAL_VOCAB_SETS || 0}`}
               />
             </div>
-            {(!vocabMistakes || vocabMistakes.length === 0) ? (
+            {aptisVocabMistakes.length === 0 ? (
               <p className="vocab-tool-good">No active topic mistakes.</p>
             ) : (
               <p className="vocab-tool-alert">
-                {vocabMistakes.length} topic mistake{vocabMistakes.length === 1 ? "" : "s"} to review.
+                {aptisVocabMistakes.length} topic mistake{aptisVocabMistakes.length === 1 ? "" : "s"} to review.
               </p>
             )}
             <div className="vocab-tool-actions">
@@ -2206,7 +2252,7 @@ const formatOteSpeakingPart = (part) => {
                 type="button"
                 className="btn vocab-tool-btn"
                 onClick={onGoVocabMistakes}
-                disabled={!onGoVocabMistakes || !vocabMistakes?.length}
+                disabled={!onGoVocabMistakes || !aptisVocabMistakes.length}
               >
                 Review mistakes
               </button>
@@ -2657,6 +2703,86 @@ const formatOteSpeakingPart = (part) => {
   <button
     type="button"
     className="collapse-head"
+    aria-expanded={showVocabPanel}
+    onClick={() => setShowVocabPanel((s) => !s)}
+  >
+    <h3 className="sec-title" style={{ margin: 0 }}>
+      Vocabulary Progress
+    </h3>
+
+    <span className="muted small" style={{ flexShrink: 0 }}>
+      {textbookVocabCompleted}/{TEXTBOOK_VOCAB_TOTAL_ACTIVITIES} activities complete
+    </span>
+
+    <span className={`chev ${showVocabPanel ? "open" : ""}`} aria-hidden>
+      ▾
+    </span>
+  </button>
+
+  {showVocabPanel && (
+    <div className="panel-body">
+      <div className="pbar-group">
+        <ProgressBar
+          value={textbookVocabCompleted}
+          max={TEXTBOOK_VOCAB_TOTAL_ACTIVITIES || 1}
+          label="Textbook vocabulary activities"
+          right={`${textbookVocabCompleted}/${TEXTBOOK_VOCAB_TOTAL_ACTIVITIES}`}
+        />
+        {textbookVocabLevelProgress.map((level) => (
+          <ProgressBar
+            key={level.id}
+            value={level.completed}
+            max={level.total || 1}
+            label={`${level.label} vocabulary`}
+            right={`${level.completed}/${level.total}`}
+          />
+        ))}
+      </div>
+
+      <p className="muted small" style={{ marginTop: ".75rem" }}>
+        Progress updates when you complete activities in the textbook vocabulary bank.
+      </p>
+
+      {textbookVocabMistakes.length ? (
+        <p className="vocab-tool-alert">
+          {textbookVocabMistakes.length} vocabulary mistake{textbookVocabMistakes.length === 1 ? "" : "s"} ready to review.
+        </p>
+      ) : (
+        <p className="vocab-tool-good">No active textbook vocabulary mistakes.</p>
+      )}
+
+      {!targetUid ? (
+        <div className="vocab-tool-actions">
+          <button
+            type="button"
+            className="btn vocab-tool-btn"
+            onClick={() => navigate(getSitePath("/vocabulary/textbook"))}
+          >
+            Open vocabulary bank
+          </button>
+          <button
+            type="button"
+            className="btn vocab-tool-btn"
+            onClick={() => (
+              onGoVocabMistakes
+                ? onGoVocabMistakes()
+                : navigate(getSitePath("/vocabulary/textbook/mistakes"))
+            )}
+          >
+            Review mistakes
+          </button>
+        </div>
+      ) : null}
+    </div>
+  )}
+</section>
+)}
+
+{isSeifHubProfile && (
+<section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
+  <button
+    type="button"
+    className="collapse-head"
     aria-expanded={showGrammarPanel}
     onClick={() => setShowGrammarPanel((s) => !s)}
   >
@@ -2935,7 +3061,7 @@ const formatOteSpeakingPart = (part) => {
 </section>
 )}
 
-{(isSeifHubProfile || isAptisProfile) && (
+{isAptisProfile && (
 <section className="panel collapsible" style={{ marginTop: "0.75rem" }}>
   <button
     type="button"

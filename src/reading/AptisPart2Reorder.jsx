@@ -29,7 +29,7 @@ import { getReadingTimingDetails, READING_SUGGESTED_SECONDS, useSuggestedTaskTim
  */
 
 // ---------- Types ----------
-/** @typedef {{ id: string, text: string, order: number, fixed?: boolean }} Sentence */
+/** @typedef {{ id: string, text: string, order: number, fixed?: boolean, explanation?: string }} Sentence */
 /** @typedef {{ id: string, title: string, prompt?: string, sentences: Sentence[] }} TextSpec */
 /** @typedef {{ id: string, title: string, intro?: string, texts: TextSpec[] }} AptisReorderTask */
 
@@ -68,6 +68,8 @@ function deepClone(obj) { return JSON.parse(JSON.stringify(obj)); }
 function TextReorder({ spec, onChangeCheck, onReveal, onReset }) {
   const [state, setState] = useState(() => buildBoard(spec.sentences));
   const [feedback, setFeedback] = useState(null); // array<boolean | null>
+  const [isResolved, setIsResolved] = useState(false);
+  const [showExplanations, setShowExplanations] = useState(false);
 
   const correctOrder = useMemo(
     () => spec.sentences.slice().sort((a,b) => a.order - b.order).map(s => s.id),
@@ -80,6 +82,14 @@ function TextReorder({ spec, onChangeCheck, onReveal, onReset }) {
       return { ...rebuilt, pool: shuffle ? rebuilt.pool : rebuilt.pool };
     });
     setFeedback(null);
+    setIsResolved(false);
+    setShowExplanations(false);
+  }
+
+  function clearResolvedFeedback() {
+    setFeedback(null);
+    setIsResolved(false);
+    setShowExplanations(false);
   }
 
   function onDropToSlot(slotIndex, item) {
@@ -100,7 +110,7 @@ function TextReorder({ spec, onChangeCheck, onReveal, onReset }) {
       next.boardSlots[slotIndex] = item;
       return next;
     });
-    setFeedback(null);
+    clearResolvedFeedback();
   }
 
   function handleCheck() {
@@ -110,6 +120,8 @@ function TextReorder({ spec, onChangeCheck, onReveal, onReset }) {
       return s.id === shouldId;
     });
     setFeedback(fb);
+    setIsResolved(fb.every((value) => value === true));
+    setShowExplanations(false);
     if (onChangeCheck) onChangeCheck(fb);
   }
 
@@ -121,6 +133,8 @@ function TextReorder({ spec, onChangeCheck, onReveal, onReset }) {
     const perfect = spec.sentences.slice().sort((a,b) => a.order - b.order);
     setState({ boardSlots: perfect, pool: [] });
     setFeedback(perfect.map(() => true));
+    setIsResolved(true);
+    setShowExplanations(false);
     onReveal?.(previousFeedback);
   }
 
@@ -147,7 +161,7 @@ function TextReorder({ spec, onChangeCheck, onReveal, onReset }) {
           next.boardSlots[slotIndex] = src;
           return next;
         });
-        setFeedback(null);
+        clearResolvedFeedback();
       }
     } catch {
       return;
@@ -165,8 +179,10 @@ function TextReorder({ spec, onChangeCheck, onReveal, onReset }) {
       next.pool.push(s);
       return next;
     });
-    setFeedback(null);
+    clearResolvedFeedback();
   }
+
+  const hasExplanations = spec.sentences.some((sentence) => sentence.explanation);
 
   return (
     <div className="text-card">
@@ -177,10 +193,20 @@ function TextReorder({ spec, onChangeCheck, onReveal, onReset }) {
           <button className="btn" onClick={() => { reset(false); onReset?.(); }}>Reset</button>
           <button className="btn primary" onClick={handleCheck}>Check</button>
           <button className="btn ghost" onClick={handleShowAnswer}>Show answer</button>
+          {isResolved && hasExplanations ? (
+            <button
+              type="button"
+              className="btn explanation-toggle"
+              aria-expanded={showExplanations}
+              onClick={() => setShowExplanations((visible) => !visible)}
+            >
+              {showExplanations ? "Hide explanations" : "Show explanations"}
+            </button>
+          ) : null}
         </div>
       </div>
 
-      <div className="panes">
+      <div className={`panes ${showExplanations ? "explanations-open" : ""}`}>
         {/* Left: slots */}
         <ol className="slots">
           {state.boardSlots.map((s, i) => {
@@ -197,7 +223,12 @@ function TextReorder({ spec, onChangeCheck, onReveal, onReset }) {
                   <div className="slot-content"
                        draggable={!isFixed}
                        onDragStart={(e)=>onDragStart(e,{type:"slot-item", slotIndex:i})}>
-                    <span>{s.text}</span>
+                    <span className="sentence-text">{s.text}</span>
+                    {showExplanations && s.explanation ? (
+                      <p className="sentence-explanation">
+                        <strong>Why this follows:</strong> {s.explanation}
+                      </p>
+                    ) : null}
                   </div>
                 ) : (
                   <div className="slot-placeholder">Drop sentence here</div>
@@ -567,8 +598,11 @@ function StyleScope(){
       .aptis-reorder .btn:hover { filter:brightness(1.05); }
       .aptis-reorder .btn.primary { background:#294b84; border-color:#3a6ebd; }
       .aptis-reorder .btn.ghost { background:transparent; border-color:#37598e; }
+      .aptis-reorder .btn.explanation-toggle { background:#173f45; border-color:#2d7c78; color:#d8fffa; }
 
       .aptis-reorder .panes { display:grid; grid-template-columns: 1fr 1fr; gap:1rem; }
+      .aptis-reorder .panes.explanations-open { grid-template-columns:1fr; }
+      .aptis-reorder .panes.explanations-open .pool { display:none; }
 
       .aptis-reorder .slots { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:0.5rem; }
       .aptis-reorder .slot { display:flex; gap:0.6rem; background:#0f1b31; border:1px dashed #3b517c; border-radius:12px; padding:0.5rem; min-height:52px; align-items:center; }
@@ -576,7 +610,10 @@ function StyleScope(){
       .aptis-reorder .slot.correct { box-shadow: inset 0 0 0 2px var(--ok); }
       .aptis-reorder .slot.wrong { box-shadow: inset 0 0 0 2px var(--bad); }
       .aptis-reorder .slot-index { width:28px; height:28px; border-radius:50%; display:flex; align-items:center; justify-content:center; background:#1b2b4d; color:#cfe1ff; font-weight:600; }
-      .aptis-reorder .slot-content { flex:1; display:flex; align-items:center; justify-content:space-between; gap:0.5rem; }
+      .aptis-reorder .slot-content { flex:1; min-width:0; }
+      .aptis-reorder .sentence-text { display:block; }
+      .aptis-reorder .sentence-explanation { margin:.55rem 0 0; padding:.55rem .65rem; border-left:3px solid #4bc1b5; border-radius:0 8px 8px 0; background:rgba(38, 122, 116, .18); color:#d8fffa; font-size:.92rem; line-height:1.45; }
+      .aptis-reorder .sentence-explanation strong { color:#8be0d7; }
       .aptis-reorder .slot-actions .icon { background:#20345a; border:1px solid #37598e; color:#cfe1ff; border-radius:8px; width:28px; height:28px; cursor:pointer; margin-left:0.25rem; }
       .aptis-reorder .slot-placeholder { flex:1; color:#7f92b7; font-style:italic; }
 

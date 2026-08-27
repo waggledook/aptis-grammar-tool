@@ -2915,7 +2915,7 @@ return (
       onGoMistakes={() => navigate("/profile/mistakes")}
       onGoGrammarReview={() => navigate("/profile/grammar-review-beta")}
       onGoFavourites={() => navigate("/profile/favourites")}
-      onGoVocabMistakes={() => navigate("/profile/vocab-mistakes")}   // 👈 ADD THIS
+      onGoVocabMistakes={() => navigate(getSitePath("/profile/vocab-mistakes"))}
       onProfilePhotoChange={syncProfilePhoto}
     />
   }

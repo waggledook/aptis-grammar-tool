@@ -31,6 +31,18 @@ function makePrioritizedSession(items, itemLimit, seenItemIds = []) {
   return [...unseenItems, ...previouslySeenItems].slice(0, itemLimit);
 }
 
+function makeUniquePrioritizedSession(items, itemLimit, seenItemIds = [], answerKey = "") {
+  if (!answerKey) return makePrioritizedSession(items, itemLimit, seenItemIds);
+  const prioritized = makePrioritizedSession(items, items.length, seenItemIds);
+  const seenAnswers = new Set();
+  return prioritized.filter((item) => {
+    const normalized = normalizeAnswer(item?.[answerKey]);
+    if (!normalized || seenAnswers.has(normalized)) return false;
+    seenAnswers.add(normalized);
+    return true;
+  }).slice(0, itemLimit);
+}
+
 function shuffleDifferent(items) {
   if (items.length < 2) return [...items];
   const originalIds = items.map((item) => item.id);
@@ -147,13 +159,33 @@ function renderVisualPrompt(entry, options = {}) {
     );
   }
   if (entry.image) {
-    return (
+    const image = (
       <img
         src={entry.image}
         alt=""
         className={options.compact ? "hub-vocab-object-image compact" : "hub-vocab-object-image"}
         draggable="false"
       />
+    );
+    if (!entry.focusArea) return image;
+    return (
+      <span
+        className={options.compact ? "hub-vocab-image-focus compact" : "hub-vocab-image-focus"}
+        role="img"
+        aria-label={entry.focusArea.label || "The relevant part of the image is highlighted."}
+      >
+        {image}
+        <span
+          className="hub-vocab-image-focus-marker"
+          style={{
+            "--focus-x": `${entry.focusArea.x}%`,
+            "--focus-y": `${entry.focusArea.y}%`,
+            "--focus-width": `${entry.focusArea.width}%`,
+            "--focus-height": `${entry.focusArea.height}%`,
+          }}
+          aria-hidden="true"
+        />
+      </span>
     );
   }
   if (entry.cueText) {
@@ -237,6 +269,7 @@ function getDisplayAnswer(entry, themeId, answerMode = "default") {
   if (answerMode === "opposite") return entry.opposite || "";
   if (answerMode === "category") return entry.category || "";
   if (answerMode === "gap") return entry.gapAnswers?.[0] || "";
+  if (entry.choiceAnswer) return entry.choiceAnswer;
   if (entry.article) return `${entry.article} ${entry.term}`;
   if (entry.speaker) return entry.speaker === "teacher" ? "The teacher says it" : "You say it";
   return getTypeAnswer(entry, themeId);
@@ -250,6 +283,7 @@ function getMistakePrompt(entry, theme, activity, answerMode = "default") {
   if (answerMode === "sequence") return entry.term || entry.phrase || activity?.title || theme.title;
   if (entry.gappedPhrase) return entry.gappedPhrase;
   if (entry.gapCueText) return entry.gapCueText;
+  if (entry.imagePrompt) return entry.imagePrompt;
   if (entry.cueText) return entry.cueText;
   if (entry.hotspotNumber) return `Number ${entry.hotspotNumber}`;
   if (answerMode === "nationality") return `Nationality for ${entry.country}`;
@@ -459,7 +493,16 @@ function FlashcardMode({
                 <strong className="hub-vocab-country-prompt">{entry.phrase}</strong>
               </>
             ) : (
-              renderVisualPrompt(flagMode ? { ...entry, flag4x3: entry.flag4x3 } : entry)
+              entry.image
+                ? (
+                  <>
+                    {renderVisualPrompt(flagMode ? { ...entry, flag4x3: entry.flag4x3 } : entry)}
+                    {entry.imagePrompt ? <strong className="hub-vocab-image-gap-prompt">{entry.imagePrompt}</strong> : null}
+                  </>
+                )
+                : entry.flashcardPrompt
+                  ? <strong className="hub-vocab-cue-prompt hub-vocab-flashcard-text-prompt">{entry.flashcardPrompt}</strong>
+                  : renderVisualPrompt(flagMode ? { ...entry, flag4x3: entry.flag4x3 } : entry)
             )}
             <span>Tap to reveal</span>
           </div>
@@ -477,8 +520,8 @@ function FlashcardMode({
               </>
             ) : (
               <>
-                <strong>{entry.displayTerm || entry.term}</strong>
-                <span>{entry.pronunciation || entry.spokenLabel || entry.displayTerm || entry.term}</span>
+                <strong>{entry.flashcardAnswer || entry.displayTerm || entry.term}</strong>
+                <span>{entry.flashcardNote || entry.pronunciation || entry.spokenLabel || entry.displayTerm || entry.term}</span>
               </>
             )}
           </div>
@@ -513,8 +556,13 @@ function MatchingMode({
   const seenItemIdsRef = useRef(coverage?.seenItemIds || []);
   seenItemIdsRef.current = coverage?.seenItemIds || [];
   const makeSession = useCallback(
-    (source = items) => makePrioritizedSession(source, itemLimit, seenItemIdsRef.current),
-    [itemLimit, items]
+    (source = items) => makeUniquePrioritizedSession(
+      source,
+      itemLimit,
+      seenItemIdsRef.current,
+      activity?.uniqueMatchAnswerKey
+    ),
+    [activity?.uniqueMatchAnswerKey, itemLimit, items]
   );
   const [sessionItems, setSessionItems] = useState(() => makeSession());
   const [reviewItems, setReviewItems] = useState(null);
@@ -543,8 +591,8 @@ function MatchingMode({
     } else {
       setMistakeItems((prev) => dedupeById([...prev, selectedLeft]));
       onMistake?.(selectedLeft, {
-        userAnswer: getPrimaryLabel(entry, theme.id),
-        correctAnswer: getPrimaryLabel(selectedLeft, theme.id),
+        userAnswer: entry.matchAnswer || getPrimaryLabel(entry, theme.id),
+        correctAnswer: selectedLeft.matchAnswer || getPrimaryLabel(selectedLeft, theme.id),
       });
       setStatus("Not that one. Try again.");
     }
@@ -604,7 +652,9 @@ function MatchingMode({
                 className={`${selectedLeft?.id === entry.id ? "selected" : ""} ${matched ? "matched" : ""}`}
                 onClick={() => setSelectedLeft(entry)}
               >
-                {renderVisualPrompt(entry, { compact: true })}
+                {entry.matchPrompt
+                  ? <strong className="hub-vocab-cue-prompt compact">{entry.matchPrompt}</strong>
+                  : renderVisualPrompt(entry, { compact: true })}
               </button>
             );
           })}
@@ -621,7 +671,7 @@ function MatchingMode({
                 className={matched ? "matched" : ""}
                 onClick={() => chooseRight(entry)}
               >
-                {getPrimaryLabel(entry, theme.id)}
+                {entry.matchAnswer || getPrimaryLabel(entry, theme.id)}
               </button>
             );
           })}
@@ -697,19 +747,21 @@ function ChoiceMode({
     }
 
     const key =
-      mode === "nationality"
-        ? "nationality"
-        : mode === "opposite"
-          ? "opposite"
-          : mode === "category"
-            ? "category"
-          : mode === "plural"
-            ? "plural"
-            : theme.id === "numbers"
-              ? "term"
-              : entry.country
-                ? "country"
-                : "term";
+      entry.choiceAnswer
+        ? "choiceAnswer"
+        : mode === "nationality"
+          ? "nationality"
+          : mode === "opposite"
+            ? "opposite"
+            : mode === "category"
+              ? "category"
+              : mode === "plural"
+                ? "plural"
+                : theme.id === "numbers"
+                  ? "term"
+                  : entry.country
+                    ? "country"
+                    : "term";
     if (Array.isArray(entry.options) && entry.options.length) {
       const correctLabels = new Set(
         [entry[key], ...(entry.acceptedAnswers || [])].filter(Boolean).map(normalizeAnswer)
@@ -814,10 +866,15 @@ function ChoiceMode({
             <strong className="hub-vocab-country-prompt">{entry.cueText || entry.term}</strong>
           </>
         ) : (
-          renderVisualPrompt(entry)
+          <>
+            {renderVisualPrompt(entry)}
+            {entry.imagePrompt ? <strong className="hub-vocab-image-gap-prompt">{entry.imagePrompt}</strong> : null}
+          </>
         )}
         <p>
-          {mode === "nationality"
+          {entry.question
+            ? entry.question
+            : mode === "nationality"
             ? `What nationality is someone from ${entry.country}?`
             : mode === "opposite"
               ? `What is the opposite of ${entry.cueText || entry.displayTerm || entry.term}?`
@@ -1152,6 +1209,11 @@ function TypeAnswerMode({
             <>
               {renderVisualPrompt(entry)}
               <strong className="hub-vocab-country-prompt">{entry.gapCueText}</strong>
+            </>
+          ) : entry.image && entry.imagePrompt ? (
+            <>
+              {renderVisualPrompt(entry)}
+              <strong className="hub-vocab-image-gap-prompt">{entry.imagePrompt}</strong>
             </>
           ) : entry.image && entry.cueText ? (
             <>
@@ -3018,6 +3080,21 @@ export default function HubVocabularyActivityRunner() {
           line-height: 1.1;
         }
 
+        .hub-vocab-card-face .hub-vocab-flashcard-text-prompt {
+          font-size: clamp(1.2rem, 3.5vw, 2rem);
+          line-height: 1.3;
+          max-width: 42rem;
+        }
+
+        .hub-vocab-card-face .hub-vocab-image-gap-prompt,
+        .hub-vocab-choice-prompt .hub-vocab-image-gap-prompt {
+          color: #fff;
+          font-size: clamp(1.05rem, 3vw, 1.55rem);
+          line-height: 1.25;
+          max-width: 42rem;
+          text-align: center;
+        }
+
         .hub-vocab-number-large.compact {
           font-size: 1.7rem;
           line-height: 1;
@@ -3119,6 +3196,33 @@ export default function HubVocabularyActivityRunner() {
           max-height: 2.25rem;
           max-width: 3.9rem;
           transition: transform 0.18s ease;
+        }
+
+        .hub-vocab-image-focus {
+          display: inline-flex;
+          line-height: 0;
+          position: relative;
+        }
+
+        .hub-vocab-image-focus-marker {
+          background: rgba(246, 189, 96, 0.08);
+          border: 3px solid #f6bd60;
+          border-radius: 999px;
+          box-shadow:
+            0 0 0 3px rgba(9, 20, 43, 0.68),
+            0 0 18px rgba(246, 189, 96, 0.9);
+          height: var(--focus-height);
+          left: var(--focus-x);
+          pointer-events: none;
+          position: absolute;
+          top: var(--focus-y);
+          transform: translate(-50%, -50%);
+          width: var(--focus-width);
+        }
+
+        .hub-vocab-image-focus.compact .hub-vocab-image-focus-marker {
+          border-width: 1px;
+          box-shadow: 0 0 0 1px rgba(9, 20, 43, 0.72);
         }
 
         .hub-vocab-flag-large.compact {
