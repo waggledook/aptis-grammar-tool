@@ -78,14 +78,51 @@ test("ordinary sync preserves a protected manual app entry", () => {
     managedBy: "manual",
   };
   const result = resolveSeifAdminSiteAccess({
-    incomingSiteAccess: {aptisTrainer: automaticAccess({active: false})},
+    incomingSiteAccess: {aptisTrainer: automaticAccess({endDate: "2027-07-14"})},
     existingData: {siteAccess: {aptisTrainer: manualAccess}},
     status: "active",
     courseStartDate: "2026-09-01",
     todayIsoDate: "2026-08-28",
   });
 
-  assert.deepEqual(result.aptisTrainer, manualAccess);
+  assert.deepEqual(result.aptisTrainer, {
+    ...manualAccess,
+    endDate: "2027-07-14",
+  });
+});
+
+test("a school sync cannot shorten a manual expiry or re-enable a manual revocation", () => {
+  const manualAccess = {
+    active: true,
+    startDate: "2026-08-01",
+    endDate: "2027-12-31",
+    indefinite: false,
+    managedBy: "manual",
+  };
+  const unchanged = resolveSeifAdminSiteAccess({
+    incomingSiteAccess: {aptisTrainer: automaticAccess({endDate: "2027-07-14"})},
+    existingData: {siteAccess: {aptisTrainer: manualAccess}},
+    status: "active",
+    courseStartDate: "2026-09-01",
+    todayIsoDate: "2026-08-28",
+  });
+  assert.deepEqual(unchanged.aptisTrainer, manualAccess);
+
+  const manuallyRevoked = {
+    active: false,
+    startDate: "",
+    endDate: "",
+    indefinite: false,
+    managedBy: "manual",
+  };
+  const revokedResult = resolveSeifAdminSiteAccess({
+    incomingSiteAccess: {aptisTrainer: automaticAccess()},
+    existingData: {siteAccess: {aptisTrainer: manuallyRevoked}},
+    status: "active",
+    courseStartDate: "2026-09-01",
+    todayIsoDate: "2026-08-28",
+  });
+  assert.deepEqual(revokedResult.aptisTrainer, manuallyRevoked);
 });
 
 test("legacy indefinite access is protected", () => {

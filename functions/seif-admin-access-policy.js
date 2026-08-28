@@ -74,6 +74,19 @@ function normalizeAutomaticAccess(rawAccess) {
   };
 }
 
+function mergeManualAccessWithSchoolExtension(existingAccess, incomingAccess) {
+  if (!existingAccess?.active || existingAccess.indefinite) return existingAccess;
+  if (!incomingAccess?.active || !incomingAccess.endDate) return existingAccess;
+  if (existingAccess.endDate && incomingAccess.endDate <= existingAccess.endDate) {
+    return existingAccess;
+  }
+
+  return {
+    ...existingAccess,
+    endDate: incomingAccess.endDate,
+  };
+}
+
 function shouldKeepContinuousAccess({
   existingAccess,
   previousCourseEndDate,
@@ -113,7 +126,10 @@ function resolveSeifAdminSiteAccess({
         !isCancellation &&
         isProtectedManualAccess(existingAccess, {accessKey, existingSeifAdmin})
       ) {
-        return [accessKey, existingAccess];
+        return [
+          accessKey,
+          mergeManualAccessWithSchoolExtension(existingAccess, incomingAccess),
+        ];
       }
 
       const resolvedAccess = normalizeAutomaticAccess(incomingAccess);
@@ -144,6 +160,7 @@ module.exports = {
   addIsoMonths,
   getSeifAdminAccessStartDate,
   isProtectedManualAccess,
+  mergeManualAccessWithSchoolExtension,
   resolveSeifAdminSiteAccess,
   shouldKeepContinuousAccess,
 };

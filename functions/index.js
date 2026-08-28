@@ -2,6 +2,7 @@
 const functions = require("firebase-functions");
 const admin     = require("firebase-admin");
 const nodemailer = require("nodemailer");
+const nodeCrypto = require("crypto");
 const {aggregateAnalyticsEvent} = require("./activityAnalytics");
 
 // ---------- init Admin (safe if called twice) ----------
@@ -13,8 +14,69 @@ const GMAIL_PASS   = process.env.GMAIL_APP_PASSWORD;
 const TEACHER_EMAIL = process.env.TEACHER_EMAIL || GMAIL_USER;
 const OTE_LEVEL_REPORT_COPY_EMAIL = "nicholas@beeskillsenglish.com";
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
+const SPEAKING_WORKSHOP_ACCESS_CODE_HASH = String(
+  process.env.SPEAKING_WORKSHOP_ACCESS_CODE_HASH || ""
+).trim().toLowerCase();
 const DEFAULT_ASSESSMENT_FEEDBACK_MODEL = "gpt-5.6-luna";
 const firestore = admin.firestore();
+
+function normalizeWorkshopAccessCode(value) {
+  return String(value || "").trim().toUpperCase();
+}
+
+exports.redeemSpeakingWorkshopAccess = functions
+  .runWith({maxInstances: 10})
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth?.uid) {
+      throw new functions.https.HttpsError(
+        "unauthenticated",
+        "Sign in before entering a workshop access code."
+      );
+    }
+
+    if (!/^[a-f0-9]{64}$/.test(SPEAKING_WORKSHOP_ACCESS_CODE_HASH)) {
+      console.error("SPEAKING_WORKSHOP_ACCESS_CODE_HASH is not configured.");
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Workshop access is not configured."
+      );
+    }
+
+    const code = normalizeWorkshopAccessCode(data?.code);
+    if (code.length < 6 || code.length > 64) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Enter a valid workshop access code."
+      );
+    }
+
+    const suppliedHash = nodeCrypto.createHash("sha256").update(code).digest();
+    const expectedHash = Buffer.from(SPEAKING_WORKSHOP_ACCESS_CODE_HASH, "hex");
+    if (
+      suppliedHash.length !== expectedHash.length ||
+      !nodeCrypto.timingSafeEqual(suppliedHash, expectedHash)
+    ) {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "That workshop access code is not valid."
+      );
+    }
+
+    const access = {
+      active: true,
+      indefinite: true,
+      startDate: new Date().toISOString().slice(0, 10),
+      endDate: "",
+      managedBy: "accessCode",
+      redeemedAt: admin.firestore.FieldValue.serverTimestamp(),
+    };
+    await firestore.doc(`users/${context.auth.uid}`).set({
+      siteAccess: {speakingWorkshops: access},
+    }, {merge: true});
+
+    return {ok: true, access: {...access, redeemedAt: new Date().toISOString()}};
+  });
 
 exports.aggregateActivityLog = functions
   .runWith({maxInstances: 5})

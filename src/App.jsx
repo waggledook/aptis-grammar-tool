@@ -64,6 +64,7 @@ import SpeakingPart3 from './components/speaking/SpeakingPart3';
 import SpeakingPart3Custom from './components/speaking/SpeakingPart3Custom';
 import SpeakingPart4 from "./components/speaking/SpeakingPart4";
 import SpeakingPart4Extra from "./components/speaking/SpeakingPart4Extra";
+import SpeakingWorkshops from "./components/speaking/workshops/SpeakingWorkshops.jsx";
 import SpeakingPart2and3_PhotoGuide from "./components/speaking/SpeakingPart2and3_PhotoGuide.jsx";
 import AptisPart1 from "./reading/AptisPart1";
 import AptisPart2Reorder from './reading/AptisPart2Reorder';
@@ -480,6 +481,7 @@ const currentSite = getSiteVariant();
 const isSeifHubSite = currentSite.id === "seifhub";
 const isOteSite = currentSite.id === "ote";
 const isAptisWritingMockRoute = !isOteSite && location.pathname.startsWith("/writing/mock-tests/");
+const isSpeakingWorkshopRoute = location.pathname.startsWith("/speaking-workshops");
 const requiresMemberAccess = !!currentSite.requiresMemberAccess;
 const isOteExamRoute =
   /^\/ote\/mock-tests\/[^/]+/.test(location.pathname) ||
@@ -522,7 +524,7 @@ const isOteRoute =
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
 const isExamRoute = isOteExamRoute || isAptisGrammarVocabularyMockRoute || isAptisWritingMockRoute;
-const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute || isAptisWritingMockRoute;
+const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute || isAptisWritingMockRoute || isSpeakingWorkshopRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
@@ -2219,7 +2221,24 @@ return (
 />
 
 
-{/* ——— Speaking routes ——— */}
+  {/* ——— Speaking routes ——— */}
+<Route
+  path="/speaking-workshops"
+  element={<SpeakingWorkshops user={user} onSignIn={() => setShowAuth(true)} />}
+/>
+<Route
+  path="/speaking-workshops/:topicId"
+  element={<SpeakingWorkshops user={user} onSignIn={() => setShowAuth(true)} />}
+/>
+<Route
+  path="/speaking-workshops/:topicId/:mode"
+  element={<SpeakingWorkshops user={user} onSignIn={() => setShowAuth(true)} />}
+/>
+<Route
+  path="/speaking-workshops/:topicId/:mode/:partNumber"
+  element={<SpeakingWorkshops user={user} onSignIn={() => setShowAuth(true)} />}
+/>
+
 <Route
   path="/speaking"
   element={

@@ -65,7 +65,9 @@ the calculated expiry date for `completed` students.
   starts no more than one calendar month after the previous contract ends. This avoids
   interrupting current students whose renewal has a future start date.
 - App access marked as a manual override in the platform admin is preserved by
-  `active` and `completed` syncs. An explicit `cancelled` request still disables it.
+  `active` and `completed` syncs. The school may extend a manual timed expiry, but
+  cannot shorten it, remove its active state, or re-enable a manually revoked app.
+  An explicit `cancelled` request still disables it.
 - `studentId` is the primary identity, so an email address may be updated safely.
 - An email already attached to another account returns HTTP `409` and is never merged
   automatically.

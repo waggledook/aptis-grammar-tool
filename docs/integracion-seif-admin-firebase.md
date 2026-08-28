@@ -79,7 +79,9 @@ No se envía un campo para SeifHub: todo alumno con `status: "active"` o
   del contrato anterior, se conserva la fecha de inicio de un acceso automático aún
   vigente. Así una renovación futura no interrumpe el acceso actual.
 - Los accesos marcados como modificación manual en el panel de las plataformas no se
-  cambian con sincronizaciones `active` o `completed`. Una petición `cancelled` sí los
+  eliminan ni acortan con sincronizaciones `active` o `completed`. El sistema escolar
+  puede ampliar la fecha final de un acceso manual con duración, pero no puede
+  desactivarlo ni reactivar una retirada manual. Una petición `cancelled` sí lo
   desactiva.
 
 ## Altas, alumnos existentes y renovaciones

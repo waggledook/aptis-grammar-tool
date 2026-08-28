@@ -21,11 +21,16 @@ export default function SpeakingPart1({
   user,
   aptisAccess,
   onSignIn,
+  questions = PART1_QUESTIONS,
   allowedQuestionIds = [],
   speakSeconds = 30,   // Aptis Part 1 typical speaking window
-  autoBeepSeconds = 1.0
+  autoBeepSeconds = 1.0,
+  partKey = "part1",
+  heading = "Speaking – Part 1 (Personal Questions)",
+  showNewOnly = true,
+  trackProgress = true,
 }) {
-  const [newOnly, setNewOnly] = useState(!!user); // toggle enabled only if signed in
+  const [newOnly, setNewOnly] = useState(!!user && showNewOnly); // toggle enabled only if signed in
   const [phase, setPhase] = useState("ready");    // ready | running | summary
   const [seg, setSeg] = useState(0);              // 0..2
   const [sub, setSub] = useState("announce");     // announce | beep | speak | doneSeg
@@ -57,19 +62,23 @@ export default function SpeakingPart1({
 
   // -------- Bank + progress tracking --------
   const BANK = useMemo(() => {
-    if (!allowedQuestionIds.length) return PART1_QUESTIONS;
+    if (!allowedQuestionIds.length) return questions;
     const allowedSet = new Set(allowedQuestionIds);
-    return PART1_QUESTIONS.filter((question) => allowedSet.has(question.id));
-  }, [allowedQuestionIds]);
+    return questions.filter((question) => allowedSet.has(question.id));
+  }, [allowedQuestionIds, questions]);
   const [completed, setCompleted] = useState(new Set()); // set of raw ids like "p1q001"
   useEffect(() => {
     let alive = true;
     (async () => {
-    const done = await loadSpeakingDone("part1", fb, user);
+    if (!trackProgress) {
+      if (alive) setCompleted(new Set());
+      return;
+    }
+    const done = await loadSpeakingDone(partKey, fb, user);
     if (alive) setCompleted(done);
     })();
     return () => { alive = false; };
-  }, [user]);
+  }, [partKey, trackProgress, user]);
 
   // Pick 3 questions
   const [chosen, setChosen] = useState([]);
@@ -205,8 +214,9 @@ export default function SpeakingPart1({
   // -------- Persistence for “new only” --------
   async function markCompleted() {
     const ids = chosen.map(q => q.id); // raw ids
+    if (!trackProgress) return;
     try {
-      const updated = await markSpeakingDone("part1", ids, fb, user);
+      const updated = await markSpeakingDone(partKey, ids, fb, user);
       if (updated) setCompleted(updated);
       toast?.("Marked these questions as completed ✓");
     } catch {}
@@ -215,7 +225,7 @@ export default function SpeakingPart1({
     try {
       if (user && fb.logSpeakingTaskCompleted) {
         await fb.logSpeakingTaskCompleted({
-          part: "part1",
+          part: partKey,
           taskId: null,          // randomised trio, no fixed "task"
           questionIds: ids,
           questionCount: ids.length,
@@ -390,7 +400,7 @@ export default function SpeakingPart1({
           await fb.saveSpeakingAiFeedback({
             part: "part1",
             taskId: chosen.map((item) => item.id).join(","),
-            taskTitle: "Speaking Part 1",
+            taskTitle: heading,
             questions: chosen.map((item) => ({ id: item.id, question: item.text })),
             transcripts: result?.transcripts || [],
             feedback: result.feedback,
@@ -417,14 +427,14 @@ export default function SpeakingPart1({
 
       <header className="header">
         <div>
-          <h2 className="title">Speaking – Part 1 (Personal Questions)</h2>
+          <h2 className="title">{heading}</h2>
           <p className="intro">
             You will answer three short personal questions. For each question we will read it aloud,
             play a beep, and then record your answer for {speakSeconds}s.
           </p>
         </div>
         {/* header right side */}
-<div className="picker" style={{ display:"flex", alignItems:"center" }}>
+{showNewOnly ? <div className="picker" style={{ display:"flex", alignItems:"center" }}>
   <button
     type="button"
     className={`toggle-btn ${newOnly ? "selected" : ""} ${(!user || phase !== "ready") ? "disabled" : ""}`}
@@ -435,7 +445,7 @@ export default function SpeakingPart1({
   >
     New questions only
   </button>
-</div>
+</div> : null}
       </header>
 
       <SpeakingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>

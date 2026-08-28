@@ -1263,7 +1263,7 @@ function renderSiteAccessControl({
       <small style={{ fontSize: compact ? "0.7rem" : "0.74rem", opacity: 0.72 }}>
         {draft.managedBy === "seifAdmin"
           ? "Future school syncs may update this app. Editing an access setting below switches it to a protected manual override."
-          : "Routine school syncs will not change this app. An explicit cancellation still removes access."}
+          : "Routine school syncs cannot remove or shorten this override, but may extend its end date. An explicit cancellation still removes access."}
       </small>
 
       <label
