@@ -7893,6 +7893,10 @@ exports.onUserRoleChange = functions
 const cors  = require("cors")({ origin: true });
 const crypto = require("crypto");
 const textToSpeech = require("@google-cloud/text-to-speech");
+const {
+  getSeifAdminAccessStartDate,
+  resolveSeifAdminSiteAccess,
+} = require("./seif-admin-access-policy");
 
 const SEIF_ADMIN_SYNC_SECRET = "SEIF_ADMIN_SYNC_SECRET";
 const SEIF_ADMIN_DEFAULT_PASSWORD = "12345678";
@@ -8012,18 +8016,22 @@ function parseSeifAdminSyncRequest(body = {}) {
   const accessEndDate = active
     ? addSeifAdminDays(courseEndDate, SEIF_ADMIN_ACCESS_EXTENSION_DAYS)
     : "";
+  const syncDate = todayIsoDate();
+  const accessStartDate = getSeifAdminAccessStartDate(courseStartDate, syncDate);
   const makeAccess = (enabled) => enabled && active
     ? {
         active: true,
-        startDate: courseStartDate || todayIsoDate(),
+        startDate: accessStartDate,
         endDate: accessEndDate,
         indefinite: false,
+        managedBy: "seifAdmin",
       }
     : {
         active: false,
         startDate: "",
         endDate: "",
         indefinite: false,
+        managedBy: "seifAdmin",
       };
 
   return {
@@ -8195,20 +8203,20 @@ exports.syncSeifAdminStudent = functions
 
       const existingData = existingDoc.exists ? existingDoc.data() || {} : {};
       const existingSeifAdmin = existingData.externalSystems?.seifAdmin || {};
-      if (payload.active && !payload.courseStartDate) {
-        Object.entries(payload.siteAccess).forEach(([accessKey, access]) => {
-          if (access.active) {
-            access.startDate = existingData.siteAccess?.[accessKey]?.startDate || access.startDate;
-          }
-        });
-      }
+      const resolvedSiteAccess = resolveSeifAdminSiteAccess({
+        incomingSiteAccess: payload.siteAccess,
+        existingData,
+        status: payload.status,
+        courseStartDate: payload.courseStartDate,
+        todayIsoDate: todayIsoDate(),
+      });
       const now = admin.firestore.FieldValue.serverTimestamp();
       const userPayload = {
         email: payload.email,
         name: payload.displayName || existingData.name || authUser.displayName || "",
         username: existingData.username || "",
         role: existingData.role || "student",
-        siteAccess: payload.siteAccess,
+        siteAccess: resolvedSiteAccess,
         externalSystems: {
           seifAdmin: {
             studentId: payload.studentId,
@@ -8249,9 +8257,9 @@ exports.syncSeifAdminStudent = functions
         status: payload.status,
         accessEndDate: payload.accessEndDate,
         access: {
-          seifhub: payload.siteAccess.seifhub.active,
-          aptisTrainer: payload.siteAccess.aptisTrainer.active,
-          ote: payload.siteAccess.ote.active,
+          seifhub: resolvedSiteAccess.seifhub.active,
+          aptisTrainer: resolvedSiteAccess.aptisTrainer.active,
+          ote: resolvedSiteAccess.ote.active,
         },
       });
     } catch (err) {

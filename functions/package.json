@@ -5,6 +5,7 @@
     "audit-users": "node scripts/audit-users.js",
     "cleanup-users": "node scripts/cleanup-users.js",
     "lint": "eslint .",
+    "test": "node --test test/*.test.js",
     "serve": "firebase emulators:start --only functions",
     "shell": "firebase functions:shell",
     "start": "npm run shell",

@@ -1090,6 +1090,7 @@ function buildAccessPayload(draft) {
     startDate: draft.startDate || "",
     endDate: draft.indefinite ? "" : (draft.endDate || ""),
     indefinite: !!draft.indefinite,
+    managedBy: draft.managedBy === "seifAdmin" ? "seifAdmin" : "manual",
   };
 }
 
@@ -1227,6 +1228,7 @@ function renderSiteAccessControl({
   saveLabel,
 }) {
   const fontSize = compact ? "0.78rem" : "0.82rem";
+  const setManualDraft = (patch) => setDraft(u.id, {...patch, managedBy: "manual"});
   const inputStyle = {
     fontSize,
     padding: "0.25rem 0.45rem",
@@ -1246,6 +1248,24 @@ function renderSiteAccessControl({
         width: "100%",
       }}
     >
+      <label style={{ display: "flex", flexDirection: "column", gap: "0.2rem", fontSize, opacity: 0.9 }}>
+        <span>Access management</span>
+        <select
+          value={draft.managedBy === "seifAdmin" ? "seifAdmin" : "manual"}
+          onChange={(event) => setDraft(u.id, {managedBy: event.target.value})}
+          style={inputStyle}
+        >
+          <option value="seifAdmin">Automatic (school system)</option>
+          <option value="manual">Manual override (protected)</option>
+        </select>
+      </label>
+
+      <small style={{ fontSize: compact ? "0.7rem" : "0.74rem", opacity: 0.72 }}>
+        {draft.managedBy === "seifAdmin"
+          ? "Future school syncs may update this app. Editing an access setting below switches it to a protected manual override."
+          : "Routine school syncs will not change this app. An explicit cancellation still removes access."}
+      </small>
+
       <label
         style={{
           display: "inline-flex",
@@ -1258,7 +1278,7 @@ function renderSiteAccessControl({
         <input
           type="checkbox"
           checked={draft.active}
-          onChange={(e) => setDraft(u.id, { active: e.target.checked })}
+          onChange={(e) => setManualDraft({ active: e.target.checked })}
         />
         {activeLabel}
       </label>
@@ -1275,7 +1295,7 @@ function renderSiteAccessControl({
           <span>Start</span>
           <AccessDateInput
             value={draft.startDate}
-            onCommit={(value) => setDraft(u.id, { startDate: value })}
+            onCommit={(value) => setManualDraft({ startDate: value })}
             style={inputStyle}
           />
         </label>
@@ -1285,7 +1305,7 @@ function renderSiteAccessControl({
           <AccessDateInput
             value={draft.endDate}
             disabled={draft.indefinite}
-            onCommit={(value) => setDraft(u.id, { endDate: value })}
+            onCommit={(value) => setManualDraft({ endDate: value })}
             style={inputStyle}
           />
         </label>
@@ -1304,7 +1324,7 @@ function renderSiteAccessControl({
           type="checkbox"
           checked={draft.indefinite}
           onChange={(e) =>
-            setDraft(u.id, {
+            setManualDraft({
               indefinite: e.target.checked,
               endDate: e.target.checked ? "" : draft.endDate,
             })
@@ -1469,6 +1489,10 @@ function renderAccessSummary(u, section, { showEdit = true } = {}) {
     { label: "Start", value: formatAccessDate(access.startDate) },
     { label: "End", value: access.indefinite ? "Indefinite" : formatAccessDate(access.endDate) },
     ...(meta.extraRows || []),
+    {
+      label: "Managed by",
+      value: access.managedBy === "manual" ? "Manual override" : "School system",
+    },
     { label: "Access", value: access.active ? "On" : "Off" },
   ];
 

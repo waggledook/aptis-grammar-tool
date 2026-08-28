@@ -7,7 +7,41 @@ function todayIsoDate() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function inferAccessManager(raw, userOrSiteAccess, accessKey) {
+  if (raw?.managedBy === "manual" || raw?.managedBy === "seifAdmin") {
+    return raw.managedBy;
+  }
+
+  const seifAdmin = userOrSiteAccess?.externalSystems?.seifAdmin;
+  if (!seifAdmin?.studentId) return "manual";
+  if (raw?.indefinite) return "manual";
+  if (!raw?.active && (raw?.startDate || raw?.endDate)) return "manual";
+  if (
+    seifAdmin.courseStartDate &&
+    (raw?.startDate || "") !== seifAdmin.courseStartDate
+  ) {
+    return "manual";
+  }
+  if (
+    seifAdmin.accessEndDate &&
+    (raw?.endDate || "") !== seifAdmin.accessEndDate
+  ) {
+    return "manual";
+  }
+
+  const schoolStatusKeepsHubActive =
+    seifAdmin.status === "active" || seifAdmin.status === "completed";
+  if (accessKey === SEIF_HUB_ACCESS_KEY && schoolStatusKeepsHubActive && !raw?.active) {
+    return "manual";
+  }
+
+  return "seifAdmin";
+}
+
 function getSiteAccessConfig(userOrSiteAccess, accessKey) {
+  const isSeifAdminAccount = Boolean(
+    userOrSiteAccess?.externalSystems?.seifAdmin?.studentId
+  );
   const siteAccess =
     userOrSiteAccess && userOrSiteAccess.siteAccess
       ? userOrSiteAccess.siteAccess
@@ -21,6 +55,7 @@ function getSiteAccessConfig(userOrSiteAccess, accessKey) {
       startDate: "",
       endDate: "",
       indefinite: true,
+      managedBy: "manual",
     };
   }
 
@@ -30,6 +65,7 @@ function getSiteAccessConfig(userOrSiteAccess, accessKey) {
       startDate: "",
       endDate: "",
       indefinite: false,
+      managedBy: isSeifAdminAccount ? "seifAdmin" : "manual",
     };
   }
 
@@ -38,6 +74,7 @@ function getSiteAccessConfig(userOrSiteAccess, accessKey) {
     startDate: raw.startDate || "",
     endDate: raw.endDate || "",
     indefinite: !!raw.indefinite,
+    managedBy: inferAccessManager(raw, userOrSiteAccess, accessKey),
   };
 }
 

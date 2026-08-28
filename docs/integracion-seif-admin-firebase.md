@@ -52,7 +52,7 @@ Cada petición representa el estado completo y actual del alumno:
 | `firstName` | string | Recomendado | Nombre del alumno. |
 | `lastName` | string | Recomendado | Apellidos del alumno. |
 | `email` | string | Sí | Email actual. Se normaliza a minúsculas. |
-| `courseStartDate` | `YYYY-MM-DD` | No | Fecha de inicio. Si se omite en un alta activa, se usa la fecha actual. |
+| `courseStartDate` | `YYYY-MM-DD` | No | Fecha de inicio del curso. El acceso automático comienza 14 días antes. Si se omite, se usa la fecha actual. |
 | `courseEndDate` | `YYYY-MM-DD` | Sí con `active` o `completed` | Fecha final del curso o contrato. |
 | `status` | string | Sí | `active`, `completed` o `cancelled`. |
 | `access.aptisTrainer` | boolean | Sí con `active` o `completed` | Acceso solicitado a Aptis Trainer. |
@@ -66,13 +66,21 @@ No se envía un campo para SeifHub: todo alumno con `status: "active"` o
 - `seifhub` se activa automáticamente con `active` y se conserva con `completed`.
 - `aptisTrainer` se controla mediante `access.aptisTrainer`.
 - `ote` se controla mediante `access.ote`.
+- Los accesos automáticos nuevos comienzan 14 días antes de `courseStartDate`.
 - La fecha de caducidad es `courseEndDate + 14 días`.
 - `completed` conserva los accesos seleccionados hasta esa misma fecha de caducidad.
 - `cancelled` desactiva las tres plataformas inmediatamente.
 - Con `active` o `completed` deben enviarse siempre los dos booleanos de `access`.
-- Cambiar un booleano de `true` a `false` retira ese acceso.
+- Cambiar un booleano de `true` a `false` retira el acceso gestionado por el sistema
+  escolar.
 - Repetir exactamente la misma petición es seguro: actualiza la misma cuenta y no
   crea duplicados.
+- Si el nuevo contrato comienza como máximo un mes natural después de la fecha final
+  del contrato anterior, se conserva la fecha de inicio de un acceso automático aún
+  vigente. Así una renovación futura no interrumpe el acceso actual.
+- Los accesos marcados como modificación manual en el panel de las plataformas no se
+  cambian con sincronizaciones `active` o `completed`. Una petición `cancelled` sí los
+  desactiva.
 
 ## Altas, alumnos existentes y renovaciones
 

@@ -42,7 +42,7 @@ Every request sends the student's complete current state:
 | `firstName` | string | Recommended | Student's first name. |
 | `lastName` | string | Recommended | Student's surname. |
 | `email` | string | Yes | Current email; normalized to lower case. |
-| `courseStartDate` | `YYYY-MM-DD` | No | Access start; today is used for a new active record if omitted. |
+| `courseStartDate` | `YYYY-MM-DD` | No | Course start; automatic platform access begins 14 days earlier. Today is used if omitted. |
 | `courseEndDate` | `YYYY-MM-DD` | With `active` or `completed` | Course or contract end date. |
 | `status` | string | Yes | `active`, `completed`, or `cancelled`. |
 | `access.aptisTrainer` | boolean | With `active` or `completed` | Desired Aptis Trainer access. |
@@ -54,12 +54,18 @@ the calculated expiry date for `completed` students.
 ## Behaviour
 
 - All access expires 14 days after `courseEndDate`.
+- Newly enabled automatic access starts 14 days before `courseStartDate`.
 - An `active` or `completed` request must always include both access booleans.
-- Changing a boolean to `false` removes that platform's access.
+- Changing a boolean to `false` removes school-managed access to that platform.
 - `completed` retains the selected access until `courseEndDate + 14 days`.
 - `cancelled` immediately disables all three platforms.
 - Repeating a request updates the same account and does not create duplicates.
 - A changed `courseEndDate` handles a renewal and recalculates the expiry date.
+- An existing, unexpired automatic access start is preserved when the next contract
+  starts no more than one calendar month after the previous contract ends. This avoids
+  interrupting current students whose renewal has a future start date.
+- App access marked as a manual override in the platform admin is preserved by
+  `active` and `completed` syncs. An explicit `cancelled` request still disables it.
 - `studentId` is the primary identity, so an email address may be updated safely.
 - An email already attached to another account returns HTTP `409` and is never merged
   automatically.
