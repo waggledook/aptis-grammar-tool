@@ -2,6 +2,7 @@
 
 const SEIF_ADMIN_EARLY_ACCESS_DAYS = 14;
 const SEIF_ADMIN_CONTINUITY_MONTHS = 1;
+const SEIF_ADMIN_CANCELLATION_GRACE_DAYS = 14;
 
 function addIsoDays(isoDate, days) {
   const [year, month, day] = String(isoDate || "").split("-").map(Number);
@@ -87,6 +88,51 @@ function mergeManualAccessWithSchoolExtension(existingAccess, incomingAccess) {
   };
 }
 
+function buildCancelledAccess(existingAccess, cancellationDate, todayIsoDate) {
+  if (!existingAccess || typeof existingAccess !== "object" || !existingAccess.active) {
+    return {
+      active: false,
+      startDate: "",
+      endDate: "",
+      indefinite: false,
+      managedBy: "seifAdmin",
+    };
+  }
+
+  const cancellationEndDate = addIsoDays(
+    cancellationDate,
+    SEIF_ADMIN_CANCELLATION_GRACE_DAYS
+  );
+  if (todayIsoDate > cancellationEndDate) {
+    return {
+      active: false,
+      startDate: "",
+      endDate: "",
+      indefinite: false,
+      managedBy: "seifAdmin",
+    };
+  }
+  if (existingAccess.endDate && existingAccess.endDate < cancellationDate) {
+    return {
+      active: false,
+      startDate: "",
+      endDate: "",
+      indefinite: false,
+      managedBy: "seifAdmin",
+    };
+  }
+
+  return {
+    ...existingAccess,
+    active: true,
+    endDate:
+      existingAccess.endDate && existingAccess.endDate < cancellationEndDate
+        ? existingAccess.endDate
+        : cancellationEndDate,
+    indefinite: false,
+  };
+}
+
 function shouldKeepContinuousAccess({
   existingAccess,
   previousCourseEndDate,
@@ -111,6 +157,7 @@ function resolveSeifAdminSiteAccess({
   status,
   courseStartDate,
   todayIsoDate,
+  cancellationDate = todayIsoDate,
 }) {
   const existingSiteAccess = existingData.siteAccess || {};
   const previousCourseEndDate =
@@ -122,8 +169,14 @@ function resolveSeifAdminSiteAccess({
     Object.entries(incomingSiteAccess || {}).map(([accessKey, incomingAccess]) => {
       const existingAccess = existingSiteAccess[accessKey];
 
+      if (isCancellation) {
+        return [
+          accessKey,
+          buildCancelledAccess(existingAccess, cancellationDate, todayIsoDate),
+        ];
+      }
+
       if (
-        !isCancellation &&
         isProtectedManualAccess(existingAccess, {accessKey, existingSeifAdmin})
       ) {
         return [
@@ -155,10 +208,12 @@ function resolveSeifAdminSiteAccess({
 
 module.exports = {
   SEIF_ADMIN_CONTINUITY_MONTHS,
+  SEIF_ADMIN_CANCELLATION_GRACE_DAYS,
   SEIF_ADMIN_EARLY_ACCESS_DAYS,
   addIsoDays,
   addIsoMonths,
   getSeifAdminAccessStartDate,
+  buildCancelledAccess,
   isProtectedManualAccess,
   mergeManualAccessWithSchoolExtension,
   resolveSeifAdminSiteAccess,

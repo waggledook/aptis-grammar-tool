@@ -246,6 +246,16 @@ export const APTIS_ROUTE_SEO = {
     description:
       "Practise choosing formal and informal language for Aptis Writing Part 4 emails.",
   },
+  "/writing/part4-register-surgery": {
+    title: "Aptis Writing Part 4 Register Surgery | Seif Aptis Trainer",
+    description:
+      "Identify and improve unsuitable formal and informal register in complete Aptis Writing Part 4 emails.",
+  },
+  "/writing/part4-error-detective": {
+    title: "Aptis Writing Part 4 Error Detective | Seif Aptis Trainer",
+    description:
+      "Spot recurring grammar, vocabulary and email-convention errors from Aptis Writing Part 4 student responses.",
+  },
   "/privacy": {
     title: "Privacy Policy | Seif Aptis Trainer",
     description:

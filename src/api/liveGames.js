@@ -40,6 +40,12 @@ import {
   FREE_THINGS_LESSON_GAME_TYPE,
   FREE_THINGS_LESSON_TASK_ID,
 } from "../products/ote/data/oteAdvancedReadingPart3FreeThingsLesson.js";
+import { APTIS_WRITING_LIVE_GAME_TYPE } from "../components/writing/data/aptisWritingTeacherTasks.js";
+import {
+  REGISTER_SURGERY_EMAILS,
+  REGISTER_SURGERY_LIVE_GAME_TYPE,
+} from "../components/writing/data/aptisWritingRegisterSurgery.js";
+import { PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE } from "../components/writing/data/aptisPart4ErrorBank.js";
 
 const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
 const SPANGLISH_GUEST_TOKEN_STORAGE_KEY = "spanglish_fixit_guest_token";
@@ -148,7 +154,10 @@ export async function joinLiveGameByPin(pin) {
     game.type === PART4_EVIDENCE_LIVE_GAME_TYPE ||
     game.type === OTE_LISTENING_LIVE_GAME_TYPE ||
     game.type === COHESION_CHALLENGE_GAME_TYPE ||
-    game.type === FREE_THINGS_LESSON_GAME_TYPE
+    game.type === FREE_THINGS_LESSON_GAME_TYPE ||
+    game.type === APTIS_WRITING_LIVE_GAME_TYPE ||
+    game.type === REGISTER_SURGERY_LIVE_GAME_TYPE ||
+    game.type === PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE
   ) {
     if (!existingPlayer) await set(playerRef, {
       name: displayName,
@@ -277,6 +286,167 @@ export async function createFreeThingsLessonLiveGame({ title } = {}) {
     state: { phase: "lobby", gapIndex: 0, sentenceIndex: 0, reviewIndex: 0 },
   });
   return { gameId, pin };
+}
+
+export async function createAptisWritingLiveGame({ part, taskId, title }) {
+  const user = auth.currentUser;
+  const partNumber = Number(part);
+  if (!user) throw new Error("You must be signed in to host a writing session.");
+  if (![2, 3, 4].includes(partNumber) || !taskId) {
+    throw new Error("Choose a valid writing part and task.");
+  }
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: title || `Aptis Writing Part ${partNumber}`,
+    type: APTIS_WRITING_LIVE_GAME_TYPE,
+    taskId,
+    part: partNumber,
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby" },
+  });
+  return { gameId, pin };
+}
+
+export async function createRegisterSurgeryLiveGame() {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host Register Surgery.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: "Aptis Writing Part 4 · Register Surgery",
+    type: REGISTER_SURGERY_LIVE_GAME_TYPE,
+    taskId: "part4-register-surgery",
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby" },
+  });
+  return { gameId, pin };
+}
+
+export async function createPart4ErrorDetectiveLiveGame() {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host Error Detective.");
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: "Aptis Writing Part 4 · Error Detective",
+    type: PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE,
+    taskId: "part4-error-detective",
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby", questionIndex: 0 },
+  });
+  return { gameId, pin };
+}
+
+export async function submitPart4ErrorDetectiveLiveAnswer({ gameId, questionId, selectedIndex }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to submit your choice.");
+  if (!gameId || !questionId || !Number.isInteger(selectedIndex)) throw new Error("Missing Error Detective answer details.");
+  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/errorDetective/${questionId}`), {
+    selectedIndex,
+    submittedAt: Date.now(),
+  });
+}
+
+export async function submitPart4ErrorDetectiveLiveCorrection({ gameId, questionId, correction }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to submit your correction.");
+  const safeCorrection = String(correction || "").trim().slice(0, 500);
+  if (!gameId || !questionId || !safeCorrection) throw new Error("Missing Error Detective correction details.");
+  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/errorDetectiveCorrections/${questionId}`), {
+    correction: safeCorrection,
+    submittedAt: Date.now(),
+  });
+}
+
+function getRegisterSurgeryTargetIds(kind) {
+  return (REGISTER_SURGERY_EMAILS[kind]?.rewrites || []).map((item) => item.id);
+}
+
+export async function submitRegisterSurgeryLiveSpot({ gameId, kind, selectedIds }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to submit your choices.");
+  if (!gameId || !["informal", "formal"].includes(kind) || !Array.isArray(selectedIds)) {
+    throw new Error("Missing Register Surgery selection details.");
+  }
+
+  const selectableIds = new Set(
+    (REGISTER_SURGERY_EMAILS[kind]?.blocks || [])
+      .flatMap((block) => block.chunks || [])
+      .filter((chunk) => chunk.selectable)
+      .map((chunk) => chunk.id)
+  );
+  const safeIds = [...new Set(selectedIds)].filter((id) => selectableIds.has(id));
+  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/registerSurgery/spot/${kind}`), {
+    selectedIds: safeIds,
+    submittedAt: Date.now(),
+  });
+}
+
+export async function submitRegisterSurgeryLiveRewrites({ gameId, kind, rewrites }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to submit your rewrites.");
+  if (!gameId || !["informal", "formal"].includes(kind) || !rewrites) {
+    throw new Error("Missing Register Surgery rewrite details.");
+  }
+
+  const requiredIds = getRegisterSurgeryTargetIds(kind);
+  const safeRewrites = Object.fromEntries(requiredIds.map((id) => [id, String(rewrites[id] || "").trim().slice(0, 800)]));
+  if (requiredIds.some((id) => !safeRewrites[id])) {
+    throw new Error("Write an alternative for every highlighted expression.");
+  }
+
+  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/registerSurgery/rewrites/${kind}`), {
+    answers: safeRewrites,
+    submittedAt: Date.now(),
+  });
+}
+
+export async function submitAptisWritingLiveResponse({ gameId, part, taskId, answers, counts }) {
+  const user = auth.currentUser;
+  const partNumber = Number(part);
+  if (!user) throw new Error("You must be signed in to submit your writing.");
+  if (!gameId || ![2, 3, 4].includes(partNumber) || !taskId || !answers) {
+    throw new Error("Missing writing response details.");
+  }
+
+  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/writingSubmission`), {
+    part: partNumber,
+    taskId,
+    answers,
+    counts: counts || {},
+    submittedAt: Date.now(),
+  });
+}
+
+export async function saveAptisWritingLiveFeedback({ gameId, playerId, taskId, feedback, meta }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to save live writing feedback.");
+  if (!gameId || !playerId || !taskId || !feedback) {
+    throw new Error("Missing live writing feedback details.");
+  }
+
+  await set(ref(rtdb, `liveGames/${gameId}/players/${playerId}/writingFeedback`), {
+    taskId,
+    feedback,
+    meta: meta || {},
+    generatedAt: Date.now(),
+    generatedBy: user.uid,
+  });
 }
 
 export async function markFreeThingsLessonPredictionReady({ gameId, gap }) {
@@ -531,6 +701,9 @@ export async function setLiveGameState(gameId, partialState) {
     }
     if (typeof partialState.playCount === "number") {
       updates.playCount = partialState.playCount;
+    }
+    if (Array.isArray(partialState.round)) {
+      updates.round = partialState.round;
     }
     if (typeof partialState.audioStage === "string") {
       updates.audioStage = partialState.audioStage;

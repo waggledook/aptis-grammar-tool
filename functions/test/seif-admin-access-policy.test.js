@@ -171,7 +171,7 @@ test("legacy dated access that differs from the last sync is protected", () => {
   assert.deepEqual(result.aptisTrainer, legacyManualAccess);
 });
 
-test("explicit cancellation disables protected access", () => {
+test("explicit cancellation gives active access a fourteen-day grace period", () => {
   const result = resolveSeifAdminSiteAccess({
     incomingSiteAccess: {ote: automaticAccess({active: false})},
     existingData: {
@@ -188,13 +188,43 @@ test("explicit cancellation disables protected access", () => {
     status: "cancelled",
     courseStartDate: "",
     todayIsoDate: "2026-08-28",
+    cancellationDate: "2026-08-28",
   });
 
   assert.deepEqual(result.ote, {
-    active: false,
-    startDate: "",
-    endDate: "",
+    active: true,
+    startDate: "2026-01-01",
+    endDate: "2026-09-11",
+    indefinite: false,
+    managedBy: "manual",
+  });
+});
+
+test("cancellation does not extend an earlier expiry and repeated syncs do not reset the cutoff", () => {
+  const existingAccess = {
+    active: true,
+    startDate: "2026-01-01",
+    endDate: "2026-09-05",
     indefinite: false,
     managedBy: "seifAdmin",
+  };
+  const capped = resolveSeifAdminSiteAccess({
+    incomingSiteAccess: {seifhub: automaticAccess({active: false})},
+    existingData: {siteAccess: {seifhub: existingAccess}},
+    status: "cancelled",
+    courseStartDate: "",
+    todayIsoDate: "2026-08-28",
+    cancellationDate: "2026-08-28",
   });
+  assert.equal(capped.seifhub.endDate, "2026-09-05");
+
+  const expired = resolveSeifAdminSiteAccess({
+    incomingSiteAccess: {seifhub: automaticAccess({active: false})},
+    existingData: {siteAccess: {seifhub: existingAccess}},
+    status: "cancelled",
+    courseStartDate: "",
+    todayIsoDate: "2026-09-12",
+    cancellationDate: "2026-08-28",
+  });
+  assert.equal(expired.seifhub.active, false);
 });

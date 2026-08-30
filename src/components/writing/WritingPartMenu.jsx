@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, ChevronRight, Clock3, GraduationCap, Lightbulb } from "lucide-react";
+import { ArrowLeft, ArrowRight, ChevronRight, Clock3, GraduationCap, Lightbulb, Radio } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import AptisDemoBadge from "../access/AptisDemoBadge.jsx";
 import Seo from "../common/Seo.jsx";
@@ -20,6 +20,8 @@ function AccessPill({ activity, isDemoMode }) {
 
 function getActivityIcon(activity, type) {
   if (type === "practice") return Clock3;
+  if (type === "teacher-live") return Radio;
+  if (type === "teacher") return GraduationCap;
   if (activity.status === "coming-soon") return GraduationCap;
   return Lightbulb;
 }
@@ -30,6 +32,7 @@ export default function WritingPartMenu({ user, aptisAccess, onSignIn }) {
   const [lockedActivity, setLockedActivity] = useState("");
   const part = getAptisWritingPart(partNumber);
   const isDemoMode = !!aptisAccess?.isDemoMode;
+  const isTeacher = user?.role === "teacher" || user?.role === "admin";
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -134,6 +137,45 @@ export default function WritingPartMenu({ user, aptisAccess, onSignIn }) {
           {renderActivity(part.practice, "practice")}
         </div>
       </section>
+
+      {isTeacher && ["2", "3", "4"].includes(part.number) ? (
+        <section className="writing-part-section writing-teacher-resource-section">
+          <div className="writing-part-section-heading">
+            <h2>Teacher resources</h2>
+            <p>Open four additional classroom topics or create a live, teacher-paced writing room.</p>
+          </div>
+          <div className="writing-part-activity-grid has-multiple">
+            {renderActivity({
+              id: `part${part.number}-teacher-topics`,
+              eyebrow: "Teacher task library",
+              title: `Extra ${part.label} writing topics`,
+              copy: "Language Exchange Club, Gardening Club, Local History Course and Drama Course, with assignment and direct-link sharing.",
+              path: `/teacher/writing?part=${part.number}`,
+            }, "teacher")}
+            {renderActivity({
+              id: `part${part.number}-teacher-live`,
+              eyebrow: "Live classroom",
+              title: `Run ${part.label} live`,
+              copy: "Choose one of the four extra topics, invite students with a PIN and review their submitted writing together.",
+              path: `/teacher/writing?part=${part.number}&mode=live`,
+            }, "teacher-live")}
+            {part.number === "4" ? renderActivity({
+              id: "part4-register-surgery",
+              eyebrow: "Classroom skills activity",
+              title: "Part 4 Register Surgery",
+              copy: "Spot unsuitable register inside two complete emails, rewrite the problem phrases and compare clear informal and formal choices.",
+              path: "/writing/part4-register-surgery",
+            }, "teacher") : null}
+            {part.number === "4" ? renderActivity({
+              id: "part4-error-detective",
+              eyebrow: "Classroom skills activity",
+              title: "Part 4 Error Detective",
+              copy: "Spot recurring errors drawn from real student submissions, then reveal the correction and a concise explanation.",
+              path: "/writing/part4-error-detective",
+            }, "teacher") : null}
+          </div>
+        </section>
+      ) : null}
     </main>
   );
 }

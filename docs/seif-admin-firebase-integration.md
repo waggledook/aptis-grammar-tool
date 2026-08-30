@@ -53,12 +53,13 @@ the calculated expiry date for `completed` students.
 
 ## Behaviour
 
-- All access expires 14 days after `courseEndDate`.
+- Normal access expires 14 days after `courseEndDate`; a cancellation gives a
+  fourteen-day grace period from the first cancellation date.
 - Newly enabled automatic access starts 14 days before `courseStartDate`.
 - An `active` or `completed` request must always include both access booleans.
 - Changing a boolean to `false` removes school-managed access to that platform.
 - `completed` retains the selected access until `courseEndDate + 14 days`.
-- `cancelled` immediately disables all three platforms.
+- `cancelled` ends currently active access 14 days after the first cancellation date.
 - Repeating a request updates the same account and does not create duplicates.
 - A changed `courseEndDate` handles a renewal and recalculates the expiry date.
 - An existing, unexpired automatic access start is preserved when the next contract
@@ -67,7 +68,7 @@ the calculated expiry date for `completed` students.
 - App access marked as a manual override in the platform admin is preserved by
   `active` and `completed` syncs. The school may extend a manual timed expiry, but
   cannot shorten it, remove its active state, or re-enable a manually revoked app.
-  An explicit `cancelled` request still disables it.
+  An explicit `cancelled` request caps it at the cancellation grace-period end.
 - `studentId` is the primary identity, so an email address may be updated safely.
 - An email already attached to another account returns HTTP `409` and is never merged
   automatically.

@@ -8265,12 +8265,19 @@ exports.syncSeifAdminStudent = functions
 
       const existingData = existingDoc.exists ? existingDoc.data() || {} : {};
       const existingSeifAdmin = existingData.externalSystems?.seifAdmin || {};
+      const cancellationDate = payload.status === "cancelled"
+        ? existingSeifAdmin.cancelledAt || todayIsoDate()
+        : "";
+      const cancellationAccessEndDate = cancellationDate
+        ? addSeifAdminDays(cancellationDate, SEIF_ADMIN_ACCESS_EXTENSION_DAYS)
+        : "";
       const resolvedSiteAccess = resolveSeifAdminSiteAccess({
         incomingSiteAccess: payload.siteAccess,
         existingData,
         status: payload.status,
         courseStartDate: payload.courseStartDate,
         todayIsoDate: todayIsoDate(),
+        cancellationDate: cancellationDate || todayIsoDate(),
       });
       const now = admin.firestore.FieldValue.serverTimestamp();
       const userPayload = {
@@ -8285,8 +8292,11 @@ exports.syncSeifAdminStudent = functions
             contractId: payload.contractId || existingSeifAdmin.contractId || "",
             status: payload.status,
             courseStartDate: payload.courseStartDate || existingSeifAdmin.courseStartDate || "",
-            courseEndDate: payload.courseEndDate,
-            accessEndDate: payload.accessEndDate,
+            courseEndDate: payload.courseEndDate || existingSeifAdmin.courseEndDate || "",
+            accessEndDate: payload.active
+              ? payload.accessEndDate
+              : cancellationAccessEndDate,
+            cancelledAt: cancellationDate,
             lastSyncedAt: now,
           },
         },
@@ -8317,7 +8327,7 @@ exports.syncSeifAdminStudent = functions
         email: payload.email,
         createdAuthUser,
         status: payload.status,
-        accessEndDate: payload.accessEndDate,
+        accessEndDate: payload.active ? payload.accessEndDate : cancellationAccessEndDate,
         access: {
           seifhub: resolvedSiteAccess.seifhub.active,
           aptisTrainer: resolvedSiteAccess.aptisTrainer.active,

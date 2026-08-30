@@ -1,0 +1,363 @@
+.teacher-writing-resources {
+  --twr-ink: #edf4ff;
+  --twr-muted: #aebed5;
+  --twr-border: rgba(135, 173, 230, 0.22);
+  max-width: 1080px;
+  padding-bottom: 4rem;
+  color: var(--twr-ink);
+}
+
+.teacher-writing-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  color: #b8d4ff;
+  font-weight: 750;
+  text-decoration: none;
+}
+
+.teacher-writing-hero {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  padding: clamp(1.25rem, 3vw, 1.8rem);
+  border: 1px solid var(--twr-border);
+  border-radius: 20px;
+  background: linear-gradient(135deg, rgba(48, 90, 156, 0.25), rgba(15, 29, 52, 0.9));
+}
+
+.teacher-writing-hero-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 54px;
+  height: 54px;
+  place-items: center;
+  border-radius: 15px;
+  background: rgba(79, 137, 224, 0.2);
+  color: #9ec5ff;
+}
+
+.teacher-writing-hero p,
+.teacher-writing-topic-section > header p {
+  margin: 0 0 0.3rem;
+  color: #8fbaff;
+  font-size: 0.74rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.teacher-writing-hero h1 {
+  margin: 0;
+  color: var(--twr-ink);
+  font-size: clamp(1.7rem, 4vw, 2.45rem);
+  text-align: left;
+}
+
+.teacher-writing-hero span {
+  display: block;
+  max-width: 760px;
+  margin-top: 0.5rem;
+  color: var(--twr-muted);
+  line-height: 1.55;
+}
+
+.teacher-writing-part-tabs {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin-top: 1rem;
+}
+
+.teacher-writing-part-tabs button {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--twr-border);
+  border-radius: 13px;
+  background: rgba(16, 32, 57, 0.78);
+  color: var(--twr-ink);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.teacher-writing-part-tabs button span {
+  color: var(--twr-muted);
+  font-size: 0.78rem;
+}
+
+.teacher-writing-part-tabs button.is-selected {
+  border-color: #eeb34e;
+  background: rgba(94, 69, 26, 0.3);
+  box-shadow: inset 0 0 0 1px rgba(238, 179, 78, 0.15);
+}
+
+.teacher-writing-topic-section {
+  margin-top: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--twr-border);
+  border-radius: 18px;
+  background: rgba(14, 28, 50, 0.78);
+}
+
+.teacher-writing-live-notice {
+  display: flex;
+  gap: 0.7rem;
+  align-items: center;
+  margin-top: 0.8rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid rgba(238, 179, 78, 0.45);
+  border-radius: 12px;
+  background: rgba(94, 69, 26, 0.28);
+  color: #f4c978;
+}
+
+.teacher-writing-live-notice div {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.teacher-writing-live-notice span {
+  color: var(--twr-muted);
+  font-size: 0.82rem;
+}
+
+.teacher-writing-skill-section {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
+  margin-top: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgba(238, 179, 78, 0.42);
+  border-radius: 15px;
+  background: rgba(94, 69, 26, 0.24);
+}
+
+.teacher-writing-skill-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(238, 179, 78, 0.15);
+  color: #f4c978;
+}
+
+.teacher-writing-skill-section p { margin: 0 0 0.2rem; color: #f4c978; font-size: 0.7rem; font-weight: 900; letter-spacing: 0.09em; text-transform: uppercase; }
+.teacher-writing-skill-section h2 { margin: 0; color: var(--twr-ink); font-size: 1.1rem; text-align: left; }
+.teacher-writing-skill-section span { display: block; margin-top: 0.3rem; color: var(--twr-muted); font-size: 0.84rem; line-height: 1.45; }
+.teacher-writing-skill-section > a { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.65rem 0.8rem; border-radius: 9px; background: #eeb34e; color: #18263c; font-size: 0.82rem; font-weight: 900; text-decoration: none; }
+
+.teacher-writing-skill-actions {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 158px;
+}
+
+.teacher-writing-skill-actions > a,
+.teacher-writing-skill-actions > button {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  justify-content: center;
+  min-height: 41px;
+  padding: 0.62rem 0.78rem;
+  border: 1px solid rgba(134, 171, 225, 0.28);
+  border-radius: 9px;
+  background: rgba(29, 55, 91, 0.86);
+  color: #e7f1ff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.teacher-writing-skill-actions > button {
+  border-color: #d99e39;
+  background: #eeb34e;
+  color: #18263c;
+}
+
+.teacher-writing-skill-actions > button:disabled {
+  cursor: wait;
+  opacity: 0.64;
+}
+
+.teacher-writing-topic-section > header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: end;
+  padding: 1.15rem 1.25rem;
+  border-bottom: 1px solid var(--twr-border);
+}
+
+.teacher-writing-topic-section > header h2 {
+  margin: 0;
+  color: var(--twr-ink);
+  text-align: left;
+}
+
+.teacher-writing-topic-section > header > span {
+  color: var(--twr-muted);
+  font-size: 0.82rem;
+}
+
+.teacher-writing-topic-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+  padding: 0.9rem;
+}
+
+.teacher-writing-topic-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.8rem;
+  padding: 1rem;
+  border: 1px solid rgba(135, 173, 230, 0.17);
+  border-radius: 14px;
+  background: rgba(22, 42, 72, 0.72);
+}
+
+.teacher-writing-topic-number {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(238, 179, 78, 0.14);
+  color: #f4c978;
+  font-weight: 900;
+}
+
+.teacher-writing-topic-copy > span {
+  color: #8fbaff;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.teacher-writing-topic-copy h3 {
+  margin: 0.25rem 0 0.4rem;
+  color: var(--twr-ink);
+  text-align: left;
+}
+
+.teacher-writing-topic-copy p {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  color: var(--twr-muted);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.teacher-writing-topic-actions {
+  display: flex;
+  grid-column: 1 / -1;
+  gap: 0.55rem;
+  margin-top: 0.2rem;
+}
+
+.teacher-writing-topic-actions a,
+.teacher-writing-topic-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  flex: 1 1 0;
+  min-height: 42px;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid #4773ac;
+  border-radius: 10px;
+  background: rgba(29, 57, 94, 0.86);
+  color: #e6f0ff;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
+.teacher-writing-topic-actions button {
+  border-color: #d99e39;
+  background: #eeb34e;
+  color: #18263c;
+}
+
+.teacher-writing-topic-actions button:disabled {
+  cursor: wait;
+  opacity: 0.64;
+}
+
+.teacher-writing-topic-actions .is-pulsing {
+  animation: teacher-writing-pulse 900ms ease-in-out infinite alternate;
+}
+
+@keyframes teacher-writing-pulse {
+  to { opacity: 0.4; }
+}
+
+:root[data-theme="light"] .teacher-writing-resources {
+  --twr-ink: #172943;
+  --twr-muted: #586a82;
+  --twr-border: rgba(43, 76, 124, 0.18);
+}
+
+:root[data-theme="light"] .teacher-writing-hero,
+:root[data-theme="light"] .teacher-writing-topic-section,
+:root[data-theme="light"] .teacher-writing-part-tabs button,
+:root[data-theme="light"] .teacher-writing-topic-card {
+  background-color: #f8fbff;
+}
+
+:root[data-theme="light"] .teacher-writing-skill-actions > a {
+  background: #edf4fd;
+  color: #244366;
+}
+
+@media (max-width: 720px) {
+  .teacher-writing-topic-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .teacher-writing-hero,
+  .teacher-writing-topic-section > header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .teacher-writing-part-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .teacher-writing-topic-actions {
+    flex-direction: column;
+  }
+
+  .teacher-writing-skill-section {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .teacher-writing-skill-section > a {
+    grid-column: 1 / -1;
+    justify-content: center;
+  }
+
+  .teacher-writing-skill-actions {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .teacher-writing-topic-actions .is-pulsing { animation: none; }
+}

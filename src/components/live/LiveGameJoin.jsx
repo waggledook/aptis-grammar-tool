@@ -7,6 +7,9 @@ import { OPTION_JURY_GAME_TYPE, PART4_EVIDENCE_LIVE_GAME_TYPE } from "../../prod
 import { COHESION_CHALLENGE_GAME_TYPE } from "../../products/ote/data/oteAdvancedReadingCohesionChallenge.js";
 import { FREE_THINGS_LESSON_GAME_TYPE } from "../../products/ote/data/oteAdvancedReadingPart3FreeThingsLesson.js";
 import { OTE_LISTENING_LIVE_GAME_TYPE } from "../../products/ote/data/oteListeningLive.js";
+import { APTIS_WRITING_LIVE_GAME_TYPE } from "../writing/data/aptisWritingTeacherTasks.js";
+import { REGISTER_SURGERY_LIVE_GAME_TYPE } from "../writing/data/aptisWritingRegisterSurgery.js";
+import { PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE } from "../writing/data/aptisPart4ErrorBank.js";
 import { getSitePath } from "../../siteConfig.js";
 
 export default function LiveGameJoin() {
@@ -45,6 +48,12 @@ export default function LiveGameJoin() {
                 ? `/live/cohesion-challenge/play/${gameId}`
               : type === OTE_LISTENING_LIVE_GAME_TYPE
                 ? `/live/ote-listening/play/${gameId}`
+              : type === APTIS_WRITING_LIVE_GAME_TYPE
+                ? `/live/aptis-writing/play/${gameId}`
+              : type === REGISTER_SURGERY_LIVE_GAME_TYPE
+                ? `/live/register-surgery/play/${gameId}`
+              : type === PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE
+                ? `/live/error-detective/play/${gameId}`
                 : `/live/play/${gameId}`;
           navigate(getSitePath(destination));
         } catch (err) {

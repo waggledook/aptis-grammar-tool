@@ -1,0 +1,260 @@
+.aptis-writing-live-page {
+  --awl-bg: #081a38;
+  --awl-surface: #132746;
+  --awl-surface-soft: #182f52;
+  --awl-border: #35578d;
+  --awl-text: #eef5ff;
+  --awl-muted: #adbed5;
+  --awl-accent: #f1ba58;
+  min-height: 100vh;
+  padding: clamp(1rem, 2.5vw, 2.5rem);
+  color: var(--awl-text);
+  background: radial-gradient(circle at top right, rgba(70, 133, 216, 0.2), transparent 34rem), var(--awl-bg);
+}
+
+.aptis-writing-live-header,
+.aptis-writing-live-lobby,
+.aptis-writing-live-stage,
+.aptis-writing-live-wait {
+  width: min(1160px, 100%);
+  margin-inline: auto;
+}
+
+.aptis-writing-live-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+}
+
+.aptis-writing-live-header p,
+.aptis-writing-live-kicker,
+.aptis-writing-live-progress p,
+.aptis-writing-live-stage-heading p,
+.aptis-writing-live-roster header p {
+  margin: 0 0 0.25rem;
+  color: #92bdff;
+  font-size: 0.76rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.aptis-writing-live-header h1 {
+  margin: 0;
+  color: var(--awl-text);
+  font-size: clamp(1.7rem, 4vw, 2.5rem);
+  text-align: left;
+}
+
+.aptis-writing-live-header > span {
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--awl-border);
+  border-radius: 999px;
+  background: var(--awl-surface);
+  color: var(--awl-accent);
+  font-size: 0.8rem;
+  font-weight: 850;
+}
+
+.aptis-writing-live-lobby {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.72fr) minmax(320px, 1.4fr);
+  gap: 1rem;
+}
+
+.aptis-writing-live-pin,
+.aptis-writing-live-roster,
+.aptis-writing-live-stage,
+.aptis-writing-live-wait {
+  border: 1px solid var(--awl-border);
+  border-radius: 18px;
+  background: var(--awl-surface);
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.2);
+}
+
+.aptis-writing-live-pin,
+.aptis-writing-live-roster,
+.aptis-writing-live-stage,
+.aptis-writing-live-wait {
+  padding: clamp(1rem, 2.5vw, 1.5rem);
+}
+
+.aptis-writing-live-pin {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.aptis-writing-live-pin > p { margin: 0; color: var(--awl-muted); font-weight: 750; }
+.aptis-writing-live-pin > strong { margin: 0.2rem 0 0.75rem; font-family: ui-monospace, monospace; font-size: clamp(2.4rem, 5vw, 3.1rem); letter-spacing: 0.05em; }
+.aptis-writing-live-pin button { display: inline-flex; gap: 0.4rem; align-items: center; margin-top: 0.7rem; padding: 0.6rem 0.75rem; border: 1px solid var(--awl-border); border-radius: 9px; background: var(--awl-surface-soft); color: var(--awl-text); cursor: pointer; font: inherit; font-weight: 800; }
+
+.aptis-writing-live-roster header,
+.aptis-writing-live-stage-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.aptis-writing-live-roster h2,
+.aptis-writing-live-stage-heading h2,
+.aptis-writing-live-progress h2 { margin: 0; color: var(--awl-text); text-align: left; }
+
+.aptis-writing-live-roster-list,
+.aptis-writing-live-progress > div:last-child {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0;
+}
+
+.aptis-writing-live-roster-list span,
+.aptis-writing-live-progress > div:last-child span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.48rem 0.65rem;
+  border-radius: 999px;
+  background: var(--awl-surface-soft);
+  color: var(--awl-muted);
+  font-size: 0.82rem;
+  font-weight: 750;
+}
+
+.aptis-writing-live-progress > div:last-child span.is-done { color: #8fe0a8; }
+.aptis-writing-live-progress i { width: 12px; height: 12px; border: 2px solid var(--awl-border); border-radius: 50%; }
+
+.aptis-writing-live-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.72rem 0.9rem;
+  border: 0;
+  border-radius: 10px;
+  background: var(--awl-accent);
+  color: #17243a;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+}
+
+.aptis-writing-live-primary:disabled { cursor: not-allowed; opacity: 0.45; }
+.aptis-writing-live-next { margin-top: 1rem; }
+
+.aptis-writing-live-stage { display: grid; gap: 1rem; }
+.aptis-writing-live-progress { padding: 1rem; border: 1px solid var(--awl-border); border-radius: 13px; background: rgba(8, 25, 49, 0.38); }
+.aptis-writing-live-progress > div:last-child { margin-bottom: 0; }
+
+.aptis-writing-live-prompt {
+  padding: clamp(1rem, 2vw, 1.35rem);
+  border: 1px solid var(--awl-border);
+  border-radius: 14px;
+  background: rgba(8, 24, 47, 0.42);
+}
+
+.aptis-writing-live-prompt h2 { margin: 0; color: var(--awl-text); text-align: left; }
+.aptis-writing-live-prompt h3 { margin: 0.9rem 0 0.4rem; color: var(--awl-text); }
+.aptis-writing-live-prompt > p:not(.aptis-writing-live-kicker) { color: var(--awl-muted); line-height: 1.55; }
+.aptis-writing-live-callout { padding: 0.9rem 1rem; border-left: 4px solid var(--awl-accent); border-radius: 0 10px 10px 0; background: var(--awl-surface-soft); font-weight: 750; }
+
+.aptis-writing-live-chat-list,
+.aptis-writing-live-email-prompts { display: grid; gap: 0.65rem; margin-top: 0.9rem; }
+.aptis-writing-live-chat-list article,
+.aptis-writing-live-email-prompts article { padding: 0.85rem 0.95rem; border-radius: 11px; background: var(--awl-surface-soft); }
+.aptis-writing-live-chat-list p,
+.aptis-writing-live-email-prompts p { margin: 0.25rem 0 0; color: var(--awl-muted); line-height: 1.5; }
+.aptis-writing-live-source { overflow: auto; padding: 1rem; border-radius: 11px; background: #0b1c35; color: var(--awl-text); font: inherit; line-height: 1.55; white-space: pre-wrap; }
+
+.aptis-writing-live-editor { display: grid; gap: 0.85rem; }
+.aptis-writing-live-field { display: grid; gap: 0.45rem; }
+.aptis-writing-live-field > span { display: flex; justify-content: space-between; gap: 0.8rem; align-items: baseline; }
+.aptis-writing-live-field em { color: var(--awl-muted); font-size: 0.76rem; font-style: normal; }
+.aptis-writing-live-field textarea { width: 100%; resize: vertical; padding: 0.85rem 0.95rem; border: 1px solid var(--awl-border); border-radius: 11px; background: #0b1c35; color: var(--awl-text); font: inherit; line-height: 1.55; }
+.aptis-writing-live-field textarea:focus { outline: 3px solid rgba(94, 154, 232, 0.25); border-color: #70a8ec; }
+
+.aptis-writing-live-submitted,
+.aptis-writing-live-finished,
+.aptis-writing-live-wait { text-align: center; }
+.aptis-writing-live-submitted { padding: 1.4rem; border-radius: 13px; background: var(--awl-surface-soft); color: #8fe0a8; }
+.aptis-writing-live-submitted h2,
+.aptis-writing-live-finished h2,
+.aptis-writing-live-wait h2 { margin: 0.55rem 0 0.3rem; color: var(--awl-text); }
+.aptis-writing-live-submitted p,
+.aptis-writing-live-finished span,
+.aptis-writing-live-wait p { margin: 0; color: var(--awl-muted); }
+
+.aptis-writing-live-review-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; }
+.aptis-writing-live-student-submission { min-width: 0; padding: 1rem; border: 1px solid var(--awl-border); border-radius: 13px; background: rgba(8, 24, 47, 0.35); }
+.aptis-writing-live-student-submission > header { display: flex; justify-content: space-between; gap: 0.5rem; color: #8fe0a8; }
+.aptis-writing-live-submission-blocks { display: grid; gap: 0.65rem; }
+.aptis-writing-live-response-block { margin-top: 0.7rem; padding: 0.8rem; border-radius: 10px; background: var(--awl-surface-soft); }
+.aptis-writing-live-response-block > strong { color: #9fc4f7; font-size: 0.78rem; }
+.aptis-writing-live-response-block p { margin: 0.4rem 0 0; color: var(--awl-text); line-height: 1.55; white-space: pre-wrap; }
+.aptis-writing-live-review-note { padding: 0.8rem; border-radius: 10px; background: var(--awl-surface-soft); color: var(--awl-muted); }
+.aptis-writing-live-anonymous-note { margin: -0.25rem 0 0; color: var(--awl-muted); }
+.aptis-writing-live-teacher-actions { display: flex; flex-wrap: wrap; justify-content: flex-start; gap: 0.65rem; margin: 0.2rem 0; }
+.aptis-writing-live-teacher-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 0.42rem; padding: 0.7rem 0.85rem; border: 1px solid var(--awl-border); border-radius: 10px; background: var(--awl-surface-soft); color: var(--awl-text); cursor: pointer; font: inherit; font-weight: 850; }
+.aptis-writing-live-teacher-actions button:last-child { border-color: #b78633; background: #f1ba58; color: #17243a; }
+.aptis-writing-live-teacher-actions button:disabled { cursor: wait; opacity: 0.62; }
+.aptis-writing-live-feedback-status { margin: 0; padding: 0.7rem 0.8rem; border-radius: 9px; background: var(--awl-surface-soft); color: var(--awl-muted); }
+
+.aptis-writing-live-ai-report { display: grid; gap: 0.75rem; margin-top: 0.9rem; padding: 0.9rem; border: 1px solid #5b78a1; border-radius: 11px; background: #0b1c35; text-align: left; }
+.aptis-writing-live-ai-report > header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; }
+.aptis-writing-live-ai-report > header div { display: grid; gap: 0.15rem; }
+.aptis-writing-live-ai-report > header small { color: #92bdff; font-size: 0.72rem; font-weight: 850; letter-spacing: 0.08em; text-transform: uppercase; }
+.aptis-writing-live-ai-report > header strong { color: var(--awl-text); }
+.aptis-writing-live-ai-report > header span { padding: 0.3rem 0.48rem; border-radius: 999px; background: var(--awl-surface-soft); color: var(--awl-muted); font-size: 0.7rem; font-weight: 800; }
+.aptis-writing-live-ai-report p { margin: 0; color: var(--awl-text); line-height: 1.5; }
+.aptis-writing-live-ai-report p > strong { color: #9fc4f7; }
+.aptis-writing-live-ai-overview { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; }
+.aptis-writing-live-ai-overview > p { padding: 0.65rem; border-radius: 8px; background: var(--awl-surface-soft); }
+.aptis-writing-live-ai-answers { display: grid; gap: 0.65rem; }
+.aptis-writing-live-ai-answers > article,
+.aptis-writing-live-ai-email { display: grid; gap: 0.45rem; padding: 0.75rem; border-radius: 9px; background: var(--awl-surface-soft); }
+.aptis-writing-live-ai-email h4 { margin: 0; color: #9fc4f7; }
+.aptis-writing-live-ai-list > strong,
+.aptis-writing-live-ai-fixes > strong { color: #9fc4f7; }
+.aptis-writing-live-ai-list ul,
+.aptis-writing-live-ai-fixes ul { margin: 0.35rem 0 0; padding-left: 1.2rem; color: var(--awl-text); }
+.aptis-writing-live-ai-list li,
+.aptis-writing-live-ai-fixes li { margin: 0.3rem 0; line-height: 1.45; }
+.aptis-writing-live-ai-fixes li > span { text-decoration: line-through; text-decoration-color: #dd8a8a; }
+.aptis-writing-live-ai-fixes li > em { display: block; margin-top: 0.15rem; color: var(--awl-muted); font-size: 0.8rem; }
+.aptis-writing-live-ai-improved { padding: 0.65rem; border-left: 3px solid var(--awl-accent); border-radius: 0 8px 8px 0; background: rgba(8, 24, 47, 0.45); }
+.aptis-writing-live-ai-improved > strong { color: #9fc4f7; }
+.aptis-writing-live-ai-improved p { margin-top: 0.3rem; white-space: pre-wrap; }
+.aptis-writing-live-ai-report blockquote { margin: 0; padding: 0.65rem 0.75rem; border-left: 3px solid #8fe0a8; color: var(--awl-text); }
+.aptis-writing-live-ai-report .aptis-writing-live-ai-note { color: var(--awl-muted); font-size: 0.78rem; }
+.aptis-writing-live-finished-grid { width: 100%; margin-top: 0.5rem; text-align: left; }
+.aptis-writing-live-finished .aptis-writing-live-teacher-actions { justify-content: center; margin-top: 0.8rem; }
+
+:root[data-theme="light"] .aptis-writing-live-page {
+  --awl-bg: #f3f7fc;
+  --awl-surface: #ffffff;
+  --awl-surface-soft: #edf3fa;
+  --awl-border: #b4c8e1;
+  --awl-text: #172943;
+  --awl-muted: #586a82;
+  --awl-accent: #d99524;
+}
+:root[data-theme="light"] .aptis-writing-live-source,
+:root[data-theme="light"] .aptis-writing-live-field textarea { background: #f8fbff; }
+:root[data-theme="light"] .aptis-writing-live-ai-report { background: #f7faff; }
+
+@media (max-width: 760px) {
+  .aptis-writing-live-lobby,
+  .aptis-writing-live-review-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 560px) {
+  .aptis-writing-live-header,
+  .aptis-writing-live-field > span { align-items: flex-start; flex-direction: column; }
+  .aptis-writing-live-header > span { align-self: flex-start; }
+  .aptis-writing-live-teacher-actions { display: grid; grid-template-columns: 1fr; }
+  .aptis-writing-live-ai-overview { grid-template-columns: 1fr; }
+}

@@ -50,6 +50,19 @@ import WritingPart3 from "./components/writing/WritingPart3.jsx";
 import WritingPart4Guide from "./components/writing/WritingPart4Guide";
 import WritingPart4Emails from "./components/writing/WritingPart4Emails";
 import WritingPart4RegisterGuide from "./components/writing/WritingPart4RegisterGuide";
+import WritingPart4RegisterSurgery from "./components/writing/WritingPart4RegisterSurgery.jsx";
+import AptisWritingLiveHost from "./components/writing/AptisWritingLiveHost.jsx";
+import AptisWritingLivePlayer from "./components/writing/AptisWritingLivePlayer.jsx";
+import AptisRegisterSurgeryLiveHost from "./components/writing/AptisRegisterSurgeryLiveHost.jsx";
+import AptisRegisterSurgeryLivePlayer from "./components/writing/AptisRegisterSurgeryLivePlayer.jsx";
+import Part4ErrorDetective from "./components/writing/Part4ErrorDetective.jsx";
+import AptisPart4ErrorDetectiveLiveHost from "./components/writing/AptisPart4ErrorDetectiveLiveHost.jsx";
+import AptisPart4ErrorDetectiveLivePlayer from "./components/writing/AptisPart4ErrorDetectiveLivePlayer.jsx";
+import {
+  APTIS_WRITING_TEACHER_PART2_TASKS,
+  APTIS_WRITING_TEACHER_PART3_TASKS,
+  APTIS_WRITING_TEACHER_PART4_TASKS,
+} from "./components/writing/data/aptisWritingTeacherTasks.js";
 import AptisWritingMockRoutes from "./components/writing/mockTests/AptisWritingMockRoutes.jsx";
 import ReadingMenu from './components/ReadingMenu';
 import ReadingPartMenu from './reading/ReadingPartMenu.jsx';
@@ -96,6 +109,8 @@ import AdminActivityCharts from "./components/admin/AdminActivityCharts";
 import AdminActivityInsights from "./components/admin/AdminActivityInsights.jsx";
 import AdminAiModelLab from "./components/admin/AdminAiModelLab.jsx";
 import TeacherTools from "./components/teacher/TeacherTools"; // ← Add this
+import TeacherResources from "./components/teacher/TeacherResources.jsx";
+import TeacherWritingResources from "./components/teacher/TeacherWritingResources.jsx";
 import MyStudents from "./components/teacher/MyStudents";
 import TeacherCourseTestPrintableReport from "./components/teacher/TeacherCourseTestPrintableReport.jsx";
 import TeacherStudentProfile from "./components/TeacherStudentProfile";
@@ -352,7 +367,7 @@ function RequireSignedIn({ user, onSignIn, children }) {
       <div className="panel" style={{ marginTop: "1rem" }}>
         <h2 className="title">Registered users only</h2>
         <p className="intro">
-          Please sign in or create an account to use this extra speaking activity.
+          Please sign in or create an account to use this extra classroom resource.
         </p>
         <button className="topbar-btn" type="button" onClick={onSignIn}>
           Sign in / Sign up
@@ -1435,6 +1450,7 @@ return (
           user ? <TeacherTools user={user} /> : <p className="muted">Please log in.</p>
         }
       />
+      <Route path="/teacher-resources" element={<TeacherResources user={user} />} />
       <Route
         path="*"
         element={
@@ -2899,6 +2915,68 @@ return (
 />
 
 <Route
+  path="/teacher/writing"
+  element={<RequireTeacher user={user}><TeacherWritingResources /></RequireTeacher>}
+/>
+
+<Route
+  path="/teacher/writing/part2"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <>
+        <button className="review-btn" onClick={() => navigate("/teacher/writing?part=2")} style={{ marginBottom: "1rem" }}>← Back to Writing resources</button>
+        <WritingPart2
+          user={user}
+          tasks={APTIS_WRITING_TEACHER_PART2_TASKS}
+          heading="Writing – Part 2 Teacher Topics"
+          intro={<>Four extra short-form topics for classroom use. Each task keeps the standard editor, assignment and feedback workflow.</>}
+          routeBasePath="/teacher/writing/part2"
+          showDemoNotice={false}
+        />
+      </>
+    </RequireSignedIn>
+  }
+/>
+
+<Route
+  path="/teacher/writing/part3"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <>
+        <button className="review-btn" onClick={() => navigate("/teacher/writing?part=3")} style={{ marginBottom: "1rem" }}>← Back to Writing resources</button>
+        <WritingPart3
+          user={user}
+          tasks={APTIS_WRITING_TEACHER_PART3_TASKS}
+          heading="Writing – Part 3 Teacher Topics"
+          intro={<>Four extra three-message topics for classroom use. Each task keeps the standard editor, assignment and feedback workflow.</>}
+          routeBasePath="/teacher/writing/part3"
+          showDemoNotice={false}
+        />
+      </>
+    </RequireSignedIn>
+  }
+/>
+
+<Route
+  path="/teacher/writing/part4"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <>
+        <button className="review-btn" onClick={() => navigate("/teacher/writing?part=4")} style={{ marginBottom: "1rem" }}>← Back to Writing resources</button>
+        <WritingPart4Emails
+          user={user}
+          tasks={APTIS_WRITING_TEACHER_PART4_TASKS}
+          heading="Writing – Part 4 Teacher Topics"
+          intro={<>Four extra two-email topics for classroom use. Each task keeps the standard editor, assignment and feedback workflow.</>}
+          routeBasePath="/teacher/writing/part4"
+          showDemoNotice={false}
+        />
+      </>
+    </RequireSignedIn>
+  }
+/>
+
+<Route
   path="/writing/part4-guide"
   element={
     <WritingPart4Guide
@@ -2921,6 +2999,29 @@ return (
       onStartPractice={() => navigate("/writing/part4")}
     />
   }
+/>
+
+<Route
+  path="/writing/part4-register-surgery"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <AptisFullAccessOnly
+        user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        onRequestAccess={() => navigate("/aptis-access")}
+        title="Aptis Trainer access required"
+        description="Part 4 Register Surgery is available to registered users with Aptis Trainer access."
+      >
+        <WritingPart4RegisterSurgery onBack={() => navigate("/writing/parts/4")} />
+      </AptisFullAccessOnly>
+    </RequireSignedIn>
+  }
+/>
+
+<Route
+  path="/writing/part4-error-detective"
+  element={<Part4ErrorDetective onBack={() => navigate("/writing/parts/4")} />}
 />
 
 {/* ——— Profile routes ——— */}
@@ -3002,6 +3103,7 @@ return (
     user ? <TeacherTools user={user} /> : <p className="muted">Please log in.</p>
   }
 />
+<Route path="/teacher-resources" element={<TeacherResources user={user} />} />
 <Route
   path="/admin"
   element={<AdminDashboard user={user} />}
@@ -3046,6 +3148,31 @@ return (
 <Route path="/live/cohesion-challenge/play/:gameId" element={<OteCohesionChallengeLivePlayer />} />
 <Route path="/live/free-things-lesson/host/:gameId" element={<RequireTeacher user={user}><OteFreeThingsLessonLiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/free-things-lesson/play/:gameId" element={<OteFreeThingsLessonLivePlayer />} />
+<Route path="/live/aptis-writing/host/:gameId" element={<RequireTeacher user={user}><AptisWritingLiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/aptis-writing/play/:gameId" element={<AptisWritingLivePlayer />} />
+<Route path="/live/register-surgery/host/:gameId" element={<RequireTeacher user={user}><AptisRegisterSurgeryLiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/error-detective/host/:gameId" element={<RequireTeacher user={user}><AptisPart4ErrorDetectiveLiveHost user={user} /></RequireTeacher>} />
+<Route
+  path="/live/register-surgery/play/:gameId"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <AptisFullAccessOnly
+        user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        onRequestAccess={() => navigate("/aptis-access")}
+        title="Aptis Trainer access required"
+        description="Live Register Surgery is available to registered users with Aptis Trainer access."
+      >
+        <AptisRegisterSurgeryLivePlayer />
+      </AptisFullAccessOnly>
+    </RequireSignedIn>
+  }
+/>
+<Route
+  path="/live/error-detective/play/:gameId"
+  element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><AptisPart4ErrorDetectiveLivePlayer /></RequireSignedIn>}
+/>
 
 <Route
   path="/grammar-sets/:setId"

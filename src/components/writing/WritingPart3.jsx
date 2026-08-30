@@ -182,19 +182,29 @@ export const WRITING_PART3_TASKS = [
     },
 ];
 
-const TASKS = WRITING_PART3_TASKS;
-
-export default function WritingPart3({ user, aptisAccess, onSignIn, onRequireSignIn, allowedTaskIds = [] }) {
+export default function WritingPart3({
+  user,
+  aptisAccess,
+  onSignIn,
+  onRequireSignIn,
+  allowedTaskIds = [],
+  tasks = WRITING_PART3_TASKS,
+  heading = "Writing – Part 3 (Three responses)",
+  intro,
+  routeBasePath = "/writing/part3",
+  showDemoNotice = true,
+}) {
   const [searchParams] = useSearchParams();
+  const taskList = tasks?.length ? tasks : WRITING_PART3_TASKS;
   const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
   const hasTaskAllowlist = allowedTaskSet.size > 0;
   const firstAvailableTaskIndex = useMemo(() => {
     if (!hasTaskAllowlist) return 0;
-    const nextIndex = TASKS.findIndex((task) => allowedTaskSet.has(task.id));
+    const nextIndex = taskList.findIndex((task) => allowedTaskSet.has(task.id));
     return nextIndex >= 0 ? nextIndex : 0;
-  }, [allowedTaskSet, hasTaskAllowlist]);
+  }, [allowedTaskSet, hasTaskAllowlist, taskList]);
   const [taskIndex, setTaskIndex] = useState(0);
-  const current = TASKS[taskIndex] || TASKS[0];
+  const current = taskList[taskIndex] || taskList[0];
 
   // 3 responses — each is { html, text }
   const [answersHTML, setAnswersHTML] = useState(["", "", ""]);
@@ -227,14 +237,14 @@ export default function WritingPart3({ user, aptisAccess, onSignIn, onRequireSig
     const requestedTaskId = searchParams.get("task");
     if (!requestedTaskId) return;
 
-    const nextIdx = TASKS.findIndex((task) => task.id === requestedTaskId);
+    const nextIdx = taskList.findIndex((task) => task.id === requestedTaskId);
     if (nextIdx === -1) return;
-    if (hasTaskAllowlist && !allowedTaskSet.has(TASKS[nextIdx].id)) {
+    if (hasTaskAllowlist && !allowedTaskSet.has(taskList[nextIdx].id)) {
       setTaskIndex(firstAvailableTaskIndex);
       return;
     }
     setTaskIndex(nextIdx);
-  }, [allowedTaskSet, firstAvailableTaskIndex, hasTaskAllowlist, searchParams]);
+  }, [allowedTaskSet, firstAvailableTaskIndex, hasTaskAllowlist, searchParams, taskList]);
 
   useEffect(() => {
     if (hasTaskAllowlist && !allowedTaskSet.has(current.id)) {
@@ -243,7 +253,7 @@ export default function WritingPart3({ user, aptisAccess, onSignIn, onRequireSig
   }, [allowedTaskSet, current.id, firstAvailableTaskIndex, hasTaskAllowlist]);
 
   function handleSelectTask(nextIdx) {
-    if (hasTaskAllowlist && !allowedTaskSet.has(TASKS[nextIdx]?.id)) {
+    if (hasTaskAllowlist && !allowedTaskSet.has(taskList[nextIdx]?.id)) {
       toast("That writing task is included with full access.");
       onRequireSignIn?.();
       return;
@@ -463,7 +473,7 @@ export default function WritingPart3({ user, aptisAccess, onSignIn, onRequireSig
    * RENDER
    * ----------------------------------------------------------- */
 
-  const decorated = decorateTasks(TASKS, { hasTaskAllowlist, allowedTaskSet });
+  const decorated = decorateTasks(taskList, { hasTaskAllowlist, allowedTaskSet });
 
   return (
     <div className="aptis-writing-p3 game-wrapper">
@@ -471,11 +481,9 @@ export default function WritingPart3({ user, aptisAccess, onSignIn, onRequireSig
 
       <header className="header">
         <div>
-          <h2 className="title">Writing – Part 3 (Three responses)</h2>
+          <h2 className="title">{heading}</h2>
           <p className="intro">
-            You are taking part in an online chat. Answer{" "}
-            <strong>three messages</strong>. Write{" "}
-            <strong>30–40 words</strong> each.
+            {intro || <>You are taking part in an online chat. Answer <strong>three messages</strong>. Write <strong>30–40 words</strong> each.</>}
           </p>
         </div>
         <div className="actions">
@@ -489,16 +497,16 @@ export default function WritingPart3({ user, aptisAccess, onSignIn, onRequireSig
             user={user}
             activityId="writing-part-3"
             activityLabel={`Aptis Writing Part 3 — ${current.title}`}
-            routePath={getSitePath(`/writing/part3?task=${encodeURIComponent(current.id)}`)}
+            routePath={getSitePath(`${routeBasePath}?task=${encodeURIComponent(current.id)}`)}
             taskId={current.id}
             taskTitle={current.title}
           />
         </div>
       </header>
 
-      <WritingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+      {showDemoNotice ? <WritingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
         Demo mode includes one Part 3 chat task. The other Part 3 tasks stay visible but require full access.
-      </WritingDemoNotice>
+      </WritingDemoNotice> : null}
 
       <div className="grid">
         {showSummary ? (

@@ -67,9 +67,10 @@ No se envía un campo para SeifHub: todo alumno con `status: "active"` o
 - `aptisTrainer` se controla mediante `access.aptisTrainer`.
 - `ote` se controla mediante `access.ote`.
 - Los accesos automáticos nuevos comienzan 14 días antes de `courseStartDate`.
-- La fecha de caducidad es `courseEndDate + 14 días`.
+- La caducidad normal es `courseEndDate + 14 días`; una cancelación concede 14 días
+  desde la primera fecha de cancelación.
 - `completed` conserva los accesos seleccionados hasta esa misma fecha de caducidad.
-- `cancelled` desactiva las tres plataformas inmediatamente.
+- `cancelled` finaliza los accesos activos 14 días después de la primera cancelación.
 - Con `active` o `completed` deben enviarse siempre los dos booleanos de `access`.
 - Cambiar un booleano de `true` a `false` retira el acceso gestionado por el sistema
   escolar.
@@ -81,8 +82,8 @@ No se envía un campo para SeifHub: todo alumno con `status: "active"` o
 - Los accesos marcados como modificación manual en el panel de las plataformas no se
   eliminan ni acortan con sincronizaciones `active` o `completed`. El sistema escolar
   puede ampliar la fecha final de un acceso manual con duración, pero no puede
-  desactivarlo ni reactivar una retirada manual. Una petición `cancelled` sí lo
-  desactiva.
+  desactivarlo ni reactivar una retirada manual. Una petición `cancelled` lo limita
+  a la fecha final del periodo de gracia.
 
 ## Altas, alumnos existentes y renovaciones
 

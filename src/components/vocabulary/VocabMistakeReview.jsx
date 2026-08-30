@@ -5,69 +5,37 @@ import {
   fetchUnresolvedVocabMistakes,
   resolveVocabMistake,
 } from "../../firebase";
-import { getHubVocabActivity } from "../../data/hubVocabularyActivities";
 import { TOPIC_DATA } from "./data/vocabTopics";
 import {
-  canonicalizeAnswer,
-  normalizeAnswers,
-} from "./utils/vocabAnswers";
+  findHubSourceContext,
+  getHubReviewChoice,
+  getHubReviewInstruction,
+  getHubReviewPrompt,
+  getReviewAcceptedAnswers,
+  isAcceptedReviewAnswer,
+} from "./utils/hubVocabMistakeReview.js";
 
-const ENTRY_ALIAS_ACTIVITY_TYPES = new Set([
-  "matching",
-  "flag-match",
-  "quick-choice",
-  "type-answer",
-  "image-hotspot-match",
-  "image-hotspot-type-answer",
-  "sentence-gap-choice",
-  "sentence-gap-type-answer",
-  "clock-choice",
-  "clock-type-answer",
-]);
+function collapseDuplicateHubMistakes(items = []) {
+  const bySourceItem = new Map();
+  const output = [];
 
-const GAP_ANSWER_ACTIVITY_TYPES = new Set([
-  "cue-gap-type-answer",
-  "gap-choice",
-  "phrase-gap-fill",
-]);
+  items.forEach((item) => {
+    if (item?.source !== "hub-textbook" || !item.topic || !item.setId || !item.itemId) {
+      output.push({ ...item, mistakeIds: [item.id] });
+      return;
+    }
+    const key = `${item.topic}:${item.setId}:${item.itemId}`;
+    const existing = bySourceItem.get(key);
+    if (existing) {
+      existing.mistakeIds.push(item.id);
+      return;
+    }
+    const merged = { ...item, mistakeIds: [item.id] };
+    bySourceItem.set(key, merged);
+    output.push(merged);
+  });
 
-function withoutInitialArticle(value) {
-  return String(value || "").trim().replace(/^(?:a|an|the)\s+/i, "");
-}
-
-function promptRevealsAnswer(prompt, correctAnswer) {
-  const promptKey = canonicalizeAnswer(withoutInitialArticle(prompt));
-  if (!promptKey) return false;
-
-  return normalizeAnswers(correctAnswer).some(
-    (answer) => canonicalizeAnswer(withoutInitialArticle(answer)) === promptKey
-  );
-}
-
-function findHubSourceContext(item) {
-  if (item?.source !== "hub-textbook" || !item.topic || !item.setId) return null;
-  const result = getHubVocabActivity(item.topic, item.setId);
-  if (!result?.theme || !result.activity) return null;
-
-  const preferredEntries = result.activity.dataKey
-    ? result.theme[result.activity.dataKey]
-    : result.theme.entries;
-  const preferredMatch = Array.isArray(preferredEntries)
-    ? preferredEntries.find((entry) => entry?.id === item.itemId)
-    : null;
-  if (preferredMatch) {
-    return {
-      ...result,
-      entries: preferredEntries,
-      entry: preferredMatch,
-    };
-  }
-
-  const entry = Object.values(result.theme)
-    .filter(Array.isArray)
-    .flat()
-    .find((entry) => entry?.id === item.itemId) || null;
-  return entry ? { ...result, entries: preferredEntries || [], entry } : null;
+  return output;
 }
 
 function getHotspotReviewVisual(item, sourceContext) {
@@ -95,9 +63,9 @@ function getHotspotReviewVisual(item, sourceContext) {
     ? roundEntries.findIndex((candidate) => candidate.id === entry.id) + 1
     : 0;
 
-  const sceneImage = item?.sceneImage || activity?.sceneImage || theme?.sceneImage || "";
-  const hotspotX = Number(item?.hotspotX ?? entry?.hotspotX);
-  const hotspotY = Number(item?.hotspotY ?? entry?.hotspotY);
+  const sceneImage = activity?.sceneImage || theme?.sceneImage || item?.sceneImage || "";
+  const hotspotX = Number(entry?.hotspotX ?? item?.hotspotX);
+  const hotspotY = Number(entry?.hotspotY ?? item?.hotspotY);
   if (!sceneImage || !Number.isFinite(hotspotX) || !Number.isFinite(hotspotY)) return null;
 
   return {
@@ -105,7 +73,7 @@ function getHotspotReviewVisual(item, sourceContext) {
     hotspotX,
     hotspotY,
     hotspotNumber: Number(item?.hotspotNumber) || roundNumber || Number(entry?.hotspotNumber) || 1,
-    viewBox: item?.hotspotViewBox || round?.viewBox || null,
+    viewBox: round?.viewBox || item?.hotspotViewBox || null,
   };
 }
 
@@ -147,29 +115,87 @@ function HotspotReviewClue({ visual }) {
   );
 }
 
-function getReviewAcceptedAnswers(item, sourceEntry) {
-  const savedAnswers = Array.isArray(item?.acceptedAnswers)
-    ? item.acceptedAnswers
-    : item?.acceptedAnswers
-      ? [item.acceptedAnswers]
-      : [];
-  const sourceAnswers = ENTRY_ALIAS_ACTIVITY_TYPES.has(item?.activityType)
-    ? sourceEntry?.acceptedAnswers || []
-    : GAP_ANSWER_ACTIVITY_TYPES.has(item?.activityType)
-      ? sourceEntry?.gapAnswers || []
-      : [];
+function ClockReviewClue({ hour, minute }) {
+  const safeHour = Number(hour) || 0;
+  const safeMinute = Number(minute) || 0;
+  const hourAngle = ((safeHour % 12) * 30 + safeMinute * 0.5) * (Math.PI / 180);
+  const minuteAngle = safeMinute * 6 * (Math.PI / 180);
+  const handEnd = (angle, length) => ({
+    x: 100 + Math.sin(angle) * length,
+    y: 100 - Math.cos(angle) * length,
+  });
+  const hourEnd = handEnd(hourAngle, 48);
+  const minuteEnd = handEnd(minuteAngle, 70);
 
-  return [...new Set(
-    [item?.correctAnswer, ...savedAnswers, ...sourceAnswers]
-      .flatMap((answer) => normalizeAnswers(answer))
-      .filter(Boolean)
-  )];
+  return (
+    <div className="review-clock" role="img" aria-label="Analogue clock">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <circle className="clock-face" cx="100" cy="100" r="92" />
+        {Array.from({ length: 60 }, (_, index) => {
+          const angle = index * 6 * (Math.PI / 180);
+          const isHour = index % 5 === 0;
+          const outer = handEnd(angle, 84);
+          const inner = handEnd(angle, isHour ? 72 : 79);
+          return (
+            <line
+              key={index}
+              className={isHour ? "clock-mark hour" : "clock-mark"}
+              x1={inner.x}
+              y1={inner.y}
+              x2={outer.x}
+              y2={outer.y}
+            />
+          );
+        })}
+        <line className="clock-hand hour" x1="100" y1="100" x2={hourEnd.x} y2={hourEnd.y} />
+        <line className="clock-hand minute" x1="100" y1="100" x2={minuteEnd.x} y2={minuteEnd.y} />
+        <circle className="clock-pin" cx="100" cy="100" r="5" />
+      </svg>
+    </div>
+  );
 }
 
-function isAcceptedReviewAnswer(userAnswer, acceptedAnswers) {
-  const user = canonicalizeAnswer(userAnswer);
-  return Boolean(user) && acceptedAnswers.some(
-    (answer) => canonicalizeAnswer(answer) === user
+function ImageReviewClue({ sources, focusArea = null }) {
+  const availableSources = [...new Set(
+    (Array.isArray(sources) ? sources : [sources]).filter(Boolean)
+  )];
+  const sourceKey = availableSources.join("|");
+  const [sourceIndex, setSourceIndex] = useState(0);
+
+  useEffect(() => {
+    setSourceIndex(0);
+  }, [sourceKey]);
+
+  const src = availableSources[sourceIndex] || "";
+  if (!src) return null;
+  const image = (
+    <img
+      src={src}
+      alt=""
+      className="clue-image"
+      onError={() => setSourceIndex((currentIndex) => currentIndex + 1)}
+    />
+  );
+  if (!focusArea) return <div className="clue-image-wrapper">{image}</div>;
+
+  return (
+    <div
+      className="clue-image-wrapper has-focus"
+      role="img"
+      aria-label={focusArea.label || "The relevant part of the image is highlighted."}
+    >
+      {image}
+      <span
+        className="review-image-focus-marker"
+        style={{
+          left: `${focusArea.x}%`,
+          top: `${focusArea.y}%`,
+          width: `${focusArea.width}%`,
+          height: `${focusArea.height}%`,
+        }}
+        aria-hidden="true"
+      />
+    </div>
   );
 }
 
@@ -179,6 +205,7 @@ export default function VocabMistakeReview({ onBack }) {
 
   const [index, setIndex] = useState(0);
   const [typedAnswer, setTypedAnswer] = useState("");
+  const [selectedChoice, setSelectedChoice] = useState("");
   const [showFeedback, setShowFeedback] = useState(false);
   const [isCorrect, setIsCorrect] = useState(false);
 
@@ -197,7 +224,7 @@ export default function VocabMistakeReview({ onBack }) {
       try {
         const data = await fetchUnresolvedVocabMistakes(50, uid);
         if (!alive) return;
-        setItems(data);
+        setItems(collapseDuplicateHubMistakes(data));
       } catch (err) {
         console.error("[VocabMistakeReview] load failed", err);
       } finally {
@@ -253,19 +280,27 @@ export default function VocabMistakeReview({ onBack }) {
   const sourceContext = findHubSourceContext(current);
   const sourceEntry = sourceContext?.entry || null;
   const hotspotVisual = getHotspotReviewVisual(current, sourceContext);
-  const savedReviewPrompt =
-    current.source === "hub-textbook" && promptRevealsAnswer(current.sentence, current.correctAnswer)
-      ? ""
-      : current.sentence;
-  const reviewPrompt = hotspotVisual
-    ? `Type the word for number ${hotspotVisual.hotspotNumber}.`
-    : savedReviewPrompt;
-  const reviewImage = current.image || sourceEntry?.image || sourceEntry?.flag4x3 || "";
-  const reviewColor = sourceEntry?.colorHex || "";
-  const reviewVisualText = !reviewPrompt && !reviewImage && !reviewColor
-    ? sourceEntry?.visualLabel || sourceEntry?.numeral || ""
+  const choiceReview = getHubReviewChoice(current, sourceContext);
+  const reviewPrompt = current.source === "hub-textbook"
+    ? getHubReviewPrompt(current, sourceContext)
+    : current.sentence;
+  const reviewImageSources = [sourceEntry?.image, sourceEntry?.flag4x3, current.image].filter(Boolean);
+  const reviewFocusArea = sourceEntry?.focusArea || current.focusArea || null;
+  const reviewColor = sourceEntry?.colorHex || current.colorHex || "";
+  const sourceVisualText = sourceEntry?.visualLabel || sourceEntry?.numeral || current.visualLabel || current.numeral || "";
+  const reviewVisualText = !reviewImageSources.length && !reviewColor && sourceVisualText !== reviewPrompt
+    ? sourceVisualText
     : "";
-  const hasHubVisualClue = Boolean(hotspotVisual || reviewImage || reviewColor || reviewVisualText);
+  const activityType = current.activityType || sourceContext?.activity?.type || "";
+  const clockHour = sourceEntry?.hour ?? current.hour;
+  const clockMinute = sourceEntry?.minute ?? current.minute;
+  const hasClock = ["clock-choice", "clock-type-answer"].includes(activityType)
+    && Number.isFinite(Number(clockHour))
+    && Number.isFinite(Number(clockMinute));
+  const hasHubVisualClue = Boolean(hotspotVisual || hasClock || reviewImageSources.length || reviewColor || reviewVisualText);
+  const reviewInstruction = current.source === "hub-textbook"
+    ? getHubReviewInstruction(current, sourceContext, hasHubVisualClue)
+    : "Type the missing word or phrase to complete each sentence.";
 
   const acceptable = getReviewAcceptedAnswers(current, sourceEntry);
 
@@ -290,20 +325,28 @@ export default function VocabMistakeReview({ onBack }) {
     }
   }
 
-  function checkAnswer() {
-    const ok = isAcceptedReviewAnswer(typedAnswer, acceptable);
+  function checkAnswer(answerValue = typedAnswer) {
+    const selectedOption = choiceReview?.options.find((option) => option.label === answerValue);
+    const ok = choiceReview
+      ? Boolean(selectedOption?.correct)
+      : isAcceptedReviewAnswer(answerValue, acceptable);
+    setSelectedChoice(choiceReview ? answerValue : "");
     setIsCorrect(ok);
     setShowFeedback(true);
 
     if (ok) {
-      resolveVocabMistake(current.id).catch((err) =>
-        console.error("[VocabMistakeReview] resolve failed", err)
-      );
+      Promise.all((current.mistakeIds || [current.id]).map((mistakeId) => (
+        resolveVocabMistake(mistakeId)
+      ))).catch((err) => console.error("[VocabMistakeReview] resolve failed", err));
 
       setTimeout(() => {
-        setItems((prev) => prev.filter((it) => it.id !== current.id));
-        setIndex((prev) => Math.min(prev, items.length - 2));
+        setItems((prev) => {
+          const remaining = prev.filter((it) => it.id !== current.id);
+          setIndex((previousIndex) => remaining.length ? Math.min(previousIndex, remaining.length - 1) : 0);
+          return remaining;
+        });
         setTypedAnswer("");
+        setSelectedChoice("");
         setShowFeedback(false);
       }, 1200);
     }
@@ -317,6 +360,8 @@ export default function VocabMistakeReview({ onBack }) {
       setIndex(0);
     }
     setTypedAnswer("");
+    setSelectedChoice("");
+    setIsCorrect(false);
     setShowFeedback(false);
   }
 
@@ -330,11 +375,7 @@ export default function VocabMistakeReview({ onBack }) {
       </header>
 
       <div className="card review-phase">
-        <p className="phase-intro">
-          {hasHubVisualClue
-            ? "Look at the clue and type the correct word or phrase."
-            : "Type the missing word or phrase to complete each sentence."}
-        </p>
+        <p className="phase-intro">{reviewInstruction}</p>
 
         <p className="muted small">
           Item {index + 1} of {items.length}
@@ -352,15 +393,13 @@ export default function VocabMistakeReview({ onBack }) {
           <div className="clue-area review-hotspot-clue">
             <HotspotReviewClue visual={hotspotVisual} />
           </div>
-        ) : reviewImage ? (
+        ) : hasClock ? (
           <div className="clue-area">
-            <div className="clue-image-wrapper">
-              <img
-                src={reviewImage}
-                alt=""
-                className="clue-image"
-              />
-            </div>
+            <ClockReviewClue hour={clockHour} minute={clockMinute} />
+          </div>
+        ) : reviewImageSources.length ? (
+          <div className="clue-area">
+            <ImageReviewClue sources={reviewImageSources} focusArea={reviewFocusArea} />
           </div>
         ) : reviewColor ? (
           <div className="clue-area">
@@ -378,42 +417,62 @@ export default function VocabMistakeReview({ onBack }) {
           </div>
         ) : cluePair && cluePair.image ? (
           <div className="clue-area">
-            <div className="clue-image-wrapper">
-              <img
-                src={cluePair.image}
-                alt={cluePair.term}
-                className="clue-image"
-              />
-            </div>
+            <ImageReviewClue sources={[cluePair.image]} />
           </div>
         ) : null}
 
-        <input
-          ref={inputRef}
-          type="text"
-          className="answer-input"
-          value={typedAnswer}
-          onChange={(e) => {
-            if (showFeedback) return;
-            setTypedAnswer(e.target.value);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              if (showFeedback) {
-                next();
-              } else {
-                checkAnswer();
-              }
-            }
-          }}
-          placeholder="Type your answer..."
-        />
+        {choiceReview ? (
+          <div className="review-choice-grid" role="group" aria-label="Answer options">
+            {choiceReview.options.map((option) => (
+              <button
+                key={option.label}
+                type="button"
+                disabled={showFeedback}
+                className={
+                  showFeedback && option.correct
+                    ? "correct"
+                    : showFeedback && selectedChoice === option.label
+                      ? "wrong"
+                      : showFeedback
+                        ? "dimmed"
+                        : ""
+                }
+                onClick={() => checkAnswer(option.label)}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <>
+            <input
+              ref={inputRef}
+              type="text"
+              className="answer-input"
+              value={typedAnswer}
+              onChange={(e) => {
+                if (showFeedback) return;
+                setTypedAnswer(e.target.value);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  if (showFeedback) {
+                    next();
+                  } else {
+                    checkAnswer();
+                  }
+                }
+              }}
+              placeholder="Type your answer..."
+            />
 
-        {!showFeedback && (
-          <button className="review-btn" onClick={checkAnswer}>
-            Check
-          </button>
+            {!showFeedback && (
+              <button className="review-btn" onClick={() => checkAnswer()}>
+                Check
+              </button>
+            )}
+          </>
         )}
 
         {showFeedback && (
@@ -436,11 +495,13 @@ export default function VocabMistakeReview({ onBack }) {
                 )}
               </>
             )}
-            <div className="nav-btns">
-              <button className="review-btn" onClick={next}>
-                Next →
-              </button>
-            </div>
+            {!isCorrect ? (
+              <div className="nav-btns">
+                <button className="review-btn" onClick={next}>
+                  Next →
+                </button>
+              </div>
+            ) : null}
           </div>
         )}
       </div>
@@ -555,13 +616,27 @@ export default function VocabMistakeReview({ onBack }) {
         .clue-image-wrapper {
           display: flex;
           justify-content: center;
+          max-width: min(100%, 420px);
+          position: relative;
         }
 
         .clue-image {
-          width: 72px;
-          height: 72px;
+          width: auto;
+          height: auto;
+          max-width: 100%;
+          max-height: 280px;
           object-fit: contain;
           filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.45));
+          border-radius: 12px;
+        }
+
+        .review-image-focus-marker {
+          position: absolute;
+          border: 3px solid #72df9b;
+          border-radius: 12px;
+          box-shadow: 0 0 0 5px rgba(114, 223, 155, 0.24), 0 6px 18px rgba(0, 0, 0, 0.35);
+          transform: translate(-50%, -50%);
+          pointer-events: none;
         }
 
         .review-hotspot-clue {
@@ -603,6 +678,84 @@ export default function VocabMistakeReview({ onBack }) {
           z-index: 2;
         }
 
+        .review-clock {
+          width: min(220px, 70vw);
+          padding: 0.65rem;
+          border: 1px solid #3f5f96;
+          border-radius: 50%;
+          background: #f8fbff;
+          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+        }
+
+        .review-clock svg {
+          display: block;
+          width: 100%;
+        }
+
+        .review-clock .clock-face {
+          fill: #f8fbff;
+          stroke: #1c3154;
+          stroke-width: 4;
+        }
+
+        .review-clock .clock-mark {
+          stroke: #6d7d97;
+          stroke-width: 1.5;
+        }
+
+        .review-clock .clock-mark.hour {
+          stroke: #1c3154;
+          stroke-width: 3;
+        }
+
+        .review-clock .clock-hand {
+          stroke: #14233d;
+          stroke-linecap: round;
+        }
+
+        .review-clock .clock-hand.hour { stroke-width: 7; }
+        .review-clock .clock-hand.minute { stroke-width: 4; }
+        .review-clock .clock-pin { fill: #4a79d8; }
+
+        .review-choice-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 0.7rem;
+          margin: 0.9rem 0 1rem;
+        }
+
+        .review-choice-grid button {
+          min-height: 48px;
+          padding: 0.7rem 0.8rem;
+          border: 1px solid #3f5f96;
+          border-radius: 10px;
+          background: #101b32;
+          color: #e6f0ff;
+          font: inherit;
+          font-weight: 700;
+          cursor: pointer;
+          transition: transform 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+        }
+
+        .review-choice-grid button:not(:disabled):hover {
+          transform: translateY(-1px);
+          border-color: #6289ff;
+        }
+
+        .review-choice-grid button.correct {
+          border-color: #6ddc88;
+          background: rgba(38, 117, 67, 0.42);
+        }
+
+        .review-choice-grid button.wrong {
+          border-color: #ff6b6b;
+          background: rgba(145, 42, 51, 0.42);
+        }
+
+        .review-choice-grid button.dimmed {
+          opacity: 0.5;
+        }
+
         .clue-colour,
         .clue-text {
           width: 72px;
@@ -623,6 +776,12 @@ export default function VocabMistakeReview({ onBack }) {
         .muted.small {
           font-size: 0.8rem;
           color: #a9b7d1;
+        }
+
+        @media (max-width: 560px) {
+          .review-choice-grid {
+            grid-template-columns: 1fr;
+          }
         }
       `}</style>
     </div>

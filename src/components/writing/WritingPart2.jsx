@@ -74,19 +74,29 @@ export const WRITING_PART2_TASKS = [
   },
 ];
 
-const TASKS = WRITING_PART2_TASKS;
-
-export default function WritingPart2({ user, aptisAccess, onSignIn, onRequireSignIn, allowedTaskIds = [] }) {
+export default function WritingPart2({
+  user,
+  aptisAccess,
+  onSignIn,
+  onRequireSignIn,
+  allowedTaskIds = [],
+  tasks = WRITING_PART2_TASKS,
+  heading = "Writing – Part 2 (Short form)",
+  intro,
+  routeBasePath = "/writing/part2",
+  showDemoNotice = true,
+}) {
   const [searchParams] = useSearchParams();
+  const taskList = tasks?.length ? tasks : WRITING_PART2_TASKS;
   const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
   const hasTaskAllowlist = allowedTaskSet.size > 0;
   const firstAvailableTaskIndex = useMemo(() => {
     if (!hasTaskAllowlist) return 0;
-    const nextIndex = TASKS.findIndex((task) => allowedTaskSet.has(task.id));
+    const nextIndex = taskList.findIndex((task) => allowedTaskSet.has(task.id));
     return nextIndex >= 0 ? nextIndex : 0;
-  }, [allowedTaskSet, hasTaskAllowlist]);
+  }, [allowedTaskSet, hasTaskAllowlist, taskList]);
   const [taskIndex, setTaskIndex] = useState(0);
-  const current = TASKS[taskIndex] || TASKS[0];
+  const current = taskList[taskIndex] || taskList[0];
 
   const [answerHTML, setAnswerHTML] = useState("");
   const [answerText, setAnswerText] = useState("");
@@ -108,22 +118,22 @@ export default function WritingPart2({ user, aptisAccess, onSignIn, onRequireSig
 
   // decorate tasks with lock info + numbered titles
   const decoratedTasks = useMemo(
-    () => decorateTasks(TASKS, { hasTaskAllowlist, allowedTaskSet }),
-    [allowedTaskSet, hasTaskAllowlist]
+    () => decorateTasks(taskList, { hasTaskAllowlist, allowedTaskSet }),
+    [allowedTaskSet, hasTaskAllowlist, taskList]
   );
 
   useEffect(() => {
     const requestedTaskId = searchParams.get("task");
     if (!requestedTaskId) return;
 
-    const nextIdx = TASKS.findIndex((task) => task.id === requestedTaskId);
+    const nextIdx = taskList.findIndex((task) => task.id === requestedTaskId);
     if (nextIdx === -1) return;
-    if (hasTaskAllowlist && !allowedTaskSet.has(TASKS[nextIdx].id)) {
+    if (hasTaskAllowlist && !allowedTaskSet.has(taskList[nextIdx].id)) {
       setTaskIndex(firstAvailableTaskIndex);
       return;
     }
     setTaskIndex(nextIdx);
-  }, [allowedTaskSet, firstAvailableTaskIndex, hasTaskAllowlist, searchParams]);
+  }, [allowedTaskSet, firstAvailableTaskIndex, hasTaskAllowlist, searchParams, taskList]);
 
   useEffect(() => {
     if (hasTaskAllowlist && !allowedTaskSet.has(current.id)) {
@@ -141,7 +151,7 @@ export default function WritingPart2({ user, aptisAccess, onSignIn, onRequireSig
   }, [current.id]);
 
   function handleSelectTask(nextIdx) {
-    if (hasTaskAllowlist && !allowedTaskSet.has(TASKS[nextIdx]?.id)) {
+    if (hasTaskAllowlist && !allowedTaskSet.has(taskList[nextIdx]?.id)) {
       toast("That writing task is included with full access.");
       onRequireSignIn?.();
       return;
@@ -336,11 +346,9 @@ export default function WritingPart2({ user, aptisAccess, onSignIn, onRequireSig
       <StyleScope />
       <header className="header">
         <div>
-          <h2 className="title">Writing – Part 2 (Short form)</h2>
+          <h2 className="title">{heading}</h2>
           <p className="intro">
-            Question 2 of 4. You are a new member of a club or website. Write
-            one short paragraph of <strong>20–30 words</strong> in full
-            sentences. Recommended time: <strong>7 minutes</strong>.
+            {intro || <>Question 2 of 4. You are a new member of a club or website. Write one short paragraph of <strong>20–30 words</strong> in full sentences. Recommended time: <strong>7 minutes</strong>.</>}
           </p>
         </div>
         <div className="actions">
@@ -354,16 +362,16 @@ export default function WritingPart2({ user, aptisAccess, onSignIn, onRequireSig
             user={user}
             activityId="writing-part-2"
             activityLabel={`Aptis Writing Part 2 — ${current.title}`}
-            routePath={getSitePath(`/writing/part2?task=${encodeURIComponent(current.id)}`)}
+            routePath={getSitePath(`${routeBasePath}?task=${encodeURIComponent(current.id)}`)}
             taskId={current.id}
             taskTitle={current.title}
           />
         </div>
       </header>
 
-      <WritingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+      {showDemoNotice ? <WritingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
         Demo mode includes one Part 2 short-form task. The other Part 2 tasks are visible in the picker but require full access.
-      </WritingDemoNotice>
+      </WritingDemoNotice> : null}
 
       <div className="grid">
         {showSummary ? (

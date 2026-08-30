@@ -593,6 +593,8 @@ function MatchingMode({
       onMistake?.(selectedLeft, {
         userAnswer: entry.matchAnswer || getPrimaryLabel(entry, theme.id),
         correctAnswer: selectedLeft.matchAnswer || getPrimaryLabel(selectedLeft, theme.id),
+        reviewOptions: rightItems.map((item) => item.matchAnswer || getPrimaryLabel(item, theme.id)),
+        reviewCorrectOption: selectedLeft.matchAnswer || getPrimaryLabel(selectedLeft, theme.id),
       });
       setStatus("Not that one. Try again.");
     }
@@ -802,6 +804,8 @@ function ChoiceMode({
         userAnswer: option.label,
         correctAnswer: option.correct ? option.label : getDisplayAnswer(entry, theme.id, mode),
         answerMode: mode,
+        reviewOptions: options.map((item) => item.label),
+        reviewCorrectOption: options.find((item) => item.correct)?.label || getDisplayAnswer(entry, theme.id, mode),
       });
       setChoiceStatus("wrong");
     }
@@ -961,6 +965,8 @@ function SpeakerChoiceMode({ theme, items, onComplete, onMistake }) {
       onMistake?.(entry, {
         userAnswer: optionValue === "teacher" ? "The teacher says it" : "You say it",
         correctAnswer: getDisplayAnswer(entry, theme.id),
+        reviewOptions: ["The teacher says it", "You say it"],
+        reviewCorrectOption: getDisplayAnswer(entry, theme.id),
       });
       setChoiceStatus("wrong");
     }
@@ -1539,6 +1545,8 @@ function ImageHotspotMatchMode({ theme, items, activity, onComplete, onMistake }
     onMistake?.(selectedHotspot, {
       userAnswer: entry.term,
       correctAnswer: selectedHotspot.term,
+      reviewOptions: wordItems.map((item) => item.term),
+      reviewCorrectOption: selectedHotspot.term,
       mistakePrompt: `Number ${numberById[selectedHotspot.id] || selectedHotspot.hotspotNumber}`,
       hotspotNumber: numberById[selectedHotspot.id] || selectedHotspot.hotspotNumber,
       hotspotViewBox: activeRound.viewBox || null,
@@ -1849,6 +1857,8 @@ function ArticleChoiceMode({ theme, items, onComplete, onMistake }) {
       onMistake?.(entry, {
         userAnswer: `${option} ${entry.term}`,
         correctAnswer: getDisplayAnswer(entry, theme.id),
+        reviewOptions: ["a", "an"],
+        reviewCorrectOption: entry.article,
       });
       setChoiceStatus("wrong");
     }
@@ -2012,6 +2022,8 @@ function CategorySortMode({
       userAnswer: category.label,
       correctAnswer: correctCategory?.label || expectedId,
       answerMode: "category",
+      reviewOptions: categories.map((item) => item.label),
+      reviewCorrectOption: correctCategory?.label || expectedId,
     });
     setFeedback({ status: "wrong", selectedId: category.id, correctId: expectedId });
   }
@@ -2217,6 +2229,12 @@ function StructuredQuestionMode({
       userAnswer,
       correctAnswer: getStructuredAnswer(entry),
       answerMode: promptType === "clock" ? "clock" : "sentence-gap",
+      ...(inputMode === "choice" ? {
+        reviewOptions: options,
+        reviewCorrectOption: options.find((option) => (
+          getStructuredAcceptedAnswers(entry).includes(normalizeAnswer(option))
+        )) || getStructuredAnswer(entry),
+      } : {}),
     });
   }
 
@@ -2410,6 +2428,8 @@ function SequenceOrderMode({ theme, activity, items, onComplete, onMistake }) {
         userAnswer: `Position ${currentPosition + 1}`,
         correctAnswer: `Position ${expectedPosition + 1}`,
         answerMode: "sequence",
+        reviewOptions: correctItems.map((_, index) => `Position ${index + 1}`),
+        reviewCorrectOption: `Position ${expectedPosition + 1}`,
       });
       nextReported.add(entry.id);
     });
@@ -2710,12 +2730,20 @@ export default function HubVocabularyActivityRunner() {
         correctAnswer: details.correctAnswer || getDisplayAnswer(entry, theme.id, details.answerMode),
         acceptedAnswers: details.acceptedAnswers || [],
         userAnswer: details.userAnswer || "",
+        reviewOptions: Array.isArray(details.reviewOptions) ? details.reviewOptions.filter(Boolean) : [],
+        reviewCorrectOption: details.reviewCorrectOption || "",
         source: "hub-textbook",
         itemId: entry.id || "",
         themeTitle: theme.title,
         activityTitle: activity.title,
         activityType: activity.type,
         image: entry.image || entry.flag4x3 || "",
+        focusArea: entry.focusArea || null,
+        colorHex: entry.colorHex || "",
+        visualLabel: entry.visualLabel || "",
+        numeral: entry.numeral || "",
+        hour: Number.isFinite(Number(entry.hour)) ? Number(entry.hour) : null,
+        minute: Number.isFinite(Number(entry.minute)) ? Number(entry.minute) : null,
         ...(isHotspotActivity ? {
           sceneImage: details.sceneImage || activity.sceneImage || theme.sceneImage || "",
           hotspotX: entry.hotspotX,
