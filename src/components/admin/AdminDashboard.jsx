@@ -9,7 +9,7 @@ import {
   listAttemptsForCourseTestSession,
   saveCourseTestAttemptReview,
 } from "../../firebase";
-import { collection, getDoc, getDocs, updateDoc, setDoc, doc, query, orderBy, limit, startAfter, serverTimestamp } from "firebase/firestore";
+import { collection, getDoc, getDocs, updateDoc, setDoc, doc, query, orderBy, limit, startAfter, serverTimestamp, writeBatch } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import {
   APTIS_TRAINER_ACCESS_KEY,
@@ -445,6 +445,16 @@ export default function AdminDashboard({ user }) {
   const [duplicateReviewError, setDuplicateReviewError] = useState("");
   const [duplicateReviewNotice, setDuplicateReviewNotice] = useState("");
   const [deletingOrphanUid, setDeletingOrphanUid] = useState("");
+  const [groupManagerOpen, setGroupManagerOpen] = useState(false);
+  const [groupTeacherId, setGroupTeacherId] = useState("");
+  const [groupName, setGroupName] = useState("");
+  const [groupStudentSearch, setGroupStudentSearch] = useState("");
+  const [groupStudentFilter, setGroupStudentFilter] = useState("all");
+  const [groupSelectedStudentIds, setGroupSelectedStudentIds] = useState([]);
+  const [groupRosterMeta, setGroupRosterMeta] = useState({});
+  const [groupRosterLoading, setGroupRosterLoading] = useState(false);
+  const [groupSaving, setGroupSaving] = useState(false);
+  const [groupManagerNotice, setGroupManagerNotice] = useState("");
 
   const navigate = useNavigate();
 
@@ -598,6 +608,42 @@ export default function AdminDashboard({ user }) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showWritingGeneral]);
 
+  useEffect(() => {
+    let alive = true;
+
+    async function loadGroupRoster() {
+      if (!groupManagerOpen || !groupTeacherId) {
+        setGroupRosterMeta({});
+        setGroupRosterLoading(false);
+        return;
+      }
+
+      setGroupRosterLoading(true);
+      setGroupRosterMeta({});
+      setGroupManagerNotice("");
+      try {
+        const snap = await getDocs(collection(db, "users", groupTeacherId, "studentRoster"));
+        if (!alive) return;
+        setGroupRosterMeta(
+          snap.docs.reduce((acc, entry) => {
+            acc[entry.id] = entry.data() || {};
+            return acc;
+          }, {})
+        );
+      } catch (error) {
+        console.error("[AdminDashboard] load group roster failed", error);
+        if (alive) setGroupManagerNotice("Could not load this teacher's existing groups.");
+      } finally {
+        if (alive) setGroupRosterLoading(false);
+      }
+    }
+
+    loadGroupRoster();
+    return () => {
+      alive = false;
+    };
+  }, [groupManagerOpen, groupTeacherId]);
+
   async function updateRole(uid, role) {
     await updateDoc(doc(db, "users", uid), { role });
 
@@ -623,6 +669,118 @@ export default function AdminDashboard({ user }) {
       );
     } finally {
       setAssigning(null);
+    }
+  }
+
+  function openGroupManager() {
+    setGroupManagerOpen(true);
+    setGroupTeacherId("");
+    setGroupName("");
+    setGroupStudentSearch("");
+    setGroupStudentFilter("all");
+    setGroupSelectedStudentIds([]);
+    setGroupRosterMeta({});
+    setGroupManagerNotice("");
+  }
+
+  function closeGroupManager() {
+    if (groupSaving) return;
+    setGroupManagerOpen(false);
+  }
+
+  async function assignSelectedStudentsToGroup() {
+    const nextGroupName = groupName.trim();
+    const selectedIds = new Set(groupSelectedStudentIds);
+    const selectedStudents = users.filter(
+      (entry) => entry.role === "student" && selectedIds.has(entry.id)
+    );
+
+    if (!groupTeacherId) {
+      window.alert("Choose a teacher for this group.");
+      return;
+    }
+    if (!nextGroupName) {
+      window.alert("Enter a group name or code.");
+      return;
+    }
+    if (nextGroupName.length > 80) {
+      window.alert("Keep the group name or code to 80 characters or fewer.");
+      return;
+    }
+    if (!selectedStudents.length) {
+      window.alert("Select at least one student.");
+      return;
+    }
+
+    const reassignedStudents = selectedStudents.filter(
+      (entry) => entry.teacherId && entry.teacherId !== groupTeacherId
+    );
+    if (reassignedStudents.length) {
+      const targetTeacher = users.find((entry) => entry.id === groupTeacherId);
+      const confirmed = window.confirm(
+        `${reassignedStudents.length} selected student${reassignedStudents.length === 1 ? " is" : "s are"} currently assigned to another teacher. Move ${reassignedStudents.length === 1 ? "this student" : "these students"} to ${labelForUser(targetTeacher || { id: groupTeacherId })} and add them to ${nextGroupName}?`
+      );
+      if (!confirmed) return;
+    }
+
+    setGroupSaving(true);
+    setGroupManagerNotice("");
+    let committedCount = 0;
+
+    try {
+      // Three writes are needed when a student moves teachers. Keeping chunks
+      // to 150 students stays below Firestore's 500-operation batch limit.
+      for (let index = 0; index < selectedStudents.length; index += 150) {
+        const chunk = selectedStudents.slice(index, index + 150);
+        const batch = writeBatch(db);
+
+        chunk.forEach((student) => {
+          batch.update(doc(db, "users", student.id), { teacherId: groupTeacherId });
+          if (student.teacherId && student.teacherId !== groupTeacherId) {
+            batch.delete(doc(db, "users", student.teacherId, "studentRoster", student.id));
+          }
+          batch.set(
+            doc(db, "users", groupTeacherId, "studentRoster", student.id),
+            {
+              className: nextGroupName,
+              updatedAt: serverTimestamp(),
+            },
+            { merge: true }
+          );
+        });
+
+        await batch.commit();
+        committedCount += chunk.length;
+      }
+
+      setUsers((prev) =>
+        prev.map((entry) =>
+          selectedIds.has(entry.id) ? { ...entry, teacherId: groupTeacherId } : entry
+        )
+      );
+      setGroupRosterMeta((prev) => {
+        const next = { ...prev };
+        selectedStudents.forEach((student) => {
+          next[student.id] = {
+            ...(next[student.id] || {}),
+            className: nextGroupName,
+          };
+        });
+        return next;
+      });
+      setGroupSelectedStudentIds([]);
+      setGroupManagerNotice(
+        `${selectedStudents.length} student${selectedStudents.length === 1 ? "" : "s"} assigned to ${nextGroupName}.`
+      );
+    } catch (error) {
+      console.error("[AdminDashboard] bulk group assignment failed", error);
+      setGroupManagerNotice(
+        committedCount
+          ? `${committedCount} students were saved before an error occurred. Close and reopen the group manager to refresh the list.`
+          : "Could not save this group. Close and reopen the group manager before trying again."
+      );
+    } finally {
+      setGroupSaving(false);
     }
   }
 
@@ -2192,6 +2350,58 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
     minWidth: "12rem",
   };
 
+  const groupSelectedStudentIdSet = new Set(groupSelectedStudentIds);
+  const normalizedGroupSearch = normalizeStudentLookup(groupStudentSearch);
+  const groupStudents = users
+    .filter((entry) => entry.role === "student")
+    .sort((a, b) => labelForUser(a).localeCompare(labelForUser(b)));
+  const groupVisibleStudents = groupStudents.filter((student) => {
+    if (groupStudentFilter === "unassigned" && student.teacherId) return false;
+    if (groupStudentFilter === "this-teacher" && student.teacherId !== groupTeacherId) return false;
+    if (groupStudentFilter === "other-teacher" && (!student.teacherId || student.teacherId === groupTeacherId)) return false;
+    if (!normalizedGroupSearch) return true;
+    return getUserLookupText(student).includes(normalizedGroupSearch);
+  });
+  const groupExistingGroups = Object.entries(groupRosterMeta).reduce((acc, [studentId, meta]) => {
+    const student = users.find((entry) => entry.id === studentId);
+    const className = String(meta?.className || "").trim();
+    if (!className || student?.teacherId !== groupTeacherId) return acc;
+    acc[className] = (acc[className] || 0) + 1;
+    return acc;
+  }, {});
+  const groupExistingGroupRows = Object.entries(groupExistingGroups)
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+  const groupReassignmentCount = groupStudents.filter(
+    (student) =>
+      groupSelectedStudentIdSet.has(student.id) &&
+      student.teacherId &&
+      student.teacherId !== groupTeacherId
+  ).length;
+  const allVisibleGroupStudentsSelected =
+    groupVisibleStudents.length > 0 &&
+    groupVisibleStudents.every((student) => groupSelectedStudentIdSet.has(student.id));
+
+  function toggleGroupStudent(studentId) {
+    setGroupManagerNotice("");
+    setGroupSelectedStudentIds((prev) =>
+      prev.includes(studentId)
+        ? prev.filter((entry) => entry !== studentId)
+        : [...prev, studentId]
+    );
+  }
+
+  function toggleAllVisibleGroupStudents() {
+    setGroupManagerNotice("");
+    const visibleIds = new Set(groupVisibleStudents.map((student) => student.id));
+    setGroupSelectedStudentIds((prev) => {
+      if (allVisibleGroupStudentsSelected) {
+        return prev.filter((studentId) => !visibleIds.has(studentId));
+      }
+      return Array.from(new Set([...prev, ...visibleIds]));
+    });
+  }
+
   function findUserForAdminNotification(notification) {
     if (!notification) return null;
     if (notification.userId) {
@@ -2260,6 +2470,15 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
         </button>
 
         <div style={{ display: "flex", gap: "0.55rem", alignItems: "center", flexWrap: "wrap", position: "relative" }}>
+          <button
+            type="button"
+            className="review-btn"
+            style={{ fontSize: "0.85rem", padding: "0.3rem 0.7rem", marginLeft: 0 }}
+            onClick={openGroupManager}
+          >
+            Manage groups
+          </button>
+
           <button
             type="button"
             className="ghost-btn"
@@ -3311,6 +3530,365 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
           </div>
         </>
       )}
+
+      {groupManagerOpen ? (
+        <div
+          className="admin-dashboard-modal-backdrop"
+          role="presentation"
+          onClick={closeGroupManager}
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 100,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "1.2rem",
+            background: "rgba(2, 6, 23, 0.82)",
+          }}
+        >
+          <div
+            className="admin-dashboard-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="group-manager-title"
+            onClick={(event) => event.stopPropagation()}
+            style={{
+              width: "min(900px, 100%)",
+              maxHeight: "90vh",
+              overflow: "auto",
+              borderRadius: "1.1rem",
+              border: "1px solid rgba(96, 165, 250, 0.42)",
+              background: "linear-gradient(180deg, #14294f, #0f1f42)",
+              boxShadow: "0 26px 80px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            <div
+              style={{
+                padding: "1rem 1.1rem",
+                borderBottom: "1px solid rgba(71, 98, 153, 0.58)",
+                display: "flex",
+                justifyContent: "space-between",
+                gap: "1rem",
+                alignItems: "flex-start",
+              }}
+            >
+              <div>
+                <div style={{ color: "#9fb4da", fontSize: "0.76rem", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                  Admin tool
+                </div>
+                <h2 id="group-manager-title" style={{ margin: "0.2rem 0 0", color: "#f8fafc", fontSize: "1.25rem" }}>
+                  Group manager
+                </h2>
+                <p style={{ margin: "0.35rem 0 0", color: "#b7c6e6", fontSize: "0.86rem" }}>
+                  Choose a teacher, name the group, then add students from the complete student list.
+                </p>
+              </div>
+              <button
+                type="button"
+                className="ghost-btn"
+                onClick={closeGroupManager}
+                disabled={groupSaving}
+                style={{ marginLeft: 0, flex: "0 0 auto", padding: "0.35rem 0.7rem" }}
+              >
+                Close
+              </button>
+            </div>
+
+            <div style={{ padding: "1.1rem", display: "grid", gap: "1rem" }}>
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: isNarrow ? "1fr" : "minmax(0, 1fr) minmax(0, 1fr)",
+                  gap: "0.8rem",
+                }}
+              >
+                <label style={{ display: "grid", gap: "0.35rem" }}>
+                  <span style={{ color: "#cbd5e1", fontSize: "0.8rem" }}>Teacher</span>
+                  <select
+                    value={groupTeacherId}
+                    onChange={(event) => {
+                      setGroupTeacherId(event.target.value);
+                      setGroupName("");
+                      setGroupSelectedStudentIds([]);
+                      setGroupManagerNotice("");
+                    }}
+                    disabled={groupSaving}
+                    style={{ ...baseInputStyle, width: "100%", minWidth: 0 }}
+                  >
+                    <option value="">Choose a teacher…</option>
+                    {teachers.map((teacher) => (
+                      <option key={teacher.id} value={teacher.id}>
+                        {detailedLabelForTeacher(teacher)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label style={{ display: "grid", gap: "0.35rem" }}>
+                  <span style={{ color: "#cbd5e1", fontSize: "0.8rem" }}>Group name or code</span>
+                  <input
+                    type="text"
+                    value={groupName}
+                    onChange={(event) => {
+                      setGroupName(event.target.value);
+                      setGroupManagerNotice("");
+                    }}
+                    maxLength={80}
+                    placeholder="e.g. Tuesday B1 evening"
+                    disabled={groupSaving}
+                    style={{ ...baseInputStyle, width: "100%", minWidth: 0 }}
+                  />
+                </label>
+              </div>
+
+              {groupTeacherId ? (
+                <section
+                  style={{
+                    padding: "0.85rem",
+                    borderRadius: "0.9rem",
+                    border: "1px solid rgba(71, 98, 153, 0.55)",
+                    background: "rgba(2, 6, 23, 0.25)",
+                  }}
+                >
+                  <div style={{ color: "#94a3b8", fontSize: "0.74rem", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+                    Existing groups
+                  </div>
+                  {groupRosterLoading ? (
+                    <p style={{ margin: "0.55rem 0 0", color: "#b7c6e6", fontSize: "0.85rem" }}>Loading groups…</p>
+                  ) : groupExistingGroupRows.length ? (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "0.6rem" }}>
+                      {groupExistingGroupRows.map((group) => (
+                        <button
+                          type="button"
+                          key={group.name}
+                          className="ghost-btn"
+                          onClick={() => {
+                            setGroupName(group.name);
+                            setGroupManagerNotice("");
+                          }}
+                          disabled={groupSaving}
+                          style={{
+                            marginLeft: 0,
+                            padding: "0.3rem 0.65rem",
+                            fontSize: "0.78rem",
+                            borderColor: groupName.trim() === group.name ? "#60a5fa" : undefined,
+                            background: groupName.trim() === group.name ? "rgba(37, 99, 235, 0.2)" : undefined,
+                          }}
+                        >
+                          {group.name} · {group.count}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p style={{ margin: "0.55rem 0 0", color: "#94a3b8", fontSize: "0.85rem" }}>
+                      No groups yet for this teacher. Enter a new name above.
+                    </p>
+                  )}
+                </section>
+              ) : null}
+
+              <div
+                style={{
+                  display: "grid",
+                  gridTemplateColumns: isNarrow ? "1fr" : "minmax(0, 1.4fr) minmax(190px, 0.75fr)",
+                  gap: "0.7rem",
+                }}
+              >
+                <label style={{ display: "grid", gap: "0.35rem" }}>
+                  <span style={{ color: "#cbd5e1", fontSize: "0.8rem" }}>Search students</span>
+                  <input
+                    type="search"
+                    value={groupStudentSearch}
+                    onChange={(event) => setGroupStudentSearch(event.target.value)}
+                    placeholder="Name, email, username, or UID"
+                    disabled={groupSaving}
+                    style={{ ...baseInputStyle, width: "100%", minWidth: 0 }}
+                  />
+                </label>
+                <label style={{ display: "grid", gap: "0.35rem" }}>
+                  <span style={{ color: "#cbd5e1", fontSize: "0.8rem" }}>Show</span>
+                  <select
+                    value={groupStudentFilter}
+                    onChange={(event) => setGroupStudentFilter(event.target.value)}
+                    disabled={groupSaving}
+                    style={{ ...baseInputStyle, width: "100%", minWidth: 0 }}
+                  >
+                    <option value="all">All students</option>
+                    <option value="unassigned">Unassigned students</option>
+                    <option value="this-teacher">This teacher’s students</option>
+                    <option value="other-teacher">Students of another teacher</option>
+                  </select>
+                </label>
+              </div>
+
+              <section
+                style={{
+                  borderRadius: "0.95rem",
+                  border: "1px solid rgba(71, 98, 153, 0.55)",
+                  background: "rgba(2, 6, 23, 0.25)",
+                  overflow: "hidden",
+                }}
+              >
+                <div
+                  style={{
+                    padding: "0.7rem 0.8rem",
+                    display: "flex",
+                    justifyContent: "space-between",
+                    gap: "0.7rem",
+                    alignItems: "center",
+                    flexWrap: "wrap",
+                    borderBottom: "1px solid rgba(71, 98, 153, 0.45)",
+                  }}
+                >
+                  <span style={{ color: "#b7c6e6", fontSize: "0.84rem" }}>
+                    {groupVisibleStudents.length} shown · {groupSelectedStudentIds.length} selected
+                  </span>
+                  <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap" }}>
+                    <button
+                      type="button"
+                      className="ghost-btn"
+                      onClick={toggleAllVisibleGroupStudents}
+                      disabled={!groupVisibleStudents.length || groupSaving}
+                      style={{ marginLeft: 0, padding: "0.28rem 0.6rem", fontSize: "0.78rem" }}
+                    >
+                      {allVisibleGroupStudentsSelected ? "Deselect shown" : "Select shown"}
+                    </button>
+                    <button
+                      type="button"
+                      className="ghost-btn"
+                      onClick={() => setGroupSelectedStudentIds([])}
+                      disabled={!groupSelectedStudentIds.length || groupSaving}
+                      style={{ marginLeft: 0, padding: "0.28rem 0.6rem", fontSize: "0.78rem" }}
+                    >
+                      Clear selection
+                    </button>
+                  </div>
+                </div>
+
+                <div style={{ maxHeight: "350px", overflow: "auto" }}>
+                  {!groupVisibleStudents.length ? (
+                    <p style={{ margin: 0, padding: "1rem", color: "#94a3b8" }}>No students match these filters.</p>
+                  ) : (
+                    groupVisibleStudents.map((student) => {
+                      const assignedTeacher = teachers.find((teacher) => teacher.id === student.teacherId) || null;
+                      const currentGroup = student.teacherId === groupTeacherId
+                        ? String(groupRosterMeta[student.id]?.className || "").trim()
+                        : "";
+                      const isSelected = groupSelectedStudentIdSet.has(student.id);
+                      const assignmentLabel = !student.teacherId
+                        ? "Unassigned"
+                        : student.teacherId === groupTeacherId
+                          ? currentGroup || "This teacher · No group"
+                          : `Teacher: ${labelForTeacher(assignedTeacher || { id: student.teacherId })}`;
+
+                      return (
+                        <label
+                          key={student.id}
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: "0.75rem",
+                            padding: "0.72rem 0.8rem",
+                            borderBottom: "1px solid rgba(71, 98, 153, 0.3)",
+                            background: isSelected ? "rgba(37, 99, 235, 0.15)" : "transparent",
+                            cursor: groupSaving ? "default" : "pointer",
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => toggleGroupStudent(student.id)}
+                            disabled={groupSaving}
+                          />
+                          <UserAvatar user={student} label={labelForUser(student)} size="sm" />
+                          <span style={{ flex: 1, minWidth: 0 }}>
+                            <strong style={{ display: "block", color: "#eef4ff", overflowWrap: "anywhere" }}>
+                              {labelForUser(student)}
+                            </strong>
+                            <span style={{ display: "block", marginTop: "0.15rem", color: "#94a3b8", fontSize: "0.78rem", overflowWrap: "anywhere" }}>
+                              {student.email || student.id}
+                            </span>
+                          </span>
+                          <span
+                            style={{
+                              flex: "0 0 auto",
+                              maxWidth: isNarrow ? "38%" : "250px",
+                              padding: "0.25rem 0.55rem",
+                              borderRadius: "999px",
+                              background: student.teacherId && student.teacherId !== groupTeacherId
+                                ? "rgba(245, 158, 11, 0.13)"
+                                : "rgba(96, 165, 250, 0.12)",
+                              border: student.teacherId && student.teacherId !== groupTeacherId
+                                ? "1px solid rgba(245, 158, 11, 0.25)"
+                                : "1px solid rgba(96, 165, 250, 0.2)",
+                              color: student.teacherId && student.teacherId !== groupTeacherId ? "#fde68a" : "#bfdbfe",
+                              fontSize: "0.72rem",
+                              textAlign: "center",
+                              overflowWrap: "anywhere",
+                            }}
+                          >
+                            {assignmentLabel}
+                          </span>
+                        </label>
+                      );
+                    })
+                  )}
+                </div>
+              </section>
+
+              {groupManagerNotice ? (
+                <div
+                  role="status"
+                  style={{
+                    padding: "0.7rem 0.8rem",
+                    borderRadius: "0.8rem",
+                    background: groupManagerNotice.includes("Could not") || groupManagerNotice.includes("error")
+                      ? "rgba(127, 29, 29, 0.22)"
+                      : "rgba(20, 83, 45, 0.24)",
+                    border: groupManagerNotice.includes("Could not") || groupManagerNotice.includes("error")
+                      ? "1px solid rgba(248, 113, 113, 0.28)"
+                      : "1px solid rgba(74, 222, 128, 0.25)",
+                    color: groupManagerNotice.includes("Could not") || groupManagerNotice.includes("error") ? "#fecaca" : "#bbf7d0",
+                    fontSize: "0.84rem",
+                  }}
+                >
+                  {groupManagerNotice}
+                </div>
+              ) : null}
+
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  gap: "0.8rem",
+                  alignItems: "center",
+                  flexWrap: "wrap",
+                }}
+              >
+                <div style={{ color: groupReassignmentCount ? "#fde68a" : "#9fb4da", fontSize: "0.82rem" }}>
+                  {groupReassignmentCount
+                    ? `${groupReassignmentCount} selected student${groupReassignmentCount === 1 ? " will" : "s will"} move from another teacher.`
+                    : "Existing group members who are not selected will stay in the group."}
+                </div>
+                <button
+                  type="button"
+                  className="review-btn"
+                  onClick={assignSelectedStudentsToGroup}
+                  disabled={groupSaving || !groupTeacherId || !groupName.trim() || !groupSelectedStudentIds.length}
+                  style={{ marginLeft: 0, minWidth: "190px" }}
+                >
+                  {groupSaving
+                    ? "Saving group…"
+                    : groupSelectedStudentIds.length
+                      ? `Assign ${groupSelectedStudentIds.length} selected student${groupSelectedStudentIds.length === 1 ? "" : "s"}`
+                      : "Assign selected students"}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       {duplicateReview ? (
         <div
