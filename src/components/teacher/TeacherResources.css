@@ -159,6 +159,20 @@
   padding: 1rem;
 }
 
+.teacher-resource-skill-group + .teacher-resource-skill-group {
+  border-top: 1px solid var(--tr-border);
+}
+
+.teacher-resource-skill-group > h3 {
+  margin: 0;
+  padding: 1rem 1rem 0;
+  color: var(--product-accent);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
 .teacher-resource-card {
   position: relative;
   display: grid;

@@ -14,6 +14,7 @@ import {
 import {
   AptisWritingLiveEditor,
   AptisWritingLivePrompt,
+  AptisWritingLiveTimer,
   AptisWritingSubmittedResponse,
   getEmptyWritingAnswers,
   getWritingCounts,
@@ -38,18 +39,26 @@ export default function AptisWritingLivePlayer() {
   const uid = auth.currentUser?.uid;
   const player = uid ? game?.players?.[uid] : null;
   const part = Number(game?.part);
-  const task = getAptisWritingTeacherTask(part, game?.taskId);
+  const task = getAptisWritingTeacherTask(part, game?.taskId, game?.questionIds);
   const phase = game?.state?.phase || "lobby";
   const submission = player?.writingSubmission || null;
   const activeAnswers = answers || getEmptyWritingAnswers(part);
 
   useEffect(() => {
-    if ([2, 3, 4].includes(part)) setAnswers(getEmptyWritingAnswers(part));
+    if ([1, 2, 3, 4].includes(part)) setAnswers(getEmptyWritingAnswers(part));
   }, [part, game?.taskId]);
 
   async function saveSubmissionToProfile(counts) {
     const html = (text) => `<p>${escapeHtml(text).replace(/\n/g, "<br/>")}</p>`;
-    if (part === 2) {
+    if (part === 1) {
+      const items = task.questions.map((question, index) => ({
+        id: question.id,
+        question: question.text,
+        answer: activeAnswers.responses[index].trim(),
+      }));
+      await fb.saveWritingP1Submission({ items, liveGameId: gameId });
+      await fb.logWritingSubmitted({ part: "part1", totalItems: items.length, mode: "live" });
+    } else if (part === 2) {
       await fb.saveWritingP2Submission({ taskId: task.id, answerText: activeAnswers.answer.trim(), answerHTML: html(activeAnswers.answer), counts, liveGameId: gameId });
       await fb.logWritingSubmitted({ part: "part2", taskId: task.id, wordCount: counts.answer, mode: "live" });
     } else if (part === 3) {
@@ -64,13 +73,21 @@ export default function AptisWritingLivePlayer() {
 
   async function submitResponse() {
     if (!hasCompleteWritingResponse(part, activeAnswers)) {
-      toast(part === 3 ? "Please answer all three messages." : part === 4 ? "Please write both emails." : "Please write your response.");
+      toast(part === 1 ? "Please answer all five questions." : part === 3 ? "Please answer all three messages." : part === 4 ? "Please write both emails." : "Please write your response.");
       return;
     }
     const counts = getWritingCounts(part, activeAnswers);
     setSaving(true);
     try {
       await submitAptisWritingLiveResponse({ gameId, part, taskId: task.id, answers: activeAnswers, counts });
+      await fb.logAptisWritingLiveSubmitted({
+        gameId,
+        pin: game.pin || null,
+        activityType: "writing-task",
+        activityTitle: task.title,
+        part,
+        taskId: task.id,
+      });
       try {
         await saveSubmissionToProfile(counts);
       } catch (profileError) {
@@ -101,6 +118,7 @@ export default function AptisWritingLivePlayer() {
 
       {phase === "writing" ? (
         <section className="aptis-writing-live-stage">
+          <AptisWritingLiveTimer part={part} state={game.state} />
           <AptisWritingLivePrompt part={part} task={task} />
           {submission ? (
             <div className="aptis-writing-live-submitted"><CheckCircle2 size={38} /><h2>Writing submitted</h2><p>Wait for your teacher to begin the class review.</p></div>
@@ -116,7 +134,7 @@ export default function AptisWritingLivePlayer() {
       {phase === "review" ? (
         <section className="aptis-writing-live-stage">
           <div className="aptis-writing-live-stage-heading"><div><p>Class review</p><h2>Your submitted writing</h2></div></div>
-          <AptisWritingSubmittedResponse part={part} submission={submission} />
+          <AptisWritingSubmittedResponse part={part} submission={submission} task={task} />
           <div className="aptis-writing-live-review-note">Your own writing stays visible here. The class responses are shown in a random anonymous order on the teacher’s review screen.</div>
         </section>
       ) : null}

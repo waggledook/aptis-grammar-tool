@@ -1,12 +1,18 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, CheckCircle2, RotateCcw, Settings2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { createPart4ErrorDetectiveLiveGame } from "../../api/liveGames.js";
+import {
+  logAptisWritingTeacherActivityCompleted,
+  logAptisWritingTeacherActivityStarted,
+} from "../../firebase.js";
 import { toast } from "../../utils/toast.js";
 import Seo from "../common/Seo.jsx";
 import { APTIS_PART4_ERROR_BANK } from "./data/aptisPart4ErrorBank.js";
 import { getErrorChunks } from "./utils/errorDetectiveChunks.js";
 import "./part4ErrorDetective.css";
+
+/* eslint-disable react-refresh/only-export-components */
 
 export { getErrorChunks } from "./utils/errorDetectiveChunks.js";
 
@@ -39,8 +45,9 @@ function categoryLabel(category) {
   return ({ grammar: "Grammar", vocabulary: "Vocabulary", email_conventions: "Email conventions" })[category] || category;
 }
 
-export default function Part4ErrorDetective({ onBack }) {
+export default function Part4ErrorDetective({ onBack, isTeacher = false }) {
   const navigate = useNavigate();
+  const analyticsRef = useRef({ started: false, completed: false });
   const [seenIds, setSeenIds] = useState(() => {
     try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch { return []; }
   });
@@ -65,8 +72,33 @@ export default function Part4ErrorDetective({ onBack }) {
   const chunks = useMemo(() => item ? getErrorChunks(item) : [], [item]);
   const complete = index >= round.length;
 
+  useLayoutEffect(() => {
+    let robots = document.querySelector('meta[name="robots"]');
+    const previous = robots?.getAttribute("content") || "";
+    if (!robots) {
+      robots = document.createElement("meta");
+      robots.setAttribute("name", "robots");
+      document.head.appendChild(robots);
+    }
+    robots.setAttribute("content", "noindex, nofollow");
+    return () => {
+      if (previous) robots.setAttribute("content", previous);
+      else robots.remove();
+    };
+  }, []);
+
   function chooseChunk(chunk, chunkIndex) {
     if (outcome && outcome !== "retry") return;
+    if (!analyticsRef.current.started) {
+      analyticsRef.current.started = true;
+      void logAptisWritingTeacherActivityStarted({
+        activityType: "error-detective",
+        activityTitle: "Error Detective",
+        part: 4,
+        taskId: "part4-error-detective",
+        itemCount: round.length,
+      });
+    }
     setSelectedIndex(chunkIndex);
     if (chunk.target) {
       if (attempts === 0) setFirstTimeCorrect((value) => value + 1);
@@ -82,6 +114,17 @@ export default function Part4ErrorDetective({ onBack }) {
   }
 
   function nextQuestion() {
+    if (index === round.length - 1 && !analyticsRef.current.completed) {
+      analyticsRef.current.completed = true;
+      void logAptisWritingTeacherActivityCompleted({
+        activityType: "error-detective",
+        activityTitle: "Error Detective",
+        part: 4,
+        taskId: "part4-error-detective",
+        itemCount: round.length,
+        score: firstTimeCorrect,
+      });
+    }
     setIndex((value) => value + 1);
     setAttempts(0);
     setSelectedIndex(null);
@@ -93,6 +136,7 @@ export default function Part4ErrorDetective({ onBack }) {
   function playAnotherRound() {
     setRound(makeErrorDetectiveRound(seenIds, round.map((entry) => entry.id)));
     setIndex(0); setAttempts(0); setSelectedIndex(null); setOutcome(null); setCorrectionDraft(""); setCorrectionChecked(false); setFirstTimeCorrect(0); setReviewOpen(false);
+    analyticsRef.current = { started: false, completed: false };
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -115,7 +159,7 @@ export default function Part4ErrorDetective({ onBack }) {
     <Seo title="Part 4 Error Detective | Seif Aptis Trainer" description="Spot recurring errors from Aptis Writing Part 4 student responses." />
     <div className="error-detective-topbar">
       <button type="button" onClick={onBack}><ArrowLeft size={18} /> Back to Part 4</button>
-      <span className="error-detective-tools"><button type="button" onClick={startLiveSession}>Run live in class</button><details><summary><Settings2 size={17} /> Practice settings</summary><button type="button" onClick={resetHistory}><RotateCcw size={16} /> Reset practice history</button></details></span>
+      <span className="error-detective-tools">{isTeacher ? <button type="button" onClick={startLiveSession}>Run live in class</button> : null}<details><summary><Settings2 size={17} /> Practice settings</summary><button type="button" onClick={resetHistory}><RotateCcw size={16} /> Reset practice history</button></details></span>
     </div>
     <header className="error-detective-hero"><p>Aptis Writing Part 4 · Classroom training</p><h1>Part 4 Error Detective</h1><span>Can you spot the mistakes Aptis students commonly make?</span></header>
     <section className="error-detective-intro"><p>These sentences are based on recurring mistakes found in real Aptis Writing Part 4 answers. Every sentence contains one error. Click the part that needs changing.</p><small>Some mistakes are grammatical. Others involve vocabulary or email conventions.</small></section>

@@ -1,18 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Clock3, Pause, Play, RotateCcw } from "lucide-react";
+import {
+  getAptisWritingLiveSuggestedSeconds,
+  getAptisWritingLiveTimerSnapshot,
+} from "./data/aptisWritingTeacherTasks.js";
 
 /* eslint-disable react-refresh/only-export-components */
+
+export { getAptisWritingLiveTimerSnapshot } from "./data/aptisWritingTeacherTasks.js";
 
 export function wordCount(value = "") {
   return (String(value).trim().match(/\b[\p{L}\p{N}’'-]+\b/gu) || []).length;
 }
 
 export function getEmptyWritingAnswers(part) {
+  if (Number(part) === 1) return { responses: ["", "", "", "", ""] };
   if (Number(part) === 3) return { responses: ["", "", ""] };
   if (Number(part) === 4) return { informal: "", formal: "" };
   return { answer: "" };
 }
 
 export function getWritingCounts(part, answers) {
+  if (Number(part) === 1) return {
+    responses: (answers?.responses || ["", "", "", "", ""]).map(wordCount),
+  };
   if (Number(part) === 3) return {
     responses: (answers?.responses || ["", "", ""]).map(wordCount),
   };
@@ -24,6 +35,9 @@ export function getWritingCounts(part, answers) {
 }
 
 export function hasCompleteWritingResponse(part, answers) {
+  if (Number(part) === 1) {
+    return (answers?.responses || []).length === 5 && answers.responses.every((answer) => answer.trim());
+  }
   if (Number(part) === 3) {
     return (answers?.responses || []).length === 3 && answers.responses.every((answer) => answer.trim());
   }
@@ -54,8 +68,68 @@ export function getAnonymousLiveSubmissions(players = [], seed = "") {
     }));
 }
 
+export function useAptisWritingLiveTimer(state, fallbackDuration = 0) {
+  const [now, setNow] = useState(Date.now());
+  const deadline = Number(state?.writingTimerDeadline) || 0;
+  const running = state?.writingTimerStatus === "running" && deadline > 0;
+
+  useEffect(() => {
+    setNow(Date.now());
+    if (!running) return undefined;
+    const timer = window.setInterval(() => setNow(Date.now()), 250);
+    return () => window.clearInterval(timer);
+  }, [deadline, running]);
+
+  return getAptisWritingLiveTimerSnapshot(state, now, fallbackDuration);
+}
+
+export function AptisWritingLiveTimer({ part, state, onStart, onPause, onReset }) {
+  const timer = useAptisWritingLiveTimer(state, getAptisWritingLiveSuggestedSeconds(part));
+  const minutes = Math.floor(timer.remainingSeconds / 60);
+  const seconds = String(timer.remainingSeconds % 60).padStart(2, "0");
+  const statusLabel = timer.status === "expired"
+    ? "Suggested time is up"
+    : timer.isRunning
+      ? "Countdown running"
+      : timer.status === "paused"
+        ? "Countdown paused"
+        : "Optional countdown not started";
+
+  return (
+    <section className={`aptis-writing-live-timer ${timer.status === "expired" ? "is-expired" : timer.remainingSeconds <= 60 ? "is-low" : ""}`}>
+      <Clock3 size={25} aria-hidden="true" />
+      <div>
+        <span>Recommended Part {part} time</span>
+        <strong role="timer" aria-label={`${minutes} minutes ${Number(seconds)} seconds remaining`}>{minutes}:{seconds}</strong>
+        <small>{statusLabel}. The teacher decides when to begin the review.</small>
+      </div>
+      {onStart ? (
+        <div className="aptis-writing-live-timer-actions">
+          {timer.isRunning
+            ? <button onClick={onPause} type="button"><Pause size={16} /> Pause</button>
+            : <button onClick={onStart} type="button"><Play size={16} /> {timer.status === "paused" ? "Resume" : timer.status === "expired" ? "Restart" : "Start timer"}</button>}
+          <button onClick={onReset} type="button"><RotateCcw size={16} /> Reset</button>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 export function AptisWritingLivePrompt({ part, task }) {
   if (!task) return null;
+
+  if (Number(part) === 1) {
+    return (
+      <section className="aptis-writing-live-prompt">
+        <p className="aptis-writing-live-kicker">Part 1 · Word-level responses</p>
+        <h2>{task.title}</h2>
+        <p>{task.context}</p>
+        <ol className="aptis-writing-live-part1-questions">
+          {task.questions.map((question) => <li key={question.id}>{question.text}</li>)}
+        </ol>
+      </section>
+    );
+  }
 
   if (Number(part) === 2) {
     return (
@@ -102,6 +176,27 @@ export function AptisWritingLivePrompt({ part, task }) {
 
 export function AptisWritingLiveEditor({ part, task, answers, onChange, disabled = false }) {
   const counts = getWritingCounts(part, answers);
+
+  if (Number(part) === 1) {
+    return (
+      <div className="aptis-writing-live-editor aptis-writing-live-part1-editor">
+        {task.questions.map((question, index) => (
+          <ShortWritingField
+            count={counts.responses[index]}
+            disabled={disabled}
+            key={question.id}
+            label={`${index + 1}. ${question.text}`}
+            onChange={(value) => {
+              const responses = [...answers.responses];
+              responses[index] = value;
+              onChange({ ...answers, responses });
+            }}
+            value={answers.responses[index]}
+          />
+        ))}
+      </div>
+    );
+  }
 
   if (Number(part) === 2) {
     return (
@@ -182,10 +277,40 @@ function WritingField({ label, value, onChange, count, maxLabel, placeholder, di
   );
 }
 
-export function AptisWritingSubmittedResponse({ part, submission }) {
+function ShortWritingField({ label, value, onChange, count, disabled }) {
+  return (
+    <label className="aptis-writing-live-field aptis-writing-live-short-field">
+      <span><strong>{label}</strong><em>{count} words · Aim for 1–5 words</em></span>
+      <input
+        disabled={disabled}
+        maxLength={100}
+        onChange={(event) => onChange(event.target.value)}
+        placeholder="Write a short answer…"
+        type="text"
+        value={value}
+      />
+    </label>
+  );
+}
+
+export function AptisWritingSubmittedResponse({ part, submission, task }) {
   if (!submission) return <p className="aptis-writing-live-empty">No response submitted.</p>;
   const answers = submission.answers || {};
   const counts = submission.counts || getWritingCounts(part, answers);
+
+  if (Number(part) === 1) {
+    return (
+      <div className="aptis-writing-live-submission-blocks">
+        {(task?.questions || []).map((question, index) => (
+          <ResponseBlock
+            key={question.id}
+            label={`${index + 1}. ${question.text} · ${counts.responses?.[index] || 0} words`}
+            text={answers.responses?.[index]}
+          />
+        ))}
+      </div>
+    );
+  }
 
   if (Number(part) === 2) {
     return <ResponseBlock label={`Short text · ${counts.answer || 0} words`} text={answers.answer} />;
@@ -209,6 +334,32 @@ export function AptisWritingSubmittedResponse({ part, submission }) {
 
 export function AptisWritingLiveFeedback({ part, feedback }) {
   if (!feedback) return null;
+
+  if (Number(part) === 1) {
+    return (
+      <section className="aptis-writing-live-ai-report">
+        <header>
+          <div><small>AI feedback</small><strong>{feedback.overall?.communication?.replace(/_/g, " ") || "Aptis-style review"}</strong></div>
+          <span>Teacher view</span>
+        </header>
+        {feedback.overall?.summary ? <p>{feedback.overall.summary}</p> : null}
+        <div className="aptis-writing-live-ai-answers">
+          {(feedback.answers || []).map((answer, index) => (
+            <article key={answer.id || index}>
+              <strong>{index + 1}. {answer.question}</strong>
+              <FeedbackPoint label="Answer" value={answer.answer} />
+              <FeedbackPoint label="Communication" value={answer.communication?.comment} />
+              <FeedbackPoint label="Length" value={answer.length?.comment} />
+              <FeedbackPoint label="Learning" value={answer.learningFeedback} />
+              <FeedbackPoint label="Suggested answer" value={answer.suggestedAnswer} />
+            </article>
+          ))}
+        </div>
+        {feedback.teacherComment ? <blockquote>{feedback.teacherComment}</blockquote> : null}
+        <p className="aptis-writing-live-ai-note">AI-estimated Aptis-style feedback, not an official score.</p>
+      </section>
+    );
+  }
 
   if (Number(part) === 4) {
     return (

@@ -18,7 +18,13 @@ import {
   setLiveGameState,
   setLiveGameStatus,
 } from "../../api/liveGames.js";
-import { rtdb } from "../../firebase.js";
+import {
+  logAptisWritingLiveExported,
+  logAptisWritingLiveFinished,
+  logAptisWritingLiveReviewStarted,
+  logAptisWritingLiveStarted,
+  rtdb,
+} from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
 import { toast } from "../../utils/toast.js";
 import Seo from "../common/Seo.jsx";
@@ -109,6 +115,15 @@ export default function AptisRegisterSurgeryLiveHost({ user }) {
     if (!players.length) return toast("Wait for at least one student to join.");
     await setLiveGameStatus(gameId, "in-progress");
     await setLiveGameState(gameId, { phase: "informal_spot" });
+    await logAptisWritingLiveStarted({
+      gameId,
+      pin: game.pin || null,
+      activityType: "register-surgery",
+      activityTitle: "Register Surgery",
+      part: 4,
+      taskId: "part4-register-surgery",
+      playerCount: players.length,
+    });
   }
 
   async function revealActiveRound() {
@@ -116,6 +131,17 @@ export default function AptisRegisterSurgeryLiveHost({ user }) {
     const missing = players.length - submittedPlayers.length;
     if (missing > 0 && !window.confirm(`${missing} student(s) have not submitted. Review the class responses anyway?`)) return;
     await setLiveGameState(gameId, { phase: activeStage.review });
+    await logAptisWritingLiveReviewStarted({
+      gameId,
+      pin: game.pin || null,
+      activityType: "register-surgery",
+      activityTitle: "Register Surgery",
+      part: 4,
+      taskId: "part4-register-surgery",
+      playerCount: players.length,
+      submissionCount: submittedPlayers.length,
+      stage: `${activeStage.kind}-${activeStage.mode}`,
+    });
   }
 
   async function openNextRound() {
@@ -135,11 +161,30 @@ export default function AptisRegisterSurgeryLiveHost({ user }) {
     }
     await setLiveGameStatus(gameId, "finished");
     await setLiveGameState(gameId, { phase: "finished" });
+    await logAptisWritingLiveFinished({
+      gameId,
+      pin: game.pin || null,
+      activityType: "register-surgery",
+      activityTitle: "Register Surgery",
+      part: 4,
+      taskId: "part4-register-surgery",
+      playerCount: players.length,
+    });
   }
 
   async function copyAllRewrites() {
     try {
       await navigator.clipboard.writeText(getRegisterSurgeryRewriteExportText(players, gameId));
+      await logAptisWritingLiveExported({
+        gameId,
+        pin: game.pin || null,
+        activityType: "register-surgery",
+        activityTitle: "Register Surgery",
+        part: 4,
+        taskId: "part4-register-surgery",
+        playerCount: players.length,
+        exportFormat: "clipboard",
+      });
       setExportState("Copied");
     } catch {
       setExportState("Copy failed");
@@ -151,6 +196,16 @@ export default function AptisRegisterSurgeryLiveHost({ user }) {
     setExportState("Preparing…");
     try {
       await downloadRegisterSurgeryLiveReportDocx({ players, gameId });
+      await logAptisWritingLiveExported({
+        gameId,
+        pin: game.pin || null,
+        activityType: "register-surgery",
+        activityTitle: "Register Surgery",
+        part: 4,
+        taskId: "part4-register-surgery",
+        playerCount: players.length,
+        exportFormat: "docx",
+      });
       setExportState("Downloaded");
     } catch (error) {
       console.error("[AptisRegisterSurgeryLiveHost] export failed", error);

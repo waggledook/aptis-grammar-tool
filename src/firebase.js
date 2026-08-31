@@ -1935,6 +1935,46 @@ export async function logHubSpanglishLiveReportViewed(details = {}) {
   });
 }
 
+export async function logAptisWritingTeacherResourceOpened(details = {}) {
+  return logActivity("aptis_writing_teacher_resource_opened", details);
+}
+
+export async function logAptisWritingTeacherActivityStarted(details = {}) {
+  return logActivity("aptis_writing_teacher_activity_started", details);
+}
+
+export async function logAptisWritingTeacherActivityCompleted(details = {}) {
+  return logActivity("aptis_writing_teacher_activity_completed", details);
+}
+
+export async function logAptisWritingLiveHosted(details = {}) {
+  return logActivity("aptis_writing_live_hosted", details);
+}
+
+export async function logAptisWritingLiveJoined(details = {}) {
+  return logActivity("aptis_writing_live_joined", details);
+}
+
+export async function logAptisWritingLiveStarted(details = {}) {
+  return logActivity("aptis_writing_live_started", details);
+}
+
+export async function logAptisWritingLiveSubmitted(details = {}) {
+  return logActivity("aptis_writing_live_submitted", details);
+}
+
+export async function logAptisWritingLiveReviewStarted(details = {}) {
+  return logActivity("aptis_writing_live_review_started", details);
+}
+
+export async function logAptisWritingLiveFinished(details = {}) {
+  return logActivity("aptis_writing_live_finished", details);
+}
+
+export async function logAptisWritingLiveExported(details = {}) {
+  return logActivity("aptis_writing_live_exported", details);
+}
+
 // ─── ACTIVITY HELPERS ────────────────────────────────────────────────────
 
 /**
@@ -4197,6 +4237,7 @@ export async function saveWritingP1Submission(payload) {
     type: "part1",
     items: payload.items,
     count: payload.items?.length ?? 0,
+    ...(payload.liveGameId ? { liveGameId: payload.liveGameId } : {}),
     createdAt: serverTimestamp(),
   });
   return ref.id;

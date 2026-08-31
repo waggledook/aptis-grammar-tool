@@ -15,7 +15,12 @@
 //   }
 // }
 
-import { auth, rtdb } from "../firebase";
+import {
+  auth,
+  logAptisWritingLiveHosted,
+  logAptisWritingLiveJoined,
+  rtdb,
+} from "../firebase";
 import {
   ref,
   push,
@@ -40,7 +45,12 @@ import {
   FREE_THINGS_LESSON_GAME_TYPE,
   FREE_THINGS_LESSON_TASK_ID,
 } from "../products/ote/data/oteAdvancedReadingPart3FreeThingsLesson.js";
-import { APTIS_WRITING_LIVE_GAME_TYPE } from "../components/writing/data/aptisWritingTeacherTasks.js";
+import {
+  APTIS_WRITING_LIVE_GAME_TYPE,
+  APTIS_WRITING_PART1_LIVE_TASK_ID,
+  getAptisWritingPart1LiveTask,
+  getAptisWritingLiveSuggestedSeconds,
+} from "../components/writing/data/aptisWritingTeacherTasks.js";
 import {
   REGISTER_SURGERY_EMAILS,
   REGISTER_SURGERY_LIVE_GAME_TYPE,
@@ -54,6 +64,33 @@ const SPANGLISH_GUEST_TOKEN_STORAGE_KEY = "spanglish_fixit_guest_token";
 function generatePin() {
   const n = Math.floor(100000 + Math.random() * 900000);
   return String(n);
+}
+
+function getAptisWritingLiveActivityDetails(game, gameId) {
+  if (game.type === REGISTER_SURGERY_LIVE_GAME_TYPE) return {
+    gameId,
+    pin: game.pin || null,
+    activityType: "register-surgery",
+    activityTitle: game.title || "Register Surgery",
+    part: 4,
+    taskId: game.taskId || "part4-register-surgery",
+  };
+  if (game.type === PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE) return {
+    gameId,
+    pin: game.pin || null,
+    activityType: "error-detective",
+    activityTitle: game.title || "Error Detective",
+    part: 4,
+    taskId: game.taskId || "part4-error-detective",
+  };
+  return {
+    gameId,
+    pin: game.pin || null,
+    activityType: "writing-task",
+    activityTitle: game.title || `Aptis Writing Part ${game.part || "?"}`,
+    part: Number(game.part) || null,
+    taskId: game.taskId || null,
+  };
 }
 
 /**
@@ -174,6 +211,10 @@ export async function joinLiveGameByPin(pin) {
     });
   }
 
+  if (!existingPlayer && [APTIS_WRITING_LIVE_GAME_TYPE, REGISTER_SURGERY_LIVE_GAME_TYPE, PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE].includes(game.type)) {
+    await logAptisWritingLiveJoined(getAptisWritingLiveActivityDetails(game, game.gameId));
+  }
+
   return { gameId: game.gameId, type: game.type || "grammar" };
 }
 
@@ -288,17 +329,22 @@ export async function createFreeThingsLessonLiveGame({ title } = {}) {
   return { gameId, pin };
 }
 
-export async function createAptisWritingLiveGame({ part, taskId, title }) {
+export async function createAptisWritingLiveGame({ part, taskId, title, questionIds = [] }) {
   const user = auth.currentUser;
   const partNumber = Number(part);
   if (!user) throw new Error("You must be signed in to host a writing session.");
-  if (![2, 3, 4].includes(partNumber) || !taskId) {
+  if (![1, 2, 3, 4].includes(partNumber) || !taskId) {
     throw new Error("Choose a valid writing part and task.");
+  }
+  const partOneTask = partNumber === 1 ? getAptisWritingPart1LiveTask(questionIds) : null;
+  if (partNumber === 1 && (taskId !== APTIS_WRITING_PART1_LIVE_TASK_ID || !partOneTask)) {
+    throw new Error("Choose five valid Part 1 questions.");
   }
 
   const gameRef = push(ref(rtdb, "liveGames"));
   const gameId = gameRef.key;
   const pin = generatePin();
+  const suggestedSeconds = getAptisWritingLiveSuggestedSeconds(partNumber);
   await set(gameRef, {
     ownerUid: user.uid,
     pin,
@@ -306,9 +352,24 @@ export async function createAptisWritingLiveGame({ part, taskId, title }) {
     type: APTIS_WRITING_LIVE_GAME_TYPE,
     taskId,
     part: partNumber,
+    ...(partOneTask ? { questionIds: partOneTask.questions.map((question) => question.id) } : {}),
     status: "lobby",
     createdAt: Date.now(),
-    state: { phase: "lobby" },
+    state: {
+      phase: "lobby",
+      writingTimerDuration: suggestedSeconds,
+      writingTimerRemaining: suggestedSeconds,
+      writingTimerDeadline: null,
+      writingTimerStatus: "ready",
+    },
+  });
+  await logAptisWritingLiveHosted({
+    gameId,
+    pin,
+    activityType: "writing-task",
+    activityTitle: title || `Aptis Writing Part ${partNumber}`,
+    part: partNumber,
+    taskId,
   });
   return { gameId, pin };
 }
@@ -330,6 +391,14 @@ export async function createRegisterSurgeryLiveGame() {
     createdAt: Date.now(),
     state: { phase: "lobby" },
   });
+  await logAptisWritingLiveHosted({
+    gameId,
+    pin,
+    activityType: "register-surgery",
+    activityTitle: "Register Surgery",
+    part: 4,
+    taskId: "part4-register-surgery",
+  });
   return { gameId, pin };
 }
 
@@ -348,6 +417,14 @@ export async function createPart4ErrorDetectiveLiveGame() {
     status: "lobby",
     createdAt: Date.now(),
     state: { phase: "lobby", questionIndex: 0 },
+  });
+  await logAptisWritingLiveHosted({
+    gameId,
+    pin,
+    activityType: "error-detective",
+    activityTitle: "Error Detective",
+    part: 4,
+    taskId: "part4-error-detective",
   });
   return { gameId, pin };
 }
@@ -420,7 +497,7 @@ export async function submitAptisWritingLiveResponse({ gameId, part, taskId, ans
   const user = auth.currentUser;
   const partNumber = Number(part);
   if (!user) throw new Error("You must be signed in to submit your writing.");
-  if (!gameId || ![2, 3, 4].includes(partNumber) || !taskId || !answers) {
+  if (!gameId || ![1, 2, 3, 4].includes(partNumber) || !taskId || !answers) {
     throw new Error("Missing writing response details.");
   }
 
@@ -728,6 +805,18 @@ export async function setLiveGameState(gameId, partialState) {
     }
     if ("phaseDuration" in partialState) {
       updates.phaseDuration = partialState.phaseDuration;
+    }
+    if (typeof partialState.writingTimerDuration === "number") {
+      updates.writingTimerDuration = partialState.writingTimerDuration;
+    }
+    if ("writingTimerRemaining" in partialState) {
+      updates.writingTimerRemaining = partialState.writingTimerRemaining;
+    }
+    if ("writingTimerDeadline" in partialState) {
+      updates.writingTimerDeadline = partialState.writingTimerDeadline;
+    }
+    if (typeof partialState.writingTimerStatus === "string") {
+      updates.writingTimerStatus = partialState.writingTimerStatus;
     }
   
     if (Object.keys(updates).length === 0) return;

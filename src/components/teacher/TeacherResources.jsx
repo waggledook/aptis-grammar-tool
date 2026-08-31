@@ -8,8 +8,6 @@ import {
   Languages,
   Mic2,
   Radio,
-  Search,
-  Scissors,
   Sparkles,
   Users,
 } from "lucide-react";
@@ -22,78 +20,77 @@ const PRODUCT_GROUPS = [
     eyebrow: "Seif Aptis Trainer",
     title: "Aptis classroom resources",
     description:
-      "Extra Aptis tasks kept outside the main learner journey. Open them in class or assign the supported activities to students.",
+      "Extra Aptis tasks kept outside the main learner journey. Resources are grouped by skill so it is clear which learner experience each link opens.",
     accent: "blue",
-    resources: [
+    skillGroups: [
       {
-        title: "Reading Part 2 teacher tasks",
-        description: "Five extra sentence-order texts prepared for classroom practice.",
-        path: "/reading/part2-teacher",
-        icon: BookOpen,
-        tags: ["Reading", "Assignable", "Direct link"],
+        title: "Reading",
+        resources: [{
+          title: "Reading Part 2 teacher tasks",
+          description: "Five extra sentence-order texts prepared for classroom practice.",
+          path: "/reading/part2-teacher",
+          icon: BookOpen,
+          tags: ["Assignable", "Direct link"],
+        }],
       },
       {
-        title: "Writing classroom topics",
-        description: "Four connected topic suites for Parts 2, 3 and 4, available for assignment, direct-link practice or live teaching.",
-        path: "/teacher/writing",
-        icon: GraduationCap,
-        tags: ["Writing", "Assignable", "Live"],
+        title: "Writing",
+        resources: [
+          {
+            title: "Writing Part 2 classroom topics",
+            description: "Four extra short-response topics for assignment, direct-link practice or a live lesson.",
+            path: "/teacher/writing?part=2",
+            icon: GraduationCap,
+            tags: ["Assignable", "Direct link", "Live lessons"],
+          },
+          {
+            title: "Writing Part 3 classroom topics",
+            description: "Four extra three-message topics for assignment, direct-link practice or a live lesson.",
+            path: "/teacher/writing?part=3",
+            icon: GraduationCap,
+            tags: ["Assignable", "Direct link", "Live lessons"],
+          },
+          {
+            title: "Writing Part 4 classroom topics",
+            description: "Four extra email topics plus Register Surgery and Error Detective, all together in one Part 4 workspace.",
+            path: "/teacher/writing?part=4",
+            icon: GraduationCap,
+            tags: ["Assignable", "Direct link", "Live lessons"],
+          },
+        ],
       },
       {
-        title: "Part 4 Register Surgery",
-        description: "A staged classroom activity for spotting, rewriting and comparing inappropriate formal and informal email language.",
-        path: "/writing/part4-register-surgery",
-        icon: Scissors,
-        tags: ["Writing Part 4", "Classroom training", "Shareable"],
-      },
-      {
-        title: "Part 4 Register Surgery · live",
-        description: "Lead spotting, rewriting and register comparison in stages, then review and download anonymous class suggestions.",
-        path: "/teacher/writing?part=4&mode=register-surgery-live",
-        icon: Radio,
-        tags: ["Writing Part 4", "PIN room", "Live lesson"],
-      },
-      {
-        title: "Part 4 Error Detective",
-        description: "Spot recurring grammar, vocabulary and email-convention errors drawn from real Aptis Writing Part 4 submissions.",
-        path: "/writing/part4-error-detective",
-        icon: Search,
-        tags: ["Writing Part 4", "Independent", "Classroom training"],
-      },
-      {
-        title: "Part 4 Error Detective · live",
-        description: "Give the class two four-sentence sets, allow pair or group work, then review corrections and response patterns together.",
-        path: "/teacher/writing?part=4&mode=error-detective-live",
-        icon: Radio,
-        tags: ["Writing Part 4", "PIN room", "Live lesson"],
-      },
-      {
-        title: "Speaking Part 2 extra practice",
-        description: "Six additional photo-description tasks in the full timed speaking flow.",
-        path: "/speaking/part2-secret",
-        icon: Mic2,
-        tags: ["Speaking", "Assignable", "Direct link"],
-      },
-      {
-        title: "Speaking Part 3 extra practice",
-        description: "Five additional picture-comparison tasks for independent or class use.",
-        path: "/speaking/part3-custom",
-        icon: Mic2,
-        tags: ["Speaking", "Assignable", "Direct link"],
-      },
-      {
-        title: "Speaking Part 4 extra practice",
-        description: "Five additional long-turn topics using the standard preparation and response timings.",
-        path: "/speaking/part4-extra",
-        icon: Mic2,
-        tags: ["Speaking", "Assignable", "Direct link"],
-      },
-      {
-        title: "Similarities and differences picture sets",
-        description: "Three classroom picture pairs with prompts, useful language and follow-up questions.",
-        path: "/teacher/extras/speaking-part3-similarities",
-        icon: Users,
-        tags: ["Speaking", "Teacher view"],
+        title: "Speaking",
+        resources: [
+          {
+            title: "Speaking Part 2 extra practice",
+            description: "Six additional photo-description tasks in the full timed speaking flow.",
+            path: "/speaking/part2-secret",
+            icon: Mic2,
+            tags: ["Assignable", "Direct link"],
+          },
+          {
+            title: "Speaking Part 3 extra practice",
+            description: "Five additional picture-comparison tasks for independent or class use.",
+            path: "/speaking/part3-custom",
+            icon: Mic2,
+            tags: ["Assignable", "Direct link"],
+          },
+          {
+            title: "Speaking Part 4 extra practice",
+            description: "Five additional long-turn topics using the standard preparation and response timings.",
+            path: "/speaking/part4-extra",
+            icon: Mic2,
+            tags: ["Assignable", "Direct link"],
+          },
+          {
+            title: "Similarities and differences picture sets",
+            description: "Three classroom picture pairs with prompts, useful language and follow-up questions.",
+            path: "/teacher/extras/speaking-part3-similarities",
+            icon: Users,
+            tags: ["Teacher view"],
+          },
+        ],
       },
     ],
   },
@@ -243,11 +240,22 @@ export default function TeacherResources({ user }) {
               <h2>{group.title}</h2>
               <span>{group.description}</span>
             </header>
-            <div className="teacher-resource-grid">
-              {group.resources.map((resource) => (
-                <ResourceCard key={resource.path} resource={resource} />
-              ))}
-            </div>
+            {group.skillGroups ? group.skillGroups.map((skillGroup) => (
+              <section className="teacher-resource-skill-group" key={skillGroup.title}>
+                <h3>{skillGroup.title}</h3>
+                <div className="teacher-resource-grid">
+                  {skillGroup.resources.map((resource) => (
+                    <ResourceCard key={resource.path} resource={resource} />
+                  ))}
+                </div>
+              </section>
+            )) : (
+              <div className="teacher-resource-grid">
+                {group.resources.map((resource) => (
+                  <ResourceCard key={resource.path} resource={resource} />
+                ))}
+              </div>
+            )}
           </section>
         ))}
       </div>

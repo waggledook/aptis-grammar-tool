@@ -5,8 +5,6 @@ import React from "react";
  * Overview of the task + navigation to subsections
  */
 export default function WritingPart4Guide({ onBack, onOpen }) {
-  const comingSoon = () => {}; // inert for disabled cards
-
   return (
     <div className="writing-p4-main game-wrapper">
       <StyleScope />
@@ -56,20 +54,9 @@ export default function WritingPart4Guide({ onBack, onOpen }) {
             <p>Write the informal and formal emails using the live Part 4 tool.</p>
           </button>
 
-          {/* DISABLED: Error correction */}
-          <button className="menu-card disabled" onClick={comingSoon} aria-disabled="true" tabIndex={-1}>
-            <h4>
-              Error Correction <span className="soon">Coming soon</span>
-            </h4>
-            <p>Fix typical mistakes in email tasks (register, tone, linking, grammar).</p>
-          </button>
-
-          {/* DISABLED: Model emails */}
-          <button className="menu-card disabled" onClick={comingSoon} aria-disabled="true" tabIndex={-1}>
-            <h4>
-              Model Emails <span className="soon">Coming soon</span>
-            </h4>
-            <p>Study complete examples with strong phrasing and clear structure.</p>
+          <button className="menu-card" onClick={() => onOpen("language-models")}>
+            <h4>Phrase Bank &amp; Annotated Models</h4>
+            <p>Choose useful language and explore complete informal and formal examples with commentary.</p>
           </button>
         </div>
       </section>

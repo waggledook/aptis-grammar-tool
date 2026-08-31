@@ -52,6 +52,16 @@ export const ACTIVITY_TYPE_LABELS = {
   hub_spanglish_live_started: "Hub Spanglish Live Started",
   hub_spanglish_live_finished: "Hub Spanglish Live Finished",
   hub_spanglish_live_report_viewed: "Hub Spanglish Live Report Viewed",
+  aptis_writing_teacher_resource_opened: "Aptis Writing Teacher Resource Opened",
+  aptis_writing_teacher_activity_started: "Aptis Writing Teacher Activity Started",
+  aptis_writing_teacher_activity_completed: "Aptis Writing Teacher Activity Completed",
+  aptis_writing_live_hosted: "Aptis Writing Live Hosted",
+  aptis_writing_live_joined: "Aptis Writing Live Joined",
+  aptis_writing_live_started: "Aptis Writing Live Started",
+  aptis_writing_live_submitted: "Aptis Writing Live Submitted",
+  aptis_writing_live_review_started: "Aptis Writing Live Review Started",
+  aptis_writing_live_finished: "Aptis Writing Live Finished",
+  aptis_writing_live_exported: "Aptis Writing Live Exported",
   hub_dependent_preps_started: "Hub Dependent Prepositions Started",
   hub_dependent_preps_review_started: "Hub Dependent Prepositions Review Loaded",
   hub_dependent_preps_completed: "Hub Dependent Prepositions Completed",
@@ -441,6 +451,24 @@ export function formatActivityDetails(log) {
       return joinParts([`PIN ${d.pin ?? "?"}`, formatCount(d.playerCount, "player"), `Rounds ${d.completedRounds ?? d.roundCount ?? "?"}/${d.roundCount ?? "?"}`]);
     case "hub_spanglish_live_report_viewed":
       return joinParts([`PIN ${d.pin ?? "?"}`, formatCount(d.playerCount, "player")]);
+    case "aptis_writing_teacher_resource_opened":
+      return joinParts([d.activityTitle || d.taskId || "Writing resource", d.part ? `Part ${d.part}` : "", d.resourceAction || "open"]);
+    case "aptis_writing_teacher_activity_started":
+    case "aptis_writing_teacher_activity_completed":
+      return joinParts([d.activityTitle || d.activityType || "Writing activity", d.part ? `Part ${d.part}` : "", d.itemCount == null ? "" : formatCount(d.itemCount, "item"), d.score == null ? "" : `Score ${d.score}/${d.itemCount ?? "?"}`]);
+    case "aptis_writing_live_hosted":
+    case "aptis_writing_live_joined":
+      return joinParts([d.activityTitle || d.activityType || "Live writing", d.part ? `Part ${d.part}` : "", `PIN ${d.pin ?? "?"}`]);
+    case "aptis_writing_live_started":
+      return joinParts([d.activityTitle || d.activityType || "Live writing", d.part ? `Part ${d.part}` : "", `PIN ${d.pin ?? "?"}`, formatCount(d.playerCount, "player")]);
+    case "aptis_writing_live_submitted":
+      return joinParts([d.activityTitle || d.activityType || "Live writing", d.part ? `Part ${d.part}` : "", d.stage || "response", `PIN ${d.pin ?? "?"}`]);
+    case "aptis_writing_live_review_started":
+      return joinParts([d.activityTitle || d.activityType || "Live writing", d.stage || "class review", `Submitted ${d.submissionCount ?? "?"}/${d.playerCount ?? "?"}`, `PIN ${d.pin ?? "?"}`]);
+    case "aptis_writing_live_finished":
+      return joinParts([d.activityTitle || d.activityType || "Live writing", d.part ? `Part ${d.part}` : "", formatCount(d.playerCount, "player"), d.submissionCount == null ? "" : formatCount(d.submissionCount, "submission")]);
+    case "aptis_writing_live_exported":
+      return joinParts([d.activityTitle || d.activityType || "Live writing", String(d.exportFormat || "export").toUpperCase(), d.submissionCount == null ? "" : formatCount(d.submissionCount, "submission")]);
     case "hub_dependent_preps_started":
       return joinParts([d.level || d.levelId || "Level", `${d.roundSeconds ?? "?"}s rounds`, `Pool ${d.totalItems ?? "?"}`]);
     case "hub_dependent_preps_review_started":

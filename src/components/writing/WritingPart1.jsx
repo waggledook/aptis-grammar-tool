@@ -3,6 +3,11 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import * as fb from "../../firebase";
 import { toast } from "../../utils/toast";
 import WritingDemoNotice from "./WritingDemoNotice.jsx";
+import {
+  APTIS_WRITING_PART1_QUESTIONS,
+  getAptisWritingPart1QuestionId,
+  pickAptisWritingPart1Questions,
+} from "./data/aptisWritingPart1Questions.js";
 
 /* =========================================================================
    CONFIG
@@ -10,47 +15,8 @@ import WritingDemoNotice from "./WritingDemoNotice.jsx";
 const QUESTIONS_PER_RUN = 5;
 const LS_HISTORY_KEY = "aptis_writing_p1_history_v1";
 
-/** Question bank */
-const WRITING_P1_BANK = [
-  "What do you do?",
-  "What did you do yesterday?",
-  "What’s your favourite colour?",
-  "What’s the weather like today?",
-  "How do you get to work?",
-  "Where do you usually eat lunch?",
-  "What time do you get up on weekdays?",
-  "What type of films do you like watching?",
-  "What’s your favourite type of music?",
-  "How often do you exercise?",
-  "Who do you spend the weekend with?",
-  "What’s your favourite food?",
-  "What do you do in your free time?",
-  "Who do you live with?",
-  "Where do you live?",
-  "What’s your favourite animal?",
-  "What’s your favourite TV show?",
-  "What’s your dream job?",
-  "What’s your favourite place in your city?",
-  "What dishes do you like to cook?",
-  "Who is your best friend?",
-  "What’s/was your favourite subject at school?",
-  "How often do you use your phone?",
-  "What kind of clothes do you like?",
-  "What’s your favourite time of year?",
-  "What do you usually do on holidays?",
-  "What’s your favourite sport?",
-  "How do you usually spend your evenings?",
-  "What kind of movies do you like?",
-  "What are you doing this weekend?",
-  "Where would you like to travel?",
-  "What languages do you speak?",
-  "What do you usually have for breakfast?",
-  "What’s your favourite app?",
-  "What hobbies do you have?",
-  "How do you relax after work?"
-];
-
-const strId = (s) => "q_" + [...s].reduce((a, c) => ((a << 5) - a + c.charCodeAt(0)) | 0, 0);
+const WRITING_P1_BANK = APTIS_WRITING_PART1_QUESTIONS;
+const strId = getAptisWritingPart1QuestionId;
 
 
 /** Minimal model answers (short, natural, no padding) */
@@ -113,15 +79,19 @@ function saveHistory(setLike) {
   try {
     const arr = Array.isArray(setLike) ? setLike : [...setLike];
     localStorage.setItem(LS_HISTORY_KEY, JSON.stringify(arr));
-  } catch {}
+  } catch {
+    // Practice still works when browser storage is unavailable.
+  }
 }
 
 function pickRandomQuestions(bank, historySet, count = QUESTIONS_PER_RUN) {
-  const withIds = bank.map((q) => ({ id: strId(q), text: q }));
-  const unseen = withIds.filter((q) => !historySet.has(q.id));
+  if (bank === WRITING_P1_BANK) return pickAptisWritingPart1Questions({ history: historySet, count });
+  const allowedIds = new Set(bank.map(strId));
+  const eligibleHistory = new Set([...historySet].filter((id) => allowedIds.has(id)));
+  const withIds = bank.map((text) => ({ id: strId(text), text }));
+  const unseen = withIds.filter((question) => !eligibleHistory.has(question.id));
   const pool = unseen.length >= count ? unseen : withIds;
-  const shuffled = pool.slice().sort(() => Math.random() - 0.5);
-  return shuffled.slice(0, count);
+  return pool.slice().sort(() => Math.random() - 0.5).slice(0, count);
 }
 
 /* =========================================================================
@@ -143,7 +113,7 @@ export default function WritingPart1({ user, aptisAccess, onSignIn, allowedQuest
   const [feedbackStatus, setFeedbackStatus] = useState("idle");
   const [feedbackError, setFeedbackError] = useState("");
   const [aiFeedback, setAiFeedback] = useState(null);
-  const [feedbackMeta, setFeedbackMeta] = useState(null);
+  const [, setFeedbackMeta] = useState(null);
   const [submissionId, setSubmissionId] = useState("");
 
 

@@ -47,6 +47,12 @@ function answerParagraphs(text) {
 }
 
 function taskPromptBlocks(part, task) {
+  if (Number(part) === 1) {
+    return [
+      bodyParagraph(task.context),
+      ...task.questions.map((question, index) => bodyParagraph(`${index + 1}. ${question.text}`, { indent: { left: 240 } })),
+    ];
+  }
   if (Number(part) === 2) {
     return [
       bodyParagraph(task.context),
@@ -82,6 +88,16 @@ function responseBlocks(part, entry, index) {
     style: "HeadingOneStyle",
     pageBreakBefore: true,
   });
+
+  if (Number(part) === 1) {
+    return [
+      header,
+      ...(entry.task?.questions || []).flatMap((question, answerIndex) => [
+        labelParagraph(`${answerIndex + 1}. ${question.text} · ${counts.responses?.[answerIndex] || 0} words`),
+        ...answerParagraphs(answers.responses?.[answerIndex]),
+      ]),
+    ];
+  }
 
   if (Number(part) === 2) {
     return [
@@ -194,7 +210,7 @@ export function buildAptisWritingLiveResponsesDocx({ part, task, submissions, ge
           children: [new TextRun({ text: "Responses are shown in a stable random order and contain no student names.", italics: true, color: MUTED })],
           spacing: { before: 180, after: 180, line: 300 },
         }),
-        ...submissions.flatMap((entry, index) => responseBlocks(part, entry, index)),
+        ...submissions.flatMap((entry, index) => responseBlocks(part, { ...entry, task }, index)),
       ],
     }],
   });

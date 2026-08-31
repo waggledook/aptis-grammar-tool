@@ -15,12 +15,15 @@ import Seo from "../common/Seo.jsx";
 import {
   APTIS_WRITING_LIVE_GAME_TYPE,
   getAptisWritingTeacherTask,
+  getAptisWritingLiveSuggestedSeconds,
 } from "./data/aptisWritingTeacherTasks.js";
 import {
   AptisWritingLiveFeedback,
   AptisWritingLivePrompt,
+  AptisWritingLiveTimer,
   AptisWritingSubmittedResponse,
   getAnonymousLiveSubmissions,
+  getAptisWritingLiveTimerSnapshot,
 } from "./AptisWritingLiveShared.jsx";
 import { downloadAptisWritingLiveResponsesDocx } from "./utils/aptisWritingLiveDocx.js";
 import "./aptisWritingLive.css";
@@ -52,7 +55,7 @@ export default function AptisWritingLiveHost({ user }) {
     [game?.players]
   );
   const part = Number(game?.part);
-  const task = getAptisWritingTeacherTask(part, game?.taskId);
+  const task = getAptisWritingTeacherTask(part, game?.taskId, game?.questionIds);
   const phase = game?.state?.phase || "lobby";
   const submissions = players.filter((player) => player.writingSubmission);
   const anonymousSubmissions = useMemo(
@@ -78,17 +81,76 @@ export default function AptisWritingLiveHost({ user }) {
   async function beginWriting() {
     await setLiveGameStatus(gameId, "in-progress");
     await setLiveGameState(gameId, { phase: "writing" });
+    await fb.logAptisWritingLiveStarted({
+      gameId,
+      pin: game.pin || null,
+      activityType: "writing-task",
+      activityTitle: task.title,
+      part,
+      taskId: task.id,
+      playerCount: players.length,
+    });
+  }
+
+  async function startWritingTimer() {
+    const timer = getAptisWritingLiveTimerSnapshot(game?.state, Date.now(), getAptisWritingLiveSuggestedSeconds(part));
+    const remainingSeconds = timer.status === "paused" && timer.remainingSeconds > 0
+      ? timer.remainingSeconds
+      : timer.durationSeconds;
+    await setLiveGameState(gameId, {
+      writingTimerDeadline: Date.now() + remainingSeconds * 1000,
+      writingTimerRemaining: null,
+      writingTimerStatus: "running",
+    });
+  }
+
+  async function pauseWritingTimer() {
+    const timer = getAptisWritingLiveTimerSnapshot(game?.state, Date.now(), getAptisWritingLiveSuggestedSeconds(part));
+    await setLiveGameState(gameId, {
+      writingTimerDeadline: null,
+      writingTimerRemaining: timer.remainingSeconds,
+      writingTimerStatus: "paused",
+    });
+  }
+
+  async function resetWritingTimer() {
+    const timer = getAptisWritingLiveTimerSnapshot(game?.state, Date.now(), getAptisWritingLiveSuggestedSeconds(part));
+    await setLiveGameState(gameId, {
+      writingTimerDeadline: null,
+      writingTimerRemaining: timer.durationSeconds,
+      writingTimerStatus: "ready",
+    });
   }
 
   async function beginReview() {
     const outstanding = players.length - submissions.length;
     if (outstanding > 0 && !window.confirm(`${outstanding} student(s) have not submitted. Begin the review anyway?`)) return;
     await setLiveGameState(gameId, { phase: "review" });
+    await fb.logAptisWritingLiveReviewStarted({
+      gameId,
+      pin: game.pin || null,
+      activityType: "writing-task",
+      activityTitle: task.title,
+      part,
+      taskId: task.id,
+      playerCount: players.length,
+      submissionCount: submissions.length,
+    });
   }
 
   async function finishSession() {
     await setLiveGameStatus(gameId, "finished");
     await setLiveGameState(gameId, { phase: "finished" });
+    await fb.logAptisWritingLiveFinished({
+      gameId,
+      pin: game.pin || null,
+      activityType: "writing-task",
+      activityTitle: task.title,
+      part,
+      taskId: task.id,
+      playerCount: players.length,
+      submissionCount: submissions.length,
+    });
   }
 
   async function downloadResponses() {
@@ -100,6 +162,17 @@ export default function AptisWritingLiveHost({ user }) {
         part,
         task,
         submissions: anonymousSubmissions,
+      });
+      await fb.logAptisWritingLiveExported({
+        gameId,
+        pin: game.pin || null,
+        activityType: "writing-task",
+        activityTitle: task.title,
+        part,
+        taskId: task.id,
+        playerCount: players.length,
+        submissionCount: anonymousSubmissions.length,
+        exportFormat: "docx",
       });
       setDownloadState("Downloaded");
     } catch (error) {
@@ -117,7 +190,7 @@ export default function AptisWritingLiveHost({ user }) {
       return;
     }
 
-    const creditCost = ({ 2: 2, 3: 3, 4: 5 })[part] || 0;
+    const creditCost = ({ 1: 1, 2: 2, 3: 3, 4: 5 })[part] || 0;
     const totalCredits = pending.length * creditCost;
     if (!window.confirm(`Generate AI feedback for ${pending.length} ${pending.length === 1 ? "response" : "responses"}? This will use ${totalCredits} writing-feedback ${totalCredits === 1 ? "credit" : "credits"} from your allowance.`)) return;
 
@@ -195,12 +268,19 @@ export default function AptisWritingLiveHost({ user }) {
 
       {phase === "writing" ? (
         <section className="aptis-writing-live-stage">
+          <AptisWritingLiveTimer
+            onPause={pauseWritingTimer}
+            onReset={resetWritingTimer}
+            onStart={startWritingTimer}
+            part={part}
+            state={game.state}
+          />
           <div className="aptis-writing-live-progress">
             <div><p>Live responses</p><h2>{submissions.length} of {players.length} submitted</h2></div>
             <div>{players.map((player) => <span className={player.writingSubmission ? "is-done" : ""} key={player.id}>{player.writingSubmission ? <Check size={15} /> : <i />}{player.name}</span>)}</div>
           </div>
           <AptisWritingLivePrompt part={part} task={task} />
-          <button className="aptis-writing-live-primary aptis-writing-live-next" disabled={!submissions.length} onClick={beginReview} type="button"><Eye size={18} /> Review submitted writing</button>
+          <button className="aptis-writing-live-primary aptis-writing-live-next" onClick={beginReview} type="button"><Eye size={18} /> Review submitted writing</button>
         </section>
       ) : null}
 
@@ -217,7 +297,7 @@ export default function AptisWritingLiveHost({ user }) {
             {anonymousSubmissions.map((player) => (
               <article className="aptis-writing-live-student-submission" key={player.id}>
                 <header><strong>{player.anonymousLabel}</strong><CheckCircle2 size={19} /></header>
-                <AptisWritingSubmittedResponse part={part} submission={player.writingSubmission} />
+                <AptisWritingSubmittedResponse part={part} submission={player.writingSubmission} task={task} />
                 <AptisWritingLiveFeedback part={part} feedback={player.writingFeedback?.taskId === task.id ? player.writingFeedback.feedback : null} />
               </article>
             ))}
@@ -239,7 +319,7 @@ export default function AptisWritingLiveHost({ user }) {
             {anonymousSubmissions.map((player) => (
               <article className="aptis-writing-live-student-submission" key={player.id}>
                 <header><strong>{player.anonymousLabel}</strong><CheckCircle2 size={19} /></header>
-                <AptisWritingSubmittedResponse part={part} submission={player.writingSubmission} />
+                <AptisWritingSubmittedResponse part={part} submission={player.writingSubmission} task={task} />
                 <AptisWritingLiveFeedback part={part} feedback={player.writingFeedback?.taskId === task.id ? player.writingFeedback.feedback : null} />
               </article>
             ))}
@@ -261,6 +341,13 @@ function feedbackButtonLabel(progress, submissions) {
 async function requestFeedbackForSubmission(part, task, submission) {
   const answers = submission?.answers || {};
   const counts = submission?.counts || {};
+  if (Number(part) === 1) {
+    return fb.requestAptisWritingPart1Feedback(task.questions.map((question, index) => ({
+      id: question.id,
+      question: question.text,
+      answer: answers.responses?.[index] || "",
+    })));
+  }
   if (Number(part) === 2) {
     return fb.requestAptisWritingPart23Feedback({
       part: "part2",

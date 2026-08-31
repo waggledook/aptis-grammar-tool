@@ -246,6 +246,11 @@ export const APTIS_ROUTE_SEO = {
     description:
       "Practise choosing formal and informal language for Aptis Writing Part 4 emails.",
   },
+  "/writing/part4-language-models": {
+    title: "Aptis Writing Part 4 Useful Phrases and Models | Seif Aptis Trainer",
+    description:
+      "Explore informal and formal Aptis Writing Part 4 phrase banks with complete annotated model emails.",
+  },
   "/writing/part4-register-surgery": {
     title: "Aptis Writing Part 4 Register Surgery | Seif Aptis Trainer",
     description:

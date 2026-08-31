@@ -150,6 +150,18 @@
 .aptis-writing-live-progress { padding: 1rem; border: 1px solid var(--awl-border); border-radius: 13px; background: rgba(8, 25, 49, 0.38); }
 .aptis-writing-live-progress > div:last-child { margin-bottom: 0; }
 
+.aptis-writing-live-timer { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 0.8rem; padding: 0.85rem 1rem; border: 1px solid var(--awl-border); border-radius: 13px; background: rgba(8, 25, 49, 0.55); }
+.aptis-writing-live-timer > svg { color: #9fc4f7; }
+.aptis-writing-live-timer > div:not(.aptis-writing-live-timer-actions) { display: grid; grid-template-columns: auto auto; align-items: baseline; justify-content: start; gap: 0.25rem 0.65rem; }
+.aptis-writing-live-timer span { color: var(--awl-muted); font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+.aptis-writing-live-timer strong { color: var(--awl-text); font-size: clamp(1.5rem, 3vw, 2.15rem); font-variant-numeric: tabular-nums; line-height: 1; }
+.aptis-writing-live-timer small { grid-column: 1 / -1; color: var(--awl-muted); }
+.aptis-writing-live-timer.is-low strong { color: #f3c66e; }
+.aptis-writing-live-timer.is-expired { border-color: #c86f6f; }
+.aptis-writing-live-timer.is-expired strong { color: #ffaaaa; }
+.aptis-writing-live-timer-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.45rem; }
+.aptis-writing-live-timer-actions button { display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; padding: 0.58rem 0.7rem; border: 1px solid var(--awl-border); border-radius: 9px; background: var(--awl-surface-soft); color: var(--awl-text); cursor: pointer; font: inherit; font-weight: 800; }
+
 .aptis-writing-live-prompt {
   padding: clamp(1rem, 2vw, 1.35rem);
   border: 1px solid var(--awl-border);
@@ -161,6 +173,8 @@
 .aptis-writing-live-prompt h3 { margin: 0.9rem 0 0.4rem; color: var(--awl-text); }
 .aptis-writing-live-prompt > p:not(.aptis-writing-live-kicker) { color: var(--awl-muted); line-height: 1.55; }
 .aptis-writing-live-callout { padding: 0.9rem 1rem; border-left: 4px solid var(--awl-accent); border-radius: 0 10px 10px 0; background: var(--awl-surface-soft); font-weight: 750; }
+.aptis-writing-live-part1-questions { display: grid; gap: 0.45rem; margin: 0.9rem 0 0; padding-left: 1.5rem; color: var(--awl-text); }
+.aptis-writing-live-part1-questions li::marker { color: #9fc4f7; font-weight: 850; }
 
 .aptis-writing-live-chat-list,
 .aptis-writing-live-email-prompts { display: grid; gap: 0.65rem; margin-top: 0.9rem; }
@@ -174,8 +188,11 @@
 .aptis-writing-live-field { display: grid; gap: 0.45rem; }
 .aptis-writing-live-field > span { display: flex; justify-content: space-between; gap: 0.8rem; align-items: baseline; }
 .aptis-writing-live-field em { color: var(--awl-muted); font-size: 0.76rem; font-style: normal; }
-.aptis-writing-live-field textarea { width: 100%; resize: vertical; padding: 0.85rem 0.95rem; border: 1px solid var(--awl-border); border-radius: 11px; background: #0b1c35; color: var(--awl-text); font: inherit; line-height: 1.55; }
-.aptis-writing-live-field textarea:focus { outline: 3px solid rgba(94, 154, 232, 0.25); border-color: #70a8ec; }
+.aptis-writing-live-field textarea,
+.aptis-writing-live-field input { width: 100%; padding: 0.85rem 0.95rem; border: 1px solid var(--awl-border); border-radius: 11px; background: #0b1c35; color: var(--awl-text); font: inherit; line-height: 1.55; }
+.aptis-writing-live-field textarea { resize: vertical; }
+.aptis-writing-live-field textarea:focus,
+.aptis-writing-live-field input:focus { outline: 3px solid rgba(94, 154, 232, 0.25); border-color: #70a8ec; }
 
 .aptis-writing-live-submitted,
 .aptis-writing-live-finished,
@@ -243,7 +260,8 @@
   --awl-accent: #d99524;
 }
 :root[data-theme="light"] .aptis-writing-live-source,
-:root[data-theme="light"] .aptis-writing-live-field textarea { background: #f8fbff; }
+:root[data-theme="light"] .aptis-writing-live-field textarea,
+:root[data-theme="light"] .aptis-writing-live-field input { background: #f8fbff; }
 :root[data-theme="light"] .aptis-writing-live-ai-report { background: #f7faff; }
 
 @media (max-width: 760px) {
@@ -257,4 +275,7 @@
   .aptis-writing-live-header > span { align-self: flex-start; }
   .aptis-writing-live-teacher-actions { display: grid; grid-template-columns: 1fr; }
   .aptis-writing-live-ai-overview { grid-template-columns: 1fr; }
+  .aptis-writing-live-timer { grid-template-columns: auto minmax(0, 1fr); }
+  .aptis-writing-live-timer-actions { grid-column: 1 / -1; justify-content: stretch; }
+  .aptis-writing-live-timer-actions button { flex: 1; }
 }

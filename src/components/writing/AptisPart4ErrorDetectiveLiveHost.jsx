@@ -3,7 +3,13 @@ import { CheckCircle2, Clipboard, Download, Eye, PenLine, Play, Radio, Users } f
 import { onValue, ref } from "firebase/database";
 import { useParams } from "react-router-dom";
 import { setLiveGameState, setLiveGameStatus } from "../../api/liveGames.js";
-import { rtdb } from "../../firebase.js";
+import {
+  logAptisWritingLiveExported,
+  logAptisWritingLiveFinished,
+  logAptisWritingLiveReviewStarted,
+  logAptisWritingLiveStarted,
+  rtdb,
+} from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
 import Seo from "../common/Seo.jsx";
 import { APTIS_PART4_ERROR_BANK, PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE } from "./data/aptisPart4ErrorBank.js";
@@ -44,17 +50,39 @@ export default function AptisPart4ErrorDetectiveLiveHost({ user }) {
   async function startSession() {
     await setLiveGameStatus(gameId, "in-progress");
     await setLiveGameState(gameId, { phase: "spot", roundIndex: 0, round: makeErrorDetectiveRound().map((item) => item.id) });
+    await logAptisWritingLiveStarted({
+      gameId, pin: game.pin || null, activityType: "error-detective", activityTitle: "Error Detective",
+      part: 4, taskId: "part4-error-detective", playerCount: players.length,
+    });
+  }
+  async function openReview(reviewPhase, stage) {
+    await setLiveGameState(gameId, { phase: reviewPhase });
+    const progressKey = stage === "spot" ? "errorDetective" : "errorDetectiveCorrections";
+    const submissionCount = players.filter((player) => batchItems.some((item) => player[progressKey]?.[item.id])).length;
+    await logAptisWritingLiveReviewStarted({
+      gameId, pin: game.pin || null, activityType: "error-detective", activityTitle: "Error Detective",
+      part: 4, taskId: "part4-error-detective", playerCount: players.length, submissionCount,
+      stage: `set-${batchIndex + 1}-${stage}`,
+    });
   }
   async function continueSession() {
     if (batchIndex === 0) return setLiveGameState(gameId, { phase: "spot", roundIndex: 1 });
     await setLiveGameStatus(gameId, "finished");
-    return setLiveGameState(gameId, { phase: "finished" });
+    await setLiveGameState(gameId, { phase: "finished" });
+    await logAptisWritingLiveFinished({
+      gameId, pin: game.pin || null, activityType: "error-detective", activityTitle: "Error Detective",
+      part: 4, taskId: "part4-error-detective", playerCount: players.length,
+    });
   }
   async function copyJoinLink() { await navigator.clipboard.writeText(joinUrl); setCopied(true); window.setTimeout(() => setCopied(false), 1600); }
   async function downloadReport() {
     setExportState("Preparing…");
     try {
       await downloadErrorDetectiveLiveReportDocx({ players, gameId, round: game?.state?.round || [] });
+      await logAptisWritingLiveExported({
+        gameId, pin: game.pin || null, activityType: "error-detective", activityTitle: "Error Detective",
+        part: 4, taskId: "part4-error-detective", playerCount: players.length, exportFormat: "docx",
+      });
       setExportState("Downloaded");
     } catch (error) {
       console.error("[AptisPart4ErrorDetectiveLiveHost] report export failed", error);
@@ -73,14 +101,14 @@ export default function AptisPart4ErrorDetectiveLiveHost({ user }) {
 
     {phase === "lobby" ? <section className="register-live-lobby"><div className="register-live-pin"><p>Students join with PIN</p><strong>{String(game.pin).replace(/^(\d{3})(\d{3})$/, "$1 $2")}</strong><button type="button" onClick={copyJoinLink}><Clipboard size={17} /> {copied ? "Copied" : "Copy join link"}</button></div><div className="register-live-roster"><header><Users size={25} /><h2>{players.length} joined</h2></header><div>{players.map((player) => <span key={player.id}>{player.name}</span>)}</div><button className="register-live-primary" disabled={!players.length} onClick={startSession} type="button"><Play size={18} /> Open first set of 4</button></div></section> : null}
 
-    {phase === "spot" ? <WorkStage heading="Find the error in these four sentences" kicker="Pair or group work · Stage 1" items={batchItems} players={players} progressKey="errorDetective" renderItem={(item, number) => { const responseCount = players.filter((player) => player.errorDetective?.[item.id]).length; return <LiveItem item={item} key={item.id} number={batchIndex * 4 + number} status={`${responseCount}/${players.length} responses`} />; }} note="Spotting review can begin at any time, even if some students have not finished." button={<button className="register-live-primary register-live-next" onClick={() => setLiveGameState(gameId, { phase: "spot_review" })} type="button"><Eye size={18} /> Review error locations</button>} /> : null}
+    {phase === "spot" ? <WorkStage heading="Find the error in these four sentences" kicker="Pair or group work · Stage 1" items={batchItems} players={players} progressKey="errorDetective" renderItem={(item, number) => { const responseCount = players.filter((player) => player.errorDetective?.[item.id]).length; return <LiveItem item={item} key={item.id} number={batchIndex * 4 + number} status={`${responseCount}/${players.length} responses`} />; }} note="Spotting review can begin at any time, even if some students have not finished." button={<button className="register-live-primary register-live-next" onClick={() => openReview("spot_review", "spot")} type="button"><Eye size={18} /> Review error locations</button>} /> : null}
 
     {phase === "spot_review" ? <section className="register-live-stage"><StageHeading batchIndex={batchIndex} kicker="Stage 1 review" title="Confirm the four error locations" />
       <div className="error-detective-live-grid is-review">{batchItems.map((item, itemIndex) => { const counts = getAnswerCounts(players, item.id); const responseCount = Object.values(counts).reduce((total, count) => total + count, 0); return <article className="error-detective-live-item" key={item.id}><header><strong>{batchIndex * 4 + itemIndex + 1}</strong><span>{responseCount} responses</span></header><LiveErrorChunks chunks={getErrorChunks(item)} counts={counts} reveal /><p className="error-detective-live-target"><strong>Problem phrase:</strong> {item.target}</p></article>; })}</div>
       <button className="register-live-primary register-live-next" onClick={() => setLiveGameState(gameId, { phase: "correct" })} type="button"><PenLine size={18} /> Open correction phase</button>
     </section> : null}
 
-    {phase === "correct" ? <WorkStage heading="Write a correction for each problem phrase" kicker="Pair or group work · Stage 2" items={batchItems} players={players} progressKey="errorDetectiveCorrections" renderItem={(item, number) => { const responseCount = players.filter((player) => player.errorDetectiveCorrections?.[item.id]).length; return <article className="error-detective-live-item" key={item.id}><header><strong>{batchIndex * 4 + number}</strong><span>{responseCount}/{players.length} corrections</span></header><p className="error-detective-live-original">{item.sentence}</p><p className="error-detective-live-target"><strong>Correct:</strong> {item.target}</p></article>; }} note="Correction review can begin at any time, even if some students have not finished." button={<button className="register-live-primary register-live-next" onClick={() => setLiveGameState(gameId, { phase: "correct_review" })} type="button"><Eye size={18} /> Review corrections</button>} /> : null}
+    {phase === "correct" ? <WorkStage heading="Write a correction for each problem phrase" kicker="Pair or group work · Stage 2" items={batchItems} players={players} progressKey="errorDetectiveCorrections" renderItem={(item, number) => { const responseCount = players.filter((player) => player.errorDetectiveCorrections?.[item.id]).length; return <article className="error-detective-live-item" key={item.id}><header><strong>{batchIndex * 4 + number}</strong><span>{responseCount}/{players.length} corrections</span></header><p className="error-detective-live-original">{item.sentence}</p><p className="error-detective-live-target"><strong>Correct:</strong> {item.target}</p></article>; }} note="Correction review can begin at any time, even if some students have not finished." button={<button className="register-live-primary register-live-next" onClick={() => openReview("correct_review", "correction")} type="button"><Eye size={18} /> Review corrections</button>} /> : null}
 
     {phase === "correct_review" ? <section className="register-live-stage"><StageHeading batchIndex={batchIndex} kicker="Stage 2 review" title="Compare the class corrections" />
       <div className="error-detective-live-grid is-review">{batchItems.map((item, itemIndex) => { const corrections = players.map((player) => player.errorDetectiveCorrections?.[item.id]?.correction).filter(Boolean); return <article className="error-detective-live-item" key={item.id}><header><strong>{batchIndex * 4 + itemIndex + 1}</strong><span>{corrections.length} corrections</span></header><div className="error-detective-live-class-corrections">{corrections.length ? corrections.map((correction, index) => <blockquote key={`${correction}-${index}`}>{correction}</blockquote>) : <p>No correction submitted.</p>}</div><p className="error-detective-live-correction"><strong>Model:</strong> {item.correctedSentence}</p><p>{item.explanation}</p></article>; })}</div>

@@ -1,5 +1,9 @@
 import React, { useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, CheckCircle2, Eye, Mail, RotateCcw, Scissors } from "lucide-react";
+import {
+  logAptisWritingTeacherActivityCompleted,
+  logAptisWritingTeacherActivityStarted,
+} from "../../firebase.js";
 import Seo from "../common/Seo.jsx";
 import {
   REGISTER_SURGERY_COMPARISONS,
@@ -18,6 +22,7 @@ function getSectionNumber(step) {
 
 export default function WritingPart4RegisterSurgery({ onBack }) {
   const activityRef = useRef(null);
+  const analyticsRef = useRef({ started: false, completed: false });
   const [step, setStep] = useState(0);
   const [stimulusOpen, setStimulusOpen] = useState(true);
   const [selected, setSelected] = useState({ informal: [], formal: [] });
@@ -45,7 +50,30 @@ export default function WritingPart4RegisterSurgery({ onBack }) {
   }
 
   function checkSelections(kind) {
+    if (!analyticsRef.current.started) {
+      analyticsRef.current.started = true;
+      void logAptisWritingTeacherActivityStarted({
+        activityType: "register-surgery",
+        activityTitle: "Register Surgery",
+        part: 4,
+        taskId: "part4-register-surgery",
+      });
+    }
     setChecked((current) => ({ ...current, [kind]: true }));
+  }
+
+  function completeActivity() {
+    setComparisonsShown(REGISTER_SURGERY_COMPARISONS.map((_, index) => index));
+    setComplete(true);
+    if (analyticsRef.current.completed) return;
+    analyticsRef.current.completed = true;
+    void logAptisWritingTeacherActivityCompleted({
+      activityType: "register-surgery",
+      activityTitle: "Register Surgery",
+      part: 4,
+      taskId: "part4-register-surgery",
+      itemCount: REGISTER_SURGERY_COMPARISONS.length,
+    });
   }
 
   function changeSelections(kind) {
@@ -81,6 +109,7 @@ export default function WritingPart4RegisterSurgery({ onBack }) {
     setSuggestionsShown({});
     setComparisonsShown([]);
     setComplete(false);
+    analyticsRef.current = { started: false, completed: false };
     window.requestAnimationFrame(() => activityRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
 
@@ -189,10 +218,7 @@ export default function WritingPart4RegisterSurgery({ onBack }) {
         <ComparisonStage
           complete={complete}
           onBack={() => goToStep(3)}
-          onComplete={() => {
-            setComparisonsShown(REGISTER_SURGERY_COMPARISONS.map((_, index) => index));
-            setComplete(true);
-          }}
+          onComplete={completeActivity}
           onRevealAll={() => setComparisonsShown(REGISTER_SURGERY_COMPARISONS.map((_, index) => index))}
           onToggle={toggleComparison}
           shown={comparisonsShown}

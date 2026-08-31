@@ -6,15 +6,19 @@ import {
   createPart4ErrorDetectiveLiveGame,
   createRegisterSurgeryLiveGame,
 } from "../../api/liveGames.js";
+import { logAptisWritingTeacherResourceOpened } from "../../firebase.js";
 import { toast } from "../../utils/toast.js";
 import Seo from "../common/Seo.jsx";
 import {
   APTIS_WRITING_TEACHER_TOPICS,
+  APTIS_WRITING_PART1_LIVE_TASK_ID,
   getAptisWritingTeacherTask,
 } from "../writing/data/aptisWritingTeacherTasks.js";
+import { pickAptisWritingPart1Questions } from "../writing/data/aptisWritingPart1Questions.js";
 import "./TeacherWritingResources.css";
 
 const PART_DETAILS = {
+  1: { label: "Part 1", format: "Five answers of 1–5 words", path: "/writing/part1" },
   2: { label: "Part 2", format: "One 20–30 word response", path: "/teacher/writing/part2" },
   3: { label: "Part 3", format: "Three 30–40 word responses", path: "/teacher/writing/part3" },
   4: { label: "Part 4", format: "Informal and formal emails", path: "/teacher/writing/part4" },
@@ -24,14 +28,20 @@ export default function TeacherWritingResources() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const requestedPart = Number(searchParams.get("part"));
-  const selectedPart = [2, 3, 4].includes(requestedPart) ? requestedPart : 2;
+  const selectedPart = [1, 2, 3, 4].includes(requestedPart) ? requestedPart : 2;
   const liveLaunchMode = searchParams.get("mode") === "live";
   const registerLiveLaunchMode = selectedPart === 4 && searchParams.get("mode") === "register-surgery-live";
   const errorDetectiveLiveLaunchMode = selectedPart === 4 && searchParams.get("mode") === "error-detective-live";
   const [creatingKey, setCreatingKey] = useState("");
   const details = PART_DETAILS[selectedPart];
   const selectedTasks = useMemo(
-    () => APTIS_WRITING_TEACHER_TOPICS.map((topic) => getAptisWritingTeacherTask(selectedPart, topic.id)),
+    () => selectedPart === 1
+      ? [{
+        id: APTIS_WRITING_PART1_LIVE_TASK_ID,
+        title: "Random five-question set",
+        context: "Five personal questions drawn from the same bank used in student Part 1 practice.",
+      }]
+      : APTIS_WRITING_TEACHER_TOPICS.map((topic) => getAptisWritingTeacherTask(selectedPart, topic.id)),
     [selectedPart]
   );
 
@@ -46,10 +56,12 @@ export default function TeacherWritingResources() {
     if (creatingKey) return;
     setCreatingKey(key);
     try {
+      const partOneQuestions = selectedPart === 1 ? pickAptisWritingPart1Questions() : [];
       const { gameId } = await createAptisWritingLiveGame({
         part: selectedPart,
         taskId: task.id,
         title: `Aptis Writing Part ${selectedPart} · ${task.title}`,
+        questionIds: partOneQuestions.map((question) => question.id),
       });
       navigate(`/live/aptis-writing/host/${gameId}`);
     } catch (error) {
@@ -88,6 +100,17 @@ export default function TeacherWritingResources() {
     }
   }
 
+  function logResourceOpen({ activityType = "writing-task", activityTitle, part, taskId, destination }) {
+    void logAptisWritingTeacherResourceOpened({
+      activityType,
+      activityTitle,
+      part,
+      taskId,
+      destination,
+      resourceAction: "open-assign",
+    });
+  }
+
   return (
     <main className="teacher-writing-resources game-wrapper">
       <Seo
@@ -105,8 +128,8 @@ export default function TeacherWritingResources() {
           <p>Aptis Trainer · Teacher resources</p>
           <h1>Writing classroom topics</h1>
           <span>
-            Four connected scenarios for Parts 2, 3 and 4. Open the normal writing task to assign or share it,
-            or start a live room for a teacher-paced class session.
+            Open the normal writing task to assign or share it, or start a live room for a teacher-paced
+            Part 1, 2, 3 or 4 classroom session.
           </span>
         </div>
       </header>
@@ -161,7 +184,10 @@ export default function TeacherWritingResources() {
               {creatingKey === "register-surgery" ? <Radio className="is-pulsing" size={17} /> : <Play size={17} />}
               {creatingKey === "register-surgery" ? "Creating room…" : "Run live"}
             </button>
-            <Link to="/writing/part4-register-surgery">Open activity <ArrowRight size={17} /></Link>
+            <Link
+              onClick={() => logResourceOpen({ activityType: "register-surgery", activityTitle: "Register Surgery", part: 4, taskId: "part4-register-surgery", destination: "/writing/part4-register-surgery" })}
+              to="/writing/part4-register-surgery"
+            >Open activity <ArrowRight size={17} /></Link>
           </div>
         </section>
       ) : null}
@@ -179,7 +205,10 @@ export default function TeacherWritingResources() {
               {creatingKey === "error-detective" ? <Radio className="is-pulsing" size={17} /> : <Play size={17} />}
               {creatingKey === "error-detective" ? "Creating room…" : "Run live"}
             </button>
-            <Link to="/writing/part4-error-detective">Open activity <ArrowRight size={17} /></Link>
+            <Link
+              onClick={() => logResourceOpen({ activityType: "error-detective", activityTitle: "Error Detective", part: 4, taskId: "part4-error-detective", destination: "/writing/part4-error-detective" })}
+              to="/writing/part4-error-detective"
+            >Open activity <ArrowRight size={17} /></Link>
           </div>
         </section>
       ) : null}
@@ -188,7 +217,7 @@ export default function TeacherWritingResources() {
         <header>
           <div>
             <p>Currently showing</p>
-            <h2>{details.label} extra topics</h2>
+            <h2>{selectedPart === 1 ? "Part 1 question-bank activity" : `${details.label} extra topics`}</h2>
           </div>
           <span>Both routes use the same task content and student accounts.</span>
         </header>
@@ -199,19 +228,22 @@ export default function TeacherWritingResources() {
             return (
               <article className="teacher-writing-topic-card" key={task.id}>
                 <div className="teacher-writing-topic-number" aria-hidden="true">
-                  {APTIS_WRITING_TEACHER_TOPICS.findIndex((topic) => topic.id === task.id) + 1}
+                  {selectedPart === 1 ? 1 : APTIS_WRITING_TEACHER_TOPICS.findIndex((topic) => topic.id === task.id) + 1}
                 </div>
                 <div className="teacher-writing-topic-copy">
                   <span>{details.label} · {details.format}</span>
                   <h3>{task.title}</h3>
-                  <p>{selectedPart === 4 ? task.formalPrompt : selectedPart === 3 ? task.context : task.prompt}</p>
+                  <p>{selectedPart === 1 ? task.context : selectedPart === 4 ? task.formalPrompt : selectedPart === 3 ? task.context : task.prompt}</p>
                 </div>
                 <div className="teacher-writing-topic-actions">
                   <button disabled={Boolean(creatingKey)} onClick={() => launchLive(task)} type="button">
                     {creating ? <Radio className="is-pulsing" size={17} /> : <Play size={17} />}
                     {creating ? "Creating room…" : "Run live"}
                   </button>
-                  <Link to={`${details.path}?task=${encodeURIComponent(task.id)}`}>
+                  <Link
+                    onClick={() => logResourceOpen({ activityTitle: task.title, part: selectedPart, taskId: task.id, destination: selectedPart === 1 ? details.path : `${details.path}?task=${encodeURIComponent(task.id)}` })}
+                    to={selectedPart === 1 ? details.path : `${details.path}?task=${encodeURIComponent(task.id)}`}
+                  >
                     <Users size={17} /> Open / assign
                   </Link>
                 </div>

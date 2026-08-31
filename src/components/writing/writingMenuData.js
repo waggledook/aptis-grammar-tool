@@ -127,6 +127,14 @@ export const APTIS_WRITING_PARTS = [
         path: "/writing/part4-register",
         demoAccess: "locked",
       },
+      {
+        id: "part4-language-models",
+        eyebrow: "Student reference",
+        title: "Phrase Bank & Annotated Models",
+        copy: "Explore useful informal and formal phrases, then tap highlighted model-email passages to see why they work.",
+        path: "/writing/part4-language-models",
+        demoAccess: "locked",
+      },
     ],
     practice: {
       id: "part4-practice",

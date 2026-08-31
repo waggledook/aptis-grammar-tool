@@ -51,6 +51,7 @@ import WritingPart4Guide from "./components/writing/WritingPart4Guide";
 import WritingPart4Emails from "./components/writing/WritingPart4Emails";
 import WritingPart4RegisterGuide from "./components/writing/WritingPart4RegisterGuide";
 import WritingPart4RegisterSurgery from "./components/writing/WritingPart4RegisterSurgery.jsx";
+import WritingPart4LanguageModels from "./components/writing/WritingPart4LanguageModels.jsx";
 import AptisWritingLiveHost from "./components/writing/AptisWritingLiveHost.jsx";
 import AptisWritingLivePlayer from "./components/writing/AptisWritingLivePlayer.jsx";
 import AptisRegisterSurgeryLiveHost from "./components/writing/AptisRegisterSurgeryLiveHost.jsx";
@@ -2984,11 +2985,17 @@ return (
       onOpen={(slug) => {
         if (slug === "register") return navigate("/writing/part4-register");
         if (slug === "practice") return navigate("/writing/part4");
+        if (slug === "language-models") return navigate("/writing/part4-language-models");
         // fallback for any future slugs
         navigate(`/writing/p4-${slug}`);
       }}
     />
   }
+/>
+
+<Route
+  path="/writing/part4-language-models"
+  element={<WritingPart4LanguageModels onBack={() => navigate("/writing/parts/4")} />}
 />
 
 <Route
@@ -3021,7 +3028,7 @@ return (
 
 <Route
   path="/writing/part4-error-detective"
-  element={<Part4ErrorDetective onBack={() => navigate("/writing/parts/4")} />}
+  element={<Part4ErrorDetective isTeacher={user?.role === "teacher" || user?.role === "admin"} onBack={() => navigate("/writing/parts/4")} />}
 />
 
 {/* ——— Profile routes ——— */}

@@ -1,4 +1,46 @@
+import { getAptisWritingPart1QuestionsById } from "./aptisWritingPart1Questions.js";
+
 export const APTIS_WRITING_LIVE_GAME_TYPE = "aptis-writing-teacher";
+export const APTIS_WRITING_PART1_LIVE_TASK_ID = "random-five-short-answers";
+export const APTIS_WRITING_LIVE_TIMINGS = Object.freeze({
+  1: 3 * 60,
+  2: 7 * 60,
+  3: 10 * 60,
+  4: 30 * 60,
+});
+
+export function getAptisWritingLiveSuggestedSeconds(part) {
+  return APTIS_WRITING_LIVE_TIMINGS[Number(part)] || 0;
+}
+
+export function getAptisWritingLiveTimerSnapshot(state = {}, now = Date.now(), fallbackDuration = 0) {
+  const durationSeconds = Math.max(0, Number(state.writingTimerDuration) || Number(fallbackDuration) || 0);
+  const storedRemaining = Number.isFinite(Number(state.writingTimerRemaining))
+    ? Number(state.writingTimerRemaining)
+    : durationSeconds;
+  const deadline = Number(state.writingTimerDeadline) || 0;
+  const isRunning = state.writingTimerStatus === "running" && deadline > 0;
+  const remainingSeconds = isRunning
+    ? Math.max(0, Math.ceil((deadline - now) / 1000))
+    : Math.max(0, Math.min(durationSeconds, storedRemaining));
+  return {
+    durationSeconds,
+    remainingSeconds,
+    status: isRunning && remainingSeconds === 0 ? "expired" : state.writingTimerStatus || "ready",
+    isRunning: isRunning && remainingSeconds > 0,
+  };
+}
+
+export function getAptisWritingPart1LiveTask(questionIds = []) {
+  const questions = getAptisWritingPart1QuestionsById(questionIds);
+  if (questions.length !== 5 || new Set(questions.map((question) => question.id)).size !== 5) return null;
+  return {
+    id: APTIS_WRITING_PART1_LIVE_TASK_ID,
+    title: "Five short answers",
+    context: "Answer five personal questions. Write between one and five words for each answer.",
+    questions,
+  };
+}
 
 export const APTIS_WRITING_TEACHER_TOPICS = [
   {
@@ -156,6 +198,9 @@ export function getAptisWritingTeacherTasks(part) {
   return [];
 }
 
-export function getAptisWritingTeacherTask(part, taskId) {
+export function getAptisWritingTeacherTask(part, taskId, questionIds = []) {
+  if (Number(part) === 1 && taskId === APTIS_WRITING_PART1_LIVE_TASK_ID) {
+    return getAptisWritingPart1LiveTask(questionIds);
+  }
   return getAptisWritingTeacherTasks(part).find((task) => task.id === taskId) || null;
 }
