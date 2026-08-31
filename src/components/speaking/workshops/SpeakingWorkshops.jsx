@@ -6,6 +6,7 @@ import SpeakingPart3 from "../SpeakingPart3";
 import SpeakingPart4 from "../SpeakingPart4";
 import SpeakingWorkshopAccessGate from "./SpeakingWorkshopAccessGate";
 import RelationshipsPreparation from "./RelationshipsPreparation";
+import TransportPreparation from "./TransportPreparation";
 import TeachingMode from "./TeachingMode";
 import {
   getSpeakingWorkshopTopic,
@@ -76,15 +77,13 @@ function TopicModeChoice({ topic, navigate }) {
       </section>
 
       <section className="workshop-mode-grid" aria-label="Choose a mode">
-        {topic.id === "relationships-family" ? (
-          <button type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/prepare`)}>
-            <span className="mode-icon" aria-hidden="true">◇</span>
-            <span className="workshop-kicker">Before the workshop</span>
-            <h2>Prepare</h2>
-            <p>A short flipped-classroom sequence with topic phrases, speaking functions and an oral rehearsal.</p>
-            <strong>Start the warm-up →</strong>
-          </button>
-        ) : null}
+        <button type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/prepare`)}>
+          <span className="mode-icon" aria-hidden="true">◇</span>
+          <span className="workshop-kicker">Before the workshop</span>
+          <h2>Prepare</h2>
+          <p>A short flipped-classroom sequence with topic phrases, speaking functions and an oral rehearsal.</p>
+          <strong>Start the warm-up →</strong>
+        </button>
         <button type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/practice`)}>
           <span className="mode-icon" aria-hidden="true">◉</span>
           <span className="workshop-kicker">Individual mode</span>
@@ -215,7 +214,13 @@ export default function SpeakingWorkshops({ user, onSignIn }) {
   if (!topicId) page = <WorkshopLanding navigate={navigate} />;
   else if (!topic) page = <Navigate to="/speaking-workshops" replace />;
   else if (!mode) page = <TopicModeChoice topic={topic} navigate={navigate} />;
-  else if (mode === "prepare" && topic.id === "relationships-family") page = <main className="speaking-workshops"><RelationshipsPreparation topic={topic} user={user} /></main>;
+  else if (mode === "prepare") page = (
+    <main className="speaking-workshops">
+      {topic.id === "relationships-family"
+        ? <RelationshipsPreparation topic={topic} user={user} />
+        : <TransportPreparation topic={topic} user={user} />}
+    </main>
+  );
   else if (mode === "teach") page = <main className="speaking-workshops"><TeachingMode topic={topic} /></main>;
   else if (mode === "practice" && !partNumber) page = <PracticePartChoice topic={topic} navigate={navigate} />;
   else if (mode === "practice") page = <ExamPractice topic={topic} partNumber={partNumber} user={user} navigate={navigate} />;

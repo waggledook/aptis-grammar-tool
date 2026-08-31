@@ -8,6 +8,7 @@ import { PART2_TASKS } from "./banks/part2";
 import SpeakingAssignButton from "./SpeakingAssignButton";
 import { getSitePath } from "../../siteConfig.js";
 import SpeakingDemoNotice from "./SpeakingDemoNotice.jsx";
+import SpeakingStickyTimer from "./SpeakingStickyTimer.jsx";
 
 
 /**
@@ -570,6 +571,13 @@ function SpeakingAutoFlow({ task, user, onFinished }) {
 
   return (
     <>
+    <SpeakingStickyTimer
+      active={overall === "running"}
+      questionIndex={seg}
+      phase={sub}
+      secondsLeft={left}
+      recording={recording}
+    />
     <div className="panes">
       {/* Left: prompt */}
 <section className="panel">

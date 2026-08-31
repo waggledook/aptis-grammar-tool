@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, Clipboard, Download, Eye, PenLine, Play, Radio, Users } from "lucide-react";
 import { onValue, ref } from "firebase/database";
+import { QRCodeSVG } from "qrcode.react";
 import { useParams } from "react-router-dom";
 import { setLiveGameState, setLiveGameStatus } from "../../api/liveGames.js";
 import {
@@ -99,7 +100,7 @@ export default function AptisPart4ErrorDetectiveLiveHost({ user }) {
     <Seo title="Host Live Error Detective | Seif Aptis Trainer" description="Teacher-paced Aptis Writing Part 4 error activity." />
     <header className="register-live-header"><div><p>Aptis Writing Part 4 · Live classroom</p><h1>Error Detective</h1></div><span>{phase === "lobby" ? "Waiting room" : phase === "finished" ? "Complete" : `Set ${batchIndex + 1} of 2 · ${PHASE_LABELS[phase] || phase}`}</span></header>
 
-    {phase === "lobby" ? <section className="register-live-lobby"><div className="register-live-pin"><p>Students join with PIN</p><strong>{String(game.pin).replace(/^(\d{3})(\d{3})$/, "$1 $2")}</strong><button type="button" onClick={copyJoinLink}><Clipboard size={17} /> {copied ? "Copied" : "Copy join link"}</button></div><div className="register-live-roster"><header><Users size={25} /><h2>{players.length} joined</h2></header><div>{players.map((player) => <span key={player.id}>{player.name}</span>)}</div><button className="register-live-primary" disabled={!players.length} onClick={startSession} type="button"><Play size={18} /> Open first set of 4</button></div></section> : null}
+    {phase === "lobby" ? <section className="register-live-lobby"><div className="register-live-pin"><p>Students join with PIN</p><strong>{String(game.pin).replace(/^(\d{3})(\d{3})$/, "$1 $2")}</strong><QRCodeSVG value={joinUrl} size={184} includeMargin /><button type="button" onClick={copyJoinLink}><Clipboard size={17} /> {copied ? "Copied" : "Copy join link"}</button></div><div className="register-live-roster"><header><Users size={25} /><h2>{players.length} joined</h2></header><div>{players.map((player) => <span key={player.id}>{player.name}</span>)}</div><button className="register-live-primary" disabled={!players.length} onClick={startSession} type="button"><Play size={18} /> Open first set of 4</button></div></section> : null}
 
     {phase === "spot" ? <WorkStage heading="Find the error in these four sentences" kicker="Pair or group work · Stage 1" items={batchItems} players={players} progressKey="errorDetective" renderItem={(item, number) => { const responseCount = players.filter((player) => player.errorDetective?.[item.id]).length; return <LiveItem item={item} key={item.id} number={batchIndex * 4 + number} status={`${responseCount}/${players.length} responses`} />; }} note="Spotting review can begin at any time, even if some students have not finished." button={<button className="register-live-primary register-live-next" onClick={() => openReview("spot_review", "spot")} type="button"><Eye size={18} /> Review error locations</button>} /> : null}
 

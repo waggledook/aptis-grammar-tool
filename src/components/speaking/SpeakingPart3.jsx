@@ -8,6 +8,7 @@ import SpeakingAssignButton from "./SpeakingAssignButton";
 import { getSitePath } from "../../siteConfig.js";
 import SpeakingDemoNotice from "./SpeakingDemoNotice.jsx";
 import SpeakingFeedbackPanel from "./SpeakingFeedbackPanel.jsx";
+import SpeakingStickyTimer from "./SpeakingStickyTimer.jsx";
 
 /**
  * Speaking – Part 3 (Compare two photos) — Exam-like
@@ -523,6 +524,13 @@ async function ensureAudioContext() {
 
   return (
     <>
+    <SpeakingStickyTimer
+      active={overall === "running"}
+      questionIndex={seg}
+      phase={sub}
+      secondsLeft={left}
+      recording={recording}
+    />
     <div className="panes panes-vertical">
       {/* Top: controls */}
       <section className="panel controls-panel">
