@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { ArrowLeft, CheckCircle2, ClipboardList, MessageCircleQuestion, Mic, PlayCircle } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckCircle2, ClipboardList, MessageCircleQuestion, Mic, PlayCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
@@ -21,6 +21,9 @@ export default function OteSpeakingPart34Menu({ user, nativeRoutes = false }) {
   const summaryPracticePath = getSitePath(
     nativeRoutes ? "/speaking/part-3-summary/practice" : "/ote/speaking/part-3-summary/practice"
   );
+  const summaryLanguagePath = getSitePath(
+    nativeRoutes ? "/speaking/part-3-summary/language" : "/ote/speaking/part-3-summary/language"
+  );
   const practicePath = isAdvanced ? summaryPracticePath : talkPracticePath;
   const guidedPath = getSitePath(
     nativeRoutes ? "/speaking/parts-3-4/guided-talk" : "/ote/speaking/parts-3-4/guided-talk"
@@ -40,6 +43,14 @@ export default function OteSpeakingPart34Menu({ user, nativeRoutes = false }) {
               icon: ClipboardList,
               path: overviewPath,
               progressId: "speaking.part3.advanced-summary-overview",
+            },
+            {
+              label: "Activity 2",
+              title: "Summary Language Reference",
+              copy: "Use clear, flexible language to report, connect and paraphrase the experts’ ideas accurately.",
+              icon: BookOpen,
+              path: summaryLanguagePath,
+              progressId: "speaking.part3.advanced-summary-language",
             },
           ]
         : [
@@ -68,7 +79,7 @@ export default function OteSpeakingPart34Menu({ user, nativeRoutes = false }) {
               progressId: "speaking.parts34.followup-guided",
             },
           ],
-    [followUpGuidedPath, guidedPath, isAdvanced, overviewPath]
+    [followUpGuidedPath, guidedPath, isAdvanced, overviewPath, summaryLanguagePath]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
   const practiceTotal = isAdvanced ? 2 : 5;
@@ -119,7 +130,7 @@ export default function OteSpeakingPart34Menu({ user, nativeRoutes = false }) {
         </div>
       </header>
 
-      <div className="ote-training-activity-grid" aria-label={isAdvanced ? "Part 3 summary activities" : "Parts 3 and 4 activities"}>
+      <div className={`ote-training-activity-grid ${isAdvanced ? "is-two-column" : ""}`} aria-label={isAdvanced ? "Part 3 summary activities" : "Parts 3 and 4 activities"}>
         {activities.map((activity) => {
           const Icon = activity.icon;
           const isComplete = completedProgress.has(activity.progressId);
@@ -147,7 +158,7 @@ export default function OteSpeakingPart34Menu({ user, nativeRoutes = false }) {
           {isAdvanced
             ? summary.allComplete
               ? "Guide complete. Now practise timed integrated summary sets with notes, preparation time, and recording."
-              : "Work through the summary strategy guide, then practise full timed Part 3 summary sets."
+              : "Work through the strategy and language resources, then practise full timed Part 3 summary sets."
             : summary.allComplete
             ? "Training complete. Now practise timed talks and follow-up questions."
             : "Work through the training activities above, then practise full timed Parts 3 and 4 sets."}

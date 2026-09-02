@@ -258,6 +258,14 @@ const OTE_ASSIGNMENT_ITEMS = [
     progressId: "speaking.part3.advanced-summary-overview",
   },
   {
+    id: "ote.advanced.speaking.part3.language",
+    variant: "advanced",
+    category: "Speaking",
+    label: "Advanced Part 3 Summary Language Reference",
+    routePath: "/ote/speaking/part-3-summary/language",
+    progressId: "speaking.part3.advanced-summary-language",
+  },
+  {
     id: "ote.advanced.speaking.part3.practice",
     variant: "advanced",
     category: "Speaking",

@@ -3238,6 +3238,23 @@
   box-shadow: var(--ote-dashboard-shadow);
 }
 
+.ote-summary-guide-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.ote-training-primary-link.is-secondary {
+  border: 2px solid var(--ote-dashboard-panel-border);
+  background: var(--ote-dashboard-secondary);
+  color: var(--ote-dashboard-text);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.1);
+}
+
+.ote-training-primary-link.is-secondary:hover {
+  border-color: var(--ote-dashboard-panel-border-hover);
+}
+
 .ote-summary-lesson-heading,
 .ote-summary-comparison-grid article header {
   display: flex;

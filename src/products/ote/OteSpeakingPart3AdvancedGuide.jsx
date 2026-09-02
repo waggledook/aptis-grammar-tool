@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, CheckCircle2, Clock3, ListChecks, MessageSquareText, RotateCcw, Sparkles, XCircle } from "lucide-react";
+import { ArrowLeft, BookOpen, CheckCircle2, Clock3, ListChecks, MessageSquareText, RotateCcw, Sparkles, XCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { logOteTrainingCompleted } from "../../firebase.js";
@@ -100,6 +100,7 @@ export default function OteSpeakingPart3AdvancedGuide({ nativeRoutes = false }) 
   const completedLoggedRef = useRef(false);
   const menuPath = getSitePath(nativeRoutes ? "/speaking/parts-3-4" : "/ote/speaking/parts-3-4");
   const practicePath = getSitePath(nativeRoutes ? "/speaking/part-3-summary/practice" : "/ote/speaking/part-3-summary/practice");
+  const languagePath = getSitePath(nativeRoutes ? "/speaking/part-3-summary/language" : "/ote/speaking/part-3-summary/language");
   const answeredCount = Object.keys(answers).length;
   const correctCount = useMemo(
     () => quizQuestions.filter((question) => answers[question.id] === question.answer).length,
@@ -355,10 +356,16 @@ export default function OteSpeakingPart3AdvancedGuide({ nativeRoutes = false }) 
           <li>Can I use my notes without reading a full script?</li>
           <li>Can I speak clearly for most of the 50 seconds?</li>
         </ul>
-        <button className="ote-training-primary-link" type="button" onClick={() => navigate(practicePath)}>
-          <Sparkles size={17} aria-hidden="true" />
-          Open Advanced Part 3 summary practice
-        </button>
+        <div className="ote-summary-guide-actions">
+          <button className="ote-training-primary-link is-secondary" type="button" onClick={() => navigate(languagePath)}>
+            <BookOpen size={17} aria-hidden="true" />
+            Open the language reference
+          </button>
+          <button className="ote-training-primary-link" type="button" onClick={() => navigate(practicePath)}>
+            <Sparkles size={17} aria-hidden="true" />
+            Open Advanced Part 3 summary practice
+          </button>
+        </div>
       </section>
     </main>
   );
