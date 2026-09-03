@@ -1,260 +1,203 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  relationshipAnswerBuilder,
-  relationshipContextQuestions,
-  relationshipPhraseCards,
-  relationshipPreparationSteps,
-} from "./relationshipsPreparationData";
+import { relationshipsPreparationConfig } from "./relationshipsPreparationData";
 
-const RELATIONSHIPS_PREPARATION_CONFIG = {
-  phraseCards: relationshipPhraseCards,
-  contextQuestions: relationshipContextQuestions,
-  answerBuilder: relationshipAnswerBuilder,
-  steps: relationshipPreparationSteps,
-  copy: {
-    phraseQuestion: "Which relationship phrase fits?",
-    builderQuestion: "Tell me about someone you are close to.",
-  },
-  rehearsal: {
-    part: 2,
-    taskIndex: 4,
-    initialQuestionIndex: 1,
-    usefulPhrases: "keep in touch · get on well · rely on · grow apart",
-    developmentPhrases: "The main reason is… · For example… · In general, I think…",
-    checks: [
-      ["answer", "I answered the exact question."],
-      ["reason", "I developed an idea with a reason or example."],
-      ["phrase", "I used at least one relationship phrase."],
-    ],
-  },
-};
+const CHAPTERS = [
+  { id: "set-a", label: "Learn A", title: "First vocabulary set", description: "Meet eight useful expressions, then retrieve every one." },
+  { id: "set-b", label: "Learn B", title: "Second vocabulary set", description: "Add eight complementary expressions and practise them." },
+  { id: "review", label: "Use it", title: "Review and ideas", description: "Mix both sets, then choose ideas you could talk about." },
+  { id: "speak", label: "Speak", title: "45-second rehearsal", description: "Use the language once before the live workshop." },
+];
 
 function readSavedProgress(key) {
   try {
     const saved = JSON.parse(window.localStorage.getItem(key) || "{}");
-    return Array.isArray(saved.completedSteps) ? saved.completedSteps : [];
+    return Array.isArray(saved.completedChapters) ? saved.completedChapters : [];
   } catch {
     return [];
   }
 }
 
-function StepActions({ stepIndex, setStepIndex, stepCount, canContinue = true }) {
-  return (
-    <footer className="prep-step-actions">
-      <button type="button" disabled={stepIndex === 0} onClick={() => setStepIndex((index) => Math.max(0, index - 1))}>
-        ← Previous
-      </button>
-      <button
-        type="button"
-        disabled={!canContinue || stepIndex === stepCount - 1}
-        onClick={() => setStepIndex((index) => Math.min(stepCount - 1, index + 1))}
-      >
-        Continue →
-      </button>
-    </footer>
-  );
-}
-
-function PhraseActivation({ cards, copy, ratings, setRatings, onComplete, stepIndex, setStepIndex, stepCount }) {
+function VocabularyCards({ set, onFinish }) {
   const [cardIndex, setCardIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
-  const card = cards[cardIndex];
-  const finished = Object.keys(ratings).length === cards.length;
-  const needsPractice = Object.values(ratings).filter((rating) => rating === "again").length;
-
-  function rateCard(rating) {
-    const nextRatings = { ...ratings, [card.id]: rating };
-    setRatings(nextRatings);
-    setFlipped(false);
-    if (Object.keys(nextRatings).length === cards.length) {
-      onComplete();
-      return;
-    }
-    const nextUnrated = cards.findIndex((item, index) => index > cardIndex && !nextRatings[item.id]);
-    setCardIndex(nextUnrated >= 0 ? nextUnrated : cards.findIndex((item) => !nextRatings[item.id]));
-  }
-
-  if (finished) {
-    return (
-      <section className="prep-activity-card prep-complete-card">
-        <span className="prep-card-icon" aria-hidden="true">✓</span>
-        <h2>Phrase check complete</h2>
-        <p>You recalled {cards.length - needsPractice} of {cards.length} confidently. {needsPractice ? `${needsPractice} can come back in your next review.` : "Everything felt familiar."}</p>
-        {needsPractice ? (
-          <button
-            className="workshop-secondary"
-            type="button"
-            onClick={() => {
-              const first = cards.findIndex((item) => ratings[item.id] === "again");
-              setRatings(Object.fromEntries(Object.entries(ratings).filter(([, rating]) => rating !== "again")));
-              setCardIndex(Math.max(0, first));
-            }}
-          >
-            Review the uncertain phrases
-          </button>
-        ) : null}
-        <StepActions stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={stepCount} />
-      </section>
-    );
-  }
+  const item = set.items[cardIndex];
 
   return (
     <section className="prep-activity-card">
       <div className="prep-activity-heading">
         <div>
-          <span className="workshop-kicker">Say it before you reveal it</span>
-          <h2>{copy.phraseQuestion}</h2>
+          <span className="workshop-kicker">{set.label} · Learn</span>
+          <h2>{set.title}</h2>
+          <p className="prep-lead">{set.introduction}</p>
         </div>
-        <strong>{Object.keys(ratings).length + 1} / {cards.length}</strong>
+        <strong>{cardIndex + 1} / {set.items.length}</strong>
       </div>
-
-      <button className={`prep-flashcard ${flipped ? "is-flipped" : ""}`} type="button" onClick={() => setFlipped((value) => !value)}>
-        <img src={card.image} alt="" />
-        <span className="prep-flashcard-copy">
-          <small>{flipped ? "Phrase" : "Visual cue"}</small>
-          {flipped ? (
-            <>
-              <strong>{card.term}</strong>
-              <span>{card.definition}</span>
-            </>
-          ) : (
-            <>
-              <strong>{card.collocation}</strong>
-              <span>Say the complete phrase aloud, then tap to check.</span>
-            </>
-          )}
-        </span>
-      </button>
-
-      <div className="prep-rating-actions">
-        <button type="button" disabled={!flipped} onClick={() => rateCard("again")}>Not yet</button>
-        <button type="button" disabled={!flipped} onClick={() => rateCard("know")}>Got it</button>
-      </div>
-      <p className="prep-support-note">This is a self-check: reveal the answer before rating yourself.</p>
-      <StepActions stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={stepCount} canContinue={false} />
-    </section>
-  );
-}
-
-function ContextChoice({ questions, answers, setAnswers, onComplete, stepIndex, setStepIndex, stepCount }) {
-  const [questionIndex, setQuestionIndex] = useState(0);
-  const question = questions[questionIndex];
-  const selected = answers[question.id];
-  const finished = Object.keys(answers).length === questions.length;
-  const score = questions.filter((item) => answers[item.id] === item.answer).length;
-
-  function choose(option) {
-    if (selected) return;
-    const nextAnswers = { ...answers, [question.id]: option };
-    setAnswers(nextAnswers);
-    if (Object.keys(nextAnswers).length === questions.length) onComplete();
-  }
-
-  if (finished && questionIndex === questions.length - 1 && selected) {
-    return (
-      <section className="prep-activity-card prep-complete-card">
-        <span className="prep-card-icon" aria-hidden="true">{score >= 5 ? "✓" : "↻"}</span>
-        <h2>{score} / {questions.length} correct</h2>
-        <p>{score >= 5 ? "These phrases are ready to use in your speaking answers." : "Good first pass. The explanations remain available if you revisit the questions."}</p>
-        <button className="workshop-secondary" type="button" onClick={() => { setAnswers({}); setQuestionIndex(0); }}>Try again</button>
-        <StepActions stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={stepCount} />
-      </section>
-    );
-  }
-
-  return (
-    <section className="prep-activity-card">
-      <div className="prep-activity-heading">
+      <article className={`prep-vocab-card ${item.image ? "has-image" : ""}`}>
+        {item.image ? <img src={item.image} alt="" /> : <span className="prep-word-mark" aria-hidden="true">{item.term.charAt(0)}</span>}
         <div>
-          <span className="workshop-kicker">Vocabulary in context</span>
-          <h2>Choose the phrase that fits</h2>
+          <span className="prep-vocab-label">Useful language</span>
+          <h3>{item.term}</h3>
+          <p>{item.meaning}</p>
+          <blockquote>{item.example}</blockquote>
+          {item.gap ? <small>{item.gap}</small> : null}
         </div>
-        <strong>{questionIndex + 1} / {questions.length}</strong>
-      </div>
-      <p className="prep-context-sentence">{question.sentence}</p>
-      <div className="prep-choice-grid">
-        {question.options.map((option) => {
-          const isCorrect = selected && option === question.answer;
-          const isWrong = selected === option && option !== question.answer;
-          return (
-            <button key={option} type="button" className={isCorrect ? "is-correct" : isWrong ? "is-wrong" : ""} onClick={() => choose(option)}>
-              {option}
-            </button>
-          );
-        })}
-      </div>
-      {selected ? (
-        <div className={`prep-feedback ${selected === question.answer ? "is-correct" : "is-wrong"}`}>
-          <strong>{selected === question.answer ? "Correct" : `The answer is “${question.answer}”.`}</strong>
-          <span>{question.explanation}</span>
+      </article>
+      <footer className="prep-card-actions">
+        <button type="button" disabled={cardIndex === 0} onClick={() => setCardIndex((index) => Math.max(0, index - 1))}>← Back</button>
+        <div className="prep-card-dots" aria-label={`Vocabulary item ${cardIndex + 1} of ${set.items.length}`}>
+          {set.items.map((card, index) => <span key={card.id} className={index === cardIndex ? "is-active" : ""} />)}
         </div>
-      ) : null}
-      <footer className="prep-step-actions">
-        <button type="button" disabled={questionIndex === 0} onClick={() => setQuestionIndex((index) => Math.max(0, index - 1))}>← Previous question</button>
-        <button type="button" disabled={!selected} onClick={() => setQuestionIndex((index) => Math.min(questions.length - 1, index + 1))}>Next question →</button>
+        <button className="workshop-primary" type="button" onClick={() => cardIndex === set.items.length - 1 ? onFinish() : setCardIndex((index) => index + 1)}>
+          {cardIndex === set.items.length - 1 ? "Practise these →" : "Next →"}
+        </button>
       </footer>
     </section>
   );
 }
 
-function AnswerBuilder({ groups, copy, selections, setSelections, onComplete, stepIndex, setStepIndex, stepCount }) {
-  const ready = groups.every((group) => selections[group.id]);
+function QuestionCycle({ kicker, title, questions, answers, setAnswers, onFinish, finishLabel = "Continue →" }) {
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const question = questions[questionIndex];
+  const selected = answers[question.id];
+  const isLast = questionIndex === questions.length - 1;
+  const correctCount = questions.filter((item) => answers[item.id] === item.answer).length;
+  const finished = Object.keys(answers).length === questions.length;
 
-  function selectOption(groupId, option) {
-    const nextSelections = { ...selections, [groupId]: option };
-    setSelections(nextSelections);
-    if (groups.every((group) => nextSelections[group.id])) onComplete();
+  if (finished && isLast) {
+    return (
+      <section className="prep-activity-card prep-complete-card">
+        <span className="prep-card-icon" aria-hidden="true">✓</span>
+        <h2>{correctCount} / {questions.length} correct</h2>
+        <p>You retrieved every target item in this activity. You can repeat it now or continue.</p>
+        <div className="prep-complete-actions">
+          <button className="workshop-secondary" type="button" onClick={() => { setAnswers({}); setQuestionIndex(0); }}>Try again</button>
+          <button className="workshop-primary" type="button" onClick={onFinish}>{finishLabel}</button>
+        </div>
+      </section>
+    );
+  }
+
+  function choose(option) {
+    if (selected) return;
+    setAnswers((current) => ({ ...current, [question.id]: option }));
+  }
+
+  return (
+    <section className="prep-activity-card">
+      <div className="prep-activity-heading">
+        <div><span className="workshop-kicker">{kicker}</span><h2>{title}</h2></div>
+        <strong>{questionIndex + 1} / {questions.length}</strong>
+      </div>
+      {question.context ? <p className="prep-question-context">{question.context}</p> : null}
+      <p className="prep-context-sentence">{question.prompt}</p>
+      <div className="prep-choice-grid">
+        {question.options.map((option) => {
+          const isCorrect = selected && option === question.answer;
+          const isWrong = selected === option && option !== question.answer;
+          return <button key={option} type="button" className={isCorrect ? "is-correct" : isWrong ? "is-wrong" : ""} onClick={() => choose(option)}>{option}</button>;
+        })}
+      </div>
+      {selected ? (
+        <div className={`prep-feedback ${selected === question.answer ? "is-correct" : "is-wrong"}`}>
+          <strong>{selected === question.answer ? "That’s it." : `Best answer: “${question.answer}”.`}</strong>
+          <span>{question.feedback}</span>
+        </div>
+      ) : null}
+      <footer className="prep-question-actions">
+        <button type="button" disabled={questionIndex === 0} onClick={() => setQuestionIndex((index) => Math.max(0, index - 1))}>← Previous</button>
+        <button type="button" disabled={!selected} onClick={() => setQuestionIndex((index) => Math.min(questions.length - 1, index + 1))}>{isLast ? "See result" : "Next →"}</button>
+      </footer>
+    </section>
+  );
+}
+
+function VocabularyChapter({ set, chapterIndex, setChapterIndex, onComplete }) {
+  const [stage, setStage] = useState("learn");
+  const [answers, setAnswers] = useState({});
+
+  if (stage === "learn") return <VocabularyCards set={set} onFinish={() => setStage("practice")} />;
+  return (
+    <QuestionCycle
+      kicker={`${set.label} · Retrieve`}
+      title="Use every expression"
+      questions={set.practice}
+      answers={answers}
+      setAnswers={setAnswers}
+      finishLabel={chapterIndex === 0 ? "Learn Set B →" : "Mixed review →"}
+      onFinish={() => {
+        onComplete(CHAPTERS[chapterIndex].id);
+        setChapterIndex(chapterIndex + 1);
+      }}
+    />
+  );
+}
+
+function IdeaActivation({ tasks, selections, setSelections, onFinish }) {
+  const complete = tasks.every((task) => (selections[task.id] || []).length >= task.minimum);
+
+  function toggle(task, idea) {
+    const current = selections[task.id] || [];
+    const next = current.includes(idea) ? current.filter((item) => item !== idea) : [...current, idea];
+    setSelections((value) => ({ ...value, [task.id]: next }));
   }
 
   return (
     <section className="prep-activity-card">
       <div className="prep-activity-heading">
         <div>
-          <span className="workshop-kicker">Speaking functions</span>
-          <h2>Build a developed answer</h2>
+          <span className="workshop-kicker">Make it personal</span>
+          <h2>What could you say?</h2>
+          <p className="prep-lead">Choose at least three talking points for each question. There are no wrong answers.</p>
         </div>
       </div>
-      <p className="prep-lead">Imagine the question is: <strong>“{copy.builderQuestion}”</strong> Choose one useful stem at each stage.</p>
-      <div className="prep-builder-grid">
-        {groups.map((group) => (
-          <fieldset key={group.id}>
-            <legend><strong>{group.label}</strong><span>{group.prompt}</span></legend>
-            {group.options.map((option) => (
-              <label key={option} className={selections[group.id] === option ? "is-selected" : ""}>
-                <input
-                  type="radio"
-                  name={`builder-${group.id}`}
-                  checked={selections[group.id] === option}
-                  onChange={() => selectOption(group.id, option)}
-                />
-                <span>{option}</span>
-              </label>
-            ))}
+      <div className="prep-idea-grid">
+        {tasks.map((task) => (
+          <fieldset key={task.id}>
+            <legend>{task.question}</legend>
+            <p>{task.instruction}</p>
+            <div>
+              {task.ideas.map((idea) => {
+                const selected = (selections[task.id] || []).includes(idea);
+                return <button key={idea} type="button" className={selected ? "is-selected" : ""} aria-pressed={selected} onClick={() => toggle(task, idea)}>{selected ? "✓ " : "+ "}{idea}</button>;
+              })}
+            </div>
+            <small>{(selections[task.id] || []).length} selected · choose at least {task.minimum}</small>
           </fieldset>
         ))}
       </div>
-      <aside className={`prep-answer-plan ${ready ? "is-ready" : ""}`}>
-        <span className="workshop-kicker">Your answer framework</span>
-        {groups.map((group) => <p key={group.id}>{selections[group.id] || <em>Choose a phrase above…</em>}</p>)}
-        {ready ? <small>Say this framework aloud and complete each ending with your own ideas.</small> : null}
-      </aside>
-      <StepActions stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={stepCount} canContinue={ready} />
+      <footer className="prep-idea-actions">
+        <span>{complete ? "You have enough ideas to speak." : "Choose your easiest ideas—not the most impressive ones."}</span>
+        <button className="workshop-primary" type="button" disabled={!complete} onClick={onFinish}>Speaking rehearsal →</button>
+      </footer>
     </section>
   );
 }
 
-function createCheckState(items) {
-  return Object.fromEntries(items.map(([id]) => [id, false]));
+function ReviewChapter({ config, setChapterIndex, onComplete }) {
+  const [stage, setStage] = useState("review");
+  const [answers, setAnswers] = useState({});
+  const [selections, setSelections] = useState({});
+
+  if (stage === "review") {
+    return <QuestionCycle kicker="Sets A + B" title="Mixed vocabulary review" questions={config.mixedReview} answers={answers} setAnswers={setAnswers} finishLabel="Choose your ideas →" onFinish={() => setStage("ideas")} />;
+  }
+  return (
+    <IdeaActivation
+      tasks={config.ideaTasks}
+      selections={selections}
+      setSelections={setSelections}
+      onFinish={() => {
+        onComplete("review");
+        setChapterIndex(3);
+      }}
+    />
+  );
 }
 
-function PhotoRehearsal({ topic, rehearsal, onComplete, onOpenReference, stepIndex, setStepIndex, stepCount }) {
-  const task = topic.parts[rehearsal.part].tasks[rehearsal.taskIndex];
-  const [questionIndex, setQuestionIndex] = useState(rehearsal.initialQuestionIndex);
+function SpeakingRehearsal({ rehearsal, onComplete, onOpenReference }) {
   const [secondsLeft, setSecondsLeft] = useState(45);
   const [running, setRunning] = useState(false);
-  const [checks, setChecks] = useState(() => createCheckState(rehearsal.checks));
-  const checkedCount = Object.values(checks).filter(Boolean).length;
+  const [attempted, setAttempted] = useState(false);
 
   useEffect(() => {
     if (!running || secondsLeft <= 0) return undefined;
@@ -263,88 +206,64 @@ function PhotoRehearsal({ topic, rehearsal, onComplete, onOpenReference, stepInd
   }, [running, secondsLeft]);
 
   useEffect(() => {
-    if (secondsLeft === 0) setRunning(false);
+    if (secondsLeft === 0) {
+      setRunning(false);
+      setAttempted(true);
+    }
   }, [secondsLeft]);
 
-  useEffect(() => {
-    setRunning(false);
+  function startAgain() {
     setSecondsLeft(45);
-    setChecks(createCheckState(rehearsal.checks));
-  }, [questionIndex, rehearsal.checks]);
-
-  function finish() {
-    onComplete();
+    setAttempted(false);
+    setRunning(true);
   }
 
   return (
-    <section className="prep-activity-card">
+    <section className="prep-activity-card prep-speaking-card">
       <div className="prep-activity-heading">
-        <div>
-          <span className="workshop-kicker">Short spoken rehearsal</span>
-          <h2>Use the language aloud</h2>
-        </div>
+        <div><span className="workshop-kicker">Final step · Speak</span><h2>One 45-second rehearsal</h2></div>
         <strong className={secondsLeft <= 10 ? "prep-time-low" : ""}>0:{String(secondsLeft).padStart(2, "0")}</strong>
       </div>
-      <p className="prep-lead">Choose a question, take a moment to think, then speak for up to 45 seconds. This rehearsal is not recorded.</p>
       <div className="prep-rehearsal-layout">
-        <img src={task.image} alt={task.alt} />
+        {rehearsal.image ? <img src={rehearsal.image} alt={rehearsal.imageAlt || ""} /> : null}
         <div>
-          <div className="prep-question-tabs" role="group" aria-label="Choose a rehearsal question">
-            {task.allQuestions.map((question, index) => (
-              <button key={question} type="button" className={questionIndex === index ? "is-active" : ""} onClick={() => setQuestionIndex(index)}>
-                Question {index + 1}
-              </button>
-            ))}
+          <blockquote>{rehearsal.question}</blockquote>
+          <div className="prep-speaking-support">
+            <section><span>Possible ideas</span>{rehearsal.ideaPrompts.map((idea) => <p key={idea}>• {idea}</p>)}</section>
+            <section><span>Useful language</span>{rehearsal.usefulChunks.map((chunk) => <p key={chunk}>{chunk}</p>)}</section>
           </div>
-          <blockquote>{task.allQuestions[questionIndex]}</blockquote>
-          <details className="prep-language-help">
-            <summary>Show language support</summary>
-            <p><strong>Useful phrases:</strong> {rehearsal.usefulPhrases}</p>
-            <p><strong>Develop:</strong> {rehearsal.developmentPhrases}</p>
-            <button type="button" onClick={onOpenReference}>Open the full language guide →</button>
-          </details>
+          <p className="prep-support-note">Nothing is recorded. Start when you are ready and keep talking until the timer finishes.</p>
           <div className="prep-timer-actions">
-            <button className="workshop-primary" type="button" onClick={() => setRunning((value) => !value)}>
-              {running ? "Pause" : secondsLeft === 0 ? "Finished" : secondsLeft < 45 ? "Continue" : "Start 45 seconds"}
-            </button>
-            <button className="workshop-secondary" type="button" onClick={() => { setRunning(false); setSecondsLeft(45); }}>Reset</button>
+            {!attempted ? <button className="workshop-primary" type="button" onClick={() => setRunning((value) => !value)}>{running ? "Pause" : secondsLeft < 45 ? "Continue" : "Start"}</button> : <button className="workshop-primary" type="button" onClick={startAgain}>Try again</button>}
+            <button className="workshop-secondary" type="button" onClick={onOpenReference}>Language guide</button>
           </div>
         </div>
       </div>
-      <fieldset className="prep-self-check">
-        <legend>After speaking, check your answer</legend>
-        {rehearsal.checks.map(([id, label]) => (
-          <label key={id} className={checks[id] ? "is-checked" : ""}>
-            <input type="checkbox" checked={checks[id]} onChange={() => setChecks((current) => ({ ...current, [id]: !current[id] }))} />
-            <span>{label}</span>
-          </label>
-        ))}
-      </fieldset>
-      <button className="prep-finish-button" type="button" disabled={checkedCount < rehearsal.checks.length} onClick={finish}>Complete preparation ✓</button>
-      <StepActions stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={stepCount} />
+      {attempted ? (
+        <div className="prep-finish-row">
+          <span>Rehearsal complete. You’re ready for the workshop.</span>
+          <button className="prep-finish-button" type="button" onClick={onComplete}>Finish preparation ✓</button>
+        </div>
+      ) : null}
     </section>
   );
 }
 
 export function WorkshopPreparation({ topic, user, config }) {
   const navigate = useNavigate();
-  const storageKey = useMemo(() => `speaking-workshop-prep:${user?.uid || "local"}:${topic.id}:${config.storageVersion || "v1"}`, [config.storageVersion, topic.id, user?.uid]);
-  const [stepIndex, setStepIndex] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState(() => readSavedProgress(storageKey));
-  const [ratings, setRatings] = useState({});
-  const [contextAnswers, setContextAnswers] = useState({});
-  const [builderSelections, setBuilderSelections] = useState({});
+  const storageKey = useMemo(() => `speaking-workshop-prep:${user?.uid || "local"}:${topic.id}:${config.storageVersion}`, [config.storageVersion, topic.id, user?.uid]);
+  const [chapterIndex, setChapterIndex] = useState(0);
+  const [completedChapters, setCompletedChapters] = useState(() => readSavedProgress(storageKey));
 
   useEffect(() => {
-    window.localStorage.setItem(storageKey, JSON.stringify({ completedSteps }));
-  }, [completedSteps, storageKey]);
+    window.localStorage.setItem(storageKey, JSON.stringify({ completedChapters }));
+  }, [completedChapters, storageKey]);
 
-  const completedSet = useMemo(() => new Set(completedSteps), [completedSteps]);
-  const currentStep = config.steps[stepIndex];
-  const allComplete = completedSteps.length === config.steps.length;
+  const completedSet = useMemo(() => new Set(completedChapters), [completedChapters]);
+  const chapter = CHAPTERS[chapterIndex];
 
-  function completeStep(stepId) {
-    setCompletedSteps((current) => current.includes(stepId) ? current : [...current, stepId]);
+  function completeChapter(id) {
+    setCompletedChapters((current) => current.includes(id) ? current : [...current, id]);
   }
 
   return (
@@ -352,44 +271,35 @@ export function WorkshopPreparation({ topic, user, config }) {
       <header className="workshop-session-header prep-session-header">
         <div>
           <span className="workshop-kicker">Prepare before the workshop · {topic.title}</span>
-          <h1>A short language warm-up</h1>
-          <p>Activate useful vocabulary, build a longer answer, then try one short spoken rehearsal. Allow about 15 minutes.</p>
+          <h1>Build your topic vocabulary</h1>
+          <p>Learn 16 useful expressions, choose ideas you can discuss, then try one short rehearsal. Allow about 12–15 minutes.</p>
         </div>
         <div className="workshop-session-header-actions">
           <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/reference`)}>Language guide</button>
           <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}`)}>Change mode</button>
         </div>
       </header>
-
-      <section className="prep-progress-summary" aria-label={`${completedSteps.length} of ${config.steps.length} preparation steps complete`}>
-        <div><strong>{completedSteps.length} / {config.steps.length}</strong><span>steps complete</span></div>
-        <div className="prep-progress-track" aria-hidden="true"><span style={{ width: `${(completedSteps.length / config.steps.length) * 100}%` }} /></div>
-        {allComplete ? <b>Ready for the workshop ✓</b> : <small>Your progress is saved on this device.</small>}
+      <section className="prep-progress-summary" aria-label={`${completedChapters.length} of ${CHAPTERS.length} preparation chapters complete`}>
+        <div><strong>{completedChapters.length} / {CHAPTERS.length}</strong><span>chapters complete</span></div>
+        <div className="prep-progress-track" aria-hidden="true"><span style={{ width: `${(completedChapters.length / CHAPTERS.length) * 100}%` }} /></div>
+        {completedChapters.length === CHAPTERS.length ? <b>Ready for the workshop ✓</b> : <small>Your progress is saved on this device.</small>}
       </section>
-
-      <nav className="prep-step-nav" aria-label="Preparation steps">
-        {config.steps.map((step, index) => (
-          <button key={step.id} type="button" className={`${stepIndex === index ? "is-active" : ""} ${completedSet.has(step.id) ? "is-complete" : ""}`} onClick={() => setStepIndex(index)}>
-            <span>{completedSet.has(step.id) ? "✓" : index + 1}</span>
-            <strong>{step.label}</strong>
-            <small>{step.title}</small>
+      <nav className="prep-step-nav" aria-label="Preparation chapters">
+        {CHAPTERS.map((item, index) => (
+          <button key={item.id} type="button" className={`${chapterIndex === index ? "is-active" : ""} ${completedSet.has(item.id) ? "is-complete" : ""}`} onClick={() => setChapterIndex(index)}>
+            <span>{completedSet.has(item.id) ? "✓" : index + 1}</span><strong>{item.label}</strong><small>{item.title}</small>
           </button>
         ))}
       </nav>
-
-      <div className="prep-current-intro">
-        <span>Step {stepIndex + 1}</span>
-        <div><h2>{currentStep.title}</h2><p>{currentStep.description}</p></div>
-      </div>
-
-      {currentStep.id === "phrases" ? <PhraseActivation cards={config.phraseCards} copy={config.copy} ratings={ratings} setRatings={setRatings} onComplete={() => completeStep("phrases")} stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={config.steps.length} /> : null}
-      {currentStep.id === "context" ? <ContextChoice questions={config.contextQuestions} answers={contextAnswers} setAnswers={setContextAnswers} onComplete={() => completeStep("context")} stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={config.steps.length} /> : null}
-      {currentStep.id === "builder" ? <AnswerBuilder groups={config.answerBuilder} copy={config.copy} selections={builderSelections} setSelections={setBuilderSelections} onComplete={() => completeStep("builder")} stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={config.steps.length} /> : null}
-      {currentStep.id === "rehearsal" ? <PhotoRehearsal topic={topic} rehearsal={config.rehearsal} onComplete={() => completeStep("rehearsal")} onOpenReference={() => navigate(`/speaking-workshops/${topic.id}/reference`)} stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={config.steps.length} /> : null}
+      <div className="prep-current-intro"><span>Chapter {chapterIndex + 1}</span><div><h2>{chapter.title}</h2><p>{chapter.description}</p></div></div>
+      {chapterIndex === 0 ? <VocabularyChapter key="set-a" set={config.sets[0]} chapterIndex={0} setChapterIndex={setChapterIndex} onComplete={completeChapter} /> : null}
+      {chapterIndex === 1 ? <VocabularyChapter key="set-b" set={config.sets[1]} chapterIndex={1} setChapterIndex={setChapterIndex} onComplete={completeChapter} /> : null}
+      {chapterIndex === 2 ? <ReviewChapter key="review" config={config} setChapterIndex={setChapterIndex} onComplete={completeChapter} /> : null}
+      {chapterIndex === 3 ? <SpeakingRehearsal rehearsal={config.rehearsal} onOpenReference={() => navigate(`/speaking-workshops/${topic.id}/reference`)} onComplete={() => completeChapter("speak")} /> : null}
     </div>
   );
 }
 
 export default function RelationshipsPreparation(props) {
-  return <WorkshopPreparation {...props} config={RELATIONSHIPS_PREPARATION_CONFIG} />;
+  return <WorkshopPreparation {...props} config={relationshipsPreparationConfig} />;
 }

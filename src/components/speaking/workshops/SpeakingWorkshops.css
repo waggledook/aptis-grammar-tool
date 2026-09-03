@@ -465,6 +465,45 @@
 .prep-lead { color: var(--workshop-muted); line-height: 1.6; }
 .prep-lead strong { color: var(--workshop-text); }
 
+.prep-vocab-card {
+  display: grid;
+  grid-template-columns: minmax(120px, .32fr) 1fr;
+  width: min(880px, 100%);
+  min-height: 330px;
+  margin: 0 auto;
+  overflow: hidden;
+  border: 1px solid #3b5376;
+  border-radius: 18px;
+  background: #0d182a;
+}
+.prep-vocab-card > img { width: 100%; height: 100%; min-height: 330px; object-fit: cover; }
+.prep-vocab-card > div { display: flex; flex-direction: column; justify-content: center; padding: clamp(1.2rem, 4vw, 2.5rem); }
+.prep-vocab-label { color: #88b7ff; font-size: .75rem; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.prep-vocab-card h3 { margin: .55rem 0; color: #7fe0a7; font-size: clamp(1.7rem, 4vw, 2.8rem); line-height: 1.1; }
+.prep-vocab-card p { margin: 0; color: var(--workshop-muted); font-size: 1.03rem; line-height: 1.5; }
+.prep-vocab-card blockquote { margin: 1.25rem 0 .65rem; padding-left: 1rem; border-left: 3px solid #5798ff; font-size: clamp(1.08rem, 2.5vw, 1.35rem); line-height: 1.5; }
+.prep-vocab-card small { color: #a9bad1; }
+.prep-word-mark { display: grid; min-height: 330px; place-items: center; background: linear-gradient(145deg, #193761, #18263b); color: rgba(136, 183, 255, .7); font-size: clamp(5rem, 13vw, 9rem); font-weight: 950; text-transform: uppercase; }
+.prep-card-actions,
+.prep-question-actions { display: flex; justify-content: space-between; align-items: center; gap: .75rem; max-width: 880px; margin: 1rem auto 0; }
+.prep-card-actions > button,
+.prep-question-actions button {
+  border: 1px solid var(--workshop-line);
+  border-radius: 10px;
+  background: #17253c;
+  color: var(--workshop-text);
+  padding: .72rem 1rem;
+  font-weight: 750;
+  cursor: pointer;
+}
+.prep-card-actions button:disabled,
+.prep-question-actions button:disabled,
+.prep-idea-actions button:disabled { opacity: .35; cursor: not-allowed; }
+.prep-card-dots { display: flex; justify-content: center; gap: .3rem; }
+.prep-card-dots span { width: .45rem; height: .45rem; border-radius: 50%; background: #3b4d67; }
+.prep-card-dots span.is-active { width: 1.2rem; border-radius: 99px; background: #77d7a0; }
+.prep-question-context { margin: 0 auto .5rem; color: #88b7ff; font-weight: 750; text-align: center; }
+
 .prep-flashcard {
   display: grid;
   grid-template-columns: minmax(210px, .85fr) 1fr;
@@ -517,6 +556,18 @@
 .prep-feedback.is-wrong { background: rgba(210, 77, 89, .16); color: #ffc2bc; }
 .prep-feedback span { color: var(--workshop-muted); }
 
+.prep-complete-actions { display: flex; justify-content: center; gap: .65rem; }
+.prep-idea-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.prep-idea-grid fieldset { min-width: 0; margin: 0; padding: 1.15rem; border: 1px solid var(--workshop-line); border-radius: 16px; }
+.prep-idea-grid legend { max-width: 90%; padding: 0 .45rem; font-size: 1.15rem; font-weight: 850; line-height: 1.4; }
+.prep-idea-grid fieldset > p { margin: .2rem 0 1rem; color: var(--workshop-muted); line-height: 1.5; }
+.prep-idea-grid fieldset > div { display: grid; gap: .5rem; }
+.prep-idea-grid button { padding: .75rem .85rem; border: 1px solid var(--workshop-line); border-radius: 10px; background: #0d182a; color: var(--workshop-muted); font: inherit; text-align: left; cursor: pointer; }
+.prep-idea-grid button.is-selected { border-color: #5798ff; background: #193761; color: var(--workshop-text); }
+.prep-idea-grid small { display: block; margin-top: .8rem; color: #8fa3bd; }
+.prep-idea-actions { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--workshop-line); color: var(--workshop-muted); }
+.prep-idea-actions button { flex: 0 0 auto; }
+
 .prep-builder-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin-top: 1.25rem; }
 .prep-builder-grid fieldset { min-width: 0; margin: 0; padding: 1rem; border: 1px solid var(--workshop-line); border-radius: 14px; }
 .prep-builder-grid legend { display: grid; gap: .15rem; padding: 0 .35rem; }
@@ -544,6 +595,12 @@
 .prep-language-help button:hover { color: #b9d3fa; }
 .prep-timer-actions { display: flex; gap: .5rem; margin-top: auto; padding-top: 1rem; }
 .prep-time-low { color: #ff9a86 !important; }
+.prep-speaking-support { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .65rem; }
+.prep-speaking-support section { padding: .8rem; border: 1px solid var(--workshop-line); border-radius: 11px; background: #0d182a; }
+.prep-speaking-support section > span { color: #88b7ff; font-size: .74rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.prep-speaking-support p { margin: .45rem 0 0; color: var(--workshop-muted); line-height: 1.4; }
+.prep-finish-row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1rem; padding: 1rem; border: 1px solid #3f9364; border-radius: 13px; background: rgba(58, 157, 99, .12); color: #a7edc4; }
+.prep-finish-row .prep-finish-button { width: auto; margin: 0; }
 .prep-self-check { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin: 1rem 0; padding: 1rem; border: 1px solid var(--workshop-line); border-radius: 14px; }
 .prep-self-check legend { padding: 0 .35rem; font-weight: 800; }
 .prep-self-check label { display: flex; gap: .55rem; padding: .7rem; border-radius: 9px; background: #0d182a; color: var(--workshop-muted); cursor: pointer; }
@@ -578,8 +635,8 @@
 :root[data-theme="light"] .workshop-review-rule { background: #e6f0ff; color: #234f8c; }
 :root[data-theme="light"] .workshop-session-actions button { background: #dcf7eb; color: #17543f; }
 :root[data-theme="light"] .workshop-session-actions button.is-end { background: #fde7e3; color: #75352d; }
-:root[data-theme="light"] :is(.prep-progress-track, .prep-flashcard, .prep-builder-grid label, .prep-answer-plan, .prep-self-check label) { background: #f4f7fb; }
-:root[data-theme="light"] :is(.prep-rating-actions button, .prep-choice-grid button, .prep-step-actions button, .prep-question-tabs button) { background: #f4f7fb; color: #172033; }
+:root[data-theme="light"] :is(.prep-progress-track, .prep-flashcard, .prep-vocab-card, .prep-builder-grid label, .prep-answer-plan, .prep-self-check label, .prep-idea-grid button, .prep-speaking-support section) { background: #f4f7fb; }
+:root[data-theme="light"] :is(.prep-rating-actions button, .prep-choice-grid button, .prep-step-actions button, .prep-question-tabs button, .prep-card-actions > button, .prep-question-actions button) { background: #f4f7fb; color: #172033; }
 :root[data-theme="light"] .prep-rating-actions button:last-child,
 :root[data-theme="light"] .prep-finish-button { background: #d9f8e5; color: #174a32; }
 :root[data-theme="light"] .prep-builder-grid label.is-selected,
@@ -593,9 +650,13 @@
   .workshop-photo-pair { grid-template-columns: 1fr; }
   .prep-step-nav { grid-template-columns: repeat(2, 1fr); }
   .prep-flashcard,
+  .prep-vocab-card,
   .prep-rehearsal-layout { grid-template-columns: 1fr; }
   .prep-flashcard img { height: 280px; min-height: 0; }
+  .prep-vocab-card > img,
+  .prep-word-mark { height: 240px; min-height: 0; }
   .prep-builder-grid { grid-template-columns: 1fr; }
+  .prep-idea-grid { grid-template-columns: 1fr; }
   .prep-self-check { grid-template-columns: 1fr; }
   .workshop-create-form { grid-template-columns: 1fr; }
   .workshop-create-form .workshop-primary { grid-column: 1; grid-row: auto; }
@@ -623,6 +684,13 @@
   .prep-step-nav button > small { display: none; }
   .prep-choice-grid { grid-template-columns: 1fr; }
   .prep-rating-actions { display: grid; grid-template-columns: 1fr 1fr; }
+  .prep-card-actions { align-items: stretch; }
+  .prep-card-dots { display: none; }
+  .prep-speaking-support { grid-template-columns: 1fr; }
+  .prep-idea-actions,
+  .prep-finish-row { align-items: stretch; flex-direction: column; }
+  .prep-idea-actions button,
+  .prep-finish-row .prep-finish-button { width: 100%; }
   .workshop-manager-heading { display: grid; }
   .workshop-review-rule { justify-self: start; }
   .workshop-programme-weeks { grid-template-columns: 1fr; }
