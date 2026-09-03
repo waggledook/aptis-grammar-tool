@@ -6,6 +6,7 @@ import SpeakingPart3 from "../SpeakingPart3";
 import SpeakingPart4 from "../SpeakingPart4";
 import SpeakingWorkshopAccessGate from "./SpeakingWorkshopAccessGate";
 import RelationshipsPreparation from "./RelationshipsPreparation";
+import SpeakingReference from "./SpeakingReference";
 import TransportPreparation from "./TransportPreparation";
 import TeachingMode from "./TeachingMode";
 import {
@@ -77,6 +78,13 @@ function TopicModeChoice({ topic, navigate }) {
       </section>
 
       <section className="workshop-mode-grid" aria-label="Choose a mode">
+        <button type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/reference`)}>
+          <span className="mode-icon" aria-hidden="true">▤</span>
+          <span className="workshop-kicker">Student reference</span>
+          <h2>Language guide</h2>
+          <p>Consult useful topic language for descriptions, comparisons, opinions and developed answers.</p>
+          <strong>Open the reference →</strong>
+        </button>
         <button type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/prepare`)}>
           <span className="mode-icon" aria-hidden="true">◇</span>
           <span className="workshop-kicker">Before the workshop</span>
@@ -221,6 +229,7 @@ export default function SpeakingWorkshops({ user, onSignIn }) {
         : <TransportPreparation topic={topic} user={user} />}
     </main>
   );
+  else if (mode === "reference") page = <main className="speaking-workshops"><SpeakingReference topic={topic} /></main>;
   else if (mode === "teach") page = <main className="speaking-workshops"><TeachingMode topic={topic} /></main>;
   else if (mode === "practice" && !partNumber) page = <PracticePartChoice topic={topic} navigate={navigate} />;
   else if (mode === "practice") page = <ExamPractice topic={topic} partNumber={partNumber} user={user} navigate={navigate} />;

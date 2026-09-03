@@ -14,6 +14,14 @@ const HOTEL_IMAGE_BASE = "/images/vocab/hotel";
 const CLOTHES_IMAGE_BASE = "/images/vocab/clothes";
 const TEXTBOOK_CLOTHES_IMAGE_BASE = "/images/vocab/textbook-clothes";
 const TEXTBOOK_ACTIVITIES_IMAGE_BASE = "/images/vocab/textbook-activities";
+const INTERMEDIATE_FOOD_COOKING_IMAGE_BASE = "/images/vocab/intermediate/food-cooking";
+const INTERMEDIATE_TRANSPORT_IMAGE_BASE = "/images/vocab/intermediate/transport";
+const INTERMEDIATE_SPORT_IMAGE_BASE = "/images/vocab/intermediate/sport";
+const INTERMEDIATE_RELATIONSHIPS_IMAGE_BASE = "/images/vocab/intermediate/relationships";
+const INTERMEDIATE_CINEMA_IMAGE_BASE = "/images/vocab/intermediate/cinema";
+const INTERMEDIATE_BODY_IMAGE_BASE = "/images/vocab/intermediate/body";
+const INTERMEDIATE_HOUSES_IMAGE_BASE = "/images/vocab/intermediate/houses";
+const INTERMEDIATE_WORK_IMAGE_BASE = "/images/vocab/intermediate/work";
 
 export const HUB_VOCAB_LEVELS = [
   {
@@ -34,13 +42,19 @@ export const HUB_VOCAB_LEVELS = [
     title: "Pre-intermediate Vocabulary",
     description: "Pre-intermediate vocabulary review and practice.",
   },
+  {
+    id: "b1",
+    label: "B1",
+    title: "Intermediate Vocabulary",
+    description: "Intermediate vocabulary review and practice.",
+  },
 ];
 
 export const HUB_VOCAB_LEVEL_COLORS = {
   a1: "#72df9b",
   a2: "#7ef0c2",
   "a2-b1": "#8fb6ff",
-  b1: "#8fb6ff",
+  b1: "#f6d26b",
   b2: "#f6d26b",
   c1: "#f2b0b7",
   c2: "#c7a4ff",
@@ -5085,6 +5099,2240 @@ HUB_VOCAB_THEMES.push({
       { id: "type3", label: "TYPE 3 — CANNOT SEPARATE" },
     ] },
     { id: "phrasal-verb-write", type: "sentence-gap-type-answer", dataKey: "phrasalVerbWriteEntries", title: "Write the phrasal verb", shortDescription: "Complete everyday sentences with the correct phrasal verb.", prompt: "Type the missing phrasal verb in the correct form.", answerLabel: "Phrasal verb", answerPlaceholder: "Type the missing words", itemLimit: 12 },
+  ],
+});
+
+function intermediateFoodEntry(id, term, category, acceptedAnswers = [term], spokenLabel = "") {
+  return {
+    id: `int-food-${id}`,
+    term,
+    image: `${INTERMEDIATE_FOOD_COOKING_IMAGE_BASE}/${id}.webp`,
+    acceptedAnswers,
+    category,
+    ...(spokenLabel ? { spokenLabel } : {}),
+  };
+}
+
+const intermediateFoodEntries = [
+  intermediateFoodEntry("crab", "crab", "fish-seafood", ["crab", "crabs"]),
+  intermediateFoodEntry("lobster", "lobster", "fish-seafood", ["lobster", "lobsters"]),
+  intermediateFoodEntry("mussels", "mussels", "fish-seafood", ["mussels", "mussel"]),
+  intermediateFoodEntry("prawns", "prawns", "fish-seafood", ["prawns", "prawn"]),
+  intermediateFoodEntry("salmon", "salmon", "fish-seafood"),
+  intermediateFoodEntry("squid", "squid", "fish-seafood"),
+  intermediateFoodEntry("tuna", "tuna", "fish-seafood"),
+  intermediateFoodEntry("beef", "beef", "meat"),
+  intermediateFoodEntry("chicken", "chicken", "meat"),
+  intermediateFoodEntry("duck", "duck", "meat"),
+  intermediateFoodEntry("lamb", "lamb", "meat"),
+  intermediateFoodEntry("pork", "pork", "meat"),
+  intermediateFoodEntry("aubergine", "aubergine", "fruit-vegetables", ["aubergine", "aubergines", "eggplant", "eggplants"], "AmE: eggplant"),
+  intermediateFoodEntry("avocado", "avocado", "fruit-vegetables", ["avocado", "avocados"]),
+  intermediateFoodEntry("beetroot", "beetroot", "fruit-vegetables", ["beetroot", "beetroots"]),
+  intermediateFoodEntry("cabbage", "cabbage", "fruit-vegetables", ["cabbage", "cabbages"]),
+  intermediateFoodEntry("cherries", "cherries", "fruit-vegetables"),
+  intermediateFoodEntry("courgette", "courgette", "fruit-vegetables", ["courgette", "courgettes", "zucchini", "zucchinis"], "AmE: zucchini"),
+  intermediateFoodEntry("cucumber", "cucumber", "fruit-vegetables", ["cucumber", "cucumbers"]),
+  intermediateFoodEntry("grapes", "grapes", "fruit-vegetables", ["grapes", "grape"]),
+  intermediateFoodEntry("green-beans", "green beans", "fruit-vegetables", ["green beans", "green bean"]),
+  intermediateFoodEntry("lemon", "lemon", "fruit-vegetables"),
+  intermediateFoodEntry("mango", "mango", "fruit-vegetables", ["mango", "mangoes", "mangos"]),
+  intermediateFoodEntry("melon", "melon", "fruit-vegetables"),
+  intermediateFoodEntry("peach", "peach", "fruit-vegetables"),
+  intermediateFoodEntry("pear", "pear", "fruit-vegetables"),
+  intermediateFoodEntry("raspberries", "raspberries", "fruit-vegetables", ["raspberries", "raspberry"]),
+  intermediateFoodEntry("red-pepper", "red pepper", "fruit-vegetables", ["red pepper", "red peppers"]),
+];
+
+const intermediateFoodDistractors = {
+  crab: ["lobster", "prawns"],
+  lobster: ["crab", "prawns"],
+  mussels: ["prawns", "squid"],
+  prawns: ["mussels", "lobster"],
+  salmon: ["tuna", "squid"],
+  squid: ["salmon", "tuna"],
+  tuna: ["salmon", "squid"],
+  beef: ["lamb", "pork"],
+  chicken: ["duck", "pork"],
+  duck: ["chicken", "lamb"],
+  lamb: ["beef", "pork"],
+  pork: ["beef", "lamb"],
+  aubergine: ["courgette", "cucumber"],
+  avocado: ["pear", "mango"],
+  beetroot: ["red pepper", "aubergine"],
+  cabbage: ["green beans", "cucumber"],
+  cherries: ["raspberries", "grapes"],
+  courgette: ["cucumber", "aubergine"],
+  cucumber: ["courgette", "green beans"],
+  grapes: ["cherries", "raspberries"],
+  "green-beans": ["cucumber", "courgette"],
+  lemon: ["mango", "pear"],
+  mango: ["peach", "pear"],
+  melon: ["mango", "pear"],
+  peach: ["mango", "pear"],
+  pear: ["peach", "mango"],
+  raspberries: ["cherries", "grapes"],
+  "red-pepper": ["beetroot", "aubergine"],
+};
+
+const intermediateFoodChoiceEntries = intermediateFoodEntries.map((entry) => ({
+  ...entry,
+  options: intermediateFoodDistractors[entry.id.replace(/^int-food-/, "")] || [],
+}));
+
+const intermediateCookingEntries = [
+  { id: "int-cooking-baked", term: "baked", acceptedAnswers: ["baked"] },
+  { id: "int-cooking-boiled", term: "boiled", acceptedAnswers: ["boiled"] },
+  { id: "int-cooking-fried", term: "fried", acceptedAnswers: ["fried"] },
+  { id: "int-cooking-grilled", term: "grilled", acceptedAnswers: ["grilled"] },
+  { id: "int-cooking-roast", term: "roast", acceptedAnswers: ["roast"] },
+  { id: "int-cooking-steamed", term: "steamed", acceptedAnswers: ["steamed"] },
+];
+
+const intermediateCookingContextEntries = [
+  { id: "int-cooking-context-01", sentence: "I usually have a _____ egg for breakfast. I cook it in water.", answer: "boiled", options: ["boiled", "fried", "baked", "grilled"] },
+  { id: "int-cooking-context-02", sentence: "She cooked the egg in a little oil in a frying pan. It was _____.", answer: "fried", options: ["fried", "boiled", "steamed", "baked"] },
+  { id: "int-cooking-context-03", sentence: "We had _____ chicken and potatoes for Sunday lunch.", answer: "roast", options: ["roast", "grilled", "boiled", "steamed"] },
+  { id: "int-cooking-context-04", sentence: "I ordered _____ salmon. You could see the dark lines from the grill.", answer: "grilled", options: ["grilled", "boiled", "baked", "steamed"] },
+  { id: "int-cooking-context-05", sentence: "The vegetables were _____ over boiling water rather than cooked in the water.", answer: "steamed", options: ["steamed", "boiled", "fried", "roast"] },
+  { id: "int-cooking-context-06", sentence: "He had a _____ potato with cheese for lunch.", answer: "baked", options: ["baked", "boiled", "fried", "steamed"] },
+  { id: "int-cooking-context-07", sentence: "I prefer _____ eggs to fried eggs. I cook them in a saucepan of water.", answer: "boiled", options: ["boiled", "fried", "grilled", "baked"] },
+  { id: "int-cooking-context-08", sentence: "These chips are _____ in hot oil.", answer: "fried", options: ["fried", "baked", "steamed", "boiled"] },
+  { id: "int-cooking-context-09", sentence: "We had _____ beef with vegetables for lunch.", answer: "roast", options: ["roast", "fried", "boiled", "steamed"] },
+  { id: "int-cooking-context-10", sentence: "The fish was _____ on a barbecue.", answer: "grilled", options: ["grilled", "boiled", "steamed", "baked"] },
+  { id: "int-cooking-context-11", sentence: "I like _____ green beans because they stay quite crisp.", answer: "steamed", options: ["steamed", "fried", "roast", "baked"] },
+  { id: "int-cooking-context-12", sentence: "She put the potato in the oven whole and ate it with butter. It was _____.", answer: "baked", options: ["baked", "fried", "grilled", "boiled"] },
+];
+
+const intermediateFoodPhrasalVerbContextEntries = [
+  ["We don't feel like cooking tonight, so let's ____.", "eat out"],
+  ["We usually ____ once or twice at the weekend.", "eat out"],
+  ["When we're on holiday, we often ____ because we want to try local restaurants.", "eat out"],
+  ["I'm drinking far too much coffee, so I'm trying to ____.", "cut down on it", ["eat out", "cut down on it", "cut it out"]],
+  ["You don't have to stop eating bread completely. Just try to ____.", "cut down on it", ["eat out", "cut down on it", "cut it out"]],
+  ["I spend too much money on takeaway food, so I need to ____.", "cut down on it", ["eat out", "cut down on it", "cut it out"]],
+  ["He still eats chocolate, but he's trying to ____.", "cut down on it", ["eat out", "cut down on it", "cut it out"]],
+  ["I've decided to ____ fizzy drinks completely.", "cut out"],
+  ["She doesn't eat meat at all now. She's decided to ____.", "cut it out", ["eat out", "cut down on it", "cut it out"]],
+  ["If you want to stop having caffeine completely, you'll need to ____ coffee and energy drinks.", "cut out"],
+  ["We were eating in restaurants almost every night, so we've decided to ____ eating out.", "cut down on"],
+  ["I used to drink cola every day, but I've completely ____.", "cut it out", ["eat out", "cut down on it", "cut it out"]],
+].map(([sentence, answer, options = ["eat out", "cut down on", "cut out"]], index) => ({
+  id: `int-food-phrasal-context-${String(index + 1).padStart(2, "0")}`,
+  sentence,
+  answer,
+  acceptedAnswers: [answer],
+  options,
+}));
+
+const intermediateFoodWriteIds = new Set([
+  "crab",
+  "lobster",
+  "mussels",
+  "prawns",
+  "salmon",
+  "squid",
+  "tuna",
+  "aubergine",
+  "avocado",
+  "beetroot",
+  "cabbage",
+  "courgette",
+  "cucumber",
+  "grapes",
+  "green-beans",
+  "mango",
+  "raspberries",
+  "red-pepper",
+]);
+
+const intermediateFoodWriteEntries = intermediateFoodEntries
+  .filter((entry) => intermediateFoodWriteIds.has(entry.id.replace(/^int-food-/, "")))
+  .map((entry) => ({
+    ...entry,
+    id: entry.id.replace("int-food-", "int-food-write-"),
+    sentence: "Type the food shown.",
+    answer: entry.term,
+  }));
+
+const intermediateCookingWriteEntries = [
+  ["I don't want chips. I'd rather have a _____ potato from the oven.", "baked"],
+  ["She cooked the egg in a saucepan of water. It was _____.", "boiled"],
+  ["He cooked the egg in a pan with oil. It was _____.", "fried"],
+  ["I ordered _____ salmon. You could see the lines made by the grill.", "grilled"],
+  ["We usually have _____ chicken on Sundays.", "roast"],
+  ["These vegetables were cooked over boiling water, not in it. They were _____.", "steamed"],
+].map(([sentence, answer], index) => ({
+  id: `int-cooking-write-${String(index + 1).padStart(2, "0")}`,
+  sentence,
+  answer,
+  acceptedAnswers: [answer],
+}));
+
+const intermediateFoodPhrasalVerbWriteEntries = [
+  ["We don't feel like cooking tonight. Let's _____ ____.", "eat out"],
+  ["When we're away, we often _____ _____ in local restaurants.", "eat out"],
+  ["I'm having too much coffee, so I'm trying to _____ _____ _____ it.", "cut down on"],
+  ["You don't need to stop eating it completely. Just _____ _____ _____ it.", "cut down on"],
+  ["I've decided to _____ _____ fizzy drinks completely.", "cut out"],
+  ["She no longer eats meat at all. She's _____ _____ _____ completely.", "cut it out"],
+].map(([sentence, answer], index) => ({
+  id: `int-food-phrasal-write-${String(index + 1).padStart(2, "0")}`,
+  sentence,
+  answer,
+  acceptedAnswers: [answer],
+}));
+
+const intermediateFoodCookingWriteEntries = [
+  ...intermediateFoodWriteEntries,
+  ...intermediateCookingWriteEntries,
+  ...intermediateFoodPhrasalVerbWriteEntries,
+];
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-food-cooking",
+  level: "b1",
+  order: 1,
+  title: "Food and cooking",
+  shortDescription: "Practise food vocabulary, cooking methods and common phrasal verbs for eating habits.",
+  textbookRef: "Intermediate Vocabulary Bank 1",
+  accent: HUB_VOCAB_LEVEL_COLORS.b1,
+  itemCount: 37,
+  entries: intermediateFoodEntries,
+  foodEntries: intermediateFoodEntries,
+  foodChoiceEntries: intermediateFoodChoiceEntries,
+  cookingEntries: intermediateCookingEntries,
+  cookingContextEntries: intermediateCookingContextEntries,
+  phrasalVerbContextEntries: intermediateFoodPhrasalVerbContextEntries,
+  writeEntries: intermediateFoodCookingWriteEntries,
+  infoNotes: [
+    {
+      title: "cut down on or cut out?",
+      body: [
+        "cut down on = have less of something",
+        "I'm trying to cut down on coffee.",
+        "cut out = stop having something completely",
+        "I've cut out fizzy drinks completely.",
+        "With a pronoun, cut out separates: cut it out, not cut out it.",
+        "cut down on does not separate: cut down on it.",
+        "eat out = eat in a restaurant instead of at home",
+      ],
+    },
+  ],
+  activities: [
+    { id: "food-flashcards", type: "flashcards", dataKey: "foodEntries", title: "Food flashcards", shortDescription: "Look at the food and recall the word.", prompt: "Look at the picture and say the word before you flip.", itemLimit: 15 },
+    { id: "food-choice", type: "quick-choice", dataKey: "foodChoiceEntries", title: "Which food is it?", shortDescription: "Choose the correct word for each food image.", prompt: "Look at the picture and choose the correct word.", itemLimit: 15 },
+    { id: "cooking-methods", type: "sentence-gap-choice", dataKey: "cookingContextEntries", title: "How is it cooked?", shortDescription: "Choose the correct way of cooking each food.", prompt: "Read the situation and choose the correct cooking word.", question: "How is it cooked?" },
+    { id: "food-phrasal-verbs", type: "sentence-gap-choice", dataKey: "phrasalVerbContextEntries", title: "Eat out, cut down on or cut out?", shortDescription: "Use context to distinguish three useful food-related phrasal verbs.", prompt: "Choose the phrasal verb that matches the meaning.", question: "Which expression fits?" },
+    { id: "food-cooking-write", type: "sentence-gap-type-answer", dataKey: "writeEntries", title: "Write the word or phrase", shortDescription: "Write food words from pictures and complete cooking and phrasal-verb vocabulary from context.", prompt: "Look at the picture or read the clue and type the missing word or phrase.", question: "Type the word or phrase.", answerLabel: "Missing word or phrase", answerPlaceholder: "Type your answer", itemLimit: 15 },
+  ],
+});
+
+function intermediateContextEntries(prefix, rows) {
+  return rows.map(([sentence, answer, options, acceptedAnswers], index) => ({
+    id: `${prefix}-${String(index + 1).padStart(2, "0")}`,
+    sentence,
+    answer,
+    ...(options ? { options } : {}),
+    ...(acceptedAnswers ? { acceptedAnswers } : {}),
+  }));
+}
+
+function intermediateWriteEntries(prefix, rows) {
+  return rows.map(([sentence, answer, acceptedAnswers = [answer]], index) => ({
+    id: `${prefix}-${String(index + 1).padStart(2, "0")}`,
+    sentence,
+    answer,
+    acceptedAnswers,
+  }));
+}
+
+const intermediatePersonalityEntries = [
+  ["affectionate", "Someone who shows people that they love or like them very much."],
+  ["ambitious", "Someone who strongly wants to be successful."],
+  ["anxious", "Someone who is often worried or nervous."],
+  ["bossy", "Someone who likes telling other people what to do."],
+  ["charming", "Someone with an attractive personality who people tend to like."],
+  ["competitive", "Someone who really wants to win."],
+  ["honest", "Someone who tells the truth and does not cheat or steal."],
+  ["imaginative", "Someone who has lots of creative or original ideas."],
+  ["independent", "Someone who likes doing things without help from other people."],
+  ["insecure", "Someone who is not confident about themselves."],
+  ["mature", "Someone who behaves in an adult and responsible way."],
+  ["moody", "Someone whose mood changes quickly and often."],
+  ["patient", "Someone who can wait or deal with problems without getting annoyed."],
+  ["rebellious", "Someone who dislikes rules and resists being controlled."],
+  ["reliable", "Someone you can trust and depend on."],
+  ["self-confident", "Someone who feels sure of themselves and their abilities.", ["self-confident", "self confident"]],
+  ["selfish", "Someone who mainly thinks about their own needs and wishes."],
+  ["sensible", "Someone who is practical and makes good decisions."],
+  ["sensitive", "Someone whose feelings can easily be hurt."],
+  ["sociable", "Someone who enjoys being with and talking to other people."],
+  ["spoilt", "Someone, often a child, who behaves badly because they usually get what they want.", ["spoilt", "spoiled"]],
+  ["stubborn", "Someone who refuses to change their opinion or attitude."],
+].map(([term, cueText, acceptedAnswers = [term]]) => ({
+  id: `int-personality-${term}`,
+  term,
+  cueText,
+  acceptedAnswers,
+}));
+
+const intermediatePersonalityContextEntries = intermediateContextEntries("int-personality-context", [
+  ["Nina is always hugging her children and telling them how much she loves them. She's very ____.", "affectionate", ["affectionate", "sociable", "sensitive", "charming"]],
+  ["Carlos wants to run his own company before he's 30 and is determined to have a very successful career. He's ____.", "ambitious", ["ambitious", "competitive", "independent", "reliable"]],
+  ["Even before a routine appointment, Maya worries that something is going to go wrong. She's quite ____.", "anxious", ["anxious", "insecure", "moody", "patient"]],
+  ["In group projects, Leo is always ordering everyone around and deciding what they should do. He's very ____.", "bossy", ["bossy", "stubborn", "rebellious", "selfish"]],
+  ["Within a few minutes of meeting Daniel, everyone at the dinner liked him. He has a very ____ personality.", "charming", ["charming", "sociable", "affectionate", "self-confident"]],
+  ["Even when she's playing a board game with her family, Marta desperately wants to win. She's extremely ____.", "competitive", ["competitive", "ambitious", "stubborn", "bossy"]],
+  ["Tom found a wallet containing €200 and immediately handed it in to the police. He's very ____.", "honest", ["honest", "reliable", "sensible", "selfish"]],
+  ["Lucía is always inventing unusual stories and coming up with original ideas. She's very ____.", "imaginative", ["imaginative", "ambitious", "mature", "sensitive"]],
+  ["Eva travels alone, solves her own problems and rarely asks anyone for help. She's very ____.", "independent", ["independent", "self-confident", "reliable", "sociable"]],
+  ["Álex keeps asking whether his work is good enough and constantly compares himself with other people. He's quite ____.", "insecure", ["insecure", "anxious", "sensitive", "moody"]],
+  ["She's only 18, but she handles responsibility and criticism in a very adult way. She's extremely ____.", "mature", ["mature", "sensible", "patient", "independent"]],
+  ["He's cheerful one minute and irritated the next, often for no obvious reason. He's very ____.", "moody", ["moody", "anxious", "sensitive", "rebellious"]],
+  ["We had to wait for nearly an hour, but Julia didn't complain or get annoyed once. She's very ____.", "patient", ["patient", "sensible", "reliable", "mature"]],
+  ["Sam hates being told what to do and deliberately breaks rules he thinks are unfair. He's quite ____.", "rebellious", ["rebellious", "stubborn", "bossy", "independent"]],
+  ["If Elena says she'll be somewhere at eight, she'll be there at eight. You can always depend on her. She's very ____.", "reliable", ["reliable", "honest", "patient", "independent"]],
+  ["David walks into presentations believing that he can handle the situation and do a good job. He's very ____.", "self-confident", ["self-confident", "ambitious", "independent", "charming"]],
+  ["He took the last three pieces of pizza without asking anyone else if they wanted one. He's so ____.", "selfish", ["selfish", "spoilt", "bossy", "stubborn"]],
+  ["Rather than spend all her savings on a holiday, Sara kept some money for emergencies. She's very ____.", "sensible", ["sensible", "mature", "reliable", "patient"]],
+  ["A small critical comment about his appearance can upset him for hours. He's quite ____.", "sensitive", ["sensitive", "insecure", "anxious", "moody"]],
+  ["Clara loves parties, meeting new people and spending time with friends. She's very ____.", "sociable", ["sociable", "charming", "affectionate", "self-confident"]],
+  ["The child starts screaming whenever his parents refuse to buy him something, because he normally gets whatever he wants. He's ____.", "spoilt", ["spoilt", "selfish", "rebellious", "bossy"]],
+  ["Once Pablo has made up his mind, he refuses to consider any other possibility, even when everyone disagrees with him. He's extremely ____.", "stubborn", ["stubborn", "bossy", "competitive", "rebellious"]],
+]);
+
+const intermediateNegativePersonalityEntries = [
+  ["ambitious", "unambitious"], ["friendly", "unfriendly"], ["honest", "dishonest"],
+  ["imaginative", "unimaginative"], ["kind", "unkind"], ["mature", "immature"],
+  ["organized", "disorganized", ["disorganized", "disorganised"]], ["patient", "impatient"],
+  ["reliable", "unreliable"], ["responsible", "irresponsible"], ["selfish", "unselfish"],
+  ["sensitive", "insensitive"], ["sociable", "unsociable"], ["tidy", "untidy"],
+].map(([base, term, acceptedAnswers = [term]]) => ({
+  id: `int-personality-negative-${term}`,
+  base,
+  cueText: `${base} → ____`,
+  term,
+  acceptedAnswers,
+}));
+
+const negativePersonalityDistractors = [
+  ["unambitious", "disambitious", "inambitious"], ["unfriendly", "disfriendly", "infriendly"],
+  ["dishonest", "unhonest", "inhonest"], ["unimaginative", "disimaginative", "inimaginative"],
+  ["unkind", "diskind", "inkind"], ["immature", "unmature", "dismature"],
+  ["disorganized", "imorganized", "irorganized"], ["impatient", "unpatient", "dispatient"],
+  ["unreliable", "disreliable", "irreliable"], ["irresponsible", "unresponsible", "disresponsible"],
+  ["unselfish", "disselfish", "inselfish"], ["insensitive", "unsensitive", "dissensitive"],
+  ["unsociable", "dissociable", "insociable"], ["untidy", "distidy", "intidy"],
+];
+
+const intermediateNegativePersonalityChoiceEntries = intermediateNegativePersonalityEntries.map((entry, index) => ({
+  id: `${entry.id}-choice`,
+  sentence: entry.cueText,
+  answer: entry.term,
+  options: negativePersonalityDistractors[index],
+}));
+
+const intermediatePersonalityFalseFriendEntries = intermediateContextEntries("int-personality-false-friend", [
+  ["Take a copy of your passport with you as well as the original. That's the _____ thing to do.", "sensible", ["sensible", "sensitive", "sympathetic"]],
+  ["Instead of spending every euro she earns, she saves some money each month. She's very ____.", "sensible", ["sensible", "sensitive", "sympathetic"]],
+  ["Wearing a helmet when you cycle in heavy traffic is a _____ precaution.", "sensible", ["sensible", "sensitive", "sympathetic"]],
+  ["Before signing the contract, he asked someone to check it carefully. That was very ____.", "sensible", ["sensible", "sensitive", "sympathetic"]],
+  ["Be careful joking about his weight. He's very _____ about it.", "sensitive", ["sensible", "sensitive", "sympathetic"]],
+  ["She's quite _____ to criticism and can get upset by even a small negative comment.", "sensitive", ["sensible", "sensitive", "sympathetic"]],
+  ["Don't mention his exam result yet. He's still very _____ about failing.", "sensitive", ["sensible", "sensitive", "sympathetic"]],
+  ["A comment about her accent upset her much more than I expected. She's quite ____.", "sensitive", ["sensible", "sensitive", "sympathetic"]],
+  ["My manager was very _____ when I explained that I was having problems at home.", "sympathetic", ["sensible", "sensitive", "sympathetic"]],
+  ["When my dog died, Ana listened to me for hours and was really ____.", "sympathetic", ["sensible", "sensitive", "sympathetic"]],
+  ["The nurse was very _____ when she saw how frightened the patient was.", "sympathetic", ["sensible", "sensitive", "sympathetic"]],
+  ["Our neighbour was extremely _____ after the accident and kept asking if there was anything she could do to help.", "sympathetic", ["sensible", "sensitive", "sympathetic"]],
+]);
+
+const intermediatePersonalityWriteEntries = intermediateWriteEntries("int-personality-write", [
+  ["My grandfather is very _____. He always gives us hugs and tells us how much he loves us.", "affectionate"],
+  ["She wants to reach the top of her profession and is prepared to work extremely hard. She's very ____.", "ambitious"],
+  ["He worries about everything and always imagines that something bad might happen. He's quite ____.", "anxious"],
+  ["Stop telling everyone what they have to do! You're being really ____.", "bossy"],
+  ["Everyone seems to like him as soon as they meet him. He's extremely ____.", "charming"],
+  ["She hates losing, even when the game isn't important. She's incredibly ____.", "competitive"],
+  ["I trust her because she always tells me the truth, even when it's difficult. She's very ____.", "honest"],
+  ["He comes up with ideas that nobody else would ever think of. He's really ____.", "imaginative"],
+  ["She prefers solving problems herself instead of relying on other people. She's very ____.", "independent"],
+  ["He doesn't believe he's good enough and needs constant reassurance from other people. He's quite ____.", "insecure"],
+  ["She's young, but she deals with difficult situations in a calm and adult way. She's very ____.", "mature"],
+  ["You never know what kind of mood he'll be in. It changes from one moment to the next. He's very ____.", "moody"],
+  ["She can explain the same thing five times without becoming annoyed. She's extremely ____.", "patient"],
+  ["As a teenager, he hated authority and was always breaking rules. He was very ____.", "rebellious"],
+  ["If I ask her to do something, I know she'll do it. She's completely ____.", "reliable"],
+  ["She believes in her abilities and isn't afraid to speak in front of a large audience. She's very ____.", "self-confident", ["self-confident", "self confident"]],
+  ["He never considers what anybody else wants. He's extremely ____.", "selfish"],
+  ["She normally thinks carefully before making a decision and rarely takes unnecessary risks. She's very ____.", "sensible"],
+  ["Be careful how you criticise him because his feelings are easily hurt. He's very ____.", "sensitive"],
+  ["She loves meeting people and rarely spends an evening at home alone. She's extremely ____.", "sociable"],
+  ["His parents have always given him everything he wanted, and now he gets angry when someone says no. He's ____.", "spoilt", ["spoilt", "spoiled"]],
+  ["Once she's decided something, it's almost impossible to make her change her mind. She's very ____.", "stubborn"],
+  ["He has no interest in career success or getting a better position. He's quite ____.", "unambitious"],
+  ["The new receptionist hardly says hello and never smiles at anyone. She seems rather ____.", "unfriendly"],
+  ["He lied about the money and tried to hide what he'd done. That was extremely ____.", "dishonest"],
+  ["Every idea he suggests is completely predictable and unoriginal. He's rather ____.", "unimaginative"],
+  ["Laughing at someone because they made a mistake was really ____.", "unkind"],
+  ["He's nearly 30, but he still behaves like a child whenever he doesn't get his own way. He's very ____.", "immature"],
+  ["She loses important papers, forgets appointments and can never find anything. She's terribly ____.", "disorganized", ["disorganized", "disorganised"]],
+  ["He starts getting annoyed if he has to wait for more than a couple of minutes. He's very ____.", "impatient"],
+  ["He often promises to help and then doesn't turn up. He's completely ____.", "unreliable"],
+  ["She ignores important duties and never thinks about the possible consequences of what she does. She's very ____.", "irresponsible"],
+  ["She regularly puts other people's needs before her own. She's extremely ____.", "unselfish"],
+  ["He makes jokes about people's problems without thinking about how they might feel. He can be very ____.", "insensitive"],
+  ["He avoids social events and doesn't particularly enjoy spending time with other people. He's quite ____.", "unsociable"],
+  ["Her clothes are all over the floor and she never puts anything back in the right place. She's very ____.", "untidy"],
+  ["When I told her about my problem, she listened carefully and was very kind and understanding. She was really ____.", "sympathetic"],
+]);
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-personality",
+  level: "b1",
+  order: 2,
+  title: "Personality",
+  shortDescription: "Practise personality adjectives, negative prefixes and commonly confused adjectives.",
+  textbookRef: "Intermediate Vocabulary Bank 2",
+  accent: HUB_VOCAB_LEVEL_COLORS.b1,
+  itemCount: 37,
+  entries: intermediatePersonalityEntries,
+  personalityEntries: intermediatePersonalityEntries,
+  personalityContextEntries: intermediatePersonalityContextEntries,
+  negativePersonalityEntries: intermediateNegativePersonalityEntries,
+  negativePersonalityChoiceEntries: intermediateNegativePersonalityChoiceEntries,
+  personalityFalseFriendEntries: intermediatePersonalityFalseFriendEntries,
+  personalityWriteEntries: intermediatePersonalityWriteEntries,
+  infoNotes: [
+    { title: "Negative prefixes", body: ["un-, in- and dis- are common negative prefixes.", "in- changes to im- before b, m and p, ir- before r, and il- before l.", "The correct prefix depends on the adjective, so learn the complete word."] },
+    { title: "A positive negative-prefix word", body: ["Most of the negative-prefix adjectives here describe negative qualities.", "unselfish is different: it has a positive meaning.", "An unselfish person thinks about other people's needs, not only their own."] },
+    { title: "sensible, sensitive and sympathetic", body: ["sensible = practical and able to make good decisions", "sensitive = easily hurt or offended", "sympathetic = kind and understanding when somebody has a problem"] },
+  ],
+  activities: [
+    { id: "personality-flashcards", type: "flashcards", dataKey: "personalityEntries", title: "Personality flashcards", shortDescription: "Read the description and recall the personality adjective.", prompt: "Read the description and say the adjective before you flip.", itemLimit: 15 },
+    { id: "personality-context", type: "sentence-gap-choice", dataKey: "personalityContextEntries", title: "What are they like?", shortDescription: "Choose the personality adjective that best fits each situation.", prompt: "Read the situation and choose the best adjective.", question: "What are they like?", itemLimit: 12 },
+    { id: "negative-prefixes", type: "sentence-gap-choice", dataKey: "negativePersonalityChoiceEntries", title: "Make it negative", shortDescription: "Choose the correct negative form of each adjective.", prompt: "Choose the correct adjective with a negative prefix.", question: "What is the negative form?" },
+    { id: "personality-false-friends", type: "sentence-gap-choice", dataKey: "personalityFalseFriendEntries", title: "Sensible, sensitive or sympathetic?", shortDescription: "Practise three adjectives that learners often confuse.", prompt: "Read the situation and choose the adjective that matches the meaning.", question: "Which adjective fits?" },
+    { id: "personality-write", type: "sentence-gap-type-answer", dataKey: "personalityWriteEntries", title: "Write the adjective", shortDescription: "Complete personality descriptions with the correct adjective from memory.", prompt: "Read the description and type the missing adjective.", answerLabel: "Adjective", answerPlaceholder: "Type the adjective", itemLimit: 15 },
+  ],
+});
+
+const intermediateMoneyVerbEntries = [
+  ["worth", "be worth", "have a particular financial value"],
+  ["borrow", "borrow", "receive money temporarily and return it later"],
+  ["afford", "can't afford", "not have enough money to buy or do something", ["can't afford", "cannot afford"]],
+  ["charge", "charge", "ask somebody to pay a particular amount for something"],
+  ["cost", "cost", "have a particular price"],
+  ["earn", "earn", "receive money for the work that you do"],
+  ["inherit", "inherit", "receive money or property from somebody after they die"],
+  ["invest", "invest", "put money into something because you hope it will increase in value"],
+  ["lend", "lend", "give somebody money temporarily and expect them to return it"],
+  ["owe", "owe", "need to give money back to somebody"],
+  ["raise", "raise", "collect money for a particular purpose"],
+  ["save", "save", "keep money instead of spending it so you can use it later"],
+  ["waste", "waste", "spend money badly or unnecessarily"],
+].map(([id, term, cueText, acceptedAnswers = [term]]) => ({
+  id: `int-money-verb-${id}`,
+  term,
+  cueText,
+  acceptedAnswers,
+}));
+
+const intermediateMoneyVerbContextEntries = intermediateContextEntries("int-money-verb-context", [
+  ["My old guitar isn't new, but collectors say it could _____ about €2,000.", "be worth", ["be worth", "cost", "earn", "raise"]],
+  ["If we sold the flat now, it would probably _____ around €300,000.", "be worth", ["be worth", "cost", "owe", "save"]],
+  ["I didn't have enough cash, so I had to _____ €20 from my brother.", "borrow", ["borrow", "lend", "owe", "inherit"]],
+  ["Could I _____ your credit card for a moment? I'll give it straight back.", "borrow", ["borrow", "lend", "charge", "save"]],
+  ["I'd love a new car, but I simply _____ one at the moment.", "can't afford", ["can't afford", "don't owe", "can't save", "don't earn"]],
+  ["Hotels are so expensive in August that we _____ to stay there for a week.", "can't afford", ["can't afford", "can't raise", "can't lend", "can't inherit"]],
+  ["The garage _____ me €180 for the repair.", "charged", ["charged", "cost", "owed", "earned"]],
+  ["How much does the hotel _____ for breakfast?", "charge", ["charge", "cost", "owe", "raise"]],
+  ["Those trainers _____ nearly €200, so I didn't buy them.", "cost", ["cost", "were worth", "charged", "earned"]],
+  ["How much did your new phone _____?", "cost", ["cost", "charge", "owe", "save"]],
+  ["She _____ about €2,500 a month working as an engineer.", "earns", ["earns", "raises", "saves", "inherits"]],
+  ["I'd like a job where I can _____ enough money to live comfortably.", "earn", ["earn", "raise", "owe", "lend"]],
+  ["She _____ the house from her grandmother after she died.", "inherited", ["inherited", "borrowed", "earned", "invested"]],
+  ["He's going to _____ some money from an elderly relative.", "inherit", ["inherit", "earn", "lend", "raise"]],
+  ["They decided to _____ some of their savings in a new business.", "invest", ["invest", "save", "raise", "waste"]],
+  ["If you _____ money in shares, their value can go up or down.", "invest", ["invest", "lend", "inherit", "owe"]],
+  ["Can you _____ me €50 until Friday?", "lend", ["lend", "borrow", "owe", "charge"]],
+  ["I don't usually _____ money to friends because it can cause arguments.", "lend", ["lend", "borrow", "raise", "invest"]],
+  ["I borrowed €100 from Laura last week, so I still _____ her €100.", "owe", ["owe", "lend", "charge", "earn"]],
+  ["How much money do you still _____ the bank?", "owe", ["owe", "borrow", "cost", "raise"]],
+  ["The school is trying to _____ €10,000 for new sports equipment.", "raise", ["raise", "earn", "save", "invest"]],
+  ["We organised a charity concert to _____ money for the local hospital.", "raise", ["raise", "earn", "lend", "inherit"]],
+  ["I'm putting some money aside every month to _____ for a holiday.", "save", ["save", "invest", "raise", "earn"]],
+  ["If you want to buy a house, you'll probably need to _____ for several years.", "save", ["save", "owe", "lend", "waste"]],
+  ["Don't _____ your money on things you don't need.", "waste", ["waste", "save", "invest", "raise"]],
+  ["He _____ hundreds of euros every month on unnecessary subscriptions.", "wastes", ["wastes", "saves", "earns", "inherits"]],
+]);
+
+const intermediateMoneyPrepositionEntries = [
+  ["pay-by", "pay by card"], ["pay-for", "pay for something"], ["spend-on", "spend money on something"],
+  ["invest-in", "invest money in something"], ["lend-to", "lend money to somebody"],
+  ["borrow-from", "borrow money from somebody"], ["charge-for", "charge somebody for something"],
+  ["get-into-debt", "get into debt"],
+].map(([id, term]) => ({ id: `int-money-preposition-${id}`, term, acceptedAnswers: [term] }));
+
+const intermediateMoneyPrepositionContextEntries = intermediateContextEntries("int-money-preposition-context", [
+  ["I normally pay _____ card rather than using cash.", "by", ["by", "with", "for", "on"]],
+  ["Can I pay _____ credit card?", "by", ["by", "for", "to", "from"]],
+  ["How much did you pay _____ your new laptop?", "for", ["for", "by", "on", "to"]],
+  ["I'll pay _____ dinner tonight.", "for", ["for", "by", "on", "from"]],
+  ["I spend far too much money _____ clothes.", "on", ["on", "in", "for", "to"]],
+  ["How much do you usually spend _____ food each week?", "on", ["on", "for", "in", "by"]],
+  ["They invested most of their savings _____ property.", "in", ["in", "on", "to", "from"]],
+  ["Would you ever invest money _____ a new company?", "in", ["in", "on", "for", "by"]],
+  ["I lent €100 _____ my sister.", "to", ["to", "from", "for", "by"]],
+  ["Never lend large amounts of money _____ people you hardly know.", "to", ["to", "from", "on", "in"]],
+  ["I borrowed the money _____ a friend.", "from", ["from", "to", "for", "by"]],
+  ["She had to borrow €500 _____ her parents.", "from", ["from", "to", "on", "in"]],
+  ["They charged us €15 _____ delivery.", "for", ["for", "on", "by", "from"]],
+  ["The restaurant charged me €8 _____ a bottle of water.", "for", ["for", "by", "to", "in"]],
+  ["It's very easy to get _____ debt if you regularly spend more than you earn.", "into", ["into", "in", "on", "to"]],
+  ["He got _____ debt after losing his job.", "into", ["into", "in", "from", "on"]],
+]);
+
+const intermediateMoneyNounEntries = ["bill", "budget", "contactless payment", "insurance", "loan", "mortgage", "salary", "tax"]
+  .map((term) => ({ id: `int-money-noun-${term.replace(/\s+/g, "-")}`, term, acceptedAnswers: [term] }));
+
+const intermediateMoneyNounContextEntries = intermediateContextEntries("int-money-noun-context", [
+  ["The waiter brought us the _____ after we'd finished eating.", "bill", ["bill", "budget", "salary", "tax"]],
+  ["My electricity _____ was much higher than usual this month.", "bill", ["bill", "loan", "insurance", "mortgage"]],
+  ["We only have €500 to spend on the whole trip, so we need to make a ____.", "budget", ["budget", "bill", "loan", "salary"]],
+  ["Our monthly _____ tells us how much we can afford to spend on food, rent and entertainment.", "budget", ["budget", "mortgage", "tax", "insurance"]],
+  ["I just held my phone next to the machine and paid without entering a PIN. I used ____.", "contactless payment", ["contactless payment", "insurance", "a loan", "a budget"]],
+  ["For small purchases, many people use _____ instead of inserting their card.", "contactless payment", ["contactless payment", "a mortgage", "a salary", "tax"]],
+  ["If the car is stolen or damaged, the _____ should cover some of the cost.", "insurance", ["insurance", "mortgage", "salary", "budget"]],
+  ["We pay for travel _____ in case we have a medical emergency abroad.", "insurance", ["insurance", "tax", "loan", "bill"]],
+  ["The bank gave her a €10,000 _____ which she has to repay over five years.", "loan", ["loan", "mortgage", "salary", "bill"]],
+  ["I didn't have enough money for the car, so I applied to the bank for a ____.", "loan", ["loan", "budget", "tax", "insurance"]],
+  ["They borrowed money from the bank to buy their home and now have a 25-year ____.", "mortgage", ["mortgage", "loan", "bill", "salary"]],
+  ["Most people need a _____ if they want to buy a house.", "mortgage", ["mortgage", "budget", "tax", "insurance"]],
+  ["Her annual _____ is €42,000.", "salary", ["salary", "tax", "loan", "budget"]],
+  ["The company offered him a higher _____ to persuade him to stay.", "salary", ["salary", "bill", "mortgage", "insurance"]],
+  ["Part of the money you earn goes to the government as ____.", "tax", ["tax", "salary", "insurance", "loan"]],
+  ["The government has increased _____ on cigarettes.", "tax", ["tax", "bill", "budget", "mortgage"]],
+]);
+
+const intermediateMoneyPhrasalVerbEntries = [
+  ["take-out", "take out", "remove or withdraw money from a bank account or cash machine"],
+  ["pay-back", "pay back", "return money you borrowed"],
+  ["live-off", "live off", "get the money or resources you need from another person or source"],
+  ["live-on", "live on", "support yourself using a particular amount of money or income"],
+].map(([id, term, cueText]) => ({ id: `int-money-phrasal-${id}`, term, cueText, acceptedAnswers: [term] }));
+
+const intermediateMoneyPhrasalVerbContextEntries = intermediateContextEntries("int-money-phrasal-context", [
+  ["I need some cash, so I'll _____ €50 _____ at the cash machine.", "take out", ["take out", "pay back", "live off", "live on"]],
+  ["She went to the ATM to _____ some money _____ before the shops closed.", "take out", ["take out", "pay back", "live off", "live on"]],
+  ["I don't usually _____ cash _____. I pay for almost everything by card.", "take out", ["take out", "pay back", "live off", "live on"]],
+  ["I lent you €40 last week. When are you going to _____ me _____?", "pay back", ["pay back", "take out", "live off", "live on"]],
+  ["I'll _____ the money _____ as soon as I get paid.", "pay back", ["pay back", "take out", "live off", "live on"]],
+  ["It took him six months to _____ the loan _____.", "pay back", ["pay back", "take out", "live off", "live on"]],
+  ["He's 25 but still _____ his parents because he doesn't have a job.", "lives off", ["lives off", "lives on", "pays back", "takes out"]],
+  ["While she was at university, she mostly _____ money from her family.", "lived off", ["lived off", "lived on", "paid back", "took out"]],
+  ["You can't _____ your parents forever. Eventually you'll need your own income.", "live off", ["live off", "live on", "pay back", "take out"]],
+  ["It's difficult to _____ €900 a month in a big city.", "live on", ["live on", "live off", "pay back", "take out"]],
+  ["Could you _____ that salary if your rent increased?", "live on", ["live on", "live off", "take out", "pay back"]],
+  ["After retiring, they have to _____ a fairly small pension.", "live on", ["live on", "live off", "take out", "pay back"]],
+]);
+
+const intermediateMoneyWriteEntries = intermediateWriteEntries("int-money-write", [
+  ["My aunt left me some money in her will, so I _____ €5,000.", "inherited"],
+  ["I don't have enough money for that laptop. I can't _____ it.", "afford"],
+  ["Could I _____ €30 from you until tomorrow?", "borrow"],
+  ["I can _____ you the money, but I'll need it back next week.", "lend"],
+  ["I borrowed €200 from him and still _____ him half of it.", "owe"],
+  ["She _____ about €36,000 a year working in IT.", "earns"],
+  ["How much did the restaurant _____ you for the meal?", "charge"],
+  ["My new bike _____ €750.", "cost"],
+  ["The necklace isn't very expensive, but it's probably _____ about €200.", "worth"],
+  ["I'm trying to _____ enough money for a deposit on a flat.", "save"],
+  ["Don't _____ your money on gadgets you'll never use.", "waste"],
+  ["We're trying to _____ €3,000 for the local animal shelter.", "raise"],
+  ["They _____ some of their savings in renewable-energy companies.", "invested"],
+  ["I paid _____ the tickets online.", "for"], ["I normally pay _____ card.", "by"],
+  ["She spends a lot of money _____ eating out.", "on"], ["He invested €5,000 _____ the company.", "in"],
+  ["I lent some money _____ my brother.", "to"], ["I borrowed the money _____ my parents.", "from"],
+  ["They charged us extra _____ breakfast.", "for"], ["After using several credit cards, he got _____ debt.", "into"],
+  ["We need to decide how much we can spend each month, so let's make a ____.", "budget"],
+  ["The waiter still hasn't brought us the ____.", "bill"],
+  ["I paid just by touching my phone against the reader. I used ____.", "contactless payment", ["contactless payment", "contactless"]],
+  ["I always buy travel _____ before going abroad.", "insurance"],
+  ["I borrowed €8,000 from the bank and have to repay the _____ over four years.", "loan"],
+  ["We're paying off a 30-year _____ on the house.", "mortgage"],
+  ["His new job comes with a much higher ____.", "salary"],
+  ["People pay _____ to the government on their earnings.", "tax"],
+  ["I need cash, so I'm going to _____ _____ €100.", "take out"],
+  ["How much money did you _____ _____ of the cash machine?", "take out"],
+  ["I owe you €20. I'll _____ you _____ tomorrow.", "pay back"],
+  ["It took her a year to _____ the money _____.", "pay back"],
+  ["He doesn't earn anything and still _____ _____ his parents.", "lives off"],
+  ["When I was studying, I had to _____ _____ money from my family.", "live off"],
+  ["Could you _____ _____ €1,200 a month?", "live on"],
+  ["They have to _____ _____ one salary at the moment.", "live on"],
+  ["This old watch could be _____ several thousand euros.", "worth"],
+  ["We can't _____ another holiday this year.", "afford"],
+  ["She took out a bank _____ to pay for the course.", "loan"],
+]);
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-money",
+  level: "b1",
+  order: 3,
+  title: "Money",
+  shortDescription: "Practise money verbs, prepositions, financial vocabulary and useful phrasal verbs.",
+  textbookRef: "Intermediate Vocabulary Bank 3",
+  accent: HUB_VOCAB_LEVEL_COLORS.b1,
+  itemCount: 33,
+  entries: intermediateMoneyVerbEntries,
+  moneyVerbEntries: intermediateMoneyVerbEntries,
+  moneyVerbContextEntries: intermediateMoneyVerbContextEntries,
+  moneyPrepositionEntries: intermediateMoneyPrepositionEntries,
+  moneyPrepositionContextEntries: intermediateMoneyPrepositionContextEntries,
+  moneyNounEntries: intermediateMoneyNounEntries,
+  moneyNounContextEntries: intermediateMoneyNounContextEntries,
+  moneyPhrasalVerbEntries: intermediateMoneyPhrasalVerbEntries,
+  moneyPhrasalVerbContextEntries: intermediateMoneyPhrasalVerbContextEntries,
+  moneyWriteEntries: intermediateMoneyWriteEntries,
+  infoNotes: [
+    { title: "borrow or lend?", body: ["borrow = receive something temporarily", "borrow money from somebody", "lend = give something temporarily", "lend money to somebody"] },
+    { title: "cost or be worth?", body: ["cost describes the price somebody pays.", "The laptop cost €900.", "be worth describes the value something has.", "The painting is worth about €5,000."] },
+    { title: "earn or raise?", body: ["earn money = receive money for work", "raise money = collect money for a cause or purpose"] },
+    { title: "live off or live on?", body: ["live off somebody / something = depend on that person or source for money", "He's still living off his parents.", "live on an amount / income = have that amount available to support yourself", "It's difficult to live on €1,000 a month."] },
+  ],
+  activities: [
+    { id: "money-verb-flashcards", type: "flashcards", dataKey: "moneyVerbEntries", title: "Money verb flashcards", shortDescription: "Recall useful verbs and verb phrases for talking about money.", prompt: "Read the meaning and say the verb or phrase before you flip." },
+    { id: "money-verbs-context", type: "sentence-gap-choice", dataKey: "moneyVerbContextEntries", title: "Which money verb?", shortDescription: "Complete gapped sentences with the correct money verb or phrase.", prompt: "Read the sentence and choose the verb or phrase that fits.", question: "Which money verb fits?", itemLimit: 12 },
+    { id: "money-prepositions", type: "sentence-gap-choice", dataKey: "moneyPrepositionContextEntries", title: "Money + prepositions", shortDescription: "Choose the preposition used in common money expressions.", prompt: "Complete the sentence with the correct preposition.", question: "Which preposition fits?", itemLimit: 12 },
+    { id: "money-nouns", type: "sentence-gap-choice", dataKey: "moneyNounContextEntries", title: "What's the money word?", shortDescription: "Choose the correct noun for common financial situations.", prompt: "Read the situation and choose the money word.", question: "Which word fits?", itemLimit: 12 },
+    { id: "money-phrasal-verbs", type: "sentence-gap-choice", dataKey: "moneyPhrasalVerbContextEntries", title: "Money phrasal verbs", shortDescription: "Practise four useful phrasal verbs for money and income.", prompt: "Choose the phrasal verb that completes the sentence.", question: "Which phrasal verb fits?" },
+    { id: "money-write", type: "sentence-gap-type-answer", dataKey: "moneyWriteEntries", title: "Write the word or phrase", shortDescription: "Complete money vocabulary and expressions from memory.", prompt: "Read the sentence and type the missing word or phrase.", answerLabel: "Missing word or phrase", answerPlaceholder: "Type your answer", itemLimit: 15 },
+  ],
+});
+
+const intermediateTransportEntries = [
+  ["coach", "coach", ["coach"], "A coach is a bus used especially for longer journeys."],
+  ["ferry", "ferry", ["ferry"]],
+  ["lorry", "lorry", ["lorry", "truck"], "AmE: truck"],
+  ["motorbike", "motorbike", ["motorbike", "motorcycle"]],
+  ["motorway", "motorway", ["motorway", "freeway"], "AmE: freeway"],
+  ["scooter", "scooter", ["scooter"]],
+  ["tram", "tram", ["tram"]],
+  ["the-underground", "the Underground", ["the Underground", "Underground", "the underground", "underground", "the subway", "subway"], "AmE: subway"],
+  ["van", "van", ["van"]],
+].map(([id, term, acceptedAnswers, spokenLabel]) => ({
+  id: `int-transport-${id}`,
+  term,
+  image: `${INTERMEDIATE_TRANSPORT_IMAGE_BASE}/${id}.webp`,
+  acceptedAnswers,
+  ...(spokenLabel ? { spokenLabel } : {}),
+}));
+
+const intermediateRoadEntries = [
+  "car crash", "cycle lane", "parking fine", "pedestrian crossing", "petrol station", "road works", "rush hour",
+  "seat belt", "speed camera", "speed limit", "taxi rank", "traffic lights", "traffic jam", "zebra crossing",
+].map((term) => {
+  const slug = term.replace(/\s+/g, "-");
+  return {
+    id: `int-road-${slug}`,
+    term,
+    image: `${INTERMEDIATE_TRANSPORT_IMAGE_BASE}/${slug}.webp`,
+    acceptedAnswers: term === "road works" ? ["road works", "roadworks"] : [term],
+  };
+});
+
+const roadChoiceOptions = [
+  ["car crash", "road works", "traffic jam"], ["cycle lane", "pedestrian crossing", "zebra crossing"],
+  ["parking fine", "speed camera", "speed limit"], ["pedestrian crossing", "zebra crossing", "cycle lane"],
+  ["petrol station", "taxi rank", "road works"], ["road works", "car crash", "traffic jam"],
+  ["rush hour", "traffic jam", "road works"], ["seat belt", "speed limit", "cycle lane"],
+  ["speed camera", "speed limit", "traffic lights"], ["speed limit", "speed camera", "traffic lights"],
+  ["taxi rank", "petrol station", "traffic jam"], ["traffic lights", "speed camera", "speed limit"],
+  ["traffic jam", "rush hour", "road works"], ["zebra crossing", "pedestrian crossing", "cycle lane"],
+];
+
+const intermediateRoadChoiceEntries = intermediateRoadEntries.map((entry, index) => ({ ...entry, options: roadChoiceOptions[index] }));
+
+const intermediateRoadBuilderEntries = intermediateContextEntries("int-road-builder", [
+  ["There was a serious car _____ on the motorway this morning.", "crash", ["crash", "jam", "fine", "works"]],
+  ["Two vehicles hit each other in a _____ crash near the junction.", "car", ["car", "road", "traffic", "speed"]],
+  ["Cyclists should use the cycle _____ instead of riding in the middle of the road.", "lane", ["lane", "rank", "belt", "limit"]],
+  ["The council has painted a new _____ lane along the main road.", "cycle", ["cycle", "traffic", "zebra", "speed"]],
+  ["I left the car there for three hours and got a parking _____.", "fine", ["fine", "limit", "rank", "jam"]],
+  ["He had to pay a €60 _____ fine for leaving the car in the wrong place.", "parking", ["parking", "traffic", "road", "speed"]],
+  ["Don't cross between the cars. Use the pedestrian _____.", "crossing", ["crossing", "lane", "rank", "station"]],
+  ["They've installed a new _____ crossing outside the school so people can cross safely.", "pedestrian", ["pedestrian", "traffic", "speed", "road"]],
+  ["We stopped at a petrol _____ to fill the tank.", "station", ["station", "rank", "lane", "crossing"]],
+  ["Is there a _____ station nearby? We're almost out of fuel.", "petrol", ["petrol", "traffic", "parking", "speed"]],
+  ["The street is partly closed because of road _____.", "works", ["works", "lights", "jam", "hour"]],
+  ["There are major _____ works on the ring road this week.", "road", ["road", "traffic", "car", "parking"]],
+  ["Traffic is usually worst during rush _____.", "hour", ["hour", "jam", "works", "rank"]],
+  ["I try not to drive during the morning _____ hour.", "rush", ["rush", "traffic", "speed", "road"]],
+  ["Please fasten your seat _____ before we leave.", "belt", ["belt", "lane", "limit", "rank"]],
+  ["Everyone in the car should wear a _____ belt.", "seat", ["seat", "speed", "traffic", "cycle"]],
+  ["A speed _____ photographed his car when he was driving too fast.", "camera", ["camera", "limit", "fine", "lights"]],
+  ["There's a _____ camera just after the bridge, so don't drive too fast.", "speed", ["speed", "traffic", "road", "parking"]],
+  ["The speed _____ on this road is 50 km/h.", "limit", ["limit", "camera", "lane", "rank"]],
+  ["The sign shows a _____ limit of 30 km/h.", "speed", ["speed", "traffic", "road", "cycle"]],
+  ["We waited at the taxi _____ outside the station.", "rank", ["rank", "lane", "station", "crossing"]],
+  ["There's a _____ rank directly outside the airport terminal.", "taxi", ["taxi", "traffic", "parking", "petrol"]],
+  ["Turn right when you reach the traffic _____.", "lights", ["lights", "jam", "works", "limit"]],
+  ["The _____ lights changed from green to red.", "traffic", ["traffic", "speed", "road", "parking"]],
+  ["We were stuck in a traffic _____ for nearly an hour.", "jam", ["jam", "hour", "works", "fine"]],
+  ["The accident caused a huge _____ jam on the motorway.", "traffic", ["traffic", "road", "parking", "speed"]],
+  ["Use the zebra _____ just outside the station.", "crossing", ["crossing", "lane", "rank", "station"]],
+  ["Drivers should stop at the _____ crossing if someone is waiting to cross.", "zebra", ["zebra", "pedestrian", "traffic", "cycle"]],
+]);
+
+const intermediateTransportPhrasalVerbEntries = [
+  ["set-off", "set off", "start a journey"],
+  ["pick-up", "pick up", "collect somebody, usually as part of a journey"],
+  ["drop-off", "drop off", "take somebody somewhere and leave them there"],
+  ["end-up", "end up", "finally arrive or find yourself somewhere, often unexpectedly"],
+  ["run-out-of", "run out of", "use all of something so that none is left"],
+  ["look-watch-out", "look out / watch out", "be careful because there is immediate danger"],
+].map(([id, term, cueText]) => ({ id: `int-transport-phrasal-${id}`, term, cueText, acceptedAnswers: [term] }));
+
+const intermediateTransportPhrasalVerbContextEntries = intermediateContextEntries("int-transport-phrasal-context", [
+  ["We need to _____ before seven if we want to avoid the morning traffic.", "set off", ["set off", "end up", "pick up", "run out of"]],
+  ["We _____ very early because the drive to the airport takes nearly three hours.", "set off", ["set off", "dropped off", "ended up", "ran out of"]],
+  ["What time are you planning to _____ tomorrow morning?", "set off", ["set off", "pick up", "end up", "drop off"]],
+  ["Could you _____ me _____ from the station at about eight?", "pick up", ["pick up", "drop off", "set off", "end up"]],
+  ["I'm going to _____ the children _____ from school on my way home.", "pick up", ["pick up", "drop off", "run out of", "set off"]],
+  ["The hotel sent a car to _____ us _____ at the airport.", "pick up", ["pick up", "drop off", "end up", "set off"]],
+  ["I can _____ you _____ outside your house if you like.", "drop off", ["drop off", "pick up", "set off", "end up"]],
+  ["The taxi _____ us _____ at the entrance to the hotel.", "dropped off", ["dropped off", "picked up", "set off", "ended up"]],
+  ["Can you _____ the children _____ at school before you go to work?", "drop off", ["drop off", "pick up", "run out of", "end up"]],
+  ["We took the wrong road and _____ in a village we'd never heard of.", "ended up", ["ended up", "set off", "picked up", "ran out of"]],
+  ["If you follow the wrong satnav directions, you might _____ somewhere completely different.", "end up", ["end up", "set off", "pick up", "drop off"]],
+  ["We missed the motorway exit and somehow _____ back in the city centre.", "ended up", ["ended up", "ran out of", "set off", "dropped off"]],
+  ["We need to find a petrol station soon. We're going to _____ petrol.", "run out of", ["run out of", "end up", "pick up", "set off"]],
+  ["The car stopped because we'd completely _____ petrol.", "run out of", ["run out of", "ended up", "set off", "dropped off"]],
+  ["Check the fuel level before a long journey so you don't _____ petrol.", "run out of", ["run out of", "pick up", "drop off", "end up"]],
+  ["_____! That car is coming straight towards us!", "Look out", ["Look out", "Set off", "Pick up", "End up"]],
+  ["_____! You're about to hit the cyclist in front of you.", "Watch out", ["Watch out", "Run out of", "Drop off", "Set off"]],
+  ["_____! The traffic lights have just changed to red.", "Look out", ["Look out", "Pick up", "End up", "Run out of"]],
+]);
+
+const intermediateTransportVisualWriteEntries = [...intermediateTransportEntries, ...intermediateRoadEntries].map((entry, index) => ({
+  ...entry,
+  id: `int-transport-write-${String(index + 1).padStart(2, "0")}`,
+  sentence: "What is this?",
+  answer: entry.term,
+}));
+
+const intermediateTransportTextWriteEntries = intermediateWriteEntries("int-transport-write-text", [
+  ["I was driving too fast and a speed _____ photographed my car.", "camera"],
+  ["The speed _____ here is only 30 km/h.", "limit"],
+  ["We were stuck in a traffic _____ for nearly forty minutes.", "jam"],
+  ["Turn left when you reach the traffic _____.", "lights"],
+  ["There's a taxi _____ outside the main entrance.", "rank"],
+  ["Always fasten your seat _____ before the car moves.", "belt"],
+  ["I got a parking _____ because I'd left the car there all afternoon.", "fine"],
+  ["We need to _____ _____ before six tomorrow morning.", "set off"],
+  ["What time did you _____ _____ for the airport?", "set off"],
+  ["Can you _____ me _____ at the station?", "pick up"],
+  ["I'll _____ you _____ outside your hotel.", "drop off"],
+  ["We took a wrong turn and _____ _____ in a tiny village.", "ended up"],
+  ["If you aren't careful, you'll _____ _____ miles from where you wanted to go.", "end up"],
+  ["We're almost _____ _____ _____ petrol.", "running out of"],
+  ["The car stopped because we'd _____ _____ _____ fuel.", "run out of"],
+  ["_____ _____! There's a motorbike coming!", "look out", ["look out", "watch out"]],
+  ["_____ _____! You're going to hit the car in front!", "watch out", ["watch out", "look out"]],
+]);
+
+const intermediateTransportWriteEntries = [...intermediateTransportVisualWriteEntries, ...intermediateTransportTextWriteEntries];
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-transport",
+  level: "b1",
+  order: 4,
+  title: "Transport",
+  shortDescription: "Practise transport vocabulary, road compounds and useful phrasal verbs for journeys.",
+  textbookRef: "Intermediate Vocabulary Bank 4",
+  accent: HUB_VOCAB_LEVEL_COLORS.b1,
+  itemCount: 28,
+  entries: intermediateTransportEntries,
+  transportEntries: intermediateTransportEntries,
+  roadEntries: intermediateRoadEntries,
+  roadChoiceEntries: intermediateRoadChoiceEntries,
+  roadBuilderEntries: intermediateRoadBuilderEntries,
+  transportPhrasalVerbEntries: intermediateTransportPhrasalVerbEntries,
+  transportPhrasalVerbContextEntries: intermediateTransportPhrasalVerbContextEntries,
+  transportWriteEntries: intermediateTransportWriteEntries,
+  infoNotes: [
+    { title: "pedestrian crossing and zebra crossing", body: ["A pedestrian crossing is any designated place where people can cross a road safely.", "A zebra crossing is a type of pedestrian crossing with distinctive stripes on the road."] },
+    { title: "pick up or drop off?", body: ["pick somebody up = collect somebody", "Can you pick me up at the station?", "drop somebody off = take somebody somewhere and leave them there", "I'll drop you off outside the hotel."] },
+    { title: "run out of", body: ["run out of something = have none of it left", "We're running out of petrol."] },
+    { title: "look out / watch out", body: ["Both expressions are used to warn somebody about immediate danger.", "Look out! There's a car coming.", "Watch out! You're going to hit that cyclist."] },
+  ],
+  activities: [
+    { id: "transport-flashcards", type: "flashcards", dataKey: "transportEntries", title: "Transport flashcards", shortDescription: "Look at the transport image and recall the word.", prompt: "Look at the picture and say the word before you flip." },
+    { id: "road-choice", type: "quick-choice", dataKey: "roadChoiceEntries", title: "On the road", shortDescription: "Recognise common road vocabulary from pictures.", prompt: "Look at the picture and choose the correct road phrase." },
+    { id: "road-builder", type: "sentence-gap-choice", dataKey: "roadBuilderEntries", title: "Build the road phrase", shortDescription: "Complete common compound nouns used for roads and driving.", prompt: "Choose the word that completes the road phrase.", question: "Which word fits?", itemLimit: 12 },
+    { id: "transport-phrasal-verbs", type: "sentence-gap-choice", dataKey: "transportPhrasalVerbContextEntries", title: "Transport phrasal verbs", shortDescription: "Choose the phrasal verb that fits each journey or driving situation.", prompt: "Read the situation and choose the correct phrasal verb.", question: "Which phrase fits?", itemLimit: 12 },
+    { id: "transport-write", type: "sentence-gap-type-answer", dataKey: "transportWriteEntries", title: "Write the word or phrase", shortDescription: "Write transport vocabulary, road phrases and phrasal verbs from memory.", prompt: "Look at the picture or read the sentence and type the missing word or phrase.", question: "Type the answer.", answerLabel: "Word or phrase", answerPlaceholder: "Type your answer", itemLimit: 15 },
+  ],
+});
+
+const intermediateVerbPrepositionEntries = [
+  ["apologize", "apologize ___ somebody ___ something", "apologize to somebody for something"],
+  ["argue", "argue ___ somebody ___ something", "argue with somebody about something"],
+  ["arrive-in", "arrive ___ a city / country", "arrive in a city / country"],
+  ["arrive-at", "arrive ___ a building / airport / station", "arrive at a building / airport / station"],
+  ["ask", "ask somebody ___ something", "ask somebody for something"],
+  ["believe", "believe ___ something", "believe in something"],
+  ["belong", "belong ___ somebody", "belong to somebody"],
+  ["choose", "choose ___ things", "choose between things"],
+  ["depend", "depend ___ something", "depend on something"],
+  ["dream", "dream ___ something", "dream about something"],
+  ["laugh", "laugh ___ somebody", "laugh at somebody"],
+  ["look-forward", "look forward ___ something / doing something", "look forward to something / doing something"],
+  ["pay", "pay ___ something", "pay for something"],
+  ["remind", "remind somebody ___ something", "remind somebody of something"],
+  ["spend", "spend money ___ something", "spend money on something"],
+  ["talk", "talk ___ somebody ___ something", "talk to somebody about something"],
+].map(([id, cueText, term]) => ({ id: `int-dependent-verb-${id}`, cueText, term, acceptedAnswers: [term] }));
+
+const intermediateAdjectivePrepositionEntries = [
+  ["afraid", "afraid ___", "afraid of"],
+  ["angry", "angry ___ somebody ___ something", "angry with somebody about something"],
+  ["close", "close ___", "close to"], ["different", "different ___", "different from"],
+  ["excited", "excited ___", "excited about"], ["famous", "famous ___", "famous for"],
+  ["fed-up", "fed up ___", "fed up with"], ["fond", "fond ___", "fond of"],
+  ["good-at", "good ___ sport", "good at sport"], ["good-for", "good ___ you", "good for you"],
+  ["interested", "interested ___", "interested in"], ["keen", "keen ___", "keen on"],
+  ["kind", "kind ___ somebody", "kind to somebody"], ["married", "married ___ somebody", "married to somebody"],
+  ["pleased", "pleased ___", "pleased with"], ["proud", "proud ___", "proud of"],
+  ["rude", "rude ___ somebody", "rude to somebody"], ["worried", "worried ___", "worried about"],
+  ["tired", "tired ___", "tired of"],
+].map(([id, cueText, term]) => ({ id: `int-dependent-adjective-${id}`, cueText, term, acceptedAnswers: [term] }));
+
+const intermediateDependentPrepositionEntries = [...intermediateVerbPrepositionEntries, ...intermediateAdjectivePrepositionEntries];
+
+const intermediateVerbPrepositionContextEntries = intermediateContextEntries("int-dependent-verb-context", [
+  ["I apologized _____ my neighbour _____ making so much noise.", "to / for", ["to / for", "with / about", "to / about", "for / to"]],
+  ["Why are you always arguing _____ your brother _____ money?", "with / about", ["with / about", "to / for", "with / for", "to / about"]],
+  ["We arrived _____ Lisbon quite late.", "in", ["in", "at", "to", "on"]],
+  ["What time did you arrive _____ the station?", "at", ["at", "in", "to", "on"]],
+  ["Could you ask the receptionist _____ another key?", "for", ["for", "to", "about", "of"]],
+  ["Do you believe _____ ghosts?", "in", ["in", "on", "at", "of"]],
+  ["Who does this jacket belong _____?", "to", ["to", "with", "for", "of"]],
+  ["I can't choose _____ the blue one and the green one.", "between", ["between", "among", "from", "of"]],
+  ["Whether we go to the beach depends _____ the weather.", "on", ["on", "of", "in", "from"]],
+  ["I sometimes dream _____ living somewhere by the sea.", "about", ["about", "of", "on", "at"]],
+  ["Please don't laugh _____ me. I'm trying my best.", "at", ["at", "to", "with", "about"]],
+  ["I'm really looking forward _____ seeing everyone again.", "to", ["to", "for", "at", "on"]],
+  ["How much did you pay _____ the tickets?", "for", ["for", "on", "to", "of"]],
+  ["This smell reminds me _____ my grandmother's kitchen.", "of", ["of", "about", "from", "to"]],
+  ["I spend far too much money _____ eating out.", "on", ["on", "in", "for", "at"]],
+  ["I need to talk _____ my manager _____ my working hours.", "to / about", ["to / about", "with / for", "to / for", "at / about"]],
+  ["They arrived _____ Spain on Monday.", "in", ["in", "at", "to", "on"]],
+  ["We arrived _____ our hotel just after midnight.", "at", ["at", "in", "to", "on"]],
+  ["He apologized _____ being so impatient.", "for", ["for", "to", "about", "of"]],
+  ["Can I ask you _____ some advice?", "for", ["for", "about", "to", "of"]],
+]);
+
+const intermediateAdjectivePrepositionContextEntries = intermediateContextEntries("int-dependent-adjective-context", [
+  ["My daughter is terrified of spiders, but I'm afraid _____ snakes.", "of", ["of", "from", "about", "at"]],
+  ["She was angry _____ her flatmate _____ leaving the door unlocked.", "with / about", ["with / about", "at / for", "to / about", "with / of"]],
+  ["I'm very close _____ my cousins. We speak almost every day.", "to", ["to", "with", "of", "from"]],
+  ["This version is quite different _____ the one we used last year.", "from", ["from", "to", "of", "with"]],
+  ["The children are really excited _____ going on holiday tomorrow.", "about", ["about", "for", "of", "with"]],
+  ["The city is famous _____ its beautiful architecture.", "for", ["for", "of", "about", "with"]],
+  ["I'm fed up _____ hearing the same excuse every day.", "with", ["with", "of", "about", "from"]],
+  ["She's very fond _____ her old teacher and still visits her.", "of", ["of", "to", "with", "about"]],
+  ["He's always been very good _____ languages.", "at", ["at", "in", "for", "with"]],
+  ["Walking every day is good _____ your health.", "for", ["for", "at", "to", "of"]],
+  ["My brother is really interested _____ astronomy.", "in", ["in", "on", "of", "about"]],
+  ["She's very keen _____ cycling and rides almost every weekend.", "on", ["on", "in", "at", "of"]],
+  ["You should always be kind _____ animals.", "to", ["to", "with", "for", "of"]],
+  ["He's been married _____ Marta for nearly ten years.", "to", ["to", "with", "at", "of"]],
+  ["I'm really pleased _____ the results.", "with", ["with", "of", "about", "for"]],
+  ["Her parents are extremely proud _____ what she's achieved.", "of", ["of", "about", "for", "with"]],
+  ["There's no reason to be rude _____ the waiter.", "to", ["to", "with", "at", "about"]],
+  ["She's worried _____ losing her job.", "about", ["about", "of", "for", "with"]],
+  ["I'm tired _____ having the same argument every week.", "of", ["of", "with", "about", "from"]],
+]);
+
+const intermediateDependentExpressionEntries = intermediateContextEntries("int-dependent-expression", [
+  ["After shouting at the waiter, I knew I needed to ____.", "apologize to him for being rude", ["apologize to him for being rude", "argue with him about being rude", "talk to him about being rude", "laugh at him for being rude"]],
+  ["They disagree about money all the time. They often ____.", "argue with each other about money", ["argue with each other about money", "talk to each other for money", "depend on each other about money", "laugh at each other about money"]],
+  ["Our flight landed and we ____.", "arrived at the airport", ["arrived at the airport", "arrived in the airport", "arrived to the airport", "arrived on the airport"]],
+  ["After the flight, we spent three days in Rome. We ____ on Friday.", "arrived in Rome", ["arrived in Rome", "arrived at Rome", "arrived to Rome", "arrived on Rome"]],
+  ["I need another towel, so I'll ____.", "ask the receptionist for one", ["ask the receptionist for one", "ask the receptionist to one", "ask the receptionist about one", "ask the receptionist of one"]],
+  ["That perfume always makes me think of my first holiday abroad. It ____.", "reminds me of that holiday", ["reminds me of that holiday", "reminds me about that holiday", "dreams me about that holiday", "belongs me to that holiday"]],
+  ["I can't wait to see everybody at the party. I'm ____.", "looking forward to seeing them", ["looking forward to seeing them", "looking forward to see them", "excited for seeing them", "interested to seeing them"]],
+  ["I need to discuss the complaint with the manager. I need to ____.", "talk to her about it", ["talk to her about it", "talk about her to it", "ask to her for it", "argue to her about it"]],
+  ["Her boyfriend forgot her birthday, and she's ____.", "angry with him about it", ["angry with him about it", "angry about him with it", "worried with him about it", "rude with him for it"]],
+  ["Leo can cook extremely well. He's ____.", "good at cooking", ["good at cooking", "good for cooking", "keen at cooking", "interested at cooking"]],
+  ["Regular exercise has health benefits. It's ____.", "good for you", ["good for you", "good at you", "fond of you", "pleased with you"]],
+  ["I've had enough of waiting in this queue. I'm ____.", "fed up with waiting", ["fed up with waiting", "tired with waiting", "worried of waiting", "keen on waiting"]],
+  ["Her son passed all his exams and she's ____.", "proud of him", ["proud of him", "pleased of him", "fond with him", "interested about him"]],
+  ["She thinks she may lose her job, so she's ____.", "worried about it", ["worried about it", "afraid about it", "tired from it", "angry of it"]],
+  ["He treats animals gently and looks after them well. He's ____.", "kind to animals", ["kind to animals", "kind with animals", "fond to animals", "good to animals"]],
+  ["The new exam isn't the same as the old one. It's ____.", "different from the old one", ["different from the old one", "different to the old one", "different of the old one", "different with the old one"]],
+]);
+
+const intermediateDependentPrepositionWriteEntries = intermediateWriteEntries("int-dependent-write", [
+  ["I apologized _____ being late.", "for"], ["I apologized _____ the customer.", "to"],
+  ["She was arguing _____ her sister about the money.", "with"], ["They argued with each other _____ where to go.", "about"],
+  ["We arrived _____ Barcelona just before lunch.", "in"], ["We arrived _____ the hotel at about ten.", "at"],
+  ["Could you ask him _____ the receipt?", "for"], ["I don't believe _____ horoscopes.", "in"],
+  ["Does this umbrella belong _____ you?", "to"], ["I had to choose _____ staying at home and going abroad.", "between"],
+  ["It all depends _____ how much it costs.", "on"], ["I often dream _____ travelling around South America.", "about"],
+  ["Everyone laughed _____ my terrible joke.", "at"], ["I can't wait for the weekend. I'm really _____ it.", "looking forward to"],
+  ["Who's going to pay _____ the taxi?", "for"], ["That song _____ my school days.", "reminds me of"],
+  ["I spend too much money _____ coffee.", "on"], ["We need to _____ Sam _____ what happened.", "talk to / about"],
+  ["My nephew is afraid _____ dogs.", "of"], ["Why are you so angry _____ me?", "with"],
+  ["She's angry with him _____ what he said.", "about"], ["I'm very close _____ my older brother.", "to"],
+  ["This book is completely _____ the film.", "different from"], ["We're really _____ going away next week.", "excited about"],
+  ["The region is _____ its beaches.", "famous for"], ["I've had enough of this noise. I'm completely _____ it.", "fed up with"],
+  ["She's always been very _____ her grandparents.", "fond of"], ["He's _____ fixing computers.", "good at"],
+  ["Drinking plenty of water is _____ you.", "good for"], ["She's _____ learning more about astronomy.", "interested in"],
+  ["My dad is really _____ fishing.", "keen on"], ["Please be _____ the new student.", "kind to"],
+  ["She's been _____ her husband for 20 years.", "married to"], ["I'm really _____ my new phone.", "pleased with"],
+  ["His family are extremely _____ what he's achieved.", "proud of"], ["There's no need to be _____ people who are trying to help you.", "rude to"],
+  ["She's _____ not having enough time to finish.", "worried about"], ["I'm _____ hearing the same complaint.", "tired of"],
+  ["I can't wait to see you next week. I'm looking forward to _____ you.", "seeing"],
+  ["After three hours in the queue, we're fed up with _____.", "waiting"],
+]);
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-dependent-prepositions",
+  level: "b1",
+  order: 5,
+  title: "Dependent prepositions",
+  shortDescription: "Practise common verb and adjective combinations with dependent prepositions.",
+  textbookRef: "Intermediate Vocabulary Bank 5",
+  accent: HUB_VOCAB_LEVEL_COLORS.b1,
+  itemCount: 35,
+  entries: intermediateDependentPrepositionEntries,
+  dependentPrepositionEntries: intermediateDependentPrepositionEntries,
+  verbPrepositionEntries: intermediateVerbPrepositionEntries,
+  verbPrepositionContextEntries: intermediateVerbPrepositionContextEntries,
+  adjectivePrepositionEntries: intermediateAdjectivePrepositionEntries,
+  adjectivePrepositionContextEntries: intermediateAdjectivePrepositionContextEntries,
+  dependentExpressionEntries: intermediateDependentExpressionEntries,
+  dependentPrepositionWriteEntries: intermediateDependentPrepositionWriteEntries,
+  infoNotes: [
+    { title: "arrive in or arrive at?", body: ["arrive in + city / country", "We arrived in Rome at midnight.", "arrive at + building / station / airport / other specific place", "We arrived at the airport at six."] },
+    { title: "Two-preposition patterns", body: ["apologize TO somebody FOR something", "argue WITH somebody ABOUT something", "talk TO somebody ABOUT something", "be angry WITH somebody ABOUT something"] },
+    { title: "good at or good for?", body: ["good at = skilled at something", "She's good at tennis.", "good for = beneficial or healthy", "Vegetables are good for you."] },
+    { title: "Verb after a preposition", body: ["When a verb comes after a preposition, use the -ing form.", "We're excited about going away.", "I'm tired of waiting.", "I'm looking forward to seeing you."] },
+  ],
+  activities: [
+    { id: "dependent-preposition-flashcards", type: "flashcards", dataKey: "dependentPrepositionEntries", title: "Dependent preposition flashcards", shortDescription: "Recall the preposition used with common verbs and adjectives.", prompt: "Say the missing preposition or prepositions, then flip to check.", itemLimit: 15 },
+    { id: "verb-prepositions", type: "sentence-gap-choice", dataKey: "verbPrepositionContextEntries", title: "Verbs + prepositions", shortDescription: "Choose the preposition used with common verbs.", prompt: "Read the sentence and choose the correct preposition or combination.", question: "Which preposition fits?", itemLimit: 12 },
+    { id: "adjective-prepositions", type: "sentence-gap-choice", dataKey: "adjectivePrepositionContextEntries", title: "Adjectives + prepositions", shortDescription: "Choose the preposition used after common adjectives.", prompt: "Read the sentence and choose the correct preposition or combination.", question: "Which preposition fits?", itemLimit: 12 },
+    { id: "dependent-expressions", type: "sentence-gap-choice", dataKey: "dependentExpressionEntries", title: "Which expression?", shortDescription: "Choose the complete verb or adjective phrase that fits the situation.", prompt: "Read the situation and choose the complete expression.", question: "Which expression fits?", itemLimit: 12 },
+    { id: "dependent-prepositions-write", type: "sentence-gap-type-answer", dataKey: "dependentPrepositionWriteEntries", title: "Write the preposition or phrase", shortDescription: "Complete verb and adjective combinations from memory.", prompt: "Read the sentence and type the missing preposition or phrase.", answerLabel: "Missing word or phrase", answerPlaceholder: "Type your answer", itemLimit: 15 },
+  ],
+});
+
+const intermediateSportPeopleEntries = [
+  ["captain", "captain", ["captain"]], ["coach", "coach", ["coach"]],
+  ["fans", "fans", ["fans"]], ["players", "players", ["players"]],
+  ["referee", "referee / umpire", ["referee", "umpire"], "The exact word depends on the sport."],
+  ["spectators", "spectators / the crowd", ["spectators", "the crowd", "crowd"]],
+  ["sports-hall", "sports hall", ["sports hall"]], ["stadium", "stadium", ["stadium"]],
+  ["team", "team", ["team"]],
+].map(([id, term, acceptedAnswers, spokenLabel]) => ({
+  id: `int-sport-${id}`,
+  term,
+  image: `${INTERMEDIATE_SPORT_IMAGE_BASE}/${id}.webp`,
+  acceptedAnswers,
+  ...(spokenLabel ? { spokenLabel } : {}),
+}));
+
+const intermediateSportPlaceEntries = [
+  ["court", ["tennis", "basketball"]], ["pitch", ["football", "rugby", "hockey"]],
+  ["pool", ["swimming", "diving"]], ["track", ["athletics"]],
+  ["circuit", ["Formula 1", "motorcycling"]], ["course", ["golf"]], ["slope", ["ski"]],
+].map(([term, sports]) => ({ id: `int-sport-place-${term}`, term, sports, acceptedAnswers: [term] }));
+
+const intermediateSportPlaceContextEntries = intermediateContextEntries("int-sport-place-context", [
+  ["You play tennis on a ____.", "court", ["court", "pitch", "course", "track"]],
+  ["A basketball match is played on a ____.", "court", ["court", "pitch", "track", "circuit"]],
+  ["Football is normally played on a ____.", "pitch", ["pitch", "court", "course", "track"]],
+  ["Rugby players compete on a ____.", "pitch", ["pitch", "court", "slope", "circuit"]],
+  ["A hockey match takes place on a ____.", "pitch", ["pitch", "court", "pool", "course"]],
+  ["Swimming races take place in a ____.", "pool", ["pool", "court", "track", "course"]],
+  ["Divers compete in a ____.", "pool", ["pool", "pitch", "circuit", "slope"]],
+  ["Runners compete on an athletics ____.", "track", ["track", "court", "course", "circuit"]],
+  ["An athletics stadium normally has a running ____ around the field.", "track", ["track", "pitch", "court", "slope"]],
+  ["A Formula 1 race takes place on a ____.", "circuit", ["circuit", "track", "course", "pitch"]],
+  ["Motorcycle races are held on a racing ____.", "circuit", ["circuit", "course", "track", "court"]],
+  ["Golfers play on a golf ____.", "course", ["course", "court", "pitch", "circuit"]],
+  ["A large golf _____ can have 18 holes.", "course", ["course", "track", "slope", "pitch"]],
+  ["You ski down a ski ____.", "slope", ["slope", "course", "track", "pitch"]],
+  ["Beginners usually start skiing on an easy ____.", "slope", ["slope", "court", "circuit", "pool"]],
+]);
+
+const intermediateSportResultEntries = intermediateContextEntries("int-sport-result", [
+  ["Our team _____ the final 2–0 last Saturday.", "won", ["won", "beat", "drew", "lost"]],
+  ["She's _____ three international tournaments in the last two years.", "won", ["won", "beaten", "drawn", "lost"]],
+  ["Who do you think will _____ the championship this year?", "win", ["win", "beat", "draw", "lose"]],
+  ["They _____ the cup for the first time in ten years.", "won", ["won", "beat", "drew", "lost"]],
+  ["We _____ the league leaders 3–1.", "beat", ["beat", "won", "drew", "lost"]],
+  ["No team has _____ them at home this season.", "beaten", ["beaten", "won", "drawn", "lost"]],
+  ["Do you think your team can _____ ours?", "beat", ["beat", "win", "draw", "lose"]],
+  ["Brazil _____ Argentina in the semi-final.", "beat", ["beat", "won", "drew", "lost"]],
+  ["The two teams _____ 1–1.", "drew", ["drew", "won", "beat", "lost"]],
+  ["We _____ with France, so neither side won.", "drew", ["drew", "won", "beat", "lost"]],
+  ["They've _____ their last three league games.", "drawn", ["drawn", "won", "beaten", "lost"]],
+  ["The teams have _____ twice already this season.", "drawn", ["drawn", "won", "beaten", "lost"]],
+  ["We _____ the final by just one point.", "lost", ["lost", "won", "beat", "drew"]],
+  ["They _____ to Italy 2–0.", "lost", ["lost", "won", "beat", "drew"]],
+  ["She hasn't _____ a match all season.", "lost", ["lost", "won", "beaten", "drawn"]],
+  ["We really don't want to _____ this game.", "lose", ["lose", "beat", "win", "draw"]],
+  ["The other player _____ me in straight sets.", "beat", ["beat", "won", "lost", "drew"]],
+  ["I've never _____ that opponent before.", "beaten", ["beaten", "won", "drawn", "lost"]],
+  ["We haven't _____ a match since March.", "won", ["won", "beaten", "drawn", "lost"]],
+  ["The match finished 2–2, so we _____ with them.", "drew", ["drew", "won", "beat", "lost"]],
+]);
+
+const intermediateSportVerbPhraseEntries = [
+  "train", "get injured", "kick the ball", "get fit", "score goals", "go swimming", "do yoga / t'ai chi", "throw the ball",
+].map((term) => ({ id: `int-sport-verb-${term.replace(/[^a-z]+/gi, "-").replace(/^-|-$/g, "")}`, term, acceptedAnswers: [term] }));
+
+const intermediateSportVerbPhraseContextEntries = intermediateContextEntries("int-sport-verb-context", [
+  ["Professional athletes often _____ twice a day.", "train", ["train", "score", "throw", "kick"]],
+  ["She's been _____ hard for the marathon.", "training", ["training", "scoring", "throwing", "kicking"]],
+  ["Don't play tennis on a wet court. You might ____.", "get injured", ["get injured", "get fit", "score goals", "go swimming"]],
+  ["He fell badly during the match and _____.", "got injured", ["got injured", "got fit", "scored", "trained"]],
+  ["A footballer uses their foot to ____.", "kick the ball", ["kick the ball", "throw the ball", "score goals", "get fit"]],
+  ["He _____ straight into the back of the net.", "kicked the ball", ["kicked the ball", "threw the ball", "trained", "went swimming"]],
+  ["She joined a gym because she wanted to ____.", "get fit", ["get fit", "get injured", "score goals", "train a team"]],
+  ["After a few months of regular exercise, he really _____.", "got fit", ["got fit", "got injured", "scored", "threw"]],
+  ["A striker's job is to try to ____.", "score goals", ["score goals", "throw the ball", "get fit", "go swimming"]],
+  ["Our new striker _____ twice in the second half.", "scored", ["scored", "trained", "threw", "kicked"]],
+  ["Would you like to _____ after work?", "go swimming", ["go swimming", "do yoga", "get injured", "score goals"]],
+  ["We _____ yesterday afternoon because it was so hot.", "went swimming", ["went swimming", "did yoga", "got fit", "trained"]],
+  ["My sister _____ every morning before breakfast.", "does yoga", ["does yoga", "goes swimming", "scores goals", "throws the ball"]],
+  ["They _____ together every Tuesday evening.", "do yoga", ["do yoga", "go swimming", "kick the ball", "get injured"]],
+  ["In basketball, players often _____ to each other.", "throw the ball", ["throw the ball", "kick the ball", "score goals", "get fit"]],
+  ["She _____ across the court to her teammate.", "threw the ball", ["threw the ball", "kicked the ball", "went swimming", "trained"]],
+]);
+
+const intermediateSportPhrasalVerbEntries = [
+  ["warm-up", "warm up", "do light exercise to prepare for sport or exercise"],
+  ["work-out", "work out", "exercise, especially as physical training or at a gym"],
+  ["sent-off", "be sent off", "be ordered to leave the pitch or court during a game"],
+  ["knocked-out", "be knocked out", "be eliminated from a competition"],
+].map(([id, term, cueText]) => ({ id: `int-sport-phrasal-${id}`, term, cueText, acceptedAnswers: [term] }));
+
+const intermediateSportPhrasalVerbContextEntries = intermediateContextEntries("int-sport-phrasal-context", [
+  ["It's important to _____ before you start running.", "warm up", ["warm up", "work out", "be sent off", "be knocked out"]],
+  ["We _____ for about ten minutes before the match began.", "warmed up", ["warmed up", "worked out", "were sent off", "were knocked out"]],
+  ["You should always _____ before doing intense exercise.", "warm up", ["warm up", "work out", "get knocked out", "get sent off"]],
+  ["She always _____ before she starts playing tennis.", "warms up", ["warms up", "works out", "gets sent off", "gets knocked out"]],
+  ["I _____ at the gym three times a week.", "work out", ["work out", "warm up", "get sent off", "get knocked out"]],
+  ["My daughter _____ every afternoon after work.", "works out", ["works out", "warms up", "gets sent off", "gets knocked out"]],
+  ["We _____ together at the gym yesterday.", "worked out", ["worked out", "warmed up", "were sent off", "were knocked out"]],
+  ["How often do you _____ at the gym?", "work out", ["work out", "warm up", "get sent off", "get knocked out"]],
+  ["He got a red card and was _____.", "sent off", ["sent off", "knocked out", "warmed up", "worked out"]],
+  ["A player can be _____ for a serious foul.", "sent off", ["sent off", "knocked out", "warmed up", "worked out"]],
+  ["Two players were _____ after the fight.", "sent off", ["sent off", "knocked out", "worked out", "warmed up"]],
+  ["The referee _____ him _____ in the second half.", "sent off", ["sent off", "knocked out", "warmed up", "worked out"]],
+  ["They lost the quarter-final and were _____ of the competition.", "knocked out", ["knocked out", "sent off", "warmed up", "worked out"]],
+  ["We were _____ in the semi-finals last year.", "knocked out", ["knocked out", "sent off", "worked out", "warmed up"]],
+  ["If they lose tonight, they'll be _____.", "knocked out", ["knocked out", "sent off", "warmed up", "worked out"]],
+  ["She was _____ in the first round of the tournament.", "knocked out", ["knocked out", "sent off", "worked out", "warmed up"]],
+]);
+
+const intermediateSportVisualWriteEntries = intermediateSportPeopleEntries.map((entry, index) => ({
+  ...entry,
+  id: `int-sport-write-${String(index + 1).padStart(2, "0")}`,
+  sentence: "What is this?",
+  answer: entry.id.endsWith("-referee") ? "referee" : entry.id.endsWith("-spectators") ? "spectators" : entry.term,
+}));
+
+const intermediateSportTextWriteEntries = intermediateWriteEntries("int-sport-write-text", [
+  ["tennis _____", "court"], ["football _____", "pitch"], ["swimming _____", "pool"],
+  ["athletics _____", "track"], ["Formula 1 _____", "circuit"], ["golf _____", "course"], ["ski _____", "slope"],
+  ["We _____ the final 3–1.", "won"], ["We _____ the other team 3–1.", "beat"],
+  ["They have never _____ us before.", "beaten"], ["She's _____ several major competitions.", "won"],
+  ["We _____ 0–0 with them.", "drew"], ["They've _____ their last two matches.", "drawn"],
+  ["We _____ the final by one goal.", "lost"], ["They _____ to Germany in the semi-final.", "lost"],
+  ["Professional sportspeople have to _____ regularly.", "train"],
+  ["He fell badly and _____ during the match.", "got injured"],
+  ["In football, players _____ the ball rather than throwing it.", "kick"],
+  ["She joined a gym because she wanted to _____.", "get fit"],
+  ["The striker _____ the winning goal in the final minute.", "scored"],
+  ["Would you like to _____ _____ this afternoon?", "go swimming"],
+  ["My parents _____ yoga twice a week.", "do"], ["In basketball, players _____ the ball to each other.", "throw"],
+  ["Always _____ _____ before doing intense exercise.", "warm up"],
+  ["The players _____ _____ for ten minutes before the game.", "warmed up"],
+  ["I usually _____ _____ at the gym after work.", "work out"],
+  ["She _____ _____ at the gym yesterday morning.", "worked out"],
+  ["He got a red card and was _____ _____.", "sent off"],
+  ["The referee _____ him _____ for a dangerous foul.", "sent off"],
+  ["They lost the quarter-final and were _____ _____.", "knocked out"],
+  ["We were _____ _____ in the first round last year.", "knocked out"],
+]);
+
+const intermediateSportWriteEntries = [...intermediateSportVisualWriteEntries, ...intermediateSportTextWriteEntries];
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-sport",
+  level: "b1",
+  order: 6,
+  title: "Sport",
+  shortDescription: "Practise people and places in sport, sports verbs, common collocations and phrasal verbs.",
+  textbookRef: "Intermediate Vocabulary Bank 6",
+  accent: HUB_VOCAB_LEVEL_COLORS.b1,
+  itemCount: 32,
+  entries: intermediateSportPeopleEntries,
+  sportPeopleEntries: intermediateSportPeopleEntries,
+  sportPlaceEntries: intermediateSportPlaceEntries,
+  sportPlaceContextEntries: intermediateSportPlaceContextEntries,
+  sportResultEntries: intermediateSportResultEntries,
+  sportVerbPhraseEntries: intermediateSportVerbPhraseEntries,
+  sportVerbPhraseContextEntries: intermediateSportVerbPhraseContextEntries,
+  sportPhrasalVerbEntries: intermediateSportPhrasalVerbEntries,
+  sportPhrasalVerbContextEntries: intermediateSportPhrasalVerbContextEntries,
+  sportWriteEntries: intermediateSportWriteEntries,
+  infoNotes: [
+    { title: "fans, spectators and the crowd", body: ["fans support a particular team or player", "spectators are people watching a sporting event", "the crowd = the spectators considered as a group"] },
+    { title: "referee / umpire", body: ["Both words refer to officials who control sporting events.", "Different sports use different terms."] },
+    { title: "win, beat, lose and draw", body: ["win – won – won", "beat – beat – beaten", "lose – lost – lost", "draw – drew – drawn", "win + match / competition / prize", "beat + person / team", "lose to + person / team", "draw with + person / team"] },
+    { title: "sent off or knocked out?", body: ["A player is sent off when an official orders them to leave a game.", "A player or team is knocked out when they are eliminated from a competition."] },
+    { title: "warm up and work out", body: ["warm up = prepare your body before exercise", "work out = exercise as physical training"] },
+  ],
+  activities: [
+    { id: "sport-flashcards", type: "flashcards", dataKey: "sportPeopleEntries", title: "Sport flashcards", shortDescription: "Look at the sporting scene and recall the word.", prompt: "Look at the picture and say the word before you flip." },
+    { id: "sport-places", type: "sentence-gap-choice", dataKey: "sportPlaceContextEntries", title: "Where do you play it?", shortDescription: "Match sports with the places where they are played or practised.", prompt: "Read the sentence and choose the correct sports place.", question: "Which place fits?", itemLimit: 12 },
+    { id: "sport-results", type: "sentence-gap-choice", dataKey: "sportResultEntries", title: "Win, beat, draw or lose?", shortDescription: "Choose the correct verb and form for sports results.", prompt: "Read the sentence and choose the verb form that fits.", question: "Which verb fits?", itemLimit: 12 },
+    { id: "sport-verb-phrases", type: "sentence-gap-choice", dataKey: "sportVerbPhraseContextEntries", title: "Sports verb phrases", shortDescription: "Complete common verb phrases used when talking about sport and exercise.", prompt: "Read the sentence and choose the verb or phrase that fits.", question: "Which phrase fits?", itemLimit: 12 },
+    { id: "sport-phrasal-verbs", type: "sentence-gap-choice", dataKey: "sportPhrasalVerbContextEntries", title: "Sport phrasal verbs", shortDescription: "Practise four common phrasal verbs used in sport and exercise.", prompt: "Read the situation and choose the phrasal verb that fits.", question: "Which phrasal verb fits?", itemLimit: 12 },
+    { id: "sport-write", type: "sentence-gap-type-answer", dataKey: "sportWriteEntries", title: "Write the word or phrase", shortDescription: "Write sports vocabulary, collocations and verbs from memory.", prompt: "Look at the picture or read the sentence and type the missing word or phrase.", answerLabel: "Word or phrase", answerPlaceholder: "Type your answer", itemLimit: 15 },
+  ],
+});
+
+const intermediateRelationshipPeopleEntries = [
+  ["classmate", "classmate", ["classmate"]], ["close-friend", "close friend", ["close friend"]],
+  ["colleague", "colleague", ["colleague"]], ["couple", "couple", ["couple"]],
+  ["ex", "ex", ["ex", "ex-partner", "ex partner"], "An ex is a person you used to have a romantic relationship with."],
+  ["fiance", "fiancé", ["fiancé", "fiance"], "A fiancé is a man who is engaged to be married."],
+  ["fiancee", "fiancée", ["fiancée", "fiancee"], "A fiancée is a woman who is engaged to be married."],
+  ["flatmate", "flatmate", ["flatmate", "roommate"], "AmE often uses roommate."],
+  ["partner", "partner", ["partner"]],
+].map(([id, term, acceptedAnswers, spokenLabel]) => ({
+  id: `int-relationship-${id}`,
+  term,
+  image: `${INTERMEDIATE_RELATIONSHIPS_IMAGE_BASE}/${id}.webp`,
+  acceptedAnswers,
+  ...(spokenLabel ? { spokenLabel } : {}),
+}));
+
+const intermediateRelationshipPeopleContextEntries = intermediateContextEntries("int-relationship-people-context", [
+  ["Julia and Leo study in the same English class. Leo is Julia's ____.", "classmate", ["classmate", "colleague", "flatmate", "partner"]],
+  ["We first met in a chemistry lesson at school, so technically she was my ____ before she became my friend.", "classmate", ["classmate", "close friend", "colleague", "fiancée"]],
+  ["She is my ____; I tell her everything and speak to her almost every day.", "close friend", ["close friend", "classmate", "colleague", "flatmate"]],
+  ["When I have a problem, the first person I call is my best ____.", "close friend", ["close friend", "partner", "classmate", "ex"]],
+  ["I work in the same department as Ahmed. He's my ____.", "colleague", ["colleague", "classmate", "flatmate", "partner"]],
+  ["Everyone at the office signed a leaving card for my ____ when she changed jobs.", "colleague", ["colleague", "flatmate", "fiancée", "classmate"]],
+  ["Nina and Tom have been together for six years. They're a ____.", "couple", ["couple", "classmate", "flatmate", "colleague"]],
+  ["The ____ at the next table are celebrating their anniversary.", "couple", ["couple", "friends", "colleagues", "classmates"]],
+  ["I saw my ____ at the supermarket yesterday. We broke up years ago.", "ex", ["ex", "partner", "flatmate", "fiancé"]],
+  ["He's still friendly with his ____ even though the relationship ended a long time ago.", "ex", ["ex", "colleague", "classmate", "close friend"]],
+  ["Olivia is engaged to Ben. Ben is Olivia's ____.", "fiancé", ["fiancé", "fiancée", "partner", "colleague"]],
+  ["My sister's ____ proposed on holiday last summer.", "fiancé", ["fiancé", "ex", "flatmate", "classmate"]],
+  ["Daniel is engaged to Rosa. Rosa is Daniel's ____.", "fiancée", ["fiancée", "fiancé", "partner", "colleague"]],
+  ["She's my ____ now, but next month she'll be my wife.", "fiancée", ["fiancée", "close friend", "flatmate", "ex"]],
+  ["I share an apartment with Eva, but we're not a couple. She's my ____.", "flatmate", ["flatmate", "classmate", "colleague", "partner"]],
+  ["My ____ always leaves dirty dishes in the kitchen.", "flatmate", ["flatmate", "fiancée", "classmate", "colleague"]],
+  ["Alex isn't my husband, but he's my ____.", "partner", ["partner", "ex", "classmate", "colleague"]],
+  ["Everyone at the wedding was invited to bring their ____.", "partner", ["partner", "flatmate", "classmate", "colleague"]],
+]);
+
+const intermediateRelationshipStorySequence = [
+  "They meet at an evening photography course.",
+  "They get to know each other over the next few weeks.",
+  "They discover that they have a lot in common.",
+  "They become friends.",
+  "Soon they start going out together.",
+  "After a while, they are together as a couple.",
+  "A few years later, one of them proposes.",
+  "Eventually, they get married.",
+].map((term, index) => ({ id: `int-relationship-story-${String(index + 1).padStart(2, "0")}`, term, sequenceOrder: index + 1 }));
+
+const intermediateRelationshipVerbEntries = [
+  "be together", "become friends", "break up", "get in touch", "get married", "get on", "get to know",
+  "go out together", "have a lot in common", "lose touch", "meet", "propose",
+].map((term) => ({ id: `int-relationship-verb-${term.replace(/\s+/g, "-")}`, term, acceptedAnswers: [term] }));
+
+const intermediateRelationshipVerbContextEntries = intermediateContextEntries("int-relationship-verb-context", [
+  ["We first _____ at a friend's birthday party.", "met", ["met", "became friends", "got in touch", "proposed"]],
+  ["My parents _____ at university when they were both studying history.", "met", ["met", "got on", "broke up", "got married"]],
+  ["It takes time to really _____ new people when you move to a new city.", "get to know", ["get to know", "get in touch", "break up with", "propose to"]],
+  ["I didn't like him much at first, but once I _____ him better, I changed my mind.", "got to know", ["got to know", "got on with", "got in touch with", "met"]],
+  ["We both love travel, live music and cooking, so we _____ _____ _____ _____.", "have a lot in common", ["have a lot in common", "get in touch", "break up", "lose touch"]],
+  ["They share the same taste in music, books and films, so they _____.", "have a lot in common", ["have a lot in common", "get together", "get married", "propose"]],
+  ["After working on the same project for months, we _____.", "became friends", ["became friends", "got married", "broke up", "lost touch"]],
+  ["They were classmates first, and then they slowly _____.", "became friends", ["became friends", "got in touch", "proposed", "were together"]],
+  ["Emma and Leo started _____ last summer.", "going out together", ["going out together", "losing touch", "getting in touch", "breaking up"]],
+  ["I heard that those two have been _____ for a few months now.", "going out together", ["going out together", "being colleagues", "getting married", "proposing"]],
+  ["They've been _____ for nearly five years.", "together", ["together", "in touch", "friends", "married to"]],
+  ["Are Marta and Hugo still _____, or did they split up?", "together", ["together", "in touch", "classmates", "colleagues"]],
+  ["They argued constantly and finally decided to _____.", "break up", ["break up", "get on", "get married", "meet up"]],
+  ["That celebrity couple _____ after ten years together.", "broke up", ["broke up", "got in touch", "met", "got on"]],
+  ["After school finished, we gradually _____ because everyone moved away.", "lost touch", ["lost touch", "got married", "proposed", "went out together"]],
+  ["I haven't spoken to him in years. We completely _____ after university.", "lost touch", ["lost touch", "got to know each other", "got in touch", "became friends"]],
+  ["She found me on social media and _____ last month.", "got in touch", ["got in touch", "lost touch", "broke up", "proposed"]],
+  ["I'll _____ with you next week when I know the dates.", "get in touch", ["get in touch", "get on", "go out together", "be together"]],
+  ["Do you _____ well with your new flatmate?", "get on", ["get on", "get to know", "lose touch", "propose"]],
+  ["I was worried about meeting her parents, but we actually _____ really well.", "got on", ["got on", "got in touch", "broke up", "got married"]],
+  ["He _____ during a weekend trip to Lisbon.", "proposed", ["proposed", "met", "broke up", "got married"]],
+  ["She said yes when he _____.", "proposed", ["proposed", "got in touch", "lost touch", "became friends"]],
+  ["They _____ in June and had a big party afterwards.", "got married", ["got married", "got in touch", "lost touch", "went out together"]],
+  ["When did your grandparents _____?", "get married", ["get married", "break up", "meet", "get to know each other"]],
+]);
+
+const intermediateRelationshipContrastEntries = intermediateContextEntries("int-relationship-contrast", [
+  ["It's only our second conversation, so I'm still _____ her.", "getting to know", ["getting to know", "getting on with", "getting in touch with", "meeting"]],
+  ["We hadn't spoken for years, but she emailed me yesterday and finally _____ again.", "got in touch", ["got in touch", "got to know me", "got on", "met"]],
+  ["I was nervous about working with him, but we actually _____ very well.", "got on", ["got on", "got in touch", "got to know", "went out together"]],
+  ["They were in a romantic relationship for three years, but then they _____.", "broke up", ["broke up", "lost touch", "became friends", "got married"]],
+  ["We didn't argue or fall out. We just moved to different countries and slowly _____.", "lost touch", ["lost touch", "broke up", "got married", "proposed"]],
+  ["They started seeing each other romantically in March and were soon _____.", "going out together", ["going out together", "getting in touch", "losing touch", "getting to know each other"]],
+  ["They aren't single anymore. They've been _____ for six months.", "together", ["together", "friends", "colleagues", "classmates"]],
+  ["At first they just chatted after class, but gradually they _____.", "became friends", ["became friends", "proposed", "got married", "broke up"]],
+  ["They first _____ at a music festival.", "met", ["met", "got in touch", "got on", "became friends"]],
+  ["They both love hiking, jazz and old films, so they _____.", "have a lot in common", ["have a lot in common", "get in touch", "break up", "go out together"]],
+  ["He bought a ring and _____ on the beach.", "proposed", ["proposed", "got married", "got in touch", "broke up"]],
+  ["After a year of planning the ceremony, they finally _____ in May.", "got married", ["got married", "proposed", "got to know each other", "met"]],
+  ["I'm not contacting her for the first time ever — we already know each other well. I just need to _____.", "get in touch", ["get in touch", "get to know her", "go out together", "be together"]],
+  ["They were never a couple, but after months of chatting they really _____.", "became friends", ["became friends", "broke up", "got married", "were together"]],
+  ["I know what my new colleague is like now because I've had time to _____ him.", "get to know", ["get to know", "get on with", "get in touch with", "lose touch with"]],
+  ["They don't speak now, but not because the romance ended badly. They simply _____ after university.", "lost touch", ["lost touch", "broke up", "proposed", "got married"]],
+]);
+
+const intermediateRelationshipVisualWriteEntries = intermediateRelationshipPeopleEntries.map((entry, index) => ({
+  ...entry,
+  id: `int-relationship-write-${String(index + 1).padStart(2, "0")}`,
+  sentence: "Who is this?",
+  answer: entry.term,
+}));
+
+const intermediateRelationshipTextWriteEntries = intermediateWriteEntries("int-relationship-write-text", [
+  ["We were in the same maths class at school, so he was my ____.", "classmate"],
+  ["When something good or bad happens, she's the first person I want to tell. She's my closest ____.", "friend", ["friend", "close friend"]],
+  ["I work with Sara at the law firm. She's my ____.", "colleague"],
+  ["They've been happily together for years. They're a ____.", "couple"],
+  ["My ____ and I ended our relationship two years ago.", "ex", ["ex", "ex-partner", "ex partner"]],
+  ["Helen is engaged to my brother, so she's his ____.", "fiancée", ["fiancée", "fiancee"]],
+  ["Laura is engaged to Ben. Ben is Laura's ____.", "fiancé", ["fiancé", "fiance"]],
+  ["I share a kitchen and living room with my ____.", "flatmate", ["flatmate", "roommate"]],
+  ["He's not my husband, but he's my ____.", "partner"],
+  ["We first _____ at a conference in Madrid.", "met"],
+  ["It took a while to really _____ each other.", "get to know"],
+  ["They both love the same books and music, so they _____ _____ _____ _____.", "have a lot in common"],
+  ["They spent more and more time together and eventually _____.", "became friends"],
+  ["After a few months, they started _____ _____.", "going out together"],
+  ["They've been _____ for nearly three years now.", "together"],
+  ["After months of arguing, they decided to _____ _____.", "break up"],
+  ["We moved to different countries and gradually _____ _____.", "lost touch"],
+  ["She found my number and _____ _____ _____ with me.", "got in touch"],
+  ["My sister and her new boss really _____ _____.", "get on"],
+  ["He _____ during a trip to Rome.", "proposed"],
+  ["They _____ _____ last spring.", "got married"],
+  ["My grandparents _____ when they were both teenagers.", "met"],
+  ["It was easy to _____ her because we worked together every day.", "get to know"],
+  ["She emailed me after years of silence and finally _____ _____ _____.", "got in touch"],
+  ["I was worried about the dinner, but I actually _____ _____ really well with her parents.", "got on"],
+  ["They were engaged for a year before they _____ _____.", "got married"],
+  ["They didn't have a dramatic row — they just slowly _____ _____.", "lost touch"],
+  ["She said yes when he _____.", "proposed"],
+  ["They've been _____ since 2022.", "together"],
+  ["Even though they are very different people, they still _____ _____ _____ _____.", "have a lot in common"],
+  ["At first they were only classmates, but later they _____ _____.", "became friends"],
+]);
+
+const intermediateRelationshipWriteEntries = [...intermediateRelationshipVisualWriteEntries, ...intermediateRelationshipTextWriteEntries];
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-relationships",
+  level: "b1",
+  order: 7,
+  title: "Relationships",
+  shortDescription: "Practise relationship vocabulary, people terms and common verb phrases.",
+  textbookRef: "Intermediate Vocabulary Bank 7",
+  accent: HUB_VOCAB_LEVEL_COLORS.b1,
+  itemCount: 21,
+  entries: intermediateRelationshipPeopleEntries,
+  relationshipPeopleEntries: intermediateRelationshipPeopleEntries,
+  relationshipPeopleContextEntries: intermediateRelationshipPeopleContextEntries,
+  relationshipStorySequence: intermediateRelationshipStorySequence,
+  relationshipVerbEntries: intermediateRelationshipVerbEntries,
+  relationshipVerbContextEntries: intermediateRelationshipVerbContextEntries,
+  relationshipContrastEntries: intermediateRelationshipContrastEntries,
+  relationshipWriteEntries: intermediateRelationshipWriteEntries,
+  infoNotes: [
+    { title: "classmate, colleague and flatmate", body: ["a classmate studies with you", "a colleague works with you", "a flatmate lives in the same flat or apartment"] },
+    { title: "fiancé and fiancée", body: ["fiancé = a man who is engaged to be married", "fiancée = a woman who is engaged to be married", "Both can be accepted without the accent in typed answers."] },
+    { title: "couple, partner and ex", body: ["a couple = two people in a romantic relationship", "your partner = the person you are in a relationship with", "your ex = someone you used to be in a relationship with"] },
+    { title: "get to know, get on and get in touch", body: ["get to know somebody = gradually learn about them", "get on with somebody = have a good relationship with them", "get in touch with somebody = contact them"] },
+    { title: "break up and lose touch", body: ["break up = a romantic relationship ends", "lose touch = stop communicating with somebody"] },
+    { title: "go out together and be together", body: ["go out together = date each other", "be together = be in a relationship / be a couple"] },
+    { title: "propose and get married", body: ["propose = ask somebody to marry you", "get married = actually marry"] },
+  ],
+  activities: [
+    { id: "relationship-flashcards", type: "flashcards", dataKey: "relationshipPeopleEntries", title: "Relationship flashcards", shortDescription: "Look at the picture and recall the relationship word.", prompt: "Look at the picture and say the word before you flip." },
+    { id: "relationship-people-context", type: "sentence-gap-choice", dataKey: "relationshipPeopleContextEntries", title: "Who are they?", shortDescription: "Choose the correct relationship word for each situation.", prompt: "Read the situation and choose the correct word.", question: "Which word fits?", itemLimit: 12 },
+    { id: "relationship-story", type: "sequence-order", dataKey: "relationshipStorySequence", title: "A relationship story", shortDescription: "Put the stages of a relationship into a logical order.", prompt: "Put the story in the most logical order." },
+    { id: "relationship-verbs", type: "sentence-gap-choice", dataKey: "relationshipVerbContextEntries", title: "Relationship verb phrases", shortDescription: "Choose the correct verb phrase for each relationship situation.", prompt: "Read the situation and choose the phrase that fits.", question: "Which phrase fits?", itemLimit: 12 },
+    { id: "relationship-contrasts", type: "sentence-gap-choice", dataKey: "relationshipContrastEntries", title: "Don’t mix them up", shortDescription: "Distinguish relationship phrases that learners often confuse.", prompt: "Read the situation and choose the complete phrase that fits best.", question: "Which phrase fits?", itemLimit: 12 },
+    { id: "relationship-write", type: "sentence-gap-type-answer", dataKey: "relationshipWriteEntries", title: "Write the word or phrase", shortDescription: "Write relationship vocabulary and verb phrases from memory.", prompt: "Look at the picture or read the sentence and type the missing word or phrase.", answerLabel: "Word or phrase", answerPlaceholder: "Type your answer", itemLimit: 15 },
+  ],
+});
+
+const intermediateCinemaGenreEntries = [
+  ["action-film", "action film", ["action film"]],
+  ["animation", "animation", ["animation", "animated film"]],
+  ["comedy", "comedy", ["comedy"]],
+  ["drama", "drama", ["drama"]],
+  ["historical-film", "historical film", ["historical film"]],
+  ["horror-film", "horror film", ["horror film", "horror"]],
+  ["musical", "musical", ["musical"]],
+  ["rom-com", "rom-com", ["rom-com", "rom com"]],
+  ["science-fiction-film", "science fiction film", ["science fiction film", "science fiction", "sci-fi", "sci fi"]],
+  ["thriller", "thriller", ["thriller"]],
+  ["war-film", "war film", ["war film"]],
+  ["western", "western", ["western"]],
+].map(([id, term, acceptedAnswers]) => ({
+  id: `int-cinema-genre-${id}`,
+  term,
+  image: `${INTERMEDIATE_CINEMA_IMAGE_BASE}/${id}.webp`,
+  acceptedAnswers,
+}));
+
+const intermediateCinemaGenreContextEntries = intermediateContextEntries("int-cinema-genre-context", [
+  ["A detective chases a criminal through a city while cars crash and buildings explode. It's an ____.", "action film", ["action film", "thriller", "war film", "drama"]],
+  ["A former soldier has just one night to rescue his daughter from a dangerous gang. It's an ____.", "action film", ["action film", "science fiction film", "western", "comedy"]],
+  ["A talking fox and a bear go on an adventure in a brightly coloured imaginary world. It's ____.", "animation", ["animation", "comedy", "musical", "science fiction film"]],
+  ["The main characters are drawn rather than acted by real people. It's ____.", "animation", ["animation", "historical film", "drama", "rom-com"]],
+  ["Two hopelessly disorganised friends keep getting into ridiculous situations. It's a ____.", "comedy", ["comedy", "drama", "thriller", "horror film"]],
+  ["A man lies to impress his boss, but every lie creates an even more absurd problem. It's a ____.", "comedy", ["comedy", "action film", "historical film", "war film"]],
+  ["A family falls apart after a long-hidden secret is revealed. It's a ____.", "drama", ["drama", "comedy", "rom-com", "action film"]],
+  ["The film focuses on serious emotional conflict between two sisters. It's a ____.", "drama", ["drama", "thriller", "musical", "science fiction film"]],
+  ["The story follows a queen and her advisers in 16th-century Europe. It's a ____.", "historical film", ["historical film", "war film", "western", "drama"]],
+  ["A group of people try to survive during the construction of an ancient empire. It's a ____.", "historical film", ["historical film", "action film", "science fiction film", "thriller"]],
+  ["A family moves into an old house where strange noises and shadows terrify them. It's a ____.", "horror film", ["horror film", "thriller", "drama", "war film"]],
+  ["Campers in an isolated forest realise something unseen is following them. It's a ____.", "horror film", ["horror film", "science fiction film", "comedy", "western"]],
+  ["Characters sing and dance to express their feelings throughout the story. It's a ____.", "musical", ["musical", "rom-com", "drama", "animation"]],
+  ["A young singer arrives in the city, and key moments of the film are performed as songs. It's a ____.", "musical", ["musical", "historical film", "thriller", "action film"]],
+  ["Two colleagues who can't stand each other slowly fall in love. It's a ____.", "rom-com", ["rom-com", "drama", "thriller", "comedy"]],
+  ["A woman returns to her hometown and unexpectedly falls for her old school rival. It's a ____.", "rom-com", ["rom-com", "war film", "science fiction film", "horror film"]],
+  ["A crew discover a mysterious signal coming from another planet. It's a ____.", "science fiction film", ["science fiction film", "thriller", "historical film", "war film"]],
+  ["In the future, robots control most everyday life, but one teenager begins to question the system. It's a ____.", "science fiction film", ["science fiction film", "action film", "western", "drama"]],
+  ["A journalist realises she is being watched by someone connected to a murder case. It's a ____.", "thriller", ["thriller", "horror film", "action film", "comedy"]],
+  ["The film builds suspense as a doctor tries to discover who is poisoning patients in the hospital. It's a ____.", "thriller", ["thriller", "drama", "historical film", "musical"]],
+  ["A group of soldiers try to survive during a major military battle. It's a ____.", "war film", ["war film", "action film", "historical film", "western"]],
+  ["The story follows nurses and soldiers during a brutal conflict in the 1940s. It's a ____.", "war film", ["war film", "science fiction film", "thriller", "rom-com"]],
+  ["A mysterious stranger rides into a dusty frontier town and faces a local gang. It's a ____.", "western", ["western", "historical film", "action film", "war film"]],
+  ["Cowboys travel across the desert, stopping in a small frontier settlement. It's a ____.", "western", ["western", "thriller", "science fiction film", "drama"]],
+]);
+
+const intermediateCinemaNounEntries = [
+  "audience", "cast", "critic", "extra", "plot", "review", "scene", "script", "sequel", "set", "soundtrack",
+  "special effects", "star", "subtitles", "trailer",
+].map((term) => ({ id: `int-cinema-noun-${term.replace(/\s+/g, "-")}`, term, acceptedAnswers: [term] }));
+
+const intermediateCinemaNounContextEntries = intermediateContextEntries("int-cinema-noun-context", [
+  ["The whole _____ came onto the stage after the premiere.", "cast", ["cast", "audience", "script", "set"]],
+  ["The film's _____ includes several well-known actors.", "cast", ["cast", "star", "critic", "scene"]],
+  ["She's the biggest _____ in the film and appears on all the posters.", "star", ["star", "extra", "critic", "audience"]],
+  ["Tom Hardy is the main _____ of the film.", "star", ["star", "cast", "script", "review"]],
+  ["The _____ was so loud that the actors could hear people laughing from the stage.", "audience", ["audience", "cast", "critic", "set"]],
+  ["The cinema was full, and the _____ loved the ending.", "audience", ["audience", "trailer", "subtitles", "scene"]],
+  ["The music was beautiful. I downloaded the _____ the next day.", "soundtrack", ["soundtrack", "script", "plot", "review"]],
+  ["The film's _____ became almost as famous as the film itself.", "soundtrack", ["soundtrack", "special effects", "scene", "sequel"]],
+  ["The _____ was quite simple, but the acting was excellent.", "plot", ["plot", "script", "scene", "critic"]],
+  ["I couldn't follow the _____ because it kept jumping between time periods.", "plot", ["plot", "set", "review", "cast"]],
+  ["That beach _____ was my favourite part of the whole film.", "scene", ["scene", "set", "plot", "trailer"]],
+  ["The final _____ where the door slowly opens is really tense.", "scene", ["scene", "review", "cast", "script"]],
+  ["The actors changed a few lines from the original _____.", "script", ["script", "plot", "review", "trailer"]],
+  ["She spent six months writing the _____ before filming began.", "script", ["script", "soundtrack", "set", "subtitles"]],
+  ["The film was so successful that they made a _____ two years later.", "sequel", ["sequel", "trailer", "review", "scene"]],
+  ["This new film continues the story from the original, so it's a ____.", "sequel", ["sequel", "set", "special effect", "soundtrack"]],
+  ["The desert town was built as a film _____.", "set", ["set", "scene", "plot", "audience"]],
+  ["They spent weeks building the palace _____ in the studio.", "set", ["set", "script", "trailer", "cast"]],
+  ["I watched the _____ online before deciding whether to buy a ticket.", "trailer", ["trailer", "review", "script", "audience"]],
+  ["The two-minute _____ made the film look amazing.", "trailer", ["trailer", "sequel", "plot", "set"]],
+  ["She only appears in the background of one party scene as an ____.", "extra", ["extra", "star", "critic", "cast"]],
+  ["He worked as an _____ in several films before getting a speaking role.", "extra", ["extra", "audience", "plot", "review"]],
+  ["The dragon looked realistic because the _____ were so good.", "special effects", ["special effects", "subtitles", "soundtrack", "review"]],
+  ["The film relies too much on _____ and not enough on story.", "special effects", ["special effects", "plot", "scene", "cast"]],
+  ["We turned on the _____ because the dialogue was in Japanese.", "subtitles", ["subtitles", "soundtrack", "trailer", "review"]],
+  ["My dad prefers watching films with _____ rather than dubbing.", "subtitles", ["subtitles", "special effects", "scripts", "sets"]],
+  ["I read a very positive _____ of the film in the newspaper.", "review", ["review", "critic", "plot", "trailer"]],
+  ["Her online _____ convinced me to go and see it.", "review", ["review", "script", "scene", "cast"]],
+  ["A well-known film _____ said the ending was disappointing.", "critic", ["critic", "extra", "star", "audience"]],
+  ["The _____ writes reviews for a major newspaper.", "critic", ["critic", "cast", "sequel", "plot"]],
+]);
+
+const intermediateCinemaFilmPhraseEntries = [
+  ["based-on", "be based on", ["be based on"]], ["set-in", "be set in", ["be set in"]],
+  ["directed-by", "be directed by", ["be directed by"]], ["play-part", "play the part of", ["play the part of"]],
+  ["shot-location", "be shot on location", ["be shot on location", "be filmed on location"]],
+  ["dubbed-into", "be dubbed into", ["be dubbed into"]],
+].map(([id, term, acceptedAnswers]) => ({ id: `int-cinema-phrase-${id}`, term, acceptedAnswers }));
+
+const intermediateCinemaFilmPhraseContextEntries = intermediateContextEntries("int-cinema-phrase-context", [
+  ["The film is _____ a bestselling novel.", "based on", ["based on", "set in", "directed by", "dubbed into"]],
+  ["Although the story was changed slightly, it's still clearly _____ a true story.", "based on", ["based on", "played by", "shot on", "set in"]],
+  ["The series was _____ a comic book.", "based on", ["based on", "dubbed into", "directed by", "set in"]],
+  ["The story is _____ New York in the 1970s.", "set in", ["set in", "based on", "shot on", "dubbed into"]],
+  ["Although it was filmed elsewhere, the film is _____ Paris.", "set in", ["set in", "shot on location", "directed by", "based on"]],
+  ["The drama is _____ a small coastal town.", "set in", ["set in", "dubbed into", "based on", "played the part of"]],
+  ["The film was _____ Chloé Zhao.", "directed by", ["directed by", "based on", "dubbed into", "set in"]],
+  ["Who was this film _____?", "directed by", ["directed by", "shot on location", "based on", "set in"]],
+  ["The Oscar-winning drama was _____ an experienced documentary filmmaker.", "directed by", ["directed by", "set in", "dubbed into", "played the part of"]],
+  ["In the film, she _____ a brilliant but troubled scientist.", "plays the part of", ["plays the part of", "is based on", "is dubbed into", "is set in"]],
+  ["Daniel Craig _____ a detective in the story.", "plays the part of", ["plays the part of", "is set in", "is directed by", "is based on"]],
+  ["Which actor _____ the king?", "plays the part of", ["plays the part of", "is shot on location", "is dubbed into", "is based on"]],
+  ["Most of the desert scenes were _____ in Morocco.", "shot on location", ["shot on location", "set in", "based on", "dubbed into"]],
+  ["Instead of using a studio, the series was _____ in real city streets.", "shot on location", ["shot on location", "directed by", "set in", "based on"]],
+  ["The mountain scenes were _____ in the Alps.", "shot on location", ["shot on location", "dubbed into", "set in", "plays the part of"]],
+  ["For the Spanish release, the film was _____ Spanish.", "dubbed into", ["dubbed into", "set in", "based on", "directed by"]],
+  ["Children often watch animated films _____ their own language.", "dubbed into", ["dubbed into", "shot on location", "set in", "plays the part of"]],
+  ["Was the series _____ French before it appeared on local television?", "dubbed into", ["dubbed into", "based on", "directed by", "set in"]],
+]);
+
+const intermediateCinemaVisualWriteEntries = intermediateCinemaGenreEntries.map((entry, index) => ({
+  ...entry,
+  id: `int-cinema-write-${String(index + 1).padStart(2, "0")}`,
+  sentence: "What kind of film is this?",
+  answer: entry.term,
+}));
+
+const intermediateCinemaTextWriteEntries = intermediateWriteEntries("int-cinema-write-text", [
+  ["The music from a film is called the _____.", "soundtrack"], ["The complete story of a film is its _____.", "plot"],
+  ["The written text containing the dialogue is the _____.", "script"], ["A short part of a film is a _____.", "scene"],
+  ["All the people acting in the film are the ____.", "cast"], ["The most important actor in the film is the _____.", "star"],
+  ["The people watching the film in the cinema are the _____.", "audience"],
+  ["A second film which continues the same story is a _____.", "sequel"],
+  ["Computer-created visual tricks are called _____ _____.", "special effects"],
+  ["A series of short scenes advertising a film before release is a _____.", "trailer"],
+  ["A person with a very small background role is an _____.", "extra"],
+  ["Written text on the screen translating the dialogue is called _____.", "subtitles"],
+  ["An article giving an opinion about a film is a ____.", "review"],
+  ["A person who writes film reviews is a _____.", "critic"],
+  ["The scenery or place used for filming is the _____.", "set"],
+  ["The story uses a novel as its source material. It's _____ _____ a novel.", "based on"],
+  ["The story takes place in 1940s London. It's _____ _____ 1940s London.", "set in"],
+  ["The film was made by Christopher Nolan. It was _____ _____ Christopher Nolan.", "directed by"],
+  ["In the film, she acts as the queen. She _____ _____ _____ _____ the queen.", "plays the part of"],
+  ["The beach scenes were filmed in a real place, not in a studio. They were _____ _____ location.", "shot on", ["shot on", "filmed on"]],
+  ["For Italian cinemas, the original voices were replaced. It was _____ _____ Italian.", "dubbed into"],
+  ["Although it was filmed in Hungary, the story is _____ _____ Paris.", "set in"],
+  ["The whole film is _____ _____ a true story.", "based on"], ["Who was the film _____ _____?", "directed by"],
+  ["Which actor _____ _____ _____ _____ the detective?", "plays the part of"],
+  ["Most of the outdoor scenes were _____ _____ location in Scotland.", "shot on", ["shot on", "filmed on"]],
+  ["For younger viewers, animated films are often _____ _____ the local language.", "dubbed into"],
+  ["This drama is _____ _____ a popular stage play.", "based on"],
+]);
+
+const intermediateCinemaWriteEntries = [...intermediateCinemaVisualWriteEntries, ...intermediateCinemaTextWriteEntries];
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-cinema",
+  level: "b1",
+  order: 8,
+  title: "Cinema",
+  shortDescription: "Practise film genres, cinema vocabulary and useful phrases for talking about films.",
+  textbookRef: "Intermediate Vocabulary Bank 8",
+  accent: HUB_VOCAB_LEVEL_COLORS.b1,
+  itemCount: 33,
+  entries: intermediateCinemaGenreEntries,
+  cinemaGenreEntries: intermediateCinemaGenreEntries,
+  cinemaGenreContextEntries: intermediateCinemaGenreContextEntries,
+  cinemaNounEntries: intermediateCinemaNounEntries,
+  cinemaNounContextEntries: intermediateCinemaNounContextEntries,
+  cinemaFilmPhraseEntries: intermediateCinemaFilmPhraseEntries,
+  cinemaFilmPhraseContextEntries: intermediateCinemaFilmPhraseContextEntries,
+  cinemaWriteEntries: intermediateCinemaWriteEntries,
+  infoNotes: [
+    { title: "dubbed or subtitled?", body: ["dubbed = the original voices are replaced in another language", "subtitles = written translation appears on the screen"] },
+    { title: "set in or shot on location?", body: ["set in = where the story takes place", "shot / filmed on location = where the film was actually filmed outside the studio"] },
+    { title: "cast and star", body: ["the cast = all the actors in a film", "the star = the most important or best-known actor in the film"] },
+  ],
+  activities: [
+    { id: "cinema-genre-flashcards", type: "flashcards", dataKey: "cinemaGenreEntries", title: "Film genre flashcards", shortDescription: "Look at the scene and recall the film genre.", prompt: "Look at the picture and say the genre before you flip." },
+    { id: "cinema-genres-context", type: "sentence-gap-choice", dataKey: "cinemaGenreContextEntries", title: "What kind of film is it?", shortDescription: "Choose the genre that matches each short film description.", prompt: "Read the description and choose the correct genre.", question: "Which genre fits?", itemLimit: 12 },
+    { id: "cinema-vocabulary", type: "sentence-gap-choice", dataKey: "cinemaNounContextEntries", title: "Cinema vocabulary", shortDescription: "Choose the correct cinema word for each situation.", prompt: "Read the sentence and choose the word that fits.", question: "Which word fits?", itemLimit: 12 },
+    { id: "cinema-film-phrases", type: "sentence-gap-choice", dataKey: "cinemaFilmPhraseContextEntries", title: "Talking about films", shortDescription: "Practise useful phrases for describing films.", prompt: "Read the sentence and choose the phrase that fits.", question: "Which phrase fits?", itemLimit: 12 },
+    { id: "cinema-write", type: "sentence-gap-type-answer", dataKey: "cinemaWriteEntries", title: "Write the word or phrase", shortDescription: "Write film genres, cinema vocabulary and film-description phrases from memory.", prompt: "Look at the picture or read the sentence and type the missing word or phrase.", answerLabel: "Word or phrase", answerPlaceholder: "Type your answer", itemLimit: 15 },
+  ],
+});
+
+const intermediateBodyPartEntries = [
+  ["arms", "arms"], ["back", "back"], ["chin", "chin"], ["ears", "ears"], ["eyes", "eyes"],
+  ["face", "face"], ["feet", "feet", "Singular: foot"], ["fingers", "fingers"], ["hands", "hands"],
+  ["head", "head"], ["knees", "knees"], ["legs", "legs"], ["lips", "lips"], ["mouth", "mouth"],
+  ["neck", "neck"], ["nose", "nose"], ["shoulders", "shoulders"], ["stomach", "stomach"],
+  ["teeth", "teeth", "Singular: tooth"], ["thumb", "thumb"], ["toes", "toes"], ["tongue", "tongue"],
+].map(([id, term, spokenLabel]) => ({
+  id: `int-body-${id}`,
+  term,
+  image: `${INTERMEDIATE_BODY_IMAGE_BASE}/${id}.webp`,
+  acceptedAnswers: [term],
+  ...(spokenLabel ? { spokenLabel } : {}),
+}));
+
+const bodyPartChoiceOptions = [
+  ["arms", "hands", "legs"], ["back", "shoulders", "stomach"], ["chin", "mouth", "neck"],
+  ["ears", "eyes", "nose"], ["eyes", "ears", "lips"], ["face", "head", "neck"],
+  ["feet", "hands", "toes"], ["fingers", "toes", "thumb"], ["hands", "arms", "feet"],
+  ["head", "face", "neck"], ["knees", "legs", "feet"], ["legs", "arms", "knees"],
+  ["lips", "mouth", "tongue"], ["mouth", "lips", "tongue"], ["neck", "shoulders", "chin"],
+  ["nose", "ears", "mouth"], ["shoulders", "back", "neck"], ["stomach", "back", "shoulders"],
+  ["teeth", "tongue", "lips"], ["thumb", "fingers", "toes"], ["toes", "fingers", "feet"],
+  ["tongue", "lips", "teeth"],
+];
+
+const intermediateBodyPartChoiceEntries = intermediateBodyPartEntries.map((entry, index) => ({
+  ...entry,
+  options: bodyPartChoiceOptions[index],
+}));
+
+const intermediateBodyVerbEntries = [
+  ["bite", ["bit"]], ["clap", ["clapped"]], ["kick", ["kicked"]], ["nod", ["nodded"]],
+  ["point", ["pointed"]], ["smell", ["smelled", "smelt"]], ["smile", ["smiled"]],
+  ["stare", ["stared"]], ["taste", ["tasted"]], ["touch", ["touched"]], ["whistle", ["whistled"]],
+].map(([term, pastForms]) => ({ id: `int-body-verb-${term}`, term, pastForms, acceptedAnswers: [term] }));
+
+const intermediateBodyVerbContextEntries = intermediateContextEntries("int-body-verb-context", [
+  ["Don't frighten that dog. It might ____.", "bite", ["bite", "kick", "touch", "stare"]],
+  ["The dog _____ me on the hand, but luckily it wasn't serious.", "bit", ["bit", "kicked", "pointed", "touched"]],
+  ["Everyone began to _____ when the singer finished.", "clap", ["clap", "whistle", "nod", "smile"]],
+  ["The audience _____ loudly at the end of the performance.", "clapped", ["clapped", "stared", "nodded", "tasted"]],
+  ["Try to _____ the ball towards the goal.", "kick", ["kick", "point", "bite", "touch"]],
+  ["She _____ the ball across the garden to her brother.", "kicked", ["kicked", "bit", "nodded", "whistled"]],
+  ["If you agree with me, just _____ your head.", "nod", ["nod", "point", "smile", "stare"]],
+  ["He _____ when I asked whether he understood.", "nodded", ["nodded", "pointed", "whistled", "clapped"]],
+  ["Can you _____ to the place on the map where we are now?", "point", ["point", "touch", "stare", "nod"]],
+  ["She _____ at the door and told us to leave.", "pointed", ["pointed", "smiled", "tasted", "bit"]],
+  ["Can you _____ smoke? I think something is burning.", "smell", ["smell", "taste", "touch", "stare"]],
+  ["He _____ the milk before putting it in his coffee.", "smelled", ["smelled", "tasted", "touched", "pointed"], ["smelled", "smelt"]],
+  ["Try to _____ for the photo.", "smile", ["smile", "stare", "nod", "whistle"]],
+  ["The baby _____ when she saw her mother.", "smiled", ["smiled", "stared", "clapped", "pointed"]],
+  ["It's rude to _____ at people.", "stare", ["stare", "point", "smile", "touch"]],
+  ["Everyone _____ at the strange object for several seconds.", "stared", ["stared", "smiled", "nodded", "whistled"]],
+  ["_____ the soup and tell me if it needs more salt.", "Taste", ["Taste", "Smell", "Touch", "Bite"]],
+  ["She _____ the sauce before serving it.", "tasted", ["tasted", "smelled", "touched", "pointed"]],
+  ["Don't _____ the oven door. It's extremely hot.", "touch", ["touch", "taste", "bite", "stare"]],
+  ["He _____ the fabric to see how soft it was.", "touched", ["touched", "smelled", "kicked", "nodded"]],
+  ["He had to _____ to call the dog back.", "whistle", ["whistle", "clap", "nod", "smile"]],
+  ["She _____ loudly to get her friend's attention.", "whistled", ["whistled", "clapped", "stared", "bit"]],
+]);
+
+const intermediateBodyAssociationEntries = intermediateContextEntries("int-body-association", [
+  ["You bite food with your ____.", "teeth", ["teeth", "tongue", "lips", "fingers"]],
+  ["You clap your ____.", "hands", ["hands", "arms", "fingers", "shoulders"]],
+  ["You kick a football with your ____.", "foot", ["foot", "hand", "knee", "head"]],
+  ["When you nod, you move your ____.", "head", ["head", "face", "neck", "shoulders"]],
+  ["You normally point at something with a ____.", "finger", ["finger", "thumb", "toe", "hand"]],
+  ["You smell things with your ____.", "nose", ["nose", "mouth", "tongue", "ears"]],
+  ["You stare at something with your ____.", "eyes", ["eyes", "ears", "face", "nose"]],
+  ["You taste food mainly with your ____.", "tongue", ["tongue", "teeth", "lips", "nose"]],
+  ["You would normally use a _____ to touch a small button carefully.", "finger", ["finger", "toe", "arm", "shoulder"]],
+  ["You use your _____ when you whistle.", "lips", ["lips", "teeth", "ears", "knees"]],
+]);
+
+const intermediateBodyVisualWriteEntries = intermediateBodyPartEntries.map((entry, index) => ({
+  ...entry,
+  id: `int-body-write-${String(index + 1).padStart(2, "0")}`,
+  sentence: "Which body part is this?",
+  answer: entry.term,
+}));
+
+const intermediateBodyTextWriteEntries = intermediateWriteEntries("int-body-write-text", [
+  ["Be careful. Some dogs _____ if they're frightened.", "bite"],
+  ["The audience _____ enthusiastically after the final song.", "clapped"],
+  ["She _____ the ball straight into the goal.", "kicked"], ["He _____ when I asked if he agreed.", "nodded"],
+  ["She _____ at the sign to show me where to go.", "pointed"], ["Can you _____ something burning?", "smell"],
+  ["She _____ at me when I walked into the room.", "smiled"], ["Don't _____ at people. It's rude.", "stare"],
+  ["_____ the soup before you add any more salt.", "taste"], ["Don't _____ the wet paint.", "touch"],
+  ["He _____ to call the dog back.", "whistled"], ["You bite food with your ____.", "teeth"],
+  ["You clap your ____.", "hands"], ["When you nod, you move your ____.", "head"],
+  ["You smell things with your ____.", "nose"], ["You taste food mainly with your ____.", "tongue"],
+  ["You usually point at something with one ____.", "finger"], ["You normally kick a ball with your ____.", "foot"],
+]);
+
+const intermediateBodyWriteEntries = [...intermediateBodyVisualWriteEntries, ...intermediateBodyTextWriteEntries];
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-body",
+  level: "b1",
+  order: 9,
+  title: "The body",
+  shortDescription: "Practise parts of the body and common verbs for physical actions and senses.",
+  textbookRef: "Intermediate Vocabulary Bank 9",
+  accent: HUB_VOCAB_LEVEL_COLORS.b1,
+  itemCount: 33,
+  entries: intermediateBodyPartEntries,
+  bodyPartEntries: intermediateBodyPartEntries,
+  bodyPartChoiceEntries: intermediateBodyPartChoiceEntries,
+  bodyVerbEntries: intermediateBodyVerbEntries,
+  bodyVerbContextEntries: intermediateBodyVerbContextEntries,
+  bodyAssociationEntries: intermediateBodyAssociationEntries,
+  bodyWriteEntries: intermediateBodyWriteEntries,
+  infoNotes: [
+    { title: "foot / feet and tooth / teeth", body: ["one foot → two feet", "one tooth → several teeth"] },
+    { title: "Body parts and possessives", body: ["In English, we normally use a possessive with parts of the body.", "Give me your hand.", "He hurt his knee."] },
+  ],
+  activities: [
+    { id: "body-flashcards", type: "flashcards", dataKey: "bodyPartEntries", title: "Body flashcards", shortDescription: "Look at the picture and recall the body part.", prompt: "Look at the picture and say the body part before you flip.", itemLimit: 15 },
+    { id: "body-part-choice", type: "quick-choice", dataKey: "bodyPartChoiceEntries", title: "Which body part is it?", shortDescription: "Recognise body parts from pictures.", prompt: "Look at the picture and choose the correct body part.", itemLimit: 15 },
+    { id: "body-verbs-context", type: "sentence-gap-choice", dataKey: "bodyVerbContextEntries", title: "Body verbs in context", shortDescription: "Choose the correct verb for physical actions and senses.", prompt: "Read the sentence and choose the verb that fits.", question: "Which verb fits?", itemLimit: 12 },
+    { id: "body-associations", type: "sentence-gap-choice", dataKey: "bodyAssociationEntries", title: "What do you use?", shortDescription: "Connect common physical actions with the relevant body part.", prompt: "Read the sentence and choose the body part that fits.", question: "Which body part fits?" },
+    { id: "body-write", type: "sentence-gap-type-answer", dataKey: "bodyWriteEntries", title: "Write the word or verb", shortDescription: "Write body parts and body-related verbs from memory.", prompt: "Look at the picture or read the sentence and type the missing word.", answerLabel: "Word", answerPlaceholder: "Type your answer", itemLimit: 15 },
+  ],
+});
+
+const intermediateEducationSystemEntries = [
+  ["primary-school", "primary school", "In the UK, the first compulsory school most children attend."],
+  ["nursery-school", "nursery school", "In the UK, a school for young children before primary school."],
+  ["secondary-school", "secondary school", "In the UK, the school children attend after primary school."],
+  ["state-school", "state school", "In the UK, a school funded by the government and free for families."],
+  ["private-school", "private school", "A school where families pay fees."],
+  ["boarding-school", "boarding school", "A school where students live as well as study."],
+  ["pupils", "pupils", "A word often used for children who attend school."],
+  ["students", "students", "People who study at school, college or university."],
+  ["head", "head", "The person in charge of a school.", ["head", "head teacher", "headteacher"]],
+  ["terms", "terms", "The three main periods into which the UK school year is divided."],
+  ["degree", "degree", "A university qualification completed after a course of study."],
+  ["elementary-school", "elementary school", "In the US, the first main level of school."],
+  ["high-school", "high school", "In the US, the school students attend before higher education."],
+  ["grades", "grades", "In the US, the numbered school-year groups children move through."],
+  ["kindergarten", "kindergarten", "In the US, the year young children normally attend before first grade."],
+  ["twelfth-grade", "twelfth grade", "The final grade of US high school.", ["twelfth grade", "12th grade"]],
+  ["semesters", "semesters", "The two main periods into which a US school year is often divided."],
+  ["college", "college", "A common US term for higher education after high school."],
+].map(([id, term, cueText, acceptedAnswers = [term]]) => ({
+  id: `int-education-${id}`, term, cueText, acceptedAnswers,
+}));
+
+const intermediateEducationSystemContextEntries = intermediateContextEntries("int-education-system-context", [
+  ["In the UK, most children start _____ at about five.", "primary school", ["primary school", "secondary school", "nursery school", "boarding school"]],
+  ["Before compulsory schooling begins, some young children go to ____.", "nursery school", ["nursery school", "primary school", "secondary school", "college"]],
+  ["In Britain, children normally move from primary school to ____.", "secondary school", ["secondary school", "nursery school", "elementary school", "college"]],
+  ["My daughter is ten and attends a local _____ in London.", "primary school", ["primary school", "secondary school", "college", "high school"]],
+  ["At 15, a British teenager would normally be at ____.", "secondary school", ["secondary school", "primary school", "nursery school", "elementary school"]],
+  ["Most schools in the UK are _____ and are funded by the government.", "state schools", ["state schools", "private schools", "boarding schools", "nursery schools"]],
+  ["Her parents pay several thousand pounds a year because she attends a ____.", "private school", ["private school", "state school", "primary school", "college"]],
+  ["The students sleep there during the school term because it's a ____.", "boarding school", ["boarding school", "state school", "nursery school", "elementary school"]],
+  ["Families don't normally pay fees for a British ____.", "state school", ["state school", "private school", "boarding school", "college"]],
+  ["Some _____ are also boarding schools, although the two ideas are not the same.", "private schools", ["private schools", "terms", "grades", "degrees"]],
+  ["The children at the primary school are often referred to as ____.", "pupils", ["pupils", "graduates", "heads", "terms"]],
+  ["The people doing courses at university are ____.", "students", ["students", "pupils", "heads", "grades"]],
+  ["The person in charge of the school is the ____.", "head", ["head", "student", "pupil", "graduate"]],
+  ["British schools usually divide the academic year into three ____.", "terms", ["terms", "semesters", "grades", "degrees"]],
+  ["After completing university successfully, she received a ____.", "degree", ["degree", "term", "grade", "semester"]],
+  ["The school _____ called a meeting with all the teachers.", "head", ["head", "pupil", "degree", "term"]],
+  ["In the US, young children normally begin their main schooling at ____.", "elementary school", ["elementary school", "high school", "college", "secondary school"]],
+  ["American teenagers attend _____ before going to college.", "high school", ["high school", "elementary school", "nursery school", "primary school"]],
+  ["After elementary and middle school, US students move on to ____.", "high school", ["high school", "college", "kindergarten", "primary school"]],
+  ["Before first grade, many American children attend ____.", "kindergarten", ["kindergarten", "college", "high school", "secondary school"]],
+  ["In the US, children are divided into school-year groups called ____.", "grades", ["grades", "terms", "semesters", "degrees"]],
+  ["The last year of American high school is ____.", "twelfth grade", ["twelfth grade", "kindergarten", "first grade", "college"]],
+  ["An American student in _____ is normally in the final year of high school.", "twelfth grade", ["twelfth grade", "kindergarten", "elementary school", "college"]],
+  ["Many US schools divide the academic year into two ____.", "semesters", ["semesters", "terms", "grades", "degrees"]],
+  ["After finishing high school, many Americans go to ____.", "college", ["college", "kindergarten", "elementary school", "twelfth grade"]],
+  ["In the US, higher education is often simply referred to as ____.", "college", ["college", "high school", "grade", "semester"]],
+  ["A British school year is normally divided into _____ rather than semesters.", "terms", ["terms", "grades", "degrees", "colleges"]],
+  ["In American schools, the equivalent school-year divisions are often called ____.", "semesters", ["semesters", "terms", "pupils", "degrees"]],
+]);
+
+const intermediateEducationDisciplineEntries = ["be allowed to", "be expelled", "be punished", "cheat", "let", "make", "misbehave"]
+  .map((term, index) => ({ id: `int-education-discipline-${index + 1}`, term, acceptedAnswers: [term] }));
+
+const intermediateEducationDisciplineContextEntries = intermediateContextEntries("int-education-discipline-context", [
+  ["We aren't _____ to use our phones during lessons.", "allowed", ["allowed", "made", "let", "punished"]],
+  ["Are students _____ to leave the school at lunchtime?", "allowed", ["allowed", "expelled", "cheated", "misbehaved"]],
+  ["Our school _____ us to use tablets in some classes.", "allows", ["allows", "lets", "makes", "punishes"]],
+  ["Our teacher sometimes _____ us play games at the end of class.", "lets", ["lets", "allows", "makes", "punishes"]],
+  ["The teacher _____ us leave early yesterday because the buses were on strike.", "let", ["let", "allowed", "made", "expelled"]],
+  ["My parents don't _____ me stay out late on school nights.", "let", ["let", "allow", "make", "punish"]],
+  ["Our maths teacher _____ us do extra homework every Friday.", "makes", ["makes", "lets", "allows", "cheats"]],
+  ["The teacher _____ me rewrite the whole essay yesterday.", "made", ["made", "let", "allowed", "misbehaved"]],
+  ["If we're late, the teacher sometimes _____ us stay behind.", "makes", ["makes", "lets", "allows", "expels"]],
+  ["Students may be _____ if they repeatedly break school rules.", "punished", ["punished", "allowed", "cheated", "misbehaved"]],
+  ["He was _____ for writing on a classroom wall.", "punished", ["punished", "expelled", "allowed", "let"]],
+  ["If you behave badly, you might be ____.", "punished", ["punished", "allowed", "made", "cheated"]],
+  ["A student can be _____ for a very serious offence.", "expelled", ["expelled", "punished", "allowed", "revised"]],
+  ["He was _____ from the school after several very serious incidents.", "expelled", ["expelled", "let", "made", "cheated"]],
+  ["For serious misconduct, students may even be ____.", "expelled", ["expelled", "allowed", "misbehaved", "passed"]],
+  ["If you copy another student's answers during a test, you're trying to ____.", "cheat", ["cheat", "revise", "misbehave", "punish"]],
+  ["Anyone caught _____ in the exam will receive a zero.", "cheating", ["cheating", "revising", "passing", "allowing"]],
+  ["He looked at another student's paper because he was trying to ____.", "cheat", ["cheat", "pass", "revise", "misbehave"]],
+  ["Most students behave well, but a few sometimes ____.", "misbehave", ["misbehave", "cheat", "revise", "allow"]],
+  ["If children _____ repeatedly, the school may contact their parents.", "misbehave", ["misbehave", "pass", "expel", "let"]],
+  ["He was punished because he had _____ badly during the lesson.", "misbehaved", ["misbehaved", "revised", "allowed", "passed"]],
+]);
+
+const intermediateEducationExamEntries = [
+  ["take-do", "take / do an exam", ["take an exam", "do an exam"]], ["revise", "revise for an exam"],
+  ["pass", "pass an exam"], ["fail", "fail an exam"], ["result", "exam result / results", ["exam result", "exam results"]],
+].map(([id, term, acceptedAnswers = [term]]) => ({ id: `int-education-exam-${id}`, term, acceptedAnswers }));
+
+const intermediateEducationExamContextEntries = intermediateContextEntries("int-education-exam-context", [
+  ["I have to _____ an important English exam next week.", "take", ["take", "revise", "pass", "fail"], ["take", "do"]],
+  ["When are you going to _____ your final exams?", "take", ["take", "revise", "get", "pass"], ["take", "do"]],
+  ["She _____ three exams at the end of last term.", "took", ["took", "passed", "revised", "failed"]],
+  ["I need to _____ for tomorrow's history exam.", "revise", ["revise", "pass", "fail", "take"]],
+  ["He hasn't done enough _____, so he's worried about the exam.", "revision", ["revision", "result", "degree", "grade"]],
+  ["She spent the whole weekend _____ for her maths test.", "revising", ["revising", "passing", "failing", "taking"]],
+  ["She studied hard and _____ the exam easily.", "passed", ["passed", "failed", "revised", "took"]],
+  ["You need at least 50% to _____.", "pass", ["pass", "fail", "revise", "result"]],
+  ["He hopes he'll _____ all his final exams.", "pass", ["pass", "revise", "take", "result"]],
+  ["Unfortunately, he _____ the exam and has to take it again.", "failed", ["failed", "passed", "revised", "took"]],
+  ["If I don't study, I'm afraid I might ____.", "fail", ["fail", "pass", "revise", "result"]],
+  ["She'd never _____ an exam before, so she was very disappointed.", "failed", ["failed", "passed", "revised", "taken"]],
+  ["We won't get our exam _____ until Friday.", "results", ["results", "degrees", "terms", "semesters"]],
+  ["When do you get the _____ of your English test?", "result", ["result", "revision", "degree", "term"]],
+  ["My exam _____ were much better than I expected.", "results", ["results", "grades", "semesters", "pupils"]],
+]);
+
+const intermediateEducationWriteEntries = intermediateWriteEntries("int-education-write", [
+  ["In the UK, children normally attend _____ _____ before secondary school.", "primary school"],
+  ["Some children go to _____ _____ before compulsory schooling begins.", "nursery school"],
+  ["British teenagers normally attend _____ _____.", "secondary school"],
+  ["A government-funded British school is a _____ _____.", "state school"],
+  ["Parents have to pay fees for a _____ _____.", "private school"],
+  ["Students both live and study at a _____ _____.", "boarding school"],
+  ["Young people attending a school are often called ____.", "pupils"],
+  ["People studying at university are ____.", "students"],
+  ["The person in charge of the school is the ____.", "head", ["head", "head teacher", "headteacher"]],
+  ["The British school year is usually divided into three ____.", "terms"],
+  ["After finishing her university course, she received a ____.", "degree"],
+  ["In the US, the first main level of school is _____ _____.", "elementary school"],
+  ["Most American teenagers attend _____ _____.", "high school"],
+  ["In the US, school-year groups are called ____.", "grades"],
+  ["Young American children often attend _____ before first grade.", "kindergarten"],
+  ["The last year of US high school is _____ _____.", "twelfth grade", ["twelfth grade", "12th grade"]],
+  ["Many US schools divide the year into two ____.", "semesters"],
+  ["After high school, many Americans go to ____.", "college"],
+  ["We aren't _____ to use phones during tests.", "allowed"], ["The school _____ students to bring laptops to class.", "allows"],
+  ["Our teacher _____ us use dictionaries during the activity.", "lets"], ["Yesterday the teacher _____ us leave five minutes early.", "let"],
+  ["My teacher _____ me redo the entire assignment.", "made"], ["Our PE teacher always _____ us run before the lesson starts.", "makes"],
+  ["If students repeatedly break the rules, they may be ____.", "punished"], ["For an extremely serious offence, a student could be ____.", "expelled"],
+  ["If you copy answers from somebody else in an exam, you ____.", "cheat"], ["He was caught _____ during the test.", "cheating"],
+  ["Children who behave badly in class ____.", "misbehave"], ["He was punished because he'd _____ during the lesson.", "misbehaved"],
+  ["I have to _____ an exam tomorrow.", "take", ["take", "do"]], ["She _____ her final exam yesterday.", "took", ["took", "did"]],
+  ["I haven't studied enough. I really need to _____ tonight.", "revise"], ["He spent all weekend _____ for his exams.", "revising"],
+  ["She got 85%, so she easily _____.", "passed"], ["I hope I _____ the exam this time.", "pass"],
+  ["He didn't study and unfortunately _____.", "failed"], ["I'm worried I might _____ the exam.", "fail"],
+  ["When will we get our exam _____?", "results"], ["My test _____ was much better than I'd expected.", "result"],
+]);
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-education", level: "b1", order: 10, title: "Education",
+  shortDescription: "Practise school-system vocabulary, discipline and common exam expressions.",
+  textbookRef: "Intermediate Vocabulary Bank 10", accent: HUB_VOCAB_LEVEL_COLORS.b1, itemCount: 30,
+  entries: intermediateEducationSystemEntries,
+  educationSystemEntries: intermediateEducationSystemEntries,
+  educationSystemContextEntries: intermediateEducationSystemContextEntries,
+  educationDisciplineEntries: intermediateEducationDisciplineEntries,
+  educationDisciplineContextEntries: intermediateEducationDisciplineContextEntries,
+  educationExamEntries: intermediateEducationExamEntries,
+  educationExamContextEntries: intermediateEducationExamContextEntries,
+  educationWriteEntries: intermediateEducationWriteEntries,
+  infoNotes: [
+    { title: "UK school vocabulary", body: ["primary school comes before secondary school", "state schools are funded by the government", "private schools charge fees", "students at boarding schools live at the school"] },
+    { title: "US school vocabulary", body: ["elementary school is the first main school level", "high school finishes with twelfth grade", "US school years are called grades", "the school year is often divided into two semesters"] },
+    { title: "term and semester", body: ["UK school years are commonly divided into terms", "US school years are commonly divided into semesters"] },
+    { title: "make, let and allow", body: ["make + person + infinitive without to", "My teacher made me stay after class.", "let + person + infinitive without to", "Our teacher let us leave early.", "allow + person + to + infinitive", "The school allows students to use laptops.", "allow is often used in the passive: We're allowed to use laptops.", "let is not normally used in this passive pattern."] },
+    { title: "Talking about exams", body: ["take / do an exam", "revise for an exam", "pass an exam", "fail an exam", "get your exam result / results"] },
+  ],
+  activities: [
+    { id: "education-flashcards", type: "flashcards", dataKey: "educationSystemEntries", title: "Education flashcards", shortDescription: "Recall common vocabulary for schools and education.", prompt: "Read the description and say the word or phrase before you flip.", itemLimit: 15 },
+    { id: "education-systems-context", type: "sentence-gap-choice", dataKey: "educationSystemContextEntries", title: "School systems in context", shortDescription: "Use UK and US education vocabulary in context.", prompt: "Read the sentence and choose the education word or phrase that fits.", question: "Which word or phrase fits?", itemLimit: 12 },
+    { id: "education-discipline", type: "sentence-gap-choice", dataKey: "educationDisciplineContextEntries", title: "Discipline at school", shortDescription: "Practise useful verbs for school rules and discipline.", prompt: "Read the situation and choose the verb or form that fits.", question: "Which word or phrase fits?", itemLimit: 12 },
+    { id: "education-exams", type: "sentence-gap-choice", dataKey: "educationExamContextEntries", title: "Exams and results", shortDescription: "Practise common verbs and expressions used when talking about exams.", prompt: "Read the sentence and choose the exam word or form that fits.", question: "Which word fits?" },
+    { id: "education-write", type: "sentence-gap-type-answer", dataKey: "educationWriteEntries", title: "Write the word or phrase", shortDescription: "Write school, discipline and exam vocabulary from memory.", prompt: "Read the sentence and type the missing word or phrase.", answerLabel: "Word or phrase", answerPlaceholder: "Type your answer", itemLimit: 15 },
+  ],
+});
+
+const intermediateHousePartEntries = [
+  ["attic", 1, "attic", 49.4, 16.2], ["balcony", 2, "balcony", 81.3, 40.1],
+  ["basement", 3, "basement", 28.3, 78.5], ["chimney", 4, "chimney", 28, 10.6],
+  ["entrance", 5, "entrance", 47.9, 56.1], ["gate", 6, "gate", 49.4, 91.4],
+  ["ground-floor", 7, "ground floor", 23.6, 59.4], ["path", 8, "path", 49.4, 80.5],
+  ["roof", 9, "roof", 67, 10.4], ["steps", 10, "steps", 45.4, 71],
+  ["terrace-patio", 11, "terrace / patio", 81.3, 64.1, ["terrace", "patio", "terrace / patio"]],
+  ["top-floor", 12, "top floor", 30.6, 34.3], ["wall", 13, "wall", 76.2, 54.6],
+].map(([id, number, term, hotspotX, hotspotY, acceptedAnswers = [term]]) => ({
+  id: `int-house-${id}`,
+  term,
+  number,
+  category: "house-part",
+  hotspotNumber: number,
+  hotspotX,
+  hotspotY,
+  image: `${INTERMEDIATE_HOUSES_IMAGE_BASE}/house-diagram-numbered.webp`,
+  acceptedAnswers,
+}));
+
+const INTERMEDIATE_HOUSE_HOTSPOT_ROUNDS = [
+  {
+    id: "house-parts",
+    title: "Parts of a house",
+    description: "Match all 13 numbered hotspots with the correct house words.",
+    categories: ["house-part"],
+  },
+];
+
+const intermediateHouseLocationContextEntries = intermediateContextEntries("int-house-location-context", [
+  ["They wanted fields, peace and no city traffic, so they moved ____.", "in the country", ["in the country", "in a suburb of", "on the outskirts of", "on the second floor"]],
+  ["My grandparents live ____ near a river, where everybody knows everybody.", "in a village", ["in a village", "in a city", "on the east coast", "on the second floor"]],
+  ["He prefers living ____ because it has shops and services but isn't too busy.", "in a town", ["in a town", "in the country", "in a suburb of", "on the east coast"]],
+  ["After university she moved ____ and now uses the metro every day.", "in a city", ["in a city", "in a village", "in the country", "on the second floor"]],
+  ["They don't live in central Leeds; they live ____ Leeds.", "on the outskirts of", ["on the outskirts of", "in a suburb of", "in the country", "on the second floor"]],
+  ["We live ____ Madrid, so we're outside the centre but still part of the city.", "in a suburb of", ["in a suburb of", "on the outskirts of", "in a village", "on the east coast"]],
+  ["The weather is milder there because the town is ____.", "on the east coast", ["on the east coast", "in the country", "on the second floor", "in a suburb of"]],
+  ["Our flat isn't on the ground floor. It's ____.", "on the second floor", ["on the second floor", "on the east coast", "in a town", "on the outskirts of"]],
+  ["They sold their flat in London and bought a cottage ____.", "in the country", ["in the country", "in a city", "on the outskirts of", "on the second floor"]],
+  ["She was brought up ____ in northern Spain with only a few hundred people.", "in a village", ["in a village", "in a city", "on the east coast", "in a suburb of"]],
+  ["It's bigger than a village but smaller than a city, so they live ____.", "in a town", ["in a town", "in the country", "on the second floor", "in a suburb of"]],
+  ["He grew up ____ and didn't learn to drive until he was thirty.", "in a city", ["in a city", "in a village", "in the country", "on the east coast"]],
+  ["The house isn't far from Birmingham because it's ____ Birmingham.", "on the outskirts of", ["on the outskirts of", "in a suburb of", "in the country", "on the second floor"]],
+  ["I live ____ Valencia called Benimaclet.", "in a suburb of", ["in a suburb of", "on the east coast", "in the country", "in a town"]],
+  ["Many tourists visit that fishing town because it's ____.", "on the east coast", ["on the east coast", "on the second floor", "in a village", "on the outskirts of"]],
+  ["Their apartment is ____ of the building, just below the top floor.", "on the second floor", ["on the second floor", "in a suburb of", "on the east coast", "in the country"]],
+  ["They wanted more space but still needed the city nearby, so they moved ____ the city.", "to the outskirts of", ["to the outskirts of", "to the country", "to a city", "to the second floor"]],
+  ["Lots of commuters live ____ the capital and travel in every day.", "in a suburb of", ["in a suburb of", "in the country", "on the second floor", "on the east coast"]],
+]);
+
+const intermediateHouseDescriptionEntries = [
+  "old", "made of stone", "low ceilings", "open fire", "cosy",
+  "modern", "spacious", "light", "wooden floors", "big windows",
+].map((term, index) => ({ id: `int-house-description-${index + 1}`, term, acceptedAnswers: [term] }));
+
+const intermediateHouseDescriptionContextEntries = intermediateContextEntries("int-house-description-context", [
+  ["The cottage is over 150 years old, so it's very ____.", "old", ["old", "modern", "spacious", "light"]],
+  ["They bought an ____ farmhouse and restored it carefully.", "old", ["old", "open", "light", "modern"]],
+  ["The walls are built from local rock, so the house is ____.", "made of stone", ["made of stone", "made of wood", "full of windows", "on the second floor"]],
+  ["Many traditional houses in the village are ____.", "made of stone", ["made of stone", "cosy", "spacious", "modern"]],
+  ["You have to be careful upstairs because the rooms have very ____.", "low ceilings", ["low ceilings", "big windows", "wooden floors", "open fires"]],
+  ["The top-floor bedrooms feel smaller because of the ____.", "low ceilings", ["low ceilings", "big windows", "modern walls", "stone roofs"]],
+  ["In winter we sit around the ____ in the living room.", "open fire", ["open fire", "big window", "roof", "path"]],
+  ["The old cottage still has an ____ instead of central heating in one room.", "open fire", ["open fire", "attic", "balcony", "gate"]],
+  ["It's small, warm and comfortable, so the flat feels really ____.", "cosy", ["cosy", "spacious", "modern", "light"]],
+  ["The room isn't large, but it's very welcoming and ____.", "cosy", ["cosy", "old", "stone", "wooden"]],
+  ["The apartment was built last year and has a very ____ design.", "modern", ["modern", "old", "cosy", "open"]],
+  ["They've just renovated the house, and now it looks very ____.", "modern", ["modern", "stone", "light", "low"]],
+  ["The rooms are huge, so the house feels very ____.", "spacious", ["spacious", "cosy", "old", "low"]],
+  ["There's plenty of room for a big family because the flat is so ____.", "spacious", ["spacious", "light", "old", "stone"]],
+  ["With all that sunlight, the kitchen feels lovely and ____.", "light", ["light", "cosy", "old", "stone"]],
+  ["The living room is very ____ because it has lots of natural light.", "light", ["light", "spacious", "low", "open"]],
+  ["I love the ____ in the living room; they look beautiful and warm.", "wooden floors", ["wooden floors", "big windows", "low ceilings", "open fires"]],
+  ["The flat has ____ throughout, not carpet.", "wooden floors", ["wooden floors", "big windows", "stone walls", "open fires"]],
+  ["The sitting room has ____ overlooking the garden, so it gets a lot of sun.", "big windows", ["big windows", "low ceilings", "open fires", "stone roofs"]],
+  ["The bedroom feels bright because of its ____.", "big windows", ["big windows", "wooden floors", "top floors", "open fires"]],
+]);
+
+const intermediateHouseTextWriteEntries = intermediateWriteEntries("int-house-write-text", [
+  ["They wanted a rural lifestyle, so they moved ____ ____ ____.", "in the country"],
+  ["He grew up ____.", "in a village"], ["After years in the countryside, she moved ____ ____.", "in a city"],
+  ["They don't live in central Bristol. They live ____ ____ ____ Bristol.", "on the outskirts of"],
+  ["We live ____ ____ ____ Madrid.", "in a suburb of"], ["The town is ____ ____ ____.", "on the east coast"],
+  ["Our flat is ____ ____ ____.", "on the second floor"], ["My grandparents live ____ ____.", "in a town"],
+  ["He was born ____ ____.", "in a village"], ["They moved ____ ____ ____ the city because they wanted more space.", "to the outskirts of"],
+  ["She lives ____ ____ ____ Valencia.", "in a suburb of"],
+  ["After university, he decided to stay ____ ____ ____ rather than moving back to the countryside.", "in a city"],
+  ["The cottage is more than 100 years old, so it's very ____.", "old"], ["The farmhouse is ____ ____ ____.", "made of stone"],
+  ["The upstairs rooms have very ____ ____.", "low ceilings"], ["In winter we all sit round the ____ ____.", "open fire"],
+  ["It's small but warm and comfortable, so it feels very ____.", "cosy"], ["They've renovated everything and now the flat looks really ____.", "modern"],
+  ["The house is very ____ because all the rooms are large.", "spacious"], ["Because there is so much natural sunlight, the kitchen is very ____.", "light"],
+  ["I love the ____ ____ in the living room.", "wooden floors"], ["The sitting room has ____ ____ overlooking the garden.", "big windows"],
+  ["The apartment doesn't feel dark at all. It's very ____.", "light"], ["The new flat is simple, stylish and very ____.", "modern"],
+  ["The lounge has a lovely ____ ____ for cold winter evenings.", "open fire"], ["There is plenty of room for everyone, so the place feels ____.", "spacious"],
+  ["The old house has beautiful ____ ____ and no carpet.", "wooden floors"],
+]);
+
+const intermediateHouseWriteEntries = intermediateHouseTextWriteEntries;
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-houses", level: "b1", order: 11, title: "Houses",
+  shortDescription: "Practise parts of a house, where people live, and useful phrases for describing homes.",
+  textbookRef: "Intermediate Vocabulary Bank 11", accent: HUB_VOCAB_LEVEL_COLORS.b1, itemCount: 29,
+  sceneImage: `${INTERMEDIATE_HOUSES_IMAGE_BASE}/house-diagram-numbered.webp`,
+  entries: intermediateHousePartEntries,
+  housePartEntries: intermediateHousePartEntries,
+  houseLocationContextEntries: intermediateHouseLocationContextEntries,
+  houseDescriptionEntries: intermediateHouseDescriptionEntries,
+  houseDescriptionContextEntries: intermediateHouseDescriptionContextEntries,
+  houseWriteEntries: intermediateHouseWriteEntries,
+  infoNotes: [
+    { title: "roof and ceiling", body: ["the roof is on the outside of the house", "the ceiling is the inside top surface of a room"] },
+    { title: "chimney and fireplace", body: ["the chimney carries smoke out of the house", "the fireplace or open fire is where the fire burns"] },
+    { title: "balcony and terrace / patio", body: ["a balcony is attached to an upper floor", "a terrace or patio is a ground-level outdoor area"] },
+  ],
+  activities: [
+    { id: "house-parts-diagram", type: "image-hotspot-match", dataKey: "housePartEntries", title: "Explore the house", shortDescription: "Match each numbered hotspot with the correct part of the house.", prompt: "Select a numbered hotspot, then choose the matching house word.", sceneImage: `${INTERMEDIATE_HOUSES_IMAGE_BASE}/house-diagram-numbered.webp`, rounds: INTERMEDIATE_HOUSE_HOTSPOT_ROUNDS },
+    { id: "house-locations", type: "sentence-gap-choice", dataKey: "houseLocationContextEntries", title: "Where do they live?", shortDescription: "Practise useful expressions for describing where people live.", prompt: "Read the sentence and choose the correct word or phrase.", question: "Which phrase fits?", itemLimit: 12 },
+    { id: "house-part-choice", type: "image-hotspot-type-answer", dataKey: "housePartEntries", title: "Name the house part", shortDescription: "Type the word for each highlighted hotspot on the house.", prompt: "Look at the highlighted hotspot and type the house word.", sceneImage: `${INTERMEDIATE_HOUSES_IMAGE_BASE}/house-diagram-numbered.webp`, rounds: INTERMEDIATE_HOUSE_HOTSPOT_ROUNDS, answerLabel: "House word", answerPlaceholder: "Type the house word" },
+    { id: "house-descriptions", type: "sentence-gap-choice", dataKey: "houseDescriptionContextEntries", title: "Describing a home", shortDescription: "Choose useful words and phrases for describing houses and flats.", prompt: "Read the sentence and choose the word or phrase that fits.", question: "Which word or phrase fits?", itemLimit: 12 },
+    { id: "house-write", type: "sentence-gap-type-answer", dataKey: "houseWriteEntries", title: "Write the word or phrase", shortDescription: "Write house vocabulary, location expressions and home-description phrases from memory.", prompt: "Look at the house picture or read the sentence and type the missing word or phrase.", answerLabel: "Word or phrase", answerPlaceholder: "Type your answer", itemLimit: 15 },
+  ],
+});
+
+const workImage = (file) => `${INTERMEDIATE_WORK_IMAGE_BASE}/${file}.webp`;
+
+const intermediateWorkVerbEntries = [
+  ["get-promoted", "get promoted", "promotion", "Your company gives you a more important position."],
+  ["do-overtime", "do overtime", "overtime", "You work extra hours beyond your normal working day."],
+  ["work-shifts", "work shifts", "shift-work", "Your working hours change, and you may work during the day or at night."],
+  ["be-sacked-fired", "be sacked / fired", "job-loss", "Your employer tells you to leave because of your performance or behaviour.", ["be sacked", "be fired", "get sacked", "get fired"]],
+  ["be-made-redundant", "be made redundant", "job-loss", "You lose your job because the company no longer needs your position."],
+  ["resign", "resign", "resignation", "You decide to leave your job.", ["resign", "quit"], "AmE: quit"],
+  ["retire", "retire", "retirement", "You stop working permanently, usually because of your age."],
+  ["set-up-business", "set up a business", "new-business", "You create and start a new business."],
+  ["training-course", "do a training course", "training-course", "You attend organised training to learn new skills for work."],
+  ["apply-job", "apply for a job", "job-application", "You send your CV / details because you want a particular job."],
+  ["run-business", "run a business", "running-business", "You manage and control a business.", ["run a business", "run a school"]],
+].map(([id, term, imageName, cueText, acceptedAnswers = [term], answerNote]) => ({
+  id: `int-work-${id}`, term, image: workImage(imageName), cueText, acceptedAnswers,
+  ...(answerNote ? { answerNote, flashcardNote: answerNote } : {}),
+}));
+
+const intermediateWorkVerbContextEntries = intermediateContextEntries("int-work-verb-context", [
+  ["After three successful years at the company, Marta was _____ to department manager.", "promoted", ["promoted", "retired", "sacked", "made redundant"]],
+  ["If I keep performing well, I hope I'll _____ next year.", "get promoted", ["get promoted", "resign", "work shifts", "do overtime"]],
+  ["We're extremely busy this week, so everyone has to _____.", "do overtime", ["do overtime", "work shifts", "resign", "retire"]],
+  ["He often _____ when there's a big deadline.", "does overtime", ["does overtime", "works shifts", "runs a business", "applies for jobs"]],
+  ["Nurses often _____ because hospitals are open twenty-four hours a day.", "work shifts", ["work shifts", "do overtime", "run businesses", "retire"]],
+  ["She _____, so sometimes she starts at 7 a.m. and sometimes at 10 p.m.", "works shifts", ["works shifts", "does overtime", "gets promoted", "resigns"]],
+  ["He repeatedly arrived late and ignored warnings, so eventually he was _____.", "sacked", ["sacked", "made redundant", "promoted", "retired"], ["sacked", "fired"]],
+  ["The company _____ him after discovering that he'd lied to customers.", "fired", ["fired", "promoted", "retired", "made redundant"], ["fired", "sacked"]],
+  ["When the factory closed, 150 employees were _____.", "made redundant", ["made redundant", "sacked", "promoted", "retired"]],
+  ["Her department disappeared during the restructuring, so she was _____.", "made redundant", ["made redundant", "fired", "promoted", "resigned"]],
+  ["After accepting another job, the director decided to _____.", "resign", ["resign", "retire", "get promoted", "be made redundant"]],
+  ["She wasn't fired. She chose to _____ because she wanted a change.", "resign", ["resign", "be sacked", "do overtime", "work shifts"]],
+  ["My dad is 66 and plans to _____ at the end of this year.", "retire", ["retire", "resign", "get promoted", "work shifts"]],
+  ["She _____ last month after nearly forty years as a teacher.", "retired", ["retired", "resigned", "was fired", "set up"]],
+  ["Two years ago they _____ an online clothing business.", "set up", ["set up", "ran", "applied for", "retired"]],
+  ["She'd always wanted to _____ her own company.", "set up", ["set up", "work shifts in", "resign from", "do overtime for"]],
+  ["Everyone has to _____ before using the new software.", "do a training course", ["do a training course", "apply for a job", "work shifts", "resign"]],
+  ["The company is paying for us to _____ next month.", "do a training course", ["do a training course", "do overtime", "run a business", "retire"]],
+  ["I saw an interesting vacancy online, so I decided to _____.", "apply for it", ["apply for it", "run it", "resign from it", "retire from it"]],
+  ["She _____ three jobs last week and is waiting to hear back.", "applied for", ["applied for", "set up", "ran", "retired from"]],
+  ["My parents _____ a small language school.", "run", ["run", "apply for", "retire", "resign"]],
+  ["She owns and _____ two restaurants with her brother.", "runs", ["runs", "promotes", "applies", "retires"]],
+]);
+
+const intermediateEmploymentStatusEntries = [
+  ["freelance", "freelance", "freelance"], ["self-employed", "self-employed", "self-employed", ["self-employed", "self employed"]],
+  ["temporary", "temporary", "temporary-job"], ["part-time", "part-time", "part-time-job", ["part-time", "part time"]],
+  ["unemployed", "unemployed", "unemployed"],
+].map(([id, term, imageName, acceptedAnswers = [term]]) => ({
+  id: `int-work-status-${id}`, term, image: workImage(imageName), acceptedAnswers,
+}));
+
+const statusContextRows = [
+  ["freelance", "She designs websites for several different companies instead of working for one employer. She's ____.", "freelance", ["freelance", "part-time", "temporary", "unemployed"]],
+  ["freelance", "I'm a _____ photographer, so different magazines hire me for individual projects.", "freelance", ["freelance", "self-employed", "temporary", "unemployed"]],
+  ["freelance", "He writes for several newspapers on a _____ basis.", "freelance", ["freelance", "part-time", "temporary", "unemployed"]],
+  ["self-employed", "She owns her own hairdressing business and works for herself. She's ____.", "self-employed", ["self-employed", "freelance", "temporary", "unemployed"]],
+  ["self-employed", "He isn't employed by a company. He's _____ and has his own plumbing business.", "self-employed", ["self-employed", "part-time", "unemployed", "temporary"]],
+  ["self-employed", "After ten years working for a firm, she became _____ and opened her own studio.", "self-employed", ["self-employed", "freelance", "temporary", "part-time"]],
+  ["temporary-job", "It's only a six-month contract, so it's a _____ job.", "temporary", ["temporary", "part-time", "freelance", "unemployed"]],
+  ["temporary-job", "I'm covering someone's maternity leave, so my position is ____.", "temporary", ["temporary", "self-employed", "part-time", "freelance"]],
+  ["temporary-job", "The work finishes at the end of August because it's only ____.", "temporary", ["temporary", "part-time", "self-employed", "unemployed"]],
+  ["part-time-job", "She only works four hours a day, so she has a _____ job.", "part-time", ["part-time", "temporary", "freelance", "unemployed"]],
+  ["part-time-job", "He's studying as well as working, so he works ____.", "part-time", ["part-time", "temporary", "self-employed", "freelance"]],
+  ["part-time-job", "She works three mornings a week rather than full-time. She's ____.", "part-time", ["part-time", "temporary", "unemployed", "self-employed"]],
+  ["unemployed", "He lost his job two months ago and is currently ____.", "unemployed", ["unemployed", "self-employed", "freelance", "temporary"]],
+  ["unemployed", "She's looking for work because she's ____ at the moment.", "unemployed", ["unemployed", "part-time", "temporary", "freelance"]],
+  ["unemployed", "After the company closed, he was _____ for nearly six months.", "unemployed", ["unemployed", "self-employed", "temporary", "part-time"]],
+];
+
+const intermediateEmploymentStatusContextEntries = statusContextRows.map(([imageName, sentence, answer, options], index) => ({
+  id: `int-work-status-context-${String(index + 1).padStart(2, "0")}`,
+  image: workImage(imageName), sentence, answer, options, acceptedAnswers: [answer],
+}));
+
+const intermediateWorkPrepositionEntries = [
+  "work for / in a company", "be in charge of something", "be responsible for something",
+  "be at school / university", "be in your first / second / third year at university",
+].map((term, index) => ({ id: `int-work-preposition-${index + 1}`, term, acceptedAnswers: [term] }));
+
+const intermediateWorkPrepositionContextEntries = intermediateContextEntries("int-work-preposition-context", [
+  ["I work _____ an international software company.", "for", ["for", "at", "of", "on"], ["for", "in"]],
+  ["She works _____ a large multinational.", "for", ["for", "at", "of", "to"], ["for", "in"]],
+  ["He works _____ the finance department of a large company.", "in", ["in", "for", "of", "at"]],
+  ["I'm _____ charge _____ the Marketing Department.", "in / of", ["in / of", "at / for", "on / of", "in / for"]],
+  ["Who's _____ charge _____ recruitment?", "in / of", ["in / of", "at / for", "in / for", "on / of"]],
+  ["She's now _____ charge _____ a team of twelve people.", "in / of", ["in / of", "for / in", "at / of", "in / for"]],
+  ["I'm responsible _____ customer complaints.", "for", ["for", "of", "to", "at"]],
+  ["He's responsible _____ training new staff.", "for", ["for", "of", "in", "to"]],
+  ["Who is responsible _____ this project?", "for", ["for", "at", "of", "on"]],
+  ["My daughter is _____ university.", "at", ["at", "in", "on", "for"]],
+  ["He's still _____ school, so he doesn't work full-time.", "at", ["at", "in", "on", "for"]],
+  ["We met when we were both _____ university.", "at", ["at", "in", "of", "for"]],
+  ["I'm _____ my third year _____ university.", "in / at", ["in / at", "at / in", "on / at", "in / of"]],
+  ["She's _____ her first year _____ university.", "in / at", ["in / at", "at / of", "on / at", "in / for"]],
+  ["He started the company while he was _____ his final year _____ university.", "in / at", ["in / at", "on / in", "at / of", "in / for"]],
+]);
+
+const intermediateWorkWordBuildingEntries = [
+  ["promote", "promotion"], ["apply", "application"], ["retire", "retirement"], ["employ", "employment"],
+  ["qualify", "qualification"], ["resign", "resignation"], ["science", "scientist"], ["law", "lawyer"],
+  ["music", "musician"], ["pharmacy", "pharmacist"], ["farm", "farmer"], ["translate", "translator"],
+].map(([baseWord, term], index) => ({ id: `int-work-wordbuild-${index + 1}`, baseWord, term, acceptedAnswers: [term] }));
+
+const intermediateWorkWordBuildingWriteEntries = intermediateWorkWordBuildingEntries.map((entry, index) => {
+  const person = index >= 6;
+  const sentence = `${entry.baseWord} → _____ (${person ? "person" : "noun"})`;
+  return { ...entry, id: `int-work-wordbuild-write-${index + 1}`, sentence, cueText: sentence, answer: entry.term };
+});
+
+const workCareerWriteRows = [
+  ["promotion", "Her company gave her a more senior role.", "promoted"],
+  ["overtime", "Because of the deadline, we have to _____ _____ tonight.", "do overtime"],
+  ["shift-work", "She sometimes works mornings and sometimes nights. She _____ _____.", "works shifts"],
+  ["job-loss", "He kept breaking company rules, so he was _____.", "sacked", ["sacked", "fired"]],
+  ["job-loss", "His position disappeared when the company reorganised, so he was _____ _____.", "made redundant"],
+  ["resignation", "She decided herself that she wanted to leave the company, so she _____.", "resigned", ["resigned", "quit"]],
+  ["retirement", "At 67, he finally stopped working permanently. He _____.", "retired"],
+  ["new-business", "They created a new online company last year. They _____ _____ a business.", "set up"],
+  ["training-course", "We need to learn the new software, so we're going to _____ a training course.", "do"],
+  ["job-application", "She saw the vacancy online and _____ _____ the job.", "applied for"],
+  ["running-business", "My parents own and _____ a small school.", "run"],
+];
+
+const intermediateWorkCareerWriteEntries = workCareerWriteRows.map(([imageName, sentence, answer, acceptedAnswers = [answer]], index) => ({
+  id: `int-work-write-career-${index + 1}`, image: workImage(imageName), sentence, cueText: sentence, answer, acceptedAnswers,
+}));
+
+const workStatusWriteRows = [
+  ["freelance", "He works independently for several different clients.", "freelance"],
+  ["self-employed", "She works for herself and owns her business.", "self-employed", ["self-employed", "self employed"]],
+  ["temporary-job", "The contract only lasts six months.", "temporary"],
+  ["part-time-job", "She only works three mornings each week.", "part-time", ["part-time", "part time"]],
+  ["unemployed", "He currently doesn't have a job.", "unemployed"],
+];
+
+const intermediateWorkStatusWriteEntries = workStatusWriteRows.map(([imageName, sentence, answer, acceptedAnswers = [answer]], index) => ({
+  id: `int-work-write-status-${index + 1}`, image: workImage(imageName), sentence, cueText: sentence, answer, acceptedAnswers,
+}));
+
+const intermediateWorkTextWriteEntries = intermediateWriteEntries("int-work-write-text", [
+  ["I work _____ a multinational company.", "for", ["for", "in"]], ["She's _____ charge _____ the whole department.", "in / of"],
+  ["I'm responsible _____ dealing with complaints.", "for"], ["My sister is _____ university.", "at"],
+  ["He's _____ his third year _____ university.", "in / at"], ["She works _____ the finance department.", "in"],
+  ["Who's responsible _____ organising the meeting?", "for"], ["My youngest son is still _____ school.", "at"],
+  ["He's _____ charge _____ staff training.", "in / of"], ["I'm _____ my final year _____ university.", "in / at"],
+  ["promote → _____", "promotion"], ["apply → _____", "application"], ["retire → _____", "retirement"],
+  ["employ → _____", "employment"], ["qualify → _____", "qualification"], ["resign → _____", "resignation"],
+  ["science → _____", "scientist"], ["law → _____", "lawyer"], ["music → _____", "musician"],
+  ["pharmacy → _____", "pharmacist"], ["farm → _____", "farmer"], ["translate → _____", "translator"],
+  ["She sent her job _____ yesterday.", "application"],
+  ["You need the right _____ before you can work in that profession.", "qualifications", ["qualifications", "qualification"]],
+]);
+
+const intermediateWorkWriteEntries = [
+  ...intermediateWorkCareerWriteEntries, ...intermediateWorkStatusWriteEntries, ...intermediateWorkTextWriteEntries,
+];
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-work", level: "b1", order: 12, title: "Work",
+  shortDescription: "Practise work and career expressions, employment status, work prepositions and word formation.",
+  textbookRef: "Intermediate Vocabulary Bank 12", accent: HUB_VOCAB_LEVEL_COLORS.b1, itemCount: 33,
+  entries: intermediateWorkVerbEntries,
+  workVerbEntries: intermediateWorkVerbEntries,
+  workVerbContextEntries: intermediateWorkVerbContextEntries,
+  employmentStatusEntries: intermediateEmploymentStatusEntries,
+  employmentStatusContextEntries: intermediateEmploymentStatusContextEntries,
+  workPrepositionEntries: intermediateWorkPrepositionEntries,
+  workPrepositionContextEntries: intermediateWorkPrepositionContextEntries,
+  workWordBuildingEntries: intermediateWorkWordBuildingEntries,
+  workWordBuildingWriteEntries: intermediateWorkWordBuildingWriteEntries,
+  workWriteEntries: intermediateWorkWriteEntries,
+  infoNotes: [
+    { title: "sacked, redundant or resigned?", body: ["be sacked / fired = the employer makes you leave, usually because of your behaviour or performance", "be made redundant = your job disappears because the company no longer needs the position", "resign = you choose to leave the job yourself"] },
+    { title: "set up or run?", body: ["set up a business = start it", "run a business = manage it"] },
+    { title: "resign", body: ["resign = formally leave your job", "quit is a common American English equivalent"] },
+    { title: "freelance and self-employed", body: ["self-employed = you work for yourself", "freelance = you work independently, often for several different clients", "A freelancer is normally self-employed, but the two words are not identical."] },
+    { title: "Word building", body: ["Many abstract nouns are made with endings such as -ment, -ion and -ation.", "Job and person nouns often use endings such as -er, -or, -ian and -ist.", "The spelling may change, so learn the complete word rather than only the suffix."] },
+  ],
+  activities: [
+    { id: "work-situation-flashcards", type: "flashcards", dataKey: "workVerbEntries", title: "Work situations", shortDescription: "Use the picture and clue to recall a useful work expression.", prompt: "Look at the picture, read the clue, and say the phrase before you flip." },
+    { id: "work-verbs-context", type: "sentence-gap-choice", dataKey: "workVerbContextEntries", title: "What happened at work?", shortDescription: "Choose the work verb or phrase that matches each situation.", prompt: "Read the sentence and choose the word or phrase that fits.", question: "Which expression fits?", itemLimit: 12 },
+    { id: "employment-status", type: "sentence-gap-choice", dataKey: "employmentStatusContextEntries", title: "Saying what you do", shortDescription: "Use pictures and context to distinguish common employment descriptions.", prompt: "Look at the picture, read the situation, and choose the correct word.", question: "Which word fits?", itemLimit: 12 },
+    { id: "work-prepositions", type: "sentence-gap-choice", dataKey: "workPrepositionContextEntries", title: "Work + prepositions", shortDescription: "Practise common work and study expressions with prepositions.", prompt: "Read the sentence and choose the correct preposition or combination.", question: "Which preposition fits?", itemLimit: 12 },
+    { id: "work-word-building", type: "sentence-gap-type-answer", dataKey: "workWordBuildingWriteEntries", title: "Build the word", shortDescription: "Form work-related nouns and job words from the base word.", prompt: "Use the base word to form the correct noun.", question: "Which word can you build?", answerLabel: "New word", answerPlaceholder: "Type the new word" },
+    { id: "work-write", type: "sentence-gap-type-answer", dataKey: "workWriteEntries", title: "Write the word or phrase", shortDescription: "Write work expressions, employment vocabulary, prepositions and word forms from memory.", prompt: "Look at the picture and clue, or read the sentence, and type the missing word or phrase.", answerLabel: "Word or phrase", answerPlaceholder: "Type your answer", itemLimit: 15 },
+  ],
+});
+
+const verbNounPairs = [
+  ["achieve", "achievement"], ["agree", "agreement"], ["argue", "argument"], ["attach", "attachment"],
+  ["choose", "choice"], ["compensate", "compensation"], ["complain", "complaint"], ["consider", "consideration"],
+  ["deliver", "delivery"], ["demonstrate", "demonstration"], ["explain", "explanation"], ["fail", "failure"],
+  ["improve", "improvement"], ["lose", "loss"], ["manage", "management"], ["pay", "payment"],
+  ["respond", "response"], ["sell", "sale"], ["serve", "service"], ["succeed", "success"],
+  ["tempt", "temptation"], ["treat", "treatment"], ["value", "value"],
+];
+
+const intermediateVerbNounEntries = verbNounPairs.map(([baseWord, term]) => ({
+  id: `int-wordbuild-${baseWord}`, baseWord, cueText: `${baseWord} → noun`, term, acceptedAnswers: [term],
+}));
+
+const intermediateVerbNounContextEntries = intermediateContextEntries("int-wordbuild-noun-context", [
+  ["Finishing the marathon was a huge _____ for her.", "achievement", ["achievement", "improvement", "success", "treatment"]],
+  ["After several hours of discussion, the two sides finally reached an _____.", "agreement", ["agreement", "argument", "explanation", "response"]],
+  ["I had an _____ with my brother about who should pay.", "argument", ["argument", "agreement", "complaint", "consideration"]],
+  ["The document is in the email _____.", "attachment", ["attachment", "response", "application", "delivery"]],
+  ["There were only two options, so it wasn't a difficult _____.", "choice", ["choice", "sale", "value", "payment"]],
+  ["The airline offered passengers _____ for the cancelled flight.", "compensation", ["compensation", "payment", "service", "treatment"]],
+  ["If you're unhappy with the service, you can make a formal _____.", "complaint", ["complaint", "argument", "response", "explanation"]],
+  ["After careful _____, we decided not to move house.", "consideration", ["consideration", "demonstration", "temptation", "compensation"]],
+  ["The shop offers free _____ on orders over €50.", "delivery", ["delivery", "payment", "sale", "service"]],
+  ["Thousands of people joined a _____ against the proposed law.", "demonstration", ["demonstration", "argument", "agreement", "treatment"]],
+  ["Nobody has given me a convincing _____ for the delay.", "explanation", ["explanation", "response", "complaint", "consideration"]],
+  ["The project was a complete _____ and was cancelled after six months.", "failure", ["failure", "success", "loss", "improvement"]],
+  ["There's been a big _____ in her English this year.", "improvement", ["improvement", "achievement", "success", "management"]],
+  ["The computer crash caused the _____ of several important files.", "loss", ["loss", "failure", "sale", "choice"]],
+  ["The restaurant has improved a lot under its new _____.", "management", ["management", "service", "treatment", "payment"]],
+  ["We haven't received your _____ yet.", "payment", ["payment", "sale", "delivery", "value"]],
+  ["I sent them an email last Monday but still haven't received a _____.", "response", ["response", "complaint", "service", "choice"]],
+  ["The owners have decided to put the house up for _____.", "sale", ["sale", "value", "payment", "delivery"]],
+  ["The food was good, but the _____ was extremely slow.", "service", ["service", "treatment", "management", "delivery"]],
+  ["The event was a great _____ and attracted more than 10,000 visitors.", "success", ["success", "achievement", "improvement", "failure"]],
+  ["I was trying to save money, but the _____ to buy the new phone was too strong.", "temptation", ["temptation", "choice", "consideration", "compensation"]],
+  ["Doctors are testing a new _____ for the condition.", "treatment", ["treatment", "service", "management", "improvement"]],
+  ["For €15, the meal was excellent _____ for money.", "value", ["value", "sale", "payment", "service"]],
+  ["The company received hundreds of _____ about its new customer-service system.", "complaints", ["complaints", "agreements", "achievements", "temptations"]],
+  ["Her rapid _____ surprised everyone; within months she was playing confidently.", "improvement", ["improvement", "failure", "loss", "payment"]],
+  ["There was no immediate _____ to my request.", "response", ["response", "agreement", "sale", "treatment"]],
+  ["We had no _____ but to cancel because of the weather.", "choice", ["choice", "value", "service", "temptation"]],
+  ["The company is now under different _____.", "management", ["management", "compensation", "delivery", "attachment"]],
+  ["The concert was such a _____ that they've already planned another one.", "success", ["success", "failure", "loss", "complaint"]],
+  ["This laptop is expensive, but it's still good _____ for money.", "value", ["value", "payment", "sale", "service"]],
+]);
+
+const intermediateWordFamilyEntries = [
+  { id: "luck", noun: "luck", positiveAdjective: "lucky", negativeAdjective: "unlucky", positiveAdverb: "luckily", negativeAdverb: "unluckily" },
+  { id: "fortune", noun: "fortune", positiveAdjective: "fortunate", negativeAdjective: "unfortunate", positiveAdverb: "fortunately", negativeAdverb: "unfortunately" },
+  { id: "comfort", noun: "comfort", positiveAdjective: "comfortable", negativeAdjective: "uncomfortable", positiveAdverb: "comfortably", negativeAdverb: "uncomfortably" },
+  { id: "patience", noun: "patience", positiveAdjective: "patient", negativeAdjective: "impatient", positiveAdverb: "patiently", negativeAdverb: "impatiently" },
+  { id: "care", noun: "care", positiveAdjective: "careful", negativeAdjective: "careless", positiveAdverb: "carefully", negativeAdverb: "carelessly" },
+];
+
+const wordFamilyForms = intermediateWordFamilyEntries.flatMap((family) => ([
+  [family.noun, "positive adjective", family.positiveAdjective],
+  [family.noun, "negative adjective", family.negativeAdjective],
+  [family.noun, "positive adverb", family.positiveAdverb],
+  [family.noun, "negative adverb", family.negativeAdverb],
+]));
+
+const intermediateWordFamilyWriteEntries = wordFamilyForms.map(([baseWord, form, answer], index) => {
+  const sentence = `${baseWord} → ${form}`;
+  return { id: `int-wordbuild-family-write-${String(index + 1).padStart(2, "0")}`, baseWord, sentence, cueText: sentence, answer, acceptedAnswers: [answer] };
+});
+
+const intermediateWordFamilyContextEntries = intermediateContextEntries("int-wordbuild-family-context", [
+  ["We were incredibly _____. We found the last two tickets.", "lucky", ["lucky", "unlucky", "luckily", "unluckily"]],
+  ["They were very _____. Their flight was cancelled twice.", "unlucky", ["unlucky", "lucky", "unluckily", "luckily"]],
+  ["_____, somebody found my wallet and handed it in.", "Luckily", ["Luckily", "Lucky", "Unluckily", "Unlucky"]],
+  ["_____, it started raining just as the outdoor concert began.", "Unluckily", ["Unluckily", "Unlucky", "Luckily", "Lucky"]],
+  ["We were _____ enough to find a hotel room at the last minute.", "fortunate", ["fortunate", "unfortunate", "fortunately", "unfortunately"]],
+  ["It was an _____ accident that nobody could have predicted.", "unfortunate", ["unfortunate", "fortunate", "unfortunately", "fortunately"]],
+  ["_____, nobody was seriously hurt in the crash.", "Fortunately", ["Fortunately", "Fortunate", "Unfortunately", "Unfortunate"]],
+  ["_____, the museum was closed when we arrived.", "Unfortunately", ["Unfortunately", "Unfortunate", "Fortunately", "Fortunate"]],
+  ["This chair is surprisingly _____, even after several hours.", "comfortable", ["comfortable", "uncomfortable", "comfortably", "uncomfortably"]],
+  ["The shoes looked great but were extremely ____.", "uncomfortable", ["uncomfortable", "comfortable", "uncomfortably", "comfortably"]],
+  ["Everyone was sitting _____ around the fire.", "comfortably", ["comfortably", "comfortable", "uncomfortably", "uncomfortable"]],
+  ["He shifted _____ in his seat throughout the interview.", "uncomfortably", ["uncomfortably", "uncomfortable", "comfortably", "comfortable"]],
+  ["You need to be _____ when you're teaching very young children.", "patient", ["patient", "impatient", "patiently", "impatiently"]],
+  ["He gets annoyed if he has to wait two minutes. He's extremely ____.", "impatient", ["impatient", "patient", "impatiently", "patiently"]],
+  ["She waited _____ while the receptionist dealt with another customer.", "patiently", ["patiently", "patient", "impatiently", "impatient"]],
+  ["He tapped his fingers _____ while he waited for the page to load.", "impatiently", ["impatiently", "impatient", "patiently", "patient"]],
+  ["Be very _____ when you carry those glasses.", "careful", ["careful", "careless", "carefully", "carelessly"]],
+  ["It was _____ of him to leave his passport on the train.", "careless", ["careless", "careful", "carelessly", "carefully"]],
+  ["Read the instructions _____ before you start.", "carefully", ["carefully", "careful", "carelessly", "careless"]],
+  ["He drove _____ and nearly caused an accident.", "carelessly", ["carelessly", "careless", "carefully", "careful"]],
+]);
+
+const intermediateWordBuildingFinalEntries = intermediateWriteEntries("int-wordbuild-final", [
+  ["Winning the national competition was an amazing _____. (achieve)", "achievement"],
+  ["After a long meeting, we finally reached an _____. (agree)", "agreement"],
+  ["They had a serious _____ about money. (argue)", "argument"],
+  ["Please open the email _____ to see the photograph. (attach)", "attachment"],
+  ["I had no _____ but to accept the offer. (choose)", "choice"],
+  ["Customers may be entitled to _____ if their flight is cancelled. (compensate)", "compensation"],
+  ["I'd like to make a formal _____ about the service. (complain)", "complaint"],
+  ["After a lot of _____, we've decided to stay where we are. (consider)", "consideration"],
+  ["The company offers free _____ on orders over €100. (deliver)", "delivery"],
+  ["There was a large _____ outside parliament yesterday. (demonstrate)", "demonstration"],
+  ["Can you give me an _____ for what happened? (explain)", "explanation"],
+  ["The experiment ended in complete _____. (fail)", "failure"],
+  ["There's been a noticeable _____ in his pronunciation. (improve)", "improvement"],
+  ["The fire resulted in the _____ of important documents. (lose)", "loss"],
+  ["The hotel is now under new _____. (manage)", "management"],
+  ["We require full _____ before the course begins. (pay)", "payment"],
+  ["I haven't received a _____ to my message yet. (respond)", "response"],
+  ["The apartment is currently for _____. (sell)", "sale"],
+  ["The food was excellent, but the _____ was very slow. (serve)", "service"],
+  ["The new product has been a huge _____. (succeed)", "success"],
+  ["I managed to resist the _____ to check my phone. (tempt)", "temptation"],
+  ["The patient responded well to the new _____. (treat)", "treatment"],
+  ["This restaurant offers excellent _____ for money. (value)", "value"],
+  ["We were very _____ to find somewhere to stay so late. (luck)", "lucky"],
+  ["He's been incredibly _____ with injuries this season. (luck)", "unlucky"],
+  ["_____, we managed to catch the last train home. (luck)", "luckily"],
+  ["_____, our luggage didn't arrive with us. (luck)", "unluckily"],
+  ["We were _____ that the weather stayed dry all weekend. (fortune)", "fortunate"],
+  ["It was an _____ mistake with serious consequences. (fortune)", "unfortunate"],
+  ["_____, the firefighters arrived very quickly. (fortune)", "fortunately"],
+  ["_____, we couldn't find another flight that evening. (fortune)", "unfortunately"],
+  ["The hotel room was clean and very _____. (comfort)", "comfortable"],
+  ["The seat became increasingly _____ after a few hours. (comfort)", "uncomfortable"],
+  ["The children were sleeping _____ in the back of the car. (comfort)", "comfortably"],
+  ["She smiled _____ when the interviewer asked about the mistake. (comfort)", "uncomfortably"],
+  ["The receptionist was extremely _____ while I searched for my booking number. (patience)", "patient"],
+  ["Young children can become _____ on long journeys. (patience)", "impatient"],
+  ["He explained the instructions _____ for the third time. (patience)", "patiently"],
+  ["She waited _____ for the computer to restart, complaining every few seconds that it was too slow. (patience)", "impatiently"],
+  ["You need to be extremely _____ with confidential information. (care)", "careful"],
+  ["Leaving the front door unlocked was very _____. (care)", "careless"],
+  ["Please check all the figures _____ before you send the report. (care)", "carefully"],
+  ["He copied the address _____ and sent the parcel to the wrong place. (care)", "carelessly"],
+  ["choose → noun", "choice"], ["lose → noun", "loss"], ["sell → noun", "sale"],
+  ["succeed → noun", "success"], ["respond → noun", "response"],
+  ["patience → negative adjective", "impatient"], ["care → negative adjective", "careless"],
+]);
+
+HUB_VOCAB_THEMES.push({
+  id: "b1-word-building", level: "b1", order: 13, title: "Word-building",
+  shortDescription: "Practise forming nouns, adjectives and adverbs from related words.",
+  textbookRef: "Intermediate Vocabulary Bank 13", accent: HUB_VOCAB_LEVEL_COLORS.b1, itemCount: 43,
+  entries: intermediateVerbNounEntries,
+  verbNounEntries: intermediateVerbNounEntries,
+  verbNounContextEntries: intermediateVerbNounContextEntries,
+  wordFamilyEntries: intermediateWordFamilyEntries,
+  wordFamilyWriteEntries: intermediateWordFamilyWriteEntries,
+  wordFamilyContextEntries: intermediateWordFamilyContextEntries,
+  wordBuildingFinalEntries: intermediateWordBuildingFinalEntries,
+  infoNotes: [
+    { title: "Making nouns from verbs", body: ["Some verbs form nouns with -ment: achieve → achievement, improve → improvement.", "Some form nouns with -ation / -ion: demonstrate → demonstration, compensate → compensation.", "Others change in less predictable ways: choose → choice, lose → loss, sell → sale.", "Learn the complete noun, not just the ending."] },
+    { title: "Adjectives from nouns", body: ["Different adjective endings are possible: luck → lucky, fortune → fortunate, comfort → comfortable.", "Nouns ending in -ence often form adjectives in -ent: patience → patient.", "Learn the complete form rather than guessing a suffix."] },
+    { title: "Negative adjectives", body: ["Some adjectives use a negative prefix: lucky → unlucky, patient → impatient.", "Some -ful adjectives form an opposite with -less: careful → careless.", "The correct pattern depends on the word."] },
+    { title: "Adverbs", body: ["Adverbs are often formed from the adjective with -ly.", "lucky → luckily", "patient → patiently", "careful → carefully", "Spelling can change, so learn the complete form."] },
+  ],
+  activities: [
+    { id: "verb-noun-flashcards", type: "flashcards", dataKey: "verbNounEntries", title: "Verb → noun flashcards", shortDescription: "Recall the noun formed from each verb.", prompt: "Look at the verb and say the noun before you flip.", itemLimit: 15 },
+    { id: "verb-nouns-context", type: "sentence-gap-choice", dataKey: "verbNounContextEntries", title: "Which noun fits?", shortDescription: "Choose the derived noun that completes each sentence.", prompt: "Read the sentence and choose the noun that fits.", question: "Which noun fits?", itemLimit: 12 },
+    { id: "complete-word-family", type: "sentence-gap-type-answer", dataKey: "wordFamilyWriteEntries", title: "Complete the word family", shortDescription: "Form positive and negative adjectives and adverbs from the base noun.", prompt: "Use the base noun to make the form requested.", question: "Which form can you build?", answerLabel: "New word", answerPlaceholder: "Type the word", itemLimit: 12 },
+    { id: "word-family-context", type: "sentence-gap-choice", dataKey: "wordFamilyContextEntries", title: "Which form fits?", shortDescription: "Choose the correct adjective or adverb for each sentence.", prompt: "Use the base word family and choose the form that fits the grammar and meaning.", question: "Which form fits?", itemLimit: 12 },
+    { id: "word-building-write", type: "sentence-gap-type-answer", dataKey: "wordBuildingFinalEntries", title: "Write the correct form", shortDescription: "Use the base word to form the noun, adjective or adverb required by the sentence.", prompt: "Read the sentence and use the word in brackets to form the correct answer.", answerLabel: "Correct form", answerPlaceholder: "Type the word", itemLimit: 15 },
   ],
 });
 

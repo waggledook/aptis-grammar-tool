@@ -248,7 +248,7 @@ function createCheckState(items) {
   return Object.fromEntries(items.map(([id]) => [id, false]));
 }
 
-function PhotoRehearsal({ topic, rehearsal, onComplete, stepIndex, setStepIndex, stepCount }) {
+function PhotoRehearsal({ topic, rehearsal, onComplete, onOpenReference, stepIndex, setStepIndex, stepCount }) {
   const task = topic.parts[rehearsal.part].tasks[rehearsal.taskIndex];
   const [questionIndex, setQuestionIndex] = useState(rehearsal.initialQuestionIndex);
   const [secondsLeft, setSecondsLeft] = useState(45);
@@ -301,6 +301,7 @@ function PhotoRehearsal({ topic, rehearsal, onComplete, stepIndex, setStepIndex,
             <summary>Show language support</summary>
             <p><strong>Useful phrases:</strong> {rehearsal.usefulPhrases}</p>
             <p><strong>Develop:</strong> {rehearsal.developmentPhrases}</p>
+            <button type="button" onClick={onOpenReference}>Open the full language guide →</button>
           </details>
           <div className="prep-timer-actions">
             <button className="workshop-primary" type="button" onClick={() => setRunning((value) => !value)}>
@@ -354,7 +355,10 @@ export function WorkshopPreparation({ topic, user, config }) {
           <h1>A short language warm-up</h1>
           <p>Activate useful vocabulary, build a longer answer, then try one short spoken rehearsal. Allow about 15 minutes.</p>
         </div>
-        <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}`)}>Change mode</button>
+        <div className="workshop-session-header-actions">
+          <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/reference`)}>Language guide</button>
+          <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}`)}>Change mode</button>
+        </div>
       </header>
 
       <section className="prep-progress-summary" aria-label={`${completedSteps.length} of ${config.steps.length} preparation steps complete`}>
@@ -381,7 +385,7 @@ export function WorkshopPreparation({ topic, user, config }) {
       {currentStep.id === "phrases" ? <PhraseActivation cards={config.phraseCards} copy={config.copy} ratings={ratings} setRatings={setRatings} onComplete={() => completeStep("phrases")} stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={config.steps.length} /> : null}
       {currentStep.id === "context" ? <ContextChoice questions={config.contextQuestions} answers={contextAnswers} setAnswers={setContextAnswers} onComplete={() => completeStep("context")} stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={config.steps.length} /> : null}
       {currentStep.id === "builder" ? <AnswerBuilder groups={config.answerBuilder} copy={config.copy} selections={builderSelections} setSelections={setBuilderSelections} onComplete={() => completeStep("builder")} stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={config.steps.length} /> : null}
-      {currentStep.id === "rehearsal" ? <PhotoRehearsal topic={topic} rehearsal={config.rehearsal} onComplete={() => completeStep("rehearsal")} stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={config.steps.length} /> : null}
+      {currentStep.id === "rehearsal" ? <PhotoRehearsal topic={topic} rehearsal={config.rehearsal} onComplete={() => completeStep("rehearsal")} onOpenReference={() => navigate(`/speaking-workshops/${topic.id}/reference`)} stepIndex={stepIndex} setStepIndex={setStepIndex} stepCount={config.steps.length} /> : null}
     </div>
   );
 }

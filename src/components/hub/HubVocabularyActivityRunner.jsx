@@ -497,7 +497,9 @@ function FlashcardMode({
                 ? (
                   <>
                     {renderVisualPrompt(flagMode ? { ...entry, flag4x3: entry.flag4x3 } : entry)}
-                    {entry.imagePrompt ? <strong className="hub-vocab-image-gap-prompt">{entry.imagePrompt}</strong> : null}
+                    {entry.imagePrompt || entry.cueText ? (
+                      <strong className="hub-vocab-image-gap-prompt">{entry.imagePrompt || entry.cueText}</strong>
+                    ) : null}
                   </>
                 )
                 : entry.flashcardPrompt
@@ -535,6 +537,65 @@ function FlashcardMode({
         </button>
         <button type="button" onClick={() => move(1)}>Next</button>
         <button type="button" onClick={reshuffle}>Shuffle</button>
+      </div>
+    </section>
+  );
+}
+
+function NumberedDiagramStudyMode({
+  theme,
+  activity,
+  items,
+  coverage = null,
+  onItemSeen,
+  onComplete,
+}) {
+  const [isComplete, setIsComplete] = useState(false);
+  const orderedItems = useMemo(
+    () => [...items].sort((left, right) => Number(left.number) - Number(right.number)),
+    [items]
+  );
+  const sceneImage = activity?.sceneImage || theme?.sceneImage || orderedItems[0]?.image || "";
+
+  useEffect(() => {
+    orderedItems.forEach((entry) => {
+      if (entry?.id) onItemSeen?.(entry.id);
+    });
+  }, [onItemSeen, orderedItems]);
+
+  if (!sceneImage || !orderedItems.length) {
+    return <EmptyActivityCard message="Add a diagram image and numbered entries to use this activity." />;
+  }
+
+  if (isComplete) {
+    return (
+      <ActivityCompleteCard
+        title="Diagram study complete"
+        total={orderedItems.length}
+        mistakes={[]}
+        completedItemIds={orderedItems.map((entry) => entry.id)}
+        coverage={coverage}
+        onRestart={() => setIsComplete(false)}
+        onReviewMistakes={null}
+        onComplete={onComplete}
+      />
+    );
+  }
+
+  return (
+    <section className="hub-vocab-practice-card hub-vocab-numbered-diagram-card">
+      <div className="hub-vocab-numbered-diagram-layout">
+        <img className="hub-vocab-numbered-diagram-image" src={sceneImage} alt="Numbered house diagram" draggable="false" />
+        <ol className="hub-vocab-numbered-diagram-key">
+          {orderedItems.map((entry) => (
+            <li key={entry.id} value={entry.number}>
+              <strong>{entry.term}</strong>
+            </li>
+          ))}
+        </ol>
+      </div>
+      <div className="hub-vocab-runner-actions">
+        <button type="button" onClick={() => setIsComplete(true)}>I've studied all {orderedItems.length} words</button>
       </div>
     </section>
   );
@@ -2513,6 +2574,9 @@ function renderActivity(theme, activity, handlers = {}) {
   };
   const activityKey = `${theme.id}:${activity.id}:${items.length}`;
   if (activity.type === "flashcards") return <FlashcardMode key={activityKey} activity={activity} items={items} {...props} />;
+  if (activity.type === "numbered-diagram-study") {
+    return <NumberedDiagramStudyMode key={activityKey} theme={theme} activity={activity} items={items} {...props} />;
+  }
   if (activity.type === "flag-flashcards") return <FlashcardMode key={activityKey} activity={activity} items={items} flagMode {...props} />;
   if (activity.type === "phrase-flashcards") return <FlashcardMode key={activityKey} activity={activity} items={items} phraseMode {...props} />;
   if (activity.type === "matching" || activity.type === "flag-match") {
@@ -3381,6 +3445,42 @@ export default function HubVocabularyActivityRunner() {
           width: auto;
         }
 
+        .hub-vocab-numbered-diagram-layout {
+          align-items: start;
+          display: grid;
+          gap: 1.25rem;
+          grid-template-columns: minmax(0, 1.65fr) minmax(12rem, 0.75fr);
+        }
+
+        .hub-vocab-numbered-diagram-image {
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(238, 244, 255, 0.14);
+          border-radius: 18px;
+          display: block;
+          max-height: 620px;
+          object-fit: contain;
+          width: 100%;
+        }
+
+        .hub-vocab-numbered-diagram-key {
+          display: grid;
+          gap: 0.42rem;
+          margin: 0;
+          padding-left: 2.15rem;
+        }
+
+        .hub-vocab-numbered-diagram-key li {
+          background: rgba(255, 255, 255, 0.055);
+          border: 1px solid rgba(238, 244, 255, 0.1);
+          border-radius: 10px;
+          color: #f6d26b;
+          padding: 0.48rem 0.65rem;
+        }
+
+        .hub-vocab-numbered-diagram-key strong {
+          color: #fff;
+        }
+
         .hub-vocab-hotspot-card {
           overflow: hidden;
         }
@@ -4012,6 +4112,16 @@ export default function HubVocabularyActivityRunner() {
           background: rgba(44, 73, 128, 0.09);
         }
 
+        :root[data-theme="light"] .hub-vocab-numbered-diagram-image,
+        :root[data-theme="light"] .hub-vocab-numbered-diagram-key li {
+          background: rgba(44, 73, 128, 0.045);
+          border-color: rgba(44, 73, 128, 0.14);
+        }
+
+        :root[data-theme="light"] .hub-vocab-numbered-diagram-key strong {
+          color: #16233d;
+        }
+
         :root[data-theme="light"] .hub-vocab-sequence-actions button {
           background: #eef3ff;
           border-color: rgba(44, 73, 128, 0.16);
@@ -4076,6 +4186,10 @@ export default function HubVocabularyActivityRunner() {
           }
 
           .hub-vocab-hotspot-layout {
+            grid-template-columns: 1fr;
+          }
+
+          .hub-vocab-numbered-diagram-layout {
             grid-template-columns: 1fr;
           }
 
