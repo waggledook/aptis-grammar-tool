@@ -425,6 +425,36 @@ export async function redeemSpeakingWorkshopAccess(code) {
   return result.data;
 }
 
+export async function createSpeakingWorkshopSession(payload = {}) {
+  const callable = httpsCallable(functionsRegion, "createSpeakingWorkshopSession");
+  const result = await callable(payload);
+  return result.data;
+}
+
+export async function listSpeakingWorkshopSessions() {
+  const callable = httpsCallable(functionsRegion, "listSpeakingWorkshopSessions");
+  const result = await callable({});
+  return result.data;
+}
+
+export async function joinSpeakingWorkshopSession(code) {
+  const callable = httpsCallable(functionsRegion, "joinSpeakingWorkshopSession");
+  const result = await callable({ code: String(code || "") });
+  return result.data;
+}
+
+export async function getSpeakingWorkshopAccess() {
+  const callable = httpsCallable(functionsRegion, "getSpeakingWorkshopAccess");
+  const result = await callable({});
+  return result.data;
+}
+
+export async function updateSpeakingWorkshopSession(sessionId, action) {
+  const callable = httpsCallable(functionsRegion, "updateSpeakingWorkshopSession");
+  const result = await callable({ sessionId, action });
+  return result.data;
+}
+
 export async function requestAptisSpeakingPart1Feedback(payload) {
   const generateAptisSpeakingPart1Feedback = httpsCallable(
     functionsRegion,

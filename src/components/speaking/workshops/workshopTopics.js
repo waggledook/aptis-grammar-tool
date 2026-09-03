@@ -107,7 +107,46 @@ const TOPIC_META = {
     summary: "Journeys, transport choices, travel experiences and getting around.",
     accent: "sky",
   },
+  "home-neighbourhood": {
+    title: "Home & Neighbourhood",
+    summary: "Homes, local places, communities, facilities and changes in the area.",
+    accent: "mint",
+  },
+  "technology-communication": {
+    title: "Technology & Communication",
+    summary: "Devices, online communication, digital habits and technological change.",
+    accent: "violet",
+  },
+  "food-eating": {
+    title: "Food & Eating",
+    summary: "Meals, cooking, restaurants, food choices and eating habits.",
+    accent: "amber",
+  },
+  "education-learning": {
+    title: "Education & Learning",
+    summary: "Schools, study methods, learning experiences and educational choices.",
+    accent: "sky",
+  },
+  "sport-entertainment": {
+    title: "Sport & Entertainment",
+    summary: "Exercise, competitions, films, music and ways of spending free time.",
+    accent: "coral",
+  },
+  "work-careers": {
+    title: "Work & Careers",
+    summary: "Jobs, workplaces, professional skills, ambitions and career decisions.",
+    accent: "violet",
+  },
 };
+
+export const SPEAKING_WORKSHOP_PROGRAMME_START = "2026-09-04";
+
+export const SPEAKING_WORKSHOP_PROGRAMME = [
+  { week: 1, topicIds: ["relationships-family", "travel-transport"] },
+  { week: 2, topicIds: ["home-neighbourhood", "technology-communication"] },
+  { week: 3, topicIds: ["food-eating", "education-learning"] },
+  { week: 4, topicIds: ["sport-entertainment", "work-careers"] },
+];
 
 function cleanInline(value = "") {
   return value.replace(/\*\*/g, "").replace(/\*/g, "").trim();
@@ -198,6 +237,18 @@ export const SPEAKING_WORKSHOP_TOPICS = [
   parseTopicSource("relationships-family", relationshipsFamilySource),
   parseTopicSource("travel-transport", travelTransportSource),
 ];
+
+const READY_TOPIC_IDS = new Set(SPEAKING_WORKSHOP_TOPICS.map((topic) => topic.id));
+
+export const SPEAKING_WORKSHOP_TOPIC_CATALOG = SPEAKING_WORKSHOP_PROGRAMME.flatMap((programmeWeek) => (
+  programmeWeek.topicIds.map((id, index) => ({
+    id,
+    ...TOPIC_META[id],
+    week: programmeWeek.week,
+    hour: index + 1,
+    ready: READY_TOPIC_IDS.has(id),
+  }))
+));
 
 export function getSpeakingWorkshopTopic(topicId) {
   return SPEAKING_WORKSHOP_TOPICS.find((topic) => topic.id === topicId) || null;

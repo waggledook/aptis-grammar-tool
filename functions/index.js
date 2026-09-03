@@ -17,11 +17,70 @@ const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SPEAKING_WORKSHOP_ACCESS_CODE_HASH = String(
   process.env.SPEAKING_WORKSHOP_ACCESS_CODE_HASH || ""
 ).trim().toLowerCase();
+const SPEAKING_WORKSHOP_REVIEW_DAYS = 14;
+const SPEAKING_WORKSHOP_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const DEFAULT_ASSESSMENT_FEEDBACK_MODEL = "gpt-5.6-luna";
 const firestore = admin.firestore();
 
 function normalizeWorkshopAccessCode(value) {
   return String(value || "").trim().toUpperCase();
+}
+
+function speakingWorkshopCodeHash(value) {
+  return nodeCrypto
+    .createHash("sha256")
+    .update(normalizeWorkshopAccessCode(value))
+    .digest("hex");
+}
+
+function createSpeakingWorkshopCode() {
+  const bytes = nodeCrypto.randomBytes(6);
+  return Array.from(bytes, (byte) => (
+    SPEAKING_WORKSHOP_CODE_ALPHABET[byte % SPEAKING_WORKSHOP_CODE_ALPHABET.length]
+  )).join("");
+}
+
+function speakingWorkshopDate(value) {
+  if (!value) return null;
+  if (typeof value.toDate === "function") return value.toDate();
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+}
+
+function serializeSpeakingWorkshopSession(snap, includeCode = false) {
+  const data = snap.data() || {};
+  const result = {
+    id: snap.id,
+    label: data.label || "Speaking workshop",
+    topicIds: Array.isArray(data.topicIds) ? data.topicIds : [],
+    phase: data.phase || "preparation",
+    registrationOpen: data.registrationOpen !== false,
+    attendeeCount: Number(data.attendeeCount || 0),
+    createdAt: speakingWorkshopDate(data.createdAt)?.toISOString() || null,
+    startedAt: speakingWorkshopDate(data.startedAt)?.toISOString() || null,
+    endedAt: speakingWorkshopDate(data.endedAt)?.toISOString() || null,
+    reviewUntil: speakingWorkshopDate(data.reviewUntil)?.toISOString() || null,
+  };
+  if (includeCode) result.joinCode = data.joinCode || "";
+  return result;
+}
+
+async function requireSpeakingWorkshopStaff(context) {
+  if (!context.auth?.uid) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "Sign in to manage speaking workshops."
+    );
+  }
+  const profile = await firestore.doc(`users/${context.auth.uid}`).get();
+  const role = profile.data()?.role || "student";
+  if (role !== "teacher" && role !== "admin") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Teacher access is required."
+    );
+  }
+  return role;
 }
 
 exports.redeemSpeakingWorkshopAccess = functions
@@ -76,6 +135,283 @@ exports.redeemSpeakingWorkshopAccess = functions
     }, {merge: true});
 
     return {ok: true, access: {...access, redeemedAt: new Date().toISOString()}};
+  });
+
+exports.createSpeakingWorkshopSession = functions
+  .runWith({maxInstances: 10})
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    await requireSpeakingWorkshopStaff(context);
+    const label = String(data?.label || "Speaking workshop").trim().slice(0, 80);
+    const topicIds = [...new Set(
+      (Array.isArray(data?.topicIds) ? data.topicIds : [])
+        .map((value) => String(value || "").trim().toLowerCase())
+        .filter((value) => /^[a-z0-9-]{3,80}$/.test(value))
+    )].slice(0, 12);
+    if (!topicIds.length) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Choose at least one workshop topic."
+      );
+    }
+
+    let joinCode = "";
+    for (let attempt = 0; attempt < 8; attempt += 1) {
+      const candidate = createSpeakingWorkshopCode();
+      const existing = await firestore.collection("speakingWorkshopSessions")
+        .where("joinCodeHash", "==", speakingWorkshopCodeHash(candidate))
+        .limit(1)
+        .get();
+      if (existing.empty) {
+        joinCode = candidate;
+        break;
+      }
+    }
+    if (!joinCode) {
+      throw new functions.https.HttpsError(
+        "resource-exhausted",
+        "Could not create a unique workshop code. Try again."
+      );
+    }
+
+    const sessionRef = firestore.collection("speakingWorkshopSessions").doc();
+    await sessionRef.set({
+      label: label || "Speaking workshop",
+      topicIds,
+      phase: "preparation",
+      registrationOpen: true,
+      attendeeCount: 0,
+      joinCode,
+      joinCodeHash: speakingWorkshopCodeHash(joinCode),
+      createdByUid: context.auth.uid,
+      createdByEmail: context.auth.token?.email || null,
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    const created = await sessionRef.get();
+    return {ok: true, session: serializeSpeakingWorkshopSession(created, true)};
+  });
+
+exports.listSpeakingWorkshopSessions = functions
+  .runWith({maxInstances: 10})
+  .region("europe-west1")
+  .https.onCall(async (_data, context) => {
+    await requireSpeakingWorkshopStaff(context);
+    const sessions = await firestore.collection("speakingWorkshopSessions")
+      .orderBy("createdAt", "desc")
+      .limit(30)
+      .get();
+    const attendeeSnaps = await Promise.all(sessions.docs.map((snap) => (
+      snap.ref.collection("attendees").orderBy("joinedAt", "asc").limit(100).get()
+    )));
+    return {
+      sessions: sessions.docs.map((snap, index) => ({
+        ...serializeSpeakingWorkshopSession(snap, true),
+        attendees: attendeeSnaps[index].docs.map((attendeeSnap) => {
+          const attendee = attendeeSnap.data() || {};
+          return {
+            uid: attendeeSnap.id,
+            name: attendee.name || "",
+            email: attendee.email || "",
+            joinedAt: speakingWorkshopDate(attendee.joinedAt)?.toISOString() || null,
+          };
+        }),
+      })),
+    };
+  });
+
+exports.joinSpeakingWorkshopSession = functions
+  .runWith({maxInstances: 20})
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth?.uid) {
+      throw new functions.https.HttpsError(
+        "unauthenticated",
+        "Sign in before joining a speaking workshop."
+      );
+    }
+    const joinCode = normalizeWorkshopAccessCode(data?.code);
+    if (!/^[A-Z2-9]{6}$/.test(joinCode)) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Enter a valid six-character workshop code."
+      );
+    }
+    const matches = await firestore.collection("speakingWorkshopSessions")
+      .where("joinCodeHash", "==", speakingWorkshopCodeHash(joinCode))
+      .limit(1)
+      .get();
+    if (matches.empty) {
+      throw new functions.https.HttpsError(
+        "not-found",
+        "That workshop code was not found."
+      );
+    }
+
+    const sessionRef = matches.docs[0].ref;
+    const attendeeRef = sessionRef.collection("attendees").doc(context.auth.uid);
+    const membershipRef = firestore
+      .doc(`users/${context.auth.uid}`)
+      .collection("speakingWorkshopMemberships")
+      .doc(sessionRef.id);
+    await firestore.runTransaction(async (transaction) => {
+      const [sessionSnap, attendeeSnap] = await Promise.all([
+        transaction.get(sessionRef),
+        transaction.get(attendeeRef),
+      ]);
+      const session = sessionSnap.data() || {};
+      if (!sessionSnap.exists || session.registrationOpen === false ||
+          session.phase === "review") {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          "Registration for this workshop is closed."
+        );
+      }
+      const attendee = {
+        uid: context.auth.uid,
+        email: context.auth.token?.email || null,
+        name: context.auth.token?.name || null,
+        joinedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+      transaction.set(attendeeRef, attendee, {merge: true});
+      transaction.set(membershipRef, {
+        sessionId: sessionRef.id,
+        joinedAt: admin.firestore.FieldValue.serverTimestamp(),
+      }, {merge: true});
+      if (!attendeeSnap.exists) {
+        transaction.update(sessionRef, {
+          attendeeCount: admin.firestore.FieldValue.increment(1),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+    });
+    const joined = await sessionRef.get();
+    return {ok: true, session: serializeSpeakingWorkshopSession(joined)};
+  });
+
+exports.getSpeakingWorkshopAccess = functions
+  .runWith({maxInstances: 20})
+  .region("europe-west1")
+  .https.onCall(async (_data, context) => {
+    if (!context.auth?.uid) {
+      throw new functions.https.HttpsError(
+        "unauthenticated",
+        "Sign in to view speaking workshop access."
+      );
+    }
+    const profile = await firestore.doc(`users/${context.auth.uid}`).get();
+    const role = profile.data()?.role || "student";
+    if (role === "teacher" || role === "admin") {
+      return {canManage: true, sessions: [], topicAccess: {}};
+    }
+
+    const membershipSnap = await firestore
+      .doc(`users/${context.auth.uid}`)
+      .collection("speakingWorkshopMemberships")
+      .limit(50)
+      .get();
+    if (membershipSnap.empty) {
+      return {canManage: false, sessions: [], topicAccess: {}};
+    }
+    const refs = membershipSnap.docs.map((snap) => (
+      firestore.collection("speakingWorkshopSessions").doc(snap.id)
+    ));
+    const sessionSnaps = await firestore.getAll(...refs);
+    const now = new Date();
+    const activeSessions = sessionSnaps.filter((snap) => {
+      if (!snap.exists) return false;
+      const session = snap.data() || {};
+      if (session.phase !== "review") return true;
+      const reviewUntil = speakingWorkshopDate(session.reviewUntil);
+      return reviewUntil && reviewUntil > now;
+    });
+    const topicAccess = {};
+    activeSessions.forEach((snap) => {
+      const session = snap.data() || {};
+      const live = session.phase === "live" || session.phase === "review";
+      (Array.isArray(session.topicIds) ? session.topicIds : []).forEach((topicId) => {
+        const current = topicAccess[topicId] || {
+          preparation: false,
+          live: false,
+          reviewUntil: null,
+          sessionIds: [],
+        };
+        current.preparation = true;
+        current.live = current.live || live;
+        current.sessionIds.push(snap.id);
+        const deadline = speakingWorkshopDate(session.reviewUntil);
+        if (deadline && (!current.reviewUntil ||
+            deadline > new Date(current.reviewUntil))) {
+          current.reviewUntil = deadline.toISOString();
+        }
+        topicAccess[topicId] = current;
+      });
+    });
+    return {
+      canManage: false,
+      sessions: activeSessions.map((snap) => (
+        serializeSpeakingWorkshopSession(snap)
+      )),
+      topicAccess,
+    };
+  });
+
+exports.updateSpeakingWorkshopSession = functions
+  .runWith({maxInstances: 10})
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    await requireSpeakingWorkshopStaff(context);
+    const sessionId = String(data?.sessionId || "").trim();
+    const action = String(data?.action || "").trim().toLowerCase();
+    if (!/^[A-Za-z0-9]{10,40}$/.test(sessionId) ||
+        !["start", "end"].includes(action)) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Choose a valid workshop session and action."
+      );
+    }
+    const sessionRef = firestore.collection("speakingWorkshopSessions")
+      .doc(sessionId);
+    await firestore.runTransaction(async (transaction) => {
+      const snap = await transaction.get(sessionRef);
+      if (!snap.exists) {
+        throw new functions.https.HttpsError("not-found", "Workshop not found.");
+      }
+      const session = snap.data() || {};
+      if (action === "start") {
+        if (session.phase !== "preparation") {
+          throw new functions.https.HttpsError(
+            "failed-precondition",
+            "Only a preparation-stage workshop can be started."
+          );
+        }
+        transaction.update(sessionRef, {
+          phase: "live",
+          startedAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+        return;
+      }
+      if (session.phase !== "live") {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          "Only a live workshop can be ended."
+        );
+      }
+      const endedAt = new Date();
+      const reviewUntil = new Date(
+        endedAt.getTime() + SPEAKING_WORKSHOP_REVIEW_DAYS * 86400000
+      );
+      transaction.update(sessionRef, {
+        phase: "review",
+        registrationOpen: false,
+        endedAt: admin.firestore.Timestamp.fromDate(endedAt),
+        reviewUntil: admin.firestore.Timestamp.fromDate(reviewUntil),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+    const updated = await sessionRef.get();
+    return {ok: true, session: serializeSpeakingWorkshopSession(updated, true)};
   });
 
 exports.aggregateActivityLog = functions
