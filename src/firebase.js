@@ -2005,6 +2005,30 @@ export async function logAptisWritingLiveExported(details = {}) {
   return logActivity("aptis_writing_live_exported", details);
 }
 
+export async function logAptisReadingLiveHosted(details = {}) {
+  return logActivity("aptis_reading_live_hosted", details);
+}
+
+export async function logAptisReadingLiveJoined(details = {}) {
+  return logActivity("aptis_reading_live_joined", details);
+}
+
+export async function logAptisReadingLiveStarted(details = {}) {
+  return logActivity("aptis_reading_live_started", details);
+}
+
+export async function logAptisReadingLiveTaskCompleted(details = {}) {
+  return logActivity("aptis_reading_live_task_completed", details);
+}
+
+export async function logAptisReadingLiveReviewStarted(details = {}) {
+  return logActivity("aptis_reading_live_review_started", details);
+}
+
+export async function logAptisReadingLiveFinished(details = {}) {
+  return logActivity("aptis_reading_live_finished", details);
+}
+
 // ─── ACTIVITY HELPERS ────────────────────────────────────────────────────
 
 /**

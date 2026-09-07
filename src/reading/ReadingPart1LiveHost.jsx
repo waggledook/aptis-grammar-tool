@@ -5,7 +5,12 @@ import { QRCodeSVG } from "qrcode.react";
 import { useParams } from "react-router-dom";
 import { setLiveGameState, setLiveGameStatus } from "../api/liveGames.js";
 import Seo from "../components/common/Seo.jsx";
-import { rtdb } from "../firebase.js";
+import {
+  logAptisReadingLiveFinished,
+  logAptisReadingLiveReviewStarted,
+  logAptisReadingLiveStarted,
+  rtdb,
+} from "../firebase.js";
 import { getSitePath } from "../siteConfig.js";
 import {
   APTIS_READING_PART1_LIVE_GAME_TYPE,
@@ -43,17 +48,33 @@ export default function ReadingPart1LiveHost({ user }) {
   const isHost = Boolean(user && game?.ownerUid === user.uid);
   const joinPath = getSitePath("/live/join");
   const joinUrl = typeof window === "undefined" ? "" : `${window.location.origin}${joinPath}?pin=${encodeURIComponent(game?.pin || "")}`;
+  const activityDetails = {
+    gameId,
+    pin: game?.pin || null,
+    activityType: "reading-task",
+    activityTitle: game?.title || `Aptis Reading Part 1 · ${task?.title || "Live session"}`,
+    part: 1,
+    taskId: task?.id || null,
+    taskIds: task ? [task.id] : [],
+    taskCount: task ? 1 : 0,
+  };
 
   async function beginTask() {
     if (!players.length) return;
     await setLiveGameStatus(gameId, "in-progress");
     await setLiveGameState(gameId, { phase: "task", reviewIndex: 0 });
+    await logAptisReadingLiveStarted({ ...activityDetails, playerCount: players.length });
   }
 
   async function beginReview() {
     const outstanding = players.length - submissions.length;
     if (outstanding > 0 && !window.confirm(`${outstanding} student(s) have not submitted. Begin the review anyway?`)) return;
     await setLiveGameState(gameId, { phase: "review", reviewIndex: 0 });
+    await logAptisReadingLiveReviewStarted({
+      ...activityDetails,
+      playerCount: players.length,
+      submissionCount: submissions.length,
+    });
   }
 
   async function nextReview() {
@@ -63,6 +84,13 @@ export default function ReadingPart1LiveHost({ user }) {
     }
     await setLiveGameStatus(gameId, "finished");
     await setLiveGameState(gameId, { phase: "finished" });
+    await logAptisReadingLiveFinished({
+      ...activityDetails,
+      playerCount: players.length,
+      submissionCount: submissions.length,
+      completedTaskCount: submissions.length,
+      possibleTaskCount: players.length,
+    });
   }
 
   async function copyJoinLink() {

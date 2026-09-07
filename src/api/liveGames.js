@@ -17,6 +17,9 @@
 
 import {
   auth,
+  logAptisReadingLiveHosted,
+  logAptisReadingLiveJoined,
+  logAptisReadingLiveTaskCompleted,
   logAptisWritingLiveHosted,
   logAptisWritingLiveJoined,
   rtdb,
@@ -98,6 +101,21 @@ function getAptisWritingLiveActivityDetails(game, gameId) {
     activityTitle: game.title || `Aptis Writing Part ${game.part || "?"}`,
     part: Number(game.part) || null,
     taskId: game.taskId || null,
+  };
+}
+
+function getAptisReadingLiveActivityDetails(game, gameId) {
+  const part = game.type === APTIS_READING_PART1_LIVE_GAME_TYPE ? 1 : 2;
+  const taskIds = game.taskIds || (game.taskId ? [game.taskId] : []);
+  return {
+    gameId,
+    pin: game.pin || null,
+    activityType: "reading-task",
+    activityTitle: game.title || `Aptis Reading Part ${part}`,
+    part,
+    taskId: game.taskId || taskIds[0] || null,
+    taskIds,
+    taskCount: taskIds.length,
   };
 }
 
@@ -224,6 +242,9 @@ export async function joinLiveGameByPin(pin) {
   if (!existingPlayer && [APTIS_WRITING_LIVE_GAME_TYPE, REGISTER_SURGERY_LIVE_GAME_TYPE, PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE].includes(game.type)) {
     await logAptisWritingLiveJoined(getAptisWritingLiveActivityDetails(game, game.gameId));
   }
+  if (!existingPlayer && [APTIS_READING_PART1_LIVE_GAME_TYPE, READING_PART2_LIVE_GAME_TYPE].includes(game.type)) {
+    await logAptisReadingLiveJoined(getAptisReadingLiveActivityDetails(game, game.gameId));
+  }
 
   return { gameId: game.gameId, type: game.type || "grammar" };
 }
@@ -279,15 +300,26 @@ export async function createReadingPart1LiveGame({ taskId, title }) {
   const gameRef = push(ref(rtdb, "liveGames"));
   const gameId = gameRef.key;
   const pin = generatePin();
+  const activityTitle = title || `Aptis Reading Part 1 · ${task.title}`;
   await set(gameRef, {
     ownerUid: user.uid,
     pin,
-    title: title || `Aptis Reading Part 1 · ${task.title}`,
+    title: activityTitle,
     type: APTIS_READING_PART1_LIVE_GAME_TYPE,
     taskId: task.id,
     status: "lobby",
     createdAt: Date.now(),
     state: { phase: "lobby", reviewIndex: 0 },
+  });
+  await logAptisReadingLiveHosted({
+    gameId,
+    pin,
+    activityType: "reading-task",
+    activityTitle,
+    part: 1,
+    taskId: task.id,
+    taskIds: [task.id],
+    taskCount: 1,
   });
   return { gameId, pin };
 }
@@ -319,12 +351,13 @@ export async function createReadingPart2LiveGame({ taskId, taskIds = [], title }
   const gameRef = push(ref(rtdb, "liveGames"));
   const gameId = gameRef.key;
   const pin = generatePin();
+  const activityTitle = title || (tasks.length === 1
+    ? `Aptis Reading Part 2 · ${tasks[0].subtitle || tasks[0].title}`
+    : `Aptis Reading Part 2 · ${tasks.length}-task session`);
   await set(gameRef, {
     ownerUid: user.uid,
     pin,
-    title: title || (tasks.length === 1
-      ? `Aptis Reading Part 2 · ${tasks[0].subtitle || tasks[0].title}`
-      : `Aptis Reading Part 2 · ${tasks.length}-task session`),
+    title: activityTitle,
     type: READING_PART2_LIVE_GAME_TYPE,
     taskId: tasks[0].id,
     taskIds: tasks.map((task) => task.id),
@@ -333,6 +366,16 @@ export async function createReadingPart2LiveGame({ taskId, taskIds = [], title }
     status: "lobby",
     createdAt: Date.now(),
     state: { phase: "lobby", taskIndex: 0, reviewIndex: 0 },
+  });
+  await logAptisReadingLiveHosted({
+    gameId,
+    pin,
+    activityType: "reading-task",
+    activityTitle,
+    part: 2,
+    taskId: tasks[0].id,
+    taskIds: tasks.map((task) => task.id),
+    taskCount: tasks.length,
   });
   return { gameId, pin };
 }
@@ -821,11 +864,28 @@ export async function submitReadingPart1LiveAnswers({ gameId, taskId, answers })
     safeAnswers[gap.id] = answer;
   }
 
-  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/readingPart1Submission`), {
+  const submissionRef = ref(rtdb, `liveGames/${gameId}/players/${user.uid}/readingPart1Submission`);
+  const existingSubmission = await get(submissionRef);
+  await set(submissionRef, {
     taskId: task.id,
     answers: safeAnswers,
     submittedAt: Date.now(),
   });
+  if (!existingSubmission.exists()) {
+    const gameSnapshot = await get(ref(rtdb, `liveGames/${gameId}`));
+    const score = answerableGaps.filter((gap) => safeAnswers[gap.id] === gap.answer).length;
+    await logAptisReadingLiveTaskCompleted({
+      ...getAptisReadingLiveActivityDetails(gameSnapshot.val() || {
+        type: APTIS_READING_PART1_LIVE_GAME_TYPE,
+        taskId: task.id,
+      }, gameId),
+      completedTaskId: task.id,
+      completedTaskTitle: task.title,
+      answeredCount: answerableGaps.length,
+      score,
+      total: answerableGaps.length,
+    });
+  }
 }
 
 export async function saveReadingPart2LiveProgress({ gameId, taskId, positions = {} }) {
@@ -851,14 +911,35 @@ export async function saveReadingPart2LiveProgress({ gameId, taskId, positions =
   const answeredCount = Object.keys(safePositions).length;
   const complete = answeredCount === answerable.length;
   const now = Date.now();
-  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/readingPart2Submissions/${task.id}`), {
+  const progressRef = ref(rtdb, `liveGames/${gameId}/players/${user.uid}/readingPart2Submissions/${task.id}`);
+  const existingProgress = (await get(progressRef)).val() || {};
+  const wasCompleted = Boolean(existingProgress.firstCompletedAt || existingProgress.complete);
+  const firstCompletedAt = existingProgress.firstCompletedAt || existingProgress.completedAt || (complete ? now : null);
+  await set(progressRef, {
     taskId: task.id,
     positions: safePositions,
     answeredCount,
     complete,
     updatedAt: now,
+    ...(firstCompletedAt ? { firstCompletedAt } : {}),
     ...(complete ? { completedAt: now } : {}),
   });
+  if (complete && !wasCompleted) {
+    const gameSnapshot = await get(ref(rtdb, `liveGames/${gameId}`));
+    const score = answerable.filter((sentence) => safePositions[sentence.order] === sentence.id).length;
+    await logAptisReadingLiveTaskCompleted({
+      ...getAptisReadingLiveActivityDetails(gameSnapshot.val() || {
+        type: READING_PART2_LIVE_GAME_TYPE,
+        taskId: task.id,
+        taskIds: [task.id],
+      }, gameId),
+      completedTaskId: task.id,
+      completedTaskTitle: task.subtitle || task.title,
+      answeredCount,
+      score,
+      total: answerable.length,
+    });
+  }
 }
 
 export async function submitReadingPart2LiveOrder(details) {

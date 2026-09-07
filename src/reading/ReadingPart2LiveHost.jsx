@@ -5,7 +5,12 @@ import { QRCodeSVG } from "qrcode.react";
 import { useParams } from "react-router-dom";
 import { setLiveGameState, setLiveGameStatus } from "../api/liveGames.js";
 import Seo from "../components/common/Seo.jsx";
-import { rtdb } from "../firebase.js";
+import {
+  logAptisReadingLiveFinished,
+  logAptisReadingLiveReviewStarted,
+  logAptisReadingLiveStarted,
+  rtdb,
+} from "../firebase.js";
 import { getSitePath } from "../siteConfig.js";
 import {
   getReadingPart2LiveScore,
@@ -57,11 +62,23 @@ export default function ReadingPart2LiveHost({ user }) {
   const joinUrl = typeof window === "undefined" ? "" : `${window.location.origin}${joinPath}?pin=${encodeURIComponent(game?.pin || "")}`;
   const completedPairs = players.reduce((total, player) => total + tasks.filter((task) => getPlacedCount(getPlayerTaskProgress(player, task)) === 5).length, 0);
   const totalPairs = players.length * tasks.length;
+  const startedPairs = players.reduce((total, player) => total + tasks.filter((task) => getPlacedCount(getPlayerTaskProgress(player, task)) > 0).length, 0);
+  const activityDetails = {
+    gameId,
+    pin: game?.pin || null,
+    activityType: "reading-task",
+    activityTitle: game?.title || `Aptis Reading Part 2 · ${tasks.length}-task session`,
+    part: 2,
+    taskId: tasks[0]?.id || null,
+    taskIds: tasks.map((task) => task.id),
+    taskCount: tasks.length,
+  };
 
   async function beginWork() {
     if (!players.length) return;
     await setLiveGameStatus(gameId, "in-progress");
     await setLiveGameState(gameId, { phase: "task", reviewIndex: 0, phaseStartedAt: Date.now() });
+    await logAptisReadingLiveStarted({ ...activityDetails, playerCount: players.length });
   }
 
   async function beginReview() {
@@ -70,6 +87,13 @@ export default function ReadingPart2LiveHost({ user }) {
       `${incompletePairs} student task${incompletePairs === 1 ? " is" : "s are"} not complete. Saved partial answers will still appear in the review. Start the review now?`,
     )) return;
     await setLiveGameState(gameId, { phase: "review", reviewIndex: 0, phaseStartedAt: Date.now() });
+    await logAptisReadingLiveReviewStarted({
+      ...activityDetails,
+      playerCount: players.length,
+      startedTaskCount: startedPairs,
+      completedTaskCount: completedPairs,
+      possibleTaskCount: totalPairs,
+    });
   }
 
   async function nextReview() {
@@ -79,6 +103,13 @@ export default function ReadingPart2LiveHost({ user }) {
     }
     await setLiveGameStatus(gameId, "finished");
     await setLiveGameState(gameId, { phase: "finished", phaseStartedAt: Date.now() });
+    await logAptisReadingLiveFinished({
+      ...activityDetails,
+      playerCount: players.length,
+      startedTaskCount: startedPairs,
+      completedTaskCount: completedPairs,
+      possibleTaskCount: totalPairs,
+    });
   }
 
   async function copyJoinLink() {
