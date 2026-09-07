@@ -248,6 +248,12 @@ export default function AptisPart1({
   aptisAccess,
   onSignIn,
   onRequireSignIn,
+  routeBasePath = "/reading/part1",
+  progressPart = "part1",
+  heading = "Reading - Part 1 (Word Choices)",
+  intro,
+  headerActions = null,
+  showDemoNotice = true,
 }) {
   const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
   const initialTaskId =
@@ -281,13 +287,13 @@ export default function AptisPart1({
     let alive = true;
     (async () => {
       if (!user) return setCompleted(new Set());
-      const done = await fetchReadingCompletionsByPart("part1");
+      const done = await fetchReadingCompletionsByPart(progressPart);
       if (alive) setCompleted(done);
     })();
     return () => {
       alive = false;
     };
-  }, [user]);
+  }, [progressPart, user]);
 
   const decoratedItems = useMemo(
     () =>
@@ -330,7 +336,11 @@ export default function AptisPart1({
   async function markCurrentTaskCompleted() {
     if (!user || completed.has(current.id)) return;
     try {
-      await logReadingPart1Completed({ taskId: current.id, source: "AptisPart1" });
+      await logReadingPart1Completed({
+        taskId: current.id,
+        source: progressPart === "part1" ? "AptisPart1" : "AptisPart1Teacher",
+        progressPart,
+      });
       setCompleted((prev) => new Set(prev).add(current.id));
       toast("Task marked as completed ✓");
     } catch (err) {
@@ -362,7 +372,8 @@ export default function AptisPart1({
         taskId: current.id,
         score,
         total,
-        source: "AptisPart1",
+        source: progressPart === "part1" ? "AptisPart1" : "AptisPart1Teacher",
+        progressPart,
         ...timingDetails,
       });
     }
@@ -393,7 +404,8 @@ export default function AptisPart1({
         taskId: current.id,
         score,
         total: answerable.length,
-        source: "AptisPart1",
+        source: progressPart === "part1" ? "AptisPart1" : "AptisPart1Teacher",
+        progressPart,
         ...timingDetails,
       });
     }
@@ -442,8 +454,8 @@ export default function AptisPart1({
 
       <header className="p1-top">
         <div className="p1-titleblock">
-          <h2 className="p1-title">Reading - Part 1 (Word Choices)</h2>
-          <p className="p1-intro">{current?.prompt}</p>
+          <h2 className="p1-title">{heading}</h2>
+          <p className="p1-intro">{intro || current?.prompt}</p>
         </div>
 
         <div className="p1-tools">
@@ -451,10 +463,11 @@ export default function AptisPart1({
             user={user}
             activityId="reading-part-1"
             activityLabel={`Aptis Reading Part 1 - ${current?.title || "Word choices"}`}
-            routePath={getSitePath(`/reading/part1?task=${encodeURIComponent(current?.id || "")}`)}
+            routePath={getSitePath(`${routeBasePath}?task=${encodeURIComponent(current?.id || "")}`)}
             taskId={current?.id || ""}
             taskTitle={current?.title || ""}
           />
+          {typeof headerActions === "function" ? headerActions(current) : headerActions}
           <ChipDropdown
             items={decoratedItems}
             value={taskIndex}
@@ -464,9 +477,11 @@ export default function AptisPart1({
         </div>
       </header>
 
-      <ReadingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
-        Demo mode includes two Part 1 reading tasks. The other Part 1 tasks stay visible but require full access.
-      </ReadingDemoNotice>
+      {showDemoNotice ? (
+        <ReadingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+          Demo mode includes two Part 1 reading tasks. The other Part 1 tasks stay visible but require full access.
+        </ReadingDemoNotice>
+      ) : null}
 
       {taskTimer.phase === "ready" ? (
         <ReadingTaskStart

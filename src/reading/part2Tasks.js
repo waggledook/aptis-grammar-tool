@@ -323,7 +323,7 @@ export const READING_PART2_STANDARD_TASK_IDS = READING_PART2_TASKS.flatMap((task
   task.texts.map((text) => `${task.id}__${text.id}`)
 );
 
-export const READING_PART2_TEACHER_TASKS = [
+const READING_PART2_TEACHER_TASKS_UNSORTED = [
   {
     id: "plastic-free-school",
     title: "Plastic-Free School Initiative",
@@ -589,4 +589,334 @@ export const READING_PART2_TEACHER_TASKS = [
       },
     ],
   },
+  {
+    id: "community-garden",
+    title: "New Community Garden",
+    texts: [
+      {
+        id: "t1",
+        title: "Community garden report",
+        sentences: [
+          {
+            id: "intro6",
+            text: "A new community garden has opened on land that was empty for several years.",
+            order: 0,
+            fixed: true,
+          },
+          {
+            id: "a",
+            text: "Local residents asked the council to improve the site and offered to help with the work.",
+            order: 1,
+            explanation: "“The site” refers to the previously empty land, while the offer to help introduces the volunteers in the next sentence.",
+          },
+          {
+            id: "b",
+            text: "Many of these volunteers spent weekends clearing rubbish and preparing the ground for planting.",
+            order: 2,
+            explanation: "“These volunteers” can only refer to the local residents who offered to help.",
+          },
+          {
+            id: "c",
+            text: "Their work created space for vegetable beds, flowers, and a small area for children.",
+            order: 3,
+            explanation: "“Their work” refers to the clearing and preparation done by the volunteers.",
+          },
+          {
+            id: "d",
+            text: "The new facilities have already attracted families who had never used the site before.",
+            order: 4,
+            explanation: "“The new facilities” summarises the garden features created by the volunteers’ work.",
+          },
+          {
+            id: "e",
+            text: "Because of this early success, the council is considering similar projects in two other neighbourhoods.",
+            order: 5,
+            explanation: "“This early success” refers to the new garden attracting families and leads naturally to plans for similar projects.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "parcel-locker",
+    title: "Collecting from a Parcel Locker",
+    texts: [
+      {
+        id: "t1",
+        title: "Parcel locker instructions",
+        sentences: [
+          {
+            id: "intro7",
+            text: "You can collect your online order from a parcel locker at any time of day.",
+            order: 0,
+            fixed: true,
+          },
+          {
+            id: "a",
+            text: "When your parcel arrives, the delivery company sends a message containing a collection code.",
+            order: 1,
+            explanation: "The collection process begins when the parcel arrives and the customer receives the code needed to open the locker.",
+          },
+          {
+            id: "b",
+            text: "Enter this code on the locker screen to open the correct compartment.",
+            order: 2,
+            explanation: "“This code” refers directly to the collection code sent in the message.",
+          },
+          {
+            id: "c",
+            text: "Inside it, you will find the parcel with your name on the label.",
+            order: 3,
+            explanation: "“It” refers to the compartment that has just opened.",
+          },
+          {
+            id: "d",
+            text: "After removing the package, close the door firmly so the system knows the locker is empty.",
+            order: 4,
+            explanation: "The package must first be found inside the compartment before it can be removed and the door closed.",
+          },
+          {
+            id: "e",
+            text: "A final message will then confirm that your order has been collected successfully.",
+            order: 5,
+            explanation: "The final confirmation is triggered after the package is removed and the locker door is closed.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "maya-chen-photographer",
+    title: "Maya Chen, Photographer",
+    texts: [
+      {
+        id: "t1",
+        title: "Maya Chen biography",
+        sentences: [
+          {
+            id: "intro8",
+            text: "Maya Chen first became interested in photography while she was still at school.",
+            order: 0,
+            fixed: true,
+          },
+          {
+            id: "a",
+            text: "Her parents gave her a second-hand camera, which she used to photograph people in her neighbourhood.",
+            order: 1,
+            explanation: "The camera explains how Maya first acted on the interest introduced in the opening sentence.",
+          },
+          {
+            id: "b",
+            text: "Some of these pictures appeared in a local exhibition when she was seventeen.",
+            order: 2,
+            explanation: "“These pictures” refers to the photographs Maya took with the second-hand camera.",
+          },
+          {
+            id: "c",
+            text: "The exhibition brought her work to the attention of a newspaper editor.",
+            order: 3,
+            explanation: "“The exhibition” refers to the local event where Maya’s pictures appeared.",
+          },
+          {
+            id: "d",
+            text: "He later offered her a summer job taking photographs for the paper.",
+            order: 4,
+            explanation: "“He” refers to the newspaper editor, and “the paper” refers to his newspaper.",
+          },
+          {
+            id: "e",
+            text: "That experience helped her decide to study photography, and she now works professionally for magazines.",
+            order: 5,
+            explanation: "“That experience” refers to the summer newspaper job and connects it to Maya’s later study and career.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "station-lost-property",
+    title: "Returning Lost Property",
+    texts: [
+      {
+        id: "t1",
+        title: "Lost property system",
+        sentences: [
+          {
+            id: "intro9",
+            text: "The city's main railway station has introduced a new system for returning lost property.",
+            order: 0,
+            fixed: true,
+          },
+          {
+            id: "a",
+            text: "When an item is found, station staff record where and when it was discovered.",
+            order: 1,
+            explanation: "The new system begins when staff find an item and record the circumstances in which it was discovered.",
+          },
+          {
+            id: "b",
+            text: "This information is added to a database together with a short description of the object.",
+            order: 2,
+            explanation: "“This information” refers to the place and time recorded by station staff.",
+          },
+          {
+            id: "c",
+            text: "When someone reports a missing item, staff ask for its colour, size, and where it was lost.",
+            order: 3,
+            explanation: "The text now moves from recording found objects to the identifying information needed when an owner reports something missing.",
+          },
+          {
+            id: "d",
+            text: "They then search the database for possible matches using these details.",
+            order: 4,
+            explanation: "“They” refers to station staff, while “these details” refers to the identifying information supplied by the person.",
+          },
+          {
+            id: "e",
+            text: "If the description agrees with the record, the owner is invited to collect the object.",
+            order: 5,
+            explanation: "The matching description and database record provide the condition for returning the object to its owner.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "westbridge-market",
+    title: "Changes at Westbridge Market",
+    texts: [
+      {
+        id: "t1",
+        title: "Westbridge market report",
+        sentences: [
+          {
+            id: "intro10",
+            text: "The Saturday market in Westbridge has recently changed its layout after complaints from shoppers.",
+            order: 0,
+            fixed: true,
+          },
+          {
+            id: "a",
+            text: "Many visitors said the central path became crowded, especially in the morning.",
+            order: 1,
+            explanation: "This sentence explains the specific problem behind the shoppers’ complaints.",
+          },
+          {
+            id: "b",
+            text: "To solve this problem, the council moved several food stalls closer to the entrance.",
+            order: 2,
+            explanation: "“This problem” refers to the crowded central path and introduces the council’s response.",
+          },
+          {
+            id: "c",
+            text: "The new arrangement has made it easier for shoppers to move around.",
+            order: 3,
+            explanation: "“The new arrangement” refers to the changed position of the food stalls and gives its positive result.",
+          },
+          {
+            id: "d",
+            text: "However, some sellers say fewer customers now visit the smaller stalls at the back.",
+            order: 4,
+            explanation: "“However” contrasts the benefit for shoppers with a new concern raised by some sellers.",
+          },
+          {
+            id: "e",
+            text: "Because of these concerns, officials will review the changes at the end of the month.",
+            order: 5,
+            explanation: "“These concerns” refers to the sellers’ complaint and explains why officials will review the layout changes.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "local-museum",
+    title: "A More Popular Local Museum",
+    texts: [
+      {
+        id: "t1",
+        title: "Museum news article",
+        sentences: [
+          {
+            id: "intro11",
+            text: "A small local museum has become more popular since reopening earlier this year.",
+            order: 0,
+            fixed: true,
+          },
+          {
+            id: "a",
+            text: "The main attraction is a new exhibition about life in the town a hundred years ago.",
+            order: 1,
+            explanation: "The new exhibition is introduced as the main reason for the museum’s increased popularity.",
+          },
+          {
+            id: "b",
+            text: "It includes old photographs, clothes, tools, and recordings of local people telling family stories.",
+            order: 2,
+            explanation: "“It” refers to the new exhibition introduced in the previous sentence.",
+          },
+          {
+            id: "c",
+            text: "Visitors have been interested in these personal memories because they know some places and names.",
+            order: 3,
+            explanation: "“These personal memories” points specifically to the recorded family stories, while “they” refers to the visitors.",
+          },
+          {
+            id: "d",
+            text: "Their positive reactions have helped visitor numbers rise far above the level before the museum closed.",
+            order: 4,
+            explanation: "“Their positive reactions” refers to the visitors’ interest in the personal memories.",
+          },
+          {
+            id: "e",
+            text: "This success has encouraged the museum to plan another exhibition using objects from local families.",
+            order: 5,
+            explanation: "“This success” summarises the rise in visitor numbers and leads to the museum’s future plan.",
+          },
+        ],
+      },
+    ],
+  },
 ];
+
+export const READING_PART2_NEW_TEACHER_TASK_IDS = [
+  "community-garden",
+  "parcel-locker",
+  "maya-chen-photographer",
+  "station-lost-property",
+  "westbridge-market",
+  "local-museum",
+];
+
+const newTeacherTaskIdSet = new Set(READING_PART2_NEW_TEACHER_TASK_IDS);
+
+export const READING_PART2_TEACHER_TASKS = [
+  ...READING_PART2_NEW_TEACHER_TASK_IDS.map((id) =>
+    READING_PART2_TEACHER_TASKS_UNSORTED.find((task) => task.id === id)
+  ).filter(Boolean),
+  ...READING_PART2_TEACHER_TASKS_UNSORTED.filter((task) => !newTeacherTaskIdSet.has(task.id)),
+];
+
+export const READING_PART2_LIVE_GAME_TYPE = "aptis-reading-part2-teacher";
+
+export function getReadingPart2TeacherTask(taskId) {
+  for (const task of READING_PART2_TEACHER_TASKS) {
+    for (const text of task.texts) {
+      const id = `${task.id}__${text.id}`;
+      if (id === taskId || task.id === taskId) return {
+        id,
+        sourceTaskId: task.id,
+        title: text.title || task.title,
+        subtitle: task.title !== text.title ? task.title : "",
+        text,
+      };
+    }
+  }
+  return null;
+}
+
+export function getReadingPart2LiveScore(task, submission) {
+  if (!task || !submission?.positions) return 0;
+  const answerable = task.text.sentences.filter((sentence) => !sentence.fixed);
+  return answerable.filter((sentence) => submission.positions[sentence.order] === sentence.id).length;
+}

@@ -486,7 +486,7 @@ return (
           onChange={handleSelectTask}     // ⬅️ call the guard, not setTaskIndex
           label="Task"
         />
-        {headerActions}
+        {typeof headerActions === "function" ? headerActions(current) : headerActions}
       </div>
     </header>
 

@@ -804,7 +804,8 @@ button {
   flex-wrap: wrap;
 }
 
-.ote-topbar-version-toggle {
+.ote-topbar-version-toggle,
+.product-switcher {
   display: inline-flex;
   gap: 2px;
   padding: 3px;
@@ -813,7 +814,8 @@ button {
   background: rgba(2, 6, 23, 0.22);
 }
 
-.ote-topbar-version-toggle button {
+.ote-topbar-version-toggle button,
+.product-switcher__option {
   min-width: 74px;
   border: 0;
   border-radius: 999px;
@@ -823,11 +825,29 @@ button {
   font-size: 0.8rem;
   font-weight: 800;
   cursor: pointer;
+  line-height: normal;
+  text-align: center;
+  text-decoration: none;
 }
 
-.ote-topbar-version-toggle button.is-active {
+.ote-topbar-version-toggle button.is-active,
+.product-switcher__option.is-active {
   background: linear-gradient(180deg, #f6bd60, #e9a93f);
   color: #13213b;
+}
+
+.product-switcher__option.is-active {
+  cursor: default;
+}
+
+.product-switcher__option:not(.is-active):hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text);
+}
+
+.product-switcher__option:focus-visible {
+  outline: 2px solid #f6bd60;
+  outline-offset: 1px;
 }
 
 .ote-topbar-version-toggle button:disabled {

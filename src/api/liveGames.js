@@ -56,6 +56,14 @@ import {
   REGISTER_SURGERY_LIVE_GAME_TYPE,
 } from "../components/writing/data/aptisWritingRegisterSurgery.js";
 import { PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE } from "../components/writing/data/aptisPart4ErrorBank.js";
+import {
+  APTIS_READING_PART1_LIVE_GAME_TYPE,
+  getReadingPart1TeacherTask,
+} from "../reading/readingPart1TeacherTasks.js";
+import {
+  READING_PART2_LIVE_GAME_TYPE,
+  getReadingPart2TeacherTask,
+} from "../reading/part2Tasks.js";
 
 const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
 const SPANGLISH_GUEST_TOKEN_STORAGE_KEY = "spanglish_fixit_guest_token";
@@ -194,7 +202,9 @@ export async function joinLiveGameByPin(pin) {
     game.type === FREE_THINGS_LESSON_GAME_TYPE ||
     game.type === APTIS_WRITING_LIVE_GAME_TYPE ||
     game.type === REGISTER_SURGERY_LIVE_GAME_TYPE ||
-    game.type === PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE
+    game.type === PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE ||
+    game.type === APTIS_READING_PART1_LIVE_GAME_TYPE ||
+    game.type === READING_PART2_LIVE_GAME_TYPE
   ) {
     if (!existingPlayer) await set(playerRef, {
       name: displayName,
@@ -256,6 +266,73 @@ export async function createPart4EvidenceLiveGame({ taskId, title }) {
     status: "lobby",
     createdAt: Date.now(),
     state: { phase: "lobby", questionIndex: 0 },
+  });
+  return { gameId, pin };
+}
+
+export async function createReadingPart1LiveGame({ taskId, title }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a reading session.");
+  const task = getReadingPart1TeacherTask(taskId);
+  if (!task) throw new Error("Choose a valid Reading Part 1 teacher task.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: title || `Aptis Reading Part 1 · ${task.title}`,
+    type: APTIS_READING_PART1_LIVE_GAME_TYPE,
+    taskId: task.id,
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby", reviewIndex: 0 },
+  });
+  return { gameId, pin };
+}
+
+export async function createReadingPart2LiveGame({ taskId, taskIds = [], title }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a reading session.");
+  const requestedIds = [...new Set([...(taskIds || []), ...(taskId ? [taskId] : [])])];
+  const tasks = requestedIds.map(getReadingPart2TeacherTask).filter(Boolean);
+  if (!tasks.length || tasks.length !== requestedIds.length) {
+    throw new Error("Choose one or more valid Reading Part 2 teacher tasks.");
+  }
+
+  const candidateIdsByTask = {};
+  tasks.forEach((task) => {
+    const answerable = task.text.sentences.filter((sentence) => !sentence.fixed);
+    const correctIds = [...answerable].sort((a, b) => a.order - b.order).map((sentence) => sentence.id);
+    const candidates = answerable.map((sentence) => sentence.id);
+    for (let index = candidates.length - 1; index > 0; index -= 1) {
+      const swapIndex = Math.floor(Math.random() * (index + 1));
+      [candidates[index], candidates[swapIndex]] = [candidates[swapIndex], candidates[index]];
+    }
+    if (candidates.every((id, index) => id === correctIds[index])) {
+      candidates.push(candidates.shift());
+    }
+    candidateIdsByTask[task.id] = candidates;
+  });
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: title || (tasks.length === 1
+      ? `Aptis Reading Part 2 · ${tasks[0].subtitle || tasks[0].title}`
+      : `Aptis Reading Part 2 · ${tasks.length}-task session`),
+    type: READING_PART2_LIVE_GAME_TYPE,
+    taskId: tasks[0].id,
+    taskIds: tasks.map((task) => task.id),
+    candidateIds: candidateIdsByTask[tasks[0].id],
+    candidateIdsByTask,
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby", taskIndex: 0, reviewIndex: 0 },
   });
   return { gameId, pin };
 }
@@ -730,6 +807,64 @@ export async function submitPart4EvidenceLiveAnswer({ gameId, questionId, option
   });
 }
 
+export async function submitReadingPart1LiveAnswers({ gameId, taskId, answers }) {
+  const user = auth.currentUser;
+  const task = getReadingPart1TeacherTask(taskId);
+  if (!user) throw new Error("You must be signed in to submit your answers.");
+  if (!gameId || !task || !answers) throw new Error("Missing Reading Part 1 answer details.");
+
+  const answerableGaps = task.gaps.filter((gap) => !gap.fixed);
+  const safeAnswers = {};
+  for (const gap of answerableGaps) {
+    const answer = answers[gap.id];
+    if (!gap.options.includes(answer)) throw new Error("Choose an answer for every gap before submitting.");
+    safeAnswers[gap.id] = answer;
+  }
+
+  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/readingPart1Submission`), {
+    taskId: task.id,
+    answers: safeAnswers,
+    submittedAt: Date.now(),
+  });
+}
+
+export async function saveReadingPart2LiveProgress({ gameId, taskId, positions = {} }) {
+  const user = auth.currentUser;
+  const task = getReadingPart2TeacherTask(taskId);
+  if (!user) throw new Error("You must be signed in to save your order.");
+  if (!gameId || !task) throw new Error("Missing Reading Part 2 answer details.");
+
+  const answerable = task.text.sentences.filter((sentence) => !sentence.fixed);
+  const validIds = new Set(answerable.map((sentence) => sentence.id));
+  const safePositions = {};
+  for (const [rawOrder, selectedId] of Object.entries(positions || {})) {
+    const order = Number(rawOrder);
+    if (!Number.isInteger(order) || order < 1 || order > 5 || !validIds.has(selectedId)) {
+      throw new Error("That sentence position could not be saved.");
+    }
+    safePositions[order] = selectedId;
+  }
+  if (new Set(Object.values(safePositions)).size !== Object.values(safePositions).length) {
+    throw new Error("Use each sentence once.");
+  }
+
+  const answeredCount = Object.keys(safePositions).length;
+  const complete = answeredCount === answerable.length;
+  const now = Date.now();
+  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/readingPart2Submissions/${task.id}`), {
+    taskId: task.id,
+    positions: safePositions,
+    answeredCount,
+    complete,
+    updatedAt: now,
+    ...(complete ? { completedAt: now } : {}),
+  });
+}
+
+export async function submitReadingPart2LiveOrder(details) {
+  return saveReadingPart2LiveProgress(details);
+}
+
 /**
  * Host-only: update high-level game status.
  * e.g. setLiveGameStatus(gameId, "in-progress") or "finished".
@@ -760,6 +895,9 @@ export async function setLiveGameState(gameId, partialState) {
     }
     if (typeof partialState.questionIndex === "number") {
       updates.questionIndex = partialState.questionIndex;
+    }
+    if (typeof partialState.taskIndex === "number") {
+      updates.taskIndex = partialState.taskIndex;
     }
     if (typeof partialState.gapIndex === "number") {
       updates.gapIndex = partialState.gapIndex;

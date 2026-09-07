@@ -1,0 +1,80 @@
+.rp2-live-task { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(300px,.85fr); gap:1rem; }
+.rp2-live-order,.rp2-live-bank { display:grid; align-content:start; gap:.55rem; }
+.rp2-live-order-row { display:grid; grid-template-columns:34px 1fr; gap:.55rem; min-height:70px; padding:.65rem; border:1px dashed #3f5d8d; border-radius:12px; background:#101d35; }
+.rp2-live-order-row > span { display:grid; place-items:center; width:30px; height:30px; border-radius:50%; background:#29446f; color:#eaf2ff; font-weight:900; }
+.rp2-live-order-row small { display:block; margin-bottom:.2rem; color:#91b8f5; font-weight:850; text-transform:uppercase; }
+.rp2-live-order-row p { margin:.15rem 0 0; line-height:1.45; }
+.rp2-live-order-row.is-fixed { border-style:solid; background:#162642; }
+.rp2-live-order-row.is-filled { border-style:solid; border-color:#45669d; background:#162642; }
+.rp2-live-order-row.is-revealed { border-color:#2aba7e; background:#123d34; }
+.rp2-live-slot-content[draggable="true"] { cursor:grab; }
+.rp2-live-slot-content[draggable="true"]:active { cursor:grabbing; }
+.rp2-live-slot-content em { display:block; margin-top:.55rem; padding:.55rem; border-radius:8px; background:#0d2f29; color:#b9f4dc; font-style:normal; }
+.rp2-live-placeholder { display:grid; align-content:center; gap:.15rem; color:#8295b4; }
+.rp2-live-placeholder strong { color:#b4c2d7; }
+.rp2-live-slot-actions { display:flex; flex-wrap:wrap; gap:.35rem; margin-top:.55rem; }
+.rp2-live-slot-actions button,.rp2-live-bank article button { display:inline-flex; align-items:center; justify-content:center; gap:.25rem; padding:.3rem .48rem; border:1px solid #49699d; border-radius:7px; background:#20395f; color:#edf4ff; font:inherit; font-size:.75rem; font-weight:800; cursor:pointer; }
+.rp2-live-slot-actions button:disabled,.rp2-live-bank article button:disabled { cursor:not-allowed; opacity:.4; }
+.rp2-live-bank { min-height:280px; padding:.8rem; border:1px solid #315185; border-radius:14px; background:#0e1b32; }
+.rp2-live-bank header,.rp2-live-distribution header { display:flex; align-items:center; justify-content:space-between; gap:.7rem; }
+.rp2-live-bank header span,.rp2-live-distribution header span { color:#91b8f5; font-size:.75rem; font-weight:850; text-transform:uppercase; }
+.rp2-live-bank header strong { color:#acbbd2; font-size:.75rem; }
+.rp2-live-bank article { display:grid; grid-template-columns:24px 1fr auto; align-items:center; gap:.45rem; padding:.65rem; border:1px solid #2c4774; border-radius:10px; background:#162642; cursor:grab; }
+.rp2-live-bank article:active { cursor:grabbing; }
+.rp2-live-bank article > svg { color:#7f9bc6; }
+.rp2-live-bank article p { margin:.1rem 0; font-size:.9rem; line-height:1.4; }
+.rp2-live-bank-empty { margin:auto 0; padding:1.5rem .5rem; color:#8295b4; text-align:center; }
+.rp2-live-task.is-disabled .rp2-live-bank article { cursor:default; }
+.rp2-live-distribution { padding:1rem; border:1px solid #315185; border-radius:15px; background:#162642; }
+.rp2-live-distribution h2 { margin:.15rem 0 0; }
+.rp2-live-distribution > div { display:grid; gap:.5rem; margin-top:.8rem; }
+.rp2-live-distribution article { display:grid; grid-template-columns:minmax(180px,1fr) minmax(100px,.55fr) 28px; align-items:center; gap:.55rem; padding:.6rem; border:1px solid #2c4774; border-radius:10px; }
+.rp2-live-distribution article p { margin:0; font-size:.88rem; line-height:1.35; }
+.rp2-live-distribution article i { overflow:hidden; height:8px; border-radius:999px; background:#0c1830; }
+.rp2-live-distribution article i b { display:block; height:100%; border-radius:inherit; background:#79aaff; }
+.rp2-live-distribution article.is-correct { border-color:#2aba7e; background:#123d34; }
+.rp2-live-distribution article.is-correct i b { background:#42d69c; }
+.rp2-live-distribution > p { margin:.8rem 0 0; padding:.7rem; border-radius:10px; background:#0c1830; color:#c9d7eb; }
+.rp2-task-nav { display:flex; flex-wrap:wrap; gap:.45rem; }
+.rp2-task-nav button { display:grid; gap:.08rem; min-width:110px; padding:.5rem .65rem; border:1px solid #35558f; border-radius:9px; background:#162642; color:#edf4ff; font:inherit; text-align:left; cursor:pointer; }
+.rp2-task-nav button span { color:#aebdd4; font-size:.72rem; }
+.rp2-task-nav button strong { font-size:.82rem; }
+.rp2-task-nav button.is-active { border-color:#f0b84d; box-shadow:0 0 0 1px #f0b84d; }
+.rp2-task-nav button.is-complete { border-color:#2aba7e; }
+.rp2-task-footer { display:flex; align-items:center; justify-content:space-between; gap:.65rem; }
+.rp2-save-state { color:#aebdd4; font-size:.82rem; }
+.rp2-work-dashboard { display:grid; gap:.65rem; }
+.rp2-work-dashboard article { display:grid; grid-template-columns:1fr auto; gap:.35rem .75rem; padding:.75rem; border:1px solid #315185; border-radius:11px; background:#162642; }
+.rp2-work-dashboard article h3,.rp2-work-dashboard article p { margin:0; }
+.rp2-work-dashboard article p { grid-column:1 / 3; color:#aebdd4; font-size:.82rem; }
+.rp2-work-dashboard article strong { color:#8eddbd; }
+.rp2-work-dashboard article span,.rp2-session-task-list > span { color:#91b8f5; font-size:.72rem; font-weight:850; text-transform:uppercase; }
+.rp2-session-task-list { display:grid; gap:.4rem; margin:0 0 1rem; padding:.75rem; border:1px solid #315185; border-radius:11px; background:#101d35; }
+.rp2-session-task-list p { display:flex; gap:.55rem; margin:0; color:#c8d5e8; font-size:.86rem; }
+.rp2-session-task-list p strong { min-width:52px; color:#edf4ff; }
+.rp2-elapsed { color:#edf4ff !important; font-size:inherit !important; }
+.rp2-full-review { display:grid; gap:.8rem; }
+.rp2-full-review > header { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
+.rp2-full-review > header span { color:#91b8f5; font-size:.75rem; font-weight:850; text-transform:uppercase; }
+.rp2-full-review > header h2 { margin:.15rem 0 0; }
+.rp2-full-review > ol { display:grid; gap:.55rem; margin:0; padding:0; list-style:none; }
+.rp2-full-review > ol > li { display:grid; grid-template-columns:36px 1fr; gap:.65rem; padding:.75rem; border:2px solid #3b557e; border-radius:12px; background:#162642; }
+.rp2-full-review > ol > li > span { display:grid; place-items:center; width:32px; height:32px; border-radius:50%; background:#29446f; font-weight:900; }
+.rp2-full-review li p { margin:.2rem 0; line-height:1.45; }
+.rp2-full-review li small { color:#aebdd4; font-weight:900; text-transform:uppercase; }
+.rp2-full-review li em { display:block; margin-top:.45rem; padding:.5rem .6rem; border-radius:8px; background:#0c1830; color:#c8d7eb; font-size:.88rem; font-style:normal; }
+.rp2-full-review li.is-correct { border-color:#2aba7e; background:#123d34; }
+.rp2-full-review li.is-correct > span { background:#21845f; }
+.rp2-full-review li.is-wrong { border-color:#e26f75; background:#431f2a; }
+.rp2-full-review li.is-wrong > span { background:#a93f4b; }
+.rp2-full-review li.is-empty { border-color:#b88a42; background:#3b2e1c; }
+.rp2-full-review-label { display:flex; align-items:center; justify-content:space-between; gap:.7rem; }
+.rp2-full-review-answer { padding:.45rem .55rem; border-left:3px solid #42d69c; background:rgba(12,24,48,.42); }
+.rp2-full-review-student { font-weight:750; }
+@media (max-width:820px) { .rp2-live-task { grid-template-columns:1fr; } }
+@media (max-width:600px) { .rp2-live-bank article { grid-template-columns:22px 1fr; } .rp2-live-bank article button { grid-column:2; justify-self:start; } .rp2-live-distribution article { grid-template-columns:1fr 28px; } .rp2-live-distribution article i { grid-column:1 / 3; } }
+:root[data-theme="light"] .rp2-live-order-row,:root[data-theme="light"] .rp2-live-bank,:root[data-theme="light"] .rp2-live-bank article,:root[data-theme="light"] .rp2-live-distribution,:root[data-theme="light"] .rp2-work-dashboard article,:root[data-theme="light"] .rp2-session-task-list,:root[data-theme="light"] .rp2-task-nav button,:root[data-theme="light"] .rp2-full-review > ol > li { background:var(--color-surface-2); border-color:var(--color-border); }
+:root[data-theme="light"] .rp2-full-review > ol > li.is-correct { border-color:#16865c; background:#e4f8ef; }
+:root[data-theme="light"] .rp2-full-review > ol > li.is-wrong { border-color:#c84f59; background:#ffeaec; }
+:root[data-theme="light"] .rp2-full-review > ol > li.is-empty { border-color:#a87427; background:#fff5df; }
+:root[data-theme="light"] .rp2-elapsed { color:var(--color-text) !important; }

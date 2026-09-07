@@ -10,6 +10,8 @@ import { OTE_LISTENING_LIVE_GAME_TYPE } from "../../products/ote/data/oteListeni
 import { APTIS_WRITING_LIVE_GAME_TYPE } from "../writing/data/aptisWritingTeacherTasks.js";
 import { REGISTER_SURGERY_LIVE_GAME_TYPE } from "../writing/data/aptisWritingRegisterSurgery.js";
 import { PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE } from "../writing/data/aptisPart4ErrorBank.js";
+import { APTIS_READING_PART1_LIVE_GAME_TYPE } from "../../reading/readingPart1TeacherTasks.js";
+import { READING_PART2_LIVE_GAME_TYPE } from "../../reading/part2Tasks.js";
 import { getSitePath } from "../../siteConfig.js";
 
 export default function LiveGameJoin() {
@@ -54,6 +56,10 @@ export default function LiveGameJoin() {
                 ? `/live/register-surgery/play/${gameId}`
               : type === PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE
                 ? `/live/error-detective/play/${gameId}`
+              : type === APTIS_READING_PART1_LIVE_GAME_TYPE
+                ? `/live/aptis-reading-part1/play/${gameId}`
+              : type === READING_PART2_LIVE_GAME_TYPE
+                ? `/live/aptis-reading-part2/play/${gameId}`
                 : `/live/play/${gameId}`;
           navigate(getSitePath(destination));
         } catch (err) {

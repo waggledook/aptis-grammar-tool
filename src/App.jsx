@@ -81,8 +81,13 @@ import SpeakingPart4Extra from "./components/speaking/SpeakingPart4Extra";
 import SpeakingWorkshops from "./components/speaking/workshops/SpeakingWorkshops.jsx";
 import SpeakingPart2and3_PhotoGuide from "./components/speaking/SpeakingPart2and3_PhotoGuide.jsx";
 import AptisPart1 from "./reading/AptisPart1";
+import ReadingPart1Teacher from "./reading/ReadingPart1Teacher.jsx";
+import ReadingPart1LiveHost from "./reading/ReadingPart1LiveHost.jsx";
+import ReadingPart1LivePlayer from "./reading/ReadingPart1LivePlayer.jsx";
 import AptisPart2Reorder from './reading/AptisPart2Reorder';
 import ReadingPart2Teacher from "./reading/ReadingPart2Teacher.jsx";
+import ReadingPart2LiveHost from "./reading/ReadingPart2LiveHost.jsx";
+import ReadingPart2LivePlayer from "./reading/ReadingPart2LivePlayer.jsx";
 import AptisPart3Matching from './reading/AptisPart3Matching';
 import AptisPart4 from "./reading/AptisPart4";
 import VocabularyMenu from "./components/vocabulary/VocabularyMenu";
@@ -118,6 +123,7 @@ import TeacherStudentProfile from "./components/TeacherStudentProfile";
 import CookieBanner from "./components/CookieBanner.jsx";
 import PrivacyPolicy from "./components/legal/PrivacyPolicy.jsx";
 import TeacherExtrasButton from "./components/common/TeacherExtrasButton.jsx";
+import ProductSwitcher from "./components/common/ProductSwitcher.jsx";
 import AptisDemoBadge from "./components/access/AptisDemoBadge.jsx";
 import AptisAccessPage from "./components/access/AptisAccessPage.jsx";
 import SupportMessageWidget from "./components/support/SupportMessageWidget.jsx";
@@ -1321,7 +1327,12 @@ return (
   }}
 >
   <div className="topbar-left">
-    {isOteRoute ? (
+    {isSeifHubSite && hasSeifHubAccess ? (
+      <ProductSwitcher
+        hasAptisAccess={hasAptisTrainerAccess}
+        hasOteAccess={hasOteAccess}
+      />
+    ) : isOteRoute ? (
       <div className="ote-topbar-version-toggle" role="group" aria-label="Choose OTE version">
         <button
           type="button"
@@ -2133,8 +2144,33 @@ return (
         onSignIn={() => setShowAuth(true)}
         onRequireSignIn={() => setShowAuth(true)}
         allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.reading.part1TaskIds : []}
+        headerActions={
+          <TeacherExtrasButton
+            user={user}
+            to="/reading/part1-teacher"
+            label="Teacher Part 1 tasks"
+          />
+        }
       />
     </>
+  }
+/>
+
+<Route
+  path="/reading/part1-teacher"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <>
+        <button
+          onClick={() => navigate("/reading/parts/1")}
+          className="review-btn"
+          style={{ marginBottom: "1rem" }}
+        >
+          ← Back
+        </button>
+        <ReadingPart1Teacher user={user} onRequireSignIn={() => setShowAuth(true)} />
+      </>
+    </RequireSignedIn>
   }
 />
 
@@ -3162,6 +3198,10 @@ return (
 <Route path="/live/aptis-writing/play/:gameId" element={<AptisWritingLivePlayer />} />
 <Route path="/live/register-surgery/host/:gameId" element={<RequireTeacher user={user}><AptisRegisterSurgeryLiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/error-detective/host/:gameId" element={<RequireTeacher user={user}><AptisPart4ErrorDetectiveLiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/aptis-reading-part1/host/:gameId" element={<RequireTeacher user={user}><ReadingPart1LiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/aptis-reading-part1/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><ReadingPart1LivePlayer /></RequireSignedIn>} />
+<Route path="/live/aptis-reading-part2/host/:gameId" element={<RequireTeacher user={user}><ReadingPart2LiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/aptis-reading-part2/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><ReadingPart2LivePlayer /></RequireSignedIn>} />
 <Route
   path="/live/register-surgery/play/:gameId"
   element={

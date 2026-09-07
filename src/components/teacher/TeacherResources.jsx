@@ -25,13 +25,22 @@ const PRODUCT_GROUPS = [
     skillGroups: [
       {
         title: "Reading",
-        resources: [{
-          title: "Reading Part 2 teacher tasks",
-          description: "Five extra sentence-order texts prepared for classroom practice.",
-          path: "/reading/part2-teacher",
-          icon: BookOpen,
-          tags: ["Assignable", "Direct link"],
-        }],
+        resources: [
+          {
+            title: "Reading Part 1 teacher tasks",
+            description: "Five extra email gap-fill tasks for assignment, direct-link practice or a live teacher-paced lesson.",
+            path: "/reading/part1-teacher",
+            icon: BookOpen,
+            tags: ["Assignable", "Direct link", "Live lessons"],
+          },
+          {
+            title: "Reading Part 2 teacher tasks",
+            description: "Eleven extra sentence-order texts for assignment, direct-link practice or a live teacher-paced lesson.",
+            path: "/reading/part2-teacher",
+            icon: BookOpen,
+            tags: ["Assignable", "Direct link", "Live lessons"],
+          },
+        ],
       },
       {
         title: "Writing",

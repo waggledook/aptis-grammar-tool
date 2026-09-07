@@ -2189,8 +2189,8 @@ export async function logReadingPart1Attempted({
   });
 }
 
-export async function logReadingPart1Completed({ taskId, source = "AptisPart1" }) {
-  await saveReadingProgress(taskId, "part1");
+export async function logReadingPart1Completed({ taskId, source = "AptisPart1", progressPart = "part1" }) {
+  await saveReadingProgress(taskId, progressPart);
   return logActivity("reading_part1_completed", {
     taskId: taskId || null,
     source,
