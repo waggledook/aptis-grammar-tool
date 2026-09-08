@@ -3,6 +3,7 @@ import {
   ArrowRight,
   BookOpen,
   Clock3,
+  House,
   Image as ImageIcon,
   Images,
   Lightbulb,
@@ -10,6 +11,7 @@ import {
   MessageCircle,
   Mic2,
   Presentation,
+  Smartphone,
   TrainFront,
   UsersRound,
 } from "lucide-react";
@@ -20,8 +22,10 @@ import SpeakingPart3 from "../SpeakingPart3";
 import SpeakingPart4 from "../SpeakingPart4";
 import SpeakingWorkshopAccessGate from "./SpeakingWorkshopAccessGate";
 import SpeakingWorkshopSessionManager from "./SpeakingWorkshopSessionManager";
+import HomeNeighbourhoodPreparation from "./HomeNeighbourhoodPreparation";
 import RelationshipsPreparation from "./RelationshipsPreparation";
 import SpeakingReference from "./SpeakingReference";
+import TechnologyCommunicationPreparation from "./TechnologyCommunicationPreparation";
 import TransportPreparation from "./TransportPreparation";
 import TeachingMode from "./TeachingMode";
 import {
@@ -35,6 +39,15 @@ import "./SpeakingWorkshops.css";
 const TOPIC_ICONS = {
   "relationships-family": UsersRound,
   "travel-transport": TrainFront,
+  "home-neighbourhood": House,
+  "technology-communication": Smartphone,
+};
+
+const PREPARATION_COMPONENTS = {
+  "relationships-family": RelationshipsPreparation,
+  "travel-transport": TransportPreparation,
+  "home-neighbourhood": HomeNeighbourhoodPreparation,
+  "technology-communication": TechnologyCommunicationPreparation,
 };
 
 const PART_ICONS = {
@@ -122,10 +135,11 @@ function WorkshopMembershipSummary({ access }) {
 function WorkshopLanding({ navigate, access }) {
   const visibleTopics = access.fullAccess
     ? SPEAKING_WORKSHOP_TOPICS
-    : SPEAKING_WORKSHOP_TOPICS.filter((topic) => access.topicAccess[topic.id]?.preparation);
+    : SPEAKING_WORKSHOP_TOPICS.filter((topic) => topic.contentReady && access.topicAccess[topic.id]?.preparation);
   const plannedTopics = access.fullAccess ? [] : SPEAKING_WORKSHOP_TOPIC_CATALOG.filter((topic) => (
-    access.topicAccess[topic.id]?.preparation && !getSpeakingWorkshopTopic(topic.id)
+    access.topicAccess[topic.id]?.preparation && !topic.contentReady
   ));
+  const readyCount = SPEAKING_WORKSHOP_TOPICS.filter((topic) => topic.ready).length;
 
   return (
     <main className="speaking-workshops">
@@ -134,7 +148,7 @@ function WorkshopLanding({ navigate, access }) {
         <h1>Topic-focused Aptis speaking</h1>
         <p>Choose a topic, then use it as timed individual exam practice or as flexible material for a teacher-led session.</p>
         <div className="workshop-hero-stats">
-          <span><strong>2</strong> complete topics</span>
+          <span><strong>{readyCount}</strong> complete topics</span>
           <span><strong>8</strong> programme topics</span>
           <span><strong>4</strong> week cycle</span>
         </div>
@@ -150,18 +164,22 @@ function WorkshopLanding({ navigate, access }) {
           const coverTask = topic.parts[2].tasks[0];
           return (
             <button
-              className={`workshop-topic-card accent-${topic.accent}`}
+              className={`workshop-topic-card accent-${topic.accent} ${topic.ready ? "" : "is-content-draft"}`}
               type="button"
               key={topic.id}
               onClick={() => navigate(`/speaking-workshops/${topic.id}`)}
             >
               <span className="workshop-topic-visual" aria-hidden="true">
-                <img src={coverTask?.image} alt="" />
+                {coverTask?.image ? <img src={coverTask.image} alt="" /> : <span className="workshop-topic-placeholder"><TopicIcon size={54} /></span>}
                 <span className="workshop-topic-number">0{index + 1}</span>
                 <span className="workshop-topic-icon"><TopicIcon size={23} strokeWidth={2.2} /></span>
               </span>
               <span className="workshop-topic-copy">
-                <span className="workshop-topic-eyebrow">Workshop topic</span>
+                <span className="workshop-topic-eyebrow">{topic.ready
+                  ? "Workshop topic"
+                  : topic.visualsReady
+                    ? "Teacher preview · preparation pending"
+                    : "Teacher preview · visuals pending"}</span>
                 <h2>{topic.title}</h2>
                 <p>{topic.summary}</p>
                 <span className="workshop-topic-footer">
@@ -188,7 +206,8 @@ function WorkshopLanding({ navigate, access }) {
 
 function TopicModeChoice({ topic, navigate, access }) {
   const grant = access.topicAccess[topic.id] || {};
-  const canUsePractice = access.fullAccess || grant.live;
+  const canUsePractice = topic.visualsReady && (access.fullAccess || grant.live);
+  const canPrepare = topic.preparationReady;
 
   return (
     <main className="speaking-workshops">
@@ -197,6 +216,11 @@ function TopicModeChoice({ topic, navigate, access }) {
         <span className="workshop-kicker">Aptis Speaking Topic</span>
         <h1>{topic.title}</h1>
         <p>{topic.summary}</p>
+        {!topic.ready ? (
+          <strong className="workshop-draft-notice">{topic.visualsReady
+            ? "Teacher preview: task bank and visuals ready · preparation pending"
+            : "Teacher preview: question bank wired · visuals and preparation pending"}</strong>
+        ) : null}
       </section>
 
       <section className="workshop-mode-grid" aria-label="Choose a mode">
@@ -207,12 +231,12 @@ function TopicModeChoice({ topic, navigate, access }) {
           <p>Consult useful topic language for descriptions, comparisons, opinions and developed answers.</p>
           <strong>Open the reference <ArrowRight size={17} /></strong>
         </button>
-        <button className="mode-prepare" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/prepare`)}>
+        <button className={`mode-prepare ${canPrepare ? "" : "is-locked"}`} type="button" disabled={!canPrepare} onClick={() => navigate(`/speaking-workshops/${topic.id}/prepare`)}>
           <span className="mode-icon" aria-hidden="true"><Lightbulb size={28} /></span>
           <span className="workshop-kicker">Before the workshop</span>
           <h2>Prepare</h2>
-          <p>A short flipped-classroom sequence with topic phrases, speaking functions and an oral rehearsal.</p>
-          <strong>Start the warm-up <ArrowRight size={17} /></strong>
+          <p>{canPrepare ? "A short flipped-classroom sequence with topic vocabulary, ideas and an oral rehearsal." : "The preparation activities will be added after the vocabulary content is ready."}</p>
+          <strong>{canPrepare ? <>Start the warm-up <ArrowRight size={17} /></> : "Preparation being developed"}</strong>
         </button>
         <button className={`mode-practice ${canUsePractice ? "" : "is-locked"}`} type="button" disabled={!canUsePractice} onClick={() => navigate(`/speaking-workshops/${topic.id}/practice`)}>
           <span className="mode-icon" aria-hidden="true">{canUsePractice ? <Mic2 size={28} /> : <LockKeyhole size={27} />}</span>
@@ -220,8 +244,14 @@ function TopicModeChoice({ topic, navigate, access }) {
           <h2>Exam practice</h2>
           <p>{canUsePractice
             ? "Original Aptis timings, spoken instructions, microphone recording and AI feedback."
-            : "Your preparation is ready. Practice unlocks when the teacher starts the workshop."}</p>
-          <strong>{canUsePractice ? <>Choose a speaking part <ArrowRight size={17} /></> : "Waiting for the workshop to start"}</strong>
+            : !topic.visualsReady
+              ? "The question bank is wired, but practice will open when its photographs are ready."
+              : topic.preparationReady
+              ? "Your preparation is ready. Practice unlocks when the teacher starts the workshop."
+              : "The task bank and photographs are ready. Practice unlocks when the teacher starts the workshop."}</p>
+          <strong>{canUsePractice
+            ? <>Choose a speaking part <ArrowRight size={17} /></>
+            : topic.visualsReady ? "Waiting for the workshop to start" : "Visuals being prepared"}</strong>
         </button>
         {access.canManage ? (
           <button className="mode-teach" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/teach`)}>
@@ -349,22 +379,22 @@ function SpeakingWorkshopsContent({ user, access }) {
   const navigate = useNavigate();
   const { topicId, mode, partNumber } = useParams();
   const topic = topicId ? getSpeakingWorkshopTopic(topicId) : null;
+  const PreparationComponent = topic ? PREPARATION_COMPONENTS[topic.id] : null;
   const topicGrant = topic ? access.topicAccess[topic.id] || {} : {};
-  const canOpenTopic = !topic || access.fullAccess || topicGrant.preparation;
-  const canOpenPractice = access.fullAccess || topicGrant.live;
+  const canOpenTopic = !topic || access.fullAccess || (topic.contentReady && topicGrant.preparation);
+  const canOpenPractice = topic?.visualsReady && (access.fullAccess || topicGrant.live);
 
   let page = null;
   if (!topicId) page = <WorkshopLanding navigate={navigate} access={access} />;
   else if (!topic) page = <Navigate to="/speaking-workshops" replace />;
   else if (!canOpenTopic) page = <Navigate to="/speaking-workshops" replace />;
   else if (!mode) page = <TopicModeChoice topic={topic} navigate={navigate} access={access} />;
-  else if (mode === "prepare") page = (
+  else if (mode === "prepare" && PreparationComponent) page = (
     <main className="speaking-workshops">
-      {topic.id === "relationships-family"
-        ? <RelationshipsPreparation topic={topic} user={user} />
-        : <TransportPreparation topic={topic} user={user} />}
+      <PreparationComponent topic={topic} user={user} />
     </main>
   );
+  else if (mode === "prepare") page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;
   else if (mode === "reference") page = <main className="speaking-workshops"><SpeakingReference topic={topic} /></main>;
   else if (mode === "teach" && access.canManage) page = <main className="speaking-workshops"><TeachingMode topic={topic} /></main>;
   else if (mode === "practice" && !canOpenPractice) page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;

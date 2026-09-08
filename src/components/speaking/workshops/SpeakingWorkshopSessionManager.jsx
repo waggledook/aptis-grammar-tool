@@ -171,7 +171,13 @@ export default function SpeakingWorkshopSessionManager() {
                             onChange={() => toggleTopic(topicId)}
                           />
                           <span>{topic.title}</span>
-                          <small>{topic.ready ? "Ready" : "Materials pending"}</small>
+                          <small>{topic.ready
+                            ? "Ready"
+                            : topic.visualsReady
+                              ? "Tasks & visuals ready · preparation pending"
+                              : topic.contentReady
+                                ? "Tasks wired · visuals pending"
+                                : "Materials pending"}</small>
                         </label>
                       );
                     })}

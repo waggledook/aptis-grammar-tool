@@ -38,11 +38,16 @@ function ClassroomTimer({ seconds, label }) {
   );
 }
 
-function Photo({ src, alt, label }) {
+function Photo({ src, alt, label, brief }) {
   return (
-    <figure className="workshop-photo">
+    <figure className={`workshop-photo ${src ? "" : "is-placeholder"}`}>
       {label ? <span>{label}</span> : null}
-      <img src={src} alt={alt} />
+      {src ? <img src={src} alt={alt} /> : (
+        <div>
+          <strong>Visual pending</strong>
+          <p>{brief || alt}</p>
+        </div>
+      )}
     </figure>
   );
 }
@@ -100,7 +105,9 @@ export default function TeachingMode({ topic }) {
           <button type="button" className={timing === "off" ? "is-active" : ""} onClick={() => setTiming("off")}>Off</button>
           <button type="button" className={timing === "suggested" ? "is-active" : ""} onClick={() => setTiming("suggested")}>Recommended</button>
         </div>
-        <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/practice/${part}`)}>Open exam practice</button>
+        <button className="workshop-secondary" type="button" disabled={!topic.visualsReady} onClick={() => navigate(`/speaking-workshops/${topic.id}/practice/${part}`)}>
+          {topic.visualsReady ? "Open exam practice" : "Exam practice opens with visuals"}
+        </button>
       </section>
 
       {timing === "suggested" ? (
@@ -115,11 +122,11 @@ export default function TeachingMode({ topic }) {
         <div className="workshop-task-number">{String(taskIndex + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}</div>
         <h2>{current?.title}</h2>
 
-        {part === 2 ? <Photo src={current.image} alt={current.alt} /> : null}
+        {part === 2 ? <Photo src={current.image} alt={current.alt} brief={current.photoBriefs?.[0]?.text} /> : null}
         {part === 3 ? (
           <div className="workshop-photo-pair">
-            <Photo src={current.photoA.src} alt={current.photoA.alt} label="A" />
-            <Photo src={current.photoB.src} alt={current.photoB.alt} label="B" />
+            <Photo src={current.photoA.src} alt={current.photoA.alt} label="A" brief={current.photoBriefs?.[0]?.text} />
+            <Photo src={current.photoB.src} alt={current.photoB.alt} label="B" brief={current.photoBriefs?.[1]?.text} />
           </div>
         ) : null}
 

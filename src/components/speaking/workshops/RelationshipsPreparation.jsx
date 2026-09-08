@@ -2,12 +2,38 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { relationshipsPreparationConfig } from "./relationshipsPreparationData";
 
-const CHAPTERS = [
+const BASE_CHAPTERS = [
   { id: "set-a", label: "Learn A", title: "First vocabulary set", description: "Meet eight useful expressions, then retrieve every one." },
   { id: "set-b", label: "Learn B", title: "Second vocabulary set", description: "Add eight complementary expressions and practise them." },
   { id: "review", label: "Use it", title: "Review and ideas", description: "Mix both sets, then choose ideas you could talk about." },
   { id: "speak", label: "Speak", title: "45-second rehearsal", description: "Use the language once before the live workshop." },
 ];
+
+const WRITE_CHAPTER = {
+  id: "write",
+  label: "Write",
+  title: "Key-word writing check",
+  description: "Complete eight short sentences with key language from both vocabulary sets.",
+};
+
+function normalizeWrittenAnswer(value = "") {
+  return String(value)
+    .trim()
+    .toLowerCase()
+    .replace(/[-–—]/g, " ")
+    .replace(/[.,!?]/g, "")
+    .replace(/\s+/g, " ")
+    .replace(/[’']/g, "'");
+}
+
+function shuffle(items) {
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+  }
+  return shuffled;
+}
 
 function readSavedProgress(key) {
   try {
@@ -111,7 +137,7 @@ function QuestionCycle({ kicker, title, questions, answers, setAnswers, onFinish
   );
 }
 
-function VocabularyChapter({ set, chapterIndex, setChapterIndex, onComplete }) {
+function VocabularyChapter({ set, chapterId, chapterIndex, setChapterIndex, onComplete }) {
   const [stage, setStage] = useState("learn");
   const [answers, setAnswers] = useState({});
 
@@ -125,14 +151,14 @@ function VocabularyChapter({ set, chapterIndex, setChapterIndex, onComplete }) {
       setAnswers={setAnswers}
       finishLabel={chapterIndex === 0 ? "Learn Set B →" : "Mixed review →"}
       onFinish={() => {
-        onComplete(CHAPTERS[chapterIndex].id);
+        onComplete(chapterId);
         setChapterIndex(chapterIndex + 1);
       }}
     />
   );
 }
 
-function IdeaActivation({ tasks, selections, setSelections, onFinish }) {
+function IdeaActivation({ tasks, selections, setSelections, onFinish, finishLabel = "Speaking rehearsal →" }) {
   const complete = tasks.every((task) => (selections[task.id] || []).length >= task.minimum);
 
   function toggle(task, idea) {
@@ -167,7 +193,7 @@ function IdeaActivation({ tasks, selections, setSelections, onFinish }) {
       </div>
       <footer className="prep-idea-actions">
         <span>{complete ? "You have enough ideas to speak." : "Choose your easiest ideas—not the most impressive ones."}</span>
-        <button className="workshop-primary" type="button" disabled={!complete} onClick={onFinish}>Speaking rehearsal →</button>
+        <button className="workshop-primary" type="button" disabled={!complete} onClick={onFinish}>{finishLabel}</button>
       </footer>
     </section>
   );
@@ -186,6 +212,7 @@ function ReviewChapter({ config, setChapterIndex, onComplete }) {
       tasks={config.ideaTasks}
       selections={selections}
       setSelections={setSelections}
+      finishLabel={config.writeTest ? "Writing check →" : "Speaking rehearsal →"}
       onFinish={() => {
         onComplete("review");
         setChapterIndex(3);
@@ -249,8 +276,112 @@ function SpeakingRehearsal({ rehearsal, onComplete, onOpenReference }) {
   );
 }
 
+function WritingTest({ writeTest, onComplete }) {
+  const [questions, setQuestions] = useState(() => shuffle(writeTest.items));
+  const [questionIndex, setQuestionIndex] = useState(0);
+  const [answer, setAnswer] = useState("");
+  const [result, setResult] = useState(null);
+  const [score, setScore] = useState(0);
+  const [finished, setFinished] = useState(false);
+  const question = questions[questionIndex];
+
+  function checkAnswer(event) {
+    event.preventDefault();
+    if (!answer.trim() || result) return;
+    const acceptedAnswers = [question.answer, ...(question.acceptedAnswers || [])].map(normalizeWrittenAnswer);
+    const correct = acceptedAnswers.includes(normalizeWrittenAnswer(answer));
+    setResult(correct ? "correct" : "wrong");
+    if (correct) setScore((current) => current + 1);
+  }
+
+  function showAnswer() {
+    if (result) return;
+    setResult("wrong");
+  }
+
+  function nextQuestion() {
+    if (questionIndex === questions.length - 1) {
+      setFinished(true);
+      return;
+    }
+    setQuestionIndex((current) => current + 1);
+    setAnswer("");
+    setResult(null);
+  }
+
+  function tryAgain() {
+    setQuestions(shuffle(writeTest.items));
+    setQuestionIndex(0);
+    setAnswer("");
+    setResult(null);
+    setScore(0);
+    setFinished(false);
+  }
+
+  if (finished) {
+    return (
+      <section className="prep-activity-card prep-complete-card">
+        <span className="prep-card-icon" aria-hidden="true">✓</span>
+        <h2>{score} / {questions.length} correct</h2>
+        <p>You completed the writing check. Review any answers you missed, or try the eight items again in a new order.</p>
+        <div className="prep-complete-actions">
+          <button className="workshop-secondary" type="button" onClick={tryAgain}>Try again</button>
+          <button className="workshop-primary" type="button" onClick={onComplete}>Speaking rehearsal →</button>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="prep-activity-card">
+      <div className="prep-activity-heading">
+        <div>
+          <span className="workshop-kicker">Sets A + B · Write</span>
+          <h2>{writeTest.title || "Write the key words"}</h2>
+          <p className="prep-lead">{writeTest.introduction}</p>
+        </div>
+        <strong>{questionIndex + 1} / {questions.length}</strong>
+      </div>
+      <div className="prep-write-layout">
+        {question.image ? <img src={question.image} alt="" /> : null}
+        <div className="prep-write-question">
+          <span>Complete the sentence</span>
+          <p>{question.prompt}</p>
+          <form onSubmit={checkAnswer}>
+            <label htmlFor={`prep-write-${question.id}`}>Missing word or words</label>
+            <input
+              id={`prep-write-${question.id}`}
+              key={question.id}
+              type="text"
+              value={answer}
+              onChange={(event) => setAnswer(event.target.value)}
+              disabled={Boolean(result)}
+              autoComplete="off"
+              autoFocus
+            />
+            {!result ? (
+              <div className="prep-write-actions">
+                <button className="workshop-secondary" type="button" onClick={showAnswer}>Show answer</button>
+                <button className="workshop-primary" type="submit" disabled={!answer.trim()}>Check</button>
+              </div>
+            ) : null}
+          </form>
+          {result ? (
+            <div className={`prep-feedback ${result === "correct" ? "is-correct" : "is-wrong"}`} role="status">
+              <strong>{result === "correct" ? "Correct." : `Answer: “${question.answer}”.`}</strong>
+              <span>{question.feedback}</span>
+            </div>
+          ) : null}
+          {result ? <button className="prep-write-next" type="button" onClick={nextQuestion}>{questionIndex === questions.length - 1 ? "See result" : "Next →"}</button> : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function WorkshopPreparation({ topic, user, config }) {
   const navigate = useNavigate();
+  const chapters = useMemo(() => config.writeTest?.items?.length ? [...BASE_CHAPTERS.slice(0, 3), WRITE_CHAPTER, BASE_CHAPTERS[3]] : BASE_CHAPTERS, [config.writeTest]);
   const storageKey = useMemo(() => `speaking-workshop-prep:${user?.uid || "local"}:${topic.id}:${config.storageVersion}`, [config.storageVersion, topic.id, user?.uid]);
   const [chapterIndex, setChapterIndex] = useState(0);
   const [completedChapters, setCompletedChapters] = useState(() => readSavedProgress(storageKey));
@@ -260,7 +391,8 @@ export function WorkshopPreparation({ topic, user, config }) {
   }, [completedChapters, storageKey]);
 
   const completedSet = useMemo(() => new Set(completedChapters), [completedChapters]);
-  const chapter = CHAPTERS[chapterIndex];
+  const chapter = chapters[chapterIndex] || chapters[0];
+  const completedCount = chapters.filter((item) => completedSet.has(item.id)).length;
 
   function completeChapter(id) {
     setCompletedChapters((current) => current.includes(id) ? current : [...current, id]);
@@ -272,30 +404,32 @@ export function WorkshopPreparation({ topic, user, config }) {
         <div>
           <span className="workshop-kicker">Prepare before the workshop · {topic.title}</span>
           <h1>Build your topic vocabulary</h1>
-          <p>Learn 16 useful expressions, choose ideas you can discuss, then try one short rehearsal. Allow about 12–15 minutes.</p>
+          <p>{config.writeTest ? "Learn 16 useful expressions, choose ideas, complete a short writing check, then rehearse once. Allow about 15–18 minutes." : "Learn 16 useful expressions, choose ideas you can discuss, then try one short rehearsal. Allow about 12–15 minutes."}</p>
         </div>
         <div className="workshop-session-header-actions">
           <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/reference`)}>Language guide</button>
           <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}`)}>Change mode</button>
         </div>
       </header>
-      <section className="prep-progress-summary" aria-label={`${completedChapters.length} of ${CHAPTERS.length} preparation chapters complete`}>
-        <div><strong>{completedChapters.length} / {CHAPTERS.length}</strong><span>chapters complete</span></div>
-        <div className="prep-progress-track" aria-hidden="true"><span style={{ width: `${(completedChapters.length / CHAPTERS.length) * 100}%` }} /></div>
-        {completedChapters.length === CHAPTERS.length ? <b>Ready for the workshop ✓</b> : <small>Your progress is saved on this device.</small>}
+      <section className="prep-progress-summary" aria-label={`${completedCount} of ${chapters.length} preparation chapters complete`}>
+        <div><strong>{completedCount} / {chapters.length}</strong><span>chapters complete</span></div>
+        <div className="prep-progress-track" aria-hidden="true"><span style={{ width: `${(completedCount / chapters.length) * 100}%` }} /></div>
+        {completedCount === chapters.length ? <b>Ready for the workshop ✓</b> : <small>Your progress is saved on this device.</small>}
       </section>
-      <nav className="prep-step-nav" aria-label="Preparation chapters">
-        {CHAPTERS.map((item, index) => (
+      <nav className="prep-step-nav" aria-label="Preparation chapters" style={{ "--prep-chapter-count": chapters.length }}>
+        {chapters.map((item, index) => (
           <button key={item.id} type="button" className={`${chapterIndex === index ? "is-active" : ""} ${completedSet.has(item.id) ? "is-complete" : ""}`} onClick={() => setChapterIndex(index)}>
             <span>{completedSet.has(item.id) ? "✓" : index + 1}</span><strong>{item.label}</strong><small>{item.title}</small>
           </button>
         ))}
       </nav>
       <div className="prep-current-intro"><span>Chapter {chapterIndex + 1}</span><div><h2>{chapter.title}</h2><p>{chapter.description}</p></div></div>
-      {chapterIndex === 0 ? <VocabularyChapter key="set-a" set={config.sets[0]} chapterIndex={0} setChapterIndex={setChapterIndex} onComplete={completeChapter} /> : null}
-      {chapterIndex === 1 ? <VocabularyChapter key="set-b" set={config.sets[1]} chapterIndex={1} setChapterIndex={setChapterIndex} onComplete={completeChapter} /> : null}
+      {chapterIndex === 0 ? <VocabularyChapter key="set-a" set={config.sets[0]} chapterId="set-a" chapterIndex={0} setChapterIndex={setChapterIndex} onComplete={completeChapter} /> : null}
+      {chapterIndex === 1 ? <VocabularyChapter key="set-b" set={config.sets[1]} chapterId="set-b" chapterIndex={1} setChapterIndex={setChapterIndex} onComplete={completeChapter} /> : null}
       {chapterIndex === 2 ? <ReviewChapter key="review" config={config} setChapterIndex={setChapterIndex} onComplete={completeChapter} /> : null}
-      {chapterIndex === 3 ? <SpeakingRehearsal rehearsal={config.rehearsal} onOpenReference={() => navigate(`/speaking-workshops/${topic.id}/reference`)} onComplete={() => completeChapter("speak")} /> : null}
+      {chapterIndex === 3 && config.writeTest ? <WritingTest writeTest={config.writeTest} onComplete={() => { completeChapter("write"); setChapterIndex(4); }} /> : null}
+      {chapterIndex === 3 && !config.writeTest ? <SpeakingRehearsal rehearsal={config.rehearsal} onOpenReference={() => navigate(`/speaking-workshops/${topic.id}/reference`)} onComplete={() => completeChapter("speak")} /> : null}
+      {chapterIndex === 4 && config.writeTest ? <SpeakingRehearsal rehearsal={config.rehearsal} onOpenReference={() => navigate(`/speaking-workshops/${topic.id}/reference`)} onComplete={() => completeChapter("speak")} /> : null}
     </div>
   );
 }

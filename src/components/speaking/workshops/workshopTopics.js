@@ -1,4 +1,6 @@
+import homeNeighbourhoodSource from "./content/home-neighbourhood.md?raw";
 import relationshipsFamilySource from "./content/relationships-family.md?raw";
+import technologyCommunicationSource from "./content/technology-communication.md?raw";
 import travelTransportSource from "./content/travel-transport.md?raw";
 
 const PHOTO_ASSETS = {
@@ -94,6 +96,98 @@ const PHOTO_ASSETS = {
       ],
     ],
   },
+  "home-neighbourhood": {
+    part2: [
+      "/images/speaking/workshops/home-neighbourhood/part2_task01_relaxing_at_home.webp",
+      "/images/speaking/workshops/home-neighbourhood/part2_task02_working_at_home.webp",
+      "/images/speaking/workshops/home-neighbourhood/part2_task03_local_park.webp",
+      "/images/speaking/workshops/home-neighbourhood/part2_task04_local_shops.webp",
+      "/images/speaking/workshops/home-neighbourhood/part2_task05_neighbours.webp",
+      "/images/speaking/workshops/home-neighbourhood/part2_task06_apartment_living.webp",
+      "/images/speaking/workshops/home-neighbourhood/part2_task07_home_improvement.webp",
+      "/images/speaking/workshops/home-neighbourhood/part2_task08_new_housing.webp",
+    ],
+    part3: [
+      [
+        "/images/speaking/workshops/home-neighbourhood/part3_task01A_house.webp",
+        "/images/speaking/workshops/home-neighbourhood/part3_task01B_flat.webp",
+      ],
+      [
+        "/images/speaking/workshops/home-neighbourhood/part3_task02A_central_neighbourhood.webp",
+        "/images/speaking/workshops/home-neighbourhood/part3_task02B_quieter_neighbourhood.webp",
+      ],
+      [
+        "/images/speaking/workshops/home-neighbourhood/part3_task03A_established_neighbourhood.webp",
+        "/images/speaking/workshops/home-neighbourhood/part3_task03B_new_neighbourhood.webp",
+      ],
+      [
+        "/images/speaking/workshops/home-neighbourhood/part3_task04A_busy_street.webp",
+        "/images/speaking/workshops/home-neighbourhood/part3_task04B_quiet_street.webp",
+      ],
+      [
+        "/images/speaking/workshops/home-neighbourhood/part3_task05A_private_garden.webp",
+        "/images/speaking/workshops/home-neighbourhood/part3_task05B_public_park.webp",
+      ],
+      [
+        "/images/speaking/workshops/home-neighbourhood/part3_task06A_large_home.webp",
+        "/images/speaking/workshops/home-neighbourhood/part3_task06B_small_home.webp",
+      ],
+      [
+        "/images/speaking/workshops/home-neighbourhood/part3_task07A_local_shops.webp",
+        "/images/speaking/workshops/home-neighbourhood/part3_task07B_shopping_centre.webp",
+      ],
+      [
+        "/images/speaking/workshops/home-neighbourhood/part3_task08A_renovating_homes.webp",
+        "/images/speaking/workshops/home-neighbourhood/part3_task08B_building_new_homes.webp",
+      ],
+    ],
+  },
+  "technology-communication": {
+    part2: [
+      "/images/speaking/workshops/technology-communication/part2_task01_using_smartphone.webp",
+      "/images/speaking/workshops/technology-communication/part2_task02_digital_payment.webp",
+      "/images/speaking/workshops/technology-communication/part2_task03_online_information.webp",
+      "/images/speaking/workshops/technology-communication/part2_task04_video_call.webp",
+      "/images/speaking/workshops/technology-communication/part2_task05_technology_help.webp",
+      "/images/speaking/workshops/technology-communication/part2_task06_digital_service.webp",
+      "/images/speaking/workshops/technology-communication/part2_task07_phone_photography.webp",
+      "/images/speaking/workshops/technology-communication/part2_task08_technology_in_public.webp",
+    ],
+    part3: [
+      [
+        "/images/speaking/workshops/technology-communication/part3_task01A_smartphone.webp",
+        "/images/speaking/workshops/technology-communication/part3_task01B_computer.webp",
+      ],
+      [
+        "/images/speaking/workshops/technology-communication/part3_task02A_digital_payment.webp",
+        "/images/speaking/workshops/technology-communication/part3_task02B_cash_payment.webp",
+      ],
+      [
+        "/images/speaking/workshops/technology-communication/part3_task03A_printed_information.webp",
+        "/images/speaking/workshops/technology-communication/part3_task03B_digital_information.webp",
+      ],
+      [
+        "/images/speaking/workshops/technology-communication/part3_task04A_phone_call.webp",
+        "/images/speaking/workshops/technology-communication/part3_task04B_video_call.webp",
+      ],
+      [
+        "/images/speaking/workshops/technology-communication/part3_task05A_personal_help.webp",
+        "/images/speaking/workshops/technology-communication/part3_task05B_online_help.webp",
+      ],
+      [
+        "/images/speaking/workshops/technology-communication/part3_task06A_phone_camera.webp",
+        "/images/speaking/workshops/technology-communication/part3_task06B_dedicated_camera.webp",
+      ],
+      [
+        "/images/speaking/workshops/technology-communication/part3_task07A_landline_phone.webp",
+        "/images/speaking/workshops/technology-communication/part3_task07B_modern_smartphone.webp",
+      ],
+      [
+        "/images/speaking/workshops/technology-communication/part3_task08A_technology_at_home.webp",
+        "/images/speaking/workshops/technology-communication/part3_task08B_technology_outside.webp",
+      ],
+    ],
+  },
 };
 
 const TOPIC_META = {
@@ -101,21 +195,37 @@ const TOPIC_META = {
     title: "Relationships & Family",
     summary: "Friends, family life, keeping in touch, shared experiences and support.",
     accent: "coral",
+    contentReady: true,
+    ready: true,
+    visualsReady: true,
+    preparationReady: true,
   },
   "travel-transport": {
     title: "Travel & Transport",
     summary: "Journeys, transport choices, travel experiences and getting around.",
     accent: "sky",
+    contentReady: true,
+    ready: true,
+    visualsReady: true,
+    preparationReady: true,
   },
   "home-neighbourhood": {
     title: "Home & Neighbourhood",
     summary: "Homes, local places, communities, facilities and changes in the area.",
     accent: "mint",
+    contentReady: true,
+    ready: true,
+    visualsReady: true,
+    preparationReady: true,
   },
   "technology-communication": {
     title: "Technology & Communication",
     summary: "Devices, online communication, digital habits and technological change.",
     accent: "violet",
+    contentReady: true,
+    ready: true,
+    visualsReady: true,
+    preparationReady: true,
   },
   "food-eating": {
     title: "Food & Eating",
@@ -198,7 +308,7 @@ function parseTopicSource(id, source) {
     }
   });
 
-  const assets = PHOTO_ASSETS[id];
+  const assets = PHOTO_ASSETS[id] || { part2: [], part3: [] };
   parts[2].tasks = parts[2].tasks.map((task, index) => ({
     ...task,
     image: assets.part2[index],
@@ -236,9 +346,11 @@ function parseTopicSource(id, source) {
 export const SPEAKING_WORKSHOP_TOPICS = [
   parseTopicSource("relationships-family", relationshipsFamilySource),
   parseTopicSource("travel-transport", travelTransportSource),
+  parseTopicSource("home-neighbourhood", homeNeighbourhoodSource),
+  parseTopicSource("technology-communication", technologyCommunicationSource),
 ];
 
-const READY_TOPIC_IDS = new Set(SPEAKING_WORKSHOP_TOPICS.map((topic) => topic.id));
+const READY_TOPIC_IDS = new Set(SPEAKING_WORKSHOP_TOPICS.filter((topic) => topic.ready).map((topic) => topic.id));
 
 export const SPEAKING_WORKSHOP_TOPIC_CATALOG = SPEAKING_WORKSHOP_PROGRAMME.flatMap((programmeWeek) => (
   programmeWeek.topicIds.map((id, index) => ({
