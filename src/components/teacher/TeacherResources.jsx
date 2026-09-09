@@ -40,6 +40,13 @@ const PRODUCT_GROUPS = [
             icon: BookOpen,
             tags: ["Assignable", "Direct link", "Live lessons"],
           },
+          {
+            title: "Reading Part 3 teacher tasks",
+            description: "Five substantial matching-opinions tasks for assignment, direct-link practice or a live whole-class session.",
+            path: "/reading/part3-teacher",
+            icon: BookOpen,
+            tags: ["Assignable", "Direct link", "Live lessons"],
+          },
         ],
       },
       {

@@ -89,6 +89,9 @@ import ReadingPart2Teacher from "./reading/ReadingPart2Teacher.jsx";
 import ReadingPart2LiveHost from "./reading/ReadingPart2LiveHost.jsx";
 import ReadingPart2LivePlayer from "./reading/ReadingPart2LivePlayer.jsx";
 import AptisPart3Matching from './reading/AptisPart3Matching';
+import ReadingPart3Teacher from "./reading/ReadingPart3Teacher.jsx";
+import ReadingPart3LiveHost from "./reading/ReadingPart3LiveHost.jsx";
+import ReadingPart3LivePlayer from "./reading/ReadingPart3LivePlayer.jsx";
 import AptisPart4 from "./reading/AptisPart4";
 import VocabularyMenu from "./components/vocabulary/VocabularyMenu";
 import ToastHost from './components/ToastHost';
@@ -2254,6 +2257,24 @@ return (
 } />
 
 <Route
+  path="/reading/part3-teacher"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <>
+        <button
+          onClick={() => navigate("/reading/parts/3")}
+          className="review-btn"
+          style={{ marginBottom: "1rem" }}
+        >
+          ← Back
+        </button>
+        <ReadingPart3Teacher user={user} />
+      </>
+    </RequireSignedIn>
+  }
+/>
+
+<Route
   path="/reading/part4"
   element={
     <>
@@ -3202,6 +3223,8 @@ return (
 <Route path="/live/aptis-reading-part1/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><ReadingPart1LivePlayer /></RequireSignedIn>} />
 <Route path="/live/aptis-reading-part2/host/:gameId" element={<RequireTeacher user={user}><ReadingPart2LiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/aptis-reading-part2/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><ReadingPart2LivePlayer /></RequireSignedIn>} />
+<Route path="/live/aptis-reading-part3/host/:gameId" element={<RequireTeacher user={user}><ReadingPart3LiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/aptis-reading-part3/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><ReadingPart3LivePlayer /></RequireSignedIn>} />
 <Route
   path="/live/register-surgery/play/:gameId"
   element={

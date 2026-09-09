@@ -73,7 +73,17 @@ function ChipDropdown({ items, value, onChange, label = "Task" }) {
 }
 
 // ---------- Component ----------
-export default function AptisPart3Matching({ tasks = READING_PART3_TASKS, user }) {
+export default function AptisPart3Matching({
+  tasks = READING_PART3_TASKS,
+  user,
+  routeBasePath = getSitePath("/reading/part3"),
+  activityId = "reading-part-3",
+  progressPart = "part3",
+  source = "AptisPart3",
+  heading = "Reading – Part 3 (Matching Opinions)",
+  intro = null,
+  headerActions = null,
+}) {
   const initialTaskId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("task") : "";
   const initialTaskIndex = Math.max(0, tasks.findIndex((task) => task.id === initialTaskId));
   const [taskIndex, setTaskIndex] = useState(initialTaskIndex);
@@ -92,13 +102,13 @@ export default function AptisPart3Matching({ tasks = READING_PART3_TASKS, user }
     let alive = true;
     (async () => {
       if (!user) return setCompleted(new Set());
-      const done = await fetchReadingCompletionsByPart("part3");
+      const done = await fetchReadingCompletionsByPart(progressPart);
       if (alive) setCompleted(done);
     })();
     return () => {
       alive = false;
     };
-  }, [user]);
+  }, [progressPart, user]);
 
   // 🔹 NEW SCROLL EFFECT — paste here
 useEffect(() => {
@@ -151,7 +161,7 @@ useEffect(() => {
     if (!user || completed.has(current.id)) return;
 
     try {
-      await logReadingPart3Completed({ taskId: current.id, source: "AptisPart3" });
+      await logReadingPart3Completed({ taskId: current.id, source, progressPart });
       setCompleted((p) => new Set(p).add(current.id));
       toast("Task marked as completed ✓");
     } catch (err) {
@@ -183,7 +193,7 @@ useEffect(() => {
         taskId: current.id,
         score,
         total,
-        source: "AptisPart3",
+        source,
         ...timingDetails,
       });
     }
@@ -216,7 +226,7 @@ useEffect(() => {
         taskId: current.id,
         score,
         total: current.questions.length,
-        source: "AptisPart3",
+        source,
         ...timingDetails,
       });
     }
@@ -244,11 +254,16 @@ useEffect(() => {
       current.comments.find((c) => c.name === commentName)?.text || "";
   
     // normalise to an array: ["part1", "part2", ...]
+    const quotedEvidence = typeof q.evidence === "string"
+      ? [...q.evidence.matchAll(/[“"]([^”"]+)[”"]/g)].map((match) => match[1])
+      : [];
     const parts = Array.isArray(q.evidenceParts)
       ? q.evidenceParts
-      : q.evidence
-      ? [q.evidence]
-      : [];
+      : quotedEvidence.length
+        ? quotedEvidence
+        : q.evidence && fullText.toLowerCase().includes(q.evidence.toLowerCase())
+          ? [q.evidence]
+          : [];
   
     if (parts.length === 0) {
       return <p>{fullText}</p>;
@@ -291,18 +306,19 @@ useEffect(() => {
       <StyleScope />
       <header className="header">
         <div>
-          <h2 className="title">Reading – Part 3 (Matching Opinions)</h2>
-          <p className="intro"><em>{current.title}</em></p>
+          <h2 className="title">{heading}</h2>
+          <p className="intro"><em>{intro || current.title}</em></p>
         </div>
         <div className="header-tools">
           <ReadingAssignButton
             user={user}
-            activityId="reading-part-3"
+            activityId={activityId}
             activityLabel={`Aptis Reading Part 3 — ${current?.title || "Matching opinions"}`}
-            routePath={getSitePath(`/reading/part3?task=${encodeURIComponent(current?.id || "")}`)}
+            routePath={`${routeBasePath}?task=${encodeURIComponent(current?.id || "")}`}
             taskId={current?.id || ""}
             taskTitle={current?.title || ""}
           />
+          {typeof headerActions === "function" ? headerActions(current) : headerActions}
           <ChipDropdown
             items={decoratedItems}
             value={taskIndex}

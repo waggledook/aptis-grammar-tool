@@ -215,7 +215,7 @@ service cloud.firestore {
           request.resource.data.teacherUid == resource.data.teacherUid &&
           request.resource.data.vocabId == resource.data.vocabId &&
           request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-            'sentence', 'status', 'teacherComment', 'updatedAt', 'updatedAtServer'
+            'sentence', 'status', 'updatedAt', 'updatedAtServer'
           ]) &&
           request.resource.data.status in ['draft', 'submitted']
         ) ||

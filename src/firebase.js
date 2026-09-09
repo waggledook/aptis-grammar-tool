@@ -2259,11 +2259,12 @@ export async function logReadingPart3Attempted({
   });
 }
 
-export async function logReadingPart3Completed({ taskId, source = "AptisPart3" }) {
-  await saveReadingProgress(taskId, "part3");
+export async function logReadingPart3Completed({ taskId, source = "AptisPart3", progressPart = "part3" }) {
+  await saveReadingProgress(taskId, progressPart);
   return logActivity("reading_part3_completed", {
     taskId: taskId || null,
     source,
+    progressPart,
   });
 }
 
