@@ -321,11 +321,13 @@
 .workshop-session-invite > div { display: grid; gap: .15rem; }
 .workshop-session-invite span { color: var(--workshop-muted); font-size: .68rem; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
 .workshop-session-invite strong { color: #9dc5ff; font-size: 1.35rem; letter-spacing: .12em; }
+.workshop-session-actions { display: grid; gap: .45rem; }
 .workshop-session-invite button,
 .workshop-session-actions button,
 .workshop-join-another button { display: flex; align-items: center; justify-content: center; gap: .35rem; border: 1px solid #405573; border-radius: 9px; background: #17253c; color: white; padding: .52rem .7rem; font-weight: 750; cursor: pointer; }
 .workshop-session-actions button { border-color: #3e8d70; background: #205f49; }
 .workshop-session-actions button.is-end { border-color: #a75e53; background: #773c34; }
+.workshop-session-actions button.is-delete { border-color: #934d53; background: #55272d; }
 .workshop-session-actions button:disabled { opacity: .5; cursor: wait; }
 
 .workshop-membership-summary { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 1rem; }
@@ -684,6 +686,7 @@
 :root[data-theme="light"] .workshop-review-rule { background: #e6f0ff; color: #234f8c; }
 :root[data-theme="light"] .workshop-session-actions button { background: #dcf7eb; color: #17543f; }
 :root[data-theme="light"] .workshop-session-actions button.is-end { background: #fde7e3; color: #75352d; }
+:root[data-theme="light"] .workshop-session-actions button.is-delete { background: #f9e1e3; color: #7a2932; }
 :root[data-theme="light"] :is(.prep-progress-track, .prep-flashcard, .prep-vocab-card, .prep-builder-grid label, .prep-answer-plan, .prep-self-check label, .prep-idea-grid button, .prep-speaking-support section, .prep-write-question input) { background: #f4f7fb; }
 :root[data-theme="light"] :is(.prep-rating-actions button, .prep-choice-grid button, .prep-step-actions button, .prep-question-tabs button, .prep-card-actions > button, .prep-question-actions button, .prep-write-next) { background: #f4f7fb; color: #172033; }
 :root[data-theme="light"] .prep-rating-actions button:last-child,

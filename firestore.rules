@@ -190,6 +190,52 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // ── Vocabulary Studio learner examples ─────────────────────────────
+    match /vocabExamples/{exampleId} {
+      allow create: if isSignedIn()
+        && request.resource.data.studentUid == request.auth.uid
+        && request.resource.data.status in ['draft', 'submitted']
+        && (
+          request.resource.data.teacherUid == null ||
+          request.resource.data.teacherUid ==
+            get(/databases/$(database)/documents/users/$(request.auth.uid)).data.teacherId
+        );
+
+      allow get, list: if isSignedIn() && (
+        resource.data.studentUid == request.auth.uid ||
+        isAdmin() ||
+        (isTeacherOrAdmin() && resource.data.teacherUid == request.auth.uid)
+      );
+
+      allow update: if isSignedIn() && (
+        isAdmin() ||
+        (
+          resource.data.studentUid == request.auth.uid &&
+          request.resource.data.studentUid == resource.data.studentUid &&
+          request.resource.data.teacherUid == resource.data.teacherUid &&
+          request.resource.data.vocabId == resource.data.vocabId &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'sentence', 'status', 'teacherComment', 'updatedAt', 'updatedAtServer'
+          ]) &&
+          request.resource.data.status in ['draft', 'submitted']
+        ) ||
+        (
+          isTeacherOrAdmin() &&
+          resource.data.teacherUid == request.auth.uid &&
+          request.resource.data.studentUid == resource.data.studentUid &&
+          request.resource.data.teacherUid == resource.data.teacherUid &&
+          request.resource.data.vocabId == resource.data.vocabId &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'status', 'teacherComment', 'reviewedBy', 'reviewedAt',
+            'updatedAt', 'updatedAtServer'
+          ]) &&
+          request.resource.data.status in ['approved', 'needs_revision']
+        )
+      );
+
+      allow delete: if false;
+    }
+
     // ── 5) Public contact form submissions ──────────────────────────────
     match /contactMessages/{messageId} {
       allow create: if true;

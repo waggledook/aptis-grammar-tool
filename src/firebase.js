@@ -455,6 +455,12 @@ export async function updateSpeakingWorkshopSession(sessionId, action) {
   return result.data;
 }
 
+export async function deleteSpeakingWorkshopSession(sessionId) {
+  const callable = httpsCallable(functionsRegion, "deleteSpeakingWorkshopSession");
+  const result = await callable({ sessionId });
+  return result.data;
+}
+
 export async function requestAptisSpeakingPart1Feedback(payload) {
   const generateAptisSpeakingPart1Feedback = httpsCallable(
     functionsRegion,

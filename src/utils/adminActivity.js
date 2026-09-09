@@ -17,6 +17,9 @@ export const ACTIVITY_TYPE_LABELS = {
   speaking_task_completed: "Speaking Task Completed",
   vocab_flashcards_session: "Vocabulary Flashcards",
   vocab_match_session: "Vocabulary Match",
+  speaking_workshop_preparation_viewed: "Workshop Preparation Viewed",
+  speaking_workshop_preparation_progress: "Workshop Preparation Progress",
+  speaking_workshop_preparation_completed: "Workshop Preparation Completed",
   strategy_guide_viewed: "Strategy Guide Viewed",
   strategy_guide_completed: "Strategy Guide Completed",
   reading_guide_viewed: "Reading Guide Viewed",
@@ -282,6 +285,28 @@ export function formatActivityDetails(log) {
   const d = log.details || {};
 
   switch (log.type) {
+    case "speaking_workshop_preparation_viewed":
+    case "speaking_workshop_preparation_progress":
+    case "speaking_workshop_preparation_completed": {
+      const timing = d.beforeWorkshop === true
+        ? "Before workshop"
+        : Array.isArray(d.sessionPhases) && d.sessionPhases.includes("live")
+          ? "During live workshop"
+          : Array.isArray(d.sessionPhases) && d.sessionPhases.includes("review")
+            ? "During review period"
+            : "No linked session";
+      return joinParts([
+        d.topicTitle || titleCaseFromSnakeCase(d.topicId),
+        d.chapterLabel ? `Chapter: ${d.chapterLabel}` : "",
+        typeof d.completedChapters === "number"
+          ? `${d.completedChapters}/${d.totalChapters ?? "?"} chapters`
+          : "",
+        timing,
+        Array.isArray(d.sessionIds) && d.sessionIds.length
+          ? formatCount(d.sessionIds.length, "linked session")
+          : "",
+      ]);
+    }
     case "grammar_session": {
       const modeLabel = d.mode === "test" ? "Test mode" : "Practice";
       return joinParts([modeLabel, formatCount(d.totalItems, "item")]);

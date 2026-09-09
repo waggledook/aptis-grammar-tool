@@ -7,11 +7,13 @@ import {
   Play,
   Plus,
   Square,
+  Trash2,
   Users,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import {
   createSpeakingWorkshopSession,
+  deleteSpeakingWorkshopSession,
   listSpeakingWorkshopSessions,
   updateSpeakingWorkshopSession,
 } from "../../../firebase";
@@ -40,13 +42,14 @@ function formatDate(value) {
   }).format(date);
 }
 
-export default function SpeakingWorkshopSessionManager() {
+export default function SpeakingWorkshopSessionManager({ user }) {
   const [sessions, setSessions] = useState([]);
   const [label, setLabel] = useState("Friday speaking workshop");
   const [topicIds, setTopicIds] = useState(() => [...SPEAKING_WORKSHOP_PROGRAMME[0].topicIds]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
+  const [deletingId, setDeletingId] = useState("");
   const [copiedId, setCopiedId] = useState("");
   const [error, setError] = useState("");
 
@@ -103,7 +106,7 @@ export default function SpeakingWorkshopSessionManager() {
   }
 
   async function updateSession(sessionId, action) {
-    if (updatingId) return;
+    if (updatingId || deletingId) return;
     setUpdatingId(sessionId);
     setError("");
     try {
@@ -118,6 +121,25 @@ export default function SpeakingWorkshopSessionManager() {
       setError("The workshop status couldn’t be changed. Refresh and try again.");
     } finally {
       setUpdatingId("");
+    }
+  }
+
+  async function deleteSession(session) {
+    if (deletingId || updatingId || user?.role !== "admin") return;
+    const confirmed = window.confirm(
+      `Delete “${session.label}”? This will remove the session and revoke access for ${session.attendeeCount || 0} registered participant${session.attendeeCount === 1 ? "" : "s"}. This cannot be undone.`
+    );
+    if (!confirmed) return;
+    setDeletingId(session.id);
+    setError("");
+    try {
+      await deleteSpeakingWorkshopSession(session.id);
+      setSessions((current) => current.filter((item) => item.id !== session.id));
+    } catch (requestError) {
+      console.error("[Speaking workshops] Could not delete session", requestError);
+      setError("The workshop couldn’t be deleted. Refresh and try again.");
+    } finally {
+      setDeletingId("");
     }
   }
 
@@ -242,13 +264,19 @@ export default function SpeakingWorkshopSessionManager() {
 
                 <div className="workshop-session-actions">
                   {session.phase === "preparation" ? (
-                    <button type="button" disabled={updatingId === session.id} onClick={() => updateSession(session.id, "start")}>
+                    <button type="button" disabled={updatingId === session.id || deletingId === session.id} onClick={() => updateSession(session.id, "start")}>
                       <Play size={17} /> Start workshop
                     </button>
                   ) : null}
                   {session.phase === "live" ? (
-                    <button className="is-end" type="button" disabled={updatingId === session.id} onClick={() => updateSession(session.id, "end")}>
+                    <button className="is-end" type="button" disabled={updatingId === session.id || deletingId === session.id} onClick={() => updateSession(session.id, "end")}>
                       <Square size={16} /> End & start review
+                    </button>
+                  ) : null}
+                  {user?.role === "admin" ? (
+                    <button className="is-delete" type="button" disabled={Boolean(updatingId) || Boolean(deletingId)} onClick={() => deleteSession(session)}>
+                      {deletingId === session.id ? <LoaderCircle className="workshop-spin" size={16} /> : <Trash2 size={16} />}
+                      {deletingId === session.id ? "Deleting…" : "Delete"}
                     </button>
                   ) : null}
                 </div>

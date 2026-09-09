@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { logActivity } from "../../../firebase";
 import { relationshipsPreparationConfig } from "./relationshipsPreparationData";
 
 const BASE_CHAPTERS = [
@@ -379,9 +380,21 @@ function WritingTest({ writeTest, onComplete }) {
   );
 }
 
-export function WorkshopPreparation({ topic, user, config }) {
+export function WorkshopPreparation({ topic, user, config, workshopSessions = [] }) {
   const navigate = useNavigate();
   const chapters = useMemo(() => config.writeTest?.items?.length ? [...BASE_CHAPTERS.slice(0, 3), WRITE_CHAPTER, BASE_CHAPTERS[3]] : BASE_CHAPTERS, [config.writeTest]);
+  const workshopSessionSignature = workshopSessions
+    .map((session) => `${session.id}:${session.phase}`)
+    .sort()
+    .join("|");
+  const activityContext = useMemo(() => ({
+    app: "aptis-speaking-workshops",
+    topicId: topic.id,
+    topicTitle: topic.title,
+    sessionIds: workshopSessions.map((session) => session.id),
+    sessionPhases: workshopSessions.map((session) => session.phase),
+    beforeWorkshop: workshopSessions.some((session) => session.phase === "preparation"),
+  }), [topic.id, topic.title, workshopSessions]);
   const storageKey = useMemo(() => `speaking-workshop-prep:${user?.uid || "local"}:${topic.id}:${config.storageVersion}`, [config.storageVersion, topic.id, user?.uid]);
   const [chapterIndex, setChapterIndex] = useState(0);
   const [completedChapters, setCompletedChapters] = useState(() => readSavedProgress(storageKey));
@@ -390,12 +403,41 @@ export function WorkshopPreparation({ topic, user, config }) {
     window.localStorage.setItem(storageKey, JSON.stringify({ completedChapters }));
   }, [completedChapters, storageKey]);
 
+  useEffect(() => {
+    if (!user?.uid || user.role === "admin" || user.role === "teacher") return;
+    const viewKey = `activity:speaking-workshop-preparation:${user.uid}:${topic.id}:${workshopSessionSignature || "no-session"}`;
+    try {
+      if (window.sessionStorage.getItem(viewKey)) return;
+      window.sessionStorage.setItem(viewKey, "1");
+    } catch {
+      // A blocked sessionStorage should not prevent activity logging.
+    }
+    void logActivity("speaking_workshop_preparation_viewed", activityContext);
+  }, [activityContext, topic.id, user?.role, user?.uid, workshopSessionSignature]);
+
   const completedSet = useMemo(() => new Set(completedChapters), [completedChapters]);
   const chapter = chapters[chapterIndex] || chapters[0];
   const completedCount = chapters.filter((item) => completedSet.has(item.id)).length;
 
   function completeChapter(id) {
-    setCompletedChapters((current) => current.includes(id) ? current : [...current, id]);
+    if (completedSet.has(id)) return;
+    const nextCompletedCount = chapters.filter((item) => item.id === id || completedSet.has(item.id)).length;
+    setCompletedChapters((current) => [...current, id]);
+    if (!user?.uid || user.role === "admin" || user.role === "teacher") return;
+    const completedChapter = chapters.find((item) => item.id === id);
+    void logActivity("speaking_workshop_preparation_progress", {
+      ...activityContext,
+      chapterId: id,
+      chapterLabel: completedChapter?.label || id,
+      completedChapters: nextCompletedCount,
+      totalChapters: chapters.length,
+    });
+    if (nextCompletedCount === chapters.length) {
+      void logActivity("speaking_workshop_preparation_completed", {
+        ...activityContext,
+        totalChapters: chapters.length,
+      });
+    }
   }
 
   return (

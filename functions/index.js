@@ -414,6 +414,52 @@ exports.updateSpeakingWorkshopSession = functions
     return {ok: true, session: serializeSpeakingWorkshopSession(updated, true)};
   });
 
+exports.deleteSpeakingWorkshopSession = functions
+  .runWith({maxInstances: 10})
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    const role = await requireSpeakingWorkshopStaff(context);
+    if (role !== "admin") {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Only administrators can delete speaking workshops."
+      );
+    }
+    const sessionId = String(data?.sessionId || "").trim();
+    if (!/^[A-Za-z0-9]{10,40}$/.test(sessionId)) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Choose a valid workshop session."
+      );
+    }
+
+    const sessionRef = firestore.collection("speakingWorkshopSessions")
+      .doc(sessionId);
+    const sessionSnap = await sessionRef.get();
+    if (!sessionSnap.exists) {
+      throw new functions.https.HttpsError("not-found", "Workshop not found.");
+    }
+
+    // Close registration before collecting attendees so an in-flight join
+    // cannot leave a new membership behind while the session is removed.
+    await sessionRef.update({
+      registrationOpen: false,
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    const attendees = await sessionRef.collection("attendees").get();
+    const bulkWriter = firestore.bulkWriter();
+    attendees.docs.forEach((attendeeSnap) => {
+      const membershipRef = firestore.doc(`users/${attendeeSnap.id}`)
+        .collection("speakingWorkshopMemberships")
+        .doc(sessionId);
+      bulkWriter.delete(membershipRef);
+    });
+    await bulkWriter.close();
+    await firestore.recursiveDelete(sessionRef);
+
+    return {ok: true, sessionId};
+  });
+
 exports.aggregateActivityLog = functions
   .runWith({maxInstances: 5})
   .region("europe-west1")

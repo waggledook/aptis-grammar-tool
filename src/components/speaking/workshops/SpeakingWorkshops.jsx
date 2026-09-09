@@ -132,7 +132,7 @@ function WorkshopMembershipSummary({ access }) {
   );
 }
 
-function WorkshopLanding({ navigate, access }) {
+function WorkshopLanding({ navigate, access, user }) {
   const visibleTopics = access.fullAccess
     ? SPEAKING_WORKSHOP_TOPICS
     : SPEAKING_WORKSHOP_TOPICS.filter((topic) => topic.contentReady && access.topicAccess[topic.id]?.preparation);
@@ -154,7 +154,7 @@ function WorkshopLanding({ navigate, access }) {
         </div>
       </section>
 
-      {access.canManage ? <SpeakingWorkshopSessionManager /> : null}
+      {access.canManage ? <SpeakingWorkshopSessionManager user={user} /> : null}
       {!access.fullAccess && access.sessions.length ? <WorkshopMembershipSummary access={access} /> : null}
 
       <section className="workshop-topic-grid" aria-label="Workshop topics">
@@ -381,17 +381,20 @@ function SpeakingWorkshopsContent({ user, access }) {
   const topic = topicId ? getSpeakingWorkshopTopic(topicId) : null;
   const PreparationComponent = topic ? PREPARATION_COMPONENTS[topic.id] : null;
   const topicGrant = topic ? access.topicAccess[topic.id] || {} : {};
+  const workshopSessions = topic ? (access.sessions || []).filter((session) => (
+    (topicGrant.sessionIds || []).includes(session.id)
+  )) : [];
   const canOpenTopic = !topic || access.fullAccess || (topic.contentReady && topicGrant.preparation);
   const canOpenPractice = topic?.visualsReady && (access.fullAccess || topicGrant.live);
 
   let page = null;
-  if (!topicId) page = <WorkshopLanding navigate={navigate} access={access} />;
+  if (!topicId) page = <WorkshopLanding navigate={navigate} access={access} user={user} />;
   else if (!topic) page = <Navigate to="/speaking-workshops" replace />;
   else if (!canOpenTopic) page = <Navigate to="/speaking-workshops" replace />;
   else if (!mode) page = <TopicModeChoice topic={topic} navigate={navigate} access={access} />;
   else if (mode === "prepare" && PreparationComponent) page = (
     <main className="speaking-workshops">
-      <PreparationComponent topic={topic} user={user} />
+      <PreparationComponent topic={topic} user={user} workshopSessions={workshopSessions} />
     </main>
   );
   else if (mode === "prepare") page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;
