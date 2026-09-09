@@ -105,19 +105,27 @@ function WorkshopMembershipSummary({ access }) {
   return (
     <section className="workshop-membership-summary" aria-label="Your workshop access">
       <div className="workshop-membership-list">
-        <span className="workshop-kicker">Your workshop access</span>
+        <span className="workshop-kicker">Your workshop sessions</span>
+        {access.joinStatus?.message ? (
+          <small className="workshop-join-error" role="alert">{access.joinStatus.message} Your existing access is shown below.</small>
+        ) : null}
         {access.sessions.map((session) => (
-          <article key={session.id}>
+          <button
+            className={session.id === access.activeSessionId ? "is-active" : ""}
+            type="button"
+            key={session.id}
+            onClick={() => access.selectSession(session.id)}
+          >
             <span className={`workshop-membership-dot is-${session.phase}`} aria-hidden="true" />
             <div>
               <strong>{session.label}</strong>
               <small>
                 {session.phase === "preparation" ? "Preparation available" : null}
                 {session.phase === "live" ? "Workshop live — practice unlocked" : null}
-                {session.phase === "review" ? `Review access until ${formatReviewDate(session.reviewUntil)}` : null}
+                {session.phase === "review" ? `Previous workshop — review access until ${formatReviewDate(session.reviewUntil)}` : null}
               </small>
             </div>
-          </article>
+          </button>
         ))}
       </div>
       <form className="workshop-join-another" onSubmit={handleJoin}>
@@ -133,11 +141,15 @@ function WorkshopMembershipSummary({ access }) {
 }
 
 function WorkshopLanding({ navigate, access, user }) {
+  const activeSession = access.sessions.find((session) => session.id === access.activeSessionId) || null;
+  const activeTopicIds = activeSession?.topicIds || [];
   const visibleTopics = access.fullAccess
     ? SPEAKING_WORKSHOP_TOPICS
-    : SPEAKING_WORKSHOP_TOPICS.filter((topic) => topic.contentReady && access.topicAccess[topic.id]?.preparation);
+    : SPEAKING_WORKSHOP_TOPICS.filter((topic) => (
+      topic.contentReady && activeTopicIds.includes(topic.id) && access.topicAccess[topic.id]?.preparation
+    ));
   const plannedTopics = access.fullAccess ? [] : SPEAKING_WORKSHOP_TOPIC_CATALOG.filter((topic) => (
-    access.topicAccess[topic.id]?.preparation && !topic.contentReady
+    activeTopicIds.includes(topic.id) && access.topicAccess[topic.id]?.preparation && !topic.contentReady
   ));
   const readyCount = SPEAKING_WORKSHOP_TOPICS.filter((topic) => topic.ready).length;
 
@@ -156,6 +168,13 @@ function WorkshopLanding({ navigate, access, user }) {
 
       {access.canManage ? <SpeakingWorkshopSessionManager user={user} /> : null}
       {!access.fullAccess && access.sessions.length ? <WorkshopMembershipSummary access={access} /> : null}
+
+      {activeSession ? (
+        <div className="workshop-active-session-heading">
+          <span className="workshop-kicker">Selected session</span>
+          <h2>{activeSession.label}</h2>
+        </div>
+      ) : null}
 
       <section className="workshop-topic-grid" aria-label="Workshop topics">
         {visibleTopics.map((topic, index) => {

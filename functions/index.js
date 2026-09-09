@@ -260,23 +260,43 @@ exports.joinSpeakingWorkshopSession = functions
         transaction.get(attendeeRef),
       ]);
       const session = sessionSnap.data() || {};
-      if (!sessionSnap.exists || session.registrationOpen === false ||
-          session.phase === "review") {
+      if (!sessionSnap.exists) {
+        throw new functions.https.HttpsError(
+          "not-found",
+          "That workshop was not found."
+        );
+      }
+      const reviewUntil = speakingWorkshopDate(session.reviewUntil);
+      const existingReviewIsActive = attendeeSnap.exists &&
+        session.phase === "review" && reviewUntil && reviewUntil > new Date();
+      if (!attendeeSnap.exists && (session.registrationOpen === false ||
+          session.phase === "review")) {
         throw new functions.https.HttpsError(
           "failed-precondition",
           "Registration for this workshop is closed."
+        );
+      }
+      if (attendeeSnap.exists && session.phase === "review" &&
+          !existingReviewIsActive) {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          "Review access for this workshop has ended."
         );
       }
       const attendee = {
         uid: context.auth.uid,
         email: context.auth.token?.email || null,
         name: context.auth.token?.name || null,
-        joinedAt: admin.firestore.FieldValue.serverTimestamp(),
       };
+      if (!attendeeSnap.exists) {
+        attendee.joinedAt = admin.firestore.FieldValue.serverTimestamp();
+      }
       transaction.set(attendeeRef, attendee, {merge: true});
       transaction.set(membershipRef, {
         sessionId: sessionRef.id,
-        joinedAt: admin.firestore.FieldValue.serverTimestamp(),
+        ...(attendeeSnap.exists ? {} : {
+          joinedAt: admin.firestore.FieldValue.serverTimestamp(),
+        }),
       }, {merge: true});
       if (!attendeeSnap.exists) {
         transaction.update(sessionRef, {

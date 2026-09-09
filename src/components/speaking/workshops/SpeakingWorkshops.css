@@ -332,8 +332,10 @@
 
 .workshop-membership-summary { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 1rem; }
 .workshop-membership-list { display: grid; gap: .65rem; }
-.workshop-membership-list article { display: flex; align-items: center; gap: .65rem; }
-.workshop-membership-list article > div { display: grid; gap: .12rem; }
+.workshop-membership-list > button { display: flex; width: 100%; align-items: center; gap: .65rem; padding: .65rem .75rem; border: 1px solid transparent; border-radius: 11px; background: transparent; color: var(--workshop-text); font: inherit; text-align: left; cursor: pointer; }
+.workshop-membership-list > button:hover { background: color-mix(in srgb, var(--workshop-panel-2) 82%, transparent); }
+.workshop-membership-list > button.is-active { border-color: #5798ff; background: rgba(53, 112, 196, .18); }
+.workshop-membership-list > button > div { display: grid; gap: .12rem; }
 .workshop-membership-list small { color: var(--workshop-muted); }
 .workshop-membership-dot { width: .72rem; height: .72rem; border-radius: 50%; background: #5798ff; box-shadow: 0 0 0 4px rgba(87, 152, 255, .12); }
 .workshop-membership-dot.is-live { background: #55d1a8; box-shadow: 0 0 0 4px rgba(85, 209, 168, .13); }
@@ -342,6 +344,8 @@
 .workshop-join-another > div { display: flex; gap: .4rem; }
 .workshop-join-another input { width: 8rem; border: 1px solid #405573; border-radius: 9px; background: #0d1728; color: white; padding: .58rem .65rem; font: inherit; letter-spacing: .08em; text-transform: uppercase; }
 .workshop-join-error { display: block; max-width: 260px; margin-top: .35rem; color: #ffaaa0; }
+.workshop-active-session-heading { margin: 1.5rem 0 -.7rem; }
+.workshop-active-session-heading h2 { margin: .3rem 0 0; font-size: clamp(1.35rem, 3vw, 1.9rem); }
 
 .workshop-session-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: 1.2rem 0 1.5rem; }
 .workshop-session-header-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; }

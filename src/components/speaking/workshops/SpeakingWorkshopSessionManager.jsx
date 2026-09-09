@@ -144,7 +144,7 @@ export default function SpeakingWorkshopSessionManager({ user }) {
   }
 
   async function copyJoinLink(session) {
-    const url = `${window.location.origin}/speaking-workshops?join=${session.joinCode}`;
+    const url = `${window.location.origin}/speaking-workshops?join=${session.joinCode}&session=${session.id}`;
     try {
       await navigator.clipboard.writeText(url);
       setCopiedId(session.id);
@@ -221,7 +221,7 @@ export default function SpeakingWorkshopSessionManager({ user }) {
       {!loading && sessions.length ? (
         <div className="workshop-session-list">
           {sessions.map((session) => {
-            const joinUrl = `${window.location.origin}/speaking-workshops?join=${session.joinCode}`;
+            const joinUrl = `${window.location.origin}/speaking-workshops?join=${session.joinCode}&session=${session.id}`;
             return (
               <article className={`workshop-session-card is-${session.phase}`} key={session.id}>
                 <div className="workshop-session-main">

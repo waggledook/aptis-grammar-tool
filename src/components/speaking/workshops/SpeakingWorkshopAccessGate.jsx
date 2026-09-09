@@ -12,21 +12,28 @@ function hasWorkshopAccess(user) {
   return user.siteAccess?.speakingWorkshops === true || !!user.siteAccess?.speakingWorkshops?.active;
 }
 
+function getWorkshopQueryValue(name) {
+  if (typeof window === "undefined") return "";
+  return new URLSearchParams(window.location.search).get(name) || "";
+}
+
+function newestSessionsFirst(sessions) {
+  return [...sessions].sort((a, b) => (
+    new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
+  ));
+}
+
 export default function SpeakingWorkshopAccessGate({ user, onSignIn, children }) {
   const [granted, setGranted] = useState(() => hasWorkshopAccess(user));
-  const [access, setAccess] = useState({ canManage: false, sessions: [], topicAccess: {} });
-  const [code, setCode] = useState(() => (
-    typeof window === "undefined"
-      ? ""
-      : new URLSearchParams(window.location.search).get("join") || ""
-  ));
+  const [access, setAccess] = useState({ canManage: false, sessions: [], topicAccess: {}, activeSessionId: "" });
+  const [code, setCode] = useState(() => getWorkshopQueryValue("join"));
   const [status, setStatus] = useState({ type: "", message: "" });
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(!!user);
   const attemptedJoinCode = useRef("");
   const isStaff = user?.role === "admin" || user?.role === "teacher";
 
-  const loadAccess = useCallback(async ({ silent = false } = {}) => {
+  const loadAccess = useCallback(async ({ silent = false, focusSessionId = "" } = {}) => {
     if (!user || isStaff || granted || hasWorkshopAccess(user)) {
       if (!silent) setLoading(false);
       return null;
@@ -34,12 +41,19 @@ export default function SpeakingWorkshopAccessGate({ user, onSignIn, children })
     if (!silent) setLoading(true);
     try {
       const result = await getSpeakingWorkshopAccess();
+      const sessions = newestSessionsFirst(
+        Array.isArray(result?.sessions) ? result.sessions : []
+      );
+      const requestedSessionId = focusSessionId || getWorkshopQueryValue("session");
       const next = {
         canManage: false,
-        sessions: Array.isArray(result?.sessions) ? result.sessions : [],
+        sessions,
         topicAccess: result?.topicAccess && typeof result.topicAccess === "object"
           ? result.topicAccess
           : {},
+        activeSessionId: sessions.some((session) => session.id === requestedSessionId)
+          ? requestedSessionId
+          : sessions[0]?.id || "",
       };
       setAccess(next);
       return next;
@@ -53,6 +67,7 @@ export default function SpeakingWorkshopAccessGate({ user, onSignIn, children })
   }, [granted, isStaff, user]);
 
   useEffect(() => {
+    if (getWorkshopQueryValue("join")) return undefined;
     loadAccess();
     if (!user || isStaff || granted || hasWorkshopAccess(user)) return undefined;
     const refresh = () => loadAccess({ silent: true });
@@ -62,7 +77,7 @@ export default function SpeakingWorkshopAccessGate({ user, onSignIn, children })
       window.clearInterval(intervalId);
       window.removeEventListener("focus", refresh);
     };
-  }, [granted, isStaff, loadAccess, user]);
+  }, [code, granted, isStaff, loadAccess, user]);
 
   const redeemCode = useCallback(async (rawCode, { rethrow = false } = {}) => {
     const normalizedCode = String(rawCode || "").trim().toUpperCase();
@@ -71,8 +86,15 @@ export default function SpeakingWorkshopAccessGate({ user, onSignIn, children })
     setStatus({ type: "", message: "" });
     try {
       try {
-        await joinSpeakingWorkshopSession(normalizedCode);
-        await loadAccess();
+        const result = await joinSpeakingWorkshopSession(normalizedCode);
+        const joinedSessionId = result?.session?.id || "";
+        await loadAccess({ focusSessionId: joinedSessionId });
+        if (typeof window !== "undefined") {
+          const url = new URL(window.location.href);
+          url.searchParams.delete("join");
+          if (joinedSessionId) url.searchParams.set("session", joinedSessionId);
+          window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+        }
       } catch (sessionError) {
         const sessionCode = String(sessionError?.code || "");
         if (!sessionCode.includes("not-found") && !sessionCode.includes("invalid-argument")) {
@@ -95,17 +117,28 @@ export default function SpeakingWorkshopAccessGate({ user, onSignIn, children })
           ? "That workshop code isn’t valid. Check it and try again."
           : "We couldn’t check that code right now. Please try again.";
       setStatus({ type: "error", message });
+      await loadAccess();
       if (rethrow) throw new Error(message);
     } finally {
       setSubmitting(false);
     }
   }, [loadAccess, submitting]);
 
+  const selectSession = useCallback((sessionId) => {
+    setAccess((current) => ({ ...current, activeSessionId: sessionId }));
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("session", sessionId);
+      window.history.replaceState({}, "", `${url.pathname}${url.search}${url.hash}`);
+    }
+  }, []);
+
   useEffect(() => {
-    if (!user || isStaff || !code || attemptedJoinCode.current === code) return;
-    attemptedJoinCode.current = code;
-    redeemCode(code);
-  }, [code, isStaff, redeemCode, user]);
+    const linkCode = getWorkshopQueryValue("join");
+    if (!user || isStaff || !linkCode || attemptedJoinCode.current === linkCode) return;
+    attemptedJoinCode.current = linkCode;
+    redeemCode(linkCode);
+  }, [isStaff, redeemCode, user]);
 
   if (isStaff || granted || hasWorkshopAccess(user)) {
     return typeof children === "function"
@@ -139,7 +172,14 @@ export default function SpeakingWorkshopAccessGate({ user, onSignIn, children })
 
   if (Object.keys(access.topicAccess).length) {
     return typeof children === "function"
-      ? children({ ...access, fullAccess: false, refresh: loadAccess, joinSession: (nextCode) => redeemCode(nextCode, { rethrow: true }) })
+      ? children({
+        ...access,
+        fullAccess: false,
+        joinStatus: status,
+        refresh: loadAccess,
+        selectSession,
+        joinSession: (nextCode) => redeemCode(nextCode, { rethrow: true }),
+      })
       : children;
   }
 
