@@ -138,7 +138,7 @@ export default function ReadingPartMenu({ user, aptisAccess, onSignIn }) {
         <div className="reading-part-activity-grid">{renderActivity(part.practice)}</div>
       </section>
 
-      {["1", "2", "3"].includes(part.number) && isTeacherOrAdmin ? (
+      {["1", "2", "3", "4"].includes(part.number) && isTeacherOrAdmin ? (
         <section className="reading-part-section">
           <div className="reading-part-section-heading"><h2>Teacher resources</h2><p>Open the additional Part {part.number} activities and classroom materials.</p></div>
           <div className="reading-part-activity-grid">
@@ -153,7 +153,9 @@ export default function ReadingPartMenu({ user, aptisAccess, onSignIn }) {
                 ? "Access five extra email gap-fill tasks, with assignment and live classroom options."
                 : part.number === "2"
                   ? "Access eleven extra sentence-order tasks, with assignment and live classroom options."
-                  : "Access five extra matching-opinions tasks, with assignment and single-task live classroom options."}</p>
+                  : part.number === "3"
+                    ? "Access five extra matching-opinions tasks, with assignment and single-task live classroom options."
+                    : "Access two extra heading-matching texts, with assignment and single-task live classroom options."}</p>
               <div className="reading-part-activity-footer"><strong>Open teacher activities <ChevronRight size={17} aria-hidden="true" /></strong></div>
             </button>
           </div>

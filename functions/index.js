@@ -833,12 +833,12 @@ function siteAccessLabel(accessKey = "") {
 
 function siteAccessUrl(accessKey = "") {
   const urls = {
-    [APTIS_TRAINER_ACCESS_KEY]: "https://aptis.beeskillsenglish.com/",
+    [APTIS_TRAINER_ACCESS_KEY]: "https://aptis-trainer.beeskillsenglish.com/",
     [SEIF_HUB_ACCESS_KEY]: "https://seifhub.beeskillsenglish.com/",
     ote: "https://ote-seif.beeskillsenglish.com/",
   };
 
-  return urls[accessKey] || "https://aptis.beeskillsenglish.com/";
+  return urls[accessKey] || "https://aptis-trainer.beeskillsenglish.com/";
 }
 
 function normalizeSiteAccessEntry(raw) {

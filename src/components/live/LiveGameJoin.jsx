@@ -13,6 +13,7 @@ import { PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE } from "../writing/data/aptisPart4
 import { APTIS_READING_PART1_LIVE_GAME_TYPE } from "../../reading/readingPart1TeacherTasks.js";
 import { READING_PART2_LIVE_GAME_TYPE } from "../../reading/part2Tasks.js";
 import { READING_PART3_LIVE_GAME_TYPE } from "../../reading/readingPart3TeacherTasks.js";
+import { READING_PART4_LIVE_GAME_TYPE } from "../../reading/readingPart4TaskBanks.js";
 import { getSitePath } from "../../siteConfig.js";
 
 export default function LiveGameJoin() {
@@ -63,6 +64,8 @@ export default function LiveGameJoin() {
                 ? `/live/aptis-reading-part2/play/${gameId}`
               : type === READING_PART3_LIVE_GAME_TYPE
                 ? `/live/aptis-reading-part3/play/${gameId}`
+              : type === READING_PART4_LIVE_GAME_TYPE
+                ? `/live/aptis-reading-part4/play/${gameId}`
                 : `/live/play/${gameId}`;
           navigate(getSitePath(destination));
         } catch (err) {

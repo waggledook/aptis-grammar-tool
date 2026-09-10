@@ -36,7 +36,7 @@ export const APTIS_DEMO_ACCESS = {
   reading: {
     part1TaskIds: ["cinema-plan", "class-homework"],
     part2TaskIds: ["cycling-lanes", "ebooks"],
-    part4TaskIds: ["yawning"],
+    part4TaskIds: ["hidden-rivers"],
   },
   speaking: {
     part1QuestionIds: ["p1q001", "p1q002", "p1q003"],

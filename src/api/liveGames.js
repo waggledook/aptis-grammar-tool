@@ -71,6 +71,10 @@ import {
   getReadingPart3TeacherTask,
   READING_PART3_LIVE_GAME_TYPE,
 } from "../reading/readingPart3TeacherTasks.js";
+import {
+  getReadingPart4TeacherTask,
+  READING_PART4_LIVE_GAME_TYPE,
+} from "../reading/readingPart4TaskBanks.js";
 
 const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
 const SPANGLISH_GUEST_TOKEN_STORAGE_KEY = "spanglish_fixit_guest_token";
@@ -113,7 +117,9 @@ function getAptisReadingLiveActivityDetails(game, gameId) {
     ? 1
     : game.type === READING_PART2_LIVE_GAME_TYPE
       ? 2
-      : 3;
+      : game.type === READING_PART3_LIVE_GAME_TYPE
+        ? 3
+        : 4;
   const taskIds = game.taskIds || (game.taskId ? [game.taskId] : []);
   return {
     gameId,
@@ -231,7 +237,8 @@ export async function joinLiveGameByPin(pin) {
     game.type === PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE ||
     game.type === APTIS_READING_PART1_LIVE_GAME_TYPE ||
     game.type === READING_PART2_LIVE_GAME_TYPE ||
-    game.type === READING_PART3_LIVE_GAME_TYPE
+    game.type === READING_PART3_LIVE_GAME_TYPE ||
+    game.type === READING_PART4_LIVE_GAME_TYPE
   ) {
     if (!existingPlayer) await set(playerRef, {
       name: displayName,
@@ -251,7 +258,7 @@ export async function joinLiveGameByPin(pin) {
   if (!existingPlayer && [APTIS_WRITING_LIVE_GAME_TYPE, REGISTER_SURGERY_LIVE_GAME_TYPE, PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE].includes(game.type)) {
     await logAptisWritingLiveJoined(getAptisWritingLiveActivityDetails(game, game.gameId));
   }
-  if (!existingPlayer && [APTIS_READING_PART1_LIVE_GAME_TYPE, READING_PART2_LIVE_GAME_TYPE, READING_PART3_LIVE_GAME_TYPE].includes(game.type)) {
+  if (!existingPlayer && [APTIS_READING_PART1_LIVE_GAME_TYPE, READING_PART2_LIVE_GAME_TYPE, READING_PART3_LIVE_GAME_TYPE, READING_PART4_LIVE_GAME_TYPE].includes(game.type)) {
     await logAptisReadingLiveJoined(getAptisReadingLiveActivityDetails(game, game.gameId));
   }
 
@@ -416,6 +423,40 @@ export async function createReadingPart3LiveGame({ taskId, title }) {
     activityType: "reading-task",
     activityTitle,
     part: 3,
+    taskId: task.id,
+    taskIds: [task.id],
+    taskCount: 1,
+  });
+  return { gameId, pin };
+}
+
+export async function createReadingPart4LiveGame({ taskId, title }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a reading session.");
+  const task = getReadingPart4TeacherTask(taskId);
+  if (!task) throw new Error("Choose a valid Reading Part 4 teacher task.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  const activityTitle = title || `Aptis Reading Part 4 · ${task.title}`;
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: activityTitle,
+    type: READING_PART4_LIVE_GAME_TYPE,
+    taskId: task.id,
+    taskIds: [task.id],
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby", phaseStartedAt: null },
+  });
+  await logAptisReadingLiveHosted({
+    gameId,
+    pin,
+    activityType: "reading-task",
+    activityTitle,
+    part: 4,
     taskId: task.id,
     taskIds: [task.id],
     taskCount: 1,
@@ -1032,6 +1073,57 @@ export async function saveReadingPart3LiveProgress({ gameId, taskId, answers = {
       answeredCount,
       score,
       total: task.questions.length,
+    });
+  }
+}
+
+export async function saveReadingPart4LiveProgress({ gameId, taskId, answers = {} }) {
+  const user = auth.currentUser;
+  const task = getReadingPart4TeacherTask(taskId);
+  if (!user) throw new Error("You must be signed in to save your answers.");
+  if (!gameId || !task) throw new Error("Missing Reading Part 4 answer details.");
+
+  const paragraphById = new Map(task.paragraphs.map((paragraph) => [String(paragraph.id), paragraph]));
+  const validHeadings = new Set(task.headings.map((heading) => heading.key));
+  const safeAnswers = {};
+  for (const [rawParagraphId, answer] of Object.entries(answers || {})) {
+    if (!paragraphById.has(String(rawParagraphId)) || !validHeadings.has(answer)) {
+      throw new Error("That heading match could not be saved.");
+    }
+    safeAnswers[rawParagraphId] = answer;
+  }
+
+  const answeredCount = Object.keys(safeAnswers).length;
+  const complete = answeredCount === task.paragraphs.length;
+  const now = Date.now();
+  const progressRef = ref(rtdb, `liveGames/${gameId}/players/${user.uid}/readingPart4Submission`);
+  const existingProgress = (await get(progressRef)).val() || {};
+  const wasCompleted = Boolean(existingProgress.firstCompletedAt || existingProgress.complete);
+  const firstCompletedAt = existingProgress.firstCompletedAt || existingProgress.completedAt || (complete ? now : null);
+  await set(progressRef, {
+    taskId: task.id,
+    answers: safeAnswers,
+    answeredCount,
+    complete,
+    updatedAt: now,
+    ...(firstCompletedAt ? { firstCompletedAt } : {}),
+    ...(complete ? { completedAt: now } : {}),
+  });
+
+  if (complete && !wasCompleted) {
+    const gameSnapshot = await get(ref(rtdb, `liveGames/${gameId}`));
+    const score = task.paragraphs.filter((paragraph) => safeAnswers[paragraph.id] === paragraph.answer).length;
+    await logAptisReadingLiveTaskCompleted({
+      ...getAptisReadingLiveActivityDetails(gameSnapshot.val() || {
+        type: READING_PART4_LIVE_GAME_TYPE,
+        taskId: task.id,
+        taskIds: [task.id],
+      }, gameId),
+      completedTaskId: task.id,
+      completedTaskTitle: task.title,
+      answeredCount,
+      score,
+      total: task.paragraphs.length,
     });
   }
 }

@@ -119,7 +119,7 @@ export const APTIS_READING_PARTS = [
     timing: "15 minutes",
     icon: BookOpen,
     menuSummary: "Strategy guide + exam practice",
-    taskIds: ["yawning", "music-consumer-behaviour"],
+    taskIds: ["hidden-rivers", "psychology-of-waiting", "yawning", "music-consumer-behaviour"],
     training: [
       {
         id: "part4-strategy-guide",

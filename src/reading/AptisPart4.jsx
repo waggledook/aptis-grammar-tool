@@ -11,6 +11,7 @@ import {
   ReadingTaskTimer,
 } from "./ReadingTaskTimer.jsx";
 import { getReadingTimingDetails, READING_SUGGESTED_SECONDS, useSuggestedTaskTimer } from "./readingTaskTiming.js";
+import { READING_PART4_NEW_STUDENT_TASKS } from "./readingPart4TaskBanks.js";
 
 /**
  * Aptis Reading – Part 4 (Heading matching)
@@ -24,7 +25,7 @@ import { getReadingTimingDetails, READING_SUGGESTED_SECONDS, useSuggestedTaskTim
  */
 
 // ---------- Demo task (Yawning) ----------
-const DEMO_TASKS = [
+const EXISTING_PART4_TASKS = [
   {
     id: "yawning",
     title: "Yawning",
@@ -245,6 +246,8 @@ const DEMO_TASKS = [
   },
 ];
 
+const DEMO_TASKS = [...READING_PART4_NEW_STUDENT_TASKS, ...EXISTING_PART4_TASKS];
+
 // ---------- Small reusable task picker (same pattern used elsewhere) ----------
 function ChipDropdown({ items, value, onChange, label = "Task" }) {
   const [open, setOpen] = useState(false);
@@ -351,6 +354,13 @@ export default function AptisPart4({
   aptisAccess,
   onSignIn,
   onRequireSignIn,
+  routeBasePath = getSitePath("/reading/part4"),
+  activityId = "reading-part-4",
+  progressPart = "part4",
+  source = "AptisPart4",
+  heading = "Reading – Part 4 (Heading Matching)",
+  headerActions = null,
+  showDemoNotice = true,
 }) {
   const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
   const initialTaskId = typeof window !== "undefined" ? new URLSearchParams(window.location.search).get("task") : "";
@@ -385,13 +395,13 @@ export default function AptisPart4({
     let alive = true;
     (async () => {
       if (!user) return setCompleted(new Set());
-      const done = await fetchReadingCompletionsByPart("part4");
+      const done = await fetchReadingCompletionsByPart(progressPart);
       if (alive) setCompleted(done);
     })();
     return () => {
       alive = false;
     };
-  }, [user]);
+  }, [progressPart, user]);
 
   // Scroll to paragraph when opening “Why?”
   useEffect(() => {
@@ -439,7 +449,7 @@ export default function AptisPart4({
     if (!user || completed.has(current.id)) return;
 
     try {
-      await logReadingPart4Completed({ taskId: current.id, source: "AptisPart4" });
+      await logReadingPart4Completed({ taskId: current.id, source, progressPart });
       setCompleted((prev) => new Set(prev).add(current.id));
       toast("Task marked as completed ✓");
     } catch (err) {
@@ -467,7 +477,7 @@ export default function AptisPart4({
         taskId: current.id,
         score,
         total,
-        source: "AptisPart4",
+        source,
         ...timingDetails,
       });
     }
@@ -498,7 +508,7 @@ export default function AptisPart4({
         taskId: current.id,
         score,
         total: current.paragraphs.length,
-        source: "AptisPart4",
+        source,
         ...timingDetails,
       });
     }
@@ -519,16 +529,16 @@ export default function AptisPart4({
 
       <header className="p4-top">
         <div className="p4-titleblock">
-          <h2 className="p4-title">Reading – Part 4 (Heading Matching)</h2>
+          <h2 className="p4-title">{heading}</h2>
           <p className="p4-intro">{current?.intro}</p>
         </div>
 
         <div className="p4-tools">
           <ReadingAssignButton
             user={user}
-            activityId="reading-part-4"
+            activityId={activityId}
             activityLabel={`Aptis Reading Part 4 — ${current?.title || "Heading matching"}`}
-            routePath={getSitePath(`/reading/part4?task=${encodeURIComponent(current?.id || "")}`)}
+            routePath={`${routeBasePath}?task=${encodeURIComponent(current?.id || "")}`}
             taskId={current?.id || ""}
             taskTitle={current?.title || ""}
           />
@@ -538,12 +548,15 @@ export default function AptisPart4({
             onChange={handleSelectTask}
             label="Task"
           />
+          {typeof headerActions === "function" ? headerActions(current) : headerActions}
         </div>
       </header>
 
-      <ReadingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
-        Demo mode includes one Part 4 reading task. The other Part 4 tasks stay visible but require full access.
-      </ReadingDemoNotice>
+      {showDemoNotice ? (
+        <ReadingDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+          Demo mode includes one Part 4 reading task. The other Part 4 tasks stay visible but require full access.
+        </ReadingDemoNotice>
+      ) : null}
 
       {taskTimer.phase === "ready" ? (
         <ReadingTaskStart
@@ -604,7 +617,8 @@ export default function AptisPart4({
             const fb = feedback[p.id];
             const status = fb === true ? "ok" : fb === false ? "bad" : "";
             const isWhyOpen = whyOpen === p.id;
-            const canExplain = fb !== undefined;
+            const hasExplanation = Boolean(p.explanation || p.evidence || p.evidenceParts?.length);
+            const canExplain = fb !== undefined && hasExplanation;
 
             const chosen = answers[p.id] || "";
 
@@ -638,7 +652,7 @@ export default function AptisPart4({
                     onClick={() =>
                       setWhyOpen((cur) => (cur === p.id ? null : p.id))
                     }
-                    title={canExplain ? "Show explanation" : "Check first"}
+                    title={canExplain ? "Show explanation" : hasExplanation ? "Check first" : "No explanation supplied for this task"}
                   >
                     Why?
                   </button>

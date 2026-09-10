@@ -93,6 +93,9 @@ import ReadingPart3Teacher from "./reading/ReadingPart3Teacher.jsx";
 import ReadingPart3LiveHost from "./reading/ReadingPart3LiveHost.jsx";
 import ReadingPart3LivePlayer from "./reading/ReadingPart3LivePlayer.jsx";
 import AptisPart4 from "./reading/AptisPart4";
+import ReadingPart4Teacher from "./reading/ReadingPart4Teacher.jsx";
+import ReadingPart4LiveHost from "./reading/ReadingPart4LiveHost.jsx";
+import ReadingPart4LivePlayer from "./reading/ReadingPart4LivePlayer.jsx";
 import VocabularyMenu from "./components/vocabulary/VocabularyMenu";
 import ToastHost from './components/ToastHost';
 import Footer from "./components/common/Footer";
@@ -2292,8 +2295,33 @@ return (
         onSignIn={() => setShowAuth(true)}
         onRequireSignIn={() => setShowAuth(true)}
         allowedTaskIds={isAptisDemoMode ? APTIS_DEMO_ACCESS.reading.part4TaskIds : []}
+        headerActions={
+          <TeacherExtrasButton
+            user={user}
+            to="/reading/part4-teacher"
+            label="Teacher Part 4 tasks"
+          />
+        }
       />
     </>
+  }
+/>
+
+<Route
+  path="/reading/part4-teacher"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <>
+        <button
+          onClick={() => navigate("/reading/parts/4")}
+          className="review-btn"
+          style={{ marginBottom: "1rem" }}
+        >
+          ← Back
+        </button>
+        <ReadingPart4Teacher user={user} />
+      </>
+    </RequireSignedIn>
   }
 />
 
@@ -3225,6 +3253,8 @@ return (
 <Route path="/live/aptis-reading-part2/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><ReadingPart2LivePlayer /></RequireSignedIn>} />
 <Route path="/live/aptis-reading-part3/host/:gameId" element={<RequireTeacher user={user}><ReadingPart3LiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/aptis-reading-part3/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><ReadingPart3LivePlayer /></RequireSignedIn>} />
+<Route path="/live/aptis-reading-part4/host/:gameId" element={<RequireTeacher user={user}><ReadingPart4LiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/aptis-reading-part4/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><ReadingPart4LivePlayer /></RequireSignedIn>} />
 <Route
   path="/live/register-surgery/play/:gameId"
   element={
