@@ -190,6 +190,98 @@ const PHOTO_ASSETS = {
       ],
     ],
   },
+  "food-eating": {
+    part2: [
+      "/images/speaking/workshops/food-eating/part2_task01_cooking_at_home.webp",
+      "/images/speaking/workshops/food-eating/part2_task02_eating_in_restaurant.webp",
+      "/images/speaking/workshops/food-eating/part2_task03_buying_fresh_food.webp",
+      "/images/speaking/workshops/food-eating/part2_task04_buying_food_out.webp",
+      "/images/speaking/workshops/food-eating/part2_task05_cooking_together.webp",
+      "/images/speaking/workshops/food-eating/part2_task06_food_delivery.webp",
+      "/images/speaking/workshops/food-eating/part2_task07_healthy_meal.webp",
+      "/images/speaking/workshops/food-eating/part2_task08_busy_cafe.webp",
+    ],
+    part3: [
+      [
+        "/images/speaking/workshops/food-eating/part3_task01A_eating_at_home.webp",
+        "/images/speaking/workshops/food-eating/part3_task01B_eating_out.webp",
+      ],
+      [
+        "/images/speaking/workshops/food-eating/part3_task02A_cooking_from_scratch.webp",
+        "/images/speaking/workshops/food-eating/part3_task02B_quick_meal.webp",
+      ],
+      [
+        "/images/speaking/workshops/food-eating/part3_task03A_supermarket.webp",
+        "/images/speaking/workshops/food-eating/part3_task03B_local_market.webp",
+      ],
+      [
+        "/images/speaking/workshops/food-eating/part3_task04A_breakfast_at_home.webp",
+        "/images/speaking/workshops/food-eating/part3_task04B_breakfast_on_the_go.webp",
+      ],
+      [
+        "/images/speaking/workshops/food-eating/part3_task05A_traditional_food.webp",
+        "/images/speaking/workshops/food-eating/part3_task05B_international_food.webp",
+      ],
+      [
+        "/images/speaking/workshops/food-eating/part3_task06A_quick_meal.webp",
+        "/images/speaking/workshops/food-eating/part3_task06B_relaxed_meal.webp",
+      ],
+      [
+        "/images/speaking/workshops/food-eating/part3_task07A_eating_indoors.webp",
+        "/images/speaking/workshops/food-eating/part3_task07B_eating_outdoors.webp",
+      ],
+      [
+        "/images/speaking/workshops/food-eating/part3_task08A_grocery_shopping.webp",
+        "/images/speaking/workshops/food-eating/part3_task08B_grocery_delivery.webp",
+      ],
+    ],
+  },
+  "education-learning": {
+    part2: [
+      "/images/speaking/workshops/education-learning/part2_task01_classroom_lesson.webp",
+      "/images/speaking/workshops/education-learning/part2_task02_library_study.webp",
+      "/images/speaking/workshops/education-learning/part2_task03_group_study.webp",
+      "/images/speaking/workshops/education-learning/part2_task04_practical_learning.webp",
+      "/images/speaking/workshops/education-learning/part2_task05_studying_at_home.webp",
+      "/images/speaking/workshops/education-learning/part2_task06_adult_learners.webp",
+      "/images/speaking/workshops/education-learning/part2_task07_exam_preparation.webp",
+      "/images/speaking/workshops/education-learning/part2_task08_getting_help.webp",
+    ],
+    part3: [
+      [
+        "/images/speaking/workshops/education-learning/part3_task01A_classroom_learning.webp",
+        "/images/speaking/workshops/education-learning/part3_task01B_online_learning.webp",
+      ],
+      [
+        "/images/speaking/workshops/education-learning/part3_task02A_studying_alone.webp",
+        "/images/speaking/workshops/education-learning/part3_task02B_studying_together.webp",
+      ],
+      [
+        "/images/speaking/workshops/education-learning/part3_task03A_academic_learning.webp",
+        "/images/speaking/workshops/education-learning/part3_task03B_practical_learning.webp",
+      ],
+      [
+        "/images/speaking/workshops/education-learning/part3_task04A_library_study.webp",
+        "/images/speaking/workshops/education-learning/part3_task04B_home_study.webp",
+      ],
+      [
+        "/images/speaking/workshops/education-learning/part3_task05A_indoor_learning.webp",
+        "/images/speaking/workshops/education-learning/part3_task05B_outdoor_learning.webp",
+      ],
+      [
+        "/images/speaking/workshops/education-learning/part3_task06A_younger_learners.webp",
+        "/images/speaking/workshops/education-learning/part3_task06B_adult_learners.webp",
+      ],
+      [
+        "/images/speaking/workshops/education-learning/part3_task07A_exam_revision.webp",
+        "/images/speaking/workshops/education-learning/part3_task07B_project_work.webp",
+      ],
+      [
+        "/images/speaking/workshops/education-learning/part3_task08A_large_class.webp",
+        "/images/speaking/workshops/education-learning/part3_task08B_small_class.webp",
+      ],
+    ],
+  },
 };
 
 const TOPIC_META = {
@@ -235,7 +327,7 @@ const TOPIC_META = {
     accent: "amber",
     contentReady: true,
     ready: false,
-    visualsReady: false,
+    visualsReady: true,
     preparationReady: false,
     referenceReady: false,
   },
@@ -245,7 +337,7 @@ const TOPIC_META = {
     accent: "sky",
     contentReady: true,
     ready: false,
-    visualsReady: false,
+    visualsReady: true,
     preparationReady: false,
     referenceReady: false,
   },

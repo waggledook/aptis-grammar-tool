@@ -262,6 +262,13 @@ function TopicModeChoice({ topic, navigate, access }) {
           <p>{canPrepare ? "A short flipped-classroom sequence with topic vocabulary, ideas and an oral rehearsal." : "The preparation activities will be added after the vocabulary content is ready."}</p>
           <strong>{canPrepare ? <>Start the warm-up <ArrowRight size={17} /></> : "Preparation being developed"}</strong>
         </button>
+        <button className="mode-relaxed" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/relaxed-practice`)}>
+          <span className="mode-icon" aria-hidden="true"><MessageCircle size={28} /></span>
+          <span className="workshop-kicker">At your own pace</span>
+          <h2>Relaxed practice</h2>
+          <p>Browse every speaking part and work through the questions without recording, feedback or exam pressure.</p>
+          <strong>Browse the task bank <ArrowRight size={17} /></strong>
+        </button>
         <button className={`mode-practice ${canUsePractice ? "" : "is-locked"}`} type="button" disabled={!canUsePractice} onClick={() => navigate(`/speaking-workshops/${topic.id}/practice`)}>
           <span className="mode-icon" aria-hidden="true">{canUsePractice ? <Mic2 size={28} /> : <LockKeyhole size={27} />}</span>
           <span className="workshop-kicker">Individual mode</span>
@@ -423,6 +430,7 @@ function SpeakingWorkshopsContent({ user, access }) {
   );
   else if (mode === "prepare") page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;
   else if (mode === "reference" && topic.referenceReady !== false) page = <main className="speaking-workshops"><SpeakingReference topic={topic} /></main>;
+  else if (mode === "relaxed-practice") page = <main className="speaking-workshops"><TeachingMode topic={topic} variant="relaxed-practice" canUseExamPractice={canOpenPractice} /></main>;
   else if (mode === "teach" && access.canManage) page = <main className="speaking-workshops"><TeachingMode topic={topic} /></main>;
   else if (mode === "practice" && !canOpenPractice) page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;
   else if (mode === "practice" && !partNumber) page = <PracticePartChoice topic={topic} navigate={navigate} />;

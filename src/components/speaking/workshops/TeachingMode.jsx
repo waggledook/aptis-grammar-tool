@@ -8,6 +8,15 @@ function formatTime(value) {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
+function randomSample(items, count) {
+  const shuffled = [...items];
+  for (let index = shuffled.length - 1; index > 0; index -= 1) {
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]];
+  }
+  return shuffled.slice(0, count);
+}
+
 function ClassroomTimer({ seconds, label }) {
   const [left, setLeft] = useState(seconds);
   const [running, setRunning] = useState(false);
@@ -52,11 +61,13 @@ function Photo({ src, alt, label, brief }) {
   );
 }
 
-export default function TeachingMode({ topic }) {
+export default function TeachingMode({ topic, variant = "teaching", canUseExamPractice = topic.visualsReady }) {
   const navigate = useNavigate();
+  const isRelaxedPractice = variant === "relaxed-practice";
   const [part, setPart] = useState(1);
   const [taskIndex, setTaskIndex] = useState(0);
-  const [timing, setTiming] = useState("suggested");
+  const [timing, setTiming] = useState(isRelaxedPractice ? "off" : "suggested");
+  const [randomPart1Set, setRandomPart1Set] = useState(null);
 
   const items = useMemo(() => {
     if (part === 1) return topic.parts[1].questions.map((question, index) => ({
@@ -67,10 +78,24 @@ export default function TeachingMode({ topic }) {
     }));
     return topic.parts[part].tasks;
   }, [part, topic]);
-  const current = items[taskIndex] || items[0];
+  const isRandomPart1Set = isRelaxedPractice && part === 1 && Boolean(randomPart1Set);
+  const current = isRandomPart1Set ? randomPart1Set : items[taskIndex] || items[0];
   const meta = SPEAKING_PART_META[part];
 
-  useEffect(() => setTaskIndex(0), [part]);
+  useEffect(() => {
+    setTaskIndex(0);
+    setRandomPart1Set(null);
+  }, [part]);
+
+  function generatePart1Set() {
+    const questions = randomSample(topic.parts[1].questions, 3);
+    setRandomPart1Set({
+      id: `${topic.id}-random-${Date.now()}`,
+      title: "Three random questions",
+      questions: questions.map((question) => question.text),
+      allQuestions: questions.map((question) => question.text),
+    });
+  }
 
   const timerSeconds = part === 4 ? 120 : meta.seconds;
 
@@ -78,9 +103,11 @@ export default function TeachingMode({ topic }) {
     <div className="workshop-teaching-shell">
       <header className="workshop-session-header">
         <div>
-          <span className="workshop-kicker">Teaching mode · {topic.title}</span>
+          <span className="workshop-kicker">{isRelaxedPractice ? "Relaxed practice" : "Teaching mode"} · {topic.title}</span>
           <h1>{meta.shortTitle}: {meta.title}</h1>
-          <p>Move through the bank at your own pace. The timer is a classroom aid and never advances the task automatically.</p>
+          <p>{isRelaxedPractice
+            ? "Work through the task bank at your own pace. There is no recording or feedback, and the optional timer never advances the task automatically."
+            : "Move through the bank at your own pace. The timer is a classroom aid and never advances the task automatically."}</p>
         </div>
         <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}`)}>Change mode</button>
       </header>
@@ -96,18 +123,30 @@ export default function TeachingMode({ topic }) {
       <section className="workshop-teacher-toolbar">
         <label>
           <span>Task</span>
-          <select value={taskIndex} onChange={(event) => setTaskIndex(Number(event.target.value))}>
+          <select value={isRandomPart1Set ? "random" : taskIndex} onChange={(event) => {
+            if (event.target.value === "random") return;
+            setRandomPart1Set(null);
+            setTaskIndex(Number(event.target.value));
+          }}>
+            {isRandomPart1Set ? <option value="random">Random set</option> : null}
             {items.map((item, index) => <option key={item.id} value={index}>{index + 1}. {item.title}</option>)}
           </select>
         </label>
+        {isRelaxedPractice && part === 1 ? (
+          <button className="workshop-secondary" type="button" onClick={generatePart1Set}>
+            {isRandomPart1Set ? "Generate 3 new questions" : "Generate 3 random questions"}
+          </button>
+        ) : null}
         <div className="workshop-timing-choice" role="group" aria-label="Timer setting">
           <span>Timing</span>
           <button type="button" className={timing === "off" ? "is-active" : ""} onClick={() => setTiming("off")}>Off</button>
           <button type="button" className={timing === "suggested" ? "is-active" : ""} onClick={() => setTiming("suggested")}>Recommended</button>
         </div>
-        <button className="workshop-secondary" type="button" disabled={!topic.visualsReady} onClick={() => navigate(`/speaking-workshops/${topic.id}/practice/${part}`)}>
-          {topic.visualsReady ? "Open exam practice" : "Exam practice opens with visuals"}
-        </button>
+        {!isRelaxedPractice || canUseExamPractice ? (
+          <button className="workshop-secondary" type="button" disabled={!topic.visualsReady} onClick={() => navigate(`/speaking-workshops/${topic.id}/practice/${part}`)}>
+            {topic.visualsReady ? "Open exam practice" : "Exam practice opens with visuals"}
+          </button>
+        ) : null}
       </section>
 
       {timing === "suggested" ? (
@@ -119,7 +158,7 @@ export default function TeachingMode({ topic }) {
       ) : null}
 
       <article className="workshop-task-stage">
-        <div className="workshop-task-number">{String(taskIndex + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}</div>
+        <div className="workshop-task-number">{isRandomPart1Set ? "RANDOM SET" : <>{String(taskIndex + 1).padStart(2, "0")} / {String(items.length).padStart(2, "0")}</>}</div>
         <h2>{current?.title}</h2>
 
         {part === 2 ? <Photo src={current.image} alt={current.alt} brief={current.photoBriefs?.[0]?.text} /> : null}
@@ -130,7 +169,7 @@ export default function TeachingMode({ topic }) {
           </div>
         ) : null}
 
-        {current?.photoBriefs?.length ? (
+        {!isRelaxedPractice && current?.photoBriefs?.length ? (
           <details className="workshop-photo-briefs">
             <summary>Original photo brief</summary>
             {current.photoBriefs.map((brief, index) => <p key={index}>{brief.label ? <strong>Photo {brief.label}: </strong> : null}{brief.text}</p>)}
@@ -141,10 +180,17 @@ export default function TeachingMode({ topic }) {
           {(current?.allQuestions || current?.questions || []).map((question, index) => <li key={index}>{question}</li>)}
         </ol>
 
-        <footer className="workshop-stage-actions">
-          <button type="button" disabled={taskIndex === 0} onClick={() => setTaskIndex((value) => Math.max(0, value - 1))}>← Previous</button>
-          <button type="button" disabled={taskIndex >= items.length - 1} onClick={() => setTaskIndex((value) => Math.min(items.length - 1, value + 1))}>Next →</button>
-        </footer>
+        {isRandomPart1Set ? (
+          <footer className="workshop-stage-actions">
+            <button type="button" onClick={() => setRandomPart1Set(null)}>← Full question bank</button>
+            <button type="button" onClick={generatePart1Set}>Another random set →</button>
+          </footer>
+        ) : (
+          <footer className="workshop-stage-actions">
+            <button type="button" disabled={taskIndex === 0} onClick={() => setTaskIndex((value) => Math.max(0, value - 1))}>← Previous</button>
+            <button type="button" disabled={taskIndex >= items.length - 1} onClick={() => setTaskIndex((value) => Math.min(items.length - 1, value + 1))}>Next →</button>
+          </footer>
+        )}
       </article>
     </div>
   );

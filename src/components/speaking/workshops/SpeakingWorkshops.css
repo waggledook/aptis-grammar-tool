@@ -210,6 +210,7 @@
 }
 .workshop-mode-grid > .mode-reference { --mode-accent: #8b9dff; }
 .workshop-mode-grid > .mode-prepare { --mode-accent: #f7b955; }
+.workshop-mode-grid > .mode-relaxed { --mode-accent: #70a8ff; }
 .workshop-mode-grid > .mode-practice { --mode-accent: #62d4bd; }
 .workshop-mode-grid > .mode-teach { --mode-accent: #ff8b74; }
 .mode-icon { display: grid; width: 3.25rem; height: 3.25rem; margin-bottom: 1.5rem; place-items: center; border-radius: 14px; background: color-mix(in srgb, var(--mode-accent) 17%, transparent); color: var(--mode-accent); }
