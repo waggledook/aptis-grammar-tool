@@ -62,18 +62,18 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
       <div className="whats-new-banner">
         <div className="whats-new-copy">
           <span className="whats-new-label">What’s new</span>
-          <h3>Grammar &amp; Vocabulary Mock Exams</h3>
+          <h3>New Aptis Reading Mock Exams</h3>
           <p>
-            Take one of three complete timed mocks, then review every answer
-            with detailed explanations and a saved result.
+            Take one of two complete 35-minute reading mocks, then review every
+            answer in context with detailed explanations and a saved result.
           </p>
         </div>
 
         <button
           className="whats-new-btn"
-          onClick={() => navigate("/grammar/aptis-mock")}
+          onClick={() => navigate("/reading/mock-tests")}
         >
-          Open mock exams
+          Open reading mocks
         </button>
       </div>
 

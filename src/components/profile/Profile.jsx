@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import * as fb from "../../firebase";
 import { toast } from "../../utils/toast";
 import { getSitePath } from "../../siteConfig.js";
+import { APTIS_READING_PARTS } from "../../reading/readingMenuData.js";
 import { PART1_QUESTIONS } from "../speaking/banks/part1";
 import { PART2_TASKS } from "../speaking/banks/part2";
 import { PART3_TASKS } from "../speaking/banks/part3";
@@ -391,6 +392,7 @@ export default function Profile({
   const [showSpeakingFeedback, setShowSpeakingFeedback] = useState(false);
   const [oteMockAttempts, setOteMockAttempts] = useState([]);
   const [aptisMockAttempts, setAptisMockAttempts] = useState([]);
+  const [aptisReadingMockAttempts, setAptisReadingMockAttempts] = useState([]);
   const [showAptisMockPanel, setShowAptisMockPanel] = useState(false);
   const [oteTrainingProgress, setOteTrainingProgress] = useState({});
   const [showOteSpeakingPanel, setShowOteSpeakingPanel] = useState(false);
@@ -944,12 +946,9 @@ function renderFeedbackButton(kind, submission) {
     part4: 2,
   };
 
-  const READING_TOTALS = {
-    part1: 6,
-    part2: 6, // update if you have more reorder tasks live
-    part3: 5,
-    part4: 2, // update if you have more live
-  };
+  const READING_TOTALS = Object.fromEntries(
+    APTIS_READING_PARTS.map((part) => [`part${part.number}`, part.taskIds.length]),
+  );
 
 
 
@@ -1021,6 +1020,7 @@ function renderFeedbackButton(kind, submission) {
           speakingFeedbackItems,
           oteMockRows,
           aptisMockRows,
+          aptisReadingMockRows,
           vocabCounts,
           vocabMistakesArr,
           vocabPractice,
@@ -1051,6 +1051,7 @@ function renderFeedbackButton(kind, submission) {
           fb.fetchSpeakingAiFeedback?.(20, uid) ?? Promise.resolve([]),
           fb.fetchOteMockAttempts?.(20, uid) ?? Promise.resolve([]),
           fb.fetchAptisGrammarVocabularyMockAttempts?.(50, uid) ?? Promise.resolve([]),
+          fb.fetchAptisReadingMockAttempts?.(50, uid) ?? Promise.resolve([]),
           fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
           fb.fetchUnresolvedVocabMistakes?.(50, uid) ?? Promise.resolve([]),
           fb.fetchVocabPracticeSummary?.(uid) ?? Promise.resolve(EMPTY_VOCAB_PRACTICE_SUMMARY),
@@ -1083,6 +1084,7 @@ function renderFeedbackButton(kind, submission) {
         setSpeakingFeedback(speakingFeedbackItems || []);
         setOteMockAttempts(oteMockRows || []);
         setAptisMockAttempts(aptisMockRows || []);
+        setAptisReadingMockAttempts(aptisReadingMockRows || []);
         setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
         setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
         setVocabPracticeSummary(vocabPractice || EMPTY_VOCAB_PRACTICE_SUMMARY);
@@ -2086,6 +2088,7 @@ const formatOteSpeakingPart = (part) => {
 
     <span className="muted small" style={{ flexShrink: 0 }}>
       {totalReadingCompleted}/{totalReadingTasks} tasks completed
+      {aptisReadingMockAttempts.length ? ` · ${aptisReadingMockAttempts.length} mock attempt${aptisReadingMockAttempts.length === 1 ? "" : "s"}` : ""}
     </span>
 
     <span className={`chev ${showReadingPanel ? "open" : ""}`} aria-hidden>
@@ -2121,6 +2124,22 @@ const formatOteSpeakingPart = (part) => {
           right={`${readingCounts.part4 || 0}/${READING_TOTALS.part4 || 0}`}
         />
       </div>
+
+      <div className="actions" style={{ marginTop: "1rem", marginBottom: ".8rem" }}>
+        {!targetUid ? <button className="btn" type="button" onClick={() => navigate(getSitePath("/reading/mock-tests"))}>Open reading mocks</button> : null}
+      </div>
+
+      {!aptisReadingMockAttempts.length ? (
+        <p className="muted small">No Aptis reading mock attempts yet.</p>
+      ) : (
+        <ul className="wlist aptis-profile-mock-list">
+          {aptisReadingMockAttempts.map((attempt, index) => (
+            <li key={attempt.id || `${attempt.mockId}-${index}`} className="wcard aptis-profile-mock-card">
+              <ProfileAptisReadingMockAttempt attempt={attempt} />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )}
 </section>
@@ -4188,6 +4207,36 @@ function ProfileAptisMockReviewItem({ item, label }) {
         </details>
       ) : null}
     </article>
+  );
+}
+
+function ProfileAptisReadingMockAttempt({ attempt }) {
+  const elapsed = Number(attempt.elapsedSeconds || 0);
+  const elapsedLabel = elapsed ? `${Math.floor(elapsed / 60)}m ${elapsed % 60}s` : "—";
+  return (
+    <details className="aptis-profile-mock-attempt">
+      <summary>
+        <span>
+          <strong>{attempt.mockTitle || "Aptis General Reading Mock"}</strong>
+          <small>{formatAptisMockAttemptDate(attempt.submittedAt || attempt.createdAt)}</small>
+        </span>
+        <b>{attempt.score ?? 0}/{attempt.total || 50} · {attempt.percentage ?? 0}%</b>
+      </summary>
+      <div className="aptis-profile-mock-review">
+        <div className="aptis-profile-mock-stats">
+          <span>Raw score <b>{attempt.rawScore ?? 0}/{attempt.rawTotal || 25}</b></span>
+          <span>Part 1 <b>{attempt.part1Score ?? 0}/5</b></span>
+          <span>Part 2 <b>{attempt.part2Score ?? 0}/6</b></span>
+          <span>Part 3 <b>{attempt.part3Score ?? 0}/7</b></span>
+          <span>Part 4 <b>{attempt.part4Score ?? 0}/7</b></span>
+          <span>Answered <b>{attempt.answered ?? 0}/{attempt.responseTotal || 29}</b></span>
+          <span>Time <b>{elapsedLabel}</b></span>
+        </div>
+        <p className="muted small" style={{ marginBottom: 0 }}>
+          {attempt.completionReason === "time_expired" ? "Submitted automatically when time expired." : "Submitted normally."}
+        </p>
+      </div>
+    </details>
   );
 }
 

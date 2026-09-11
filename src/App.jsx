@@ -96,6 +96,7 @@ import AptisPart4 from "./reading/AptisPart4";
 import ReadingPart4Teacher from "./reading/ReadingPart4Teacher.jsx";
 import ReadingPart4LiveHost from "./reading/ReadingPart4LiveHost.jsx";
 import ReadingPart4LivePlayer from "./reading/ReadingPart4LivePlayer.jsx";
+import AptisReadingMockRunner from "./reading/mockTests/AptisReadingMockRunner.jsx";
 import VocabularyMenu from "./components/vocabulary/VocabularyMenu";
 import ToastHost from './components/ToastHost';
 import Footer from "./components/common/Footer";
@@ -349,6 +350,7 @@ import OteWritingRegisterBasics from "./products/ote/OteWritingRegisterBasics.js
 import OteWritingRegisterGapTrainer from "./products/ote/OteWritingRegisterGapTrainer.jsx";
 import OteLevelTestChooser from "./products/ote/OteLevelTestChooser.jsx";
 import OteLevelTest from "./products/ote/OteLevelTest.jsx";
+import OteLevelTestV2 from "./products/ote/OteLevelTestV2.jsx";
 import OteAdvancedLevelTest from "./products/ote/OteAdvancedLevelTest.jsx";
 import OteCourseLanding from "./products/ote/OteCourseLanding.jsx";
 import OteReadingMenu, { OteReadingPartShell } from "./products/ote/OteReadingMenu.jsx";
@@ -505,6 +507,7 @@ const isCoursePack = location.pathname.startsWith("/course-pack");
 const isAdminRoute = location.pathname.startsWith("/admin");
 const isFlashcardsPlayerRoute = /^\/grammar\/flashcards\/[^/]+$/.test(location.pathname);
 const isAptisGrammarVocabularyMockRoute = location.pathname === "/grammar/aptis-mock";
+const isAptisReadingMockRoute = location.pathname === "/reading/mock-tests";
 const isHubCourseTestRunnerRoute = /^\/your-class\/tests\/[^/]+$/.test(location.pathname);
 const currentSite = getSiteVariant();
 const isSeifHubSite = currentSite.id === "seifhub";
@@ -552,8 +555,8 @@ const isOteRoute =
       location.pathname.startsWith("/results")));
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
-const isExamRoute = isOteExamRoute || isAptisGrammarVocabularyMockRoute || isAptisWritingMockRoute;
-const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute || isAptisWritingMockRoute || isSpeakingWorkshopRoute;
+const isExamRoute = isOteExamRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisWritingMockRoute;
+const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisWritingMockRoute || isSpeakingWorkshopRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
@@ -979,10 +982,12 @@ const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-i
 const isPublicSpanglishPlayRoute = /^\/games\/spanglish-fix-it\/play\/[^/]+$/.test(location.pathname);
 const isPublicOteLevelTestRoute =
   location.pathname.startsWith("/ote/level-test") ||
+  location.pathname.startsWith("/ote/level-test-v2") ||
   location.pathname === "/ote/advanced-level-test" ||
   location.pathname.startsWith("/ote/courses/") ||
   (isOteSite && (
     location.pathname.startsWith("/level-test") ||
+    location.pathname.startsWith("/level-test-v2") ||
     location.pathname === "/advanced-level-test" ||
     location.pathname.startsWith("/courses/")
   ));
@@ -1651,6 +1656,7 @@ return (
     element={<OteListeningPartShell user={user} nativeRoutes={false} />}
   />
   <Route path="/ote/level-test" element={<OteLevelTestChooser nativeRoutes={false} />} />
+  <Route path="/ote/level-test-v2" element={<OteLevelTestV2 />} />
   <Route path="/ote/level-test/general" element={<OteLevelTest nativeRoutes={false} />} />
   <Route path="/ote/level-test/advanced" element={<OteAdvancedLevelTest nativeRoutes={false} />} />
   <Route path="/ote/advanced-level-test" element={<Navigate to={getSitePath("/ote/level-test/advanced")} replace />} />
@@ -1837,6 +1843,10 @@ return (
         ? <OteLevelTestChooser nativeRoutes />
         : <Navigate to={getSitePath("/ote/level-test")} replace />
     }
+  />
+  <Route
+    path="/level-test-v2"
+    element={isOteSite ? <OteLevelTestV2 /> : <Navigate to={getSitePath("/ote/level-test-v2")} replace />}
   />
   <Route
     path="/level-test/general"
@@ -2124,6 +2134,28 @@ return (
       aptisAccess={aptisAccess}
       onSignIn={() => setShowAuth(true)}
     />
+  }
+/>
+
+<Route
+  path="/reading/mock-tests"
+  element={
+    <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+      <AptisFullAccessOnly
+        user={user}
+        aptisAccess={aptisAccess}
+        onSignIn={() => setShowAuth(true)}
+        onRequestAccess={() => navigate("/aptis-access")}
+        title="Aptis reading mock access required"
+        description="Active Aptis Trainer access is required to open these reading mocks."
+      >
+        <AptisReadingMockRunner
+          user={user}
+          onHome={() => navigate(siteHomePath)}
+          onProfile={() => navigate(siteProfilePath)}
+        />
+      </AptisFullAccessOnly>
+    </RequireSignedIn>
   }
 />
 

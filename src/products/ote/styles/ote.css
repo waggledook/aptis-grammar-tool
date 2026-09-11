@@ -15699,3 +15699,30 @@
     font-size: .7rem;
   }
 }
+/* OTE level-test V2 setup */
+.ote-level-test-v2 .ote-level-choice-card { text-align: left; width: 100%; }
+.ote-level-test-v2 .ote-level-choice-card.is-selected { border-color: #f6c453; box-shadow: 0 0 0 2px rgba(246,196,83,.18); }
+.ote-v2-section { margin-top: 1.5rem; }
+.ote-v2-skill-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: 1rem; }
+.ote-v2-skill { position: relative; display: flex; min-height: 190px; flex-direction: column; align-items: flex-start; gap: .65rem; padding: 1.1rem; border: 1px solid var(--color-border); border-radius: 18px; background: var(--color-surface-2); color: var(--color-text); text-align: left; }
+.ote-v2-skill:not(:disabled) { cursor: pointer; }
+.ote-v2-skill.is-selected { border-color: #f6c453; background: rgba(246,196,83,.08); }
+.ote-v2-skill:disabled:not(.is-selected) { opacity: .58; }
+.ote-v2-skill span { color: var(--color-text-muted); font-size: .75rem; font-weight: 800; text-transform: uppercase; }
+.ote-v2-skill strong { font-size: 1.05rem; }
+.ote-v2-skill small { color: var(--color-text-muted); line-height: 1.45; }
+.ote-v2-skill > svg:last-child { position: absolute; right: 1rem; top: 1rem; color: #f6c453; }
+.ote-v2-email-card { display: grid; grid-template-columns: auto 1fr minmax(240px,360px); gap: 1rem; align-items: center; padding: 1.25rem; border: 1px solid var(--color-border); border-radius: 18px; background: var(--color-surface-2); }
+.ote-v2-email-card label { display: block; font-weight: 800; }
+.ote-v2-email-card p { margin: .3rem 0 0; color: var(--color-text-muted); }
+.ote-v2-email-card input { width: 100%; padding: .85rem 1rem; border: 1px solid var(--color-border); border-radius: 12px; background: var(--color-surface); color: var(--color-text); }
+.ote-v2-start { justify-content: flex-end; margin-top: 1.25rem; }
+.ote-v2-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 1rem; max-width: 1180px; margin: 1rem auto 0; padding: .75rem 1rem; border-radius: 14px; background: rgba(246,196,83,.1); }
+.ote-v2-toolbar span,.ote-v2-toolbar button { display: flex; align-items: center; gap: .45rem; }
+.ote-v2-toolbar button { border: 0; background: transparent; color: inherit; cursor: pointer; font-weight: 700; }
+.ote-v2-save-status { margin-left: auto; color: var(--color-text-muted); font-size: .86rem; }
+.ote-v2-save-status.is-saved { color: #86efac; }
+.ote-v2-save-status.is-error { color: #fca5a5; }
+.ote-v2-resume-message { max-width: 1180px; margin: .75rem auto 0; padding: .75rem 1rem; border: 1px solid rgba(134,239,172,.28); border-radius: 12px; background: rgba(34,197,94,.08); color: var(--color-text); }
+@media (max-width: 900px) { .ote-v2-skill-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } .ote-v2-email-card { grid-template-columns: auto 1fr; } .ote-v2-email-card input { grid-column: 1 / -1; } }
+@media (max-width: 560px) { .ote-v2-skill-grid { grid-template-columns: 1fr; } }

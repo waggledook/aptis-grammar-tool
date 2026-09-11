@@ -12,7 +12,15 @@ try { admin.app(); } catch { admin.initializeApp(); }
 const GMAIL_USER   = process.env.GMAIL_USER;
 const GMAIL_PASS   = process.env.GMAIL_APP_PASSWORD;
 const TEACHER_EMAIL = process.env.TEACHER_EMAIL || GMAIL_USER;
-const OTE_LEVEL_REPORT_COPY_EMAIL = "nicholas@beeskillsenglish.com";
+const OTE_LEVEL_REPORT_COPY_EMAILS = String(
+  process.env.OTE_LEVEL_REPORT_COPY_EMAILS ||
+  "nicholas@beeskillsenglish.com,contemarco67@gmail.com,Cursos@seifenglish.com"
+).split(",").map((email) => email.trim()).filter(Boolean);
+const OTE_LEVEL_REPORT_REPLY_EMAIL =
+  process.env.OTE_LEVEL_REPORT_REPLY_EMAIL || "Cursos@seifenglish.com";
+const OTE_V2_RESUME_URL = process.env.OTE_V2_RESUME_URL ||
+  "https://ote-seif.beeskillsenglish.com/level-test-v2";
+const OTE_V2_RESUME_DAYS = 30;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const SPEAKING_WORKSHOP_ACCESS_CODE_HASH = String(
   process.env.SPEAKING_WORKSHOP_ACCESS_CODE_HASH || ""
@@ -21,6 +29,55 @@ const SPEAKING_WORKSHOP_REVIEW_DAYS = 14;
 const SPEAKING_WORKSHOP_CODE_ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const DEFAULT_ASSESSMENT_FEEDBACK_MODEL = "gpt-5.6-luna";
 const firestore = admin.firestore();
+
+function hashOteResumeToken(token) {
+  return nodeCrypto.createHash("sha256").update(String(token || "")).digest("hex");
+}
+
+function normalizeOteV2Draft(raw = {}) {
+  const answers = raw?.answers && typeof raw.answers === "object" ? raw.answers : {};
+  const production = raw?.production && typeof raw.production === "object" ? raw.production : {};
+  return {
+    funnelType: cleanString(raw?.funnelType || "", 40),
+    selectedSkills: Array.isArray(raw?.selectedSkills)
+      ? raw.selectedSkills.slice(0, 5).map((skill) => cleanString(skill, 30)).filter(Boolean)
+      : ["grammar-vocabulary"],
+    phase: ["batch1", "batch2", "results", "production"].includes(raw?.phase) ? raw.phase : "batch1",
+    routeKey: ["lower", "upper"].includes(raw?.routeKey) ? raw.routeKey : "",
+    answers: Object.fromEntries(Object.entries(answers).slice(0, 20).map(([key, value]) => [
+      cleanString(key, 80),
+      cleanString(value, 180),
+    ]).filter(([key, value]) => key && value)),
+    production: {
+      step: ["writing", "lead"].includes(production?.step) ? production.step : "",
+      writingAnswer: cleanString(production?.writingAnswer || "", 5000),
+    },
+  };
+}
+
+async function getAuthorizedOteV2Attempt(attemptId, token, {allowWriteToken = false} = {}) {
+  const safeId = cleanString(attemptId || "", 120);
+  const safeToken = cleanString(token || "", 180);
+  if (!safeId || !safeToken) {
+    throw new functions.https.HttpsError("permission-denied", "This resume link is invalid.");
+  }
+  const ref = firestore.collection("oteLevelTestV2Attempts").doc(safeId);
+  const snap = await ref.get();
+  const attempt = snap.exists ? snap.data() : null;
+  const suppliedHash = hashOteResumeToken(safeToken);
+  const matchesHash = (value) => {
+    const expectedHash = String(value || "");
+    return Boolean(expectedHash) && expectedHash.length === suppliedHash.length &&
+      nodeCrypto.timingSafeEqual(Buffer.from(expectedHash), Buffer.from(suppliedHash));
+  };
+  const hashesMatch = matchesHash(attempt?.resumeTokenHash) ||
+    (allowWriteToken && matchesHash(attempt?.writeTokenHash));
+  const expiresAtMs = attempt?.expiresAt?.toMillis?.() || 0;
+  if (!attempt || !hashesMatch || expiresAtMs <= Date.now() || attempt.revokedAt) {
+    throw new functions.https.HttpsError("permission-denied", "This resume link is invalid or has expired.");
+  }
+  return {ref, attempt};
+}
 
 function normalizeWorkshopAccessCode(value) {
   return String(value || "").trim().toUpperCase();
@@ -5339,6 +5396,10 @@ function normalizeOteLevelProductionPayload(data = {}) {
 
   return {
     mode: cleanString(data?.mode || "general_production_check", 80),
+    funnelType: cleanString(data?.funnelType || "current", 40),
+    selectedSkills: Array.isArray(data?.selectedSkills)
+      ? data.selectedSkills.slice(0, 5).map((skill) => cleanString(skill, 30)).filter(Boolean)
+      : ["grammar-vocabulary", "speaking", "writing"],
     lead: {
       email: cleanString(lead?.email || "", 180).toLowerCase(),
       name: cleanString(lead?.name || "", 120),
@@ -5767,11 +5828,11 @@ async function sendOteLevelReportEmail({ payload, speakingItems, feedback, submi
       "<p>Tu informe está abajo. Nuestro equipo académico también ha recibido una copia para poder recomendarte el siguiente paso.</p>",
       report.html,
     ].join("\n"),
-    replyTo: OTE_LEVEL_REPORT_COPY_EMAIL,
+    replyTo: OTE_LEVEL_REPORT_REPLY_EMAIL,
   };
   const adminMsg = {
     from: FROM_ADDRESS,
-    to: OTE_LEVEL_REPORT_COPY_EMAIL,
+    to: OTE_LEVEL_REPORT_COPY_EMAILS,
     subject: `Nuevo test de nivel Oxford Test of English: ${payload.lead.email}`,
     text: report.text,
     html: report.html,
@@ -7492,10 +7553,10 @@ exports.generateOteLevelProductionFeedback = functions
         "These recordings are too large for the level-test diagnostic."
       );
     }
-    if (payload.writing.answer.wordCount < 35) {
+    if (!recordingsWithAudio.length && payload.writing.answer.wordCount < 35) {
       throw new functions.https.HttpsError(
         "invalid-argument",
-        "The writing response is too short to estimate reliably."
+        "At least one complete speaking or writing sample is required."
       );
     }
 
@@ -7587,6 +7648,8 @@ exports.generateOteLevelProductionFeedback = functions
         name: payload.lead.name || "",
         uid: context.auth?.uid || null,
         mode: payload.mode,
+        funnelType: payload.funnelType,
+        selectedSkills: payload.selectedSkills,
         phase1: payload.phase1,
         quizReport: payload.quizReport,
         speakingTranscripts: speakingItems,
@@ -7632,6 +7695,132 @@ exports.generateOteLevelProductionFeedback = functions
         audioStored: false,
       },
     };
+  });
+
+exports.createOteV2ResumeDraft = functions
+  .region("europe-west1")
+  .https.onCall(async (data) => {
+    const email = normalizeUserEmail(data?.email);
+    if (!email || email.length > 320 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new functions.https.HttpsError("invalid-argument", "A valid email address is required.");
+    }
+    if (!FROM_ADDRESS || !GMAIL_PASS) {
+      throw new functions.https.HttpsError("failed-precondition", "Resume email is not configured.");
+    }
+
+    const emailHash = hashOteResumeToken(email);
+    const rateRef = firestore.collection("oteV2ResumeRateLimits").doc(emailHash);
+    await firestore.runTransaction(async (transaction) => {
+      const rateSnap = await transaction.get(rateRef);
+      const rate = rateSnap.exists ? rateSnap.data() : {};
+      const windowStartMs = rate?.windowStart?.toMillis?.() || 0;
+      const inWindow = Date.now() - windowStartMs < 15 * 60 * 1000;
+      const sends = inWindow ? Number(rate?.sends || 0) : 0;
+      if (sends >= 3) {
+        throw new functions.https.HttpsError("resource-exhausted", "Please wait before requesting another link.");
+      }
+      transaction.set(rateRef, {
+        windowStart: inWindow ? rate.windowStart : admin.firestore.Timestamp.now(),
+        sends: sends + 1,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+    });
+
+    const resumeToken = nodeCrypto.randomBytes(32).toString("base64url");
+    const writeToken = nodeCrypto.randomBytes(32).toString("base64url");
+    const attemptRef = firestore.collection("oteLevelTestV2Attempts").doc();
+    const expiresAt = admin.firestore.Timestamp.fromMillis(
+      Date.now() + OTE_V2_RESUME_DAYS * 24 * 60 * 60 * 1000
+    );
+    const draft = normalizeOteV2Draft(data?.draft);
+    await attemptRef.set({
+      email,
+      emailHash,
+      resumeTokenHash: hashOteResumeToken(resumeToken),
+      writeTokenHash: hashOteResumeToken(writeToken),
+      draft,
+      status: "in_progress",
+      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      expiresAt,
+    });
+
+    const resumeUrl = `${OTE_V2_RESUME_URL}?resume=${encodeURIComponent(attemptRef.id)}.${encodeURIComponent(resumeToken)}`;
+    try {
+      await transporter.sendMail({
+        from: FROM_ADDRESS,
+        to: email,
+        replyTo: OTE_LEVEL_REPORT_REPLY_EMAIL,
+        subject: "Continúa tu test de nivel Oxford Test of English",
+        text: [
+          "Has guardado un test de nivel Oxford Test of English.",
+          "",
+          "Continúa desde donde lo dejaste:",
+          resumeUrl,
+          "",
+          `Este enlace caduca en ${OTE_V2_RESUME_DAYS} días. Si no solicitaste este mensaje, puedes ignorarlo.`,
+        ].join("\n"),
+        html: [
+          "<p>Has guardado un test de nivel Oxford Test of English.</p>",
+          `<p><a href="${escapeHtml(resumeUrl)}" style="display:inline-block;padding:12px 18px;background:#1d4ed8;color:#fff;text-decoration:none;border-radius:8px;font-weight:700">Continuar mi test</a></p>`,
+          `<p>Este enlace caduca en ${OTE_V2_RESUME_DAYS} días. Si no solicitaste este mensaje, puedes ignorarlo.</p>`,
+        ].join("\n"),
+      });
+    } catch (error) {
+      await attemptRef.delete().catch(() => null);
+      console.error("[createOteV2ResumeDraft] Resume email failed", error);
+      throw new functions.https.HttpsError("unavailable", "The resume email could not be sent.");
+    }
+
+    // The browser receives a write-only capability for its new draft. The read capability
+    // is sent exclusively to the email address, so knowing an address never reveals a test.
+    return {attemptId: attemptRef.id, writeToken, expiresAt: expiresAt.toDate().toISOString()};
+  });
+
+exports.loadOteV2ResumeDraft = functions
+  .region("europe-west1")
+  .https.onCall(async (data) => {
+    const {ref, attempt} = await getAuthorizedOteV2Attempt(data?.attemptId, data?.token);
+    await ref.update({
+      emailVerifiedAt: attempt.emailVerifiedAt || admin.firestore.FieldValue.serverTimestamp(),
+      lastOpenedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    return {
+      attemptId: ref.id,
+      email: attempt.email,
+      draft: normalizeOteV2Draft(attempt.draft),
+      expiresAt: attempt.expiresAt.toDate().toISOString(),
+    };
+  });
+
+exports.saveOteV2ResumeDraft = functions
+  .region("europe-west1")
+  .https.onCall(async (data) => {
+    const {ref} = await getAuthorizedOteV2Attempt(
+      data?.attemptId,
+      data?.token,
+      {allowWriteToken: true}
+    );
+    const draft = normalizeOteV2Draft(data?.draft);
+    await ref.update({draft, updatedAt: admin.firestore.FieldValue.serverTimestamp()});
+    return {saved: true, savedAt: new Date().toISOString()};
+  });
+
+exports.cleanupExpiredOteV2ResumeDrafts = functions
+  .region("europe-west1")
+  .pubsub.schedule("every 24 hours")
+  .timeZone("Europe/Madrid")
+  .onRun(async () => {
+    const expired = await firestore.collection("oteLevelTestV2Attempts")
+      .where("expiresAt", "<=", admin.firestore.Timestamp.now())
+      .limit(400)
+      .get();
+    if (expired.empty) return null;
+    const batch = firestore.batch();
+    expired.docs.forEach((docSnap) => batch.delete(docSnap.ref));
+    await batch.commit();
+    console.log(`[cleanupExpiredOteV2ResumeDrafts] Deleted ${expired.size} expired drafts.`);
+    return null;
   });
 
 exports.generateAptisWritingPart23Feedback = functions

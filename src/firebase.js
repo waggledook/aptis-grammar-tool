@@ -587,6 +587,24 @@ export async function requestOteLevelProductionFeedback(payload) {
   return result.data;
 }
 
+export async function createOteV2ResumeDraft({ email, draft }) {
+  const callable = httpsCallable(functionsRegion, "createOteV2ResumeDraft");
+  const result = await callable({ email, draft });
+  return result.data;
+}
+
+export async function loadOteV2ResumeDraft({ attemptId, token }) {
+  const callable = httpsCallable(functionsRegion, "loadOteV2ResumeDraft");
+  const result = await callable({ attemptId, token });
+  return result.data;
+}
+
+export async function saveOteV2ResumeDraft({ attemptId, token, draft }) {
+  const callable = httpsCallable(functionsRegion, "saveOteV2ResumeDraft");
+  const result = await callable({ attemptId, token, draft });
+  return result.data;
+}
+
 export async function doPasswordReset(email, redirectUrl = "") {
   const safeRedirect = String(redirectUrl || "").trim();
   if (!safeRedirect) {
@@ -6454,6 +6472,85 @@ export async function fetchAptisGrammarVocabularyMockAttempts(n = 30, uid) {
 
   const q = query(
     collection(db, "users", realUid, "aptisGrammarVocabularyMockAttempts"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+}
+
+export async function saveAptisReadingMockAttempt(payload = {}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to save this result.");
+
+  const profileSnap = await getDoc(doc(db, "users", user.uid));
+  const teacherUid = profileSnap.exists() ? profileSnap.data()?.teacherId || null : null;
+  const ref = doc(collection(db, "users", user.uid, "aptisReadingMockAttempts"));
+  const row = {
+    product: "aptis-general",
+    module: "reading",
+    mockId: payload.mockId || "",
+    mockTitle: payload.mockTitle || "",
+    mockVersion: payload.mockVersion || "",
+    status: "submitted",
+    studentUid: user.uid,
+    studentEmail: user.email || null,
+    studentName: user.displayName || null,
+    teacherUid,
+    score: Number(payload.scaledScore || 0),
+    total: 50,
+    rawScore: Number(payload.rawScore || 0),
+    rawTotal: 25,
+    percentage: Number(payload.percentage || 0),
+    part1Score: Number(payload.part1Score || 0),
+    part2Score: Number(payload.part2Score || 0),
+    part3Score: Number(payload.part3Score || 0),
+    part4Score: Number(payload.part4Score || 0),
+    answered: Number(payload.answered || 0),
+    responseTotal: 29,
+    elapsedSeconds: Number(payload.elapsedSeconds || 0),
+    durationSeconds: Number(payload.durationSeconds || 0),
+    startedAtClient: payload.startedAtClient || null,
+    activitySessionId: payload.activitySessionId || null,
+    completionReason: payload.completionReason || "completed",
+    answers: payload.answers && typeof payload.answers === "object" ? payload.answers : {},
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    submittedAt: serverTimestamp(),
+  };
+
+  await setDoc(ref, row);
+  await logActivity("aptis_reading_mock_completed", {
+    product: row.product,
+    module: row.module,
+    activitySessionId: row.activitySessionId,
+    attemptId: ref.id,
+    mockId: row.mockId,
+    mockTitle: row.mockTitle,
+    mockVersion: row.mockVersion,
+    score: row.score,
+    total: row.total,
+    rawScore: row.rawScore,
+    rawTotal: row.rawTotal,
+    percentage: row.percentage,
+    part1Score: row.part1Score,
+    part2Score: row.part2Score,
+    part3Score: row.part3Score,
+    part4Score: row.part4Score,
+    answered: row.answered,
+    elapsedSeconds: row.elapsedSeconds,
+    durationSeconds: row.durationSeconds,
+    completionReason: row.completionReason,
+  });
+  return ref.id;
+}
+
+export async function fetchAptisReadingMockAttempts(n = 30, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const q = query(
+    collection(db, "users", realUid, "aptisReadingMockAttempts"),
     orderBy("createdAt", "desc"),
     limit(n)
   );

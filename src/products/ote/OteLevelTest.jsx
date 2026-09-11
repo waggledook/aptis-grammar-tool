@@ -152,8 +152,18 @@ function ProductionCheck({
   showAdvancedDiagnosticCard = false,
   testEdition = "general",
   sessionId = "",
+  selectedSkills = ["speaking", "writing"],
+  initialLeadEmail = "",
+  funnelType = "current",
+  initialProductionDraft = null,
+  onProductionDraftChange = null,
+  draftBase = null,
 }) {
-  const [step, setStep] = useState("mic");
+  const includeSpeaking = selectedSkills.includes("speaking");
+  const includeWriting = selectedSkills.includes("writing");
+  const [step, setStep] = useState(
+    initialProductionDraft?.step || (includeSpeaking ? "mic" : "writing")
+  );
   const [activeSpeakingIndex, setActiveSpeakingIndex] = useState(0);
   const [recordingPhase, setRecordingPhase] = useState("idle");
   const [secondsLeft, setSecondsLeft] = useState(0);
@@ -162,10 +172,10 @@ function ProductionCheck({
   const [micCheckSecondsLeft, setMicCheckSecondsLeft] = useState(0);
   const [micCheckRecording, setMicCheckRecording] = useState(null);
   const [micError, setMicError] = useState("");
-  const [writingAnswer, setWritingAnswer] = useState("");
+  const [writingAnswer, setWritingAnswer] = useState(initialProductionDraft?.writingAnswer || "");
   const [writingStarted, setWritingStarted] = useState(false);
   const [writingSecondsLeft, setWritingSecondsLeft] = useState(productionTasks.writing.recommendedSeconds);
-  const [leadEmail, setLeadEmail] = useState("");
+  const [leadEmail, setLeadEmail] = useState(initialLeadEmail);
   const [leadStatus, setLeadStatus] = useState("idle");
   const [feedbackResult, setFeedbackResult] = useState(null);
   const [feedbackError, setFeedbackError] = useState("");
@@ -188,6 +198,15 @@ function ProductionCheck({
   useEffect(() => {
     recordingsRef.current = recordings;
   }, [recordings]);
+
+  useEffect(() => {
+    if (!includeWriting || !onProductionDraftChange) return;
+    onProductionDraftChange({
+      ...(draftBase || {}),
+      phase: "production",
+      production: {step: step === "lead" ? "lead" : "writing", writingAnswer},
+    });
+  }, [draftBase, includeWriting, onProductionDraftChange, step, writingAnswer]);
 
   useEffect(() => {
     micCheckRecordingRef.current = micCheckRecording;
@@ -475,7 +494,7 @@ function ProductionCheck({
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
-    setStep("writing");
+    setStep(includeWriting ? "writing" : "lead");
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -520,6 +539,8 @@ function ProductionCheck({
         ].filter(Boolean).join("\n");
       const result = await requestOteLevelProductionFeedback({
         mode: feedbackMode,
+        funnelType,
+        selectedSkills: ["grammar-vocabulary", ...selectedSkills],
         lead: { email: trimmedEmail },
         phase1,
         quizReport,
@@ -816,7 +837,7 @@ function ProductionCheck({
           </article>
         </div>
         <div className="ote-level-actions">
-          <button className="ote-level-secondary" type="button" onClick={() => setStep("speaking")}>Volver a speaking</button>
+          {includeSpeaking ? <button className="ote-level-secondary" type="button" onClick={() => setStep("speaking")}>Volver a speaking</button> : null}
           <button className="ote-level-primary" type="button" disabled={writingWordCount < 35} onClick={() => {
             setStep("lead");
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -915,6 +936,11 @@ export default function OteLevelTest({
   getProfile = getOteLevelTestProfile,
   productionTasks = OTE_LEVEL_PRODUCTION_TASKS,
   copy = {},
+  selectedProductionSkills = ["speaking", "writing"],
+  initialLeadEmail = "",
+  funnelType = "current",
+  initialDraft = null,
+  onDraftChange = null,
 }) {
   const testCopy = { ...DEFAULT_LEVEL_TEST_COPY, ...copy };
   const sessionIdRef = useRef(createLevelTestSessionId());
@@ -923,9 +949,10 @@ export default function OteLevelTest({
   const completedLoggedRef = useRef(false);
   const productionStartedLoggedRef = useRef(false);
   const quizTopRef = useRef(null);
-  const [phase, setPhase] = useState("batch1");
-  const [routeKey, setRouteKey] = useState("");
-  const [answers, setAnswers] = useState({});
+  const [phase, setPhase] = useState(initialDraft?.phase || "batch1");
+  const [routeKey, setRouteKey] = useState(initialDraft?.routeKey || "");
+  const [answers, setAnswers] = useState(initialDraft?.answers || {});
+  const productionDraftBase = useMemo(() => ({routeKey, answers}), [answers, routeKey]);
   const coreItems = batches.core.items;
   const routeBatch = routeKey ? batches[routeKey] : null;
   const activeItems = phase === "batch1" ? coreItems : routeBatch?.items || [];
@@ -996,6 +1023,11 @@ export default function OteLevelTest({
       totalQuestions: 20,
     });
   }, [batches.core?.id, testCopy.testEdition]);
+
+  useEffect(() => {
+    if (phase === "production" && selectedProductionSkills.includes("writing")) return;
+    onDraftChange?.({ phase, routeKey, answers });
+  }, [answers, onDraftChange, phase, routeKey, selectedProductionSkills]);
 
   function chooseAnswer(itemId, option) {
     setAnswers((current) => ({ ...current, [itemId]: option }));
@@ -1103,6 +1135,12 @@ export default function OteLevelTest({
           showAdvancedDiagnosticCard={testCopy.showAdvancedDiagnosticSuggestion}
           testEdition={testCopy.testEdition}
           sessionId={sessionIdRef.current}
+          selectedSkills={selectedProductionSkills}
+          initialLeadEmail={initialLeadEmail}
+          funnelType={funnelType}
+          initialProductionDraft={initialDraft?.production}
+          onProductionDraftChange={onDraftChange}
+          draftBase={productionDraftBase}
           onBackToResult={() => {
             setPhase("results");
             window.scrollTo({ top: 0, behavior: "smooth" });
@@ -1173,26 +1211,26 @@ export default function OteLevelTest({
             </div>
           </div>
 
-          <div className="ote-level-upsell">
-            <article>
+          {selectedProductionSkills.length ? <div className="ote-level-upsell">
+            {selectedProductionSkills.includes("speaking") ? <article>
               <Mic size={24} aria-hidden="true" />
               <h3>1. Speaking</h3>
               <p>Graba tres respuestas cortas en unos {speakingMinutes} minutos para completar una recomendación más fiable.</p>
-            </article>
-            <article>
+            </article> : null}
+            {selectedProductionSkills.includes("writing") ? <article>
               <PenLine size={24} aria-hidden="true" />
-              <h3>2. Writing</h3>
+              <h3>Writing</h3>
               <p>Escribe una respuesta breve de {writingMinutes} minutos para comprobar precisión, registro y claridad.</p>
-            </article>
+            </article> : null}
             <article>
               <Volume2 size={24} aria-hidden="true" />
-              <h3>3. Informe completo</h3>
+              <h3>Informe completo</h3>
               <p>Recibe el informe por email con tu resultado, correcciones y siguiente paso recomendado.</p>
             </article>
-          </div>
+          </div> : null}
 
           <div className="ote-level-cta-row">
-            <button
+            {selectedProductionSkills.length ? <button
               className="ote-level-primary"
               type="button"
               onClick={() => {
@@ -1212,9 +1250,9 @@ export default function OteLevelTest({
                 window.scrollTo({ top: 0, behavior: "smooth" });
               }}
             >
-              Continuar con speaking y writing
+              Continuar con {selectedProductionSkills.map((skill) => skill === "speaking" ? "speaking" : "writing").join(" y ")}
               <ArrowRight size={18} aria-hidden="true" />
-            </button>
+            </button> : null}
             <a className="ote-level-secondary" href={coursePath}>
               Saltar y ver curso
             </a>

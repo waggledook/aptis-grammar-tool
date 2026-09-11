@@ -6,14 +6,13 @@ import {
   Bookmark,
   CheckCircle2,
   CircleHelp,
-  House,
   List,
   LogOut,
   RotateCcw,
   X,
 } from "lucide-react";
 import Seo from "../common/Seo.jsx";
-import UserAvatar from "../common/UserAvatar.jsx";
+import AptisMockPortalHeader from "../common/AptisMockPortalHeader.jsx";
 import {
   APTIS_GRAMMAR_VOCABULARY_MOCKS,
   getAptisGrammarVocabularyMock,
@@ -409,7 +408,7 @@ export default function HubAptisGrammarVocabularyMock({ user, onHome, onProfile 
         description="A mock Aptis grammar and vocabulary runner with exam-style timing and navigation."
       />
 
-      <MockPortalHeader
+      <AptisMockPortalHeader
         user={user}
         onHome={() => leaveMock(onHome)}
         onProfile={() => leaveMock(onProfile)}
@@ -555,34 +554,6 @@ export default function HubAptisGrammarVocabularyMock({ user, onHome, onProfile 
 
       <AptisMockStyles />
     </div>
-  );
-}
-
-function MockPortalHeader({ user, onHome, onProfile }) {
-  return (
-    <header className="aptis-mock-portal-header">
-      <img
-        src="/images/seif-trainer-logo.png"
-        alt="Seif English"
-        className="aptis-mock-portal-logo"
-        draggable="false"
-      />
-      <nav aria-label="Mock navigation">
-        <button type="button" onClick={onHome} className="aptis-mock-home-button">
-          <House size={19} aria-hidden="true" />
-          Home
-        </button>
-        <button
-          type="button"
-          onClick={onProfile}
-          className="aptis-mock-profile-button"
-          aria-label="Open profile"
-          title={user?.email || "My profile"}
-        >
-          <UserAvatar user={user} size="md" />
-        </button>
-      </nav>
-    </header>
   );
 }
 

@@ -111,6 +111,8 @@ export const ACTIVITY_TYPE_LABELS = {
   ote_mock_completed: "OTE Mock Completed",
   aptis_mock_started: "Aptis Grammar & Vocabulary Mock Started",
   aptis_mock_completed: "Aptis Grammar & Vocabulary Mock Completed",
+  aptis_reading_mock_started: "Aptis Reading Mock Started",
+  aptis_reading_mock_completed: "Aptis Reading Mock Completed",
   ote_register_checked: "OTE Register Checked",
   ote_level_test_selected: "OTE Level Test Selected",
   ote_level_test_started: "OTE Level Test Started",
@@ -727,6 +729,22 @@ export function formatActivityDetails(log) {
         typeof d.percentage === "number" ? `${d.percentage}%` : "",
         typeof d.grammarScore === "number" ? `Grammar ${d.grammarScore}/25` : "",
         typeof d.vocabularyScore === "number" ? `Vocabulary ${d.vocabularyScore}/25` : "",
+        typeof d.elapsedSeconds === "number" ? `Time ${formatDurationSeconds(d.elapsedSeconds)}` : "",
+        d.completionReason === "time_expired" ? "Time expired" : "Submitted",
+      ]);
+    case "aptis_reading_mock_started":
+      return joinParts([
+        d.mockTitle || d.mockId || "Reading mock",
+        d.mockVersion ? `Version ${d.mockVersion}` : "",
+        typeof d.rawTotal === "number" ? `${d.rawTotal} raw points` : "",
+        typeof d.durationSeconds === "number" ? `Time allowed ${formatDurationSeconds(d.durationSeconds)}` : "",
+      ]);
+    case "aptis_reading_mock_completed":
+      return joinParts([
+        d.mockTitle || d.mockId || "Reading mock",
+        `Score ${formatScore(d.score, d.total)}`,
+        typeof d.rawScore === "number" ? `Raw ${formatScore(d.rawScore, d.rawTotal)}` : "",
+        typeof d.percentage === "number" ? `${d.percentage}%` : "",
         typeof d.elapsedSeconds === "number" ? `Time ${formatDurationSeconds(d.elapsedSeconds)}` : "",
         d.completionReason === "time_expired" ? "Time expired" : "Submitted",
       ]);
