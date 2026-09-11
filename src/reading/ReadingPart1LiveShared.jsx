@@ -56,7 +56,7 @@ export function ReadingPart1LiveTask({
   );
 }
 
-export function ReadingPart1Distribution({ players, gap, reveal = false }) {
+export function ReadingPart1Distribution({ players, gap, reveal = false, showWhy = false }) {
   const submissions = players
     .map((player) => player.readingPart1Submission?.answers?.[gap.id])
     .filter(Boolean);
@@ -82,7 +82,7 @@ export function ReadingPart1Distribution({ players, gap, reveal = false }) {
           );
         })}
       </div>
-      {reveal ? <p><strong>Why:</strong> {gap.explanation}</p> : null}
+      {showWhy ? <p><strong>Why:</strong> {gap.explanation}</p> : null}
     </section>
   );
 }

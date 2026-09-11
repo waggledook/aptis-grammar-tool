@@ -30,7 +30,7 @@ export function ReadingPart3LiveTask({ task, answers = {}, onChange, disabled = 
   );
 }
 
-export function ReadingPart3FullReview({ task, players = [], playerAnswers }) {
+export function ReadingPart3FullReview({ task, players = [], playerAnswers, showWhy = false }) {
   const studentView = playerAnswers !== undefined;
   const answers = playerAnswers || {};
   const names = task.comments.map((comment) => comment.name);
@@ -56,8 +56,8 @@ export function ReadingPart3FullReview({ task, players = [], playerAnswers }) {
                 })}</div>
               )}
               <p className="rp3-review-correct"><strong>Correct answer:</strong> {question.answer}{!studentView ? ` · ${correctCount}/${classAnswers.length} correct` : ""}</p>
-              <p><strong>Evidence:</strong> {question.evidenceParts?.join(" … ") || question.evidence}</p>
-              <p className="rp3-review-explanation"><strong>Explanation:</strong> {question.explanation}</p>
+              {showWhy ? <p><strong>Evidence:</strong> {question.evidenceParts?.join(" … ") || question.evidence}</p> : null}
+              {showWhy ? <p className="rp3-review-explanation"><strong>Explanation:</strong> {question.explanation}</p> : null}
             </div>
           </li>
         );

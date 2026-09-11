@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Clipboard, Clock3, Play, Users } from "lucide-react";
+import { CheckCircle2, Clipboard, Clock3, Lightbulb, Play, Users } from "lucide-react";
 import { onValue, ref } from "firebase/database";
 import { QRCodeSVG } from "qrcode.react";
 import { useParams } from "react-router-dom";
@@ -54,6 +54,8 @@ export default function ReadingPart2LiveHost({ user }) {
   const phase = game?.state?.phase || "lobby";
   const reviewIndex = Math.min(Number(game?.state?.reviewIndex || 0), Math.max(0, tasks.length - 1));
   const reviewTask = tasks[reviewIndex];
+  const whyRevealedByTask = game?.state?.whyRevealedByTask || {};
+  const whyRevealed = Boolean(reviewTask && whyRevealedByTask[reviewTask.id]);
   const players = useMemo(() => Object.entries(game?.players || {})
     .map(([id, player]) => ({ id, ...player }))
     .sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0)), [game?.players]);
@@ -77,7 +79,7 @@ export default function ReadingPart2LiveHost({ user }) {
   async function beginWork() {
     if (!players.length) return;
     await setLiveGameStatus(gameId, "in-progress");
-    await setLiveGameState(gameId, { phase: "task", reviewIndex: 0, phaseStartedAt: Date.now() });
+    await setLiveGameState(gameId, { phase: "task", reviewIndex: 0, phaseStartedAt: Date.now(), whyRevealedByTask: null });
     await logAptisReadingLiveStarted({ ...activityDetails, playerCount: players.length });
   }
 
@@ -86,7 +88,7 @@ export default function ReadingPart2LiveHost({ user }) {
     if (incompletePairs > 0 && !window.confirm(
       `${incompletePairs} student task${incompletePairs === 1 ? " is" : "s are"} not complete. Saved partial answers will still appear in the review. Start the review now?`,
     )) return;
-    await setLiveGameState(gameId, { phase: "review", reviewIndex: 0, phaseStartedAt: Date.now() });
+    await setLiveGameState(gameId, { phase: "review", reviewIndex: 0, phaseStartedAt: Date.now(), whyRevealedByTask: null });
     await logAptisReadingLiveReviewStarted({
       ...activityDetails,
       playerCount: players.length,
@@ -109,6 +111,13 @@ export default function ReadingPart2LiveHost({ user }) {
       startedTaskCount: startedPairs,
       completedTaskCount: completedPairs,
       possibleTaskCount: totalPairs,
+    });
+  }
+
+  async function revealWhy() {
+    if (!reviewTask || whyRevealed) return;
+    await setLiveGameState(gameId, {
+      whyRevealedByTask: { ...whyRevealedByTask, [reviewTask.id]: true },
     });
   }
 
@@ -156,9 +165,12 @@ export default function ReadingPart2LiveHost({ user }) {
 
       {phase === "review" && reviewTask ? (
         <section className="rp1-live-stage">
-          <div className="rp1-live-status"><CheckCircle2 size={21} /><div><strong>Reviewing the complete task</strong><span>All six sentences stay visible. Class accuracy is shown for every position.</span></div></div>
-          <ReadingPart2FullReview players={players} task={reviewTask} />
-          <div className="rp1-live-actions"><button className="rp1-live-primary" onClick={nextReview} type="button">{reviewIndex === tasks.length - 1 ? "Finish session" : `Review task ${reviewIndex + 2}`}</button></div>
+          <div className="rp1-live-status"><CheckCircle2 size={21} /><div><strong>Reviewing the complete task</strong><span>{whyRevealed ? "The explanations are now visible to everyone." : "Answers and class accuracy are visible; explanations remain hidden."}</span></div></div>
+          <ReadingPart2FullReview players={players} showWhy={whyRevealed} task={reviewTask} />
+          <div className="rp1-live-actions">
+            {!whyRevealed ? <button className="rp1-live-primary" onClick={revealWhy} type="button"><Lightbulb size={18} /> Reveal why</button> : null}
+            <button className="rp1-live-secondary" onClick={nextReview} type="button">{reviewIndex === tasks.length - 1 ? "Finish session" : `Review task ${reviewIndex + 2}`}</button>
+          </div>
         </section>
       ) : null}
 

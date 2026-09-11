@@ -325,7 +325,7 @@ export async function createReadingPart1LiveGame({ taskId, title }) {
     taskId: task.id,
     status: "lobby",
     createdAt: Date.now(),
-    state: { phase: "lobby", reviewIndex: 0 },
+    state: { phase: "lobby", reviewIndex: 0, whyRevealedByGap: {} },
   });
   await logAptisReadingLiveHosted({
     gameId,
@@ -381,7 +381,7 @@ export async function createReadingPart2LiveGame({ taskId, taskIds = [], title }
     candidateIdsByTask,
     status: "lobby",
     createdAt: Date.now(),
-    state: { phase: "lobby", taskIndex: 0, reviewIndex: 0 },
+    state: { phase: "lobby", taskIndex: 0, reviewIndex: 0, whyRevealedByTask: {} },
   });
   await logAptisReadingLiveHosted({
     gameId,
@@ -415,7 +415,7 @@ export async function createReadingPart3LiveGame({ taskId, title }) {
     taskIds: [task.id],
     status: "lobby",
     createdAt: Date.now(),
-    state: { phase: "lobby", phaseStartedAt: null },
+    state: { phase: "lobby", phaseStartedAt: null, whyRevealed: false },
   });
   await logAptisReadingLiveHosted({
     gameId,
@@ -449,7 +449,7 @@ export async function createReadingPart4LiveGame({ taskId, title }) {
     taskIds: [task.id],
     status: "lobby",
     createdAt: Date.now(),
-    state: { phase: "lobby", phaseStartedAt: null },
+    state: { phase: "lobby", phaseStartedAt: null, whyRevealed: false },
   });
   await logAptisReadingLiveHosted({
     gameId,
@@ -1210,6 +1210,15 @@ export async function setLiveGameState(gameId, partialState) {
     }
     if ("phaseDuration" in partialState) {
       updates.phaseDuration = partialState.phaseDuration;
+    }
+    if (typeof partialState.whyRevealed === "boolean") {
+      updates.whyRevealed = partialState.whyRevealed;
+    }
+    if ("whyRevealedByGap" in partialState) {
+      updates.whyRevealedByGap = partialState.whyRevealedByGap;
+    }
+    if ("whyRevealedByTask" in partialState) {
+      updates.whyRevealedByTask = partialState.whyRevealedByTask;
     }
     if (typeof partialState.writingTimerDuration === "number") {
       updates.writingTimerDuration = partialState.writingTimerDuration;

@@ -38,6 +38,8 @@ export default function ReadingPart1LivePlayer() {
   const reviewIndex = Number(game?.state?.reviewIndex || 0);
   const answerableGaps = task?.gaps.filter((gap) => !gap.fixed) || [];
   const reviewGap = answerableGaps[reviewIndex];
+  const whyRevealedByGap = game?.state?.whyRevealedByGap || {};
+  const whyRevealed = Boolean(reviewGap && whyRevealedByGap[reviewGap.id]);
   const submission = player?.readingPart1Submission;
   const players = Object.entries(game?.players || {}).map(([id, value]) => ({ id, ...value }));
   const complete = answerableGaps.length > 0 && answerableGaps.every((gap) => answers[gap.id]);
@@ -83,18 +85,18 @@ export default function ReadingPart1LivePlayer() {
 
       {phase === "review" && reviewGap ? (
         <section className="rp1-live-stage">
-          <div className="rp1-live-status"><CheckCircle2 size={21} /><div><strong>Your answer: {submission?.answers?.[reviewGap.id] || "No answer"}</strong><span>Compare it with the class distribution and explanation.</span></div></div>
-          <ReadingPart1Distribution gap={reviewGap} players={players} reveal />
+          <div className="rp1-live-status"><CheckCircle2 size={21} /><div><strong>Your answer: {submission?.answers?.[reviewGap.id] || "No answer"}</strong><span>{whyRevealed ? "The explanation has now been revealed." : "The answer is visible. Your teacher will reveal the explanation when ready."}</span></div></div>
+          <ReadingPart1Distribution gap={reviewGap} players={players} reveal showWhy={whyRevealed} />
           <ReadingPart1LiveTask task={task} answers={submission?.answers || {}} disabled revealGapIds={[reviewGap.id]} />
         </section>
       ) : null}
 
-      {phase === "finished" ? <PlayerReport submission={submission} task={task} /> : null}
+      {phase === "finished" ? <PlayerReport submission={submission} task={task} whyRevealedByGap={whyRevealedByGap} /> : null}
     </main>
   );
 }
 
-function PlayerReport({ submission, task }) {
+function PlayerReport({ submission, task, whyRevealedByGap }) {
   const score = getReadingPart1LiveScore(task, submission);
   return (
     <section className="rp1-live-stage rp1-live-report">
@@ -102,7 +104,7 @@ function PlayerReport({ submission, task }) {
       <div>{task.gaps.filter((gap) => !gap.fixed).map((gap) => {
         const answer = submission?.answers?.[gap.id];
         const correct = answer === gap.answer;
-        return <article className={correct ? "is-correct" : "is-wrong"} key={gap.id}><span>Gap {gap.id}</span><h3>{answer || "No answer"}</h3><strong>{correct ? "Correct" : `Answer: ${gap.answer}`}</strong><p>{gap.explanation}</p></article>;
+        return <article className={correct ? "is-correct" : "is-wrong"} key={gap.id}><span>Gap {gap.id}</span><h3>{answer || "No answer"}</h3><strong>{correct ? "Correct" : `Answer: ${gap.answer}`}</strong>{whyRevealedByGap?.[gap.id] ? <p>{gap.explanation}</p> : null}</article>;
       })}</div>
     </section>
   );

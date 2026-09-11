@@ -4,6 +4,7 @@ import {
   BookOpen,
   Clock3,
   House,
+  GraduationCap,
   Image as ImageIcon,
   Images,
   Lightbulb,
@@ -13,6 +14,7 @@ import {
   Presentation,
   Smartphone,
   TrainFront,
+  Utensils,
   UsersRound,
 } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
@@ -41,6 +43,8 @@ const TOPIC_ICONS = {
   "travel-transport": TrainFront,
   "home-neighbourhood": House,
   "technology-communication": Smartphone,
+  "food-eating": Utensils,
+  "education-learning": GraduationCap,
 };
 
 const PREPARATION_COMPONENTS = {
@@ -227,6 +231,7 @@ function TopicModeChoice({ topic, navigate, access }) {
   const grant = access.topicAccess[topic.id] || {};
   const canUsePractice = topic.visualsReady && (access.fullAccess || grant.live);
   const canPrepare = topic.preparationReady;
+  const canUseReference = topic.referenceReady !== false;
 
   return (
     <main className="speaking-workshops">
@@ -243,12 +248,12 @@ function TopicModeChoice({ topic, navigate, access }) {
       </section>
 
       <section className="workshop-mode-grid" aria-label="Choose a mode">
-        <button className="mode-reference" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/reference`)}>
+        <button className={`mode-reference ${canUseReference ? "" : "is-locked"}`} type="button" disabled={!canUseReference} onClick={() => navigate(`/speaking-workshops/${topic.id}/reference`)}>
           <span className="mode-icon" aria-hidden="true"><BookOpen size={28} /></span>
           <span className="workshop-kicker">Student reference</span>
           <h2>Language guide</h2>
-          <p>Consult useful topic language for descriptions, comparisons, opinions and developed answers.</p>
-          <strong>Open the reference <ArrowRight size={17} /></strong>
+          <p>{canUseReference ? "Consult useful topic language for descriptions, comparisons, opinions and developed answers." : "The topic language guide will be added alongside the preparation activities."}</p>
+          <strong>{canUseReference ? <>Open the reference <ArrowRight size={17} /></> : "Language guide being developed"}</strong>
         </button>
         <button className={`mode-prepare ${canPrepare ? "" : "is-locked"}`} type="button" disabled={!canPrepare} onClick={() => navigate(`/speaking-workshops/${topic.id}/prepare`)}>
           <span className="mode-icon" aria-hidden="true"><Lightbulb size={28} /></span>
@@ -417,7 +422,7 @@ function SpeakingWorkshopsContent({ user, access }) {
     </main>
   );
   else if (mode === "prepare") page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;
-  else if (mode === "reference") page = <main className="speaking-workshops"><SpeakingReference topic={topic} /></main>;
+  else if (mode === "reference" && topic.referenceReady !== false) page = <main className="speaking-workshops"><SpeakingReference topic={topic} /></main>;
   else if (mode === "teach" && access.canManage) page = <main className="speaking-workshops"><TeachingMode topic={topic} /></main>;
   else if (mode === "practice" && !canOpenPractice) page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;
   else if (mode === "practice" && !partNumber) page = <PracticePartChoice topic={topic} navigate={navigate} />;

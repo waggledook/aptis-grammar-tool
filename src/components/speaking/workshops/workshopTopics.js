@@ -1,3 +1,5 @@
+import educationLearningSource from "./content/education-learning.md?raw";
+import foodEatingSource from "./content/food-eating.md?raw";
 import homeNeighbourhoodSource from "./content/home-neighbourhood.md?raw";
 import relationshipsFamilySource from "./content/relationships-family.md?raw";
 import technologyCommunicationSource from "./content/technology-communication.md?raw";
@@ -231,11 +233,21 @@ const TOPIC_META = {
     title: "Food & Eating",
     summary: "Meals, cooking, restaurants, food choices and eating habits.",
     accent: "amber",
+    contentReady: true,
+    ready: false,
+    visualsReady: false,
+    preparationReady: false,
+    referenceReady: false,
   },
   "education-learning": {
     title: "Education & Learning",
     summary: "Schools, study methods, learning experiences and educational choices.",
     accent: "sky",
+    contentReady: true,
+    ready: false,
+    visualsReady: false,
+    preparationReady: false,
+    referenceReady: false,
   },
   "sport-entertainment": {
     title: "Sport & Entertainment",
@@ -348,6 +360,8 @@ export const SPEAKING_WORKSHOP_TOPICS = [
   parseTopicSource("travel-transport", travelTransportSource),
   parseTopicSource("home-neighbourhood", homeNeighbourhoodSource),
   parseTopicSource("technology-communication", technologyCommunicationSource),
+  parseTopicSource("food-eating", foodEatingSource),
+  parseTopicSource("education-learning", educationLearningSource),
 ];
 
 const READY_TOPIC_IDS = new Set(SPEAKING_WORKSHOP_TOPICS.filter((topic) => topic.ready).map((topic) => topic.id));

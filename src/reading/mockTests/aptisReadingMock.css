@@ -24,3 +24,16 @@
 .part2-order-row{grid-template-columns:1fr;min-height:70px;padding:10px 12px}.part2-order-row>span{display:none}.part2-order-row.is-fixed{min-height:auto;padding:8px 2px 24px;border:0;background:transparent}.part2-order-row.is-fixed small{display:none}.part2-order-row.is-fixed p{margin:0;font-size:1.05rem;line-height:1.6}.part2-slot{display:grid;min-height:48px;align-items:center;outline:none}.part2-slot p{margin:0}.part2-slot:focus-visible{outline:3px solid #8e6caf;outline-offset:4px}.part2-slot:hover{cursor:grab}.part2-slot:active{cursor:grabbing}.part2-empty{min-height:48px;text-align:center}.part2-empty span{align-self:center;color:#8b8390;font-size:.78rem}.part2-bank article{align-items:start}.part2-bank article>svg{margin-top:7px}
 
 .reading-mock-save-status{min-height:24px;margin:-18px 0 28px;color:#615968;font-size:.92rem;font-weight:750}.reading-mock-save-status.is-saved{color:#116847}.reading-mock-save-status.is-error{color:#9a2f24}.reading-mock-save-status.is-signed-out{color:#765100}
+
+/* The mock always uses a white exam-paper surface, independent of the app theme. */
+.aptis-reading-mock { color-scheme: light; }
+.reading-mock-part4 select,
+.reading-mock-part4 select option {
+  background: #fff;
+  color: #252029;
+  -webkit-text-fill-color: #252029;
+}
+.reading-mock-part4 select option:disabled {
+  color: #8a838d;
+  -webkit-text-fill-color: #8a838d;
+}

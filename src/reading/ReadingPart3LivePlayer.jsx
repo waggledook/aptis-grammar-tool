@@ -34,6 +34,7 @@ export default function ReadingPart3LivePlayer() {
   const player = uid ? game?.players?.[uid] : null;
   const task = getReadingPart3TeacherTask(game?.taskId);
   const phase = game?.state?.phase || "lobby";
+  const whyRevealed = Boolean(game?.state?.whyRevealed);
   const savedAnswers = player?.readingPart3Submission && task && player.readingPart3Submission.taskId === task.id
     ? player.readingPart3Submission.answers || {}
     : {};
@@ -80,9 +81,9 @@ export default function ReadingPart3LivePlayer() {
 
       {phase === "review" ? (
         <section className="rp1-live-stage">
-          <div className="rp1-live-status"><CheckCircle2 size={21} /><div><strong>{getScore(task, answers)} of 7 correct</strong><span>All your answers remain visible with corrective feedback.</span></div></div>
+          <div className="rp1-live-status"><CheckCircle2 size={21} /><div><strong>{getScore(task, answers)} of 7 correct</strong><span>{whyRevealed ? "Evidence and explanations have now been revealed." : "Corrective feedback is visible. Your teacher will reveal the reasoning when ready."}</span></div></div>
           <ReadingPart3Comments task={task} />
-          <ReadingPart3FullReview playerAnswers={answers} task={task} />
+          <ReadingPart3FullReview playerAnswers={answers} showWhy={whyRevealed} task={task} />
         </section>
       ) : null}
 

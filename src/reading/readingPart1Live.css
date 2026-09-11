@@ -12,6 +12,7 @@
 .rp1-live-pin > strong { font-size:clamp(2rem,6vw,3.5rem); letter-spacing:.12em; }
 .rp1-live-pin button,.rp1-live-primary { display:inline-flex; align-items:center; justify-content:center; gap:.4rem; padding:.72rem .95rem; border:0; border-radius:10px; background:#f0b84d; color:#12203a; font:inherit; font-weight:900; cursor:pointer; }
 .rp1-live-primary:disabled { cursor:not-allowed; opacity:.48; }
+.rp1-live-secondary { display:inline-flex; align-items:center; justify-content:center; gap:.4rem; padding:.72rem .95rem; border:1px solid #5679b1; border-radius:10px; background:#182a49; color:#edf4ff; font:inherit; font-weight:850; cursor:pointer; }
 .rp1-live-roster header,.rp1-live-distribution header { display:flex; align-items:center; justify-content:space-between; gap:1rem; }
 .rp1-live-roster h2,.rp1-live-distribution h2 { margin:.15rem 0 0; }
 .rp1-live-roster header span,.rp1-live-distribution header span { color:#90b7f5; font-size:.75rem; font-weight:850; text-transform:uppercase; }
@@ -57,7 +58,8 @@
 .rp1-live-wait { display:grid; place-items:center; min-height:260px; text-align:center; }
 .rp1-live-wait h2,.rp1-live-wait p { margin:.2rem 0; }
 .rp1-live-wait p { color:#aebdd4; }
-@media (max-width:720px) { .rp1-live-lobby { grid-template-columns:1fr; } .rp1-live-header { flex-direction:column; } .rp1-live-phase { width:100%; text-align:left; } .rp1-live-email { font-size:.93rem; } .rp1-live-gap select { min-width:92px; } .rp1-live-actions { flex-direction:column; } .rp1-live-primary { width:100%; } }
+@media (max-width:720px) { .rp1-live-lobby { grid-template-columns:1fr; } .rp1-live-header { flex-direction:column; } .rp1-live-phase { width:100%; text-align:left; } .rp1-live-email { font-size:.93rem; } .rp1-live-gap select { min-width:92px; } .rp1-live-actions { flex-direction:column; } .rp1-live-primary,.rp1-live-secondary { width:100%; } }
 :root[data-theme="light"] .rp1-live-page { color:var(--color-text); }
 :root[data-theme="light"] .rp1-live-stage,:root[data-theme="light"] .rp1-live-email-card,:root[data-theme="light"] .rp1-live-distribution,:root[data-theme="light"] .rp1-live-report article { background:var(--color-surface-2); border-color:var(--color-border); }
 :root[data-theme="light"] .rp1-live-email-card select { background:#fff; color:#17233c; }
+:root[data-theme="light"] .rp1-live-secondary { background:#fff; color:#17233c; }

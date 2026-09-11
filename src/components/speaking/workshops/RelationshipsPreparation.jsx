@@ -36,6 +36,10 @@ function shuffle(items) {
   return shuffled;
 }
 
+function shuffledOptionOrders(questions) {
+  return Object.fromEntries(questions.map((question) => [question.id, shuffle(question.options)]));
+}
+
 function readSavedProgress(key) {
   try {
     const saved = JSON.parse(window.localStorage.getItem(key) || "{}");
@@ -84,6 +88,7 @@ function VocabularyCards({ set, onFinish }) {
 
 function QuestionCycle({ kicker, title, questions, answers, setAnswers, onFinish, finishLabel = "Continue →" }) {
   const [questionIndex, setQuestionIndex] = useState(0);
+  const [optionOrders, setOptionOrders] = useState(() => shuffledOptionOrders(questions));
   const question = questions[questionIndex];
   const selected = answers[question.id];
   const isLast = questionIndex === questions.length - 1;
@@ -97,7 +102,11 @@ function QuestionCycle({ kicker, title, questions, answers, setAnswers, onFinish
         <h2>{correctCount} / {questions.length} correct</h2>
         <p>You retrieved every target item in this activity. You can repeat it now or continue.</p>
         <div className="prep-complete-actions">
-          <button className="workshop-secondary" type="button" onClick={() => { setAnswers({}); setQuestionIndex(0); }}>Try again</button>
+          <button className="workshop-secondary" type="button" onClick={() => {
+            setAnswers({});
+            setQuestionIndex(0);
+            setOptionOrders(shuffledOptionOrders(questions));
+          }}>Try again</button>
           <button className="workshop-primary" type="button" onClick={onFinish}>{finishLabel}</button>
         </div>
       </section>
@@ -118,7 +127,7 @@ function QuestionCycle({ kicker, title, questions, answers, setAnswers, onFinish
       {question.context ? <p className="prep-question-context">{question.context}</p> : null}
       <p className="prep-context-sentence">{question.prompt}</p>
       <div className="prep-choice-grid">
-        {question.options.map((option) => {
+        {(optionOrders[question.id] || question.options).map((option) => {
           const isCorrect = selected && option === question.answer;
           const isWrong = selected === option && option !== question.answer;
           return <button key={option} type="button" className={isCorrect ? "is-correct" : isWrong ? "is-wrong" : ""} onClick={() => choose(option)}>{option}</button>;

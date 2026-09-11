@@ -54,7 +54,7 @@ export function ReadingPart4LiveTask({ task, answers = {}, onChange, disabled = 
   );
 }
 
-export function ReadingPart4FullReview({ task, players = [], playerAnswers }) {
+export function ReadingPart4FullReview({ task, players = [], playerAnswers, showWhy = false }) {
   const studentView = playerAnswers !== undefined;
   const answers = playerAnswers || {};
 
@@ -89,9 +89,9 @@ export function ReadingPart4FullReview({ task, players = [], playerAnswers }) {
                 <p className="rp4-review-correct"><strong>Correct heading:</strong> {correctHeading.key}. {correctHeading.text}{!studentView ? ` · ${correctCount}/${classAnswers.length} correct` : ""}</p>
               </div>
             </div>
-            <p className="rp4-review-text">{highlightEvidence(paragraph.text, evidenceParts)}</p>
-            {evidenceParts.length ? <p className="rp4-review-evidence"><strong>Evidence:</strong> {evidenceParts.join(" … ")}</p> : null}
-            {paragraph.explanation ? <p className="rp4-review-explanation"><strong>Why it matches:</strong> {paragraph.explanation}</p> : null}
+            <p className="rp4-review-text">{showWhy ? highlightEvidence(paragraph.text, evidenceParts) : paragraph.text}</p>
+            {showWhy && evidenceParts.length ? <p className="rp4-review-evidence"><strong>Evidence:</strong> {evidenceParts.join(" … ")}</p> : null}
+            {showWhy && paragraph.explanation ? <p className="rp4-review-explanation"><strong>Why it matches:</strong> {paragraph.explanation}</p> : null}
           </li>
         );
       })}</ol>

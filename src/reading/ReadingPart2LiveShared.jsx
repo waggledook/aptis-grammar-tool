@@ -161,7 +161,7 @@ export function ReadingPart2LiveTask({
   );
 }
 
-export function ReadingPart2FullReview({ task, players = [], playerPositions }) {
+export function ReadingPart2FullReview({ task, players = [], playerPositions, showWhy = false }) {
   const studentView = playerPositions !== undefined;
   const positions = playerPositions || {};
   const fixed = task.text.sentences.find((sentence) => sentence.fixed);
@@ -195,7 +195,7 @@ export function ReadingPart2FullReview({ task, players = [], playerPositions }) 
                 </div>
                 {studentView && selectedSentence ? <p className="rp2-full-review-student">{selectedSentence.text}</p> : null}
                 {(!studentView || !correct) ? <p className="rp2-full-review-answer"><strong>{studentView ? "Correct answer:" : "Answer:"}</strong> {correctSentence.text}</p> : null}
-                <em><strong>Why this follows:</strong> {correctSentence.explanation}</em>
+                {showWhy ? <em><strong>Why this follows:</strong> {correctSentence.explanation}</em> : null}
               </div>
             </li>
           );

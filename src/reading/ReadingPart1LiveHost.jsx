@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Check, CheckCircle2, Clipboard, Play, Send, Users } from "lucide-react";
+import { Check, CheckCircle2, Clipboard, Lightbulb, Play, Send, Users } from "lucide-react";
 import { onValue, ref } from "firebase/database";
 import { QRCodeSVG } from "qrcode.react";
 import { useParams } from "react-router-dom";
@@ -41,6 +41,8 @@ export default function ReadingPart1LiveHost({ user }) {
   const reviewIndex = Number(game?.state?.reviewIndex || 0);
   const answerableGaps = task?.gaps.filter((gap) => !gap.fixed) || [];
   const reviewGap = answerableGaps[reviewIndex];
+  const whyRevealedByGap = game?.state?.whyRevealedByGap || {};
+  const whyRevealed = Boolean(reviewGap && whyRevealedByGap[reviewGap.id]);
   const players = useMemo(() => Object.entries(game?.players || {})
     .map(([id, player]) => ({ id, ...player }))
     .sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0)), [game?.players]);
@@ -62,14 +64,14 @@ export default function ReadingPart1LiveHost({ user }) {
   async function beginTask() {
     if (!players.length) return;
     await setLiveGameStatus(gameId, "in-progress");
-    await setLiveGameState(gameId, { phase: "task", reviewIndex: 0 });
+    await setLiveGameState(gameId, { phase: "task", reviewIndex: 0, whyRevealedByGap: null });
     await logAptisReadingLiveStarted({ ...activityDetails, playerCount: players.length });
   }
 
   async function beginReview() {
     const outstanding = players.length - submissions.length;
     if (outstanding > 0 && !window.confirm(`${outstanding} student(s) have not submitted. Begin the review anyway?`)) return;
-    await setLiveGameState(gameId, { phase: "review", reviewIndex: 0 });
+    await setLiveGameState(gameId, { phase: "review", reviewIndex: 0, whyRevealedByGap: null });
     await logAptisReadingLiveReviewStarted({
       ...activityDetails,
       playerCount: players.length,
@@ -90,6 +92,13 @@ export default function ReadingPart1LiveHost({ user }) {
       submissionCount: submissions.length,
       completedTaskCount: submissions.length,
       possibleTaskCount: players.length,
+    });
+  }
+
+  async function revealWhy() {
+    if (!reviewGap || whyRevealed) return;
+    await setLiveGameState(gameId, {
+      whyRevealedByGap: { ...whyRevealedByGap, [reviewGap.id]: true },
     });
   }
 
@@ -137,9 +146,13 @@ export default function ReadingPart1LiveHost({ user }) {
 
       {phase === "review" && reviewGap ? (
         <section className="rp1-live-stage">
-          <ReadingPart1Distribution gap={reviewGap} players={players} reveal />
+          <div className="rp1-live-status"><Lightbulb size={21} /><div><strong>{whyRevealed ? "Why revealed to the class" : "Explanation hidden"}</strong><span>{whyRevealed ? "Students can now see the reasoning for this answer." : "Discuss the answer first, then reveal the reasoning when you are ready."}</span></div></div>
+          <ReadingPart1Distribution gap={reviewGap} players={players} reveal showWhy={whyRevealed} />
           <ReadingPart1LiveTask task={task} disabled revealGapIds={[reviewGap.id]} />
-          <div className="rp1-live-actions"><button className="rp1-live-primary" type="button" onClick={nextReview}>{reviewIndex === answerableGaps.length - 1 ? "Finish session" : `Reveal gap ${answerableGaps[reviewIndex + 1]?.id}`}</button></div>
+          <div className="rp1-live-actions">
+            {!whyRevealed ? <button className="rp1-live-primary" type="button" onClick={revealWhy}><Lightbulb size={18} /> Reveal why</button> : null}
+            <button className="rp1-live-secondary" type="button" onClick={nextReview}>{reviewIndex === answerableGaps.length - 1 ? "Finish session" : `Next: gap ${answerableGaps[reviewIndex + 1]?.id}`}</button>
+          </div>
         </section>
       ) : null}
 

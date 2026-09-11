@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { CheckCircle2, Clipboard, Clock3, Play, Users } from "lucide-react";
+import { CheckCircle2, Clipboard, Clock3, Lightbulb, Play, Users } from "lucide-react";
 import { onValue, ref } from "firebase/database";
 import { QRCodeSVG } from "qrcode.react";
 import { useParams } from "react-router-dom";
@@ -43,6 +43,7 @@ export default function ReadingPart4LiveHost({ user }) {
 
   const task = getReadingPart4TeacherTask(game?.taskId);
   const phase = game?.state?.phase || "lobby";
+  const whyRevealed = Boolean(game?.state?.whyRevealed);
   const players = useMemo(() => Object.entries(game?.players || {}).map(([id, player]) => ({ id, ...player })).sort((a, b) => (a.joinedAt || 0) - (b.joinedAt || 0)), [game?.players]);
   const isHost = Boolean(user && game?.ownerUid === user.uid);
   const completedCount = players.filter((player) => Object.keys(getAnswers(player, task)).length === 7).length;
@@ -62,14 +63,14 @@ export default function ReadingPart4LiveHost({ user }) {
   async function beginWork() {
     if (!players.length) return;
     await setLiveGameStatus(gameId, "in-progress");
-    await setLiveGameState(gameId, { phase: "task", phaseStartedAt: Date.now() });
+    await setLiveGameState(gameId, { phase: "task", phaseStartedAt: Date.now(), whyRevealed: false });
     await logAptisReadingLiveStarted({ ...activityDetails, playerCount: players.length });
   }
 
   async function beginReview() {
     const incomplete = players.length - completedCount;
     if (incomplete > 0 && !window.confirm(`${incomplete} student${incomplete === 1 ? " has" : "s have"} not answered all seven paragraphs. Saved partial answers will still appear. Start the review now?`)) return;
-    await setLiveGameState(gameId, { phase: "review", phaseStartedAt: Date.now() });
+    await setLiveGameState(gameId, { phase: "review", phaseStartedAt: Date.now(), whyRevealed: false });
     await logAptisReadingLiveReviewStarted({
       ...activityDetails,
       playerCount: players.length,
@@ -89,6 +90,11 @@ export default function ReadingPart4LiveHost({ user }) {
       completedTaskCount: completedCount,
       possibleTaskCount: players.length,
     });
+  }
+
+  async function revealWhy() {
+    if (whyRevealed) return;
+    await setLiveGameState(gameId, { whyRevealed: true });
   }
 
   async function copyJoinLink() {
@@ -127,10 +133,13 @@ export default function ReadingPart4LiveHost({ user }) {
 
       {phase === "review" ? (
         <section className="rp1-live-stage">
-          <div className="rp1-live-status"><CheckCircle2 size={21} /><div><strong>Reviewing all seven paragraphs</strong><span>The full text and class response distribution remain visible.</span></div></div>
+          <div className="rp1-live-status"><CheckCircle2 size={21} /><div><strong>Reviewing all seven paragraphs</strong><span>{whyRevealed ? "Evidence and explanations are now visible to everyone." : "Answers and class responses are visible; evidence and explanations remain hidden."}</span></div></div>
           <ReadingPart4Headings task={task} />
-          <ReadingPart4FullReview players={players} task={task} />
-          <div className="rp1-live-actions"><button className="rp1-live-primary" onClick={finishSession} type="button">Finish session</button></div>
+          <ReadingPart4FullReview players={players} showWhy={whyRevealed} task={task} />
+          <div className="rp1-live-actions">
+            {!whyRevealed ? <button className="rp1-live-primary" onClick={revealWhy} type="button"><Lightbulb size={18} /> Reveal why</button> : null}
+            <button className="rp1-live-secondary" onClick={finishSession} type="button">Finish session</button>
+          </div>
         </section>
       ) : null}
 

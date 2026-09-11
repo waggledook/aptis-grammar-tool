@@ -35,6 +35,7 @@ export default function ReadingPart2LivePlayer() {
   const task = tasks[Math.min(activeTaskIndex, Math.max(0, tasks.length - 1))];
   const reviewIndex = Math.min(Number(game?.state?.reviewIndex || 0), Math.max(0, tasks.length - 1));
   const reviewTask = tasks[reviewIndex];
+  const whyRevealed = Boolean(reviewTask && game?.state?.whyRevealedByTask?.[reviewTask.id]);
 
   function getSavedProgress(selectedTask) {
     if (!player || !selectedTask) return null;
@@ -105,8 +106,8 @@ export default function ReadingPart2LivePlayer() {
 
       {phase === "review" ? (
         <section className="rp1-live-stage">
-          <div className="rp1-live-status"><CheckCircle2 size={21} /><div><strong>{getReadingPart2LiveScore(reviewTask, { positions: reviewPositions })} of 5 correctly placed</strong><span>Your complete order stays visible below with corrective feedback.</span></div></div>
-          <ReadingPart2FullReview playerPositions={reviewPositions} task={reviewTask} />
+          <div className="rp1-live-status"><CheckCircle2 size={21} /><div><strong>{getReadingPart2LiveScore(reviewTask, { positions: reviewPositions })} of 5 correctly placed</strong><span>{whyRevealed ? "The explanations have now been revealed." : "Your corrected order is visible. Your teacher will reveal the explanations when ready."}</span></div></div>
+          <ReadingPart2FullReview playerPositions={reviewPositions} showWhy={whyRevealed} task={reviewTask} />
         </section>
       ) : null}
 
