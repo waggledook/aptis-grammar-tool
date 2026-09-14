@@ -11,8 +11,8 @@ export const PART3_CUSTOM_TASKS = [
       alt: "A person relaxing on a sofa at home wearing headphones.",
     },
     questions: [
-      "What are the advantages of experiencing music in these two different ways?",
-      "In which situation do you think the person is enjoying the music more?",
+      "How might the experience of listening to music be different in these situations?",
+      "Which way of listening to music would you prefer? Why?",
     ],
   },
   {
@@ -27,8 +27,8 @@ export const PART3_CUSTOM_TASKS = [
       alt: "A person using a self-checkout machine in a modern supermarket.",
     },
     questions: [
-      "How does the shopping experience differ in these two places?",
-      "Which of these places do you think offers better value for money?",
+      "How might the shopping experience be different in these two places?",
+      "Which place would you prefer to buy food in? Why?",
     ],
   },
   {
@@ -43,8 +43,8 @@ export const PART3_CUSTOM_TASKS = [
       alt: "An individual jogging alone through a peaceful forest trail.",
     },
     questions: [
-      "Which of these activities would be more motivating for someone trying to get fit?",
-      "What are the benefits of exercising outdoors compared to indoors?",
+      "What kind of people might prefer these two types of exercise?",
+      "Which activity would be more motivating for someone trying to get fit? Why?",
     ],
   },
   {
@@ -59,8 +59,8 @@ export const PART3_CUSTOM_TASKS = [
       alt: "A person watching an instructional video on a tablet to learn a craft at home.",
     },
     questions: [
-      "Which of these methods do you think is more effective for learning something difficult?",
-      "What are the advantages of learning a skill on your own?",
+      "What kind of learners might prefer these two ways of learning?",
+      "Which method do you think is more effective for learning something difficult? Why?",
     ],
   },
   {
@@ -75,8 +75,8 @@ export const PART3_CUSTOM_TASKS = [
       alt: "A busy city street filled with cars and tall buildings.",
     },
     questions: [
-      "How do you think people feel when they are in each of these two places?",
-      "Which of these areas would you prefer to spend your weekend in?",
+      "How might people feel in these two places?",
+      "Which place would you prefer to spend your free time in? Why?",
     ],
   },
 ];

@@ -11,7 +11,7 @@ export const MORE_PART2_TASKS = [
     },
     questions: [
       "Tell me about a time you went to an airport to travel somewhere.",
-      "Do you think air travel will become more expensive in the future? Why?",
+      "Why do many people find air travel stressful?",
     ],
   },
   {
@@ -25,8 +25,8 @@ export const MORE_PART2_TASKS = [
       usefulLanguage: ["lifting weights", "working out", "using exercise machines", "staying fit"],
     },
     questions: [
-      "What kind of physical exercise do people in your country usually prefer?",
-      "Why is it important for people to stay active as they get older?",
+      "Are gyms popular where you live? Why or why not?",
+      "Why do some people prefer exercising at a gym rather than outdoors?",
     ],
   },
   {
@@ -41,7 +41,7 @@ export const MORE_PART2_TASKS = [
     },
     questions: [
       "Tell me about a hobby or activity you enjoy doing in your free time.",
-      "Do you think having a hobby is more important for retired people or for students?",
+      "Why is it important for people to have hobbies?",
     ],
   },
   {
@@ -55,8 +55,8 @@ export const MORE_PART2_TASKS = [
       usefulLanguage: ["watching a performance", "sitting in the audience", "performing on stage", "going to the theater"],
     },
     questions: [
-      "Tell me about a performance or live show you have seen in the past.",
-      "Do you think live performances are better than watching movies at home?",
+      "Tell me about a performance or live show you have seen.",
+      "Why do some people prefer live performances to watching entertainment at home?",
     ],
   },
   {
@@ -70,7 +70,7 @@ export const MORE_PART2_TASKS = [
       usefulLanguage: ["using their phones", "sitting together", "looking at screens", "not talking to each other"],
     },
     questions: [
-      "How much time do you usually spend on your phone or computer each day?",
+      "How do you usually use technology to communicate with other people?",
       "Do you think technology is making people more or less social? Why?",
     ],
   },
@@ -85,8 +85,8 @@ export const MORE_PART2_TASKS = [
       usefulLanguage: ["handing out food", "helping the community", "working as a volunteer", "supporting people"],
     },
     questions: [
-      "Have you ever helped out in your local community or worked as a volunteer?",
-      "Do you think schools should encourage students to do more volunteer work?",
+      "What do people do to help others in your local community?",
+      "Do you think schools should encourage young people to do volunteer work? Why?",
     ],
   },
 ];
