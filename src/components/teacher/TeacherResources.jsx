@@ -87,24 +87,24 @@ const PRODUCT_GROUPS = [
         resources: [
           {
             title: "Speaking Part 2 extra practice",
-            description: "Six additional photo-description tasks in the full timed speaking flow.",
+            description: "Six additional photo-description tasks with relaxed, timed exam and teacher-led modes.",
             path: "/speaking/part2-secret",
             icon: Mic2,
-            tags: ["Assignable", "Direct link"],
+            tags: ["Relaxed practice", "Exam mode", "Teaching mode"],
           },
           {
             title: "Speaking Part 3 extra practice",
-            description: "Five additional picture-comparison tasks for independent or class use.",
+            description: "Five additional picture-comparison tasks with relaxed, timed exam and teacher-led modes.",
             path: "/speaking/part3-custom",
             icon: Mic2,
-            tags: ["Assignable", "Direct link"],
+            tags: ["Relaxed practice", "Exam mode", "Teaching mode"],
           },
           {
             title: "Speaking Part 4 extra practice",
-            description: "Five additional long-turn topics using the standard preparation and response timings.",
+            description: "Five additional long-turn topics with relaxed, timed exam and teacher-led modes.",
             path: "/speaking/part4-extra",
             icon: Mic2,
-            tags: ["Assignable", "Direct link"],
+            tags: ["Relaxed practice", "Exam mode", "Teaching mode"],
           },
           {
             title: "Similarities and differences picture sets",

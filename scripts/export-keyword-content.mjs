@@ -9,6 +9,7 @@ const outputPath = path.join(__dirname, "..", "src", "data", "content", "keyword
 
 function normalizeItem(item, index) {
   const itemId = item.itemId || item.id || `kw_${String(index + 1).padStart(4, "0")}`;
+  const explanation = typeof item.explanation === "string" ? item.explanation.trim() : "";
   return {
     itemId,
     fullSentence: item.fullSentence || "",
@@ -16,6 +17,7 @@ function normalizeItem(item, index) {
     keyWord: item.keyWord || "",
     answer: item.answer || "",
     tags: item.tags || "",
+    ...(explanation ? { explanation } : {}),
   };
 }
 

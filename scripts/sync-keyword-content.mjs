@@ -27,6 +27,9 @@ function ensureAnswer(value, itemId) {
 
 function normalizeItem(item, index) {
   const itemId = ensureString(item.itemId || `kw_${String(index + 1).padStart(4, "0")}`, "itemId", `row_${index + 1}`);
+  const explanation = item.explanation == null
+    ? ""
+    : ensureString(item.explanation, "explanation", itemId).trim();
   return {
     itemId,
     fullSentence: ensureString(item.fullSentence || "", "fullSentence", itemId),
@@ -34,6 +37,7 @@ function normalizeItem(item, index) {
     keyWord: ensureString(item.keyWord || "", "keyWord", itemId),
     answer: ensureAnswer(item.answer ?? "", itemId),
     tags: ensureString(item.tags || "", "tags", itemId),
+    ...(explanation ? { explanation } : {}),
   };
 }
 

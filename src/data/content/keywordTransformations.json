@@ -8,7 +8,8 @@
       "few gaps in Luis's knowledge",
       "few gaps in Luis' knowledge"
     ],
-    "tags": "C1, noun phrases, quantifiers"
+    "tags": "C1, noun phrases, quantifiers",
+    "explanation": "Use few with plural countable nouns. The phrase gaps in someone’s knowledge refers to things that person does not know."
   },
   {
     "itemId": "kw_0002",
@@ -20,7 +21,8 @@
       "must have forgotten he was",
       "must have forgotten that he was"
     ],
-    "tags": "C1, modals, past modals, probability"
+    "tags": "C1, modals, past modals, probability",
+    "explanation": "Use must have + past participle to make a strong deduction about the past: he must have forgotten."
   },
   {
     "itemId": "kw_0003",
@@ -37,7 +39,8 @@
       "meant a loss of privacy",
       "meant the loss of privacy"
     ],
-    "tags": "C1, result, noun phrases, linking"
+    "tags": "C1, result, noun phrases, linking",
+    "explanation": "Result in and lead to are followed by a noun or noun phrase: resulted in / led to a loss of privacy."
   },
   {
     "itemId": "kw_0004",
@@ -52,7 +55,8 @@
       "intention whatsoever of returning",
       "intention whatsoever of going back"
     ],
-    "tags": "C1, verb patterns, fixed phrase, formal"
+    "tags": "C1, verb patterns, fixed phrase, formal",
+    "explanation": "The pattern is have no intention of + -ing: she had no intention of returning."
   },
   {
     "itemId": "kw_0005",
@@ -60,7 +64,8 @@
     "gapFill": "Irene seems __________________ joining us this evening.",
     "keyWord": "changed",
     "answer": "to have changed her mind about",
-    "tags": "C1, perfect, verb patterns, gerunds and infinitives"
+    "tags": "C1, perfect, verb patterns, gerunds and infinitives",
+    "explanation": "After seem, use the perfect infinitive to have + past participle to refer to an earlier action or change: she seems to have changed her mind."
   },
   {
     "itemId": "kw_0006",
@@ -71,7 +76,8 @@
       "impression it would",
       "impression that it would"
     ],
-    "tags": "C1, fixed phrase, future"
+    "tags": "C1, fixed phrase, future",
+    "explanation": "Be under the impression (that) + clause means to believe something, often when that belief may be mistaken."
   },
   {
     "itemId": "kw_0007",
@@ -86,7 +92,8 @@
       "the impressive reputation of being",
       "a reputation of being"
     ],
-    "tags": "C1, noun phrases, fixed phrase, prepositions"
+    "tags": "C1, noun phrases, fixed phrase, prepositions",
+    "explanation": "Use gain a reputation for + -ing to describe how someone comes to be regarded by other people: gain a reputation for being a skilled negotiator."
   },
   {
     "itemId": "kw_0008",
@@ -99,7 +106,8 @@
       "for the help that you gave me",
       "for the help which you gave me"
     ],
-    "tags": "C1, fixed phrase, conditionals"
+    "tags": "C1, fixed phrase, conditionals",
+    "explanation": "But for + noun means if it had not been for: But for your help = If you hadn’t helped me."
   },
   {
     "itemId": "kw_0009",
@@ -110,7 +118,8 @@
       "will be beaten by Brazil in",
       "will get beaten by Brazil in"
     ],
-    "tags": "C1, passive voice, future"
+    "tags": "C1, passive voice, future",
+    "explanation": "The future passive is formed with will be + past participle: France will be beaten by Brazil."
   },
   {
     "itemId": "kw_0010",
@@ -123,7 +132,8 @@
       "prevent valuables being",
       "prevent valuables getting"
     ],
-    "tags": "C1, passive voice, verb patterns, gerunds and infinitives"
+    "tags": "C1, passive voice, verb patterns, gerunds and infinitives",
+    "explanation": "Use prevent + object + (from) + -ing. In a passive structure, this becomes prevent valuables from being stolen."
   },
   {
     "itemId": "kw_0011",
@@ -133,9 +143,10 @@
     "answer": [
       "order to avoid leaving",
       "an attempt to avoid leaving",
-      "effort to avoid leaving"
+      "an effort to avoid leaving"
     ],
-    "tags": "C1, verb patterns, purpose, linking, gerunds and infinitives"
+    "tags": "C1, verb patterns, purpose, linking, gerunds and infinitives",
+    "explanation": "Avoid is followed by a gerund: avoid leaving. Expressions such as in order to, in an attempt to and in an effort to can introduce purpose."
   },
   {
     "itemId": "kw_0012",
@@ -147,7 +158,8 @@
       "can be fixed or",
       "can be mended or"
     ],
-    "tags": "C1, passive voice, modal verbs, possibility"
+    "tags": "C1, passive voice, modal verbs, possibility",
+    "explanation": "Whether ... or not presents two alternatives. With a modal passive, use can + be + past participle: can be repaired."
   },
   {
     "itemId": "kw_0013",
@@ -158,7 +170,8 @@
       "couldn't manage to get",
       "didn't manage to get"
     ],
-    "tags": "C1, verb patterns, modal verbs, ability"
+    "tags": "C1, verb patterns, modal verbs, ability",
+    "explanation": "Manage is followed by the to-infinitive: manage to get. In the negative, didn’t manage to means that the attempt was unsuccessful."
   },
   {
     "itemId": "kw_0014",
@@ -171,7 +184,8 @@
       "a single guest turned up",
       "one of the guests turned up"
     ],
-    "tags": "C1, quantifiers, exceptions"
+    "tags": "C1, quantifiers, exceptions",
+    "explanation": "Not even one and not a single + singular noun strongly emphasise that the number was zero."
   },
   {
     "itemId": "kw_0015",
@@ -186,7 +200,8 @@
       "not have been placed in charge",
       "never have been placed in charge"
     ],
-    "tags": "C1, passive voice, past modals, modals"
+    "tags": "C1, passive voice, past modals, modals",
+    "explanation": "Use should not have + past participle to criticise a past decision or action. Put someone in charge of + -ing means make them responsible for something."
   },
   {
     "itemId": "kw_0016",
@@ -198,7 +213,8 @@
       "been put forward for changing",
       "been put forward about changing"
     ],
-    "tags": "C1, passive voice, phrasal verbs"
+    "tags": "C1, passive voice, phrasal verbs",
+    "explanation": "Put forward is a phrasal verb meaning propose or suggest. In the passive: a suggestion has been put forward."
   },
   {
     "itemId": "kw_0017",
@@ -206,7 +222,8 @@
     "gapFill": "The guide says that we __________________ in less than a week.",
     "keyWord": "crossed",
     "answer": "will have crossed the mountains",
-    "tags": "C1, future, perfect"
+    "tags": "C1, future, perfect",
+    "explanation": "Use the future perfect will have + past participle for something that will be completed before a future point: we will have crossed the mountains."
   },
   {
     "itemId": "kw_0018",
@@ -219,7 +236,8 @@
       "agreement was reached about",
       "agreement was reached on"
     ],
-    "tags": "C1, passive voice, noun phrases, formal"
+    "tags": "C1, passive voice, noun phrases, formal",
+    "explanation": "Reach an agreement on/about something means agree formally. The noun phrase can be made passive: an agreement had been reached."
   },
   {
     "itemId": "kw_0019",
@@ -230,7 +248,8 @@
       "having a cold, Maya managed to",
       "her cold, Maya managed to"
     ],
-    "tags": "C1, concession, ability, linking"
+    "tags": "C1, concession, ability, linking",
+    "explanation": "Despite is followed by a noun, pronoun or gerund rather than a finite clause: despite having a cold. Manage to + infinitive expresses successful achievement."
   },
   {
     "itemId": "kw_0020",
@@ -243,7 +262,8 @@
       "few have heard about",
       "few of them have heard about"
     ],
-    "tags": "C1, quantifiers, prepositions, perfect"
+    "tags": "C1, quantifiers, prepositions, perfect",
+    "explanation": "Very few + plural noun means almost none. Have heard of someone means know that the person exists or know something about them."
   },
   {
     "itemId": "kw_0021",
@@ -255,7 +275,8 @@
       "nothing which Emma would not do",
       "nothing Emma would not do"
     ],
-    "tags": "C1, Quantifiers, modals"
+    "tags": "C1, Quantifiers, modals",
+    "explanation": "Nothing ... would not do expresses the idea of being willing to do absolutely anything: there is nothing she would not do."
   },
   {
     "itemId": "kw_0022",
@@ -267,7 +288,8 @@
       "little likelihood that we will see",
       "little likelihood we will see"
     ],
-    "tags": "C1, probability, noun phrases, formal"
+    "tags": "C1, probability, noun phrases, formal",
+    "explanation": "Little likelihood expresses low probability. It can be followed by of + -ing or by a clause: little likelihood of seeing him / little likelihood that we will see him."
   },
   {
     "itemId": "kw_0023",
@@ -280,7 +302,8 @@
       "is not the first occasion",
       "will not be the first occasion"
     ],
-    "tags": "C1, Linking"
+    "tags": "C1, Linking",
+    "explanation": "Use this is not the first time + present perfect to talk about something that has happened before: this is not the first time he’s lost it."
   },
   {
     "itemId": "kw_0024",
@@ -291,7 +314,8 @@
       "of leaving by the time",
       "of leaving by the time that"
     ],
-    "tags": "C1, Fixed phrase, prepositions"
+    "tags": "C1, Fixed phrase, prepositions",
+    "explanation": "On the point of + -ing means about to do something. By the time introduces the later event used as the time reference."
   },
   {
     "itemId": "kw_0025",
@@ -299,11 +323,12 @@
     "gapFill": "The meals in that restaurant are __________________ pay for.",
     "keyWord": "far",
     "answer": "far too expensive for Olivia to",
-    "tags": "C1, comparatives and superlatives, intensifiers"
+    "tags": "C1, comparatives and superlatives, intensifiers",
+    "explanation": "Far can intensify too + adjective: far too expensive. The pattern for + person + to-infinitive shows who is unable to do the action."
   },
   {
     "itemId": "kw_0026",
-    "fullSentence": "Could Sofia have forgotten her umbrella this morning?",
+    "fullSentence": "Could Sofia have left her umbrella at home this morning?",
     "gapFill": "I __________________ her umbrella at home this morning.",
     "keyWord": "wonder",
     "answer": [
@@ -312,7 +337,8 @@
       "wonder whether Sofia has left",
       "wonder whether Sofia could have left"
     ],
-    "tags": "C1, modal verbs, past modals, indirect questions, questions"
+    "tags": "C1, modal verbs, past modals, indirect questions, questions",
+    "explanation": "After wonder, use if or whether to introduce an indirect question, with normal statement word order: I wonder whether Sofia has left it at home."
   },
   {
     "itemId": "kw_0027",
@@ -320,7 +346,8 @@
     "gapFill": "Tougher rules __________________ result of last year's accident.",
     "keyWord": "imposed",
     "answer": "were imposed as a",
-    "tags": "C1, passive voice, result, linking"
+    "tags": "C1, passive voice, result, linking",
+    "explanation": "As a result of + noun expresses cause. The verb impose can also be used in the passive: tougher rules were imposed as a result of the accident."
   },
   {
     "itemId": "kw_0028",
@@ -335,7 +362,8 @@
       "we complete our chores before going",
       "we complete our chores before we go"
     ],
-    "tags": "C1, gerunds and infinitives"
+    "tags": "C1, gerunds and infinitives",
+    "explanation": "Before can be followed either by a gerund or by a full clause: before going / before we go."
   },
   {
     "itemId": "kw_0029",
@@ -343,7 +371,8 @@
     "gapFill": "I was shocked by my __________________ what had happened the day before.",
     "keyWord": "account",
     "answer": "cousin’s account of",
-    "tags": "C1, noun phrases, formal, fixed phrase"
+    "tags": "C1, noun phrases, formal, fixed phrase",
+    "explanation": "An account of something is a description or report of it. Use the possessive before account: my cousin’s account of what happened."
   },
   {
     "itemId": "kw_0030",
@@ -354,7 +383,8 @@
       "is several decades since",
       "has been several decades since"
     ],
-    "tags": "C1, perfect, verb forms"
+    "tags": "C1, perfect, verb forms",
+    "explanation": "Use it is / has been + period of time + since + past simple to say how long ago something happened."
   },
   {
     "itemId": "kw_0031",
@@ -362,7 +392,8 @@
     "gapFill": "People often comment on the extent to __________________ her aunt.",
     "keyWord": "takes",
     "answer": "which Jenny takes after",
-    "tags": "C1, Relative clauses, phrasal verbs"
+    "tags": "C1, Relative clauses, phrasal verbs",
+    "explanation": "The formal structure the extent to which means how much or how strongly something is true. Take after means resemble an older family member."
   },
   {
     "itemId": "kw_0032",
@@ -375,7 +406,8 @@
       "agreement was reached about",
       "agreement was reached on"
     ],
-    "tags": "C1, passive voice, noun phrases, formal"
+    "tags": "C1, passive voice, noun phrases, formal",
+    "explanation": "Reach an agreement can be expressed in the passive as an agreement was/had been reached. Use on or about before the subject of the agreement."
   },
   {
     "itemId": "kw_0033",
@@ -387,7 +419,8 @@
       " will have lived in Paris for",
       "will have been living in Paris for"
     ],
-    "tags": "C1, future, perfect"
+    "tags": "C1, future, perfect",
+    "explanation": "Use the future perfect with for + period to show how long something will have continued by a future point: will have been in Paris for two years."
   },
   {
     "itemId": "kw_0034",
@@ -398,7 +431,8 @@
       "led to the cancellation",
       "led to the cancelling"
     ],
-    "tags": "C1, result, linking"
+    "tags": "C1, result, linking",
+    "explanation": "Lead to expresses a result and is followed by a noun or gerund: led to the cancellation / cancelling of the shows."
   },
   {
     "itemId": "kw_0035",
@@ -410,7 +444,8 @@
       "did not make any reference to",
       "made no reference to"
     ],
-    "tags": "C1, fixed phrase, formal"
+    "tags": "C1, fixed phrase, formal",
+    "explanation": "Make reference to is a formal equivalent of mention. Negative forms include made no reference to and did not make any reference to."
   },
   {
     "itemId": "kw_0036",
@@ -421,7 +456,8 @@
       "it clear he was not",
       "it clear that he was not"
     ],
-    "tags": "C1, fixed phrase"
+    "tags": "C1, fixed phrase",
+    "explanation": "The fixed structure is make it clear (that) + clause: Daniel made it clear that he was not willing to stay."
   },
   {
     "itemId": "kw_0037",
@@ -429,7 +465,8 @@
     "gapFill": "Jordan _____________________ the flat when the doorbell rang.",
     "keyWord": "point",
     "answer": "was on the point of leaving",
-    "tags": "C1, fixed phrase, prepositions"
+    "tags": "C1, fixed phrase, prepositions",
+    "explanation": "Be on the point of + -ing means be just about to do something: was on the point of leaving."
   },
   {
     "itemId": "kw_0038",
@@ -440,7 +477,8 @@
       "her delight, Ivy was",
       "Ivy's delight, she was"
     ],
-    "tags": "C1, fronting, intensifiers"
+    "tags": "C1, fronting, intensifiers",
+    "explanation": "Much to + possessive + emotion noun introduces someone’s strong reaction: Much to her delight, ..."
   },
   {
     "itemId": "kw_0039",
@@ -453,7 +491,8 @@
       "went up as a result of",
       "rose as a result of"
     ],
-    "tags": "C1, linking, result"
+    "tags": "C1, linking, result",
+    "explanation": "As a result of + noun introduces the cause of a result: attendance rose as a result of the discount."
   },
   {
     "itemId": "kw_0040",
@@ -465,7 +504,8 @@
       "as she was short of",
       "since she was short of"
     ],
-    "tags": "C1, linking, fixed phrase"
+    "tags": "C1, linking, fixed phrase",
+    "explanation": "Be short of + noun means not have enough of something: she was short of time."
   },
   {
     "itemId": "kw_0041",
@@ -478,7 +518,8 @@
       "he was going to call the moment that",
       "he was going to call the moment"
     ],
-    "tags": "C1, reported speech, linking"
+    "tags": "C1, reported speech, linking",
+    "explanation": "The moment (that) + clause means as soon as. In reported speech, will normally changes to would: he said he would call the moment he arrived."
   },
   {
     "itemId": "kw_0042",
@@ -490,7 +531,8 @@
       "no intention of traveling",
       "no intention of going"
     ],
-    "tags": "C1, prepositions, noun phrases, formal"
+    "tags": "C1, prepositions, noun phrases, formal",
+    "explanation": "Use have no intention of + -ing to say that someone does not plan to do something: no intention of travelling abroad."
   },
   {
     "itemId": "kw_0043",
@@ -498,7 +540,8 @@
     "gapFill": "Hopefully, there’ll be _____________________ better in the economy soon.",
     "keyWord": "change",
     "answer": "a change for the",
-    "tags": "C1, fixed phrase"
+    "tags": "C1, fixed phrase",
+    "explanation": "A change for the better is a fixed expression meaning an improvement."
   },
   {
     "itemId": "kw_0044",
@@ -511,7 +554,8 @@
       "she was interested in seeing",
       "she would be interested in seeing"
     ],
-    "tags": "C1, gerunds and infinitives, reported speech"
+    "tags": "C1, gerunds and infinitives, reported speech",
+    "explanation": "Interested is followed by in + -ing: interested in seeing the film. In a reported yes/no question, use whether or if followed by statement word order."
   },
   {
     "itemId": "kw_0045",
@@ -526,7 +570,8 @@
       "have not heard anything from Luis for",
       "have not heard anything from Luis in"
     ],
-    "tags": "C1, perfect, prepositions"
+    "tags": "C1, perfect, prepositions",
+    "explanation": "Use the present perfect with for/in ages to describe a situation continuing up to the present: I haven’t heard from Luis for ages."
   },
   {
     "itemId": "kw_0046",
@@ -534,7 +579,8 @@
     "gapFill": "The team has _____________________ the tournament.",
     "keyWord": "every",
     "answer": "every chance of winning",
-    "tags": "C1, fixed phrase, probability"
+    "tags": "C1, fixed phrase, probability",
+    "explanation": "Have every chance of + -ing means be very likely to do something: the team has every chance of winning."
   },
   {
     "itemId": "kw_0047",
@@ -545,7 +591,8 @@
       "has been a sharp rise in",
       "has been a significant rise in"
     ],
-    "tags": "C1, noun phrases, trends"
+    "tags": "C1, noun phrases, trends",
+    "explanation": "Trends can be expressed with a noun phrase after there has been: there has been a significant rise in the cost."
   },
   {
     "itemId": "kw_0048",
@@ -553,7 +600,8 @@
     "gapFill": "If she fails the course, _____________________ what will happen next!",
     "keyWord": "knowing",
     "answer": "there is no knowing",
-    "tags": "C1, fixed phrase, probability"
+    "tags": "C1, fixed phrase, probability",
+    "explanation": "There is no knowing is a fixed expression meaning it is impossible to know or predict something."
   },
   {
     "itemId": "kw_0049",
@@ -567,7 +615,8 @@
       "made a big impression on all of",
       "made an impression on all of"
     ],
-    "tags": "C1, fixed phrase, prepositions"
+    "tags": "C1, fixed phrase, prepositions",
+    "explanation": "The collocation is make an impression on someone: her attitude made a great impression on us."
   },
   {
     "itemId": "kw_0050",
@@ -575,7 +624,8 @@
     "gapFill": "Jay’s startup _____________________ during its first year.",
     "keyWord": "so",
     "answer": "was not so successful",
-    "tags": "C1, comparatives and superlatives, intensifiers, so/such"
+    "tags": "C1, comparatives and superlatives, intensifiers, so/such",
+    "explanation": "Successful is the adjective formed from the noun success. After be, use the adjective: the startup was not so successful."
   },
   {
     "itemId": "kw_0051",
@@ -583,7 +633,8 @@
     "gapFill": "I don’t think _____________________ your laptop to Ben.",
     "keyWord": "should",
     "answer": "you should have lent",
-    "tags": "C1, modal verbs, past modals"
+    "tags": "C1, modal verbs, past modals",
+    "explanation": "Use I don’t think + should have + past participle to say that a past action was probably a mistake: I don’t think you should have lent your laptop."
   },
   {
     "itemId": "kw_0052",
@@ -591,11 +642,12 @@
     "gapFill": "The teacher found _____________________ the email quite unusual.",
     "keyWord": "failure",
     "answer": [
-      "mark's failure to answer",
-      "mark's failure to reply to",
-      "mark's failure to respond to"
+      "Mark's failure to answer",
+      "Mark's failure to reply to",
+      "Mark's failure to respond to"
     ],
-    "tags": "C1, fixed phrase, formal"
+    "tags": "C1, fixed phrase, formal",
+    "explanation": "Failure to + infinitive is a formal noun structure meaning that someone did not do something: Mark's failure to reply."
   },
   {
     "itemId": "kw_0053",
@@ -606,7 +658,8 @@
       "you will find it difficult",
       "you will find it hard"
     ],
-    "tags": "C1, fixed phrase"
+    "tags": "C1, fixed phrase",
+    "explanation": "The pattern find it + adjective + to-infinitive means experience something as difficult, easy, strange, etc.: find it difficult to follow."
   },
   {
     "itemId": "kw_0054",
@@ -614,7 +667,8 @@
     "gapFill": "Experts think Leila _____________________ the national title in tennis.",
     "keyWord": "capable",
     "answer": "is capable of winning",
-    "tags": "C1, ability, prepositions"
+    "tags": "C1, ability, prepositions",
+    "explanation": "Capable is followed by of + -ing: she is capable of winning. It expresses ability or potential."
   },
   {
     "itemId": "kw_0055",
@@ -625,7 +679,8 @@
       "explain why she made",
       "explain why she had made"
     ],
-    "tags": "C1, reported speech, verb patterns"
+    "tags": "C1, reported speech, verb patterns",
+    "explanation": "Explain can be followed by why + clause: explain why she made the error. A past perfect form can be used when the action happened earlier."
   },
   {
     "itemId": "kw_0056",
@@ -633,7 +688,8 @@
     "gapFill": "Omar _____________________ organising the school event.",
     "keyWord": "made",
     "answer": "was made responsible for",
-    "tags": "C1, passive voice, prepositions"
+    "tags": "C1, passive voice, prepositions",
+    "explanation": "Make someone responsible for + -ing can be used in the passive: Omar was made responsible for organising the event."
   },
   {
     "itemId": "kw_0057",
@@ -644,7 +700,8 @@
       "with a chance of winning",
       "with any chance of winning"
     ],
-    "tags": "C1, fixed phrase, probability, prepositions"
+    "tags": "C1, fixed phrase, probability, prepositions",
+    "explanation": "Be in with a chance of + -ing means have a realistic possibility of succeeding: in with a chance of winning."
   },
   {
     "itemId": "kw_0058",
@@ -657,7 +714,8 @@
       "nobody apart from his cousin",
       "no one apart from his cousin"
     ],
-    "tags": "C1, exceptions, quantifiers"
+    "tags": "C1, exceptions, quantifiers",
+    "explanation": "Apart from means except for. It can come before or after the person or thing being excluded: apart from his cousin, nobody knew."
   },
   {
     "itemId": "kw_0059",
@@ -668,7 +726,8 @@
       "high time Rita got",
       "high time Rita had"
     ],
-    "tags": "C1, fixed phrase, unreal forms"
+    "tags": "C1, fixed phrase, unreal forms",
+    "explanation": "It's high time + past simple is used to say that something should already have happened: It's high time Rita got her glasses repaired."
   },
   {
     "itemId": "kw_0060",
@@ -676,7 +735,8 @@
     "gapFill": "No matter _____________________, the door wouldn’t open.",
     "keyWord": "hard",
     "answer": "how hard they tried",
-    "tags": "C1, linking, concession"
+    "tags": "C1, linking, concession",
+    "explanation": "No matter how + adjective/adverb expresses concession: no matter how hard they tried = despite all their efforts."
   },
   {
     "itemId": "kw_0061",
@@ -684,7 +744,8 @@
     "gapFill": "As _____________________, Daria knows everything.",
     "keyWord": "concerned",
     "answer": "far as science fiction is concerned",
-    "tags": "C1, linking, fixed phrase"
+    "tags": "C1, linking, fixed phrase",
+    "explanation": "As far as ... is concerned is a fixed expression meaning when considering or talking about a particular subject."
   },
   {
     "itemId": "kw_0062",
@@ -695,7 +756,8 @@
       "never occurred to Nina to ask",
       "had never occurred to Nina to ask"
     ],
-    "tags": "C1, gerunds and infinitives"
+    "tags": "C1, gerunds and infinitives",
+    "explanation": "The pattern it occurs to someone to + infinitive means that an idea enters their mind: it never occurred to Nina to ask."
   },
   {
     "itemId": "kw_0063",
@@ -706,7 +768,8 @@
       "in spite of never having",
       "in spite of having never"
     ],
-    "tags": "C1, concession, linking"
+    "tags": "C1, concession, linking",
+    "explanation": "In spite of is followed by a noun or gerund. To refer to an earlier action, use having + past participle: in spite of never having set foot outside Europe."
   },
   {
     "itemId": "kw_0064",
@@ -718,7 +781,8 @@
       "was only after",
       "was only once"
     ],
-    "tags": "C1, concession, linking"
+    "tags": "C1, concession, linking",
+    "explanation": "The cleft structure it was only when/after/once ... that emphasises the point at which something finally happened."
   },
   {
     "itemId": "kw_0065",
@@ -731,15 +795,17 @@
       "prevent it becoming",
       "prevent it being"
     ],
-    "tags": "C1, formal, verb patterns, gerunds and infinitives"
+    "tags": "C1, formal, verb patterns, gerunds and infinitives",
+    "explanation": "Use prevent + object + (from) + -ing: prevent it from becoming popular. From can often be omitted."
   },
   {
     "itemId": "kw_0066",
     "fullSentence": "The island is abundant in terms of biodiversity and untouched ecosystems.",
-    "gapFill": "The island has a lot _______________________ terms of biodiversity.",
+    "gapFill": "The island has a lot _______________________ terms of biodiversity and untouched ecosystems.",
     "keyWord": "offer",
     "answer": "to offer in",
-    "tags": "C1, noun phrases, prepositions"
+    "tags": "C1, noun phrases, prepositions",
+    "explanation": "Have a lot to offer means have many positive qualities or advantages. In terms of introduces the particular area being considered."
   },
   {
     "itemId": "kw_0067",
@@ -750,18 +816,20 @@
       "she would rather not",
       "she'd rather not"
     ],
-    "tags": "C1, modal verbs, formal, gerunds and infinitives"
+    "tags": "C1, modal verbs, formal, gerunds and infinitives",
+    "explanation": "Would rather is followed by the bare infinitive. To express a negative preference, use would rather not + verb: she'd rather not cook with anyone else."
   },
   {
     "itemId": "kw_0068",
     "fullSentence": "To succeed as a nurse, you need to have an enormous amount of patience.",
-    "gapFill": "Being a nurse calls _______________________ these days.",
+    "gapFill": "Being a nurse calls _______________________.",
     "keyWord": "deal",
     "answer": [
       "for a great deal of patience",
       "for a good deal of patience"
     ],
-    "tags": "C1, phrasal verbs, noun phrases, quantifiers, formal"
+    "tags": "C1, phrasal verbs, noun phrases, quantifiers, formal",
+    "explanation": "Call for means require or need. A great/good deal of is used with uncountable nouns: calls for a great deal of patience."
   },
   {
     "itemId": "kw_0069",
@@ -770,9 +838,12 @@
     "keyWord": "to",
     "answer": [
       "to have been",
-      "to have been anywhere"
+      "to have been anywhere",
+      "to have gone",
+      "to have gone anywhere"
     ],
-    "tags": "C1, verb patterns, gerunds and infinitives, perfect"
+    "tags": "C1, verb patterns, gerunds and infinitives, perfect",
+    "explanation": "After verbs such as claim, use the perfect infinitive to have + past participle to refer to an earlier action: claimed not to have gone anywhere near the building."
   },
   {
     "itemId": "kw_0070",
@@ -780,7 +851,8 @@
     "gapFill": "I need _______________________ before travelling next month.",
     "keyWord": "get",
     "answer": "to get my ID renewed",
-    "tags": "C1, causative, passive voice"
+    "tags": "C1, causative, passive voice",
+    "explanation": "Get + object + past participle is a causative structure used when someone arranges for something to be done: get my ID renewed."
   },
   {
     "itemId": "kw_0071",
@@ -793,7 +865,8 @@
       "cut down the amount",
       "cut down the quantity"
     ],
-    "tags": "C1, phrasal verbs, quantifiers"
+    "tags": "C1, phrasal verbs, quantifiers",
+    "explanation": "Cut down on + noun means reduce how much of something you use or consume: cut down on the amount of crisps."
   },
   {
     "itemId": "kw_0072",
@@ -806,15 +879,17 @@
       "lack of leadership which caused",
       "absence of leadership which caused"
     ],
-    "tags": "C1, noun phrases, relative clauses, cleft sentences"
+    "tags": "C1, noun phrases, relative clauses, cleft sentences",
+    "explanation": "The cleft structure it was ... that/which places emphasis on the cause: It was the lack of leadership that caused the problems."
   },
   {
     "itemId": "kw_0073",
-    "fullSentence": "Experts believe that many people find it hard to manage their finances.",
+    "fullSentence": "Experts believe that many people cannot keep their finances under control.",
     "gapFill": "Many people are thought _______________________ their finances under control.",
     "keyWord": "unable",
     "answer": "to be unable to keep",
-    "tags": "C1, fixed phrase, passive voice"
+    "tags": "C1, fixed phrase, passive voice",
+    "explanation": "Passive reporting structures use be + past participle + infinitive: many people are thought to be unable to keep their finances under control."
   },
   {
     "itemId": "kw_0074",
@@ -822,7 +897,8 @@
     "gapFill": "Leo _______________________ the missing notebook.",
     "keyWord": "having",
     "answer": "denied having seen",
-    "tags": "C1, verb patterns, gerunds and infinitives, reported speech, reporting verbs"
+    "tags": "C1, verb patterns, gerunds and infinitives, reported speech, reporting verbs",
+    "explanation": "Deny is followed by a gerund. Use having + past participle when the denied action happened earlier: denied having seen the notebook."
   },
   {
     "itemId": "kw_0075",
@@ -833,7 +909,8 @@
       "be grateful if you would",
       "be grateful if you could"
     ],
-    "tags": "C1, conditionals"
+    "tags": "C1, conditionals",
+    "explanation": "Be grateful if + subject + could/would is a polite way of making a request: I'd be grateful if you could help me."
   },
   {
     "itemId": "kw_0076",
@@ -848,7 +925,8 @@
       "no time starting",
       "no time in starting"
     ],
-    "tags": "C1, fixed phrase, gerunds and infinitives"
+    "tags": "C1, fixed phrase, gerunds and infinitives",
+    "explanation": "Lose no time or lose little time (in) + -ing means begin doing something immediately or almost immediately."
   },
   {
     "itemId": "kw_0077",
@@ -859,7 +937,8 @@
       "condition that it is hard to",
       "condition it is hard to"
     ],
-    "tags": "C1, fixed phrase, noun phrases, intensifiers, so/such"
+    "tags": "C1, fixed phrase, noun phrases, intensifiers, so/such",
+    "explanation": "The pattern such + adjective + noun + that introduces a result: in such good condition that it is hard to believe its age."
   },
   {
     "itemId": "kw_0078",
@@ -870,7 +949,8 @@
       "was not a single",
       "was not one single"
     ],
-    "tags": "C1, quantifiers, exceptions, intensifiers"
+    "tags": "C1, quantifiers, exceptions, intensifiers",
+    "explanation": "Not a single + singular countable noun strongly emphasises that there were none: not a single loaf was left."
   },
   {
     "itemId": "kw_0079",
@@ -878,7 +958,8 @@
     "gapFill": "If _______________________ noise, we might have stayed until the end of the performance.",
     "keyWord": "so",
     "answer": "there had not been so much",
-    "tags": "C1, conditionals, intensifiers, so/such"
+    "tags": "C1, conditionals, intensifiers, so/such",
+    "explanation": "In a third conditional, use if + past perfect and might/would have + past participle: If there hadn't been so much noise, we might have stayed."
   },
   {
     "itemId": "kw_0080",
@@ -886,7 +967,8 @@
     "gapFill": "There _______________________ number of students registering for evening classes last year.",
     "keyWord": "fall",
     "answer": "was a fall in the",
-    "tags": "C1, noun phrases, trends"
+    "tags": "C1, noun phrases, trends",
+    "explanation": "Changes in quantities can be expressed with there was + a noun of change + in: there was a fall in the number of students."
   },
   {
     "itemId": "kw_0081",
@@ -896,7 +978,8 @@
     "answer": [
       "pay on time will result in"
     ],
-    "tags": "C1, result, formal, linking"
+    "tags": "C1, result, formal, linking",
+    "explanation": "Failure to + infinitive means not doing something. Result in is followed by a noun or gerund: failure to pay will result in your reservation being cancelled."
   },
   {
     "itemId": "kw_0082",
@@ -908,7 +991,8 @@
       "made a speedy recovery",
       "made a quick recovery"
     ],
-    "tags": "C1, fixed phrase"
+    "tags": "C1, fixed phrase",
+    "explanation": "Make a recovery is a common collocation. Adjectives such as quick, fast and speedy describe how rapidly someone recovers."
   },
   {
     "itemId": "kw_0083",
@@ -919,7 +1003,8 @@
       "took any notice of",
       "took much notice of"
     ],
-    "tags": "C1, fixed phrase, exceptions, prepositions"
+    "tags": "C1, fixed phrase, exceptions, prepositions",
+    "explanation": "Take notice of means pay attention to. After a limiting subject such as few students, any or much is commonly used in the object phrase: few students took any notice."
   },
   {
     "itemId": "kw_0084",
@@ -929,7 +1014,8 @@
     "answer": [
       "seeing him live that made"
     ],
-    "tags": "C1, cleft sentences, relative clauses"
+    "tags": "C1, cleft sentences, relative clauses",
+    "explanation": "The cleft structure it was only ... that is used to emphasise the thing that caused a realisation: It was only seeing him live that made me realise."
   },
   {
     "itemId": "kw_0085",
@@ -940,17 +1026,19 @@
       "it is to come up",
       "it can be to come up"
     ],
-    "tags": "C1, phrasal verbs, emphasis"
+    "tags": "C1, phrasal verbs, emphasis",
+    "explanation": "How + adjective + subject + be can form an exclamative structure: how difficult it is. Come up with means think of or produce an idea."
   },
   {
     "itemId": "kw_0086",
     "fullSentence": "Claims for pay must be submitted before the deadline.",
-    "gapFill": "You have _______________________ your pay claims before the end of the month.",
+    "gapFill": "You have _______________________ your pay claims before the deadline.",
     "keyWord": "put",
     "answer": [
       "to put in"
     ],
-    "tags": "C1, phrasal verbs"
+    "tags": "C1, phrasal verbs",
+    "explanation": "Put in is a phrasal verb meaning formally submit something, especially a request, claim or application: put in a pay claim."
   },
   {
     "itemId": "kw_0087",
@@ -960,7 +1048,8 @@
     "answer": [
       "be prevented in"
     ],
-    "tags": "C1, passive voice, prepositions"
+    "tags": "C1, passive voice, prepositions",
+    "explanation": "The modal passive is formed with modal + be + past participle: mosquito bites can be prevented."
   },
   {
     "itemId": "kw_0088",
@@ -972,7 +1061,8 @@
       "see the point of learning",
       "see any point in learning"
     ],
-    "tags": "C1, gerunds and infinitives, fixed phrase"
+    "tags": "C1, gerunds and infinitives, fixed phrase",
+    "explanation": "See the point in/of + -ing means understand the purpose or value of doing something: I can't see the point in learning it."
   },
   {
     "itemId": "kw_0089",
@@ -984,7 +1074,8 @@
       "circumstances should you have",
       "circumstances should you leave"
     ],
-    "tags": "C1, inversion, formal, modals"
+    "tags": "C1, inversion, formal, modals",
+    "explanation": "After a negative expression such as under no circumstances at the beginning of a sentence, use inversion: Under no circumstances should you leave your phone switched on."
   },
   {
     "itemId": "kw_0090",
@@ -995,7 +1086,8 @@
       "is highly thought",
       "is highly spoken"
     ],
-    "tags": "C1, passive voice, formal"
+    "tags": "C1, passive voice, formal",
+    "explanation": "Be highly thought of and be highly spoken of are passive expressions meaning have a very good reputation."
   },
   {
     "itemId": "kw_0091",
@@ -1005,7 +1097,8 @@
     "answer": [
       "a matter of time before"
     ],
-    "tags": "C1, fixed phrase, future, noun phrases"
+    "tags": "C1, fixed phrase, future, noun phrases",
+    "explanation": "It's only a matter of time before ... means that something is considered certain to happen eventually."
   },
   {
     "itemId": "kw_0092",
@@ -1014,10 +1107,10 @@
     "keyWord": "many",
     "answer": [
       "to everyone because as many",
-      "to everyone as as many",
       "to everyone since as many"
     ],
-    "tags": "C1, quantifiers, result"
+    "tags": "C1, quantifiers, result",
+    "explanation": "As many as + number emphasises that a quantity is surprisingly or notably large: as many as twenty food trucks."
   },
   {
     "itemId": "kw_0093",
@@ -1032,7 +1125,8 @@
       "by having a discussion about",
       "by having a discussion of"
     ],
-    "tags": "C1, noun phrases, prepositions"
+    "tags": "C1, noun phrases, prepositions",
+    "explanation": "Begin with + noun describes the first part of something: begin with a discussion. Begin by + -ing describes the first action: begin by having a discussion."
   },
   {
     "itemId": "kw_0094",
@@ -1045,17 +1139,19 @@
       "in no doubt that",
       "not in any doubt that"
     ],
-    "tags": "C1, formal, fixed phrase, prepositions, noun phrases"
+    "tags": "C1, formal, fixed phrase, prepositions, noun phrases",
+    "explanation": "Be in no doubt (that) means be completely certain. The equivalent negative form is not be in any doubt."
   },
   {
     "itemId": "kw_0095",
-    "fullSentence": "My uncle had completely forgotten that he emailed me.",
+    "fullSentence": "My uncle had completely forgotten that he had emailed me.",
     "gapFill": "My uncle didn’t _______________________ emailing me.",
     "keyWord": "recollection",
     "answer": [
       "have any recollection of"
     ],
-    "tags": "C1, noun phrases, formal, prepositions"
+    "tags": "C1, noun phrases, formal, prepositions",
+    "explanation": "Have no/any recollection of + noun or -ing means not remember something: he didn't have any recollection of emailing me."
   },
   {
     "itemId": "kw_0096",
@@ -1065,7 +1161,8 @@
     "answer": [
       "made a name for"
     ],
-    "tags": "C1, fixed phrase"
+    "tags": "C1, fixed phrase",
+    "explanation": "Make a name for yourself means become well known or successful in a particular field: make a name for herself as a chef."
   },
   {
     "itemId": "kw_0097",
@@ -1075,7 +1172,8 @@
     "answer": [
       "count on being"
     ],
-    "tags": "C1, phrasal verbs, passive voice"
+    "tags": "C1, phrasal verbs, passive voice",
+    "explanation": "Count on + noun/-ing means rely on or confidently expect something: staff should not count on being allocated a locker."
   },
   {
     "itemId": "kw_0098",
@@ -1088,7 +1186,8 @@
       "to put up with rude behaviour",
       "to put up with any rude behaviour"
     ],
-    "tags": "C1, phrasal verbs"
+    "tags": "C1, phrasal verbs",
+    "explanation": "Put up with is a phrasal verb meaning tolerate something unpleasant: put up with rude behaviour."
   },
   {
     "itemId": "kw_0099",
@@ -1101,7 +1200,8 @@
       "can afford this holiday so long",
       "can afford the holiday so long"
     ],
-    "tags": "C1, conditionals, linking"
+    "tags": "C1, conditionals, linking",
+    "explanation": "As long as and so long as introduce a condition and mean provided that: we can afford the holiday as long as we avoid expensive places."
   },
   {
     "itemId": "kw_0100",
@@ -1111,7 +1211,8 @@
     "answer": [
       "no chance of winning"
     ],
-    "tags": "C1, probability, noun phrases, fixed phrase"
+    "tags": "C1, probability, noun phrases, fixed phrase",
+    "explanation": "Have no chance of + -ing means that something is extremely unlikely or impossible: he has almost no chance of winning."
   },
   {
     "itemId": "kw_0101",
@@ -1121,7 +1222,8 @@
     "answer": [
       "on the point of leaving"
     ],
-    "tags": "C1, fixed phrase, prepositions"
+    "tags": "C1, fixed phrase, prepositions",
+    "explanation": "Be on the point of + -ing means be just about to do something: Nina was on the point of leaving."
   },
   {
     "itemId": "kw_0102",
@@ -1131,7 +1233,8 @@
     "answer": [
       "made it impossible for"
     ],
-    "tags": "C1, causative, formal"
+    "tags": "C1, causative, formal",
+    "explanation": "Use make it + adjective + for someone + to-infinitive to describe the effect of a situation: the storm made it impossible for Theo to leave."
   },
   {
     "itemId": "kw_0103",
@@ -1146,7 +1249,8 @@
       "in danger of getting dismissed",
       "in danger of getting sacked"
     ],
-    "tags": "C1, probability, noun phrases, prepositions"
+    "tags": "C1, probability, noun phrases, prepositions",
+    "explanation": "Be in danger of + -ing means be at risk of something happening: he is in danger of being dismissed."
   },
   {
     "itemId": "kw_0104",
@@ -1156,10 +1260,11 @@
     "answer": [
       "paying attention to what he was",
       "paying attention to what she was",
-      "paying any attention to what she",
-      "paying any attention to what she"
+      "paying any attention to what he was",
+      "paying any attention to what she was"
     ],
-    "tags": "C1, fixed phrase, relative clauses"
+    "tags": "C1, fixed phrase, relative clauses",
+    "explanation": "The expression is pay attention to + noun or clause: pay attention to what someone is saying. Any can strengthen the negative form: not paying any attention."
   },
   {
     "itemId": "kw_0105",
@@ -1171,7 +1276,8 @@
       "inexperience affect his",
       "absence of experience affect his"
     ],
-    "tags": "C1, noun phrases, prepositions"
+    "tags": "C1, noun phrases, prepositions",
+    "explanation": "A noun phrase such as lack of experience can be used as the subject of affect: Will his lack of experience affect his ability?"
   },
   {
     "itemId": "kw_0106",
@@ -1183,7 +1289,8 @@
       "forget to stay in touch",
       "forget to get in touch"
     ],
-    "tags": "C1, fixed phrase, gerunds and infinitives"
+    "tags": "C1, fixed phrase, gerunds and infinitives",
+    "explanation": "Keep/stay in touch means continue communicating with someone. Get in touch usually means contact someone."
   },
   {
     "itemId": "kw_0107",
@@ -1193,7 +1300,8 @@
     "answer": [
       "go ahead according"
     ],
-    "tags": "C1, future, fixed phrase, phrasal verbs"
+    "tags": "C1, future, fixed phrase, phrasal verbs",
+    "explanation": "Go ahead means happen or proceed as planned. According to plan means in the way that was originally arranged."
   },
   {
     "itemId": "kw_0108",
@@ -1206,7 +1314,8 @@
       "up any hope of finding",
       "up all hope of finding"
     ],
-    "tags": "C1, noun phrases, phrasal verbs, prepositions"
+    "tags": "C1, noun phrases, phrasal verbs, prepositions",
+    "explanation": "Give up hope of + -ing means stop believing that something will happen: he has given up hope of finding a flat."
   },
   {
     "itemId": "kw_0109",
@@ -1217,18 +1326,19 @@
       "sure how I would have reacted",
       "certain how I would have reacted"
     ],
-    "tags": "C1, indirect questions, past modals, modals"
+    "tags": "C1, indirect questions, past modals, modals",
+    "explanation": "After sure/certain, use an indirect question with how + subject + verb: I'm not sure how I would have reacted."
   },
   {
     "itemId": "kw_0110",
-    "fullSentence": "I don’t think the business will break even this year, considering the economy.",
+    "fullSentence": "I don’t think the business will make a profit this year, considering the economy.",
     "gapFill": "Given the economic climate, _______________________ the business made a profit this year.",
     "keyWord": "surprised",
     "answer": [
-      "I would be surprised if",
-      "I will be surprised if"
+      "I would be surprised if"
     ],
-    "tags": "C1, conditionals, probability"
+    "tags": "C1, conditionals, probability",
+    "explanation": "Would be surprised if + past simple can express that a present or future event seems unlikely: I would be surprised if the business made a profit."
   },
   {
     "itemId": "kw_0111",
@@ -1237,11 +1347,10 @@
     "keyWord": "should",
     "answer": [
       "account should this gate be",
-      "account should this gate be kept",
-      "account must this gate be",
-      "account must this gate be kept"
+      "account should this gate be kept"
     ],
-    "tags": "C1, modal verbs, inversion, passive voice"
+    "tags": "C1, modal verbs, inversion, passive voice",
+    "explanation": "When a negative expression such as on no account comes first, use inversion: On no account should this gate be closed."
   },
   {
     "itemId": "kw_0112",
@@ -1249,7 +1358,8 @@
     "gapFill": "Anna’s suggestions met with _______________________ the rest of the team.",
     "keyWord": "support",
     "answer": "no support from",
-    "tags": "C1, formal, noun phrases, prepositions"
+    "tags": "C1, formal, noun phrases, prepositions",
+    "explanation": "Meet with + noun can describe the reaction something receives: the suggestions met with no support from the team."
   },
   {
     "itemId": "kw_0113",
@@ -1257,7 +1367,8 @@
     "gapFill": "Alba is making _______________________ herself as a filmmaker.",
     "keyWord": "name",
     "answer": "a name for",
-    "tags": "C1, fixed phrase"
+    "tags": "C1, fixed phrase",
+    "explanation": "Make a name for yourself means become well known or respected, especially in a particular field."
   },
   {
     "itemId": "kw_0114",
@@ -1265,7 +1376,8 @@
     "gapFill": "This morning’s briefing _______________________ a short feedback session.",
     "keyWord": "by",
     "answer": "will be followed by",
-    "tags": "C1, passive voice, future"
+    "tags": "C1, passive voice, future",
+    "explanation": "Use be followed by to show that one event comes after another: the briefing will be followed by a feedback session."
   },
   {
     "itemId": "kw_0115",
@@ -1277,15 +1389,17 @@
       "pleasure to take you for a",
       "pleasure to take you on"
     ],
-    "tags": "C1, fixed phrase, prepositions"
+    "tags": "C1, fixed phrase, prepositions",
+    "explanation": "The fixed structure it is/will be a pleasure to + infinitive is a polite way of saying that you are happy to do something."
   },
   {
     "itemId": "kw_0116",
     "fullSentence": "Omar volunteered with a local youth charity last summer.",
-    "gapFill": "Omar used _______________________ with a local youth charity.",
+    "gapFill": "Omar _______________________ with a local youth charity last summer.",
     "keyWord": "as",
-    "answer": "to work as a volunteer",
-    "tags": "C1, modal verbs, noun phrases"
+    "answer": "worked as a volunteer",
+    "tags": "C1, modal verbs, noun phrases",
+    "explanation": "Work as + job/role describes the function someone performs: Omar worked as a volunteer."
   },
   {
     "itemId": "kw_0117",
@@ -1293,7 +1407,8 @@
     "gapFill": "Isla was _______________________ out when she got the call.",
     "keyWord": "point",
     "answer": "on the point of stepping",
-    "tags": "C1, fixed phrase, prepositions"
+    "tags": "C1, fixed phrase, prepositions",
+    "explanation": "Be on the point of + -ing means be just about to do something: Isla was on the point of stepping out."
   },
   {
     "itemId": "kw_0118",
@@ -1301,7 +1416,8 @@
     "gapFill": "I was unaware _______________________ attend the workshop.",
     "keyWord": "decision",
     "answer": "of Nina's decision to",
-    "tags": "C1, prepositions, noun phrases"
+    "tags": "C1, prepositions, noun phrases",
+    "explanation": "Unaware is followed by of + noun phrase. Decision is followed by the to-infinitive: unaware of Nina's decision to attend."
   },
   {
     "itemId": "kw_0119",
@@ -1309,7 +1425,8 @@
     "gapFill": "As _______________________, Luca is just like his father.",
     "keyWord": "concerned",
     "answer": "far as reliability is concerned",
-    "tags": "C1, linking, passive voice"
+    "tags": "C1, linking, passive voice",
+    "explanation": "As far as ... is concerned means when considering a particular subject: as far as reliability is concerned."
   },
   {
     "itemId": "kw_0120",
@@ -1320,15 +1437,17 @@
       "spent ten minutes looking",
       "spent ten minutes searching"
     ],
-    "tags": "C1, verb patterns, gerunds and infinitives"
+    "tags": "C1, verb patterns, gerunds and infinitives",
+    "explanation": "Use spend + period of time + -ing to say how long an activity takes: she spent ten minutes looking for her sunglasses."
   },
   {
     "itemId": "kw_0121",
-    "fullSentence": "'Sorry sir, is this your wallet?' the attendant asked.",
-    "gapFill": "''Excuse me sir, but _______________________?' the attendant asked.",
+    "fullSentence": "‘Sorry, sir, is this your wallet?’ the attendant asked.",
+    "gapFill": "‘Excuse me, sir, but _______________________?’ the attendant asked.",
     "keyWord": "belong",
     "answer": "does this wallet belong to you",
-    "tags": "C1, questions, prepositions"
+    "tags": "C1, questions, prepositions",
+    "explanation": "Belong is followed by to: belong to someone. It is not used with a direct object."
   },
   {
     "itemId": "kw_0122",
@@ -1336,7 +1455,8 @@
     "gapFill": "Please ensure that _______________________ change in your booking.",
     "keyWord": "notify",
     "answer": "you notify us of any",
-    "tags": "C1, formal, prepositions, verb patterns"
+    "tags": "C1, formal, prepositions, verb patterns",
+    "explanation": "The formal pattern is notify someone of something: notify us of any change."
   },
   {
     "itemId": "kw_0123",
@@ -1347,7 +1467,8 @@
       "are scheduled to take",
       "have been scheduled to take"
     ],
-    "tags": "C1, fixed phrase, passive voice, prepositions"
+    "tags": "C1, fixed phrase, passive voice, prepositions",
+    "explanation": "Be scheduled to + infinitive means be officially planned to happen: the repairs are scheduled to take place."
   },
   {
     "itemId": "kw_0124",
@@ -1360,7 +1481,8 @@
       "great difficulty in persuading",
       "great difficulty persuading"
     ],
-    "tags": "C1, gerunds and infinitives, noun phrases"
+    "tags": "C1, gerunds and infinitives, noun phrases",
+    "explanation": "Use have difficulty (in) + -ing to describe something that is hard to do: she had great difficulty convincing her manager."
   },
   {
     "itemId": "kw_0125",
@@ -1371,17 +1493,19 @@
       "the fact it is",
       "the fact that it is"
     ],
-    "tags": "B2, linking, contrast, concession"
+    "tags": "B2, linking, contrast, concession",
+    "explanation": "Despite can be followed by the fact (that) + clause: despite the fact that it is unhealthy."
   },
   {
     "itemId": "kw_0126",
     "fullSentence": "The tomatoes would have ripened earlier if the weather had been sunnier.",
-    "gapFill": "The tomatoes would have ripened earlier last year _______________________ more sunshine.",
+    "gapFill": "The tomatoes would have ripened earlier _______________________ more sunshine.",
     "keyWord": "there",
     "answer": [
       "if there had been"
     ],
-    "tags": "B2, conditionals, past perfect"
+    "tags": "B2, conditionals, past perfect",
+    "explanation": "In a third conditional, use if + past perfect for the unreal past condition: if there had been more sunshine."
   },
   {
     "itemId": "kw_0127",
@@ -1391,7 +1515,8 @@
     "answer": [
       "is said to be"
     ],
-    "tags": "B2, passive voice, reported speech"
+    "tags": "B2, passive voice, reported speech",
+    "explanation": "Passive reporting structures use be + past participle + to-infinitive: the restaurant is said to be excellent."
   },
   {
     "itemId": "kw_0128",
@@ -1402,7 +1527,8 @@
       "to get used to working",
       "to get used to being"
     ],
-    "tags": "B2, verb patterns, used to"
+    "tags": "B2, verb patterns, used to",
+    "explanation": "Get used to means gradually become accustomed to something. Here to is a preposition, so it is followed by a noun or -ing form: get used to working."
   },
   {
     "itemId": "kw_0129",
@@ -1412,7 +1538,8 @@
     "answer": [
       "refused to say"
     ],
-    "tags": "B2, reporting verbs, gerunds and infinitives"
+    "tags": "B2, reporting verbs, gerunds and infinitives",
+    "explanation": "Refuse is followed by the to-infinitive: refuse to do something. It means say firmly that you will not do it."
   },
   {
     "itemId": "kw_0130",
@@ -1422,7 +1549,8 @@
     "answer": [
       "you ought not to go"
     ],
-    "tags": "B2, modal verbs, advice"
+    "tags": "B2, modal verbs, advice",
+    "explanation": "Ought to is a modal-like expression used for advice or judgement. The negative form is ought not to + infinitive."
   },
   {
     "itemId": "kw_0131",
@@ -1435,7 +1563,8 @@
       "idea whose bracelet it might",
       "idea whose bracelet it could"
     ],
-    "tags": "B2, relative clauses, indirect questions, questions"
+    "tags": "B2, relative clauses, indirect questions, questions",
+    "explanation": "In an indirect question, use statement word order: whose it might be, not whose might it be. Whose can stand alone when the noun is understood."
   },
   {
     "itemId": "kw_0132",
@@ -1448,7 +1577,8 @@
       "only one not to get",
       "only one to not get"
     ],
-    "tags": "B2, emphasis, passive voice"
+    "tags": "B2, emphasis, passive voice",
+    "explanation": "The structure the only one + to-infinitive identifies the single exception: the only one not to be broken."
   },
   {
     "itemId": "kw_0133",
@@ -1458,7 +1588,8 @@
     "answer": [
       "had not been invited"
     ],
-    "tags": "B2, passive voice, past perfect"
+    "tags": "B2, passive voice, past perfect",
+    "explanation": "Use the past perfect passive had been + past participle for a passive action that happened before another past event: she had not been invited."
   },
   {
     "itemId": "kw_0134",
@@ -1471,7 +1602,8 @@
       "get far more than",
       "get far more money than"
     ],
-    "tags": "B2, comparatives and superlatives, quantifiers"
+    "tags": "B2, comparatives and superlatives, quantifiers",
+    "explanation": "Far can intensify a comparative: far more than means much more than."
   },
   {
     "itemId": "kw_0135",
@@ -1481,7 +1613,8 @@
     "answer": [
       "does not feel like"
     ],
-    "tags": "B2, phrasal verbs, verb patterns, gerunds and infinitives"
+    "tags": "B2, phrasal verbs, verb patterns, gerunds and infinitives",
+    "explanation": "Feel like + -ing means want to do something: she doesn't feel like going to the cinema."
   },
   {
     "itemId": "kw_0136",
@@ -1491,7 +1624,8 @@
     "answer": [
       "turned out to be"
     ],
-    "tags": "B2, phrasal verbs, gerunds and infinitives"
+    "tags": "B2, phrasal verbs, gerunds and infinitives",
+    "explanation": "Turn out to be means eventually prove to be or be discovered to be something: the book turned out to be very moving."
   },
   {
     "itemId": "kw_0137",
@@ -1501,7 +1635,8 @@
     "answer": [
       "rain they succeeded in"
     ],
-    "tags": "B2, linking, contrast, concession, ability"
+    "tags": "B2, linking, contrast, concession, ability",
+    "explanation": "Succeed is followed by in + -ing: succeed in completing something. Despite is followed by a noun or -ing form."
   },
   {
     "itemId": "kw_0138",
@@ -1511,7 +1646,8 @@
     "answer": [
       "is a choice of"
     ],
-    "tags": "B2, noun phrases, prepositions"
+    "tags": "B2, noun phrases, prepositions",
+    "explanation": "A choice of + plural noun means a range of different options: a choice of over forty dishes."
   },
   {
     "itemId": "kw_0139",
@@ -1526,7 +1662,8 @@
       "doubted whether more roads would",
       "doubted whether more roads will"
     ],
-    "tags": "B2, reporting verbs, future"
+    "tags": "B2, reporting verbs, future",
+    "explanation": "Doubt can be followed by that, whether or if + clause. In reported speech after a past reporting verb, will commonly backshifts to would."
   },
   {
     "itemId": "kw_0140",
@@ -1536,7 +1673,8 @@
     "answer": [
       "no intention of leaving"
     ],
-    "tags": "B2, fixed phrase, noun phrases, formal"
+    "tags": "B2, fixed phrase, noun phrases, formal",
+    "explanation": "Use have no intention of + -ing to express a firm decision not to do something: no intention of leaving."
   },
   {
     "itemId": "kw_0141",
@@ -1546,7 +1684,8 @@
     "answer": [
       "have made a mistake"
     ],
-    "tags": "B2, modal verbs, deduction, past modals"
+    "tags": "B2, modal verbs, deduction, past modals",
+    "explanation": "Use may have + past participle for a possible past action: I may have made a mistake."
   },
   {
     "itemId": "kw_0142",
@@ -1555,12 +1694,10 @@
     "keyWord": "point",
     "answer": [
       "little point in going",
-      "no point in going",
-      "Little point going",
-      "No point going",
-      "Is not any point going"
+      "no point in going"
     ],
-    "tags": "B2, fixed phrase, noun phrases, prepositions"
+    "tags": "B2, fixed phrase, noun phrases, prepositions",
+    "explanation": "There is no/little point in + -ing means that doing something is useless or not worthwhile."
   },
   {
     "itemId": "kw_0143",
@@ -1570,10 +1707,11 @@
     "answer": [
       "as long as I agreed",
       "so long as I agreed",
-      "as long I promised",
+      "as long as I promised",
       "so long as I promised"
     ],
-    "tags": "B2, conditionals, reported speech"
+    "tags": "B2, conditionals, reported speech",
+    "explanation": "As long as and so long as introduce a condition and mean provided that: as long as I agreed to look after it."
   },
   {
     "itemId": "kw_0144",
@@ -1583,7 +1721,8 @@
     "answer": [
       "is much more popular"
     ],
-    "tags": "B2, comparatives and superlatives"
+    "tags": "B2, comparatives and superlatives",
+    "explanation": "Much can intensify a comparative adjective: much more popular means considerably more popular."
   },
   {
     "itemId": "kw_0145",
@@ -1593,17 +1732,19 @@
     "answer": [
       "to give up smoking"
     ],
-    "tags": "B2, verb patterns, gerunds and infinitives, phrasal verbs"
+    "tags": "B2, verb patterns, gerunds and infinitives, phrasal verbs",
+    "explanation": "Give up + -ing means stop doing an activity or habit: give up smoking. Decision is followed by the to-infinitive: the decision to give up."
   },
   {
     "itemId": "kw_0146",
-    "fullSentence": "My students did very few writings this term",
+    "fullSentence": "My students completed very few writing assignments this term.",
     "gapFill": "Hardly _______________________ by my students this term.",
     "keyWord": "were",
     "answer": [
-      "any writings were done"
+      "any writing assignments were completed"
     ],
-    "tags": "B2, passive voice, quantifiers"
+    "tags": "B2, passive voice, quantifiers",
+    "explanation": "Hardly any + plural countable noun means very few: hardly any writing assignments were completed."
   },
   {
     "itemId": "kw_0147",
@@ -1613,10 +1754,11 @@
     "answer": [
       "any attention to how",
       "any attention to the way",
-      "Attention to how",
-      "Attention to the way"
+      "attention to how",
+      "attention to the way"
     ],
-    "tags": "B2, fixed phrase, prepositions"
+    "tags": "B2, fixed phrase, prepositions",
+    "explanation": "The expression is pay attention to + noun or clause: pay attention to how someone is acting. In a negative sentence, any is common: didn't pay any attention."
   },
   {
     "itemId": "kw_0148",
@@ -1624,10 +1766,10 @@
     "gapFill": "Sophie still has not _______________________ emails in English at work.",
     "keyWord": "used",
     "answer": [
-      "got used to writing",
-      "got used to sending"
+      "got used to writing"
     ],
-    "tags": "B2, verb patterns, used to, prepositions"
+    "tags": "B2, verb patterns, used to, prepositions",
+    "explanation": "Get used to + noun/-ing means become accustomed to something. Here to is a preposition, so use writing rather than write."
   },
   {
     "itemId": "kw_0149",
@@ -1638,7 +1780,8 @@
       "if her son could try",
       "whether her son could try"
     ],
-    "tags": "B2, indirect questions, reported speech, questions"
+    "tags": "B2, indirect questions, reported speech, questions",
+    "explanation": "Reported yes/no questions use if or whether + subject + verb, with statement word order: she asked if her son could try it on."
   },
   {
     "itemId": "kw_0150",
@@ -1648,7 +1791,8 @@
     "answer": [
       "warned us not to sit"
     ],
-    "tags": "B2, reported speech, reporting verbs, gerunds and infinitives"
+    "tags": "B2, reported speech, reporting verbs, gerunds and infinitives",
+    "explanation": "Warn someone not to + infinitive is used to advise someone against doing something because it may be dangerous or harmful."
   },
   {
     "itemId": "kw_0151",
@@ -1656,10 +1800,11 @@
     "gapFill": "We couldn't _______________________________________ from the museum.",
     "keyWord": "way",
     "answer": [
-      "find the way home",
-      "find our way home"
+      "find our way back",
+      "find the way back"
     ],
-    "tags": "B2, fixed phrase"
+    "tags": "B2, fixed phrase",
+    "explanation": "Find your way back means manage to return to a place, especially when navigation is involved: we couldn't find our way back."
   },
   {
     "itemId": "kw_0152",
@@ -1672,7 +1817,8 @@
       "no difficulty in passing",
       "little difficulty passing"
     ],
-    "tags": "B2, fixed phrase, noun phrases, gerunds and infinitives"
+    "tags": "B2, fixed phrase, noun phrases, gerunds and infinitives",
+    "explanation": "Use have no/little difficulty (in) + -ing to say that something is easy or causes few problems: he had no difficulty passing the exam."
   },
   {
     "itemId": "kw_0153",
@@ -1680,10 +1826,10 @@
     "gapFill": "David _______________________________________ advice I always rely on.",
     "keyWord": "somebody",
     "answer": [
-      "is somebody whose",
-      "is someone whose"
+      "is somebody whose"
     ],
-    "tags": "B2, relative clauses"
+    "tags": "B2, relative clauses",
+    "explanation": "Whose is a possessive relative pronoun and is followed by a noun: David is somebody whose advice I rely on."
   },
   {
     "itemId": "kw_0154",
@@ -1698,7 +1844,8 @@
       "seems as though",
       "appears as though"
     ],
-    "tags": "B2, linking, speculation"
+    "tags": "B2, linking, speculation",
+    "explanation": "Seem, appear and look can be followed by as if/as though + clause to describe how a situation appears: it seems as if we've gone to the wrong platform."
   },
   {
     "itemId": "kw_0155",
@@ -1710,7 +1857,8 @@
       "make much sense to",
       "make sense to"
     ],
-    "tags": "B2, fixed phrase, quantifiers"
+    "tags": "B2, fixed phrase, quantifiers",
+    "explanation": "Make sense to someone means be understandable or logical to them: the explanation didn't make any sense to me."
   },
   {
     "itemId": "kw_0156",
@@ -1718,10 +1866,10 @@
     "gapFill": "I wish that we _______________________________________ more when we lived abroad.",
     "keyWord": "could",
     "answer": [
-      "could have travelled",
-      "could have done"
+      "could have travelled"
     ],
-    "tags": "B2, unreal forms, modal verbs, past modals"
+    "tags": "B2, unreal forms, modal verbs, past modals",
+    "explanation": "Use wish + could have + past participle to express regret about a missed possibility or opportunity in the past: I wish we could have travelled more."
   },
   {
     "itemId": "kw_0157",
@@ -1731,7 +1879,8 @@
     "answer": [
       "gave us a detailed description"
     ],
-    "tags": "B2, noun phrases, formal"
+    "tags": "B2, noun phrases, formal",
+    "explanation": "The noun form of describe is description. Use give someone a description of something: she gave us a detailed description of the apartment."
   },
   {
     "itemId": "kw_0158",
@@ -1742,7 +1891,8 @@
       "too complicated for",
       "too tricky for"
     ],
-    "tags": "B2, quantifiers, prepositions, intensifiers, so/such"
+    "tags": "B2, quantifiers, prepositions, intensifiers, so/such",
+    "explanation": "Use too + adjective + for someone + to-infinitive when something is excessively difficult, large, etc. for a person to do: too complicated for the students to follow."
   },
   {
     "itemId": "kw_0159",
@@ -1752,7 +1902,8 @@
     "answer": [
       "did not mean to"
     ],
-    "tags": "B2, verb patterns, past simple, gerunds and infinitives"
+    "tags": "B2, verb patterns, past simple, gerunds and infinitives",
+    "explanation": "Mean to + infinitive means intend to do something. In the negative, didn't mean to shows that an action was accidental."
   },
   {
     "itemId": "kw_0160",
@@ -1763,7 +1914,8 @@
       "made arrangements for",
       "made the arrangements for"
     ],
-    "tags": "B2, fixed phrase, noun phrases, prepositions"
+    "tags": "B2, fixed phrase, noun phrases, prepositions",
+    "explanation": "Make arrangements for + noun means organise or plan something in advance: make arrangements for a trip."
   },
   {
     "itemId": "kw_0161",
@@ -1773,7 +1925,8 @@
     "answer": [
       "are said to be"
     ],
-    "tags": "B2, passive voice, reported speech"
+    "tags": "B2, passive voice, reported speech",
+    "explanation": "Passive reporting structures use be + past participle + to-infinitive: the forests are said to be disappearing."
   },
   {
     "itemId": "kw_0162",
@@ -1783,7 +1936,8 @@
     "answer": [
       "prevented us from enjoying"
     ],
-    "tags": "B2, gerunds and infinitives, verb patterns, prepositions"
+    "tags": "B2, gerunds and infinitives, verb patterns, prepositions",
+    "explanation": "Use prevent + person + from + -ing: the rain prevented us from enjoying our meal."
   },
   {
     "itemId": "kw_0163",
@@ -1793,7 +1947,8 @@
     "answer": [
       "seems to have left"
     ],
-    "tags": "B2, perfect, speculation"
+    "tags": "B2, perfect, speculation",
+    "explanation": "After seem, use the perfect infinitive to have + past participle to refer to an earlier action: Luca seems to have left his wallet at home."
   },
   {
     "itemId": "kw_0164",
@@ -1806,7 +1961,8 @@
       "had a tooth taken out",
       "had a tooth extracted"
     ],
-    "tags": "B2, causative, passive voice"
+    "tags": "B2, causative, passive voice",
+    "explanation": "Use have + object + past participle when someone else performs a service or action for you: Mr Silva had his tooth taken out."
   },
   {
     "itemId": "kw_0165",
@@ -1816,17 +1972,19 @@
     "answer": [
       "not overslept he would have"
     ],
-    "tags": "B2, conditionals, past perfect"
+    "tags": "B2, conditionals, past perfect",
+    "explanation": "A third conditional uses if + past perfect and would have + past participle for an unreal past result: if he had not overslept, he would have passed."
   },
   {
     "itemId": "kw_0166",
     "fullSentence": "The manager postponed the excursion until after the inspection.",
-    "gapFill": "The trip to the castle _______________________________________ manager until after the inspection.",
+    "gapFill": "The excursion _______________________________________ until after the inspection.",
     "keyWord": "off",
     "answer": [
-      "was put off by the"
+      "was put off by the manager"
     ],
-    "tags": "B2, phrasal verbs, passive voice"
+    "tags": "B2, phrasal verbs, passive voice",
+    "explanation": "Put off means postpone. In the passive, use be + put off: the excursion was put off."
   },
   {
     "itemId": "kw_0167",
@@ -1836,7 +1994,8 @@
     "answer": [
       "how wide the sofa"
     ],
-    "tags": "B2, indirect questions, questions"
+    "tags": "B2, indirect questions, questions",
+    "explanation": "Indirect questions use statement word order: how wide the sofa was, not how wide was the sofa."
   },
   {
     "itemId": "kw_0168",
@@ -1846,7 +2005,8 @@
     "answer": [
       "took Ella ages to sort"
     ],
-    "tags": "B2, causality, emphasis"
+    "tags": "B2, causality, emphasis",
+    "explanation": "Use it takes + person + period of time + to-infinitive to say how long an activity requires: it took Ella ages to sort out her files."
   },
   {
     "itemId": "kw_0169",
@@ -1856,7 +2016,8 @@
     "answer": [
       "had the building designed"
     ],
-    "tags": "B2, causative have, passive voice, causative"
+    "tags": "B2, causative have, passive voice, causative",
+    "explanation": "The causative structure have + object + past participle shows that someone arranges for another person to do something: she had the building designed."
   },
   {
     "itemId": "kw_0170",
@@ -1867,7 +2028,8 @@
       "accused him of breaking",
       "accused him of having broken"
     ],
-    "tags": "B2, reporting verbs, gerunds and infinitives, reported speech"
+    "tags": "B2, reporting verbs, gerunds and infinitives, reported speech",
+    "explanation": "Accuse is followed by person + of + -ing: accuse someone of breaking something. Having + past participle can emphasise that the action happened earlier."
   },
   {
     "itemId": "kw_0171",
@@ -1878,7 +2040,8 @@
       "had been paying attention",
       "had been paying any attention"
     ],
-    "tags": "B2, conditionals, fixed phrase"
+    "tags": "B2, conditionals, fixed phrase",
+    "explanation": "For an unreal past condition, use if + past perfect. The continuous form can describe an ongoing activity: if she had been paying attention."
   },
   {
     "itemId": "kw_0172",
@@ -1891,7 +2054,8 @@
       " could be tricky for",
       "could be tough for"
     ],
-    "tags": "B2, speculation, modal verbs, prepositions"
+    "tags": "B2, speculation, modal verbs, prepositions",
+    "explanation": "Could can express possibility. The pattern could be + adjective + for someone + to-infinitive describes something that may be difficult: it could be hard for us to find accommodation."
   },
   {
     "itemId": "kw_0173",
@@ -1901,7 +2065,8 @@
     "answer": [
       "ought to have asked"
     ],
-    "tags": "B2, modal verbs, past modals"
+    "tags": "B2, modal verbs, past modals",
+    "explanation": "Ought to have + past participle, like should have, is used to criticise or regret a past action: you ought to have asked."
   },
   {
     "itemId": "kw_0174",
@@ -1911,7 +2076,8 @@
     "answer": [
       "because the fog was"
     ],
-    "tags": "B2, linking, causality"
+    "tags": "B2, linking, causality",
+    "explanation": "Because is followed by a clause with a subject and verb, while because of is followed by a noun phrase: because the fog was heavy / because of the heavy fog."
   },
   {
     "itemId": "kw_0175",
@@ -1921,7 +2087,8 @@
     "answer": [
       "have not heard from"
     ],
-    "tags": "B2, present perfect, verb forms"
+    "tags": "B2, present perfect, verb forms",
+    "explanation": "Use the present perfect negative with for + period to describe how long something has not happened: I haven't heard from Clara for six months."
   },
   {
     "itemId": "kw_0176",
@@ -1931,7 +2098,8 @@
     "answer": [
       "not advisable to book"
     ],
-    "tags": "B2, formal, gerunds and infinitives"
+    "tags": "B2, formal, gerunds and infinitives",
+    "explanation": "Advisable is followed by the to-infinitive: it is advisable to book. Not advisable means something is not recommended."
   },
   {
     "itemId": "kw_0177",
@@ -1941,7 +2109,8 @@
     "answer": [
       "was set up by"
     ],
-    "tags": "B2, phrasal verbs, passive voice"
+    "tags": "B2, phrasal verbs, passive voice",
+    "explanation": "Set up is a phrasal verb meaning establish or start an organisation or business. In the passive: the agency was set up by her aunt."
   },
   {
     "itemId": "kw_0178",
@@ -1951,17 +2120,19 @@
     "answer": [
       "has been a rise"
     ],
-    "tags": "B2, noun phrases, trends"
+    "tags": "B2, noun phrases, trends",
+    "explanation": "A trend can be expressed with there has been + noun of change + in: there has been a rise in the number of people."
   },
   {
     "itemId": "kw_0179",
     "fullSentence": "Jacob said he would never mention the incident again.",
-    "gapFill": "Jacob promised never _______________________________________ again.",
+    "gapFill": "Jacob said he would never _______________________________________ again.",
     "keyWord": "discuss",
     "answer": [
-      "to discuss the incident"
+      "discuss the incident"
     ],
-    "tags": "B2, reported speech, gerunds and infinitives, verb patterns"
+    "tags": "B2, reported speech, gerunds and infinitives, verb patterns",
+    "explanation": "Discuss is a transitive verb, so it takes a direct object without about: discuss the incident, not discuss about the incident."
   },
   {
     "itemId": "kw_0180",
@@ -1972,7 +2143,8 @@
       "never stayed in a nicer",
       "never stayed in a better"
     ],
-    "tags": "B2, comparatives and superlatives, present perfect"
+    "tags": "B2, comparatives and superlatives, present perfect",
+    "explanation": "A superlative idea can be expressed with never + present perfect + comparative: I've never stayed in a nicer Airbnb."
   },
   {
     "itemId": "kw_0181",
@@ -1983,7 +2155,8 @@
       "anyone came to",
       "anybody came to"
     ],
-    "tags": "B2, quantifiers, past simple"
+    "tags": "B2, quantifiers, past simple",
+    "explanation": "Hardly anyone/anybody means almost nobody. Although the meaning is negative, the verb itself is affirmative: hardly anyone came."
   },
   {
     "itemId": "kw_0182",
@@ -1994,17 +2167,19 @@
       "until we had completed",
       "until we completed"
     ],
-    "tags": "B2, linking, past perfect"
+    "tags": "B2, linking, past perfect",
+    "explanation": "Until introduces the point when a situation ends. For two past events, either the past simple or past perfect may be possible depending on the emphasis."
   },
   {
     "itemId": "kw_0183",
-    "fullSentence": "Ella hadn’t expected the exhibition to be so interesting.",
+    "fullSentence": "Ella hadn’t expected the exhibition to be so good.",
     "gapFill": "The exhibition ____________________________ Ella had expected.",
     "keyWord": "better",
     "answer": [
       "was better than"
     ],
-    "tags": "B2, comparatives and superlatives"
+    "tags": "B2, comparatives and superlatives",
+    "explanation": "Use a comparative + than to compare reality with an expectation: the exhibition was better than Ella had expected."
   },
   {
     "itemId": "kw_0184",
@@ -2014,7 +2189,8 @@
     "answer": [
       "unless he does more"
     ],
-    "tags": "B2, conditionals, verb forms"
+    "tags": "B2, conditionals, verb forms",
+    "explanation": "Unless means if ... not: he won't pass unless he studies more. Do more studying is another way of saying study more."
   },
   {
     "itemId": "kw_0185",
@@ -2024,7 +2200,8 @@
     "answer": [
       "what the problem was"
     ],
-    "tags": "B2, indirect questions, reported speech, questions"
+    "tags": "B2, indirect questions, reported speech, questions",
+    "explanation": "Reported wh-questions use question word + subject + verb, without inversion: what the problem was."
   },
   {
     "itemId": "kw_0186",
@@ -2036,7 +2213,8 @@
       "put an ad for",
       "put an advert for"
     ],
-    "tags": "B2, fixed phrase"
+    "tags": "B2, fixed phrase",
+    "explanation": "Put an advertisement/ad/advert for something means publish an advertisement for it: put an advert for the vacancy online."
   },
   {
     "itemId": "kw_0187",
@@ -2046,7 +2224,8 @@
     "answer": [
       "finished her presentation by congratulating"
     ],
-    "tags": "B2, gerunds and infinitives, verb patterns"
+    "tags": "B2, gerunds and infinitives, verb patterns",
+    "explanation": "Use finish + noun + by + -ing to describe the action used to end something: she finished her presentation by congratulating her teacher."
   },
   {
     "itemId": "kw_0188",
@@ -2059,7 +2238,8 @@
       "'s a month since",
       "'s been a month since"
     ],
-    "tags": "B2, present perfect, time expressions"
+    "tags": "B2, present perfect, time expressions",
+    "explanation": "Use it is/has been + period of time + since + past simple to say how much time has passed since an event."
   },
   {
     "itemId": "kw_0189",
@@ -2069,7 +2249,8 @@
     "answer": [
       "following their appearance"
     ],
-    "tags": "B2, noun phrases, prepositions"
+    "tags": "B2, noun phrases, prepositions",
+    "explanation": "Following + noun is a more formal way of saying after: following their appearance on TV."
   },
   {
     "itemId": "kw_0190",
@@ -2080,7 +2261,8 @@
       "like to learn",
       "like to know"
     ],
-    "tags": "B2, verb patterns, gerunds and infinitives"
+    "tags": "B2, verb patterns, gerunds and infinitives",
+    "explanation": "Would like is followed by the to-infinitive: she would like to learn more."
   },
   {
     "itemId": "kw_0191",
@@ -2090,7 +2272,8 @@
     "answer": [
       "let us drive"
     ],
-    "tags": "B2, causative, modal verbs, gerunds and infinitives"
+    "tags": "B2, causative, modal verbs, gerunds and infinitives",
+    "explanation": "Let is followed by object + bare infinitive, without to: let us drive, not let us to drive."
   },
   {
     "itemId": "kw_0192",
@@ -2100,7 +2283,8 @@
     "answer": [
       "seen the football match"
     ],
-    "tags": "B2, reported speech, past perfect"
+    "tags": "B2, reported speech, past perfect",
+    "explanation": "Reported yes/no questions use if or whether + statement word order. The past perfect can show that the action happened before the reporting verb: if I had seen the match."
   },
   {
     "itemId": "kw_0193",
@@ -2110,7 +2294,8 @@
     "answer": [
       "there is a tear in"
     ],
-    "tags": "B2, noun phrases"
+    "tags": "B2, noun phrases",
+    "explanation": "Torn is an adjective/past participle; the corresponding countable noun is tear: there is a tear in the shirt."
   },
   {
     "itemId": "kw_0194",
@@ -2120,7 +2305,8 @@
     "answer": [
       "attention to what"
     ],
-    "tags": "B2, fixed phrase, prepositions"
+    "tags": "B2, fixed phrase, prepositions",
+    "explanation": "The expression is pay attention to + noun or clause: pay attention to what someone says or suggests."
   },
   {
     "itemId": "kw_0195",
@@ -2132,7 +2318,8 @@
       "If he could lend her",
       "if he would lend her"
     ],
-    "tags": "B2, reporting verbs, gerunds and infinitives"
+    "tags": "B2, reporting verbs, gerunds and infinitives",
+    "explanation": "Lend means give something temporarily to another person, while borrow means receive it temporarily. Use lend + person + object: lend her his tablet."
   },
   {
     "itemId": "kw_0196",
@@ -2142,7 +2329,8 @@
     "answer": [
       "might have forgotten"
     ],
-    "tags": "B2, past modals, speculation"
+    "tags": "B2, past modals, speculation",
+    "explanation": "Use might have + past participle to express an uncertain possibility about the past: Tom might have forgotten."
   },
   {
     "itemId": "kw_0197",
@@ -2153,7 +2341,8 @@
       "student has fun",
       "student has a lot of fun"
     ],
-    "tags": "B2, noun phrases, quantifiers"
+    "tags": "B2, noun phrases, quantifiers",
+    "explanation": "Every is followed by a singular countable noun and a singular verb: every student has fun."
   },
   {
     "itemId": "kw_0198",
@@ -2162,10 +2351,10 @@
     "keyWord": "my",
     "answer": [
       "my trip to Berlin I",
-      "my time in Berlin I",
-      "my holiday in Berlin I"
+      "my time in Berlin I"
     ],
-    "tags": "B2, noun phrases, past simple"
+    "tags": "B2, noun phrases, past simple",
+    "explanation": "During is followed by a noun phrase, while while is normally followed by a clause: during my time in Berlin / while I was in Berlin."
   },
   {
     "itemId": "kw_0199",
@@ -2176,7 +2365,8 @@
       "ought to have switched",
       "ought to have turned"
     ],
-    "tags": "B2, past modals, advice"
+    "tags": "B2, past modals, advice",
+    "explanation": "Ought to have + past participle is used to say that a different action would have been better in the past: you ought to have switched the oven off."
   },
   {
     "itemId": "kw_0200",
@@ -2187,7 +2377,8 @@
       "chance of James",
       "chance of James’s"
     ],
-    "tags": "B2, noun phrases, speculation"
+    "tags": "B2, noun phrases, speculation",
+    "explanation": "Chance of is followed by a noun or -ing form: a chance of James leaving. A possessive form before the gerund is also possible: a chance of James's leaving."
   },
   {
     "itemId": "kw_0201",
@@ -2197,7 +2388,8 @@
     "answer": [
       "from Sophie nobody"
     ],
-    "tags": "B2, prepositions, quantifiers"
+    "tags": "B2, prepositions, quantifiers",
+    "explanation": "Apart from + noun means except for. It can be followed by a negative expression such as nobody: apart from Sophie, nobody responded."
   },
   {
     "itemId": "kw_0202",
@@ -2208,7 +2400,8 @@
       "got used to",
       "gotten used to"
     ],
-    "tags": "B2, used to, verb patterns, perfect"
+    "tags": "B2, used to, verb patterns, perfect",
+    "explanation": "Get used to + noun means become accustomed to something: have you got used to the new software yet?"
   },
   {
     "itemId": "kw_0203",
@@ -2218,7 +2411,8 @@
     "answer": [
       "felt like going"
     ],
-    "tags": "B2, Gerunds and infinitives, phrasal verbs"
+    "tags": "B2, Gerunds and infinitives, phrasal verbs",
+    "explanation": "Feel like + -ing means want to do something: nobody felt like going outside."
   },
   {
     "itemId": "kw_0204",
@@ -2228,7 +2422,8 @@
     "answer": [
       "being unable to speak"
     ],
-    "tags": "B2, gerunds and infinitives, ability"
+    "tags": "B2, gerunds and infinitives, ability",
+    "explanation": "Besides is followed by a noun or -ing form. Unable is followed by the to-infinitive: besides being unable to speak French."
   },
   {
     "itemId": "kw_0205",
@@ -2238,7 +2433,8 @@
     "answer": [
       "as soon as"
     ],
-    "tags": "B2, linking, time expressions"
+    "tags": "B2, linking, time expressions",
+    "explanation": "As soon as introduces an action that happens immediately after another: the meeting will begin as soon as the CEO enters."
   },
   {
     "itemId": "kw_0206",
@@ -2248,7 +2444,8 @@
     "answer": [
       "read such a strange"
     ],
-    "tags": "B2, emphasis, comparatives and superlatives"
+    "tags": "B2, emphasis, comparatives and superlatives",
+    "explanation": "Such + a/an + adjective + singular noun can express strong emphasis: I've never read such a strange book."
   },
   {
     "itemId": "kw_0207",
@@ -2258,7 +2455,8 @@
     "answer": [
       "were taken around the city"
     ],
-    "tags": "B2, Passive voice, verb forms, phrasal verbs"
+    "tags": "B2, Passive voice, verb forms, phrasal verbs",
+    "explanation": "The passive is formed with be + past participle. Phrasal/prepositional elements stay with the verb: we were taken around the city."
   },
   {
     "itemId": "kw_0208",
@@ -2268,7 +2466,8 @@
     "answer": [
       "insisted on paying"
     ],
-    "tags": "B2, reporting verbs, gerunds and infinitives, reported speech, prepositions"
+    "tags": "B2, reporting verbs, gerunds and infinitives, reported speech, prepositions",
+    "explanation": "Insist on is followed by a noun or -ing form: he insisted on paying the bill."
   },
   {
     "itemId": "kw_0209",
@@ -2278,7 +2477,8 @@
     "answer": [
       "succeed in convincing"
     ],
-    "tags": "B2, verb patterns, prepositions, gerunds and infinitives, formal"
+    "tags": "B2, verb patterns, prepositions, gerunds and infinitives, formal",
+    "explanation": "Succeed is followed by in + -ing: succeed in convincing someone. It expresses successfully achieving something difficult."
   },
   {
     "itemId": "kw_0210",
@@ -2288,7 +2488,8 @@
     "answer": [
       "mind not eating"
     ],
-    "tags": "B2, Gerunds and infinitives, verb patterns"
+    "tags": "B2, Gerunds and infinitives, verb patterns",
+    "explanation": "Would you mind + -ing is used to make a polite request. For a negative request, use mind not + -ing: Would you mind not eating here?"
   },
   {
     "itemId": "kw_0211",
@@ -2298,7 +2499,8 @@
     "answer": [
       "made a good impression on"
     ],
-    "tags": "B2, fixed phrase, prepositions"
+    "tags": "B2, fixed phrase, prepositions",
+    "explanation": "The collocation is make a good impression on someone: Rachel made a good impression on her interviewer."
   },
   {
     "itemId": "kw_0212",
@@ -2308,7 +2510,8 @@
     "answer": [
       "wishes she had told"
     ],
-    "tags": "B2, unreal forms, past perfect, perfect"
+    "tags": "B2, unreal forms, past perfect, perfect",
+    "explanation": "Use wish + past perfect to express regret about a past action: she wishes she had told her friend the truth."
   },
   {
     "itemId": "kw_0213",
@@ -2318,7 +2521,8 @@
     "answer": [
       "had trouble understanding"
     ],
-    "tags": "B2, Gerunds and infinitives, fixed phrase, noun phrases"
+    "tags": "B2, Gerunds and infinitives, fixed phrase, noun phrases",
+    "explanation": "Have trouble + -ing means experience difficulty doing something: I had trouble understanding the guidelines."
   },
   {
     "itemId": "kw_0214",
@@ -2330,7 +2534,8 @@
       "found it difficult to follow",
       "found it tough to follow"
     ],
-    "tags": "B2, fixed phrase, verb patterns"
+    "tags": "B2, fixed phrase, verb patterns",
+    "explanation": "Use find it + adjective + to-infinitive to describe how easy or difficult an action is: she found it hard to follow the instructions."
   },
   {
     "itemId": "kw_0215",
@@ -2341,7 +2546,8 @@
       "has been put off",
       "'s been put off"
     ],
-    "tags": "B2, phrasal verbs, passive voice, verbs forms"
+    "tags": "B2, phrasal verbs, passive voice, verbs forms",
+    "explanation": "Put off means postpone. In the present perfect passive, use has/have been put off."
   },
   {
     "itemId": "kw_0216",
@@ -2349,10 +2555,10 @@
     "gapFill": "I’ve got ____________________________ with Marcus again.",
     "keyWord": "INTENTION",
     "answer": [
-      "no intention of playing",
-      "little intention of playing"
+      "no intention of playing"
     ],
-    "tags": "B2, noun phrase, verb pattern (preposition + -ing)"
+    "tags": "B2, noun phrase, verb pattern (preposition + -ing)",
+    "explanation": "The pattern is have/got no intention of + -ing: I've got no intention of playing with Marcus again."
   },
   {
     "itemId": "kw_0217",
@@ -2360,7 +2566,8 @@
     "gapFill": "The explosion ____________________________ by a short circuit.",
     "keyWord": "HAVE",
     "answer": "seems to have been caused",
-    "tags": "B2, passive voice, perfect, speculation"
+    "tags": "B2, passive voice, perfect, speculation",
+    "explanation": "Use seem + perfect passive infinitive, to have been + past participle, when a past event appears to have happened to the subject: the explosion seems to have been caused by a short circuit."
   },
   {
     "itemId": "kw_0218",
@@ -2374,7 +2581,8 @@
       "there was little point",
       "there was not any point"
     ],
-    "tags": "B2, fixed phrase, verb patterns, noun phrases"
+    "tags": "B2, fixed phrase, verb patterns, noun phrases",
+    "explanation": "There is no/little point (in) + -ing means that doing something is useless or not worthwhile."
   },
   {
     "itemId": "kw_0219",
@@ -2382,7 +2590,8 @@
     "gapFill": "I called the doctor, but they said I ____________________________ an appointment.",
     "keyWord": "HAVE",
     "answer": "did not have to make",
-    "tags": "B2, modal verbs, obligation, reported speech"
+    "tags": "B2, modal verbs, obligation, reported speech",
+    "explanation": "Didn't have to + infinitive means something was not necessary. It does not mean that the action was prohibited."
   },
   {
     "itemId": "kw_0220",
@@ -2395,7 +2604,8 @@
       "as long as I had",
       "so long as I had"
     ],
-    "tags": "B2, conditionals, reported speech, linking"
+    "tags": "B2, conditionals, reported speech, linking",
+    "explanation": "As long as and so long as mean provided that and introduce a condition: as long as I was packed."
   },
   {
     "itemId": "kw_0221",
@@ -2407,7 +2617,8 @@
       "get my phone repaired",
       "get my phone mended"
     ],
-    "tags": "B2, causative, passive voice"
+    "tags": "B2, causative, passive voice",
+    "explanation": "Get + object + past participle is a causative structure used when someone else does something for you: get my phone fixed."
   },
   {
     "itemId": "kw_0222",
@@ -2415,7 +2626,8 @@
     "gapFill": "The company blamed the ____________________________ the pandemic.",
     "keyWord": "FALL",
     "answer": "fall in sales on",
-    "tags": "B2, noun phrase, prepositions, reporting verbs, reported speech"
+    "tags": "B2, noun phrase, prepositions, reporting verbs, reported speech",
+    "explanation": "Blame something on someone/something means say that it caused a problem: the company blamed the fall in sales on the pandemic."
   },
   {
     "itemId": "kw_0223",
@@ -2423,7 +2635,8 @@
     "gapFill": "Ellie ____________________________ so much time online.",
     "keyWord": "WISHED",
     "answer": "wished she had not wasted",
-    "tags": "B2, wish, past perfect, verb forms, unreal forms"
+    "tags": "B2, wish, past perfect, verb forms, unreal forms",
+    "explanation": "Use wish + past perfect for regret about the past: Ellie wished she had not wasted so much time."
   },
   {
     "itemId": "kw_0224",
@@ -2434,7 +2647,8 @@
       "is thought to have been",
       "is believed to have been"
     ],
-    "tags": "B2, passive voice, reported speech, perfect"
+    "tags": "B2, passive voice, reported speech, perfect",
+    "explanation": "In a passive reporting structure referring to an earlier passive action, use be thought + to have been + past participle: the song is thought to have been written about his childhood."
   },
   {
     "itemId": "kw_0225",
@@ -2442,7 +2656,8 @@
     "gapFill": "I wouldn’t have passed the exam if ____________________________ your help.",
     "keyWord": "BEEN",
     "answer": "it had not been for",
-    "tags": "B2, unreal conditional, fixed expression (if it hadn’t been for)"
+    "tags": "B2, unreal conditional, fixed expression (if it hadn’t been for)",
+    "explanation": "If it had not been for + noun means without that person or thing: if it hadn't been for your help."
   },
   {
     "itemId": "kw_0226",
@@ -2450,10 +2665,10 @@
     "gapFill": "Hardly ____________________________ by the platoon.",
     "keyWord": "WERE",
     "answer": [
-      "any soldiers were left behind",
-      "any soldiers were abandoned"
+      "any soldiers were left behind"
     ],
-    "tags": "B2, passive voice, quantifiers, emphasis"
+    "tags": "B2, passive voice, quantifiers, emphasis",
+    "explanation": "Hardly any + plural noun means almost none. In the passive: hardly any soldiers were left behind."
   },
   {
     "itemId": "kw_0227",
@@ -2461,7 +2676,8 @@
     "gapFill": "She asked ____________________________ was.",
     "keyWord": "HOW",
     "answer": "how high the mountain",
-    "tags": "B2, indirect questions, questions, reported speech"
+    "tags": "B2, indirect questions, questions, reported speech",
+    "explanation": "To ask about a measurement, use how + adjective: how high, how wide, how long, etc. Indirect questions use statement word order: how high the mountain was."
   },
   {
     "itemId": "kw_0228",
@@ -2469,7 +2685,8 @@
     "gapFill": "There isn’t ____________________________ this sofa and the one we saw yesterday.",
     "keyWord": "MUCH",
     "answer": "much difference between",
-    "tags": "B2, comparatives and superlatives, noun phrases"
+    "tags": "B2, comparatives and superlatives, noun phrases",
+    "explanation": "Not much difference between two things means that they are very similar: there isn't much difference between them."
   },
   {
     "itemId": "kw_0229",
@@ -2477,7 +2694,8 @@
     "gapFill": "Maria refused to ____________________________ shouting at us.",
     "keyWord": "WAS",
     "answer": "say she was sorry for",
-    "tags": "B2, reporting verbs, verb forms, prepositions, reported speech"
+    "tags": "B2, reporting verbs, verb forms, prepositions, reported speech",
+    "explanation": "Say you are sorry for + -ing means apologise for an action: say she was sorry for shouting."
   },
   {
     "itemId": "kw_0230",
@@ -2485,7 +2703,8 @@
     "gapFill": "What most visitors ____________________________ this town is its restaurants.",
     "keyWord": "FIND",
     "answer": "find most enjoyable about",
-    "tags": "B2, verb patterns, fixed phrase, cleft sentences, comparatives and superlatives"
+    "tags": "B2, verb patterns, fixed phrase, cleft sentences, comparatives and superlatives",
+    "explanation": "Find + object + adjective means consider or experience something in a particular way: visitors find the restaurants enjoyable."
   },
   {
     "itemId": "kw_0231",
@@ -2496,7 +2715,8 @@
       "succeed in getting",
       "succeed in obtaining"
     ],
-    "tags": "B2, verb patterns, gerunds and infinitives, probability, speculation"
+    "tags": "B2, verb patterns, gerunds and infinitives, probability, speculation",
+    "explanation": "Succeed is followed by in + -ing: succeed in getting the grant. Be unlikely to expresses low probability."
   },
   {
     "itemId": "kw_0232",
@@ -2504,7 +2724,8 @@
     "gapFill": "It’s ____________________________ we last spoke on the phone.",
     "keyWord": "BEEN",
     "answer": "been two years since",
-    "tags": "B2, time expressions, present perfect, verb forms"
+    "tags": "B2, time expressions, present perfect, verb forms",
+    "explanation": "Use it has been + period of time + since + past simple to say how long ago something happened: it's been two years since we last spoke."
   },
   {
     "itemId": "kw_0233",
@@ -2512,7 +2733,8 @@
     "gapFill": "Anna ____________________________ honest with her.",
     "keyWord": "ACCUSED",
     "answer": "accused Paul of not being",
-    "tags": "B2, reporting verbs, verb patterns, reported speech, prepositions"
+    "tags": "B2, reporting verbs, verb patterns, reported speech, prepositions",
+    "explanation": "Accuse is followed by person + of + -ing: accuse someone of not being honest."
   },
   {
     "itemId": "kw_0234",
@@ -2523,7 +2745,8 @@
       "not to be late",
       "not to arrive late"
     ],
-    "tags": "B2, reporting verbs, verb forms, gerunds and infinitives"
+    "tags": "B2, reporting verbs, verb forms, gerunds and infinitives",
+    "explanation": "Advise is followed by object + to-infinitive. For negative advice, use advise someone not to + infinitive."
   },
   {
     "itemId": "kw_0235",
@@ -2534,7 +2757,8 @@
       "in spite of being",
       "in spite of having been"
     ],
-    "tags": "B2, concession, prepositions, linking, contrast"
+    "tags": "B2, concession, prepositions, linking, contrast",
+    "explanation": "In spite of is followed by a noun or -ing form: in spite of being badly prepared. Having been can emphasise that the state existed before the main event."
   },
   {
     "itemId": "kw_0236",
@@ -2542,7 +2766,8 @@
     "gapFill": "It ____________________________ to Barcelona.",
     "keyWord": "FLY",
     "answer": "takes two hours to fly",
-    "tags": "B2, verb forms, time expressions, gerunds and infinitives"
+    "tags": "B2, verb forms, time expressions, gerunds and infinitives",
+    "explanation": "Use it takes + period of time + to-infinitive to express the duration of an activity: it takes two hours to fly to Barcelona."
   },
   {
     "itemId": "kw_0237",
@@ -2550,7 +2775,8 @@
     "gapFill": "I didn’t know the hotel ____________________________ way from the station.",
     "keyWord": "SUCH",
     "answer": "was such a long",
-    "tags": "B2, emphasis, noun phrases, intensifiers"
+    "tags": "B2, emphasis, noun phrases, intensifiers",
+    "explanation": "Such + a/an + adjective + noun can emphasise degree: such a long way from the station."
   },
   {
     "itemId": "kw_0238",
@@ -2558,15 +2784,17 @@
     "gapFill": "If Dan had left on time, he would ____________________________ bus.",
     "keyWord": "HAVE",
     "answer": "not have missed the",
-    "tags": "B2, conditionals, past modals, modal verbs"
+    "tags": "B2, conditionals, past modals, modal verbs",
+    "explanation": "A third conditional uses if + past perfect and would have + past participle for an unreal past result: he would not have missed the bus."
   },
   {
     "itemId": "kw_0239",
-    "fullSentence": "None of the other apps perform better than this one.",
+    "fullSentence": "This app performs considerably better than all the others.",
     "gapFill": "The other apps don’t work ____________________________ this one.",
     "keyWord": "NEARLY",
     "answer": "nearly as well as",
-    "tags": "B2, comparatives and superlatives, emphasis, intensifiers"
+    "tags": "B2, comparatives and superlatives, emphasis, intensifiers",
+    "explanation": "Not nearly as + adverb/adjective + as means considerably less: the other apps don't work nearly as well as this one."
   },
   {
     "itemId": "kw_0240",
@@ -2574,15 +2802,17 @@
     "gapFill": "Mia asked Ben ____________________________ his laptop for a second.",
     "keyWord": "WHETHER",
     "answer": "whether she could use",
-    "tags": "B2, reported speech, questions, indirect questions, modal verbs"
+    "tags": "B2, reported speech, questions, indirect questions, modal verbs",
+    "explanation": "Reported yes/no questions can use whether + subject + verb, with statement word order: she asked whether she could use his laptop."
   },
   {
     "itemId": "kw_0241",
-    "fullSentence": "Lucas show so much talent as a photographer—his pictures look unreal.",
+    "fullSentence": "Lucas shows so much talent as a photographer—his pictures look unreal.",
     "gapFill": "Lucas is ____________________________ photographer that his pictures look unreal.",
     "keyWord": "SUCH",
     "answer": "such a talented",
-    "tags": "B2, emphasis, noun phrases, intensifiers, so/such"
+    "tags": "B2, emphasis, noun phrases, intensifiers, so/such",
+    "explanation": "Use such + a/an + adjective + singular noun + that to express a strong degree and its result: such a talented photographer that his pictures look unreal."
   },
   {
     "itemId": "kw_0242",
@@ -2590,7 +2820,8 @@
     "gapFill": "I should ____________________________ at the weekend.",
     "keyWord": "NOT",
     "answer": "not have drunk so much",
-    "tags": "B2, advice, past modals, quantifiers, modal verbs, wish"
+    "tags": "B2, advice, past modals, quantifiers, modal verbs, wish",
+    "explanation": "Use should not have + past participle to express regret or criticism about a past action: I should not have drunk so much."
   },
   {
     "itemId": "kw_0243",
@@ -2601,7 +2832,8 @@
       "was caused by a",
       "was caused by the"
     ],
-    "tags": "B2, causality, verb forms, passive voice"
+    "tags": "B2, causality, verb forms, passive voice",
+    "explanation": "In the passive, cause is followed by by to introduce the cause: the delay was caused by a signal failure."
   },
   {
     "itemId": "kw_0244",
@@ -2609,7 +2841,8 @@
     "gapFill": "Mia ____________________________ presentation.",
     "keyWord": "INVITED",
     "answer": "invited Leo to her",
-    "tags": "B2, reporting verbs, verb patterns, reported speech"
+    "tags": "B2, reporting verbs, verb patterns, reported speech",
+    "explanation": "Invite is followed by person + to + event/place: Mia invited Leo to her presentation."
   },
   {
     "itemId": "kw_0245",
@@ -2617,10 +2850,10 @@
     "gapFill": "Several drivers ____________________________ the roadwork signs.",
     "keyWord": "PAID",
     "answer": [
-      "paid no attention to",
-      "paid little attention to"
+      "paid no attention to"
     ],
-    "tags": "B2, fixed phrase, verb forms, noun phrases"
+    "tags": "B2, fixed phrase, verb forms, noun phrases",
+    "explanation": "Pay no attention to means ignore: several drivers paid no attention to the signs."
   },
   {
     "itemId": "kw_0246",
@@ -2631,7 +2864,8 @@
       "was not enough water for",
       "was not sufficient water for"
     ],
-    "tags": "B2, quantifiers, noun phrases, prepositions"
+    "tags": "B2, quantifiers, noun phrases, prepositions",
+    "explanation": "Enough comes before a noun: enough water. The pattern enough + noun + for someone + to-infinitive shows whether the quantity is sufficient for an action."
   },
   {
     "itemId": "kw_0247",
@@ -2642,7 +2876,8 @@
       "only exercise Eva gets is",
       "only exercise Eva does is"
     ],
-    "tags": "B2, noun phrases, emphasis, cleft sentences"
+    "tags": "B2, noun phrases, emphasis, cleft sentences",
+    "explanation": "The only + noun + subject + verb can emphasise a single exception: the only exercise Eva gets is cycling to school."
   },
   {
     "itemId": "kw_0248",
@@ -2653,7 +2888,8 @@
       "gave up coaching to",
       "gave coaching up to"
     ],
-    "tags": "B2, phrasal verbs, verb patterns, gerunds and infinitives"
+    "tags": "B2, phrasal verbs, verb patterns, gerunds and infinitives",
+    "explanation": "Give up + noun/-ing means stop an activity. A following to-infinitive can express purpose: he gave up coaching to become a painter."
   },
   {
     "itemId": "kw_0249",
@@ -2661,7 +2897,8 @@
     "gapFill": "There isn’t ____________________________ Madrid as there used to be.",
     "keyWord": "NEARLY",
     "answer": "nearly as much pollution in",
-    "tags": "B2, comparatives and superlatives, quantifiers, intensifiers"
+    "tags": "B2, comparatives and superlatives, quantifiers, intensifiers",
+    "explanation": "Not nearly as much + uncountable noun + as expresses a large difference in quantity: there isn't nearly as much pollution as there used to be."
   },
   {
     "itemId": "kw_0250",
@@ -2674,7 +2911,8 @@
       "includes a vivid account of",
       "is a vivid account of"
     ],
-    "tags": "C2, fixed phrase, noun phrases"
+    "tags": "C2, fixed phrase, noun phrases",
+    "explanation": "Give an account of something means describe or report it. An adjective can describe the quality of the account: give a vivid account of the witnesses' experiences."
   },
   {
     "itemId": "kw_0251",
@@ -2682,11 +2920,11 @@
     "gapFill": "These herbs ____________________________ by mites and aphids.",
     "keyWord": "PRONE",
     "answer": [
-      "are prone to getting damaged by",
       "are prone to being damaged",
-      "are prone to damage"
+      "are prone to getting damaged"
     ],
-    "tags": "C2, adjectives, prepositions, passive voice"
+    "tags": "C2, adjectives, prepositions, passive voice",
+    "explanation": "Be prone to is followed by a noun or -ing form and means be likely to experience something, usually negative: these herbs are prone to being damaged."
   },
   {
     "itemId": "kw_0252",
@@ -2704,7 +2942,8 @@
       "cast light on how",
       "throw light on how"
     ],
-    "tags": "C2, fixed phrase, indirect questions, questions"
+    "tags": "C2, fixed phrase, indirect questions, questions",
+    "explanation": "Shed/cast/throw light on something means help to explain or clarify it: shed some light on how Marta paid for the wedding."
   },
   {
     "itemId": "kw_0253",
@@ -2715,7 +2954,8 @@
       "come to terms with the fact that",
       "Come to terms with the fact"
     ],
-    "tags": "C2, fixed phrase, noun phrases"
+    "tags": "C2, fixed phrase, noun phrases",
+    "explanation": "Come to terms with + noun means gradually accept a difficult or unpleasant reality: come to terms with the fact that he won't be returning."
   },
   {
     "itemId": "kw_0254",
@@ -2728,7 +2968,8 @@
       "took the attendees by surprise when Nina started",
       "took the attendees aback when Nina started"
     ],
-    "tags": "C2, fixed phrase, prepositions, phrasal verbs"
+    "tags": "C2, fixed phrase, prepositions, phrasal verbs",
+    "explanation": "Take someone by surprise or take someone aback means surprise them unexpectedly: Nina's sudden rapping took the attendees by surprise."
   },
   {
     "itemId": "kw_0255",
@@ -2739,7 +2980,8 @@
       "not take Leo long to get over",
       "not take long for Leo to get over"
     ],
-    "tags": "C2, verb patterns, time expressions, phrasal verbs"
+    "tags": "C2, verb patterns, time expressions, phrasal verbs",
+    "explanation": "Get over an illness means recover from it. The pattern it doesn't take someone long to + infinitive describes something happening quickly."
   },
   {
     "itemId": "kw_0256",
@@ -2748,12 +2990,11 @@
     "keyWord": "EXTENT",
     "answer": [
       "extinguished that the extent of the destruction",
-      "put out the extent of the destruction",
-      "out that the extent of the destruction",
-      "extinguished extent of the destruction",
-      "out the extent of the destruction"
+      "put out that the extent of the destruction",
+      "out that the extent of the destruction"
     ],
-    "tags": "C2, cleft sentences, time expressions"
+    "tags": "C2, cleft sentences, time expressions",
+    "explanation": "The cleft structure it wasn't until ... that emphasises when something finally became clear: it wasn't until the fire was out that the extent of the destruction became apparent."
   },
   {
     "itemId": "kw_0257",
@@ -2763,7 +3004,8 @@
     "answer": [
       "to dawn on Maya"
     ],
-    "tags": "C2, fixed phrase, idioms"
+    "tags": "C2, fixed phrase, idioms",
+    "explanation": "Dawn on someone means gradually become understood or realised: it began to dawn on Maya how lucky she had been."
   },
   {
     "itemId": "kw_0258",
@@ -2774,7 +3016,8 @@
       "is restricted to students",
       "is restricted to those students"
     ],
-    "tags": "C2, passive voice, prepositions"
+    "tags": "C2, passive voice, prepositions",
+    "explanation": "Be restricted to + person/group means only that group is permitted access: access is restricted to students with advanced passes."
   },
   {
     "itemId": "kw_0259",
@@ -2786,7 +3029,8 @@
       "circumstances must this storeroom be",
       "circumstances is this storeroom to be"
     ],
-    "tags": "C2, inversion, modal verbs"
+    "tags": "C2, inversion, modal verbs",
+    "explanation": "When under no circumstances is fronted, use inversion: Under no circumstances should this storeroom be left locked."
   },
   {
     "itemId": "kw_0260",
@@ -2799,7 +3043,8 @@
       "was a constant source of embarrassment for",
       "was always a source of embarrassment for"
     ],
-    "tags": "C2, fixed phrase, noun phrases"
+    "tags": "C2, fixed phrase, noun phrases",
+    "explanation": "A source of + noun describes something that repeatedly causes a particular feeling or situation: a constant source of embarrassment."
   },
   {
     "itemId": "kw_0261",
@@ -2811,7 +3056,8 @@
       "prospects are there of",
       "prospects does the company have of"
     ],
-    "tags": "C2, noun phrases, speculation, probability"
+    "tags": "C2, noun phrases, speculation, probability",
+    "explanation": "The prospects of + -ing means the chances of something happening successfully: the prospects of the company launching the app."
   },
   {
     "itemId": "kw_0262",
@@ -2819,11 +3065,10 @@
     "gapFill": "Mia didn’t ____________________________ her sister’s warnings.",
     "keyWord": "NOTICE",
     "answer": [
-      "take much notice of",
-      "take any notice of",
-      "take a lot of notice of"
+      "take any notice of"
     ],
-    "tags": "C2, fixed phrase, prepositions"
+    "tags": "C2, fixed phrase, prepositions",
+    "explanation": "Take notice of means pay attention to. In a negative sentence, any is common: she didn't take any notice of the warnings."
   },
   {
     "itemId": "kw_0263",
@@ -2833,7 +3078,8 @@
     "answer": [
       "far as Vanessa is concerned"
     ],
-    "tags": "C2, fixed phrase, linking"
+    "tags": "C2, fixed phrase, linking",
+    "explanation": "As far as someone is concerned means in that person's opinion or from their point of view."
   },
   {
     "itemId": "kw_0264",
@@ -2843,7 +3089,8 @@
     "answer": [
       "took exception to"
     ],
-    "tags": "C2, fixed phrase, idioms"
+    "tags": "C2, fixed phrase, idioms",
+    "explanation": "Take exception to something means object to it or feel offended by it: Professor Ling took exception to some of the comments."
   },
   {
     "itemId": "kw_0265",
@@ -2853,7 +3100,8 @@
     "answer": [
       "in the dark for personal"
     ],
-    "tags": "C2, Idioms, fixed phrase"
+    "tags": "C2, Idioms, fixed phrase",
+    "explanation": "Keep someone in the dark means deliberately not give them information: James kept us in the dark."
   },
   {
     "itemId": "kw_0266",
@@ -2863,7 +3111,8 @@
     "answer": [
       "I hadn’t been taken in"
     ],
-    "tags": "C2, unreal forms, passive voice, phrasal verbs"
+    "tags": "C2, unreal forms, passive voice, phrasal verbs",
+    "explanation": "Take someone in means deceive them. In the passive, be taken in means be deceived: I wish I hadn't been taken in."
   },
   {
     "itemId": "kw_0267",
@@ -2873,7 +3122,8 @@
     "answer": [
       "discussion of the proposal was out of the"
     ],
-    "tags": "C2, fixed phrase, noun phrases, prepositions"
+    "tags": "C2, fixed phrase, noun phrases, prepositions",
+    "explanation": "Be out of the question means be impossible or completely unacceptable: further discussion was out of the question."
   },
   {
     "itemId": "kw_0268",
@@ -2883,7 +3133,8 @@
     "answer": [
       "for the ingenuity of Laura’s thinking"
     ],
-    "tags": "C2, prepositions, noun phrases, conditionals"
+    "tags": "C2, prepositions, noun phrases, conditionals",
+    "explanation": "But for + noun means if it had not been for: But for Laura's ingenuity, the project would have failed."
   },
   {
     "itemId": "kw_0269",
@@ -2893,7 +3144,8 @@
     "answer": [
       "with a view to becoming"
     ],
-    "tags": "C2, verb patterns, fixed phrase"
+    "tags": "C2, verb patterns, fixed phrase",
+    "explanation": "With a view to + -ing means with the intention or aim of doing something: with a view to becoming a dietician."
   },
   {
     "itemId": "kw_0270",
@@ -2904,7 +3156,8 @@
       "was a sharp contrast between",
       "was a clear contrast between"
     ],
-    "tags": "C2, comparatives and superlatives, noun phrases"
+    "tags": "C2, comparatives and superlatives, noun phrases",
+    "explanation": "Use a contrast between A and B to describe a strong difference: there was a sharp contrast between his speech and his essays."
   },
   {
     "itemId": "kw_0271",
@@ -2912,12 +3165,11 @@
     "gapFill": "Theo has ____________________________ the next phase of the project.",
     "keyWord": "CHANCE",
     "answer": [
-      "little chance of leading",
-      "Little chance of being asked to lead",
-      "Almost no chance if leading",
+      "little chance of being asked to lead",
       "almost no chance of being asked to lead"
     ],
-    "tags": "C2, noun phrases, probability"
+    "tags": "C2, noun phrases, probability",
+    "explanation": "Have little/almost no chance of + -ing expresses very low probability: little chance of being asked to lead."
   },
   {
     "itemId": "kw_0272",
@@ -2930,7 +3182,8 @@
       "Have a clue about how to",
       "Have any clue about how to"
     ],
-    "tags": "C2, informal, noun phrases, fixed phrase"
+    "tags": "C2, informal, noun phrases, fixed phrase",
+    "explanation": "Have no clue / not have a clue means have no knowledge or idea. It can be followed by how to + infinitive."
   },
   {
     "itemId": "kw_0273",
@@ -2942,7 +3195,8 @@
       "did Teresa make a complete recovery",
       "did Teresa make a total recovery"
     ],
-    "tags": "C2, inversion, fixed phrase"
+    "tags": "C2, inversion, fixed phrase",
+    "explanation": "When only after + time expression begins the sentence, use inversion: Only after a few months did Teresa make a full recovery."
   },
   {
     "itemId": "kw_0274",
@@ -2952,22 +3206,22 @@
     "answer": [
       "to popular belief not all"
     ],
-    "tags": "C2, fixed phrase, contrast, linking"
+    "tags": "C2, fixed phrase, contrast, linking",
+    "explanation": "Contrary to popular belief introduces information that contradicts a commonly held opinion."
   },
   {
     "itemId": "kw_0275",
-    "fullSentence": "Luke’s was not an ambitious person, and that’s why he was so satisfied.",
+    "fullSentence": "Luke was not an ambitious person, and that’s why he was so satisfied.",
     "gapFill": "Luke’s ____________________________ of ambition.",
     "keyWord": "DUE",
     "answer": [
       "satisfaction was due to a lack",
       "satisfaction was due to his lack",
       "satisfaction was due to an absence",
-      "satisfaction was due to his absence",
-      "Being satisfied was due to a lack",
-      "Being satisfied was due to his lack"
+      "satisfaction was due to his absence"
     ],
-    "tags": "C2, noun phrases, causality, linking"
+    "tags": "C2, noun phrases, causality, linking",
+    "explanation": "Be due to + noun means be caused by something: his satisfaction was due to his lack of ambition."
   },
   {
     "itemId": "kw_0276",
@@ -2977,7 +3231,8 @@
     "answer": [
       "believe her luck when she"
     ],
-    "tags": "C2, Idioms, fixed phrase"
+    "tags": "C2, Idioms, fixed phrase",
+    "explanation": "Can't believe your luck means be extremely surprised and pleased by something fortunate that has happened."
   },
   {
     "itemId": "kw_0277",
@@ -2988,7 +3243,8 @@
       "nowhere until Andrea came up with",
       "Nowhere before Andrea came up with"
     ],
-    "tags": "C2, phrasal verbs, linking, fixed phrase"
+    "tags": "C2, phrasal verbs, linking, fixed phrase",
+    "explanation": "Get nowhere means make no progress. Come up with means think of or produce an idea or solution."
   },
   {
     "itemId": "kw_0278",
@@ -2998,7 +3254,8 @@
     "answer": [
       "lacks awareness when it"
     ],
-    "tags": "C2, noun phrases, fixed phrase, linking"
+    "tags": "C2, noun phrases, fixed phrase, linking",
+    "explanation": "Lack + noun means not have enough of a quality or ability. When it comes to introduces the particular area being considered."
   },
   {
     "itemId": "kw_0279",
@@ -3013,7 +3270,8 @@
       "Try to take the engine apart unless",
       "Try to take apart the engine unless"
     ],
-    "tags": "C2, phrasal verbs, conditionals"
+    "tags": "C2, phrasal verbs, conditionals",
+    "explanation": "Take something apart means separate it into pieces. Unless means if ... not: don't take it apart unless you've done this before."
   },
   {
     "itemId": "kw_0280",
@@ -3023,7 +3281,8 @@
     "answer": [
       "sprained wrist affect his ability"
     ],
-    "tags": "C2, noun phrases, ability"
+    "tags": "C2, noun phrases, ability",
+    "explanation": "Affect is a verb meaning influence. The pattern noun phrase + affect someone’s ability to + infinitive describes an effect on what someone can do."
   },
   {
     "itemId": "kw_0281",
@@ -3033,7 +3292,8 @@
     "answer": [
       "he had not turned down"
     ],
-    "tags": "C2, unreal forms, perfect, wish"
+    "tags": "C2, unreal forms, perfect, wish",
+    "explanation": "Use wish + past perfect for regret about the past: he wishes he had not turned down the opportunity. Turn down means reject."
   },
   {
     "itemId": "kw_0282",
@@ -3046,7 +3306,8 @@
       "was held up on account of unforeseen",
       "was held up as a result of unforeseen"
     ],
-    "tags": "C2, passive voice, causative, linking"
+    "tags": "C2, passive voice, causative, linking",
+    "explanation": "Hold up means delay. In the passive, be held up by + noun identifies the cause of the delay."
   },
   {
     "itemId": "kw_0283",
@@ -3062,22 +3323,24 @@
       "was not anything for me to do but",
       "was not anything for me to do except"
     ],
-    "tags": "C2, fixed phrase, negatives"
+    "tags": "C2, fixed phrase, negatives",
+    "explanation": "There wasn't anything I could do except/but + infinitive expresses that no alternative was available."
   },
   {
     "itemId": "kw_0284",
-    "fullSentence": "Nora wouldn't have landed the role had her sister not advised her for the audition.",
-    "gapFill": "Nora wouldn’t have landed the role ____________________________ for the audition.",
+    "fullSentence": "Nora wouldn't have landed the role had her sister not advised her about the audition.",
+    "gapFill": "Nora wouldn’t have landed the role ____________________________ about the audition.",
     "keyWord": "WITHOUT",
     "answer": [
       "without her sister’s advice",
       "without her sister having advised her",
       "without the advice of her sister",
-      "Without being advised by her sister",
-      "Without having been advised by her sister",
-      "Without her sister's advising her"
+      "without being advised by her sister",
+      "without having been advised by her sister",
+      "without her sister's advising her"
     ],
-    "tags": "C2, conditionals, prepositions, time clauses"
+    "tags": "C2, conditionals, prepositions, time clauses",
+    "explanation": "Without can be followed by a noun or -ing form to express an unreal past condition: without her sister's advice / without her sister having advised her."
   },
   {
     "itemId": "kw_0285",
@@ -3086,11 +3349,11 @@
     "keyWord": "SUBJECT",
     "answer": [
       "subject to the board's approval",
-      "subject to the board approving to",
       "subject to the approval of the board",
       "subject to the board's approving"
     ],
-    "tags": "C2, conditionals, formal"
+    "tags": "C2, conditionals, formal",
+    "explanation": "Subject to + noun/-ing means dependent on a condition being fulfilled: subject to the board's approval."
   },
   {
     "itemId": "kw_0286",
@@ -3103,7 +3366,8 @@
       "Carl's pronouncing things unclearly which made",
       "Carl pronouncing things unclearly which made"
     ],
-    "tags": "C2, relative clauses, causative, reported speech, cleft sentences"
+    "tags": "C2, relative clauses, causative, reported speech, cleft sentences",
+    "explanation": "The cleft structure it was ... which/that can emphasise the cause of a result: it was Carl's unclear pronunciation which made understanding him difficult."
   },
   {
     "itemId": "kw_0287",
@@ -3119,7 +3383,8 @@
       "Does Lily get the chance to",
       "Does Lily get to"
     ],
-    "tags": "C2, inversion, adverbs of frequency"
+    "tags": "C2, inversion, adverbs of frequency",
+    "explanation": "When rarely begins a sentence, use inversion with an auxiliary: Rarely does Lily get the opportunity to perform."
   },
   {
     "itemId": "kw_0288",
@@ -3127,10 +3392,10 @@
     "gapFill": "The historian ____________________________ the inscriptions over the entrance.",
     "keyWord": "DREW",
     "answer": [
-      "drew our attention to",
-      "drew our attentions to"
+      "drew our attention to"
     ],
-    "tags": "C2, phrasal verbs, fixed phrase"
+    "tags": "C2, phrasal verbs, fixed phrase",
+    "explanation": "Draw someone's attention to something means make them notice it: the historian drew our attention to the inscriptions."
   },
   {
     "itemId": "kw_0289",
@@ -3143,7 +3408,8 @@
       "requested to remain in their seats",
       "Requested to remain seated"
     ],
-    "tags": "C2, passive voice, formal"
+    "tags": "C2, passive voice, formal",
+    "explanation": "Remain + adjective describes continuing in a state: remain seated. In formal instructions, people may be asked/requested to remain somewhere."
   },
   {
     "itemId": "kw_0290",
@@ -3154,7 +3420,8 @@
       "a great deal more skill than",
       "a good deal more skill than"
     ],
-    "tags": "C2, comparatives and superlatives, noun phrases, quantifiers"
+    "tags": "C2, comparatives and superlatives, noun phrases, quantifiers",
+    "explanation": "A great/good deal more + uncountable noun expresses a large comparative difference: a great deal more skill than."
   },
   {
     "itemId": "kw_0291",
@@ -3171,7 +3438,8 @@
       "did not go over very",
       "did not go over so"
     ],
-    "tags": "C2, phrasal verbs"
+    "tags": "C2, phrasal verbs",
+    "explanation": "Go down well with someone means be received positively. The negative form means something was not well received."
   },
   {
     "itemId": "kw_0292",
@@ -3182,7 +3450,8 @@
       "explanations were ever given",
       "explanation was ever given"
     ],
-    "tags": "C2, passive voice, noun phrases"
+    "tags": "C2, passive voice, noun phrases",
+    "explanation": "Give an explanation can be used in the passive: no explanation was ever given. The passive focuses on the missing explanation rather than who failed to provide it."
   },
   {
     "itemId": "kw_0293",
@@ -3197,7 +3466,8 @@
       "came as a total shock to",
       "came as a shock to"
     ],
-    "tags": "C2, fixed phrase, noun phrases"
+    "tags": "C2, fixed phrase, noun phrases",
+    "explanation": "Come as a surprise/shock to someone means be unexpected: his resignation came as a complete surprise to everyone."
   },
   {
     "itemId": "kw_0294",
@@ -3210,7 +3480,8 @@
       "On the verge of heading out",
       "On the verge of heading out of"
     ],
-    "tags": "C2, idioms, verb patterns"
+    "tags": "C2, idioms, verb patterns",
+    "explanation": "Be on the verge of + -ing means be very close to doing something: I was on the verge of leaving."
   },
   {
     "itemId": "kw_0295",
@@ -3221,7 +3492,8 @@
       "to extend her stay at the resort by",
       "To extend her stay at the resort for"
     ],
-    "tags": "C2, verb patterns, time expressions"
+    "tags": "C2, verb patterns, time expressions",
+    "explanation": "Extend something by + period describes how much longer it becomes: extend her stay by two weeks."
   },
   {
     "itemId": "kw_0296",
@@ -3232,7 +3504,8 @@
       "had no intention of disturbing",
       "didn’t have any intention of disturbing"
     ],
-    "tags": "C2, noun phrases, formal, prepositions"
+    "tags": "C2, noun phrases, formal, prepositions",
+    "explanation": "Have no intention of + -ing means not intend to do something: I had no intention of disturbing the meeting."
   },
   {
     "itemId": "kw_0297",
@@ -3253,7 +3526,8 @@
       "Quite unlike her to turn up",
       "Quite unlike her to show up"
     ],
-    "tags": "C2, contrast, fixed phrase"
+    "tags": "C2, contrast, fixed phrase",
+    "explanation": "It's unlike someone to + infinitive means that an action is unusual or uncharacteristic for that person: it's unlike her to be late."
   },
   {
     "itemId": "kw_0298",
@@ -3270,7 +3544,8 @@
       "Little call for",
       "Very little call for"
     ],
-    "tags": "C2, quantifiers, formal, noun phrases, phrasal verbs"
+    "tags": "C2, quantifiers, formal, noun phrases, phrasal verbs",
+    "explanation": "There is little/no call for something means there is little or no demand or need for it."
   },
   {
     "itemId": "kw_0299",
@@ -3283,7 +3558,8 @@
       "it clear you have every right to",
       "it clear you have a right to"
     ],
-    "tags": "C2, formal, noun phrases"
+    "tags": "C2, formal, noun phrases",
+    "explanation": "Have the right to + infinitive means be legally or officially entitled to do something. Make it clear + clause emphasises that something is stated unambiguously."
   },
   {
     "itemId": "kw_0300",
@@ -3293,18 +3569,20 @@
     "answer": [
       "Camilla’s great annoyance"
     ],
-    "tags": "C2, noun phrases, formal, possessive"
+    "tags": "C2, noun phrases, formal, possessive",
+    "explanation": "To + possessive + emotion noun is a formal structure describing someone's reaction: To Camilla's great annoyance, her daughter had taken her laptop."
   },
   {
     "itemId": "kw_0301",
-    "fullSentence": "This substance must always be attended at all times.",
+    "fullSentence": "This substance must never be left unattended.",
     "gapFill": "Under ____________________________ left unattended.",
     "keyWord": "IS",
     "answer": [
       "no circumstances is this substance to be",
       "no circumstances is the substance to be"
     ],
-    "tags": "C2, inversion, formal, passive voice"
+    "tags": "C2, inversion, formal, passive voice",
+    "explanation": "When under no circumstances is fronted, use inversion. The formal structure be to + infinitive can express a strong instruction: Under no circumstances is this substance to be left unattended."
   },
   {
     "itemId": "kw_0302",
@@ -3315,7 +3593,8 @@
       "is bound to have completed the manuscript",
       "is bound to have completed her manuscript"
     ],
-    "tags": "C2, probability, perfect, future"
+    "tags": "C2, probability, perfect, future",
+    "explanation": "Be bound to expresses very strong probability. Use the perfect infinitive to have + past participle for an action expected to be completed by a future point."
   },
   {
     "itemId": "kw_0303",
@@ -3326,7 +3605,8 @@
       "a matter of time before Dylan breaks",
       "a matter of time until Dylan breaks"
     ],
-    "tags": "C2, fixed phrase, future, time expressions"
+    "tags": "C2, fixed phrase, future, time expressions",
+    "explanation": "It's only a matter of time before/until ... means that something is considered certain to happen eventually."
   },
   {
     "itemId": "kw_0304",
@@ -3339,7 +3619,8 @@
       "will be subject to delays",
       "are subject to delays"
     ],
-    "tags": "C2, passive voice, formal"
+    "tags": "C2, passive voice, formal",
+    "explanation": "Be subject to + noun means be likely or liable to experience something: routes may be subject to delays."
   },
   {
     "itemId": "kw_0305",
@@ -3348,11 +3629,10 @@
     "keyWord": "CONSEQUENCE",
     "answer": [
       "is of no consequence to me which",
-      "is of little consequence to me which",
-      "is of no consequence to me what",
-      "is of little consequence to me what"
+      "is of no consequence to me what"
     ],
-    "tags": "C2, formal, noun phrases, prepositions"
+    "tags": "C2, formal, noun phrases, prepositions",
+    "explanation": "Be of no consequence to someone means be unimportant to them or make no difference: it is of no consequence to me which brand you choose."
   },
   {
     "itemId": "kw_0306",
@@ -3367,7 +3647,8 @@
       "has declined significantly during the past",
       "has declined significantly in the last"
     ],
-    "tags": "C2, present perfect, trends, time expressions"
+    "tags": "C2, present perfect, trends, time expressions",
+    "explanation": "Use the present perfect to describe a change over a period continuing up to now: the number has declined significantly over the past decade."
   },
   {
     "itemId": "kw_0307",
@@ -3380,19 +3661,20 @@
       "to drop a line",
       "to drop a quick line"
     ],
-    "tags": "C2, informal, idioms, fixed phrase"
+    "tags": "C2, informal, idioms, fixed phrase",
+    "explanation": "Drop someone a line is an informal expression meaning send them a short message."
   },
   {
     "itemId": "kw_0308",
     "fullSentence": "Darren was furious that Emily hadn’t responded to his proposal.",
-    "gapFill": "Darren thought that ____________________________ was enfuriating.",
+    "gapFill": "Darren thought that ____________________________ was infuriating.",
     "keyWord": "FAILURE",
     "answer": [
       "Emily’s failure to reply to his proposal",
-      "Emily's failure to respond to his proposal",
-      "Emily’s failure to answer his proposal"
+      "Emily's failure to respond to his proposal"
     ],
-    "tags": "C2, noun phrases, formal, possessive"
+    "tags": "C2, noun phrases, formal, possessive",
+    "explanation": "Failure to + infinitive is a formal noun structure meaning that someone did not do something: Emily's failure to respond."
   },
   {
     "itemId": "kw_0309",
@@ -3403,7 +3685,8 @@
       "the cracked jug could be made into",
       "the cracked jug might be made into"
     ],
-    "tags": "C2, passive voice, modal verbs"
+    "tags": "C2, passive voice, modal verbs",
+    "explanation": "The modal passive is formed with modal + be + past participle: the jug could be made into a flower pot."
   },
   {
     "itemId": "kw_0310",
@@ -3413,7 +3696,8 @@
     "answer": [
       "in the habit of running"
     ],
-    "tags": "C2, habit, prepositions, gerunds and infinitives, noun phrases"
+    "tags": "C2, habit, prepositions, gerunds and infinitives, noun phrases",
+    "explanation": "Be in the habit of + -ing means regularly do something: he is in the habit of running half marathons."
   },
   {
     "itemId": "kw_0311",
@@ -3423,7 +3707,8 @@
     "answer": [
       "the height of her success"
     ],
-    "tags": "C2, noun phrases, time expressions, formal"
+    "tags": "C2, noun phrases, time expressions, formal",
+    "explanation": "At the height of + noun refers to the point when something is at its strongest or most successful: at the height of her success."
   },
   {
     "itemId": "kw_0312",
@@ -3435,7 +3720,8 @@
       "the majority of his classmates",
       "the great majority of his classmates"
     ],
-    "tags": "C2, contrast, quantifiers, noun phrases, formal"
+    "tags": "C2, contrast, quantifiers, noun phrases, formal",
+    "explanation": "The majority of means most of a group. Vast/great can intensify it: the vast majority of his classmates."
   },
   {
     "itemId": "kw_0313",
@@ -3450,7 +3736,8 @@
       "thrilled at how skilful a",
       "Thrilled at how skillful a"
     ],
-    "tags": "C2, emphasis, noun phrases, passive voice"
+    "tags": "C2, emphasis, noun phrases, passive voice",
+    "explanation": "The structure how + adjective + a/an + singular noun is a formal way of expressing degree: how skilful a debater Daniel was."
   },
   {
     "itemId": "kw_0314",
@@ -3461,7 +3748,8 @@
       "dedicated herself to her career in the",
       "committed herself to her career in the"
     ],
-    "tags": "C2, reflexive pronouns, present perfect, collocations, prepositions"
+    "tags": "C2, reflexive pronouns, present perfect, collocations, prepositions",
+    "explanation": "Dedicate/commit yourself to + noun or -ing means devote your time and effort seriously to something."
   },
   {
     "itemId": "kw_0315",
@@ -3473,7 +3761,8 @@
       "come up with the answer",
       "come up with the solution"
     ],
-    "tags": "C2, phrasal verbs, modals"
+    "tags": "C2, phrasal verbs, modals",
+    "explanation": "Come up with means think of or produce an idea, answer or solution: come up with a solution to a problem."
   },
   {
     "itemId": "kw_0316",
@@ -3484,7 +3773,8 @@
       "to Lara’s delight, she was",
       "to the delight of Lara, she was"
     ],
-    "tags": "C2, fixed phrase, passive voice, fronting, possessive"
+    "tags": "C2, fixed phrase, passive voice, fronting, possessive",
+    "explanation": "Much to + possessive + emotion noun introduces a strong reaction: Much to Lara's delight, she was chosen."
   },
   {
     "itemId": "kw_0317",
@@ -3495,7 +3785,8 @@
       "want to leave anything to chance",
       "intend to leave anything to chance"
     ],
-    "tags": "C2, idioms, verb patterns, gerunds and infinitives"
+    "tags": "C2, idioms, verb patterns, gerunds and infinitives",
+    "explanation": "Leave something to chance means allow it to depend on luck rather than planning or control."
   },
   {
     "itemId": "kw_0318",
@@ -3508,30 +3799,22 @@
       "purpose for organising the meeting was",
       "purpose in organising the meeting was"
     ],
-    "tags": "C2, gerunds and infinitives, noun phrases, purpose, prepositions"
+    "tags": "C2, gerunds and infinitives, noun phrases, purpose, prepositions",
+    "explanation": "Purpose in/for + -ing describes the reason for doing something: her purpose in organising the meeting was to review turnover."
   },
   {
     "itemId": "kw_0319",
-    "fullSentence": "It may appear odd, the designer has no official qualifications in fashion.",
+    "fullSentence": "It may seem odd that the designer has no formal qualifications in fashion.",
     "gapFill": "Odd ____________________________ formal qualifications in fashion.",
     "keyWord": "lacks",
     "answer": [
-      "as it seems, the designer lacks any",
-      "though it seems, the designer lacks any",
-      "though it appears, the designer lacks any",
-      "as it appears, the designer lacks any",
-      "as it seems, the designer lacks",
-      "though it seems, the designer lacks",
-      "though it appears, the designer lacks",
-      "as it appears, the designer lacks",
-      "though it may appear the designer lacks",
-      "as it may appear the designer lacks",
-      "though it may seem the designer lacks",
-      "though it may appear the designer lacks any",
-      "as it may appear the designer lacks any",
-      "though it may seem the designer lacks any"
+      "as it may seem, the designer lacks any",
+      "though it may seem, the designer lacks any",
+      "as it may seem, the designer lacks",
+      "though it may seem, the designer lacks"
     ],
-    "tags": "C2, concession, contrast, fronting"
+    "tags": "C2, concession, contrast, fronting",
+    "explanation": "Adjective + as/though + subject + may/seem expresses concession: Odd as it may seem, ... means although it may seem odd."
   },
   {
     "itemId": "kw_0320",
@@ -3543,7 +3826,8 @@
       "occurred to me that I could ask",
       "occurred to me I could ask"
     ],
-    "tags": "C2, fixed phrase, past simple, negatives"
+    "tags": "C2, fixed phrase, past simple, negatives",
+    "explanation": "The pattern it occurs to someone to + infinitive means that an idea enters their mind: it never occurred to me to ask."
   },
   {
     "itemId": "kw_0321",
@@ -3551,10 +3835,10 @@
     "gapFill": "No matter ____________________________, I couldn’t convince Mia to attend the show.",
     "keyWord": "hard",
     "answer": [
-      "how hard I tried",
-      "how much I tried"
+      "how hard I tried"
     ],
-    "tags": "C2, concession, emphasis"
+    "tags": "C2, concession, emphasis",
+    "explanation": "No matter how + adjective/adverb expresses concession: no matter how hard I tried = despite all my efforts."
   },
   {
     "itemId": "kw_0322",
@@ -3567,7 +3851,8 @@
       "in the light of new",
       "in light of new"
     ],
-    "tags": "C2, linking, formal, noun phrases, idioms"
+    "tags": "C2, linking, formal, noun phrases, idioms",
+    "explanation": "In light of / in the light of + noun means considering new information or circumstances."
   },
   {
     "itemId": "kw_0323",
@@ -3578,7 +3863,8 @@
       "a sharp rise in the price of",
       "a sharp increase in the price of"
     ],
-    "tags": "C2, noun phrases, quantifiers, trends"
+    "tags": "C2, noun phrases, quantifiers, trends",
+    "explanation": "A change can be expressed with there has been + adjective + noun of change + in: there has been a sharp rise in the price."
   },
   {
     "itemId": "kw_0324",
@@ -3589,7 +3875,8 @@
       "waited for Josh to clear his plate",
       "waited until Josh had cleared his plate"
     ],
-    "tags": "C2, past perfect, time clauses, verb patterns"
+    "tags": "C2, past perfect, time clauses, verb patterns",
+    "explanation": "Wait for + person + to-infinitive focuses on the person completing an action; wait until + clause focuses on the time when it is completed."
   },
   {
     "itemId": "kw_0325",
@@ -3600,7 +3887,8 @@
       "yourself be taken in by",
       "yourself get taken in by"
     ],
-    "tags": "C2, passive voice, reflexive pronouns, idioms, phrasal verbs"
+    "tags": "C2, passive voice, reflexive pronouns, idioms, phrasal verbs",
+    "explanation": "Take someone in means deceive them. In the passive, be/get taken in means be deceived: don't let yourself be taken in."
   },
   {
     "itemId": "kw_0326",
@@ -3613,7 +3901,8 @@
       "there is no dramatic change to",
       "there are no dramatic changes to"
     ],
-    "tags": "C2, conditionals, noun phrases, linking, formal"
+    "tags": "C2, conditionals, noun phrases, linking, formal",
+    "explanation": "Providing/provided (that) introduces a condition and means if or on condition that: providing there is no dramatic change."
   },
   {
     "itemId": "kw_0327",
@@ -3624,7 +3913,8 @@
       "to come to terms with",
       "coming to terms with"
     ],
-    "tags": "C2, idioms, gerunds and infinitives, fixed phrase"
+    "tags": "C2, idioms, gerunds and infinitives, fixed phrase",
+    "explanation": "Come to terms with + noun/-ing means gradually accept a difficult situation: come to terms with losing a job."
   },
   {
     "itemId": "kw_0328",
@@ -3633,15 +3923,16 @@
     "keyWord": "has",
     "answer": [
       "has no intention of visiting",
-      "has no plans of visiting",
+      "has no plans to visit",
       "has no intention of ever visiting",
-      "has no plans of ever visiting"
+      "has no plans to ever visit"
     ],
-    "tags": "C2, fixed phrase, noun phrases, formal, prepositions"
+    "tags": "C2, fixed phrase, noun phrases, formal, prepositions",
+    "explanation": "Have no intention of + -ing and have no plans to + infinitive both express a firm lack of intention."
   },
   {
     "itemId": "kw_0329",
-    "fullSentence": "They made Sam think he would to win the competition.",
+    "fullSentence": "They made Sam think he would win the competition.",
     "gapFill": "Sam ____________________________ he would win the competition.",
     "keyWord": "believe",
     "answer": [
@@ -3650,7 +3941,8 @@
       "was led to believe",
       "was given to believe"
     ],
-    "tags": "C2, passive voice, gerunds and infinitives, formal"
+    "tags": "C2, passive voice, gerunds and infinitives, formal",
+    "explanation": "Be led/given to believe means be made to believe something, often because of what other people have said or implied."
   },
   {
     "itemId": "kw_0330",
@@ -3665,18 +3957,20 @@
       "Kyra realise how hard getting",
       "Kyra suspect how hard getting"
     ],
-    "tags": "C2, inversion, indirect questions, emphasis"
+    "tags": "C2, inversion, indirect questions, emphasis",
+    "explanation": "When little meaning 'not at all' begins a sentence, use inversion: Little does Kyra know how difficult it is."
   },
   {
     "itemId": "kw_0331",
     "fullSentence": "From the moment he spoke, the panel were impressed by his confidence.",
-    "gapFill": "The first speaker ____________________________ the panel.",
+    "gapFill": "He ____________________________ the panel.",
     "keyWord": "made",
     "answer": [
       "made an instant impression on",
       "made an immediate impression on"
     ],
-    "tags": "C2, fixed phrase, noun phrases, formal"
+    "tags": "C2, fixed phrase, noun phrases, formal",
+    "explanation": "Make an impression on someone means have a noticeable effect on their opinion of you: he made an immediate impression on the panel."
   },
   {
     "itemId": "kw_0332",
@@ -3687,7 +3981,8 @@
       "put me at ease with",
       "made me feel at ease with"
     ],
-    "tags": "C2, idioms, verb patterns, noun phrases, prepositions"
+    "tags": "C2, idioms, verb patterns, noun phrases, prepositions",
+    "explanation": "Put someone at ease means make them feel relaxed and comfortable. Be/feel at ease describes the resulting state."
   },
   {
     "itemId": "kw_0333",
@@ -3696,20 +3991,22 @@
     "keyWord": "whatsoever",
     "answer": [
       "were no valuable minerals whatsoever in",
-      "were not any valuable materials whatsoever in"
+      "were not any valuable minerals whatsoever in"
     ],
-    "tags": "C2, emphasis, formal, quantifiers"
+    "tags": "C2, emphasis, formal, quantifiers",
+    "explanation": "Whatsoever can follow a negative noun phrase for strong emphasis: no valuable minerals whatsoever."
   },
   {
     "itemId": "kw_0334",
     "fullSentence": "We’ve made it clear we won’t collaborate with that brand again — no exceptions.",
-    "gapFill": "Under ____________________________ with that band again.",
+    "gapFill": "Under ____________________________ with that brand again.",
     "keyWord": "ever",
     "answer": [
       "no circumstances will we ever collaborate",
       "no circumstances whatsoever will we ever collaborate"
     ],
-    "tags": "C2, inversion, fixed phrase, emphasis"
+    "tags": "C2, inversion, fixed phrase, emphasis",
+    "explanation": "When under no circumstances begins the sentence, use auxiliary-subject inversion: Under no circumstances will we ever collaborate with them."
   },
   {
     "itemId": "kw_0335",
@@ -3719,12 +4016,10 @@
     "answer": [
       "came to the conclusion",
       "came to the realisation",
-      "came to the realization",
-      "came to the conclusion that",
-      "came to the realisation that",
-      "came to the realization that"
+      "came to the realization"
     ],
-    "tags": "C2, fixed phrase, noun phrases, prepositions, formal"
+    "tags": "C2, fixed phrase, noun phrases, prepositions, formal",
+    "explanation": "Come to the conclusion/realisation that means eventually reach a particular understanding or decision."
   },
   {
     "itemId": "kw_0336",
@@ -3738,7 +4033,8 @@
       "was in no mood to do",
       "was in no mood for doing"
     ],
-    "tags": "C2, idioms, noun phrases, prepositions"
+    "tags": "C2, idioms, noun phrases, prepositions",
+    "explanation": "Be in the mood to + infinitive / for + -ing means feel like doing something. In no mood means have no desire to do it."
   },
   {
     "itemId": "kw_0337",
@@ -3749,7 +4045,8 @@
       "was taken aback by the announcement of",
       "was taken aback at the announcement of"
     ],
-    "tags": "C2, passive voice, phrasal verbs, noun phrases"
+    "tags": "C2, passive voice, phrasal verbs, noun phrases",
+    "explanation": "Be taken aback by/at something means be suddenly and strongly surprised or shocked by it."
   },
   {
     "itemId": "kw_0338",
@@ -3759,7 +4056,8 @@
     "answer": [
       "it not been for"
     ],
-    "tags": "C2, inversion, conditionals, formal, emphasis"
+    "tags": "C2, inversion, conditionals, formal, emphasis",
+    "explanation": "A third conditional can omit if and use inversion: Had it not been for ... = If it had not been for ..."
   },
   {
     "itemId": "kw_0339",
@@ -3770,18 +4068,20 @@
       "did with his time was no concern",
       "was doing with his time was no concern"
     ],
-    "tags": "C2, reported speech, noun phrases, cleft sentences, emphasis"
+    "tags": "C2, reported speech, noun phrases, cleft sentences, emphasis",
+    "explanation": "Be no concern of someone's means be none of that person's business: what he did with his time was no concern of hers."
   },
   {
     "itemId": "kw_0340",
     "fullSentence": "I was just about to leave the gym when Leo called.",
-    "gapFill": "I ____________________________ when Leo arrived.",
+    "gapFill": "I ____________________________ when Leo called.",
     "keyWord": "point",
     "answer": [
       "was on the point of leaving the gym",
       "was on the point of leaving"
     ],
-    "tags": "C2, time expressions, fixed phrase, prepositions"
+    "tags": "C2, time expressions, fixed phrase, prepositions",
+    "explanation": "Be on the point of + -ing means be just about to do something: I was on the point of leaving."
   },
   {
     "itemId": "kw_0341",
@@ -3792,7 +4092,8 @@
       "sooner had I got into the taxi than",
       "sooner had I got in the taxi than"
     ],
-    "tags": "C2, inversion, time clauses, past perfect, emphasis"
+    "tags": "C2, inversion, time clauses, past perfect, emphasis",
+    "explanation": "No sooner + past perfect + than expresses two past events happening almost immediately one after the other. Fronting no sooner requires inversion: No sooner had I got in ... than ..."
   },
   {
     "itemId": "kw_0342",
@@ -3808,7 +4109,8 @@
       "did not take notice at all of",
       "did not take any notice whatsoever of"
     ],
-    "tags": "C2, emphasis, fixed phrase, prepositions, noun phrases"
+    "tags": "C2, emphasis, fixed phrase, prepositions, noun phrases",
+    "explanation": "Take notice of means pay attention to. Expressions such as absolutely no, whatsoever and at all can intensify the negative."
   },
   {
     "itemId": "kw_0343",
@@ -3819,7 +4121,8 @@
       "not the first time Erin has left",
       "not the first time that Erin has left"
     ],
-    "tags": "C2, present perfect, time expressions"
+    "tags": "C2, present perfect, time expressions",
+    "explanation": "Use this is not the first time + present perfect when something has happened previously: this is not the first time Erin has left early."
   },
   {
     "itemId": "kw_0344",
@@ -3827,10 +4130,10 @@
     "gapFill": "Sonia is ____________________________ than as a poet.",
     "keyWord": "better",
     "answer": [
-      "better known as a journalist",
-      "better known as a writer"
+      "better known as a journalist"
     ],
-    "tags": "C2, comparatives and superlatives, passive voice, noun phrases, prepositions"
+    "tags": "C2, comparatives and superlatives, passive voice, noun phrases, prepositions",
+    "explanation": "Be better known as X than as Y compares the roles or activities for which someone is recognised."
   },
   {
     "itemId": "kw_0345",
@@ -3841,7 +4144,8 @@
       "has been brought to my attention",
       "has just been brought to my attention"
     ],
-    "tags": "C2, passive voice, formal, present perfect, noun phrases"
+    "tags": "C2, passive voice, formal, present perfect, noun phrases",
+    "explanation": "Bring something to someone's attention means make them aware of it. The passive form is often formal: it has been brought to my attention that ..."
   },
   {
     "itemId": "kw_0346",
@@ -3851,10 +4155,11 @@
     "answer": [
       "complete distrust between",
       "a complete lack of trust between",
-      "a complete absence of trust",
+      "a complete absence of trust between",
       "complete mistrust between"
     ],
-    "tags": "C2, noun phrases, emphasis, quantifiers"
+    "tags": "C2, noun phrases, emphasis, quantifiers",
+    "explanation": "Complete distrust/mistrust or a complete lack/absence of trust expresses that there is no trust at all. Use between for two people."
   },
   {
     "itemId": "kw_0347",
@@ -3865,7 +4170,8 @@
       "made no reference to the impact",
       "did not make any reference to the impact"
     ],
-    "tags": "C2, noun phrases, reporting, prepositions"
+    "tags": "C2, noun phrases, reporting, prepositions",
+    "explanation": "Make reference to is a formal equivalent of mention: she made no reference to the impact of her coach."
   },
   {
     "itemId": "kw_0348",
@@ -3876,18 +4182,19 @@
       "will be held indoors in the event of",
       "will take place indoors in the event of"
     ],
-    "tags": "C2, conditionals, formal, prepositions, linking"
+    "tags": "C2, conditionals, formal, prepositions, linking",
+    "explanation": "In the event of + noun is a formal way of saying if something happens: in the event of his party's victory."
   },
   {
     "itemId": "kw_0349",
-    "fullSentence": "We were surprised when Maya arrived suddenly at the party",
+    "fullSentence": "We were surprised when Maya arrived suddenly at the party.",
     "gapFill": "Maya took _________________________ at the party.",
     "keyWord": "arrival",
     "answer": [
-      "us by surprise with her sudden arrival",
-      "us by surprise by her sudden arrival"
+      "us by surprise with her sudden arrival"
     ],
-    "tags": "C2, fixed phrase, noun phrases"
+    "tags": "C2, fixed phrase, noun phrases",
+    "explanation": "Take someone by surprise means surprise them unexpectedly. With can introduce the event that causes the surprise: took us by surprise with her sudden arrival."
   },
   {
     "itemId": "kw_0350",
@@ -3904,17 +4211,19 @@
       "Nothing that I would like more than",
       "Nothing I would like more than"
     ],
-    "tags": "C2, emphasis, cleft sentences, noun phrases, comparatives and superlatives"
+    "tags": "C2, emphasis, cleft sentences, noun phrases, comparatives and superlatives",
+    "explanation": "Nothing ... more than is an emphatic comparative structure for expressing a strongest preference: there's nothing I would love more than to live abroad."
   },
   {
     "itemId": "kw_0351",
-    "fullSentence": "The manager explained that the executive’s language skills was the sole reason she avoided dismissal.",
-    "gapFill": "The manager explained that had _________________________ executive would have been dismissed.",
+    "fullSentence": "The manager explained that the executive’s language skills were the sole reason she avoided dismissal.",
+    "gapFill": "The manager explained that, _________________________, the executive would have been dismissed.",
     "keyWord": "her",
     "answer": [
-      "it not been for her language skills the"
+      "had it not been for her language skills"
     ],
-    "tags": "C2, conditionals, inversion, emphasis, unreal conditionals"
+    "tags": "C2, conditionals, inversion, emphasis, unreal conditionals",
+    "explanation": "A third conditional can omit if and use inversion: had it not been for something = if it had not been for something."
   },
   {
     "itemId": "kw_0352",
@@ -3925,7 +4234,8 @@
       "no reason to suppose",
       "no grounds to suppose"
     ],
-    "tags": "C2, negation, noun phrases"
+    "tags": "C2, negation, noun phrases",
+    "explanation": "Have no reason/grounds to suppose + clause means have no evidence or basis for believing something."
   },
   {
     "itemId": "kw_0353",
@@ -3935,10 +4245,11 @@
     "answer": [
       "there is a threat of storms",
       "there is the threat of storms",
-      "That there is a threat of storms",
-      "That there is the threat of storms"
+      "that there is a threat of storms",
+      "that there is the threat of storms"
     ],
-    "tags": "C2, probability, noun phrases, future, idioms"
+    "tags": "C2, probability, noun phrases, future, idioms",
+    "explanation": "A threat of + noun means a possibility of something harmful or unpleasant happening: there is a threat of storms."
   },
   {
     "itemId": "kw_0354",
@@ -3948,7 +4259,8 @@
     "answer": [
       "took the technician over four hours to repair"
     ],
-    "tags": "C2, time expressions, verb patterns"
+    "tags": "C2, time expressions, verb patterns",
+    "explanation": "Use it takes + person + period of time + to-infinitive to express how long an activity requires: it took the technician over four hours to repair the server."
   },
   {
     "itemId": "kw_0355",
@@ -3959,20 +4271,21 @@
       "unable to find anywhere",
       "not able to find anywhere"
     ],
-    "tags": "C2, ability, modality, negation"
+    "tags": "C2, ability, modality, negation",
+    "explanation": "Anywhere is commonly used after negatives to mean in any place: I was unable to find anywhere that had the book in stock."
   },
   {
     "itemId": "kw_0356",
     "fullSentence": "I refuse to spend the whole afternoon speaking to technical support operators.",
-    "gapFill": "I _________________________ to technical support operators all afternoon",
+    "gapFill": "I _________________________ to technical support operators all afternoon.",
     "keyWord": "intention",
     "answer": [
       "have no intention of speaking",
       "do not have any intention of speaking",
-      "have not got any intention of speaking",
-      "have little intention of speaking"
+      "have not got any intention of speaking"
     ],
-    "tags": "C2, verb patterns, modality, noun phrases, negation, formal"
+    "tags": "C2, verb patterns, modality, noun phrases, negation, formal",
+    "explanation": "Have no intention of + -ing expresses a firm refusal or decision not to do something: I have no intention of speaking to them all afternoon."
   },
   {
     "itemId": "kw_0357",
@@ -3982,17 +4295,19 @@
     "answer": [
       "passionate debate broke out between"
     ],
-    "tags": "C2, phrasal verbs, noun phrases"
+    "tags": "C2, phrasal verbs, noun phrases",
+    "explanation": "Break out can describe the sudden beginning of an argument, debate, fight or similar event: a passionate debate broke out."
   },
   {
     "itemId": "kw_0358",
-    "fullSentence": "I respect Jasper’s creativity, but his leadership style leaves much to be desired.",
+    "fullSentence": "I respect Jasper’s creativity, but I dislike his leadership style.",
     "gapFill": "Much _________________________ his leadership style.",
     "keyWord": "dislike",
     "answer": [
       "as I respect Jasper’s creativity I dislike"
     ],
-    "tags": "C2, contrast, concession, linking, fronting"
+    "tags": "C2, contrast, concession, linking, fronting",
+    "explanation": "The concessive structure adjective/adverb + as + subject + verb means although: Much as I respect his creativity, I dislike his leadership style."
   },
   {
     "itemId": "kw_0359",
@@ -4002,7 +4317,8 @@
     "answer": [
       "far as I am aware"
     ],
-    "tags": "C2, fixed phrase, linking"
+    "tags": "C2, fixed phrase, linking",
+    "explanation": "As far as I am aware means according to what I know or understand."
   },
   {
     "itemId": "kw_0360",
@@ -4013,7 +4329,8 @@
       "as the reason for the delay",
       "as the reason for a delay"
     ],
-    "tags": "C2, noun phrases, causality, linking"
+    "tags": "C2, noun phrases, causality, linking",
+    "explanation": "Give something as the reason for + noun/-ing means identify it as the cause: technical issues were given as the reason for the delay."
   },
   {
     "itemId": "kw_0361",
@@ -4024,11 +4341,12 @@
       "did not live up to the expectations",
       "failed to live up to the expectations"
     ],
-    "tags": "C2, idioms, noun phrases, phrasal verbs"
+    "tags": "C2, idioms, noun phrases, phrasal verbs",
+    "explanation": "Live up to expectations means be as good as people expected. Fail to live up to expectations means disappoint."
   },
   {
     "itemId": "kw_0362",
-    "fullSentence": "Everyone was surprised when the company changed its objectives",
+    "fullSentence": "Everyone was surprised when the company changed its objectives.",
     "gapFill": "The company’s _________________________ surprise.",
     "keyWord": "took",
     "answer": [
@@ -4036,7 +4354,8 @@
       "change of objectives took everyone by",
       "objective change took everyone by"
     ],
-    "tags": "C2, fixed phrase, noun phrases, prepositions"
+    "tags": "C2, fixed phrase, noun phrases, prepositions",
+    "explanation": "Take someone by surprise means surprise them unexpectedly: the change in objectives took everyone by surprise."
   },
   {
     "itemId": "kw_0363",
@@ -4044,11 +4363,12 @@
     "gapFill": "Only _________________________ to finish his thesis.",
     "keyWord": "did",
     "answer": [
-      "After years of studying did Tomas manage",
+      "after years of studying did Tomas manage",
       "after studying for years did Tomas manage",
-      "After years of study did Tomas manage"
+      "after years of study did Tomas manage"
     ],
-    "tags": "C2, inversion, emphasis, time expressions"
+    "tags": "C2, inversion, emphasis, time expressions",
+    "explanation": "When only + time expression is fronted, use inversion: Only after years of study did Tomas manage to finish his thesis."
   },
   {
     "itemId": "kw_0364",
@@ -4060,7 +4380,8 @@
       "speed with which the temperature would",
       "speed of the temperature"
     ],
-    "tags": "C2, relative clauses, noun phrases, emphasis"
+    "tags": "C2, relative clauses, noun phrases, emphasis",
+    "explanation": "The formal relative structure the speed at/with which ... describes how quickly something happens: the speed at which the temperature changed."
   },
   {
     "itemId": "kw_0365",
@@ -4071,7 +4392,8 @@
       "kept his students in the dark",
       "left his students in the dark"
     ],
-    "tags": "C2, idioms, prepositions"
+    "tags": "C2, idioms, prepositions",
+    "explanation": "Keep/leave someone in the dark means not give them information about something."
   },
   {
     "itemId": "kw_0366",
@@ -4081,7 +4403,8 @@
     "answer": [
       "from being shocked by Max’s"
     ],
-    "tags": "C2, contrast, fixed phrase, linking"
+    "tags": "C2, contrast, fixed phrase, linking",
+    "explanation": "Far from + -ing means the opposite of what might be expected: far from being shocked, his parents seem to enjoy his behaviour."
   },
   {
     "itemId": "kw_0367",
@@ -4089,10 +4412,10 @@
     "gapFill": "Mr Holt _________________________ economist.",
     "keyWord": "reputed",
     "answer": [
-      "is reputed to be a reliable and knowledgeable",
-      "is reputed for being a reliable and knowledgeable"
+      "is reputed to be a reliable and knowledgeable"
     ],
-    "tags": "C2, passive voice, verb patterns"
+    "tags": "C2, passive voice, verb patterns",
+    "explanation": "Be reputed to be + noun/adjective is a formal passive reporting structure meaning be generally believed or considered to be something."
   },
   {
     "itemId": "kw_0368",
@@ -4105,7 +4428,8 @@
       "get a hold of",
       "can get a hold of"
     ],
-    "tags": "C2, fixed phrase, conditionals, informal"
+    "tags": "C2, fixed phrase, conditionals, informal",
+    "explanation": "Get hold of something means obtain or gain access to it. Unless introduces a negative condition: unless I get hold of the results."
   },
   {
     "itemId": "kw_0369",
@@ -4116,17 +4440,19 @@
       "in the hope of getting",
       "with the hope of getting"
     ],
-    "tags": "C2, noun phrases, purpose, verb patterns"
+    "tags": "C2, noun phrases, purpose, verb patterns",
+    "explanation": "In the hope of + -ing means with the aim or expectation of achieving something: in the hope of getting a place."
   },
   {
     "itemId": "kw_0370",
-    "fullSentence": "Silvia believes the journalist has sold the story to another publication.",
+    "fullSentence": "According to Silvia, there are rumours that the journalist has sold the story to another publication.",
     "gapFill": "According to Silvia, the journalist _________________________ the story to another publication.",
     "keyWord": "rumoured",
     "answer": [
       "is rumoured to have sold"
     ],
-    "tags": "C2, reporting verbs, modality, perfect, passive voice, reported speech"
+    "tags": "C2, reporting verbs, modality, perfect, passive voice, reported speech",
+    "explanation": "Use be rumoured + perfect infinitive to refer to a reported earlier action: the journalist is rumoured to have sold the story."
   },
   {
     "itemId": "kw_0371",
@@ -4135,11 +4461,10 @@
     "keyWord": "of",
     "answer": [
       "expectation of the proposal being",
-      "expectation of the proposal’s being",
-      "expectation of her proposal being",
-      "expectation of her proposal’s being"
+      "expectation of the proposal’s being"
     ],
-    "tags": "C2, noun phrases, modality, verb patterns, formal"
+    "tags": "C2, noun phrases, modality, verb patterns, formal",
+    "explanation": "Expectation of + noun/-ing expresses what someone believes is likely to happen: little expectation of the proposal being a success."
   },
   {
     "itemId": "kw_0372",
@@ -4149,7 +4474,8 @@
     "answer": [
       "the exception of logistics"
     ],
-    "tags": "C2, exceptions, prepositions, noun phrases"
+    "tags": "C2, exceptions, prepositions, noun phrases",
+    "explanation": "With the exception of + noun is a formal way of saying except for: with the exception of logistics."
   },
   {
     "itemId": "kw_0373",
@@ -4162,7 +4488,8 @@
       "is keen on is",
       "is really keen on is"
     ],
-    "tags": "C2, verb patterns, emphasis, cleft sentences"
+    "tags": "C2, verb patterns, emphasis, cleft sentences",
+    "explanation": "Be keen on + noun/-ing means be very interested in or enthusiastic about something. A what-cleft can emphasise the activity: What Zoe is keen on is running."
   },
   {
     "itemId": "kw_0374",
@@ -4175,7 +4502,8 @@
       "bears no similarity to",
       "bears little similarity to"
     ],
-    "tags": "C2, emphasis, noun phrases, comparatives and superlatives, formal"
+    "tags": "C2, emphasis, noun phrases, comparatives and superlatives, formal",
+    "explanation": "Bear no/little resemblance to means look or be very different from something else."
   },
   {
     "itemId": "kw_0375",
@@ -4187,7 +4515,8 @@
       "main reason for visiting New York was",
       "primary reason for visiting New York was"
     ],
-    "tags": "C2, noun phrases, purpose, linking"
+    "tags": "C2, noun phrases, purpose, linking",
+    "explanation": "Reason for + -ing describes why someone does something: her main reason for visiting New York was to work on her accent."
   },
   {
     "itemId": "kw_0376",
@@ -4198,25 +4527,21 @@
       "are to be warned about",
       "are to be warned regarding",
       "are to be warned concerning",
-      "are to be warned over",
-      "are expected to be warned about",
-      "are set to be warned about"
+      "are to be warned over"
     ],
-    "tags": "C2, passive voice, modality, formal, future"
+    "tags": "C2, passive voice, modality, formal, future",
+    "explanation": "Be to + passive infinitive can express a formal future plan or arrangement: employees are to be warned about the restructuring plans."
   },
   {
     "itemId": "kw_0377",
     "fullSentence": "It cannot be denied that we’ll need to speed things up if we want to meet the deadline.",
-    "gapFill": "There is  _________________________ we’ll have to work faster to meet the deadline.",
+    "gapFill": "There is _________________________ we’ll have to work faster to meet the deadline.",
     "keyWord": "escaping",
     "answer": [
       "no escaping the fact that",
-      "no escaping the fact",
-      "no way of escaping the fact",
-      "no way of escaping the fact that",
-      "Little escaping the fact that",
-      "Little escaping that fact"
+      "no way of escaping the fact that"
     ],
-    "tags": "C2, fixed phrase, emphasis, modality, probability"
+    "tags": "C2, fixed phrase, emphasis, modality, probability",
+    "explanation": "There is no escaping the fact that ... means an unpleasant or unavoidable reality cannot be denied."
   }
 ]

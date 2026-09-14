@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { AlertCircle, Star } from "lucide-react";
+import { AlertCircle, Lightbulb, Star } from "lucide-react";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import {
@@ -214,6 +214,7 @@ export default function HubKeywordTrainer() {
   const [sendingReport, setSendingReport] = useState(false);
   const [currentSetMode, setCurrentSetMode] = useState("normal");
   const [revealedAnswers, setRevealedAnswers] = useState({});
+  const [revealedExplanations, setRevealedExplanations] = useState({});
   const [initialModeHandled, setInitialModeHandled] = useState(false);
 
   useEffect(() => {
@@ -320,6 +321,7 @@ export default function HubKeywordTrainer() {
     setAnswers({});
     setResults({});
     setRevealedAnswers({});
+    setRevealedExplanations({});
     setReportingIndex(null);
     setReportReason("");
     setReportComment("");
@@ -352,7 +354,10 @@ export default function HubKeywordTrainer() {
 
   async function loadFavouriteChallenges() {
     try {
-      const favourites = (await fetchHubKeywordFavourites()).map(prepareKeywordItem);
+      const latestById = new Map(items.map((item) => [item.itemId, item]));
+      const favourites = (await fetchHubKeywordFavourites()).map((item) =>
+        prepareKeywordItem({ ...item, ...(latestById.get(item.itemId) || {}) })
+      );
       if (!favourites.length) {
         toast("No favourite keyword items yet.");
         return;
@@ -372,7 +377,10 @@ export default function HubKeywordTrainer() {
 
   async function loadRecentMistakes() {
     try {
-      const mistakes = (await fetchHubKeywordMistakes()).map(prepareKeywordItem);
+      const latestById = new Map(items.map((item) => [item.itemId, item]));
+      const mistakes = (await fetchHubKeywordMistakes()).map((item) =>
+        prepareKeywordItem({ ...item, ...(latestById.get(item.itemId) || {}) })
+      );
       const deduped = [];
       const seen = new Set();
 
@@ -462,6 +470,7 @@ export default function HubKeywordTrainer() {
         fullSentence: challenge.fullSentence || "",
         acceptedAnswers: challenge.acceptedAnswers,
         tags: challenge.tags || "",
+        explanation: challenge.explanation || "",
       });
     } catch (error) {
       console.error("[HubKeywordTrainer] record mistake failed", error);
@@ -487,6 +496,7 @@ export default function HubKeywordTrainer() {
           fullSentence: challenge.fullSentence || "",
           answer: challenge.acceptedAnswers,
           tags: challenge.tags || "",
+          explanation: challenge.explanation || "",
         });
         setFavouriteIds((prev) => new Set([...prev, challenge.itemId]));
         toast("Added to favourites.");
@@ -503,7 +513,6 @@ export default function HubKeywordTrainer() {
 
     setSendingReport(true);
     try {
-      const result = results[index];
       await sendReport({
         itemId: challenge.itemId,
         question: `${challenge.fullSentence}\n\n${challenge.gapFill}\n\nKey word: ${challenge.keyWord}`,
@@ -761,6 +770,35 @@ export default function HubKeywordTrainer() {
                   {!result.isCorrect && revealedAnswers[index] && (
                     <p>Possible answers: {result.acceptedAnswers.join(" / ")}</p>
                   )}
+                  {challenge.explanation && (
+                    <div className="hub-keyword-explanation">
+                      <button
+                        type="button"
+                        className="hub-explanation-toggle"
+                        aria-expanded={Boolean(revealedExplanations[index])}
+                        aria-controls={`keyword-explanation-${challenge.itemId}`}
+                        onClick={() =>
+                          setRevealedExplanations((prev) => ({
+                            ...prev,
+                            [index]: !prev[index],
+                          }))
+                        }
+                      >
+                        <Lightbulb size={17} aria-hidden="true" />
+                        {revealedExplanations[index]
+                          ? "Hide explanation"
+                          : "Explain this transformation"}
+                      </button>
+                      {revealedExplanations[index] && (
+                        <p
+                          id={`keyword-explanation-${challenge.itemId}`}
+                          className="hub-explanation-copy"
+                        >
+                          {challenge.explanation}
+                        </p>
+                      )}
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -1008,6 +1046,39 @@ export default function HubKeywordTrainer() {
         .hub-reveal-btn {
           margin-top: 0.7rem;
           align-self: flex-start;
+        }
+        .hub-keyword-explanation {
+          margin-top: 0.75rem;
+          padding-top: 0.7rem;
+          border-top: 1px solid currentColor;
+          border-top-color: color-mix(in srgb, currentColor 22%, transparent);
+        }
+        .hub-explanation-toggle {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.45rem;
+          padding: 0;
+          border: 0;
+          background: transparent;
+          color: inherit;
+          font: inherit;
+          font-weight: 800;
+          cursor: pointer;
+          text-decoration: underline;
+          text-underline-offset: 0.2rem;
+        }
+        .hub-explanation-toggle:hover { filter: brightness(1.15); }
+        .hub-explanation-toggle:focus-visible {
+          outline: 2px solid #93c5fd;
+          outline-offset: 4px;
+          border-radius: 0.25rem;
+        }
+        .hub-keyword-feedback .hub-explanation-copy {
+          margin-top: 0.65rem;
+          padding: 0.75rem 0.85rem;
+          border-radius: 0.7rem;
+          background: rgba(2, 6, 23, 0.28);
+          color: inherit;
         }
         .hub-keyword-token-feedback {
           display: flex;
