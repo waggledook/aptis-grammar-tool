@@ -1,0 +1,31 @@
+OTE Advanced Speaking Part 2 — Teacher Voicemail Bank
+======================================================
+
+The exact read-aloud scripts are stored separately in:
+audio-scripts/ote-advanced-speaking-voicemail-teacher-bank/task-01.txt to task-08.txt
+
+Record each script as the matching MP3 filename in:
+public/audio/ote/speaking/advanced/teacher-voicemail-bank/
+
+Required files
+--------------
+task-01.mp3 — Wrong meeting-room booking
+task-02.mp3 — Feedback after presentations
+task-03.mp3 — Credit for a shared idea
+task-04.mp3 — An angry email about a mark
+task-05.mp3 — A course complaint
+task-06.mp3 — Corrections during client meetings
+task-07.mp3 — Blaming an employee online
+task-08.mp3 — Public error totals
+
+Recording notes
+---------------
+- Use a clear, neutral British-English exam voice.
+- Read only the contents of each individual task file.
+- Do not add the task number, title, filename, preparation time or speaking time.
+- The shared Advanced instructions and “time to think” audio already exist.
+
+Archived superseded audio
+-------------------------
+The six clips recorded from the earlier, unintended draft are preserved in:
+public/audio/ote/speaking/advanced/teacher-voicemail-bank-superseded-draft/

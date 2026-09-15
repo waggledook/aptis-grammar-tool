@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, CheckCircle2, Download, Mic, RotateCcw, Timer } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clipboard, Download, ExternalLink, Mic, RotateCcw, Timer } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import SpeakingFeedbackPanel from "../../components/speaking/SpeakingFeedbackPanel.jsx";
@@ -10,6 +10,10 @@ import {
   saveSpeakingAiFeedback,
 } from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
+import {
+  OTE_ADVANCED_VOICEMAIL_TEACHER_GROUPS,
+  OTE_ADVANCED_VOICEMAIL_TEACHER_TASKS,
+} from "./data/oteAdvancedVoicemailTeacherTasks.js";
 import { OTE_SPEAKING_AUDIO } from "./mockTests/data/oteSpeakingMockData.js";
 import { recordingsToFeedbackAudio } from "./utils/speakingFeedback.js";
 import OteAssignableCard from "./OteAssignableCard.jsx";
@@ -367,7 +371,9 @@ function getSupportedMimeType() {
 }
 
 function buildTaskSpeech(task) {
-  return `${task.lead} In your message, you should: ${task.bullets.join("; ")}.`;
+  const lead = String(task.lead || "").trim();
+  const introducesBullets = /(?:and|should):$/i.test(lead);
+  return `${lead}${introducesBullets ? "" : " In your message, you should:"} ${task.bullets.join("; ")}.`;
 }
 
 function useSpeech() {
@@ -528,16 +534,27 @@ async function createZipAndDownload(files, zipName = "ote-voicemail-practice.zip
   URL.revokeObjectURL(url);
 }
 
-export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = null, onRequireSignIn }) {
+export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = null, onRequireSignIn, teacherBank = false }) {
   const { setId } = useParams();
   const navigate = useNavigate();
   const { speakingId, playAudioFile, playCueThenSpeak, speak, stop } = useSpeech();
   const menuPath = getSitePath(nativeRoutes ? "/speaking/part-2-voicemails" : "/ote/speaking/part-2-voicemails");
-  const rawBasePath = nativeRoutes ? "/speaking/part-2-voicemails/practice" : "/ote/speaking/part-2-voicemails/practice";
+  const teacherResourcesPath = getSitePath("/teacher-resources");
+  const rawBasePath = teacherBank
+    ? nativeRoutes
+      ? "/speaking/part-2-voicemails/teacher-bank"
+      : "/ote/speaking/part-2-voicemails/teacher-bank"
+    : nativeRoutes
+      ? "/speaking/part-2-voicemails/practice"
+      : "/ote/speaking/part-2-voicemails/practice";
   const basePath = getSitePath(rawBasePath);
   const getSetPath = (id) => getSitePath(`${rawBasePath}/${id}`);
-  const isAdvanced = user?.oteVersion === "advanced";
-  const activeSets = isAdvanced ? ADVANCED_PRACTICE_SETS : PRACTICE_SETS;
+  const isAdvanced = teacherBank || user?.oteVersion === "advanced";
+  const activeSets = teacherBank
+    ? OTE_ADVANCED_VOICEMAIL_TEACHER_TASKS
+    : isAdvanced
+      ? ADVANCED_PRACTICE_SETS
+      : PRACTICE_SETS;
   const activeInstructions = isAdvanced ? ADVANCED_VOICEMAIL_INSTRUCTIONS : VOICEMAIL_INSTRUCTIONS;
   const selectedSet = useMemo(() => activeSets.find((item) => item.id === setId), [activeSets, setId]);
   const completedProgress = useOteTrainingProgress();
@@ -550,6 +567,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
   const [feedbackResult, setFeedbackResult] = useState(null);
   const [feedbackLoading, setFeedbackLoading] = useState(false);
   const [feedbackError, setFeedbackError] = useState("");
+  const [copiedSetId, setCopiedSetId] = useState("");
 
   const streamRef = useRef(null);
   const activeRunStreamRef = useRef(null);
@@ -565,6 +583,8 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
   const activeTask = selectedSet?.tasks?.[activeIndex];
   const complete = selectedSet && recordings.length >= selectedSet.tasks.length;
   const assignmentVariant = isAdvanced ? "advanced" : "general";
+  const progressPrefix = teacherBank ? "speaking.part2.teacher-bank" : "speaking.part2.practice";
+  const activityMode = teacherBank ? "voicemail_teacher_bank" : "voicemail_practice";
   const getPrepSeconds = (task) => task?.prepSeconds || (isAdvanced ? 10 : 20);
 
   useEffect(() => {
@@ -573,12 +593,12 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     logOteTrainingCompleted({
       section: "speaking",
       part: "part-2",
-      mode: "voicemail_practice",
+      mode: activityMode,
       setId: selectedSet.id,
       setTitle: selectedSet.title,
       recordingCount: recordings.length,
     });
-  }, [complete, recordings.length, selectedSet]);
+  }, [activityMode, complete, recordings.length, selectedSet]);
 
   function buildAssignmentItem(set) {
     return {
@@ -587,8 +607,8 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
       category: "Speaking",
       label: `Part 2: ${set.title}`,
       routePath: getSetPath(set.id),
-      progressId: `speaking.part2.practice.${set.id}`,
-      parentProgressId: "speaking.part2.practice",
+      progressId: `${progressPrefix}.${set.id}`,
+      parentProgressId: teacherBank ? "" : "speaking.part2.practice",
     };
   }
 
@@ -616,7 +636,22 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     activityStartedRef.current = false;
     activityCompletedRef.current = false;
     stop();
-  }, [setId, isAdvanced]);
+  }, [setId, isAdvanced, teacherBank]);
+
+  async function copyStudentLink(set) {
+    const relativeUrl = getSetPath(set.id);
+    const shareUrl = typeof window === "undefined"
+      ? relativeUrl
+      : new URL(relativeUrl, window.location.origin).toString();
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedSetId(set.id);
+      window.setTimeout(() => setCopiedSetId((current) => current === set.id ? "" : current), 1800);
+    } catch (error) {
+      console.warn("[OTE teacher bank] Could not copy student link", error);
+      window.prompt("Copy this student link:", shareUrl);
+    }
+  }
 
   async function ensureStream() {
     if (streamRef.current) return streamRef.current;
@@ -705,7 +740,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
       logOteTrainingStarted({
         section: "speaking",
         part: "part-2",
-        mode: "voicemail_practice",
+        mode: activityMode,
         setId: selectedSet.id,
         setTitle: selectedSet.title,
         taskCount: selectedSet.tasks.length,
@@ -721,7 +756,8 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
     );
     if (listeningWasSkipped(stream)) return;
     if (activeTask.taskAudioSrc) {
-      await playAudioFile(`task-${activeTask.id}`, activeTask.taskAudioSrc);
+      const played = await playAudioFile(`task-${activeTask.id}`, activeTask.taskAudioSrc);
+      if (!played) await speak(`task-fallback-${activeTask.id}`, taskSpeech);
     } else {
       await speak(`task-${activeTask.id}`, taskSpeech);
     }
@@ -831,7 +867,7 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
       logOteTrainingCompleted({
         section: "speaking",
         part: "part-2",
-        mode: "voicemail_practice",
+        mode: activityMode,
         setId: selectedSet.id,
         setTitle: selectedSet.title,
         recordingCount: recordings.length,
@@ -901,37 +937,64 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
   if (!selectedSet) {
     return (
       <main className="ote-training-page">
-        <Seo title="OTE Speaking Part 2 Practice | Seif English" description="Timed voicemail practice sets for OTE Speaking Part 2." />
-        <button className="ote-training-back" type="button" onClick={() => navigate(menuPath)}>
+        <Seo
+          title={teacherBank ? "OTE Advanced Voicemail Teacher Bank | Seif English" : "OTE Speaking Part 2 Practice | Seif English"}
+          description={teacherBank ? "Shareable Advanced OTE Speaking Part 2 voicemail tasks." : "Timed voicemail practice sets for OTE Speaking Part 2."}
+        />
+        <button className="ote-training-back" type="button" onClick={() => navigate(teacherBank ? teacherResourcesPath : menuPath)}>
           <ArrowLeft size={18} aria-hidden="true" />
-          Back to voicemail training
+          {teacherBank ? "Back to teacher resources" : "Back to voicemail training"}
         </button>
         <header className="ote-training-hero">
-          <p className="ote-kicker">Practice</p>
-          <h1>Voicemail Practice Sets</h1>
+          <p className="ote-kicker">{teacherBank ? "Teacher task bank" : "Practice"}</p>
+          <h1>{teacherBank ? "Advanced Voicemail Tasks" : "Voicemail Practice Sets"}</h1>
           <p>
-            {isAdvanced
+            {teacherBank
+              ? "Choose from eight diplomatic voice-message tasks in two themed sets. Open one in class or copy its direct student link. These extra tasks do not appear in the learner menu."
+              : isAdvanced
               ? "Choose a set. Each one gives you a diplomatic voice message task with some time to think and 40 seconds to speak."
               : "Choose a set. Each one includes a polite Message 1 task and a friendly Message 2 reply."}
           </p>
         </header>
         <div className="ote-practice-set-grid">
-          {activeSets.map((set, index) => (
-            <OteAssignableCard
-              key={set.id}
-              user={user}
-              item={buildAssignmentItem(set)}
-              className={`ote-practice-set-card ${completedProgress.has(`speaking.part2.practice.${set.id}`) ? "is-complete" : ""}`}
-              onClick={() => navigate(getSetPath(set.id))}
-            >
-              {completedProgress.has(`speaking.part2.practice.${set.id}`) ? (
-                <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" />
-              ) : null}
-              <span>Set {index + 1}</span>
-              <h2>{set.title}</h2>
-              <p>{set.description}</p>
-            </OteAssignableCard>
-          ))}
+          {activeSets.map((set, index) => {
+            const isComplete = completedProgress.has(`${progressPrefix}.${set.id}`);
+            if (teacherBank) {
+              const group = OTE_ADVANCED_VOICEMAIL_TEACHER_GROUPS.find((item) => item.id === set.groupId);
+              return (
+                <article className={`ote-practice-set-card ote-teacher-bank-card ${isComplete ? "is-complete" : ""}`} key={set.id}>
+                  {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+                  <span>{group?.label} · Task {index + 1}</span>
+                  <strong className="ote-teacher-bank-group-title">{group?.title}</strong>
+                  <h2>{set.title}</h2>
+                  <p>{set.description}</p>
+                  <div className="ote-teacher-bank-card-actions">
+                    <button type="button" onClick={() => navigate(getSetPath(set.id))}>
+                      <ExternalLink size={16} aria-hidden="true" /> Open task
+                    </button>
+                    <button type="button" onClick={() => copyStudentLink(set)}>
+                      <Clipboard size={16} aria-hidden="true" />
+                      {copiedSetId === set.id ? "Link copied" : "Copy student link"}
+                    </button>
+                  </div>
+                </article>
+              );
+            }
+            return (
+              <OteAssignableCard
+                key={set.id}
+                user={user}
+                item={buildAssignmentItem(set)}
+                className={`ote-practice-set-card ${isComplete ? "is-complete" : ""}`}
+                onClick={() => navigate(getSetPath(set.id))}
+              >
+                {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+                <span>Set {index + 1}</span>
+                <h2>{set.title}</h2>
+                <p>{set.description}</p>
+              </OteAssignableCard>
+            );
+          })}
         </div>
       </main>
     );
@@ -943,14 +1006,17 @@ export default function OteSpeakingPart2Practice({ nativeRoutes = false, user = 
 
   return (
     <main className="ote-training-page">
-      <Seo title={`${selectedSet.title} | OTE Voicemail Practice`} description="Timed OTE Speaking Part 2 voicemail practice." />
+      <Seo
+        title={`${selectedSet.title} | OTE ${isAdvanced ? "Advanced " : ""}Voicemail Practice`}
+        description={`Timed OTE ${isAdvanced ? "Advanced " : ""}Speaking Part 2 voicemail practice.`}
+      />
       <button className="ote-training-back" type="button" onClick={() => navigate(basePath)}>
         <ArrowLeft size={18} aria-hidden="true" />
-        Back to practice sets
+        {teacherBank ? "Back to teacher task bank" : "Back to practice sets"}
       </button>
 
       <header className="ote-training-hero">
-        <p className="ote-kicker">Practice set</p>
+        <p className="ote-kicker">{teacherBank ? "Teacher bank task" : "Practice set"}</p>
         <h1>{selectedSet.title}</h1>
         <p>
           {isAdvanced

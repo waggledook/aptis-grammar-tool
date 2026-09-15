@@ -1712,6 +1712,8 @@ return (
   />
   <Route path="/ote/speaking/part-2-voicemails/practice" element={<OteSpeakingPart2Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/part-2-voicemails/practice/:setId" element={<OteSpeakingPart2Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
+  <Route path="/ote/speaking/part-2-voicemails/teacher-bank" element={<OteSpeakingPart2Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} teacherBank />} />
+  <Route path="/ote/speaking/part-2-voicemails/teacher-bank/:setId" element={<OteSpeakingPart2Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} teacherBank />} />
   <Route path="/ote/speaking/part-3-summary/practice" element={<OteSpeakingPart3SummaryPractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/part-3-summary/practice/:setId" element={<OteSpeakingPart3SummaryPractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/part-3-summary/language" element={<OteSpeakingPart3LanguageReference nativeRoutes={false} />} />
@@ -1930,6 +1932,8 @@ return (
   />
   <Route path="/speaking/part-2-voicemails/practice" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/speaking/part-2-voicemails/practice/:setId" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
+  <Route path="/speaking/part-2-voicemails/teacher-bank" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} teacherBank />} />
+  <Route path="/speaking/part-2-voicemails/teacher-bank/:setId" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} teacherBank />} />
   <Route path="/speaking/part-3-summary/practice" element={<OteSpeakingPart3SummaryPractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/speaking/part-3-summary/practice/:setId" element={<OteSpeakingPart3SummaryPractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/speaking/part-3-summary/language" element={<OteSpeakingPart3LanguageReference nativeRoutes={isOteSite} />} />

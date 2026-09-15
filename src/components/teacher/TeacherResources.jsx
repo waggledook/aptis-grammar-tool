@@ -122,9 +122,16 @@ const PRODUCT_GROUPS = [
     eyebrow: "OTE Seif",
     title: "OTE classroom resources",
     description:
-      "Advanced reading extensions and teacher-controlled live activities. Student-facing live rooms are opened with a PIN or shared link.",
+      "Advanced reading and speaking extensions, plus teacher-controlled live activities. Student-facing resources are opened with a PIN or shared link.",
     accent: "violet",
     resources: [
+      {
+        title: "Advanced voicemail task bank",
+        description: "Eight extra diplomatic voice-message tasks in two themed sets, with individual student links, timed recording and AI feedback.",
+        path: "/ote/speaking/part-2-voicemails/teacher-bank",
+        icon: Mic2,
+        tags: ["Advanced Speaking", "Direct link", "8 tasks"],
+      },
       {
         title: "C1 gapped-text classroom sets",
         description: "Two extra Part 3 texts that do not count towards learner completion.",

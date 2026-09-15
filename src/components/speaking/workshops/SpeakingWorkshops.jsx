@@ -25,6 +25,8 @@ import SpeakingPart4 from "../SpeakingPart4";
 import SpeakingWorkshopAccessGate from "./SpeakingWorkshopAccessGate";
 import SpeakingWorkshopSessionManager from "./SpeakingWorkshopSessionManager";
 import HomeNeighbourhoodPreparation from "./HomeNeighbourhoodPreparation";
+import FoodEatingPreparation from "./FoodEatingPreparation";
+import EducationLearningPreparation from "./EducationLearningPreparation";
 import RelationshipsPreparation from "./RelationshipsPreparation";
 import SpeakingReference from "./SpeakingReference";
 import TechnologyCommunicationPreparation from "./TechnologyCommunicationPreparation";
@@ -52,6 +54,8 @@ const PREPARATION_COMPONENTS = {
   "travel-transport": TransportPreparation,
   "home-neighbourhood": HomeNeighbourhoodPreparation,
   "technology-communication": TechnologyCommunicationPreparation,
+  "food-eating": FoodEatingPreparation,
+  "education-learning": EducationLearningPreparation,
 };
 
 const PART_ICONS = {
@@ -200,9 +204,11 @@ function WorkshopLanding({ navigate, access, user }) {
               <span className="workshop-topic-copy">
                 <span className="workshop-topic-eyebrow">{topic.ready
                   ? "Workshop topic"
-                  : topic.visualsReady
-                    ? "Teacher preview · preparation pending"
-                    : "Teacher preview · visuals pending"}</span>
+                  : topic.preparationReady && topic.referenceReady === false
+                    ? "Teacher preview · reference pending"
+                    : topic.visualsReady
+                      ? "Teacher preview · preparation pending"
+                      : "Teacher preview · visuals pending"}</span>
                 <h2>{topic.title}</h2>
                 <p>{topic.summary}</p>
                 <span className="workshop-topic-footer">
@@ -241,9 +247,11 @@ function TopicModeChoice({ topic, navigate, access }) {
         <h1>{topic.title}</h1>
         <p>{topic.summary}</p>
         {!topic.ready ? (
-          <strong className="workshop-draft-notice">{topic.visualsReady
-            ? "Teacher preview: task bank and visuals ready · preparation pending"
-            : "Teacher preview: question bank wired · visuals and preparation pending"}</strong>
+          <strong className="workshop-draft-notice">{topic.preparationReady && topic.referenceReady === false
+            ? "Teacher preview: task bank, visuals and preparation ready · reference pending"
+            : topic.visualsReady
+              ? "Teacher preview: task bank and visuals ready · preparation pending"
+              : "Teacher preview: question bank wired · visuals and preparation pending"}</strong>
         ) : null}
       </section>
 

@@ -272,7 +272,7 @@ function SpeakingRehearsal({ rehearsal, onComplete, onOpenReference }) {
           <p className="prep-support-note">Nothing is recorded. Start when you are ready and keep talking until the timer finishes.</p>
           <div className="prep-timer-actions">
             {!attempted ? <button className="workshop-primary" type="button" onClick={() => setRunning((value) => !value)}>{running ? "Pause" : secondsLeft < 45 ? "Continue" : "Start"}</button> : <button className="workshop-primary" type="button" onClick={startAgain}>Try again</button>}
-            <button className="workshop-secondary" type="button" onClick={onOpenReference}>Language guide</button>
+            {onOpenReference ? <button className="workshop-secondary" type="button" onClick={onOpenReference}>Language guide</button> : null}
           </div>
         </div>
       </div>
@@ -458,7 +458,7 @@ export function WorkshopPreparation({ topic, user, config, workshopSessions = []
           <p>{config.writeTest ? "Learn 16 useful expressions, choose ideas, complete a short writing check, then rehearse once. Allow about 15–18 minutes." : "Learn 16 useful expressions, choose ideas you can discuss, then try one short rehearsal. Allow about 12–15 minutes."}</p>
         </div>
         <div className="workshop-session-header-actions">
-          <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/reference`)}>Language guide</button>
+          {topic.referenceReady !== false ? <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/reference`)}>Language guide</button> : null}
           <button className="workshop-secondary" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}`)}>Change mode</button>
         </div>
       </header>
@@ -479,8 +479,8 @@ export function WorkshopPreparation({ topic, user, config, workshopSessions = []
       {chapterIndex === 1 ? <VocabularyChapter key="set-b" set={config.sets[1]} chapterId="set-b" chapterIndex={1} setChapterIndex={setChapterIndex} onComplete={completeChapter} /> : null}
       {chapterIndex === 2 ? <ReviewChapter key="review" config={config} setChapterIndex={setChapterIndex} onComplete={completeChapter} /> : null}
       {chapterIndex === 3 && config.writeTest ? <WritingTest writeTest={config.writeTest} onComplete={() => { completeChapter("write"); setChapterIndex(4); }} /> : null}
-      {chapterIndex === 3 && !config.writeTest ? <SpeakingRehearsal rehearsal={config.rehearsal} onOpenReference={() => navigate(`/speaking-workshops/${topic.id}/reference`)} onComplete={() => completeChapter("speak")} /> : null}
-      {chapterIndex === 4 && config.writeTest ? <SpeakingRehearsal rehearsal={config.rehearsal} onOpenReference={() => navigate(`/speaking-workshops/${topic.id}/reference`)} onComplete={() => completeChapter("speak")} /> : null}
+      {chapterIndex === 3 && !config.writeTest ? <SpeakingRehearsal rehearsal={config.rehearsal} onOpenReference={topic.referenceReady !== false ? () => navigate(`/speaking-workshops/${topic.id}/reference`) : null} onComplete={() => completeChapter("speak")} /> : null}
+      {chapterIndex === 4 && config.writeTest ? <SpeakingRehearsal rehearsal={config.rehearsal} onOpenReference={topic.referenceReady !== false ? () => navigate(`/speaking-workshops/${topic.id}/reference`) : null} onComplete={() => completeChapter("speak")} /> : null}
     </div>
   );
 }

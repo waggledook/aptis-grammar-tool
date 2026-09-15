@@ -1,9 +1,13 @@
 import { homeNeighbourhoodReferenceSheet } from "./homeNeighbourhoodReferenceData";
 import { technologyCommunicationReferenceSheet } from "./technologyCommunicationReferenceData";
+import { foodEatingReferenceSheet } from "./foodEatingReferenceData";
+import { educationLearningReferenceSheet } from "./educationLearningReferenceData";
 
 export const SPEAKING_REFERENCE_SHEETS = {
   "home-neighbourhood": homeNeighbourhoodReferenceSheet,
   "technology-communication": technologyCommunicationReferenceSheet,
+  "food-eating": foodEatingReferenceSheet,
+  "education-learning": educationLearningReferenceSheet,
   "relationships-family": {
     title: "Relationships & Family",
     eyebrow: "Speaking language guide",

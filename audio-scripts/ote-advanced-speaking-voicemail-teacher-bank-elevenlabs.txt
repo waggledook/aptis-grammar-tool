@@ -1,0 +1,29 @@
+You work for a company. You were responsible for reserving the main meeting room for a visit from an important supplier tomorrow. You have just discovered that you accidentally booked it for the wrong day, and no other large room is currently available. Leave a voice message for your manager, Rebecca Cole, and: explain what happened; say how this may affect the visit; suggest a way to solve the problem.
+
+<break time="3s" />
+
+You study at college. Your tutor, Dr Harris, plans to ask students to give detailed critical feedback immediately after each class presentation. You think this could embarrass some students, particularly those who are less confident, and make the discussion less honest. Leave a voice message for your tutor and: acknowledge the purpose of the activity; explain why you are concerned; suggest a different way for students to give useful feedback.
+
+<break time="3s" />
+
+You work for a company. At yesterday's meeting, your colleague, Laura Bennett, presented an idea that you had developed together but described it as her own. Your manager praised her for the idea and now expects her to lead the project. Leave a voice message for Laura and: explain why you are disappointed; say why the situation should be corrected; suggest how you could explain both contributions to your manager.
+
+<break time="3s" />
+
+You study at college. A first-year student you mentor, Luca, has received a low mark and has written an angry email accusing his tutor of unfair treatment. He plans to send it immediately and has asked for your opinion. Leave a voice message for Luca and: acknowledge why he is disappointed; explain your concern about the email; suggest a more effective way to discuss the mark with his tutor first.
+
+<break time="3s" />
+
+You study at college. Your course representative, Amir, has written a formal complaint about changes to the timetable and has asked you to sign it. You agree that the changes have caused problems, but several claims in the complaint are exaggerated. Leave a voice message for Amir and: acknowledge the students' concerns; explain why you cannot sign the complaint; suggest how the complaint could be revised before it is sent.
+
+<break time="3s" />
+
+You work for a company. A junior colleague, Ben Turner, has started correcting other team members whenever they make small mistakes during meetings with clients. Ben is usually right, but some colleagues feel undermined and the meetings have become uncomfortable. Leave a voice message for Ben and: acknowledge his intention to provide accurate information; explain how his corrections affect the team; suggest a more professional approach for future client meetings.
+
+<break time="3s" />
+
+You study at college. A careers event was badly organized, and several students have complained. Another student, Chloe, now wants to publish an online post blaming one college employee by name. You think this would be unfair because several people were involved. Leave a voice message for Chloe and: acknowledge the problems with the event; explain your concern about the post; suggest a more appropriate way to make a complaint.
+
+<break time="3s" />
+
+You work for a company. Your manager, Olivia Grant, plans to display each employee's monthly error total on a board in the main office. She believes this will encourage staff to be more careful. You are concerned about the effect on the team. Leave a voice message for Olivia and: acknowledge what she wants to achieve; explain why you disagree with the plan; suggest a different way to improve accuracy.
