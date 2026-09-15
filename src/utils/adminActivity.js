@@ -113,6 +113,8 @@ export const ACTIVITY_TYPE_LABELS = {
   aptis_mock_completed: "Aptis Grammar & Vocabulary Mock Completed",
   aptis_reading_mock_started: "Aptis Reading Mock Started",
   aptis_reading_mock_completed: "Aptis Reading Mock Completed",
+  aptis_speaking_mock_started: "Aptis Speaking Mock Started",
+  aptis_speaking_mock_completed: "Aptis Speaking Mock Completed",
   ote_register_checked: "OTE Register Checked",
   ote_level_test_selected: "OTE Level Test Selected",
   ote_level_test_started: "OTE Level Test Started",

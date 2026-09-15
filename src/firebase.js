@@ -1612,6 +1612,24 @@ export async function logOteMockCompleted(details = {}) {
   return logOteActivity("ote_mock_completed", details);
 }
 
+export async function logAptisSpeakingMockStarted(details = {}) {
+  return logActivity("aptis_speaking_mock_started", {
+    product: "aptis",
+    section: "speaking",
+    mode: "full-mock",
+    ...details,
+  });
+}
+
+export async function logAptisSpeakingMockCompleted(details = {}) {
+  return logActivity("aptis_speaking_mock_completed", {
+    product: "aptis",
+    section: "speaking",
+    mode: "full-mock",
+    ...details,
+  });
+}
+
 export async function logOteRegisterChecked(details = {}) {
   return logOteActivity("ote_register_checked", details);
 }

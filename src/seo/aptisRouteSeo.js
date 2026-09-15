@@ -91,6 +91,11 @@ export const APTIS_ROUTE_SEO = {
     description:
       "Practise all parts of the Aptis Speaking test: personal questions, photo description, compare and discuss, and a short presentation.",
   },
+  "/speaking/mock-tests": {
+    title: "Aptis General Speaking Mock Test | Seif Aptis Trainer",
+    description:
+      "Complete a four-part Aptis General Speaking mock with timed prompts, microphone recording, downloads and optional AI transcript feedback.",
+  },
   "/speaking/part1": {
     title: "Aptis Speaking Part 1 Practice | Seif Aptis Trainer",
     description:

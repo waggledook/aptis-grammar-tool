@@ -1,0 +1,17 @@
+You work for a company. You sent a price estimate to a customer this morning. You have now realised that you used an old price list and the estimate is too low. The customer has replied to accept it. Your manager, Paula, is meeting the customer today. Leave a voice message for Paula and: explain the mistake; recommend how Paula should handle the meeting; offer to help resolve the situation.
+
+<break time="3s" />
+
+You work for a company. Your manager, Louise, has asked you to write a performance review for a new colleague by tomorrow morning. You have only worked directly with him twice, but Louise needs the review before deciding whether to extend his contract. Leave a voice message for Louise and: explain why you cannot complete the review fairly; say why using it could be risky; suggest another source of feedback.
+
+<break time="3s" />
+
+You study at college. Your class representative, Alex, wants to choose speakers for an important college event by asking students to vote publicly in class. Alex thinks this will produce a quick decision, but several interested students are shy and less well known. Leave a voice message for Alex and: give your opinion of the plan; explain how the vote could affect some students; recommend a fairer selection method instead.
+
+<break time="3s" />
+
+You study at college. Your coursemate, Priya, has written a complaint about a lecturer and plans to send it. You agree that the problem she describes is serious, but the message makes personal claims about the lecturer without giving any evidence. Leave a voice message for Priya and: say which part of the complaint you support; explain the risk of including personal claims; recommend how Priya should revise the message.
+
+<break time="3s" />
+
+You work for a company. Your manager, Victor, wants you to contact colleagues on annual leave because they know how to solve a customer problem. The customer expects an answer today, but the colleagues had been promised they would not be disturbed. Leave a voice message for Victor and: tell Victor whether you will contact them; explain the reasons for your decision; suggest what Victor could tell the customer instead.

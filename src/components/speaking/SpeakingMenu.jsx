@@ -64,14 +64,13 @@ export default function SpeakingMenu({ user, aptisAccess, onSignIn }) {
           <h3>Complete speaking test</h3>
           <p>Do the whole speaking paper in exam conditions when you want a fuller challenge.</p>
         </div>
-        <a
-          href="https://aptis-gen.speaking1.beeskillsenglish.com/"
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          type="button"
+          onClick={() => navigate("/speaking/mock-tests")}
           className="mock-test-btn menu-cta-btn"
         >
           Open complete test
-        </a>
+        </button>
       </section>
 
       <button className="topbar-btn speaking-menu-back listening-menu-back" type="button" onClick={() => navigate("/")}>

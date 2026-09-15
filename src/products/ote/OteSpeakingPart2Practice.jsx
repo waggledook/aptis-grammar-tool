@@ -358,6 +358,126 @@ const ADVANCED_PRACTICE_SETS = [
       },
     ],
   },
+  {
+    id: "advanced-set-6",
+    title: "Incorrect Price Estimate",
+    description: "Take responsibility for an incorrect customer estimate and help resolve it.",
+    tasks: [
+      {
+        id: "advanced-set-6-message",
+        type: "advanced-diplomatic",
+        label: "Voice message",
+        title: "Incorrect Price Estimate",
+        audience: "Manager",
+        taskAudioSrc: "/audio/ote/speaking/advanced/part2-prompts/advanced-set-6-message.mp3",
+        lead:
+          "You work for a company. You sent a price estimate to a customer this morning. You have now realised that you used an old price list and the estimate is too low. The customer has replied to accept it. Your manager, Paula, is meeting the customer today. Leave a voice message for Paula and:",
+        bullets: [
+          "explain the mistake",
+          "recommend how Paula should handle the meeting",
+          "offer to help resolve the situation",
+        ],
+        prepSeconds: 10,
+        responseSeconds: 40,
+      },
+    ],
+  },
+  {
+    id: "advanced-set-7",
+    title: "An Unfair Performance Review",
+    description: "Explain why you cannot assess a colleague fairly and suggest better evidence.",
+    tasks: [
+      {
+        id: "advanced-set-7-message",
+        type: "advanced-diplomatic",
+        label: "Voice message",
+        title: "An Unfair Performance Review",
+        audience: "Manager",
+        taskAudioSrc: "/audio/ote/speaking/advanced/part2-prompts/advanced-set-7-message.mp3",
+        lead:
+          "You work for a company. Your manager, Louise, has asked you to write a performance review for a new colleague by tomorrow morning. You have only worked directly with him twice, but Louise needs the review before deciding whether to extend his contract. Leave a voice message for Louise and:",
+        bullets: [
+          "explain why you cannot complete the review fairly",
+          "say why using it could be risky",
+          "suggest another source of feedback",
+        ],
+        prepSeconds: 10,
+        responseSeconds: 40,
+      },
+    ],
+  },
+  {
+    id: "advanced-set-8",
+    title: "Choosing Student Speakers",
+    description: "Challenge a public vote and recommend a fairer selection method.",
+    tasks: [
+      {
+        id: "advanced-set-8-message",
+        type: "advanced-diplomatic",
+        label: "Voice message",
+        title: "Choosing Student Speakers",
+        audience: "Class representative",
+        taskAudioSrc: "/audio/ote/speaking/advanced/part2-prompts/advanced-set-8-message.mp3",
+        lead:
+          "You study at college. Your class representative, Alex, wants to choose speakers for an important college event by asking students to vote publicly in class. Alex thinks this will produce a quick decision, but several interested students are shy and less well known. Leave a voice message for Alex and:",
+        bullets: [
+          "give your opinion of the plan",
+          "explain how the vote could affect some students",
+          "recommend a fairer selection method instead",
+        ],
+        prepSeconds: 10,
+        responseSeconds: 40,
+      },
+    ],
+  },
+  {
+    id: "advanced-set-9",
+    title: "A Strongly Worded Complaint",
+    description: "Support a serious complaint while recommending a fairer, evidence-based message.",
+    tasks: [
+      {
+        id: "advanced-set-9-message",
+        type: "advanced-diplomatic",
+        label: "Voice message",
+        title: "A Strongly Worded Complaint",
+        audience: "Coursemate",
+        taskAudioSrc: "/audio/ote/speaking/advanced/part2-prompts/advanced-set-9-message.mp3",
+        lead:
+          "You study at college. Your coursemate, Priya, has written a complaint about a lecturer and plans to send it. You agree that the problem she describes is serious, but the message makes personal claims about the lecturer without giving any evidence. Leave a voice message for Priya and:",
+        bullets: [
+          "say which part of the complaint you support",
+          "explain the risk of including personal claims",
+          "recommend how Priya should revise the message",
+        ],
+        prepSeconds: 10,
+        responseSeconds: 40,
+      },
+    ],
+  },
+  {
+    id: "advanced-set-10",
+    title: "Contacting Colleagues on Leave",
+    description: "Balance an urgent customer problem against colleagues' agreed time off.",
+    tasks: [
+      {
+        id: "advanced-set-10-message",
+        type: "advanced-diplomatic",
+        label: "Voice message",
+        title: "Contacting Colleagues on Leave",
+        audience: "Manager",
+        taskAudioSrc: "/audio/ote/speaking/advanced/part2-prompts/advanced-set-10-message.mp3",
+        lead:
+          "You work for a company. Your manager, Victor, wants you to contact colleagues on annual leave because they know how to solve a customer problem. The customer expects an answer today, but the colleagues had been promised they would not be disturbed. Leave a voice message for Victor and:",
+        bullets: [
+          "tell Victor whether you will contact them",
+          "explain the reasons for your decision",
+          "suggest what Victor could tell the customer instead",
+        ],
+        prepSeconds: 10,
+        responseSeconds: 40,
+      },
+    ],
+  },
 ];
 
 function formatTime(seconds) {

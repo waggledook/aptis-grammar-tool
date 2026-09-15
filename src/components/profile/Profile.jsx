@@ -2556,6 +2556,10 @@ const formatOteSpeakingPart = (part) => {
                       ? "Speaking Part 1"
                       : item.part === "part2"
                       ? "Speaking Part 2"
+                      : item.part === "part3"
+                      ? "Speaking Part 3"
+                      : item.part === "part4"
+                      ? "Speaking Part 4"
                       : item.part || "Speaking";
                   const title = item.taskTitle || partLabel;
                   const transcripts = item.transcripts || [];

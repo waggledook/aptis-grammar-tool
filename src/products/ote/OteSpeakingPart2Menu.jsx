@@ -99,7 +99,7 @@ export default function OteSpeakingPart2Menu({ user, nativeRoutes = false }) {
     [advancedGuidedPath, cheatSheetPath, guidedMessage2Path, guidedPath, introPath, isAdvanced]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
-  const practiceTotal = 5;
+  const practiceTotal = isAdvanced ? 10 : 5;
   const practiceChildCount = Array.from(completedProgress).filter((progressId) =>
     /^speaking\.part2\.practice\.[\w-]+$/.test(progressId)
   ).length;
