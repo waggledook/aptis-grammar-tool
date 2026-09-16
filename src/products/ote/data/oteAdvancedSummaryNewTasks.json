@@ -1,0 +1,182 @@
+[
+  {
+    "id": "too-many-options",
+    "title": "Too Many Options",
+    "description": "Listen to two experts and summarize their shared main points about having too many choices.",
+    "topic": "having too many choices",
+    "bank": "student",
+    "prompt": "Your tutor has asked you to summarize some research for your tutor group. Listen to two experts talking about research into having too many choices. The two experts make the same two main points. You should:",
+    "requirements": [
+      "combine the information from the two experts and",
+      "summarize the two main points the experts make."
+    ],
+    "experts": [
+      {
+        "label": "Expert 1",
+        "audioSrc": "/audio/ote/speaking/advanced/part3-summary/too-many-options-expert-1.mp3",
+        "script": "Researchers have long been interested in what happens when consumers are given a wide range of choices. Having several options can be useful because people are more likely to find something that suits their needs, and the freedom to choose can increase their sense of control. However, this advantage does not continue indefinitely. When the number of possibilities becomes very large, comparing them requires more time and mental effort. People may delay making a decision, rely on simple shortcuts or avoid choosing altogether. This difficulty can continue after a decision: people may feel less satisfied because it is easy to imagine that another option might have been better. The problem, then, is not choice itself but the point at which choice becomes difficult to manage.",
+        "wordCount": 125
+      },
+      {
+        "label": "Expert 2",
+        "audioSrc": "/audio/ote/speaking/advanced/part3-summary/too-many-options-expert-2.mp3",
+        "script": "A certain amount of choice is generally positive. In experiments, people often prefer situations where they can select between alternatives rather than simply being given one option, especially when personal preferences matter. But researchers have also found that very large choice sets can create problems. Faced with dozens of similar products, for example, shoppers may struggle to compare all the relevant features and become less confident about what to buy. This can lead to decisions being postponed or abandoned, while the same overload may cause people to question their final choice because the rejected alternatives remain easy to imagine. Offering enough variety is useful, but adding more possibilities does not always improve the experience.",
+        "wordCount": 114
+      }
+    ],
+    "teacherKey": {
+      "essentialContentPoints": [
+        "A reasonable amount of choice can be beneficial.",
+        "Too much choice can create overload and make the decision-making experience worse."
+      ],
+      "supportingEvidence": [
+        "People are more likely to find something that suits their needs or preferences; having alternatives can provide freedom or a greater sense of control.",
+        "Comparing numerous options requires more time and mental effort; people may become less confident, postpone or avoid a decision, use shortcuts, or feel less satisfied with the eventual choice."
+      ],
+      "markingNote": "Treat difficulty before a decision and reduced confidence or satisfaction afterwards as supporting consequences of the same broader point: excessive choice can become difficult to manage. A candidate does not need to mention both stages or list every possible consequence.",
+      "wordCounts": {
+        "total": 239,
+        "expert1": 125,
+        "expert2": 114
+      }
+    },
+    "internalDescription": "Combine two expert accounts of why a reasonable amount of choice can be beneficial and how excessive choice can create overload.",
+    "taskIntroScript": "Your tutor has asked you to summarize some research for your tutor group. Listen to two experts talking about research into having too many choices.",
+    "taskIntroAudioSrc": "/audio/ote/speaking/advanced/part3-summary/too-many-options-topic.mp3"
+  },
+  {
+    "id": "testing-yourself",
+    "title": "Learning by Testing Yourself",
+    "description": "Listen to two experts and summarize their shared main points about testing yourself when learning.",
+    "topic": "testing yourself when learning",
+    "bank": "student",
+    "prompt": "Your tutor has asked you to summarize some research for your tutor group. Listen to two experts talking about research into testing yourself when learning. The two experts make the same two main points. You should:",
+    "requirements": [
+      "combine the information from the two experts and",
+      "summarize the two main points the experts make."
+    ],
+    "experts": [
+      {
+        "label": "Expert 1",
+        "audioSrc": "/audio/ote/speaking/advanced/part3-summary/testing-yourself-expert-1.mp3",
+        "script": "Research on learning suggests that trying to recall information from memory can strengthen it more effectively than simply reading the same material again. In studies, learners who test themselves often remember more later, even when the test is only used for practice and does not contribute to a grade. The act of retrieving an answer appears to make that knowledge easier to access in the future. However, practice tests are most useful when learners also discover what they got wrong. Feedback helps them correct errors and prevents mistaken answers from becoming familiar. For this reason, researchers often recommend a cycle of retrieval, checking and further practice rather than repeated rereading or testing without correction.",
+        "wordCount": 114
+      },
+      {
+        "label": "Expert 2",
+        "audioSrc": "/audio/ote/speaking/advanced/part3-summary/testing-yourself-expert-2.mp3",
+        "script": "Students often feel that rereading notes is an efficient way to revise because the material becomes increasingly familiar. But familiarity is not the same as being able to produce an answer independently. Experiments have repeatedly shown that learners who attempt to retrieve information, for example with questions or flashcards, tend to retain it for longer. Yet testing alone is not enough in every case. If someone repeatedly gives an incorrect answer and never checks it, the exercise may reinforce confusion rather than solve it. Effective self-testing therefore includes feedback: learners need to compare their response with the correct information and then return to material they have not yet mastered.",
+        "wordCount": 109
+      }
+    ],
+    "teacherKey": {
+      "essentialContentPoints": [
+        "Actively retrieving information through self-testing can improve long-term learning more effectively than rereading.",
+        "Self-testing is most effective when it includes feedback or checking."
+      ],
+      "supportingEvidence": [
+        "Retrieval strengthens access to knowledge; learners who test themselves tend to remember information for longer; recognising familiar material is not the same as producing an answer independently.",
+        "Feedback allows learners to correct mistakes, prevents incorrect answers from becoming familiar or reinforcing confusion, and helps learners identify what requires further practice."
+      ],
+      "markingNote": "The distinction between familiarity and independent recall supports the first point. Correcting errors and directing further practice are both acceptable ways of supporting the second point; neither is a separate third main point.",
+      "wordCounts": {
+        "total": 223,
+        "expert1": 114,
+        "expert2": 109
+      }
+    },
+    "internalDescription": "Combine two expert accounts of why retrieving information can improve learning and why effective self-testing includes feedback.",
+    "taskIntroScript": "Your tutor has asked you to summarize some research for your tutor group. Listen to two experts talking about research into testing yourself when learning.",
+    "taskIntroAudioSrc": "/audio/ote/speaking/advanced/part3-summary/testing-yourself-topic.mp3"
+  },
+  {
+    "id": "background-music",
+    "title": "Background Music and Concentration",
+    "description": "Listen to two experts and summarize their shared main points about listening to music while working.",
+    "topic": "listening to music while working",
+    "bank": "teacher",
+    "prompt": "Your tutor has asked you to summarize some research for your tutor group. Listen to two experts talking about research into listening to music while working. The two experts make the same two main points. You should:",
+    "requirements": [
+      "combine the information from the two experts and",
+      "summarize the two main points the experts make."
+    ],
+    "experts": [
+      {
+        "label": "Expert 1",
+        "audioSrc": "/audio/ote/speaking/advanced/part3-summary/background-music-expert-1.mp3",
+        "script": "Research into background music suggests that its effects depend heavily on the task. During repetitive or routine activities, music can improve mood and make people feel more motivated, which may help them work for longer without becoming bored. Some studies have found small improvements in speed or persistence in these situations. The picture changes, however, when the work demands close attention, especially if it involves reading, writing or remembering language. Music with lyrics can compete for the same mental resources needed for these tasks, making it harder to concentrate. Instrumental music is often less disruptive, but even that may be distracting for some people when the task is particularly complex.",
+        "wordCount": 110
+      },
+      {
+        "label": "Expert 2",
+        "audioSrc": "/audio/ote/speaking/advanced/part3-summary/background-music-expert-2.mp3",
+        "script": "People often say that music helps them work, and in some circumstances the evidence supports that view. Listening to familiar music can make an unpleasant or monotonous task feel easier and may increase motivation. This is one reason music is common in workplaces where the activity itself does not require much verbal thought. But researchers also find that background sound can reduce performance on more demanding tasks. Lyrics are especially likely to interfere when someone is trying to understand a text, compose an answer or hold words in memory. The effect varies between individuals, but in general the more attention a task requires, the more useful silence—or very unobtrusive music—may become.",
+        "wordCount": 113
+      }
+    ],
+    "teacherKey": {
+      "essentialContentPoints": [
+        "Background music can help people perform routine, repetitive or monotonous tasks.",
+        "Background music can interfere with performance on tasks that require greater concentration, particularly language-based tasks."
+      ],
+      "supportingEvidence": [
+        "It can improve mood or motivation, reduce boredom, help people persist for longer, or produce small improvements in speed.",
+        "Lyrics may compete with the mental resources used for reading, writing or verbal memory; instrumental or unobtrusive music may be less disruptive; silence may be preferable for particularly complex work."
+      ],
+      "markingNote": "Individual differences and the contrast between lyrical and instrumental music are supporting details. The central contrast is between music helping with relatively routine work and potentially hindering more demanding work.",
+      "wordCounts": {
+        "total": 223,
+        "expert1": 110,
+        "expert2": 113
+      }
+    },
+    "internalDescription": "Combine two expert accounts of when background music can support performance and when it can interfere with concentration.",
+    "taskIntroScript": "Your tutor has asked you to summarize some research for your tutor group. Listen to two experts talking about research into listening to music while working.",
+    "taskIntroAudioSrc": "/audio/ote/speaking/advanced/part3-summary/background-music-topic.mp3"
+  },
+  {
+    "id": "screens-and-paper",
+    "title": "Reading on Screens and Paper",
+    "description": "Listen to two experts and summarize their shared main points about reading on screens and paper.",
+    "topic": "reading on screens and paper",
+    "bank": "teacher",
+    "prompt": "Your tutor has asked you to summarize some research for your tutor group. Listen to two experts talking about research into reading on screens and paper. The two experts make the same two main points. You should:",
+    "requirements": [
+      "combine the information from the two experts and",
+      "summarize the two main points the experts make."
+    ],
+    "experts": [
+      {
+        "label": "Expert 1",
+        "audioSrc": "/audio/ote/speaking/advanced/part3-summary/screens-and-paper-expert-1.mp3",
+        "script": "Studies comparing reading on paper and on screens suggest that the format can influence how well people understand longer or more demanding texts. On paper, readers can move through a document more easily, remember roughly where information appeared, and are often less tempted to skim. These features may support deeper comprehension, especially when the material is complex. Digital reading, however, has clear practical advantages: texts are easy to carry, search and access, and readers can adjust the display to suit their needs. Researchers therefore do not argue that screens are always worse. Instead, they suggest that readers may need to slow down and use more deliberate strategies when reading important material digitally.",
+        "wordCount": 112
+      },
+      {
+        "label": "Expert 2",
+        "audioSrc": "/audio/ote/speaking/advanced/part3-summary/screens-and-paper-expert-2.mp3",
+        "script": "Research shows that people often read differently when text appears on a screen. They may scroll quickly, jump between sections or pay less attention to the overall structure, which can make detailed understanding more difficult. Paper can encourage a steadier reading pace and gives readers physical cues about where information is located in a text. At the same time, digital formats are convenient and flexible. A single device can store large amounts of material, and features such as search, highlighting and adjustable text size can be useful. The key issue seems to be how people read rather than the device itself: careful, active reading can reduce the disadvantages associated with screens.",
+        "wordCount": 111
+      }
+    ],
+    "teacherKey": {
+      "essentialContentPoints": [
+        "Paper can support comprehension when people read longer or more demanding texts.",
+        "Screens are not necessarily an inferior way to read: digital formats offer practical benefits and can be effective when readers adapt their reading behaviour."
+      ],
+      "supportingEvidence": [
+        "Readers may navigate paper more deliberately, maintain a steadier pace, use physical or spatial cues to locate information, or be less likely to skim.",
+        "Digital texts are portable, searchable, accessible and adjustable; slowing down and reading carefully or actively can reduce the disadvantages associated with screens."
+      ],
+      "markingNote": "Portability and search functions are supporting advantages, while deliberate reading explains how comprehension can be protected. A complete account of the second main point should communicate that digital reading has genuine benefits and need not lead to poorer understanding when readers use suitable strategies; candidates do not need to list multiple digital features.",
+      "wordCounts": {
+        "total": 223,
+        "expert1": 112,
+        "expert2": 111
+      }
+    },
+    "internalDescription": "Combine two expert accounts of why paper can support comprehension and why screen reading still offers benefits and can be effective.",
+    "taskIntroScript": "Your tutor has asked you to summarize some research for your tutor group. Listen to two experts talking about research into reading on screens and paper.",
+    "taskIntroAudioSrc": "/audio/ote/speaking/advanced/part3-summary/screens-and-paper-topic.mp3"
+  }
+]

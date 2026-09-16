@@ -1,0 +1,74 @@
+.speaking-mock-entry {
+  margin-top: 1rem;
+}
+
+.speaking-menu .speaking-mock-card {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.15rem 1.25rem;
+  border-color: rgba(255, 189, 56, 0.58);
+  text-align: left;
+}
+
+.speaking-mock-card > div > span {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: #ffcf70;
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.speaking-menu .speaking-mock-card h2 {
+  margin: 0.28rem 0;
+  color: #eef4ff;
+  font-size: 1.28rem;
+  text-align: left;
+}
+
+.speaking-menu .speaking-mock-card p {
+  max-width: 46rem;
+  margin: 0.2rem 0 0.5rem;
+  text-align: left;
+}
+
+.speaking-mock-card small {
+  color: rgba(238, 244, 255, 0.67);
+  font-weight: 750;
+}
+
+.speaking-mock-card > strong {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.35rem;
+  color: #ffbd38;
+}
+
+:root[data-theme="light"] .speaking-menu .speaking-mock-card {
+  border-color: #b47a15;
+}
+
+:root[data-theme="light"] .speaking-mock-card > div > span,
+:root[data-theme="light"] .speaking-mock-card > strong {
+  color: #8a5900;
+}
+
+:root[data-theme="light"] .speaking-menu .speaking-mock-card h2 {
+  color: var(--color-text);
+}
+
+:root[data-theme="light"] .speaking-mock-card small {
+  color: var(--color-text-soft);
+}
+
+@media (max-width: 620px) {
+  .speaking-menu .speaking-mock-card {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

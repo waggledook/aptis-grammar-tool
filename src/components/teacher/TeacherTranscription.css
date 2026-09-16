@@ -1,0 +1,153 @@
+.teacher-transcription-page {
+  max-width: 1040px;
+  padding-bottom: 4rem;
+  color: #edf5ff;
+}
+
+.teacher-transcription-back {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  margin: .5rem 0 1.2rem;
+  color: #a9caff;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.teacher-transcription-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.1rem;
+  padding: clamp(1.4rem, 3vw, 2rem);
+  border: 1px solid rgba(124, 169, 239, .3);
+  border-radius: 22px;
+  background: radial-gradient(circle at 90% 0%, rgba(78, 111, 202, .23), transparent 42%), #12233f;
+}
+
+.teacher-transcription-mark {
+  display: grid;
+  flex: 0 0 58px;
+  height: 58px;
+  place-items: center;
+  border-radius: 17px;
+  background: rgba(100, 155, 240, .19);
+  color: #bcd7ff;
+}
+
+.teacher-transcription-eyebrow,
+.teacher-transcription-step {
+  margin: 0 0 .35rem;
+  color: #95beff;
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .09em;
+  text-transform: uppercase;
+}
+
+.teacher-transcription-header h1 { margin: 0; font-size: clamp(1.9rem, 4vw, 2.65rem); }
+.teacher-transcription-header p:last-child { margin: .5rem 0 0; color: #c1cee2; line-height: 1.6; }
+
+.teacher-transcription-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.teacher-transcription-card {
+  padding: 1.4rem;
+  border: 1px solid rgba(148, 177, 221, .22);
+  border-radius: 19px;
+  background: #14243e;
+}
+
+.teacher-transcription-card h2 { margin: 0 0 1rem; font-size: 1.25rem; }
+.teacher-transcription-card label { display: block; margin: 1rem 0 .4rem; font-weight: 700; }
+.teacher-transcription-card label span { color: #a9bbd5; font-weight: 400; }
+
+.teacher-transcription-drop {
+  display: flex;
+  min-height: 205px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: .55rem;
+  padding: 1.2rem;
+  border: 2px dashed rgba(134, 180, 244, .42);
+  border-radius: 14px;
+  background: rgba(68, 113, 180, .08);
+  text-align: center;
+}
+
+.teacher-transcription-drop.is-dragging { border-color: #b9d9ff; background: rgba(83, 144, 230, .2); }
+.teacher-transcription-drop > svg { color: #94c1ff; }
+.teacher-transcription-drop span, .teacher-transcription-note { color: #adc1d9; font-size: .86rem; line-height: 1.5; }
+.teacher-transcription-drop button, .teacher-transcription-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .55rem .85rem;
+  border: 1px solid rgba(156, 194, 246, .4);
+  border-radius: 9px;
+  background: rgba(75, 117, 182, .2);
+  color: #edf5ff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+
+.teacher-transcription-files { display: grid; gap: .75rem; margin: 1rem 0; padding: 0; list-style: none; }
+.teacher-transcription-file { display: grid; gap: .55rem; padding: .85rem; border: 1px solid rgba(148, 177, 221, .2); border-radius: 12px; background: #0e1c32; overflow-wrap: anywhere; }
+.teacher-transcription-file-head { display: flex; justify-content: space-between; align-items: start; gap: .5rem; }
+.teacher-transcription-file-head > div { display: grid; gap: .25rem; min-width: 0; }
+.teacher-transcription-file span { color: #aec3dd; font-size: .85rem; }
+.teacher-transcription-file audio { width: 100%; }
+.teacher-transcription-file label { margin: .2rem 0 0; font-size: .88rem; }
+.teacher-transcription-row-transcript { margin: .3rem 0 0; white-space: pre-wrap; line-height: 1.55; }
+.teacher-transcription-row-error { margin: .3rem 0 0; color: #ffc2c2; line-height: 1.5; }
+.teacher-transcription-card select, .teacher-transcription-card textarea {
+  width: 100%;
+  padding: .72rem .8rem;
+  border: 1px solid rgba(151, 183, 225, .4);
+  border-radius: 9px;
+  background: #0d1b31;
+  color: #f0f6ff;
+  font: inherit;
+}
+.teacher-transcription-card textarea { resize: vertical; line-height: 1.5; }
+.teacher-transcription-card select:focus-visible, .teacher-transcription-card textarea:focus-visible,
+.teacher-transcription-page button:focus-visible, .teacher-transcription-back:focus-visible {
+  outline: 3px solid #90c2ff;
+  outline-offset: 2px;
+}
+
+.teacher-transcription-primary {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: .5rem;
+  margin-top: 1rem;
+  padding: .75rem 1rem;
+  border: 0;
+  border-radius: 10px;
+  background: #80b9ff;
+  color: #10213a;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+.teacher-transcription-page button:disabled { opacity: .55; cursor: not-allowed; }
+.teacher-transcription-error { padding: .85rem 1rem; border-radius: 10px; background: #69343a; color: #fff; }
+.teacher-transcription-result { margin-top: 1rem; }
+.teacher-transcription-structured-result { margin-top: 1rem; }
+.teacher-transcription-result-heading { display: flex; justify-content: space-between; align-items: start; gap: 1rem; }
+.teacher-transcription-text { margin: .5rem 0 0; white-space: pre-wrap; line-height: 1.7; overflow-wrap: anywhere; }
+.teacher-transcription-task-preview { margin-top: 1rem; padding: .85rem; border-radius: 10px; background: rgba(113, 160, 227, .11); line-height: 1.5; }
+.teacher-transcription-task-preview p { margin: .4rem 0 0; color: #d8e6f6; }
+
+@media (max-width: 720px) {
+  .teacher-transcription-layout { grid-template-columns: 1fr; }
+  .teacher-transcription-header { flex-direction: column; }
+  .teacher-transcription-result-heading { flex-wrap: wrap; }
+  .teacher-transcription-file-head { flex-wrap: wrap; }
+}

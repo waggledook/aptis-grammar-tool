@@ -561,6 +561,18 @@ export async function requestOteSpeakingFeedback(payload) {
   return result.data;
 }
 
+export async function requestStaffAudioTranscription(audio) {
+  const callable = httpsCallable(functionsRegion, "transcribeStaffAudio", { timeout: 120000 });
+  const result = await callable({ audio });
+  return result.data;
+}
+
+export async function requestStaffTranscriptFeedback(payload) {
+  const callable = httpsCallable(functionsRegion, "generateStaffTranscriptFeedback", { timeout: 120000 });
+  const result = await callable(payload);
+  return result.data;
+}
+
 export async function requestOteLevelProductionFeedback(payload) {
   const generateOteLevelProductionFeedback = httpsCallable(
     functionsRegion,

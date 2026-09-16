@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, CheckCircle2, Download, Mic, NotebookTabs, Timer } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clipboard, Download, ExternalLink, Mic, NotebookTabs, Timer } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import SpeakingFeedbackPanel from "../../components/speaking/SpeakingFeedbackPanel.jsx";
@@ -12,6 +12,8 @@ import {
 import { getSitePath } from "../../siteConfig.js";
 import { OTE_SPEAKING_AUDIO } from "./mockTests/data/oteSpeakingMockData.js";
 import { recordingsToFeedbackAudio } from "./utils/speakingFeedback.js";
+import { SUMMARY_PRACTICE_SETS, SUMMARY_TEACHER_SETS, SUMMARY_SHARED_TASK_ENDING } from "./data/oteSummaryPracticeSets.js";
+import OteAssignButton from "./OteAssignButton.jsx";
 import OteAssignableCard from "./OteAssignableCard.jsx";
 import { useOteTrainingProgress } from "./utils/trainingProgress.js";
 import "./styles/ote.css";
@@ -27,88 +29,6 @@ const SUMMARY_INSTRUCTIONS = [
   "Start speaking when you hear the tone.",
 ];
 
-const SUMMARY_PRACTICE_SETS = [
-  {
-    id: "urban-green-spaces",
-    title: "Urban Green Spaces",
-    description: "Combine two expert views on how urban nature supports health and why access and quality matter.",
-    topic: "urban green spaces",
-    taskAudioSrc: "/audio/ote/speaking/advanced/part3-summary/urban-green-spaces-task.mp3",
-    prompt:
-      "Your tutor has asked you to summarize some research for your tutor group. Listen to two experts talking about research into urban green spaces. The two experts make the same two main points. You should:",
-    requirements: [
-      "combine the information from the two experts.",
-      "summarize the two main points the experts make.",
-    ],
-    experts: [
-      {
-        label: "Expert 1",
-        audioSrc: "/audio/ote/speaking/advanced/part3-summary/urban-green-spaces-expert-1.mp3",
-        script:
-          "A substantial body of research links urban green spaces with better health. People who spend time in parks, gardens or tree-lined areas often report lower stress and improved mood, and regular visits can encourage walking and other forms of physical activity. These effects may be especially valuable in crowded cities, where contact with nature offers relief from noise and pressure. Yet simply placing a park on a map is not enough. Green spaces are used more frequently when they feel safe, are easy to reach and contain features that suit local residents, such as paths, seating and shaded areas. Poorly maintained spaces may provide little benefit because people are unlikely to spend time there.",
-        wordCount: 114,
-      },
-      {
-        label: "Expert 2",
-        audioSrc: "/audio/ote/speaking/advanced/part3-summary/urban-green-spaces-expert-2.mp3",
-        script:
-          "Cities are often assessed by how much green land they contain, but researchers argue that quality and access are just as important as total area. Contact with natural surroundings can reduce feelings of anxiety, support social interaction and create opportunities for exercise, all of which contribute to physical and mental well-being. However, these advantages depend on people being able and willing to use the space regularly. A large park far from residential neighbourhoods may be less useful than several smaller areas within walking distance. Good lighting, suitable facilities and careful maintenance also influence who visits. In short, urban nature can improve health, but planners need to consider how green spaces function in everyday life, not merely how much land is provided.",
-        wordCount: 121,
-      },
-    ],
-    teacherKey: {
-      essentialContentPoints: [
-        "Urban green spaces can improve mental and physical health by reducing stress, encouraging exercise and supporting social contact.",
-        "Their benefits depend on usability rather than quantity alone: spaces must be accessible, safe, well maintained and suited to residents' needs.",
-      ],
-      wordCounts: {
-        total: 235,
-        expert1: 114,
-        expert2: 121,
-      },
-    },
-  },
-  {
-    id: "short-breaks",
-    title: "Short Breaks",
-    description: "Summarize two expert views on planned breaks, attention, and what makes a break useful.",
-    topic: "taking short breaks",
-    taskAudioSrc: "/audio/ote/speaking/advanced/part3-summary/short-breaks-task.mp3",
-    prompt:
-      "Your tutor has asked you to summarize some research for your tutor group. Listen to two experts talking about research into taking short breaks. The two experts make the same two main points. You should:",
-    requirements: [
-      "combine the information from the two experts.",
-      "summarize the two main points the experts make.",
-    ],
-    experts: [
-      {
-        label: "Expert 1",
-        audioSrc: "/audio/ote/speaking/advanced/part3-summary/short-breaks-expert-1.mp3",
-        script:
-          "Research into attention suggests that short breaks can make study and work more effective. When people concentrate for a long period, their performance often falls because the mind becomes less responsive to the task. In several experiments, participants who paused briefly returned with better focus and made fewer mistakes than those who continued without stopping. The nature of the break also seems important. A few minutes of walking, stretching or looking away from a screen can be useful, whereas checking messages may simply replace one demanding activity with another. Very long or frequent breaks can also interrupt progress, so the aim is not to avoid effort but to divide it into manageable periods.",
-        wordCount: 113,
-      },
-      {
-        label: "Expert 2",
-        audioSrc: "/audio/ote/speaking/advanced/part3-summary/short-breaks-expert-2.mp3",
-        script:
-          "People sometimes assume that productive workers should remain at their desks continuously, but the evidence points in a different direction. Brief, planned pauses can restore attention and may help learners remember material more successfully, particularly during tasks that require sustained concentration. However, not every pause has the same effect. Researchers have found that light movement or a quiet change of activity is generally more refreshing than spending the break on social media, which continues to place demands on attention. Breaks also need to be kept under control: if they last too long or occur whenever a task becomes difficult, it may be harder to return to the original goal and maintain momentum.",
-        wordCount: 112,
-      },
-    ],
-    teacherKey: {
-      essentialContentPoints: [
-        "Brief, planned breaks can restore attention and improve performance or learning.",
-        "The type and length of the break matter: light movement or a genuine mental rest is useful, whereas screen use and excessively long or frequent breaks may be counterproductive.",
-      ],
-      wordCounts: {
-        total: 225,
-        expert1: 113,
-        expert2: 112,
-      },
-    },
-  },
-];
 
 function formatTime(seconds) {
   const safe = Math.max(0, Math.ceil(seconds || 0));
@@ -292,16 +212,23 @@ function NotesPanel({ value, onChange, onClose }) {
   );
 }
 
-export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, user = null, onRequireSignIn }) {
+export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, user = null, onRequireSignIn, teacherBank = false }) {
   const { setId } = useParams();
   const navigate = useNavigate();
   const { speakingId, playAudioFile, speak, stop } = useSpeech();
   const menuPath = getSitePath(nativeRoutes ? "/speaking" : "/ote/speaking");
-  const rawBasePath = nativeRoutes ? "/speaking/part-3-summary/practice" : "/ote/speaking/part-3-summary/practice";
+  const teacherResourcesPath = getSitePath("/teacher-resources");
+  const rawBasePath = teacherBank
+    ? nativeRoutes ? "/speaking/part-3-summary/teacher-bank" : "/ote/speaking/part-3-summary/teacher-bank"
+    : nativeRoutes ? "/speaking/part-3-summary/practice" : "/ote/speaking/part-3-summary/practice";
   const basePath = getSitePath(rawBasePath);
   const getSetPath = (id) => getSitePath(`${rawBasePath}/${id}`);
-  const selectedSet = useMemo(() => SUMMARY_PRACTICE_SETS.find((item) => item.id === setId), [setId]);
+  const activeSets = teacherBank ? SUMMARY_TEACHER_SETS : SUMMARY_PRACTICE_SETS;
+  const selectedSet = useMemo(() => activeSets.find((item) => item.id === setId), [activeSets, setId]);
+  const progressPrefix = teacherBank ? "speaking.part3.teacher-bank" : "speaking.parts34.practice";
+  const activityMode = teacherBank ? "summary_teacher_bank" : "summary_practice";
   const completedProgress = useOteTrainingProgress();
+  const [copiedSetId, setCopiedSetId] = useState("");
 
   const [phase, setPhase] = useState("ready");
   const [secondsLeft, setSecondsLeft] = useState(40);
@@ -333,23 +260,37 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
     logOteTrainingCompleted({
       section: "speaking",
       part: "part-3",
-      mode: "summary_practice",
+      mode: activityMode,
+      progressId: teacherBank ? `${progressPrefix}.${selectedSet.id}` : undefined,
       setId: selectedSet.id,
       setTitle: selectedSet.title,
       recordingCount: recordings.length,
     });
-  }, [complete, recordings.length, selectedSet]);
+  }, [activityMode, complete, progressPrefix, recordings.length, selectedSet, teacherBank]);
 
   function buildAssignmentItem(set) {
     return {
-      id: `ote.advanced.speaking.part3.practice.${set.id}`,
+      id: `ote.advanced.speaking.part3.${teacherBank ? "teacher-bank" : "practice"}.${set.id}`,
       variant: "advanced",
       category: "Speaking",
       label: `Part 3 Summary: ${set.title}`,
       routePath: getSetPath(set.id),
-      progressId: `speaking.parts34.practice.${set.id}`,
-      parentProgressId: "speaking.parts34.practice",
+      progressId: `${progressPrefix}.${set.id}`,
+      parentProgressId: teacherBank ? "" : "speaking.parts34.practice",
     };
+  }
+
+  async function copyStudentLink(set) {
+    const relativeUrl = getSetPath(set.id);
+    const shareUrl = new URL(relativeUrl, window.location.origin).toString();
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopiedSetId(set.id);
+      window.setTimeout(() => setCopiedSetId((current) => current === set.id ? "" : current), 1800);
+    } catch (error) {
+      console.warn("[OTE summary teacher bank] Could not copy student link", error);
+      window.prompt("Copy this student link:", shareUrl);
+    }
   }
 
   useEffect(() => {
@@ -451,7 +392,8 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
       logOteTrainingStarted({
         section: "speaking",
         part: "part-3",
-        mode: "summary_practice",
+        mode: activityMode,
+        progressId: teacherBank ? `${progressPrefix}.${selectedSet.id}` : undefined,
         setId: selectedSet.id,
         setTitle: selectedSet.title,
       });
@@ -460,14 +402,21 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
     setSecondsLeft(0);
     await playAudioFile("summary-instructions", OTE_SPEAKING_AUDIO.summaryAdvancedInstructions);
     if (skipListeningRef.current) return beginThinkingPhase(stream, { playCue: false });
-    if (selectedSet.taskAudioSrc) {
+    if (selectedSet.taskIntroAudioSrc) {
+      const playedIntro = await playAudioFile("summary-task-intro", selectedSet.taskIntroAudioSrc);
+      if (!playedIntro && !skipListeningRef.current) await speak("summary-task-intro", selectedSet.taskIntroScript, 0.92);
+      if (skipListeningRef.current) return beginThinkingPhase(stream, { playCue: false });
+      const playedEnding = await playAudioFile("summary-task-ending", OTE_SPEAKING_AUDIO.combineAndSummarise);
+      if (!playedEnding && !skipListeningRef.current) await speak("summary-task-ending", SUMMARY_SHARED_TASK_ENDING, 0.92);
+    } else if (selectedSet.taskAudioSrc) {
       const played = await playAudioFile("summary-task", selectedSet.taskAudioSrc);
-      if (!played) await speak("summary-task", `${selectedSet.prompt} ${selectedSet.requirements.join(" ")}`, 0.92);
+      if (!played && !skipListeningRef.current) await speak("summary-task", `${selectedSet.prompt} ${selectedSet.requirements.join(" ")}`, 0.92);
     } else {
       await speak("summary-task", `${selectedSet.prompt} ${selectedSet.requirements.join(" ")}`, 0.92);
     }
     if (skipListeningRef.current) return beginThinkingPhase(stream, { playCue: false });
-    await speak("summary-listen-cue", "Now listen to the two experts.", 0.94);
+    const playedListenCue = await playAudioFile("summary-listen-cue", OTE_SPEAKING_AUDIO.nowListenToTwoExperts);
+    if (!playedListenCue) await speak("summary-listen-cue", "Now listen to the two experts.", 0.94);
     if (skipListeningRef.current) return beginThinkingPhase(stream, { playCue: false });
     for (let index = 0; index < selectedSet.experts.length; index += 1) {
       const expert = selectedSet.experts[index];
@@ -530,7 +479,8 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
         logOteTrainingCompleted({
           section: "speaking",
           part: "part-3",
-          mode: "summary_practice",
+          mode: activityMode,
+          progressId: teacherBank ? `${progressPrefix}.${selectedSet.id}` : undefined,
           setId: selectedSet.id,
           setTitle: selectedSet.title,
           recordingCount: 1,
@@ -650,35 +600,56 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
   if (!selectedSet) {
     return (
       <main className="ote-training-page">
-        <Seo title="OTE Advanced Speaking Part 3 Summary Practice | Seif English" description="Timed Advanced OTE speaking summary practice sets." />
-        <button className="ote-training-back" type="button" onClick={() => navigate(menuPath)}>
+        <Seo title={teacherBank ? "OTE Advanced Summary Teacher Bank | Seif English" : "OTE Advanced Speaking Part 3 Summary Practice | Seif English"} description="Timed Advanced OTE speaking summary practice sets." />
+        <button className="ote-training-back" type="button" onClick={() => navigate(teacherBank ? teacherResourcesPath : menuPath)}>
           <ArrowLeft size={18} aria-hidden="true" />
-          Back to speaking
+          {teacherBank ? "Back to teacher resources" : "Back to speaking"}
         </button>
         <header className="ote-training-hero">
-          <p className="ote-kicker">Advanced Speaking Part 3</p>
-          <h1>Summary Practice</h1>
+          <p className="ote-kicker">{teacherBank ? "Teacher task bank" : "Advanced Speaking Part 3"}</p>
+          <h1>{teacherBank ? "Advanced Summary Tasks" : "Summary Practice"}</h1>
           <p>
-            Choose a set, listen to two expert sources, make notes, then give one timed spoken summary that combines the shared ideas.
+            {teacherBank
+              ? "Open a classroom task, copy its student link, or assign it. These extra tasks are available to enabled users through their link or assignment."
+              : "Choose a set, listen to two expert sources, make notes, then give one timed spoken summary that combines the shared ideas."}
           </p>
         </header>
         <div className="ote-practice-set-grid">
-          {SUMMARY_PRACTICE_SETS.map((set, index) => (
-            <OteAssignableCard
-              key={set.id}
-              user={user}
-              item={buildAssignmentItem(set)}
-              className={`ote-practice-set-card ${completedProgress.has(`speaking.parts34.practice.${set.id}`) ? "is-complete" : ""}`}
-              onClick={() => navigate(getSetPath(set.id))}
-            >
-              {completedProgress.has(`speaking.parts34.practice.${set.id}`) ? (
-                <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" />
-              ) : null}
-              <span>Set {index + 1}</span>
-              <h2>{set.title}</h2>
-              <p>{set.description}</p>
-            </OteAssignableCard>
-          ))}
+          {activeSets.map((set, index) => {
+            const isComplete = completedProgress.has(`${progressPrefix}.${set.id}`);
+            if (teacherBank) return (
+              <article className={`ote-practice-set-card ote-teacher-bank-card ${isComplete ? "is-complete" : ""}`} key={set.id}>
+                {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+                <span>Task {index + 1}</span>
+                <h2>{set.title}</h2>
+                <p>{set.description}</p>
+                <div className="ote-teacher-bank-card-actions">
+                  <button type="button" onClick={() => navigate(getSetPath(set.id))}>
+                    <ExternalLink size={16} aria-hidden="true" /> Open task
+                  </button>
+                  <button type="button" onClick={() => copyStudentLink(set)}>
+                    <Clipboard size={16} aria-hidden="true" />
+                    {copiedSetId === set.id ? "Link copied" : "Copy student link"}
+                  </button>
+                  <OteAssignButton user={user} item={buildAssignmentItem(set)} />
+                </div>
+              </article>
+            );
+            return (
+              <OteAssignableCard
+                key={set.id}
+                user={user}
+                item={buildAssignmentItem(set)}
+                className={`ote-practice-set-card ${isComplete ? "is-complete" : ""}`}
+                onClick={() => navigate(getSetPath(set.id))}
+              >
+                {isComplete ? <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" /> : null}
+                <span>Set {index + 1}</span>
+                <h2>{set.title}</h2>
+                <p>{set.description}</p>
+              </OteAssignableCard>
+            );
+          })}
         </div>
       </main>
     );
@@ -689,11 +660,11 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
       <Seo title={`${selectedSet.title} | OTE Summary Practice`} description="Timed OTE Advanced Speaking Part 3 summary practice." />
       <button className="ote-training-back" type="button" onClick={() => navigate(basePath)}>
         <ArrowLeft size={18} aria-hidden="true" />
-        Back to summary sets
+        {teacherBank ? "Back to teacher task bank" : "Back to summary sets"}
       </button>
 
       <header className="ote-training-hero">
-        <p className="ote-kicker">Part 3 summary set</p>
+        <p className="ote-kicker">{teacherBank ? "Teacher bank task" : "Part 3 summary set"}</p>
         <h1>{selectedSet.title}</h1>
         <p>
           Listen to both experts, use the notes area if you wish, then prepare and record a 50-second spoken summary.
@@ -732,22 +703,6 @@ export default function OteSpeakingPart3SummaryPractice({ nativeRoutes = false, 
                 <li key={requirement}>{requirement}</li>
               ))}
             </ul>
-
-            <section className="ote-summary-script-panel" aria-label="Source information">
-              <p className="ote-kicker">Sources</p>
-              <strong>Now listen to the two experts.</strong>
-              <div className="ote-summary-source-list">
-                {selectedSet.experts.map((expert) => (
-                  <article key={expert.label}>
-                    <span>{expert.label}</span>
-                    <p>{expert.wordCount} words</p>
-                  </article>
-                ))}
-              </div>
-              <small>
-                The transcript is hidden during the timed task. Use the audio and your notes to identify the two shared ideas.
-              </small>
-            </section>
 
             {speakingId ? <p className="ote-speaking-status">Playing: {speakingId.replaceAll("-", " ")}</p> : null}
             {micError ? <p className="ote-mic-error">{micError}</p> : null}

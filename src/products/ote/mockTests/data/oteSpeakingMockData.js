@@ -7,6 +7,8 @@ export const OTE_SPEAKING_AUDIO = {
   nowListenToMessage: "/audio/ote/speaking/instructions/now-listen-to-the-message.mp3",
   part3Instructions: "/audio/ote/speaking/instructions/part-3-instructions.mp3",
   summaryAdvancedInstructions: "/audio/ote/speaking/instructions/summary-advanced-instructions.mp3",
+  combineAndSummarise: "/audio/ote/speaking/instructions/combine-and-summarise.mp3",
+  nowListenToTwoExperts: "/audio/ote/speaking/instructions/now-listen-to-the-two-experts.mp3",
   summaryExpert1Intro: "/audio/ote/speaking/instructions/expert-1.mp3",
   summaryExpert2Intro: "/audio/ote/speaking/instructions/expert-2.mp3",
   part4Instructions: "/audio/ote/speaking/instructions/part-4-instructions.mp3",
@@ -351,6 +353,7 @@ export const OTE_SPEAKING_MOCKS = {
           listenPrompt: "Now listen to the two experts.",
           listenItems: ["Expert 1", "Expert 2"],
           taskAudioSrc: "/audio/ote/speaking/advanced/mock-1/summary-task.mp3",
+          nowListenAudioSrc: OTE_SPEAKING_AUDIO.nowListenToTwoExperts,
           expertIntroAudioSources: [
             OTE_SPEAKING_AUDIO.summaryExpert1Intro,
             OTE_SPEAKING_AUDIO.summaryExpert2Intro,

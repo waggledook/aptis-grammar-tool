@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import {
   ArrowRight,
   BookOpen,
+  FileAudio,
   GraduationCap,
   Headphones,
   Languages,
@@ -86,6 +87,13 @@ const PRODUCT_GROUPS = [
         title: "Speaking",
         resources: [
           {
+            title: "Audio transcription & feedback",
+            description: "Upload one recording or a speaking set, review transcripts, then request one task-aware AI feedback report.",
+            path: "/teacher/transcription",
+            icon: FileAudio,
+            tags: ["Teacher tool", "Audio upload", "Optional feedback"],
+          },
+          {
             title: "Speaking Part 2 extra practice",
             description: "Six additional photo-description tasks with relaxed, timed exam and teacher-led modes.",
             path: "/speaking/part2-secret",
@@ -131,6 +139,13 @@ const PRODUCT_GROUPS = [
         path: "/ote/speaking/part-2-voicemails/teacher-bank",
         icon: Mic2,
         tags: ["Advanced Speaking", "Direct link", "8 tasks"],
+      },
+      {
+        title: "Advanced summary task bank",
+        description: "Two extra Part 3 summary tasks with individual student links, timed recording and AI feedback.",
+        path: "/ote/speaking/part-3-summary/teacher-bank",
+        icon: Mic2,
+        tags: ["Advanced Speaking", "Assignable", "2 tasks"],
       },
       {
         title: "C1 gapped-text classroom sets",

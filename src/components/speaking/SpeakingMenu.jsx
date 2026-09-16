@@ -1,9 +1,11 @@
 import React, { useEffect } from "react";
+import { ArrowRight, ClipboardCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AptisDemoBadge from "../access/AptisDemoBadge.jsx";
 import Seo from "../common/Seo.jsx";
 import { APTIS_SPEAKING_PARTS } from "./speakingMenuData.js";
 import "../listening/listeningMenu.css";
+import "./speakingMenu.css";
 
 export default function SpeakingMenu({ user, aptisAccess, onSignIn }) {
   const navigate = useNavigate();
@@ -22,10 +24,22 @@ export default function SpeakingMenu({ user, aptisAccess, onSignIn }) {
 
       <header className="speaking-menu-header listening-menu-header">
         <h1>Aptis Speaking Parts</h1>
-        <p>Open a part to choose between guided training and exam-style speaking practice.</p>
+        <p>Choose a complete mock test, or open a part for guided training and exam-style practice.</p>
       </header>
 
       <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
+
+      <section className="speaking-mock-entry listening-menu-section">
+        <button className="menu-card speaking-mock-card" type="button" onClick={() => navigate("/speaking/mock-tests")}>
+          <div>
+            <span><ClipboardCheck size={25} aria-hidden="true" /> Full exam practice</span>
+            <h2>Speaking mock tests</h2>
+            <p>Take a complete four-part speaking test with timed questions, downloadable recordings and optional AI feedback.</p>
+            <small>3 complete mocks · Mock 1 open to everyone · Mocks 2–3 with active access</small>
+          </div>
+          <strong>Open mock tests <ArrowRight size={18} aria-hidden="true" /></strong>
+        </button>
+      </section>
 
       <section className="speaking-menu-section listening-menu-section">
         <div className="speaking-parts-grid listening-parts-grid" aria-label="Aptis Speaking parts">
@@ -56,21 +70,6 @@ export default function SpeakingMenu({ user, aptisAccess, onSignIn }) {
             );
           })}
         </div>
-      </section>
-
-      <section className="full-test-card">
-        <div>
-          <div className="section-kicker">Full test</div>
-          <h3>Complete speaking test</h3>
-          <p>Do the whole speaking paper in exam conditions when you want a fuller challenge.</p>
-        </div>
-        <button
-          type="button"
-          onClick={() => navigate("/speaking/mock-tests")}
-          className="mock-test-btn menu-cta-btn"
-        >
-          Open complete test
-        </button>
       </section>
 
       <button className="topbar-btn speaking-menu-back listening-menu-back" type="button" onClick={() => navigate("/")}>

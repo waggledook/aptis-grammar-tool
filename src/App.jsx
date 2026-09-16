@@ -1,6 +1,6 @@
 // src/App.jsx
 import React, { useState, useEffect, useLayoutEffect, useMemo } from 'react'
-import { Routes, Route, useNavigate, useLocation, Navigate } from "react-router-dom";
+import { Routes, Route, useNavigate, useLocation, useParams, Navigate } from "react-router-dom";
 import {
   auth,
   doSignOut,
@@ -79,6 +79,8 @@ import SpeakingPart3Custom from './components/speaking/SpeakingPart3Custom';
 import SpeakingPart4 from "./components/speaking/SpeakingPart4";
 import SpeakingPart4Extra from "./components/speaking/SpeakingPart4Extra";
 import AptisSpeakingMock from "./components/speaking/mockTests/AptisSpeakingMock.jsx";
+import AptisSpeakingMockMenu from "./components/speaking/mockTests/AptisSpeakingMockMenu.jsx";
+import { getAptisSpeakingMock } from "./components/speaking/mockTests/aptisSpeakingMockData.js";
 import SpeakingWorkshops from "./components/speaking/workshops/SpeakingWorkshops.jsx";
 import SpeakingPart2and3_PhotoGuide from "./components/speaking/SpeakingPart2and3_PhotoGuide.jsx";
 import AptisPart1 from "./reading/AptisPart1";
@@ -124,6 +126,7 @@ import AdminActivityInsights from "./components/admin/AdminActivityInsights.jsx"
 import AdminAiModelLab from "./components/admin/AdminAiModelLab.jsx";
 import TeacherTools from "./components/teacher/TeacherTools"; // ← Add this
 import TeacherResources from "./components/teacher/TeacherResources.jsx";
+import TeacherTranscription from "./components/teacher/TeacherTranscription.jsx";
 import TeacherWritingResources from "./components/teacher/TeacherWritingResources.jsx";
 import MyStudents from "./components/teacher/MyStudents";
 import TeacherCourseTestPrintableReport from "./components/teacher/TeacherCourseTestPrintableReport.jsx";
@@ -421,6 +424,27 @@ function AptisFullAccessOnly({
         ) : null}
       </div>
     </div>
+  );
+}
+
+function AptisSpeakingMockWithAccess({ user, aptisAccess, onSignIn, onRequestAccess }) {
+  const { mockId } = useParams();
+  const mock = getAptisSpeakingMock(mockId);
+  const test = <AptisSpeakingMock user={user} onRequireSignIn={onSignIn} />;
+
+  if (!mock || mock.number === 1) return test;
+
+  return (
+    <AptisFullAccessOnly
+      user={user}
+      aptisAccess={aptisAccess}
+      onSignIn={onSignIn}
+      onRequestAccess={onRequestAccess}
+      title="Aptis speaking mock access required"
+      description="Mock 1 is open to everyone. Active Aptis Trainer access is required for Mocks 2 and 3."
+    >
+      {test}
+    </AptisFullAccessOnly>
   );
 }
 
@@ -979,7 +1003,7 @@ const linkedAptisAccess = {
   isDemoMode: isLinkedAptisDemoMode,
 };
 const hasMemberSiteAccess = !requiresMemberAccess || (isOteSite ? hasOteAccess : hasSeifHubAccess);
-const isTeacherToolsRoute = location.pathname === "/teacher-tools";
+const isTeacherToolsRoute = ["/teacher-tools", "/teacher/transcription"].includes(location.pathname);
 const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-it/join";
 const isPublicSpanglishPlayRoute = /^\/games\/spanglish-fix-it\/play\/[^/]+$/.test(location.pathname);
 const isPublicOteLevelTestRoute =
@@ -1477,6 +1501,7 @@ return (
         }
       />
       <Route path="/teacher-resources" element={<TeacherResources user={user} />} />
+      <Route path="/teacher/transcription" element={<RequireTeacher user={user}><TeacherTranscription /></RequireTeacher>} />
       <Route
         path="*"
         element={
@@ -1718,6 +1743,8 @@ return (
   <Route path="/ote/speaking/part-2-voicemails/teacher-bank/:setId" element={<OteSpeakingPart2Practice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} teacherBank />} />
   <Route path="/ote/speaking/part-3-summary/practice" element={<OteSpeakingPart3SummaryPractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/ote/speaking/part-3-summary/practice/:setId" element={<OteSpeakingPart3SummaryPractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
+  <Route path="/ote/speaking/part-3-summary/teacher-bank" element={<OteSpeakingPart3SummaryPractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} teacherBank />} />
+  <Route path="/ote/speaking/part-3-summary/teacher-bank/:setId" element={<OteSpeakingPart3SummaryPractice nativeRoutes={false} user={user} onRequireSignIn={() => setShowAuth(true)} teacherBank />} />
   <Route path="/ote/speaking/part-3-summary/language" element={<OteSpeakingPart3LanguageReference nativeRoutes={false} />} />
   <Route path="/ote/speaking/parts-4-5-debate" element={<OteSpeakingPart45DebateMenu user={user} nativeRoutes={false} />} />
   <Route path="/ote/speaking/parts-4-5-debate/overview" element={<OteSpeakingPart45DebateGuide nativeRoutes={false} />} />
@@ -1938,6 +1965,8 @@ return (
   <Route path="/speaking/part-2-voicemails/teacher-bank/:setId" element={<OteSpeakingPart2Practice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} teacherBank />} />
   <Route path="/speaking/part-3-summary/practice" element={<OteSpeakingPart3SummaryPractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
   <Route path="/speaking/part-3-summary/practice/:setId" element={<OteSpeakingPart3SummaryPractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} />} />
+  <Route path="/speaking/part-3-summary/teacher-bank" element={<OteSpeakingPart3SummaryPractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} teacherBank />} />
+  <Route path="/speaking/part-3-summary/teacher-bank/:setId" element={<OteSpeakingPart3SummaryPractice nativeRoutes={isOteSite} user={user} onRequireSignIn={() => setShowAuth(true)} teacherBank />} />
   <Route path="/speaking/part-3-summary/language" element={<OteSpeakingPart3LanguageReference nativeRoutes={isOteSite} />} />
   <Route path="/speaking/parts-4-5-debate" element={<OteSpeakingPart45DebateMenu user={user} nativeRoutes={isOteSite} />} />
   <Route path="/speaking/parts-4-5-debate/overview" element={<OteSpeakingPart45DebateGuide nativeRoutes={isOteSite} />} />
@@ -2409,10 +2438,13 @@ return (
 />
 
 {!isOteSite && (
-  <Route
-    path="/speaking/mock-tests"
-    element={<AptisSpeakingMock user={user} onRequireSignIn={() => setShowAuth(true)} />}
-  />
+  <>
+    <Route path="/speaking/mock-tests" element={<AptisSpeakingMockMenu user={user} aptisAccess={aptisAccess} onSignIn={() => setShowAuth(true)} />} />
+    <Route
+      path="/speaking/mock-tests/:mockId"
+      element={<AptisSpeakingMockWithAccess user={user} aptisAccess={aptisAccess} onSignIn={() => setShowAuth(true)} onRequestAccess={() => navigate("/aptis-access")} />}
+    />
+  </>
 )}
 
 <Route
@@ -3244,6 +3276,7 @@ return (
   }
 />
 <Route path="/teacher-resources" element={<TeacherResources user={user} />} />
+<Route path="/teacher/transcription" element={<RequireTeacher user={user}><TeacherTranscription /></RequireTeacher>} />
 <Route
   path="/admin"
   element={<AdminDashboard user={user} />}

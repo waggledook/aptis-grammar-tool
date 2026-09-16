@@ -52,7 +52,7 @@ export default function SpeakingFeedbackPanel({ feedbackResult, questions = [], 
           : "";
         return (
           <div className="speaking-answer-feedback" key={item.questionId || index}>
-            <h4>{answers.length === 1 ? "Response" : `Q${index + 1}`}: {questionText || item.question}</h4>
+            <h4>{answers.length === 1 ? "Response" : `Q${transcripts[index]?.questionNumber || item.questionNumber || index + 1}`}: {questionText || item.question}</h4>
             <p className="speaking-transcript">"{transcript || "No clear transcript."}"</p>
             <div className="speaking-feedback-grid">
               <Criterion title="Task" data={item.taskFulfilment} />

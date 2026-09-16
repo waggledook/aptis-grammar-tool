@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../common/Seo.jsx";
 import SpeakingFeedbackPanel from "../SpeakingFeedbackPanel.jsx";
 import {
@@ -12,7 +12,7 @@ import {
   saveSpeakingAiFeedback,
 } from "../../../firebase.js";
 import { recordingsToFeedbackAudio } from "../../../products/ote/utils/speakingFeedback.js";
-import { APTIS_SPEAKING_MOCK, getAptisSpeakingMockPart } from "./aptisSpeakingMockData.js";
+import { getAptisSpeakingMock, getAptisSpeakingMockPart } from "./aptisSpeakingMockData.js";
 import { downloadRecordingsZip } from "./downloadRecordingsZip.js";
 import "./AptisSpeakingMock.css";
 
@@ -47,6 +47,26 @@ function feedbackErrorMessage(error) {
 }
 
 export default function AptisSpeakingMock({ user, onRequireSignIn }) {
+  const { mockId } = useParams();
+  const mock = getAptisSpeakingMock(mockId);
+  if (!mock) {
+    return <UnknownMockScreen />;
+  }
+  return <AptisSpeakingMockRunner key={mock.id} mock={mock} user={user} onRequireSignIn={onRequireSignIn} />;
+}
+
+function UnknownMockScreen() {
+  const navigate = useNavigate();
+  return (
+    <main className="aptis-speaking-mock">
+      <CenteredScreen title="Speaking mock not found">
+        <button className="asm-btn asm-btn-primary" type="button" onClick={() => navigate("/speaking/mock-tests")}>Choose a mock test</button>
+      </CenteredScreen>
+    </main>
+  );
+}
+
+function AptisSpeakingMockRunner({ mock, user, onRequireSignIn }) {
   const navigate = useNavigate();
   const [screen, setScreen] = useState("opening");
   const [partNumber, setPartNumber] = useState(1);
@@ -135,8 +155,8 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
         ? Math.max(0, Math.round((Date.now() - startedAtRef.current) / 1000))
         : 0;
       void logAptisSpeakingMockCompleted({
-        mockId: APTIS_SPEAKING_MOCK.id,
-        mockTitle: APTIS_SPEAKING_MOCK.title,
+        mockId: mock.id,
+        mockTitle: mock.title,
         recordingCount: recordingsRef.current.length,
         completedParts: [1, 2, 3, 4].filter(
           (number) => recordingsRef.current.filter((recording) => recording.partNumber === number).length === partRecordingCount(number)
@@ -146,7 +166,7 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
         reason,
       });
     }
-  }, [cancelActiveAudio, stopStream]);
+  }, [cancelActiveAudio, mock.id, mock.title, stopStream]);
 
   const moveToPartReady = useCallback((number) => {
     cancelActiveAudio();
@@ -174,7 +194,7 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
       return;
     }
 
-    const part = getAptisSpeakingMockPart(meta.partNumber);
+    const part = getAptisSpeakingMockPart(meta.partNumber, mock);
     if (meta.questionIndex + 1 < part.questions.length) {
       setQuestionIndex(meta.questionIndex + 1);
       setPhase("listen");
@@ -183,7 +203,7 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
       return;
     }
     moveToPartReady(meta.partNumber + 1);
-  }, [completeMock, moveToPartReady]);
+  }, [completeMock, mock, moveToPartReady]);
 
   advanceAfterRecordingRef.current = advanceAfterRecording;
 
@@ -282,7 +302,7 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
   useEffect(() => {
     if (screen !== "part-intro") return undefined;
     let cancelled = false;
-    const part = getAptisSpeakingMockPart(partNumber);
+    const part = getAptisSpeakingMockPart(partNumber, mock);
     setPhase("listen");
     (async () => {
       await playFile(part.instructionAudio);
@@ -293,7 +313,7 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
         setPhase("questions");
         return;
       }
-      await playFile(APTIS_SPEAKING_MOCK.beepAudio);
+      await playFile(mock.beepAudio);
       if (cancelled) return;
       setQuestionIndex(0);
       setScreen("question");
@@ -303,14 +323,14 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
       cancelled = true;
       cancelActiveAudio();
     };
-  }, [cancelActiveAudio, partNumber, playFile, screen]);
+  }, [cancelActiveAudio, mock, partNumber, playFile, screen]);
 
   useEffect(() => {
     if (screen !== "part4" || phase !== "questions") return undefined;
     let cancelled = false;
-    const part = getAptisSpeakingMockPart(4);
+    const part = getAptisSpeakingMockPart(4, mock);
     (async () => {
-      await playFile(APTIS_SPEAKING_MOCK.beepAudio);
+      await playFile(mock.beepAudio);
       if (cancelled) return;
       await playFile(part.questionsAudio);
       if (cancelled) return;
@@ -321,17 +341,17 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
       cancelled = true;
       cancelActiveAudio();
     };
-  }, [cancelActiveAudio, phase, playFile, screen]);
+  }, [cancelActiveAudio, mock, phase, playFile, screen]);
 
   useEffect(() => {
     if (screen !== "question" || phase !== "listen") return undefined;
     let cancelled = false;
-    const part = getAptisSpeakingMockPart(partNumber);
+    const part = getAptisSpeakingMockPart(partNumber, mock);
     const question = part.questions[questionIndex];
     (async () => {
       await playFile(question.audio);
       if (cancelled) return;
-      await playFile(APTIS_SPEAKING_MOCK.beepAudio);
+      await playFile(mock.beepAudio);
       if (cancelled) return;
       await startCapture({
         id: question.id,
@@ -346,7 +366,7 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
       cancelled = true;
       cancelActiveAudio();
     };
-  }, [cancelActiveAudio, partNumber, phase, playFile, questionIndex, screen, startCapture]);
+  }, [cancelActiveAudio, mock, partNumber, phase, playFile, questionIndex, screen, startCapture]);
 
   useEffect(() => {
     if (!(["prep", "record"].includes(phase))) return undefined;
@@ -370,13 +390,13 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
   useEffect(() => {
     if (screen !== "part4" || phase !== "transition") return undefined;
     let cancelled = false;
-    const part = getAptisSpeakingMockPart(4);
+    const part = getAptisSpeakingMockPart(4, mock);
     (async () => {
       // Match the original test sequence: announce the two-minute response,
       // play the signal, then begin the recorder.
       await playFile(part.startAudio);
       if (cancelled) return;
-      await playFile(APTIS_SPEAKING_MOCK.beepAudio);
+      await playFile(mock.beepAudio);
       if (cancelled) return;
       await startCapture({
         id: "part4-talk",
@@ -391,7 +411,7 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
       cancelled = true;
       cancelActiveAudio();
     };
-  }, [cancelActiveAudio, phase, playFile, screen, startCapture]);
+  }, [cancelActiveAudio, mock, phase, playFile, screen, startCapture]);
 
   useEffect(() => {
     // React Strict Mode deliberately mounts, cleans up and mounts again in
@@ -480,8 +500,8 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
     completionLoggedRef.current = false;
     startedAtRef.current = Date.now();
     void logAptisSpeakingMockStarted({
-      mockId: APTIS_SPEAKING_MOCK.id,
-      mockTitle: APTIS_SPEAKING_MOCK.title,
+      mockId: mock.id,
+      mockTitle: mock.title,
     });
     startPart(1);
   }
@@ -509,7 +529,7 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
     if (!meta) return;
     setMicError("");
     setPhase("transition");
-    await playFile(APTIS_SPEAKING_MOCK.beepAudio);
+    await playFile(mock.beepAudio);
     if (!mountedRef.current) return;
     await startCapture(meta);
   }
@@ -521,7 +541,7 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
       return;
     }
 
-    const definition = getAptisSpeakingMockPart(part);
+    const definition = getAptisSpeakingMockPart(part, mock);
     const partRecordings = recordings.filter((recording) => recording.partNumber === part);
     if (partRecordings.length !== partRecordingCount(part)) return;
 
@@ -539,14 +559,14 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
         result = await requestAptisSpeakingPart1Feedback({ questions, recordings: feedbackAudio });
       } else if (part === 2) {
         result = await requestAptisSpeakingPart2Feedback({
-          task: { id: APTIS_SPEAKING_MOCK.id, title: definition.title, alt: definition.imageAlt },
+          task: { id: mock.id, title: definition.title, alt: definition.imageAlt },
           questions,
           recordings: feedbackAudio,
         });
       } else if (part === 3) {
         result = await requestAptisSpeakingPart3Feedback({
           task: {
-            id: APTIS_SPEAKING_MOCK.id,
+            id: mock.id,
             title: definition.title,
             photoA: { alt: definition.images[0].alt },
             photoB: { alt: definition.images[1].alt },
@@ -556,7 +576,7 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
         });
       } else {
         result = await requestAptisSpeakingPart4Feedback({
-          task: { id: APTIS_SPEAKING_MOCK.id, title: definition.title, alt: definition.imageAlt },
+          task: { id: mock.id, title: definition.title, alt: definition.imageAlt },
           questions,
           recordings: feedbackAudio,
         });
@@ -568,12 +588,12 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
           await saveSpeakingAiFeedback({
             product: "aptis",
             part: `part${part}`,
-            taskId: `${APTIS_SPEAKING_MOCK.id}-part${part}`,
-            taskTitle: `${APTIS_SPEAKING_MOCK.title} – Part ${part}`,
+            taskId: `${mock.id}-part${part}`,
+            taskTitle: `${mock.title} – Part ${part}`,
             questions,
             transcripts: result.transcripts || [],
             feedback: result.feedback,
-            meta: { ...(result.meta || {}), mockId: APTIS_SPEAKING_MOCK.id },
+            meta: { ...(result.meta || {}), mockId: mock.id },
           });
         } catch (saveError) {
           console.warn(`[Aptis speaking mock] Part ${part} feedback could not be saved`, saveError);
@@ -591,21 +611,21 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
     }
   }
 
-  const part = getAptisSpeakingMockPart(partNumber);
+  const part = getAptisSpeakingMockPart(partNumber, mock);
   const question = part.questions?.[questionIndex];
 
   return (
     <main className="aptis-speaking-mock">
       <Seo
-        title="Aptis General Speaking Mock Test | Seif Aptis Trainer"
+        title={`${mock.title} | Seif Aptis Trainer`}
         description="Complete a four-part Aptis General Speaking mock with timed prompts, microphone recording, downloads and optional AI transcript feedback."
       />
       {screen === "opening" ? (
-        <OpeningScreen onStart={() => setScreen("instructions")} onBack={() => navigate("/speaking")} />
+        <OpeningScreen mock={mock} onStart={() => setScreen("instructions")} onBack={() => navigate("/speaking/mock-tests")} />
       ) : null}
 
       {screen === "instructions" ? (
-        <InstructionsScreen onBegin={() => setScreen("mic")} />
+        <InstructionsScreen mock={mock} onBegin={() => setScreen("mic")} />
       ) : null}
 
       {screen === "mic" ? (
@@ -660,6 +680,7 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
       {screen === "complete" ? (
         <CompleteScreen
           user={user}
+          mock={mock}
           recordings={recordings}
           skippedParts={skippedParts}
           feedbackResults={feedbackResults}
@@ -667,19 +688,19 @@ export default function AptisSpeakingMock({ user, onRequireSignIn }) {
           feedbackErrors={feedbackErrors}
           onGenerateFeedback={generateFeedback}
           onDownloadZip={() => downloadRecordingsZip(recordings)}
-          onBack={() => navigate("/speaking")}
+          onBack={() => navigate("/speaking/mock-tests")}
         />
       ) : null}
     </main>
   );
 }
 
-function OpeningScreen({ onStart, onBack }) {
+function OpeningScreen({ mock, onStart, onBack }) {
   return (
     <section className="asm-setup-screen">
       <div className="asm-setup-content asm-opening-content">
-        <p className="asm-setup-kicker">{APTIS_SPEAKING_MOCK.displayTitle}</p>
-        <h1>Speaking Practice Test Version 001</h1>
+        <p className="asm-setup-kicker">{mock.displayTitle}</p>
+        <h1>Speaking Practice Test Version {String(mock.number).padStart(3, "0")}</h1>
         <dl className="asm-assessment-facts">
           <div>
             <dt>Number of Questions</dt>
@@ -692,14 +713,14 @@ function OpeningScreen({ onStart, onBack }) {
         </dl>
         <div className="asm-setup-actions">
           <button className="asm-btn asm-btn-exam" type="button" onClick={onStart}>Start Assessment</button>
-          <button className="asm-link-btn" type="button" onClick={onBack}>← Back to Speaking</button>
+          <button className="asm-link-btn" type="button" onClick={onBack}>← Choose another mock</button>
         </div>
       </div>
     </section>
   );
 }
 
-function InstructionsScreen({ onBegin }) {
+function InstructionsScreen({ mock, onBegin }) {
   return (
     <section className="asm-setup-screen">
       <div className="asm-setup-content asm-instructions-content">
@@ -709,7 +730,7 @@ function InstructionsScreen({ onBegin }) {
         <p>You will answer some questions about yourself and then do three short speaking tasks.</p>
         <p>Listen to the instructions and speak clearly into your microphone when you hear the signal.</p>
         <p>Each part of the test will appear automatically.</p>
-        <p>The test will take about {APTIS_SPEAKING_MOCK.durationMinutes} minutes.</p>
+        <p>The test will take about {mock.durationMinutes} minutes.</p>
         <p className="asm-instruction-final">When you click on the ‘Next’ button, you will test your microphone before the test begins.</p>
         </div>
         <button className="asm-btn asm-btn-exam" type="button" onClick={onBegin}>Next</button>
@@ -767,7 +788,7 @@ function PromptScreen({ part, onSkip }) {
 function QuestionScreen({ part, question, questionIndex, phase, secondsLeft, micError, onFinish, onRetry, onSkip }) {
   const canFinish = phase === "record" && secondsLeft <= part.responseSeconds - 5;
   return (
-    <section className="asm-task-wrap">
+    <section className={`asm-task-wrap${part.number === 2 ? " asm-part2-question" : ""}`}>
       <div className="asm-two-column">
         <div className="asm-panel">
           <header className="asm-task-heading">
@@ -891,6 +912,7 @@ function SkipPartButton({ partNumber, onSkip }) {
 
 function CompleteScreen({
   user,
+  mock,
   recordings,
   skippedParts,
   feedbackResults,
@@ -921,7 +943,7 @@ function CompleteScreen({
           {!user ? <p className="asm-muted">You can sign in without losing the recordings on this page.</p> : null}
           <div className="asm-review-grid">
             {[1, 2, 3, 4].map((partNumber) => {
-              const definition = getAptisSpeakingMockPart(partNumber);
+              const definition = getAptisSpeakingMockPart(partNumber, mock);
               const partRecordings = recordings.filter((recording) => recording.partNumber === partNumber);
               const count = partRecordings.length;
               const complete = count === partRecordingCount(partNumber);
@@ -977,7 +999,7 @@ function CompleteScreen({
           <p className="asm-review-note">AI feedback is based on the transcript of your recording. Pronunciation is not assessed reliably.</p>
         </section>
 
-        <button className="asm-link-btn" type="button" onClick={onBack}>← Back to Speaking</button>
+        <button className="asm-link-btn" type="button" onClick={onBack}>← Choose another mock</button>
       </div>
     </section>
   );
