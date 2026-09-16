@@ -20,6 +20,10 @@ import {
   HUB_VOCAB_LEVELS,
 } from "../../data/hubVocabularyActivities.js";
 import { OTE_SPEAKING_MOCKS } from "../../products/ote/mockTests/data/oteSpeakingMockData.js";
+import { ADVANCED_PRACTICE_SETS as OTE_ADVANCED_INTERVIEW_SETS } from "../../products/ote/data/oteInterviewPracticeSets.js";
+import { ADVANCED_PRACTICE_SETS as OTE_ADVANCED_VOICEMAIL_SETS } from "../../products/ote/data/oteVoicemailPracticeSets.js";
+import { SUMMARY_PRACTICE_SETS, SUMMARY_TEACHER_SETS } from "../../products/ote/data/oteSummaryPracticeSets.js";
+import { DEBATE_PRACTICE_SETS } from "../../products/ote/data/oteDebatePracticeSets.js";
 import { getOteWritingMock, getOteWritingMocks } from "../../products/ote/mockTests/data/oteWritingMockData.js";
 import { getOteWritingPracticeGroups } from "../../products/ote/mockTests/data/oteWritingPracticeData.js";
 import { getWritingMock as getAptisWritingMock } from "../writing/mockTests/data/mocks.js";
@@ -101,10 +105,10 @@ const OTE_SPEAKING_TOTALS = {
     mock: 0,
   },
   advanced: {
-    part1: 5,
-    part2: 5,
-    part3Summary: 2,
-    parts45: 3,
+    part1: OTE_ADVANCED_INTERVIEW_SETS.length,
+    part2: OTE_ADVANCED_VOICEMAIL_SETS.length,
+    part3Summary: SUMMARY_PRACTICE_SETS.length,
+    parts45: DEBATE_PRACTICE_SETS.length,
     mock: 0,
   },
 };
@@ -200,16 +204,12 @@ const OTE_LISTENING_PART_LABELS = {
   },
 };
 
-const OTE_ADVANCED_SPEAKING_TASK_IDS = new Set([
-  "urban-green-spaces",
-  "short-breaks",
-  "travel-environment-debate",
-  "travel-environment-follow-ups",
-  "shopping-consumerism-debate",
-  "shopping-consumerism-follow-ups",
-  "science-natural-world-debate",
-  "science-natural-world-follow-ups",
-]);
+const OTE_ADVANCED_SUMMARY_TASK_IDS = new Set(
+  [...SUMMARY_PRACTICE_SETS, ...SUMMARY_TEACHER_SETS].map((set) => set.id)
+);
+const OTE_ADVANCED_DEBATE_TASK_IDS = new Set(
+  DEBATE_PRACTICE_SETS.flatMap((set) => [`${set.id}-debate`, `${set.id}-follow-ups`])
+);
 
 function normalizeOteProfileVariant(version) {
   return version === "advanced" ? "advanced" : "general";
@@ -220,7 +220,8 @@ function isAdvancedOteSpeakingFeedback(item = {}) {
   const taskId = String(item.taskId || "").toLowerCase();
   const taskTitle = String(item.taskTitle || "").toLowerCase();
   if (taskId.startsWith("advanced-set-")) return true;
-  if (OTE_ADVANCED_SPEAKING_TASK_IDS.has(taskId)) return true;
+  if (OTE_ADVANCED_SUMMARY_TASK_IDS.has(taskId) || OTE_ADVANCED_DEBATE_TASK_IDS.has(taskId)) return true;
+  if (taskId.startsWith("teacher-voicemail-")) return true;
   if (part === "part-5" || part === "part5" || part === "parts-4-5") return true;
   if (taskId.includes("-debate") || taskId.includes("-follow-ups")) return true;
   if (taskTitle.includes("advanced") || taskTitle.includes("summary")) return true;
@@ -1245,19 +1246,27 @@ const normalizeOteSpeakingPart = (part) => {
   if (value === "parts-3-4" || value === "part34" || value === "part-3-4") return "parts34";
   return value;
 };
-const uniqueOteSpeakingTasks = (partKey) =>
+const uniqueOteSpeakingTasks = (partKey, allowedIds = null) =>
   new Set(
     oteSpeakingFeedback
       .filter((item) => normalizeOteSpeakingPart(item.part) === partKey)
       .map((item) => item.taskId || item.taskTitle || item.id)
+      .map((taskId) => partKey === "parts45" ? String(taskId).replace(/-(?:debate|follow-ups)$/, "") : taskId)
+      .filter((taskId) => !allowedIds || allowedIds.has(taskId))
       .filter(Boolean)
   ).size;
+const advancedSpeakingSetIds = {
+  part1: new Set(OTE_ADVANCED_INTERVIEW_SETS.map((set) => set.id)),
+  part2: new Set(OTE_ADVANCED_VOICEMAIL_SETS.map((set) => set.id)),
+  part3Summary: new Set(SUMMARY_PRACTICE_SETS.map((set) => set.id)),
+  parts45: new Set(DEBATE_PRACTICE_SETS.map((set) => set.id)),
+};
 const oteSpeakingProgress = {
-  part1: uniqueOteSpeakingTasks("part1"),
-  part2: uniqueOteSpeakingTasks("part2"),
+  part1: uniqueOteSpeakingTasks("part1", oteProfileVariant === "advanced" ? advancedSpeakingSetIds.part1 : null),
+  part2: uniqueOteSpeakingTasks("part2", oteProfileVariant === "advanced" ? advancedSpeakingSetIds.part2 : null),
   parts34: uniqueOteSpeakingTasks("parts34"),
-  part3Summary: uniqueOteSpeakingTasks("part3Summary"),
-  parts45: uniqueOteSpeakingTasks("parts45"),
+  part3Summary: uniqueOteSpeakingTasks("part3Summary", advancedSpeakingSetIds.part3Summary),
+  parts45: uniqueOteSpeakingTasks("parts45", advancedSpeakingSetIds.parts45),
   mock: new Set(
     filteredOteMockAttempts
       .filter((attempt) => (attempt.module || "speaking") === "speaking")
