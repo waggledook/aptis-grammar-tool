@@ -1,5 +1,8 @@
 import { MOCK_2_REVIEW_FEEDBACK } from "./aptisGrammarVocabularyMock2Feedback.js";
 import { MOCK_3_REVIEW_FEEDBACK } from "./aptisGrammarVocabularyMock3Feedback.js";
+import { MOCK_4_REVIEW_FEEDBACK } from "./aptisGrammarVocabularyMock4Feedback.js";
+import { MOCK_5_REVIEW_FEEDBACK } from "./aptisGrammarVocabularyMock5Feedback.js";
+import { MOCK_6_REVIEW_FEEDBACK } from "./aptisGrammarVocabularyMock6Feedback.js";
 
 export const MOCK_1_REVIEW_FEEDBACK = {
   grammar: {
@@ -74,5 +77,8 @@ export function getAptisMockReviewFeedback(mockId) {
   if (mockId === "mock-1") return MOCK_1_REVIEW_FEEDBACK;
   if (mockId === "mock-2") return MOCK_2_REVIEW_FEEDBACK;
   if (mockId === "mock-3") return MOCK_3_REVIEW_FEEDBACK;
+  if (mockId === "mock-4") return MOCK_4_REVIEW_FEEDBACK;
+  if (mockId === "mock-5") return MOCK_5_REVIEW_FEEDBACK;
+  if (mockId === "mock-6") return MOCK_6_REVIEW_FEEDBACK;
   return EMPTY_REVIEW_FEEDBACK;
 }

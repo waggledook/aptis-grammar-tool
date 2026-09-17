@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { ArrowLeft, CheckCircle2, Download, Mic, NotebookTabs, RotateCcw, Timer } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Clipboard, Download, ExternalLink, Mic, NotebookTabs, RotateCcw, Timer } from "lucide-react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
-import { DEBATE_PRACTICE_SETS } from "./data/oteDebatePracticeSets.js";
+import { DEBATE_PRACTICE_SETS, DEBATE_TEACHER_SETS } from "./data/oteDebatePracticeSets.js";
 import SpeakingFeedbackPanel from "../../components/speaking/SpeakingFeedbackPanel.jsx";
 import {
   logOteTrainingCompleted,
@@ -339,19 +339,30 @@ function NativeDebateMindMap({ set }) {
   );
 }
 
-export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, user = null, onRequireSignIn }) {
+export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, user = null, onRequireSignIn, teacherBank = false }) {
   const { setId } = useParams();
   const [searchParams] = useSearchParams();
   const initialMode = searchParams.get("mode") === "followups" ? "followups" : "full";
   const navigate = useNavigate();
   const { speakingId, playAudioFile, speak, stop } = useSpeech();
   const menuPath = getSitePath(nativeRoutes ? "/speaking/parts-4-5-debate" : "/ote/speaking/parts-4-5-debate");
-  const rawBasePath = nativeRoutes ? "/speaking/parts-4-5-debate/practice" : "/ote/speaking/parts-4-5-debate/practice";
+  const rawBasePath = teacherBank
+    ? nativeRoutes ? "/speaking/parts-4-5-debate/teacher-bank" : "/ote/speaking/parts-4-5-debate/teacher-bank"
+    : nativeRoutes ? "/speaking/parts-4-5-debate/practice" : "/ote/speaking/parts-4-5-debate/practice";
   const basePath = getSitePath(rawBasePath);
   const getSetPath = (id, query = "") => getSitePath(`${rawBasePath}/${id}${query}`);
-  const selectedSet = useMemo(() => DEBATE_PRACTICE_SETS.find((item) => item.id === setId), [setId]);
+  const activeSets = teacherBank ? DEBATE_TEACHER_SETS : DEBATE_PRACTICE_SETS;
+  const selectedSet = useMemo(() => activeSets.find((item) => item.id === setId), [activeSets, setId]);
   const steps = useMemo(() => buildSteps(selectedSet, initialMode), [selectedSet, initialMode]);
   const completedProgress = useOteTrainingProgress();
+  const [copiedSetId, setCopiedSetId] = useState("");
+  const progressPrefix = teacherBank ? "speaking.parts45.teacher-bank" : "speaking.parts45.practice";
+
+  async function copyStudentLink(set) {
+    await navigator.clipboard.writeText(new URL(getSetPath(set.id), window.location.origin).toString());
+    setCopiedSetId(set.id);
+    window.setTimeout(() => setCopiedSetId((current) => current === set.id ? "" : current), 1800);
+  }
 
   const [stepIndex, setStepIndex] = useState(0);
   const [phase, setPhase] = useState("ready");
@@ -391,22 +402,23 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
     logOteTrainingCompleted({
       section: "speaking",
       part: initialMode === "followups" ? "part-5" : "parts-4-5",
-      mode: initialMode === "followups" ? "follow_up_practice" : "debate_follow_up_practice",
+      mode: teacherBank ? "debate_teacher_bank" : initialMode === "followups" ? "follow_up_practice" : "debate_follow_up_practice",
+      progressId: teacherBank ? `${progressPrefix}.${selectedSet.id}` : undefined,
       setId: selectedSet.id,
       setTitle: selectedSet.title,
       recordingCount: recordings.length,
     });
-  }, [complete, initialMode, recordings.length, selectedSet]);
+  }, [complete, initialMode, progressPrefix, recordings.length, selectedSet, teacherBank]);
 
   function buildAssignmentItem(set) {
     return {
-      id: `ote.advanced.speaking.parts45.practice.${set.id}`,
+      id: `ote.advanced.speaking.parts45.${teacherBank ? "teacher-bank" : "practice"}.${set.id}`,
       variant: "advanced",
       category: "Speaking",
       label: `Parts 4 and 5: ${set.title}`,
       routePath: getSetPath(set.id),
-      progressId: `speaking.parts45.practice.${set.id}`,
-      parentProgressId: "speaking.parts45.practice",
+      progressId: `${progressPrefix}.${set.id}`,
+      parentProgressId: teacherBank ? "" : "speaking.parts45.practice",
     };
   }
 
@@ -518,7 +530,8 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
       logOteTrainingStarted({
         section: "speaking",
         part: initialMode === "followups" ? "part-5" : "parts-4-5",
-        mode: initialMode === "followups" ? "follow_up_practice" : "debate_follow_up_practice",
+        mode: teacherBank ? "debate_teacher_bank" : initialMode === "followups" ? "follow_up_practice" : "debate_follow_up_practice",
+        progressId: teacherBank ? `${progressPrefix}.${selectedSet.id}` : undefined,
         setId: selectedSet.id,
         setTitle: selectedSet.title,
         taskCount: steps.length,
@@ -756,37 +769,42 @@ export default function OteSpeakingPart45DebatePractice({ nativeRoutes = false, 
     return (
       <main className="ote-training-page ote-debate-practice-page">
         <Seo title="OTE Advanced Speaking Parts 4 and 5 Practice | Seif English" description="Advanced OTE debate and follow-up question practice." />
-        <button className="ote-training-back" type="button" onClick={() => navigate(menuPath)}>
+        <button className="ote-training-back" type="button" onClick={() => navigate(teacherBank ? getSitePath("/teacher-resources") : menuPath)}>
           <ArrowLeft size={18} aria-hidden="true" />
-          Back to speaking
+          {teacherBank ? "Back to teacher resources" : "Back to speaking"}
         </button>
         <header className="ote-training-hero">
-          <p className="ote-kicker">Advanced Speaking Parts 4 and 5</p>
-          <h1>Debate and Follow-up Practice</h1>
+          <p className="ote-kicker">{teacherBank ? "Teacher task bank" : "Advanced Speaking Parts 4 and 5"}</p>
+          <h1>{teacherBank ? "Advanced Debate Tasks" : "Debate and Follow-up Practice"}</h1>
           <p>
-            Choose a debate set. Start with Part 4 to practise the full flow, or jump straight to Part 5 follow-up questions.
+            {teacherBank
+              ? "Open a classroom task, copy its student link, or assign it. Audio for these new tasks is being prepared."
+              : "Choose a debate set. Start with Part 4 to practise the full flow, or jump straight to Part 5 follow-up questions."}
           </p>
         </header>
         <div className="ote-practice-set-grid">
-          {DEBATE_PRACTICE_SETS.map((set, index) => (
+          {activeSets.map((set, index) => (
             <article
-              className={`ote-practice-set-card ote-debate-set-card ${completedProgress.has(`speaking.parts45.practice.${set.id}`) ? "is-complete" : ""}`}
+              className={`ote-practice-set-card ote-debate-set-card ${completedProgress.has(`${progressPrefix}.${set.id}`) ? "is-complete" : ""}`}
               key={set.id}
             >
               <OteAssignButton user={user} item={buildAssignmentItem(set)} className="ote-assign-btn ote-assign-card-btn" />
-              {completedProgress.has(`speaking.parts45.practice.${set.id}`) ? (
+              {completedProgress.has(`${progressPrefix}.${set.id}`) ? (
                 <CheckCircle2 className="ote-training-complete-icon" size={22} aria-label="Completed" />
               ) : null}
-              <span>Set {index + 1}</span>
+              <span>{teacherBank ? "Task" : "Set"} {index + 1}</span>
               <h2>{set.title}</h2>
               <p>{set.description}</p>
               <div className="ote-debate-set-actions">
                 <button type="button" onClick={() => navigate(getSetPath(set.id))}>
-                  Debate + follow-ups
+                  {teacherBank ? <ExternalLink size={16} aria-hidden="true" /> : null} Debate + follow-ups
                 </button>
                 <button type="button" onClick={() => navigate(getSetPath(set.id, "?mode=followups"))}>
                   Follow-ups only
                 </button>
+                {teacherBank ? <button type="button" onClick={() => copyStudentLink(set)}>
+                  <Clipboard size={16} aria-hidden="true" /> {copiedSetId === set.id ? "Link copied" : "Copy student link"}
+                </button> : null}
               </div>
             </article>
           ))}

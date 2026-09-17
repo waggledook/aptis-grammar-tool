@@ -7,7 +7,7 @@ import { PRACTICE_SETS as OTE_GENERAL_VOICEMAIL_SETS, ADVANCED_PRACTICE_SETS as 
 import { SUMMARY_PRACTICE_SETS, SUMMARY_TEACHER_SETS } from "../../products/ote/data/oteSummaryPracticeSets.js";
 import { PRACTICE_SETS as OTE_GENERAL_INTERVIEW_SETS, ADVANCED_PRACTICE_SETS as OTE_ADVANCED_INTERVIEW_SETS } from "../../products/ote/data/oteInterviewPracticeSets.js";
 import { PRACTICE_SETS as OTE_TALK_SETS } from "../../products/ote/data/oteTalkPracticeSets.js";
-import { DEBATE_PRACTICE_SETS as OTE_DEBATE_SETS } from "../../products/ote/data/oteDebatePracticeSets.js";
+import { DEBATE_PRACTICE_SETS as OTE_DEBATE_SETS, DEBATE_TEACHER_SETS as OTE_DEBATE_TEACHER_SETS } from "../../products/ote/data/oteDebatePracticeSets.js";
 
 function voicemailTasks(sets) {
   return sets.flatMap((set) => set.tasks.map((task) => ({
@@ -111,7 +111,7 @@ export const TRANSCRIPTION_TASK_GROUPS = [
   },
   {
     id: "ote_advanced_debate", app: "ote-advanced", label: "Part 4 · debate", credits: 4,
-    tasks: OTE_DEBATE_SETS.map((set) => ({
+    tasks: [...OTE_DEBATE_SETS, ...OTE_DEBATE_TEACHER_SETS].map((set) => ({
       id: set.id, title: set.title,
       prompt: `Your tutor says: “${set.statement}” Give a talk for or against the statement. Use two or three ideas: ${set.mindMapIdeas.join(", ")}.`,
       context: set,
@@ -119,7 +119,7 @@ export const TRANSCRIPTION_TASK_GROUPS = [
   },
   {
     id: "ote_advanced_followup", app: "ote-advanced", label: "Part 5 · follow-up questions", credits: 4,
-    tasks: OTE_DEBATE_SETS.map((set) => ({
+    tasks: [...OTE_DEBATE_SETS, ...OTE_DEBATE_TEACHER_SETS].map((set) => ({
       id: set.id, title: set.title, questions: set.questions, context: set,
     })),
   },

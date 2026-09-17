@@ -539,6 +539,9 @@ export default function OteSpeakingMockRunner({ user, onRequireSignIn, nativeRou
       if (step.task?.taskAudioSrc) {
         await playAudioFile(step.task.taskAudioSrc);
         consumeSkipRequest();
+      } else if (step.kind === "debate-task" && step.task?.statement) {
+        await speakPrompt(step.task.statement);
+        consumeSkipRequest();
       }
       if (step.task?.nowListenAudioSrc) {
         await playAudioFile(step.task.nowListenAudioSrc);
@@ -760,6 +763,7 @@ function StartScreen({ mock, user, onStart }) {
           Your speaking module will run automatically. You can use Skip to move through
           practice questions more quickly.
         </p>
+        {mock.draft ? <p className="ote-warning">Draft preview: only Parts 4 and 5 are included. Parts 1–3 are still to be added.</p> : null}
         {!user ? <p className="ote-warning">Sign in to save this mock to your account.</p> : null}
         <button className="ote-primary-btn" type="button" onClick={onStart}>
           Start speaking mock
@@ -1303,7 +1307,7 @@ function CompleteScreen({ user, mock, recordings, elapsedSeconds = 0, onDashboar
         <button
           className="ote-download-zip-btn"
           type="button"
-          onClick={() => createZipAndDownload(downloadableRecordings, "ote-speaking-mock-1-recordings.zip")}
+          onClick={() => createZipAndDownload(downloadableRecordings, `ote-${mock.id}-recordings.zip`)}
           disabled={!downloadableRecordings.length}
         >
           <Download size={22} />

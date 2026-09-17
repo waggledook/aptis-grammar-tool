@@ -459,6 +459,66 @@ export const OTE_SPEAKING_MOCKS = {
       },
     ],
   },
+  // Draft shell: Parts 1–3 are still to be added; Parts 4–5 have recorded audio.
+  // Deliberately not linked from student menus or assignment catalogs.
+  "speaking-advanced-2": {
+    id: "speaking-advanced-2",
+    title: "OTE Advanced Speaking Mock 2 (Draft: Parts 4–5)",
+    moduleLabel: "Speaking",
+    levelLabel: "Advanced",
+    draft: true,
+    maxDurationSeconds: 8 * 60,
+    part4Theme: "mobile phones in schools",
+    parts: [
+      {
+        id: "part-4",
+        number: 4,
+        title: "Debate",
+        instructions: [
+          "You are going to take part in a debate.",
+          "First read and listen to the task, then decide what you want to say.",
+          "The clock shows how much time you have to speak.",
+          "Start speaking when you hear the tone.",
+        ],
+        task: {
+          id: "adv2-p4-debate",
+          title: "Debate",
+          visualType: "debate",
+          allowNotes: true,
+          statement: "Schools should ban mobile phones during the school day.",
+          prompt: "Your tutor has asked you to take part in a class debate. You are going to put a case for or against the statement below.",
+          taskAudioSrc: "/audio/ote/speaking/advanced/mock-2/debate-task.mp3",
+          prepInstructionAudioSrc: OTE_SPEAKING_AUDIO.debatePrepareInstructions,
+          requirements: [
+            "use two or three of the ideas below to argue your case",
+            "provide support for the ideas you choose",
+            "give a conclusion",
+          ],
+          mindMapIdeas: ["student concentration", "educational uses", "emergency contact", "social interaction", "school discipline"],
+          prepSeconds: 45,
+          responseSeconds: 120,
+        },
+      },
+      {
+        id: "part-5",
+        number: 5,
+        title: "Follow-up Questions",
+        instructions: [
+          "You are going to answer four questions on the topic of your debate.",
+          "The clock shows how much time you have to speak.",
+          "Start speaking when you hear the tone.",
+        ],
+        instructionAudioSrc: OTE_SPEAKING_AUDIO.followUpAdvancedInstructions,
+        topic: "mobile phones in schools",
+        questions: [
+          { id: "adv2-p5-q1", prompt: "The topic of your debate was banning mobile phones in schools. Could schools enforce this rule effectively?", audioSrc: "/audio/ote/speaking/advanced/mock-2/follow-up-q1.mp3", responseSeconds: 40 },
+          { id: "adv2-p5-q2", prompt: "How important is it for young people to learn to control their own screen time?", audioSrc: "/audio/ote/speaking/advanced/mock-2/follow-up-q2.mp3", responseSeconds: 40 },
+          { id: "adv2-p5-q3", prompt: "Do you think technology has improved communication between different generations?", audioSrc: "/audio/ote/speaking/advanced/mock-2/follow-up-q3.mp3", responseSeconds: 40 },
+          { id: "adv2-p5-q4", prompt: "One day, mobile phones may disappear completely. How do you think people will communicate?", audioSrc: "/audio/ote/speaking/advanced/mock-2/follow-up-q4.mp3", responseSeconds: 40 },
+        ],
+      },
+    ],
+  },
 };
 
 export function getOteSpeakingMock(mockId = "speaking-1") {

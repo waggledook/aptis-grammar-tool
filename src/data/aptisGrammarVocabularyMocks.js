@@ -1,3 +1,5 @@
+import { APTIS_GRAMMAR_VOCABULARY_MOCKS_4_TO_6 } from "./aptisGrammarVocabularyMocks4to6.js";
+
 function grammarQuestion(id, prompt, options, correctAnswer, target, difficulty) {
   return { id, prompt, options, correctAnswer, target, difficulty };
 }
@@ -297,6 +299,7 @@ export const APTIS_GRAMMAR_VOCABULARY_MOCKS = [
       ),
     ],
   },
+  ...APTIS_GRAMMAR_VOCABULARY_MOCKS_4_TO_6,
 ];
 
 export function getAptisGrammarVocabularyMock(mockId) {

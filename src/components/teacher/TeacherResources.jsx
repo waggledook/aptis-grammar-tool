@@ -148,6 +148,13 @@ const PRODUCT_GROUPS = [
         tags: ["Advanced Speaking", "Assignable", "2 tasks"],
       },
       {
+        title: "Advanced debate task bank",
+        description: "Two extra Parts 4 and 5 debate-and-follow-up sets, with individual student links, timed recording and AI feedback.",
+        path: "/ote/speaking/parts-4-5-debate/teacher-bank",
+        icon: Mic2,
+        tags: ["Advanced Speaking", "Assignable", "2 tasks"],
+      },
+      {
         title: "C1 gapped-text classroom sets",
         description: "Two extra Part 3 texts that do not count towards learner completion.",
         path: "/ote/reading/advanced/part-3-gapped-text",

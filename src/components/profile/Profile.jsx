@@ -1214,7 +1214,7 @@ const filteredOteWriting = oteWriting.filter(
   (entry) => isAdvancedOteWritingSubmission(entry) === (oteProfileVariant === "advanced")
 );
 const filteredOteMockAttempts = oteMockAttempts.filter(
-  (attempt) => isAdvancedOteMockAttempt(attempt) === (oteProfileVariant === "advanced")
+  (attempt) => !OTE_SPEAKING_MOCKS[attempt.mockId]?.draft && isAdvancedOteMockAttempt(attempt) === (oteProfileVariant === "advanced")
 );
 const oteSpeakingMockAttempts = filteredOteMockAttempts.filter(
   (attempt) => (attempt.module || "speaking") === "speaking"
@@ -1225,7 +1225,7 @@ const oteReadingMockAttempts = filteredOteMockAttempts.filter(
 const oteWritingMockCount = filteredOteWriting.filter((entry) => entry.type !== "ote-writing-practice").length;
 const oteWritingPracticeCount = filteredOteWriting.length - oteWritingMockCount;
 const oteSpeakingMockTotal = Object.values(OTE_SPEAKING_MOCKS || {}).filter(
-  (mock) => isAdvancedOteMockAttempt(mock) === (oteProfileVariant === "advanced")
+  (mock) => !mock.draft && isAdvancedOteMockAttempt(mock) === (oteProfileVariant === "advanced")
 ).length;
 const oteWritingMocksTotal = getOteWritingMocks().filter(
   (mock) => isAdvancedOteWritingSubmission(mock) === (oteProfileVariant === "advanced")

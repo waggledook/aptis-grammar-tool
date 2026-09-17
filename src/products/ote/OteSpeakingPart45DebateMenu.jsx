@@ -6,6 +6,7 @@ import { getSitePath } from "../../siteConfig.js";
 import { useOteTrainingProgress, useOteTrainingSummary } from "./utils/trainingProgress.js";
 import OteAssignableCard from "./OteAssignableCard.jsx";
 import { getOteAssignmentItems } from "./data/oteAssignmentCatalog.js";
+import { DEBATE_PRACTICE_SETS } from "./data/oteDebatePracticeSets.js";
 import "./styles/ote.css";
 
 export default function OteSpeakingPart45DebateMenu({ user, nativeRoutes = false }) {
@@ -54,7 +55,7 @@ export default function OteSpeakingPart45DebateMenu({ user, nativeRoutes = false
     [followUpGuidedTaskPath, guidedTaskPath, overviewPath]
   );
   const summary = useOteTrainingSummary(activities, completedProgress);
-  const practiceTotal = 3;
+  const practiceTotal = DEBATE_PRACTICE_SETS.length;
   const practiceChildCount = Array.from(completedProgress).filter((progressId) =>
     /^speaking\.parts45\.practice\.[\w-]+$/.test(progressId)
   ).length;

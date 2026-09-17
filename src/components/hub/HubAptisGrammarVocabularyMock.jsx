@@ -1384,6 +1384,7 @@ function AptisMockStyles() {
         margin: 0 0 28px;
         font-size: 22px;
         line-height: 1.35;
+        white-space: pre-line;
       }
 
       .aptis-mock-placeholder {
@@ -1992,6 +1993,7 @@ function AptisMockStyles() {
       .aptis-mock-review-list article strong {
         margin-bottom: 9px;
         line-height: 1.4;
+        white-space: pre-line;
       }
 
       .aptis-mock-review-list article p {
