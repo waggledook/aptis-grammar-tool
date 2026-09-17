@@ -4,6 +4,7 @@ const admin     = require("firebase-admin");
 const nodemailer = require("nodemailer");
 const nodeCrypto = require("crypto");
 const {aggregateAnalyticsEvent} = require("./activityAnalytics");
+const {buildSiteAccessEmail} = require("./site-access-email");
 
 // ---------- init Admin (safe if called twice) ----------
 try { admin.app(); } catch { admin.initializeApp(); }
@@ -934,19 +935,6 @@ function hasMeaningfulAccessNotificationChange(beforeAccess, afterAccess) {
     beforeAccess.endDate !== afterAccess.endDate ||
     beforeAccess.indefinite !== afterAccess.indefinite
   );
-}
-
-function formatAccessDate(dateString = "") {
-  if (!dateString) return "";
-
-  const parsed = new Date(`${dateString}T00:00:00`);
-  if (Number.isNaN(parsed.getTime())) return dateString;
-
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  }).format(parsed);
 }
 
 function isAptisFeedbackTask(taskType) {
@@ -8624,98 +8612,22 @@ exports.emailSiteAccessGranted = functions.region("europe-west1")
 
     const displayName =
       after.displayName || after.name || after.username || userEmail.split("@")[0] || "there";
-    const firstAccess = changedAccesses[0];
-    const isSingleAccess = changedAccesses.length === 1;
-    const accessListText = changedAccesses
-      .map(({ label, url, access }) => {
-        const startLine = access.startDate
-          ? `Start date: ${formatAccessDate(access.startDate)}`
-          : "Start date: active now";
-        const endLine = access.indefinite
-          ? "End date: no end date set"
-          : access.endDate
-            ? `End date: ${formatAccessDate(access.endDate)}`
-            : "End date: not set";
-
-        return [`${label}: ${url}`, startLine, endLine].join("\n");
-      })
-      .join("\n\n");
-    const accessListHtml = changedAccesses
-      .map(({ label, url, access }) => {
-        const startLine = access.startDate
-          ? `Start date: ${formatAccessDate(access.startDate)}`
-          : "Start date: active now";
-        const endLine = access.indefinite
-          ? "End date: no end date set"
-          : access.endDate
-            ? `End date: ${formatAccessDate(access.endDate)}`
-            : "End date: not set";
-
-        return [
-          `<li>`,
-          `<strong>${escapeHtml(label)}</strong><br/>`,
-          `<a href="${escapeHtml(url)}">${escapeHtml(url)}</a><br/>`,
-          `${escapeHtml(startLine)}<br/>`,
-          `${escapeHtml(endLine)}`,
-          `</li>`,
-        ].join("");
-      })
-      .join("");
     const hasNewGrant = changedAccesses.some((entry) => entry.isNewGrant);
-    const subject = isSingleAccess
-      ? `Your ${firstAccess.label} access is ready`
-      : "Your Seif English platform access is ready";
-    const intro = hasNewGrant
-      ? "Good news: your access has been activated."
-      : "Good news: your access details have been updated.";
     const isNewSeifAdminAccount =
       !change.before.exists &&
       after.onboarding?.source === "seifAdmin" &&
       after.onboarding?.temporaryPasswordIssued === true;
-    const temporaryPasswordText = isNewSeifAdminAccount
-      ? [
-          "",
-          `Temporary password: ${SEIF_ADMIN_DEFAULT_PASSWORD}`,
-          "For your security, please change this as soon as you sign in. Open your Profile, then use Account & Security → Change password.",
-        ]
-      : [];
-    const temporaryPasswordHtml = isNewSeifAdminAccount
-      ? [
-          `<p><strong>Temporary password:</strong> <code>${escapeHtml(SEIF_ADMIN_DEFAULT_PASSWORD)}</code></p>`,
-          "<p><strong>For your security, please change this as soon as you sign in.</strong> Open your Profile, then use Account &amp; Security &rarr; Change password.</p>",
-        ].join("")
-      : "";
-
-    const text = [
-      `Hi ${displayName},`,
-      "",
-      intro,
-      "",
-      accessListText,
-      "",
-      "You can sign in with the same email address you used for your Seif English account.",
-      ...temporaryPasswordText,
-      "If anything looks wrong, just reply to this email and we will help.",
-      "",
-      "Best,",
-      "Seif English Academy",
-    ].join("\n");
-
-    const html =
-      `<p>Hi ${escapeHtml(displayName)},</p>` +
-      `<p>${escapeHtml(intro)}</p>` +
-      `<ul>${accessListHtml}</ul>` +
-      `<p>You can sign in with the same email address you used for your Seif English account.</p>` +
-      temporaryPasswordHtml +
-      `<p>If anything looks wrong, just reply to this email and we will help.</p>` +
-      `<p>Best,<br/>Seif English Academy</p>`;
-
+    const email = buildSiteAccessEmail({
+      displayName,
+      changedAccesses,
+      isNewAccount: isNewSeifAdminAccount,
+      hasNewGrant,
+      temporaryPassword: isNewSeifAdminAccount ? SEIF_ADMIN_DEFAULT_PASSWORD : null,
+    });
     const userMsg = {
-      from: FROM_ADDRESS,
+      from: {name: "Seif English Academy", address: FROM_ADDRESS},
       to: userEmail,
-      subject,
-      text,
-      html,
+      ...email,
       replyTo: TEACHER_EMAIL || FROM_ADDRESS,
     };
 
