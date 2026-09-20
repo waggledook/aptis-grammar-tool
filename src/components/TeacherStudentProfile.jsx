@@ -27,11 +27,11 @@ function formatDate(value) {
 
 function labelForPerson(person = {}) {
   return (
-    person.displayName ||
-    person.name ||
-    person.username ||
-    person.email ||
-    person.id ||
+    person?.displayName ||
+    person?.name ||
+    person?.username ||
+    person?.email ||
+    person?.id ||
     ""
   );
 }
@@ -59,6 +59,7 @@ export default function TeacherStudentProfile({ user }) {
     let alive = true;
     (async () => {
       try {
+        setLoading(true);
         setError("");
         setStudent(null);
         setAssignedTeacher(null);
@@ -123,9 +124,6 @@ export default function TeacherStudentProfile({ user }) {
   if (!studentId) {
     return <p>⚠ No student selected.</p>;
   }
-  if (loading) {
-    return <p className="muted">Loading student profile…</p>;
-  }
   if (error) {
     return (
       <div style={{ padding: "1rem" }}>
@@ -137,6 +135,9 @@ export default function TeacherStudentProfile({ user }) {
         </p>
       </div>
     );
+  }
+  if (loading || !student) {
+    return <p className="muted">Loading student profile…</p>;
   }
 
   const emailLabel =
