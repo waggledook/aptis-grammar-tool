@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Seo from "../common/Seo.jsx";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
+import { useAptisPracticeTracking } from "../../utils/useAptisPracticeTracking.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Task bank (move to /banks later if you like)
@@ -389,6 +390,7 @@ export default function ListeningPart3({ user, onRequireSignIn }) {
 
   const [taskIndex, setTaskIndex] = useState(0);
   const current = items[taskIndex] || items[0];
+  const practice = useAptisPracticeTracking({ user, skill: "listening", part: "part3", taskId: current?.id, title: current?.title, source: "ListeningPart3" });
 
   // answers + feedback
   const [answers, setAnswers] = useState({}); // key -> man|woman|both
@@ -469,6 +471,7 @@ export default function ListeningPart3({ user, onRequireSignIn }) {
   }, [current?.id]);
 
   function handleSelectTask(nextIndex) {
+    practice.restart();
     if (!user && nextIndex >= 1) {
       onRequireSignIn?.();
       return;
@@ -487,6 +490,7 @@ export default function ListeningPart3({ user, onRequireSignIn }) {
   }
 
   function handleReset() {
+    practice.restart();
     setAnswers({});
     setFeedback({});
     setWhyOpen(null);
@@ -495,6 +499,7 @@ export default function ListeningPart3({ user, onRequireSignIn }) {
   }
 
   function handleShowAnswers() {
+    if (user) void practice.recordReveal();
     const ans = {};
     const fbMap = {};
     current.statements.forEach((s) => {
@@ -525,6 +530,7 @@ export default function ListeningPart3({ user, onRequireSignIn }) {
     setCheckedOnce(true);
 
     const total = current.statements.length;
+    if (user) await practice.recordCheck({ score: correct, total, playsUsed });
     if (correct === total) {
       toast("Perfect ✓");
 

@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { saveReadingCompletion, saveReadingProgress, fetchReadingCompletions, logReadingPart2Attempted, logReadingReorderCompleted } from '../firebase';
+import { useAptisPracticeTracking } from '../utils/useAptisPracticeTracking.js';
 import { toast } from "../utils/toast"; // your ToastHost helper
 import { getSitePath } from "../siteConfig.js";
 import ReadingAssignButton from "./ReadingAssignButton.jsx";
@@ -381,6 +382,7 @@ export default function AptisPart2Reorder({
       : 0;
   const [taskIndex, setTaskIndex] = useState(initialTaskIndex);
   const current = flattened[taskIndex] || flattened[0];
+  const practice = useAptisPracticeTracking({ user, skill: "reading", part: progressPart || "part2", taskId: current?.id, title: current?.title, source: "AptisPart2Reorder" });
 
   // ✅ NEW: track which tasks are completed for this user
   const [completed, setCompleted] = useState(new Set());
@@ -433,6 +435,7 @@ function handleSelectTask(nextIndex) {
     onRequireSignIn?.(); // open your sign-in modal
     return;
   }
+  practice.restart();
   setTaskIndex(nextIndex);
   resetTaskTimer();
 }
@@ -510,7 +513,7 @@ return (
           <TextReorder
             key={current?.id}
             spec={current.text}
-            onReset={resetTaskTimer}
+            onReset={() => { practice.restart(); resetTaskTimer(); }}
             onReveal={async (fb) => {
               const timingDetails = getReadingTimingDetails(taskTimer, "answers_revealed");
               const answerableOrders = new Set(
@@ -520,6 +523,7 @@ return (
                 (total, order) => total + (fb[order] === true ? 1 : 0),
                 0
               );
+              if (user) await practice.recordReveal();
               if (user) {
                 await logReadingPart2Attempted({
                   taskId: current.id,
@@ -539,6 +543,8 @@ return (
                 (total, order) => total + (fb[order] === true ? 1 : 0),
                 0
               );
+
+              if (user) await practice.recordCheck({ score, total: answerableOrders.size, durationSeconds: timingDetails.durationSeconds });
 
               if (user) {
                 await logReadingPart2Attempted({

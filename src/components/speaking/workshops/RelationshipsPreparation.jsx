@@ -352,7 +352,7 @@ function WritingTest({ writeTest, onComplete }) {
         </div>
         <strong>{questionIndex + 1} / {questions.length}</strong>
       </div>
-      <div className="prep-write-layout">
+      <div className={`prep-write-layout ${question.image ? "" : "is-text-only"}`}>
         {question.image ? <img src={question.image} alt="" /> : null}
         <div className="prep-write-question">
           <span>Complete the sentence</span>

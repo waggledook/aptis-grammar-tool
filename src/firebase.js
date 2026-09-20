@@ -2507,6 +2507,33 @@ export async function saveListeningProgress(taskId, part = "part1") {
   );
 }
 
+/** Learner-readable results for individual Aptis reading/listening practice runs. */
+export async function saveAptisPracticeAttempt(payload, { isFirstSave = false } = {}) {
+  const uid = auth.currentUser?.uid;
+  if (!uid || uid !== payload?.uid || !payload?.id) return;
+  const details = { ...payload };
+  delete details.id;
+  delete details.uid;
+  const ref = doc(db, "users", uid, "aptisPracticeAttempts", payload.id);
+  await setDoc(ref, {
+    ...details,
+    ...(isFirstSave ? { createdAt: serverTimestamp() } : {}),
+    updatedAt: serverTimestamp(),
+  }, { merge: true });
+}
+
+export async function fetchAptisPracticeAttempts(n = 200, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+  const q = query(
+    collection(db, "users", realUid, "aptisPracticeAttempts"),
+    orderBy("updatedAt", "desc"),
+    limit(n)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+}
+
 // ─── WRITING SUBMISSION ────────────────────────────────────────────────────
 export async function logWritingSubmitted(details) {
   // details: { part: "part1"|"part2"|"part3"|"part4", taskId?, wordCount?, counts? ... }

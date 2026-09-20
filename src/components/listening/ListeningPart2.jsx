@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Seo from "../common/Seo.jsx";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
+import { useAptisPracticeTracking } from "../../utils/useAptisPracticeTracking.js";
 import ListeningDemoNotice from "./ListeningDemoNotice.jsx";
 
 const PART2_LISTENING_TASKS = [
@@ -202,6 +203,7 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
 
   const [taskIndex, setTaskIndex] = useState(0);
   const current = items[taskIndex] || items[0];
+  const practice = useAptisPracticeTracking({ user, skill: "listening", part: "part2", taskId: current?.id, title: current?.title, source: "ListeningPart2" });
 
   const [answers, setAnswers] = useState({});
   const [feedback, setFeedback] = useState({});
@@ -277,6 +279,7 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
   }, [current?.id]);
 
   function handleSelectTask(nextIndex) {
+    practice.restart();
     const nextTask = items[nextIndex];
     if (hasTaskAllowlist && !allowedTaskSet.has(nextTask?.id)) {
       toast("That listening task is included with full access.");
@@ -302,6 +305,7 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
   }
 
   function handleReset() {
+    practice.restart();
     setAnswers({});
     setFeedback({});
     setWhyOpen(null);
@@ -309,6 +313,7 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
   }
 
   function handleShowAnswers() {
+    if (user) void practice.recordReveal();
     const ans = {};
     const fbMap = {};
     current.prompts.forEach((s) => {
@@ -339,6 +344,7 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
     setCheckedOnce(true);
 
     const total = current.prompts.length;
+    if (user) await practice.recordCheck({ score: correct, total, playsUsed });
 
     if (correct === total) {
       toast("Perfect ✓");

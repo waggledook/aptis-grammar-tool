@@ -2,12 +2,16 @@ import { homeNeighbourhoodReferenceSheet } from "./homeNeighbourhoodReferenceDat
 import { technologyCommunicationReferenceSheet } from "./technologyCommunicationReferenceData";
 import { foodEatingReferenceSheet } from "./foodEatingReferenceData";
 import { educationLearningReferenceSheet } from "./educationLearningReferenceData";
+import { sportEntertainmentReferenceSheet } from "./sportEntertainmentReferenceData";
+import { workCareersReferenceSheet } from "./workCareersReferenceData";
 
 export const SPEAKING_REFERENCE_SHEETS = {
   "home-neighbourhood": homeNeighbourhoodReferenceSheet,
   "technology-communication": technologyCommunicationReferenceSheet,
   "food-eating": foodEatingReferenceSheet,
   "education-learning": educationLearningReferenceSheet,
+  "sport-entertainment": sportEntertainmentReferenceSheet,
+  "work-careers": workCareersReferenceSheet,
   "relationships-family": {
     title: "Relationships & Family",
     eyebrow: "Speaking language guide",

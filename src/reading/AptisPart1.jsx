@@ -7,6 +7,7 @@ import {
 } from "../firebase";
 import { getSitePath } from "../siteConfig.js";
 import { toast } from "../utils/toast";
+import { useAptisPracticeTracking } from "../utils/useAptisPracticeTracking.js";
 import ReadingAssignButton from "./ReadingAssignButton.jsx";
 import ReadingDemoNotice from "./ReadingDemoNotice.jsx";
 import {
@@ -274,6 +275,14 @@ export default function AptisPart1({
   const [whyOpen, setWhyOpen] = useState(null);
   const taskTimer = useSuggestedTaskTimer(READING_SUGGESTED_SECONDS.part1);
   const current = tasks[taskIndex] || tasks[0];
+  const practice = useAptisPracticeTracking({
+    user,
+    skill: "reading",
+    part: progressPart,
+    taskId: current?.id,
+    title: current?.title,
+    source: progressPart === "part1" ? "AptisPart1" : "AptisPart1Teacher",
+  });
 
   useEffect(() => {
     if (!tasks.length) return;
@@ -311,6 +320,7 @@ export default function AptisPart1({
   );
 
   function resetForTask(nextIndex) {
+    practice.restart();
     setTaskIndex(nextIndex);
     setAnswers({});
     setFeedback({});
@@ -367,6 +377,8 @@ export default function AptisPart1({
       0
     );
 
+    if (user) await practice.recordCheck({ score, total, durationSeconds: timingDetails.durationSeconds });
+
     if (user) {
       await logReadingPart1Attempted({
         taskId: current.id,
@@ -384,6 +396,7 @@ export default function AptisPart1({
   }
 
   async function handleShowAnswers() {
+    if (user) await practice.recordReveal();
     const timingDetails = getReadingTimingDetails(taskTimer, "answers_revealed");
     const answerable = current.gaps.filter((gap) => !gap.fixed);
     const score = answerable.reduce(
@@ -413,6 +426,7 @@ export default function AptisPart1({
   }
 
   function handleReset() {
+    practice.restart();
     setAnswers({});
     setFeedback({});
     setWhyOpen(null);

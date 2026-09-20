@@ -335,6 +335,7 @@ export default function Profile({
     part3: 0,
     part4: 0,
   });
+  const [aptisPracticeAttempts, setAptisPracticeAttempts] = useState([]);
   
   const [speakingCounts, setSpeakingCounts] = useState({
     part1: 0,
@@ -1005,6 +1006,7 @@ function renderFeedbackButton(kind, submission) {
           rCounts,
           sCounts,
           lCounts,
+          practiceRows,
           m,
           f,
           w,
@@ -1036,6 +1038,7 @@ function renderFeedbackButton(kind, submission) {
           fb.fetchReadingCounts?.(uid) ?? Promise.resolve({ part1: 0, part2: 0, part3: 0, part4: 0 }),
           fb.fetchSpeakingCounts(uid),
           fb.fetchListeningCounts?.(uid) ?? Promise.resolve({ part1: 0, part2: 0, part3: 0, part4: 0 }),
+          isAptisProfile ? fb.fetchAptisPracticeAttempts(200, uid) : Promise.resolve([]),
           fb.fetchRecentMistakes(8, uid),
           fb.fetchRecentFavourites(8, uid),
           fb.fetchWritingP1Sessions(10, uid),
@@ -1069,6 +1072,7 @@ function renderFeedbackButton(kind, submission) {
         setReadingCounts(rCounts || { part1: 0, part2: 0, part3: 0, part4: 0 });
         setSpeakingCounts(sCounts);
         setListeningCounts(lCounts || { part1: 0, part2: 0, part3: 0, part4: 0 });
+        setAptisPracticeAttempts(practiceRows || []);
         setMistakes(m);
         setFavourites(f);
         setWritingP1(w);
@@ -1108,7 +1112,7 @@ function renderFeedbackButton(kind, submission) {
     return () => {
       alive = false;
     };
-  }, [targetUid, user?.uid]);  
+  }, [targetUid, user?.uid, isAptisProfile]);
 
 
   const totalWritingItems =
@@ -2134,6 +2138,8 @@ const formatOteSpeakingPart = (part) => {
         />
       </div>
 
+      <AptisPracticePerformance attempts={aptisPracticeAttempts} skill="reading" />
+
       <div className="actions" style={{ marginTop: "1rem", marginBottom: ".8rem" }}>
         {!targetUid ? <button className="btn" type="button" onClick={() => navigate(getSitePath("/reading/mock-tests"))}>Open reading mocks</button> : null}
       </div>
@@ -2203,6 +2209,7 @@ const formatOteSpeakingPart = (part) => {
           right={`${listeningCounts.part4 || 0}/${LISTENING_TOTALS.part4 || 0}`}
         />
       </div>
+      <AptisPracticePerformance attempts={aptisPracticeAttempts} skill="listening" />
     </div>
   )}
 </section>
@@ -6041,4 +6048,62 @@ function htmlFromPlainEmail(text = "") {
 function robustEmailForClipboard({ html = "", text = "" }) {
   const plain = plainFromEmail({ html, text });
   return htmlFromPlainEmail(plain);
+}
+
+function AptisPracticePerformance({ attempts, skill }) {
+  const rows = attempts.filter((attempt) => attempt.skill === skill && /^part[1-4]$/.test(attempt.part || ""));
+  const scored = rows.filter((attempt) => Number(attempt.firstTotal) > 0 && Number.isFinite(Number(attempt.firstScore)));
+  const correct = scored.reduce((sum, attempt) => sum + Number(attempt.firstScore), 0);
+  const total = scored.reduce((sum, attempt) => sum + Number(attempt.firstTotal), 0);
+  const percentage = total ? Math.round((correct / total) * 100) : null;
+  const tasks = new Set(rows.map((attempt) => `${attempt.part}:${attempt.taskId}`)).size;
+
+  return (
+    <div style={{ marginTop: "1rem" }}>
+      <h4 style={{ margin: "0 0 .35rem" }}>Practice performance</h4>
+      {!rows.length ? (
+        <p className="muted small">Results from new practice runs will appear here after a check or answer reveal.</p>
+      ) : (
+        <>
+          <p className="muted small" style={{ margin: "0 0 .7rem" }}>
+            First-check accuracy: {percentage === null ? "No independent checks yet" : `${percentage}% (${correct}/${total})`}
+            {` · ${rows.length} recorded run${rows.length === 1 ? "" : "s"} across ${tasks} task${tasks === 1 ? "" : "s"}`}
+          </p>
+          <div className="pbar-group">
+            {[1, 2, 3, 4].map((number) => {
+              const partRows = scored.filter((attempt) => attempt.part === `part${number}`);
+              const partCorrect = partRows.reduce((sum, attempt) => sum + Number(attempt.firstScore), 0);
+              const partTotal = partRows.reduce((sum, attempt) => sum + Number(attempt.firstTotal), 0);
+              return (
+                <ProgressBar
+                  key={number}
+                  value={partCorrect}
+                  max={partTotal || 1}
+                  label={`Part ${number} first checks`}
+                  right={partTotal ? `${Math.round((partCorrect / partTotal) * 100)}% · ${partRows.length} run${partRows.length === 1 ? "" : "s"}` : "No checks yet"}
+                />
+              );
+            })}
+          </div>
+          <p className="muted small" style={{ margin: ".75rem 0 .35rem" }}>Recent runs (repeats shown separately)</p>
+          <ul className="wlist">
+            {rows.slice(0, 5).map((attempt) => {
+              const first = Number(attempt.firstTotal) > 0 ? `${attempt.firstScore}/${attempt.firstTotal} on first check` : "No independent check";
+              const latest = Number(attempt.latestTotal) > 0 && attempt.checkCount > 1
+                ? ` → ${attempt.latestScore}/${attempt.latestTotal} on latest check`
+                : "";
+              const date = attempt.updatedAt?.toDate?.()?.toLocaleDateString?.() || "";
+              return (
+                <li key={attempt.id} className="wcard">
+                  <strong>Part {String(attempt.part).replace("part", "")} · {attempt.title || attempt.taskId}</strong>
+                  <div className="muted small">{first}{latest}{attempt.assisted ? " · Answers revealed" : ""}{date ? ` · ${date}` : ""}</div>
+                </li>
+              );
+            })}
+          </ul>
+          <p className="muted small" style={{ margin: ".5rem 0 0" }}>Accuracy uses the first check in each run, before any revealed answers. Up to 200 recent practice runs are included.</p>
+        </>
+      )}
+    </div>
+  );
 }

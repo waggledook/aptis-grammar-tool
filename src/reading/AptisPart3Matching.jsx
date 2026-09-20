@@ -6,6 +6,7 @@ import {
   logReadingPart3Completed,
 } from "../firebase";
 import { toast } from "../utils/toast";
+import { useAptisPracticeTracking } from "../utils/useAptisPracticeTracking.js";
 import { getSitePath } from "../siteConfig.js";
 import ReadingAssignButton from "./ReadingAssignButton.jsx";
 import { READING_PART3_TASKS } from "./part3Tasks.js";
@@ -95,6 +96,7 @@ export default function AptisPart3Matching({
   const taskTimer = useSuggestedTaskTimer(READING_SUGGESTED_SECONDS.part3);
   const commentRefs = useRef({});
   const current = tasks[taskIndex] || tasks[0];
+  const practice = useAptisPracticeTracking({ user, skill: "reading", part: progressPart, taskId: current?.id, title: current?.title, source });
 
   
 
@@ -140,6 +142,7 @@ useEffect(() => {
   );
 
   function handleSelectTask(nextIndex) {
+    practice.restart();
     setTaskIndex(nextIndex);
     setAnswers({});
     setFeedback({});
@@ -186,6 +189,8 @@ useEffect(() => {
       0
     );
     const allCorrect = score === total;
+
+    if (user) await practice.recordCheck({ score, total, durationSeconds: timingDetails.durationSeconds });
   
     // ✅ Log an attempt whenever the user clicks "Check"
     if (user) {
@@ -205,6 +210,7 @@ useEffect(() => {
   }
 
   async function handleShowAnswers() {
+    if (user) await practice.recordReveal();
     const timingDetails = getReadingTimingDetails(taskTimer, "answers_revealed");
     const score = current.questions.reduce(
       (total, question) => total + (answers[question.id] === question.answer ? 1 : 0),
@@ -235,6 +241,7 @@ useEffect(() => {
   }
 
   function handleReset() {
+    practice.restart();
     setAnswers({});
     setFeedback({});
     setResultMode(null);

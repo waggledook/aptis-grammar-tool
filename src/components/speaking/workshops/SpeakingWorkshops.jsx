@@ -2,6 +2,7 @@ import React, { useLayoutEffect } from "react";
 import {
   ArrowRight,
   BookOpen,
+  Briefcase,
   Clock3,
   House,
   GraduationCap,
@@ -14,6 +15,7 @@ import {
   Presentation,
   Smartphone,
   TrainFront,
+  Trophy,
   Utensils,
   UsersRound,
 } from "lucide-react";
@@ -27,6 +29,8 @@ import SpeakingWorkshopSessionManager from "./SpeakingWorkshopSessionManager";
 import HomeNeighbourhoodPreparation from "./HomeNeighbourhoodPreparation";
 import FoodEatingPreparation from "./FoodEatingPreparation";
 import EducationLearningPreparation from "./EducationLearningPreparation";
+import SportEntertainmentPreparation from "./SportEntertainmentPreparation";
+import WorkCareersPreparation from "./WorkCareersPreparation";
 import RelationshipsPreparation from "./RelationshipsPreparation";
 import SpeakingReference from "./SpeakingReference";
 import TechnologyCommunicationPreparation from "./TechnologyCommunicationPreparation";
@@ -47,6 +51,8 @@ const TOPIC_ICONS = {
   "technology-communication": Smartphone,
   "food-eating": Utensils,
   "education-learning": GraduationCap,
+  "sport-entertainment": Trophy,
+  "work-careers": Briefcase,
 };
 
 const PREPARATION_COMPONENTS = {
@@ -56,6 +62,8 @@ const PREPARATION_COMPONENTS = {
   "technology-communication": TechnologyCommunicationPreparation,
   "food-eating": FoodEatingPreparation,
   "education-learning": EducationLearningPreparation,
+  "sport-entertainment": SportEntertainmentPreparation,
+  "work-careers": WorkCareersPreparation,
 };
 
 const PART_ICONS = {
@@ -204,10 +212,14 @@ function WorkshopLanding({ navigate, access, user }) {
               <span className="workshop-topic-copy">
                 <span className="workshop-topic-eyebrow">{topic.ready
                   ? "Workshop topic"
+                  : topic.preparationVisualsReady === false
+                    ? "Teacher preview · preparation illustrations pending"
                   : topic.preparationReady && topic.referenceReady === false
                     ? "Teacher preview · reference pending"
                     : topic.visualsReady
-                      ? "Teacher preview · preparation pending"
+                      ? topic.referenceReady === false
+                        ? "Teacher preview · preparation and reference pending"
+                        : "Teacher preview · preparation pending"
                       : "Teacher preview · visuals pending"}</span>
                 <h2>{topic.title}</h2>
                 <p>{topic.summary}</p>
@@ -247,11 +259,17 @@ function TopicModeChoice({ topic, navigate, access }) {
         <h1>{topic.title}</h1>
         <p>{topic.summary}</p>
         {!topic.ready ? (
-          <strong className="workshop-draft-notice">{topic.preparationReady && topic.referenceReady === false
+          <strong className="workshop-draft-notice">{topic.preparationVisualsReady === false
+            ? "Teacher preview: task bank, photographs, preparation and language guide ready · preparation illustrations pending"
+            : topic.preparationReady && topic.referenceReady === false
             ? "Teacher preview: task bank, visuals and preparation ready · reference pending"
             : topic.visualsReady
-              ? "Teacher preview: task bank and visuals ready · preparation pending"
-              : "Teacher preview: question bank wired · visuals and preparation pending"}</strong>
+              ? topic.referenceReady === false
+                ? "Teacher preview: task bank and visuals ready · preparation and reference pending"
+                : "Teacher preview: task bank and visuals ready · preparation pending"
+              : topic.referenceReady === false
+                ? "Teacher preview: task bank ready · visuals, preparation and reference pending"
+                : "Teacher preview: task bank ready · visuals and preparation pending"}</strong>
         ) : null}
       </section>
 

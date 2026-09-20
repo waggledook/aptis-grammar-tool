@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import Seo from "../common/Seo.jsx";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
+import { useAptisPracticeTracking } from "../../utils/useAptisPracticeTracking.js";
 import ListeningDemoNotice from "./ListeningDemoNotice.jsx";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -835,6 +836,7 @@ export default function ListeningPart1({ user, aptisAccess, onSignIn, onRequireS
   }, []);
 
   const current = sessionTasks[sessionIndex] || null;
+  const practice = useAptisPracticeTracking({ user, skill: "listening", part: "part1", taskId: current?.id, title: current?.title, source: "ListeningPart1", preserveAcrossTaskSwitches: true });
   const currentId = current?.id || null;
 
   const currentAnswer = currentId ? answersByTask[currentId] || "" : "";
@@ -901,7 +903,14 @@ export default function ListeningPart1({ user, aptisAccess, onSignIn, onRequireS
       return;
     }
 
+    practice.restartAll();
     stopAudio(true);
+    setAnswersByTask({});
+    setFeedbackByTask({});
+    setCheckedByTask({});
+    setShowScriptByTask({});
+    setWhyOpenByTask({});
+    setPlaysUsedByTask({});
     setMode(nextMode);
     setSessionTasks(picked);
     setSessionIndex(0);
@@ -963,6 +972,7 @@ export default function ListeningPart1({ user, aptisAccess, onSignIn, onRequireS
 
   function handleResetTask() {
     if (!current) return;
+    practice.restart();
 
     setAnswersByTask((prev) => ({ ...prev, [current.id]: "" }));
     setFeedbackByTask((prev) => {
@@ -980,6 +990,7 @@ export default function ListeningPart1({ user, aptisAccess, onSignIn, onRequireS
 
   function handleShowAnswer() {
     if (!current) return;
+    if (user) void practice.recordReveal();
 
     setAnswersByTask((prev) => ({ ...prev, [current.id]: current.answer }));
     setFeedbackByTask((prev) => ({ ...prev, [current.id]: true }));
@@ -998,6 +1009,7 @@ export default function ListeningPart1({ user, aptisAccess, onSignIn, onRequireS
     }
 
     const isCorrect = chosen === current.answer;
+    if (user) await practice.recordCheck({ score: isCorrect ? 1 : 0, total: 1, playsUsed: playsUsedByTask[current.id] || 0 });
 
     setFeedbackByTask((prev) => ({ ...prev, [current.id]: isCorrect }));
     setCheckedByTask((prev) => ({ ...prev, [current.id]: true }));

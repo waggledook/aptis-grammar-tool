@@ -2,10 +2,104 @@ import educationLearningSource from "./content/education-learning.md?raw";
 import foodEatingSource from "./content/food-eating.md?raw";
 import homeNeighbourhoodSource from "./content/home-neighbourhood.md?raw";
 import relationshipsFamilySource from "./content/relationships-family.md?raw";
+import sportEntertainmentSource from "./content/sport-entertainment.md?raw";
 import technologyCommunicationSource from "./content/technology-communication.md?raw";
 import travelTransportSource from "./content/travel-transport.md?raw";
+import workCareersSource from "./content/work-careers.md?raw";
 
 const PHOTO_ASSETS = {
+  "work-careers": {
+    part2: [
+      "/images/speaking/workshops/work-careers/part2_task01_office.webp",
+      "/images/speaking/workshops/work-careers/part2_task02_outdoor_work.webp",
+      "/images/speaking/workshops/work-careers/part2_task03_teamwork.webp",
+      "/images/speaking/workshops/work-careers/part2_task04_customers.webp",
+      "/images/speaking/workshops/work-careers/part2_task05_home_working.webp",
+      "/images/speaking/workshops/work-careers/part2_task06_practical_work.webp",
+      "/images/speaking/workshops/work-careers/part2_task07_busy_workplace.webp",
+      "/images/speaking/workshops/work-careers/part2_task08_small_business.webp",
+    ],
+    part3: [
+      [
+        "/images/speaking/workshops/work-careers/part3_task01A_office_work.webp",
+        "/images/speaking/workshops/work-careers/part3_task01B_outdoor_work.webp",
+      ],
+      [
+        "/images/speaking/workshops/work-careers/part3_task02A_working_alone.webp",
+        "/images/speaking/workshops/work-careers/part3_task02B_teamwork.webp",
+      ],
+      [
+        "/images/speaking/workshops/work-careers/part3_task03A_home_working.webp",
+        "/images/speaking/workshops/work-careers/part3_task03B_shared_workplace.webp",
+      ],
+      [
+        "/images/speaking/workshops/work-careers/part3_task04A_creative_work.webp",
+        "/images/speaking/workshops/work-careers/part3_task04B_practical_work.webp",
+      ],
+      [
+        "/images/speaking/workshops/work-careers/part3_task05A_customer_facing.webp",
+        "/images/speaking/workshops/work-careers/part3_task05B_behind_scenes.webp",
+      ],
+      [
+        "/images/speaking/workshops/work-careers/part3_task06A_large_company.webp",
+        "/images/speaking/workshops/work-careers/part3_task06B_small_business.webp",
+      ],
+      [
+        "/images/speaking/workshops/work-careers/part3_task07A_daytime_work.webp",
+        "/images/speaking/workshops/work-careers/part3_task07B_shift_work.webp",
+      ],
+      [
+        "/images/speaking/workshops/work-careers/part3_task08A_employee.webp",
+        "/images/speaking/workshops/work-careers/part3_task08B_self_employed.webp",
+      ],
+    ],
+  },
+  "sport-entertainment": {
+    part2: [
+      "/images/speaking/workshops/sport-entertainment/part2_task01_team_sport.webp",
+      "/images/speaking/workshops/sport-entertainment/part2_task02_exercising_alone.webp",
+      "/images/speaking/workshops/sport-entertainment/part2_task03_watching_live_sport.webp",
+      "/images/speaking/workshops/sport-entertainment/part2_task04_live_music.webp",
+      "/images/speaking/workshops/sport-entertainment/part2_task05_cinema.webp",
+      "/images/speaking/workshops/sport-entertainment/part2_task06_home_entertainment.webp",
+      "/images/speaking/workshops/sport-entertainment/part2_task07_social_game.webp",
+      "/images/speaking/workshops/sport-entertainment/part2_task08_live_performance.webp",
+    ],
+    part3: [
+      [
+        "/images/speaking/workshops/sport-entertainment/part3_task01A_team_sport.webp",
+        "/images/speaking/workshops/sport-entertainment/part3_task01B_individual_sport.webp",
+      ],
+      [
+        "/images/speaking/workshops/sport-entertainment/part3_task02A_indoor_exercise.webp",
+        "/images/speaking/workshops/sport-entertainment/part3_task02B_outdoor_exercise.webp",
+      ],
+      [
+        "/images/speaking/workshops/sport-entertainment/part3_task03A_live_sport.webp",
+        "/images/speaking/workshops/sport-entertainment/part3_task03B_sport_at_home.webp",
+      ],
+      [
+        "/images/speaking/workshops/sport-entertainment/part3_task04A_live_music.webp",
+        "/images/speaking/workshops/sport-entertainment/part3_task04B_recorded_music.webp",
+      ],
+      [
+        "/images/speaking/workshops/sport-entertainment/part3_task05A_cinema.webp",
+        "/images/speaking/workshops/sport-entertainment/part3_task05B_home_viewing.webp",
+      ],
+      [
+        "/images/speaking/workshops/sport-entertainment/part3_task06A_amateur_performance.webp",
+        "/images/speaking/workshops/sport-entertainment/part3_task06B_audience.webp",
+      ],
+      [
+        "/images/speaking/workshops/sport-entertainment/part3_task07A_board_game.webp",
+        "/images/speaking/workshops/sport-entertainment/part3_task07B_video_game.webp",
+      ],
+      [
+        "/images/speaking/workshops/sport-entertainment/part3_task08A_large_event.webp",
+        "/images/speaking/workshops/sport-entertainment/part3_task08B_small_event.webp",
+      ],
+    ],
+  },
   "relationships-family": {
     part2: [
       "/images/speaking/workshops/relationships-family/part2_task01_eating_together.webp",
@@ -345,11 +439,23 @@ const TOPIC_META = {
     title: "Sport & Entertainment",
     summary: "Exercise, competitions, films, music and ways of spending free time.",
     accent: "coral",
+    contentReady: true,
+    ready: true,
+    visualsReady: true,
+    preparationReady: true,
+    referenceReady: true,
+    preparationVisualsReady: true,
   },
   "work-careers": {
     title: "Work & Careers",
     summary: "Jobs, workplaces, professional skills, ambitions and career decisions.",
     accent: "violet",
+    contentReady: true,
+    ready: true,
+    visualsReady: true,
+    preparationReady: true,
+    referenceReady: true,
+    preparationVisualsReady: true,
   },
 };
 
@@ -454,6 +560,8 @@ export const SPEAKING_WORKSHOP_TOPICS = [
   parseTopicSource("technology-communication", technologyCommunicationSource),
   parseTopicSource("food-eating", foodEatingSource),
   parseTopicSource("education-learning", educationLearningSource),
+  parseTopicSource("sport-entertainment", sportEntertainmentSource),
+  parseTopicSource("work-careers", workCareersSource),
 ];
 
 const READY_TOPIC_IDS = new Set(SPEAKING_WORKSHOP_TOPICS.filter((topic) => topic.ready).map((topic) => topic.id));

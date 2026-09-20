@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { fetchReadingCompletionsByPart, logReadingPart4Attempted, logReadingPart4Completed, } from "../firebase";
 import { toast } from "../utils/toast";
+import { useAptisPracticeTracking } from "../utils/useAptisPracticeTracking.js";
 import { getSitePath } from "../siteConfig.js";
 import ReadingAssignButton from "./ReadingAssignButton.jsx";
 import ReadingDemoNotice from "./ReadingDemoNotice.jsx";
@@ -381,6 +382,7 @@ export default function AptisPart4({
   const paraRefs = useRef({});
 
   const current = tasks[taskIndex] || tasks[0];
+  const practice = useAptisPracticeTracking({ user, skill: "reading", part: progressPart, taskId: current?.id, title: current?.title, source });
 
   useEffect(() => {
     if (!tasks.length) return;
@@ -423,6 +425,7 @@ export default function AptisPart4({
   }, [allowedTaskIds.length, allowedTaskSet, tasks, completed]);
 
   function handleSelectTask(nextIndex) {
+    practice.restart();
     if (!user && decoratedItems[nextIndex]?.locked) {
       onRequireSignIn?.();
       return;
@@ -470,6 +473,8 @@ export default function AptisPart4({
     const total = current.paragraphs.length;
     const score = current.paragraphs.reduce((acc, p) => acc + (fb[p.id] === true ? 1 : 0), 0);
     const allCorrect = score === total;
+
+    if (user) await practice.recordCheck({ score, total, durationSeconds: timingDetails.durationSeconds });
   
     // ✅ Log an attempt whenever the user clicks "Check"
     if (user) {
@@ -489,6 +494,7 @@ export default function AptisPart4({
   }
 
   async function handleShowAnswers() {
+    if (user) await practice.recordReveal();
     const timingDetails = getReadingTimingDetails(taskTimer, "answers_revealed");
     const score = current.paragraphs.reduce(
       (total, paragraph) => total + (answers[paragraph.id] === paragraph.answer ? 1 : 0),
@@ -515,6 +521,7 @@ export default function AptisPart4({
   }
 
   function handleReset() {
+    practice.restart();
     setAnswers({});
     setFeedback({});
     setWhyOpen(null);
