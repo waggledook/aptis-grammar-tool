@@ -14,7 +14,7 @@ import { setLiveGameState, setLiveGameStatus } from "../../api/liveGames.js";
 import { getSitePath } from "../../siteConfig.js";
 import { toast } from "../../utils/toast.js";
 import { LISTEN_AGAIN_PROMPT_SRC } from "../../products/ote/utils/listeningLive.js";
-import { APTIS_LISTENING_PART2_LIVE_GAME_TYPE, getTeacherListeningPart2Task } from "./teacherListeningPart2Data.js";
+import { APTIS_LISTENING_PART2_LIVE_GAME_TYPE, APTIS_LISTENING_PART2_SPEAKER_CUES, getTeacherListeningPart2Task } from "./teacherListeningPart2Data.js";
 import { MatchingSheet, SpeakerFeedback, SpeakerScript } from "./AptisListeningPart2LiveShared.jsx";
 import { hasListeningAnswer, scoreAnswers } from "./aptisListeningPart2LiveUtils.js";
 import "./aptisListeningPart2Live.css";
@@ -88,8 +88,8 @@ export default function AptisListeningPart2LiveHost({ user }) {
         : kind === "full"
           ? [LISTEN_AGAIN_PROMPT_SRC, task.audioSrc]
           : reviewIndex === 0
-            ? [LISTEN_AGAIN_PROMPT_SRC, task.speakerAudio[reviewIndex]]
-            : [task.speakerAudio[reviewIndex]];
+            ? [LISTEN_AGAIN_PROMPT_SRC, APTIS_LISTENING_PART2_SPEAKER_CUES[reviewIndex], task.speakerAudio[reviewIndex]]
+            : [APTIS_LISTENING_PART2_SPEAKER_CUES[reviewIndex], task.speakerAudio[reviewIndex]];
       for (const src of sources) {
         if (token !== playbackTokenRef.current) return;
         const audio = new Audio(src);

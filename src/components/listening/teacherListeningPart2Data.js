@@ -1,11 +1,13 @@
 export const APTIS_LISTENING_PART2_LIVE_GAME_TYPE = "aptis_listening_part2_teacher";
+export const APTIS_LISTENING_PART2_SPEAKER_CUES = [1, 2, 3, 4].map((number) =>
+  `/audio/listening/part2/teacher/speaker-cue-${number}.mp3`);
 
 export const TEACHER_LISTENING_PART2_TASKS = [
   {
     id: "using-customer-reviews",
     title: "Using Customer Reviews",
     intro: "You will hear four people talking about using customer reviews. Match each speaker (1–4) with the statement that best describes them. There are two extra statements that you do not need to use. You can listen to the recording twice.",
-    audioSrc: "/audio/listening/part2/teacher/customer-reviews.mp3",
+    audioSrc: "/audio/listening/part2/teacher/customer-reviews-numbered.mp3",
     speakerAudio: ["a", "b", "c", "d"].map((speaker) => `/audio/listening/part2/teacher/customer-reviews-${speaker}.mp3`),
     choices: [
       { key: "a", text: "usually follows star ratings" },
@@ -48,7 +50,7 @@ export const TEACHER_LISTENING_PART2_TASKS = [
     id: "volunteering",
     title: "Volunteering",
     intro: "You will hear four people talking about volunteering. Match each speaker (1–4) with the statement that best describes them. There are two extra statements that you do not need to use. You can listen to the recording twice.",
-    audioSrc: "/audio/listening/part2/teacher/volunteering.mp3",
+    audioSrc: "/audio/listening/part2/teacher/volunteering-numbered.mp3",
     speakerAudio: ["a", "b", "c", "d"].map((speaker) => `/audio/listening/part2/teacher/volunteering-${speaker}.mp3`),
     choices: [
       { key: "a", text: "started because of a friend" },
