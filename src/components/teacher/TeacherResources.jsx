@@ -58,6 +58,25 @@ const PRODUCT_GROUPS = [
         ],
       },
       {
+        title: "Listening",
+        resources: [
+          {
+            title: "Listening Part 2 · Using Customer Reviews",
+            description: "Four-speaker matching task with full recording, answer feedback and transcript.",
+            path: "/listening/part2-teacher/using-customer-reviews",
+            icon: Headphones,
+            tags: ["Direct link", "Speaker matching", "Live lesson"],
+          },
+          {
+            title: "Listening Part 2 · Volunteering",
+            description: "Four-speaker matching task with full recording, answer feedback and transcript.",
+            path: "/listening/part2-teacher/volunteering",
+            icon: Headphones,
+            tags: ["Direct link", "Speaker matching", "Live lesson"],
+          },
+        ],
+      },
+      {
         title: "Writing",
         resources: [
           {

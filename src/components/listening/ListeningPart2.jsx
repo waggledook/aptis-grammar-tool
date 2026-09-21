@@ -1,9 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
+import { createAptisListeningPart2LiveGame } from "../../api/liveGames.js";
+import { getSitePath } from "../../siteConfig.js";
 import { useAptisPracticeTracking } from "../../utils/useAptisPracticeTracking.js";
 import ListeningDemoNotice from "./ListeningDemoNotice.jsx";
+import { TEACHER_LISTENING_PART2_TASKS } from "./teacherListeningPart2Data.js";
 
 const PART2_LISTENING_TASKS = [
     {
@@ -196,14 +200,18 @@ const PART2_LISTENING_TASKS = [
 
 const LETTERS = ["a", "b", "c", "d", "e", "f"];
 
-export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireSignIn, allowedTaskIds = [] }) {
-  const items = PART2_LISTENING_TASKS;
+export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireSignIn, allowedTaskIds = [], teacherBank = false }) {
+  const navigate = useNavigate();
+  const { taskId } = useParams();
+  const items = teacherBank ? TEACHER_LISTENING_PART2_TASKS : PART2_LISTENING_TASKS;
   const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
-  const hasTaskAllowlist = allowedTaskSet.size > 0;
+  const hasTaskAllowlist = !teacherBank && allowedTaskSet.size > 0;
 
-  const [taskIndex, setTaskIndex] = useState(0);
+  const [regularTaskIndex, setRegularTaskIndex] = useState(0);
+  const linkedTaskIndex = items.findIndex((task) => task.id === taskId);
+  const taskIndex = teacherBank ? Math.max(0, linkedTaskIndex) : regularTaskIndex;
   const current = items[taskIndex] || items[0];
-  const practice = useAptisPracticeTracking({ user, skill: "listening", part: "part2", taskId: current?.id, title: current?.title, source: "ListeningPart2" });
+  const practice = useAptisPracticeTracking({ user, skill: "listening", part: "part2", taskId: current?.id, title: current?.title, source: teacherBank ? "ListeningPart2Teacher" : "ListeningPart2" });
 
   const [answers, setAnswers] = useState({});
   const [feedback, setFeedback] = useState({});
@@ -213,27 +221,30 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
 
   const scriptLineRefs = useRef({});
   const audioRef = useRef(null);
+  const loggedStartRef = useRef(false);
 
   const [playsUsed, setPlaysUsed] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [creatingLive, setCreatingLive] = useState(false);
+  const canHostLive = teacherBank && (user?.role === "teacher" || user?.role === "admin");
 
   const decoratedItems = useMemo(
     () =>
       items.map((t, i) => {
-        const locked = hasTaskAllowlist ? !allowedTaskSet.has(t.id) : !user && i >= 1;
+        const locked = teacherBank ? false : hasTaskAllowlist ? !allowedTaskSet.has(t.id) : !user && i >= 1;
         return {
           ...t,
           locked,
           title: `${i + 1}. ${t.title}${locked ? " 🔒" : ""}`,
         };
       }),
-    [allowedTaskSet, hasTaskAllowlist, items, user]
+    [allowedTaskSet, hasTaskAllowlist, items, teacherBank, user]
   );
 
   useEffect(() => {
     if (!hasTaskAllowlist || allowedTaskSet.has(current?.id)) return;
     const nextIndex = items.findIndex((task) => allowedTaskSet.has(task.id));
-    setTaskIndex(nextIndex >= 0 ? nextIndex : 0);
+    setRegularTaskIndex(nextIndex >= 0 ? nextIndex : 0);
   }, [allowedTaskSet, current?.id, hasTaskAllowlist, items]);
 
   useEffect(() => {
@@ -244,6 +255,7 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
     setWhyOpen(null);
     stopAudio(true);
     setPlaysUsed(0);
+    loggedStartRef.current = false;
   }, [current?.id]);
 
   useEffect(() => {
@@ -281,6 +293,10 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
   function handleSelectTask(nextIndex) {
     practice.restart();
     const nextTask = items[nextIndex];
+    if (teacherBank) {
+      if (nextTask) navigate(`/listening/part2-teacher/${nextTask.id}`);
+      return;
+    }
     if (hasTaskAllowlist && !allowedTaskSet.has(nextTask?.id)) {
       toast("That listening task is included with full access.");
       onRequireSignIn?.();
@@ -291,7 +307,21 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
       onRequireSignIn?.();
       return;
     }
-    setTaskIndex(nextIndex);
+    setRegularTaskIndex(nextIndex);
+  }
+
+  async function handleCreateLive() {
+    if (!canHostLive || creatingLive) return;
+    setCreatingLive(true);
+    try {
+      const { gameId } = await createAptisListeningPart2LiveGame({ taskId: current.id });
+      navigate(getSitePath(`/live/aptis-listening-part2/host/${gameId}`));
+    } catch (error) {
+      console.error("[ListeningPart2] live session creation failed", error);
+      toast(error.message || "Could not create the listening room.");
+    } finally {
+      setCreatingLive(false);
+    }
   }
 
   function handleChange(key, value) {
@@ -352,8 +382,9 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
         if (user && fb.logListeningPart2Completed) {
           await fb.logListeningPart2Completed({
             taskId: current.id,
+            taskTitle: current.title,
             playsUsed,
-            source: "ListeningPart2",
+            source: teacherBank ? "ListeningPart2Teacher" : "ListeningPart2",
           });
         }
       } catch (e) {
@@ -367,10 +398,11 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
       if (user && fb.logListeningPart2Attempted) {
         await fb.logListeningPart2Attempted({
           taskId: current.id,
+          taskTitle: current.title,
           score: correct,
           total,
           playsUsed,
-          source: "ListeningPart2",
+          source: teacherBank ? "ListeningPart2Teacher" : "ListeningPart2",
         });
       }
     } catch (e) {
@@ -386,7 +418,9 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
       el.currentTime = 0;
       setIsPlaying(false);
       if (!silent) toast("Stopped.");
-    } catch {}
+    } catch {
+      // The player may already have been unloaded during a task switch.
+    }
   }
 
   async function handlePlayStop() {
@@ -407,6 +441,10 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
 
     try {
       await el.play();
+      if (teacherBank && user && !loggedStartRef.current) {
+        loggedStartRef.current = true;
+        void fb.logAptisListeningTeacherTaskStarted({ taskId: current.id, taskTitle: current.title, part: 2 });
+      }
     } catch (e) {
       console.warn("[listening p2] play blocked:", e);
       toast("Click again to allow audio.");
@@ -443,6 +481,12 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
             />
           </div>
 
+          {canHostLive && (
+            <button className="btn primary" disabled={creatingLive} onClick={handleCreateLive} type="button">
+              {creatingLive ? "Creating live room…" : "Start live lesson"}
+            </button>
+          )}
+
           {!hasTaskAllowlist && !user && (
             <p className="lock-note">
               Sign in to unlock the remaining listening tasks.
@@ -453,9 +497,9 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
         </div>
       </header>
 
-      <ListeningDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
+      {!teacherBank && <ListeningDemoNotice user={user} aptisAccess={aptisAccess} onSignIn={onSignIn}>
         Demo mode includes one Part 2 sample task. Full access unlocks the remaining Part 2 tasks.
-      </ListeningDemoNotice>
+      </ListeningDemoNotice>}
 
       <section className="panel">
         <div className="panelbar">
@@ -508,7 +552,7 @@ export default function ListeningPart2({ user, aptisAccess, onSignIn, onRequireS
                       className={`select ${status}`}
                       value={chosen}
                       onChange={(e) => handleChange(s.key, e.target.value)}
-                      aria-label={`Choose speaker for statement ${idx + 1}`}
+                      aria-label={`Choose statement for ${s.text}`}
                     >
                       <option value="">—</option>
 {current.choices.map((choice) => (

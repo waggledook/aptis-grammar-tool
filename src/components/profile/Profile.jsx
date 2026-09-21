@@ -4,6 +4,7 @@ import * as fb from "../../firebase";
 import { toast } from "../../utils/toast";
 import { getSitePath } from "../../siteConfig.js";
 import { APTIS_READING_PARTS } from "../../reading/readingMenuData.js";
+import { APTIS_GRAMMAR_VOCABULARY_MOCKS } from "../../data/aptisGrammarVocabularyMocks.js";
 import { PART1_QUESTIONS } from "../speaking/banks/part1";
 import { PART2_TASKS } from "../speaking/banks/part2";
 import { PART3_TASKS } from "../speaking/banks/part3";
@@ -90,6 +91,10 @@ function formatGrammarReviewStatus({ due, maintenance, scheduled, legacy }) {
 const TOTAL_VOCAB_EXERCISE_TASKS = vocabExerciseTasks.length;
 const TOTAL_SYNONYM_ITEMS = synonymSeedItems.length;
 const TOTAL_COLLOCATION_ITEMS = collocationPrecisionItems.length;
+const APTIS_GRAMMAR_VOCABULARY_MOCK_IDS = new Set(
+  APTIS_GRAMMAR_VOCABULARY_MOCKS.map((mock) => mock.id)
+);
+const APTIS_GRAMMAR_VOCABULARY_MOCK_TOTAL = APTIS_GRAMMAR_VOCABULARY_MOCKS.length;
 const HUB_GRAMMAR_LEVEL_COLORS = {
   a2: "#7ef0c2",
   b1: "#8fb6ff",
@@ -1159,6 +1164,11 @@ const textbookVocabMistakes = vocabMistakes.filter(
 const aptisVocabMistakes = vocabMistakes.filter(
   (item) => item?.source !== "hub-textbook"
 );
+const completedAptisGrammarVocabularyMocks = new Set(
+  aptisMockAttempts
+    .map((attempt) => attempt.mockId)
+    .filter((mockId) => APTIS_GRAMMAR_VOCABULARY_MOCK_IDS.has(mockId))
+).size;
 
 const vocabExerciseAttempted = vocabPracticeSummary?.exercise?.attempted || 0;
 const vocabExercisePerfect = vocabPracticeSummary?.exercise?.perfect || 0;
@@ -3113,7 +3123,7 @@ const formatOteSpeakingPart = (part) => {
     </h3>
 
     <span className="muted small" style={{ flexShrink: 0 }}>
-      {new Set(aptisMockAttempts.map((attempt) => attempt.mockId).filter(Boolean)).size}/3 mocks completed
+      {completedAptisGrammarVocabularyMocks}/{APTIS_GRAMMAR_VOCABULARY_MOCK_TOTAL} mocks completed
       {aptisMockAttempts.length ? ` · ${aptisMockAttempts.length} attempt${aptisMockAttempts.length === 1 ? "" : "s"}` : ""}
     </span>
 

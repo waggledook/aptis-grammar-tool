@@ -38,6 +38,7 @@ export const ACTIVITY_TYPE_LABELS = {
   listening_part1_completed: "Listening Part 1 Completed",
   listening_part2_attempted: "Listening Part 2 Attempt",
   listening_part2_completed: "Listening Part 2 Completed",
+  aptis_listening_teacher_task_started: "Aptis Listening Teacher Task Started",
   listening_part3_attempted: "Listening Part 3 Attempt",
   listening_part3_completed: "Listening Part 3 Completed",
   listening_part4_attempted: "Listening Part 4 Attempt",
@@ -71,6 +72,15 @@ export const ACTIVITY_TYPE_LABELS = {
   aptis_reading_live_task_completed: "Aptis Reading Live Task Completed",
   aptis_reading_live_review_started: "Aptis Reading Live Review Started",
   aptis_reading_live_finished: "Aptis Reading Live Finished",
+  aptis_listening_live_hosted: "Aptis Listening Live Hosted",
+  aptis_listening_live_joined: "Aptis Listening Live Joined",
+  aptis_listening_live_started: "Aptis Listening Live Started",
+  aptis_listening_live_student_started: "Aptis Listening Live Student Started",
+  aptis_listening_live_first_round_submitted: "Aptis Listening Live First Answers Submitted",
+  aptis_listening_live_second_round_started: "Aptis Listening Live Replay Started",
+  aptis_listening_live_review_started: "Aptis Listening Live Review Started",
+  aptis_listening_live_finished: "Aptis Listening Live Finished",
+  aptis_listening_live_student_completed: "Aptis Listening Live Student Completed",
   hub_dependent_preps_started: "Hub Dependent Prepositions Started",
   hub_dependent_preps_review_started: "Hub Dependent Prepositions Review Loaded",
   hub_dependent_preps_completed: "Hub Dependent Prepositions Completed",
@@ -443,12 +453,14 @@ export function formatActivityDetails(log) {
     case "listening_part2_attempted":
     case "listening_part3_attempted":
     case "listening_part4_attempted":
-      return joinParts([d.taskId || "Task", `Score ${formatScore(d.score, d.total)}`, typeof d.playsUsed === "number" ? `Listens ${d.playsUsed}/2` : ""]);
+      return joinParts([d.taskTitle || d.taskId || "Task", `Score ${formatScore(d.score, d.total)}`, typeof d.playsUsed === "number" ? `Listens ${d.playsUsed}/2` : ""]);
+    case "aptis_listening_teacher_task_started":
+      return joinParts([d.taskTitle || d.taskId || "Listening task", "Part 2"]);
     case "listening_part1_completed":
     case "listening_part2_completed":
     case "listening_part3_completed":
     case "listening_part4_completed":
-      return joinParts([d.taskId || "Task", "Completed", typeof d.playsUsed === "number" ? `Listens ${d.playsUsed}/2` : ""]);
+      return joinParts([d.taskTitle || d.taskId || "Task", "Completed", typeof d.playsUsed === "number" ? `Listens ${d.playsUsed}/2` : ""]);
     case "hub_grammar_submitted":
       return joinParts([d.activityTitle || d.activityId || "Grammar activity", `${d.score ?? "?"}%`, `Correct ${formatScore(d.correct, d.total)}`]);
     case "hub_vocab_activity_completed":
@@ -514,6 +526,21 @@ export function formatActivityDetails(log) {
     case "aptis_reading_live_review_started":
     case "aptis_reading_live_finished":
       return joinParts([d.activityTitle || "Live reading", d.part ? `Part ${d.part}` : "", formatCount(d.playerCount, "player"), d.completedTaskCount == null ? "" : `Completed ${formatScore(d.completedTaskCount, d.possibleTaskCount)}`, `PIN ${d.pin ?? "?"}`]);
+    case "aptis_listening_live_hosted":
+    case "aptis_listening_live_joined":
+    case "aptis_listening_live_student_started":
+      return joinParts([d.activityTitle || "Live listening", "Part 2", `PIN ${d.pin ?? "?"}`]);
+    case "aptis_listening_live_started":
+      return joinParts([d.activityTitle || "Live listening", "Part 2", formatCount(d.playerCount, "player"), `PIN ${d.pin ?? "?"}`]);
+    case "aptis_listening_live_first_round_submitted":
+      return joinParts([d.activityTitle || "Live listening", `Answered ${formatScore(d.answeredCount, d.total)}`, `PIN ${d.pin ?? "?"}`]);
+    case "aptis_listening_live_second_round_started":
+      return joinParts([d.activityTitle || "Live listening", d.secondMode === "speaker" ? "Speaker replay" : "Full replay", `Submitted ${formatScore(d.firstRoundCount, d.playerCount)}`, `PIN ${d.pin ?? "?"}`]);
+    case "aptis_listening_live_review_started":
+    case "aptis_listening_live_finished":
+      return joinParts([d.activityTitle || "Live listening", formatCount(d.playerCount, "player"), d.secondMode === "speaker" ? "Speaker replay" : "Full replay", `PIN ${d.pin ?? "?"}`]);
+    case "aptis_listening_live_student_completed":
+      return joinParts([d.activityTitle || "Live listening", `First ${formatScore(d.firstRoundScore, d.total)}`, `Final ${formatScore(d.score, d.total)}`, `PIN ${d.pin ?? "?"}`]);
     case "hub_dependent_preps_started":
       return joinParts([d.level || d.levelId || "Level", `${d.roundSeconds ?? "?"}s rounds`, `Pool ${d.totalItems ?? "?"}`]);
     case "hub_dependent_preps_review_started":

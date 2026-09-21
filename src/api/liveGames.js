@@ -17,6 +17,8 @@
 
 import {
   auth,
+  logAptisListeningLiveHosted,
+  logAptisListeningLiveJoined,
   logAptisReadingLiveHosted,
   logAptisReadingLiveJoined,
   logAptisReadingLiveTaskCompleted,
@@ -44,6 +46,10 @@ import {
   COHESION_CHALLENGE_TASK_ID,
 } from "../products/ote/data/oteAdvancedReadingCohesionChallenge.js";
 import { OTE_LISTENING_LIVE_GAME_TYPE } from "../products/ote/data/oteListeningLive.js";
+import {
+  APTIS_LISTENING_PART2_LIVE_GAME_TYPE,
+  getTeacherListeningPart2Task,
+} from "../components/listening/teacherListeningPart2Data.js";
 import {
   FREE_THINGS_LESSON_GAME_TYPE,
   FREE_THINGS_LESSON_TASK_ID,
@@ -130,6 +136,17 @@ function getAptisReadingLiveActivityDetails(game, gameId) {
     taskId: game.taskId || taskIds[0] || null,
     taskIds,
     taskCount: taskIds.length,
+  };
+}
+
+function getAptisListeningLiveActivityDetails(game, gameId) {
+  return {
+    gameId,
+    pin: game.pin || null,
+    activityType: "listening-task",
+    activityTitle: game.title || "Aptis Listening Part 2",
+    part: 2,
+    taskId: game.taskId || null,
   };
 }
 
@@ -230,6 +247,7 @@ export async function joinLiveGameByPin(pin) {
     game.type === OPTION_JURY_GAME_TYPE ||
     game.type === PART4_EVIDENCE_LIVE_GAME_TYPE ||
     game.type === OTE_LISTENING_LIVE_GAME_TYPE ||
+    game.type === APTIS_LISTENING_PART2_LIVE_GAME_TYPE ||
     game.type === COHESION_CHALLENGE_GAME_TYPE ||
     game.type === FREE_THINGS_LESSON_GAME_TYPE ||
     game.type === APTIS_WRITING_LIVE_GAME_TYPE ||
@@ -260,6 +278,9 @@ export async function joinLiveGameByPin(pin) {
   }
   if (!existingPlayer && [APTIS_READING_PART1_LIVE_GAME_TYPE, READING_PART2_LIVE_GAME_TYPE, READING_PART3_LIVE_GAME_TYPE, READING_PART4_LIVE_GAME_TYPE].includes(game.type)) {
     await logAptisReadingLiveJoined(getAptisReadingLiveActivityDetails(game, game.gameId));
+  }
+  if (!existingPlayer && game.type === APTIS_LISTENING_PART2_LIVE_GAME_TYPE) {
+    await logAptisListeningLiveJoined(getAptisListeningLiveActivityDetails(game, game.gameId));
   }
 
   return { gameId: game.gameId, type: game.type || "grammar" };
@@ -487,6 +508,29 @@ export async function createOteListeningLiveGame({ activityId, title }) {
       playCount: 0,
     },
   });
+  return { gameId, pin };
+}
+
+export async function createAptisListeningPart2LiveGame({ taskId }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a listening session.");
+  const task = getTeacherListeningPart2Task(taskId);
+  if (!task) throw new Error("Choose an available Aptis Listening Part 2 task.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: task.title,
+    type: APTIS_LISTENING_PART2_LIVE_GAME_TYPE,
+    taskId: task.id,
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby", reviewIndex: 0, playCount: 0, completedCount: 0, audioStage: "idle" },
+  });
+  await logAptisListeningLiveHosted(getAptisListeningLiveActivityDetails({ pin, title: task.title, taskId: task.id }, gameId));
   return { gameId, pin };
 }
 
@@ -778,7 +822,7 @@ export async function submitCohesionChallengeLiveAnswer({
   );
 }
 
-export async function submitOteListeningLiveAnswer({
+export async function submitListeningLiveAnswer({
   gameId,
   itemId,
   value,
@@ -795,14 +839,18 @@ export async function submitOteListeningLiveAnswer({
   await runTransaction(answerRef, (current) => {
     const now = Date.now();
     const existing = current || {};
+    const isRevision = stage === "script_check" || stage === "second_listen";
     const hadInitialAnswer =
-      stage === "script_check"
+      isRevision
         ? existing.initialAnswered ?? existing.value !== undefined
         : true;
     const initialValue =
-      stage === "script_check"
+      isRevision
         ? existing.initialValue ?? (hadInitialAnswer ? existing.value : undefined)
         : value;
+    const preScriptValue = stage === "script_check"
+      ? existing.preScriptValue !== undefined ? existing.preScriptValue : existing.value ?? null
+      : existing.preScriptValue;
     return {
       ...existing,
       value,
@@ -810,15 +858,22 @@ export async function submitOteListeningLiveAnswer({
       initialValue: hadInitialAnswer ? initialValue : null,
       initialAnswered: hadInitialAnswer,
       initialSubmittedAt:
-        stage === "script_check"
+        isRevision
           ? existing.initialSubmittedAt || existing.submittedAt || now
           : now,
       ...(stage === "script_check"
         ? {
             scriptCheckValue: value,
             scriptCheckUpdatedAt: now,
-            changedAfterScript: !hadInitialAnswer || value !== initialValue,
+            preScriptValue,
+            changedAfterScript: preScriptValue === null || value !== preScriptValue,
           }
+        : stage === "second_listen"
+          ? {
+              secondListenValue: value,
+              secondListenUpdatedAt: now,
+              changedAfterFirstListen: !hadInitialAnswer || value !== initialValue,
+            }
         : {
             scriptCheckValue: null,
             scriptCheckUpdatedAt: null,
@@ -829,7 +884,13 @@ export async function submitOteListeningLiveAnswer({
   });
 }
 
-export async function confirmOteListeningLiveScriptCheck({ gameId, itemId, value }) {
+export async function submitAptisListeningFirstRound({ gameId }) {
+  const user = auth.currentUser;
+  if (!user || !gameId) throw new Error("You must be signed in to submit first-round answers.");
+  await set(ref(rtdb, `liveGames/${gameId}/players/${user.uid}/listeningFirstRoundSubmittedAt`), Date.now());
+}
+
+export async function confirmListeningLiveScriptCheck({ gameId, itemId, value }) {
   const user = auth.currentUser;
   if (!user) throw new Error("You must be signed in to confirm an answer.");
   if (!gameId || !itemId) throw new Error("Missing listening answer details.");
@@ -847,6 +908,9 @@ export async function confirmOteListeningLiveScriptCheck({ gameId, itemId, value
       existing.initialAnswered ?? existing.value !== undefined;
     const initialValue =
       existing.initialValue ?? (initialAnswered ? existing.value : undefined);
+    const preScriptValue = existing.preScriptValue !== undefined
+      ? existing.preScriptValue
+      : existing.value ?? null;
     return {
       ...existing,
       value: finalValue,
@@ -857,10 +921,14 @@ export async function confirmOteListeningLiveScriptCheck({ gameId, itemId, value
       scriptCheckValue: finalValue,
       scriptCheckUpdatedAt: now,
       scriptCheckedAt: now,
-      changedAfterScript: !initialAnswered || finalValue !== initialValue,
+      preScriptValue,
+      changedAfterScript: preScriptValue === null || finalValue !== preScriptValue,
     };
   });
 }
+
+export const submitOteListeningLiveAnswer = submitListeningLiveAnswer;
+export const confirmOteListeningLiveScriptCheck = confirmListeningLiveScriptCheck;
 
 export async function assignOptionJuryPlayer({ gameId, playerId, optionAssignment }) {
   if (!auth.currentUser) throw new Error("You must be signed in to assign options.");
@@ -1184,11 +1252,17 @@ export async function setLiveGameState(gameId, partialState) {
     if (typeof partialState.playCount === "number") {
       updates.playCount = partialState.playCount;
     }
+    if (typeof partialState.completedCount === "number") {
+      updates.completedCount = partialState.completedCount;
+    }
     if (Array.isArray(partialState.round)) {
       updates.round = partialState.round;
     }
     if (typeof partialState.audioStage === "string") {
       updates.audioStage = partialState.audioStage;
+    }
+    if (typeof partialState.secondMode === "string") {
+      updates.secondMode = partialState.secondMode;
     }
     if (typeof partialState.clickDuration === "number") {
       updates.clickDuration = partialState.clickDuration;

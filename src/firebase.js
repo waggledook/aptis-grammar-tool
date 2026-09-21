@@ -2083,6 +2083,46 @@ export async function logAptisReadingLiveFinished(details = {}) {
   return logActivity("aptis_reading_live_finished", details);
 }
 
+export async function logAptisListeningLiveHosted(details = {}) {
+  return logActivity("aptis_listening_live_hosted", details);
+}
+
+export async function logAptisListeningLiveJoined(details = {}) {
+  return logActivity("aptis_listening_live_joined", details);
+}
+
+export async function logAptisListeningLiveStarted(details = {}) {
+  return logActivity("aptis_listening_live_started", details);
+}
+
+export async function logAptisListeningLiveStudentStarted(details = {}) {
+  return logActivity("aptis_listening_live_student_started", details);
+}
+
+export async function logAptisListeningLiveFirstRoundSubmitted(details = {}) {
+  return logActivity("aptis_listening_live_first_round_submitted", details);
+}
+
+export async function logAptisListeningLiveSecondRoundStarted(details = {}) {
+  return logActivity("aptis_listening_live_second_round_started", details);
+}
+
+export async function logAptisListeningLiveReviewStarted(details = {}) {
+  return logActivity("aptis_listening_live_review_started", details);
+}
+
+export async function logAptisListeningLiveFinished(details = {}) {
+  return logActivity("aptis_listening_live_finished", details);
+}
+
+export async function logAptisListeningLiveStudentCompleted(details = {}) {
+  return logActivity("aptis_listening_live_student_completed", details);
+}
+
+export async function logAptisListeningTeacherTaskStarted(details = {}) {
+  return logActivity("aptis_listening_teacher_task_started", details);
+}
+
 // ─── ACTIVITY HELPERS ────────────────────────────────────────────────────
 
 /**
@@ -2403,6 +2443,7 @@ export async function logListeningPart1Completed({
 // ─── LISTENING PART 2 (Matching speakers) ───────────────────────────────────
 export async function logListeningPart2Attempted({
   taskId,
+  taskTitle = null,
   score,
   total,
   playsUsed = null,
@@ -2410,6 +2451,7 @@ export async function logListeningPart2Attempted({
 }) {
   return logActivity("listening_part2_attempted", {
     taskId: taskId || null,
+    taskTitle,
     score: typeof score === "number" ? score : null,
     total: typeof total === "number" ? total : null,
     playsUsed: typeof playsUsed === "number" ? playsUsed : null,
@@ -2419,12 +2461,14 @@ export async function logListeningPart2Attempted({
 
 export async function logListeningPart2Completed({
   taskId,
+  taskTitle = null,
   playsUsed = null,
   source = "ListeningPart2",
 }) {
   await saveListeningProgress(taskId, "part2");
   return logActivity("listening_part2_completed", {
     taskId: taskId || null,
+    taskTitle,
     playsUsed: typeof playsUsed === "number" ? playsUsed : null,
     source,
   });

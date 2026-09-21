@@ -210,6 +210,8 @@ import ListeningPartMenu from "./components/listening/ListeningPartMenu.jsx";
 import AptisListeningStrategyGuide from "./components/listening/AptisListeningStrategyGuide.jsx";
 import ListeningPart1 from "./components/listening/ListeningPart1.jsx";
 import ListeningPart2 from "./components/listening/ListeningPart2.jsx";
+import AptisListeningPart2LiveHost from "./components/listening/AptisListeningPart2LiveHost.jsx";
+import AptisListeningPart2LivePlayer from "./components/listening/AptisListeningPart2LivePlayer.jsx";
 import ListeningPart3 from "./components/listening/ListeningPart3.jsx";
 import ListeningPart4 from "./components/listening/ListeningPart4.jsx";
 import HubLanding from "./components/hub/HubLanding.jsx";
@@ -2786,6 +2788,11 @@ return (
 />
 
 <Route
+  path="/listening/part2-teacher/:taskId?"
+  element={<ListeningPart2 user={user} teacherBank />}
+/>
+
+<Route
   path="/listening/part3"
   element={
     <AptisFullAccessOnly
@@ -3321,6 +3328,8 @@ return (
 <Route path="/live/part4-evidence/play/:gameId" element={<OteReadingPart4EvidenceLivePlayer />} />
 <Route path="/live/ote-listening/host/:gameId" element={<RequireTeacher user={user}><OteListeningLiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/ote-listening/play/:gameId" element={<OteListeningLivePlayer />} />
+<Route path="/live/aptis-listening-part2/host/:gameId" element={<RequireTeacher user={user}><AptisListeningPart2LiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/aptis-listening-part2/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><AptisListeningPart2LivePlayer /></RequireSignedIn>} />
 <Route path="/live/cohesion-challenge/host/:gameId" element={<RequireTeacher user={user}><OteCohesionChallengeLiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/cohesion-challenge/play/:gameId" element={<OteCohesionChallengeLivePlayer />} />
 <Route path="/live/free-things-lesson/host/:gameId" element={<RequireTeacher user={user}><OteFreeThingsLessonLiveHost user={user} /></RequireTeacher>} />

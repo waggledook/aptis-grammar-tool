@@ -1,0 +1,40 @@
+.aptis-p2-live-page { max-width: 1120px; margin: 0 auto; padding: 1.5rem; color: #edf4ff; }
+.aptis-p2-live-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; }
+.aptis-p2-live-header p { margin: 0 0 .3rem; color: #a7c7f8; font-size: .85rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+.aptis-p2-live-header h1 { margin: 0; font-size: clamp(1.7rem, 3vw, 2.5rem); }
+.aptis-p2-live-header > span { border: 1px solid #486996; border-radius: 999px; padding: .5rem .8rem; white-space: nowrap; }
+.aptis-p2-live-card { margin: 1rem 0; padding: 1.25rem; border: 1px solid #365481; border-radius: 16px; background: #11203b; }
+.aptis-p2-live-card h2 { margin: 0 0 .7rem; }
+.aptis-p2-live-card p { line-height: 1.55; }
+.aptis-p2-live-lobby { display: grid; grid-template-columns: minmax(240px, 320px) 1fr; gap: 1rem; }
+.aptis-p2-live-pin { display: grid; justify-items: center; gap: .7rem; }
+.aptis-p2-live-pin > strong { font-size: 2.3rem; letter-spacing: .14em; }
+.aptis-p2-live-roster { display: flex; flex-wrap: wrap; gap: .5rem; padding: 0; list-style: none; }
+.aptis-p2-live-roster li { padding: .4rem .7rem; border-radius: 999px; background: #203c62; }
+.aptis-p2-live-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; margin: 1rem 0 0; }
+.aptis-p2-live-actions button, .aptis-p2-live-pin button { padding: .68rem .9rem; border: 1px solid #7295cd; border-radius: 9px; background: #274c83; color: #fff; font: inherit; font-weight: 700; cursor: pointer; }
+.aptis-p2-live-actions button:disabled { opacity: .5; cursor: default; }
+.aptis-p2-live-actions button.is-primary { background: #3675cb; }
+.aptis-p2-live-status { padding: .75rem 1rem; border: 1px solid #466593; border-radius: 10px; background: #1a3154; }
+.aptis-p2-live-choice-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45rem .9rem; margin: .8rem 0 1.2rem; }
+.aptis-p2-live-choice-list span { padding: .55rem .7rem; border: 1px solid #38567d; border-radius: 8px; }
+.aptis-p2-live-rows { display: grid; gap: .55rem; }
+.aptis-p2-live-rows label { display: grid; grid-template-columns: 130px 1fr; align-items: center; gap: .7rem; }
+.aptis-p2-live-rows select, .aptis-p2-live-script-check select { width: 100%; padding: .65rem; border: 1px solid #6e8bb5; border-radius: 8px; background: #1b3355; color: #fff; font: inherit; }
+.aptis-p2-live-rows select:disabled { opacity: .75; }
+.aptis-p2-live-script { margin: 1rem 0; padding: 1rem; border-left: 4px solid #7eb5ff; background: #172b49; border-radius: 8px; }
+.aptis-p2-live-script h2 { font-size: 1.1rem; }
+.aptis-p2-live-script p { margin-bottom: 0; }
+.aptis-p2-live-script mark { padding: .1rem .15rem; border-radius: 3px; background: #ffdb87; color: #172034; }
+.aptis-p2-live-script-check { display: grid; gap: .6rem; max-width: 560px; }
+.aptis-p2-live-verdict { display: flex; flex-wrap: wrap; gap: .8rem; align-items: center; }
+.aptis-p2-live-verdict > span { padding: .5rem .7rem; border-radius: 8px; background: #203b60; }
+.aptis-p2-live-verdict .is-correct { background: #174b3c; }
+.aptis-p2-live-verdict .is-incorrect { background: #713b34; }
+.aptis-p2-live-report { display: grid; gap: .5rem; }
+.aptis-p2-live-report li { padding: .5rem; }
+:root[data-theme="light"] .aptis-p2-live-page { color: #14233a; }
+:root[data-theme="light"] .aptis-p2-live-card { background: #fff; border-color: #b7cae2; }
+:root[data-theme="light"] .aptis-p2-live-status, :root[data-theme="light"] .aptis-p2-live-script, :root[data-theme="light"] .aptis-p2-live-verdict > span, :root[data-theme="light"] .aptis-p2-live-choice-list span { background: #eef4fc; color: #14233a; }
+:root[data-theme="light"] .aptis-p2-live-rows select, :root[data-theme="light"] .aptis-p2-live-script-check select { background: #fff; color: #14233a; }
+@media (max-width: 720px) { .aptis-p2-live-lobby, .aptis-p2-live-choice-list { grid-template-columns: 1fr; } .aptis-p2-live-header { flex-direction: column; } .aptis-p2-live-rows label { grid-template-columns: 1fr; gap: .3rem; } }
