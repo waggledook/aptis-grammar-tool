@@ -1587,6 +1587,10 @@ export async function logOteTrainingStarted(details = {}) {
   return logOteActivity("ote_training_started", details);
 }
 
+export async function logOteReadingLiveHosted(details = {}) {
+  return logOteActivity("ote_reading_live_hosted", details);
+}
+
 export async function logOteTrainingCompleted(details = {}) {
   await markOteTrainingProgress(details);
   return logOteActivity("ote_training_completed", details);

@@ -1,5 +1,5 @@
 // src/App.jsx
-import React, { useState, useEffect, useLayoutEffect, useMemo } from 'react'
+import React, { useState, useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { Routes, Route, useNavigate, useLocation, useParams, Navigate } from "react-router-dom";
 import {
   auth,
@@ -19,6 +19,7 @@ import {
   fetchReadingProgressMap,
   fetchOteTrainingProgressMap,
   fetchRecentOteTrainingProgress,
+  logOteTrainingStarted,
   fetchRecentVocabProgress,
   listAssignedActivitiesForStudent,
   listGrammarSetAttemptsForStudent,
@@ -359,7 +360,7 @@ import OteLevelTest from "./products/ote/OteLevelTest.jsx";
 import OteLevelTestV2 from "./products/ote/OteLevelTestV2.jsx";
 import OteAdvancedLevelTest from "./products/ote/OteAdvancedLevelTest.jsx";
 import OteCourseLanding from "./products/ote/OteCourseLanding.jsx";
-import OteReadingMenu, { OteReadingPartShell } from "./products/ote/OteReadingMenu.jsx";
+import OteReadingMenu, { getOteReadingLessonActivity, OteReadingPartShell } from "./products/ote/OteReadingMenu.jsx";
 import { APTIS_SITE_ID, canAccessAptisTrainer, canAccessOte, canAccessSeifHub, getSiteHomePath, getSitePath, getSiteVariant } from "./siteConfig.js";
 
 function BellIcon() {
@@ -522,6 +523,7 @@ function HubTranslationRoute({ user, hasAccess, onSignIn }) {
 export default function App() {
   // — AUTH STATE —
 const [user,     setUser]     = useState(null)
+const readingLessonLoggedKeyRef = useRef("");
 const [showAuth, setShowAuth] = useState(false)
 const [theme, setTheme] = useState(() => {
   if (typeof window === "undefined") return "dark";
@@ -1028,6 +1030,20 @@ const showMemberAccessGate =
   !isPublicOteLevelTestRoute &&
   location.pathname !== "/privacy" &&
   !location.pathname.startsWith("/admin");
+
+useEffect(() => {
+  const activity = !showMemberAccessGate && user?.uid
+    ? getOteReadingLessonActivity(location.pathname)
+    : null;
+  const key = activity ? `${user.uid}:${location.pathname}` : "";
+  if (!key) {
+    readingLessonLoggedKeyRef.current = "";
+    return;
+  }
+  if (readingLessonLoggedKeyRef.current === key) return;
+  readingLessonLoggedKeyRef.current = key;
+  void logOteTrainingStarted(activity);
+}, [location.pathname, showMemberAccessGate, user?.uid]);
 
 const toggleTheme = () => {
   setTheme((current) => (current === "light" ? "dark" : "light"));

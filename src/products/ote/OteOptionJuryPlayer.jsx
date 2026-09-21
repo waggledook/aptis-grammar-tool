@@ -3,7 +3,7 @@ import { Check, Gavel, Lock, Send } from "lucide-react";
 import { onValue, ref } from "firebase/database";
 import { useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
-import { auth, logOteTrainingCompleted, rtdb } from "../../firebase.js";
+import { auth, logOteTrainingCompleted, logOteTrainingStarted, rtdb } from "../../firebase.js";
 import { saveOptionJuryEvaluation, submitOptionJuryFinalVote, submitOptionJuryInvestigation } from "../../api/liveGames.js";
 import { toast } from "../../utils/toast.js";
 import {
@@ -45,6 +45,7 @@ export default function OteOptionJuryPlayer() {
   const [changedMind, setChangedMind] = useState(null);
   const autoInvestigationRef = useRef("");
   const autoVoteRef = useRef("");
+  const startedRef = useRef(new Set());
 
   useEffect(() => {
     const unsubscribe = onValue(ref(rtdb, `liveGames/${gameId}`), (snapshot) => {
@@ -84,6 +85,28 @@ export default function OteOptionJuryPlayer() {
     setVote("");
     setChangedMind(null);
   }, [questionIndex]);
+
+  useEffect(() => {
+    if (phase === "lobby" || !uid || !player || !task) return;
+    const storageKey = `ote_option_jury_started:${gameId}:${uid}`;
+    if (startedRef.current.has(storageKey) || window.localStorage.getItem(storageKey)) return;
+    startedRef.current.add(storageKey);
+    window.localStorage.setItem(storageKey, "1");
+    logOteTrainingStarted({
+      section: "reading",
+      part: "part-4",
+      mode: "live_option_jury",
+      taskId: `advanced-reading-part-4-option-jury-${task.id}`,
+      taskTitle: `Option Jury: ${task.title}`,
+      progressId: "reading.part4.advanced-option-jury",
+      variant: "advanced",
+      gameId,
+      participantRole: "student",
+    }).catch((error) => {
+      window.localStorage.removeItem(storageKey);
+      console.error("[OptionJuryPlayer] start log failed", error);
+    });
+  }, [gameId, phase, player, task, uid]);
 
   useEffect(() => {
     if (phase !== "finished" || !uid || !task || !teamLetter) return;

@@ -149,6 +149,7 @@ export default function OteReadingPart2ThreeProfilesGuide({ nativeRoutes = false
     logOteTrainingCompleted({
       progressId: "reading.part2.general-three-texts-guide",
       section: "reading",
+      variant: "general",
       part: "part-2",
       mode: "general_three_texts_guide",
       taskTitle: "General Reading Part 2 three texts guide",

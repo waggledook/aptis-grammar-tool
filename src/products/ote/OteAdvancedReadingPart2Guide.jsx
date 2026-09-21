@@ -152,6 +152,7 @@ export default function OteAdvancedReadingPart2Guide({ nativeRoutes = false }) {
     logOteTrainingCompleted({
       progressId: "reading.part2.advanced-guide",
       section: "reading",
+      variant: "advanced",
       part: "part-2",
       mode: "advanced_guide",
       taskTitle: "Advanced Reading Part 2 guide",

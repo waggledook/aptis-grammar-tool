@@ -117,6 +117,7 @@ export const ACTIVITY_TYPE_LABELS = {
   ai_feedback_generated: "AI Feedback Generated",
   ote_training_started: "OTE Training Started",
   ote_training_completed: "OTE Training Completed",
+  ote_reading_live_hosted: "OTE Reading Live Hosted",
   ote_mock_started: "OTE Mock Started",
   ote_mock_completed: "OTE Mock Completed",
   aptis_mock_started: "Aptis Grammar & Vocabulary Mock Started",
@@ -734,6 +735,8 @@ export function formatActivityDetails(log) {
           : "";
       return joinParts(["OTE", sectionLabel, partLabel, modeLabel, taskLabel, size, score]);
     }
+    case "ote_reading_live_hosted":
+      return joinParts(["OTE", "Advanced Reading", d.part ? `Part ${d.part}` : "", d.activityTitle || "Live session", `PIN ${d.pin ?? "?"}`]);
     case "ote_mock_started":
     case "ote_mock_completed": {
       const size =

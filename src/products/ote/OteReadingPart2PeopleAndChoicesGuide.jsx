@@ -154,6 +154,7 @@ export default function OteReadingPart2PeopleAndChoicesGuide({ nativeRoutes = fa
     logOteTrainingCompleted({
       progressId: "reading.part2.general-people-choices-guide",
       section: "reading",
+      variant: "general",
       part: "part-2",
       mode: "general_people_choices_guide",
       taskTitle: "General Reading Part 2 people and choices guide",

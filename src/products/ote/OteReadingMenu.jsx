@@ -286,6 +286,31 @@ const READING_VARIANTS = {
   },
 };
 
+// The route tracker shares this menu catalog so newly added lessons receive start logs.
+// eslint-disable-next-line react-refresh/only-export-components
+export function getOteReadingLessonActivity(pathname) {
+  const match = String(pathname || "").match(/^\/(?:ote\/)?reading\/(general|advanced)\/([^/]+)\/(.+)$/);
+  if (!match) return null;
+  const [, variant, partId, route] = match;
+  const part = READING_VARIANTS[variant]?.parts.find((entry) => entry.id === partId);
+  const guide = part?.guides?.find((entry) => entry.route === route);
+  if (!guide || guide.teacherOnly) return null;
+  if ([
+    "reading.part2.general-compare-people",
+    "reading.part4.advanced-inside-paragraph",
+  ].includes(guide.progressId)) return null;
+
+  const partNumber = part.label.match(/\d+/)?.[0];
+  return {
+    progressId: guide.progressId,
+    section: "reading",
+    part: `part-${partNumber}`,
+    mode: guide.eyebrow?.toLowerCase().includes("skill trainer") ? "skill_trainer" : "strategy_guide",
+    taskTitle: guide.title,
+    variant,
+  };
+}
+
 function getReadingBasePath(nativeRoutes) {
   return nativeRoutes ? "/reading" : "/ote/reading";
 }

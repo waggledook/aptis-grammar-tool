@@ -22,6 +22,7 @@ import {
   logAptisReadingLiveHosted,
   logAptisReadingLiveJoined,
   logAptisReadingLiveTaskCompleted,
+  logOteReadingLiveHosted,
   logAptisWritingLiveHosted,
   logAptisWritingLiveJoined,
   rtdb,
@@ -294,16 +295,18 @@ export async function createOptionJuryLiveGame({ taskId, title }) {
   const gameRef = push(ref(rtdb, "liveGames"));
   const gameId = gameRef.key;
   const pin = generatePin();
+  const activityTitle = title || "Option Jury";
   await set(gameRef, {
     ownerUid: user.uid,
     pin,
-    title: title || "Option Jury",
+    title: activityTitle,
     type: OPTION_JURY_GAME_TYPE,
     taskId,
     status: "lobby",
     createdAt: Date.now(),
     state: { phase: "lobby", questionIndex: 0 },
   });
+  await logOteReadingLiveHosted({ gameId, pin, activityTitle, part: 4, mode: "live_option_jury", taskId, variant: "advanced" });
   return { gameId, pin };
 }
 
@@ -315,16 +318,18 @@ export async function createPart4EvidenceLiveGame({ taskId, title }) {
   const gameRef = push(ref(rtdb, "liveGames"));
   const gameId = gameRef.key;
   const pin = generatePin();
+  const activityTitle = title || "Part 4 Evidence Reveal";
   await set(gameRef, {
     ownerUid: user.uid,
     pin,
-    title: title || "Part 4 Evidence Reveal",
+    title: activityTitle,
     type: PART4_EVIDENCE_LIVE_GAME_TYPE,
     taskId,
     status: "lobby",
     createdAt: Date.now(),
     state: { phase: "lobby", questionIndex: 0 },
   });
+  await logOteReadingLiveHosted({ gameId, pin, activityTitle, part: 4, mode: "live_answer_evidence", taskId, variant: "advanced" });
   return { gameId, pin };
 }
 
@@ -541,10 +546,11 @@ export async function createCohesionChallengeLiveGame({ title } = {}) {
   const gameRef = push(ref(rtdb, "liveGames"));
   const gameId = gameRef.key;
   const pin = generatePin();
+  const activityTitle = title || "Classroom Cohesion Challenge";
   await set(gameRef, {
     ownerUid: user.uid,
     pin,
-    title: title || "Classroom Cohesion Challenge",
+    title: activityTitle,
     type: COHESION_CHALLENGE_GAME_TYPE,
     taskId: COHESION_CHALLENGE_TASK_ID,
     status: "lobby",
@@ -554,6 +560,7 @@ export async function createCohesionChallengeLiveGame({ title } = {}) {
       questionIndex: 0,
     },
   });
+  await logOteReadingLiveHosted({ gameId, pin, activityTitle, part: 3, mode: "teacher_led_live", taskId: COHESION_CHALLENGE_TASK_ID, variant: "advanced" });
   return { gameId, pin };
 }
 
@@ -564,16 +571,18 @@ export async function createFreeThingsLessonLiveGame({ title } = {}) {
   const gameRef = push(ref(rtdb, "liveGames"));
   const gameId = gameRef.key;
   const pin = generatePin();
+  const activityTitle = title || "Why Free Things Are Complicated · Live lesson";
   await set(gameRef, {
     ownerUid: user.uid,
     pin,
-    title: title || "Why Free Things Are Complicated · Live lesson",
+    title: activityTitle,
     type: FREE_THINGS_LESSON_GAME_TYPE,
     taskId: FREE_THINGS_LESSON_TASK_ID,
     status: "lobby",
     createdAt: Date.now(),
     state: { phase: "lobby", gapIndex: 0, sentenceIndex: 0, reviewIndex: 0 },
   });
+  await logOteReadingLiveHosted({ gameId, pin, activityTitle, part: 3, mode: "live_guided_lesson", taskId: FREE_THINGS_LESSON_TASK_ID, variant: "advanced" });
   return { gameId, pin };
 }
 
