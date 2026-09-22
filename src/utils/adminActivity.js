@@ -456,7 +456,7 @@ export function formatActivityDetails(log) {
     case "listening_part4_attempted":
       return joinParts([d.taskTitle || d.taskId || "Task", `Score ${formatScore(d.score, d.total)}`, typeof d.playsUsed === "number" ? `Listens ${d.playsUsed}/2` : ""]);
     case "aptis_listening_teacher_task_started":
-      return joinParts([d.taskTitle || d.taskId || "Listening task", "Part 2"]);
+      return joinParts([d.taskTitle || d.taskId || "Listening task", d.part ? `Part ${d.part}` : ""]);
     case "listening_part1_completed":
     case "listening_part2_completed":
     case "listening_part3_completed":
@@ -530,16 +530,16 @@ export function formatActivityDetails(log) {
     case "aptis_listening_live_hosted":
     case "aptis_listening_live_joined":
     case "aptis_listening_live_student_started":
-      return joinParts([d.activityTitle || "Live listening", "Part 2", `PIN ${d.pin ?? "?"}`]);
+      return joinParts([d.activityTitle || "Live listening", d.part ? `Part ${d.part}` : "", `PIN ${d.pin ?? "?"}`]);
     case "aptis_listening_live_started":
-      return joinParts([d.activityTitle || "Live listening", "Part 2", formatCount(d.playerCount, "player"), `PIN ${d.pin ?? "?"}`]);
+      return joinParts([d.activityTitle || "Live listening", d.part ? `Part ${d.part}` : "", formatCount(d.playerCount, "player"), `PIN ${d.pin ?? "?"}`]);
     case "aptis_listening_live_first_round_submitted":
       return joinParts([d.activityTitle || "Live listening", `Answered ${formatScore(d.answeredCount, d.total)}`, `PIN ${d.pin ?? "?"}`]);
     case "aptis_listening_live_second_round_started":
-      return joinParts([d.activityTitle || "Live listening", d.secondMode === "speaker" ? "Speaker replay" : "Full replay", `Submitted ${formatScore(d.firstRoundCount, d.playerCount)}`, `PIN ${d.pin ?? "?"}`]);
+      return joinParts([d.activityTitle || "Live listening", d.secondMode === "speaker" ? "Speaker replay" : d.secondMode === "section" ? "Question sections" : "Full replay", `Submitted ${formatScore(d.firstRoundCount, d.playerCount)}`, `PIN ${d.pin ?? "?"}`]);
     case "aptis_listening_live_review_started":
     case "aptis_listening_live_finished":
-      return joinParts([d.activityTitle || "Live listening", formatCount(d.playerCount, "player"), d.secondMode === "speaker" ? "Speaker replay" : "Full replay", `PIN ${d.pin ?? "?"}`]);
+      return joinParts([d.activityTitle || "Live listening", formatCount(d.playerCount, "player"), d.secondMode === "speaker" ? "Speaker replay" : d.secondMode === "section" ? "Question sections" : "Full replay", `PIN ${d.pin ?? "?"}`]);
     case "aptis_listening_live_student_completed":
       return joinParts([d.activityTitle || "Live listening", `First ${formatScore(d.firstRoundScore, d.total)}`, `Final ${formatScore(d.score, d.total)}`, `PIN ${d.pin ?? "?"}`]);
     case "hub_dependent_preps_started":

@@ -74,6 +74,13 @@ const PRODUCT_GROUPS = [
             icon: Headphones,
             tags: ["Direct link", "Speaker matching", "Live lesson"],
           },
+          {
+            title: "Listening Part 3 · Renting and Borrowing Possessions",
+            description: "Two-person opinion-matching task with a full dialogue, answer feedback and transcript.",
+            path: "/listening/part3-teacher/renting-borrowing",
+            icon: Headphones,
+            tags: ["Direct link", "Opinion matching", "Live lesson"],
+          },
         ],
       },
       {

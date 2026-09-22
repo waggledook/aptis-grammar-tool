@@ -28,6 +28,15 @@ export default function ListeningMenu({ user, aptisAccess, onSignIn }) {
       <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
 
       <section className="listening-menu-section">
+        <button className="menu-card listening-mock-card" type="button" onClick={() => navigate("/listening/mock-tests")}>
+          <span>Exam preview</span>
+          <h2>Listening mock exam</h2>
+          <p>Explore the 17-question, 40-minute exam flow. Recordings and final content are being prepared.</p>
+          <strong>Open mock preview →</strong>
+        </button>
+      </section>
+
+      <section className="listening-menu-section">
         <div className="listening-parts-grid" aria-label="Aptis Listening parts">
           {APTIS_LISTENING_PARTS.map((part) => {
             const Icon = part.icon;

@@ -146,6 +146,10 @@ export const APTIS_ROUTE_SEO = {
     description:
       "Practise Aptis Listening with short extracts, speaker matching, opinion matching and longer monologues.",
   },
+  "/listening/mock-tests": {
+    title: "Aptis General Listening Mock Preview | Seif Aptis Trainer",
+    description: "Preview a 17-question Aptis General Listening mock interface with exam-style navigation and a 40-minute timer.",
+  },
   "/listening/part1": {
     title: "Aptis Listening Part 1 Practice | Seif Aptis Trainer",
     description:

@@ -52,6 +52,10 @@ import {
   getTeacherListeningPart2Task,
 } from "../components/listening/teacherListeningPart2Data.js";
 import {
+  APTIS_LISTENING_PART3_LIVE_GAME_TYPE,
+  getTeacherListeningPart3Task,
+} from "../components/listening/teacherListeningPart3Data.js";
+import {
   FREE_THINGS_LESSON_GAME_TYPE,
   FREE_THINGS_LESSON_TASK_ID,
 } from "../products/ote/data/oteAdvancedReadingPart3FreeThingsLesson.js";
@@ -141,12 +145,13 @@ function getAptisReadingLiveActivityDetails(game, gameId) {
 }
 
 function getAptisListeningLiveActivityDetails(game, gameId) {
+  const part = game.type === APTIS_LISTENING_PART3_LIVE_GAME_TYPE ? 3 : 2;
   return {
     gameId,
     pin: game.pin || null,
     activityType: "listening-task",
-    activityTitle: game.title || "Aptis Listening Part 2",
-    part: 2,
+    activityTitle: game.title || `Aptis Listening Part ${part}`,
+    part,
     taskId: game.taskId || null,
   };
 }
@@ -249,6 +254,7 @@ export async function joinLiveGameByPin(pin) {
     game.type === PART4_EVIDENCE_LIVE_GAME_TYPE ||
     game.type === OTE_LISTENING_LIVE_GAME_TYPE ||
     game.type === APTIS_LISTENING_PART2_LIVE_GAME_TYPE ||
+    game.type === APTIS_LISTENING_PART3_LIVE_GAME_TYPE ||
     game.type === COHESION_CHALLENGE_GAME_TYPE ||
     game.type === FREE_THINGS_LESSON_GAME_TYPE ||
     game.type === APTIS_WRITING_LIVE_GAME_TYPE ||
@@ -280,7 +286,7 @@ export async function joinLiveGameByPin(pin) {
   if (!existingPlayer && [APTIS_READING_PART1_LIVE_GAME_TYPE, READING_PART2_LIVE_GAME_TYPE, READING_PART3_LIVE_GAME_TYPE, READING_PART4_LIVE_GAME_TYPE].includes(game.type)) {
     await logAptisReadingLiveJoined(getAptisReadingLiveActivityDetails(game, game.gameId));
   }
-  if (!existingPlayer && game.type === APTIS_LISTENING_PART2_LIVE_GAME_TYPE) {
+  if (!existingPlayer && [APTIS_LISTENING_PART2_LIVE_GAME_TYPE, APTIS_LISTENING_PART3_LIVE_GAME_TYPE].includes(game.type)) {
     await logAptisListeningLiveJoined(getAptisListeningLiveActivityDetails(game, game.gameId));
   }
 
@@ -536,6 +542,29 @@ export async function createAptisListeningPart2LiveGame({ taskId }) {
     state: { phase: "lobby", reviewIndex: 0, playCount: 0, completedCount: 0, audioStage: "idle" },
   });
   await logAptisListeningLiveHosted(getAptisListeningLiveActivityDetails({ pin, title: task.title, taskId: task.id }, gameId));
+  return { gameId, pin };
+}
+
+export async function createAptisListeningPart3LiveGame({ taskId }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a listening session.");
+  const task = getTeacherListeningPart3Task(taskId);
+  if (!task) throw new Error("Choose an available Aptis Listening Part 3 task.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: task.title,
+    type: APTIS_LISTENING_PART3_LIVE_GAME_TYPE,
+    taskId: task.id,
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby", reviewIndex: 0, playCount: 0, completedCount: 0, audioStage: "idle", secondMode: "" },
+  });
+  await logAptisListeningLiveHosted(getAptisListeningLiveActivityDetails({ type: APTIS_LISTENING_PART3_LIVE_GAME_TYPE, pin, title: task.title, taskId: task.id }, gameId));
   return { gameId, pin };
 }
 

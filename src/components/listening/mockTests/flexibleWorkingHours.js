@@ -1,0 +1,30 @@
+// Aptis Listening Mock 1, Question 15. Authored task and recording supplied by the user.
+export const FLEXIBLE_WORKING_HOURS_QUESTION = {
+  id: "q15",
+  number: 15,
+  type: "opinion-matching",
+  part: 3,
+  prompt: "Listen to two people discussing flexible working hours. Read the statements below and decide who expresses each opinion — the man, the woman, or both the man and the woman.",
+  audioSrc: "/audio/listening/mock-1/flexible-working-hours.mp3",
+  options: ["Man", "Woman", "Both"],
+  items: [
+    { id: "opinion-1", label: "Flexible schedules can improve productivity.", answer: "Both" },
+    { id: "opinion-2", label: "Teams need some shared working hours.", answer: "Woman" },
+    { id: "opinion-3", label: "New employees benefit from working on-site.", answer: "Man" },
+    { id: "opinion-4", label: "Managers place too much value on attendance.", answer: "Woman" },
+  ],
+  script: [
+    { speaker: "Woman", text: "Our company has extended its flexible-hours trial. I start at seven, before the phones get busy. That quiet period lets me finish reports before most colleagues arrive, and I’m not spending the first hour wishing I were still asleep." },
+    { speaker: "Man", text: "My problem was always the opposite. I concentrate better later, so starting at ten suits me. By lunchtime I’ve often completed more than I did under the old eight-thirty start." },
+    { speaker: "Woman", text: "The difficulty comes when work passes between people. Yesterday, a client needed figures from three departments. One colleague had left and another had not arrived, so a simple reply took most of the day." },
+    { speaker: "Man", text: "That sounds more like poor planning than a problem with flexible hours. If everyone keeps their calendar updated and urgent work has a named contact, the whole team need not be available simultaneously." },
+    { speaker: "Woman", text: "Calendars cannot predict every request. I would keep a few hours in the middle of the day when people know they can reach one another without arranging it." },
+    { speaker: "Man", text: "For experienced staff, perhaps. I’m less comfortable applying the same system to somebody who has just joined. Our new assistant works from home most mornings, and although scheduled calls cover the formal training, he misses the quick explanations that happen when a problem first appears. He often saves minor difficulties until our weekly call, when they are much harder to resolve." },
+    { speaker: "Woman", text: "I wonder whether that says more about the induction process. Leaving a beginner to learn from whoever happens to be nearby is hardly proper support. A mentor and frequent online sessions might give him what he needs." },
+    { speaker: "Man", text: "Those sessions would help, but they still have to be booked. Beginners do not always recognise which questions are worth raising. Being beside more experienced colleagues gives them access to advice they would never think to request formally." },
+    { speaker: "Woman", text: "What worries me is how some managers interpret the arrangements. A late arrival is treated as a lack of commitment, even when that person works well into the evening. If the work is accurate and deadlines are met, watching the clock tells you little." },
+    { speaker: "Man", text: "Results matter, certainly, but they do not reveal everything. Someone may meet individual targets while being unavailable whenever a colleague needs assistance. Seeing people at work provides information about contribution that cannot always be reduced to a completed-task list." },
+    { speaker: "Woman", text: "Occasional visibility has value. It should not become an easy substitute for judging what people actually contribute." },
+    { speaker: "Man", text: "Then perhaps the real challenge is flexibility without invisibility." },
+  ],
+};

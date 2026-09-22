@@ -2481,6 +2481,7 @@ export async function logListeningPart2Completed({
 // ─── LISTENING PART 3 (Opinion matching) ────────────────────────────────────
 export async function logListeningPart3Attempted({
   taskId,
+  taskTitle = null,
   score,
   total,
   playsUsed = null,
@@ -2488,6 +2489,7 @@ export async function logListeningPart3Attempted({
 }) {
   return logActivity("listening_part3_attempted", {
     taskId: taskId || null,
+    taskTitle,
     score: typeof score === "number" ? score : null,
     total: typeof total === "number" ? total : null,
     playsUsed: typeof playsUsed === "number" ? playsUsed : null,
@@ -2497,12 +2499,14 @@ export async function logListeningPart3Attempted({
 
 export async function logListeningPart3Completed({
   taskId,
+  taskTitle = null,
   playsUsed = null,
   source = "ListeningPart3",
 }) {
   await saveListeningProgress(taskId, "part3");
   return logActivity("listening_part3_completed", {
     taskId: taskId || null,
+    taskTitle,
     playsUsed: typeof playsUsed === "number" ? playsUsed : null,
     source,
   });

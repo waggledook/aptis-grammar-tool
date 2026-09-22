@@ -214,7 +214,10 @@ import ListeningPart2 from "./components/listening/ListeningPart2.jsx";
 import AptisListeningPart2LiveHost from "./components/listening/AptisListeningPart2LiveHost.jsx";
 import AptisListeningPart2LivePlayer from "./components/listening/AptisListeningPart2LivePlayer.jsx";
 import ListeningPart3 from "./components/listening/ListeningPart3.jsx";
+import AptisListeningPart3LiveHost from "./components/listening/AptisListeningPart3LiveHost.jsx";
+import AptisListeningPart3LivePlayer from "./components/listening/AptisListeningPart3LivePlayer.jsx";
 import ListeningPart4 from "./components/listening/ListeningPart4.jsx";
+import AptisListeningMock from "./components/listening/mockTests/AptisListeningMock.jsx";
 import HubLanding from "./components/hub/HubLanding.jsx";
 import HubGrammarMenu from "./components/hub/HubGrammarMenu.jsx";
 import HubGrammarFlashcardsMenu from "./components/hub/HubGrammarFlashcardsMenu.jsx";
@@ -541,6 +544,7 @@ const isHubCourseTestRunnerRoute = /^\/your-class\/tests\/[^/]+$/.test(location.
 const currentSite = getSiteVariant();
 const isSeifHubSite = currentSite.id === "seifhub";
 const isOteSite = currentSite.id === "ote";
+const isAptisListeningMockRoute = !isOteSite && !isSeifHubSite && location.pathname === "/listening/mock-tests";
 const isAptisWritingMockRoute = !isOteSite && location.pathname.startsWith("/writing/mock-tests/");
 const isAptisSpeakingMockRoute = !isOteSite && location.pathname.startsWith("/speaking/mock-tests");
 const isSpeakingWorkshopRoute = location.pathname.startsWith("/speaking-workshops");
@@ -585,8 +589,8 @@ const isOteRoute =
       location.pathname.startsWith("/results")));
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
-const isExamRoute = isOteExamRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisWritingMockRoute || isAptisSpeakingMockRoute;
-const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisWritingMockRoute || isAptisSpeakingMockRoute || isSpeakingWorkshopRoute;
+const isExamRoute = isOteExamRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisListeningMockRoute || isAptisWritingMockRoute || isAptisSpeakingMockRoute;
+const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisListeningMockRoute || isAptisWritingMockRoute || isAptisSpeakingMockRoute || isSpeakingWorkshopRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
@@ -2709,6 +2713,7 @@ return (
 />
 
 {/* listening routes */}
+{!isOteSite && !isSeifHubSite && <Route path="/listening/mock-tests" element={<AptisListeningMock />} />}
 <Route
   path="/listening"
   element={
@@ -2823,6 +2828,11 @@ return (
       />
     </AptisFullAccessOnly>
   }
+/>
+
+<Route
+  path="/listening/part3-teacher/:taskId?"
+  element={<ListeningPart3 user={user} teacherBank />}
 />
 
 <Route
@@ -3346,6 +3356,8 @@ return (
 <Route path="/live/ote-listening/play/:gameId" element={<OteListeningLivePlayer />} />
 <Route path="/live/aptis-listening-part2/host/:gameId" element={<RequireTeacher user={user}><AptisListeningPart2LiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/aptis-listening-part2/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><AptisListeningPart2LivePlayer /></RequireSignedIn>} />
+<Route path="/live/aptis-listening-part3/host/:gameId" element={<RequireTeacher user={user}><AptisListeningPart3LiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/aptis-listening-part3/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><AptisListeningPart3LivePlayer /></RequireSignedIn>} />
 <Route path="/live/cohesion-challenge/host/:gameId" element={<RequireTeacher user={user}><OteCohesionChallengeLiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/cohesion-challenge/play/:gameId" element={<OteCohesionChallengeLivePlayer />} />
 <Route path="/live/free-things-lesson/host/:gameId" element={<RequireTeacher user={user}><OteFreeThingsLessonLiveHost user={user} /></RequireTeacher>} />

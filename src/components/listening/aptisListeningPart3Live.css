@@ -1,0 +1,8 @@
+.aptis-p3-live-rows { display: grid; gap: .75rem; margin: 1rem 0; }
+.aptis-p3-live-rows label { display: grid; grid-template-columns: minmax(0, 1fr) 170px; gap: .85rem; align-items: center; padding: .65rem .8rem; border: 1px solid #38567d; border-radius: 9px; }
+.aptis-p3-live-rows select { width: 100%; padding: .65rem; border: 1px solid #6e8bb5; border-radius: 8px; background: #1b3355; color: #fff; font: inherit; }
+.aptis-p3-live-rows select:disabled { opacity: .75; }
+.aptis-p3-live-script p { margin: .8rem 0; }
+:root[data-theme="light"] .aptis-p3-live-rows label { border-color: #b7cae2; }
+:root[data-theme="light"] .aptis-p3-live-rows select { background: #fff; color: #14233a; }
+@media (max-width: 720px) { .aptis-p3-live-rows label { grid-template-columns: 1fr; } }
