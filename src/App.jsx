@@ -2713,7 +2713,25 @@ return (
 />
 
 {/* listening routes */}
-{!isOteSite && !isSeifHubSite && <Route path="/listening/mock-tests" element={<AptisListeningMock />} />}
+{!isOteSite && !isSeifHubSite && (
+  <Route
+    path="/listening/mock-tests"
+    element={
+      <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+        <AptisFullAccessOnly
+          user={user}
+          aptisAccess={aptisAccess}
+          onSignIn={() => setShowAuth(true)}
+          onRequestAccess={() => navigate("/aptis-access")}
+          title="Aptis listening mock access required"
+          description="Sign in with an account that has active Aptis Trainer access to open this listening mock."
+        >
+          <AptisListeningMock />
+        </AptisFullAccessOnly>
+      </RequireSignedIn>
+    }
+  />
+)}
 <Route
   path="/listening"
   element={

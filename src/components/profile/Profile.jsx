@@ -28,6 +28,7 @@ import { DEBATE_PRACTICE_SETS } from "../../products/ote/data/oteDebatePracticeS
 import { getOteWritingMock, getOteWritingMocks } from "../../products/ote/mockTests/data/oteWritingMockData.js";
 import { getOteWritingPracticeGroups } from "../../products/ote/mockTests/data/oteWritingPracticeData.js";
 import { getWritingMock as getAptisWritingMock } from "../writing/mockTests/data/mocks.js";
+import { LISTENING_MOCK_REVIEW } from "../listening/mockTests/listeningMockReviewData.js";
 import { generalListeningPart1Sets } from "../../products/ote/data/oteGeneralListeningPart1.js";
 import { generalListeningPart2Sets } from "../../products/ote/data/oteGeneralListeningPart2.js";
 import { generalListeningPart3Sets } from "../../products/ote/data/oteGeneralListeningPart3.js";
@@ -400,6 +401,7 @@ export default function Profile({
   const [oteMockAttempts, setOteMockAttempts] = useState([]);
   const [aptisMockAttempts, setAptisMockAttempts] = useState([]);
   const [aptisReadingMockAttempts, setAptisReadingMockAttempts] = useState([]);
+  const [aptisListeningMockAttempts, setAptisListeningMockAttempts] = useState([]);
   const [showAptisMockPanel, setShowAptisMockPanel] = useState(false);
   const [oteTrainingProgress, setOteTrainingProgress] = useState({});
   const [showOteSpeakingPanel, setShowOteSpeakingPanel] = useState(false);
@@ -1029,6 +1031,7 @@ function renderFeedbackButton(kind, submission) {
           oteMockRows,
           aptisMockRows,
           aptisReadingMockRows,
+          aptisListeningMockRows,
           vocabCounts,
           vocabMistakesArr,
           vocabPractice,
@@ -1061,6 +1064,7 @@ function renderFeedbackButton(kind, submission) {
           fb.fetchOteMockAttempts?.(20, uid) ?? Promise.resolve([]),
           fb.fetchAptisGrammarVocabularyMockAttempts?.(50, uid) ?? Promise.resolve([]),
           fb.fetchAptisReadingMockAttempts?.(50, uid) ?? Promise.resolve([]),
+          fb.fetchAptisListeningMockAttempts?.(50, uid) ?? Promise.resolve([]),
           fb.fetchVocabTopicCounts?.(uid) ?? Promise.resolve({}),
           fb.fetchUnresolvedVocabMistakes?.(50, uid) ?? Promise.resolve([]),
           fb.fetchVocabPracticeSummary?.(uid) ?? Promise.resolve(EMPTY_VOCAB_PRACTICE_SUMMARY),
@@ -1095,6 +1099,7 @@ function renderFeedbackButton(kind, submission) {
         setOteMockAttempts(oteMockRows || []);
         setAptisMockAttempts(aptisMockRows || []);
         setAptisReadingMockAttempts(aptisReadingMockRows || []);
+        setAptisListeningMockAttempts(aptisListeningMockRows || []);
         setVocabTopicCounts(vocabCounts || {}); // 👈 NEW
         setVocabMistakes(vocabMistakesArr || []); // 👈 NEW
         setVocabPracticeSummary(vocabPractice || EMPTY_VOCAB_PRACTICE_SUMMARY);
@@ -2183,6 +2188,7 @@ const formatOteSpeakingPart = (part) => {
 
     <span className="muted small" style={{ flexShrink: 0 }}>
       {totalListeningCompleted}/{totalListeningTasks} tasks completed
+      {aptisListeningMockAttempts.length ? ` · ${aptisListeningMockAttempts.length} mock attempt${aptisListeningMockAttempts.length === 1 ? "" : "s"}` : ""}
     </span>
 
     <span className={`chev ${showListeningPanel ? "open" : ""}`} aria-hidden>
@@ -2220,6 +2226,22 @@ const formatOteSpeakingPart = (part) => {
         />
       </div>
       <AptisPracticePerformance attempts={aptisPracticeAttempts} skill="listening" />
+
+      <div className="actions" style={{ marginTop: "1rem", marginBottom: ".8rem" }}>
+        {!targetUid ? <button className="btn" type="button" onClick={() => navigate(getSitePath("/listening/mock-tests"))}>Open listening mock</button> : null}
+      </div>
+
+      {!aptisListeningMockAttempts.length ? (
+        <p className="muted small">No Aptis listening mock attempts yet.</p>
+      ) : (
+        <ul className="wlist aptis-profile-mock-list">
+          {aptisListeningMockAttempts.map((attempt, attemptIndex) => (
+            <li key={attempt.id || `${attempt.mockId}-${attemptIndex}`} className="wcard aptis-profile-mock-card">
+              <ProfileAptisListeningMockAttempt attempt={attempt} />
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )}
 </section>
@@ -4265,6 +4287,63 @@ function ProfileAptisReadingMockAttempt({ attempt }) {
         <p className="muted small" style={{ marginBottom: 0 }}>
           {attempt.completionReason === "time_expired" ? "Submitted automatically when time expired." : "Submitted normally."}
         </p>
+      </div>
+    </details>
+  );
+}
+
+function ProfileAptisListeningMockAttempt({ attempt }) {
+  const elapsed = Number(attempt.elapsedSeconds || 0);
+  const elapsedLabel = elapsed ? `${Math.floor(elapsed / 60)}m ${elapsed % 60}s` : "—";
+  const itemResults = Array.isArray(attempt.itemResults) ? attempt.itemResults : [];
+  const partTotals = [13, 4, 4, 4];
+
+  return (
+    <details className="aptis-profile-mock-attempt">
+      <summary>
+        <span>
+          <strong>{attempt.mockTitle || "Aptis General Listening Mock"}</strong>
+          <small>{formatAptisMockAttemptDate(attempt.submittedAt || attempt.createdAt)}</small>
+        </span>
+        <b>{attempt.score ?? 0}/{attempt.total || 25} · {attempt.percentage ?? 0}%</b>
+      </summary>
+      <div className="aptis-profile-mock-review">
+        <div className="aptis-profile-mock-stats">
+          {[1, 2, 3, 4].map((part, index) => (
+            <span key={part}>Part {part} <b>{attempt[`part${part}Score`] ?? 0}/{partTotals[index]}</b></span>
+          ))}
+          <span>Answered <b>{attempt.answered ?? 0}/{attempt.total || 25}</b></span>
+          <span>Question screens <b>{attempt.questionScreensAnswered ?? 0}/{attempt.questionScreensTotal || 17}</b></span>
+          <span>Time <b>{elapsedLabel}</b></span>
+        </div>
+        <p className="muted small">
+          {attempt.completionReason === "time_expired" ? "Submitted automatically when time expired." : "Submitted normally."}
+        </p>
+        {itemResults.length ? (
+          <details className="aptis-profile-review-section">
+            <summary>Item-by-item report · {itemResults.filter((item) => item.correct).length}/{itemResults.length} correct</summary>
+            <div className="aptis-profile-answer-list">
+              {itemResults.map((item, index) => {
+                const review = LISTENING_MOCK_REVIEW[item.questionId]?.[item.itemId];
+                return (
+                  <article className={item.correct ? "is-correct" : "is-incorrect"} key={`${item.questionId}-${item.itemId}-${index}`}>
+                    <div className="aptis-profile-answer-head">
+                      <span>Question {item.questionNumber} · Part {item.part}</span>
+                      <b>{item.correct ? "Correct" : "Review"}</b>
+                    </div>
+                    <strong>{item.itemPrompt || item.questionPrompt || `Question ${item.questionNumber}`}</strong>
+                    <p><b>Student answer:</b> {item.selectedAnswer || "Not answered"}</p>
+                    <p><b>Correct answer:</b> {item.correctAnswer || "—"}</p>
+                    {review?.evidenceParts?.length ? <p><b>Evidence:</b> {review.evidenceParts.join(" · ")}</p> : null}
+                    {review?.explanation ? <p><b>Explanation:</b> {review.explanation}</p> : null}
+                  </article>
+                );
+              })}
+            </div>
+          </details>
+        ) : (
+          <p className="muted small" style={{ marginBottom: 0 }}>This older attempt does not include an item-by-item report.</p>
+        )}
       </div>
     </details>
   );

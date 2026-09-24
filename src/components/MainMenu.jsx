@@ -30,6 +30,14 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
     );
   }
 
+  function openListeningMock() {
+    if (!user) {
+      onSignIn?.();
+      return;
+    }
+    navigate(isDemoMode ? "/aptis-access" : "/listening/mock-tests");
+  }
+
   const lockedLabels = {
     reading: "Reading Practice",
     speaking: "Speaking Practice",
@@ -62,18 +70,18 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
       <div className="whats-new-banner">
         <div className="whats-new-copy">
           <span className="whats-new-label">What’s new</span>
-          <h3>Three Aptis Speaking Mock Tests</h3>
+          <h3>New Aptis Listening Mock Exam</h3>
           <p>
-            Try Mock 1 for free, or unlock Mocks 2 and 3 with active Aptis Trainer access.
-            Record your answers, download the audio and get optional AI feedback.
+            Take a complete 17-question, 40-minute listening test covering all four parts.
+            Afterwards, review every answer with replayable audio, highlighted transcripts and clear explanations.
           </p>
         </div>
 
         <button
           className="whats-new-btn"
-          onClick={() => navigate("/speaking/mock-tests")}
+          onClick={openListeningMock}
         >
-          Open speaking mocks
+          {isDemoMode ? (user ? "View access options" : "Sign in to unlock") : "Start Listening Mock 1"}
         </button>
       </div>
 

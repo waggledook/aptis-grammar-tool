@@ -6667,6 +6667,84 @@ export async function fetchAptisReadingMockAttempts(n = 30, uid) {
   return snap.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
 }
 
+export async function saveAptisListeningMockAttempt(payload = {}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to save this result.");
+
+  const profileSnap = await getDoc(doc(db, "users", user.uid));
+  const teacherUid = profileSnap.exists() ? profileSnap.data()?.teacherId || null : null;
+  const ref = doc(collection(db, "users", user.uid, "aptisListeningMockAttempts"));
+  const row = {
+    product: "aptis-general",
+    module: "listening",
+    mockId: payload.mockId || "",
+    mockTitle: payload.mockTitle || "",
+    mockVersion: payload.mockVersion || "",
+    status: "submitted",
+    studentUid: user.uid,
+    studentEmail: user.email || null,
+    studentName: user.displayName || null,
+    teacherUid,
+    score: Number(payload.score || 0),
+    total: Number(payload.total || 25),
+    percentage: Number(payload.percentage || 0),
+    part1Score: Number(payload.part1Score || 0),
+    part2Score: Number(payload.part2Score || 0),
+    part3Score: Number(payload.part3Score || 0),
+    part4Score: Number(payload.part4Score || 0),
+    answered: Number(payload.answered || 0),
+    questionScreensAnswered: Number(payload.questionScreensAnswered || 0),
+    questionScreensTotal: Number(payload.questionScreensTotal || 17),
+    elapsedSeconds: Number(payload.elapsedSeconds || 0),
+    durationSeconds: Number(payload.durationSeconds || 0),
+    startedAtClient: payload.startedAtClient || null,
+    activitySessionId: payload.activitySessionId || null,
+    completionReason: payload.completionReason || "completed",
+    answers: payload.answers && typeof payload.answers === "object" ? payload.answers : {},
+    plays: payload.plays && typeof payload.plays === "object" ? payload.plays : {},
+    itemResults: Array.isArray(payload.itemResults) ? payload.itemResults : [],
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+    submittedAt: serverTimestamp(),
+  };
+
+  await setDoc(ref, row);
+  await logActivity("aptis_listening_mock_completed", {
+    product: row.product,
+    module: row.module,
+    activitySessionId: row.activitySessionId,
+    attemptId: ref.id,
+    mockId: row.mockId,
+    mockTitle: row.mockTitle,
+    mockVersion: row.mockVersion,
+    score: row.score,
+    total: row.total,
+    percentage: row.percentage,
+    part1Score: row.part1Score,
+    part2Score: row.part2Score,
+    part3Score: row.part3Score,
+    part4Score: row.part4Score,
+    answered: row.answered,
+    elapsedSeconds: row.elapsedSeconds,
+    durationSeconds: row.durationSeconds,
+    completionReason: row.completionReason,
+  });
+  return ref.id;
+}
+
+export async function fetchAptisListeningMockAttempts(n = 30, uid) {
+  const realUid = _uidOrCurrent(uid);
+  if (!realUid) return [];
+
+  const q = query(
+    collection(db, "users", realUid, "aptisListeningMockAttempts"),
+    orderBy("createdAt", "desc"),
+    limit(n)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.map((entry) => ({ id: entry.id, ...entry.data() }));
+}
+
 /** Optional: use a preset image that already lives in your app bundle or CDN */
 export async function setPresetAvatar(url) {
   const user = auth.currentUser;

@@ -35,7 +35,7 @@
 .listening-mock-card span{color:#ffcf70;font-size:.76rem;font-weight:900;text-transform:uppercase}
 .listening-menu .listening-mock-card h2{margin:.35rem 0;color:#eef4ff;font-size:1.3rem;text-align:left}
 .listening-menu .listening-mock-card p{margin:0 0 .65rem;text-align:left}
-.listening-mock-card strong{color:#ffbd38}
+.listening-mock-card strong{display:inline-flex;align-items:center;gap:.4rem;color:#ffbd38}
 :root[data-theme="light"] .listening-menu .listening-mock-card h2{color:var(--color-text)}
 :root[data-theme="light"] .listening-mock-card span,:root[data-theme="light"] .listening-mock-card strong{color:#8a5900}
 

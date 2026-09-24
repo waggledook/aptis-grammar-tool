@@ -8,6 +8,7 @@ import { B1_QUESTIONS_ELEVEN_TO_THIRTEEN } from "./b1QuestionsElevenToThirteen.j
 export const LISTENING_MOCK = {
   id: "listening-mock-1",
   title: "Aptis General Listening Mock 1",
+  version: "1",
   durationSeconds: 40 * 60,
   questions: [
     ...A1_FIRST_FIVE_QUESTIONS,

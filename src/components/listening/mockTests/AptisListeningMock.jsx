@@ -1,7 +1,8 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Bookmark, Check, ClipboardList, Info, LogOut, PlayCircle, Square, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../common/Seo.jsx";
+import { auth, logActivity, saveAptisListeningMockAttempt } from "../../../firebase.js";
 import AptisListeningReview from "./AptisListeningReview.jsx";
 import { LISTENING_MOCK } from "./listeningMockData.js";
 import "./aptisListeningMock.css";
@@ -26,13 +27,40 @@ export default function AptisListeningMock() {
   const [finishOpen, setFinishOpen] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [audioError, setAudioError] = useState("");
-  const [completionReason, setCompletionReason] = useState("finished");
+  const [completionReason, setCompletionReason] = useState("completed");
+  const [saveState, setSaveState] = useState("idle");
+  const [saveError, setSaveError] = useState("");
   const audioRef = useRef(null);
   const deadlineRef = useRef(null);
+  const startedAtRef = useRef(null);
+  const activitySessionIdRef = useRef("");
+  const saveStartedRef = useRef(false);
   const current = questions[index];
   const answeredCount = questions.filter((question) => question.items.every((item) => answers[answerKey(question.id, item.id)])).length;
   const answeredItemCount = questions.reduce((total, question) => total + question.items.filter((item) => answers[answerKey(question.id, item.id)]).length, 0);
   const correctAnswerCount = questions.reduce((total, question) => total + question.items.filter((item) => answers[answerKey(question.id, item.id)] === item.answer).length, 0);
+  const partScores = useMemo(() => [1, 2, 3, 4].map((part) => questions
+    .filter((question) => question.part === part)
+    .reduce((total, question) => total + question.items.filter((item) => answers[answerKey(question.id, item.id)] === item.answer).length, 0)), [answers]);
+  const itemResults = useMemo(() => questions.flatMap((question) => question.items.map((item) => {
+    const selectedKey = answers[answerKey(question.id, item.id)] || "";
+    const options = item.options || question.options || [];
+    const selectedIndex = /^[A-Z]$/.test(selectedKey) ? selectedKey.charCodeAt(0) - 65 : -1;
+    const correctIndex = /^[A-Z]$/.test(item.answer) ? item.answer.charCodeAt(0) - 65 : -1;
+    return {
+      questionId: question.id,
+      questionNumber: question.number,
+      part: question.part,
+      itemId: item.id,
+      questionPrompt: question.prompt || "",
+      itemPrompt: item.prompt || item.label || question.prompt || "",
+      selectedKey,
+      selectedAnswer: selectedIndex >= 0 ? options[selectedIndex] || selectedKey : selectedKey,
+      correctKey: item.answer,
+      correctAnswer: correctIndex >= 0 ? options[correctIndex] || item.answer : item.answer,
+      correct: Boolean(selectedKey) && selectedKey === item.answer,
+    };
+  })), [answers]);
 
   useEffect(() => {
     if (stage !== "exam") return undefined;
@@ -44,9 +72,50 @@ export default function AptisListeningMock() {
 
   useEffect(() => {
     if (stage !== "exam" || secondsLeft > 0) return;
-    setCompletionReason("time expired");
+    setCompletionReason("time_expired");
     setStage("complete");
   }, [secondsLeft, stage]);
+
+  useEffect(() => {
+    if (stage !== "complete" || saveStartedRef.current || !mockReady) return;
+    saveStartedRef.current = true;
+    if (!auth.currentUser) {
+      setSaveState("signed-out");
+      return;
+    }
+
+    setSaveState("saving");
+    setSaveError("");
+    saveAptisListeningMockAttempt({
+      mockId: LISTENING_MOCK.id,
+      mockTitle: LISTENING_MOCK.title,
+      mockVersion: LISTENING_MOCK.version,
+      score: correctAnswerCount,
+      total: totalItemCount,
+      percentage: Math.round((correctAnswerCount / totalItemCount) * 100),
+      part1Score: partScores[0],
+      part2Score: partScores[1],
+      part3Score: partScores[2],
+      part4Score: partScores[3],
+      answered: answeredItemCount,
+      questionScreensAnswered: answeredCount,
+      questionScreensTotal: questions.length,
+      elapsedSeconds: LISTENING_MOCK.durationSeconds - secondsLeft,
+      durationSeconds: LISTENING_MOCK.durationSeconds,
+      startedAtClient: startedAtRef.current,
+      activitySessionId: activitySessionIdRef.current,
+      completionReason,
+      answers,
+      plays,
+      itemResults,
+    })
+      .then(() => setSaveState("saved"))
+      .catch((error) => {
+        console.error("[Aptis listening mock] Could not save attempt", error);
+        setSaveError(error?.message || "Your result could not be saved.");
+        setSaveState("error");
+      });
+  }, [answeredCount, answeredItemCount, answers, completionReason, correctAnswerCount, itemResults, partScores, plays, secondsLeft, stage]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -60,6 +129,25 @@ export default function AptisListeningMock() {
   }, [index, stage]);
 
   function start() {
+    if (!startedAtRef.current) {
+      const startedAtClient = new Date().toISOString();
+      const activitySessionId = globalThis.crypto?.randomUUID?.()
+        || `aptis-listening-${LISTENING_MOCK.id}-${Date.now()}`;
+      startedAtRef.current = startedAtClient;
+      activitySessionIdRef.current = activitySessionId;
+      void logActivity("aptis_listening_mock_started", {
+        product: "aptis-general",
+        module: "listening",
+        mockId: LISTENING_MOCK.id,
+        mockTitle: LISTENING_MOCK.title,
+        mockVersion: LISTENING_MOCK.version,
+        total: totalItemCount,
+        questionScreens: questions.length,
+        durationSeconds: LISTENING_MOCK.durationSeconds,
+        startedAtClient,
+        activitySessionId,
+      });
+    }
     deadlineRef.current = Date.now() + LISTENING_MOCK.durationSeconds * 1000;
     setSecondsLeft(LISTENING_MOCK.durationSeconds);
     setIndex(0);
@@ -71,6 +159,12 @@ export default function AptisListeningMock() {
     setBookmarks({});
     setPlays({});
     setDrawerOpen(false);
+    setCompletionReason("completed");
+    setSaveState("idle");
+    setSaveError("");
+    startedAtRef.current = null;
+    activitySessionIdRef.current = "";
+    saveStartedRef.current = false;
     setStage("instructions");
   }
 
@@ -105,7 +199,7 @@ export default function AptisListeningMock() {
     }
   }
 
-  function finish(reason = "finished") {
+  function finish(reason = "completed") {
     setCompletionReason(reason);
     setFinishOpen(false);
     setDrawerOpen(false);
@@ -186,11 +280,15 @@ export default function AptisListeningMock() {
 
       {stage === "complete" && <main className="alm-complete">
         <p className="alm-draft">Mock 1</p>
-        <h1>Listening mock {completionReason === "time expired" ? "time is up" : "complete"}</h1>
+        <h1>Listening mock {completionReason === "time_expired" ? "time is up" : "complete"}</h1>
         <p>You completed {answeredCount} of 17 question screens and answered {answeredItemCount} of {totalItemCount} items.</p>
         {mockReady
           ? <p>You scored <strong>{correctAnswerCount} out of {totalItemCount}</strong>.</p>
           : <p>{readyQuestionCount} of 17 questions {readyQuestionCount === 1 ? "has" : "have"} a recording and answer key. The remaining questions are still being prepared, so there is no overall score yet.</p>}
+        {saveState === "saving" && <p className="alm-save-status">Saving this attempt to your profile…</p>}
+        {saveState === "saved" && <p className="alm-save-status is-saved">Saved to your Listening Progress profile.</p>}
+        {saveState === "signed-out" && <p className="alm-save-status">Sign in before starting a mock to save the result to your profile.</p>}
+        {saveState === "error" && <p className="alm-save-status is-error" role="alert">{saveError}</p>}
         <div className="alm-complete-actions"><button type="button" onClick={() => setStage("review")}>Review answers</button><button type="button" onClick={restart}>Start again</button><button type="button" onClick={leave}>Listening practice</button></div>
       </main>}
 

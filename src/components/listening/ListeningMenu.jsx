@@ -1,4 +1,5 @@
 import React, { useEffect } from "react";
+import { LockKeyhole } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AptisDemoBadge from "../access/AptisDemoBadge.jsx";
 import Seo from "../common/Seo.jsx";
@@ -8,6 +9,16 @@ import "./listeningMenu.css";
 export default function ListeningMenu({ user, aptisAccess, onSignIn }) {
   const navigate = useNavigate();
   const isDemoMode = !!aptisAccess?.isDemoMode;
+  const canOpenMock = Boolean(user) && !isDemoMode;
+
+  function openListeningMock() {
+    if (!user) {
+      if (onSignIn) onSignIn();
+      else navigate("/listening/mock-tests");
+      return;
+    }
+    navigate(isDemoMode ? "/aptis-access" : "/listening/mock-tests");
+  }
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "auto" });
@@ -28,11 +39,14 @@ export default function ListeningMenu({ user, aptisAccess, onSignIn }) {
       <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
 
       <section className="listening-menu-section">
-        <button className="menu-card listening-mock-card" type="button" onClick={() => navigate("/listening/mock-tests")}>
+        <button className="menu-card listening-mock-card" type="button" onClick={openListeningMock}>
           <span>Full mock</span>
           <h2>Listening mock exam</h2>
           <p>Complete all four parts in one 17-question, 40-minute test, then review every answer with transcripts and evidence.</p>
-          <strong>Start Mock 1 →</strong>
+          <strong>
+            {canOpenMock ? "Start Mock 1 →" : user ? "View access options" : "Sign in to unlock"}
+            {!canOpenMock ? <LockKeyhole size={17} aria-hidden="true" /> : null}
+          </strong>
         </button>
       </section>
 

@@ -124,6 +124,8 @@ export const ACTIVITY_TYPE_LABELS = {
   aptis_mock_completed: "Aptis Grammar & Vocabulary Mock Completed",
   aptis_reading_mock_started: "Aptis Reading Mock Started",
   aptis_reading_mock_completed: "Aptis Reading Mock Completed",
+  aptis_listening_mock_started: "Aptis Listening Mock Started",
+  aptis_listening_mock_completed: "Aptis Listening Mock Completed",
   aptis_speaking_mock_started: "Aptis Speaking Mock Started",
   aptis_speaking_mock_completed: "Aptis Speaking Mock Completed",
   ote_register_checked: "OTE Register Checked",
@@ -776,6 +778,21 @@ export function formatActivityDetails(log) {
         d.mockTitle || d.mockId || "Reading mock",
         `Score ${formatScore(d.score, d.total)}`,
         typeof d.rawScore === "number" ? `Raw ${formatScore(d.rawScore, d.rawTotal)}` : "",
+        typeof d.percentage === "number" ? `${d.percentage}%` : "",
+        typeof d.elapsedSeconds === "number" ? `Time ${formatDurationSeconds(d.elapsedSeconds)}` : "",
+        d.completionReason === "time_expired" ? "Time expired" : "Submitted",
+      ]);
+    case "aptis_listening_mock_started":
+      return joinParts([
+        d.mockTitle || d.mockId || "Listening mock",
+        d.mockVersion ? `Version ${d.mockVersion}` : "",
+        typeof d.total === "number" ? formatCount(d.total, "item") : "",
+        typeof d.durationSeconds === "number" ? `Time allowed ${formatDurationSeconds(d.durationSeconds)}` : "",
+      ]);
+    case "aptis_listening_mock_completed":
+      return joinParts([
+        d.mockTitle || d.mockId || "Listening mock",
+        `Score ${formatScore(d.score, d.total)}`,
         typeof d.percentage === "number" ? `${d.percentage}%` : "",
         typeof d.elapsedSeconds === "number" ? `Time ${formatDurationSeconds(d.elapsedSeconds)}` : "",
         d.completionReason === "time_expired" ? "Time expired" : "Submitted",
