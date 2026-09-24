@@ -4,8 +4,8 @@ export const FLEXIBLE_WORKING_HOURS_QUESTION = {
   number: 15,
   type: "opinion-matching",
   part: 3,
-  prompt: "Listen to two people discussing flexible working hours. Read the statements below and decide who expresses each opinion — the man, the woman, or both the man and the woman.",
-  audioSrc: "/audio/listening/mock-1/flexible-working-hours.mp3",
+  prompt: "Listen to two people discussing flexible working hours. Read the opinions below and decide whose opinion matches each statement: the man, the woman, or both the man and the woman. You can listen to the discussion twice.",
+  audioSrc: "/audio/listening/mock-1/complete/q15.mp3",
   options: ["Man", "Woman", "Both"],
   items: [
     { id: "opinion-1", label: "Flexible schedules can improve productivity.", answer: "Both" },

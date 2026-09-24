@@ -2,11 +2,14 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Bookmark, Check, ClipboardList, Info, LogOut, PlayCircle, Square, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import Seo from "../../common/Seo.jsx";
+import AptisListeningReview from "./AptisListeningReview.jsx";
 import { LISTENING_MOCK } from "./listeningMockData.js";
 import "./aptisListeningMock.css";
 
 const questions = LISTENING_MOCK.questions;
 const readyQuestionCount = questions.filter((question) => question.audioSrc && question.items.every((item) => item.answer)).length;
+const mockReady = readyQuestionCount === questions.length;
+const totalItemCount = questions.reduce((total, question) => total + question.items.length, 0);
 const formatTime = (seconds) => `00:${String(Math.floor(seconds / 60)).padStart(2, "0")}:${String(seconds % 60).padStart(2, "0")}`;
 const answerKey = (questionId, itemId) => `${questionId}:${itemId}`;
 
@@ -28,6 +31,8 @@ export default function AptisListeningMock() {
   const deadlineRef = useRef(null);
   const current = questions[index];
   const answeredCount = questions.filter((question) => question.items.every((item) => answers[answerKey(question.id, item.id)])).length;
+  const answeredItemCount = questions.reduce((total, question) => total + question.items.filter((item) => answers[answerKey(question.id, item.id)]).length, 0);
+  const correctAnswerCount = questions.reduce((total, question) => total + question.items.filter((item) => answers[answerKey(question.id, item.id)] === item.answer).length, 0);
 
   useEffect(() => {
     if (stage !== "exam") return undefined;
@@ -109,10 +114,10 @@ export default function AptisListeningMock() {
 
   return (
     <div className="aptis-listening-mock">
-      <Seo title="Aptis General Listening Mock | Seif Aptis Trainer" description="Preview the Aptis General Listening mock exam interface with 17 question screens and a 40-minute timer." />
+      <Seo title="Aptis General Listening Mock | Seif Aptis Trainer" description="Practise the Aptis General Listening exam with 17 question screens and a 40-minute timer." />
       {stage === "instructions" && (
         <main className="alm-instructions">
-          <p className="alm-draft">Mock 1 · Draft preview</p>
+          <p className="alm-draft">Mock 1</p>
           <h1>Aptis General Listening Instructions</h1>
           <h2>Listening</h2>
           <p>You will listen to seventeen recordings.</p>
@@ -120,7 +125,7 @@ export default function AptisListeningMock() {
           <p>You can listen to each recording <strong>TWO TIMES ONLY.</strong></p>
           <p>You have 40 minutes to complete the test.</p>
           <p className="alm-instructions-last">When you click on the ‘Next’ button, the test will begin.</p>
-          <aside>Draft preview: {readyQuestionCount} of 17 questions {readyQuestionCount === 1 ? "has" : "have"} a recording and answer key. The remaining questions are placeholders, so this version does not calculate an overall score.</aside>
+          {!mockReady && <aside>Draft preview: {readyQuestionCount} of 17 questions {readyQuestionCount === 1 ? "has" : "have"} a recording and answer key. The remaining questions are placeholders, so this version does not calculate an overall score.</aside>}
         </main>
       )}
 
@@ -180,14 +185,18 @@ export default function AptisListeningMock() {
       )}
 
       {stage === "complete" && <main className="alm-complete">
-        <p className="alm-draft">Mock 1 · Draft preview</p>
+        <p className="alm-draft">Mock 1</p>
         <h1>Listening mock {completionReason === "time expired" ? "time is up" : "complete"}</h1>
-        <p>You answered all items on {answeredCount} of 17 question screens.</p>
-        <p>{readyQuestionCount} of 17 questions {readyQuestionCount === 1 ? "has" : "have"} a recording and answer key. The remaining questions are still being prepared, so there is no overall score yet.</p>
-        <div className="alm-complete-actions"><button type="button" onClick={restart}>Start again</button><button type="button" onClick={leave}>Listening practice</button></div>
+        <p>You completed {answeredCount} of 17 question screens and answered {answeredItemCount} of {totalItemCount} items.</p>
+        {mockReady
+          ? <p>You scored <strong>{correctAnswerCount} out of {totalItemCount}</strong>.</p>
+          : <p>{readyQuestionCount} of 17 questions {readyQuestionCount === 1 ? "has" : "have"} a recording and answer key. The remaining questions are still being prepared, so there is no overall score yet.</p>}
+        <div className="alm-complete-actions"><button type="button" onClick={() => setStage("review")}>Review answers</button><button type="button" onClick={restart}>Start again</button><button type="button" onClick={leave}>Listening practice</button></div>
       </main>}
 
-      <footer className="alm-footer">
+      {stage === "review" && <AptisListeningReview questions={questions} answers={answers} onRestart={restart} onLeave={leave} />}
+
+      {stage !== "review" && <footer className="alm-footer">
         <div className="alm-footer-left">
           <button type="button" onClick={() => setDrawerOpen(true)} aria-label="Question list" title="Question list"><ClipboardList size={22} /></button>
           <button type="button" onClick={() => setInfoOpen(true)} aria-label="Instructions" title="Instructions"><Info size={22} /></button>
@@ -197,7 +206,7 @@ export default function AptisListeningMock() {
           {stage === "exam" && <button className="alm-previous" type="button" onClick={() => goTo(index - 1)} disabled={index === 0}><ArrowLeft size={20} /> Previous</button>}
           {(stage === "instructions" || stage === "exam") && <button className="alm-next" type="button" onClick={() => stage === "instructions" ? start() : index === questions.length - 1 ? setFinishOpen(true) : goTo(index + 1)}>{stage === "exam" && index === questions.length - 1 ? "Finish" : "Next"} <ArrowRight size={20} /></button>}
         </div>
-      </footer>
+      </footer>}
 
       {drawerOpen && <div className="alm-overlay" onClick={() => setDrawerOpen(false)}>
         <aside className="alm-drawer" onClick={(event) => event.stopPropagation()} aria-label="Question list">
@@ -212,7 +221,7 @@ export default function AptisListeningMock() {
         </aside>
       </div>}
 
-      {infoOpen && <div className="alm-overlay alm-dialog-overlay" onClick={() => setInfoOpen(false)}><section className="alm-dialog" role="dialog" aria-modal="true" aria-labelledby="alm-info-heading" onClick={(event) => event.stopPropagation()}><button className="alm-dialog-close" type="button" onClick={() => setInfoOpen(false)} aria-label="Close"><X size={22} /></button><h2 id="alm-info-heading">Listening instructions</h2><p>There are 17 questions and 40 minutes to complete the mock. Each available recording can be played up to two times.</p><p>This is a draft preview with {readyQuestionCount} completed {readyQuestionCount === 1 ? "question" : "questions"}. No overall score is available yet.</p></section></div>}
+      {infoOpen && <div className="alm-overlay alm-dialog-overlay" onClick={() => setInfoOpen(false)}><section className="alm-dialog" role="dialog" aria-modal="true" aria-labelledby="alm-info-heading" onClick={(event) => event.stopPropagation()}><button className="alm-dialog-close" type="button" onClick={() => setInfoOpen(false)} aria-label="Close"><X size={22} /></button><h2 id="alm-info-heading">Listening instructions</h2><p>There are 17 questions and 40 minutes to complete the mock. Each recording can be played up to two times.</p>{!mockReady && <p>This is a draft preview with {readyQuestionCount} completed {readyQuestionCount === 1 ? "question" : "questions"}. No overall score is available yet.</p>}</section></div>}
       {finishOpen && <div className="alm-overlay alm-dialog-overlay" onClick={() => setFinishOpen(false)}><section className="alm-dialog" role="dialog" aria-modal="true" aria-labelledby="alm-finish-heading" onClick={(event) => event.stopPropagation()}><h2 id="alm-finish-heading">Finish listening mock?</h2><p>{answeredCount} of 17 question screens are complete. You can return to any question before finishing.</p><div><button type="button" onClick={() => setFinishOpen(false)}>Keep working</button><button type="button" onClick={() => finish()}>Finish mock</button></div></section></div>}
     </div>
   );

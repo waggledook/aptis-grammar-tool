@@ -31,7 +31,7 @@
 }
 
 .listening-menu .listening-mock-card{display:block;width:100%;padding:1.15rem 1.3rem;border-color:rgba(255,189,56,.55);text-align:left}
-.listening-menu .listening-mock-card.is-coming-soon{cursor:not-allowed;opacity:.68}
+.listening-menu .listening-mock-card:hover{border-color:#ffbd38;transform:translateY(-2px)}
 .listening-mock-card span{color:#ffcf70;font-size:.76rem;font-weight:900;text-transform:uppercase}
 .listening-menu .listening-mock-card h2{margin:.35rem 0;color:#eef4ff;font-size:1.3rem;text-align:left}
 .listening-menu .listening-mock-card p{margin:0 0 .65rem;text-align:left}

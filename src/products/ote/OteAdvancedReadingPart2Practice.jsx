@@ -248,9 +248,9 @@ export default function OteAdvancedReadingPart2Practice({ user, nativeRoutes = f
                   const answer = answers[item.id];
                   const isCorrect = answer === item.answer;
                   const reviewed = phase === "review";
-                  return <article className={`ote-reading-match-item ${expanded ? "is-open" : ""} ${reviewed ? (isCorrect ? "is-correct" : "is-wrong") : ""}`} key={item.id}>
+                  return <article className={`ote-reading-match-item ${expanded ? "is-open" : ""} ${answer ? "is-answered" : ""} ${reviewed ? (isCorrect ? "is-correct" : "is-wrong") : ""}`} key={item.id}>
                     <button type="button" className="ote-reading-match-toggle" onClick={() => setExpandedId(expanded ? "" : item.id)} aria-expanded={expanded}><span>{index + 1}. {item.prompt}</span><ChevronDown size={22} aria-hidden="true" /></button>
-                    {expanded ? <div className="ote-reading-match-options">{["A", "B", "C"].map((choice) => <button key={choice} type="button" className={`${answer === choice ? "is-selected" : ""} ${reviewed && choice === item.answer ? "is-answer" : ""} ${reviewed && answer === choice && !isCorrect ? "is-incorrect" : ""}`} disabled={reviewed} onClick={() => chooseAnswer(item.id, choice)}>{choice}. {reviewers[choice].name}</button>)}{reviewed ? <div className={`ote-reading-item-feedback ${isCorrect ? "is-correct" : "is-wrong"}`}><strong>{isCorrect ? "Correct." : "Not quite."}</strong><p>{item.feedback}</p></div> : null}</div> : null}
+                    {expanded ? <div className="ote-reading-match-options">{["A", "B", "C"].map((choice) => <button key={choice} type="button" aria-pressed={answer === choice} className={`${answer === choice ? "is-selected" : ""} ${reviewed && choice === item.answer ? "is-answer" : ""} ${reviewed && answer === choice && !isCorrect ? "is-incorrect" : ""}`} disabled={reviewed} onClick={() => chooseAnswer(item.id, choice)}>{choice}. {reviewers[choice].name}</button>)}{reviewed ? <div className={`ote-reading-item-feedback ${isCorrect ? "is-correct" : "is-wrong"}`}><strong>{isCorrect ? "Correct." : "Not quite."}</strong><p>{item.feedback}</p></div> : null}</div> : null}
                   </article>;
                 })}
               </div>

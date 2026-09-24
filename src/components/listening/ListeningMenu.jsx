@@ -28,11 +28,11 @@ export default function ListeningMenu({ user, aptisAccess, onSignIn }) {
       <AptisDemoBadge user={user} aptisAccess={aptisAccess} onSignIn={onSignIn} />
 
       <section className="listening-menu-section">
-        <button className="menu-card listening-mock-card is-coming-soon" type="button" disabled>
-          <span>Coming soon</span>
+        <button className="menu-card listening-mock-card" type="button" onClick={() => navigate("/listening/mock-tests")}>
+          <span>Full mock</span>
           <h2>Listening mock exam</h2>
-          <p>A complete 17-question, 40-minute listening mock is currently being prepared.</p>
-          <strong>Coming soon</strong>
+          <p>Complete all four parts in one 17-question, 40-minute test, then review every answer with transcripts and evidence.</p>
+          <strong>Start Mock 1 →</strong>
         </button>
       </section>
 

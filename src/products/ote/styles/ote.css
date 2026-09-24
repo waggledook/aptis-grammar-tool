@@ -1284,6 +1284,13 @@
 
 .ote-reading-match-item:last-child { border-bottom: 0; }
 .ote-reading-match-item.is-open { background: rgba(75, 131, 202, 0.14); }
+.ote-reading-match-item.is-answered:not(.is-correct):not(.is-wrong) .ote-reading-match-toggle {
+  background: #174f91;
+  color: #fff;
+}
+.ote-reading-match-item.is-answered.is-open:not(.is-correct):not(.is-wrong) .ote-reading-match-toggle {
+  background: #103d75;
+}
 .ote-reading-match-item.is-correct { border-left: 3px solid #43a86e; }
 .ote-reading-match-item.is-wrong { border-left: 3px solid #cd6666; }
 
@@ -1332,7 +1339,7 @@
 }
 
 .ote-reading-match-options > button:hover:not(:disabled) { border-color: var(--ote-dashboard-accent); }
-.ote-reading-match-options > button.is-selected { border-color: var(--ote-dashboard-accent); background: rgba(246, 189, 96, 0.12); }
+.ote-reading-match-options > button.is-selected { border-color: #4b83ca; background: #174f91; color: #fff; }
 .ote-reading-match-options > button.is-answer { border-color: #43a86e; background: rgba(67, 168, 110, 0.14); }
 .ote-reading-match-options > button.is-incorrect { border-color: #cd6666; background: rgba(205, 102, 102, 0.14); }
 
@@ -1446,6 +1453,8 @@
 :root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-list { border-color: #b7cae8; }
 :root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-item { border-color: #b7cae8; background: #fff; }
 :root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-item.is-open { background: #edf5ff; }
+:root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-item.is-answered:not(.is-correct):not(.is-wrong) .ote-reading-match-toggle { background: #1656a6; color: #fff; }
+:root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-item.is-answered.is-open:not(.is-correct):not(.is-wrong) .ote-reading-match-toggle { background: #0e3f7f; }
 :root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-item.is-correct {
   border-left-color: #238052;
   background: #f0faf4;
@@ -1459,7 +1468,7 @@
 :root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-toggle { color: #173b72; }
 :root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-options { border-color: #b7cae8; }
 :root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-options > button { border-color: #3f70b8; background: #fff; color: #173b72; }
-:root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-options > button.is-selected { border-color: #24569c; background: #e8f1ff; }
+:root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-options > button.is-selected { border-color: #24569c; background: #1656a6; color: #fff; }
 :root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-options > button.is-answer { border-color: #238052; background: #e9f8ef; color: #164b32; }
 :root[data-theme="light"] .ote-reading-matching-page .ote-reading-match-options > button.is-incorrect { border-color: #be4a4a; background: #fff0f0; color: #7e2424; }
 :root[data-theme="light"] .ote-reading-evidence { background: #ffdc73; color: #1f2a3c; }
