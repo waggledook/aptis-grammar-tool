@@ -296,6 +296,8 @@ import OteWritingMockRunner from "./products/ote/OteWritingMockRunner.jsx";
 import OteWritingTrainingMenu from "./products/ote/OteWritingTrainingMenu.jsx";
 import OteWritingPracticeMenu from "./products/ote/OteWritingPracticeMenu.jsx";
 import OteWritingPracticeRunner from "./products/ote/OteWritingPracticeRunner.jsx";
+import OteWritingAdvancedSummaryTeacherBank from "./products/ote/OteWritingAdvancedSummaryTeacherBank.jsx";
+import OteWritingAdvancedEssayTeacherBank from "./products/ote/OteWritingAdvancedEssayTeacherBank.jsx";
 import OteAdvancedReadingPart1Practice from "./products/ote/OteAdvancedReadingPart1Practice.jsx";
 import OteAdvancedReadingPart2Practice from "./products/ote/OteAdvancedReadingPart2Practice.jsx";
 import OteAdvancedReadingCompareCandidates from "./products/ote/OteAdvancedReadingCompareCandidates.jsx";
@@ -1879,6 +1881,22 @@ return (
     element={<OteWritingPracticeRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
   />
   <Route
+    path="/ote/writing/advanced-summary/teacher-bank"
+    element={<OteWritingAdvancedSummaryTeacherBank user={user} nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/writing/advanced-summary/teacher-bank/:setId"
+    element={<OteWritingPracticeRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} teacherBank />}
+  />
+  <Route
+    path="/ote/writing/advanced-essay/teacher-bank"
+    element={<OteWritingAdvancedEssayTeacherBank user={user} nativeRoutes={false} />}
+  />
+  <Route
+    path="/ote/writing/advanced-essay/teacher-bank/:setId"
+    element={<OteWritingPracticeRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} teacherBank teacherBankKind="advanced-essay" />}
+  />
+  <Route
     path="/ote/writing/mock-tests"
     element={<OteWritingMockMenu user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes={false} />}
   />
@@ -2163,6 +2181,22 @@ return (
       <Route
         path="/writing/training/:section/practice/:setId"
         element={<OteWritingPracticeRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />}
+      />
+      <Route
+        path="/writing/advanced-summary/teacher-bank"
+        element={<OteWritingAdvancedSummaryTeacherBank user={user} nativeRoutes />}
+      />
+      <Route
+        path="/writing/advanced-summary/teacher-bank/:setId"
+        element={<OteWritingPracticeRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes teacherBank />}
+      />
+      <Route
+        path="/writing/advanced-essay/teacher-bank"
+        element={<OteWritingAdvancedEssayTeacherBank user={user} nativeRoutes />}
+      />
+      <Route
+        path="/writing/advanced-essay/teacher-bank/:setId"
+        element={<OteWritingPracticeRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes teacherBank teacherBankKind="advanced-essay" />}
       />
       <Route path="/writing/mock-tests" element={<OteWritingMockMenu user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />
       <Route path="/writing/mock-tests/:mockId" element={<OteWritingMockRunner user={user} onRequireSignIn={() => setShowAuth(true)} nativeRoutes />} />

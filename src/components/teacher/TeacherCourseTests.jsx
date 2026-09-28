@@ -352,6 +352,7 @@ function getListeningPhaseLabel(phase = "", sectionIndex = 0, totalSections = 0)
   if (phase === "awaiting-first-play") return `${position} · waiting to play 1`;
   if (phase === "awaiting-second-play") return `${position} · waiting to play 2`;
   if (phase === "ready-finish") return "Listening complete · ready to submit";
+  if (phase === "ready-finish-skipped") return "Listening skipped early · ready to submit";
   if (phase === "resume-blocked") return `${position} · paused after refresh`;
   if (phase === "completed") return "Listening submitted";
   return `${position} · ready`;

@@ -1,3 +1,6 @@
+import { OTE_ADVANCED_WRITING_SUMMARY_STUDENT_TASKS } from "../../data/oteAdvancedWritingSummaryTasks.js";
+import { OTE_ADVANCED_WRITING_ESSAY_STUDENT_TASKS } from "../../data/oteAdvancedWritingEssayTasks.js";
+
 export const OTE_WRITING_PRACTICE_SETS = {
   email: [
     {
@@ -507,6 +510,7 @@ export const OTE_WRITING_PRACTICE_SETS = {
         "Organize your essay clearly, introducing the topic, providing support for the points you make, and giving a conclusion.",
       instruction: "Write your essay.",
     },
+    ...OTE_ADVANCED_WRITING_ESSAY_STUDENT_TASKS,
   ],
   advancedSummary: [
     {
@@ -696,6 +700,7 @@ export const OTE_WRITING_PRACTICE_SETS = {
         ],
       },
     },
+    ...OTE_ADVANCED_WRITING_SUMMARY_STUDENT_TASKS,
   ],
 };
 

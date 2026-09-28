@@ -15,6 +15,8 @@ import {
   getOteWritingPracticeGroupForSet,
   getOteWritingPracticeSet,
 } from "./mockTests/data/oteWritingPracticeData.js";
+import { getOteAdvancedWritingSummaryTeacherTask } from "./data/oteAdvancedWritingSummaryTasks.js";
+import { getOteAdvancedWritingEssayTeacherTask } from "./data/oteAdvancedWritingEssayTasks.js";
 import {
   formatSummaryMarkingGuide,
   getSummaryMainIdeas,
@@ -124,14 +126,28 @@ function getPracticeTargetAudience(task = {}) {
   return "English teacher";
 }
 
-export default function OteWritingPracticeRunner({ user, onRequireSignIn, nativeRoutes = false }) {
+export default function OteWritingPracticeRunner({
+  user,
+  onRequireSignIn,
+  nativeRoutes = false,
+  teacherBank = false,
+  teacherBankKind = "advanced-summary",
+}) {
   const { section = "", setId = "email-informal-1" } = useParams();
   const navigate = useNavigate();
-  const task = getOteWritingPracticeSet(setId);
-  const group = section ? getOteWritingPracticeGroup(section) : getOteWritingPracticeGroupForSet(task.id);
+  const task = teacherBank
+    ? teacherBankKind === "advanced-essay"
+      ? getOteAdvancedWritingEssayTeacherTask(setId)
+      : getOteAdvancedWritingSummaryTeacherTask(setId)
+    : getOteWritingPracticeSet(setId);
+  const group = teacherBank
+    ? teacherBankKind === "advanced-essay"
+      ? { id: "advanced-essay", label: "Advanced Essay" }
+      : { id: "advanced-summary", label: "Advanced Summary" }
+    : section ? getOteWritingPracticeGroup(section) : getOteWritingPracticeGroupForSet(task.id);
   const groupIsAdvanced = group.id.startsWith("advanced-");
   const userIsAdvanced = user?.oteVersion === "advanced";
-  const groupMatchesVariant = !user || groupIsAdvanced === userIsAdvanced;
+  const groupMatchesVariant = teacherBank || !user || groupIsAdvanced === userIsAdvanced;
   const [phase, setPhase] = useState("ready");
   const [secondsLeft, setSecondsLeft] = useState(task.timeSeconds);
   const [answer, setAnswer] = useState("");
@@ -146,9 +162,11 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
   const saveStartedRef = useRef(false);
   const words = useMemo(() => countWords(answer), [answer]);
   const practiceMenuPath = getSitePath(
-    nativeRoutes ? `/writing/training/${group.id}/practice` : `/ote/writing/training/${group.id}/practice`
+    teacherBank
+      ? nativeRoutes ? `/writing/${teacherBankKind}/teacher-bank` : `/ote/writing/${teacherBankKind}/teacher-bank`
+      : nativeRoutes ? `/writing/training/${group.id}/practice` : `/ote/writing/training/${group.id}/practice`
   );
-  const writingPath = getSitePath(nativeRoutes ? "/writing" : "/ote/writing");
+  const writingPath = getSitePath(teacherBank ? "/teacher-resources" : nativeRoutes ? "/writing" : "/ote/writing");
 
   useEffect(() => {
     setPhase("ready");
@@ -191,7 +209,8 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
     logOteTrainingStarted({
       section: "writing",
       part: getPracticePart(task),
-      mode: "timed_practice",
+      mode: teacherBank ? "teacher_bank" : "timed_practice",
+      progressId: teacherBank ? `writing.${teacherBankKind}.teacher-bank.${task.id}` : undefined,
       taskId: task.id,
       taskTitle: task.title,
       taskType: task.type,
@@ -221,7 +240,8 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
     logOteTrainingCompleted({
       section: "writing",
       part: getPracticePart(task),
-      mode: "timed_practice",
+      mode: teacherBank ? "teacher_bank" : "timed_practice",
+      progressId: teacherBank ? `writing.${teacherBankKind}.teacher-bank.${task.id}` : undefined,
       taskId: task.id,
       taskTitle: task.title,
       taskType: task.type,
@@ -239,7 +259,7 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
       type: "ote-writing-practice",
       mockId: "",
       mockTitle: task.title,
-      moduleLabel: "Writing Practice",
+      moduleLabel: teacherBank ? "Writing Teacher Bank" : "Writing Practice",
       practiceTaskId: task.id,
       practiceSection: group.id,
       practiceSectionLabel: group.label,
@@ -416,13 +436,13 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
 
       <button className="ote-training-back" type="button" onClick={() => navigate(practiceMenuPath)}>
         <ArrowLeft size={18} aria-hidden="true" />
-        Back to practice sets
+        {teacherBank ? "Back to teacher task bank" : "Back to practice sets"}
       </button>
 
       <header className="ote-training-hero">
-        <p className="ote-kicker">{task.registerLabel ? `${task.registerLabel} ${group.label} practice` : `${group.label} practice`}</p>
+        <p className="ote-kicker">{teacherBank ? "Teacher bank task" : task.registerLabel ? `${task.registerLabel} ${group.label} practice` : `${group.label} practice`}</p>
         <h1>{task.title}</h1>
-        <p>Complete one timed writing task. Signed-in attempts are saved to your profile.</p>
+        <p>{teacherBank ? "Complete or preview this assignable timed writing task. Signed-in attempts are saved to the current profile." : "Complete one timed writing task. Signed-in attempts are saved to your profile."}</p>
       </header>
 
       {phase === "writing" ? (
@@ -544,7 +564,7 @@ export default function OteWritingPracticeRunner({ user, onRequireSignIn, native
                 Try again
               </button>
               <button type="button" onClick={() => navigate(practiceMenuPath)}>
-                Back to practice sets
+                {teacherBank ? "Back to teacher task bank" : "Back to practice sets"}
               </button>
             </div>
             <WritingAiFeedback feedback={aiFeedback} status={feedbackStatus} error={feedbackError} />

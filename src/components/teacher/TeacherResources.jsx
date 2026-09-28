@@ -4,6 +4,7 @@ import {
   ArrowRight,
   BookOpen,
   FileAudio,
+  FileText,
   GraduationCap,
   Headphones,
   Languages,
@@ -172,6 +173,20 @@ const PRODUCT_GROUPS = [
         path: "/ote/speaking/part-3-summary/teacher-bank",
         icon: Mic2,
         tags: ["Advanced Speaking", "Assignable", "2 tasks"],
+      },
+      {
+        title: "Advanced writing essay task bank",
+        description: "Two extra Part 1 essay tasks with individual student links, timed writing and AI feedback.",
+        path: "/ote/writing/advanced-essay/teacher-bank",
+        icon: FileText,
+        tags: ["Advanced Writing", "Assignable", "2 tasks"],
+      },
+      {
+        title: "Advanced writing summary task bank",
+        description: "Two extra Part 2 summary tasks with individual student links, timed writing and AI feedback.",
+        path: "/ote/writing/advanced-summary/teacher-bank",
+        icon: FileText,
+        tags: ["Advanced Writing", "Assignable", "2 tasks"],
       },
       {
         title: "Advanced debate task bank",

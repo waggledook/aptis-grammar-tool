@@ -464,6 +464,15 @@ function hasAnyAnswer(value) {
   return true;
 }
 
+function hasCompleteItemAnswer(item, value) {
+  if (!isInlineTextInputItem(item)) return hasAnyAnswer(value);
+
+  const gapIds = item.inlineParts
+    .filter((part) => part && typeof part === "object" && part.gapId)
+    .map((part) => part.gapId);
+  return gapIds.length > 0 && gapIds.every((gapId) => hasAnyAnswer(value?.[gapId]));
+}
+
 function getListeningStartedStorageKey(attemptId) {
   return attemptId ? `course-test-listening-started:${attemptId}` : "";
 }
@@ -1163,6 +1172,7 @@ export default function HubCourseTestRunner({ user }) {
   const [listeningPhase, setListeningPhase] = useState("idle");
   const [listeningCountdown, setListeningCountdown] = useState(0);
   const [listeningManualPlay, setListeningManualPlay] = useState(null);
+  const [listeningExitWarning, setListeningExitWarning] = useState(null);
   const autosaveIntervalRef = useRef(null);
   const hydrationDoneRef = useRef(false);
   const hydratedAttemptIdRef = useRef("");
@@ -1330,7 +1340,7 @@ export default function HubCourseTestRunner({ user }) {
     setListeningPhase(
       blockedListeningPhases.has(restoredListeningPhase) ||
       ((listeningHadStarted || localListeningStarted) &&
-        !["completed", "ready-finish", "resume-blocked"].includes(restoredListeningPhase))
+        !["completed", "ready-finish", "ready-finish-skipped", "resume-blocked"].includes(restoredListeningPhase))
         ? "resume-blocked"
         : restoredListeningPhase
     );
@@ -1387,15 +1397,35 @@ export default function HubCourseTestRunner({ user }) {
   const activeListeningPreReadSeconds = Number(activeListeningSection?.timing?.preReadSeconds || 45);
   const listeningCountdownMessage =
     listeningPhase === "preread"
-      ? `Recording 1 starts in ${listeningCountdown}s`
+      ? `First listen starts in ${listeningCountdown}s`
       : listeningPhase === "pause"
-        ? `Play 2 starts in ${listeningCountdown}s`
+        ? `Second listen starts automatically in ${listeningCountdown}s`
         : listeningPhase === "between-sections"
           ? `Next exercise starts in ${listeningCountdown}s`
           : "";
-  const listeningReadyForNext =
-    listeningPhase === "ready-next" || listeningPhase === "ready-finish";
+  const listeningReadyForSubmission = ["ready-finish", "ready-finish-skipped"].includes(listeningPhase);
   const listeningComplete = Boolean(attempt?.completed || attempt?.submittedAt);
+  const activeListeningUnansweredCount = activeListeningSection
+    ? (activeListeningSection.items || []).filter(
+        (item) => !hasCompleteItemAnswer(item, sectionAnswers?.[activeListeningSection.id]?.[item.id])
+      ).length
+    : 0;
+  const listeningUnansweredCount = listeningSections.reduce(
+    (total, section) =>
+      total +
+      (section.items || []).filter(
+        (item) => !hasCompleteItemAnswer(item, sectionAnswers?.[section.id]?.[item.id])
+      ).length,
+    0
+  );
+  const firstListenComplete = [
+    "pause",
+    "playing-second",
+    "awaiting-second-play",
+    "between-sections",
+    "ready-finish",
+  ].includes(listeningPhase);
+  const secondListenComplete = ["between-sections", "ready-finish"].includes(listeningPhase);
 
   const completedSections = Object.values(sectionStatuses).filter((value) => value === "done").length;
   const allDone = mainSections.length > 0 && completedSections === mainSections.length;
@@ -1579,8 +1609,28 @@ export default function HubCourseTestRunner({ user }) {
       }
 
       await new Promise((resolve, reject) => {
-        audio.addEventListener("ended", resolve, { once: true });
-        audio.addEventListener("error", reject, { once: true });
+        const cleanup = () => {
+          audio.removeEventListener("ended", handleEnded);
+          audio.removeEventListener("error", handleError);
+          audio.removeEventListener("pause", handleCancelledPause);
+        };
+        const handleEnded = () => {
+          cleanup();
+          resolve();
+        };
+        const handleError = (event) => {
+          cleanup();
+          reject(event);
+        };
+        const handleCancelledPause = () => {
+          if (listeningRunTokenRef.current === runToken) return;
+          cleanup();
+          resolve();
+        };
+
+        audio.addEventListener("ended", handleEnded);
+        audio.addEventListener("error", handleError);
+        audio.addEventListener("pause", handleCancelledPause);
       });
       return listeningRunTokenRef.current === runToken;
     } catch (error) {
@@ -2005,6 +2055,79 @@ export default function HubCourseTestRunner({ user }) {
     }
   }
 
+  function requestFinishListening() {
+    if (listeningUnansweredCount > 0) {
+      const noun = listeningUnansweredCount === 1 ? "question" : "questions";
+      setListeningExitWarning({
+        action: "submit",
+        title: `${listeningUnansweredCount} ${noun} unanswered`,
+        body: `The listening has finished, but you have not answered ${listeningUnansweredCount} ${noun}. Check any unanswered questions still visible, or submit the test with ${listeningUnansweredCount === 1 ? "this answer" : "these answers"} blank. Earlier listening exercises cannot be reopened.`,
+        confirmLabel: "Submit with blanks",
+      });
+      return;
+    }
+
+    handleFinishListening();
+  }
+
+  function requestSkipListeningActivity() {
+    if (!activeListeningSection) return;
+
+    if (listeningPhase === "between-sections") {
+      handleSkipListeningActivity();
+      return;
+    }
+
+    const warningByPhase = {
+      preread: {
+        title: "This exercise has not started yet",
+        body: "You have not heard the first or second listen. Stay on this exercise: the first listen will start automatically after the reading time.",
+      },
+      "playing-first": {
+        title: "The first listen is still playing",
+        body: "This exercise is not complete. Let the first listen finish; the second listen will then start automatically after a short countdown.",
+      },
+      "awaiting-first-play": {
+        title: "You have not heard the first listen",
+        body: "Your browser needs you to press Play recording 1. After it finishes, you will also get a second listen.",
+      },
+      pause: {
+        title: "Your second listen is about to start",
+        body: `Do not leave this exercise yet. You have heard the first listen, and the second will start automatically${listeningCountdown > 0 ? ` in ${listeningCountdown} seconds` : " shortly"}.`,
+      },
+      "playing-second": {
+        title: "The second listen is still playing",
+        body: "This exercise is not complete until the recording finishes. Stay here and use this second listen to check your answers.",
+      },
+      "awaiting-second-play": {
+        title: "You have not heard the second listen",
+        body: "You have completed the first listen, but your browser needs you to press Play recording 2 before this exercise is complete.",
+      },
+      "resume-blocked": {
+        title: "This listening exercise was interrupted",
+        body: "The page was refreshed after listening began, so the exercise cannot confirm which listens you heard. Ask your teacher before skipping it.",
+      },
+    };
+    const warning = warningByPhase[listeningPhase] || {
+      title: "This exercise is not complete",
+      body: "You have not completed both listens. Stay on this exercise to hear the full recording twice and check your answers.",
+    };
+
+    setListeningExitWarning({
+      action: "skip",
+      ...warning,
+      body: `${warning.body} ${
+        activeListeningUnansweredCount > 0
+          ? `You also have ${activeListeningUnansweredCount} unanswered ${activeListeningUnansweredCount === 1 ? "question" : "questions"} in this exercise.`
+          : ""
+      } Once you skip, you cannot return to this exercise.`.replace(/\s+/g, " ").trim(),
+      confirmLabel:
+        listeningSectionIndex >= listeningSections.length - 1
+          ? "Skip to submission"
+          : "Skip this exercise",
+    });
+  }
+
   async function handleSkipListeningActivity() {
     if (!activeListeningSection) return;
 
@@ -2022,10 +2145,10 @@ export default function HubCourseTestRunner({ user }) {
     }
 
     if (listeningSectionIndex >= listeningSections.length - 1) {
-      setListeningPhase("ready-finish");
+      setListeningPhase("ready-finish-skipped");
       await persistRunnerState({
         listeningSectionIndex,
-        listeningPhase: "ready-finish",
+        listeningPhase: "ready-finish-skipped",
       });
       return;
     }
@@ -2404,19 +2527,88 @@ export default function HubCourseTestRunner({ user }) {
                       {activeListeningSection.sharedPrompt.title}
                     </p>
                   ) : null}
+                  <div className="hub-course-test-listen-progress" aria-label="Two-listen progress">
+                    <div
+                      className={`hub-course-test-listen-step ${
+                        firstListenComplete
+                          ? "is-complete"
+                          : listeningPhase === "playing-first"
+                            ? "is-active"
+                            : "is-upcoming"
+                      }`}
+                    >
+                      <span className="hub-course-test-listen-number">
+                        {firstListenComplete ? "✓" : "1"}
+                      </span>
+                      <span>
+                        <strong>First listen</strong>
+                        <small>
+                          {firstListenComplete
+                            ? "Complete"
+                            : listeningPhase === "playing-first"
+                              ? "Playing now"
+                              : "Still to hear"}
+                        </small>
+                      </span>
+                    </div>
+                    <span className="hub-course-test-listen-connector" aria-hidden="true">→</span>
+                    <div
+                      className={`hub-course-test-listen-step ${
+                        secondListenComplete
+                          ? "is-complete"
+                          : listeningPhase === "playing-second"
+                            ? "is-active"
+                            : listeningPhase === "pause" || listeningPhase === "awaiting-second-play"
+                              ? "is-next"
+                              : "is-upcoming"
+                      }`}
+                    >
+                      <span className="hub-course-test-listen-number">
+                        {secondListenComplete ? "✓" : "2"}
+                      </span>
+                      <span>
+                        <strong>Second listen</strong>
+                        <small>
+                          {secondListenComplete
+                            ? "Complete"
+                            : listeningPhase === "playing-second"
+                              ? "Playing now"
+                              : listeningPhase === "pause"
+                                ? `Starts in ${listeningCountdown}s`
+                                : listeningPhase === "awaiting-second-play"
+                                  ? "Press play to continue"
+                                  : "Still to hear"}
+                        </small>
+                      </span>
+                    </div>
+                  </div>
                   {listeningCountdownMessage ? (
-                    <div className="hub-course-test-listening-countdown" role="timer" aria-live="polite">
-                      <span>{listeningPhase === "preread" ? "Read the questions" : "Get ready"}</span>
+                    <div
+                      className={`hub-course-test-listening-countdown ${listeningPhase === "pause" ? "is-second-listen" : ""}`}
+                      role="timer"
+                      aria-live="polite"
+                    >
+                      <span>
+                        {listeningPhase === "preread"
+                          ? "Read the questions"
+                          : listeningPhase === "pause"
+                            ? "Second listen coming next"
+                            : "Get ready"}
+                      </span>
                       <strong>{listeningCountdown}s</strong>
-                      <em>{listeningCountdownMessage}</em>
+                      <em>
+                        {listeningPhase === "pause"
+                          ? "Stay on this exercise — the recording will play again automatically."
+                          : listeningCountdownMessage}
+                      </em>
                     </div>
                   ) : null}
                   {!listeningCountdownMessage ? (
                     <p className="hub-course-test-listening-status">
                       {listeningPhase === "playing-first"
-                        ? "Play 1"
+                        ? "First listen — playing now (1 of 2)"
                         : listeningPhase === "playing-second"
-                          ? "Play 2"
+                          ? "Second listen — playing now (2 of 2)"
                           : listeningPhase === "awaiting-first-play"
                             ? "Press to play recording 1."
                             : listeningPhase === "awaiting-second-play"
@@ -2425,6 +2617,8 @@ export default function HubCourseTestRunner({ user }) {
                                 ? "This listening exercise was already started before the page refreshed. Ask your teacher before continuing."
                               : listeningPhase === "ready-finish"
                                 ? "Listening complete. Submit when you're ready."
+                                : listeningPhase === "ready-finish-skipped"
+                                  ? "Exercise skipped before both listens were completed. Check your answers before submitting."
                                 : "Listening in progress."}
                     </p>
                   ) : null}
@@ -2502,13 +2696,17 @@ export default function HubCourseTestRunner({ user }) {
                 </div>
 
                 <div className="hub-course-test-listening-actions">
-                  {listeningPhase !== "ready-finish" ? (
+                  {!listeningReadyForSubmission ? (
                     <button
                       className="ghost-btn"
                       type="button"
-                      onClick={handleSkipListeningActivity}
+                      onClick={requestSkipListeningActivity}
                     >
-                      {listeningSectionIndex >= listeningSections.length - 1 ? "Finish activity" : "Next activity"}
+                      {listeningPhase === "between-sections"
+                        ? "Start next exercise now"
+                        : listeningSectionIndex >= listeningSections.length - 1
+                          ? "Finish exercise early"
+                          : "Skip exercise early"}
                     </button>
                   ) : null}
 
@@ -2525,11 +2723,11 @@ export default function HubCourseTestRunner({ user }) {
                     </button>
                   ) : null}
 
-                  {listeningPhase === "ready-finish" ? (
+                  {listeningReadyForSubmission ? (
                     <button
                       className="btn"
                       type="button"
-                      onClick={handleFinishListening}
+                      onClick={requestFinishListening}
                       disabled={finishingListening}
                     >
                       {finishingListening ? "Submitting..." : "Submit listening and finish test"}
@@ -2893,6 +3091,46 @@ export default function HubCourseTestRunner({ user }) {
               </div>
             ) : null}
           </>
+        ) : null}
+
+        {listeningExitWarning ? (
+          <div className="hub-course-test-modal" onClick={() => setListeningExitWarning(null)}>
+            <div
+              className="hub-course-test-modal-card hub-course-test-listening-warning"
+              role="alertdialog"
+              aria-modal="true"
+              aria-labelledby="listening-warning-title"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="hub-course-test-listening-warning-icon" aria-hidden="true">!</div>
+              <div className="hub-course-test-modal-head">
+                <div>
+                  <h3 id="listening-warning-title">{listeningExitWarning.title}</h3>
+                  <p>{listeningExitWarning.body}</p>
+                </div>
+              </div>
+              <div className="hub-course-test-confirm-actions">
+                <button className="btn" type="button" onClick={() => setListeningExitWarning(null)}>
+                  {listeningExitWarning.action === "submit" ? "Check my answers" : "Keep listening"}
+                </button>
+                <button
+                  className="ghost-btn"
+                  type="button"
+                  onClick={() => {
+                    const action = listeningExitWarning.action;
+                    setListeningExitWarning(null);
+                    if (action === "submit") {
+                      handleFinishListening();
+                    } else {
+                      handleSkipListeningActivity();
+                    }
+                  }}
+                >
+                  {listeningExitWarning.confirmLabel}
+                </button>
+              </div>
+            </div>
+          </div>
         ) : null}
 
         {detailedFeedbackOpen && canOpenDetailedFeedback ? (
@@ -4418,6 +4656,108 @@ function HubCourseTestRunnerStyles() {
         line-height: 1.5;
       }
 
+      .hub-course-test-listen-progress {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        gap: 0.65rem;
+        align-items: center;
+        margin: 0.35rem 0 0.2rem;
+      }
+
+      .hub-course-test-listen-step {
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        min-width: 0;
+        padding: 0.75rem 0.85rem;
+        border: 1px solid rgba(120, 182, 255, 0.2);
+        border-radius: 14px;
+        background: rgba(120, 182, 255, 0.06);
+        color: #b8c8e6;
+      }
+
+      .hub-course-test-listen-step > span:last-child {
+        display: grid;
+        gap: 0.1rem;
+        min-width: 0;
+      }
+
+      .hub-course-test-listen-step strong,
+      .hub-course-test-listen-step small {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .hub-course-test-listen-step strong {
+        color: #dce9ff;
+        font-size: 0.93rem;
+      }
+
+      .hub-course-test-listen-step small {
+        color: #8ea5c8;
+        font-size: 0.78rem;
+      }
+
+      .hub-course-test-listen-number {
+        display: grid;
+        flex: 0 0 auto;
+        place-items: center;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 999px;
+        border: 1px solid rgba(120, 182, 255, 0.36);
+        background: rgba(120, 182, 255, 0.1);
+        color: #cfe0fb;
+        font-weight: 900;
+      }
+
+      .hub-course-test-listen-step.is-active {
+        border-color: rgba(125, 211, 255, 0.72);
+        background: rgba(50, 147, 215, 0.18);
+        box-shadow: inset 0 0 0 1px rgba(125, 211, 255, 0.2);
+      }
+
+      .hub-course-test-listen-step.is-active .hub-course-test-listen-number {
+        border-color: #7dd3ff;
+        background: #7dd3ff;
+        color: #07162e;
+      }
+
+      .hub-course-test-listen-step.is-next {
+        border-color: rgba(251, 191, 36, 0.72);
+        background: rgba(251, 191, 36, 0.12);
+        box-shadow: inset 0 0 0 1px rgba(251, 191, 36, 0.12);
+      }
+
+      .hub-course-test-listen-step.is-next strong,
+      .hub-course-test-listen-step.is-next small {
+        color: #ffe39a;
+      }
+
+      .hub-course-test-listen-step.is-next .hub-course-test-listen-number {
+        border-color: #fbbf24;
+        background: #fbbf24;
+        color: #2d1b00;
+      }
+
+      .hub-course-test-listen-step.is-complete {
+        border-color: rgba(147, 232, 183, 0.42);
+        background: rgba(147, 232, 183, 0.09);
+      }
+
+      .hub-course-test-listen-step.is-complete .hub-course-test-listen-number {
+        border-color: rgba(147, 232, 183, 0.62);
+        background: rgba(147, 232, 183, 0.18);
+        color: #c8f7df;
+      }
+
+      .hub-course-test-listen-connector {
+        color: #7187a8;
+        font-size: 1.2rem;
+        font-weight: 900;
+      }
+
       .hub-course-test-listening-countdown {
         display: grid;
         grid-template-columns: 1fr auto;
@@ -4430,6 +4770,21 @@ function HubCourseTestRunnerStyles() {
           radial-gradient(circle at top right, rgba(147, 232, 183, 0.22), transparent 42%),
           rgba(9, 27, 47, 0.82);
         box-shadow: 0 18px 36px rgba(2, 8, 24, 0.24);
+      }
+
+      .hub-course-test-listening-countdown.is-second-listen {
+        border-color: rgba(251, 191, 36, 0.72);
+        background:
+          radial-gradient(circle at top right, rgba(251, 191, 36, 0.25), transparent 44%),
+          rgba(45, 27, 0, 0.78);
+        box-shadow:
+          inset 0 0 0 1px rgba(251, 191, 36, 0.14),
+          0 18px 36px rgba(2, 8, 24, 0.24);
+      }
+
+      .hub-course-test-listening-countdown.is-second-listen span,
+      .hub-course-test-listening-countdown.is-second-listen em {
+        color: #ffe7a6;
       }
 
       .hub-course-test-listening-countdown span {
@@ -4484,6 +4839,27 @@ function HubCourseTestRunnerStyles() {
         justify-content: flex-end;
         gap: 0.7rem;
         flex-wrap: wrap;
+      }
+
+      .hub-course-test-listening-warning {
+        width: min(560px, 100%);
+        border-color: rgba(251, 191, 36, 0.58);
+        background:
+          radial-gradient(circle at top right, rgba(251, 191, 36, 0.16), transparent 42%),
+          linear-gradient(180deg, rgba(25, 26, 43, 0.99), rgba(22, 29, 56, 0.99));
+      }
+
+      .hub-course-test-listening-warning-icon {
+        display: grid;
+        place-items: center;
+        width: 2.75rem;
+        height: 2.75rem;
+        border-radius: 999px;
+        background: #fbbf24;
+        color: #2d1b00;
+        font-size: 1.5rem;
+        font-weight: 950;
+        box-shadow: 0 8px 22px rgba(251, 191, 36, 0.22);
       }
 
       :root[data-theme="light"] .hub-course-test-wrapper {
@@ -4723,6 +5099,69 @@ function HubCourseTestRunnerStyles() {
         color: var(--color-text);
       }
 
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listen-step {
+        background: var(--color-surface);
+        border-color: var(--color-border);
+        color: var(--color-text-soft);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listen-step strong {
+        color: var(--color-text);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listen-step small {
+        color: var(--color-text-soft);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listen-number {
+        background: var(--color-surface-3);
+        border-color: var(--color-border-strong);
+        color: var(--color-text);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listen-connector {
+        color: var(--color-muted);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listen-step.is-active {
+        background: rgba(37, 99, 235, 0.09);
+        border-color: rgba(37, 99, 235, 0.5);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listen-step.is-next {
+        background: rgba(180, 109, 0, 0.09);
+        border-color: rgba(180, 109, 0, 0.52);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listen-step.is-next :is(strong, small) {
+        color: #754600;
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listen-step.is-complete {
+        background: rgba(22, 128, 60, 0.07);
+        border-color: rgba(22, 128, 60, 0.35);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listen-step.is-complete .hub-course-test-listen-number {
+        background: rgba(22, 128, 60, 0.12);
+        border-color: rgba(22, 128, 60, 0.45);
+        color: #0f6b32;
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listening-countdown.is-second-listen {
+        background: rgba(180, 109, 0, 0.08);
+        border-color: rgba(180, 109, 0, 0.48);
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listening-countdown.is-second-listen :is(span, em) {
+        color: #754600;
+      }
+
+      :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-listening-warning {
+        background: var(--color-surface-2);
+        border-color: rgba(180, 109, 0, 0.48);
+      }
+
       :root[data-theme="light"] .hub-course-test-wrapper .hub-course-test-report-track {
         background: var(--color-surface-3);
         border: 1px solid var(--color-border);
@@ -4897,6 +5336,20 @@ function HubCourseTestRunnerStyles() {
       }
 
       @media (max-width: 640px) {
+        .hub-course-test-listen-progress {
+          grid-template-columns: 1fr;
+          gap: 0.45rem;
+        }
+
+        .hub-course-test-listen-connector {
+          display: none;
+        }
+
+        .hub-course-test-listen-step strong,
+        .hub-course-test-listen-step small {
+          white-space: normal;
+        }
+
         .hub-course-test-feedback-attempt-body {
           grid-template-columns: 1fr;
         }

@@ -382,7 +382,23 @@
 .workshop-timing-choice button:last-child { border-radius: 0 9px 9px 0; }
 .workshop-timing-choice button.is-active { background: #245da8; border-color: #5798ff; }
 
-.workshop-timer-row { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; margin: .75rem 0; }
+.workshop-timer-row {
+  position: sticky;
+  z-index: 30;
+  top: .75rem;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin: .75rem 0;
+  padding: .55rem;
+  border: 1px solid color-mix(in srgb, var(--workshop-line) 82%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--workshop-bg) 90%, transparent);
+  box-shadow: 0 12px 30px rgba(2, 8, 20, .22);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
 .workshop-timer-row > p { color: var(--workshop-muted); margin: 0 0 0 auto; }
 .classroom-timer { display: flex; align-items: center; gap: 1rem; padding: .7rem .8rem; border: 1px solid var(--workshop-line); border-radius: 12px; background: #0d1728; }
 .classroom-timer > div:first-child { display: flex; align-items: baseline; gap: .6rem; }
@@ -733,7 +749,8 @@
   .workshop-topic-copy { min-height: 260px; }
   .workshop-part-tabs { grid-template-columns: repeat(2, 1fr); }
   .workshop-code-form > div { display: grid; }
-  .workshop-timer-row > p { margin-left: 0; }
+  .workshop-timer-row { top: .4rem; gap: .4rem; padding: .4rem; }
+  .workshop-timer-row > p { display: none; }
   .classroom-timer { width: 100%; justify-content: space-between; }
   .prep-progress-summary { grid-template-columns: 1fr; gap: .55rem; }
   .prep-step-nav { grid-template-columns: 1fr 1fr; }
