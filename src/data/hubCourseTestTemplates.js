@@ -1878,7 +1878,7 @@ export const HUB_COURSE_TEST_TEMPLATES = [
         sharedPrompt: { type: "text-block", title: "Example", exampleLines: ["Example answer: waited"] },
         items: [
           textInputItem("g3-1", "I ________ (look) for my keys.", ["am looking", "i am looking", "i'm looking", "'m looking"]),
-          textInputItem("g3-2", "Jackie ________ (not be) born in the USA.", ["wasn't born", "was not born"]),
+          textInputItem("g3-2", "Jackie ________ (not be) born in the USA.", ["wasn't", "was not"]),
           textInputItem("g3-3", "He ________ (send) me 20 emails yesterday.", ["sent"]),
           textInputItem("g3-4", "Please ________ (not drive) fast. I’m frightened.", ["don't drive", "do not drive"]),
           textInputItem("g3-5", "________ (be) Ahmed at home yesterday morning?", ["was"]),
