@@ -2824,6 +2824,14 @@ export async function saveHubGrammarSubmission(payload) {
   });
 }
 
+export async function logHubGrammarStarted(details = {}) {
+  return logActivity("hub_grammar_started", {
+    app: "seifhub",
+    trigger: "first_answer",
+    ...details,
+  });
+}
+
 export async function saveHubDictationSession(payload) {
   const uid = auth.currentUser?.uid;
   if (!uid) return;

@@ -43,6 +43,7 @@ export const ACTIVITY_TYPE_LABELS = {
   listening_part3_completed: "Listening Part 3 Completed",
   listening_part4_attempted: "Listening Part 4 Attempt",
   listening_part4_completed: "Listening Part 4 Completed",
+  hub_grammar_started: "Hub Grammar Started",
   hub_grammar_submitted: "Hub Grammar Submitted",
   hub_vocab_activity_completed: "Hub Vocabulary Activity Completed",
   hub_dictation_completed: "Hub Dictation Completed",
@@ -464,6 +465,12 @@ export function formatActivityDetails(log) {
     case "listening_part3_completed":
     case "listening_part4_completed":
       return joinParts([d.taskTitle || d.taskId || "Task", "Completed", typeof d.playsUsed === "number" ? `Listens ${d.playsUsed}/2` : ""]);
+    case "hub_grammar_started":
+      return joinParts([
+        d.activityTitle || d.activityId || "Grammar activity",
+        d.level || "",
+        formatCount(d.totalItems, "question"),
+      ]);
     case "hub_grammar_submitted":
       return joinParts([d.activityTitle || d.activityId || "Grammar activity", `${d.score ?? "?"}%`, `Correct ${formatScore(d.correct, d.total)}`]);
     case "hub_vocab_activity_completed":

@@ -3,21 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
-import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
+import {
+  HUB_GRAMMAR_ACTIVITIES,
+  HUB_GRAMMAR_LEVELS,
+  HUB_GRAMMAR_LEVEL_COLORS,
+} from "../../data/hubGrammarActivities.js";
 import * as fb from "../../firebase";
 import { toast } from "../../utils/toast";
 
-const LEVELS = ["a2", "b1", "b2", "c1", "c2"];
-const LEVEL_COLORS = {
-  a2: "#7ef0c2",
-  b1: "#8fb6ff",
-  b2: "#f6d26b",
-  c1: "#f2b0b7",
-  c2: "#c7a4ff",
-};
-
 function getSearchText(activity) {
-  return [activity.title, activity.shortDescription, activity.intro, ...(activity.levels || [])]
+  return [activity.title, activity.shortDescription, activity.intro, activity.level]
     .filter(Boolean)
     .join(" ")
     .toLowerCase();
@@ -38,6 +33,10 @@ export default function HubMiniGrammarTests({ user }) {
   const [shareOverlayActivity, setShareOverlayActivity] = useState(null);
 
   const isTeacher = user?.role === "teacher" || user?.role === "admin";
+  const availableLevels = useMemo(() => {
+    const activityLevels = new Set(HUB_GRAMMAR_ACTIVITIES.map((activity) => activity.level));
+    return HUB_GRAMMAR_LEVELS.filter((level) => activityLevels.has(level.id));
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -97,10 +96,9 @@ export default function HubMiniGrammarTests({ user }) {
 
     return HUB_GRAMMAR_ACTIVITIES.map((activity, index) => ({ activity, index }))
       .filter(({ activity }) => {
-        const levels = activity.levels || [];
         const matchesLevel =
           selectedLevels.length === 0 ||
-          selectedLevels.some((level) => levels.includes(level));
+          selectedLevels.includes(activity.level);
         const matchesQuery =
           !normalizedQuery || getSearchText(activity).includes(normalizedQuery);
 
@@ -281,20 +279,21 @@ export default function HubMiniGrammarTests({ user }) {
 
         <div className="hub-mini-filters">
           <div className="hub-mini-filter-group">
-            <span className="hub-mini-filter-label">Levels</span>
+            <span className="hub-mini-filter-label">Level</span>
             <div className="level-row">
-              {LEVELS.map((level) => (
+              {availableLevels.map((level) => (
                 <label
-                  key={level}
-                  className={`level-pill ${selectedLevels.includes(level) ? "selected" : ""}`}
-                  style={{ "--badge-color": LEVEL_COLORS[level] || "#8aa0ff" }}
+                  key={level.id}
+                  className={`level-pill ${selectedLevels.includes(level.id) ? "selected" : ""}`}
+                  style={{ "--badge-color": HUB_GRAMMAR_LEVEL_COLORS[level.id] || "#8aa0ff" }}
+                  title={level.title}
                 >
                   <input
                     type="checkbox"
-                    checked={selectedLevels.includes(level)}
-                    onChange={() => toggleLevel(level)}
+                    checked={selectedLevels.includes(level.id)}
+                    onChange={() => toggleLevel(level.id)}
                   />
-                  <span>{level.toUpperCase()}</span>
+                  <span>{level.label}</span>
                 </label>
               ))}
             </div>
@@ -342,15 +341,12 @@ export default function HubMiniGrammarTests({ user }) {
                 ) : null}
               </div>
               <div className="hub-mini-card-levels">
-                {(activity.levels || []).map((level) => (
-                  <span
-                    key={`${activity.id}-${level}`}
-                    className="cefr-badge"
-                    style={{ "--badge-color": LEVEL_COLORS[level] || "#8aa0ff" }}
-                  >
-                    {level.toUpperCase()}
-                  </span>
-                ))}
+                <span
+                  className="cefr-badge"
+                  style={{ "--badge-color": HUB_GRAMMAR_LEVEL_COLORS[activity.level] || "#8aa0ff" }}
+                >
+                  {HUB_GRAMMAR_LEVELS.find((level) => level.id === activity.level)?.label || activity.level.toUpperCase()}
+                </span>
               </div>
               <p>{activity.shortDescription}</p>
             </button>

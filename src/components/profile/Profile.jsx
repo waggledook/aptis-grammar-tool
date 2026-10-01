@@ -15,7 +15,11 @@ import { getTotalVocabSets, TOPIC_DATA } from "../vocabulary/data/vocabTopics";
 import { vocabExerciseTasks } from "../vocabulary/data/vocabExerciseBank.js";
 import synonymSeedItems from "../vocabulary/data/synonymSeedItems.js";
 import collocationPrecisionItems from "../vocabulary/collocations/data/collocationPrecisionItems.js";
-import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
+import {
+  HUB_GRAMMAR_ACTIVITIES,
+  HUB_GRAMMAR_LEVELS,
+  HUB_GRAMMAR_LEVEL_COLORS,
+} from "../../data/hubGrammarActivities.js";
 import {
   getAllHubVocabThemes,
   HUB_VOCAB_LEVELS,
@@ -50,7 +54,6 @@ import {
   updatePassword,
 } from "firebase/auth";
 
-const HUB_GRAMMAR_LEVELS = ["a2", "b1", "b2", "c1", "c2"];
 const TEXTBOOK_VOCAB_THEMES = getAllHubVocabThemes();
 const TEXTBOOK_VOCAB_LEVEL_TOTALS = Object.fromEntries(
   HUB_VOCAB_LEVELS.map((level) => [
@@ -96,13 +99,6 @@ const APTIS_GRAMMAR_VOCABULARY_MOCK_IDS = new Set(
   APTIS_GRAMMAR_VOCABULARY_MOCKS.map((mock) => mock.id)
 );
 const APTIS_GRAMMAR_VOCABULARY_MOCK_TOTAL = APTIS_GRAMMAR_VOCABULARY_MOCKS.length;
-const HUB_GRAMMAR_LEVEL_COLORS = {
-  a2: "#7ef0c2",
-  b1: "#8fb6ff",
-  b2: "#f6d26b",
-  c1: "#f2b0b7",
-  c2: "#c7a4ff",
-};
 const OTE_SPEAKING_TOTALS = {
   general: {
     part1: 6,
@@ -267,7 +263,7 @@ function isAdvancedOteWritingSubmission(entry = {}) {
 
 function buildHubGrammarDashboard(submissions = []) {
   const byLevel = Object.fromEntries(
-    HUB_GRAMMAR_LEVELS.map((level) => [level, { completed: 0, total: 0 }])
+    HUB_GRAMMAR_LEVELS.map((level) => [level.id, { completed: 0, total: 0 }])
   );
 
   const completedIds = new Set(
@@ -277,14 +273,11 @@ function buildHubGrammarDashboard(submissions = []) {
   );
 
   HUB_GRAMMAR_ACTIVITIES.forEach((activity) => {
-    const levels = Array.isArray(activity.levels) ? activity.levels : [];
-    levels.forEach((level) => {
-      if (!byLevel[level]) return;
-      byLevel[level].total += 1;
-      if (completedIds.has(activity.id)) {
-        byLevel[level].completed += 1;
-      }
-    });
+    if (!byLevel[activity.level]) return;
+    byLevel[activity.level].total += 1;
+    if (completedIds.has(activity.id)) {
+      byLevel[activity.level].completed += 1;
+    }
   });
 
   return {
@@ -3015,22 +3008,22 @@ const formatOteSpeakingPart = (part) => {
           />
 
           {HUB_GRAMMAR_LEVELS
-            .filter((level) => (hubGrammarDash.byLevel?.[level]?.total || 0) > 0)
+            .filter((level) => (hubGrammarDash.byLevel?.[level.id]?.total || 0) > 0)
             .map((level) => (
               <ProgressBar
-                key={`hub-grammar-${level}`}
+                key={`hub-grammar-${level.id}`}
                 label={
                   <span className="hub-mini-level-label">
                     <span
                       className="hub-mini-level-dot"
-                      style={{ background: HUB_GRAMMAR_LEVEL_COLORS[level] || "#8aa0ff" }}
+                      style={{ background: HUB_GRAMMAR_LEVEL_COLORS[level.id] || "#8aa0ff" }}
                     />
-                    {level.toUpperCase()}
+                    {level.label}
                   </span>
                 }
-                value={hubGrammarDash.byLevel?.[level]?.completed || 0}
-                max={hubGrammarDash.byLevel?.[level]?.total || 1}
-                right={`${hubGrammarDash.byLevel?.[level]?.completed || 0}/${hubGrammarDash.byLevel?.[level]?.total || 0}`}
+                value={hubGrammarDash.byLevel?.[level.id]?.completed || 0}
+                max={hubGrammarDash.byLevel?.[level.id]?.total || 1}
+                right={`${hubGrammarDash.byLevel?.[level.id]?.completed || 0}/${hubGrammarDash.byLevel?.[level.id]?.total || 0}`}
               />
             ))}
         </div>

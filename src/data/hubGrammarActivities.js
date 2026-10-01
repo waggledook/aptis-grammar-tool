@@ -1,3 +1,43 @@
+export const HUB_GRAMMAR_LEVELS = [
+  { id: "a1", label: "A1", title: "Beginner" },
+  { id: "a1-a2", label: "A1–A2", title: "Elementary" },
+  { id: "a2", label: "A2", title: "A2" },
+  { id: "a2-b1", label: "A2–B1", title: "Pre-intermediate" },
+  { id: "b1", label: "B1", title: "Intermediate" },
+  { id: "b1-b2", label: "B1–B2", title: "Intermediate Plus" },
+  { id: "b2", label: "B2", title: "Upper-intermediate" },
+  { id: "c1", label: "C1", title: "Advanced" },
+  { id: "c1-c2", label: "C1–C2", title: "Advanced Plus" },
+  { id: "c2", label: "C2", title: "Proficiency" },
+];
+
+export const HUB_GRAMMAR_LEVEL_COLORS = {
+  a1: "#72df9b",
+  "a1-a2": "#75e8ad",
+  a2: "#7ef0c2",
+  "a2-b1": "#69c8df",
+  b1: "#8fb6ff",
+  "b1-b2": "#c4c47f",
+  b2: "#f6d26b",
+  c1: "#f2b0b7",
+  "c1-c2": "#dcb0dc",
+  c2: "#c7a4ff",
+};
+
+const GRAMMAR_LEVEL_ORDER = HUB_GRAMMAR_LEVELS.map((level) => level.id).filter(
+  (level) => !level.includes("-")
+);
+
+export function getHubGrammarLevel(activity) {
+  if (activity?.level) return String(activity.level).toLowerCase();
+
+  const legacyLevels = Array.isArray(activity?.levels) ? activity.levels : [];
+  const orderedLevels = [...new Set(legacyLevels.map((level) => String(level).toLowerCase()))]
+    .sort((left, right) => GRAMMAR_LEVEL_ORDER.indexOf(left) - GRAMMAR_LEVEL_ORDER.indexOf(right));
+
+  return orderedLevels.join("-");
+}
+
 const singleGap = (id, prompt, parts, acceptedAnswers, feedback, extra = {}) => ({
   id,
   type: "gap-fill",
@@ -272,7 +312,4028 @@ const adverbPlacementItem = (
   };
 };
 
-export const HUB_GRAMMAR_ACTIVITIES = [
+const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
+  {
+    id: "a1-1a-verb-be-i-you",
+    title: "1A · Verb Be: I and You",
+    shortDescription: "Practise am and are in statements, negatives, questions, and short answers.",
+    levels: ["a1"],
+    intro:
+      "Start with the basic forms of be for I and you, then build questions, negatives, and a short conversation.",
+    items: [
+      multipleChoiceItem(
+        "a1-1a-mc-1",
+        "Choose the correct form of be.",
+        "I ____ on the morning course.",
+        ["am", "is", "are"],
+        0,
+        "Use 'am' with I."
+      ),
+      multipleChoiceItem(
+        "a1-1a-mc-2",
+        "Choose the correct form of be.",
+        "You ____ beside the window.",
+        ["am", "is", "are"],
+        2,
+        "Use 'are' with you."
+      ),
+      placeholderGapItem(
+        "a1-1a-gf-1",
+        "Complete the second sentence with a contraction.",
+        "I am ready now. → __________ ready now.",
+        "I'm",
+        [],
+        "The contraction of 'I am' is 'I'm'."
+      ),
+      multipleChoiceItem(
+        "a1-1a-mc-3",
+        "Choose the correct negative form.",
+        "You ____ in the wrong queue. This one is for online orders.",
+        ["isn't", "aren't", "am not"],
+        1,
+        "Use 'aren't' or 'are not' with you."
+      ),
+      doubleGap(
+        "a1-1a-gf-2",
+        "Complete the question and short answer.",
+        ["A: ", { gapId: "g1" }, " I in the right room?\nB: Yes, you ", { gapId: "g2" }, "."],
+        ["Am"],
+        ["are"],
+        "Put 'am' before I in the question. In the positive short answer, use 'you are'."
+      ),
+      multipleChoiceItem(
+        "a1-1a-mc-4",
+        "Choose the best short answer.",
+        "Are you busy right now?",
+        ["No, I'm not.", "No, I not.", "No, you aren't."],
+        0,
+        "Answer a question about you with 'Yes, I am' or 'No, I'm not'."
+      ),
+      errorCorrectionItem(
+        "a1-1a-ec-1",
+        "Check the highlighted word.",
+        "I is on the evening course.",
+        "is",
+        false,
+        "am",
+        "Use 'am', not 'is', with I."
+      ),
+      errorCorrectionItem(
+        "a1-1a-ec-2",
+        "Check the highlighted phrase.",
+        "You're not in my group today.",
+        "You're not",
+        true,
+        "",
+        "Correct! 'You're not' is a natural contraction of 'you are not'."
+      ),
+      wordOrderItem(
+        "a1-1a-wo-1",
+        "Put the words in the correct order.",
+        ["you", "Are", "after", "class", "free"],
+        "Are you free after class?",
+        "For a question, put 'are' before 'you'."
+      ),
+      wordOrderItem(
+        "a1-1a-wo-2",
+        "Put the words in the correct order.",
+        ["not", "I", "at", "am", "the", "correct", "table"],
+        "I am not at the correct table.",
+        "The negative order is subject + be + not."
+      ),
+      placeholderGapItem(
+        "a1-1a-gf-3",
+        "Complete the reply.",
+        "A: Are you in the weekend class?\nB: Yes, __________.",
+        "I am",
+        [],
+        "Use 'Yes, I am' for a positive short answer about yourself."
+      ),
+      {
+        id: "a1-1a-dialogue-1",
+        type: "gap-fill",
+        prompt: "Complete the introduction with forms of be.",
+        parts: [
+          "A: Hi, I ",
+          { gapId: "g1" },
+          " Nia. ",
+          { gapId: "g2" },
+          " you Leo?\nB: No, I ",
+          { gapId: "g3" },
+          " not. I ",
+          { gapId: "g4" },
+          " Sam.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["am", "'m"],
+            feedback: "Use 'am' with I.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["Are"],
+            feedback: "Begin the question with 'Are'.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["am", "'m"],
+            feedback: "The negative short answer is 'No, I am not'.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["am", "'m"],
+            feedback: "Use 'am' with I.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-1b-verb-be-he-she-it",
+    title: "1B · Verb Be: He, She, and It",
+    shortDescription: "Use is with he, she, and it in statements, negatives, and questions.",
+    levels: ["a1"],
+    intro:
+      "Work from simple statements to questions and a short conversation using he, she, and it.",
+    items: [
+      multipleChoiceItem(
+        "a1-1b-mc-1",
+        "Choose the correct form of be.",
+        "Lena ____ in the garden.",
+        ["am", "is", "are"],
+        1,
+        "Use 'is' with she, he, and a person's name."
+      ),
+      multipleChoiceItem(
+        "a1-1b-mc-2",
+        "Choose the correct form of be.",
+        "My phone ____ in my bag.",
+        ["am", "are", "is"],
+        2,
+        "Use 'is' with one thing."
+      ),
+      placeholderGapItem(
+        "a1-1b-gf-1",
+        "Complete the second sentence with a contraction.",
+        "He is a careful driver. → __________ a careful driver.",
+        "He's",
+        [],
+        "The contraction of 'he is' is 'he's'."
+      ),
+      placeholderGapItem(
+        "a1-1b-gf-2",
+        "Complete the sentence with a negative form of be.",
+        "The museum __________ open on Mondays.",
+        "isn't",
+        ["is not"],
+        "Use 'isn't' or 'is not' with one place or thing."
+      ),
+      multipleChoiceItem(
+        "a1-1b-mc-3",
+        "Choose the best short answer.",
+        "Is Ava your neighbour?",
+        ["Yes, she is.", "Yes, she's.", "Yes, it is."],
+        0,
+        "Use 'Yes, she is'. Do not use the contraction 'she's' as a short answer."
+      ),
+      doubleGap(
+        "a1-1b-gf-3",
+        "Complete the question and short answer.",
+        ["A: ", { gapId: "g1" }, " it cold outside?\nB: No, it ", { gapId: "g2" }, "."],
+        ["Is"],
+        ["isn't", "is not"],
+        "Put 'is' before it in the question. Use 'isn't' or 'is not' in the negative answer."
+      ),
+      errorCorrectionItem(
+        "a1-1b-ec-1",
+        "Check the highlighted word.",
+        "She are near the main entrance.",
+        "are",
+        false,
+        "is",
+        "Use 'is' with she."
+      ),
+      errorCorrectionItem(
+        "a1-1b-ec-2",
+        "Check the highlighted phrase.",
+        "He's not here this morning.",
+        "He's not",
+        true,
+        "",
+        "Correct! 'He's not' means 'he is not'."
+      ),
+      wordOrderItem(
+        "a1-1b-wo-1",
+        "Put the words in the correct order.",
+        ["this", "she", "Where", "afternoon", "is"],
+        "Where is she this afternoon?",
+        "Put the question word first, then 'is', then the subject."
+      ),
+      wordOrderItem(
+        "a1-1b-wo-2",
+        "Put the words in the correct order.",
+        ["the", "Is", "blue", "under", "it", "chair"],
+        "Is it under the blue chair?",
+        "For a yes/no question, put 'is' before 'it'."
+      ),
+      placeholderGapItem(
+        "a1-1b-gf-4",
+        "Complete the question.",
+        "__________ he at home today?",
+        "Is",
+        [],
+        "Begin a question about he with 'Is'."
+      ),
+      {
+        id: "a1-1b-dialogue-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with forms of be.",
+        parts: [
+          "A: This is Omar. He ",
+          { gapId: "g1" },
+          " our new neighbour.\nB: ",
+          { gapId: "g2" },
+          " he from Cairo?\nA: No, he ",
+          { gapId: "g3" },
+          ". He ",
+          { gapId: "g4" },
+          " from Alexandria.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["is", "'s"],
+            feedback: "Use 'is' with he.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["Is"],
+            feedback: "Begin the question with 'Is'.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["isn't", "is not"],
+            feedback: "Use the negative short answer 'he isn't' or 'he is not'.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["is", "'s"],
+            feedback: "Use 'is' with he.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-2a-verb-be-we-you-they",
+    title: "2A · Verb Be: We, You, and They",
+    shortDescription: "Practise are with plural subjects in statements, negatives, and questions.",
+    levels: ["a1"],
+    intro:
+      "Use are with we, plural you, and they, then apply the forms in questions and short exchanges.",
+    items: [
+      multipleChoiceItem(
+        "a1-2a-mc-1",
+        "Choose the correct form of be.",
+        "My cousin and I ____ on the same course.",
+        ["am", "is", "are"],
+        2,
+        "'My cousin and I' means we, so use 'are'."
+      ),
+      multipleChoiceItem(
+        "a1-2a-mc-2",
+        "Choose the correct form of be.",
+        "The lights ____ on.",
+        ["am", "are", "is"],
+        1,
+        "Use 'are' with a plural noun."
+      ),
+      placeholderGapItem(
+        "a1-2a-gf-1",
+        "Complete the second sentence with a contraction.",
+        "We are ready for the tour. → __________ ready for the tour.",
+        "We're",
+        [],
+        "The contraction of 'we are' is 'we're'."
+      ),
+      multipleChoiceItem(
+        "a1-2a-mc-3",
+        "Choose the correct negative form.",
+        "The sandwiches ____ fresh, so don't eat them.",
+        ["aren't", "isn't", "am not"],
+        0,
+        "Use 'aren't' or 'are not' with a plural noun."
+      ),
+      placeholderGapItem(
+        "a1-2a-gf-2",
+        "Complete the sentence with a form of be.",
+        "You __________ both very helpful.",
+        "are",
+        ["'re"],
+        "Use 'are' when you refers to more than one person."
+      ),
+      doubleGap(
+        "a1-2a-gf-3",
+        "Complete the question and short answer.",
+        ["A: ", { gapId: "g1" }, " they near the lift?\nB: Yes, they ", { gapId: "g2" }, "."],
+        ["Are"],
+        ["are"],
+        "Put 'are' before they in the question and use 'they are' in the positive short answer."
+      ),
+      multipleChoiceItem(
+        "a1-2a-mc-4",
+        "Choose the best short answer.",
+        "Are you and Jo in room five?",
+        ["No, you aren't.", "No, they aren't.", "No, we aren't."],
+        2,
+        "When you answer for yourself and Jo, use 'we'."
+      ),
+      errorCorrectionItem(
+        "a1-2a-ec-1",
+        "Check the highlighted word.",
+        "These chairs is very comfortable.",
+        "is",
+        false,
+        "are",
+        "Use 'are' with the plural subject 'these chairs'."
+      ),
+      errorCorrectionItem(
+        "a1-2a-ec-2",
+        "Check the highlighted phrase.",
+        "We're not far from the station.",
+        "We're not",
+        true,
+        "",
+        "Correct! 'We're not' is a natural contraction of 'we are not'."
+      ),
+      wordOrderItem(
+        "a1-2a-wo-1",
+        "Put the words in the correct order.",
+        ["they", "Are", "the", "near", "desk", "front"],
+        "Are they near the front desk?",
+        "For a yes/no question, put 'are' before 'they'."
+      ),
+      wordOrderItem(
+        "a1-2a-wo-2",
+        "Put the words in the correct order.",
+        ["not", "on", "We", "guest", "the", "are", "list"],
+        "We are not on the guest list.",
+        "The negative order is subject + be + not."
+      ),
+      {
+        id: "a1-2a-dialogue-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with plural forms of be.",
+        parts: [
+          "A: ",
+          { gapId: "g1" },
+          " you two here for the art class?\nB: No, we ",
+          { gapId: "g2" },
+          ". We ",
+          { gapId: "g3" },
+          " here for the music class. Our friends ",
+          { gapId: "g4" },
+          " inside already.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["Are"],
+            feedback: "Begin a question about plural you with 'Are'.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["aren't", "are not"],
+            feedback: "Use 'we aren't' or 'we are not' for the negative short answer.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["are", "'re"],
+            feedback: "Use 'are' with we.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["are", "'re"],
+            feedback: "Use 'are' with the plural subject 'our friends'.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-2b-wh-how-questions-be",
+    title: "2B · Wh- and How Questions with Be",
+    shortDescription: "Build questions with who, what, where, when, how, and how old.",
+    levels: ["a1"],
+    intro:
+      "Choose the right question word, put be before the subject, and finish with a short information-gap conversation.",
+    items: [
+      multipleChoiceItem(
+        "a1-2b-mc-1",
+        "Choose the question word that matches the answer.",
+        "____ is the last bus? At 11:30.",
+        ["Who", "When", "Where"],
+        1,
+        "Use 'when' to ask about a time."
+      ),
+      multipleChoiceItem(
+        "a1-2b-mc-2",
+        "Choose the question that matches the answer.",
+        "She's our new coach.",
+        ["Where is that woman?", "How is that woman?", "Who is that woman?"],
+        2,
+        "Use 'who' to ask about a person."
+      ),
+      multipleChoiceItem(
+        "a1-2b-mc-3",
+        "Choose the question that matches the answer.",
+        "Much better, thanks.",
+        ["How are you today?", "What are you?", "Where are you today?"],
+        0,
+        "Use 'How are you?' to ask how somebody feels."
+      ),
+      placeholderGapItem(
+        "a1-2b-gf-1",
+        "Complete the question with one question word.",
+        "__________ is the nearest cash machine? Next to the supermarket.",
+        "Where",
+        [],
+        "Use 'where' to ask about a place."
+      ),
+      doubleGap(
+        "a1-2b-gf-2",
+        "Complete the question.",
+        ["", { gapId: "g1" }, " old ", { gapId: "g2" }, " your children? They're six."],
+        ["How"],
+        ["are"],
+        "Use 'How old + be + subject' to ask about age."
+      ),
+      wordOrderItem(
+        "a1-2b-wo-1",
+        "Put the words in the correct order.",
+        ["the", "What", "Wi-Fi", "is", "password"],
+        "What is the Wi-Fi password?",
+        "The order is question word + be + subject."
+      ),
+      wordOrderItem(
+        "a1-2b-wo-2",
+        "Put the words in the correct order.",
+        ["the", "Where", "clean", "are", "towels"],
+        "Where are the clean towels?",
+        "Put 'where' first, then 'are', then the subject."
+      ),
+      errorCorrectionItem(
+        "a1-2b-ec-1",
+        "Check the highlighted question.",
+        "Where you are at the moment?",
+        "Where you are",
+        false,
+        "Where are you",
+        "In a question, put 'are' before the subject 'you'."
+      ),
+      multipleChoiceItem(
+        "a1-2b-mc-4",
+        "Choose the question form used in this course.",
+        "____? She's at the bus stop.",
+        ["Where she is", "Where is she", "Where's she"],
+        1,
+        "Use the full form before a pronoun in this course: 'Where is she?'"
+      ),
+      errorCorrectionItem(
+        "a1-2b-ec-3",
+        "Check the highlighted phrase.",
+        "What's the price of this notebook?",
+        "What's the price",
+        true,
+        "",
+        "Correct! 'What's' is possible because a noun phrase follows it."
+      ),
+      placeholderGapItem(
+        "a1-2b-gf-3",
+        "Complete the question. Use the full form or a contraction.",
+        "__________ your surname?",
+        "What is",
+        ["What's"],
+        "Use 'What is' or 'What's' before the noun phrase 'your surname'."
+      ),
+      {
+        id: "a1-2b-dialogue-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with three question words.",
+        parts: [
+          "A: ",
+          { gapId: "g1" },
+          " is the art class?\nB: It's upstairs.\nA: ",
+          { gapId: "g2" },
+          " is it?\nB: It's on Wednesday.\nA: ",
+          { gapId: "g3" },
+          " is the teacher?\nB: Ms Patel.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["Where"],
+            feedback: "Use 'where' to ask about a place.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["When"],
+            feedback: "Use 'when' to ask about a day or time.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["Who"],
+            feedback: "Use 'who' to ask about a person.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-3a-singular-plural-a-an",
+    title: "3A · Singular and Plural Nouns: A and An",
+    shortDescription: "Choose a or an and form regular plural nouns correctly.",
+    levels: ["a1"],
+    intro:
+      "Begin with a and an, then practise regular plural endings and use both skills in a short description.",
+    items: [
+      multipleChoiceItem(
+        "a1-3a-mc-1",
+        "Choose the correct article.",
+        "There is ____ orange in my lunchbox.",
+        ["a", "an", "the"],
+        1,
+        "Use 'an' before a word that begins with a vowel sound."
+      ),
+      multipleChoiceItem(
+        "a1-3a-mc-2",
+        "Choose the correct article.",
+        "Mila is ____ doctor at the town clinic.",
+        ["a", "an", "the"],
+        0,
+        "Use 'a' before a singular noun that begins with a consonant sound."
+      ),
+      placeholderChoiceGapItem(
+        "a1-3a-cg-1",
+        "Choose a, an, or no article for each gap.",
+        "Outside, I can see ____ bicycle, ____ old bus, and ____ taxis.",
+        ["a", "an", "—"],
+        "Use 'a' before bicycle, 'an' before old, and no article before the plural noun taxis.",
+        ["a", "an", "—"]
+      ),
+      multipleChoiceItem(
+        "a1-3a-mc-3",
+        "Choose the correct plural.",
+        "One city, two ____.",
+        ["citys", "cityes", "cities"],
+        2,
+        "After a consonant + y, change y to i and add -es: city → cities."
+      ),
+      multipleChoiceItem(
+        "a1-3a-mc-4",
+        "Choose the correct plural.",
+        "One brush, three ____.",
+        ["brushs", "brushes", "brushies"],
+        1,
+        "Nouns ending in -sh normally add -es."
+      ),
+      placeholderGapItem(
+        "a1-3a-gf-1",
+        "Write the plural form of the noun in brackets.",
+        "Two __________ are asleep in the car. (baby)",
+        "babies",
+        [],
+        "After a consonant + y, change y to i and add -es."
+      ),
+      placeholderGapItem(
+        "a1-3a-gf-2",
+        "Write the plural form of the noun in brackets.",
+        "We need four __________ for these gifts. (box)",
+        "boxes",
+        [],
+        "Add -es to a noun ending in -x."
+      ),
+      errorCorrectionItem(
+        "a1-3a-ec-1",
+        "Check the highlighted article.",
+        "I have an new camera.",
+        "an",
+        false,
+        "a",
+        "Use 'a' before the consonant sound at the beginning of 'new'."
+      ),
+      errorCorrectionItem(
+        "a1-3a-ec-2",
+        "Check the highlighted noun.",
+        "There are two bus at the stop.",
+        "bus",
+        false,
+        "buses",
+        "The plural of 'bus' is 'buses'."
+      ),
+      errorCorrectionItem(
+        "a1-3a-ec-3",
+        "Check the highlighted noun.",
+        "We visit three citys on our trip.",
+        "citys",
+        false,
+        "cities",
+        "Change consonant + y to -ies: city → cities."
+      ),
+      placeholderChoiceGapItem(
+        "a1-3a-cg-2",
+        "Choose the correct article.",
+        "Please close ____ gate behind you.",
+        ["the"],
+        "Use 'the' when both people know which specific gate you mean.",
+        ["a", "an", "the", "—"]
+      ),
+      {
+        id: "a1-3a-description-1",
+        type: "gap-fill",
+        prompt: "Complete the description with articles or plural nouns.",
+        parts: [
+          "In my bag, I have ",
+          { gapId: "g1" },
+          " map, ",
+          { gapId: "g2" },
+          " apple, and two ",
+          { gapId: "g3" },
+          ". (sandwich)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["a"],
+            feedback: "Use 'a' before map.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["an"],
+            feedback: "Use 'an' before apple.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["sandwiches"],
+            feedback: "Add -es to a noun ending in -ch.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-3b-demonstratives",
+    title: "3B · This, That, These, and Those",
+    shortDescription: "Choose demonstratives for near and distant singular and plural things.",
+    levels: ["a1"],
+    intro:
+      "Decide whether each person or thing is near or far away and whether it is singular or plural.",
+    items: [
+      multipleChoiceItem(
+        "a1-3b-mc-1",
+        "Choose the correct demonstrative.",
+        "I'm holding one photo. ____ photo is from my holiday.",
+        ["That", "This", "These", "Those"],
+        1,
+        "Use 'this' for one thing near you."
+      ),
+      multipleChoiceItem(
+        "a1-3b-mc-2",
+        "Choose the correct demonstrative.",
+        "Look at the clock on the wall over there. ____ clock is very old.",
+        ["This", "These", "Those", "That"],
+        3,
+        "Use 'that' for one thing away from you."
+      ),
+      multipleChoiceItem(
+        "a1-3b-mc-3",
+        "Choose the correct demonstrative.",
+        "The two cups beside me are clean. ____ cups are for us.",
+        ["These", "This", "That", "Those"],
+        0,
+        "Use 'these' for plural things near you."
+      ),
+      multipleChoiceItem(
+        "a1-3b-mc-4",
+        "Choose the correct demonstrative.",
+        "Can you see the boats far out on the water? ____ boats are beautiful.",
+        ["This", "That", "Those", "These"],
+        2,
+        "Use 'those' for plural things away from you."
+      ),
+      doubleGap(
+        "a1-3b-gf-1",
+        "Complete the sentence with two demonstratives.",
+        ["", { gapId: "g1" }, " is my coat here, and ", { gapId: "g2" }, " is your coat by the door."],
+        ["This"],
+        ["that"],
+        "Use 'this' for the coat here and 'that' for the coat farther away."
+      ),
+      placeholderGapItem(
+        "a1-3b-gf-2",
+        "Complete the question with one demonstrative.",
+        "I'm holding two small objects. What are __________ in my hand?",
+        "these",
+        [],
+        "The objects are in the speaker's hand, so use 'these' for plural things nearby."
+      ),
+      errorCorrectionItem(
+        "a1-3b-ec-1",
+        "Check the highlighted word.",
+        "This shoes are wet.",
+        "This",
+        false,
+        "These",
+        "Use the plural form 'these' with shoes."
+      ),
+      errorCorrectionItem(
+        "a1-3b-ec-2",
+        "Check the highlighted word.",
+        "Who are that people outside?",
+        "that",
+        false,
+        "those",
+        "Use the plural form 'those' with people who are farther away."
+      ),
+      errorCorrectionItem(
+        "a1-3b-ec-3",
+        "Check the highlighted word.",
+        "These are my notes for today's class.",
+        "These",
+        true,
+        "",
+        "Correct! 'These' can stand alone as a pronoun for plural things nearby."
+      ),
+      wordOrderItem(
+        "a1-3b-wo-1",
+        "Put the words in the correct order.",
+        ["are", "What", "the", "those", "on", "shelf", "top"],
+        "What are those on the top shelf?",
+        "Use 'those' as a plural pronoun for things farther away."
+      ),
+      wordOrderItem(
+        "a1-3b-wo-2",
+        "Put the words in the correct order.",
+        ["over", "your", "Is", "that", "bike", "there"],
+        "Is that your bike over there?",
+        "Use 'that' for one thing over there."
+      ),
+      {
+        id: "a1-3b-dialogue-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with this, that, these, or those.",
+        parts: [
+          "A: What is ",
+          { gapId: "g1" },
+          " beside me?\nB: It's a radio.\nA: And what are ",
+          { gapId: "g2" },
+          " near the door?\nB: They're speakers. Are ",
+          { gapId: "g3" },
+          " headphones here black?\nA: No. ",
+          { gapId: "g4" },
+          " pair over there is black.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["this"],
+            feedback: "Use 'this' for one thing beside the speaker.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["those"],
+            feedback: "Use 'those' for plural things near the door, away from the speaker.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["these"],
+            feedback: "Use 'these' for the headphones here.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["That"],
+            feedback: "Use 'that' for one pair over there.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-4a-possessive-adjectives-s",
+    title: "4A · Possessive Adjectives and Possessive 's",
+    shortDescription: "Use my, your, his, her, its, our, and their, plus possessive apostrophes.",
+    levels: ["a1"],
+    intro:
+      "Match people and things with the correct possessive adjective, then show ownership with 's or a final apostrophe.",
+    items: [
+      multipleChoiceItem(
+        "a1-4a-mc-1",
+        "Choose the correct possessive adjective.",
+        "I'm Leo. ____ address is 18 Green Street.",
+        ["My", "His", "Our"],
+        0,
+        "Use 'my' for something that belongs to me."
+      ),
+      multipleChoiceItem(
+        "a1-4a-mc-2",
+        "Choose the correct possessive adjective.",
+        "You have a new phone. Is this ____ number?",
+        ["my", "your", "their"],
+        1,
+        "Use 'your' for something that belongs to you."
+      ),
+      multipleChoiceItem(
+        "a1-4a-mc-3",
+        "Choose the correct possessive adjective.",
+        "My school has a new website. ____ address is easy to remember.",
+        ["His", "It's", "Its"],
+        2,
+        "Use 'its' for possession. 'It's' means 'it is'."
+      ),
+      multipleChoiceItem(
+        "a1-4a-mc-4",
+        "Choose the correct possessive adjective.",
+        "Sam is my uncle. ____ wife is called Aisha.",
+        ["Her", "His", "Their"],
+        1,
+        "Use 'his' for something connected to a man."
+      ),
+      multipleChoiceItem(
+        "a1-4a-mc-5",
+        "Choose the correct possessive adjective.",
+        "Nadia is my aunt. ____ job is very interesting.",
+        ["Her", "His", "Its"],
+        0,
+        "Use 'her' for something connected to a woman."
+      ),
+      placeholderChoiceGapItem(
+        "a1-4a-cg-1",
+        "Choose the correct possessive adjective for each gap.",
+        "We like ____ new flat. The children love ____ bedrooms, and the cat sleeps in ____ basket.",
+        ["our", "their", "its"],
+        "Use 'our' for we, 'their' for the children, and 'its' for the cat.",
+        ["my", "your", "his", "her", "its", "our", "their"]
+      ),
+      multipleChoiceItem(
+        "a1-4a-mc-6",
+        "Choose the correct possessive form.",
+        "The bicycle belongs to Jamie. This is ____.",
+        ["Jamie bicycle", "Jamies bicycle", "Jamie's bicycle"],
+        2,
+        "Add 's to a person's name to show possession."
+      ),
+      errorCorrectionItem(
+        "a1-4a-ec-1",
+        "Check the highlighted word.",
+        "This is Ben, and her sister is a nurse.",
+        "her",
+        false,
+        "his",
+        "Use 'his' because the sister is Ben's sister."
+      ),
+      errorCorrectionItem(
+        "a1-4a-ec-2",
+        "Check the highlighted word.",
+        "The company changes it's logo every year.",
+        "it's",
+        false,
+        "its",
+        "Use the possessive adjective 'its'. 'It's' means 'it is'."
+      ),
+      errorCorrectionItem(
+        "a1-4a-ec-3",
+        "Check the highlighted phrase.",
+        "This is Nora bag on the chair.",
+        "Nora bag",
+        false,
+        "Nora's bag",
+        "Add 's after Nora to show that the bag belongs to her."
+      ),
+      wordOrderItem(
+        "a1-4a-wo-1",
+        "Put the words in the correct order.",
+        ["bus", "is", "players'", "This", "the"],
+        "This is the players' bus.",
+        "For a regular plural noun ending in s, put the apostrophe after the s: players'."
+      ),
+      {
+        id: "a1-4a-description-1",
+        type: "gap-fill",
+        prompt: "Complete the family description with possessive adjectives.",
+        parts: [
+          "Eva and Amir are brother and sister. ",
+          { gapId: "g1" },
+          " parents have a café. ",
+          { gapId: "g2" },
+          " name is Corner Cup. Eva works there with ",
+          { gapId: "g3" },
+          " mother, and Amir works there with ",
+          { gapId: "g4" },
+          " father.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["Their"],
+            feedback: "Use 'their' for Eva and Amir.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["Its"],
+            feedback: "Use 'its' for the café's name.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["her"],
+            feedback: "Use 'her' for Eva.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["his"],
+            feedback: "Use 'his' for Amir.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-4b-adjectives",
+    title: "4B · Adjectives",
+    shortDescription: "Place adjectives before nouns or after be and keep their form unchanged.",
+    levels: ["a1"],
+    intro:
+      "Choose the correct adjective form, fix common word-order errors, and build natural descriptions.",
+    items: [
+      multipleChoiceItem(
+        "a1-4b-mc-1",
+        "Choose the correct adjective.",
+        "The soup is ____.",
+        ["hot", "hotly", "hots"],
+        0,
+        "Use the adjective 'hot' after be."
+      ),
+      multipleChoiceItem(
+        "a1-4b-mc-2",
+        "Choose the correct adjective.",
+        "It is a ____ street.",
+        ["quietly", "quiets", "quiet"],
+        2,
+        "Use an adjective before a noun: a quiet street."
+      ),
+      multipleChoiceItem(
+        "a1-4b-mc-3",
+        "Choose the sentence with the correct word order.",
+        "They live in ____.",
+        ["a house small", "a small house", "a smalls house"],
+        1,
+        "Put the adjective before the noun: a small house."
+      ),
+      multipleChoiceItem(
+        "a1-4b-mc-4",
+        "Choose the correct form.",
+        "The rooms are ____.",
+        ["clean", "cleans", "cleanes"],
+        0,
+        "Adjectives do not change for plural nouns."
+      ),
+      multipleChoiceItem(
+        "a1-4b-mc-5",
+        "Choose the correct form.",
+        "Maya is calm, and her brother is ____ too.",
+        ["calms", "calm", "calm man"],
+        1,
+        "The adjective has the same form for women and men."
+      ),
+      multipleChoiceItem(
+        "a1-4b-mc-6",
+        "Choose the sentence with correct adjective position and form.",
+        "Which description is correct?",
+        [
+          "The café has tables small, and the chairs are comfortables.",
+          "The café has smalls tables, and comfortable are the chairs.",
+          "The café has small tables, and the chairs are comfortable.",
+        ],
+        2,
+        "Put an adjective before a noun or after be, and do not add a plural -s to an adjective."
+      ),
+      errorCorrectionItem(
+        "a1-4b-ec-1",
+        "Check the highlighted phrase.",
+        "We have a red car.",
+        "a red car",
+        true,
+        "",
+        "Correct! Put the adjective before the noun."
+      ),
+      errorCorrectionItem(
+        "a1-4b-ec-2",
+        "Check the highlighted word.",
+        "Those are importants documents.",
+        "importants",
+        false,
+        "important",
+        "Adjectives do not take a plural -s in English."
+      ),
+      errorCorrectionItem(
+        "a1-4b-ec-3",
+        "Check the highlighted word.",
+        "The café is very noisily.",
+        "noisily",
+        false,
+        "noisy",
+        "Use the adjective 'noisy' after be."
+      ),
+      wordOrderItem(
+        "a1-4b-wo-1",
+        "Put the words in the correct order.",
+        ["comfortable", "a", "chair", "very", "is", "It"],
+        "It is a very comfortable chair.",
+        "Put the adjective before the noun: a very comfortable chair."
+      ),
+      singleGap(
+        "a1-4b-rf-1",
+        "Rewrite the description as one noun phrase.",
+        ["It's ", { gapId: "g1" }, "."],
+        ["a modern hotel"],
+        "Put the adjective before the noun and use 'a' with the singular noun.",
+        { originalSentence: "The hotel is modern." }
+      ),
+      {
+        id: "a1-4b-description-1",
+        type: "gap-fill",
+        prompt: "Complete the description with the adjectives in brackets.",
+        parts: [
+          "The café is ",
+          { gapId: "g1" },
+          ", but it's a ",
+          { gapId: "g2" },
+          " place. The chairs are ",
+          { gapId: "g3" },
+          ", and the coffee is ",
+          { gapId: "g4" },
+          ". (small / friendly / comfortable / good)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["small"],
+            feedback: "Use 'small' after is.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["friendly"],
+            feedback: "Use 'friendly' before the noun place.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["comfortable"],
+            feedback: "The adjective stays unchanged with the plural noun chairs.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["good"],
+            feedback: "Use 'good' after is.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-5a-present-simple-i-you-we-they",
+    title: "5A · Present Simple: I, You, We, and They",
+    shortDescription: "Build affirmative and negative present-simple sentences about habits and facts.",
+    levels: ["a1"],
+    intro:
+      "Use the base verb with I, you, we, and they, and make negatives with don't plus the base verb.",
+    items: [
+      multipleChoiceItem(
+        "a1-5a-mc-1",
+        "Choose the correct verb form.",
+        "I ____ the bus to college every day.",
+        ["takes", "am take", "take"],
+        2,
+        "Use the base verb with I: I take."
+      ),
+      multipleChoiceItem(
+        "a1-5a-mc-2",
+        "Choose the correct verb form.",
+        "We ____ near the city centre.",
+        ["lives", "live", "are live"],
+        1,
+        "Use the base verb with we: we live."
+      ),
+      multipleChoiceItem(
+        "a1-5a-mc-3",
+        "Choose the correct negative form.",
+        "They ____ TV before school.",
+        ["don't watch", "not watch", "aren't watch"],
+        0,
+        "Use don't + base verb with they."
+      ),
+      placeholderGapItem(
+        "a1-5a-gf-1",
+        "Complete the sentence with the verb in brackets.",
+        "You __________ very fast. (read)",
+        "read",
+        [],
+        "Use the base verb with you."
+      ),
+      placeholderGapItem(
+        "a1-5a-gf-2",
+        "Complete the negative sentence.",
+        "I __________ meat. (not / eat)",
+        "don't eat",
+        ["do not eat"],
+        "Use don't or do not + base verb with I."
+      ),
+      doubleGap(
+        "a1-5a-gf-3",
+        "Complete the sentence with the verbs in brackets.",
+        ["We ", { gapId: "g1" }, " online from Monday to Friday, but we ", { gapId: "g2" }, " on Sunday. (study / not study)"],
+        ["study"],
+        ["don't study", "do not study"],
+        "Use the base verb in the affirmative and don't + base verb in the negative."
+      ),
+      errorCorrectionItem(
+        "a1-5a-ec-1",
+        "Check the highlighted word.",
+        "I walks home after class.",
+        "walks",
+        false,
+        "walk",
+        "Use the base verb without -s after I."
+      ),
+      errorCorrectionItem(
+        "a1-5a-ec-2",
+        "Check the highlighted phrase.",
+        "They don't works on Fridays.",
+        "don't works",
+        false,
+        "don't work",
+        "After don't, use the base verb: don't work."
+      ),
+      errorCorrectionItem(
+        "a1-5a-ec-3",
+        "Check the highlighted phrase.",
+        "We play tennis in the park on Saturdays.",
+        "We play",
+        true,
+        "",
+        "Correct! Use the base verb with we."
+      ),
+      wordOrderItem(
+        "a1-5a-wo-1",
+        "Put the words in the correct order.",
+        ["very", "You", "English", "well", "speak"],
+        "You speak English very well.",
+        "The affirmative order is subject + base verb + the rest of the sentence."
+      ),
+      wordOrderItem(
+        "a1-5a-wo-2",
+        "Put the words in the correct order.",
+        ["phone", "do", "at", "my", "I", "use", "not", "work"],
+        "I do not use my phone at work.",
+        "The negative order is subject + do not + base verb."
+      ),
+      {
+        id: "a1-5a-routine-1",
+        type: "gap-fill",
+        prompt: "Complete the routine with the verbs in brackets.",
+        parts: [
+          "My friends and I ",
+          { gapId: "g1" },
+          " near the college. We ",
+          { gapId: "g2" },
+          " there together. We ",
+          { gapId: "g3" },
+          " lunch on campus; we ",
+          { gapId: "g4" },
+          " sandwiches at home. (live / walk / not buy / make)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["live"],
+            feedback: "My friends and I means we, so use the base verb live.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["walk"],
+            feedback: "Use the base verb walk with we.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["don't buy", "do not buy"],
+            feedback: "Use don't + base verb for the negative.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["make"],
+            feedback: "Use the base verb make with we.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-5b-present-simple-questions",
+    title: "5B · Present Simple Questions: I, You, We, and They",
+    shortDescription: "Make present-simple questions and short answers with do and don't.",
+    levels: ["a1"],
+    intro:
+      "Begin questions with do, keep the main verb in its base form, and answer with do or don't.",
+    items: [
+      multipleChoiceItem(
+        "a1-5b-mc-1",
+        "Choose the correct auxiliary.",
+        "____ you work on Saturdays?",
+        ["Do", "Are", "Does"],
+        0,
+        "Use 'do' to make a present-simple question with you."
+      ),
+      multipleChoiceItem(
+        "a1-5b-mc-2",
+        "Choose the best short answer.",
+        "Do they know the answer?",
+        ["Yes, they are.", "Yes, they know.", "Yes, they do."],
+        2,
+        "Use 'Yes, they do' as the positive short answer."
+      ),
+      multipleChoiceItem(
+        "a1-5b-mc-3",
+        "Choose the best short answer.",
+        "Do we need more paper?",
+        ["No, we aren't.", "No, we don't.", "No, we not."],
+        1,
+        "Use 'No, we don't' as the negative short answer."
+      ),
+      placeholderGapItem(
+        "a1-5b-gf-1",
+        "Complete the question with one word.",
+        "__________ I need my passport?",
+        "Do",
+        [],
+        "Begin a present-simple question with I using 'Do'."
+      ),
+      doubleGap(
+        "a1-5b-gf-2",
+        "Complete the question. Use the verb in brackets.",
+        ["Where ", { gapId: "g1" }, " you ", { gapId: "g2" }, "? (live)"],
+        ["do"],
+        ["live"],
+        "The question order is question word + do + subject + base verb."
+      ),
+      doubleGap(
+        "a1-5b-gf-3",
+        "Complete the question. Use the verb in brackets.",
+        ["What time ", { gapId: "g1" }, " they ", { gapId: "g2" }, " work? (finish)"],
+        ["do"],
+        ["finish"],
+        "Use do before they and keep finish in the base form."
+      ),
+      errorCorrectionItem(
+        "a1-5b-ec-1",
+        "Check the highlighted phrase.",
+        "Do you likes this song?",
+        "Do you likes",
+        false,
+        "Do you like",
+        "After do, use the base verb: Do you like...?"
+      ),
+      errorCorrectionItem(
+        "a1-5b-ec-2",
+        "Check the highlighted question.",
+        "Where you do study?",
+        "Where you do study",
+        false,
+        "Where do you study",
+        "Put do before the subject: Where do you study?"
+      ),
+      errorCorrectionItem(
+        "a1-5b-ec-3",
+        "Check the highlighted question.",
+        "Do we have enough chairs?",
+        "Do we have",
+        true,
+        "",
+        "Correct! The order is do + subject + base verb."
+      ),
+      wordOrderItem(
+        "a1-5b-wo-1",
+        "Put the words in the correct order.",
+        ["music", "Do", "home", "they", "at", "play"],
+        "Do they play music at home?",
+        "Begin with do, then add the subject and base verb."
+      ),
+      wordOrderItem(
+        "a1-5b-wo-2",
+        "Put the words in the correct order.",
+        ["we", "What", "the", "time", "lesson", "do", "start"],
+        "What time do we start the lesson?",
+        "Use question phrase + do + subject + base verb."
+      ),
+      {
+        id: "a1-5b-dialogue-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with do, don't, or the verb study.",
+        parts: [
+          "A: Do you ",
+          { gapId: "g1" },
+          " in the evening?\nB: Yes, I ",
+          { gapId: "g2" },
+          ".\nA: Where ",
+          { gapId: "g3" },
+          " you study?\nB: At the library.\nA: Do your friends ",
+          { gapId: "g4" },
+          " there too?\nB: No, they ",
+          { gapId: "g5" },
+          ".",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["study"],
+            feedback: "Use the base verb study after do.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["do"],
+            feedback: "Use 'Yes, I do' for the positive short answer.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["do"],
+            feedback: "Put do before the subject in the question.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["study"],
+            feedback: "Use the base verb study after do.",
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["don't", "do not"],
+            feedback: "Use 'No, they don't' for the negative short answer.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-6a-present-simple-he-she-it",
+    title: "6A · Present Simple: He, She, and It",
+    shortDescription: "Use third-person present-simple forms in statements, negatives, and questions.",
+    levels: ["a1"],
+    intro:
+      "Practise third-person endings, doesn't, does questions, and the irregular forms has, goes, and does.",
+    items: [
+      multipleChoiceItem(
+        "a1-6a-mc-1",
+        "Choose the correct verb form.",
+        "Luca ____ near the train station.",
+        ["live", "lives", "living"],
+        1,
+        "Add -s to the verb with he, she, or one person's name."
+      ),
+      multipleChoiceItem(
+        "a1-6a-mc-2",
+        "Choose the correct verb form.",
+        "Omar ____ his homework before dinner.",
+        ["does", "do", "dos"],
+        0,
+        "The third-person form of do is does."
+      ),
+      multipleChoiceItem(
+        "a1-6a-mc-3",
+        "Choose the correct verb form.",
+        "She ____ a comedy show on Tuesday evenings.",
+        ["watch", "watchs", "watches"],
+        2,
+        "Add -es to a verb ending in -ch: watch → watches."
+      ),
+      multipleChoiceItem(
+        "a1-6a-mc-4",
+        "Choose the correct verb form.",
+        "Nora ____ French at college.",
+        ["studies", "study", "studys"],
+        0,
+        "After a consonant + y, change y to i and add -es: study → studies."
+      ),
+      multipleChoiceItem(
+        "a1-6a-mc-5",
+        "Choose the correct verb form.",
+        "He ____ two younger sisters.",
+        ["have", "haves", "has"],
+        2,
+        "The third-person form of have is has."
+      ),
+      placeholderGapItem(
+        "a1-6a-gf-1",
+        "Complete the negative sentence.",
+        "It __________ much here in summer. (not / rain)",
+        "doesn't rain",
+        ["does not rain"],
+        "Use doesn't + base verb with it."
+      ),
+      doubleGap(
+        "a1-6a-gf-2",
+        "Complete the question. Use the verb in brackets.",
+        ["", { gapId: "g1" }, " your brother ", { gapId: "g2" }, " online? (study)"],
+        ["Does"],
+        ["study"],
+        "Use does before the subject and keep the main verb in the base form."
+      ),
+      multipleChoiceItem(
+        "a1-6a-mc-6",
+        "Choose the best short answer.",
+        "Does Maya work on Fridays?",
+        ["No, she don't.", "No, she doesn't.", "No, she isn't."],
+        1,
+        "Use 'No, she doesn't' as the negative short answer."
+      ),
+      errorCorrectionItem(
+        "a1-6a-ec-1",
+        "Check the highlighted phrase.",
+        "He don't use social media.",
+        "don't use",
+        false,
+        "doesn't use",
+        "Use doesn't with he, then use the base verb."
+      ),
+      errorCorrectionItem(
+        "a1-6a-ec-2",
+        "Check the highlighted question.",
+        "Does she walks to school?",
+        "Does she walks",
+        false,
+        "Does she walk",
+        "After does, use the base verb without -s."
+      ),
+      wordOrderItem(
+        "a1-6a-wo-1",
+        "Put the words in the correct order.",
+        ["your", "Where", "work", "does", "father"],
+        "Where does your father work?",
+        "Use question word + does + subject + base verb."
+      ),
+      {
+        id: "a1-6a-profile-1",
+        type: "gap-fill",
+        prompt: "Complete each gap with the correct form of the base verb in brackets.",
+        parts: [
+          "Mara ",
+          { gapId: "g1" },
+          " near the sea. (live)\nShe ",
+          { gapId: "g2" },
+          " in a hotel. (work)\nShe ",
+          { gapId: "g3" },
+          " to work by bus. (go)\nThe hotel is closed on Mondays, so she ",
+          { gapId: "g4" },
+          " that day. (work)\nDoes she ",
+          { gapId: "g5" },
+          " her job? (like)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["lives"],
+            feedback: "Add -s to live with she.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["works"],
+            feedback: "Add -s to work with she.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["goes"],
+            feedback: "The third-person form of go is goes.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["doesn't work", "does not work"],
+            feedback: "The hotel is closed, so use doesn't + the base verb work.",
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["like"],
+            feedback: "Use the base verb after does.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-6b-adverbs-frequency",
+    title: "6B · Adverbs of Frequency",
+    shortDescription: "Use always, usually, sometimes, and never in the correct position.",
+    levels: ["a1"],
+    intro:
+      "Match frequency adverbs to their meaning, then place them before main verbs or after be.",
+    items: [
+      multipleChoiceItem(
+        "a1-6b-mc-1",
+        "Choose the adverb that means 100% of the time.",
+        "I ____ lock the door when I leave home.",
+        ["always", "sometimes", "never"],
+        0,
+        "Always means every time."
+      ),
+      multipleChoiceItem(
+        "a1-6b-mc-2",
+        "Choose the adverb that means 0% of the time.",
+        "We ____ drive to work because we don't have a car.",
+        ["usually", "sometimes", "never"],
+        2,
+        "Never means not at any time."
+      ),
+      multipleChoiceItem(
+        "a1-6b-mc-3",
+        "Choose the most logical adverb.",
+        "Maya works from home from Monday to Thursday, but she works at the office on Friday. She ____ works from home.",
+        ["never", "usually", "always"],
+        1,
+        "She works from home on most working days, so 'usually' is the best answer."
+      ),
+      multipleChoiceItem(
+        "a1-6b-mc-4",
+        "Choose the sentence with the correct word order.",
+        "Which sentence is correct?",
+        ["I usually walk to the market.", "I walk usually to the market.", "Usually I walk always to the market."],
+        0,
+        "Put an adverb of frequency before the main verb."
+      ),
+      multipleChoiceItem(
+        "a1-6b-mc-5",
+        "Choose the sentence with the correct word order.",
+        "Which sentence is correct?",
+        ["She always is early.", "She is always early.", "She is early always."],
+        1,
+        "Put an adverb of frequency after the verb be."
+      ),
+      adverbPlacementItem(
+        "a1-6b-place-1",
+        "Place the adverb in the correct position.",
+        "Mina walks to school.",
+        ["usually"],
+        { usually: 1 },
+        "Mina usually walks to school.",
+        "Put usually before the main verb walks."
+      ),
+      adverbPlacementItem(
+        "a1-6b-place-2",
+        "Place the adverb in the correct position.",
+        "They are at home on Sunday mornings.",
+        ["always"],
+        { always: 2 },
+        "They are always at home on Sunday mornings.",
+        "Put always after the verb are."
+      ),
+      placeholderGapItem(
+        "a1-6b-gf-1",
+        "Complete the question with always, usually, sometimes, or never.",
+        "Leo visits his grandparents on most Sundays. Does he __________ visit them at the weekend?",
+        "usually",
+        [],
+        "Most Sundays means usually. In a question with does, put the adverb before the main verb."
+      ),
+      errorCorrectionItem(
+        "a1-6b-ec-1",
+        "Check the highlighted phrase.",
+        "She eats always lunch at her desk.",
+        "eats always",
+        false,
+        "always eats",
+        "Put always before the main verb eats."
+      ),
+      errorCorrectionItem(
+        "a1-6b-ec-2",
+        "Check the highlighted phrase.",
+        "He doesn't never arrive late.",
+        "doesn't never arrive",
+        false,
+        "never arrives",
+        "Never already has a negative meaning, so use it with an affirmative verb."
+      ),
+      errorCorrectionItem(
+        "a1-6b-ec-3",
+        "Check the highlighted phrase.",
+        "We sometimes go for a walk after dinner.",
+        "sometimes go",
+        true,
+        "",
+        "Correct! Sometimes comes before the main verb go."
+      ),
+      {
+        id: "a1-6b-routine-1",
+        type: "gap-fill",
+        prompt: "Complete the routine with the frequency adverbs shown by the percentages.",
+        parts: [
+          "Noah ",
+          { gapId: "g1" },
+          " checks the weather before work (100%). He is ",
+          { gapId: "g2" },
+          " late (0%). He ",
+          { gapId: "g3" },
+          " walks to work (about 50%), but he ",
+          { gapId: "g4" },
+          " takes the bus (most days).",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["always"],
+            feedback: "Use always for 100%. It comes before checks.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["never"],
+            feedback: "Use never for 0%. It comes after is.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["sometimes"],
+            feedback: "Use sometimes for about 50%. It comes before walks.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["usually"],
+            feedback: "Use usually for most days. It comes before takes.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-7a-question-word-order",
+    title: "7A · Word Order in Questions",
+    shortDescription: "Build questions with be and with present-simple auxiliary verbs.",
+    levels: ["a1"],
+    intro:
+      "Decide whether a question needs be or do/does, then put the subject and main verb in the correct order.",
+    items: [
+      multipleChoiceItem(
+        "a1-7a-mc-1",
+        "Choose the correct question.",
+        "You want to know if your friend is tired.",
+        ["Are you tired?", "Do you tired?", "You are tired?"],
+        0,
+        "With be, put the verb before the subject: Are you tired?"
+      ),
+      multipleChoiceItem(
+        "a1-7a-mc-2",
+        "Choose the correct auxiliary.",
+        "____ Marta work in the town centre?",
+        ["Is", "Does", "Do"],
+        1,
+        "Use does to make a present-simple question about Marta."
+      ),
+      multipleChoiceItem(
+        "a1-7a-mc-3",
+        "Choose the correct verb.",
+        "Where ____ the nearest pharmacy?",
+        ["does", "do", "is"],
+        2,
+        "Use is because the question uses the verb be."
+      ),
+      multipleChoiceItem(
+        "a1-7a-mc-4",
+        "Choose the correct auxiliary.",
+        "Where ____ Luca live?",
+        ["does", "is", "do"],
+        0,
+        "Use does before a third-person subject with a main verb."
+      ),
+      doubleGap(
+        "a1-7a-gf-1",
+        "Complete the present-simple question. Use the verb in brackets.",
+        ["What time ", { gapId: "g1" }, " the film ", { gapId: "g2" }, "? (start)"],
+        ["does"],
+        ["start"],
+        "Use does + subject + base verb."
+      ),
+      placeholderGapItem(
+        "a1-7a-gf-2",
+        "Complete the question with the correct form of be.",
+        "How old __________ your cousins?",
+        "are",
+        [],
+        "With be, use question phrase + verb + subject."
+      ),
+      errorCorrectionItem(
+        "a1-7a-ec-1",
+        "Check the highlighted question.",
+        "Do you are ready to leave?",
+        "Do you are",
+        false,
+        "Are you",
+        "Do not use do with be. Put are before the subject."
+      ),
+      errorCorrectionItem(
+        "a1-7a-ec-2",
+        "Check the highlighted question.",
+        "Where is your brother work?",
+        "Where is your brother work",
+        false,
+        "Where does your brother work",
+        "Use does for a present-simple question with the main verb work."
+      ),
+      errorCorrectionItem(
+        "a1-7a-ec-3",
+        "Check the highlighted question.",
+        "What does Eva studies at university?",
+        "What does Eva studies",
+        false,
+        "What does Eva study",
+        "After does, use the base verb study."
+      ),
+      wordOrderItem(
+        "a1-7a-wo-1",
+        "Put the words in the correct order.",
+        ["the", "closed", "Why", "shops", "are"],
+        "Why are the shops closed?",
+        "With be, use question word + verb + subject."
+      ),
+      wordOrderItem(
+        "a1-7a-wo-2",
+        "Put the words in the correct order.",
+        ["travel", "Mia", "Who", "does", "with"],
+        "Who does Mia travel with?",
+        "With another verb, use question word + does + subject + base verb."
+      ),
+      {
+        id: "a1-7a-dialogue-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with be, do, or does.",
+        parts: [
+          "A: Where ",
+          { gapId: "g1" },
+          " you from?\nB: I'm from Leeds.\nA: Where ",
+          { gapId: "g2" },
+          " you live now?\nB: In York.\nA: ",
+          { gapId: "g3" },
+          " your parents in York too?\nB: No, they aren't.\nA: What ",
+          { gapId: "g4" },
+          " they do?\nB: They're teachers.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["are"],
+            feedback: "Use are in the be question Where are you from?",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["do"],
+            feedback: "Use do with the main verb live.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["Are"],
+            feedback: "Begin the be question with Are.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["do"],
+            feedback: "Use do with the plural subject they.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-7b-imperatives-object-pronouns",
+    title: "7B · Imperatives and Object Pronouns",
+    shortDescription: "Give instructions and replace object nouns with me, him, her, it, us, or them.",
+    levels: ["a1"],
+    intro:
+      "Use the base verb for positive instructions, don't for negative instructions, and object pronouns after verbs and prepositions.",
+    items: [
+      multipleChoiceItem(
+        "a1-7b-mc-1",
+        "Choose the correct instruction.",
+        "____ the lights, please. It's dark in here.",
+        ["Turn on", "You turn on", "Turning on"],
+        0,
+        "Begin a positive imperative with the base verb."
+      ),
+      multipleChoiceItem(
+        "a1-7b-mc-2",
+        "Choose the correct negative instruction.",
+        "____ this button. It starts the alarm.",
+        ["Not press", "Doesn't press", "Don't press"],
+        2,
+        "Use don't + base verb for a negative imperative."
+      ),
+      multipleChoiceItem(
+        "a1-7b-mc-3",
+        "Choose the correct object pronoun.",
+        "Please send the photo to ____.",
+        ["I", "me", "my"],
+        1,
+        "Use the object pronoun me after the preposition to."
+      ),
+      multipleChoiceItem(
+        "a1-7b-mc-4",
+        "Choose the correct object pronoun.",
+        "I know Sara well. I see ____ every weekend.",
+        ["her", "she", "hers"],
+        0,
+        "Use her as the object of see."
+      ),
+      multipleChoiceItem(
+        "a1-7b-mc-5",
+        "Choose the correct object pronoun.",
+        "These boxes are heavy. Can you move ____?",
+        ["they", "it", "them"],
+        2,
+        "Use them to replace a plural object."
+      ),
+      placeholderChoiceGapItem(
+        "a1-7b-cg-1",
+        "Choose the correct object pronoun for each gap.",
+        "Leo calls Ana every day. He calls ____ after work. Ana tells Leo and me about her day. She tells ____ everything.",
+        ["her", "us"],
+        "Use her for Ana and us for Leo and me.",
+        ["me", "you", "him", "her", "it", "us", "them"]
+      ),
+      errorCorrectionItem(
+        "a1-7b-ec-1",
+        "Check the highlighted phrase.",
+        "Please listen I for a moment.",
+        "listen I",
+        false,
+        "listen to me",
+        "Use the object pronoun me after the preposition to."
+      ),
+      errorCorrectionItem(
+        "a1-7b-ec-2",
+        "Check the highlighted instruction.",
+        "Don't talks during the film.",
+        "Don't talks",
+        false,
+        "Don't talk",
+        "Use don't + base verb in a negative imperative."
+      ),
+      errorCorrectionItem(
+        "a1-7b-ec-3",
+        "Check the highlighted phrase.",
+        "Please give it to us before lunch.",
+        "give it to us",
+        true,
+        "",
+        "Correct! It replaces one thing, and us is the object after to."
+      ),
+      wordOrderItem(
+        "a1-7b-wo-1",
+        "Put the words in the correct order.",
+        ["table", "Please", "on", "put", "the", "them"],
+        "Please put them on the table.",
+        "Use the object pronoun after the verb: put them."
+      ),
+      wordOrderItem(
+        "a1-7b-wo-2",
+        "Put the words in the correct order.",
+        ["now", "Don't", "it", "open"],
+        "Don't open it now.",
+        "Use don't + base verb, then the object pronoun."
+      ),
+      {
+        id: "a1-7b-instructions-1",
+        type: "gap-fill",
+        prompt: "Complete each instruction with the base verb or the correct object pronoun in brackets.",
+        parts: [
+          "1. Take this note and give ",
+          { gapId: "g1" },
+          " to Ben. (it)\n2. Don't ",
+          { gapId: "g2" },
+          " the note to the other students. (show)\n3. Ben needs help. Please speak to ",
+          { gapId: "g3" },
+          ". (he)\n4. I have the answer. Ask Ben to call ",
+          { gapId: "g4" },
+          ". (I)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["it"],
+            feedback: "Use it to replace this note.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["show"],
+            feedback: "Use the base verb show after don't."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["him"],
+            feedback: "Use him as the object form of he."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["me"],
+            feedback: "Use me as the object form of I."
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-8a-can-cant",
+    title: "8A · Can and Can't",
+    shortDescription: "Talk about ability, permission, and possibility with can and can't.",
+    levels: ["a1"],
+    intro:
+      "Use can or can't with the base verb, put can before the subject in questions, and give short answers.",
+    items: [
+      multipleChoiceItem(
+        "a1-8a-mc-1",
+        "Choose the correct form.",
+        "Mia ____ speak three languages.",
+        ["can", "cans", "can to"],
+        0,
+        "Can has the same form with all subjects and is followed by the base verb."
+      ),
+      multipleChoiceItem(
+        "a1-8a-mc-2",
+        "Choose the correct negative form.",
+        "I ____ come to the meeting tonight.",
+        ["don't can", "can't", "am not can"],
+        1,
+        "Use can't + base verb for a negative sentence."
+      ),
+      multipleChoiceItem(
+        "a1-8a-mc-3",
+        "Choose the correct permission question.",
+        "____ I use this chair?",
+        ["Do", "Am", "Can"],
+        2,
+        "Put can before the subject to ask permission."
+      ),
+      multipleChoiceItem(
+        "a1-8a-mc-4",
+        "Choose the correct question form.",
+        "____ your brother know how to swim?",
+        ["Can", "Does", "Is"],
+        1,
+        "Use does before your brother and keep know in the base form."
+      ),
+      multipleChoiceItem(
+        "a1-8a-mc-5",
+        "Choose the best short answer.",
+        "Can they stay until six?",
+        ["No, they don't.", "No, they aren't.", "No, they can't."],
+        2,
+        "Use can or can't in a short answer to a can question."
+      ),
+      placeholderGapItem(
+        "a1-8a-gf-1",
+        "Complete the sentence with can or can't.",
+        "The weather is warm, so we __________ sit in the garden.",
+        "can",
+        [],
+        "Use can for something that is possible."
+      ),
+      doubleGap(
+        "a1-8a-gf-2",
+        "Complete the question and short answer.",
+        ["", { gapId: "g1" }, " Leo drive? Yes, he ", { gapId: "g2" }, "."],
+        ["Can"],
+        ["can"],
+        "Begin the question with Can and repeat can in the positive short answer."
+      ),
+      errorCorrectionItem(
+        "a1-8a-ec-1",
+        "Check the highlighted phrase.",
+        "She cans play the piano very well.",
+        "cans play",
+        false,
+        "can play",
+        "Can does not take -s with he, she, or it."
+      ),
+      errorCorrectionItem(
+        "a1-8a-ec-2",
+        "Check the highlighted question.",
+        "Do you can carry this bag?",
+        "Do you can carry",
+        false,
+        "Can you carry",
+        "Do not use do with can. Begin the question with Can."
+      ),
+      errorCorrectionItem(
+        "a1-8a-ec-3",
+        "Check the highlighted phrase.",
+        "You can't take photos in this room.",
+        "can't take",
+        true,
+        "",
+        "Correct! Can't can express that something is not permitted."
+      ),
+      wordOrderItem(
+        "a1-8a-wo-1",
+        "Put the words in the correct order.",
+        ["bag", "Can", "leave", "here", "my", "I"],
+        "Can I leave my bag here?",
+        "For a permission question, use can + subject + base verb."
+      ),
+      {
+        id: "a1-8a-dialogue-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with can, can't, and the base verbs in brackets.",
+        parts: [
+          "A: We need someone to take photos at the school event. ",
+          { gapId: "g1" },
+          " you ",
+          { gapId: "g2" },
+          " this camera? (use)\nB: Yes, I ",
+          { gapId: "g3" },
+          ". I have to leave at six, so I ",
+          { gapId: "g4" },
+          " stay later.\nA: That's fine. ",
+          { gapId: "g5" },
+          " your sister ",
+          { gapId: "g6" },
+          " us after six? (help)\nB: No, she ",
+          { gapId: "g7" },
+          ". She's working.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["Can"],
+            feedback: "Begin the question with Can."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["use"],
+            feedback: "Use the base verb use after can."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["can"],
+            feedback: "Use can in the positive short answer."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["can't", "cannot"],
+            feedback: "The speaker has to leave at six, so use can't."
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["Can"],
+            feedback: "Begin the question about the sister with Can."
+          },
+          {
+            id: "g6",
+            acceptedAnswers: ["help"],
+            feedback: "Use the base verb help after can."
+          },
+          {
+            id: "g7",
+            acceptedAnswers: ["can't", "cannot"],
+            feedback: "She is working, so use can't in the short answer."
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-8b-like-love-hate-ing",
+    title: "8B · Like, Love, and Hate + -ing",
+    shortDescription: "Use verb + -ing after like, love, and hate, with accurate spelling.",
+    levels: ["a1"],
+    intro:
+      "Choose the -ing form after like, love, and hate, then apply the spelling rules in questions and descriptions.",
+    items: [
+      multipleChoiceItem(
+        "a1-8b-mc-1",
+        "Choose the correct verb form.",
+        "I like ____ photos of city streets.",
+        ["taking", "take", "takes"],
+        0,
+        "Use verb + -ing after like."
+      ),
+      multipleChoiceItem(
+        "a1-8b-mc-2",
+        "Choose the correct verb form.",
+        "She loves ____ to podcasts on the bus.",
+        ["listen", "listens", "listening"],
+        2,
+        "Use verb + -ing after loves."
+      ),
+      multipleChoiceItem(
+        "a1-8b-mc-3",
+        "Choose the correct verb form.",
+        "We don't like ____ in long queues.",
+        ["wait", "waiting", "waits"],
+        1,
+        "Use verb + -ing after don't like."
+      ),
+      multipleChoiceItem(
+        "a1-8b-mc-4",
+        "Choose the correct -ing spelling.",
+        "dance → ____",
+        ["dancing", "danceing", "dancinng"],
+        0,
+        "Drop the final e before adding -ing: dance → dancing."
+      ),
+      multipleChoiceItem(
+        "a1-8b-mc-5",
+        "Choose the correct -ing spelling.",
+        "run → ____",
+        ["runing", "runinng", "running"],
+        2,
+        "Double the final consonant after one vowel: run → running."
+      ),
+      placeholderGapItem(
+        "a1-8b-gf-1",
+        "Complete the sentence with the -ing form of the verb.",
+        "He hates __________ wet clothes. (wear)",
+        "wearing",
+        [],
+        "Add -ing to wear: wearing."
+      ),
+      doubleGap(
+        "a1-8b-gf-2",
+        "Complete the sentence with the -ing forms in brackets.",
+        ["I love ", { gapId: "g1" }, ", but I don't like ", { gapId: "g2" }, " walls. (draw / paint)"],
+        ["drawing"],
+        ["painting"],
+        "Use the -ing form after love and don't like."
+      ),
+      errorCorrectionItem(
+        "a1-8b-ec-1",
+        "Check the highlighted phrase.",
+        "She likes cook for her friends.",
+        "likes cook",
+        false,
+        "likes cooking",
+        "Use the -ing form after likes."
+      ),
+      errorCorrectionItem(
+        "a1-8b-ec-2",
+        "Check the highlighted word.",
+        "They hate waitting for slow buses.",
+        "waitting",
+        false,
+        "waiting",
+        "Waiting has one t because wait does not end in one vowel + one consonant."
+      ),
+      errorCorrectionItem(
+        "a1-8b-ec-3",
+        "Check the highlighted phrase.",
+        "Mara loves dancing with her friends.",
+        "loves dancing",
+        true,
+        "",
+        "Correct! Use the -ing form after loves."
+      ),
+      wordOrderItem(
+        "a1-8b-wo-1",
+        "Put the words in the correct order.",
+        ["playing", "What", "like", "games", "you", "do"],
+        "What games do you like playing?",
+        "Use like + -ing in the present-simple question."
+      ),
+      {
+        id: "a1-8b-profile-1",
+        type: "gap-fill",
+        prompt: "Complete the description with the -ing forms of the verbs.",
+        parts: [
+          "On Saturdays, Ken loves ",
+          { gapId: "g1" },
+          " in the morning. He likes ",
+          { gapId: "g2" },
+          " friends for lunch, but he hates ",
+          { gapId: "g3" },
+          ". In the evening, he likes ",
+          { gapId: "g4" },
+          " films. (cycle / meet / shop / watch)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["cycling"],
+            feedback: "Drop the final e before adding -ing: cycle → cycling."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["meeting"],
+            feedback: "Add -ing to meet: meeting."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["shopping"],
+            feedback: "Double the final p before adding -ing: shop → shopping."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["watching"],
+            feedback: "Add -ing to watch: watching."
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-9a-present-continuous",
+    title: "9A · Present Continuous",
+    shortDescription: "Describe actions happening now with be and the -ing form.",
+    levels: ["a1"],
+    intro:
+      "Build present-continuous statements, negatives, questions, and short answers, with careful attention to be and -ing spelling.",
+    items: [
+      multipleChoiceItem(
+        "a1-9a-mc-1",
+        "Choose the correct verb form.",
+        "The children ____ in the garden right now.",
+        ["play", "are playing", "plays"],
+        1,
+        "Use are + verb-ing with the plural subject the children."
+      ),
+      multipleChoiceItem(
+        "a1-9a-mc-2",
+        "Choose the correct verb form.",
+        "I ____ for the train at the moment.",
+        ["waiting", "wait", "am waiting"],
+        2,
+        "Use am + verb-ing with I."
+      ),
+      placeholderGapItem(
+        "a1-9a-gf-1",
+        "Complete the sentence with the correct form of the verb in brackets.",
+        "Leo __________ his bicycle now. (repair)",
+        "is repairing",
+        ["'s repairing"],
+        "Use is + repairing for an action happening now."
+      ),
+      multipleChoiceItem(
+        "a1-9a-mc-3",
+        "Choose the correct negative form.",
+        "Mina ____ today because she is ill.",
+        ["isn't working", "doesn't working", "not working"],
+        0,
+        "Use isn't + verb-ing with she."
+      ),
+      placeholderGapItem(
+        "a1-9a-gf-2",
+        "Complete the sentence with the correct form of the verb in brackets.",
+        "We __________ dinner at the moment. (make)",
+        "are making",
+        ["'re making"],
+        "Use are + making with we. Drop the final e before adding -ing."
+      ),
+      multipleChoiceItem(
+        "a1-9a-mc-4",
+        "Choose the correct -ing form.",
+        "swim → ____",
+        ["swiming", "swimming", "swims"],
+        1,
+        "Double the final consonant before adding -ing: swim → swimming."
+      ),
+      multipleChoiceItem(
+        "a1-9a-mc-5",
+        "Choose the correct form of be.",
+        "____ your parents travelling today?",
+        ["Is", "Do", "Are"],
+        2,
+        "Put are before the plural subject your parents."
+      ),
+      doubleGap(
+        "a1-9a-gf-3",
+        "Complete the question. Use the verb in brackets.",
+        ["", { gapId: "g1" }, " Noah ", { gapId: "g2" }, " his room? (paint)"],
+        ["Is"],
+        ["painting"],
+        "Use is before Noah and the -ing form painting after the subject."
+      ),
+      multipleChoiceItem(
+        "a1-9a-mc-6",
+        "Choose the correct form of be.",
+        "Why ____ Ella crying?",
+        ["does", "is", "are"],
+        1,
+        "Use is with Ella in a present-continuous question."
+      ),
+      doubleGap(
+        "a1-9a-gf-4",
+        "Complete the question. Use the verb in brackets.",
+        ["What ", { gapId: "g1" }, " you ", { gapId: "g2" }, "? (cook)"],
+        ["are"],
+        ["cooking"],
+        "Use question word + are + subject + verb-ing."
+      ),
+      multipleChoiceItem(
+        "a1-9a-mc-7",
+        "Choose the best short answer.",
+        "Are they waiting outside?",
+        ["Yes, they are.", "Yes, they're.", "Yes, they do."],
+        0,
+        "Use are in the short answer, without a contraction."
+      ),
+      errorCorrectionItem(
+        "a1-9a-ec-1",
+        "Check the highlighted phrase.",
+        "He watching a video in his room.",
+        "He watching",
+        false,
+        ["He is watching", "He's watching"],
+        "The present continuous needs be: He is watching or He's watching."
+      ),
+      errorCorrectionItem(
+        "a1-9a-ec-2",
+        "Check the highlighted word.",
+        "I am writeing an email to my cousin.",
+        "writeing",
+        false,
+        "writing",
+        "Drop the final e before adding -ing: write → writing."
+      ),
+      errorCorrectionItem(
+        "a1-9a-ec-3",
+        "Check the highlighted phrase.",
+        "The dogs aren't sleeping in the kitchen.",
+        "aren't sleeping",
+        true,
+        "",
+        "Correct! Use aren't + verb-ing with a plural subject."
+      ),
+      wordOrderItem(
+        "a1-9a-wo-1",
+        "Put the words in the correct order.",
+        ["to", "She", "her", "is", "manager", "talking"],
+        "She is talking to her manager.",
+        "The order is subject + be + verb-ing."
+      ),
+      wordOrderItem(
+        "a1-9a-wo-2",
+        "Put the words in the correct order.",
+        ["today", "not", "We", "the", "are", "car", "using"],
+        "We are not using the car today.",
+        "Put not after be in a negative present-continuous sentence."
+      ),
+      wordOrderItem(
+        "a1-9a-wo-3",
+        "Put the words in the correct order.",
+        ["looking", "What", "you", "at", "are"],
+        "What are you looking at?",
+        "Use question word + be + subject + verb-ing."
+      ),
+      {
+        id: "a1-9a-scene-1",
+        type: "gap-fill",
+        prompt: "Complete the scene. Use the base verb in brackets where shown.",
+        parts: [
+          "It is 8:00. Theo ",
+          { gapId: "g1" },
+          " his bag. (pack)\nHis sister ",
+          { gapId: "g2" },
+          " the tickets. (check)\nThey ",
+          { gapId: "g3" },
+          " the house yet. (leave)\n",
+          { gapId: "g4" },
+          " their parents ",
+          { gapId: "g5" },
+          " in the car? (wait)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["is packing", "'s packing"],
+            feedback: "Use is + packing with Theo.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["is checking", "'s checking"],
+            feedback: "Use is + checking with his sister.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["aren't leaving", "are not leaving"],
+            feedback: "Yet and the context show that they are not leaving now.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["Are"],
+            feedback: "Begin the question about the plural subject their parents with Are.",
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["waiting"],
+            feedback: "Use the -ing form waiting after are and the subject.",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-9b-present-continuous-or-simple",
+    title: "9B · Present Continuous or Present Simple?",
+    shortDescription: "Choose between routines and actions happening now or today.",
+    levels: ["a1"],
+    intro:
+      "Use the present simple for usual actions and the present continuous for actions happening now or around today.",
+    items: [
+      multipleChoiceItem(
+        "a1-9b-mc-1",
+        "Choose the correct verb form.",
+        "Nico ____ breakfast at home every weekday.",
+        ["is having", "has", "having"],
+        1,
+        "Every weekday describes a routine, so use the present simple."
+      ),
+      multipleChoiceItem(
+        "a1-9b-mc-2",
+        "Choose the correct verb form.",
+        "Be quiet! The baby ____.",
+        ["sleeps", "sleep", "is sleeping"],
+        2,
+        "The action is happening now, so use the present continuous."
+      ),
+      placeholderGapItem(
+        "a1-9b-gf-1",
+        "Complete the sentence with the correct form of the verb in brackets.",
+        "I usually __________ lunch at about one o'clock. (eat)",
+        "eat",
+        [],
+        "Usually signals a routine, so use the present simple."
+      ),
+      placeholderGapItem(
+        "a1-9b-gf-2",
+        "Complete the sentence with the correct form of the verb in brackets.",
+        "Please call later. I __________ a customer right now. (help)",
+        "am helping",
+        ["'m helping"],
+        "Right now signals the present continuous."
+      ),
+      multipleChoiceItem(
+        "a1-9b-mc-3",
+        "Choose the sentence about a usual habit.",
+        "Which sentence describes a routine?",
+        ["We often take the early train.", "We're taking the early train today.", "We're on the early train now."],
+        0,
+        "Often describes a repeated habit, so use the present simple."
+      ),
+      multipleChoiceItem(
+        "a1-9b-mc-4",
+        "Choose the sentence about today.",
+        "Which sentence describes a temporary action?",
+        ["I work at the front desk every day.", "I usually work upstairs.", "I'm working at the front desk today."],
+        2,
+        "Today can describe a temporary action happening around now."
+      ),
+      doubleGap(
+        "a1-9b-gf-3",
+        "Complete each gap with the correct form of the base verb beside it.",
+        ["Lina usually ", { gapId: "g1" }, " to work. (drive) But today she ", { gapId: "g2" }, " the bus. (take)"],
+        ["drives"],
+        ["is taking", "'s taking"],
+        "Use the present simple for the usual action and the present continuous for today."
+      ),
+      multipleChoiceItem(
+        "a1-9b-mc-5",
+        "Choose the time expression that best completes the sentence.",
+        "Sam is wearing a suit ____.",
+        ["every Monday", "at the moment", "usually"],
+        1,
+        "At the moment matches the present continuous."
+      ),
+      multipleChoiceItem(
+        "a1-9b-mc-6",
+        "Choose the correct verb form.",
+        "My parents never ____ coffee after dinner.",
+        ["drink", "are drinking", "drinks"],
+        0,
+        "Never describes a usual pattern, so use the present simple."
+      ),
+      errorCorrectionItem(
+        "a1-9b-ec-1",
+        "Check the highlighted phrase.",
+        "Ella is usually walking to college.",
+        "is usually walking",
+        false,
+        "usually walks",
+        "Use the present simple for a usual action."
+      ),
+      errorCorrectionItem(
+        "a1-9b-ec-2",
+        "Check the highlighted phrase.",
+        "Look outside! It rains heavily.",
+        "rains",
+        false,
+        "is raining",
+        "The action is happening now, so use is raining."
+      ),
+      errorCorrectionItem(
+        "a1-9b-ec-3",
+        "Check the highlighted phrase.",
+        "We don't normally open on Sundays.",
+        "don't normally open",
+        true,
+        "",
+        "Correct! Normally describes a routine, so the present simple is appropriate."
+      ),
+      wordOrderItem(
+        "a1-9b-wo-1",
+        "Put the words in the correct order.",
+        ["after", "usually", "work", "They", "exercise"],
+        "They usually exercise after work.",
+        "Use the present simple and put usually before the main verb."
+      ),
+      wordOrderItem(
+        "a1-9b-wo-2",
+        "Put the words in the correct order.",
+        ["this", "with", "staying", "week", "I'm", "friends"],
+        "I'm staying with friends this week.",
+        "This week describes a temporary situation, so use the present continuous."
+      ),
+      multipleChoiceItem(
+        "a1-9b-mc-7",
+        "Choose the correct question.",
+        "You want to ask about Kim's usual journey to work.",
+        ["Is Kim going to work?", "Kim goes to work by bus?", "Does Kim go to work by bus?"],
+        2,
+        "Use does + base verb to ask about a usual action."
+      ),
+      multipleChoiceItem(
+        "a1-9b-mc-8",
+        "Choose the correct question.",
+        "You can hear music and want to know about it now.",
+        ["Do they play music?", "Are they playing music?", "They are playing music?"],
+        1,
+        "Use are + subject + verb-ing for an action happening now."
+      ),
+      {
+        id: "a1-9b-dialogue-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation. Use the base verb in brackets where shown.",
+        parts: [
+          "A: Where ",
+          { gapId: "g1" },
+          " you usually ",
+          { gapId: "g2" },
+          " after class? (go)\nB: I usually go home, but today I ",
+          { gapId: "g3" },
+          " for a friend. (wait)\nA: ",
+          { gapId: "g4" },
+          " she ",
+          { gapId: "g5" },
+          " here now? (come)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["do"],
+            feedback: "Use do before you in a present-simple question.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["go"],
+            feedback: "Use the base verb go after the subject."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["am waiting", "'m waiting"],
+            feedback: "Today shows a temporary action, so use am waiting.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["Is"],
+            feedback: "Begin the present-continuous question about she with Is.",
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["coming"],
+            feedback: "Use coming after is and the subject."
+          },
+        ],
+      },
+      {
+        id: "a1-9b-routine-now-1",
+        type: "gap-fill",
+        prompt: "Complete the description. Use the correct form of each base verb in brackets.",
+        parts: [
+          "Ravi usually ",
+          { gapId: "g1" },
+          " in a shop. (work)\nHe ",
+          { gapId: "g2" },
+          " a dark uniform there. (wear)\nThis week he ",
+          { gapId: "g3" },
+          " his sister at her café. (help)\nToday he ",
+          { gapId: "g4" },
+          " food to customers. (serve)\nHis usual uniform is at home, so he ",
+          { gapId: "g5" },
+          " it today. (wear)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["works"],
+            feedback: "Usually signals the present simple: Ravi works."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["wears"],
+            feedback: "This is part of his usual work routine, so use wears."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["is helping", "'s helping"],
+            feedback: "This week describes a temporary action, so use is helping."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["is serving", "'s serving"],
+            feedback: "Today describes what is happening now, so use is serving."
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["isn't wearing", "is not wearing"],
+            feedback: "Today contrasts with his usual routine, so use isn't wearing."
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-10a-there-is-there-are",
+    title: "10A · There Is, There Are, Some, and Any",
+    shortDescription: "Say what is in a place and use some and any with plural nouns.",
+    levels: ["a1"],
+    intro:
+      "Practise singular and plural forms of there is and there are, then use some and any in statements, negatives, and questions.",
+    items: [
+      multipleChoiceItem(
+        "a1-10a-mc-1",
+        "Choose the correct form.",
+        "____ a notice beside the entrance.",
+        ["There are", "There is", "Are there"],
+        1,
+        "Use there is before one singular thing."
+      ),
+      multipleChoiceItem(
+        "a1-10a-mc-2",
+        "Choose the correct form.",
+        "____ three clean glasses on the shelf.",
+        ["There's", "There isn't", "There are"],
+        2,
+        "Use there are before a plural noun."
+      ),
+      multipleChoiceItem(
+        "a1-10a-mc-3",
+        "Choose the correct word.",
+        "There are ____ cushions on the sofa.",
+        ["some", "any", "a"],
+        0,
+        "Use some with a plural noun in an affirmative sentence."
+      ),
+      multipleChoiceItem(
+        "a1-10a-mc-4",
+        "Choose the correct word.",
+        "There aren't ____ clean plates.",
+        ["some", "a", "any"],
+        2,
+        "Use any with a plural noun in a negative sentence."
+      ),
+      multipleChoiceItem(
+        "a1-10a-mc-5",
+        "Choose the correct word.",
+        "Are there ____ lockers near the office?",
+        ["any", "some", "a"],
+        0,
+        "Use any with a plural noun in a question."
+      ),
+      placeholderGapItem(
+        "a1-10a-gf-1",
+        "Complete the sentence.",
+        "__________ a small balcony outside my room.",
+        "There is",
+        ["There's"],
+        "Use there is or there's before one singular thing."
+      ),
+      placeholderGapItem(
+        "a1-10a-gf-2",
+        "Complete the sentence.",
+        "__________ two messages for you on the desk.",
+        "There are",
+        [],
+        "Use there are before the plural noun messages."
+      ),
+      doubleGap(
+        "a1-10a-gf-3",
+        "Complete the two negative sentences.",
+        ["", { gapId: "g1" }, " a printer in this office. ", { gapId: "g2" }, " any computers here either."],
+        ["There isn't", "There is not"],
+        ["There aren't", "There are not"],
+        "Use there isn't with one thing and there aren't with plural things."
+      ),
+      multipleChoiceItem(
+        "a1-10a-mc-6",
+        "Choose the correct question.",
+        "You want to know if the building has a lift.",
+        ["Are there a lift?", "Is there a lift?", "There is a lift?"],
+        1,
+        "Put is before there when asking about one thing."
+      ),
+      multipleChoiceItem(
+        "a1-10a-mc-7",
+        "Choose the best short answer.",
+        "Are there any cafés near the station?",
+        ["Yes, there are.", "Yes, there is.", "Yes, they're."],
+        0,
+        "Answer a plural there are question with Yes, there are."
+      ),
+      doubleGap(
+        "a1-10a-gf-4",
+        "Complete the question and short answer.",
+        ["", { gapId: "g1" }, " any towels in the bathroom? No, ", { gapId: "g2" }, "."],
+        ["Are there"],
+        ["there aren't", "there are not"],
+        "Use Are there for the plural question and there aren't in the negative short answer."
+      ),
+      errorCorrectionItem(
+        "a1-10a-ec-1",
+        "Check the highlighted phrase.",
+        "There are a sofa under the window.",
+        "There are",
+        false,
+        "There is",
+        "Use there is before the singular noun a sofa."
+      ),
+      errorCorrectionItem(
+        "a1-10a-ec-2",
+        "Check the highlighted word.",
+        "There aren't some bins in this street.",
+        "some",
+        false,
+        "any",
+        "Use any, not some, in a negative sentence."
+      ),
+      errorCorrectionItem(
+        "a1-10a-ec-3",
+        "Check the highlighted question.",
+        "Is there a pharmacy near here?",
+        "Is there a pharmacy",
+        true,
+        "",
+        "Correct! Use Is there to ask about one place or thing."
+      ),
+      wordOrderItem(
+        "a1-10a-wo-1",
+        "Put the words in the correct order.",
+        ["on", "a", "There", "is", "floor", "the", "lamp"],
+        "There is a lamp on the floor.",
+        "Begin with there is, then add the singular noun phrase."
+      ),
+      wordOrderItem(
+        "a1-10a-wo-2",
+        "Put the words in the correct order.",
+        ["any", "park", "Are", "trees", "the", "there", "in"],
+        "Are there any trees in the park?",
+        "Use Are there any + plural noun in a question."
+      ),
+      placeholderChoiceGapItem(
+        "a1-10a-cg-1",
+        "Choose some or any for each gap.",
+        "There are ____ plants by the window. There aren't ____ plants by the door. Are there ____ plants upstairs?",
+        ["some", "any", "any"],
+        "Use some in an affirmative sentence and any in negatives and questions.",
+        ["some", "any"]
+      ),
+      {
+        id: "a1-10a-classroom-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation about the new classroom.",
+        parts: [
+          "A: Is the new classroom ready?\nB: Yes. ",
+          { gapId: "g1" },
+          " a large screen, and ",
+          { gapId: "g2" },
+          " some tables. But ",
+          { gapId: "g3" },
+          " any chairs yet.\nA: ",
+          { gapId: "g4" },
+          " any windows?\nB: Yes, ",
+          { gapId: "g5" },
+          ".",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["There is", "There's"],
+            feedback: "Use there is before the singular noun a screen."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["there are"],
+            feedback: "Use there are before the plural noun tables."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["there aren't", "there are not"],
+            feedback: "Use there aren't before any chairs."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["Are there"],
+            feedback: "Begin the plural question with Are there."
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["there are"],
+            feedback: "Use there are in a positive short answer."
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-10b-past-simple-be",
+    title: "10B · Past Simple: Be",
+    shortDescription: "Use was and were in past statements, negatives, questions, and short answers.",
+    levels: ["a1"],
+    intro:
+      "Move from was and were in simple past statements to negatives, questions, short answers, and there was or there were.",
+    items: [
+      multipleChoiceItem(
+        "a1-10b-mc-1",
+        "Choose the correct past form of be.",
+        "I ____ at the dentist yesterday morning.",
+        ["was", "were", "am"],
+        0,
+        "Use was with I in the past."
+      ),
+      multipleChoiceItem(
+        "a1-10b-mc-2",
+        "Choose the correct past form of be.",
+        "The shops ____ very busy last Saturday.",
+        ["was", "are", "were"],
+        2,
+        "Use were with the plural subject the shops."
+      ),
+      multipleChoiceItem(
+        "a1-10b-mc-3",
+        "Choose the correct negative form.",
+        "Ben ____ at training last night because he was ill.",
+        ["weren't", "wasn't", "isn't"],
+        1,
+        "Use wasn't with Ben in the past."
+      ),
+      multipleChoiceItem(
+        "a1-10b-mc-4",
+        "Choose the correct negative form.",
+        "We ____ ready when the taxi arrived.",
+        ["weren't", "wasn't", "aren't"],
+        0,
+        "Use weren't with we in the past."
+      ),
+      placeholderGapItem(
+        "a1-10b-gf-1",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "Kai __________ at the library yesterday afternoon. (be)",
+        "was",
+        [],
+        "Use was with one person in the past."
+      ),
+      placeholderGapItem(
+        "a1-10b-gf-2",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "My gloves __________ under the seat this morning. (be)",
+        "were",
+        [],
+        "Use were with the plural noun gloves."
+      ),
+      doubleGap(
+        "a1-10b-gf-3",
+        "Complete the question and short answer with the past form of be.",
+        ["", { gapId: "g1" }, " the clinic open yesterday? No, it ", { gapId: "g2" }, "."],
+        ["Was"],
+        ["wasn't", "was not"],
+        "Use was in the question and wasn't in the negative short answer."
+      ),
+      multipleChoiceItem(
+        "a1-10b-mc-5",
+        "Choose the correct question.",
+        "____ your keys in your coat pocket?",
+        ["Was", "Were", "Are"],
+        1,
+        "Use were before the plural subject your keys."
+      ),
+      multipleChoiceItem(
+        "a1-10b-mc-6",
+        "Choose the best short answer.",
+        "Was Eva at the meeting?",
+        ["Yes, she were.", "Yes, she's.", "Yes, she was."],
+        2,
+        "Use was in the positive short answer."
+      ),
+      doubleGap(
+        "a1-10b-gf-4",
+        "Complete both gaps with the past form of the verb in brackets.",
+        ["Where ", { gapId: "g1" }, " you last night? (be) I ", { gapId: "g2" }, " at my cousin's house. (be)"],
+        ["were"],
+        ["was"],
+        "Use were with you and was with I."
+      ),
+      placeholderGapItem(
+        "a1-10b-gf-5",
+        "Complete the sentence.",
+        "__________ a power cut in our street last night.",
+        "There was",
+        [],
+        "Use there was before one past event or thing."
+      ),
+      placeholderGapItem(
+        "a1-10b-gf-6",
+        "Complete the sentence.",
+        "__________ several empty seats near the front.",
+        "There were",
+        [],
+        "Use there were before a plural noun in the past."
+      ),
+      errorCorrectionItem(
+        "a1-10b-ec-1",
+        "Check the highlighted word.",
+        "You was very quiet at lunch.",
+        "was",
+        false,
+        "were",
+        "Use were with you in the past."
+      ),
+      errorCorrectionItem(
+        "a1-10b-ec-2",
+        "Check the highlighted phrase.",
+        "Were Ben at work yesterday?",
+        "Were Ben",
+        false,
+        "Was Ben",
+        "Use was with the singular subject Ben."
+      ),
+      errorCorrectionItem(
+        "a1-10b-ec-3",
+        "Check the highlighted phrase.",
+        "There weren't any buses after midnight.",
+        "There weren't",
+        true,
+        "",
+        "Correct! Use there weren't before a plural noun in a past negative sentence."
+      ),
+      wordOrderItem(
+        "a1-10b-wo-1",
+        "Put the words in the correct order.",
+        ["the", "They", "at", "concert", "were", "last", "night"],
+        "They were at the concert last night.",
+        "Use subject + were + place + past time expression."
+      ),
+      wordOrderItem(
+        "a1-10b-wo-2",
+        "Put the words in the correct order.",
+        ["there", "Was", "near", "hotel", "the", "a", "beach"],
+        "Was there a beach near the hotel?",
+        "Put was before there to make a singular question about the past."
+      ),
+      {
+        id: "a1-10b-weekend-1",
+        type: "gap-fill",
+        prompt: "Complete each gap with the correct past form of the verb be.",
+        parts: [
+          "Last weekend ",
+          { gapId: "g1" },
+          " very busy. (be)\nMy parents ",
+          { gapId: "g2" },
+          " at home on Saturday. (be)\nI ",
+          { gapId: "g3" },
+          " with them (be) because I ",
+          { gapId: "g4" },
+          " at work. (be)\n",
+          { gapId: "g5" },
+          " they free on Sunday? (be)\nNo, they ",
+          { gapId: "g6" },
+          ". (be)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["was"],
+            feedback: "Use was with the singular subject last weekend."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["were"],
+            feedback: "Use were with my parents."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["wasn't", "was not"],
+            feedback: "The sentence gives a contrasting reason, so use wasn't."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["was"],
+            feedback: "Use was with I."
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["Were"],
+            feedback: "Begin the question about they with Were."
+          },
+          {
+            id: "g6",
+            acceptedAnswers: ["weren't", "were not"],
+            feedback: "Use weren't in the negative short answer."
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-11a-past-simple-regular-verbs",
+    title: "11A · Past Simple: Regular Verbs",
+    shortDescription: "Use regular past forms in statements, negatives, questions, and short answers.",
+    levels: ["a1"],
+    intro:
+      "Practise regular -ed spelling, then use did and didn't with the base verb in past-simple questions and negatives.",
+    items: [
+      multipleChoiceItem(
+        "a1-11a-mc-1",
+        "Choose the correct past form.",
+        "clean → ____",
+        ["cleant", "cleaned", "cleanid"],
+        1,
+        "Most regular verbs form the past with -ed: clean → cleaned."
+      ),
+      multipleChoiceItem(
+        "a1-11a-mc-2",
+        "Choose the correct past form.",
+        "move → ____",
+        ["moveed", "movved", "moved"],
+        2,
+        "For a verb ending in e, add -d: move → moved."
+      ),
+      multipleChoiceItem(
+        "a1-11a-mc-3",
+        "Choose the correct past form.",
+        "carry → ____",
+        ["carried", "carryed", "carrid"],
+        0,
+        "After a consonant + y, change y to i and add -ed."
+      ),
+      multipleChoiceItem(
+        "a1-11a-mc-4",
+        "Choose the correct past form.",
+        "plan → ____",
+        ["planed", "planned", "planied"],
+        1,
+        "Double the final consonant before adding -ed: plan → planned."
+      ),
+      placeholderGapItem(
+        "a1-11a-gf-1",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "We __________ a small castle on Sunday. (visit)",
+        "visited",
+        [],
+        "Add -ed to the regular verb visit."
+      ),
+      placeholderGapItem(
+        "a1-11a-gf-2",
+        "Complete the negative sentence with the verb in brackets.",
+        "Maya __________ the report yesterday. (not finish)",
+        "didn't finish",
+        ["did not finish"],
+        "Use didn't + the base verb finish."
+      ),
+      multipleChoiceItem(
+        "a1-11a-mc-5",
+        "Choose the correct auxiliary.",
+        "____ you call the hotel yesterday?",
+        ["Was", "Did", "Do"],
+        1,
+        "Use did to make a past-simple question."
+      ),
+      multipleChoiceItem(
+        "a1-11a-mc-6",
+        "Choose the correct verb form.",
+        "Did the shop ____ on time this morning?",
+        ["open", "opens", "opened"],
+        0,
+        "Use the base verb after did."
+      ),
+      multipleChoiceItem(
+        "a1-11a-mc-7",
+        "Choose the best short answer.",
+        "Did Amir text you last night?",
+        ["No, he wasn't.", "No, he doesn't.", "No, he didn't."],
+        2,
+        "Use didn't in a negative short answer to a did question."
+      ),
+      doubleGap(
+        "a1-11a-gf-3",
+        "Complete the question and short answer. Use the verb in brackets.",
+        ["", { gapId: "g1" }, " Ada ", { gapId: "g2" }, " you after class? No, she didn't. (phone)"],
+        ["Did"],
+        ["phone"],
+        "Use did before the subject and the base verb phone after it."
+      ),
+      errorCorrectionItem(
+        "a1-11a-ec-1",
+        "Check the highlighted phrase.",
+        "We didn't watched the match last night.",
+        "didn't watched",
+        false,
+        "didn't watch",
+        "Use the base verb after didn't."
+      ),
+      errorCorrectionItem(
+        "a1-11a-ec-2",
+        "Check the highlighted word.",
+        "They planed a picnic for Saturday.",
+        "planed",
+        false,
+        "planned",
+        "Double the final consonant before adding -ed: planned."
+      ),
+      errorCorrectionItem(
+        "a1-11a-ec-3",
+        "Check the highlighted phrase.",
+        "The children played in the garden after lunch.",
+        "played",
+        true,
+        "",
+        "Correct! Played is the regular past form of play."
+      ),
+      wordOrderItem(
+        "a1-11a-wo-1",
+        "Put the words in the correct order.",
+        ["evening", "called", "yesterday", "I", "my", "aunt"],
+        "I called my aunt yesterday evening.",
+        "Use the regular past form called before the object."
+      ),
+      wordOrderItem(
+        "a1-11a-wo-2",
+        "Put the words in the correct order.",
+        ["door", "didn't", "They", "the", "close"],
+        "They didn't close the door.",
+        "Use didn't + base verb in a past negative sentence."
+      ),
+      wordOrderItem(
+        "a1-11a-wo-3",
+        "Put the words in the correct order.",
+        ["arrive", "train", "the", "Did", "late"],
+        "Did the train arrive late?",
+        "Use did + subject + base verb in a past question."
+      ),
+      {
+        id: "a1-11a-diary-1",
+        type: "gap-fill",
+        prompt: "Complete each gap with the past form of the base verb in brackets.",
+        parts: [
+          "On Saturday, Leila ",
+          { gapId: "g1" },
+          " her grandmother. (visit)\nThey ",
+          { gapId: "g2" },
+          " lunch together. (cook)\nAfter lunch, they ",
+          { gapId: "g3" },
+          " through the park. (walk)\nIt ",
+          { gapId: "g4" },
+          " to rain. (start)\nSo they ",
+          { gapId: "g5" },
+          " home. (hurry)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["visited"],
+            feedback: "Add -ed to visit: visited."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["cooked"],
+            feedback: "Add -ed to cook: cooked."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["walked"],
+            feedback: "Add -ed to walk: walked."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["started"],
+            feedback: "Add -ed to start: started."
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["hurried"],
+            feedback: "Change the final y to i and add -ed: hurried."
+          },
+        ],
+      },
+      {
+        id: "a1-11a-dialogue-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation. Use the base verb in brackets where shown.",
+        parts: [
+          "A: ",
+          { gapId: "g1" },
+          " you ",
+          { gapId: "g2" },
+          " the concert? (enjoy)\nB: Yes, I ",
+          { gapId: "g3" },
+          ".\nA: ",
+          { gapId: "g4" },
+          " the band ",
+          { gapId: "g5" },
+          " late? (finish)\nB: No, they ",
+          { gapId: "g6" },
+          ".",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["Did"],
+            feedback: "Begin the past-simple question with Did."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["enjoy"],
+            feedback: "Use the base verb enjoy after did."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["did"],
+            feedback: "Use did in a positive short answer."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["Did"],
+            feedback: "Begin the second past-simple question with Did."
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["finish"],
+            feedback: "Use the base verb finish after did."
+          },
+          {
+            id: "g6",
+            acceptedAnswers: ["didn't", "did not"],
+            feedback: "Use didn't in a negative short answer."
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-11b-past-simple-irregular-get-go-have-do",
+    title: "11B · Past Simple: Get, Go, Have, and Do",
+    shortDescription: "Use four common irregular past forms and build questions and negatives with did.",
+    levels: ["a1"],
+    intro:
+      "Learn got, went, had, and did, then keep the base verb after did and didn't in questions and negatives.",
+    items: [
+      multipleChoiceItem(
+        "a1-11b-mc-1",
+        "Choose the correct past form.",
+        "get → ____",
+        ["getted", "got", "get"],
+        1,
+        "The past form of get is got."
+      ),
+      multipleChoiceItem(
+        "a1-11b-mc-2",
+        "Choose the correct past form.",
+        "go → ____",
+        ["goed", "go", "went"],
+        2,
+        "The past form of go is went."
+      ),
+      multipleChoiceItem(
+        "a1-11b-mc-3",
+        "Choose the correct past form.",
+        "have → ____",
+        ["had", "haved", "has"],
+        0,
+        "The past form of have is had."
+      ),
+      multipleChoiceItem(
+        "a1-11b-mc-4",
+        "Choose the correct past form.",
+        "do → ____",
+        ["done", "did", "doed"],
+        1,
+        "The past form of do is did."
+      ),
+      placeholderGapItem(
+        "a1-11b-gf-1",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "I __________ home just before midnight. (get)",
+        "got",
+        [],
+        "Use the irregular past form got."
+      ),
+      placeholderGapItem(
+        "a1-11b-gf-2",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "Rosa __________ to the market before lunch. (go)",
+        "went",
+        [],
+        "Use the irregular past form went."
+      ),
+      placeholderGapItem(
+        "a1-11b-gf-3",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "We __________ soup and bread for dinner. (have)",
+        "had",
+        [],
+        "Use the irregular past form had."
+      ),
+      placeholderGapItem(
+        "a1-11b-gf-4",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "The children __________ their homework before the film. (do)",
+        "did",
+        [],
+        "Use the irregular past form did."
+      ),
+      multipleChoiceItem(
+        "a1-11b-mc-5",
+        "Choose the correct negative form.",
+        "Luca ____ to the gym yesterday.",
+        ["didn't went", "not went", "didn't go"],
+        2,
+        "Use didn't + the base verb go."
+      ),
+      multipleChoiceItem(
+        "a1-11b-mc-6",
+        "Choose the correct negative form.",
+        "We ____ time for breakfast this morning.",
+        ["didn't have", "didn't had", "not had"],
+        0,
+        "Use didn't + the base verb have."
+      ),
+      multipleChoiceItem(
+        "a1-11b-mc-7",
+        "Choose the correct auxiliary.",
+        "____ you get my message last night?",
+        ["Does", "Did", "Was"],
+        1,
+        "Use did to make a past-simple question."
+      ),
+      multipleChoiceItem(
+        "a1-11b-mc-8",
+        "Choose the correct verb form.",
+        "Where did your friends ____ after dinner?",
+        ["went", "goed", "go"],
+        2,
+        "Use the base verb go after did."
+      ),
+      multipleChoiceItem(
+        "a1-11b-mc-9",
+        "Choose the best short answer.",
+        "Did Sara do the shopping?",
+        ["Yes, she did.", "Yes, she was.", "Yes, she done."],
+        0,
+        "Use did in a positive short answer."
+      ),
+      errorCorrectionItem(
+        "a1-11b-ec-1",
+        "Check the highlighted phrase.",
+        "I didn't went out on Friday.",
+        "didn't went",
+        false,
+        "didn't go",
+        "Use the base verb go after didn't."
+      ),
+      errorCorrectionItem(
+        "a1-11b-ec-2",
+        "Check the highlighted phrase.",
+        "Did Leo had lunch at home?",
+        "Did Leo had",
+        false,
+        "Did Leo have",
+        "Use the base verb have after did."
+      ),
+      errorCorrectionItem(
+        "a1-11b-ec-3",
+        "Check the highlighted phrase.",
+        "We did the shopping after work.",
+        "did the shopping",
+        true,
+        "",
+        "Correct! Did is the irregular past form of do."
+      ),
+      wordOrderItem(
+        "a1-11b-wo-1",
+        "Put the words in the correct order.",
+        ["morning", "Nina", "a", "had", "busy"],
+        "Nina had a busy morning.",
+        "Use had as the past form of have."
+      ),
+      wordOrderItem(
+        "a1-11b-wo-2",
+        "Put the words in the correct order.",
+        ["weekend", "Where", "they", "go", "did", "the", "at"],
+        "Where did they go at the weekend?",
+        "Use question word + did + subject + base verb."
+      ),
+      {
+        id: "a1-11b-day-1",
+        type: "gap-fill",
+        prompt: "Complete each gap with the correct past form. Use the base verb in brackets where shown.",
+        parts: [
+          "Yesterday I ",
+          { gapId: "g1" },
+          " up late. (get)\nI ",
+          { gapId: "g2" },
+          " breakfast because I was in a hurry. (not have)\nI ",
+          { gapId: "g3" },
+          " to work by taxi. (go)\nAt lunch, I ",
+          { gapId: "g4" },
+          " a sandwich. (have)\nAfter work, I ",
+          { gapId: "g5" },
+          " the shopping. (do)\n",
+          { gapId: "g6" },
+          " I ",
+          { gapId: "g7" },
+          " to bed early? (go) No, I ",
+          { gapId: "g8" },
+          ".",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["got"],
+            feedback: "Use got, the past form of get."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["didn't have", "did not have"],
+            feedback: "The reason shows a negative, so use didn't have."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["went"],
+            feedback: "Use went, the past form of go."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["had"],
+            feedback: "Use had, the past form of have."
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["did"],
+            feedback: "Use did, the past form of do."
+          },
+          {
+            id: "g6",
+            acceptedAnswers: ["Did"],
+            feedback: "Begin the past-simple question with Did."
+          },
+          {
+            id: "g7",
+            acceptedAnswers: ["go"],
+            feedback: "Use the base verb go after did."
+          },
+          {
+            id: "g8",
+            acceptedAnswers: ["didn't", "did not"],
+            feedback: "Use didn't in the negative short answer."
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-12a-past-simple-regular-irregular",
+    title: "12A · Past Simple: Regular and Irregular Verbs",
+    shortDescription: "Combine past be with regular and irregular past-simple forms.",
+    levels: ["a1"],
+    intro:
+      "Review was and were, build regular and irregular past forms, and use did or didn't with the base verb.",
+    items: [
+      multipleChoiceItem(
+        "a1-12a-mc-1",
+        "Choose the correct past form.",
+        "The roads ____ very quiet after the storm.",
+        ["was", "were", "did"],
+        1,
+        "Use were with the plural subject the roads."
+      ),
+      multipleChoiceItem(
+        "a1-12a-mc-2",
+        "Choose the correct past form.",
+        "close → ____",
+        ["closd", "closeed", "closed"],
+        2,
+        "For a regular verb ending in e, add -d: close → closed."
+      ),
+      multipleChoiceItem(
+        "a1-12a-mc-3",
+        "Choose the correct past form.",
+        "bring → ____",
+        ["brought", "bringed", "brang"],
+        0,
+        "The irregular past form of bring is brought."
+      ),
+      multipleChoiceItem(
+        "a1-12a-mc-4",
+        "Choose the correct verb form.",
+        "Tariq ____ his phone on the kitchen table this morning.",
+        ["leaves", "left", "leaved"],
+        1,
+        "Use the irregular past form left."
+      ),
+      multipleChoiceItem(
+        "a1-12a-mc-5",
+        "Choose the correct verb form.",
+        "We ____ a documentary last night.",
+        ["see", "seed", "saw"],
+        2,
+        "Use the irregular past form saw."
+      ),
+      placeholderGapItem(
+        "a1-12a-gf-1",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "The café __________ at nine yesterday. (close)",
+        "closed",
+        [],
+        "Add -d to the regular verb close."
+      ),
+      placeholderGapItem(
+        "a1-12a-gf-2",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "Nora __________ her umbrella on the train. (forget)",
+        "forgot",
+        [],
+        "The irregular past form of forget is forgot."
+      ),
+      placeholderGapItem(
+        "a1-12a-gf-3",
+        "Complete the negative sentence with the verb in brackets.",
+        "The parcel arrived this morning, so we __________ it yesterday. (not receive)",
+        "didn't receive",
+        ["did not receive"],
+        "Use didn't + the base verb receive."
+      ),
+      placeholderGapItem(
+        "a1-12a-gf-4",
+        "Complete the negative sentence with the verb in brackets.",
+        "I had no cash, so I __________ anything at the market. (not buy)",
+        "didn't buy",
+        ["did not buy"],
+        "Use didn't + the base verb buy, not the past form bought."
+      ),
+      multipleChoiceItem(
+        "a1-12a-mc-6",
+        "Choose the correct verb form.",
+        "Did Mila ____ the address in her notebook?",
+        ["write", "wrote", "writes"],
+        0,
+        "Use the base verb write after did."
+      ),
+      multipleChoiceItem(
+        "a1-12a-mc-7",
+        "Choose the best short answer.",
+        "Did the parcel arrive on Tuesday?",
+        ["No, it wasn't.", "No, it didn't.", "No, it doesn't."],
+        1,
+        "Use didn't in a negative short answer to a did question."
+      ),
+      doubleGap(
+        "a1-12a-gf-5",
+        "Complete the question and short answer. Use the verb in brackets.",
+        ["", { gapId: "g1" }, " Karim ", { gapId: "g2" }, " dessert? Yes, he did. (bring)"],
+        ["Did"],
+        ["bring"],
+        "Use did before the subject and the base verb bring after it."
+      ),
+      errorCorrectionItem(
+        "a1-12a-ec-1",
+        "Check the highlighted phrase.",
+        "We didn't found the correct platform.",
+        "didn't found",
+        false,
+        "didn't find",
+        "Use the base verb find after didn't."
+      ),
+      errorCorrectionItem(
+        "a1-12a-ec-2",
+        "Check the highlighted phrase.",
+        "Did Ana called you yesterday?",
+        "Did Ana called",
+        false,
+        "Did Ana call",
+        "Use the base verb call after did."
+      ),
+      errorCorrectionItem(
+        "a1-12a-ec-3",
+        "Check the highlighted word.",
+        "The meeting ended just before five.",
+        "ended",
+        true,
+        "",
+        "Correct! Ended is the regular past form of end."
+      ),
+      wordOrderItem(
+        "a1-12a-wo-1",
+        "Put the words in the correct order.",
+        ["six", "They", "station", "left", "the", "at"],
+        "They left the station at six.",
+        "Use the irregular past form left after the subject."
+      ),
+      wordOrderItem(
+        "a1-12a-wo-2",
+        "Put the words in the correct order.",
+        ["message", "open", "I", "yesterday", "didn't", "the"],
+        "I didn't open the message yesterday.",
+        "Use didn't + the base verb open."
+      ),
+      {
+        id: "a1-12a-journey-1",
+        type: "gap-fill",
+        prompt: "Complete the story with the past form of each base verb in brackets.",
+        parts: [
+          "On Tuesday, Eva ",
+          { gapId: "g1" },
+          " home early. (leave)\nShe ",
+          { gapId: "g2" },
+          " to the station. (walk)\nOn the platform, she ",
+          { gapId: "g3" },
+          " an old friend. (see)\nThey ",
+          { gapId: "g4" },
+          " for a few minutes. (talk)\nEva ",
+          { gapId: "g5" },
+          " a coffee. (buy)\nThen her train ",
+          { gapId: "g6" },
+          ". (arrive)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["left"],
+            feedback: "Use left, the irregular past form of leave."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["walked"],
+            feedback: "Add -ed to walk: walked."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["saw"],
+            feedback: "Use saw, the irregular past form of see."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["talked"],
+            feedback: "Add -ed to talk: talked."
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["bought"],
+            feedback: "Use bought, the irregular past form of buy."
+          },
+          {
+            id: "g6",
+            acceptedAnswers: ["arrived"],
+            feedback: "Add -d to arrive: arrived."
+          },
+        ],
+      },
+      {
+        id: "a1-12a-dialogue-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation. Use the base verb in brackets where shown.",
+        parts: [
+          "A: ",
+          { gapId: "g1" },
+          " you at the market yesterday? (be)\nB: Yes, I ",
+          { gapId: "g2" },
+          ".\nA: ",
+          { gapId: "g3" },
+          " you ",
+          { gapId: "g4" },
+          " the jacket you wanted? (find)\nB: No, I ",
+          { gapId: "g5" },
+          ". But I ",
+          { gapId: "g6" },
+          " a scarf. (buy)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["Were"],
+            feedback: "Begin the past be question about you with Were."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["was"],
+            feedback: "Use was in the positive short answer with I."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["Did"],
+            feedback: "Begin the past-simple question with Did."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["find"],
+            feedback: "Use the base verb find after did."
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["didn't", "did not"],
+            feedback: "Use didn't in the negative short answer."
+          },
+          {
+            id: "g6",
+            acceptedAnswers: ["bought"],
+            feedback: "Use bought, the irregular past form of buy."
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "a1-12b-past-simple-revision",
+    title: "12B · Past Simple Revision",
+    shortDescription: "Review past be and past-simple verbs in statements, negatives, and questions.",
+    levels: ["a1"],
+    intro:
+      "Choose between was or were and did or didn't, then apply regular and irregular past forms in longer contexts.",
+    items: [
+      multipleChoiceItem(
+        "a1-12b-mc-1",
+        "Choose the correct question.",
+        "You want to ask about someone's location last night.",
+        ["Where were you last night?", "Where did you be last night?", "Where you were last night?"],
+        0,
+        "Use were before you in a past question with be."
+      ),
+      multipleChoiceItem(
+        "a1-12b-mc-2",
+        "Choose the correct question.",
+        "You want to ask about Leo's evening meal.",
+        ["What Leo cooked for dinner?", "What was Leo cook for dinner?", "What did Leo cook for dinner?"],
+        2,
+        "Use did + subject + base verb for a past-simple question with cook."
+      ),
+      multipleChoiceItem(
+        "a1-12b-mc-3",
+        "Choose the correct negative form.",
+        "The museum ____ open when we arrived.",
+        ["didn't be", "wasn't", "weren't"],
+        1,
+        "Use wasn't with the singular subject the museum."
+      ),
+      multipleChoiceItem(
+        "a1-12b-mc-4",
+        "Choose the correct negative form.",
+        "They ____ the earlier train.",
+        ["didn't take", "weren't take", "didn't took"],
+        0,
+        "Use didn't + the base verb take."
+      ),
+      multipleChoiceItem(
+        "a1-12b-mc-5",
+        "Choose the correct sentence.",
+        "Which sentence is correct?",
+        ["We go to the lake last Sunday.", "We goed to the lake last Sunday.", "We went to the lake last Sunday."],
+        2,
+        "Went is the irregular past form of go."
+      ),
+      placeholderGapItem(
+        "a1-12b-gf-1",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "The weather __________ warm and sunny yesterday. (be)",
+        "was",
+        [],
+        "Use was with the singular subject the weather."
+      ),
+      placeholderGapItem(
+        "a1-12b-gf-2",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "Our neighbours __________ us for dinner on Friday. (invite)",
+        "invited",
+        [],
+        "Add -d to the regular verb invite."
+      ),
+      placeholderGapItem(
+        "a1-12b-gf-3",
+        "Complete the sentence with the past form of the verb in brackets.",
+        "I __________ a cake for my brother's birthday. (make)",
+        "made",
+        [],
+        "Made is the irregular past form of make."
+      ),
+      doubleGap(
+        "a1-12b-gf-4",
+        "Complete both sentences with the correct past form of be.",
+        ["Maya ", { gapId: "g1" }, " at the rehearsal. (be) Her friends ", { gapId: "g2" }, " there because they stayed at home. (not be)"],
+        ["was"],
+        ["weren't", "were not"],
+        "Use was with Maya and weren't with the plural subject her friends."
+      ),
+      doubleGap(
+        "a1-12b-gf-5",
+        "Complete the question. Use the verb in brackets.",
+        ["Where ", { gapId: "g1" }, " Leo ", { gapId: "g2" }, " the tickets? (put)"],
+        ["did"],
+        ["put"],
+        "Use did before Leo and the base verb put after the subject."
+      ),
+      multipleChoiceItem(
+        "a1-12b-mc-6",
+        "Choose the correct question.",
+        "Which question is correct?",
+        ["Did Nina send the email?", "Did Nina sent the email?", "Nina did send the email?"],
+        0,
+        "Use did + subject + base verb."
+      ),
+      multipleChoiceItem(
+        "a1-12b-mc-7",
+        "Choose the best short answer.",
+        "Were the children tired after the walk?",
+        ["Yes, they did.", "Yes, they were.", "Yes, they was."],
+        1,
+        "Use were in a positive short answer to a were question."
+      ),
+      errorCorrectionItem(
+        "a1-12b-ec-1",
+        "Check the highlighted question.",
+        "Where did you went after lunch?",
+        "did you went",
+        false,
+        "did you go",
+        "Use the base verb go after did."
+      ),
+      errorCorrectionItem(
+        "a1-12b-ec-2",
+        "Check the highlighted phrase.",
+        "Was your parents at the ceremony?",
+        "Was your parents",
+        false,
+        "Were your parents",
+        "Use were with the plural subject your parents."
+      ),
+      errorCorrectionItem(
+        "a1-12b-ec-3",
+        "Check the highlighted phrase.",
+        "I didn't see your message until this morning.",
+        "didn't see",
+        true,
+        "",
+        "Correct! Use didn't + the base verb see."
+      ),
+      wordOrderItem(
+        "a1-12b-wo-1",
+        "Put the words in the correct order.",
+        ["yesterday", "Why", "closed", "office", "the", "was"],
+        "Why was the office closed yesterday?",
+        "With be, use question word + was + subject."
+      ),
+      wordOrderItem(
+        "a1-12b-wo-2",
+        "Put the words in the correct order.",
+        ["home", "What", "you", "time", "get", "did"],
+        "What time did you get home?",
+        "Use question phrase + did + subject + base verb."
+      ),
+      placeholderChoiceGapItem(
+        "a1-12b-cg-1",
+        "Choose was, were, did, or didn't for each gap.",
+        "Where ____ you yesterday afternoon? What ____ you do there? I called, but you ____ answer.",
+        ["were", "did", "didn't"],
+        "Use were with you and be; use did or didn't with another main verb.",
+        ["was", "were", "did", "didn't"]
+      ),
+      {
+        id: "a1-12b-saturday-1",
+        type: "gap-fill",
+        prompt: "Complete the story. Use the base verb in brackets beside each gap.",
+        parts: [
+          "Last Saturday ",
+          { gapId: "g1" },
+          " very busy. (be)\nI ",
+          { gapId: "g2" },
+          " up at seven. (get)\nI ",
+          { gapId: "g3" },
+          " the kitchen before breakfast. (clean)\nThen my sister and I ",
+          { gapId: "g4" },
+          " to the market. (go)\nIt ",
+          { gapId: "g5" },
+          " to rain. (start)\nSo we ",
+          { gapId: "g6" },
+          " long. (not stay)\nIn the evening, some friends ",
+          { gapId: "g7" },
+          " to our house. (come)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["was"],
+            feedback: "Use was with the singular subject last Saturday."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["got"],
+            feedback: "Use got, the irregular past form of get."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["cleaned"],
+            feedback: "Add -ed to clean: cleaned."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["went"],
+            feedback: "Use went, the irregular past form of go."
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["started"],
+            feedback: "Add -ed to start: started."
+          },
+          {
+            id: "g6",
+            acceptedAnswers: ["didn't stay", "did not stay"],
+            feedback: "The rain gives the reason for leaving, so use didn't stay."
+          },
+          {
+            id: "g7",
+            acceptedAnswers: ["came"],
+            feedback: "Use came, the irregular past form of come."
+          },
+        ],
+      },
+      {
+        id: "a1-12b-interview-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation. Use the base verb in brackets where shown.",
+        parts: [
+          "A: Where ",
+          { gapId: "g1" },
+          " you last night? (be)\nB: I ",
+          { gapId: "g2" },
+          " at Priya's house. (be)\nA: ",
+          { gapId: "g3" },
+          " you ",
+          { gapId: "g4" },
+          " a film? (watch)\nB: No, we ",
+          { gapId: "g5" },
+          ". We ",
+          { gapId: "g6" },
+          " cards. (play)\nA: What time ",
+          { gapId: "g7" },
+          " you ",
+          { gapId: "g8" },
+          "? (leave)\nB: At about eleven.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["were"],
+            feedback: "Use were before you in a past be question."
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["was"],
+            feedback: "Use was with I."
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["Did"],
+            feedback: "Begin the past-simple question with Did."
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["watch"],
+            feedback: "Use the base verb watch after did."
+          },
+          {
+            id: "g5",
+            acceptedAnswers: ["didn't", "did not"],
+            feedback: "Use didn't in the negative short answer."
+          },
+          {
+            id: "g6",
+            acceptedAnswers: ["played"],
+            feedback: "Add -ed to play: played."
+          },
+          {
+            id: "g7",
+            acceptedAnswers: ["did"],
+            feedback: "Use did before you in the past-simple question."
+          },
+          {
+            id: "g8",
+            acceptedAnswers: ["leave"],
+            feedback: "Use the base verb leave after did."
+          },
+        ],
+      },
+    ],
+  },
   {
     id: "second-conditional-reformulation",
     title: "Second Conditional Reformulation",
@@ -16515,6 +20576,16 @@ export const HUB_GRAMMAR_ACTIVITIES = [
     ],
   },
 ];
+
+export const HUB_GRAMMAR_ACTIVITIES = HUB_GRAMMAR_ACTIVITY_DEFINITIONS.map((activity) => {
+  const level = getHubGrammarLevel(activity);
+  return {
+    ...activity,
+    level,
+    // Kept as a one-value compatibility field for existing submissions and consumers.
+    levels: level ? [level] : [],
+  };
+});
 
 export function getHubGrammarActivity(activityId) {
   return HUB_GRAMMAR_ACTIVITIES.find((activity) => activity.id === activityId) || null;

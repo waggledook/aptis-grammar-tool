@@ -4,7 +4,7 @@ import { QRCodeSVG } from "qrcode.react";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { getHubGrammarActivity } from "../../data/hubGrammarActivities.js";
-import { saveHubGrammarSubmission } from "../../firebase";
+import { logHubGrammarStarted, saveHubGrammarSubmission } from "../../firebase";
 import { toast } from "../../utils/toast";
 
 function normalizeAnswer(text) {
@@ -466,6 +466,9 @@ export default function HubGrammarActivityRunner({ user }) {
   const activity = getHubGrammarActivity(activityId);
   const inputRefs = useRef({});
   const itemRefs = useRef({});
+  const checkedItemResultsRef = useRef({});
+  const submissionStartedRef = useRef(false);
+  const startLoggedRef = useRef(false);
   const [answers, setAnswers] = useState(() => (activity ? buildInitialAnswers(activity) : {}));
   const [confirmedCorrections, setConfirmedCorrections] = useState({});
   const [selectedAdverb, setSelectedAdverb] = useState(null);
@@ -591,17 +594,22 @@ export default function HubGrammarActivityRunner({ user }) {
 
     if (restoredDraft && !restoredDraft.submitted) {
       setAnswers({ ...initialAnswers, ...(restoredDraft.answers || {}) });
-      setCheckedItemResults(restoredDraft.checkedItemResults || {});
+      checkedItemResultsRef.current = restoredDraft.checkedItemResults || {};
+      setCheckedItemResults(checkedItemResultsRef.current);
+      startLoggedRef.current = restoredDraft.startLogged === true;
       setDraftStatus("restored");
     } else {
       setAnswers(initialAnswers);
+      checkedItemResultsRef.current = {};
       setCheckedItemResults({});
+      startLoggedRef.current = false;
       setDraftStatus("idle");
     }
 
     setConfirmedCorrections({});
     setSelectedAdverb(null);
     setSelectedWordToken(null);
+    submissionStartedRef.current = false;
     setSubmitted(false);
     setSaving(false);
     setResult(null);
@@ -621,6 +629,7 @@ export default function HubGrammarActivityRunner({ user }) {
             activityId: activity.id,
             answers,
             checkedItemResults,
+            startLogged: startLoggedRef.current,
             submitted: false,
             updatedAt: new Date().toISOString(),
           })
@@ -667,7 +676,19 @@ export default function HubGrammarActivityRunner({ user }) {
     );
   }
 
+  const markActivityStarted = () => {
+    if (startLoggedRef.current) return;
+    startLoggedRef.current = true;
+    void logHubGrammarStarted({
+      activityId: activity.id,
+      activityTitle: activity.title,
+      level: activity.level || "",
+      totalItems: activity.items.length,
+    });
+  };
+
   const handleChange = (key, value) => {
+    markActivityStarted();
     setAnswers((prev) => ({ ...prev, [key]: value }));
   };
 
@@ -725,6 +746,7 @@ export default function HubGrammarActivityRunner({ user }) {
   };
 
   const handleJudgeSelection = (item, value) => {
+    markActivityStarted();
     const itemId = item.id;
     const nextAnswers = { ...answers, [itemId]: value };
     setAnswers(nextAnswers);
@@ -796,6 +818,7 @@ export default function HubGrammarActivityRunner({ user }) {
 
   const placeAdverb = (itemId, adverb, slotIndex) => {
     if (!adverb) return;
+    markActivityStarted();
 
     setAnswers((prev) => {
       const currentPlacements = { ...(prev[itemId] || {}) };
@@ -815,6 +838,7 @@ export default function HubGrammarActivityRunner({ user }) {
 
   const placeWordToken = (itemId, tokenIndex, insertIndex = null) => {
     if (tokenIndex == null || Number.isNaN(Number(tokenIndex))) return;
+    markActivityStarted();
 
     setAnswers((prev) => {
       const currentOrder = Array.isArray(prev[itemId]) ? prev[itemId] : [];
@@ -858,8 +882,11 @@ export default function HubGrammarActivityRunner({ user }) {
     setConfirmedCorrections({});
     setSelectedAdverb(null);
     setSelectedWordToken(null);
+    checkedItemResultsRef.current = {};
     setCheckedItemResults({});
     setDraftStatus("idle");
+    startLoggedRef.current = false;
+    submissionStartedRef.current = false;
     setSubmitted(false);
     setResult(null);
 
@@ -884,17 +911,30 @@ export default function HubGrammarActivityRunner({ user }) {
   };
 
   const handleCheckItem = (item, answerOverride = null) => {
-    if (!item || submitted || checkedItemResults[item.id]) return;
+    if (!item || submitted || checkedItemResultsRef.current[item.id]) return;
+    markActivityStarted();
 
     const sourceAnswers = answerOverride || answers;
     const evaluatedItem = evaluateGrammarItem(item, sourceAnswers);
-    setCheckedItemResults((prev) => ({
-      ...prev,
+    const nextCheckedItemResults = {
+      ...checkedItemResultsRef.current,
       [item.id]: evaluatedItem,
-    }));
+    };
+    checkedItemResultsRef.current = nextCheckedItemResults;
+    setCheckedItemResults(nextCheckedItemResults);
     setConfirmedCorrections((prev) => ({ ...prev, [item.id]: true }));
     setSelectedAdverb((current) => (current?.itemId === item.id ? null : current));
     setSelectedWordToken((current) => (current?.itemId === item.id ? null : current));
+
+    const testIsComplete = activity.items.every(
+      (activityItem) => nextCheckedItemResults[activityItem.id]
+    );
+    if (testIsComplete) {
+      const evaluatedItems = activity.items.map((activityItem) =>
+        evaluateGrammarItem(activityItem, sourceAnswers)
+      );
+      saveEvaluatedSubmission(evaluatedItems, { automatic: true });
+    }
   };
 
   const handleMultipleChoiceSelect = (item, optionIndex) => {
@@ -902,6 +942,42 @@ export default function HubGrammarActivityRunner({ user }) {
     const nextAnswers = { ...answers, [item.id]: value };
     setAnswers(nextAnswers);
     handleCheckItem(item, nextAnswers);
+  };
+
+  const saveEvaluatedSubmission = async (evaluatedItems, { automatic = false } = {}) => {
+    if (submissionStartedRef.current || submitted || saving) return;
+    submissionStartedRef.current = true;
+
+    const { correct, score } = scoreEvaluatedItems(evaluatedItems, totalGaps);
+    const payload = {
+      activityId: activity.id,
+      activityTitle: activity.title,
+      items: evaluatedItems,
+      score,
+      correct,
+      total: totalGaps,
+    };
+
+    setSubmitted(true);
+    setResult(payload);
+    setSaving(true);
+
+    try {
+      await saveHubGrammarSubmission(payload);
+      if (typeof window !== "undefined" && draftStorageKey) {
+        window.localStorage.removeItem(draftStorageKey);
+      }
+      setDraftStatus("idle");
+      toast(automatic ? "Test completed and saved." : "Grammar activity submitted and saved.");
+    } catch (error) {
+      console.error("[HubGrammarActivityRunner] save failed", error);
+      submissionStartedRef.current = false;
+      setSubmitted(false);
+      setResult(null);
+      toast("Your feedback was shown, but the submission could not be saved. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -1109,33 +1185,7 @@ export default function HubGrammarActivityRunner({ user }) {
       };
     });
 
-    const { correct, score } = scoreEvaluatedItems(evaluatedItems, totalGaps);
-    const payload = {
-      activityId: activity.id,
-      activityTitle: activity.title,
-      items: evaluatedItems,
-      score,
-      correct,
-      total: totalGaps,
-    };
-
-    setSubmitted(true);
-    setResult(payload);
-    setSaving(true);
-
-    try {
-      await saveHubGrammarSubmission(payload);
-      if (typeof window !== "undefined" && draftStorageKey) {
-        window.localStorage.removeItem(draftStorageKey);
-      }
-      setDraftStatus("idle");
-      toast("Grammar activity submitted and saved.");
-    } catch (error) {
-      console.error("[HubGrammarActivityRunner] save failed", error);
-      toast("Your feedback was shown, but the submission could not be saved.");
-    } finally {
-      setSaving(false);
-    }
+    await saveEvaluatedSubmission(evaluatedItems);
   };
 
   return (
