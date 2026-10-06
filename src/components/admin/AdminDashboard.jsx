@@ -437,6 +437,9 @@ export default function AdminDashboard({ user }) {
   const [readAdminNotificationKeys, setReadAdminNotificationKeys] = useState({});
   const [selectedAdminUserId, setSelectedAdminUserId] = useState("");
   const [activeAdminEdit, setActiveAdminEdit] = useState(null);
+  const [studentNameDraft, setStudentNameDraft] = useState("");
+  const [savingStudentName, setSavingStudentName] = useState(false);
+  const [studentNameError, setStudentNameError] = useState("");
   const [selectedAdminNotification, setSelectedAdminNotification] = useState(null);
   const [creditDrafts, setCreditDrafts] = useState({});
   const [savingCredits, setSavingCredits] = useState({});
@@ -650,6 +653,57 @@ export default function AdminDashboard({ user }) {
     setUsers((prev) =>
       prev.map((u) => (u.id === uid ? { ...u, role } : u))
     );
+  }
+
+  function openStudentNameEditor(student) {
+    if (student.role !== "student") return;
+    setStudentNameDraft(student.displayName || student.name || "");
+    setStudentNameError("");
+    setActiveAdminEdit({ section: "name", userId: student.id });
+  }
+
+  async function saveStudentName(studentId) {
+    const student = users.find((entry) => entry.id === studentId);
+    const nextName = studentNameDraft.trim();
+
+    if (!student || student.role !== "student") {
+      setStudentNameError("This account is no longer a student account.");
+      return;
+    }
+    if (!nextName) {
+      setStudentNameError("Enter the student's name.");
+      return;
+    }
+    if (nextName.length > 120) {
+      setStudentNameError("Keep the student's name to 120 characters or fewer.");
+      return;
+    }
+
+    setSavingStudentName(true);
+    setStudentNameError("");
+
+    try {
+      await updateDoc(doc(db, "users", studentId), {
+        name: nextName,
+        displayName: nextName,
+        profileNameUpdatedAt: serverTimestamp(),
+        profileNameUpdatedBy: user.uid,
+      });
+
+      setUsers((prev) =>
+        prev.map((entry) =>
+          entry.id === studentId
+            ? { ...entry, name: nextName, displayName: nextName }
+            : entry
+        )
+      );
+      setActiveAdminEdit(null);
+    } catch (error) {
+      console.error("[AdminDashboard] update student name failed", error);
+      setStudentNameError("Could not save the student's name. Please try again.");
+    } finally {
+      setSavingStudentName(false);
+    }
   }
 
   // assign / clear a teacher for a student
@@ -2097,8 +2151,20 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
           width: "100%",
         }}
       >
+        {u.role === "student" && (
+          <button
+            type="button"
+            className="ghost-btn"
+            onClick={() => openStudentNameEditor(u)}
+            style={roleButtonStyle}
+          >
+            Edit name
+          </button>
+        )}
+
         {u.role !== "teacher" && (
           <button
+            type="button"
             className="ghost-btn"
             onClick={() => updateRole(u.id, "teacher")}
             style={roleButtonStyle}
@@ -2109,6 +2175,7 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
 
         {u.role !== "student" && (
           <button
+            type="button"
             className="ghost-btn"
             onClick={() => updateRole(u.id, "student")}
             style={roleButtonStyle}
@@ -2119,6 +2186,7 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
 
         {u.role !== "admin" && (
           <button
+            type="button"
             className="ghost-btn"
             onClick={() => updateRole(u.id, "admin")}
             style={roleButtonStyle}
@@ -3337,6 +3405,7 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
               const hubStatus = getHubStatus(u);
               const aptisStatus = getAptisStatus(u);
               const oteStatus = getOteStatus(u);
+              const profileName = String(u.displayName || u.name || "").trim();
               const emailKey = (u.email || "").trim().toLowerCase();
               const duplicateCount = duplicateEmailMap[emailKey] || 0;
 
@@ -3365,6 +3434,18 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
                     }}
                   >
                     <div style={{ minWidth: 0 }}>
+                      {profileName && (
+                        <div
+                          style={{
+                            marginBottom: "0.2rem",
+                            color: "#f8fafc",
+                            fontSize: isNarrow ? "1rem" : "1.1rem",
+                            fontWeight: 700,
+                          }}
+                        >
+                          {profileName}
+                        </div>
+                      )}
                       <button
                         type="button"
                         onClick={() => goToProfile(u.id)}
@@ -3373,11 +3454,11 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
                           border: "none",
                           padding: 0,
                           margin: 0,
-                          color: "#f8fafc",
+                          color: profileName ? "#b7c6e6" : "#f8fafc",
                           textAlign: "left",
                           cursor: "pointer",
-                          fontSize: isNarrow ? "1rem" : "1.1rem",
-                          fontWeight: 700,
+                          fontSize: profileName ? "0.9rem" : isNarrow ? "1rem" : "1.1rem",
+                          fontWeight: profileName ? 500 : 700,
                         }}
                       >
                         {u.email || `(no email) ${u.id}`}
@@ -4342,6 +4423,74 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
               </div>
               {renderAssignmentControl(activeAdminEditUser)}
             </>
+          ) : null}
+        </AdminEditModal>
+      ) : null}
+
+      {activeAdminEdit?.section === "name" ? (
+        <AdminEditModal
+          title="Edit student name"
+          user={activeAdminEditUser}
+          onClose={() => {
+            if (!savingStudentName) setActiveAdminEdit(null);
+          }}
+        >
+          {activeAdminEditUser ? (
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                saveStudentName(activeAdminEditUser.id);
+              }}
+              style={{ display: "grid", gap: "0.9rem" }}
+            >
+              <label style={{ display: "grid", gap: "0.35rem" }}>
+                <span style={{ color: "#cbd5e1", fontSize: "0.8rem" }}>Student name</span>
+                <input
+                  type="text"
+                  value={studentNameDraft}
+                  onChange={(event) => {
+                    setStudentNameDraft(event.target.value);
+                    setStudentNameError("");
+                  }}
+                  maxLength={120}
+                  autoComplete="name"
+                  autoFocus
+                  disabled={savingStudentName}
+                  aria-invalid={studentNameError ? "true" : undefined}
+                  aria-describedby={studentNameError ? "student-name-error" : undefined}
+                  style={{ ...baseInputStyle, width: "100%", minWidth: 0 }}
+                />
+              </label>
+
+              <div style={{ color: "#9fb4da", fontSize: "0.8rem" }}>
+                Account: {activeAdminEditUser.email || activeAdminEditUser.id}
+              </div>
+
+              {studentNameError ? (
+                <div id="student-name-error" role="alert" style={{ color: "#fca5a5", fontSize: "0.84rem" }}>
+                  {studentNameError}
+                </div>
+              ) : null}
+
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.55rem", flexWrap: "wrap" }}>
+                <button
+                  type="button"
+                  className="ghost-btn"
+                  onClick={() => setActiveAdminEdit(null)}
+                  disabled={savingStudentName}
+                  style={{ marginLeft: 0 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="review-btn"
+                  disabled={savingStudentName || !studentNameDraft.trim()}
+                >
+                  {savingStudentName ? "Saving..." : "Save name"}
+                </button>
+              </div>
+            </form>
           ) : null}
         </AdminEditModal>
       ) : null}

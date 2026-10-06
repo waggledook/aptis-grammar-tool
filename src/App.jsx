@@ -680,6 +680,7 @@ useEffect(() => {
         ...u,
         role: data.role || "student",
         name: data.name || u.displayName || "",
+        displayName: data.displayName || data.name || u.displayName || "",
         username: data.username || "",
         teacherId: data.teacherId || null,
         courseAccess: data.courseAccess || {},

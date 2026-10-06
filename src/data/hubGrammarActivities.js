@@ -4749,10 +4749,10 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
       multipleChoiceItem(
         "a2-1c-mc-2",
         "Choose the correct possessive adjective.",
-        "You have a visitor. Is this ____ coat?",
+        "Sam, is this ____ coat? It has your name inside.",
         ["my", "his", "your"],
         2,
-        "Use your for something that belongs to you."
+        "The speaker is talking directly to Sam, so use your."
       ),
       multipleChoiceItem(
         "a2-1c-mc-3",
@@ -4887,21 +4887,21 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         type: "gap-fill",
         prompt: "Complete the workplace description with possessive adjectives.",
         parts: [
-          "I work for North Star Travel. ",
+          "North Star Travel is a small company. ",
           { gapId: "g1" },
-          " office is near the station. My manager is Chloe. ",
+          " office is near the station. I work there, and my manager is Chloe. ",
           { gapId: "g2" },
           " desk is opposite mine. We have two new colleagues. ",
           { gapId: "g3" },
-          " names are Tariq and Mei. Chloe says ",
+          " names are Tariq and Mei. Chloe says, ‘",
           { gapId: "g4" },
-          " team is complete now.",
+          " team is complete now.’",
         ],
         gaps: [
           { id: "g1", acceptedAnswers: ["Its"], feedback: "Use its for the company's office." },
           { id: "g2", acceptedAnswers: ["Her"], feedback: "Use her for Chloe." },
           { id: "g3", acceptedAnswers: ["Their"], feedback: "Use their for the two colleagues." },
-          { id: "g4", acceptedAnswers: ["our"], feedback: "Use our because Chloe is part of the team." },
+          { id: "g4", acceptedAnswers: ["Our"], feedback: "Chloe is speaking as a member of the team, so she uses our." },
         ],
       },
       wordOrderItem(
@@ -4997,8 +4997,8 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "a2-2a-cg-1",
         "Choose a, an, the, or no article for each gap.",
         "I have ____ new passport and ____ old identity card. ____ passport is in my bag, with ____ tickets for tomorrow.",
-        ["a", "an", "the", "—"],
-        "Use a or an for a new singular item, the for the specific passport already mentioned, and no article before the plural noun tickets.",
+        ["a", "an", "the", "the"],
+        "Use a or an for a new singular item, then the for the specific passport and tickets in this situation.",
         ["a", "an", "the", "—"]
       ),
       errorCorrectionItem(
@@ -5159,13 +5159,13 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         0,
         "Use be + degree word + adjective."
       ),
-      singleGap(
+      placeholderGapItem(
         "a2-2b-rf-1",
-        "Rewrite the description as one noun phrase.",
-        ["It's ", { gapId: "g1" }, "."],
-        ["a modern hotel"],
-        "Put the adjective before the noun and use a with the singular noun.",
-        { originalSentence: "The hotel is modern." }
+        "Put the words in brackets in the correct order.",
+        "We stayed in __________ near the station. (hotel / a / modern)",
+        "a modern hotel",
+        [],
+        "Put the article first, followed by the adjective and noun: a modern hotel."
       ),
       singleGap(
         "a2-2b-rf-2",
@@ -5260,28 +5260,14 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           { id: "g3", acceptedAnswers: ["comfortable sofas"], feedback: "Keep the adjective unchanged before the plural noun." },
         ],
       },
-      {
-        id: "a2-2b-description-1",
-        type: "gap-fill",
-        prompt: "Arrange the words in brackets to complete the description.",
-        parts: [
-          "Riverside is ",
-          { gapId: "g1" },
-          ". (modern / hotel) It has ",
-          { gapId: "g2" },
-          ". (very small / garden) The rooms are ",
-          { gapId: "g3" },
-          ". (really comfortable) The staff are ",
-          { gapId: "g4" },
-          ". (very friendly)",
-        ],
-        gaps: [
-          { id: "g1", acceptedAnswers: ["a modern hotel"], feedback: "Use a + adjective + noun." },
-          { id: "g2", acceptedAnswers: ["a very small garden"], feedback: "Put very before the adjective and the adjective before the noun." },
-          { id: "g3", acceptedAnswers: ["really comfortable"], feedback: "Use really before the adjective comfortable." },
-          { id: "g4", acceptedAnswers: ["very friendly"], feedback: "Use very before the adjective friendly." },
-        ],
-      },
+      placeholderChoiceGapItem(
+        "a2-2b-description-1",
+        "Choose the correctly ordered phrase for each gap.",
+        "Riverside is ____ near the station. It has ____. The rooms are ____, and the staff are ____.",
+        ["a modern hotel", "a very small garden", "really comfortable", "very friendly"],
+        "Put articles and degree words before the adjective, and put the adjective before a noun.",
+        ["a modern hotel", "a hotel modern", "a very small garden", "a small very garden", "really comfortable", "comfortable really", "very friendly", "friendlies very"]
+      ),
     ],
   },
   {
@@ -5351,8 +5337,8 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
       placeholderGapItem(
         "a2-2c-gf-2",
         "Complete the suggestion with the verb in brackets.",
-        "__________ the earlier train tomorrow. (take)",
-        "Let's take",
+        "Let's __________ the earlier train tomorrow. (take)",
+        "take",
         [],
         "Use let's + the base verb take."
       ),
@@ -5446,29 +5432,21 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
       {
         id: "a2-2c-suggestions-1",
         type: "gap-fill",
-        prompt: "Complete the conversation. Use the base verb in brackets where shown.",
+        prompt: "Complete the conversation with the words in brackets.",
         parts: [
-          "A: It's sunny. ",
+          "A: It's sunny. Let's ",
           { gapId: "g1" },
-          " ",
-          { gapId: "g2" },
           " to the lake. (walk)\nB: Good idea. ",
+          "Let's ",
+          { gapId: "g2" },
+          " the car. (not take)\nA: Can you ",
           { gapId: "g3" },
-          " ",
-          { gapId: "g4" },
-          " the car. (not take)\nA: ",
-          { gapId: "g5" },
-          " you ",
-          { gapId: "g6" },
           " some water? (bring)",
         ],
         gaps: [
-          { id: "g1", acceptedAnswers: ["Let's"], feedback: "Begin the positive suggestion with Let's." },
-          { id: "g2", acceptedAnswers: ["walk"], feedback: "Use the base verb walk after let's." },
-          { id: "g3", acceptedAnswers: ["Let's"], feedback: "Begin the negative suggestion with Let's." },
-          { id: "g4", acceptedAnswers: ["not take"], feedback: "Use not + base verb after let's." },
-          { id: "g5", acceptedAnswers: ["Can"], feedback: "Begin the polite request with Can." },
-          { id: "g6", acceptedAnswers: ["bring"], feedback: "Use the base verb bring after can." },
+          { id: "g1", acceptedAnswers: ["walk"], feedback: "Use the base verb walk after let's." },
+          { id: "g2", acceptedAnswers: ["not take"], feedback: "Use not + base verb after let's." },
+          { id: "g3", acceptedAnswers: ["bring"], feedback: "Use the base verb bring after can." },
         ],
       },
     ],
@@ -6501,14 +6479,40 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "I work from home twice a week.",
         "Frequency expressions usually go at the end of the sentence."
       ),
-      placeholderChoiceGapItem(
-        "a2-4c-cg-1",
-        "Choose the correct frequency adverb for each gap.",
-        "I ____ eat breakfast before work. My brother is ____ late, and our parents don't ____ call before nine.",
-        ["usually", "never", "often"],
-        "Put the adverb before a main verb, after be, or between don't and the main verb.",
-        ["always", "usually", "often", "sometimes", "hardly ever", "never"]
-      ),
+      {
+        id: "a2-4c-cg-1",
+        type: "gap-fill",
+        prompt: "Choose the phrase with the frequency adverb in the correct position.",
+        parts: [
+          "I ",
+          { gapId: "g1" },
+          " breakfast before work. My brother ",
+          { gapId: "g2" },
+          " late, and our parents ",
+          { gapId: "g3" },
+          " before nine.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["always eat"],
+            choices: ["eat always", "always eats", "always eat"],
+            feedback: "Put always before the main verb eat, and use eat with I.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["is never"],
+            choices: ["does never be", "is never", "isn't never"],
+            feedback: "Put never after the verb is, and do not use it with another negative.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["don't usually call"],
+            choices: ["don't usually call", "don't usually calls", "doesn't usually call"],
+            feedback: "With parents, use don't + usually + the base verb call.",
+          },
+        ],
+      },
       errorCorrectionItem(
         "a2-4c-ec-1",
         "Check the highlighted phrase.",
@@ -6573,7 +6577,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           { gapId: "g3" },
           " lunch at her desk. (not often / eat) She goes to a café ",
           { gapId: "g4" },
-          ". (twice a week)",
+          ". (week / twice / a)",
         ],
         gaps: [
           { id: "g1", acceptedAnswers: ["usually walks"], feedback: "Put usually before the main verb walks." },
@@ -6595,7 +6599,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           { gapId: "g3" },
           " breakfast together. (not usually / have) We meet for dinner ",
           { gapId: "g4" },
-          ". (once a week)",
+          ". (week / once / a)",
         ],
         gaps: [
           { id: "g1", acceptedAnswers: ["always get up"], feedback: "Put always before the main verb get up." },
@@ -11106,6 +11110,3663 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           { id: "g3", acceptedAnswers: ["did"], feedback: "Use did to ask when the finished trip happened." },
           { id: "g4", acceptedAnswers: ["go"], feedback: "Use the base verb go after the subject." },
           { id: "g5", acceptedAnswers: ["Are"], feedback: "Use Are before you in a going to question." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-1a-pronouns",
+    title: "1A · Pronouns and Object Order",
+    shortDescription: "Review subject, object, and possessive pronouns and place two objects correctly.",
+    levels: ["b1", "b2"],
+    intro:
+      "Choose the correct subject, object, or possessive form. With two objects, use verb + person + thing, or verb + thing + to/for + person; put a direct-object pronoun before the indirect object.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-1a-mc-1",
+        "Choose the correct pronoun.",
+        "Could you send ____ the address?",
+        ["I", "me", "mine"],
+        1,
+        "Use the object pronoun me after send."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1a-mc-2",
+        "Choose the correct possessive pronoun.",
+        "This umbrella isn't mine. Is it ____?",
+        ["yours", "your", "you"],
+        0,
+        "Use the possessive pronoun yours when no noun follows."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1a-mc-3",
+        "Choose the correct pronoun.",
+        "Marta invited Leo and ____ to the opening.",
+        ["I", "mine", "me"],
+        2,
+        "Use the object pronoun me after invited."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1a-mc-4",
+        "Choose the correct possessive pronoun.",
+        "Our cases are black; the red ones are ____.",
+        ["their", "theirs", "them"],
+        1,
+        "Use the possessive pronoun theirs without a following noun."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1a-mc-5",
+        "Choose the correct word order.",
+        "I didn't need the charger, so I gave ____.",
+        ["to Maya it", "Maya to it", "it to Maya"],
+        2,
+        "Put the direct-object pronoun it before to + person."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1a-mc-6",
+        "Choose the correct possessive pronoun.",
+        "Their flat is bigger than ____.",
+        ["ours", "our", "us"],
+        0,
+        "Use ours because the noun flat is understood and not repeated."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1a-mc-7",
+        "Choose the correct pronoun.",
+        "The manager showed ____ the new office.",
+        ["we", "us", "ours"],
+        1,
+        "Use the object pronoun us after showed."
+      ),
+      placeholderGapItem(
+        "b1-b2-1a-gf-1",
+        "Complete the sentence using the words in brackets in the correct order.",
+        "I've finished the report. I'll send __________ this afternoon. (it / you)",
+        "it to you",
+        [],
+        "When the direct object is a pronoun, put it before to + person."
+      ),
+      placeholderGapItem(
+        "b1-b2-1a-gf-2",
+        "Complete the sentence using the words in brackets in the correct order.",
+        "She showed __________ after dinner. (her photos / us)",
+        "us her photos",
+        ["her photos to us"],
+        "Both verb + person + thing and verb + thing + to + person are possible here."
+      ),
+      placeholderGapItem(
+        "b1-b2-1a-gf-3",
+        "Complete the sentence using the words in brackets in the correct order.",
+        "Please give __________ tomorrow. (them / me)",
+        "them to me",
+        [],
+        "Put the direct-object pronoun them before to me."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-1a-cg-1",
+        "Choose the correct pronoun or possessive form for each gap.",
+        "Sara and I work together. ____ desk is beside mine. She often helps ____, and I sometimes lend ____ my tablet. The blue case is ____.",
+        ["Her", "me", "her", "hers"],
+        "Use a possessive adjective before a noun, object pronouns after verbs, and a possessive pronoun without a noun.",
+        ["She", "Her", "Hers", "I", "me", "my", "mine", "her", "hers"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-1a-ec-1",
+        "Check the highlighted phrase.",
+        "Me and Zara prepared the presentation.",
+        "Me and Zara",
+        false,
+        "Zara and I",
+        "Use the subject pronoun I as part of the subject."
+      ),
+      errorCorrectionItem(
+        "b1-b2-1a-ec-2",
+        "Check the highlighted phrase.",
+        "This jacket isn't your; it's my.",
+        "your; it's my",
+        false,
+        "yours; it's mine",
+        "Use possessive pronouns when the noun jacket is not repeated."
+      ),
+      errorCorrectionItem(
+        "b1-b2-1a-ec-3",
+        "Check the highlighted phrase.",
+        "The receptionist sent to us the booking details.",
+        "sent to us the booking details",
+        false,
+        ["sent us the booking details", "sent the booking details to us"],
+        "Use person + thing, or thing + to + person, after send."
+      ),
+      wordOrderItem(
+        "b1-b2-1a-wo-1",
+        "Put the words in the correct order.",
+        ["lend", "Could", "to", "you", "me", "it"],
+        "Could you lend it to me?",
+        "Put the direct-object pronoun it before to me."
+      ),
+      wordOrderItem(
+        "b1-b2-1a-wo-2",
+        "Put the words in the correct order.",
+        ["ours", "seats", "Those", "are"],
+        "Those seats are ours.",
+        "Use the possessive pronoun ours without a following noun."
+      ),
+      {
+        id: "b1-b2-1a-lost-property-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with the correct pronouns or possessive forms.",
+        parts: [
+          "A: Is this backpack ",
+          { gapId: "g1" },
+          "? (you)\nB: No, ",
+          { gapId: "g2" },
+          " is under the chair. (I) Perhaps it belongs to Leo. You can show ",
+          { gapId: "g3" },
+          " the label. (he)\nA: Good idea. I'll take ",
+          { gapId: "g4" },
+          " to him now. (it)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["yours"], feedback: "Use yours because no noun follows." },
+          { id: "g2", acceptedAnswers: ["mine"], feedback: "Use mine because backpack is understood." },
+          { id: "g3", acceptedAnswers: ["him"], feedback: "Use the object pronoun him after show." },
+          { id: "g4", acceptedAnswers: ["it"], feedback: "Use it to refer to the backpack." },
+        ],
+      },
+      {
+        id: "b1-b2-1a-gift-1",
+        type: "gap-fill",
+        prompt: "Complete the description with the words in brackets in the correct order.",
+        parts: [
+          "My colleagues bought ",
+          { gapId: "g1" },
+          " when I left the company. (a watch / me) I loved it, so I showed ",
+          { gapId: "g2" },
+          " that evening. (it / my family) Later, I sent ",
+          { gapId: "g3" },
+          ". (a photo / them) My sister said the watch looked like ",
+          { gapId: "g4" },
+          ". (she)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["me a watch", "a watch for me"], feedback: "Use me a watch or a watch for me after bought." },
+          { id: "g2", acceptedAnswers: ["it to my family"], feedback: "Put the direct-object pronoun it before to my family." },
+          { id: "g3", acceptedAnswers: ["them a photo", "a photo to them"], feedback: "Both person + thing and thing + to + person are possible after sent." },
+          { id: "g4", acceptedAnswers: ["hers"], feedback: "Use the possessive pronoun hers without a following noun." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-1b-adjectives",
+    title: "1B · Adjectives and Comparison",
+    shortDescription: "Use adjective order, one and ones, and more precise comparative forms.",
+    levels: ["b1", "b2"],
+    intro:
+      "Put adjectives before nouns or after linking verbs. Use one or ones to avoid repeating a noun, less and the least for lower degrees, and a bit or much before comparatives to show the size of a difference.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-1b-mc-1",
+        "Choose the correct adjective position.",
+        "We found ____ near the station.",
+        ["a café quiet", "quietly a café", "a quiet café"],
+        2,
+        "Put the adjective quiet before the noun café."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1b-mc-2",
+        "Choose the correct replacement word.",
+        "My charger is broken, so I need a new ____.",
+        ["ones", "one", "charger one"],
+        1,
+        "Use one to avoid repeating the singular countable noun charger."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1b-mc-3",
+        "Choose the correct replacement word.",
+        "The large lockers are full, but two small ____ are free.",
+        ["ones", "one", "one's"],
+        0,
+        "Use ones to replace a plural countable noun."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1b-mc-4",
+        "Choose the correct comparative form.",
+        "The side streets are ____ crowded than the main road.",
+        ["least", "fewer", "less"],
+        2,
+        "Use less + adjective to express a lower degree."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1b-mc-5",
+        "Choose the correct superlative form.",
+        "This was ____ expensive option available.",
+        ["the least", "the less", "least"],
+        0,
+        "Use the least + adjective for the lowest degree in a group."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1b-mc-6",
+        "Choose the correct modifier.",
+        "The second task was ____ more difficult than the first.",
+        ["very", "much", "many"],
+        1,
+        "Use much before a comparative to show a large difference."
+      ),
+      multipleChoiceItem(
+        "b1-b2-1b-mc-7",
+        "Choose the correct modifier.",
+        "It's ____ warmer today than yesterday.",
+        ["very", "many", "a bit"],
+        2,
+        "Use a bit before a comparative to show a small difference."
+      ),
+      placeholderGapItem(
+        "b1-b2-1b-gf-1",
+        "Complete the sentence with one or ones.",
+        "These shoes are uncomfortable. Have you got any softer __________?",
+        "ones",
+        [],
+        "Use ones to replace the plural noun shoes."
+      ),
+      placeholderGapItem(
+        "b1-b2-1b-gf-2",
+        "Complete the sentence with a comparative form of the adjective in brackets.",
+        "The revised form only takes five minutes, so it is __________ the old one. (time-consuming)",
+        "less time-consuming than",
+        [],
+        "Use less + adjective + than to compare a lower degree."
+      ),
+      placeholderGapItem(
+        "b1-b2-1b-gf-3",
+        "Complete the sentence with the correct superlative form.",
+        "That was __________ useful section of the report. (least)",
+        "the least",
+        [],
+        "Use the least before the adjective useful."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-1b-cg-1",
+        "Choose the correct form for each gap.",
+        "The first apartment was nice, but the second ____ was ____ brighter and much ____. It was also the ____ expensive of the three.",
+        ["one", "a bit", "quieter", "least"],
+        "Use one to replace apartment, modifiers before comparatives, and the least for the lowest degree.",
+        ["one", "ones", "a bit", "very", "quieter", "quietest", "least", "less"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-1b-ec-1",
+        "Check the highlighted phrase.",
+        "That was the most bad meal I've had here.",
+        "the most bad",
+        false,
+        "the worst",
+        "Worst is the irregular superlative form of bad."
+      ),
+      errorCorrectionItem(
+        "b1-b2-1b-ec-2",
+        "Check the highlighted phrase.",
+        "I don't want the expensive bag; I'll take a cheap.",
+        "a cheap",
+        false,
+        "a cheap one",
+        "Use one after an adjective when replacing a singular countable noun."
+      ),
+      errorCorrectionItem(
+        "b1-b2-1b-ec-3",
+        "Check the highlighted phrase.",
+        "The new office is much more quieter than the old one.",
+        "much more quieter",
+        false,
+        "much quieter",
+        "Do not use both more and the -er form; much quieter is correct."
+      ),
+      wordOrderItem(
+        "b1-b2-1b-wo-1",
+        "Put the words in the correct order.",
+        ["a", "one", "I'd", "larger", "prefer"],
+        "I'd prefer a larger one.",
+        "Use adjective + one to avoid repeating the noun."
+      ),
+      wordOrderItem(
+        "b1-b2-1b-wo-2",
+        "Put the words in the correct order.",
+        ["is", "than", "This", "much", "solution", "simpler", "ours"],
+        "This solution is much simpler than ours.",
+        "Put much before the comparative adjective."
+      ),
+      {
+        id: "b1-b2-1b-laptops-1",
+        type: "gap-fill",
+        prompt: "Complete the comparisons with the correct forms of the adjectives in brackets.",
+        parts: [
+          "The silver laptop weighs 1.3 kg, and the black one weighs 1.5 kg. The silver laptop is ",
+          { gapId: "g1" },
+          " than the black one. (light / small difference) The black laptop has a processor that is twice as fast, so it is ",
+          { gapId: "g2" },
+          " than the silver one. (powerful / large difference) However, its battery only lasts six hours, compared with ten hours for the silver laptop, so it is ",
+          { gapId: "g3" },
+          " than the silver one for travelling. (practical) The blue laptop costs €600; the other two cost over €900. It is ",
+          { gapId: "g4" },
+          " model. (expensive)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["a bit lighter"], feedback: "Use a bit + comparative adjective for the small difference in weight." },
+          { id: "g2", acceptedAnswers: ["much more powerful"], feedback: "Use much before more powerful for the large difference." },
+          { id: "g3", acceptedAnswers: ["less practical"], feedback: "Use less + adjective + than to express a lower degree." },
+          { id: "g4", acceptedAnswers: ["the least expensive"], feedback: "Use the least + adjective for the lowest price in the group." },
+        ],
+      },
+      {
+        id: "b1-b2-1b-clothes-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with one or ones and the adjective forms in brackets.",
+        parts: [
+          "A: Which coat do you prefer?\nB: The dark ",
+          { gapId: "g1" },
+          ". It's much ",
+          { gapId: "g2" },
+          " than the grey one. (smart)\nA: What about the jackets?\nB: The short ",
+          { gapId: "g3" },
+          " are practical, but the long ones are ",
+          { gapId: "g4" },
+          ". (comfortable)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["one"], feedback: "Use one to replace the singular noun coat." },
+          { id: "g2", acceptedAnswers: ["smarter"], feedback: "Use the comparative form smarter after much." },
+          { id: "g3", acceptedAnswers: ["ones"], feedback: "Use ones to replace plural jackets." },
+          { id: "g4", acceptedAnswers: ["more comfortable"], feedback: "Use more before the long adjective comfortable." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-2a-present-tenses",
+    title: "2A · Present Tenses",
+    shortDescription: "Choose present simple or continuous for states, actions, arrangements, and timetables.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use the present simple for habits, states, and timetables, and the present continuous for actions in progress and future arrangements. Some verbs change meaning depending on whether they describe a state or an action.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-2a-mc-1",
+        "Choose the correct present form.",
+        "Sorry, I ____ what this instruction means.",
+        ["don't understand", "am not understanding", "not understand"],
+        0,
+        "Understand is normally a non-action verb, so use the present simple."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2a-mc-2",
+        "Choose the correct present form.",
+        "We ____ with friends while our kitchen is being repaired.",
+        ["stay", "are stay", "are staying"],
+        2,
+        "Use the present continuous for a temporary action around now."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2a-mc-3",
+        "Choose the correct present form.",
+        "Theo can't answer. He ____ a shower.",
+        ["has", "is having", "have"],
+        1,
+        "Have describes an action here, so the present continuous is possible."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2a-mc-4",
+        "Choose the correct present form.",
+        "What ____ of the new layout?",
+        ["do you think", "are you thinking", "you think"],
+        0,
+        "Think means have an opinion here, so use the present simple."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2a-mc-5",
+        "Choose the correct future use.",
+        "It's arranged: I ____ the architect at eleven tomorrow.",
+        ["meet", "am meeting", "am meet"],
+        1,
+        "Use the present continuous for a future arrangement."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2a-mc-6",
+        "Choose the correct future use.",
+        "The last ferry ____ at 9.30 tonight.",
+        ["is leave", "leaving", "leaves"],
+        2,
+        "Use the present simple for a timetable."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2a-mc-7",
+        "Choose the correct question form.",
+        "Why ____ at the ceiling?",
+        ["are you looking", "do you look now", "you are looking"],
+        0,
+        "Use the present continuous for an action happening now."
+      ),
+      doubleGap(
+        "b1-b2-2a-gf-1",
+        "Complete the question with the correct present form of the verb.",
+        ["", { gapId: "g1" }, " you ", { gapId: "g2" }, " camping or staying in hotels? (prefer)"],
+        ["Do"],
+        ["prefer"],
+        "Prefer is normally a non-action verb, so use the present simple."
+      ),
+      placeholderGapItem(
+        "b1-b2-2a-gf-2",
+        "Complete the sentence with the correct present form of the verb.",
+        "We __________ of moving closer to the office. (think)",
+        "are thinking",
+        [],
+        "Think means consider here, so use the present continuous."
+      ),
+      placeholderGapItem(
+        "b1-b2-2a-gf-3",
+        "Complete the sentence with the correct present form of the verb.",
+        "The conference __________ at nine on Monday. (start)",
+        "starts",
+        [],
+        "Use the present simple for a scheduled event."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-2a-cg-1",
+        "Choose the correct present form for each gap.",
+        "I usually ____ from home, but this week I ____ at our city office. I ____ the early train tomorrow because the first meeting ____ at eight.",
+        ["work", "am working", "am taking", "starts"],
+        "Use present simple for routines and timetables, and present continuous for temporary actions and arrangements.",
+        ["work", "am working", "take", "am taking", "starts", "is starting"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-2a-ec-1",
+        "Check the highlighted phrase.",
+        "I am knowing the answer now.",
+        "am knowing",
+        false,
+        "know",
+        "Know is a non-action verb, so use the present simple."
+      ),
+      errorCorrectionItem(
+        "b1-b2-2a-ec-2",
+        "Check the highlighted phrase.",
+        "The museum is opening at ten every day.",
+        "is opening",
+        false,
+        "opens",
+        "Use the present simple for a regular timetable."
+      ),
+      errorCorrectionItem(
+        "b1-b2-2a-ec-3",
+        "Check the highlighted phrase.",
+        "We're having dinner with the new clients tonight.",
+        "We're having dinner",
+        true,
+        "",
+        "Correct! The present continuous can describe a future arrangement."
+      ),
+      wordOrderItem(
+        "b1-b2-2a-wo-1",
+        "Put the words in the correct order.",
+        ["you", "are", "weekend", "doing", "What", "this"],
+        "What are you doing this weekend?",
+        "Use the present continuous to ask about a future arrangement."
+      ),
+      wordOrderItem(
+        "b1-b2-2a-wo-2",
+        "Put the words in the correct order.",
+        ["does", "flight", "What", "your", "arrive", "time"],
+        "What time does your flight arrive?",
+        "Use the present simple for a timetable."
+      ),
+      {
+        id: "b1-b2-2a-trip-1",
+        type: "gap-fill",
+        prompt: "Complete the travel plans with the present simple or present continuous form of the verbs in brackets.",
+        parts: [
+          "We ",
+          { gapId: "g1" },
+          " to Bristol on Friday evening. (drive) Our hotel ",
+          { gapId: "g2" },
+          " check-in from 3 p.m. (allow) We ",
+          { gapId: "g3" },
+          " some friends for dinner at eight. (meet) Our train home ",
+          { gapId: "g4" },
+          " at 6.15 on Sunday. (leave)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["are driving"], feedback: "Use the present continuous for the travel arrangement." },
+          { id: "g2", acceptedAnswers: ["allows"], feedback: "Use the present simple for the hotel's regular policy." },
+          { id: "g3", acceptedAnswers: ["are meeting"], feedback: "Use the present continuous for the dinner arrangement." },
+          { id: "g4", acceptedAnswers: ["leaves"], feedback: "Use the present simple for the train timetable." },
+        ],
+      },
+      {
+        id: "b1-b2-2a-hotel-1",
+        type: "gap-fill",
+        prompt: "Complete the hotel conversation with the correct present forms of the verbs in brackets.",
+        parts: [
+          "A: Can I help you?\nB: Yes, I ",
+          { gapId: "g1" },
+          " for the manager. (look)\nA: She ",
+          { gapId: "g2" },
+          " lunch at the moment. (have) Do you ",
+          { gapId: "g3" },
+          " this document needs her signature? (think)\nB: Yes, and I ",
+          { gapId: "g4" },
+          " a flight this afternoon. (catch)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["am looking"], feedback: "Use the present continuous for the action happening now." },
+          { id: "g2", acceptedAnswers: ["is having"], feedback: "Have describes the action of eating lunch here." },
+          { id: "g3", acceptedAnswers: ["think"], feedback: "Use the present simple for an opinion." },
+          { id: "g4", acceptedAnswers: ["am catching"], feedback: "Use the present continuous for the travel arrangement." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-2b-possessives",
+    title: "2B · Possessives",
+    shortDescription: "Use possessive apostrophes, of + possessive pronoun, and own accurately.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use 's with singular names and irregular plurals, and an apostrophe after regular plural nouns ending in -s. For shared possession, add 's only to the second name. Use of mine/yours and possessive adjective + own for emphasis.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-2b-mc-1",
+        "Choose the correct possessive form.",
+        "All twelve ____ projects are displayed in the hall.",
+        ["students's", "students'", "student's"],
+        1,
+        "Add an apostrophe after the regular plural noun students."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2b-mc-2",
+        "Choose the correct possessive form.",
+        "The toys are in the ____ room.",
+        ["childrens'", "childrens", "children's"],
+        2,
+        "Add 's to the irregular plural noun children."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2b-mc-3",
+        "Choose the correct possessive form.",
+        "We had dinner at ____ flat.",
+        ["Nadia and Omar's", "Nadia's and Omar", "Nadia's and Omar's"],
+        0,
+        "For a shared flat, add 's only to the second name."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2b-mc-4",
+        "Choose the correct possessive expression.",
+        "I need to stop at the ____ on my way home.",
+        ["chemist", "chemist's", "chemists"],
+        1,
+        "The chemist's means the chemist's shop."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2b-mc-5",
+        "Choose the correct possessive expression.",
+        "That woman is a former colleague ____.",
+        ["of mine", "of my", "of me"],
+        0,
+        "Use of + possessive pronoun: a colleague of mine."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2b-mc-6",
+        "Choose the correct possessive expression.",
+        "Where did you get this idea ____?",
+        ["of your", "of you", "of yours"],
+        2,
+        "Use of + possessive pronoun after this idea."
+      ),
+      multipleChoiceItem(
+        "b1-b2-2b-mc-7",
+        "Choose the correct expression with own.",
+        "The company produces ____ bread and cakes.",
+        ["its owns", "its own", "the own"],
+        1,
+        "Use possessive adjective + own: its own."
+      ),
+      placeholderGapItem(
+        "b1-b2-2b-gf-1",
+        "Complete the sentence with the correct possessive form.",
+        "We borrowed my __________ car for the weekend. (parents)",
+        "parents'",
+        [],
+        "Add an apostrophe after the regular plural noun parents."
+      ),
+      placeholderGapItem(
+        "b1-b2-2b-gf-2",
+        "Complete the sentence with the correct possessive form.",
+        "Is that __________ house at the end of the road? (Kate and David)",
+        "Kate and David's",
+        [],
+        "For a house shared by two people, add 's only to the second name."
+      ),
+      placeholderGapItem(
+        "b1-b2-2b-gf-3",
+        "Complete the sentence with own and the correct possessive word.",
+        "I'd love to run __________ business one day. (I)",
+        "my own",
+        [],
+        "Use the possessive adjective my before own."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-2b-cg-1",
+        "Choose the correct possessive expression for each gap.",
+        "We met at ____ house, then borrowed ____ car. The satnav was an old one ____, so I used ____ phone instead.",
+        ["Alex's", "his parents'", "of theirs", "my own"],
+        "Choose the possessive form that matches each noun and meaning.",
+        ["Alex", "Alex's", "his parents", "his parents'", "of their", "of theirs", "my own", "mine own"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-2b-ec-1",
+        "Check the highlighted phrase.",
+        "The womens' changing room is downstairs.",
+        "womens' changing room",
+        false,
+        "women's changing room",
+        "Women is an irregular plural, so add 's."
+      ),
+      errorCorrectionItem(
+        "b1-b2-2b-ec-2",
+        "Check the highlighted phrase.",
+        "James brother works in the same building.",
+        "James brother",
+        false,
+        ["James's brother", "James' brother"],
+        "A name ending in -s can take 's or an apostrophe to show possession."
+      ),
+      errorCorrectionItem(
+        "b1-b2-2b-ec-3",
+        "Check the highlighted phrase.",
+        "We're staying at Ana's and Leo's house this weekend.",
+        "Ana's and Leo's house",
+        false,
+        "Ana and Leo's house",
+        "For a shared house, add 's only to the second name."
+      ),
+      wordOrderItem(
+        "b1-b2-2b-wo-1",
+        "Put the words in the correct order.",
+        ["friend", "She's", "of", "a", "sister's", "my"],
+        "She's a friend of my sister's.",
+        "Use noun + of + possessive form."
+      ),
+      wordOrderItem(
+        "b1-b2-2b-wo-2",
+        "Put the words in the correct order.",
+        ["own", "their", "The", "office", "designers", "have"],
+        "The designers have their own office.",
+        "Use possessive adjective + own before the noun."
+      ),
+      {
+        id: "b1-b2-2b-family-1",
+        type: "gap-fill",
+        prompt: "Complete the family description with the correct possessive forms.",
+        parts: [
+          "My ",
+          { gapId: "g1" },
+          " names are Marta and Celia. (sisters) Marta is staying at our ",
+          { gapId: "g2" },
+          " house this month. (grandparents) Celia and her partner have bought ",
+          { gapId: "g3" },
+          " first flat. (they) It's close to a cousin ",
+          { gapId: "g4" },
+          ". (we)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["sisters'"], feedback: "Use an apostrophe after the regular plural sisters." },
+          { id: "g2", acceptedAnswers: ["grandparents'"], feedback: "Use an apostrophe after the regular plural grandparents." },
+          { id: "g3", acceptedAnswers: ["their own"], feedback: "Use their own to emphasize that the flat belongs to them." },
+          { id: "g4", acceptedAnswers: ["of ours"], feedback: "Use of + possessive pronoun: of ours." },
+        ],
+      },
+      {
+        id: "b1-b2-2b-shops-1",
+        type: "gap-fill",
+        prompt: "Complete the description with the correct possessive expressions.",
+        parts: [
+          "I left my coat at the ",
+          { gapId: "g1" },
+          " yesterday. (hairdresser) A friend ",
+          { gapId: "g2" },
+          " collected it for me. (I) She was using her ",
+          { gapId: "g3" },
+          " car (own) because her ",
+          { gapId: "g4" },
+          " car was at the garage. (husband)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["hairdresser's"], feedback: "The hairdresser's means the hairdresser's shop." },
+          { id: "g2", acceptedAnswers: ["of mine"], feedback: "Use of + possessive pronoun: a friend of mine." },
+          { id: "g3", acceptedAnswers: ["own"], feedback: "Use own after the possessive adjective her." },
+          { id: "g4", acceptedAnswers: ["husband's"], feedback: "Add 's to husband to show possession." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-3a-past-forms-used-to",
+    title: "3A · Past Simple, Past Continuous, and Used To",
+    shortDescription: "Distinguish finished past events, actions in progress, and past habits or states.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use the past simple for finished actions and states, the past continuous for actions in progress or interrupted actions, and used to for past habits or states that continued for a significant time and are no longer true.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-3a-mc-1",
+        "Choose the correct past forms.",
+        "I ____ home when it ____ to snow.",
+        ["cycled / was starting", "was cycling / was starting", "was cycling / started"],
+        2,
+        "Use the past continuous for the action in progress and the past simple for the interruption."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3a-mc-2",
+        "Choose the correct form.",
+        "We ____ near the coast when I was a child, but we moved inland later.",
+        ["used to live", "used live", "were use to live"],
+        0,
+        "Use used to for a past state that was true for a significant time and is no longer true."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3a-mc-3",
+        "Choose the correct negative form.",
+        "Mara ____ coffee, but now she drinks it every day.",
+        ["didn't used to like", "didn't use to like", "wasn't use to like"],
+        1,
+        "After didn't, use the base form use: didn't use to."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3a-mc-4",
+        "Choose the correct past form.",
+        "I ____ at that clinic for two years before changing jobs.",
+        ["was working", "used to work", "worked"],
+        2,
+        "Use the past simple when the sentence states the completed length of time."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3a-mc-5",
+        "Choose the correct past form.",
+        "At nine last night, we ____ for the final train.",
+        ["waited", "were waiting", "used to wait"],
+        1,
+        "Use the past continuous for an action in progress at a specific past time."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3a-mc-6",
+        "Choose the correct question form.",
+        "Where ____ on holiday when you were young?",
+        ["did you use to go", "did you used to go", "were you use to go"],
+        0,
+        "Use did + subject + use to + base verb in questions."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3a-mc-7",
+        "Choose the correct past forms.",
+        "At seven, I ____ dinner while Max ____ the table.",
+        ["cooked / setting", "was cook / was set", "was cooking / was setting"],
+        2,
+        "Use the past continuous for two actions happening at the same time."
+      ),
+      placeholderGapItem(
+        "b1-b2-3a-gf-1",
+        "Complete the sentence with used to and the verb in brackets.",
+        "My grandfather __________ a motorbike when he was younger. (have)",
+        "used to have",
+        [],
+        "Use used to have for a past state that is no longer true."
+      ),
+      placeholderGapItem(
+        "b1-b2-3a-gf-2",
+        "Complete the sentence with the correct past form of the verb.",
+        "The lights went out while we __________ dinner. (cook)",
+        "were cooking",
+        [],
+        "Use the past continuous for the action already in progress."
+      ),
+      placeholderGapItem(
+        "b1-b2-3a-gf-3",
+        "Complete the negative sentence with used to and the verb in brackets.",
+        "I __________ vegetables, but I eat them now. (not like)",
+        "didn't use to like",
+        ["did not use to like"],
+        "Use didn't use to + base verb for a past state that was not true."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-3a-cg-1",
+        "Choose the correct past form for each gap.",
+        "When I was at university, I ____ in a shared house. One evening, I ____ when the fire alarm ____. Everyone ____ outside immediately.",
+        ["used to live", "was studying", "rang", "ran"],
+        "Use used to for the long-term past situation, the past continuous for the action in progress, and the past simple for the finished events.",
+        ["used to live", "was studying", "rang", "ran"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-3a-ec-1",
+        "Check the highlighted phrase.",
+        "She used to worked in a bookshop.",
+        "used to worked",
+        false,
+        "used to work",
+        "Use the base verb after used to."
+      ),
+      errorCorrectionItem(
+        "b1-b2-3a-ec-2",
+        "Check the highlighted phrase.",
+        "We were knowing each other at school.",
+        "were knowing",
+        false,
+        "knew",
+        "Know describes a state, so use the past simple rather than the past continuous."
+      ),
+      errorCorrectionItem(
+        "b1-b2-3a-ec-3",
+        "Check the highlighted phrase.",
+        "I was walking through the park when I found the wallet.",
+        "was walking through the park",
+        true,
+        "",
+        "Correct! The past continuous describes the action in progress when the past-simple event happened."
+      ),
+      wordOrderItem(
+        "b1-b2-3a-wo-1",
+        "Put the words in the correct order.",
+        ["to", "Did", "glasses", "wear", "use", "you"],
+        "Did you use to wear glasses?",
+        "Use did + subject + use to + base verb."
+      ),
+      wordOrderItem(
+        "b1-b2-3a-wo-2",
+        "Put the words in the correct order.",
+        ["called", "were", "What", "you", "I", "doing", "when"],
+        "What were you doing when I called?",
+        "Use the past continuous for the action in progress."
+      ),
+      {
+        id: "b1-b2-3a-journey-1",
+        type: "gap-fill",
+        prompt: "Complete the story with the past simple or past continuous forms of the verbs in brackets.",
+        parts: [
+          "We ",
+          { gapId: "g1" },
+          " to the airport (drive) when the car ",
+          { gapId: "g2" },
+          ". (stop) While my brother ",
+          { gapId: "g3" },
+          " the engine (check), I ",
+          { gapId: "g4" },
+          " the airline. (call)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["were driving"], feedback: "Use the past continuous for the journey in progress." },
+          { id: "g2", acceptedAnswers: ["stopped"], feedback: "Use the past simple for the event that interrupted the journey." },
+          { id: "g3", acceptedAnswers: ["was checking"], feedback: "Use the past continuous for the action in progress." },
+          { id: "g4", acceptedAnswers: ["called"], feedback: "Use the past simple for the completed call." },
+        ],
+      },
+      {
+        id: "b1-b2-3a-childhood-1",
+        type: "gap-fill",
+        prompt: "Complete the childhood memories with used to or the past simple forms of the verbs in brackets.",
+        parts: [
+          "We ",
+          { gapId: "g1" },
+          " in a small village. (live) My friends and I often ",
+          { gapId: "g2" },
+          " by the river after school. (play) We ",
+          { gapId: "g3" },
+          " computers then. (not have) In 2012, my family ",
+          { gapId: "g4" },
+          " to the city. (move)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["used to live", "lived"], feedback: "Use used to live or the past simple for the long-term past state." },
+          { id: "g2", acceptedAnswers: ["used to play", "played"], feedback: "Use used to play or the past simple with often for the repeated habit." },
+          { id: "g3", acceptedAnswers: ["didn't use to have", "did not use to have", "didn't have", "did not have"], feedback: "Use didn't use to have or the past-simple negative." },
+          { id: "g4", acceptedAnswers: ["moved"], feedback: "Use the past simple with the finished time in 2012." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-3b-prepositions",
+    title: "3B · Prepositions",
+    shortDescription: "Use prepositions of place and movement and common dependent prepositions.",
+    levels: ["b1", "b2"],
+    intro:
+      "Choose prepositions according to the meaning of place or movement, and learn the fixed prepositions that follow particular verbs and adjectives. Use verb-ing after a preposition when another verb follows.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-3b-mc-1",
+        "Choose the correct preposition of place.",
+        "There is a storage box ____ the bed.",
+        ["under", "through", "across"],
+        0,
+        "Use under for a lower position beneath something."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3b-mc-2",
+        "Choose the correct preposition of movement.",
+        "We walked ____ the tunnel and emerged beside the river.",
+        ["along", "through", "on"],
+        1,
+        "Use through for movement from one end of an enclosed space to the other."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3b-mc-3",
+        "Choose the correct dependent preposition.",
+        "Rosa is very interested ____ astronomy.",
+        ["at", "for", "in"],
+        2,
+        "Interested is followed by in."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3b-mc-4",
+        "Choose the correct dependent preposition.",
+        "We waited ____ the announcement before leaving.",
+        ["for", "at", "on"],
+        0,
+        "Wait is followed by for."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3b-mc-5",
+        "Choose the correct dependent preposition.",
+        "Mika is good ____ solving technical problems.",
+        ["in", "for", "at"],
+        2,
+        "Good is followed by at, and a following verb takes the -ing form."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3b-mc-6",
+        "Choose the correct dependent preposition.",
+        "Who's responsible ____ updating the website?",
+        ["of", "for", "about"],
+        1,
+        "Responsible is followed by for."
+      ),
+      multipleChoiceItem(
+        "b1-b2-3b-mc-7",
+        "Choose the correct sentence.",
+        "Which sentence is correct?",
+        ["We discussed the problem.", "We discussed about the problem.", "We discussed on the problem."],
+        0,
+        "Discuss takes a direct object and no preposition."
+      ),
+      placeholderGapItem(
+        "b1-b2-3b-gf-1",
+        "Complete the sentence with the correct preposition of movement.",
+        "The child ran __________ the road without looking.",
+        "across",
+        [],
+        "Use across for movement from one side of the road to the other."
+      ),
+      placeholderGapItem(
+        "b1-b2-3b-gf-2",
+        "Complete the sentence with the correct dependent preposition.",
+        "I'm worried __________ the delay.",
+        "about",
+        [],
+        "Worried is followed by about."
+      ),
+      placeholderGapItem(
+        "b1-b2-3b-gf-3",
+        "Complete the sentence with the correct dependent preposition.",
+        "You can't always rely __________ the buses here.",
+        "on",
+        [],
+        "Rely is followed by on."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-3b-cg-1",
+        "Choose the correct preposition for each gap.",
+        "Walk ____ the bank, turn right, and go ____ the glass doors. The office is ____ the second floor, next ____ the lift.",
+        ["past", "through", "on", "to"],
+        "Choose prepositions that describe the route and final location.",
+        ["past", "across", "through", "into", "on", "in", "to", "for"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-3b-ec-1",
+        "Check the highlighted phrase.",
+        "We entered into the building through a side door.",
+        "entered into the building",
+        false,
+        "entered the building",
+        "Enter takes a direct object and no preposition."
+      ),
+      errorCorrectionItem(
+        "b1-b2-3b-ec-2",
+        "Check the highlighted phrase.",
+        "Everyone laughed on my mistake.",
+        "laughed on my mistake",
+        false,
+        "laughed at my mistake",
+        "Laugh is followed by at."
+      ),
+      errorCorrectionItem(
+        "b1-b2-3b-ec-3",
+        "Check the highlighted phrase.",
+        "The committee discussed about the new timetable.",
+        "discussed about the new timetable",
+        false,
+        "discussed the new timetable",
+        "Discuss takes a direct object and no preposition."
+      ),
+      wordOrderItem(
+        "b1-b2-3b-wo-1",
+        "Put the words in the correct order.",
+        ["for", "Who", "is", "the", "responsible", "budget"],
+        "Who is responsible for the budget?",
+        "Responsible is followed by for."
+      ),
+      wordOrderItem(
+        "b1-b2-3b-wo-2",
+        "Put the words in the correct order.",
+        ["looking", "I'm", "meeting", "forward", "you", "to"],
+        "I'm looking forward to meeting you.",
+        "Use verb-ing after the preposition to in look forward to."
+      ),
+      {
+        id: "b1-b2-3b-route-1",
+        type: "gap-fill",
+        prompt: "Complete the route with the correct prepositions.",
+        parts: [
+          "Go ",
+          { gapId: "g1" },
+          " the steps and walk ",
+          { gapId: "g2" },
+          " the corridor. Go ",
+          { gapId: "g3" },
+          " the café, then turn left. The meeting room is ",
+          { gapId: "g4" },
+          " the reception desk.",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["up"], feedback: "Use up for movement to a higher level." },
+          { id: "g2", acceptedAnswers: ["along"], feedback: "Use along for movement following the length of the corridor." },
+          { id: "g3", acceptedAnswers: ["past"], feedback: "Use past for movement beyond the café." },
+          { id: "g4", acceptedAnswers: ["opposite"], feedback: "Use opposite for a position facing the reception desk." },
+        ],
+      },
+      {
+        id: "b1-b2-3b-team-1",
+        type: "gap-fill",
+        prompt: "Complete the team update with the correct dependent prepositions.",
+        parts: [
+          "We're waiting ",
+          { gapId: "g1" },
+          " the client to reply. Nina is worried ",
+          { gapId: "g2" },
+          " the deadline, but Leo believes ",
+          { gapId: "g3" },
+          " taking more time. I'm responsible ",
+          { gapId: "g4" },
+          " checking the final figures.",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["for"], feedback: "Wait is followed by for." },
+          { id: "g2", acceptedAnswers: ["about"], feedback: "Worried is followed by about." },
+          { id: "g3", acceptedAnswers: ["in"], feedback: "Believe is followed by in in this meaning." },
+          { id: "g4", acceptedAnswers: ["for"], feedback: "Responsible is followed by for." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-4a-future-forms",
+    title: "4A · Future Forms",
+    shortDescription: "Choose will, shall, or be going to for decisions, plans, offers, and predictions.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use will for instant decisions, promises, offers, and opinion-based predictions; use shall with I or we for offers and suggestions; and use be going to for prior plans and predictions based on present evidence.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-4a-mc-1",
+        "Choose the best future form.",
+        "The phone's ringing, but everyone is busy. ____ it.",
+        ["I'm going to answer", "I'll answer", "I answer"],
+        1,
+        "Use will for a decision made at the moment of speaking."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4a-mc-2",
+        "Choose the best future form.",
+        "We've booked a table for eight. We ____ at the new Thai restaurant tonight.",
+        ["will probably eat", "eat", "are going to eat"],
+        2,
+        "Use be going to for a plan decided before the moment of speaking."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4a-mc-3",
+        "Choose the best future form.",
+        "Look at that cyclist near the kerb! He ____.",
+        ["is going to fall", "will falling", "shall fall"],
+        0,
+        "Use be going to for a prediction based on present evidence."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4a-mc-4",
+        "Choose the best future form.",
+        "Don't worry. I ____ anyone about your surprise party.",
+        ["am not telling", "won't tell", "don't tell"],
+        1,
+        "Use won't for a promise not to do something."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4a-mc-5",
+        "Choose the best future form.",
+        "I think the interview ____ less formal than the last one.",
+        ["will be", "is being", "shall be"],
+        0,
+        "Use will for a prediction introduced as an opinion with I think."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4a-mc-6",
+        "Choose the best suggestion.",
+        "It's warm in here. ____ the window?",
+        ["Will we opening", "Are we going to open", "Shall we open"],
+        2,
+        "Use Shall we + base verb to make a suggestion."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4a-mc-7",
+        "Choose the best form.",
+        "I ____ the parcel after work, but the post office was closed.",
+        ["would send", "was going to send", "will send"],
+        1,
+        "Use was going to for a past plan that did not happen."
+      ),
+      placeholderGapItem(
+        "b1-b2-4a-gf-1",
+        "Complete the offer with will and the verb in brackets.",
+        "That box looks heavy. __________ it for you. (carry)",
+        "I'll carry",
+        ["I will carry"],
+        "Use I'll carry or I will carry for an offer made now."
+      ),
+      placeholderGapItem(
+        "b1-b2-4a-gf-2",
+        "Complete the plan with be going to and the verb in brackets.",
+        "We __________ the spare room next weekend; we've already bought the paint. (decorate)",
+        "are going to decorate",
+        [],
+        "Use are going to decorate for a prior plan."
+      ),
+      doubleGap(
+        "b1-b2-4a-gf-3",
+        "Complete the suggestion. Use the verb in brackets.",
+        ["What ", { gapId: "g1" }, " we ", { gapId: "g2" }, " after lunch? (do)"],
+        ["shall"],
+        ["do"],
+        "Use shall before we and the base verb do after the subject."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-4a-cg-1",
+        "Choose the best future form for each gap.",
+        "Those clouds are dark. It ____ rain. I forgot my umbrella, so I ____ buy one now. ____ I get one for you too? We ____ meet Kim outside the station at six; that's the plan.",
+        ["is going to", "will", "Shall", "are going to"],
+        "Use going to for evidence and prior plans, will for an instant decision, and Shall I for an offer.",
+        ["will", "shall", "Shall", "is going to", "are going to", "am going to"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-4a-ec-1",
+        "Check the highlighted phrase.",
+        "The doorbell is ringing. I answer it.",
+        "answer it",
+        false,
+        "will answer it",
+        "Use will for the decision made when the doorbell rings."
+      ),
+      errorCorrectionItem(
+        "b1-b2-4a-ec-2",
+        "Check the highlighted phrase.",
+        "Will I carry those bags for you?",
+        "Will I carry",
+        false,
+        "Shall I carry",
+        "Use Shall I + base verb to offer to do something."
+      ),
+      errorCorrectionItem(
+        "b1-b2-4a-ec-3",
+        "Check the highlighted phrase.",
+        "Watch out! That glass is going to fall.",
+        "is going to fall",
+        true,
+        "",
+        "Correct! Be going to expresses a prediction based on present evidence."
+      ),
+      wordOrderItem(
+        "b1-b2-4a-wo-1",
+        "Put the words in the correct order.",
+        ["we", "invite", "Shall", "Amir", "too"],
+        "Shall we invite Amir too?",
+        "Use Shall + subject + base verb for a suggestion."
+      ),
+      wordOrderItem(
+        "b1-b2-4a-wo-2",
+        "Put the words in the correct order.",
+        ["going", "early", "We're", "tomorrow", "to", "leave"],
+        "We're going to leave early tomorrow.",
+        "Use be going to + base verb for a planned action."
+      ),
+      {
+        id: "b1-b2-4a-course-plans-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with the most natural future forms. Use the verbs in brackets.",
+        parts: [
+          "A: What are your plans after the course?\nB: I ",
+          { gapId: "g1" },
+          " in my aunt's shop for a few months. (work) After that, I think I ",
+          { gapId: "g2" },
+          " abroad. (travel)\nA: That suitcase looks heavy. I ",
+          { gapId: "g3" },
+          " it downstairs for you. (take)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["am going to work"], feedback: "Use be going to for the plan already decided." },
+          { id: "g2", acceptedAnswers: ["will travel"], feedback: "Use will after I think for an opinion-based prediction." },
+          { id: "g3", acceptedAnswers: ["will take"], feedback: "Use will for the offer made now." },
+        ],
+      },
+      {
+        id: "b1-b2-4a-weekend-change-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with suitable future forms. Use the verbs in brackets.",
+        parts: [
+          "A: We ",
+          { gapId: "g1" },
+          " a picnic today, but the park is closed. (have)\nB: And look at the sky. It ",
+          { gapId: "g2" },
+          " soon. (rain)\nA: Then we ",
+          { gapId: "g3" },
+          " at home. (stay) ",
+          { gapId: "g4" },
+          " a film? (watch)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["were going to have"], feedback: "Use were going to for the earlier plan that will not happen." },
+          { id: "g2", acceptedAnswers: ["is going to rain"], feedback: "Use be going to because the sky provides present evidence." },
+          { id: "g3", acceptedAnswers: ["will stay"], feedback: "Use will for the decision made in response to the change." },
+          { id: "g4", acceptedAnswers: ["Shall we watch"], feedback: "Use Shall we + base verb to make a suggestion." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-4b-conditionals",
+    title: "4B · First and Second Conditionals",
+    shortDescription: "Use first conditionals for real possibilities and second conditionals for hypothetical situations.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use if or unless + present simple for possible future conditions, followed by will or another suitable modal or imperative. Use if + past simple with would, could, or might for hypothetical or unlikely situations.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-4b-mc-1",
+        "Choose the correct conditional form.",
+        "If we leave in the next ten minutes, we ____ the last bus.",
+        ["would catch", "caught", "will catch"],
+        2,
+        "Use will + base verb for the likely result of a possible future condition."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4b-mc-2",
+        "Choose the sentence with the same meaning.",
+        "We won't finish today unless everyone helps.",
+        ["We won't finish today if not everyone helps.", "We'll finish today if nobody helps.", "We wouldn't finish today if everyone helped."],
+        0,
+        "Unless everyone helps means if everyone does not help."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4b-mc-3",
+        "Choose the correct result clause.",
+        "If the screen freezes, ____ the power button for ten seconds.",
+        ["you will pressed", "hold", "you would hold"],
+        1,
+        "An imperative can follow an if-clause when giving instructions."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4b-mc-4",
+        "Choose the correct conditional form.",
+        "If I won enough money, I ____ a year off work.",
+        ["will take", "take", "would take"],
+        2,
+        "Use would + base verb for the hypothetical result of an unlikely condition."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4b-mc-5",
+        "Choose the best form.",
+        "If you don't leave soon, you ____ the beginning of the concert.",
+        ["would miss", "might miss", "missed"],
+        1,
+        "Might can replace will in a first conditional when the result is uncertain."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4b-mc-6",
+        "Choose the correct advice phrase.",
+        "____, I'd ask for the details in writing.",
+        ["If I were you", "If I will be you", "Unless I was you"],
+        0,
+        "Use the fixed phrase If I were you to introduce advice."
+      ),
+      multipleChoiceItem(
+        "b1-b2-4b-mc-7",
+        "Choose the correct conditional form.",
+        "The office is too far away. If it were closer, I ____ there.",
+        ["will walk", "walk", "could walk"],
+        2,
+        "Use could + base verb for a hypothetical possibility."
+      ),
+      placeholderGapItem(
+        "b1-b2-4b-gf-1",
+        "Complete the first conditional with the verb in brackets.",
+        "If the weather __________ tomorrow, we'll eat outside. (improve)",
+        "improves",
+        [],
+        "Use the present simple in the if-clause of a first conditional."
+      ),
+      placeholderGapItem(
+        "b1-b2-4b-gf-2",
+        "Complete the second conditional with the verb in brackets.",
+        "If I __________ more storage space, I'd keep these boxes. (have)",
+        "had",
+        [],
+        "Use the past simple in the if-clause of a second conditional."
+      ),
+      placeholderGapItem(
+        "b1-b2-4b-gf-3",
+        "Complete the sentence with unless and the verb in brackets.",
+        "Unless the supplier __________ the parts today, production will stop. (send)",
+        "sends",
+        [],
+        "Use the present simple after unless for a possible future condition."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-4b-cg-1",
+        "Choose the correct form for each conditional.",
+        "If the lift is broken, ____ the stairs. We ____ late unless we leave now. If I lived nearby, I ____ cycle to work. If you need a lift, I ____ take you.",
+        ["use", "will be", "would", "can"],
+        "Use an imperative or a suitable modal in first conditionals, and would in the hypothetical result.",
+        ["use", "used", "will be", "would be", "would", "will", "can", "could"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-4b-ec-1",
+        "Check the highlighted phrase.",
+        "If it will rain tomorrow, the match will be indoors.",
+        "will rain",
+        false,
+        "rains",
+        "Use the present simple, not will, in the if-clause of a first conditional."
+      ),
+      errorCorrectionItem(
+        "b1-b2-4b-ec-2",
+        "Check the highlighted phrase.",
+        "Unless you don't save the file, you may lose your changes.",
+        "Unless you don't save",
+        false,
+        "Unless you save",
+        "Unless already contains a negative meaning, so do not add don't here."
+      ),
+      errorCorrectionItem(
+        "b1-b2-4b-ec-3",
+        "Check the highlighted phrase.",
+        "If I were you, I'd compare the two offers first.",
+        "If I were you",
+        true,
+        "",
+        "Correct! If I were you is the standard phrase for giving advice."
+      ),
+      wordOrderItem(
+        "b1-b2-4b-wo-1",
+        "Put the words in the correct order.",
+        ["practised", "confident", "If", "feel", "she", "she'd", "more,", "more"],
+        "If she practised more, she'd feel more confident.",
+        "Use past simple in the hypothetical condition and would in the result."
+      ),
+      wordOrderItem(
+        "b1-b2-4b-wo-2",
+        "Put the words in the correct order.",
+        ["need", "me", "Call", "if", "help", "you"],
+        "Call me if you need help.",
+        "An imperative can be the result of a real condition."
+      ),
+      {
+        id: "b1-b2-4b-event-plan-1",
+        type: "gap-fill",
+        prompt: "Complete the event plan with first conditional forms. Use the verbs in brackets.",
+        parts: [
+          "If more than fifty people ",
+          { gapId: "g1" },
+          ", we'll open the larger room. (register) We won't order food unless everyone ",
+          { gapId: "g2" },
+          " by Friday. (reply) If anyone has dietary requirements, they ",
+          { gapId: "g3" },
+          " us in advance. (tell)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["register"], feedback: "Use the present simple in the if-clause." },
+          { id: "g2", acceptedAnswers: ["replies"], feedback: "Use the present simple after unless." },
+          { id: "g3", acceptedAnswers: ["should tell"], feedback: "Should can express advice in the result clause." },
+        ],
+      },
+      {
+        id: "b1-b2-4b-imaginary-office-1",
+        type: "gap-fill",
+        prompt: "Complete the hypothetical conversation. Use the verbs in brackets.",
+        parts: [
+          "A: If you ",
+          { gapId: "g1" },
+          " your own office, what would you change? (have)\nB: I ",
+          { gapId: "g2" },
+          " a quiet room for calls. (create) I might work fewer hours if the team ",
+          { gapId: "g3" },
+          " larger. (be)\nA: If I ",
+          { gapId: "g4" },
+          " you, I'd start with the quiet room. (be)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["had"], feedback: "Use the past simple for the hypothetical condition." },
+          { id: "g2", acceptedAnswers: ["would create"], feedback: "Use would + base verb for the hypothetical result." },
+          { id: "g3", acceptedAnswers: ["was", "were"], feedback: "Both was and were are possible in many second-conditional if-clauses." },
+          { id: "g4", acceptedAnswers: ["were"], feedback: "Use were in the fixed phrase If I were you." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-5a-present-perfect-simple",
+    title: "5A · Present Perfect Simple",
+    shortDescription: "Use the present perfect for experiences, recent news, and situations continuing until now.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use have or has + past participle for experiences without a finished time, recent news with just, and continuing states. Use yet in questions and negatives, already for earlier-than-expected events, and the past simple with a finished past time.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-5a-mc-1",
+        "Choose the correct form.",
+        "Nora ____ the video call, so you can join now.",
+        ["has just started", "just started yesterday", "has just start"],
+        0,
+        "Use has just + past participle for very recent news."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5a-mc-2",
+        "Choose the correct question.",
+        "____ the hotel yet?",
+        ["Did you booked", "Have you booked", "Have you book"],
+        1,
+        "Use Have + subject + past participle, with yet at the end of the question."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5a-mc-3",
+        "Choose the correct form.",
+        "There's no need to email Priya. I ____ her the details.",
+        ["have sent already to", "already did send", "have already sent"],
+        2,
+        "Put already between have and the past participle."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5a-mc-4",
+        "Choose the correct time expression.",
+        "We've rented this flat ____ March 2022.",
+        ["since", "for", "all"],
+        0,
+        "Use since with the starting point March 2022."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5a-mc-5",
+        "Choose the correct sentence.",
+        "Which sentence is correct?",
+        ["The office has been quiet for all morning.", "The office is quiet since all morning.", "The office has been quiet all morning."],
+        2,
+        "Do not use for before all + a time expression."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5a-mc-6",
+        "Choose the correct form.",
+        "I ____ Sam since our first week at university.",
+        ["am knowing", "have known", "have been knowing"],
+        1,
+        "Know is a non-action verb, so use the present perfect simple."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5a-mc-7",
+        "Choose the correct form.",
+        "We ____ the new director at Tuesday's meeting.",
+        ["met", "have met", "have meet"],
+        0,
+        "Use the past simple with the finished past time Tuesday's meeting."
+      ),
+      placeholderGapItem(
+        "b1-b2-5a-gf-1",
+        "Complete the recent news with just and the verb in brackets.",
+        "The replacement bus __________. (arrive)",
+        "has just arrived",
+        [],
+        "Use has just + past participle for a very recent event."
+      ),
+      placeholderGapItem(
+        "b1-b2-5a-gf-2",
+        "Complete the negative sentence with the verb in brackets.",
+        "We __________ a venue for the conference yet. (not choose)",
+        "haven't chosen",
+        ["have not chosen"],
+        "Use haven't + past participle in a present-perfect negative."
+      ),
+      doubleGap(
+        "b1-b2-5a-gf-3",
+        "Complete the question. Use the verb in brackets.",
+        [{ gapId: "g1" }, " you ", { gapId: "g2" }, " to the new manager yet? (speak)"],
+        ["Have"],
+        ["spoken"],
+        "Use Have before the subject and the past participle spoken."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-5a-cg-1",
+        "Choose the correct form or time word for each gap.",
+        "Jade ____ just ____ the invoice. She hasn't received a reply ____. She has worked with this client ____ 2023.",
+        ["has", "sent", "yet", "since"],
+        "Build the present perfect with has + past participle, and choose yet or since according to the meaning.",
+        ["has", "did", "sent", "send", "yet", "already", "since", "for"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-5a-ec-1",
+        "Check the highlighted phrase.",
+        "I've met Karim at the workshop last Friday.",
+        "I've met Karim at the workshop last Friday",
+        false,
+        "I met Karim at the workshop last Friday",
+        "Use the past simple with the finished past time last Friday."
+      ),
+      errorCorrectionItem(
+        "b1-b2-5a-ec-2",
+        "Check the highlighted phrase.",
+        "We've lived on this street for three years.",
+        "We've lived",
+        true,
+        "",
+        "Correct! The present perfect with for describes a situation continuing until now."
+      ),
+      errorCorrectionItem(
+        "b1-b2-5a-ec-3",
+        "Check the highlighted word.",
+        "The courier hasn't collected the package already.",
+        "already",
+        false,
+        "yet",
+        "Use yet, normally at the end, in a negative sentence about an expected event."
+      ),
+      wordOrderItem(
+        "b1-b2-5a-wo-1",
+        "Put the words in the correct order.",
+        ["ridden", "Have", "horse", "ever", "you", "a"],
+        "Have you ever ridden a horse?",
+        "Put ever before the past participle in a present-perfect experience question."
+      ),
+      wordOrderItem(
+        "b1-b2-5a-wo-2",
+        "Put the words in the correct order.",
+        ["result", "haven't", "yet", "They", "the", "announced"],
+        "They haven't announced the result yet.",
+        "Put yet at the end of a present-perfect negative."
+      ),
+      {
+        id: "b1-b2-5a-lisbon-trip-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with the present perfect or past simple. Use the verbs in brackets.",
+        parts: [
+          "A: Have you ever ",
+          { gapId: "g1" },
+          " Lisbon? (visit)\nB: Yes, I ",
+          { gapId: "g2" },
+          " there last summer. (go)\nA: Have you ",
+          { gapId: "g3" },
+          " pastéis de nata yet? (try)\nB: No, I ",
+          { gapId: "g4" },
+          " them yet. (not eat)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["visited"], feedback: "Use the past participle visited after Have you ever." },
+          { id: "g2", acceptedAnswers: ["went"], feedback: "Use the past simple with the finished time last summer." },
+          { id: "g3", acceptedAnswers: ["tried"], feedback: "Use the past participle tried after Have you." },
+          { id: "g4", acceptedAnswers: ["haven't eaten", "have not eaten"], feedback: "Use a present-perfect negative with yet." },
+        ],
+      },
+      {
+        id: "b1-b2-5a-studio-life-1",
+        type: "gap-fill",
+        prompt: "Complete the description with the present perfect simple. Use the verbs in brackets.",
+        parts: [
+          "Leo ",
+          { gapId: "g1" },
+          " this studio since 2021. (own) He ",
+          { gapId: "g2" },
+          " his neighbours for years. (know) He ",
+          { gapId: "g3" },
+          " a car since he moved here. (not need) He ",
+          { gapId: "g4" },
+          " at home all week. (be)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["has owned"], feedback: "Use the present perfect simple with the non-action verb own." },
+          { id: "g2", acceptedAnswers: ["has known"], feedback: "Use the present perfect simple with the non-action verb know." },
+          { id: "g3", acceptedAnswers: ["hasn't needed", "has not needed"], feedback: "Use the negative present perfect for the situation continuing until now." },
+          { id: "g4", acceptedAnswers: ["has been"], feedback: "Use the present perfect with all week and no for." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-5b-present-perfect-continuous",
+    title: "5B · Present Perfect Continuous",
+    shortDescription: "Use the present perfect continuous for recent, repeated, and unfinished activities.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use have or has been + verb-ing for recent or repeated activities, visible present results, and actions continuing until now. Use the present perfect simple with non-action verbs and when a completed quantity is important.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-5b-mc-1",
+        "Choose the correct form.",
+        "Mina ____ late a lot recently.",
+        ["works", "has been working", "has working"],
+        1,
+        "Use the present perfect continuous for a repeated recent activity."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5b-mc-2",
+        "Choose the best explanation of the present result.",
+        "Why is there blue paint on your hands?",
+        ["I've been painting the shelves.", "I paint the shelves every year.", "I've painted the shelves in 2024."],
+        0,
+        "Use the present perfect continuous for a recent activity with a visible result now."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5b-mc-3",
+        "Choose the correct form.",
+        "How long ____ Marta?",
+        ["have you been knowing", "are you knowing", "have you known"],
+        2,
+        "Know is a non-action verb, so use the present perfect simple."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5b-mc-4",
+        "Choose the correct form.",
+        "She ____ for three hours yesterday and then went home.",
+        ["has been working", "worked", "has worked"],
+        1,
+        "Use the past simple with the finished past time yesterday."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5b-mc-5",
+        "Choose the correct form.",
+        "It ____ since early this morning, and the roads are still wet.",
+        ["rains", "has rained yesterday", "has been raining"],
+        2,
+        "Use the present perfect continuous for an activity continuing from the past until now."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5b-mc-6",
+        "Choose the best form.",
+        "I ____ twelve customer emails so far today.",
+        ["have answered", "have been answering", "answer"],
+        0,
+        "Use the present perfect simple when the completed quantity is important."
+      ),
+      multipleChoiceItem(
+        "b1-b2-5b-mc-7",
+        "Choose the best explanation of the present result.",
+        "His clothes are covered in mud because he ____ in the garden.",
+        ["worked last year", "has been working", "works"],
+        1,
+        "Use the present perfect continuous for a recent activity with a result visible now."
+      ),
+      placeholderGapItem(
+        "b1-b2-5b-gf-1",
+        "Complete the sentence with the present perfect continuous form of the verb.",
+        "We __________ for the technician since nine o'clock, and the technician still isn't here. (wait)",
+        "have been waiting",
+        [],
+        "Use have been + verb-ing for an action continuing until now."
+      ),
+      placeholderGapItem(
+        "b1-b2-5b-gf-2",
+        "Complete the negative sentence with the present perfect continuous form of the verb.",
+        "The baby __________ well recently. (not sleep)",
+        "hasn't been sleeping",
+        ["has not been sleeping"],
+        "Use hasn't been + verb-ing for a recent negative pattern."
+      ),
+      placeholderGapItem(
+        "b1-b2-5b-gf-3",
+        "Complete the question with the present perfect continuous form of the verb.",
+        "How long __________ Japanese? (learn)",
+        "have you been learning",
+        [],
+        "Use have + subject + been + verb-ing in the question."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-5b-cg-1",
+        "Choose the correct form for each gap.",
+        "Lina ____ for a half marathon since January. She ____ three 10K races so far. Recently, her knee ____ hurting, so she ____ to rest for a week yesterday.",
+        ["has been training", "has completed", "has been", "decided"],
+        "Use the continuous for ongoing activity, the simple for a completed quantity, and the past simple with yesterday.",
+        ["has trained", "has been training", "completed", "has completed", "is", "has been", "has decided", "decided"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-5b-ec-1",
+        "Check the highlighted phrase.",
+        "I've been knowing Elena since primary school.",
+        "I've been knowing",
+        false,
+        ["I've known", "I have known"],
+        "Know is a non-action verb, so use the present perfect simple."
+      ),
+      errorCorrectionItem(
+        "b1-b2-5b-ec-2",
+        "Check the highlighted phrase.",
+        "We've been writing six pages of the report so far.",
+        "We've been writing six pages",
+        false,
+        ["We've written six pages", "We have written six pages"],
+        "Use the present perfect simple when emphasizing a completed quantity."
+      ),
+      errorCorrectionItem(
+        "b1-b2-5b-ec-3",
+        "Check the highlighted phrase.",
+        "I've been reading the manual all morning.",
+        "I've been reading",
+        true,
+        "",
+        "Correct! The activity began earlier and has continued through the morning."
+      ),
+      wordOrderItem(
+        "b1-b2-5b-wo-1",
+        "Put the words in the correct order.",
+        ["they", "How", "waiting", "have", "long", "been"],
+        "How long have they been waiting?",
+        "Use How long + have + subject + been + verb-ing."
+      ),
+      wordOrderItem(
+        "b1-b2-5b-wo-2",
+        "Put the words in the correct order.",
+        ["all", "reach", "I've", "day", "been", "you", "trying", "to"],
+        "I've been trying to reach you all day.",
+        "Use have been + verb-ing, followed by the time expression."
+      ),
+      {
+        id: "b1-b2-5b-catering-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with the present perfect simple or continuous. Use the verbs in brackets.",
+        parts: [
+          "A: You look exhausted.\nB: I ",
+          { gapId: "g1" },
+          " food since six this morning. (prepare) I ",
+          { gapId: "g2" },
+          " forty sandwiches so far. (make) I ",
+          { gapId: "g3" },
+          " down much today. (not sit)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["have been preparing"], feedback: "Use the continuous for the ongoing activity." },
+          { id: "g2", acceptedAnswers: ["have made"], feedback: "Use the simple because forty sandwiches is a completed quantity." },
+          { id: "g3", acceptedAnswers: ["haven't been sitting", "have not been sitting"], feedback: "Use the negative continuous for the activity over the period today." },
+        ],
+      },
+      {
+        id: "b1-b2-5b-research-job-1",
+        type: "gap-fill",
+        prompt: "Complete the interview with the best verb forms. Use the verbs in brackets.",
+        parts: [
+          "A: How long ",
+          { gapId: "g1" },
+          " at the research centre? (work)\nB: I ",
+          { gapId: "g2" },
+          " here for nearly two years. (work) I ",
+          { gapId: "g3" },
+          " the director since university. (know) Yesterday, I ",
+          { gapId: "g4" },
+          " until ten because of a deadline. (work)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["have you been working"], feedback: "Use a present-perfect continuous question for duration until now." },
+          { id: "g2", acceptedAnswers: ["have been working", "have worked"], feedback: "With work, both the simple and continuous forms can describe duration." },
+          { id: "g3", acceptedAnswers: ["have known"], feedback: "Use the simple form with the non-action verb know." },
+          { id: "g4", acceptedAnswers: ["worked"], feedback: "Use the past simple with the finished time yesterday." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-6a-obligation-advice",
+    title: "6A · Obligation, Necessity, Prohibition, and Advice",
+    shortDescription: "Distinguish rules, personal obligations, lack of necessity, prohibition, and advice.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use have to and need to for obligations and necessities in different tenses, must for strong present obligation, and should or ought to for advice. Don't have to and needn't mean something is unnecessary; mustn't means it is prohibited.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-6a-mc-1",
+        "Choose the correct form.",
+        "All visitors ____ at reception before entering the laboratory.",
+        ["has to sign", "have sign", "have to sign"],
+        2,
+        "Use have to + base verb with the plural subject all visitors."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6a-mc-2",
+        "Choose the correct past form.",
+        "The lift was broken, so we ____ six flights of stairs.",
+        ["must climb", "had to climb", "have to climbed"],
+        1,
+        "Use had to for an obligation or necessity in the past."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6a-mc-3",
+        "Choose the form that means there is no obligation.",
+        "Entry is free, so you ____ for a ticket.",
+        ["don't have to pay", "mustn't pay", "shouldn't pay"],
+        0,
+        "Don't have to means that payment is not necessary."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6a-mc-4",
+        "Choose the form that expresses prohibition.",
+        "These chemicals are dangerous. You ____ them without gloves.",
+        ["don't need to touch", "oughtn't touch", "mustn't touch"],
+        2,
+        "Mustn't means that touching the chemicals is prohibited."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6a-mc-5",
+        "Choose the best form.",
+        "I ____ to call my grandmother tonight; it's her birthday.",
+        ["must remember", "should remembering", "have remember"],
+        0,
+        "Use must for a strong personal obligation the speaker feels now."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6a-mc-6",
+        "Choose the best advice.",
+        "That cough sounds painful. You ____ a doctor.",
+        ["don't have to see", "should see", "mustn't see"],
+        1,
+        "Use should + base verb to give advice."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6a-mc-7",
+        "Choose the correct future form.",
+        "When the new rule begins, cyclists ____ lights after dark.",
+        ["must to use", "had to use", "will have to use"],
+        2,
+        "Use will have to for a future obligation."
+      ),
+      placeholderGapItem(
+        "b1-b2-6a-gf-1",
+        "Complete the sentence with the past form of have to and the verb in brackets.",
+        "We __________ the outdoor concert because of the storm. (cancel)",
+        "had to cancel",
+        [],
+        "Use had to + base verb for a past necessity."
+      ),
+      placeholderGapItem(
+        "b1-b2-6a-gf-2",
+        "Complete the sentence with don't have to and the verb in brackets.",
+        "Towels are provided, so you __________ your own. (bring)",
+        "don't have to bring",
+        ["do not have to bring"],
+        "Use don't have to + base verb when something is not necessary."
+      ),
+      placeholderGapItem(
+        "b1-b2-6a-gf-3",
+        "Complete the advice with ought to and the verb in brackets.",
+        "You __________ your files before installing the update. (back up)",
+        "ought to back up",
+        [],
+        "Use ought to + base verb to give advice."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-6a-cg-1",
+        "Choose the best form for each gap.",
+        "Employees ____ display their ID badges. Visitors ____ enter the server room. You ____ book a desk on Fridays because plenty are free. If your back hurts, you ____ take regular breaks.",
+        ["have to", "mustn't", "don't have to", "should"],
+        "Distinguish obligation, prohibition, lack of obligation, and advice.",
+        ["have to", "must", "mustn't", "don't have to", "needn't", "should", "shouldn't", "ought to"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-6a-ec-1",
+        "Check the highlighted phrase.",
+        "Parking is free on Sundays, so you mustn't pay.",
+        "mustn't pay",
+        false,
+        ["don't have to pay", "do not have to pay", "needn't pay", "do not need to pay"],
+        "Use don't have to or needn't for something that is unnecessary; mustn't means prohibited."
+      ),
+      errorCorrectionItem(
+        "b1-b2-6a-ec-2",
+        "Check the highlighted phrase.",
+        "We must to submit the form before noon.",
+        "must to submit",
+        false,
+        "must submit",
+        "Use the base verb without to after must."
+      ),
+      errorCorrectionItem(
+        "b1-b2-6a-ec-3",
+        "Check the highlighted phrase.",
+        "You needn't bring a printed copy; the digital version is enough.",
+        "needn't bring",
+        true,
+        "",
+        "Correct! Needn't + base verb means that something is not necessary."
+      ),
+      wordOrderItem(
+        "b1-b2-6a-wo-1",
+        "Put the words in the correct order.",
+        ["have", "work", "tomorrow", "You", "late", "won't", "to"],
+        "You won't have to work late tomorrow.",
+        "Use won't have to for the absence of a future obligation."
+      ),
+      wordOrderItem(
+        "b1-b2-6a-wo-2",
+        "Put the words in the correct order.",
+        ["manager", "speak", "Should", "my", "I", "to"],
+        "Should I speak to my manager?",
+        "Use Should + subject + base verb to ask for advice."
+      ),
+      {
+        id: "b1-b2-6a-conference-rules-1",
+        type: "gap-fill",
+        prompt: "Complete the conference information with had to, mustn't, don't have to, or need to. Use the verbs in brackets.",
+        parts: [
+          "Last year, attendees ",
+          { gapId: "g1" },
+          " paper passes at the entrance. (show) This year, you ",
+          { gapId: "g2" },
+          " one because the pass is in the app. (print) However, you ",
+          { gapId: "g3" },
+          " by 9:00 for the security check. (arrive) You ",
+          { gapId: "g4" },
+          " bags near the emergency exits. (leave)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["had to show"], feedback: "Use had to for the rule in the past." },
+          { id: "g2", acceptedAnswers: ["don't have to print", "do not have to print"], feedback: "Use don't have to because printing is unnecessary." },
+          { id: "g3", acceptedAnswers: ["need to arrive"], feedback: "Use need to for a present necessity." },
+          { id: "g4", acceptedAnswers: ["mustn't leave", "must not leave"], feedback: "Use mustn't for a prohibition." },
+        ],
+      },
+      {
+        id: "b1-b2-6a-headache-advice-1",
+        type: "gap-fill",
+        prompt: "Complete the advice with suitable forms. Use the verbs in brackets.",
+        parts: [
+          "If you get headaches at your desk, you ",
+          { gapId: "g1" },
+          " regular screen breaks. (take) You ",
+          { gapId: "g2" },
+          " lunch just because you're busy. (not skip) You ",
+          { gapId: "g3" },
+          " your screen position too. (check) If the pain becomes sudden or severe, you ",
+          { gapId: "g4" },
+          " to a doctor immediately. (speak)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["should take", "ought to take"], feedback: "Use should or ought to for practical advice." },
+          { id: "g2", acceptedAnswers: ["shouldn't skip", "should not skip", "oughtn't to skip", "ought not to skip"], feedback: "Use a negative advice form with the base verb skip." },
+          { id: "g3", acceptedAnswers: ["should check", "ought to check"], feedback: "Use should or ought to for another recommendation." },
+          { id: "g4", acceptedAnswers: ["must speak", "need to speak", "have to speak"], feedback: "Use a strong obligation or necessity form for urgent advice." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-6b-can-could-able-to",
+    title: "6B · Can, Could, and Be Able To",
+    shortDescription: "Express ability, successful actions, possibility, permission, requests, and deduction.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use can for present ability, possibility, and permission, and could for general past ability and polite requests. Use be able to where can has no suitable form, and was or were able to for a successful action on one specific past occasion.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-6b-mc-1",
+        "Choose the correct form.",
+        "Eva ____ read both Greek and Cyrillic alphabets.",
+        ["can", "is can", "can to"],
+        0,
+        "Use can + base verb for present ability."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6b-mc-2",
+        "Choose the correct future form.",
+        "After the software update, users ____ edit documents offline.",
+        ["will can", "can will", "will be able to"],
+        2,
+        "Use will be able to because can has no future infinitive form."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6b-mc-3",
+        "Choose the correct form for general past ability.",
+        "By the age of twelve, Luis ____ play several songs from memory.",
+        ["was able playing", "could", "can"],
+        1,
+        "Use could for a general ability in the past."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6b-mc-4",
+        "Choose the best form for a successful action on one occasion.",
+        "The lock was damaged, but the technician ____ the door after twenty minutes.",
+        ["was able to open", "could open", "can open"],
+        0,
+        "Use was able to for a successful action on a specific past occasion."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6b-mc-5",
+        "Choose the correct infinitive form.",
+        "Maya hopes ____ work abroad next year.",
+        ["can", "to be able to", "being able to"],
+        1,
+        "Use to be able to after hopes; can has no infinitive form."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6b-mc-6",
+        "Choose the correct deduction.",
+        "This ____ be the right address; the building number is 18, not 80.",
+        ["must", "could to", "can't"],
+        2,
+        "Use can't for a deduction that something is impossible."
+      ),
+      multipleChoiceItem(
+        "b1-b2-6b-mc-7",
+        "Choose the most polite request.",
+        "____ you send me the revised schedule, please?",
+        ["Could", "Are able", "Must"],
+        0,
+        "Use Could you ...? to make a polite request."
+      ),
+      placeholderGapItem(
+        "b1-b2-6b-gf-1",
+        "Complete the sentence with the present perfect form of be able to and the verb in brackets.",
+        "Since the repair, we __________ the upstairs rooms again. (use)",
+        "have been able to use",
+        [],
+        "Use have been able to + base verb for ability continuing to the present."
+      ),
+      placeholderGapItem(
+        "b1-b2-6b-gf-2",
+        "Complete the negative sentence with the future form of be able to and the verb in brackets.",
+        "I __________ the meeting tomorrow because of a medical appointment. (not attend)",
+        "won't be able to attend",
+        ["will not be able to attend"],
+        "Use won't be able to + base verb for a future lack of ability or possibility."
+      ),
+      placeholderGapItem(
+        "b1-b2-6b-gf-3",
+        "Complete the sentence with was able to and the verb in brackets.",
+        "After several attempts, Sami __________ the account. (unlock)",
+        "was able to unlock",
+        [],
+        "Use was able to for a successful action on this specific occasion."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-6b-cg-1",
+        "Choose the correct ability form for each gap.",
+        "When Leo was eight, he ____ read music. Yesterday, he ____ repair a broken keyboard after hours of work. We ____ contact the venue all morning. After the upgrade, the system ____ process larger files.",
+        ["could", "was able to", "haven't been able to", "will be able to"],
+        "Choose could for general past ability, was able to for one successful action, and be able to for perfect and future forms.",
+        ["could", "was able to", "can", "haven't been able to", "couldn't", "will be able to", "will can"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-6b-ec-1",
+        "Check the highlighted phrase.",
+        "Once the bridge reopens, buses will can use this route again.",
+        "will can use",
+        false,
+        "will be able to use",
+        "Use will be able to, not will can, for future ability or possibility."
+      ),
+      errorCorrectionItem(
+        "b1-b2-6b-ec-2",
+        "Check the highlighted phrase.",
+        "Despite the noise, I managed finish the recording.",
+        "managed finish",
+        false,
+        "managed to finish",
+        "Use managed to + base verb for a successful action."
+      ),
+      errorCorrectionItem(
+        "b1-b2-6b-ec-3",
+        "Check the highlighted phrase.",
+        "My grandfather could swim before he started school.",
+        "could swim",
+        true,
+        "",
+        "Correct! Could describes a general ability in the past."
+      ),
+      wordOrderItem(
+        "b1-b2-6b-wo-1",
+        "Put the words in the correct order.",
+        ["Arabic", "like", "I'd", "speak", "able", "to", "be", "to"],
+        "I'd like to be able to speak Arabic.",
+        "Use to be able to after would like."
+      ),
+      wordOrderItem(
+        "b1-b2-6b-wo-2",
+        "Put the words in the correct order.",
+        ["tomorrow", "join", "able", "Will", "to", "us", "be", "you"],
+        "Will you be able to join us tomorrow?",
+        "Use Will + subject + be able to + base verb."
+      ),
+      {
+        id: "b1-b2-6b-emergency-training-1",
+        type: "gap-fill",
+        prompt: "Complete the report with suitable ability forms. Use the verbs in brackets.",
+        parts: [
+          "As a child, Rina ",
+          { gapId: "g1" },
+          " calm in emergencies. (stay) During yesterday's exercise, she ",
+          { gapId: "g2" },
+          " a jammed door. (open) Since joining the team, she ",
+          { gapId: "g3" },
+          " during several real emergencies. (help) Next year, she ",
+          { gapId: "g4" },
+          " new volunteers. (train)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["could stay"], feedback: "Use could for a general ability in the past." },
+          { id: "g2", acceptedAnswers: ["was able to open", "managed to open"], feedback: "Use was able to or managed to for success on one specific occasion." },
+          { id: "g3", acceptedAnswers: ["has been able to help"], feedback: "Use has been able to for ability from the past until now." },
+          { id: "g4", acceptedAnswers: ["will be able to train"], feedback: "Use will be able to for future ability." },
+        ],
+      },
+      {
+        id: "b1-b2-6b-printer-problem-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with suitable forms. Use the verbs in brackets.",
+        parts: [
+          "A: ",
+          { gapId: "g1" },
+          " me with this printer, please? (help)\nB: Yes, I ",
+          { gapId: "g2" },
+          " a look now. (take) This ",
+          { gapId: "g3" },
+          " the correct cable; the plug is the wrong shape. (be) I might ",
+          { gapId: "g4" },
+          " it if we find the other cable. (repair)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["Could you help", "Can you help"], feedback: "Use Could you or Can you + base verb for a request." },
+          { id: "g2", acceptedAnswers: ["can take"], feedback: "Use can for present willingness and possibility." },
+          { id: "g3", acceptedAnswers: ["can't be", "cannot be"], feedback: "Use can't for the deduction that this is impossible." },
+          { id: "g4", acceptedAnswers: ["be able to repair"], feedback: "Use be able to after might." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-7a-phrasal-verbs",
+    title: "7A · Phrasal Verbs",
+    shortDescription: "Place noun and pronoun objects correctly with separable and inseparable phrasal verbs.",
+    levels: ["b1", "b2"],
+    intro:
+      "Some phrasal verbs have no object. With separable phrasal verbs, a noun can go before or after the particle, but a pronoun must go between them. Inseparable phrasal verbs stay together, even when the object is a pronoun.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-7a-mc-1",
+        "Choose the correct pronoun position.",
+        "The music is too loud. Please ____.",
+        ["turn it down", "turn down it", "turn it"],
+        0,
+        "Turn down is separable, so the pronoun it goes between the verb and particle."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7a-mc-2",
+        "Choose the correct sentence.",
+        "Which sentence has the object in the correct position?",
+        ["Nora takes her mother after.", "Nora takes after to her mother.", "Nora takes after her mother."],
+        2,
+        "Take after is inseparable, so the phrasal verb stays together before its object."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7a-mc-3",
+        "Choose the correct form.",
+        "The hikers ____ before sunrise to avoid the heat.",
+        ["set the journey off", "set off", "set before sunrise off"],
+        1,
+        "Set off has no object here and cannot be separated."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7a-mc-4",
+        "Choose the pair in which both forms are possible.",
+        "Which pair is correct?",
+        ["fill in it / fill it in", "fill in the form / fill the form in", "fill the form / fill it"],
+        1,
+        "A noun object can go before or after the particle in the separable phrasal verb fill in."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7a-mc-5",
+        "Choose the correct pronoun position.",
+        "Before you leave, ____.",
+        ["switch it off", "switch off it", "switch it"],
+        0,
+        "With the separable phrasal verb switch off, the pronoun goes between the two parts."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7a-mc-6",
+        "Choose the correct form.",
+        "I'm looking forward ____ from you.",
+        ["to hear", "for hearing", "to hearing"],
+        2,
+        "Look forward to stays together, and a following verb takes the -ing form."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7a-mc-7",
+        "Choose the correct sentence.",
+        "Which sentence is correct?",
+        ["Tariq gets his new flatmates on with.", "Tariq gets on well with his new flatmates.", "Tariq gets on his new flatmates with."],
+        1,
+        "Get on with has two particles and is inseparable."
+      ),
+      placeholderGapItem(
+        "b1-b2-7a-gf-1",
+        "Complete the sentence with pick up and the pronoun me in the correct position.",
+        "Could you __________ outside the station at six?",
+        "pick me up",
+        [],
+        "Put the pronoun me between pick and up."
+      ),
+      placeholderGapItem(
+        "b1-b2-7a-gf-2",
+        "Complete the sentence with put away and the pronoun them in the correct position.",
+        "These folders are confidential. Please __________ before the meeting.",
+        "put them away",
+        [],
+        "Put the pronoun them between put and away."
+      ),
+      placeholderGapItem(
+        "b1-b2-7a-gf-3",
+        "Complete the sentence with look after and the pronoun her in the correct position.",
+        "Marta is ill, so her sister is __________ this week.",
+        "looking after her",
+        [],
+        "Look after is inseparable, so put the pronoun after the complete phrasal verb."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-7a-cg-1",
+        "Choose the correct phrasal-verb form for each gap.",
+        "When the courier arrived, I ____ the form and handed it back. I didn't need the old envelope, so I ____. Before leaving, I ____ the lights. Then I ____ for my keys.",
+        ["filled it in", "threw it away", "switched them off", "looked for them"],
+        "Put pronouns inside separable phrasal verbs, but after inseparable ones such as look for.",
+        ["filled it in", "filled in it", "threw it away", "threw away it", "switched them off", "switched off them", "looked for them", "looked them for"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-7a-ec-1",
+        "Check the highlighted phrase.",
+        "The TV is very loud. Could you turn down it?",
+        "turn down it",
+        false,
+        "turn it down",
+        "With a separable phrasal verb, the pronoun must go between the verb and particle."
+      ),
+      errorCorrectionItem(
+        "b1-b2-7a-ec-2",
+        "Check the highlighted phrase.",
+        "I've looked my charger for everywhere.",
+        "looked my charger for",
+        false,
+        "looked for my charger",
+        "Look for is inseparable, so the object follows the complete phrasal verb."
+      ),
+      errorCorrectionItem(
+        "b1-b2-7a-ec-3",
+        "Check the highlighted phrase.",
+        "Rita grew London up, but she now lives in Bristol.",
+        "grew London up",
+        false,
+        "grew up in London",
+        "Grow up has no object; use in before the place."
+      ),
+      wordOrderItem(
+        "b1-b2-7a-wo-1",
+        "Put the words in the correct order.",
+        ["give", "Don't", "away", "it"],
+        "Don't give it away.",
+        "Put the pronoun between the two parts of the separable phrasal verb."
+      ),
+      wordOrderItem(
+        "b1-b2-7a-wo-2",
+        "Put the words in the correct order.",
+        ["looking", "I'm", "weekend", "forward", "the", "to"],
+        "I'm looking forward to the weekend.",
+        "Keep the two-particle phrasal verb look forward to together."
+      ),
+      {
+        id: "b1-b2-7a-travel-day-1",
+        type: "gap-fill",
+        prompt: "Complete the travel story with the correct form of each phrasal verb in brackets.",
+        parts: [
+          "We ",
+          { gapId: "g1" },
+          " before sunrise. (set off) Our plane ",
+          { gapId: "g2" },
+          " on time. (take off) At the hotel, the receptionist gave us registration cards and asked us to ",
+          { gapId: "g3" },
+          ". (fill in) Later, we ",
+          { gapId: "g4" },
+          " in our bags. (put away)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["set off"], feedback: "Set off has no object and stays together." },
+          { id: "g2", acceptedAnswers: ["took off"], feedback: "Use the past form took off; this phrasal verb has no object here." },
+          { id: "g3", acceptedAnswers: ["fill them in"], feedback: "Put the pronoun them between fill and in." },
+          { id: "g4", acceptedAnswers: ["put them away"], feedback: "Put the pronoun them between put and away." },
+        ],
+      },
+      {
+        id: "b1-b2-7a-family-plans-1",
+        type: "gap-fill",
+        prompt: "Complete the description with the correct form of each phrasal verb in brackets.",
+        parts: [
+          "My sister really ",
+          { gapId: "g1" },
+          " our mother. (take after) I ",
+          { gapId: "g2" },
+          " her very well. (get on with) At the moment, she's ",
+          { gapId: "g3" },
+          " a new flat. (look for) She's ",
+          { gapId: "g4" },
+          " closer to us. (look forward to / live)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["takes after"], feedback: "Keep take after together before its object." },
+          { id: "g2", acceptedAnswers: ["get on with"], feedback: "Keep the two-particle verb get on with together." },
+          { id: "g3", acceptedAnswers: ["looking for"], feedback: "Keep look for together before the object." },
+          { id: "g4", acceptedAnswers: ["looking forward to living"], feedback: "Use verb-ing after the preposition to in look forward to." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-7b-verb-patterns",
+    title: "7B · Verb Patterns",
+    shortDescription: "Choose infinitives, gerunds, and object patterns after common verbs and expressions.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use to + infinitive after many verbs and adjectives, a bare infinitive after modal verbs and after let or make, and a gerund after prepositions and certain verbs. Some verbs take an object before the infinitive.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-7b-mc-1",
+        "Choose the correct verb pattern.",
+        "We really enjoy ____ documentaries together.",
+        ["to watch", "watching", "watch"],
+        1,
+        "Enjoy is followed by a gerund."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7b-mc-2",
+        "Choose the correct verb pattern.",
+        "They decided ____ before the traffic became heavy.",
+        ["to leave", "leaving", "leave"],
+        0,
+        "Decide is followed by to + infinitive."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7b-mc-3",
+        "Choose the correct verb pattern.",
+        "We might ____ a little late tonight.",
+        ["to be", "being", "be"],
+        2,
+        "Use the bare infinitive after the modal verb might."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7b-mc-4",
+        "Choose the correct verb pattern.",
+        "The guard wouldn't let him ____ the building.",
+        ["to enter", "entering", "enter"],
+        2,
+        "Let takes an object followed by a bare infinitive."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7b-mc-5",
+        "Choose the correct verb pattern.",
+        "My colleague persuaded me ____ for the promotion.",
+        ["applying", "to apply", "apply"],
+        1,
+        "Persuade takes an object followed by to + infinitive."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7b-mc-6",
+        "Choose the correct verb pattern.",
+        "Kai is very good at ____ practical solutions.",
+        ["finding", "to find", "find"],
+        0,
+        "Use a gerund after the preposition at."
+      ),
+      multipleChoiceItem(
+        "b1-b2-7b-mc-7",
+        "Choose the correct negative infinitive.",
+        "The editor told everyone ____ the draft outside the team.",
+        ["don't share", "not sharing", "not to share"],
+        2,
+        "Put not before to + infinitive: not to share."
+      ),
+      placeholderGapItem(
+        "b1-b2-7b-gf-1",
+        "Complete the sentence with the correct form of the verb in brackets.",
+        "The final paragraph is difficult __________ without more context. (understand)",
+        "to understand",
+        [],
+        "Use to + infinitive after the adjective difficult."
+      ),
+      placeholderGapItem(
+        "b1-b2-7b-gf-2",
+        "Complete the negative infinitive with the verb in brackets.",
+        "The usher told us __________ in the aisle. (not stand)",
+        "not to stand",
+        [],
+        "Use tell + object + not to + infinitive."
+      ),
+      placeholderGapItem(
+        "b1-b2-7b-gf-3",
+        "Complete the sentence with the correct form of the verb in brackets.",
+        "After ten years, Mila has given up __________ nights. (work)",
+        "working",
+        [],
+        "Give up is followed by a gerund."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-7b-cg-1",
+        "Choose the correct verb form for each gap.",
+        "Dan offered ____ us move. I suggested ____ a van. His neighbour let us ____ some boxes in her garage. We finished ____ at midnight.",
+        ["to help", "hiring", "store", "unpacking"],
+        "Use an infinitive after offer, gerunds after suggest and finish, and a bare infinitive after let + object.",
+        ["to help", "helping", "hire", "hiring", "to store", "store", "to unpack", "unpacking"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-7b-ec-1",
+        "Check the highlighted phrase.",
+        "The delay made us to miss our connection.",
+        "made us to miss",
+        false,
+        "made us miss",
+        "Make takes an object followed by a bare infinitive."
+      ),
+      errorCorrectionItem(
+        "b1-b2-7b-ec-2",
+        "Check the highlighted phrase.",
+        "I'm looking forward to meet the new team.",
+        "to meet",
+        false,
+        "to meeting",
+        "The to in look forward to is a preposition, so use a gerund after it."
+      ),
+      errorCorrectionItem(
+        "b1-b2-7b-ec-3",
+        "Check the highlighted phrase.",
+        "Learning another language takes time and patience.",
+        "Learning another language",
+        true,
+        "",
+        "Correct! A gerund phrase can be the subject of a sentence."
+      ),
+      wordOrderItem(
+        "b1-b2-7b-wo-1",
+        "Put the words in the correct order.",
+        ["lock", "reminded", "door", "me", "She", "the", "to"],
+        "She reminded me to lock the door.",
+        "Use remind + object + to + infinitive."
+      ),
+      wordOrderItem(
+        "b1-b2-7b-wo-2",
+        "Put the words in the correct order.",
+        ["wait", "They", "outside", "made", "us"],
+        "They made us wait outside.",
+        "Use make + object + bare infinitive."
+      ),
+      {
+        id: "b1-b2-7b-language-course-1",
+        type: "gap-fill",
+        prompt: "Complete the course review with the correct forms of the verbs in brackets.",
+        parts: [
+          "Our teacher encouraged us ",
+          { gapId: "g1" },
+          " from the first lesson. (speak) She allowed us ",
+          { gapId: "g2" },
+          " short conversations. (record) She sometimes made us ",
+          { gapId: "g3" },
+          " the same dialogue twice. (practise) We all enjoyed ",
+          { gapId: "g4" },
+          " in pairs. (work) She also took us to a café ",
+          { gapId: "g5" },
+          " ordering in a real setting. (practise)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["to speak"], feedback: "Encourage takes an object followed by to + infinitive." },
+          { id: "g2", acceptedAnswers: ["to record"], feedback: "Allow takes an object followed by to + infinitive." },
+          { id: "g3", acceptedAnswers: ["practise"], feedback: "Use the bare infinitive after made us." },
+          { id: "g4", acceptedAnswers: ["working"], feedback: "Enjoy is followed by a gerund." },
+          { id: "g5", acceptedAnswers: ["to practise"], feedback: "Use to + infinitive to express the purpose of going to the café." },
+        ],
+      },
+      {
+        id: "b1-b2-7b-future-study-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with the correct forms of the verbs in brackets.",
+        parts: [
+          "A: What do you hope ",
+          { gapId: "g1" },
+          " next year? (study)\nB: Design, but I can't afford ",
+          { gapId: "g2" },
+          " a flat alone. (rent) I'm considering ",
+          { gapId: "g3" },
+          " with two friends. (share) My parents want me ",
+          { gapId: "g4" },
+          " at home, though. (stay)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["to study"], feedback: "Hope is followed by to + infinitive." },
+          { id: "g2", acceptedAnswers: ["to rent"], feedback: "Afford is followed by to + infinitive." },
+          { id: "g3", acceptedAnswers: ["sharing"], feedback: "Consider is followed by a gerund." },
+          { id: "g4", acceptedAnswers: ["to stay"], feedback: "Want takes an object followed by to + infinitive." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-8a-have-something-done",
+    title: "8A · Have Something Done",
+    shortDescription: "Use have + object + past participle when someone else performs a service for you.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use have + object + past participle when you arrange for someone else to do something. Have is the main verb, so use do, does, or did in simple-tense questions and negatives, and change have to match the required tense or verb pattern. Get can often replace have in this structure.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-8a-mc-1",
+        "Choose the correct causative form.",
+        "A company cleans our office windows every month. We ____ every month.",
+        ["clean the windows", "have cleaned the windows", "have the windows cleaned"],
+        2,
+        "Use have + object + past participle when another person performs the service."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8a-mc-2",
+        "Choose the correct form.",
+        "Leila is at the salon now. She ____.",
+        ["cuts her hair", "is having her hair cut", "is having cut her hair"],
+        1,
+        "Use is having + object + past participle for a service happening now."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8a-mc-3",
+        "Choose the correct question.",
+        "Which question is correct?",
+        ["Have you had your eyes tested recently?", "Have you your eyes had tested recently?", "Did you had your eyes tested recently?"],
+        0,
+        "Use have + subject + had + object + past participle in the present perfect question."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8a-mc-4",
+        "Choose the correct form after should.",
+        "That lock is unreliable. You ____.",
+        ["should have it replaced", "should have replaced it", "should it have replaced"],
+        0,
+        "After should, use have + object + past participle."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8a-mc-5",
+        "Choose the sentence that means a mechanic did the work.",
+        "I paid a garage to service my car yesterday.",
+        ["I serviced my car yesterday.", "I had serviced my car yesterday.", "I had my car serviced yesterday."],
+        2,
+        "Had my car serviced means that I arranged and paid for the mechanic's work."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8a-mc-6",
+        "Choose the correct present-simple question.",
+        "How often ____ your boiler checked?",
+        ["does you have", "do you have", "are you have"],
+        1,
+        "Have is the main verb here, so use do to form the question."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8a-mc-7",
+        "Choose the correct sentence.",
+        "Which sentence correctly names the person who did the work?",
+        ["We had the heating checked by a qualified engineer.", "We had a qualified engineer checked the heating.", "We had checked the heating by a qualified engineer."],
+        0,
+        "Use by after the past participle to identify who performed the service."
+      ),
+      placeholderGapItem(
+        "b1-b2-8a-gf-1",
+        "Complete the sentence with have something done. Use the words in brackets.",
+        "Leo __________ at a specialist shop once a month. (dry-clean / his suits)",
+        "has his suits dry-cleaned",
+        [],
+        "Use has + object + past participle for a regular service."
+      ),
+      placeholderGapItem(
+        "b1-b2-8a-gf-2",
+        "Complete the negative sentence with have something done. Use the words in brackets.",
+        "I __________; I wash them myself. (not clean / the windows)",
+        "don't have the windows cleaned",
+        ["do not have the windows cleaned"],
+        "Use don't have + object + past participle for the present-simple negative."
+      ),
+      placeholderGapItem(
+        "b1-b2-8a-gf-3",
+        "Complete the plan with be going to and have or get something done. Use the words in brackets.",
+        "We __________ next month. (repair / the roof)",
+        "are going to have the roof repaired",
+        ["are going to get the roof repaired"],
+        "Use be going to have or get + object + past participle for the planned service."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-8a-cg-1",
+        "Choose the correct causative form for each gap.",
+        "Last week, Priya ____ at a repair shop. Right now, she ____ at the same shop. She ____ professionally, but next month she ____.",
+        ["had her laptop repaired", "is having its screen replaced", "has never had its keyboard cleaned", "will have its battery changed"],
+        "Change have to match the time, then use object + past participle.",
+        ["had her laptop repaired", "repaired her laptop", "is having its screen replaced", "is having replaced its screen", "has never had its keyboard cleaned", "has never cleaned its keyboard", "will have its battery changed", "will have changed its battery"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-8a-ec-1",
+        "Check the highlighted phrase.",
+        "Yesterday, I had cut my hair by a stylist.",
+        "had cut my hair",
+        false,
+        "had my hair cut",
+        "Put the object before the past participle in have something done."
+      ),
+      errorCorrectionItem(
+        "b1-b2-8a-ec-2",
+        "Check the highlighted phrase.",
+        "She has her passport renew last week.",
+        "has her passport renew",
+        false,
+        "had her passport renewed",
+        "Use had for the finished past time and the past participle renewed."
+      ),
+      errorCorrectionItem(
+        "b1-b2-8a-ec-3",
+        "Check the highlighted phrase.",
+        "We need to have the alarm tested before the building opens.",
+        "to have the alarm tested",
+        true,
+        "",
+        "Correct! Have something done can follow the infinitive marker to."
+      ),
+      wordOrderItem(
+        "b1-b2-8a-wo-1",
+        "Put the words in the correct order.",
+        ["installed", "We're", "having", "new", "windows"],
+        "We're having new windows installed.",
+        "Use be + having + object + past participle."
+      ),
+      wordOrderItem(
+        "b1-b2-8a-wo-2",
+        "Put the words in the correct order.",
+        ["you", "taken", "Where", "did", "photo", "have", "your"],
+        "Where did you have your photo taken?",
+        "Use did + subject + have + object + past participle."
+      ),
+      {
+        id: "b1-b2-8a-home-renovation-1",
+        type: "gap-fill",
+        prompt: "Complete the renovation update with have something done. Use the words in brackets.",
+        parts: [
+          "The Parkers ",
+          { gapId: "g1" },
+          " this week. (paint / the kitchen) At the moment, they ",
+          { gapId: "g2" },
+          ". (replace / the floor) Next month, they're ",
+          { gapId: "g3" },
+          ". (install / new lights) They also ought to ",
+          { gapId: "g4" },
+          ". (check / the locks)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["have had the kitchen painted"], feedback: "Use have had + object + past participle for the completed service this week." },
+          { id: "g2", acceptedAnswers: ["are having the floor replaced"], feedback: "Use are having + object + past participle for work happening now." },
+          { id: "g3", acceptedAnswers: ["going to have new lights installed"], feedback: "The sentence already supplies they're, so continue with going to have + object + past participle." },
+          { id: "g4", acceptedAnswers: ["have the locks checked"], feedback: "Use have + object + past participle after ought to." },
+        ],
+      },
+      {
+        id: "b1-b2-8a-car-service-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with have something done. Use the words in brackets.",
+        parts: [
+          "A: How often do you ",
+          { gapId: "g1" },
+          "? (service / your car)\nB: Once a year. I ",
+          { gapId: "g2" },
+          " last month. (service / it)\nA: Those tyres look worn.\nB: I know. I'm ",
+          { gapId: "g3" },
+          " on Friday. (replace / them)\nA: You should ",
+          { gapId: "g4" },
+          " too. (check / the brakes)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["have your car serviced"], feedback: "Use have + object + past participle after do you." },
+          { id: "g2", acceptedAnswers: ["had it serviced"], feedback: "Use had + object + past participle for the service last month." },
+          { id: "g3", acceptedAnswers: ["going to have them replaced"], feedback: "The sentence already supplies I'm, so continue with going to have + object + past participle." },
+          { id: "g4", acceptedAnswers: ["have the brakes checked"], feedback: "Use have + object + past participle after should." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-8b-passive",
+    title: "8B · The Passive",
+    shortDescription: "Build passive forms across tenses and choose the passive when the action is the focus.",
+    levels: ["b1", "b2"],
+    intro:
+      "Form the passive with the correct form of be + past participle. The tense is carried by be. Use the passive when the action or receiver is more important than the person doing it, and use by when the agent needs to be named.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-8b-mc-1",
+        "Choose the correct present-simple passive.",
+        "Household glass ____ from this point every Tuesday.",
+        ["is collected", "collects", "is collecting"],
+        0,
+        "Use is + past participle for the present-simple passive."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8b-mc-2",
+        "Choose the correct present-continuous passive.",
+        "The main entrance ____ at the moment.",
+        ["has repaired", "is being repaired", "is repairing"],
+        1,
+        "Use is being + past participle for the present-continuous passive."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8b-mc-3",
+        "Choose the correct present-perfect passive.",
+        "The revised budget ____ by the board.",
+        ["has approved", "is been approved", "has been approved"],
+        2,
+        "Use has been + past participle for the present-perfect passive."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8b-mc-4",
+        "Choose the correct past-perfect passive.",
+        "By the time we arrived, the road ____ because of flooding.",
+        ["was closing", "has been closed", "had been closed"],
+        2,
+        "Use had been + past participle for a passive action completed before another past event."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8b-mc-5",
+        "Choose the correct future passive.",
+        "The award winners ____ next Friday.",
+        ["will announce", "will be announced", "will be announcing"],
+        1,
+        "Use will be + past participle for the future passive."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8b-mc-6",
+        "Choose the correct passive after a modal verb.",
+        "Protective glasses ____ inside the workshop.",
+        ["must be worn", "must worn", "must be wearing"],
+        0,
+        "Use modal + be + past participle."
+      ),
+      multipleChoiceItem(
+        "b1-b2-8b-mc-7",
+        "Choose the correct passive gerund.",
+        "No one likes ____ during a presentation.",
+        ["being interrupt", "being interrupted", "to being interrupted"],
+        1,
+        "Use being + past participle to form a passive gerund."
+      ),
+      placeholderGapItem(
+        "b1-b2-8b-gf-1",
+        "Complete the past-simple passive with the verb in brackets.",
+        "The community centre __________ by a local architect. (design)",
+        "was designed",
+        [],
+        "Use was + past participle for the past-simple passive."
+      ),
+      placeholderGapItem(
+        "b1-b2-8b-gf-2",
+        "Complete the past-continuous passive with the verb in brackets.",
+        "At noon, the main hall __________ for the evening event. (clean)",
+        "was being cleaned",
+        [],
+        "Use was being + past participle for an action in progress in the past."
+      ),
+      placeholderGapItem(
+        "b1-b2-8b-gf-3",
+        "Complete the passive infinitive with the verb in brackets.",
+        "All applications need __________ online by Friday. (submit)",
+        "to be submitted",
+        [],
+        "Use to be + past participle after need."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-8b-cg-1",
+        "Choose the correct passive form for each gap.",
+        "These glass bottles ____ locally. New sorting equipment ____ this week. Four units ____ already, and the rest ____ before the end of the month.",
+        ["are recycled", "is being installed", "have been delivered", "will be tested"],
+        "Choose the form of be that matches the tense, then add the past participle.",
+        ["recycle", "are recycled", "is installed", "is being installed", "have delivered", "have been delivered", "will test", "will be tested"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-8b-ec-1",
+        "Check the highlighted phrase.",
+        "The sports centre was build in the 1980s.",
+        "was build",
+        false,
+        "was built",
+        "Use the past participle built after was."
+      ),
+      errorCorrectionItem(
+        "b1-b2-8b-ec-2",
+        "Check the highlighted phrase.",
+        "A confirmation email has being sent to every participant.",
+        "has being sent",
+        false,
+        "has been sent",
+        "Use has been + past participle for the present-perfect passive."
+      ),
+      errorCorrectionItem(
+        "b1-b2-8b-ec-3",
+        "Check the highlighted phrase.",
+        "The old lighthouse can be seen from the harbour.",
+        "can be seen",
+        true,
+        "",
+        "Correct! Use can be + past participle after a modal verb."
+      ),
+      wordOrderItem(
+        "b1-b2-8b-wo-1",
+        "Put the words in the correct order.",
+        ["announced", "results", "tomorrow", "will", "The", "be"],
+        "The results will be announced tomorrow.",
+        "Use will be + past participle for the future passive."
+      ),
+      wordOrderItem(
+        "b1-b2-8b-wo-2",
+        "Put the words in the correct order.",
+        ["clear", "were", "instructions", "given", "We"],
+        "We were given clear instructions.",
+        "An indirect object can become the subject of a passive sentence."
+      ),
+      {
+        id: "b1-b2-8b-coffee-process-1",
+        type: "gap-fill",
+        prompt: "Complete the process description with present passive forms. Use the verbs in brackets.",
+        parts: [
+          "First, the coffee beans ",
+          { gapId: "g1" },
+          " at a high temperature. (roast) Next, they ",
+          { gapId: "g2" },
+          " into a fine powder. (grind) Hot water ",
+          { gapId: "g3" },
+          " to the coffee. (add) Finally, the drink can ",
+          { gapId: "g4" },
+          ". (serve)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["are roasted"], feedback: "Use are + past participle for this stage of the process." },
+          { id: "g2", acceptedAnswers: ["are ground"], feedback: "Use the irregular past participle ground." },
+          { id: "g3", acceptedAnswers: ["is added"], feedback: "Use is + past participle with the uncountable subject water." },
+          { id: "g4", acceptedAnswers: ["be served"], feedback: "Use be + past participle after can." },
+        ],
+      },
+      {
+        id: "b1-b2-8b-event-venue-1",
+        type: "gap-fill",
+        prompt: "Complete the venue update with the correct passive forms. Use the verbs in brackets.",
+        parts: [
+          "When we arrived, the stage ",
+          { gapId: "g1" },
+          ". (build) Most of the sound equipment ",
+          { gapId: "g2" },
+          ". (deliver) The final lights ",
+          { gapId: "g3" },
+          " tomorrow. (install) Before the event, we are going to ",
+          { gapId: "g4" },
+          " the emergency exits. (show)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["was being built"], feedback: "Use the past-continuous passive for work in progress when we arrived." },
+          { id: "g2", acceptedAnswers: ["had already been delivered"], feedback: "Use the past-perfect passive for an earlier completed action." },
+          { id: "g3", acceptedAnswers: ["will be installed"], feedback: "Use the future passive for tomorrow's work." },
+          { id: "g4", acceptedAnswers: ["be shown"], feedback: "The sentence already supplies are going to, so use the passive infinitive be shown." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-9a-reported-speech",
+    title: "9A · Reported Speech",
+    shortDescription: "Report statements, questions, requests, and instructions with appropriate changes.",
+    levels: ["b1", "b2"],
+    intro:
+      "Backshift tenses and change pronouns, place words, and time expressions when reporting earlier speech. Use normal statement order in reported questions, if or whether for yes/no questions, tell + object + infinitive for instructions, and ask + object + infinitive for requests.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-9a-mc-1",
+        "Choose the correct reported statement.",
+        "Mara said, ‘I'm exhausted.’",
+        ["Mara said that I am exhausted.", "Mara said that she was exhausted.", "Mara told that she exhausted."],
+        1,
+        "Change I to she and backshift am to was."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9a-mc-2",
+        "Choose the correct reported statement.",
+        "Leo said, ‘I'll send the file tomorrow.’",
+        ["Leo said he will send the file tomorrow.", "Leo told he sent the file yesterday.", "Leo said he would send the file the next day."],
+        2,
+        "Backshift will to would and change tomorrow to the next day."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9a-mc-3",
+        "Choose the correct reported statement.",
+        "Nina said, ‘I lost my keys yesterday.’",
+        ["Nina said she had lost her keys the day before.", "Nina said she lost my keys tomorrow.", "Nina told that she has lost her keys yesterday."],
+        0,
+        "Backshift the past simple to the past perfect and change yesterday to the day before."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9a-mc-4",
+        "Choose the correct reported question.",
+        "‘Where do you work?’ she asked me.",
+        ["She asked me where I worked.", "She asked me where did I work.", "She asked where do you work."],
+        0,
+        "Use normal statement order and omit do in a reported question."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9a-mc-5",
+        "Choose the correct reported yes/no question.",
+        "‘Have you finished?’ the editor asked him.",
+        ["The editor asked him had he finished.", "The editor told him if he finished.", "The editor asked him whether he had finished."],
+        2,
+        "Use ask + object + whether or if, followed by normal statement order."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9a-mc-6",
+        "Choose the correct reported instruction.",
+        "‘Wait outside,’ the receptionist said to us.",
+        ["The receptionist asked that we waited outside.", "The receptionist told us to wait outside.", "The receptionist told to us wait outside."],
+        1,
+        "Use tell + object + to + infinitive for an instruction."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9a-mc-7",
+        "Choose the correct reported request.",
+        "‘Could you close the window, please?’ Ana said to me.",
+        ["Ana asked me to close the window.", "Ana told that I closed the window.", "Ana asked me whether close the window."],
+        0,
+        "Use ask + object + to + infinitive for a polite request."
+      ),
+      placeholderGapItem(
+        "b1-b2-9a-gf-1",
+        "Report the statement. Use the verb in brackets.",
+        "‘I can't stay after six.’ He said that he __________ after six. (stay)",
+        "couldn't stay",
+        ["could not stay"],
+        "Backshift can't to couldn't and keep the base verb stay."
+      ),
+      placeholderGapItem(
+        "b1-b2-9a-gf-2",
+        "Report the question. Use the verb in brackets.",
+        "‘Where do you work?’ She asked me __________. (work)",
+        "where I worked",
+        [],
+        "Use the question word followed by normal statement order."
+      ),
+      placeholderGapItem(
+        "b1-b2-9a-gf-3",
+        "Report the negative instruction. Use the verb in brackets.",
+        "‘Don't open the side door.’ The guard told us __________ the side door. (open)",
+        "not to open",
+        [],
+        "Use tell + object + not to + infinitive."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-9a-cg-1",
+        "Choose the correct forms to report Olivia's words.",
+        "Olivia said, ‘I'm working here today. I finished the report yesterday. I'll send it this afternoon, and I can stay late.’ She said she ____ there that day, she ____ the report the day before, she ____ that afternoon, and she ____ late.",
+        ["was working", "had finished", "would send it", "could stay"],
+        "Backshift the verbs and change the time and place references to match the reporting situation.",
+        ["was working", "is working", "had finished", "finished", "would send it", "will send it", "could stay", "can stay"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-9a-ec-1",
+        "Check the highlighted phrase.",
+        "The interviewer asked me where did I live.",
+        "where did I live",
+        false,
+        "where I lived",
+        "Reported questions use normal statement order and do not use did."
+      ),
+      errorCorrectionItem(
+        "b1-b2-9a-ec-2",
+        "Check the highlighted phrase.",
+        "She told me that she will call me tomorrow.",
+        "will call me tomorrow",
+        false,
+        "would call me the next day",
+        "Backshift will to would and change tomorrow to the next day."
+      ),
+      errorCorrectionItem(
+        "b1-b2-9a-ec-3",
+        "Check the highlighted phrase.",
+        "He asked whether I had seen the message.",
+        "whether I had seen",
+        true,
+        "",
+        "Correct! Use whether followed by normal statement order in a reported yes/no question."
+      ),
+      wordOrderItem(
+        "b1-b2-9a-wo-1",
+        "Put the words in the correct order.",
+        ["join", "asked", "wanted", "if", "They", "us", "them", "to", "we"],
+        "They asked us if we wanted to join them.",
+        "Use ask + object + if + statement word order."
+      ),
+      wordOrderItem(
+        "b1-b2-9a-wo-2",
+        "Put the words in the correct order.",
+        ["late", "manager", "not", "me", "The", "be", "told", "to"],
+        "The manager told me not to be late.",
+        "Use tell + object + not to + infinitive."
+      ),
+      {
+        id: "b1-b2-9a-job-interview-1",
+        type: "gap-fill",
+        prompt: "Complete the report of the interview. Use the verbs in brackets.",
+        parts: [
+          "The interviewer asked, ‘Why do you want this job?’ She asked me ",
+          { gapId: "g1" },
+          " the job. (want) Then she asked, ‘Have you worked remotely before?’ She asked me ",
+          { gapId: "g2" },
+          " remotely before. (work) Next, she asked, ‘Can you start on Monday?’ She asked me ",
+          { gapId: "g3" },
+          " on Monday. (start) Finally, she said, ‘Please email your references.’ She asked me ",
+          { gapId: "g4" },
+          " my references. (email)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["why I wanted"], feedback: "Use why + normal statement order and backshift want to wanted." },
+          { id: "g2", acceptedAnswers: ["if I had worked", "whether I had worked"], feedback: "Use if or whether, normal statement order, and the past perfect." },
+          { id: "g3", acceptedAnswers: ["if I could start", "whether I could start"], feedback: "Use if or whether and backshift can to could." },
+          { id: "g4", acceptedAnswers: ["to email"], feedback: "Use ask + object + to + infinitive for the polite request." },
+        ],
+      },
+      {
+        id: "b1-b2-9a-office-message-1",
+        type: "gap-fill",
+        prompt: "Complete the report of Maya's message. Use the verbs in brackets.",
+        parts: [
+          "Maya said, ‘I left the keys here yesterday. I'll collect them tomorrow. I've already told Ben. Don't move them.’ She said she ",
+          { gapId: "g1" },
+          " the keys there the day before. (leave) She said she ",
+          { gapId: "g2" },
+          " them the next day. (collect) She added that she ",
+          { gapId: "g3" },
+          " Ben. (tell) She told us ",
+          { gapId: "g4" },
+          " them. (not move)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["had left"], feedback: "Backshift the past simple to the past perfect." },
+          { id: "g2", acceptedAnswers: ["would collect"], feedback: "Backshift will to would." },
+          { id: "g3", acceptedAnswers: ["had already told"], feedback: "Backshift the present perfect to the past perfect." },
+          { id: "g4", acceptedAnswers: ["not to move"], feedback: "Use told us + not to + infinitive for the negative instruction." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-9b-third-conditional-past-perfect",
+    title: "9B · Third Conditional and Past Perfect",
+    shortDescription: "Describe unreal past results and show which past event happened first.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use if + past perfect with would have + past participle for imaginary past situations and their consequences. Use the past perfect in narratives and reported speech to make clear that one event happened before another past event.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-9b-mc-1",
+        "Choose the correct third-conditional result.",
+        "If I'd known the train was cancelled, I ____ to the conference.",
+        ["would drive", "had driven", "would have driven"],
+        2,
+        "Use would have + past participle in the result clause."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9b-mc-2",
+        "Choose the correct third-conditional condition.",
+        "We would have arrived on time if we ____ earlier.",
+        ["had left", "would have left", "have left"],
+        0,
+        "Use the past perfect in the if-clause."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9b-mc-3",
+        "Choose the correct negative condition.",
+        "If Mia ____ the wrong address, the parcel would have arrived today.",
+        ["wouldn't write", "hadn't written", "didn't wrote"],
+        1,
+        "Use hadn't + past participle in a negative third-conditional if-clause."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9b-mc-4",
+        "Choose the correct question form.",
+        "What ____ if you had missed the final train?",
+        ["had you done", "would you have done", "would you did"],
+        1,
+        "Use would + subject + have + past participle in the question."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9b-mc-5",
+        "Choose the form that makes the sequence of events clear.",
+        "When the doctor called his name, the patient ____.",
+        ["had already left", "already leaves", "has already left"],
+        0,
+        "Use the past perfect for the event that happened before the doctor called."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9b-mc-6",
+        "Choose the correct narrative form.",
+        "I realised that someone ____ the locked cabinet before I arrived.",
+        ["opens", "has opened", "had opened"],
+        2,
+        "Use the past perfect for the earlier past action."
+      ),
+      multipleChoiceItem(
+        "b1-b2-9b-mc-7",
+        "Choose the correct reported form.",
+        "‘I've never tried climbing,’ Sara said. Sara said that she ____ climbing.",
+        ["had never tried", "never has tried", "would never try"],
+        0,
+        "Backshift the present perfect to the past perfect in reported speech."
+      ),
+      placeholderGapItem(
+        "b1-b2-9b-gf-1",
+        "Complete the third-conditional if-clause with the verb in brackets.",
+        "If we __________ earlier, we'd have paid less for the tickets. (book)",
+        "had booked",
+        [],
+        "Use had + past participle in the if-clause."
+      ),
+      placeholderGapItem(
+        "b1-b2-9b-gf-2",
+        "Complete the third-conditional result with the verb in brackets.",
+        "He __________ the train if his alarm had rung. (not miss)",
+        "wouldn't have missed",
+        ["would not have missed"],
+        "Use wouldn't have + past participle for the negative imaginary result."
+      ),
+      placeholderGapItem(
+        "b1-b2-9b-gf-3",
+        "Complete the sentence with the past perfect form of the verb.",
+        "By the time the firefighters arrived, everyone __________ the building. (leave)",
+        "had left",
+        [],
+        "Use the past perfect for the action completed before the firefighters arrived."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-9b-cg-1",
+        "Choose the correct third-conditional form for each gap.",
+        "If I ____ my phone, it ____. I ____ you from the road, and we ____ the address more quickly.",
+        ["had charged", "wouldn't have switched off", "would have called", "might have found"],
+        "Use the past perfect in the condition and would or might have + past participle in the results.",
+        ["charged", "had charged", "wouldn't switch off", "wouldn't have switched off", "would call", "would have called", "might find", "might have found"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-9b-ec-1",
+        "Check the highlighted phrase.",
+        "If I would have checked the timetable, I wouldn't have been late.",
+        "would have checked",
+        false,
+        "had checked",
+        "Use the past perfect, not would have, in the if-clause."
+      ),
+      errorCorrectionItem(
+        "b1-b2-9b-ec-2",
+        "Check the highlighted phrase.",
+        "She would have applied if she had knew about the vacancy.",
+        "had knew",
+        false,
+        "had known",
+        "Use the past participle known after had."
+      ),
+      errorCorrectionItem(
+        "b1-b2-9b-ec-3",
+        "Check the highlighted phrase.",
+        "The guests had left by the time the music stopped.",
+        "had left",
+        true,
+        "",
+        "Correct! The past perfect marks the event that happened first."
+      ),
+      wordOrderItem(
+        "b1-b2-9b-wo-1",
+        "Put the words in the correct order.",
+        ["helped", "you", "would", "had", "I", "have", "If", "asked,"],
+        "If you had asked, I would have helped.",
+        "Use if + past perfect, followed by would have + past participle."
+      ),
+      wordOrderItem(
+        "b1-b2-9b-wo-2",
+        "Put the words in the correct order.",
+        ["arrived,", "shop", "time", "had", "the", "closed", "By", "we", "the"],
+        "By the time we arrived, the shop had closed.",
+        "Use the past perfect for the event completed before we arrived."
+      ),
+      {
+        id: "b1-b2-9b-missed-meeting-1",
+        type: "gap-fill",
+        prompt: "Complete the reflection with third-conditional forms. Use the verbs in brackets.",
+        parts: [
+          "If I ",
+          { gapId: "g1" },
+          " my calendar, I wouldn't have missed the meeting. (check) If I had arrived on time, my manager ",
+          { gapId: "g2" },
+          " me. (not call) I ",
+          { gapId: "g3" },
+          " the client if I had been there. (meet) The discussion might ",
+          { gapId: "g4" },
+          " more quickly if the fire alarm hadn't interrupted us. (finish)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["had checked"], feedback: "Use the past perfect in the if-clause." },
+          { id: "g2", acceptedAnswers: ["wouldn't have called", "would not have called"], feedback: "Use wouldn't have + past participle for the negative result." },
+          { id: "g3", acceptedAnswers: ["would have met"], feedback: "Use would have + past participle for the imaginary result." },
+          { id: "g4", acceptedAnswers: ["have finished"], feedback: "The sentence already supplies might, so add have + past participle." },
+        ],
+      },
+      {
+        id: "b1-b2-9b-station-story-1",
+        type: "gap-fill",
+        prompt: "Complete the story with the past perfect. Use the verbs in brackets.",
+        parts: [
+          "When Eli reached the station, his train ",
+          { gapId: "g1" },
+          ". (depart) He realised that he ",
+          { gapId: "g2" },
+          " his wallet at home too. (leave) He told the station agent that he ",
+          { gapId: "g3" },
+          " early, but the traffic ",
+          { gapId: "g4" },
+          " terrible. (be)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["had already departed"], feedback: "Use the past perfect for the train's earlier departure." },
+          { id: "g2", acceptedAnswers: ["had left"], feedback: "Use the past perfect for leaving the wallet before reaching the station." },
+          { id: "g3", acceptedAnswers: ["had set off"], feedback: "Use the past perfect in reported speech for the earlier action." },
+          { id: "g4", acceptedAnswers: ["had been"], feedback: "Use the past perfect for the earlier traffic conditions." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-10a-be-do-have",
+    title: "10A · Be, Do, and Have: Main and Auxiliary Verbs",
+    shortDescription: "Distinguish be, do, and have as main verbs and as auxiliaries in different structures.",
+    levels: ["b1", "b2"],
+    intro:
+      "Be, do, and have can be main verbs with their own meanings or auxiliaries that build questions, negatives, continuous forms, perfect forms, and passives. Identify the job each verb is doing before choosing its form.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-10a-mc-1",
+        "Identify the function of the verb.",
+        "After the overnight flight, everyone was exhausted. What is the function of was?",
+        ["It forms the past continuous.", "It forms a passive.", "It is the main verb be."],
+        2,
+        "Was is the main verb linking everyone to the state exhausted."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10a-mc-2",
+        "Identify the function of the verb.",
+        "The designers were discussing the final layout. What is the function of were?",
+        ["It is the main verb be.", "It forms the past continuous.", "It forms the present perfect."],
+        1,
+        "Were is an auxiliary followed by verb-ing to form the past continuous."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10a-mc-3",
+        "Identify the function of the verb.",
+        "In ‘I did the shopping after work,’ did is ____.",
+        ["the main verb do", "a past-simple auxiliary", "a form of be"],
+        0,
+        "Did carries the meaning perform or complete, so it is the main verb."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10a-mc-4",
+        "Identify the function of the verb.",
+        "In ‘Did you lock the door?’, did is ____.",
+        ["the main verb do", "an auxiliary in a past-simple question", "an auxiliary forming the past perfect"],
+        1,
+        "Did is the auxiliary used to form the past-simple question."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10a-mc-5",
+        "Identify the function of the verb.",
+        "In ‘We had dinner near the station,’ had is ____.",
+        ["a past-perfect auxiliary", "a passive auxiliary", "the main verb have"],
+        2,
+        "Had means ate in this sentence, so it is the main verb."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10a-mc-6",
+        "Identify the function of the verb.",
+        "In ‘Mina has already sent the invoice,’ has is ____.",
+        ["an auxiliary forming the present perfect", "the main verb have", "an auxiliary forming the passive"],
+        0,
+        "Has is followed by the past participle sent to form the present perfect."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10a-mc-7",
+        "Choose the correct question.",
+        "Which question correctly uses have as a main verb?",
+        ["How often have you your bike serviced?", "How often are you have your bike serviced?", "How often do you have your bike serviced?"],
+        2,
+        "When have is the main verb, use do to form a present-simple question."
+      ),
+      placeholderGapItem(
+        "b1-b2-10a-gf-1",
+        "Complete the sentence with the correct passive form of the verb in brackets.",
+        "The railway bridge __________ at the moment. (repair)",
+        "is being repaired",
+        [],
+        "Use is being + past participle; be acts as the auxiliary in the passive continuous form."
+      ),
+      doubleGap(
+        "b1-b2-10a-gf-2",
+        "Complete the past-simple question. Use the verb in brackets.",
+        ["What ", { gapId: "g1" }, " you ", { gapId: "g2" }, " after class? (do)"],
+        ["did"],
+        ["do"],
+        "Use auxiliary did before the subject and main verb do after it."
+      ),
+      doubleGap(
+        "b1-b2-10a-gf-3",
+        "Complete the present-perfect question. Use the verb in brackets.",
+        [{ gapId: "g1" }, " you ", { gapId: "g2" }, " lunch yet? (have)"],
+        ["Have"],
+        ["had"],
+        "Use auxiliary Have before the subject and the past participle had as the main verb."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-10a-cg-1",
+        "Choose the correct form of be, do, or have for each gap.",
+        "Leo ____ very tired today because he ____ been working late. He usually ____ his paperwork before six, but this week he ____ to stay until eight.",
+        ["is", "has", "does", "has"],
+        "Choose the form that matches the subject and the verb's main or auxiliary function.",
+        ["am", "is", "are", "do", "does", "did", "have", "has", "had"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-10a-ec-1",
+        "Check the highlighted phrase.",
+        "Maya doesn't be in the office on Fridays.",
+        "doesn't be",
+        false,
+        ["isn't", "is not"],
+        "Do not use do with the main verb be; use isn't or is not."
+      ),
+      errorCorrectionItem(
+        "b1-b2-10a-ec-2",
+        "Check the highlighted phrase.",
+        "Have you did your expenses for this month?",
+        "Have you did",
+        false,
+        "Have you done",
+        "Use the past participle done after the present-perfect auxiliary have."
+      ),
+      errorCorrectionItem(
+        "b1-b2-10a-ec-3",
+        "Check the highlighted phrase.",
+        "The road is being widened near the school.",
+        "is being widened",
+        true,
+        "",
+        "Correct! The forms of be build a present-continuous passive."
+      ),
+      wordOrderItem(
+        "b1-b2-10a-wo-1",
+        "Put the words in the correct order.",
+        ["waiting", "you", "How", "been", "long", "have"],
+        "How long have you been waiting?",
+        "Use have and been as auxiliaries in the present perfect continuous."
+      ),
+      wordOrderItem(
+        "b1-b2-10a-wo-2",
+        "Put the words in the correct order.",
+        ["lunch", "What", "have", "you", "for", "did"],
+        "What did you have for lunch?",
+        "Use did as the auxiliary and have as the main verb."
+      ),
+      {
+        id: "b1-b2-10a-busy-morning-1",
+        type: "gap-fill",
+        prompt: "Complete the account with the correct forms of the verbs in brackets.",
+        parts: [
+          "At eight this morning, I ",
+          { gapId: "g1" },
+          " at home. (be) I ",
+          { gapId: "g2" },
+          " breakfast when a client called. (have) After the call, I ",
+          { gapId: "g3" },
+          " some quick calculations. (do) By nine, I ",
+          { gapId: "g4" },
+          " the quotation. (send)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["was"], feedback: "Use was as the main verb to describe location." },
+          { id: "g2", acceptedAnswers: ["was having"], feedback: "Use was as an auxiliary with having for the action in progress." },
+          { id: "g3", acceptedAnswers: ["did"], feedback: "Use did as the past form of the main verb do." },
+          { id: "g4", acceptedAnswers: ["had sent"], feedback: "Use had as the auxiliary in the past perfect." },
+        ],
+      },
+      {
+        id: "b1-b2-10a-presentation-check-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with the correct auxiliary or main-verb forms.",
+        parts: [
+          "A: ",
+          { gapId: "g1" },
+          " you ",
+          { gapId: "g2" },
+          " the slides yet? (do)\nB: Yes. They ",
+          { gapId: "g3" },
+          " by Jo now. (check) I still ",
+          { gapId: "g4" },
+          " to add one chart. (have)\nA: ",
+          { gapId: "g5" },
+          " Jo in the meeting room? (be)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["Have"], feedback: "Use Have as the present-perfect auxiliary." },
+          { id: "g2", acceptedAnswers: ["done"], feedback: "Use the past participle done as the main verb." },
+          { id: "g3", acceptedAnswers: ["are being checked"], feedback: "Use are being + past participle for the passive action happening now." },
+          { id: "g4", acceptedAnswers: ["have"], feedback: "Use have as the main verb in have to." },
+          { id: "g5", acceptedAnswers: ["Is"], feedback: "Use Is before the subject to ask about Jo's location." },
+        ],
+      },
+    ],
+  },
+  {
+    id: "b1-b2-10b-verb-form-review",
+    title: "10B · Revision of Verb Forms",
+    shortDescription: "Review the principal verb forms and structures from the Intermediate Plus level.",
+    levels: ["b1", "b2"],
+    intro:
+      "Use the context, time expressions, and surrounding structure to choose among present, past, future, perfect, passive, conditional, reported, causative, and infinitive or gerund forms.",
+    items: [
+      multipleChoiceItem(
+        "b1-b2-10b-mc-1",
+        "Choose the best verb form.",
+        "Nico looks exhausted. He ____ on the proposal all week.",
+        ["worked yesterday", "has been working", "is work"],
+        1,
+        "Use the present perfect continuous for an activity continuing through this week with a visible result now."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10b-mc-2",
+        "Choose the best future form.",
+        "Our tickets are booked. We ____ to Lisbon on Friday morning.",
+        ["are flying", "will have flown", "fly probably"],
+        0,
+        "Use the present continuous for a fixed future arrangement."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10b-mc-3",
+        "Choose the correct past form.",
+        "When we reached the cinema, the film ____.",
+        ["has already started", "already starts", "had already started"],
+        2,
+        "Use the past perfect for the action completed before we reached the cinema."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10b-mc-4",
+        "Choose the correct causative form.",
+        "My phone screen is cracked. I need to ____.",
+        ["have it replaced", "replace it by someone", "have replaced it"],
+        0,
+        "Use have + object + past participle for a service arranged with another person."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10b-mc-5",
+        "Choose the correct passive form.",
+        "The shortlist ____ on the company website tomorrow.",
+        ["will announce", "will be announced", "is announcing"],
+        1,
+        "Use will be + past participle for the future passive."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10b-mc-6",
+        "Choose the correct third-conditional result.",
+        "If we had left ten minutes earlier, we ____ the traffic jam.",
+        ["had avoided", "would avoid", "would have avoided"],
+        2,
+        "Use would have + past participle for the imaginary past result."
+      ),
+      multipleChoiceItem(
+        "b1-b2-10b-mc-7",
+        "Choose the correct verb pattern.",
+        "Marta suggested ____ a short break before the next section.",
+        ["to take", "taking", "take"],
+        1,
+        "Suggest is followed by a gerund."
+      ),
+      placeholderGapItem(
+        "b1-b2-10b-gf-1",
+        "Complete the sentence with the correct form of the verb in brackets.",
+        "I __________ Jo since our first day at university. (know)",
+        "have known",
+        [],
+        "Use the present perfect simple with the non-action verb know and since."
+      ),
+      placeholderGapItem(
+        "b1-b2-10b-gf-2",
+        "Complete the sentence to show that something is not necessary. Use the verb in brackets.",
+        "You __________ cash; the café accepts cards. (not bring)",
+        "don't need to bring",
+        ["do not need to bring", "don't have to bring", "do not have to bring", "needn't bring"],
+        "Use don't need to, don't have to, or needn't to express a lack of necessity."
+      ),
+      placeholderGapItem(
+        "b1-b2-10b-gf-3",
+        "Report the question. Use the verb in brackets.",
+        "‘Where do you live?’ The interviewer asked me __________. (live)",
+        "where I lived",
+        [],
+        "Use the question word followed by normal statement order."
+      ),
+      placeholderChoiceGapItem(
+        "b1-b2-10b-cg-1",
+        "Choose the correct form for each gap.",
+        "Last weekend, we ____ by professionals. We ____ the room ourselves if we'd had time, but work was busy. Now we ____, and my sister has offered ____ us choose them.",
+        ["had the living room painted", "would have painted", "are going to buy new curtains", "to help"],
+        "Choose the causative, third conditional, planned future, and infinitive patterns required by the context.",
+        ["painted the living room", "had the living room painted", "would paint", "would have painted", "buy new curtains", "are going to buy new curtains", "helping", "to help"]
+      ),
+      errorCorrectionItem(
+        "b1-b2-10b-ec-1",
+        "Check the highlighted phrase.",
+        "If I would have known about the delay, I would have taken a later train.",
+        "would have known",
+        false,
+        "had known",
+        "Use the past perfect, not would have, in a third-conditional if-clause."
+      ),
+      errorCorrectionItem(
+        "b1-b2-10b-ec-2",
+        "Check the highlighted phrase.",
+        "My supervisor let me to leave early after the conference.",
+        "let me to leave",
+        false,
+        "let me leave",
+        "Use a bare infinitive after let + object."
+      ),
+      errorCorrectionItem(
+        "b1-b2-10b-ec-3",
+        "Check the highlighted phrase.",
+        "I've been learning German since January.",
+        "I've been learning",
+        true,
+        "",
+        "Correct! The present perfect continuous describes an activity continuing from January until now."
+      ),
+      wordOrderItem(
+        "b1-b2-10b-wo-1",
+        "Put the words in the correct order.",
+        ["painted", "We're", "have", "going", "kitchen", "the", "to"],
+        "We're going to have the kitchen painted.",
+        "Use be going to + have + object + past participle."
+      ),
+      wordOrderItem(
+        "b1-b2-10b-wo-2",
+        "Put the words in the correct order.",
+        ["her", "asked", "could", "if", "help", "She", "I", "me"],
+        "She asked me if I could help her.",
+        "Use ask + object + if, followed by normal statement order."
+      ),
+      {
+        id: "b1-b2-10b-graduation-plans-1",
+        type: "gap-fill",
+        prompt: "Complete the conversation with the correct forms of the verbs in brackets.",
+        parts: [
+          "A: What ",
+          { gapId: "g1" },
+          " after you graduate? (do)\nB: I ",
+          { gapId: "g2" },
+          " to Canada next month; my ticket is booked. (fly) I ",
+          { gapId: "g3" },
+          " to go there for years. (want)\nA: I'm sure you ",
+          { gapId: "g4" },
+          " it. (love)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["are you going to do"], feedback: "Use be going to to ask about an intention." },
+          { id: "g2", acceptedAnswers: ["am flying"], feedback: "Use the present continuous for the booked arrangement." },
+          { id: "g3", acceptedAnswers: ["have wanted", "have always wanted"], feedback: "Use the present perfect simple for the continuing state." },
+          { id: "g4", acceptedAnswers: ["will love"], feedback: "Use will for the speaker's prediction." },
+        ],
+      },
+      {
+        id: "b1-b2-10b-missed-invitation-1",
+        type: "gap-fill",
+        prompt: "Report Nia's message and complete the final conditional. Use the verbs in brackets.",
+        parts: [
+          "Nia said, ‘I can't come tonight. I've already made other plans. Please invite me next time.’ She said she ",
+          { gapId: "g1" },
+          " that evening. (come) She explained that she ",
+          { gapId: "g2" },
+          " other plans. (make) She asked us ",
+          { gapId: "g3" },
+          " her the next time. (invite) If she had been free, she ",
+          { gapId: "g4" },
+          " us. (join)",
+        ],
+        gaps: [
+          { id: "g1", acceptedAnswers: ["couldn't come", "could not come"], feedback: "Backshift can't to couldn't in the reported statement." },
+          { id: "g2", acceptedAnswers: ["had already made"], feedback: "Backshift the present perfect to the past perfect." },
+          { id: "g3", acceptedAnswers: ["to invite"], feedback: "Use asked us + to + infinitive for the request." },
+          { id: "g4", acceptedAnswers: ["would have joined"], feedback: "Use would have + past participle in the third-conditional result." },
         ],
       },
     ],
