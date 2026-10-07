@@ -4,6 +4,8 @@ const setTwoAssetRoot = "/images/ote/listening/advanced/part-1/set-2";
 const setTwoAudioRoot = "/audio/ote/listening/advanced/part-1/set-2";
 const setThreeAudioRoot = "/audio/ote/listening/advanced/part-1/set-3";
 const setFourAudioRoot = "/audio/ote/listening/advanced/part-1/set-4";
+const additionalC1ChallengeAudioRoot =
+  "/audio/ote/listening/advanced/part-1/additional-c1-challenge";
 
 const advancedListeningPart1SetCatalog = [
   {
@@ -1157,6 +1159,317 @@ const advancedListeningPart1SetCatalog = [
         },
         explanation:
           "The reviewer sees broadly comparable coverage and does not think Professor Hale controls the argument. He criticises the move from three locally sourced personal accounts to national claims about renters.",
+      },
+    ],
+  },
+  {
+    id: "additional-c1-challenge",
+    title: "Additional C1 Challenge",
+    level: "C1",
+    description:
+      "Five upper-C1 extracts focused on implied meaning, speaker intention and precise distinctions between plausible answers.",
+    teacherOnly: true,
+    assetsReady: true,
+    audioReady: true,
+    instructionAudioReady: true,
+    questions: [
+      {
+        id: "literary-translation",
+        context: "A literary translator is discussing a new novel.",
+        prompt: "What does she suggest about her translation?",
+        kind: "text",
+        answer: 2,
+        instructionAudioSrc: `${additionalC1ChallengeAudioRoot}/question-1.mp3`,
+        optionsAudioSrc: `${additionalC1ChallengeAudioRoot}/options-1.mp3`,
+        audioSrc: `${additionalC1ChallengeAudioRoot}/item-1.mp3`,
+        options: [
+          { text: "It retains unusual expressions to preserve the novel's atmosphere." },
+          { text: "It explains the humour without changing how characters speak." },
+          { text: "It changes particular expressions to convey the same personality." },
+        ],
+        reviewEvidence: [
+          {
+            option: 0,
+            quote: "I tried keeping the phrase and explaining it in a note.",
+            note:
+              "Keeping the phrase was an attempted solution, not the approach ultimately chosen. The notes retained elsewhere concern places and customs.",
+          },
+          {
+            option: 1,
+            quote: "You understood the joke, but he'd become someone who needed explaining, rather than someone you could hear.",
+            note:
+              "The note explained the humour, but changed the reading experience, so she rejected this solution for the uncle's dialogue.",
+          },
+          {
+            option: 2,
+            quote: "Eventually I gave him a slightly different stock response.",
+            note:
+              "She changes the recurring expression so English readers hear the same calculating personality without needing an explanation.",
+          },
+        ],
+        script: [
+          {
+            speaker: "Woman",
+            text: "The publisher worried about the jokes, but the awkward passages were actually the uncle's perfectly ordinary remarks. In the original, he keeps using the same polite phrase when someone asks a favour. Word for word, it sounds rather generous in English. Yet, by that point, readers should recognise a man who expects something in return. I tried keeping the phrase and explaining it in a note. You understood the joke, but he'd become someone who needed explaining, rather than someone you could hear. Eventually I gave him a slightly different stock response. The city names and family customs still need their notes. What matters with his dialogue is that you start wondering what he'll ask for before he finishes speaking.",
+          },
+        ],
+        profile: {
+          level: "C1",
+          words: 120,
+          focus: "Inferring the principle behind a specific translation choice",
+          distractors:
+            "The translator tried keeping and explaining the phrase, while notes remain appropriate for other cultural details.",
+        },
+        explanation:
+          "The closest English wording makes a calculating character sound generous. Changing his recurring response restores the reader's sense of his personality, preserving the intended effect by departing from the original wording.",
+      },
+      {
+        id: "promotion-authority",
+        context: "A woman is discussing a promotion with a colleague.",
+        prompt: "What does the man think she should clarify?",
+        kind: "text",
+        answer: 1,
+        instructionAudioSrc: `${additionalC1ChallengeAudioRoot}/question-2.mp3`,
+        optionsAudioSrc: `${additionalC1ChallengeAudioRoot}/options-2.mp3`,
+        audioSrc: `${additionalC1ChallengeAudioRoot}/item-2.mp3`,
+        options: [
+          { text: "Whether the pay increase reflects the additional workload." },
+          { text: "Whether her responsibilities would be matched by decision-making authority." },
+          { text: "Whether accepting would change how colleagues respond to her." },
+        ],
+        reviewEvidence: [
+          {
+            option: 0,
+            quote: "It's a decent rise, but I'd have six managers reporting to me.",
+            note:
+              "The woman mentions pay and reporting responsibilities, but the man does not question whether the two are proportionate.",
+          },
+          {
+            option: 1,
+            quote: "Having everyone bring you a problem is one thing; being able to do anything about it is another.",
+            note:
+              "He distinguishes being responsible for problems from possessing the authority needed to resolve them.",
+          },
+          {
+            option: 2,
+            quote: "You already settle most of their disputes, though, don't you?",
+            note:
+              "Her colleagues already seek her help. His concern is her formal ability to act, not whether their attitude towards her would change.",
+          },
+        ],
+        script: [
+          {
+            speaker: "Woman",
+            text: "They're offering me the regional coordinator's role. It's a decent rise, but I'd have six managers reporting to me.",
+          },
+          {
+            speaker: "Man",
+            text: "You already settle most of their disputes, though, don't you?",
+          },
+          {
+            speaker: "Woman",
+            text: "Usually. Officially, this would put me in charge.",
+          },
+          {
+            speaker: "Man",
+            text: "Of what, exactly? Remember when Daniel took over the northern office? He could rearrange shifts, but every change to staffing still went back to headquarters.",
+          },
+          {
+            speaker: "Woman",
+            text: "I'd assumed the title meant I could sort those things out.",
+          },
+          {
+            speaker: "Man",
+            text: "It may. I'd want that spelled out before you give up a job where people already come to you. Having everyone bring you a problem is one thing; being able to do anything about it is another.",
+          },
+        ],
+        profile: {
+          level: "C1",
+          words: 110,
+          focus: "Inferring a concern through an example and distinguishing doubt from a claim",
+          distractors:
+            "Pay, workload and existing influence are all mentioned, but the example isolates the difference between responsibility and authority.",
+        },
+        explanation:
+          "Daniel's example shows that a senior title can bring responsibility without enough power to resolve problems. The man wants her to establish what decisions she could actually make; he does not claim that the role necessarily lacks that power.",
+      },
+      {
+        id: "film-sound",
+        context: "A sound designer is describing work on a film.",
+        prompt: "What does comparing the two sound effects illustrate?",
+        kind: "text",
+        answer: 0,
+        instructionAudioSrc: `${additionalC1ChallengeAudioRoot}/question-3.mp3`,
+        optionsAudioSrc: `${additionalC1ChallengeAudioRoot}/options-3.mp3`,
+        audioSrc: `${additionalC1ChallengeAudioRoot}/item-3.mp3`,
+        options: [
+          { text: "Sound can alter an audience's understanding of an action." },
+          { text: "Convincing sound requires close coordination with an actor's movements." },
+          { text: "Reproducing familiar sounds accurately can require considerable experimentation." },
+        ],
+        reviewEvidence: [
+          {
+            option: 0,
+            quote: "With that sound, her departure seemed entirely routine. We tried a heavier noise, using exactly the same performance, and suddenly it felt as though she'd made a decision she wouldn't go back on.",
+            note:
+              "Only the sound changes, yet the audience interprets the character's departure differently.",
+          },
+          {
+            option: 1,
+            quote: "Getting the timing to match her movement took several sessions, of course.",
+            note:
+              "Coordination was technically demanding, but it is a later production requirement rather than the point established by comparing the two effects.",
+          },
+          {
+            option: 2,
+            quote: "The recording was accurate enough; you could even hear the latch settling.",
+            note:
+              "The first sound was already accurate. The experiment concerns the meaning conveyed by replacing it, rather than achieving realism.",
+          },
+        ],
+        script: [
+          {
+            speaker: "Man",
+            text: "People ask how closely a sound effect should resemble the real thing. We once had a scene in which a woman quietly shut a door after an argument. The recording was accurate enough; you could even hear the latch settling. With that sound, her departure seemed entirely routine. We tried a heavier noise, using exactly the same performance, and suddenly it felt as though she'd made a decision she wouldn't go back on. Getting the timing to match her movement took several sessions, of course. A fraction too early and you heard a separate event. That's the sort of adjustment an audience won't identify, although they'll certainly feel when something's wrong.",
+          },
+        ],
+        profile: {
+          level: "C1",
+          words: 111,
+          focus: "Identifying what a controlled comparison establishes",
+          distractors:
+            "Technical realism, experimentation and precise timing are all raised, but the unchanged performance isolates sound's effect on interpretation.",
+        },
+        explanation:
+          "The performance stays the same, but one sound makes the departure seem routine and the other makes it seem decisive. The comparison establishes a change in interpretation, not merely a requirement for technical realism.",
+      },
+      {
+        id: "software-trial",
+        context: "Two colleagues are discussing a proposed software trial.",
+        prompt: "What has the woman agreed to do?",
+        kind: "text",
+        answer: 2,
+        instructionAudioSrc: `${additionalC1ChallengeAudioRoot}/question-4.mp3`,
+        optionsAudioSrc: `${additionalC1ChallengeAudioRoot}/options-4.mp3`,
+        audioSrc: `${additionalC1ChallengeAudioRoot}/item-4.mp3`,
+        options: [
+          { text: "Run a trial without interrupting the current booking system." },
+          { text: "Make preliminary arrangements for staff to receive training." },
+          { text: "Investigate whether the trial would justify its practical costs." },
+        ],
+        reviewEvidence: [
+          {
+            option: 0,
+            quote: "We'd need to run it alongside the present system, though.",
+            note:
+              "Running both systems is a requirement for any future trial, not something she has yet authorised.",
+          },
+          {
+            option: 1,
+            quote: "Shall I reserve a training session?",
+            note:
+              "The man proposes arranging training. The woman instead commits to investigating the resource demands.",
+          },
+          {
+            option: 2,
+            quote: "Do that, and I'll ask accounts what their end would involve. If those figures leave us with something worthwhile, there's a gap after the conference.",
+            note:
+              "She agrees to investigate the practical implications, with any trial remaining conditional on the resulting figures.",
+          },
+        ],
+        script: [
+          {
+            speaker: "Man",
+            text: "The supplier can give us six weeks on the new booking system. Shall I reserve a training session?",
+          },
+          {
+            speaker: "Woman",
+            text: "The demonstration was impressive. We'd need to run it alongside the present system, though.",
+          },
+          {
+            speaker: "Man",
+            text: "Just while everyone gets used to it. The training's included.",
+          },
+          {
+            speaker: "Woman",
+            text: "Included in the price. We'd still be taking people off the phones, and someone would have to enter the same bookings twice.",
+          },
+          {
+            speaker: "Man",
+            text: "I could work out the staffing.",
+          },
+          {
+            speaker: "Woman",
+            text: "Do that, and I'll ask accounts what their end would involve. If those figures leave us with something worthwhile, there's a gap after the conference.",
+          },
+          {
+            speaker: "Man",
+            text: "So I can tell the supplier we're interested?",
+          },
+          {
+            speaker: "Woman",
+            text: "Interested, certainly. That gap isn't going anywhere while we check.",
+          },
+        ],
+        profile: {
+          level: "C1",
+          words: 113,
+          focus: "Distinguishing current commitment from conditional future arrangements",
+          distractors:
+            "The dialogue discusses running parallel systems and arranging training, but neither has been authorised.",
+        },
+        explanation:
+          "She agrees to investigate the work and costs involved while the man checks staffing. The possible slot is conditional on that assessment, so her interest does not yet authorise either the trial or its training.",
+      },
+      {
+        id: "restaurant-review",
+        context: "A restaurant critic is reviewing a tasting menu.",
+        prompt: "What is her main reservation?",
+        kind: "text",
+        answer: 1,
+        instructionAudioSrc: `${additionalC1ChallengeAudioRoot}/question-5.mp3`,
+        optionsAudioSrc: `${additionalC1ChallengeAudioRoot}/options-5.mp3`,
+        audioSrc: `${additionalC1ChallengeAudioRoot}/item-5.mp3`,
+        options: [
+          { text: "The presentation promises more than the cooking delivers." },
+          { text: "Learning about the food comes at the expense of relaxation." },
+          { text: "The ambitious menu puts excessive pressure on the staff." },
+        ],
+        reviewEvidence: [
+          {
+            option: 0,
+            quote: "Some combinations sound improbable on paper, but each one earns its place when you taste it.",
+            note:
+              "She praises the cooking rather than suggesting the elaborate presentation disguises disappointing food.",
+          },
+          {
+            option: 1,
+            quote: "I found myself sitting up straighter, listening carefully, trying not to get anything wrong. By the fourth course, our conversation had dwindled to comments about what we'd just been told.",
+            note:
+              "Her classroom-like attention and dwindling conversation show that instruction has crowded out a relaxed shared meal.",
+          },
+          {
+            option: 2,
+            quote: "Nothing arrived late, and the team seemed perfectly comfortable with the routine.",
+            note:
+              "The small team manages the demanding menu comfortably, so pressure on the staff is not her reservation.",
+          },
+        ],
+        script: [
+          {
+            speaker: "Woman",
+            text: "The kitchen is open, so you can watch a small team produce twelve remarkably precise courses. Some combinations sound improbable on paper, but each one earns its place when you taste it. The staff explain every ingredient, every technique, even how you should approach the first mouthful. You do learn an extraordinary amount. I found myself sitting up straighter, listening carefully, trying not to get anything wrong. By the fourth course, our conversation had dwindled to comments about what we'd just been told. Nothing arrived late, and the team seemed perfectly comfortable with the routine. Yet when I think about going back, it isn't another beautifully judged sauce I'm hoping for. It's an evening in which the food leaves a little room for the people eating it.",
+          },
+        ],
+        profile: {
+          level: "C1",
+          words: 127,
+          focus: "Inferring a criticism from narrated experience",
+          distractors:
+            "The critic praises both the cooking and staff competence, while her behaviour reveals the loss of a relaxed social experience.",
+        },
+        explanation:
+          "The critic admires the food and values what she learns. Her attentive, almost classroom-like behaviour and restricted conversation imply that the explanations have crowded out the pleasure of a relaxed meal together.",
       },
     ],
   },

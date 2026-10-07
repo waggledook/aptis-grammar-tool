@@ -430,7 +430,9 @@ export default function OteAdvancedListeningPart1Practice({
     logOteTrainingStarted({
       section: "listening",
       part: `part-${partNumber}`,
-      mode: "exam_style_practice",
+      mode: practiceSet.teacherOnly
+        ? "teacher_bank_short_extracts"
+        : "exam_style_practice",
       taskId: `${variant}-listening-part-${partNumber}-${practiceSet.id}`,
       taskTitle: `${listeningLabel} Listening ${partLabel} ${practiceSet.title}`,
       variant,
@@ -472,12 +474,17 @@ export default function OteAdvancedListeningPart1Practice({
     logOteTrainingCompleted({
       section: "listening",
       part: `part-${partNumber}`,
-      mode: "exam_style_practice",
+      mode: practiceSet.teacherOnly
+        ? "teacher_bank_short_extracts"
+        : "exam_style_practice",
       taskId: `${variant}-listening-part-${partNumber}-${practiceSet.id}`,
       taskTitle: `${listeningLabel} Listening ${partLabel} ${practiceSet.title}`,
       variant,
       score,
       total: questions.length,
+      ...(practiceSet.teacherOnly
+        ? { progressId: `listening.part${partNumber}.teacher-bank.${practiceSet.id}` }
+        : {}),
     });
   }
 
@@ -497,7 +504,9 @@ export default function OteAdvancedListeningPart1Practice({
     finishPractice();
   };
 
-  if (user && user.oteVersion !== variant) {
+  const canOpenTeacherSet =
+    practiceSet.teacherOnly && (user?.role === "teacher" || user?.role === "admin");
+  if (user && user.oteVersion !== variant && !canOpenTeacherSet) {
     return (
       <main className="ote-training-page">
         <header className="ote-training-hero">
@@ -567,9 +576,11 @@ export default function OteAdvancedListeningPart1Practice({
               <article><h3>Optional review</h3><p>Review each answer immediately, or continue and use the detailed feedback at the end.</p></article>
             </div>
             <p className="ote-listening-audio-note">
-              {practiceSet.audioReady
+              {practiceSet.audioReady && practiceSet.instructionAudioReady !== false
                 ? "This set uses the final recorded extracts. Each question runs automatically through both listens and the answer countdown."
-                : "The final MP3 recordings can be added without changing the activity. Until then, the runner uses browser voice previews."}
+                : practiceSet.audioReady
+                  ? "This set uses the final recorded extracts. A browser voice will read each question and its options until those short recordings are added."
+                  : "The final MP3 recordings can be added without changing the activity. Until then, the runner uses browser voice previews."}
             </p>
             <div className="ote-recorder-actions">
               <button type="button" onClick={startPractice}><Headphones size={18} aria-hidden="true" /> Start practice</button>

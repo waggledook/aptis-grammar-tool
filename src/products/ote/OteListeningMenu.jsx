@@ -415,12 +415,20 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
                       Open task
                     </button>
                     <button
-                      disabled={!!creatingLiveSetId}
+                      disabled={
+                        !!creatingLiveSetId ||
+                        set.audioReady === false ||
+                        set.instructionAudioReady === false
+                      }
                       onClick={() => launchLiveSet(set)}
                       type="button"
                     >
                       <Radio size={16} aria-hidden="true" />
-                      {creatingLiveSetId === set.id ? "Creating room…" : "Run live"}
+                      {creatingLiveSetId === set.id
+                        ? "Creating room…"
+                        : set.audioReady === false || set.instructionAudioReady === false
+                          ? "Audio pending"
+                          : "Run live"}
                     </button>
                   </div>
                 </article>
@@ -497,7 +505,7 @@ export default function OteListeningMenu({ user, nativeRoutes = false }) {
             const Icon = part.icon || ListChecks;
             const partPath = getSitePath(`${basePath}/${activeVariant}/${part.id}`);
             const partSets = getListeningSets(activeVariant, part.id);
-            const listedPartSets = partSets;
+            const listedPartSets = partSets.filter((set) => !set.teacherOnly);
             const readyPartSets = listedPartSets.filter(
               (set) =>
                 set.assetsReady !== false && set.practiceReady !== false
