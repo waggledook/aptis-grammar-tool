@@ -1,5 +1,9 @@
 const audioRoot = "/audio/ote/listening/advanced/part-2/set-1";
 const setTwoAudioRoot = "/audio/ote/listening/advanced/part-2/set-2";
+const spaceDebrisAudioRoot =
+  "/audio/ote/listening/advanced/part-2/space-debris";
+const dictionariesAudioRoot =
+  "/audio/ote/listening/advanced/part-2/dictionaries";
 
 export const advancedListeningPart2Sets = [
   {
@@ -366,6 +370,419 @@ export const advancedListeningPart2Sets = [
       "Displays and videos address boredom, whereas reliable waiting times reduce uncertainty.",
       "Several groups receive separate access, but priority-ticket holders are the group connected with resentment.",
       "Apologies and café vouchers are plausible distractors before clear explanations are valued more highly.",
+    ],
+  },
+  {
+    id: "space-debris",
+    level: "C1",
+    title: "Removing Space Debris",
+    description: "Complete six gaps in a set of lecture notes with words from the recording.",
+    teacherOnly: true,
+    assetsReady: true,
+    audioReady: true,
+    audioSrc: `${spaceDebrisAudioRoot}/removing-space-debris.mp3`,
+    instructionAudioReady: true,
+    instructionAudioSrc: `${spaceDebrisAudioRoot}/question.mp3`,
+    instructions:
+      "Listen to a lecture about removing space debris. Complete the gaps in the notes with a word or two-word phrase from the audio. Remember to check your spelling.",
+    preparationPrompt: "The clock shows how much time you have to look at the task.",
+    preparationSeconds: 30,
+    gaps: [
+      {
+        id: "large-targets",
+        answer: "large objects",
+        section: "Choosing targets",
+        before: "Removing",
+        after:
+          "is intended to prevent further fragmentation rather than collect existing fragments.",
+        review: {
+          explanation:
+            "The lecture contrasts tiny existing fragments with the large intact objects selected for preventive removal. “Satellites” alone would exclude discarded rocket sections.",
+          correctQuote: "large objects",
+          distractors: [
+            {
+              quote: "thousands of tiny fragments",
+              note:
+                "These fragments pose a threat, but the lecturer says collecting them individually is extremely difficult.",
+            },
+            {
+              quote: "complete satellites and the discarded sections of rockets",
+              note:
+                "These examples define the broader category required by the note: large objects.",
+            },
+          ],
+        },
+      },
+      {
+        id: "battery-isolation",
+        answer: "solar panels",
+        acceptedAnswers: ["panels"],
+        section: "Preventing break-ups",
+        before: "Discharged batteries must be separated from",
+        after: "to prevent a renewed build-up of energy.",
+        review: {
+          explanation:
+            "Discharging a battery is not necessarily permanent because solar panels may keep generating electricity. Physically separating the panels prevents the charge from rebuilding.",
+          correctQuote: "Solar panels",
+          distractors: [
+            {
+              quote: "unused fuel and charged batteries",
+              note:
+                "These are two stored-energy risks, but the gap asks what must be separated from the batteries afterwards.",
+            },
+            {
+              quote: "switching off the instruments",
+              note:
+                "The lecturer explicitly says this does not remove the continuing source of energy.",
+            },
+          ],
+        },
+      },
+      {
+        id: "capture-distance",
+        answer: "distance",
+        section: "Capture methods",
+        before: "Nets allow a greater",
+        after: "between the spacecraft and its target during capture.",
+        review: {
+          explanation:
+            "A vehicle using an arm must approach closely, whereas a net can be launched from farther away. The advantage applies specifically during capture, not necessarily afterwards.",
+          correctQuote: "distance",
+          distractors: [
+            {
+              quote: "approach closely",
+              note:
+                "This describes the requirement when using an arm, which the net avoids during capture.",
+            },
+            {
+              quote: "does not necessarily make the subsequent operation easier",
+              note:
+                "The lecturer limits the advantage rather than claiming that distance improves the whole operation.",
+            },
+          ],
+        },
+      },
+      {
+        id: "model-validation",
+        answer: "computer models",
+        section: "Testing and control",
+        before: "Experiment recordings helped engineers assess the accuracy of",
+        after: "before designing equipment for a mission.",
+        review: {
+          explanation:
+            "The recordings were compared with predictions from computer models. The small physical models were the targets used in the aircraft experiment, not the tools being validated.",
+          correctQuote: "computer models",
+          distractors: [
+            {
+              quote: "small physical models of satellites",
+              note:
+                "These were the experimental targets rather than the predictive design tools whose accuracy was assessed.",
+            },
+            {
+              quote: "successful catches",
+              note:
+                "A catch supplied evidence, but proving that an operational system was ready was not the purpose of the test.",
+            },
+          ],
+        },
+      },
+      {
+        id: "cable-control",
+        answer: "cable",
+        acceptedAnswers: ["flexible link"],
+        section: "Testing and control",
+        before: "Immediate control of movement prevents the",
+        after: "becoming wrapped around both craft.",
+        review: {
+          explanation:
+            "A net leaves the two craft connected by a cable. If the target continues tumbling, this flexible link can wind around both spacecraft, so its motion must be controlled promptly.",
+          correctQuote: "cable",
+          distractors: [
+            {
+              quote: "an arm holds them together more firmly",
+              note:
+                "The arm is presented as the more controlled alternative; it is not the flexible connection at risk of wrapping around the craft.",
+            },
+            {
+              quote: "the net",
+              note:
+                "The net encloses the target, while the cable or flexible link is the connection described as winding around both spacecraft.",
+            },
+          ],
+        },
+      },
+      {
+        id: "capture-handles",
+        answer: "handles",
+        section: "Future design",
+        before: "Adding",
+        after:
+          "would give both removal and maintenance vehicles something secure to grip.",
+        review: {
+          explanation:
+            "Visual markers help an approaching vehicle identify a satellite, but handles provide the physical attachment point needed for removal, repair or refuelling.",
+          correctQuote: "Handles",
+          distractors: [
+            {
+              quote: "Visual markers",
+              note:
+                "Markers help vehicles identify the satellite; they do not provide something secure to grip.",
+            },
+          ],
+        },
+      },
+    ],
+    supportingNotes: [],
+    script: [
+      {
+        speaker: "Lecturer",
+        text: "Today I want to look at how engineers might remove abandoned satellites from orbit. People often picture a machine sweeping up thousands of tiny fragments. Those fragments certainly pose a threat, but collecting them individually is extremely difficult. Much of the work on removal therefore concerns large objects: complete satellites and the discarded sections of rockets. The purpose is preventive. If one of these breaks apart in a collision, it can produce a whole new population of fragments. Taking it away beforehand avoids that multiplication.",
+      },
+      {
+        speaker: "Lecturer",
+        text: "Collisions are not the only cause of break-ups. A satellite can stop working while still containing unused fuel and charged batteries. Both can become dangerous if the craft overheats. Operators can reduce these risks before abandoning a satellite, by releasing fuel and discharging its batteries. That second measure needs to be permanent, though. Solar panels may continue producing electricity after the mission ends. Physically separating these from the batteries prevents the charge from building up again. Simply switching off the instruments does not deal with this source of energy.",
+      },
+      {
+        speaker: "Lecturer",
+        text: "An abandoned satellite may tumble, so a vehicle using an arm must approach closely and follow its movement accurately. A net offers a different arrangement. It can be launched while the vehicle remains much farther away. That distance is valuable during capture, although it does not necessarily make the subsequent operation easier.",
+      },
+      {
+        speaker: "Lecturer",
+        text: "One research programme tested nets inside an aircraft that briefly created weightless conditions. The targets were small physical models of satellites, and weights attached to the corners helped the nets spread around them. Cameras recorded the process. It is tempting to view successful catches as the whole point of the exercise. However, the researchers already had computer models predicting how a net would behave. The recordings allowed them to check those predictions against actual movement. Once they could trust these models, they could use them to design larger nets for a mission. A successful trial was therefore evidence for a design tool, rather than proof that an operational removal system was ready.",
+      },
+      {
+        speaker: "Lecturer",
+        text: "After capture, attention shifts to the connection between the two craft. With a net, this is a cable; an arm holds them together more firmly. The latter arrangement offers greater control once contact has been made. Returning to the net, its target may still be tumbling. Unless that motion is checked promptly, the flexible link could wind around both spacecraft. That is why an apparently successful catch may still require urgent action.",
+      },
+      {
+        speaker: "Lecturer",
+        text: "Finally, disposal should not just transfer danger from space to people below. Some material can survive the journey through the atmosphere, so the return of a large object may need careful control. Future satellites can also be designed to simplify capture. Visual markers help approaching vehicles identify them. Handles provide somewhere secure to attach. These are useful not only when removing failed equipment: a vehicle arriving to repair or refuel a working satellite can use them too.",
+      },
+    ],
+    itemDesign: [
+      "The first answer identifies a broad target category after tiny fragments and two examples compete for attention.",
+      "The second answer follows references to stored energy, discharged batteries and a renewed charge.",
+      "The third answer separates a capture-stage advantage from the difficulty of later control.",
+      "The fourth answer distinguishes predictive computer models from the physical models used as targets.",
+      "The fifth answer follows a comparison between an arm and a net, then a change of wording from cable to flexible link.",
+      "The final answer distinguishes an identification aid from a physical attachment point.",
+    ],
+  },
+  {
+    id: "dictionaries",
+    level: "C1",
+    title: "How Dictionaries Select New Words",
+    description: "Complete six gaps in a set of lecture notes with words from the recording.",
+    teacherOnly: true,
+    assetsReady: true,
+    audioReady: true,
+    audioSrc: `${dictionariesAudioRoot}/how-dictionaries-select-new-words.mp3`,
+    instructionAudioReady: true,
+    instructionAudioSrc: `${dictionariesAudioRoot}/question.mp3`,
+    instructions:
+      "Listen to a lecture about how dictionaries select new words. Complete the gaps in the notes with a word or two-word phrase from the audio. Remember to check your spelling.",
+    preparationPrompt: "The clock shows how much time you have to look at the task.",
+    preparationSeconds: 30,
+    gaps: [
+      {
+        id: "search-records",
+        answer: "search records",
+        acceptedAnswers: ["records"],
+        section: "Finding candidates",
+        before: "Editors can identify gaps in existing coverage by examining",
+        after: ".",
+        review: {
+          explanation:
+            "Repeated unsuccessful searches on the dictionary website create records that reveal expressions visitors expect to find. They identify possible omissions without proving that a word deserves an entry.",
+          correctQuote: "search records",
+          distractors: [
+            {
+              quote: "Editors read widely",
+              note:
+                "Wide reading helps editors notice candidate words, but the note specifically asks about identifying gaps in the dictionary’s existing coverage.",
+            },
+            {
+              quote: "readers send suggestions",
+              note:
+                "Suggestions are another source of candidates, but they are not the website evidence linked to omissions.",
+            },
+          ],
+        },
+      },
+      {
+        id: "press-release",
+        answer: "press release",
+        acceptedAnswers: ["release"],
+        section: "Checking the evidence",
+        before: "Some apparently separate news articles are copies of a company’s",
+        after: ".",
+        review: {
+          explanation:
+            "The wording across many news websites can create a misleading impression of broad use. Comparison shows that the articles repeat the company’s original press release.",
+          correctQuote: "press release",
+          distractors: [
+            {
+              quote: "product launch",
+              note:
+                "The launch is the event being promoted, not the written source copied by the articles.",
+            },
+            {
+              quote: "advertisements were written for it later",
+              note:
+                "The advertisements add campaign appearances but are not the source repeated by the news articles.",
+            },
+          ],
+        },
+      },
+      {
+        id: "publication-dates",
+        answer: "publication dates",
+        acceptedAnswers: ["dates"],
+        section: "Checking the evidence",
+        before: "Recording",
+        after: "helps establish whether use has continued over time.",
+        review: {
+          explanation:
+            "Publication dates let editors arrange examples in sequence and distinguish sustained use from a brief burst of attention.",
+          correctQuote: "publication dates",
+          distractors: [
+            {
+              quote: "details of its source",
+              note:
+                "Source details identify where evidence appeared; the dates establish its distribution over time.",
+            },
+            {
+              quote: "a fixed waiting period",
+              note:
+                "The lecturer explicitly says that continued use does not have to be assessed through one fixed delay.",
+            },
+          ],
+        },
+      },
+      {
+        id: "wider-circulation",
+        answer: "news reports",
+        section: "Checking the evidence",
+        before:
+          "For technical vocabulary, evidence of wider circulation can come from",
+        after: ".",
+        review: {
+          explanation:
+            "Research reports show specialist use, while news reports explaining a public issue demonstrate that the expression has moved into communication for a general audience.",
+          correctQuote: "news reports",
+          distractors: [
+            {
+              quote: "Research reports",
+              note:
+                "These may contain an expression for years without showing that it has circulated beyond the specialist field.",
+            },
+            {
+              quote: "quote a scientist’s unusual terminology",
+              note:
+                "Merely quoting specialist language is contrasted with using the expression to explain events to the public.",
+            },
+          ],
+        },
+      },
+      {
+        id: "quotation-grammar",
+        answer: "grammar",
+        section: "Preparing the entry",
+        before: "An ordinary quotation may provide essential information about",
+        after: ".",
+        review: {
+          explanation:
+            "Questions about whether a noun or preposition can follow a word concern its grammar. A less memorable quotation may reveal that relationship more clearly than one chosen only for its wording.",
+          correctQuote: "grammar",
+          distractors: [
+            {
+              quote: "Pronunciation, spelling",
+              note:
+                "These also require checking, but they are not the language relationship illustrated by nouns and prepositions.",
+            },
+            {
+              quote: "captures the meaning beautifully",
+              note:
+                "A vivid illustration of meaning may still leave the practical grammatical question unresolved.",
+            },
+          ],
+        },
+      },
+      {
+        id: "usage-labels",
+        answer: "usage labels",
+        section: "Helping readers",
+        before:
+          "Readers can assess appropriateness for a particular situation by consulting",
+        after: ".",
+        review: {
+          explanation:
+            "Subject labels identify a field such as medicine, whereas usage labels show whether an expression is suitable for contexts such as formal writing or informal conversation.",
+          correctQuote: "Usage labels",
+          distractors: [
+            {
+              quote: "Subject labels",
+              note:
+                "These identify the field of an expression but do not tell readers which social situation it suits.",
+            },
+            {
+              quote: "medicine",
+              note:
+                "This is an example of a subject field, not guidance about register or situational appropriateness.",
+            },
+          ],
+        },
+      },
+    ],
+    supportingNotes: [
+      {
+        section: "Finding candidates",
+        text: "Dictionary entries describe language already used by the public.",
+        beforeGap: "search-records",
+      },
+      {
+        section: "Helping readers",
+        text: "An entry may require revision as language changes.",
+        afterGap: "usage-labels",
+      },
+    ],
+    script: [
+      {
+        speaker: "Woman",
+        text: "Today I’d like to explain how editors decide which new words to include in a general English dictionary. Announcements about additions tend to attract attention to unusual expressions. Behind those announcements, however, lies a patient investigation into what people are already saying and writing.",
+      },
+      {
+        speaker: "Woman",
+        text: "Finding candidates involves more than noticing fashionable language. Editors read widely, and readers send suggestions, sometimes with very useful supporting material. Another clue comes from the dictionary website itself. When visitors repeatedly look for an expression and receive no result, their search records can reveal an omission. These tell editors where the dictionary may be failing its readers; they do not establish that the expression deserves an entry.",
+      },
+      {
+        speaker: "Woman",
+        text: "Suppose a company introduces an expression in a press release promoting a product launch. Editors subsequently find it on dozens of news websites, with further appearances in advertisements. That looks like an impressive range. Comparing the wording, though, reveals that the news articles repeat what the firm issued at the launch, whereas the advertisements were written for it later. The many appearances consequently describe a successful campaign, without showing that other people have adopted the expression for themselves.",
+      },
+      {
+        speaker: "Woman",
+        text: "The evidence also needs a time dimension. Each saved passage is accompanied by details of its source, including publication dates. These allow editors to arrange the material in sequence and distinguish a sudden burst of attention from use that continues after the original excitement has faded. This need not involve a fixed waiting period: an expression naming an important new reality may become established remarkably quickly.",
+      },
+      {
+        speaker: "Woman",
+        text: "Breadth is particularly important with vocabulary from specialised fields. Research reports can contain an expression for years without making it useful to readers outside that field. Now imagine it occurring in news reports about an issue affecting the public. The articles use it to explain events, rather than merely quote a scientist’s unusual terminology. That provides a different kind of evidence. The expression has moved into communication aimed at a general audience, even though its subject has not changed.",
+      },
+      {
+        speaker: "Woman",
+        text: "The next job is to prepare the entry. Pronunciation, spelling and grammar all need checking, alongside the definition. When choosing quotations, editors may find one that captures the meaning beautifully but leaves a practical uncertainty unresolved. Can the word be followed directly by a noun, or does a preposition have to come between them? A less memorable example may make that relationship visible. For learners trying to build their own sentences, this can be more useful than a striking quotation. The selection therefore depends on what the reader needs to discover.",
+      },
+      {
+        speaker: "Woman",
+        text: "Readers also need guidance about suitability. Subject labels, such as ‘medicine’, identify a field, but they cannot tell someone whether an expression belongs in a formal letter or a conversation with friends. Usage labels supply that information, marking expressions as informal, for instance. These distinctions help readers choose language for a situation; the fact that an expression has an entry does not settle that choice. Dictionaries document what people use, and their entries remain open to revision as the evidence changes.",
+      },
+    ],
+    itemDesign: [
+      "Website search records are explicitly linked with identifying omissions, not proving entry-worthiness.",
+      "The second answer requires recovering the original written source behind apparently separate news coverage.",
+      "Publication dates distinguish sustained use from a temporary burst of attention.",
+      "News reports show movement beyond a specialist field, while research reports remain a competing source type.",
+      "The fifth answer connects a later practical example involving nouns and prepositions with an earlier checklist category.",
+      "The final answer distinguishes usage labels from subject labels by their function for readers.",
     ],
   },
 ];

@@ -231,6 +231,20 @@ const PRODUCT_GROUPS = [
         tags: ["Listening", "Live lesson"],
       },
       {
+        title: "Advanced Listening Part 2 · Removing space debris",
+        description: "A C1 note-completion lecture with six gaps, detailed answer evidence and a teacher-controlled live mode.",
+        path: "/ote/listening/advanced/part-2-note-completion#teacher-listening-tasks",
+        icon: Headphones,
+        tags: ["Advanced Listening", "Direct link", "Live lesson"],
+      },
+      {
+        title: "Advanced Listening Part 2 · Dictionary words",
+        description: "A C1 note-completion lecture about how dictionaries select new words, with independent and live classroom modes.",
+        path: "/ote/listening/advanced/part-2-note-completion#teacher-listening-tasks",
+        icon: Headphones,
+        tags: ["Advanced Listening", "Direct link", "Live lesson"],
+      },
+      {
         title: "Advanced Listening Part 3 · Subscription services",
         description: "A C1 woman, man or both task with full recording, transcript-led review and a teacher-controlled live mode.",
         path: "/ote/listening/advanced/part-3-opinion-matching#teacher-listening-tasks",

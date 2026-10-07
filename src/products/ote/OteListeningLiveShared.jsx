@@ -1,6 +1,10 @@
 import React from "react";
 import { BookOpenCheck, CheckCircle2, Headphones, Radio } from "lucide-react";
-import { normaliseListeningAnswer, optionLetter } from "./utils/listeningLive.js";
+import {
+  isAdvancedPart2AnswerCorrect,
+  normaliseListeningAnswer,
+  optionLetter,
+} from "./utils/listeningLive.js";
 import { OpinionMatchingTask } from "./OteAdvancedListeningPart3Practice.jsx";
 
 function evidenceFor(activity, item) {
@@ -597,7 +601,7 @@ export function ListeningFeedback({
       ? selectedValue === item.answer
       : isPartThree
         ? selectedValue === item.answer
-      : normaliseListeningAnswer(selectedValue) === normaliseListeningAnswer(item.answer);
+      : isAdvancedPart2AnswerCorrect(item, selectedValue);
 
   return (
     <section className={`ote-listening-question-feedback ${correct ? "is-correct" : "is-wrong"}`}>

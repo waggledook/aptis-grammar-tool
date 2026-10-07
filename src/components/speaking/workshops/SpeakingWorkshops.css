@@ -329,6 +329,18 @@
 .workshop-session-actions button.is-end { border-color: #a75e53; background: #773c34; }
 .workshop-session-actions button.is-delete { border-color: #934d53; background: #55272d; }
 .workshop-session-actions button:disabled { opacity: .5; cursor: wait; }
+.workshop-review-archive { overflow: hidden; border: 1px solid #66549c; border-radius: 16px; background: color-mix(in srgb, var(--workshop-panel) 88%, #32275d); }
+.workshop-review-archive > summary { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .9rem 1rem; color: #d9d0fb; cursor: pointer; list-style: none; }
+.workshop-review-archive > summary::-webkit-details-marker { display: none; }
+.workshop-review-archive > summary > svg { flex: 0 0 auto; transition: transform .16s ease; }
+.workshop-review-archive[open] > summary > svg { transform: rotate(180deg); }
+.workshop-review-archive > summary:hover { background: rgba(157, 134, 224, .08); }
+.workshop-review-archive > summary:focus-visible { outline: 3px solid rgba(157, 134, 224, .28); outline-offset: -3px; }
+.workshop-review-archive-label { display: flex; min-width: 0; align-items: center; gap: .7rem; }
+.workshop-review-archive-label > span { display: grid; gap: .14rem; }
+.workshop-review-archive-label strong { color: #ece7ff; }
+.workshop-review-archive-label small { color: #a99cce; font-size: .78rem; }
+.workshop-review-session-list { display: grid; gap: .75rem; padding: .75rem; border-top: 1px solid #66549c; }
 
 .workshop-membership-summary { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 1rem; }
 .workshop-membership-list { display: grid; gap: .65rem; }
@@ -707,6 +719,11 @@
 :root[data-theme="light"] .workshop-session-actions button { background: #dcf7eb; color: #17543f; }
 :root[data-theme="light"] .workshop-session-actions button.is-end { background: #fde7e3; color: #75352d; }
 :root[data-theme="light"] .workshop-session-actions button.is-delete { background: #f9e1e3; color: #7a2932; }
+:root[data-theme="light"] .workshop-review-archive { border-color: #b9ace0; background: #f7f4ff; }
+:root[data-theme="light"] .workshop-review-archive > summary { color: #4f3d83; }
+:root[data-theme="light"] .workshop-review-archive-label strong { color: #3f306f; }
+:root[data-theme="light"] .workshop-review-archive-label small { color: #726690; }
+:root[data-theme="light"] .workshop-review-session-list { border-top-color: #d5ccec; }
 :root[data-theme="light"] :is(.prep-progress-track, .prep-flashcard, .prep-vocab-card, .prep-builder-grid label, .prep-answer-plan, .prep-self-check label, .prep-idea-grid button, .prep-speaking-support section, .prep-write-question input) { background: #f4f7fb; }
 :root[data-theme="light"] :is(.prep-rating-actions button, .prep-choice-grid button, .prep-step-actions button, .prep-question-tabs button, .prep-card-actions > button, .prep-question-actions button, .prep-write-next) { background: #f4f7fb; color: #172033; }
 :root[data-theme="light"] .prep-rating-actions button:last-child,

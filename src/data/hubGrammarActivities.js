@@ -8855,14 +8855,48 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           { id: "g2", acceptedAnswers: ["wasn't", "was not"], feedback: "Use wasn't in the negative singular short answer." },
         ],
       },
-      placeholderChoiceGapItem(
-        "a2-8c-cg-1",
-        "Choose the correct past form for each gap.",
-        "At the old station, ____ a ticket office and ____ two platforms. There ____ a café. (not be) There ____ any toilets. (not be)",
-        ["there was", "there were", "wasn't", "weren't"],
-        "Use singular or plural forms and follow each negative cue.",
-        ["there was", "there were", "wasn't", "weren't"]
-      ),
+      {
+        id: "a2-8c-cg-1",
+        type: "gap-fill",
+        prompt: "Choose the correct past form for each gap.",
+        parts: [
+          "At the old station, ",
+          { gapId: "g1" },
+          " a ticket office and ",
+          { gapId: "g2" },
+          " two platforms. There ",
+          { gapId: "g3" },
+          " a café. (not be) There ",
+          { gapId: "g4" },
+          " any toilets. (not be)",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["there was"],
+            choices: ["there weren't", "there were", "there was", "there wasn't"],
+            feedback: "Use there was with the singular noun ticket office.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["there were"],
+            choices: ["there were", "there wasn't", "there was", "there weren't"],
+            feedback: "Use there were with the plural noun platforms.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["wasn't"],
+            choices: ["was", "were", "weren't", "wasn't"],
+            feedback: "Use wasn't after There with the singular noun café and the negative cue.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["weren't"],
+            choices: ["was", "weren't", "wasn't", "were"],
+            feedback: "Use weren't after There with the plural noun toilets and the negative cue.",
+          },
+        ],
+      },
       errorCorrectionItem(
         "a2-8c-ec-1",
         "Check the highlighted phrase.",
@@ -9224,14 +9258,48 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         [],
         "Use many with the plural countable noun buses."
       ),
-      placeholderChoiceGapItem(
-        "a2-9b-cg-1",
-        "Choose the correct quantifier for each gap.",
-        "We have ____ time before the train and only ____ coins for the ticket machine. There are ____ people in the queue, so we don't have ____ time.",
-        ["a little", "a few", "a lot of", "much"],
-        "Match each quantifier to the noun and the meaning of the sentence.",
-        ["a lot of", "a little", "a few", "much", "many", "any"]
-      ),
+      {
+        id: "a2-9b-cg-1",
+        type: "gap-fill",
+        prompt: "Choose a correct quantifier for each gap.",
+        parts: [
+          "The train leaves in five minutes, so we have only ",
+          { gapId: "g1" },
+          " time and just ",
+          { gapId: "g2" },
+          " coins for the ticket machine. There are ",
+          { gapId: "g3" },
+          " people in the queue, so we don't have ",
+          { gapId: "g4" },
+          " time.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["a little"],
+            choices: ["a lot of", "a little", "a few", "much", "many", "any"],
+            feedback: "Use a little for a small positive amount of the uncountable noun time.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["a few"],
+            choices: ["a lot of", "a little", "a few", "much", "many", "any"],
+            feedback: "Use a few with the plural countable noun coins.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["a lot of", "many"],
+            choices: ["a lot of", "a little", "a few", "much", "many", "any"],
+            feedback: "Both a lot of and many are correct with the plural countable noun people.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["much"],
+            choices: ["a lot of", "a little", "a few", "much", "many", "any"],
+            feedback: "Use much with the uncountable noun time in a negative sentence.",
+          },
+        ],
+      },
       errorCorrectionItem(
         "a2-9b-ec-1",
         "Check the highlighted phrase.",

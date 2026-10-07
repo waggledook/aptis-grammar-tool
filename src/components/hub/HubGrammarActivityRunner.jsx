@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { QRCodeSVG } from "qrcode.react";
 import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
@@ -367,8 +367,40 @@ function scoreEvaluatedItems(evaluatedItems = [], totalGaps = 0) {
   };
 }
 
-function getDraftStorageKey(activityId, user) {
-  const userKey = user?.uid || user?.email || "guest";
+function isEvaluatedItemCorrect(item = {}) {
+  if (Array.isArray(item.gaps)) {
+    return item.gaps.every((gap) => gap.isCorrect);
+  }
+
+  return !!item.isCorrect;
+}
+
+function getIncorrectEvaluatedItems(items = []) {
+  return items.filter((item) => !isEvaluatedItemCorrect(item));
+}
+
+function countIncorrectAnswers(items = []) {
+  return items.reduce((count, item) => {
+    if (Array.isArray(item.gaps)) {
+      return count + item.gaps.filter((gap) => !gap.isCorrect).length;
+    }
+
+    return count + (item.isCorrect ? 0 : 1);
+  }, 0);
+}
+
+function formatReviewDate(value) {
+  const date = new Date(Number(value) || 0);
+  if (Number.isNaN(date.getTime()) || !date.getTime()) return "Unknown date";
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+}
+
+function getDraftStorageKey(activityId, userKey = "guest") {
   return `hub-grammar-draft:${activityId}:${userKey}`;
 }
 
@@ -462,8 +494,48 @@ function renderSentence(
 
 export default function HubGrammarActivityRunner({ user }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { activityId } = useParams();
   const activity = getHubGrammarActivity(activityId);
+  const mistakeReviewRequested = new URLSearchParams(location.search).get("review") === "mistakes";
+  const mistakeReview = mistakeReviewRequested ? location.state?.grammarMistakeReview : null;
+  const mistakeReviewItems = useMemo(
+    () => getIncorrectEvaluatedItems(mistakeReview?.submission?.items || []),
+    [mistakeReview]
+  );
+  const mistakeReviewItemsById = useMemo(
+    () => Object.fromEntries(mistakeReviewItems.map((item) => [String(item.id), item])),
+    [mistakeReviewItems]
+  );
+  const isMistakeReview = !!(mistakeReviewRequested && mistakeReview?.submission && activity);
+  const visibleItems = useMemo(
+    () =>
+      isMistakeReview
+        ? activity.items.filter((item) => mistakeReviewItemsById[String(item.id)])
+        : activity?.items || [],
+    [activity, isMistakeReview, mistakeReviewItemsById]
+  );
+  const mistakeAnswerCount = useMemo(
+    () => countIncorrectAnswers(mistakeReviewItems),
+    [mistakeReviewItems]
+  );
+  const visibleAnswerCount = useMemo(
+    () =>
+      visibleItems.reduce((count, item) => {
+        if (
+          item.type === "multiple-choice" ||
+          item.type === "error-correction" ||
+          item.type === "comma-placement" ||
+          item.type === "adverb-placement" ||
+          item.type === "word-order" ||
+          item.type === "audio-response"
+        ) {
+          return count + 1;
+        }
+        return count + (item.gaps?.length || 0);
+      }, 0),
+    [visibleItems]
+  );
   const inputRefs = useRef({});
   const itemRefs = useRef({});
   const checkedItemResultsRef = useRef({});
@@ -480,15 +552,16 @@ export default function HubGrammarActivityRunner({ user }) {
   const [result, setResult] = useState(null);
   const [showShareModal, setShowShareModal] = useState(false);
   const isTeacher = user?.role === "teacher" || user?.role === "admin";
+  const draftUserKey = user?.uid || user?.email || "guest";
   const draftStorageKey = useMemo(
-    () => (activity ? getDraftStorageKey(activity.id, user) : ""),
-    [activity, user?.uid, user?.email]
+    () => (activity && !isMistakeReview ? getDraftStorageKey(activity.id, draftUserKey) : ""),
+    [activity, draftUserKey, isMistakeReview]
   );
 
   const orderedInputKeys = useMemo(() => {
-    if (!activity) return [];
+    if (!visibleItems.length) return [];
 
-    return activity.items.flatMap((item) => {
+    return visibleItems.flatMap((item) => {
       if (item.type === "error-correction") {
         return [`${item.id}:correction`];
       }
@@ -515,13 +588,13 @@ export default function HubGrammarActivityRunner({ user }) {
 
       return item.gaps.map((gap) => `${item.id}:${gap.id}`);
     });
-  }, [activity]);
+  }, [visibleItems]);
 
   const firstControlKeysByItem = useMemo(() => {
-    if (!activity) return {};
+    if (!visibleItems.length) return {};
 
     return Object.fromEntries(
-      activity.items.map((item) => {
+      visibleItems.map((item) => {
         if (item.type === "multiple-choice") {
           return [item.id, `${item.id}:option:0`];
         }
@@ -554,7 +627,7 @@ export default function HubGrammarActivityRunner({ user }) {
         return [item.id, `${item.id}:${firstGap?.id}`];
       })
     );
-  }, [activity]);
+  }, [visibleItems]);
 
   const totalGaps = useMemo(
     () =>
@@ -581,11 +654,28 @@ export default function HubGrammarActivityRunner({ user }) {
     inputRefs.current = {};
     itemRefs.current = {};
     const initialAnswers = activity ? buildInitialAnswers(activity) : {};
+
+    if (activity && isMistakeReview) {
+      setAnswers(initialAnswers);
+      checkedItemResultsRef.current = {};
+      setCheckedItemResults({});
+      startLoggedRef.current = true;
+      setDraftStatus("idle");
+      setConfirmedCorrections({});
+      setSelectedAdverb(null);
+      setSelectedWordToken(null);
+      submissionStartedRef.current = true;
+      setSubmitted(false);
+      setSaving(false);
+      setResult(null);
+      return;
+    }
+
     let restoredDraft = null;
 
     if (activity && typeof window !== "undefined") {
       try {
-        const rawDraft = window.localStorage.getItem(getDraftStorageKey(activity.id, user));
+        const rawDraft = window.localStorage.getItem(draftStorageKey);
         restoredDraft = rawDraft ? JSON.parse(rawDraft) : null;
       } catch (error) {
         console.warn("[HubGrammarActivityRunner] draft restore failed", error);
@@ -613,7 +703,7 @@ export default function HubGrammarActivityRunner({ user }) {
     setSubmitted(false);
     setSaving(false);
     setResult(null);
-  }, [activityId, activity, user?.uid, user?.email]);
+  }, [activityId, activity, draftStorageKey, isMistakeReview, mistakeReview, mistakeReviewItems]);
 
   useEffect(() => {
     if (!activity || !draftStorageKey || submitted) return;
@@ -654,16 +744,16 @@ export default function HubGrammarActivityRunner({ user }) {
   }, [activityId, orderedInputKeys, submitted]);
 
   useEffect(() => {
-    if (!submitted || !result || !activity?.items?.length) return;
+    if (!submitted || !result || !visibleItems.length) return;
 
-    const firstItemId = activity.items[0]?.id;
+    const firstItemId = visibleItems[0]?.id;
     const node = firstItemId ? itemRefs.current[firstItemId] : null;
     if (!node) return;
 
     requestAnimationFrame(() => {
       node.scrollIntoView({ behavior: "smooth", block: "start" });
     });
-  }, [submitted, result, activity]);
+  }, [submitted, result, visibleItems]);
 
   if (!activity) {
     return (
@@ -671,6 +761,17 @@ export default function HubGrammarActivityRunner({ user }) {
         <p className="muted">That grammar activity could not be found.</p>
         <button className="review-btn" onClick={() => navigate(getSitePath("/grammar"))}>
           Back to grammar menu
+        </button>
+      </div>
+    );
+  }
+
+  if (mistakeReviewRequested && !isMistakeReview) {
+    return (
+      <div className="game-wrapper">
+        <p className="muted">This mistake review is no longer available. Open it again from the student activity notification.</p>
+        <button className="review-btn" onClick={() => navigate(-1)}>
+          Back to notifications
         </button>
       </div>
     );
@@ -720,10 +821,10 @@ export default function HubGrammarActivityRunner({ user }) {
   };
 
   const focusNextQuestion = (itemId) => {
-    if (!activity) return;
+    if (!visibleItems.length) return;
 
-    const currentIndex = activity.items.findIndex((item) => item.id === itemId);
-    const nextItem = currentIndex >= 0 ? activity.items[currentIndex + 1] : null;
+    const currentIndex = visibleItems.findIndex((item) => item.id === itemId);
+    const nextItem = currentIndex >= 0 ? visibleItems[currentIndex + 1] : null;
     if (!nextItem) return;
 
     const nextKey = firstControlKeysByItem[nextItem.id];
@@ -823,10 +924,6 @@ export default function HubGrammarActivityRunner({ user }) {
     handleChange(item.id, next);
   };
 
-  const clearCommas = (itemId) => {
-    handleChange(itemId, []);
-  };
-
   const handleNoCommasNeeded = (item) => {
     const nextAnswers = { ...answers, [item.id]: [] };
     setAnswers(nextAnswers);
@@ -902,8 +999,8 @@ export default function HubGrammarActivityRunner({ user }) {
     checkedItemResultsRef.current = {};
     setCheckedItemResults({});
     setDraftStatus("idle");
-    startLoggedRef.current = false;
-    submissionStartedRef.current = false;
+    startLoggedRef.current = isMistakeReview;
+    submissionStartedRef.current = isMistakeReview;
     setSubmitted(false);
     setResult(null);
 
@@ -943,13 +1040,29 @@ export default function HubGrammarActivityRunner({ user }) {
     setSelectedAdverb((current) => (current?.itemId === item.id ? null : current));
     setSelectedWordToken((current) => (current?.itemId === item.id ? null : current));
 
-    const testIsComplete = activity.items.every(
+    const itemsToComplete = isMistakeReview ? visibleItems : activity.items;
+    const testIsComplete = itemsToComplete.every(
       (activityItem) => nextCheckedItemResults[activityItem.id]
     );
     if (testIsComplete) {
-      const evaluatedItems = activity.items.map((activityItem) =>
+      const evaluatedItems = itemsToComplete.map((activityItem) =>
         evaluateGrammarItem(activityItem, sourceAnswers)
       );
+
+      if (isMistakeReview) {
+        const { correct, score } = scoreEvaluatedItems(evaluatedItems, visibleAnswerCount);
+        setSubmitted(true);
+        setResult({
+          ...mistakeReview.submission,
+          items: evaluatedItems,
+          correct,
+          score,
+          total: visibleAnswerCount,
+        });
+        toast("Mistake review completed.");
+        return;
+      }
+
       saveEvaluatedSubmission(evaluatedItems, { automatic: true });
     }
   };
@@ -1208,21 +1321,34 @@ export default function HubGrammarActivityRunner({ user }) {
   return (
     <div className="hub-grammar-page">
       <Seo
-        title={`${activity.title} | Seif Hub`}
-        description={activity.shortDescription}
+        title={`${activity.title}${isMistakeReview ? " Mistake Review" : ""} | Seif Hub`}
+        description={
+          isMistakeReview
+            ? `Review incorrect answers from ${activity.title}.`
+            : activity.shortDescription
+        }
       />
 
       <div className="hub-grammar-shell">
         <div className="hub-grammar-topbar">
-          <button className="review-btn" onClick={() => navigate(getSitePath("/grammar/mini-tests"))}>
-            ← Back to mini tests
+          <button
+            className="review-btn"
+            onClick={() =>
+              isMistakeReview
+                ? navigate(-1)
+                : navigate(getSitePath("/grammar/mini-tests"))
+            }
+          >
+            {isMistakeReview ? "← Back to notifications" : "← Back to mini tests"}
           </button>
         </div>
 
         <header className="hub-grammar-header">
           <div className="hub-grammar-kicker-row">
-            <span className="hub-grammar-kicker">Seif Hub Grammar Activity</span>
-            {!submitted && draftStatus !== "idle" ? (
+            <span className="hub-grammar-kicker">
+              {isMistakeReview ? "Mistake review" : "Seif Hub Grammar Activity"}
+            </span>
+            {!isMistakeReview && !submitted && draftStatus !== "idle" ? (
               <span className={`hub-grammar-draft-pill is-${draftStatus}`}>
                 {draftStatus === "restored"
                   ? "Draft restored"
@@ -1233,7 +1359,7 @@ export default function HubGrammarActivityRunner({ user }) {
                       : "Draft saved"}
               </span>
             ) : null}
-            {isTeacher ? (
+            {isTeacher && !isMistakeReview ? (
               <button
                 type="button"
                 className="hub-grammar-share-pill"
@@ -1244,7 +1370,13 @@ export default function HubGrammarActivityRunner({ user }) {
             ) : null}
           </div>
           <h1>{activity.title}</h1>
-          <p>{activity.intro}</p>
+          <p>
+            {isMistakeReview
+              ? `${mistakeReview.studentLabel || "Student"} · ${mistakeAnswerCount} incorrect ${
+                  mistakeAnswerCount === 1 ? "answer" : "answers"
+                } across ${visibleItems.length} ${visibleItems.length === 1 ? "question" : "questions"}. The answers have been cleared so these questions can be tried again.`
+              : activity.intro}
+          </p>
         </header>
 
         {showShareModal ? (
@@ -1294,7 +1426,26 @@ export default function HubGrammarActivityRunner({ user }) {
           </div>
         ) : null}
 
-        {result && (
+        {isMistakeReview ? (
+          <section className="hub-grammar-summary">
+            <div>
+              <span className="hub-grammar-summary-label">Original score</span>
+              <strong>{mistakeReview.submission.score ?? 0}%</strong>
+            </div>
+            <div>
+              <span className="hub-grammar-summary-label">
+                {result ? "Review score" : "Incorrect"}
+              </span>
+              <strong>
+                {result ? `${result.correct}/${result.total}` : mistakeAnswerCount}
+              </strong>
+            </div>
+            <div>
+              <span className="hub-grammar-summary-label">Completed</span>
+              <strong>{formatReviewDate(mistakeReview.completedAtMs)}</strong>
+            </div>
+          </section>
+        ) : result ? (
           <section className="hub-grammar-summary">
             <div>
               <span className="hub-grammar-summary-label">Score</span>
@@ -1311,12 +1462,24 @@ export default function HubGrammarActivityRunner({ user }) {
               <strong>{saving ? "Saving..." : "Saved to profile"}</strong>
             </div>
           </section>
-        )}
+        ) : null}
 
         <div className="hub-grammar-list">
-          {activity.items.map((item, index) => {
-            const evaluatedItem = result?.items.find((entry) => entry.id === item.id) || checkedItemResults[item.id];
+          {isMistakeReview && !visibleItems.length ? (
+            <div className="hub-grammar-card">
+              <p className="muted" style={{ margin: 0 }}>
+                No reviewable mistakes were found in this submission.
+              </p>
+            </div>
+          ) : null}
+          {visibleItems.map((item, index) => {
+            const evaluatedItem = result?.items.find(
+              (entry) => String(entry.id) === String(item.id)
+            ) || checkedItemResults[item.id];
             const itemLocked = submitted || Boolean(checkedItemResults[item.id]);
+            const originalItemNumber = activity.items.findIndex(
+              (entry) => String(entry.id) === String(item.id)
+            ) + 1;
 
             return (
               <article
@@ -1325,7 +1488,9 @@ export default function HubGrammarActivityRunner({ user }) {
                 ref={registerItem(item.id)}
               >
                 <div className="hub-grammar-card-head">
-                  <span className="hub-grammar-number">{index + 1}</span>
+                  <span className="hub-grammar-number">
+                    {isMistakeReview ? originalItemNumber : index + 1}
+                  </span>
                   <p>{item.prompt}</p>
                 </div>
 
@@ -1884,16 +2049,29 @@ export default function HubGrammarActivityRunner({ user }) {
         </div>
 
         <div className="hub-grammar-actions">
-          <button
-            className="generate-btn"
-            onClick={handleSubmit}
-            disabled={submitted || saving}
-          >
-            {submitted ? "Submitted" : "Submit final result"}
-          </button>
-          <button className="ghost-btn" onClick={handleReset}>
-            Reset activity
-          </button>
+          {isMistakeReview ? (
+            <>
+              <button className="review-btn" onClick={handleReset}>
+                {submitted ? "Try review again" : "Clear review answers"}
+              </button>
+              <button className="ghost-btn" onClick={() => navigate(-1)}>
+                Back to notifications
+              </button>
+            </>
+          ) : (
+            <>
+              <button
+                className="generate-btn"
+                onClick={handleSubmit}
+                disabled={submitted || saving}
+              >
+                {submitted ? "Submitted" : "Submit final result"}
+              </button>
+              <button className="ghost-btn" onClick={handleReset}>
+                Reset activity
+              </button>
+            </>
+          )}
         </div>
       </div>
 

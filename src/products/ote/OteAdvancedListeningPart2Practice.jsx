@@ -12,6 +12,7 @@ import Seo from "../../components/common/Seo.jsx";
 import { logOteTrainingCompleted, logOteTrainingStarted } from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
 import { getAdvancedListeningPart2Set } from "./data/oteAdvancedListeningPart2.js";
+import { isAdvancedPart2AnswerCorrect } from "./utils/listeningLive.js";
 import "./styles/ote.css";
 
 const LISTEN_AGAIN_PROMPT_SRC = "/audio/ote/listening/instructions/now-listen-again.mp3";
@@ -206,7 +207,8 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
   const inputRefs = useRef([]);
 
   const score = practiceSet.gaps.reduce(
-    (total, gap) => total + (normaliseAnswer(answers[gap.id]) === normaliseAnswer(gap.answer) ? 1 : 0),
+    (total, gap) =>
+      total + (isAdvancedPart2AnswerCorrect(gap, answers[gap.id]) ? 1 : 0),
     0
   );
   const answeredCount = practiceSet.gaps.filter((gap) => normaliseAnswer(answers[gap.id])).length;
@@ -450,7 +452,9 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
     logOteTrainingStarted({
       section: "listening",
       part: "part-2",
-      mode: "exam_style_note_completion",
+      mode: practiceSet.teacherOnly
+        ? "teacher_bank_note_completion"
+        : "exam_style_note_completion",
       taskId: `advanced-listening-part-2-${practiceSet.id}`,
       taskTitle: `Advanced Listening Part 2 ${practiceSet.title}`,
       variant: "advanced",
@@ -471,16 +475,23 @@ export default function OteAdvancedListeningPart2Practice({ user, nativeRoutes =
     logOteTrainingCompleted({
       section: "listening",
       part: "part-2",
-      mode: "exam_style_note_completion",
+      mode: practiceSet.teacherOnly
+        ? "teacher_bank_note_completion"
+        : "exam_style_note_completion",
       taskId: `advanced-listening-part-2-${practiceSet.id}`,
       taskTitle: `Advanced Listening Part 2 ${practiceSet.title}`,
       variant: "advanced",
       score,
       total: practiceSet.gaps.length,
+      ...(practiceSet.teacherOnly
+        ? { progressId: `listening.part2.teacher-bank.${practiceSet.id}` }
+        : {}),
     });
   }
 
-  if (user && user.oteVersion !== "advanced") {
+  const canOpenTeacherSet =
+    practiceSet.teacherOnly && (user?.role === "teacher" || user?.role === "admin");
+  if (user && user.oteVersion !== "advanced" && !canOpenTeacherSet) {
     return (
       <main className="ote-training-page">
         <header className="ote-training-hero">
@@ -634,7 +645,7 @@ function PartTwoComplete({ set, answers, score, onBack, onRetry }) {
 
         <div className="ote-listening-part2-review">
           {set.gaps.map((gap, index) => {
-            const isCorrect = normaliseAnswer(answers[gap.id]) === normaliseAnswer(gap.answer);
+            const isCorrect = isAdvancedPart2AnswerCorrect(gap, answers[gap.id]);
             return (
               <article className={isCorrect ? "is-correct" : "is-wrong"} key={gap.id}>
                 <span>Gap {index + 1}</span>

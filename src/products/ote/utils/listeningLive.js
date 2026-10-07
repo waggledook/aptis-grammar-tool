@@ -11,3 +11,11 @@ export function normaliseListeningAnswer(value) {
     .toLocaleLowerCase("en-GB")
     .replace(/\s+/g, " ");
 }
+
+export function isAdvancedPart2AnswerCorrect(item, value) {
+  const submitted = normaliseListeningAnswer(value);
+  if (!submitted) return false;
+  return [item?.answer, ...(item?.acceptedAnswers || [])]
+    .map(normaliseListeningAnswer)
+    .includes(submitted);
+}

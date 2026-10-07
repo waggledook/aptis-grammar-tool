@@ -25,7 +25,7 @@ import {
   ListeningScriptCheck,
   ListeningTask,
 } from "./OteListeningLiveShared.jsx";
-import { normaliseListeningAnswer } from "./utils/listeningLive.js";
+import { isAdvancedPart2AnswerCorrect } from "./utils/listeningLive.js";
 import "./styles/ote.css";
 import "./styles/listening-live.css";
 
@@ -126,7 +126,7 @@ export default function OteListeningLivePlayer() {
 
     const score = items.filter((item) => {
       if (activity.format === "advanced-part2") {
-        return normaliseListeningAnswer(answers[item.id]) === normaliseListeningAnswer(item.answer);
+        return isAdvancedPart2AnswerCorrect(item, answers[item.id]);
       }
       if (activity.format === "part3") {
         return answers[item.id] === item.answer;
@@ -144,7 +144,7 @@ export default function OteListeningLivePlayer() {
           ? undefined
           : record?.initialValue ?? record?.value;
       if (activity.format === "advanced-part2") {
-        return normaliseListeningAnswer(value) === normaliseListeningAnswer(item.answer);
+        return isAdvancedPart2AnswerCorrect(item, value);
       }
       if (activity.format === "part3") return value === item.answer;
       return Number(value) === item.answer;
@@ -337,7 +337,7 @@ export default function OteListeningLivePlayer() {
 function StudentResult({ activity, answerRecords, answers, items }) {
   function answerIsCorrect(item, value) {
     if (activity.format === "advanced-part2") {
-      return normaliseListeningAnswer(value) === normaliseListeningAnswer(item.answer);
+      return isAdvancedPart2AnswerCorrect(item, value);
     }
     if (activity.format === "part3") return value === item.answer;
     return Number(value) === item.answer;

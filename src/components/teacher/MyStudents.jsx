@@ -17,6 +17,7 @@ import {
 } from "../../firebase";
 import { TOPIC_DATA } from "../vocabulary/data/vocabTopics";
 import { fetchItemsByIds } from "../../api/grammar";
+import { getSitePath } from "../../siteConfig.js";
 import { toast } from "../../utils/toast";
 import UserAvatar from "../common/UserAvatar.jsx";
 
@@ -93,14 +94,28 @@ function formatDate(value) {
 function formatRelative(value) {
   const ms = timestampToMs(value);
   if (!ms) return "No recent activity";
-  const diffMs = Date.now() - ms;
-  const diffDays = Math.floor(diffMs / 86400000);
+  const now = new Date();
+  const activityDate = new Date(ms);
+  const localDayNumber = (date) => Math.floor(
+    Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()) / 86400000
+  );
+  const diffDays = localDayNumber(now) - localDayNumber(activityDate);
 
   if (diffDays <= 0) return "Today";
   if (diffDays === 1) return "Yesterday";
   if (diffDays < 7) return `${diffDays} days ago`;
   if (diffDays < 30) return `${Math.floor(diffDays / 7)} week${Math.floor(diffDays / 7) === 1 ? "" : "s"} ago`;
   return formatDate(value);
+}
+
+function getMiniTestMistakeCount(submission = {}) {
+  return (submission.items || []).reduce((count, item) => {
+    if (Array.isArray(item.gaps)) {
+      return count + item.gaps.filter((gap) => !gap.isCorrect).length;
+    }
+
+    return count + (item.isCorrect ? 0 : 1);
+  }, 0);
 }
 
 function normalizeStudentLookup(value = "") {
@@ -1389,6 +1404,33 @@ export default function MyStudents({
     void markSubmissionRead(entry.id);
   }
 
+  function openMiniTestMistakeReview(entry) {
+    const submission = entry?.submission;
+    const activityId = submission?.activityId;
+    if (!activityId || !Array.isArray(submission.items)) {
+      toast("This mini test does not have enough saved detail for mistake review.");
+      return;
+    }
+
+    setSelectedNotification(null);
+    navigate(getSitePath(`/grammar/activity/${encodeURIComponent(activityId)}?review=mistakes`), {
+      state: {
+        grammarMistakeReview: {
+          studentLabel: entry.studentLabel || "Student",
+          completedAtMs: timestampToMs(entry.createdAt),
+          submission: {
+            activityId,
+            activityTitle: submission.activityTitle || entry.title || "Mini grammar test",
+            score: submission.score ?? 0,
+            correct: submission.correct ?? 0,
+            total: submission.total ?? 0,
+            items: submission.items,
+          },
+        },
+      },
+    });
+  }
+
   useEffect(() => {
     let alive = true;
 
@@ -1849,6 +1891,16 @@ async function copySelectedSubmission() {
                 </div>
               </div>
               <div className="teacher-review-top-actions">
+                {selectedNotification.kind === "mini-test" &&
+                getMiniTestMistakeCount(selectedNotification.submission) > 0 ? (
+                  <button
+                    type="button"
+                    className="review-btn"
+                    onClick={() => openMiniTestMistakeReview(selectedNotification)}
+                  >
+                    Review mistakes
+                  </button>
+                ) : null}
                 <button
                   type="button"
                   className="ghost-btn"

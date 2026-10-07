@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import {
   CalendarClock,
   Check,
+  ChevronDown,
   Clipboard,
   LoaderCircle,
   Play,
@@ -154,6 +155,77 @@ export default function SpeakingWorkshopSessionManager({ user }) {
     }
   }
 
+  const currentSessions = sessions.filter((session) => session.phase !== "review");
+  const endedSessions = sessions.filter((session) => session.phase === "review");
+
+  function renderSessionCard(session) {
+    const joinUrl = `${window.location.origin}/speaking-workshops?join=${session.joinCode}&session=${session.id}`;
+    const isReviewSession = session.phase === "review";
+
+    return (
+      <article className={`workshop-session-card is-${session.phase}`} key={session.id}>
+        <div className="workshop-session-main">
+          <span className="workshop-session-phase">{phaseLabel(session)}</span>
+          <h3>{session.label}</h3>
+          <p>{session.topicIds.map((id) => topicTitles[id] || id).join(" · ")}</p>
+          <span className="workshop-attendee-count"><Users size={17} /> {session.attendeeCount} registered</span>
+          {session.attendees?.length ? (
+            <details className="workshop-attendee-list">
+              <summary>View participants</summary>
+              <div>
+                {session.attendees.map((attendee) => (
+                  <span key={attendee.uid}>{attendee.name || attendee.email || "Participant"}</span>
+                ))}
+              </div>
+            </details>
+          ) : null}
+          {isReviewSession && session.reviewUntil ? (
+            <small>
+              {new Date(session.reviewUntil) > new Date()
+                ? `Participant access ends automatically on ${formatDate(session.reviewUntil)}.`
+                : `Participant access ended on ${formatDate(session.reviewUntil)}.`}
+            </small>
+          ) : null}
+        </div>
+
+        {!isReviewSession ? (
+          <div className="workshop-session-invite">
+            <QRCodeSVG value={joinUrl} size={94} includeMargin />
+            <div>
+              <span>Student code</span>
+              <strong>{session.joinCode}</strong>
+              <button type="button" onClick={() => copyJoinLink(session)}>
+                {copiedId === session.id ? <Check size={16} /> : <Clipboard size={16} />}
+                {copiedId === session.id ? "Copied" : "Copy join link"}
+              </button>
+            </div>
+          </div>
+        ) : null}
+
+        {session.phase !== "review" || user?.role === "admin" ? (
+          <div className="workshop-session-actions">
+            {session.phase === "preparation" ? (
+              <button type="button" disabled={updatingId === session.id || deletingId === session.id} onClick={() => updateSession(session.id, "start")}>
+                <Play size={17} /> Start workshop
+              </button>
+            ) : null}
+            {session.phase === "live" ? (
+              <button className="is-end" type="button" disabled={updatingId === session.id || deletingId === session.id} onClick={() => updateSession(session.id, "end")}>
+                <Square size={16} /> End & start review
+              </button>
+            ) : null}
+            {user?.role === "admin" ? (
+              <button className="is-delete" type="button" disabled={Boolean(updatingId) || Boolean(deletingId)} onClick={() => deleteSession(session)}>
+                {deletingId === session.id ? <LoaderCircle className="workshop-spin" size={16} /> : <Trash2 size={16} />}
+                {deletingId === session.id ? "Deleting…" : "Delete"}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+      </article>
+    );
+  }
+
   return (
     <section className="workshop-manager" aria-labelledby="workshop-manager-title">
       <header className="workshop-manager-heading">
@@ -220,69 +292,24 @@ export default function SpeakingWorkshopSessionManager({ user }) {
 
       {!loading && sessions.length ? (
         <div className="workshop-session-list">
-          {sessions.map((session) => {
-            const joinUrl = `${window.location.origin}/speaking-workshops?join=${session.joinCode}&session=${session.id}`;
-            return (
-              <article className={`workshop-session-card is-${session.phase}`} key={session.id}>
-                <div className="workshop-session-main">
-                  <span className="workshop-session-phase">{phaseLabel(session)}</span>
-                  <h3>{session.label}</h3>
-                  <p>{session.topicIds.map((id) => topicTitles[id] || id).join(" · ")}</p>
-                  <span className="workshop-attendee-count"><Users size={17} /> {session.attendeeCount} registered</span>
-                  {session.attendees?.length ? (
-                    <details className="workshop-attendee-list">
-                      <summary>View participants</summary>
-                      <div>
-                        {session.attendees.map((attendee) => (
-                          <span key={attendee.uid}>{attendee.name || attendee.email || "Participant"}</span>
-                        ))}
-                      </div>
-                    </details>
-                  ) : null}
-                  {session.phase === "review" && session.reviewUntil ? (
-                    <small>
-                      {new Date(session.reviewUntil) > new Date()
-                        ? `Participant access ends automatically on ${formatDate(session.reviewUntil)}.`
-                        : `Participant access ended on ${formatDate(session.reviewUntil)}.`}
-                    </small>
-                  ) : null}
-                </div>
-
-                {session.phase !== "review" ? (
-                  <div className="workshop-session-invite">
-                    <QRCodeSVG value={joinUrl} size={94} includeMargin />
-                    <div>
-                      <span>Student code</span>
-                      <strong>{session.joinCode}</strong>
-                      <button type="button" onClick={() => copyJoinLink(session)}>
-                        {copiedId === session.id ? <Check size={16} /> : <Clipboard size={16} />}
-                        {copiedId === session.id ? "Copied" : "Copy join link"}
-                      </button>
-                    </div>
-                  </div>
-                ) : null}
-
-                <div className="workshop-session-actions">
-                  {session.phase === "preparation" ? (
-                    <button type="button" disabled={updatingId === session.id || deletingId === session.id} onClick={() => updateSession(session.id, "start")}>
-                      <Play size={17} /> Start workshop
-                    </button>
-                  ) : null}
-                  {session.phase === "live" ? (
-                    <button className="is-end" type="button" disabled={updatingId === session.id || deletingId === session.id} onClick={() => updateSession(session.id, "end")}>
-                      <Square size={16} /> End & start review
-                    </button>
-                  ) : null}
-                  {user?.role === "admin" ? (
-                    <button className="is-delete" type="button" disabled={Boolean(updatingId) || Boolean(deletingId)} onClick={() => deleteSession(session)}>
-                      {deletingId === session.id ? <LoaderCircle className="workshop-spin" size={16} /> : <Trash2 size={16} />}
-                      {deletingId === session.id ? "Deleting…" : "Delete"}
-                    </button>
-                  ) : null}
-                </div>
-              </article>
-            );
-          })}
+          {currentSessions.map(renderSessionCard)}
+          {endedSessions.length ? (
+            <details className="workshop-review-archive">
+              <summary>
+                <span className="workshop-review-archive-label">
+                  <CalendarClock size={20} aria-hidden="true" />
+                  <span>
+                    <strong>Ended workshops</strong>
+                    <small>{endedSessions.length} session{endedSessions.length === 1 ? "" : "s"} in review or expired</small>
+                  </span>
+                </span>
+                <ChevronDown size={20} aria-hidden="true" />
+              </summary>
+              <div className="workshop-review-session-list">
+                {endedSessions.map(renderSessionCard)}
+              </div>
+            </details>
+          ) : null}
         </div>
       ) : null}
     </section>

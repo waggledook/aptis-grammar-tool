@@ -30,8 +30,8 @@ import {
   ListeningTask,
 } from "./OteListeningLiveShared.jsx";
 import {
+  isAdvancedPart2AnswerCorrect,
   LISTEN_AGAIN_PROMPT_SRC,
-  normaliseListeningAnswer,
 } from "./utils/listeningLive.js";
 import "./styles/ote.css";
 import "./styles/listening-live.css";
@@ -431,7 +431,7 @@ export default function OteListeningLiveHost({ user }) {
 function ListeningLiveReport({ activity, items, players }) {
   function isCorrect(item, value) {
     if (activity.format === "advanced-part2") {
-      return normaliseListeningAnswer(value) === normaliseListeningAnswer(item.answer);
+      return isAdvancedPart2AnswerCorrect(item, value);
     }
     if (activity.format === "part3") {
       return value === item.answer;
