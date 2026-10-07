@@ -778,7 +778,11 @@ export default function HubGrammarActivityRunner({ user }) {
 
   const handleGapChoiceSelect = (item, gap, choice) => {
     const key = `${item.id}:${gap.id}`;
-    handleChange(key, choice);
+    markActivityStarted();
+    const nextAnswers = { ...answers, [key]: choice };
+    setAnswers(nextAnswers);
+
+    if (!String(choice || "").trim()) return;
 
     const gapIndex = item.gaps.findIndex((entry) => entry.id === gap.id);
     const nextGap = gapIndex >= 0 ? item.gaps[gapIndex + 1] : null;
@@ -793,6 +797,19 @@ export default function HubGrammarActivityRunner({ user }) {
         return;
       }
 
+      const firstUnansweredGap = item.gaps.find(
+        (entry) => !String(nextAnswers[`${item.id}:${entry.id}`] || "").trim()
+      );
+      if (firstUnansweredGap) {
+        if (Array.isArray(firstUnansweredGap.choices) && firstUnansweredGap.choices.length) {
+          focusControl(`${item.id}:${firstUnansweredGap.id}:option:0`);
+        } else {
+          focusControl(`${item.id}:${firstUnansweredGap.id}`);
+        }
+        return;
+      }
+
+      handleCheckItem(item, nextAnswers);
       focusNextQuestion(item.id);
     });
   };

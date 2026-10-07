@@ -402,7 +402,9 @@ export function OteListeningPart3Practice({
     logOteTrainingStarted({
       section: "listening",
       part: "part-3",
-      mode: "exam_style_opinion_matching",
+      mode: practiceSet.teacherOnly
+        ? "teacher_bank_opinion_matching"
+        : "exam_style_opinion_matching",
       taskId: `${variant}-listening-part-3-${practiceSet.id}`,
       taskTitle: `${variantLabel} Listening Part 3 ${practiceSet.title}`,
       variant,
@@ -420,18 +422,25 @@ export function OteListeningPart3Practice({
     logOteTrainingCompleted({
       section: "listening",
       part: "part-3",
-      mode: "exam_style_opinion_matching",
+      mode: practiceSet.teacherOnly
+        ? "teacher_bank_opinion_matching"
+        : "exam_style_opinion_matching",
       taskId: `${variant}-listening-part-3-${practiceSet.id}`,
       taskTitle: `${variantLabel} Listening Part 3 ${practiceSet.title}`,
       variant,
       level: practiceSet.level,
       score,
       total: practiceSet.opinions.length,
+      ...(practiceSet.teacherOnly
+        ? { progressId: `listening.part3.teacher-bank.${practiceSet.id}` }
+        : {}),
     });
   }
 
   const userVariant = user?.oteVersion === "advanced" ? "advanced" : "general";
-  if (user && userVariant !== variant) {
+  const canOpenTeacherSet =
+    practiceSet.teacherOnly && (user?.role === "teacher" || user?.role === "admin");
+  if (user && userVariant !== variant && !canOpenTeacherSet) {
     return (
       <main className="ote-training-page">
         <header className="ote-training-hero">

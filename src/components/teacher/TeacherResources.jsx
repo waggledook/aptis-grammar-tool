@@ -230,6 +230,20 @@ const PRODUCT_GROUPS = [
         icon: Headphones,
         tags: ["Listening", "Live lesson"],
       },
+      {
+        title: "Advanced Listening Part 3 · Subscription services",
+        description: "A C1 woman, man or both task with full recording, transcript-led review and a teacher-controlled live mode.",
+        path: "/ote/listening/advanced/part-3-opinion-matching#teacher-listening-tasks",
+        icon: Headphones,
+        tags: ["Advanced Listening", "Direct link", "Live lesson"],
+      },
+      {
+        title: "Advanced Listening Part 3 · Analogue media",
+        description: "A C1 discussion about vinyl and film photography with detailed attribution feedback and a teacher-controlled live mode.",
+        path: "/ote/listening/advanced/part-3-opinion-matching#teacher-listening-tasks",
+        icon: Headphones,
+        tags: ["Advanced Listening", "Direct link", "Live lesson"],
+      },
     ],
   },
   {

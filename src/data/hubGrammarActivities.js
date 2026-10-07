@@ -6711,11 +6711,11 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
       errorCorrectionItem(
         "a2-5a-ec-1",
         "Check the highlighted phrase.",
-        "Mina can knows the answer.",
-        "can knows",
+        "Mina can repairs bicycles.",
+        "can repairs",
         false,
-        "can know",
-        "After can, use the base verb know."
+        "can repair",
+        "After can, use the base verb repair."
       ),
       errorCorrectionItem(
         "a2-5a-ec-2",
@@ -7368,7 +7368,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           { gapId: "g1" },
           "? I sent ",
           { gapId: "g2" },
-          " a message, but she didn't answer ",
+          " a message, but she didn't read ",
           { gapId: "g3" },
           ". Her colleagues are with ",
           { gapId: "g4" },
@@ -7379,7 +7379,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         gaps: [
           { id: "g1", acceptedAnswers: ["her"], feedback: "Use her for Ana after call." },
           { id: "g2", acceptedAnswers: ["her"], feedback: "Use her for Ana after sent." },
-          { id: "g3", acceptedAnswers: ["it"], feedback: "Use it for the singular noun message." },
+          { id: "g3", acceptedAnswers: ["it"], feedback: "Use it for the singular noun message after read." },
           { id: "g4", acceptedAnswers: ["her"], feedback: "Use her for Ana after with." },
           { id: "g5", acceptedAnswers: ["them"], feedback: "Use them for Ana's colleagues after ask." },
         ],
@@ -8332,7 +8332,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           { gapId: "g4" },
           " she stay long?\nB: No. She ",
           { gapId: "g5" },
-          " stay because she had another appointment. (not stay)",
+          " stay because she had another appointment. (not can)",
         ],
         gaps: [
           { id: "g1", acceptedAnswers: ["Did"], feedback: "Begin the question with Did." },
@@ -8599,8 +8599,8 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
       ),
       placeholderGapItem(
         "a2-8b-gf-1",
-        "Complete the sentence with there is.",
-        "__________ a small balcony outside the bedroom.",
+        "Rewrite the description with there.",
+        "The bedroom has a small balcony. → __________ a small balcony outside the bedroom.",
         "There is",
         ["There's"],
         "Use There is or There's with the singular noun balcony."
@@ -8616,26 +8616,60 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
       {
         id: "a2-8b-question-1",
         type: "gap-fill",
-        prompt: "Complete the question and short answer.",
+        prompt: "Complete the conversation with the correct question and short answer.",
         parts: [
+          "A: I need to get some cash. ",
           { gapId: "g1" },
-          " there a cash machine nearby? Yes, there ",
+          " a cash machine nearby?\nB: Yes, ",
           { gapId: "g2" },
-          ".",
+          ". It's beside the station.",
         ],
         gaps: [
-          { id: "g1", acceptedAnswers: ["Is"], feedback: "Begin the singular question with Is." },
-          { id: "g2", acceptedAnswers: ["is"], feedback: "Use is in the positive short answer." },
+          { id: "g1", acceptedAnswers: ["Is there"], feedback: "Use Is there to ask about a singular place or thing." },
+          { id: "g2", acceptedAnswers: ["there is"], feedback: "Use the full form there is in a positive short answer." },
         ],
       },
-      placeholderChoiceGapItem(
-        "a2-8b-cg-1",
-        "Choose there is, there are, some, or any for each gap.",
-        "____ a desk beside the window. ____ two chairs near it. There are ____ books on the shelf, but there aren't ____ magazines.",
-        ["There is", "There are", "some", "any"],
-        "Match there is or there are to the noun, use some in the positive statement, and any in the negative statement.",
-        ["There is", "There are", "some", "any"]
-      ),
+      {
+        id: "a2-8b-cg-1",
+        type: "gap-fill",
+        prompt: "Choose there is, there are, some, or any for each gap.",
+        parts: [
+          { gapId: "g1" },
+          " a desk beside the window. ",
+          { gapId: "g2" },
+          " two chairs near it. There are ",
+          { gapId: "g3" },
+          " books on the shelf, but there aren't ",
+          { gapId: "g4" },
+          " magazines.",
+        ],
+        gaps: [
+          {
+            id: "g1",
+            acceptedAnswers: ["There is"],
+            choices: ["There are", "There is", "any", "some"],
+            feedback: "Use There is with the singular noun desk.",
+          },
+          {
+            id: "g2",
+            acceptedAnswers: ["There are"],
+            choices: ["some", "any", "There are", "There is"],
+            feedback: "Use There are with the plural noun chairs.",
+          },
+          {
+            id: "g3",
+            acceptedAnswers: ["some"],
+            choices: ["some", "There is", "There are", "any"],
+            feedback: "Use some in a positive statement with the plural noun books.",
+          },
+          {
+            id: "g4",
+            acceptedAnswers: ["any"],
+            choices: ["some", "There are", "There is", "any"],
+            feedback: "Use any in a negative statement with the plural noun magazines.",
+          },
+        ],
+      },
       errorCorrectionItem(
         "a2-8b-ec-1",
         "Check the highlighted phrase.",
@@ -11818,7 +11852,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         gaps: [
           { id: "g1", acceptedAnswers: ["sisters'"], feedback: "Use an apostrophe after the regular plural sisters." },
           { id: "g2", acceptedAnswers: ["grandparents'"], feedback: "Use an apostrophe after the regular plural grandparents." },
-          { id: "g3", acceptedAnswers: ["their own"], feedback: "Use their own to emphasize that the flat belongs to them." },
+          { id: "g3", acceptedAnswers: ["their"], feedback: "Use the possessive adjective their for Celia and her partner." },
           { id: "g4", acceptedAnswers: ["of ours"], feedback: "Use of + possessive pronoun: of ours." },
         ],
       },
@@ -11957,8 +11991,8 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "We were knowing each other at school.",
         "were knowing",
         false,
-        "knew",
-        "Know describes a state, so use the past simple rather than the past continuous."
+        ["knew", "used to know"],
+        "Know describes a state, so use knew or used to know rather than the past continuous."
       ),
       errorCorrectionItem(
         "b1-b2-3a-ec-3",

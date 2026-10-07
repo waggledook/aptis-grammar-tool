@@ -1,5 +1,9 @@
 const setOneAudioRoot = "/audio/ote/listening/advanced/part-3/set-1";
 const setTwoAudioRoot = "/audio/ote/listening/advanced/part-3/set-2";
+const subscriptionServicesAudioRoot =
+  "/audio/ote/listening/advanced/part-3/subscription-services";
+const analogueMediaAudioRoot =
+  "/audio/ote/listening/advanced/part-3/analogue-media";
 
 export const advancedListeningPart3Sets = [
   {
@@ -561,6 +565,504 @@ export const advancedListeningPart3Sets = [
       },
       { speaker: "Woman", text: "Dr Owen Marsh, thank you for joining me." },
       { speaker: "Man", text: "A pleasure." },
+    ],
+  },
+  {
+    id: "subscription-services",
+    level: "C1",
+    title: "Subscription services",
+    description:
+      "Match six opinions from an extended discussion to the woman, the man, or both speakers.",
+    teacherOnly: true,
+    assetsReady: true,
+    audioReady: true,
+    audioSrc: `${subscriptionServicesAudioRoot}/subscription-services.mp3`,
+    instructionAudioReady: true,
+    instructionAudioSrc: `${subscriptionServicesAudioRoot}/question.mp3`,
+    instructions:
+      "Listen to a consumer journalist and a consumer researcher discussing subscription services. Match the people—the woman, the man, or both—to the opinions below.",
+    preparationPrompt: "The clock shows how much time you have to look at the task.",
+    preparationSeconds: 30,
+    speakers: [
+      { id: "woman", label: "Woman", name: "Dr Hannah Price" },
+      { id: "man", label: "Man", name: "Ben Mercer" },
+      { id: "both", label: "Both", name: "Both speakers" },
+    ],
+    opinions: [
+      {
+        id: "hidden-total",
+        text: "Regular small payments can make total spending difficult to judge.",
+        answer: "both",
+        review: {
+          explanation:
+            "Both speakers explain that individually manageable charges can hide the size of the combined commitment. The woman describes the general effect; the man confirms it through his own spending.",
+          evidence: [
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote: "the overall commitment slips out of view",
+              note:
+                "The woman explains why separate, manageable payments make the total harder to see.",
+            },
+            {
+              speaker: "Man",
+              type: "correct",
+              quote:
+                "I wouldn’t have agreed to the combined figure quite so readily if it had appeared as one bill.",
+              note:
+                "The man independently says that seeing the payments as one total would have changed his judgement.",
+            },
+          ],
+        },
+      },
+      {
+        id: "infrequent-value",
+        text: "Limited use does not necessarily mean a subscription offers poor value.",
+        answer: "woman",
+        review: {
+          explanation:
+            "The woman argues that occasional access can still be valuable when it solves an important problem. The man keeps regular use as his test and prefers paying only when the need arises.",
+          evidence: [
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote:
+                "If it saves you hours on those occasions, its availability may justify the fee.",
+              note:
+                "Her example shows how infrequent use can still provide enough value to justify a subscription.",
+            },
+            {
+              speaker: "Man",
+              type: "distractor",
+              quote: "I’d still want it earning its keep regularly.",
+              note:
+                "The man maintains the opposite criterion: he expects value to be demonstrated through regular use.",
+            },
+          ],
+        },
+      },
+      {
+        id: "bundle-discovery",
+        text: "Bundles can expose subscribers to options they would not otherwise consider.",
+        answer: "man",
+        review: {
+          explanation:
+            "The man says a reading bundle led him to try unfamiliar magazines that became favourites. The woman first describes unchanged habits and then questions how typical his experience is.",
+          evidence: [
+            {
+              speaker: "Woman",
+              type: "distractor",
+              quote:
+                "People may end up opening the same two publications they would have paid for separately.",
+              note:
+                "The woman presents a competing outcome in which the bundle does not broaden anybody’s choices.",
+            },
+            {
+              speaker: "Man",
+              type: "correct",
+              quote: "A reading package included magazines I’d never have sought out.",
+              note:
+                "The man directly describes discovering options he would not otherwise have considered.",
+            },
+          ],
+        },
+      },
+      {
+        id: "easy-cancellation",
+        text: "Easy cancellation can make people more willing to try a subscription.",
+        answer: "both",
+        review: {
+          explanation:
+            "The woman argues that a straightforward exit lowers the perceived commitment. The man then describes choosing a service partly because he could cancel it online.",
+          evidence: [
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote:
+                "knowing you can walk away without a tussle can make the initial commitment feel much smaller.",
+              note:
+                "The woman directly links easy cancellation with greater willingness to sign up.",
+            },
+            {
+              speaker: "Man",
+              type: "correct",
+              quote:
+                "A competing service let me leave through my account page. I went with that one, even though I wasn’t sure I’d keep it.",
+              note:
+                "The man’s choice supplies a separate example of an easy exit encouraging a trial.",
+            },
+          ],
+        },
+      },
+      {
+        id: "price-return-warning",
+        text: "Providers should warn customers before discounted subscriptions return to the full price.",
+        answer: "woman",
+        review: {
+          explanation:
+            "The woman specifically calls for a timely reminder when an introductory offer ends. The man thinks clear price and date information at sign-up is sufficient.",
+          evidence: [
+            {
+              speaker: "Man",
+              type: "distractor",
+              quote:
+                "If the introductory price, the later rate and the dates are clearly explained when I join, I reckon I’ve been given what I need.",
+              note:
+                "The man rejects the need for a fresh warning when the information was provided at the start.",
+            },
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote:
+                "It’s the jump from an introductory offer to the standard rate that merits another message.",
+              note:
+                "The woman identifies the return to the full price as the point that requires a new warning.",
+            },
+          ],
+        },
+      },
+      {
+        id: "aspirational-subscription",
+        text:
+          "People sometimes keep subscriptions because cancelling would mean giving up on a personal ambition.",
+        answer: "man",
+        review: {
+          explanation:
+            "The man links his unused language-learning subscription with reluctance to abandon an imagined future self. The woman treats that explanation cautiously and offers more ordinary alternatives.",
+          evidence: [
+            {
+              speaker: "Man",
+              type: "correct",
+              quote:
+                "Cancelling would have felt like admitting that the fluent version of me wasn’t going to materialise.",
+              note:
+                "The man explicitly connects keeping the subscription with preserving a personal ambition.",
+            },
+            {
+              speaker: "Woman",
+              type: "distractor",
+              quote:
+                "I’d want to separate that from the more mundane explanations: forgetting an account exists, or postponing an administrative chore.",
+              note:
+                "The woman questions whether the ambition is what actually kept the payment going.",
+            },
+          ],
+        },
+      },
+    ],
+    script: [
+      {
+        speaker: "Man",
+        text: "Welcome to Everyday Economics. I’m Ben Mercer, and today we’re discussing subscriptions, from streaming services to software and monthly deliveries. My guest is consumer researcher Dr Hannah Price. Hannah, I added up my subscriptions last week. Each looked harmless enough; together, they were rather less comforting.",
+      },
+      {
+        speaker: "Woman",
+        text: "That’s part of their appeal, isn’t it? You’re judging a manageable amount each time, while the overall commitment slips out of view. And when some payments are monthly and others annual, comparing them requires a bit of detective work.",
+      },
+      {
+        speaker: "Man",
+        text: "Exactly. I’d budgeted for the obvious ones, but several smaller charges had somehow become part of the scenery. I wouldn’t have agreed to the combined figure quite so readily if it had appeared as one bill.",
+      },
+      {
+        speaker: "Woman",
+        text: "Though seeing the total doesn’t settle whether it’s money well spent.",
+      },
+      {
+        speaker: "Man",
+        text: "Surely checking how often you use each service gets you most of the way there? If I barely open an app, it’s first on my cancellation list.",
+      },
+      {
+        speaker: "Woman",
+        text: "I’d hesitate over that rule. Take a specialist reference service you consult only when an awkward problem arises. If it saves you hours on those occasions, its availability may justify the fee. Frequency tells you something, but it doesn’t capture what having access is worth.",
+      },
+      {
+        speaker: "Man",
+        text: "I’d still want it earning its keep regularly. Otherwise, paying only when the need arises seems more sensible to me. What about bundles? People often dismiss them as a way of charging us for extras we don’t want.",
+      },
+      {
+        speaker: "Woman",
+        text: "They can simplify things, but a longer menu doesn’t necessarily change anybody’s habits. People may end up opening the same two publications they would have paid for separately.",
+      },
+      {
+        speaker: "Man",
+        text: "Mine actually changed. A reading package included magazines I’d never have sought out. Since there was no separate purchase to justify, I gave them a chance. A couple became favourites. The package made acting on a passing curiosity feel less of a gamble.",
+      },
+      {
+        speaker: "Woman",
+        text: "I’d be interested to see how typical that is. Another gamble is signing up in the first place. Providers sometimes seem to think making the exit difficult protects their income. Yet knowing you can walk away without a tussle can make the initial commitment feel much smaller.",
+      },
+      {
+        speaker: "Man",
+        text: "That rings true. I nearly abandoned a software subscription because ending it required a phone call during office hours. A competing service let me leave through my account page. I went with that one, even though I wasn’t sure I’d keep it.",
+      },
+      { speaker: "Woman", text: "So the exit helped sell the entrance." },
+      {
+        speaker: "Man",
+        text: "Nicely put. Renewal reminders are another contentious area. I hear demands for messages before every payment. If the introductory price, the later rate and the dates are clearly explained when I join, I reckon I’ve been given what I need. Endless notifications would soon become wallpaper.",
+      },
+      {
+        speaker: "Woman",
+        text: "I’m less concerned about an ordinary monthly payment. It’s the jump from an introductory offer to the standard rate that merits another message. Giving the information months earlier isn’t enough. People should have a timely opportunity to reconsider what they’re paying.",
+      },
+      {
+        speaker: "Man",
+        text: "Although sometimes they know perfectly well and carry on anyway. I’ve kept a language-learning subscription through months when I did almost nothing with it. Cancelling would have felt like admitting that the fluent version of me wasn’t going to materialise. I suspect plenty of subscriptions survive because we’re reluctant to close the door on who we’d like to become.",
+      },
+      {
+        speaker: "Woman",
+        text: "I’d want to separate that from the more mundane explanations: forgetting an account exists, or postponing an administrative chore. A subscription can sit there for months without anybody making an active decision to keep it. An interview can produce a satisfying story about somebody’s aspirations; establishing what actually kept the payment going is harder.",
+      },
+      { speaker: "Man", text: "Fair challenge. So it’s worth examining the decision as well as the debit. Hannah, thanks for joining me." },
+      { speaker: "Woman", text: "Thank you." },
+    ],
+  },
+  {
+    id: "analogue-media",
+    level: "C1",
+    title: "The appeal of analogue media",
+    description:
+      "Match six opinions from an extended discussion to the woman, the man, or both speakers.",
+    teacherOnly: true,
+    assetsReady: true,
+    audioReady: true,
+    audioSrc: `${analogueMediaAudioRoot}/analogue-media.mp3`,
+    instructionAudioReady: true,
+    instructionAudioSrc: `${analogueMediaAudioRoot}/question.mp3`,
+    instructions:
+      "Listen to a technology journalist and a cultural sociologist discussing vinyl records and film photography. Match the people—the woman, the man, or both—to the opinions below.",
+    preparationPrompt: "The clock shows how much time you have to look at the task.",
+    preparationSeconds: 30,
+    speakers: [
+      { id: "woman", label: "Woman", name: "Dr Leila Morgan" },
+      { id: "man", label: "Man", name: "Oliver Grant" },
+      { id: "both", label: "Both", name: "Both speakers" },
+    ],
+    opinions: [
+      {
+        id: "control-over-nostalgia",
+        text: "The appeal of analogue media owes more to control than to nostalgia.",
+        answer: "woman",
+        review: {
+          explanation:
+            "The woman accepts that nostalgia can contribute, but explicitly ranks control over the process as the more convincing explanation. The man gives nostalgia greater importance.",
+          evidence: [
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote:
+                "That’s a more convincing explanation to me than wanting to recreate the past.",
+              note:
+                "The woman directly places control over the experience above nostalgia.",
+            },
+            {
+              speaker: "Man",
+              type: "distractor",
+              quote: "I’d give nostalgia more weight.",
+              note:
+                "The man states the opposite ranking, even for people who did not experience the original era.",
+            },
+          ],
+        },
+      },
+      {
+        id: "physical-significance",
+        text:
+          "Physical copies can make music or photographs feel more personally significant.",
+        answer: "both",
+        review: {
+          explanation:
+            "The man describes the personal meaning attached to an inscribed record, while the woman explains how a printed photograph can become part of a relationship.",
+          evidence: [
+            {
+              speaker: "Man",
+              type: "correct",
+              quote:
+                "I have a record a friend gave me, with a message inside the sleeve. Playing the same album online wouldn’t carry quite the same significance.",
+              note:
+                "The physical record carries a personal association that the digital version would not reproduce.",
+            },
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote:
+                "The object becomes part of the relationship, not merely a container for the image.",
+              note:
+                "The woman independently links a physical photograph with greater personal meaning.",
+            },
+          ],
+        },
+      },
+      {
+        id: "analogue-limits",
+        text:
+          "The limitations of analogue equipment can encourage more careful creative choices.",
+        answer: "man",
+        review: {
+          explanation:
+            "The man says a limited number of film exposures made him consider light and framing more carefully. The woman distinguishes this from merely becoming cautious about wasting a shot.",
+          evidence: [
+            {
+              speaker: "Man",
+              type: "correct",
+              quote:
+                "Having less room for manoeuvre made those choices more considered.",
+              note:
+                "The man attributes more deliberate creative decisions to the restriction itself.",
+            },
+            {
+              speaker: "Woman",
+              type: "distractor",
+              quote:
+                "With film, worrying about wasting a shot can simply make someone cautious. That’s different from developing an eye.",
+              note:
+                "The woman rejects the idea that the limitation necessarily improves creative judgement.",
+            },
+          ],
+        },
+      },
+      {
+        id: "imperfection-quality",
+        text:
+          "Technical imperfections can be mistaken for evidence of artistic quality.",
+        answer: "man",
+        review: {
+          explanation:
+            "The man criticises treating blur or surface noise as automatic proof of merit. The woman argues that imperfections can add character and questions whether audiences are making that confusion.",
+          evidence: [
+            {
+              speaker: "Man",
+              type: "correct",
+              quote:
+                "A technical flaw seems to become a certificate of merit before anyone considers the work itself.",
+              note:
+                "The man directly argues that the format’s imperfections can be mistaken for artistic value.",
+            },
+            {
+              speaker: "Woman",
+              type: "distractor",
+              quote:
+                "The experience includes those qualities; people aren’t necessarily confusing them with anything.",
+              note:
+                "The woman defends the appeal of imperfection and disputes the man’s interpretation.",
+            },
+          ],
+        },
+      },
+      {
+        id: "online-communities",
+        text:
+          "Online communities can help people maintain an interest in analogue activities.",
+        answer: "woman",
+        review: {
+          explanation:
+            "The woman says practical advice and creative challenges sustain participation after the novelty fades. The man thinks online display and equipment talk can displace the activity itself.",
+          evidence: [
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote:
+                "The conversation keeps the activity moving once the novelty has worn off.",
+              note:
+                "The woman directly links online communities with sustained engagement.",
+            },
+            {
+              speaker: "Man",
+              type: "distractor",
+              quote:
+                "The online activity can start replacing the hobby it’s supposedly supporting.",
+              note:
+                "The man describes online participation as a possible substitute for, rather than support for, the hobby.",
+            },
+          ],
+        },
+      },
+      {
+        id: "supplement-digital",
+        text:
+          "Analogue media will generally supplement digital formats rather than replace them.",
+        answer: "both",
+        review: {
+          explanation:
+            "Both speakers predict selective analogue use alongside everyday digital formats. The woman uses occasional film projects; the man contrasts special vinyl listening with portable digital music.",
+          evidence: [
+            {
+              speaker: "Woman",
+              type: "correct",
+              quote:
+                "I expect these formats to find a lasting place alongside digital ones.",
+              note:
+                "The woman explicitly predicts coexistence rather than replacement.",
+            },
+            {
+              speaker: "Man",
+              type: "correct",
+              quote: "I’d envisage the same sort of arrangement.",
+              note:
+                "The man explicitly shares her view before contrasting special analogue occasions with digital routines.",
+            },
+          ],
+        },
+      },
+    ],
+    script: [
+      {
+        speaker: "Man",
+        text: "Welcome to Everyday Futures. I’m Oliver Grant. Today we’re looking at vinyl records and film cameras: technologies people choose despite having convenient digital alternatives. With me is cultural sociologist Dr Leila Morgan. Leila, is this essentially nostalgia, even for people too young to remember these formats being normal?",
+      },
+      {
+        speaker: "Woman",
+        text: "There can be nostalgia involved, but I wouldn’t put it at the centre. What attracts people is having a process they can take charge of: choosing a record, turning it over, deciding when to take a photograph. The inconvenience becomes a way of setting the terms of the experience. That’s a more convincing explanation to me than wanting to recreate the past.",
+      },
+      {
+        speaker: "Man",
+        text: "I’d give nostalgia more weight. You don’t need to have lived through an era to romanticise it. A film camera can represent an imagined world that felt less hurried, whether that world ever existed or not. Though sometimes the attachment is quite specific. I have a record a friend gave me, with a message inside the sleeve. Playing the same album online wouldn’t carry quite the same significance.",
+      },
+      {
+        speaker: "Woman",
+        text: "A printed photograph can acquire that extra weight too. One image on your desk gets associated with a particular person or occasion in a way that a file among thousands may never do. The object becomes part of the relationship, not merely a container for the image.",
+      },
+      {
+        speaker: "Man",
+        text: "And with photography, having a limited number of exposures can change what happens before the image exists. When I tried film, I stopped firing away at everything. I started thinking about the light and the framing before pressing the button. Having less room for manoeuvre made those choices more considered.",
+      },
+      {
+        speaker: "Woman",
+        text: "I wouldn’t credit the restriction with that. Being able to review a digital image immediately can make the next decision more informed. With film, worrying about wasting a shot can simply make someone cautious. That’s different from developing an eye.",
+      },
+      {
+        speaker: "Man",
+        text: "Fair distinction. Deliberate choices don’t guarantee a good result either. What bothers me is seeing a blurred image described as artistic simply because it came from film. Or hearing surface noise taken as evidence that a recording has soul. A technical flaw seems to become a certificate of merit before anyone considers the work itself.",
+      },
+      {
+        speaker: "Woman",
+        text: "I’d be slower to dismiss those reactions. Something uneven or imperfect can give a photograph a character that a cleaner version lacks. The experience includes those qualities; people aren’t necessarily confusing them with anything.",
+      },
+      {
+        speaker: "Man",
+        text: "I still think the format gets too much credit in some of those judgements.",
+      },
+      {
+        speaker: "Woman",
+        text: "There’s a similar argument about people showing their collections online: that it’s all display and little actual engagement. Yet the groups I follow give people practical reasons to carry on. Someone explains a developing problem, or sets a monthly photography challenge. The conversation keeps the activity moving once the novelty has worn off.",
+      },
+      {
+        speaker: "Man",
+        text: "I’m not sure that describes much of what I see. People spend hours arranging records for photographs and discussing equipment, while actually listening or taking pictures seems to become an afterthought. The online activity can start replacing the hobby it’s supposedly supporting.",
+      },
+      {
+        speaker: "Woman",
+        text: "In those cases, perhaps. But when someone posts the results of a challenge, there has been an activity beyond arranging a collection. And getting advice after a disappointing first attempt can be what brings them back for a second. That matters more than whether their enthusiasm began with an attractive picture online.",
+      },
+      { speaker: "Man", text: "Where does that leave the longer-term future?" },
+      {
+        speaker: "Woman",
+        text: "I expect these formats to find a lasting place alongside digital ones. People may choose film for a particular project without wanting it for every ordinary photograph. That selectiveness isn’t a sign that the interest has failed.",
+      },
+      {
+        speaker: "Man",
+        text: "I’d envisage the same sort of arrangement. Taking music everywhere on a phone will still make sense for someone who treasures an evening with a record. The special occasion can flourish while the everyday routine remains digital. Leila, thank you.",
+      },
+      { speaker: "Woman", text: "Thank you." },
     ],
   },
 ];

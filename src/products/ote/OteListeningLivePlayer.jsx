@@ -87,13 +87,18 @@ export default function OteListeningLivePlayer() {
     const commonDetails = {
       section: "listening",
       part: `part-${activity.part}`,
-      mode: "teacher_led_live",
+      mode: activity.set.teacherOnly
+        ? "teacher_bank_live"
+        : "teacher_led_live",
       taskId,
       taskTitle,
       variant: activity.variant,
       level: activity.level,
       gameId,
       participantRole: "student",
+      ...(activity.set.teacherOnly
+        ? { progressId: `listening.part${activity.part}.teacher-bank.${activity.set.id}` }
+        : {}),
     };
     const startedStorageKey = `ote_listening_live_started:${gameId}:${uid}`;
 

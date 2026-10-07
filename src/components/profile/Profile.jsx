@@ -154,7 +154,12 @@ const OTE_READING_PRACTICE_SETS = {
 function buildOteListeningPracticeSets(variant, groups) {
   return groups.flatMap(({ part, partLabel, sets }) =>
     sets
-      .filter((set) => set.assetsReady !== false && set.practiceReady !== false)
+      .filter(
+        (set) =>
+          !set.teacherOnly &&
+          set.assetsReady !== false &&
+          set.practiceReady !== false
+      )
       .map((set) => ({
         id: set.id,
         label: `${partLabel} · ${set.title}`,

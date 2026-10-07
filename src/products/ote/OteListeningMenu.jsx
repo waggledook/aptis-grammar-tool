@@ -217,24 +217,29 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
   const navigate = useNavigate();
   const { variant = "general", partId = "" } = useParams();
   const activeVariant = getUserListeningVariant(user);
-  const config = LISTENING_VARIANTS[activeVariant];
+  const canHostLive = user?.role === "teacher" || user?.role === "admin";
+  const browsingVariant =
+    canHostLive && LISTENING_VARIANTS[variant] ? variant : activeVariant;
+  const config = LISTENING_VARIANTS[browsingVariant];
   const basePath = getListeningBasePath(nativeRoutes);
   const requestedPartIsValid = config.parts.some((item) => item.id === partId);
   const completedProgress = useOteTrainingProgress();
   const [creatingLiveSetId, setCreatingLiveSetId] = useState("");
-  const canHostLive = user?.role === "teacher" || user?.role === "admin";
 
-  if (variant !== activeVariant || !requestedPartIsValid) {
+  if (variant !== browsingVariant || !requestedPartIsValid) {
     const fallbackPartId = requestedPartIsValid ? partId : config.parts[0].id;
-    return <Navigate to={getSitePath(`${basePath}/${activeVariant}/${fallbackPartId}`)} replace />;
+    return <Navigate to={getSitePath(`${basePath}/${browsingVariant}/${fallbackPartId}`)} replace />;
   }
 
   const part = config.parts.find((item) => item.id === partId) || config.parts[0];
   const Icon = part.icon || Headphones;
   const menuPath = getSitePath(basePath);
   const listeningSets = getListeningSets(variant, partId);
-  const hasListeningSets = listeningSets.length > 0;
-  const visiblePracticeSets = listeningSets;
+  const visiblePracticeSets = listeningSets.filter((set) => !set.teacherOnly);
+  const teacherPracticeSets = canHostLive
+    ? listeningSets.filter((set) => set.teacherOnly)
+    : [];
+  const livePracticeSets = listeningSets.filter((set) => !set.teacherOnly);
   const hasVisiblePracticeSets = visiblePracticeSets.length > 0;
   const guideCards = (part.guides || []).map((guide) => ({
     ...guide,
@@ -371,7 +376,61 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
             </article>
           )}
         </div>
-        {canHostLive && hasListeningSets ? (
+      </section>
+
+      {teacherPracticeSets.length ? (
+        <section
+          className="ote-training-section ote-teacher-practice-section"
+          id="teacher-listening-tasks"
+        >
+          <div className="ote-teacher-practice-heading">
+            <Users size={26} aria-hidden="true" />
+            <div>
+              <p className="ote-kicker">Teacher resources</p>
+              <h2>Advanced Listening classroom tasks</h2>
+              <p>
+                Extra C1 tasks for direct-link practice or a teacher-controlled live lesson.
+                These do not count towards learner completion.
+              </p>
+            </div>
+          </div>
+          <div className="ote-practice-set-grid">
+            {teacherPracticeSets.map((set) => {
+              const setPath = getSitePath(
+                `${basePath}/${variant}/${partId}/practice/${set.id}`
+              );
+              return (
+                <article
+                  className="ote-practice-set-card ote-teacher-practice-card ote-teacher-bank-card"
+                  key={set.id}
+                >
+                  <Headphones size={28} aria-hidden="true" />
+                  <span>Teacher task · {set.level || "C1"}</span>
+                  <h2>{set.title}</h2>
+                  <p>{set.description}</p>
+                  <strong>Not included in completion</strong>
+                  <div className="ote-teacher-bank-card-actions">
+                    <button type="button" onClick={() => navigate(setPath)}>
+                      <Headphones size={16} aria-hidden="true" />
+                      Open task
+                    </button>
+                    <button
+                      disabled={!!creatingLiveSetId}
+                      onClick={() => launchLiveSet(set)}
+                      type="button"
+                    >
+                      <Radio size={16} aria-hidden="true" />
+                      {creatingLiveSetId === set.id ? "Creating room…" : "Run live"}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
+
+      {canHostLive && livePracticeSets.length ? (
           <aside className="ote-listening-teacher-mode">
             <div>
               <Radio size={25} aria-hidden="true" />
@@ -381,7 +440,7 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
               </span>
             </div>
             <div>
-              {listeningSets
+              {livePracticeSets
                 .filter((set) => set.assetsReady !== false && set.audioReady !== false)
                 .map((set) => (
                   <button
@@ -398,8 +457,7 @@ function OteListeningPartShell({ user, nativeRoutes = false }) {
                 ))}
             </div>
           </aside>
-        ) : null}
-      </section>
+      ) : null}
     </main>
   );
 }
