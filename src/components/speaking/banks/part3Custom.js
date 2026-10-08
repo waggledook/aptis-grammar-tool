@@ -4,11 +4,11 @@ export const PART3_CUSTOM_TASKS = [
     title: "Entertainment",
     photoA: {
       src: "/images/speaking/part3-custom/entertainment-a.png",
-      alt: "A large, excited crowd at a live music concert.",
+      alt: "A person relaxing on a sofa at home wearing headphones.",
     },
     photoB: {
       src: "/images/speaking/part3-custom/entertainment-b.png",
-      alt: "A person relaxing on a sofa at home wearing headphones.",
+      alt: "A large, excited crowd at a live music concert.",
     },
     questions: [
       "How might the experience of listening to music be different in these situations?",
