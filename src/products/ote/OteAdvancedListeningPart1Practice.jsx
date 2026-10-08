@@ -445,7 +445,7 @@ export default function OteAdvancedListeningPart1Practice({
   }
 
   function reviewCurrentQuestion() {
-    if (currentAnswer == null || questionStage !== "answering") return;
+    if (phase !== "active" || currentAnswer == null || questionStage === "reviewing") return;
     stopPlayback();
     setQuestionStage("reviewing");
     window.requestAnimationFrame(() => {
@@ -573,11 +573,11 @@ export default function OteAdvancedListeningPart1Practice({
                 <h3>Five questions</h3>
                 <p>{formatSummary}</p>
               </article>
-              <article><h3>Optional review</h3><p>Review each answer immediately, or continue and use the detailed feedback at the end.</p></article>
+              <article><h3>Optional review</h3><p>Review an answer as soon as you choose it, or continue listening and use the detailed feedback at the end.</p></article>
             </div>
             <p className="ote-listening-audio-note">
               {practiceSet.audioReady && practiceSet.instructionAudioReady !== false
-                ? "This set uses the final recorded extracts. Each question runs automatically through both listens and the answer countdown."
+                ? "This set uses the final recorded extracts. Each question runs automatically through both listens and the answer countdown unless you choose to review early."
                 : practiceSet.audioReady
                   ? "This set uses the final recorded extracts. A browser voice will read each question and its options until those short recordings are added."
                   : "The final MP3 recordings can be added without changing the activity. Until then, the runner uses browser voice previews."}
@@ -735,7 +735,7 @@ export default function OteAdvancedListeningPart1Practice({
                 Previous question
               </button>
             ) : null}
-            {questionStage === "answering" ? (
+            {questionStage !== "reviewing" ? (
               <button
                 className="ote-listening-secondary-action"
                 type="button"
