@@ -1,5 +1,7 @@
 // src/components/teacher/TeacherTools.jsx
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { getSitePath, getSiteVariant } from "../../siteConfig.js";
 import TeacherGrammarTool from "./TeacherGrammarTool";
 import TeacherGrammarSetResults from "./TeacherGrammarSetResults";
 import TeacherUseOfEnglishQuizBuilder from "./TeacherUseOfEnglishQuizBuilder";
@@ -7,6 +9,16 @@ import TeacherCourseTests from "./TeacherCourseTests";
 import TeacherAssignedActivities from "./TeacherAssignedActivities";
 
 export default function TeacherTools({ user }) {
+  // ---------- Local UI state ----------
+  const [showBuilder, setShowBuilder] = useState(false);
+  const [showResults, setShowResults] = useState(false);
+  const [showUseOfEnglishBuilder, setShowUseOfEnglishBuilder] = useState(false);
+  const [showCourseTests, setShowCourseTests] = useState(false);
+  const [showAssignments, setShowAssignments] = useState(false);
+  const currentSite = getSiteVariant();
+  const resourceSection = currentSite.id === "ote" ? "ote" : currentSite.id === "seifhub" ? "hub" : "aptis";
+  const teacherResourcesPath = `${getSitePath("/teacher-resources")}#${resourceSection}`;
+
   // ---------- Auth gate ----------
   if (!user || (user.role !== "teacher" && user.role !== "admin")) {
     return (
@@ -21,13 +33,6 @@ export default function TeacherTools({ user }) {
       </div>
     );
   }
-
-  // ---------- Local UI state ----------
-  const [showBuilder, setShowBuilder] = useState(false);
-  const [showResults, setShowResults] = useState(false);
-  const [showUseOfEnglishBuilder, setShowUseOfEnglishBuilder] = useState(false);
-  const [showCourseTests, setShowCourseTests] = useState(false);
-  const [showAssignments, setShowAssignments] = useState(false);
 
   return (
     <div className="teacher-tools-page game-wrapper">
@@ -44,6 +49,17 @@ export default function TeacherTools({ user }) {
           </p>
         </div>
       </header>
+
+      <section className="teacher-resources-shortcut">
+        <div>
+          <p className="teacher-resources-shortcut-label">Ready-made teaching material</p>
+          <h2>Classroom resources</h2>
+          <p>Browse activities for lessons, assignments, and teacher-controlled live sessions across all three platforms.</p>
+        </div>
+        <Link className="teacher-resources-shortcut-link" to={teacherResourcesPath}>
+          Browse resources <span aria-hidden="true">→</span>
+        </Link>
+      </section>
 
       {/* 1) Create / edit a grammar set */}
       <section className="panel collapsible">
@@ -203,6 +219,64 @@ function TeacherToolsStyleScope() {
         font-size: 0.9em;
       }
 
+      .teacher-tools-page .teacher-resources-shortcut {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        margin: 0 0 1rem;
+        padding: 1rem 1.1rem;
+        border: 1px solid rgba(96, 165, 250, 0.42);
+        border-radius: 14px;
+        background: linear-gradient(135deg, rgba(30, 64, 175, 0.2), rgba(14, 116, 144, 0.12));
+        color: var(--ink);
+      }
+
+      .teacher-tools-page .teacher-resources-shortcut-label {
+        margin: 0 0 0.2rem;
+        color: #93c5fd;
+        font-size: 0.72rem;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .teacher-tools-page .teacher-resources-shortcut h2 {
+        margin: 0;
+        font-size: 1.15rem;
+      }
+
+      .teacher-tools-page .teacher-resources-shortcut p:last-child {
+        margin: 0.3rem 0 0;
+        color: var(--muted);
+      }
+
+      .teacher-tools-page .teacher-resources-shortcut-link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        flex: 0 0 auto;
+        min-height: 42px;
+        padding: 0.7rem 0.9rem;
+        border-radius: 10px;
+        background: #2563eb;
+        color: #fff;
+        font-weight: 800;
+        text-decoration: none;
+        transition: background 0.2s ease, transform 0.2s ease;
+      }
+
+      .teacher-tools-page .teacher-resources-shortcut-link:hover {
+        background: #1d4ed8;
+        transform: translateY(-1px);
+      }
+
+      .teacher-tools-page .teacher-resources-shortcut-link:focus-visible {
+        outline: 3px solid rgba(147, 197, 253, 0.75);
+        outline-offset: 3px;
+      }
+
       .teacher-tools-page .panel {
         background: #13213b;
         border: 1px solid #2c4b83;
@@ -258,6 +332,11 @@ function TeacherToolsStyleScope() {
       }
 
       @media (max-width: 640px) {
+        .teacher-tools-page .teacher-resources-shortcut {
+          align-items: stretch;
+          flex-direction: column;
+        }
+
         .teacher-tools-page .collapse-head {
           align-items: flex-start;
         }

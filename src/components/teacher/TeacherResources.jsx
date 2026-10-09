@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useLocation } from "react-router-dom";
 import {
   ArrowRight,
   BookOpen,
@@ -157,106 +157,126 @@ const PRODUCT_GROUPS = [
     eyebrow: "OTE Seif",
     title: "OTE classroom resources",
     description:
-      "Advanced reading and speaking extensions, plus teacher-controlled live activities. Student-facing resources are opened with a PIN or shared link.",
+      "Extra OTE tasks and teacher-controlled live activities, grouped by skill so each resource is easy to find. Student-facing resources are opened with a PIN or shared link.",
     accent: "violet",
-    resources: [
+    skillGroups: [
       {
-        title: "Advanced voicemail task bank",
-        description: "Eight extra diplomatic voice-message tasks in two themed sets, with individual student links, timed recording and AI feedback.",
-        path: "/ote/speaking/part-2-voicemails/teacher-bank",
-        icon: Mic2,
-        tags: ["Advanced Speaking", "Direct link", "8 tasks"],
+        title: "Reading",
+        resources: [
+          {
+            title: "C1 gapped-text classroom sets",
+            description: "Two extra Part 3 texts that do not count towards learner completion.",
+            path: "/ote/reading/advanced/part-3-gapped-text",
+            icon: BookOpen,
+            tags: ["Advanced Reading", "Direct link"],
+          },
+          {
+            title: "Classroom Cohesion Challenge",
+            description: "Defend missing-sentence choices independently or turn the activity into a live PIN session.",
+            path: "/ote/reading/advanced/part-3-gapped-text/classroom-cohesion-challenge",
+            icon: Users,
+            tags: ["Advanced Reading", "Independent", "Live"],
+          },
+          {
+            title: "Why Free Things · live lesson",
+            description: "Lead a class through gist, gap prediction, clue reveals, sentence placement and feedback.",
+            path: "/ote/reading/advanced/part-3-gapped-text/live/free-things-lesson",
+            icon: Radio,
+            tags: ["Advanced Reading", "Live lesson"],
+          },
+          {
+            title: "Part 4 live activities",
+            description: "Launch Option Jury or Evidence Reveal with class answers and highlighted textual evidence.",
+            path: "/ote/reading/advanced/part-4-long-text/live/option-jury",
+            icon: Radio,
+            tags: ["Advanced Reading", "Live lesson"],
+          },
+        ],
       },
       {
-        title: "Advanced summary task bank",
-        description: "Two extra Part 3 summary tasks with individual student links, timed recording and AI feedback.",
-        path: "/ote/speaking/part-3-summary/teacher-bank",
-        icon: Mic2,
-        tags: ["Advanced Speaking", "Assignable", "2 tasks"],
+        title: "Listening",
+        resources: [
+          {
+            title: "Teacher-controlled Listening",
+            description: "Choose an OTE Listening part and run an available set live, controlling playback and feedback.",
+            path: "/ote/listening",
+            icon: Headphones,
+            tags: ["Listening", "Live lesson"],
+          },
+          {
+            title: "Advanced Listening Part 2 · Removing space debris",
+            description: "A C1 note-completion lecture with six gaps, detailed answer evidence and a teacher-controlled live mode.",
+            path: "/ote/listening/advanced/part-2-note-completion#teacher-listening-tasks",
+            icon: Headphones,
+            tags: ["Advanced Listening", "Direct link", "Live lesson"],
+          },
+          {
+            title: "Advanced Listening Part 2 · Dictionary words",
+            description: "A C1 note-completion lecture about how dictionaries select new words, with independent and live classroom modes.",
+            path: "/ote/listening/advanced/part-2-note-completion#teacher-listening-tasks",
+            icon: Headphones,
+            tags: ["Advanced Listening", "Direct link", "Live lesson"],
+          },
+          {
+            title: "Advanced Listening Part 3 · Subscription services",
+            description: "A C1 woman, man or both task with full recording, transcript-led review and a teacher-controlled live mode.",
+            path: "/ote/listening/advanced/part-3-opinion-matching#teacher-listening-tasks",
+            icon: Headphones,
+            tags: ["Advanced Listening", "Direct link", "Live lesson"],
+          },
+          {
+            title: "Advanced Listening Part 3 · Analogue media",
+            description: "A C1 discussion about vinyl and film photography with detailed attribution feedback and a teacher-controlled live mode.",
+            path: "/ote/listening/advanced/part-3-opinion-matching#teacher-listening-tasks",
+            icon: Headphones,
+            tags: ["Advanced Listening", "Direct link", "Live lesson"],
+          },
+        ],
       },
       {
-        title: "Advanced writing essay task bank",
-        description: "Two extra Part 1 essay tasks with individual student links, timed writing and AI feedback.",
-        path: "/ote/writing/advanced-essay/teacher-bank",
-        icon: FileText,
-        tags: ["Advanced Writing", "Assignable", "2 tasks"],
+        title: "Writing",
+        resources: [
+          {
+            title: "Advanced writing essay task bank",
+            description: "Two extra Part 1 essay tasks with individual student links, timed writing and AI feedback.",
+            path: "/ote/writing/advanced-essay/teacher-bank",
+            icon: FileText,
+            tags: ["Advanced Writing", "Assignable", "2 tasks"],
+          },
+          {
+            title: "Advanced writing summary task bank",
+            description: "Two extra Part 2 summary tasks with individual student links, timed writing and AI feedback.",
+            path: "/ote/writing/advanced-summary/teacher-bank",
+            icon: FileText,
+            tags: ["Advanced Writing", "Assignable", "2 tasks"],
+          },
+        ],
       },
       {
-        title: "Advanced writing summary task bank",
-        description: "Two extra Part 2 summary tasks with individual student links, timed writing and AI feedback.",
-        path: "/ote/writing/advanced-summary/teacher-bank",
-        icon: FileText,
-        tags: ["Advanced Writing", "Assignable", "2 tasks"],
-      },
-      {
-        title: "Advanced debate task bank",
-        description: "Two extra Parts 4 and 5 debate-and-follow-up sets, with individual student links, timed recording and AI feedback.",
-        path: "/ote/speaking/parts-4-5-debate/teacher-bank",
-        icon: Mic2,
-        tags: ["Advanced Speaking", "Assignable", "2 tasks"],
-      },
-      {
-        title: "C1 gapped-text classroom sets",
-        description: "Two extra Part 3 texts that do not count towards learner completion.",
-        path: "/ote/reading/advanced/part-3-gapped-text",
-        icon: BookOpen,
-        tags: ["Advanced Reading", "Direct link"],
-      },
-      {
-        title: "Classroom Cohesion Challenge",
-        description: "Defend missing-sentence choices independently or turn the activity into a live PIN session.",
-        path: "/ote/reading/advanced/part-3-gapped-text/classroom-cohesion-challenge",
-        icon: Users,
-        tags: ["Advanced Reading", "Independent", "Live"],
-      },
-      {
-        title: "Why Free Things · live lesson",
-        description: "Lead a class through gist, gap prediction, clue reveals, sentence placement and feedback.",
-        path: "/ote/reading/advanced/part-3-gapped-text/live/free-things-lesson",
-        icon: Radio,
-        tags: ["Advanced Reading", "Live lesson"],
-      },
-      {
-        title: "Part 4 live activities",
-        description: "Launch Option Jury or Evidence Reveal with class answers and highlighted textual evidence.",
-        path: "/ote/reading/advanced/part-4-long-text/live/option-jury",
-        icon: Radio,
-        tags: ["Advanced Reading", "Live lesson"],
-      },
-      {
-        title: "Teacher-controlled Listening",
-        description: "Choose an OTE Listening part and run an available set live, controlling playback and feedback.",
-        path: "/ote/listening",
-        icon: Headphones,
-        tags: ["Listening", "Live lesson"],
-      },
-      {
-        title: "Advanced Listening Part 2 · Removing space debris",
-        description: "A C1 note-completion lecture with six gaps, detailed answer evidence and a teacher-controlled live mode.",
-        path: "/ote/listening/advanced/part-2-note-completion#teacher-listening-tasks",
-        icon: Headphones,
-        tags: ["Advanced Listening", "Direct link", "Live lesson"],
-      },
-      {
-        title: "Advanced Listening Part 2 · Dictionary words",
-        description: "A C1 note-completion lecture about how dictionaries select new words, with independent and live classroom modes.",
-        path: "/ote/listening/advanced/part-2-note-completion#teacher-listening-tasks",
-        icon: Headphones,
-        tags: ["Advanced Listening", "Direct link", "Live lesson"],
-      },
-      {
-        title: "Advanced Listening Part 3 · Subscription services",
-        description: "A C1 woman, man or both task with full recording, transcript-led review and a teacher-controlled live mode.",
-        path: "/ote/listening/advanced/part-3-opinion-matching#teacher-listening-tasks",
-        icon: Headphones,
-        tags: ["Advanced Listening", "Direct link", "Live lesson"],
-      },
-      {
-        title: "Advanced Listening Part 3 · Analogue media",
-        description: "A C1 discussion about vinyl and film photography with detailed attribution feedback and a teacher-controlled live mode.",
-        path: "/ote/listening/advanced/part-3-opinion-matching#teacher-listening-tasks",
-        icon: Headphones,
-        tags: ["Advanced Listening", "Direct link", "Live lesson"],
+        title: "Speaking",
+        resources: [
+          {
+            title: "Advanced voicemail task bank",
+            description: "Eight extra diplomatic voice-message tasks in two themed sets, with individual student links, timed recording and AI feedback.",
+            path: "/ote/speaking/part-2-voicemails/teacher-bank",
+            icon: Mic2,
+            tags: ["Advanced Speaking", "Direct link", "8 tasks"],
+          },
+          {
+            title: "Advanced summary task bank",
+            description: "Two extra Part 3 summary tasks with individual student links, timed recording and AI feedback.",
+            path: "/ote/speaking/part-3-summary/teacher-bank",
+            icon: Mic2,
+            tags: ["Advanced Speaking", "Assignable", "2 tasks"],
+          },
+          {
+            title: "Advanced debate task bank",
+            description: "Two extra Parts 4 and 5 debate-and-follow-up sets, with individual student links, timed recording and AI feedback.",
+            path: "/ote/speaking/parts-4-5-debate/teacher-bank",
+            icon: Mic2,
+            tags: ["Advanced Speaking", "Assignable", "2 tasks"],
+          },
+        ],
       },
     ],
   },
@@ -302,7 +322,14 @@ function ResourceCard({ resource }) {
 }
 
 export default function TeacherResources({ user }) {
+  const location = useLocation();
   const isTeacher = user?.role === "teacher" || user?.role === "admin";
+
+  useEffect(() => {
+    if (!isTeacher || !location.hash) return;
+
+    document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: "start" });
+  }, [isTeacher, location.hash]);
 
   if (!isTeacher) {
     return (
@@ -366,7 +393,7 @@ export default function TeacherResources({ user }) {
                 <h3>{skillGroup.title}</h3>
                 <div className="teacher-resource-grid">
                   {skillGroup.resources.map((resource) => (
-                    <ResourceCard key={resource.path} resource={resource} />
+                    <ResourceCard key={`${resource.path}-${resource.title}`} resource={resource} />
                   ))}
                 </div>
               </section>

@@ -181,6 +181,16 @@ export default function MainMenu({ user, aptisAccess, onSignIn }) {
         {(user?.role === "teacher" || user?.role === "admin") && (
           <button
             className="menu-card"
+            onClick={() => navigate("/teacher-resources#aptis")}
+          >
+            <h3>Classroom Resources</h3>
+            <p>Open ready-made Aptis activities for lessons, assignments, and live class sessions.</p>
+          </button>
+        )}
+
+        {(user?.role === "teacher" || user?.role === "admin") && (
+          <button
+            className="menu-card"
             onClick={() => navigate("/teacher-tools")}
           >
             <h3>Teacher Tools</h3>

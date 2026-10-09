@@ -11,6 +11,7 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
   const readingPath = getSitePath(nativeRoutes ? "/reading" : "/ote/reading");
   const listeningPath = getSitePath(nativeRoutes ? "/listening" : "/ote/listening");
   const profilePath = getSitePath("/profile");
+  const teacherResourcesPath = `${getSitePath("/teacher-resources")}#ote`;
   const teacherToolsPath = getSitePath("/teacher-tools");
   const myStudentsPath = getSitePath("/my-students");
   const myClassPath = getSitePath("/your-class");
@@ -22,6 +23,13 @@ export default function OteDashboard({ user, nativeRoutes = false }) {
 
   const accountCards = (
     <>
+      {isTeacherOrAdmin ? (
+        <button className="menu-card" type="button" onClick={() => navigate(teacherResourcesPath)}>
+          <h3>Classroom Resources</h3>
+          <p>Open ready-made OTE activities for lessons, assignments, and live class sessions.</p>
+        </button>
+      ) : null}
+
       {isTeacherOrAdmin ? (
         <button className="menu-card" type="button" onClick={() => navigate(teacherToolsPath)}>
           <h3>Teacher Tools</h3>

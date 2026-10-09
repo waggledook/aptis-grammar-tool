@@ -208,6 +208,18 @@ export default function HubLanding({ user, hasAccess, onSignIn, siteVariant = nu
             {(user?.role === "teacher" || user?.role === "admin") && (
               <button
                 className="menu-card"
+                onClick={() => navigate(`${getSitePath("/teacher-resources")}#hub`)}
+              >
+                <h3>Classroom Resources</h3>
+                <p>
+                  Open ready-made Hub activities and games for independent practice or live class sessions.
+                </p>
+              </button>
+            )}
+
+            {(user?.role === "teacher" || user?.role === "admin") && (
+              <button
+                className="menu-card"
                 onClick={() => navigate(getSitePath("/teacher-tools"))}
               >
                 <h3>Teacher Tools</h3>
