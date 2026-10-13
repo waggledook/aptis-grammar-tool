@@ -216,6 +216,8 @@ import AptisListeningPart2LivePlayer from "./components/listening/AptisListening
 import ListeningPart3 from "./components/listening/ListeningPart3.jsx";
 import AptisListeningPart3LiveHost from "./components/listening/AptisListeningPart3LiveHost.jsx";
 import AptisListeningPart3LivePlayer from "./components/listening/AptisListeningPart3LivePlayer.jsx";
+import AptisListeningPart4LiveHost from "./components/listening/AptisListeningPart4LiveHost.jsx";
+import AptisListeningPart4LivePlayer from "./components/listening/AptisListeningPart4LivePlayer.jsx";
 import ListeningPart4 from "./components/listening/ListeningPart4.jsx";
 import AptisListeningMock from "./components/listening/mockTests/AptisListeningMock.jsx";
 import HubLanding from "./components/hub/HubLanding.jsx";
@@ -2905,6 +2907,11 @@ return (
   }
 />
 
+<Route
+  path="/listening/part4-teacher/:taskId?"
+  element={<ListeningPart4 user={user} teacherBank />}
+/>
+
 {/* vocabulary routes */}
 <Route
   path="/vocabulary"
@@ -3411,6 +3418,8 @@ return (
 <Route path="/live/aptis-listening-part2/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><AptisListeningPart2LivePlayer /></RequireSignedIn>} />
 <Route path="/live/aptis-listening-part3/host/:gameId" element={<RequireTeacher user={user}><AptisListeningPart3LiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/aptis-listening-part3/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><AptisListeningPart3LivePlayer /></RequireSignedIn>} />
+<Route path="/live/aptis-listening-part4/host/:gameId" element={<RequireTeacher user={user}><AptisListeningPart4LiveHost user={user} /></RequireTeacher>} />
+<Route path="/live/aptis-listening-part4/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><AptisListeningPart4LivePlayer /></RequireSignedIn>} />
 <Route path="/live/cohesion-challenge/host/:gameId" element={<RequireTeacher user={user}><OteCohesionChallengeLiveHost user={user} /></RequireTeacher>} />
 <Route path="/live/cohesion-challenge/play/:gameId" element={<OteCohesionChallengeLivePlayer />} />
 <Route path="/live/free-things-lesson/host/:gameId" element={<RequireTeacher user={user}><OteFreeThingsLessonLiveHost user={user} /></RequireTeacher>} />

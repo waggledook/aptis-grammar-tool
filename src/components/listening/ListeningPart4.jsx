@@ -1,11 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 import { toast } from "../../utils/toast";
 import * as fb from "../../firebase";
+import { createAptisListeningPart4LiveGame } from "../../api/liveGames.js";
+import { getSitePath } from "../../siteConfig.js";
 import { useAptisPracticeTracking } from "../../utils/useAptisPracticeTracking.js";
+import { TEACHER_LISTENING_PART4_TASKS } from "./teacherListeningPart4Data.js";
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Task bank (empty for now)
+// Task bank
 // ─────────────────────────────────────────────────────────────────────────────
 const PART4_LISTENING_TASKS = [
     {
@@ -187,12 +191,16 @@ const PART4_LISTENING_TASKS = [
     },
   ];
 
-export default function ListeningPart4({ user, onRequireSignIn }) {
-  const items = PART4_LISTENING_TASKS.length ? PART4_LISTENING_TASKS : [EMPTY_TASK];
+export default function ListeningPart4({ user, onRequireSignIn, teacherBank = false }) {
+  const navigate = useNavigate();
+  const { taskId } = useParams();
+  const items = teacherBank ? TEACHER_LISTENING_PART4_TASKS : PART4_LISTENING_TASKS;
 
-  const [taskIndex, setTaskIndex] = useState(0);
+  const [regularTaskIndex, setRegularTaskIndex] = useState(0);
+  const linkedTaskIndex = items.findIndex((task) => task.id === taskId);
+  const taskIndex = teacherBank ? Math.max(0, linkedTaskIndex) : regularTaskIndex;
   const current = items[taskIndex] || items[0];
-  const practice = useAptisPracticeTracking({ user, skill: "listening", part: "part4", taskId: current?.id, title: current?.title, source: "ListeningPart4" });
+  const practice = useAptisPracticeTracking({ user, skill: "listening", part: "part4", taskId: current?.id, title: current?.title, source: teacherBank ? "ListeningPart4Teacher" : "ListeningPart4" });
 
   const [answers, setAnswers] = useState({});
   const [feedback, setFeedback] = useState({});
@@ -203,21 +211,24 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
 
   const scriptLineRefs = useRef({});
   const audioRef = useRef(null);
+  const loggedStartRef = useRef(false);
 
   const [playsUsed, setPlaysUsed] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [creatingLive, setCreatingLive] = useState(false);
+  const canHostLive = teacherBank && (user?.role === "teacher" || user?.role === "admin");
 
   const decoratedItems = useMemo(
     () =>
       items.map((t, i) => {
-        const locked = !user && i >= 1;
+        const locked = !teacherBank && !user && i >= 1;
         return {
           ...t,
           locked,
           title: `${i + 1}. ${t.title}${locked ? " 🔒" : ""}`,
         };
       }),
-    [items, user]
+    [items, teacherBank, user]
   );
 
   useEffect(() => {
@@ -228,6 +239,7 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
     setWhyOpen(null);
     stopAudio(true);
     setPlaysUsed(0);
+    loggedStartRef.current = false;
   }, [current?.id]);
 
   useEffect(() => {
@@ -264,11 +276,30 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
 
   function handleSelectTask(nextIndex) {
     practice.restart();
+    if (teacherBank) {
+      const nextTask = items[nextIndex];
+      if (nextTask) navigate(`/listening/part4-teacher/${nextTask.id}`);
+      return;
+    }
     if (!user && nextIndex >= 1) {
       onRequireSignIn?.();
       return;
     }
-    setTaskIndex(nextIndex);
+    setRegularTaskIndex(nextIndex);
+  }
+
+  async function handleCreateLive() {
+    if (!canHostLive || creatingLive) return;
+    setCreatingLive(true);
+    try {
+      const { gameId } = await createAptisListeningPart4LiveGame({ taskId: current.id });
+      navigate(getSitePath(`/live/aptis-listening-part4/host/${gameId}`));
+    } catch (error) {
+      console.error("[ListeningPart4] live session creation failed", error);
+      toast(error.message || "Could not create the listening room.");
+    } finally {
+      setCreatingLive(false);
+    }
   }
 
   function handleChange(key, value) {
@@ -290,7 +321,7 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
   }
 
   function handleShowAnswers() {
-    if (!PART4_LISTENING_TASKS.length) return;
+    if (!items.length) return;
     if (user) void practice.recordReveal();
 
     const ans = {};
@@ -308,7 +339,7 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
   }
 
   async function handleCheck() {
-    if (!PART4_LISTENING_TASKS.length) {
+    if (!items.length) {
       toast("Tasks coming soon.");
       return;
     }
@@ -339,7 +370,7 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
           await fb.logListeningPart4Completed({
             taskId: current.id,
             playsUsed,
-            source: "ListeningPart4",
+            source: teacherBank ? "ListeningPart4Teacher" : "ListeningPart4",
           });
         }
       } catch (e) {
@@ -356,7 +387,7 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
           score: correct,
           total,
           playsUsed,
-          source: "ListeningPart4",
+          source: teacherBank ? "ListeningPart4Teacher" : "ListeningPart4",
         });
       }
     } catch (e) {
@@ -372,7 +403,9 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
       el.currentTime = 0;
       setIsPlaying(false);
       if (!silent) toast("Stopped.");
-    } catch {}
+    } catch {
+      // Stopping audio is best-effort when the browser has already released it.
+    }
   }
 
   async function handlePlayStop() {
@@ -396,6 +429,10 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
 
     try {
       await el.play();
+      if (teacherBank && user && !loggedStartRef.current) {
+        loggedStartRef.current = true;
+        void fb.logAptisListeningTeacherTaskStarted({ taskId: current.id, taskTitle: current.title, part: 4 });
+      }
     } catch (e) {
       console.warn("[listening p4] play blocked:", e);
       toast("Click again to allow audio.");
@@ -432,7 +469,13 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
             />
           </div>
 
-          {!user && PART4_LISTENING_TASKS.length > 1 && (
+          {canHostLive && (
+            <button className="btn primary" disabled={creatingLive} onClick={handleCreateLive} type="button">
+              {creatingLive ? "Creating live room…" : "Start live lesson"}
+            </button>
+          )}
+
+          {!teacherBank && !user && items.length > 1 && (
             <p className="lock-note">Sign in to unlock the remaining listening tasks.</p>
           )}
 
@@ -475,7 +518,7 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
             <button
               className="btn ghost"
               onClick={handleShowAnswers}
-              disabled={!PART4_LISTENING_TASKS.length}
+              disabled={!items.length}
             >
               Show answers
             </button>
@@ -501,7 +544,7 @@ export default function ListeningPart4({ user, onRequireSignIn }) {
                     <button
                       type="button"
                       className="why-btn"
-                      disabled={!checkedOnce || !PART4_LISTENING_TASKS.length}
+                      disabled={!checkedOnce || !items.length}
                       onClick={() => setWhyOpen((cur) => (cur === q.key ? null : q.key))}
                       title={checkedOnce ? "Show explanation" : "Check first to unlock"}
                     >

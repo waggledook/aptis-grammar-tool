@@ -9,6 +9,7 @@ import { FREE_THINGS_LESSON_GAME_TYPE } from "../../products/ote/data/oteAdvance
 import { OTE_LISTENING_LIVE_GAME_TYPE } from "../../products/ote/data/oteListeningLive.js";
 import { APTIS_LISTENING_PART2_LIVE_GAME_TYPE } from "../listening/teacherListeningPart2Data.js";
 import { APTIS_LISTENING_PART3_LIVE_GAME_TYPE } from "../listening/teacherListeningPart3Data.js";
+import { APTIS_LISTENING_PART4_LIVE_GAME_TYPE } from "../listening/teacherListeningPart4Data.js";
 import { APTIS_WRITING_LIVE_GAME_TYPE } from "../writing/data/aptisWritingTeacherTasks.js";
 import { REGISTER_SURGERY_LIVE_GAME_TYPE } from "../writing/data/aptisWritingRegisterSurgery.js";
 import { PART4_ERROR_DETECTIVE_LIVE_GAME_TYPE } from "../writing/data/aptisPart4ErrorBank.js";
@@ -58,6 +59,8 @@ export default function LiveGameJoin() {
                 ? `/live/aptis-listening-part2/play/${gameId}`
               : type === APTIS_LISTENING_PART3_LIVE_GAME_TYPE
                 ? `/live/aptis-listening-part3/play/${gameId}`
+              : type === APTIS_LISTENING_PART4_LIVE_GAME_TYPE
+                ? `/live/aptis-listening-part4/play/${gameId}`
               : type === APTIS_WRITING_LIVE_GAME_TYPE
                 ? `/live/aptis-writing/play/${gameId}`
               : type === REGISTER_SURGERY_LIVE_GAME_TYPE
