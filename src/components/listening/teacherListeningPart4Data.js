@@ -1,5 +1,7 @@
 export const APTIS_LISTENING_PART4_LIVE_GAME_TYPE = "aptis_listening_part4_teacher";
 
+const TEACHER_LISTENING_PART4_TASK_SEQUENCE = ["cashless-venues", "museum-replicas"];
+
 export const TEACHER_LISTENING_PART4_TASKS = [
   {
     id: "museum-replicas",
@@ -9,88 +11,88 @@ export const TEACHER_LISTENING_PART4_TASKS = [
     audioSrc: "/audio/listening/part4/museum-replicas.mp3",
     questions: [
       {
-        key: "visitor-understanding",
-        text: "Why does the speaker value replicas in exhibitions?",
-        answer: "C",
-        scriptLineIndex: 2,
-        scriptRange: [2, 3],
+        key: "handling-replicas",
+        text: "What does the curator suggest about handling replicas?",
+        answer: "A",
+        scriptLineIndex: 1,
+        scriptRange: [1, 2],
         evidenceParts: [
-          "People could lift the copy, turn it over and try carrying it by a reconstructed handle",
-          "many returned to the original and noticed details they had walked past",
-          "The modern object had taught people how to look at the ancient one",
+          "People who had said “I could carry that easily” tried lifting it full and called someone over to take the other handle",
+          "After a few turns, they look at the small amount of flour they’ve produced and ask how much a family would need",
         ],
         explanation:
-          "Handling the replica lets visitors explore features that cannot be experienced through glass. They then return to the original and notice more, so the replica deepens their understanding of the authentic object.",
+          "Visitors underestimate the effort involved in carrying the bowl and producing flour. Handling the replicas changes their assumptions about ordinary activities in the past. The comparisons between makers and the signs of damage belong to the researchers’ examination of originals.",
         options: [
           {
             value: "A",
-            text: "They make exhibitions less expensive to update.",
+            text: "They can correct visitors’ assumptions about everyday life.",
           },
           {
             value: "B",
-            text: "They attract visitors who are unfamiliar with history.",
+            text: "They can help visitors compare the skills of different makers.",
           },
           {
             value: "C",
-            text: "They can deepen visitors' understanding of originals.",
+            text: "They can help visitors recognise signs of historical damage.",
           },
         ],
       },
       {
         key: "overall-view",
-        text: "What is the speaker's overall opinion of replicas?",
-        answer: "A",
+        text: "What is the curator’s overall view of replicas?",
+        answer: "B",
         scriptLineIndex: 4,
         scriptRange: [0, 5],
         evidenceParts: [
-          "I would not trade our damaged bowl for its flawless younger relative",
-          "I would, however, keep them close together",
-          "One carries the history; the other helps more of us discover what that history means",
+          "a transparent working copy lets visitors follow water through the valves",
+          "people spent the session following the moving water; the bronze pump remained at the edge of their attention",
+          "the letter will stay under glass",
+          "the pump will remain downstairs",
         ],
         explanation:
-          "The curator values the authenticity of originals and the interpretive help offered by replicas. Replicas are useful alongside clearly identified originals, rather than as replacements for them.",
+          "The curator now makes selective decisions according to what best explains the subject. The original letter retains its significance, handling copies reveal practical demands, and a working replica is preferred to an available original pump because it communicates the water system more effectively.",
         options: [
           {
             value: "A",
-            text: "They should complement original objects, not replace them.",
+            text: "Replicas should support encounters with originals rather than replace them.",
           },
           {
             value: "B",
-            text: "They deserve the same status as original objects.",
+            text: "Replicas may be preferable when they explain the subject more effectively.",
           },
           {
             value: "C",
-            text: "They are mainly appropriate in children's exhibitions.",
+            text: "Replicas should be reserved for objects unavailable for display.",
           },
         ],
       },
     ],
     script: [
-      {
-        speaker: "Museum curator",
-        text:
-          "Museum visitors sometimes feel cheated when an object is a replica. I understand. If you travelled to see a Roman helmet, learning that the object in front of you was made last year can feel like meeting an actor instead of the historical figure.",
-      },
-      {
-        speaker: "Museum curator",
-        text:
-          "Originals have a presence that is difficult to manufacture. Scratches on a tool or the faded edge of a letter connect us with the people who used them. Knowing an object survived a fire, a journey or several centuries changes the way we attend to it. Museums should be honest about that history and about what is modern.",
-      },
-      {
-        speaker: "Museum curator",
-        text:
-          "Yet glass cases impose limits. You can see the front of an ancient bowl but not its weight, the roughness underneath or how it sits in the hand. Last year, we displayed a copy beside a Bronze Age bowl. People could lift the copy, turn it over and try carrying it by a reconstructed handle. Afterwards, many returned to the original and noticed details they had walked past. The modern object had taught people how to look at the ancient one.",
-      },
-      {
-        speaker: "Museum curator",
-        text:
-          "Copies can also restore missing context. A stone fragment may seem dull until a reconstruction shows the complete pattern and original colours. If the original is too fragile to travel, a replica can reach a school or regional museum that would otherwise have only a photograph. As digital printing becomes cheaper, there is a temptation to fill every gap with something bright and complete. That would remove the uncertainty that makes historical evidence interesting. A reconstruction is an argument about the past, not the past itself, and labels should make that clear.",
-      },
-      {
-        speaker: "Museum curator",
-        text:
-          "So I would not trade our damaged bowl for its flawless younger relative. I would, however, keep them close together. One carries the history; the other helps more of us discover what that history means.",
-      },
+        {
+          speaker: "Museum curator",
+          text:
+            "Early in my museum career, I asked for the original object whenever it could be displayed safely. A copy seemed an apology for something missing. I still remember finding the writer’s thumbprint in the ink on a nineteenth-century letter. A photograph would have shown the same words, but I stood there much longer than I expected.",
+        },
+        {
+          speaker: "Museum curator",
+          text:
+            "In our domestic-life gallery, visitors used to glance at an ancient bowl and move on. We introduced a weighted copy. People who had said “I could carry that easily” tried lifting it full and called someone over to take the other handle. Nearby, a replica hand mill lets visitors grind grain. Most start briskly. After a few turns, they look at the small amount of flour they’ve produced and ask how much a family would need. Researchers study the original’s cracks and tool marks, comparing it with examples from workshops in other towns.",
+        },
+        {
+          speaker: "Museum curator",
+          text:
+            "Our new water-supply exhibition takes that experiment further. The old pump is sound enough to display, and we have it in storage. In the gallery, a transparent working copy lets visitors follow water through the valves. When we showed both during the trial, people spent the session following the moving water; the bronze pump remained at the edge of their attention.",
+        },
+        {
+          speaker: "Museum curator",
+          text:
+            "Of course, copies include decisions. Missing parts may be added from drawings, and colours may come from traces too small for visitors to see. For one object, we’re showing two versions based on different interpretations of the same evidence. Each has a label explaining which details are known and which have been filled in.",
+        },
+        {
+          speaker: "Museum curator",
+          text:
+            "Next month, the letter will stay under glass, the bowl’s copy will be replaced with a sturdier one, and the pump will remain downstairs. The school groups arrive on Tuesday; I’ve ordered extra grain.",
+        },
     ],
   },
   {
@@ -184,7 +186,11 @@ export const TEACHER_LISTENING_PART4_TASKS = [
       },
     ],
   },
-];
+].sort(
+  (firstTask, secondTask) =>
+    TEACHER_LISTENING_PART4_TASK_SEQUENCE.indexOf(firstTask.id) -
+    TEACHER_LISTENING_PART4_TASK_SEQUENCE.indexOf(secondTask.id)
+);
 
 export function getTeacherListeningPart4Task(taskId) {
   return TEACHER_LISTENING_PART4_TASKS.find((task) => task.id === taskId) || null;

@@ -582,6 +582,7 @@ export async function createAptisListeningPart4LiveGame({ taskId }) {
   if (!user) throw new Error("You must be signed in to host a listening session.");
   const task = getTeacherListeningPart4Task(taskId);
   if (!task) throw new Error("Choose an available Aptis Listening Part 4 task.");
+  if (!task.audioSrc) throw new Error("Add the recording before starting this live lesson.");
 
   const gameRef = push(ref(rtdb, "liveGames"));
   const gameId = gameRef.key;

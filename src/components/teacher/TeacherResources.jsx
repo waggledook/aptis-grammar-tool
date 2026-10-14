@@ -83,9 +83,9 @@ const PRODUCT_GROUPS = [
             tags: ["Direct link", "Opinion matching", "Live lesson"],
           },
           {
-            title: "Listening Part 4 · Museum Replicas and Cashless Venues",
-            description: "A two-monologue set with double multiple-choice questions, full recordings, answer feedback and transcripts.",
-            path: "/listening/part4-teacher/museum-replicas",
+            title: "Listening Part 4 · Cashless Venues and Museum Replicas",
+            description: "Two double multiple-choice tasks with answer feedback, evidence-led transcripts and teacher-controlled review.",
+            path: "/listening/part4-teacher/cashless-venues",
             icon: Headphones,
             tags: ["Direct link", "Double multiple choice", "Live lesson"],
           },

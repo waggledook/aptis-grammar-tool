@@ -289,7 +289,7 @@ export default function ListeningPart4({ user, onRequireSignIn, teacherBank = fa
   }
 
   async function handleCreateLive() {
-    if (!canHostLive || creatingLive) return;
+    if (!canHostLive || creatingLive || !current.audioSrc) return;
     setCreatingLive(true);
     try {
       const { gameId } = await createAptisListeningPart4LiveGame({ taskId: current.id });
@@ -470,8 +470,8 @@ export default function ListeningPart4({ user, onRequireSignIn, teacherBank = fa
           </div>
 
           {canHostLive && (
-            <button className="btn primary" disabled={creatingLive} onClick={handleCreateLive} type="button">
-              {creatingLive ? "Creating live room…" : "Start live lesson"}
+            <button className="btn primary" disabled={creatingLive || !current.audioSrc} onClick={handleCreateLive} type="button">
+              {creatingLive ? "Creating live room…" : current.audioSrc ? "Start live lesson" : "Recording required for live lesson"}
             </button>
           )}
 
@@ -498,14 +498,18 @@ export default function ListeningPart4({ user, onRequireSignIn, teacherBank = fa
               {isPlaying ? "Stop" : "Play"}
             </button>
 
-            <div className="listenMeta">
-              <span className={`pill ${playsUsed >= 2 ? "pill-dim" : ""}`}>
-                Listens left: <strong>{listensLeft}</strong>/2
-              </span>
-              {playsUsed > 0 && (
-                <span className="smallnote">(You’ve used {playsUsed} of 2)</span>
-              )}
-            </div>
+            {current.audioSrc ? (
+              <div className="listenMeta">
+                <span className={`pill ${playsUsed >= 2 ? "pill-dim" : ""}`}>
+                  Listens left: <strong>{listensLeft}</strong>/2
+                </span>
+                {playsUsed > 0 && (
+                  <span className="smallnote">(You’ve used {playsUsed} of 2)</span>
+                )}
+              </div>
+            ) : (
+              <span className="pill recording-pending">New recording coming soon</span>
+            )}
           </div>
 
           <div className="controls">
@@ -905,6 +909,7 @@ function StyleScope() {
       }
 
       .pill-dim { opacity: .75; }
+      .recording-pending { color: #ffd98a; border-color: rgba(255, 217, 138, .35); }
 
       .scriptWrap { margin-top: 1rem; }
       .scriptPanel {
