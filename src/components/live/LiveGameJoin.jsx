@@ -18,6 +18,7 @@ import { READING_PART2_LIVE_GAME_TYPE } from "../../reading/part2Tasks.js";
 import { READING_PART3_LIVE_GAME_TYPE } from "../../reading/readingPart3TeacherTasks.js";
 import { READING_PART4_LIVE_GAME_TYPE } from "../../reading/readingPart4TaskBanks.js";
 import { getSitePath } from "../../siteConfig.js";
+import { COLLOCATION_TEAM_GAME_TYPE } from "../vocabulary/collocations/collocationTeamLive.js";
 
 export default function LiveGameJoin() {
     const navigate = useNavigate();
@@ -75,6 +76,8 @@ export default function LiveGameJoin() {
                 ? `/live/aptis-reading-part3/play/${gameId}`
               : type === READING_PART4_LIVE_GAME_TYPE
                 ? `/live/aptis-reading-part4/play/${gameId}`
+              : type === COLLOCATION_TEAM_GAME_TYPE
+                ? `/live/collocations/play/${gameId}`
                 : `/live/play/${gameId}`;
           navigate(getSitePath(destination));
         } catch (err) {

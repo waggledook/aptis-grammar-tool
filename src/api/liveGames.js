@@ -90,6 +90,13 @@ import {
   getReadingPart4TeacherTask,
   READING_PART4_LIVE_GAME_TYPE,
 } from "../reading/readingPart4TaskBanks.js";
+import {
+  COLLOCATION_TEAM_GAME_TYPE,
+  evaluateCollocationSelection,
+  getCollocationTeamCaptain,
+  getCorrectWords,
+  getNextUnansweredIndex,
+} from "../components/vocabulary/collocations/collocationTeamLive.js";
 
 const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
 const SPANGLISH_GUEST_TOKEN_STORAGE_KEY = "spanglish_fixit_guest_token";
@@ -201,6 +208,54 @@ export async function createLiveGame({ setId, type = "grammar" }) {
   return { gameId, pin };
 }
 
+function cleanCollocationLiveItem(item) {
+  return {
+    itemId: String(item.itemId),
+    prompt: String(item.prompt || ""),
+    question: String(item.question || "Which words form natural collocations?"),
+    level: String(item.level || ""),
+    topic: String(item.topic || ""),
+    secondaryTopics: (item.secondaryTopics || []).map(String),
+    pattern: String(item.pattern || ""),
+    options: (item.options || []).map((option) => ({
+      word: String(option.word || ""),
+      collocation: String(option.collocation || ""),
+      isCorrect: !!option.isCorrect,
+      definition: String(option.definition || ""),
+      example: String(option.example || ""),
+      note: String(option.note || ""),
+    })),
+  };
+}
+
+export async function createCollocationTeamLiveGame({ items, title } = {}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a collocation game.");
+  if (!Array.isArray(items) || items.length < 2) {
+    throw new Error("Choose at least two collocation sets for the live game.");
+  }
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: title || "Collocation Team Challenge",
+    type: COLLOCATION_TEAM_GAME_TYPE,
+    items: items.map(cleanCollocationLiveItem),
+    status: "lobby",
+    createdAt: Date.now(),
+    state: {
+      phase: "lobby",
+      teamCount: 2,
+      teamsLocked: false,
+      reviewItemIndexes: [],
+    },
+  });
+  return { gameId, pin };
+}
+
 /**
  * Find a live game by its PIN.
  * Returns { gameId, ...data } or null.
@@ -272,7 +327,8 @@ export async function joinLiveGameByPin(pin) {
     game.type === APTIS_READING_PART1_LIVE_GAME_TYPE ||
     game.type === READING_PART2_LIVE_GAME_TYPE ||
     game.type === READING_PART3_LIVE_GAME_TYPE ||
-    game.type === READING_PART4_LIVE_GAME_TYPE
+    game.type === READING_PART4_LIVE_GAME_TYPE ||
+    game.type === COLLOCATION_TEAM_GAME_TYPE
   ) {
     if (!existingPlayer) await set(playerRef, {
       name: displayName,
@@ -300,6 +356,112 @@ export async function joinLiveGameByPin(pin) {
   }
 
   return { gameId: game.gameId, type: game.type || "grammar" };
+}
+
+export async function configureCollocationLiveTeams({ gameId, teams, assignments, teamCount, teamsLocked = false }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to organise teams.");
+
+  const updates = {
+    teams,
+    "state/teamCount": teamCount,
+    "state/teamsLocked": !!teamsLocked,
+  };
+  Object.entries(assignments || {}).forEach(([uid, teamId]) => {
+    updates[`players/${uid}/teamId`] = teamId || null;
+  });
+  await update(ref(rtdb, `liveGames/${gameId}`), updates);
+}
+
+export async function updateCollocationLiveTeam({ gameId, teamId, team }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to organise teams.");
+  await set(ref(rtdb, `liveGames/${gameId}/teams/${teamId}`), team);
+}
+
+export async function setCollocationLiveTeamsLocked(gameId, teamsLocked) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to organise teams.");
+  await set(ref(rtdb, `liveGames/${gameId}/state/teamsLocked`), !!teamsLocked);
+}
+
+export async function startCollocationTeamLiveGame(gameId) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to start the game.");
+  await update(ref(rtdb, `liveGames/${gameId}`), {
+    status: "in-progress",
+    "state/phase": "play",
+    "state/startedAt": Date.now(),
+  });
+}
+
+export async function startCollocationTeamReview(gameId, reviewItemIndexes) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to start the review.");
+  await update(ref(rtdb, `liveGames/${gameId}/state`), {
+    phase: "review",
+    reviewItemIndexes,
+    reviewStartedAt: Date.now(),
+  });
+}
+
+export async function finishCollocationTeamLiveGame(gameId) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to finish the game.");
+  await update(ref(rtdb, `liveGames/${gameId}`), {
+    status: "finished",
+    "state/phase": "finished",
+    "state/finishedAt": Date.now(),
+  });
+}
+
+export async function submitCollocationTeamAnswer({ gameId, itemIndex, selectedWords, review = false }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to submit an answer.");
+
+  const gameSnap = await get(ref(rtdb, `liveGames/${gameId}`));
+  if (!gameSnap.exists()) throw new Error("This live game is no longer available.");
+  const game = gameSnap.val();
+  const teamId = game.players?.[user.uid]?.teamId;
+  const team = game.teams?.[teamId];
+  const expectedPhase = review ? "review" : "play";
+  if (!teamId) throw new Error("Your teacher has not assigned you to a team yet.");
+  if (game.status !== "in-progress" || game.state?.phase !== expectedPhase) {
+    throw new Error("This part of the game is not accepting answers.");
+  }
+
+  const item = game.items?.[itemIndex];
+  if (!item) throw new Error("That collocation set could not be found.");
+  const reviewIndexes = game.state?.reviewItemIndexes || [];
+  const teamAnswerMap = game.teamAnswers?.[teamId] || {};
+  const teamReviewMap = game.reviewAnswers?.[teamId] || {};
+  const reviewPosition = reviewIndexes.findIndex((index) => !teamReviewMap?.[index]);
+  const expectedItemIndex = review
+    ? reviewIndexes[reviewPosition]
+    : getNextUnansweredIndex(teamAnswerMap, game.items?.length || 0);
+  const captainPosition = review
+    ? (game.items?.length || 0) + reviewPosition
+    : expectedItemIndex;
+  if (itemIndex !== expectedItemIndex) throw new Error("Your team has already moved to another set.");
+  if (getCollocationTeamCaptain(team, captainPosition) !== user.uid) {
+    throw new Error("Only the current team captain can submit this answer.");
+  }
+
+  const availableWords = new Set((item.options || []).map((option) => option.word));
+  const uniqueSelectedWords = [...new Set(selectedWords || [])];
+  if (
+    uniqueSelectedWords.length !== getCorrectWords(item).length ||
+    uniqueSelectedWords.some((word) => !availableWords.has(word))
+  ) {
+    throw new Error(`Choose exactly ${getCorrectWords(item).length} available options.`);
+  }
+  const evaluation = evaluateCollocationSelection(item, uniqueSelectedWords);
+  const answerRoot = review ? "reviewAnswers" : "teamAnswers";
+  await set(ref(rtdb, `liveGames/${gameId}/${answerRoot}/${teamId}/${itemIndex}`), {
+    ...evaluation,
+    submittedBy: user.uid,
+    submittedAt: Date.now(),
+  });
 }
 
 export async function createOptionJuryLiveGame({ taskId, title }) {

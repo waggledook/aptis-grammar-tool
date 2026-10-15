@@ -12279,7 +12279,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           { gapId: "g2" },
           " the corridor. Go ",
           { gapId: "g3" },
-          " the café, then turn left. The meeting room is ",
+          " the café, then turn left. The reception desk is on one side of the corridor, and the meeting room is directly facing it on the other. The meeting room is ",
           { gapId: "g4" },
           " the reception desk.",
         ],
@@ -12487,7 +12487,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         ],
         gaps: [
           { id: "g1", acceptedAnswers: ["were going to have"], feedback: "Use were going to for the earlier plan that will not happen." },
-          { id: "g2", acceptedAnswers: ["is going to rain"], feedback: "Use be going to because the sky provides present evidence." },
+          { id: "g2", acceptedAnswers: ["is going to rain", "'s going to rain"], feedback: "Use is going to rain or ’s going to rain because the sky provides present evidence." },
           { id: "g3", acceptedAnswers: ["will stay"], feedback: "Use will for the decision made in response to the change." },
           { id: "g4", acceptedAnswers: ["Shall we watch"], feedback: "Use Shall we + base verb to make a suggestion." },
         ],
@@ -12647,7 +12647,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         gaps: [
           { id: "g1", acceptedAnswers: ["register"], feedback: "Use the present simple in the if-clause." },
           { id: "g2", acceptedAnswers: ["replies"], feedback: "Use the present simple after unless." },
-          { id: "g3", acceptedAnswers: ["should tell"], feedback: "Should can express advice in the result clause." },
+          { id: "g3", acceptedAnswers: ["should tell", "will tell"], feedback: "Use should tell for advice or will tell / ’ll tell for an expected future result." },
         ],
       },
       {
@@ -12667,7 +12667,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         ],
         gaps: [
           { id: "g1", acceptedAnswers: ["had"], feedback: "Use the past simple for the hypothetical condition." },
-          { id: "g2", acceptedAnswers: ["would create"], feedback: "Use would + base verb for the hypothetical result." },
+          { id: "g2", acceptedAnswers: ["would create", "'d create"], feedback: "Use would create or the contraction ’d create for the hypothetical result." },
           { id: "g3", acceptedAnswers: ["was", "were"], feedback: "Both was and were are possible in many second-conditional if-clauses." },
           { id: "g4", acceptedAnswers: ["were"], feedback: "Use were in the fixed phrase If I were you." },
         ],
@@ -12743,7 +12743,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "Complete the recent news with just and the verb in brackets.",
         "The replacement bus __________. (arrive)",
         "has just arrived",
-        [],
+        ["'s just arrived"],
         "Use has just + past participle for a very recent event."
       ),
       placeholderGapItem(
@@ -12774,9 +12774,9 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "b1-b2-5a-ec-1",
         "Check the highlighted phrase.",
         "I've met Karim at the workshop last Friday.",
-        "I've met Karim at the workshop last Friday",
+        "I've met Karim",
         false,
-        "I met Karim at the workshop last Friday",
+        "I met Karim",
         "Use the past simple with the finished past time last Friday."
       ),
       errorCorrectionItem(
@@ -12849,10 +12849,10 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           " at home all week. (be)",
         ],
         gaps: [
-          { id: "g1", acceptedAnswers: ["has owned"], feedback: "Use the present perfect simple with the non-action verb own." },
-          { id: "g2", acceptedAnswers: ["has known"], feedback: "Use the present perfect simple with the non-action verb know." },
+          { id: "g1", acceptedAnswers: ["has owned", "'s owned"], feedback: "Use the present perfect simple with the non-action verb own." },
+          { id: "g2", acceptedAnswers: ["has known", "'s known"], feedback: "Use the present perfect simple with the non-action verb know." },
           { id: "g3", acceptedAnswers: ["hasn't needed", "has not needed"], feedback: "Use the negative present perfect for the situation continuing until now." },
-          { id: "g4", acceptedAnswers: ["has been"], feedback: "Use the present perfect with all week and no for." },
+          { id: "g4", acceptedAnswers: ["has been", "'s been"], feedback: "Use the present perfect with all week and no for." },
         ],
       },
     ],
@@ -13375,7 +13375,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         gaps: [
           { id: "g1", acceptedAnswers: ["could stay"], feedback: "Use could for a general ability in the past." },
           { id: "g2", acceptedAnswers: ["was able to open", "managed to open"], feedback: "Use was able to or managed to for success on one specific occasion." },
-          { id: "g3", acceptedAnswers: ["has been able to help"], feedback: "Use has been able to for ability from the past until now." },
+          { id: "g3", acceptedAnswers: ["has been able to help", "'s been able to help"], feedback: "Use has been able to for ability from the past until now." },
           { id: "g4", acceptedAnswers: ["will be able to train"], feedback: "Use will be able to for future ability." },
         ],
       },
@@ -14066,7 +14066,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "A confirmation email has being sent to every participant.",
         "has being sent",
         false,
-        "has been sent",
+        ["has been sent", "'s been sent"],
         "Use has been + past participle for the present-perfect passive."
       ),
       errorCorrectionItem(
@@ -14110,7 +14110,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         gaps: [
           { id: "g1", acceptedAnswers: ["are roasted"], feedback: "Use are + past participle for this stage of the process." },
           { id: "g2", acceptedAnswers: ["are ground"], feedback: "Use the irregular past participle ground." },
-          { id: "g3", acceptedAnswers: ["is added"], feedback: "Use is + past participle with the uncountable subject water." },
+          { id: "g3", acceptedAnswers: ["is added", "'s added"], feedback: "Use is + past participle with the uncountable subject water." },
           { id: "g4", acceptedAnswers: ["be served"], feedback: "Use be + past participle after can." },
         ],
       },
@@ -14131,7 +14131,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         ],
         gaps: [
           { id: "g1", acceptedAnswers: ["was being built"], feedback: "Use the past-continuous passive for work in progress when we arrived." },
-          { id: "g2", acceptedAnswers: ["had already been delivered"], feedback: "Use the past-perfect passive for an earlier completed action." },
+          { id: "g2", acceptedAnswers: ["had already been delivered", "'d already been delivered"], feedback: "Use the past-perfect passive for an earlier completed action." },
           { id: "g3", acceptedAnswers: ["will be installed"], feedback: "Use the future passive for tomorrow's work." },
           { id: "g4", acceptedAnswers: ["be shown"], feedback: "The sentence already supplies are going to, so use the passive infinitive be shown." },
         ],
@@ -14249,7 +14249,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "She told me that she will call me tomorrow.",
         "will call me tomorrow",
         false,
-        "would call me the next day",
+        ["would call me the next day", "'d call me the next day"],
         "Backshift will to would and change tomorrow to the next day."
       ),
       errorCorrectionItem(
@@ -14292,7 +14292,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         ],
         gaps: [
           { id: "g1", acceptedAnswers: ["why I wanted"], feedback: "Use why + normal statement order and backshift want to wanted." },
-          { id: "g2", acceptedAnswers: ["if I had worked", "whether I had worked"], feedback: "Use if or whether, normal statement order, and the past perfect." },
+          { id: "g2", acceptedAnswers: ["if I had worked", "whether I had worked", "if I'd worked", "whether I'd worked"], feedback: "Use if or whether, normal statement order, and the past perfect." },
           { id: "g3", acceptedAnswers: ["if I could start", "whether I could start"], feedback: "Use if or whether and backshift can to could." },
           { id: "g4", acceptedAnswers: ["to email"], feedback: "Use ask + object + to + infinitive for the polite request." },
         ],
@@ -14313,9 +14313,9 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           " them. (not move)",
         ],
         gaps: [
-          { id: "g1", acceptedAnswers: ["had left"], feedback: "Backshift the past simple to the past perfect." },
-          { id: "g2", acceptedAnswers: ["would collect"], feedback: "Backshift will to would." },
-          { id: "g3", acceptedAnswers: ["had already told"], feedback: "Backshift the present perfect to the past perfect." },
+          { id: "g1", acceptedAnswers: ["had left", "'d left"], feedback: "Backshift the past simple to the past perfect." },
+          { id: "g2", acceptedAnswers: ["would collect", "'d collect"], feedback: "Backshift will to would." },
+          { id: "g3", acceptedAnswers: ["had already told", "'d already told"], feedback: "Backshift the present perfect to the past perfect." },
           { id: "g4", acceptedAnswers: ["not to move"], feedback: "Use told us + not to + infinitive for the negative instruction." },
         ],
       },
@@ -14390,7 +14390,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "Complete the third-conditional if-clause with the verb in brackets.",
         "If we __________ earlier, we'd have paid less for the tickets. (book)",
         "had booked",
-        [],
+        ["'d booked"],
         "Use had + past participle in the if-clause."
       ),
       placeholderGapItem(
@@ -14406,7 +14406,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "Complete the sentence with the past perfect form of the verb.",
         "By the time the firefighters arrived, everyone __________ the building. (leave)",
         "had left",
-        [],
+        ["'d left"],
         "Use the past perfect for the action completed before the firefighters arrived."
       ),
       placeholderChoiceGapItem(
@@ -14423,7 +14423,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "If I would have checked the timetable, I wouldn't have been late.",
         "would have checked",
         false,
-        "had checked",
+        ["had checked", "'d checked"],
         "Use the past perfect, not would have, in the if-clause."
       ),
       errorCorrectionItem(
@@ -14432,7 +14432,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "She would have applied if she had knew about the vacancy.",
         "had knew",
         false,
-        "had known",
+        ["had known", "'d known"],
         "Use the past participle known after had."
       ),
       errorCorrectionItem(
@@ -14474,9 +14474,9 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           " more quickly if the fire alarm hadn't interrupted us. (finish)",
         ],
         gaps: [
-          { id: "g1", acceptedAnswers: ["had checked"], feedback: "Use the past perfect in the if-clause." },
+          { id: "g1", acceptedAnswers: ["had checked", "'d checked"], feedback: "Use the past perfect in the if-clause." },
           { id: "g2", acceptedAnswers: ["wouldn't have called", "would not have called"], feedback: "Use wouldn't have + past participle for the negative result." },
-          { id: "g3", acceptedAnswers: ["would have met"], feedback: "Use would have + past participle for the imaginary result." },
+          { id: "g3", acceptedAnswers: ["would have met", "'d have met"], feedback: "Use would have + past participle for the imaginary result." },
           { id: "g4", acceptedAnswers: ["have finished"], feedback: "The sentence already supplies might, so add have + past participle." },
         ],
       },
@@ -14496,10 +14496,10 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           " terrible. (be)",
         ],
         gaps: [
-          { id: "g1", acceptedAnswers: ["had already departed"], feedback: "Use the past perfect for the train's earlier departure." },
-          { id: "g2", acceptedAnswers: ["had left"], feedback: "Use the past perfect for leaving the wallet before reaching the station." },
-          { id: "g3", acceptedAnswers: ["had set off"], feedback: "Use the past perfect in reported speech for the earlier action." },
-          { id: "g4", acceptedAnswers: ["had been"], feedback: "Use the past perfect for the earlier traffic conditions." },
+          { id: "g1", acceptedAnswers: ["had already departed", "'d already departed"], feedback: "Use the past perfect for the train's earlier departure." },
+          { id: "g2", acceptedAnswers: ["had left", "'d left"], feedback: "Use the past perfect for leaving the wallet before reaching the station." },
+          { id: "g3", acceptedAnswers: ["had set off", "'d set off"], feedback: "Use the past perfect in reported speech for the earlier action." },
+          { id: "g4", acceptedAnswers: ["had been", "'d been"], feedback: "Use the past perfect for the earlier traffic conditions." },
         ],
       },
     ],
@@ -14573,7 +14573,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "Complete the sentence with the correct passive form of the verb in brackets.",
         "The railway bridge __________ at the moment. (repair)",
         "is being repaired",
-        [],
+        ["'s being repaired"],
         "Use is being + past participle; be acts as the auxiliary in the passive continuous form."
       ),
       doubleGap(
@@ -14660,7 +14660,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
           { id: "g1", acceptedAnswers: ["was"], feedback: "Use was as the main verb to describe location." },
           { id: "g2", acceptedAnswers: ["was having"], feedback: "Use was as an auxiliary with having for the action in progress." },
           { id: "g3", acceptedAnswers: ["did"], feedback: "Use did as the past form of the main verb do." },
-          { id: "g4", acceptedAnswers: ["had sent"], feedback: "Use had as the auxiliary in the past perfect." },
+          { id: "g4", acceptedAnswers: ["had sent", "'d sent"], feedback: "Use had as the auxiliary in the past perfect." },
         ],
       },
       {
@@ -14792,7 +14792,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "If I would have known about the delay, I would have taken a later train.",
         "would have known",
         false,
-        "had known",
+        ["had known", "'d known"],
         "Use the past perfect, not would have, in a third-conditional if-clause."
       ),
       errorCorrectionItem(
@@ -14866,9 +14866,9 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         ],
         gaps: [
           { id: "g1", acceptedAnswers: ["couldn't come", "could not come"], feedback: "Backshift can't to couldn't in the reported statement." },
-          { id: "g2", acceptedAnswers: ["had already made"], feedback: "Backshift the present perfect to the past perfect." },
+          { id: "g2", acceptedAnswers: ["had already made", "'d already made"], feedback: "Backshift the present perfect to the past perfect." },
           { id: "g3", acceptedAnswers: ["to invite"], feedback: "Use asked us + to + infinitive for the request." },
-          { id: "g4", acceptedAnswers: ["would have joined"], feedback: "Use would have + past participle in the third-conditional result." },
+          { id: "g4", acceptedAnswers: ["would have joined", "'d have joined"], feedback: "Use would have + past participle in the third-conditional result." },
         ],
       },
     ],
@@ -14910,6 +14910,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         [
           "she could communicate in paris",
           "she would be able to communicate in paris",
+          "she'd be able to communicate in paris",
         ],
         "After the if-clause, use would/could + base verb to describe the imaginary result.",
         { originalSentence: "She doesn’t learn French, so she can’t communicate in Paris." }
@@ -15656,7 +15657,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "pv1",
         "They are redecorating my house at the moment.",
         ["My house ", { gapId: "g1" }, " at the moment."],
-        ["is being redecorated"],
+        ["is being redecorated", "'s being redecorated"],
         "Use the present continuous passive: is being + past participle."
       ),
       singleGap(
@@ -15670,7 +15671,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "pv3",
         "They have delivered the parcel.",
         ["The parcel ", { gapId: "g1" }, "."],
-        ["has been delivered"],
+        ["has been delivered", "'s been delivered"],
         "Use the present perfect passive: has been delivered."
       ),
       singleGap(
@@ -15740,14 +15741,14 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "pv13",
         "They had already completed the task before I arrived.",
         ["The task ", { gapId: "g1" }, " before I arrived."],
-        ["had already been completed", "had been completed already"],
+        ["had already been completed", "had been completed already", "'d already been completed", "'d been completed already"],
         "Use the past perfect passive: had already been completed."
       ),
       singleGap(
         "pv14",
         "They serve breakfast at 8 o'clock.",
         ["Breakfast ", { gapId: "g1" }, " at 8 o'clock."],
-        ["is served"],
+        ["is served", "'s served"],
         "Use the present simple passive: is served."
       ),
       singleGap(

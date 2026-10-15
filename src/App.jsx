@@ -108,6 +108,8 @@ import VocabularyTopics from "./components/vocabulary/VocabularyTopics";
 import { getTopicSetIds } from "./components/vocabulary/data/vocabTopics";
 import CollocationDash from "./components/vocabulary/collocations/CollocationDash";
 import CollocationPrecisionTrainer from "./components/vocabulary/collocations/CollocationPrecisionTrainer";
+import CollocationTeamLiveHost from "./components/vocabulary/collocations/CollocationTeamLiveHost.jsx";
+import CollocationTeamLivePlayer from "./components/vocabulary/collocations/CollocationTeamLivePlayer.jsx";
 import AptisVocabularyStrategyGuide from "./components/vocabulary/AptisVocabularyStrategyGuide.jsx";
 import VocabLab from "./components/vocabulary/VocabLab";
 import SynonymTrainer from "./components/vocabulary/SynonymTrainer";
@@ -3013,7 +3015,7 @@ return (
       onSignIn={() => setShowAuth(true)}
       title="Collocation Trainer is included with full access"
     >
-      <CollocationPrecisionTrainer />
+      <CollocationPrecisionTrainer user={user} />
     </AptisFullAccessOnly>
   }
 />
@@ -3408,6 +3410,8 @@ return (
 <Route path="/live/join" element={<LiveGameJoin />} />
 <Route path="/live/host/:gameId" element={<LiveGameHost />} />
 <Route path="/live/play/:gameId" element={<LiveGamePlayer />} />
+<Route path="/live/collocations/host/:gameId" element={<RequireTeacher user={user}><CollocationTeamLiveHost /></RequireTeacher>} />
+<Route path="/live/collocations/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><CollocationTeamLivePlayer /></RequireSignedIn>} />
 <Route path="/live/option-jury/host/:gameId" element={<OteOptionJuryHost user={user} />} />
 <Route path="/live/option-jury/play/:gameId" element={<OteOptionJuryPlayer />} />
 <Route path="/live/part4-evidence/host/:gameId" element={<RequireTeacher user={user}><OteReadingPart4EvidenceLiveHost user={user} /></RequireTeacher>} />

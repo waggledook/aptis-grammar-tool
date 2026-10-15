@@ -22,8 +22,11 @@ import {
   sendReport,
 } from "../../../firebase";
 import collocationPrecisionItems from "./data/collocationPrecisionItems.js";
+import { createCollocationTeamLiveGame } from "../../../api/liveGames.js";
+import { getSitePath } from "../../../siteConfig.js";
 
 const SESSION_SIZE = 6;
+const LIVE_SESSION_SIZE = 10;
 const REPORT_REASONS = [
   { value: "Incorrect collocation", label: "A correct collocation is marked wrong" },
   { value: "Valid distractor", label: "A distractor is actually possible or natural" },
@@ -82,8 +85,8 @@ function feedbackTitle(result, correctTotal) {
   return "Keep going: review the target collocations";
 }
 
-function createSession(pool) {
-  return shuffle(pool).slice(0, SESSION_SIZE).map((item) => ({
+function createSession(pool, size = SESSION_SIZE) {
+  return shuffle(pool).slice(0, size).map((item) => ({
     ...item,
     options: shuffle(item.options),
   }));
@@ -98,7 +101,7 @@ function createPrioritisedSession(pool, seenItemIds = new Set()) {
   }));
 }
 
-export default function CollocationPrecisionTrainer() {
+export default function CollocationPrecisionTrainer({ user }) {
   const navigate = useNavigate();
   const completionLoggedRef = useRef(false);
   const signedIn = !!auth.currentUser;
@@ -132,6 +135,7 @@ export default function CollocationPrecisionTrainer() {
   const [reportReason, setReportReason] = useState("");
   const [reportComment, setReportComment] = useState("");
   const [sendingReport, setSendingReport] = useState(false);
+  const [creatingLiveGame, setCreatingLiveGame] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -264,6 +268,36 @@ export default function CollocationPrecisionTrainer() {
       levels: selectedLevels,
       source: "CollocationPrecisionTrainer",
     });
+  }
+
+  async function hostTeamGame() {
+    if (!user || (user.role !== "teacher" && user.role !== "admin")) {
+      toast("Only teachers can host live team games.");
+      return;
+    }
+    if (!selectedLevels.length || filteredPool.length < 2 || creatingLiveGame) return;
+
+    const liveItems = createSession(filteredPool, LIVE_SESSION_SIZE);
+    const titleParts = [
+      "Collocation Team Challenge",
+      selectedLevels.length === 1 ? selectedLevels[0].toUpperCase() : null,
+      topic !== "all" ? topic.replace(/-/g, " ") : null,
+      pattern !== "all" ? pattern : null,
+    ].filter(Boolean);
+
+    setCreatingLiveGame(true);
+    try {
+      const { gameId } = await createCollocationTeamLiveGame({
+        items: liveItems,
+        title: titleParts.join(" · "),
+      });
+      navigate(getSitePath(`/live/collocations/host/${gameId}`));
+    } catch (error) {
+      console.error("[CollocationPrecisionTrainer] create live game failed", error);
+      toast(error.message || "Could not create the live team game.");
+    } finally {
+      setCreatingLiveGame(false);
+    }
   }
 
   async function loadMistakeSet() {
@@ -564,6 +598,17 @@ export default function CollocationPrecisionTrainer() {
             <button className="review-btn" onClick={() => startSession()} disabled={!selectedLevels.length}>
               Generate Practice Set
             </button>
+            {(user?.role === "teacher" || user?.role === "admin") && (
+              <button
+                className="review-btn"
+                onClick={hostTeamGame}
+                disabled={!selectedLevels.length || filteredPool.length < 2 || creatingLiveGame}
+              >
+                {creatingLiveGame
+                  ? "Creating team room…"
+                  : `Host team game (${Math.min(LIVE_SESSION_SIZE, filteredPool.length)} sets)`}
+              </button>
+            )}
             <button className="review-btn secondary" onClick={loadMistakeSet} disabled={!signedIn}>
               <RotateCcw size={16} /> Review Mistakes
             </button>
