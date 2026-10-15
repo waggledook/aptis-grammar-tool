@@ -1,6 +1,7 @@
 export const COLLOCATION_TEAM_GAME_TYPE = "collocation-team";
 export const COLLOCATION_TEAM_ROTATION_SIZE = 3;
 export const COLLOCATION_TEAM_REVIEW_SIZE = 5;
+export const COLLOCATION_TEAM_ROUND_SECONDS = 45;
 
 export function getCorrectWords(item) {
   return (item?.options || [])
@@ -10,20 +11,27 @@ export function getCorrectWords(item) {
 
 export function evaluateCollocationSelection(item, selectedWords = []) {
   const selected = new Set(selectedWords);
+  const uniqueWords = [...selected];
   const correctWords = getCorrectWords(item);
   const correct = new Set(correctWords);
-  const selectedCorrect = selectedWords.filter((word) => correct.has(word));
-  const selectedWrong = selectedWords.filter((word) => !correct.has(word));
+  const selectedCorrect = uniqueWords.filter((word) => correct.has(word));
+  const selectedWrong = uniqueWords.filter((word) => !correct.has(word));
   const missed = correctWords.filter((word) => !selected.has(word));
 
+  const percentage = correctWords.length
+    ? Math.round((selectedCorrect.length / correctWords.length) * 100)
+    : 0;
+
   return {
-    selectedWords,
+    selectedWords: uniqueWords,
     selectedCorrect,
     selectedWrong,
     missed,
     isPerfect: selectedWrong.length === 0 && missed.length === 0,
-    score: Math.max(0, selectedCorrect.length - selectedWrong.length),
+    score: selectedCorrect.length,
     possibleScore: correctWords.length,
+    percentage,
+    points: percentage,
   };
 }
 
@@ -77,15 +85,20 @@ export function getNextUnansweredIndex(answerMap, total) {
   return total;
 }
 
-export function buildCollocationReviewIndexes(items, teamAnswers, limit = COLLOCATION_TEAM_REVIEW_SIZE) {
+export function buildCollocationReviewIndexes(
+  items,
+  teamAnswers,
+  limit = COLLOCATION_TEAM_REVIEW_SIZE,
+  teamIds = Object.keys(teamAnswers || {})
+) {
   const scores = (items || []).map((item, itemIndex) => {
     let errorCount = 0;
     let imperfectTeams = 0;
 
-    Object.values(teamAnswers || {}).forEach((answers) => {
+    teamIds.forEach((teamId) => {
+      const answers = teamAnswers?.[teamId];
       const answer = answers?.[itemIndex];
-      if (!answer) return;
-      const evaluation = evaluateCollocationSelection(item, answer.selectedWords || []);
+      const evaluation = evaluateCollocationSelection(item, answer?.selectedWords || []);
       const errors = evaluation.missed.length + evaluation.selectedWrong.length;
       errorCount += errors;
       if (!evaluation.isPerfect) imperfectTeams += 1;
@@ -103,6 +116,51 @@ export function buildCollocationReviewIndexes(items, teamAnswers, limit = COLLOC
     ))
     .slice(0, limit)
     .map((entry) => entry.itemIndex);
+}
+
+export function collocationTeamTotalPoints(game, teamId) {
+  const { isQuestion, isReview, itemIndex } = getCollocationLiveRound(game);
+  return ["teamAnswers", "reviewAnswers"].reduce((total, answerRoot) => (
+    total + Object.entries(game?.[answerRoot]?.[teamId] || {}).reduce((sum, [key, answer]) => {
+      if (isQuestion && (answerRoot === "reviewAnswers") === isReview && Number(key) === itemIndex) return sum;
+      return sum + evaluateCollocationSelection(game?.items?.[key], answer?.selectedWords || []).points;
+    }, 0)
+  ), 0);
+}
+
+export function getCollocationLiveRound(game) {
+  const phase = game?.state?.phase || "lobby";
+  const isReview = phase.startsWith("review-");
+  const index = Number(isReview ? game?.state?.reviewIndex || 0 : game?.state?.questionIndex || 0);
+  const itemIndex = isReview ? game?.state?.reviewItemIndexes?.[index] : index;
+  return {
+    phase,
+    isReview,
+    isQuestion: phase === "question" || phase === "review-question",
+    isReveal: phase === "reveal" || phase === "review-reveal",
+    index,
+    itemIndex,
+    item: game?.items?.[itemIndex],
+    captainPosition: isReview ? (game?.items?.length || 0) + index : index,
+  };
+}
+
+export function createCollocationRoundState(game, index, review, serverNow) {
+  const itemIndex = review ? game?.state?.reviewItemIndexes?.[index] : index;
+  if (!game?.items?.[itemIndex]) throw new Error("That collocation set could not be found.");
+  const captainPosition = review ? game.items.length + index : index;
+  const captainUids = Object.fromEntries(
+    Object.entries(game.teams || {})
+      .map(([teamId, team]) => [teamId, getCollocationTeamCaptain(team, captainPosition)])
+      .filter(([, uid]) => uid)
+  );
+  return {
+    phase: review ? "review-question" : "question",
+    [review ? "reviewIndex" : "questionIndex"]: index,
+    questionDuration: COLLOCATION_TEAM_ROUND_SECONDS,
+    questionDeadline: serverNow + COLLOCATION_TEAM_ROUND_SECONDS * 1000,
+    captainUids,
+  };
 }
 
 export function collocationTeamName(game, teamId) {

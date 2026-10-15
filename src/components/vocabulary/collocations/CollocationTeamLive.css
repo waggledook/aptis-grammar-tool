@@ -387,7 +387,8 @@
   gap: .75rem;
 }
 
-.ctl-option-grid button {
+.ctl-option-grid button,
+.ctl-option-grid-display > div {
   min-height: 72px;
   padding: .8rem;
   border: 2px solid #315b91;
@@ -397,6 +398,80 @@
   font-size: clamp(1rem, 3vw, 1.35rem);
   font-weight: 800;
   cursor: pointer;
+}
+
+.ctl-option-grid-display > div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.ctl-option-grid :is(button, div).correct {
+  border-color: #65d49a;
+  background: rgba(46, 125, 79, .35);
+}
+
+.ctl-option-grid :is(button, div).missed {
+  border-color: #e5bf62;
+  border-style: dashed;
+  background: rgba(229, 191, 98, .16);
+}
+
+.ctl-option-grid :is(button, div).wrong {
+  border-color: #f18989;
+  background: rgba(152, 58, 58, .35);
+}
+
+.ctl-option-grid :is(button, div).quiet {
+  opacity: .65;
+}
+
+.ctl-timer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-width: 145px;
+  padding: .4rem .9rem;
+  border: 1px solid var(--ctl-blue);
+  border-radius: 12px;
+  background: rgba(59, 130, 246, .1);
+}
+
+.ctl-timer span {
+  font-size: .8rem;
+  color: var(--ctl-muted);
+}
+
+.ctl-timer strong {
+  font-size: 2rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.ctl-timer.is-low {
+  color: #ffc2c2;
+  border-color: #f18989;
+  background: rgba(152, 58, 58, .16);
+}
+
+.ctl-feedback-team {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+  color: var(--ctl-muted);
+  font-weight: 700;
+}
+
+.ctl-feedback-team select {
+  border: 1px solid var(--ctl-border);
+  border-radius: 8px;
+  padding: .5rem;
+  background: var(--ctl-panel-deep);
+  color: var(--ctl-text);
 }
 
 .ctl-option-grid button.selected {
@@ -535,4 +610,40 @@
 
 :root[data-theme="light"] .ctl-option-grid button.selected {
   background: #dceaff;
+}
+
+:root[data-theme="light"] .ctl-option-grid-display > div {
+  color: #10213c;
+  background: #f7faff;
+}
+
+:root[data-theme="light"] .ctl-option-grid :is(button, div).correct {
+  background: rgba(22, 128, 60, .12);
+  border-color: rgba(22, 128, 60, .46);
+  color: #075e2c;
+}
+
+:root[data-theme="light"] .ctl-option-grid :is(button, div).missed {
+  background: rgba(154, 103, 0, .12);
+  border-color: rgba(154, 103, 0, .5);
+  color: #7c5200;
+}
+
+:root[data-theme="light"] .ctl-option-grid :is(button, div).wrong {
+  background: rgba(180, 35, 24, .11);
+  border-color: rgba(180, 35, 24, .42);
+  color: #7a180f;
+}
+
+:root[data-theme="light"] .ctl-timer.is-low {
+  color: #9b2424;
+}
+
+:root[data-theme="light"] .ctl-team-badge,
+:root[data-theme="light"] .ctl-phase,
+:root[data-theme="light"] .ctl-discuss-note,
+:root[data-theme="light"] .ctl-target-copy,
+:root[data-theme="light"] .ctl-player-chip,
+:root[data-theme="light"] .ctl-question-meta span {
+  color: #244c82;
 }

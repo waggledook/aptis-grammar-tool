@@ -5,11 +5,15 @@ import { useParams } from "react-router-dom";
 import { auth, rtdb } from "../../../firebase.js";
 import { submitCollocationTeamAnswer } from "../../../api/liveGames.js";
 import { toast } from "../../../utils/toast.js";
+import CollocationFeedback from "./CollocationFeedback.jsx";
 import {
+  collocationTeamTotalPoints,
+  evaluateCollocationSelection,
   getCollocationTeamCaptain,
+  getCollocationLiveRound,
   getCorrectWords,
-  getNextUnansweredIndex,
 } from "./collocationTeamLive.js";
+import useCollocationRoundTimer from "./useCollocationRoundTimer.js";
 import "./CollocationTeamLive.css";
 
 function displayName(players, uid) {
@@ -36,26 +40,17 @@ export default function CollocationTeamLivePlayer() {
   const teamId = me?.teamId;
   const team = teamId ? game?.teams?.[teamId] : null;
   const items = game?.items || [];
-  const phase = game?.state?.phase || "lobby";
-  const reviewIndexes = game?.state?.reviewItemIndexes || [];
-  const mainAnswers = teamId ? game?.teamAnswers?.[teamId] || {} : {};
-  const reviewAnswers = teamId ? game?.reviewAnswers?.[teamId] || {} : {};
-  const mainPosition = getNextUnansweredIndex(mainAnswers, items.length);
-  const reviewPosition = reviewIndexes.findIndex((itemIndex) => !reviewAnswers?.[itemIndex]);
-  const activePosition = phase === "review"
-    ? items.length + (reviewPosition < 0 ? reviewIndexes.length : reviewPosition)
-    : mainPosition;
-  const activeItemIndex = phase === "review"
-    ? (reviewPosition < 0 ? null : reviewIndexes[reviewPosition])
-    : (mainPosition >= items.length ? null : mainPosition);
-  const currentItem = activeItemIndex == null ? null : items[activeItemIndex];
-  const captainUid = getCollocationTeamCaptain(team, activePosition);
+  const {
+    phase, isReview, isQuestion, isReveal,
+    index: roundIndex, itemIndex: currentItemIndex, item: currentItem, captainPosition,
+  } = getCollocationLiveRound(game);
+  const answersRoot = isReview ? game?.reviewAnswers : game?.teamAnswers;
+  const teamAnswer = teamId ? answersRoot?.[teamId]?.[currentItemIndex] : null;
+  const captainUid = getCollocationTeamCaptain(team, captainPosition);
   const isCaptain = !!uid && uid === captainUid;
   const correctTargetCount = getCorrectWords(currentItem).length;
-  const completedCount = phase === "review"
-    ? reviewIndexes.filter((itemIndex) => reviewAnswers?.[itemIndex]).length
-    : mainPosition;
-  const totalCount = phase === "review" ? reviewIndexes.length : items.length;
+  const feedbackResult = evaluateCollocationSelection(currentItem, teamAnswer?.selectedWords || []);
+  const remainingSeconds = useCollocationRoundTimer(game?.state?.questionDeadline, isQuestion);
   const teammates = useMemo(
     () => (team?.memberUids || []).map((memberUid) => ({
       uid: memberUid,
@@ -66,10 +61,10 @@ export default function CollocationTeamLivePlayer() {
 
   useEffect(() => {
     setSelectedWords([]);
-  }, [activeItemIndex, phase]);
+  }, [currentItemIndex, isReview]);
 
   function toggleWord(word) {
-    if (!isCaptain || submitting) return;
+    if (!isCaptain || submitting || teamAnswer || !isQuestion || remainingSeconds === 0) return;
     setSelectedWords((previous) => {
       if (previous.includes(word)) return previous.filter((entry) => entry !== word);
       if (previous.length >= correctTargetCount) {
@@ -81,7 +76,7 @@ export default function CollocationTeamLivePlayer() {
   }
 
   async function handleSubmit() {
-    if (!isCaptain || !currentItem || submitting) return;
+    if (!isCaptain || !currentItem || submitting || teamAnswer || !isQuestion) return;
     if (selectedWords.length !== correctTargetCount) {
       toast(`Choose ${correctTargetCount} words before submitting.`);
       return;
@@ -90,9 +85,9 @@ export default function CollocationTeamLivePlayer() {
     try {
       await submitCollocationTeamAnswer({
         gameId,
-        itemIndex: activeItemIndex,
+        itemIndex: currentItemIndex,
         selectedWords,
-        review: phase === "review",
+        review: isReview,
       });
     } catch (error) {
       console.error("[CollocationTeamLivePlayer] submit failed", error);
@@ -100,6 +95,15 @@ export default function CollocationTeamLivePlayer() {
     } finally {
       setSubmitting(false);
     }
+  }
+
+  function optionClass(option) {
+    const chosenWords = isReveal ? teamAnswer?.selectedWords || [] : teamAnswer?.selectedWords || selectedWords;
+    if (!isReveal) return chosenWords.includes(option.word) ? "selected" : "";
+    if (option.isCorrect && chosenWords.includes(option.word)) return "correct";
+    if (option.isCorrect) return "missed";
+    if (chosenWords.includes(option.word)) return "wrong";
+    return "quiet";
   }
 
   if (loading) return <main className="ctl-page"><p>Joining the team room…</p></main>;
@@ -113,18 +117,20 @@ export default function CollocationTeamLivePlayer() {
           <h1>{game.title}</h1>
           <p>PIN {game.pin}</p>
         </div>
-        {team && <span className="ctl-team-badge">{team.name}</span>}
+        {team && <span className="ctl-team-badge">{team.name} · {collocationTeamTotalPoints(game, teamId)} pts</span>}
       </header>
+
+      {(phase === "play" || phase === "review") && (
+        <section className="ctl-panel">
+          <h2>This room uses the previous game format</h2>
+          <p>Ask your teacher to create a new room to use timed sets and immediate feedback.</p>
+        </section>
+      )}
 
       {phase === "lobby" && (
         <section className="ctl-panel ctl-player-lobby">
           {!me && <p>Your place in the lobby is being confirmed…</p>}
-          {me && !team && (
-            <>
-              <span className="ctl-label">You’re in</span>
-              <h2>Waiting for your teacher to create the teams</h2>
-            </>
-          )}
+          {me && !team && <><span className="ctl-label">You’re in</span><h2>Waiting for your teacher to create the teams</h2></>}
           {team && (
             <>
               <span className="ctl-label">Your team</span>
@@ -142,97 +148,69 @@ export default function CollocationTeamLivePlayer() {
         </section>
       )}
 
-      {(phase === "play" || phase === "review") && team && (
+      {(isQuestion || isReveal) && team && currentItem && (
         <>
           <section className="ctl-round-status">
             <div>
-              <span className="ctl-label">{phase === "review" ? "Most-missed review" : "Team round"}</span>
-              <strong>{completedCount} / {totalCount} complete</strong>
+              <span className="ctl-label">{isReview ? `Review set ${roundIndex + 1} of ${game.state.reviewItemIndexes.length}` : `Set ${roundIndex + 1} of ${items.length}`}</span>
+              <strong>{isReveal ? `${feedbackResult.percentage}% · ${feedbackResult.points} points this set` : teamAnswer ? "Answer locked" : "Choose together"}</strong>
             </div>
-            <div className={isCaptain ? "ctl-captain-banner is-you" : "ctl-captain-banner"}>
-              <span>Captain</span>
-              <strong>{isCaptain ? "You" : displayName(game.players, captainUid)}</strong>
-            </div>
+            {isQuestion ? (
+              <div className={`ctl-timer ${remainingSeconds != null && remainingSeconds <= 10 ? "is-low" : ""}`}>
+                <span>Time left</span><strong>{remainingSeconds ?? 45}</strong>
+              </div>
+            ) : (
+              <div className="ctl-captain-banner"><span>Next step</span><strong>Teacher starts the next set</strong></div>
+            )}
           </section>
 
-          {currentItem ? (
-            <section className="ctl-question-card">
-              <div className="ctl-question-meta">
-                <span>{currentItem.level?.toUpperCase()}</span>
-                <span>{currentItem.topic}</span>
-                <span>{currentItem.pattern}</span>
-              </div>
-              <p className="ctl-question-copy">{currentItem.question}</p>
-              <p className="ctl-target-copy">
-                Choose {correctTargetCount} target collocations. Selected: {selectedWords.length} / {correctTargetCount}
-              </p>
-              <h2>{currentItem.prompt}</h2>
-              <div className="ctl-option-grid">
-                {(currentItem.options || []).map((option) => (
-                  <button
-                    key={option.word}
-                    type="button"
-                    className={selectedWords.includes(option.word) ? "selected" : ""}
-                    onClick={() => toggleWord(option.word)}
-                    disabled={!isCaptain || submitting}
-                  >
-                    {option.word}
-                  </button>
-                ))}
-              </div>
-              {isCaptain ? (
-                <button className="ctl-button ctl-button-primary ctl-submit" type="button" onClick={handleSubmit} disabled={submitting || selectedWords.length !== correctTargetCount}>
-                  {submitting ? "Submitting…" : "Submit team answer"}
+          <section className="ctl-question-card">
+            <div className="ctl-question-meta">
+              <span>{currentItem.level?.toUpperCase()}</span><span>{currentItem.topic}</span><span>{currentItem.pattern}</span>
+            </div>
+            <p className="ctl-question-copy">{currentItem.question}</p>
+            <p className="ctl-target-copy">Choose {correctTargetCount} target collocations.</p>
+            <h2>{currentItem.prompt}</h2>
+            <div className="ctl-option-grid">
+              {(currentItem.options || []).map((option) => (
+                <button
+                  key={option.word}
+                  type="button"
+                  className={optionClass(option)}
+                  onClick={() => toggleWord(option.word)}
+                  disabled={!isQuestion || !isCaptain || submitting || !!teamAnswer || remainingSeconds === 0}
+                >
+                  {option.word}
                 </button>
-              ) : (
-                <p className="ctl-discuss-note">Discuss the choices. Only the current captain submits the team answer.</p>
-              )}
-            </section>
-          ) : (
-            <section className="ctl-panel ctl-wait-card">
-              <span className="ctl-label">Your team is finished</span>
-              <h2>Wait for the other teams</h2>
-              <p>The teacher will start the next phase when everyone is ready.</p>
-            </section>
-          )}
+              ))}
+            </div>
+
+            {isQuestion && isCaptain && !teamAnswer && (
+              <button className="ctl-button ctl-button-primary ctl-submit" type="button" onClick={handleSubmit} disabled={submitting || selectedWords.length !== correctTargetCount || remainingSeconds === 0}>
+                {submitting ? "Submitting…" : `Submit team answer (${selectedWords.length}/${correctTargetCount})`}
+              </button>
+            )}
+            {isQuestion && !isCaptain && !teamAnswer && <p className="ctl-discuss-note">Discuss the choices. {displayName(game.players, captainUid)} is this set’s captain.</p>}
+            {isQuestion && teamAnswer && <p className="ctl-discuss-note ctl-answer-locked">Answer locked — waiting for the reveal.</p>}
+            {isQuestion && remainingSeconds === 0 && !teamAnswer && <p className="ctl-discuss-note">Time is up. No answer was submitted for this set.</p>}
+            {isReveal && !teamAnswer && <p className="ctl-discuss-note">No answer was submitted. This set earns 0 points.</p>}
+            {isReveal && <CollocationFeedback item={currentItem} result={feedbackResult} />}
+          </section>
         </>
       )}
 
-      {(phase === "play" || phase === "review") && !team && (
-        <section className="ctl-panel"><h2>You have not been assigned to a team.</h2><p>Ask your teacher to return to the lobby setup.</p></section>
+      {(isQuestion || isReveal) && !team && (
+        <section className="ctl-panel"><h2>You have not been assigned to a team.</h2><p>Ask your teacher to create the teams again.</p></section>
       )}
 
       {phase === "finished" && (
-        <section className="ctl-panel">
+        <section className="ctl-panel ctl-player-lobby">
           <span className="ctl-label">Game complete</span>
           <h2>{team?.name || "Your team"}</h2>
-          {team && (
-            <div className="ctl-personal-result">
-              <strong>{Object.values(mainAnswers).filter((answer) => answer.isPerfect).length}/{items.length}</strong>
-              <span>sets perfect first time</span>
-              {!!reviewIndexes.length && <p>{Object.values(reviewAnswers).filter((answer) => answer.isPerfect).length}/{reviewIndexes.length} perfect in the review</p>}
-            </div>
-          )}
-          {!!reviewIndexes.length && (
-            <div className="ctl-answer-review">
-              <h3>Review answers</h3>
-              {reviewIndexes.map((itemIndex) => {
-                const item = items[itemIndex];
-                return (
-                  <article key={itemIndex}>
-                    <h4>{item?.prompt}</h4>
-                    {(item?.options || []).filter((option) => option.isCorrect).map((option) => (
-                      <div className="ctl-revealed-collocation" key={option.word}>
-                        <strong>{option.collocation}</strong>
-                        <p>{option.definition}</p>
-                        {option.example && <blockquote>“{option.example}”</blockquote>}
-                      </div>
-                    ))}
-                  </article>
-                );
-              })}
-            </div>
-          )}
+          <div className="ctl-personal-result">
+            <strong>{team ? collocationTeamTotalPoints(game, teamId) : 0}</strong>
+            <span>total points</span>
+          </div>
         </section>
       )}
     </main>

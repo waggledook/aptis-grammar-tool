@@ -92,10 +92,11 @@ import {
 } from "../reading/readingPart4TaskBanks.js";
 import {
   COLLOCATION_TEAM_GAME_TYPE,
+  COLLOCATION_TEAM_ROUND_SECONDS,
+  createCollocationRoundState,
   evaluateCollocationSelection,
   getCollocationTeamCaptain,
   getCorrectWords,
-  getNextUnansweredIndex,
 } from "../components/vocabulary/collocations/collocationTeamLive.js";
 
 const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
@@ -250,6 +251,10 @@ export async function createCollocationTeamLiveGame({ items, title } = {}) {
       phase: "lobby",
       teamCount: 2,
       teamsLocked: false,
+      questionIndex: 0,
+      reviewIndex: 0,
+      questionDuration: COLLOCATION_TEAM_ROUND_SECONDS,
+      questionDeadline: null,
       reviewItemIndexes: [],
     },
   });
@@ -386,32 +391,78 @@ export async function setCollocationLiveTeamsLocked(gameId, teamsLocked) {
 }
 
 export async function startCollocationTeamLiveGame(gameId) {
-  const user = auth.currentUser;
-  if (!user) throw new Error("You must be signed in to start the game.");
+  const { game, serverNow } = await getOwnedCollocationLiveGame(gameId);
+  if (game.status !== "lobby" || !game.state?.teamsLocked) {
+    throw new Error("Lock the teams in the lobby before starting.");
+  }
+  const roundState = createCollocationRoundState(game, 0, false, serverNow);
+  const stateUpdates = Object.fromEntries(Object.entries(roundState).map(([key, value]) => [`state/${key}`, value]));
   await update(ref(rtdb, `liveGames/${gameId}`), {
     status: "in-progress",
-    "state/phase": "play",
-    "state/startedAt": Date.now(),
+    ...stateUpdates,
+    "state/startedAt": serverNow,
   });
 }
 
 export async function startCollocationTeamReview(gameId, reviewItemIndexes) {
-  const user = auth.currentUser;
-  if (!user) throw new Error("You must be signed in to start the review.");
+  const { game, serverNow } = await getOwnedCollocationLiveGame(gameId);
+  if (game.status !== "in-progress" || game.state?.phase !== "reveal" || game.state?.questionIndex !== game.items.length - 1) {
+    throw new Error("Finish the main sets before starting the review.");
+  }
+  const reviewGame = { ...game, state: { ...game.state, reviewItemIndexes } };
   await update(ref(rtdb, `liveGames/${gameId}/state`), {
-    phase: "review",
+    ...createCollocationRoundState(reviewGame, 0, true, serverNow),
     reviewItemIndexes,
-    reviewStartedAt: Date.now(),
+    reviewStartedAt: serverNow,
   });
 }
 
-export async function finishCollocationTeamLiveGame(gameId) {
+async function getOwnedCollocationLiveGame(gameId) {
   const user = auth.currentUser;
-  if (!user) throw new Error("You must be signed in to finish the game.");
+  if (!user) throw new Error("You must be signed in to control the game.");
+  const [snapshot, offset] = await Promise.all([
+    get(ref(rtdb, `liveGames/${gameId}`)),
+    get(ref(rtdb, ".info/serverTimeOffset")),
+  ]);
+  const game = snapshot.val();
+  if (!game || game.type !== COLLOCATION_TEAM_GAME_TYPE || game.ownerUid !== user.uid) {
+    throw new Error("Only the host can control this game.");
+  }
+  return { game, serverNow: Date.now() + (Number(offset.val()) || 0) };
+}
+
+export async function revealCollocationTeamRound(gameId, review = false, expectedDeadline, expectedIndex) {
+  const { serverNow } = await getOwnedCollocationLiveGame(gameId);
+  await runTransaction(ref(rtdb, `liveGames/${gameId}/state`), (current) => {
+    if (!current || current.phase !== (review ? "review-question" : "question")) return;
+    // A delayed reveal from an earlier set must never close the next one.
+    if (expectedDeadline != null && current.questionDeadline !== expectedDeadline) return;
+    if (expectedIndex != null && current[review ? "reviewIndex" : "questionIndex"] !== expectedIndex) return;
+    return {
+      ...current,
+      phase: review ? "review-reveal" : "reveal",
+      questionDeadline: null,
+      revealedAt: serverNow,
+    };
+  }, { applyLocally: false });
+}
+
+export async function startNextCollocationTeamRound({ gameId, index, review = false }) {
+  const { game, serverNow } = await getOwnedCollocationLiveGame(gameId);
+  const indexKey = review ? "reviewIndex" : "questionIndex";
+  if (game.status !== "in-progress" || game.state?.phase !== (review ? "review-reveal" : "reveal") || index !== game.state[indexKey] + 1) {
+    throw new Error("Reveal this set before starting the next one.");
+  }
+  await update(ref(rtdb, `liveGames/${gameId}/state`), createCollocationRoundState(game, index, review, serverNow));
+}
+
+export async function finishCollocationTeamLiveGame(gameId) {
+  const { serverNow } = await getOwnedCollocationLiveGame(gameId);
   await update(ref(rtdb, `liveGames/${gameId}`), {
     status: "finished",
     "state/phase": "finished",
-    "state/finishedAt": Date.now(),
+    "state/questionDeadline": null,
+    "state/finishedAt": serverNow,
   });
 }
 
@@ -419,12 +470,15 @@ export async function submitCollocationTeamAnswer({ gameId, itemIndex, selectedW
   const user = auth.currentUser;
   if (!user) throw new Error("You must be signed in to submit an answer.");
 
-  const gameSnap = await get(ref(rtdb, `liveGames/${gameId}`));
+  const [gameSnap, offset] = await Promise.all([
+    get(ref(rtdb, `liveGames/${gameId}`)),
+    get(ref(rtdb, ".info/serverTimeOffset")),
+  ]);
   if (!gameSnap.exists()) throw new Error("This live game is no longer available.");
   const game = gameSnap.val();
   const teamId = game.players?.[user.uid]?.teamId;
   const team = game.teams?.[teamId];
-  const expectedPhase = review ? "review" : "play";
+  const expectedPhase = review ? "review-question" : "question";
   if (!teamId) throw new Error("Your teacher has not assigned you to a team yet.");
   if (game.status !== "in-progress" || game.state?.phase !== expectedPhase) {
     throw new Error("This part of the game is not accepting answers.");
@@ -433,16 +487,17 @@ export async function submitCollocationTeamAnswer({ gameId, itemIndex, selectedW
   const item = game.items?.[itemIndex];
   if (!item) throw new Error("That collocation set could not be found.");
   const reviewIndexes = game.state?.reviewItemIndexes || [];
-  const teamAnswerMap = game.teamAnswers?.[teamId] || {};
-  const teamReviewMap = game.reviewAnswers?.[teamId] || {};
-  const reviewPosition = reviewIndexes.findIndex((index) => !teamReviewMap?.[index]);
   const expectedItemIndex = review
-    ? reviewIndexes[reviewPosition]
-    : getNextUnansweredIndex(teamAnswerMap, game.items?.length || 0);
+    ? reviewIndexes[game.state?.reviewIndex || 0]
+    : game.state?.questionIndex || 0;
   const captainPosition = review
-    ? (game.items?.length || 0) + reviewPosition
+    ? (game.items?.length || 0) + (game.state?.reviewIndex || 0)
     : expectedItemIndex;
   if (itemIndex !== expectedItemIndex) throw new Error("Your team has already moved to another set.");
+  const serverNow = Date.now() + (Number(offset.val()) || 0);
+  if (!game.state?.questionDeadline || serverNow >= game.state.questionDeadline) {
+    throw new Error("Time is up for this set.");
+  }
   if (getCollocationTeamCaptain(team, captainPosition) !== user.uid) {
     throw new Error("Only the current team captain can submit this answer.");
   }
@@ -457,10 +512,11 @@ export async function submitCollocationTeamAnswer({ gameId, itemIndex, selectedW
   }
   const evaluation = evaluateCollocationSelection(item, uniqueSelectedWords);
   const answerRoot = review ? "reviewAnswers" : "teamAnswers";
+  if (game[answerRoot]?.[teamId]?.[itemIndex]) throw new Error("Your team answer is already locked.");
   await set(ref(rtdb, `liveGames/${gameId}/${answerRoot}/${teamId}/${itemIndex}`), {
     ...evaluation,
     submittedBy: user.uid,
-    submittedAt: Date.now(),
+    submittedAt: serverNow,
   });
 }
 

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { onValue, ref } from "firebase/database";
 import { QRCodeSVG } from "qrcode.react";
 import { useParams } from "react-router-dom";
@@ -7,26 +7,29 @@ import { auth, rtdb } from "../../../firebase.js";
 import {
   configureCollocationLiveTeams,
   finishCollocationTeamLiveGame,
+  revealCollocationTeamRound,
   setCollocationLiveTeamsLocked,
   startCollocationTeamLiveGame,
   startCollocationTeamReview,
+  startNextCollocationTeamRound,
   updateCollocationLiveTeam,
 } from "../../../api/liveGames.js";
 import { toast } from "../../../utils/toast.js";
 import { getSitePath } from "../../../siteConfig.js";
+import CollocationFeedback from "./CollocationFeedback.jsx";
 import {
   buildBalancedCollocationTeams,
   buildCollocationReviewIndexes,
+  collocationTeamTotalPoints,
+  evaluateCollocationSelection,
   getCollocationTeamCaptain,
+  getCollocationLiveRound,
 } from "./collocationTeamLive.js";
+import useCollocationRoundTimer from "./useCollocationRoundTimer.js";
 import "./CollocationTeamLive.css";
 
 function playerName(playersById, uid) {
   return playersById[uid]?.name || "Player";
-}
-
-function answerCount(answerMap) {
-  return Object.keys(answerMap || {}).length;
 }
 
 export default function CollocationTeamLiveHost() {
@@ -36,6 +39,8 @@ export default function CollocationTeamLiveHost() {
   const [teamCount, setTeamCount] = useState(2);
   const [busy, setBusy] = useState(false);
   const [copyState, setCopyState] = useState("");
+  const [feedbackTeamId, setFeedbackTeamId] = useState("");
+  const autoRevealKeyRef = useRef("");
 
   useEffect(() => {
     const unsubscribe = onValue(ref(rtdb, `liveGames/${gameId}`), (snapshot) => {
@@ -59,18 +64,32 @@ export default function CollocationTeamLiveHost() {
   const teams = game?.teams || {};
   const teamEntries = Object.entries(teams);
   const items = game?.items || [];
-  const phase = game?.state?.phase || "lobby";
+  const {
+    phase, isReview, isQuestion, isReveal,
+    index: roundIndex, itemIndex: currentItemIndex, item: currentItem,
+  } = getCollocationLiveRound(game);
   const teamsLocked = !!game?.state?.teamsLocked;
   const reviewIndexes = game?.state?.reviewItemIndexes || [];
+  const answersRoot = isReview ? game?.reviewAnswers : game?.teamAnswers;
   const isHost = auth.currentUser?.uid === game?.ownerUid;
   const unassignedPlayers = players.filter((player) => !player.teamId || !teams[player.teamId]);
   const activeTeams = teamEntries.filter(([, team]) => (team.memberUids || []).length > 0);
-  const allMainComplete = activeTeams.length > 0 && activeTeams.every(([teamId]) => (
-    answerCount(game?.teamAnswers?.[teamId]) >= items.length
-  ));
-  const allReviewComplete = activeTeams.length > 0 && reviewIndexes.length > 0 && activeTeams.every(([teamId]) => (
-    reviewIndexes.every((itemIndex) => game?.reviewAnswers?.[teamId]?.[itemIndex])
-  ));
+  const answeredTeams = activeTeams.filter(([teamId]) => answersRoot?.[teamId]?.[currentItemIndex]);
+  const allTeamsAnswered = activeTeams.length > 0 && answeredTeams.length === activeTeams.length;
+  const deadline = game?.state?.questionDeadline;
+  const remainingSeconds = useCollocationRoundTimer(deadline, isQuestion);
+
+  useEffect(() => {
+    if (!isHost || !isQuestion || (!allTeamsAnswered && remainingSeconds !== 0)) return;
+    const key = `${gameId}:${phase}:${currentItemIndex}:${deadline}`;
+    if (autoRevealKeyRef.current === key) return;
+    autoRevealKeyRef.current = key;
+    revealCollocationTeamRound(gameId, isReview, deadline, roundIndex).catch((error) => {
+      autoRevealKeyRef.current = "";
+      console.error("[CollocationTeamLiveHost] automatic reveal failed", error);
+      toast("Could not reveal this set automatically.");
+    });
+  }, [allTeamsAnswered, currentItemIndex, deadline, gameId, isHost, isQuestion, isReview, phase, remainingSeconds, roundIndex]);
 
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
   const joinPath = getSitePath(`/live/join?pin=${encodeURIComponent(game?.pin || "")}`);
@@ -122,10 +141,7 @@ export default function CollocationTeamLiveHost() {
       memberUids: (team.memberUids || []).filter((memberUid) => memberUid !== uid),
     }]));
     if (destinationTeamId && nextTeams[destinationTeamId]) {
-      nextTeams[destinationTeamId].memberUids = [
-        ...(nextTeams[destinationTeamId].memberUids || []),
-        uid,
-      ];
+      nextTeams[destinationTeamId].memberUids = [...(nextTeams[destinationTeamId].memberUids || []), uid];
     }
     runAction(
       () => configureCollocationLiveTeams({
@@ -169,16 +185,40 @@ export default function CollocationTeamLiveHost() {
   }
 
   function handleStartReview() {
-    const indexes = buildCollocationReviewIndexes(items, game?.teamAnswers);
+    const indexes = buildCollocationReviewIndexes(
+      items,
+      game?.teamAnswers,
+      undefined,
+      activeTeams.map(([teamId]) => teamId)
+    );
     if (!indexes.length) {
-      toast("Every submitted set was perfect, so there is nothing to retest.");
+      toast("Every team was perfect, so there is nothing to retest.");
       runAction(() => finishCollocationTeamLiveGame(gameId), "Could not finish the game.");
       return;
     }
-    runAction(
-      () => startCollocationTeamReview(gameId, indexes),
-      "Could not start the review."
-    );
+    runAction(() => startCollocationTeamReview(gameId, indexes), "Could not start the review.");
+  }
+
+  function handleNextRound() {
+    if (isReview) {
+      if (roundIndex >= reviewIndexes.length - 1) {
+        runAction(() => finishCollocationTeamLiveGame(gameId), "Could not finish the game.");
+      } else {
+        runAction(
+          () => startNextCollocationTeamRound({ gameId, index: roundIndex + 1, review: true }),
+          "Could not start the next review set."
+        );
+      }
+      return;
+    }
+    if (roundIndex >= items.length - 1) {
+      handleStartReview();
+    } else {
+      runAction(
+        () => startNextCollocationTeamRound({ gameId, index: roundIndex + 1 }),
+        "Could not start the next set."
+      );
+    }
   }
 
   async function handleCopy() {
@@ -195,16 +235,34 @@ export default function CollocationTeamLiveHost() {
   if (!game) return <div className="ctl-page"><h1>Collocation Team Challenge</h1><p>Game not found.</p></div>;
   if (!isHost) return <div className="ctl-page"><h1>Collocation Team Challenge</h1><p>You are not the host of this game.</p></div>;
 
+  const phaseLabel = phase === "question"
+    ? `Set ${roundIndex + 1} of ${items.length}`
+    : phase === "reveal"
+      ? `Set ${roundIndex + 1} feedback`
+      : phase === "review-question"
+        ? `Review ${roundIndex + 1} of ${reviewIndexes.length}`
+        : phase === "review-reveal"
+          ? `Review ${roundIndex + 1} feedback`
+          : phase;
+
   return (
     <main className="ctl-page ctl-host">
       <header className="ctl-hero">
         <div>
           <p className="ctl-kicker">Live team game</p>
           <h1>{game.title}</h1>
-          <p>{items.length} collocation sets · captains rotate every 3 sets</p>
+          <p>{items.length} collocation sets · 45 seconds per set · captains rotate every 3 sets</p>
         </div>
-        <span className={`ctl-phase ctl-phase-${phase}`}>{phase === "play" ? "Team round" : phase}</span>
+        <span className={`ctl-phase ctl-phase-${phase}`}>{phaseLabel}</span>
       </header>
+
+      {(phase === "play" || phase === "review") && (
+        <section className="ctl-panel">
+          <h2>Start a new room for timed sets</h2>
+          <p>This room was started with the previous game format. New rooms use the 45-second rounds and immediate feedback.</p>
+          <a className="ctl-button" href={getSitePath("/vocabulary/collocations/trainer")}>Open Collocation Trainer</a>
+        </section>
+      )}
 
       {phase === "lobby" && (
         <>
@@ -212,9 +270,7 @@ export default function CollocationTeamLiveHost() {
             <div>
               <span className="ctl-label">Game PIN</span>
               <strong className="ctl-pin">{game.pin}</strong>
-              <button className="ctl-button ctl-button-secondary" type="button" onClick={handleCopy}>
-                Copy join link
-              </button>
+              <button className="ctl-button ctl-button-secondary" type="button" onClick={handleCopy}>Copy join link</button>
               {copyState && <span className="ctl-small">{copyState}</span>}
             </div>
             <QRCodeSVG value={joinUrl} size={112} bgColor="#ffffff" fgColor="#10213c" />
@@ -222,21 +278,12 @@ export default function CollocationTeamLiveHost() {
 
           <section className="ctl-panel">
             <div className="ctl-panel-heading">
-              <div>
-                <span className="ctl-label">Lobby</span>
-                <h2>{players.length} student{players.length === 1 ? "" : "s"} joined</h2>
-              </div>
+              <div><span className="ctl-label">Lobby</span><h2>{players.length} student{players.length === 1 ? "" : "s"} joined</h2></div>
               {!teamsLocked && (
                 <div className="ctl-team-controls">
                   <label>
                     Teams
-                    <input
-                      type="number"
-                      min="1"
-                      max={Math.max(1, players.length)}
-                      value={teamCount}
-                      onChange={(event) => setTeamCount(Math.max(1, Number(event.target.value) || 1))}
-                    />
+                    <input type="number" min="1" max={Math.max(1, players.length)} value={teamCount} onChange={(event) => setTeamCount(Math.max(1, Number(event.target.value) || 1))} />
                   </label>
                   <button className="ctl-button" type="button" onClick={handleRandomise} disabled={busy || !players.length}>
                     {teamEntries.length ? "Randomise again" : "Create teams"}
@@ -249,9 +296,7 @@ export default function CollocationTeamLiveHost() {
               <div className="ctl-waiting">
                 <strong>Waiting for a team</strong>
                 <div className="ctl-player-list">
-                  {unassignedPlayers.map((player) => (
-                    <span key={player.uid} className="ctl-player-chip">{player.name}</span>
-                  ))}
+                  {unassignedPlayers.map((player) => <span key={player.uid} className="ctl-player-chip">{player.name}</span>)}
                 </div>
               </div>
             )}
@@ -275,9 +320,7 @@ export default function CollocationTeamLiveHost() {
                           <span>{playerName(playersById, uid)}</span>
                           {!teamsLocked && (
                             <select value={teamId} onChange={(event) => handleMovePlayer(uid, event.target.value)}>
-                              {teamEntries.map(([optionId, optionTeam]) => (
-                                <option key={optionId} value={optionId}>{optionTeam.name || optionId}</option>
-                              ))}
+                              {teamEntries.map(([optionId, optionTeam]) => <option key={optionId} value={optionId}>{optionTeam.name || optionId}</option>)}
                               <option value="">Unassigned</option>
                             </select>
                           )}
@@ -288,15 +331,9 @@ export default function CollocationTeamLiveHost() {
                     {!!(team.memberUids || []).length && (
                       <label className="ctl-captain-select">
                         Captain
-                        <select
-                          value={team.captainOverrideUid || ""}
-                          disabled={teamsLocked}
-                          onChange={(event) => handleTeamChange(teamId, { captainOverrideUid: event.target.value })}
-                        >
+                        <select value={team.captainOverrideUid || ""} disabled={teamsLocked} onChange={(event) => handleTeamChange(teamId, { captainOverrideUid: event.target.value })}>
                           <option value="">Rotate automatically</option>
-                          {(team.memberUids || []).map((uid) => (
-                            <option key={uid} value={uid}>{playerName(playersById, uid)}</option>
-                          ))}
+                          {(team.memberUids || []).map((uid) => <option key={uid} value={uid}>{playerName(playersById, uid)}</option>)}
                         </select>
                       </label>
                     )}
@@ -306,25 +343,11 @@ export default function CollocationTeamLiveHost() {
             )}
 
             <div className="ctl-actions">
-              {!!teamEntries.length && !teamsLocked && (
-                <button className="ctl-button" type="button" onClick={handleLock} disabled={busy}>Lock teams</button>
-              )}
+              {!!teamEntries.length && !teamsLocked && <button className="ctl-button" type="button" onClick={handleLock} disabled={busy}>Lock teams</button>}
               {teamsLocked && (
                 <>
-                  <button
-                    className="ctl-button ctl-button-secondary"
-                    type="button"
-                    onClick={() => runAction(
-                      () => setCollocationLiveTeamsLocked(gameId, false),
-                      "Could not unlock the teams."
-                    )}
-                    disabled={busy}
-                  >
-                    Unlock teams
-                  </button>
-                  <button className="ctl-button ctl-button-primary" type="button" onClick={handleStart} disabled={busy}>
-                    Start team round
-                  </button>
+                  <button className="ctl-button ctl-button-secondary" type="button" onClick={() => runAction(() => setCollocationLiveTeamsLocked(gameId, false), "Could not unlock the teams.")} disabled={busy}>Unlock teams</button>
+                  <button className="ctl-button ctl-button-primary" type="button" onClick={handleStart} disabled={busy}>Start first set</button>
                 </>
               )}
             </div>
@@ -332,84 +355,111 @@ export default function CollocationTeamLiveHost() {
         </>
       )}
 
-      {phase === "play" && (
-        <section className="ctl-panel">
-          <div className="ctl-panel-heading">
-            <div><span className="ctl-label">Team round</span><h2>Teams work through all {items.length} sets</h2></div>
-            <button className="ctl-button ctl-button-primary" type="button" onClick={handleStartReview} disabled={busy || !allMainComplete}>
-              Start most-missed review
-            </button>
-          </div>
-          {!allMainComplete && <p className="ctl-muted">The review becomes available when every team finishes.</p>}
-          <div className="ctl-progress-grid">
-            {activeTeams.map(([teamId, team]) => {
-              const completed = answerCount(game?.teamAnswers?.[teamId]);
-              const captainUid = getCollocationTeamCaptain(team, Math.min(completed, items.length - 1));
-              return (
-                <article className="ctl-progress-card" key={teamId}>
-                  <strong>{team.name}</strong>
-                  <span>{completed} / {items.length}</span>
-                  <div className="ctl-progress-track"><i style={{ width: `${(completed / items.length) * 100}%` }} /></div>
-                  <small>{completed >= items.length ? "Finished" : `Captain: ${playerName(playersById, captainUid)}`}</small>
-                </article>
-              );
-            })}
-          </div>
-        </section>
-      )}
+      {(isQuestion || isReveal) && currentItem && (
+        <>
+          <section className="ctl-round-status">
+            <div>
+              <span className="ctl-label">{isReview ? "Most-missed review" : "Team round"}</span>
+              <strong>{answeredTeams.length} / {activeTeams.length} teams answered</strong>
+            </div>
+            {isQuestion ? (
+              <div className={`ctl-timer ${remainingSeconds != null && remainingSeconds <= 10 ? "is-low" : ""}`}>
+                <span>Time left</span><strong>{remainingSeconds ?? 45}</strong>
+              </div>
+            ) : (
+              <button className="ctl-button ctl-button-primary" type="button" onClick={handleNextRound} disabled={busy}>
+                {isReview && roundIndex >= reviewIndexes.length - 1
+                  ? "Finish game"
+                  : !isReview && roundIndex >= items.length - 1
+                    ? "Start most-missed review"
+                    : "Start next set"}
+              </button>
+            )}
+          </section>
 
-      {phase === "review" && (
-        <section className="ctl-panel">
-          <div className="ctl-panel-heading">
-            <div><span className="ctl-label">Most-missed review</span><h2>{reviewIndexes.length} sets selected automatically</h2></div>
-            <button className="ctl-button ctl-button-primary" type="button" onClick={() => runAction(() => finishCollocationTeamLiveGame(gameId), "Could not finish the game.")} disabled={busy || !allReviewComplete}>
-              Finish and reveal
-            </button>
-          </div>
-          <div className="ctl-progress-grid">
-            {activeTeams.map(([teamId, team]) => {
-              const completed = reviewIndexes.filter((itemIndex) => game?.reviewAnswers?.[teamId]?.[itemIndex]).length;
-              return (
-                <article className="ctl-progress-card" key={teamId}>
-                  <strong>{team.name}</strong>
-                  <span>{completed} / {reviewIndexes.length}</span>
-                  <div className="ctl-progress-track"><i style={{ width: `${(completed / reviewIndexes.length) * 100}%` }} /></div>
-                </article>
-              );
-            })}
-          </div>
-        </section>
+          <section className="ctl-question-card">
+            <div className="ctl-question-meta">
+              <span>{currentItem.level?.toUpperCase()}</span><span>{currentItem.topic}</span><span>{currentItem.pattern}</span>
+            </div>
+            <p className="ctl-question-copy">{currentItem.question}</p>
+            <h2>{currentItem.prompt}</h2>
+            <div className="ctl-option-grid ctl-option-grid-display">
+              {(currentItem.options || []).map((option) => {
+                const selections = feedbackTeamId ? answersRoot?.[feedbackTeamId]?.[currentItemIndex]?.selectedWords || [] : [];
+                const status = !isReveal ? "" : option.isCorrect
+                  ? !feedbackTeamId || selections.includes(option.word) ? "correct" : "missed"
+                  : selections.includes(option.word) ? "wrong" : "quiet";
+                return <div key={option.word} className={status}>{option.word}</div>;
+              })}
+            </div>
+            {isReveal && (
+              <>
+                <label className="ctl-feedback-team">
+                  Show feedback for
+                  <select value={feedbackTeamId} onChange={(event) => setFeedbackTeamId(event.target.value)}>
+                    <option value="">Class answer key</option>
+                    {activeTeams.map(([teamId, team]) => <option key={teamId} value={teamId}>{team.name}</option>)}
+                  </select>
+                </label>
+                <CollocationFeedback
+                  item={currentItem}
+                  answerKey={!feedbackTeamId}
+                  result={evaluateCollocationSelection(currentItem, answersRoot?.[feedbackTeamId]?.[currentItemIndex]?.selectedWords || [])}
+                />
+              </>
+            )}
+          </section>
+
+          <section className="ctl-panel">
+            <div className="ctl-panel-heading"><div><span className="ctl-label">Scoreboard</span><h2>{isReveal ? "Round points" : "Live progress"}</h2></div></div>
+            <div className="ctl-progress-grid">
+              {[...activeTeams]
+                .sort(([teamA], [teamB]) => collocationTeamTotalPoints(game, teamB) - collocationTeamTotalPoints(game, teamA))
+                .map(([teamId, team]) => {
+                  const answer = answersRoot?.[teamId]?.[currentItemIndex];
+                  const result = evaluateCollocationSelection(currentItem, answer?.selectedWords || []);
+                  const captainUid = getCollocationTeamCaptain(team, isReview ? items.length + roundIndex : roundIndex);
+                  return (
+                    <article className="ctl-progress-card ctl-score-card" key={teamId}>
+                      <strong>{team.name}</strong>
+                      <span>{collocationTeamTotalPoints(game, teamId)} pts</span>
+                      <div className="ctl-progress-track"><i style={{ width: `${isReveal ? result.percentage : answer ? 100 : 0}%` }} /></div>
+                      <small>
+                        {isReveal
+                          ? `${result.score}/${result.possibleScore} correct · ${result.percentage}% · +${result.points} pts${answer ? "" : " (no answer)"}`
+                          : answer
+                            ? "Answer locked"
+                            : `Captain: ${playerName(playersById, captainUid)}`}
+                      </small>
+                    </article>
+                  );
+                })}
+            </div>
+            {isQuestion && (
+              <div className="ctl-actions">
+                <button className="ctl-button ctl-button-secondary" type="button" onClick={() => runAction(() => revealCollocationTeamRound(gameId, isReview, deadline, roundIndex), "Could not reveal this set.")} disabled={busy}>Reveal now</button>
+              </div>
+            )}
+          </section>
+        </>
       )}
 
       {phase === "finished" && (
         <section className="ctl-panel">
           <span className="ctl-label">Complete</span>
-          <h2>Team results</h2>
+          <h2>Final team scores</h2>
           <div className="ctl-results-grid">
-            {activeTeams.map(([teamId, team]) => {
-              const mainAnswers = Object.values(game?.teamAnswers?.[teamId] || {});
-              const reviewAnswers = Object.values(game?.reviewAnswers?.[teamId] || {});
-              return (
+            {[...activeTeams]
+              .sort(([teamA], [teamB]) => collocationTeamTotalPoints(game, teamB) - collocationTeamTotalPoints(game, teamA))
+              .map(([teamId, team], index) => (
                 <article className="ctl-result-card" key={teamId}>
+                  <span>#{index + 1}</span>
                   <h3>{team.name}</h3>
-                  <strong>{mainAnswers.filter((answer) => answer.isPerfect).length}/{items.length}</strong>
-                  <span>perfect first time</span>
-                  {!!reviewIndexes.length && <p>{reviewAnswers.filter((answer) => answer.isPerfect).length}/{reviewIndexes.length} perfect in review</p>}
+                  <strong>{collocationTeamTotalPoints(game, teamId)}</strong>
+                  <span>points</span>
                 </article>
-              );
-            })}
-          </div>
-          {!!reviewIndexes.length && (
-            <div className="ctl-answer-review">
-              <h3>Reviewed collocations</h3>
-              {reviewIndexes.map((itemIndex) => (
-                <div key={itemIndex}>
-                  <strong>{items[itemIndex]?.prompt}</strong>
-                  <span>{items[itemIndex]?.options?.filter((option) => option.isCorrect).map((option) => option.collocation).join(" · ")}</span>
-                </div>
               ))}
-            </div>
-          )}
+          </div>
         </section>
       )}
     </main>

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertCircle, BookOpen, RotateCcw, Save, Star } from "lucide-react";
+import { AlertCircle, BookOpen, RotateCcw, Star } from "lucide-react";
 
 import Seo from "../../common/Seo.jsx";
 import { toast } from "../../../utils/toast";
@@ -24,6 +24,7 @@ import {
 import collocationPrecisionItems from "./data/collocationPrecisionItems.js";
 import { createCollocationTeamLiveGame } from "../../../api/liveGames.js";
 import { getSitePath } from "../../../siteConfig.js";
+import CollocationFeedback from "./CollocationFeedback.jsx";
 
 const SESSION_SIZE = 6;
 const LIVE_SESSION_SIZE = 10;
@@ -75,14 +76,6 @@ function isPerfectSelection(item, selectedWords) {
   const correct = new Set(correctWords(item));
   if (selected.size !== correct.size) return false;
   return Array.from(correct).every((word) => selected.has(word));
-}
-
-function feedbackTitle(result, correctTotal) {
-  if (result.isPerfect) return "Perfect";
-  if (result.selectedCorrect.length) {
-    return `Good work: ${result.selectedCorrect.length} of ${correctTotal} target collocations found`;
-  }
-  return "Keep going: review the target collocations";
 }
 
 function createSession(pool, size = SESSION_SIZE) {
@@ -748,50 +741,12 @@ export default function CollocationPrecisionTrainer({ user }) {
               )}
 
               {result && (
-                <div className={`cp-feedback ${result.isPerfect ? "is-correct" : result.selectedCorrect.length ? "is-partial" : "is-wrong"}`}>
-                  <strong>{feedbackTitle(result, correctOptions.length)}</strong>
-                  <div className="cp-feedback-summary">
-                    <span className="cp-score-pill found">{result.selectedCorrect.length} found</span>
-                    {!!result.missed.length && <span className="cp-score-pill missed">{result.missed.length} to add</span>}
-                    {!!result.selectedWrong.length && <span className="cp-score-pill wrong">{result.selectedWrong.length} not target</span>}
-                  </div>
-
-                  <div className="cp-feedback-list">
-                    {correctOptions.map((option) => (
-                      <div key={option.word} className="cp-feedback-entry">
-                        <div className="cp-entry-head">
-                          <strong>{option.collocation}</strong>
-                          <span className={`cp-entry-status ${result.selectedCorrect.includes(option.word) ? "found" : "missed"}`}>
-                            {result.selectedCorrect.includes(option.word) ? "Found" : "Add this"}
-                          </span>
-                          <button
-                            type="button"
-                            className="cp-save"
-                            onClick={() => saveDiaryEntry(item, option)}
-                            disabled={!signedIn}
-                            title={signedIn ? "Save example" : "Sign in to save examples"}
-                          >
-                            <Save size={15} /> Save
-                          </button>
-                        </div>
-                        <p>{option.definition}</p>
-                        {option.example && <p className="cp-example">“{option.example}”</p>}
-                        <p className="cp-note">{option.note}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  {!!result.selectedWrong.length && (
-                    <div className="cp-traps">
-                      <strong>Not common collocations here</strong>
-                      {item.options
-                        .filter((option) => result.selectedWrong.includes(option.word))
-                        .map((option) => (
-                          <p key={option.word}><b>{option.word}:</b> {option.note}</p>
-                        ))}
-                    </div>
-                  )}
-                </div>
+                <CollocationFeedback
+                  item={item}
+                  result={result}
+                  onSave={saveDiaryEntry}
+                  canSave={signedIn}
+                />
               )}
 
             </article>
