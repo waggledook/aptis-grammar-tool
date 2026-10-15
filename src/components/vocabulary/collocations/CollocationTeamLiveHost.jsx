@@ -19,11 +19,12 @@ import { getSitePath } from "../../../siteConfig.js";
 import CollocationFeedback from "./CollocationFeedback.jsx";
 import {
   buildBalancedCollocationTeams,
-  buildCollocationReviewIndexes,
+  buildCollocationTeamReviews,
   collocationTeamTotalPoints,
-  evaluateCollocationSelection,
+  evaluateCollocationTeamAnswer,
   getCollocationTeamCaptain,
   getCollocationLiveRound,
+  getCorrectWords,
 } from "./collocationTeamLive.js";
 import useCollocationRoundTimer from "./useCollocationRoundTimer.js";
 import "./CollocationTeamLive.css";
@@ -65,23 +66,30 @@ export default function CollocationTeamLiveHost() {
   const teamEntries = Object.entries(teams);
   const items = game?.items || [];
   const {
-    phase, isReview, isQuestion, isReveal,
-    index: roundIndex, itemIndex: currentItemIndex, item: currentItem,
+    phase, isReview, isPersonalisedReview, isQuestion, isReveal,
+    index: roundIndex, reviewRoundCount,
   } = getCollocationLiveRound(game);
   const teamsLocked = !!game?.state?.teamsLocked;
-  const reviewIndexes = game?.state?.reviewItemIndexes || [];
   const answersRoot = isReview ? game?.reviewAnswers : game?.teamAnswers;
   const isHost = auth.currentUser?.uid === game?.ownerUid;
   const unassignedPlayers = players.filter((player) => !player.teamId || !teams[player.teamId]);
   const activeTeams = teamEntries.filter(([, team]) => (team.memberUids || []).length > 0);
-  const answeredTeams = activeTeams.filter(([teamId]) => answersRoot?.[teamId]?.[currentItemIndex]);
-  const allTeamsAnswered = activeTeams.length > 0 && answeredTeams.length === activeTeams.length;
+  const eligibleTeams = activeTeams.filter(([teamId]) => getCollocationLiveRound(game, teamId).hasTask);
+  const previewTeamId = isPersonalisedReview
+    ? (teams[feedbackTeamId] ? feedbackTeamId : eligibleTeams[0]?.[0] || activeTeams[0]?.[0] || "")
+    : feedbackTeamId;
+  const { item: currentItem, itemIndex: currentItemIndex, hasTask: previewHasTask } = getCollocationLiveRound(game, previewTeamId);
+  const currentTargetCount = getCorrectWords(currentItem).length;
+  const answeredTeams = eligibleTeams.filter(([teamId]) => (
+    answersRoot?.[teamId]?.[getCollocationLiveRound(game, teamId).itemIndex]
+  ));
+  const allTeamsAnswered = eligibleTeams.length > 0 && answeredTeams.length === eligibleTeams.length;
   const deadline = game?.state?.questionDeadline;
   const remainingSeconds = useCollocationRoundTimer(deadline, isQuestion);
 
   useEffect(() => {
     if (!isHost || !isQuestion || (!allTeamsAnswered && remainingSeconds !== 0)) return;
-    const key = `${gameId}:${phase}:${currentItemIndex}:${deadline}`;
+    const key = `${gameId}:${phase}:${roundIndex}:${deadline}`;
     if (autoRevealKeyRef.current === key) return;
     autoRevealKeyRef.current = key;
     revealCollocationTeamRound(gameId, isReview, deadline, roundIndex).catch((error) => {
@@ -89,7 +97,7 @@ export default function CollocationTeamLiveHost() {
       console.error("[CollocationTeamLiveHost] automatic reveal failed", error);
       toast("Could not reveal this set automatically.");
     });
-  }, [allTeamsAnswered, currentItemIndex, deadline, gameId, isHost, isQuestion, isReview, phase, remainingSeconds, roundIndex]);
+  }, [allTeamsAnswered, deadline, gameId, isHost, isQuestion, isReview, phase, remainingSeconds, roundIndex]);
 
   const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
   const joinPath = getSitePath(`/live/join?pin=${encodeURIComponent(game?.pin || "")}`);
@@ -185,23 +193,18 @@ export default function CollocationTeamLiveHost() {
   }
 
   function handleStartReview() {
-    const indexes = buildCollocationReviewIndexes(
-      items,
-      game?.teamAnswers,
-      undefined,
-      activeTeams.map(([teamId]) => teamId)
-    );
-    if (!indexes.length) {
+    const plan = buildCollocationTeamReviews(game);
+    if (!plan.reviewRoundCount) {
       toast("Every team was perfect, so there is nothing to retest.");
       runAction(() => finishCollocationTeamLiveGame(gameId), "Could not finish the game.");
       return;
     }
-    runAction(() => startCollocationTeamReview(gameId, indexes), "Could not start the review.");
+    runAction(() => startCollocationTeamReview(gameId), "Could not start the review.");
   }
 
   function handleNextRound() {
     if (isReview) {
-      if (roundIndex >= reviewIndexes.length - 1) {
+      if (roundIndex >= reviewRoundCount - 1) {
         runAction(() => finishCollocationTeamLiveGame(gameId), "Could not finish the game.");
       } else {
         runAction(
@@ -240,7 +243,7 @@ export default function CollocationTeamLiveHost() {
     : phase === "reveal"
       ? `Set ${roundIndex + 1} feedback`
       : phase === "review-question"
-        ? `Review ${roundIndex + 1} of ${reviewIndexes.length}`
+        ? `Review ${roundIndex + 1} of ${reviewRoundCount}`
         : phase === "review-reveal"
           ? `Review ${roundIndex + 1} feedback`
           : phase;
@@ -355,12 +358,13 @@ export default function CollocationTeamLiveHost() {
         </>
       )}
 
-      {(isQuestion || isReveal) && currentItem && (
+      {(isQuestion || isReveal) && (currentItem || isReview) && (
         <>
           <section className="ctl-round-status">
             <div>
-              <span className="ctl-label">{isReview ? "Most-missed review" : "Team round"}</span>
-              <strong>{answeredTeams.length} / {activeTeams.length} teams answered</strong>
+              <span className="ctl-label">{isReview ? "Personalised team review" : "Team round"}</span>
+              <strong>{answeredTeams.length} / {eligibleTeams.length} teams answered</strong>
+              {isPersonalisedReview && <small>Each team has its own missed collocations. Finished teams wait.</small>}
             </div>
             {isQuestion ? (
               <div className={`ctl-timer ${remainingSeconds != null && remainingSeconds <= 10 ? "is-low" : ""}`}>
@@ -368,47 +372,72 @@ export default function CollocationTeamLiveHost() {
               </div>
             ) : (
               <button className="ctl-button ctl-button-primary" type="button" onClick={handleNextRound} disabled={busy}>
-                {isReview && roundIndex >= reviewIndexes.length - 1
+                {isReview && roundIndex >= reviewRoundCount - 1
                   ? "Finish game"
                   : !isReview && roundIndex >= items.length - 1
-                    ? "Start most-missed review"
+                    ? "Start personalised review"
                     : "Start next set"}
               </button>
             )}
           </section>
 
-          <section className="ctl-question-card">
+          {isPersonalisedReview && (
+            <section className="ctl-panel">
+              <label className="ctl-feedback-team">
+                Team workspace
+                <select value={previewTeamId} onChange={(event) => setFeedbackTeamId(event.target.value)}>
+                  {activeTeams.map(([teamId, team]) => {
+                    const task = getCollocationLiveRound(game, teamId);
+                    return <option key={teamId} value={teamId}>{team.name} · {task.hasTask ? task.item.prompt : "Review complete"}</option>;
+                  })}
+                </select>
+              </label>
+            </section>
+          )}
+
+          {currentItem && previewHasTask ? <section className="ctl-question-card">
             <div className="ctl-question-meta">
               <span>{currentItem.level?.toUpperCase()}</span><span>{currentItem.topic}</span><span>{currentItem.pattern}</span>
             </div>
             <p className="ctl-question-copy">{currentItem.question}</p>
+            {isPersonalisedReview && (
+              <>
+                <p className="ctl-review-context">{teams[previewTeamId]?.name} already found {currentItem.previouslyFound}/{currentItem.originalTargetCount}. Those correct options are hidden.</p>
+                <p className="ctl-target-copy">Find the remaining {currentTargetCount} collocation{currentTargetCount === 1 ? "" : "s"}.</p>
+              </>
+            )}
             <h2>{currentItem.prompt}</h2>
             <div className="ctl-option-grid ctl-option-grid-display">
               {(currentItem.options || []).map((option) => {
-                const selections = feedbackTeamId ? answersRoot?.[feedbackTeamId]?.[currentItemIndex]?.selectedWords || [] : [];
+                const selections = previewTeamId ? answersRoot?.[previewTeamId]?.[currentItemIndex]?.selectedWords || [] : [];
                 const status = !isReveal ? "" : option.isCorrect
-                  ? !feedbackTeamId || selections.includes(option.word) ? "correct" : "missed"
+                  ? !previewTeamId || selections.includes(option.word) ? "correct" : "missed"
                   : selections.includes(option.word) ? "wrong" : "quiet";
                 return <div key={option.word} className={status}>{option.word}</div>;
               })}
             </div>
             {isReveal && (
               <>
-                <label className="ctl-feedback-team">
+                {!isPersonalisedReview && <label className="ctl-feedback-team">
                   Show feedback for
                   <select value={feedbackTeamId} onChange={(event) => setFeedbackTeamId(event.target.value)}>
                     <option value="">Class answer key</option>
                     {activeTeams.map(([teamId, team]) => <option key={teamId} value={teamId}>{team.name}</option>)}
                   </select>
-                </label>
+                </label>}
                 <CollocationFeedback
                   item={currentItem}
-                  answerKey={!feedbackTeamId}
-                  result={evaluateCollocationSelection(currentItem, answersRoot?.[feedbackTeamId]?.[currentItemIndex]?.selectedWords || [])}
+                  answerKey={!previewTeamId}
+                  result={evaluateCollocationTeamAnswer(game, previewTeamId, currentItemIndex, answersRoot?.[previewTeamId]?.[currentItemIndex]?.selectedWords || [], isReview)}
                 />
               </>
             )}
-          </section>
+          </section> : (
+            <section className="ctl-panel ctl-player-lobby">
+              <h2>{teams[previewTeamId]?.name} has finished its review</h2>
+              <p>This team has no more missed sets. Choose another team to follow its progress.</p>
+            </section>
+          )}
 
           <section className="ctl-panel">
             <div className="ctl-panel-heading"><div><span className="ctl-label">Scoreboard</span><h2>{isReveal ? "Round points" : "Live progress"}</h2></div></div>
@@ -416,16 +445,18 @@ export default function CollocationTeamLiveHost() {
               {[...activeTeams]
                 .sort(([teamA], [teamB]) => collocationTeamTotalPoints(game, teamB) - collocationTeamTotalPoints(game, teamA))
                 .map(([teamId, team]) => {
-                  const answer = answersRoot?.[teamId]?.[currentItemIndex];
-                  const result = evaluateCollocationSelection(currentItem, answer?.selectedWords || []);
+                  const task = getCollocationLiveRound(game, teamId);
+                  const answer = answersRoot?.[teamId]?.[task.itemIndex];
+                  const result = evaluateCollocationTeamAnswer(game, teamId, task.itemIndex, answer?.selectedWords || [], isReview);
                   const captainUid = getCollocationTeamCaptain(team, isReview ? items.length + roundIndex : roundIndex);
                   return (
                     <article className="ctl-progress-card ctl-score-card" key={teamId}>
                       <strong>{team.name}</strong>
                       <span>{collocationTeamTotalPoints(game, teamId)} pts</span>
+                      {isPersonalisedReview && <small>{task.hasTask ? task.item.prompt : "Review complete"}</small>}
                       <div className="ctl-progress-track"><i style={{ width: `${isReveal ? result.percentage : answer ? 100 : 0}%` }} /></div>
                       <small>
-                        {isReveal
+                        {!task.hasTask ? "No set to answer this round" : isReveal
                           ? `${result.score}/${result.possibleScore} correct · ${result.percentage}% · +${result.points} pts${answer ? "" : " (no answer)"}`
                           : answer
                             ? "Answer locked"
@@ -451,9 +482,9 @@ export default function CollocationTeamLiveHost() {
           <div className="ctl-results-grid">
             {[...activeTeams]
               .sort(([teamA], [teamB]) => collocationTeamTotalPoints(game, teamB) - collocationTeamTotalPoints(game, teamA))
-              .map(([teamId, team], index) => (
+              .map(([teamId, team]) => (
                 <article className="ctl-result-card" key={teamId}>
-                  <span>#{index + 1}</span>
+                  <span>#{1 + activeTeams.filter(([otherTeamId]) => collocationTeamTotalPoints(game, otherTeamId) > collocationTeamTotalPoints(game, teamId)).length}</span>
                   <h3>{team.name}</h3>
                   <strong>{collocationTeamTotalPoints(game, teamId)}</strong>
                   <span>points</span>

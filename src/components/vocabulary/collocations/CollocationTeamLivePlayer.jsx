@@ -8,7 +8,7 @@ import { toast } from "../../../utils/toast.js";
 import CollocationFeedback from "./CollocationFeedback.jsx";
 import {
   collocationTeamTotalPoints,
-  evaluateCollocationSelection,
+  evaluateCollocationTeamAnswer,
   getCollocationTeamCaptain,
   getCollocationLiveRound,
   getCorrectWords,
@@ -41,15 +41,15 @@ export default function CollocationTeamLivePlayer() {
   const team = teamId ? game?.teams?.[teamId] : null;
   const items = game?.items || [];
   const {
-    phase, isReview, isQuestion, isReveal,
+    phase, isReview, isPersonalisedReview, isQuestion, isReveal, hasTask, reviewCount, reviewRoundCount,
     index: roundIndex, itemIndex: currentItemIndex, item: currentItem, captainPosition,
-  } = getCollocationLiveRound(game);
+  } = getCollocationLiveRound(game, teamId);
   const answersRoot = isReview ? game?.reviewAnswers : game?.teamAnswers;
   const teamAnswer = teamId ? answersRoot?.[teamId]?.[currentItemIndex] : null;
   const captainUid = getCollocationTeamCaptain(team, captainPosition);
   const isCaptain = !!uid && uid === captainUid;
   const correctTargetCount = getCorrectWords(currentItem).length;
-  const feedbackResult = evaluateCollocationSelection(currentItem, teamAnswer?.selectedWords || []);
+  const feedbackResult = evaluateCollocationTeamAnswer(game, teamId, currentItemIndex, teamAnswer?.selectedWords || [], isReview);
   const remainingSeconds = useCollocationRoundTimer(game?.state?.questionDeadline, isQuestion);
   const teammates = useMemo(
     () => (team?.memberUids || []).map((memberUid) => ({
@@ -148,11 +148,11 @@ export default function CollocationTeamLivePlayer() {
         </section>
       )}
 
-      {(isQuestion || isReveal) && team && currentItem && (
+      {(isQuestion || isReveal) && team && hasTask && currentItem && (
         <>
           <section className="ctl-round-status">
             <div>
-              <span className="ctl-label">{isReview ? `Review set ${roundIndex + 1} of ${game.state.reviewItemIndexes.length}` : `Set ${roundIndex + 1} of ${items.length}`}</span>
+              <span className="ctl-label">{isReview ? `Your review · Set ${roundIndex + 1} of ${reviewCount}` : `Set ${roundIndex + 1} of ${items.length}`}</span>
               <strong>{isReveal ? `${feedbackResult.percentage}% · ${feedbackResult.points} points this set` : teamAnswer ? "Answer locked" : "Choose together"}</strong>
             </div>
             {isQuestion ? (
@@ -160,7 +160,7 @@ export default function CollocationTeamLivePlayer() {
                 <span>Time left</span><strong>{remainingSeconds ?? 45}</strong>
               </div>
             ) : (
-              <div className="ctl-captain-banner"><span>Next step</span><strong>Teacher starts the next set</strong></div>
+              <div className="ctl-captain-banner"><span>Next step</span><strong>{isReview && roundIndex >= reviewRoundCount - 1 ? "Teacher finishes the game" : "Teacher starts the next set"}</strong></div>
             )}
           </section>
 
@@ -169,7 +169,15 @@ export default function CollocationTeamLivePlayer() {
               <span>{currentItem.level?.toUpperCase()}</span><span>{currentItem.topic}</span><span>{currentItem.pattern}</span>
             </div>
             <p className="ctl-question-copy">{currentItem.question}</p>
-            <p className="ctl-target-copy">Choose {correctTargetCount} target collocations.</p>
+            {isPersonalisedReview && (
+              <p className="ctl-review-context">
+                You already found {currentItem.previouslyFound}/{currentItem.originalTargetCount}. Those correct options are hidden.
+                {" "}Each new correct answer recovers points from the original set.
+              </p>
+            )}
+            <p className="ctl-target-copy">
+              Choose {correctTargetCount} {isPersonalisedReview ? "remaining" : "target"} collocation{correctTargetCount === 1 ? "" : "s"}.
+            </p>
             <h2>{currentItem.prompt}</h2>
             <div className="ctl-option-grid">
               {(currentItem.options || []).map((option) => (
@@ -197,6 +205,14 @@ export default function CollocationTeamLivePlayer() {
             {isReveal && <CollocationFeedback item={currentItem} result={feedbackResult} />}
           </section>
         </>
+      )}
+
+      {(isQuestion || isReveal) && isReview && team && !hasTask && (
+        <section className="ctl-panel ctl-player-lobby">
+          <span className="ctl-label">Your review is complete</span>
+          <h2>{reviewCount ? "You have finished your review sets" : "You found every collocation first time"}</h2>
+          <p>Your team has no more sets to review. Wait while the other teams finish theirs.</p>
+        </section>
       )}
 
       {(isQuestion || isReveal) && !team && (

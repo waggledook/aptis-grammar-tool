@@ -1,6 +1,5 @@
 export const COLLOCATION_TEAM_GAME_TYPE = "collocation-team";
 export const COLLOCATION_TEAM_ROTATION_SIZE = 3;
-export const COLLOCATION_TEAM_REVIEW_SIZE = 5;
 export const COLLOCATION_TEAM_ROUND_SECONDS = 45;
 
 export function getCorrectWords(item) {
@@ -85,72 +84,116 @@ export function getNextUnansweredIndex(answerMap, total) {
   return total;
 }
 
-export function buildCollocationReviewIndexes(
-  items,
-  teamAnswers,
-  limit = COLLOCATION_TEAM_REVIEW_SIZE,
-  teamIds = Object.keys(teamAnswers || {})
-) {
-  const scores = (items || []).map((item, itemIndex) => {
-    let errorCount = 0;
-    let imperfectTeams = 0;
+export function buildCollocationTeamReviews(game) {
+  const reviewItemIndexesByTeam = Object.fromEntries(
+    Object.entries(game?.teams || {})
+      .filter(([, team]) => (team.memberUids || []).length > 0)
+      .map(([teamId]) => [teamId, (game.items || [])
+        .map((item, index) => (
+          evaluateCollocationSelection(item, game.teamAnswers?.[teamId]?.[index]?.selectedWords || []).missed.length
+            ? index
+            : null
+        ))
+        .filter((index) => index !== null)])
+  );
+  return {
+    reviewMode: "personalised",
+    reviewItemIndexesByTeam,
+    reviewRoundCount: Math.max(0, ...Object.values(reviewItemIndexesByTeam).map((indexes) => indexes.length)),
+  };
+}
 
-    teamIds.forEach((teamId) => {
-      const answers = teamAnswers?.[teamId];
-      const answer = answers?.[itemIndex];
-      const evaluation = evaluateCollocationSelection(item, answer?.selectedWords || []);
-      const errors = evaluation.missed.length + evaluation.selectedWrong.length;
-      errorCount += errors;
-      if (!evaluation.isPerfect) imperfectTeams += 1;
-    });
+export function getCollocationTeamReviewItem(game, teamId, itemIndex) {
+  const originalItem = game?.items?.[itemIndex];
+  if (!originalItem) return null;
+  const originalResult = evaluateCollocationSelection(
+    originalItem,
+    game?.teamAnswers?.[teamId]?.[itemIndex]?.selectedWords || []
+  );
+  const masteredWords = new Set(originalResult.selectedCorrect);
+  return {
+    ...originalItem,
+    options: originalItem.options.filter((option) => !masteredWords.has(option.word)),
+    previouslyFound: masteredWords.size,
+    originalTargetCount: originalResult.possibleScore,
+  };
+}
 
-    return { itemIndex, errorCount, imperfectTeams };
-  });
-
-  return scores
-    .filter((entry) => entry.errorCount > 0)
-    .sort((a, b) => (
-      b.imperfectTeams - a.imperfectTeams ||
-      b.errorCount - a.errorCount ||
-      a.itemIndex - b.itemIndex
-    ))
-    .slice(0, limit)
-    .map((entry) => entry.itemIndex);
+export function evaluateCollocationTeamAnswer(game, teamId, itemIndex, selectedWords = [], review = false) {
+  const originalItem = game?.items?.[itemIndex];
+  if (!review || game?.state?.reviewMode !== "personalised") {
+    return evaluateCollocationSelection(originalItem, selectedWords);
+  }
+  const reviewItem = getCollocationTeamReviewItem(game, teamId, itemIndex);
+  const result = evaluateCollocationSelection(reviewItem, selectedWords);
+  const originalResult = evaluateCollocationSelection(originalItem, game?.teamAnswers?.[teamId]?.[itemIndex]?.selectedWords || []);
+  const improvedPercentage = originalResult.possibleScore
+    ? Math.round(((originalResult.score + result.score) / originalResult.possibleScore) * 100)
+    : 0;
+  return {
+    ...result,
+    // Recovered collocations top up the original card to at most 100 points.
+    points: Math.max(0, Math.min(100, improvedPercentage) - originalResult.percentage),
+  };
 }
 
 export function collocationTeamTotalPoints(game, teamId) {
-  const { isQuestion, isReview, itemIndex } = getCollocationLiveRound(game);
+  const { isQuestion, isReview, itemIndex } = getCollocationLiveRound(game, teamId);
   return ["teamAnswers", "reviewAnswers"].reduce((total, answerRoot) => (
     total + Object.entries(game?.[answerRoot]?.[teamId] || {}).reduce((sum, [key, answer]) => {
       if (isQuestion && (answerRoot === "reviewAnswers") === isReview && Number(key) === itemIndex) return sum;
-      return sum + evaluateCollocationSelection(game?.items?.[key], answer?.selectedWords || []).points;
+      return sum + evaluateCollocationTeamAnswer(game, teamId, Number(key), answer?.selectedWords || [], answerRoot === "reviewAnswers").points;
     }, 0)
   ), 0);
 }
 
-export function getCollocationLiveRound(game) {
+export function getCollocationLiveRound(game, teamId) {
   const phase = game?.state?.phase || "lobby";
   const isReview = phase.startsWith("review-");
   const index = Number(isReview ? game?.state?.reviewIndex || 0 : game?.state?.questionIndex || 0);
-  const itemIndex = isReview ? game?.state?.reviewItemIndexes?.[index] : index;
+  const isPersonalisedReview = isReview && game?.state?.reviewMode === "personalised";
+  const reviewIndexes = isPersonalisedReview
+    ? game?.state?.reviewItemIndexesByTeam?.[teamId] || []
+    : game?.state?.reviewItemIndexes || [];
+  const itemIndex = isReview ? reviewIndexes[index] : index;
+  const item = isPersonalisedReview
+    ? getCollocationTeamReviewItem(game, teamId, itemIndex)
+    : game?.items?.[itemIndex];
   return {
     phase,
     isReview,
+    isPersonalisedReview,
     isQuestion: phase === "question" || phase === "review-question",
     isReveal: phase === "reveal" || phase === "review-reveal",
     index,
     itemIndex,
-    item: game?.items?.[itemIndex],
+    item,
+    hasTask: !!item && getCorrectWords(item).length > 0,
+    reviewCount: reviewIndexes.length,
+    reviewRoundCount: isPersonalisedReview ? Number(game.state.reviewRoundCount) || 0 : reviewIndexes.length,
     captainPosition: isReview ? (game?.items?.length || 0) + index : index,
   };
 }
 
 export function createCollocationRoundState(game, index, review, serverNow) {
+  const isPersonalisedReview = review && game?.state?.reviewMode === "personalised";
   const itemIndex = review ? game?.state?.reviewItemIndexes?.[index] : index;
-  if (!game?.items?.[itemIndex]) throw new Error("That collocation set could not be found.");
+  if (!isPersonalisedReview && !game?.items?.[itemIndex]) throw new Error("That collocation set could not be found.");
+  const reviewItemKeysByTeam = isPersonalisedReview
+    ? Object.fromEntries(Object.entries(game.teams || {}).flatMap(([teamId, team]) => {
+      const nextIndex = game.state.reviewItemIndexesByTeam?.[teamId]?.[index];
+      return (team.memberUids || []).length && game.items?.[nextIndex]
+        ? [[teamId, String(nextIndex)]]
+        : [];
+    }))
+    : {};
+  if (isPersonalisedReview && !Object.keys(reviewItemKeysByTeam).length) {
+    throw new Error("There are no more collocations to review.");
+  }
   const captainPosition = review ? game.items.length + index : index;
   const captainUids = Object.fromEntries(
     Object.entries(game.teams || {})
+      .filter(([teamId]) => !isPersonalisedReview || Object.hasOwn(reviewItemKeysByTeam, teamId))
       .map(([teamId, team]) => [teamId, getCollocationTeamCaptain(team, captainPosition)])
       .filter(([, uid]) => uid)
   );
@@ -160,6 +203,7 @@ export function createCollocationRoundState(game, index, review, serverNow) {
     questionDuration: COLLOCATION_TEAM_ROUND_SECONDS,
     questionDeadline: serverNow + COLLOCATION_TEAM_ROUND_SECONDS * 1000,
     captainUids,
+    ...(isPersonalisedReview ? { reviewItemKeysByTeam } : {}),
   };
 }
 

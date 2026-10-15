@@ -38,6 +38,7 @@ import {
   update,
   runTransaction,
 } from "firebase/database";
+import { getRealtimeServerTimeOffset } from "../utils/realtimeServerTime.js";
 import {
   OPTION_JURY_GAME_TYPE,
   PART4_EVIDENCE_LIVE_GAME_TYPE,
@@ -93,9 +94,11 @@ import {
 import {
   COLLOCATION_TEAM_GAME_TYPE,
   COLLOCATION_TEAM_ROUND_SECONDS,
+  buildCollocationTeamReviews,
   createCollocationRoundState,
-  evaluateCollocationSelection,
+  evaluateCollocationTeamAnswer,
   getCollocationTeamCaptain,
+  getCollocationLiveRound,
   getCorrectWords,
 } from "../components/vocabulary/collocations/collocationTeamLive.js";
 
@@ -404,15 +407,18 @@ export async function startCollocationTeamLiveGame(gameId) {
   });
 }
 
-export async function startCollocationTeamReview(gameId, reviewItemIndexes) {
+export async function startCollocationTeamReview(gameId) {
   const { game, serverNow } = await getOwnedCollocationLiveGame(gameId);
   if (game.status !== "in-progress" || game.state?.phase !== "reveal" || game.state?.questionIndex !== game.items.length - 1) {
     throw new Error("Finish the main sets before starting the review.");
   }
-  const reviewGame = { ...game, state: { ...game.state, reviewItemIndexes } };
+  const plan = buildCollocationTeamReviews(game);
+  if (!plan.reviewRoundCount) throw new Error("Every team has already found all the collocations.");
+  const reviewGame = { ...game, state: { ...game.state, ...plan } };
   await update(ref(rtdb, `liveGames/${gameId}/state`), {
     ...createCollocationRoundState(reviewGame, 0, true, serverNow),
-    reviewItemIndexes,
+    ...plan,
+    reviewItemIndexes: null,
     reviewStartedAt: serverNow,
   });
 }
@@ -422,13 +428,13 @@ async function getOwnedCollocationLiveGame(gameId) {
   if (!user) throw new Error("You must be signed in to control the game.");
   const [snapshot, offset] = await Promise.all([
     get(ref(rtdb, `liveGames/${gameId}`)),
-    get(ref(rtdb, ".info/serverTimeOffset")),
+    getRealtimeServerTimeOffset(rtdb),
   ]);
   const game = snapshot.val();
   if (!game || game.type !== COLLOCATION_TEAM_GAME_TYPE || game.ownerUid !== user.uid) {
     throw new Error("Only the host can control this game.");
   }
-  return { game, serverNow: Date.now() + (Number(offset.val()) || 0) };
+  return { game, serverNow: Date.now() + offset };
 }
 
 export async function revealCollocationTeamRound(gameId, review = false, expectedDeadline, expectedIndex) {
@@ -472,7 +478,7 @@ export async function submitCollocationTeamAnswer({ gameId, itemIndex, selectedW
 
   const [gameSnap, offset] = await Promise.all([
     get(ref(rtdb, `liveGames/${gameId}`)),
-    get(ref(rtdb, ".info/serverTimeOffset")),
+    getRealtimeServerTimeOffset(rtdb),
   ]);
   if (!gameSnap.exists()) throw new Error("This live game is no longer available.");
   const game = gameSnap.val();
@@ -484,17 +490,10 @@ export async function submitCollocationTeamAnswer({ gameId, itemIndex, selectedW
     throw new Error("This part of the game is not accepting answers.");
   }
 
-  const item = game.items?.[itemIndex];
-  if (!item) throw new Error("That collocation set could not be found.");
-  const reviewIndexes = game.state?.reviewItemIndexes || [];
-  const expectedItemIndex = review
-    ? reviewIndexes[game.state?.reviewIndex || 0]
-    : game.state?.questionIndex || 0;
-  const captainPosition = review
-    ? (game.items?.length || 0) + (game.state?.reviewIndex || 0)
-    : expectedItemIndex;
+  const { item, hasTask, itemIndex: expectedItemIndex, captainPosition } = getCollocationLiveRound(game, teamId);
+  if (!hasTask) throw new Error("Your team has no collocations to review in this round.");
   if (itemIndex !== expectedItemIndex) throw new Error("Your team has already moved to another set.");
-  const serverNow = Date.now() + (Number(offset.val()) || 0);
+  const serverNow = Date.now() + offset;
   if (!game.state?.questionDeadline || serverNow >= game.state.questionDeadline) {
     throw new Error("Time is up for this set.");
   }
@@ -510,7 +509,7 @@ export async function submitCollocationTeamAnswer({ gameId, itemIndex, selectedW
   ) {
     throw new Error(`Choose exactly ${getCorrectWords(item).length} available options.`);
   }
-  const evaluation = evaluateCollocationSelection(item, uniqueSelectedWords);
+  const evaluation = evaluateCollocationTeamAnswer(game, teamId, itemIndex, uniqueSelectedWords, review);
   const answerRoot = review ? "reviewAnswers" : "teamAnswers";
   if (game[answerRoot]?.[teamId]?.[itemIndex]) throw new Error("Your team answer is already locked.");
   await set(ref(rtdb, `liveGames/${gameId}/${answerRoot}/${teamId}/${itemIndex}`), {
