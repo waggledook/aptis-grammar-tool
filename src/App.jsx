@@ -110,6 +110,7 @@ import CollocationDash from "./components/vocabulary/collocations/CollocationDas
 import CollocationPrecisionTrainer from "./components/vocabulary/collocations/CollocationPrecisionTrainer";
 import CollocationTeamLiveHost from "./components/vocabulary/collocations/CollocationTeamLiveHost.jsx";
 import CollocationTeamLivePlayer from "./components/vocabulary/collocations/CollocationTeamLivePlayer.jsx";
+import CollocationTeamLiveSetup from "./components/vocabulary/collocations/CollocationTeamLiveSetup.jsx";
 import AptisVocabularyStrategyGuide from "./components/vocabulary/AptisVocabularyStrategyGuide.jsx";
 import VocabLab from "./components/vocabulary/VocabLab";
 import SynonymTrainer from "./components/vocabulary/SynonymTrainer";
@@ -1018,7 +1019,8 @@ const linkedAptisAccess = {
   isDemoMode: isLinkedAptisDemoMode,
 };
 const hasMemberSiteAccess = !requiresMemberAccess || (isOteSite ? hasOteAccess : hasSeifHubAccess);
-const isTeacherToolsRoute = ["/teacher-tools", "/teacher/transcription"].includes(location.pathname);
+const isTeacherToolsRoute = ["/teacher-tools", "/teacher/transcription", "/live/collocations/setup"].includes(location.pathname)
+  || location.pathname.startsWith("/live/collocations/host/");
 const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-it/join";
 const isPublicSpanglishPlayRoute = /^\/games\/spanglish-fix-it\/play\/[^/]+$/.test(location.pathname);
 const isPublicOteLevelTestRoute =
@@ -3410,6 +3412,7 @@ return (
 <Route path="/live/join" element={<LiveGameJoin />} />
 <Route path="/live/host/:gameId" element={<LiveGameHost />} />
 <Route path="/live/play/:gameId" element={<LiveGamePlayer />} />
+<Route path="/live/collocations/setup" element={<RequireTeacher user={user}><CollocationTeamLiveSetup user={user} /></RequireTeacher>} />
 <Route path="/live/collocations/host/:gameId" element={<RequireTeacher user={user}><CollocationTeamLiveHost /></RequireTeacher>} />
 <Route path="/live/collocations/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><CollocationTeamLivePlayer /></RequireSignedIn>} />
 <Route path="/live/option-jury/host/:gameId" element={<OteOptionJuryHost user={user} />} />

@@ -105,16 +105,24 @@ function speakingWorkshopDate(value) {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
+function speakingWorkshopPhase(data = {}, now = new Date()) {
+  const phase = data.phase || "preparation";
+  const startsAt = speakingWorkshopDate(data.startsAt);
+  if (phase === "preparation" && startsAt && startsAt <= now) return "live";
+  return phase;
+}
+
 function serializeSpeakingWorkshopSession(snap, includeCode = false) {
   const data = snap.data() || {};
   const result = {
     id: snap.id,
     label: data.label || "Speaking workshop",
     topicIds: Array.isArray(data.topicIds) ? data.topicIds : [],
-    phase: data.phase || "preparation",
+    phase: speakingWorkshopPhase(data),
     registrationOpen: data.registrationOpen !== false,
     attendeeCount: Number(data.attendeeCount || 0),
     createdAt: speakingWorkshopDate(data.createdAt)?.toISOString() || null,
+    startsAt: speakingWorkshopDate(data.startsAt)?.toISOString() || null,
     startedAt: speakingWorkshopDate(data.startedAt)?.toISOString() || null,
     endedAt: speakingWorkshopDate(data.endedAt)?.toISOString() || null,
     reviewUntil: speakingWorkshopDate(data.reviewUntil)?.toISOString() || null,
@@ -212,6 +220,13 @@ exports.createSpeakingWorkshopSession = functions
         "Choose at least one workshop topic."
       );
     }
+    const startsAt = speakingWorkshopDate(data?.startsAt);
+    if (!startsAt) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Choose a valid workshop start date and time."
+      );
+    }
 
     let joinCode = "";
     for (let attempt = 0; attempt < 8; attempt += 1) {
@@ -241,6 +256,7 @@ exports.createSpeakingWorkshopSession = functions
       attendeeCount: 0,
       joinCode,
       joinCodeHash: speakingWorkshopCodeHash(joinCode),
+      startsAt: admin.firestore.Timestamp.fromDate(startsAt),
       createdByUid: context.auth.uid,
       createdByEmail: context.auth.token?.email || null,
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -406,7 +422,8 @@ exports.getSpeakingWorkshopAccess = functions
     const topicAccess = {};
     activeSessions.forEach((snap) => {
       const session = snap.data() || {};
-      const live = session.phase === "live" || session.phase === "review";
+      const phase = speakingWorkshopPhase(session, now);
+      const live = phase === "live" || phase === "review";
       (Array.isArray(session.topicIds) ? session.topicIds : []).forEach((topicId) => {
         const current = topicAccess[topicId] || {
           preparation: false,
@@ -470,7 +487,7 @@ exports.updateSpeakingWorkshopSession = functions
         });
         return;
       }
-      if (session.phase !== "live") {
+      if (speakingWorkshopPhase(session) !== "live") {
         throw new functions.https.HttpsError(
           "failed-precondition",
           "Only a live workshop can be ended."
@@ -483,6 +500,8 @@ exports.updateSpeakingWorkshopSession = functions
       transaction.update(sessionRef, {
         phase: "review",
         registrationOpen: false,
+        startedAt: session.startedAt || session.startsAt ||
+          admin.firestore.FieldValue.serverTimestamp(),
         endedAt: admin.firestore.Timestamp.fromDate(endedAt),
         reviewUntil: admin.firestore.Timestamp.fromDate(reviewUntil),
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),

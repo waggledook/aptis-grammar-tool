@@ -137,6 +137,34 @@ export function evaluateCollocationTeamAnswer(game, teamId, itemIndex, selectedW
   };
 }
 
+export function getCollocationDraftAnswers(game, serverNow) {
+  const { isQuestion, isReview } = getCollocationLiveRound(game);
+  if (!isQuestion || game?.status !== "in-progress") return [];
+  const answerRoot = isReview ? "reviewAnswers" : "teamAnswers";
+  const draftRoot = isReview ? "reviewDrafts" : "teamDrafts";
+  return Object.entries(game.teams || {}).flatMap(([teamId, team]) => {
+    const { item, itemIndex, hasTask, captainPosition } = getCollocationLiveRound(game, teamId);
+    if (!hasTask || game[answerRoot]?.[teamId]?.[itemIndex]) return [];
+    const draft = game[draftRoot]?.[teamId]?.[itemIndex];
+    const captainUid = getCollocationTeamCaptain(team, captainPosition);
+    if (!draft || draft.submittedBy !== captainUid || draft.questionDeadline !== game.state.questionDeadline) return [];
+    const selectedWords = [...new Set(Array.isArray(draft.selectedWords) ? draft.selectedWords : [])];
+    const available = new Set((item.options || []).map((option) => option.word));
+    if (!selectedWords.length || selectedWords.length > getCorrectWords(item).length || selectedWords.some((word) => !available.has(word))) return [];
+    return [{
+      answerRoot,
+      teamId,
+      itemIndex,
+      answer: {
+        ...evaluateCollocationTeamAnswer(game, teamId, itemIndex, selectedWords, isReview),
+        submittedBy: captainUid,
+        submittedAt: Math.min(serverNow, game.state.questionDeadline),
+        submissionMode: serverNow >= game.state.questionDeadline ? "timeout" : "teacher_reveal",
+      },
+    }];
+  });
+}
+
 export function collocationTeamTotalPoints(game, teamId) {
   const { isQuestion, isReview, itemIndex } = getCollocationLiveRound(game, teamId);
   return ["teamAnswers", "reviewAnswers"].reduce((total, answerRoot) => (

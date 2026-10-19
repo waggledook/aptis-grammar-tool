@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { onValue, ref } from "firebase/database";
 import { useParams } from "react-router-dom";
 
 import { auth, rtdb } from "../../../firebase.js";
-import { submitCollocationTeamAnswer } from "../../../api/liveGames.js";
+import { saveCollocationTeamDraft, submitCollocationTeamAnswer } from "../../../api/liveGames.js";
+import { trackCollocationLiveParticipation } from "../../../utils/collocationLiveActivity.js";
 import { toast } from "../../../utils/toast.js";
 import CollocationFeedback from "./CollocationFeedback.jsx";
 import {
@@ -26,6 +27,10 @@ export default function CollocationTeamLivePlayer() {
   const [loading, setLoading] = useState(true);
   const [selectedWords, setSelectedWords] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [draftSaveError, setDraftSaveError] = useState(false);
+  const selectedWordsRef = useRef([]);
+  const selectionKeyRef = useRef("");
+  const draftRequestRef = useRef(0);
 
   useEffect(() => {
     const unsubscribe = onValue(ref(rtdb, `liveGames/${gameId}`), (snapshot) => {
@@ -49,6 +54,8 @@ export default function CollocationTeamLivePlayer() {
   const captainUid = getCollocationTeamCaptain(team, captainPosition);
   const isCaptain = !!uid && uid === captainUid;
   const correctTargetCount = getCorrectWords(currentItem).length;
+  const questionDeadline = game?.state?.questionDeadline;
+  const draft = game?.[isReview ? "reviewDrafts" : "teamDrafts"]?.[teamId]?.[currentItemIndex];
   const feedbackResult = evaluateCollocationTeamAnswer(game, teamId, currentItemIndex, teamAnswer?.selectedWords || [], isReview);
   const remainingSeconds = useCollocationRoundTimer(game?.state?.questionDeadline, isQuestion);
   const teammates = useMemo(
@@ -60,18 +67,36 @@ export default function CollocationTeamLivePlayer() {
   );
 
   useEffect(() => {
-    setSelectedWords([]);
-  }, [currentItemIndex, isReview]);
+    const key = `${gameId}:${teamId}:${isReview}:${currentItemIndex}:${questionDeadline}:${isCaptain}`;
+    if (selectionKeyRef.current === key) return;
+    selectionKeyRef.current = key;
+    draftRequestRef.current += 1;
+    const restored = draft?.questionDeadline === questionDeadline && Array.isArray(draft?.selectedWords) ? draft.selectedWords : [];
+    selectedWordsRef.current = restored;
+    setSelectedWords(restored);
+    setDraftSaveError(false);
+  }, [currentItemIndex, draft, gameId, isCaptain, isReview, questionDeadline, teamId]);
+
+  useEffect(() => {
+    trackCollocationLiveParticipation(game, gameId, uid);
+  }, [game, gameId, uid]);
 
   function toggleWord(word) {
     if (!isCaptain || submitting || teamAnswer || !isQuestion || remainingSeconds === 0) return;
-    setSelectedWords((previous) => {
-      if (previous.includes(word)) return previous.filter((entry) => entry !== word);
-      if (previous.length >= correctTargetCount) {
-        toast(`Choose only ${correctTargetCount} target collocations.`);
-        return previous;
-      }
-      return [...previous, word];
+    const previous = selectedWordsRef.current;
+    if (!previous.includes(word) && previous.length >= correctTargetCount) {
+      toast(`Choose only ${correctTargetCount} target collocations.`);
+      return;
+    }
+    const next = previous.includes(word) ? previous.filter((entry) => entry !== word) : [...previous, word];
+    selectedWordsRef.current = next;
+    setSelectedWords(next);
+    const request = ++draftRequestRef.current;
+    void saveCollocationTeamDraft({ gameId, teamId, itemIndex: currentItemIndex, selectedWords: next, review: isReview, questionDeadline }).then(() => {
+      if (draftRequestRef.current === request) setDraftSaveError(false);
+    }).catch((error) => {
+      console.error("[CollocationTeamLivePlayer] draft save failed", error);
+      if (draftRequestRef.current === request) setDraftSaveError(true);
     });
   }
 
@@ -98,7 +123,7 @@ export default function CollocationTeamLivePlayer() {
   }
 
   function optionClass(option) {
-    const chosenWords = isReveal ? teamAnswer?.selectedWords || [] : teamAnswer?.selectedWords || selectedWords;
+    const chosenWords = isReveal ? teamAnswer?.selectedWords || [] : teamAnswer?.selectedWords || (isCaptain ? selectedWords : draft?.selectedWords || []);
     if (!isReveal) return chosenWords.includes(option.word) ? "selected" : "";
     if (option.isCorrect && chosenWords.includes(option.word)) return "correct";
     if (option.isCorrect) return "missed";
@@ -194,13 +219,18 @@ export default function CollocationTeamLivePlayer() {
             </div>
 
             {isQuestion && isCaptain && !teamAnswer && (
-              <button className="ctl-button ctl-button-primary ctl-submit" type="button" onClick={handleSubmit} disabled={submitting || selectedWords.length !== correctTargetCount || remainingSeconds === 0}>
-                {submitting ? "Submitting…" : `Submit team answer (${selectedWords.length}/${correctTargetCount})`}
-              </button>
+              <>
+                <button className="ctl-button ctl-button-primary ctl-submit" type="button" onClick={handleSubmit} disabled={submitting || selectedWords.length !== correctTargetCount || remainingSeconds === 0}>
+                  {submitting ? "Submitting…" : `Submit team answer (${selectedWords.length}/${correctTargetCount})`}
+                </button>
+                <p className="ctl-discuss-note">Your current choices are saved automatically and count when time runs out, even if you have not chosen all {correctTargetCount}.</p>
+                {draftSaveError && <p role="alert">Your latest choices could not be saved. Check your connection and select them again, or submit your answer.</p>}
+              </>
             )}
             {isQuestion && !isCaptain && !teamAnswer && <p className="ctl-discuss-note">Discuss the choices. {displayName(game.players, captainUid)} is this set’s captain.</p>}
             {isQuestion && teamAnswer && <p className="ctl-discuss-note ctl-answer-locked">Answer locked — waiting for the reveal.</p>}
-            {isQuestion && remainingSeconds === 0 && !teamAnswer && <p className="ctl-discuss-note">Time is up. No answer was submitted for this set.</p>}
+            {isQuestion && remainingSeconds === 0 && !teamAnswer && <p className="ctl-discuss-note">Time is up. Your saved choices are being submitted automatically.</p>}
+            {isReveal && teamAnswer?.submissionMode === "timeout" && <p className="ctl-discuss-note">Your choices were submitted automatically when time ran out.</p>}
             {isReveal && !teamAnswer && <p className="ctl-discuss-note">No answer was submitted. This set earns 0 points.</p>}
             {isReveal && <CollocationFeedback item={currentItem} result={feedbackResult} />}
           </section>

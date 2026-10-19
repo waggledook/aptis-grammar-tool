@@ -37,8 +37,10 @@ import {
   equalTo,
   update,
   runTransaction,
+  serverTimestamp as realtimeServerTimestamp,
 } from "firebase/database";
 import { getRealtimeServerTimeOffset } from "../utils/realtimeServerTime.js";
+import { getCollocationLiveActivityDetails, logCollocationLiveActivity } from "../utils/collocationLiveActivity.js";
 import {
   OPTION_JURY_GAME_TYPE,
   PART4_EVIDENCE_LIVE_GAME_TYPE,
@@ -99,6 +101,7 @@ import {
   evaluateCollocationTeamAnswer,
   getCollocationTeamCaptain,
   getCollocationLiveRound,
+  getCollocationDraftAnswers,
   getCorrectWords,
 } from "../components/vocabulary/collocations/collocationTeamLive.js";
 
@@ -261,6 +264,7 @@ export async function createCollocationTeamLiveGame({ items, title } = {}) {
       reviewItemIndexes: [],
     },
   });
+  void logCollocationLiveActivity("hosted", getCollocationLiveActivityDetails({ pin, title, items }, gameId));
   return { gameId, pin };
 }
 
@@ -362,6 +366,9 @@ export async function joinLiveGameByPin(pin) {
   if (!existingPlayer && [APTIS_LISTENING_PART2_LIVE_GAME_TYPE, APTIS_LISTENING_PART3_LIVE_GAME_TYPE, APTIS_LISTENING_PART4_LIVE_GAME_TYPE].includes(game.type)) {
     await logAptisListeningLiveJoined(getAptisListeningLiveActivityDetails(game, game.gameId));
   }
+  if (!existingPlayer && game.type === COLLOCATION_TEAM_GAME_TYPE) {
+    void logCollocationLiveActivity("joined", getCollocationLiveActivityDetails(game, game.gameId));
+  }
 
   return { gameId: game.gameId, type: game.type || "grammar" };
 }
@@ -405,6 +412,7 @@ export async function startCollocationTeamLiveGame(gameId) {
     ...stateUpdates,
     "state/startedAt": serverNow,
   });
+  void logCollocationLiveActivity("started", getCollocationLiveActivityDetails(game, gameId));
 }
 
 export async function startCollocationTeamReview(gameId) {
@@ -420,6 +428,11 @@ export async function startCollocationTeamReview(gameId) {
     ...plan,
     reviewItemIndexes: null,
     reviewStartedAt: serverNow,
+  });
+  void logCollocationLiveActivity("review_started", {
+    ...getCollocationLiveActivityDetails(game, gameId),
+    reviewRoundCount: plan.reviewRoundCount,
+    reviewTeamCount: Object.values(plan.reviewItemIndexesByTeam).filter((indexes) => indexes.length).length,
   });
 }
 
@@ -438,7 +451,19 @@ async function getOwnedCollocationLiveGame(gameId) {
 }
 
 export async function revealCollocationTeamRound(gameId, review = false, expectedDeadline, expectedIndex) {
-  const { serverNow } = await getOwnedCollocationLiveGame(gameId);
+  const { game, serverNow } = await getOwnedCollocationLiveGame(gameId);
+  const phase = review ? "review-question" : "question";
+  if (game.status !== "in-progress" || game.state?.phase !== phase) return;
+  if (expectedDeadline != null && game.state.questionDeadline !== expectedDeadline) return;
+  if (expectedIndex != null && game.state[review ? "reviewIndex" : "questionIndex"] !== expectedIndex) return;
+  // Save work before revealing. Captains' drafts stop accepting changes at the
+  // deadline, so scoring does not depend on a late client-side submit request.
+  await Promise.all(getCollocationDraftAnswers(game, serverNow).map(({ answerRoot, teamId, itemIndex, answer }) => (
+    runTransaction(ref(rtdb, `liveGames/${gameId}/${answerRoot}/${teamId}/${itemIndex}`), (current) => {
+      if (current) return;
+      return answer;
+    }, { applyLocally: false })
+  )));
   await runTransaction(ref(rtdb, `liveGames/${gameId}/state`), (current) => {
     if (!current || current.phase !== (review ? "review-question" : "question")) return;
     // A delayed reveal from an earlier set must never close the next one.
@@ -463,12 +488,26 @@ export async function startNextCollocationTeamRound({ gameId, index, review = fa
 }
 
 export async function finishCollocationTeamLiveGame(gameId) {
-  const { serverNow } = await getOwnedCollocationLiveGame(gameId);
+  const { game, serverNow } = await getOwnedCollocationLiveGame(gameId);
+  if (game.status === "finished") return;
   await update(ref(rtdb, `liveGames/${gameId}`), {
     status: "finished",
     "state/phase": "finished",
     "state/questionDeadline": null,
     "state/finishedAt": serverNow,
+  });
+  void logCollocationLiveActivity("finished", getCollocationLiveActivityDetails(game, gameId));
+}
+
+export async function saveCollocationTeamDraft({ gameId, teamId, itemIndex, selectedWords, review = false, questionDeadline }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to save your choices.");
+  const root = review ? "reviewDrafts" : "teamDrafts";
+  await set(ref(rtdb, `liveGames/${gameId}/${root}/${teamId}/${itemIndex}`), {
+    selectedWords: [...new Set(selectedWords || [])],
+    submittedBy: user.uid,
+    questionDeadline,
+    updatedAt: realtimeServerTimestamp(),
   });
 }
 

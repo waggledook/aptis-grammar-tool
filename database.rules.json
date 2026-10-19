@@ -88,6 +88,34 @@
           }
         },
 
+        "teamDrafts": {
+          "$teamId": {
+            "$itemIndex": {
+              ".write": "auth != null && ((root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid) || (root.child('liveGames').child($gameId).child('type').val() === 'collocation-team' && root.child('liveGames').child($gameId).child('status').val() === 'in-progress' && root.child('liveGames').child($gameId).child('state').child('phase').val() === 'question' && now < root.child('liveGames').child($gameId).child('state').child('questionDeadline').val() && root.child('liveGames').child($gameId).child('state').child('questionIndex').val() + '' === $itemIndex && root.child('liveGames').child($gameId).child('state').child('captainUids').child($teamId).val() === auth.uid && root.child('liveGames').child($gameId).child('players').child(auth.uid).child('teamId').val() === $teamId && !root.child('liveGames').child($gameId).child('teamAnswers').child($teamId).child($itemIndex).exists() && newData.child('submittedBy').val() === auth.uid))",
+              ".validate": "newData.hasChildren(['submittedBy', 'questionDeadline', 'updatedAt']) && newData.child('questionDeadline').val() === root.child('liveGames').child($gameId).child('state').child('questionDeadline').val() && newData.child('updatedAt').val() <= now",
+              "selectedWords": { "$index": { ".validate": "newData.isString()" } },
+              "submittedBy": { ".validate": "newData.isString()" },
+              "questionDeadline": { ".validate": "newData.isNumber()" },
+              "updatedAt": { ".validate": "newData.isNumber()" },
+              "$other": { ".validate": false }
+            }
+          }
+        },
+
+        "reviewDrafts": {
+          "$teamId": {
+            "$itemIndex": {
+              ".write": "auth != null && ((root.child('liveGames').child($gameId).child('ownerUid').val() === auth.uid) || (root.child('liveGames').child($gameId).child('type').val() === 'collocation-team' && root.child('liveGames').child($gameId).child('status').val() === 'in-progress' && root.child('liveGames').child($gameId).child('state').child('phase').val() === 'review-question' && now < root.child('liveGames').child($gameId).child('state').child('questionDeadline').val() && (root.child('liveGames').child($gameId).child('state').child('reviewMode').val() === 'personalised' ? root.child('liveGames').child($gameId).child('state').child('reviewItemKeysByTeam').child($teamId).val() === $itemIndex : root.child('liveGames').child($gameId).child('state').child('reviewItemIndexes').child(root.child('liveGames').child($gameId).child('state').child('reviewIndex').val() + '').val() + '' === $itemIndex) && root.child('liveGames').child($gameId).child('state').child('captainUids').child($teamId).val() === auth.uid && root.child('liveGames').child($gameId).child('players').child(auth.uid).child('teamId').val() === $teamId && !root.child('liveGames').child($gameId).child('reviewAnswers').child($teamId).child($itemIndex).exists() && newData.child('submittedBy').val() === auth.uid))",
+              ".validate": "newData.hasChildren(['submittedBy', 'questionDeadline', 'updatedAt']) && newData.child('questionDeadline').val() === root.child('liveGames').child($gameId).child('state').child('questionDeadline').val() && newData.child('updatedAt').val() <= now",
+              "selectedWords": { "$index": { ".validate": "newData.isString()" } },
+              "submittedBy": { ".validate": "newData.isString()" },
+              "questionDeadline": { ".validate": "newData.isNumber()" },
+              "updatedAt": { ".validate": "newData.isNumber()" },
+              "$other": { ".validate": false }
+            }
+          }
+        },
+
         "teamAnswers": {
           "$teamId": {
             "$itemIndex": {

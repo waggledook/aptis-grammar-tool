@@ -26,6 +26,18 @@ const PRODUCT_GROUPS = [
     accent: "blue",
     skillGroups: [
       {
+        title: "Vocabulary",
+        resources: [
+          {
+            title: "Collocation Team Challenge",
+            description: "Choose levels, rounds and individual sets, then run a timed team game with personalised review.",
+            path: "/live/collocations/setup",
+            icon: Users,
+            tags: ["Live team game", "Custom sets", "Personalised review"],
+          },
+        ],
+      },
+      {
         title: "Reading",
         resources: [
           {

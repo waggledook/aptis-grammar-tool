@@ -1,0 +1,55 @@
+.ctl-setup-back {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  margin-bottom: 1.25rem;
+  color: var(--ctl-blue);
+  text-decoration: none;
+}
+.ctl-setup .ctl-phase { display: inline-flex; align-items: center; gap: .55rem; }
+.ctl-setup-settings h2 { margin-bottom: 1rem; }
+.ctl-setup-levels { display: flex; gap: .6rem; margin: 0 0 1rem; padding: 0; border: 0; }
+.ctl-setup-levels legend { padding: 0 0 .5rem; font-weight: 700; }
+.ctl-setup-levels label { display: flex; gap: .5rem; align-items: center; border: 1px solid var(--ctl-border); border-radius: 9px; padding: .55rem .9rem; cursor: pointer; }
+.ctl-setup input[type="checkbox"] { accent-color: #3b82f6; width: 18px; height: 18px; margin: 0; }
+.ctl-setup-fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.ctl-setup-fields > label, .ctl-setup-search, .ctl-setup-title { display: flex; flex-direction: column; gap: .5rem; font-weight: 700; }
+.ctl-setup input:not([type="checkbox"]), .ctl-setup select { width: 100%; box-sizing: border-box; min-height: 44px; padding: .65rem .75rem; border: 1px solid var(--ctl-border); border-radius: 9px; background: var(--ctl-panel-deep); color: var(--ctl-text); }
+.ctl-setup input::placeholder { color: var(--ctl-muted); }
+.ctl-setup :is(input, select, button, summary, a):focus-visible { outline: 3px solid var(--ctl-blue); outline-offset: 3px; }
+.ctl-setup label small, .ctl-setup-hint { font-size: .83rem; font-weight: 400; line-height: 1.5; }
+.ctl-setup-layout { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(280px, 1fr); gap: 1rem; align-items: start; }
+.ctl-setup-browser, .ctl-setup-selection { min-width: 0; }
+.ctl-setup-search { margin-top: 1.2rem; }
+.ctl-setup-bank-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .85rem; margin-top: 1rem; }
+.ctl-setup-set { display: flex; flex-direction: column; align-items: stretch; padding: 1rem; border: 1px solid var(--ctl-border); border-radius: 13px; background: var(--ctl-panel-deep); }
+.ctl-setup-set.is-selected { border-color: var(--ctl-blue); box-shadow: inset 0 0 0 1px var(--ctl-blue); }
+.ctl-setup-set-meta { display: flex; flex-wrap: wrap; gap: .5rem; color: var(--ctl-muted); font-size: .78rem; }
+.ctl-setup-set-meta span:first-child { color: var(--ctl-blue); font-weight: 800; }
+.ctl-setup-set h3 { margin: .65rem 0 .25rem; font-size: 1.4rem; }
+.ctl-setup-set > p { margin: 0 0 .75rem; font-size: .8rem; }
+.ctl-setup-set details { margin-bottom: .9rem; font-size: .84rem; color: var(--ctl-muted); }
+.ctl-setup-set summary { cursor: pointer; color: var(--ctl-blue); }
+.ctl-setup-set details ul { padding-left: 1.1rem; margin-bottom: 0; line-height: 1.7; }
+.ctl-setup-set > button { margin-top: auto; gap: .4rem; }
+.ctl-setup-selection .ctl-actions { gap: .5rem; }
+.ctl-setup-selection > p { line-height: 1.5; }
+.ctl-setup-selection .ctl-actions button { font-size: .82rem; gap: .4rem; }
+.ctl-setup-round-list { padding-left: 1.4rem; max-height: 520px; overflow: auto; margin: 1rem 0; }
+.ctl-setup-round-list li { position: relative; padding: .7rem 2rem .7rem .15rem; border-bottom: 1px solid var(--ctl-border); }
+.ctl-setup-round-list small { display: block; margin-top: .25rem; font-size: .72rem; line-height: 1.5; color: var(--ctl-muted); }
+.ctl-setup-remove { display: inline-flex; align-items: center; justify-content: center; position: absolute; top: .55rem; right: 0; width: 32px; height: 32px; border: 0; border-radius: 7px; color: var(--ctl-muted); background: transparent; cursor: pointer; }
+.ctl-setup-remove:hover { color: var(--ctl-text); background: var(--ctl-panel); }
+.ctl-setup-create { width: 100%; margin-top: 1rem; }
+.ctl-setup-title { margin-top: 1.25rem; }
+.ctl-setup-pagination { display: flex; align-items: center; justify-content: space-between; gap: .5rem; margin-top: 1.25rem; font-size: .8rem; color: var(--ctl-muted); }
+.ctl-setup-pagination button { padding: .5rem; gap: .25rem; }
+@media (max-width: 850px) {
+  .ctl-setup-layout { grid-template-columns: 1fr; }
+  .ctl-setup-selection { grid-row: 1; }
+  .ctl-setup-round-list { max-height: 245px; }
+}
+@media (max-width: 520px) {
+  .ctl-setup-fields, .ctl-setup-bank-grid { grid-template-columns: 1fr; }
+  .ctl-setup .ctl-phase { align-self: flex-start; }
+}

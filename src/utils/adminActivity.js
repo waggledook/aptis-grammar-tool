@@ -106,6 +106,14 @@ export const ACTIVITY_TYPE_LABELS = {
   collocation_precision_started: "Collocation Trainer Started",
   collocation_precision_review_loaded: "Collocation Trainer Review Loaded",
   collocation_precision_completed: "Collocation Trainer Completed",
+  collocation_live_hosted: "Collocation Live Session Hosted",
+  collocation_live_joined: "Collocation Live Session Joined",
+  collocation_live_started: "Collocation Live Session Started",
+  collocation_live_review_started: "Collocation Live Review Started",
+  collocation_live_finished: "Collocation Live Session Finished",
+  collocation_live_participation_started: "Collocation Live Participation Started",
+  collocation_live_round_completed: "Collocation Live Round Completed",
+  collocation_live_participation_completed: "Collocation Live Participation Completed",
   synonym_trainer_started: "Synonym Trainer Started",
   synonym_trainer_review_loaded: "Synonym Trainer Review Loaded",
   synonym_trainer_completed: "Synonym Trainer Completed",
@@ -628,6 +636,32 @@ export function formatActivityDetails(log) {
         d.pattern || "",
         d.topic || "",
         `Perfect ${formatScore(d.correct, d.total)}`,
+      ]);
+    case "collocation_live_hosted":
+    case "collocation_live_joined":
+    case "collocation_live_started":
+    case "collocation_live_review_started":
+    case "collocation_live_finished":
+    case "collocation_live_participation_started":
+    case "collocation_live_participation_completed":
+      return joinParts([
+        d.activityTitle || "Collocation Team Challenge",
+        d.teamName || "",
+        formatCount(d.setCount, "set"),
+        formatCount(d.playerCount, "player"),
+        d.points == null ? "" : `${d.points}/${d.possiblePoints ?? "?"} pts`,
+        `PIN ${d.pin ?? "?"}`,
+      ]);
+    case "collocation_live_round_completed":
+      return joinParts([
+        d.activityTitle || "Collocation Team Challenge",
+        d.teamName || "",
+        `${d.review ? "Review" : "Set"} ${Number(d.itemIndex || 0) + 1}`,
+        d.prompt || "",
+        `${d.score ?? 0}/${d.possibleScore ?? "?"} correct`,
+        `+${d.roundPoints ?? 0} pts`,
+        d.submissionMode === "timeout" ? "Auto-submitted at timeout" : d.submissionMode === "unanswered" ? "No selections" : "",
+        `PIN ${d.pin ?? "?"}`,
       ]);
     case "synonym_trainer_started":
       return joinParts([

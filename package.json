@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "test:grammar-review": "node scripts/test-grammar-review.mjs",
     "test:collocation-team": "node --test scripts/test-collocation-team.mjs",
+    "test:speaking-workshop-schedule": "node --test scripts/test-speaking-workshop-schedule.mjs",
     "preview": "vite preview",
     "content:export:keyword": "node scripts/export-keyword-content.mjs",
     "content:export:opencloze": "node scripts/export-open-cloze-content.mjs",

@@ -6,6 +6,12 @@ import sportEntertainmentSource from "./content/sport-entertainment.md?raw";
 import technologyCommunicationSource from "./content/technology-communication.md?raw";
 import travelTransportSource from "./content/travel-transport.md?raw";
 import workCareersSource from "./content/work-careers.md?raw";
+import { SPEAKING_WORKSHOP_PROGRAMME } from "./workshopSchedule";
+
+export {
+  SPEAKING_WORKSHOP_PROGRAMME,
+  SPEAKING_WORKSHOP_PROGRAMME_START,
+} from "./workshopSchedule";
 
 const PHOTO_ASSETS = {
   "work-careers": {
@@ -458,15 +464,6 @@ const TOPIC_META = {
     preparationVisualsReady: true,
   },
 };
-
-export const SPEAKING_WORKSHOP_PROGRAMME_START = "2026-09-04";
-
-export const SPEAKING_WORKSHOP_PROGRAMME = [
-  { week: 1, topicIds: ["relationships-family", "travel-transport"] },
-  { week: 2, topicIds: ["home-neighbourhood", "technology-communication"] },
-  { week: 3, topicIds: ["food-eating", "education-learning"] },
-  { week: 4, topicIds: ["sport-entertainment", "work-careers"] },
-];
 
 function cleanInline(value = "") {
   return value.replace(/\*\*/g, "").replace(/\*/g, "").trim();

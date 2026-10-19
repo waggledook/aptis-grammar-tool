@@ -4,7 +4,9 @@ import {
   Check,
   ChevronDown,
   Clipboard,
+  Clock3,
   LoaderCircle,
+  MessageSquareText,
   Play,
   Plus,
   Square,
@@ -22,6 +24,16 @@ import {
   SPEAKING_WORKSHOP_PROGRAMME,
   SPEAKING_WORKSHOP_TOPIC_CATALOG,
 } from "./workshopTopics";
+import {
+  getNextSpeakingWorkshopDate,
+  getSpeakingWorkshopProgrammeWeek,
+} from "./workshopSchedule";
+
+const WORKSHOP_TIME_ZONE = "Europe/Madrid";
+
+function capitalize(value = "") {
+  return value ? `${value.charAt(0).toUpperCase()}${value.slice(1)}` : "";
+}
 
 function phaseLabel(session) {
   if (session.phase === "live") return "Live now";
@@ -31,11 +43,20 @@ function phaseLabel(session) {
   return "Preparation open";
 }
 
+function withScheduledPhase(session, now) {
+  const startsAt = session.startsAt ? new Date(session.startsAt).getTime() : NaN;
+  if (session.phase === "preparation" && Number.isFinite(startsAt) && startsAt <= now) {
+    return { ...session, phase: "live" };
+  }
+  return session;
+}
+
 function formatDate(value) {
   if (!value) return "";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
   return new Intl.DateTimeFormat("en-GB", {
+    timeZone: WORKSHOP_TIME_ZONE,
     day: "numeric",
     month: "short",
     hour: "2-digit",
@@ -43,16 +64,74 @@ function formatDate(value) {
   }).format(date);
 }
 
+function formatSessionStart(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: WORKSHOP_TIME_ZONE,
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function buildInvitationText(session, joinUrl, topicTitles) {
+  const startsAt = session.startsAt ? new Date(session.startsAt) : null;
+  const hasStart = startsAt && !Number.isNaN(startsAt.getTime());
+  const time = hasStart ? new Intl.DateTimeFormat("es-ES", {
+    timeZone: WORKSHOP_TIME_ZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(startsAt) : "";
+  const weekday = hasStart ? capitalize(new Intl.DateTimeFormat("es-ES", {
+    timeZone: WORKSHOP_TIME_ZONE,
+    weekday: "long",
+  }).format(startsAt)) : "";
+  const fullDate = hasStart ? capitalize(new Intl.DateTimeFormat("es-ES", {
+    timeZone: WORKSHOP_TIME_ZONE,
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  }).format(startsAt)) : "";
+  const topics = new Intl.ListFormat("es-ES", { type: "conjunction" }).format(
+    session.topicIds.map((id) => topicTitles[id] || id)
+  );
+  const heading = hasStart
+    ? `Taller de Speaking Aptis — ${weekday} ${time}`
+    : "Taller de Speaking Aptis";
+  const schedule = hasStart ? `\n📅 ${fullDate}\n🕕 ${time}` : "";
+
+  return `${heading}
+
+Antes del taller tienes disponible una preparación opcional en Aptis Trainer sobre los temas ${topics}.
+
+La preparación dura aproximadamente 12–15 minutos e incluye vocabulario útil, ejercicios cortos, ideas para responder y una breve práctica oral.
+
+👉 ${joinUrl}
+
+Importante: este enlace es únicamente para acceder al material de preparación y práctica en Aptis Trainer. No es el enlace de Zoom para entrar en la clase.
+
+No es obligatorio completar la preparación para asistir al taller.${schedule}`;
+}
+
 export default function SpeakingWorkshopSessionManager({ user }) {
   const [sessions, setSessions] = useState([]);
   const [label, setLabel] = useState("Friday speaking workshop");
-  const [topicIds, setTopicIds] = useState(() => [...SPEAKING_WORKSHOP_PROGRAMME[0].topicIds]);
+  const [sessionDate, setSessionDate] = useState(() => getNextSpeakingWorkshopDate());
+  const [startTime, setStartTime] = useState("18:00");
+  const [topicIds, setTopicIds] = useState(() => [
+    ...getSpeakingWorkshopProgrammeWeek().topicIds,
+  ]);
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [updatingId, setUpdatingId] = useState("");
   const [deletingId, setDeletingId] = useState("");
   const [copiedId, setCopiedId] = useState("");
   const [error, setError] = useState("");
+  const [now, setNow] = useState(() => Date.now());
 
   async function loadSessions() {
     setLoading(true);
@@ -70,6 +149,11 @@ export default function SpeakingWorkshopSessionManager({ user }) {
 
   useEffect(() => {
     loadSessions();
+  }, []);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => setNow(Date.now()), 15000);
+    return () => window.clearInterval(intervalId);
   }, []);
 
   const topicTitles = useMemo(() => Object.fromEntries(
@@ -90,13 +174,27 @@ export default function SpeakingWorkshopSessionManager({ user }) {
     setTopicIds([...programmeWeek.topicIds]);
   }
 
+  function selectDate(value) {
+    setSessionDate(value);
+    if (value) setTopicIds([...getSpeakingWorkshopProgrammeWeek(value).topicIds]);
+  }
+
   async function handleCreate(event) {
     event.preventDefault();
     if (!topicIds.length || creating) return;
+    const startsAt = new Date(`${sessionDate}T${startTime}:00`);
+    if (Number.isNaN(startsAt.getTime())) {
+      setError("Choose a valid workshop date and start time.");
+      return;
+    }
     setCreating(true);
     setError("");
     try {
-      const result = await createSpeakingWorkshopSession({ label, topicIds });
+      const result = await createSpeakingWorkshopSession({
+        label,
+        topicIds,
+        startsAt: startsAt.toISOString(),
+      });
       if (result?.session) setSessions((current) => [{ ...result.session, attendees: [] }, ...current]);
     } catch (requestError) {
       console.error("[Speaking workshops] Could not create session", requestError);
@@ -144,23 +242,29 @@ export default function SpeakingWorkshopSessionManager({ user }) {
     }
   }
 
-  async function copyJoinLink(session) {
-    const url = `${window.location.origin}/speaking-workshops?join=${session.joinCode}&session=${session.id}`;
+  async function copyText(value, copyKey) {
     try {
-      await navigator.clipboard.writeText(url);
-      setCopiedId(session.id);
+      await navigator.clipboard.writeText(value);
+      setCopiedId(copyKey);
       window.setTimeout(() => setCopiedId(""), 1800);
     } catch {
-      setError(`Copy this link: ${url}`);
+      setError(`Copy this text manually: ${value}`);
     }
   }
 
-  const currentSessions = sessions.filter((session) => session.phase !== "review");
-  const endedSessions = sessions.filter((session) => session.phase === "review");
+  const visibleSessions = useMemo(
+    () => sessions.map((session) => withScheduledPhase(session, now)),
+    [now, sessions]
+  );
+  const currentSessions = visibleSessions.filter((session) => session.phase !== "review");
+  const endedSessions = visibleSessions.filter((session) => session.phase === "review");
 
   function renderSessionCard(session) {
     const joinUrl = `${window.location.origin}/speaking-workshops?join=${session.joinCode}&session=${session.id}`;
     const isReviewSession = session.phase === "review";
+    const invitationText = buildInvitationText(session, joinUrl, topicTitles);
+    const linkCopyKey = `${session.id}:link`;
+    const invitationCopyKey = `${session.id}:invitation`;
 
     return (
       <article className={`workshop-session-card is-${session.phase}`} key={session.id}>
@@ -168,6 +272,12 @@ export default function SpeakingWorkshopSessionManager({ user }) {
           <span className="workshop-session-phase">{phaseLabel(session)}</span>
           <h3>{session.label}</h3>
           <p>{session.topicIds.map((id) => topicTitles[id] || id).join(" · ")}</p>
+          {session.startsAt ? (
+            <span className="workshop-session-start">
+              <Clock3 size={16} />
+              {session.phase === "preparation" ? "Practice unlocks automatically" : "Scheduled start"}: {formatSessionStart(session.startsAt)}
+            </span>
+          ) : null}
           <span className="workshop-attendee-count"><Users size={17} /> {session.attendeeCount} registered</span>
           {session.attendees?.length ? (
             <details className="workshop-attendee-list">
@@ -194,9 +304,13 @@ export default function SpeakingWorkshopSessionManager({ user }) {
             <div>
               <span>Student code</span>
               <strong>{session.joinCode}</strong>
-              <button type="button" onClick={() => copyJoinLink(session)}>
-                {copiedId === session.id ? <Check size={16} /> : <Clipboard size={16} />}
-                {copiedId === session.id ? "Copied" : "Copy join link"}
+              <button type="button" onClick={() => copyText(joinUrl, linkCopyKey)}>
+                {copiedId === linkCopyKey ? <Check size={16} /> : <Clipboard size={16} />}
+                {copiedId === linkCopyKey ? "Copied" : "Copy join link"}
+              </button>
+              <button type="button" onClick={() => copyText(invitationText, invitationCopyKey)}>
+                {copiedId === invitationCopyKey ? <Check size={16} /> : <MessageSquareText size={16} />}
+                {copiedId === invitationCopyKey ? "Copied" : "Copy invitation"}
               </button>
             </div>
           </div>
@@ -206,7 +320,7 @@ export default function SpeakingWorkshopSessionManager({ user }) {
           <div className="workshop-session-actions">
             {session.phase === "preparation" ? (
               <button type="button" disabled={updatingId === session.id || deletingId === session.id} onClick={() => updateSession(session.id, "start")}>
-                <Play size={17} /> Start workshop
+                <Play size={17} /> Start now
               </button>
             ) : null}
             {session.phase === "live" ? (
@@ -232,7 +346,7 @@ export default function SpeakingWorkshopSessionManager({ user }) {
         <div>
           <span className="workshop-kicker">Teacher controls</span>
           <h2 id="workshop-manager-title">Run a workshop session</h2>
-          <p>Registration opens preparation immediately. Ending a live session keeps access open for exactly two weeks.</p>
+          <p>Preparation opens immediately. Practice unlocks at the scheduled start, and students can still register while the workshop is live. Ending it keeps access open for exactly two weeks.</p>
         </div>
         <span className="workshop-review-rule"><CalendarClock size={19} /> 14-day review</span>
       </header>
@@ -242,8 +356,24 @@ export default function SpeakingWorkshopSessionManager({ user }) {
           <span>Session name</span>
           <input value={label} onChange={(event) => setLabel(event.target.value)} maxLength={80} />
         </label>
+        <label>
+          <span>Workshop date</span>
+          <input type="date" value={sessionDate} onChange={(event) => selectDate(event.target.value)} required />
+        </label>
+        <label>
+          <span>Start time</span>
+          <input
+            type="time"
+            value={startTime}
+            min="10:00"
+            max="18:00"
+            step="900"
+            onChange={(event) => setStartTime(event.target.value)}
+            required
+          />
+        </label>
         <fieldset className="workshop-programme-selector">
-          <legend>Four-week programme</legend>
+          <legend>Four-week programme · selected automatically from Saturday</legend>
           <div className="workshop-programme-weeks">
             {SPEAKING_WORKSHOP_PROGRAMME.map((programmeWeek) => {
               const isSelected = programmeWeek.topicIds.length === topicIds.length &&
