@@ -1,39 +1,48 @@
 /* src/pages/OpeningPage.module.css */
 .container {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 1rem;
-    text-align: center;
-  }
-  
-  .title {
-    font-size: 2.5rem;
-    margin-bottom: 1rem;
-    color: #111;
-  }
-  
-  .subtitle {
-    font-size: 1.25rem;
-    margin-bottom: 2rem;
-  }
-  
-  .infoRow {
-    display: flex;
-    gap: 2rem;
-    margin-bottom: 2rem;
-  }
-  
-  .label {
-    font-weight: bold;
-  }
-  
-  .value {
-    font-size: 1.5rem;
-  }
-  
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 3vw, 2rem);
+  color: var(--color-text);
+  text-align: center;
+}
+
+.title {
+  margin: 0 0 0.75rem;
+  color: var(--color-text);
+  font-size: clamp(2rem, 6vw, 2.75rem);
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+.subtitle {
+  margin: 0 0 2rem;
+  color: var(--color-text-soft);
+  font-size: 1.25rem;
+}
+
+.infoRow {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 6vw, 3.5rem);
+  margin-bottom: 2rem;
+}
+
+.label {
+  margin: 0;
+  color: var(--color-text-soft);
+  font-weight: 750;
+}
+
+.value {
+  margin: 0.25rem 0 0;
+  color: var(--color-text);
+  font-size: 1.5rem;
+}
+
 .mockList {
   width: min(100%, 760px);
   display: grid;
@@ -44,60 +53,113 @@
   display: grid;
   gap: 0.65rem;
   padding: 1rem;
-  border: 1px solid #d7deea;
-  border-radius: 8px;
-  background: #fff;
-  color: #142033;
+  border: 1px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-surface-2);
+  color: var(--color-text);
   cursor: pointer;
   text-align: left;
-  box-shadow: 0 8px 24px rgba(20, 32, 51, 0.08);
+  box-shadow: 0 8px 24px var(--color-shadow-soft);
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .mockButton:hover {
-  border-color: #4c7ef3;
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-3);
+  box-shadow: 0 12px 30px var(--color-shadow);
+  transform: translateY(-2px);
+}
+
+.mockButton:focus-visible,
+.backButton:focus-visible {
+  border-color: var(--color-border-strong);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 .mockTitle {
+  color: var(--color-text);
   font-size: 1.1rem;
-  font-weight: 700;
+  font-weight: 750;
 }
 
 .mockDescription {
-  color: #526173;
+  color: var(--color-muted);
   font-size: 0.92rem;
   line-height: 1.45;
 }
 
 .openTag,
 .lockedTag {
-  border-radius: 999px;
-  font-size: 0.8rem;
-  font-weight: 700;
-  padding: 0.25rem 0.55rem;
   display: block;
   width: 100%;
   box-sizing: border-box;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 750;
+}
+
+.openTag {
+  border-color: rgba(74, 222, 128, 0.28);
+  background: rgba(34, 197, 94, 0.16);
+  color: #9af5b9;
+}
+
+.lockedTag {
+  border-color: rgba(251, 191, 36, 0.3);
+  background: rgba(245, 158, 11, 0.17);
+  color: #fcd875;
 }
 
 .backButton {
   margin-top: 1.25rem;
   padding: 0.65rem 0.9rem;
-  border: 1px solid #cbd3df;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
-  background: #fff;
-  color: #273548;
+  background: var(--color-surface-2);
+  color: var(--color-text);
   font: inherit;
   font-weight: 750;
   cursor: pointer;
+  box-shadow: 0 5px 14px var(--color-shadow-soft);
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
-.openTag {
+.backButton:hover {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-3);
+  transform: translateY(-1px);
+}
+
+:global(:root[data-theme="light"]) .openTag {
+  border-color: #b9e5c9;
   background: #e7f7ed;
   color: #17633a;
 }
 
-.lockedTag {
+:global(:root[data-theme="light"]) .lockedTag {
+  border-color: #f0d39d;
   background: #fff1d6;
   color: #8a4d00;
 }
-  
+
+@media (max-width: 520px) {
+  .container {
+    justify-content: flex-start;
+    min-height: auto;
+    padding: 1rem 0;
+  }
+
+  .infoRow {
+    width: 100%;
+    gap: 0.75rem;
+  }
+
+  .label {
+    font-size: 0.9rem;
+  }
+}

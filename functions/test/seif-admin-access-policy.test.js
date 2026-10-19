@@ -171,7 +171,7 @@ test("legacy dated access that differs from the last sync is protected", () => {
   assert.deepEqual(result.aptisTrainer, legacyManualAccess);
 });
 
-test("explicit cancellation gives active access a fourteen-day grace period", () => {
+test("explicit cancellation preserves protected manual access for admin review", () => {
   const result = resolveSeifAdminSiteAccess({
     incomingSiteAccess: {ote: automaticAccess({active: false})},
     existingData: {
@@ -194,8 +194,8 @@ test("explicit cancellation gives active access a fourteen-day grace period", ()
   assert.deepEqual(result.ote, {
     active: true,
     startDate: "2026-01-01",
-    endDate: "2026-09-11",
-    indefinite: false,
+    endDate: "",
+    indefinite: true,
     managedBy: "manual",
   });
 });

@@ -70,7 +70,7 @@ No se envía un campo para SeifHub: todo alumno con `status: "active"` o
 - La caducidad normal es `courseEndDate + 14 días`; una cancelación concede 14 días
   desde la primera fecha de cancelación.
 - `completed` conserva los accesos seleccionados hasta esa misma fecha de caducidad.
-- `cancelled` finaliza los accesos activos 14 días después de la primera cancelación.
+- `cancelled` finaliza los accesos automáticos 14 días después de la primera cancelación.
 - Con `active` o `completed` deben enviarse siempre los dos booleanos de `access`.
 - Cambiar un booleano de `true` a `false` retira el acceso gestionado por el sistema
   escolar.
@@ -82,8 +82,13 @@ No se envía un campo para SeifHub: todo alumno con `status: "active"` o
 - Los accesos marcados como modificación manual en el panel de las plataformas no se
   eliminan ni acortan con sincronizaciones `active` o `completed`. El sistema escolar
   puede ampliar la fecha final de un acceso manual con duración, pero no puede
-  desactivarlo ni reactivar una retirada manual. Una petición `cancelled` lo limita
-  a la fecha final del periodo de gracia.
+  desactivarlo ni reactivar una retirada manual. Si una petición `cancelled` reduciría
+  un acceso manual, se conserva el acceso y se crea una revisión en las notificaciones
+  del administrador. El administrador puede aplicar la cancelación (devolviendo esos
+  accesos a la gestión automática) o conservar la modificación manual. Las peticiones
+  repetidas de la misma cancelación respetan esa decisión. Las fechas de caducidad
+  manual siguen vigentes durante la revisión. Una petición posterior `active` o
+  `completed` cierra la revisión pendiente; una nueva cancelación se revisa por separado.
 
 ## Altas, alumnos existentes y renovaciones
 
@@ -153,7 +158,7 @@ Aunque el estado administrativo sea `completed`, los accesos seleccionados sigue
 activos hasta `courseEndDate + 14 días`. Después, las plataformas rechazan el acceso
 automáticamente por fecha.
 
-### Cancelación inmediata
+### Cancelación
 
 ```json
 {
@@ -163,11 +168,17 @@ automáticamente por fecha.
 }
 ```
 
-`cancelled` se reserva para bajas que deben cortar el acceso inmediatamente, por
-ejemplo una cancelación anticipada, impago, error o incidencia. Desactiva SeifHub,
-Aptis Trainer y OTE, pero no elimina la cuenta ni cambia su contraseña.
+`cancelled` se reserva para bajas, por ejemplo una cancelación anticipada, impago,
+error o incidencia. Limita el acceso automático a 14 días desde la primera
+cancelación. Los conflictos con accesos manuales requieren revisión administrativa.
+No elimina la cuenta ni cambia su contraseña.
 
 ## Respuesta correcta
+
+La respuesta incluye `cancellationReviewRequired: true` cuando hay un conflicto
+pendiente de revisión. `accessEndDate` indica la fecha calculada por el sistema
+escolar; no sustituye la caducidad de un acceso manual protegido. Los booleanos de
+`access` reflejan los ajustes guardados; sus fechas siguen determinando el acceso real.
 
 Un alta nueva devuelve HTTP `201`; una actualización devuelve HTTP `200`:
 

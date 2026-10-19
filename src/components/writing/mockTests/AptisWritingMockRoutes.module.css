@@ -3,29 +3,29 @@
   display: grid;
   place-items: center;
   padding: 2rem 1rem;
-  background: #f5f6f8;
-  color: #182230;
+  background: var(--color-page-bg);
+  color: var(--color-text);
 }
 
 .accessCard {
   width: min(100%, 520px);
   padding: 2rem;
-  border: 1px solid #d6dbe3;
+  border: 1px solid var(--color-border);
   border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 18px 50px rgba(24, 34, 48, 0.12);
+  background: var(--color-surface);
+  box-shadow: 0 18px 50px var(--color-shadow);
   text-align: center;
 }
 
 .accessCard h1 {
   margin: 0 0 0.75rem;
-  color: #182230;
+  color: var(--color-text);
   font-size: 1.65rem;
 }
 
 .accessCard p {
   margin: 0 0 1.25rem;
-  color: #526173;
+  color: var(--color-muted);
   line-height: 1.55;
 }
 
@@ -48,7 +48,12 @@
 }
 
 .actions .secondary {
-  border: 1px solid #c7ced8;
-  background: #fff;
-  color: #273548;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-2);
+  color: var(--color-text);
+}
+
+.actions button:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
 }

@@ -38,8 +38,8 @@
   
   /* for each question block */
   .questionBlock {
-    background: #fafafa;
-    border: 1px solid #ccc;
+    background: var(--color-surface-2);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     padding: 1rem;
     margin-bottom: 1.5rem;
@@ -56,24 +56,23 @@
   .answerInput {
     width: 100%;
     padding: 0.5rem;
-    border: 1px solid #ccc;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
-    background: #fff;
-    color: #111;
-    caret-color: #111;
-    color-scheme: light;
+    background: var(--color-surface);
+    color: var(--color-text);
+    caret-color: currentColor;
     font: inherit;
     box-sizing: border-box;
   }
 
   .answerInput::placeholder {
-    color: #777;
+    color: var(--color-muted);
     opacity: 1;
   }
 
   .answerInput:focus {
-    border-color: #5a2d82;
-    outline: 2px solid rgba(90, 45, 130, 0.2);
+    border-color: var(--color-border-strong);
+    outline: 3px solid var(--focus-ring);
     outline-offset: 1px;
   }
   

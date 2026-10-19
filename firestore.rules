@@ -88,7 +88,9 @@ service cloud.firestore {
         "role",
         "teacherId",
         "courseAccess",
-        "siteAccess"
+        "siteAccess",
+        "schoolCancellationReview",
+        "externalSystems"
       ]);
     }
     
@@ -154,6 +156,8 @@ service cloud.firestore {
         && (!("role" in request.resource.data) || request.resource.data.role == "student")
         && !("courseAccess" in request.resource.data)
         && !("siteAccess" in request.resource.data)
+        && !("schoolCancellationReview" in request.resource.data)
+        && !("externalSystems" in request.resource.data)
         && (!("teacherId" in request.resource.data) || request.resource.data.teacherId == null);
 
       allow update: if

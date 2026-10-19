@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarClock,
   Check,
@@ -11,13 +11,16 @@ import {
   Plus,
   Square,
   Trash2,
+  UserPlus,
   Users,
 } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import {
+  addSpeakingWorkshopMember,
   createSpeakingWorkshopSession,
   deleteSpeakingWorkshopSession,
   listSpeakingWorkshopSessions,
+  searchSpeakingWorkshopStudents,
   updateSpeakingWorkshopSession,
 } from "../../../firebase";
 import {
@@ -130,8 +133,14 @@ export default function SpeakingWorkshopSessionManager({ user }) {
   const [updatingId, setUpdatingId] = useState("");
   const [deletingId, setDeletingId] = useState("");
   const [copiedId, setCopiedId] = useState("");
+  const [addingMemberId, setAddingMemberId] = useState("");
+  const [memberEmails, setMemberEmails] = useState({});
+  const [memberNotices, setMemberNotices] = useState({});
+  const [memberSearches, setMemberSearches] = useState({});
   const [error, setError] = useState("");
   const [now, setNow] = useState(() => Date.now());
+  const memberSearchTimer = useRef(null);
+  const memberSearchRequest = useRef(0);
 
   async function loadSessions() {
     setLoading(true);
@@ -154,6 +163,10 @@ export default function SpeakingWorkshopSessionManager({ user }) {
   useEffect(() => {
     const intervalId = window.setInterval(() => setNow(Date.now()), 15000);
     return () => window.clearInterval(intervalId);
+  }, []);
+
+  useEffect(() => () => {
+    if (memberSearchTimer.current) window.clearTimeout(memberSearchTimer.current);
   }, []);
 
   const topicTitles = useMemo(() => Object.fromEntries(
@@ -224,7 +237,7 @@ export default function SpeakingWorkshopSessionManager({ user }) {
   }
 
   async function deleteSession(session) {
-    if (deletingId || updatingId || user?.role !== "admin") return;
+    if (deletingId || updatingId || addingMemberId || user?.role !== "admin") return;
     const confirmed = window.confirm(
       `Delete “${session.label}”? This will remove the session and revoke access for ${session.attendeeCount || 0} registered participant${session.attendeeCount === 1 ? "" : "s"}. This cannot be undone.`
     );
@@ -240,6 +253,112 @@ export default function SpeakingWorkshopSessionManager({ user }) {
     } finally {
       setDeletingId("");
     }
+  }
+
+  async function addMember(event, sessionId) {
+    event.preventDefault();
+    if (addingMemberId || user?.role !== "admin") return;
+    const email = String(memberEmails[sessionId] || "").trim();
+    if (!email) return;
+    setAddingMemberId(sessionId);
+    setMemberNotices((current) => ({ ...current, [sessionId]: null }));
+    try {
+      const result = await addSpeakingWorkshopMember(sessionId, email);
+      if (result?.session && result?.attendee) {
+        setSessions((current) => current.map((session) => {
+          if (session.id !== sessionId) return session;
+          const attendees = Array.isArray(session.attendees) ? session.attendees : [];
+          const nextAttendees = attendees.some((attendee) => attendee.uid === result.attendee.uid)
+            ? attendees.map((attendee) => (
+              attendee.uid === result.attendee.uid ? { ...attendee, ...result.attendee } : attendee
+            ))
+            : [...attendees, result.attendee];
+          return { ...session, ...result.session, attendees: nextAttendees };
+        }));
+      }
+      setMemberEmails((current) => ({ ...current, [sessionId]: "" }));
+      setMemberSearches((current) => ({
+        ...current,
+        [sessionId]: { status: "idle", students: [] },
+      }));
+      setMemberNotices((current) => ({
+        ...current,
+        [sessionId]: {
+          type: "success",
+          message: result?.alreadyMember
+            ? "This student already has access to the workshop."
+            : "Participant added. Their workshop access is ready.",
+        },
+      }));
+    } catch (requestError) {
+      console.error("[Speaking workshops] Could not add participant", requestError);
+      const code = String(requestError?.code || "");
+      const message = code.includes("not-found")
+        ? "No Aptis Trainer account was found for that email."
+        : code.includes("failed-precondition")
+          ? "Participants can only be added before or during a live workshop."
+          : code.includes("permission-denied")
+            ? "Only administrators can add participants."
+            : "The participant couldn’t be added. Please try again.";
+      setMemberNotices((current) => ({
+        ...current,
+        [sessionId]: { type: "error", message },
+      }));
+    } finally {
+      setAddingMemberId("");
+    }
+  }
+
+  function updateMemberSearch(sessionId, value) {
+    setMemberEmails((current) => ({ ...current, [sessionId]: value }));
+    setMemberNotices((current) => ({ ...current, [sessionId]: null }));
+    if (memberSearchTimer.current) window.clearTimeout(memberSearchTimer.current);
+    const query = value.trim();
+    if (query.length < 2) {
+      memberSearchRequest.current += 1;
+      setMemberSearches((current) => ({
+        ...current,
+        [sessionId]: { status: "idle", students: [] },
+      }));
+      return;
+    }
+
+    const requestId = memberSearchRequest.current + 1;
+    memberSearchRequest.current = requestId;
+    setMemberSearches((current) => ({
+      ...current,
+      [sessionId]: { status: "loading", students: [] },
+    }));
+    memberSearchTimer.current = window.setTimeout(async () => {
+      try {
+        const result = await searchSpeakingWorkshopStudents(sessionId, query);
+        if (memberSearchRequest.current !== requestId) return;
+        setMemberSearches((current) => ({
+          ...current,
+          [sessionId]: {
+            status: "ready",
+            students: Array.isArray(result?.students) ? result.students : [],
+          },
+        }));
+      } catch (requestError) {
+        if (memberSearchRequest.current !== requestId) return;
+        console.error("[Speaking workshops] Could not search students", requestError);
+        setMemberSearches((current) => ({
+          ...current,
+          [sessionId]: { status: "error", students: [] },
+        }));
+      }
+    }, 250);
+  }
+
+  function selectMemberSearchResult(sessionId, student) {
+    memberSearchRequest.current += 1;
+    if (memberSearchTimer.current) window.clearTimeout(memberSearchTimer.current);
+    setMemberEmails((current) => ({ ...current, [sessionId]: student.email }));
+    setMemberSearches((current) => ({
+      ...current,
+      [sessionId]: { status: "idle", students: [] },
+    }));
   }
 
   async function copyText(value, copyKey) {
@@ -265,6 +384,8 @@ export default function SpeakingWorkshopSessionManager({ user }) {
     const invitationText = buildInvitationText(session, joinUrl, topicTitles);
     const linkCopyKey = `${session.id}:link`;
     const invitationCopyKey = `${session.id}:invitation`;
+    const memberSearch = memberSearches[session.id] || { status: "idle", students: [] };
+    const memberSearchListId = `workshop-member-results-${session.id}`;
 
     return (
       <article className={`workshop-session-card is-${session.phase}`} key={session.id}>
@@ -288,6 +409,79 @@ export default function SpeakingWorkshopSessionManager({ user }) {
                 ))}
               </div>
             </details>
+          ) : null}
+          {user?.role === "admin" && !isReviewSession ? (
+            <form className="workshop-add-member" onSubmit={(event) => addMember(event, session.id)}>
+              <label htmlFor={`workshop-add-member-${session.id}`}>Add participant by account email</label>
+              <div>
+                <input
+                  id={`workshop-add-member-${session.id}`}
+                  type="email"
+                  value={memberEmails[session.id] || ""}
+                  onChange={(event) => updateMemberSearch(session.id, event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Escape") {
+                      setMemberSearches((current) => ({
+                        ...current,
+                        [session.id]: { status: "idle", students: [] },
+                      }));
+                    }
+                  }}
+                  placeholder="Start typing a name or email"
+                  autoComplete="off"
+                  aria-autocomplete="list"
+                  aria-controls={memberSearchListId}
+                  aria-expanded={memberSearch.status === "loading" || memberSearch.status === "ready"}
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={Boolean(addingMemberId) || !String(memberEmails[session.id] || "").trim()}
+                >
+                  {addingMemberId === session.id
+                    ? <LoaderCircle className="workshop-spin" size={16} />
+                    : <UserPlus size={16} />}
+                  {addingMemberId === session.id ? "Adding…" : "Add"}
+                </button>
+              </div>
+              {memberSearch.status === "loading" ? (
+                <div className="workshop-student-search-state">
+                  <LoaderCircle className="workshop-spin" size={15} /> Searching active students…
+                </div>
+              ) : null}
+              {memberSearch.status === "ready" && memberSearch.students.length ? (
+                <ul className="workshop-student-suggestions" id={memberSearchListId} role="listbox">
+                  {memberSearch.students.map((student) => (
+                    <li key={student.uid}>
+                      <button
+                        type="button"
+                        role="option"
+                        aria-selected="false"
+                        onMouseDown={(event) => event.preventDefault()}
+                        onClick={() => selectMemberSearchResult(session.id, student)}
+                      >
+                        <span>
+                          <strong>{student.name || student.email}</strong>
+                          {student.name ? <small>{student.email}</small> : null}
+                        </span>
+                        {student.alreadyMember ? <em>Already added</em> : null}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              {memberSearch.status === "ready" && !memberSearch.students.length ? (
+                <div className="workshop-student-search-state">No matching active students.</div>
+              ) : null}
+              {memberSearch.status === "error" ? (
+                <div className="workshop-student-search-state is-error">Student search is unavailable right now.</div>
+              ) : null}
+              {memberNotices[session.id] ? (
+                <small className={`is-${memberNotices[session.id].type}`} role="status">
+                  {memberNotices[session.id].message}
+                </small>
+              ) : null}
+            </form>
           ) : null}
           {isReviewSession && session.reviewUntil ? (
             <small>
@@ -329,7 +523,7 @@ export default function SpeakingWorkshopSessionManager({ user }) {
               </button>
             ) : null}
             {user?.role === "admin" ? (
-              <button className="is-delete" type="button" disabled={Boolean(updatingId) || Boolean(deletingId)} onClick={() => deleteSession(session)}>
+              <button className="is-delete" type="button" disabled={Boolean(updatingId) || Boolean(deletingId) || Boolean(addingMemberId)} onClick={() => deleteSession(session)}>
                 {deletingId === session.id ? <LoaderCircle className="workshop-spin" size={16} /> : <Trash2 size={16} />}
                 {deletingId === session.id ? "Deleting…" : "Delete"}
               </button>

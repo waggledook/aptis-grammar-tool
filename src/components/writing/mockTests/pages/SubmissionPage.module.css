@@ -1,9 +1,19 @@
 .page {
+  min-height: 100vh;
   padding: 2rem;
-  max-width: 900px;
+  width: 100%;
+  max-width: none;
   margin: auto;
-  background: #fff;
-  color: #111;
+  background: var(--color-page-bg);
+  color: var(--color-text);
+}
+
+.page > .toolbar,
+.page > .feedbackWorkspace,
+.page > .content {
+  width: min(100%, 900px);
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .page h1,
@@ -25,7 +35,7 @@
   padding: 0.6rem 1rem;
   border: 0;
   border-radius: 8px;
-  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+  background: linear-gradient(135deg, #16803c 0%, #166534 100%);
   color: #fff;
   font: inherit;
   font-weight: 700;
@@ -33,16 +43,16 @@
 }
 
 .helperText {
-  color: #555;
+  color: var(--color-muted);
   font-size: 0.95rem;
 }
 
 .feedbackWorkspace {
-  background: #f6f8fb;
-  border: 1px solid #dce3ec;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
-  color: #17202a;
-  margin: 1.5rem 0 2rem;
+  color: var(--color-text);
+  margin: 1.5rem auto 2rem;
   padding: 1rem;
 }
 
@@ -55,13 +65,13 @@
 }
 
 .feedbackNotice {
-  color: #7a4a00;
+  color: #fcd875;
   font-weight: 600;
 }
 
 .feedbackCard {
-  background: #fff;
-  border: 1px solid #dce3ec;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 6px;
   margin-top: 1rem;
   padding: 1rem;
@@ -89,13 +99,13 @@
 }
 
 .feedbackEmpty {
-  color: #626f7d;
+  color: var(--color-muted);
 }
 
 .feedbackError {
-  background: #fff4f4;
-  border-left: 4px solid #c83737;
-  color: #9f1f1f;
+  background: var(--color-danger-bg);
+  border-left: 4px solid var(--color-danger-border);
+  color: var(--color-danger);
   padding: 0.65rem 0.8rem;
 }
 
@@ -104,7 +114,7 @@
 }
 
 .feedbackLevel {
-  color: #5a2d82;
+  color: var(--color-link);
   font-weight: 700;
 }
 
@@ -114,7 +124,7 @@
 }
 
 .feedbackNotes {
-  border-top: 1px solid #e6ecf2;
+  border-top: 1px solid var(--color-border);
   display: grid;
   gap: 0.35rem;
   margin-top: 0.75rem;
@@ -143,25 +153,25 @@
 }
 
 .feedbackSection {
-  border-top: 1px solid #dfe7ef;
+  border-top: 1px solid var(--color-border);
   margin-top: 1.1rem;
   padding-top: 1rem;
 }
 
 .feedbackSection h4 {
-  color: #26394f;
+  color: var(--color-text-soft);
   font-size: 1.05rem;
   margin: 0 0 0.35rem;
 }
 
 .feedbackQuestion {
-  color: #536171;
+  color: var(--color-muted);
   font-size: 0.93rem;
 }
 
 .feedbackStudentAnswer {
-  background: #fff;
-  border-left: 4px solid #b8c4d3;
+  background: var(--color-surface-2);
+  border-left: 4px solid var(--color-border);
   margin: 0.65rem 0;
   padding: 0.55rem 0.75rem;
 }
@@ -181,8 +191,8 @@
 
 .feedbackMistakes li,
 .feedbackSuggestions li {
-  background: #f9fbfd;
-  border: 1px solid #edf1f5;
+  background: var(--color-surface-3);
+  border: 1px solid var(--color-border);
   border-radius: 4px;
   list-style: none;
   margin: 0 0 0.45rem;
@@ -191,7 +201,7 @@
 
 .feedbackMistakes small,
 .feedbackSuggestions small {
-  color: #667586;
+  color: var(--color-muted);
   display: block;
   font-size: 0.75rem;
   font-weight: 700;
@@ -200,31 +210,31 @@
 }
 
 .feedbackMistakes span:first-of-type {
-  color: #9f1f1f;
+  color: #fca5a5;
 }
 
 .feedbackMistakes strong {
-  color: #16703b;
+  color: #86efac;
 }
 
 .feedbackSuggestions span:first-of-type {
-  color: #445363;
+  color: var(--color-text-soft);
 }
 
 .feedbackSuggestions strong {
-  color: #265c9c;
+  color: #93c5fd;
 }
 
 .feedbackMistakes em,
 .feedbackSuggestions em {
-  color: #536171;
+  color: var(--color-muted);
   display: block;
   font-size: 0.92rem;
 }
 
 .feedbackImproved {
-  background: #f7fbf8;
-  border-left: 4px solid #39a467;
+  background: rgba(34, 197, 94, 0.12);
+  border-left: 4px solid var(--color-success);
   margin-top: 0.9rem;
   padding: 0.7rem 0.85rem;
 }
@@ -234,19 +244,23 @@
 }
 
 .feedbackResult blockquote {
-  border-left: 4px solid #d6dfe8;
-  color: #445363;
+  border-left: 4px solid var(--color-border);
+  color: var(--color-text-soft);
   margin: 0.9rem 0 0;
   padding-left: 0.85rem;
 }
 
 .content {
-  background: white;
-  color: #111;
+  background: var(--color-surface);
+  color: var(--color-text);
+  padding: clamp(1rem, 3vw, 2rem);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  box-shadow: 0 14px 36px var(--color-shadow-soft);
 }
 
 .documentHeader {
-  border-bottom: 2px solid #ddd;
+  border-bottom: 2px solid var(--color-border);
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
 }
@@ -257,7 +271,7 @@
 
 .submissionMeta {
   margin: 0;
-  color: #666;
+  color: var(--color-muted);
   font-size: 0.95rem;
 }
 
@@ -271,15 +285,15 @@
 }
 
 .promptText {
-  background: #f9f9f9;
+  background: var(--color-surface-3);
   padding: 0.75rem;
-  border-left: 4px solid #5a2d82;
+  border-left: 4px solid var(--color-border-strong);
   margin-bottom: 1rem;
 }
 
 .qaBlock {
-  background: #fafafa;
-  border: 1px solid #ddd;
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border);
   padding: 1rem;
   border-radius: 4px;
   margin-bottom: 1rem;
@@ -306,8 +320,24 @@
 .emailBlock {
   margin: 0 0 1rem;
   padding: 1rem 1rem 1rem 1.25rem;
-  background: #f8f8f8;
-  border-left: 4px solid #b9b9b9;
+  background: var(--color-surface-2);
+  border-left: 4px solid var(--color-border);
+}
+
+:global(:root[data-theme="light"]) .feedbackNotice {
+  color: #7a4a00;
+}
+
+:global(:root[data-theme="light"]) .feedbackMistakes span:first-of-type {
+  color: #9f1f1f;
+}
+
+:global(:root[data-theme="light"]) .feedbackMistakes strong {
+  color: #16703b;
+}
+
+:global(:root[data-theme="light"]) .feedbackSuggestions strong {
+  color: #265c9c;
 }
 
 @media print {
@@ -329,6 +359,7 @@
     margin: 2rem 0 0;
     page-break-before: always;
     padding: 0;
+    color: #111;
   }
 
   .feedbackWorkspace:not(.hasFeedback) {
@@ -371,11 +402,30 @@
     margin: 0;
     font-size: 11pt;
     color: #000;
+    background: #fff;
   }
 
   .content {
     order: 1;
     width: 100%;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    color: #111;
+    box-shadow: none;
+  }
+
+  .feedbackCard,
+  .feedbackStudentAnswer,
+  .feedbackMistakes li,
+  .feedbackSuggestions li,
+  .feedbackImproved,
+  .promptText,
+  .qaBlock,
+  .emailBlock {
+    background: #fff;
+    color: #111;
+    border-color: #ddd;
   }
 
   .feedbackWorkspace {

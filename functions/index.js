@@ -383,6 +383,200 @@ exports.joinSpeakingWorkshopSession = functions
     return {ok: true, session: serializeSpeakingWorkshopSession(joined)};
   });
 
+exports.addSpeakingWorkshopMember = functions
+  .runWith({maxInstances: 10})
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    const role = await requireSpeakingWorkshopStaff(context);
+    if (role !== "admin") {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Only administrators can add workshop participants."
+      );
+    }
+
+    const sessionId = String(data?.sessionId || "").trim();
+    const email = String(data?.email || "").trim().toLowerCase();
+    if (!/^[A-Za-z0-9]{10,40}$/.test(sessionId) ||
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Choose a valid workshop session and account email."
+      );
+    }
+
+    let authUser;
+    try {
+      authUser = await admin.auth().getUserByEmail(email);
+    } catch (error) {
+      if (error?.code === "auth/user-not-found") {
+        throw new functions.https.HttpsError(
+          "not-found",
+          "No Aptis Trainer account was found for that email."
+        );
+      }
+      throw error;
+    }
+
+    const sessionRef = firestore.collection("speakingWorkshopSessions")
+      .doc(sessionId);
+    const attendeeRef = sessionRef.collection("attendees").doc(authUser.uid);
+    const membershipRef = firestore.doc(`users/${authUser.uid}`)
+      .collection("speakingWorkshopMemberships")
+      .doc(sessionId);
+    let alreadyMember = false;
+
+    await firestore.runTransaction(async (transaction) => {
+      const [sessionSnap, attendeeSnap] = await Promise.all([
+        transaction.get(sessionRef),
+        transaction.get(attendeeRef),
+      ]);
+      if (!sessionSnap.exists) {
+        throw new functions.https.HttpsError(
+          "not-found",
+          "That workshop was not found."
+        );
+      }
+      const session = sessionSnap.data() || {};
+      if (session.registrationOpen === false || session.phase === "review") {
+        throw new functions.https.HttpsError(
+          "failed-precondition",
+          "Participants can only be added before or during a live workshop."
+        );
+      }
+
+      alreadyMember = attendeeSnap.exists;
+      const attendee = {
+        uid: authUser.uid,
+        email: authUser.email || email,
+        name: authUser.displayName || null,
+        addedByAdminUid: context.auth.uid,
+      };
+      if (!alreadyMember) {
+        attendee.joinedAt = admin.firestore.FieldValue.serverTimestamp();
+      }
+      transaction.set(attendeeRef, attendee, {merge: true});
+      transaction.set(membershipRef, {
+        sessionId,
+        addedByAdminUid: context.auth.uid,
+        ...(alreadyMember ? {} : {
+          joinedAt: admin.firestore.FieldValue.serverTimestamp(),
+        }),
+      }, {merge: true});
+      if (!alreadyMember) {
+        transaction.update(sessionRef, {
+          attendeeCount: admin.firestore.FieldValue.increment(1),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      }
+    });
+
+    const updated = await sessionRef.get();
+    return {
+      ok: true,
+      alreadyMember,
+      attendee: {
+        uid: authUser.uid,
+        email: authUser.email || email,
+        name: authUser.displayName || "",
+      },
+      session: serializeSpeakingWorkshopSession(updated, true),
+    };
+  });
+
+function normalizeWorkshopStudentSearch(value = "") {
+  return String(value || "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ");
+}
+
+function speakingWorkshopStudentSearchScore(profile = {}, query = "") {
+  const values = [
+    profile.displayName,
+    profile.name,
+    profile.username,
+    profile.email,
+  ].map(normalizeWorkshopStudentSearch).filter(Boolean);
+  if (values.some((value) => value === query)) return 0;
+  if (values.some((value) => value.startsWith(query))) return 1;
+  if (values.some((value) => value.split(" ").some((part) => part.startsWith(query)))) return 2;
+  return values.some((value) => value.includes(query)) ? 3 : null;
+}
+
+exports.searchSpeakingWorkshopStudents = functions
+  .runWith({maxInstances: 10})
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    const role = await requireSpeakingWorkshopStaff(context);
+    if (role !== "admin") {
+      throw new functions.https.HttpsError(
+        "permission-denied",
+        "Only administrators can search for workshop participants."
+      );
+    }
+
+    const sessionId = String(data?.sessionId || "").trim();
+    const searchText = normalizeWorkshopStudentSearch(data?.query);
+    if (!/^[A-Za-z0-9]{10,40}$/.test(sessionId) ||
+        searchText.length < 2 || searchText.length > 80) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Enter at least two characters to search active students."
+      );
+    }
+
+    const sessionRef = firestore.collection("speakingWorkshopSessions")
+      .doc(sessionId);
+    const [sessionSnap, studentSnaps] = await Promise.all([
+      sessionRef.get(),
+      firestore.collection("users")
+        .where("role", "==", "student")
+        .limit(2000)
+        .get(),
+    ]);
+    if (!sessionSnap.exists) {
+      throw new functions.https.HttpsError(
+        "not-found",
+        "That workshop was not found."
+      );
+    }
+
+    const matches = studentSnaps.docs
+      .map((snap) => {
+        const profile = snap.data() || {};
+        return {
+          uid: snap.id,
+          email: profile.email || "",
+          name: profile.displayName || profile.name || profile.username || "",
+          score: speakingWorkshopStudentSearchScore(profile, searchText),
+          profile,
+        };
+      })
+      .filter((entry) => entry.email && entry.score !== null &&
+        hasAptisTrainerAccess(entry.profile))
+      .sort((a, b) => a.score - b.score ||
+        (a.name || a.email).localeCompare(b.name || b.email))
+      .slice(0, 8);
+
+    const attendeeSnaps = matches.length
+      ? await firestore.getAll(...matches.map((entry) => (
+        sessionRef.collection("attendees").doc(entry.uid)
+      )))
+      : [];
+
+    return {
+      students: matches.map((entry, index) => ({
+        uid: entry.uid,
+        email: entry.email,
+        name: entry.name,
+        alreadyMember: attendeeSnaps[index]?.exists || false,
+      })),
+    };
+  });
+
 exports.getSpeakingWorkshopAccess = functions
   .runWith({maxInstances: 20})
   .region("europe-west1")
@@ -8769,6 +8963,8 @@ const textToSpeech = require("@google-cloud/text-to-speech");
 const {
   getSeifAdminAccessStartDate,
   resolveSeifAdminSiteAccess,
+  resolveSeifAdminCancellationReview,
+  resolveSeifAdminCancellationDecision,
 } = require("./seif-admin-access-policy");
 
 const SEIF_ADMIN_SYNC_SECRET = "SEIF_ADMIN_SYNC_SECRET";
@@ -9058,7 +9254,7 @@ exports.syncSeifAdminStudent = functions
 
     try {
       const payload = parseSeifAdminSyncRequest(req.body || {});
-      const {authUser, existingDoc, createdAuthUser, skipped} =
+      const {authUser, createdAuthUser, skipped} =
         await resolveSeifAdminAuthUser(payload);
 
       if (skipped) {
@@ -9070,59 +9266,80 @@ exports.syncSeifAdminStudent = functions
           createdAuthUser: false,
           status: payload.status,
           accessEndDate: "",
+          cancellationReviewRequired: false,
           access: {seifhub: false, aptisTrainer: false, ote: false},
         });
       }
 
-      const existingData = existingDoc.exists ? existingDoc.data() || {} : {};
-      const existingSeifAdmin = existingData.externalSystems?.seifAdmin || {};
-      const cancellationDate = payload.status === "cancelled"
-        ? existingSeifAdmin.cancelledAt || todayIsoDate()
-        : "";
-      const cancellationAccessEndDate = cancellationDate
-        ? addSeifAdminDays(cancellationDate, SEIF_ADMIN_ACCESS_EXTENSION_DAYS)
-        : "";
-      const resolvedSiteAccess = resolveSeifAdminSiteAccess({
-        incomingSiteAccess: payload.siteAccess,
-        existingData,
-        status: payload.status,
-        courseStartDate: payload.courseStartDate,
-        todayIsoDate: todayIsoDate(),
-        cancellationDate: cancellationDate || todayIsoDate(),
-      });
-      const now = admin.firestore.FieldValue.serverTimestamp();
-      const userPayload = {
-        email: payload.email,
-        name: payload.displayName || existingData.name || authUser.displayName || "",
-        username: existingData.username || "",
-        role: existingData.role || "student",
-        siteAccess: resolvedSiteAccess,
-        externalSystems: {
-          seifAdmin: {
-            studentId: payload.studentId,
-            contractId: payload.contractId || existingSeifAdmin.contractId || "",
+      const userRef = firestore.doc(`users/${authUser.uid}`);
+      const {resolvedSiteAccess, cancellationAccessEndDate, cancellationReviewRequired} =
+        await firestore.runTransaction(async (transaction) => {
+          const currentDoc = await transaction.get(userRef);
+          const existingData = currentDoc.exists ? currentDoc.data() || {} : {};
+          const existingSeifAdmin = existingData.externalSystems?.seifAdmin || {};
+          const cancellationDate = payload.status === "cancelled"
+            ? existingSeifAdmin.cancelledAt || todayIsoDate()
+            : "";
+          const cancellationAccessEndDate = cancellationDate
+            ? addSeifAdminDays(cancellationDate, SEIF_ADMIN_ACCESS_EXTENSION_DAYS)
+            : "";
+          const resolvedSiteAccess = resolveSeifAdminSiteAccess({
+            incomingSiteAccess: payload.siteAccess,
+            existingData,
             status: payload.status,
-            courseStartDate: payload.courseStartDate || existingSeifAdmin.courseStartDate || "",
-            courseEndDate: payload.courseEndDate || existingSeifAdmin.courseEndDate || "",
-            accessEndDate: payload.active
-              ? payload.accessEndDate
-              : cancellationAccessEndDate,
-            cancelledAt: cancellationDate,
-            lastSyncedAt: now,
-          },
-        },
-        updatedAt: now,
-      };
+            courseStartDate: payload.courseStartDate,
+            todayIsoDate: todayIsoDate(),
+            cancellationDate: cancellationDate || todayIsoDate(),
+          });
+          const now = admin.firestore.FieldValue.serverTimestamp();
+          const userPayload = {
+            email: payload.email,
+            name: payload.displayName || existingData.name || authUser.displayName || "",
+            username: existingData.username || "",
+            role: existingData.role || "student",
+            siteAccess: resolvedSiteAccess,
+            externalSystems: {
+              seifAdmin: {
+                studentId: payload.studentId,
+                contractId: payload.contractId || existingSeifAdmin.contractId || "",
+                status: payload.status,
+                courseStartDate: payload.courseStartDate || existingSeifAdmin.courseStartDate || "",
+                courseEndDate: payload.courseEndDate || existingSeifAdmin.courseEndDate || "",
+                accessEndDate: payload.active
+                  ? payload.accessEndDate
+                  : cancellationAccessEndDate,
+                cancelledAt: cancellationDate,
+                lastSyncedAt: now,
+              },
+            },
+            updatedAt: now,
+          };
 
-      if (!existingDoc.exists) userPayload.createdAt = now;
-      if (createdAuthUser) {
-        userPayload.onboarding = {
-          source: "seifAdmin",
-          temporaryPasswordIssued: true,
-          temporaryPasswordIssuedAt: now,
-        };
-      }
-      await firestore.doc(`users/${authUser.uid}`).set(userPayload, {merge: true});
+          if (!currentDoc.exists) userPayload.createdAt = now;
+          if (createdAuthUser) {
+            userPayload.onboarding = {
+              source: "seifAdmin",
+              temporaryPasswordIssued: true,
+              temporaryPasswordIssuedAt: now,
+            };
+          }
+          const review = resolveSeifAdminCancellationReview({
+            incomingSiteAccess: payload.siteAccess,
+            existingData,
+            status: payload.status,
+            cancellationDate,
+            todayIsoDate: todayIsoDate(),
+            detectedAt: new Date().toISOString(),
+          });
+          transaction.set(userRef, userPayload, {merge: true});
+          // Replace the review map so a new episode cannot inherit an old decision.
+          transaction.update(userRef, {schoolCancellationReview: review});
+          return {
+            resolvedSiteAccess,
+            cancellationAccessEndDate,
+            cancellationReviewRequired: review?.status === "pending",
+          };
+        });
 
       console.log("SEIF_ADMIN_SYNC_OK", {
         uid: authUser.uid,
@@ -9139,6 +9356,7 @@ exports.syncSeifAdminStudent = functions
         createdAuthUser,
         status: payload.status,
         accessEndDate: payload.active ? payload.accessEndDate : cancellationAccessEndDate,
+        cancellationReviewRequired,
         access: {
           seifhub: resolvedSiteAccess.seifhub.active,
           aptisTrainer: resolvedSiteAccess.aptisTrainer.active,
@@ -9159,6 +9377,52 @@ exports.syncSeifAdminStudent = functions
       });
       return res.status(status).json({ok: false, error: {code, message}});
     }
+  });
+
+
+exports.reviewSeifAdminCancellation = functions.region("europe-west1")
+  .https.onCall(async (data, context) => {
+    if (!context.auth?.uid) {
+      throw new functions.https.HttpsError("unauthenticated", "Sign in to review access changes.");
+    }
+    const uid = String(data?.uid || "");
+    const reviewId = String(data?.reviewId || "");
+    const reviewVersion = data?.reviewVersion;
+    const decision = data?.decision;
+    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(uid) || !reviewId || reviewId.length > 150 ||
+        !Number.isInteger(reviewVersion) || reviewVersion < 1 ||
+        !["apply", "keep"].includes(decision)) {
+      throw new functions.https.HttpsError("invalid-argument", "Choose a pending cancellation and a review action.");
+    }
+    return firestore.runTransaction(async (transaction) => {
+      const adminProfile = await transaction.get(firestore.doc(`users/${context.auth.uid}`));
+      if (adminProfile.data()?.role !== "admin") {
+        throw new functions.https.HttpsError("permission-denied", "Only administrators can review school cancellations.");
+      }
+      const userRef = firestore.doc(`users/${uid}`);
+      const snapshot = await transaction.get(userRef);
+      if (!snapshot.exists) {
+        throw new functions.https.HttpsError("not-found", "This student account no longer exists.");
+      }
+      let result;
+      try {
+        result = resolveSeifAdminCancellationDecision({
+          existingData: snapshot.data(), reviewId, reviewVersion, decision, todayIsoDate: todayIsoDate(),
+        });
+      } catch (error) {
+        throw new functions.https.HttpsError("failed-precondition", error.message);
+      }
+      const now = admin.firestore.FieldValue.serverTimestamp();
+      const review = result.reviewUpdated ? result.review : {
+        ...result.review, decidedAt: now, decidedBy: context.auth.uid,
+      };
+      transaction.update(userRef, {
+        schoolCancellationReview: review,
+        siteAccess: result.siteAccess,
+        updatedAt: now,
+      });
+      return {reviewUpdated: result.reviewUpdated, status: review.status};
+    });
   });
 
 

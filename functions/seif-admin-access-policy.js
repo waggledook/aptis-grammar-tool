@@ -133,6 +133,109 @@ function buildCancelledAccess(existingAccess, cancellationDate, todayIsoDate) {
   };
 }
 
+function manualAccessSnapshot(access) {
+  return {
+    active: !!access.active,
+    startDate: access.startDate || "",
+    endDate: access.endDate || "",
+    indefinite: !!access.indefinite,
+    managedBy: "manual",
+  };
+}
+
+function resolveSeifAdminCancellationReview({
+  incomingSiteAccess,
+  existingData = {},
+  status,
+  cancellationDate,
+  todayIsoDate,
+  detectedAt = todayIsoDate,
+}) {
+  const previous = existingData.schoolCancellationReview || null;
+  const sameCancellation =
+    existingData.externalSystems?.seifAdmin?.status === "cancelled" &&
+    previous?.cancellationDate === cancellationDate;
+
+  if (status !== "cancelled") {
+    return previous ? {...previous, status: "superseded"} : null;
+  }
+  // An admin's decision covers repeated updates for this cancellation episode.
+  if (sameCancellation && previous?.status === "kept") return previous;
+
+  const entries = {};
+  for (const accessKey of Object.keys(incomingSiteAccess || {}).sort()) {
+    const access = existingData.siteAccess?.[accessKey];
+    if (!isProtectedManualAccess(access, {
+      accessKey,
+      existingSeifAdmin: existingData.externalSystems?.seifAdmin || {},
+    }) || !access.active) continue;
+    if (!access.indefinite && access.endDate && access.endDate < todayIsoDate) continue;
+
+    const proposedAccess = normalizeAutomaticAccess(
+      buildCancelledAccess(access, cancellationDate, todayIsoDate)
+    );
+    if (!proposedAccess.active || access.indefinite || !access.endDate ||
+        proposedAccess.endDate < access.endDate) {
+      entries[accessKey] = {manualAccess: manualAccessSnapshot(access), proposedAccess};
+    }
+  }
+  if (!Object.keys(entries).length) {
+    return previous?.status === "pending" || !sameCancellation
+      ? previous && {...previous, status: "superseded"}
+      : previous;
+  }
+  const continuing = sameCancellation && previous?.status === "pending";
+  return {
+    id: continuing ? previous.id : `${cancellationDate}:${detectedAt}`,
+    version: continuing
+      ? previous.version + (JSON.stringify(previous.entries) === JSON.stringify(entries) ? 0 : 1)
+      : 1,
+    status: "pending",
+    cancellationDate,
+    detectedAt: continuing ? previous.detectedAt : detectedAt,
+    entries,
+  };
+}
+
+function resolveSeifAdminCancellationDecision({existingData, reviewId, reviewVersion, decision, todayIsoDate}) {
+  const review = existingData.schoolCancellationReview;
+  if (!review || review.id !== reviewId || review.status !== "pending" ||
+      existingData.externalSystems?.seifAdmin?.status !== "cancelled") {
+    throw new Error("This cancellation is no longer awaiting review.");
+  }
+  if (decision !== "apply" && decision !== "keep") {
+    throw new Error("Choose whether to apply the cancellation or keep the override.");
+  }
+  if (review.version !== reviewVersion) {
+    return {review, siteAccess: existingData.siteAccess, reviewUpdated: true};
+  }
+  const refreshed = resolveSeifAdminCancellationReview({
+    incomingSiteAccess: Object.fromEntries(
+      ["seifhub", "aptisTrainer", "ote"].map((key) => [key, {}])
+    ),
+    existingData,
+    status: "cancelled",
+    cancellationDate: review.cancellationDate,
+    todayIsoDate,
+  });
+  // Refresh a stale proposal before allowing an admin to approve it.
+  if (refreshed.status !== "pending" ||
+      JSON.stringify(refreshed.entries) !== JSON.stringify(review.entries)) {
+    return {review: refreshed, siteAccess: existingData.siteAccess, reviewUpdated: true};
+  }
+  const siteAccess = {...existingData.siteAccess};
+  for (const [key, entry] of Object.entries(review.entries)) {
+    siteAccess[key] = decision === "apply"
+      ? entry.proposedAccess
+      : entry.manualAccess;
+  }
+  return {
+    review: {...review, status: decision === "apply" ? "applied" : "kept", decision},
+    siteAccess,
+    reviewUpdated: false,
+  };
+}
+
 function shouldKeepContinuousAccess({
   existingAccess,
   previousCourseEndDate,
@@ -170,9 +273,14 @@ function resolveSeifAdminSiteAccess({
       const existingAccess = existingSiteAccess[accessKey];
 
       if (isCancellation) {
+        if (isProtectedManualAccess(existingAccess, {accessKey, existingSeifAdmin})) {
+          return [accessKey, manualAccessSnapshot(existingAccess)];
+        }
         return [
           accessKey,
-          buildCancelledAccess(existingAccess, cancellationDate, todayIsoDate),
+          normalizeAutomaticAccess(
+            buildCancelledAccess(existingAccess, cancellationDate, todayIsoDate)
+          ),
         ];
       }
 
@@ -217,5 +325,7 @@ module.exports = {
   isProtectedManualAccess,
   mergeManualAccessWithSchoolExtension,
   resolveSeifAdminSiteAccess,
+  resolveSeifAdminCancellationReview,
+  resolveSeifAdminCancellationDecision,
   shouldKeepContinuousAccess,
 };

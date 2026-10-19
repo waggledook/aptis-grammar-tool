@@ -8,8 +8,9 @@ import {
   listAllCourseTestSessions,
   listAttemptsForCourseTestSession,
   saveCourseTestAttemptReview,
+  reviewSeifAdminCancellation,
 } from "../../firebase";
-import { collection, getDoc, getDocs, updateDoc, setDoc, doc, query, orderBy, limit, startAfter, serverTimestamp, writeBatch } from "firebase/firestore";
+import { collection, getDoc, getDocs, updateDoc, setDoc, doc, query, orderBy, limit, startAfter, serverTimestamp, writeBatch, onSnapshot, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import {
   APTIS_TRAINER_ACCESS_KEY,
@@ -21,6 +22,7 @@ import {
 } from "../../siteConfig.js";
 import { getHubCourseTestTemplate } from "../../data/hubCourseTestTemplates.js";
 import UserAvatar from "../common/UserAvatar.jsx";
+import SchoolCancellationReview from "./SchoolCancellationReview.jsx";
 import { getDuplicateDisplayNameGroups, getUserDisplayLabel, getUserIdentityLabel } from "../../utils/userLabels.js";
 
 function getTodayLocalIsoDate() {
@@ -441,6 +443,9 @@ export default function AdminDashboard({ user }) {
   const [savingStudentName, setSavingStudentName] = useState(false);
   const [studentNameError, setStudentNameError] = useState("");
   const [selectedAdminNotification, setSelectedAdminNotification] = useState(null);
+  const [cancellationReviewUsers, setCancellationReviewUsers] = useState([]);
+  const [cancellationReviewError, setCancellationReviewError] = useState("");
+  const [savingCancellationReview, setSavingCancellationReview] = useState(false);
   const [creditDrafts, setCreditDrafts] = useState({});
   const [savingCredits, setSavingCredits] = useState({});
   const [duplicateReview, setDuplicateReview] = useState(null);
@@ -540,6 +545,27 @@ export default function AdminDashboard({ user }) {
 
     loadStudentRequests();
   }, []);
+
+  useEffect(() => {
+    if (!user?.uid || user.role !== "admin") return;
+    return onSnapshot(
+      query(collection(db, "users"), where("schoolCancellationReview.status", "==", "pending")),
+      (snapshot) => {
+        setCancellationReviewUsers(snapshot.docs.map((entry) => ({id: entry.id, ...entry.data()})));
+      },
+      (error) => {
+        console.error("[AdminDashboard] load cancellation reviews failed", error);
+        setCancellationReviewError("Could not load school cancellation reviews. Refresh to try again.");
+      }
+    );
+  }, [user?.uid, user?.role]);
+
+  useEffect(() => {
+    if (loading || !cancellationReviewUsers.length) return;
+    const currentById = new Map(cancellationReviewUsers.map((entry) => [entry.id, entry]));
+    setUsers((previous) => previous.map((entry) => currentById.has(entry.id)
+      ? {...entry, ...currentById.get(entry.id)} : entry));
+  }, [loading, cancellationReviewUsers]);
 
   useEffect(() => {
     async function loadHubAccessRequests() {
@@ -1475,7 +1501,7 @@ function renderSiteAccessControl({
       <small style={{ fontSize: compact ? "0.7rem" : "0.74rem", opacity: 0.72 }}>
         {draft.managedBy === "seifAdmin"
           ? "Future school syncs may update this app. Editing an access setting below switches it to a protected manual override."
-          : "Routine school syncs cannot remove or shorten this override, but may extend its end date. An explicit cancellation still removes access."}
+          : "School syncs cannot remove or shorten this override, but may extend its end date. Conflicting cancellations need admin review."}
       </small>
 
       <label
@@ -2353,14 +2379,29 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
       detail: preview || message.userEmail || message.userName || "No message text",
     };
   });
-  const adminNotifications = [...supportMessageNotifications, ...accessRequestNotifications, ...recentSignupNotifications]
+  const cancellationReviewNotifications = cancellationReviewUsers.map((entry) => ({
+    id: `school-cancellation:${entry.id}:${entry.schoolCancellationReview.id}`,
+    type: "school-cancellation",
+    userId: entry.id,
+    userEmail: entry.email || "",
+    userName: labelForUser(entry),
+    createdAt: entry.schoolCancellationReview.detectedAt,
+    title: "School cancellation needs review",
+    detail: `${entry.email || labelForUser(entry)} · Manual access preserved`,
+  })).sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt));
+  const otherAdminNotifications = [...supportMessageNotifications, ...accessRequestNotifications, ...recentSignupNotifications]
     .sort((a, b) => timestampToMs(b.createdAt) - timestampToMs(a.createdAt))
     .slice(0, 30);
+  const adminNotifications = [...cancellationReviewNotifications, ...otherAdminNotifications];
   const unreadAdminNotificationCount = adminNotifications.filter(
     (notification) => !readAdminNotificationKeys[notification.id]
   ).length;
   const selectedAdminUser = selectedAdminUserId
-    ? users.find((entry) => entry.id === selectedAdminUserId) || null
+    ? cancellationReviewUsers.find((entry) => entry.id === selectedAdminUserId) ||
+      users.find((entry) => entry.id === selectedAdminUserId) || null
+    : null;
+  const selectedCancellationReview = selectedAdminNotification?.type === "school-cancellation"
+    ? cancellationReviewUsers.find((entry) => entry.id === selectedAdminUserId)?.schoolCancellationReview
     : null;
   const activeAdminEditUser = activeAdminEdit?.userId
     ? users.find((entry) => entry.id === activeAdminEdit.userId) || null
@@ -2473,7 +2514,8 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
   function findUserForAdminNotification(notification) {
     if (!notification) return null;
     if (notification.userId) {
-      const byId = users.find((entry) => entry.id === notification.userId);
+      const byId = cancellationReviewUsers.find((entry) => entry.id === notification.userId) ||
+        users.find((entry) => entry.id === notification.userId);
       if (byId) return byId;
     }
 
@@ -2517,14 +2559,56 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
 
   function openAdminNotification(notification) {
     const target = findUserForAdminNotification(notification);
+    setCancellationReviewError("");
     setSelectedAdminNotification(notification);
     setSelectedAdminUserId(target?.id || "");
     setAdminNotificationsOpen(false);
     markAdminNotificationRead(notification.id);
   }
 
+  async function decideSchoolCancellation(decision) {
+    if (!selectedCancellationReview || savingCancellationReview) return;
+    setSavingCancellationReview(true);
+    setCancellationReviewError("");
+    try {
+      const result = await reviewSeifAdminCancellation(
+        selectedAdminUserId, selectedCancellationReview.id, selectedCancellationReview.version, decision
+      );
+      const snapshot = await getDoc(doc(db, "users", selectedAdminUserId));
+      if (snapshot.exists()) {
+        setUsers((previous) => previous.map((entry) => entry.id === snapshot.id
+          ? {...entry, ...snapshot.data()} : entry));
+        setHubDrafts((previous) => {const next = {...previous}; delete next[snapshot.id]; return next;});
+        setAptisDrafts((previous) => {const next = {...previous}; delete next[snapshot.id]; return next;});
+        setOteDrafts((previous) => {const next = {...previous}; delete next[snapshot.id]; return next;});
+      }
+      if (result.reviewUpdated) {
+        setCancellationReviewError("Access changed since this alert was created. Review the updated details before choosing again.");
+      } else {
+        setSelectedAdminNotification(null);
+        setSelectedAdminUserId("");
+      }
+    } catch (error) {
+      setCancellationReviewError(error.message || "Could not save the review. Please try again.");
+    } finally {
+      setSavingCancellationReview(false);
+    }
+  }
+
   return (
     <div className="admin-dashboard" style={{ maxWidth: 1160, margin: "auto" }}>
+      {cancellationReviewError && !selectedAdminNotification ? (
+        <p role="alert" style={{color: "#fca5a5"}}>{cancellationReviewError}</p>
+      ) : null}
+      {cancellationReviewUsers.length > 0 ? (
+        <div role="status" style={{padding: "0.85rem", marginBottom: "1rem", border: "1px solid #d97706", borderRadius: "0.6rem"}}>
+          <strong>{cancellationReviewUsers.length} school cancellation{cancellationReviewUsers.length === 1 ? " needs" : "s need"} review.</strong>
+          {" Manual access is preserved until its expiry or an admin decision. "}
+          <button type="button" className="review-btn" onClick={() => openAdminNotification(cancellationReviewNotifications[0])}>
+            Review cancellation
+          </button>
+        </div>
+      ) : null}
       <div
         style={{
           display: "flex",
@@ -4216,6 +4300,16 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
                 </button>
               </div>
             </div>
+
+            {selectedAdminNotification.type === "school-cancellation" ? (
+              <SchoolCancellationReview
+                review={selectedCancellationReview}
+                school={selectedAdminUser?.externalSystems?.seifAdmin}
+                saving={savingCancellationReview}
+                error={cancellationReviewError}
+                onDecide={decideSchoolCancellation}
+              />
+            ) : null}
 
             {selectedAdminNotification.message ? (
               <div style={{ padding: "1rem 1.1rem 0" }}>

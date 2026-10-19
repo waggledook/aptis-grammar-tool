@@ -317,6 +317,27 @@
 .workshop-attendee-list summary { width: max-content; color: #9dc5ff; font-weight: 750; cursor: pointer; }
 .workshop-attendee-list > div { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .45rem; }
 .workshop-attendee-list > div span { padding: .3rem .5rem; border-radius: 99px; background: #1b2b44; color: #dceaff; }
+.workshop-add-member { position: relative; display: grid; gap: .38rem; max-width: 440px; margin-top: .75rem; }
+.workshop-add-member > label { color: var(--workshop-muted); font-size: .72rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
+.workshop-add-member > div { display: flex; gap: .4rem; }
+.workshop-add-member input { min-width: 0; flex: 1 1 auto; border: 1px solid #405573; border-radius: 9px; background: #0d1728; color: white; padding: .55rem .68rem; font: inherit; font-size: .82rem; }
+.workshop-add-member button { display: flex; flex: 0 0 auto; align-items: center; justify-content: center; gap: .35rem; border: 1px solid #3e8d70; border-radius: 9px; background: #205f49; color: white; padding: .52rem .7rem; font-weight: 750; cursor: pointer; }
+.workshop-add-member button:disabled { opacity: .5; cursor: wait; }
+.workshop-add-member > small { margin: 0; color: #a7edc4; }
+.workshop-add-member > small.is-error { color: #ffaaa0; }
+.workshop-student-search-state { display: flex; align-items: center; gap: .4rem; color: var(--workshop-muted); font-size: .76rem; }
+.workshop-student-search-state.is-error { color: #ffaaa0; }
+.workshop-student-suggestions { position: absolute; z-index: 10; top: calc(100% + .2rem); right: 0; left: 0; overflow: hidden; margin: 0; padding: .3rem; border: 1px solid #405573; border-radius: 11px; background: #101c30; box-shadow: 0 14px 30px rgba(0, 0, 0, .32); list-style: none; }
+.workshop-student-suggestions li + li { border-top: 1px solid var(--workshop-line); }
+.workshop-add-member .workshop-student-suggestions button { display: flex; width: 100%; align-items: center; justify-content: space-between; gap: .75rem; border: 0; background: transparent; color: var(--workshop-text); padding: .58rem .62rem; text-align: left; }
+.workshop-add-member .workshop-student-suggestions button:hover,
+.workshop-add-member .workshop-student-suggestions button:focus-visible { background: #193761; outline: none; }
+.workshop-student-suggestions button > span { display: grid; min-width: 0; gap: .08rem; }
+.workshop-student-suggestions strong,
+.workshop-student-suggestions small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.workshop-student-suggestions strong { font-size: .82rem; }
+.workshop-student-suggestions small { margin: 0; color: var(--workshop-muted); font-size: .73rem; font-weight: 500; }
+.workshop-student-suggestions em { flex: 0 0 auto; color: #9dc5ff; font-size: .68rem; font-style: normal; font-weight: 800; }
 .workshop-session-invite { display: flex; align-items: center; gap: .7rem; }
 .workshop-session-invite > svg { border-radius: 8px; background: white; }
 .workshop-session-invite > div { display: grid; gap: .15rem; }
@@ -720,6 +741,12 @@
 :root[data-theme="light"] .workshop-session-actions button { background: #dcf7eb; color: #17543f; }
 :root[data-theme="light"] .workshop-session-actions button.is-end { background: #fde7e3; color: #75352d; }
 :root[data-theme="light"] .workshop-session-actions button.is-delete { background: #f9e1e3; color: #7a2932; }
+:root[data-theme="light"] .workshop-add-member input { background: #f4f7fb; color: #172033; }
+:root[data-theme="light"] .workshop-add-member button { background: #dcf7eb; color: #17543f; }
+:root[data-theme="light"] .workshop-student-suggestions { background: white; }
+:root[data-theme="light"] .workshop-add-member .workshop-student-suggestions button { background: transparent; color: #172033; }
+:root[data-theme="light"] .workshop-add-member .workshop-student-suggestions button:hover,
+:root[data-theme="light"] .workshop-add-member .workshop-student-suggestions button:focus-visible { background: #dcecff; }
 :root[data-theme="light"] .workshop-review-archive { border-color: #b9ace0; background: #f7f4ff; }
 :root[data-theme="light"] .workshop-review-archive > summary { color: #4f3d83; }
 :root[data-theme="light"] .workshop-review-archive-label strong { color: #3f306f; }
@@ -793,5 +820,6 @@
   .workshop-session-invite { align-items: flex-start; }
   .workshop-session-invite > svg { width: 82px; height: 82px; }
   .workshop-session-actions button { width: 100%; }
+  .workshop-add-member > div { display: grid; }
   .workshop-join-another input { min-width: 0; width: 100%; }
 }

@@ -112,6 +112,12 @@ export const auth = getAuth(app);
 export const storage = getStorage(app);
 export const functionsRegion = getFunctions(app, "europe-west1");
 
+export async function reviewSeifAdminCancellation(uid, reviewId, reviewVersion, decision) {
+  const callable = httpsCallable(functionsRegion, "reviewSeifAdminCancellation");
+  const result = await callable({uid, reviewId, reviewVersion, decision});
+  return result.data;
+}
+
 if (
   import.meta.env.DEV &&
   import.meta.env.VITE_USE_FUNCTIONS_EMULATOR === "true" &&
@@ -440,6 +446,24 @@ export async function listSpeakingWorkshopSessions() {
 export async function joinSpeakingWorkshopSession(code) {
   const callable = httpsCallable(functionsRegion, "joinSpeakingWorkshopSession");
   const result = await callable({ code: String(code || "") });
+  return result.data;
+}
+
+export async function addSpeakingWorkshopMember(sessionId, email) {
+  const callable = httpsCallable(functionsRegion, "addSpeakingWorkshopMember");
+  const result = await callable({
+    sessionId: String(sessionId || ""),
+    email: String(email || ""),
+  });
+  return result.data;
+}
+
+export async function searchSpeakingWorkshopStudents(sessionId, query) {
+  const callable = httpsCallable(functionsRegion, "searchSpeakingWorkshopStudents");
+  const result = await callable({
+    sessionId: String(sessionId || ""),
+    query: String(query || ""),
+  });
   return result.data;
 }
 
