@@ -132,19 +132,21 @@ export const WRITING_PART4_TASKS = [
     },
   ];
 
+const EMPTY_ALLOWED_TASK_IDS = [];
+
 export default function WritingPart4Emails({
   user,
   aptisAccess,
   onSignIn,
   onRequireSignIn,
-  allowedTaskIds = [],
+  allowedTaskIds = EMPTY_ALLOWED_TASK_IDS,
   tasks = WRITING_PART4_TASKS,
   heading = "Writing – Part 4 (Two emails)",
   intro,
   routeBasePath = "/writing/part4",
   showDemoNotice = true,
 }) {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const taskList = tasks?.length ? tasks : WRITING_PART4_TASKS;
   const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
   const hasTaskAllowlist = allowedTaskSet.size > 0;
@@ -288,6 +290,11 @@ function handleDownload() {
       return;
     }
     setTaskIndex(nextIdx);
+    setSearchParams((previous) => {
+      const next = new URLSearchParams(previous);
+      next.set("task", taskList[nextIdx].id);
+      return next;
+    });
     setShowSummary(false); // ✅ hide summary on new task
     setSubmissionId("");
     resetFeedback();

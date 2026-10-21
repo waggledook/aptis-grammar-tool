@@ -74,19 +74,21 @@ export const WRITING_PART2_TASKS = [
   },
 ];
 
+const EMPTY_ALLOWED_TASK_IDS = [];
+
 export default function WritingPart2({
   user,
   aptisAccess,
   onSignIn,
   onRequireSignIn,
-  allowedTaskIds = [],
+  allowedTaskIds = EMPTY_ALLOWED_TASK_IDS,
   tasks = WRITING_PART2_TASKS,
   heading = "Writing – Part 2 (Short form)",
   intro,
   routeBasePath = "/writing/part2",
   showDemoNotice = true,
 }) {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const taskList = tasks?.length ? tasks : WRITING_PART2_TASKS;
   const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
   const hasTaskAllowlist = allowedTaskSet.size > 0;
@@ -157,6 +159,11 @@ export default function WritingPart2({
       return;
     }
     setTaskIndex(nextIdx);
+    setSearchParams((previous) => {
+      const next = new URLSearchParams(previous);
+      next.set("task", taskList[nextIdx].id);
+      return next;
+    });
   }
 
   // ---------- summary + export helpers (inside component so they see current task) ----------

@@ -182,19 +182,21 @@ export const WRITING_PART3_TASKS = [
     },
 ];
 
+const EMPTY_ALLOWED_TASK_IDS = [];
+
 export default function WritingPart3({
   user,
   aptisAccess,
   onSignIn,
   onRequireSignIn,
-  allowedTaskIds = [],
+  allowedTaskIds = EMPTY_ALLOWED_TASK_IDS,
   tasks = WRITING_PART3_TASKS,
   heading = "Writing – Part 3 (Three responses)",
   intro,
   routeBasePath = "/writing/part3",
   showDemoNotice = true,
 }) {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const taskList = tasks?.length ? tasks : WRITING_PART3_TASKS;
   const allowedTaskSet = useMemo(() => new Set(allowedTaskIds), [allowedTaskIds]);
   const hasTaskAllowlist = allowedTaskSet.size > 0;
@@ -259,6 +261,11 @@ export default function WritingPart3({
       return;
     }
     setTaskIndex(nextIdx);
+    setSearchParams((previous) => {
+      const next = new URLSearchParams(previous);
+      next.set("task", taskList[nextIdx].id);
+      return next;
+    });
   }
 
   function handleAnswerChange(idx, { html, text }) {
