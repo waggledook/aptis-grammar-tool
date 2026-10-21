@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
+import HubVocabWordFormationSort from "./HubVocabWordFormationSort.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { getHubVocabActivity, getHubVocabTheme } from "../../data/hubVocabularyActivities.js";
 import {
@@ -163,7 +164,7 @@ function renderVisualPrompt(entry, options = {}) {
       <img
         src={entry.image}
         alt=""
-        className={options.compact ? "hub-vocab-object-image compact" : "hub-vocab-object-image"}
+        className={`${options.compact ? "hub-vocab-object-image compact" : "hub-vocab-object-image"}${entry.imageKind === "scene" ? " is-scene" : ""}`}
         draggable="false"
       />
     );
@@ -276,7 +277,7 @@ function getDisplayAnswer(entry, themeId, answerMode = "default") {
 }
 
 function getMistakePrompt(entry, theme, activity, answerMode = "default") {
-  if (entry.sentence) return entry.sentence;
+  if (entry.sentence) return entry.baseWord ? `${entry.sentence} (${entry.baseWord.toUpperCase()})` : entry.sentence;
   if (answerMode === "clock") {
     return `Clock showing ${String(entry.hour).padStart(2, "0")}:${String(entry.minute).padStart(2, "0")}`;
   }
@@ -408,11 +409,12 @@ function FlashcardMode({
   const [index, setIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
   const [viewedIds, setViewedIds] = useState(() => new Set());
+  const [isRoundComplete, setIsRoundComplete] = useState(false);
   const entry = cardEntries[index];
-  const isRoundComplete = cardEntries.length > 0 && viewedIds.size >= cardEntries.length;
+  const allRevealed = cardEntries.length > 0 && viewedIds.size >= cardEntries.length;
 
   useEffect(() => {
-    if (!entry?.id) return;
+    if (!entry?.id || !isFlipped) return;
     onItemSeen?.(entry.id);
     setViewedIds((prev) => {
       if (prev.has(entry.id)) return prev;
@@ -420,7 +422,7 @@ function FlashcardMode({
       next.add(entry.id);
       return next;
     });
-  }, [entry?.id, onItemSeen]);
+  }, [entry?.id, isFlipped, onItemSeen]);
 
   useEffect(() => {
     function handleKeyDown(event) {
@@ -459,7 +461,8 @@ function FlashcardMode({
     setCardEntries(nextEntries);
     setIndex(0);
     setIsFlipped(false);
-    setViewedIds(nextEntries[0]?.id ? new Set([nextEntries[0].id]) : new Set());
+    setViewedIds(new Set());
+    setIsRoundComplete(false);
   }
 
   if (isRoundComplete) {
@@ -480,7 +483,7 @@ function FlashcardMode({
   return (
     <section className="hub-vocab-practice-card">
       <div className="hub-vocab-card-count">
-        <span>Card {index + 1} of {cardEntries.length} · viewed {Math.min(viewedIds.size, cardEntries.length)}/{cardEntries.length}</span>
+        <span>Card {index + 1} of {cardEntries.length} · revealed {Math.min(viewedIds.size, cardEntries.length)}/{cardEntries.length}</span>
         <span className="hub-vocab-shortcuts">Space / ↑ / ↓ flip · ← / → move</span>
       </div>
 
@@ -502,8 +505,12 @@ function FlashcardMode({
                     ) : null}
                   </>
                 )
-                : entry.flashcardPrompt
-                  ? <strong className="hub-vocab-cue-prompt hub-vocab-flashcard-text-prompt">{entry.flashcardPrompt}</strong>
+                : entry.flashcardPrompt || entry.cueText
+                  ? (
+                    <strong className="hub-vocab-cue-prompt hub-vocab-flashcard-text-prompt">
+                      {entry.flashcardPrompt || entry.cueText}
+                    </strong>
+                  )
                   : renderVisualPrompt(flagMode ? { ...entry, flag4x3: entry.flag4x3 } : entry)
             )}
             <span>Tap to reveal</span>
@@ -537,6 +544,7 @@ function FlashcardMode({
         </button>
         <button type="button" onClick={() => move(1)}>Next</button>
         <button type="button" onClick={reshuffle}>Shuffle</button>
+        {allRevealed ? <button type="button" onClick={() => setIsRoundComplete(true)}>Finish flashcards</button> : null}
       </div>
     </section>
   );
@@ -705,19 +713,23 @@ function MatchingMode({
 
       <div className="hub-vocab-match-grid">
         <div className="hub-vocab-match-column">
-          {leftItems.map((entry) => {
+          {leftItems.map((entry, index) => {
             const matched = matchedIds.includes(entry.id);
             return (
               <button
                 key={entry.id}
                 type="button"
                 disabled={matched}
+                aria-label={!entry.matchPrompt && entry.image ? `Picture ${index + 1}${entry.imagePrompt ? `: ${entry.imagePrompt}` : ""}` : undefined}
                 className={`${selectedLeft?.id === entry.id ? "selected" : ""} ${matched ? "matched" : ""}`}
                 onClick={() => setSelectedLeft(entry)}
               >
                 {entry.matchPrompt
                   ? <strong className="hub-vocab-cue-prompt compact">{entry.matchPrompt}</strong>
-                  : renderVisualPrompt(entry, { compact: true })}
+                  : <>
+                    {renderVisualPrompt(entry, { compact: true })}
+                    {entry.image && entry.imagePrompt ? <span className="hub-vocab-match-image-clue">{entry.imagePrompt}</span> : null}
+                  </>}
               </button>
             );
           })}
@@ -2065,10 +2077,10 @@ function CategorySortMode({
   }, [entry?.id, onItemSeen, reviewItems]);
 
   useEffect(() => {
-    if (feedback?.status !== "correct") return undefined;
+    if (feedback?.status !== "correct" || entry?.explanation) return undefined;
     const timer = window.setTimeout(next, 700);
     return () => window.clearTimeout(timer);
-  }, [feedback, next]);
+  }, [entry?.explanation, feedback, next]);
 
   function choose(category) {
     if (!entry || feedback) return;
@@ -2158,13 +2170,16 @@ function CategorySortMode({
         ))}
       </div>
       {feedback ? (
-        <div className={`hub-vocab-feedback ${feedback.status}`}>
-          <span>
-            {feedback.status === "correct"
-              ? "Correct. Next one coming..."
-              : <>Answer: <strong>{categories.find((category) => category.id === feedback.correctId)?.label}</strong></>}
-          </span>
-          {feedback.status === "wrong" ? <button type="button" onClick={next}>Next</button> : null}
+        <div className={`hub-vocab-feedback ${feedback.status}`} role="status">
+          <div>
+            <span>
+              {feedback.status === "correct"
+                ? (entry.explanation ? "Correct." : "Correct. Next one coming...")
+                : <>Answer: <strong>{categories.find((category) => category.id === feedback.correctId)?.label}</strong></>}
+            </span>
+            {entry.explanation ? <p className="hub-vocab-answer-explanation">{entry.explanation}</p> : null}
+          </div>
+          {feedback.status === "wrong" || entry.explanation ? <button type="button" onClick={next}>Next</button> : null}
         </div>
       ) : null}
     </section>
@@ -2279,10 +2294,10 @@ function StructuredQuestionMode({
   }, [entry?.id, onItemSeen, reviewItems]);
 
   useEffect(() => {
-    if (feedback?.status !== "correct") return undefined;
+    if (feedback?.status !== "correct" || entry?.explanation) return undefined;
     const timer = window.setTimeout(next, 700);
     return () => window.clearTimeout(timer);
-  }, [feedback, next]);
+  }, [entry?.explanation, feedback, next]);
 
   function recordWrong(userAnswer) {
     setMistakeItems((previous) => dedupeById([...previous, entry]));
@@ -2365,7 +2380,14 @@ function StructuredQuestionMode({
       ) : (
         <>
           {entry.image ? renderVisualPrompt(entry) : null}
-          <strong className="hub-vocab-structured-prompt">{entry.sentence}</strong>
+          {entry.baseWord ? (
+            <div className="hub-vocab-word-formation-prompt">
+              <span>{entry.sentence}</span>
+              <strong className="hub-vocab-base-word" aria-label={`Base word: ${entry.baseWord}`}>
+                {entry.baseWord.toUpperCase()}
+              </strong>
+            </div>
+          ) : <strong className="hub-vocab-structured-prompt">{entry.sentence}</strong>}
         </>
       )}
       <p>{activity.question || (promptType === "clock" ? "What time is it?" : "Complete the sentence.")}</p>
@@ -2426,13 +2448,16 @@ function StructuredQuestionMode({
         </form>
       )}
       {feedback ? (
-        <div className={`hub-vocab-feedback ${feedback.status}`}>
-          <span>
-            {feedback.status === "correct"
-              ? "Correct. Next one coming..."
-              : <>Answer: <strong>{getStructuredAnswer(entry)}</strong></>}
-          </span>
-          {feedback.status === "wrong" ? <button type="button" onClick={next}>Next</button> : null}
+        <div className={`hub-vocab-feedback ${feedback.status}`} role="status">
+          <div>
+            <span>
+              {feedback.status === "correct"
+                ? (entry.explanation ? "Correct." : "Correct. Next one coming...")
+                : <>Answer: <strong>{getStructuredAnswer(entry)}</strong></>}
+            </span>
+            {entry.explanation ? <p className="hub-vocab-answer-explanation">{entry.explanation}</p> : null}
+          </div>
+          {feedback.status === "wrong" || entry.explanation ? <button type="button" onClick={next}>Next</button> : null}
         </div>
       ) : null}
     </section>
@@ -2608,6 +2633,9 @@ function renderActivity(theme, activity, handlers = {}) {
   }
   if (activity.type === "article-choice") return <ArticleChoiceMode theme={theme} activity={activity} items={items} {...props} />;
   if (activity.type === "category-sort") return <CategorySortMode theme={theme} activity={activity} items={items} {...props} />;
+  if (activity.type === "word-formation-sort") {
+    return <HubVocabWordFormationSort key={activityKey} activity={activity} items={items} createSession={makePrioritizedSession} completionCard={ActivityCompleteCard} {...props} />;
+  }
   if (activity.type === "sequence-order") return <SequenceOrderMode theme={theme} activity={activity} items={items} {...props} />;
   if (activity.type === "sentence-gap-choice") {
     return <StructuredQuestionMode theme={theme} activity={activity} items={items} promptType="sentence" inputMode="choice" {...props} />;
@@ -2835,7 +2863,7 @@ export default function HubVocabularyActivityRunner() {
   }
 
   return (
-    <div className="menu-wrapper hub-vocab-runner">
+    <div className={`menu-wrapper hub-vocab-runner${activity.visualPractice ? " has-picture-practice" : ""}`}>
       <Seo
         title={`${activity.title} | ${theme.title} | Seif Hub`}
         description={activity.shortDescription}
@@ -3290,6 +3318,48 @@ export default function HubVocabularyActivityRunner() {
           transition: transform 0.18s ease;
         }
 
+        .has-picture-practice .hub-vocab-object-image {
+          box-sizing: border-box;
+          box-shadow: none;
+        }
+
+        .has-picture-practice .hub-vocab-object-image.is-scene {
+          max-height: min(280px, 65vw);
+          max-width: min(280px, 100%);
+        }
+
+        .has-picture-practice .hub-vocab-type-form .hub-vocab-object-image {
+          max-height: 140px;
+          max-width: min(170px, 60vw);
+        }
+
+        .has-picture-practice .hub-vocab-match-grid {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        }
+
+        .has-picture-practice .hub-vocab-match-column {
+          grid-auto-rows: 1fr;
+        }
+
+        .has-picture-practice .hub-vocab-match-column button {
+          flex-direction: column;
+          gap: 0.45rem;
+          min-height: 155px;
+          min-width: 0;
+          overflow-wrap: anywhere;
+        }
+
+        .has-picture-practice .hub-vocab-match-column .hub-vocab-object-image.compact {
+          max-height: 95px;
+          max-width: min(120px, 100%);
+        }
+
+        .hub-vocab-match-image-clue {
+          font-size: 0.8rem;
+          font-weight: 500;
+          line-height: 1.35;
+        }
+
         .hub-vocab-image-focus {
           display: inline-flex;
           line-height: 0;
@@ -3678,6 +3748,35 @@ export default function HubVocabularyActivityRunner() {
           text-align: center;
         }
 
+        .hub-vocab-word-formation-prompt {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: baseline;
+          gap: 1.25rem;
+          width: 100%;
+          max-width: 54rem;
+          font-size: clamp(1.2rem, 3vw, 1.8rem);
+          font-weight: 400;
+          line-height: 1.55;
+          text-align: left;
+        }
+
+        .hub-vocab-base-word {
+          font-weight: 850;
+          letter-spacing: 0.025em;
+        }
+
+        @media (max-width: 560px) {
+          .hub-vocab-word-formation-prompt {
+            grid-template-columns: 1fr;
+            gap: 0.4rem;
+          }
+
+          .hub-vocab-base-word {
+            justify-self: end;
+          }
+        }
+
         .hub-vocab-category-grid {
           display: grid;
           gap: 0.7rem;
@@ -3903,6 +4002,12 @@ export default function HubVocabularyActivityRunner() {
           gap: 1rem;
           justify-content: space-between;
           padding: 0.9rem 1rem;
+        }
+
+        .hub-vocab-answer-explanation {
+          font-size: 1rem;
+          line-height: 1.5;
+          margin: 0.5rem 0 0;
         }
 
         .hub-vocab-feedback.correct {

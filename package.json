@@ -10,6 +10,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "test:grammar-review": "node scripts/test-grammar-review.mjs",
+    "test:intermediate-plus-vocab": "node --test scripts/test-intermediate-plus-vocab.mjs",
     "test:collocation-team": "node --test scripts/test-collocation-team.mjs",
     "test:speaking-workshop-schedule": "node --test scripts/test-speaking-workshop-schedule.mjs",
     "preview": "vite preview",

@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../../components/common/Seo.jsx";
 import { logOteTrainingCompleted, logOteTrainingStarted } from "../../firebase.js";
 import { getSitePath } from "../../siteConfig.js";
+import { OTE_ADVANCED_READING_PART2_TEACHER_TASKS_BY_ID } from "./data/oteAdvancedReadingPart2TeacherTasks.js";
 import "./styles/ote.css";
 
 const TIME_SECONDS = 8 * 60;
@@ -126,6 +127,7 @@ const practiceSets = {
   "c1-pilot-1": { id: "c1-pilot-1", title: "Handwriting or Digital Notes?", topic: "handwriting and digital note-taking", heading: "Should students take notes by hand?", intro: "Three education specialists consider whether handwriting is better for learning than digital note-taking.", reviewers: noteTakingReviewers, questions: noteTakingQuestions },
   "c1-pilot-2": { id: "c1-pilot-2", title: "Personality Tests at Work", topic: "personality tests in recruitment", heading: "Should employers use personality tests?", intro: "Three workplace specialists discuss the growing use of personality assessments in recruitment.", reviewers: recruitmentReviewers, questions: recruitmentQuestions },
   "c1-pilot-3": { id: "c1-pilot-3", title: "Making Cities Wilder", topic: "urban rewilding", heading: "Should cities make more room for nature?", intro: "Three specialists consider the advantages and possible drawbacks of urban rewilding.", reviewers: rewildingReviewers, questions: rewildingQuestions },
+  ...OTE_ADVANCED_READING_PART2_TEACHER_TASKS_BY_ID,
 };
 
 const evidenceBySet = {

@@ -1,5 +1,6 @@
 import { getHubVocabActivity } from "../../../data/hubVocabularyActivities.js";
 import { canonicalizeAnswer, normalizeAnswers } from "./vocabAnswers.js";
+import { getWordFormationSortPrompt } from "./wordFormationSort.js";
 
 export const HUB_CHOICE_REVIEW_TYPES = new Set([
   "matching",
@@ -12,6 +13,7 @@ export const HUB_CHOICE_REVIEW_TYPES = new Set([
   "speaker-choice",
   "article-choice",
   "category-sort",
+  "word-formation-sort",
   "image-hotspot-match",
   "sentence-gap-choice",
   "clock-choice",
@@ -184,7 +186,7 @@ function getSourceChoiceLabels(context, activityType) {
 
   if (activityType === "speaker-choice") return ["The teacher says it", "You say it"];
   if (activityType === "article-choice") return ["a", "an"];
-  if (activityType === "category-sort") {
+  if (activityType === "category-sort" || activityType === "word-formation-sort") {
     return (activity.categories || []).map((category) => category?.label).filter(Boolean);
   }
   if (activityType === "sequence-order") {
@@ -203,7 +205,7 @@ function getSourceChoiceLabels(context, activityType) {
 
 function getSourceCorrectOption(item, context, activityType) {
   const { activity, entry } = context || {};
-  if (activityType === "category-sort") {
+  if (activityType === "category-sort" || activityType === "word-formation-sort") {
     const categoryId = entry?.[activity?.categoryKey || "category"];
     return activity?.categories?.find((category) => category.id === categoryId)?.label || item.correctAnswer || "";
   }
@@ -215,7 +217,7 @@ function getSourceCorrectOption(item, context, activityType) {
 }
 
 function getOptionLimit(activityType, activity, sourceLabels) {
-  if (["speaker-choice", "article-choice", "category-sort", "sequence-order"].includes(activityType)) {
+  if (["speaker-choice", "article-choice", "category-sort", "word-formation-sort", "sequence-order"].includes(activityType)) {
     return sourceLabels.length;
   }
   if (["matching", "flag-match"].includes(activityType)) {
@@ -279,15 +281,19 @@ export function getHubReviewPrompt(item, context = findHubSourceContext(item)) {
     : String(item?.sentence || "").trim();
 
   if (activityType === "clock-choice" || activityType === "clock-type-answer") return "";
+  if (activityType === "word-formation-sort") return entry ? getWordFormationSortPrompt(entry) : savedPrompt;
   if (activityType === "category-sort" && activity?.promptKey && entry?.[activity.promptKey]) {
     return entry[activity.promptKey];
   }
   if (activityType === "sentence-gap-choice" || activityType === "sentence-gap-type-answer") {
+    if (entry?.sentence && entry?.baseWord) return `${entry.sentence} (${entry.baseWord.toUpperCase()})`;
     return entry?.sentence || savedPrompt;
   }
   if (savedPrompt) return savedPrompt;
-  if (["matching", "flag-match", "quick-choice", "image-hotspot-match", "image-hotspot-type-answer"].includes(activityType)) {
+  if (["matching", "flag-match", "quick-choice", "type-answer", "image-hotspot-match", "image-hotspot-type-answer"].includes(activityType)) {
     if (entry?.matchPrompt) return entry.matchPrompt;
+    if (entry?.imagePrompt) return entry.imagePrompt;
+    if (entry?.image && entry?.cueText) return entry.cueText;
     if (entry?.image || entry?.flag4x3 || entry?.colorHex || entry?.visualLabel) return "";
   }
   if (activityType === "speaker-choice") return entry?.phrase || "";
@@ -308,6 +314,8 @@ export function getHubReviewPrompt(item, context = findHubSourceContext(item)) {
 
 export function getHubReviewInstruction(item, context = findHubSourceContext(item), hasVisual = false) {
   const activityType = item?.activityType || context?.activity?.type || "";
+  if (activityType === "word-formation-sort") return "Choose the suffix that forms the adjective from this base word.";
+  if (activityType === "matching" && context?.activity?.visualPractice) return "Look at the picture and any clue. Choose the matching word or phrase.";
   if (HUB_CHOICE_REVIEW_TYPES.has(activityType) || normalizeList(item?.reviewOptions).length) {
     return context?.activity?.prompt || "Choose the correct answer.";
   }

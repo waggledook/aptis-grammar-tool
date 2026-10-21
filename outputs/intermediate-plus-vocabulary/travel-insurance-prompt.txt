@@ -1,0 +1,5 @@
+Generated with the built-in image generation tool on 21 October 2026.
+transparent_background: true
+Asset: public/images/vocab/intermediate-plus/packing/travel-insurance-documents.png
+
+Use case: scientific-educational. Create one colourful educational pictogram representing travel insurance for an English vocabulary exercise. Subject: a simple opaque white illustrated sheet of paper with a slightly folded corner, bearing a small blue travel suitcase and a green shield with a check mark. Friendly polished flat illustration with clean dark outlines, a little gentle dimensional shading, easily recognisable at flashcard size. Single isolated object, centred, generous transparent margin. The page and symbols must be opaque; only the surrounding background is genuinely transparent. No surrounding scene, no drop shadow, no text, no personal details, no official insignia, document numbers, barcodes, signatures or realistic security features. This is a generic symbolic classroom illustration, not a reproduction of an actual document.

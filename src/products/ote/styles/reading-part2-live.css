@@ -1,0 +1,38 @@
+.ote-part2-live-sources > header p {
+  margin: .35rem 0 0;
+  color: #c7d5e9;
+}
+
+.ote-part2-live-sources > div {
+  grid-template-columns: 1fr;
+}
+
+.ote-part2-live-sources article {
+  display: grid;
+  gap: .45rem;
+}
+
+.ote-part2-live-sources article h3,
+.ote-part2-live-sources article p {
+  margin: 0;
+}
+
+.ote-part2-live-sources article > strong {
+  color: #91b8f5;
+  font-size: .78rem;
+  text-transform: uppercase;
+}
+
+.ote-part2-live-sources article p {
+  line-height: 1.65;
+}
+
+@media (min-width: 1080px) {
+  .ote-part2-live-page .rp1-live-stage {
+    max-width: 1240px;
+  }
+}
+
+:root[data-theme="light"] .ote-part2-live-sources > header p {
+  color: var(--color-text-soft);
+}

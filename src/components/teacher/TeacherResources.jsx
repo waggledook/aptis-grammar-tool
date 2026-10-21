@@ -183,6 +183,13 @@ const PRODUCT_GROUPS = [
         title: "Reading",
         resources: [
           {
+            title: "Advanced Reading Part 2 · classroom tasks",
+            description: "Two extra C1 multiple-matching tasks for standalone practice, whole-task live sessions or scaffolded paragraph-by-paragraph lessons.",
+            path: "/ote/reading/advanced/part-2-matching/teacher-bank",
+            icon: BookOpen,
+            tags: ["Advanced Reading", "Standalone", "2 live modes"],
+          },
+          {
             title: "C1 gapped-text classroom sets",
             description: "Two extra Part 3 texts that do not count towards learner completion.",
             path: "/ote/reading/advanced/part-3-gapped-text",

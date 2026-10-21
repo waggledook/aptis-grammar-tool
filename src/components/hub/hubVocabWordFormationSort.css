@@ -1,0 +1,114 @@
+.hub-vocab-formation-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.hub-vocab-formation-instructions { margin: 0; line-height: 1.5; }
+
+.hub-vocab-formation-word-bank {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.6rem;
+}
+
+.hub-vocab-formation-word {
+  display: grid;
+  gap: 0.3rem;
+  padding: 0.75rem 1rem;
+  min-height: 48px;
+  max-width: 19rem;
+  border: 2px solid #526486;
+  border-radius: 12px;
+  background: #1a2847;
+  color: #eef4ff;
+  font: inherit;
+  text-align: left;
+  cursor: grab;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.hub-vocab-formation-word:active { cursor: grabbing; }
+.hub-vocab-formation-word strong { font-size: 1.1rem; }
+.hub-vocab-formation-word span { font-size: 0.9rem; line-height: 1.4; }
+.hub-vocab-formation-word.selected { border-color: #f6bd60; background: #3c3540; }
+.hub-vocab-formation-word.dragging { opacity: 0.4; }
+.hub-vocab-formation-drag-preview {
+  position: fixed;
+  z-index: 1000;
+  padding: 0.75rem 1rem;
+  border: 2px solid #f6bd60;
+  border-radius: 12px;
+  background: #1a2847;
+  color: #fff;
+  font-weight: 800;
+  pointer-events: none;
+}
+.hub-vocab-formation-board button:focus-visible { outline: 3px solid #f6bd60; outline-offset: 3px; }
+.hub-vocab-formation-selection { margin: 0; min-height: 3em; line-height: 1.5; }
+
+.hub-vocab-formation-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.hub-vocab-formation-column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 10rem;
+  padding: 0.6rem;
+  border: 2px dashed #526486;
+  border-radius: 14px;
+  background: #121e36;
+}
+
+.hub-vocab-formation-column.drag-over { border-color: #f6bd60; background: #333347; }
+.hub-vocab-formation-column-heading {
+  min-height: 48px;
+  width: 100%;
+  padding: 0.65rem 0.3rem;
+  border: 0;
+  border-radius: 9px;
+  background: #293b5d;
+  color: #fff;
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 850;
+  cursor: pointer;
+}
+
+.hub-vocab-formation-column ul { list-style: none; padding: 0; margin: 0.6rem 0 0; }
+.hub-vocab-formation-column li {
+  display: grid;
+  gap: 0.2rem;
+  margin-bottom: 0.5rem;
+  padding: 0.6rem;
+  border-radius: 9px;
+  background: #25463f;
+  color: #e5fff0;
+  overflow-wrap: anywhere;
+}
+.hub-vocab-formation-column li span { font-size: 0.9rem; }
+.hub-vocab-formation-drop-hint { margin: auto; padding: 0.7rem 0; opacity: 0.65; }
+.hub-vocab-formation-feedback { min-height: 2rem; line-height: 1.5; }
+.hub-vocab-formation-feedback p { margin: 0; }
+
+@media (min-width: 1100px) {
+  .hub-vocab-formation-columns { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .hub-vocab-formation-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hub-vocab-formation-word { flex: 1 1 7rem; }
+}
+
+:root[data-theme="light"] .hub-vocab-formation-word { background: #fff; color: #18253f; border-color: #8b9cba; }
+:root[data-theme="light"] .hub-vocab-formation-word.selected { background: #fff2d8; border-color: #b27305; }
+:root[data-theme="light"] .hub-vocab-formation-column { background: #f3f6fc; border-color: #8b9cba; }
+:root[data-theme="light"] .hub-vocab-formation-column.drag-over { background: #fff2d8; border-color: #b27305; }
+:root[data-theme="light"] .hub-vocab-formation-column-heading { background: #dae3f2; color: #18253f; }
+:root[data-theme="light"] .hub-vocab-formation-column li { background: #dcefe2; color: #17412a; }

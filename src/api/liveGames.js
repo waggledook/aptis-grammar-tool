@@ -51,6 +51,11 @@ import {
 } from "../products/ote/data/oteAdvancedReadingCohesionChallenge.js";
 import { OTE_LISTENING_LIVE_GAME_TYPE } from "../products/ote/data/oteListeningLive.js";
 import {
+  getOteAdvancedReadingPart2TeacherTask,
+  OTE_ADVANCED_READING_PART2_LIVE_GAME_TYPE,
+  OTE_ADVANCED_READING_PART2_PARAGRAPH_LIVE_GAME_TYPE,
+} from "../products/ote/data/oteAdvancedReadingPart2TeacherTasks.js";
+import {
   APTIS_LISTENING_PART2_LIVE_GAME_TYPE,
   getTeacherListeningPart2Task,
 } from "../components/listening/teacherListeningPart2Data.js";
@@ -340,6 +345,8 @@ export async function joinLiveGameByPin(pin) {
     game.type === READING_PART2_LIVE_GAME_TYPE ||
     game.type === READING_PART3_LIVE_GAME_TYPE ||
     game.type === READING_PART4_LIVE_GAME_TYPE ||
+    game.type === OTE_ADVANCED_READING_PART2_LIVE_GAME_TYPE ||
+    game.type === OTE_ADVANCED_READING_PART2_PARAGRAPH_LIVE_GAME_TYPE ||
     game.type === COLLOCATION_TEAM_GAME_TYPE
   ) {
     if (!existingPlayer) await set(playerRef, {
@@ -723,6 +730,77 @@ export async function createReadingPart3LiveGame({ taskId, title }) {
     taskId: task.id,
     taskIds: [task.id],
     taskCount: 1,
+  });
+  return { gameId, pin };
+}
+
+export async function createOteAdvancedReadingPart2LiveGame({ taskId, title }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a reading session.");
+  const task = getOteAdvancedReadingPart2TeacherTask(taskId);
+  if (!task) throw new Error("Choose a valid OTE Advanced Reading Part 2 teacher task.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  const activityTitle = title || `OTE Advanced Reading Part 2 · ${task.title}`;
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: activityTitle,
+    type: OTE_ADVANCED_READING_PART2_LIVE_GAME_TYPE,
+    taskId: task.id,
+    taskIds: [task.id],
+    status: "lobby",
+    createdAt: Date.now(),
+    state: { phase: "lobby", phaseStartedAt: null, whyRevealed: false },
+  });
+  await logOteReadingLiveHosted({
+    gameId,
+    pin,
+    activityTitle,
+    part: 2,
+    mode: "teacher_resource_live",
+    taskId: task.id,
+    variant: "advanced",
+  });
+  return { gameId, pin };
+}
+
+export async function createOteAdvancedReadingPart2ParagraphLiveGame({ taskId, title }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a reading session.");
+  const task = getOteAdvancedReadingPart2TeacherTask(taskId);
+  if (!task) throw new Error("Choose a valid OTE Advanced Reading Part 2 teacher task.");
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  const activityTitle = title || `OTE Advanced Reading Part 2 paragraph lesson · ${task.title}`;
+  await set(gameRef, {
+    ownerUid: user.uid,
+    pin,
+    title: activityTitle,
+    type: OTE_ADVANCED_READING_PART2_PARAGRAPH_LIVE_GAME_TYPE,
+    taskId: task.id,
+    taskIds: [task.id],
+    status: "lobby",
+    createdAt: Date.now(),
+    state: {
+      phase: "lobby",
+      phaseStartedAt: null,
+      sourceIndex: 0,
+      explanationsRevealed: false,
+    },
+  });
+  await logOteReadingLiveHosted({
+    gameId,
+    pin,
+    activityTitle,
+    part: 2,
+    mode: "teacher_resource_paragraph_live",
+    taskId: task.id,
+    variant: "advanced",
   });
   return { gameId, pin };
 }
@@ -1472,6 +1550,73 @@ export async function saveReadingPart3LiveProgress({ gameId, taskId, answers = {
   }
 }
 
+export async function saveOteAdvancedReadingPart2LiveProgress({ gameId, taskId, answers = {} }) {
+  const user = auth.currentUser;
+  const task = getOteAdvancedReadingPart2TeacherTask(taskId);
+  if (!user) throw new Error("You must be signed in to save your answers.");
+  if (!gameId || !task) throw new Error("Missing OTE Reading Part 2 answer details.");
+
+  const questionById = new Map(task.questions.map((question) => [String(question.id), question]));
+  const validReviewers = new Set(Object.keys(task.reviewers));
+  const safeAnswers = {};
+  for (const [rawQuestionId, answer] of Object.entries(answers || {})) {
+    if (!questionById.has(String(rawQuestionId)) || !validReviewers.has(answer)) {
+      throw new Error("That specialist match could not be saved.");
+    }
+    safeAnswers[rawQuestionId] = answer;
+  }
+
+  const answeredCount = Object.keys(safeAnswers).length;
+  const complete = answeredCount === task.questions.length;
+  const now = Date.now();
+  const progressRef = ref(rtdb, `liveGames/${gameId}/players/${user.uid}/oteReadingPart2Submission`);
+  const existingProgress = (await get(progressRef)).val() || {};
+  const firstCompletedAt = existingProgress.firstCompletedAt
+    || existingProgress.completedAt
+    || (complete ? now : null);
+  await set(progressRef, {
+    taskId: task.id,
+    answers: safeAnswers,
+    answeredCount,
+    complete,
+    updatedAt: now,
+    ...(firstCompletedAt ? { firstCompletedAt } : {}),
+    ...(complete ? { completedAt: now } : {}),
+  });
+}
+
+export async function submitOteAdvancedReadingPart2ParagraphIdeas({
+  gameId,
+  taskId,
+  sourceLetter,
+  selectedQuestionIds = [],
+}) {
+  const user = auth.currentUser;
+  const task = getOteAdvancedReadingPart2TeacherTask(taskId);
+  if (!user) throw new Error("You must be signed in to submit your ideas.");
+  if (!gameId || !task || !["A", "B", "C"].includes(sourceLetter)) {
+    throw new Error("Missing paragraph activity details.");
+  }
+
+  const validQuestionIds = new Set(task.questions.map((question) => question.id));
+  const requestedIds = [...new Set(selectedQuestionIds)];
+  if (requestedIds.some((questionId) => !validQuestionIds.has(questionId))) {
+    throw new Error("One of those question choices is not available.");
+  }
+
+  const selected = Object.fromEntries(requestedIds.map((questionId) => [questionId, true]));
+  await set(
+    ref(rtdb, `liveGames/${gameId}/players/${user.uid}/oteReadingPart2ParagraphSubmissions/${sourceLetter}`),
+    {
+      taskId: task.id,
+      sourceLetter,
+      selected,
+      submitted: true,
+      submittedAt: Date.now(),
+    }
+  );
+}
+
 export async function saveReadingPart4LiveProgress({ gameId, taskId, answers = {} }) {
   const user = auth.currentUser;
   const task = getReadingPart4TeacherTask(taskId);
@@ -1561,6 +1706,9 @@ export async function setLiveGameState(gameId, partialState) {
     if (typeof partialState.taskIndex === "number") {
       updates.taskIndex = partialState.taskIndex;
     }
+    if (typeof partialState.sourceIndex === "number") {
+      updates.sourceIndex = partialState.sourceIndex;
+    }
     if (typeof partialState.gapIndex === "number") {
       updates.gapIndex = partialState.gapIndex;
     }
@@ -1614,6 +1762,9 @@ export async function setLiveGameState(gameId, partialState) {
     }
     if (typeof partialState.whyRevealed === "boolean") {
       updates.whyRevealed = partialState.whyRevealed;
+    }
+    if (typeof partialState.explanationsRevealed === "boolean") {
+      updates.explanationsRevealed = partialState.explanationsRevealed;
     }
     if ("whyRevealedByGap" in partialState) {
       updates.whyRevealedByGap = partialState.whyRevealedByGap;

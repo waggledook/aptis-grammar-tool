@@ -1,3 +1,5 @@
+import { INTERMEDIATE_PLUS_VOCAB_THEMES } from "./hubIntermediatePlusVocabulary.js";
+
 const FLAG_BASE = "/images/vocab/countries-nationalities/flags";
 const CLASSROOM_IMAGE_BASE = "/images/vocab/classroom";
 const CLASSROOM_LANGUAGE_IMAGE_BASE = "/images/vocab/classroom-language";
@@ -48,6 +50,12 @@ export const HUB_VOCAB_LEVELS = [
     title: "Intermediate Vocabulary",
     description: "Intermediate vocabulary review and practice.",
   },
+  {
+    id: "b1-b2",
+    label: "B1–B2",
+    title: "Intermediate Plus Vocabulary",
+    description: "Intermediate Plus vocabulary, word building and phrases in context.",
+  },
 ];
 
 export const HUB_VOCAB_LEVEL_COLORS = {
@@ -55,6 +63,7 @@ export const HUB_VOCAB_LEVEL_COLORS = {
   a2: "#7ef0c2",
   "a2-b1": "#8fb6ff",
   b1: "#f6d26b",
+  "b1-b2": "#c4c47f",
   b2: "#f6d26b",
   c1: "#f2b0b7",
   c2: "#c7a4ff",
@@ -7336,12 +7345,22 @@ HUB_VOCAB_THEMES.push({
   ],
 });
 
+HUB_VOCAB_THEMES.push(...INTERMEDIATE_PLUS_VOCAB_THEMES);
+
 export function getHubVocabThemes(levelId = "a1") {
   return HUB_VOCAB_THEMES.filter((theme) => !levelId || theme.level === levelId).sort(sortThemes);
 }
 
 export function getAllHubVocabThemes() {
   return [...HUB_VOCAB_THEMES].sort(sortThemes);
+}
+
+export function getHubVocabProgressCounts(progress = {}) {
+  return Object.fromEntries(getAllHubVocabThemes().map((theme) => [theme.id, {
+    total: theme.activities.length,
+    // Retired activities remain in saved history but must not complete a new menu.
+    completed: theme.activities.filter((activity) => progress[`${theme.id}:${activity.id}`]?.completed).length,
+  }]));
 }
 
 function sortThemes(left, right) {

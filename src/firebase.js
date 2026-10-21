@@ -48,7 +48,7 @@ import {
   httpsCallable,
 } from "firebase/functions";
 import { TOPIC_DATA } from "./components/vocabulary/data/vocabTopics";
-import { getAllHubVocabThemes } from "./data/hubVocabularyActivities";
+import { getAllHubVocabThemes, getHubVocabProgressCounts } from "./data/hubVocabularyActivities";
 import {
   buildGrammarReviewSummary,
   getGrammarReviewTransition,
@@ -1020,27 +1020,8 @@ export async function fetchHubVocabProgress(uid) {
 
 export async function fetchHubVocabThemeCounts(uid) {
   const realUid = _uidOrCurrent(uid);
-  const themes = getAllHubVocabThemes();
-  const stats = Object.fromEntries(
-    themes.map((theme) => [
-      theme.id,
-      {
-        completed: 0,
-        total: Array.isArray(theme.activities) ? theme.activities.length : 0,
-      },
-    ])
-  );
-
-  if (!realUid) return stats;
-
-  const progress = await fetchHubVocabProgress(realUid);
-  Object.values(progress).forEach((entry) => {
-    if (!entry?.themeId || !entry.completed) return;
-    if (!stats[entry.themeId]) stats[entry.themeId] = { completed: 0, total: 0 };
-    stats[entry.themeId].completed += 1;
-  });
-
-  return stats;
+  const progress = realUid ? await fetchHubVocabProgress(realUid) : {};
+  return getHubVocabProgressCounts(progress);
 }
 
 // ────────────────────────────────
