@@ -6,6 +6,7 @@ import {
   resolveVocabMistake,
 } from "../../firebase";
 import { TOPIC_DATA } from "./data/vocabTopics";
+import { canReviewHubVocabMistake } from "../../data/hubVocabularyActivities.js";
 import {
   findHubSourceContext,
   getHubReviewChoice,
@@ -199,7 +200,7 @@ function ImageReviewClue({ sources, focusArea = null }) {
   );
 }
 
-export default function VocabMistakeReview({ onBack }) {
+export default function VocabMistakeReview({ onBack, user }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -224,7 +225,7 @@ export default function VocabMistakeReview({ onBack }) {
       try {
         const data = await fetchUnresolvedVocabMistakes(50, uid);
         if (!alive) return;
-        setItems(collapseDuplicateHubMistakes(data));
+        setItems(collapseDuplicateHubMistakes(data.filter((item) => canReviewHubVocabMistake(item, user))));
       } catch (err) {
         console.error("[VocabMistakeReview] load failed", err);
       } finally {
@@ -236,7 +237,7 @@ export default function VocabMistakeReview({ onBack }) {
     return () => {
       alive = false;
     };
-  }, []);
+  }, [user]);
 
   // Focus input
   useEffect(() => {

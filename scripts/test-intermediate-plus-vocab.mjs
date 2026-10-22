@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { existsSync } from "node:fs";
-import { HUB_VOCAB_LEVELS, getHubVocabActivity, getHubVocabThemes, getHubVocabProgressCounts } from "../src/data/hubVocabularyActivities.js";
+import { HUB_VOCAB_LEVELS, getHubVocabActivity, getHubVocabThemes, getHubVocabProgressCounts, getVisibleHubVocabThemes, canAccessHubVocabTheme, canPreviewHubVocabDrafts, canReviewHubVocabMistake } from "../src/data/hubVocabularyActivities.js";
 import {
   findHubSourceContext, getHubReviewChoice, getHubReviewPrompt, getHubReviewInstruction,
   getReviewAcceptedAnswers, isAcceptedReviewAnswer,
@@ -18,6 +18,33 @@ const expectedTitles = [
   "At a restaurant", "DIY and repairs", "Phrasal verbs", "Looking after yourself",
 ];
 const normalize = (value) => String(value).toLowerCase().replace(/[’]/g, "'").replace(/[-–—]/g, " ").replace(/[.,!?]/g, "").replace(/\s+/g, " ").trim();
+
+test("only the first two Intermediate Plus banks are published to students", () => {
+  const expected = ["b1-b2-adjective-suffixes", "b1-b2-packing"];
+  for (const user of [undefined, { role: "student" }, { role: "teacher" }, { role: "admin" }]) {
+    assert.deepEqual(getVisibleHubVocabThemes(user).filter((theme) => theme.level === "b1-b2").map((theme) => theme.id), expected);
+    if (user?.role !== "admin") assert.deepEqual(getVisibleHubVocabThemes(user, { includeDrafts: true }).filter((theme) => theme.level === "b1-b2").map((theme) => theme.id), expected);
+  }
+  assert.equal(getVisibleHubVocabThemes({ role: "admin" }, { includeDrafts: true }).filter((theme) => theme.level === "b1-b2").length, 12);
+  for (const level of ["a1", "a2", "a2-b1", "b1"]) assert.equal(getVisibleHubVocabThemes().filter((theme) => theme.level === level).length, getHubVocabThemes(level).length);
+});
+
+test("unpublished banks remain admin-accessible but not through student direct links or mistake review", () => {
+  for (const theme of themes) {
+    const published = theme.order <= 2;
+    assert.equal(canAccessHubVocabTheme(theme, { role: "student" }), published);
+    assert.equal(canAccessHubVocabTheme(theme, { role: "teacher" }), published);
+    assert(canAccessHubVocabTheme(theme, { role: "admin" }));
+    const mistake = { source: "hub-textbook", topic: theme.id };
+    assert.equal(canReviewHubVocabMistake(mistake, { role: "student" }), published);
+    assert(canReviewHubVocabMistake(mistake, { role: "admin" }));
+  }
+  assert(!canAccessHubVocabTheme(null, { role: "admin" }));
+  assert(!canPreviewHubVocabDrafts({ role: "student", preview: true }));
+  assert(canReviewHubVocabMistake({ source: "topic-vocab", topic: "travel" }, { role: "student" }));
+  const draft = themes.find((theme) => theme.order === 3);
+  assert(canAccessHubVocabTheme({ ...draft, studentVisible: true }, { role: "student" }), "Publishing a bank restores access without removing its content or progress IDs.");
+});
 
 test("the supplied 12 banks are reachable through the level browser and routes", () => {
   assert(HUB_VOCAB_LEVELS.some((level) => level.id === "b1-b2"));
@@ -43,7 +70,8 @@ test("every activity has usable prompts and valid answer data", () => {
     assert.equal(new Set(entries.map((entry) => entry.id)).size, entries.length, `${label}: repeated item IDs`);
     for (const entry of entries) {
       if (activity.visualPractice) {
-        assert(entry.image && existsSync(new URL(`../public${entry.image}`, import.meta.url)), `${label}: missing image`);
+        if (entry.image) assert(existsSync(new URL(`../public${entry.image}`, import.meta.url)), `${label}: missing image`);
+        else assert(["flashcards", "type-answer"].includes(activity.type) && entry.cueText, `${label}: missing visual or standalone phrase clue`);
       } else assert(!entry.image && !entry.sceneImage && !activity.sceneImage, `${label}: unexpected visual dependency`);
       if (activity.type === "flashcards") {
         assert(entry.flashcardPrompt && entry.flashcardAnswer, label);
@@ -52,7 +80,7 @@ test("every activity has usable prompts and valid answer data", () => {
         assert((entry.matchPrompt || entry.image) && entry.matchAnswer, label);
         assert.notEqual(normalize(entry.matchPrompt), normalize(entry.matchAnswer), label);
       } else if (activity.type === "type-answer") {
-        assert(entry.image && entry.term, label);
+        assert((entry.image || entry.cueText) && entry.term, label);
       } else if (activity.type === "category-sort") {
         assert(activity.categories.some((category) => category.id === entry.category), `${label}: unknown category`);
         assert(entry[activity.promptKey], `${label}: missing sort prompt`);
@@ -113,6 +141,36 @@ test("written variants survive mistake review", () => {
     const item = { source: "hub-textbook", topic: theme.id, setId: activity.id, itemId: entry.id, activityType: activity.type, correctAnswer: entry.answer || entry.term };
     assert(isAcceptedReviewAnswer(variant, getReviewAcceptedAnswers(item, findHubSourceContext(item).entry)));
   }
+});
+
+test("Photography covers every term visually and in sentence recall without publishing the bank", () => {
+  const { theme } = getHubVocabActivity("b1-b2-photography", "camera-recall");
+  assert.equal(theme.studentVisible, false);
+  assert.equal(theme.activities.length, 6);
+  assert.equal(theme.photographyStudy.length, 22);
+  assert.equal(theme.photographyCameraPictures.length, 11);
+  assert.equal(theme.photographyPositions.length, 11);
+  assert.equal(theme.photographyContexts.length, 11);
+  assert.deepEqual(new Set([...theme.photographyPositions, ...theme.photographyContexts].map((entry) => entry.answer)), new Set(theme.entries.map((entry) => entry.term)));
+  for (const entry of theme.photographyStudy) {
+    assert(entry.image && entry.imagePrompt && !entry.matchPrompt);
+    assert(/\.(svg|webp)$/.test(entry.image), entry.image);
+    assert(!normalize(entry.imagePrompt).includes(normalize(entry.term)), `${entry.term}: clue reveals answer`);
+  }
+  for (const activity of theme.activities) {
+    assert(activity.visualPractice);
+    for (const entry of theme[activity.dataKey]) {
+      assert(existsSync(new URL(`../public${entry.image}`, import.meta.url)));
+      if (activity.type !== "sentence-gap-type-answer") continue;
+      const item = { source: "hub-textbook", topic: theme.id, setId: activity.id, itemId: entry.id, activityType: activity.type, correctAnswer: entry.answer };
+      const context = findHubSourceContext(item);
+      assert.equal(context.entry.image, entry.image, "Review retains the photo or code diagram.");
+      assert.equal(getHubReviewPrompt(item, context), entry.sentence);
+      assert(isAcceptedReviewAnswer(entry.answer, getReviewAcceptedAnswers(item, context.entry)));
+    }
+  }
+  assert(theme.photographyPositions.some((entry) => entry.image.endsWith("town-square.webp")));
+  assert(!getHubVocabActivity(theme.id, "meaning-matching"), "Visual practice replaces the duplicate meaning exercise.");
 });
 
 test("word formation requires a missing form rather than a visible ending", () => {
@@ -220,6 +278,33 @@ test("removed Packing activities do not inflate completion of the condensed menu
   const progress = Object.fromEntries(["meaning-flashcards", "meaning-matching", "packing-categories", "packing-recall", "packing-picture-flashcards"].map((id) => [`b1-b2-packing:${id}`, { completed: true }]));
   assert.deepEqual(getHubVocabProgressCounts(progress)["b1-b2-packing"], { completed: 1, total: 5 });
   assert.deepEqual(getHubVocabProgressCounts()["b1-b2-packing"], { completed: 0, total: 5 });
+});
+
+test("Shops uses all 26 venues in picture practice and all 32 words in study and writing", () => {
+  const { theme } = getHubVocabActivity("b1-b2-shops-services", "shop-picture-flashcards");
+  assert.equal(theme.activities.length, 6);
+  assert.equal(theme.studentVisible, false, "Keep the bank in admin preview until activated.");
+  assert.equal(theme.shopPictures.length, 26);
+  for (const key of ["shopPictureStudy", "shopWritten"]) {
+    assert.deepEqual(new Set(theme[key].map((entry) => entry.id)), new Set(theme.entries.map((entry) => entry.id)));
+  }
+  for (const entry of theme.shopPictures) {
+    assert.equal(entry.matchPrompt, "");
+    assert(entry.image.endsWith(".webp"));
+    assert(entry.category !== "Shopping phrases");
+  }
+  for (const term of ["chain store", "charity shop", "pound shop", "craft fair", "outlet", "off-licence", "stationer's"]) assert(theme.shopPictures.find((entry) => entry.term === term)?.image);
+  assert(theme.shopWritten.filter((entry) => entry.category !== "Shopping phrases").every((entry) => entry.imagePrompt));
+  for (const entry of theme.shopWritten) {
+    assert(!normalize(entry.imagePrompt || entry.cueText).includes(normalize(entry.term)), "The clue must not contain the full answer.");
+    const activity = getHubVocabActivity(theme.id, "shop-written-recall").activity;
+    const item = { source: "hub-textbook", topic: theme.id, setId: activity.id, itemId: entry.id, activityType: activity.type, correctAnswer: entry.term };
+    const context = findHubSourceContext(item);
+    assert.equal(getHubReviewPrompt(item, context), entry.imagePrompt || entry.cueText);
+    for (const answer of [entry.term, ...entry.acceptedAnswers]) assert(isAcceptedReviewAnswer(answer, getReviewAcceptedAnswers(item, context.entry)));
+  }
+  assert.equal(getHubVocabActivity(theme.id, "shopping-recall"), null);
+  for (const id of ["where-to-go", "shopping-phrases", "shop-name-apostrophes"]) assert(getHubVocabActivity(theme.id, id));
 });
 
 test("suffix columns replace adjective matching and disambiguate repeated base words", () => {

@@ -21,7 +21,8 @@ import {
   HUB_GRAMMAR_LEVEL_COLORS,
 } from "../../data/hubGrammarActivities.js";
 import {
-  getAllHubVocabThemes,
+  getVisibleHubVocabThemes,
+  canReviewHubVocabMistake,
   HUB_VOCAB_LEVELS,
 } from "../../data/hubVocabularyActivities.js";
 import { OTE_SPEAKING_MOCKS } from "../../products/ote/mockTests/data/oteSpeakingMockData.js";
@@ -54,7 +55,7 @@ import {
   updatePassword,
 } from "firebase/auth";
 
-const TEXTBOOK_VOCAB_THEMES = getAllHubVocabThemes();
+const TEXTBOOK_VOCAB_THEMES = getVisibleHubVocabThemes();
 const TEXTBOOK_VOCAB_LEVEL_TOTALS = Object.fromEntries(
   HUB_VOCAB_LEVELS.map((level) => [
     level.id,
@@ -1162,7 +1163,7 @@ const textbookVocabCompleted = textbookVocabLevelProgress.reduce(
   0
 );
 const textbookVocabMistakes = vocabMistakes.filter(
-  (item) => item?.source === "hub-textbook"
+  (item) => item?.source === "hub-textbook" && canReviewHubVocabMistake(item, user)
 );
 const aptisVocabMistakes = vocabMistakes.filter(
   (item) => item?.source !== "hub-textbook"

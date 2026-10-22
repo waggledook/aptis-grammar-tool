@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   ArrowRight,
   Bookmark,
+  BookOpenCheck,
   CheckCircle2,
   CircleHelp,
   List,
@@ -18,6 +19,7 @@ import {
   getAptisGrammarVocabularyMock,
 } from "../../data/aptisGrammarVocabularyMocks.js";
 import { getAptisMockReviewFeedback } from "../../data/aptisGrammarVocabularyMockFeedback.js";
+import { buildAptisGrammarVocabularyMistakes } from "../../utils/aptisGrammarVocabularyMistakes.js";
 import {
   auth,
   fetchAptisGrammarVocabularyMockAttempts,
@@ -184,6 +186,10 @@ export default function HubAptisGrammarVocabularyMock({ user, onHome, onProfile 
     [activeMock.grammarQuestions, currentIndex, vocabularyTasks]
   );
   const results = useMemo(() => calculateResults(activeMock, answers), [activeMock, answers]);
+  const mistakeReviewItems = useMemo(
+    () => buildAptisGrammarVocabularyMistakes(mockAttempts),
+    [mockAttempts]
+  );
   const timerRunning = stage === "question";
 
   useEffect(() => {
@@ -415,7 +421,15 @@ export default function HubAptisGrammarVocabularyMock({ user, onHome, onProfile 
       />
 
       {stage === "menu" ? (
-        <MockMenu attempts={mockAttempts} loading={attemptsLoading} onSelect={selectMock} />
+        <MockMenu
+          attempts={mockAttempts}
+          loading={attemptsLoading}
+          mistakeCount={mistakeReviewItems.length}
+          onReview={() => setStage("mistake-review")}
+          onSelect={selectMock}
+        />
+      ) : stage === "mistake-review" ? (
+        <MistakeReviewSession items={mistakeReviewItems} onExit={returnToMenu} />
       ) : stage === "landing" ? (
         <main className="aptis-mock-start">
           <section className="aptis-mock-start-copy">
@@ -557,7 +571,7 @@ export default function HubAptisGrammarVocabularyMock({ user, onHome, onProfile 
   );
 }
 
-function MockMenu({ attempts, loading, onSelect }) {
+function MockMenu({ attempts, loading, mistakeCount, onReview, onSelect }) {
   return (
     <main className="aptis-mock-menu">
       <section className="aptis-mock-menu-copy">
@@ -566,6 +580,28 @@ function MockMenu({ attempts, loading, onSelect }) {
         <p className="aptis-mock-menu-intro">
           Each practice test has 25 grammar questions, followed by five vocabulary tasks.
         </p>
+
+        <button
+          className="aptis-mock-mistakes-entry"
+          type="button"
+          disabled={loading || mistakeCount === 0}
+          onClick={onReview}
+        >
+          <span className="aptis-mock-mistakes-entry-icon" aria-hidden="true">
+            <BookOpenCheck size={28} />
+          </span>
+          <span>
+            <strong>Review your mistakes</strong>
+            <small>
+              {loading
+                ? "Checking your submitted mocks…"
+                : mistakeCount > 0
+                  ? `${mistakeCount} ${mistakeCount === 1 ? "question" : "questions"} ready to practise with immediate feedback.`
+                  : "Complete a mock and any answers you get wrong will appear here."}
+            </small>
+          </span>
+          <ArrowRight size={24} aria-hidden="true" />
+        </button>
 
         <div className="aptis-mock-menu-grid">
           {APTIS_GRAMMAR_VOCABULARY_MOCKS.map((mock) => {
@@ -601,6 +637,239 @@ function MockMenu({ attempts, loading, onSelect }) {
         </div>
       </section>
     </main>
+  );
+}
+
+export function MistakeReviewSession({
+  items,
+  onExit,
+  title = "Review your mistakes",
+  exitLabel = "All mock tests",
+  completeTitle = "Review complete",
+}) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [feedback, setFeedback] = useState(null);
+  const [outcomes, setOutcomes] = useState([]);
+  const [complete, setComplete] = useState(false);
+  const feedbackRef = useRef(null);
+  const item = items[currentIndex] || null;
+
+  useEffect(() => {
+    if (!feedback) return;
+    feedbackRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [feedback]);
+
+  function answer(value) {
+    if (!item || feedback) return;
+    const correct = item.kind === "grammar"
+      ? value === item.correctValue
+      : value === item.row.correctAnswer;
+    setFeedback({ value, correct });
+    setOutcomes((current) => [...current, correct]);
+  }
+
+  function next() {
+    if (!feedback) return;
+    if (currentIndex === items.length - 1) {
+      setComplete(true);
+      return;
+    }
+    setCurrentIndex((index) => index + 1);
+    setFeedback(null);
+  }
+
+  function restart() {
+    setCurrentIndex(0);
+    setFeedback(null);
+    setOutcomes([]);
+    setComplete(false);
+  }
+
+  if (!item) {
+    return (
+      <main className="aptis-mock-results">
+        <section className="aptis-mock-results-inner aptis-mock-review-empty-state">
+          <CheckCircle2 size={50} aria-hidden="true" />
+          <h1>No mistakes to review</h1>
+          <p>Complete a mock and any questions you answer incorrectly will appear here.</p>
+          <button className="aptis-mock-secondary" type="button" onClick={onExit}>
+            {exitLabel}
+          </button>
+        </section>
+      </main>
+    );
+  }
+
+  if (complete) {
+    const correctCount = outcomes.filter(Boolean).length;
+    return (
+      <main className="aptis-mock-results">
+        <section className="aptis-mock-results-inner">
+          <header className="aptis-mock-results-header">
+            <CheckCircle2 size={50} aria-hidden="true" />
+            <div>
+              <p>Grammar and Vocabulary</p>
+              <h1>{completeTitle}</h1>
+              <span>You received feedback after every answer.</span>
+            </div>
+          </header>
+
+          <div className="aptis-mock-score-grid aptis-mock-review-score-grid">
+            <article className="is-total">
+              <span>Correct first time</span>
+              <strong>{correctCount}/{items.length}</strong>
+            </article>
+            <article>
+              <span>Items reviewed</span>
+              <strong>{items.length}</strong>
+            </article>
+          </div>
+
+          <div className="aptis-mock-results-actions">
+            <button className="aptis-mock-secondary" type="button" onClick={onExit}>
+              {exitLabel}
+            </button>
+            <button className="aptis-mock-primary" type="button" onClick={restart}>
+              <RotateCcw size={21} />
+              Review again
+            </button>
+          </div>
+        </section>
+      </main>
+    );
+  }
+
+  const isVocabulary = item.kind === "vocabulary";
+
+  return (
+    <>
+      <main className={`aptis-mock-paper aptis-mock-mistake-review ${isVocabulary ? "is-vocabulary" : ""}`}>
+        <section className="aptis-mock-question-screen">
+          <header className="aptis-mock-question-header aptis-mock-review-question-header">
+            <div>
+              <p>{title}</p>
+              <h1>Question {currentIndex + 1} of {items.length}</h1>
+              <span>
+                Mock {Number(item.mockVersion)} · {isVocabulary
+                  ? `Vocabulary question ${item.number} · ${item.task.type}`
+                  : `Grammar question ${item.number}`}
+                {item.studentIds?.length
+                  ? ` · Missed by ${item.studentIds.length} ${item.studentIds.length === 1 ? "student" : "students"}`
+                  : ""}
+              </span>
+            </div>
+          </header>
+
+          {isVocabulary ? (
+            <VocabularyMistakeQuestion
+              item={item}
+              feedback={feedback}
+              onAnswer={answer}
+            />
+          ) : (
+            <div className="aptis-mock-grammar">
+              <p className="aptis-mock-grammar-prompt">{item.question.prompt}</p>
+              <div className="aptis-mock-options">
+                {item.question.options.map((option, optionIndex) => {
+                  const isCorrectOption = feedback && option === item.correctValue;
+                  const isWrongSelection = feedback && feedback.value === option && !feedback.correct;
+                  return (
+                    <button
+                      key={`${item.key}:${option}`}
+                      type="button"
+                      className={[
+                        feedback?.value === option ? "is-selected" : "",
+                        isCorrectOption ? "is-review-correct" : "",
+                        isWrongSelection ? "is-review-wrong" : "",
+                      ].filter(Boolean).join(" ")}
+                      disabled={Boolean(feedback)}
+                      onClick={() => answer(option)}
+                    >
+                      <span>{String.fromCharCode(65 + optionIndex)}</span>
+                      <strong>{option}</strong>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {feedback ? (
+            <section
+              ref={feedbackRef}
+              className={`aptis-mock-immediate-feedback ${feedback.correct ? "is-correct" : "is-wrong"}`}
+              role="status"
+              aria-live="polite"
+            >
+              <strong>{feedback.correct ? "Correct" : "Not quite"}</strong>
+              {!feedback.correct ? <p>Correct answer: {item.correctValue}</p> : null}
+              {item.explanation ? <p>{item.explanation}</p> : null}
+            </section>
+          ) : (
+            <p className="aptis-mock-review-prompt">Choose an answer to see feedback straight away.</p>
+          )}
+        </section>
+      </main>
+
+      <footer className="aptis-mock-footer aptis-mock-review-footer">
+        <button className="aptis-mock-secondary" type="button" onClick={onExit}>
+          <ArrowLeft size={22} />
+          {exitLabel}
+        </button>
+        <button className="aptis-mock-primary" type="button" disabled={!feedback} onClick={next}>
+          {currentIndex === items.length - 1 ? "Finish review" : "Next mistake"}
+          {currentIndex === items.length - 1 ? <CheckCircle2 size={24} /> : <ArrowRight size={25} />}
+        </button>
+      </footer>
+    </>
+  );
+}
+
+function VocabularyMistakeQuestion({ item, feedback, onAnswer }) {
+  const { row, task } = item;
+  const sentenceParts = row.prompt.split("__________");
+  const isSentence = sentenceParts.length === 2;
+  const select = (
+    <select
+      className={feedback ? (feedback.correct ? "is-review-correct" : "is-review-wrong") : ""}
+      aria-label={`Question ${row.number}`}
+      value={feedback?.value || ""}
+      disabled={Boolean(feedback)}
+      onChange={(event) => onAnswer(event.target.value)}
+    >
+      <option value="">Choose a word</option>
+      {task.options.map((option) => (
+        <option key={`${item.key}:${option.value}`} value={option.value}>
+          {option.label}
+        </option>
+      ))}
+    </select>
+  );
+
+  return (
+    <div className="aptis-mock-vocabulary aptis-mock-vocabulary-review">
+      <p className="aptis-mock-vocab-section">{task.range}: {task.type}</p>
+      <p className="aptis-mock-vocab-instruction">{task.instruction}</p>
+      <div className="aptis-mock-vocab-form">
+        {isSentence ? (
+          <div className="aptis-mock-vocab-row is-sentence">
+            <span>{row.number}.</span>
+            <label>
+              <span>{sentenceParts[0]}</span>
+              {select}
+              <span>{sentenceParts[1]}</span>
+            </label>
+          </div>
+        ) : (
+          <label className="aptis-mock-vocab-row">
+            <span>{row.number}.</span>
+            <strong>{row.prompt}</strong>
+            <span>{task.type === "Collocations" ? "+" : task.showEquals ? "=" : ""}</span>
+            {select}
+          </label>
+        )}
+      </div>
+    </div>
   );
 }
 
@@ -978,7 +1247,7 @@ function ExamFooter({ stage, currentIndex, onNext, onPrevious, onOpenList, onExi
   );
 }
 
-function AptisMockStyles() {
+export function AptisMockStyles() {
   return (
     <style>{`
       .aptis-mock {
@@ -1102,6 +1371,65 @@ function AptisMockStyles() {
         color: #555760;
         font-size: 20px;
         line-height: 1.45;
+      }
+
+      .aptis-mock-mistakes-entry {
+        width: min(100%, 680px);
+        min-height: 92px;
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 16px;
+        margin-top: 28px;
+        padding: 16px 18px;
+        border: 2px solid #cfc2df;
+        border-radius: 12px;
+        background: #f7f4fc;
+        color: #28222f;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .aptis-mock-mistakes-entry:hover:not(:disabled),
+      .aptis-mock-mistakes-entry:focus-visible:not(:disabled) {
+        border-color: var(--aptis-purple);
+        background: #f1ebf8;
+      }
+
+      .aptis-mock-mistakes-entry:disabled {
+        cursor: default;
+        opacity: 0.68;
+      }
+
+      .aptis-mock-mistakes-entry-icon {
+        display: grid;
+        place-items: center;
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        background: var(--aptis-purple);
+        color: #fff;
+      }
+
+      .aptis-mock-mistakes-entry strong,
+      .aptis-mock-mistakes-entry small {
+        display: block;
+      }
+
+      .aptis-mock-mistakes-entry strong {
+        color: var(--aptis-purple);
+        font-size: 19px;
+      }
+
+      .aptis-mock-mistakes-entry small {
+        margin-top: 5px;
+        color: #5f5867;
+        font-size: 14px;
+        line-height: 1.4;
+      }
+
+      .aptis-mock-mistakes-entry > svg {
+        color: var(--aptis-purple);
       }
 
       .aptis-mock-menu-grid {
@@ -1497,6 +1825,118 @@ function AptisMockStyles() {
         background: #fff;
         color: #1f2024;
         font-size: 17px;
+      }
+
+      .aptis-mock-mistake-review {
+        padding-top: 122px;
+      }
+
+      .aptis-mock-review-question-header {
+        display: block;
+        margin-bottom: 54px;
+      }
+
+      .aptis-mock-review-question-header span {
+        display: block;
+        margin-top: 11px;
+        color: #6a6270;
+        font-size: 15px;
+        font-weight: 700;
+      }
+
+      .aptis-mock-options button:disabled,
+      .aptis-mock-vocab-row select:disabled {
+        color: #18191d;
+        cursor: default;
+        opacity: 1;
+        -webkit-text-fill-color: currentColor;
+      }
+
+      .aptis-mock-options button.is-review-correct {
+        border-color: #2f9861;
+        background: #e8f7ee;
+        box-shadow: inset 0 0 0 2px #2f9861;
+      }
+
+      .aptis-mock-options button.is-review-wrong {
+        border-color: #cc5148;
+        background: #fcebea;
+        box-shadow: inset 0 0 0 2px #cc5148;
+      }
+
+      .aptis-mock-vocab-row select.is-review-correct {
+        border-color: #2f9861;
+        background: #e8f7ee;
+      }
+
+      .aptis-mock-vocab-row select.is-review-wrong {
+        border-color: #cc5148;
+        background: #fcebea;
+      }
+
+      .aptis-mock-immediate-feedback {
+        width: min(100%, 1040px);
+        margin: 28px auto 0;
+        padding: 18px 20px;
+        border: 1px solid;
+        border-left-width: 5px;
+        border-radius: 10px;
+        scroll-margin-bottom: 120px;
+      }
+
+      .aptis-mock-immediate-feedback.is-correct {
+        border-color: #65aa7e;
+        background: #edf8f1;
+        color: #215f38;
+      }
+
+      .aptis-mock-immediate-feedback.is-wrong {
+        border-color: #d26a61;
+        background: #fdf0ef;
+        color: #7b302b;
+      }
+
+      .aptis-mock-immediate-feedback > strong {
+        display: block;
+        font-size: 19px;
+      }
+
+      .aptis-mock-immediate-feedback p {
+        margin: 7px 0 0;
+        color: inherit;
+        line-height: 1.5;
+      }
+
+      .aptis-mock-review-prompt {
+        width: min(100%, 1040px);
+        margin: 24px auto 0;
+        color: #6a6270;
+        font-size: 15px;
+      }
+
+      .aptis-mock-review-footer {
+        justify-content: space-between;
+      }
+
+      .aptis-mock-review-footer .aptis-mock-primary:disabled {
+        cursor: default;
+        opacity: 0.45;
+      }
+
+      .aptis-mock-review-score-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .aptis-mock-review-empty-state {
+        display: grid;
+        justify-items: start;
+        gap: 14px;
+      }
+
+      .aptis-mock-review-empty-state h1,
+      .aptis-mock-review-empty-state p {
+        margin: 0;
+        text-align: left;
       }
 
       .aptis-mock-vocab-row.is-sentence {
@@ -2192,6 +2632,23 @@ function AptisMockStyles() {
 
         .aptis-mock-results-actions {
           flex-direction: column-reverse;
+        }
+
+        .aptis-mock-mistakes-entry {
+          grid-template-columns: auto minmax(0, 1fr);
+        }
+
+        .aptis-mock-mistakes-entry > svg {
+          display: none;
+        }
+
+        .aptis-mock-review-footer {
+          align-items: stretch;
+        }
+
+        .aptis-mock-review-footer .aptis-mock-secondary,
+        .aptis-mock-review-footer .aptis-mock-primary {
+          flex: 1 1 180px;
         }
 
         .aptis-mock-results-actions button {

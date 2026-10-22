@@ -1,0 +1,310 @@
+{
+  "bank": "b1-b2-shops-services",
+  "status": "Connected locally to six activities: study cards (32 entries), venue picture matching (26), situations, phrasal-verb choices, apostrophes and combined written recall (32). Remains unpublished for admin review.",
+  "assetCount": 26,
+  "missingShopTypes": [],
+  "optionalShoppingScenes": [
+    "close down",
+    "sell out / be out of",
+    "look round",
+    "look for"
+  ],
+  "existingActionReuse": {
+    "try on": "/images/vocab/intermediate-plus/shops-and-services/try-on.webp"
+  },
+  "assets": [
+    {
+      "target": "chemist's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/chemists.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/chemists.png"
+    },
+    {
+      "target": "baker's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/bakers.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/bakers.png"
+    },
+    {
+      "target": "barber's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/barbers.webp",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "usageNote": "Keep the original landscape aspect ratio with object-fit: contain; no forced crop or stretching needed.",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/barbers.png"
+    },
+    {
+      "target": "butcher's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/butchers.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/butchers.png"
+    },
+    {
+      "target": "car showroom",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/car-showroom.webp",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "usageNote": "Keep the original landscape aspect ratio with object-fit: contain; no forced crop or stretching needed.",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/car-showroom.png"
+    },
+    {
+      "target": "deli",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/deli.webp",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "usageNote": "Keep the original landscape aspect ratio with object-fit: contain; no forced crop or stretching needed.",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/deli.png"
+    },
+    {
+      "target": "DIY store",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/diy-store.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/diy-store.png"
+    },
+    {
+      "target": "dry-cleaner's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/dry-cleaners.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/dry-cleaners.png"
+    },
+    {
+      "target": "estate agent's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/estate-agents.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/estate-agents.png"
+    },
+    {
+      "target": "fishmonger's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/fishmongers.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/fishmongers.png"
+    },
+    {
+      "target": "florist's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/florists.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/florists.png"
+    },
+    {
+      "target": "garden centre",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/garden-centre.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/garden-centre.png"
+    },
+    {
+      "target": "greengrocer's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/greengrocers.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/greengrocers.png"
+    },
+    {
+      "target": "hairdresser's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/hairdressers.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/hairdressers.png"
+    },
+    {
+      "target": "jeweller's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/jewellers.webp",
+      "dimensions": [
+        1536,
+        1024
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "usageNote": "Keep the original landscape aspect ratio with object-fit: contain; no forced crop or stretching needed.",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/jewellers.png"
+    },
+    {
+      "target": "launderette",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/launderette.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/launderette.png"
+    },
+    {
+      "target": "market stall",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/market-stall.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/market-stall.png"
+    },
+    {
+      "target": "newsagent's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/newsagents.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/newsagents.png"
+    },
+    {
+      "target": "off-licence",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/off-licence.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": true,
+      "kind": "storefront-scene",
+      "editNote": "Removed the large shop name from the main sign. Smaller product descriptions retained. Original preserved in the supplied Downloads folder.",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/off-licence.png"
+    },
+    {
+      "target": "stationer's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/stationers.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": true,
+      "kind": "storefront-scene",
+      "editNote": "Removed the large shop name from the main sign. Smaller product descriptions retained. Original preserved in the supplied Downloads folder.",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/stationers.png"
+    },
+    {
+      "target": "travel agent's",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/travel-agents.webp",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/travel-agents.png"
+    },
+    {
+      "target": "chain store",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/chain-store.webp",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/chain-store.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene"
+    },
+    {
+      "target": "charity shop",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/charity-shop.webp",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/charity-shop.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene"
+    },
+    {
+      "target": "pound shop",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/pound-shop.webp",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/pound-shop.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene"
+    },
+    {
+      "target": "craft fair",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/craft-fair.webp",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/craft-fair.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene"
+    },
+    {
+      "target": "outlet",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/outlet.webp",
+      "sourceImage": "/images/vocab/intermediate-plus/shops-and-services/outlet.png",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "edited": false,
+      "kind": "storefront-scene"
+    }
+  ],
+  "format": "WebP; full dimensions/aspect ratios preserved; source PNGs retained."
+}

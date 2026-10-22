@@ -1,0 +1,123 @@
+{
+  "bank": "b1-b2-photography",
+  "studentVisible": false,
+  "photoSource": "/Users/nicholasbeeson/Downloads/photography-countryside-set/",
+  "townSquareSource": "/Users/nicholasbeeson/Downloads/Plaza británica con fuente y bicicleta.png",
+  "suppliedPhotos": 6,
+  "codeDiagrams": 11,
+  "reusedImages": [
+    "/images/vocab/a2-prepositions/opposite.webp"
+  ],
+  "conversion": {
+    "sourceBytes": 18593432,
+    "webpBytes": 2801588,
+    "dimensionsPreserved": true,
+    "alphaPreserved": true
+  },
+  "diagramBuilder": "scripts/build-photography-diagrams.py",
+  "coverage": {
+    "study": 22,
+    "cameraMatching": 11,
+    "positionQuestions": 11,
+    "cameraQuestions": 11
+  },
+  "assets": [
+    {
+      "image": "/images/vocab/intermediate-plus/photography/countryside-reference-sharp.webp",
+      "bytes": 690296,
+      "origin": "supplied photo"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/position-bottom-right.svg",
+      "bytes": 467,
+      "origin": "code"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/position-centre.svg",
+      "bytes": 467,
+      "origin": "code"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/position-top-left.svg",
+      "bytes": 465,
+      "origin": "code"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/frame-surface.svg",
+      "bytes": 494,
+      "origin": "code"
+    },
+    {
+      "image": "/images/vocab/a2-prepositions/opposite.webp",
+      "bytes": 258852,
+      "origin": "existing topic vocabulary"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/picture-upper-area.svg",
+      "bytes": 495,
+      "origin": "code"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/camera-flash.svg",
+      "bytes": 671,
+      "origin": "code"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/camera-zoom.svg",
+      "bytes": 921296,
+      "origin": "code"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/countryside-out-of-focus.webp",
+      "bytes": 114690,
+      "origin": "supplied photo"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/camera-portrait.svg",
+      "bytes": 660,
+      "origin": "code"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/countryside-overexposed.webp",
+      "bytes": 454418,
+      "origin": "supplied photo"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/camera-lens.svg",
+      "bytes": 710,
+      "origin": "code"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/countryside-wide-angle.webp",
+      "bytes": 720568,
+      "origin": "supplied photo"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/photo-edit.svg",
+      "bytes": 921449,
+      "origin": "code"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/dog-close-up.webp",
+      "bytes": 280314,
+      "origin": "supplied photo"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/camera-settings.svg",
+      "bytes": 519,
+      "origin": "code"
+    },
+    {
+      "image": "/images/vocab/intermediate-plus/photography/town-square.webp",
+      "bytes": 541302,
+      "origin": "supplied photo"
+    }
+  ],
+  "notes": [
+    "The wider-view image changes scene details and is used as a standalone framing illustration, not a controlled optical comparison.",
+    "Zoom and crop diagrams reuse the same sharp photo, embedded as WebP for standalone SVG rendering.",
+    "Position grids distinguish picture-plane position from depth. Contextual questions transfer corner phrases to the supplied scenes.",
+    "All 22 lexical terms are covered in sentence recall; image cues do not print target answers.",
+    "Photography remains unpublished for admin review."
+  ]
+}

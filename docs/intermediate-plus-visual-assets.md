@@ -21,7 +21,7 @@ Existing Topic Vocab is the first source; suitable visuals elsewhere in the proj
 
 **Current status:** all 44 lexical entries now have an available image: 30 supplied images imported into [the Packing asset folder](../public/images/vocab/intermediate-plus/packing/), eight existing project images, and six generated document icons. The 30 supplied files comprise 26 transparent 1254 × 1254 object images and four opaque 622 × 622 action scenes. The document icons include new passport and ID-card alternatives to the older reusable images below. See the [44-entry asset manifest](../outputs/intermediate-plus-vocabulary/packing-asset-manifest.json) for exact paths, dimensions, transparency checks and usage notes. Images are now connected: 44 picture flashcards and 43 entries for matching and written naming, alongside document and travel-context choices. The guidebook is study-only because its cover prints part of the answer. Written cues use small images; no white backdrop is added to transparent assets.
 
-The original gaps listed below are now covered by those supplied/generated files. No additional images are missing by entry count. Unpack needs an arrival/taking-things-out context; unlabelled toiletries and travel iron benefit from use clues. The guidebook cover reads “TRAVEL GUIDE”, so it gives away part of the answer in picture-only recall. Keep the four action scenes small; regenerate them before large display. The ID-card and driving-licence alternatives retain a soft outer glow.
+The new Packing images now load as WebP with dimensions and transparency preserved; their PNG originals are retained. The original gaps listed below are now covered by those supplied/generated files. No additional images are missing by entry count. Unpack needs an arrival/taking-things-out context; unlabelled toiletries and travel iron benefit from use clues. The guidebook cover reads “TRAVEL GUIDE”, so it gives away part of the answer in picture-only recall. Keep the four action scenes small; regenerate them before large display. The ID-card and driving-licence alternatives retain a soft outer glow.
 
 **Reuse:**
 
@@ -45,26 +45,31 @@ The original gaps listed below are now covered by those supplied/generated files
 
 ## 3. Shops and services
 
-**Reuse:** [chemist's](../public/images/vocab/a2-places-buildings/chemist.webp) and the [try on](../public/images/vocab/clothes/try-on.png) action.
+**Current status:** all 26 shop/venue types are imported and connected to picture practice in [the Shops and services asset folder](../public/images/vocab/intermediate-plus/shops-and-services/). See the [asset manifest](../outputs/intermediate-plus-vocabulary/shops-asset-manifest.json). The large shop names have been removed from [off-licence](../public/images/vocab/intermediate-plus/shops-and-services/off-licence.webp) and [stationer's](../public/images/vocab/intermediate-plus/shops-and-services/stationers.webp); smaller product descriptions remain. WebP versions are used in activities, with PNG originals retained. The bank remains unpublished for admin review.
 
-**Contextual reuse:** the existing [market](../public/images/vocab/a2-places-buildings/market.webp) can introduce the setting; a marked stall may support market stall. The [hairdresser](../public/images/vocab/jobs-a2/hairdresser.webp) introduces the profession, rather than unambiguously depicting a hairdresser's premises.
+**Covered:** baker's, barber's, butcher's, car showroom, chain store, chemist's, deli, DIY store, dry-cleaner's, estate agent's, fishmonger's, florist's, garden centre, greengrocer's, hairdresser's, jeweller's, launderette, market stall, newsagent's, off-licence, stationer's, travel agent's, charity shop, pound shop, craft fair and outlet. No venue images are missing. Chain store uses the supplied comparison of the same business in two locations.
 
-**New:**
+**Activities:** 32 study cards (pictures plus phrase meanings), picture matching for 26 venues, shop-purpose choices, shopping-phrase choices, apostrophes, and written recall for all 32 entries. Small written images have purpose clues; phrases lacking action pictures retain text clues.
 
-- Premises: baker's, barber's, butcher's, car showroom, deli, DIY store, dry-cleaner's, estate agent's, fishmonger's, florist's, garden centre, greengrocer's, hairdresser's, jeweller's, launderette, market stall, newsagent's, off-licence, stationer's, travel agent's.
-- Other venues: charity shop, pound shop, craft fair, outlet.
-- Chain store: a short panel showing the same shop in different locations, rather than one anonymous storefront.
-- Optional shopping scenes: a business closing down; an empty product shelf to support sell out / be out of; someone browsing for look round and someone seeking a particular item for look for. These distinctions still need contextual wording.
+**Existing action reuse:** [try on](../public/images/vocab/clothes/try-on.png). Optional new scenes can illustrate a business closing down; an empty product shelf for sell out / be out of; browsing for look round; and seeking a particular item for look for. These distinctions still need contextual wording and can remain text-based if no scenes are created.
+
+**Layout note:** barber's, car showroom, deli and jeweller's are landscape images; the rest are square. Preserve their aspect ratios with contain sizing. There is no need to regenerate them solely to force a square shape. Some small storefront details may benefit from a purpose clue when used on narrow screens.
 
 **Best visual activity:** a consistent shopping-street or storefront collection, with visible goods/services. Avoid making the shop sign itself supply the answer. Chain store and the shopping verbs work best with a short situation as well as a picture.
 
 ## 4. Photography
 
+**Integrated, 22 October 2026:** all six supplied pictures are connected: the sharp countryside scene, wider view, blurred and overexposed versions, dog close-up and town square. Runtime photos use WebP (2.7 MiB versus 17.7 MiB of PNGs; original dimensions and alpha verified). Eleven native SVG diagrams cover camera features/settings, zoom and saved-photo cropping, picture-position grids, and on top of versus at the top of. Build them with `python3 scripts/build-photography-diagrams.py` after photo conversion. The existing topic-vocabulary opposite picture is reused.
+
+Six activities cover all 22 terms: visual flashcards, camera-picture matching, position choices, camera-context choices, position writing and camera writing. Contextual corner questions use the supplied scenes; grids introduce corner/centre positions clearly. Writing retains smaller visuals, and diagrams/photos survive mistake review. No further generated images are needed for the current activities. Photography remains unpublished for admin review. Asset provenance and sizes: `outputs/intermediate-plus-vocabulary/photography-asset-manifest.json`.
+
+The wider-view picture changes a few scene details, so it illustrates broad framing independently. The code-based zoom and crop demonstrations use exactly the same sharp source image. They illustrate framing and editing, without claiming to simulate optical perspective changes.
+
 **Reuse:** [camera](../public/images/vocab/small-things/camera.webp), [photo](../public/images/vocab/small-things/photo.png), [take a photo](../public/images/vocab/more-verb-phrases-a2/take-a-photo.webp); existing simple position cards for [behind](../public/images/vocab/a2-prepositions/behind.webp), [in front of](../public/images/vocab/a2-prepositions/in-front-of.webp) and [opposite](../public/images/vocab/a2-prepositions/opposite.webp).
 
 **Contextual reuse:** existing speaking pictures such as the [balcony scene](../public/images/speaking/describing-pictures/balcony-scene.png) and [mountain scene](../public/images/speaking/describing-pictures/mountain-scene.png) can support photo description. They were not composed to contrast every target position clearly.
 
-**New:**
+**Original asset plan (now covered by the supplied pictures and code):**
 
 - Two purpose-built scenes with clearly identifiable subjects in the foreground, background, distance, centre and specified corners. Include behind / in front of relationships within the scenes.
 - A paired diagram distinguishing on top of an object from at the top of a picture.

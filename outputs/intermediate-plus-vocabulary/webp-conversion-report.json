@@ -1,0 +1,631 @@
+{
+  "convertedOn": "2026-10-22",
+  "quality": 90,
+  "preservedDimensions": true,
+  "preservedAlpha": true,
+  "originalPngsRetained": true,
+  "sourceBytes": 107871628,
+  "webpBytes": 16007912,
+  "assets": [
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/bakers.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/bakers.webp",
+      "sourceBytes": 2515701,
+      "webpBytes": 354632,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/barbers.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/barbers.webp",
+      "sourceBytes": 2661776,
+      "webpBytes": 402184,
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/butchers.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/butchers.webp",
+      "sourceBytes": 2387246,
+      "webpBytes": 337874,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/car-showroom.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/car-showroom.webp",
+      "sourceBytes": 2559588,
+      "webpBytes": 385612,
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/chain-store.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/chain-store.webp",
+      "sourceBytes": 2776703,
+      "webpBytes": 444320,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/charity-shop.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/charity-shop.webp",
+      "sourceBytes": 3052386,
+      "webpBytes": 478854,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/chemists.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/chemists.webp",
+      "sourceBytes": 2363971,
+      "webpBytes": 238116,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/craft-fair.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/craft-fair.webp",
+      "sourceBytes": 3133867,
+      "webpBytes": 491356,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/deli.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/deli.webp",
+      "sourceBytes": 2724846,
+      "webpBytes": 432962,
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/diy-store.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/diy-store.webp",
+      "sourceBytes": 2846961,
+      "webpBytes": 489700,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/dry-cleaners.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/dry-cleaners.webp",
+      "sourceBytes": 2709502,
+      "webpBytes": 426982,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/estate-agents.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/estate-agents.webp",
+      "sourceBytes": 2671299,
+      "webpBytes": 425658,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/fishmongers.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/fishmongers.webp",
+      "sourceBytes": 2371689,
+      "webpBytes": 320972,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/florists.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/florists.webp",
+      "sourceBytes": 2839233,
+      "webpBytes": 442854,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/garden-centre.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/garden-centre.webp",
+      "sourceBytes": 2808759,
+      "webpBytes": 433046,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/greengrocers.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/greengrocers.webp",
+      "sourceBytes": 2561955,
+      "webpBytes": 358928,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/hairdressers.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/hairdressers.webp",
+      "sourceBytes": 2629584,
+      "webpBytes": 410658,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/jewellers.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/jewellers.webp",
+      "sourceBytes": 2445769,
+      "webpBytes": 363032,
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/launderette.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/launderette.webp",
+      "sourceBytes": 2154854,
+      "webpBytes": 258978,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/market-stall.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/market-stall.webp",
+      "sourceBytes": 2808782,
+      "webpBytes": 425480,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/newsagents.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/newsagents.webp",
+      "sourceBytes": 2602254,
+      "webpBytes": 400562,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/off-licence.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/off-licence.webp",
+      "sourceBytes": 2566513,
+      "webpBytes": 420624,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/outlet.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/outlet.webp",
+      "sourceBytes": 2931591,
+      "webpBytes": 461530,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/pound-shop.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/pound-shop.webp",
+      "sourceBytes": 2909509,
+      "webpBytes": 499266,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/stationers.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/stationers.webp",
+      "sourceBytes": 2545985,
+      "webpBytes": 414534,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/shops-and-services/travel-agents.png",
+      "image": "/images/vocab/intermediate-plus/shops-and-services/travel-agents.webp",
+      "sourceBytes": 2235201,
+      "webpBytes": 297626,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/adaptor.png",
+      "image": "/images/vocab/intermediate-plus/packing/adaptor.webp",
+      "sourceBytes": 1112832,
+      "webpBytes": 83492,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/bathrobe.png",
+      "image": "/images/vocab/intermediate-plus/packing/bathrobe.webp",
+      "sourceBytes": 1632720,
+      "webpBytes": 245818,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/batteries.png",
+      "image": "/images/vocab/intermediate-plus/packing/batteries.webp",
+      "sourceBytes": 935132,
+      "webpBytes": 146392,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/beach-bag.png",
+      "image": "/images/vocab/intermediate-plus/packing/beach-bag.webp",
+      "sourceBytes": 2302549,
+      "webpBytes": 422190,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/booking-confirmation.png",
+      "image": "/images/vocab/intermediate-plus/packing/booking-confirmation.webp",
+      "sourceBytes": 990179,
+      "webpBytes": 86598,
+      "dimensions": [
+        1223,
+        1286
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/brush.png",
+      "image": "/images/vocab/intermediate-plus/packing/brush.webp",
+      "sourceBytes": 695041,
+      "webpBytes": 112218,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/comb.png",
+      "image": "/images/vocab/intermediate-plus/packing/comb.webp",
+      "sourceBytes": 672361,
+      "webpBytes": 190710,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/deodorant.png",
+      "image": "/images/vocab/intermediate-plus/packing/deodorant.webp",
+      "sourceBytes": 818620,
+      "webpBytes": 59828,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/driving-licence.png",
+      "image": "/images/vocab/intermediate-plus/packing/driving-licence.webp",
+      "sourceBytes": 1243038,
+      "webpBytes": 96732,
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/earphones.png",
+      "image": "/images/vocab/intermediate-plus/packing/earphones.webp",
+      "sourceBytes": 602833,
+      "webpBytes": 126642,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/first-aid-kit.png",
+      "image": "/images/vocab/intermediate-plus/packing/first-aid-kit.webp",
+      "sourceBytes": 2025452,
+      "webpBytes": 320470,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/fold.png",
+      "image": "/images/vocab/intermediate-plus/packing/fold.webp",
+      "sourceBytes": 639399,
+      "webpBytes": 81316,
+      "dimensions": [
+        622,
+        622
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/guidebook.png",
+      "image": "/images/vocab/intermediate-plus/packing/guidebook.webp",
+      "sourceBytes": 1503414,
+      "webpBytes": 246348,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/hairdryer.png",
+      "image": "/images/vocab/intermediate-plus/packing/hairdryer.webp",
+      "sourceBytes": 866184,
+      "webpBytes": 100340,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/id-card.png",
+      "image": "/images/vocab/intermediate-plus/packing/id-card.webp",
+      "sourceBytes": 1077453,
+      "webpBytes": 58800,
+      "dimensions": [
+        1536,
+        1024
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/insect-repellent.png",
+      "image": "/images/vocab/intermediate-plus/packing/insect-repellent.webp",
+      "sourceBytes": 577631,
+      "webpBytes": 66046,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/make-up.png",
+      "image": "/images/vocab/intermediate-plus/packing/make-up.webp",
+      "sourceBytes": 1575810,
+      "webpBytes": 247566,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/nail-scissors.png",
+      "image": "/images/vocab/intermediate-plus/packing/nail-scissors.webp",
+      "sourceBytes": 463223,
+      "webpBytes": 94432,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/pack-of-cards.png",
+      "image": "/images/vocab/intermediate-plus/packing/pack-of-cards.webp",
+      "sourceBytes": 1905069,
+      "webpBytes": 290316,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/passport.png",
+      "image": "/images/vocab/intermediate-plus/packing/passport.webp",
+      "sourceBytes": 1095509,
+      "webpBytes": 130872,
+      "dimensions": [
+        1214,
+        1295
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/razor.png",
+      "image": "/images/vocab/intermediate-plus/packing/razor.webp",
+      "sourceBytes": 445860,
+      "webpBytes": 85228,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/roll-up.png",
+      "image": "/images/vocab/intermediate-plus/packing/roll-up.webp",
+      "sourceBytes": 624868,
+      "webpBytes": 75146,
+      "dimensions": [
+        622,
+        622
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/shampoo.png",
+      "image": "/images/vocab/intermediate-plus/packing/shampoo.webp",
+      "sourceBytes": 565474,
+      "webpBytes": 48652,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/slippers.png",
+      "image": "/images/vocab/intermediate-plus/packing/slippers.webp",
+      "sourceBytes": 1616735,
+      "webpBytes": 248062,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/sun-hat.png",
+      "image": "/images/vocab/intermediate-plus/packing/sun-hat.webp",
+      "sourceBytes": 1509210,
+      "webpBytes": 289166,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/sunscreen.png",
+      "image": "/images/vocab/intermediate-plus/packing/sunscreen.webp",
+      "sourceBytes": 692087,
+      "webpBytes": 76970,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/swimming-trunks.png",
+      "image": "/images/vocab/intermediate-plus/packing/swimming-trunks.webp",
+      "sourceBytes": 1856483,
+      "webpBytes": 239530,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/toothbrush.png",
+      "image": "/images/vocab/intermediate-plus/packing/toothbrush.webp",
+      "sourceBytes": 262545,
+      "webpBytes": 56976,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/toothpaste.png",
+      "image": "/images/vocab/intermediate-plus/packing/toothpaste.webp",
+      "sourceBytes": 609444,
+      "webpBytes": 71358,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/towel.png",
+      "image": "/images/vocab/intermediate-plus/packing/towel.webp",
+      "sourceBytes": 1893786,
+      "webpBytes": 376066,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/travel-insurance-documents.png",
+      "image": "/images/vocab/intermediate-plus/packing/travel-insurance-documents.webp",
+      "sourceBytes": 864845,
+      "webpBytes": 74494,
+      "dimensions": [
+        1223,
+        1286
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/travel-iron.png",
+      "image": "/images/vocab/intermediate-plus/packing/travel-iron.webp",
+      "sourceBytes": 999455,
+      "webpBytes": 139886,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/unpack.png",
+      "image": "/images/vocab/intermediate-plus/packing/unpack.webp",
+      "sourceBytes": 585305,
+      "webpBytes": 74346,
+      "dimensions": [
+        622,
+        622
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/visa.png",
+      "image": "/images/vocab/intermediate-plus/packing/visa.webp",
+      "sourceBytes": 1117286,
+      "webpBytes": 137822,
+      "dimensions": [
+        1312,
+        1199
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/washbag.png",
+      "image": "/images/vocab/intermediate-plus/packing/washbag.webp",
+      "sourceBytes": 2104875,
+      "webpBytes": 329020,
+      "dimensions": [
+        1254,
+        1254
+      ]
+    },
+    {
+      "source": "public/images/vocab/intermediate-plus/packing/wrap.png",
+      "image": "/images/vocab/intermediate-plus/packing/wrap.webp",
+      "sourceBytes": 573397,
+      "webpBytes": 61724,
+      "dimensions": [
+        622,
+        622
+      ]
+    }
+  ]
+}

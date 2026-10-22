@@ -14,27 +14,29 @@
       "entryId": "intplus-packing-adaptor",
       "term": "adaptor",
       "category": "Electronics",
-      "image": "/images/vocab/intermediate-plus/packing/adaptor.png",
+      "image": "/images/vocab/intermediate-plus/packing/adaptor.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/adaptor.png"
     },
     {
       "entryId": "intplus-packing-batteries",
       "term": "batteries",
       "category": "Electronics",
-      "image": "/images/vocab/intermediate-plus/packing/batteries.png",
+      "image": "/images/vocab/intermediate-plus/packing/batteries.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/batteries.png"
     },
     {
       "entryId": "intplus-packing-charger",
@@ -53,27 +55,29 @@
       "entryId": "intplus-packing-earphones",
       "term": "earphones",
       "category": "Electronics",
-      "image": "/images/vocab/intermediate-plus/packing/earphones.png",
+      "image": "/images/vocab/intermediate-plus/packing/earphones.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/earphones.png"
     },
     {
       "entryId": "intplus-packing-hairdryer",
       "term": "hairdryer",
       "category": "Electronics",
-      "image": "/images/vocab/intermediate-plus/packing/hairdryer.png",
+      "image": "/images/vocab/intermediate-plus/packing/hairdryer.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/hairdryer.png"
     },
     {
       "entryId": "intplus-packing-headphones",
@@ -92,7 +96,7 @@
       "entryId": "intplus-packing-travel-iron",
       "term": "travel iron",
       "category": "Electronics",
-      "image": "/images/vocab/intermediate-plus/packing/travel-iron.png",
+      "image": "/images/vocab/intermediate-plus/packing/travel-iron.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
@@ -100,39 +104,42 @@
         1254
       ],
       "hasTransparentPixels": true,
-      "usageNote": "Clearly an iron; use a travel/compact cue if the full phrase travel iron is required."
+      "usageNote": "Clearly an iron; use a travel/compact cue if the full phrase travel iron is required.",
+      "sourceImage": "/images/vocab/intermediate-plus/packing/travel-iron.png"
     },
     {
       "entryId": "intplus-packing-brush",
       "term": "brush",
       "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/brush.png",
+      "image": "/images/vocab/intermediate-plus/packing/brush.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/brush.png"
     },
     {
       "entryId": "intplus-packing-comb",
       "term": "comb",
       "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/comb.png",
+      "image": "/images/vocab/intermediate-plus/packing/comb.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/comb.png"
     },
     {
       "entryId": "intplus-packing-deodorant",
       "term": "deodorant",
       "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/deodorant.png",
+      "image": "/images/vocab/intermediate-plus/packing/deodorant.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
@@ -140,13 +147,14 @@
         1254
       ],
       "hasTransparentPixels": true,
-      "usageNote": "Recognisable stick applicator; pair with an underarm/use clue for assessed identification."
+      "usageNote": "Recognisable stick applicator; pair with an underarm/use clue for assessed identification.",
+      "sourceImage": "/images/vocab/intermediate-plus/packing/deodorant.png"
     },
     {
       "entryId": "intplus-packing-insect-repellent",
       "term": "insect repellent",
       "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/insect-repellent.png",
+      "image": "/images/vocab/intermediate-plus/packing/insect-repellent.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
@@ -154,52 +162,14 @@
         1254
       ],
       "hasTransparentPixels": true,
-      "usageNote": "Generic spray bottle; use a mosquito/travel-use clue rather than unqualified picture naming."
+      "usageNote": "Generic spray bottle; use a mosquito/travel-use clue rather than unqualified picture naming.",
+      "sourceImage": "/images/vocab/intermediate-plus/packing/insect-repellent.png"
     },
     {
       "entryId": "intplus-packing-make-up",
       "term": "make-up",
       "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/make-up.png",
-      "source": "user-supplied packing bundle",
-      "kind": "standalone-object",
-      "dimensions": [
-        1254,
-        1254
-      ],
-      "hasTransparentPixels": true
-    },
-    {
-      "entryId": "intplus-packing-razor",
-      "term": "razor",
-      "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/razor.png",
-      "source": "user-supplied packing bundle",
-      "kind": "standalone-object",
-      "dimensions": [
-        1254,
-        1254
-      ],
-      "hasTransparentPixels": true
-    },
-    {
-      "entryId": "intplus-packing-nail-scissors",
-      "term": "nail scissors",
-      "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/nail-scissors.png",
-      "source": "user-supplied packing bundle",
-      "kind": "standalone-object",
-      "dimensions": [
-        1254,
-        1254
-      ],
-      "hasTransparentPixels": true
-    },
-    {
-      "entryId": "intplus-packing-shampoo",
-      "term": "shampoo",
-      "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/shampoo.png",
+      "image": "/images/vocab/intermediate-plus/packing/make-up.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
@@ -207,72 +177,120 @@
         1254
       ],
       "hasTransparentPixels": true,
-      "usageNote": "Unlabelled toiletry bottle; include a hair-washing clue to make the answer unique."
+      "sourceImage": "/images/vocab/intermediate-plus/packing/make-up.png"
+    },
+    {
+      "entryId": "intplus-packing-razor",
+      "term": "razor",
+      "category": "Toiletries",
+      "image": "/images/vocab/intermediate-plus/packing/razor.webp",
+      "source": "user-supplied packing bundle",
+      "kind": "standalone-object",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/razor.png"
+    },
+    {
+      "entryId": "intplus-packing-nail-scissors",
+      "term": "nail scissors",
+      "category": "Toiletries",
+      "image": "/images/vocab/intermediate-plus/packing/nail-scissors.webp",
+      "source": "user-supplied packing bundle",
+      "kind": "standalone-object",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/nail-scissors.png"
+    },
+    {
+      "entryId": "intplus-packing-shampoo",
+      "term": "shampoo",
+      "category": "Toiletries",
+      "image": "/images/vocab/intermediate-plus/packing/shampoo.webp",
+      "source": "user-supplied packing bundle",
+      "kind": "standalone-object",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "hasTransparentPixels": true,
+      "usageNote": "Unlabelled toiletry bottle; include a hair-washing clue to make the answer unique.",
+      "sourceImage": "/images/vocab/intermediate-plus/packing/shampoo.png"
     },
     {
       "entryId": "intplus-packing-sunscreen",
       "term": "sunscreen",
       "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/sunscreen.png",
+      "image": "/images/vocab/intermediate-plus/packing/sunscreen.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/sunscreen.png"
     },
     {
       "entryId": "intplus-packing-toothbrush",
       "term": "toothbrush",
       "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/toothbrush.png",
+      "image": "/images/vocab/intermediate-plus/packing/toothbrush.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/toothbrush.png"
     },
     {
       "entryId": "intplus-packing-toothpaste",
       "term": "toothpaste",
       "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/toothpaste.png",
+      "image": "/images/vocab/intermediate-plus/packing/toothpaste.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/toothpaste.png"
     },
     {
       "entryId": "intplus-packing-washbag",
       "term": "washbag",
       "category": "Toiletries",
-      "image": "/images/vocab/intermediate-plus/packing/washbag.png",
+      "image": "/images/vocab/intermediate-plus/packing/washbag.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/washbag.png"
     },
     {
       "entryId": "intplus-packing-bathrobe",
       "term": "bathrobe",
       "category": "Clothes and shoes",
-      "image": "/images/vocab/intermediate-plus/packing/bathrobe.png",
+      "image": "/images/vocab/intermediate-plus/packing/bathrobe.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/bathrobe.png"
     },
     {
       "entryId": "intplus-packing-flip-flops",
@@ -317,40 +335,43 @@
       "entryId": "intplus-packing-slippers",
       "term": "slippers",
       "category": "Clothes and shoes",
-      "image": "/images/vocab/intermediate-plus/packing/slippers.png",
+      "image": "/images/vocab/intermediate-plus/packing/slippers.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/slippers.png"
     },
     {
       "entryId": "intplus-packing-sun-hat",
       "term": "sun hat",
       "category": "Clothes and shoes",
-      "image": "/images/vocab/intermediate-plus/packing/sun-hat.png",
+      "image": "/images/vocab/intermediate-plus/packing/sun-hat.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/sun-hat.png"
     },
     {
       "entryId": "intplus-packing-swimming-trunks",
       "term": "swimming trunks",
       "category": "Clothes and shoes",
-      "image": "/images/vocab/intermediate-plus/packing/swimming-trunks.png",
+      "image": "/images/vocab/intermediate-plus/packing/swimming-trunks.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/swimming-trunks.png"
     },
     {
       "entryId": "intplus-packing-swimsuit",
@@ -382,33 +403,7 @@
       "entryId": "intplus-packing-beach-bag",
       "term": "beach bag",
       "category": "Other holiday items",
-      "image": "/images/vocab/intermediate-plus/packing/beach-bag.png",
-      "source": "user-supplied packing bundle",
-      "kind": "standalone-object",
-      "dimensions": [
-        1254,
-        1254
-      ],
-      "hasTransparentPixels": true
-    },
-    {
-      "entryId": "intplus-packing-first-aid-kit",
-      "term": "first-aid kit",
-      "category": "Other holiday items",
-      "image": "/images/vocab/intermediate-plus/packing/first-aid-kit.png",
-      "source": "user-supplied packing bundle",
-      "kind": "standalone-object",
-      "dimensions": [
-        1254,
-        1254
-      ],
-      "hasTransparentPixels": true
-    },
-    {
-      "entryId": "intplus-packing-guidebook",
-      "term": "guidebook",
-      "category": "Other holiday items",
-      "image": "/images/vocab/intermediate-plus/packing/guidebook.png",
+      "image": "/images/vocab/intermediate-plus/packing/beach-bag.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
@@ -416,52 +411,84 @@
         1254
       ],
       "hasTransparentPixels": true,
-      "usageNote": "Cover reads TRAVEL GUIDE; suitable for study and contextual practice, but gives away part of the answer in picture-only recall."
+      "sourceImage": "/images/vocab/intermediate-plus/packing/beach-bag.png"
+    },
+    {
+      "entryId": "intplus-packing-first-aid-kit",
+      "term": "first-aid kit",
+      "category": "Other holiday items",
+      "image": "/images/vocab/intermediate-plus/packing/first-aid-kit.webp",
+      "source": "user-supplied packing bundle",
+      "kind": "standalone-object",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/first-aid-kit.png"
+    },
+    {
+      "entryId": "intplus-packing-guidebook",
+      "term": "guidebook",
+      "category": "Other holiday items",
+      "image": "/images/vocab/intermediate-plus/packing/guidebook.webp",
+      "source": "user-supplied packing bundle",
+      "kind": "standalone-object",
+      "dimensions": [
+        1254,
+        1254
+      ],
+      "hasTransparentPixels": true,
+      "usageNote": "Cover reads TRAVEL GUIDE; suitable for study and contextual practice, but gives away part of the answer in picture-only recall.",
+      "sourceImage": "/images/vocab/intermediate-plus/packing/guidebook.png"
     },
     {
       "entryId": "intplus-packing-pack-of-cards",
       "term": "pack of cards",
       "category": "Other holiday items",
-      "image": "/images/vocab/intermediate-plus/packing/pack-of-cards.png",
+      "image": "/images/vocab/intermediate-plus/packing/pack-of-cards.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/pack-of-cards.png"
     },
     {
       "entryId": "intplus-packing-towel",
       "term": "towel",
       "category": "Other holiday items",
-      "image": "/images/vocab/intermediate-plus/packing/towel.png",
+      "image": "/images/vocab/intermediate-plus/packing/towel.webp",
       "source": "user-supplied packing bundle",
       "kind": "standalone-object",
       "dimensions": [
         1254,
         1254
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/towel.png"
     },
     {
       "entryId": "intplus-packing-passport",
       "term": "passport",
       "category": "Documents",
-      "image": "/images/vocab/intermediate-plus/packing/passport.png",
+      "image": "/images/vocab/intermediate-plus/packing/passport.webp",
       "source": "built-in image generator; created in this chat",
       "kind": "educational-document-icon",
       "dimensions": [
         1214,
         1295
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/passport.png"
     },
     {
       "entryId": "intplus-packing-id-card",
       "term": "ID card",
       "category": "Documents",
-      "image": "/images/vocab/intermediate-plus/packing/id-card.png",
+      "image": "/images/vocab/intermediate-plus/packing/id-card.webp",
       "source": "built-in image generator; created in this chat",
       "kind": "educational-document-icon",
       "dimensions": [
@@ -469,39 +496,42 @@
         1024
       ],
       "hasTransparentPixels": true,
-      "usageNote": "Transparent background with a soft outer glow retained from generation."
+      "usageNote": "Transparent background with a soft outer glow retained from generation.",
+      "sourceImage": "/images/vocab/intermediate-plus/packing/id-card.png"
     },
     {
       "entryId": "intplus-packing-visa",
       "term": "visa",
       "category": "Documents",
-      "image": "/images/vocab/intermediate-plus/packing/visa.png",
+      "image": "/images/vocab/intermediate-plus/packing/visa.webp",
       "source": "built-in image generator; created in this chat",
       "kind": "educational-document-icon",
       "dimensions": [
         1312,
         1199
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/visa.png"
     },
     {
       "entryId": "intplus-packing-travel-insurance-documents",
       "term": "travel insurance documents",
       "category": "Documents",
-      "image": "/images/vocab/intermediate-plus/packing/travel-insurance-documents.png",
+      "image": "/images/vocab/intermediate-plus/packing/travel-insurance-documents.webp",
       "source": "built-in image generator; created in this chat",
       "kind": "educational-document-icon",
       "dimensions": [
         1223,
         1286
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/travel-insurance-documents.png"
     },
     {
       "entryId": "intplus-packing-driving-licence",
       "term": "driving licence",
       "category": "Documents",
-      "image": "/images/vocab/intermediate-plus/packing/driving-licence.png",
+      "image": "/images/vocab/intermediate-plus/packing/driving-licence.webp",
       "source": "built-in image generator; created in this chat",
       "kind": "educational-document-icon",
       "dimensions": [
@@ -509,26 +539,28 @@
         1024
       ],
       "hasTransparentPixels": true,
-      "usageNote": "Transparent background with a soft outer glow retained from generation."
+      "usageNote": "Transparent background with a soft outer glow retained from generation.",
+      "sourceImage": "/images/vocab/intermediate-plus/packing/driving-licence.png"
     },
     {
       "entryId": "intplus-packing-booking-confirmation",
       "term": "booking confirmation",
       "category": "Documents",
-      "image": "/images/vocab/intermediate-plus/packing/booking-confirmation.png",
+      "image": "/images/vocab/intermediate-plus/packing/booking-confirmation.webp",
       "source": "built-in image generator; created in this chat",
       "kind": "educational-document-icon",
       "dimensions": [
         1223,
         1286
       ],
-      "hasTransparentPixels": true
+      "hasTransparentPixels": true,
+      "sourceImage": "/images/vocab/intermediate-plus/packing/booking-confirmation.png"
     },
     {
       "entryId": "intplus-packing-fold",
       "term": "fold",
       "category": "Packing verbs",
-      "image": "/images/vocab/intermediate-plus/packing/fold.png",
+      "image": "/images/vocab/intermediate-plus/packing/fold.webp",
       "source": "user-supplied packing bundle",
       "kind": "contextual-action-scene",
       "dimensions": [
@@ -536,7 +568,8 @@
         622
       ],
       "hasTransparentPixels": false,
-      "displayNote": "622 x 622 source: use as a small activity image; regenerate before large display."
+      "displayNote": "622 x 622 source: use as a small activity image; regenerate before large display.",
+      "sourceImage": "/images/vocab/intermediate-plus/packing/fold.png"
     },
     {
       "entryId": "intplus-packing-pack",
@@ -555,7 +588,7 @@
       "entryId": "intplus-packing-roll-up",
       "term": "roll up",
       "category": "Packing verbs",
-      "image": "/images/vocab/intermediate-plus/packing/roll-up.png",
+      "image": "/images/vocab/intermediate-plus/packing/roll-up.webp",
       "source": "user-supplied packing bundle",
       "kind": "contextual-action-scene",
       "dimensions": [
@@ -563,13 +596,14 @@
         622
       ],
       "hasTransparentPixels": false,
-      "displayNote": "622 x 622 source: use as a small activity image; regenerate before large display."
+      "displayNote": "622 x 622 source: use as a small activity image; regenerate before large display.",
+      "sourceImage": "/images/vocab/intermediate-plus/packing/roll-up.png"
     },
     {
       "entryId": "intplus-packing-unpack",
       "term": "unpack",
       "category": "Packing verbs",
-      "image": "/images/vocab/intermediate-plus/packing/unpack.png",
+      "image": "/images/vocab/intermediate-plus/packing/unpack.webp",
       "source": "user-supplied packing bundle",
       "kind": "contextual-action-scene",
       "dimensions": [
@@ -578,13 +612,14 @@
       ],
       "hasTransparentPixels": false,
       "usageNote": "Still image can also suggest packing; require an arrival/taking-things-out cue.",
-      "displayNote": "622 x 622 source: use as a small activity image; regenerate before large display."
+      "displayNote": "622 x 622 source: use as a small activity image; regenerate before large display.",
+      "sourceImage": "/images/vocab/intermediate-plus/packing/unpack.png"
     },
     {
       "entryId": "intplus-packing-wrap",
       "term": "wrap",
       "category": "Packing verbs",
-      "image": "/images/vocab/intermediate-plus/packing/wrap.png",
+      "image": "/images/vocab/intermediate-plus/packing/wrap.webp",
       "source": "user-supplied packing bundle",
       "kind": "contextual-action-scene",
       "dimensions": [
@@ -593,7 +628,8 @@
       ],
       "hasTransparentPixels": false,
       "usageNote": "Shows clothing wrapped in paper; demonstrates wrap, but is not a fragile-item example.",
-      "displayNote": "622 x 622 source: use as a small activity image; regenerate before large display."
+      "displayNote": "622 x 622 source: use as a small activity image; regenerate before large display.",
+      "sourceImage": "/images/vocab/intermediate-plus/packing/wrap.png"
     }
   ],
   "activityUsage": {
@@ -605,5 +641,6 @@
     ],
     "writtenImageMaxHeight": 140,
     "addedImageBackground": false
-  }
+  },
+  "format": "New Packing images served as WebP; reused project images retain existing formats. Source PNGs retained."
 }

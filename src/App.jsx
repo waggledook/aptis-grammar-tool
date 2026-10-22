@@ -130,6 +130,7 @@ import AdminActivityInsights from "./components/admin/AdminActivityInsights.jsx"
 import AdminAiModelLab from "./components/admin/AdminAiModelLab.jsx";
 import TeacherTools from "./components/teacher/TeacherTools"; // ← Add this
 import TeacherResources from "./components/teacher/TeacherResources.jsx";
+import TeacherAptisGrammarVocabularyReview from "./components/teacher/TeacherAptisGrammarVocabularyReview.jsx";
 import TeacherTranscription from "./components/teacher/TeacherTranscription.jsx";
 import TeacherWritingResources from "./components/teacher/TeacherWritingResources.jsx";
 import MyStudents from "./components/teacher/MyStudents";
@@ -1537,6 +1538,14 @@ return (
         }
       />
       <Route path="/teacher-resources" element={<TeacherResources user={user} />} />
+      <Route
+        path="/teacher-resources/grammar-vocabulary-mistakes"
+        element={
+          <RequireTeacher user={user}>
+            <TeacherAptisGrammarVocabularyReview user={user} />
+          </RequireTeacher>
+        }
+      />
       <Route path="/teacher/transcription" element={<RequireTeacher user={user}><TeacherTranscription /></RequireTeacher>} />
       <Route
         path="*"
@@ -2935,18 +2944,19 @@ return (
   }
 />
 <Route path="/vocabulary/strategy-guide" element={<AptisVocabularyStrategyGuide />} />
-<Route path="/vocabulary/textbook" element={<HubVocabularyA1Menu />} />
+<Route path="/vocabulary/textbook" element={<HubVocabularyA1Menu user={user} />} />
 <Route
   path="/vocabulary/textbook/mistakes"
   element={
     <VocabMistakeReview
+      user={user}
       onBack={() => navigate(getSitePath("/vocabulary/textbook"))}
     />
   }
 />
-<Route path="/vocabulary/textbook/:themeId/:activityId" element={<HubVocabularyActivityRunner />} />
-<Route path="/vocabulary/a1" element={<HubVocabularyA1Menu />} />
-<Route path="/vocabulary/a1/:themeId/:activityId" element={<HubVocabularyActivityRunner />} />
+<Route path="/vocabulary/textbook/:themeId/:activityId" element={<HubVocabularyActivityRunner user={user} />} />
+<Route path="/vocabulary/a1" element={<HubVocabularyA1Menu user={user} />} />
+<Route path="/vocabulary/a1/:themeId/:activityId" element={<HubVocabularyActivityRunner user={user} />} />
   <Route
     path="/vocabulary/topics"
     element={
@@ -3370,6 +3380,7 @@ return (
         ← Back to profile
       </button>
       <VocabMistakeReview
+        user={user}
         onBack={() => navigate(siteProfilePath)}
       />
     </>
@@ -3384,6 +3395,14 @@ return (
   }
 />
 <Route path="/teacher-resources" element={<TeacherResources user={user} />} />
+<Route
+  path="/teacher-resources/grammar-vocabulary-mistakes"
+  element={
+    <RequireTeacher user={user}>
+      <TeacherAptisGrammarVocabularyReview user={user} />
+    </RequireTeacher>
+  }
+/>
 <Route path="/teacher/transcription" element={<RequireTeacher user={user}><TeacherTranscription /></RequireTeacher>} />
 <Route
   path="/admin"

@@ -4,7 +4,8 @@ import Seo from "../common/Seo.jsx";
 import { getSitePath } from "../../siteConfig.js";
 import { fetchHubVocabThemeCounts } from "../../firebase.js";
 import {
-  getAllHubVocabThemes,
+  getVisibleHubVocabThemes,
+  canPreviewHubVocabDrafts,
   HUB_VOCAB_LEVELS,
   HUB_VOCAB_LEVEL_COLORS,
 } from "../../data/hubVocabularyActivities.js";
@@ -21,12 +22,14 @@ function getSearchText(theme) {
     .toLowerCase();
 }
 
-export default function HubVocabularyA1Menu() {
+export default function HubVocabularyA1Menu({ user }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [selectedLevels, setSelectedLevels] = useState([]);
   const [progressCounts, setProgressCounts] = useState({});
-  const themes = useMemo(() => getAllHubVocabThemes(), []);
+  const [showDrafts, setShowDrafts] = useState(false);
+  const canPreview = canPreviewHubVocabDrafts(user);
+  const themes = useMemo(() => getVisibleHubVocabThemes(user, { includeDrafts: showDrafts }), [user, showDrafts]);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -109,6 +112,12 @@ export default function HubVocabularyA1Menu() {
       </div>
 
       <section className="hub-mini-browser">
+        {canPreview ? (
+          <label className="hub-vocab-draft-toggle">
+            <input type="checkbox" checked={showDrafts} onChange={(event) => setShowDrafts(event.target.checked)} />
+            Show unpublished banks (admin preview)
+          </label>
+        ) : null}
         <div className="hub-mini-browser-head">
           <div>
             <h2>Browse Topics</h2>
@@ -187,6 +196,7 @@ export default function HubVocabularyA1Menu() {
                 <span className="hub-vocab-topic-ref">{theme.textbookRef}</span>
               </div>
               <h3>{theme.title}</h3>
+              {theme.studentVisible === false ? <span className="hub-vocab-draft-label">Unpublished · admin preview</span> : null}
               <p>{theme.shortDescription}</p>
               <div className="hub-vocab-topic-meta">
                 <span>{theme.itemCount || theme.entries.length} items</span>
@@ -211,6 +221,19 @@ export default function HubVocabularyA1Menu() {
       ) : null}
 
       <style>{`
+        .hub-vocab-draft-toggle {
+          display: flex;
+          align-items: center;
+          gap: 0.6rem;
+          margin-bottom: 1rem;
+        }
+
+        .hub-vocab-draft-label {
+          display: inline-block;
+          color: #f6bd60;
+          font-weight: 700;
+          margin-bottom: 0.5rem;
+        }
         .hub-menu-wrapper {
           padding-top: 0;
           margin-top: 0;

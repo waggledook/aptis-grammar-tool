@@ -7355,6 +7355,24 @@ export function getAllHubVocabThemes() {
   return [...HUB_VOCAB_THEMES].sort(sortThemes);
 }
 
+export function canPreviewHubVocabDrafts(user) {
+  return user?.role === "admin";
+}
+
+export function canAccessHubVocabTheme(theme, user) {
+  return Boolean(theme && (theme.studentVisible !== false || canPreviewHubVocabDrafts(user)));
+}
+
+export function getVisibleHubVocabThemes(user, { includeDrafts = false } = {}) {
+  return getAllHubVocabThemes().filter((theme) => (
+    theme.studentVisible !== false || (includeDrafts && canPreviewHubVocabDrafts(user))
+  ));
+}
+
+export function canReviewHubVocabMistake(item, user) {
+  return item?.source !== "hub-textbook" || canAccessHubVocabTheme(getHubVocabTheme(item.topic), user);
+}
+
 export function getHubVocabProgressCounts(progress = {}) {
   return Object.fromEntries(getAllHubVocabThemes().map((theme) => [theme.id, {
     total: theme.activities.length,

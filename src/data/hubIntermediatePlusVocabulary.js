@@ -1,8 +1,13 @@
 import { INTERMEDIATE_PLUS_PACKING_IMAGES } from "./hubIntermediatePlusPackingImages.js";
+import { INTERMEDIATE_PLUS_SHOP_IMAGES } from "./hubIntermediatePlusShopImages.js";
+import { INTERMEDIATE_PLUS_PHOTOGRAPHY_IMAGES } from "./hubIntermediatePlusPhotographyImages.js";
 
 // English File Intermediate Plus: text practice for all 12 supplied banks,
 // with separate picture datasets as verified visuals become available.
 const ACCENT = "#c4c47f";
+
+// Add a bank's slug here after its assets and activities are ready for students.
+export const INTERMEDIATE_PLUS_PUBLISHED_BANKS = ["adjective-suffixes", "packing"];
 
 function slug(value) {
   return value.toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -54,6 +59,7 @@ function sort(id, title, dataKey, categories, shortDescription, promptKey = "ter
 function bank(id, order, title, shortDescription, entries, datasets, activities, infoNotes, { matchingActivity, includeMeaningActivities = true } = {}) {
   return {
     id: `b1-b2-${id}`, level: "b1-b2", order, title, shortDescription,
+    studentVisible: INTERMEDIATE_PLUS_PUBLISHED_BANKS.includes(id),
     textbookRef: `Intermediate Plus Vocabulary Bank ${order}`, accent: ACCENT,
     itemCount: entries.length, entries, ...datasets, infoNotes,
     activities: [
@@ -385,6 +391,23 @@ const shopEntries = vocabulary("shops", [
   ["look for", "try to find something", "Shopping phrases"],
   ["be out of", "have none of a particular product left in stock", "Shopping phrases"],
 ]);
+const shopPictureStudy = shopEntries.map((entry) => {
+  const visual = INTERMEDIATE_PLUS_SHOP_IMAGES[entry.term];
+  return {
+    ...entry,
+    ...visual,
+    matchPrompt: "",
+    flashcardNote: entry.meaning,
+    // Phrases without a distinct action picture retain a meaning cue.
+    ...(!visual ? { cueText: entry.meaning } : {}),
+  };
+});
+const shopPictures = shopPictureStudy.filter((entry) => entry.category !== "Shopping phrases");
+const shopWritten = shopPictureStudy.map((entry) => ({
+  ...entry,
+  // Small storefronts need a purpose clue for fair written identification.
+  ...(entry.image ? { imagePrompt: entry.imagePrompt || entry.meaning } : {}),
+}));
 const shopSituations = questions("shop-situations", [
   ["I need prescription medicine. I'll go to the _____.", "chemist's", ["butcher's", "stationer's", "jeweller's"], "Chemist's is a common British word for a pharmacy.", ["pharmacy"]],
   ["Where can I have a delicate suit cleaned professionally? At the _____.", "dry-cleaner's", ["launderette", "estate agent's", "garden centre"], "At a launderette you generally use washing machines yourself.", ["dry cleaner's", "dry cleaners"]],
@@ -413,12 +436,14 @@ const shopSpellings = questions("shop-spellings", [
   ["Write the shop name: a _____ sells paper and pens. (stationer)", "stationer's", ["stationers", "stationers'", "stationer"], "Stationery is writing material; stationary means not moving."],
 ]);
 const shops = bank("shops-services", 3, "Shops and services", "Find the right shop, use shopping phrasal verbs and practise shop-name apostrophes.", shopEntries,
-  { shopSituations, shopPhrases, shopSpellings }, [
+  { shopSituations, shopPhrases, shopSpellings, shopPictureStudy, shopPictures, shopWritten }, [
+    { id: "shop-picture-flashcards", type: "flashcards", title: "Shops and shopping flashcards", dataKey: "shopPictureStudy", visualPractice: true, visualStyle: "storefront", shortDescription: "Study all the shops, services and shopping phrases.", prompt: "Look at the picture and any clue, or read the phrase meaning. Say the word or phrase, then flip to check.", itemLimit: 15 },
+    { id: "shop-picture-matching", type: "matching", title: "Match shops and pictures", dataKey: "shopPictures", visualPractice: true, visualStyle: "storefront", shortDescription: "Match shop pictures and purpose clues with the correct names.", prompt: "Choose a picture and read any clue, then choose its shop or service name.", uniqueMatchAnswerKey: "matchAnswer", itemLimit: 4 },
     choice("where-to-go", "Where would you go?", "shopSituations", "Choose the shop or service for each situation."),
     choice("shopping-phrases", "Shopping phrases in context", "shopPhrases", "Choose the phrase or word order that fits."),
     choice("shop-name-apostrophes", "Shop names and apostrophes", "shopSpellings", "Choose the correct singular shop name or ordinary plural."),
-    write("shopping-recall", "Complete the shopping phrases", "shopPhrases", "Type the missing shopping phrase, including the right particle."),
-  ], [{ title: "Shop names", body: ["Baker's and butcher's are short for baker's shop and butcher's shop.", "Several bakers is an ordinary plural without an apostrophe.", "Look round a shop, look for a product, and try it on. A shop can sell out of a product or close down."] }]);
+    { id: "shop-written-recall", type: "type-answer", title: "Write the shop or shopping phrase", dataKey: "shopWritten", visualPractice: true, visualStyle: "storefront", shortDescription: "Name shops and services from small pictures and clues, and recall the shopping phrases.", prompt: "Use the small picture and clue, or the phrase meaning. Type the shop name or shopping phrase, including any apostrophe.", answerLabel: "Shop or phrase", answerPlaceholder: "Type the shop or phrase", itemLimit: 12 },
+  ], [{ title: "Shop names", body: ["Baker's and butcher's are short for baker's shop and butcher's shop.", "Several bakers is an ordinary plural without an apostrophe.", "Look round a shop, look for a product, and try it on. A shop can sell out of a product or close down."] }], { includeMeaningActivities: false });
 
 const photographyEntries = vocabulary("photography", [
   ["behind", "at the back of another person or thing", "Describing position"],
@@ -444,36 +469,55 @@ const photographyEntries = vocabulary("photography", [
   ["landscape", "a view of natural scenery such as mountains or fields", "Taking photos"],
   ["settings", "the controls used to adjust how a camera takes pictures", "Taking photos"],
 ]);
-const photographyPositions = questions("photo-position", [
-  ["The nearest objects to the viewer are _____.", "in the foreground", ["in the background", "in the distance", "at the top of"], "Foreground is nearest; background is further away."],
-  ["The distant mountains form the part of the scene furthest behind the subject. They are _____.", "in the background", ["in the foreground", "on top of", "opposite"]],
-  ["The bird is physically standing on the upper surface of the frame. It is _____ the frame.", "on top of", ["at the top of", "in the centre of", "in the distance"], "On top of describes contact with an upper surface."],
-  ["A bird is drawn inside the picture, near its upper edge. It is _____ the picture.", "at the top of", ["on top of", "opposite", "in front of"], "At the top of identifies a position within the picture, without saying it rests on the frame."],
-  ["The logo sits exactly where the bottom edge meets the right edge: _____.", "in the bottom right-hand corner", ["in the top left-hand corner", "in the centre", "in the foreground"], "Corner names describe position within the image.", ["in the bottom right corner"]],
-  ["A figure appears halfway between the left and right edges, and halfway between the top and bottom: _____.", "in the centre", ["in the background", "in the top left-hand corner", "in the distance"], "Centre is the British spelling.", ["in the center", "in the middle"]],
-  ["The cafe is directly across the road from the cinema, facing it. It is _____ the cinema.", "opposite", ["on top of", "in the centre", "in the distance"], "Opposite means across from and facing.", ["across from"]],
-  ["The adult is at the back of the child. The adult is _____ the child.", "behind", ["opposite", "on top of", "in front of"]],
-  ["The date appears where the upper and left edges meet: _____.", "in the top left-hand corner", ["in the bottom right-hand corner", "in the centre", "in the distance"], "Use in with the corner of a picture.", ["in the top left corner"]],
-  ["Beyond the village, very far away, we can see a tower _____.", "in the distance", ["on top of", "in front of", "in the centre"]],
-  ["The child stands on the nearer side of the adult, partly hiding her. The child is _____ her.", "in front of", ["behind", "on top of", "in the distance"]],
-]);
-const photographyContexts = questions("photo-use", [
-  ["The room is dark, so the photographer uses a brief burst of light: the _____.", "flash", ["lens", "portrait", "landscape"]],
-  ["The subject is far away. Use the camera control to _____ and make it appear larger.", "zoom in", ["edit", "turn over", "wrap"]],
-  ["The edges are blurred rather than sharp. The photo is _____.", "out of focus", ["overexposed", "in the foreground", "in the centre"], "Out of focus describes lack of sharpness; overexposed describes excessive brightness."],
-  ["The image is too bright because it received too much light. It is _____.", "overexposed", ["out of focus", "opposite", "spacious"]],
-  ["To include more of the scenery in one image, choose a _____.", "wide-angle lens", ["portrait setting", "close-up", "flash"], "A wide-angle lens captures a broader view.", ["wide angle lens"]],
-  ["After taking the picture, I _____ it to change its brightness and crop the edges.", "edit", ["zoom in", "expose", "focus"]],
-  ["A detailed photograph of just one small flower is a _____.", "close-up", ["landscape", "portrait setting", "wide-angle lens"], "Close-up is a noun; close up can also appear without a hyphen.", ["close up"]],
-  ["To photograph a person, select the camera's _____ setting.", "portrait", ["landscape", "packaging", "recycling"]],
-]);
-const photography = bank("photography", 4, "Photography", "Describe positions precisely and learn the vocabulary of taking and editing photos.", photographyEntries,
-  { photographyPositions, photographyContexts }, [
-    choice("position-clues", "Where is it in the photo?", "photographyPositions", "Use the written scene description to choose the position phrase."),
-    choice("camera-vocabulary", "Taking photos", "photographyContexts", "Choose the photography term that fits the situation."),
-    write("position-recall", "Write the position phrase", "photographyPositions", "Complete each written scene description with a position phrase."),
-    write("camera-recall", "Recall the camera vocabulary", "photographyContexts", "Complete the photography sentences without answer options."),
-  ], [{ title: "Describing a picture", body: ["Use in the foreground / background, in the centre and in the corner.", "On top of a frame means resting on its surface. At the top of a photo means in its upper part.", "The written descriptions contain all the information needed for these activities."] }]);
+const photographyStudy = photographyEntries.map((entry) => ({
+  ...entry,
+  ...INTERMEDIATE_PLUS_PHOTOGRAPHY_IMAGES[entry.term],
+  imageKind: "scene",
+  matchPrompt: "",
+  flashcardNote: `${entry.meaning}. ${entry.category}`,
+}));
+const photographyCameraPictures = photographyStudy.filter((entry) => entry.category === "Taking photos");
+function photoQuestionVisuals(items, imagesByAnswer = {}) {
+  return items.map((entry) => ({ ...entry, image: imagesByAnswer[entry.answer] || INTERMEDIATE_PLUS_PHOTOGRAPHY_IMAGES[entry.answer].image, imageKind: "scene" }));
+}
+const photographyPositions = photoQuestionVisuals(questions("photo-position", [
+  ["The dog is sitting _____.", "in the foreground", ["in the background", "in the distance", "in the centre"], "The foreground is the part nearest the viewer."],
+  ["The hills form the part of the scene behind the walkers. They are _____.", "in the background", ["in the foreground", "in the centre", "in the bottom right-hand corner"], "The background is the part of a scene behind the main subjects."],
+  ["The real ball is resting _____ the wooden frame.", "on top of", ["at the top of", "in the centre of", "in front of"], "On top of describes contact with an upper surface."],
+  ["The ball is painted inside the picture. It is _____ the picture.", "at the top of", ["on top of", "opposite", "in front of"], "At the top of identifies the upper part of the picture; the ball is not resting on the frame."],
+  ["The red rucksack is _____ of the photo.", "in the bottom right-hand corner", ["in the top left-hand corner", "in the centre", "in the top right-hand corner"], "Corner names describe position within the image, rather than depth.", ["in the bottom right corner"]],
+  ["The gold dot is _____.", "in the centre", ["in the background", "in the top left-hand corner", "in the distance"], "Centre describes the middle of the image, rather than how far away something is.", ["in the center", "in the middle"]],
+  ["The women face each other across the table. The woman in yellow sits _____ the other woman.", "opposite", ["next to", "on top of", "under"], "Opposite describes facing positions on different sides.", ["across from"]],
+  ["The man in blue is _____ the woman in yellow.", "behind", ["opposite", "on top of", "in front of"], "The man is further back along the path."],
+  ["The hanging purple flowers are _____ of the photo.", "in the top left-hand corner", ["in the bottom right-hand corner", "in the centre", "in the bottom left-hand corner"], "This describes the upper-left area of the image.", ["in the top left corner"]],
+  ["The church is very far away: we can see it _____.", "in the distance", ["in the foreground", "in the centre", "in the bottom right-hand corner"], "In the distance emphasises how far away something is."],
+  ["The woman in yellow is _____ the man in blue.", "in front of", ["behind", "on top of", "opposite"], "The woman is nearer the viewer than the man."],
+]), {
+  "in the bottom right-hand corner": INTERMEDIATE_PLUS_PHOTOGRAPHY_IMAGES.behind.image,
+  "in the top left-hand corner": "/images/vocab/intermediate-plus/photography/town-square.webp",
+});
+const photographyContexts = photoQuestionVisuals(questions("photo-use", [
+  ["The room is dark, so the photographer uses a brief burst of light: the _____.", "flash", ["lens", "portrait setting", "landscape"], "The flash adds a brief burst of artificial light."],
+  ["Without moving the camera, use the control to _____ and make the walkers appear larger.", "zoom in", ["zoom out", "edit", "focus"], "Zooming in makes the subject occupy more of the frame. Cropping a saved photo is editing."],
+  ["Look at the edges throughout the image. The photo is _____.", "out of focus", ["overexposed", "in the foreground", "in the centre"], "The whole picture is blurred. An intentionally blurred background alone does not make a portrait out of focus."],
+  ["The image has lost detail in its very bright areas. It is _____.", "overexposed", ["out of focus", "opposite", "spacious"], "Overexposure makes bright areas lose detail; it is different from a lack of sharpness."],
+  ["To include more of the scenery in one image, choose a _____.", "wide-angle lens", ["portrait setting", "close-up", "flash"], "A wide-angle lens captures a broader field of view.", ["wide angle lens"]],
+  ["After saving the picture, I _____ it to crop the edges and change its brightness.", "edit", ["zoom in", "expose", "focus"], "Editing changes an existing image after it has been taken."],
+  ["This detailed shot of the dog's face is a _____.", "close-up", ["landscape", "portrait setting", "wide-angle lens"], "A close-up shows a subject at very short range.", ["close up"]],
+  ["For a photo of a person, select the camera's _____.", "portrait setting", ["wide-angle lens", "flash", "landscape"], "The highlighted person icon represents a mode intended for photographing people.", ["portrait mode"]],
+  ["Light passes through the round optical part marked in gold: the _____.", "lens", ["flash", "portrait setting", "landscape"], "The lens directs light to form the image."],
+  ["A photograph whose subject is natural scenery is a _____.", "landscape", ["close-up", "portrait setting", "lens"], "Here landscape refers to the subject of the photo, rather than its horizontal orientation."],
+  ["Before taking the photo, adjust the camera's _____ to control how it captures the image.", "settings", ["landscapes", "close-ups", "backgrounds"], "Settings are the camera controls and values you can change."],
+]));
+const photography = bank("photography", 4, "Photography", "Describe positions in real scenes and recognise camera features, photo effects and editing.", photographyEntries,
+  { photographyStudy, photographyCameraPictures, photographyPositions, photographyContexts }, [
+    { id: "photo-visual-flashcards", type: "flashcards", title: "Photography in pictures", dataKey: "photographyStudy", visualPractice: true, visualStyle: "photography", shortDescription: "Study all 22 position phrases and photography terms with pictures and diagrams.", prompt: "Look at the picture and clue, say the phrase or camera term, then flip to check.", itemLimit: 12 },
+    { id: "photo-camera-matching", type: "matching", title: "Match camera terms and pictures", dataKey: "photographyCameraPictures", visualPractice: true, visualStyle: "photography", shortDescription: "Match camera features, photo effects and types of shot.", prompt: "Choose a picture and read its clue, then choose the photography term.", uniqueMatchAnswerKey: "matchAnswer", itemLimit: 3 },
+    { ...choice("position-clues", "Where is it in the photo?", "photographyPositions", "Use the scenes and diagrams to choose precise position phrases."), visualPractice: true, visualStyle: "photography" },
+    { ...choice("camera-vocabulary", "Taking photos", "photographyContexts", "Identify camera features and choose terms for the pictures and situations."), visualPractice: true, visualStyle: "photography" },
+    { ...write("position-recall", "Write the position phrase", "photographyPositions", "Complete photo descriptions with the correct position phrases."), visualPractice: true, visualStyle: "photography" },
+    { ...write("camera-recall", "Write the photography term", "photographyContexts", "Use small pictures and sentence clues to recall all 11 camera and photography terms."), visualPractice: true, visualStyle: "photography" },
+  ], [{ title: "Describing a picture", body: ["Use in the foreground / background for depth, and in the centre / corner for position within the image.", "On top of a frame means resting on its surface. At the top of a photo means in its upper part.", "Zooming changes the framing while taking a photo; editing changes an existing photo. A close-up describes the resulting shot."] }], { includeMeaningActivities: false });
 
 const recyclingEntries = vocabulary("recycling", [
   ["bin", "a container into which you put rubbish", "Waste nouns", ["dustbin", "rubbish bin"]],

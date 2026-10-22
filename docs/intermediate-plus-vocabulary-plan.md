@@ -8,7 +8,7 @@ All 12 supplied pages were rendered and visually reviewed. The PDF is an image s
 
 ## Source coverage and future visual work
 
-The section names below describe the source. The table preserves the initial activity and visual possibilities. All current activities work with text; visual assets and visual activities are deferred at the user's request. Coursebook exercise instructions and audio references are source material, not project instructions. See the implementation summary and activity audit below for what is now built.
+The section names below describe the source. The table preserves the initial activity and visual possibilities. Text practice is available for all banks; Packing, Shops and services, and Photography now also have integrated visual practice. The remaining banks' visuals are deferred. Coursebook exercise instructions and audio references are source material, not project instructions. See the implementation summary and activity audit below for what is now built.
 
 | PDF page | Book page | Bank | Source coverage | Proposed practice | Visual requirements |
 | --- | --- | --- | --- | --- | --- |
@@ -37,14 +37,14 @@ The section names below describe the source. The table preserves the initial act
 
 ## Implemented text activities
 
-The 12 banks contain 440 lexical entries, 325 distinct structured questions and 73 activities, including three Packing picture activities. The entry count includes separate senses/forms and some revision vocabulary; it is not a count of distinct new words in the book. Definitions and practice sentences are original adaptations. Some contexts are deliberately revisited first with choices and then as written recall.
+The 12 banks contain 440 lexical entries, 328 distinct structured questions and 73 activities, including 12 visual activities across Packing, Shops and services, and Photography. The entry count includes separate senses/forms and some revision vocabulary; it is not a count of distinct new words in the book. Definitions and practice sentences are original adaptations. Some contexts are deliberately revisited first with choices and then as written recall.
 
 | Bank | Entries | Activities | Bank-specific practice |
 | --- | ---: | ---: | --- |
 | Adjective suffixes | 46 | 5 | Interactive base-word suffix columns with adjective reveals; contextual adjective formation choices; adjective contrasts; 64 contextual word-formation gaps with separate base words, in 20-question rounds |
 | Packing | 44 | 5 | Picture flashcards; picture matching; document purposes; contextual items and verbs; written naming with small pictures |
-| Shops and services | 32 | 6 | Shop-purpose choices; shopping phrasal verbs; apostrophes; written recall |
-| Photography | 22 | 6 | Written position descriptions; camera vocabulary; written recall for both |
+| Shops and services | 32 | 6 | Picture/meaning study; venue picture matching; shop-purpose choices; phrasal verbs; apostrophes; combined written naming |
+| Photography | 22 | 6 | Visual study; camera-picture matching; scene-based position and camera choices; picture-supported sentence writing covering all 22 terms |
 | Rubbish and recycling | 33 | 6 | Written re-verb formation; packaging clues; re- and disposal verbs; written recall |
 | Study and work | 38 | 6 | University contexts; applications and word distinctions; written recall for both |
 | Television | 26 | 6 | Programme descriptions; series vocabulary; TV particles and pronoun placement; written recall |
@@ -54,7 +54,7 @@ The 12 banks contain 440 lexical entries, 325 distinct structured questions and 
 | Phrasal verbs | 47 | 8 | Money; away/back; meanings of take; separability; pronoun placement; particle recall |
 | Looking after yourself | 38 | 7 | Hairstyles/services; hair contexts; equipment/exercise sorting; fitness and beauty; written recall |
 
-Implementation: `src/data/hubIntermediatePlusVocabulary.js`, registered through `src/data/hubVocabularyActivities.js`. All lexical entries appear in the flashcard pools. Adjective meaning matching has been replaced with interactive suffix columns; Packing uses picture matching; the remaining banks retain meaning matching. Written practice uses self-contained prompts rather than questions that require seeing multiple-choice options. Near-synonymous adjective clues include the base word. Written variants include spelling alternatives and common equivalents where they fit the sentence.
+Implementation: `src/data/hubIntermediatePlusVocabulary.js`, registered through `src/data/hubVocabularyActivities.js`. All lexical entries appear in the flashcard pools. Adjective meaning matching has been replaced with interactive suffix columns; Packing, Shops and services, and Photography use picture matching; the remaining banks retain meaning matching. Written practice uses self-contained prompts rather than questions that require seeing multiple-choice options. Near-synonymous adjective clues include the base word. Written variants include spelling alternatives and common equivalents where they fit the sentence.
 
 ### Packing visual integration
 
@@ -63,6 +63,22 @@ Packing is condensed to five activities: picture flashcards, picture matching, d
 The separate image dataset maps all 44 words to verified images. Flashcards show all 44; picture matching and writing cover 43, excluding the guidebook whose cover prints part of its answer. Short clues disambiguate documents, generic toiletries, travel iron, pack/unpack and other actions. The same clues survive mistake review, along with accepted variants such as adapter, dressing gown and driving license. Matching uses four-pair rounds with larger images and readable clues. Writing uses images capped at 140 pixels high. Transparent images retain their alpha with no added white backdrop; action scenes retain their original photographic backgrounds.
 
 Validation: 13 automated checks pass; production build passes; targeted lint has no errors and the same eight existing hook warnings. Isolated browser checks exercised matching completion and mistake retry, written completion and mistake review, accepted spelling variants, and image loading. A 390-pixel viewport verified no horizontal overflow and a transparent image background in both matching and writing. Browser test progress was stubbed, so these checks did not update the user's account or exercise authenticated persistence.
+
+### Shops and services visual integration
+
+All 26 shop/venue types now have pictures, including the final chain store, charity shop, pound shop, craft fair and outlet. Six activities replace duplicate meaning-only practice: study cards (all 32 entries, with pictures for 26 venues and try on), venue picture matching (26), Where would you go?, shopping phrases, apostrophes, and written recall (all 32). Phrases without a distinct action image use standalone meaning cues. Written venue questions use small images plus purpose clues; matching shows larger storefronts without cropping their compositions. The two corrected signs remain in use. Shops stays unpublished for admin review.
+
+Packing's 36 new images and the 26 shop/venue pictures now load as WebP. Full image dimensions and alpha channels were checked against the PNG sources. The 62 images total 15.3 MiB versus 102.9 MiB of PNGs, about 85% smaller. PNG originals remain available; this measures image payload savings, not a reduction in the whole deployment directory. The reused try-on image also has a WebP derivative for Shops. Other reused project assets retain their existing formats. Future imports can use `python3 scripts/convert-vocab-images-to-webp.py <directory>` (requires Pillow).
+
+Validation: 16 automated checks pass. Production build passes; targeted lint has no errors and the same eight existing hook warnings. Isolated browser checks verify matching completion/mistakes, written completion/review, correct apostrophes, the accepted look around variant, mixed picture/text prompts, WebP loading and contain sizing, and no horizontal overflow at 390 pixels. Account persistence was stubbed for browser checks.
+
+### Photography visual integration
+
+Six supplied pictures now load as WebP: sharp countryside, wider view, out of focus, overexposed, dog close-up and town square. Eleven SVG diagrams built in code cover the remaining camera controls, zoom/crop demonstrations, picture-position grids, and frame-surface versus upper-picture positions. The existing opposite picture is reused. All 22 words and phrases appear in visual study and sentence writing; the camera matching pool contains 11 terms. Six activities replace the two meaning-only exercises while retaining the existing position/camera choices and writing routes. Writing uses images up to 180 pixels high; recognition activities show larger scenes. No white backdrop is added to transparent visuals.
+
+The supplied wider view is used independently because some scene details differ. Zoom/crop SVGs embed the same sharp source, illustrating framing and changes to an existing image. The corner phrases transfer from clear grid diagrams to the rucksack in the countryside scene and hanging flowers in the town square. Contexts distinguish background from distance, depth from image-plane position, and zoom from editing. Photography remains unpublished for admin review; only Adjective suffixes and Packing are student-visible.
+
+Validation: 17 automated checks pass, covering full lexical coverage, visual files, unambiguous choice data, accepted spellings, and source reconstruction for mistake review. Production build passes; targeted lint has no errors and the same eight existing hook warnings. Isolated browser checks verify SVG/WebP loading, choice feedback, written completion and mistake retry, accepted close up / portrait mode variants, mobile matching completion, smaller written images and no horizontal overflow at 390 pixels. Progress writes are stubbed; authenticated persistence is not exercised.
 
 ## Activity audit
 
@@ -104,8 +120,18 @@ The adjective meaning-matching activity was replaced with the reusable `word-for
 
 ## Status
 
-- Complete: source review; vocabulary and question data; 73 activities including Packing visual integration; B1-B2 menu registration; local player and data checks.
+### Student publication and admin review
+
+Only Adjective suffixes and Packing are currently marked visible to students. The remaining ten Intermediate Plus banks are unpublished. Earlier levels keep their existing availability.
+
+Admins can select **Show unpublished banks (admin preview)** in the textbook topic browser. Unpublished cards are labelled, and their activity pages display an admin-preview notice. Students do not see those banks in browsing/search and cannot open their activity pages through either textbook or legacy A1 direct links. Unpublished textbook mistakes are excluded from student review; profile progress totals include published banks only. Content and saved progress are retained.
+
+Publication is controlled by `INTERMEDIATE_PLUS_PUBLISHED_BANKS` near the top of [hubIntermediatePlusVocabulary.js](../src/data/hubIntermediatePlusVocabulary.js). To activate another bank after review, add its existing bank slug to that array and publish the frontend through the normal GitHub/Netlify workflow. The preview checkbox only changes the admin's view; it does not publish content.
+
+Validation: 15 vocabulary tests and the production build pass, including student/admin visibility, direct-access policy, mistake-review eligibility and restoring access when a bank is published. Isolated browser checks verified the two-bank student view, a blocked unpublished direct link, admin access to that same bank, all twelve banks appearing after the admin preview toggle, and drafts disappearing again when switching to the student role. This change has not itself been deployed.
+
+- Complete: source review; vocabulary and question data; 73 activities including Packing and Shops visual integration; B1-B2 menu registration; local player and data checks.
 - Complete: [bank-by-bank visual asset inventory](intermediate-plus-visual-assets.md), distinguishing existing Topic Vocab/textbook reuse, contextual reuse and proposed new assets.
 - Packing assets available: 30 supplied images imported, eight existing project images selected for reuse, and six generated document icons; all 44 entries mapped in [the asset manifest](../outputs/intermediate-plus-vocabulary/packing-asset-manifest.json). Context and quality notes remain relevant when building visual exercises.
 - Deferred: creation and integration of remaining banks' visual assets and exercises.
-- No frontend or backend deployment has been performed. Packing assets are connected locally to the five-activity menu.
+- No frontend or backend deployment has been performed. Packing assets are connected locally to the five-activity menu; Shops assets to its six-activity menu. Shops remains unpublished.

@@ -6592,10 +6592,11 @@ export async function fetchAptisGrammarVocabularyMockAttempts(n = 30, uid) {
   const realUid = _uidOrCurrent(uid);
   if (!realUid) return [];
 
+  const constraints = [orderBy("createdAt", "desc")];
+  if (Number.isFinite(Number(n)) && Number(n) > 0) constraints.push(limit(Number(n)));
   const q = query(
     collection(db, "users", realUid, "aptisGrammarVocabularyMockAttempts"),
-    orderBy("createdAt", "desc"),
-    limit(n)
+    ...constraints
   );
   const snap = await getDocs(q);
   return snap.docs.map((entry) => ({ id: entry.id, ...entry.data() }));

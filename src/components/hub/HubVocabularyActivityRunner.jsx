@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Seo from "../common/Seo.jsx";
 import HubVocabWordFormationSort from "./HubVocabWordFormationSort.jsx";
 import { getSitePath } from "../../siteConfig.js";
-import { getHubVocabActivity, getHubVocabTheme } from "../../data/hubVocabularyActivities.js";
+import { getHubVocabActivity, getHubVocabTheme, canAccessHubVocabTheme } from "../../data/hubVocabularyActivities.js";
 import {
   fetchHubVocabProgress,
   recordVocabMistake,
@@ -2690,7 +2690,23 @@ function ThemeSupplementaryContent({ theme }) {
   );
 }
 
-export default function HubVocabularyActivityRunner() {
+export default function HubVocabularyActivityRunner({ user }) {
+  const { themeId } = useParams();
+  const navigate = useNavigate();
+  const theme = getHubVocabTheme(themeId);
+  if (!canAccessHubVocabTheme(theme, user)) {
+    return (
+      <section className="panel">
+        <h2>Vocabulary bank not available</h2>
+        <p>This bank is not currently available for practice.</p>
+        <button className="review-btn" onClick={() => navigate(getSitePath("/vocabulary/textbook"))}>Back to vocabulary topics</button>
+      </section>
+    );
+  }
+  return <HubVocabularyActivityContent key={themeId} isDraft={theme.studentVisible === false} />;
+}
+
+function HubVocabularyActivityContent({ isDraft }) {
   const navigate = useNavigate();
   const { themeId, activityId } = useParams();
   const result = getHubVocabActivity(themeId, activityId);
@@ -2863,7 +2879,8 @@ export default function HubVocabularyActivityRunner() {
   }
 
   return (
-    <div className={`menu-wrapper hub-vocab-runner${activity.visualPractice ? " has-picture-practice" : ""}`}>
+    <div className={`menu-wrapper hub-vocab-runner${activity.visualPractice ? " has-picture-practice" : ""}${activity.visualStyle === "storefront" ? " has-storefront-visuals" : ""}${activity.visualStyle === "photography" ? " has-photography-visuals" : ""}`}>
+      {isDraft ? <p role="status">Admin preview — this bank is unpublished and hidden from students.</p> : null}
       <Seo
         title={`${activity.title} | ${theme.title} | Seif Hub`}
         description={activity.shortDescription}
@@ -3358,6 +3375,30 @@ export default function HubVocabularyActivityRunner() {
           font-size: 0.8rem;
           font-weight: 500;
           line-height: 1.35;
+        }
+
+        .has-storefront-visuals .hub-vocab-match-column .hub-vocab-object-image.compact {
+          max-height: 150px;
+          max-width: min(200px, 100%);
+        }
+
+        .has-storefront-visuals .hub-vocab-match-column button {
+          min-height: 200px;
+        }
+
+        .has-photography-visuals .hub-vocab-object-image.is-scene {
+          max-height: min(460px, 85vw);
+          max-width: min(640px, 100%);
+        }
+
+        .has-photography-visuals .hub-vocab-match-column .hub-vocab-object-image.compact {
+          max-height: 155px;
+          max-width: min(230px, 100%);
+        }
+
+        .has-photography-visuals .hub-vocab-type-form .hub-vocab-object-image {
+          max-height: 180px;
+          max-width: min(300px, 100%);
         }
 
         .hub-vocab-image-focus {

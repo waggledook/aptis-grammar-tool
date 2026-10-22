@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   ArrowRight,
   BookOpen,
+  BookOpenCheck,
   FileAudio,
   FileText,
   GraduationCap,
@@ -25,6 +26,18 @@ const PRODUCT_GROUPS = [
       "Extra Aptis tasks kept outside the main learner journey. Resources are grouped by skill so it is clear which learner experience each link opens.",
     accent: "blue",
     skillGroups: [
+      {
+        title: "Grammar & Vocabulary",
+        resources: [
+          {
+            title: "Class mock mistake review",
+            description: "Select allocated students, combine overlapping mock errors and run a tailored immediate-feedback review.",
+            path: "/teacher-resources/grammar-vocabulary-mistakes",
+            icon: BookOpenCheck,
+            tags: ["Multi-student", "Custom mix", "Immediate feedback"],
+          },
+        ],
+      },
       {
         title: "Vocabulary",
         resources: [
