@@ -9,7 +9,7 @@ Audited 21 October 2026 against the 12 supplied vocabulary banks, the current In
 - **New** identifies gaps if we add the proposed picture activities. Lists name vocabulary targets, not necessarily separate image files: a scene with hotspots can cover several targets.
 - **Optional** means useful enrichment, rather than a prerequisite for a sound activity.
 
-Existing Topic Vocab is the first source; suitable visuals elsewhere in the project are also included. Paths below are relative to this document. New files could live under `public/images/vocab/intermediate-plus/<bank>/`. Shared images should have one source file, referenced by every relevant bank.
+Asset-source preference, clarified 22 October: reuse suitable newer artwork created for Textbook Vocab, including across textbook banks. Avoid borrowing from the older Topic Vocab collections, whose image quality is lower. Check the newer textbook assets first and create fresh artwork for gaps. Source provenance matters: placing an older Topic Vocab image in a textbook folder or converting it to WebP does not make it a newer textbook asset. Older Topic Vocab links below are historical audit candidates, not the default production plan. Previously integrated reuse is recorded in the relevant bank sections. Paths below are relative to this document. New files can live under `public/images/vocab/intermediate-plus/<bank>/`. Shared images should have one source file, referenced by every relevant bank.
 
 ## 1. Adjective suffixes
 
@@ -81,6 +81,10 @@ The wider-view picture changes a few scene details, so it illustrates broad fram
 
 ## 5. Rubbish and recycling
 
+**Integrated, 22 October 2026:** all 20 supplied images from `rubbish-and-recycling-complete` are connected as WebP: 34.0 MiB of PNGs becomes 4.9 MiB, with dimensions and alpha verified. PNG originals are retained. The existing bottle, yoghurt pot and take-out illustrations have WebP derivatives; the existing throw-away scene already uses WebP. No white backgrounds are added to cutouts.
+
+The six activities now include visual study of all 33 terms, picture matching (23), re- verb formation, packaging contexts, disposal/re- choices, and combined written recall (all 33 terms, 12 per round). The 24 study pictures include the readable sell-by-date label; this image is excluded from matching and writing because it prints the answer. Its written question uses a meaning clue. Waste uses an initial-letter cue to distinguish it from rubbish; abstract verbs remain text-based. Writing shows pictures up to 140 pixels high. The bank remains unpublished for admin review. Sources and conversion sizes: `outputs/intermediate-plus-vocabulary/recycling-asset-manifest.json`.
+
 **Reuse:** [milk bottle](../public/images/vocab/food/milk.png) for bottle; [yoghurt pot](../public/images/vocab/food/yoghurt.png) for pot; [take out the rubbish](../public/images/vocab/pre-int/housework/take-out-the-rubbish.png); [throw away](../public/images/vocab/pre-int/phrasal-verbs/throw-away.webp).
 
 **Contextual reuse:** the take-out picture contains a bin bag and an outdoor bin. Marking either detail can support those nouns; separate object pictures would be clearer for small flashcards.
@@ -97,6 +101,10 @@ The wider-view picture changes a few scene details, so it illustrates broad fram
 
 ## 6. Study and work
 
+**Integrated, 22 October 2026:** 18 existing Topic Vocab illustrations are connected through WebP derivatives (1.80 MiB of PNGs becomes 0.40 MiB, preserving dimensions and exact alpha). No new artwork is required. The image map pairs every icon with a meaning clue; generic academic icons and differently coloured certificates are not treated as enough evidence to identify a role or qualification.
+
+The bank retains six activities: study cards for all 38 terms, picture/clue matching (18), two contextual choice activities, and two writing activities covering all 20 higher-education terms and all 18 application/work-distinction terms. Small pictures appear in writing where available; abstract terms retain self-contained sentence gaps. Writing recalls complete phrases such as apply for, covering letter and work permit. Dissertation/thesis prompts give an initial where their meanings overlap. Study and work remains unpublished for admin review. Asset sources and sizes: `outputs/intermediate-plus-vocabulary/study-work-asset-manifest.json`.
+
 **Reuse extensively from Topic Vocab Education:**
 
 - Places/people: [campus](../public/images/vocab/education/campus.png), [halls of residence](../public/images/vocab/education/halls.png), [undergraduates](../public/images/vocab/education/undergrad.png), [postgraduates](../public/images/vocab/education/postgrad.png), [professors](../public/images/vocab/education/professor.png), [tutor](../public/images/vocab/education/tutor.png).
@@ -112,18 +120,17 @@ The wider-view picture changes a few scene details, so it illustrates broad fram
 
 ## 7. Television
 
-**Reuse from Topic Vocab TV and Cinema:**
+**Revised direction, 22 October 2026:** check suitable newer Textbook Vocab artwork first, then create coordinated new images for gaps. Reusing artwork created for textbook banks is welcome; borrowing from the older Topic Vocab collections is not preferred. The earlier Topic Vocab reuse list is superseded for Television; no TV visuals have been connected yet.
 
-- [Cartoon](../public/images/vocab/tv/cartoons.png), [chat show](../public/images/vocab/tv/talk_show.png), [documentary](../public/images/vocab/tv/documentary.png), [the news](../public/images/vocab/tv/news.png), [reality show](../public/images/vocab/tv/reality_show.png), [weather forecast](../public/images/vocab/tv/weather_forecast.png).
-- [Historical drama](../public/images/vocab/tv/historical_drama.png) for period drama; [sports programme](../public/images/vocab/tv/sports_programme.png) for sport, with a live-broadcast cue when the target is live sport.
-- [Soap](../public/images/vocab/tv/soap_opera.png), [sitcom](../public/images/vocab/tv/sitcom.png), [series](../public/images/vocab/tv/series.png), [streaming](../public/images/vocab/tv/stream.png).
-- TV actions elsewhere in the project: [turn on](../public/images/vocab/pre-int/opposite-verbs/turn-on-tv.webp), [turn down](../public/images/vocab/pre-int/phrasal-verbs/turn-down.webp), [turn up](../public/images/vocab/pre-int/phrasal-verbs/turn-up.webp).
+**Fifteen programme-image targets (reuse suitable newer textbook artwork or create fresh images):** advert, cartoon, chat show, cookery programme, current affairs programme, documentary, crime drama, live sport, period drama, quiz show, reality show, the news, weather forecast, soap and sitcom. Use consistent square programme stills, with clear subjects and no printed genre names. The scene itself should occupy the image, rather than appearing on a tiny TV in a room.
 
-**New:** advert, cookery programme, current affairs programme, crime drama, quiz show.
+**Optional new object:** a coordinated, unbranded box set on a transparent background.
 
-**Optional new supporting visuals:** a series → seasons → episodes diagram; box set; a coordinated TV-control pair for turn off and turn over/change channel. The series diagram can be built in code rather than generated as an image.
+**Build in code:** series → seasons → episodes diagram; a fictional streaming-service interface using the new programme artwork; TV/remote state changes for on, off, volume and channel switching; a programme schedule for be on. A box-set diagram can also be coded if no object image is supplied. Suitable newer textbook visuals can also be reused in these components; older Topic Vocab imports are excluded from this plan.
 
-**Best visual activity:** programme identification with brief descriptions, then contextual TV actions. Current affairs and news need distinct situations; a generic presenter picture will not distinguish them. The existing thriller icon is not a clear substitute for crime drama.
+**Activity use:** programme pictures plus short descriptions, then contextual writing and TV actions. Clues must establish live versus recorded sport, news reports versus current-affairs analysis, and sitcom/soap distinctions that a still image alone cannot demonstrate. No activity should require guessing those from appearance.
+
+The complete scene directions and filenames are in `outputs/intermediate-plus-vocabulary/television-asset-brief.md`. That brief is ready for asset creation; no new TV pictures have been generated or integrated.
 
 ## 8. The country
 
@@ -176,7 +183,7 @@ The wider-view picture changes a few scene details, so it illustrates broad fram
 **Reuse existing visuals across banks:**
 
 - Clothes: [try on](../public/images/vocab/clothes/try-on.png), [take off](../public/images/vocab/clothes/take-off.png).
-- TV: the turn on/up/down pictures listed in Television.
+- TV: use the planned new native TV-control visuals from Television; the older Topic Vocab on/up/down images are no longer the default source.
 - Disposal: take out the rubbish and throw away, listed in Rubbish and recycling.
 - [Put away clothes](../public/images/vocab/pre-int/housework/put-away-your-clothes.png).
 - [Send food back](../public/images/vocab/food/send_back.png).

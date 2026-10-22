@@ -1,6 +1,8 @@
 import { INTERMEDIATE_PLUS_PACKING_IMAGES } from "./hubIntermediatePlusPackingImages.js";
 import { INTERMEDIATE_PLUS_SHOP_IMAGES } from "./hubIntermediatePlusShopImages.js";
 import { INTERMEDIATE_PLUS_PHOTOGRAPHY_IMAGES } from "./hubIntermediatePlusPhotographyImages.js";
+import { INTERMEDIATE_PLUS_RECYCLING_IMAGES } from "./hubIntermediatePlusRecyclingImages.js";
+import { INTERMEDIATE_PLUS_STUDY_WORK_IMAGES } from "./hubIntermediatePlusStudyWorkImages.js";
 
 // English File Intermediate Plus: text practice for all 12 supplied banks,
 // with separate picture datasets as verified visuals become available.
@@ -521,10 +523,10 @@ const photography = bank("photography", 4, "Photography", "Describe positions in
 
 const recyclingEntries = vocabulary("recycling", [
   ["bin", "a container into which you put rubbish", "Waste nouns", ["dustbin", "rubbish bin"]],
-  ["bin bag", "a plastic sack placed inside a rubbish container", "Waste nouns"],
-  ["landfill site", "an area where waste is buried under earth", "Waste nouns"],
+  ["bin bag", "a plastic sack placed inside a rubbish container", "Waste nouns", ["rubbish bag", "garbage bag", "trash bag"]],
+  ["landfill site", "an area where waste is buried under earth", "Waste nouns", ["landfill"]],
   ["refuse collector", "a worker whose job is to take household rubbish away", "Waste nouns", ["dustman", "bin man", "bin collector"]],
-  ["rubbish", "things people throw away because they no longer want them", "Waste nouns", ["garbage", "trash"]],
+  ["rubbish", "things people throw away because they no longer want them", "Waste nouns", ["garbage", "trash", "waste"]],
   ["waste", "unwanted material left over from a process or activity", "Waste nouns"],
   ["waste-paper basket", "a small indoor container for discarded paper", "Waste nouns", ["wastepaper basket", "waste paper basket"]],
   ["give away", "pass something to another person without asking for payment", "Phrasal verbs"],
@@ -537,13 +539,13 @@ const recyclingEntries = vocabulary("recycling", [
   ["carton", "a paper-based container often used for milk or juice", "Packaging"],
   ["jar", "a wide-mouthed glass container often used for jam or olives", "Packaging"],
   ["lid", "the removable top of a pot, jar or other container", "Packaging"],
-  ["cap", "a small top used to close a bottle or tube", "Packaging"],
+  ["cap", "a small top used to close a bottle or tube", "Packaging", ["bottle cap"]],
   ["packet", "a small bag or wrapping containing goods such as biscuits", "Packaging"],
   ["plastic bag", "a flexible carrier made from a synthetic material", "Packaging"],
-  ["pot", "a small container commonly used for one serving of yogurt", "Packaging"],
+  ["pot", "a small container commonly used for one serving of yogurt", "Packaging", ["yoghurt pot", "yogurt pot"]],
   ["pouch", "a small flexible sealed container for food or liquid", "Packaging"],
   ["sell-by date", "the date a product label gives as the last day for a shop to sell it", "Packaging", ["sell by date"]],
-  ["tin", "a sealed metal food container such as one used for sardines", "Packaging"],
+  ["tin", "a sealed metal food container such as one used for sardines", "Packaging", ["tin can"]],
   ["polystyrene tray", "a light rigid foam base sometimes used to package food", "Packaging"],
   ["tub", "a wide container commonly used for ice cream or spreads", "Packaging"],
   ["wrapper", "the paper or plastic covering around an individual product", "Packaging"],
@@ -554,6 +556,22 @@ const recyclingEntries = vocabulary("recycling", [
   ["rethink", "consider an idea or plan again", "re- verbs"],
   ["reuse", "use an object again rather than throw it away", "re- verbs"],
 ]);
+const recyclingPictureStudy = recyclingEntries.map((entry) => {
+  const visual = INTERMEDIATE_PLUS_RECYCLING_IMAGES[entry.term];
+  return {
+    ...entry,
+    ...visual,
+    matchPrompt: "",
+    flashcardNote: entry.meaning,
+    // Waste overlaps with rubbish: the initial identifies the requested word.
+    ...(!visual ? {
+      cueText: entry.term === "waste" ? `${entry.meaning} (w_____).` : entry.meaning,
+      flashcardPrompt: entry.term === "waste" ? `${entry.meaning} (w_____).` : entry.meaning,
+    } : {}),
+  };
+});
+// The date label prints its answer. Waste and the other abstract verbs use text.
+const recyclingPictures = recyclingPictureStudy.filter((entry) => entry.image && !entry.studyOnly);
 const packagingContexts = questions("packaging", [
   ["This milk comes in a rectangular paper-based _____.", "carton", ["jar", "tin", "wrapper"]],
   ["The olives are in a transparent glass _____ with a screw lid.", "jar", ["carton", "wrapper", "tray"]],
@@ -567,7 +585,7 @@ const packagingContexts = questions("packaging", [
 const recyclingContexts = questions("recycling-use", [
   ["Please _____ the rubbish from the kitchen to the bins outside.", "take out", ["give away", "reheat", "rethink"]],
   ["These old toys are still useful. I'll _____ the toys to a charity rather than sell them.", "give away", ["take out", "throw away", "take away"], "Give away means donate without payment. With a pronoun, say give them away."],
-  ["This broken pen cannot be repaired. I'll _____ the pen.", "throw away", ["reheat", "reapply", "replay"], "Throw away means discard.", ["throw out"]],
+  ["I'll _____ this paper because I no longer need it.", "throw away", ["reheat", "reapply", "replay"], "Throw away means discard.", ["throw out"]],
   ["The removal team will _____ the old sofa from the flat.", "take away", ["reheat", "replay", "rethink"]],
   ["Use the same shopping bag again: _____ it.", "reuse", ["reheat", "reapply", "rethink"], "Reuse means use again; recycle means process the material for another use."],
   ["Turn used glass into new glass products: _____ it.", "recycle", ["replay", "reheat", "rethink"]],
@@ -584,13 +602,52 @@ const rePrefixFormation = questions("re-prefix-formation", [
   ["Use a verb beginning with re-: We missed the goal. Could you _____ that part of the recording?", "replay", [], "Replay = play again."],
   ["Use a verb beginning with re-: The first coat of paint has worn away. We need to _____ the paint.", "reapply", [], "Reapply = apply again."],
 ]);
+const recyclingNounSentences = {
+  bin: "Put household rubbish in this large metal _____.",
+  "bin bag": "Line the household rubbish container with a black _____.",
+  "landfill site": "This place where waste is buried is a _____.",
+  "refuse collector": "The worker who collects household rubbish is a _____.",
+  rubbish: "These unwanted things left on the ground are _____.",
+  waste: "Complete the noun beginning with w: unwanted material left after a process is _____.",
+  "waste-paper basket": "Put unwanted paper from your desk into this small indoor _____.",
+  bottle: "The milk is in a narrow-necked glass _____.",
+  can: "The fizzy drink is in a metal drinks _____.",
+  "cardboard box": "Pack the goods in this strong _____. Include the material in your answer.",
+  carton: "This milk comes in a rectangular paper-based _____.",
+  jar: "The jam comes in a wide-mouthed glass _____ with a screw lid.",
+  lid: "Close the food container with this flat removable _____.",
+  cap: "Screw this small _____ onto the bottle to close it.",
+  packet: "This sealed bag of crisps is a _____.",
+  "plastic bag": "Carry your shopping in this _____. Include the material in your answer.",
+  pot: "This single serving of yoghurt comes in a small _____.",
+  pouch: "This flexible, resealable food pack that stands upright is a _____.",
+  "sell-by date": "A label giving the last day a shop should sell the product shows its _____.",
+  tin: "These beans come in a metal food _____. Use the usual British word beginning with t.",
+  "polystyrene tray": "The food rests on a light, rigid foam _____. Include the material in your answer.",
+  tub: "The spread comes in a wide plastic _____ with a removable lid.",
+  wrapper: "Peel the thin outer _____ off the chocolate.",
+};
+const recyclingWritten = recyclingPictureStudy.map((entry) => {
+  const context = recyclingContexts.find((question) => question.answer.toLowerCase() === entry.term);
+  const sentence = recyclingNounSentences[entry.term] || context.sentence;
+  // Keep the readable date label for study only, while still testing its meaning.
+  const { image, imageKind, imagePrompt: _imagePrompt, ...textEntry } = entry;
+  return {
+    ...textEntry,
+    acceptedAnswers: [...new Set([...entry.acceptedAnswers, ...(context?.acceptedAnswers || [])])],
+    ...((image && !entry.studyOnly) ? { image, imageKind, imagePrompt: sentence } : { cueText: sentence }),
+  };
+});
 const recycling = bank("rubbish-recycling", 5, "Rubbish and recycling", "Learn waste and packaging vocabulary, disposal phrases and verbs beginning with re-.", recyclingEntries,
-  { packagingContexts, recyclingContexts, rePrefixFormation }, [
+  { packagingContexts, recyclingContexts, rePrefixFormation, recyclingPictureStudy, recyclingPictures, recyclingWritten }, [
+    { id: "recycling-picture-flashcards", type: "flashcards", title: "Rubbish and recycling flashcards", dataKey: "recyclingPictureStudy", visualPractice: true, shortDescription: "Study waste and packaging pictures, disposal phrases and re- verbs.", prompt: "Look at the picture and any clue, or read the meaning. Say the word or phrase, then flip to check.", itemLimit: 15 },
+    { id: "recycling-picture-matching", type: "matching", title: "Match waste and packaging pictures", dataKey: "recyclingPictures", visualPractice: true, shortDescription: "Recognise containers, waste vocabulary and disposal actions.", prompt: "Choose a picture and read any clue, then choose its word or phrase.", uniqueMatchAnswerKey: "matchAnswer", itemLimit: 4 },
     write("build-re-verbs", "Build a verb with re-", "rePrefixFormation", "Read the situation and form the verb meaning again."),
     choice("packaging-clues", "Which packaging?", "packagingContexts", "Identify the packaging from its description."),
     choice("re-verbs", "Reuse, recycle or rethink?", "recyclingContexts", "Choose the action that fits the situation."),
-    write("recycling-recall", "Write the action", "recyclingContexts", "Recall the complete verb or phrasal verb."),
-  ], [{ title: "Again, away and out", body: ["Re- often means again: reheat, reapply, rethink.", "Reuse the bag itself; recycle the material to make something new.", "Take out the rubbish, throw away broken things and give away usable items you no longer need."] }]);
+    { id: "recycling-written-recall", type: "type-answer", title: "Write the word or action", dataKey: "recyclingWritten", visualPractice: true, shortDescription: "Practise all 33 words and phrases with small pictures and sentence gaps.", prompt: "Use the small picture and sentence, or read the text clue. Type the missing word or complete phrase.", answerLabel: "Missing word or phrase", answerPlaceholder: "Type the missing word or phrase", itemLimit: 12 },
+  ], [{ title: "Again, away and out", body: ["Re- often means again: reheat, reapply, rethink.", "Reuse the bag itself; recycle the material to make something new.", "Take out the rubbish, throw away broken things and give away usable items you no longer need."] },
+    { title: "Containers and packaging", body: ["This bank uses can for a drinks container and tin for a food container in British English.", "A cap screws onto a bottle; a lid covers a food container. A pot holds a small serving; a tub is a wider container.", "Rubbish and waste can overlap in meaning. A clue beginning with w asks specifically for waste."] }], { includeMeaningActivities: false });
 
 const studyEntries = vocabulary("study", [
   ["campus", "the buildings and grounds belonging to a university", "Higher education"],
@@ -632,6 +689,19 @@ const studyEntries = vocabulary("study", [
   ["apprenticeship", "a period of employment and training to learn a skilled job or trade", "Work and study distinctions"],
   ["internship", "a period of practical work experience, often for a student or recent graduate", "Work and study distinctions"],
 ]);
+const studyPictureStudy = studyEntries.map((entry) => {
+  const visual = INTERMEDIATE_PLUS_STUDY_WORK_IMAGES[entry.term];
+  return {
+    ...entry,
+    ...visual,
+    matchPrompt: "",
+    flashcardNote: entry.meaning,
+    ...(!visual ? { cueText: entry.meaning } : {}),
+  };
+});
+// Meaning clues are retained beside every icon, especially generic certificate
+// and academic-role images. Their colours/shapes do not establish word meaning.
+const studyPictures = studyPictureStudy.filter((entry) => entry.image);
 const educationContexts = questions("education-context", [
   ["Students taking their first degree are _____.", "undergraduates", ["postgraduates", "professors", "faculties"]],
   ["Students doing further degrees after their first degree are _____.", "postgraduates", ["undergraduates", "faculties", "tutorials"]],
@@ -657,14 +727,66 @@ const applicationContexts = questions("applications", [
   ["You may need a work _____ before taking employment in another country.", "permit", ["reference", "vacancy", "skill"]],
   ["The university awarded a _____ to help pay her fees because of her excellent results.", "scholarship", ["vacancy", "reference", "CV"]],
 ]);
+const studyRecallSentences = {
+  campus: "Our university's buildings and grounds form its _____.",
+  dissertation: "Use the term beginning with d: her extended university research project is a _____.",
+  faculties: "The university's large academic divisions, such as Arts and Medicine, are called _____.",
+  "halls of residence": "The first-year students live in university accommodation called _____.",
+  lectures: "In these large teaching sessions, students mainly listen to a speaker: _____.",
+  postgraduates: "Students doing further qualifications after their first degree are _____.",
+  professors: "The senior university academics holding the highest academic rank are _____.",
+  seminars: "Our classes are based on discussion rather than listening to a long talk: these are _____.",
+  thesis: "Use the term beginning with t: he is writing a research _____ for his doctorate.",
+  tutor: "The teacher who guides me individually throughout my course is my _____.",
+  undergraduates: "Students studying for their first university degree are _____.",
+  webinars: "Seminars or presentations delivered over the internet are _____.",
+  degree: "The general word for a university qualification awarded after completing a course is a _____.",
+  "Master's degree": "A common postgraduate qualification between a first degree and a doctorate is a _____.",
+  PhD: "The three-letter abbreviation for a doctoral qualification based on original research is _____.",
+  "academic staff": "The university's teaching and research employees are its _____.",
+  "research staff": "The university employees whose main work is investigating subjects and carrying out studies are its _____.",
+  humanities: "History, literature and philosophy belong to the _____.",
+  "overseas students": "Students who have come from other countries to study are _____.",
+  tutorials: "Teaching sessions with a teacher and just one or two students are _____.",
+  CV: "Send your _____, the document listing your education, qualifications and work history.",
+  experience: "The knowledge and skills gained by doing a job are your work _____.",
+  intern: "A student gaining short-term practical work experience in an office is an _____.",
+  interview: "The employer has invited me to a formal meeting to assess my suitability: an _____.",
+  "job offer": "The employer has formally invited me to accept the position. I have received a _____.",
+  "work permit": "Official permission to be employed in another country is a _____.",
+  qualifications: "The application asks for certificates and other formal awards: my _____.",
+  reference: "A statement from a previous manager recommending an applicant is a _____.",
+  skills: "The abilities I can use to do particular tasks well are my _____.",
+  vacancy: "There is an unfilled post in the department: a job _____.",
+  "apply for": "Before the closing date, I want to _____ the advertised job.",
+  grant: "The council awarded a _____ to fund the community research project.",
+  scholarship: "The university awarded a _____ to help pay her fees because of her excellent results.",
+  "covering letter": "With my CV, I sent a _____ explaining why I am suitable for the job.",
+  attend: "Use a verb beginning with a: I must _____ the lecture, so I need to be there on time.",
+  assist: "Use a verb beginning with a: could you _____ me with preparing the presentation?",
+  apprenticeship: "He is employed and training to become an electrician. He is doing an _____.",
+  internship: "During her degree she spent six weeks getting practical experience at a magazine. She did an _____.",
+};
+const studyWritten = studyEntries.map((entry) => ({
+  id: `${entry.id}-written`,
+  answer: entry.term,
+  acceptedAnswers: entry.acceptedAnswers,
+  sentence: studyRecallSentences[entry.term],
+  category: entry.category,
+  ...(INTERMEDIATE_PLUS_STUDY_WORK_IMAGES[entry.term] ? { image: INTERMEDIATE_PLUS_STUDY_WORK_IMAGES[entry.term].image } : {}),
+}));
+const educationRecall = studyWritten.filter((entry) => entry.category === "Higher education");
+const applicationRecall = studyWritten.filter((entry) => entry.category !== "Higher education");
 const study = bank("study-work", 6, "Study and work", "Navigate higher education, applications, qualifications and work experience.", studyEntries,
-  { educationContexts, applicationContexts }, [
+  { educationContexts, applicationContexts, studyPictureStudy, studyPictures, studyWritten, educationRecall, applicationRecall }, [
+    { id: "study-picture-flashcards", type: "flashcards", title: "Study and work flashcards", dataKey: "studyPictureStudy", visualPractice: true, shortDescription: "Study all 38 words and phrases with existing education/work pictures and meaning cues.", prompt: "Look at the picture and clue, or read the meaning. Say the word or phrase, then flip to check.", itemLimit: 15 },
+    { id: "study-picture-matching", type: "matching", title: "Match pictures and study terms", dataKey: "studyPictures", visualPractice: true, shortDescription: "Match education and work illustrations with the help of precise meaning clues.", prompt: "Read each picture's meaning clue, then choose the word or phrase. Use the clue to distinguish similar icons.", uniqueMatchAnswerKey: "matchAnswer", itemLimit: 4 },
     choice("university-life", "Higher education in context", "educationContexts", "Choose the university term that matches each description."),
     choice("applications-and-distinctions", "Applying and gaining experience", "applicationContexts", "Complete application phrases and distinguish easily confused words."),
-    write("education-recall", "Recall university vocabulary", "educationContexts", "Type the missing higher-education word or phrase."),
-    write("application-recall", "Complete the application phrases", "applicationContexts", "Recall the vocabulary of applications and work experience."),
+    { ...write("education-recall", "Recall university vocabulary", "educationRecall", "Complete sentence gaps covering all 20 higher-education terms, with small pictures where useful."), visualPractice: true },
+    { ...write("application-recall", "Complete the application phrases", "applicationRecall", "Recall all 18 application and work-distinction terms as complete words and phrases."), visualPractice: true },
   ], [{ title: "Attend and assist", body: ["Attend a lecture or interview = be present.", "Assist someone with a task = help them."] },
-    { title: "Degrees and experience", body: ["Undergraduates study for a first degree; postgraduates study for further qualifications.", "An apprenticeship trains you for a skilled occupation. An internship provides practical work experience.", "Dissertation and thesis usage varies by education system; the bank presents a common British distinction."] }]);
+    { title: "Degrees and experience", body: ["Undergraduates study for a first degree; postgraduates study for further qualifications.", "An apprenticeship trains you for a skilled occupation. An internship provides practical work experience.", "Dissertation and thesis usage varies by education system. An initial-letter clue identifies the requested word where these overlap.", "The illustrations support the meaning clues: certificate colours do not identify a degree level, and a generic academic icon does not establish someone's rank."] }], { includeMeaningActivities: false });
 
 const televisionEntries = vocabulary("television", [
   ["advert", "a short message on TV promoting a product or service", "Programme types", ["advertisement", "commercial"]],

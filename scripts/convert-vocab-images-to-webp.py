@@ -5,6 +5,7 @@ Requires Pillow. Originals are retained; activity data must select the .webp pat
 Usage: python3 scripts/convert-vocab-images-to-webp.py public/images/vocab/<folder>
 """
 import argparse
+from io import BytesIO
 from pathlib import Path
 from PIL import Image
 
@@ -18,8 +19,26 @@ for directory in args.directories:
     for source in sorted(directory.glob("*.png")):
         target = source.with_suffix(".webp")
         with Image.open(source) as original:
-            if not target.exists() or source.stat().st_mtime > target.stat().st_mtime:
-                original.save(target, "WEBP", quality=90, method=6, alpha_quality=100, exact=True)
+            regenerate = not target.exists() or source.stat().st_mtime > target.stat().st_mtime
+            if not regenerate:
+                try:
+                    with Image.open(target) as existing:
+                        existing.load()
+                        regenerate = existing.format != "WEBP" or existing.size != original.size
+                except OSError:
+                    regenerate = True
+            if regenerate:
+                # Finish and validate encoding before replacing the runtime file.
+                # An interrupted conversion must not leave an empty .webp that
+                # later runs mistake for an up-to-date image.
+                encoded = BytesIO()
+                original.save(encoded, "WEBP", quality=90, method=6, alpha_quality=100, exact=True)
+                with Image.open(BytesIO(encoded.getvalue())) as checked:
+                    assert checked.format == "WEBP" and checked.size == original.size, target
+                    assert original.convert("RGBA").getchannel("A").tobytes() == checked.convert("RGBA").getchannel("A").tobytes(), target
+                temporary = target.with_suffix(".webp.tmp")
+                temporary.write_bytes(encoded.getvalue())
+                temporary.replace(target)
             with Image.open(target) as converted:
                 assert converted.format == "WEBP" and converted.size == original.size, target
                 # WebP may omit an entirely opaque alpha channel.

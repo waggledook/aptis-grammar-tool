@@ -7,6 +7,7 @@ import {
   inspectDuplicateFirestoreUsers,
   listAllCourseTestSessions,
   listAttemptsForCourseTestSession,
+  resetUserPasswordToDefault,
   saveCourseTestAttemptReview,
   reviewSeifAdminCancellation,
 } from "../../firebase";
@@ -453,6 +454,7 @@ export default function AdminDashboard({ user }) {
   const [duplicateReviewError, setDuplicateReviewError] = useState("");
   const [duplicateReviewNotice, setDuplicateReviewNotice] = useState("");
   const [deletingOrphanUid, setDeletingOrphanUid] = useState("");
+  const [resettingPasswordUid, setResettingPasswordUid] = useState("");
   const [groupManagerOpen, setGroupManagerOpen] = useState(false);
   const [groupTeacherId, setGroupTeacherId] = useState("");
   const [groupName, setGroupName] = useState("");
@@ -1088,6 +1090,31 @@ export default function AdminDashboard({ user }) {
       setDuplicateReviewError(error?.message || "The stale profile could not be removed.");
     } finally {
       setDeletingOrphanUid("");
+    }
+  }
+
+  async function resetPasswordToDefault(targetUser) {
+    if (!targetUser?.id || resettingPasswordUid) return;
+    const accountLabel = targetUser.email || labelForUser(targetUser);
+    const confirmed = window.confirm(
+      `Reset the password for ${accountLabel} to 12345678?\n\n` +
+      "Existing sign-in sessions will be revoked and the user will be emailed the temporary password. " +
+      "They should change it immediately after signing in."
+    );
+    if (!confirmed) return;
+
+    setResettingPasswordUid(targetUser.id);
+    try {
+      const result = await resetUserPasswordToDefault(targetUser.id);
+      const sessionWarning = result.sessionsRevoked
+        ? ""
+        : " The password and email were updated, but some existing sessions may still be active.";
+      window.alert(`Password reset complete. An email was sent to ${result.email}.${sessionWarning}`);
+    } catch (error) {
+      console.error("[AdminDashboard] password reset failed", error);
+      window.alert(error?.message || "The password could not be reset.");
+    } finally {
+      setResettingPasswordUid("");
     }
   }
 
@@ -2185,6 +2212,19 @@ function AdminEditModal({ title, user: modalUser, children, onClose }) {
             style={roleButtonStyle}
           >
             Edit name
+          </button>
+        )}
+
+        {u.id !== user.uid && (
+          <button
+            type="button"
+            className="ghost-btn"
+            onClick={() => resetPasswordToDefault(u)}
+            disabled={Boolean(resettingPasswordUid) || !u.email}
+            style={roleButtonStyle}
+            title={u.email ? "Reset to the temporary default and email the user" : "This account has no email address"}
+          >
+            {resettingPasswordUid === u.id ? "Resetting..." : "Reset password"}
           </button>
         )}
 

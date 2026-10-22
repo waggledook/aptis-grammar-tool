@@ -5,6 +5,7 @@ const nodemailer = require("nodemailer");
 const nodeCrypto = require("crypto");
 const {aggregateAnalyticsEvent} = require("./activityAnalytics");
 const {buildSiteAccessEmail} = require("./site-access-email");
+const {buildPasswordResetEmail} = require("./password-reset-email");
 
 // ---------- init Admin (safe if called twice) ----------
 try { admin.app(); } catch { admin.initializeApp(); }
@@ -8972,6 +8973,183 @@ const SEIF_ADMIN_DEFAULT_PASSWORD = "12345678";
 const SEIF_ADMIN_ACCESS_EXTENSION_DAYS = 14;
 const SEIF_ADMIN_DATED_ACCESS_STATUSES = new Set(["active", "completed"]);
 const SEIF_ADMIN_IMMEDIATE_DEACTIVATION_STATUSES = new Set(["cancelled"]);
+
+async function requireAdminForPasswordReset(context) {
+  if (!context.auth?.uid) {
+    throw new functions.https.HttpsError(
+      "unauthenticated",
+      "Sign in before resetting a user password."
+    );
+  }
+
+  const adminProfile = await firestore.doc(`users/${context.auth.uid}`).get();
+  if (adminProfile.data()?.role !== "admin") {
+    throw new functions.https.HttpsError(
+      "permission-denied",
+      "Only administrators can reset user passwords."
+    );
+  }
+}
+
+exports.resetUserPasswordToDefault = functions
+  .region("europe-west1")
+  .https.onCall(async (data, context) => {
+    await requireAdminForPasswordReset(context);
+
+    if (!FROM_ADDRESS || !GMAIL_PASS) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Password reset email is not configured. No password was changed."
+      );
+    }
+
+    const targetUid = String(data?.uid || "").trim();
+    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(targetUid)) {
+      throw new functions.https.HttpsError(
+        "invalid-argument",
+        "Choose a valid user account."
+      );
+    }
+    if (targetUid === context.auth.uid) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "Use Account & Security to change your own password."
+      );
+    }
+
+    let targetAuthUser;
+    try {
+      targetAuthUser = await admin.auth().getUser(targetUid);
+    } catch (error) {
+      if (error?.code === "auth/user-not-found") {
+        throw new functions.https.HttpsError(
+          "not-found",
+          "This Firebase Authentication account no longer exists."
+        );
+      }
+      throw error;
+    }
+
+    const targetEmail = normalizeUserEmail(targetAuthUser.email);
+    if (!targetEmail || !targetEmail.includes("@")) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "This account has no email address for the notification."
+      );
+    }
+    if (targetAuthUser.disabled) {
+      throw new functions.https.HttpsError(
+        "failed-precondition",
+        "This account is disabled. Enable it before resetting its password."
+      );
+    }
+
+    const targetProfile = await firestore.doc(`users/${targetUid}`).get();
+    const auditRef = firestore.collection("adminPasswordResetAudit").doc();
+    const profile = targetProfile.data() || {};
+    const displayName =
+      profile.displayName || profile.name || profile.username ||
+      targetAuthUser.displayName || targetEmail.split("@")[0];
+    await auditRef.set({
+      action: "reset_password_to_default",
+      status: "started",
+      targetUid,
+      targetEmail,
+      requestedByUid: context.auth.uid,
+      requestedByEmail: context.auth.token?.email || null,
+      startedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+    const updateAudit = async (patch) => {
+      try {
+        await auditRef.update(patch);
+      } catch (error) {
+        console.error("[resetUserPasswordToDefault] audit update failed", {
+          targetUid,
+          auditId: auditRef.id,
+          error,
+        });
+      }
+    };
+
+    try {
+      await admin.auth().updateUser(targetUid, {
+        password: SEIF_ADMIN_DEFAULT_PASSWORD,
+      });
+    } catch (error) {
+      await updateAudit({
+        status: "password_update_failed",
+        error: String(error?.message || error).slice(0, 1000),
+        failedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      console.error("[resetUserPasswordToDefault] password update failed", {
+        targetUid,
+        auditId: auditRef.id,
+        error,
+      });
+      throw new functions.https.HttpsError(
+        "internal",
+        "The password could not be reset. No notification email was sent."
+      );
+    }
+
+    let sessionsRevoked = true;
+    try {
+      await admin.auth().revokeRefreshTokens(targetUid);
+    } catch (error) {
+      sessionsRevoked = false;
+      console.error("[resetUserPasswordToDefault] session revocation failed", {
+        targetUid,
+        auditId: auditRef.id,
+        error,
+      });
+    }
+
+    const email = buildPasswordResetEmail({
+      displayName,
+      temporaryPassword: SEIF_ADMIN_DEFAULT_PASSWORD,
+    });
+    let mailResult;
+    try {
+      mailResult = await transporter.sendMail({
+        from: {name: "Seif English Academy", address: FROM_ADDRESS},
+        to: targetEmail,
+        ...email,
+        replyTo: TEACHER_EMAIL || FROM_ADDRESS,
+      });
+    } catch (error) {
+      await updateAudit({
+        status: "password_reset_email_failed",
+        emailSent: false,
+        sessionsRevoked,
+        error: String(error?.message || error).slice(0, 1000),
+        failedAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+      console.error("[resetUserPasswordToDefault] email failed", {
+        targetUid,
+        auditId: auditRef.id,
+        error,
+      });
+      throw new functions.https.HttpsError(
+        "internal",
+        "The password was reset, but the notification email could not be sent. Contact the user directly before retrying."
+      );
+    }
+    await updateAudit({
+      status: sessionsRevoked ? "completed" : "completed_with_session_warning",
+      emailSent: true,
+      sessionsRevoked,
+      emailMessageId: String(mailResult?.messageId || "").slice(0, 500),
+      completedAt: admin.firestore.FieldValue.serverTimestamp(),
+    });
+
+    console.log("[resetUserPasswordToDefault] completed", {
+      targetUid,
+      targetEmail,
+      auditId: auditRef.id,
+      sessionsRevoked,
+    });
+    return {ok: true, uid: targetUid, email: targetEmail, sessionsRevoked};
+  });
 
 class SeifAdminApiError extends Error {
   constructor(status, code, message) {

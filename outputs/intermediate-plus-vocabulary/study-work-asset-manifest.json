@@ -1,0 +1,236 @@
+{
+  "bank": "b1-b2-study-work",
+  "studentVisible": false,
+  "assets": [
+    {
+      "source": "public/images/vocab/education/campus.png",
+      "image": "/images/vocab/intermediate-plus/study-work/campus.webp",
+      "dimensions": [
+        263,
+        236
+      ],
+      "sourceBytes": 53355,
+      "webpBytes": 7768,
+      "alphaPreserved": true,
+      "term": "campus"
+    },
+    {
+      "source": "public/images/vocab/education/halls.png",
+      "image": "/images/vocab/intermediate-plus/study-work/halls.webp",
+      "dimensions": [
+        241,
+        221
+      ],
+      "sourceBytes": 41516,
+      "webpBytes": 4670,
+      "alphaPreserved": true,
+      "term": "halls of residence"
+    },
+    {
+      "source": "public/images/vocab/education/undergrad.png",
+      "image": "/images/vocab/intermediate-plus/study-work/undergrad.webp",
+      "dimensions": [
+        238,
+        254
+      ],
+      "sourceBytes": 47468,
+      "webpBytes": 7106,
+      "alphaPreserved": true,
+      "term": "undergraduates"
+    },
+    {
+      "source": "public/images/vocab/education/postgrad.png",
+      "image": "/images/vocab/intermediate-plus/study-work/postgrad.webp",
+      "dimensions": [
+        287,
+        229
+      ],
+      "sourceBytes": 61154,
+      "webpBytes": 10830,
+      "alphaPreserved": true,
+      "term": "postgraduates"
+    },
+    {
+      "source": "public/images/vocab/education/professor.png",
+      "image": "/images/vocab/intermediate-plus/study-work/professor.webp",
+      "dimensions": [
+        239,
+        274
+      ],
+      "sourceBytes": 58976,
+      "webpBytes": 11876,
+      "alphaPreserved": true,
+      "term": "professors"
+    },
+    {
+      "source": "public/images/vocab/education/tutor.png",
+      "image": "/images/vocab/intermediate-plus/study-work/tutor.webp",
+      "dimensions": [
+        185,
+        167
+      ],
+      "sourceBytes": 36606,
+      "webpBytes": 7462,
+      "alphaPreserved": true,
+      "term": "tutor"
+    },
+    {
+      "source": "public/images/vocab/education/lecture.png",
+      "image": "/images/vocab/intermediate-plus/study-work/lecture.webp",
+      "dimensions": [
+        303,
+        281
+      ],
+      "sourceBytes": 54675,
+      "webpBytes": 15368,
+      "alphaPreserved": true,
+      "term": "lectures"
+    },
+    {
+      "source": "public/images/vocab/education/seminar.png",
+      "image": "/images/vocab/intermediate-plus/study-work/seminar.webp",
+      "dimensions": [
+        177,
+        129
+      ],
+      "sourceBytes": 38269,
+      "webpBytes": 9108,
+      "alphaPreserved": true,
+      "term": "seminars"
+    },
+    {
+      "source": "public/images/vocab/education/tutorial.png",
+      "image": "/images/vocab/intermediate-plus/study-work/tutorial.webp",
+      "dimensions": [
+        303,
+        201
+      ],
+      "sourceBytes": 38421,
+      "webpBytes": 9294,
+      "alphaPreserved": true,
+      "term": "tutorials"
+    },
+    {
+      "source": "public/images/vocab/education/webinar.png",
+      "image": "/images/vocab/intermediate-plus/study-work/webinar.webp",
+      "dimensions": [
+        284,
+        219
+      ],
+      "sourceBytes": 41712,
+      "webpBytes": 7954,
+      "alphaPreserved": true,
+      "term": "webinars"
+    },
+    {
+      "source": "public/images/vocab/education/dissertation.png",
+      "image": "/images/vocab/intermediate-plus/study-work/dissertation.webp",
+      "dimensions": [
+        242,
+        251
+      ],
+      "sourceBytes": 56559,
+      "webpBytes": 9308,
+      "alphaPreserved": true,
+      "term": "dissertation"
+    },
+    {
+      "source": "public/images/vocab/education/thesis.png",
+      "image": "/images/vocab/intermediate-plus/study-work/thesis.webp",
+      "dimensions": [
+        134,
+        144
+      ],
+      "sourceBytes": 22871,
+      "webpBytes": 3196,
+      "alphaPreserved": true,
+      "term": "thesis"
+    },
+    {
+      "source": "public/images/vocab/education/degree.png",
+      "image": "/images/vocab/intermediate-plus/study-work/degree.webp",
+      "dimensions": [
+        245,
+        181
+      ],
+      "sourceBytes": 47091,
+      "webpBytes": 7664,
+      "alphaPreserved": true,
+      "term": "degree"
+    },
+    {
+      "source": "public/images/vocab/education/masters.png",
+      "image": "/images/vocab/intermediate-plus/study-work/masters.webp",
+      "dimensions": [
+        163,
+        140
+      ],
+      "sourceBytes": 30080,
+      "webpBytes": 5974,
+      "alphaPreserved": true,
+      "term": "Master's degree"
+    },
+    {
+      "source": "public/images/vocab/education/phd.png",
+      "image": "/images/vocab/intermediate-plus/study-work/phd.webp",
+      "dimensions": [
+        163,
+        140
+      ],
+      "sourceBytes": 31203,
+      "webpBytes": 6348,
+      "alphaPreserved": true,
+      "term": "PhD"
+    },
+    {
+      "source": "public/images/vocab/work/researcher.png",
+      "image": "/images/vocab/intermediate-plus/study-work/researcher.webp",
+      "dimensions": [
+        475,
+        886
+      ],
+      "sourceBytes": 555867,
+      "webpBytes": 130364,
+      "alphaPreserved": true,
+      "term": "research staff"
+    },
+    {
+      "source": "public/images/vocab/work/apply-for-a-job.png",
+      "image": "/images/vocab/intermediate-plus/study-work/apply-for-a-job.webp",
+      "dimensions": [
+        449,
+        502
+      ],
+      "sourceBytes": 281890,
+      "webpBytes": 64650,
+      "alphaPreserved": true,
+      "term": "apply for"
+    },
+    {
+      "source": "public/images/vocab/work/have-an-interview.png",
+      "image": "/images/vocab/intermediate-plus/study-work/have-an-interview.webp",
+      "dimensions": [
+        522,
+        513
+      ],
+      "sourceBytes": 389636,
+      "webpBytes": 99824,
+      "alphaPreserved": true,
+      "term": "interview"
+    }
+  ],
+  "notes": [
+    "All images reuse existing Topic Vocab artwork; original PNGs remain in their existing folders.",
+    "Meaning clues accompany icons; certificate colours are not used to assess degree levels.",
+    "Faculties, academic staff and abstract application terms retain text cues.",
+    "Dissertation and thesis overlap in real usage; the initial identifies the requested vocabulary term."
+  ],
+  "coverage": {
+    "studyTerms": 38,
+    "pictureMatching": 18,
+    "educationWritten": 20,
+    "applicationWritten": 18,
+    "writtenPictures": 18,
+    "activities": 6
+  }
+}

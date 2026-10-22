@@ -8,7 +8,7 @@ All 12 supplied pages were rendered and visually reviewed. The PDF is an image s
 
 ## Source coverage and future visual work
 
-The section names below describe the source. The table preserves the initial activity and visual possibilities. Text practice is available for all banks; Packing, Shops and services, and Photography now also have integrated visual practice. The remaining banks' visuals are deferred. Coursebook exercise instructions and audio references are source material, not project instructions. See the implementation summary and activity audit below for what is now built.
+The section names below describe the source. The table preserves the initial activity and visual possibilities. Text practice is available for all banks; Packing, Shops and services, Photography, Rubbish and recycling, and Study and work now also have integrated visual practice. The remaining banks' visuals are deferred. Coursebook exercise instructions and audio references are source material, not project instructions. See the implementation summary and activity audit below for what is now built.
 
 | PDF page | Book page | Bank | Source coverage | Proposed practice | Visual requirements |
 | --- | --- | --- | --- | --- | --- |
@@ -18,7 +18,7 @@ The section names below describe the source. The table preserves the initial act
 | 4 | 227 | Photography | Describing a photo; taking photos; on top of versus at the top of | Spatial descriptions using original scenes; phrase matching; camera-vocabulary gaps; written recall | Original scenes with clear spatial relationships; photography concepts where useful |
 | 5 | 228 | Rubbish and recycling | Rubbish nouns and phrasal verbs; packaging; the prefix re- | Definition matching; packaging pictures; contextual phrasal verbs; re- word formation; written recall | Packaging and waste containers |
 | 6 | 229 | Study and work | Higher education; applying for a job or course; attend versus assist; apprenticeship versus internship | Definition flashcards; education/application contextual gaps; collocations; meaning distinctions; written recall | Text practice can stand alone |
-| 7 | 230 | Television | Types of programme; series, soaps and sitcoms; TV phrasal verbs | Programme-type recognition; definition matching; distinctions between series/season/episode; TV phrasal-verb gaps; written recall | Original scenes representing programme types |
+| 7 | 230 | Television | Types of programme; series, soaps and sitcoms; TV phrasal verbs | Programme-type recognition; definition matching; distinctions between series/season/episode; TV phrasal-verb gaps; written recall | Fresh coordinated programme stills; code-based series, streaming and TV-control visuals |
 | 8 | 231 | The country | Nature; the country versus the countryside; farm animals and buildings; farming verbs and related vocabulary | Nature/farm picture flashcards and matching; category sorting; farming-verb gaps; spelling | Countryside features, farm objects and animals |
 | 9 | 232 | At a restaurant | Things on the table; food/plate/dish/meal/course distinctions; waiter and customer actions | Tableware pictures; waiter/customer sorting; restaurant collocations and contextual gaps; meaning distinctions; written recall | Tableware and restaurant actions |
 | 10 | 233 | DIY and repairs | Tools and repair materials; useful things around the house; verb phrases; repair/mend/fix synonyms | Object pictures; tool-purpose matching; verb collocations; contextual gaps; spelling | Tools, household objects and repair actions where useful |
@@ -37,7 +37,7 @@ The section names below describe the source. The table preserves the initial act
 
 ## Implemented text activities
 
-The 12 banks contain 440 lexical entries, 328 distinct structured questions and 73 activities, including 12 visual activities across Packing, Shops and services, and Photography. The entry count includes separate senses/forms and some revision vocabulary; it is not a count of distinct new words in the book. Definitions and practice sentences are original adaptations. Some contexts are deliberately revisited first with choices and then as written recall.
+The 12 banks contain 440 lexical entries, 366 distinct structured questions and 73 activities, including 19 visual activities across Packing, Shops and services, Photography, Rubbish and recycling, and Study and work. The entry count includes separate senses/forms and some revision vocabulary; it is not a count of distinct new words in the book. Definitions and practice sentences are original adaptations. Some contexts are deliberately revisited first with choices and then as written recall.
 
 | Bank | Entries | Activities | Bank-specific practice |
 | --- | ---: | ---: | --- |
@@ -45,8 +45,8 @@ The 12 banks contain 440 lexical entries, 328 distinct structured questions and 
 | Packing | 44 | 5 | Picture flashcards; picture matching; document purposes; contextual items and verbs; written naming with small pictures |
 | Shops and services | 32 | 6 | Picture/meaning study; venue picture matching; shop-purpose choices; phrasal verbs; apostrophes; combined written naming |
 | Photography | 22 | 6 | Visual study; camera-picture matching; scene-based position and camera choices; picture-supported sentence writing covering all 22 terms |
-| Rubbish and recycling | 33 | 6 | Written re-verb formation; packaging clues; re- and disposal verbs; written recall |
-| Study and work | 38 | 6 | University contexts; applications and word distinctions; written recall for both |
+| Rubbish and recycling | 33 | 6 | Mixed picture/text study; waste and packaging picture matching; re- verb formation; packaging contexts; action choices; written recall covering all 33 terms |
+| Study and work | 38 | 6 | Mixed picture/text study; 18 picture/clue matches; university and application choices; writing covering all 38 complete terms and phrases |
 | Television | 26 | 6 | Programme descriptions; series vocabulary; TV particles and pronoun placement; written recall |
 | The country | 39 | 6 | Nature/farm categories; descriptive clues and plurals; farming verbs; written recall |
 | At a restaurant | 38 | 6 | Waiter/customer roles; food-word distinctions; restaurant collocations; written recall |
@@ -54,7 +54,7 @@ The 12 banks contain 440 lexical entries, 328 distinct structured questions and 
 | Phrasal verbs | 47 | 8 | Money; away/back; meanings of take; separability; pronoun placement; particle recall |
 | Looking after yourself | 38 | 7 | Hairstyles/services; hair contexts; equipment/exercise sorting; fitness and beauty; written recall |
 
-Implementation: `src/data/hubIntermediatePlusVocabulary.js`, registered through `src/data/hubVocabularyActivities.js`. All lexical entries appear in the flashcard pools. Adjective meaning matching has been replaced with interactive suffix columns; Packing, Shops and services, and Photography use picture matching; the remaining banks retain meaning matching. Written practice uses self-contained prompts rather than questions that require seeing multiple-choice options. Near-synonymous adjective clues include the base word. Written variants include spelling alternatives and common equivalents where they fit the sentence.
+Implementation: `src/data/hubIntermediatePlusVocabulary.js`, registered through `src/data/hubVocabularyActivities.js`. All lexical entries appear in the flashcard pools. Adjective meaning matching has been replaced with interactive suffix columns; Packing, Shops and services, Photography, Rubbish and recycling, and Study and work use picture matching; the remaining banks retain meaning matching. Written practice uses self-contained prompts rather than questions that require seeing multiple-choice options. Near-synonymous adjective clues include the base word. Written variants include spelling alternatives and common equivalents where they fit the sentence.
 
 ### Packing visual integration
 
@@ -79,6 +79,30 @@ Six supplied pictures now load as WebP: sharp countryside, wider view, out of fo
 The supplied wider view is used independently because some scene details differ. Zoom/crop SVGs embed the same sharp source, illustrating framing and changes to an existing image. The corner phrases transfer from clear grid diagrams to the rucksack in the countryside scene and hanging flowers in the town square. Contexts distinguish background from distance, depth from image-plane position, and zoom from editing. Photography remains unpublished for admin review; only Adjective suffixes and Packing are student-visible.
 
 Validation: 17 automated checks pass, covering full lexical coverage, visual files, unambiguous choice data, accepted spellings, and source reconstruction for mistake review. Production build passes; targeted lint has no errors and the same eight existing hook warnings. Isolated browser checks verify SVG/WebP loading, choice feedback, written completion and mistake retry, accepted close up / portrait mode variants, mobile matching completion, smaller written images and no horizontal overflow at 390 pixels. Progress writes are stubbed; authenticated persistence is not exercised.
+
+### Rubbish and recycling visual integration
+
+The 20 supplied pictures now load as WebP (4.9 MiB versus 34.0 MiB of PNGs), retaining full dimensions and exact alpha. Bottle, yoghurt pot and take-out illustrations are reused through WebP derivatives, and the existing throw-away WebP is reused directly. Transparent cutouts retain their alpha without a white panel. A separate image map records neutral clues for related containers and person/place scenes.
+
+The bank retains six activities: visual study (33 terms, 24 pictures), picture matching (23), re- formation, packaging choices, disposal/re- choices, and combined written recall (33). Final writing uses self-contained gapped sentences and pictures up to 140 pixels high, with text prompts for abstract verbs, waste and the sell-by date. The printed date label is study-only; waste has an initial-letter cue because it overlaps with rubbish. The disposal sentence matches the reused paper-discarding picture. Accepted answers include yogurt pot, bottle cap, landfill and throw out. New picture and combined-writing IDs distinguish these tasks from retired meaning-only and action-only practice; historical records are retained.
+
+The bank remains unpublished; only Adjective suffixes and Packing are student-visible. No deployment was performed. The image conversion script now validates a complete encoding before replacing a runtime file and recovers incomplete WebPs on rerun. Its recovery, exact alpha, dimensions and reuse of unchanged outputs were checked with a temporary sample.
+
+Validation: 18 automated checks pass, including image availability, complete lexical coverage, date-label exclusion, written variants and mistake-review reconstruction. Production build passes with existing bundle-size/Browserslist warnings; targeted lint has no errors. Isolated browser checks verify all 24 study images load, matching completion and wrong-answer feedback, accepted yogurt pot / sell by date / throw out variants, text and picture writing, completion and mistake retry. At 390 pixels, matching and writing have no horizontal overflow, and written pictures remain 140 pixels high. Account progress writes were stubbed; authenticated persistence was not exercised.
+
+### Study and work visual integration
+
+Eighteen Topic Vocab illustrations are reused through WebP derivatives: campus, halls, students, academic roles, teaching sessions, research documents, degree certificates, research staff, applying for a job and an interview. Original PNGs remain in their existing folders. The derivatives preserve dimensions and exact alpha (1.80 MiB PNG to 0.40 MiB WebP); no white background is added. No new artwork or mock application documents are needed for the current activities.
+
+The six-activity menu now has study cards for all 38 terms, four-pair picture/clue matching rounds from 18 entries, the two existing contextual choice activities, and higher-education/application writing rounds. All icons have meaning clues: neither certificate colour nor a generic person's appearance reliably identifies their qualification or academic rank. Faculties, skills, experience and other abstract concepts retain text cues. Dissertation/thesis prompts specify an initial because usage overlaps.
+
+Writing now covers all 20 higher-education terms and all 18 application/work-distinction terms, in rounds of 12. It requests complete phrases, including covering letter, job offer, work permit and apply for, and retains accepted variants such as student halls, cover letter and résumé. Pictures are capped at 140 pixels high. Existing writing routes and source questions are retained so earlier mistakes remain reconstructable. The bank stays unpublished; only Adjective suffixes and Packing are visible to students.
+
+Validation: 19 automated checks pass, including all image paths, complete written coverage, clues without target words, retained answer variants, and reconstruction of an older written mistake after the pool expansion. Targeted lint is clean and the production build passes with existing bundle-size/Browserslist warnings. Isolated browser checks verify all 18 images load, matching completion and feedback, mixed picture/text written completion, full-phrase feedback and mistake retry, accepted cover letter / résumé / student halls variants, and no horizontal overflow for matching and writing at 390 pixels. Browser progress writes were stubbed; authenticated persistence was not exercised. Nothing was deployed.
+
+### Television asset direction
+
+On 22 October 2026 the user clarified the asset-source policy: suitable newer images created for Textbook Vocab may be reused, including across banks; older, lower-quality Topic Vocab artwork should not be the source for new integrations. Check the newer textbook collections first and create fresh artwork for gaps. The Television brief specifies 15 programme-type targets and an optional transparent box-set object, subject to that provenance check. Series/season/episode structure, streaming, scheduling and TV controls can be built in code. These assets are planned, not generated or integrated. Existing integrated banks are unchanged by this Television planning decision. Scene directions: `outputs/intermediate-plus-vocabulary/television-asset-brief.md`.
 
 ## Activity audit
 

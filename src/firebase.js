@@ -425,6 +425,12 @@ export async function deleteOrphanedFirestoreUserProfile({ email, uid, uids }) {
   return result.data;
 }
 
+export async function resetUserPasswordToDefault(uid) {
+  const callable = httpsCallable(functionsRegion, "resetUserPasswordToDefault");
+  const result = await callable({ uid: String(uid || "") });
+  return result.data;
+}
+
 export async function redeemSpeakingWorkshopAccess(code) {
   const callable = httpsCallable(functionsRegion, "redeemSpeakingWorkshopAccess");
   const result = await callable({ code: String(code || "") });

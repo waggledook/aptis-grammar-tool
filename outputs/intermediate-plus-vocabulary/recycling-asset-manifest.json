@@ -1,0 +1,204 @@
+{
+  "bank": "b1-b2-rubbish-recycling",
+  "studentVisible": false,
+  "sourceDirectory": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/",
+  "suppliedImages": 20,
+  "reusedTopicImages": {
+    "bottle": "public/images/vocab/food/milk.png",
+    "pot": "public/images/vocab/food/yoghurt.png",
+    "take out": "public/images/vocab/pre-int/housework/take-out-the-rubbish.png",
+    "throw away": "public/images/vocab/pre-int/phrasal-verbs/throw-away.webp"
+  },
+  "conversion": {
+    "sourceBytes": 35604850,
+    "webpBytes": 5156112,
+    "dimensionsPreserved": true,
+    "alphaPreserved": true,
+    "originalPngsRetained": true
+  },
+  "coverage": {
+    "study": 33,
+    "studyPictures": 24,
+    "pictureMatching": 23,
+    "written": 33,
+    "writtenPictures": 23,
+    "activities": 6
+  },
+  "assets": [
+    {
+      "term": "bin",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/bin.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/bin.png",
+      "bytes": 213222,
+      "studyOnly": false
+    },
+    {
+      "term": "bin bag",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/bin-bag.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/bin-bag.png",
+      "bytes": 208576,
+      "studyOnly": false
+    },
+    {
+      "term": "landfill site",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/landfill-site.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/landfill-site.png",
+      "bytes": 717298,
+      "studyOnly": false
+    },
+    {
+      "term": "refuse collector",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/refuse-collector.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/refuse-collector.png",
+      "bytes": 352152,
+      "studyOnly": false
+    },
+    {
+      "term": "rubbish",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/rubbish.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/rubbish.png",
+      "bytes": 416020,
+      "studyOnly": false
+    },
+    {
+      "term": "waste-paper basket",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/waste-paper-basket.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/waste-paper-basket.png",
+      "bytes": 538420,
+      "studyOnly": false
+    },
+    {
+      "term": "take out",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/take-out.webp",
+      "source": "public/images/vocab/pre-int/housework/take-out-the-rubbish.png",
+      "bytes": 67726,
+      "studyOnly": false
+    },
+    {
+      "term": "throw away",
+      "image": "/images/vocab/pre-int/phrasal-verbs/throw-away.webp",
+      "source": "public/images/vocab/pre-int/phrasal-verbs/throw-away.webp",
+      "bytes": 207276,
+      "studyOnly": false
+    },
+    {
+      "term": "bottle",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/bottle.webp",
+      "source": "public/images/vocab/food/milk.png",
+      "bytes": 2810,
+      "studyOnly": false
+    },
+    {
+      "term": "can",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/can.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/can.png",
+      "bytes": 107298,
+      "studyOnly": false
+    },
+    {
+      "term": "cardboard box",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/cardboard-box.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/cardboard-box.png",
+      "bytes": 176248,
+      "studyOnly": false
+    },
+    {
+      "term": "carton",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/carton.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/carton.png",
+      "bytes": 121878,
+      "studyOnly": false
+    },
+    {
+      "term": "jar",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/jar.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/jar.png",
+      "bytes": 349118,
+      "studyOnly": false
+    },
+    {
+      "term": "lid",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/lid.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/lid.png",
+      "bytes": 115616,
+      "studyOnly": false
+    },
+    {
+      "term": "cap",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/cap.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/cap.png",
+      "bytes": 185818,
+      "studyOnly": false
+    },
+    {
+      "term": "packet",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/packet.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/packet.png",
+      "bytes": 257640,
+      "studyOnly": false
+    },
+    {
+      "term": "plastic bag",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/plastic-bag.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/plastic-bag.png",
+      "bytes": 165430,
+      "studyOnly": false
+    },
+    {
+      "term": "pot",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/pot.webp",
+      "source": "public/images/vocab/food/yoghurt.png",
+      "bytes": 11038,
+      "studyOnly": false
+    },
+    {
+      "term": "pouch",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/pouch.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/pouch.png",
+      "bytes": 257770,
+      "studyOnly": false
+    },
+    {
+      "term": "sell-by date",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/sell-by-date.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/sell-by-date.png",
+      "bytes": 272190,
+      "studyOnly": true
+    },
+    {
+      "term": "tin",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/tin.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/tin.png",
+      "bytes": 215540,
+      "studyOnly": false
+    },
+    {
+      "term": "polystyrene tray",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/polystyrene-tray.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/polystyrene-tray.png",
+      "bytes": 139462,
+      "studyOnly": false
+    },
+    {
+      "term": "tub",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/tub.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/tub.png",
+      "bytes": 113350,
+      "studyOnly": false
+    },
+    {
+      "term": "wrapper",
+      "image": "/images/vocab/intermediate-plus/rubbish-and-recycling/wrapper.webp",
+      "source": "/Users/nicholasbeeson/Downloads/rubbish-and-recycling-complete/wrapper.png",
+      "bytes": 233066,
+      "studyOnly": false
+    }
+  ],
+  "notes": [
+    "The sell-by-date image prints the answer: study only; its written question uses a text clue.",
+    "Waste, give away, take away and re- verbs use text cues; an initial disambiguates waste from rubbish.",
+    "Existing bottle, pot and take-out illustrations have WebP derivatives; throw-away already uses WebP.",
+    "All 33 lexical terms appear in the final written pool; short round limits remain in place.",
+    "Transparent cutouts retain alpha and have no added white background."
+  ]
+}

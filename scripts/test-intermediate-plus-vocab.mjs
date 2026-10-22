@@ -71,7 +71,11 @@ test("every activity has usable prompts and valid answer data", () => {
     for (const entry of entries) {
       if (activity.visualPractice) {
         if (entry.image) assert(existsSync(new URL(`../public${entry.image}`, import.meta.url)), `${label}: missing image`);
-        else assert(["flashcards", "type-answer"].includes(activity.type) && entry.cueText, `${label}: missing visual or standalone phrase clue`);
+        else assert(
+          (["flashcards", "type-answer"].includes(activity.type) && entry.cueText)
+          || (["sentence-gap-choice", "sentence-gap-type-answer"].includes(activity.type) && entry.sentence),
+          `${label}: missing visual or self-contained text prompt`
+        );
       } else assert(!entry.image && !entry.sceneImage && !activity.sceneImage, `${label}: unexpected visual dependency`);
       if (activity.type === "flashcards") {
         assert(entry.flashcardPrompt && entry.flashcardAnswer, label);
@@ -171,6 +175,71 @@ test("Photography covers every term visually and in sentence recall without publ
   }
   assert(theme.photographyPositions.some((entry) => entry.image.endsWith("town-square.webp")));
   assert(!getHubVocabActivity(theme.id, "meaning-matching"), "Visual practice replaces the duplicate meaning exercise.");
+});
+
+test("Recycling uses the complete picture set, reuses topic images and tests all 33 terms in six activities", () => {
+  const { theme } = getHubVocabActivity("b1-b2-rubbish-recycling", "recycling-written-recall");
+  assert.equal(theme.studentVisible, false);
+  assert.equal(theme.activities.length, 6);
+  assert.equal(theme.recyclingPictureStudy.length, 33);
+  assert.equal(theme.recyclingPictureStudy.filter((entry) => entry.image).length, 24);
+  assert.equal(theme.recyclingPictures.length, 23);
+  assert.equal(theme.recyclingWritten.length, 33);
+  assert.deepEqual(new Set(theme.recyclingWritten.map((entry) => entry.term)), new Set(theme.entries.map((entry) => entry.term)));
+  const study = (term) => theme.recyclingPictureStudy.find((entry) => entry.term === term);
+  for (const term of ["bottle", "pot", "take out", "throw away"]) assert(study(term).image);
+  const date = study("sell-by date");
+  assert(date.image && date.studyOnly, "The readable date label belongs in study.");
+  assert(!theme.recyclingPictures.some((entry) => entry.term === date.term));
+  assert(!theme.recyclingWritten.find((entry) => entry.term === date.term).image, "Written recall must not display its printed answer.");
+  assert(!theme.recyclingPictures.some((entry) => entry.term === "waste"), "Synonymous rubbish/waste pictures need different text cues.");
+  assert(theme.recyclingWritten.find((entry) => entry.term === "waste").cueText.includes("beginning with w"));
+  for (const entry of theme.recyclingWritten) {
+    const prompt = entry.imagePrompt || entry.cueText;
+    assert.equal((prompt.match(/_____/g) || []).length, 1, entry.term);
+    const item = { source: "hub-textbook", topic: theme.id, setId: "recycling-written-recall", itemId: entry.id, activityType: "type-answer", correctAnswer: entry.term };
+    const context = findHubSourceContext(item);
+    assert.equal(context.entry, entry);
+    assert.equal(getHubReviewPrompt(item, context), prompt);
+    for (const answer of [entry.term, ...entry.acceptedAnswers]) assert(isAcceptedReviewAnswer(answer, getReviewAcceptedAnswers(item, context.entry)));
+  }
+  assert(!getHubVocabActivity(theme.id, "meaning-matching"));
+});
+
+test("Study and work reuses icons with meaning clues and covers all 38 terms in written practice", () => {
+  const { theme } = getHubVocabActivity("b1-b2-study-work", "education-recall");
+  assert.equal(theme.studentVisible, false);
+  assert.equal(theme.activities.length, 6);
+  assert.equal(theme.studyPictureStudy.length, 38);
+  assert.equal(theme.studyPictures.length, 18);
+  assert.equal(theme.educationRecall.length, 20);
+  assert.equal(theme.applicationRecall.length, 18);
+  assert.deepEqual(new Set([...theme.educationRecall, ...theme.applicationRecall].map((entry) => entry.answer)), new Set(theme.entries.map((entry) => entry.term)));
+  for (const entry of theme.studyPictures) {
+    assert(entry.image.endsWith(".webp") && entry.imagePrompt && !entry.matchPrompt);
+    assert(!normalize(entry.imagePrompt).includes(normalize(entry.term)), `${entry.term}: clue prints the target word`);
+  }
+  for (const term of ["dissertation", "thesis"]) assert(theme.studyPictures.find((entry) => entry.term === term).imagePrompt.includes(`beginning with ${term[0]}`));
+  for (const term of ["skills", "experience", "attend", "assist", "apprenticeship", "internship", "faculties"]) {
+    assert(!theme.studyPictureStudy.find((entry) => entry.term === term).image, `${term}: no forced or misleading picture`);
+  }
+  for (const activityId of ["education-recall", "application-recall"]) {
+    const { activity } = getHubVocabActivity(theme.id, activityId);
+    for (const entry of theme[activity.dataKey]) {
+      assert.equal((entry.sentence.match(/_____/g) || []).length, 1);
+      assert(!entry.sentence.includes(" / "), "Written recall does not retain multiple-choice alternatives.");
+      const item = { source: "hub-textbook", topic: theme.id, setId: activityId, itemId: entry.id, activityType: activity.type, correctAnswer: entry.answer };
+      const context = findHubSourceContext(item);
+      assert.equal(context.entry, entry);
+      assert.equal(getHubReviewPrompt(item, context), entry.sentence);
+      for (const answer of [entry.answer, ...entry.acceptedAnswers]) assert(isAcceptedReviewAnswer(answer, getReviewAcceptedAnswers(item, context.entry)));
+    }
+  }
+  for (const term of ["covering letter", "job offer", "work permit", "apply for"]) assert(theme.applicationRecall.some((entry) => entry.answer === term), `Recall the complete phrase: ${term}`);
+  const previous = theme.applicationContexts.find((entry) => entry.answer === "covering");
+  const previousContext = findHubSourceContext({ source: "hub-textbook", topic: theme.id, setId: "application-recall", itemId: previous.id, activityType: "sentence-gap-type-answer", correctAnswer: previous.answer });
+  assert.equal(previousContext.entry, previous, "Existing written mistakes still resolve after expanding the pool.");
+  assert(!getHubVocabActivity(theme.id, "meaning-matching"));
 });
 
 test("word formation requires a missing form rather than a visible ending", () => {
