@@ -456,8 +456,8 @@ function SpeakingWorkshopsContent({ user, access }) {
   );
   else if (mode === "prepare") page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;
   else if (mode === "reference" && topic.referenceReady !== false) page = <main className="speaking-workshops"><SpeakingReference topic={topic} /></main>;
-  else if (mode === "relaxed-practice") page = <main className="speaking-workshops"><TeachingMode topic={topic} variant="relaxed-practice" canUseExamPractice={canOpenPractice} /></main>;
-  else if (mode === "teach" && access.canManage) page = <main className="speaking-workshops"><TeachingMode topic={topic} /></main>;
+  else if (mode === "relaxed-practice") page = <main className="speaking-workshops"><TeachingMode key={`${topic.id}:relaxed`} topic={topic} user={user} workshopSessions={workshopSessions} variant="relaxed-practice" canUseExamPractice={canOpenPractice} /></main>;
+  else if (mode === "teach" && access.canManage) page = <main className="speaking-workshops"><TeachingMode key={`${topic.id}:teaching`} topic={topic} user={user} /></main>;
   else if (mode === "practice" && !canOpenPractice) page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;
   else if (mode === "practice" && !partNumber) page = <PracticePartChoice topic={topic} navigate={navigate} />;
   else if (mode === "practice") page = <ExamPractice topic={topic} partNumber={partNumber} user={user} navigate={navigate} />;

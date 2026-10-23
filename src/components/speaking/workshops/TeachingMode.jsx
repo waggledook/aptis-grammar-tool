@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { logActivity } from "../../../firebase";
 import { SPEAKING_PART_META } from "./workshopTopics";
 
 function formatTime(value) {
@@ -61,13 +62,20 @@ function Photo({ src, alt, label, brief }) {
   );
 }
 
-export default function TeachingMode({ topic, variant = "teaching", canUseExamPractice = topic.visualsReady }) {
+export default function TeachingMode({
+  topic,
+  user,
+  workshopSessions = [],
+  variant = "teaching",
+  canUseExamPractice = topic.visualsReady,
+}) {
   const navigate = useNavigate();
   const isRelaxedPractice = variant === "relaxed-practice";
   const [part, setPart] = useState(1);
   const [taskIndex, setTaskIndex] = useState(0);
   const [timing, setTiming] = useState(isRelaxedPractice ? "off" : "suggested");
   const [randomPart1Set, setRandomPart1Set] = useState(null);
+  const viewedTaskKeys = useRef(new Set());
 
   const items = useMemo(() => {
     if (part === 1) return topic.parts[1].questions.map((question, index) => ({
@@ -82,16 +90,43 @@ export default function TeachingMode({ topic, variant = "teaching", canUseExamPr
   const current = isRandomPart1Set ? randomPart1Set : items[taskIndex] || items[0];
   const meta = SPEAKING_PART_META[part];
 
-  useEffect(() => {
+  function selectPart(number) {
+    setPart(number);
     setTaskIndex(0);
     setRandomPart1Set(null);
-  }, [part]);
+  }
+
+  useEffect(() => {
+    if (!isRelaxedPractice || !current?.id) return;
+
+    const taskKey = `${topic.id}:${part}:${current.id}`;
+    if (viewedTaskKeys.current.has(taskKey)) return;
+    viewedTaskKeys.current.add(taskKey);
+
+    const questions = current.allQuestions || current.questions || current.qs || [];
+    void logActivity("speaking_workshop_relaxed_task_viewed", {
+      app: "aptis-speaking-workshops",
+      topicId: topic.id,
+      topicTitle: topic.title,
+      mode: "relaxed-practice",
+      part,
+      taskId: current.id,
+      taskTitle: current.title || "",
+      questionCount: questions.length,
+      questionIds: current.questionIds || [],
+      randomSet: isRandomPart1Set,
+      actorRole: user?.role || "",
+      sessionIds: workshopSessions.map((session) => session.id),
+      sessionPhases: workshopSessions.map((session) => session.phase),
+    });
+  }, [current, isRandomPart1Set, isRelaxedPractice, part, topic.id, topic.title, user?.role, workshopSessions]);
 
   function generatePart1Set() {
     const questions = randomSample(topic.parts[1].questions, 3);
     setRandomPart1Set({
       id: `${topic.id}-random-${Date.now()}`,
       title: "Three random questions",
+      questionIds: questions.map((question) => question.id),
       questions: questions.map((question) => question.text),
       allQuestions: questions.map((question) => question.text),
     });
@@ -114,7 +149,7 @@ export default function TeachingMode({ topic, variant = "teaching", canUseExamPr
 
       <nav className="workshop-part-tabs" aria-label="Speaking part">
         {[1, 2, 3, 4].map((number) => (
-          <button key={number} type="button" className={part === number ? "is-active" : ""} onClick={() => setPart(number)}>
+          <button key={number} type="button" className={part === number ? "is-active" : ""} onClick={() => selectPart(number)}>
             Part {number}<small>{topic.counts[number]} {number === 1 ? "questions" : "tasks"}</small>
           </button>
         ))}

@@ -20,6 +20,7 @@ export const ACTIVITY_TYPE_LABELS = {
   speaking_workshop_preparation_viewed: "Workshop Preparation Viewed",
   speaking_workshop_preparation_progress: "Workshop Preparation Progress",
   speaking_workshop_preparation_completed: "Workshop Preparation Completed",
+  speaking_workshop_relaxed_task_viewed: "Workshop Relaxed Task Viewed",
   strategy_guide_viewed: "Strategy Guide Viewed",
   strategy_guide_completed: "Strategy Guide Completed",
   reading_guide_viewed: "Reading Guide Viewed",
@@ -331,6 +332,24 @@ export function formatActivityDetails(log) {
         Array.isArray(d.sessionIds) && d.sessionIds.length
           ? formatCount(d.sessionIds.length, "linked session")
           : "",
+      ]);
+    }
+    case "speaking_workshop_relaxed_task_viewed": {
+      const timing = Array.isArray(d.sessionPhases) && d.sessionPhases.includes("live")
+        ? "During live workshop"
+        : Array.isArray(d.sessionPhases) && d.sessionPhases.includes("review")
+          ? "During review period"
+          : Array.isArray(d.sessionPhases) && d.sessionPhases.includes("preparation")
+            ? "Before workshop"
+            : "No linked session";
+      return joinParts([
+        d.topicTitle || titleCaseFromSnakeCase(d.topicId),
+        d.part ? `Part ${String(d.part).replace("part", "")}` : "",
+        d.taskTitle || d.taskId || "",
+        formatCount(d.questionCount, "question"),
+        d.randomSet ? "Random set" : "",
+        d.actorRole ? titleCaseFromSnakeCase(d.actorRole) : "",
+        timing,
       ]);
     }
     case "grammar_session": {
