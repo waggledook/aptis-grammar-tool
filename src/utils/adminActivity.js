@@ -132,6 +132,8 @@ export const ACTIVITY_TYPE_LABELS = {
   ote_mock_completed: "OTE Mock Completed",
   aptis_mock_started: "Aptis Grammar & Vocabulary Mock Started",
   aptis_mock_completed: "Aptis Grammar & Vocabulary Mock Completed",
+  aptis_mock_mistake_review_started: "Aptis Mock Mistake Review Started",
+  aptis_mock_mistake_review_completed: "Aptis Mock Mistake Review Completed",
   aptis_reading_mock_started: "Aptis Reading Mock Started",
   aptis_reading_mock_completed: "Aptis Reading Mock Completed",
   aptis_listening_mock_started: "Aptis Listening Mock Started",
@@ -825,6 +827,26 @@ export function formatActivityDetails(log) {
         typeof d.vocabularyScore === "number" ? `Vocabulary ${d.vocabularyScore}/25` : "",
         typeof d.elapsedSeconds === "number" ? `Time ${formatDurationSeconds(d.elapsedSeconds)}` : "",
         d.completionReason === "time_expired" ? "Time expired" : "Submitted",
+      ]);
+    case "aptis_mock_mistake_review_started":
+      return joinParts([
+        d.reviewScope === "teacher_class" ? "Teacher-led class review" : "Learner review",
+        formatCount(d.totalItems, "item"),
+        typeof d.grammarItemCount === "number" ? `${d.grammarItemCount} grammar` : "",
+        typeof d.vocabularyItemCount === "number" ? `${d.vocabularyItemCount} vocabulary` : "",
+        typeof d.selectedStudentCount === "number"
+          ? formatCount(d.selectedStudentCount, "student")
+          : "",
+        typeof d.sourceMockCount === "number" ? formatCount(d.sourceMockCount, "source mock") : "",
+      ]);
+    case "aptis_mock_mistake_review_completed":
+      return joinParts([
+        d.reviewScope === "teacher_class" ? "Teacher-led class review" : "Learner review",
+        `${formatScore(d.correctCount, d.totalItems)} correct first time`,
+        typeof d.accuracy === "number" ? `${d.accuracy}% accuracy` : "",
+        typeof d.grammarItemCount === "number" ? `${d.grammarItemCount} grammar` : "",
+        typeof d.vocabularyItemCount === "number" ? `${d.vocabularyItemCount} vocabulary` : "",
+        typeof d.elapsedSeconds === "number" ? `Time ${formatDurationSeconds(d.elapsedSeconds)}` : "",
       ]);
     case "aptis_reading_mock_started":
       return joinParts([

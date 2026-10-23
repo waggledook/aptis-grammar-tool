@@ -6,6 +6,9 @@ const nodeCrypto = require("crypto");
 const {aggregateAnalyticsEvent} = require("./activityAnalytics");
 const {buildSiteAccessEmail} = require("./site-access-email");
 const {buildPasswordResetEmail} = require("./password-reset-email");
+const {
+  canUseRelaxedPractice,
+} = require("./speaking-workshop-access-policy");
 
 // ---------- init Admin (safe if called twice) ----------
 try { admin.app(); } catch { admin.initializeApp(); }
@@ -120,6 +123,7 @@ function serializeSpeakingWorkshopSession(snap, includeCode = false) {
     label: data.label || "Speaking workshop",
     topicIds: Array.isArray(data.topicIds) ? data.topicIds : [],
     phase: speakingWorkshopPhase(data),
+    relaxedPracticeRequiresLive: data.relaxedPracticeRequiresLive === true,
     registrationOpen: data.registrationOpen !== false,
     attendeeCount: Number(data.attendeeCount || 0),
     createdAt: speakingWorkshopDate(data.createdAt)?.toISOString() || null,
@@ -253,6 +257,9 @@ exports.createSpeakingWorkshopSession = functions
       label: label || "Speaking workshop",
       topicIds,
       phase: "preparation",
+      // Existing sessions intentionally omit this field and retain legacy access.
+      // Sessions created from this release onward unlock relaxed practice at start.
+      relaxedPracticeRequiresLive: true,
       registrationOpen: true,
       attendeeCount: 0,
       joinCode,
@@ -623,11 +630,14 @@ exports.getSpeakingWorkshopAccess = functions
         const current = topicAccess[topicId] || {
           preparation: false,
           live: false,
+          relaxedPractice: false,
           reviewUntil: null,
           sessionIds: [],
         };
         current.preparation = true;
         current.live = current.live || live;
+        current.relaxedPractice = current.relaxedPractice ||
+          canUseRelaxedPractice(session, phase);
         current.sessionIds.push(snap.id);
         const deadline = speakingWorkshopDate(session.reviewUntil);
         if (deadline && (!current.reviewUntil ||

@@ -21,6 +21,12 @@ import {
 import { getAptisMockReviewFeedback } from "../../data/aptisGrammarVocabularyMockFeedback.js";
 import { buildAptisGrammarVocabularyMistakes } from "../../utils/aptisGrammarVocabularyMistakes.js";
 import {
+  APTIS_MOCK_MISTAKE_REVIEW_COMPLETED,
+  APTIS_MOCK_MISTAKE_REVIEW_STARTED,
+  buildAptisMockMistakeReviewCompletion,
+  createAptisMockMistakeReviewTracking,
+} from "../../utils/aptisMockMistakeReviewActivity.js";
+import {
   auth,
   fetchAptisGrammarVocabularyMockAttempts,
   logActivity,
@@ -174,6 +180,7 @@ export default function HubAptisGrammarVocabularyMock({ user, onHome, onProfile 
   const saveStartedRef = useRef(false);
   const startedAtRef = useRef(null);
   const activitySessionIdRef = useRef("");
+  const mistakeReviewTrackingRef = useRef(null);
 
   const activeMock = useMemo(
     () => getAptisGrammarVocabularyMock(selectedMockId) || APTIS_GRAMMAR_VOCABULARY_MOCKS[0],
@@ -382,7 +389,31 @@ export default function HubAptisGrammarVocabularyMock({ user, onHome, onProfile 
     setQuestionListOpen(false);
   }
 
+  function startMistakeReviewActivity() {
+    const tracking = createAptisMockMistakeReviewTracking(mistakeReviewItems, {
+      reviewScope: "learner",
+    });
+    mistakeReviewTrackingRef.current = tracking;
+    void logActivity(APTIS_MOCK_MISTAKE_REVIEW_STARTED, tracking.details);
+  }
+
+  function openMistakeReview() {
+    startMistakeReviewActivity();
+    setStage("mistake-review");
+  }
+
+  function completeMistakeReview(summary) {
+    const tracking = mistakeReviewTrackingRef.current;
+    if (!tracking || tracking.completed) return;
+    tracking.completed = true;
+    void logActivity(
+      APTIS_MOCK_MISTAKE_REVIEW_COMPLETED,
+      buildAptisMockMistakeReviewCompletion(tracking, summary)
+    );
+  }
+
   function returnToMenu() {
+    mistakeReviewTrackingRef.current = null;
     setStage("menu");
     setSelectedMockId(null);
     setCurrentIndex(0);
@@ -425,11 +456,16 @@ export default function HubAptisGrammarVocabularyMock({ user, onHome, onProfile 
           attempts={mockAttempts}
           loading={attemptsLoading}
           mistakeCount={mistakeReviewItems.length}
-          onReview={() => setStage("mistake-review")}
+          onReview={openMistakeReview}
           onSelect={selectMock}
         />
       ) : stage === "mistake-review" ? (
-        <MistakeReviewSession items={mistakeReviewItems} onExit={returnToMenu} />
+        <MistakeReviewSession
+          items={mistakeReviewItems}
+          onComplete={completeMistakeReview}
+          onExit={returnToMenu}
+          onRestart={startMistakeReviewActivity}
+        />
       ) : stage === "landing" ? (
         <main className="aptis-mock-start">
           <section className="aptis-mock-start-copy">
@@ -643,6 +679,8 @@ function MockMenu({ attempts, loading, mistakeCount, onReview, onSelect }) {
 export function MistakeReviewSession({
   items,
   onExit,
+  onComplete,
+  onRestart,
   title = "Review your mistakes",
   exitLabel = "All mock tests",
   completeTitle = "Review complete",
@@ -671,6 +709,10 @@ export function MistakeReviewSession({
   function next() {
     if (!feedback) return;
     if (currentIndex === items.length - 1) {
+      onComplete?.({
+        answeredCount: outcomes.length,
+        correctCount: outcomes.filter(Boolean).length,
+      });
       setComplete(true);
       return;
     }
@@ -679,6 +721,7 @@ export function MistakeReviewSession({
   }
 
   function restart() {
+    onRestart?.();
     setCurrentIndex(0);
     setFeedback(null);
     setOutcomes([]);

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   BookOpenCheck,
@@ -11,11 +11,18 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   fetchAptisGrammarVocabularyMockAttempts,
   listTeacherStudentsWithRosterMeta,
+  logActivity,
 } from "../../firebase.js";
 import {
   buildAptisGrammarVocabularyClassMistakes,
   prioritizeAptisGrammarVocabularyMistakes,
 } from "../../utils/aptisGrammarVocabularyMistakes.js";
+import {
+  APTIS_MOCK_MISTAKE_REVIEW_COMPLETED,
+  APTIS_MOCK_MISTAKE_REVIEW_STARTED,
+  buildAptisMockMistakeReviewCompletion,
+  createAptisMockMistakeReviewTracking,
+} from "../../utils/aptisMockMistakeReviewActivity.js";
 import AptisMockPortalHeader from "../common/AptisMockPortalHeader.jsx";
 import Seo from "../common/Seo.jsx";
 import {
@@ -61,6 +68,7 @@ export default function TeacherAptisGrammarVocabularyReview({ user }) {
   const [prioritizeFrequent, setPrioritizeFrequent] = useState(true);
   const [reviewItems, setReviewItems] = useState([]);
   const [stage, setStage] = useState("setup");
+  const reviewTrackingRef = useRef(null);
 
   useEffect(() => {
     let alive = true;
@@ -165,6 +173,27 @@ export default function TeacherAptisGrammarVocabularyReview({ user }) {
     setMistakesLoading(false);
   }
 
+  function startReviewActivity(items = reviewItems) {
+    const tracking = createAptisMockMistakeReviewTracking(items, {
+      reviewScope: "teacher_class",
+      selectedStudentCount: selectedStudents.length,
+      selectionMode: reviewMode,
+      prioritizeFrequent,
+    });
+    reviewTrackingRef.current = tracking;
+    void logActivity(APTIS_MOCK_MISTAKE_REVIEW_STARTED, tracking.details);
+  }
+
+  function completeReviewActivity(summary) {
+    const tracking = reviewTrackingRef.current;
+    if (!tracking || tracking.completed) return;
+    tracking.completed = true;
+    void logActivity(
+      APTIS_MOCK_MISTAKE_REVIEW_COMPLETED,
+      buildAptisMockMistakeReviewCompletion(tracking, summary)
+    );
+  }
+
   function startReview() {
     let nextItems;
 
@@ -189,6 +218,7 @@ export default function TeacherAptisGrammarVocabularyReview({ user }) {
     }
     if (!nextItems.length) return;
     setReviewItems(nextItems);
+    startReviewActivity(nextItems);
     setStage("review");
     window.scrollTo({ top: 0, behavior: "auto" });
   }
@@ -216,7 +246,10 @@ export default function TeacherAptisGrammarVocabularyReview({ user }) {
           title="Class mistake review"
           exitLabel="Back to setup"
           completeTitle="Class review complete"
+          onComplete={completeReviewActivity}
+          onRestart={() => startReviewActivity(reviewItems)}
           onExit={() => {
+            reviewTrackingRef.current = null;
             setStage("setup");
             window.scrollTo({ top: 0, behavior: "auto" });
           }}

@@ -248,6 +248,9 @@ function WorkshopLanding({ navigate, access, user }) {
 function TopicModeChoice({ topic, navigate, access }) {
   const grant = access.topicAccess[topic.id] || {};
   const canUsePractice = topic.visualsReady && (access.fullAccess || grant.live);
+  // Undefined preserves access while an older Functions deployment is serving
+  // the client and for existing sessions grandfathered by the backend.
+  const canUseRelaxedPractice = access.fullAccess || grant.relaxedPractice !== false;
   const canPrepare = topic.preparationReady;
   const canUseReference = topic.referenceReady !== false;
 
@@ -288,12 +291,16 @@ function TopicModeChoice({ topic, navigate, access }) {
           <p>{canPrepare ? "A short flipped-classroom sequence with topic vocabulary, ideas and an oral rehearsal." : "The preparation activities will be added after the vocabulary content is ready."}</p>
           <strong>{canPrepare ? <>Start the warm-up <ArrowRight size={17} /></> : "Preparation being developed"}</strong>
         </button>
-        <button className="mode-relaxed" type="button" onClick={() => navigate(`/speaking-workshops/${topic.id}/relaxed-practice`)}>
-          <span className="mode-icon" aria-hidden="true"><MessageCircle size={28} /></span>
+        <button className={`mode-relaxed ${canUseRelaxedPractice ? "" : "is-locked"}`} type="button" disabled={!canUseRelaxedPractice} onClick={() => navigate(`/speaking-workshops/${topic.id}/relaxed-practice`)}>
+          <span className="mode-icon" aria-hidden="true">{canUseRelaxedPractice ? <MessageCircle size={28} /> : <LockKeyhole size={27} />}</span>
           <span className="workshop-kicker">At your own pace</span>
           <h2>Relaxed practice</h2>
-          <p>Browse every speaking part and work through the questions without recording, feedback or exam pressure.</p>
-          <strong>Browse the task bank <ArrowRight size={17} /></strong>
+          <p>{canUseRelaxedPractice
+            ? "Browse every speaking part and work through the questions without recording, feedback or exam pressure."
+            : "Your preparation is ready. Relaxed practice unlocks when the workshop starts."}</p>
+          <strong>{canUseRelaxedPractice
+            ? <>Browse the task bank <ArrowRight size={17} /></>
+            : "Waiting for the workshop to start"}</strong>
         </button>
         <button className={`mode-practice ${canUsePractice ? "" : "is-locked"}`} type="button" disabled={!canUsePractice} onClick={() => navigate(`/speaking-workshops/${topic.id}/practice`)}>
           <span className="mode-icon" aria-hidden="true">{canUsePractice ? <Mic2 size={28} /> : <LockKeyhole size={27} />}</span>
@@ -443,6 +450,7 @@ function SpeakingWorkshopsContent({ user, access }) {
   )) : [];
   const canOpenTopic = !topic || access.fullAccess || (topic.contentReady && topicGrant.preparation);
   const canOpenPractice = topic?.visualsReady && (access.fullAccess || topicGrant.live);
+  const canOpenRelaxedPractice = access.fullAccess || topicGrant.relaxedPractice !== false;
 
   let page = null;
   if (!topicId) page = <WorkshopLanding navigate={navigate} access={access} user={user} />;
@@ -456,6 +464,7 @@ function SpeakingWorkshopsContent({ user, access }) {
   );
   else if (mode === "prepare") page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;
   else if (mode === "reference" && topic.referenceReady !== false) page = <main className="speaking-workshops"><SpeakingReference topic={topic} /></main>;
+  else if (mode === "relaxed-practice" && !canOpenRelaxedPractice) page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;
   else if (mode === "relaxed-practice") page = <main className="speaking-workshops"><TeachingMode key={`${topic.id}:relaxed`} topic={topic} user={user} workshopSessions={workshopSessions} variant="relaxed-practice" canUseExamPractice={canOpenPractice} /></main>;
   else if (mode === "teach" && access.canManage) page = <main className="speaking-workshops"><TeachingMode key={`${topic.id}:teaching`} topic={topic} user={user} /></main>;
   else if (mode === "practice" && !canOpenPractice) page = <Navigate to={`/speaking-workshops/${topic.id}`} replace />;

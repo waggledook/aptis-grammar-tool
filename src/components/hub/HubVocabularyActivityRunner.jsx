@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import Seo from "../common/Seo.jsx";
 import HubVocabWordFormationSort from "./HubVocabWordFormationSort.jsx";
 import { getSitePath } from "../../siteConfig.js";
@@ -65,6 +66,8 @@ function FeedbackNextButton({ onClick }) {
     </button>
   );
 }
+
+const ActivityProgressionContext = React.createContext(null);
 
 function shuffle(items) {
   return [...items].sort(() => Math.random() - 0.5);
@@ -351,6 +354,7 @@ function ActivityCompleteCard({
   onReviewMistakes,
   onComplete,
 }) {
+  const progression = React.useContext(ActivityProgressionContext);
   const didCompleteRef = useRef(false);
   const isCoverageRound = Boolean(coverage?.tracked && onComplete);
   const coverageSeen = new Set([
@@ -406,29 +410,129 @@ function ActivityCompleteCard({
           <button type="button" onClick={onReviewMistakes}>Review mistakes</button>
         ) : null}
       </div>
+      {(!isCoverageRound || overallComplete) && progression?.nextActivity ? (
+        <button
+          type="button"
+          className="hub-vocab-next-activity"
+          onClick={progression.goToNextActivity}
+        >
+          <span>Next activity</span>
+          <strong>{progression.nextActivity.title} <ChevronRight size={18} aria-hidden="true" /></strong>
+        </button>
+      ) : null}
     </section>
   );
 }
 
 function ActivityTabs({ theme, activityId, progressMap = {} }) {
   const navigate = useNavigate();
+  const tabsRef = useRef(null);
+  const activeTabRef = useRef(null);
+  const [overflow, setOverflow] = useState({ left: false, right: false });
+  const currentIndex = Math.max(theme.activities.findIndex((activity) => activity.id === activityId), 0);
+  const currentActivity = theme.activities[currentIndex];
+
+  const updateOverflow = useCallback(() => {
+    const tabs = tabsRef.current;
+    if (!tabs) return;
+    const maxScrollLeft = Math.max(tabs.scrollWidth - tabs.clientWidth, 0);
+    setOverflow({
+      left: tabs.scrollLeft > 4,
+      right: tabs.scrollLeft < maxScrollLeft - 4,
+    });
+  }, []);
+
+  const goToActivity = useCallback((activity) => {
+    if (!activity) return;
+    navigate(getSitePath(`/vocabulary/textbook/${theme.id}/${activity.id}`));
+  }, [navigate, theme.id]);
+
+  useEffect(() => {
+    const tabs = tabsRef.current;
+    if (!tabs) return undefined;
+    updateOverflow();
+
+    const resizeObserver = typeof ResizeObserver === "function"
+      ? new ResizeObserver(updateOverflow)
+      : null;
+    resizeObserver?.observe(tabs);
+    window.addEventListener("resize", updateOverflow);
+    return () => {
+      resizeObserver?.disconnect();
+      window.removeEventListener("resize", updateOverflow);
+    };
+  }, [theme.activities.length, updateOverflow]);
+
+  useEffect(() => {
+    activeTabRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+      inline: "center",
+    });
+    const frame = window.requestAnimationFrame(updateOverflow);
+    return () => window.cancelAnimationFrame(frame);
+  }, [activityId, updateOverflow]);
 
   return (
-    <div className="hub-vocab-tabs" aria-label="Vocabulary activity types">
-      {theme.activities.map((activity) => {
-        const completed = Boolean(progressMap[`${theme.id}:${activity.id}`]?.completed);
-        return (
-          <button
-            key={activity.id}
-            type="button"
-            className={`${activity.id === activityId ? "active" : ""} ${completed ? "completed" : ""}`}
-            onClick={() => navigate(getSitePath(`/vocabulary/textbook/${theme.id}/${activity.id}`))}
-          >
-            {activity.title}
-            {completed ? <span className="hub-vocab-tab-check" aria-label="Completed">✓</span> : null}
-          </button>
-        );
-      })}
+    <div className="hub-vocab-stepper">
+      <div className="hub-vocab-stepper-meta">
+        <p>
+          <strong>Activity {currentIndex + 1} of {theme.activities.length}</strong>
+          <span>{currentActivity?.title}</span>
+        </p>
+        <div className="hub-vocab-stepper-track" aria-hidden="true">
+          {theme.activities.map((activity, index) => {
+            const completed = Boolean(progressMap[`${theme.id}:${activity.id}`]?.completed);
+            return <span key={activity.id} className={`${completed ? "completed" : ""} ${index === currentIndex ? "active" : ""}`} />;
+          })}
+        </div>
+      </div>
+
+      <div className="hub-vocab-stepper-row">
+        <button
+          type="button"
+          className="hub-vocab-stepper-arrow"
+          aria-label="Previous activity"
+          disabled={currentIndex === 0}
+          onClick={() => goToActivity(theme.activities[currentIndex - 1])}
+        >
+          <ChevronLeft size={21} strokeWidth={2.6} aria-hidden="true" />
+        </button>
+
+        <div className={`hub-vocab-tabs-viewport ${overflow.left ? "can-scroll-left" : ""} ${overflow.right ? "can-scroll-right" : ""}`}>
+          <div ref={tabsRef} className="hub-vocab-tabs" aria-label="Vocabulary activity types" onScroll={updateOverflow}>
+            {theme.activities.map((activity, index) => {
+              const completed = Boolean(progressMap[`${theme.id}:${activity.id}`]?.completed);
+              const isActive = activity.id === activityId;
+              return (
+                <button
+                  key={activity.id}
+                  ref={isActive ? activeTabRef : null}
+                  type="button"
+                  className={`${isActive ? "active" : ""} ${completed ? "completed" : ""}`}
+                  aria-current={isActive ? "page" : undefined}
+                  onClick={() => goToActivity(activity)}
+                >
+                  <span className={`hub-vocab-tab-marker ${completed ? "completed" : ""}`} aria-label={completed ? "Completed" : undefined}>
+                    {completed ? "✓" : index + 1}
+                  </span>
+                  <span className="hub-vocab-tab-label">{activity.title}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <button
+          type="button"
+          className="hub-vocab-stepper-arrow"
+          aria-label="Next activity"
+          disabled={currentIndex >= theme.activities.length - 1}
+          onClick={() => goToActivity(theme.activities[currentIndex + 1])}
+        >
+          <ChevronRight size={21} strokeWidth={2.6} aria-hidden="true" />
+        </button>
+      </div>
     </div>
   );
 }
@@ -2766,6 +2870,18 @@ function HubVocabularyActivityContent({ isDraft }) {
   const [liveSeenIds, setLiveSeenIds] = useState(() => new Set());
   const progressKey = theme && activity ? `${theme.id}:${activity.id}` : "";
   const activityProgress = progressKey ? progressMap[progressKey] || {} : {};
+  const currentActivityIndex = theme?.activities?.findIndex((entry) => entry.id === activityId) ?? -1;
+  const nextActivity = currentActivityIndex >= 0
+    ? theme?.activities?.[currentActivityIndex + 1] || null
+    : null;
+  const goToNextActivity = useCallback(() => {
+    if (!theme || !nextActivity) return;
+    navigate(getSitePath(`/vocabulary/textbook/${theme.id}/${nextActivity.id}`));
+  }, [navigate, nextActivity, theme]);
+  const activityProgression = useMemo(() => ({
+    nextActivity,
+    goToNextActivity,
+  }), [goToNextActivity, nextActivity]);
   const activityItemIds = useMemo(
     () => new Set(activityItems.map((item) => item?.id).filter(Boolean)),
     [activityItems]
@@ -2941,9 +3057,11 @@ function HubVocabularyActivityContent({ isDraft }) {
       </div>
 
       <header className="hub-vocab-runner-head" style={{ "--theme-accent": theme.accent }}>
-        <div>
-          <span className="cefr-badge" style={{ "--badge-color": theme.accent }}>{theme.level.toUpperCase()}</span>
-          <p className="hub-vocab-kicker">{theme.textbookRef}</p>
+        <div className="hub-vocab-runner-head-copy">
+          <div className="hub-vocab-runner-meta">
+            <span className="cefr-badge" style={{ "--badge-color": theme.accent }}>{theme.level.toUpperCase()}</span>
+            <p className="hub-vocab-kicker">{theme.textbookRef}</p>
+          </div>
           <h1>{theme.title}</h1>
           <p>{activity.prompt || activity.shortDescription}</p>
         </div>
@@ -2957,18 +3075,20 @@ function HubVocabularyActivityContent({ isDraft }) {
 
       <OverallCoverageTracker coverage={coverage} />
 
-      {progressLoaded ? (
-        renderActivity(theme, activity, {
-          onComplete: handleComplete,
-          onMistake: handleMistake,
-          onItemSeen: handleItemSeen,
-          coverage,
-        })
-      ) : (
-        <section className="hub-vocab-practice-card hub-vocab-empty-card">
-          <strong>Loading activity progress…</strong>
-        </section>
-      )}
+      <ActivityProgressionContext.Provider value={activityProgression}>
+        {progressLoaded ? (
+          renderActivity(theme, activity, {
+            onComplete: handleComplete,
+            onMistake: handleMistake,
+            onItemSeen: handleItemSeen,
+            coverage,
+          })
+        ) : (
+          <section className="hub-vocab-practice-card hub-vocab-empty-card">
+            <strong>Loading activity progress…</strong>
+          </section>
+        )}
+      </ActivityProgressionContext.Provider>
 
       <ThemeSupplementaryContent theme={theme} />
 
@@ -3029,68 +3149,240 @@ function HubVocabularyActivityContent({ isDraft }) {
 
         .hub-vocab-runner-head {
           --theme-accent: #72df9b;
+          align-items: center;
           display: flex;
           justify-content: space-between;
-          gap: 1.25rem;
+          gap: 1rem;
           border: 1px solid color-mix(in srgb, var(--theme-accent), transparent 62%);
-          border-radius: 26px;
+          border-radius: 20px;
           background:
             radial-gradient(circle at top right, color-mix(in srgb, var(--theme-accent), transparent 72%), transparent 42%),
             linear-gradient(135deg, #17243f, #10192d);
           color: #eef4ff;
-          padding: 1.35rem;
-          box-shadow: 0 18px 38px rgba(0, 0, 0, 0.22);
+          padding: 0.9rem 1rem;
+          box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+        }
+
+        .hub-vocab-runner-head-copy {
+          min-width: 0;
+          text-align: left;
+        }
+
+        .hub-vocab-runner-meta {
+          align-items: center;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.45rem 0.7rem;
+        }
+
+        .hub-vocab-runner-head .cefr-badge {
+          position: static;
         }
 
         .hub-vocab-kicker {
           color: color-mix(in srgb, var(--theme-accent), white 20%);
+          font-size: 0.74rem;
           font-weight: 800;
           letter-spacing: 0.08em;
-          margin: 0.65rem 0 0.2rem;
+          margin: 0;
           text-transform: uppercase;
         }
 
         .hub-vocab-runner-head h1 {
           color: #fff;
-          font-size: clamp(2rem, 5vw, 4rem);
-          line-height: 0.95;
-          margin: 0;
+          font-size: clamp(1.65rem, 3vw, 2.65rem);
+          line-height: 1.02;
+          margin: 0.3rem 0 0;
         }
 
         .hub-vocab-runner-head p:last-child {
           color: rgba(238, 244, 255, 0.82);
-          font-size: 1.05rem;
-          margin-bottom: 0;
+          font-size: 0.92rem;
+          margin: 0.3rem 0 0;
         }
 
         .hub-vocab-runner-stat {
-          align-self: stretch;
-          display: grid;
-          min-width: 8rem;
-          place-content: center;
-          text-align: center;
-          border-radius: 22px;
+          align-items: baseline;
+          align-self: center;
+          display: flex;
+          flex: 0 0 auto;
+          gap: 0.38rem;
+          min-width: 0;
+          padding: 0.58rem 0.78rem;
+          border-radius: 14px;
           background: rgba(255, 255, 255, 0.08);
           border: 1px solid rgba(255, 255, 255, 0.14);
         }
 
         .hub-vocab-runner-stat strong {
           color: #fff;
-          font-size: 2.6rem;
+          font-size: 1.5rem;
           line-height: 1;
         }
 
         .hub-vocab-runner-stat span {
           color: rgba(238, 244, 255, 0.7);
+          font-size: 0.68rem;
           font-weight: 800;
+          letter-spacing: 0.05em;
           text-transform: uppercase;
+        }
+
+        .hub-vocab-stepper {
+          display: grid;
+          gap: 0.5rem;
+        }
+
+        .hub-vocab-stepper-meta {
+          align-items: end;
+          display: flex;
+          gap: 1rem;
+          justify-content: space-between;
+        }
+
+        .hub-vocab-stepper-meta p {
+          align-items: baseline;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.3rem 0.65rem;
+          margin: 0;
+        }
+
+        .hub-vocab-stepper-meta strong {
+          color: #eef4ff;
+          font-size: 0.88rem;
+        }
+
+        .hub-vocab-stepper-meta p span {
+          color: rgba(238, 244, 255, 0.64);
+          font-size: 0.82rem;
+          font-weight: 700;
+        }
+
+        .hub-vocab-stepper-track {
+          display: flex;
+          gap: 0.28rem;
+          justify-content: flex-end;
+          max-width: min(18rem, 42%);
+          width: 100%;
+        }
+
+        .hub-vocab-stepper-track > span {
+          background: rgba(238, 244, 255, 0.15);
+          border-radius: 999px;
+          flex: 1 1 0;
+          height: 0.25rem;
+          transition: background 150ms ease, transform 150ms ease;
+        }
+
+        .hub-vocab-stepper-track > span.completed {
+          background: rgba(114, 223, 155, 0.7);
+        }
+
+        .hub-vocab-stepper-track > span.active {
+          background: #f6bd60;
+          transform: scaleY(1.5);
+        }
+
+        .hub-vocab-stepper-row {
+          align-items: center;
+          display: grid;
+          gap: 0.42rem;
+          grid-template-columns: 2.65rem minmax(0, 1fr) 2.65rem;
+        }
+
+        .hub-vocab-stepper-arrow {
+          align-items: center;
+          align-self: center;
+          background: rgba(143, 182, 255, 0.08);
+          border: 1px solid rgba(143, 182, 255, 0.26);
+          border-radius: 999px;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 5px 12px rgba(0, 0, 0, 0.16);
+          color: #c8d9f7;
+          cursor: pointer;
+          display: flex;
+          height: 2.35rem;
+          justify-content: center;
+          justify-self: center;
+          padding: 0;
+          transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+          width: 2.35rem;
+        }
+
+        .hub-vocab-stepper-arrow:hover:not(:disabled) {
+          background: rgba(246, 189, 96, 0.16);
+          border-color: rgba(246, 189, 96, 0.68);
+          color: #ffd88a;
+          transform: translateY(-1px) scale(1.04);
+        }
+
+        .hub-vocab-stepper-arrow:active:not(:disabled) {
+          transform: scale(0.96);
+        }
+
+        .hub-vocab-stepper-arrow:focus-visible {
+          outline: 3px solid rgba(143, 182, 255, 0.56);
+          outline-offset: 2px;
+        }
+
+        .hub-vocab-stepper-arrow:disabled {
+          background: transparent;
+          border-color: rgba(238, 244, 255, 0.1);
+          box-shadow: none;
+          color: rgba(238, 244, 255, 0.34);
+          cursor: default;
+        }
+
+        .hub-vocab-tabs-viewport {
+          min-width: 0;
+          overflow: hidden;
+          position: relative;
+        }
+
+        .hub-vocab-tabs-viewport::before,
+        .hub-vocab-tabs-viewport::after {
+          bottom: 0.45rem;
+          content: "";
+          opacity: 0;
+          pointer-events: none;
+          position: absolute;
+          top: 0;
+          transition: opacity 150ms ease;
+          width: 2.6rem;
+          z-index: 2;
+        }
+
+        .hub-vocab-tabs-viewport::before {
+          background: linear-gradient(90deg, #0e1b34 10%, transparent);
+          left: 0;
+        }
+
+        .hub-vocab-tabs-viewport::after {
+          background: linear-gradient(270deg, #0e1b34 10%, transparent);
+          right: 0;
+        }
+
+        .hub-vocab-tabs-viewport.can-scroll-left::before,
+        .hub-vocab-tabs-viewport.can-scroll-right::after {
+          opacity: 1;
         }
 
         .hub-vocab-tabs {
           display: flex;
-          gap: 0.55rem;
+          gap: 0.45rem;
           overflow-x: auto;
-          padding: 0.15rem 0 0.35rem;
+          padding: 0.1rem 0 0.45rem;
+          scrollbar-color: rgba(238, 244, 255, 0.24) transparent;
+          scrollbar-width: thin;
+        }
+
+        .hub-vocab-tabs::-webkit-scrollbar {
+          height: 5px;
+        }
+
+        .hub-vocab-tabs::-webkit-scrollbar-thumb {
+          background: rgba(238, 244, 255, 0.24);
+          border-radius: 999px;
         }
 
         .hub-vocab-tabs button,
@@ -3107,6 +3399,40 @@ function HubVocabularyActivityContent({ isDraft }) {
           padding: 0.65rem 1rem;
         }
 
+        .hub-vocab-tabs button {
+          align-items: center;
+          border-radius: 13px;
+          display: flex;
+          flex: 0 0 clamp(9.75rem, 15vw, 12.5rem);
+          font-size: 0.88rem;
+          gap: 0.55rem;
+          justify-content: flex-start;
+          line-height: 1.18;
+          min-height: 3.25rem;
+          padding: 0.55rem 0.72rem;
+          text-align: left;
+          transition: background 150ms ease, border-color 150ms ease, color 150ms ease, transform 150ms ease;
+        }
+
+        .hub-vocab-tabs button:hover {
+          background: #213252;
+          border-color: rgba(238, 244, 255, 0.3);
+          transform: translateY(-1px);
+        }
+
+        .hub-vocab-tabs button:focus-visible {
+          outline: 3px solid rgba(143, 182, 255, 0.56);
+          outline-offset: 2px;
+        }
+
+        .hub-vocab-tab-label {
+          display: -webkit-box;
+          flex: 1 1 auto;
+          overflow: hidden;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 2;
+        }
+
         .hub-vocab-next-shortcut {
           font-size: 0.78em;
           font-weight: 700;
@@ -3116,26 +3442,40 @@ function HubVocabularyActivityContent({ isDraft }) {
         }
 
         .hub-vocab-tabs button.active {
-          background: #f6bd60;
-          border-color: #f6bd60;
-          color: #13213b;
+          background: rgba(246, 189, 96, 0.14);
+          border-color: rgba(246, 189, 96, 0.76);
+          box-shadow: inset 0 -3px 0 #f6bd60;
+          color: #ffe1a3;
         }
 
         .hub-vocab-tabs button.completed:not(.active) {
           border-color: rgba(114, 223, 155, 0.46);
         }
 
-        .hub-vocab-tab-check {
+        .hub-vocab-tab-marker {
           align-items: center;
-          background: rgba(114, 223, 155, 0.18);
-          border: 1px solid rgba(114, 223, 155, 0.5);
+          background: rgba(238, 244, 255, 0.08);
+          border: 1px solid rgba(238, 244, 255, 0.2);
           border-radius: 999px;
+          color: rgba(238, 244, 255, 0.72);
           display: inline-flex;
-          font-size: 0.78rem;
-          height: 1.15rem;
+          flex: 0 0 auto;
+          font-size: 0.68rem;
+          height: 1.35rem;
           justify-content: center;
-          margin-left: 0.45rem;
-          width: 1.15rem;
+          width: 1.35rem;
+        }
+
+        .hub-vocab-tabs button.active .hub-vocab-tab-marker {
+          background: #f6bd60;
+          border-color: #f6bd60;
+          color: #13213b;
+        }
+
+        .hub-vocab-tab-marker.completed {
+          background: rgba(114, 223, 155, 0.18);
+          border-color: rgba(114, 223, 155, 0.5);
+          color: #9ff1bc;
         }
 
         .hub-vocab-practice-card {
@@ -3151,6 +3491,44 @@ function HubVocabularyActivityContent({ isDraft }) {
         .hub-vocab-complete-card {
           justify-items: center;
           text-align: center;
+        }
+
+        .hub-vocab-next-activity {
+          align-items: flex-start;
+          background: rgba(246, 189, 96, 0.14);
+          border: 1px solid rgba(246, 189, 96, 0.72);
+          border-radius: 16px;
+          color: #eef4ff;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          font: inherit;
+          gap: 0.18rem;
+          min-width: min(22rem, 100%);
+          padding: 0.72rem 0.95rem;
+          text-align: left;
+          transition: background 150ms ease, transform 150ms ease;
+        }
+
+        .hub-vocab-next-activity:hover {
+          background: rgba(246, 189, 96, 0.22);
+          transform: translateY(-1px);
+        }
+
+        .hub-vocab-next-activity > span {
+          color: rgba(238, 244, 255, 0.68);
+          font-size: 0.72rem;
+          font-weight: 850;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+        }
+
+        .hub-vocab-next-activity strong {
+          align-items: center;
+          color: #ffe1a3;
+          display: inline-flex;
+          font-size: 1rem;
+          gap: 0.2rem;
         }
 
         .hub-vocab-complete-copy {
@@ -4218,6 +4596,7 @@ function HubVocabularyActivityContent({ isDraft }) {
         }
 
         :root[data-theme="light"] .hub-vocab-tabs button,
+        :root[data-theme="light"] .hub-vocab-stepper-arrow,
         :root[data-theme="light"] .hub-vocab-runner-actions button,
         :root[data-theme="light"] .hub-vocab-progress-line button,
         :root[data-theme="light"] .hub-vocab-feedback button {
@@ -4227,11 +4606,77 @@ function HubVocabularyActivityContent({ isDraft }) {
           box-shadow: 0 8px 18px rgba(43, 67, 112, 0.08);
         }
 
-        :root[data-theme="light"] .hub-vocab-tabs button.active {
+        :root[data-theme="light"] .hub-vocab-stepper-meta strong {
+          color: #1b2a48;
+        }
+
+        :root[data-theme="light"] .hub-vocab-stepper-meta p span {
+          color: rgba(27, 42, 72, 0.64);
+        }
+
+        :root[data-theme="light"] .hub-vocab-stepper-arrow:hover:not(:disabled) {
+          background: rgba(246, 189, 96, 0.2);
+          border-color: #d59b3b;
+          color: #8a5a0d;
+        }
+
+        :root[data-theme="light"] .hub-vocab-stepper-arrow:disabled {
+          background: transparent;
+          border-color: rgba(44, 73, 128, 0.12);
+          color: rgba(27, 42, 72, 0.32);
+          box-shadow: none;
+        }
+
+        :root[data-theme="light"] .hub-vocab-tabs-viewport::before {
+          background: linear-gradient(90deg, #f4f7ff 10%, transparent);
+        }
+
+        :root[data-theme="light"] .hub-vocab-tabs-viewport::after {
+          background: linear-gradient(270deg, #f4f7ff 10%, transparent);
+        }
+
+        :root[data-theme="light"] .hub-vocab-tab-marker {
+          background: rgba(44, 73, 128, 0.07);
+          border-color: rgba(44, 73, 128, 0.2);
+          color: rgba(27, 42, 72, 0.72);
+        }
+
+        :root[data-theme="light"] .hub-vocab-tab-marker.completed {
+          background: rgba(50, 142, 101, 0.12);
+          border-color: rgba(50, 142, 101, 0.36);
+          color: #1f7a52;
+        }
+
+        :root[data-theme="light"] .hub-vocab-tabs button.active .hub-vocab-tab-marker {
           background: #f6bd60;
           border-color: #d59b3b;
           color: #13213b;
-          box-shadow: 0 10px 18px rgba(213, 155, 59, 0.24);
+        }
+
+        :root[data-theme="light"] .hub-vocab-tabs button.active {
+          background: rgba(246, 189, 96, 0.2);
+          border-color: #d59b3b;
+          color: #13213b;
+          box-shadow: inset 0 -3px 0 #d59b3b, 0 6px 14px rgba(213, 155, 59, 0.14);
+        }
+
+        :root[data-theme="light"] .hub-vocab-tabs button:hover {
+          background: #f7f9ff;
+          border-color: rgba(44, 73, 128, 0.28);
+        }
+
+        :root[data-theme="light"] .hub-vocab-next-activity {
+          background: rgba(246, 189, 96, 0.18);
+          border-color: #d59b3b;
+          color: #1b2a48;
+        }
+
+        :root[data-theme="light"] .hub-vocab-next-activity > span {
+          color: rgba(27, 42, 72, 0.62);
+        }
+
+        :root[data-theme="light"] .hub-vocab-next-activity strong {
+          color: #714c0f;
         }
 
         :root[data-theme="light"] .hub-vocab-practice-card {
@@ -4425,10 +4870,31 @@ function HubVocabularyActivityContent({ isDraft }) {
         }
 
         @media (max-width: 720px) {
+          .hub-vocab-stepper-meta p > span {
+            display: none;
+          }
+
+          .hub-vocab-stepper-track {
+            max-width: 48%;
+          }
+
+          .hub-vocab-stepper-row {
+            grid-template-columns: 2.35rem minmax(0, 1fr) 2.35rem;
+          }
+
+          .hub-vocab-tabs button {
+            flex-basis: 9rem;
+            min-height: 3rem;
+          }
+
           .hub-vocab-runner-head,
           .hub-vocab-feedback {
             flex-direction: column;
             align-items: stretch;
+          }
+
+          .hub-vocab-runner-stat {
+            align-self: flex-start;
           }
 
           .hub-vocab-choice-grid {
