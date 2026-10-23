@@ -19,8 +19,8 @@ const expectedTitles = [
 ];
 const normalize = (value) => String(value).toLowerCase().replace(/[’]/g, "'").replace(/[-–—]/g, " ").replace(/[.,!?]/g, "").replace(/\s+/g, " ").trim();
 
-test("only the first two Intermediate Plus banks are published to students", () => {
-  const expected = ["b1-b2-adjective-suffixes", "b1-b2-packing"];
+test("only the first three Intermediate Plus banks are published to students", () => {
+  const expected = ["b1-b2-adjective-suffixes", "b1-b2-packing", "b1-b2-shops-services"];
   for (const user of [undefined, { role: "student" }, { role: "teacher" }, { role: "admin" }]) {
     assert.deepEqual(getVisibleHubVocabThemes(user).filter((theme) => theme.level === "b1-b2").map((theme) => theme.id), expected);
     if (user?.role !== "admin") assert.deepEqual(getVisibleHubVocabThemes(user, { includeDrafts: true }).filter((theme) => theme.level === "b1-b2").map((theme) => theme.id), expected);
@@ -31,7 +31,7 @@ test("only the first two Intermediate Plus banks are published to students", () 
 
 test("unpublished banks remain admin-accessible but not through student direct links or mistake review", () => {
   for (const theme of themes) {
-    const published = theme.order <= 2;
+    const published = theme.order <= 3;
     assert.equal(canAccessHubVocabTheme(theme, { role: "student" }), published);
     assert.equal(canAccessHubVocabTheme(theme, { role: "teacher" }), published);
     assert(canAccessHubVocabTheme(theme, { role: "admin" }));
@@ -128,6 +128,28 @@ test("mistake review reconstructs matching, choice and sorting prompts without l
       assert.equal(getHubReviewPrompt(item, context), activity.type === "word-formation-sort" ? getWordFormationSortPrompt(entry) : activity.type === "category-sort" ? entry.term : entry.sentence || entry.matchPrompt || entry.imagePrompt || "");
     }
   }
+});
+
+test("mistake review replaces a stale saved correct option with the current source answer", () => {
+  const { theme, activity } = getHubVocabActivity("b1-b2-shops-services", "shop-name-apostrophes");
+  const entry = theme[activity.dataKey].find((candidate) => candidate.answer === "bakers");
+  const item = {
+    source: "hub-textbook",
+    topic: theme.id,
+    setId: activity.id,
+    itemId: entry.id,
+    activityType: activity.type,
+    correctAnswer: "bakers",
+    userAnswer: "baker's",
+    reviewOptions: ["baker's", "baker"],
+    reviewCorrectOption: "baker's",
+  };
+  const review = getHubReviewChoice(item, findHubSourceContext(item));
+
+  assert.equal(review.correctLabel, "bakers");
+  assert.equal(review.options.filter((option) => option.correct).length, 1);
+  assert(review.options.some((option) => option.label === "bakers" && option.correct));
+  assert(review.options.some((option) => option.label === "baker's" && !option.correct));
 });
 
 test("written variants survive mistake review", () => {
@@ -349,10 +371,10 @@ test("removed Packing activities do not inflate completion of the condensed menu
   assert.deepEqual(getHubVocabProgressCounts()["b1-b2-packing"], { completed: 0, total: 5 });
 });
 
-test("Shops uses all 26 venues in picture practice and all 32 words in study and writing", () => {
+test("published Shops uses all 26 venues in picture practice and all 32 words in study and writing", () => {
   const { theme } = getHubVocabActivity("b1-b2-shops-services", "shop-picture-flashcards");
   assert.equal(theme.activities.length, 6);
-  assert.equal(theme.studentVisible, false, "Keep the bank in admin preview until activated.");
+  assert.equal(theme.studentVisible, true, "The reviewed bank should be visible to students.");
   assert.equal(theme.shopPictures.length, 26);
   for (const key of ["shopPictureStudy", "shopWritten"]) {
     assert.deepEqual(new Set(theme[key].map((entry) => entry.id)), new Set(theme.entries.map((entry) => entry.id)));

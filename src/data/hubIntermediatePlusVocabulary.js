@@ -9,7 +9,7 @@ import { INTERMEDIATE_PLUS_STUDY_WORK_IMAGES } from "./hubIntermediatePlusStudyW
 const ACCENT = "#c4c47f";
 
 // Add a bank's slug here after its assets and activities are ready for students.
-export const INTERMEDIATE_PLUS_PUBLISHED_BANKS = ["adjective-suffixes", "packing"];
+export const INTERMEDIATE_PLUS_PUBLISHED_BANKS = ["adjective-suffixes", "packing", "shops-services"];
 
 function slug(value) {
   return value.toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -360,7 +360,7 @@ const packing = bank("packing", 2, "Packing", "Prepare for a trip with holiday e
   ], [{ title: "Useful packing phrases", body: ["Pack a suitcase before you leave; unpack it when you arrive.", "Fold or roll up clothes, and wrap fragile things.", "A booking confirmation proves a reservation; travel insurance documents show your cover for problems during a trip."] }], { includeMeaningActivities: false });
 
 const shopEntries = vocabulary("shops", [
-  ["baker's", "a shop that makes and sells bread and cakes", "Shops"],
+  ["baker's", "a shop that makes and sells bread and cakes", "Shops", ["bakery"]],
   ["barber's", "a business specialising in short haircuts and shaving", "Shops and services"],
   ["butcher's", "a shop selling fresh meat", "Shops"],
   ["car showroom", "a place where cars are displayed for customers to inspect and buy", "Shops"],

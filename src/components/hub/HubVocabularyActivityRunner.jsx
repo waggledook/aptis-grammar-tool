@@ -3377,13 +3377,30 @@ function HubVocabularyActivityContent({ isDraft }) {
           line-height: 1.35;
         }
 
+        .has-storefront-visuals .hub-vocab-match-grid {
+          gap: 0.5rem;
+          grid-template-columns: minmax(0, 1.12fr) minmax(10rem, 0.88fr);
+          max-width: 820px;
+        }
+
+        .has-storefront-visuals .hub-vocab-match-column {
+          gap: 0.35rem;
+        }
+
         .has-storefront-visuals .hub-vocab-match-column .hub-vocab-object-image.compact {
-          max-height: 150px;
-          max-width: min(200px, 100%);
+          max-height: 104px;
+          max-width: min(148px, 100%);
         }
 
         .has-storefront-visuals .hub-vocab-match-column button {
-          min-height: 200px;
+          border-radius: 16px;
+          min-height: 132px;
+          padding: 0.45rem 0.6rem;
+        }
+
+        .has-storefront-visuals .hub-vocab-match-column button:active:not(:disabled) > *,
+        .has-storefront-visuals .hub-vocab-match-column button.selected > * {
+          transform: scale(1.15);
         }
 
         .has-photography-visuals .hub-vocab-object-image.is-scene {
@@ -4368,6 +4385,20 @@ function HubVocabularyActivityContent({ isDraft }) {
           .hub-vocab-object-image.compact {
             max-height: 1.85rem;
             max-width: 3.2rem;
+          }
+
+          .has-storefront-visuals .hub-vocab-match-grid {
+            grid-template-columns: minmax(0, 1.08fr) minmax(7.5rem, 0.92fr);
+          }
+
+          .has-storefront-visuals .hub-vocab-match-column button {
+            min-height: 104px;
+            padding: 0.35rem 0.4rem;
+          }
+
+          .has-storefront-visuals .hub-vocab-match-column .hub-vocab-object-image.compact {
+            max-height: 74px;
+            max-width: min(102px, 100%);
           }
         }
       `}</style>

@@ -45,10 +45,20 @@ function normalizeList(value) {
     .filter(Boolean);
 }
 
+function canonicalizeChoiceLabel(value) {
+  return String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[‘’]/g, "'")
+    .replace(/&/g, "and")
+    .replace(/[-–—_\s]+/g, "")
+    .replace(/[^a-z0-9']/g, "");
+}
+
 function uniqueLabels(values) {
   const seen = new Set();
   return values.filter((value) => {
-    const key = canonicalizeAnswer(value);
+    const key = canonicalizeChoiceLabel(value);
     if (!key || seen.has(key)) return false;
     seen.add(key);
     return true;
@@ -244,19 +254,19 @@ export function getHubReviewChoice(item, context = findHubSourceContext(item)) {
     ? savedOptions
     : getSourceChoiceLabels(context, activityType);
   const correctLabel = String(
-    item?.reviewCorrectOption
-    || getSourceCorrectOption(item, context, activityType)
+    getSourceCorrectOption(item, context, activityType)
     || item?.correctAnswer
+    || item?.reviewCorrectOption
     || ""
   ).trim();
-  const correctKey = canonicalizeAnswer(correctLabel);
+  const correctKey = canonicalizeChoiceLabel(correctLabel);
   const uniqueSourceLabels = uniqueLabels(sourceLabels);
   let labels;
   if (savedOptions.length) {
     labels = uniqueLabels([...uniqueSourceLabels, correctLabel]);
   } else {
     const limit = getOptionLimit(activityType, context?.activity, uniqueSourceLabels);
-    const distractors = uniqueSourceLabels.filter((label) => canonicalizeAnswer(label) !== correctKey);
+    const distractors = uniqueSourceLabels.filter((label) => canonicalizeChoiceLabel(label) !== correctKey);
     labels = rotateOptions(
       [correctLabel, ...distractors.slice(0, Math.max(1, limit - 1))].filter(Boolean),
       item?.itemId || item?.id
@@ -268,7 +278,7 @@ export function getHubReviewChoice(item, context = findHubSourceContext(item)) {
     correctLabel,
     options: labels.map((label) => ({
       label,
-      correct: canonicalizeAnswer(label) === correctKey,
+      correct: canonicalizeChoiceLabel(label) === correctKey,
     })),
   };
 }

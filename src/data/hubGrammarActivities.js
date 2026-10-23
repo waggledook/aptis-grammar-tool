@@ -222,10 +222,11 @@ const placeholderChoiceGapItem = (
     parts.push(source.slice(cursor, index));
 
     const gapId = `g${gapIndex + 1}`;
+    const acceptedAnswer = answers[gapIndex];
     parts.push({ gapId });
     gaps.push({
       id: gapId,
-      acceptedAnswers: [answers[gapIndex]],
+      acceptedAnswers: Array.isArray(acceptedAnswer) ? acceptedAnswer : [acceptedAnswer],
       feedback: explanation,
       choices,
     });
@@ -12042,7 +12043,7 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "When I was at university, I ____ in a shared house. One evening, I ____ when the fire alarm ____. Everyone ____ outside immediately.",
         ["used to live", "was studying", "rang", "ran"],
         "Use used to for the long-term past situation, the past continuous for the action in progress, and the past simple for the finished events.",
-        ["used to live", "was studying", "rang", "ran"]
+        ["rang", "used to live", "ran", "was studying"]
       ),
       errorCorrectionItem(
         "b1-b2-3a-ec-1",
@@ -12059,8 +12060,8 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "We were knowing each other at school.",
         "were knowing",
         false,
-        ["knew", "used to know"],
-        "Know describes a state, so use knew or used to know rather than the past continuous."
+        ["met", "knew", "used to know"],
+        "Know is not normally continuous here. Use knew or used to know for the past state, or met if the meaning is when the relationship began."
       ),
       errorCorrectionItem(
         "b1-b2-3a-ec-3",
@@ -13010,7 +13011,17 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         gaps: [
           { id: "g1", acceptedAnswers: ["have been preparing"], feedback: "Use the continuous for the ongoing activity." },
           { id: "g2", acceptedAnswers: ["have made"], feedback: "Use the simple because forty sandwiches is a completed quantity." },
-          { id: "g3", acceptedAnswers: ["haven't been sitting", "have not been sitting"], feedback: "Use the negative continuous for the activity over the period today." },
+          {
+            id: "g3",
+            acceptedAnswers: [
+              "haven't been sitting",
+              "have not been sitting",
+              "haven't sat",
+              "have not sat",
+            ],
+            feedback:
+              "Both forms work here: the continuous emphasizes the pattern over the day, while the simple focuses on how few times the speaker has sat down.",
+          },
         ],
       },
       {
@@ -13129,8 +13140,8 @@ const HUB_GRAMMAR_ACTIVITY_DEFINITIONS = [
         "b1-b2-6a-cg-1",
         "Choose the best form for each gap.",
         "Employees ____ display their ID badges. Visitors ____ enter the server room. You ____ book a desk on Fridays because plenty are free. If your back hurts, you ____ take regular breaks.",
-        ["have to", "mustn't", "don't have to", "should"],
-        "Distinguish obligation, prohibition, lack of obligation, and advice.",
+        ["have to", "mustn't", "don't have to", ["should", "ought to"]],
+        "Use have to for obligation, mustn't for prohibition, don't have to for lack of obligation, and should or ought to for advice.",
         ["have to", "must", "mustn't", "don't have to", "needn't", "should", "shouldn't", "ought to"]
       ),
       errorCorrectionItem(
