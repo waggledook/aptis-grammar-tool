@@ -9,7 +9,7 @@ import { INTERMEDIATE_PLUS_STUDY_WORK_IMAGES } from "./hubIntermediatePlusStudyW
 const ACCENT = "#c4c47f";
 
 // Add a bank's slug here after its assets and activities are ready for students.
-export const INTERMEDIATE_PLUS_PUBLISHED_BANKS = ["adjective-suffixes", "packing", "shops-services"];
+export const INTERMEDIATE_PLUS_PUBLISHED_BANKS = ["adjective-suffixes", "packing", "shops-services", "photography"];
 
 function slug(value) {
   return value.toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -504,7 +504,7 @@ const photographyContexts = photoQuestionVisuals(questions("photo-use", [
   ["Look at the edges throughout the image. The photo is _____.", "out of focus", ["overexposed", "in the foreground", "in the centre"], "The whole picture is blurred. An intentionally blurred background alone does not make a portrait out of focus."],
   ["The image has lost detail in its very bright areas. It is _____.", "overexposed", ["out of focus", "opposite", "spacious"], "Overexposure makes bright areas lose detail; it is different from a lack of sharpness."],
   ["To include more of the scenery in one image, choose a _____.", "wide-angle lens", ["portrait setting", "close-up", "flash"], "A wide-angle lens captures a broader field of view.", ["wide angle lens"]],
-  ["After saving the picture, I _____ it to crop the edges and change its brightness.", "edit", ["zoom in", "expose", "focus"], "Editing changes an existing image after it has been taken."],
+  ["After saving the picture, I _____ it to crop the edges and change its brightness.", "edit", ["zoom in", "expose", "focus"], "Both present simple edit and past simple edited work in this context.", ["edited"]],
   ["This detailed shot of the dog's face is a _____.", "close-up", ["landscape", "portrait setting", "wide-angle lens"], "A close-up shows a subject at very short range.", ["close up"]],
   ["For a photo of a person, select the camera's _____.", "portrait setting", ["wide-angle lens", "flash", "landscape"], "The highlighted person icon represents a mode intended for photographing people.", ["portrait mode"]],
   ["Light passes through the round optical part marked in gold: the _____.", "lens", ["flash", "portrait setting", "landscape"], "The lens directs light to form the image."],

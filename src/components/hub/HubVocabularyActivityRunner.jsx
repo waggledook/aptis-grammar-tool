@@ -21,6 +21,51 @@ function normalizeAnswer(value = "") {
     .replace(/[’']/g, "'");
 }
 
+function useFeedbackAdvanceShortcut(hasFeedback, onNext) {
+  const onNextRef = useRef(onNext);
+  onNextRef.current = onNext;
+
+  useEffect(() => {
+    if (!hasFeedback) return undefined;
+
+    function handleKeyDown(event) {
+      if (
+        event.key !== "Enter" ||
+        event.repeat ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        event.shiftKey ||
+        event.isComposing
+      ) {
+        return;
+      }
+
+      const target = event.target;
+      if (target instanceof HTMLTextAreaElement || target?.isContentEditable) return;
+      const externalControl = target?.closest?.("a, button, input, select, textarea, [contenteditable='true']");
+      if (externalControl && !externalControl.closest(".hub-vocab-practice-card")) return;
+
+      event.preventDefault();
+      event.stopPropagation();
+      onNextRef.current();
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [hasFeedback]);
+}
+
+function FeedbackNextButton({ onClick }) {
+  useFeedbackAdvanceShortcut(true, onClick);
+
+  return (
+    <button type="button" onClick={onClick} aria-keyshortcuts="Enter">
+      Next <span className="hub-vocab-next-shortcut" aria-hidden="true">Enter ↵</span>
+    </button>
+  );
+}
+
 function shuffle(items) {
   return [...items].sort(() => Math.random() - 0.5);
 }
@@ -989,7 +1034,7 @@ function ChoiceMode({
       {choiceStatus ? (
         <div className={`hub-vocab-feedback ${choiceStatus}`}>
           {choiceStatus === "correct" ? "Correct. Next one coming..." : "Not quite. Try again or move on."}
-          {choiceStatus === "wrong" ? <button type="button" onClick={next}>Next</button> : null}
+          {choiceStatus === "wrong" ? <FeedbackNextButton onClick={next} /> : null}
         </div>
       ) : null}
     </section>
@@ -1112,7 +1157,7 @@ function SpeakerChoiceMode({ theme, items, onComplete, onMistake }) {
           {choiceStatus === "correct"
             ? "Correct. Next one coming..."
             : `Not quite. This is usually ${entry.speaker === "teacher" ? "a teacher phrase" : "something the student says"}.`}
-          {choiceStatus === "wrong" ? <button type="button" onClick={next}>Next</button> : null}
+          {choiceStatus === "wrong" ? <FeedbackNextButton onClick={next} /> : null}
         </div>
       ) : null}
     </section>
@@ -1332,7 +1377,7 @@ function TypeAnswerMode({
               Answer: <strong>{isNationalityMode ? entry.nationality : isPluralMode ? entry.plural : isOppositeMode ? entry.opposite : isGapMode ? entry.gapAnswers?.[0] : getTypeAnswer(entry, theme.id)}</strong>
             </span>
           )}
-          {feedback === "wrong" ? <button type="button" onClick={next}>Next</button> : null}
+          {feedback === "wrong" ? <FeedbackNextButton onClick={next} /> : null}
         </div>
       ) : null}
     </section>
@@ -1476,7 +1521,7 @@ function PhraseGapFillMode({ items, onComplete, onMistake }) {
               Answer: <strong>{entry.gapAnswers?.[0]}</strong>
             </span>
           )}
-          {feedback === "wrong" ? <button type="button" onClick={next}>Next</button> : null}
+          {feedback === "wrong" ? <FeedbackNextButton onClick={next} /> : null}
         </div>
       ) : null}
     </section>
@@ -1880,7 +1925,7 @@ function ImageHotspotTypeMode({ theme, items, activity, onComplete, onMistake })
               Answer: <strong>{entry.term}</strong>
             </span>
           )}
-          {feedback === "wrong" ? <button type="button" onClick={next}>Next</button> : null}
+          {feedback === "wrong" ? <FeedbackNextButton onClick={next} /> : null}
         </div>
       ) : null}
     </section>
@@ -1999,7 +2044,7 @@ function ArticleChoiceMode({ theme, items, onComplete, onMistake }) {
       {choiceStatus ? (
         <div className={`hub-vocab-feedback ${choiceStatus}`}>
           {choiceStatus === "correct" ? `Correct. ${entry.article} ${entry.term}.` : `Not quite. It should be ${entry.article} ${entry.term}.`}
-          {choiceStatus === "wrong" ? <button type="button" onClick={next}>Next</button> : null}
+          {choiceStatus === "wrong" ? <FeedbackNextButton onClick={next} /> : null}
         </div>
       ) : null}
     </section>
@@ -2179,7 +2224,7 @@ function CategorySortMode({
             </span>
             {entry.explanation ? <p className="hub-vocab-answer-explanation">{entry.explanation}</p> : null}
           </div>
-          {feedback.status === "wrong" || entry.explanation ? <button type="button" onClick={next}>Next</button> : null}
+          {feedback.status === "wrong" || entry.explanation ? <FeedbackNextButton onClick={next} /> : null}
         </div>
       ) : null}
     </section>
@@ -2374,7 +2419,7 @@ function StructuredQuestionMode({
   }
 
   const prompt = (
-    <div className="hub-vocab-choice-prompt">
+    <div className={`hub-vocab-choice-prompt${entry.image ? " has-visual-question" : ""}`}>
       {promptType === "clock" ? (
         <ClockFace hour={entry.hour} minute={entry.minute} />
       ) : (
@@ -2457,7 +2502,7 @@ function StructuredQuestionMode({
             </span>
             {entry.explanation ? <p className="hub-vocab-answer-explanation">{entry.explanation}</p> : null}
           </div>
-          {feedback.status === "wrong" || entry.explanation ? <button type="button" onClick={next}>Next</button> : null}
+          {feedback.status === "wrong" || entry.explanation ? <FeedbackNextButton onClick={next} /> : null}
         </div>
       ) : null}
     </section>
@@ -3062,6 +3107,14 @@ function HubVocabularyActivityContent({ isDraft }) {
           padding: 0.65rem 1rem;
         }
 
+        .hub-vocab-next-shortcut {
+          font-size: 0.78em;
+          font-weight: 700;
+          margin-left: 0.35rem;
+          opacity: 0.68;
+          white-space: nowrap;
+        }
+
         .hub-vocab-tabs button.active {
           background: #f6bd60;
           border-color: #f6bd60;
@@ -3355,26 +3408,29 @@ function HubVocabularyActivityContent({ isDraft }) {
         }
 
         .has-picture-practice .hub-vocab-match-column {
+          gap: 0.35rem;
           grid-auto-rows: 1fr;
         }
 
         .has-picture-practice .hub-vocab-match-column button {
+          border-radius: 16px;
           flex-direction: column;
-          gap: 0.45rem;
-          min-height: 155px;
+          gap: 0.35rem;
+          min-height: 132px;
           min-width: 0;
           overflow-wrap: anywhere;
+          padding: 0.45rem 0.55rem;
         }
 
         .has-picture-practice .hub-vocab-match-column .hub-vocab-object-image.compact {
-          max-height: 95px;
-          max-width: min(120px, 100%);
+          max-height: 92px;
+          max-width: min(132px, 100%);
         }
 
         .hub-vocab-match-image-clue {
-          font-size: 0.8rem;
+          font-size: 0.76rem;
           font-weight: 500;
-          line-height: 1.35;
+          line-height: 1.25;
         }
 
         .has-storefront-visuals .hub-vocab-match-grid {
@@ -3404,13 +3460,13 @@ function HubVocabularyActivityContent({ isDraft }) {
         }
 
         .has-photography-visuals .hub-vocab-object-image.is-scene {
-          max-height: min(460px, 85vw);
-          max-width: min(640px, 100%);
+          max-height: min(260px, 48vw);
+          max-width: min(360px, 100%);
         }
 
         .has-photography-visuals .hub-vocab-match-column .hub-vocab-object-image.compact {
-          max-height: 155px;
-          max-width: min(230px, 100%);
+          max-height: 92px;
+          max-width: min(132px, 100%);
         }
 
         .has-photography-visuals .hub-vocab-type-form .hub-vocab-object-image {
@@ -3804,6 +3860,56 @@ function HubVocabularyActivityContent({ isDraft }) {
           line-height: 1.25;
           max-width: 52rem;
           text-align: center;
+        }
+
+        .has-picture-practice .hub-vocab-practice-card {
+          gap: 0.75rem;
+          padding: clamp(0.85rem, 2vw, 1.15rem);
+        }
+
+        .has-picture-practice .hub-vocab-choice-prompt.has-visual-question {
+          align-items: center;
+          column-gap: clamp(1rem, 3vw, 1.75rem);
+          grid-template-columns: minmax(150px, 280px) minmax(0, 1fr);
+          justify-items: stretch;
+          justify-self: center;
+          max-width: 900px;
+          row-gap: 0.45rem;
+          width: 100%;
+        }
+
+        .has-picture-practice .hub-vocab-choice-prompt.has-visual-question > .hub-vocab-object-image,
+        .has-picture-practice .hub-vocab-choice-prompt.has-visual-question > .hub-vocab-image-focus {
+          grid-column: 1;
+          grid-row: 1 / span 2;
+          justify-self: center;
+        }
+
+        .has-picture-practice .hub-vocab-choice-prompt.has-visual-question > .hub-vocab-structured-prompt,
+        .has-picture-practice .hub-vocab-choice-prompt.has-visual-question > .hub-vocab-word-formation-prompt {
+          font-size: clamp(1.25rem, 2vw, 1.8rem);
+          grid-column: 2;
+          line-height: 1.2;
+          max-width: 42rem;
+          text-align: left;
+        }
+
+        .has-picture-practice .hub-vocab-choice-prompt.has-visual-question > p {
+          grid-column: 2;
+          text-align: left;
+        }
+
+        .has-picture-practice .hub-vocab-choice-grid {
+          gap: 0.55rem;
+          justify-self: center;
+          max-width: 900px;
+          width: 100%;
+        }
+
+        .has-picture-practice .hub-vocab-choice-grid button {
+          font-size: 0.92rem;
+          min-height: 2.85rem;
+          padding: 0.48rem 0.65rem;
         }
 
         .hub-vocab-word-formation-prompt {
@@ -4361,6 +4467,21 @@ function HubVocabularyActivityContent({ isDraft }) {
             padding: 0.85rem;
           }
 
+          .has-picture-practice .hub-vocab-choice-prompt.has-visual-question {
+            grid-template-columns: minmax(0, 1fr);
+          }
+
+          .has-picture-practice .hub-vocab-choice-prompt.has-visual-question > .hub-vocab-object-image,
+          .has-picture-practice .hub-vocab-choice-prompt.has-visual-question > .hub-vocab-image-focus,
+          .has-picture-practice .hub-vocab-choice-prompt.has-visual-question > .hub-vocab-structured-prompt,
+          .has-picture-practice .hub-vocab-choice-prompt.has-visual-question > .hub-vocab-word-formation-prompt,
+          .has-picture-practice .hub-vocab-choice-prompt.has-visual-question > p {
+            grid-column: 1;
+            grid-row: auto;
+            justify-self: center;
+            text-align: center;
+          }
+
           .hub-vocab-match-grid {
             grid-template-columns: minmax(4.8rem, 0.74fr) minmax(0, 1.26fr);
             gap: 0.42rem;
@@ -4385,6 +4506,22 @@ function HubVocabularyActivityContent({ isDraft }) {
           .hub-vocab-object-image.compact {
             max-height: 1.85rem;
             max-width: 3.2rem;
+          }
+
+          .has-picture-practice .hub-vocab-match-column button {
+            gap: 0.25rem;
+            min-height: 92px;
+            padding: 0.35rem 0.4rem;
+          }
+
+          .has-picture-practice .hub-vocab-match-column .hub-vocab-object-image.compact {
+            max-height: 64px;
+            max-width: min(92px, 100%);
+          }
+
+          .has-picture-practice .hub-vocab-match-image-clue {
+            font-size: 0.7rem;
+            line-height: 1.2;
           }
 
           .has-storefront-visuals .hub-vocab-match-grid {
