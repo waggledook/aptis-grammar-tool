@@ -7396,3 +7396,15 @@ export function getHubVocabActivity(themeId, activityId) {
   const activity = theme.activities.find((item) => item.id === activityId) || null;
   return activity ? { theme, activity } : null;
 }
+
+export function getHubVocabActivityItems(theme, activity) {
+  if (!theme || !activity) return [];
+  if (
+    theme.id === "people-family" &&
+    (activity.id === "family-matching" || activity.id === "family-spelling")
+  ) {
+    return [...(theme.entries || []), ...(theme.familyEntries || [])];
+  }
+  const dataset = activity.dataKey ? theme[activity.dataKey] : theme.entries;
+  return Array.isArray(dataset) ? dataset : [];
+}

@@ -19,8 +19,8 @@ const expectedTitles = [
 ];
 const normalize = (value) => String(value).toLowerCase().replace(/[’]/g, "'").replace(/[-–—]/g, " ").replace(/[.,!?]/g, "").replace(/\s+/g, " ").trim();
 
-test("only the first four Intermediate Plus banks are published to students", () => {
-  const expected = ["b1-b2-adjective-suffixes", "b1-b2-packing", "b1-b2-shops-services", "b1-b2-photography"];
+test("only the first five Intermediate Plus banks are published to students", () => {
+  const expected = ["b1-b2-adjective-suffixes", "b1-b2-packing", "b1-b2-shops-services", "b1-b2-photography", "b1-b2-rubbish-recycling"];
   for (const user of [undefined, { role: "student" }, { role: "teacher" }, { role: "admin" }]) {
     assert.deepEqual(getVisibleHubVocabThemes(user).filter((theme) => theme.level === "b1-b2").map((theme) => theme.id), expected);
     if (user?.role !== "admin") assert.deepEqual(getVisibleHubVocabThemes(user, { includeDrafts: true }).filter((theme) => theme.level === "b1-b2").map((theme) => theme.id), expected);
@@ -31,7 +31,7 @@ test("only the first four Intermediate Plus banks are published to students", ()
 
 test("unpublished banks remain admin-accessible but not through student direct links or mistake review", () => {
   for (const theme of themes) {
-    const published = theme.order <= 4;
+    const published = theme.order <= 5;
     assert.equal(canAccessHubVocabTheme(theme, { role: "student" }), published);
     assert.equal(canAccessHubVocabTheme(theme, { role: "teacher" }), published);
     assert(canAccessHubVocabTheme(theme, { role: "admin" }));
@@ -201,9 +201,9 @@ test("published Photography covers every term visually and in sentence recall", 
   assert(!getHubVocabActivity(theme.id, "meaning-matching"), "Visual practice replaces the duplicate meaning exercise.");
 });
 
-test("Recycling uses the complete picture set, reuses topic images and tests all 33 terms in six activities", () => {
+test("published Recycling uses the complete picture set, reuses topic images and tests all 33 terms in six activities", () => {
   const { theme } = getHubVocabActivity("b1-b2-rubbish-recycling", "recycling-written-recall");
-  assert.equal(theme.studentVisible, false);
+  assert.equal(theme.studentVisible, true);
   assert.equal(theme.activities.length, 6);
   assert.equal(theme.recyclingPictureStudy.length, 33);
   assert.equal(theme.recyclingPictureStudy.filter((entry) => entry.image).length, 24);

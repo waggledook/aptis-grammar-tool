@@ -15,6 +15,7 @@ import {
   fetchWritingP3Submissions,
   fetchWritingP4Submissions,
   fetchVocabProgressMap,
+  fetchHubVocabProgress,
   fetchSpeakingProgressMap,
   fetchReadingProgressMap,
   fetchOteTrainingProgressMap,
@@ -106,6 +107,7 @@ import ToastHost from './components/ToastHost';
 import Footer from "./components/common/Footer";
 import VocabularyTopics from "./components/vocabulary/VocabularyTopics";
 import { getTopicSetIds } from "./components/vocabulary/data/vocabTopics";
+import { resolveTextbookVocabAssignmentCompletion } from "./utils/textbookVocabAssignments.js";
 import CollocationDash from "./components/vocabulary/collocations/CollocationDash";
 import CollocationPrecisionTrainer from "./components/vocabulary/collocations/CollocationPrecisionTrainer";
 import CollocationTeamLiveHost from "./components/vocabulary/collocations/CollocationTeamLiveHost.jsx";
@@ -241,6 +243,9 @@ import HubMeaningfulPrefixesLesson from "./components/hub/HubMeaningfulPrefixesL
 import HubVocabularyMenu from "./components/hub/HubVocabularyMenu.jsx";
 import HubVocabularyA1Menu from "./components/hub/HubVocabularyA1Menu.jsx";
 import HubVocabularyActivityRunner from "./components/hub/HubVocabularyActivityRunner.jsx";
+import TextbookVocabLiveBuilder from "./components/hub/TextbookVocabLiveBuilder.jsx";
+import TextbookVocabLiveHost from "./components/hub/TextbookVocabLiveHost.jsx";
+import TextbookVocabLivePlayer from "./components/hub/TextbookVocabLivePlayer.jsx";
 import HubGamesMenu from "./components/hub/HubGamesMenu.jsx";
 import HubGameLeaderboards from "./components/hub/HubGameLeaderboards.jsx";
 import HubDependentPrepositionGame from "./components/hub/HubDependentPrepositionGame.jsx";
@@ -868,9 +873,10 @@ useEffect(() => {
     }
 
     try {
-      const [assignments, vocabProgress, speakingProgress, readingProgress, oteTrainingProgress, dictationSessions, translationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+      const [assignments, vocabProgress, textbookVocabProgress, speakingProgress, readingProgress, oteTrainingProgress, dictationSessions, translationSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
         listAssignedActivitiesForStudent(user.uid),
         fetchVocabProgressMap(user.uid),
+        fetchHubVocabProgress(user.uid),
         fetchSpeakingProgressMap(user.uid),
         fetchReadingProgressMap(user.uid),
         fetchOteTrainingProgressMap(user.uid),
@@ -888,6 +894,7 @@ useEffect(() => {
 
       const completionSources = {
         vocabulary: vocabProgress || {},
+        textbookVocabulary: textbookVocabProgress || {},
         speaking: speakingProgress || {},
         reading: readingProgress || {},
         oteTraining: oteTrainingProgress || {},
@@ -970,6 +977,12 @@ useEffect(() => {
             (setId) => timestampToMs(completionSources.vocabulary?.[`${topicId}:${setId}`]) < assignedAt
           );
         }
+        if (assignment.activityType === "textbook-vocabulary") {
+          return !resolveTextbookVocabAssignmentCompletion(
+            assignment,
+            completionSources.textbookVocabulary
+          ).completed;
+        }
         if (assignment.activityType === "dictation") {
           return (completionSources.dictation?.[assignment.id] || 0) < assignedAt;
         }
@@ -1025,8 +1038,9 @@ const linkedAptisAccess = {
   isDemoMode: isLinkedAptisDemoMode,
 };
 const hasMemberSiteAccess = !requiresMemberAccess || (isOteSite ? hasOteAccess : hasSeifHubAccess);
-const isTeacherToolsRoute = ["/teacher-tools", "/teacher/transcription", "/live/collocations/setup"].includes(location.pathname)
-  || location.pathname.startsWith("/live/collocations/host/");
+const isTeacherToolsRoute = ["/teacher-tools", "/teacher/transcription", "/live/collocations/setup", "/vocabulary/textbook/live"].includes(location.pathname)
+  || location.pathname.startsWith("/live/collocations/host/")
+  || location.pathname.startsWith("/live/textbook-vocabulary/host/");
 const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-it/join";
 const isPublicSpanglishPlayRoute = /^\/games\/spanglish-fix-it\/play\/[^/]+$/.test(location.pathname);
 const isPublicOteLevelTestRoute =
@@ -2946,6 +2960,14 @@ return (
 <Route path="/vocabulary/strategy-guide" element={<AptisVocabularyStrategyGuide />} />
 <Route path="/vocabulary/textbook" element={<HubVocabularyA1Menu user={user} />} />
 <Route
+  path="/vocabulary/textbook/live"
+  element={
+    <RequireTeacher user={user}>
+      <TextbookVocabLiveBuilder user={user} />
+    </RequireTeacher>
+  }
+/>
+<Route
   path="/vocabulary/textbook/mistakes"
   element={
     <VocabMistakeReview
@@ -3441,6 +3463,8 @@ return (
 <Route path="/live/collocations/setup" element={<RequireTeacher user={user}><CollocationTeamLiveSetup user={user} /></RequireTeacher>} />
 <Route path="/live/collocations/host/:gameId" element={<RequireTeacher user={user}><CollocationTeamLiveHost /></RequireTeacher>} />
 <Route path="/live/collocations/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><CollocationTeamLivePlayer /></RequireSignedIn>} />
+<Route path="/live/textbook-vocabulary/host/:gameId" element={<RequireTeacher user={user}><TextbookVocabLiveHost /></RequireTeacher>} />
+<Route path="/live/textbook-vocabulary/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><TextbookVocabLivePlayer /></RequireSignedIn>} />
 <Route path="/live/option-jury/host/:gameId" element={<OteOptionJuryHost user={user} />} />
 <Route path="/live/option-jury/play/:gameId" element={<OteOptionJuryPlayer />} />
 <Route path="/live/part4-evidence/host/:gameId" element={<RequireTeacher user={user}><OteReadingPart4EvidenceLiveHost user={user} /></RequireTeacher>} />

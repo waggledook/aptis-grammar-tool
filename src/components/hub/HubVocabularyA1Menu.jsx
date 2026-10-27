@@ -9,6 +9,7 @@ import {
   HUB_VOCAB_LEVELS,
   HUB_VOCAB_LEVEL_COLORS,
 } from "../../data/hubVocabularyActivities.js";
+import TextbookVocabAssignButton from "./TextbookVocabAssignButton.jsx";
 
 function getSearchText(theme) {
   return [
@@ -102,6 +103,11 @@ export default function HubVocabularyA1Menu({ user }) {
         </div>
 
         <div className="hub-vocab-banner-actions">
+          {user?.role === "teacher" || user?.role === "admin" ? (
+            <button className="whats-new-btn" onClick={() => navigate(getSitePath("/vocabulary/textbook/live"))}>
+              Create live quiz
+            </button>
+          ) : null}
           <button className="whats-new-btn secondary" onClick={() => navigate(getSitePath("/vocabulary/textbook/mistakes"))}>
             Review mistakes
           </button>
@@ -208,6 +214,9 @@ export default function HubVocabularyA1Menu({ user }) {
               </div>
               <span className="hub-vocab-card-cta">Open practice menu</span>
             </button>
+            <div className="hub-vocab-topic-teacher-actions">
+              <TextbookVocabAssignButton user={user} theme={theme} />
+            </div>
           </article>
           );
         })}
@@ -567,6 +576,13 @@ export default function HubVocabularyA1Menu({ user }) {
           font-size: 0.82rem;
           font-weight: 700;
           padding: 0.25rem 0.62rem;
+        }
+
+        .hub-vocab-topic-teacher-actions {
+          display: flex;
+          justify-content: flex-end;
+          padding-top: 0.75rem;
+          border-top: 1px solid rgba(238, 244, 255, 0.11);
         }
 
         .hub-vocab-topic-progress {

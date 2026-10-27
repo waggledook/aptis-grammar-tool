@@ -9,7 +9,7 @@ import { INTERMEDIATE_PLUS_STUDY_WORK_IMAGES } from "./hubIntermediatePlusStudyW
 const ACCENT = "#c4c47f";
 
 // Add a bank's slug here after its assets and activities are ready for students.
-export const INTERMEDIATE_PLUS_PUBLISHED_BANKS = ["adjective-suffixes", "packing", "shops-services", "photography"];
+export const INTERMEDIATE_PLUS_PUBLISHED_BANKS = ["adjective-suffixes", "packing", "shops-services", "photography", "rubbish-recycling"];
 
 function slug(value) {
   return value.toLowerCase().replace(/['’]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");

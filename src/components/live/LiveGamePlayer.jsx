@@ -348,7 +348,7 @@ export default function LiveGamePlayer() {
         `}
       </style>
 
-      <h1>Live Game</h1>
+      <h1>{game.title || "Live Game"}</h1>
       <p className="muted">
         Game PIN: <strong>{game.pin}</strong>
       </p>
@@ -467,6 +467,34 @@ export default function LiveGamePlayer() {
 
           {!loadingItems && currentItem && (
           <>
+            {currentItem.image ? (
+              <img
+                src={currentItem.image}
+                alt={currentItem.imageAlt || "Vocabulary question"}
+                style={{
+                  display: "block",
+                  width: "min(100%, 420px)",
+                  maxHeight: "260px",
+                  objectFit: "contain",
+                  margin: "0 auto .9rem",
+                  borderRadius: ".8rem",
+                }}
+              />
+            ) : null}
+            {!currentItem.image && currentItem.colorHex ? (
+              <div
+                role="img"
+                aria-label="Colour shown for this vocabulary question"
+                style={{
+                  width: "min(100%, 320px)",
+                  height: "160px",
+                  margin: "0 auto .9rem",
+                  border: "1px solid rgba(255,255,255,.2)",
+                  borderRadius: ".8rem",
+                  background: currentItem.colorHex,
+                }}
+              />
+            ) : null}
             <p
               style={{
                 marginBottom: ".75rem",

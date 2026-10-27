@@ -109,6 +109,12 @@ import {
   getCollocationDraftAnswers,
   getCorrectWords,
 } from "../components/vocabulary/collocations/collocationTeamLive.js";
+import {
+  getTextbookVocabLiveMode,
+  isTextbookVocabLiveWrittenAnswerCorrect,
+  scoreTextbookVocabLiveAnswer,
+  TEXTBOOK_VOCAB_LIVE_GAME_TYPE,
+} from "../components/hub/textbookVocabLive.js";
 
 const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
 const SPANGLISH_GUEST_TOKEN_STORAGE_KEY = "spanglish_fixit_guest_token";
@@ -218,6 +224,320 @@ export async function createLiveGame({ setId, type = "grammar" }) {
 
   await set(gameRef, initialData);
   return { gameId, pin };
+}
+
+function cleanTextbookVocabLiveQuestion(question) {
+  const interactionType = getTextbookVocabLiveMode(question.interactionType).id;
+  const base = {
+    id: String(question.id),
+    interactionType,
+    sourceThemeId: String(question.sourceThemeId || ""),
+    sourceThemeTitle: String(question.sourceThemeTitle || ""),
+    sourceActivityId: String(question.sourceActivityId || ""),
+    sourceActivityTitle: String(question.sourceActivityTitle || ""),
+    sourceActivityType: String(question.sourceActivityType || ""),
+    level: String(question.level || ""),
+    textbookRef: String(question.textbookRef || ""),
+    sentence: String(question.sentence || question.text || ""),
+    text: String(question.text || question.sentence || ""),
+    image: String(question.image || ""),
+    colorHex: String(question.colorHex || ""),
+    imageAlt: String(question.imageAlt || "Vocabulary question image"),
+  };
+
+  if (!base.id || !base.sentence) {
+    throw new Error("One of the selected vocabulary questions is incomplete.");
+  }
+
+  if (interactionType === "matching") {
+    const matchOptions = (question.matchOptions || []).slice(0, 4).map((option) => String(option || "").trim());
+    const pairs = (question.pairs || []).slice(0, 4).map((pair) => ({
+      id: String(pair.id || ""),
+      prompt: String(pair.prompt || ""),
+      image: String(pair.image || ""),
+      colorHex: String(pair.colorHex || ""),
+      imageAlt: String(pair.imageAlt || "Vocabulary prompt"),
+      answerIndex: Number(pair.answerIndex),
+    }));
+    if (
+      matchOptions.length !== 4 ||
+      matchOptions.some((option) => !option) ||
+      new Set(matchOptions.map((option) => option.toLowerCase())).size !== 4 ||
+      pairs.length !== 4 ||
+      pairs.some((pair) => !pair.id || !pair.prompt || !Number.isInteger(pair.answerIndex) || pair.answerIndex < 0 || pair.answerIndex >= 4)
+    ) {
+      throw new Error("Each matching round needs four complete, distinct pairs.");
+    }
+    return { ...base, matchOptions, pairs };
+  }
+
+  const answer = String(question.answer || question.options?.[question.answerIndex] || "").trim();
+  if (!answer) throw new Error("One of the selected vocabulary questions has no answer.");
+
+  if (interactionType === "write") {
+    const acceptedAnswers = [...new Set([
+      answer,
+      ...(question.acceptedAnswers || []).map((acceptedAnswer) => String(acceptedAnswer || "").trim()),
+    ].filter(Boolean))].slice(0, 12);
+    return { ...base, answer, acceptedAnswers };
+  }
+
+  const options = (question.options || []).slice(0, 4).map((option) => String(option || "").trim());
+  const answerIndex = Number(question.answerIndex);
+  if (
+    options.length < 2 ||
+    options.some((option) => !option) ||
+    !Number.isInteger(answerIndex) ||
+    answerIndex < 0 ||
+    answerIndex >= options.length
+  ) {
+    throw new Error("One of the selected multiple-choice questions is incomplete.");
+  }
+  return {
+    ...base,
+    answer,
+    options,
+    answerIndex,
+    explanations: options.map((_, index) => String(question.explanations?.[index] || "")),
+  };
+}
+
+const TEXTBOOK_VOCAB_LIVE_DURATIONS = [15, 20, 30, 45, 60, 90];
+
+function textbookVocabDurationForItem(game, item) {
+  const interactionType = getTextbookVocabLiveMode(item?.interactionType).id;
+  return Number(game?.state?.modeDurations?.[interactionType])
+    || Number(game?.state?.questionDuration)
+    || getTextbookVocabLiveMode(interactionType).defaultDuration;
+}
+
+export async function createTextbookVocabLiveGame({ items, title, questionDuration, modeDurations = {} } = {}) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to host a vocabulary quiz.");
+  if (!Array.isArray(items) || items.length < 1) throw new Error("Choose vocabulary for the live quiz.");
+  if (items.length > 50) throw new Error("Live vocabulary quizzes can contain up to 50 questions.");
+
+  const cleanItems = items.map(cleanTextbookVocabLiveQuestion);
+  const activeModes = [...new Set(cleanItems.map((item) => item.interactionType))];
+  const minimumItems = activeModes.length === 1 && activeModes[0] === "matching" ? 1 : 2;
+  if (cleanItems.length < minimumItems) throw new Error("Choose enough vocabulary for at least two live rounds.");
+  const sessionMode = activeModes.length === 1 ? activeModes[0] : "mixed";
+  const cleanModeDurations = Object.fromEntries(activeModes.map((interactionType) => {
+    const requestedDuration = Number(modeDurations[interactionType] ?? questionDuration);
+    return [
+      interactionType,
+      TEXTBOOK_VOCAB_LIVE_DURATIONS.includes(requestedDuration)
+        ? requestedDuration
+        : getTextbookVocabLiveMode(interactionType).defaultDuration,
+    ];
+  }));
+
+  const gameRef = push(ref(rtdb, "liveGames"));
+  const gameId = gameRef.key;
+  const pin = generatePin();
+  const cleanTitle = String(title || "").trim().slice(0, 120) || "Textbook Vocabulary Quiz";
+  const firstDuration = cleanModeDurations[cleanItems[0].interactionType];
+  await set(gameRef, {
+    ownerUid: user.uid,
+    setId: "textbook-vocabulary-custom",
+    type: TEXTBOOK_VOCAB_LIVE_GAME_TYPE,
+    interactionType: sessionMode,
+    title: cleanTitle,
+    pin,
+    items: cleanItems,
+    status: "lobby",
+    createdAt: Date.now(),
+    state: {
+      phase: "lobby",
+      questionIndex: 0,
+      questionDuration: firstDuration,
+      modeDurations: cleanModeDurations,
+      questionDeadline: null,
+    },
+  });
+  return { gameId, pin };
+}
+
+async function getOwnedTextbookVocabLiveGame(gameId) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to control the quiz.");
+  const [snapshot, offset] = await Promise.all([
+    get(ref(rtdb, `liveGames/${gameId}`)),
+    getRealtimeServerTimeOffset(rtdb),
+  ]);
+  const game = snapshot.val();
+  if (!game || game.type !== TEXTBOOK_VOCAB_LIVE_GAME_TYPE || game.ownerUid !== user.uid) {
+    throw new Error("Only the quiz host can control this room.");
+  }
+  return { game, serverNow: Date.now() + offset };
+}
+
+export async function setTextbookVocabLiveDuration(gameId, questionDuration, interactionType) {
+  const { game } = await getOwnedTextbookVocabLiveGame(gameId);
+  const duration = Number(questionDuration);
+  if (game.status !== "lobby") throw new Error("The timer can only be changed in the lobby.");
+  if (!TEXTBOOK_VOCAB_LIVE_DURATIONS.includes(duration)) throw new Error("Choose an available question time.");
+  const cleanMode = getTextbookVocabLiveMode(interactionType || game.items?.[0]?.interactionType).id;
+  if (!game.items?.some((item) => item.interactionType === cleanMode)) throw new Error("That format is not used in this quiz.");
+  const updates = { [`state/modeDurations/${cleanMode}`]: duration };
+  if (game.items?.[0]?.interactionType === cleanMode) updates["state/questionDuration"] = duration;
+  await update(ref(rtdb, `liveGames/${gameId}`), updates);
+}
+
+export async function startTextbookVocabLiveGame(gameId) {
+  const { game, serverNow } = await getOwnedTextbookVocabLiveGame(gameId);
+  const minimumItems = game.items?.every((item) => item.interactionType === "matching") ? 1 : 2;
+  if (game.status !== "lobby" || !Array.isArray(game.items) || game.items.length < minimumItems) {
+    throw new Error("This quiz is not ready to start.");
+  }
+  const duration = textbookVocabDurationForItem(game, game.items[0]);
+  await update(ref(rtdb, `liveGames/${gameId}`), {
+    status: "in-progress",
+    "state/phase": "question",
+    "state/questionIndex": 0,
+    "state/questionDuration": duration,
+    "state/questionDeadline": serverNow + (duration * 1000),
+    "state/startedAt": serverNow,
+  });
+}
+
+export async function revealTextbookVocabLiveQuestion(gameId, expectedDeadline, expectedIndex) {
+  const { game, serverNow } = await getOwnedTextbookVocabLiveGame(gameId);
+  if (game.status !== "in-progress" || game.state?.phase !== "question") return;
+  await runTransaction(ref(rtdb, `liveGames/${gameId}/state`), (current) => {
+    if (!current || current.phase !== "question") return;
+    if (expectedDeadline != null && current.questionDeadline !== expectedDeadline) return;
+    if (expectedIndex != null && current.questionIndex !== expectedIndex) return;
+    return {
+      ...current,
+      phase: "reveal",
+      questionDeadline: null,
+      revealedAt: serverNow,
+    };
+  }, { applyLocally: false });
+}
+
+export async function startNextTextbookVocabLiveQuestion(gameId) {
+  const { game, serverNow } = await getOwnedTextbookVocabLiveGame(gameId);
+  const currentIndex = Number(game.state?.questionIndex) || 0;
+  const nextIndex = currentIndex + 1;
+  if (game.status !== "in-progress" || game.state?.phase !== "reveal") {
+    throw new Error("Reveal the current answer before moving on.");
+  }
+  if (nextIndex >= game.items.length) {
+    await finishTextbookVocabLiveGame(gameId);
+    return;
+  }
+  const duration = textbookVocabDurationForItem(game, game.items[nextIndex]);
+  await update(ref(rtdb, `liveGames/${gameId}/state`), {
+    phase: "question",
+    questionIndex: nextIndex,
+    questionDuration: duration,
+    questionDeadline: serverNow + (duration * 1000),
+    phaseStartedAt: serverNow,
+  });
+}
+
+export async function finishTextbookVocabLiveGame(gameId) {
+  const { game, serverNow } = await getOwnedTextbookVocabLiveGame(gameId);
+  if (game.status === "finished") return;
+  await update(ref(rtdb, `liveGames/${gameId}`), {
+    status: "finished",
+    "state/phase": "finished",
+    "state/questionDeadline": null,
+    "state/finishedAt": serverNow,
+  });
+}
+
+export async function submitTextbookVocabLiveAnswer({ gameId, selectedIndex, typedAnswer, matches }) {
+  const user = auth.currentUser;
+  if (!user) throw new Error("You must be signed in to answer.");
+
+  const [snapshot, offset] = await Promise.all([
+    get(ref(rtdb, `liveGames/${gameId}`)),
+    getRealtimeServerTimeOffset(rtdb),
+  ]);
+  const game = snapshot.val();
+  const serverNow = Date.now() + offset;
+  const questionIndex = Number(game?.state?.questionIndex) || 0;
+  const item = game?.items?.[questionIndex];
+  if (!game || game.type !== TEXTBOOK_VOCAB_LIVE_GAME_TYPE) throw new Error("Quiz not found.");
+  if (!game.players?.[user.uid]) throw new Error("Join the quiz before answering.");
+  if (game.status !== "in-progress" || game.state?.phase !== "question") {
+    throw new Error("This question is not accepting answers.");
+  }
+  if (!game.state?.questionDeadline || serverNow >= game.state.questionDeadline) {
+    throw new Error("Time is up for this question.");
+  }
+  if (!item) throw new Error("This vocabulary question is unavailable.");
+
+  const interactionType = getTextbookVocabLiveMode(item.interactionType || game.interactionType).id;
+  let answerPayload;
+  let correct;
+  let correctCount;
+  let totalCount;
+
+  if (interactionType === "write") {
+    const cleanTypedAnswer = String(typedAnswer || "").trim().slice(0, 200);
+    if (!cleanTypedAnswer) throw new Error("Write an answer before submitting.");
+    correct = isTextbookVocabLiveWrittenAnswerCorrect(cleanTypedAnswer, item.acceptedAnswers || [item.answer]);
+    answerPayload = { typedAnswer: cleanTypedAnswer };
+  } else if (interactionType === "matching") {
+    const cleanMatches = Array.isArray(matches) ? matches.map(Number) : [];
+    totalCount = item.pairs?.length || 0;
+    if (
+      totalCount !== 4 ||
+      cleanMatches.length !== totalCount ||
+      new Set(cleanMatches).size !== totalCount ||
+      cleanMatches.some((optionIndex) => !Number.isInteger(optionIndex) || optionIndex < 0 || optionIndex >= item.matchOptions.length)
+    ) {
+      throw new Error("Match all four items before submitting.");
+    }
+    correctCount = item.pairs.reduce((count, pair, pairIndex) => (
+      count + (cleanMatches[pairIndex] === pair.answerIndex ? 1 : 0)
+    ), 0);
+    correct = correctCount === totalCount;
+    answerPayload = { matches: cleanMatches, correctCount, totalCount };
+  } else {
+    const optionIndex = Number(selectedIndex);
+    if (!Number.isInteger(optionIndex) || optionIndex < 0 || optionIndex >= item.options.length) {
+      throw new Error("Choose an available answer.");
+    }
+    correct = optionIndex === item.answerIndex;
+    answerPayload = { selectedIndex: optionIndex };
+  }
+
+  const fullScore = scoreTextbookVocabLiveAnswer({
+    correct: interactionType === "matching" ? correctCount > 0 : correct,
+    remainingMs: game.state.questionDeadline - serverNow,
+    durationSeconds: game.state.questionDuration,
+  });
+  const scoreDelta = interactionType === "matching"
+    ? Math.round(fullScore * (correctCount / totalCount))
+    : fullScore;
+  const answerResult = await runTransaction(
+    ref(rtdb, `liveGames/${gameId}/answers/${questionIndex}/${user.uid}`),
+    (current) => current ? undefined : {
+      ...answerPayload,
+      correct,
+      scoreDelta,
+      submittedAt: serverNow,
+    },
+    { applyLocally: false }
+  );
+  if (!answerResult.committed) throw new Error("Your answer is already locked.");
+
+  await runTransaction(ref(rtdb, `liveGames/${gameId}/players/${user.uid}`), (current) => {
+    if (!current) return;
+    return {
+      ...current,
+      score: (Number(current.score) || 0) + scoreDelta,
+      lastAnswerCorrect: correct,
+      ...(interactionType === "multiple-choice" ? { lastAnswerIndex: answerPayload.selectedIndex } : {}),
+      ...(interactionType === "matching" ? { lastAnswerCorrectCount: correctCount } : {}),
+    };
+  });
+  return { correct, scoreDelta };
 }
 
 function cleanCollocationLiveItem(item) {
@@ -347,10 +667,12 @@ export async function joinLiveGameByPin(pin) {
     game.type === READING_PART4_LIVE_GAME_TYPE ||
     game.type === OTE_ADVANCED_READING_PART2_LIVE_GAME_TYPE ||
     game.type === OTE_ADVANCED_READING_PART2_PARAGRAPH_LIVE_GAME_TYPE ||
-    game.type === COLLOCATION_TEAM_GAME_TYPE
+    game.type === COLLOCATION_TEAM_GAME_TYPE ||
+    game.type === TEXTBOOK_VOCAB_LIVE_GAME_TYPE
   ) {
     if (!existingPlayer) await set(playerRef, {
       name: displayName,
+      ...(game.type === TEXTBOOK_VOCAB_LIVE_GAME_TYPE ? { score: 0 } : {}),
       joinedAt: Date.now(),
     });
   } else {

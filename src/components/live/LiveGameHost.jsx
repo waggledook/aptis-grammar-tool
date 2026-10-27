@@ -8,6 +8,7 @@ import { setLiveGameStatus, setLiveGameState } from "../../api/liveGames";
 import { toast } from "../../utils/toast";
 import { useTickSound } from "../../hooks/useTickSound";
 import { QRCodeSVG } from "qrcode.react";
+import { getSitePath } from "../../siteConfig.js";
 
 const ROUND_TICK_TRACKS = [
   "/sounds/live-host-round-1.mp3",
@@ -77,10 +78,12 @@ const previousAnsweredCountRef = useRef(0);
 
 const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
 // If we already know the PIN, include it as a query param
-const joinUrl =
-game && game.pin
-  ? `${baseUrl}/live/join?pin=${encodeURIComponent(game.pin)}`
-  : `${baseUrl}/live/join`;
+const joinPath = getSitePath(
+  game && game.pin
+    ? `/live/join?pin=${encodeURIComponent(game.pin)}`
+    : "/live/join"
+);
+const joinUrl = `${baseUrl}${joinPath}`;
 
   async function handleCopyJoinLink() {
     if (!joinUrl || typeof window === "undefined" || !navigator?.clipboard?.writeText) return;
@@ -516,7 +519,7 @@ useEffect(() => {
           `}
         </style>  
       <header className="page-header">
-        <h1>Host Live Game</h1>
+        <h1>{game.title || "Host Live Game"}</h1>
       </header>
 
       <section className="card">
@@ -761,6 +764,34 @@ useEffect(() => {
 
         {!loadingItems && currentItem && (
           <>
+            {currentItem.image ? (
+              <img
+                src={currentItem.image}
+                alt={currentItem.imageAlt || "Vocabulary question"}
+                style={{
+                  display: "block",
+                  width: "min(100%, 460px)",
+                  maxHeight: "300px",
+                  objectFit: "contain",
+                  margin: "0 auto .9rem",
+                  borderRadius: ".8rem",
+                }}
+              />
+            ) : null}
+            {!currentItem.image && currentItem.colorHex ? (
+              <div
+                role="img"
+                aria-label="Colour shown for this vocabulary question"
+                style={{
+                  width: "min(100%, 360px)",
+                  height: "180px",
+                  margin: "0 auto .9rem",
+                  border: "1px solid rgba(255,255,255,.2)",
+                  borderRadius: ".8rem",
+                  background: currentItem.colorHex,
+                }}
+              />
+            ) : null}
             <p
               style={{
                 marginBottom: ".75rem",

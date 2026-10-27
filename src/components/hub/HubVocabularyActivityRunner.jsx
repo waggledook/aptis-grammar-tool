@@ -3,8 +3,14 @@ import { useNavigate, useParams } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Seo from "../common/Seo.jsx";
 import HubVocabWordFormationSort from "./HubVocabWordFormationSort.jsx";
+import TextbookVocabAssignButton from "./TextbookVocabAssignButton.jsx";
 import { getSitePath } from "../../siteConfig.js";
-import { getHubVocabActivity, getHubVocabTheme, canAccessHubVocabTheme } from "../../data/hubVocabularyActivities.js";
+import {
+  getHubVocabActivity,
+  getHubVocabActivityItems,
+  getHubVocabTheme,
+  canAccessHubVocabTheme,
+} from "../../data/hubVocabularyActivities.js";
 import {
   fetchHubVocabProgress,
   recordVocabMistake,
@@ -149,17 +155,6 @@ function getStructuredOptions(entry, items, optionLimit = 4) {
   const correctOption = unique.find((option) => accepted.has(normalizeAnswer(option))) || correctAnswer;
   const distractors = unique.filter((option) => !accepted.has(normalizeAnswer(option)));
   return shuffle([correctOption, ...distractors.slice(0, Math.max(1, optionLimit - 1))]);
-}
-
-function getActivityItems(theme, activity) {
-  if (
-    theme?.id === "people-family" &&
-    (activity?.id === "family-matching" || activity?.id === "family-spelling")
-  ) {
-    return [...(theme.entries || []), ...(theme.familyEntries || [])];
-  }
-  const dataset = activity?.dataKey ? theme?.[activity.dataKey] : theme?.entries;
-  return Array.isArray(dataset) ? dataset : [];
 }
 
 function getPrimaryLabel(entry, themeId) {
@@ -2739,7 +2734,7 @@ function SequenceOrderMode({ theme, activity, items, onComplete, onMistake }) {
 }
 
 function renderActivity(theme, activity, handlers = {}) {
-  const items = getActivityItems(theme, activity);
+  const items = getHubVocabActivityItems(theme, activity);
   const props = {
     onComplete: handlers.onComplete,
     onMistake: handlers.onMistake,
@@ -2852,17 +2847,17 @@ export default function HubVocabularyActivityRunner({ user }) {
       </section>
     );
   }
-  return <HubVocabularyActivityContent key={themeId} isDraft={theme.studentVisible === false} />;
+  return <HubVocabularyActivityContent key={themeId} isDraft={theme.studentVisible === false} user={user} />;
 }
 
-function HubVocabularyActivityContent({ isDraft }) {
+function HubVocabularyActivityContent({ isDraft, user }) {
   const navigate = useNavigate();
   const { themeId, activityId } = useParams();
   const result = getHubVocabActivity(themeId, activityId);
   const theme = result?.theme || getHubVocabTheme(themeId);
   const activity = result?.activity;
   const activityItems = useMemo(
-    () => theme && activity ? getActivityItems(theme, activity) : [],
+    () => theme && activity ? getHubVocabActivityItems(theme, activity) : [],
     [activity, theme]
   );
   const [progressMap, setProgressMap] = useState({});
@@ -3051,6 +3046,7 @@ function HubVocabularyActivityContent({ isDraft }) {
         <button className="review-btn" onClick={() => navigate(getSitePath("/vocabulary/textbook"))}>
           ← Back to vocabulary topics
         </button>
+        <TextbookVocabAssignButton user={user} theme={theme} activity={activity} />
         <button className="review-btn mistakes" onClick={() => navigate(getSitePath("/vocabulary/textbook/mistakes"))}>
           Review mistakes
         </button>

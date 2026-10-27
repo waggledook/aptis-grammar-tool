@@ -328,6 +328,13 @@ const PRODUCT_GROUPS = [
     accent: "amber",
     resources: [
       {
+        title: "Textbook vocabulary live quiz creator",
+        description: "Build a random or curated live quiz using multiple choice, write and four-item matching rounds.",
+        path: "/vocabulary/textbook/live?site=seifhub",
+        icon: BookOpenCheck,
+        tags: ["Mixed formats", "Custom quiz", "Live lesson"],
+      },
+      {
         title: "Spanglish Fix-It",
         description: "Run the Spanish-to-English correction game normally or create a teacher-hosted live round.",
         path: "/games/spanglish-fix-it?site=seifhub",

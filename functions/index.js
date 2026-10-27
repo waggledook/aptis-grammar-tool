@@ -6,6 +6,8 @@ const nodeCrypto = require("crypto");
 const {aggregateAnalyticsEvent} = require("./activityAnalytics");
 const {buildSiteAccessEmail} = require("./site-access-email");
 const {buildPasswordResetEmail} = require("./password-reset-email");
+const {createLegacyTestEmailHandler} = require("./legacy-test-email");
+const {createLiveGameEmailHandler} = require("./live-game-email-handler");
 const {
   canUseRelaxedPractice,
 } = require("./speaking-workshop-access-policy");
@@ -1033,6 +1035,29 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: { user: GMAIL_USER, pass: GMAIL_PASS },
 });
+
+// The legacy catch-all must keep its deployed name and region so that updating
+// it replaces the existing trigger instead of creating a second sender.
+exports.emailAnyTestResults = functions.region("us-central1")
+  .database.ref("/{testName}/{pushId}")
+  .onCreate(createLegacyTestEmailHandler({
+    transporter,
+    fromAddress: FROM_ADDRESS,
+    teacherEmail: TEACHER_EMAIL,
+  }));
+
+// Only lobby creation and status transitions invoke this handler; individual
+// answers do not cause database reads or emails.
+exports.emailLiveGameActivity = functions.region("europe-west1")
+  .runWith({maxInstances: 5})
+  .database.ref("/liveGames/{gameId}/status")
+  .onWrite(createLiveGameEmailHandler({
+    firestore,
+    auth: admin.auth(),
+    transporter,
+    fromAddress: FROM_ADDRESS,
+    teacherEmail: TEACHER_EMAIL,
+  }));
 
 function getFeedbackWeekKey(date = new Date()) {
   const d = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));

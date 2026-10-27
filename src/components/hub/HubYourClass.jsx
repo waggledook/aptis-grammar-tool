@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { getSitePath } from "../../siteConfig.js";
 import {
   fetchVocabProgressMap,
+  fetchHubVocabProgress,
   fetchSpeakingProgressMap,
   fetchHubDictationSessions,
   fetchHubTranslationSessions,
@@ -21,6 +22,7 @@ import {
   fetchUserPublicProfile,
 } from "../../firebase";
 import { getTopicSetIds } from "../vocabulary/data/vocabTopics.js";
+import { resolveTextbookVocabAssignmentCompletion } from "../../utils/textbookVocabAssignments.js";
 import UserAvatar from "../common/UserAvatar.jsx";
 
 function timestampToDate(value) {
@@ -86,6 +88,8 @@ function getAssignmentTypeLabel(type) {
       return "OTE activity";
     case "vocabulary-topic":
       return "Vocabulary set";
+    case "textbook-vocabulary":
+      return "Textbook vocabulary";
     default:
       return "Assigned activity";
   }
@@ -218,6 +222,10 @@ function resolveAssignedCompletion(assignment, sources) {
       : { completed: false, completedAt: 0 };
   }
 
+  if (assignment?.activityType === "textbook-vocabulary") {
+    return resolveTextbookVocabAssignmentCompletion(assignment, sources.textbookVocabulary);
+  }
+
   if (assignment?.activityType === "dictation") {
     const completedAt = sources.dictation?.[assignment.id] || 0;
     return completedAt >= assignedAt ? { completed: true, completedAt } : { completed: false, completedAt: 0 };
@@ -258,11 +266,12 @@ export default function HubYourClass({ user }) {
 
       setLoading(true);
       try {
-        const [rows, attempts, assignedRows, vocabProgress, speakingProgress, readingProgress, oteTrainingProgress, dictationSessions, translationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+        const [rows, attempts, assignedRows, vocabProgress, textbookVocabProgress, speakingProgress, readingProgress, oteTrainingProgress, dictationSessions, translationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
           listStudentCourseTestSessions(user.uid),
           listStudentCourseTestAttempts(user.uid),
           listAssignedActivitiesForStudent(user.uid),
           fetchVocabProgressMap(user.uid),
+          fetchHubVocabProgress(user.uid),
           fetchSpeakingProgressMap(user.uid),
           fetchReadingProgressMap(user.uid),
           fetchOteTrainingProgressMap(user.uid),
@@ -288,6 +297,7 @@ export default function HubYourClass({ user }) {
         setTeacherProfile(loadedTeacher);
         const completionSources = {
           vocabulary: vocabProgress || {},
+          textbookVocabulary: textbookVocabProgress || {},
           speaking: speakingProgress || {},
           reading: readingProgress || {},
           oteTraining: oteTrainingProgress || {},

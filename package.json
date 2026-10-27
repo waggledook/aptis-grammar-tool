@@ -12,6 +12,7 @@
     "test:grammar-review": "node scripts/test-grammar-review.mjs",
     "test:intermediate-plus-vocab": "node --test scripts/test-intermediate-plus-vocab.mjs",
     "test:collocation-team": "node --test scripts/test-collocation-team.mjs",
+    "test:textbook-vocab-teacher-tools": "node --test scripts/test-textbook-vocab-teacher-tools.mjs",
     "test:speaking-workshop-schedule": "node --test scripts/test-speaking-workshop-schedule.mjs",
     "test:aptis-mock-review-activity": "node --test scripts/test-aptis-mock-mistake-review-activity.mjs",
     "preview": "vite preview",

@@ -3,6 +3,7 @@ import {
   createAssignedActivity,
   deleteAssignedActivity,
   fetchVocabProgressMap,
+  fetchHubVocabProgress,
   fetchSpeakingProgressMap,
   fetchHubDictationSessions,
   fetchHubFlashcardSessions,
@@ -23,11 +24,13 @@ import { HUB_GRAMMAR_ACTIVITIES } from "../../data/hubGrammarActivities.js";
 import { HUB_GRAMMAR_FLASHCARD_DECKS } from "../../data/hubGrammarFlashcards.js";
 import { HUB_DICTATION_SETS } from "../../data/hubDictationSets.js";
 import { HUB_TRANSLATION_ALL_SET_ID, HUB_TRANSLATION_SETS } from "../../data/hubTranslationSets.js";
+import { getVisibleHubVocabThemes } from "../../data/hubVocabularyActivities.js";
 import { getOteAssignmentItems } from "../../products/ote/data/oteAssignmentCatalog.js";
 import { PART2_TASKS } from "../speaking/banks/part2";
 import { PART3_TASKS } from "../speaking/banks/part3";
 import { PART4_TASKS } from "../speaking/banks/part4";
 import { getTopicSetIds } from "../vocabulary/data/vocabTopics.js";
+import { resolveTextbookVocabAssignmentCompletion } from "../../utils/textbookVocabAssignments.js";
 import { getSitePath } from "../../siteConfig.js";
 import { toast } from "../../utils/toast";
 
@@ -68,6 +71,27 @@ const READING_OPTIONS = [
 ];
 
 const OTE_ASSIGNMENT_OPTIONS = getOteAssignmentItems({ nativeRoutes: false });
+
+const TEXTBOOK_VOCAB_OPTIONS = getVisibleHubVocabThemes(null).flatMap((theme) => [
+  {
+    id: theme.id,
+    label: `${theme.textbookRef} — ${theme.title} (whole bank)`,
+    routePath: getSitePath(`/vocabulary/textbook/${theme.id}/${theme.activities?.[0]?.id || "flashcards"}`),
+    themeId: theme.id,
+    themeTitle: theme.title,
+    textbookActivityId: "",
+    textbookActivityTitle: "",
+  },
+  ...(theme.activities || []).map((activity) => ({
+    id: `${theme.id}:${activity.id}`,
+    label: `${theme.textbookRef} — ${theme.title} — ${activity.title}`,
+    routePath: getSitePath(`/vocabulary/textbook/${theme.id}/${activity.id}`),
+    themeId: theme.id,
+    themeTitle: theme.title,
+    textbookActivityId: activity.id,
+    textbookActivityTitle: activity.title,
+  })),
+]);
 
 const ALL_DICTATION_SENTENCES = HUB_DICTATION_SETS.flatMap((set) =>
   (set.sentences || []).map((sentence, index) => ({
@@ -155,6 +179,8 @@ function getAssignmentTypeLabel(type) {
       return "OTE activity";
     case "vocabulary-topic":
       return "Vocabulary set";
+    case "textbook-vocabulary":
+      return "Textbook vocabulary";
     default:
       return "Assignment";
   }
@@ -279,6 +305,10 @@ function resolveAssignmentCompletion(assignment, sources) {
     return { completed, completedAt: completed ? Math.max(...completionTimes) : 0 };
   }
 
+  if (assignment?.activityType === "textbook-vocabulary") {
+    return resolveTextbookVocabAssignmentCompletion(assignment, sources.textbookVocabulary);
+  }
+
   if (assignment?.activityType === "dictation") {
     const completedAt = sources.dictation?.[assignment.id] || 0;
     return { completed: completedAt >= assignedAt, completedAt };
@@ -375,8 +405,9 @@ export default function TeacherAssignedActivities({ user }) {
         const completionByStudentId = Object.fromEntries(
           await Promise.all(
             (studentRows || []).map(async (student) => {
-              const [vocabProgress, speakingProgress, readingProgress, oteTrainingProgress, dictationSessions, translationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
+              const [vocabProgress, textbookVocabProgress, speakingProgress, readingProgress, oteTrainingProgress, dictationSessions, translationSessions, flashcardSessions, miniTests, grammarAttempts, p1, p2, p3, p4] = await Promise.all([
                 fetchVocabProgressMap(student.id),
+                fetchHubVocabProgress(student.id),
                 fetchSpeakingProgressMap(student.id),
                 fetchReadingProgressMap(student.id),
                 fetchOteTrainingProgressMap(student.id),
@@ -395,6 +426,7 @@ export default function TeacherAssignedActivities({ user }) {
                 student.id,
                 {
                   vocabulary: vocabProgress || {},
+                  textbookVocabulary: textbookVocabProgress || {},
                   speaking: speakingProgress || {},
                   reading: readingProgress || {},
                   oteTraining: oteTrainingProgress || {},
@@ -564,6 +596,7 @@ export default function TeacherAssignedActivities({ user }) {
     if (activityType === "speaking") return SPEAKING_OPTIONS;
     if (activityType === "reading") return READING_OPTIONS;
     if (activityType === "ote-training") return OTE_ASSIGNMENT_OPTIONS;
+    if (activityType === "textbook-vocabulary") return TEXTBOOK_VOCAB_OPTIONS;
     return miniTestOptions;
   }, [activityType, dictationPresetOptions, flashcardDeckOptions, miniTestOptions, publishedGrammarSetOptions, useOfEnglishOptions]);
 
@@ -829,6 +862,14 @@ export default function TeacherAssignedActivities({ user }) {
         notes: String(notes || "").trim(),
       };
 
+      if (activityType === "textbook-vocabulary") {
+        assignmentPayload.themeId = chosenOption.themeId;
+        assignmentPayload.themeTitle = chosenOption.themeTitle;
+        assignmentPayload.textbookActivityId = chosenOption.textbookActivityId;
+        assignmentPayload.textbookActivityTitle = chosenOption.textbookActivityTitle;
+        assignmentPayload.assignmentScope = chosenOption.textbookActivityId ? "activity" : "bank";
+      }
+
       if (activityType === "dictation") {
         const trimmedTitle = String(dictationTitle || "").trim();
         const fallbackTitle = `Dictation — ${dictationSentences.length} sentence${dictationSentences.length === 1 ? "" : "s"}`;
@@ -938,7 +979,7 @@ export default function TeacherAssignedActivities({ user }) {
         <div className="teacher-assign-head">
           <div>
             <h3>Create an assigned activity</h3>
-            <p>Send mini tests, flashcards, grammar sets, Use of English sets, OTE work, reading, writing, speaking, or dictation tasks to your class.</p>
+            <p>Send textbook vocabulary, mini tests, flashcards, grammar sets, Use of English, OTE, reading, writing, speaking, or dictation tasks to your class.</p>
           </div>
         </div>
 
@@ -951,6 +992,7 @@ export default function TeacherAssignedActivities({ user }) {
                 <span>Activity type</span>
                 <select value={activityType} onChange={(event) => setActivityType(event.target.value)}>
                   <option value="mini-test">Mini test</option>
+                  <option value="textbook-vocabulary">Textbook vocabulary</option>
                   <option value="flashcards">Grammar flashcards</option>
                   <option value="grammar-set">Aptis grammar set</option>
                   <option value="use-of-english">Use of English set</option>
@@ -974,7 +1016,7 @@ export default function TeacherAssignedActivities({ user }) {
             </div>
 
             <label className="field">
-              <span>{activityType === "dictation" ? "Dictation set" : activityType === "translation" ? "Translation task" : "Activity"}</span>
+              <span>{activityType === "dictation" ? "Dictation set" : activityType === "translation" ? "Translation task" : activityType === "textbook-vocabulary" ? "Bank or activity" : "Activity"}</span>
               <select value={activityId} onChange={(event) => setActivityId(event.target.value)}>
                 {currentOptions.length ? (
                   currentOptions.map((option) => (
