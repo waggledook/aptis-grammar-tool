@@ -1162,7 +1162,9 @@ export async function createReadingPart4LiveGame({ taskId, title }) {
     taskIds: [task.id],
     status: "lobby",
     createdAt: Date.now(),
-    state: { phase: "lobby", phaseStartedAt: null, whyRevealed: false },
+    state: { phase: "lobby", phaseStartedAt: null, whyRevealed: false,
+      ...(task.activityMode === "first-pass" ? { paragraphIndex: 0, mainIdeaSeconds: task.firstPass.mainIdeaSeconds, headingSeconds: task.firstPass.headingSeconds } : {}),
+    },
   });
   await logAptisReadingLiveHosted({
     gameId,
@@ -2002,6 +2004,7 @@ export async function saveReadingPart4LiveProgress({ gameId, taskId, answers = {
       answeredCount,
       score,
       total: task.paragraphs.length,
+      ...(task.activityMode === "first-pass" ? { mode: "first-pass", reviewOnly: true, scoreContext: "guided-final-review" } : {}),
     });
   }
 }

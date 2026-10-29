@@ -88,6 +88,13 @@ const PRODUCT_GROUPS = [
             icon: BookOpen,
             tags: ["Assignable", "Direct link", "Live lessons"],
           },
+          {
+            title: "Reading Part 4 · Saving the smells of the past",
+            description: "A main-idea-first live lesson: write before seeing headings, discuss seven scaffolded rounds, then review with the full heading bank.",
+            path: "/teacher-resources/reading-part4-saving-smells",
+            icon: BookOpenCheck,
+            tags: ["Main idea first", "7 live rounds", "Anonymous discussion"],
+          },
         ],
       },
       {

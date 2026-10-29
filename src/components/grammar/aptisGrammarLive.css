@@ -27,3 +27,26 @@
 .agl-live-review summary { cursor: pointer; font-weight: 600; }
 .agl-live-review summary small { display: block; margin-top: .3rem; color: #88dfcc; font-size: .8rem; }
 .agl-live-review details p { margin: .7rem 0 0; color: #b6cfcc; }
+.agl-round-leaderboard { margin-top: 1.2rem; text-align: left; }
+.agl-round-leaderboard-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .6rem; }
+.agl-round-leaderboard-heading h2 { display: flex; align-items: center; gap: .6rem; margin: 0; font-size: 1.15rem; text-align: left; }
+.agl-round-leaderboard-heading > span { color: #adc6c7; font-size: .8rem; }
+.agl-round-accuracy { display: flex; flex-wrap: wrap; gap: 1rem; margin: 1rem 0; }
+.agl-round-accuracy p { display: grid; flex: 1 1 180px; gap: .4rem; margin: 0; padding: 1rem; border: 1px solid #426b60; border-radius: 10px; background: #17332f; }
+.agl-round-accuracy span { color: #cae9de; font-size: .85rem; }
+.agl-round-accuracy strong { color: #a8ebd4; font-size: 1.8rem; line-height: 1.2; font-variant-numeric: tabular-nums; }
+.agl-round-accuracy small { color: #adc6c7; font-size: .75rem; }
+.agl-round-leaderboard-table { max-height: 24rem; overflow: auto; }
+.agl-round-leaderboard table { width: 100%; border-collapse: collapse; color: #e0edf3; font-size: .85rem; }
+.agl-round-leaderboard caption { caption-side: bottom; padding-top: .8rem; color: #adc6c7; font-size: .75rem; line-height: 1.6; text-align: left; }
+.agl-round-leaderboard :is(th, td) { padding: .8rem .6rem; border-bottom: 1px solid #315a63; text-align: right; font-variant-numeric: tabular-nums; }
+.agl-round-leaderboard thead th { color: #adc6c7; font-size: .75rem; }
+.agl-round-leaderboard :is(th, td):first-child { width: 3rem; text-align: left; }
+.agl-round-leaderboard th:nth-child(2) { text-align: left; overflow-wrap: anywhere; }
+.agl-round-leaderboard tbody th { max-width: 16rem; }
+.agl-round-leaderboard .is-me { background: #21483f; }
+.agl-round-leaderboard tbody small { display: inline-block; margin-left: .4rem; color: #a8ebd4; font-size: .7rem; font-weight: 400; }
+@media (max-width: 520px) {
+  .agl-round-leaderboard :is(th, td) { padding: .7rem .35rem; }
+  .agl-round-leaderboard table { font-size: .8rem; }
+}

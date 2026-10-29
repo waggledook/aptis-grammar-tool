@@ -17,6 +17,7 @@ import { ReadingPart4FullReview, ReadingPart4Headings } from "./ReadingPart4Live
 import "./readingPart1Live.css";
 import "./readingPart3Live.css";
 import "./readingPart4Live.css";
+import ReadingPart4FirstPassHost from "./ReadingPart4FirstPassHost.jsx";
 
 const PHASE_LABELS = { lobby: "Waiting room", task: "Independent work", review: "Whole-task review", finished: "Complete" };
 
@@ -110,6 +111,7 @@ export default function ReadingPart4LiveHost({ user }) {
   if (loading) return <main className="rp1-live-page"><p>Loading Reading Part 4 room…</p></main>;
   if (!game || game.type !== READING_PART4_LIVE_GAME_TYPE || !task) return <main className="rp1-live-page"><h1>Reading Part 4 live</h1><p>Session not found.</p></main>;
   if (!isHost) return <main className="rp1-live-page"><h1>Reading Part 4 live</h1><p>You are not the host of this session.</p></main>;
+  if (task.activityMode === "first-pass") return <ReadingPart4FirstPassHost key={gameId} game={game} gameId={gameId} task={task} />;
 
   return (
     <main className="rp1-live-page">

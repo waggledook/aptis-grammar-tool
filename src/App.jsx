@@ -99,6 +99,7 @@ import ReadingPart3LiveHost from "./reading/ReadingPart3LiveHost.jsx";
 import ReadingPart3LivePlayer from "./reading/ReadingPart3LivePlayer.jsx";
 import AptisPart4 from "./reading/AptisPart4";
 import ReadingPart4Teacher from "./reading/ReadingPart4Teacher.jsx";
+import ReadingPart4FirstPassLesson from "./reading/ReadingPart4FirstPassLesson.jsx";
 import ReadingPart4LiveHost from "./reading/ReadingPart4LiveHost.jsx";
 import ReadingPart4LivePlayer from "./reading/ReadingPart4LivePlayer.jsx";
 import AptisReadingMockRunner from "./reading/mockTests/AptisReadingMockRunner.jsx";
@@ -610,7 +611,8 @@ const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
 const isExamRoute = isOteExamRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisListeningMockRoute || isAptisWritingMockRoute || isAptisSpeakingMockRoute;
 const isAptisGrammarLiveRoute = location.pathname === "/teacher-resources/aptis-grammar" || location.pathname.startsWith("/live/aptis-grammar/");
-const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisListeningMockRoute || isAptisWritingMockRoute || isAptisSpeakingMockRoute || isSpeakingWorkshopRoute || isAptisGrammarLiveRoute;
+const isReadingPart4ClassroomRoute = location.pathname === "/teacher-resources/reading-part4-saving-smells";
+const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisListeningMockRoute || isAptisWritingMockRoute || isAptisSpeakingMockRoute || isSpeakingWorkshopRoute || isAptisGrammarLiveRoute || isReadingPart4ClassroomRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
@@ -1042,6 +1044,8 @@ const linkedAptisAccess = {
 const hasMemberSiteAccess = !requiresMemberAccess || (isOteSite ? hasOteAccess : hasSeifHubAccess);
 const isTeacherToolsRoute = ["/teacher-tools", "/teacher/transcription", "/live/collocations/setup", "/vocabulary/textbook/live"].includes(location.pathname)
   || location.pathname === "/teacher-resources/aptis-grammar"
+  || location.pathname === "/teacher-resources/reading-part4-saving-smells"
+  || location.pathname.startsWith("/live/aptis-reading-part4/host/")
   || location.pathname.startsWith("/live/aptis-grammar/host/")
   || location.pathname.startsWith("/live/collocations/host/")
   || location.pathname.startsWith("/live/textbook-vocabulary/host/");
@@ -1557,6 +1561,7 @@ return (
       />
       <Route path="/teacher-resources" element={<TeacherResources user={user} />} />
       <Route path="/teacher-resources/aptis-grammar" element={<RequireTeacher user={user}><TeacherAptisGrammarLiveBuilder key={user?.uid} user={user} /></RequireTeacher>} />
+      <Route path="/teacher-resources/reading-part4-saving-smells" element={<RequireTeacher user={user}><ReadingPart4FirstPassLesson /></RequireTeacher>} />
       <Route
         path="/teacher-resources/grammar-vocabulary-mistakes"
         element={
@@ -3423,6 +3428,7 @@ return (
 />
 <Route path="/teacher-resources" element={<TeacherResources user={user} />} />
 <Route path="/teacher-resources/aptis-grammar" element={<RequireTeacher user={user}><TeacherAptisGrammarLiveBuilder key={user?.uid} user={user} /></RequireTeacher>} />
+<Route path="/teacher-resources/reading-part4-saving-smells" element={<RequireTeacher user={user}><ReadingPart4FirstPassLesson /></RequireTeacher>} />
 <Route
   path="/teacher-resources/grammar-vocabulary-mistakes"
   element={

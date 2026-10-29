@@ -10,6 +10,7 @@ import { getReadingPart4TeacherTask, READING_PART4_LIVE_GAME_TYPE } from "./read
 import { ReadingPart4FullReview, ReadingPart4Headings, ReadingPart4LiveTask } from "./ReadingPart4LiveShared.jsx";
 import "./readingPart1Live.css";
 import "./readingPart4Live.css";
+import ReadingPart4FirstPassPlayer from "./ReadingPart4FirstPassPlayer.jsx";
 
 const PHASE_LABELS = { lobby: "Waiting", task: "Independent work", review: "Class review", finished: "Complete" };
 
@@ -62,6 +63,7 @@ export default function ReadingPart4LivePlayer() {
   if (loading) return <main className="rp1-live-page"><p>Joining Reading Part 4 room…</p></main>;
   if (!game || game.type !== READING_PART4_LIVE_GAME_TYPE || !task) return <main className="rp1-live-page"><h1>Reading Part 4 live</h1><p>Session not found.</p></main>;
   if (!player) return <main className="rp1-live-page"><h1>Reading Part 4 live</h1><p>You have not joined this session. Return to the join page and enter the PIN.</p></main>;
+  if (task.activityMode === "first-pass") return <ReadingPart4FirstPassPlayer key={`${gameId}:${uid}`} game={game} gameId={gameId} task={task} player={player} uid={uid} />;
 
   return (
     <main className="rp1-live-page">

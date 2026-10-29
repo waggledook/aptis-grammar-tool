@@ -1,4 +1,5 @@
 import { READING_PART4_WHY_DATA } from "./readingPart4WhyData.js";
+import { SAVING_SMELLS_FIRST_PASS_TASK } from "./savingSmellsFirstPass.js";
 
 const RAW_NEW_READING_PART4_TASKS = [
   {
@@ -326,5 +327,6 @@ export const READING_PART4_TEACHER_TASKS = ALL_NEW_READING_PART4_TASKS.slice(2);
 export const READING_PART4_LIVE_GAME_TYPE = "aptis-reading-part4-live";
 
 export function getReadingPart4TeacherTask(taskId) {
+  if (taskId === SAVING_SMELLS_FIRST_PASS_TASK.id) return SAVING_SMELLS_FIRST_PASS_TASK;
   return READING_PART4_TEACHER_TASKS.find((task) => task.id === taskId) || null;
 }

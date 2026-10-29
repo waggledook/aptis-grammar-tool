@@ -4,10 +4,72 @@ import test from "node:test";
 import vm from "node:vm";
 import * as grammar from "../src/components/grammar/aptisGrammarLive.js";
 import * as vocabulary from "../src/components/hub/textbookVocabLive.js";
-import { buildGrammarLiveReport, buildGrammarLiveStandings, formatGrammarPercent } from "../src/components/grammar/aptisGrammarLiveResults.js";
+import { buildGrammarLiveProgress, buildGrammarLiveReport, buildGrammarLiveStandings, formatGrammarPercent } from "../src/components/grammar/aptisGrammarLiveResults.js";
 
 const rawBank = JSON.parse(await fs.readFile(new URL("./grammar-items.json", import.meta.url)));
 const bank = grammar.buildGrammarQuestionBank(rawBank);
+
+test("round standings hide current answers and points until reveal, then include missed questions in accuracy", () => {
+  const game = {
+    state: { phase: "question", questionIndex: 1 },
+    items: [{ options: ["A", "B"], answerIndex: 0 }, { options: ["A", "B"], answerIndex: 1 }],
+    players: { a: { name: "Ana", score: 1800 }, b: { name: "Ben", score: 1000 }, c: { name: "Cara", score: 0 } },
+    answers: {
+      0: { a: { selectedIndex: 0 }, b: { selectedIndex: 0 } },
+      1: { a: { selectedIndex: 1, scoreDelta: 800 }, b: { selectedIndex: 0, scoreDelta: 0 } },
+    },
+  };
+  const before = JSON.stringify(game);
+  const hidden = buildGrammarLiveProgress(game);
+  assert.equal(hidden.completedQuestionCount, 1);
+  assert.equal(hidden.roundCorrectCount, null);
+  assert.equal(hidden.roundCorrectPercent, null);
+  assert.deepEqual(hidden.standings.map((p) => [p.uid, p.rank, p.score, p.correctPercent]), [
+    ["a", 1, 1000, 100], ["b", 1, 1000, 100], ["c", 2, 0, 0],
+  ]);
+  assert.equal(JSON.stringify(game), before);
+  const revealed = buildGrammarLiveProgress({ ...game, state: { ...game.state, phase: "reveal" } });
+  assert.equal(revealed.completedQuestionCount, 2);
+  assert.equal(revealed.roundCorrectCount, 1);
+  assert.equal(formatGrammarPercent(revealed.roundCorrectPercent), "33.3%");
+  assert.deepEqual(revealed.standings.map((p) => [p.uid, p.rank, p.score, p.correctCount, p.correctPercent]), [
+    ["a", 1, 1800, 2, 100], ["b", 2, 1000, 1, 50], ["c", 3, 0, 0, 0],
+  ]);
+});
+
+test("first-round results stay hidden even after submission and zero-answer rounds report zero percent", () => {
+  const game = {
+    state: { phase: "question", questionIndex: 0 },
+    items: [{ options: ["A", "B"], answerIndex: 0 }],
+    players: { a: { score: 800 }, b: { score: 0 } },
+    answers: { 0: { a: { selectedIndex: 0, scoreDelta: 800 } } },
+  };
+  const hidden = buildGrammarLiveProgress(game);
+  assert.equal(hidden.completedQuestionCount, 0);
+  assert.equal(hidden.roundCorrectPercent, null);
+  assert.ok(hidden.standings.every((p) => p.score === 0 && p.rank === 1 && p.correctCount === 0));
+  const unanswered = buildGrammarLiveProgress({ ...game, answers: {}, state: { phase: "reveal", questionIndex: 0 } });
+  assert.equal(unanswered.roundCorrectPercent, 0);
+  assert.ok(unanswered.standings.every((p) => p.correctPercent === 0));
+  const empty = buildGrammarLiveProgress({ ...game, players: {}, state: { phase: "reveal", questionIndex: 0 } });
+  assert.equal(empty.roundCorrectPercent, 0);
+  assert.deepEqual(buildGrammarLiveProgress().standings, []);
+});
+
+test("finished progress uses all questions and ignores malformed choices and outsiders", () => {
+  const game = {
+    state: { phase: "finished", questionIndex: 0 },
+    items: [{ options: ["A", "B"], answerIndex: 0 }, { options: ["A", "B"], answerIndex: 1 }],
+    players: { a: { score: 900 } },
+    answers: { 0: { a: { selectedIndex: "0", correct: true } }, 1: { a: { selectedIndex: 1 }, outsider: { selectedIndex: 1 } } },
+  };
+  const progress = buildGrammarLiveProgress(game);
+  assert.equal(progress.completedQuestionCount, 2);
+  assert.equal(progress.standings.length, 1);
+  assert.equal(progress.standings[0].correctCount, 1);
+  assert.equal(progress.standings[0].correctPercent, 50);
+  assert.equal(progress.standings[0].score, 900);
+});
 
 test("the anonymous class report separates wrong choices and missing answers using all participants as the denominator", () => {
   const items = grammar.buildGrammarLiveItems(bank.slice(0, 2));

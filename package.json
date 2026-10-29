@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "test:grammar-review": "node scripts/test-grammar-review.mjs",
     "test:aptis-grammar-live": "node --experimental-vm-modules --test scripts/test-aptis-grammar-live.mjs",
+    "test:reading-part4-first-pass": "node --experimental-vm-modules --test scripts/test-reading-part4-first-pass.mjs",
     "test:intermediate-plus-vocab": "node --test scripts/test-intermediate-plus-vocab.mjs",
     "test:collocation-team": "node --test scripts/test-collocation-team.mjs",
     "test:textbook-vocab-teacher-tools": "node --test scripts/test-textbook-vocab-teacher-tools.mjs",

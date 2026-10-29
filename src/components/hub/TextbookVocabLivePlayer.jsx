@@ -10,7 +10,8 @@ import useLiveRoundTimer from "../live/useLiveRoundTimer.js";
 import { getTextbookVocabLiveMode } from "./textbookVocabLive.js";
 import { APTIS_GRAMMAR_LIVE_GAME_TYPE } from "../grammar/aptisGrammarLive.js";
 import AptisGrammarPodium from "../grammar/AptisGrammarPodium.jsx";
-import { buildGrammarLiveStandings } from "../grammar/aptisGrammarLiveResults.js";
+import AptisGrammarLiveLeaderboard from "../grammar/AptisGrammarLiveLeaderboard.jsx";
+import { buildGrammarLiveProgress } from "../grammar/aptisGrammarLiveResults.js";
 import { getSitePath } from "../../siteConfig.js";
 import "../vocabulary/collocations/CollocationTeamLive.css";
 import "./TextbookVocabLiveGame.css";
@@ -59,8 +60,9 @@ export default function TextbookVocabLivePlayer({ subject = "vocabulary" }) {
   const displayedScore = isQuestion && myAnswer
     ? Math.max(0, (Number(me?.score) || 0) - (Number(myAnswer.scoreDelta) || 0))
     : Number(me?.score) || 0;
-  const myRank = isGrammar && phase === "finished"
-    ? buildGrammarLiveStandings(game?.players).find((player) => player.uid === uid)?.rank || 0
+  const grammarProgress = useMemo(() => isGrammar ? buildGrammarLiveProgress(game) : null, [isGrammar, game]);
+  const myRank = isGrammar
+    ? grammarProgress.standings.find((player) => player.uid === uid)?.rank || 0
     : players.findIndex((player) => player.uid === uid) + 1;
 
   useEffect(() => {
@@ -204,6 +206,7 @@ export default function TextbookVocabLivePlayer({ subject = "vocabulary" }) {
             {isReveal && interactionType === "matching" && <div className={`tvl-personal-feedback ${myAnswer?.correct ? "is-correct" : "is-wrong"}`}><strong>{myAnswer ? `${myAnswer.correctCount || 0} of ${myAnswer.totalCount || 4} matches correct.` : "No matches submitted."}</strong><span>{myAnswer ? `You earned ${myAnswer.scoreDelta || 0} points.` : "Review the four correct pairs above."}</span></div>}
             {isGrammar && isReveal && currentItem.explanations?.[currentItem.answerIndex] && <div className="agl-live-explanation">{currentItem.explanations[currentItem.answerIndex]}</div>}
           </section>
+          {isGrammar && <AptisGrammarLiveLeaderboard progress={grammarProgress} myUid={uid} />}
         </>
       )}
 
