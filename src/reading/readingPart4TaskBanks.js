@@ -236,72 +236,72 @@ const RAW_NEW_READING_PART4_TASKS = [
     "headings": [
       {
         "key": "A",
-        "text": "A former sign of progress is reconsidered"
-      },
-      {
-        "key": "B",
-        "text": "Bringing the stars back into view"
-      },
-      {
-        "key": "C",
-        "text": "A safer street is not always a brighter one"
-      },
-      {
-        "key": "D",
         "text": "An efficient lamp can increase total lighting"
       },
       {
-        "key": "E",
-        "text": "Responding to changing needs through the night"
-      },
-      {
-        "key": "F",
+        "key": "B",
         "text": "Different places require different solutions"
       },
       {
-        "key": "G",
+        "key": "C",
+        "text": "Bringing the stars back into view"
+      },
+      {
+        "key": "D",
+        "text": "Why insects gather around streetlights"
+      },
+      {
+        "key": "E",
         "text": "Protecting the city’s night-time wildlife"
       },
       {
+        "key": "F",
+        "text": "A former sign of progress is reconsidered"
+      },
+      {
+        "key": "G",
+        "text": "Responding to changing needs through the night"
+      },
+      {
         "key": "H",
-        "text": "Why insects gather around streetlights"
+        "text": "A safer street is not always a brighter one"
       }
     ],
     "paragraphs": [
       {
         "id": 1,
         "text": "For much of the twentieth century, a brightly illuminated skyline seemed to announce that a city was modern, prosperous and safe. New developments generally brought additional lamps, while darkness was treated as a problem to be removed. That assumption is now changing. Rising energy costs encouraged councils to reduce unnecessary lighting, but environmental concerns have made the discussion much broader. Darkness is increasingly regarded as something worth protecting rather than merely an absence of light. The aim is rarely to leave whole neighbourhoods unlit; instead, planners are questioning whether every place needs to remain equally bright throughout the night.",
-        "answer": "A"
+        "answer": "F"
       },
       {
         "id": 2,
         "text": "A streetlamp may appear to illuminate only the pavement below it, yet part of its output can travel sideways or upwards and scatter through the atmosphere. Together, light from buildings, signs and roads forms the pale glow above urban areas. This can hide all but the brightest stars, even far from its source. Astronomers need dark conditions for observation, but they are not the only people affected. The night sky also has cultural and recreational value for ordinary residents. By shielding lamps and directing their light downwards, cities can reduce waste on the ground while revealing more of what lies above it.",
-        "answer": "B"
+        "answer": "C"
       },
       {
         "id": 3,
         "text": "Along a riverbank after sunset, what looks like unused space to a daytime visitor may become a busy route for feeding and movement. Bats, migrating birds and many insects have developed around regular cycles of light and darkness. Artificial illumination can change when they become active, draw them away from suitable habitats or expose them to predators. Insects around lamps are the most familiar example, but the effects can reach species that depend on them. Some authorities are creating dark routes through parks and beside waterways, as well as choosing warmer colours and fittings that prevent light escaping beyond the area where people need it.",
-        "answer": "G"
+        "answer": "E"
       },
       {
         "id": 4,
         "text": "Proposals to dim streetlights often produce the same objection: surely a darker street must expose people to more accidents and crime. Visibility, however, depends on the direction and distribution of light as well as its strength. A very bright lamp can create glare, while sharp contrasts may make the space beyond it harder to see. A study of 62 local authorities in England and Wales found little evidence that part-night lighting, switch-offs or dimming increased collisions or recorded crime. This does not mean that any reduction is automatically sensible. Busy crossings and poorly designed paths may still require care, but simply adding brightness is not a complete safety policy.",
-        "answer": "C"
+        "answer": "H"
       },
       {
         "id": 5,
         "text": "When efficient LEDs began replacing older orange streetlamps, they appeared to offer a straightforward solution. Each lamp could provide the required illumination with less electricity, reducing bills and emissions. Yet cheaper light can encourage users to install more lamps or illuminate additional spaces more brightly. As a result, some of the expected environmental gain disappears—a pattern known as the rebound effect. Certain white LEDs also contain more short-wavelength light, which scatters readily and can affect nocturnal species more. Changing the technology therefore achieves less if no one also asks how much light should be produced and where it should fall.",
-        "answer": "D"
+        "answer": "A"
       },
       {
         "id": 6,
         "text": "A residential road is usually far quieter at two in the morning than at eight in the evening. Networked lighting can reflect that difference. Lamps can operate at a lower level during quiet periods, brighten when movement is detected and return to full output during emergencies. Central systems can also report faults, helping maintenance teams locate problems quickly. Nevertheless, installing sensors and communications equipment costs money, and badly adjusted controls may annoy residents by changing too suddenly. The attraction lies not in making the city permanently darker, but in replacing one fixed setting with illumination that follows actual patterns of use.",
-        "answer": "E"
+        "answer": "G"
       },
       {
         "id": 7,
         "text": "Technically successful schemes may still fail if residents feel ignored. The same lighting level may be welcomed beside a nature reserve but rejected near a late-night bus stop, and people with different ages and visual needs may experience a street differently. Local authorities therefore have to weigh energy use and collision figures against harder-to-measure feelings of comfort and security. Temporary trials can reveal unexpected problems before changes become permanent, while public consultation may identify places requiring exceptions. A darker city is not created by applying a single rule everywhere; it emerges from repeated decisions about where light provides genuine value and where it merely continues from habit.",
-        "answer": "F"
+        "answer": "B"
       }
     ]
   }

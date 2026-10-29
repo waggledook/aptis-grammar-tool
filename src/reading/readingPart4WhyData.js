@@ -221,7 +221,7 @@ export const READING_PART4_WHY_DATA = {
   "cities-turning-down-lights": [
     {
       id: 1,
-      answer: "A",
+      answer: "F",
       evidenceParts: [
         "a brightly illuminated skyline seemed to announce that a city was modern, prosperous and safe",
         "That assumption is now changing",
@@ -231,7 +231,7 @@ export const READING_PART4_WHY_DATA = {
     },
     {
       id: 2,
-      answer: "B",
+      answer: "C",
       evidenceParts: [
         "forms the pale glow above urban areas",
         "hide all but the brightest stars",
@@ -241,7 +241,7 @@ export const READING_PART4_WHY_DATA = {
     },
     {
       id: 3,
-      answer: "G",
+      answer: "E",
       evidenceParts: [
         "Bats, migrating birds and many insects",
         "Artificial illumination can change when they become active",
@@ -251,7 +251,7 @@ export const READING_PART4_WHY_DATA = {
     },
     {
       id: 4,
-      answer: "C",
+      answer: "H",
       evidenceParts: [
         "surely a darker street must expose people to more accidents and crime",
         "A very bright lamp can create glare",
@@ -261,7 +261,7 @@ export const READING_PART4_WHY_DATA = {
     },
     {
       id: 5,
-      answer: "D",
+      answer: "A",
       evidenceParts: [
         "provide the required illumination with less electricity",
         "cheaper light can encourage users to install more lamps or illuminate additional spaces more brightly",
@@ -271,7 +271,7 @@ export const READING_PART4_WHY_DATA = {
     },
     {
       id: 6,
-      answer: "E",
+      answer: "G",
       evidenceParts: [
         "far quieter at two in the morning than at eight in the evening",
         "brighten when movement is detected",
@@ -281,7 +281,7 @@ export const READING_PART4_WHY_DATA = {
     },
     {
       id: 7,
-      answer: "F",
+      answer: "B",
       evidenceParts: [
         "welcomed beside a nature reserve but rejected near a late-night bus stop",
         "people with different ages and visual needs may experience a street differently",
