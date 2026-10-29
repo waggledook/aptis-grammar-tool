@@ -43,7 +43,7 @@ test("every activity creation type in the API has an email definition", () => {
     "components/listening/teacherListeningPart4Data.js", "products/ote/data/oteAdvancedReadingPart4OptionJury.js",
     "products/ote/data/oteAdvancedReadingCohesionChallenge.js", "products/ote/data/oteAdvancedReadingPart3FreeThingsLesson.js",
     "products/ote/data/oteAdvancedReadingPart2TeacherTasks.js", "products/ote/data/oteListeningLive.js",
-    "components/vocabulary/collocations/collocationTeamLive.js", "components/hub/textbookVocabLive.js",
+    "components/vocabulary/collocations/collocationTeamLive.js", "components/hub/textbookVocabLive.js", "components/grammar/aptisGrammarLive.js",
   ];
   const definitions = definitionFiles.map((file) => fs.readFileSync(path.join(root, file), "utf8")).join("\n");
   for (const [, constant, type] of definitions.matchAll(/export const ([A-Z0-9_]*GAME_TYPE) = "([^"]+)"/g)) {
@@ -58,6 +58,14 @@ test("stored site overrides inference, and unfamiliar activity types do not inve
   const unknown = buildLiveGameEmail({kind: "launched", gameId: "s", game: {...game, type: "new-activity", site: "https://untrusted.test"}, host});
   assert.doesNotMatch(unknown.html, /href=|untrusted\.test/);
   assert.match(unknown.text, /Site not recorded/);
+});
+
+test("custom Aptis grammar quizzes include the Aptis host link and actual quiz results", () => {
+  const quiz = {...game, type: "aptis-grammar-quiz-live", title: "B1 conditionals", items: [{sentence: "If I ___ you…", level: "B1", sourceThemeTitle: "Conditionals"}], players: {a: {name: "Ana", score: 800}}, answers: {0: {a: {correct: true, scoreDelta: 800}}}};
+  const email = buildLiveGameEmail({kind: "finished", gameId: "grammar-session", game: quiz, host, finishedAt: createdAt});
+  assert.match(email.text, /https:\/\/aptis-trainer\.beeskillsenglish\.com\/live\/aptis-grammar\/host\/grammar-session/);
+  assert.match(email.text, /1\/1 correct \(100%\) · 800 points/);
+  assert.match(email.text, /Conditionals/);
 });
 
 test("user-supplied text is escaped and subject headers stay on one line", () => {

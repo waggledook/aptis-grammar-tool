@@ -30,6 +30,13 @@ const PRODUCT_GROUPS = [
         title: "Grammar & Vocabulary",
         resources: [
           {
+            title: "Aptis Grammar Quiz Studio",
+            description: "Build a bespoke quiz by level and topic, generate a random mix or hand-pick questions, then host live or share for practice.",
+            path: "/teacher-resources/aptis-grammar",
+            icon: Radio,
+            tags: ["A2–C1", "Custom quizzes", "Live activities"],
+          },
+          {
             title: "Class mock mistake review",
             description: "Select allocated students, combine overlapping mock errors and run a tailored immediate-feedback review.",
             path: "/teacher-resources/grammar-vocabulary-mistakes",

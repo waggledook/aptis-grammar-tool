@@ -23,40 +23,17 @@
 }
 
 .emailBox {
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
+  background: #fafafa;
+  border: 1px solid #ccc;
   border-radius: 4px;
   padding: 1rem;
   margin-bottom: 1.5rem;
 }
 
 .questionBlock {
-  background: var(--color-surface-2);
-  border: 1px solid var(--color-border);
+  background: #fafafa;
+  border: 1px solid #ccc;
   border-radius: 4px;
   padding: 1rem;
   margin-bottom: 1.5rem;
-}
-
-.emailBlock,
-.questionSection {
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  border: 1px solid var(--color-border);
-  border-radius: 6px;
-  background: var(--color-surface-2);
-}
-
-.emailBlock p + p {
-  margin-top: 0.75rem;
-}
-
-.subHeading {
-  margin: 0 0 0.5rem;
-}
-
-.subPrompt {
-  margin-bottom: 1rem;
-  color: var(--color-text-soft);
-  line-height: 1.55;
 }

@@ -122,6 +122,7 @@ import Seo from "./components/common/Seo.jsx";
 import './App.css'
 import { collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, where } from "firebase/firestore";
 import GrammarSetRunner from "./components/grammar/GrammarSetRunner";
+import TeacherAptisGrammarLiveBuilder from "./components/teacher/TeacherAptisGrammarLiveBuilder.jsx";
 import UseOfEnglishCustomQuizRunner from "./components/grammar/UseOfEnglishCustomQuizRunner.jsx";
 import GrammarReviewBeta from "./components/grammar/GrammarReviewBeta.jsx";
 import GrammarReviewNudge from "./components/grammar/GrammarReviewNudge.jsx";
@@ -608,7 +609,8 @@ const isOteRoute =
 const siteHomePath = getSiteHomePath();
 const siteProfilePath = getSitePath("/profile");
 const isExamRoute = isOteExamRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisListeningMockRoute || isAptisWritingMockRoute || isAptisSpeakingMockRoute;
-const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisListeningMockRoute || isAptisWritingMockRoute || isAptisSpeakingMockRoute || isSpeakingWorkshopRoute;
+const isAptisGrammarLiveRoute = location.pathname === "/teacher-resources/aptis-grammar" || location.pathname.startsWith("/live/aptis-grammar/");
+const isWideLayout = isCoursePack || isAdminRoute || isFlashcardsPlayerRoute || isOteExamRoute || isOteWritingPracticeTaskRoute || isOteReadingPracticeTaskRoute || isAptisGrammarVocabularyMockRoute || isAptisReadingMockRoute || isAptisListeningMockRoute || isAptisWritingMockRoute || isAptisSpeakingMockRoute || isSpeakingWorkshopRoute || isAptisGrammarLiveRoute;
 const [teacherUnreadCount, setTeacherUnreadCount] = useState(0);
 const [teacherReadSubmissionKeys, setTeacherReadSubmissionKeys] = useState({});
 const [studentAssignmentCount, setStudentAssignmentCount] = useState(0);
@@ -1039,6 +1041,8 @@ const linkedAptisAccess = {
 };
 const hasMemberSiteAccess = !requiresMemberAccess || (isOteSite ? hasOteAccess : hasSeifHubAccess);
 const isTeacherToolsRoute = ["/teacher-tools", "/teacher/transcription", "/live/collocations/setup", "/vocabulary/textbook/live"].includes(location.pathname)
+  || location.pathname === "/teacher-resources/aptis-grammar"
+  || location.pathname.startsWith("/live/aptis-grammar/host/")
   || location.pathname.startsWith("/live/collocations/host/")
   || location.pathname.startsWith("/live/textbook-vocabulary/host/");
 const isPublicSpanglishJoinRoute = location.pathname === "/games/spanglish-fix-it/join";
@@ -1552,6 +1556,7 @@ return (
         }
       />
       <Route path="/teacher-resources" element={<TeacherResources user={user} />} />
+      <Route path="/teacher-resources/aptis-grammar" element={<RequireTeacher user={user}><TeacherAptisGrammarLiveBuilder key={user?.uid} user={user} /></RequireTeacher>} />
       <Route
         path="/teacher-resources/grammar-vocabulary-mistakes"
         element={
@@ -3417,6 +3422,7 @@ return (
   }
 />
 <Route path="/teacher-resources" element={<TeacherResources user={user} />} />
+<Route path="/teacher-resources/aptis-grammar" element={<RequireTeacher user={user}><TeacherAptisGrammarLiveBuilder key={user?.uid} user={user} /></RequireTeacher>} />
 <Route
   path="/teacher-resources/grammar-vocabulary-mistakes"
   element={
@@ -3465,6 +3471,8 @@ return (
 <Route path="/live/collocations/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><CollocationTeamLivePlayer /></RequireSignedIn>} />
 <Route path="/live/textbook-vocabulary/host/:gameId" element={<RequireTeacher user={user}><TextbookVocabLiveHost /></RequireTeacher>} />
 <Route path="/live/textbook-vocabulary/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><TextbookVocabLivePlayer /></RequireSignedIn>} />
+<Route path="/live/aptis-grammar/host/:gameId" element={<RequireTeacher user={user}><TextbookVocabLiveHost subject="grammar" /></RequireTeacher>} />
+<Route path="/live/aptis-grammar/play/:gameId" element={<RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}><TextbookVocabLivePlayer subject="grammar" /></RequireSignedIn>} />
 <Route path="/live/option-jury/host/:gameId" element={<OteOptionJuryHost user={user} />} />
 <Route path="/live/option-jury/play/:gameId" element={<OteOptionJuryPlayer />} />
 <Route path="/live/part4-evidence/host/:gameId" element={<RequireTeacher user={user}><OteReadingPart4EvidenceLiveHost user={user} /></RequireTeacher>} />

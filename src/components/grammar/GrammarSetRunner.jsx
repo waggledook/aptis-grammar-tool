@@ -6,7 +6,9 @@ import { fetchItemsByIds } from "../../api/grammar";
 import GapFillList from "../GapFillList";
 import { toast } from "../../utils/toast";
 import { QRCodeSVG } from "qrcode.react";   // 👈 NEW
-import { createLiveGame } from "../../api/liveGames";
+import { createAptisGrammarLiveGame, createLiveGame } from "../../api/liveGames";
+import { buildGrammarLiveItems } from "./aptisGrammarLive.js";
+import { getSitePath } from "../../siteConfig.js";
 
 export default function GrammarSetRunner({ user }) {
   const { setId } = useParams();
@@ -61,6 +63,16 @@ export default function GrammarSetRunner({ user }) {
     if (!setMeta) return;
 
     try {
+      if (setMeta.builder === "aptis-grammar-live") {
+        const { gameId, pin } = await createAptisGrammarLiveGame({
+          title: setMeta.title,
+          items: buildGrammarLiveItems(items),
+          questionDuration: setMeta.liveQuestionDuration || 30,
+        });
+        toast(`Live game created – PIN ${pin}`);
+        navigate(getSitePath(`/live/aptis-grammar/host/${gameId}`));
+        return;
+      }
       const { gameId, pin } = await createLiveGame({
         setId,
         type: "grammar",

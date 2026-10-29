@@ -24,6 +24,7 @@ import { READING_PART4_LIVE_GAME_TYPE } from "../../reading/readingPart4TaskBank
 import { getSitePath } from "../../siteConfig.js";
 import { COLLOCATION_TEAM_GAME_TYPE } from "../vocabulary/collocations/collocationTeamLive.js";
 import { TEXTBOOK_VOCAB_LIVE_GAME_TYPE } from "../hub/textbookVocabLive.js";
+import { APTIS_GRAMMAR_LIVE_GAME_TYPE } from "../grammar/aptisGrammarLive.js";
 
 export default function LiveGameJoin() {
     const navigate = useNavigate();
@@ -89,6 +90,8 @@ export default function LiveGameJoin() {
                 ? `/live/collocations/play/${gameId}`
               : type === TEXTBOOK_VOCAB_LIVE_GAME_TYPE
                 ? `/live/textbook-vocabulary/play/${gameId}`
+              : type === APTIS_GRAMMAR_LIVE_GAME_TYPE
+                ? `/live/aptis-grammar/play/${gameId}`
                 : `/live/play/${gameId}`;
           navigate(getSitePath(destination));
         } catch (err) {

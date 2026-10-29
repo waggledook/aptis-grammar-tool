@@ -1,39 +1,52 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { onValue, ref } from "firebase/database";
 import { Check, LockKeyhole, Send } from "lucide-react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import { submitTextbookVocabLiveAnswer } from "../../api/liveGames.js";
 import { auth, rtdb } from "../../firebase.js";
 import { toast } from "../../utils/toast.js";
 import useLiveRoundTimer from "../live/useLiveRoundTimer.js";
 import { getTextbookVocabLiveMode } from "./textbookVocabLive.js";
+import { APTIS_GRAMMAR_LIVE_GAME_TYPE } from "../grammar/aptisGrammarLive.js";
+import AptisGrammarPodium from "../grammar/AptisGrammarPodium.jsx";
+import { buildGrammarLiveStandings } from "../grammar/aptisGrammarLiveResults.js";
+import { getSitePath } from "../../siteConfig.js";
 import "../vocabulary/collocations/CollocationTeamLive.css";
 import "./TextbookVocabLiveGame.css";
+import "../grammar/aptisGrammarLive.css";
 
-export default function TextbookVocabLivePlayer() {
+export default function TextbookVocabLivePlayer({ subject = "vocabulary" }) {
   const { gameId } = useParams();
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [typedAnswer, setTypedAnswer] = useState("");
   const [matches, setMatches] = useState([]);
+  const [connectionError, setConnectionError] = useState("");
 
   useEffect(() => onValue(ref(rtdb, `liveGames/${gameId}`), (snapshot) => {
     setGame(snapshot.exists() ? snapshot.val() : null);
     setLoading(false);
-  }), [gameId]);
+  }, () => { setConnectionError("Could not connect to this live room. Please reload and try again."); setLoading(false); }), [gameId]);
+
+  const isGrammar = subject === "grammar" || game?.type === APTIS_GRAMMAR_LIVE_GAME_TYPE;
+  const activityTitle = isGrammar ? "Aptis Grammar Live" : "Textbook Vocabulary Live";
 
   const uid = auth.currentUser?.uid || "";
   const me = uid ? game?.players?.[uid] : null;
-  const players = useMemo(() => Object.entries(game?.players || {})
-    .map(([playerUid, player]) => ({ uid: playerUid, ...player }))
-    .sort((left, right) => (Number(right.score) || 0) - (Number(left.score) || 0)
-      || String(left.name || "").localeCompare(String(right.name || ""))), [game?.players]);
-  const items = game?.items || [];
   const status = game?.status || "lobby";
   const phase = game?.state?.phase || "lobby";
   const questionIndex = Number(game?.state?.questionIndex) || 0;
+  const players = useMemo(() => Object.entries(game?.players || {})
+    .map(([playerUid, player]) => ({
+      uid: playerUid, ...player,
+      visibleScore: Math.max(0, (Number(player.score) || 0) - (phase === "question"
+        ? Number(game?.answers?.[questionIndex]?.[playerUid]?.scoreDelta) || 0 : 0)),
+    }))
+    .sort((left, right) => right.visibleScore - left.visibleScore
+      || String(left.name || "").localeCompare(String(right.name || ""))), [game?.players, game?.answers, phase, questionIndex]);
+  const items = game?.items || [];
   const questionDuration = Number(game?.state?.questionDuration) || 30;
   const deadline = game?.state?.questionDeadline || null;
   const currentItem = items[questionIndex] || null;
@@ -46,7 +59,9 @@ export default function TextbookVocabLivePlayer() {
   const displayedScore = isQuestion && myAnswer
     ? Math.max(0, (Number(me?.score) || 0) - (Number(myAnswer.scoreDelta) || 0))
     : Number(me?.score) || 0;
-  const myRank = players.findIndex((player) => player.uid === uid) + 1;
+  const myRank = isGrammar && phase === "finished"
+    ? buildGrammarLiveStandings(game?.players).find((player) => player.uid === uid)?.rank || 0
+    : players.findIndex((player) => player.uid === uid) + 1;
 
   useEffect(() => {
     setTypedAnswer("");
@@ -89,8 +104,8 @@ export default function TextbookVocabLivePlayer() {
     answer({ matches: matches.map(Number) });
   }
 
-  if (loading) return <main className="ctl-page tvl-page"><p>Joining the vocabulary room…</p></main>;
-  if (!game) return <main className="ctl-page tvl-page"><h1>Textbook Vocabulary Live</h1><p>Quiz not found.</p></main>;
+  if (loading) return <main className="ctl-page tvl-page"><p>Joining the live room…</p></main>;
+  if (!game) return <main className="ctl-page tvl-page"><h1>{activityTitle}</h1><p>{connectionError || "Quiz not found."}</p></main>;
 
   const matchingComplete = matches.length === 4 && matches.every((value) => value !== "");
   const actionPrompt = interactionType === "write"
@@ -107,11 +122,11 @@ export default function TextbookVocabLivePlayer() {
         : "No answer submitted";
 
   return (
-    <main className="ctl-page tvl-page tvl-player">
+    <main className={`ctl-page tvl-page tvl-player ${isGrammar ? "agl-live-room" : ""} ${isGrammar && phase === "finished" ? "agl-finished-room" : ""}`}>
       <header className="ctl-hero">
         <div>
-          <p className="ctl-kicker">Textbook Vocabulary Live</p>
-          <h1>{game.title || "Textbook Vocabulary Quiz"}</h1>
+          <p className="ctl-kicker">{activityTitle}</p>
+          <h1>{game.title || activityTitle}</h1>
           <p>PIN {game.pin} · {items.length} live rounds · {game.interactionType === "mixed" ? "Mixed formats" : interactionMode.label}</p>
         </div>
         {me && <span className="ctl-team-badge">{displayedScore} pts{myRank ? ` · #${myRank}` : ""}</span>}
@@ -187,17 +202,24 @@ export default function TextbookVocabLivePlayer() {
             {isQuestion && !myAnswer && remainingSeconds === 0 && <p className="ctl-discuss-note">Time is up. Waiting for the answer reveal.</p>}
             {isReveal && interactionType !== "matching" && <div className={`tvl-personal-feedback ${myAnswer?.correct ? "is-correct" : "is-wrong"}`}><strong>{myAnswer?.correct ? "That’s right." : `Correct answer: ${currentItem.answer || currentItem.options?.[currentItem.answerIndex] || ""}`}</strong>{myAnswer?.correct ? <span>You earned {myAnswer.scoreDelta || 0} points.</span> : <span>Use the feedback before the next question begins.</span>}</div>}
             {isReveal && interactionType === "matching" && <div className={`tvl-personal-feedback ${myAnswer?.correct ? "is-correct" : "is-wrong"}`}><strong>{myAnswer ? `${myAnswer.correctCount || 0} of ${myAnswer.totalCount || 4} matches correct.` : "No matches submitted."}</strong><span>{myAnswer ? `You earned ${myAnswer.scoreDelta || 0} points.` : "Review the four correct pairs above."}</span></div>}
+            {isGrammar && isReveal && currentItem.explanations?.[currentItem.answerIndex] && <div className="agl-live-explanation">{currentItem.explanations[currentItem.answerIndex]}</div>}
           </section>
         </>
       )}
 
-      {(isQuestion || isReveal) && !me && <section className="ctl-panel ctl-player-lobby"><h2>You haven’t joined this room.</h2><p>Return to the join page and enter PIN {game.pin}.</p></section>}
+      {(isQuestion || isReveal) && !me && <section className="ctl-panel ctl-player-lobby"><h2>You haven’t joined this room.</h2><p><Link to={getSitePath(`/live/join?pin=${game.pin}`)}>Join with PIN {game.pin}</Link></p></section>}
 
       {phase === "finished" && (
-        <section className="ctl-panel ctl-player-lobby">
+        <section className={isGrammar ? "agl-player-finish" : "ctl-panel ctl-player-lobby"}>
+          {isGrammar ? <><AptisGrammarPodium players={game.players} myUid={uid} />{me && <div className="agl-student-finish-summary"><div><p className="agl-results-kicker">Your result</p><h2>{me.name || "Player"}, you finished #{myRank}</h2></div><strong>{Number(me.score) || 0} pts</strong></div>}</> : <>
           <span className="ctl-label">Quiz complete</span><h2>{me ? `${me.name || "Player"}, you finished #${myRank}` : "Final scores"}</h2>
           {me && <div className="ctl-personal-result"><strong>{Number(me.score) || 0}</strong><span>total points</span></div>}
           <div className="ctl-results-grid tvl-player-results">{players.slice(0, 5).map((player, index) => <article className="ctl-result-card" key={player.uid}><span>#{index + 1}</span><h3>{player.name || "Player"}</h3><strong>{Number(player.score) || 0}</strong><span>points</span></article>)}</div>
+          </>}
+          {isGrammar && me && <div className="agl-live-review"><h3>Your grammar review</h3>{items.map((item, index) => {
+            const answer = game.answers?.[index]?.[uid];
+            return <details key={item.id}><summary>{index + 1}. {item.sentence}<small>{answer?.correct ? "Correct" : answer ? "Review this answer" : "No answer"}</small></summary><p>Your answer: {item.options?.[answer?.selectedIndex] || "Not answered"}</p><p>Correct answer: <strong>{item.options?.[item.answerIndex]}</strong></p><p>{item.explanations?.[item.answerIndex]}</p></details>;
+          })}</div>}
         </section>
       )}
     </main>

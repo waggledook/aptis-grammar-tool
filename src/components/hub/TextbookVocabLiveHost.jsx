@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { onValue, ref } from "firebase/database";
 import { Copy, Eye, Play, SkipForward, Square } from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 
 import {
   finishTextbookVocabLiveGame,
@@ -16,26 +16,34 @@ import { getSitePath } from "../../siteConfig.js";
 import { toast } from "../../utils/toast.js";
 import useLiveRoundTimer from "../live/useLiveRoundTimer.js";
 import { getTextbookVocabLiveMode } from "./textbookVocabLive.js";
+import { APTIS_GRAMMAR_LIVE_GAME_TYPE } from "../grammar/aptisGrammarLive.js";
+import AptisGrammarOptionExplanations from "../grammar/AptisGrammarOptionExplanations.jsx";
+import AptisGrammarLiveResults from "../grammar/AptisGrammarLiveResults.jsx";
 import "../vocabulary/collocations/CollocationTeamLive.css";
 import "./TextbookVocabLiveGame.css";
+import "../grammar/aptisGrammarLive.css";
 
 function playerScore(player, currentAnswer, phase) {
   if (phase !== "question" || !currentAnswer) return Number(player.score) || 0;
   return Math.max(0, (Number(player.score) || 0) - (Number(currentAnswer.scoreDelta) || 0));
 }
 
-export default function TextbookVocabLiveHost() {
+export default function TextbookVocabLiveHost({ subject = "vocabulary" }) {
   const { gameId } = useParams();
   const [game, setGame] = useState(null);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [copyState, setCopyState] = useState("");
+  const [connectionError, setConnectionError] = useState("");
   const autoRevealKeyRef = useRef("");
 
   useEffect(() => onValue(ref(rtdb, `liveGames/${gameId}`), (snapshot) => {
     setGame(snapshot.exists() ? snapshot.val() : null);
     setLoading(false);
-  }), [gameId]);
+  }, () => { setConnectionError("Could not connect to this live room. Please reload and try again."); setLoading(false); }), [gameId]);
+
+  const isGrammar = subject === "grammar" || game?.type === APTIS_GRAMMAR_LIVE_GAME_TYPE;
+  const activityTitle = isGrammar ? "Aptis Grammar Live" : "Textbook Vocabulary Live";
 
   const players = useMemo(() => Object.entries(game?.players || {})
     .map(([uid, player]) => ({ uid, ...player }))
@@ -122,9 +130,9 @@ export default function TextbookVocabLiveHost() {
     );
   }
 
-  if (loading) return <main className="ctl-page tvl-page"><p>Opening the vocabulary room…</p></main>;
-  if (!game) return <main className="ctl-page tvl-page"><h1>Textbook Vocabulary Live</h1><p>Quiz not found.</p></main>;
-  if (!isHost) return <main className="ctl-page tvl-page"><h1>Textbook Vocabulary Live</h1><p>You are not the host of this quiz.</p></main>;
+  if (loading) return <main className="ctl-page tvl-page"><p>Opening the live room…</p></main>;
+  if (!game) return <main className="ctl-page tvl-page"><h1>{activityTitle}</h1><p>{connectionError || "Quiz not found."}</p></main>;
+  if (!isHost) return <main className="ctl-page tvl-page"><h1>{activityTitle}</h1><p>You are not the host of this quiz.</p></main>;
 
   const phaseLabel = phase === "question"
     ? `${interactionType === "matching" ? "Round" : "Question"} ${questionIndex + 1} of ${items.length}`
@@ -135,11 +143,12 @@ export default function TextbookVocabLiveHost() {
         : "Lobby";
 
   return (
-    <main className="ctl-page tvl-page tvl-host">
+    <main className={`ctl-page tvl-page tvl-host ${isGrammar ? "agl-live-room" : ""} ${isGrammar && phase === "finished" ? "agl-finished-room" : ""}`}>
+      {isGrammar && (phase === "lobby" || phase === "finished") && <Link className="agl-back" to={getSitePath("/teacher-resources/aptis-grammar")}>← Back to Grammar Quiz Studio</Link>}
       <header className="ctl-hero">
         <div>
-          <p className="ctl-kicker">Live textbook vocabulary</p>
-          <h1>{game.title || "Textbook Vocabulary Quiz"}</h1>
+          <p className="ctl-kicker">{activityTitle}</p>
+          <h1>{game.title || activityTitle}</h1>
           <p>{items.length} live rounds · {sessionModeLabel}</p>
         </div>
         <span className={`ctl-phase ctl-phase-${phase}`}>{phaseLabel}</span>
@@ -236,6 +245,7 @@ export default function TextbookVocabLiveHost() {
                 {!isReveal ? <div className="tvl-match-answer-bank">{(currentItem.matchOptions || []).map((option) => <span key={option}>{option}</span>)}</div> : null}
               </div>
             )}
+            {isGrammar && isReveal && <AptisGrammarOptionExplanations key={`${gameId}:${questionIndex}`} item={currentItem} />}
           </section>
 
           <section className="ctl-panel">
@@ -259,6 +269,7 @@ export default function TextbookVocabLiveHost() {
       )}
 
       {phase === "finished" && (
+        isGrammar ? <AptisGrammarLiveResults key={gameId} game={game} /> :
         <section className="ctl-panel">
           <span className="ctl-label">Quiz complete</span><h2>Final scores</h2>
           <div className="ctl-results-grid">{sortedPlayers.map((player, index) => <article className="ctl-result-card" key={player.uid}><span>#{index + 1}</span><h3>{player.name || "Player"}</h3><strong>{Number(player.score) || 0}</strong><span>points</span></article>)}</div>

@@ -115,6 +115,9 @@ import {
   scoreTextbookVocabLiveAnswer,
   TEXTBOOK_VOCAB_LIVE_GAME_TYPE,
 } from "../components/hub/textbookVocabLive.js";
+import { APTIS_GRAMMAR_LIVE_GAME_TYPE } from "../components/grammar/aptisGrammarLive.js";
+
+const CUSTOM_QUIZ_GAME_TYPES = [TEXTBOOK_VOCAB_LIVE_GAME_TYPE, APTIS_GRAMMAR_LIVE_GAME_TYPE];
 
 const SPANGLISH_GUEST_STORAGE_KEY = "spanglish_fixit_guest_id";
 const SPANGLISH_GUEST_TOKEN_STORAGE_KEY = "spanglish_fixit_guest_token";
@@ -246,7 +249,7 @@ function cleanTextbookVocabLiveQuestion(question) {
   };
 
   if (!base.id || !base.sentence) {
-    throw new Error("One of the selected vocabulary questions is incomplete.");
+    throw new Error("One of the selected quiz questions is incomplete.");
   }
 
   if (interactionType === "matching") {
@@ -272,7 +275,7 @@ function cleanTextbookVocabLiveQuestion(question) {
   }
 
   const answer = String(question.answer || question.options?.[question.answerIndex] || "").trim();
-  if (!answer) throw new Error("One of the selected vocabulary questions has no answer.");
+  if (!answer) throw new Error("One of the selected quiz questions has no answer.");
 
   if (interactionType === "write") {
     const acceptedAnswers = [...new Set([
@@ -312,15 +315,27 @@ function textbookVocabDurationForItem(game, item) {
 }
 
 export async function createTextbookVocabLiveGame({ items, title, questionDuration, modeDurations = {} } = {}) {
+  return createCustomLiveQuiz({ items, title, questionDuration, modeDurations, gameType: TEXTBOOK_VOCAB_LIVE_GAME_TYPE });
+}
+
+export async function createAptisGrammarLiveGame({ items, title, questionDuration } = {}) {
+  if (Array.isArray(items) && items.some((item) => item.interactionType !== "multiple-choice")) {
+    throw new Error("Aptis grammar quizzes use multiple-choice questions.");
+  }
+  return createCustomLiveQuiz({ items, title, questionDuration, gameType: APTIS_GRAMMAR_LIVE_GAME_TYPE });
+}
+
+// Grammar and textbook vocabulary share the same timed question/reveal lifecycle.
+async function createCustomLiveQuiz({ items, title, questionDuration, modeDurations = {}, gameType }) {
   const user = auth.currentUser;
-  if (!user) throw new Error("You must be signed in to host a vocabulary quiz.");
-  if (!Array.isArray(items) || items.length < 1) throw new Error("Choose vocabulary for the live quiz.");
-  if (items.length > 50) throw new Error("Live vocabulary quizzes can contain up to 50 questions.");
+  if (!user) throw new Error("You must be signed in to host a live quiz.");
+  if (!Array.isArray(items) || items.length < 1) throw new Error("Choose questions for the live quiz.");
+  if (items.length > 50) throw new Error("Live quizzes can contain up to 50 questions.");
 
   const cleanItems = items.map(cleanTextbookVocabLiveQuestion);
   const activeModes = [...new Set(cleanItems.map((item) => item.interactionType))];
   const minimumItems = activeModes.length === 1 && activeModes[0] === "matching" ? 1 : 2;
-  if (cleanItems.length < minimumItems) throw new Error("Choose enough vocabulary for at least two live rounds.");
+  if (cleanItems.length < minimumItems) throw new Error("Choose at least two questions for the live quiz.");
   const sessionMode = activeModes.length === 1 ? activeModes[0] : "mixed";
   const cleanModeDurations = Object.fromEntries(activeModes.map((interactionType) => {
     const requestedDuration = Number(modeDurations[interactionType] ?? questionDuration);
@@ -335,12 +350,13 @@ export async function createTextbookVocabLiveGame({ items, title, questionDurati
   const gameRef = push(ref(rtdb, "liveGames"));
   const gameId = gameRef.key;
   const pin = generatePin();
-  const cleanTitle = String(title || "").trim().slice(0, 120) || "Textbook Vocabulary Quiz";
+  const isGrammar = gameType === APTIS_GRAMMAR_LIVE_GAME_TYPE;
+  const cleanTitle = String(title || "").trim().slice(0, 120) || (isGrammar ? "Aptis Grammar Quiz" : "Textbook Vocabulary Quiz");
   const firstDuration = cleanModeDurations[cleanItems[0].interactionType];
   await set(gameRef, {
     ownerUid: user.uid,
-    setId: "textbook-vocabulary-custom",
-    type: TEXTBOOK_VOCAB_LIVE_GAME_TYPE,
+    setId: isGrammar ? "aptis-grammar-custom" : "textbook-vocabulary-custom",
+    type: gameType,
     interactionType: sessionMode,
     title: cleanTitle,
     pin,
@@ -366,7 +382,7 @@ async function getOwnedTextbookVocabLiveGame(gameId) {
     getRealtimeServerTimeOffset(rtdb),
   ]);
   const game = snapshot.val();
-  if (!game || game.type !== TEXTBOOK_VOCAB_LIVE_GAME_TYPE || game.ownerUid !== user.uid) {
+  if (!game || !CUSTOM_QUIZ_GAME_TYPES.includes(game.type) || game.ownerUid !== user.uid) {
     throw new Error("Only the quiz host can control this room.");
   }
   return { game, serverNow: Date.now() + offset };
@@ -461,7 +477,7 @@ export async function submitTextbookVocabLiveAnswer({ gameId, selectedIndex, typ
   const serverNow = Date.now() + offset;
   const questionIndex = Number(game?.state?.questionIndex) || 0;
   const item = game?.items?.[questionIndex];
-  if (!game || game.type !== TEXTBOOK_VOCAB_LIVE_GAME_TYPE) throw new Error("Quiz not found.");
+  if (!game || !CUSTOM_QUIZ_GAME_TYPES.includes(game.type)) throw new Error("Quiz not found.");
   if (!game.players?.[user.uid]) throw new Error("Join the quiz before answering.");
   if (game.status !== "in-progress" || game.state?.phase !== "question") {
     throw new Error("This question is not accepting answers.");
@@ -469,7 +485,7 @@ export async function submitTextbookVocabLiveAnswer({ gameId, selectedIndex, typ
   if (!game.state?.questionDeadline || serverNow >= game.state.questionDeadline) {
     throw new Error("Time is up for this question.");
   }
-  if (!item) throw new Error("This vocabulary question is unavailable.");
+  if (!item) throw new Error("This quiz question is unavailable.");
 
   const interactionType = getTextbookVocabLiveMode(item.interactionType || game.interactionType).id;
   let answerPayload;
@@ -668,11 +684,11 @@ export async function joinLiveGameByPin(pin) {
     game.type === OTE_ADVANCED_READING_PART2_LIVE_GAME_TYPE ||
     game.type === OTE_ADVANCED_READING_PART2_PARAGRAPH_LIVE_GAME_TYPE ||
     game.type === COLLOCATION_TEAM_GAME_TYPE ||
-    game.type === TEXTBOOK_VOCAB_LIVE_GAME_TYPE
+    CUSTOM_QUIZ_GAME_TYPES.includes(game.type)
   ) {
     if (!existingPlayer) await set(playerRef, {
       name: displayName,
-      ...(game.type === TEXTBOOK_VOCAB_LIVE_GAME_TYPE ? { score: 0 } : {}),
+      ...(CUSTOM_QUIZ_GAME_TYPES.includes(game.type) ? { score: 0 } : {}),
       joinedAt: Date.now(),
     });
   } else {

@@ -9,6 +9,7 @@ const SITES = {
 // Match the game types and host routes in src/api/liveGames.js and src/App.jsx.
 const ACTIVITY_TYPES = {
   grammar: ["Grammar quiz", "aptis", "/live/host/"],
+  "aptis-grammar-quiz-live": ["Aptis Grammar Live", "aptis", "/live/aptis-grammar/host/"],
   vocab: ["Vocabulary quiz", "aptis", "/live/host/"],
   "textbook-vocabulary-live": ["Textbook Vocabulary Quiz", "seifhub", "/live/textbook-vocabulary/host/"],
   "collocation-team": ["Collocation Team Challenge", "aptis", "/live/collocations/host/"],
@@ -154,7 +155,7 @@ function responseCount(value) {
 
 function getParticipation(game, metadata) {
   const participants = Object.entries(game.players || {}).filter(([, player]) => player && typeof player === "object");
-  if (["grammar", "vocab", "textbook-vocabulary-live", "spanglish_fixit"].includes(game.type)) {
+  if (["grammar", "aptis-grammar-quiz-live", "vocab", "textbook-vocabulary-live", "spanglish_fixit"].includes(game.type)) {
     const expected = metadata.questionCount && metadata.questionCount * (game.type === "spanglish_fixit" ? 2 : 1);
     return quizResults(game, participants, expected);
   }

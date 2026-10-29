@@ -9,31 +9,27 @@
 }
 
 .toolbar button {
-  background: var(--color-surface-3);
-  border: 1px solid var(--color-border);
-  color: var(--color-text);
+  background: #eee;
+  border: 1px solid #ccc;
+  color: #111;
   padding: 0.25rem 0.5rem;
   cursor: pointer;
   font-weight: bold;
 }
 
 .toolbar button:hover {
-  border-color: var(--color-border-strong);
-  background: var(--color-surface-2);
+  background: #e4e4e4;
 }
 
 .active {
-  background: var(--color-border) !important;
-  border-color: var(--color-border-strong) !important;
+  background: #ddd !important;
+  border-color: #888 !important;
 }
 
 .editable {
   padding: 0.5rem;
-  border: 1px solid var(--color-border);
+  border: 1px solid #ccc;
   border-radius: 4px;
-  background: var(--color-surface);
-  color: var(--color-text);
-  caret-color: currentColor;
   overflow-y: auto;
   direction: ltr !important;
   unicode-bidi: embed !important;
@@ -41,24 +37,18 @@
 
 .editable:empty:before {
   content: attr(data-placeholder);
-  color: var(--color-muted);
-}
-
-.editable:focus {
-  border-color: var(--color-border-strong);
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 1px;
+  color: #999;
 }
 
 .wordCount {
   text-align: right;
   margin-top: 0.25rem;
   font-size: 0.875rem;
-  color: var(--color-muted);
+  color: #555;
 }
 
 .wordCountWarning {
-  color: var(--color-danger);
+  color: red;
   font-weight: bold;
 }
 
@@ -68,11 +58,10 @@
   right: 0.5rem;
   background: none;
   border: none;
-  color: var(--color-text-soft);
   font-size: 1.2rem;
   cursor: pointer;
 }
 
 .bookmarked {
-  color: var(--color-accent);
+  color: gold;
 }

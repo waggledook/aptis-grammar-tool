@@ -1,0 +1,29 @@
+.ctl-page.agl-live-room { --ctl-blue: #88dfcc; }
+.agl-live-room :is(h1, h2, h3) { color: #edf7f4; }
+.agl-live-room .ctl-hero h1 { text-align: left; }
+.ctl-page.agl-live-room .ctl-kicker, .ctl-page.agl-live-room .ctl-label { color: #88dfcc; }
+.ctl-page.agl-live-room .ctl-button-primary { background: #88dfcc; border-color: #88dfcc; }
+.agl-live-room > .agl-back { display: inline-flex; margin-bottom: 1.3rem; color: #b2d7cf; font-size: .85rem; text-decoration: none; }
+.agl-live-explanation { margin-top: 1.2rem; padding: 1rem; border: 1px solid #426b60; border-radius: 10px; color: #cae9de; background: #17332f; text-align: left; font-size: .95rem; line-height: 1.65; }
+.agl-live-explanation p { margin: .4rem 0 0; }
+.agl-explanation-heading { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .75rem; }
+.agl-explanation-heading .ctl-button { flex-shrink: 0; font-size: .8rem; }
+.agl-option-explanation-list { display: grid; gap: .75rem; margin: 1rem 0 0; padding: 0; list-style: none; }
+.agl-option-explanation-list li { padding: 1rem; border: 1px solid #45605f; border-radius: 9px; background: #122a2c; }
+.agl-option-explanation-list li.is-correct { border-color: #68b797; background: #1b4035; }
+.agl-option-explanation-heading { display: flex; align-items: center; gap: .65rem; flex-wrap: wrap; }
+.agl-option-letter { display: grid; place-items: center; flex: 0 0 1.8rem; height: 1.8rem; border-radius: 50%; background: #294448; color: #d5ede8; font-size: .78rem; font-weight: 800; }
+.agl-option-explanation-heading strong { overflow-wrap: anywhere; }
+.agl-option-verdict { margin-left: auto; padding: .15rem .45rem; border-radius: 5px; background: #463b38; color: #edc6b9; font-size: .7rem; font-weight: 700; }
+.is-correct .agl-option-verdict { background: #2b5c46; color: #c0f0d3; }
+.agl-option-explanation-list p { font-size: .9rem; line-height: 1.7; }
+@media (max-width: 520px) {
+  .agl-explanation-heading { align-items: stretch; flex-direction: column; }
+  .agl-explanation-heading .ctl-button { width: 100%; }
+  .agl-option-explanation-list li { padding: .8rem; }
+}
+.agl-live-review { margin-top: 2rem; text-align: left; }
+.agl-live-review details { padding: 1rem 0; border-top: 1px solid #315a63; line-height: 1.7; }
+.agl-live-review summary { cursor: pointer; font-weight: 600; }
+.agl-live-review summary small { display: block; margin-top: .3rem; color: #88dfcc; font-size: .8rem; }
+.agl-live-review details p { margin: .7rem 0 0; color: #b6cfcc; }

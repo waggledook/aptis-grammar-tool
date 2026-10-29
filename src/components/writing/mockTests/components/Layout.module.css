@@ -1,8 +1,10 @@
 .wrapper {
     position: relative;
     min-height: 100vh;
-    background: var(--color-page-bg);
-    color: var(--color-text);
+    background: #fff;
+    color: #111;
+    /* The exam keeps its paper appearance independently of the menu theme. */
+    color-scheme: light;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
       'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   }
@@ -18,27 +20,22 @@
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
-  background: linear-gradient(135deg, #16803c 0%, #166534 100%);
+  background: linear-gradient(135deg, #28a745 0%, #218838 100%);
   color: white;
   font-size: 1.125rem;
   cursor: pointer;
-  box-shadow: 0 4px 8px var(--color-shadow-soft);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .wrapper :where(button):hover {
   transform: translateY(-2px);
-  box-shadow: 0 7px 12px var(--color-shadow);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
 }
 
 .wrapper :where(button):active {
   transform: translateY(1px);
-  box-shadow: 0 3px 5px var(--color-shadow-soft);
-}
-
-.wrapper :where(button):focus-visible {
-  outline: 3px solid var(--focus-ring);
-  outline-offset: 2px;
+  box-shadow: 0 3px 4px rgba(0, 0, 0, 0.1);
 }
   
   /* --- Header & Timer --- */
@@ -47,14 +44,7 @@
     top: 0;
     right: 0;
     padding: 0.5rem 1rem;
-    border: 1px solid var(--color-border);
-    border-top: 0;
-    border-right: 0;
-    border-radius: 0 0 0 10px;
-    background: var(--color-surface-raised);
-    color: var(--color-text);
-    box-shadow: 0 4px 18px var(--color-shadow-soft);
-    backdrop-filter: blur(12px);
+    background: white;
     z-index: 10;
   
     display: flex;
@@ -66,7 +56,7 @@
     text-align: right;
   }
 .mockLabel {
-    color: var(--color-muted);
+    color: #555;
     font-size: 0.75rem;
     font-weight: 700;
     margin-bottom: 2px;
@@ -78,14 +68,14 @@
   }
   .timerText {
     font-size: 0.75rem;
-    color: var(--color-muted);
+    color: #555;
     margin-top: 2px;
   }
   
   .timeBarContainer {
     width: 120px;
     height: 4px;
-    background: var(--color-surface-3);
+    background: #e0e0e0;
     border-radius: 2px;
     margin-top: 4px;
     overflow: hidden;
@@ -93,7 +83,7 @@
   
   .timeBar {
     height: 100%;
-    background: var(--color-border-strong);
+    background: #5a2d82;
     transition: width 1s linear;
   }
   
@@ -109,10 +99,8 @@
     justify-content: space-between;
     align-items: center;
     padding: 0.5rem 1rem;
-    background: var(--color-surface-raised);
-    border-top: 1px solid var(--color-border);
-    box-shadow: 0 -6px 20px var(--color-shadow-soft);
-    backdrop-filter: blur(12px);
+    background: white;
+    border-top: 1px solid #ddd;
     z-index: 10;
   }
   
@@ -142,9 +130,8 @@
   
   /* Menu = neutral gray */
   .menuButton {
-    border: 1px solid var(--color-border);
-    background: var(--color-surface-2);
-    color: var(--color-text);
+    background: #eee;
+    color: #333;
   }
   .menuButton:hover {
     transform: translateY(-2px);
@@ -167,7 +154,7 @@
     transition: transform 0.2s ease, box-shadow 0.2s ease;
   
     /* vibrant blue gradient */
-    background: linear-gradient(135deg, #1d4ed8 0%, #0369a1 100%);
+    background: linear-gradient(135deg, #0066ff 0%, #00ccff 100%);
     color: white;
   }
   
@@ -190,10 +177,7 @@
   }
   .drawer {
     width: 200px;
-    border-right: 1px solid var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-text);
-    box-shadow: 12px 0 30px var(--color-shadow);
+    background: white;
     padding: 1rem;
   }
   .drawerList {
@@ -210,12 +194,12 @@
     width: 100%;
     box-sizing: border-box;  /* ← include padding in width calculation */
     padding: 0.75rem 1rem;/* comfortable tap area */
-    color: var(--color-text);
+    color: #333;          /* dark text */
     text-align: left;
     cursor: pointer;
   }
   .drawerList button:hover {
-    background: var(--color-surface-2);
+    background: #f5f5f5;  /* light hover highlight */
   }
   
   /* --- Review Modal --- */
@@ -229,10 +213,7 @@
     z-index: 100;
   }
   .modal {
-    border: 1px solid var(--color-border);
-    background: var(--color-surface);
-    color: var(--color-text);
-    box-shadow: 0 24px 70px var(--color-shadow);
+    background: white;
     border-radius: 8px;
     width: 90%;
     max-width: 500px;
@@ -243,7 +224,7 @@
   }
   .modalSubheader {
     margin: 0 0 1rem;
-    color: var(--color-muted);
+    color: #555;
   }
   .partList {
     list-style: none;
@@ -253,7 +234,7 @@
     display: flex;
     justify-content: space-between;
     padding: 0.5rem 0.75rem;
-    border: 1px solid var(--color-border);
+    border: 1px solid #ddd;
     border-radius: 4px;
     margin-bottom: 0.5rem;
   }
@@ -330,7 +311,7 @@
     border-radius: 4px;
   }
   .partButton:hover {
-    background: var(--color-surface-2);
+    background: #f5f5f5;
   }
   .partItem + .partItem {
     margin-top: 0.5rem;
@@ -352,9 +333,9 @@
     cursor: pointer;
     box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    background: var(--color-surface-2);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
+    background: #eee;
+    color: #333;
+    border: 1px solid #ccc;
   }
   .cancelButton:hover {
     transform: translateY(-2px);
@@ -396,7 +377,7 @@
 
   .errorText {
     margin: 0.75rem 0 0;
-    color: var(--color-danger);
+    color: #b42318;
     font-size: 0.95rem;
   }
   
