@@ -126,6 +126,8 @@ import GrammarSetRunner from "./components/grammar/GrammarSetRunner";
 import TeacherAptisGrammarLiveBuilder from "./components/teacher/TeacherAptisGrammarLiveBuilder.jsx";
 import UseOfEnglishCustomQuizRunner from "./components/grammar/UseOfEnglishCustomQuizRunner.jsx";
 import GrammarReviewBeta from "./components/grammar/GrammarReviewBeta.jsx";
+import GerundInfinitiveActivity from "./components/grammar/GerundInfinitiveActivity.jsx";
+import { GERUND_INFINITIVE_PATH } from "./utils/gerundInfinitiveActivity.js";
 import GrammarReviewNudge from "./components/grammar/GrammarReviewNudge.jsx";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 import AdminActivityLog from "./components/admin/AdminActivityLog.jsx";
@@ -1544,6 +1546,15 @@ return (
 
    {/* ————— Show the right “page” ————— */}
 <Routes>
+  {/* Shared direct-link resource, available to signed-in learners on every platform. */}
+  <Route
+    path={GERUND_INFINITIVE_PATH}
+    element={
+      <RequireSignedIn user={user} onSignIn={() => setShowAuth(true)}>
+        {user && <GerundInfinitiveActivity key={`${user.uid}:${currentSite.id}`} user={user} siteId={currentSite.id} />}
+      </RequireSignedIn>
+    }
+  />
   {showMemberAccessGate ? (
     <>
       <Route path="/privacy" element={<PrivacyPolicy />} />

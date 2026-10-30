@@ -5,6 +5,8 @@ export const WRITING_GENERAL_GUEST_LABEL = "Guest (Aptis Writing General)";
 export const ACTIVITY_TYPE_LABELS = {
   grammar_session: "Grammar Session",
   grammar_session_completed: "Grammar Session Completed",
+  gerund_infinitive_started: "Gerund or Infinitive Started",
+  gerund_infinitive_completed: "Gerund or Infinitive Completed",
   grammar_reference_opened: "Grammar Reference Opened",
   grammar_review_started: "Grammar Mistake Review Started",
   grammar_review_completed: "Grammar Mistake Review Completed",
@@ -354,6 +356,20 @@ export function formatActivityDetails(log) {
         timing,
       ]);
     }
+    case "gerund_infinitive_started":
+      return joinParts(["Gerund or infinitive?", d.siteId || "", formatCount(d.totalItems, "gap"), "4 practice cards + mixed test"]);
+    case "gerund_infinitive_completed":
+      return joinParts([
+        "Gerund or infinitive?",
+        d.siteId || "",
+        `${formatScore(d.answeredCount, d.totalItems)} checked`,
+        `${formatScore(d.correctCount, d.totalItems)} correct`,
+        `${d.revealedCount ?? 0} shown`,
+        `${d.firstCorrectCount ?? 0} correct on first check`,
+        d.mixed ? `Mixed test ${formatScore(d.mixed.correctCount, d.mixed.total)}` : "",
+        ...(Array.isArray(d.cards) ? d.cards.map((card) => `${card.title}: ${formatScore(card.correctCount, card.total)}`) : []),
+        typeof d.elapsedSeconds === "number" ? `Time ${formatDurationSeconds(d.elapsedSeconds)}` : "",
+      ]);
     case "grammar_session": {
       const modeLabel = d.mode === "test" ? "Test mode" : "Practice";
       return joinParts([modeLabel, formatCount(d.totalItems, "item")]);

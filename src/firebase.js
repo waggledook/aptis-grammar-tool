@@ -1218,6 +1218,22 @@ export async function logActivity(type, details = {}) {
   }
 }
 
+// This activity confirms saves to the learner, so propagate failures for retry.
+export async function saveGerundInfinitiveActivityEvent(phase, details, expectedUserId) {
+  const user = auth.currentUser;
+  if (!user || user.uid !== expectedUserId) throw new Error("Please sign in again to save your activity.");
+  if (!["started", "completed"].includes(phase)) throw new Error("Invalid activity event.");
+  const { app, canFinish: _canFinish, ...safeDetails } = details;
+  return addDoc(collection(db, "activityLog"), {
+    userId: user.uid,
+    userEmail: user.email || null,
+    type: `gerund_infinitive_${phase}`,
+    details: safeDetails,
+    createdAt: serverTimestamp(),
+    app,
+  });
+}
+
 const STRATEGY_GUIDE_VIEW_DEDUPE_MS = 2000;
 const recentStrategyGuideViews = new Map();
 
