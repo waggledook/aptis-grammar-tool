@@ -41,7 +41,7 @@ function capitalize(value = "") {
 function phaseLabel(session) {
   if (session.phase === "live") return "Live now";
   if (session.phase === "review") {
-    return new Date(session.reviewUntil || 0) > new Date() ? "Two-week review" : "Review expired";
+    return new Date(session.reviewUntil || 0) > new Date() ? "Review open" : "Review expired";
   }
   return "Preparation open";
 }
@@ -540,9 +540,9 @@ export default function SpeakingWorkshopSessionManager({ user }) {
         <div>
           <span className="workshop-kicker">Teacher controls</span>
           <h2 id="workshop-manager-title">Run a workshop session</h2>
-          <p>Preparation opens immediately. Practice unlocks at the scheduled start, and students can still register while the workshop is live. Ending it keeps access open for exactly two weeks.</p>
+          <p>Preparation opens immediately. Practice unlocks at the scheduled start, and students can still register while the workshop is live. Ending it keeps access open for exactly four weeks.</p>
         </div>
-        <span className="workshop-review-rule"><CalendarClock size={19} /> 14-day review</span>
+        <span className="workshop-review-rule"><CalendarClock size={19} /> 28-day review</span>
       </header>
 
       <form className="workshop-create-form" onSubmit={handleCreate}>

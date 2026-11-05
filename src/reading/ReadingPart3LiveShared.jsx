@@ -14,12 +14,12 @@ export function ReadingPart3LiveTask({ task, answers = {}, onChange, disabled = 
   return (
     <section className="rp3-live-questions">
       <header><span>Questions 1–7</span><h2>Who expresses each idea?</h2></header>
-      <ol>{task.questions.map((question) => (
+      <ol>{task.questions.map((question, index) => (
         <li key={question.id}>
-          <span>{question.id}</span>
+          <span>{index + 1}</span>
           <label>
             <strong>{question.text}</strong>
-            <select aria-label={`Answer question ${question.id}`} disabled={disabled} onChange={(event) => onChange?.(question.id, event.target.value)} value={answers[question.id] || ""}>
+            <select aria-label={`Answer question ${index + 1}`} disabled={disabled} onChange={(event) => onChange?.(question.id, event.target.value)} value={answers[question.id] || ""}>
               <option value="">Choose a person</option>
               {names.map((name) => <option key={name} value={name}>{name}</option>)}
             </select>
@@ -38,7 +38,7 @@ export function ReadingPart3FullReview({ task, players = [], playerAnswers, show
   return (
     <section className="rp3-full-review">
       <header><div><span>Complete task review</span><h2>{task.title}</h2></div><strong>{studentView ? "Your answers" : `${players.length} students`}</strong></header>
-      <ol>{task.questions.map((question) => {
+      <ol>{task.questions.map((question, index) => {
         const selected = answers[question.id];
         const correct = selected === question.answer;
         const classAnswers = players.map((player) => player.readingPart3Submission?.taskId === task.id ? player.readingPart3Submission.answers?.[question.id] : null).filter(Boolean);
@@ -46,7 +46,7 @@ export function ReadingPart3FullReview({ task, players = [], playerAnswers, show
         const stateClass = studentView ? correct ? "is-correct" : selected ? "is-wrong" : "is-empty" : "";
         return (
           <li className={stateClass} key={question.id}>
-            <span>{question.id}</span>
+            <span>{index + 1}</span>
             <div>
               <h3>{question.text}</h3>
               {studentView ? <p className="rp3-review-answer"><strong>Your answer:</strong> {selected || "Not answered"}</p> : (

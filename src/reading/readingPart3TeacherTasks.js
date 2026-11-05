@@ -1,3 +1,4 @@
+// Question IDs stay stable for saved answers; their array order controls presentation.
 export const READING_PART3_TEACHER_TASKS = [
   {
     "id": "repair-or-replace",
@@ -22,25 +23,18 @@ export const READING_PART3_TEACHER_TASKS = [
     ],
     "questions": [
       {
+        "id": 6,
+        "text": "Who chooses replacements that should remain useful longer?",
+        "answer": "Marcus",
+        "evidence": "\"I spend more on something well made\" and \"Paying less immediately can be expensive if the same problem returns next year.\"",
+        "explanation": "When Marcus replaces something, he chooses a better-quality product that is less likely to break quickly."
+      },
+      {
         "id": 1,
         "text": "Who avoids repairs that could make an item dangerous?",
         "answer": "Elena",
         "evidence": "\"If a repair involves electricity or could make an appliance unsafe, I take it to someone qualified.\"",
         "explanation": "Elena attempts simple repairs but avoids jobs that might create a safety risk."
-      },
-      {
-        "id": 2,
-        "text": "Who replaces products when repairs offer poor value?",
-        "answer": "Marcus",
-        "evidence": "\"The work would cost almost as much as a new one.\"",
-        "explanation": "Marcus replaces cheaper products when paying for a repair would offer little financial benefit."
-      },
-      {
-        "id": 3,
-        "text": "Who accepts imperfect results in order to reduce waste?",
-        "answer": "Nadia",
-        "evidence": "\"Waste is my main concern\" and \"My repairs don't always look perfect.\"",
-        "explanation": "Nadia accepts less attractive results and some inconvenience because she wants to prevent usable objects from being thrown away. Marcus also dislikes throwing things away, but he replaces products when repairing them offers poor value."
       },
       {
         "id": 4,
@@ -50,18 +44,11 @@ export const READING_PART3_TEACHER_TASKS = [
         "explanation": "Tom pays to preserve particular objects because of their sentimental importance rather than their financial value."
       },
       {
-        "id": 5,
-        "text": "Who is shown how to repair things at an event?",
+        "id": 3,
+        "text": "Who accepts imperfect results in order to reduce waste?",
         "answer": "Nadia",
-        "evidence": "Nadia takes items to a monthly repair café, where volunteers show visitors what to do instead of completing the repairs for them.",
-        "explanation": "The organised event and direct guidance distinguish Nadia from Elena, who learns from her father and uses online videos."
-      },
-      {
-        "id": 6,
-        "text": "Who chooses replacements that should remain useful longer?",
-        "answer": "Marcus",
-        "evidence": "\"I spend more on something well made\" and \"Paying less immediately can be expensive if the same problem returns next year.\"",
-        "explanation": "When Marcus replaces something, he chooses a better-quality product that is less likely to break quickly."
+        "evidence": "\"Waste is my main concern\" and \"My repairs don't always look perfect.\"",
+        "explanation": "Nadia accepts less attractive results and some inconvenience because she wants to prevent usable objects from being thrown away. Marcus also dislikes throwing things away, but he replaces products when repairing them offers poor value."
       },
       {
         "id": 7,
@@ -69,6 +56,20 @@ export const READING_PART3_TEACHER_TASKS = [
         "answer": "Elena",
         "evidence": "\"Online videos have made that much easier.\"",
         "explanation": "Elena uses instructional videos to help her carry out straightforward repairs."
+      },
+      {
+        "id": 5,
+        "text": "Who is shown how to repair things at an event?",
+        "answer": "Nadia",
+        "evidence": "Nadia takes items to a monthly repair café, where volunteers show visitors what to do instead of completing the repairs for them.",
+        "explanation": "The organised event and direct guidance distinguish Nadia from Elena, who learns from her father and uses online videos."
+      },
+      {
+        "id": 2,
+        "text": "Who replaces products when repairs offer poor value?",
+        "answer": "Marcus",
+        "evidence": "\"The work would cost almost as much as a new one.\"",
+        "explanation": "Marcus replaces cheaper products when paying for a repair would offer little financial benefit."
       }
     ]
   },
@@ -95,6 +96,27 @@ export const READING_PART3_TEACHER_TASKS = [
     ],
     "questions": [
       {
+        "id": 3,
+        "text": "Who widened their social circle after living with strangers?",
+        "answer": "Mei",
+        "evidence": "Mei's housemates introduced her to friends from several countries, making her social life wider.",
+        "explanation": "The people she lives with were originally strangers, but they subsequently helped her meet a wider range of people."
+      },
+      {
+        "id": 6,
+        "text": "Who has fewer meal duties because everyone contributes?",
+        "answer": "Mei",
+        "evidence": "The housemates take turns cooking, meaning each person only prepares dinner twice a week.",
+        "explanation": "Everyone contributes to the arrangement, reducing the number of meals Mei personally has to prepare. Rosa also believes everyone should contribute, but she discusses cleaning and household supplies rather than meals."
+      },
+      {
+        "id": 5,
+        "text": "Who now avoids living with people they know very well?",
+        "answer": "Lucas",
+        "evidence": "After sharing damaged a close friendship, Lucas began to prefer living with people he knows less well.",
+        "explanation": "Candidates must infer that Lucas now avoids sharing with close friends, rather than simply matching the question to a repeated expression."
+      },
+      {
         "id": 1,
         "text": "Who avoids a long journey by sharing housing costs?",
         "answer": "Rosa",
@@ -109,11 +131,11 @@ export const READING_PART3_TEACHER_TASKS = [
         "explanation": "Having complete control is conveyed through several details: the space is entirely his, and he can invite people over, cook late or leave things untidy. He considers this freedom worth the additional cost."
       },
       {
-        "id": 3,
-        "text": "Who widened their social circle after living with strangers?",
-        "answer": "Mei",
-        "evidence": "Mei's housemates introduced her to friends from several countries, making her social life wider.",
-        "explanation": "The people she lives with were originally strangers, but they subsequently helped her meet a wider range of people."
+        "id": 7,
+        "text": "Who tries to prevent future difficulties through early discussion?",
+        "answer": "Lucas",
+        "evidence": "Before anyone moves in, the household discusses working hours, visitors and acceptable noise. Lucas says this prevents later problems.",
+        "explanation": "The answer requires candidates to connect the early discussion with its intended future effect. Rosa also uses a household system, but hers was introduced after the residents had already begun sharing."
       },
       {
         "id": 4,
@@ -121,27 +143,6 @@ export const READING_PART3_TEACHER_TASKS = [
         "answer": "Rosa",
         "evidence": "Rosa's household introduced a weekly list for cleaning and buying supplies, after which arguments about whose turn it was almost disappeared.",
         "explanation": "The weekly list represents the organisation of shared duties, and fewer arguments are its reported result. Lucas mentions disagreements, creating a lexical distraction, but he does not report this particular outcome."
-      },
-      {
-        "id": 5,
-        "text": "Who now avoids living with people they know very well?",
-        "answer": "Lucas",
-        "evidence": "After sharing damaged a close friendship, Lucas began to prefer living with people he knows less well.",
-        "explanation": "Candidates must infer that Lucas now avoids sharing with close friends, rather than simply matching the question to a repeated expression."
-      },
-      {
-        "id": 6,
-        "text": "Who has fewer meal duties because everyone contributes?",
-        "answer": "Mei",
-        "evidence": "The housemates take turns cooking, meaning each person only prepares dinner twice a week.",
-        "explanation": "Everyone contributes to the arrangement, reducing the number of meals Mei personally has to prepare. Rosa also believes everyone should contribute, but she discusses cleaning and household supplies rather than meals."
-      },
-      {
-        "id": 7,
-        "text": "Who tries to prevent future difficulties through early discussion?",
-        "answer": "Lucas",
-        "evidence": "Before anyone moves in, the household discusses working hours, visitors and acceptable noise. Lucas says this prevents later problems.",
-        "explanation": "The answer requires candidates to connect the early discussion with its intended future effect. Rosa also uses a household system, but hers was introduced after the residents had already begun sharing."
       }
     ]
   },
@@ -168,11 +169,11 @@ export const READING_PART3_TEACHER_TASKS = [
     ],
     "questions": [
       {
-        "id": 1,
-        "text": "Who wants tourists to visit throughout the year?",
-        "answer": "Lucía",
-        "evidence": "Lucía wants food weekends and cultural events to be promoted during the colder months.",
-        "explanation": "She wants a steadier flow of visitors instead of tourism being concentrated between June and August. Daniel also experiences seasonal problems, but he does not propose attracting visitors throughout the year."
+        "id": 5,
+        "text": "Who cannot depend on receiving regular work?",
+        "answer": "Daniel",
+        "evidence": "Daniel may work six days a week during busy periods but receive no shifts during quieter weeks.",
+        "explanation": "The amount of work and income he receives changes greatly, making his employment unreliable."
       },
       {
         "id": 2,
@@ -189,18 +190,18 @@ export const READING_PART3_TEACHER_TASKS = [
         "explanation": "Eva connects the growth of holiday accommodation with reduced housing availability and higher costs for residents."
       },
       {
-        "id": 4,
-        "text": "Who believes visitors help independent local businesses?",
-        "answer": "Lucía",
-        "evidence": "Lucía says several small businesses near her bakery would probably close without visitors.",
-        "explanation": "She believes tourist spending is necessary for the survival of independent businesses in the town."
+        "id": 7,
+        "text": "Who wants visitors directed beyond the busiest area?",
+        "answer": "Eva",
+        "evidence": "Eva wants attractions outside the historic centre to be advertised.",
+        "explanation": "She wants visitors to explore quieter neighbourhoods so that the benefits and pressures of tourism are distributed more widely."
       },
       {
-        "id": 5,
-        "text": "Who cannot depend on receiving regular work?",
-        "answer": "Daniel",
-        "evidence": "Daniel may work six days a week during busy periods but receive no shifts during quieter weeks.",
-        "explanation": "The amount of work and income he receives changes greatly, making his employment unreliable."
+        "id": 1,
+        "text": "Who wants tourists to visit throughout the year?",
+        "answer": "Lucía",
+        "evidence": "Lucía wants food weekends and cultural events to be promoted during the colder months.",
+        "explanation": "She wants a steadier flow of visitors instead of tourism being concentrated between June and August. Daniel also experiences seasonal problems, but he does not propose attracting visitors throughout the year."
       },
       {
         "id": 6,
@@ -210,11 +211,11 @@ export const READING_PART3_TEACHER_TASKS = [
         "explanation": "Despite the inconvenience of crowds, he appreciates interacting with people from other places."
       },
       {
-        "id": 7,
-        "text": "Who wants visitors directed beyond the busiest area?",
-        "answer": "Eva",
-        "evidence": "Eva wants attractions outside the historic centre to be advertised.",
-        "explanation": "She wants visitors to explore quieter neighbourhoods so that the benefits and pressures of tourism are distributed more widely."
+        "id": 4,
+        "text": "Who believes visitors help independent local businesses?",
+        "answer": "Lucía",
+        "evidence": "Lucía says several small businesses near her bakery would probably close without visitors.",
+        "explanation": "She believes tourist spending is necessary for the survival of independent businesses in the town."
       }
     ]
   },
@@ -248,32 +249,11 @@ export const READING_PART3_TEACHER_TASKS = [
         "explanation": "She supports reducing traffic, but only once public transport has become a reliable alternative."
       },
       {
-        "id": 2,
-        "text": "Who would travel differently if they felt better protected?",
-        "answer": "Carla",
-        "evidence": "Carla would use her bicycle more often if there were a protected route.",
-        "explanation": "The lack of physical protection from buses and cars currently affects how frequently she cycles."
-      },
-      {
-        "id": 3,
-        "text": "Who fears a transport policy could send shoppers elsewhere?",
-        "answer": "Ben",
-        "evidence": "Ben believes customers from nearby villages may use an out-of-town shopping centre if parking disappears.",
-        "explanation": "He fears the policy could cause customers to take their business somewhere else."
-      },
-      {
         "id": 4,
         "text": "Who says walking areas must consider physical ability?",
         "answer": "David",
         "evidence": "David describes the difficulty of crossing a traffic-free area with a walking stick, particularly without seats.",
         "explanation": "He argues that removing vehicles does not automatically make an area accessible to people with different physical needs."
-      },
-      {
-        "id": 5,
-        "text": "Who experiences delays while already using the suggested alternative?",
-        "answer": "Aisha",
-        "evidence": "Aisha already travels by bus, but heavy traffic can make a ten-minute journey take twice as long.",
-        "explanation": "The bus is the proposed alternative to private cars, yet its present service is crowded and unreliable."
       },
       {
         "id": 6,
@@ -283,11 +263,32 @@ export const READING_PART3_TEACHER_TASKS = [
         "explanation": "Rather than allowing or banning traffic permanently, he proposes different access rules at different times."
       },
       {
+        "id": 2,
+        "text": "Who would travel differently if they felt better protected?",
+        "answer": "Carla",
+        "evidence": "Carla would use her bicycle more often if there were a protected route.",
+        "explanation": "The lack of physical protection from buses and cars currently affects how frequently she cycles."
+      },
+      {
         "id": 7,
         "text": "Who connects fewer vehicles with a healthier shared environment?",
         "answer": "Carla",
         "evidence": "Carla connects fewer vehicles with cleaner air and additional space for trees, seating and cafés.",
         "explanation": "She sees reducing traffic as a way of improving health and the shared surroundings, not merely helping cyclists."
+      },
+      {
+        "id": 5,
+        "text": "Who experiences delays while already using the suggested alternative?",
+        "answer": "Aisha",
+        "evidence": "Aisha already travels by bus, but heavy traffic can make a ten-minute journey take twice as long.",
+        "explanation": "The bus is the proposed alternative to private cars, yet its present service is crowded and unreliable."
+      },
+      {
+        "id": 3,
+        "text": "Who fears a transport policy could send shoppers elsewhere?",
+        "answer": "Ben",
+        "evidence": "Ben believes customers from nearby villages may use an out-of-town shopping centre if parking disappears.",
+        "explanation": "He fears the policy could cause customers to take their business somewhere else."
       }
     ]
   },
@@ -314,11 +315,32 @@ export const READING_PART3_TEACHER_TASKS = [
     ],
     "questions": [
       {
+        "id": 4,
+        "text": "Who trusts recommendations more when they know the person?",
+        "answer": "Ethan",
+        "evidence": "Ethan would rather ask a friend who understands what matters to him.",
+        "explanation": "Because he knows the person, Ethan can judge how seriously to take the recommendation even when their tastes differ."
+      },
+      {
+        "id": 7,
+        "text": "Who changes their rating after a satisfactory response?",
+        "answer": "Priya",
+        "evidence": "Priya changed a delivery service's rating from two stars to four after receiving an immediate refund.",
+        "explanation": "She revised her judgement after the company responded satisfactorily to the missing order."
+      },
+      {
         "id": 1,
         "text": "Who compares several opinions before choosing a business?",
         "answer": "Nora",
         "evidence": "Nora considers the overall pattern, pays attention when several people mention the same problem and checks reviews before choosing a hotel or restaurant.",
         "explanation": "Nora compares multiple opinions before deciding where to go. Sam also pays attention to repeated comments, but he uses them to improve his own business rather than choose another one."
+      },
+      {
+        "id": 5,
+        "text": "Who checks when feedback was written before trusting it?",
+        "answer": "Nora",
+        "evidence": "Nora checks dates because a place may have changed its staff or management since older reviews were written.",
+        "explanation": "She considers when feedback was published before deciding whether it is still useful and trustworthy. Sam also mentions reviews remaining visible for years, but he discusses their effect on a business rather than how he evaluates them."
       },
       {
         "id": 2,
@@ -335,32 +357,11 @@ export const READING_PART3_TEACHER_TASKS = [
         "explanation": "She delays making the complaint public so that the business can respond directly."
       },
       {
-        "id": 4,
-        "text": "Who trusts recommendations more when they know the person?",
-        "answer": "Ethan",
-        "evidence": "Ethan would rather ask a friend who understands what matters to him.",
-        "explanation": "Because he knows the person, Ethan can judge how seriously to take the recommendation even when their tastes differ."
-      },
-      {
-        "id": 5,
-        "text": "Who checks when feedback was written before trusting it?",
-        "answer": "Nora",
-        "evidence": "Nora checks dates because a place may have changed its staff or management since older reviews were written.",
-        "explanation": "She considers when feedback was published before deciding whether it is still useful and trustworthy. Sam also mentions reviews remaining visible for years, but he discusses their effect on a business rather than how he evaluates them."
-      },
-      {
         "id": 6,
         "text": "Who replies publicly for the benefit of future customers?",
         "answer": "Sam",
         "evidence": "Sam replies politely and explains what has changed, not only for the original customer but also for anyone reading later.",
         "explanation": "His public response is intended to reassure prospective customers that the café listens and takes problems seriously."
-      },
-      {
-        "id": 7,
-        "text": "Who changes their rating after a satisfactory response?",
-        "answer": "Priya",
-        "evidence": "Priya changed a delivery service's rating from two stars to four after receiving an immediate refund.",
-        "explanation": "She revised her judgement after the company responded satisfactorily to the missing order."
       }
     ]
   }

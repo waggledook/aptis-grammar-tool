@@ -411,7 +411,7 @@ useEffect(() => {
         })() : null}
 
         <ol className="questions">
-          {current.questions.map((q) => {
+          {current.questions.map((q, index) => {
             const fb = feedback[q.id];
             const isUnanswered = !!resultMode && !answers[q.id];
             const needsRecheck = !!resultMode && !!answers[q.id] && fb == null;
@@ -443,7 +443,7 @@ useEffect(() => {
                   <span className="qtext">{q.text}</span>
 
                   <select
-                    aria-label={`Answer question ${q.id}: ${q.text}`}
+                    aria-label={`Answer question ${index + 1}: ${q.text}`}
                     value={answers[q.id] || ""}
                     onChange={(e) => handleChange(q.id, e.target.value)}
                   >

@@ -180,7 +180,7 @@ async function saveRegisterAttempt(meta, attempt) {
                 { phrase: "Sounds good to me!", key: "informal", why: "Informal use of exclamation mark '!' and informal omission of subject 'It'." },
                 { phrase: "I have some reservations about the proposal.", key: "formal", why: "Neutral, hedged evaluation suits formal tone." },
                 { phrase: "Let me know what you think!", key: "informal", why: "Fixed phrases like 'let me know', and the use of the exclamation '!'." },
-                { phrase: "I look forward to hearing from you.", key: "formal", why: "Set phrase in formal writing. Compare in an informal email, '(I'm) looking forward to seeign you'" },
+                { phrase: "I look forward to hearing from you.", key: "formal", why: "Set phrase in formal writing. Compare in an informal email, '(I'm) looking forward to seeing you'" },
                 { phrase: "Speak to you soon!", key: "informal", why: "Informal goodbye; omits the subject and auxiliary verb (I will). This type of omission is typical of informal writing." },
                 {
                   phrase: "I think they should refund the full amount, don’t you?",

@@ -43,11 +43,6 @@ const PRODUCT_GROUPS = [
             icon: BookOpenCheck,
             tags: ["Multi-student", "Custom mix", "Immediate feedback"],
           },
-        ],
-      },
-      {
-        title: "Vocabulary",
-        resources: [
           {
             title: "Collocation Team Challenge",
             description: "Choose levels, rounds and individual sets, then run a timed team game with personalised review.",
@@ -255,6 +250,13 @@ const PRODUCT_GROUPS = [
             path: "/ote/listening",
             icon: Headphones,
             tags: ["Listening", "Live lesson"],
+          },
+          {
+            title: "Advanced Listening Parts 1 & 4 · Additional C1 Challenge",
+            description: "Open five upper-C1 short extracts for independent practice, with recorded audio, transcripts and detailed answer feedback.",
+            path: "/ote/listening/advanced/part-1-short-extracts/practice/additional-c1-challenge",
+            icon: Headphones,
+            tags: ["Advanced Listening", "Direct link", "5 extracts"],
           },
           {
             title: "Advanced Listening Part 2 · Removing space debris",
