@@ -785,6 +785,170 @@ export const advancedListeningPart2Sets = [
       "The final answer distinguishes usage labels from subject labels by their function for readers.",
     ],
   },
+  {
+    id: "effective-practice-in-sport",
+    level: "C1",
+    title: "What Makes Practice Effective in Sport",
+    description: "Complete six gaps in a set of lecture notes with words from the recording.",
+    teacherOnly: true,
+    assetsReady: true,
+    audioReady: true,
+    audioSrc: "/audio/ote/listening/advanced/part-2/effective-practice-in-sport/practice.mp3",
+    instructionAudioReady: true,
+    instructionAudioSrc: "/audio/ote/listening/advanced/part-2/effective-practice-in-sport/question.mp3",
+    instructions: "Listen to a lecture about effective practice in sport. Complete the gaps in the notes with a word or two-word phrase from the audio. Remember to check your spelling.",
+    preparationPrompt: "The clock shows how much time you have to look at the task.",
+    preparationSeconds: 30,
+    gaps: [
+      {
+        id: "competitive-decisions",
+        answer: "decisions",
+        section: "Defining success",
+        before: "Effective practice develops the",
+        after: "needed during competition.",
+        review: {
+          explanation: "Practice develops the ability to select a response during competition, as well as execute a movement.",
+          correctQuote: "decisions",
+          distractors: [
+            {
+              quote: "movements",
+              note: "Movements are also practised, but the note focuses on selecting responses in competition."
+            }
+          ]
+        }
+      },
+      {
+        id: "accuracy-targets",
+        answer: "target areas",
+        section: "Planning activities",
+        before: "Coaches can assess accuracy by introducing smaller",
+        after: ".",
+        review: {
+          explanation: "Target areas make passing accuracy visible and can gradually be made smaller. Counting passes is a different measure.",
+          correctQuote: "target areas",
+          distractors: [
+            {
+              quote: "Counting successful passes",
+              note: "A count records success, but it is not the physical target introduced on the court."
+            }
+          ]
+        }
+      },
+      {
+        id: "reviewing-video",
+        answer: "video",
+        section: "Planning activities",
+        before: "Reviewing",
+        after: "can reveal changes missed during a session.",
+        review: {
+          explanation: "Video allows earlier and later attempts to be compared, including changes missed at the time. The lecturer also calls this a moving image.",
+          correctQuote: "Video",
+          distractors: [
+            {
+              quote: "A written score",
+              note: "A score shows how often an action worked, while video can reveal how it worked."
+            }
+          ]
+        },
+        acceptedAnswers: [
+          "moving image"
+        ]
+      },
+      {
+        id: "varying-positions",
+        answer: "starting positions",
+        section: "Planning activities",
+        before: "Changing players'",
+        after: "introduces variety without replacing the skill.",
+        review: {
+          explanation: "The coach keeps the passing task but varies where players begin. Adding an opponent is a later variation.",
+          correctQuote: "starting positions",
+          distractors: [
+            {
+              quote: "Introducing an opponent later",
+              note: "This is a subsequent change, rather than the starting arrangement described in the note."
+            }
+          ]
+        },
+        acceptedAnswers: [
+          "positions"
+        ]
+      },
+      {
+        id: "independent-assessment",
+        answer: "feedback",
+        section: "Increasing independence",
+        before: "A player's own assessment can come before the coach's",
+        after: ".",
+        review: {
+          explanation: "Before offering feedback, the coach asks the player to interpret the attempt and suggest a change.",
+          correctQuote: "feedback",
+          distractors: [
+            {
+              quote: "instructions arrive after every attempt",
+              note: "This describes the contrasting pattern in which the player may depend on instructions."
+            }
+          ]
+        }
+      },
+      {
+        id: "testing-pressure",
+        answer: "pressure",
+        section: "Checking learning",
+        before: "Skills should eventually be tested under",
+        after: ".",
+        review: {
+          explanation: "Keeping score and limiting time are examples of introducing pressure to test a skill beyond a quiet exercise.",
+          correctQuote: "pressure",
+          distractors: [
+            {
+              quote: "Keeping score or limiting the available time",
+              note: "These are examples of how pressure can be introduced; the note asks for the broader condition."
+            }
+          ]
+        }
+      }
+    ],
+    supportingNotes: [],
+    script: [
+      {
+        speaker: "Lecturer",
+        text: "Imagine watching two tennis players practise. One receives the same comfortable ball again and again, returning almost every shot successfully. The other has to move, judge an unfamiliar bounce and occasionally miss. From the side of the court, the first session might look more impressive. But a useful question is what each player will be able to do when the predictable supply of balls disappears. Today, I'd like to explore the difference between producing a good performance in practice and preparing to perform elsewhere."
+      },
+      {
+        speaker: "Lecturer",
+        text: "Repetition has a place, particularly when someone is becoming familiar with a movement. Competition, however, rarely presents an action in isolation. A player must notice where an opponent is standing and select an appropriate response. Practice therefore needs to develop decisions as well as movements. Someone who can perform a shot beautifully when told exactly what to do may still struggle to recognise the moment to use it."
+      },
+      {
+        speaker: "Lecturer",
+        text: "That distinction affects how an activity is planned. Consider a coach working on accurate passing. Simply asking for more effort gives players little to work towards. Placing target areas on the court creates a visible measure of where the ball arrives. These can gradually be made smaller. Counting successful passes is useful, although that number alone cannot show whether the movement is becoming easier or more controlled."
+      },
+      {
+        speaker: "Lecturer",
+        text: "There are other ways to examine a change. A player's memory of a session may be dominated by its final few minutes. Video allows an earlier attempt to be compared with a later one, including changes that nobody noticed at the time. A written score can show how often something worked; a moving image can help show how it worked. Neither needs to become a judgement on the player's overall ability."
+      },
+      {
+        speaker: "Lecturer",
+        text: "Variation also requires care. Replacing an exercise every few minutes may be entertaining without giving anyone time to understand it. Instead, a coach can retain the basic task but alter the starting positions. Players still work on passing, yet they must adjust to receiving the ball from somewhere different. Introducing an opponent later adds another decision. The intention is to change a meaningful demand rather than merely create novelty."
+      },
+      {
+        speaker: "Lecturer",
+        text: "Another consideration is when the coach speaks. Before offering feedback, the coach might ask a player where the last attempt went and what they would change. This gives the player an opportunity to interpret the result independently. If instructions arrive after every attempt, the next action may depend on waiting for another instruction. A conversation about one specific feature can be more manageable than a list of everything that went wrong."
+      },
+      {
+        speaker: "Lecturer",
+        text: "Finally, a skill that works in a quiet exercise needs a further test under pressure. Keeping score or limiting the available time can introduce consequences without reproducing an entire match. Mistakes then become information about what still needs work. The most useful practice session is not necessarily the one that looks most successful while it is happening."
+      }
+    ],
+    itemDesign: [
+      "Distinguish competitive decisions from the execution of movements.",
+      "Identify the physical measure used to assess accuracy rather than the count of successful passes.",
+      "Connect video with its later description as a moving image.",
+      "Separate changes to starting positions from later introduction of an opponent.",
+      "Follow the sequence of player assessment before coach feedback.",
+      "Recognise scorekeeping and time limits as examples of pressure."
+    ]
+  },
 ];
 
 export function getAdvancedListeningPart2Set(setId) {
